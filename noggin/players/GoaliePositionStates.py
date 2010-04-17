@@ -9,6 +9,7 @@ def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
     #goalie is out of position. difference in accuracy?
     player.isChasing = False
+    return player.goNow('goalieAtPosition')
     return player.goNow('goalieAwesomePosition')
 
 def goalieAwesomePosition(player):
@@ -165,3 +166,20 @@ def goalieOutOfPosition(player):
 
     return player.stay()
 
+def goalieAtPosition(player):
+    brain = player.brain
+    nav = player.brain.nav
+    if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
+        player.brain.tracker.activeLoc()
+    else:
+        player.brain.tracker.trackBall()
+
+    # Check that the position is correct
+    ## position = RobotLocation(player.brain.play.getPosition())
+
+    ## if (abs(nav.dest.x - position.x) > constants.SHOULD_POSITION_DIFF or
+    ##     abs(nav.dest.y - position,y) >  constants.SHOULD_POSITION_DIFF or
+    ##     not player.atDestinationGoalie() or
+    ##     not player.atHeading()):
+    ##     return player.goNow("goalieAwesomePosition")
+    return player.stay()
