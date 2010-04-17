@@ -54,8 +54,8 @@ def squatPosition(player):
     ball = brain.ball
     bearing = None
 
-    if (not nav.atDestinationGoalie() or
-        not nav.atHeading()):
+    if (not player.atDestinationGoalie() or
+        not player.atHeading()):
         if not useOmni:
             nav.goTo((PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y,\
                           NogginConstants.OPP_GOAL_HEADING))

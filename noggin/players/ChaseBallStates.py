@@ -62,7 +62,7 @@ def chaseAfterKick(player):
         elif player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
             turnDir = constants.TURN_LEFT
 
-        player.setSpeed(0, 0, turnDir * constants.BALL_SPIN_SPEED)
+        player.setWalk(0, 0, turnDir * constants.BALL_SPIN_SPEED)
         return player.stay()
 
     if player.brain.ball.framesOn > constants.BALL_ON_THRESH:
@@ -92,7 +92,7 @@ def turnToBall(player):
         turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_MAGNITUDE
 
     if ball.on:
-        player.setSpeed(x=0,y=0,theta=turnRate)
+        player.setWalk(x=0,y=0,theta=turnRate)
 
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
@@ -161,11 +161,11 @@ def approachBallWithLoc(player):
         player.brain.tracker.trackBall()
 
     dest = player.getApproachPosition()
-    useOmni = MyMath.dist(my.x, my.y, dest[0], dest[1]) <= \
+    useOmni = my.dist(dest) <= \
         constants.APPROACH_OMNI_DIST
     changedOmni = False
 
-    if useOmni != nav.movingOmni:
+    if useOmni != nav.movingOmni():
         player.changeOmniGoToCounter += 1
     else :
         player.changeOmniGoToCounter = 0
@@ -173,10 +173,8 @@ def approachBallWithLoc(player):
         changedOmni = True
 
     if player.firstFrame() or \
-            nav.destX != dest[0] or \
-            nav.destY != dest[1] or \
-            nav.destH != dest[2] or \
-            changedOmni:
+           nav.dest != dest or \
+           changedOmni:
         if not useOmni:
             player.brain.CoA.setRobotGait(player.brain.motion)
             nav.goTo(dest)
@@ -274,7 +272,7 @@ def approachBallWalk(player):
 
     # Set our walk towards the ball
     if ball.on:
-        player.setSpeed(sX,0,sTheta)
+        player.setWalk(sX,0,sTheta)
 
     return player.stay()
 
@@ -325,7 +323,7 @@ def positionForKick(player):
         sX = 0.0
 
     if ball.on:
-        player.setSpeed(sX,sY,0)
+        player.setWalk(sX,sY,0)
     return player.stay()
 
 def dribble(player):
@@ -393,17 +391,17 @@ def avoidObstacle(player):
             transitions.shouldAvoidObstacleRight(player)):
             # Backup
             player.printf("Avoid by backup");
-            player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
+            player.setWalk(constants.DODGE_BACK_SPEED, 0, 0)
 
         elif transitions.shouldAvoidObstacleLeft(player):
             # Dodge right
             player.printf("Avoid by right dodge");
-            player.setSpeed(0, constants.DODGE_RIGHT_SPEED, 0)
+            player.setWalk(0, constants.DODGE_RIGHT_SPEED, 0)
 
         elif transitions.shouldAvoidObstacleRight(player):
             # Dodge left
             player.printf("Avoid by left dodge");
-            player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
+            player.setWalk(0, constants.DODGE_LEFT_SPEED, 0)
 
     if not transitions.shouldAvoidObstacle(player):
         player.doneAvoidingCounter += 1
@@ -488,7 +486,7 @@ def ballInMyBox(player):
 
     ball = player.brain.ball
     if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
-        player.setSpeed(0, 0, constants.BALL_SPIN_SPEED *
+        player.setWalk(0, 0, constants.BALL_SPIN_SPEED *
                         MyMath.sign(ball.bearing) )
     elif fabs(ball.bearing) < constants.BALL_APPROACH_BEARING_OFF_THRESH :
         player.stopWalking()
@@ -527,9 +525,7 @@ def orbitBeforeKick(player):
         brain.tracker.trackBall()
 
         shotPoint = KickingHelpers.getShotCloseAimPoint(player)
-        bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                  shotPoint[0],
-                                                  shotPoint[1] )
+        bearingToGoal = my.getRelativeBearing(shotPoint)
         spinDir = -MyMath.sign(bearingToGoal)
         player.brain.nav.orbitAngle(spinDir * 90)
     if not player.brain.tracker.activeLocOn and \

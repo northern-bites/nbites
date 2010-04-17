@@ -15,7 +15,7 @@ import sensors
 from . import GameController
 from . import FallController
 from .headTracking import HeadTracking
-from . import Navigator
+from .navigator import Navigator
 from .util import NaoOutput
 from . import NogginConstants as Constants
 from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet, Play, TeamMember)

@@ -47,7 +47,6 @@
  * goals), etc.
  */
 
-#include "ifdefs.h"
 #include "Common.h"
 
 #include <math.h>

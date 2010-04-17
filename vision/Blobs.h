@@ -2,8 +2,6 @@
 #define Blobs_h_defined
 
 #include "Common.h"
-#include "ifdefs.h"
-//#include "NaoPose.h"
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
 #include "Blob.h"

@@ -200,3 +200,8 @@ void VisualFieldObject::updateObject(Blob * b, certainty _certainty,
     setDistanceCertainty(_distCertainty);
     setDistance(1);
 }
+
+const bool VisualFieldObject::hasPositiveID()
+{
+	return possibleFieldObjects->size() == 1;
+}

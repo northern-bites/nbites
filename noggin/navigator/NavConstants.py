@@ -1,4 +1,4 @@
-from .players import BrunswickSpeeds as speeds
+from ..players import BrunswickSpeeds as speeds
 
 #navstates.py
 GOTO_FORWARD_SPEED = speeds.MAX_X_SPEED

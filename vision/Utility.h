@@ -9,13 +9,11 @@
 
 class Utility;
 #include "Common.h"
-#include "ifdefs.h"
 #include "Structs.h"
 #include "VisualLine.h"
 #include "VisionDef.h"
 #include "VisualLandmark.h"
 #include "VisualLine.h"
-#include "NogginStructs.h"
 
 // This class contains static utility functions which are used in many different
 // parts of our code.
@@ -227,10 +225,8 @@ public:
 
     static const std::string getCornerIDString(int _id);
 
-	static const std::pair<float, float> findClosestLinePointCartesian(LineLandmark l,
-																	   float x_r,
-																	   float y_r,
-																	   float h_r);
+	static const point<int> findCloserEndpoint(const VisualLine&,
+											   const point<int>& intersection);
 };
 
 

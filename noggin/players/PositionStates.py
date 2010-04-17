@@ -2,6 +2,7 @@ from .. import NogginConstants
 from . import ChaseBallConstants as ChaseConstants
 import man.noggin.playbook.PBConstants as PBConstants
 import man.noggin.util.MyMath as MyMath
+from man.noggin.typeDefs.Location import RobotLocation
 import PositionTransitions as transitions
 import PositionConstants as constants
 
@@ -16,7 +17,6 @@ def playbookPosition(player):
     Have the robot navigate to the position reported to it from playbook
     """
     brain = player.brain
-    position = brain.play.getPosition()
     nav = brain.nav
     my = brain.my
     ball = brain.ball
@@ -38,19 +38,21 @@ def playbookPosition(player):
     else:
         destHeading = NogginConstants.OPP_GOAL_HEADING
 
-    distToPoint = MyMath.dist(my.x, my.y, position[0], position[1])
-    position = (position[0], position[1], destHeading)
+
+    position = brain.play.getPosition()
+    position = RobotLocation(position[0], position[1], destHeading)
 
     if brain.gameController.currentState == 'gameReady':
         useOmniDist = constants.OMNI_POSITION_READY_DIST
     else:
         useOmniDist = constants.OMNI_POSITION_DIST
 
-    useOmni = distToPoint <= useOmniDist
+    distToPoint = my.dist(position)
+    useOmni = (distToPoint <= useOmniDist)
 
     changedOmni = False
 
-    if useOmni != nav.movingOmni:
+    if useOmni != nav.movingOmni():
         player.changeOmniGoToCounter += 1
     else :
         player.changeOmniGoToCounter = 0
@@ -59,8 +61,8 @@ def playbookPosition(player):
 
     # Send a goto if we have changed destinations or are just starting
     if (player.firstFrame() or
-        abs(nav.destX - position[0]) > constants.GOTO_DEST_EPSILON or
-        abs(nav.destY - position[1]) > constants.GOTO_DEST_EPSILON or
+        abs(nav.dest.x - position.x) > constants.GOTO_DEST_EPSILON or
+        abs(nav.dest.y - position.y) > constants.GOTO_DEST_EPSILON or
         changedOmni):
 
         if brain.my.locScore == NogginConstants.BAD_LOC:
@@ -95,18 +97,18 @@ def atPosition(player):
     position = player.brain.play.getPosition()
     if player.firstFrame():
         player.stopWalking()
-        player.notAtPositionCounter = 0
+    ##     player.notAtPositionCounter = 0
 
-    if not nav.atHeading(nav.destH) or not nav.atDestinationCloser() or\
-            nav.destX != position[0] or nav.destY != position[1]:
-        player.notAtPositionCounter += 1
-    else:
-        player.notAtPositionCounter = 0
+    ## if not nav.atHeading(nav.destH) or not nav.atDestinationCloser() or\
+    ##         nav.destX != position[0] or nav.destY != position[1]:
+    ##     player.notAtPositionCounter += 1
+    ## else:
+    ##     player.notAtPositionCounter = 0
 
-    if (abs(nav.destX - position[0]) > constants.GOTO_DEST_EPSILON or
-        abs(nav.destY - position[1]) > constants.GOTO_DEST_EPSILON or
-        not nav.atDestinationGoalie() or
-        not nav.atHeading()):
+    if (abs(nav.dest.x - position.x) > constants.GOTO_DEST_EPSILON or
+        abs(nav.dest.y - position.y) > constants.GOTO_DEST_EPSILON or
+        not player.atDestinationGoalie() or
+        not player.atHeading()):
         return player.goLater('playbookPosition')
 
     return player.stay()
@@ -134,7 +136,7 @@ def spinToBall(player):
         player.stopWalking()
         player.currentSpinDir = MyMath.sign(turnRate)
     elif player.stoppedWalk and ball.on and player.brain.nav.isStopped():
-        player.setSpeed(x=0,y=0,theta=turnRate)
+        player.setWalk(x=0,y=0,theta=turnRate)
 
     return player.stay()
 
@@ -161,7 +163,7 @@ def spinFindBallPosition(player):
         player.stoppedWalk = True
 
     if player.firstFrame() and player.stoppedWalk:
-        player.setSpeed(0,
+        player.setWalk(0,
                         0,
                         ChaseConstants.FIND_BALL_SPIN_SPEED)
         player.brain.tracker.trackBall()
@@ -185,5 +187,5 @@ def relocalize(player):
         player.brain.tracker.locPans()
 
     if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
-        player.setSpeed(0 , 0, constants.RELOC_SPIN_SPEED)
+        player.setWalk(0 , 0, constants.RELOC_SPIN_SPEED)
     return player.stay()

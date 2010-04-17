@@ -79,7 +79,7 @@ def useRightStrafeFarSpeed(player):
     return (player.framesFromCenter >= 1)
 
 def strafeLeftSpeed(player):
-    player.setSpeed(-.75, goalCon.STRAFE_SPEED, .25)
+    player.setWalk(-.75, goalCon.STRAFE_SPEED, .25)
     player.framesFromCenter += 1
 
 def strafeLeft(player):
@@ -87,7 +87,7 @@ def strafeLeft(player):
         player.stepsOffCenter += goalCon.STRAFE_STEPS
 
 def strafeRightSpeed(player):
-    player.setSpeed(-.75, -goalCon.STRAFE_SPEED, -.25)
+    player.setWalk(-.75, -goalCon.STRAFE_SPEED, -.25)
     player.framesFromCenter -= 1
 
 def strafeRight(player):

@@ -37,7 +37,6 @@ def standup(guard):
     #guard.printf("standup angleY is "+str(inertial.angleY))
 
     if guard.firstFrame():
-        guard.brain.tracker.stopHeadMoves()
         guard.brain.tracker.setNeutralHead()
 
     # If on back, perform back stand up
