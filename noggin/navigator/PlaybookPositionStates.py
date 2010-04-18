@@ -31,7 +31,6 @@ def playbookWalk(nav):
     bearingDiff = fabs(my.getRelativeBearing(dest))
     if bearingDiff > constants.HEADING_THRESHOLD_TO_SPIN:
         nav.spinToPointCount += 1
-        print bearingDiff
         if nav.spinToPointCount > constants.FRAMES_THRESHHOLD_TO_SPIN:
             return nav.goLater('playbookSpin')
     else:

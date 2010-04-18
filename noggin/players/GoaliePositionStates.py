@@ -9,7 +9,6 @@ def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
     #goalie is out of position. difference in accuracy?
     player.isChasing = False
-    return player.goNow('goalieAtPosition')
     return player.goNow('goalieAwesomePosition')
 
 def goalieAwesomePosition(player):
@@ -41,35 +40,12 @@ def goalieAwesomePosition(player):
     else:
         bearing = NogginConstants.OPP_GOAL_HEADING
 
-    if (not nav.atDestinationGoalie() or
-        not nav.atHeading()):
-        print position
-        print my.x, my.y
-        if not useOmni:
-            nav.goTo(position)
-        else:
-            nav.omniGoTo(position)
-    else:
-        return player.goLater('goalieAtPosition')
+    position = RobotLocation(brain.play.getPosition(), my.h + bearing)
+    nav.positionPlaybook(position)
 
-    return player.stay()
+    if nav.isStopped():
+        return player.goLater("goalieAtPosition")
 
-def goalieAtPosition(player):
-    brain = player.brain
-    nav = player.brain.nav
-    if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
-        player.brain.tracker.activeLoc()
-    else:
-        player.brain.tracker.trackBall()
-
-    # Check that the position is correct
-    position = player.brain.play.getPosition()
-
-    if (abs(nav.destX - position[0]) > constants.SHOULD_POSITION_DIFF or
-        abs(nav.destY - position[1]) >  constants.SHOULD_POSITION_DIFF or
-        not nav.atDestinationGoalie() or
-        not nav.atHeading()):
-        return player.goNow('goalieAwesomePosition')
     return player.stay()
 
 def goaliePositionForSave(player):
@@ -175,11 +151,11 @@ def goalieAtPosition(player):
         player.brain.tracker.trackBall()
 
     # Check that the position is correct
-    ## position = RobotLocation(player.brain.play.getPosition())
+    position = RobotLocation(player.brain.play.getPosition())
 
-    ## if (abs(nav.dest.x - position.x) > constants.SHOULD_POSITION_DIFF or
-    ##     abs(nav.dest.y - position,y) >  constants.SHOULD_POSITION_DIFF or
-    ##     not player.atDestinationGoalie() or
-    ##     not player.atHeading()):
-    ##     return player.goNow("goalieAwesomePosition")
+    if (abs(nav.dest.x - position.x) > constants.SHOULD_POSITION_DIFF or
+        abs(nav.dest.y - position,y) >  constants.SHOULD_POSITION_DIFF or
+        not player.atDestinationGoalie() or
+        not player.atHeading()):
+        return player.goNow("goalieAwesomePosition")
     return player.stay()

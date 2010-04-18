@@ -40,8 +40,8 @@ class Navigator(FSA.FSA):
         self.dest = dest
 
         if not self.currentState == 'playbookWalk'and \
-               not self.currentState == 'playbookOmni' and \
-               not self.currentState == 'playbookSpin':
+                not self.currentState == 'playbookOmni' and \
+                not self.currentState == 'playbookSpin':
             self.switchTo('playbookWalk')
 
     def omniGoTo(self, dest):
