@@ -441,34 +441,38 @@ def chaseAroundBox(player):
     if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
         # go to corner nearest ball
         if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
-            player.brain.nav.goTo( (NogginConstants.MY_GOALBOX_RIGHT_X +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOALBOX_TOP_Y +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOAL_HEADING ))
+            player.brain.nav.goTo(
+                RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X +
+                              constants.GOALBOX_OFFSET,
+                              NogginConstants.MY_GOALBOX_TOP_Y +
+                              constants.GOALBOX_OFFSET,
+                              NogginConstants.MY_GOAL_HEADING ))
 
         if ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
-            player.brain.nav.goTo(( NogginConstants.MY_GOALBOX_RIGHT_X +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOALBOX_BOTTOM_Y -
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOAL_HEADING ))
+            player.brain.nav.goTo(
+                RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X +
+                              constants.GOALBOX_OFFSET,
+                              NogginConstants.MY_GOALBOX_BOTTOM_Y -
+                              constants.GOALBOX_OFFSET,
+                              NogginConstants.MY_GOAL_HEADING ))
 
     if my.x < NogginConstants.MY_GOALBOX_RIGHT_X:
         # go to corner nearest ball
         if my.y > NogginConstants.MY_GOALBOX_TOP_Y:
-            player.brain.nav.goTo(( NogginConstants.MY_GOALBOX_RIGHT_X +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOALBOX_TOP_Y +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOAL_HEADING ))
+            player.brain.nav.goTo(
+                RobotLocation( NogginConstants.MY_GOALBOX_RIGHT_X +
+                               constants.GOALBOX_OFFSET,
+                               NogginConstants.MY_GOALBOX_TOP_Y +
+                               constants.GOALBOX_OFFSET,
+                               NogginConstants.MY_GOAL_HEADING ))
 
         if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
-            player.brain.nav.goTo(( NogginConstants.MY_GOALBOX_RIGHT_X +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOALBOX_BOTTOM_Y -
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOAL_HEADING ))
+            player.brain.nav.goTo(
+                RobotLocation( NogginConstants.MY_GOALBOX_RIGHT_X +
+                               constants.GOALBOX_OFFSET,
+                               NogginConstants.MY_GOALBOX_BOTTOM_Y -
+                               constants.GOALBOX_OFFSET,
+                               NogginConstants.MY_GOAL_HEADING ))
     return player.stay()
 
 def steps(player):
