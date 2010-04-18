@@ -67,7 +67,7 @@ static const int DIST_POINT_FUDGE = 5;
 
 #ifdef OFFLINE
 static const bool BALLDISTDEBUG = false;
-static const bool BALLDEBUG = true;
+static const bool BALLDEBUG = false;
 static const bool DEBUGBALLPOINTS = false;
 #else
 static const bool BALLDISTDEBUG = false;
