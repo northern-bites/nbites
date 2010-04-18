@@ -51,12 +51,6 @@ def decideKick(player):
         player.inKickingState = False
         return player.goLater('scanFindBall')
 
-    # Get references to the collected data
-    myLeftPostBearing =  player.kickDecider.myLeftPostBearing
-    myRightPostBearing = player.kickDecider.myRightPostBearing
-    oppLeftPostBearing = player.kickDecider.oppLeftPostBearing
-    oppRightPostBearing = player.kickDecider.oppRightPostBearing
-
     player.printf(player.kickDecider)
 
     if player.penaltyKicking:

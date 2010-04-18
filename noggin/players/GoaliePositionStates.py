@@ -27,20 +27,19 @@ def goalieAwesomePosition(player):
     else:
         player.brain.tracker.trackBall()
 
-    useOmni = helper.useOmni(player)
-    changedOmni = False
 
+    heading = None
     ball = brain.ball
-    bearing = None
 
     if ball.on:
-        bearing = ball.bearing
+        heading = brain.my.h + ball.bearing
     elif ball.framesOff < 3:
-        bearing = ball.locBearing
+        heading = brain.my.h + ball.locBearing
     else:
-        bearing = NogginConstants.OPP_GOAL_HEADING
+        heading = NogginConstants.OPP_GOAL_HEADING
 
-    position = RobotLocation(brain.play.getPosition(), my.h + bearing)
+    position = player.brain.play.getPosition()
+    position = RobotLocation(position[0], position[1], heading)
     nav.positionPlaybook(position)
 
     if nav.isStopped():
@@ -65,11 +64,6 @@ def goaliePositionForSave(player):
 
 def goaliePositionBallClose(player):
 
-    nav = player.brain.nav
-    player.brain.tracker.trackBall()
-
-    #if not nav.atHeading(NogginConstants.OPP_GOAL_HEADING):
-    #    return player.goLater('goalieSpinToPosition')
     if helper.useLeftStrafeCloseSpeed(player):
         helper.strafeLeftSpeed(player)
     elif helper.useRightStrafeCloseSpeed(player):
@@ -85,7 +79,6 @@ def goaliePositionBallClose(player):
 
 def goaliePositionBallFar(player):
 
-    nav = player.brain.nav
     player.brain.tracker.activeLoc()
 
     if helper.outOfPosition(player):
@@ -105,7 +98,7 @@ def goaliePositionBallFar(player):
     return player.stay()
 
 def goalieSpinToPosition(player):
-    nav = player.brain.nav
+
     if helper.useFarPosition(player):
         player.brain.tracker.activeLoc()
     else:
@@ -145,16 +138,28 @@ def goalieOutOfPosition(player):
 def goalieAtPosition(player):
     brain = player.brain
     nav = player.brain.nav
+
     if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLoc()
     else:
         player.brain.tracker.trackBall()
 
     # Check that the position is correct
-    position = RobotLocation(player.brain.play.getPosition())
+    ball = brain.ball
+    heading = None
+
+    if ball.on:
+        heading = brain.my.h + ball.bearing
+    elif ball.framesOff < 3:
+        heading = brain.my.h + ball.locBearing
+    else:
+        heading = NogginConstants.OPP_GOAL_HEADING
+
+    position = player.brain.play.getPosition()
+    position = RobotLocation(position[0], position[1], heading)
 
     if (abs(nav.dest.x - position.x) > constants.SHOULD_POSITION_DIFF or
-        abs(nav.dest.y - position,y) >  constants.SHOULD_POSITION_DIFF or
+        abs(nav.dest.y - position.y) >  constants.SHOULD_POSITION_DIFF or
         not player.atDestinationGoalie() or
         not player.atHeading()):
         return player.goNow("goalieAwesomePosition")

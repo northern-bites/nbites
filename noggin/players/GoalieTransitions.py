@@ -18,30 +18,31 @@ def goalieRunChecks(player):
             player.shouldChaseCounter = 0
             return 'goalieSave'
 
-    ## elif not player.isChasing:
-    ##     if shouldChaseLoc(player):
-    ##         player.shouldChaseCounter+=1
-    ##         if DEBUG: print "should chase: ", player.shouldChaseCounter
-    ##         if player.shouldChaseCounter >= goalCon.START_CHASE_BUFFER:
-    ##             player.shouldChaseCounter = 0
-    ##             return 'chase'
-    ##     else:
-    ##         player.shouldChaseCounter = 0
+    elif not player.isChasing:
+       if shouldChaseLoc(player):
+           player.shouldChaseCounter+=1
+           if DEBUG: print "should chase: ", player.shouldChaseCounter
+           if player.shouldChaseCounter >= goalCon.START_CHASE_BUFFER:
+               player.shouldChaseCounter = 0
+               return 'chase'
+       else:
+           player.shouldChaseCounter = 0
+
+    elif player.isChasing and\
+            not chaseTran.shouldntStopChasing(player):
+        if shouldStopChaseLoc(player) :
+            player.shouldChaseCounter+=1
+            if DEBUG: print "should stop chase: ", player.shouldChaseCounter
+            if player.shouldChaseCounter >= goalCon.STOP_CHASE_BUFFER:
+                player.shouldChaseCounter = 0
+                player.isChasing = False
+                return 'goaliePosition'
+        else:
+            player.shouldChaseCounter = 0
+
     elif player.currentState == 'gamePlaying':
         player.isChasing = False
         return 'goalieAtPosition'
-
-    ## elif player.isChasing and\
-    ##             not chaseTran.shouldntStopChasing(player):
-    ##     if shouldStopChaseLoc(player) :
-    ##         player.shouldChaseCounter+=1
-    ##         if DEBUG: print "should stop chase: ", player.shouldChaseCounter
-    ##         if player.shouldChaseCounter >= goalCon.STOP_CHASE_BUFFER:
-    ##             player.shouldChaseCounter = 0
-    ##             player.isChasing = False
-    ##             return 'goaliePosition'
-    ##     else:
-    ##         player.shouldChaseCounter = 0
 
     return player.currentState
 
@@ -219,26 +220,18 @@ def shouldHoldSave(player):
     return False
 
 def shouldChaseLoc(player):
-    if player.penaltyKicking:
+    if player.penaltyKicking or player.saving:
         return False
 
     ball = player.brain.ball
-    my = player.brain.my
-    if (player.squatting and ball.locDist <= goalCon.CHASE_FROM_SQUAT_DIST and
-        abs(ball.locBearing) <= goalCon.CHASE_FROM_SQUAT_BEARING and
-        abs(ball.velX) <= goalCon.CHASE_FROM_SQUAT_VEL and
-        abs(ball.velY) <= goalCon.CHASE_FROM_SQUAT_VEL):
+    if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y
+        and ball.y < Constants.MY_GOALBOX_TOP_Y
+        and ball.x < Constants.MY_GOALBOX_RIGHT_X +
+        goalCon.AGGRESSIVENESS_OFFSET):
         return True
-    if not player.squatting:
-        if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + goalCon.GOALBOX_Y_REDUCTION
-            and ball.y < Constants.MY_GOALBOX_TOP_Y -goalCon.GOALBOX_Y_REDUCTION
-            and ball.x < Constants.MY_GOALBOX_RIGHT_X +
-            goalCon.AGGRESSIVENESS_OFFSET):
-            return True
     return False
 
 def shouldStopChaseLoc(player):
-    my = player.brain.my
     ball = player.brain.ball
     #change to use ball uncertainty
     if ball.uncertX < Constants.GOOD_LOC_XY_UNCERT_THRESH:

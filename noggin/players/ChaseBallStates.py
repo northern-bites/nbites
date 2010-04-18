@@ -11,7 +11,6 @@ import PositionConstants
 from .. import NogginConstants
 from ..playbook.PBConstants import GOALIE
 from math import fabs
-import man.motion.RobotGaits as RobotGaits
 
 def chase(player):
     """
@@ -313,9 +312,9 @@ def positionForKick(player):
     sY = max(constants.PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     if transitions.shouldApproachForKick(player):
-        targetX = (ball.relX -
-                   (constants.BALL_KICK_LEFT_X_CLOSE +
-                    constants.BALL_KICK_LEFT_X_FAR) / 2.0)
+        #        targetX = (ball.relX -
+        #                   (constants.BALL_KICK_LEFT_X_CLOSE +
+        #                    constants.BALL_KICK_LEFT_X_FAR) / 2.0)
         sX = MyMath.clip(ball.relX * constants.PFK_X_GAIN,
                          constants.PFK_MIN_X_SPEED,
                          constants.PFK_MAX_X_SPEED)
@@ -493,12 +492,11 @@ def ballInMyBox(player):
     if not player.ballInMyGoalBox():
         return player.goLater('chase')
     return player.stay()
-
+# TODO
 def approachDangerousBall(player):
     if player.firstFrame():
         player.stopWalking()
     #print "approach dangerous ball"
-    my = player.brain.my
     #single steps towards ball and goal with spin
     player.setSteps(0, 0, 0, 0)
 

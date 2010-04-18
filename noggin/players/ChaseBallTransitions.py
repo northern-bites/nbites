@@ -73,7 +73,7 @@ def shouldRepositionForKick(player):
     """
     Stop waiting for kick and realign on the ball instead
     """
-    ball = player.brain.ball
+
     return False
 
 def shouldApproachForKick(player):
