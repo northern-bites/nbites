@@ -12,7 +12,7 @@ def stop(tracker):
         tracker.brain.motion.stopHeadMoves()
 
     if not tracker.brain.motion.isHeadActive():
-        return tracker.goLater('stopped')
+        return tracker.goNow('stopped')
 
     return tracker.stay()
 

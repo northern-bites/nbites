@@ -153,7 +153,6 @@ def fallen(player):
     player.isChasing = False
     player.inKickingState = False
     player.justKicked = False
-    player.brain.nav.switchTo('stopped')
     return player.stay()
 
 
