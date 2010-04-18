@@ -42,17 +42,17 @@ def walkStraightToPoint(nav):
     if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('spinToFinalHeading')
 
-    nav.dest.h = nav.dest.getTargetHeading(my)
+    destH = nav.brain.my.getTargetHeading(nav.dest)
 
-    if helper.notAtHeading(my, nav.dest.h):
+    if not helper.atHeadingGoTo(my, destH):
         nav.walkToPointSpinCount += 1
+        if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH + 25:
+            return nav.goLater('spinToWalkHeading')
+
     else :
         nav.walkToPointSpinCount = 0
 
-    if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH:
-        return nav.goLater('spinToWalkHeading')
-
-    walkY, walkX, walkTheta = helper.getWalkStraightParam(my, nav.dest)
+    walkX, walkY, walkTheta = helper.getWalkStraightParam(my, nav.dest)
 
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
@@ -85,9 +85,11 @@ def spinToWalkHeading(nav):
 
     if helper.atHeadingGoTo(my, targetH):
         nav.stopSpinToWalkCount += 1
+        if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
+            return nav.goLater('walkStraightToPoint')
+
     else :
-        nav.stopSpinToWalkCount -= 1
-        nav.stopSpinToWalkCount = max(0, nav.stopSpinToWalkCount)
+        nav.stopSpinToWalkCount = 0
 
     headingDiff = fabs(nav.brain.my.h - targetH)
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
@@ -96,8 +98,6 @@ def spinToWalkHeading(nav):
     if sTheta != nav.walkTheta:
         helper.setSpeed(nav, 0, 0, sTheta)
 
-    if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
-        return nav.goLater('walkStraightToPoint')
     if helper.atDestinationCloser(my, nav.dest):
         return nav.goLater('spinToFinalHeading')
 

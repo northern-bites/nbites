@@ -3,6 +3,7 @@ Here we house all of the state methods used for chasing the ball
 """
 from man.noggin.util import MyMath
 from man.motion import SweetMoves
+from man.noggin.typeDefs.Location import RobotLocation
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 import KickingHelpers
