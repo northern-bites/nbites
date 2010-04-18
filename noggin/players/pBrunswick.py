@@ -171,10 +171,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             ballLoc = RobotLocation(ball.x, ball.y, NogginConstants.OPP_GOAL_HEADING)
             destH = my.getRelativeBearing(destKickLoc)
 
-        elif self.shouldMoveAroundBall():
-            return self.getPointToMoveAroundBall()
         elif self.inFrontOfBall():
             destH = self.getApproachHeadingFromFront()
+        elif self.shouldMoveAroundBall():
+            return self.getPointToMoveAroundBall()
         else :
             destH = self.getApproachHeadingFromBehind()
 
