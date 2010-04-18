@@ -16,7 +16,6 @@ def doingSweetMove(nav):
         helper.executeMove(motion, nav.sweetMove)
 
     if not motion.isBodyActive():
-        del nav.sweetMove
         return nav.goNow('stopped')
 
     return nav.stay()
