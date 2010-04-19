@@ -31,10 +31,9 @@ def goalieAwesomePosition(player):
     heading = None
     ball = brain.ball
 
-    if ball.on:
+    if ball.framesOff < 5:
+        # TODO: this may be a problem if the ball is behind us
         heading = brain.my.h + ball.bearing
-    elif ball.framesOff < 3:
-        heading = brain.my.h + ball.locBearing
     else:
         heading = NogginConstants.OPP_GOAL_HEADING
 
@@ -75,10 +74,9 @@ def goalieAtPosition(player):
     ball = brain.ball
     heading = None
 
-    if ball.on:
+    if ball.framesOff < 5:
+        # TODO: this may be a problem if the ball is behind us
         heading = brain.my.h + ball.bearing
-    elif ball.framesOff < 3:
-        heading = brain.my.h + ball.locBearing
     else:
         heading = NogginConstants.OPP_GOAL_HEADING
 

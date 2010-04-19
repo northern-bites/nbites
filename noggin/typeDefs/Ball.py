@@ -66,23 +66,25 @@ class Ball(VisualObject):
     def updateVision(self,visionBall):
         """update method gets list of vision updated information"""
         # Hold our history
-        self.lastVisionDist = self.dist
+        self.lastVisionDist = self.visDist
         self.lastVisionBearing = self.bearing
         self.lastVisionCenterX = self.centerX
         self.lastVisionCenterY = self.centerY
         self.lastVisionAngleX = self.angleX
         self.lastVisionAngleY = self.angleY
 
-        if self.dist > 0:
+        # ball is on
+        if self.visDist > 0:
             self.lastSeenBearing = self.bearing
-            self.lastSeenDist = self.dist
-            if not self.on:
+            self.lastSeenDist = self.visDist
+            if not self.on: # ball wasn't on last frame
                 self.prevFramesOff = self.framesOff
         else:
             if self.on:
                 self.prevFramesOn = self.framesOn
 
         # Now update to the new stuff
+        # self.on updated in visualObject
         VisualObject.updateVision(self, visionBall)
         self.elevation = visionBall.elevation
         self.confidence = visionBall.confidence
@@ -114,13 +116,13 @@ class Ball(VisualObject):
         """
         # Get latest estimates
         if my.teamColor == Constants.TEAM_BLUE:
-            self.x = loc.ballX
-            self.y = loc.ballY
+            self.locX = loc.ballX
+            self.locY = loc.ballY
             self.velX = loc.ballVelX
             self.velY = loc.ballVelY
         else:
-            self.x = Constants.FIELD_GREEN_WIDTH - loc.ballX
-            self.y = Constants.FIELD_GREEN_HEIGHT - loc.ballY
+            self.locX = Constants.FIELD_GREEN_WIDTH - loc.ballX
+            self.locY = Constants.FIELD_GREEN_HEIGHT - loc.ballY
             self.velX = -loc.ballVelX
             self.velY = -loc.ballVelY
 
@@ -137,6 +139,19 @@ class Ball(VisualObject):
         self.locRelY = getRelativeY(self.locDist, self.locBearing)
         self.relVelX = getRelativeVelocityX(my.h, self.velX, self.velY)
         self.relVelY = getRelativeVelocityY(my.h, self.velX, self.velY)
+
+    def updateBestValues(self, my):
+        if self.on:
+            self.x = my.x + self.relX
+            self.y = my.y + self.relY
+            self.bearing = self.visBearing
+            self.dist = self.visDist
+        else:
+            self.x = self.locX
+            self.y = self.locY
+            # TODO prbly want to calculate now...
+            self.bearing = self.locBearing
+            self.dist = self.locDist
 
     def __str__(self):
         """returns string with all class variables"""
