@@ -18,8 +18,9 @@ def spinToBall(nav):
     nav.dest = ball
     nav.dest.h = my.getTargetHeading(ball)
 
-    x, y, theta = helper.getSpinOnlyParam(my, nav.dest)
-    helper.setSpeed(nav, x, y, theta)
+    theta = MyMath.sign(ball.bearing) * constants.GOTO_SPIN_SPEED * \
+             helper.getRotScale(ball.bearing)
+    helper.setSpeed(nav, 0, 0, theta)
 
     # if we're facing the ball...
     if abs(ball.bearing) < 10:
@@ -86,10 +87,11 @@ def walkStraightToBall(nav):
 def omniWalkToBall(nav):
     ball = nav.brain.ball
     nav.dest = ball
+    # be nice if we could use bearing here instead...
     nav.dest.h = nav.brain.my.getTargetHeading(ball)
 
-
-    walkX, walkY, walkTheta = helper.getOmniWalkParam(nav.brain.my, nav.dest)
+    walkX, walkY, walkTheta = \
+           helper.getOmniWalkFacingDestParam(nav.brain.my, nav.dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     #if we're close to the ball...
