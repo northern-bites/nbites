@@ -8,7 +8,6 @@ import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 import KickingHelpers
 import GoalieTransitions as goalTran
-import PositionConstants
 from .. import NogginConstants
 from ..playbook.PBConstants import GOALIE
 from math import fabs
@@ -80,19 +79,8 @@ def turnToBall(player):
     if player.firstFrame():
         player.hasAlignedOnce = False
         player.brain.tracker.trackBall()
-        player.brain.CoA.setRobotGait(player.brain.motion)
 
-    # Determine the speed to turn to the ball
-    turnRate = MyMath.clip(ball.bearing*constants.BALL_SPIN_GAIN,
-                           -constants.BALL_SPIN_SPEED,
-                           constants.BALL_SPIN_SPEED)
-
-    # Avoid spinning so slowly that we step in place
-    if fabs(turnRate) < constants.MIN_BALL_SPIN_MAGNITUDE:
-        turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_MAGNITUDE
-
-    if ball.on:
-        player.setWalk(x=0,y=0,theta=turnRate)
+    player.brain.nav.chaseBall()
 
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
@@ -107,7 +95,6 @@ def turnToBall(player):
 
 def approachBallWithLoc(player):
     if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
         player.hasAlignedOnce = False
 
     nav = player.brain.nav
@@ -160,27 +147,29 @@ def approachBallWithLoc(player):
     else :
         player.brain.tracker.trackBall()
 
-    dest = player.getApproachPosition()
-    useOmni = my.dist(dest) <= \
-        constants.APPROACH_OMNI_DIST
-    changedOmni = False
 
-    if useOmni != nav.movingOmni():
-        player.changeOmniGoToCounter += 1
-    else :
-        player.changeOmniGoToCounter = 0
-    if player.changeOmniGoToCounter > PositionConstants.CHANGE_OMNI_THRESH:
-        changedOmni = True
+    player.brain.nav.chaseBall()
+    ## dest = player.getApproachPosition()
+    ## useOmni = my.dist(dest) <= \
+    ##     constants.APPROACH_OMNI_DIST
+    ## changedOmni = False
 
-    if player.firstFrame() or \
-           nav.dest != dest or \
-           changedOmni:
-        if not useOmni:
-            player.brain.CoA.setRobotGait(player.brain.motion)
-            nav.goTo(dest)
-        else:
-            player.brain.CoA.setRobotSlowGait(player.brain.motion)
-            nav.omniGoTo(dest)
+    ## if useOmni != nav.movingOmni():
+    ##     player.changeOmniGoToCounter += 1
+    ## else :
+    ##     player.changeOmniGoToCounter = 0
+    ## if player.changeOmniGoToCounter > PositionConstants.CHANGE_OMNI_THRESH:
+    ##     changedOmni = True
+
+    ## if player.firstFrame() or \
+    ##        nav.dest != dest or \
+    ##        changedOmni:
+    ##     if not useOmni:
+    ##         player.brain.CoA.setRobotGait(player.brain.motion)
+    ##         nav.goTo(dest)
+    ##     else:
+    ##         player.brain.CoA.setRobotSlowGait(player.brain.motion)
+    ##         nav.omniGoTo(dest)
 
     return player.stay()
 
@@ -192,7 +181,6 @@ def approachBall(player):
     if player.firstFrame():
         player.hasAlignedOnce = False
         player.brain.tracker.trackBall()
-        player.brain.CoA.setRobotGait(player.brain.motion)
 
     #if player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST:
     if transitions.shouldActiveLoc(player):
@@ -255,24 +243,25 @@ def approachBallWalk(player):
     if player.brain.play.isRole(GOALIE) and goalTran.dangerousBall(player):
         return player.goNow('approachDangerousBall')
 
-    if ball.dist < constants.APPROACH_WITH_GAIN_DIST:
-        sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
-                         constants.MIN_APPROACH_X_SPEED,
-                         constants.MAX_APPROACH_X_SPEED)
-    else :
-        sX = constants.MAX_APPROACH_X_SPEED
+    ## if ball.dist < constants.APPROACH_WITH_GAIN_DIST:
+    ##     sX = MyMath.clip(ball.dist*constants.APPROACH_X_GAIN,
+    ##                      constants.MIN_APPROACH_X_SPEED,
+    ##                      constants.MAX_APPROACH_X_SPEED)
+    ## else :
+    ##     sX = constants.MAX_APPROACH_X_SPEED
 
-    # Determine the speed to turn to the ball
-    sTheta = MyMath.clip(ball.bearing*constants.APPROACH_SPIN_GAIN,
-                         -constants.APPROACH_SPIN_SPEED,
-                         constants.APPROACH_SPIN_SPEED)
-    # Avoid spinning so slowly that we step in place
-    if fabs(sTheta) < constants.MIN_APPROACH_SPIN_MAGNITUDE:
-        sTheta = 0.0
+    ## # Determine the speed to turn to the ball
+    ## sTheta = MyMath.clip(ball.bearing*constants.APPROACH_SPIN_GAIN,
+    ##                      -constants.APPROACH_SPIN_SPEED,
+    ##                      constants.APPROACH_SPIN_SPEED)
+    ## # Avoid spinning so slowly that we step in place
+    ## if fabs(sTheta) < constants.MIN_APPROACH_SPIN_MAGNITUDE:
+    ##     sTheta = 0.0
 
-    # Set our walk towards the ball
-    if ball.on:
-        player.setWalk(sX,0,sTheta)
+    ## # Set our walk towards the ball
+    ## if ball.on:
+    ##     player.setWalk(sX,0,sTheta)
+    player.brain.nav.chaseBall()
 
     return player.stay()
 

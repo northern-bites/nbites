@@ -127,8 +127,11 @@ def getWalkStraightParam(my, dest):
     return (sX, sY, sTheta)
 
 def getSpinOnlyParam(my, dest):
+    # Determine the speed to turn
+    # see if getRotScale can go faster
 
     spinDir = my.spinDirToHeading(dest.h)
+    # getRelativeBearing can be replaced w/simpler math
     headingDiff = fabs(my.getRelativeBearing(dest))
     sTheta = spinDir * constants.GOTO_SPIN_SPEED * \
              getRotScale(headingDiff)
