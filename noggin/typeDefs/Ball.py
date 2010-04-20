@@ -120,13 +120,13 @@ class Ball(VisualObject):
         """
         # Get latest estimates
         if my.teamColor == Constants.TEAM_BLUE:
-            self.locX = loc.ballX
-            self.locY = loc.ballY
+            self.x = loc.ballX
+            self.y = loc.ballY
             self.velX = loc.ballVelX
             self.velY = loc.ballVelY
         else:
-            self.locX = Constants.FIELD_GREEN_WIDTH - loc.ballX
-            self.locY = Constants.FIELD_GREEN_HEIGHT - loc.ballY
+            self.x = Constants.FIELD_GREEN_WIDTH - loc.ballX
+            self.y = Constants.FIELD_GREEN_HEIGHT - loc.ballY
             self.velX = -loc.ballVelX
             self.velY = -loc.ballVelY
 
@@ -139,7 +139,6 @@ class Ball(VisualObject):
         # Determine other values
         self.locDist = my.dist(self, forceCalc=True)
         self.locBearing = my.getRelativeBearing(self, forceCalc=True)
-        print self.locDist, self.locBearing
         self.locRelX = getRelativeX(self.locDist, self.locBearing)
         self.locRelY = getRelativeY(self.locDist, self.locBearing)
         self.relVelX = getRelativeVelocityX(my.h, self.velX, self.velY)
@@ -147,8 +146,6 @@ class Ball(VisualObject):
 
     def updateBestValues(self, my):
         if self.on:
-            self.x = my.x + self.relX
-            self.y = my.y + self.relY
             self.bearing = self.visBearing
             self.dist = self.visDist
 
@@ -157,16 +154,12 @@ class Ball(VisualObject):
             pass
 
         else:
-            self.x = self.locX
-            self.y = self.locY
             self.bearing = self.locBearing
             self.dist = self.locDist
 
     def __str__(self):
         """returns string with all class variables"""
-        return (" loc: (%g,%g) uncert: (%g,%g) sd: %g vel (%g,%g) dist: %g \
-        bearing: %g \n \
-        vision: elevation: %g" %
+        return (" loc: (%g,%g) uncert: (%g,%g) sd: %g vel (%g,%g) dist: %g bearing: %g vision: elevation: %g" %
                 (self.x,self.y,self.uncertX,self.uncertY,self.sd,
-                 self.velX,self.velY, self.locDist, self.locBearing, self.elevation)
+                 self.velX,self.velY, self.dist, self.bearing, self.elevation)
                 + VisualObject.__str__(self) )
