@@ -7,6 +7,8 @@ from ..util.MyMath import (getRelativeVelocityX,
                           getRelativeX,
                           getRelativeY)
 
+FRAMES_AFTER_LOST_BALL_TO_USE_VISION = 3
+
 
 class Ball(VisualObject):
     """
@@ -67,15 +69,15 @@ class Ball(VisualObject):
         """update method gets list of vision updated information"""
         # Hold our history
         self.lastVisionDist = self.visDist
-        self.lastVisionBearing = self.bearing
+        self.lastVisionBearing = self.visBearing
         self.lastVisionCenterX = self.centerX
         self.lastVisionCenterY = self.centerY
         self.lastVisionAngleX = self.angleX
         self.lastVisionAngleY = self.angleY
 
-        # ball is on
+        # ball was on last frame (visDist already updated, self.on not)
         if self.visDist > 0:
-            self.lastSeenBearing = self.bearing
+            self.lastSeenBearing = self.visBearing
             self.lastSeenDist = self.visDist
             if not self.on: # ball wasn't on last frame
                 self.prevFramesOff = self.framesOff
@@ -89,10 +91,10 @@ class Ball(VisualObject):
         self.elevation = visionBall.elevation
         self.confidence = visionBall.confidence
 
-        if self.dist > 0:
+        if self.on:
             self.reportBallSeen()
-            self.relX = getRelativeX(self.dist, self.bearing)
-            self.relY = getRelativeY(self.dist, self.bearing)
+            self.relX = getRelativeX(self.visDist, self.visBearing)
+            self.relY = getRelativeY(self.visDist, self.visBearing)
         else:
             self.relX = 0.0
             self.relY = 0.0
@@ -146,10 +148,14 @@ class Ball(VisualObject):
             self.y = my.y + self.relY
             self.bearing = self.visBearing
             self.dist = self.visDist
+
+        # use old vision data for several frames after we last see the ball.
+        elif self.framesOff <= FRAMES_AFTER_LOST_BALL_TO_USE_VISION:
+            pass
+
         else:
             self.x = self.locX
             self.y = self.locY
-            # TODO prbly want to calculate now...
             self.bearing = self.locBearing
             self.dist = self.locDist
 

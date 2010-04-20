@@ -21,7 +21,14 @@ class Location (object):
                     self.z == other.z)
 
     def dist(self, other):
-        ''' returns euclidian dist'''
+        """
+        returns euclidian dist
+        """
+
+        # if we're calculating distance from us to the ball use stored value
+        if hasattr(self, "teamColor") and hasattr(other, "dist"):
+            return other.dist
+
         # HACK HACK HACK HACK for infinity values HACK HACK
         if other.x == float('inf') or \
                other.y == float('inf'):
@@ -46,7 +53,13 @@ class RobotLocation(Location):
         self.h = h
 
     def getRelativeBearing(self, other):
-        '''return relative heading from robot localization to abs x,y on field'''
+        """return relative heading in degrees from robot localization to
+        abs x,y on field """
+
+        # if we're calculating bearing from us to the ball use stored value
+        if hasattr(self, "teamColor") and hasattr(other, "bearing"):
+            return other.dist
+
         return MyMath.sub180Angle((degrees(MyMath.safe_atan2(other.y - self.y,
                                                other.x - self.x))) - self.h)
 
