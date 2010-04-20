@@ -16,6 +16,12 @@
     </fileset>
   </path>
 
+  <target name="compile.all"
+	  description="compile TOOL and TOOLVisionLink"
+	  depends="compile,vision">
+  </target>
+
+
   <target name="compile"
           description="compile the source " >
     <javac srcdir="." destdir="">
@@ -32,7 +38,7 @@
     </path>
    </pathconvert>
   </target>
-  
+
   <target name="vision"
 	  depends="vision.check"
 	  description="compile the TOOLVisionLink">
