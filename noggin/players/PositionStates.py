@@ -28,10 +28,8 @@ def playbookPosition(player):
             brain.tracker.activeLoc()
 
     # determine final goal heading
-    if ball.on:
+    if ball.framesOff < 30:
         destHeading = my.h + ball.bearing
-    elif ball.framesOff < 30:
-        destHeading = my.h + ball.locBearing
     else:
         destHeading = NogginConstants.OPP_GOAL_HEADING
 
