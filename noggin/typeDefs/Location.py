@@ -20,6 +20,9 @@ class Location (object):
                     self.y == other.y and
                     self.z == other.z)
 
+    def __str__(self):
+        return ("x: %g  y: %g z: %g" % (self.x, self.y, self.z))
+
     def dist(self, other, forceCalc = False):
         """
         returns euclidian dist
@@ -52,6 +55,9 @@ class RobotLocation(Location):
     def __init__(self, xP = 0, yP = 0, h = 0):
         Location.__init__(self, xP, yP)
         self.h = h
+
+    def __str__(self):
+        return (Location.__str__(self) +  " h: %g" % (self.h))
 
     def getRelativeBearing(self, other, forceCalc = False):
         """return relative heading in degrees from robot localization to
