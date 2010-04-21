@@ -3,6 +3,7 @@ Here we house all of the state methods used for chasing the ball
 """
 from man.noggin.util import MyMath
 from man.motion import SweetMoves
+from man.noggin.typeDefs.Location import RobotLocation
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 import KickingHelpers
@@ -11,7 +12,6 @@ import PositionConstants
 from .. import NogginConstants
 from ..playbook.PBConstants import GOALIE
 from math import fabs
-import man.motion.RobotGaits as RobotGaits
 
 def chase(player):
     """
@@ -62,7 +62,7 @@ def chaseAfterKick(player):
         elif player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
             turnDir = constants.TURN_LEFT
 
-        player.setSpeed(0, 0, turnDir * constants.BALL_SPIN_SPEED)
+        player.setWalk(0, 0, turnDir * constants.BALL_SPIN_SPEED)
         return player.stay()
 
     if player.brain.ball.framesOn > constants.BALL_ON_THRESH:
@@ -92,7 +92,7 @@ def turnToBall(player):
         turnRate = MyMath.sign(turnRate)*constants.MIN_BALL_SPIN_MAGNITUDE
 
     if ball.on:
-        player.setSpeed(x=0,y=0,theta=turnRate)
+        player.setWalk(x=0,y=0,theta=turnRate)
 
     if transitions.shouldKick(player):
         return player.goNow('waitBeforeKick')
@@ -161,11 +161,11 @@ def approachBallWithLoc(player):
         player.brain.tracker.trackBall()
 
     dest = player.getApproachPosition()
-    useOmni = MyMath.dist(my.x, my.y, dest[0], dest[1]) <= \
+    useOmni = my.dist(dest) <= \
         constants.APPROACH_OMNI_DIST
     changedOmni = False
 
-    if useOmni != nav.movingOmni:
+    if useOmni != nav.movingOmni():
         player.changeOmniGoToCounter += 1
     else :
         player.changeOmniGoToCounter = 0
@@ -173,10 +173,8 @@ def approachBallWithLoc(player):
         changedOmni = True
 
     if player.firstFrame() or \
-            nav.destX != dest[0] or \
-            nav.destY != dest[1] or \
-            nav.destH != dest[2] or \
-            changedOmni:
+           nav.dest != dest or \
+           changedOmni:
         if not useOmni:
             player.brain.CoA.setRobotGait(player.brain.motion)
             nav.goTo(dest)
@@ -274,7 +272,7 @@ def approachBallWalk(player):
 
     # Set our walk towards the ball
     if ball.on:
-        player.setSpeed(sX,0,sTheta)
+        player.setWalk(sX,0,sTheta)
 
     return player.stay()
 
@@ -315,9 +313,9 @@ def positionForKick(player):
     sY = max(constants.PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     if transitions.shouldApproachForKick(player):
-        targetX = (ball.relX -
-                   (constants.BALL_KICK_LEFT_X_CLOSE +
-                    constants.BALL_KICK_LEFT_X_FAR) / 2.0)
+        #        targetX = (ball.relX -
+        #                   (constants.BALL_KICK_LEFT_X_CLOSE +
+        #                    constants.BALL_KICK_LEFT_X_FAR) / 2.0)
         sX = MyMath.clip(ball.relX * constants.PFK_X_GAIN,
                          constants.PFK_MIN_X_SPEED,
                          constants.PFK_MAX_X_SPEED)
@@ -325,7 +323,7 @@ def positionForKick(player):
         sX = 0.0
 
     if ball.on:
-        player.setSpeed(sX,sY,0)
+        player.setWalk(sX,sY,0)
     return player.stay()
 
 def dribble(player):
@@ -393,17 +391,17 @@ def avoidObstacle(player):
             transitions.shouldAvoidObstacleRight(player)):
             # Backup
             player.printf("Avoid by backup");
-            player.setSpeed(constants.DODGE_BACK_SPEED, 0, 0)
+            player.setWalk(constants.DODGE_BACK_SPEED, 0, 0)
 
         elif transitions.shouldAvoidObstacleLeft(player):
             # Dodge right
             player.printf("Avoid by right dodge");
-            player.setSpeed(0, constants.DODGE_RIGHT_SPEED, 0)
+            player.setWalk(0, constants.DODGE_RIGHT_SPEED, 0)
 
         elif transitions.shouldAvoidObstacleRight(player):
             # Dodge left
             player.printf("Avoid by left dodge");
-            player.setSpeed(0, constants.DODGE_LEFT_SPEED, 0)
+            player.setWalk(0, constants.DODGE_LEFT_SPEED, 0)
 
     if not transitions.shouldAvoidObstacle(player):
         player.doneAvoidingCounter += 1
@@ -444,34 +442,38 @@ def chaseAroundBox(player):
     if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
         # go to corner nearest ball
         if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
-            player.brain.nav.goTo( (NogginConstants.MY_GOALBOX_RIGHT_X +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOALBOX_TOP_Y +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOAL_HEADING ))
+            player.brain.nav.goTo(
+                RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X +
+                              constants.GOALBOX_OFFSET,
+                              NogginConstants.MY_GOALBOX_TOP_Y +
+                              constants.GOALBOX_OFFSET,
+                              NogginConstants.MY_GOAL_HEADING ))
 
         if ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
-            player.brain.nav.goTo(( NogginConstants.MY_GOALBOX_RIGHT_X +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOALBOX_BOTTOM_Y -
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOAL_HEADING ))
+            player.brain.nav.goTo(
+                RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X +
+                              constants.GOALBOX_OFFSET,
+                              NogginConstants.MY_GOALBOX_BOTTOM_Y -
+                              constants.GOALBOX_OFFSET,
+                              NogginConstants.MY_GOAL_HEADING ))
 
     if my.x < NogginConstants.MY_GOALBOX_RIGHT_X:
         # go to corner nearest ball
         if my.y > NogginConstants.MY_GOALBOX_TOP_Y:
-            player.brain.nav.goTo(( NogginConstants.MY_GOALBOX_RIGHT_X +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOALBOX_TOP_Y +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOAL_HEADING ))
+            player.brain.nav.goTo(
+                RobotLocation( NogginConstants.MY_GOALBOX_RIGHT_X +
+                               constants.GOALBOX_OFFSET,
+                               NogginConstants.MY_GOALBOX_TOP_Y +
+                               constants.GOALBOX_OFFSET,
+                               NogginConstants.MY_GOAL_HEADING ))
 
         if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
-            player.brain.nav.goTo(( NogginConstants.MY_GOALBOX_RIGHT_X +
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOALBOX_BOTTOM_Y -
-                                    constants.GOALBOX_OFFSET,
-                                    NogginConstants.MY_GOAL_HEADING ))
+            player.brain.nav.goTo(
+                RobotLocation( NogginConstants.MY_GOALBOX_RIGHT_X +
+                               constants.GOALBOX_OFFSET,
+                               NogginConstants.MY_GOALBOX_BOTTOM_Y -
+                               constants.GOALBOX_OFFSET,
+                               NogginConstants.MY_GOAL_HEADING ))
     return player.stay()
 
 def steps(player):
@@ -488,19 +490,18 @@ def ballInMyBox(player):
 
     ball = player.brain.ball
     if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
-        player.setSpeed(0, 0, constants.BALL_SPIN_SPEED *
+        player.setWalk(0, 0, constants.BALL_SPIN_SPEED *
                         MyMath.sign(ball.bearing) )
     elif fabs(ball.bearing) < constants.BALL_APPROACH_BEARING_OFF_THRESH :
         player.stopWalking()
     if not player.ballInMyGoalBox():
         return player.goLater('chase')
     return player.stay()
-
+# TODO
 def approachDangerousBall(player):
     if player.firstFrame():
         player.stopWalking()
     #print "approach dangerous ball"
-    my = player.brain.my
     #single steps towards ball and goal with spin
     player.setSteps(0, 0, 0, 0)
 
@@ -527,9 +528,7 @@ def orbitBeforeKick(player):
         brain.tracker.trackBall()
 
         shotPoint = KickingHelpers.getShotCloseAimPoint(player)
-        bearingToGoal = MyMath.getRelativeBearing(my.x, my.y, my.h,
-                                                  shotPoint[0],
-                                                  shotPoint[1] )
+        bearingToGoal = my.getRelativeBearing(shotPoint)
         spinDir = -MyMath.sign(bearingToGoal)
         player.brain.nav.orbitAngle(spinDir * 90)
     if not player.brain.tracker.activeLocOn and \

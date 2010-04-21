@@ -1,4 +1,6 @@
 from .. import NogginConstants
+from man.noggin.typeDefs.Location import Location
+
 SUPER_SAFE_KICKS = False # Only kick straight when we see the goal
 MAX_FORWARD_KICK_ANGLE = 55
 MIN_SIDEWASE_KICK_ANGLE = 15
@@ -57,14 +59,14 @@ LOOK_POST_KICK_FRAMES_OFF = 10
 CLEAR_CENTER_FIELD_STRAIGHT_ANGLE = 60
 FACING_SIDELINE_ANGLE = 30
 
-SHOOT_AT_LEFT_AIM_POINT = (NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
-                            NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y +
-                            NogginConstants.GOAL_WIDTH *3.0/4.0)
+SHOOT_AT_LEFT_AIM_POINT = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
+                                   NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y +
+                                   NogginConstants.GOAL_WIDTH *3.0/4.0)
 
 
-SHOOT_AT_RIGHT_AIM_POINT = ( NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
-                              NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y +
-                              NogginConstants.GOAL_WIDTH/4.0)
+SHOOT_AT_RIGHT_AIM_POINT = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
+                                    NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y +
+                                    NogginConstants.GOAL_WIDTH/4.0)
 
 
 SHOOT_BALL_LOC_ALIGN_ANGLE = 5

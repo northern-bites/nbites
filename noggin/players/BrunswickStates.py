@@ -14,17 +14,13 @@ def gameInitial(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        if player.squatting:
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-            player.squatting = False
-        else:
-            player.stopWalking()
+        player.stopWalking()
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
-          and player.motion.isBodyActive()):
+          and not player.motion.isBodyActive()):
         player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
 
@@ -35,16 +31,8 @@ def gamePenalized(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        if player.squatting:
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-            player.squatting = False
-        else:
-            player.stopWalking()
-        player.penalizeHeads()
-
-    if (player.stateTime >=
-        SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT_STAND_UP)):
         player.stopWalking()
+        player.penalizeHeads()
 
     return player.stay()
 
@@ -57,16 +45,19 @@ def gameReady(player):
         player.inKickingState = False
         player.justKicked = False
         player.brain.CoA.setRobotGait(player.brain.motion)
+
+        if player.squatting:
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            player.squatting = False
+        else:
+            player.standup()
+
     if player.brain.gameController.ownKickOff:
         player.hasKickedOffKick = False
     else:
         player.hasKickedOffKick = True
 
-    if player.squatting:
-        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-        player.squatting = False
-    else:
-        player.standup()
+    player.standup()
 
     player.brain.tracker.locPans()
     if player.lastDiffState == 'gameInitial':
@@ -86,6 +77,7 @@ def gameSet(player):
         player.inKickingState = False
         player.justKicked = False
         player.brain.CoA.setRobotGait(player.brain.motion)
+
     if player.firstFrame() and player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
 
@@ -95,9 +87,6 @@ def gameSet(player):
 
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
-            if player.squatting:
-                return player.goLater('squatted')
-            return player.goLater('squat')
 
         if player.brain.play.isRole(CHASER):
             player.brain.tracker.trackBall()
@@ -144,9 +133,6 @@ def penaltyShotsGameSet(player):
             player.brain.tracker.activeLoc()
     if player.brain.play.isRole(GOALIE):
         player.brain.resetGoalieLocalization()
-        if player.squatting:
-            return player.goLater('squatted')
-        return player.goLater('squat')
 
     return player.stay()
 
@@ -167,8 +153,6 @@ def fallen(player):
     player.isChasing = False
     player.inKickingState = False
     player.justKicked = False
-    player.squatting = False
-    player.brain.nav.switchTo('stopped')
     return player.stay()
 
 
@@ -182,11 +166,7 @@ def gameFinished(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        if player.squatting:
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-            player.squatting = False
-        else:
-            player.stopWalking()
+        player.stopWalking()
 
         player.zeroHeads()
         player.GAME_FINISHED_satDown = False

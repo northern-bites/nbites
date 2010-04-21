@@ -49,7 +49,7 @@ def walkTest(player):
         player.testFrames = currentCommand[2]
         currentVector = currentCommand[1]
         if currentCommand[0] == WALK:
-            player.setSpeed(currentVector[0],
+            player.setWalk(currentVector[0],
                             currentVector[1],
                             currentVector[2],)
         elif currentCommand[0] == STEP:

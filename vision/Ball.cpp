@@ -42,7 +42,7 @@ using namespace std;
 
 // Ball constants
 // EXAMINED: look at this switch - SMALLBALLDIM
-static const int SMALLBALLDIM = 4; // below this size balls are considered small
+static const int SMALLBALLDIM = 3; // below this size balls are considered small
 static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
 // ratio of width/height worse than this is a very bad sign
 static const float BALLTOOFAT = 1.5f;
@@ -123,7 +123,7 @@ void Ball::createBall(int h) {
 int Ball::balls(int horizon, VisualBall *thisBall)
 {
     const int MIN_BLOB_SIZE = 3;
-	const int MIN_AREA = 35;
+	const int MIN_AREA = 20;
 	const int MAX_AREA = 1000;
 	const int PIX_EST_DIV = 3;
 	const int BOTTOM_EDGE_BUFF = 3;
@@ -403,7 +403,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 			done = true;
 			float distanceDifference = fabs(e.dist - thisBall->getDistance());
 			const float DISTANCE_MISMATCH = 50.0f;
-			if (distanceDifference > DISTANCE_MISMATCH &&
+			/*if (distanceDifference > DISTANCE_MISMATCH &&
 				(e.dist *2 <  thisBall->getDistance() ||
 				 thisBall->getDistance() * 2 < e.dist)
 				&& e.dist < PIXACC && e.dist > 0) {
@@ -414,7 +414,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 				thisBall->init();
 				topBlob->init();
 				done = false;
-			}
+				}*/
 		}
 	}
     // sometimes when we're close to the ball we catch reflections off

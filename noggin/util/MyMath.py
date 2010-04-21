@@ -5,9 +5,7 @@ myMath.py - a number of methods for simple often used math
 
 from math import (atan2,
                   cos,
-                  degrees,
                   fabs,
-                  hypot,
                   pi,
                   radians,
                   sin)
@@ -37,15 +35,6 @@ def sub180Diff(angle, from_angle):
         else:
             angle += 360
     return angle
-
-def dist(x1,y1,x2,y2):
-    ''' returns euclidian dist'''
-    # HACK HACK HACK HACK for infinity values HACK HACK
-    if x2 == float('inf') or \
-            y2 == float('inf'):
-        print "WE HAVE AN INFINITY = ", x1,y1,x2,y2
-        return 10000
-    return hypot(y2-y1,x2-x1)
 
 def safe_atan2(y, x):
     if x == 0.0:
@@ -90,43 +79,6 @@ def getRelativeVelocityX(robotH, velX, velY):
 def getRelativeVelocityY(robotH, velX, velY):
     '''Returns the y velocity of the ball relative to the self heading'''
     return velX * sin(radians(robotH)) + velY * cos(radians(robotH))
-
-def getRelativeBearing(robotX, robotY, robotH, x, y):
-    '''return relative heading from self localization to abs x,y on field'''
-    return sub180Angle((degrees(safe_atan2(y - robotY,
-                                           x - robotX))) - robotH)
-
-def getTargetHeading(my, targetX, targetY):
-    '''determine the heading facing a target x, y'''
-    return sub180Angle(degrees(safe_atan2(targetY - my.y, targetX - my.x)))
-
-def getSpinDir(h, targetH):
-    """
-    Advanced function to get the spin direction for a given heading.
-    """
-    LEFT_SPIN = 1
-    RIGHT_SPIN = -1
-    spinDir = 0
-
-    if abs(h - targetH) < 5:
-        spinDir = 0
-    elif targetH == 0:
-        spinDir = -sign(h)
-    elif targetH == (180 or -180):
-        spinDir = sign(h)
-    elif sign(targetH) == sign(h):
-        spinDir = sign(targetH - h)
-    elif h < 0:
-        if (h + 180) >= targetH:
-            spinDir = LEFT_SPIN
-        else: # h+180 < targetH
-            spinDir = RIGHT_SPIN
-    else: # h>0
-        if (h - 180) >=targetH:
-            spinDir = LEFT_SPIN
-        else:
-            spinDir = RIGHT_SPIN
-    return spinDir
 
 def linesIntersect(x1,y1, x2, y2,
                      u1,v1, u2,v2):

@@ -24,8 +24,6 @@ class FieldObject(VisualObject):
         """initialization all values for FieldObject() class"""
         # Things to be filled out later
         VisualObject.__init__(self)
-        self.x = 0
-        self.y = 0
         self.localId = 0 # name based around team color
         self.locDist = 0
         self.locBearing = 0

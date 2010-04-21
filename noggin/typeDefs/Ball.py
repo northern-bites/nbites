@@ -2,8 +2,7 @@ import time
 
 from .VisualObject import VisualObject
 from .. import NogginConstants as Constants
-from ..util.MyMath import (dist, getRelativeBearing,
-                          getRelativeVelocityX,
+from ..util.MyMath import (getRelativeVelocityX,
                           getRelativeVelocityY,
                           getRelativeX,
                           getRelativeY)
@@ -37,8 +36,6 @@ class Ball(VisualObject):
          self.elevation,
          self.prevFramesOn,
          self.prevFramesOff,
-         self.x,
-         self.y,
          self.uncertX,
          self.uncertY,
          self.sd,
@@ -134,9 +131,8 @@ class Ball(VisualObject):
         self.sd = self.uncertX * self.uncertY
 
         # Determine other values
-        self.locDist = dist(my.x, my.y, self.x, self.y)
-        self.locBearing = getRelativeBearing(my.x, my.y, my.h,
-                                             self.x, self.y)
+        self.locDist = my.dist(self)
+        self.locBearing = my.getRelativeBearing(self)
         self.locRelX = getRelativeX(self.locDist, self.locBearing)
         self.locRelY = getRelativeY(self.locDist, self.locBearing)
         self.relVelX = getRelativeVelocityX(my.h, self.velX, self.velY)

@@ -6,7 +6,6 @@ from . import KickingStates
 from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieSaveStates
-from . import SquatPositionStates
 from . import BrunswickStates
 
 from . import GoalieTransitions
@@ -19,7 +18,8 @@ from ..playbook import PBConstants
 from . import ChaseBallConstants as ChaseConstants
 
 from man.motion import SweetMoves
-from ..util import MyMath
+from man.noggin.typeDefs.Location import Location, RobotLocation
+
 from math import sin, cos, radians
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
@@ -28,7 +28,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(PenaltyKickStates)
         self.addStates(GoaliePositionStates)
         self.addStates(GoalieSaveStates)
-        self.addStates(SquatPositionStates)
         self.addStates(PositionStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
@@ -109,15 +108,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if not self.brain.playbook.subRoleChanged():
-            if self.play.isRole(PBConstants.GOALIE):
-                state = GoalieTransitions.goalieRunChecks(self)
-                return state
+        if self.play.isRole(PBConstants.GOALIE):
+            state = GoalieTransitions.goalieRunChecks(self)
+            return state
+
+        elif not self.brain.playbook.subRoleChanged():
             return self.currentState
+
         # We don't stop chasing if we are in certain roles
         elif (self.play.isRole(PBConstants.CHASER) and
               ChaseBallTransitions.shouldntStopChasing(self)):
             return self.currentState
+
         else:
             return self.getRoleState()
 
@@ -127,23 +129,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         elif ( self.play.isRole(PBConstants.OFFENDER) or
                self.play.isRole(PBConstants.DEFENDER) ):
             return 'playbookPosition'
-        elif self.play.isRole(PBConstants.GOALIE):
-            if (self.lastDiffState == 'gamePenalized' or
-                self.lastDiffState == 'fallen'):
-                return 'goaliePosition'
-            elif self.squatting:
-                return 'squatted'
-            return 'squat'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
         elif self.play.isRole(PBConstants.SEARCHER):
             return 'scanFindBall'
         else:
             return 'scanFindBall'
-
-
-
-
 
     ###### HELPER METHODS ######
     def getSpinDirAfterKick(self):
@@ -176,18 +167,14 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         my = self.brain.my
 
         if self.penaltyKicking:
-            destKickLocX, destKickLocY =  \
-                self.getPenaltyKickingBallDest()
-            destH = MyMath.getRelativeBearing(ball.x,
-                                              ball.y,
-                                              NogginConstants.
-                                              OPP_GOAL_HEADING,
-                                              destKickLocX,
-                                              destKickLocY)
-        elif self.shouldMoveAroundBall():
-            return self.getPointToMoveAroundBall()
+            destKickLoc = self.getPenaltyKickingBallDest()
+            ballLoc = RobotLocation(ball.x, ball.y, NogginConstants.OPP_GOAL_HEADING)
+            destH = my.getRelativeBearing(destKickLoc)
+
         elif self.inFrontOfBall():
             destH = self.getApproachHeadingFromFront()
+        elif self.shouldMoveAroundBall():
+            return self.getPointToMoveAroundBall()
         else :
             destH = self.getApproachHeadingFromBehind()
 
@@ -195,28 +182,21 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             cos(radians(destH))
         destY = ball.y - ChaseConstants.APPROACH_DIST_TO_BALL * \
             sin(radians(destH))
-        return destX, destY, destH
+        return RobotLocation(destX, destY, destH)
 
     def getApproachHeadingFromBehind(self):
         ball = self.brain.ball
         aimPoint = KickingHelpers.getShotFarAimPoint(self)
-        ballBearingToGoal = MyMath.getRelativeBearing(ball.x, ball.y,
-                                                      NogginConstants.
-                                                      OPP_GOAL_HEADING,
-                                                      aimPoint[0],
-                                                      aimPoint[1])
+        ballLoc = RobotLocation(ball.x, ball.y, NogginConstants.OPP_GOAL_HEADING)
+        ballBearingToGoal = ballLoc.getRelativeBearing(aimPoint)
         return ballBearingToGoal
 
     def getApproachHeadingFromFront(self):
         ball = self.brain.ball
         my = self.brain.my
         kickDest = KickingHelpers.getShotFarAimPoint(self)
-        ballBearingToKickDest = MyMath.getRelativeBearing(ball.x,
-                                                          ball.y,
-                                                          NogginConstants.
-                                                          OPP_GOAL_HEADING,
-                                                          kickDest[0],
-                                                          kickDest[1] )
+        ballLoc = RobotLocation(ball.x, ball.y, NogginConstants.OPP_GOAL_HEADING)
+        ballBearingToKickDest = ballLoc.getRelativeBearing(kickDest)
         if my.y > ball.y:
             destH = ballBearingToKickDest - 90
         else :
@@ -225,11 +205,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getPenaltyKickingBallDest(self):
         if not self.penaltyMadeFirstKick:
-            return (NogginConstants.FIELD_WIDTH * 3/4,
-                    NogginConstants.FIELD_HEIGHT /4)
+            return Location(NogginConstants.FIELD_WIDTH * 3/4,
+                            NogginConstants.FIELD_HEIGHT /4)
 
-        return (NogginConstants.OPP_GOAL_MIDPOINT[0],
-                NogginConstants.OPP_GOAL_MIDPOINT[1] )
+        return Location(NogginConstants.OPP_GOAL_MIDPOINT[0],
+                        NogginConstants.OPP_GOAL_MIDPOINT[1] )
 
     def ballInOppGoalBox(self):
         ball = self.brain.ball
@@ -261,7 +241,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         relY =  -ChaseConstants.ORBIT_OFFSET_DIST * \
             sin(radians(ChaseConstants.ORBIT_STEP_ANGLE)) + self.brain.ball.relY
         relTheta = ChaseConstants.ORBIT_STEP_ANGLE * 2 + self.brain.ball.bearing
-        return relX, relY, relTheta
+        return RobotLocation(relX, relY, relTheta)
 
     def shouldMoveAroundBall(self):
         return (self.brain.ball.x < self.brain.my.x
@@ -279,4 +259,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             y = self.brain.ball.y + 75.0
             destH = -90.0
 
-        return x, y, destH
+        return RobotLocation(x, y, destH)

@@ -1,4 +1,4 @@
-from .players import BrunswickSpeeds as speeds
+from ..players import BrunswickSpeeds as speeds
 
 #navstates.py
 GOTO_FORWARD_SPEED = speeds.MAX_X_SPEED
@@ -79,3 +79,11 @@ FRAME_RATE = 22                 # Rough estimate. fps
 
 MIN_SPIN_SPEED = speeds.MIN_SPIN_MAGNITUDE
 MIN_SPIN_MAGNITUDE_WALK = speeds.MIN_SPIN_WHILE_X_MAGNITUDE
+
+#
+FINAL_HEADING_DIST = 100
+FINAL_HEADING_READY_DIST = 60
+HEADING_THRESHOLD_TO_SPIN = 60
+FRAMES_THRESHOLD_TO_SPIN = 30
+FRAMES_THRESHOLD_TO_POSITION_OMNI = 30
+FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK = 30

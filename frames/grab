@@ -23,5 +23,9 @@ fi
 echo "mkdir -p $LOCAL_DEST"
 mkdir -p $LOCAL_DEST
 
-echo "scp -r root@$ROBOT:frames/* $LOCAL_DEST/"
-scp -r root@$ROBOT:frames/* $LOCAL_DEST/
+# set directory to be world-writable so we can add learning files etc.
+
+chmod a+w $LOCAL_DEST
+
+echo "scp -r nao@$ROBOT:/home/nao/naoqi/frames/* $LOCAL_DEST/"
+scp -r nao@$ROBOT:/home/nao/naoqi/frames/* $LOCAL_DEST/

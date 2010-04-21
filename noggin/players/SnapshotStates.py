@@ -3,7 +3,7 @@ import man.motion.HeadMoves as HeadMoves
 
 ####Change these for picture taking####
 FRAME_SAVE_RATE = 1
-NUM_FRAMES_TO_SAVE = 500
+NUM_FRAMES_TO_SAVE = 150
 
 def gameReady(player):
     player.brain.resetLocalization()
@@ -23,12 +23,13 @@ def saveFrames(player):
         ##replace <TYPE_SNAPSHOT_PAN> with any PHOTO PAN in
         ##    man/motion/HeadMoves.py
         player.standup()
-        player.setSpeed(0,0,0)
-    if player.counter % FRAME_SAVE_RATE == 0:
+        player.savedFrames = 0
+    if player.brain.ball.on or player.brain.yglp.on or player.brain.ygrp.on or \
+            player.brain.ygCrossbar.on or player.brain.bglp.on or \
+            player.brain.bgrp.on or player.brain.bgCrossbar.on:         
         player.brain.sensors.saveFrame()
-    if player.counter == 800:
-        player.setSpeed(0,0,0)
-    if player.counter > FRAME_SAVE_RATE * NUM_FRAMES_TO_SAVE:
+        player.savedFrames += 1
+    if player.savedFrames == NUM_FRAMES_TO_SAVE:
         return player.goNow('doneState')
 
     return player.stay()
