@@ -119,26 +119,23 @@ void LocEKF::mergeEKF(const LocEKF& other)
 
 	const int DRIFT_PROB_MAX_DIFF = 10;
 	if ( other.getProbability() > probability * DRIFT_PROB_MAX_DIFF ){
-		new_xhat_k = other.getState();
+		xhat_k = other.getState();
 		P_k = other.getStateUncertainty();
 	} else if ( probability > other.getProbability() * DRIFT_PROB_MAX_DIFF) {
 		new_xhat_k = xhat_k;
 	} else {
-		new_xhat_k(0) = ( (1/newProbability)*
-						  (probability * getXEst() +
-						   other.getProbability() * other.getXEst()) );
-		new_xhat_k(1) = ( (1/newProbability)*
-						  (probability * getYEst() +
-						   other.getProbability() * other.getYEst()) );
-		new_xhat_k(2) = ( (1/newProbability)*
-						  (probability * getHEst() +
-						   other.getProbability() * other.getHEst()) );
+		new_xhat_k(0) = static_cast<float>( (1/newProbability)*
+											(probability * getXEst() +
+											 other.getProbability() * other.getXEst()) );
+		new_xhat_k(1) = static_cast<float>( (1/newProbability)*
+											(probability * getYEst() +
+											 other.getProbability() * other.getYEst()) );
+		new_xhat_k(2) = static_cast<float>( (1/newProbability)*
+											(probability * getHEst() +
+											 other.getProbability() * other.getHEst()) );
 		// cout << "newxhatk " << new_xhat_k << "\t" ;
 		// cout << "newprob " << newProbability << endl;
 
-
-
-		// @todo set covariance matrix of new model
 		const StateVector diffA = (xhat_k - new_xhat_k);
 		const StateMatrix a = P_k + outer_prod(diffA,
 											   trans(diffA));
@@ -147,15 +144,15 @@ void LocEKF::mergeEKF(const LocEKF& other)
 		const StateMatrix b = (other.getStateUncertainty() +
 							   outer_prod(diffB, trans(diffB)));
 
-		const StateMatrix new_P_k = ( ((probability * a) +
-									   (other.getProbability() * b)) /
-									  newProbability);
+		P_k = ( ((probability * a) +
+				 (other.getProbability() * b)) /
+				newProbability);
+		xhat_k = new_xhat_k;
 	}
+
 	// cout << "\txhat: " << new_xhat_k << endl;
 	//cout << "\t\tP_k: " << new_P_k << endl;
 	setProbability(newProbability);
-	xhat_k = new_xhat_k;
-	//P_k = new_P_k;
 }
 
 
@@ -483,10 +480,18 @@ void LocEKF::incorporateCartesianMeasurement(int obsIndex,
 	const double uncertY = getYUncert();
 	const double uncertH = getHUncert();
 
-	R_pred_k(0,0) = uncertX * cosh + uncertY * sinh;
+	const double sinhUncert = uncertH * cosh;
+	const double coshUncert = uncertH * sinh;
+
+	const float xInvariance = abs(x_b -x);
+	const float yInvariance = abs(y_b -y);
+
+	R_pred_k(0,0) = ((uncertX / xInvariance + coshUncert / cosh) +
+					 (uncertY / yInvariance + sinhUncert / sinh));
 	R_pred_k(0,1) = 0;
 	R_pred_k(1,0) = 0;
-	R_pred_k(1,1) = - uncertX * sinh + uncertY * cosh;
+	R_pred_k(1,1) = ((uncertX / xInvariance + sinhUncert / sinh) +
+					 (uncertY / yInvariance + coshUncert / cosh));
 
 
 
@@ -624,10 +629,16 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		const double uncertY = getYUncert();
 		const double uncertH = getHUncert();
 
-		R_pred_k(0,0) = static_cast<float>(hypot(uncertX, uncertY));
+
+		const float xInvariance = abs(x - x_b);
+		const float yInvariance = abs(y - y_b);
+
+		R_pred_k(0,0) = ((uncertX/xInvariance) + (uncertY/yInvariance) /
+						 (xInvariance*xInvariance + yInvariance*yInvariance));
 		R_pred_k(0,1) = 0;
 		R_pred_k(1,0) = 0;
-		R_pred_k(1,1) = .5 * uncertH;
+		R_pred_k(1,1) = (((uncertY / yInvariance) + (uncertX / xInvariance)) /
+						 (yInvariance / xInvariance) + uncertH);
 
 #ifdef DEBUG_LOC_EKF_INPUTS
         cout << "\t\t\tR vector is" << R_k << endl;

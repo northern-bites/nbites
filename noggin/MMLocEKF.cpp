@@ -224,7 +224,7 @@ void MMLocEKF::consolidateModels(int maxAfterMerge)
 	double mergeThreshold = MERGE_THRESH_INIT;
 	int numMerges = 0;
 	const int MAX_MERGES = 10;
-	const double MIN_ACCEPT_PROB = 0.003;
+	const double MIN_ACCEPT_PROB = 0.0001;
 
 	for (int i=0; i < MAX_MODELS; ++i){
 		if (models[i]->isActive() &&
