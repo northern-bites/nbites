@@ -1,6 +1,0 @@
-
-0       string          NB_log          Northern Bites Robot Log
->6      long            0               \b, Single type
->6      long            1               \b, Double type
->6      long            2               \b, Triple type
->6      long            3               \b, Dual type
