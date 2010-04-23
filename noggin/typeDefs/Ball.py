@@ -43,6 +43,7 @@ class Ball(VisualObject):
          self.velY,
          self.uncertVelX,
          self.uncertVelY,
+         self.heading,
          self.locDist,
          self.locBearing,
          self.locRelX,
@@ -137,6 +138,8 @@ class Ball(VisualObject):
         self.locRelY = getRelativeY(self.locDist, self.locBearing)
         self.relVelX = getRelativeVelocityX(my.h, self.velX, self.velY)
         self.relVelY = getRelativeVelocityY(my.h, self.velX, self.velY)
+
+        self.heading = my.getTargetHeading(self)
 
     def __str__(self):
         """returns string with all class variables"""
