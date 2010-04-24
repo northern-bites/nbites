@@ -1,9 +1,6 @@
 
-from .. import NogginConstants
 import GoalieTransitions as helper
 import GoalieConstants as constants
-from ..util import MyMath
-from man.noggin.typeDefs.Location import RobotLocation
 
 def goaliePosition(player):
     #consider using ball.x < fixed point- locDist could cause problems if
@@ -31,16 +28,7 @@ def goalieAwesomePosition(player):
     heading = None
     ball = brain.ball
 
-    if ball.on:
-        heading = brain.my.h + ball.bearing
-    elif ball.framesOff < 3:
-        heading = brain.my.h + ball.locBearing
-    else:
-        heading = NogginConstants.OPP_GOAL_HEADING
-
-    position = player.brain.play.getPosition()
-    position = RobotLocation(position[0], position[1], heading)
-    nav.positionPlaybook(position)
+    nav.positionPlaybook()
 
     if nav.isStopped():
         return player.goLater("goalieAtPosition")
@@ -73,17 +61,8 @@ def goalieAtPosition(player):
 
     # Check that the position is correct
     ball = brain.ball
-    heading = None
-
-    if ball.on:
-        heading = brain.my.h + ball.bearing
-    elif ball.framesOff < 3:
-        heading = brain.my.h + ball.locBearing
-    else:
-        heading = NogginConstants.OPP_GOAL_HEADING
 
     position = player.brain.play.getPosition()
-    position = RobotLocation(position[0], position[1], heading)
 
     if (abs(nav.dest.x - position.x) > constants.SHOULD_POSITION_DIFF or
         abs(nav.dest.y - position.y) >  constants.SHOULD_POSITION_DIFF or

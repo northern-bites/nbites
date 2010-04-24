@@ -290,7 +290,7 @@ def fancyGoaliePosition(team):
 
         # Determine X,Y of ellipse based on theta, set heading on the ball
         x, y = team.ellipse.getPositionFromTheta(theta)
-        h = teab.brain.ball.h
+        h = ball.heading
         position = (x,y,h)
 
     return position

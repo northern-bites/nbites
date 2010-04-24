@@ -208,7 +208,7 @@ READY_KICKOFF_OFFENDER_1_Y = NogginConstants.CENTER_FIELD_Y - \
 
 READY_KICKOFF_CHASER_X = (NogginConstants.CENTER_FIELD_X -
                           NogginConstants.CENTER_CIRCLE_RADIUS/2.0)
-READY_KICKOFF_CHASER_X = NogginConstants.CENTER_FIELD_Y # near center
+READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 
 # READY_NON_KICKOFF
 
