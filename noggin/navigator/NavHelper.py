@@ -140,19 +140,16 @@ def atDestination(my, dest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
     """
-    return ( fabs(my.x - dest.x) < constants.CLOSE_ENOUGH_XY and
-             fabs(my.y - dest.y) < constants.CLOSE_ENOUGH_XY)
+    return my.dist(dest) < constants.CLOSE_ENOUGH_XY
 
 def atDestinationCloser(my, dest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
     """
-    return (fabs(my.x - dest.x) < constants.CLOSER_XY and
-            fabs(my.y - dest.y) < constants.CLOSER_XY)
+    return my.dist(dest) < constants.CLOSER_XY
 
 def atDestinationGoalie(my, dest):
-    return (fabs(my.x - dest.x) < constants.GOALIE_CLOSE_X and
-            fabs(my.y - dest.y) < constants.GOALIE_CLOSE_Y)
+    return my.dist(dest) < constants.GOALIE_CLOSE
 
 def atHeadingGoTo(my, targetHeading):
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
