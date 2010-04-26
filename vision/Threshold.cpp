@@ -65,7 +65,7 @@ using boost::shared_ptr;
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
-    : inverted(false), vision(vis), pose(posPtr)
+    : vision(vis), pose(posPtr)
 {
 
     // storing locally
@@ -182,88 +182,29 @@ void Threshold::thresholdAndRuns() {
 /* Thresholding.  Since there's no real benefit (and in fact can it can be a
  * detriment with compiler optimizations on) to combine the thresholding and
  * the runs loops, I (Jeremy) have split out the thresholding into it's own
- * method here.  This also allows for my incredibly complex unrolled loops for
- * each robot to be separated from other, clearer, code.
+ * method here.
  */
 void Threshold::threshold() {
-    // My loop variables
-    int m;
-    unsigned char *tPtr, *tEnd, *tOff; // pointers into thresholded array
-    const unsigned char *yPtr, *uPtr, *vPtr; // pointers into image array
+
+    unsigned char *tPtr, *tEnd; // pointers into thresholded array
+    const unsigned char *yPtr; // pointers into image array
 
     // My loop variable initializations
     yPtr = &yplane[0];
-    uPtr = &uplane[0];
-    vPtr = &vplane[0];
 
     tPtr = &thresholded[0][0];
     tEnd = &thresholded[IMAGE_HEIGHT-1][IMAGE_WIDTH-1] + 1;
 
-#if ROBOT(NAO_SIM)
-    m = (IMAGE_WIDTH * IMAGE_HEIGHT) % 8;
-
-    // number of non-unrolled offset from beginning of row
-    tOff = tPtr + m;
-
-    // here is non-unrolled loop
-    while (tPtr < tOff)
-        *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-
-    // here is the unrolled loop
-    while (tPtr < tEnd) {
-        // Eight unrolled table lookups
-        *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-        *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-        *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-        *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-        *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-        *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-        *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-        *tPtr++ = bigTable[*yPtr++>>YSHIFT][*yPtr++>>USHIFT][*yPtr++>>VSHIFT];
-    }
-
-#elif ROBOT(NAO_RL)
-    m = (IMAGE_WIDTH * IMAGE_HEIGHT) % 8;
-
-    // number of non-unrolled offset from beginning of row
-    tOff = tPtr + m;
-
-    // due to YUV422 data, we can only increment u & v every two assigments
-    // thus, we need to do different stuff if we start off with even or odd
-    // remainder.  However, we won't get odd # of pixels in 422 (not valid), so
-    // lets ignore that
-
-    // here is non-unrolled loop (unrolled by 2, actually)
-    while (tPtr < tOff) {
-        // we increment Y by 2 every time, and U and V by 4 every two times
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2;
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2; uPtr+=4; vPtr+=4;
-    }
-
-    // here is the unrolled loop
-    while (tPtr < tEnd) {
-        // Eight unrolled table lookups
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2;
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2; uPtr+=4; vPtr+=4;
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2;
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2; uPtr+=4; vPtr+=4;
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2;
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2; uPtr+=4; vPtr+=4;
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2;
-        *tPtr++ = bigTable[*uPtr>>USHIFT][*vPtr>>VSHIFT][*yPtr>>YSHIFT];
-        yPtr+=2; uPtr+=4; vPtr+=4;
-    }
-
-#endif // ROBOT(...)
+	// Loop optimizations thanks to Bill Silver. Uses constant offesets to
+	// speed up the table lookups. Operates on bigTable in UVY order for
+	// more optimizations.
+	while (tPtr < tEnd)
+	{
+		unsigned char* p = bigTable[yPtr[UOFFSET] >> 1][yPtr[VOFFSET] >> 1];
+        *tPtr++ = p[yPtr[YOFFSET1] >> 1];
+        *tPtr++ = p[yPtr[YOFFSET2] >> 1];
+        yPtr += 4;
+	}
 }
 
 /* Image runs.  As explained in the comments for the threshold() method, I
@@ -1126,33 +1067,8 @@ const uchar* Threshold::getYUV() {
  * @param newyuv     presumably a new yuv value in bytes or something
  */
 void Threshold::setYUV(const uchar* newyuv) {
-
     yuv = newyuv;
-    yplane = yuv;
-
-    if (!inverted) {
-#if ROBOT(NAO_RL)
-        // I've reversed the U and V planes, in addition to offsetting them, as
-        // the color table format is still reversed
-        uplane = yplane + 3; // normally, is 1, but with reversed tables, is 1
-        vplane = yplane + 1; // normally, is 3, but with reversed tables, is 1
-#elif ROBOT(NAO_SIM)
-#else
-#    error Undefined robot type
-#endif
-
-    }else {
-        // inverted
-#if ROBOT(NAO)
-        // this is actually the correct (non-inverted) settings, but again, with
-        // our color tables, inverted=non-inverted and non-inverted=inverted
-        uplane = yplane + 1;
-        vplane = yplane + 3;
-#elif ROBOT(NAO_SIM)
-#else
-#    error Undefined robot type
-#endif
-    }
+	yplane = yuv;
 }
 
 /* Calculate the distance between two objects (x distance only).

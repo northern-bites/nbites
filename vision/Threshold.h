@@ -57,6 +57,12 @@ static const int MIN_X_OPEN = 40;
 
 static const int VISUAL_HORIZON_COLOR = BROWN;
 
+static const int UOFFSET=3;
+static const int VOFFSET=1;
+static const int YOFFSET1=0;
+static const int YOFFSET2=2;
+
+
 //
 // DISTANCE ESTIMATES CONSTANTS
 // based on Height and Width
@@ -113,9 +119,6 @@ public:
     void setYUV(const uchar* newyuv);
     const uchar* getYUV();
     static const char * getShortColor(int _id);
-
-    void swapUV() { inverted = !inverted; setYUV(yuv); }
-    void swapUV(bool _inverted) { inverted = _inverted; setYUV(yuv); }
 
     int getPixelBoundaryLeft();
     int getPixelBoundaryRight();
@@ -175,8 +178,6 @@ public:
     //write lines, points, boxes to this array to avoid changing the real image
     unsigned char debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
 #endif
-
-    bool inverted;
 
 private:
 
