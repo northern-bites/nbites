@@ -3,9 +3,10 @@ import time
 from .VisualObject import VisualObject
 from .. import NogginConstants as Constants
 from ..util.MyMath import (getRelativeVelocityX,
-                          getRelativeVelocityY,
-                          getRelativeX,
-                          getRelativeY)
+                           getRelativeVelocityY,
+                           getRelativeX,
+                           getRelativeY,
+                           sub180Angle)
 
 FRAMES_AFTER_LOST_BALL_TO_USE_VISION = 3
 
@@ -148,6 +149,7 @@ class Ball(VisualObject):
         if self.on:
             self.bearing = self.visBearing
             self.dist = self.visDist
+            self.heading = sub180Angle(my.h + self.bearing)
 
         # use old vision data for several frames after we last see the ball.
         elif self.framesOff <= FRAMES_AFTER_LOST_BALL_TO_USE_VISION:
@@ -156,9 +158,9 @@ class Ball(VisualObject):
         else:
             self.bearing = self.locBearing
             self.dist = self.locDist
-
+            # uses my.x, my.y which are loc determined to get heading
+            self.heading = my.getTargetHeading(self)
         # TODO: use vision bearing + my heading if ball.on
-        self.heading = my.getTargetHeading(self)
 
     def __str__(self):
         """returns string with all class variables"""
