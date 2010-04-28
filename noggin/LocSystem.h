@@ -21,8 +21,9 @@ public:
     virtual void reset() = 0;
     // These should be made pure virtual and the implementing MCL class should
     // be forced to implement them
-    virtual void blueGoalieReset() {}
-    virtual void redGoalieReset() {}
+    virtual void blueGoalieReset() = 0;
+    virtual void redGoalieReset() = 0;
+	virtual void resetLocTo(float x, float y, float h) = 0;
 
     // Getters
     virtual const PoseEst getCurrentEstimate() const = 0;

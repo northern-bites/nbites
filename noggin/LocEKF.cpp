@@ -88,12 +88,9 @@ LocEKF::LocEKF(float initX, float initY, float initH,
  */
 void LocEKF::reset()
 {
-    setXEst(INIT_LOC_X);
-    setYEst(INIT_LOC_Y);
-    setHEst(INIT_LOC_H);
-    setXUncert(INIT_X_UNCERT);
-    setYUncert(INIT_Y_UNCERT);
-    setHUncert(INIT_H_UNCERT);
+	resetLocTo(INIT_LOC_X,
+			   INIT_LOC_Y,
+			   INIT_LOC_H);
 }
 
 /**
@@ -101,12 +98,10 @@ void LocEKF::reset()
  */
 void LocEKF::blueGoalieReset()
 {
-    setXEst(INIT_BLUE_GOALIE_LOC_X);
-    setYEst(INIT_BLUE_GOALIE_LOC_Y);
-    setHEst(INIT_BLUE_GOALIE_LOC_H);
-    setXUncert(INIT_X_UNCERT);
-    setYUncert(INIT_Y_UNCERT);
-    setHUncert(INIT_H_UNCERT);
+	resetLocTo(INIT_BLUE_GOALIE_LOC_X,
+			   INIT_BLUE_GOALIE_LOC_Y,
+			   INIT_BLUE_GOALIE_LOC_H);
+
 }
 
 /**
@@ -114,9 +109,21 @@ void LocEKF::blueGoalieReset()
  */
 void LocEKF::redGoalieReset()
 {
-    setXEst(INIT_RED_GOALIE_LOC_X);
-    setYEst(INIT_RED_GOALIE_LOC_Y);
-    setHEst(INIT_RED_GOALIE_LOC_H);
+	resetLocTo(INIT_RED_GOALIE_LOC_X,
+			   INIT_RED_GOALIE_LOC_Y,
+			   INIT_RED_GOALIE_LOC_H);
+}
+
+/**
+ * Reset the EKF to the given position. Gives it a large uncertainity.
+ *
+ * @param x,y,h the position to set the EKF to.
+ */
+void LocEKF::resetLocTo(float x, float y, float h)
+{
+    setXEst(x);
+    setYEst(y);
+    setHEst(subPIAngle(h));
     setXUncert(INIT_X_UNCERT);
     setYUncert(INIT_Y_UNCERT);
     setHUncert(INIT_H_UNCERT);

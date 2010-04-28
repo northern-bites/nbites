@@ -41,6 +41,7 @@ public:
     virtual void reset();
     virtual void redGoalieReset();
     virtual void blueGoalieReset();
+	virtual inline void resetLocTo(float x, float y, float h);
 
     // Getters
     /**
@@ -62,7 +63,8 @@ public:
      * @return The current estimate of the loc heading in degrees
      */
     virtual const float getHEstDeg() const {
-        return subPIAngle(xhat_k(2)) * TO_DEG; }
+        return subPIAngle(xhat_k(2)) * TO_DEG;
+	}
 
 
     /**
