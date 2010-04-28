@@ -39,5 +39,5 @@ OPTION(
 OPTION(
   USE_MM_LOC_EKF
   "Use the Multimodal EKF instead of a single LocEKF"
-  ON
+  OFF
   )

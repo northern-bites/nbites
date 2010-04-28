@@ -1,10 +1,9 @@
 #include "MMLocEKF.h"
 
 // @todo implement mostLikelyModel tracking
-
 MMLocEKF::MMLocEKF() :
 	LocSystem(),mostLikelyModel(0), numActive(0),
-	numFree(MAX_MODELS), frameNum(0)
+	numFree(MAX_MODELS)
 {
 	initModels();
 }
@@ -31,7 +30,6 @@ void MMLocEKF::initModels()
 	numFree = MAX_MODELS;
 	activateModel(models[0]);
 	models[0]->setProbability(1.0);
-
 }
 
 /**
@@ -44,6 +42,9 @@ void MMLocEKF::destroyModels()
 	}
 }
 
+/**
+ * Update localization according to the given odometry and visual observations.
+ */
 void MMLocEKF::updateLocalization(MotionModel u, std::vector<Observation> Z)
 {
 	// Apply time update
@@ -71,8 +72,8 @@ void MMLocEKF::timeUpdate(MotionModel u)
 bool MMLocEKF::correctionStep(vector<Observation>& Z)
 {
 
-	bool appliedUnambiguous = applyUnambiguousObservations(Z);
-	bool appliedAmbiguous = applyAmbiguousObservations(Z);
+	const bool appliedUnambiguous = applyUnambiguousObservations(Z);
+	const bool appliedAmbiguous = applyAmbiguousObservations(Z);
 	return appliedUnambiguous || appliedAmbiguous;
 }
 
@@ -167,27 +168,8 @@ void MMLocEKF::endFrame()
 		}
 	}
 
-	// cout << "Before MERGE: " <<endl;
-	// for (int i=0; i < MAX_MODELS; ++i){
-	// 	if (models[i]->isActive()){
-	// 		models[i]->printAfterUpdateInfo();
-	// 	}
-	// }
-
 	consolidateModels(MAX_ACTIVE_MODELS);
 	normalizeProbabilities(modelList, PROB_SUM);
-
-	// cout << "After MERGE: " <<endl;
-
-	// cout << "f" << frameNum;
-	// for (int i=0; i < MAX_MODELS; ++i){
-	// 	if (models[i]->isActive()){
-	// 		cout << "\t" << models[i]->getProbability();
-	// 	}
-	// }
-	// cout << endl;
-
-	frameNum++;
 }
 
 void MMLocEKF::normalizeProbabilities(const list<LocEKF*>& unnormalized,
@@ -205,9 +187,6 @@ void MMLocEKF::normalizeProbabilities(const list<LocEKF*>& unnormalized,
     if(sumAlpha == 1.0) return;
 
     if (sumAlpha == 0) sumAlpha = 1e-12;
-
-	// if (frameNum > 685 && frameNum < 700)
-	// 	cout << "\tsumAlpha = " << sumAlpha <<endl;
 
 	model = unnormalized.begin();
     for ( ; model != unnormalized.end() ; model++) {

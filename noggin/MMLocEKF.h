@@ -70,8 +70,6 @@ private:						// Private variables
 	const static int MAX_ACTIVE_MODELS = 6;
 	const static double OUTLIER_PROB_LIMIT = 0.005;
 
-	int frameNum;
-
 public:
 	// LocSystem virtual getters
     virtual const PoseEst getCurrentEstimate() const;

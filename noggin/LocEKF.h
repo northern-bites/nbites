@@ -179,7 +179,9 @@ private:
 	int findNearestNeighbor(Observation *z);
     float getDivergence(Observation * z, PointLandmark pt);
 
+#ifdef USE_MM_LOC_EKF
 	bool updateProbability(const Observation& Z);
+#endif
 
     void limitAPrioriUncert();
     void limitPosteriorUncert();

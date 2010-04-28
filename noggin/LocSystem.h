@@ -49,8 +49,7 @@ public:
     virtual void setHUncert(float uncertH) = 0;
 	virtual void activate() { active = true; }
 	virtual void deactivate() { active = false; }
-	void setProbability(double p) { // cout << "p: " << p << endl;
-		probability = p; }
+	void setProbability(double p) { probability = p; }
 
 
     friend std::ostream& operator<< (std::ostream &o,

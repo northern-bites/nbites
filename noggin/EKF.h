@@ -199,6 +199,7 @@ public:
         // For most implementations this should be ignored
         beforeCorrectionFinish();
 
+		// Copy the updated states onto the EKF's state
 		updateState();
     }
 

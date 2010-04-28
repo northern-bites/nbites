@@ -106,15 +106,19 @@ void LocEKF::copyEKF(const LocEKF& other)
 
 }
 
+
+/**
+ * Merges the current EKF with the given EKF in such a way as to preserve the
+ * the probability distribution.
+ *
+ * @param other The EKF that this EKF will be merged with.
+ */
 void LocEKF::mergeEKF(const LocEKF& other)
 {
-	double newProbability = (probability + other.getProbability());
-	// cout << "mine: " << probability << " other: " << other.getProbability() <<endl;
-	if (newProbability < 0.00001)
-		newProbability = 1e-8;
+	// Make sure that the new probability is not 0 or rediculously close to it.
+	const double newProbability = max(probability + other.getProbability(),
+									  0.000001);
 
-	// @todo check for "drift" chances, that is, one small prob and one large prob.
-	// see page 6 of Quinlan pdf
 	StateVector new_xhat_k(LOC_EKF_DIMENSION);
 
 	const int DRIFT_PROB_MAX_DIFF = 10;
@@ -133,8 +137,6 @@ void LocEKF::mergeEKF(const LocEKF& other)
 		new_xhat_k(2) = static_cast<float>( (1/newProbability)*
 											(probability * getHEst() +
 											 other.getProbability() * other.getHEst()) );
-		// cout << "newxhatk " << new_xhat_k << "\t" ;
-		// cout << "newprob " << newProbability << endl;
 
 		const StateVector diffA = (xhat_k - new_xhat_k);
 		const StateMatrix a = P_k + outer_prod(diffA,
@@ -144,17 +146,15 @@ void LocEKF::mergeEKF(const LocEKF& other)
 		const StateMatrix b = (other.getStateUncertainty() +
 							   outer_prod(diffB, trans(diffB)));
 
-		P_k = ( ((probability * a) +
-				 (other.getProbability() * b)) /
-				newProbability);
+		P_k = (((probability * a) + (other.getProbability() * b))
+			   /
+			   newProbability);
+
 		xhat_k = new_xhat_k;
 	}
 
-	// cout << "\txhat: " << new_xhat_k << endl;
-	//cout << "\t\tP_k: " << new_P_k << endl;
 	setProbability(newProbability);
 }
-
 
 /**
  * Reset the EKF to a starting configuration
@@ -224,6 +224,9 @@ void LocEKF::odometryUpdate(MotionModel u)
     lastOdo = u;
 }
 
+/**
+ * Apply a whole set of observations from one time frame.
+ */
 void LocEKF::applyObservations(vector<Observation> Z)
 {
 	lastObservations = Z;
@@ -249,17 +252,29 @@ void LocEKF::applyObservations(vector<Observation> Z)
     //limitPosteriorUncert();
 }
 
+
+/**
+ * Apply an individual observation to the EKF.
+ */
 bool LocEKF::applyObservation(Observation Z)
 {
 #if DEBUG_LOC_EKF_INPUTS
 	printBeforeUpdateInfo();
 #endif
+
 	correctionStep(Z);
 	updateState();
+
+#ifdef USE_MM_LOC_EKF
 	return updateProbability(Z);
+#else
+	return true;
+#endif
+
 }
 
-bool LocEKF::updateProbability(const Observation& Z)
+#ifdef USE_MM_LOC_EKF
+bool LocEKF::updateProabbility(const Observation& Z)
 {
 
 	if (R_k(0,0) == DONT_PROCESS_KEY)
@@ -307,6 +322,8 @@ bool LocEKF::updateProbability(const Observation& Z)
 	probability *= probCo;
 	return false;
 }
+
+#endif
 
 
 
@@ -486,13 +503,14 @@ void LocEKF::incorporateCartesianMeasurement(int obsIndex,
 	const float xInvariance = abs(x_b -x);
 	const float yInvariance = abs(y_b -y);
 
+#ifdef USE_MM_LOC_EKF
 	R_pred_k(0,0) = ((uncertX / xInvariance + coshUncert / cosh) +
 					 (uncertY / yInvariance + sinhUncert / sinh));
 	R_pred_k(0,1) = 0;
 	R_pred_k(1,0) = 0;
 	R_pred_k(1,1) = ((uncertX / xInvariance + sinhUncert / sinh) +
 					 (uncertY / yInvariance + coshUncert / cosh));
-
+#endif
 
 
 #ifdef DEBUG_LOC_EKF_INPUTS
@@ -566,6 +584,8 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		d_x(1) = safe_atan2(relY_p, relX_p) - h_r;
 		d_x(1) = subPIAngle(d_x(1));
 
+
+#ifdef USE_MM_LOC_EKF
 		// Set the uncertainty of the prediction
 		// @todo double check this. Almost certainly not right... @jgm
 		const double uncertX = getXUncert();
@@ -576,6 +596,7 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		R_pred_k(0,1) = 0;
 		R_pred_k(1,0) = 0;
 		R_pred_k(1,1) = .5 * uncertH;
+#endif
 
 		// Calculate invariance
         V_k	   = z_x - d_x;
@@ -625,10 +646,10 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		R_k(1,0) = 0.0;
         R_k(1,1) = z.getBearingSD() * z.getBearingSD();
 
+#ifdef USE_MM_LOC_EKF
 		const double uncertX = getXUncert();
 		const double uncertY = getYUncert();
 		const double uncertH = getHUncert();
-
 
 		const float xInvariance = abs(x - x_b);
 		const float yInvariance = abs(y - y_b);
@@ -639,6 +660,7 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
 		R_pred_k(1,0) = 0;
 		R_pred_k(1,1) = (((uncertY / yInvariance) + (uncertX / xInvariance)) /
 						 (yInvariance / xInvariance) + uncertH);
+#endif
 
 #ifdef DEBUG_LOC_EKF_INPUTS
         cout << "\t\t\tR vector is" << R_k << endl;
