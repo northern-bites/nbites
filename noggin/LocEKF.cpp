@@ -403,30 +403,14 @@ void LocEKF::incorporateMeasurement(Observation z,
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tIncorporating measurement " << z << endl;
 #endif
-    int obsIndex;
 
-	// Hack in here for if the vision system cannot identify this observation
-	// (no possible identities)
-	// @todo this should never happen, so fix vision system to stop it from happening.
-	if (z.getNumPossibilities() == 0){
-		R_k(0,0) = DONT_PROCESS_KEY;
-		return;
+	const int obsIndex = findBestLandmark(z);
 
-		// Get the best fit for ambigious data
-		// NOTE: this is only done, if useAmbiguous is turned to true
-	} else if (z.getNumPossibilities() > 1) {
-        obsIndex = findBestLandmark(&z);
-
-	// No landmark is close enough, don't attempt to use one
-	} else {
-        obsIndex = 0;
-    }
 	// No landmark is close enough, don't attempt to use one
 	if (obsIndex < 0) {
 		R_k(0,0) = DONT_PROCESS_KEY;
 		return;
 	}
-
 
 	if ( z.isLine() ){
 		incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
@@ -437,7 +421,7 @@ void LocEKF::incorporateMeasurement(Observation z,
     }
 
     // Calculate the standard error of the measurement
-    StateMeasurementMatrix newP = prod(P_k, trans(H_k));
+    const StateMeasurementMatrix newP = prod(P_k, trans(H_k));
     MeasurementMatrix se = prod(H_k, newP) + R_k;
     se(0,0) = sqrt(se(0,0));
     se(1,1) = sqrt(se(1,1));
@@ -695,9 +679,17 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
  *
  * @param z The observation to be fixed
  */
-int LocEKF::findBestLandmark(Observation *z)
+int LocEKF::findBestLandmark(const Observation& z)
 {
-	if (z->isLine()){
+
+	// Hack in here for if the vision system cannot identify this observation
+	// (no possible identities)
+	// @TODO this should never happen, so fix vision system to stop it from happening.
+	if (z.getNumPossibilities() == 0){
+		return -1;
+	} else if (z.getNumPossibilities() == 1){
+		return 0;
+	} else if (z.isLine()){
 		return findMostLikelyLine(z);
 	} else {
 		return findNearestNeighbor(z);
@@ -707,10 +699,10 @@ int LocEKF::findBestLandmark(Observation *z)
 /**
  * Uses the Mahalanobis distance to find the most likely line choice
  */
-int LocEKF::findMostLikelyLine(Observation *z)
+int LocEKF::findMostLikelyLine(const Observation &z)
 {
 
-	vector<LineLandmark> possibleLines = z->getLinePossibilities();
+	vector<LineLandmark> possibleLines = z.getLinePossibilities();
 	int minIndex = -1;
 	float minDivergence = 800000.0f;
 	for (unsigned int i = 0; i < possibleLines.size(); ++i) {
@@ -732,7 +724,7 @@ int LocEKF::findMostLikelyLine(Observation *z)
  * @param The ConcreteLine to compare against
  * @return The Mahalanobis distance between the lines
  */
-float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
+float LocEKF::getMahalanobisDistance(const Observation& z, const LineLandmark& l)
 {
 	// Robot's current estimated position
 	const float x_r = xhat_k_bar(0);
@@ -741,8 +733,8 @@ float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
 
 	// x,y coordinates of observed line in the field frame of reference
 	MeasurementVector z_x(2);
-	z_x(0) = x_r + z->getVisDistance() * cos(z->getVisBearing() + h_r);
-	z_x(1) = y_r + z->getVisDistance() * sin(z->getVisBearing() + h_r);
+	z_x(0) = x_r + z.getVisDistance() * cos(z.getVisBearing() + h_r);
+	z_x(1) = y_r + z.getVisDistance() * sin(z.getVisBearing() + h_r);
 
 	const pair<float, float> line_xy =
 		findClosestLinePointCartesian(l, x_r, y_r, h_r);
@@ -751,9 +743,9 @@ float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
 	u(0) = line_xy.first;
 	u(1) = line_xy.second;
 
-	const float dist_sd_2 = pow(z->getDistanceSD(), 2);
+	const float dist_sd_2 = pow(z.getDistanceSD(), 2);
 
-	const float bsd = z->getVisBearing();
+	const float bsd = z.getVisBearing();
 
 	float cosb, sinb;
 	sincosf(bsd, &sinb, &cosb);
@@ -786,9 +778,9 @@ float LocEKF::getMahalanobisDistance(Observation *z, LineLandmark l)
  * @param The observed point
  * @return Index of the nearest neighbor
  */
-int LocEKF::findNearestNeighbor(Observation *z)
+int LocEKF::findNearestNeighbor(const Observation& z)
 {
-	vector<PointLandmark> possiblePoints = z->getPointPossibilities();
+	vector<PointLandmark> possiblePoints = z.getPointPossibilities();
 	float minDivergence = 250.0f;
 	int minIndex = -1;
 	for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
@@ -810,13 +802,13 @@ int LocEKF::findNearestNeighbor(Observation *z)
  *
  * @return The divergence value
  */
-float LocEKF::getDivergence(Observation * z, PointLandmark pt)
+float LocEKF::getDivergence(const Observation& z, const PointLandmark& pt)
 {
     const float x = xhat_k_bar(0);
     const float y = xhat_k_bar(1);
     const float h = xhat_k_bar(2);
-    float x_b_r = z->getVisDistance() * cos(z->getVisBearing());
-    float y_b_r = z->getVisDistance() * sin(z->getVisBearing());
+    float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
+    float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
 
     float sinh, cosh;
     sincosf(h, &sinh, &cosh);
@@ -959,16 +951,16 @@ void LocEKF::deadzone(float &R, float &innovation,
     } else {
         // Decrease the innovations, so that it doesn't effect the estimate
         innovation=0.0;
-        invR = 0.25 / (eps*eps) - 1.0/ CPC;
+        invR = 0.25f / (eps*eps) - 1.0f/ CPC;
     }
 
     // Limit the min Covariance value
     if (invR<1.0e-08) {
-        invR=1e-08;
+        invR=1e-08f;
     }
     // Set the covariance to be the adjusted value
     if ( R < 1.0/invR ) {
-        R=1.0/invR;
+        R=1.0f/invR;
     }
 }
 

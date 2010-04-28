@@ -175,11 +175,11 @@ private:
 									   MeasurementVector &V_k);
 
 
-    int findBestLandmark(Observation * z);
-	int findMostLikelyLine(Observation *z);
-	float getMahalanobisDistance(Observation *z, LineLandmark ll);
-	int findNearestNeighbor(Observation *z);
-    float getDivergence(Observation * z, PointLandmark pt);
+    int findBestLandmark(const Observation& z);
+	int findMostLikelyLine(const Observation& z);
+	float getMahalanobisDistance(const Observation& z, const LineLandmark& ll);
+	int findNearestNeighbor(const Observation& z);
+    float getDivergence(const Observation& z, const PointLandmark& pt);
 
 #ifdef USE_MM_LOC_EKF
 	bool updateProbability(const Observation& Z);
