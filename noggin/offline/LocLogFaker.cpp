@@ -52,6 +52,7 @@ int main(int argc, char** argv)
     fstream inputFile;
     fstream mclFile;
     fstream ekfFile;
+    fstream ekfDiffFile;
 
     /* Test for the correct number of CLI arguments */
     if(argc != 2) {
@@ -76,16 +77,20 @@ int main(int argc, char** argv)
     // Open output files
     string mclFileName(argv[1]);
     string ekfFileName(argv[1]);
+    string ekfDiffFileName(argv[1]);
 
     mclFileName.replace(mclFileName.end()-3, mclFileName.end(), "mcl.faker");
     ekfFileName.replace(ekfFileName.end()-3, ekfFileName.end(), "ekf.faker");
+    ekfDiffFileName.replace(ekfDiffFileName.end()-3, ekfDiffFileName.end(), "ekf.diff.faker");
 
     mclFile.open(mclFileName.c_str(), ios::out);
     ekfFile.open(ekfFileName.c_str(), ios::out);
+    ekfDiffFile.open(ekfDiffFileName.c_str(), ios::out);
+	printOutPoseDiffHeader(&ekfDiffFile);
 
     // Iterate through the path
     cout << "Running loc systems" << endl;
-    iterateFakerPath(&mclFile, &ekfFile, &letsGo);
+    iterateFakerPath(&mclFile, &ekfFile, &ekfDiffFile, &letsGo);
 
     // Close the output files
     mclFile.close();

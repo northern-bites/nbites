@@ -7,6 +7,8 @@
 #include "PyLoc.h"
 #include "EKFStructs.h"
 #include <cstdlib>
+#include "MMLocEKF.h"
+#include "LocEKF.h"
 
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
@@ -128,7 +130,12 @@ void Noggin::initializeLocalization()
 #   endif
 
     // Initialize the localization modules
-    loc = shared_ptr<LocEKF>(new LocEKF());
+#ifdef USE_MM_LOC_EKF
+    loc = shared_ptr<LocSystem>(new MMLocEKF());
+#else
+    loc = shared_ptr<LocSystem>(new LocEKF());
+#endif
+
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers

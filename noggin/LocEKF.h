@@ -38,6 +38,17 @@ public:
 
     // Update functions
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
+	void odometryUpdate(MotionModel u);
+	void applyObservations(vector<Observation> Z);
+	bool applyObservation(Observation Z);
+	void endFrame();
+
+	void copyEKF(const LocEKF& other);
+	void mergeEKF(const LocEKF& other);
+
+	void printAfterUpdateInfo();
+	void printBeforeUpdateInfo();
+
     virtual void reset();
     virtual void redGoalieReset();
     virtual void blueGoalieReset();
@@ -108,6 +119,7 @@ public:
 	virtual const vector<Observation> getLastObservations() const {
 		return lastObservations;
 	}
+
     // Setters
     /**
      * @param val The new estimate of the loc x position
@@ -143,6 +155,7 @@ public:
      * @param _use True if we are to use ambiguous landmark observations
      */
     void setUseAmbiguous(bool _use) { useAmbiguous = _use; }
+
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
@@ -168,6 +181,10 @@ private:
 	int findNearestNeighbor(Observation *z);
     float getDivergence(Observation * z, PointLandmark pt);
 
+#ifdef USE_MM_LOC_EKF
+	bool updateProbability(const Observation& Z);
+#endif
+
     void limitAPrioriUncert();
     void limitPosteriorUncert();
     void clipRobotPose();
@@ -181,6 +198,7 @@ private:
     MotionModel lastOdo;
 	vector<Observation> lastObservations;
     bool useAmbiguous;
+	MeasurementMatrix R_pred_k;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;

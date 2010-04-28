@@ -153,10 +153,10 @@ private: // Member functions
     static std::pair <float, float> leastSquaresFit(const VisualLine& l);
 
     //list <const ConcreteLine *> possibleLines;
-    inline float lineDistanceToSD(float _distance) {
+    inline static float lineDistanceToSD(float _distance) {
         return (10.0f + (_distance * _distance)*0.0125f);
     }
-    inline float lineBearingToSD(float _bearing) {
+    inline static float lineBearingToSD(float _bearing) {
         return static_cast<float>(M_PI) / 8.0f;
     }
 
