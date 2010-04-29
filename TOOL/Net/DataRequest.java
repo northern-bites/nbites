@@ -1,4 +1,3 @@
-
 // This file is part of TOOL, a robotics interaction and development
 // package created by the Northern Bites RoboCup team of Bowdoin College
 // in Brunswick, Maine.
@@ -22,46 +21,51 @@ import TOOL.Data.DataTypes;
 
 public class DataRequest {
 
-    public static final DataTypes.DataType INFO    = DataTypes.DataType.INFO;
-    public static final DataTypes.DataType JOINTS  = DataTypes.DataType.JOINTS;
-    public static final DataTypes.DataType SENSORS = DataTypes.DataType.SENSORS;
-    public static final DataTypes.DataType IMAGE   = DataTypes.DataType.IMAGE;
-    public static final DataTypes.DataType THRESH  = DataTypes.DataType.THRESH;
-    public static final DataTypes.DataType JPEG    = DataTypes.DataType.JPEG;
-    public static final DataTypes.DataType OBJECTS = DataTypes.DataType.OBJECTS;
-    public static final DataTypes.DataType MOTION  = DataTypes.DataType.MOTION;
-    public static final DataTypes.DataType LOCAL   = DataTypes.DataType.LOCAL;
-    public static final DataTypes.DataType COMM    = DataTypes.DataType.COMM;
+    public static final DataTypes.DataType INFO			= DataTypes.DataType.INFO;
+    public static final DataTypes.DataType JOINTS		= DataTypes.DataType.JOINTS;
+    public static final DataTypes.DataType SENSORS		= DataTypes.DataType.SENSORS;
+    public static final DataTypes.DataType IMAGE		= DataTypes.DataType.IMAGE;
+    public static final DataTypes.DataType THRESH		= DataTypes.DataType.THRESH;
+    public static final DataTypes.DataType JPEG			= DataTypes.DataType.JPEG;
+    public static final DataTypes.DataType OBJECTS		= DataTypes.DataType.OBJECTS;
+    public static final DataTypes.DataType MOTION		= DataTypes.DataType.MOTION;
+    public static final DataTypes.DataType LOCAL		= DataTypes.DataType.LOCAL;
+    public static final DataTypes.DataType COMM			= DataTypes.DataType.COMM;
+    public static final DataTypes.DataType MMEKF		= DataTypes.DataType.MMEKF;
 
     public static final int LENGTH = DataTypes.LENGTH;
 
     public static final DataRequest INFO_ONLY =
         new DataRequest(true, false, false, false, false, false, false, false,
-                        false, false);
+                        false, false, false);
     public static final DataRequest IMAGE_ONLY =
         new DataRequest(false, false, false, true, false, false, false, false,
-                        false, false);
+                        false, false, false);
     public static final DataRequest IMAGE_JOINTS =
         new DataRequest(false, true, false, true, false, false, false, false,
-                        false, false);
+                        false, false, false);
     public static final DataRequest IMAGE_JOINTS_SENSORS =
         new DataRequest(false, true, true, true, false, false, false, false,
-                        false, false);
+                        false, false, false);
     public static final DataRequest THRESH_ONLY =
         new DataRequest(false, false, false, false, true, false, false, false,
-                        false, false);
+                        false, false, false);
     public static final DataRequest IMAGE_THRESH =
         new DataRequest(false, false, false, true, true, false, false, false,
-                        false, false);
+                        false, false, false);
 	public static final DataRequest OBJECTS_ONLY =
 		new DataRequest(false, false, false, false, false,
-						false, true, false, false, false);
+						false, true, false, false, false, false);
 	public static final DataRequest LOC_ONLY =
 		new DataRequest(false, false, false, false, false,
-						false, false, false, true, false);
+						false, false, false, true, false, false);
 	public static final DataRequest COMM_ONLY =
 		new DataRequest(false, false, false, false, false,
-						false, false, false, false, true);
+						false, false, false, false, true, false);
+
+	public static final DataRequest MMEKF_ONLY =
+		new DataRequest(false, false, false, false, false,
+						false, false, false, false, false, true);
 
     public static boolean isImplemented(DataTypes.DataType type) {
         switch (type) {
@@ -75,6 +79,7 @@ public class DataRequest {
 		case MOTION:       return false;
 		case LOCAL:        return true;
 		case COMM:         return true;
+		case MMEKF:        return true;
 		default:           return false;
         }
     }
@@ -82,8 +87,9 @@ public class DataRequest {
     private byte[] data;
 
     public DataRequest(boolean i, boolean j, boolean s, boolean img, boolean t,
-					   boolean jpeg, boolean o, boolean m, boolean l, boolean c) {
-        this(new boolean[] {i, j, s, img, t, jpeg, o, m, l, c});
+					   boolean jpeg, boolean o, boolean m, boolean l, boolean c,
+					   boolean mmekf) {
+        this(new boolean[] {i, j, s, img, t, jpeg, o, m, l, c, mmekf});
     }
     public DataRequest(boolean[] values) {
 
@@ -101,17 +107,18 @@ public class DataRequest {
         System.arraycopy(values, 0, data, 0, LENGTH);
     }
 
-    public byte[] getBytes() { return data; }
-    public boolean info()    { return get(INFO   ); }
-    public boolean joints()  { return get(JOINTS ); }
-    public boolean sensors() { return get(SENSORS); }
-    public boolean image()   { return get(IMAGE  ); }
-    public boolean thresh()  { return get(THRESH ); }
-    public boolean jpeg()    { return get(JPEG   ); }
-    public boolean objects() { return get(OBJECTS); }
-    public boolean motion()  { return get(MOTION ); }
-    public boolean local()   { return get(LOCAL  ); }
-    public boolean comm()    { return get(COMM   ); }
+    public byte[]  getBytes()	{ return data            ; }
+    public boolean info()		{ return get(INFO		); }
+    public boolean joints()		{ return get(JOINTS		); }
+    public boolean sensors()	{ return get(SENSORS	); }
+    public boolean image()		{ return get(IMAGE		); }
+    public boolean thresh()		{ return get(THRESH		); }
+    public boolean jpeg()		{ return get(JPEG		); }
+    public boolean objects()	{ return get(OBJECTS	); }
+    public boolean motion()		{ return get(MOTION		); }
+    public boolean local()		{ return get(LOCAL		); }
+    public boolean comm()		{ return get(COMM		); }
+    public boolean mmekf()		{ return get(MMEKF		); }
 
     public boolean get(DataTypes.DataType t) {
         return data[t.ordinal()] == 1;
@@ -124,15 +131,16 @@ public class DataRequest {
         data[t.ordinal()] = ((byte)(((int)(data[t.ordinal()] + 1)) % 2));
     }
 
-    public void setInfo   (boolean b) { set(INFO,    b); }
-    public void setJoints (boolean b) { set(JOINTS,  b); }
-    public void setSensors(boolean b) { set(SENSORS, b); }
-    public void setImage  (boolean b) { set(IMAGE,   b); }
-    public void setThresh (boolean b) { set(THRESH,  b); }
-    public void setJPEG   (boolean b) { set(JPEG,    b); }
-    public void setObjects(boolean b) { set(OBJECTS, b); }
-    public void setMotion (boolean b) { set(MOTION,  b); }
-    public void setLocal  (boolean b) { set(LOCAL,   b); }
-    public void setComm   (boolean b) { set(COMM,    b); }
+    public void setInfo			(boolean b) { set(INFO,			b); }
+    public void setJoints		(boolean b) { set(JOINTS,		b); }
+    public void setSensors		(boolean b) { set(SENSORS,		b); }
+    public void setImage		(boolean b) { set(IMAGE,		b); }
+    public void setThresh		(boolean b) { set(THRESH,		b); }
+    public void setJPEG			(boolean b) { set(JPEG,			b); }
+    public void setObjects		(boolean b) { set(OBJECTS,		b); }
+    public void setMotion		(boolean b) { set(MOTION,		b); }
+    public void setLocal		(boolean b) { set(LOCAL,		b); }
+    public void setComm			(boolean b) { set(COMM,			b); }
+    public void setMMEKF		(boolean b) { set(MMEKF,		b); }
 
 }

@@ -25,7 +25,7 @@ public class WorldControllerPainter implements RobotListener
     // to render the world controller information
     protected Field field;
     // The panel holding the buffered image, on whose graphical context
-    // we willd raw
+    // we will draw
     protected ImagePanel viewer;
 
     // DEBUG SWITCHES
@@ -103,6 +103,9 @@ public class WorldControllerPainter implements RobotListener
     // Add a RobotHistory instance to handle the case that we are visualizing
     // a single robot
     RobotHistory single_robot;
+
+	private LinkedList<LocalizationPacket> ekf_models =
+		new LinkedList<LocalizationPacket>();
 
     // A tautological geometric constant
     private boolean draw_real, draw_est;
@@ -187,11 +190,17 @@ public class WorldControllerPainter implements RobotListener
         try {
             paintLandmarks(g2);
             paintRobotInformation(g2);
+			paintEKFModels(g2);
+
             paintParticleSet(g2);
+
+			// Paint the estimatedPose data, from artificial data
             paintEstRobotPose(g2);
             paintEstimateMeanAndVariance(g2);
             paintRealRobotPose(g2);
             paintRealBallPose(g2);
+
+
         } catch (ConcurrentModificationException e) {
             // Ignore.  The painting and simulation threads are trying
             // to concurrently access elements in the same list
@@ -339,7 +348,9 @@ public class WorldControllerPainter implements RobotListener
                                     recent_estimate.getYUncert(),
                                     recent_estimate.getHUncert());
                 robotColor = robotColor.darker();
+
             }
+
             // Draw the most recent ball estimated locations and uncertainties
             Color ballColor = Color.WHITE;
             for (LocalizationPacket recent_estimate :
@@ -657,6 +668,7 @@ public class WorldControllerPainter implements RobotListener
 		// This prevents us from gathering too much of a
 		// backlog of unpainted landmarks
 		if (numSeenLandmarks > seenLandmarks.length){
+			clearSeenLandmarks();
 			return;
 		}
         seenLandmarks[numSeenLandmarks][X_INDEX] = x;
@@ -760,6 +772,49 @@ public class WorldControllerPainter implements RobotListener
                                       robot.getNumber().intValue());
         reportEndFrame();
     }
+
+	/**
+	 * Function to update the state of the EKF Models displayed on the
+	 * field. Displays all the models in a gray shade to signify that
+	 * they are models and not the main model.
+	 */
+	public void updateModels(LinkedList<RobotModel> models)
+	{
+		ekf_models.clear();
+		for (RobotModel model : models){
+			RobotData d = model.getData();
+			LocalizationPacket robot_estimate = LocalizationPacket.
+				makeEstimateAndUncertPacket(d.getRobotX(),
+											d.getRobotY(),
+											d.getRobotHeading(),
+											d.getRobotUncertX(),
+											d.getRobotUncertY(),
+											d.getRobotUncertH());
+
+			// If the robot is on the red team, then we need to transform its
+			// co-ordinates because it has a different (0,0) that the robots on the
+			// blue team
+			if (model.getColor() == RED_TEAM) {
+				transformFieldCoordinatesToRedTeamSide(robot_estimate);
+			}
+			this.ekf_models.add(robot_estimate);
+		}
+	}
+
+	public void updateModels(Vector<LocalizationPacket> models, int teamColor)
+	{
+		ekf_models.clear();
+		for (LocalizationPacket packet : models){
+			// If the robot is on the red team, then we need to transform its
+			// co-ordinates because it has a different (0,0) that the robots on the
+			// blue team
+			if (teamColor == RED_TEAM) {
+				transformFieldCoordinatesToRedTeamSide(packet);
+			}
+			this.ekf_models.add(packet);
+		}
+
+	}
 
     public void transformFieldCoordinatesToRedTeamSide(LocalizationPacket
                                                        loc_pack)
@@ -973,7 +1028,6 @@ public class WorldControllerPainter implements RobotListener
                                     mclPlayerNum);
     }
 
-
     /**
      * Function to draw the know position of the robot; mostly used for
      * debugging of artificially created data. Draws nothing if the current pose
@@ -1003,6 +1057,32 @@ public class WorldControllerPainter implements RobotListener
         drawBallRealPosition(g2, realBallPose[0],
                              realBallPose[1]);
     }
+
+	/**
+	 * Function to draw EKF Models, the ones that are less likely, but
+	 * still "active," on the field.
+	 *
+	 * @param g2 The graphics context on which the models will be drawn
+	 */
+	public void paintEKFModels(Graphics2D g2)
+	{
+		for (LocalizationPacket p : ekf_models){
+			drawRobotsEstimatedPosition(g2,
+										Color.GRAY,
+										p.getXEst(),
+										p.getYEst(),
+										p.getHeadingEst(),
+										p.getHeadPanEst(),
+										0);
+			drawRobotsUncertainty(g2,
+								  p.getXEst(),
+								  p.getYEst(),
+								  p.getHeadingEst(),
+								  p.getXUncert(),
+								  p.getYUncert(),
+								  p.getHUncert());
+		}
+	}
 
 
     /**
