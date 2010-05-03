@@ -56,6 +56,49 @@ def executeMove(motionInst, sweetMove):
 
         motionInst.enqueue(move)
 
+def getOmniWalkFacingDestParam(my, dest):
+    bearingDeg = my.getRelativeBearing(dest)
+    bearing = radians(bearingDeg)
+
+    distToDest = my.dist(dest)
+
+    # calculate forward speed
+    forwardGain = constants.OMNI_GOTO_X_GAIN * distToDest* \
+        cos(bearing)
+    sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
+    sX = MyMath.clip(sX,
+                     constants.OMNI_MIN_X_SPEED,
+                     constants.OMNI_MAX_X_SPEED)
+    if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
+        sX = 0
+
+    # calculate sideways speed
+    strafeGain = constants.OMNI_GOTO_Y_GAIN * distToDest* \
+        sin(bearing)
+    sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
+    sY = MyMath.clip(sY,
+                     constants.OMNI_MIN_Y_SPEED,
+                     constants.OMNI_MAX_Y_SPEED,)
+    if fabs(sY) < constants.OMNI_MIN_Y_MAGNITUDE:
+        sY = 0
+
+    if atDestinationCloser(my, dest):
+        sX = sY = 0.0
+
+    # calculate spin speed
+    spinGain = constants.GOTO_SPIN_GAIN
+    sTheta = bearing * spinGain
+    sTheta = MyMath.clip(sTheta,
+                         constants.OMNI_MIN_SPIN_SPEED,
+                         constants.OMNI_MAX_SPIN_SPEED)
+    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
+        sTheta = 0.0
+
+    if atHeading(my, dest.h):
+        sTheta = 0.0
+
+    return (sX, sY, sTheta)
+
 def getOmniWalkParam(my, dest):
 
     bearing = radians(my.getRelativeBearing(dest))
@@ -127,8 +170,11 @@ def getWalkStraightParam(my, dest):
     return (sX, sY, sTheta)
 
 def getSpinOnlyParam(my, dest):
+    # Determine the speed to turn
+    # see if getRotScale can go faster
 
     spinDir = my.spinDirToHeading(dest.h)
+    # getRelativeBearing can be replaced w/simpler math
     headingDiff = fabs(my.getRelativeBearing(dest))
     sTheta = spinDir * constants.GOTO_SPIN_SPEED * \
              getRotScale(headingDiff)

@@ -2,6 +2,7 @@ from math import fabs
 from ..util import FSA
 from . import NavStates
 from . import PlaybookPositionStates
+from . import ChaseStates
 from . import NavConstants as constants
 from . import NavHelper as helper
 from man.noggin.typeDefs.Location import RobotLocation
@@ -14,6 +15,7 @@ class Navigator(FSA.FSA):
         self.brain = brain
         self.addStates(NavStates)
         self.addStates(PlaybookPositionStates)
+        self.addStates(ChaseStates)
         self.currentState = 'stopped'
         self.setName('Navigator')
         self.setPrintStateChanges(True)
@@ -36,11 +38,25 @@ class Navigator(FSA.FSA):
         self.sweetMove = move
         self.switchTo('doingSweetMove')
 
-    def positionPlaybook(self):
+    def chaseBall(self):
+        """
+        robot will walk to the ball with it centered at his feet.
+        if no ball is visible, localization will be used
+        """
+        if not self.currentState == 'spinToBall' and \
+           not self.currentState == 'walkStraightToBall' and \
+           not self.currentState == 'omniWalkToBall':
+            print "switching from ", self.currentState
+            self.switchTo('spinToBall')
 
-        if not self.currentState == 'playbookWalk'and \
-                not self.currentState == 'playbookOmni' and \
-                not self.currentState == 'playbookSpin':
+    def positionPlaybook(self, dest):
+        """robot will walk to the x,y,h given in dest using a mix of omni,
+        straight walks and spins"""
+        self.dest = dest
+
+        if not self.currentState == 'playbookWalk' and \
+               not self.currentState == 'playbookOmni' and \
+               not self.currentState == 'playbookSpin':
             self.switchTo('playbookWalk')
 
     def omniGoTo(self, dest):
@@ -51,8 +67,8 @@ class Navigator(FSA.FSA):
         self.dest = dest
 
         if not self.currentState == 'spinToWalkHeading' and \
-                not self.currentState == 'walkStraightToPoint' and \
-                not self.currentState == 'spinToFinalHeading':
+               not self.currentState == 'walkStraightToPoint' and \
+               not self.currentState == 'spinToFinalHeading':
             if not helper.atHeadingGoTo(self.brain.my, self.dest.h):
                 self.switchTo('spinToWalkHeading')
             elif helper.atHeadingGoTo(self.brain.my, self.dest.h):
