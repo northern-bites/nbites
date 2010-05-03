@@ -190,7 +190,7 @@ public class WorldControllerPainter implements RobotListener
         try {
             paintLandmarks(g2);
             paintRobotInformation(g2);
-			paintEKFModels(g2);
+			//paintEKFModels(g2);
 
             paintParticleSet(g2);
 
@@ -667,7 +667,7 @@ public class WorldControllerPainter implements RobotListener
     {
 		// This prevents us from gathering too much of a
 		// backlog of unpainted landmarks
-		if (numSeenLandmarks > seenLandmarks.length){
+		if (numSeenLandmarks >= seenLandmarks.length){
 			clearSeenLandmarks();
 			return;
 		}
