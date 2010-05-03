@@ -1,7 +1,10 @@
 
 CUR_DIR = $(shell pwd)
-BUILD_DIR = build
-INSTALL_DIR = install
+NBITES_DIR = $(CUR_DIR)/../..
+BUILD_DIR = $(NBITES_DIR)/build/man
+STRAIGHT_DIR = $(BUILD_DIR)/straight
+CROSS_DIR = $(BUILD_DIR)/cross
+INSTALL_DIR = $(BUILD_DIR)/install
 INSTALL_SCRIPT = ./upload.sh
 CMAKE_DIR = cmake.man
 CMAKE_DEPEND = $(BUILD_DIR)/Makefile
@@ -11,7 +14,7 @@ CMAKE_SRCS = \
 	manconfig.in
 CMAKE_SRCS := $(addprefix $(CMAKE_DIR),$(CMAKE_SRCS))
 CONFIG_FILE = manconfig.h
-CROSS_FILE = $(BUILD_DIR)/cross
+CROSS_FILE = $(BUILD_DIR)/cross_file
 STRAIGHT_FILE = $(BUILD_DIR)/straight
 WEBOTS_FILE = $(BUILD_DIR)/webots
 
@@ -39,7 +42,9 @@ default_target: all
 
 all: $(CMAKE_DEPEND)
 	@#echo $(TRUNK_REVISION)
-	@$(MAKE) $(MAKE_OPTIONS) -C $(BUILD_DIR)
+	@if [ -e $(CROSS_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR); \
+	fi
 
 straight: $(STRAIGHT_FILE)
 	@set -e; \
@@ -67,7 +72,7 @@ $(STRAIGHT_FILE):
 
 cross: $(CROSS_FILE)
 	@set -e ; \
-		$(CD) $(BUILD_DIR); \
+		$(CD) $(CROSS_DIR); \
 		$(CCMAKE) $(CCMAKE_CROSS_OPT) .
 
 $(CROSS_FILE):
@@ -77,7 +82,8 @@ $(CROSS_FILE):
 	@set -e; \
 		$(MKDIR) -p $(BUILD_DIR); \
 		$(TOUCH) $(CROSS_FILE); \
-		$(CD) $(BUILD_DIR); \
+		$(MKDIR) -p $(CROSS_DIR); \
+		$(CD) $(CROSS_DIR); \
 		$(CMAKE) $(CMAKE_CROSS_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
 
