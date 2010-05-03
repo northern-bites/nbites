@@ -396,8 +396,8 @@ void VisualCorner::setPossibleCorners(
 			}
 		}
 	}
-
-	possibleCorners = updated;
+	if (updated.size() > 0)
+		possibleCorners = updated;
 }
 
 /**
@@ -408,7 +408,6 @@ void VisualCorner::setPossibleCorners(
 void VisualCorner::
 setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
 {
-
 	list<const ConcreteCorner*> updated(0);
 
 	for (list<const ConcreteCorner*>::const_iterator
@@ -427,5 +426,6 @@ setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
 		}
 	}
 
-	possibleCorners = updated;
+	if (updated.size() > 0)
+		possibleCorners = updated;
 }
