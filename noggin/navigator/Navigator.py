@@ -36,8 +36,7 @@ class Navigator(FSA.FSA):
         self.sweetMove = move
         self.switchTo('doingSweetMove')
 
-    def positionPlaybook(self, dest):
-        self.dest = dest
+    def positionPlaybook(self):
 
         if not self.currentState == 'playbookWalk'and \
                 not self.currentState == 'playbookOmni' and \

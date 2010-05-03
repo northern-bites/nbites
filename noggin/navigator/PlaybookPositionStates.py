@@ -12,7 +12,7 @@ def playbookWalk(nav):
         nav.omniWalkToCount = 0
 
     my = nav.brain.my
-    dest = nav.dest
+    dest = nav.brain.play.getPosition()
 
     dest.h = my.getTargetHeading(dest)
 
@@ -44,7 +44,7 @@ def playbookOmni(nav):
         nav.spinToPointCount = 0
 
     my = nav.brain.my
-    dest = nav.dest
+    dest = nav.brain.play.getPosition()
 
     walkX, walkY, walkTheta = helper.getOmniWalkParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
@@ -79,7 +79,7 @@ def playbookSpin(nav):
         nav.walkToPointCount = 0
 
     my = nav.brain.my
-    dest = nav.dest
+    dest = nav.brain.play.getPosition()
 
     dest.h = my.getTargetHeading(dest)
 
@@ -109,7 +109,7 @@ def playbookFinalSpin(nav):
         nav.walkToPointCount = 0
 
     my = nav.brain.my
-    dest = nav.dest
+    dest = nav.brain.play.getPosition()
 
     walkX, walkY, walkTheta = helper.getSpinOnlyParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)

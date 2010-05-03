@@ -5,7 +5,7 @@ from . import SubRoles
 def rChaser(team, workingPlay):
     workingPlay.setRole(PBConstants.CHASER)
     workingPlay.setSubRole(PBConstants.CHASE_NORMAL)
-    pos = (team.brain.my.x,team.brain.my.y)
+    pos = (team.brain.my.x,team.brain.my.y, team.brain.ball.heading)
     workingPlay.setPosition(pos)
 
 def rSearcher(team, workingPlay):

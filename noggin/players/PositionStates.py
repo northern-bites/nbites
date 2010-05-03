@@ -1,7 +1,6 @@
 from .. import NogginConstants
 from . import ChaseBallConstants as ChaseConstants
 import man.noggin.util.MyMath as MyMath
-from man.noggin.typeDefs.Location import RobotLocation, Location
 import PositionTransitions as transitions
 import PositionConstants as constants
 
@@ -27,22 +26,7 @@ def playbookPosition(player):
         else:
             brain.tracker.activeLoc()
 
-    # determine final goal heading
-    if ball.on:
-        destHeading = my.h + ball.bearing
-    elif ball.framesOff < 30:
-        destHeading = my.h + ball.locBearing
-    else:
-        destHeading = NogginConstants.OPP_GOAL_HEADING
-
-    # turn playbook value into location for navigator
-    position = player.brain.play.getPosition()
-    position = RobotLocation(position[0], position[1], destHeading)
-
-    if gcState == 'gameReady':
-        position.h = NogginConstants.OPP_GOAL_HEADING
-
-    nav.positionPlaybook(position)
+    nav.positionPlaybook()
 
     if brain.my.locScore == NogginConstants.BAD_LOC:
         player.shouldRelocalizeCounter += 1
@@ -70,7 +54,7 @@ def atPosition(player):
     """
     nav = player.brain.nav
     position = player.brain.play.getPosition()
-    position = Location(position[0], position[1])
+
     if player.firstFrame():
         player.stopWalking()
         player.notAtPositionCounter = 0
