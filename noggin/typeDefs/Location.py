@@ -63,7 +63,7 @@ class RobotLocation(Location):
         """return relative heading in degrees from robot localization to
         abs x,y on field """
 
-        # if we're calculating bearing from us to the ball use stored value
+        # if we're calculating bearing from us(has a team color) to the ball use stored value
         if forceCalc and hasattr(self, "teamColor") and \
                hasattr(other, "bearing"):
             return other.dist

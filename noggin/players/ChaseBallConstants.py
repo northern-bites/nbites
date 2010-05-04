@@ -1,4 +1,4 @@
-import BrunswickSpeeds as speeds
+from ..navigator import BrunswickSpeeds as speeds
 
 MAX_X_SPEED = speeds.MAX_X_SPEED
 MAX_Y_SPEED = speeds.MAX_Y_SPEED

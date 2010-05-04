@@ -56,46 +56,81 @@ def executeMove(motionInst, sweetMove):
 
         motionInst.enqueue(move)
 
-def getOmniWalkFacingDestParam(my, dest):
+def getNewOmniWalkParam(my, dest):
     bearingDeg = my.getRelativeBearing(dest)
     bearing = radians(bearingDeg)
 
     distToDest = my.dist(dest)
 
-    # calculate forward speed
-    forwardGain = constants.OMNI_GOTO_X_GAIN * distToDest* \
-        cos(bearing)
-    sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
-    sX = MyMath.clip(sX,
-                     constants.OMNI_MIN_X_SPEED,
-                     constants.OMNI_MAX_X_SPEED)
+    # calculate ideal max forward speed
+    forwardGain = distToDest * cos(bearing)
+    sX = constants.GOTO_FORWARD_SPEED * forwardGain
+
+    # calculate ideal max sideways speed
+    strafeGain =  distToDest * sin(bearing)
+    sY = constants.GOTO_STRAFE_SPEED  * strafeGain
+
+    # calculate ideal max spin speed
+    sTheta = (my.spinDirToHeading(dest.h) * getRotScale(bearing) *
+              constants.GOTO_SPIN_SPEED)
+
+    ## if any are below min thresholds, set to 0
     if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
         sX = 0
 
-    # calculate sideways speed
-    strafeGain = constants.OMNI_GOTO_Y_GAIN * distToDest* \
-        sin(bearing)
-    sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
-    sY = MyMath.clip(sY,
-                     constants.OMNI_MIN_Y_SPEED,
-                     constants.OMNI_MAX_Y_SPEED,)
     if fabs(sY) < constants.OMNI_MIN_Y_MAGNITUDE:
         sY = 0
 
-    if atDestinationCloser(my, dest):
-        sX = sY = 0.0
-
-    # calculate spin speed
-    spinGain = constants.GOTO_SPIN_GAIN
-    sTheta = bearing * spinGain
-    sTheta = MyMath.clip(sTheta,
-                         constants.OMNI_MIN_SPIN_SPEED,
-                         constants.OMNI_MAX_SPIN_SPEED)
-    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
+    if fabs(sTheta) < constants.MIN_SPIN_SPEED:
         sTheta = 0.0
 
-    if atHeading(my, dest.h):
-        sTheta = 0.0
+    ## if x only, clip x to WALK_TO_MAX_X_SPEED
+    ## if y only, clip y to WALK_TO_MAX_Y_SPEED
+    ## if theta only, clip theta to GOTO_SPIN_SPEED
+    ## if x and y, clip each to ??
+    ## if x and theta, clip x to ?, theta to WALK_TO_MAX_SPIN_SPEED
+    ## if y and theta, clip y to ?, theta to ?
+
+    if sX > 0:
+        if sY > 0:
+            if sTheta > 0:
+                sX = MyMath.clip(sY, constants.OMNI_MIN_X_SPEED,
+                                 constants.OMNI_MAX_X_SPEED)
+                sY = MyMath.clip(sY, constants.OMNI_MIN_Y_SPEED,
+                                 constants.OMNI_MAX_Y_SPEED)
+                sZ = MyMath.clip(sTheta, constants.OMNI_MIN_SPIN_SPEED,
+                                 constants.OMNI_MAX_SPIN_SPEED)
+            else: # sTheta = 0
+                sX = MyMath.clip(sX, constants.WALK_TO_MIN_X_SPEED,
+                                 constants.WALK_TO_MAX_X_SPEED)
+                sY = MyMath.clip(sY, -constants.GOTO_STRAFE_SPEED,
+                                 constants.GOTO_STRAFE_SPEED)
+        else: # sY = 0
+            if sTheta > 0:
+                sX = MyMath.clip(sX, constants.WALK_TO_MIN_X_SPEED,
+                                 constants.WALK_TO_MAX_X_SPEED)
+                sTheta = MyMath.clip(sTheta, constants.WALK_TO_MIN_SPIN_SPEED,
+                                     constants.WALK_TO_MAX_SPIN_SPEED)
+            else: # sTheta = 0
+                sX = MyMath.clip(sX, constants.WALK_TO_MIN_X_SPEED,
+                                 constants.WALK_TO_MAX_X_SPEED)
+    else: # sX = 0
+        if sY > 0:
+            if sTheta > 0:
+                sY = MyMath.clip(sY, -constants.GOTO_STRAFE_SPEED,
+                                 constants.GOTO_STRAFE_SPEED)
+                sTheta = MyMath.clip(sTheta, constants.OMNI_MIN_SPIN_SPEED,
+                                     constants.OMNI_MAX_SPIN_SPEED)
+            else: #sTheta = 0
+                sY = MyMath.clip(sY, -constants.GOTO_STRAFE_SPEED,
+                                 constants.GOTO_STRAFE_SPEED)
+        else: # sY = 0
+            if sTheta > 0:
+                sTheta = MyMath.clip(sTheta, constants.OMNI_MIN_SPIN_SPEED,
+                                     constants.OMNI_MAX_SPIN_SPEED)
+
+    print ("sX = %g sY = %g sTheta = %g bearing = %g dist = %g" %
+           (sX, sY,sTheta, bearing, distToDest))
 
     return (sX, sY, sTheta)
 
@@ -175,7 +210,7 @@ def getSpinOnlyParam(my, dest):
 
     spinDir = my.spinDirToHeading(dest.h)
     # getRelativeBearing can be replaced w/simpler math
-    headingDiff = fabs(my.getRelativeBearing(dest))
+    headingDiff = my.getRelativeBearing(dest)
     sTheta = spinDir * constants.GOTO_SPIN_SPEED * \
              getRotScale(headingDiff)
 

@@ -49,10 +49,9 @@ class Navigator(FSA.FSA):
             print "switching from ", self.currentState
             self.switchTo('spinToBall')
 
-    def positionPlaybook(self, dest):
-        """robot will walk to the x,y,h given in dest using a mix of omni,
+    def positionPlaybook(self):
+        """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
-        self.dest = dest
 
         if not self.currentState == 'playbookWalk' and \
                not self.currentState == 'playbookOmni' and \
