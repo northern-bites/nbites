@@ -71,8 +71,8 @@ def getNewOmniWalkParam(my, dest):
     sY = constants.GOTO_STRAFE_SPEED  * strafeGain
 
     # calculate ideal max spin speed
-    sTheta = (my.spinDirToHeading(dest.h) * getRotScale(bearing) *
-              constants.GOTO_SPIN_SPEED)
+    sTheta = (my.spinDirToHeading(dest.h) * getRotScale(bearingDeg) *
+              constants.OMNI_MAX_SPIN_SPEED)
 
     ## if any are below min thresholds, set to 0
     if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
@@ -90,23 +90,34 @@ def getNewOmniWalkParam(my, dest):
     ## if x and y, clip each to ??
     ## if x and theta, clip x to ?, theta to WALK_TO_MAX_SPIN_SPEED
     ## if y and theta, clip y to ?, theta to ?
+    if fabs(sTheta) >= 18:
+        if fabs(sX) > fabs(sY):
+            sY = 0
+        else:
+            sX = 0
+    if fabs(sTheta) == 30:
+        sX, sY = 0, 0
 
-    if sX > 0:
-        if sY > 0:
-            if sTheta > 0:
-                sX = MyMath.clip(sY, constants.OMNI_MIN_X_SPEED,
+    ## need fewer, but bigger adjustments of heading from a distance to maximize
+    ## use of faster clipping for x, y
+
+    ## scale and clip based on walk values present
+    if fabs(sX) > 0:
+        if fabs(sY) > 0:
+            if fabs(sTheta) > 0:
+                sX = MyMath.clip(sX, constants.OMNI_MIN_X_SPEED,
                                  constants.OMNI_MAX_X_SPEED)
                 sY = MyMath.clip(sY, constants.OMNI_MIN_Y_SPEED,
                                  constants.OMNI_MAX_Y_SPEED)
-                sZ = MyMath.clip(sTheta, constants.OMNI_MIN_SPIN_SPEED,
-                                 constants.OMNI_MAX_SPIN_SPEED)
+                sTheta = MyMath.clip(sTheta, constants.OMNI_MIN_SPIN_SPEED,
+                                     constants.OMNI_MAX_SPIN_SPEED)
             else: # sTheta = 0
                 sX = MyMath.clip(sX, constants.WALK_TO_MIN_X_SPEED,
                                  constants.WALK_TO_MAX_X_SPEED)
                 sY = MyMath.clip(sY, -constants.GOTO_STRAFE_SPEED,
                                  constants.GOTO_STRAFE_SPEED)
         else: # sY = 0
-            if sTheta > 0:
+            if fabs(sTheta) > 0:
                 sX = MyMath.clip(sX, constants.WALK_TO_MIN_X_SPEED,
                                  constants.WALK_TO_MAX_X_SPEED)
                 sTheta = MyMath.clip(sTheta, constants.WALK_TO_MIN_SPIN_SPEED,
@@ -115,7 +126,7 @@ def getNewOmniWalkParam(my, dest):
                 sX = MyMath.clip(sX, constants.WALK_TO_MIN_X_SPEED,
                                  constants.WALK_TO_MAX_X_SPEED)
     else: # sX = 0
-        if sY > 0:
+        if fabs(sY) > 0:
             if sTheta > 0:
                 sY = MyMath.clip(sY, -constants.GOTO_STRAFE_SPEED,
                                  constants.GOTO_STRAFE_SPEED)

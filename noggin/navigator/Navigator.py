@@ -47,7 +47,7 @@ class Navigator(FSA.FSA):
            not self.currentState == 'walkStraightToBall' and \
            not self.currentState == 'omniWalkToBall':
             print "switching from ", self.currentState
-            self.switchTo('spinToBall')
+            self.switchTo('walkStraightToBall')
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
