@@ -34,6 +34,7 @@ message KeyFrame {
 
 	optional int32 tCorners = 8;
 	optional int32 lCorners = 9;
+	optional int32 ccCorners = 10;
 
 }
 

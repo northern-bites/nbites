@@ -71,7 +71,7 @@ public class VisionState {
 	private CrossType seeCross;
 	private GoalType seeBlue, seeYellow;
 	private int seeRedRobots, seeBlueRobots;
-	private int seeLCorners, seeTCorners;
+	private int seeLCorners, seeTCorners, seeCcCorners;
     private Vector<VisualFieldObject> visualFieldObjects;
     private Vector<VisualCorner> visualCorners;
 	private int tableSize = 128;
@@ -96,6 +96,7 @@ public class VisionState {
 		seeBlueRobots = 0;
 		seeLCorners = 0;
 		seeTCorners = 0;
+		seeCcCorners = 0;
     }
 
 	/** We are going to collect stats on the pixels we see in a bunch of frames.  For any
@@ -729,6 +730,7 @@ public class VisionState {
 		int other = 0;
 		seeLCorners = 0;
 		seeTCorners = 0;
+		seeCcCorners = 0;
         for (int i = 0; i < visualCorners.size(); i++) {
             corner = visualCorners.elementAt(i);
 			VisualCorner.shape corn = corner.getShape();
@@ -736,6 +738,8 @@ public class VisionState {
 				seeLCorners++;
 			} else if (corn == VisualCorner.shape.T) {
 				seeTCorners++;
+			} else if (corn == VisualCorner.shape.CIRCLE ){
+				seeCcCorners++;
 			} else {
 				// current covers UNKNOWN and CIRCLE it is plausible that we'll want to process these
 				other++;
@@ -867,6 +871,7 @@ public class VisionState {
 	public CrossType getCrossVision() {return seeCross;}
 	public int getLCornersVision() {return seeLCorners;}
 	public int getTCornersVision() {return seeTCorners;}
+	public int getCcCornersVision() {return seeCcCorners;}
 
 	public String getBlueGoalString() {
 		switch (seeBlue) {
@@ -910,6 +915,9 @@ public class VisionState {
 	}
 	public String getTCornerString() {
 		return ""+seeTCorners;
+	}
+	public String getCcCornerString() {
+		return ""+seeCcCorners;
 	}
 
     //setters
