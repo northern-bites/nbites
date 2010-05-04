@@ -104,9 +104,8 @@ public class KeyPanel extends JPanel implements ItemListener {
 
 		am.put("LCorner", new AbstractAction("LCorner"){
 				public void actionPerformed(ActionEvent e){
-					int index = lCorners.getSelectedIndex();
 					lCorners.setSelectedIndex((lCorners.getSelectedIndex() + 1) %
-											  (lCorners.getItemCount()-1));
+											  (lCorners.getItemCount()));
 				}
 			});
 
@@ -114,9 +113,8 @@ public class KeyPanel extends JPanel implements ItemListener {
 
 		am.put("CcCorner", new AbstractAction("CcCorner"){
 				public void actionPerformed(ActionEvent e){
-					int index = ccCorners.getSelectedIndex();
 					ccCorners.setSelectedIndex((ccCorners.getSelectedIndex() + 1) %
-											  (ccCorners.getItemCount()-1));
+											  (ccCorners.getItemCount()));
 				}
 			});
 
@@ -124,9 +122,8 @@ public class KeyPanel extends JPanel implements ItemListener {
 
 		am.put("TCorner", new AbstractAction("TCorner"){
 				public void actionPerformed(ActionEvent e){
-					int index = tCorners.getSelectedIndex();
 					tCorners.setSelectedIndex((tCorners.getSelectedIndex() + 1) %
-											  (tCorners.getItemCount()-1));
+											  (tCorners.getItemCount()));
 				}
 			});
 	}
@@ -210,8 +207,6 @@ public class KeyPanel extends JPanel implements ItemListener {
 		ccCorners.addItem("No CC Corners");
 		ccCorners.addItem("One");
 		ccCorners.addItem("Two");
-		ccCorners.addItem("Three");
-		ccCorners.addItem("Four");
 		ccCorners.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					JComboBox sourceBox = (JComboBox) e.getSource();
@@ -461,7 +456,7 @@ public class KeyPanel extends JPanel implements ItemListener {
 		@param num    how many corners
 	 */
 	public void setCcCornerStatus(int num) {
-		if (num > 3) num = 3;
+		if (num > 2) num = 2;
 		ccCorners.setSelectedIndex(num);
 	}
 
@@ -619,12 +614,6 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Two")) {
 			learn.setCcCorners(2);
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("Three")) {
-			learn.setCcCorners(3);
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("Four")) {
-			learn.setCcCorners(4);
 		}
 	}
 
