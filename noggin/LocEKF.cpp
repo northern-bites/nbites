@@ -755,18 +755,18 @@ float LocEKF::getMahalanobisDistance(const Observation& z, const LineLandmark& l
 
 	MeasurementMatrix s_inverse =
 		boost::numeric::ublas::scalar_matrix<float>(2,2,0.0f);
-	s_inverse(0,0) = ((0.0001 + dist_sd_2*sinb_2)/
-			  (1.e-8 + (dist_sd_2*cosb_2)/10000. +
-			   (dist_sd_2*sinb_2)/10000.));
+	s_inverse(0,0) = ((0.0001f + dist_sd_2*sinb_2)/
+			  (1.e-8f + (dist_sd_2*cosb_2)/10000.f +
+			   (dist_sd_2*sinb_2)/10000.f));
 	s_inverse(0,1) = (-((dist_sd_2*cosb*sinb)/
-				(1.e-8 + (dist_sd_2*cosb_2)/10000. +
-				 (dist_sd_2*sinb_2)/10000.)));
+				(1.e-8f + (dist_sd_2*cosb_2)/10000.f +
+				 (dist_sd_2*sinb_2)/10000.f)));
 	s_inverse(1,0) = -((dist_sd_2*cosb*sinb)/
-			   (1.e-8 + (dist_sd_2*cosb_2)/10000. +
-				(dist_sd_2*sinb_2)/10000.));
-	s_inverse(1,1) = ((0.0001 + dist_sd_2*cosb_2)/
-			  (1.e-8 + (dist_sd_2*cosb_2)/10000. +
-			   (dist_sd_2*sinb_2)/10000.));
+			   (1.e-8f + (dist_sd_2*cosb_2)/10000.f +
+				(dist_sd_2*sinb_2)/10000.f));
+	s_inverse(1,1) = ((0.0001f + dist_sd_2*cosb_2)/
+			  (1.e-8f + (dist_sd_2*cosb_2)/10000.f +
+			   (dist_sd_2*sinb_2)/10000.f));
 
 	return sqrt(inner_prod(trans(z_x-u),prod(s_inverse,z_x-u)));
 }
