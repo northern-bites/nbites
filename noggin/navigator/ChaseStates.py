@@ -1,8 +1,4 @@
-from . import NavConstants as constants
 from . import NavHelper as helper
-from ..players import BrunswickSpeeds as speeds
-from ..util import MyMath
-from math import fabs
 DEBUG = False
 
 def walkSpinToBall(nav):

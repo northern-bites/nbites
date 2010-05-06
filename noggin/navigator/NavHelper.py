@@ -138,9 +138,6 @@ def getWalkSpinParam(my, dest):
     else: #if we make getRotScale finer grained we could
         sX = 0
 
-    print ("sX = %g sTheta = %g bearing = %g dist = %g" %
-           (sX, sTheta, bearing, distToDest))
-
     return (sX, 0, sTheta)
 
 def getWalkStraightParam(my, dest):

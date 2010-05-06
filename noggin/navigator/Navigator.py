@@ -52,7 +52,7 @@ class Navigator(FSA.FSA):
 
         if not self.currentState == 'playbookWalk' and \
                not self.currentState == 'playbookOmni' and \
-               not self.currentState == 'playbookSpin':
+               not self.currentState == 'playbookFinalSpin':
             self.switchTo('playbookWalk')
 
     def omniGoTo(self, dest):

@@ -16,7 +16,7 @@ def playbookWalk(nav):
 
     dest.h = my.getTargetHeading(dest)
 
-    walkX, walkY, walkTheta = helper.getWalkStraightParam(my, dest)
+    walkX, walkY, walkTheta = helper.getWalkSpinParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     # this order is important! the other way he will attempt to spin and walk
@@ -27,14 +27,6 @@ def playbookWalk(nav):
             return nav.goLater('playbookOmni')
     else:
         nav.omniWalkToCount = 0
-
-    bearingDiff = fabs(my.getRelativeBearing(dest))
-    if bearingDiff > constants.HEADING_THRESHOLD_TO_SPIN:
-        nav.spinToPointCount += 1
-        if nav.spinToPointCount > constants.FRAMES_THRESHOLD_TO_SPIN:
-            return nav.goLater('playbookSpin')
-    else:
-        nav.spinToPointCount = 0
 
     return nav.stay()
 
@@ -69,37 +61,6 @@ def playbookOmni(nav):
         nav.stopOmniCount += 1
         if nav.stopOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
             return nav.goLater('playbookWalk')
-
-    return nav.stay()
-
-def playbookSpin(nav):
-    if nav.firstFrame():
-        nav.walkOmniCount = 0
-        nav.spinToPointCount = 0
-        nav.walkToPointCount = 0
-
-    my = nav.brain.my
-    dest = nav.brain.play.getPosition()
-
-    dest.h = my.getTargetHeading(dest)
-
-    walkX, walkY, walkTheta = helper.getSpinOnlyParam(my, dest)
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
-
-    if helper.useFinalHeading(nav.brain, dest):
-        nav.walkOmniCount += 1
-        if nav.walkOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
-            return nav.goLater('playbookOmni')
-    else:
-        nav.walkOmniCount = 0
-
-    headingDiff = fabs(my.getRelativeBearing(dest))
-    if headingDiff < constants.HEADING_THRESHOLD_TO_SPIN:
-        nav.walkToPointCount += 1
-        if nav.walkToPointCount > constants.FRAMES_THRESHOLD_TO_SPIN:
-            return nav.goLater('playbookWalk')
-    else:
-        nav.walkToPointCount = 0
 
     return nav.stay()
 
