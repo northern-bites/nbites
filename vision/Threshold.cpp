@@ -257,6 +257,8 @@ void Threshold::findGoals(int column, int topEdge) {
 		case BLUEGREEN:
 			blueGreen++;
 			break;
+		case GREEN:
+			break;
 		default:
 			bad++;
 		}
@@ -335,6 +337,12 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 			switch (lastPixel) {
 			case ORANGE:
 				// add to Ball data structure
+				if (j == topEdge) {
+					while (j > 0 && thresholded[j][column] == ORANGE) {
+						currentRun++;
+						j--;
+					}
+				}
 				if (currentRun > 2) {
 					orange->newRun(column, j, currentRun);
 				}
