@@ -104,7 +104,10 @@ $(WEBOTS_FILE):
 
 
 install: $(CMAKE_DEPEND)
-	@$(MAKE) $(MAKE_OPTIONS) -C $(BUILD_DIR) install
+	$(MKDIR) $(INSTALL_DIR)
+	@if [ -e $(CROSS_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) install; \
+	fi
 	$(INSTALL_SCRIPT)
 
 clean_install:

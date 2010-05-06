@@ -21,6 +21,9 @@ IF( NOT EXISTS ${TRUNK_PATH} )
     )
 ENDIF( NOT EXISTS ${TRUNK_PATH} )
 
+SET( NBITES_DIR ${TRUNK_PATH}/../.. )
+SET( BUILD_DIR ${NBITES_DIR}/build/man )
+
 ############################ TRUNK REVISION
 # Record the current revision number of the repository
 #SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
@@ -51,10 +54,12 @@ ENDIF( NOT EXISTS ${AL_DIR} )
 # Ensure the MAN_INSTALL_PREFIX variable is set
 
 IF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT(
-    MAN_INSTALL_PREFIX ${TRUNK_PATH}/install ABSOLUTE
-    )
-  SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
+  IF( OE_CROSS_BUILD )
+    GET_FILENAME_COMPONENT(
+      MAN_INSTALL_PREFIX ${BUILD_DIR}/cross_install ABSOLUTE
+       )
+    SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
+  ENDIF( OE_CROSS_BUILD )
   MESSAGE( STATUS
     "Environment variable MAN_INSTALL_PREFIX was not set, resetting to default ${MAN_INSTALL_PREFIX}!" )
 ELSE( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
@@ -91,7 +96,7 @@ SET( CMAKE_MODULE_PATH ${TRUNK_PATH}/cmake )
 ############################ ROBOT TYPE
 # Definitions for the type of robot (for compilation definitions), and
 # prefixes for library, executable, and path names
-
+# TODO: get rid of AIBO code 
 IF( NOT DEFINED ROBOT_TYPE )
   SET( ROBOT_TYPE NAO_RL )
 ENDIF( NOT DEFINED ROBOT_TYPE )

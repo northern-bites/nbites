@@ -63,7 +63,7 @@ echo "echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt"
 echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt
 echo "cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME"
 cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME
-
+#TODO make this only one rsync call
 echo "rsync -rcLv $SRC $DEST/"
 rsync -rcLv $SRC $DEST/
 
