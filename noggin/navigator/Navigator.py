@@ -43,11 +43,8 @@ class Navigator(FSA.FSA):
         robot will walk to the ball with it centered at his feet.
         if no ball is visible, localization will be used
         """
-        if not self.currentState == 'spinToBall' and \
-           not self.currentState == 'walkStraightToBall' and \
-           not self.currentState == 'omniWalkToBall':
-            print "switching from ", self.currentState
-            self.switchTo('walkStraightToBall')
+        if not self.currentState == 'walkSpinToBall':
+            self.switchTo('walkSpinToBall')
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
