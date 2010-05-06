@@ -127,10 +127,6 @@ def getWalkSpinParam(my, dest):
         sX = MyMath.clip(sX, constants.WALK_TO_MIN_X_SPEED,
                          constants.WALK_TO_MAX_X_SPEED)
 
-    ## elif absSTheta <= (constants.HEADING_NEAR_SCALE *
-    ##                    constants.OMNI_MAX_SPIN_SPEED): #9
-    ##     sX = MyMath.clip(sX, -9, 9)
-
     elif absSTheta <= (constants.HEADING_MEDIUM_SCALE *
                        constants.OMNI_MAX_SPIN_SPEED): #18
         sX = MyMath.clip(sX, -9, 9)
