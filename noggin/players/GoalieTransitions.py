@@ -185,7 +185,7 @@ def dangerousBall(player):
     if (ball.x < player.brain.my.x or
         player.brain.myGoalLeftPost.on or
         player.brain.myGoalRightPost.on or
-        player.brain.myGoalCrossbar.on) and ball.locDist <= 40:
+        player.brain.myGoalCrossbar.on) and ball.dist <= 40:
         return True
     #idea: draw ray from me to ball, see if it intersects goal
     return False

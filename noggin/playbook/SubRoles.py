@@ -270,11 +270,13 @@ def getPointBetweenBallAndGoal(ball,dist_from_ball):
 
 def fancyGoaliePosition(team):
     """returns a goalie position using ellipse"""
+
     position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y)
+
     # lets try maintaining home position until the ball is closer in
     # might help us stay localized better
     ball = team.brain.ball
-    if 0 < ball.locDist < PBConstants.ELLIPSE_POSITION_LIMIT:
+    if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
         # Use an ellipse just above the goalline to determine x and y position
         # We get the angle from goal center to the ball to determine our X,Y
         theta = MyMath.safe_atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
