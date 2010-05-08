@@ -99,19 +99,19 @@ class Brain(object):
         # Build instances of the vision based field objects
         # Yello goal left and right posts
         self.yglp = Landmarks.FieldObject(self.vision.yglp,
-                                         Constants.VISION_YGLP)
+                                          Constants.VISION_YGLP)
         self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
-                                         Constants.VISION_YGRP)
+                                          Constants.VISION_YGRP)
         # Blue Goal left and right posts
         self.bglp = Landmarks.FieldObject(self.vision.bglp,
-                                         Constants.VISION_BGLP)
+                                          Constants.VISION_BGLP)
         self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
-                                         Constants.VISION_BGRP)
+                                          Constants.VISION_BGRP)
 
         self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
-                                            Constants.VISION_BG_CROSSBAR)
+                                             Constants.VISION_BG_CROSSBAR)
         self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
-                                            Constants.VISION_YG_CROSSBAR)
+                                             Constants.VISION_YG_CROSSBAR)
 
         # Now we setup the corners
         self.corners = []
