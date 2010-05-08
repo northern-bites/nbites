@@ -137,8 +137,6 @@ def positionForKick(player):
     if player.firstFrame():
         player.brain.CoA.setRobotSlowGait(player.brain.motion)
 
-    ball = player.brain.ball
-
     player.inKickingState = True
     # Leave this state if necessary
     if transitions.shouldKick(player):
@@ -153,27 +151,8 @@ def positionForKick(player):
         player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('approachBall')
 
-    # Determine approach speed
-    targetY = ball.relY
+    player.brain.nav.kickPosition()
 
-    sY = MyMath.clip(targetY * constants.PFK_Y_GAIN,
-                     constants.PFK_MIN_Y_SPEED,
-                     constants.PFK_MAX_Y_SPEED)
-
-    sY = max(constants.PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
-
-    if transitions.shouldApproachForKick(player):
-        #        targetX = (ball.relX -
-        #                   (constants.BALL_KICK_LEFT_X_CLOSE +
-        #                    constants.BALL_KICK_LEFT_X_FAR) / 2.0)
-        sX = MyMath.clip(ball.relX * constants.PFK_X_GAIN,
-                         constants.PFK_MIN_X_SPEED,
-                         constants.PFK_MAX_X_SPEED)
-    else:
-        sX = 0.0
-
-    if ball.on:
-        player.setWalk(sX,sY,0)
     return player.stay()
 
 def dribble(player):
