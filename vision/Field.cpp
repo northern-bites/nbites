@@ -71,7 +71,7 @@ Field::Field(Vision* vis, Threshold * thr)
 {
 #ifdef OFFLINE
 	debugHorizon = false;
-	debugFieldEdge = true;
+	debugFieldEdge = false;
 	openField = false;
 	debugShot = false;
 #else
