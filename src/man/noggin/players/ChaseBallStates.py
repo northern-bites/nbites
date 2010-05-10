@@ -77,7 +77,6 @@ def approachBall(player):
     else :
         player.brain.tracker.trackBall()
 
-
     if player.penaltyKicking and \
             player.ballInOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
