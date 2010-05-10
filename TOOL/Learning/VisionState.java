@@ -1,6 +1,14 @@
 package TOOL.Learning;
 
 import java.util.Vector;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
+import javax.swing.JCheckBox;
+import java.awt.GridLayout;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 
 import TOOL.TOOL;
 import TOOL.Vision.*;
@@ -97,6 +105,8 @@ public class VisionState {
 		seeLCorners = 0;
 		seeTCorners = 0;
 		seeCcCorners = 0;
+
+		createDebugWindow();
     }
 
 	/** We are going to collect stats on the pixels we see in a bunch of frames.  For any
@@ -925,4 +935,108 @@ public class VisionState {
     public void setThreshImage(ProcessedImage i) { thresholdedImage = i;  }
     public void setColorTable(ColorTable c) { colorTable = c; }
     public void setBall(Ball b) { ball = b;  }
+
+
+	/**
+	 * Constructs the window with checkboxes to toggle on and off vision debugging flags.
+	 */
+	private void createDebugWindow()
+	{
+		JFrame debugWindow = new JFrame();
+		JPanel buttonPanel = new JPanel();
+
+		final JCheckBox fieldLinesDebugVertEdgeDetectBox = new JCheckBox("DebugFLVertEdgeDetect");
+		fieldLinesDebugVertEdgeDetectBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugVertEdgeDetect(fieldLinesDebugVertEdgeDetectBox.isSelected());
+				}
+			});
+
+		final JCheckBox fieldLinesDebugHorEdgeDetectBox = new JCheckBox("field Lines Debug Hor Edge DetectBox");
+		fieldLinesDebugHorEdgeDetectBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugHorEdgeDetect(fieldLinesDebugHorEdgeDetectBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugSecondVertEdgeDetectBox = new JCheckBox("field Lines Debug Second Vert EdgeDetectBox");
+		fieldLinesDebugSecondVertEdgeDetectBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugSecondVertEdgeDetect(fieldLinesDebugSecondVertEdgeDetectBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugCreateLinesBox = new JCheckBox("field Lines Debug Create Lines Box");
+		fieldLinesDebugCreateLinesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugCreateLines(fieldLinesDebugCreateLinesBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugFitUnusedPointsBox = new JCheckBox("field Lines Debug Fit Unused PointsBox");
+		fieldLinesDebugFitUnusedPointsBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugFitUnusedPoints(fieldLinesDebugFitUnusedPointsBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugJoinLinesBox = new JCheckBox("field Lines Debug Join Lines Box");
+		fieldLinesDebugJoinLinesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugJoinLines(fieldLinesDebugJoinLinesBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugExtendLinesBox = new JCheckBox("field Lines Debug Extend Lines Box");
+		fieldLinesDebugExtendLinesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugExtendLines(fieldLinesDebugExtendLinesBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugIntersectLinesBox = new JCheckBox("field Lines Debug Intersect Lines Box");
+		fieldLinesDebugIntersectLinesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugIntersectLines(fieldLinesDebugIntersectLinesBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugIdentifyCornersBox = new JCheckBox("field Lines Debug Identify Corners Box");
+		fieldLinesDebugIdentifyCornersBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugIdentifyCorners(fieldLinesDebugIdentifyCornersBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugCcScanBox = new JCheckBox("field Lines Debug Cc Scan Box");
+		fieldLinesDebugCcScanBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugCcScan(fieldLinesDebugCcScanBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugRiskyCornersBox = new JCheckBox("field Lines Debug Risky Corners Box");
+		fieldLinesDebugRiskyCornersBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugRiskyCorners(fieldLinesDebugRiskyCornersBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugCornerAndObjectDistancesBox = new JCheckBox("field Lines Debug Corner And ObjectDistancesBox");
+		fieldLinesDebugCornerAndObjectDistancesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugCornerAndObjectDistances(fieldLinesDebugCornerAndObjectDistancesBox.isSelected());}
+			});
+
+		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
+		buttonPanel.add(fieldLinesDebugHorEdgeDetectBox);
+		buttonPanel.add(fieldLinesDebugCornerAndObjectDistancesBox);
+		buttonPanel.add(fieldLinesDebugSecondVertEdgeDetectBox);
+		buttonPanel.add(fieldLinesDebugCreateLinesBox);
+		buttonPanel.add(fieldLinesDebugFitUnusedPointsBox);
+		buttonPanel.add(fieldLinesDebugJoinLinesBox);
+		buttonPanel.add(fieldLinesDebugExtendLinesBox);
+		buttonPanel.add(fieldLinesDebugIntersectLinesBox);
+		buttonPanel.add(fieldLinesDebugIdentifyCornersBox);
+		buttonPanel.add(fieldLinesDebugCcScanBox);
+		buttonPanel.add(fieldLinesDebugRiskyCornersBox);
+
+		buttonPanel.setLayout(new GridLayout(12,1));
+
+		debugWindow.add(buttonPanel);
+		debugWindow.setSize(400,400);
+		debugWindow.setVisible(true);
+	}
 }
