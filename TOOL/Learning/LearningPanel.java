@@ -61,9 +61,13 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
     private Learning learn;
 
 	private JPanel logs, screen;
-	private JCheckBox falseGoals, falseCrosses, falseBalls;
-	private JCheckBox missedGoals, missedCrosses, missedBalls;
-	private JCheckBox onlyBalls, onlyGoals, onlyCrosses, onlyBots;
+	private JCheckBox falseGoals, falseCrosses, falseBalls, falseLCorners,
+		falseTCorners, falseCcCorners;
+	private JCheckBox missedGoals, missedCrosses, missedBalls, missedLCorners,
+		missedTCorners, missedCcCorners;
+
+	private JCheckBox onlyBalls, onlyGoals, onlyCrosses, onlyBots,
+		onlyLCorners, onlyTCorners, onlyCcCorners;
 
 
 	/**  Constructor.  Sets up panel and listeners.
@@ -84,16 +88,29 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		falseGoals = new JCheckBox("False Goals");
 		falseCrosses = new JCheckBox("False Cross");
 		falseBalls = new JCheckBox("False Balls");
+		falseLCorners = new JCheckBox("False LCorners");
+		falseTCorners = new JCheckBox("False TCorners");
+		falseCcCorners = new JCheckBox("False CcCorners");
 
 		missedGoals = new JCheckBox("Missed Goals");
 		missedCrosses = new JCheckBox("Missed Crosses");
 		missedBalls = new JCheckBox("Missed Balls");
+		missedLCorners = new JCheckBox("Missed LCorners");
+		missedTCorners = new JCheckBox("Missed TCorners");
+		missedCcCorners = new JCheckBox("Missed CcCorners");
 		logs.add(falseGoals);
 		logs.add(falseCrosses);
 		logs.add(falseBalls);
+		logs.add(falseLCorners);
+		logs.add(falseTCorners);
+		logs.add(falseCcCorners);
+
 		logs.add(missedGoals);
 		logs.add(missedCrosses);
 		logs.add(missedBalls);
+		logs.add(missedLCorners);
+		logs.add(missedTCorners);
+		logs.add(missedCcCorners);
 
 		// checkboxes for screening frames - e.g. only give me frames with goals
 		screen = new JPanel();
@@ -102,11 +119,16 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		onlyCrosses = new JCheckBox("Need Cross");
 		onlyBalls = new JCheckBox("Need Ball");
 		onlyBots = new JCheckBox("Need Bots");
+		onlyLCorners = new JCheckBox("Need LCorners");
+		onlyCcCorners = new JCheckBox("Need CcCorners");
+		onlyTCorners = new JCheckBox("Need TCorners");
 		screen.add(onlyBalls);
 		screen.add(onlyGoals);
 		screen.add(onlyCrosses);
 		screen.add(onlyBots);
-
+		screen.add(onlyLCorners);
+		screen.add(onlyCcCorners);
+		screen.add(onlyTCorners);
 
         prevImage = new JButton("Previous (S)");
         prevImage.setFocusable(false);
@@ -284,6 +306,24 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		return falseCrosses.isSelected();
 	}
 
+	/* return true    if false LCorner logging has been checked
+	 */
+	public boolean getFalseLCorners() {
+		return falseLCorners.isSelected();
+	}
+
+	/* return true    if false TCorner logging has been checked
+	 */
+	public boolean getFalseTCorners() {
+		return falseTCorners.isSelected();
+	}
+
+	/* return true    if false CcCorner logging has been checked
+	 */
+	public boolean getFalseCcCorners() {
+		return falseCcCorners.isSelected();
+	}
+
 	/* return true    if missed ball logging has been checked
 	 */
 	public boolean getMissedBalls() {
@@ -300,6 +340,24 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 	 */
 	public boolean getMissedCrosses() {
 		return missedCrosses.isSelected();
+	}
+
+	/* return true    if missed LCorner logging has been checked
+	 */
+	public boolean getMissedLCorners() {
+		return missedLCorners.isSelected();
+	}
+
+	/* return true    if missed TCorner logging has been checked
+	 */
+	public boolean getMissedTCorners() {
+		return missedTCorners.isSelected();
+	}
+
+	/* return true    if missed CcCorner logging has been checked
+	 */
+	public boolean getMissedCcCorners() {
+		return missedCcCorners.isSelected();
 	}
 
 	/* return true    if screening all but balls
@@ -326,6 +384,23 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 		return onlyBots.isSelected();
 	}
 
+	/* return true    if screening all but LCorners
+	 */
+	public boolean getOnlyLCorners() {
+		return onlyLCorners.isSelected();
+	}
+
+	/* return true    if screening all but TCorners
+	 */
+	public boolean getOnlyTCorners() {
+		return onlyTCorners.isSelected();
+	}
+
+	/* return true    if screening all but CcCorners
+	 */
+	public boolean getOnlyCcCorners() {
+		return onlyCcCorners.isSelected();
+	}
 
     /**
      * Greys out buttons depending on whether we can actually use them at this

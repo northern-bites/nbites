@@ -580,6 +580,7 @@ public class Learning implements DataListener, MouseListener,
 		for human approval.
 	 */
 	public void runBatch () {
+		System.out.println("Running a batch job");
 		initStats();
 		quietMode = true;
 		int framesProcessed = 0;
@@ -617,15 +618,12 @@ public class Learning implements DataListener, MouseListener,
 		long time depending on the amount of data contained.
 	 */
 	public void runRecursiveBatch() {
-		System.out.println("Running batch job");
+		System.out.println("Running recursive batch job");
 		initStats();
 		quietMode = true;
 		int framesProcessed = 0;
 		long t = System.currentTimeMillis();
 		String topPath = currentSet.path();
-		boolean screen = false;
-		screen = learnPanel.getOnlyBalls() || learnPanel.getOnlyGoals() ||
-			learnPanel.getOnlyCrosses() || learnPanel.getOnlyBots();
 		// We need to get rid of the current directory
 		int end = topPath.length() - 2;
 		for ( ; end > -1 && !topPath.substring(end, end+1).equals(System.getProperty("file.separator"));
@@ -655,13 +653,7 @@ public class Learning implements DataListener, MouseListener,
 							}
 							current = keys.getFrame(f.index());
 							curFrameIndex = f.index();
-							if (current.getHumanChecked() &&
-								(!screen || (learnPanel.getOnlyBalls() && current.getBall()) ||
-								 (learnPanel.getOnlyGoals() && (current.getBlueGoal().getNumber() != 0 ||
-																current.getYellowGoal().getNumber() != 0)) ||
-								 (learnPanel.getOnlyCrosses() && current.getCross().getNumber() != 0) ||
-								 (learnPanel.getOnlyBots() && (current.getRedRobots() != 0 ||
-															current.getBlueRobots() != 0)))) {
+							if (shouldProcessFrame(current)) {
 								// we have good data, so let's process the frame
 								visionState.newFrame(f, tool.getColorTable());
 								visionState.update(false, f);
@@ -689,6 +681,7 @@ public class Learning implements DataListener, MouseListener,
 		}
 		t = System.currentTimeMillis() - t;
 		quietMode = false;
+		System.out.println("Processed " + topPath);
 		printStats(framesProcessed, t);
 	}
 
@@ -984,9 +977,10 @@ public class Learning implements DataListener, MouseListener,
 		System.out.println("Cross Statistics:        Good: "+goodCross+" OK: "+okCross+
 						   "    False positives: "+falseCross+" badID: "+
 						   badCross+" missed: "+missedCross);
-		System.out.println("Corner Statistics:  GoodT: "+goodT+" GoodL: "+goodL+" False Ts: "+
-						   falseT+" False Ls: "+falseL+" Missed Ts: "+missedT+
-						   " Missed Ls: "+missedL);
+		System.out.println("Corner Statistics:"+
+						   "  GoodT: "+goodT+" GoodL: "+goodL+" GoodCC: "+goodCC+
+						   "\n\tFalse Ts: "+ falseT+" False Ls: "+falseL+" False CCs: "+falseCC+
+						   "\n\tMissed Ts: "+missedT+" Missed Ls: "+missedL+" Missed CCs: "+missedCC);
 	}
 
 	/** Compare our key file against vision and update stats accordingly
@@ -1001,31 +995,73 @@ public class Learning implements DataListener, MouseListener,
 		if (ells > ellsV) {
 			missedL += ells - ellsV;
 			goodL += ellsV;
+			printMissedLCornerMessage();
 		} else if (ellsV > ells) {
 			falseL += ellsV - ells;
+			printFalseLCornerMessage();
 			goodL += ells;
 		} else if (ells > 0) {
 			goodL+= ells;
 		}
+
 		if (tees > teesV) {
 			missedT += tees - teesV;
 			goodT += teesV;
+			printMissedTCornerMessage();
 		} else if (teesV > tees) {
 			falseT += teesV - tees;
 			goodT += tees;
+			printFalseTCornerMessage();
 		} else if (tees > 0) {
 			goodT += tees;
 		}
+
 		if (cees > ceesV) {
 			missedCC += cees - ceesV;
 			goodCC += ceesV;
+			printMissedCcCornerMessage();
 		} else if (ceesV > cees) {
 			falseCC += ceesV - cees;
 			goodCC += cees;
+			printFalseTCornerMessage();
 		} else if (cees > 0) {
 			goodCC += cees;
 		}
 	}
+
+	/**
+	 * Print respective messages for missed/false corners in frames
+	 */
+	public void printFalseLCornerMessage()
+	{
+		if (learnPanel.getFalseLCorners())
+			System.out.println("False LCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printFalseTCornerMessage()
+	{
+		if (learnPanel.getFalseTCorners())
+			System.out.println("False TCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printFalseCcCornerMessage()
+	{
+		if (learnPanel.getFalseCcCorners())
+			System.out.println("False CcCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printMissedLCornerMessage()
+	{
+		if (learnPanel.getMissedLCorners())
+			System.out.println("Missed LCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printMissedTCornerMessage()
+	{
+		if (learnPanel.getMissedTCorners())
+			System.out.println("Missed TCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printMissedCcCornerMessage()
+	{
+		if (learnPanel.getMissedCcCorners())
+			System.out.println("Missed CcCorner in "+curFrame+" frame "+curFrameIndex);
+	};
 
 	/** Compare our key file against vision and update stats accordingly
 	 */
@@ -1362,6 +1398,37 @@ public class Learning implements DataListener, MouseListener,
 			case DOUBLE_CROSS: goodCross+=2; break;
 			}
 		}
+	}
+
+	/** Should we process this frame? Does it fit the requirements
+	 * set by the panel buttons
+	 *
+	 * @return boolean If the current frame has the required objects in it
+	 */
+	public boolean shouldProcessFrame(KeyFrame current){
+		final boolean screen = ( learnPanel.getOnlyBalls()		||
+								 learnPanel.getOnlyGoals()		||
+								 learnPanel.getOnlyCrosses()	||
+								 learnPanel.getOnlyBots() );
+
+		return current.getHumanChecked() &&
+			(!screen ||
+			 (learnPanel.getOnlyBalls() && current.getBall()) ||
+
+			 (learnPanel.getOnlyGoals() &&
+			  (current.getBlueGoal().getNumber() != 0 ||
+			   current.getYellowGoal().getNumber() != 0)) ||
+
+			 (learnPanel.getOnlyCrosses() && current.getCross().getNumber() != 0) ||
+
+			 (learnPanel.getOnlyBots() && (current.getRedRobots() != 0 ||
+										   current.getBlueRobots() != 0)) ||
+
+			 (learnPanel.getOnlyLCorners() && current.getLCorners() != 0) ||
+			 (learnPanel.getOnlyTCorners() && current.getTCorners() != 0) ||
+			 (learnPanel.getOnlyCcCorners() && current.getCcCorners() != 0)
+
+			 );
 	}
 
 	/** Someday we'll use this to collect robot stats.  But first we need to be
