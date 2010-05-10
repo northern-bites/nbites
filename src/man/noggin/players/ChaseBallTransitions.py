@@ -7,20 +7,6 @@ from ..util import MyMath
 
 ####### CHASING STUFF ##############
 
-def shouldTurnToBall_FoundBall(player):
-    """
-    Should we turn to the ball heading after searching for the ball
-    """
-    return( player.brain.ball.framesOn > constants.BALL_ON_THRESH)
-
-def shouldTurnToBall_ApproachBall(player):
-    """
-    Should turn to the ball, if we are currently approaching it
-    """
-    ball = player.brain.ball
-    return (ball.on and
-            abs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH)
-
 def shouldApproachBall(player):
     """
     Begin walking to the ball if it is close to straight in front of us

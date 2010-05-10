@@ -52,9 +52,6 @@ def positionForKick(nav):
     sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     if ball.dist > 5:
-        #        targetX = (ball.relX -
-        #                   (constants.BALL_KICK_LEFT_X_CLOSE +
-        #                    constants.BALL_KICK_LEFT_X_FAR) / 2.0)
         sX = MyMath.clip(relX * PFK_X_GAIN,
                          PFK_MIN_X_SPEED,
                          PFK_MAX_X_SPEED)
