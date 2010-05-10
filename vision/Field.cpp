@@ -472,7 +472,7 @@ void Field::findConvexHull(int pH) {
 		e = vision->pose->pixEstimate(quarter * 3, topEdge[quarter * 3], 0.0f);
 		tDist = e.dist;
 	}
-	cout << "Distances are " << qDist << " " << hDist << " " << tDist << endl;
+	// cout << "Distances are " << qDist << " " << hDist << " " << tDist << endl;
 	//cout << "Max dist is " << maxPix << endl;
 }
 
