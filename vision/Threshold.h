@@ -147,10 +147,10 @@ public:
         return yplane[y*IMAGE_ROW_OFFSET+2*x];
     }
     inline uchar getU(int x, int y) {
-        return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
+		return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + UOFFSET];
     }
     inline uchar getV(int x, int y) {
-        return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
+		return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + VOFFSET];
     }
 #elif ROBOT(NAO_SIM)
 #  error NAO_SIM robot type not implemented
