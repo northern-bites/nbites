@@ -58,8 +58,7 @@ class Navigator(FSA.FSA):
         straight walks and spins"""
 
         if not self.currentState == 'playbookWalk' and \
-               not self.currentState == 'playbookOmni' and \
-               not self.currentState == 'playbookFinalSpin':
+               not self.currentState == 'playbookOmni':
             self.switchTo('playbookWalk')
 
     def omniGoTo(self, dest):
