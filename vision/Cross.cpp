@@ -102,7 +102,7 @@ void Cross::createObject() {
 
 void Cross::checkForX(Blob b) {
 
-	const float greenThreshold = 0.8f;
+	const float greenThreshold = 0.75f;
 	int x = b.getLeftTopX();
 	int y = b.getLeftTopY();
 	int w = b.width();
@@ -114,17 +114,17 @@ void Cross::checkForX(Blob b) {
 
 	// first scan the sides
 	for (int i = max(0, y - 2); i < min(IMAGE_HEIGHT - 1, y + h + 2); i++) {
-		if (x > 1) {
-			if (thresh->thresholded[i][x - 2] == GREEN)
+		if (x > 3) {
+			if (thresh->thresholded[i][x - 4] == GREEN)
 				count++;
-			else if (thresh->thresholded[i][x - 2] == WHITE)
+			else if (thresh->thresholded[i][x - 4] == WHITE)
 				count-=3;
 			counter++;
 		} else return;
-		if (x + w + 2 < IMAGE_WIDTH) {
-			if (thresh->thresholded[i][x + w+ 2] == GREEN)
+		if (x + w + 4 < IMAGE_WIDTH) {
+			if (thresh->thresholded[i][x + w+ 4] == GREEN)
 				count++;
-			else if (thresh->thresholded[i][x + w+ 2] == WHITE)
+			else if (thresh->thresholded[i][x + w+ 4] == WHITE)
 				count-=3;
 			counter++;
 		} else return;
@@ -156,6 +156,11 @@ void Cross::checkForX(Blob b) {
 	// make sure we aren't too close to the horizon
 	if (y - HORIZONCHECK < field->horizonAt(x) && field->horizonAt(x) > 0) return;
 	if (y - HORIZONCHECK < field->horizonAt(x+w) && field->horizonAt(x+w) > 0) return;
+
+	if (CROSSDEBUG) {
+		cout << "Passed Horizon checks " << endl;
+		cout << "White green information " << count << " " << counter << endl;
+	}
 
 	// if we pass the basic threshold then make sure it isn't a line
 	if (count > (float)counter * greenThreshold) {
@@ -229,7 +234,7 @@ void Cross::newRun(int x, int y, int h)
         // skip over noise --- jumps over two pixel noise currently.
         //HW--added CONSTANT for noise jumps.
         if (last > 0 && runs[last].x == x &&
-            (runs[last].y - (y + h) <= NOISE_SKIPS)) {
+            (runs[last].y - (y + h) <= NOISE)) {
             runs[last].h += runs[last].y - y; // merge run lengths
             runs[last].y = y; // reset the new y val
             h = runs[last].h;
