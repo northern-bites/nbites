@@ -56,7 +56,7 @@ def pDefensiveMiddie(team, workingPlay):
         y = PBConstants.MAX_MIDDIE_Y
     h = team.brain.ball.heading
 
-    pos = (PBConstants.DEFENSIVE_MIDDIE_X, y), h
+    pos = (PBConstants.DEFENSIVE_MIDDIE_X, y, h)
     workingPlay.setPosition(pos)
 
 def pOffensiveMiddie(team, workingPlay):
@@ -159,7 +159,7 @@ def pKickoffSweeper(team, workingPlay):
     """position kickoff sweeper"""
     workingPlay.setSubRole(PBConstants.KICKOFF_SWEEPER)
     x = PBConstants.KICKOFF_DEFENDER_X
-    h = team.brain.ball.heading
+    h = team.brain.my.headingTo(PBConstants.CENTER_FIELD)
 
     if team.kickoffFormation == 0:
         y = PBConstants.KICKOFF_DEFENDER_0_Y
@@ -173,7 +173,7 @@ def pKickoffStriker(team, workingPlay):
     """position kickoff striker"""
     workingPlay.setSubRole(PBConstants.KICKOFF_STRIKER)
     x = PBConstants.KICKOFF_OFFENDER_X
-    h = team.brain.ball.heading
+    h = team.brain.my.headingTo(PBConstants.CENTER_FIELD)
 
     if team.kickoffFormation == 0:
         y = PBConstants.KICKOFF_OFFENDER_0_Y
@@ -196,7 +196,7 @@ def pReadyChaser(team, workingPlay):
         x = PBConstants.READY_NON_KICKOFF_CHASER_X
         y = PBConstants.READY_NON_KICKOFF_CHASER_Y
 
-    h = team.brain.ball.heading
+    h = team.brain.my.headingTo(PBConstants.CENTER_FIELD)
     pos = (x,y,h)
     workingPlay.setPosition(pos)
 
@@ -215,7 +215,7 @@ def pReadyOffender(team, workingPlay):
         x = PBConstants.READY_NON_KICKOFF_OFFENDER_X
         y = PBConstants.READY_NON_KICKOFF_OFFENDER_Y
 
-    h = team.brain.ball.heading
+    h = team.brain.my.headingTo(PBConstants.CENTER_FIELD)
     pos = (x,y,h)
     workingPlay.setPosition(pos)
 
@@ -234,7 +234,7 @@ def pReadyDefender(team, workingPlay):
         x = PBConstants.READY_NON_KICKOFF_DEFENDER_X
         y = PBConstants.READY_NON_KICKOFF_DEFENDER_Y
 
-    h = team.brain.ball.heading
+    h = team.brain.my.headingTo(PBConstants.CENTER_FIELD)
     pos = (x,y,h)
     workingPlay.setPosition(pos)
 
@@ -245,7 +245,7 @@ def pGoalieReady(team, workingPlay):
     workingPlay.setSubRole(PBConstants.READY_GOALIE)
     position = (PBConstants.GOALIE_HOME_X,
                 PBConstants.GOALIE_HOME_Y,
-                team.brain.ball.heading)
+                team.brain.my.headingTo(PBConstants.CENTER_FIELD))
     workingPlay.setPosition(position)
 
 
