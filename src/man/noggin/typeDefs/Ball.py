@@ -159,7 +159,7 @@ class Ball(VisualObject):
             self.bearing = self.locBearing
             self.dist = self.locDist
             # uses my.x, my.y which are loc determined to get heading
-            self.heading = my.getTargetHeading(self)
+            self.heading = my.headingTo(self)
         # TODO: use vision bearing + my heading if ball.on
 
     def __str__(self):

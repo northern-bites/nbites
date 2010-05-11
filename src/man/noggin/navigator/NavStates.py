@@ -42,7 +42,7 @@ def walkStraightToPoint(nav):
     if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
         return nav.goLater('spinToFinalHeading')
 
-    destH = nav.brain.my.getTargetHeading(nav.dest)
+    destH = nav.brain.my.headingTo(nav.dest)
 
     if not helper.atHeadingGoTo(my, destH):
         nav.walkToPointSpinCount += 1
@@ -63,7 +63,7 @@ def spinToWalkHeading(nav):
     Spin to the heading needed to walk to a specific point
     """
     my = nav.brain.my
-    targetH = my.getTargetHeading(nav.dest)
+    targetH = my.headingTo(nav.dest)
     newSpinDir = my.spinDirToHeading(targetH)
 
     if nav.firstFrame():
