@@ -127,7 +127,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if self.play.isRole(PBConstants.CHASER):
             return 'chase'
         elif ( self.play.isRole(PBConstants.OFFENDER) or
-               self.play.isRole(PBConstants.DEFENDER) ):
+               self.play.isRole(PBConstants.DEFENDER) or
+               self.play.isRole(PBConstants.MIDDIE)):
             return 'playbookPosition'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
