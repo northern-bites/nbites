@@ -14,7 +14,7 @@ def playbookWalk(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    dest.h = my.getTargetHeading(dest)
+    dest.h = my.headingTo(dest)
 
     walkX, walkY, walkTheta = helper.getWalkSpinParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)

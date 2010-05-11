@@ -40,10 +40,12 @@ class Location (object):
             return 10000
         return hypot(other.y - self.y, other.x - self.x)
 
-    def getTargetHeading(self, target):
-        '''determine the heading from one location to another'''
-        return MyMath.sub180Angle(degrees(MyMath.safe_atan2(target.y - self.y,
-                                                            target.x - self.x)))
+    def headingTo(self, other):
+        '''determine the heading facing a target x, y'''
+        ## print "other.y:%f my.y:%f other.x:%f my.x:%f" % (other.y, self.y,
+        ##                                                  other.x, self.x)
+        return MyMath.sub180Angle(degrees(MyMath.safe_atan2(other.y - self.y,
+                                                            other.x - self.x)))
 
     def visible():
         pass
@@ -70,11 +72,6 @@ class RobotLocation(Location):
 
         return MyMath.sub180Angle((degrees(MyMath.safe_atan2(other.y - self.y,
                                                other.x - self.x))) - self.h)
-
-    def headingTo(self, other):
-        '''determine the heading facing a target x, y'''
-        return MyMath.sub180Angle(degrees(MyMath.safe_atan2(other.y - self.y,
-                                              other.x - self.x)))
 
     def spinDirToPoint(self, other):
         """
@@ -115,6 +112,7 @@ class RobotLocation(Location):
     def spinDirToHeading(self, targetH):
         """
         Advanced function to get the spin direction for a given heading.
+        heading in degrees
         """
         LEFT_SPIN = 1
         RIGHT_SPIN = -1
