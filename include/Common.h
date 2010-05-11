@@ -7,6 +7,7 @@
 
 #include <math.h> // for PI
 #include "NBMath.h"
+#include "manconfig.h"
 
 // ROBOT TYPES
 #define NAO_RL    3

@@ -265,7 +265,7 @@ void LocEKF::applyObservations(vector<Observation> Z)
  */
 bool LocEKF::applyObservation(Observation Z)
 {
-#if DEBUG_LOC_EKF_INPUTS
+#ifdef DEBUG_LOC_EKF_INPUTS
 	printBeforeUpdateInfo();
 #endif
 
