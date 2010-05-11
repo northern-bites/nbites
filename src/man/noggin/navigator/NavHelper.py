@@ -58,8 +58,7 @@ def executeMove(motionInst, sweetMove):
 
 def getOmniWalkParam(my, dest):
 
-    bearingDeg = my.getRelativeBearing(dest)
-    bearing = radians(bearingDeg)
+    bearing = radians(my.getRelativeBearing(dest))
 
     distToDest = my.dist(dest)
 
@@ -86,7 +85,9 @@ def getOmniWalkParam(my, dest):
     # calculate spin speed
     spinGain = constants.GOTO_SPIN_GAIN
     spinDir = my.spinDirToHeading(dest.h)
-    sTheta = spinDir * fabs(bearingDeg) * spinGain
+    hDiff = MyMath.sub180Angle(my.h - dest.h)
+    sTheta = spinDir * getRotScale(hDiff) * constants.OMNI_MAX_SPIN_SPEED * \
+             spinGain
     sTheta = MyMath.clip(sTheta,
                          constants.OMNI_MIN_SPIN_SPEED,
                          constants.OMNI_MAX_SPIN_SPEED)

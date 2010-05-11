@@ -28,16 +28,6 @@ def playbookPosition(player):
 
     nav.positionPlaybook()
 
-    if brain.my.locScore == NogginConstants.BAD_LOC:
-        player.shouldRelocalizeCounter += 1
-
-        # only need to check after we increment counter
-        if player.shouldRelocalizeCounter >=\
-               constants.SHOULD_RELOC_FRAME_THRESH:
-            return player.goLater('relocalize')
-
-    else:
-        player.shouldRelocalizeCounter = 0
 
     if transitions.shouldAvoidObstacle(player):
         return player.goNow('avoidObstacle')
