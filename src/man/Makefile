@@ -1,32 +1,37 @@
-
+#Directory setup
 CUR_DIR = $(shell pwd)
 NBITES_DIR = $(CUR_DIR)/../..
 BUILD_DIR = $(NBITES_DIR)/build/man
 STRAIGHT_DIR = $(BUILD_DIR)/straight
 CROSS_DIR = $(BUILD_DIR)/cross
-INSTALL_DIR = $(BUILD_DIR)/install
-INSTALL_SCRIPT = ./upload.sh
+WEBOTS_DIR = $(BUILD_DIR)/webots
+CROSS_INSTALL_DIR = $(BUILD_DIR)/cross_install
+WEBOTS_INSTALL_DIR = $(BUILD_DIR)/webots_install
 CMAKE_DIR = cmake.man
 CMAKE_DEPEND = $(BUILD_DIR)/Makefile
+#Source setup
 CMAKE_SRCS = \
 	CMakeLists.txt \
 	buildconfig.cmake \
 	manconfig.in
 CMAKE_SRCS := $(addprefix $(CMAKE_DIR),$(CMAKE_SRCS))
+#File setup
 CONFIG_FILE = manconfig.h
+INSTALL_SCRIPT = ./upload.sh
 CROSS_FILE = $(BUILD_DIR)/cross_file
-STRAIGHT_FILE = $(BUILD_DIR)/straight
-WEBOTS_FILE = $(BUILD_DIR)/webots
+STRAIGHT_FILE = $(BUILD_DIR)/straight_file
+WEBOTS_FILE = $(BUILD_DIR)/webots_file
 
 PYC_FILES = $(shell find . -name "*.pyc")
 
 CROSS_TOOLCHAIN = $(abspath $(CURDIR)/cmake/geode.cmake)
-CMAKE_DEFS = -DOE_CROSS_BUILD=OFF -DSTRAIGHT=ON
+CMAKE_STRAIGHT_DEFS = -DOE_CROSS_BUILD=OFF -DSTRAIGHT=ON
 CMAKE_CROSS_DEFS = -DCMAKE_TOOLCHAIN_FILE=$(CROSS_TOOLCHAIN) -DOE_CROSS_BUILD=ON
 CMAKE_WEBOTS_DEFS = -DOE_CROSS_BUILD=OFF -DMAN_IS_REMOTE_=ON -DWEBOTS_BACKEND=ON -DCOLOR_TABLE=tables/webots.mtb
 CCMAKE_CROSS_OPT = -DCMAKE_SHARED_LINKER_FLAGS:STRING="" -DCMAKE_MODULE_LINKER_FLAGS:STRING=""
-
+#Commands setup
 CD=cd
+RM=rm
 CMAKE=cmake
 CCMAKE=ccmake
 MKDIR=mkdir
@@ -44,12 +49,11 @@ all: $(CMAKE_DEPEND)
 	@#echo $(TRUNK_REVISION)
 	@if [ -e $(CROSS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR); \
+	elif [ -e $(STRAIGHT_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR); \
+	else [ -e $(WEBOTS_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR); \
 	fi
-
-straight: $(STRAIGHT_FILE)
-	@set -e; \
-		$(CD) $(BUILD_DIR); \
-		$(CCMAKE) .
 
 $(CMAKE_DEPEND):
 	@if [ -f $(WEBOTS_FILE) ]; then \
@@ -60,15 +64,24 @@ $(CMAKE_DEPEND):
 		$(MAKE) $(MAKE_OPTIONS) cross; \
 	fi
 
+straight: $(STRAIGHT_FILE)
+	@set -e; \
+		$(CD) $(STRAIGHT_DIR); \
+		$(CCMAKE) .
+
 $(STRAIGHT_FILE):
-	@if [ -e $(CROSS_FILE) ]  || [ -f $(WEBOTS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) clean; \
+	@if [ -e $(CROSS_FILE) ]; then \
+		$(RM) $(CROSS_FILE); \
+	fi
+	@if [ -e $(WEBOTS_FILE) ]; then \
+		$(RM) $(WEBOTS_FILE); \
 	fi
 	@set -e; \
 		$(MKDIR) -p $(BUILD_DIR); \
 		$(TOUCH) $(STRAIGHT_FILE); \
-		$(CD) $(BUILD_DIR); \
-		$(CMAKE) $(CMAKE_DEFS) $(CURDIR)/$(CMAKE_DIR)
+		$(MKDIR) -p $(STRAIGHT_DIR); \
+		$(CD) $(STRAIGHT_DIR); \
+		$(CMAKE) $(CMAKE_STRAUGHT_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
 cross: $(CROSS_FILE)
 	@set -e ; \
@@ -76,9 +89,12 @@ cross: $(CROSS_FILE)
 		$(CCMAKE) $(CCMAKE_CROSS_OPT) .
 
 $(CROSS_FILE):
-	@if [ -e $(STRAIGHT_FILE) ] || [ -e $(WEBOTS_FILE) ]; then \
-	       $(MAKE) clean; \
-        fi
+	@if [ -e $(STRAIGHT_FILE) ]; then \
+		$(RM) $(STRAIGHT_FILE); \
+	fi
+	@if [ -e $(WEBOTS_FILE) ]; then \
+		$(RM) $(WEBOTS_FILE); \
+	fi
 	@set -e; \
 		$(MKDIR) -p $(BUILD_DIR); \
 		$(TOUCH) $(CROSS_FILE); \
@@ -89,29 +105,36 @@ $(CROSS_FILE):
 
 webots: $(WEBOTS_FILE)
 	@set -e;
-		$(CD) $(BUILD_DIR); \
+		$(CD) $(WEBOTS_DIR); \
 		$(CCMAKE) .
 
 $(WEBOTS_FILE):
-	@if [ -e $(STRAIGHT_FILE) ] || [ -e $(CROSS_FILE) ]; then \
-	       $(MAKE) clean; \
-        fi
+	@if [ -e $(STRAIGHT_FILE) ]; then \
+		$(RM) $(STRAIGHT_FILE); \
+	fi
+	@if [ -e $(CROSS_FILE) ]; then \
+		$(RM) $(CROSS_FILE); \
+	fi
 	@set -e; \
 		$(MKDIR) -p $(BUILD_DIR); \
 		$(TOUCH) $(WEBOTS_FILE); \
-		$(CD) $(BUILD_DIR); \
+		$(MKDIR) -p $(WEBOTS_DIR); \
+		$(CD) $(WEBOTS_DIR); \
 		$(CMAKE) $(CMAKE_WEBOTS_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
 
 install: $(CMAKE_DEPEND)
-	$(MKDIR) $(INSTALL_DIR)
 	@if [ -e $(CROSS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) install; \
+	fi
+	@if [ -e $(WEBOTS_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) install; \
 	fi
 	$(INSTALL_SCRIPT)
 
 clean_install:
-	$(RM) -r $(INSTALL_DIR)/*
+	$(RM) -r $(CROSS_INSTALL_DIR)/*
+	$(RM) -r $(WEBOTS_INSTALL_DIR)/*
 
 cclean: $(CMAKE_DEPEND)
 	@$(MAKE) $(MAKE_OPTIONS) -C $(BUILD_DIR) clean
