@@ -366,7 +366,8 @@ void Field::findConvexHull(int pH) {
 			int x = i * SCANSIZE;
 			if (i == HULLS - 1)
 				x--;
-			pixel = thresh->thresholded[top][x];
+			pixel = thresh->getColor(x, top);
+			//pixel = thresh->thresholded[top][x];
 			if (pixel == GREEN) {
 				good++;
 			} else if (pixel == BLUEGREEN || pixel == GREY) {
@@ -523,7 +524,8 @@ int Field::findGreenHorizon(int pH, float sl) {
 		// and we only look at every 10th pixel
         for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1
                  && greenPixels < 3; i+= SCAN_INTERVAL_X) {
-            pixel = thresh->thresholded[scanY][i];
+            //pixel = thresh->thresholded[scanY][i];
+			pixel = thresh->getColor(i, scanY);
             if (pixel == GREEN) {
                 greenPixels++;
             }
@@ -556,7 +558,8 @@ int Field::findGreenHorizon(int pH, float sl) {
 			if (debugHorizon) {
 				thresh->drawPoint(l, scanY, BLACK);
 			}
-            int newPixel = thresh->thresholded[scanY][l];
+			int newPixel = thresh->getColor(l, scanY);
+            //int newPixel = thresh->thresholded[scanY][l];
             if (newPixel == GREEN) {
 				// firstpix tracks where we saw the first green pixel
                 if (firstpix == -1) {
@@ -591,7 +594,8 @@ int Field::findGreenHorizon(int pH, float sl) {
                     scanY = IMAGE_HEIGHT;
                 }
 
-                int newPixel = thresh->thresholded[scanY][j];
+				int newPixel = thresh->getColor(j, scanY);
+                //int newPixel = thresh->thresholded[scanY][j];
 				if (debugHorizon) {
 					thresh->drawPoint(j, scanY, BLACK);
 				}

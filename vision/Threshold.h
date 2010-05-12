@@ -47,12 +47,24 @@ class Threshold;  // forward reference
 #define ORANGEU 135
 #define WHITEY  105
 #define FUDGEV  2
+#define HIGHGREENY 92
+#define LOWGREENY  44
+#define HIGHGREENU 120
+#define LOWGREENU  88
+#define HIGHGREENV 148
+#define LOWGREENV  128
 #else
 #define BLUEV 145
 #define YELLOWV 120
 #define ORANGEU 145
 #define WHITEY  145
 #define FUDGEV 5
+#define HIGHGREENY 92
+#define LOWGREENY  44
+#define HIGHGREENU 120
+#define LOWGREENU  88
+#define HIGHGREENV 148
+#define LOWGREENV  128
 #endif
 
 //
@@ -100,6 +112,8 @@ public:
     void visionLoop();
     inline void threshold();
     inline void runs();
+	unsigned char getColor(int x, int y);
+	unsigned char getExpandedColor(int x, int y, unsigned char col);
     void thresholdAndRuns();
 	void findGoals(int column, int top);
 	void findBallsCrosses(int column, int top);

@@ -186,7 +186,7 @@ void Threshold::thresholdAndRuns() {
  */
 void Threshold::threshold() {
 
-    unsigned char *tPtr, *tEnd; // pointers into thresholded array
+    /*unsigned char *tPtr, *tEnd; // pointers into thresholded array
     const unsigned char *yPtr; // pointers into image array
 
     // My loop variable initializations
@@ -204,7 +204,54 @@ void Threshold::threshold() {
         *tPtr++ = p[yPtr[YOFFSET1] >> 1];
         *tPtr++ = p[yPtr[YOFFSET2] >> 1];
         yPtr += 4;
+		}*/
+#ifdef OFFLINE
+	// this makes looking at images in the TOOL tolerable
+	for (int i = 0; i < IMAGE_HEIGHT; i++) {
+		for (int j = 0; j < IMAGE_WIDTH; j++) {
+			thresholded[i][j] = GREY;
+		}
 	}
+#endif
+}
+
+/*
+ */
+unsigned char Threshold::getColor(int r, int c) {
+	//cout << "Getting color " << r << " " << c << endl;
+	int y = getY(r, c);
+	//cout << "Y" << endl;
+	int u = getU(r, c);
+	//cout << "U" << endl;
+	int v = getV(r, c);
+	//cout << "V" << endl;
+	if (u  > ORANGEU) {
+		return ORANGE;
+	} else if (y > WHITEY) {
+		return WHITE;
+	} else if (v > BLUEV) {
+		return BLUE;
+	} else if (v < YELLOWV) {
+		return YELLOW;
+	} else if (y > LOWGREENY && y < HIGHGREENY && u > LOWGREENU &&
+			   u < HIGHGREENU && v > LOWGREENV && v < HIGHGREENV) {
+		return GREEN;
+	}
+	return GREY;
+
+}
+
+unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
+	int v = getV(x, y);
+	if (col == BLUE) {
+		if (v > BLUEV - FUDGEV) return BLUE;
+		return GREY;
+	}
+	if (col == YELLOW) {
+		if (v < YELLOWV + FUDGEV) return YELLOW;
+	}
+	return GREY;
+
 }
 
 /* Image runs.  As explained in the comments for the threshold() method, I
@@ -242,26 +289,21 @@ void Threshold::findGoals(int column, int topEdge) {
 	topEdge = min(topEdge, lowerBound[column]);
 	for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
 		// get the next pixel
-		if (getU(column, j)  > ORANGEU) {
-			thresholded[j][column] = ORANGE;
-		} else if (getY(column, j) > WHITEY) {
-			thresholded[j][column] = WHITE;
-		} else if (getV(column, j) > BLUEV) {
-			thresholded[j][column] = BLUE;
-			while (j >=1 && getV(column, j - 1) > BLUEV - FUDGEV) {
+		thresholded[j][column] = getColor(column, j);
+		unsigned char pixel = thresholded[j][column];
+		if (pixel == BLUE) {
+			while (j >=1 && getExpandedColor(column, j - 1, BLUE)) {
+				thresholded[j - 1][column] = BLUE;
 				j--;
-				thresholded[j][column] = BLUE;
 				blues++;
 			}
-		} else if (getV(column, j) < YELLOWV) {
-			thresholded[j][column] = YELLOW;
-			while (j >=1 && getV(column, j - 1) < YELLOWV + FUDGEV) {
+		} else if (pixel == YELLOW) {
+			while (j >=1 && getExpandedColor(column, j - 1, BLUE)) {
 				j--;
 				thresholded[j][column] = YELLOW;
 				yellows++;
 			}
 		}
-		unsigned char pixel = thresholded[j][column];
 		// otherwise, do stuff according to color
 		switch (pixel) {
 		case BLUE:
@@ -285,6 +327,7 @@ void Threshold::findGoals(int column, int topEdge) {
 	bad = 0;
 	for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
 		// get the next pixel
+		// note:  These were thresholded in the findBallsCrosses loop
 		unsigned char pixel = thresholded[j][column];
 		// otherwise, do stuff according to color
 		switch (pixel) {
@@ -330,14 +373,14 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 	int bound = lowerBound[column];
 	// if a ball is in the middle of the boundary, then look a little lower
 	if (bound < IMAGE_HEIGHT - 1) {
-		while (bound < IMAGE_HEIGHT && thresholded[bound][column] == ORANGE) {
+		//while (bound < IMAGE_HEIGHT && thresholded[bound][column] == ORANGE) {
+		while (bound < IMAGE_HEIGHT && getColor(column, bound) == ORANGE) {
 			bound++;
 		}
 	}
 	// scan down the column looking for ORANGE and WHITE
 	//int lasty = getY(column, bound), lastu = getU(column, bound), newu, newy;
 	for (int j = bound; j >= topEdge; j--) {
-		//cout << "Column " << column << " " << j << endl;
 		//cout << "U value " << getU(column, j) << " " << (getU(column, j) >> 1) << endl;
 		//newy = getY(column, j);
 		//newu = getU(column, j);
@@ -347,7 +390,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 		//}
 		//lasty = newy;
 		//lastu = newu;
-		if (getU(column, j)  > ORANGEU) {
+		/*if (getU(column, j)  > ORANGEU) {
 			thresholded[j][column] = ORANGE;
 		} else if (getY(column, j) > WHITEY) {
 			thresholded[j][column] = WHITE;
@@ -355,7 +398,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 			thresholded[j][column] = BLUE;
 		} else if (getV(column, j) < YELLOWV) {
 			thresholded[j][column] = YELLOW;
-		}
+			}*/
+		thresholded[j][column] = getColor(column, j);
 		/*else if (getY(column, j) >> 1 < 67) {
 			thresholded[j][column] = GREEN;
 		} else if (getY(column, j) >> 1 > 70) {
