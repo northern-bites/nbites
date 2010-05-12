@@ -13,6 +13,13 @@ def playbookWalk(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
+    if nav.brain.play.isRole(GOALIE):
+        if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
+            return nav.goNow('stop')
+    else:
+        if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
+            return nav.goNow('stop')
+
     dest.h = my.headingTo(dest)
 
     walkX, walkY, walkTheta = helper.getWalkSpinParam(my, dest)
@@ -37,15 +44,15 @@ def playbookOmni(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    walkX, walkY, walkTheta = helper.getOmniWalkParam(my, dest)
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
-
     if nav.brain.play.isRole(GOALIE):
         if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
             return nav.goNow('stop')
     else:
         if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
             return nav.goNow('stop')
+
+    walkX, walkY, walkTheta = helper.getOmniWalkParam(my, dest)
+    helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     if not helper.useFinalHeading(nav.brain, dest):
         nav.stopOmniCount += 1
