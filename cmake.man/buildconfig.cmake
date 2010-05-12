@@ -70,6 +70,18 @@ ELSE( WEBOTS_BACKEND )
     )
 ENDIF( WEBOTS_BACKEND )
 
+IF( OE_CROSS_BUILD )
+  OPTION( OFFLINE
+    "turn offline vision debugging on for compatability with tool"
+    OFF
+    )
+ELSE( OE_CROSS_BUILD )
+  OPTION( OFFLINE
+    "turn offline vision debugging on for compatability with tool"
+    ON
+    )
+ENDIF( OE_CROSS_BUILD )
+
 OPTION(
     MAN_IS_REMOTE_
     "Compile as a remote binary, versus a dynamic library (ON/OFF)"
