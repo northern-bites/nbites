@@ -1,4 +1,4 @@
-
+from typeDefs.Location import Location
 # Constants.py
 # This file holds all Constants which span multiple files
 
@@ -71,7 +71,7 @@ NUM_FIELD_OBJECT_DIST_CERTAINTIES = 4
 ##
 
 # Switch to tell us if we are using the lab field or not
-USING_LAB_FIELD = False
+USING_LAB_FIELD = True
 
 #---Landmark Constants------#
 # Notes:
@@ -98,6 +98,7 @@ FIELD_HEIGHT = FIELD_GREEN_HEIGHT
 
 CENTER_FIELD_X = FIELD_GREEN_WIDTH / 2.0
 CENTER_FIELD_Y = FIELD_GREEN_HEIGHT / 2.0
+CENTER_FIELD = Location(CENTER_FIELD_X, CENTER_FIELD_Y)
 
 FIELD_GREEN_LEFT_SIDELINE_X = 0
 FIELD_GREEN_RIGHT_SIDELINE_X = FIELD_GREEN_WIDTH
