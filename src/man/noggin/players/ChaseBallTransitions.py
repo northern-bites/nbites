@@ -59,7 +59,7 @@ def shouldRepositionForKick(player):
     """
     Stop waiting for kick and realign on the ball instead
     """
-
+    ball = player.brain.ball
     return False
 
 def shouldApproachForKick(player):
@@ -94,7 +94,7 @@ def shouldDribble(player):
              0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
              0 < abs(player.brain.ball.relY) < constants.SHOULD_DRIBBLE_Y and
              abs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING and
-             not inOppGoalbox(player) and
+             not player.brain.my.inOppGoalbox() and
              player.brain.my.x > (
             NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
             NogginConstants.GREEN_PAD_X) )
@@ -107,18 +107,12 @@ def shouldStopDribbling(player):
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
     goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (player.penaltyKicking or
-            inOppGoalbox(player) or
+            player.brain.my.inOppGoalbox() or
             player.brain.ball.relX > constants.STOP_DRIBBLE_X or
             abs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
             abs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
             player.brain.my.x < ( NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
                                   NogginConstants.GREEN_PAD_X))
-
-
-def inOppGoalbox(player):
-    return (NogginConstants.OPP_GOALBOX_LEFT_X < player.brain.my.x and
-            NogginConstants.OPP_GOALBOX_BOTTOM_Y < player.brain.my.y <
-            NogginConstants.OPP_GOALBOX_TOP_Y)
 
 ######### BALL IN BOX ###############
 
@@ -144,7 +138,7 @@ def shouldChaseAroundBox(player):
                     NogginConstants.MY_GOALBOX_TOP_Y) )
 
 def shouldNotGoInBox(player):
-    return (False and player.ballInMyGoalBox() and \
+    return (False and player.ball.inMyGoalBox() and \
                 player.brain.ball.dist < constants.IGNORE_BALL_IN_BOX_DIST)
 
 ####### AVOIDANCE STUFF ##############
