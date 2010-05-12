@@ -40,6 +40,21 @@ class Threshold;  // forward reference
 #define VMAX  128
 #endif
 
+#define DARK
+#ifdef DARK
+#define BLUEV 145
+#define YELLOWV 128
+#define ORANGEU 135
+#define WHITEY  105
+#define FUDGEV  2
+#else
+#define BLUEV 145
+#define YELLOWV 120
+#define ORANGEU 145
+#define WHITEY  145
+#define FUDGEV 5
+#endif
+
 //
 // THRESHOLDING CONSTANTS
 // Constants pertaining to object detection and horizon detection

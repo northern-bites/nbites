@@ -83,6 +83,8 @@ static const float NORMALPOST = 0.45f;
 static const float QUESTIONABLEPOST = 0.85f;
 static const int DIST_POINT_FUDGE = 5;
 
+#define USE_EDGES       // use experimental no-color system
+
 #ifdef OFFLINE
 static const bool PRINTOBJS = false;
 static const bool POSTDEBUG = false;
@@ -90,7 +92,7 @@ static const bool POSTLOGIC = false;
 static const bool TOPFIND = false;
 static const bool CORNERDEBUG = false;
 static const bool SANITY = false;
-static const bool CORRECT = false;
+static const bool CORRECT = true;
 #else
 static const bool PRINTOBJS = false;
 static const bool POSTDEBUG = false;
@@ -342,7 +344,12 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
     for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
         //cout << "Vert scan " << x << " " << y << endl;
         // if it is the color we're looking for - good
+#if define USE_EDGES
+		if ((c == YELLOW && thresh->getV[x][y] < YELLOWV) || (c == BLUE && thresh->getV[x][y] > BLUEV) ||
+			(thresh->thresholde[y][x] == GREEN) {
+#else
         if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
+#endif
             good++;
             run++;
             if (run > 1) {
@@ -394,7 +401,12 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
     // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH
               && y < height && bad < stopper; ) {
+#if define USE_EDGES
+		if ((c == YELLOW && thresh->getV[x][y] < YELLOWV) || (c == BLUE && thresh->getV[x][y] > BLUEV) ||
+			(thresh->thresholde[y][x] == GREEN) {
+#else
         if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
+#endif
             // if it is either of the colors we're looking for - good
             good++;
             run++;
@@ -517,7 +529,20 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
                 i > IMAGE_HEIGHT - 1) {
                 fake++;
             } else {
+#ifdef USE_EDGES
+				int curcol = GREY;
+				if (thresh->getU(theSpot, i)  > ORANGEU) {
+					curcol = ORANGE;
+				} else if (thresh->getY(theSpot, i) > WHITEY) {
+					curcol = WHITE;
+				} else if (thresh->getV(theSpot, i) > BLUEV) {
+					curcol = BLUE;
+				} else if (thresh->getV(theSpot, i) < YELLOWV) {
+					curcol = YELLOW;
+				}
+#else
                 int curcol = thresh->thresholded[i][theSpot];
+#endif
                 if (curcol == c || curcol == c2) {
                     good++;
                     goodRun++;
@@ -569,7 +594,20 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
                     if (checkEdge(theSpot, i, theSpot - dir, i)) {
                         //count++;
                     }
+#ifdef USE_EDGES
+					int curcol = GREY;
+					if (thresh->getU(theSpot, i)  > ORANGEU) {
+						curcol = ORANGE;
+					} else if (thresh->getY(theSpot, i) > WHITEY) {
+						curcol = WHITE;
+					} else if (thresh->getV(theSpot, i) > BLUEV) {
+						curcol = BLUE;
+					} else if (thresh->getV(theSpot, i) < YELLOWV) {
+						curcol = YELLOW;
+					}
+#else
                     int curcol = thresh->thresholded[i][theSpot];
+#endif
                     if (curcol == c || curcol == c2) {
                         good++;
                         run = 0;
@@ -657,7 +695,20 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
                 if (checkEdge(i, theSpot, i, theSpot - dir)) {
                     //count++;
                 }
+#ifdef USE_EDGES
+				int curcol = GREY;
+				if (thresh->getU(i, theSpot)  > ORANGEU) {
+					curcol = ORANGE;
+				} else if (thresh->getY(i, theSpot) > WHITEY) {
+					curcol = WHITE;
+				} else if (thresh->getV(i, theSpot) > BLUEV) {
+					curcol = BLUE;
+				} else if (thresh->getV(i, theSpot) < YELLOWV) {
+					curcol = YELLOW;
+				}
+#else
                 int curcol = thresh->thresholded[theSpot][i];
+#endif
                 if (curcol == c || curcol == c2) {
                     good++;
                     run = 0;
@@ -696,9 +747,17 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
         for (int d = left.y; d < horizonAt(left.x); d+=1) {
             good = 0;
             for (int a = left.x; a < right.x; a++) {
+#ifdef USE_EDGES
+				if (c == BLUE && thresh->getV(a, d) > BLUEV - FUDGEV) {
+					good++;
+				} else if (c == YELLOW && thresh->getV(a, d) < YELLOWV + FUDGEV) {
+					good++;
+				}
+#else
                 if (thresh->thresholded[d][a] == c) {
                     good++;
                 }
+#endif
             }
             if (good > spanX * SPAN_MULTIPLIER) {
                 found = d;
@@ -743,6 +802,112 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 	const int MINIMUM_SKEW = 5;
 	const int MIN_WIDTH = 16;
 
+#ifdef USE_EDGES
+	int points[3];
+	int diffy = (b.getLeftBottomY() - b.getLeftTopY()) / 4;
+	int midy = b.getLeftTopY();
+	int midsy = 0, bottomy = 0, topy = 0;
+	bool correct = false;
+	for (int i = 1; i < 4; i++) {
+		midy = midy + diffy;
+		int midx = min(b.getLeftTopX(), b.getLeftBottomX());
+		if (i == 1) topy = midy;
+		else if (i == 2) midsy = midy;
+		else bottomy = midy;
+		int col = BLACK;
+		int count = 0;
+		while (col != color && midx < IMAGE_WIDTH) {
+			midx++;
+			if (color == BLUE) {
+				if (thresh->getV(midx, midy) > BLUEV - FUDGEV) {
+					col = BLUE;
+					if (count == 0) {
+						while (midx >= 0 && thresh->getV(midx, midy) > BLUEV - FUDGEV) {
+							midx--;
+							count++;
+						}
+					}
+				} else count++;
+			} else {
+				if (thresh->getV(midx, midy) < YELLOWV + FUDGEV) {
+					col = YELLOW;
+					if (count == 0) {
+						while (midx >= 0 && thresh->getV(midx, midy) < YELLOWV + FUDGEV) {
+							midx--;
+							count++;
+						}
+					}
+				} else count++;
+			}
+			if (count >  2) correct = true;
+		}
+		points[i-1] = midx;
+	}
+	float newSlope1 = -(float)(points[2] - points[1]) /
+		(float)(bottomy - midsy);
+	float newSlope2 = -(float)(points[1] - points[0]) /
+		(float)(midsy - topy);
+	float newSlope3 = -(float)(points[2] - points[0]) /
+		(float)(bottomy - topy);
+	if (CORRECT)
+		cout << "Slopes " << newSlope1 << " " << newSlope2 << " " << newSlope3 << endl;
+	if (correct && abs(newSlope1 - newSlope2) < 0.25 && abs(newSlope2 - newSlope3) < 0.25) {
+		return newSlope3;
+	}
+
+	// repeat on the right side if necessary
+	midy = b.getLeftTopY();
+	midsy = 0, bottomy = 0, topy = 0;
+	correct = false;
+	for (int i = 1; i < 4; i++) {
+		midy = midy + diffy;
+		int midx = max(b.getRightTopX(), b.getRightBottomX());
+		if (i == 1) topy = midy;
+		else if (i == 2) midsy = midy;
+		else bottomy = midy;
+		int col = BLACK;
+		int count = 0;
+		while (col != color && midx > 0 && midx <= IMAGE_WIDTH) {
+			midx--;
+			if (color == BLUE) {
+				if (thresh->getV(midx, midy) > BLUEV - FUDGEV) {
+					col = BLUE;
+					if (count == 0) {
+						while (midx < IMAGE_WIDTH -1 && thresh->getV(midx, midy) > BLUEV - FUDGEV) {
+							midx++;
+							count++;
+						}
+					}
+				} else count++;
+			} else {
+				if (thresh->getV(midx, midy) < YELLOWV+FUDGEV) {
+					col = YELLOW;
+					if (count == 0) {
+						while (midx < IMAGE_WIDTH - 1 && thresh->getV(midx, midy) < YELLOWV + FUDGEV) {
+							midx++;
+							count++;
+						}
+					}
+				} else count++;
+			}
+			if (count >  2) correct = true;
+		}
+		points[i-1] = midx;
+	}
+	newSlope1 = -(float)(points[2] - points[1]) /
+		(float)(bottomy - midsy);
+	newSlope2 = -(float)(points[1] - points[0]) /
+		(float)(midsy - topy);
+	newSlope3 = -(float)(points[2] - points[0]) /
+		(float)(bottomy - topy);
+	if (CORRECT)
+		cout << "Slopes " << newSlope1 << " " << newSlope2 << " " << newSlope3 << endl;
+	if (correct && abs(newSlope1 - newSlope2) < 0.25 && abs(newSlope2 - newSlope3) < 0.25) {
+		return newSlope3;
+	}
+	return 0.0f;
+
+#else
     // try and find the cross bar - start at the upper left corner
     int biggest = 0, biggest2 = 0;
 	int skewr = 0, skewl = 0;
@@ -861,6 +1026,7 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 			(float)(b.getRightBottomY() - b.getRightTopY());
 	}
 	return newSlope;
+#endif
 	}
 
 /*  Routine to find a general rectangular goal.
@@ -1049,8 +1215,16 @@ bool ObjectFragments::qualityPost(Blob b, int c)
     //bool soFar;
     for (int i = b.getLeftTopX(); i < b.getRightTopX(); i++)
         for (int j = b.getLeftTopY(); j < b.getLeftBottomY(); j++)
+#ifdef USE_EDGES
+			if (c == YELLOW && thresh->getV(i, j) < YELLOWV + FUDGEV) {
+				good++;
+			} else if (c == BLUE && thresh->getV(i, j) > BLUEV - FUDGEV) {
+				good++;
+			}
+#else
             if (thresh->thresholded[j][i] == c)
                 good++;
+#endif
     if (good < b.getArea() * PERCENT_NEEDED) return false;
     return true;
 }
@@ -1481,7 +1655,8 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
 	// make sure we have some size to our post
     if (spanY + 1 == 0) return;
 
-	drawBlob(pole, BLACK);
+	if (POSTDEBUG)
+		drawBlob(pole, BLACK);
 	// make sure that the ratio of height to width is reasonable
     float rat = (float)(spanX) / (float)(spanY);
     if (!postRatiosOk(rat) && spanY < IMAGE_HEIGHT / 2 && spanX < 30) {
@@ -1741,9 +1916,17 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
             ny = yProject(startx, starty, nx);
             if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
                 total++;
+#ifdef USE_EDGES
+				if (color == YELLOW && thresh->getV(nx, ny) < YELLOWV + FUDGEV) {
+					good++;
+				}else if (color == BLUE && thresh->getV(nx, ny) > BLUEV - FUDGEV) {
+					good++;
+				}
+#else
                 if (thresh->thresholded[ny][nx] == color) {
                     good++;
                 }
+#endif
             }
         }
     }

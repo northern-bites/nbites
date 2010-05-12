@@ -224,7 +224,6 @@ void Threshold::runs() {
 		findBallsCrosses(i, topEdge);
 		findGoals(i, topEdge);
     }
-
 }
 
 /** Ideally goals will be either right at the field edge, or will have part above
@@ -243,25 +242,25 @@ void Threshold::findGoals(int column, int topEdge) {
 	topEdge = min(topEdge, lowerBound[column]);
 	for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
 		// get the next pixel
-		/*if (getU(column, j)  > 145) {
+		if (getU(column, j)  > ORANGEU) {
 			thresholded[j][column] = ORANGE;
-		} else if (getY(column, j) > 145) {
+		} else if (getY(column, j) > WHITEY) {
 			thresholded[j][column] = WHITE;
-		} else if (getV(column, j) > 145) {
+		} else if (getV(column, j) > BLUEV) {
 			thresholded[j][column] = BLUE;
-			while (j >=1 && getV(column, j - 1) > 140) {
+			while (j >=1 && getV(column, j - 1) > BLUEV - FUDGEV) {
 				j--;
 				thresholded[j][column] = BLUE;
 				blues++;
 			}
-		} else if (getV(column, j) < 120) {
+		} else if (getV(column, j) < YELLOWV) {
 			thresholded[j][column] = YELLOW;
-			while (j >=1 && getV(column, j - 1) < 125) {
+			while (j >=1 && getV(column, j - 1) < YELLOWV + FUDGEV) {
 				j--;
 				thresholded[j][column] = YELLOW;
 				yellows++;
 			}
-			}*/
+		}
 		unsigned char pixel = thresholded[j][column];
 		// otherwise, do stuff according to color
 		switch (pixel) {
@@ -348,15 +347,15 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 		//}
 		//lasty = newy;
 		//lastu = newu;
-		/*if (getU(column, j)  > 145) {
+		if (getU(column, j)  > ORANGEU) {
 			thresholded[j][column] = ORANGE;
-		} else if (getY(column, j) > 145) {
+		} else if (getY(column, j) > WHITEY) {
 			thresholded[j][column] = WHITE;
-		} else if (getV(column, j) > 145) {
+		} else if (getV(column, j) > BLUEV) {
 			thresholded[j][column] = BLUE;
-		} else if (getV(column, j) < 120) {
+		} else if (getV(column, j) < YELLOWV) {
 			thresholded[j][column] = YELLOW;
-			}*/
+		}
 		/*else if (getY(column, j) >> 1 < 67) {
 			thresholded[j][column] = GREEN;
 		} else if (getY(column, j) >> 1 > 70) {
