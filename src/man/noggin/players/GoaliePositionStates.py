@@ -18,6 +18,7 @@ def goalieAwesomePosition(player):
 
     if player.firstFrame():
         player.changeOmniGoToCounter = 0
+        nav.positionPlaybook()
 
     if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLoc()
@@ -28,9 +29,7 @@ def goalieAwesomePosition(player):
     heading = None
     ball = brain.ball
 
-    nav.positionPlaybook()
-
-    if nav.isStopped():
+    if nav.isStopped() and player.counter > 0:
         return player.goLater("goalieAtPosition")
 
     return player.stay()
