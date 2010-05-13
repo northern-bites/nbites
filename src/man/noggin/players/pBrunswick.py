@@ -36,10 +36,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.setName('pBrunswick')
         self.pb = None # must be init'd later, depends on player init
-        self.stoppedWalk = False
-        self.currentSpinDir = None
         self.currentGait = None
-        self.trackingBall = False
 
         self.chosenKick = None
         self.kickDecider = None
