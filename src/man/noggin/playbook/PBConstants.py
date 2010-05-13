@@ -1,8 +1,8 @@
 """
 File to hold all of the cross field constants for the cooperative behavior system
 """
-
 from .. import NogginConstants
+from ..typeDefs.Location import Location
 from math import pi
 
 # Test switches to force one role to always be given out
@@ -185,7 +185,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 
 
 ## POSITION CONSTANTS ##
-
+CENTER_FIELD = Location(NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y)
 
 READY_KICKOFF_DEFENDER_X = NogginConstants.CENTER_FIELD_X * 0.5
 READY_KICKOFF_DEFENDER_CENTER_OFFSET = NogginConstants.FIELD_WHITE_HEIGHT/10.
