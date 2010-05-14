@@ -1,38 +1,55 @@
 package TOOL.Calibrate;
 
-import java.lang.Math;
-
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
-import java.awt.Color;
-import java.awt.image.*;
-import java.awt.Cursor;
-import java.awt.geom.*;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GradientPaint;
-import java.awt.AlphaComposite;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.Toolkit;
-import java.awt.Point;
-
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-
+import TOOL.Data.ColorTableListener;
 import TOOL.Data.DataListener;
 import TOOL.Data.DataSet;
 import TOOL.Data.Frame;
-import TOOL.Data.ColorTableListener;
-//import TOOL.Misc.Pair;
-import TOOL.Misc.Estimate;
 
+import TOOL.GUI.IncrementalSliderParent;
+
+import TOOL.Image.CalibrationDrawingPanel;
+import TOOL.Image.ColorTable;
+import TOOL.Image.DrawingPanel;
+import TOOL.Image.ImageMarkerPanel;
+import TOOL.Image.ImageOverlay;
+import TOOL.Image.ImageOverlayAction;
+import TOOL.Image.ImagePanel;
+import TOOL.Image.ImageSwatch;
+import TOOL.Image.PixelSelectionPanel;
+import TOOL.Image.ProcessedImage;
+import TOOL.Image.TOOLImage;
+import TOOL.Image.ThresholdedImage;
+
+import TOOL.Misc.Estimate;
+import TOOL.TOOL;
+import TOOL.Vision.Vision;
+
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import java.lang.Math;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,31 +62,6 @@ import java.util.Vector;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-
-// Image stuff
-import TOOL.Image.ColorTable;
-import TOOL.Image.ImageSwatch;
-import TOOL.Image.ImagePanel;
-import TOOL.Image.TOOLImage;
-import TOOL.Image.ThresholdedImage;
-import TOOL.Image.ProcessedImage;
-import TOOL.Image.PixelSelectionPanel;
-import TOOL.Image.ImageMarkerPanel;
-import TOOL.Image.CalibrationDrawingPanel;
-import TOOL.Image.DrawingPanel;
-
-
-import TOOL.Image.ImageOverlay;
-import TOOL.Image.ImageOverlayAction;
-
-import TOOL.Vision.Vision;
-
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
-import TOOL.GUI.IncrementalSliderParent;
-
-
-import TOOL.TOOL;
 
 
 
@@ -174,7 +166,7 @@ public class Calibrate implements DataListener, MouseListener,
         setupWindowsAndListeners();
 
 
-       // Will take care of the cursor
+		// Will take care of the cursor
         updateSelectedColor(0);
         updateBrushSize(0);
 
@@ -958,8 +950,8 @@ public class Calibrate implements DataListener, MouseListener,
                     Estimate est = thresholdedImage.pixEstimate(x,y,0);
                     // we want to print a pixEstimate on this pixel if shift is down
                     System.out.printf(
-                        "pixel (%d,%d) dist: %.2f bearing: %.2f\n",
-                        x, y, est.dist, est.bearing);
+									  "pixel (%d,%d) dist: %.2f bearing: %.2f\n",
+									  x, y, est.dist, est.bearing);
                 }
                 else{
                     // Undefine the color underneath the cursor if in that mode.
@@ -1032,7 +1024,7 @@ public class Calibrate implements DataListener, MouseListener,
             selector.setMarkerImagePosition(displayer.getImageX(x),
                                             displayer.getImageY(y));
 			calibratePanel.setXYText(displayer.getImageX(x),
-                                            displayer.getImageY(y));
+									 displayer.getImageY(y));
         } else {
 			calibratePanel.setXYText(-1,-1);
 		}
@@ -1074,21 +1066,21 @@ public class Calibrate implements DataListener, MouseListener,
         if (!f.hasImage())
             return;
         //if visionState is null, initialize, else just load the frame
-	if (visionState == null)
-	    visionState = new VisionState(f, tool.getColorTable());
-	else 
-	    visionState.newFrame(f, tool.getColorTable());
-	
+		if (visionState == null)
+			visionState = new VisionState(f, tool.getColorTable());
+		else
+			visionState.newFrame(f, tool.getColorTable());
+
         thresholdedImage = visionState.getThreshImage();//sync the thresholded images
         rawImage = visionState.getImage();
         imageID = rawImage.hashCode();
 
         colorTable = visionState.getColorTable();
-	/*
-        if (drawThreshColors) {
-            thresholdedImage.thresholdImage(colorTable, rawImage);
-        }
-	*/
+		/*
+		  if (drawThreshColors) {
+		  thresholdedImage.thresholdImage(colorTable, rawImage);
+		  }
+		*/
 
         // Since we now handle different sized frames, it's possible to
         // switch between modes, changing the image's size without updating
@@ -1103,10 +1095,10 @@ public class Calibrate implements DataListener, MouseListener,
         selector.updateImage(rawImage);
         calibratePanel.setSelectorOverlay();
 
-	visionState.update();
-	calibratePanel.setDisplayerOverlay();
-	displayer.updateImage(thresholdedImage);
-	
+		visionState.update();
+		calibratePanel.setDisplayerOverlay();
+		displayer.updateImage(thresholdedImage);
+
         selector.repaint();
         displayer.repaint();
 
@@ -1116,9 +1108,9 @@ public class Calibrate implements DataListener, MouseListener,
         calibratePanel.fixButtons();
         // 0 based indexing.
         calibratePanel.setText("Image " + (f.index()) + " of " +
-                               (f.dataSet().size() - 1) + 
-			       " -  processed in " + visionState.getProcessTime() + 
-			       " micro secs");
+                               (f.dataSet().size() - 1) +
+							   " -  processed in " + visionState.getProcessTime() +
+							   " micro secs");
     }
 
 
@@ -1137,17 +1129,17 @@ public class Calibrate implements DataListener, MouseListener,
     }
 
     public CalibrationDrawingPanel getDisplayer() {
-	return displayer;
+		return displayer;
     }
 
     public PixelSelectionPanel getSelector() {
-	return selector;
+		return selector;
     }
-    
+
     public ImageOverlay getEdgeOverlay() {
-	return overlay;
+		return overlay;
     }
     public VisionState getVisionState() {
-	return visionState;
+		return visionState;
     }
 }

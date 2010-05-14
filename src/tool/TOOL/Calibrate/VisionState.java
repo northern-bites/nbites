@@ -90,7 +90,7 @@ public class VisionState {
                                                              thresholdedImage.getHeight());
         }
     }
-    
+
     public void newFrame(Frame f, ColorTable c) {
     	this.f = f;
     	rawImage = f.image();
@@ -100,17 +100,17 @@ public class VisionState {
             thresholdedImage = new ProcessedImage(f, colorTable);
             thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
                                                              thresholdedImage.getHeight());
-        }        
+        }
     }
 
     //This updates the whole processed stuff
     //- the thresholded image, the field objects and the ball
     public void update() {
-	//if the thresholdedImage is not null, process it again
+		//if the thresholdedImage is not null, process it again
         if (thresholdedImage != null)  {
             //we process the image; the visionLink updates itself with the new data from the bot
             thresholdedImage.thresholdImage(f, colorTable);
-	    if (!drawThreshColors) thresholdedImage.clearColoring();
+			if (!drawThreshColors) thresholdedImage.clearColoring();
             //get the ball from the link
             ball = thresholdedImage.getVisionLink().getBall();
             visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
@@ -123,11 +123,11 @@ public class VisionState {
             //draw the stuff onto the overlay
             drawObjectBoxes();
         }
-	//else the thresholdedImage is null, so initialize it
-	else {
-	    thresholdedImage = new ProcessedImage(f, colorTable);
-	    update();
-	}
+		//else the thresholdedImage is null, so initialize it
+		else {
+			thresholdedImage = new ProcessedImage(f, colorTable);
+			update();
+		}
     }
 
     //drawObjectBoxes - draws the object onto the overlay
