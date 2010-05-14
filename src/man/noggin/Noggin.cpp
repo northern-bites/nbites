@@ -538,19 +538,19 @@ void Noggin::modifySysPath ()
     // Enter the current working directory into the python module path
     //
 #if ROBOT(NAO)
-#if defined OFFLINE || defined STRAIGHT
-    const char *cwd = "/usr/local/nao/modules/lib";
-#else
 #  ifdef WEBOTS_BACKEND
-    const string test = std::string(getenv("WEBOTS_HOME")) +
-        std::string("/projects/contests") +
-        std::string("/nao_robocup/controllers/nao_soccer_player_red/lib");
-    const char *cwd = test.c_str();
+     const string test = std::string(getenv("WEBOTS_HOME")) +
+         std::string("/projects/contests") +
+         std::string("/nao_robocup/controllers/nao_soccer_player_red/lib");
+     const char *cwd = test.c_str();
 #  else //WEBOTS
-    //    const char *cwd = "/opt/naoqi/modules/lib";
-    const char *cwd = "/home/nao/naoqi/lib/naoqi";
+#    if defined OFFLINE || defined STRAIGHT
+       const char *cwd = "/usr/local/nao/modules/lib";
+#    else
+       //    const char *cwd = "/opt/naoqi/modules/lib";
+       const char *cwd = "/home/nao/naoqi/lib/naoqi";
+#    endif
 #  endif
-#endif
 #else//ROBOT(NAO)
     const char *cwd = get_current_dir_name();
 #endif
