@@ -52,7 +52,7 @@ public class UDPServer extends Thread {
 
     /**
      * The executing body of the server thread, listens on the port (while open)
-     * and notifies the listeners with new Robots.  Exits upon socket 
+     * and notifies the listeners with new Robots.  Exits upon socket
      * closure/unbinding or when server is no longer receiving.  Does not exit on
      * packet receival error.
      */
@@ -95,10 +95,10 @@ public class UDPServer extends Thread {
     }
 
     private void notifyListeners(Robot robot) {
-	Iterator<RobotListener> itr = listens.iterator();
-	while (itr.hasNext()) {
-	    itr.next().updateRobot(robot);
-	}
+		Iterator<RobotListener> itr = listens.iterator();
+		while (itr.hasNext()) {
+			itr.next().updateRobot(robot);
+		}
     }
 
     /**

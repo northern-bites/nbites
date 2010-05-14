@@ -591,6 +591,7 @@ public class WorldController extends JPanel implements KeyListener,
 	public void stopTCPStream()
 	{
 		tcp_handler.setReceiving(false);
+		painter.clearSimulationHistory();
 		tcpButtons();
 	}
 

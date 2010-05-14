@@ -253,20 +253,20 @@ extern "C" {
         jmethodID setVisualCornersInfo = env->GetMethodID(javaClass, "setVisualCornersInfo",
                                                           "(IIFFI)V");
         //push data from the lines object
-        const vector<VisualLine> *lines = vision.fieldLines->getLines();
-        for (vector<VisualLine>::const_iterator i = lines->begin();
+        const vector< shared_ptr<VisualLine> > *lines = vision.fieldLines->getLines();
+        for (vector< shared_ptr<VisualLine> >::const_iterator i = lines->begin();
              i!= lines->end(); i++) {
             env->CallVoidMethod(jobj, prepPointBuffers,
-                                i->points.size());
-            for(vector<linePoint>::const_iterator j = i->points.begin();
-                j != i->points.end(); j++) {
+                                (*i)->points.size());
+            for(vector<linePoint>::const_iterator j = (*i)->points.begin();
+                j != (*i)->points.end(); j++) {
                 env->CallVoidMethod(jobj, setPointInfo,
                                     j->x, j->y,
                                     j->lineWidth, j->foundWithScan);
             }
             env->CallVoidMethod(jobj, setVisualLineInfo,
-                                i->start.x, i->start.y,
-                                i->end.x, i->end.y);
+                                (*i)->start.x, (*i)->start.y,
+                                (*i)->end.x, (*i)->end.y);
         }
         //push data from unusedPoints
         const list <linePoint> *unusedPoints = vision.fieldLines->getUnusedPoints();

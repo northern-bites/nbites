@@ -1,4 +1,3 @@
-
 // This file is part of TOOL, a robotics interaction and development
 // package created by the Northern Bites RoboCup team of Bowdoin College
 // in Brunswick, Maine.
@@ -214,9 +213,12 @@ public class RemoteRobot extends FileSet {
 			if ( !proto.isConnected())
 				connect();
 			proto.request(DataRequest.LOC_ONLY);
-			LocalizationPacket[] loc = {proto.getMyLocalization(),
-										proto.getBallLocalization() };
-			Vector<LocalizationPacket>  locInfo = new Vector<LocalizationPacket>(Arrays.asList(loc));
+
+			Vector<LocalizationPacket>  locInfo =
+				new Vector<LocalizationPacket>();
+			locInfo.add(proto.getMyLocalization());
+			locInfo.add(proto.getBallLocalization());
+
 			return locInfo;
 		} catch (TOOLException e) {
 			NetworkModule.logError("Attempt to retrieve localization failed",
@@ -224,6 +226,22 @@ public class RemoteRobot extends FileSet {
 			return null;
 		}
 	}
+
+	public Vector<LocalizationPacket> retrieveMMLocEKF() {
+		try {
+			if ( !proto.isConnected())
+				connect();
+			proto.request(DataRequest.MMEKF_ONLY);
+
+			return proto.getMultimodalEKFInfo();
+		} catch (TOOLException e) {
+			NetworkModule.logError("Attempt to retrieve multimodal" +
+								   "information failed",
+								   e);
+			return null;
+		}
+	}
+
 
 	public PlayerInfo retrieveGCInfo() {
 		try {

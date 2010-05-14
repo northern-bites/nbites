@@ -40,23 +40,26 @@ public class LogHandler
     // Raw data stuff
     public final static int MCL_TEAM_COLOR_INDEX = 0;
     public final static int MCL_PLAYER_NUM_INDEX = 1;
-    public final static int MCL_MY_X_INDEX = 2;
-    public final static int MCL_MY_Y_INDEX = 3;
-    public final static int MCL_MY_H_INDEX = 4;
-    public final static int MCL_UNCERT_X_INDEX = 5;
-    public final static int MCL_UNCERT_Y_INDEX = 6;
-    public final static int MCL_UNCERT_H_INDEX = 7;
-    public final static int MCL_BALL_X_INDEX = 8;
-    public final static int MCL_BALL_Y_INDEX = 9;
-    public final static int MCL_BALL_UNCERT_X_INDEX = 10;
-    public final static int MCL_BALL_UNCERT_Y_INDEX = 11;
-    public final static int MCL_BALL_VELOCITY_X_INDEX = 12;
-    public final static int MCL_BALL_VELOCITY_Y_INDEX = 13;
-    public final static int MCL_BALL_VELOCITY_UNCERT_X_INDEX = 14;
-    public final static int MCL_BALL_VELOCITY_UNCERT_Y_INDEX = 15;
-    public final static int MCL_ODO_X_INDEX = 16;
-    public final static int MCL_ODO_Y_INDEX = 17;
-    public final static int MCL_ODO_H_INDEX = 18;
+
+    public final static int MCL_MY_X_INDEX = 0;
+    public final static int MCL_MY_Y_INDEX = 1;
+    public final static int MCL_MY_H_INDEX = 2;
+    public final static int MCL_UNCERT_X_INDEX = 3;
+    public final static int MCL_UNCERT_Y_INDEX = 4;
+    public final static int MCL_UNCERT_H_INDEX = 5;
+
+	// Obs info
+	public final static int MCL_BALL_X_INDEX = 0;
+    public final static int MCL_BALL_Y_INDEX = 1;
+    public final static int MCL_BALL_UNCERT_X_INDEX = 2;
+    public final static int MCL_BALL_UNCERT_Y_INDEX = 3;
+    public final static int MCL_BALL_VELOCITY_X_INDEX = 4;
+    public final static int MCL_BALL_VELOCITY_Y_INDEX = 5;
+    public final static int MCL_BALL_VELOCITY_UNCERT_X_INDEX = 6;
+    public final static int MCL_BALL_VELOCITY_UNCERT_Y_INDEX = 7;
+    public final static int MCL_ODO_X_INDEX = 8;
+    public final static int MCL_ODO_Y_INDEX = 9;
+    public final static int MCL_ODO_H_INDEX = 10;
 
     //////////////////// VARIABLES /////////////
 
@@ -313,6 +316,7 @@ public class LogHandler
                 System.err.println(e3.getMessage());
                 return false;
             }
+			logBox.setLogName(logFile);
             return true;
         }
     }
@@ -376,7 +380,7 @@ public class LogHandler
         StringTokenizer t;
 
         // Make sure the line is not blank
-        if (log_strings.size() > 0) {
+        if (!log_strings.isEmpty()) {
             // set frame total in the log box
             logBox.frameTotal.setText("" + log_num_frames);
             debugViewer.frameTotal.setText("" + log_num_frames);
@@ -401,33 +405,29 @@ public class LogHandler
 
                 // Update the debug viewer
                 debugInfo = t.nextToken();
-                processDebugInfo(debugInfo);
+                Vector<LocalizationPacket> locModels =
+					processDebugInfo(debugInfo);
 
+				LocalizationPacket actualEst = locModels.get(0);
+				locModels.remove(0);
                 if(!hasParticles) {
+
                     // Draw the robot position if there aren'y any particles
-                    painter.updateEstPoseInfo(Float.parseFloat
-                                              (debugViewer.myX.getText()),
-                                              Float.parseFloat
-                                              (debugViewer.myY.getText()),
-                                              Float.parseFloat
-                                              (debugViewer.myH.getText()));
+                    painter.updateEstPoseInfo(
+											  (float)actualEst.getXEst(),
+											  (float)actualEst.getYEst(),
+											  (float)actualEst.getHeadingEst());
                 }
 
-
                 // Draw the uncertainty ellipses on the screen
-                painter.updateUncertainytInfo(Double.parseDouble
-                                              (debugViewer.myX.getText()),
-                                              Double.parseDouble
-                                              (debugViewer.myY.getText()),
-                                              Double.parseDouble
-                                              (debugViewer.myH.getText()),
-                                              Double.parseDouble
-                                              (debugViewer.myUncertX.getText()),
-                                              Double.parseDouble
-                                              (debugViewer.myUncertY.getText()),
-                                              Double.parseDouble
-                                              (debugViewer.myUncertH.
-                                               getText()));
+				painter.updateUncertainytInfo( actualEst.getXEst(),
+											   actualEst.getYEst(),
+											   actualEst.getHeadingEst(),
+											   actualEst.getXUncert(),
+											   actualEst.getYUncert(),
+											   actualEst.getHUncert());
+
+				painter.updateModels(locModels, team_color);
 
                 // Parse the known robot position
                 realPoseInfo = t.nextToken();
@@ -453,26 +453,57 @@ public class LogHandler
      * Method to print data to the debug viewer from an MCL log file
      *
      * @param newInfos The newest set of sensor info to display
+     * @return Vector<LocalizationPacket> Vector of loc packets,
+     *         each one representing a model in the locsystem
      */
-    private void processDebugInfo(String newInfos)
+    private Vector<LocalizationPacket> processDebugInfo(String newInfos)
     {
-        String[] updateInfos = newInfos.split(" ");
-        Double ball_velocity_x, ball_velocity_y, ball_thinks_x,
-            ball_thinks_y, ball_uncert_x, ball_uncert_y;
-        LocalizationPacket ball_loc_info;
+		StringTokenizer robotObsSplit =
+			new StringTokenizer(newInfos,"|");
+		String playerInfo = robotObsSplit.nextToken();
+		String robotInfo = robotObsSplit.nextToken();
+		String obsInfo = robotObsSplit.nextToken();
 
         // Strip the team color and player number from the front of the line
-        team_color = Integer.parseInt(updateInfos[MCL_TEAM_COLOR_INDEX]);
-        player_number = Integer.parseInt(updateInfos[MCL_PLAYER_NUM_INDEX]);
+		String[] playerInfos = playerInfo.split(" ");
+        team_color = Integer.parseInt(playerInfos[MCL_TEAM_COLOR_INDEX]);
+        player_number = Integer.parseInt(playerInfos[MCL_PLAYER_NUM_INDEX]);
+
+		StringTokenizer models = new StringTokenizer(robotInfo, ";");
+
+		Vector<LocalizationPacket> modelPackets =
+			new Vector<LocalizationPacket>();
+
+
+		while (models.hasMoreTokens()){
+			String[] robotInfoVals = models.nextToken().split(" ");
+			modelPackets.add(LocalizationPacket.makeEstimateAndUncertPacket
+							 (
+							  new Double(robotInfoVals[MCL_MY_X_INDEX]),
+							  new Double(robotInfoVals[MCL_MY_Y_INDEX]),
+							  new Double(robotInfoVals[MCL_MY_H_INDEX]),
+							  new Double(robotInfoVals[MCL_UNCERT_X_INDEX]),
+							  new Double(robotInfoVals[MCL_UNCERT_Y_INDEX]),
+							  new Double(robotInfoVals[MCL_UNCERT_H_INDEX]))
+							 );
+		}
 
         // Do boring converting from strings to appropriate types...
         // put all the loc values into debugViewer
-        debugViewer.myX.setText(updateInfos[MCL_MY_X_INDEX]);
-        debugViewer.myY.setText(updateInfos[MCL_MY_Y_INDEX]);
-        debugViewer.myH.setText(updateInfos[MCL_MY_H_INDEX]);
-        debugViewer.myUncertX.setText(updateInfos[MCL_UNCERT_X_INDEX]);
-        debugViewer.myUncertY.setText(updateInfos[MCL_UNCERT_Y_INDEX]);
-        debugViewer.myUncertH.setText(updateInfos[MCL_UNCERT_H_INDEX]);
+
+		// First locpacket is best model
+		LocalizationPacket robotLoc = modelPackets.get(0);
+        debugViewer.myX.setText(Double.toString(robotLoc.getXEst()));
+		debugViewer.myY.setText(Double.toString(robotLoc.getYEst()));
+        debugViewer.myH.setText(Double.toString(robotLoc.getHeadingEst()));
+        debugViewer.myUncertX.setText(Double.toString(robotLoc.getXUncert()));
+        debugViewer.myUncertY.setText(Double.toString(robotLoc.getYUncert()));
+        debugViewer.myUncertH.setText(Double.toString(robotLoc.getHUncert()));
+
+        String[] updateInfos = obsInfo.split(" ");
+        Double ball_velocity_x, ball_velocity_y, ball_thinks_x,
+            ball_thinks_y, ball_uncert_x, ball_uncert_y;
+        LocalizationPacket ball_loc_info;
 
         // Ball information
         ball_thinks_x = new Double(updateInfos[MCL_BALL_X_INDEX]);
@@ -511,6 +542,7 @@ public class LogHandler
         painter.reportUpdatedBallLocalization(ball_loc_info, team_color,
                                               player_number);
 
+		return modelPackets;
     }
 
     /**

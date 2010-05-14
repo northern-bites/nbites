@@ -148,6 +148,9 @@ public class Learning implements DataListener, MouseListener,
 	private int missedBlue;                    // ditto
 	private int missedYellow, missedRed;       // ditto
 	private int missedBlueRobot;               // ditto
+	private int goodL, badL, goodT, badT;      // ditto
+	private int missedL, missedT;              // ditto
+	private int falseT, falseL;
 
 	private String curFrame;                   // current frame of batch job
 	private int    curFrameIndex;              // index
@@ -411,6 +414,8 @@ public class Learning implements DataListener, MouseListener,
 					.setCross(CrossType.NO_CROSS)
 					.setRedRobots(0)
 					.setBlueRobots(0)
+					.setTCorners(0)
+					.setLCorners(0)
 					.build();
 				keys.addFrame(next);
 			}
@@ -467,6 +472,8 @@ public class Learning implements DataListener, MouseListener,
 				key.setCrossStatus(current.getCross());
 				key.setRedRobotStatus(current.getRedRobots());
 				key.setBlueRobotStatus(current.getBlueRobots());
+				key.setTCornerStatus(current.getTCorners());
+				key.setLCornerStatus(current.getLCorners());
 				newKey =
 					KeyFrame.newBuilder()
 					.setHumanChecked(current.getHumanChecked())
@@ -475,7 +482,9 @@ public class Learning implements DataListener, MouseListener,
 					.setYellowGoal(current.getYellowGoal())
 					.setCross(current.getCross())
 					.setRedRobots(current.getRedRobots())
-					.setBlueRobots(current.getBlueRobots());
+					.setBlueRobots(current.getBlueRobots())
+					.setTCorners(current.getTCorners())
+					.setLCorners(current.getLCorners());
 			} else {
 				// set up based upon vision data
 				key.setHumanStatus(false);
@@ -485,6 +494,8 @@ public class Learning implements DataListener, MouseListener,
 				key.setCrossStatus(getCross());
 				key.setRedRobotStatus(getRedRobots());
 				key.setBlueRobotStatus(getBlueRobots());
+				key.setTCornerStatus(getTCorners());
+				key.setLCornerStatus(getLCorners());
 				newKey =
 					KeyFrame.newBuilder()
 					.setHumanChecked(current.getHumanChecked())
@@ -493,7 +504,9 @@ public class Learning implements DataListener, MouseListener,
 					.setYellowGoal(getYellowGoal())
 					.setCross(getCross())
 					.setRedRobots(getRedRobots())
-					.setBlueRobots(getBlueRobots());
+					.setBlueRobots(getBlueRobots())
+					.setTCorners(getTCorners())
+					.setLCorners(getLCorners());
 			}
 			// write out the vision data in the GUI
 			key.setBall(getBallString());
@@ -502,6 +515,8 @@ public class Learning implements DataListener, MouseListener,
 			key.setCross(getCrossString());
 			key.setRedRobot(getRedRobotString());
 			key.setBlueRobot(getBlueRobotString());
+			key.setTCorner(getTCornerString());
+			key.setLCorner(getLCornerString());
 			//learnPanel.setOverlays();
 			// set up the builder in case we decide to edit
 
@@ -536,6 +551,8 @@ public class Learning implements DataListener, MouseListener,
 		key.setCrossStatus(current.getCross());
 		key.setRedRobotStatus(current.getRedRobots());
 		key.setBlueRobotStatus(current.getBlueRobots());
+		key.setTCornerStatus(current.getTCorners());
+		key.setLCornerStatus(current.getLCorners());
 		newKey =
 			KeyFrame.newBuilder()
 			.setHumanChecked(current.getHumanChecked())
@@ -544,7 +561,9 @@ public class Learning implements DataListener, MouseListener,
 			.setYellowGoal(current.getYellowGoal())
 			.setCross(current.getCross())
 			.setRedRobots(current.getRedRobots())
-			.setBlueRobots(current.getBlueRobots());
+			.setBlueRobots(current.getBlueRobots())
+			.setTCorners(current.getTCorners())
+			.setLCorners(current.getLCorners());
 	}
 
 	/** Run a "batch" learning job.  We're going to bootstrap this.
@@ -575,6 +594,7 @@ public class Learning implements DataListener, MouseListener,
 				updateGoalStats();
 				updateCrossStats();
 				updateRobotStats();
+				updateCornerStats();
 				framesProcessed++;
 			}
 		}
@@ -642,6 +662,7 @@ public class Learning implements DataListener, MouseListener,
 								updateGoalStats();
 								updateCrossStats();
 								updateRobotStats();
+								updateCornerStats();
 								framesProcessed++;
 							}
 							try {
@@ -938,7 +959,8 @@ public class Learning implements DataListener, MouseListener,
 		goodBlue = 0; badBlue = 0; goodYellow = 0; badYellow = 0; okBlue=0; okYellow=0;
 		goodRed = 0; badRed = 0; goodBlueRobot = 0; badBlueRobot = 0;
 		missedBall = 0; missedCross = 0; missedBlue = 0; missedYellow = 0;
-		missedRed = 0; missedBlueRobot = 0;
+		missedRed = 0; missedBlueRobot = 0; goodT = 0; goodL = 0; badT = 0; badL = 0;
+		missedT = 0; missedL = 0; falseT = 0; falseL = 0;
 	}
 
 	/** Print out statistics.
@@ -954,6 +976,36 @@ public class Learning implements DataListener, MouseListener,
 		System.out.println("Cross Statistics:        Good: "+goodCross+" OK: "+okCross+
 						   "    False positives: "+falseCross+" badID: "+
 						   badCross+" missed: "+missedCross);
+		System.out.println("Corner Statistics:  GoodT: "+goodT+" GoodL: "+goodL+" False Ts: "+
+						   falseT+" False Ls: "+falseL+" Missed Ts: "+missedT+
+						   " Missed Ls: "+missedL);
+	}
+
+	/** Compare our key file against vision and update stats accordingly
+	 */
+	public void updateCornerStats() {
+		int ells = current.getLCorners();
+		int tees = current.getTCorners();
+		int ellsV = visionState.getLCornersVision();
+		int teesV = visionState.getTCornersVision();
+		if (ells > ellsV) {
+			missedL += ells - ellsV;
+			goodL += ellsV;
+		} else if (ellsV > ells) {
+			falseL += ellsV - ells;
+			goodL += ells;
+		} else if (ells > 0) {
+			goodL+= ells;
+		}
+		if (tees > teesV) {
+			missedT += tees - teesV;
+			goodT += teesV;
+		} else if (teesV > tees) {
+			falseT += teesV - tees;
+			goodT += tees;
+		} else if (tees > 0) {
+			goodT += tees;
+		}
 	}
 
 	/** Compare our key file against vision and update stats accordingly
@@ -1368,7 +1420,9 @@ public class Learning implements DataListener, MouseListener,
 				.setYellowGoal(current.getYellowGoal())
 				.setCross(current.getCross())
 				.setRedRobots(current.getRedRobots())
-				.setBlueRobots(current.getBlueRobots());
+				.setBlueRobots(current.getBlueRobots())
+				.setLCorners(current.getLCorners())
+				.setTCorners(current.getTCorners());
 		}
 		key.setHumanStatus(hasHuman);
 	}
@@ -1411,6 +1465,22 @@ public class Learning implements DataListener, MouseListener,
 	public void setBlueRobot(int howMany) {
 		if (newKey != null)
 			newKey.setBlueRobots(howMany);
+	}
+
+	/** Used to set the information in the Key file.
+	 * @param ells       how many L corners there are in the frame
+	 */
+	public void setLCorners(int ells) {
+		if (newKey != null)
+			newKey.setLCorners(ells);
+	}
+
+	/** Used to set the information in the Key file.
+	 * @param tees    how many T corners there are in the frame
+	 */
+	public void setTCorners(int tees) {
+		if (newKey != null)
+			newKey.setTCorners(tees);
 	}
 
 	/** Used to get information from vision.
@@ -1462,6 +1532,22 @@ public class Learning implements DataListener, MouseListener,
 	}
 
 	/** Used to get information from vision.
+	 * @return    how many L corners
+	 */
+	public int getLCorners() {
+		if (visionState == null) return 0;
+		return visionState.getLCornersVision();
+	}
+
+	/** Used to get information from vision.
+	 * @return    how many T corners
+	 */
+	public int getTCorners() {
+		if (visionState == null) return 0;
+		return visionState.getTCornersVision();
+	}
+
+	/** Used to get information from vision.
 	 * @return    whether human has approved or not
 	 */
 	public String getHuman() {
@@ -1503,6 +1589,24 @@ public class Learning implements DataListener, MouseListener,
 	public String getBlueRobotString() {
 		if (visionState == null) return "No Frame Loaded";
 		return visionState.getBlueRobotString();
+	}
+
+	/** Based on current state returns an appropriate description for
+	 * display.
+	 * @return   blue robot descriptor
+	 */
+	public String getLCornerString() {
+		if (visionState == null) return "No Frame Loaded";
+		return visionState.getLCornerString();
+	}
+
+	/** Based on current state returns an appropriate description for
+	 * display.
+	 * @return   blue robot descriptor
+	 */
+	public String getTCornerString() {
+		if (visionState == null) return "No Frame Loaded";
+		return visionState.getTCornerString();
 	}
 
 	/** Based on current state returns an appropriate description for
