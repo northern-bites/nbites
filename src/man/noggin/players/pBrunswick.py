@@ -49,8 +49,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.posForSaveCounter = 0
         self.framesFromCenter = 0
         self.stepsOffCenter = 0
-        self.ballRelY = 0.0
-        self.ballRelX = 0.0
         self.isChasing = False
         self.saving = False
 

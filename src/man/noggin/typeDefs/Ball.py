@@ -49,9 +49,7 @@ class Ball(VisualObject):
          self.uncertVelY,
          self.heading,
          self.locDist,
-         self.locBearing,
-         self.locRelX,
-         self.locRelY, # loc based
+         self.locBearing, # loc based
          self.relX, # vision based
          self.relY,
          self.relVelX,
@@ -138,8 +136,6 @@ class Ball(VisualObject):
         # Determine other values
         self.locDist = my.dist(self, forceCalc=True)
         self.locBearing = my.getRelativeBearing(self, forceCalc=True)
-        self.locRelX = getRelativeX(self.locDist, self.locBearing)
-        self.locRelY = getRelativeY(self.locDist, self.locBearing)
         self.relVelX = getRelativeVelocityX(my.h, self.velX, self.velY)
         self.relVelY = getRelativeVelocityY(my.h, self.velX, self.velY)
 
