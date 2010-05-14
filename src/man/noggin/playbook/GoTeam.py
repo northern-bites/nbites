@@ -262,10 +262,6 @@ class GoTeam:
                 append(mate)
                 self.numActiveFieldPlayers += 1
 
-                # Not using teammate ball reports for now
-                if (False and mate.ballDist > 0):
-                    self.brain.ball.reportBallSeen()
-
     def highestActivePlayerNumber(self):
         """returns true if the player is the highest active player number"""
         activeMate = self.getOtherActiveTeammate()
