@@ -276,7 +276,7 @@ class Brain(object):
         """
         updates self.play to the new play
         """
-        self.play = self.playbook.update()
+        self.playbook.update(self.play)
 
     # move to comm
     def setPacketData(self):

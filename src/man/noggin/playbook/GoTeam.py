@@ -28,10 +28,6 @@ class GoTeam:
 
         self.time = time.time()
 
-        self.play = Play.Play()
-        self.workingPlay = None
-        self.lastPlay = None
-
         # Information about teammates
 
         #self.position = []
@@ -47,79 +43,76 @@ class GoTeam:
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
                                PBConstants.LARGE_ELLIPSE_WIDTH)
 
-    def run(self):
+    def run(self, play):
         """
         We run this each frame to get the latest info
         """
         if self.brain.gameController.currentState != 'gamePenalized':
             self.aPrioriTeammateUpdate()
-        self.workingPlay = self.strategize()
-        # Update all of our new infos
-        self.updateStateInfo()
 
-    def strategize(self):
+        play.changed = False
+        self.strategize(play)
+
+        # Update all of our new infos
+        self.updateStateInfo(play)
+
+    def strategize(self, play):
         """
         creates a play, picks the strategy to run, returns the play after
         it is modified by Strategies
         """
-        newPlay = Play.Play()
         currentGCState = self.brain.gameController.currentState
         # We don't control anything in initial or finished
         if (currentGCState == 'gameInitial' or
             currentGCState == 'gameFinished'):
-            #a new play is always initialized to INIT values so there is no need
-            #to change them here
-            pass
+            if not play.isSubRole(PBConstants.INIT_SUB_ROLE):
+                play.setStrategy(PBConstants.INIT_STRATEGY)
+                play.setFormation(PBConstants.INIT_FORMATION)
+                play.setRole(PBConstants.INIT_ROLE)
+                play.setSubRole(PBConstants.INIT_SUB_ROLE)
 
         # Have a separate strategy to easily deal with being penalized
         elif currentGCState == 'gamePenalized':
-            # look into saving time by not setting this if last play
-            # was penalized
-            newPlay.setStrategy(PBConstants.PENALTY_STRATEGY)
-            newPlay.setFormation(PBConstants.PENALTY_FORMATION)
-            newPlay.setRole(PBConstants.PENALTY_ROLE)
-            newPlay.setSubRole(PBConstants.PENALTY_SUB_ROLE)
+            if not play.isSubRole(PBConstants.PENALTY_SUB_ROLE):
+                play.setStrategy(PBConstants.PENALTY_STRATEGY)
+                play.setFormation(PBConstants.PENALTY_FORMATION)
+                play.setRole(PBConstants.PENALTY_ROLE)
+                play.setSubRole(PBConstants.PENALTY_SUB_ROLE)
 
         # Check for testing stuff
         elif PBConstants.TEST_DEFENDER:
-            Strategies.sTestDefender(self, newPlay)
+            Strategies.sTestDefender(self, play)
         elif PBConstants.TEST_OFFENDER:
-            Strategies.sTestOffender(self, newPlay)
+            Strategies.sTestOffender(self, play)
         elif PBConstants.TEST_CHASER:
-            Strategies.sTestChaser(self, newPlay)
+            Strategies.sTestChaser(self, play)
 
         # Have a separate ready section to make things simpler
         elif (currentGCState == 'gameReady' or
               currentGCState =='gameSet'):
-            Strategies.sReady(self, newPlay)
+            Strategies.sReady(self, play)
 
         # Now we look at game strategies
         elif self.numActiveFieldPlayers == 0:
-            Strategies.sNoFieldPlayers(self, newPlay)
+            Strategies.sNoFieldPlayers(self, play)
         elif self.numActiveFieldPlayers == 1:
-            Strategies.sOneField(self, newPlay)
+            Strategies.sOneField(self, play)
 
         # This is the important area, what is usually used during play
         elif self.numActiveFieldPlayers == 2:
-            Strategies.sWin(self, newPlay)
+            Strategies.sWin(self, play)
 
         # This can only be used right now if the goalie is pulled
         elif self.numActiveFieldPlayers == 3:
-            Strategies.sThreeField(self, newPlay)
+            Strategies.sThreeField(self, play)
 
-        return newPlay
-
-    def updateStateInfo(self):
+    def updateStateInfo(self, play):
         """
         Update information specific to the coordinated behaviors
         """
-        # Update Play Memory
-        self.lastPlay = self.play
-        self.play = self.workingPlay
-
-        if not self.play.equals(self.lastPlay):
+        if play.changed:
             if self.printStateChanges:
-                self.printf("Play switched to " + self.play.__str__())
+                self.printf("Play switched to " + play.__str__())
 
     ######################################################
     ############       Role Switching Stuff     ##########
@@ -254,7 +247,7 @@ class GoTeam:
 
         self.numActiveFieldPlayers = 0
         for mate in self.brain.teamMembers:
-            if (mate.isDead() or mate.isPenalized()):
+            if (mate.isDead()):# or mate.isPenalized()):
                 #reset to false when we get a new packet from mate
                 mate.active = False
             elif (mate.active and (not mate.isTeammateRole(PBConstants.GOALIE)
@@ -345,48 +338,6 @@ class GoTeam:
                 RESET_COLORS_CODE)
         else:
             self.brain.out.printf(str(outputString))
-
-
-    def determineChaseTime(self, useZone = False):
-        """
-        Metric for deciding chaser.
-        Attempt to define a time to get to the ball.
-        Can give bonuses or penalties in certain situations.
-        """
-        # if the robot sees the ball use visual distances to ball
-        time = 0.0
-
-        if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
-            self.printf("DETERMINE CHASE TIME DEBUG")
-        if self.me.ballDist > 0:
-            time += (self.me.ballDist / PBConstants.CHASE_SPEED) *\
-                PBConstants.SEC_TO_MILLIS
-
-            if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
-                self.printf("\tChase time base is " + str(time))
-
-            # Give a bonus for seeing the ball
-            time -= PBConstants.BALL_ON_BONUS
-
-            if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
-                self.printf("\tChase time after ball on bonus " + str(time))
-
-        else: # use loc distances if no visual ball
-            time += (self.me.ballLocDist / PBConstants.CHASE_SPEED) *\
-                PBConstants.SEC_TO_MILLIS
-            if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
-                self.printf("\tChase time base is " + str(time))
-
-
-        # Add a penalty for being fallen over
-        time += (self.brain.fallController.getTimeRemainingEst() *
-                 PBConstants.SEC_TO_MILLIS)
-
-        if PBConstants.DEBUG_DETERMINE_CHASE_TIME:
-            self.printf("\tChase time after fallen over penalty " + str(time))
-            self.printf("")
-
-        return time
 
 class Ellipse:
   """
