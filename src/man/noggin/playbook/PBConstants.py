@@ -13,12 +13,10 @@ TEST_CHASER = False
 # Print information as to how the chaser is determined
 DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
-DEBUG_SEARCHER = False
 DEBUG_DETERMINE_CHASE_TIME = False
 
 USE_ZONE_STRATEGY = False
 USE_DUB_D = False
-USE_FINDER = False
 PULL_THE_GOALIE = False
 USE_FANCY_GOALIE = False
 
@@ -28,8 +26,6 @@ DEFAULT_CHASER_NUMBER = 3
 # Length of time to spend in the kickoff play
 KICKOFF_FORMATION_TIME = 3
 
-# Time limit for moving into the finder routine
-FINDER_TIME_THRESH = 5
 NUM_TEAM_PLAYERS = NogginConstants.NUM_PLAYERS_PER_TEAM
 PACKET_DEAD_PERIOD = 5 # TO-DO: look at shortening so it replaces penalized
 
@@ -79,7 +75,7 @@ CENTER_FIELD_DIST_THRESH = 125.
 ####
 
 # number of roles
-NUM_ROLES = 9
+NUM_ROLES = 8
 # dictionary of roles
 ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
                                     "PENALTY_ROLE",
@@ -87,7 +83,6 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
                                     "MIDDIE",
                                     "OFFENDER",
                                     "DEFENDER",
-                                    "SEARCHER",
                                     "GOALIE",
                                     "DEFENDER_DUB_D")))
 # tuple of roles
@@ -97,14 +92,13 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
  MIDDIE,
  OFFENDER,
  DEFENDER,
- SEARCHER,
  GOALIE,
  DEFENDER_DUB_D) = range(NUM_ROLES)
 
 #### SUB_ROLE CONSTANTS ####
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 26
+NUM_SUB_ROLES = 22
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
                                             #OFFENDER SUB ROLES 2-4
@@ -131,17 +125,11 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "GOALIE_NORMAL",
                                             "GOALIE_CHASER",
 
-                                            # FINDER SUB ROLES 16-19
-                                            "FRONT_FINDER",
-                                            "LEFT_FINDER",
-                                            "RIGHT_FINDER",
-                                            "OTHER_FINDER",
-
-                                            # KICKOFF SUB ROLES 20-21
+                                            # KICKOFF SUB ROLES 16-17
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 22-25
+                                            # READY SUB ROLES 18-21
                                             "READY_GOALIE",
                                             "READY_CHASER",
                                             "READY_DEFENDER",
@@ -168,11 +156,6 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 
  GOALIE_NORMAL,
  GOALIE_CHASER,
-
- FRONT_FINDER,
- LEFT_FINDER,
- RIGHT_FINDER,
- OTHER_FINDER,
 
  KICKOFF_SWEEPER,
  KICKOFF_STRIKER,
@@ -276,20 +259,13 @@ DEG_TO_RAD = pi / 180.
 BALL_FOCUS_UNCERT_THRESH = 100.
 
 
-# Finder
-TWO_DOG_FINDER_POSITIONS = (
-    (NogginConstants.FIELD_WIDTH * 1./2.,
-     NogginConstants.CENTER_FIELD_Y),
-    (NogginConstants.FIELD_WIDTH * 1./3.,
-     NogginConstants.CENTER_FIELD_Y))
-
 # Dub_d
 DEEP_BACK_X = SWEEPER_X
 LEFT_DEEP_BACK_Y = NogginConstants.MY_GOALBOX_BOTTOM_Y - 40.
 RIGHT_DEEP_BACK_Y = NogginConstants.MY_GOALBOX_TOP_Y + 40.
 
 # number of formations
-NUM_FORMATIONS = 16
+NUM_FORMATIONS = 15
 # dictionary of formations
 FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "PENALTY_FORMATION",
@@ -301,7 +277,6 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
                                               "ONE_DUB_D",
                                               "TWO_DUB_D",
                                               "THREE_DUB_D",
-                                              "FINDER",
                                               "KICKOFF",
                                               "READY_FORMATION",
                                               "TEST_DEFEND",
@@ -318,7 +293,6 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
  ONE_DUB_D,
  TWO_DUB_D,
  THREE_DUB_D,
- FINDER,
  KICKOFF,
  READY_FORMATION,
  TEST_DEFEND,

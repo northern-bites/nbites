@@ -125,7 +125,7 @@ class GoTeam:
     ############       Role Switching Stuff     ##########
     ######################################################
     def determineChaser(self):
-        '''return the player number of the chaser'''
+        """return the player number of the chaser"""
 
         chaser_mate = self.me
 
@@ -237,9 +237,9 @@ class GoTeam:
     ######################################################
 
     def aPrioriTeammateUpdate(self):
-        '''
+        """
         Here we update information about teammates before running a new frame
-        '''
+        """
         # Change which wing is forward based on the opponents score
         # self.kickoffFormation =
         #(self.brain.gameController.theirTeam.teamScore) % 2
@@ -263,25 +263,25 @@ class GoTeam:
                 self.numActiveFieldPlayers += 1
 
                 # Not using teammate ball reports for now
-                if (PBConstants.USE_FINDER and mate.ballDist > 0):
+                if (False and mate.ballDist > 0):
                     self.brain.ball.reportBallSeen()
 
     def highestActivePlayerNumber(self):
-        '''returns true if the player is the highest active player number'''
+        """returns true if the player is the highest active player number"""
         activeMate = self.getOtherActiveTeammate()
         if activeMate.playerNumber > self.me.playerNumber:
             return False
         return True
 
     def getOtherActiveTeammate(self):
-        '''this returns the teammate instance of an active teammate that isn't
-        you.'''
+        """this returns the teammate instance of an active teammate that isn't
+        you."""
         for mate in self.activeFieldPlayers:
             if self.me.playerNumber != mate.playerNumber:
                 return mate
 
     def reset(self):
-        '''resets all information stored from teammates'''
+        """resets all information stored from teammates"""
         for mate in self.brain.teamMembers:
             mate.reset()
 
@@ -290,11 +290,11 @@ class GoTeam:
     ######################################################
 
     def ballInMyGoalBox(self):
-        '''
+        """
         returns True if estimate of ball (x,y) lies in my goal box
         -includes all y values below top of goalbox
         (so inside the goal is included)
-        '''
+        """
         ball = self.brain.ball
         return (ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y and
                 ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
@@ -316,8 +316,7 @@ class GoTeam:
             return False
         # TO-DO: switch this to activeFieldPlayers
         for mate in self.brain.teamMembers:
-            if (mate.active and (mate.isTeammateRole(PBConstants.CHASER)
-                                 or mate.isTeammateRole(PBConstants.SEARCHER))):
+            if (mate.active and (mate.isTeammateRole(PBConstants.CHASER))):
                 return False
         return True
 
@@ -332,7 +331,7 @@ class GoTeam:
 ################################################################################
 
     def printf(self, outputString, printingColor='purple'):
-        '''FSA print function that allows colors to be specified'''
+        """FSA print function that allows colors to be specified"""
         if printingColor == 'red':
             self.brain.out.printf(RED_COLOR_CODE + str(outputString) +\
                 RESET_COLORS_CODE)
