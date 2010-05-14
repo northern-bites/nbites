@@ -1,5 +1,3 @@
-import time
-
 from .VisualObject import VisualObject
 from .. import NogginConstants as Constants
 from ..util.MyMath import (getRelativeVelocityX,
@@ -60,7 +58,6 @@ class Ball(VisualObject):
          self.lastVisionCenterY,
          self.lastVisionAngleX,
          self.lastVisionAngleY,
-         self.lastTimeSeen,
          self.lastSeenDist,
          self.lastSeenBearing) = [0]*Constants.NUM_TOTAL_BALL_VALUES
 
@@ -91,25 +88,6 @@ class Ball(VisualObject):
         VisualObject.updateVision(self, visionBall)
         self.elevation = visionBall.elevation
         self.confidence = visionBall.confidence
-
-        if self.on:
-            self.reportBallSeen()
-        else:
-            self.relX = 0.0
-            self.relY = 0.0
-
-    def reportBallSeen(self):
-        """
-        Reset the time since seen.  Happens when we see a ball or when
-        a teammate tells us he did.
-        """
-        self.lastTimeSeen = time.time()
-
-    def timeSinceSeen(self):
-        """
-        Update the time since we last saw a ball
-        """
-        return (time.time() - self.lastTimeSeen)
 
     def updateLoc(self, loc, my):
         """
