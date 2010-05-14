@@ -92,7 +92,7 @@ static const bool POSTLOGIC = false;
 static const bool TOPFIND = false;
 static const bool CORNERDEBUG = false;
 static const bool SANITY = false;
-static const bool CORRECT = true;
+static const bool CORRECT = false;
 #else
 static const bool PRINTOBJS = false;
 static const bool POSTDEBUG = false;
@@ -344,9 +344,9 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
     for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
         //cout << "Vert scan " << x << " " << y << endl;
         // if it is the color we're looking for - good
-#if define USE_EDGES
-		if ((c == YELLOW && thresh->getV[x][y] < YELLOWV) || (c == BLUE && thresh->getV[x][y] > BLUEV) ||
-			(thresh->thresholde[y][x] == GREEN) {
+#ifdef USE_EDGES
+		unsigned char pixel = thresh->getColor(x, y);
+		if (pixel == c) {
 #else
         if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
 #endif
@@ -401,9 +401,9 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
     // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH
               && y < height && bad < stopper; ) {
-#if define USE_EDGES
-		if ((c == YELLOW && thresh->getV[x][y] < YELLOWV) || (c == BLUE && thresh->getV[x][y] > BLUEV) ||
-			(thresh->thresholde[y][x] == GREEN) {
+#ifdef USE_EDGES
+		unsigned char pixel = thresh->getColor(x, y);
+		if (pixel == c) {
 #else
         if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
 #endif
@@ -591,9 +591,6 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
                     good++;
 
                 else {
-                    if (checkEdge(theSpot, i, theSpot - dir, i)) {
-                        //count++;
-                    }
 #ifdef USE_EDGES
 					int curcol = GREY;
 					if (thresh->getU(theSpot, i)  > ORANGEU) {
@@ -692,9 +689,6 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
                 // assume the best?
                 fakegood++;
             } else {
-                if (checkEdge(i, theSpot, i, theSpot - dir)) {
-                    //count++;
-                }
 #ifdef USE_EDGES
 				int curcol = GREY;
 				if (thresh->getU(i, theSpot)  > ORANGEU) {

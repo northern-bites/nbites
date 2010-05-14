@@ -218,18 +218,18 @@ void Threshold::threshold() {
 /*
  */
 unsigned char Threshold::getColor(int r, int c) {
-	//cout << "Getting color " << r << " " << c << endl;
-	int y = getY(r, c);
-	//cout << "Y" << endl;
-	int u = getU(r, c);
-	//cout << "U" << endl;
-	int v = getV(r, c);
-	//cout << "V" << endl;
+	//cout << "Checking " << r << " " << c << endl;
+	const unsigned char *yPtr = &yplane[0] +c*IMAGE_ROW_OFFSET+2*r;
+	int u = yPtr[UOFFSET + 2*(r%2)];
 	if (u  > ORANGEU) {
 		return ORANGE;
-	} else if (y > WHITEY) {
+	}
+	int y = yPtr[0];
+	if (y > WHITEY) {
 		return WHITE;
-	} else if (v > BLUEV) {
+	}
+	int v = yPtr[VOFFSET+2*(r%2)];
+	if (v > BLUEV) {
 		return BLUE;
 	} else if (v < YELLOWV) {
 		return YELLOW;
@@ -238,8 +238,8 @@ unsigned char Threshold::getColor(int r, int c) {
 		return GREEN;
 	}
 	return GREY;
-
 }
+
 
 unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
 	int v = getV(x, y);
@@ -381,30 +381,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 	// scan down the column looking for ORANGE and WHITE
 	//int lasty = getY(column, bound), lastu = getU(column, bound), newu, newy;
 	for (int j = bound; j >= topEdge; j--) {
-		//cout << "U value " << getU(column, j) << " " << (getU(column, j) >> 1) << endl;
-		//newy = getY(column, j);
-		//newu = getU(column, j);
-		//if (j < IMAGE_HEIGHT - 1 && (abs(newy - lasty) > 10 ||
-		//							 abs(newu - lastu) > 10)) {
-		//	thresholded[j][column] = BLACK;
-		//}
-		//lasty = newy;
-		//lastu = newu;
-		/*if (getU(column, j)  > ORANGEU) {
-			thresholded[j][column] = ORANGE;
-		} else if (getY(column, j) > WHITEY) {
-			thresholded[j][column] = WHITE;
-		} else if (getV(column, j) > BLUEV) {
-			thresholded[j][column] = BLUE;
-		} else if (getV(column, j) < YELLOWV) {
-			thresholded[j][column] = YELLOW;
-			}*/
 		thresholded[j][column] = getColor(column, j);
-		/*else if (getY(column, j) >> 1 < 67) {
-			thresholded[j][column] = GREEN;
-		} else if (getY(column, j) >> 1 > 70) {
-			thresholded[j][column] = WHITE;
-			}*/
 		// get the next pixel
 		unsigned char pixel = thresholded[j][column];
 		// for simplicity treat ORANGERED as ORANGE - we'll look

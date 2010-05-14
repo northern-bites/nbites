@@ -113,6 +113,9 @@ public:
     inline void threshold();
     inline void runs();
 	unsigned char getColor(int x, int y);
+	bool isGreen(int x, int y);
+	bool isYellow(int x, int y);
+	bool isBlue(int x, int y);
 	unsigned char getExpandedColor(int x, int y, unsigned char col);
     void thresholdAndRuns();
 	void findGoals(int column, int top);
@@ -173,7 +176,7 @@ public:
 
 #if ROBOT(NAO_RL)
     inline uchar getY(int x, int y) {
-        return yplane[y*IMAGE_ROW_OFFSET+2*x];
+        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
     }
     inline uchar getU(int x, int y) {
 		return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + UOFFSET];
