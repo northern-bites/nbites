@@ -180,9 +180,9 @@ class Brain(object):
         """
         Main control loop called every TIME_STEP milliseconds
         """
+        # order here is very important
         # Update Environment
-        self.ball.updateVision(self.vision.ball)
-        self.updateFieldObjects()
+        self.updateVisualObjects()
         self.sonar.updateSensors(self.sensors, sensors.UltraSoundMode)
 
         # Communications update
@@ -190,6 +190,7 @@ class Brain(object):
 
         # Localization Update
         self.updateLocalization()
+        self.ball.updateBestValues(self.my)
 
         #Set LEDS
         self.leds.processLeds()
@@ -208,10 +209,11 @@ class Brain(object):
         # Update any logs we have
         self.out.updateLogs()
 
-    def updateFieldObjects(self):
+    def updateVisualObjects(self):
         """
         Update information about seen objects
         """
+        self.ball.updateVision(self.vision.ball)
         self.yglp.updateVision(self.vision.yglp)
         self.ygrp.updateVision(self.vision.ygrp)
         self.bglp.updateVision(self.vision.bglp)

@@ -72,23 +72,24 @@ class TeamMember(RobotLocation):
         self.bearingToGoal = self.getBearingToGoal()
         self.active = True
         self.grabbing = (0 < self.ballDist <=
-                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING) or\
+                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING) or \
                         (0 < self.ballLocDist <=
                         NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
         #potential problem when goalie is grabbing?
         #only going to be dribbling or grabbing if you see the ball
         self.dribbling = (0 < self.ballDist <=
-                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING) or\
+                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING) or \
                           (0 < self.ballLocDist <=
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.lastPacketTime = self.brain.playbook.pb.time
 
 
     def updateMe(self):
-        '''
+        """
         updates my information as a teammate (since we don't get our own
         packets)
-        '''
+        """
+
         my = self.brain.my
         ball = self.brain.ball
         pb = self.brain.playbook
@@ -142,25 +143,26 @@ class TeamMember(RobotLocation):
         self.dribbling = False
 
     def getBearingToGoal(self):
-        '''returns bearing to goal'''
+        """returns bearing to goal"""
+
         return self.getOthersRelativeBearing(self.x, self.y, self.h,
                                            NogginConstants.OPP_GOALBOX_LEFT_X,
                                            NogginConstants.OPP_GOALBOX_MIDDLE_Y)
 
     def getDistToBall(self):
-        '''
+        """
         returns teammate distance to ball in centimeters.
         -based on its own localization but my own ball estimates
-        '''
+        """
         return hypot(self.brain.ball.x - self.x,
                      self.brain.ball.y - self.y)
 
     def getBearingToBall(self):
-        '''
+        """
         returns teammate bearing to the ball in degrees.
         -based on its own localization but my own ball estimates
         -return values is between -180,180
-        '''
+        """
         return self.getOthersRelativeBearing(self.x, self.y, self.h,
                                              self.brain.ball.x,
                                              self.brain.ball.y)
@@ -188,12 +190,12 @@ class TeamMember(RobotLocation):
         return (self.playerNumber == DEFAULT_DEFENDER_NUMBER)
 
     def isPenalized(self):
-        '''
+        """
         this checks GameController to see if a player is penalized.
         this check is more redundant than anything, because our players stop
         sending packets when they are penalized, so they will most likely
         fall under the isTeammateDead() check anyways.
-        '''
+        """
         #penalty state is the first item the player tuple [0]
         #penalty state == 1 is penalized
         return (
@@ -201,10 +203,10 @@ class TeamMember(RobotLocation):
            )
 
     def isDead(self):
-        '''
-        returns True if teammates' last timestamp is sufficiently behind ours.
+        """
+        returns True if teammates last timestamp is sufficiently behind ours.
         however, the dog could still be on but sending really laggy packets.
-        '''
+        """
         return (PACKET_DEAD_PERIOD <
                 (self.brain.playbook.pb.time - self.lastPacketTime))
 

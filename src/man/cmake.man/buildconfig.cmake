@@ -127,4 +127,3 @@ OPTION(
   "Redirect the standard error to standard out in C++"
   ON
   )
-
