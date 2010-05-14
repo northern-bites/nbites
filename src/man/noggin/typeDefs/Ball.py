@@ -96,8 +96,6 @@ class Ball(VisualObject):
 
         if self.on:
             self.reportBallSeen()
-            self.relX = getRelativeX(self.visDist, self.visBearing)
-            self.relY = getRelativeY(self.visDist, self.visBearing)
         else:
             self.relX = 0.0
             self.relY = 0.0
@@ -160,6 +158,10 @@ class Ball(VisualObject):
             self.dist = self.locDist
             # uses my.x, my.y which are loc determined to get heading
             self.heading = my.headingTo(self)
+
+        self.relX = getRelativeX(self.dist, self.bearing)
+        self.relY = getRelativeY(self.dist, self.bearing)
+
         # TODO: use vision bearing + my heading if ball.on
 
     def __str__(self):
