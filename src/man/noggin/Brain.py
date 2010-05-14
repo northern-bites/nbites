@@ -1,5 +1,6 @@
 
 # Redirect standard error to standard out
+import time
 import sys
 _stderr = sys.stderr
 sys.stderr = sys.stdout
@@ -253,6 +254,7 @@ class Brain(object):
         # Update the corner information
         self.corners = []
 
+        self.time = time.time()
         # Now we get the latest list of lines
         self.lines = []
 

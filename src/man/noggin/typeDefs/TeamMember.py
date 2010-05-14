@@ -10,6 +10,10 @@ PACKET_DEAD_PERIOD = 5 # TO-DO: look at shortening so it replaces penalized
 DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_CHASER_NUMBER = 3
+DEBUG_DETERMINE_CHASE_TIME = False
+BALL_ON_BONUS = 1000.
+CHASE_SPEED = 7.00
+SEC_TO_MILLIS = 1000.0
 
 
 class TeamMember(RobotLocation):
@@ -81,7 +85,7 @@ class TeamMember(RobotLocation):
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING) or \
                           (0 < self.ballLocDist <=
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
-        self.lastPacketTime = self.brain.playbook.pb.time
+        self.lastPacketTime = time.time()#self.brain.playbook.pb.time
 
 
     def updateMe(self):
@@ -108,7 +112,7 @@ class TeamMember(RobotLocation):
         self.ballDist = ball.dist
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
-        self.chaseTime = pb.pb.determineChaseTime()
+        self.chaseTime = self.determineChaseTime()
 
         self.ballLocDist = ball.locDist
         self.ballLocBearing = ball.locBearing
@@ -119,7 +123,7 @@ class TeamMember(RobotLocation):
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
         self.grabbing = (0 < self.ballDist <=
                           NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
-        self.lastPacketTime = pb.pb.time
+        self.lastPacketTime = self.brain.time
 
     def reset(self):
         '''Reset all important Teammate variables'''
@@ -174,6 +178,39 @@ class TeamMember(RobotLocation):
         return MyMath.sub180Angle(playerH -(degrees(MyMath.safe_atan2(
                         y - playerY, x - playerX)) - 90.0))
 
+    def determineChaseTime(self):
+        """
+        Metric for deciding chaser.
+        Attempt to define a time to get to the ball.
+        Can give bonuses or penalties in certain situations.
+        """
+        time = 0.0
+
+        if DEBUG_DETERMINE_CHASE_TIME:
+            self.printf("DETERMINE CHASE TIME DEBUG")
+
+        time += (self.ballDist / CHASE_SPEED) *\
+            SEC_TO_MILLIS
+
+        if DEBUG_DETERMINE_CHASE_TIME:
+            self.printf("\tChase time base is " + str(time))
+
+        # Give a bonus for seeing the ball
+        time -= BALL_ON_BONUS
+
+        if DEBUG_DETERMINE_CHASE_TIME:
+            self.printf("\tChase time after ball on bonus " + str(time))
+
+        # Add a penalty for being fallen over
+        time += (self.brain.fallController.getTimeRemainingEst() *
+                 SEC_TO_MILLIS)
+
+        if DEBUG_DETERMINE_CHASE_TIME:
+            self.printf("\tChase time after fallen over penalty " + str(time))
+            self.printf("")
+
+        return time
+
     def hasBall(self):
         return (self.dribbling or self.grabbing)
 
@@ -207,6 +244,9 @@ class TeamMember(RobotLocation):
         returns True if teammates last timestamp is sufficiently behind ours.
         however, the dog could still be on but sending really laggy packets.
         """
+        return (PACKET_DEAD_PERIOD <
+                (self.brain.time - self.lastPacketTime))
+
         return (PACKET_DEAD_PERIOD <
                 (self.brain.playbook.pb.time - self.lastPacketTime))
 
