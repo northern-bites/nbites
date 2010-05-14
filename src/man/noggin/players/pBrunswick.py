@@ -12,7 +12,6 @@ from . import GoalieTransitions
 from . import ChaseBallTransitions
 from . import KickingHelpers
 
-from . import KickingConstants
 from .. import NogginConstants
 from ..playbook import PBConstants
 from . import ChaseBallConstants as ChaseConstants
@@ -121,16 +120,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def getRoleState(self):
         if self.play.isRole(PBConstants.CHASER):
             return 'chase'
-        elif ( self.play.isRole(PBConstants.OFFENDER) or
-               self.play.isRole(PBConstants.DEFENDER) or
-               self.play.isRole(PBConstants.MIDDIE)):
-            return 'playbookPosition'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
-        elif self.play.isRole(PBConstants.SEARCHER):
-            return 'scanFindBall'
         else:
-            return 'scanFindBall'
+            return 'playbookPosition'
+
 
     ###### HELPER METHODS ######
     def getSpinDirAfterKick(self):
@@ -209,9 +203,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getNextOrbitPos(self):
         relX = -ChaseConstants.ORBIT_OFFSET_DIST * \
-            cos(radians(ChaseConstants.ORBIT_STEP_ANGLE)) + self.brain.ball.relX
+               ChaseConstants.COS_ORBIT_STEP_ANGLE + self.brain.ball.relX
         relY =  -ChaseConstants.ORBIT_OFFSET_DIST * \
-            sin(radians(ChaseConstants.ORBIT_STEP_ANGLE)) + self.brain.ball.relY
+               ChaseConstants.SIN_ORBIT_STEP_RADIANS + self.brain.ball.relY
         relTheta = ChaseConstants.ORBIT_STEP_ANGLE * 2 + self.brain.ball.bearing
         return RobotLocation(relX, relY, relTheta)
 
