@@ -57,6 +57,12 @@ static const int MIN_X_OPEN = 40;
 
 static const int VISUAL_HORIZON_COLOR = BROWN;
 
+static const int UOFFSET=3;
+static const int VOFFSET=1;
+static const int YOFFSET1=0;
+static const int YOFFSET2=2;
+
+
 //
 // DISTANCE ESTIMATES CONSTANTS
 // based on Height and Width
@@ -114,9 +120,6 @@ public:
     const uchar* getYUV();
     static const char * getShortColor(int _id);
 
-    void swapUV() { inverted = !inverted; setYUV(yuv); }
-    void swapUV(bool _inverted) { inverted = _inverted; setYUV(yuv); }
-
     int getPixelBoundaryLeft();
     int getPixelBoundaryRight();
     int getPixelBoundaryUp();
@@ -144,10 +147,10 @@ public:
         return yplane[y*IMAGE_ROW_OFFSET+2*x];
     }
     inline uchar getU(int x, int y) {
-        return uplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
+		return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + UOFFSET];
     }
     inline uchar getV(int x, int y) {
-        return vplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
+		return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + VOFFSET];
     }
 #elif ROBOT(NAO_SIM)
 #  error NAO_SIM robot type not implemented
@@ -176,8 +179,6 @@ public:
     unsigned char debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
 #endif
 
-    bool inverted;
-
 private:
 
     // class pointers
@@ -188,7 +189,7 @@ private:
     const uchar* yuv;
     const uchar* yplane, *uplane, *vplane;
 
-    unsigned char bigTable[YMAX][UMAX][VMAX];
+    unsigned char bigTable[UMAX][VMAX][YMAX];
 
     // open field variables
     int openField[IMAGE_WIDTH];

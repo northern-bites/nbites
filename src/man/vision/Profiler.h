@@ -24,7 +24,16 @@ enum ProfiledComponent {
   P_FGHORIZON,
   P_RUNS,
   P_OBJECT,
+
   P_LINES,
+
+  P_VERT_LINES,
+  P_HOR_LINES,
+  P_CREATE_LINES,
+  P_JOIN_LINES,
+  P_FIT_UNUSED,
+  P_INTERSECT_LINES,
+
   P_PYTHON,
   P_PYUPDATE,
   P_PYRUN,

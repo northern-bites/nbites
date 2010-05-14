@@ -88,9 +88,11 @@ const int FieldLines::LINE_COLORS[NUM_WHITE_COLORS] =
 
 const char * FieldLines::linePointInfoFile = "linepoints.xls";
 
-FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
+FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr,
+					   shared_ptr<Profiler> profilerPtr) {
     vision = visPtr;
     pose = posePtr;
+	profiler = profilerPtr;
 
     // Initialize the array of VisualFieldObject which we use for distance
     // based identification of corners
@@ -122,33 +124,50 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr) {
 // Main Line Loop. Calls all of the smaller line functions.  Order matters.
 void FieldLines::lineLoop() {
 
+	PROF_ENTER(profiler,P_VERT_LINES);
     vector<linePoint> vertLinePoints;
     findVerticalLinePoints(vertLinePoints);
+	PROF_EXIT(profiler,P_VERT_LINES);
 
+	PROF_ENTER(profiler,P_HOR_LINES);
     vector<linePoint> horLinePoints;
     findHorizontalLinePoints(horLinePoints);
+	PROF_EXIT(profiler,P_HOR_LINES);
 
     sort(horLinePoints.begin(), horLinePoints.end());
 
     // Must allocate enough space to fit both hor and vert points into this list
+
     list<linePoint> linePoints(vertLinePoints.size() + horLinePoints.size());
     merge(vertLinePoints.begin(), vertLinePoints.end(),
           horLinePoints.begin(), horLinePoints.end(),
           linePoints.begin());
 
+	PROF_ENTER(profiler,P_CREATE_LINES);
     createLines(linePoints); // Lines is a global member of FieldLines
+	PROF_EXIT(profiler,P_CREATE_LINES);
 
+	PROF_ENTER(profiler,P_JOIN_LINES);
 	joinLines();
+	PROF_EXIT(profiler,P_JOIN_LINES);
+
     //extendLines(linesList);
 
     // Only those linePoints which were not used in any line remain within the
     // linePoints list
     // unusedPoints is used by vision to draw points on the screen
+
+	PROF_ENTER(profiler,P_FIT_UNUSED);
     unusedPointsList = linePoints;
 	fitUnusedPoints(linesList, unusedPointsList);
+	PROF_EXIT(profiler,P_FIT_UNUSED);
 
 	//removeDuplicateLines();
+
+	PROF_ENTER(profiler,P_INTERSECT_LINES);
     cornersList = intersectLines();
+	PROF_EXIT(profiler,P_INTERSECT_LINES);
+
 }
 
 // While lineLoop is called before object recognition so that ObjectFragments

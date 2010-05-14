@@ -71,7 +71,7 @@ Field::Field(Vision* vis, Threshold * thr)
 {
 #ifdef OFFLINE
 	debugHorizon = false;
-	debugFieldEdge = true;
+	debugFieldEdge = false;
 	openField = false;
 	debugShot = false;
 #else
@@ -439,7 +439,7 @@ void Field::findConvexHull(int pH) {
 		//cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
 		int diff = convex[i].y - convex[i-1].y;
 		float step = 0.0f;
-		if (convex[i].x != convex[i-1].x) 
+		if (convex[i].x != convex[i-1].x)
 		  step = (float)diff / (float)(convex[i].x - convex[i-1].x);
 		float cur = convex[i].y;
 		for (int j = convex[i].x; j > convex[i-1].x; j--) {
@@ -456,6 +456,23 @@ void Field::findConvexHull(int pH) {
 		if (debugFieldEdge)
 			thresh->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x, convex[i].y, ORANGE);
 	}
+	// calculate the distance to the edge of the field at three key points
+	const int quarter = IMAGE_WIDTH / 4;
+	const int TOPPING = 30;
+	float qDist = 1000.0f, hDist = 1000.0f, tDist = 1000.0f;
+	if (topEdge[quarter] > TOPPING) {
+		e = vision->pose->pixEstimate(quarter, topEdge[quarter], 0.0f);
+		qDist = e.dist;
+	}
+	if (topEdge[quarter * 2] > TOPPING) {
+		e = vision->pose->pixEstimate(quarter * 2, topEdge[quarter * 2], 0.0f);
+		hDist = e.dist;
+	}
+	if (topEdge[quarter * 3] > TOPPING) {
+		e = vision->pose->pixEstimate(quarter * 3, topEdge[quarter * 3], 0.0f);
+		tDist = e.dist;
+	}
+	// cout << "Distances are " << qDist << " " << hDist << " " << tDist << endl;
 	//cout << "Max dist is " << maxPix << endl;
 }
 

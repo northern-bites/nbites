@@ -32,6 +32,7 @@ struct linePoint;
 #include "Utility.h" //
 #include "NaoPose.h" // Used to estimate distances in the image
 #include "Vision.h"
+#include "Profiler.h"
 
 static const int NO_EDGE = -3;
 
@@ -195,7 +196,9 @@ private:
 
 public:
 
-    FieldLines(Vision *visPtr, boost::shared_ptr<NaoPose> posePtr);
+    FieldLines(Vision *visPtr,
+			   boost::shared_ptr<NaoPose> posePtr,
+			   boost::shared_ptr<Profiler> profilerPtr);
     virtual ~FieldLines() {}
 
     // master loop
@@ -686,6 +689,7 @@ private:
 private:
     Vision *vision;
     boost::shared_ptr<NaoPose> pose;
+    boost::shared_ptr<Profiler> profiler;
 
     std::vector <boost::shared_ptr<VisualLine> > linesList;
     std::list <VisualCorner> cornersList;
@@ -736,7 +740,6 @@ private:
     static const bool printLinePointInfo = false;
     static const char *linePointInfoFile;
 #endif
-
 };
 
 

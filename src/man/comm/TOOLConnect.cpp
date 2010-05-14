@@ -173,22 +173,8 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Image data request
     if (r.image) {
         sensors->lockImage();
-        if (!vision->thresh->inverted) {
-            serial.write_bytes(sensors->getImage(), IMAGE_BYTE_SIZE);
-            sensors->releaseImage();
-        }else {
-            unsigned char image[IMAGE_BYTE_SIZE], swap;
-            // copy raw image data
-            memcpy(&image[0], sensors->getImage(), IMAGE_BYTE_SIZE);
-            sensors->releaseImage();
-            // swap U and V pixels
-            for (int i = 1; i < IMAGE_BYTE_SIZE; i += 4) {
-                swap = image[i];
-                image[i] = image[i+2];
-                image[i+2] = swap;
-            }
-            serial.write_bytes(&image[0], IMAGE_BYTE_SIZE);
-        }
+		serial.write_bytes(sensors->getImage(), IMAGE_BYTE_SIZE);
+		sensors->releaseImage();
     }
 
     if (r.thresh)
