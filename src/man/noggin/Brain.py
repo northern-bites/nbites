@@ -3,6 +3,9 @@
 import sys
 _stderr = sys.stderr
 sys.stderr = sys.stdout
+import cProfile
+import pstats
+
 
 # Packages and modules from super-directories
 from man import comm
@@ -38,6 +41,8 @@ class Brain(object):
         """
         Class constructor
         """
+        self.counter = 0
+
         self.on = True
         # Output Class
         self.out = NaoOutput.NaoOutput(self)
@@ -175,6 +180,29 @@ class Brain(object):
 ##
 ##--------------CONTROL METHODS---------------##
 ##
+    def profile(self):
+        if self.counter == 0:
+            cProfile.runctx('self.run()',  self.__dict__, locals(),
+                            'pythonStats')
+            self.p = pstats.Stats('pythonStats')
+
+        elif self.counter < 3000:
+            self.p.add('pythonStats')
+            cProfile.runctx('self.run()',  self.__dict__, locals(),
+                            'pythonStats')
+
+        elif self.counter == 3000:
+            self.p.strip_dirs()
+            self.p.sort_stats('cumulative')
+            ## print 'PYTHON STATS:'
+            ## self.p.print_stats()
+            ## print 'OUTGOING CALLEES:'
+            ## self.p.print_callees()
+            ## print 'OUTGOING CALLEES:'
+            ## self.p.print_callers()
+            self.p.dump_stats('pythonStats')
+
+        self.counter += 1
 
     def run(self):
         """
@@ -196,6 +224,7 @@ class Brain(object):
         self.leds.processLeds()
 
         # Behavior stuff
+        self.time = time.time()
         self.gameController.run()
         self.fallController.run()
         self.updatePlaybook()

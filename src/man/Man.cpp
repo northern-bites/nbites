@@ -49,113 +49,114 @@ Man::Man (shared_ptr<Sensors> _sensors,
           shared_ptr<MotionEnactor> _enactor,
           shared_ptr<Synchro> synchro,
           shared_ptr<Lights> _lights)
-    : sensors(_sensors),
-      transcriber(_transcriber),
-      imageTranscriber(_imageTranscriber),
-      enactor(_enactor),
-      lights(_lights)
+  : sensors(_sensors),
+    transcriber(_transcriber),
+    imageTranscriber(_imageTranscriber),
+    enactor(_enactor),
+    lights(_lights)
 {
-    // initialize system helper modules
-    profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
-	//profiler->profiling = true;
-	//profiler->profileFrames(60);
-
-    // give python a pointer to the sensors structure. Method defined in
-    // Sensors.h
-    set_sensors_pointer(sensors);
-
-    imageTranscriber->setSubscriber(this);
-
-    pose = shared_ptr<NaoPose>(new NaoPose(sensors));
-
-    guardian = shared_ptr<RoboGuardian>(new RoboGuardian(synchro, sensors));
-
-    // initialize core processing modules
-#ifdef USE_MOTION
-    motion = shared_ptr<Motion>(
-        new Motion(synchro, enactor, sensors,profiler));
-    guardian->setMotionInterface(motion->getInterface());
+  // initialize system helper modules
+  profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
+#ifdef USE_TIME_PROFILING
+  profiler->profiling = true;
+  profiler->profileFrames(3000);
 #endif
-    // initialize python roboguardian module.
-    // give python a pointer to the guardian. Method defined in PyRoboguardian.h
-    set_guardian_pointer(guardian);
+  // give python a pointer to the sensors structure. Method defined in
+  // Sensors.h
+  set_sensors_pointer(sensors);
 
-    set_lights_pointer(_lights);
+  imageTranscriber->setSubscriber(this);
 
-    vision = shared_ptr<Vision>(new Vision(pose, profiler));
-    comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
+  pose = shared_ptr<NaoPose>(new NaoPose(sensors));
+
+  guardian = shared_ptr<RoboGuardian>(new RoboGuardian(synchro, sensors));
+
+  // initialize core processing modules
+#ifdef USE_MOTION
+  motion = shared_ptr<Motion>(
+                              new Motion(synchro, enactor, sensors,profiler));
+  guardian->setMotionInterface(motion->getInterface());
+#endif
+  // initialize python roboguardian module.
+  // give python a pointer to the guardian. Method defined in PyRoboguardian.h
+  set_guardian_pointer(guardian);
+
+  set_lights_pointer(_lights);
+
+  vision = shared_ptr<Vision>(new Vision(pose, profiler));
+  comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 #ifdef USE_NOGGIN
-    noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
-                                           sensors, motion->getInterface()));
+  noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
+                                         sensors, motion->getInterface()));
 #endif// USE_NOGGIN
-	PROF_ENTER(profiler.get(), P_GETIMAGE);
+  PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
 Man::~Man ()
 {
-    cout << "Man destructor" << endl;
+  cout << "Man destructor" << endl;
 }
 
 void Man::startSubThreads() {
 
 #ifdef DEBUG_MAN_THREADING
-    cout << "Man::start" << endl;
+  cout << "Man::start" << endl;
 #endif
 
 
-    // Start Comm thread (it handles its own threading
-    if (comm->start() != 0)
-        cerr << "Comm failed to start" << endl;
-    else
-        comm->getTrigger()->await_on();
+  // Start Comm thread (it handles its own threading
+  if (comm->start() != 0)
+    cerr << "Comm failed to start" << endl;
+  else
+    comm->getTrigger()->await_on();
 
 #ifdef USE_MOTION
-// Start Motion thread (it handles its own threading
-    if (motion->start() != 0)
-        cerr << "Motion failed to start" << endl;
-    else
-        motion->getTrigger()->await_on();
+  // Start Motion thread (it handles its own threading
+  if (motion->start() != 0)
+    cerr << "Motion failed to start" << endl;
+  else
+    motion->getTrigger()->await_on();
 #endif
 
 
-    if(guardian->start() != 0)
-        cout << "RoboGuardian failed to start" << endl;
-    else
-        guardian->getTrigger()->await_on();
+  if(guardian->start() != 0)
+    cout << "RoboGuardian failed to start" << endl;
+  else
+    guardian->getTrigger()->await_on();
 
 
 #ifdef DEBUG_MAN_THREADING
-    cout << "  run :: Signalling start" << endl;
+  cout << "  run :: Signalling start" << endl;
 #endif
 }
 
 void Man::stopSubThreads() {
 
-    guardian->stop();
-    guardian->getTrigger()->await_off();
+  guardian->stop();
+  guardian->getTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
-    cout << "  Guardian thread is stopped" << endl;
+  cout << "  Guardian thread is stopped" << endl;
 #endif
 
 #ifdef DEBUG_MAN_THREADING
-    cout << "  Man stoping:" << endl;
+  cout << "  Man stoping:" << endl;
 #endif
 
 #ifdef USE_MOTION
-    // Finished with run loop, stop sub-threads and exit
-    motion->stop();
-    motion->getTrigger()->await_off();
+  // Finished with run loop, stop sub-threads and exit
+  motion->stop();
+  motion->getTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
-    cout << "  Motion thread is stopped" << endl;
+  cout << "  Motion thread is stopped" << endl;
 #endif
 
 #endif
-    comm->stop();
-    comm->getTrigger()->await_off();
-    // @jfishman - tool will not exit, due to socket blocking
-    //comm->getTOOLTrigger()->await_off();
+  comm->stop();
+  comm->getTrigger()->await_off();
+  // @jfishman - tool will not exit, due to socket blocking
+  //comm->getTOOLTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
-    cout << "  Comm thread is stopped" << endl;
+  cout << "  Comm thread is stopped" << endl;
 #endif
 }
 
@@ -163,51 +164,51 @@ void
 Man::processFrame ()
 {
 #ifdef USE_VISION
-    //  This is called from Python right now
-    //if(camera_active)
-    //vision->copyImage(sensors->getImage());
+  //  This is called from Python right now
+  //if(camera_active)
+  //vision->copyImage(sensors->getImage());
 #endif
 
 
-    PROF_ENTER(profiler.get(), P_FINAL);
-	PROF_EXIT(profiler.get(), P_GETIMAGE);
+  PROF_ENTER(profiler.get(), P_FINAL);
+  PROF_EXIT(profiler.get(), P_GETIMAGE);
 #ifdef USE_VISION
-    //if(camera_active)
-	PROF_ENTER(profiler, P_VISION);
-    vision->notifyImage(sensors->getImage());
-	PROF_EXIT(profiler, P_VISION);
-    //vision->notifyImage();
+  //if(camera_active)
+  PROF_ENTER(profiler, P_VISION);
+  vision->notifyImage(sensors->getImage());
+  PROF_EXIT(profiler, P_VISION);
+  //vision->notifyImage();
 #endif
 
-    // run Python behaviors
+  // run Python behaviors
 #ifdef USE_NOGGIN
-    noggin->runStep();
+  noggin->runStep();
 #endif
-    PROF_ENTER(profiler.get(), P_LIGHTS);
-    lights->sendLights();
-    PROF_EXIT(profiler.get(), P_LIGHTS);
+  PROF_ENTER(profiler.get(), P_LIGHTS);
+  lights->sendLights();
+  PROF_EXIT(profiler.get(), P_LIGHTS);
 
-	PROF_ENTER(profiler.get(), P_GETIMAGE);
-    PROF_EXIT(profiler.get(), P_FINAL);
-    PROF_NFRAME(profiler.get());
+  PROF_ENTER(profiler.get(), P_GETIMAGE);
+  PROF_EXIT(profiler.get(), P_FINAL);
+  PROF_NFRAME(profiler.get());
 }
 
 
 void Man::notifyNextVisionImage() {
-    // Synchronize noggin's information about joint angles with the motion
-    // thread's information
+  // Synchronize noggin's information about joint angles with the motion
+  // thread's information
 
-    sensors->updateVisionAngles();
+  sensors->updateVisionAngles();
 
-    transcriber->postVisionSensors();
+  transcriber->postVisionSensors();
 
-    // Process current frame
-    processFrame();
+  // Process current frame
+  processFrame();
 
-    //Release the camera image
-    //if(camera_active)
-    imageTranscriber->releaseImage();
+  //Release the camera image
+  //if(camera_active)
+  imageTranscriber->releaseImage();
 
-    // Make sure messages are printed
-    fflush(stdout);
+  // Make sure messages are printed
+  fflush(stdout);
 }
