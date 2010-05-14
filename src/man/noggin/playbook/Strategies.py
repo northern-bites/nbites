@@ -4,10 +4,12 @@ from . import Formations
 
 def sReady(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_READY)
+
     Formations.fReady(team, workingPlay)
 
 def sNoFieldPlayers(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_NO_FIELD_PLAYERS)
+
     Formations.fNoFieldPlayers(team, workingPlay)
 
 def sOneField(team, workingPlay):

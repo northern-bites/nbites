@@ -21,18 +21,27 @@ class Play:
         self.role = role
         self.subRole = subRole
         self.position = RobotLocation(0,0,0)
+        self.changed = True
 
     def setStrategy(self, strategy):
-        self.strategy = strategy
+        if self.strategy != strategy:
+            self.strategy = strategy
+            self.changed = True
 
     def setFormation(self, formation):
-        self.formation = formation
+        if self.formation != formation:
+            self.formation = formation
+            self.changed = True
 
     def setRole(self, role):
-        self.role = role
+        if self.role != role:
+            self.role = role
+            self.changed = True
 
     def setSubRole(self, subRole):
-        self.subRole = subRole
+        if self.subRole != subRole:
+            self.subRole = subRole
+            self.changed = True
 
     def setPosition(self, position):
         self.position.x = position[0]

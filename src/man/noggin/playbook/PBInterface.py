@@ -13,17 +13,16 @@ class PBInterface:
         self.subRole = None
         self.lastSubRole = None
 
-    def update(self):
+    def update(self, play):
         '''
         Runs the playbook (calls the run method of GoTeam)
         '''
-        self.pb.run()
-        self.storeUsedValues()
-        return self.pb.play
+        self.pb.run(play)
+        self.storeUsedValues(play)
 
     def subRoleChanged(self):
         return (self.subRole != self.lastSubRole)
 
-    def storeUsedValues(self):
+    def storeUsedValues(self, play):
         self.lastSubRole = self.subRole
-        self.subRole = self.pb.play.subRole
+        self.subRole = play.subRole
