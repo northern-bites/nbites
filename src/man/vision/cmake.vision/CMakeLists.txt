@@ -38,7 +38,7 @@ SET( CMAKE_COLOR_MAKEFILE TRUE )
 # Ensure the TRUNK_PATH variable is set
 
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../../../ ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH ../../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )

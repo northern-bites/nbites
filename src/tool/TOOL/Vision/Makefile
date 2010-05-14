@@ -1,5 +1,7 @@
 PLATFORM := $(shell uname)
 META_DIR := ../..
+NBITES_DIR := $(META_DIR)/../..
+BUILD_DIR := $(NBITES_DIR)/build/tool
 DIR := TOOL/Vision
 TEST_CLASS := None
 
@@ -86,5 +88,5 @@ vision: $(NATIVE_VISION_TARGET)
 $(NATIVE_VISION_TARGET) : $(NATIVE_VISION_LIBS) $(NATIVE_VISION_SRCS)
 	@echo $(NATIVE_VISION_TARGET)
 	$(JAVAC) $(JAVA_OPTS) $(NATIVE_VISION_CLASS_FILE).java Ball.java VisualCorner.java VisualFieldObject.java LinePoint.java VisualLine.java Horizon.java
-	$(JAVAH) -jni -classpath $(META_DIR) $(NATIVE_VISION_JAVA_CLASS_NAME)
+	$(JAVAH) -jni -classpath $(BUILD_DIR) $(NATIVE_VISION_JAVA_CLASS_NAME)
 	$(CXX) -o $(NATIVE_VISION_TARGET) $(NATIVE_VISION_SRCS) $(NATIVE_VISION_LIBS)  $(VISION_SHARED_OPTS) $(VISION_INCLUDE) $(PYLIBS) $(COMPILE_TIME_DEFS)  

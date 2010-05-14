@@ -5,7 +5,11 @@
     tool ant build file
   </description>
   <!-- set global properties for this build -->
-  <property name="classpath" location="."/>
+  <property name="nbites.dir" location="../.."/>
+  <property name="build.dir" location="${nbites.dir}/build/tool"/>
+  <property name="src.dir" location="${nbites.dir}/src"/>
+  <property name="man.dir" location="${src.dir}/man"/>
+  <property name="classpath" location="${build.dir}"/>
 
   <!-- PATH structure that holds the classpath for the build-->
   <path id="tool.paths">
@@ -18,37 +22,49 @@
 
   <target name="compile"
           description="compile the source " >
-    <javac srcdir="." destdir="">
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${classes.dir}"/>
+    <javac srcdir="." destdir="${build.dir}">
       <classpath refid="tool.paths"/>
     </javac>
   </target>
 
-  <target name="vision.check">
-    <!-- check if we already have the TOOLVisionLink dynamic lib -->
-   <pathconvert property="vision.make" setonempty="false" pathsep=" ">
-    <path>
-      <fileset dir="."
-               includes="*TOOLVisionLink.*" />
-    </path>
-   </pathconvert>
-  </target>
-  
   <target name="vision"
-	  depends="vision.check"
-	  description="compile the TOOLVisionLink">
+      description="compile the TOOLVisionLink">
     <!-- at this point we just run an external calling make vision -->
     <!-- TODO unify the build systems -->
-    <exec executable="make">
+    <javah destdir="${build.dir}">
+      <classpath refid="tool.paths"/>
+      <class name="TOOL.Vision.TOOLVisionLink"/>
+    </javah>
+<!--exec executable="make">
       <arg value="vision"/>
+    </exec-->
+  </target>
+  
+  <property name="man.vision.build.dir" value="${build.dir}/man.vision"/>
+  <property name="straight.defs" value="-DOE_CROSS_BUILD=OFF -DSTRAIGHT=ON"/>
+  <property name="man.vision.dir" value="${man.dir}/vision"/>
+  <property name="man.vision.cmake.dir" value="${man.vision.dir}/cmake.vision"/>
+
+  <target name="man.vision"
+    description="build the man vision library">
+    <mkdir dir="${man.vision.build.dir}"/>
+    <exec executable="cmake" dir="${man.vision.build.dir}">
+      <arg value="${straight.defs}"/>
+      <arg value="${man.vision.cmake.dir}"/>
+    </exec>
+    <exec executable="command" dir="${man.vision.build.dir}" spawn="true">
+          <arg value="."/>
     </exec>
   </target>
 
   <target name="run"
-	  depends="compile,vision"
-	  description="runs the tool ">
+      depends="compile,vision"
+      description="runs the tool ">
     <java classname="TOOL.TOOL"
-	  fork="true"
-	  maxmemory="512m">
+      fork="true"
+      maxmemory="512m">
       <sysproperty key="java.library.path" value="./"/>
       <classpath refid="tool.paths"/>
       <arg value="-d32"/>
@@ -56,29 +72,28 @@
   </target>
 
   <!-- Clean up everything -->
-  <target name="clean.all"
-	  depends="clean.vision,clean"
-          description="clean up everything" >
+  <target name="clean.all">
+    <delete dir="${build.dir}"/>
   </target>
 
   <target name="clean.vision"
-	  description="clean VisionLink library">
+      description="clean VisionLink library">
     <delete>
       <fileset dir=".">
-	<!-- delete the TOOLVisionLink dynamic lib -->
-	<include name="*TOOLVisionLink.*"/>
-	<!-- delete the JNI header generated for the TOOLVisionLink -->
-	<include name="TOOL/**/*.h"/>
+    <!-- delete the TOOLVisionLink dynamic lib -->
+    <include name="*TOOLVisionLink.*"/>
+    <!-- delete the JNI header generated for the TOOLVisionLink -->
+    <include name="TOOL/**/*.h"/>
       </fileset>
     </delete>
   </target>
 
   <!-- Clean class files -->
   <target name="clean"
-	  description="clean .class files" >
+      description="clean .class files" >
     <delete>
       <fileset dir=".">
-	<include name="**/*.class"/>
+    <include name="**/*.class"/>
       </fileset>
     </delete>
   </target>
