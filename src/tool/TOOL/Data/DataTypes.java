@@ -1,4 +1,3 @@
-
 // This file is part of TOOL, a robotics interaction and development
 // package created by the Northern Bites RoboCup team of Bowdoin College
 // in Brunswick, Maine.
@@ -24,31 +23,33 @@ public class DataTypes {
 
     public static enum DataType {
         INFO,
-        JOINTS,
-        SENSORS,
-        IMAGE,
-        THRESH,
-        JPEG,
-        OBJECTS,
-        MOTION,
-        LOCAL,
-        COMM
-    }
+		JOINTS,
+		SENSORS,
+		IMAGE,
+		THRESH,
+		JPEG,
+		OBJECTS,
+		MOTION,
+		LOCAL,
+		COMM,
+		MMEKF
+		}
     public static final int LENGTH = DataType.values().length;
 
-    public static String title(DataType type) { 
+    public static String title(DataType type) {
         switch (type) {
-            case INFO:         return "Robot Info";
-            case JOINTS:       return "Joints";
-            case SENSORS:      return "Sensors";
-            case IMAGE:        return "Image";
-            case THRESH:       return "Thresh Image";
-            case JPEG:         return "JPEG Image";
-            case OBJECTS:      return "Objects";
-            case MOTION:       return "Motion";
-            case LOCAL:        return "Localization";
-            case COMM:         return "Comm";
-            default:           return "N/A";
+            case INFO:			return "Robot Info";
+            case JOINTS:		return "Joints";
+            case SENSORS:		return "Sensors";
+            case IMAGE:			return "Image";
+            case THRESH:		return "Thresh Image";
+            case JPEG:			return "JPEG Image";
+            case OBJECTS:		return "Objects";
+            case MOTION:		return "Motion";
+            case LOCAL:			return "Localization";
+            case COMM:			return "Comm";
+            case MMEKF:         return "Multimodal EKF";
+            default:			return "N/A";
         }
     }
 
@@ -57,4 +58,3 @@ public class DataTypes {
     }
 
 }
-
