@@ -254,7 +254,7 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     const float footAngleX = ankleAngleCompensation.get<0>();
     const float footAngleY = ankleAngleCompensation.get<1>();
     const float footAngleZ = getFootRotation_c()
-        + leg_sign*gait->stance[WP::LEG_ROT_Z]*0.5;
+        + static_cast<float>(leg_sign) * gait->stance[WP::LEG_ROT_Z] * 0.5f;
 
     const ufvector3 bodyOrientation = CoordFrame3D::vector3D(bodyAngleX,
                                                        bodyAngleY, 0.0f);
@@ -361,7 +361,7 @@ const float WalkingLeg::getFootRotation(){
 const float WalkingLeg::getFootRotation_c(){
     const float abs_rot =  std::abs(getFootRotation());
 
-    const float rot_rel_c = abs_rot*0.5*leg_sign;
+    const float rot_rel_c = abs_rot * 0.5f * static_cast<float>(leg_sign);
 
     return rot_rel_c;
 
@@ -516,7 +516,8 @@ WalkingLeg::getAnglesFromGoal(const ChainID chainID,
         const ufvector3 foot_orientation =
             CoordFrame3D::vector3D(0.0f,
                                    0.0f,
-                                   sign*stance[WP::LEG_ROT_Z]*0.5);
+                                   static_cast<float>(sign) *
+                                   stance[WP::LEG_ROT_Z]*0.5f);
         const ufvector3 body_goal =
             CoordFrame3D::vector3D(0.0f,0.0f,0.0f);
 

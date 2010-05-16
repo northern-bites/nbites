@@ -158,13 +158,13 @@ def shouldStopChaseLoc(player):
     elif (my.x > Constants.MY_GOALBOX_RIGHT_X + goalCon.END_CLEAR_BUFFER
           or my.y > Constants.MY_GOALBOX_TOP_Y + goalCon.END_CLEAR_BUFFER
           or my.y < Constants.MY_GOALBOX_BOTTOM_Y + goalCon.END_CLEAR_BUFFER) and \
-          (ball.locDist >= 10 or ball.dist >= 10):
+          (ball.dist >= 10):
           return True
 
     elif (my.x > Constants.MY_GOALBOX_RIGHT_X
           or my.y > Constants.MY_GOALBOX_TOP_Y
           or my.y < Constants.MY_GOALBOX_BOTTOM_Y) and \
-          (ball.locDist >= 30 or ball.dist >= 30):
+          (ball.dist >= 30):
           return True
 
     return False
@@ -185,7 +185,7 @@ def dangerousBall(player):
     if (ball.x < player.brain.my.x or
         player.brain.myGoalLeftPost.on or
         player.brain.myGoalRightPost.on or
-        player.brain.myGoalCrossbar.on) and ball.locDist <= 40:
+        player.brain.myGoalCrossbar.on) and ball.dist <= 40:
         return True
     #idea: draw ray from me to ball, see if it intersects goal
     return False

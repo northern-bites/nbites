@@ -13,27 +13,20 @@ def scanFindBall(player):
         player.brain.tracker.trackBall()
 
     if player.brain.play.isRole(GOALIE):
-        if transitions.shouldTurnToBall_FoundBall(player):
-            return player.goLater('turnToBall')
-        elif transitions.shouldSpinFindBall(player):
+        if transitions.shouldSpinFindBall(player):
             return player.goLater('spinFindBall')
     else:
         if transitions.shouldApproachBallWithLoc(player):
-            player.brain.tracker.trackBall()
-            return player.goLater('approachBallWithLoc')
-        elif transitions.shouldSpinFindBall(player):
-            return player.goLater('spinFindBall')
-        elif transitions.shouldTurnToBall_FoundBall(player):
-            return player.goLater('turnToBall')
+            return player.goLater('approachBall')
         elif transitions.shouldSpinFindBall(player):
             return player.goLater('spinFindBall')
 
-    if abs(player.brain.ball.locBearing) < constants.SCAN_FIND_BEARING_THRESH \
-            or player.brain.ball.locDist < constants.SCAN_FIND_DIST_THRESH \
+    if abs(player.brain.ball.bearing) < constants.SCAN_FIND_BEARING_THRESH \
+            or player.brain.ball.dist < constants.SCAN_FIND_DIST_THRESH \
             and not player.brain.play.isRole(GOALIE):
         return player.stay()
     elif player.brain.play.isRole(GOALIE) and \
-            abs(player.brain.ball.locBearing) <\
+            abs(player.brain.ball.bearing) <\
             constants.SCAN_FIND_BEARING_THRESH:
         return player.stay()
     elif player.firstFrame():
@@ -48,21 +41,15 @@ def spinFindBall(player):
 
     if player.brain.play.isRole(GOALIE):
         if transitions.shouldApproachBall(player):
-            player.brain.tracker.trackBall()
             return player.goLater('approachBall')
-        elif transitions.shouldTurnToBall_FoundBall(player):
-            return player.goLater('turnToBall')
     else:
         if transitions.shouldApproachBallWithLoc(player):
-            player.brain.tracker.trackBall()
-            return player.goLater('approachBallWithLoc')
-        elif transitions.shouldApproachBall(player):
-            player.brain.tracker.trackBall()
             return player.goLater('approachBall')
-        elif transitions.shouldTurnToBall_FoundBall(player):
-            return player.goLater('turnToBall')
+        elif transitions.shouldApproachBall(player):
+            return player.goLater('approachBall')
         elif transitions.shouldWalkToBallLocPos(player):
-            return player.goLater('walkToBallLocPos')
+            return player.goLater('approachBall')
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
@@ -71,26 +58,8 @@ def spinFindBall(player):
         else:
             my = player.brain.my
             ball = player.brain.ball
-            spinDir = my.spinDirToHeading(my.h + ball.locBearing)
+            spinDir = my.spinDirToHeading(my.h + ball.bearing)
 
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
-    return player.stay()
-
-def walkToBallLocPos(player):
-    player.brain.tracker.trackBall()
-    if transitions.shouldApproachBallWithLoc(player):
-        player.brain.tracker.trackBall()
-        return player.goLater('approachBallWithLoc')
-    elif transitions.shouldTurnToBall_FoundBall(player):
-        return player.goLater('turnToBall')
-
-    ball = player.brain.ball
-    destH = player.brain.my.getTargetHeading(ball)
-    dest = RobotLocation(ball.x, ball.y, destH)
-
-    nav = player.brain.nav
-    if player.firstFrame() or \
-            nav.dest != dest:
-        nav.goTo(dest)
     return player.stay()

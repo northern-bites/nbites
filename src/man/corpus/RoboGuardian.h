@@ -108,7 +108,7 @@ private:
 
     mutable pthread_mutex_t click_mutex;
     static const int GUARDIAN_FRAME_RATE;
-    static const float GUARDIAN_FRAME_LENGTH_uS;
+    static const int GUARDIAN_FRAME_LENGTH_uS;
 
 
 };

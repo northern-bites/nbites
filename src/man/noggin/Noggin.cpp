@@ -7,6 +7,8 @@
 #include "PyLoc.h"
 #include "EKFStructs.h"
 #include <cstdlib>
+#include "MMLocEKF.h"
+#include "LocEKF.h"
 
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
@@ -128,7 +130,12 @@ void Noggin::initializeLocalization()
 #   endif
 
     // Initialize the localization modules
-    loc = shared_ptr<LocEKF>(new LocEKF());
+#ifdef USE_MM_LOC_EKF
+    loc = shared_ptr<LocSystem>(new MMLocEKF());
+#else
+    loc = shared_ptr<LocSystem>(new LocEKF());
+#endif
+
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers
@@ -424,7 +431,7 @@ void Noggin::updateLocalization()
         if (!(n.ballX == 0.0 && n.ballY == 0.0) &&
             !(gc->gameState() == STATE_INITIAL ||
               gc->gameState() == STATE_FINISHED)) {
-            m.distance = hypot(loc->getXEst() - n.ballX,
+            m.distance = hypotf(loc->getXEst() - n.ballX,
                                loc->getYEst() - n.ballY);
             m.bearing = subPIAngle(atan2(n.ballY - loc->getYEst(),
                                          n.ballX - loc->getXEst()) -
@@ -538,19 +545,19 @@ void Noggin::modifySysPath ()
     // Enter the current working directory into the python module path
     //
 #if ROBOT(NAO)
-#if defined OFFLINE || defined STRAIGHT
-    const char *cwd = "/usr/local/nao/modules/lib";
-#else
 #  ifdef WEBOTS_BACKEND
-    const string test = std::string(getenv("WEBOTS_HOME")) +
-        std::string("/projects/contests") +
-        std::string("/nao_robocup/controllers/nao_soccer_player_red/lib");
-    const char *cwd = test.c_str();
+     const string test = std::string(getenv("WEBOTS_HOME")) +
+         std::string("/projects/contests") +
+         std::string("/nao_robocup/controllers/nao_soccer_player_red/lib");
+     const char *cwd = test.c_str();
 #  else //WEBOTS
-    //    const char *cwd = "/opt/naoqi/modules/lib";
-    const char *cwd = "/home/nao/naoqi/lib/naoqi";
+#    if defined OFFLINE || defined STRAIGHT
+       const char *cwd = "/usr/local/nao/modules/lib";
+#    else
+       //    const char *cwd = "/opt/naoqi/modules/lib";
+       const char *cwd = "/home/nao/naoqi/lib/naoqi";
+#    endif
 #  endif
-#endif
 #else//ROBOT(NAO)
     const char *cwd = get_current_dir_name();
 #endif

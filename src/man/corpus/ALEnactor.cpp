@@ -52,8 +52,9 @@ void ALEnactor::run() {
             //Don't sleep at all
         } else{
 			interval.tv_sec = 0;
-			interval.tv_nsec = static_cast<long long int>(MOTION_FRAME_LENGTH_uS
-														  - static_cast<float>(processTime));
+			interval.tv_nsec = static_cast<long int>(
+                static_cast<long long int>(MOTION_FRAME_LENGTH_uS)
+                - processTime);
 			nanosleep(&interval,&remainder);
         }
 #endif

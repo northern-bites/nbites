@@ -1,5 +1,3 @@
-
-
 #######################################
 ##  Build configurations for Noggin. ##
 #######################################
@@ -17,25 +15,29 @@
 
 # See documentation strings for descriptions
 SET(
-    @PYTHON_PLAYER@  pNone
-    CACHE STRING
-    "Choose the player to be imported in Switch.py"
-    )
+  @PYTHON_PLAYER@  pNone
+  CACHE STRING
+  "Choose the player to be imported in Switch.py"
+  )
 # DO NOT add any cache settings or documentation to this variable
 #  It is included directly in source files and such things will come
 #  along with it
 SET(
-    PYTHON_PLAYER ${@PYTHON_PLAYER@}
-    )
+  PYTHON_PLAYER ${@PYTHON_PLAYER@}
+  )
 OPTION(
-    DEBUG_NOGGIN_INITIALIZATION
-    "Print about the initialization of the Man class"
-    ON
-    )
+  DEBUG_NOGGIN_INITIALIZATION
+  "Print about the initialization of the Man class"
+  ON
+  )
 OPTION(
-    USE_NOGGIN_AUTO_HALT
-    "Make noggin halt brain run() calls until a reload after an error"
-    ON
-    )
+  USE_NOGGIN_AUTO_HALT
+  "Make noggin halt brain run() calls until a reload after an error"
+  ON
+  )
 
-
+OPTION(
+  USE_MM_LOC_EKF
+  "Use the Multimodal EKF instead of a single LocEKF"
+  OFF
+  )

@@ -3,10 +3,12 @@ import time
 from .VisualObject import VisualObject
 from .. import NogginConstants as Constants
 from ..util.MyMath import (getRelativeVelocityX,
-                          getRelativeVelocityY,
-                          getRelativeX,
-                          getRelativeY)
+                           getRelativeVelocityY,
+                           getRelativeX,
+                           getRelativeY,
+                           sub180Angle)
 
+FRAMES_AFTER_LOST_BALL_TO_USE_VISION = 10
 
 class Ball(VisualObject):
     """
@@ -41,8 +43,11 @@ class Ball(VisualObject):
          self.sd,
          self.velX,
          self.velY,
+         self.bearing,
+         self.dist,
          self.uncertVelX,
          self.uncertVelY,
+         self.heading,
          self.locDist,
          self.locBearing,
          self.locRelX,
@@ -66,31 +71,33 @@ class Ball(VisualObject):
     def updateVision(self,visionBall):
         """update method gets list of vision updated information"""
         # Hold our history
-        self.lastVisionDist = self.dist
-        self.lastVisionBearing = self.bearing
+        self.lastVisionDist = self.visDist
+        self.lastVisionBearing = self.visBearing
         self.lastVisionCenterX = self.centerX
         self.lastVisionCenterY = self.centerY
         self.lastVisionAngleX = self.angleX
         self.lastVisionAngleY = self.angleY
 
-        if self.dist > 0:
-            self.lastSeenBearing = self.bearing
-            self.lastSeenDist = self.dist
-            if not self.on:
+        # ball was on last frame (visDist already updated, self.on not)
+        if self.visDist > 0:
+            self.lastSeenBearing = self.visBearing
+            self.lastSeenDist = self.visDist
+            if not self.on: # ball wasn't on last frame
                 self.prevFramesOff = self.framesOff
         else:
             if self.on:
                 self.prevFramesOn = self.framesOn
 
         # Now update to the new stuff
+        # self.on updated in visualObject
         VisualObject.updateVision(self, visionBall)
         self.elevation = visionBall.elevation
         self.confidence = visionBall.confidence
 
-        if self.dist > 0:
+        if self.on:
             self.reportBallSeen()
-            self.relX = getRelativeX(self.dist, self.bearing)
-            self.relY = getRelativeY(self.dist, self.bearing)
+            self.relX = getRelativeX(self.visDist, self.visBearing)
+            self.relY = getRelativeY(self.visDist, self.visBearing)
         else:
             self.relX = 0.0
             self.relY = 0.0
@@ -131,18 +138,33 @@ class Ball(VisualObject):
         self.sd = self.uncertX * self.uncertY
 
         # Determine other values
-        self.locDist = my.dist(self)
-        self.locBearing = my.getRelativeBearing(self)
+        self.locDist = my.dist(self, forceCalc=True)
+        self.locBearing = my.getRelativeBearing(self, forceCalc=True)
         self.locRelX = getRelativeX(self.locDist, self.locBearing)
         self.locRelY = getRelativeY(self.locDist, self.locBearing)
         self.relVelX = getRelativeVelocityX(my.h, self.velX, self.velY)
         self.relVelY = getRelativeVelocityY(my.h, self.velX, self.velY)
 
+    def updateBestValues(self, my):
+        if self.on:
+            self.bearing = self.visBearing
+            self.dist = self.visDist
+            self.heading = sub180Angle(my.h + self.bearing)
+
+        # use old vision data for several frames after we last see the ball.
+        elif self.framesOff <= FRAMES_AFTER_LOST_BALL_TO_USE_VISION:
+            pass
+
+        else:
+            self.bearing = self.locBearing
+            self.dist = self.locDist
+            # uses my.x, my.y which are loc determined to get heading
+            self.heading = my.getTargetHeading(self)
+        # TODO: use vision bearing + my heading if ball.on
+
     def __str__(self):
         """returns string with all class variables"""
-        return (" loc: (%g,%g) uncert: (%g,%g) sd: %g vel (%g,%g) dist: %g \
-        bearing: %g \n \
-        vision: elevation: %g" %
+        return (" loc: (%g,%g) uncert: (%g,%g) sd: %g vel (%g,%g) dist: %g bearing: %g vision: elevation: %g" %
                 (self.x,self.y,self.uncertX,self.uncertY,self.sd,
-                 self.velX,self.velY, self.locDist, self.locBearing, self.elevation)
+                 self.velX,self.velY, self.dist, self.bearing, self.elevation)
                 + VisualObject.__str__(self) )
