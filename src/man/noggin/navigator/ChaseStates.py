@@ -1,5 +1,6 @@
 from . import NavHelper as helper
 from . import WalkHelper as walker
+from . import NavTransitions as navTrans
 from ..navigator import BrunswickSpeeds as speeds
 from math import (sin, cos)
 from ..util import MyMath
@@ -18,7 +19,7 @@ def walkSpinToBall(nav):
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     #if we're close to the ball...
-    if helper.atDestinationCloser(nav.brain.my, nav.dest):
+    if navTrans.atDestinationCloser(nav.brain.my, nav.dest):
         # and facing  it, stop
         if abs(ball.bearing) < 10:
             return nav.goNow('stop')

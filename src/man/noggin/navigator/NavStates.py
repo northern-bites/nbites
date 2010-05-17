@@ -4,6 +4,7 @@ from ..util import MyMath
 from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
+from . import NavTransitions as navTrans
 from ..playbook.PBConstants import GOALIE
 from math import fabs
 
@@ -35,7 +36,7 @@ def walkStraightToPoint(nav):
         nav.walkToPointSpinCount = 0
 
     my = nav.brain.my
-    if helper.atDestinationCloser(my, nav.dest):
+    if navTrans.atDestinationCloser(my, nav.dest):
         nav.walkToPointCount += 1
     else :
         nav.walkToPointCount = 0
@@ -45,7 +46,7 @@ def walkStraightToPoint(nav):
 
     destH = nav.brain.my.headingTo(nav.dest)
 
-    if not helper.atHeadingGoTo(my, destH):
+    if not navTrans.atHeadingGoTo(my, destH):
         nav.walkToPointSpinCount += 1
         if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH + 25:
             return nav.goLater('spinToWalkHeading')
@@ -84,7 +85,7 @@ def spinToWalkHeading(nav):
                              str(nav.brain.my.h)+
                              " and my target h: " + str(targetH))
 
-    if helper.atHeadingGoTo(my, targetH):
+    if navTrans.atHeadingGoTo(my, targetH):
         nav.stopSpinToWalkCount += 1
         if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
             return nav.goLater('walkStraightToPoint')
@@ -94,12 +95,12 @@ def spinToWalkHeading(nav):
 
     headingDiff = fabs(nav.brain.my.h - targetH)
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
-        helper.getRotScale(headingDiff)
+        walker.getRotScale(headingDiff)
 
     if sTheta != nav.walkTheta:
         helper.setSpeed(nav, 0, 0, sTheta)
 
-    if helper.atDestinationCloser(my, nav.dest):
+    if navTrans.atDestinationCloser(my, nav.dest):
         return nav.goLater('spinToFinalHeading')
 
     return nav.stay()
@@ -121,9 +122,9 @@ def spinToFinalHeading(nav):
                    % (targetH, headingDiff, nav.brain.my.uncertH))
     spinDir = nav.brain.my.spinDirToHeading(targetH)
 
-    spin = spinDir*constants.GOTO_SPIN_SPEED*helper.getRotScale(headingDiff)
+    spin = spinDir*constants.GOTO_SPIN_SPEED*walker.getRotScale(headingDiff)
 
-    if helper.atHeading(nav.brain.my, targetH):
+    if navTrans.atHeading(nav.brain.my, targetH):
         nav.stopSpinToWalkCount += 1
     else:
         nav.stopSpinToWalkCount = 0
@@ -140,10 +141,10 @@ def omniWalkToPoint(nav):
     if nav.firstFrame():
         nav.walkToPointCount = 0
     if nav.brain.play.isRole(GOALIE):
-        if helper.atDestinationGoalie(my, dest) and helper.atHeading(my, dest.h):
+        if navTrans.atDestinationGoalie(my, dest) and navTrans.atHeading(my, dest.h):
             return nav.goNow('stop')
     else:
-        if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
+        if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
             return nav.goNow('stop')
 
     walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
