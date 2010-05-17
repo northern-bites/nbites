@@ -41,9 +41,10 @@ class Navigator(FSA.FSA):
     def chaseBall(self):
         """
         robot will walk to the ball with it centered at his feet.
-        if no ball is visible, localization will be used
+        if no ball is visible, localization will be usedn
         """
-        if not self.currentState == 'walkSpinToBall':
+        if not self.currentState == 'walkSpinToBall' and \
+               not self.currentState == 'chaseAroundBox':
             self.switchTo('walkSpinToBall')
 
     def kickPosition(self):
