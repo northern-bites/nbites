@@ -1,5 +1,6 @@
 from . import NavConstants as constants
 from . import NavHelper as helper
+from . import WalkHelper as walker
 from ..playbook.PBConstants import GOALIE
 
 DEBUG = False
@@ -22,7 +23,7 @@ def playbookWalk(nav):
 
     dest.h = my.headingTo(dest)
 
-    walkX, walkY, walkTheta = helper.getWalkSpinParam(my, dest)
+    walkX, walkY, walkTheta = walker.getWalkSpinParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     # this order is important! the other way he will attempt to spin and walk
@@ -51,7 +52,7 @@ def playbookOmni(nav):
         if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
             return nav.goNow('stop')
 
-    walkX, walkY, walkTheta = helper.getOmniWalkParam(my, dest)
+    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     if not helper.useFinalHeading(nav.brain, dest):

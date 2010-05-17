@@ -3,6 +3,7 @@
 from ..util import MyMath
 from . import NavConstants as constants
 from . import NavHelper as helper
+from . import WalkHelper as walker
 from ..playbook.PBConstants import GOALIE
 from math import fabs
 
@@ -52,7 +53,7 @@ def walkStraightToPoint(nav):
     else :
         nav.walkToPointSpinCount = 0
 
-    walkX, walkY, walkTheta = helper.getWalkStraightParam(my, nav.dest)
+    walkX, walkY, walkTheta = walker.getWalkStraightParam(my, nav.dest)
 
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
@@ -145,7 +146,7 @@ def omniWalkToPoint(nav):
         if helper.atDestinationCloser(my, dest) and helper.atHeading(my, dest.h):
             return nav.goNow('stop')
 
-    walkX, walkY, walkTheta = helper.getOmniWalkParam(my, dest)
+    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     return nav.stay()
