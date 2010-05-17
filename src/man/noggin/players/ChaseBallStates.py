@@ -3,14 +3,11 @@ Here we house all of the state methods used for chasing the ball
 """
 from man.noggin.util import MyMath
 from man.motion import SweetMoves
-from man.noggin.typeDefs.Location import RobotLocation
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 import KickingHelpers
 import GoalieTransitions as goalTran
-from .. import NogginConstants
 from ..playbook.PBConstants import GOALIE
-from math import fabs
 
 def chase(player):
     """
@@ -107,11 +104,7 @@ def approachBallWalk(player):
     """
 
     if not player.brain.play.isRole(GOALIE):
-        if transitions.shouldNotGoInBox(player):
-            return player.goLater('ballInMyBox')
-        elif transitions.shouldChaseAroundBox(player):
-            return player.goLater('chaseAroundBox')
-        elif not player.brain.tracker.activeLocOn and \
+        if not player.brain.tracker.activeLocOn and \
                 transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
         elif player.brain.tracker.activeLocOn and \
@@ -245,65 +238,6 @@ def avoidObstacle(player):
 
     return player.stay()
 
-def chaseAroundBox(player):
-    if player.firstFrame():
-        player.shouldNotChaseAroundBox = 0
-
-        player.brain.CoA.setRobotGait(player.brain.motion)
-
-    if transitions.shouldKick(player):
-        return player.goNow('waitBeforeKick')
-    elif transitions.shouldScanFindBall(player):
-        return player.goLater('scanFindBall')
-    elif transitions.shouldAvoidObstacle(player): # Has potential to go into box!
-        return player.goLater('avoidObstacle')
-
-    if not transitions.shouldChaseAroundBox(player):
-        player.shouldChaseAroundBox += 1
-    else :
-        player.shouldChaseAroundBox = 0
-    if player.shouldChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
-        return player.goLater('chase')
-
-    ball = player.brain.ball
-    my = player.brain.my
-    if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
-        # go to corner nearest ball
-        if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
-            player.brain.nav.goTo(
-                RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X +
-                              constants.GOALBOX_OFFSET,
-                              NogginConstants.MY_GOALBOX_TOP_Y +
-                              constants.GOALBOX_OFFSET,
-                              NogginConstants.MY_GOAL_HEADING ))
-
-        if ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
-            player.brain.nav.goTo(
-                RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X +
-                              constants.GOALBOX_OFFSET,
-                              NogginConstants.MY_GOALBOX_BOTTOM_Y -
-                              constants.GOALBOX_OFFSET,
-                              NogginConstants.MY_GOAL_HEADING ))
-
-    if my.x < NogginConstants.MY_GOALBOX_RIGHT_X:
-        # go to corner nearest ball
-        if my.y > NogginConstants.MY_GOALBOX_TOP_Y:
-            player.brain.nav.goTo(
-                RobotLocation( NogginConstants.MY_GOALBOX_RIGHT_X +
-                               constants.GOALBOX_OFFSET,
-                               NogginConstants.MY_GOALBOX_TOP_Y +
-                               constants.GOALBOX_OFFSET,
-                               NogginConstants.MY_GOAL_HEADING ))
-
-        if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
-            player.brain.nav.goTo(
-                RobotLocation( NogginConstants.MY_GOALBOX_RIGHT_X +
-                               constants.GOALBOX_OFFSET,
-                               NogginConstants.MY_GOALBOX_BOTTOM_Y -
-                               constants.GOALBOX_OFFSET,
-                               NogginConstants.MY_GOAL_HEADING ))
-    return player.stay()
-
 def steps(player):
     if player.brain.nav.isStopped():
         player.setSteps(3,3,0,5)
@@ -311,20 +245,6 @@ def steps(player):
         player.stopWalking()
     return player.stay()
 
-def ballInMyBox(player):
-    if player.firstFrame():
-        player.brain.tracker.activeLoc()
-        player.brain.CoA.setRobotGait(player.brain.motion)
-
-    ball = player.brain.ball
-    if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
-        player.setWalk(0, 0, constants.BALL_SPIN_SPEED *
-                        MyMath.sign(ball.bearing) )
-    elif fabs(ball.bearing) < constants.BALL_APPROACH_BEARING_OFF_THRESH :
-        player.stopWalking()
-    if not player.ball.inMyGoalBox():
-        return player.goLater('chase')
-    return player.stay()
 # TODO
 def approachDangerousBall(player):
     if player.firstFrame():
