@@ -15,9 +15,9 @@ VisualCorner::VisualCorner(const int _x, const int _y,
     : VisualDetection(_x, _y, _distance, _bearing),
       VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
       possibleCorners(ConcreteCorner::concreteCorners().begin(),
-					  ConcreteCorner::concreteCorners().end()),
-	  cornerType(UNKNOWN), line1(l1), line2(l2),
-	  lines(), t1(_t1), t2(_t2),
+                      ConcreteCorner::concreteCorners().end()),
+      cornerType(UNKNOWN), line1(l1), line2(l2),
+      lines(), t1(_t1), t2(_t2),
       // Technically the initialization of tBar and tStem is incorrect here for
       // which we apologize. It's a hack, but the true values of tBar and tStem
       // will get assigned in determineCornerShape which is right here in the
@@ -25,8 +25,8 @@ VisualCorner::VisualCorner(const int _x, const int _y,
       tBar(line1), tStem(line2),
       angleBetweenLines(0)
 {
-	lines.push_back(line1);
-	lines.push_back(line2);
+    lines.push_back(line1);
+    lines.push_back(line2);
     determineCornerShape();
 
     // Calculate and set the standard deviation of the measurements
@@ -41,7 +41,7 @@ VisualCorner::VisualCorner(const VisualCorner& other)
       possibleCorners(other.possibleCorners),
       cornerType(other.cornerType),
       line1(other.line1), line2(other.line2), lines(other.lines),
-	  t1(other.t1), t2(other.t2),
+      t1(other.t1), t2(other.t2),
       tBar(other.tBar), tStem(other.tStem),
       angleBetweenLines(other.angleBetweenLines)
 {
@@ -101,10 +101,10 @@ const shape VisualCorner::getLClassification() {
     // to direct our line segment away from the corner)
     point <int> line1End, line2End;
 
-	const point<int> corner(cornerX, cornerY);
+    const point<int> corner(cornerX, cornerY);
 
-	const point<int> end1 = line1->getEndpoint();
-	const point<int> start1 = line1->getStartpoint();
+    const point<int> end1 = line1->getEndpoint();
+    const point<int> start1 = line1->getStartpoint();
     // corner is closer to start point of line 1
     if (Utility::getLength(corner, start1) < Utility::getLength(corner, end1)) {
         line1End = line1->getEndpoint();
@@ -117,8 +117,8 @@ const shape VisualCorner::getLClassification() {
         line1Basis.second *= -1;
     }
 
-	const point<int> start2 = line2->getStartpoint();
-	const point<int> end2 = line2->getEndpoint();
+    const point<int> start2 = line2->getStartpoint();
+    const point<int> end2 = line2->getEndpoint();
     // corner is closer to start point of line 2
     if (Utility::getLength(corner, start2) < Utility::getLength(corner, end2)) {
         line2End = line2->getEndpoint();
@@ -135,9 +135,9 @@ const shape VisualCorner::getLClassification() {
     // By this point, we now have the actual vector representations of the lines
     // and can calculate theta
     float dotProduct = static_cast<float>( (line1Basis.first *
-											 line2Basis.first) +
-										   (line1Basis.second *
-											 line2Basis.second) );
+                                             line2Basis.first) +
+                                           (line1Basis.second *
+                                             line2Basis.second) );
 
     // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
     // -> ...
@@ -236,52 +236,52 @@ const shape VisualCorner::getLClassification() {
  */
 void VisualCorner::identifyLinesInCorner()
 {
-	// Check lines in positively identified corners
-	if (hasPositiveID()) {
-		const ConcreteCorner * corner = possibleCorners.front();
-		if (cornerType == T) {
-			tBar->setPossibleLines(corner->getTBar());
-			tStem->setPossibleLines(corner->getTStem());
-		} else {
-			// The best we can do is say that we know it's one of
-			// the two lines in this corner
-			line1->setPossibleLines(corner->getLines());
-			line2->setPossibleLines(corner->getLines());
-		}
-		return;
-	} else if (possibleCorners.size() < ConcreteCorner::NUM_CORNERS){
-		list<const ConcreteLine*> possibilites;
-		list<const ConcreteCorner*>::const_iterator c;
-		// for (c = possibleCorners.begin();
-		// 	 c != possibleCorners.end();
-		// 	 ++c){
-		// 	possibilites.insert(possibilites.end(),
-		// 						(*c)->getLines().begin(),
-		// 						(*c)->getLines().end());
+    // Check lines in positively identified corners
+    if (hasPositiveID()) {
+        const ConcreteCorner * corner = possibleCorners.front();
+        if (cornerType == T) {
+            tBar->setPossibleLines(corner->getTBar());
+            tStem->setPossibleLines(corner->getTStem());
+        } else {
+            // The best we can do is say that we know it's one of
+            // the two lines in this corner
+            line1->setPossibleLines(corner->getLines());
+            line2->setPossibleLines(corner->getLines());
+        }
+        return;
+    } else if (possibleCorners.size() < ConcreteCorner::NUM_CORNERS){
+        list<const ConcreteLine*> possibilites;
+        list<const ConcreteCorner*>::const_iterator c;
+        // for (c = possibleCorners.begin();
+        //   c != possibleCorners.end();
+        //   ++c){
+        //  possibilites.insert(possibilites.end(),
+        //                      (*c)->getLines().begin(),
+        //                      (*c)->getLines().end());
 
-		// }
-		// line1->setPossibleLines(possibilites);
-		// line2->setPossibleLines(possibilites);
-	}
+        // }
+        // line1->setPossibleLines(possibilites);
+        // line2->setPossibleLines(possibilites);
+    }
 
-	// Use the shape of the corner to identify the lines
-	if (cornerType == T){
-		tBar->setPossibleLines(ConcreteLine::tBarLines());
-		tStem->setPossibleLines(ConcreteLine::tStemLines());
-	} else if (cornerType == INNER_L || cornerType == OUTER_L) {
-		line1->setPossibleLines(ConcreteLine::lCornerLines());
-		line2->setPossibleLines(ConcreteLine::lCornerLines());
-	}
+    // Use the shape of the corner to identify the lines
+    if (cornerType == T){
+        tBar->setPossibleLines(ConcreteLine::tBarLines());
+        tStem->setPossibleLines(ConcreteLine::tStemLines());
+    } else if (cornerType == INNER_L || cornerType == OUTER_L) {
+        line1->setPossibleLines(ConcreteLine::lCornerLines());
+        line2->setPossibleLines(ConcreteLine::lCornerLines());
+    }
 }
 
 // See if any corners have a line that was positively identified,
 // and use that to limit the number of possible corners that it be
 void VisualCorner::identifyFromLines()
 {
-	if (line1->hasPositiveID())
-		IDFromLine(line1);
-	if (line2->hasPositiveID())
-		IDFromLine(line2);
+    if (line1->hasPositiveID())
+        IDFromLine(line1);
+    if (line2->hasPositiveID())
+        IDFromLine(line2);
 }
 
 /**
@@ -292,22 +292,22 @@ void VisualCorner::identifyFromLines()
  */
 void VisualCorner::IDFromLine(const shared_ptr<VisualLine> line)
 {
-	// We don't want to use an ambiguous line, or
-	// change the ID an a corner that has already been identified
-	if (!line->hasPositiveID() || hasPositiveID())
-		return;
-	const ConcreteLine* concreteLine = line->getPossibleLines().front();
+    // We don't want to use an ambiguous line, or
+    // change the ID an a corner that has already been identified
+    if (!line->hasPositiveID() || hasPositiveID())
+        return;
+    const ConcreteLine* concreteLine = line->getPossibleLines().front();
 
-	const vector <const ConcreteCorner*> concretes =
-		ConcreteCorner::concreteCorners();
+    const vector <const ConcreteCorner*> concretes =
+        ConcreteCorner::concreteCorners();
 
-	list<const ConcreteCorner*> possibles;
-	vector<const ConcreteCorner*>::const_iterator i = concretes.begin();
-	for ( ; i != concretes.end() ; ++i){
-		if ((*i)->isLineInCorner(concreteLine))
-			possibles.push_back(*i);
-	}
-	setPossibleCorners(possibles);
+    list<const ConcreteCorner*> possibles;
+    vector<const ConcreteCorner*>::const_iterator i = concretes.begin();
+    for ( ; i != concretes.end() ; ++i){
+        if ((*i)->isLineInCorner(concreteLine))
+            possibles.push_back(*i);
+    }
+    setPossibleCorners(possibles);
 }
 
 /**
@@ -361,36 +361,36 @@ void VisualCorner::determineCornerIDFromShape()
 
 const bool VisualCorner::hasPositiveID()
 {
-	return possibleCorners.size() == 1;
+    return possibleCorners.size() == 1;
 }
 
 void VisualCorner::setPossibleCorners(
-	std::list <const ConcreteCorner *> _possibleCorners)
+    std::list <const ConcreteCorner *> _possibleCorners)
 {
-	list<const ConcreteCorner*> updated(0);
+    list<const ConcreteCorner*> updated(0);
 
-	for (list<const ConcreteCorner*>::const_iterator
-			 currCorner = possibleCorners.begin();
-		 currCorner != possibleCorners.end(); currCorner++) {
+    for (list<const ConcreteCorner*>::const_iterator
+             currCorner = possibleCorners.begin();
+         currCorner != possibleCorners.end(); currCorner++) {
 
-		for ( list<const ConcreteCorner*>::iterator
-				  newCorner = _possibleCorners.begin();
-			  newCorner != _possibleCorners.end() ; ) {
+        for ( list<const ConcreteCorner*>::iterator
+                  newCorner = _possibleCorners.begin();
+              newCorner != _possibleCorners.end() ; ) {
 
-			// If the line is in both sets, then it's still a
-			// possible corner
-			if (**newCorner == **currCorner) {
-				updated.push_back(*newCorner);
-				newCorner = _possibleCorners.erase(newCorner);
-				break;
-			} else {
-				// Increment the iterator if we don't erase a corner
-				newCorner++;
-			}
-		}
-	}
-	if (updated.size() > 0)
-		possibleCorners = updated;
+            // If the line is in both sets, then it's still a
+            // possible corner
+            if (**newCorner == **currCorner) {
+                updated.push_back(*newCorner);
+                newCorner = _possibleCorners.erase(newCorner);
+                break;
+            } else {
+                // Increment the iterator if we don't erase a corner
+                newCorner++;
+            }
+        }
+    }
+    if (updated.size() > 0)
+        possibleCorners = updated;
 }
 
 /**
@@ -401,28 +401,28 @@ void VisualCorner::setPossibleCorners(
 void VisualCorner::
 setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
 {
-	list<const ConcreteCorner*> updated(0);
+    list<const ConcreteCorner*> updated(0);
 
-	for (list<const ConcreteCorner*>::const_iterator
-			 currCorner = possibleCorners.begin();
-		 currCorner != possibleCorners.end(); currCorner++) {
+    for (list<const ConcreteCorner*>::const_iterator
+             currCorner = possibleCorners.begin();
+         currCorner != possibleCorners.end(); currCorner++) {
 
-		for ( vector<const ConcreteCorner*>::iterator
-				  newCorner = _possibleCorners.begin();
-			  newCorner != _possibleCorners.end() ; ) {
+        for ( vector<const ConcreteCorner*>::iterator
+                  newCorner = _possibleCorners.begin();
+              newCorner != _possibleCorners.end() ; ) {
 
-			// If the line is in both sets, then it's still a
-			// possible corner
-			if (**newCorner == **currCorner) {
-				updated.push_back(*newCorner);
-				newCorner = _possibleCorners.erase(newCorner);
-				break;
-			} else {
-				// Increment the iterator if we don't erase a corner
-				newCorner++;
-			}
-		}
-	}
-	if (updated.size() > 0)
-		possibleCorners = updated;
+            // If the line is in both sets, then it's still a
+            // possible corner
+            if (**newCorner == **currCorner) {
+                updated.push_back(*newCorner);
+                newCorner = _possibleCorners.erase(newCorner);
+                break;
+            } else {
+                // Increment the iterator if we don't erase a corner
+                newCorner++;
+            }
+        }
+    }
+    if (updated.size() > 0)
+        possibleCorners = updated;
 }

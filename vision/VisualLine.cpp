@@ -17,7 +17,7 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
-					ConcreteLine::concreteLines().end())
+                    ConcreteLine::concreteLines().end())
 {
     for (list<list<linePoint>::iterator>::iterator i = nodes.begin();
          i != nodes.end(); i++) {
@@ -29,18 +29,18 @@ VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
 
 VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
-					ConcreteLine::concreteLines().end())
+                    ConcreteLine::concreteLines().end())
 {
 
 }
 
 VisualLine::VisualLine(float _dist, float _bearing) :
-	VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
+    VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
-					ConcreteLine::concreteLines().end())
+                    ConcreteLine::concreteLines().end())
 {
-	setDistanceWithSD(_dist);
-	setBearingWithSD(_bearing);
+    setDistanceWithSD(_dist);
+    setBearingWithSD(_bearing);
 }
 
 
@@ -50,7 +50,7 @@ VisualLine::VisualLine(float _dist, float _bearing) :
 VisualLine::VisualLine(list<linePoint> &linePoints)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
-					ConcreteLine::concreteLines().end())
+                    ConcreteLine::concreteLines().end())
 {
     for (list<linePoint>::iterator i = linePoints.begin();
          i != linePoints.end(); i++) {
@@ -64,12 +64,12 @@ VisualLine::VisualLine(list<linePoint> &linePoints)
 VisualLine::VisualLine(const VisualLine& other)
     : VisualLandmark<lineID>(other),
       start(other.start), end(other.end), leftBound(other.leftBound),
-	  rightBound(other.rightBound),
+      rightBound(other.rightBound),
       bottomBound(other.bottomBound),
-	  topBound(other.topBound),
-	  points(other.points),
+      topBound(other.topBound),
+      points(other.points),
       angle(other.angle), length(other.length),
-	  a(other.a), b(other.b),
+      a(other.a), b(other.b),
       color(other.color), colorStr(other.colorStr),
       avgVerticalWidth(other.avgVerticalWidth),
       avgHorizontalWidth(other.avgHorizontalWidth),
@@ -246,8 +246,8 @@ void VisualLine::calculateWidths()
  */
 void VisualLine::setColor(const int c)
 {
-	color = c;
-	setColorString(Utility::getColorString(c));
+    color = c;
+    setColorString(Utility::getColorString(c));
 }
 
 /**
@@ -256,9 +256,9 @@ void VisualLine::setColor(const int c)
 const float VisualLine::calcLength() const
 {
     return Utility::getLength( static_cast<float>(start.x),
-							   static_cast<float>(start.y),
+                               static_cast<float>(start.y),
                                static_cast<float>(end.x),
-							   static_cast<float>(end.y) );
+                               static_cast<float>(end.y) );
 }
 
 /**
@@ -335,10 +335,10 @@ VisualLine::leastSquaresFit(const vector<linePoint> &thePoints)
       }*/
 
     const float b = ((ySum * xSquaredSum) - (xSum * xYSum)) /
-		((numPoints * xSquaredSum) - (xSum * xSum)) ;
+        ((numPoints * xSquaredSum) - (xSum * xSum)) ;
 
     const float m =  ( (numPoints * xYSum) - (xSum * ySum) ) /
-		((numPoints * xSquaredSum) - (xSum * xSum)) ;
+        ((numPoints * xSquaredSum) - (xSum * xSum)) ;
 
     return pair<float, float>(m, b);
 }
@@ -381,27 +381,27 @@ void VisualLine::setBearingWithSD(float _bearing)
 void VisualLine::
 setPossibleLines( list <const ConcreteLine*> _possibleLines)
 {
-	list<const ConcreteLine*> updated(0);
+    list<const ConcreteLine*> updated(0);
 
-	for (list<const ConcreteLine*>::iterator
-			 currLine = possibleLines.begin();
-		 currLine != possibleLines.end(); currLine++) {
+    for (list<const ConcreteLine*>::iterator
+             currLine = possibleLines.begin();
+         currLine != possibleLines.end(); currLine++) {
 
-		for ( list<const ConcreteLine*>::iterator
-				  newLine = _possibleLines.begin();
-			  newLine != _possibleLines.end(); ) {
+        for ( list<const ConcreteLine*>::iterator
+                  newLine = _possibleLines.begin();
+              newLine != _possibleLines.end(); ) {
 
-			// If the line is in both sets
-			if (**newLine == **currLine) {
-				updated.push_back(*newLine);
-				newLine = _possibleLines.erase(newLine);
-			} else {
-				// Increment the iterator if we don't erase a line
-				newLine++;
-			}
-		}
-	}
-	possibleLines = updated;
+            // If the line is in both sets
+            if (**newLine == **currLine) {
+                updated.push_back(*newLine);
+                newLine = _possibleLines.erase(newLine);
+            } else {
+                // Increment the iterator if we don't erase a line
+                newLine++;
+            }
+        }
+    }
+    possibleLines = updated;
 }
 
 /**
@@ -412,30 +412,30 @@ setPossibleLines( list <const ConcreteLine*> _possibleLines)
 void VisualLine::
 setPossibleLines( vector <const ConcreteLine*> _possibleLines)
 {
-	list<const ConcreteLine*> updated(0);
+    list<const ConcreteLine*> updated(0);
 
-	for (list<const ConcreteLine*>::iterator
-			 currLine = possibleLines.begin();
-		 currLine != possibleLines.end(); currLine++) {
+    for (list<const ConcreteLine*>::iterator
+             currLine = possibleLines.begin();
+         currLine != possibleLines.end(); currLine++) {
 
-		for ( vector<const ConcreteLine*>::iterator
-				  newLine = _possibleLines.begin();
-			  newLine != _possibleLines.end(); ) {
+        for ( vector<const ConcreteLine*>::iterator
+                  newLine = _possibleLines.begin();
+              newLine != _possibleLines.end(); ) {
 
-			// If the line is in both sets
-			if (**newLine == **currLine) {
-				updated.push_back(*newLine);
-				newLine = _possibleLines.erase(newLine);
-			} else {
-				// Increment the iterator if we don't erase a line
-				newLine++;
-			}
-		}
-	}
-	possibleLines = updated;
+            // If the line is in both sets
+            if (**newLine == **currLine) {
+                updated.push_back(*newLine);
+                newLine = _possibleLines.erase(newLine);
+            } else {
+                // Increment the iterator if we don't erase a line
+                newLine++;
+            }
+        }
+    }
+    possibleLines = updated;
 }
 
 const bool VisualLine::hasPositiveID()
 {
-	return possibleLines.size() == 1;
+    return possibleLines.size() == 1;
 }

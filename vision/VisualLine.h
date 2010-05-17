@@ -142,7 +142,7 @@ private: // Member functions
     // y = mx + b
     // returns a pair <m, b>
     static std::pair <float, float> leastSquaresFit(const std::vector <linePoint>
-                                               &thePoints);
+                                                    &thePoints);
     // Using the points in the line, finds the line of best fit that corresponds
     // with those points.
     static std::pair <float, float> leastSquaresFit(const VisualLine& l);
@@ -159,9 +159,9 @@ private: // Member functions
 private: // Member variables
     point <int> start, end;
     // left, right x values, bottom, top y values
-	int leftBound, rightBound, bottomBound, topBound;
-	std::vector <linePoint> points;
-	float angle; // Angle from horizontal in degrees
+    int leftBound, rightBound, bottomBound, topBound;
+    std::vector <linePoint> points;
+    float angle; // Angle from horizontal in degrees
     float length;
 
     // y = ax + b (a = slope, b = y-intercept)
@@ -181,54 +181,54 @@ private: // Member variables
 
 public:
     // Getters
-	inline const bool getCCLine() const;
+    inline const bool getCCLine() const;
 
-	inline const float getAngle() const;
-	inline const float getAvgHorizontalWidth() const;
-	inline const float getAvgVerticalWidth() const;
-	inline const float getBearing() const;
-	inline const float getBearingSD() const;
-	inline const float getDistance() const;
-	inline const float getDistanceSD() const;
-	inline const float getLength() const;
-	inline const float getSlope() const;
-	inline const float getYIntercept() const;
+    inline const float getAngle() const;
+    inline const float getAvgHorizontalWidth() const;
+    inline const float getAvgVerticalWidth() const;
+    inline const float getBearing() const;
+    inline const float getBearingSD() const;
+    inline const float getDistance() const;
+    inline const float getDistanceSD() const;
+    inline const float getLength() const;
+    inline const float getSlope() const;
+    inline const float getYIntercept() const;
 
-	inline const int getColor() const;
+    inline const int getColor() const;
 
-	inline const linePoint getLeftLinePoint() const;
-	inline const linePoint getRightLinePoint() const;
-	inline const linePoint getThickestHorizontalPoint() const;
-	inline const linePoint getThickestVerticalPoint() const;
-	inline const linePoint getThinnestHorizontalPoint() const;
-	inline const linePoint getThinnestVerticalPoint() const;
+    inline const linePoint getLeftLinePoint() const;
+    inline const linePoint getRightLinePoint() const;
+    inline const linePoint getThickestHorizontalPoint() const;
+    inline const linePoint getThickestVerticalPoint() const;
+    inline const linePoint getThinnestHorizontalPoint() const;
+    inline const linePoint getThinnestVerticalPoint() const;
 
-	inline const point<int> getBottomEndpoint() const;
-	inline const point<int> getEndpoint() const;
-	inline const point<int> getLeftEndpoint() const;
-	inline const point<int> getRightEndpoint() const;
-	inline const point<int> getStartpoint() const;
-	inline const point<int> getTopEndpoint() const;
+    inline const point<int> getBottomEndpoint() const;
+    inline const point<int> getEndpoint() const;
+    inline const point<int> getLeftEndpoint() const;
+    inline const point<int> getRightEndpoint() const;
+    inline const point<int> getStartpoint() const;
+    inline const point<int> getTopEndpoint() const;
 
-	inline const std::string getColorString() const;
+    inline const std::string getColorString() const;
     inline const std::list <const ConcreteLine *> getPossibleLines() const;
-	inline const std::vector<linePoint> getPoints() const;
+    inline const std::vector<linePoint> getPoints() const;
 
-	virtual const bool hasPositiveID();
+    virtual const bool hasPositiveID();
 
 
 
     // Setters
     inline void setBearing(float _bearing);
     inline void setBearingSD(float _bearingSD);
-	inline void setCCLine(bool _ccLine);
+    inline void setCCLine(bool _ccLine);
     inline void setColorString(const std::string s);
     inline void setDistance(float _distance);
     inline void setDistanceSD(float _distanceSD);
     inline void setPossibleLines(const ConcreteLine* _possible);
 
     void setBearingWithSD(float _bearing);
-	void setColor(const int c);
+    void setColor(const int c);
     void setDistanceWithSD(float _distance);
     void setPossibleLines(std::list <const ConcreteLine*> _possibles);
     void setPossibleLines(std::vector <const ConcreteLine*> _possibles);
@@ -240,132 +240,132 @@ public:
 
 inline const bool VisualLine::getCCLine() const
 {
-	return ccLine;
+    return ccLine;
 }
 
 inline const float VisualLine::getDistance() const
 {
-	return distance;
+    return distance;
 }
 inline const float VisualLine::getBearing() const
 {
-	return bearing;
+    return bearing;
 }
 inline const float VisualLine::getDistanceSD() const
 {
-	return distanceSD;
+    return distanceSD;
 }
 inline const float VisualLine::getBearingSD() const
 {
-	return bearingSD;
+    return bearingSD;
 }
 
 inline const float VisualLine::getLength() const
 {
-	return length;
+    return length;
 }
 
 inline const float VisualLine::getAngle() const
 {
-	return angle;
+    return angle;
 }
 
 inline const float VisualLine::getSlope() const
 {
-	return a;
+    return a;
 }
 
 inline const float VisualLine::getYIntercept() const
 {
-	return b;
+    return b;
 }
 
 inline const float VisualLine::getAvgVerticalWidth() const
 {
-	return avgVerticalWidth;
+    return avgVerticalWidth;
 }
 
 inline const float VisualLine::getAvgHorizontalWidth() const
 {
-	return avgHorizontalWidth;
+    return avgHorizontalWidth;
 }
 
 inline const point<int> VisualLine::getStartpoint() const
 {
-	return start;
+    return start;
 }
 inline const point<int> VisualLine::getEndpoint() const
 {
-	return end;
+    return end;
 }
 
 inline const point<int> VisualLine::getLeftEndpoint() const
 {
-	return (leftBound == start.x ? start : end);
+    return (leftBound == start.x ? start : end);
 }
 
 inline const point<int> VisualLine::getRightEndpoint() const
 {
-	return (rightBound == start.x ? start : end);
+    return (rightBound == start.x ? start : end);
 }
 
 inline const point<int> VisualLine::getTopEndpoint() const
 {
-	return (topBound == start.y ? start : end);
+    return (topBound == start.y ? start : end);
 }
 
 inline const point<int> VisualLine::getBottomEndpoint() const
 {
-	return (bottomBound == start.y ? start : end);
+    return (bottomBound == start.y ? start : end);
 }
 
 inline const linePoint VisualLine::getLeftLinePoint() const
 {
-	return points.front();
+    return points.front();
 }
 
 inline const linePoint VisualLine::getRightLinePoint() const
 {
-	return points.back();
+    return points.back();
 }
 
 inline const linePoint VisualLine::getThinnestHorizontalPoint() const
 {
-	return thinnestHorPoint;
+    return thinnestHorPoint;
 }
 inline const linePoint VisualLine::getThinnestVerticalPoint() const
 {
-	return thinnestVertPoint;
+    return thinnestVertPoint;
 }
 inline const linePoint VisualLine::getThickestHorizontalPoint() const
 {
-	return thickestHorPoint;
+    return thickestHorPoint;
 }
 inline const linePoint VisualLine::getThickestVerticalPoint() const
 {
-	return thickestVertPoint;
+    return thickestVertPoint;
 }
 
 
 inline const std::vector<linePoint> VisualLine::getPoints() const
 {
-	return points;
+    return points;
 }
 
 inline const int VisualLine::getColor() const
 {
-	return color;
+    return color;
 }
 
 inline const std::string VisualLine::getColorString() const
 {
-	return colorStr;
+    return colorStr;
 }
 
 inline
 const std::list <const ConcreteLine *> VisualLine::getPossibleLines() const
 {
-	return possibleLines;
+    return possibleLines;
 }
 
 /**
@@ -373,33 +373,33 @@ const std::list <const ConcreteLine *> VisualLine::getPossibleLines() const
  */
 inline void VisualLine::setColorString(const std::string s)
 {
-	colorStr = s;
+    colorStr = s;
 }
 
 inline void VisualLine::setPossibleLines(const ConcreteLine* _possible) {
-	possibleLines.clear();
-	possibleLines.push_back(_possible);
+    possibleLines.clear();
+    possibleLines.push_back(_possible);
 }
 
 inline void VisualLine::setBearing(float _bearing)
 {
-	bearing = _bearing;
+    bearing = _bearing;
 }
 inline void VisualLine::setBearingSD(float _bearingSD)
 {
-	bearingSD = _bearingSD;
+    bearingSD = _bearingSD;
 }
 inline void VisualLine::setCCLine(bool _ccLine)
 {
-	ccLine = _ccLine;
+    ccLine = _ccLine;
 }
 inline void VisualLine::setDistance(float _distance)
 {
-	distance = _distance;
+    distance = _distance;
 }
 inline void VisualLine::setDistanceSD(float _distanceSD)
 {
-	distanceSD = _distanceSD;
+    distanceSD = _distanceSD;
 }
 
 #endif
