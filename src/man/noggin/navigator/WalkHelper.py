@@ -4,13 +4,21 @@ from man.noggin.util import MyMath
 from ..players import ChaseBallConstants
 
 def getOmniWalkParam(my, dest):
+    # we use distance and bearing to get relX, relY which we already have
+    # for the ball. be nice not to recalculate it.
+    relX, relY = 0, 0
 
-    bearing = radians(my.getRelativeBearing(dest))
+    if hasattr(dest, "relX"):
+        relX = dest.relX
+        relY = dest.relY
 
-    distToDest = my.dist(dest)
+    else:
+        bearing = my.getRelativeBearing(dest)
+        distToDest = my.dist(dest)
+        relX = MyMath.getRelativeX(distToDest, bearing)
+        relY = MyMath.getRelativeY(distToDest, bearing)
 
     # calculate forward speed
-    relX = distToDest * cos(bearing)
     forwardGain = constants.OMNI_GOTO_X_GAIN * relX
     sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
     sX = MyMath.clip(sX,
@@ -20,7 +28,6 @@ def getOmniWalkParam(my, dest):
         sX = 0
 
     # calculate sideways speed
-    relY = distToDest * sin(bearing)
     strafeGain = constants.OMNI_GOTO_Y_GAIN * relY
     sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
     sY = MyMath.clip(sY,
@@ -45,17 +52,22 @@ def getOmniWalkParam(my, dest):
     return (sX, sY, sTheta)
 
 def getWalkSpinParam(my, dest):
-    bearingDeg = my.getRelativeBearing(dest)
-    bearing = radians(bearingDeg)
 
-    distToDest = my.dist(dest)
+    relX = 0
+
+    if hasattr(dest, "relX"):
+        relX = dest.relX
+    else:
+        bearingDeg = my.getRelativeBearing(dest)
+        distToDest = my.dist(dest)
+        relX = MyMath.getRelativeX(distToDest, bearingDeg)
 
     # calculate ideal max forward speed
-    forwardGain = distToDest * cos(bearing)
-    sX = constants.GOTO_FORWARD_SPEED * forwardGain
+    sX = constants.GOTO_FORWARD_SPEED * relX
 
     # calculate ideal max spin speed
-    sTheta = (my.spinDirToHeading(dest.h) * getRotScale(bearingDeg) *
+    hDiff = MyMath.sub180Angle(my.h - dest.h)
+    sTheta = (my.spinDirToHeading(dest.h) * getRotScale(hDiff) *
               constants.OMNI_MAX_SPIN_SPEED)
 
     ## if any are below min thresholds, set to 0
@@ -82,7 +94,6 @@ def getWalkSpinParam(my, dest):
 
 def getWalkStraightParam(my, dest):
 
-    bearing = my.getRelativeBearing(dest)
     distToDest = my.dist(dest)
 
     if distToDest < ChaseBallConstants.APPROACH_WITH_GAIN_DIST:
@@ -90,18 +101,21 @@ def getWalkStraightParam(my, dest):
     else :
         gain = 1.0
 
-    sTheta = MyMath.clip(MyMath.sign(bearing) *
+    sX = MyMath.clip(constants.GOTO_FORWARD_SPEED*gain,
+                     constants.WALK_TO_MIN_X_SPEED,
+                     constants.WALK_TO_MAX_X_SPEED)
+
+    bearingDeg= my.getRelativeBearing(dest)
+
+    sTheta = MyMath.clip(MyMath.sign(bearingeDeg *
                          constants.GOTO_STRAIGHT_SPIN_SPEED *
-                         getRotScale(bearing),
+                         getRotScale(bearingDeg,
                          -constants.GOTO_STRAIGHT_SPIN_SPEED,
                          constants.GOTO_STRAIGHT_SPIN_SPEED )
 
     if fabs(sTheta) < constants.MIN_SPIN_MAGNITUDE_WALK:
         sTheta = 0
 
-    sX = MyMath.clip(constants.GOTO_FORWARD_SPEED*gain,
-                     constants.WALK_TO_MIN_X_SPEED,
-                     constants.WALK_TO_MAX_X_SPEED)
     sY = 0
 
     return (sX, sY, sTheta)
