@@ -1,5 +1,5 @@
 from . import NavConstants as constants
-from math import fabs, cos, sin, radians
+from math import fabs
 from man.noggin.util import MyMath
 from ..players import ChaseBallConstants
 
@@ -14,7 +14,7 @@ def getOmniWalkParam(my, dest):
 
     else:
         bearing = my.getRelativeBearing(dest)
-        distToDest = my.dist(dest)
+        distToDest = my.distTo(dest)
         relX = MyMath.getRelativeX(distToDest, bearing)
         relY = MyMath.getRelativeY(distToDest, bearing)
 
@@ -59,7 +59,7 @@ def getWalkSpinParam(my, dest):
         relX = dest.relX
     else:
         bearingDeg = my.getRelativeBearing(dest)
-        distToDest = my.dist(dest)
+        distToDest = my.distTo(dest)
         relX = MyMath.getRelativeX(distToDest, bearingDeg)
 
     # calculate ideal max forward speed
@@ -94,11 +94,11 @@ def getWalkSpinParam(my, dest):
 
 def getWalkStraightParam(my, dest):
 
-    distToDest = my.dist(dest)
+    distToDest = my.distTo(dest)
 
     if distToDest < ChaseBallConstants.APPROACH_WITH_GAIN_DIST:
         gain = constants.GOTO_FORWARD_GAIN * distToDest
-    else :
+    else:
         gain = 1.0
 
     sX = MyMath.clip(constants.GOTO_FORWARD_SPEED*gain,
@@ -107,9 +107,9 @@ def getWalkStraightParam(my, dest):
 
     bearingDeg= my.getRelativeBearing(dest)
 
-    sTheta = MyMath.clip(MyMath.sign(bearingeDeg *
+    sTheta = MyMath.clip(MyMath.sign(bearingDeg) *
                          constants.GOTO_STRAIGHT_SPIN_SPEED *
-                         getRotScale(bearingDeg,
+                         getRotScale(bearingDeg),
                          -constants.GOTO_STRAIGHT_SPIN_SPEED,
                          constants.GOTO_STRAIGHT_SPIN_SPEED )
 

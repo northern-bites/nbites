@@ -112,7 +112,7 @@ class Ball(VisualObject):
         self.sd = self.uncertX * self.uncertY
 
         # Determine other values
-        self.locDist = my.dist(self, forceCalc=True)
+        self.locDist = my.distTo(self, forceCalc=True)
         self.locBearing = my.getRelativeBearing(self, forceCalc=True)
         self.relVelX = getRelativeVelocityX(my.h, self.velX, self.velY)
         self.relVelY = getRelativeVelocityY(my.h, self.velX, self.velY)
@@ -131,12 +131,10 @@ class Ball(VisualObject):
             self.bearing = self.locBearing
             self.dist = self.locDist
             # uses my.x, my.y which are loc determined to get heading
-            self.heading = my.headingTo(self)
+            self.heading = my.headingTo(self, forceCalc=True)
 
         self.relX = getRelativeX(self.dist, self.bearing)
         self.relY = getRelativeY(self.dist, self.bearing)
-
-        # TODO: use vision bearing + my heading if ball.on
 
     def __str__(self):
         """returns string with all class variables"""
