@@ -4,7 +4,7 @@ from . import NavStates
 from . import PlaybookPositionStates
 from . import ChaseStates
 from . import NavConstants as constants
-from . import NavHelper as helper
+from . import NavTransitions as navTrans
 from man.noggin.typeDefs.Location import RobotLocation
 
 class Navigator(FSA.FSA):
@@ -71,9 +71,9 @@ class Navigator(FSA.FSA):
         if not self.currentState == 'spinToWalkHeading' and \
                not self.currentState == 'walkStraightToPoint' and \
                not self.currentState == 'spinToFinalHeading':
-            if not helper.atHeadingGoTo(self.brain.my, self.dest.h):
+            if not navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
                 self.switchTo('spinToWalkHeading')
-            elif helper.atHeadingGoTo(self.brain.my, self.dest.h):
+            elif navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
                 self.switchTo('walkStraightToPoint')
 
     def stop(self):

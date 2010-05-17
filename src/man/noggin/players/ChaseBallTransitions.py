@@ -3,7 +3,6 @@ import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
 import KickingHelpers as helpers
 from .. import NogginConstants
-from ..util import MyMath
 
 ####### CHASING STUFF ##############
 
@@ -113,33 +112,6 @@ def shouldStopDribbling(player):
             abs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
             player.brain.my.x < ( NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
                                   NogginConstants.GREEN_PAD_X))
-
-######### BALL IN BOX ###############
-
-def shouldChaseAroundBox(player):
-    ball = player.brain.ball
-    my = player.brain.my
-    intersect = MyMath.linesIntersect
-
-    return ( intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
-                    NogginConstants.MY_GOALBOX_LEFT_X,
-                    NogginConstants.MY_GOALBOX_BOTTOM_Y,
-                    NogginConstants.MY_GOALBOX_RIGHT_X,
-                    NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-         intersect( my.x, my.y, ball.x, ball.y, # LEFT_GOALBOX_LINE
-                    NogginConstants.MY_GOALBOX_RIGHT_X,
-                    NogginConstants.MY_GOALBOX_TOP_Y,
-                    NogginConstants.MY_GOALBOX_RIGHT_X,
-                    NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-         intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
-                    NogginConstants.MY_GOALBOX_LEFT_X,
-                    NogginConstants.MY_GOALBOX_TOP_Y,
-                    NogginConstants.MY_GOALBOX_RIGHT_X,
-                    NogginConstants.MY_GOALBOX_TOP_Y) )
-
-def shouldNotGoInBox(player):
-    return (False and player.ball.inMyGoalBox() and \
-                player.brain.ball.dist < constants.IGNORE_BALL_IN_BOX_DIST)
 
 ####### AVOIDANCE STUFF ##############
 

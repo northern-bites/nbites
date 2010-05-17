@@ -1,9 +1,14 @@
 from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
-from ..navigator import BrunswickSpeeds as speeds
-from math import (sin, cos)
-from ..util import MyMath
+from . import NavConstants as constants
+from . import BrunswickSpeeds as speeds
+from man.noggin.util import MyMath
+from man.noggin.typeDefs.Location import RobotLocation
+from man.noggin import NogginConstants
+from man.noggin.playbook.PBConstants import GOALIE
+from math import (sin, cos, fabs)
+
 DEBUG = False
 
 def walkSpinToBall(nav):
@@ -24,7 +29,88 @@ def walkSpinToBall(nav):
         if abs(ball.bearing) < 10:
             return nav.goNow('stop')
 
+    if not nav.brain.play.isRole(GOALIE):
+        if navTrans.shouldNotGoInBox(nav):
+            return nav.goLater('ballInMyBox')
+        elif navTrans.shouldChaseAroundBox(nav):
+            return nav.goLater('chaseAroundBox')
+
+
     return nav.stay()
+
+def chaseAroundBox(nav):
+    if nav.firstFrame():
+        # reset dest to new RobotLocation to avoid problems w/dist calculations
+        nav.dest = RobotLocation()
+        nav.shouldNotChaseAroundBox = 0
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
+
+    if not navTrans.shouldChaseAroundBox(nav):
+        nav.shouldChaseAroundBox += 1
+    else :
+        nav.shouldChaseAroundBox = 0
+
+    if nav.shouldChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
+        return nav.goLater('walkSpinToBall')
+
+    ball = nav.brain.ball
+    my = nav.brain.my
+
+    if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
+        # go to corner nearest ball
+        if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
+            nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
+                          constants.GOALBOX_OFFSET)
+            nav.dest.y = (NogginConstants.MY_GOALBOX_TOP_Y +
+                          constants.GOALBOX_OFFSET)
+            nav.dest.h = NogginConstants.MY_GOAL_HEADING
+
+        elif ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+            nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
+                          constants.GOALBOX_OFFSET)
+            nav.dest.y = (NogginConstants.MY_GOALBOX_BOTTOM_Y -
+                          constants.GOALBOX_OFFSET)
+            nav.dest.h = NogginConstants.MY_GOAL_HEADING
+
+    if my.x < NogginConstants.MY_GOALBOX_RIGHT_X:
+        # go to corner nearest ball
+        if my.y > NogginConstants.MY_GOALBOX_TOP_Y:
+            nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
+                          constants.GOALBOX_OFFSET)
+            nav.dest.y = (NogginConstants.MY_GOALBOX_TOP_Y +
+                          constants.GOALBOX_OFFSET)
+            nav.dest.h = NogginConstants.MY_GOAL_HEADING
+
+        if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+            nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
+                          constants.GOALBOX_OFFSET)
+            nav.dest.y = (NogginConstants.MY_GOALBOX_BOTTOM_Y -
+                          constants.GOALBOX_OFFSET)
+            nav.dest.h = NogginConstants.MY_GOAL_HEADING
+
+    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, nav.dest)
+    helper.setSpeed(nav, walkX, walkY, walkTheta)
+
+    return nav.stay()
+
+def ballInMyBox(nav):
+    if nav.firstFrame():
+        nav.brain.tracker.activeLoc()
+
+    ball = nav.brain.ball
+
+    if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
+        nav.setWalk(0, 0, constants.BALL_SPIN_SPEED *
+                    MyMath.sign(ball.bearing) )
+
+    elif fabs(ball.bearing) < constants.BALL_APPROACH_BEARING_OFF_THRESH :
+        nav.stopWalking()
+
+    if not nav.ball.inMyGoalBox():
+        return nav.goLater('chase')
+
+    return nav.stay()
+
 
 # Values for controlling the strafing
 PFK_MAX_Y_SPEED = speeds.MAX_Y_SPEED

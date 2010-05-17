@@ -1,7 +1,6 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 from ..playbook.PBConstants import GOALIE
-from man.noggin.typeDefs.Location import RobotLocation
 
 def scanFindBall(player):
     """
