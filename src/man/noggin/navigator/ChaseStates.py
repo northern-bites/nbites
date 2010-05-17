@@ -7,7 +7,7 @@ from man.noggin.util import MyMath
 from man.noggin.typeDefs.Location import RobotLocation
 from man.noggin import NogginConstants
 from man.noggin.playbook.PBConstants import GOALIE
-from math import (sin, cos, fabs)
+from math import fabs
 
 DEBUG = False
 
@@ -35,10 +35,12 @@ def walkSpinToBall(nav):
         elif navTrans.shouldChaseAroundBox(nav):
             return nav.goLater('chaseAroundBox')
 
-
     return nav.stay()
 
 def chaseAroundBox(nav):
+    # does not work if we are in corner and ball is not- we'll run through box
+    # would be nice to force spin towards ball at dest
+
     if nav.firstFrame():
         # reset dest to new RobotLocation to avoid problems w/dist calculations
         nav.dest = RobotLocation()
@@ -47,7 +49,7 @@ def chaseAroundBox(nav):
 
     if not navTrans.shouldChaseAroundBox(nav):
         nav.shouldChaseAroundBox += 1
-    else :
+    else:
         nav.shouldChaseAroundBox = 0
 
     if nav.shouldChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
@@ -63,14 +65,14 @@ def chaseAroundBox(nav):
                           constants.GOALBOX_OFFSET)
             nav.dest.y = (NogginConstants.MY_GOALBOX_TOP_Y +
                           constants.GOALBOX_OFFSET)
-            nav.dest.h = NogginConstants.MY_GOAL_HEADING
+            nav.dest.h = my.headingTo(nav.dest)
 
         elif ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
             nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
                           constants.GOALBOX_OFFSET)
             nav.dest.y = (NogginConstants.MY_GOALBOX_BOTTOM_Y -
                           constants.GOALBOX_OFFSET)
-            nav.dest.h = NogginConstants.MY_GOAL_HEADING
+            nav.dest.h = my.headingTo(nav.dest)
 
     if my.x < NogginConstants.MY_GOALBOX_RIGHT_X:
         # go to corner nearest ball
@@ -79,16 +81,16 @@ def chaseAroundBox(nav):
                           constants.GOALBOX_OFFSET)
             nav.dest.y = (NogginConstants.MY_GOALBOX_TOP_Y +
                           constants.GOALBOX_OFFSET)
-            nav.dest.h = NogginConstants.MY_GOAL_HEADING
+            nav.dest.h = my.headingTo(nav.dest)
 
         if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
             nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
                           constants.GOALBOX_OFFSET)
             nav.dest.y = (NogginConstants.MY_GOALBOX_BOTTOM_Y -
                           constants.GOALBOX_OFFSET)
-            nav.dest.h = NogginConstants.MY_GOAL_HEADING
+            nav.dest.h = my.headingTo(nav.dest)
 
-    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, nav.dest)
+    walkX, walkY, walkTheta = walker.getWalkSpinParam(my, nav.dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     return nav.stay()
