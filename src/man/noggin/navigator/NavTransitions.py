@@ -7,16 +7,16 @@ def atDestination(my, dest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
     """
-    return my.dist(dest) < constants.CLOSE_ENOUGH_XY
+    return my.distTo(dest) < constants.CLOSE_ENOUGH_XY
 
 def atDestinationCloser(my, dest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
     """
-    return my.dist(dest) < constants.CLOSER_XY
+    return my.distTo(dest) < constants.CLOSER_XY
 
 def atDestinationGoalie(my, dest):
-    return my.dist(dest) < constants.GOALIE_CLOSE
+    return my.distTo(dest) < constants.GOALIE_CLOSE
 
 def atHeadingGoTo(my, targetHeading):
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
@@ -43,7 +43,7 @@ def useFinalHeading(brain, position):
     else:
         useFinalHeadingDist = constants.FINAL_HEADING_DIST
 
-    distToPoint = brain.my.dist(position)
+    distToPoint = brain.my.distTo(position)
 
     return (distToPoint <= useFinalHeadingDist)
 

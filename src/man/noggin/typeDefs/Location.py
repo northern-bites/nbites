@@ -25,13 +25,13 @@ class Location (object):
     def __str__(self):
         return ("x: %g  y: %g z: %g" % (self.x, self.y, self.z))
 
-    def dist(self, other, forceCalc = False):
+    def distTo(self, other, forceCalc = False):
         """
         returns euclidian dist
         """
 
         # if we're calculating distance from us to the ball use stored value
-        if forceCalc and hasattr(self, "teamColor") and \
+        if not forceCalc and hasattr(self, "teamColor") and \
                hasattr(other, "dist"):
             return other.dist
 
@@ -39,13 +39,18 @@ class Location (object):
         if other.x == float('inf') or \
                other.y == float('inf'):
             print "WE HAVE AN INFINITY = ", self.x, self.y, other.x, other.y
-            return 10000
+            return 10000.
         return hypot(other.y - self.y, other.x - self.x)
 
-    def headingTo(self, other):
+    def headingTo(self, other, forceCalc = False):
         '''determine the heading facing a target x, y'''
         ## print "other.y:%f my.y:%f other.x:%f my.x:%f" % (other.y, self.y,
         ##                                                  other.x, self.x)
+
+        if not forceCalc and hasattr(self, "teamColor") and \
+               hasattr(other, "heading"):
+            return other.heading
+
         return MyMath.sub180Angle(degrees(MyMath.safe_atan2(other.y - self.y,
                                                             other.x - self.x)))
     def inOppGoalBox(self):
@@ -90,7 +95,7 @@ class RobotLocation(Location):
         abs x,y on field """
 
         # if we're calculating bearing from us(has a team color) to the ball use stored value
-        if forceCalc and hasattr(self, "teamColor") and \
+        if not forceCalc and hasattr(self, "teamColor") and \
                hasattr(other, "bearing"):
             return other.dist
 

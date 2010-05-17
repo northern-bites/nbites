@@ -27,7 +27,7 @@ def getKickObjective(player):
     if my.x < NogginConstants.FIELD_WIDTH / 2:
         return constants.OBJECTIVE_CLEAR
 
-    elif my.dist( Location(NogginConstants.OPP_GOALBOX_RIGHT_X,
+    elif my.distTo( Location(NogginConstants.OPP_GOALBOX_RIGHT_X,
                            NogginConstants.OPP_GOALBOX_MIDDLE_Y )) > \
                            NogginConstants.FIELD_WIDTH / 3 :
         return constants.OBJECTIVE_CENTER
