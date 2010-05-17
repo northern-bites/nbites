@@ -83,8 +83,6 @@ static const float NORMALPOST = 0.45f;
 static const float QUESTIONABLEPOST = 0.85f;
 static const int DIST_POINT_FUDGE = 5;
 
-#define USE_EDGES       // use experimental no-color system
-
 #ifdef OFFLINE
 static const bool PRINTOBJS = false;
 static const bool POSTDEBUG = false;
@@ -344,12 +342,8 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
     for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
         //cout << "Vert scan " << x << " " << y << endl;
         // if it is the color we're looking for - good
-#ifdef USE_EDGES
 		unsigned char pixel = thresh->getColor(x, y);
-		if (pixel == c) {
-#else
-        if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
-#endif
+		if (pixel == c || pixel == c2) {
             good++;
             run++;
             if (run > 1) {
@@ -401,12 +395,8 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
     // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH
               && y < height && bad < stopper; ) {
-#ifdef USE_EDGES
 		unsigned char pixel = thresh->getColor(x, y);
-		if (pixel == c) {
-#else
-        if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
-#endif
+		if (pixel == c || pixel == c2) {
             // if it is either of the colors we're looking for - good
             good++;
             run++;
@@ -529,20 +519,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
                 i > IMAGE_HEIGHT - 1) {
                 fake++;
             } else {
-#ifdef USE_EDGES
-				int curcol = GREY;
-				if (thresh->getU(theSpot, i)  > ORANGEU) {
-					curcol = ORANGE;
-				} else if (thresh->getY(theSpot, i) > WHITEY) {
-					curcol = WHITE;
-				} else if (thresh->getV(theSpot, i) > BLUEV) {
-					curcol = BLUE;
-				} else if (thresh->getV(theSpot, i) < YELLOWV) {
-					curcol = YELLOW;
-				}
-#else
-                int curcol = thresh->thresholded[i][theSpot];
-#endif
+				int curcol = thresh->getColor(theSpot, i);
                 if (curcol == c || curcol == c2) {
                     good++;
                     goodRun++;
@@ -591,20 +568,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
                     good++;
 
                 else {
-#ifdef USE_EDGES
-					int curcol = GREY;
-					if (thresh->getU(theSpot, i)  > ORANGEU) {
-						curcol = ORANGE;
-					} else if (thresh->getY(theSpot, i) > WHITEY) {
-						curcol = WHITE;
-					} else if (thresh->getV(theSpot, i) > BLUEV) {
-						curcol = BLUE;
-					} else if (thresh->getV(theSpot, i) < YELLOWV) {
-						curcol = YELLOW;
-					}
-#else
-                    int curcol = thresh->thresholded[i][theSpot];
-#endif
+                    int curcol = thresh->getColor(theSpot, i);
                     if (curcol == c || curcol == c2) {
                         good++;
                         run = 0;
@@ -689,20 +653,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
                 // assume the best?
                 fakegood++;
             } else {
-#ifdef USE_EDGES
-				int curcol = GREY;
-				if (thresh->getU(i, theSpot)  > ORANGEU) {
-					curcol = ORANGE;
-				} else if (thresh->getY(i, theSpot) > WHITEY) {
-					curcol = WHITE;
-				} else if (thresh->getV(i, theSpot) > BLUEV) {
-					curcol = BLUE;
-				} else if (thresh->getV(i, theSpot) < YELLOWV) {
-					curcol = YELLOW;
-				}
-#else
-                int curcol = thresh->thresholded[theSpot][i];
-#endif
+                int curcol = thresh->getColor(i, theSpot);
                 if (curcol == c || curcol == c2) {
                     good++;
                     run = 0;
@@ -741,17 +692,9 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
         for (int d = left.y; d < horizonAt(left.x); d+=1) {
             good = 0;
             for (int a = left.x; a < right.x; a++) {
-#ifdef USE_EDGES
-				if (c == BLUE && thresh->getV(a, d) > BLUEV - FUDGEV) {
-					good++;
-				} else if (c == YELLOW && thresh->getV(a, d) < YELLOWV + FUDGEV) {
-					good++;
-				}
-#else
-                if (thresh->thresholded[d][a] == c) {
+                if (thresh->getExpandedColor(a, d) == c) {
                     good++;
                 }
-#endif
             }
             if (good > spanX * SPAN_MULTIPLIER) {
                 found = d;
@@ -796,7 +739,6 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 	const int MINIMUM_SKEW = 5;
 	const int MIN_WIDTH = 16;
 
-#ifdef USE_EDGES
 	int points[3];
 	int diffy = (b.getLeftBottomY() - b.getLeftTopY()) / 4;
 	int midy = b.getLeftTopY();
@@ -813,20 +755,20 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 		while (col != color && midx < IMAGE_WIDTH) {
 			midx++;
 			if (color == BLUE) {
-				if (thresh->getV(midx, midy) > BLUEV - FUDGEV) {
+				if (thresh->getExpandedColor(midx, midy) == BLUE) {
 					col = BLUE;
 					if (count == 0) {
-						while (midx >= 0 && thresh->getV(midx, midy) > BLUEV - FUDGEV) {
+						while (midx >= 0 && thresh->getExpandedColor(midx, midy) == BLUE) {
 							midx--;
 							count++;
 						}
 					}
 				} else count++;
 			} else {
-				if (thresh->getV(midx, midy) < YELLOWV + FUDGEV) {
+				if (thresh->getExpandedColor(midx, midy) == YELLOW) {
 					col = YELLOW;
 					if (count == 0) {
-						while (midx >= 0 && thresh->getV(midx, midy) < YELLOWV + FUDGEV) {
+						while (midx >= 0 && thresh->getExpandedColor(midx, midy) == YELLOW) {
 							midx--;
 							count++;
 						}
@@ -864,20 +806,20 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 		while (col != color && midx > 0 && midx <= IMAGE_WIDTH) {
 			midx--;
 			if (color == BLUE) {
-				if (thresh->getV(midx, midy) > BLUEV - FUDGEV) {
+				if (thresh->getExpandedColor(midx, midy) == BLUE) {
 					col = BLUE;
 					if (count == 0) {
-						while (midx < IMAGE_WIDTH -1 && thresh->getV(midx, midy) > BLUEV - FUDGEV) {
+						while (midx < IMAGE_WIDTH -1 && thresh->getExpandedColor(midx, midy) == BLUE) {
 							midx++;
 							count++;
 						}
 					}
 				} else count++;
 			} else {
-				if (thresh->getV(midx, midy) < YELLOWV+FUDGEV) {
+				if (thresh->getExpandedColor(midx, midy) == YELLOW) {
 					col = YELLOW;
 					if (count == 0) {
-						while (midx < IMAGE_WIDTH - 1 && thresh->getV(midx, midy) < YELLOWV + FUDGEV) {
+						while (midx < IMAGE_WIDTH - 1 && thresh->getExpandedColor(midx, midy) == YELLOW) {
 							midx++;
 							count++;
 						}
@@ -901,7 +843,7 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 	}
 	return 0.0f;
 
-#else
+	/*
     // try and find the cross bar - start at the upper left corner
     int biggest = 0, biggest2 = 0;
 	int skewr = 0, skewl = 0;
@@ -1019,9 +961,8 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 		newSlope = -(float)(b.getRightBottomX() - b.getRightTopX()) /
 			(float)(b.getRightBottomY() - b.getRightTopY());
 	}
-	return newSlope;
-#endif
-	}
+	return newSlope;*/
+}
 
 /*  Routine to find a general rectangular goal.
  * We start with a point.  We scan up from the point and down from the point
@@ -1209,16 +1150,8 @@ bool ObjectFragments::qualityPost(Blob b, int c)
     //bool soFar;
     for (int i = b.getLeftTopX(); i < b.getRightTopX(); i++)
         for (int j = b.getLeftTopY(); j < b.getLeftBottomY(); j++)
-#ifdef USE_EDGES
-			if (c == YELLOW && thresh->getV(i, j) < YELLOWV + FUDGEV) {
-				good++;
-			} else if (c == BLUE && thresh->getV(i, j) > BLUEV - FUDGEV) {
-				good++;
-			}
-#else
-            if (thresh->thresholded[j][i] == c)
+			if (thresh->getExpandedColor(i, j) == c)
                 good++;
-#endif
     if (good < b.getArea() * PERCENT_NEEDED) return false;
     return true;
 }
@@ -1910,17 +1843,9 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
             ny = yProject(startx, starty, nx);
             if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
                 total++;
-#ifdef USE_EDGES
-				if (color == YELLOW && thresh->getV(nx, ny) < YELLOWV + FUDGEV) {
-					good++;
-				}else if (color == BLUE && thresh->getV(nx, ny) > BLUEV - FUDGEV) {
-					good++;
-				}
-#else
-                if (thresh->thresholded[ny][nx] == color) {
+                if (thresh->getExpandedColor(nx, ny) == color) {
                     good++;
                 }
-#endif
             }
         }
     }

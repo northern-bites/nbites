@@ -186,7 +186,8 @@ void Threshold::thresholdAndRuns() {
  */
 void Threshold::threshold() {
 
-    /*unsigned char *tPtr, *tEnd; // pointers into thresholded array
+#ifndef USE_EDGES
+    unsigned char *tPtr, *tEnd; // pointers into thresholded array
     const unsigned char *yPtr; // pointers into image array
 
     // My loop variable initializations
@@ -204,7 +205,8 @@ void Threshold::threshold() {
         *tPtr++ = p[yPtr[YOFFSET1] >> 1];
         *tPtr++ = p[yPtr[YOFFSET2] >> 1];
         yPtr += 4;
-		}*/
+	}
+#endif
 #ifdef OFFLINE
 	// this makes looking at images in the TOOL tolerable
 	for (int i = 0; i < IMAGE_HEIGHT; i++) {
@@ -219,6 +221,7 @@ void Threshold::threshold() {
  */
 unsigned char Threshold::getColor(int r, int c) {
 	//cout << "Checking " << r << " " << c << endl;
+#ifdef USE_EDGES
 	const unsigned char *yPtr = &yplane[0] +c*IMAGE_ROW_OFFSET+2*r;
 	int u = yPtr[UOFFSET + 2*(r%2)];
 	if (u  > ORANGEU) {
@@ -238,10 +241,14 @@ unsigned char Threshold::getColor(int r, int c) {
 		return GREEN;
 	}
 	return GREY;
+#else
+	return thresholded[c][r];
+#endif
 }
 
 
 unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
+#ifdef USE_EDGES
 	int v = getV(x, y);
 	if (col == BLUE) {
 		if (v > BLUEV - FUDGEV) return BLUE;
@@ -251,6 +258,9 @@ unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
 		if (v < YELLOWV + FUDGEV) return YELLOW;
 	}
 	return GREY;
+#else
+	return getColor(x, y);
+#endif
 
 }
 
@@ -289,7 +299,9 @@ void Threshold::findGoals(int column, int topEdge) {
 	topEdge = min(topEdge, lowerBound[column]);
 	for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
 		// get the next pixel
+#ifdef USE_EDGES
 		thresholded[j][column] = getColor(column, j);
+#endif
 		unsigned char pixel = thresholded[j][column];
 		if (pixel == BLUE) {
 			while (j >=1 && getExpandedColor(column, j - 1, BLUE)) {
@@ -381,7 +393,9 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 	// scan down the column looking for ORANGE and WHITE
 	//int lasty = getY(column, bound), lastu = getU(column, bound), newu, newy;
 	for (int j = bound; j >= topEdge; j--) {
+#ifdef USE_EDGES
 		thresholded[j][column] = getColor(column, j);
+#endif
 		// get the next pixel
 		unsigned char pixel = thresholded[j][column];
 		// for simplicity treat ORANGERED as ORANGE - we'll look
