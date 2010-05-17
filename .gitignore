@@ -5,6 +5,7 @@ install/*
 *.ekf
 *.mcl
 *.obs
+/data/tables/*
 upload.sh
 noggin/players/Switch.py
 noggin/WebotsConfig.py
