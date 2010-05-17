@@ -656,7 +656,7 @@ public class Learning implements DataListener, MouseListener,
 							if (shouldProcessFrame(current)) {
 								// we have good data, so let's process the frame
 								visionState.newFrame(f, tool.getColorTable());
-								visionState.update(false, f);
+								visionState.update(true, f);
 								visionState.updateObjects();
 								updateBallStats();
 								updateGoalStats();
@@ -960,8 +960,9 @@ public class Learning implements DataListener, MouseListener,
 		goodBlue = 0; badBlue = 0; goodYellow = 0; badYellow = 0; okBlue=0; okYellow=0;
 		goodRed = 0; badRed = 0; goodBlueRobot = 0; badBlueRobot = 0;
 		missedBall = 0; missedCross = 0; missedBlue = 0; missedYellow = 0;
-		missedRed = 0; missedBlueRobot = 0; goodT = 0; goodL = 0; badT = 0; badL = 0;
-		missedT = 0; missedL = 0; falseT = 0; falseL = 0;
+		missedRed = 0; missedBlueRobot = 0; goodT = 0; goodL = 0; goodCC = 0;
+        badT = 0; badL = 0; badCC = 0; missedT = 0; missedL = 0; missedCC = 0;
+        falseT = 0; falseL = 0; falseCC = 0;
 	}
 
 	/** Print out statistics.
@@ -1406,10 +1407,13 @@ public class Learning implements DataListener, MouseListener,
 	 * @return boolean If the current frame has the required objects in it
 	 */
 	public boolean shouldProcessFrame(KeyFrame current){
-		final boolean screen = ( learnPanel.getOnlyBalls()		||
-								 learnPanel.getOnlyGoals()		||
-								 learnPanel.getOnlyCrosses()	||
-								 learnPanel.getOnlyBots() );
+		final boolean screen = ( learnPanel.getOnlyBalls()	   ||
+								 learnPanel.getOnlyGoals()	   ||
+								 learnPanel.getOnlyCrosses()   ||
+								 learnPanel.getOnlyBots()      ||
+                                 learnPanel.getOnlyCcCorners() ||
+                                 learnPanel.getOnlyTCorners()  ||
+                                 learnPanel.getOnlyLCorners());
 
 		return current.getHumanChecked() &&
 			(!screen ||

@@ -954,67 +954,67 @@ public class VisionState {
 				}
 			});
 
-		final JCheckBox fieldLinesDebugHorEdgeDetectBox = new JCheckBox(" Debug Hor Edge DetectBox");
+		final JCheckBox fieldLinesDebugHorEdgeDetectBox = new JCheckBox(" Debug Hor Edge Detect");
 		fieldLinesDebugHorEdgeDetectBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugHorEdgeDetect(fieldLinesDebugHorEdgeDetectBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugSecondVertEdgeDetectBox = new JCheckBox(" Debug Second Vert EdgeDetectBox");
+		final JCheckBox fieldLinesDebugSecondVertEdgeDetectBox = new JCheckBox(" Debug Second Vert EdgeDetect");
 		fieldLinesDebugSecondVertEdgeDetectBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugSecondVertEdgeDetect(fieldLinesDebugSecondVertEdgeDetectBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugCreateLinesBox = new JCheckBox(" Debug Create Lines Box");
+		final JCheckBox fieldLinesDebugCreateLinesBox = new JCheckBox(" Debug Create Lines ");
 		fieldLinesDebugCreateLinesBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugCreateLines(fieldLinesDebugCreateLinesBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugFitUnusedPointsBox = new JCheckBox(" Debug Fit Unused PointsBox");
+		final JCheckBox fieldLinesDebugFitUnusedPointsBox = new JCheckBox(" Debug Fit Unused Points");
 		fieldLinesDebugFitUnusedPointsBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugFitUnusedPoints(fieldLinesDebugFitUnusedPointsBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugJoinLinesBox = new JCheckBox(" Debug Join Lines Box");
+		final JCheckBox fieldLinesDebugJoinLinesBox = new JCheckBox(" Debug Join Lines ");
 		fieldLinesDebugJoinLinesBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugJoinLines(fieldLinesDebugJoinLinesBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugExtendLinesBox = new JCheckBox(" Debug Extend Lines Box");
+		final JCheckBox fieldLinesDebugExtendLinesBox = new JCheckBox(" Debug Extend Lines ");
 		fieldLinesDebugExtendLinesBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugExtendLines(fieldLinesDebugExtendLinesBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugIntersectLinesBox = new JCheckBox(" Debug Intersect Lines Box");
+		final JCheckBox fieldLinesDebugIntersectLinesBox = new JCheckBox(" Debug Intersect Lines ");
 		fieldLinesDebugIntersectLinesBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugIntersectLines(fieldLinesDebugIntersectLinesBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugIdentifyCornersBox = new JCheckBox(" Debug Identify Corners Box");
+		final JCheckBox fieldLinesDebugIdentifyCornersBox = new JCheckBox(" Debug Identify Corners ");
 		fieldLinesDebugIdentifyCornersBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugIdentifyCorners(fieldLinesDebugIdentifyCornersBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugCcScanBox = new JCheckBox(" Debug Cc Scan Box");
+		final JCheckBox fieldLinesDebugCcScanBox = new JCheckBox(" Debug Cc Scan ");
 		fieldLinesDebugCcScanBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugCcScan(fieldLinesDebugCcScanBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugRiskyCornersBox = new JCheckBox(" Debug Risky Corners Box");
+		final JCheckBox fieldLinesDebugRiskyCornersBox = new JCheckBox(" Debug Risky Corners ");
 		fieldLinesDebugRiskyCornersBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugRiskyCorners(fieldLinesDebugRiskyCornersBox.isSelected());}
 			});
-		final JCheckBox fieldLinesDebugCornerAndObjectDistancesBox = new JCheckBox(" Debug Corner And ObjectDistancesBox");
+		final JCheckBox fieldLinesDebugCornerAndObjectDistancesBox = new JCheckBox(" Debug Corner And ObjectDistances");
 		fieldLinesDebugCornerAndObjectDistancesBox.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					thresholdedImage.getVisionLink().
