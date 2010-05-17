@@ -137,6 +137,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
         nextImage.setFocusable(false);
 
         jumpToFrame = new JTextField("0", 4);
+		jumpToFrame.setFocusable(true);
 
         jumpToButton = new JButton("Jump");
         jumpToButton.setFocusable(false);
@@ -436,6 +437,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
 	// These methods are place holders designed to fill contracts
     public void notifyDataSet(DataSet s, Frame f) {
+        jumpToFrame.setText((new Integer(f.index())).toString());
     }
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}

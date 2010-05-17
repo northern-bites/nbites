@@ -315,7 +315,7 @@ public class Learning implements DataListener, MouseListener,
 
     /** @return true if we have a thresholded image, else false. */
     public boolean hasImage() {
-        return false;
+        return currentFrame != null && currentFrame.hasImage();
     }
 
 	/** @return true if in quiet mode */
