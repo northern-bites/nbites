@@ -35,7 +35,7 @@ TABLE_STD_NAME=table.mtb
 if [ $REMOTE = "ON" ] && [  $WEBOTS = "OFF" ] ; then
 
   echo "Installing remotely"
-  SRC=${MAN_INSTALL_PREFIX} #cross_install/lib/*
+  SRC=${MAN_INSTALL_PREFIX}/lib/* #cross_install/lib/*
   DEST=/home/nao/naoqi/lib/naoqi
 
   if [ ! -n "$ROBOT" ]; then
@@ -46,7 +46,7 @@ if [ $REMOTE = "ON" ] && [  $WEBOTS = "OFF" ] ; then
 
 else
   echo "Installing locally"
-  SRC=${MAN_INSTALL_PREFIX} #install/*
+  SRC=${MAN_INSTALL_PREFIX}/lib/* #install/*
   DEST=$LOCAL_DEST
 
 fi
