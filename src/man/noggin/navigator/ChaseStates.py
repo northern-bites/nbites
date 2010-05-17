@@ -1,4 +1,5 @@
 from . import NavHelper as helper
+from . import WalkHelper as walker
 from ..navigator import BrunswickSpeeds as speeds
 from math import (sin, cos)
 from ..util import MyMath
@@ -12,7 +13,7 @@ def walkSpinToBall(nav):
 
     # Set our walk towards the ball
     walkX, walkY, walkTheta = \
-           helper.getWalkSpinParam(nav.brain.my, nav.dest)
+           walker.getWalkSpinParam(nav.brain.my, nav.dest)
 
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
@@ -37,7 +38,7 @@ PFK_Y_GAIN = 0.6
 def positionForKick(nav):
     ## nav.dest = kick.getKickPosition()
 
-    ## sX,sY,sTheta = helper.getOmniWalkParam(nav.brain.my, nav.dest)
+    ## sX,sY,sTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
 
     ball = nav.brain.ball
 
