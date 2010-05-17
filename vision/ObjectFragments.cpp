@@ -489,6 +489,27 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
     int i = 0;
     int fake = 0;
     bool atTop = false;
+
+    int shortSpan = spanY / 4;
+    int qy = top.y + shortSpan;
+    int qx = xProject(top.x, top.y, qy);
+    stop scan;
+    horizontalScan(qx, qy, dir, 3, c, c2, 0, IMAGE_WIDTH - 1, scan);
+    int qs = abs(qx - scan.x);
+
+    qy += shortSpan;
+    qx = xProject(top.x, top.y, qy);
+    horizontalScan(qx, qy, dir, 3, c, c2, 0, IMAGE_WIDTH - 1, scan);
+    qs = min(qs, abs(qx - scan.x));
+    int te = top.x;
+    top.x = top.x + dir * qs;
+    top.y = yProject(te, top.y, top.x);
+    bottom.y = top.y + spanY;
+    bottom.x = xProject(top.x, top.y, top.y + spanY);
+    //thresh->drawLine(top.x, top.y, bottom.x, bottom.y, WHITE);
+    //if (qs > 0) return;
+    
+
     //drawPoint(top.x, top.y, RED);
     //drawPoint(bottom.x, bottom.y, RED);
     /* loop until we now longer have viable expansion
@@ -498,7 +519,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
 	   points we get along that scanline.  If there are enough good ones,
 	   we expand and keep moving.  If not, then we may stop
     */
-    for (j = 1; badLines < 2 && top.x + dir * j >= 0
+    /*for (j = 1; badLines < 2 && top.x + dir * j >= 0
              && top.x + dir * j < IMAGE_WIDTH; j+=increment) {
         //count = 0;
         good = 0;
@@ -583,7 +604,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
         bottom.y = yProject(temp, bottom.y, bottom.x);
         top.y = bottom.y - spanY;
         top.x = xProject(bottom.x, bottom.y, bottom.y - spanY);
-    }
+	}*/
 }
 
 /*
@@ -692,7 +713,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
         for (int d = left.y; d < horizonAt(left.x); d+=1) {
             good = 0;
             for (int a = left.x; a < right.x; a++) {
-                if (thresh->getExpandedColor(a, d) == c) {
+	      if (thresh->getExpandedColor(a, d, c) == c) {
                     good++;
                 }
             }
@@ -755,20 +776,20 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 		while (col != color && midx < IMAGE_WIDTH) {
 			midx++;
 			if (color == BLUE) {
-				if (thresh->getExpandedColor(midx, midy) == BLUE) {
+			  if (thresh->getExpandedColor(midx, midy, color) == BLUE) {
 					col = BLUE;
 					if (count == 0) {
-						while (midx >= 0 && thresh->getExpandedColor(midx, midy) == BLUE) {
+					  while (midx >= 0 && thresh->getExpandedColor(midx, midy, color) == BLUE) {
 							midx--;
 							count++;
 						}
 					}
 				} else count++;
 			} else {
-				if (thresh->getExpandedColor(midx, midy) == YELLOW) {
+			  if (thresh->getExpandedColor(midx, midy, color) == YELLOW) {
 					col = YELLOW;
 					if (count == 0) {
-						while (midx >= 0 && thresh->getExpandedColor(midx, midy) == YELLOW) {
+					  while (midx >= 0 && thresh->getExpandedColor(midx, midy, color) == YELLOW) {
 							midx--;
 							count++;
 						}
@@ -806,20 +827,20 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 		while (col != color && midx > 0 && midx <= IMAGE_WIDTH) {
 			midx--;
 			if (color == BLUE) {
-				if (thresh->getExpandedColor(midx, midy) == BLUE) {
+			  if (thresh->getExpandedColor(midx, midy, color) == BLUE) {
 					col = BLUE;
 					if (count == 0) {
-						while (midx < IMAGE_WIDTH -1 && thresh->getExpandedColor(midx, midy) == BLUE) {
+					  while (midx < IMAGE_WIDTH -1 && thresh->getExpandedColor(midx, midy, color) == BLUE) {
 							midx++;
 							count++;
 						}
 					}
 				} else count++;
 			} else {
-				if (thresh->getExpandedColor(midx, midy) == YELLOW) {
+			  if (thresh->getExpandedColor(midx, midy, color) == YELLOW) {
 					col = YELLOW;
 					if (count == 0) {
-						while (midx < IMAGE_WIDTH - 1 && thresh->getExpandedColor(midx, midy) == YELLOW) {
+					  while (midx < IMAGE_WIDTH - 1 && thresh->getExpandedColor(midx, midy, color) == YELLOW) {
 							midx++;
 							count++;
 						}
@@ -1017,7 +1038,10 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 		obj.setRightTop(rightTop);
 		obj.setLeftBottom(leftBottom);
 		obj.setRightBottom(rightBottom);
-		float newSlope = correct(obj, c, c2);
+		float newSlope = 0.0f;
+		if (count < 1) {
+		  newSlope = correct(obj, c, c2);
+		}
 		// if we detected that the post was leaning then redo with a new slope
 		if (newSlope != 0.0) {
 			if (CORRECT)
@@ -1150,7 +1174,7 @@ bool ObjectFragments::qualityPost(Blob b, int c)
     //bool soFar;
     for (int i = b.getLeftTopX(); i < b.getRightTopX(); i++)
         for (int j = b.getLeftTopY(); j < b.getLeftBottomY(); j++)
-			if (thresh->getExpandedColor(i, j) == c)
+	  if (thresh->getExpandedColor(i, j, c) == c)
                 good++;
     if (good < b.getArea() * PERCENT_NEEDED) return false;
     return true;
@@ -1843,7 +1867,7 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
             ny = yProject(startx, starty, nx);
             if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
                 total++;
-                if (thresh->getExpandedColor(nx, ny) == color) {
+                if (thresh->getExpandedColor(nx, ny, color) == color) {
                     good++;
                 }
             }
