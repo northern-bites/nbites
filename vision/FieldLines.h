@@ -2,12 +2,13 @@
 #define FieldLines_h_DEFINED
 
 // System includes
-#include <cmath>                       // use fabs, max, min
+#include <math.h>                       // use fabs, max, min
 #include <vector>                      //
 #include <list>                        //
 #include <sstream>                     //
 #include <iomanip> // setprecision for cout
 #include <boost/shared_ptr.hpp>
+
 
 class FieldLines;
 
@@ -20,7 +21,7 @@ static const int BAD_DISTANCE = -23523134;
 
 // for percentColor(), ortho directions
 enum TestDirection {TEST_UP, TEST_DOWN, TEST_LEFT, TEST_RIGHT};
-
+enum ExtendDirection {EXTEND_DOWN, EXTEND_UP};
 struct linePoint;
 
 #include "Common.h" //
@@ -442,16 +443,19 @@ public:
 
 	const bool arePointsCloseEnough(const float estimatedDistance,
 									const ConcreteCorner* j,
-									const VisualFieldObject* k) const;
+									const VisualFieldObject* k,
+									const float distToCorner) const;
 
 
     float getAllowedDistanceError(VisualFieldObject const *obj) const;
 
 
 
-
-
-
+	void extendLineVertScan(ExtendDirection dir,
+							std::list<linePoint>* foundLinePoints,
+							boost::shared_ptr<VisualLine> line,
+							point<int> lastPoint,
+							int startY, int endY);
 
     // Return true if it appears the T is out of bounds, false otherwise
     /*
@@ -487,6 +491,9 @@ public:
     const float percentColorBetween(const int x1, const int y1,
                                     const int x2, const int y2,
                                     const int color) const;
+	const bool linePointWidthsSimilar(const linePoint& last,
+									  const linePoint& current) const;
+
 
 
     void drawBox(BoundingBox box, int color) const;
@@ -539,6 +546,7 @@ public:
     void setDebugCornerAndObjectDistances(bool _bool) {
         debugCornerAndObjectDistances = _bool;
     }
+
     void setStandardView(bool _bool) {
         standardView = _bool;
     }
@@ -611,10 +619,10 @@ private:
     const bool postOnScreen() const;
 
 #ifdef OFFLINE
-    static const bool isUphillEdge(const int, const int,
-                                   const ScanDirection dir);
-    static const bool isDownhillEdge(const int, const int,
-                                     const ScanDirection dir);
+    static inline const bool isUphillEdge(const int, const int,
+										  const ScanDirection dir);
+    static inline const bool isDownhillEdge(const int, const int,
+											const ScanDirection dir);
 
     // Check to see if a particular variable holds a valid edge or the special
     // value of NO_EDGE.
@@ -622,12 +630,14 @@ private:
         return edgeY != NO_EDGE;
     }
 
-    static const bool isAtTopOfImage(const int y, const int horizonY);
-    static const bool isAtRightOfImage(const int x, const int endX);
-    static const bool isWaitingForAnotherTopEdge(const int topEdgeY,
-                                                 const int currentY);
-    static const bool isWaitingForAnotherRightEdge(const int rightEdgeX,
-                                                   const int currentX);
+    static inline const bool isAtTopOfImage(const int y,
+											const int horizonY);
+    static inline const bool isAtRightOfImage(const int x,
+											  const int endX);
+    static inline const bool isWaitingForAnotherTopEdge(const int topEdgeY,
+														const int currentY);
+    static inline const bool isWaitingForAnotherRightEdge(const int rightEdgeX,
+														  const int currentX);
 
     // These cannot be static only because they access the debugging booleans.
     const bool isFirstUphillEdge(const int uphillEdgeLoc,

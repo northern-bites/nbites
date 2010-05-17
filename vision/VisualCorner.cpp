@@ -53,12 +53,12 @@ VisualCorner::VisualCorner(const VisualCorner& other)
  * constructed in FieldLines::interesctLines()
  */
 void VisualCorner::determineCornerShape() {
-    if (Utility::tValueInMiddleOfLine(t1, line1->length, MIN_EXTEND_DIST)) {
+    if (Utility::tValueInMiddleOfLine(t1, line1->getLength(), MIN_EXTEND_DIST)) {
         cornerType = T;
         tBar = line1;
         tStem = line2;
         setID(T_CORNER);
-    } else if(Utility::tValueInMiddleOfLine(t2, line2->length,
+    } else if(Utility::tValueInMiddleOfLine(t2, line2->getLength(),
                                             MIN_EXTEND_DIST)) {
         cornerType = T;
         tBar = line2;
@@ -101,39 +101,31 @@ const shape VisualCorner::getLClassification() {
     // to direct our line segment away from the corner)
     point <int> line1End, line2End;
 
+	const point<int> corner(cornerX, cornerY);
+
+	const point<int> end1 = line1->getEndpoint();
+	const point<int> start1 = line1->getStartpoint();
     // corner is closer to start point of line 1
-    if (Utility::getLength(static_cast<float>(cornerX),
-						   static_cast<float>(cornerY),
-						   static_cast<float>(line1->start.x),
-						   static_cast<float>(line1->start.y) ) <
-        Utility::getLength(static_cast<float>(cornerX),
-						   static_cast<float>(cornerY),
-						   static_cast<float>(line1->end.x),
-						   static_cast<float>(line1->end.y) )) {
-        line1End = line1->end;
+    if (Utility::getLength(corner, start1) < Utility::getLength(corner, end1)) {
+        line1End = line1->getEndpoint();
     }
     // Closer to end
     else {
-        line1End = line1->start;
+        line1End = line1->getStartpoint();
         // Swap the signs on the line 1 basis
         line1Basis.first *= -1;
         line1Basis.second *= -1;
     }
 
+	const point<int> start2 = line2->getStartpoint();
+	const point<int> end2 = line2->getEndpoint();
     // corner is closer to start point of line 2
-    if (Utility::getLength(static_cast<float>(cornerX),
-						   static_cast<float>(cornerY),
-						   static_cast<float>(line2->start.x),
-						   static_cast<float>(line2->start.y) ) <
-        Utility::getLength(static_cast<float>(cornerX),
-						   static_cast<float>(cornerY),
-						   static_cast<float>(line2->end.x),
-						   static_cast<float>(line2->end.y) )) {
-        line2End = line2->end;
+    if (Utility::getLength(corner, start2) < Utility::getLength(corner, end2)) {
+        line2End = line2->getEndpoint();
     }
     // Closer to end
     else {
-        line2End = line2->start;
+        line2End = line2->getStartpoint();
         // Swap the signs on the line 2 basis
         line2Basis.first *= -1;
         line2Basis.second *= -1;
@@ -150,7 +142,7 @@ const shape VisualCorner::getLClassification() {
     // v dot w = ||v|| ||w|| cos theta -> v dot w / (||v|| ||w||) = cos theta
     // -> ...
     float theta = TO_DEG * NBMath::safe_acos(dotProduct/
-                                             (line1->length * line2->length));
+                                             (line1->getLength() * line2->getLength()));
     /*
       cout << " first line: " << line1->start << ", " << line1->end << endl;
       cout << " second line: " << line2->start << ", " << line2->end << endl;
@@ -390,6 +382,7 @@ void VisualCorner::setPossibleCorners(
 			if (**newCorner == **currCorner) {
 				updated.push_back(*newCorner);
 				newCorner = _possibleCorners.erase(newCorner);
+				break;
 			} else {
 				// Increment the iterator if we don't erase a corner
 				newCorner++;
@@ -416,16 +409,20 @@ setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
 
 		for ( vector<const ConcreteCorner*>::iterator
 				  newCorner = _possibleCorners.begin();
-			  newCorner != _possibleCorners.end() ; newCorner++) {
+			  newCorner != _possibleCorners.end() ; ) {
 
 			// If the line is in both sets, then it's still a
 			// possible corner
 			if (**newCorner == **currCorner) {
 				updated.push_back(*newCorner);
+				newCorner = _possibleCorners.erase(newCorner);
+				break;
+			} else {
+				// Increment the iterator if we don't erase a corner
+				newCorner++;
 			}
 		}
 	}
-
 	if (updated.size() > 0)
 		possibleCorners = updated;
 }

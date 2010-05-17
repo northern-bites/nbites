@@ -114,8 +114,7 @@ public:
     virtual const std::string toString() const;
 
     static const std::vector <const ConcreteCorner*>&
-	getPossibleCorners(shape
-					   corner_type);
+	getPossibleCorners(shape corner_type);
 
 	const std::vector<const ConcreteLine*> getLines() const {
 		return lines;

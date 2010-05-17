@@ -63,16 +63,20 @@ VisualLine::VisualLine(list<linePoint> &linePoints)
 
 VisualLine::VisualLine(const VisualLine& other)
     : VisualLandmark<lineID>(other),
-      start(other.start), end(other.end), left(other.left), right(other.right),
-      bottom(other.bottom), top(other.top), points(other.points),
-      angle(other.angle), a(other.a), b(other.b), length(other.length),
+      start(other.start), end(other.end), leftBound(other.leftBound),
+	  rightBound(other.rightBound),
+      bottomBound(other.bottomBound),
+	  topBound(other.topBound),
+	  points(other.points),
+      angle(other.angle), length(other.length),
+	  a(other.a), b(other.b),
       color(other.color), colorStr(other.colorStr),
       avgVerticalWidth(other.avgVerticalWidth),
       avgHorizontalWidth(other.avgHorizontalWidth),
-      thinnestHorPoint(other.thinnestHorPoint),
-      thickestHorPoint(other.thickestHorPoint),
-      thinnestVertPoint(other.thinnestVertPoint),
-      thickestVertPoint(other.thickestVertPoint),
+      thinnestHorPoint(other.getThinnestHorizontalPoint()),
+      thickestHorPoint(other.getThickestHorizontalPoint()),
+      thinnestVertPoint(other.getThinnestVerticalPoint()),
+      thickestVertPoint(other.getThickestVerticalPoint()),
       distance(other.getDistance()), bearing(other.getBearing()),
       distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
       ccLine(other.getCCLine()),
@@ -110,63 +114,63 @@ void VisualLine::addPoints(const vector <linePoint> &additionalPoints)
 void VisualLine::init()
 {
     // Points are sorted by x
-    left = points[0].x;
-    right = points[points.size()-1].x;
+    leftBound = points[0].x;
+    rightBound = points[points.size()-1].x;
 
     // Unfortunately we can't get the top and bottom so easily
-    top = min_element(points.begin(), points.end(), YOrder())->y;
-    bottom = max_element(points.begin(), points.end(), YOrder())->y;
+    topBound = min_element(points.begin(), points.end(), YOrder())->y;
+    bottomBound = max_element(points.begin(), points.end(), YOrder())->y;
 
     pair <float, float> equation = leastSquaresFit(points);
     a = equation.first;
     b = equation.second;
 
     // We are calling this a vertical line
-    if (abs(right - left) < 2) {
-        right = left;
+    if (abs(rightBound - leftBound) < 2) {
+        rightBound = leftBound;
 
-        start.x = left;
-        end.x = left;
-        start.y = bottom;
-        end.y = top;
+        start.x = leftBound;
+        end.x = leftBound;
+        start.y = bottomBound;
+        end.y = topBound;
     }
-    // Line is more horizontally oriented, use left and right and calculate the
+    // Line is more horizontally oriented, use leftBound and rightBound and calculate the
     // endpoints
-    else if (right-left > bottom-top){
-        start.x = left;
-        end.x = right;
+    else if (rightBound-leftBound > bottomBound-topBound){
+        start.x = leftBound;
+        end.x = rightBound;
         start.y = Utility::getLineY(start.x, b, a);
         end.y = Utility::getLineY(end.x, b, a);
         // Since we are basing our end point's y values on the least squares
         // regression values, need to recalculate the top and bottom points
         if (start.y < end.y) {
-            top = start.y;
-            bottom = end.y;
+            topBound = start.y;
+            bottomBound = end.y;
         }
         else {
-            top = end.y;
-            bottom = start.y;
+            topBound = end.y;
+            bottomBound = start.y;
         }
     }
     // Line is more vertically oriented, use top and bottom to calculate the
     // other endpoints
     else {
-        start.y = bottom;
-        end.y = top;
+        start.y = bottomBound;
+        end.y = topBound;
         start.x = Utility::getLineX(start.y, b, a);
         end.x = Utility::getLineX(end.y, b, a);
         if (start.x < end.x) {
-            left = start.x;
-            right = end.x;
+            leftBound = start.x;
+            rightBound = end.x;
         }
         else {
-            left = end.x;
-            right = start.x;
+            leftBound = end.x;
+            rightBound = start.x;
         }
     }
 
-    angle = getAngle();
-    length = getLength();
+    angle = calcAngle();
+    length = calcLength();
 
     calculateWidths();
 }
@@ -237,8 +241,19 @@ void VisualLine::calculateWidths()
     }
 }
 
+/**
+ * Set the color value of the line. Also sets the string value of the color.
+ */
+void VisualLine::setColor(const int c)
+{
+	color = c;
+	setColorString(Utility::getColorString(c));
+}
 
-const float VisualLine::getLength()
+/**
+ * Calculate the length of the line on screen from its endpoints.
+ */
+const float VisualLine::calcLength() const
 {
     return Utility::getLength( static_cast<float>(start.x),
 							   static_cast<float>(start.y),
@@ -246,8 +261,10 @@ const float VisualLine::getLength()
 							   static_cast<float>(end.y) );
 }
 
-// Get the angle from horizontal (in degrees) the line makes on the screen
-const float VisualLine::getAngle()
+/**
+ * Calculate the angle from horizontal (in degrees) the line makes on the screen
+ */
+const float VisualLine::calcAngle() const
 {
     return Utility::getAngle(start.x, start.y,
                              end.x, end.y);
@@ -257,19 +274,13 @@ const float VisualLine::getAngle()
 // than the change in x
 const bool VisualLine::isVerticallyOriented()
 {
-    return right - left < bottom - top;
+    return rightBound - leftBound < bottomBound - topBound;
 }
 
 
 const bool VisualLine::isPerfectlyVertical()
 {
-    return right == left;
-}
-
-// Return the slope of the line (returns NAN if vertical)
-const float VisualLine::getSlope() const
-{
-    return Utility::getSlope(*this);
+    return rightBound == leftBound;
 }
 
 // Given a line, returns (a, b) where the line can be represented by
@@ -280,7 +291,7 @@ const float VisualLine::getSlope() const
 pair<int, int> VisualLine::
 getLineComponents(const VisualLine &aLine)
 {
-    int i = aLine.right - aLine.left;
+    int i = aLine.rightBound - aLine.leftBound;
     // If y2 is above y1 in the image, y2 is smaller in image coordinates than
     // y1, so this would be a negative j value (as per our axis oriented towards
     // bottom of screen)
@@ -323,10 +334,10 @@ VisualLine::leastSquaresFit(const vector<linePoint> &thePoints)
       xSquaredSum += (thePoints[i].x * thePoints[i].x);
       }*/
 
-    float b = ((ySum * xSquaredSum) - (xSum * xYSum)) /
+    const float b = ((ySum * xSquaredSum) - (xSum * xYSum)) /
 		((numPoints * xSquaredSum) - (xSum * xSum)) ;
 
-    float m =  ( (numPoints * xYSum) - (xSum * ySum) ) /
+    const float m =  ( (numPoints * xYSum) - (xSum * ySum) ) /
 		((numPoints * xSquaredSum) - (xSum * xSum)) ;
 
     return pair<float, float>(m, b);
