@@ -21,7 +21,6 @@ def playbookPosition(player):
     gcState = brain.gameController.currentState
 
     if player.firstFrame():
-        nav.positionPlaybook()
 
         if gcState == 'gameReady':
             brain.tracker.locPans()
@@ -31,31 +30,7 @@ def playbookPosition(player):
     if transitions.shouldAvoidObstacle(player):
         return player.goNow('avoidObstacle')
 
-    # we're at the point, let's switch to another state
-    if nav.isStopped() and player.counter > 0:
-        return player.goLater('atPosition')
-
-    return player.stay()
-
-def atPosition(player):
-    """
-    State for when we're at the position
-    """
-    nav = player.brain.nav
-
-    if player.firstFrame():
-        player.stopWalking()
-        player.notAtPositionCounter = 0
-
-    # buffer switching back to playbook position
-    if transitions.shouldReposition(player, nav.dest, player.brain.my):
-        player.notAtPositionCounter += 1
-
-        if player.notAtPositionCounter >=\
-               constants.NOT_AT_POSITION_FRAMES_THRESH:
-            return player.goLater('playbookPosition')
-    else:
-        player.notAtPositionCounter = 0
+    nav.positionPlaybook()
 
     return player.stay()
 

@@ -5,7 +5,6 @@ from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
-from ..playbook.PBConstants import GOALIE
 from math import fabs
 
 DEBUG = False
