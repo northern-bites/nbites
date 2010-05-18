@@ -49,7 +49,7 @@ FINK_INCLUDE := -I/sw/include
 NATIVE_VISION_TARGET := $(META_DIR)/lib$(NATIVE_VISION_CLASS_FILE).jnilib
 VISION_SHARED_OPTS := -dynamiclib -m32
 else
-JAVA_INCLUDE:= -I/usr/lib/jvm/java-1.5.0-sun/include/ -I/usr/lib/jvm/java-6-sun-1.6.0.20/include/ -I/usr/lib/jvm/java-6-sun-1.6.0.20/include/linux/
+JAVA_INCLUDE:= -I/usr/lib/jvm/java-1.5.0-sun/include/linux/ -I/usr/lib/jvm/java-1.5.0-sun/include/ -I/usr/lib/jvm/java-6-sun-1.6.0.20/include/ -I/usr/lib/jvm/java-6-sun-1.6.0.20/include/linux/
 VISION_SHARED_OPTS := -shared -fpic
 NATIVE_VISION_TARGET := $(META_DIR)/lib$(NATIVE_VISION_CLASS_FILE).so
 endif
