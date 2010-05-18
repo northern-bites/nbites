@@ -413,7 +413,6 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
     }
     scan.bad = bad;
     scan.good = good;
-    //cout << "return with " << temp.x << endl;
 }
 
 /*
@@ -448,10 +447,8 @@ bool ObjectFragments::checkEdge(int x, int y, int x2, int y2)
  * them to find the true edge. The idea is pretty simply.  The passed in points
  * form a potential edge to our goal.  However, they are just a starting point.
  * WHat we want to do is to move the edge until it hits the real edge of the
- * object.  So we essentially loop, constantly moving the edge in the passed
- * in direction until we get to the new edge.
- * TODO:  Use edge detection?
- * TODO:  Do lower res scanning?
+ * object.  We scan out in three places to see how far the object goes.  Then
+ * we take the middle value (Olympic scoring - throw out high and low values).
  *
  * @param top         the topmost estimated point
  * @param bottom      the bottommost estimated point
@@ -464,158 +461,55 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
                                                  point <int>& bottom,
                                                  int c, int c2, bool left)
 {
-    const int POST_DIVISOR = 3;
-	const int MIN_WIDTH = 5;
-	const int INITIAL_MIN = 5;
-	const int IMAGE_DIFFERENCE = 3;
-
-    int increment = 1;
-    int spanY = bottom.y - top.y + 1;
-    int count = 0;
-    int good = spanY;
-    int goodRun = 0;
-    int j = 0;
+    int spanY = bottom.y - top.y;
     int dir = 1;
-    int theSpot = 0;
-    //int xShift = 0;
-    int run = 0;
-    int initRun = 0;
     if (left)
         dir = -1;
-    int minCount = (spanY / POST_DIVISOR) / increment;
-    int minRun = min(spanY, max(MIN_WIDTH, spanY / 2));
-    int minGood = max(1, (spanY / 4) / increment);
-    int badLines = 0;
-    int i = 0;
-    int fake = 0;
-    bool atTop = false;
-
     int shortSpan = spanY / 4;
     int qy = top.y + shortSpan;
     int qx = xProject(top.x, top.y, qy);
     stop scan;
-    horizontalScan(qx, qy, dir, 3, c, c2, 0, IMAGE_WIDTH - 1, scan);
-    int qs = abs(qx - scan.x);
 
+	// scan out a 1/4 of the way down the edge
+    horizontalScan(qx, qy, dir, 3, c, c2, 0, IMAGE_WIDTH - 1, scan);
+    int qs = abs(qx - scan.x);   // how far did we go?
+
+	// scan out halfway
     qy += shortSpan;
     qx = xProject(top.x, top.y, qy);
     horizontalScan(qx, qy, dir, 3, c, c2, 0, IMAGE_WIDTH - 1, scan);
-    qs = min(qs, abs(qx - scan.x));
+	int q2 = abs(qx - scan.x);
+
+	// scan out 3/4 of the way
+	qy+= shortSpan;
+	qx = xProject(top.x, top.y, qy);
+    horizontalScan(qx, qy, dir, 3, c, c2, 0, IMAGE_WIDTH - 1, scan);
+    int q3 = abs(qx - scan.x);
+
+	// we'll take the middle of the three values
+	if (qs > q3) {
+		if (qs > q2) {
+			qs = max(q2, q3);
+		}
+	} else {
+		if (qs < q2) {
+			qs = min(q2, q3);
+		}
+	}
+
+	// reset the edge
     int te = top.x;
     top.x = top.x + dir * qs;
     top.y = yProject(te, top.y, top.x);
     bottom.y = top.y + spanY;
     bottom.x = xProject(top.x, top.y, top.y + spanY);
-    //thresh->drawLine(top.x, top.y, bottom.x, bottom.y, WHITE);
-    //if (qs > 0) return;
-    
-
-    //drawPoint(top.x, top.y, RED);
-    //drawPoint(bottom.x, bottom.y, RED);
-    /* loop until we now longer have viable expansion
-          too many bad lines in a row
-          top is off the edge of the screen
-       basically we scan the next line out and count how many good and bad
-	   points we get along that scanline.  If there are enough good ones,
-	   we expand and keep moving.  If not, then we may stop
-    */
-    /*for (j = 1; badLines < 2 && top.x + dir * j >= 0
-             && top.x + dir * j < IMAGE_WIDTH; j+=increment) {
-        //count = 0;
-        good = 0;
-        fake = 0;
-        run = 0;
-        goodRun = 0;
-        initRun = 0;
-        int actualY = yProject(top.x, top.y, top.x + dir * j);
-        if (actualY < 1) atTop = true;
-		// here's where we do the scanning.  Stop early if we have enough information
-        for (i = actualY; count < minCount  &&
-                 i <= actualY + spanY && (run < minRun || goodRun > spanY / 2)
-                 && (top.y > 1 || initRun < minRun);
-             i+= increment) {
-            theSpot = xProject(top.x + dir * j, actualY, i);
-            if (theSpot < 0 || theSpot > IMAGE_WIDTH - 1 || theSpot - dir < 0 ||
-                theSpot - dir > IMAGE_WIDTH - 1 || i < 0 ||
-                i > IMAGE_HEIGHT - 1) {
-                fake++;
-            } else {
-				int curcol = thresh->getColor(theSpot, i);
-                if (curcol == c || curcol == c2) {
-                    good++;
-                    goodRun++;
-                    initRun = -1;
-                    run = 0;
-                } else {
-                    goodRun = 0;
-                    if (initRun > -1) {
-                        initRun++;
-                        if (atTop && initRun > INITIAL_MIN) break;
-                    }
-                    if (curcol != ORANGE && curcol != WHITE)
-                        run++;
-                }
-            }
-        }
-        if (good + fake < minGood || good < 1) {
-            badLines++;
-        }
-    }
-
-    // ok so we did the basic scanning.  The problem is that sometimes we ended
-	// early because we hit a screen edge and weren't really done in the sense that
-	// we had found the edge.  Try and
-	// check for those situations and see if we can continue to expand the edge.
-	// TODO:  Surely this could be improved
-    int temp = top.x;
-    top.x = top.x + dir * (j - badLines) - dir;
-    top.y = yProject(temp, top.y, top.x);
-    bottom.y = top.y + spanY;
-    bottom.x = xProject(top.x, top.y, top.y + spanY);
-    if (top.x < 2 || top.x > IMAGE_WIDTH - IMAGE_DIFFERENCE) {
-        for (j = 1; count < minCount && bottom.x + dir * j >= 0
-                 && bottom.x + dir * j < IMAGE_WIDTH
-                 && good > minGood && run < minRun; j+=increment) {
-            good = 0;
-            run = 0;
-            int actualY = yProject(bottom.x, bottom.y, bottom.x + dir * j);
-            for (i = actualY; count < minCount && i >= actualY - spanY &&
-                     run < minRun; i-= increment) {
-                theSpot = xProject(bottom.x + dir * j, actualY, i);
-
-                if (theSpot < 0 || theSpot > IMAGE_WIDTH - 1
-                    || theSpot - dir < 0 || theSpot - dir > IMAGE_WIDTH - 1
-                    || i < 0 || i > IMAGE_HEIGHT - 1)
-                    good++;
-
-                else {
-                    int curcol = thresh->getColor(theSpot, i);
-                    if (curcol == c || curcol == c2) {
-                        good++;
-                        run = 0;
-                    } else {
-                        run++;
-                    }
-                }
-            }
-        }
-        temp = bottom.x;
-        bottom.x = bottom.x + dir * (j - increment) - dir;
-        bottom.y = yProject(temp, bottom.y, bottom.x);
-        top.y = bottom.y - spanY;
-        top.x = xProject(bottom.x, bottom.y, bottom.y - spanY);
-	}*/
 }
 
 /*
  * Given two points that should define an edge of a structure, try and improve
  * them to find the true edge.  The idea is pretty simply.  The passed in points
  * form a potential edge to our goal.  However, they are just a starting point.
- * WHat we want to do is to move the edge until it hits the real edge of the
- * object.  So we essentially loop, constantly moving the edge in the passed
- * in direction until we get to the new edge.
- * TODO:  Use edge detection?
- * TODO:  Do lower res scanning?
+ * See comments for previous method.
  * @param left        the leftmost estimated point
  * @param right       the rightmost estimated point
  * @param c           the primary color of the structure
@@ -627,109 +521,49 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
                                                    point <int>& right, int c,
                                                    int c2, bool up)
 {
-    const int INITIAL_GREEN = 3;
-    const int MIN_WIDTH = 5;
-	const int RUN_DIVISOR = 5;
-	const int COUNT_DIVISOR = 3;
-	const int GOOD_DIVISOR = 3;
-	const float SPAN_MULTIPLIER = 0.5;
-
-    int spanX = right.x - left.x + 1;
-    int spanY = right.y - left.y + 1;
-    int count = 0;
-    int good = spanX;
-    int j = 0;
+    int spanX = right.x - left.x;
     int dir = 1;
-    int theSpot = 0;
-    int run = 0;
-    int badLines = 0;
-    int maxgreen = INITIAL_GREEN;
-    // EXAMINED: change to lower res
-    maxgreen = 100;
     if (up)
         dir = -1;
-    int minRun = min(spanX, max(MIN_WIDTH, spanX / RUN_DIVISOR));
-    int minCount = min(spanX, max(2, spanX / COUNT_DIVISOR));
-    int minGood = max(1, spanX / GOOD_DIVISOR);
-    int greens = 0;
-    int fakegood = 0;
+    int shortSpan = spanX / 4;
+    int qx = left.x + shortSpan;
+    int qy = yProject(left.x, right.y, qx);
+    stop scan;
 
-	// Main loop - keep moving the edge in the right direction
-    // loop until we can't expand anymore
-    for (j = 1; count < minCount && left.y + dir * j >= 0
-             && left.y + dir * j < IMAGE_HEIGHT && badLines < 2
-             && greens < max(minRun, maxgreen); j++) {
-        good = 0;
-        run = 0;
-        greens = 0;
-        fakegood = 0;
-        int actualX = xProject(left.x, left.y, left.y + dir * j);
-		// count up the good and bad pixels in this scanline
-        for (int i = actualX; count < minCount && i <= actualX + spanX
-                 && greens < maxgreen; i++) {
-            theSpot = yProject(actualX, left.y + dir * j, i);
-            if (theSpot < 0 || theSpot > IMAGE_HEIGHT - 1 || theSpot - dir < 0
-                || theSpot - dir > IMAGE_HEIGHT - 1 || i < 0
-                || i > IMAGE_WIDTH - 1) {
-                // assume the best?
-                fakegood++;
-            } else {
-                int curcol = thresh->getColor(i, theSpot);
-                if (curcol == c || curcol == c2) {
-                    good++;
-                    run = 0;
-                } else {
-                    if (curcol != ORANGE && curcol != WHITE)
-                        run++;
-                    if (curcol == GREEN) {
-                        greens++;
-                    }
-                }
-            }
-        }
-        good += fakegood / 2;
-        if (good < minGood)
-            badLines++;
-    }
-    // if we had to stop because we hit the left edge, then see if we can go
-    // farther by using the bottom.
-    int temp = left.y;
-    left.y =  left.y + dir * (j - badLines) - dir;
-    left.x = xProject(left.x, temp, left.y);
+	thresh->drawPoint(left.x, left.y, BLUE);
+	// scan out a 1/4 of the way to the right the edge
+    vertScan(qx, qy, dir, 3, c, c2, scan);
+    int qs = abs(qy - scan.y);   // how far did we go?
+
+	// scan out halfway
+    qx += shortSpan;
+    qy = yProject(left.x, left.y, qx);
+    vertScan(qx, qy, dir, 3, c, c2, scan);
+    int q2 = abs(qy - scan.y);
+
+	// scan out 3/4 of the way
+	qx+= shortSpan;
+	qy = yProject(left.x, left.y, qx);
+    vertScan(qx, qy, dir, 3, c, c2, scan);
+    int q3 = abs(qy - scan.y);
+
+	// we'll take the middle of the three values
+	if (qs > q3) {
+		if (qs > q2) {
+			qs = max(q2, q3);
+		}
+	} else {
+		if (qs < q2) {
+			qs = min(q2, q3);
+		}
+	}
+
+	// reset the edge
+    int te = left.y;
+    left.y = left.y + dir * qs;
+    left.x = xProject(left.x, te, left.y);
     right.x = left.x + spanX;
-    right.y = left.y + spanY;
-
-    if( right.x > IMAGE_WIDTH) {
-        right.x = IMAGE_WIDTH;
-    }
-
-    if( left.x < 0) {
-        left.x = 0;
-    }
-
-    if (!up && horizonAt(left.x) > left.y) {
-        // for the heck of it let's scan down
-        int found = left.y;
-        for (int d = left.y; d < horizonAt(left.x); d+=1) {
-            good = 0;
-            for (int a = left.x; a < right.x; a++) {
-	      if (thresh->getExpandedColor(a, d, c) == c) {
-                    good++;
-                }
-            }
-            if (good > spanX * SPAN_MULTIPLIER) {
-                found = d;
-            }
-        }
-        if (found != left.y) {
-            left.y = found;
-            left.x = xProject(left.x, temp, left.y);
-            right.x = left.x + spanX;
-            right.y = left.y + spanY;
-            //drawPoint(right.x, right.y, ORANGE);
-            findHorizontalEdge(left, right, c, c2, up);
-        }
-    }
+    right.y = yProject(left.x, left.y, left.x + spanX);
 }
 
 
@@ -864,125 +698,6 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 	}
 	return 0.0f;
 
-	/*
-    // try and find the cross bar - start at the upper left corner
-    int biggest = 0, biggest2 = 0;
-	int skewr = 0, skewl = 0;
-    int x = b.getLeftTopX();
-    int y = b.getLeftTopY();
-    int h = b.height();
-    int w = b.width();
-
-	if (w < MIN_WIDTH) return 0.0f;
-    //int need = min(w / 2, 20);
-    int need = max(w, MIN_SIZE);
-	float newSlope = 0.0f;
-	if (CORRECT) {
-		drawBlob(b, ORANGE);
-	}
-	stop scan;
-	// scan the left side to see how far out we can go seeing post
-    for (int i = 0; i < h / HEIGHT_DIVISOR && biggest < need; i+=1) {
-        int tx = xProject(x, y, y + i);
-        horizontalScan(tx, y + i, -1, ERROR_TOLERANCE, color, color,
-					   max(0, x - 2 * w), IMAGE_WIDTH - 1, scan);
-        if (scan.good > biggest) {
-            biggest = scan.good;
-        }
-    }
-	// now the right side
-    x = b.getRightTopX();
-    y = b.getRightTopY();
-    for (int i = 0; i < h / HEIGHT_DIVISOR && biggest2 < need; i+=1) {
-        int tx = xProject(x, y, y + i);
-        horizontalScan(tx, y + i, 1, ERROR_TOLERANCE, color, color, x - 1,
-					   IMAGE_WIDTH - 1, scan);
-        if (scan.good > biggest2) {
-            biggest2 = scan.good;
-        }
-    }
-	// What we're going to do is scan opposite corners at the bottom and subtract
-	// those results.
-	x = b.getRightBottomX();
-	y = b.getRightBottomY();
-	int bestr = 0, bestl = 0;
-    for (int i = 0; i < h / HEIGHT_DIVISOR && skewr < biggest; i+=1) {
-        int tx = xProject(x, y, y - i);
-        horizontalScan(tx, y - i, 1, ERROR_TOLERANCE, color, color,
-					   x - 1, IMAGE_WIDTH - 1, scan);
-        if (scan.good > skewr) {
-            skewr = scan.good;
-			bestr = i;
-        }
-    }
-	x = b.getLeftBottomX();
-	y = b.getLeftBottomY();
-    for (int i = 0; i < h / HEIGHT_DIVISOR && skewl < biggest2; i+=1) {
-        int tx = xProject(x, y, y - i);
-        horizontalScan(tx, y - i, -1, ERROR_TOLERANCE, color, color,
-					   max(0, x - 2 * w), IMAGE_WIDTH - 1, scan);
-        if (scan.good > skewl) {
-			bestl = i;
-            skewl = scan.good;
-        }
-    }
-
-	int stops = 10;
-	// Now based on our scanning, check if the post is leaning left
-	if (biggest > LEAN_THRESH && skewr > MINIMUM_SKEW) {
-		if (CORRECT)
-			cout << "Left lean detected " << biggest <<
-				" " << skewr << " " << bestr << endl;
-		int topmove = min(skewr, biggest);
-		//drawLine(b.getLeftTop.x - skewr, b.getLeftTopY(), b.getLeftBottom.x + skewr,
-		//    b.getLeftBottomY(), ORANGE);
-		b.setLeftTopX(max(0, b.getLeftTopX() - topmove));
-		b.setRightBottomX(b.getRightBottomX() + skewr);
-		// make sure we don't over-correct
-		x = b.getLeftBottomX() + skewr;
-		y = b.getLeftBottomY();
-		int backr = 0;
-		int stopper = max(stops, bestr);
-		for (int i = 0; i < stopper; i+=1) {
-			int tx = xProject(x, y, y - i);
-			horizontalScan(tx, y - i, -1, ERROR_TOLERANCE, color, color,
-						   max(0, x - 2 * w), IMAGE_WIDTH - 1, scan);
-			if (scan.good > backr) {
-				backr = scan.good;
-			}
-		}
-		b.setLeftBottomX(b.getLeftBottomX() + skewr - backr);
-		b.setRightTopX(min(IMAGE_WIDTH - 1, b.getRightTopX() - topmove + backr));
-		newSlope = -(float)(b.getLeftBottomX() - b.getLeftTopX()) /
-			(float)(b.getLeftBottomY() - b.getLeftTopY());
-		return newSlope;
-	}
-	// based on our scanning check if it is leaning right
-	if (biggest2 > LEAN_THRESH && skewl > MINIMUM_SKEW) {
-		if (CORRECT)
-			cout << "Right lean detected " << biggest2 << " "
-				 << skewl << " " << bestl << endl;
-		int topmove = min(skewl, biggest2);
-		b.setRightTopX(b.getRightTopX() + topmove);
-		b.setLeftBottomX(max(0, b.getLeftBottomX() - skewl));
-		x = max(0, b.getRightBottomX() - skewl);
-		y = b.getRightBottomY();
-		int backl = 0;
-		int stopper = max(stops, bestl);
-		for (int i = 0; i < stopper; i+=1) {
-			int tx = xProject(x, y, y - i);
-			horizontalScan(tx, y - i, 1, ERROR_TOLERANCE, color, color, 0,
-						   IMAGE_WIDTH - 1, scan);
-			if (scan.good > backl) {
-				backl = scan.good;
-			}
-		}
-		b.setRightBottomX(min(IMAGE_WIDTH - 1, b.getRightBottomX() - skewl + backl));
-		b.setLeftTopX(b.getLeftTopX() + topmove - backl);
-		newSlope = -(float)(b.getRightBottomX() - b.getRightTopX()) /
-			(float)(b.getRightBottomY() - b.getRightTopY());
-	}
-	return newSlope;*/
 }
 
 /*  Routine to find a general rectangular goal.
@@ -1026,7 +741,6 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 		point <int> rightTop = point<int>(topx, top);
 		point <int> leftBottom = point<int>(bottomx, bottom);
 		point <int> rightBottom = point<int>(bottomx, bottom);
-		//vision->drawLine(topx, top, bottomx, bottom, BLACK);
 		// first expand the sides
 		findVerticalEdge(leftTop, leftBottom, c, c2, true);
 		findVerticalEdge(rightTop, rightBottom, c, c2, false);
