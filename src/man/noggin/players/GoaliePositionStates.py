@@ -65,7 +65,7 @@ def goalieAtPosition(player):
 
     if (abs(nav.dest.x - position.x) > constants.SHOULD_POSITION_DIFF or
         abs(nav.dest.y - position.y) >  constants.SHOULD_POSITION_DIFF or
-        not player.atDestinationGoalie() or
+        not player.atDestination() or
         not player.atHeading()):
         return player.goNow("goalieAwesomePosition")
     return player.stay()

@@ -15,9 +15,6 @@ def atDestinationCloser(my, dest):
     """
     return my.distTo(dest) < constants.CLOSER_XY
 
-def atDestinationGoalie(my, dest):
-    return my.distTo(dest) < constants.GOALIE_CLOSE
-
 def atHeadingGoTo(my, targetHeading):
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
     return hDiff < constants.AT_HEADING_GOTO_DEG

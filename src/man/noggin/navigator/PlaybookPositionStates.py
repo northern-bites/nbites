@@ -15,12 +15,8 @@ def playbookWalk(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    if nav.brain.play.isRole(GOALIE):
-        if navTrans.atDestinationGoalie(my, dest) and navTrans.atHeading(my, dest.h):
-            return nav.goNow('stop')
-    else:
-        if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
-            return nav.goNow('stop')
+    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
+        return nav.goNow('stop')
 
     dest.h = my.headingTo(dest)
 
@@ -46,12 +42,8 @@ def playbookOmni(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    if nav.brain.play.isRole(GOALIE):
-        if navTrans.atDestinationGoalie(my, dest) and navTrans.atHeading(my, dest.h):
-            return nav.goNow('stop')
-    else:
-        if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
-            return nav.goNow('stop')
+    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
+        return nav.goNow('stop')
 
     walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
