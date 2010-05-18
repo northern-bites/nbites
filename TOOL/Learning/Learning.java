@@ -1024,7 +1024,7 @@ public class Learning implements DataListener, MouseListener,
 		} else if (ceesV > cees) {
 			falseCC += ceesV - cees;
 			goodCC += cees;
-			printFalseTCornerMessage();
+			printFalseCcCornerMessage();
 		} else if (cees > 0) {
 			goodCC += cees;
 		}
