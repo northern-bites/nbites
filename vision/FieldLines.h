@@ -491,10 +491,8 @@ public:
     const float percentColorBetween(const int x1, const int y1,
                                     const int x2, const int y2,
                                     const int color) const;
-    const bool linePointWidthsSimilar(const linePoint& last,
-                                      const linePoint& current) const;
-
-
+    const bool linePointWidthsDifferent(const linePoint& last,
+                                        const linePoint& current) const;
 
     void drawBox(BoundingBox box, int color) const;
     void drawSurroundingBox(boost::shared_ptr<VisualLine> aLine, int color) const;

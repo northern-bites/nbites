@@ -113,6 +113,8 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr,
     debugIntersectLines = false;
     debugIdentifyCorners = false;
     debugCornerAndObjectDistances = false;
+    debugFitUnusedPoints = false;
+    debugRiskyCorners = false;
     debugCcScan = false;
     standardView = true;//false;
 #endif
@@ -1078,16 +1080,13 @@ void FieldLines::createLines(list <linePoint> &linePoints) {
             // In addition, if the new point is closer to us than the last
             // point, the lineWidth should have increased or at most decrease by
             // some small number of pixels.
-            if (true || back->foundWithScan == currentPoint->foundWithScan) {
-				if (linePointWidthsSimilar(*back, *currentPoint)){
-                    if (debugCreateLines)
-                        cout << "\tSecond loop: Sanity check 'Points of "
-                             << "similar line widths failed', line width 1: "
-                             << back->lineWidth << ", line width 2:"
-                             << currentPoint->lineWidth << endl;
-                    continue;
-                }
-
+            if (linePointWidthsDifferent(*back, *currentPoint)){
+                if (debugCreateLines)
+                    cout << "\tSecond loop: Sanity check 'Points of "
+                         << "similar line widths failed', line width 1: "
+                         << back->lineWidth << ", line width 2:"
+                         << currentPoint->lineWidth << endl;
+                continue;
             }
 
             // ANGLE CHECK:  Check to see if the horizontal angle of the line as
@@ -1682,6 +1681,7 @@ shared_ptr<VisualLine> FieldLines::mergeLines(shared_ptr<VisualLine> line1,
 // line farther to both the right and the left in the case of mostly
 // horizontal lines, or to the top and bottom in the case of mostly
 // vertical lines
+// @TODO: document and improve these functions. Reduce code duplication.
 void FieldLines::extendLines(vector < shared_ptr<VisualLine> > &lines) {
     if (debugExtendLines) {
         cout << "In extendLines with " << lines.size() << " lines. " << endl;
@@ -1730,7 +1730,6 @@ void FieldLines::extendLineVertically(shared_ptr<VisualLine> line) {
     if (debugExtendLines) { cout << "Extending to the top" << endl; }
     // Extend towards the top of the image
 
-	// @TODO Fix VisualLine so we don't need to do this bullshit
 	extendLineVertScan(EXTEND_UP, &foundLinePoints, line, topPt,
 					   topPt.y, vision->thresh->getVisionHorizon());
 
@@ -1856,7 +1855,7 @@ void FieldLines::extendLineHorizontally(shared_ptr<VisualLine> line) {
         if (newPoint != VisualLine::DUMMY_LINEPOINT &&
             // @TODO: Make sure the line width isn't too different from the avg
             // of the line (or the closest point on the line)
-			linePointWidthsSimilar(closestPoint, newPoint)) {
+			!linePointWidthsDifferent(closestPoint, newPoint)) {
 
             if (debugExtendLines) {
                 cout << "\tAdding point " << newPoint << endl;
@@ -1991,10 +1990,11 @@ const bool FieldLines::isGreenColor(int threshColor) {
 // the correct (x,y) location and width and scan.
 linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
                                                     ScanDirection dir) {
+    static const int MAX_SEARCH = 100;
     if (dir == HORIZONTAL) {
         // @TODO: figure out a limit to search
-        int leftX = findEdgeFromMiddleOfLine(x, y, 100, TEST_LEFT);
-        int rightX = findEdgeFromMiddleOfLine(x, y, 100, TEST_RIGHT);
+        int leftX = findEdgeFromMiddleOfLine(x, y, MAX_SEARCH, TEST_LEFT);
+        int rightX = findEdgeFromMiddleOfLine(x, y, MAX_SEARCH, TEST_RIGHT);
 
         // We can't use this point
         if (leftX == NO_EDGE && rightX == NO_EDGE) {
@@ -2026,9 +2026,8 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
     }
     // Vertical
     else {
-        // @TODO: Named constant
-        int topY = findEdgeFromMiddleOfLine(x, y, 100, TEST_UP);
-        int bottomY = findEdgeFromMiddleOfLine(x, y, 100, TEST_DOWN);
+        int topY = findEdgeFromMiddleOfLine(x, y, MAX_SEARCH, TEST_UP);
+        int bottomY = findEdgeFromMiddleOfLine(x, y, MAX_SEARCH, TEST_DOWN);
 
         // We can't use this point
         if (topY == NO_EDGE && bottomY == NO_EDGE) {
@@ -4181,27 +4180,28 @@ const float FieldLines::percentColor(const int x, const int y,
  * Checks to ensure that the difference in widths between two points is
  * similar enough that the new one can be considered part of that line.
  */
-const bool FieldLines::linePointWidthsSimilar(const linePoint& last,
-										const linePoint& current) const
+const bool FieldLines::linePointWidthsDifferent(const linePoint& last,
+                                                const linePoint& current) const
 {
-	float lastPointDistance = pose->pixEstimate(last.x, last.y,
+    const static int MIN_WIDTH_DIFF = 2;
+    const static int MAX_WIDTH_DIFF = 5;
+	const float lastPointDistance = pose->pixEstimate(last.x, last.y,
 												0).dist;
-	float curPointDistance = pose->pixEstimate(current.x, current.y,
+	const float curPointDistance = pose->pixEstimate(current.x, current.y,
 											   0).dist;
 
-	float distanceDifference = curPointDistance - lastPointDistance;
-	float lineWidthDifference = (current.lineWidth -
+	const float distanceDifference = curPointDistance - lastPointDistance;
+	const float lineWidthDifference = (current.lineWidth -
 								 last.lineWidth);
 
 	return ((distanceDifference < 0 && // line is going toward us
-			 // @TODO named constant
 			 // The line shouldn't shrink more than 2 pix
-			 (lineWidthDifference < -2 ||
-			  lineWidthDifference > 5) ) ||
+			 (lineWidthDifference < -MIN_WIDTH_DIFF ||
+			  lineWidthDifference > MAX_WIDTH_DIFF) ) ||
 
 			(distanceDifference >= 0 && // line is going away from us
-			 (lineWidthDifference > 2 ||
-			  lineWidthDifference < -5)) );
+			 (lineWidthDifference > MIN_WIDTH_DIFF ||
+			  lineWidthDifference < -MAX_WIDTH_DIFF)) );
 }
 
 /* Since this is a specific case where we're just testing for the percent
