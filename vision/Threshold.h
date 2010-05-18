@@ -40,7 +40,7 @@ class Threshold;  // forward reference
 #define VMAX  128
 #endif
 
-#define USE_EDGES
+//#define USE_EDGES
 #define DARK
 #ifdef DARK
 #define BLUEV 145

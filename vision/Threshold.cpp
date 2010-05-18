@@ -206,7 +206,7 @@ void Threshold::threshold() {
         *tPtr++ = p[yPtr[YOFFSET2] >> 1];
         yPtr += 4;
 	}
-#endif
+#else
 #ifdef OFFLINE
 	// this makes looking at images in the TOOL tolerable
 	for (int i = 0; i < IMAGE_HEIGHT; i++) {
@@ -214,6 +214,7 @@ void Threshold::threshold() {
 			thresholded[i][j] = GREY;
 		}
 	}
+#endif
 #endif
 }
 
