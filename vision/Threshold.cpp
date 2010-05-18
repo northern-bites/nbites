@@ -306,14 +306,18 @@ void Threshold::findGoals(int column, int topEdge) {
 		unsigned char pixel = thresholded[j][column];
 		if (pixel == BLUE) {
 			while (j >=1 && getExpandedColor(column, j - 1, BLUE)) {
+#ifdef USE_EDGES
 				thresholded[j - 1][column] = BLUE;
+#endif
 				j--;
 				blues++;
 			}
 		} else if (pixel == YELLOW) {
 			while (j >=1 && getExpandedColor(column, j - 1, BLUE)) {
 				j--;
+#ifdef USE_EDGES
 				thresholded[j][column] = YELLOW;
+#endif
 				yellows++;
 			}
 		}
