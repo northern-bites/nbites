@@ -29,6 +29,20 @@
     </javac>
   </target>
 
+  <target name="compile.debug"
+          description="compile the source " >
+    <javac srcdir="." destdir="" debug="true">
+      <classpath refid="tool.paths"/>
+    </javac>
+  </target>
+
+  <target name="debug"
+          description="compile and run with debugging information"
+          depends="compile.debug, vision, run">
+  </target>
+
+
+
   <target name="vision.check">
     <!-- check if we already have the TOOLVisionLink dynamic lib -->
    <pathconvert property="vision.make" setonempty="false" pathsep=" ">

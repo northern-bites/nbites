@@ -169,6 +169,7 @@ public class Learning implements DataListener, MouseListener,
         selector.changeSettings(ImagePanel.SCALE_AUTO_BOTH);
 
 		key = new KeyPanel(this);
+		keys = Keys.newBuilder();
         setupWindowsAndListeners();
 
 		ind = 0;
@@ -437,11 +438,9 @@ public class Learning implements DataListener, MouseListener,
 			currentFrame = f;
 			if (!f.hasImage())
 				return;
-			//if visionState is null, initialize, else just load the frame
-			if (visionState == null)
-				visionState = new VisionState(f, tool.getColorTable());
-			else
-				visionState.newFrame(f, tool.getColorTable());
+
+            // Load VisionState for new frame
+            newFrameForVisionState(f);
 
 			rawImage = visionState.getImage();
 
@@ -596,7 +595,7 @@ public class Learning implements DataListener, MouseListener,
 			curFrameIndex = d.index();
 			if (current.getHumanChecked()) {
 				// we have good data, so let's process the frame
-				visionState.newFrame(d, tool.getColorTable());
+                newFrameForVisionState(d);
 				visionState.update(false, d);
 				visionState.updateObjects();
 				updateBallStats();
@@ -612,6 +611,10 @@ public class Learning implements DataListener, MouseListener,
 		printStats(framesProcessed, t);
 	}
 
+    /**
+		Gets the directory one step up from current directory and runs a recursive batch
+		operation on the sets contained within it.
+    */
     public void runRecursiveBatchOnCurrentDir()
     {
 		String topPath = currentSet.path();
@@ -628,8 +631,7 @@ public class Learning implements DataListener, MouseListener,
         }
     }
 
-	/** Run a recursive batch job.  We'll grab the higher level part of the
-		current path and try running batch on every data set it contains.
+	/** Run a recursive batch job.
 		Obviously this is not for the faint of heart as it could take a very
 		long time depending on the amount of data contained.
 	 */
@@ -641,50 +643,48 @@ public class Learning implements DataListener, MouseListener,
 		long t = System.currentTimeMillis();
         // topPath should now contain the parent directory pathname
         // now we need to start retrieving all of the data sets that contain it
-        FileSource source = (FileSource)(tool.getSourceManager().activeSource());
+        FileSource source = (FileSource)(tool.getSourceManager().addSource(topPath));
         List<DataSet> dataList = source.getDataSets();
         for (DataSet d : dataList) {
-            if (d.path().startsWith(topPath)) {
-                // we have a target data set
-                curFrame = d.path();
-                String keyName = d.path()+"KEY.KEY";
-                // See if the key exists.
-                try {
-                    FileInputStream input = new FileInputStream(keyName);
-                    keys.clear();
-                    keys.mergeFrom(input);
-                    input.close();
-                    for (Frame f : d) {
-                        try {
-                            f.load();
-                        } catch (TOOLException e) {
-                            System.out.println("Couldn't load frame");
-                        }
-                        current = keys.getFrame(f.index());
-                        curFrameIndex = f.index();
-                        if (shouldProcessFrame(current)) {
-                            // we have good data, so let's process the frame
-                            visionState.newFrame(f, tool.getColorTable());
-                            visionState.update(true, f);
-                            visionState.updateObjects();
-                            updateBallStats();
-                            updateGoalStats();
-                            updateCrossStats();
-                            updateRobotStats();
-                            updateCornerStats();
-                            framesProcessed++;
-                        }
-                        try {
-                            f.unload();
-                        } catch (TOOLException e) {
-                            System.out.println("Problem unloading frame");
-                        }
+            // we have a target data set
+            curFrame = d.path();
+            String keyName = d.path()+"KEY.KEY";
+            // See if the key exists.
+            try {
+                FileInputStream input = new FileInputStream(keyName);
+                keys.clear();
+                keys.mergeFrom(input);
+                input.close();
+                for (Frame f : d) {
+                    try {
+                        f.load();
+                    } catch (TOOLException e) {
+                        System.out.println("Couldn't load frame");
                     }
-                } catch (FileNotFoundException e) {
-                    // key file doesn't exist, so skip it
-                } catch (java.io.IOException e) {
-                    // something went wrong, so keep going
+                    current = keys.getFrame(f.index());
+                    curFrameIndex = f.index();
+                    if (shouldProcessFrame(current)) {
+                        // we have good data, so let's process the frame
+                        newFrameForVisionState(f);
+                        visionState.update(true, f);
+                        visionState.updateObjects();
+                        updateBallStats();
+                        updateGoalStats();
+                        updateCrossStats();
+                        updateRobotStats();
+                        updateCornerStats();
+                        framesProcessed++;
+                    }
+                    try {
+                        f.unload();
+                    } catch (TOOLException e) {
+                        System.out.println("Problem unloading frame");
+                    }
                 }
+            } catch (FileNotFoundException e) {
+                // key file doesn't exist, so skip it
+            } catch (java.io.IOException e) {
+                // something went wrong, so keep going
             }
         }
 		t = System.currentTimeMillis() - t;
@@ -743,7 +743,7 @@ public class Learning implements DataListener, MouseListener,
 							curFrameIndex = f.index();
 							if (current.getHumanChecked()) {
 								// we have good data, so let's process the frame
-								visionState.newFrame(f, tool.getColorTable());
+                                newFrameForVisionState(f);
 								// we need to figure out what objects are in the frame
 								boolean or, yell, bl, wh, re, na;
 								or = current.getBall();
@@ -839,7 +839,7 @@ public class Learning implements DataListener, MouseListener,
 							curFrameIndex = f.index();
 							if (current.getHumanChecked()) {
 								// we have good data, so let's process the frame
-								visionState.newFrame(f, tool.getColorTable());
+								newFrameForVisionState(f);
 								// we need to figure out what objects are in the frame
 								boolean or, yell, bl, wh, re, na;
 								or = current.getBall();
@@ -1749,5 +1749,19 @@ public class Learning implements DataListener, MouseListener,
 		if (visionState == null) return "No Frame Loaded";
 		return visionState.getYellowGoalString();
 	}
+
+
+    /**
+     * If visionState is null, initialize, else just load the frame.
+     *
+     * @param f Frame to load into the vision state
+     */
+    public void newFrameForVisionState(Frame f) {
+        if (visionState == null)
+            visionState = new VisionState(f, tool.getColorTable());
+        else
+            visionState.newFrame(f, tool.getColorTable());
+    }
+
 
 }

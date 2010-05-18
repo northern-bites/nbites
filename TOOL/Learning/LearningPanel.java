@@ -39,6 +39,7 @@ import java.awt.Cursor;
 import TOOL.Image.ImageOverlay;
 
 import TOOL.Calibrate.ColorSwatchParent;
+
 import TOOL.TOOL;
 
 /**  Panel used to navigate through frames in the learning system.  It also is used to
@@ -241,7 +242,12 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
 		runRecursive.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					learn.runRecursiveBatchOnCurrentDir();
+                    String topDir =
+                        learn.getTool().
+                        CONSOLE.promptDirOpen("Top Directory for Recursion",
+                                              "../man/frames/");
+                    System.out.println(topDir);
+					learn.runRecursiveBatch(topDir);
 				}
 			});
 
