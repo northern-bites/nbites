@@ -434,10 +434,9 @@ public:
                             const int intersectX,
                             const int intersectY) const;
 
-    void classifyCornerWithObjects(
+    const list<const ConcreteCorner*> classifyCornerWithObjects(
         const VisualCorner &corner,
-        const std::vector <const VisualFieldObject*> &visibleObjects,
-        list<const ConcreteCorner*>* classifications) const;
+        const std::vector <const VisualFieldObject*> &visibleObjects) const;
 
     std::list<const ConcreteCorner*>
     compareObjsCorners(const VisualCorner& corner,
