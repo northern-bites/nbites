@@ -3,7 +3,6 @@ from math import (fabs, hypot, cos, sin, acos, asin)
 
 from . import PBConstants
 from . import Strategies
-from ..typeDefs import Play
 from .. import NogginConstants
 import time
 
