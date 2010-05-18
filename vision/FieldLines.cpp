@@ -1853,8 +1853,6 @@ void FieldLines::extendLineHorizontally(shared_ptr<VisualLine> line) {
         const linePoint newPoint = findLinePointFromMiddleOfLine(x, startY, VERTICAL);
 		const linePoint closestPoint = line->getLeftLinePoint();
         if (newPoint != VisualLine::DUMMY_LINEPOINT &&
-            // @TODO: Make sure the line width isn't too different from the avg
-            // of the line (or the closest point on the line)
 			!linePointWidthsDifferent(closestPoint, newPoint)) {
 
             if (debugExtendLines) {
@@ -1992,7 +1990,8 @@ linePoint FieldLines::findLinePointFromMiddleOfLine(int x, int y,
                                                     ScanDirection dir) {
     static const int MAX_SEARCH = 100;
     if (dir == HORIZONTAL) {
-        // @TODO: figure out a limit to search
+        // @TODO: figure out a limit to search,
+        // perhaps based on distance between points
         int leftX = findEdgeFromMiddleOfLine(x, y, MAX_SEARCH, TEST_LEFT);
         int rightX = findEdgeFromMiddleOfLine(x, y, MAX_SEARCH, TEST_RIGHT);
 
@@ -2361,13 +2360,13 @@ list< VisualCorner > FieldLines::intersectLines() {
 			// distances actually show up as negative numbers (we have a
 			// polynomial function that maxes out at around 110 and then
 			// decreases towards negative infinity)
-			estimate pixEstimate = pose->pixEstimate(intersection.x,
+			const estimate pixEstimate = pose->pixEstimate(intersection.x,
 													 intersection.y,
 													 LINE_HEIGHT);
-			float distance = pixEstimate.dist;
-			float bearing = pixEstimate.bearing;
+			const float intersectDist = pixEstimate.dist;
+			const float intersectBearing = pixEstimate.bearing;
 
-			if (isCornerTooFar(distance, numChecksPassed))
+			if (isCornerTooFar(intersectDist, numChecksPassed))
 				continue;
             ++numChecksPassed;
 
@@ -2376,9 +2375,9 @@ list< VisualCorner > FieldLines::intersectLines() {
             ++numChecksPassed;
 
             // Find which end of each line is closer to the potential corner
-            point<int> line1Closer =
+            const point<int> line1Closer =
 				Utility::findCloserEndpoint(**i, intersection);
-            point<int> line2Closer =
+            const point<int> line2Closer =
 				Utility::findCloserEndpoint(**j, intersection);
 
             if (debugIntersectLines)
@@ -2432,7 +2431,7 @@ list< VisualCorner > FieldLines::intersectLines() {
                                       LEGIT_INTERSECTION_POINT_COLOR);
             // assign x, y, dist, bearing, line i, line j, t value for line i,
             // t value for line 2
-            VisualCorner c(intersectX, intersectY, distance, bearing,
+            VisualCorner c(intersectX, intersectY, intersectDist, intersectBearing,
                            *i, *j, t_I, t_J);
  			if (isDupe) {
  				if (c.getShape() != T) {
@@ -2467,7 +2466,14 @@ list< VisualCorner > FieldLines::intersectLines() {
 
             corners.push_back(c);
 
-            // @TODO:  Should I be adding the intersection point to both lines?
+            // Add the intersection point to both lines.
+            // Has 0 lineWidth. As a corner, hard to figure out its "the width"
+            const linePoint intersectLinePt(intersection.x, intersection.y,
+                                            0.0,
+                                            intersectDist, intersectBearing);
+
+            (*i)->addPoint(intersectLinePt);
+            (*j)->addPoint(intersectLinePt);
 
             if (debugIntersectLines)
                 cout <<"\tPassed all " << numChecksPassed
@@ -3149,7 +3155,7 @@ const bool FieldLines::unsureBluePostOnScreen() const{
 }
 
 // Returns whether there is a yellow post close to this corner
-const bool FieldLines::yellowPostCloseToCorner(VisualCorner& c) {
+const bool FieldLines::yellowPostCloseToCorner(const VisualCorner& c) {
     static const int CLOSE = 75;
     if (vision->yglp->getDistance() > 0 &&
         vision->yglp->getIDCertainty() == _SURE) {
@@ -3162,7 +3168,7 @@ const bool FieldLines::yellowPostCloseToCorner(VisualCorner& c) {
     return false;
 }
 // Returns whether there is a blue post close to this corner
-const bool FieldLines::bluePostCloseToCorner(VisualCorner& c) {
+const bool FieldLines::bluePostCloseToCorner(const VisualCorner& c) {
     static const int CLOSE = 75;
     if (vision->bglp->getDistance() > 0 &&
         vision->bglp->getIDCertainty() == _SURE) {
@@ -3285,7 +3291,6 @@ const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
 
 	// @TODO: Adjust relative error for distance to visual object/corner,
 	// possibly according to pose SD estimate (if it exists?)
-	const float relativeErrorEst = absoluteError / estimatedDistance * 100.0f;
 	const float relativeErrorReal = absoluteError / realDistance * 100.0f;
 
 	// If we have already one good distance between this corner and a
@@ -3294,14 +3299,25 @@ const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
 	const float MAX_RELATIVE_ERROR = 15.0f;
 	const float USE_RELATIVE_DISTANCE = 250.0f;
 
-	if ( relativeErrorReal < MAX_RELATIVE_ERROR &&
-		 relativeErrorEst < MAX_RELATIVE_ERROR &&
-		 k->getDistance() > USE_RELATIVE_DISTANCE &&
-		 distToCorner > USE_RELATIVE_DISTANCE) {
+    if (absoluteError < getAllowedDistanceError(k)) {
+		if (debugIdentifyCorners) {
+			cout << "\tDistance between " << j->toString() << " and "
+				 << k->toString() << " too large." << endl
+				 << "\tReal: " << realDistance
+				 << "\tEstimated: " << estimatedDistance << endl
+				 << "\tAbsolute error: " << absoluteError
+				 << "\tRelative error: " << relativeErrorReal << "% , "
+				 << relativeErrorReal << "%"
+				 << endl;
+		}
+		return false;
+    } else if ( relativeErrorReal < MAX_RELATIVE_ERROR &&
+                k->getDistance() > USE_RELATIVE_DISTANCE &&
+                distToCorner > USE_RELATIVE_DISTANCE) {
 		if (debugIdentifyCorners) {
 			cout << "\tDistance between " << j->toString() << " and "
 				 << k->toString() << " was fine! Relative error of "
-				 << relativeErrorEst << " and " << relativeErrorReal
+                 << relativeErrorReal
 				 << " and absolute error of "
 				 << absoluteError
 				 << " corner pos: (" << j->getFieldX() << ","
@@ -3310,19 +3326,7 @@ const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
 				 << k->getFieldY() << endl;
 		}
 		return true;
-	} else if (absoluteError > getAllowedDistanceError(k)) {
-		if (debugIdentifyCorners) {
-			cout << "\tDistance between " << j->toString() << " and "
-				 << k->toString() << " too large." << endl
-				 << "\tReal: " << realDistance
-				 << "\tEstimated: " << estimatedDistance << endl
-				 << "\tAbsolute error: " << absoluteError
-				 << "\tRelative error: " << relativeErrorEst << "% , "
-				 << relativeErrorReal << "%"
-				 << endl;
-		}
-		return false;
-	} else {
+    } else {
 		if (debugIdentifyCorners) {
 			cout << "\tDistance between " << j->toString() << " and "
 				 << k->toString() << " was fine! Absolute error of "
@@ -3336,19 +3340,11 @@ const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
 	}
 }
 
-float FieldLines::getAllowedDistanceError(VisualFieldObject const *obj) const {
-    switch (obj->getID()) {
-    case BLUE_GOAL_POST:
-    case BLUE_GOAL_LEFT_POST:
-    case BLUE_GOAL_RIGHT_POST:
-    case YELLOW_GOAL_POST:
-    case YELLOW_GOAL_LEFT_POST:
-    case YELLOW_GOAL_RIGHT_POST:
-        return 60;
-    default:
-        return 0;
-    }
-
+// @TODO A real distance error calculation. For now, just uses 2 times
+// the FieldObject's Distance SD
+float FieldLines::getAllowedDistanceError(const VisualFieldObject * obj) const
+{
+    return obj->getDistanceSD() * 2;
 }
 
 
@@ -3377,11 +3373,8 @@ const bool FieldLines::isGreenWhiteEdge(int x, int y,
 const bool FieldLines::isWhiteGreenEdge(int x, int y,
                                         int potentialMidPoint,
                                         ScanDirection direction) const {
-    bool print = (direction == VERTICAL && debugVertEdgeDetect) ||
+    const bool print = (direction == VERTICAL && debugVertEdgeDetect) ||
         (direction == HORIZONTAL && debugHorEdgeDetect);
-
-    int MIN_GREEN_PIXELS_TO_TEST = 3;
-    int MAX_GREEN_PIXELS_TO_TEST = NUM_TEST_PIXELS;
 
     // Idea:  For lines at the edge of the field that are far away there is
     // VERY little green above them.  Rather than test a constant number
@@ -3419,7 +3412,6 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
         return false;
     }
 
-
     // we have a good amount of green above so continue to check the line for
     // white
     float whitePercent, yellowPercent;
@@ -3434,13 +3426,10 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
     }
 
     // Require at least 2 out of 9 pixels to be white..
-    // @TODO: named constant
-    bool whiteBelow = whitePercent >= 200.0/9.0;
+    const bool whiteBelow = whitePercent >= WHITE_PERCENT_CLEARANCE;
 
     // Require at most 3 out of 9 pixels to be yellow
-    const float MAX_YELLOW_IN_LINE = 300.0f/9.0f;
     const bool notMuchYellow = yellowPercent <= MAX_YELLOW_IN_LINE;
-
 
     // A simple, unadulterated whiteGreen transition
     if (greenAbove && whiteBelow && notMuchYellow) {
@@ -3452,7 +3441,7 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
             printf("\t\t\tisWhiteGreenVerticalEdge():: (3) White below failed "
                    " at "
                    "(%d, %d); found %f%% white; needed %f%%\n", x, y,
-                   whitePercent, 200.0/9.0);
+                   whitePercent, WHITE_PERCENT_CLEARANCE);
         }
         if (!notMuchYellow) {
             printf("\t\t\tisWhiteGreenVerticalEdge():: (4) Yellow below failed "
@@ -3471,8 +3460,11 @@ int FieldLines::numPixelsToHitColor(const int x, const int y,
     int count = 0;
 
     if (testDir == TEST_UP || testDir == TEST_DOWN) {
-        if (testDir == TEST_UP) { sign = -1; }
-        else { sign = 1; }
+        if (testDir == TEST_UP) {
+            sign = -1;
+        } else {
+            sign = 1;
+        }
 
         while (Utility::isPointOnScreen(x, y + (sign * count))) {
             for (int j = 0; j < numColors; ++j) {
@@ -3489,8 +3481,11 @@ int FieldLines::numPixelsToHitColor(const int x, const int y,
 
     }
     else if (testDir == TEST_LEFT || testDir == TEST_RIGHT) {
-        if (testDir == TEST_LEFT) { sign = -1; }
-        else { sign = 1; }
+        if (testDir == TEST_LEFT) {
+            sign = -1;
+        } else {
+            sign = 1;
+        }
 
         while (Utility::isPointOnScreen(x + (sign * count), y)) {
             for (int j = 0; j < numColors; ++j) {

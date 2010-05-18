@@ -94,6 +94,7 @@ public:
 
     void addPoints(const std::list <linePoint> &additionalPoints);
     void addPoints(const std::vector <linePoint> &additionalPoints);
+    void addPoint(const linePoint &point);
 
     static const linePoint DUMMY_LINEPOINT;
 

@@ -99,6 +99,14 @@ void VisualLine::addPoints(const list <linePoint> &additionalPoints)
     init();
 }
 
+// Do not use often, forces us to re-sort all the points!
+void VisualLine::addPoint(const linePoint& point)
+{
+    points.push_back(point);
+    sort(points.begin(), points.end());
+    init();
+}
+
 void VisualLine::addPoints(const vector <linePoint> &additionalPoints)
 {
     for (vector<linePoint>::const_iterator i = additionalPoints.begin();

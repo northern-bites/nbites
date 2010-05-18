@@ -191,6 +191,14 @@ private:
 
     static const int DEBUG_GROUP_LINES_BOX_WIDTH = 4;
 
+    ///////////////////////////////////////////////////////////
+    // isWhiteGreenEdge constants
+    ///////////////////////////////////////////////////////////
+    static const float WHITE_PERCENT_CLEARANCE = 200.0f/9.0f;// 2/9 must be white
+    static const float MAX_YELLOW_IN_LINE = 300.0f/9.0f;    // 3/9 can be yellow
+    static const int MIN_GREEN_PIXELS_TO_TEST = 3;
+    static const int MAX_GREEN_PIXELS_TO_TEST = NUM_TEST_PIXELS;
+
     ////////////////////////////////////////////////////////////
     // Identify corners constants
     ////////////////////////////////////////////////////////////
@@ -447,7 +455,7 @@ public:
                                     const float distToCorner) const;
 
 
-    float getAllowedDistanceError(VisualFieldObject const *obj) const;
+    float getAllowedDistanceError(const VisualFieldObject* obj) const;
 
 
 
@@ -609,10 +617,10 @@ private:
     const bool unsureBluePostOnScreen() const;
 
     // Returns whether there is a yellow post close to this corner
-    const bool yellowPostCloseToCorner(VisualCorner& c);
+    const bool yellowPostCloseToCorner(const VisualCorner& c);
 
     // Returns whether there is a blue post close to this corner
-    const bool bluePostCloseToCorner(VisualCorner& c);
+    const bool bluePostCloseToCorner(const VisualCorner& c);
 
     const bool postOnScreen() const;
 
