@@ -29,7 +29,7 @@ else
 fi
 
 COLOR_TABLE_PATH=${COLOR_TABLE}
-COLOR_TABLE_DIR=install/etc
+COLOR_TABLE_DIR=${MAN_INSTALL_PREFIX}/etc
 TABLE_STD_NAME=table.mtb
 
 if [ $REMOTE = "ON" ] && [  $WEBOTS = "OFF" ] ; then
@@ -46,7 +46,7 @@ if [ $REMOTE = "ON" ] && [  $WEBOTS = "OFF" ] ; then
 
 else
   echo "Installing locally"
-  SRC=${MAN_INSTALL_PREFIX}/lib/* #install/*
+  SRC=${MAN_INSTALL_PREFIX}/*
   DEST=$LOCAL_DEST
 
 fi
@@ -67,7 +67,7 @@ cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME
 echo "rsync -rcLv $SRC $DEST/"
 rsync -rcLv $SRC $DEST/
 
-ETC_SRC=install/etc/*
+ETC_SRC=${MAN_INSTALL_PREFIX}/etc/*
 ETC_DEST=$DEST/../../etc
 rsync -rcLv $ETC_SRC $ETC_DEST/
 #echo "scp -rv $SRC $DEST/"
