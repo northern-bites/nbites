@@ -241,7 +241,7 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
 
 		runRecursive.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					learn.runRecursiveBatch();
+					learn.runRecursiveBatchOnCurrentDir();
 				}
 			});
 

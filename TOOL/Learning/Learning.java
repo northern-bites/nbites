@@ -612,17 +612,8 @@ public class Learning implements DataListener, MouseListener,
 		printStats(framesProcessed, t);
 	}
 
-	/** Run a recursive batch job.  We'll grab the higher level part of the
-		current path and try running batch on every data set it contains.
-		Obviously this is not for the faint of heart as it could take a very
-		long time depending on the amount of data contained.
-	 */
-	public void runRecursiveBatch() {
-		System.out.println("Running recursive batch job");
-		initStats();
-		quietMode = true;
-		int framesProcessed = 0;
-		long t = System.currentTimeMillis();
+    public void runRecursiveBatchOnCurrentDir()
+    {
 		String topPath = currentSet.path();
 		// We need to get rid of the current directory
 		int end = topPath.length() - 2;
@@ -630,55 +621,72 @@ public class Learning implements DataListener, MouseListener,
 			  end--) {}
 		if (end > -1) {
 			topPath = topPath.substring(0, end+1);
-			// topPath should now contain the parent directory pathname
-			// now we need to start retrieving all of the data sets that contain it
-			FileSource source = (FileSource)(tool.getSourceManager().activeSource());
-			List<DataSet> dataList = source.getDataSets();
-			for (DataSet d : dataList) {
-				if (d.path().startsWith(topPath)) {
-					// we have a target data set
-					curFrame = d.path();
-					String keyName = d.path()+"KEY.KEY";
-					// See if the key exists.
-					try {
-						FileInputStream input = new FileInputStream(keyName);
-						keys.clear();
-						keys.mergeFrom(input);
-						input.close();
-						for (Frame f : d) {
-							try {
-								f.load();
-							} catch (TOOLException e) {
-								System.out.println("Couldn't load frame");
-							}
-							current = keys.getFrame(f.index());
-							curFrameIndex = f.index();
-							if (shouldProcessFrame(current)) {
-								// we have good data, so let's process the frame
-								visionState.newFrame(f, tool.getColorTable());
-								visionState.update(true, f);
-								visionState.updateObjects();
-								updateBallStats();
-								updateGoalStats();
-								updateCrossStats();
-								updateRobotStats();
-								updateCornerStats();
-								framesProcessed++;
-							}
-							try {
-								f.unload();
-							} catch (TOOLException e) {
-								System.out.println("Problem unloading frame");
-							}
-						}
-					} catch (FileNotFoundException e) {
-						// key file doesn't exist, so skip it
-					} catch (java.io.IOException e) {
-						// something went wrong, so keep going
-					}
-				}
-			}
-		}
+            runRecursiveBatch(topPath);
+        } else {
+            System.out.println("No possible path");
+            return;
+        }
+    }
+
+	/** Run a recursive batch job.  We'll grab the higher level part of the
+		current path and try running batch on every data set it contains.
+		Obviously this is not for the faint of heart as it could take a very
+		long time depending on the amount of data contained.
+	 */
+	public void runRecursiveBatch(String topPath) {
+		System.out.println("Running recursive batch job");
+		initStats();
+		quietMode = true;
+		int framesProcessed = 0;
+		long t = System.currentTimeMillis();
+        // topPath should now contain the parent directory pathname
+        // now we need to start retrieving all of the data sets that contain it
+        FileSource source = (FileSource)(tool.getSourceManager().activeSource());
+        List<DataSet> dataList = source.getDataSets();
+        for (DataSet d : dataList) {
+            if (d.path().startsWith(topPath)) {
+                // we have a target data set
+                curFrame = d.path();
+                String keyName = d.path()+"KEY.KEY";
+                // See if the key exists.
+                try {
+                    FileInputStream input = new FileInputStream(keyName);
+                    keys.clear();
+                    keys.mergeFrom(input);
+                    input.close();
+                    for (Frame f : d) {
+                        try {
+                            f.load();
+                        } catch (TOOLException e) {
+                            System.out.println("Couldn't load frame");
+                        }
+                        current = keys.getFrame(f.index());
+                        curFrameIndex = f.index();
+                        if (shouldProcessFrame(current)) {
+                            // we have good data, so let's process the frame
+                            visionState.newFrame(f, tool.getColorTable());
+                            visionState.update(true, f);
+                            visionState.updateObjects();
+                            updateBallStats();
+                            updateGoalStats();
+                            updateCrossStats();
+                            updateRobotStats();
+                            updateCornerStats();
+                            framesProcessed++;
+                        }
+                        try {
+                            f.unload();
+                        } catch (TOOLException e) {
+                            System.out.println("Problem unloading frame");
+                        }
+                    }
+                } catch (FileNotFoundException e) {
+                    // key file doesn't exist, so skip it
+                } catch (java.io.IOException e) {
+                    // something went wrong, so keep going
+                }
+            }
+        }
 		t = System.currentTimeMillis() - t;
 		quietMode = false;
 		System.out.println("Processed " + topPath);
