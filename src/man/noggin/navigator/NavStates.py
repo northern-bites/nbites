@@ -140,12 +140,9 @@ def omniWalkToPoint(nav):
     dest = nav.dest
     if nav.firstFrame():
         nav.walkToPointCount = 0
-    if nav.brain.play.isRole(GOALIE):
-        if navTrans.atDestinationGoalie(my, dest) and navTrans.atHeading(my, dest.h):
-            return nav.goNow('stop')
-    else:
-        if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
-            return nav.goNow('stop')
+
+    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
+        return nav.goNow('stop')
 
     walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
