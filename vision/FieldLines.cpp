@@ -622,10 +622,6 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points) {
 // of printing debugging info and as such have to accept diverse parameters.
 //
 
-
-
-// TODO: Make all inlined?
-
 // Check to see if we are at the top of the image. The top could be capped
 // by the horizon as well.
 //
@@ -3289,14 +3285,12 @@ const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
 	const float realDistance = getRealDistance(j, k);
 	const float absoluteError = fabs(realDistance - estimatedDistance);
 
-	// @TODO: Adjust relative error for distance to visual object/corner,
-	// possibly according to pose SD estimate (if it exists?)
 	const float relativeErrorReal = absoluteError / realDistance * 100.0f;
 
 	// If we have already one good distance between this corner and a
 	// field object, we only require that the next objects have a small
 	// relative error.
-	const float MAX_RELATIVE_ERROR = 15.0f;
+	const float MAX_RELATIVE_ERROR = 20.0f;
 	const float USE_RELATIVE_DISTANCE = 250.0f;
 
     if (absoluteError < getAllowedDistanceError(k)) {
