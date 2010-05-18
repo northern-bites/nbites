@@ -305,7 +305,7 @@ void Threshold::findGoals(int column, int topEdge) {
 #endif
 		unsigned char pixel = thresholded[j][column];
 		if (pixel == BLUE) {
-			while (j >=1 && getExpandedColor(column, j - 1, BLUE)) {
+			while (j >=1 && getExpandedColor(column, j - 1, BLUE) == BLUE) {
 #ifdef USE_EDGES
 				thresholded[j - 1][column] = BLUE;
 #endif
@@ -313,7 +313,7 @@ void Threshold::findGoals(int column, int topEdge) {
 				blues++;
 			}
 		} else if (pixel == YELLOW) {
-			while (j >=1 && getExpandedColor(column, j - 1, BLUE)) {
+			while (j >=1 && getExpandedColor(column, j - 1, YELLOW) == YELLOW) {
 				j--;
 #ifdef USE_EDGES
 				thresholded[j][column] = YELLOW;

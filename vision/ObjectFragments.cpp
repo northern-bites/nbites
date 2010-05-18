@@ -1156,22 +1156,21 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 
     int largel = 0;
     int larger = 0;
-	int mind = MIN_POST_SEPARATION + (right - left) / 2;
+	int mind = height / 2 + (right - left) / 2;
     for (int i = 0; i < numberOfRuns; i++) {
         int nextX = runs[i].x;
         int nextY = runs[i].y;
         int nextH = runs[i].h;
+		int horX = horizonAt(nextX);
         // meanwhile collect some information on which post we're looking at
-        if (nextH > 0) {
-            if (nextX < left - mind && nextH > MIN_GOAL_HEIGHT &&
-                nextY < horizonAt(nextX) &&
-                nextY + nextH > horizonAt(nextX) - HORIZON_TOLERANCE) {
+        if (nextH > MIN_GOAL_HEIGHT && nextY < horX &&
+			nextY + nextH > horX - HORIZON_TOLERANCE) {
+            if (nextX < left - mind) {
                 if (nextH > largel) {
                     largel = nextH;
+					cout << "next x " << nextX << " " << mind << endl;
 				}
-            } else if (nextX > right + mind && nextH > MIN_GOAL_HEIGHT &&
-                       nextY < horizonAt(nextX) &&
-                       nextY + nextH > horizonAt(nextX) - HORIZON_TOLERANCE) {
+            } else if (nextX > right + mind) {
                 if (nextH > larger) {
                     larger = nextH;
                 }
@@ -1180,11 +1179,14 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
     }
     if ((larger > height / 2 || larger > MIN_OTHER_THRESHOLD) && larger >
 		largel) {
-        if (POSTLOGIC)
-            cout << "Larger" << endl;
+        if (POSTLOGIC) {
+            cout << "Larger " << left << " " << right << " " << larger << endl;
+		}
         return LEFT;
     } else if (largel > MIN_OTHER_THRESHOLD || largel > height / 2) {
-        if (POSTLOGIC) cout << "Largel" << endl;
+        if (POSTLOGIC) {
+			cout << "Largel " << left << " " << right << " " << largel << endl;
+		}
         return RIGHT;
     }
 	if (POSTLOGIC)
