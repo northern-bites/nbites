@@ -132,17 +132,14 @@ def positionForKick(nav):
     ball = nav.brain.ball
 
     # Determine approach speed
-    relY = ball.relX
-    relX = ball.relY
-
-    sY = MyMath.clip(relY * PFK_Y_GAIN,
+    sY = MyMath.clip(ball.relY * PFK_Y_GAIN,
                      PFK_MIN_Y_SPEED,
                      PFK_MAX_Y_SPEED)
 
     sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     if ball.dist > 5:
-        sX = MyMath.clip(relX * PFK_X_GAIN,
+        sX = MyMath.clip(ball.relX * PFK_X_GAIN,
                          PFK_MIN_X_SPEED,
                          PFK_MAX_X_SPEED)
     else:
