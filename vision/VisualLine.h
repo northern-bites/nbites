@@ -134,9 +134,8 @@ public:
 private: // Member functions
     void init();
     void calculateWidths();
-
-	const float calcAngle() const;
-	const float calcLength() const;
+	const float calculateAngle() const;
+	const float calculateLength() const;
 
     // Use least squares to fit the line to the points
     // from http://www.efunda.com/math/leastsquares/lstsqr1dcurve.cfm
@@ -157,13 +156,13 @@ private: // Member functions
     }
 
 
-private: // Member variables
+private:                        // Member variables
     point <int> start, end;
     // left, right x values, bottom, top y values
     int leftBound, rightBound, bottomBound, topBound;
     std::vector <linePoint> points;
-    float angle; // Angle from horizontal in degrees
-    float length;
+    float angle;                // Angle from horizontal in degrees
+    float length;               // Length on screen
 
     // y = ax + b (a = slope, b = y-intercept)
     float a, b;
@@ -173,12 +172,12 @@ private: // Member variables
     linePoint thinnestHorPoint, thickestHorPoint;
     linePoint thinnestVertPoint, thickestVertPoint;
 
-    float distance;
-    float bearing;
-    float distanceSD;
-    float bearingSD;
-    bool ccLine;
-    std::list <const ConcreteLine*> possibleLines;
+    float distance;             // Distance to the closest point on the line
+    float bearing;              // Bearing to the closest point on the line
+    float distanceSD;           // Standard deviation of distance measurement
+    float bearingSD;            // Standard deviation of bearing measurement
+    bool ccLine;                // Is this line part of the center circle?
+    std::list <const ConcreteLine*> possibleLines; // Possible ConcreteLines
 
 public:
     // Getters
@@ -217,8 +216,6 @@ public:
 
     virtual const bool hasPositiveID();
 
-
-
     // Setters
     inline void setBearing(float _bearing);
     inline void setBearingSD(float _bearingSD);
@@ -238,7 +235,6 @@ public:
 /**
  * Inline "Getter" definitions
  */
-
 inline const bool VisualLine::getCCLine() const
 {
     return ccLine;

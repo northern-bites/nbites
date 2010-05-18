@@ -118,7 +118,9 @@ void VisualLine::addPoints(const vector <linePoint> &additionalPoints)
     init();
 }
 
-
+/**
+ * Computes and sets the basic parameters of a VisualLine from its linePoints
+ */
 void VisualLine::init()
 {
     // Points are sorted by x
@@ -177,8 +179,8 @@ void VisualLine::init()
         }
     }
 
-    angle = calcAngle();
-    length = calcLength();
+    angle = calculateAngle();
+    length = calculateLength();
 
     calculateWidths();
 }
@@ -261,7 +263,7 @@ void VisualLine::setColor(const int c)
 /**
  * Calculate the length of the line on screen from its endpoints.
  */
-const float VisualLine::calcLength() const
+const float VisualLine::calculateLength() const
 {
     return Utility::getLength( static_cast<float>(start.x),
                                static_cast<float>(start.y),
@@ -272,7 +274,7 @@ const float VisualLine::calcLength() const
 /**
  * Calculate the angle from horizontal (in degrees) the line makes on the screen
  */
-const float VisualLine::calcAngle() const
+const float VisualLine::calculateAngle() const
 {
     return Utility::getAngle(start.x, start.y,
                              end.x, end.y);
@@ -284,7 +286,6 @@ const bool VisualLine::isVerticallyOriented()
 {
     return rightBound - leftBound < bottomBound - topBound;
 }
-
 
 const bool VisualLine::isPerfectlyVertical()
 {
