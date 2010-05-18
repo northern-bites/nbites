@@ -44,7 +44,7 @@ def chaseAroundBox(nav):
     if nav.firstFrame():
         # reset dest to new RobotLocation to avoid problems w/dist calculations
         nav.dest = RobotLocation()
-        nav.shouldNotChaseAroundBox = 0
+        nav.shouldChaseAroundBox = 0
         nav.brain.CoA.setRobotGait(nav.brain.motion)
 
     if not navTrans.shouldChaseAroundBox(nav):
