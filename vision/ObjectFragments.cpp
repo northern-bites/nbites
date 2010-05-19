@@ -1168,7 +1168,6 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
             if (nextX < left - mind) {
                 if (nextH > largel) {
                     largel = nextH;
-					cout << "next x " << nextX << " " << mind << endl;
 				}
             } else if (nextX > right + mind) {
                 if (nextH > larger) {

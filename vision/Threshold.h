@@ -12,6 +12,7 @@ class Threshold;  // forward reference
 #include "ObjectFragments.h"
 #include "Ball.h"
 #include "Field.h"
+#include "VisualFieldEdge.h"
 #include "Cross.h"
 #include "Robots.h"
 #ifndef NO_ZLIB

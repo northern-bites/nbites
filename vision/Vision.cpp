@@ -61,6 +61,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
     navy1 = new VisualRobot();
     navy2 = new VisualRobot();
 	cross = new VisualCross();
+	fieldEdge = new VisualFieldEdge();
 
     thresh = new Threshold(this, pose);
     fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose, profiler));

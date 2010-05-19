@@ -59,6 +59,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Field.h"
+#include "VisualFieldEdge.h"
 #include "debug.h"
 #include "Utility.h"
 
@@ -475,6 +476,7 @@ void Field::findConvexHull(int pH) {
 		e = vision->pose->pixEstimate(quarter * 3, topEdge[quarter * 3], 0.0f);
 		tDist = e.dist;
 	}
+	vision->fieldEdge->setDistances(qDist, hDist, tDist);
 	//cout << "Distances are " << qDist << " " << hDist << " " << tDist << endl;
 	//cout << "Max dist is " << maxPix << endl;
 }
