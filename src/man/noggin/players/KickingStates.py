@@ -9,6 +9,7 @@ import KickingConstants as constants
 import ChaseBallConstants
 from man.noggin.typeDefs.Location import Location, RobotLocation
 from .. import NogginConstants
+from ..typeDefs.LocationConstants import FACING_SIDELINE_ANGLE
 import ChaseBallTransitions
 from math import fabs
 from ..util import MyMath
@@ -142,7 +143,7 @@ def clearBall(player):
                 return player.goLater('kickBallRight')
 
         elif my.inTopOfField():
-            if constants.FACING_SIDELINE_ANGLE < my.h:
+            if FACING_SIDELINE_ANGLE < my.h:
                 if constants.DEBUG_KICKS: print ("\t\ttop1")
                 return player.goLater('kickBallRight')
             elif my.h < -90:
@@ -154,7 +155,7 @@ def clearBall(player):
                 return player.goLater('kickBallStraight')
 
         elif my.inBottomOfField():
-            if -constants.FACING_SIDELINE_ANGLE > my.h:
+            if -FACING_SIDELINE_ANGLE > my.h:
                 if constants.DEBUG_KICKS: print ("\t\tbottom1")
                 return player.goLater('kickBallLeft')
             elif my.h > 90:
