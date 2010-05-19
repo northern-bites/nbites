@@ -4,8 +4,8 @@ import time
 import sys
 _stderr = sys.stderr
 sys.stderr = sys.stdout
-import cProfile
-import pstats
+## import cProfile
+## import pstats
 
 
 # Packages and modules from super-directories
