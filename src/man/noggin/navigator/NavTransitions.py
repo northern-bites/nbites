@@ -49,6 +49,21 @@ def useFinalHeading(brain, position):
 def shouldChaseAroundBox(nav):
     ball = nav.brain.ball
     my = nav.brain.my
+
+    # 3 common, simple cases where we don't need to worry about the box.
+    if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
+        if ball.x > NogginConstants.MY_GOALBOX_RIGHT_X:
+            return False
+
+    if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+        if ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+            return False
+
+    if my.y > NogginConstants.MY_GOALBOX_TOP_Y:
+        if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
+            return False
+
+    # handle more complex cases where correct behavior isn't obvious
     intersect = MyMath.linesIntersect
 
     return ( intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
