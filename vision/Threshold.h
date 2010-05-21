@@ -41,7 +41,9 @@ class Threshold;  // forward reference
 #define VMAX  128
 #endif
 
-//#define USE_EDGES
+#define SHOULDERS
+
+#define USE_EDGES
 #define DARK
 #ifdef DARK
 #define BLUEV 145
@@ -115,10 +117,8 @@ public:
     inline void threshold();
     inline void runs();
 	unsigned char getColor(int x, int y);
-	bool isGreen(int x, int y);
-	bool isYellow(int x, int y);
-	bool isBlue(int x, int y);
 	unsigned char getExpandedColor(int x, int y, unsigned char col);
+	int getHorizontalEdge(int x1, int y1, int dir);
     void thresholdAndRuns();
 	void findGoals(int column, int top);
 	void findBallsCrosses(int column, int top);

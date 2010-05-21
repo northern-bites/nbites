@@ -218,13 +218,14 @@ void Threshold::threshold() {
 #endif
 }
 
-/*
+/*  Returns the color at the sent in point.  If we aren't using color tables
+	it does a lookup in the big table, otherwise it just gets the thresholded
+	value.
  */
-unsigned char Threshold::getColor(int r, int c) {
-	//cout << "Checking " << r << " " << c << endl;
+unsigned char Threshold::getColor(int x1, int y1) {
 #ifdef USE_EDGES
-	const unsigned char *yPtr = &yplane[0] +c*IMAGE_ROW_OFFSET+2*r;
-	int u = yPtr[UOFFSET + 2*(r%2)];
+	const unsigned char *yPtr = &yplane[0] +y1*IMAGE_ROW_OFFSET+2*x1;
+	int u = yPtr[UOFFSET + 2*(x1%2)];
 	if (u  > ORANGEU) {
 		return ORANGE;
 	}
@@ -232,7 +233,7 @@ unsigned char Threshold::getColor(int r, int c) {
 	if (y > WHITEY) {
 		return WHITE;
 	}
-	int v = yPtr[VOFFSET+2*(r%2)];
+	int v = yPtr[VOFFSET+2*(x1%2)];
 	if (v > BLUEV) {
 		return BLUE;
 	} else if (v < YELLOWV) {
@@ -247,6 +248,9 @@ unsigned char Threshold::getColor(int r, int c) {
 #endif
 }
 
+/*  When we have identified a possible post we open up the color spectrum a
+	bit to get better coverage.
+ */
 
 unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
 #ifdef USE_EDGES
@@ -265,6 +269,35 @@ unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
 
 }
 
+/*  A first attempt at doing true edge detection.  A work in progress
+ */
+
+int Threshold::getHorizontalEdge(int x1, int y1, int dir) {
+	const unsigned char *yPtr = &yplane[0] + y1*IMAGE_ROW_OFFSET+2*x1;
+	int oldy, oldv, oldu, newy, newu, newv, maxCount;
+	oldy = yPtr[0];
+	oldu = yPtr[UOFFSET + 2*(x1%2)];
+	oldv = yPtr[VOFFSET + 2*(x1%2)];
+	newy = oldy;
+	newu = oldu;
+	newv = oldv;
+	if (dir == 1) {
+		maxCount = IMAGE_WIDTH - x1 - 1;
+	} else {
+		maxCount = x1;
+	}
+	int count = 0;
+	while (abs(oldy - newy) < 20 && abs(oldu - newu) < 20 && abs(oldv < newv) < 20
+		   && ((dir == 1 && count < maxCount) || (dir == -1 && count > -1))) {
+		yPtr+= 4;
+		oldy = yPtr[0];
+		oldu = yPtr[UOFFSET];
+		oldv = yPtr[VOFFSET];
+		count++;
+	}
+	return count -1;
+}
+
 /* Image runs.  As explained in the comments for the threshold() method, I
  * (Jeremy) have split the thresholdAndRuns() method into parts.  This also
  * helped with working out the slow sections of code.
@@ -275,7 +308,10 @@ unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
  * balls will only be in the confines of the field).
  */
 void Threshold::runs() {
-  //detectSelf();
+#ifdef SHOULDERS
+	// back when the robots had colored shoulder pads we worried about seeing them
+	detectSelf();
+#endif
     // split up the loops
     for (int i = 0; i < IMAGE_WIDTH; i += 1) {
 		int topEdge = max(0, field->horizonAt(i));

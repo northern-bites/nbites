@@ -442,6 +442,7 @@ bool ObjectFragments::checkEdge(int x, int y, int x2, int y2)
     return false;
 }
 
+
 /*
  * Given two points that should define an edge of a structure, try and improve
  * them to find the true edge. The idea is pretty simply.  The passed in points
@@ -501,8 +502,10 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
     int te = top.x;
     top.x = top.x + dir * qs;
     top.y = yProject(te, top.y, top.x);
-    bottom.y = top.y + spanY;
-    bottom.x = xProject(top.x, top.y, top.y + spanY);
+    bottom.y = min(top.y + spanY, IMAGE_HEIGHT -1);
+    bottom.x = min(max(0, xProject(top.x, top.y, top.y + spanY)), IMAGE_WIDTH-1);
+	top.x = min(max(0, top.x), IMAGE_WIDTH-1);
+	top.y = max(0, top.y);
 }
 
 /*
@@ -562,8 +565,10 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
     int te = left.y;
     left.y = left.y + dir * qs;
     left.x = xProject(left.x, te, left.y);
-    right.x = left.x + spanX;
-    right.y = yProject(left.x, left.y, left.x + spanX);
+    right.x = min(left.x + spanX, IMAGE_WIDTH-1);
+    right.y = min(max(0, yProject(left.x, left.y, left.x + spanX)), IMAGE_HEIGHT-1);
+	left.y = min(max(0, left.y), IMAGE_HEIGHT-1);
+	left.x = min(max(0, left.x), IMAGE_WIDTH-1);
 }
 
 
@@ -586,115 +591,59 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
  */
 
 float ObjectFragments::correct(Blob b, int color, int c2) {
-
-	const int MIN_SIZE = 10;
-	const int HEIGHT_DIVISOR = 5;
-	const int ERROR_TOLERANCE = 6;
-	const int LEAN_THRESH = 5;
-	const int MINIMUM_SKEW = 5;
-	const int MIN_WIDTH = 16;
+	const float GOOD_SLOPE = 0.25f;
 
 	int points[3];
 	int diffy = (b.getLeftBottomY() - b.getLeftTopY()) / 4;
 	int midy = b.getLeftTopY();
 	int midsy = 0, bottomy = 0, topy = 0;
 	bool correct = false;
-	for (int i = 1; i < 4; i++) {
-		midy = midy + diffy;
-		int midx = min(b.getLeftTopX(), b.getLeftBottomX());
-		if (i == 1) topy = midy;
-		else if (i == 2) midsy = midy;
-		else bottomy = midy;
-		int col = BLACK;
-		int count = 0;
-		while (col != color && midx < IMAGE_WIDTH) {
-			midx++;
-			if (color == BLUE) {
-			  if (thresh->getExpandedColor(midx, midy, color) == BLUE) {
-					col = BLUE;
-					if (count == 0) {
-					  while (midx >= 0 && thresh->getExpandedColor(midx, midy, color) == BLUE) {
-							midx--;
-							count++;
-						}
-					}
-				} else count++;
+	int midx, col, count;
+	// loop to the right and to the left
+	for (int k = 1; k > -2; k = k - 2) {
+		// loop at 1/4 2/4 and 3/4
+		for (int i = 1; i < 4; i++) {
+			midy = midy + diffy;
+			if (k > 0) {
+				midx = b.getLeft();
 			} else {
-			  if (thresh->getExpandedColor(midx, midy, color) == YELLOW) {
-					col = YELLOW;
-					if (count == 0) {
-					  while (midx >= 0 && thresh->getExpandedColor(midx, midy, color) == YELLOW) {
-							midx--;
-							count++;
-						}
-					}
-				} else count++;
+				midx = b.getRight();
 			}
-			if (count >  2) correct = true;
-		}
-		points[i-1] = midx;
-	}
-	float newSlope1 = -(float)(points[2] - points[1]) /
-		(float)(bottomy - midsy);
-	float newSlope2 = -(float)(points[1] - points[0]) /
-		(float)(midsy - topy);
-	float newSlope3 = -(float)(points[2] - points[0]) /
-		(float)(bottomy - topy);
-	if (CORRECT)
-		cout << "Slopes " << newSlope1 << " " << newSlope2 << " " << newSlope3 << endl;
-	if (correct && abs(newSlope1 - newSlope2) < 0.25 && abs(newSlope2 - newSlope3) < 0.25) {
-		return newSlope3;
-	}
-
-	// repeat on the right side if necessary
-	midy = b.getLeftTopY();
-	midsy = 0, bottomy = 0, topy = 0;
-	correct = false;
-	for (int i = 1; i < 4; i++) {
-		midy = midy + diffy;
-		int midx = max(b.getRightTopX(), b.getRightBottomX());
-		if (i == 1) topy = midy;
-		else if (i == 2) midsy = midy;
-		else bottomy = midy;
-		int col = BLACK;
-		int count = 0;
-		while (col != color && midx > 0 && midx <= IMAGE_WIDTH) {
-			midx--;
-			if (color == BLUE) {
-			  if (thresh->getExpandedColor(midx, midy, color) == BLUE) {
-					col = BLUE;
+			if (i == 1) topy = midy;
+			else if (i == 2) midsy = midy;
+			else bottomy = midy;
+			col = BLACK;
+			count = 0;
+			// we should be at the current edge - loop until we find real thing
+			while (col != color && midx < IMAGE_WIDTH && midx > -1) {
+				// normally we assume we are outside the real edge
+				midx+= k;
+				if (thresh->getExpandedColor(midx, midy, color) == color) {
+					col = color;
 					if (count == 0) {
-					  while (midx < IMAGE_WIDTH -1 && thresh->getExpandedColor(midx, midy, color) == BLUE) {
-							midx++;
+						// this is the case where the real edge is outside our blob
+						while (midx >= 0 && thresh->getExpandedColor(midx, midy, color) == color) {
+							midx-= k;
 							count++;
 						}
 					}
 				} else count++;
-			} else {
-			  if (thresh->getExpandedColor(midx, midy, color) == YELLOW) {
-					col = YELLOW;
-					if (count == 0) {
-					  while (midx < IMAGE_WIDTH - 1 && thresh->getExpandedColor(midx, midy, color) == YELLOW) {
-							midx++;
-							count++;
-						}
-					}
-				} else count++;
+				if (count >  2) correct = true;
 			}
-			if (count >  2) correct = true;
+			points[i-1] = midx;
 		}
-		points[i-1] = midx;
-	}
-	newSlope1 = -(float)(points[2] - points[1]) /
-		(float)(bottomy - midsy);
-	newSlope2 = -(float)(points[1] - points[0]) /
-		(float)(midsy - topy);
-	newSlope3 = -(float)(points[2] - points[0]) /
-		(float)(bottomy - topy);
-	if (CORRECT)
-		cout << "Slopes " << newSlope1 << " " << newSlope2 << " " << newSlope3 << endl;
-	if (correct && abs(newSlope1 - newSlope2) < 0.25 && abs(newSlope2 - newSlope3) < 0.25) {
-		return newSlope3;
+		float newSlope1 = -(float)(points[2] - points[1]) /
+			(float)(bottomy - midsy);
+		float newSlope2 = -(float)(points[1] - points[0]) /
+			(float)(midsy - topy);
+		float newSlope3 = -(float)(points[2] - points[0]) /
+			(float)(bottomy - topy);
+		if (CORRECT)
+			cout << "Slopes " << newSlope1 << " " << newSlope2 << " " << newSlope3 << endl;
+		if (correct && abs(newSlope1 - newSlope2) < GOOD_SLOPE && abs(newSlope2 - newSlope3) < GOOD_SLOPE) {
+			return newSlope3;
+		}
+		midy = b.getRightTopY();
 	}
 	return 0.0f;
 
@@ -771,12 +720,7 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
  */
 
 
-/*  As we saw with beacons, we tend to work with blobs for convenience.  So at
- *  some point need to transfer their contents over to the field object that
- * we have identified.
- * In this case we have a goal.  Before we commit we make sure it has enough of
- * the right color.  We also collect up certainty information and pass that
- * along.
+/*  Revised to basically do nothing but transfer the contents of the blob.
  * @param one             the field object we'd like to update
  * @param two             the blob that contains the information we need
  * @param certainty       how certain are we of its ID?
@@ -785,20 +729,8 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
                                    certainty _certainty,
                                    distanceCertainty _distCertainty) {
-    // before we do this let's make sure that the object is really our color
-	const float BLUEPOST = 0.6f;
-	float perc = NORMALPOST;
-	if (_certainty != _SURE && two.height() < 40 && color == BLUE) {
-		//cout << "uppint the anty on blue" << endl;
-		perc = BLUEPOST;
-	}
-    if (rightBlobColor(two, perc)) {
-        one->updateObject(&two, _certainty, _distCertainty);
-        return true;
-    } else {
-		//cout << "Screening object for low percentage of real color " << endl;
-        return false;
-    }
+	one->updateObject(&two, _certainty, _distCertainty);
+	return true;
 }
 
 /* Here we are trying to figure out how confident we are about our values with
@@ -888,7 +820,7 @@ bool ObjectFragments::qualityPost(Blob b, int c)
     //bool soFar;
     for (int i = b.getLeftTopX(); i < b.getRightTopX(); i++)
         for (int j = b.getLeftTopY(); j < b.getLeftBottomY(); j++)
-	  if (thresh->getExpandedColor(i, j, c) == c)
+			if (thresh->getExpandedColor(i, j, c) == c)
                 good++;
     if (good < b.getArea() * PERCENT_NEEDED) return false;
     return true;
@@ -1359,7 +1291,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
 	// if we feel pretty good about this, then prepare for the next post
 
 	// first get rid of all the color that corresponds to this post
-    bool questions = howbig == SMALL && !rightBlobColor(pole, QUESTIONABLEPOST);
+    bool questions = howbig == SMALL;
     for (int i = 0; i < numberOfRuns; i++) {
         nextX = runs[i].x;
         if (nextX >= trueLeft && nextX <= trueRight) {
@@ -1566,6 +1498,7 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
     int y = tempobj.getLeftTopY();
     int spanX = tempobj.width();
     int spanY = tempobj.height();
+	int goal = (int)((spanX * spanY) * minpercent);
     if (spanX < 1 || spanY < 1) {
 		if (POSTDEBUG) {
 			cout << "Invalid size in color check" << endl;
@@ -1584,12 +1517,13 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
                 total++;
                 if (thresh->getExpandedColor(nx, ny, color) == color) {
                     good++;
+					if (good > goal) return true;
                 }
             }
         }
     }
     float percent = (float)good / (float) (total);
-	//cout << "Color check " << percent << " " << minpercent << endl;
+	cout << "Color check " << percent << " " << minpercent << endl;
     if (percent > minpercent) {
         return true;
     }
