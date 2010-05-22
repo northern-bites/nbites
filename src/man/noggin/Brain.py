@@ -47,12 +47,14 @@ class Brain(object):
         self.on = True
         # Output Class
         self.out = NaoOutput.NaoOutput(self)
+
         # Setup nao modules inside brain for easy access
         self.vision = vision.Vision()
         self.sensors = sensors.sensors
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
         self.comm.gc.player = TeamConfig.PLAYER_NUMBER
+
         #initalize the leds
         #print leds
         self.leds = Leds.Leds(self)
@@ -60,9 +62,11 @@ class Brain(object):
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
         self.motionModule = motion
+
         # Get the pointer to the C++ RoboGuardian object for use with Python
         self.roboguardian = _roboguardian.roboguardian
         self.roboguardian.enableFallProtection(True)
+
         # Get our reference to the C++ localization system
         self.loc = Loc()
 
@@ -77,14 +81,17 @@ class Brain(object):
 
         # Initialize various components
         self.my = MyInfo.MyInfo()
+
         # Functional Variables
         self.my.playerNumber = self.comm.gc.player
+
         # Information about the environment
         self.initFieldObjects()
         self.initTeamMembers()
         self.ball = Ball.Ball(self.vision.ball)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
+
         # workaround for slarti (now trillian) sonar problems
         if self.CoA.name == 'marvin':
             self.sonar.MIN_DIST = 30.0
@@ -102,12 +109,14 @@ class Brain(object):
         Build our set of Field Objects which are team specific compared
         to the generic forms used in the vision system
         """
+
         # Build instances of the vision based field objects
         # Yello goal left and right posts
         self.yglp = Landmarks.FieldObject(self.vision.yglp,
                                           Constants.VISION_YGLP)
         self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
                                           Constants.VISION_YGRP)
+
         # Blue Goal left and right posts
         self.bglp = Landmarks.FieldObject(self.vision.bglp,
                                           Constants.VISION_BGLP)
@@ -126,12 +135,12 @@ class Brain(object):
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
 
-
     def makeFieldObjectsRelative(self):
         """
         Builds a list of fieldObjects based on their relative names to the robot
         Needs to be called when team color is determined
         """
+
         # Blue team setup
         if self.my.teamColor == Constants.TEAM_BLUE:
             # Yellow goal
@@ -177,7 +186,6 @@ class Brain(object):
             mate.playerNumber = i + 1
             self.teamMembers.append(mate)
 
-
 ##
 ##--------------CONTROL METHODS---------------##
 ##
@@ -209,6 +217,7 @@ class Brain(object):
         """
         Main control loop called every TIME_STEP milliseconds
         """
+
         # order here is very important
         # Update Environment
         self.updateVisualObjects()
@@ -270,6 +279,7 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
+
         # Update global information to current estimates
         self.my.updateLoc(self.loc)
         self.ball.updateLoc(self.loc, self.my)
@@ -306,6 +316,7 @@ class Brain(object):
         """
         Reset our localization
         """
+
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
@@ -315,6 +326,7 @@ class Brain(object):
         """
         Reset our localization
         """
+
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
