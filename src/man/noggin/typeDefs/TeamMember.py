@@ -26,8 +26,6 @@ class TeamMember(RobotLocation):
         RobotLocation.__init__(self)
         # things in the Packet()
         self.playerNumber = 0
-        self.ballX = 0
-        self.ballY = 0
         self.ballDist = 0
         self.ballBearing = 0
         self.role = None
@@ -53,8 +51,6 @@ class TeamMember(RobotLocation):
         self.x = packet.playerX
         self.y = packet.playerY
         self.h = packet.playerH
-        self.ballX = packet.ballX
-        self.ballY = packet.ballY
         self.ballDist = packet.ballDist
         self.ballBearing = packet.ballBearing
         self.role = packet.role
@@ -89,8 +85,6 @@ class TeamMember(RobotLocation):
         self.x = my.x
         self.y = my.y
         self.h = my.h
-        self.ballX = ball.x
-        self.ballY = ball.y
         self.ballDist = ball.dist
         self.ballBearing = 0
         self.role = self.brain.play.role
@@ -100,7 +94,6 @@ class TeamMember(RobotLocation):
         self.active = (not self.brain.gameController.currentState ==
                        'gamePenalized')
 
-        #only going to be dribbling or grabbing if you see the ball
         self.dribbling = self.ballDist <= \
                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING
         self.grabbing = self.ballDist <= \
@@ -112,8 +105,6 @@ class TeamMember(RobotLocation):
         self.x = 0
         self.y = 0
         self.h = 0
-        self.ballX = 0
-        self.ballY = 0
         self.ballDist = 0
         self.ballBearing = 0
         self.role = None
