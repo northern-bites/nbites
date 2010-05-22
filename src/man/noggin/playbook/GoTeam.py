@@ -1,9 +1,8 @@
-from math import (fabs, hypot, cos, sin, acos, asin)
+from math import (hypot, cos, sin, acos, asin)
 
 
 from . import PBConstants
 from . import Strategies
-from .. import NogginConstants
 import time
 
 # ANSI terminal color codes
@@ -136,22 +135,25 @@ class GoTeam:
                 self.printf("\t mate #%g"% mate.playerNumber)
 
             # If the player number is me, or our ball models are super divergent ignore
-            if (mate.playerNumber == self.me.playerNumber or
-                fabs(mate.ballY - self.brain.ball.y) >
-                PBConstants.BALL_DIVERGENCE_THRESH or
-                fabs(mate.ballX - self.brain.ball.x) >
-                PBConstants.BALL_DIVERGENCE_THRESH):
-
+            if mate.playerNumber == self.me.playerNumber:
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf("Ball models are divergent, or it's me")
+                    self.printf("it's me")
+
                 continue
 
-            #dangerous- two players might both have ball, both would stay chaser
-            #same as the aibo code but thresholds for hasBall are higher now
             elif mate.hasBall():
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate
+
+            ## elif (fabs(mate.ballY - self.brain.ball.y) >
+            ##     PBConstants.BALL_DIVERGENCE_THRESH or
+            ##     fabs(mate.ballX - self.brain.ball.x) >
+            ##     PBConstants.BALL_DIVERGENCE_THRESH):
+
+            ##     if PBConstants.DEBUG_DET_CHASER:
+            ##         self.printf("Ball models are divergent")
+            ##     continue
 
             else:
                 # Tie break stuff
@@ -167,12 +169,14 @@ class GoTeam:
                       PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
                       self.me.isTeammateRole(PBConstants.CHASER))) and
                     mate.playerNumber < self.me.playerNumber):
+
                     if PBConstants.DEBUG_DET_CHASER:
                         self.printf("\t #%d @ %g >= #%d @ %g" %
                                (mate.playerNumber, mate.chaseTime,
                                 chaser_mate.playerNumber,
                                 chaser_mate.chaseTime))
                         continue
+
                 #TO-DO: break into a separate function call
                 elif (mate.playerNumber > self.me.playerNumber and
                       mate.chaseTime - self.me.chaseTime <
