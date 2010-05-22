@@ -1,6 +1,7 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 from ..playbook.PBConstants import GOALIE
+from math import fabs
 
 def scanFindBall(player):
     """
@@ -11,25 +12,21 @@ def scanFindBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    if player.brain.play.isRole(GOALIE):
-        if transitions.shouldSpinFindBall(player):
-            return player.goLater('spinFindBall')
-    else:
-        if transitions.shouldApproachBallWithLoc(player):
-            return player.goLater('approachBall')
-        elif transitions.shouldSpinFindBall(player):
-            return player.goLater('spinFindBall')
+    if transitions.shouldApproachBall(player):
+        return player.goNow('approachBall')
 
-    if abs(player.brain.ball.bearing) < constants.SCAN_FIND_BEARING_THRESH \
-            or player.brain.ball.dist < constants.SCAN_FIND_DIST_THRESH \
-            and not player.brain.play.isRole(GOALIE):
+    # a time based check. may be a problem for goalie. if it's not good for him to
+    # spin, he should prbly not be chaser anymore, so this wouldn't get reached
+    if transitions.shouldSpinFindBall(player):
+        return player.goNow('spinFindBall')
+
+    ball = player.brain.ball
+    if fabs(ball.bearing) < constants.SCAN_FIND_BEARING_THRESH:
         return player.stay()
-    elif player.brain.play.isRole(GOALIE) and \
-            abs(player.brain.ball.bearing) <\
-            constants.SCAN_FIND_BEARING_THRESH:
-        return player.stay()
-    elif player.firstFrame():
+
+    else:
         return player.goLater('spinFindBall')
+
     return player.stay()
 
 def spinFindBall(player):
@@ -38,27 +35,26 @@ def spinFindBall(player):
     move to align on it. If we don't find it, we go to a garbage state
     """
 
-    if player.brain.play.isRole(GOALIE):
-        if transitions.shouldApproachBall(player):
-            return player.goLater('approachBall')
-    else:
-        if transitions.shouldApproachBallWithLoc(player):
-            return player.goLater('approachBall')
-        elif transitions.shouldApproachBall(player):
-            return player.goLater('approachBall')
-        elif transitions.shouldWalkToBallLocPos(player):
-            return player.goLater('approachBall')
+    if transitions.shouldApproachBall(player):
+        return player.goNow('approachBall')
 
     if player.firstFrame():
+        #if ball.on
         player.brain.tracker.trackBall()
+        #else:
+        #tracker.findBall()
 
         if player.justKicked:
             spinDir = player.getSpinDirAfterKick()
         else:
             my = player.brain.my
             ball = player.brain.ball
-            spinDir = my.spinDirToHeading(my.h + ball.bearing)
+            spinDir = my.spinDirToPoint(ball)
 
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
+
+    if not player.brain.play.isRole(GOALIE):
+        if transitions.shouldWalkToBallLocPos(player):
+            return player.goLater('approachBall')
 
     return player.stay()
