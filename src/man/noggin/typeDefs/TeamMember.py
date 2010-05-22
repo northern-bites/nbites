@@ -1,12 +1,14 @@
 
 from math import (hypot, degrees)
 
-from .Location import RobotLocation
+from .Location import (RobotLocation, Location)
 from .. import NogginConstants
 from ..util import MyMath
 import time
 
-PACKET_DEAD_PERIOD = 5 # TO-DO: look at shortening so it replaces penalized
+OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
+                    NogginConstants.OPP_GOALBOX_MIDDLE_Y)
+PACKET_DEAD_PERIOD = 2
 DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_CHASER_NUMBER = 3
@@ -24,23 +26,16 @@ class TeamMember(RobotLocation):
         RobotLocation.__init__(self)
         # things in the Packet()
         self.playerNumber = 0
-        self.h = 0
-        self.uncertX = 0
-        self.uncertY = 0
-        self.uncertH = 0
         self.ballX = 0
         self.ballY = 0
-        self.ballUncertX = 0
-        self.ballUncertY = 0
         self.ballDist = 0
+        self.ballBearing = 0
         self.role = None
         self.subRole = None
         self.chaseTime = 0
         self.lastPacketTime = time.time()
 
         #other info we want stored
-        self.ballLocDist = 0
-        self.ballLocBearing = 0
         self.brain = tbrain # brain instance
         self.active = True
         self.grabbing = False
@@ -58,33 +53,25 @@ class TeamMember(RobotLocation):
         self.x = packet.playerX
         self.y = packet.playerY
         self.h = packet.playerH
-        self.uncertX = packet.uncertX
-        self.uncertY = packet.uncertY
-        self.uncertH = packet.uncertH
         self.ballX = packet.ballX
         self.ballY = packet.ballY
-        self.ballUncertX = packet.ballUncertX
-        self.ballUncertY = packet.ballUncertY
         self.ballDist = packet.ballDist
+        self.ballBearing = packet.ballBearing
         self.role = packet.role
         self.subRole = packet.subRole
         self.chaseTime = packet.chaseTime
 
         # calculates ball localization distance, bearing
-        self.ballLocDist = self.getDistToBall()
-        self.ballLocBearing = self.getBearingToBall()
         self.bearingToGoal = self.getBearingToGoal()
         self.active = True
-        self.grabbing = (0 < self.ballDist <=
-                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING) or \
-                        (0 < self.ballLocDist <=
-                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
+        self.grabbing = self.ballDist <= \
+                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING
+
         #potential problem when goalie is grabbing?
         #only going to be dribbling or grabbing if you see the ball
-        self.dribbling = (0 < self.ballDist <=
-                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING) or \
-                          (0 < self.ballLocDist <=
-                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
+        self.dribbling = self.ballDist <= \
+                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING
+
         self.lastPacketTime = time.time()#self.brain.playbook.pb.time
 
 
@@ -102,27 +89,22 @@ class TeamMember(RobotLocation):
         self.x = my.x
         self.y = my.y
         self.h = my.h
-        self.uncertX = my.uncertX
-        self.uncertY = my.uncertY
-        self.uncertH = my.uncertH
         self.ballX = ball.x
         self.ballY = ball.y
-        self.ballUncertX = ball.uncertX
-        self.ballUncertY = ball.uncertY
         self.ballDist = ball.dist
+        self.ballBearing = 0
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
 
-        self.ballLocDist = ball.locDist
-        self.ballLocBearing = ball.locBearing
         self.active = (not self.brain.gameController.currentState ==
                        'gamePenalized')
+
         #only going to be dribbling or grabbing if you see the ball
-        self.dribbling = (0 < self.ballDist <=
-                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING)
-        self.grabbing = (0 < self.ballDist <=
-                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING)
+        self.dribbling = self.ballDist <= \
+                         NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING
+        self.grabbing = self.ballDist <= \
+                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING
         self.lastPacketTime = self.brain.time
 
     def reset(self):
@@ -130,18 +112,12 @@ class TeamMember(RobotLocation):
         self.x = 0
         self.y = 0
         self.h = 0
-        self.uncertX = 0
-        self.uncertY = 0
-        self.uncertH = 0
         self.ballX = 0
         self.ballY = 0
-        self.ballUncertX = 0
-        self.ballUncertY = 0
         self.ballDist = 0
+        self.ballBearing = 0
         self.role = None
         self.subRole = None
-        self.ballLocDist = 0
-        self.ballLocBearing = 0
         self.active = False
         self.grabbing = False
         self.dribbling = False
@@ -149,34 +125,7 @@ class TeamMember(RobotLocation):
     def getBearingToGoal(self):
         """returns bearing to goal"""
 
-        return self.getOthersRelativeBearing(self.x, self.y, self.h,
-                                           NogginConstants.OPP_GOALBOX_LEFT_X,
-                                           NogginConstants.OPP_GOALBOX_MIDDLE_Y)
-
-    def getDistToBall(self):
-        """
-        returns teammate distance to ball in centimeters.
-        -based on its own localization but my own ball estimates
-        """
-        return hypot(self.brain.ball.x - self.x,
-                     self.brain.ball.y - self.y)
-
-    def getBearingToBall(self):
-        """
-        returns teammate bearing to the ball in degrees.
-        -based on its own localization but my own ball estimates
-        -return values is between -180,180
-        """
-        return self.getOthersRelativeBearing(self.x, self.y, self.h,
-                                             self.brain.ball.x,
-                                             self.brain.ball.y)
-
-    def getOthersRelativeBearing(self,playerX,playerY,playerH,x,y):
-        """
-        get another player's bearing to a point (x,y)
-        """
-        return MyMath.sub180Angle(playerH -(degrees(MyMath.safe_atan2(
-                        y - playerY, x - playerX)) - 90.0))
+        return self.getRelativeBearing(OPP_GOAL)
 
     def determineChaseTime(self):
         """
@@ -186,8 +135,8 @@ class TeamMember(RobotLocation):
         """
         time = 0.0
 
-        if DEBUG_DETERMINE_CHASE_TIME:
-            self.printf("DETERMINE CHASE TIME DEBUG")
+        ## if DEBUG_DETERMINE_CHASE_TIME:
+        ##     self.printf("DETERMINE CHASE TIME DEBUG")
 
         time += (self.ballDist / CHASE_SPEED) *\
             SEC_TO_MILLIS
@@ -196,7 +145,8 @@ class TeamMember(RobotLocation):
             self.printf("\tChase time base is " + str(time))
 
         # Give a bonus for seeing the ball
-        time -= BALL_ON_BONUS
+        if self.brain.ball.on:
+            time -= BALL_ON_BONUS
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.printf("\tChase time after ball on bonus " + str(time))
@@ -212,7 +162,7 @@ class TeamMember(RobotLocation):
         return time
 
     def hasBall(self):
-        return (self.dribbling or self.grabbing)
+        return self.grabbing
 
     def isTeammateRole(self, roleToTest):
         return (self.role == roleToTest)
