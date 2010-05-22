@@ -11,8 +11,7 @@ def shouldApproachBall(player):
     Begin walking to the ball if it is close to straight in front of us
     """
     ball = player.brain.ball
-    return ( ball.on and
-             abs(ball.bearing) < constants.BALL_APPROACH_BEARING_THRESH )
+    return (ball.framesOn > 1)
 
 def shouldApproachBallWithLoc(player):
     return player.brain.ball.on and \
