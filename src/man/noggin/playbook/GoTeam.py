@@ -145,18 +145,21 @@ class GoTeam:
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("Ball models are divergent, or it's me")
                 continue
+
             #dangerous- two players might both have ball, both would stay chaser
             #same as the aibo code but thresholds for hasBall are higher now
             elif mate.hasBall():
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate
+
             else:
                 # Tie break stuff
                 if self.me.chaseTime < mate.chaseTime:
                     chaseTimeScale = self.me.chaseTime
                 else:
                     chaseTimeScale = mate.chaseTime
+
                 #TO-DO: break into a separate function call
                 if ((self.me.chaseTime - mate.chaseTime <
                      PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
@@ -246,8 +249,8 @@ class GoTeam:
 
         self.numActiveFieldPlayers = 0
         for mate in self.brain.teamMembers:
-            if (mate.isDead()):# or mate.isPenalized()):
-                #reset to false when we get a new packet from mate
+            if (mate.active and mate.isDead()): #no need to check inactive mates
+                #we set to True when we get a new packet from mate
                 mate.active = False
             elif (mate.active and (not mate.isTeammateRole(PBConstants.GOALIE)
                                    or (mate.isDefaultGoalie() and self.pulledGoalie))):
@@ -277,17 +280,6 @@ class GoTeam:
     ############   Strategy Decision Stuff     ###########
     ######################################################
 
-    def ballInMyGoalBox(self):
-        """
-        returns True if estimate of ball (x,y) lies in my goal box
-        -includes all y values below top of goalbox
-        (so inside the goal is included)
-        """
-        ball = self.brain.ball
-        return (ball.y > NogginConstants.MY_GOALBOX_BOTTOM_Y and
-                ball.x < NogginConstants.MY_GOALBOX_RIGHT_X and
-                ball.y < NogginConstants.MY_GOALBOX_TOP_Y)
-
     def goalieShouldChase(self):
         return self.noCalledChaser()
 
@@ -302,10 +294,12 @@ class GoTeam:
         if self.brain.gameController.currentState == 'gameReady' or\
                 self.brain.gameController.currentState =='gameSet':
             return False
+
         # TO-DO: switch this to activeFieldPlayers
-        for mate in self.brain.teamMembers:
-            if (mate.active and (mate.isTeammateRole(PBConstants.CHASER))):
+        for mate in self.activeFieldPlayers:
+            if mate.isTeammateRole(PBConstants.CHASER):
                 return False
+
         return True
 
     def pullTheGoalie(self):
