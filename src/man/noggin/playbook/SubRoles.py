@@ -186,12 +186,13 @@ def pKickoffStriker(team, workingPlay):
 # SubRoles for ready state
 def pReadyChaser(team, workingPlay):
     workingPlay.setSubRole(PBConstants.READY_CHASER)
-    #TODO-have separate formations,roles(?),subroles
-    kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
+
+    kickOff = team.brain.gameController.ownKickOff
 
     if kickOff:
         x = PBConstants.READY_KICKOFF_CHASER_X
         y = PBConstants.READY_KICKOFF_CHASER_Y
+
     else:
         x = PBConstants.READY_NON_KICKOFF_CHASER_X
         y = PBConstants.READY_NON_KICKOFF_CHASER_Y
@@ -202,8 +203,8 @@ def pReadyChaser(team, workingPlay):
 
 def pReadyOffender(team, workingPlay):
     workingPlay.setSubRole(PBConstants.READY_OFFENDER)
-    #TODO-have separate formations,roles(?),subroles
-    kickOff = (team.brain.gameController.gc.kickOff== team.brain.my.teamColor)
+
+    kickOff = team.brain.gameController.ownKickOff
 
     if kickOff:
         x = PBConstants.READY_KICKOFF_OFFENDER_X
@@ -221,8 +222,8 @@ def pReadyOffender(team, workingPlay):
 
 def pReadyDefender(team, workingPlay):
     workingPlay.setSubRole(PBConstants.READY_DEFENDER)
-    #TODO-have separate formations,roles(?),subroles
-    kickOff = (team.brain.gameController.gc.kickOff == team.brain.my.teamColor)
+
+    kickOff = team.brain.gameController.ownKickOff
 
     if kickOff:
         x = PBConstants.READY_KICKOFF_DEFENDER_X
