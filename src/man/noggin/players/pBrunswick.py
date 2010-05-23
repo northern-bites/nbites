@@ -109,6 +109,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         elif self.brain.playbook.subRoleUnchanged():
             return self.currentState
 
+        elif self.inKickingState:
+            return self.currentState
+
         else:
             return self.getRoleState()
 
