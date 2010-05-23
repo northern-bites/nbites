@@ -597,7 +597,7 @@ void Noggin::startLocLog()
 #ifdef WEBOTS_BACKEND
     string s  = "./lib/man/noggin/" + string(buf) + ".loc";
 #else
-    string s  = "/home/root/" + string(buf) + ".loc";
+    string s  = "/home/nao/naoqi/log/" + string(buf) + ".loc";
 #endif
     cout << "Started localization log at " << s << endl;
     outputFile.open(s.c_str(), ios::out);
