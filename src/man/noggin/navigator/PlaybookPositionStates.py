@@ -62,7 +62,7 @@ def playbookAtPosition(nav):
     dest = nav.brain.play.getPosition()
 
     # TODO: buffer this switch
-    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
+    if navTrans.atDestination(my, dest) and navTrans.atHeading(my, dest.h):
         return nav.stay()
 
     else:
