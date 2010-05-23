@@ -11,9 +11,8 @@ TEST_OFFENDER = False
 TEST_CHASER = False
 
 # Print information as to how the chaser is determined
-DEBUG_DET_CHASER = False
+DEBUG_DET_CHASER = True
 DEBUG_DET_SUPPORTER = False
-DEBUG_DETERMINE_CHASE_TIME = False
 
 USE_ZONE_STRATEGY = False
 USE_DUB_D = False
@@ -27,17 +26,11 @@ DEFAULT_CHASER_NUMBER = 3
 KICKOFF_FORMATION_TIME = 3
 
 NUM_TEAM_PLAYERS = NogginConstants.NUM_PLAYERS_PER_TEAM
-PACKET_DEAD_PERIOD = 5 # TO-DO: look at shortening so it replaces penalized
+PACKET_DEAD_PERIOD = 2 # TO-DO: look at shortening so it replaces penalized
 
 ####
 #### Role Switching / Tie Breaking ####
 ####
-
-# penalty is: (ball_dist*heading)/scale
-PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
-# penalty is: (ball_dist*ball_bearing)/scale
-BALL_BEARING_PENALTY_SCALE = 200.0 # max 90% of distance
-NO_VISUAL_BALL_PENALTY = 2 # centimeter penalty for not seeing the ball
 TEAMMATE_CHASING_PENALTY = 3 # adds standard penalty for teammates (buffer)
 TEAMMATE_CHASER_USE_NUMBERS_BUFFER = 20.0 # cm
 TEAMMATE_POSITIONING_USE_NUMBERS_BUFFER = 25.0 # cm

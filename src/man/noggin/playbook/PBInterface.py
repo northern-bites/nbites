@@ -18,11 +18,8 @@ class PBInterface:
         Runs the playbook (calls the run method of GoTeam)
         '''
         self.pb.run(play)
-        self.storeUsedValues(play)
-
-    def subRoleChanged(self):
-        return (self.subRole != self.lastSubRole)
-
-    def storeUsedValues(self, play):
         self.lastSubRole = self.subRole
         self.subRole = play.subRole
+
+    def subRoleUnchanged(self):
+        return (self.subRole == self.lastSubRole)
