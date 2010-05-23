@@ -146,15 +146,6 @@ class GoTeam:
                     self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate
 
-            ## elif (fabs(mate.ballY - self.brain.ball.y) >
-            ##     PBConstants.BALL_DIVERGENCE_THRESH or
-            ##     fabs(mate.ballX - self.brain.ball.x) >
-            ##     PBConstants.BALL_DIVERGENCE_THRESH):
-
-            ##     if PBConstants.DEBUG_DET_CHASER:
-            ##         self.printf("Ball models are divergent")
-            ##     continue
-
             else:
                 # Tie break stuff
                 if self.me.chaseTime < mate.chaseTime:
