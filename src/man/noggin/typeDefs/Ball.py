@@ -6,7 +6,7 @@ from ..util.MyMath import (getRelativeVelocityX,
                            getRelativeY,
                            sub180Angle)
 
-FRAMES_AFTER_LOST_BALL_TO_USE_VISION = 10
+FRAMES_AFTER_LOST_BALL_TO_USE_VISION = 15
 
 class Ball(VisualObject):
     """
