@@ -12,10 +12,15 @@ PACKET_DEAD_PERIOD = 2
 DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_CHASER_NUMBER = 3
-DEBUG_DETERMINE_CHASE_TIME = False
+DEBUG_DETERMINE_CHASE_TIME = True
 BALL_ON_BONUS = 1000.
 CHASE_SPEED = 7.00
 SEC_TO_MILLIS = 1000.0
+# penalty is: (ball_dist*heading)/scale
+PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
+# penalty is: (ball_dist*ball_bearing)/scale
+BALL_BEARING_PENALTY_SCALE = 200.0 # max 90% of distance
+NO_VISUAL_BALL_PENALTY = 2 # centimeter penalty for not seeing the ball
 
 
 class TeamMember(RobotLocation):
@@ -133,22 +138,22 @@ class TeamMember(RobotLocation):
             SEC_TO_MILLIS
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.printf("\tChase time base is " + str(time))
+            self.brain.out.printf("\tChase time base is " + str(time))
 
         # Give a bonus for seeing the ball
         if self.brain.ball.on:
             time -= BALL_ON_BONUS
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.printf("\tChase time after ball on bonus " + str(time))
+            self.brain.out.printf("\tChase time after ball on bonus " + str(time))
 
         # Add a penalty for being fallen over
         time += (self.brain.fallController.getTimeRemainingEst() *
                  SEC_TO_MILLIS)
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.printf("\tChase time after fallen over penalty " + str(time))
-            self.printf("")
+            self.brain.out.printf("\tChase time after fallen over penalty " + str(time))
+            self.brain.out.printf("")
 
         return time
 

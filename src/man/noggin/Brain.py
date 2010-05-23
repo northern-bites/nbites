@@ -306,6 +306,7 @@ class Brain(object):
                           loc.ballXUncert,
                           loc.ballYUncert,
                           self.ball.dist,
+                          self.ball.bearing,
                           self.play.role,
                           self.play.subRole,
                           self.playbook.pb.me.chaseTime,
