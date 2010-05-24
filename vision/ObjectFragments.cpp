@@ -85,8 +85,8 @@ static const int DIST_POINT_FUDGE = 5;
 
 #ifdef OFFLINE
 static const bool PRINTOBJS = false;
-static const bool POSTDEBUG = false;
-static const bool POSTLOGIC = false;
+static const bool POSTDEBUG = true;
+static const bool POSTLOGIC = true;
 static const bool TOPFIND = false;
 static const bool CORNERDEBUG = false;
 static const bool SANITY = false;
@@ -338,11 +338,15 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
     int run = 1;
     int width = IMAGE_WIDTH;
     int height = IMAGE_HEIGHT;
+	unsigned char pixel;
     // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
         //cout << "Vert scan " << x << " " << y << endl;
         // if it is the color we're looking for - good
-		unsigned char pixel = thresh->getColor(x, y);
+		if (c == GREEN)
+			pixel = thresh->getColor(x, y);
+		else
+			pixel = thresh->getExpandedColor(x, y, c);
 		if (pixel == c || pixel == c2) {
             good++;
             run++;
@@ -392,10 +396,14 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
     int startX = x;
     int startY = y;
     int height = IMAGE_HEIGHT;
+	unsigned char pixel;
     // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH
               && y < height && bad < stopper; ) {
-		unsigned char pixel = thresh->getColor(x, y);
+		if (c == GREEN)
+			pixel = thresh->getColor(x, y);
+		else
+			pixel = thresh->getExpandedColor(x, y, c);
 		if (pixel == c || pixel == c2) {
             // if it is either of the colors we're looking for - good
             good++;
@@ -472,19 +480,19 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
     stop scan;
 
 	// scan out a 1/4 of the way down the edge
-    horizontalScan(qx, qy, dir, 3, c, c2, 0, IMAGE_WIDTH - 1, scan);
+    horizontalScan(qx, qy, dir, 4, c, c2, 0, IMAGE_WIDTH - 1, scan);
     int qs = abs(qx - scan.x);   // how far did we go?
 
 	// scan out halfway
     qy += shortSpan;
     qx = xProject(top.x, top.y, qy);
-    horizontalScan(qx, qy, dir, 3, c, c2, 0, IMAGE_WIDTH - 1, scan);
+    horizontalScan(qx, qy, dir, 4, c, c2, 0, IMAGE_WIDTH - 1, scan);
 	int q2 = abs(qx - scan.x);
 
 	// scan out 3/4 of the way
 	qy+= shortSpan;
 	qx = xProject(top.x, top.y, qy);
-    horizontalScan(qx, qy, dir, 3, c, c2, 0, IMAGE_WIDTH - 1, scan);
+    horizontalScan(qx, qy, dir, 4, c, c2, 0, IMAGE_WIDTH - 1, scan);
     int q3 = abs(qx - scan.x);
 
 	// we'll take the middle of the three values
@@ -533,22 +541,25 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
     int qy = yProject(left.x, right.y, qx);
     stop scan;
 
-	thresh->drawPoint(left.x, left.y, BLUE);
+	//thresh->drawPoint(left.x, left.y, BLUE);
 	// scan out a 1/4 of the way to the right the edge
-    vertScan(qx, qy, dir, 3, c, c2, scan);
+    vertScan(qx, qy, dir, 4, c, c2, scan);
     int qs = abs(qy - scan.y);   // how far did we go?
+	//thresh->drawPoint(scan.x, scan.y, ORANGE);
 
 	// scan out halfway
     qx += shortSpan;
     qy = yProject(left.x, left.y, qx);
-    vertScan(qx, qy, dir, 3, c, c2, scan);
+    vertScan(qx, qy, dir, 4, c, c2, scan);
     int q2 = abs(qy - scan.y);
+	//thresh->drawPoint(scan.x, scan.y, BLUE);
 
 	// scan out 3/4 of the way
 	qx+= shortSpan;
 	qy = yProject(left.x, left.y, qx);
-    vertScan(qx, qy, dir, 3, c, c2, scan);
+    vertScan(qx, qy, dir, 4, c, c2, scan);
     int q3 = abs(qy - scan.y);
+	//thresh->drawPoint(scan.x, scan.y, WHITE);
 
 	// we'll take the middle of the three values
 	if (qs > q3) {
@@ -560,6 +571,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
 			qs = min(q2, q3);
 		}
 	}
+	cout << "Horizontal " << dir << " " << qs << " " << q2 << " " << q3 << endl;
 
 	// reset the edge
     int te = left.y;
@@ -640,7 +652,8 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 			(float)(bottomy - topy);
 		if (CORRECT)
 			cout << "Slopes " << newSlope1 << " " << newSlope2 << " " << newSlope3 << endl;
-		if (correct && abs(newSlope1 - newSlope2) < GOOD_SLOPE && abs(newSlope2 - newSlope3) < GOOD_SLOPE) {
+		if (correct && abs(newSlope1 - newSlope2) < GOOD_SLOPE &&
+			abs(newSlope2 - newSlope3) < GOOD_SLOPE && abs(newSlope3 - slope) > 0.25) {
 			return newSlope3;
 		}
 		midy = b.getRightTopY();
@@ -664,12 +677,13 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
  */
 void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 {
-    const int ERROR_TOLERANCE = 3;
+    const int ERROR_TOLERANCE = 5;
 
 	int count = 0;
 	bool looping = false;
     // set bad values so we can check for failure
     obj.setLeftTopX(BADVALUE); obj.setLeftTopY(BADVALUE);
+	drawPoint(x, y, RED);
 	stop scan;
 	do {
 		// first we try going up from our start
@@ -682,7 +696,31 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 		vertScan(x, y, 1,  ERROR_TOLERANCE, c, c2, scan);
 		h += scan.good;
 		// if we have a really short strip, then punt
-		if (h < 2) return;
+		if (h < 2) {
+			// since this really shouldn't happen let's explor a little
+			if (x < IMAGE_WIDTH - 2) {
+				vertScan(x+1, y, -1, ERROR_TOLERANCE, c, c2, scan);
+				h = scan.good;
+				top = scan.y;
+				topx = scan.x;
+				vertScan(x+1, y, 1, ERROR_TOLERANCE, c, c2, scan);
+				h += scan.good;
+				if (h < 2 && x > 2) {
+					vertScan(x-1, y, -1, ERROR_TOLERANCE, c, c2, scan);
+					h = scan.good;
+					top = scan.y;
+					topx = scan.x;
+					vertScan(x-1, y, 1, ERROR_TOLERANCE, c, c2, scan);
+					h += scan.good;
+				}
+			}
+			if (h < 2) {
+				if (POSTDEBUG) {
+					cout << "Bad vertical scans only got " << h << endl;
+				}
+				return;
+			}
+		}
 		int bottom = scan.y;
 		int bottomx = scan.x;
 		// we have the starting points of our goal
@@ -979,6 +1017,8 @@ int ObjectFragments::classifyByCrossbar(Blob b)
 int ObjectFragments::classifyByLineIntersection(Blob post) {
 
 	const int MAXIMUM_Y_DIFF = 30;
+	const float CLOSE_DIST = 150.0f;
+	const float FAR_DIST = 180.0f;
 
     // TODO: check if this should be the same standard minHeight for a post
     if (post.getRightBottomY() - post.getRightTopY() < MAXIMUM_Y_DIFF) return NOPOST;
@@ -1013,11 +1053,29 @@ int ObjectFragments::classifyByLineIntersection(Blob post) {
 			// if the corner is higher in the visual field than the bottom of the post
 			// then we have an easy job - we can decide based on which side its on
 			// This is based on the layout of the field and the limitations of the
-			// camera (and the fact that the goal box is absurdly large)
+			// camera.
 			if (closeEnough) {
-				if (x <= post.getLeftBottomX())
-					return LEFT;
-				return RIGHT;
+				// roughly how far away is it?
+				estimate e = vision->pose->pixEstimate(x, y, 0.0);
+				// if it is in the right position we can figure out which post
+				cout << "Dist is " << e.dist << endl;
+				if (x <= post.getLeftBottomX()) {
+					if (e.dist < CLOSE_DIST)
+						return LEFT;
+					else if (e.dist > FAR_DIST) {
+						if (post.getBottom() < IMAGE_HEIGHT - 10)
+							return LEFT;
+						return RIGHT;
+					}
+				} else {
+					if (e.dist < CLOSE_DIST)
+						return RIGHT;
+					else if (e.dist > FAR_DIST) {
+						if (post.getBottom() < IMAGE_HEIGHT - 10)
+							return RIGHT;
+						return LEFT;
+					}
+				}
 			}
         }
     }
@@ -1088,7 +1146,7 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 
     int largel = 0;
     int larger = 0;
-	int mind = height / 2 + (right - left) / 2;
+	int mind = min(100, height / 2 + (right - left) / 2);
     for (int i = 0; i < numberOfRuns; i++) {
         int nextX = runs[i].x;
         int nextY = runs[i].y;
@@ -1096,13 +1154,16 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 		int horX = horizonAt(nextX);
         // meanwhile collect some information on which post we're looking at
         if (nextH > MIN_GOAL_HEIGHT && nextY < horX &&
+			nextX > 5 && nextX < IMAGE_WIDTH - 5 &&
 			nextY + nextH > horX - HORIZON_TOLERANCE) {
             if (nextX < left - mind) {
                 if (nextH > largel) {
+					cout << "Nextl " << nextX << endl;
                     largel = nextH;
 				}
             } else if (nextX > right + mind) {
                 if (nextH > larger) {
+					cout << "Nextr " << nextX << endl;
                     larger = nextH;
                 }
             }
@@ -1604,14 +1665,14 @@ bool ObjectFragments::locationOk(Blob b)
         if (!greenCheck(b) || mh - trueBottom > spanY || spanX < MIN_WIDTH ||
             mh - trueBottom > ALLOWABLE_HORIZON_DIFF) {
             if (spanY > TALL_POST) {
-	      //return true;
+				//return true;
             } else {
-	      if (SANITY) {
-                cout << "Screening blob for bottom reasons" << endl;
-                printBlob(b);
-	      }
-	      return false;
-	    }
+				if (SANITY) {
+					cout << "Screening blob for bottom reasons" << endl;
+					printBlob(b);
+				}
+				return false;
+			}
         } else {
         }
     }
