@@ -129,10 +129,12 @@ def positionForKick(player):
     if transitions.shouldKick(player):
         player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goNow('waitBeforeKick')
+
     elif transitions.shouldScanFindBall(player):
         player.inKickingState = False
         player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
+
     elif transitions.shouldApproachFromPositionForKick(player):
         player.inKickingState = False
         player.brain.CoA.setRobotGait(player.brain.motion)
@@ -203,23 +205,26 @@ def avoidObstacle(player):
 
         player.brain.CoA.setRobotGait(player.brain.motion)
 
-        if (transitions.shouldAvoidObstacleLeft(player) and
-            transitions.shouldAvoidObstacleRight(player)):
+
+        avoidLeft = transitions.shouldAvoidObstacleLeft(player)
+        avoidRight = transitions.shouldAvoidObstacleRight(player)
+
+        if (avoidLeft and avoidRight):
             # Backup
             player.printf("Avoid by backup");
             player.setWalk(constants.DODGE_BACK_SPEED, 0, 0)
 
-        elif transitions.shouldAvoidObstacleLeft(player):
+        elif avoidLeft:
             # Dodge right
             player.printf("Avoid by right dodge");
             player.setWalk(0, constants.DODGE_RIGHT_SPEED, 0)
 
-        elif transitions.shouldAvoidObstacleRight(player):
+        elif avoidRight:
             # Dodge left
             player.printf("Avoid by left dodge");
             player.setWalk(0, constants.DODGE_LEFT_SPEED, 0)
 
-    if not transitions.shouldAvoidObstacle(player):
+    if not (avoidLeft or avoidRight):
         player.doneAvoidingCounter += 1
     else :
         player.doneAvoidingCounter -= 1
