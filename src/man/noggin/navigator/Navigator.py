@@ -38,33 +38,25 @@ class Navigator(FSA.FSA):
         self.switchTo('doingSweetMove')
 
     def dribble(self):
-        if not self.currentState == 'dribble':
-            self.switchTo('dribble')
+        self.switchTo('dribble')
 
     def chaseBall(self):
         """
         robot will walk to the ball with it centered at his feet.
         if no ball is visible, localization will be usedn
         """
-        if not self.currentState == 'walkSpinToBall' and \
-               not self.currentState == 'chaseAroundBox':
-            self.switchTo('walkSpinToBall')
+        self.switchTo('walkSpinToBall')
 
     def kickPosition(self):
         """
         state to align on the ball once we are near it
         """
-        if not self.currentState == 'positionForKick':
-            self.switchTo('positionForKick')
+        self.switchTo('positionForKick')
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
-
-        if not self.currentState == 'playbookWalk' and \
-               not self.currentState == 'playbookOmni' and \
-               not self.currentState == 'playbookAtPosition':
-            self.switchTo('playbookWalk')
+        self.switchTo('playbookWalk')
 
     def omniGoTo(self, dest):
         self.dest = dest

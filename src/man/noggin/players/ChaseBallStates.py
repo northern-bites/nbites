@@ -66,6 +66,7 @@ def approachBall(player):
     Once we are alligned with the ball, approach it
     """
     if player.firstFrame():
+        player.brain.nav.chaseBall()
         player.hasAlignedOnce = False
 
     if transitions.shouldActiveLoc(player):
@@ -99,14 +100,15 @@ def approachBall(player):
         if transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
 
-    player.brain.nav.chaseBall()
-
     return player.stay()
 
 def positionForKick(player):
     """
     State to align on the ball once we are near it
     """
+
+    if player.firstFrame():
+        player.brain.nav.kickPosition()
 
     player.inKickingState = True
     # Leave this state if necessary
@@ -125,14 +127,15 @@ def positionForKick(player):
         if transitions.shouldDribble(player):
             return player.goNow('dribble')
 
-    player.brain.nav.kickPosition()
-
     return player.stay()
 
 def dribble(player):
     """
     Keep running at the ball, but dribble
     """
+    if player.firstFrame():
+        player.brain.nav.dribble()
+
     # if we should stop dribbling, see what else we should do
     if transitions.shouldStopDribbling(player):
 
@@ -143,8 +146,6 @@ def dribble(player):
             return player.goNow('positionForKick')
         elif transitions.shouldApproachBall(player):
             return player.goNow('approachBall')
-
-    player.brain.nav.dribble()
 
     return player.stay()
 
@@ -208,6 +209,7 @@ def orbitBeforeKick(player):
     """
     brain = player.brain
     my = brain.my
+
     if player.firstFrame():
         player.orbitStartH = my.h
         brain.tracker.trackBall()
@@ -226,4 +228,5 @@ def orbitBeforeKick(player):
 
     if player.brain.nav.isStopped() and not player.firstFrame():
         return player.goLater('positionForKick')
+
     return player.stay()
