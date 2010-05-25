@@ -51,7 +51,7 @@ all: $(CMAKE_DEPEND)
 		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR); \
 	elif [ -e $(STRAIGHT_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR); \
-	else [ -e $(WEBOTS_FILE) ]; then \
+	elif [ -e $(WEBOTS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR); \
 	fi
 
