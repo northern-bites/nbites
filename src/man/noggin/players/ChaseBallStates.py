@@ -38,7 +38,6 @@ def chase(player):
 
 def chaseAfterKick(player):
     if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
 
         player.brain.tracker.trackBall()
 
@@ -121,24 +120,23 @@ def positionForKick(player):
     """
     State to align on the ball once we are near it
     """
-    if player.firstFrame():
-        player.brain.CoA.setRobotSlowGait(player.brain.motion)
 
     player.inKickingState = True
     # Leave this state if necessary
     if transitions.shouldKick(player):
-        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goNow('waitBeforeKick')
 
     elif transitions.shouldScanFindBall(player):
         player.inKickingState = False
-        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
 
     elif transitions.shouldApproachFromPositionForKick(player):
         player.inKickingState = False
-        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('approachBall')
+
+    if not player.brain.play.isRole(GOALIE):
+        if transitions.shouldDribble(player):
+            return player.goNow('dribble')
 
     player.brain.nav.kickPosition()
 
@@ -148,12 +146,10 @@ def dribble(player):
     """
     Keep running at the ball, but dribble
     """
-    if player.firstFrame():
-        player.brain.CoA.setRobotDribbleGait(player.brain.motion)
-
     # if we should stop dribbling, see what else we should do
     if transitions.shouldStopDribbling(player):
 
+        # may not be appropriate due to turned out feet...
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKick(player):
@@ -169,7 +165,6 @@ def waitBeforeKick(player):
     """
     player.inKickingState = True
     if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
         player.stopWalking()
 
     if not player.brain.nav.isStopped():
@@ -268,17 +263,17 @@ def orbitBeforeKick(player):
     my = brain.my
     if player.firstFrame():
         player.orbitStartH = my.h
-        brain.CoA.setRobotGait(brain.motion)
         brain.tracker.trackBall()
 
         shotPoint = KickingHelpers.getShotCloseAimPoint(player)
         bearingToGoal = my.getRelativeBearing(shotPoint)
         spinDir = -MyMath.sign(bearingToGoal)
         player.brain.nav.orbitAngle(spinDir * 90)
+
     if not player.brain.tracker.activeLocOn and \
             transitions.shouldScanFindBall(player):
-        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
+
     elif brain.ball.dist > constants.STOP_ORBIT_BALL_DIST:
         return player.goLater('chase')
 

@@ -12,6 +12,8 @@ from math import fabs
 DEBUG = False
 
 def walkSpinToBall(nav):
+    if nav.firstFrame():
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
 
     ball = nav.brain.ball
     nav.dest = ball
@@ -98,6 +100,7 @@ def chaseAroundBox(nav):
 def ballInMyBox(nav):
     if nav.firstFrame():
         nav.brain.tracker.activeLoc()
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
 
     ball = nav.brain.ball
 
@@ -128,6 +131,8 @@ def positionForKick(nav):
     ## nav.dest = kick.getKickPosition()
 
     ## sX,sY,sTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
+    if nav.firstFrame():
+        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
 
     ball = nav.brain.ball
 
@@ -146,4 +151,28 @@ def positionForKick(nav):
         sX = 0.0
 
     helper.setSpeed(nav,sX,sY,0)
+
+    return nav.stay()
+
+def dribble(nav):
+
+    if nav.firstFrame():
+        nav.brain.CoA.setRobotDribbleGait(nav.brain.motion)
+
+    ball = nav.brain.ball
+    nav.dest = ball
+    nav.dest.h = ball.heading
+
+    # Set our walk towards the ball
+    walkX, walkY, walkTheta = \
+           walker.getWalkSpinParam(nav.brain.my, nav.dest)
+
+    helper.setSpeed(nav, walkX, walkY, walkTheta)
+
+    if not nav.brain.play.isRole(GOALIE):
+        if navTrans.shouldNotGoInBox(nav):
+            return nav.goLater('ballInMyBox')
+        elif navTrans.shouldChaseAroundBox(nav):
+            return nav.goLater('chaseAroundBox')
+
     return nav.stay()

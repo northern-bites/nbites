@@ -26,7 +26,6 @@ class Navigator(FSA.FSA):
         self.dest = RobotLocation(0, 0, 0)
 
         # Walk controls
-        self.currentGait = None
         self.walkX = 0
         self.walkY = 0
         self.walkTheta = 0
@@ -37,6 +36,10 @@ class Navigator(FSA.FSA):
     def performSweetMove(self, move):
         self.sweetMove = move
         self.switchTo('doingSweetMove')
+
+    def dribble(self):
+        if not self.currentState == 'dribble':
+            self.switchTo('dribble')
 
     def chaseBall(self):
         """
@@ -150,5 +153,3 @@ class Navigator(FSA.FSA):
         self.stepTheta = theta
         self.numSteps = numSteps
         self.switchTo('stepping')
-
-#######SHOULD NOT BE CALLED BY ANYTHING OUTSIDE NAVIGATOR FOLDER#######

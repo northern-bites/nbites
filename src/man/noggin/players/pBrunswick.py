@@ -34,8 +34,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(BrunswickStates)
 
         self.setName('pBrunswick')
-        self.pb = None # must be init'd later, depends on player init
-        self.currentGait = None
 
         self.chosenKick = None
         self.kickDecider = None

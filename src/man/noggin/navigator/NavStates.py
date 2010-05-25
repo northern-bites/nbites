@@ -31,6 +31,7 @@ def walkStraightToPoint(nav):
     If we no longer are heading towards it change to the spin state.
     """
     if nav.firstFrame():
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
 
@@ -68,6 +69,7 @@ def spinToWalkHeading(nav):
     newSpinDir = my.spinDirToHeading(targetH)
 
     if nav.firstFrame():
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.changeSpinDirCounter = 0
         nav.stopSpinToWalkCount = 0
         nav.curSpinDir = newSpinDir
@@ -110,6 +112,7 @@ def spinToFinalHeading(nav):
     Stops when at heading
     """
     if nav.firstFrame():
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.stopSpinToWalkCount = 0
 
     targetH = nav.dest.h
@@ -137,7 +140,9 @@ def spinToFinalHeading(nav):
 def omniWalkToPoint(nav):
     my = nav.brain.my
     dest = nav.dest
+
     if nav.firstFrame():
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.walkToPointCount = 0
 
     if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
@@ -153,11 +158,14 @@ def walking(nav):
     """
     State to be used when setSpeed is called
     """
+    if nav.firstFrame():
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
     if nav.updatedTrajectory:
         helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
 
     return nav.stay()
+
 # State to use with the setSteps method
 def stepping(nav):
     """
@@ -165,9 +173,12 @@ def stepping(nav):
     This is different from walking.
     """
     if nav.firstFrame():
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
         helper.step(nav, nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
+
     elif not nav.brain.motion.isWalkActive():
         return nav.goNow("stopped")
+
     return nav.stay()
 
 ### Stopping States ###
@@ -191,6 +202,7 @@ def stopped(nav):
 
 def orbitPoint(nav):
     if nav.updatedTrajectory:
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
         helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
 
@@ -203,6 +215,7 @@ def orbitPointThruAngle(nav):
     """
     if fabs(nav.angleToOrbit) < constants.MIN_ORBIT_ANGLE:
         return nav.goNow('stop')
+
     if nav.updatedTrajectory:
         if nav.angleToOrbit < 0:
             orbitDir = constants.ORBIT_LEFT
@@ -232,6 +245,7 @@ def orbitPointThruAngle(nav):
     #  (frames/second) / (degrees/second) * degrees
     framesToOrbit = fabs((constants.FRAME_RATE / nav.walkTheta) *
                          nav.angleToOrbit)
+
     if nav.counter >= framesToOrbit:
         return nav.goLater('stop')
     return nav.stay()
