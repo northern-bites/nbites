@@ -160,9 +160,9 @@ def shouldAvoidObstacle(player):
             not player.penaltyKicking)
 
 def shouldAvoidObstacleDuringApproachBall(player):
-    return shouldAvoidObstacle(player) and \
-        (player.brain.ball.dist >
-         constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST)
+    return (player.brain.ball.dist >
+            constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST and \
+            shouldAvoidObstacle(player))
 
 ####### FIND BALL STUFF ##############
 

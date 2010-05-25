@@ -71,29 +71,22 @@ def approachBall(player):
 
     if transitions.shouldActiveLoc(player):
         player.brain.tracker.activeLoc()
-    else :
+    else:
         player.brain.tracker.trackBall()
 
+    # Switch to other states if we should
     if player.penaltyKicking and \
-            player.brain.ball.inOppGoalBox():
+           player.brain.ball.inOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
 
-    # Switch to other states if we should
-    if player.brain.play.isRole(GOALIE):
-        if transitions.shouldKick(player):
-            return player.goNow('waitBeforeKick')
-        elif transitions.shouldPositionForKick(player):
-            return player.goNow('positionForKick')
-        elif not player.brain.tracker.activeLocOn and \
-                transitions.shouldScanFindBall(player):
-            return player.goLater('scanFindBall')
-    else:
+    if not player.brain.play.isRole(GOALIE):
         if transitions.shouldDribble(player):
             return player.goNow('dribble')
-        elif transitions.shouldKick(player):
-            return player.goNow('waitBeforeKick')
-        elif transitions.shouldPositionForKick(player):
-            return player.goNow('positionForKick')
+
+    if transitions.shouldKick(player):
+        return player.goNow('waitBeforeKick')
+    elif transitions.shouldPositionForKick(player):
+        return player.goNow('positionForKick')
 
     return approachBallWalk(player)
 
@@ -103,14 +96,16 @@ def approachBallWalk(player):
     We use things as to when we should leave and how we should walk
     """
 
+
+    if player.brain.tracker.activeLocOn:
+        if transitions.shouldScanFindBallActiveLoc(player):
+            return player.goLater('scanFindBall')
+    else:
+        if transitions.shouldScanFindBall(player):
+            return player.goLater('scanFindBall')
+
     if not player.brain.play.isRole(GOALIE):
-        if not player.brain.tracker.activeLocOn and \
-                transitions.shouldScanFindBall(player):
-            return player.goLater('scanFindBall')
-        elif player.brain.tracker.activeLocOn and \
-                transitions.shouldScanFindBallActiveLoc(player):
-            return player.goLater('scanFindBall')
-        elif transitions.shouldAvoidObstacleDuringApproachBall(player):
+        if transitions.shouldAvoidObstacleDuringApproachBall(player):
             return player.goLater('avoidObstacle')
 
     # Determine our speed for approaching the ball
