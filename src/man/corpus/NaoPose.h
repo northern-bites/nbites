@@ -176,6 +176,7 @@ public:
     const float getHeadYaw() {
       return sensors->getHeadAngles()[0];
     }
+    const float getDistanceBetweenTwoObjects(estimate e1, estimate e2);
 
     const float getHeadPitch() {
       return sensors->getHeadAngles()[1];
