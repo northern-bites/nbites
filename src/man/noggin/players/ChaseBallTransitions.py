@@ -33,7 +33,7 @@ def shouldApproachBallWithLoc(player):
     return player.brain.ball.on and \
         player.brain.my.locScore >= NogginConstants.OK_LOC and \
         constants.USE_LOC_CHASE and \
-        player.brain.ball.locDist > 30
+        player.brain.ball.dist > 30
 
 def shouldApproachFromPositionForKick(player):
     """
@@ -42,7 +42,7 @@ def shouldApproachFromPositionForKick(player):
     ball = player.brain.ball
     return shouldApproachBall(player) and \
         not shouldPositionForKick(player) and \
-        ball.locDist > 50.0
+        ball.dist > 50.0
 
 def shouldTurnToBallFromPositionForKick(player):
     """
@@ -159,7 +159,7 @@ def shouldChaseAroundBox(player):
 
 def shouldNotGoInBox(player):
     return (False and player.ballInMyGoalBox() and \
-                player.brain.ball.locDist < constants.IGNORE_BALL_IN_BOX_DIST)
+                player.brain.ball.dist < constants.IGNORE_BALL_IN_BOX_DIST)
 
 ####### AVOIDANCE STUFF ##############
 
@@ -210,7 +210,7 @@ def shouldAvoidObstacle(player):
 
 def shouldAvoidObstacleDuringApproachBall(player):
     return shouldAvoidObstacle(player) and \
-        (player.brain.ball.locDist >
+        (player.brain.ball.dist >
          constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST)
 
 ####### FIND BALL STUFF ##############
@@ -247,12 +247,12 @@ def shouldWalkToBallLocPos(player):
 
 def shouldActiveLoc(player):
     if player.brain.ball.on:
-        return (player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST
-                and abs(player.brain.ball.locBearing) <
+        return (player.brain.ball.dist > constants.APPROACH_ACTIVE_LOC_DIST
+                and abs(player.brain.ball.bearing) <
                 constants.APPROACH_ACTIVE_LOC_BEARING)
 
     else:
-        return player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST
+        return player.brain.ball.dist > constants.APPROACH_ACTIVE_LOC_DIST
 
 def shouldStopPenaltyKickDribbling(player):
     """
@@ -273,4 +273,4 @@ def inPenaltyKickStrikezone(player):
 def shouldNotApproachWithLocAnymore(player):
     return (player.brain.my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH
             and
-            player.brain.ball.locDist > constants.APPROACH_NO_MORE_LOC_DIST )
+            player.brain.ball.dist > constants.APPROACH_NO_MORE_LOC_DIST )

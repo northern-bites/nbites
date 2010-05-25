@@ -190,59 +190,51 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 READY_KICKOFF_DEFENDER_X = NogginConstants.CENTER_FIELD_X * 0.5
 READY_KICKOFF_DEFENDER_CENTER_OFFSET = NogginConstants.FIELD_WHITE_HEIGHT/10.
 
-READY_KICKOFF_DEFENDER_0_POS = [READY_KICKOFF_DEFENDER_X,
-                                NogginConstants.CENTER_FIELD_Y -
-                                READY_KICKOFF_DEFENDER_CENTER_OFFSET] # left
-
-READY_KICKOFF_DEFENDER_1_POS = [READY_KICKOFF_DEFENDER_X,
-                                NogginConstants.CENTER_FIELD_Y +
-                                READY_KICKOFF_DEFENDER_CENTER_OFFSET] # right
+READY_KICKOFF_DEFENDER_0_Y = NogginConstants.CENTER_FIELD_Y - \
+                             READY_KICKOFF_DEFENDER_CENTER_OFFSET # left
+READY_KICKOFF_DEFENDER_1_Y = NogginConstants.CENTER_FIELD_Y + \
+                             READY_KICKOFF_DEFENDER_CENTER_OFFSET # right
 
 READY_KICKOFF_OFFENDER_X = READY_KICKOFF_DEFENDER_X #keeps positions level
 READY_KICKOFF_OFFENDER_CENTER_OFFSET = READY_KICKOFF_DEFENDER_CENTER_OFFSET
 
-READY_KICKOFF_OFFENDER_0_POS = [READY_KICKOFF_OFFENDER_X,
-                                NogginConstants.CENTER_FIELD_Y +
-                                READY_KICKOFF_OFFENDER_CENTER_OFFSET] # right
+READY_KICKOFF_OFFENDER_0_X = READY_KICKOFF_OFFENDER_X
+READY_KICKOFF_OFFENDER_0_Y = NogginConstants.CENTER_FIELD_Y + \
+                           READY_KICKOFF_OFFENDER_CENTER_OFFSET # right
 
-READY_KICKOFF_OFFENDER_1_POS = [READY_KICKOFF_OFFENDER_X,
-                                NogginConstants.CENTER_FIELD_Y -
-                                READY_KICKOFF_OFFENDER_CENTER_OFFSET] # left
+READY_KICKOFF_OFFENDER_1_X = READY_KICKOFF_OFFENDER_X
+READY_KICKOFF_OFFENDER_1_Y = NogginConstants.CENTER_FIELD_Y - \
+                             READY_KICKOFF_OFFENDER_CENTER_OFFSET # left
 
-READY_KICKOFF_CHASER_POS = [NogginConstants.CENTER_FIELD_X -
-                        NogginConstants.CENTER_CIRCLE_RADIUS/2.0,
-                        NogginConstants.CENTER_FIELD_Y] # near center
+READY_KICKOFF_CHASER_X = (NogginConstants.CENTER_FIELD_X -
+                          NogginConstants.CENTER_CIRCLE_RADIUS/2.0)
+READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 
 # READY_NON_KICKOFF
 
 READY_NON_KICKOFF_MAX_X = (NogginConstants.GREEN_PAD_X +
                                 NogginConstants.FIELD_GREEN_WIDTH * 1./4.)
 
-READY_NON_KICKOFF_DEFENDER_POS = [READY_NON_KICKOFF_MAX_X,
-                              NogginConstants.GREEN_PAD_Y +
-                              NogginConstants.FIELD_GREEN_HEIGHT * 1./5.]
+READY_NON_KICKOFF_DEFENDER_X = READY_NON_KICKOFF_MAX_X
+READY_NON_KICKOFF_DEFENDER_Y = NogginConstants.GREEN_PAD_Y + \
+                               NogginConstants.FIELD_GREEN_HEIGHT * 1./5.
 
-READY_NON_KICKOFF_CHASER_POS = [READY_NON_KICKOFF_MAX_X,
-                            NogginConstants.CENTER_FIELD_Y]
+READY_NON_KICKOFF_CHASER_X = READY_NON_KICKOFF_MAX_X
+READY_NON_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y
 
-READY_NON_KICKOFF_OFFENDER_POS = [READY_NON_KICKOFF_MAX_X,
-                              NogginConstants.GREEN_PAD_Y +
-                              NogginConstants.FIELD_WHITE_WIDTH * 3./5.,
-                              NogginConstants.OPP_GOAL_HEADING]
+READY_NON_KICKOFF_OFFENDER_X = READY_NON_KICKOFF_MAX_X
+READY_NON_KICKOFF_OFFENDER_Y = NogginConstants.GREEN_PAD_Y + \
+                               NogginConstants.FIELD_WHITE_WIDTH * 3./5
 
 #TODO: reconsider where players should move after kickoff
 # KICK OFF POSITIONS (right after kickoff, rather)
-KICKOFF_OFFENDER_0_POS = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                      NogginConstants.FIELD_HEIGHT * 1./4.]
+KICKOFF_OFFENDER_X = NogginConstants.CENTER_FIELD_X * 1./2.
+KICKOFF_OFFENDER_0_Y = NogginConstants.FIELD_HEIGHT * 1./4.
+KICKOFF_OFFENDER_1_Y = NogginConstants.FIELD_HEIGHT * 3./4.
 
-KICKOFF_OFFENDER_1_POS = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                      NogginConstants.FIELD_HEIGHT * 3./4.]
-
-KICKOFF_DEFENDER_0_POS = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                      NogginConstants.FIELD_HEIGHT * 1./4.]
-
-KICKOFF_DEFENDER_1_POS = [NogginConstants.CENTER_FIELD_X * 1./2.,
-                      NogginConstants.FIELD_HEIGHT * 3./4.]
+KICKOFF_DEFENDER_X = NogginConstants.CENTER_FIELD_X * 1./2.
+KICKOFF_DEFENDER_0_Y = NogginConstants.FIELD_HEIGHT * 1./4.
+KICKOFF_DEFENDER_1_Y = NogginConstants.FIELD_HEIGHT * 3./4.
 
 # Defender
 DEFENDER_BALL_DIST = 100
@@ -295,8 +287,6 @@ TWO_DOG_FINDER_POSITIONS = (
 DEEP_BACK_X = SWEEPER_X
 LEFT_DEEP_BACK_Y = NogginConstants.MY_GOALBOX_BOTTOM_Y - 40.
 RIGHT_DEEP_BACK_Y = NogginConstants.MY_GOALBOX_TOP_Y + 40.
-LEFT_DEEP_BACK_POS =  (DEEP_BACK_X, LEFT_DEEP_BACK_Y)
-RIGHT_DEEP_BACK_POS = (DEEP_BACK_X, RIGHT_DEEP_BACK_Y)
 
 # number of formations
 NUM_FORMATIONS = 16

@@ -1223,7 +1223,9 @@ bool Ball::badSurround(Blob b) {
 			return true;
 		}
 	}
-	if (red > orange && greens < static_cast<float>(w * h) * GREEN_PERCENT) {
+	if ((red > orange) &&
+        (static_cast<float>(greens) <
+         (static_cast<float>(w * h) * GREEN_PERCENT))) {
 		if (BALLDEBUG) {
 			cout << "Too much real orangered without enough green" << endl;
 		}

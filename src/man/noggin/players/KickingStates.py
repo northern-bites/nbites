@@ -679,26 +679,26 @@ class KickDecider:
         if info.myGoalLeftPost.on:
             if info.myGoalLeftPost.certainty == NogginConstants.SURE:
                 self.sawOwnGoal = True
-                self.myGoalLeftPostBearings.append(info.myGoalLeftPost.bearing)
-                self.myGoalLeftPostDists.append(info.myGoalLeftPost.dist)
+                self.myGoalLeftPostBearings.append(info.myGoalLeftPost.visBearing)
+                self.myGoalLeftPostDists.append(info.myGoalLeftPost.visDist)
 
         if info.myGoalRightPost.on:
             if info.myGoalRightPost.certainty == NogginConstants.SURE:
                 self.sawOwnGoal = True
-                self.myGoalRightPostBearings.append(info.myGoalRightPost.bearing)
-                self.myGoalRightPostDists.append(info.myGoalRightPost.dist)
+                self.myGoalRightPostBearings.append(info.myGoalRightPost.visBearing)
+                self.myGoalRightPostDists.append(info.myGoalRightPost.visDist)
 
         if info.oppGoalLeftPost.on:
             if info.oppGoalLeftPost.certainty == NogginConstants.SURE:
                 self.sawOppGoal = True
-                self.oppGoalLeftPostBearings.append(info.oppGoalLeftPost.bearing)
-                self.oppGoalLeftPostDists.append(info.oppGoalLeftPost.dist)
+                self.oppGoalLeftPostBearings.append(info.oppGoalLeftPost.visBearing)
+                self.oppGoalLeftPostDists.append(info.oppGoalLeftPost.visDist)
 
         if info.oppGoalRightPost.on:
             if info.oppGoalRightPost.certainty == NogginConstants.SURE:
                 self.sawOppGoal = True
-                self.oppGoalRightPostBearings.append(info.oppGoalRightPost.bearing)
-                self.oppGoalRightPostDists.append(info.oppGoalRightPost.dist)
+                self.oppGoalRightPostBearings.append(info.oppGoalRightPost.visBearing)
+                self.oppGoalRightPostDists.append(info.oppGoalRightPost.visDist)
 
     def calculate(self):
         """

@@ -99,19 +99,19 @@ class Brain(object):
         # Build instances of the vision based field objects
         # Yello goal left and right posts
         self.yglp = Landmarks.FieldObject(self.vision.yglp,
-                                         Constants.VISION_YGLP)
+                                          Constants.VISION_YGLP)
         self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
-                                         Constants.VISION_YGRP)
+                                          Constants.VISION_YGRP)
         # Blue Goal left and right posts
         self.bglp = Landmarks.FieldObject(self.vision.bglp,
-                                         Constants.VISION_BGLP)
+                                          Constants.VISION_BGLP)
         self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
-                                         Constants.VISION_BGRP)
+                                          Constants.VISION_BGRP)
 
         self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
-                                            Constants.VISION_BG_CROSSBAR)
+                                             Constants.VISION_BG_CROSSBAR)
         self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
-                                            Constants.VISION_YG_CROSSBAR)
+                                             Constants.VISION_YG_CROSSBAR)
 
         # Now we setup the corners
         self.corners = []
@@ -180,9 +180,9 @@ class Brain(object):
         """
         Main control loop called every TIME_STEP milliseconds
         """
+        # order here is very important
         # Update Environment
-        self.ball.updateVision(self.vision.ball)
-        self.updateFieldObjects()
+        self.updateVisualObjects()
         self.sonar.updateSensors(self.sensors, sensors.UltraSoundMode)
 
         # Communications update
@@ -190,6 +190,7 @@ class Brain(object):
 
         # Localization Update
         self.updateLocalization()
+        self.ball.updateBestValues(self.my)
 
         #Set LEDS
         self.leds.processLeds()
@@ -208,10 +209,11 @@ class Brain(object):
         # Update any logs we have
         self.out.updateLogs()
 
-    def updateFieldObjects(self):
+    def updateVisualObjects(self):
         """
         Update information about seen objects
         """
+        self.ball.updateVision(self.vision.ball)
         self.yglp.updateVision(self.vision.yglp)
         self.ygrp.updateVision(self.vision.ygrp)
         self.bglp.updateVision(self.vision.bglp)

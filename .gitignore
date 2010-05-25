@@ -41,3 +41,6 @@ noggin/util/fakeData/*
 docs*
 /noggin/offline/c++filt
 /noggin/offline/faker
+/noggin/offline/fakerData/*
+*~
+docs/*

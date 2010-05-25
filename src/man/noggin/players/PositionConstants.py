@@ -1,4 +1,5 @@
-import BrunswickSpeeds as speeds
+from ..navigator import BrunswickSpeeds as speeds
+
 USE_SQUAT_DEFENDER = False
 
 BALL_SPIN_POSITION_THRESH = 10

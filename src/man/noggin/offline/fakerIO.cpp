@@ -11,6 +11,8 @@ using namespace boost;
 /**
  * Method to read in a robot path from a formatted file
  *
+ * Reads in path defined by robot velocities.
+ *
  * @param inputFile The opened file containing the path information
  * @param letsGo Where the robot path is to be stored
  */
@@ -99,68 +101,87 @@ void readObsInputFile(fstream * inputFile,
             } else {
                 // if it's a corner
                 list <const ConcreteCorner*> toUse;
-                const ConcreteCorner * corn;
+                const ConcreteCorner* corn;
                 switch(ids[k]) {
                 case BLUE_CORNER_TOP_L:
-                    corn = &ConcreteCorner::blue_corner_top_l;
+                    corn = &ConcreteCorner::blue_corner_top_l();
                     break;
                 case BLUE_CORNER_BOTTOM_L:
-                    corn = &ConcreteCorner::blue_corner_bottom_l;
+					corn = &ConcreteCorner::blue_corner_bottom_l();
                     break;
                 case BLUE_GOAL_LEFT_T:
-                    corn = &ConcreteCorner::blue_goal_left_t;
+                    corn = &ConcreteCorner::blue_goal_left_t();
                     break;
                 case BLUE_GOAL_RIGHT_T:
-                    corn = &ConcreteCorner::blue_goal_right_t;
+                    corn = &ConcreteCorner::blue_goal_right_t();
                     break;
                 case BLUE_GOAL_LEFT_L:
-                    corn = &ConcreteCorner::blue_goal_left_l;
+                    corn = &ConcreteCorner::blue_goal_left_l();
                     break;
                 case BLUE_GOAL_RIGHT_L:
-                    corn = &ConcreteCorner::blue_goal_right_l;
+                    corn = &ConcreteCorner::blue_goal_right_l();
                     break;
                 case CENTER_TOP_T:
-                    corn = &ConcreteCorner::center_top_t;
+                    corn = &ConcreteCorner::center_top_t();
                     break;
                 case CENTER_BOTTOM_T:
-                    corn = &ConcreteCorner::center_bottom_t;
+                    corn = &ConcreteCorner::center_bottom_t();
                     break;
                 case YELLOW_CORNER_TOP_L:
-                    corn = &ConcreteCorner::yellow_corner_top_l;
+                    corn = &ConcreteCorner::yellow_corner_top_l();
                     break;
                 case YELLOW_CORNER_BOTTOM_L:
-                    corn = &ConcreteCorner::yellow_corner_bottom_l;
+                    corn = &ConcreteCorner::yellow_corner_bottom_l();
                     break;
                 case YELLOW_GOAL_LEFT_T:
-                    corn = &ConcreteCorner::yellow_goal_left_t;
+                    corn = &ConcreteCorner::yellow_goal_left_t();
                     break;
                 case YELLOW_GOAL_RIGHT_T:
-                    corn = &ConcreteCorner::yellow_goal_right_t;
+                    corn = &ConcreteCorner::yellow_goal_right_t();
                     break;
                 case YELLOW_GOAL_LEFT_L:
-                    corn = &ConcreteCorner::yellow_goal_left_l;
+                    corn = &ConcreteCorner::yellow_goal_left_l();
                     break;
                 case YELLOW_GOAL_RIGHT_L:
                     // Intentional fall through
                 default:
-                    corn = &ConcreteCorner::yellow_goal_right_l;
+                    corn = &ConcreteCorner::yellow_goal_right_l();
                     break;
                 }
                 // Append to the list
                 toUse.assign(1,corn);
 
                 VisualCorner vc(20, 20, dists[k], bearings[k],
-                                VisualLine(), VisualLine(), 10.0f, 10.0f);
+                                shared_ptr<VisualLine>(new VisualLine()),
+								shared_ptr<VisualLine>(new VisualLine()),
+								10.0f, 10.0f);
                 vc.setPossibleCorners(toUse);
 
                 // Set ID
-                if (toUse == ConcreteCorner::lCorners) {
-                    vc.setID(L_INNER_CORNER);
-                } else if (toUse == ConcreteCorner::tCorners) {
-                    vc.setID(T_CORNER);
-                } else {
-                    vc.setID((cornerID)ids[k]);
-                }
+				const vector<const ConcreteCorner*> lCorners =
+					ConcreteCorner::lCorners();
+				for (int i = 0; i < lCorners.size(); ++i){
+					const ConcreteCorner* c = lCorners[i];
+
+					if (c == corn){
+						vc.setID(L_INNER_CORNER);
+					}
+				}
+
+				if (vc.getID() != L_INNER_CORNER){
+					const vector<const ConcreteCorner*> tCorners =
+						ConcreteCorner::tCorners();
+					for (int i = 0; i < tCorners.size(); ++i){
+						const ConcreteCorner* c = tCorners[i];
+
+						if (c == corn)
+							vc.setID(T_CORNER);
+					}
+				}
+				if (vc.getID() != L_INNER_CORNER ||
+					vc.getID() != T_CORNER){
+					vc.setID((cornerID)ids[k]);
+				}
                 Observation seen(vc);
                 z_t.push_back(seen);
             }
@@ -237,30 +258,31 @@ void printOutObsLine(fstream* outputFile, vector<Observation> sightings,
     // Print the actual robot position
     *outputFile << setprecision(6) << currentPose->x << " "
                 << currentPose->y << " "
-                << NBMath::subPIAngle(currentPose->h) << " "
-    // print actual ball position
-                << currentBall->x << " "
-                << currentBall->y << " "
-                << currentBall->velX << " "
-                << currentBall->velY << " ";
-    // Odometery
-    *outputFile << lastOdo.deltaF << " " << lastOdo.deltaL << " "
-                << lastOdo.deltaR << " ";
-    // Output landmark infos
-    for(unsigned int k = 0; k < sightings.size(); ++k) {
-        *outputFile << setprecision(12) << sightings[k].getID() << " "
-                    << sightings[k].getVisDistance() << " "
-                    << sightings[k].getVisBearing() << " ";
-    }
-    // Output ball as landmark
-    if (_b.getDistance() > 0.0) {
-        *outputFile << setprecision(12) << ball_id << " "
-                    << _b.getDistance() << " "
-                    << _b.getBearing() << " ";
-    }
+                << NBMath::subPIAngle(currentPose->h) << " ";
 
-    // Close the line
-    *outputFile << endl;
+    // print actual ball position
+	*outputFile << currentBall->x << " "
+				<< currentBall->y << " "
+				<< currentBall->velX << " "
+				<< currentBall->velY << " ";
+	// Odometery
+	*outputFile << lastOdo.deltaF << " " << lastOdo.deltaL << " "
+				<< lastOdo.deltaR << " ";
+    // Output landmark infos
+	for(unsigned int k = 0; k < sightings.size(); ++k) {
+		*outputFile << setprecision(12) << sightings[k].getID() << " "
+					<< sightings[k].getVisDistance() << " "
+					<< sightings[k].getVisBearing() << " ";
+	}
+	// Output ball as landmark
+	if (_b.getDistance() > 0.0) {
+		*outputFile << setprecision(12) << ball_id << " "
+					<< _b.getDistance() << " "
+					<< _b.getBearing() << " ";
+	}
+
+	// Close the line
+	*outputFile << endl;
 }
 
 /**
@@ -272,9 +294,10 @@ void printOutObsLine(fstream* outputFile, vector<Observation> sightings,
  * @param lastOdo Odometery since previous frame
  */
 void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
-                        vector<Observation> sightings, MotionModel lastOdo,
-                        PoseEst *currentPose, BallPose * currentBall,
-                        shared_ptr<BallEKF> ballEKF, VisualBall _b,
+                        const vector<Observation>& sightings,
+						const MotionModel& lastOdo,
+                        const PoseEst& currentPose, const BallPose& currentBall,
+                        shared_ptr<BallEKF> ballEKF, const VisualBall& _b,
                         int team_color, int player_number, int ball_id)
 {
     // Output particle infos
@@ -301,34 +324,58 @@ void printOutMCLLogLine(fstream* outputFile, shared_ptr<MCL> myLoc,
  * @param lastOdo Odometery since previous frame
  */
 void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
-                     vector<Observation> sightings, MotionModel lastOdo,
-                     PoseEst *currentPose, BallPose * currentBall,
-                     shared_ptr<BallEKF> ballEKF, VisualBall _b,
+                     const vector<Observation>& sightings,
+					 const MotionModel& lastOdo,
+                     const PoseEst &currentPose, const BallPose& currentBall,
+                     shared_ptr<BallEKF> ballEKF, const VisualBall& _b,
                      int team_color, int player_number, int ball_id)
 {
     // Output standard infos
-    *outputFile << setprecision(6) << team_color<< " " << player_number << " "
+    *outputFile << setprecision(6) << team_color<< " " << player_number << "|"
                 << myLoc->getXEst() << " " << myLoc->getYEst() << " "
                 << myLoc->getHEst() << " "
                 << myLoc->getXUncert() << " " << myLoc->getYUncert() << " "
-                << myLoc->getHUncert() << " "
-                // X Estimate
-                << (ballEKF->getXEst()) << " "
-                // Y Estimate
+                << myLoc->getHUncert() << " ";
+
+#ifdef USE_MM_LOC_EKF
+	shared_ptr<MMLocEKF> mmloc = boost::dynamic_pointer_cast<MMLocEKF>(myLoc);
+	const list<LocEKF*> models = mmloc->getModels();
+	list<LocEKF*>::const_iterator model;
+
+	*outputFile << ";";
+
+	for(model = models.begin(); model != models.end() ; ++model){
+		if (!(*model)->isActive())
+			continue;
+		*outputFile << (*model)->getXEst() << " " <<
+			(*model)->getYEst() << " " <<
+			(*model)->getHEst() << " " <<
+			(*model)->getXUncert() << " " <<
+			(*model)->getYUncert() << " " <<
+			(*model)->getHUncert()
+					<< ";";	// Split models with ;
+	}
+	// Split models section from ball and obs section
+#endif
+	*outputFile << "|";
+
+    // X Estimate
+	 *outputFile << (ballEKF->getXEst()) << " "
+		// Y Estimate
                 << (ballEKF->getYEst()) << " "
-                // X Uncert
+		// X Uncert
                 << (ballEKF->getXUncert()) << " "
-                // Y Uncert
+		// Y Uncert
                 << (ballEKF->getYUncert()) << " "
-                // X Velocity Estimate
+		// X Velocity Estimate
                 << ballEKF->getXVelocityEst() << " "
-                // Y Velocity Estimate
+		// Y Velocity Estimate
                 << ballEKF->getYVelocityEst() << " "
-                // X Velocity Uncert
+		// X Velocity Uncert
                 << ballEKF->getXVelocityUncert() << " "
-                // Y Velocity Uncert
+		// Y Velocity Uncert
                 << ballEKF->getYVelocityUncert() << " "
-                // Odometery
+		// Odometery
                 << lastOdo.deltaF << " " << lastOdo.deltaL << " "
                 << lastOdo.deltaR;
 
@@ -336,14 +383,14 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
     *outputFile << ":";
 
     // Print the actual robot position
-    *outputFile << currentPose->x << " "
-                << currentPose->y << " "
-                << currentPose->h << " "
-    // print actual ball position
-                << currentBall->x << " "
-                << currentBall->y << " "
-                << currentBall->velX << " "
-                << currentBall->velY << " ";
+    *outputFile << currentPose.x << " "
+                << currentPose.y << " "
+                << currentPose.h << " "
+		// print actual ball position
+                << currentBall.x << " "
+                << currentBall.y << " "
+                << currentBall.velX << " "
+                << currentBall.velY << " ";
 
     // Divide the sections with a colon
     *outputFile << ":";
@@ -363,6 +410,34 @@ void printOutLogLine(fstream* outputFile, shared_ptr<LocSystem> myLoc,
 
     // Close the line
     *outputFile << endl;
+}
+
+void printOutPoseDiffHeader(std::fstream* outputFile)
+{
+	*outputFile << "x y h 2d 3d" << endl;
+}
+
+/**
+ * Print out the differences between real pose and the
+ * loc estimated pose.
+ *
+ */
+void printOutPoseDiffs(std::fstream* outputFile,
+					   boost::shared_ptr<LocSystem> myLoc,
+					   const PoseEst& currentPose)
+{
+
+	*outputFile << setprecision(6)
+		// Print in following order:
+				<< currentPose.x - myLoc->getXEst() << " "
+				<< currentPose.y - myLoc->getYEst() << " "
+				<< currentPose.h - myLoc->getHEst() << " "
+				<< sqrt(pow(currentPose.x - myLoc->getXEst(),2) +
+						pow(currentPose.y - myLoc->getYEst(),2) +
+						pow(currentPose.h - myLoc->getHEst(),2)) << " "
+				<< sqrt(pow(currentPose.x - myLoc->getXEst(),2) +
+						pow(currentPose.y - myLoc->getYEst(),2))
+				<< endl;
 }
 
 /**
@@ -458,15 +533,15 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
                   >> initBallVelXUncert >> initBallVelYUncert;
     }
     // Initialize localization systems
-    shared_ptr<LocSystem> locEKF  = shared_ptr<LocEKF>(
-        new LocEKF(initX, initY, initH, initUncertX, initUncertY, initUncertH));
+    shared_ptr<LocSystem> locEKF  = shared_ptr<MMLocEKF>(
+        new MMLocEKF());
     shared_ptr<BallEKF> ballEKF =  shared_ptr<BallEKF>(
         new BallEKF(initBallX, initBallY, initBallVelX, initBallVelY,
                     initBallXUncert, initBallYUncert,
                     initBallVelXUncert, initBallVelYUncert));
 
     printOutLogLine(outputFile,locEKF, sightings, lastOdo,
-                    &currentPose, &currentBall, ballEKF, *_b,
+                    currentPose, currentBall, ballEKF, *_b,
                     teamColor, playerNumber, BALL_ID);
 
     float ballDist, ballBearing;
@@ -518,7 +593,7 @@ void readRobotLogFile(fstream* inputFile, fstream* outputFile)
 
         // Write out the next observation line
         printOutLogLine(outputFile, locEKF, sightings, lastOdo,
-                        &currentPose, &currentBall, ballEKF, *_b,
+                        currentPose, currentBall, ballEKF, *_b,
                         teamColor, playerNumber, BALL_ID);
     }
 }

@@ -58,13 +58,14 @@ def executeMove(motionInst, sweetMove):
 
 def getOmniWalkParam(my, dest):
 
-    bearing = radians(my.getRelativeBearing(dest))
+    bearingDeg = my.getRelativeBearing(dest)
+    bearing = radians(bearingDeg)
 
     distToDest = my.dist(dest)
 
     # calculate forward speed
-    forwardGain = constants.OMNI_GOTO_X_GAIN * distToDest* \
-        cos(bearing)
+    relX = distToDest * cos(bearing)
+    forwardGain = constants.OMNI_GOTO_X_GAIN * relX
     sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
     sX = MyMath.clip(sX,
                      constants.OMNI_MIN_X_SPEED,
@@ -73,8 +74,8 @@ def getOmniWalkParam(my, dest):
         sX = 0
 
     # calculate sideways speed
-    strafeGain = constants.OMNI_GOTO_Y_GAIN * distToDest* \
-        sin(bearing)
+    relY = distToDest * sin(bearing)
+    strafeGain = constants.OMNI_GOTO_Y_GAIN * relY
     sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
     sY = MyMath.clip(sY,
                      constants.OMNI_MIN_Y_SPEED,
@@ -82,23 +83,54 @@ def getOmniWalkParam(my, dest):
     if fabs(sY) < constants.OMNI_MIN_Y_MAGNITUDE:
         sY = 0
 
-    if atDestinationCloser(my, dest):
-        sX = sY = 0.0
-
     # calculate spin speed
     spinGain = constants.GOTO_SPIN_GAIN
     spinDir = my.spinDirToHeading(dest.h)
-    sTheta = spinDir * fabs(my.h - dest.h) * spinGain
+    sTheta = spinDir * fabs(bearingDeg) * spinGain
     sTheta = MyMath.clip(sTheta,
                          constants.OMNI_MIN_SPIN_SPEED,
                          constants.OMNI_MAX_SPIN_SPEED)
+
     if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
         sTheta = 0.0
 
-    if atHeading(my, dest.h):
+    return (sX, sY, sTheta)
+
+def getWalkSpinParam(my, dest):
+    bearingDeg = my.getRelativeBearing(dest)
+    bearing = radians(bearingDeg)
+
+    distToDest = my.dist(dest)
+
+    # calculate ideal max forward speed
+    forwardGain = distToDest * cos(bearing)
+    sX = constants.GOTO_FORWARD_SPEED * forwardGain
+
+    # calculate ideal max spin speed
+    sTheta = (my.spinDirToHeading(dest.h) * getRotScale(bearingDeg) *
+              constants.OMNI_MAX_SPIN_SPEED)
+
+    ## if any are below min thresholds, set to 0
+    if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
+        sX = 0
+
+    if fabs(sTheta) < constants.MIN_SPIN_SPEED:
         sTheta = 0.0
 
-    return (sX, sY, sTheta)
+    absSTheta = fabs(sTheta)
+
+    if absSTheta == 0:
+        sX = MyMath.clip(sX, constants.WALK_TO_MIN_X_SPEED,
+                         constants.WALK_TO_MAX_X_SPEED)
+
+    elif absSTheta <= (constants.HEADING_MEDIUM_SCALE *
+                       constants.OMNI_MAX_SPIN_SPEED): #18
+        sX = MyMath.clip(sX, -9, 9)
+
+    else: #if we make getRotScale finer grained we could
+        sX = 0
+
+    return (sX, 0, sTheta)
 
 def getWalkStraightParam(my, dest):
 
@@ -127,9 +159,12 @@ def getWalkStraightParam(my, dest):
     return (sX, sY, sTheta)
 
 def getSpinOnlyParam(my, dest):
+    # Determine the speed to turn
+    # see if getRotScale can go faster
 
     spinDir = my.spinDirToHeading(dest.h)
-    headingDiff = fabs(my.getRelativeBearing(dest))
+    # getRelativeBearing can be replaced w/simpler math
+    headingDiff = my.getRelativeBearing(dest)
     sTheta = spinDir * constants.GOTO_SPIN_SPEED * \
              getRotScale(headingDiff)
 
@@ -140,19 +175,16 @@ def atDestination(my, dest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
     """
-    return ( fabs(my.x - dest.x) < constants.CLOSE_ENOUGH_XY and
-             fabs(my.y - dest.y) < constants.CLOSE_ENOUGH_XY)
+    return my.dist(dest) < constants.CLOSE_ENOUGH_XY
 
 def atDestinationCloser(my, dest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
     """
-    return (fabs(my.x - dest.x) < constants.CLOSER_XY and
-            fabs(my.y - dest.y) < constants.CLOSER_XY)
+    return my.dist(dest) < constants.CLOSER_XY
 
 def atDestinationGoalie(my, dest):
-    return (fabs(my.x - dest.x) < constants.GOALIE_CLOSE_X and
-            fabs(my.y - dest.y) < constants.GOALIE_CLOSE_Y)
+    return my.dist(dest) < constants.GOALIE_CLOSE
 
 def atHeadingGoTo(my, targetHeading):
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))

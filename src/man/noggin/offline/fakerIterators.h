@@ -54,6 +54,7 @@ void iterateMCLObsPath(std::fstream * locFile, std::fstream * coreFile,
                        int ball_id);
 
 void iterateFakerPath(std::fstream * mclFile, std::fstream * ekfFile,
+					  std::fstream * ekfDiffFile,
                       NavPath * letsGo, float noiseLevel = 0.05);
 void checkObjects(std::vector<Observation> &Z_t, PoseEst myPos,
 				  float noiseLevel);
@@ -72,3 +73,6 @@ float sampleTriangularDistribution(float sd);
 
 #endif // obsToLoc_h_DEFINED
 
+std::pair<float,float>
+findClosestLinePointCartesian(LineLandmark l, float x_r,
+							  float y_r, float h_r);

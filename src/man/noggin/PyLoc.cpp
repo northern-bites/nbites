@@ -46,6 +46,11 @@ public:
         ballEKF->reset();
     }
 
+	void resetLocTo(float x, float y, float h){
+		loc->resetLocTo(x, y, h * TO_RAD);
+		ballEKF->reset();
+	}
+
     /* Getters */
     // We use degreees in python, and radians in C++
     // Self localization
@@ -115,6 +120,8 @@ BOOST_PYTHON_MODULE(_localization)
              "reset the localization system")
         .def("redGoalieReset", &PyLoc::redGoalieReset,
              "reset the localization system")
+		.def("resetLocTo", &PyLoc::resetLocTo,
+			 "reset the localiation system to a specific location")
         ;
 }
 

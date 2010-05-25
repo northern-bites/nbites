@@ -55,13 +55,13 @@ int main(int argc, char** argv)
     ekfCoreFile.open(ekfCoreFileName.c_str(), ios::out);
 
     // Create the EKF System
-    shared_ptr<LocEKF> ekfLoc = shared_ptr<LocEKF>(new LocEKF());
+    shared_ptr<LocSystem> locSys = shared_ptr<MMLocEKF>(new MMLocEKF());
     // Iterate through the path
     cout << "Running EKF loc" << endl;
     long long ekfTime = -micro_time();
     ekfLoc->setUseAmbiguous(true);
     iterateObsPath(&ekfFile, &ekfCoreFile,
-                   ekfLoc, &realPoses, &ballPoses, &odos,
+                   locSys, &realPoses, &ballPoses, &odos,
                    &sightings, &ballDists, &ballBearings, BALL_ID);
     ekfTime += micro_time();
     ekfTime *= 0.001;
