@@ -199,15 +199,13 @@ def avoidObstacle(player):
     """
     If we detect something in front of us, dodge it
     """
+
+    avoidLeft = transitions.shouldAvoidObstacleLeft(player)
+    avoidRight = transitions.shouldAvoidObstacleRight(player)
+
     if player.firstFrame():
         player.doneAvoidingCounter = 0
         player.printf(player.brain.sonar)
-
-        player.brain.CoA.setRobotGait(player.brain.motion)
-
-
-        avoidLeft = transitions.shouldAvoidObstacleLeft(player)
-        avoidRight = transitions.shouldAvoidObstacleRight(player)
 
         if (avoidLeft and avoidRight):
             # Backup
