@@ -85,3 +85,55 @@ def shouldChaseAroundBox(nav):
 def shouldNotGoInBox(nav):
     return (False and nav.ball.inMyGoalBox() and
             nav.brain.ball.dist < constants.IGNORE_BALL_IN_BOX_DIST)
+
+####### AVOIDANCE STUFF ##############
+
+def shouldAvoidObstacleLeft(nav):
+    """
+    Need to avoid an obstacle on our left side
+    """
+    sonar = nav.brain.sonar
+    if  (sonar.LLdist != sonar.UNKNOWN_VALUE and
+         sonar.LLdist < constants.AVOID_OBSTACLE_FRONT_DIST) or \
+         (sonar.LRdist != sonar.UNKNOWN_VALUE and
+          sonar.LRdist < constants.AVOID_OBSTACLE_SIDE_DIST):
+        nav.shouldAvoidObstacleLeftCounter += 1
+    else :
+        nav.shouldAvoidObstacleLeftCounter = 0
+
+    if nav.shouldAvoidObstacleLeftCounter > \
+            constants.AVOID_OBSTACLE_FRAMES_THRESH:
+        return True
+    return False
+
+def shouldAvoidObstacleRight(nav):
+    """
+    Need to avoid an obstacle on our right side
+    """
+    sonar = nav.brain.sonar
+    if (sonar.RRdist != sonar.UNKNOWN_VALUE and
+         sonar.RRdist < constants.AVOID_OBSTACLE_SIDE_DIST) or \
+         (sonar.RLdist != sonar.UNKNOWN_VALUE and
+          sonar.RLdist < constants.AVOID_OBSTACLE_FRONT_DIST):
+         nav.shouldAvoidObstacleRightCounter += 1
+    else :
+        nav.shouldAvoidObstacleRightCounter = 0
+
+    if nav.shouldAvoidObstacleRightCounter > \
+            constants.AVOID_OBSTACLE_FRAMES_THRESH:
+        return True
+
+    return False
+
+def shouldAvoidObstacle(nav):
+    """
+    Should avoid an obstacle
+    """
+    return ((shouldAvoidObstacleLeft(nav) or
+             shouldAvoidObstacleRight(nav)) and
+            not nav.brain.player.penaltyKicking)
+
+def shouldAvoidObstacleDuringApproachBall(nav):
+    return (nav.brain.ball.dist >
+            constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST and \
+            shouldAvoidObstacle(nav))

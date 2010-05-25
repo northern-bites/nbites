@@ -36,6 +36,8 @@ def walkSpinToBall(nav):
             return nav.goLater('ballInMyBox')
         elif navTrans.shouldChaseAroundBox(nav):
             return nav.goLater('chaseAroundBox')
+        elif navTrans.shouldAvoidObstacleDuringApproachBall(nav):
+            return nav.goLater('avoidObstacle')
 
     return nav.stay()
 
@@ -55,7 +57,11 @@ def chaseAroundBox(nav):
         nav.shouldChaseAroundBox = 0
 
     if nav.shouldChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
-        return nav.goLater('walkSpinToBall')
+        return nav.goNow('walkSpinToBall')
+
+    elif navTrans.shouldAvoidObstacleDuringApproachBall(nav):
+        return nav.goNow('avoidObstacle')
+
 
     ball = nav.brain.ball
     my = nav.brain.my

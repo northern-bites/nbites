@@ -153,6 +153,48 @@ def omniWalkToPoint(nav):
 
     return nav.stay()
 
+# WARNING: avoidObstacle could possibly go into our own box
+def avoidObstacle(nav):
+    """
+    If we detect something in front of us, dodge it
+    """
+
+    avoidLeft = navTrans.shouldAvoidObstacleLeft(nav)
+    avoidRight = navTrans.shouldAvoidObstacleRight(nav)
+
+    if nav.firstFrame():
+        nav.doneAvoidingCounter = 0
+        nav.printf(nav.brain.sonar)
+
+        if (avoidLeft and avoidRight):
+            # Backup
+            nav.printf("Avoid by backup");
+            helper.setSpeed(nav, constants.DODGE_BACK_SPEED, 0, 0)
+
+        elif avoidLeft:
+            # Dodge right
+            nav.printf("Avoid by right dodge");
+            helper.setSpeed(nav, 0, constants.DODGE_RIGHT_SPEED, 0)
+
+        elif avoidRight:
+            # Dodge left
+            nav.printf("Avoid by left dodge");
+            helper.setSpeed(nav, 0, constants.DODGE_LEFT_SPEED, 0)
+
+    if not (avoidLeft or avoidRight):
+        nav.doneAvoidingCounter += 1
+    else:
+        nav.doneAvoidingCounter -= 1
+        nav.doneAvoidingCounter = max(0, nav.doneAvoidingCounter)
+
+    if nav.doneAvoidingCounter > constants.DONE_AVOIDING_FRAMES_THRESH:
+        nav.shouldAvoidObstacleRight = 0
+        nav.shouldAvoidObstacleLeft = 0
+        return nav.goLater(nav.lastDiffState)
+
+    return nav.stay()
+
+
 # State to be used with standard setSpeed movement
 def walking(nav):
     """

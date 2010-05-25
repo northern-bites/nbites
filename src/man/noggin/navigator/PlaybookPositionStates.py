@@ -30,6 +30,9 @@ def playbookWalk(nav):
     else:
         nav.omniWalkToCount = 0
 
+    if navTrans.shouldAvoidObstacle(nav):
+        return nav.goLater('avoidObstacle')
+
     return nav.stay()
 
 def playbookOmni(nav):
@@ -53,6 +56,9 @@ def playbookOmni(nav):
             return nav.goLater('playbookWalk')
     else:
         nav.stopOmniCount = 0
+
+    if navTrans.shouldAvoidObstacle(nav):
+        return nav.goLater('avoidObstacle')
 
     return nav.stay()
 

@@ -89,9 +89,6 @@ def approachBall(player):
         if transitions.shouldDribble(player):
             return player.goNow('dribble')
 
-        elif transitions.shouldAvoidObstacleDuringApproachBall(player):
-            return player.goNow('avoidObstacle')
-
     if transitions.shouldPositionForKick(player):
         return player.goNow('positionForKick')
 
@@ -179,48 +176,6 @@ def waitBeforeKick(player):
     # Just don't get stuck here!
     if player.counter > 50:
         return player.goNow('scanFindBall')
-    return player.stay()
-
-# WARNING: avoidObstacle could possibly go into our own box
-def avoidObstacle(player):
-    """
-    If we detect something in front of us, dodge it
-    """
-
-    avoidLeft = transitions.shouldAvoidObstacleLeft(player)
-    avoidRight = transitions.shouldAvoidObstacleRight(player)
-
-    if player.firstFrame():
-        player.doneAvoidingCounter = 0
-        player.printf(player.brain.sonar)
-
-        if (avoidLeft and avoidRight):
-            # Backup
-            player.printf("Avoid by backup");
-            player.setWalk(constants.DODGE_BACK_SPEED, 0, 0)
-
-        elif avoidLeft:
-            # Dodge right
-            player.printf("Avoid by right dodge");
-            player.setWalk(0, constants.DODGE_RIGHT_SPEED, 0)
-
-        elif avoidRight:
-            # Dodge left
-            player.printf("Avoid by left dodge");
-            player.setWalk(0, constants.DODGE_LEFT_SPEED, 0)
-
-    if not (avoidLeft or avoidRight):
-        player.doneAvoidingCounter += 1
-    else :
-        player.doneAvoidingCounter -= 1
-        player.doneAvoidingCounter = max(0, player.doneAvoidingCounter)
-
-    if player.doneAvoidingCounter > constants.DONE_AVOIDING_FRAMES_THRESH:
-        player.shouldAvoidObstacleRight = 0
-        player.shouldAvoidObstacleLeft = 0
-        player.stopWalking()
-        return player.goLater(player.lastDiffState)
-
     return player.stay()
 
 def steps(player):

@@ -21,16 +21,12 @@ def playbookPosition(player):
     gcState = brain.gameController.currentState
 
     if player.firstFrame():
+        nav.positionPlaybook()
 
         if gcState == 'gameReady':
             brain.tracker.locPans()
         else:
             brain.tracker.activeLoc()
-
-    if transitions.shouldAvoidObstacle(player):
-        return player.goNow('avoidObstacle')
-
-    nav.positionPlaybook()
 
     return player.stay()
 
