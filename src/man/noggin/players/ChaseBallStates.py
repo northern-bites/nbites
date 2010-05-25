@@ -78,23 +78,22 @@ def approachBall(player):
            player.brain.ball.inOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
 
-    if not player.brain.play.isRole(GOALIE):
+    elif transitions.shouldKick(player):
+        return player.goNow('waitBeforeKick')
+
+    elif player.brain.play.isRole(GOALIE):
+        if goalTran.dangerousBall(player):
+            return player.goNow('approachDangerousBall')
+
+    else:
         if transitions.shouldDribble(player):
             return player.goNow('dribble')
 
-    if transitions.shouldKick(player):
-        return player.goNow('waitBeforeKick')
-    elif transitions.shouldPositionForKick(player):
+        elif transitions.shouldAvoidObstacleDuringApproachBall(player):
+            return player.goNow('avoidObstacle')
+
+    if transitions.shouldPositionForKick(player):
         return player.goNow('positionForKick')
-
-    return approachBallWalk(player)
-
-def approachBallWalk(player):
-    """
-    Method that is used by both approach ball and dribble
-    We use things as to when we should leave and how we should walk
-    """
-
 
     if player.brain.tracker.activeLocOn:
         if transitions.shouldScanFindBallActiveLoc(player):
@@ -102,15 +101,6 @@ def approachBallWalk(player):
     else:
         if transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
-
-    if not player.brain.play.isRole(GOALIE):
-        if transitions.shouldAvoidObstacleDuringApproachBall(player):
-            return player.goLater('avoidObstacle')
-
-    # Determine our speed for approaching the ball
-    ball = player.brain.ball
-    if player.brain.play.isRole(GOALIE) and goalTran.dangerousBall(player):
-        return player.goNow('approachDangerousBall')
 
     player.brain.nav.chaseBall()
 
@@ -157,7 +147,9 @@ def dribble(player):
         elif transitions.shouldApproachBall(player):
             return player.goNow('approachBall')
 
-    return approachBallWalk(player)
+    player.brain.nav.dribble()
+
+    return player.stay()
 
 def waitBeforeKick(player):
     """
