@@ -76,6 +76,7 @@ MESSAGE( STATUS "" )
 
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
+FIND_PACKAGE( BOOST_PYTHON REQUIRED)
 
 
 ############################ TESTS
@@ -128,23 +129,23 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ConcreteCross
                  ${VISION_INCLUDE_DIR}/ConcreteLine
                  ${VISION_INCLUDE_DIR}/Cross
-		 ${VISION_INCLUDE_DIR}/Field
+         ${VISION_INCLUDE_DIR}/Field
                  ${VISION_INCLUDE_DIR}/FieldLines
                  ${VISION_INCLUDE_DIR}/ObjectFragments
                  ${VISION_INCLUDE_DIR}/Profiler
                  ${VISION_INCLUDE_DIR}/PyVision
-		 ${VISION_INCLUDE_DIR}/Robots
+         ${VISION_INCLUDE_DIR}/Robots
                  ${VISION_INCLUDE_DIR}/Threshold
                  ${VISION_INCLUDE_DIR}/Utility
                  ${VISION_INCLUDE_DIR}/Vision
-		 ${VISION_INCLUDE_DIR}/VisualBall
-		 ${VISION_INCLUDE_DIR}/VisualCrossbar
+         ${VISION_INCLUDE_DIR}/VisualBall
+         ${VISION_INCLUDE_DIR}/VisualCrossbar
                  ${VISION_INCLUDE_DIR}/VisualCorner
                  ${VISION_INCLUDE_DIR}/VisualDetection
                  ${VISION_INCLUDE_DIR}/VisualLandmark
-		 ${VISION_INCLUDE_DIR}/VisualFieldObject
-		 ${VISION_INCLUDE_DIR}/VisualRobot
-		 ${VISION_INCLUDE_DIR}/VisualCross
+         ${VISION_INCLUDE_DIR}/VisualFieldObject
+         ${VISION_INCLUDE_DIR}/VisualRobot
+     ${VISION_INCLUDE_DIR}/VisualCross
                  ${VISION_INCLUDE_DIR}/VisualLine
                  #${VISION_INCLUDE_DIR}/Zlib
                  )
