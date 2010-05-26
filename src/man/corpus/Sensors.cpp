@@ -205,13 +205,13 @@ const vector<float> Sensors::getBodyAngleErrors () const
 
 const float Sensors::getBodyAngleError (int index) const
 {
-	pthread_mutex_lock (&errors_mutex);
+    pthread_mutex_lock (&errors_mutex);
 
-	const float angleError = bodyAnglesError[index];
+    const float angleError = bodyAnglesError[index];
 
-	pthread_mutex_unlock (&errors_mutex);
+    pthread_mutex_unlock (&errors_mutex);
 
-	return angleError;
+    return angleError;
 }
 
 const FSR Sensors::getLeftFootFSR () const
@@ -554,8 +554,8 @@ void Sensors::setInertial (const Inertial &v)
 }
 
 void Sensors::setUnfilteredInertial(const float accX, const float accY, const float accZ,
-                          const float gyrX, const float gyrY,
-                          const float angleX, const float angleY)
+                                    const float gyrX, const float gyrY,
+                                    const float angleX, const float angleY)
 {
     pthread_mutex_lock (&unfiltered_inertial_mutex);
 
@@ -679,10 +679,10 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
     ultraSoundDistance = sensorValues[19];
     // ugh... can't cast float to an enum, so cast to int and then to the enum.
     ultraSoundMode = static_cast<UltraSoundMode>(
-        static_cast<int>(sensorValues[20]));
+                                                 static_cast<int>(sensorValues[20]));
 
     supportFoot = static_cast<SupportFoot>(
-        static_cast<int>(sensorValues[21]));
+                                           static_cast<int>(sensorValues[21]));
 
     pthread_mutex_unlock (&support_foot_mutex);
     pthread_mutex_unlock (&ultra_sound_mutex);
@@ -745,9 +745,9 @@ static const int VERSION = 0;
 
 void Sensors::saveFrame()
 {
-	int MAX_FRAMES = 3000;
-	if (saved_frames > MAX_FRAMES)
-		return;
+    int MAX_FRAMES = 3000;
+    if (saved_frames > MAX_FRAMES)
+        return;
     string EXT(".NBFRM");
     string BASE("/");
     int NUMBER = saved_frames;

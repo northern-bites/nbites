@@ -15,8 +15,6 @@ using namespace boost;
 #include "ALNames.h"
 using namespace ALNames;
 
-
-
 #include "Kinematics.h"
 using Kinematics::jointsMaxVelNoLoad;
 
@@ -48,7 +46,7 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
 
     // connect to dcm using the static methods declared above
 
-	// TODO: Should use specialized proxy created at start
+    // TODO: Should use specialized proxy created at start
     broker->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&staticPostSensors,this));
     broker->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&staticSendCommands,this));
 }
@@ -78,19 +76,19 @@ void NaoEnactor::sendJoints()
     motionValues = switchboard->getNextJoints();
 
     for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++)
-    {
-        joint_command[5][i][0] = motionValues[i];
-    }
+        {
+            joint_command[5][i][0] = motionValues[i];
+        }
 
 #ifndef NO_ACTUAL_MOTION
     try
-    {
-        dcmProxy->setAlias(joint_command);
-    }
+        {
+            dcmProxy->setAlias(joint_command);
+        }
     catch(AL::ALError& a)
-    {
-        std::cout << "dcm value set error " << a.toString() << std::endl;
-    }
+        {
+            std::cout << "dcm value set error " << a.toString() << std::endl;
+        }
 #endif
 }
 
@@ -119,11 +117,11 @@ void NaoEnactor::sendHardness(){
     if(!diffStiff)
         return;
 
- // #ifdef ROBOT_NAME_zaphod
- //     // turn off broken neck
- //    hardness_command[5][Kinematics::HEAD_YAW][0] = -1.0f;
- //    hardness_command[5][Kinematics::HEAD_PITCH][0] = -1.0f;
- // #endif
+    // #ifdef ROBOT_NAME_zaphod
+    //     // turn off broken neck
+    //    hardness_command[5][Kinematics::HEAD_YAW][0] = -1.0f;
+    //    hardness_command[5][Kinematics::HEAD_PITCH][0] = -1.0f;
+    // #endif
 
 #ifndef NO_ACTUAL_MOTION
     try {
@@ -195,12 +193,12 @@ void NaoEnactor::postSensors(){
  * Creates the appropriate aliases with the DCM
  */
 void NaoEnactor::initDCMAliases(){
-	AL::ALValue positionCommandsAlias;
+    AL::ALValue positionCommandsAlias;
     positionCommandsAlias.arraySetSize(3);
     positionCommandsAlias[0] = string("AllActuatorPosition");
     positionCommandsAlias[1].arraySetSize(Kinematics::NUM_JOINTS);
 
-	AL::ALValue hardCommandsAlias;
+    AL::ALValue hardCommandsAlias;
     hardCommandsAlias.arraySetSize(3);
     hardCommandsAlias[0] = string("AllActuatorHardness");
     hardCommandsAlias[1].arraySetSize(Kinematics::NUM_JOINTS);
@@ -254,9 +252,9 @@ void NaoEnactor::initDCMCommands(){
     us_command[1] = string("Merge");
     us_command[2].arraySetSize(1);
     us_command[2][0].arraySetSize(2);
-//      // the current mode - changes every 5 frames
-//     us_command[2][0][0] = 0.0f; //static_cast<float>(setMode);
-//     us_command[2][0][1] = 0.0f; //dcm->getTime(250);
+    //      // the current mode - changes every 5 frames
+    //     us_command[2][0][0] = 0.0f; //static_cast<float>(setMode);
+    //     us_command[2][0][1] = 0.0f; //dcm->getTime(250);
 
 
 }
