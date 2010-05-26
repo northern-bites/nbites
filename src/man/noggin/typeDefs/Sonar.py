@@ -7,7 +7,7 @@ class Sonar:
         # Class constants
         self.UNKNOWN_VALUE = "unknown distance"
         self.MIN_DIST = 0.0 # minimum readable distance in cm
-        self.MAX_DIST = 255.0 # maximum readable distance in cm
+        self.MAX_DIST = 254.0 # maximum readable distance in cm
 
         self.lastDist = self.UNKNOWN_VALUE
         self.lastMode = None
