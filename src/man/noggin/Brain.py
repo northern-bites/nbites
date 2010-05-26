@@ -221,7 +221,7 @@ class Brain(object):
         # order here is very important
         # Update Environment
         self.updateVisualObjects()
-        self.sonar.updateSensors(self.sensors, sensors.UltraSoundMode)
+        self.sonar.updateSensors(self.sensors)
 
         # Communications update
         self.updateComm()

@@ -1,3 +1,9 @@
+import sensors
+
+LL = sensors.UltraSoundMode.LL
+RR = sensors.UltraSoundMode.RR
+LR = sensors.UltraSoundMode.LR
+RL = sensors.UltraSoundMode.RL
 
 class Sonar:
     """
@@ -17,7 +23,7 @@ class Sonar:
         self.LRdist = self.UNKNOWN_VALUE
         self.RLdist = self.UNKNOWN_VALUE
 
-    def updateSensors(self, sensors, modes):
+    def updateSensors(self, sensors):
         """
         Update the sonar info from the most recent sensors
         """
@@ -27,13 +33,13 @@ class Sonar:
         if (self.lastDist <= self.MIN_DIST or
             self.lastDist >= self.MAX_DIST):
             self.lastDist = self.UNKNOWN_VALUE
-        if self.lastMode == modes.LL:
+        if self.lastMode == LL:
             self.LLdist = self.lastDist
-        elif self.lastMode == modes.RR:
+        elif self.lastMode == RR:
             self.RRdist = self.lastDist
-        elif self.lastMode == modes.LR:
+        elif self.lastMode == LR:
             self.LRdist = self.lastDist
-        elif self.lastMode == modes.RL:
+        elif self.lastMode == RL:
             self.RLdist = self.lastDist
 
     def __str__(self):
