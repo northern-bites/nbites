@@ -32,9 +32,9 @@ def walkSpinToBall(nav):
             return nav.goNow('stop')
 
     if not nav.brain.play.isRole(GOALIE):
-        if navTrans.shouldNotGoInBox(nav):
+        if navTrans.shouldNotGoInBox(ball):
             return nav.goLater('ballInMyBox')
-        elif navTrans.shouldChaseAroundBox(nav):
+        elif navTrans.shouldChaseAroundBox(nav.brain.my, ball):
             return nav.goLater('chaseAroundBox')
         elif navTrans.shouldAvoidObstacleDuringApproachBall(nav):
             return nav.goLater('avoidObstacle')
@@ -51,7 +51,10 @@ def chaseAroundBox(nav):
         nav.shouldChaseAroundBox = 0
         nav.brain.CoA.setRobotGait(nav.brain.motion)
 
-    if not navTrans.shouldChaseAroundBox(nav):
+    ball = nav.brain.ball
+    my = nav.brain.my
+
+    if not navTrans.shouldChaseAroundBox(my, ball):
         nav.shouldChaseAroundBox += 1
     else:
         nav.shouldChaseAroundBox = 0
@@ -61,10 +64,6 @@ def chaseAroundBox(nav):
 
     elif navTrans.shouldAvoidObstacleDuringApproachBall(nav):
         return nav.goNow('avoidObstacle')
-
-
-    ball = nav.brain.ball
-    my = nav.brain.my
 
     if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
         # go to corner nearest ball
@@ -176,9 +175,9 @@ def dribble(nav):
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     if not nav.brain.play.isRole(GOALIE):
-        if navTrans.shouldNotGoInBox(nav):
+        if navTrans.shouldNotGoInBox(ball):
             return nav.goLater('ballInMyBox')
-        elif navTrans.shouldChaseAroundBox(nav):
+        elif navTrans.shouldChaseAroundBox(nav.brain.my, ball):
             return nav.goLater('chaseAroundBox')
 
     return nav.stay()

@@ -46,9 +46,7 @@ def useFinalHeading(brain, position):
 
 ######### BALL IN BOX ###############
 
-def shouldChaseAroundBox(nav):
-    ball = nav.brain.ball
-    my = nav.brain.my
+def shouldChaseAroundBox(my, ball):
 
     # 3 common, simple cases where we don't need to worry about the box.
     if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
@@ -82,9 +80,9 @@ def shouldChaseAroundBox(nav):
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y) )
 
-def shouldNotGoInBox(nav):
-    return (False and nav.ball.inMyGoalBox() and
-            nav.brain.ball.dist < constants.IGNORE_BALL_IN_BOX_DIST)
+def shouldNotGoInBox(ball):
+    return (False and ball.inMyGoalBox() and
+            ball.dist < constants.IGNORE_BALL_IN_BOX_DIST)
 
 ####### AVOIDANCE STUFF ##############
 
