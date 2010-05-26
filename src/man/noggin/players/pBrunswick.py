@@ -49,16 +49,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.isChasing = False
         self.saving = False
 
-        self.shouldAvoidObstacleRightCounter = 0
-        self.shouldAvoidObstacleLeftCounter = 0
-        self.doneAvoidingCounter = 0
-        self.shouldApproachWithoutLoc = 0
-
-        self.notAtPositionCounter = 0
-        self.changeOmniGoToCounter = 0
         self.shouldRelocalizeCounter = 0
-        self.shouldChaseAroundBox = 0
-        self.shouldNotChaseAroundBox = 0
 
         self.angleToAlign = 0.0
         self.orbitAngle = 0.0
@@ -74,10 +65,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         # Kickoff kick
         self.hasKickedOffKick = True
-
-        # Goalie squat save
-        self.squatting = False
-
 
     def run(self):
         self.play = self.brain.play
