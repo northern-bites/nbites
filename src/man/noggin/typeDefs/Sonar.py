@@ -4,9 +4,9 @@ class Sonar:
     """
     def __init__(self):
         # Class constants
-        self.UNKNOWN_VALUE = "unknown distance"
+        self.UNKNOWN_VALUE = -1 #"unknown distance"
         self.MIN_DIST = 0.0 # minimum readable distance in cm
-        self.MAX_DIST = 254.0 # maximum readable distance in cm
+        self.MAX_DIST = 150.0 # maximum readable distance in cm
 
         self.leftDist = self.UNKNOWN_VALUE
         self.rightDist = self.UNKNOWN_VALUE

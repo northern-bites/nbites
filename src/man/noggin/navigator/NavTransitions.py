@@ -91,10 +91,8 @@ def shouldAvoidObstacleLeft(nav):
     Need to avoid an obstacle on our left side
     """
     sonar = nav.brain.sonar
-    if  (sonar.LLdist != sonar.UNKNOWN_VALUE and
-         sonar.LLdist < constants.AVOID_OBSTACLE_FRONT_DIST) or \
-         (sonar.LRdist != sonar.UNKNOWN_VALUE and
-          sonar.LRdist < constants.AVOID_OBSTACLE_SIDE_DIST):
+    if (sonar.leftDist != sonar.UNKNOWN_VALUE and
+        sonar.leftDist < constants.AVOID_OBSTACLE_SIDE_DIST):
         nav.shouldAvoidObstacleLeftCounter += 1
     else :
         nav.shouldAvoidObstacleLeftCounter = 0
@@ -109,10 +107,8 @@ def shouldAvoidObstacleRight(nav):
     Need to avoid an obstacle on our right side
     """
     sonar = nav.brain.sonar
-    if (sonar.RRdist != sonar.UNKNOWN_VALUE and
-         sonar.RRdist < constants.AVOID_OBSTACLE_SIDE_DIST) or \
-         (sonar.RLdist != sonar.UNKNOWN_VALUE and
-          sonar.RLdist < constants.AVOID_OBSTACLE_FRONT_DIST):
+    if (sonar.rightDist != sonar.UNKNOWN_VALUE and
+        sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST):
          nav.shouldAvoidObstacleRightCounter += 1
     else :
         nav.shouldAvoidObstacleRightCounter = 0

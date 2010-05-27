@@ -61,8 +61,6 @@ void NaoEnactor::sendCommands(){
 
     sendJoints();
     sendHardness();
-    sendUltraSound();
-
 }
 
 void NaoEnactor::sendJoints()
@@ -131,44 +129,6 @@ void NaoEnactor::sendHardness(){
                   << hardness_command.toString() << std::endl;
     }
 #endif
-}
-
-void NaoEnactor::sendUltraSound(){
-    //The US sensors only resond on a 250 ms cycle -- TODO/HACK is this right??
-    static const int US_FRAME_RATE = 4;
-    //We need to skip approximately 12.5 (13) motion frames before sending
-    //another command
-    static const int US_IDLE_SKIP = MOTION_FRAME_RATE /  US_FRAME_RATE + 1;
-
-    static int counter = 0;
-    static int mode = 68.0;
-    try {
-        if (counter == US_IDLE_SKIP){
-            // This is testing code which sends a new value to the actuator
-            // every 13 motion frames (250ms). It also cycles the
-            //ultrasound mode between the four possibilities. See docs.
-            // mode = mode % 4;
-
-            // the current mode - changes every 5 frames
-            us_command[2][0][0] = static_cast<float>(mode);
-            us_command[2][0][1] = dcmProxy->getTime(250);
-
-            // set the mode only once every 4 frames because it responds slowly anyway
-            // but this rate needs to change if we don't run vision at 15 fps
-            dcmProxy->set(us_command);
-
-            //Reset the counter after each command is sent
-            counter = 0;
-            // mode+=1;
-
-        }else
-            counter++;
-
-    } catch(AL::ALError &e) {
-        cout << "Failed to set ultrasound mode. Reason: "
-             << e.toString() << endl;
-    }
-
 }
 
 void NaoEnactor::postSensors(){
@@ -252,10 +212,9 @@ void NaoEnactor::initDCMCommands(){
     us_command[1] = string("Merge");
     us_command[2].arraySetSize(1);
     us_command[2][0].arraySetSize(2);
-    //      // the current mode - changes every 5 frames
-    //     us_command[2][0][0] = 0.0f; //static_cast<float>(setMode);
-    //     us_command[2][0][1] = 0.0f; //dcm->getTime(250);
-
+    us_command[2][0][0] = (4.0 + 64.0);
+    us_command[2][0][1] = dcmProxy->getTime(0);
+    dcmProxy->set(us_command);
 
 }
 
