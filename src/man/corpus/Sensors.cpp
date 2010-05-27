@@ -56,7 +56,7 @@ Sensors::Sensors ()
       leftFootBumper(0.0f, 0.0f),
       rightFootBumper(0.0f, 0.0f),
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
-      ultraSoundDistance(0.0f), ultraSoundMode(LL),
+      ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
       image(&global_image[0]),
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
@@ -294,37 +294,49 @@ const Inertial Sensors::getUnfilteredInertial () const
     return inert;
 }
 
-const float Sensors::getUltraSound () const
+const float Sensors::getUltraSoundLeft () const
 {
     pthread_mutex_lock (&ultra_sound_mutex);
 
-    float dist = ultraSoundDistance;
+    float dist = ultraSoundDistanceLeft;
 
     pthread_mutex_unlock (&ultra_sound_mutex);
 
     return dist;
 }
 
-const float Sensors::getUltraSound_cm () const
+const float Sensors::getUltraSoundRight () const
 {
     pthread_mutex_lock (&ultra_sound_mutex);
 
-    float dist = ultraSoundDistance;
+    float dist = ultraSoundDistanceRight;
+
+    pthread_mutex_unlock (&ultra_sound_mutex);
+
+    return dist;
+}
+
+
+const float Sensors::getUltraSoundLeft_cm () const
+{
+    pthread_mutex_lock (&ultra_sound_mutex);
+
+    float dist = ultraSoundDistanceLeft;
 
     pthread_mutex_unlock (&ultra_sound_mutex);
 
     return dist * M_TO_CM;
 }
 
-const UltraSoundMode Sensors::getUltraSoundMode () const
+const float Sensors::getUltraSoundRight_cm () const
 {
     pthread_mutex_lock (&ultra_sound_mutex);
 
-    UltraSoundMode mode = ultraSoundMode;
+    float dist = ultraSoundDistanceRight;
 
     pthread_mutex_unlock (&ultra_sound_mutex);
 
-    return mode;
+    return dist * M_TO_CM;
 }
 
 const SupportFoot Sensors::getSupportFoot () const
@@ -400,8 +412,8 @@ const vector<float> Sensors::getAllSensors () const
         inertial.angleX, inertial.angleY;
 
     // write the ultrasound values
-    allSensors += ultraSoundDistance;
-    allSensors += static_cast<float>(ultraSoundMode);
+    allSensors += ultraSoundDistanceLeft;
+    allSensors += ultraSoundDistanceRight;
 
     allSensors += supportFoot;
 
@@ -573,20 +585,13 @@ void Sensors::setUnfilteredInertial (const Inertial &v)
     pthread_mutex_unlock (&unfiltered_inertial_mutex);
 }
 
-void Sensors::setUltraSound (const float dist)
+void Sensors::setUltraSound (const float distLeft,
+                             const float distRight)
 {
     pthread_mutex_lock (&ultra_sound_mutex);
 
-    ultraSoundDistance = dist;
-
-    pthread_mutex_unlock (&ultra_sound_mutex);
-}
-
-void Sensors::setUltraSoundMode (const UltraSoundMode mode)
-{
-    pthread_mutex_lock (&ultra_sound_mutex);
-
-    ultraSoundMode = mode;
+    ultraSoundDistanceLeft = distLeft;
+    ultraSoundDistanceRight = distRight;
 
     pthread_mutex_unlock (&ultra_sound_mutex);
 }
@@ -631,8 +636,8 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
  */
 void Sensors::setVisionSensors (const FootBumper &_leftBumper,
                                 const FootBumper &_rightBumper,
-                                const float ultraSound,
-                                const UltraSoundMode _mode,
+                                const float ultraSoundLeft,
+                                const float ultraSoundRight,
                                 const float bCharge, const float bCurrent)
 {
     pthread_mutex_lock (&battery_mutex);
@@ -641,8 +646,8 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
 
     leftFootBumper = _leftBumper;
     rightFootBumper = _rightBumper;
-    ultraSoundDistance = ultraSound;
-    ultraSoundMode = _mode;
+    ultraSoundDistanceLeft = ultraSoundLeft;
+    ultraSoundDistanceRight = ultraSoundRight;
     batteryCharge = bCharge;
     batteryCurrent = bCurrent;
 
@@ -676,13 +681,11 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
                         sensorValues[15], sensorValues[16], // gyros
                         sensorValues[17], sensorValues[18]); // angleX/angleY
 
-    ultraSoundDistance = sensorValues[19];
-    // ugh... can't cast float to an enum, so cast to int and then to the enum.
-    ultraSoundMode = static_cast<UltraSoundMode>(
-                                                 static_cast<int>(sensorValues[20]));
+    ultraSoundDistanceLeft = sensorValues[19];
+    ultraSoundDistanceRight = sensorValues[20];
 
     supportFoot = static_cast<SupportFoot>(
-                                           static_cast<int>(sensorValues[21]));
+                                           static_cast<int>(sensorValues[22]));
 
     pthread_mutex_unlock (&support_foot_mutex);
     pthread_mutex_unlock (&ultra_sound_mutex);

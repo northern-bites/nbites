@@ -141,13 +141,13 @@ void NaoEnactor::sendUltraSound(){
     static const int US_IDLE_SKIP = MOTION_FRAME_RATE /  US_FRAME_RATE + 1;
 
     static int counter = 0;
-    static int mode = 0;
+    static int mode = 68.0;
     try {
         if (counter == US_IDLE_SKIP){
             // This is testing code which sends a new value to the actuator
             // every 13 motion frames (250ms). It also cycles the
             //ultrasound mode between the four possibilities. See docs.
-            mode = mode % 4;
+            // mode = mode % 4;
 
             // the current mode - changes every 5 frames
             us_command[2][0][0] = static_cast<float>(mode);
@@ -159,7 +159,7 @@ void NaoEnactor::sendUltraSound(){
 
             //Reset the counter after each command is sent
             counter = 0;
-            mode+=1;
+            // mode+=1;
 
         }else
             counter++;

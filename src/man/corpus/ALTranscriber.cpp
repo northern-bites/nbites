@@ -245,8 +245,8 @@ void ALTranscriber::initSyncVisionWithALMemory() {
         string("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"),
         string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"),
-        string("Device/SubDeviceList/US/Sensor/Value"),
-        string("Device/SubDeviceList/US/Actuator/Value"),
+        string("Device/SubDeviceList/US/Left/Sensor/Value"),
+        string("Device/SubDeviceList/US/Right/Sensor/Value"),
         string("Device/SubDeviceList/Battery/Charge/Sensor/Value"),
         string("Device/SubDeviceList/Battery/Current/Sensor/Value");
 
@@ -257,21 +257,20 @@ void ALTranscriber::syncVisionWithALMemory() {
     static vector<float> varValues(6, 0.0f);
     alfastaccessVision->GetValues(varValues);
 
-    const float leftFootBumperLeft  = varValues[0],
-        leftFootBumperRight  = varValues[1];
-    const float rightFootBumperLeft = varValues[2],
-        rightFootBumperRight = varValues[3];
-    const float ultraSoundDist = varValues[4];
-    const int ultraSoundMode = static_cast<int>(varValues[5]);
+    const float leftFootBumperLeft  = varValues[0];
+    const float leftFootBumperRight = varValues[1];
+    const float rightFootBumperLeft = varValues[2];
+    const float rightFootBumperRight = varValues[3];
+    const float ultraSoundDistLeft = varValues[4];
+    const float ultraSoundDistRight = varValues[5];
     const float batteryCharge = varValues[6];
     const float batteryCurrent = varValues[7];
 
     sensors->
         setVisionSensors(FootBumper(leftFootBumperLeft, leftFootBumperRight),
                          FootBumper(rightFootBumperLeft, rightFootBumperRight),
-                         ultraSoundDist,
-                         // UltraSoundMode is just an enum
-                         static_cast<UltraSoundMode> (ultraSoundMode),
+                         ultraSoundDistLeft,
+                         ultraSoundDistRight,
                          batteryCharge,
                          batteryCurrent);
 }

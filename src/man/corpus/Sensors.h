@@ -76,13 +76,6 @@ struct Inertial {
     float angleY;
 };
 
-enum UltraSoundMode {
-    LL = 0,
-    LR,
-    RL,
-    RR
-};
-
 
 class Sensors {
   //friend class Man;
@@ -110,9 +103,10 @@ class Sensors {
     const Inertial getInertial() const;
     const Inertial getInertial_degs() const;
     const Inertial getUnfilteredInertial() const;
-    const float getUltraSound() const;
-    const float getUltraSound_cm() const;
-    const UltraSoundMode getUltraSoundMode() const;
+    const float getUltraSoundLeft() const;
+    const float getUltraSoundRight() const;
+    const float getUltraSoundLeft_cm() const;
+    const float getUltraSoundRight_cm() const;
     const SupportFoot getSupportFoot() const;
     const float getChestButton() const;
     const float getBatteryCharge() const;
@@ -145,8 +139,7 @@ class Sensors {
                                const float gyrX, const float gyrY,
                                const float angleX, const float angleY);
     void setUnfilteredInertial(const Inertial &inertial);
-    void setUltraSound(const float dist);
-    void setUltraSoundMode(const UltraSoundMode);
+    void setUltraSound(const float l_dist, const float r_dist);
     void setSupportFoot(const SupportFoot _supportFoot);
 
     void setMotionSensors(const FSR &_leftFoot, const FSR &_rightFoot,
@@ -156,8 +149,8 @@ class Sensors {
 
     void setVisionSensors(const FootBumper &_leftBumper,
                           const FootBumper &_rightBumper,
-                          const float ultraSound,
-                          const UltraSoundMode _mode,
+                          const float ultraSoundLeft,
+                          const float ultraSoundRight,
                           const float batteryCharge,
                           const float batteryCurrent);
 
@@ -232,8 +225,8 @@ private:
     // Inertial sensors
     Inertial inertial;
     // Sonar sensors
-    float ultraSoundDistance;
-    UltraSoundMode ultraSoundMode;
+    float ultraSoundDistanceLeft;
+    float ultraSoundDistanceRight;
 
     const unsigned char *image;
 
