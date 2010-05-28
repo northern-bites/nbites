@@ -59,6 +59,7 @@ public:
     int xProject(int startx, int starty, int newx);
     int xProject(point <int> point, int newx);
     void vertScan(int x, int y, int dir, int stopper, int c, int c2, stop & scan);
+	int pickNth(int val[], int n, int s);
     void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
                         int r, stop & scan);
     int findTrueLineVertical(point <int> top, point <int> bottom, int c, int c2,
@@ -73,7 +74,7 @@ public:
     int horizonAt(int x);
 
     // finding square objects
-    void squareGoal(int x, int y, int c, int c2, Blob & pole);
+    void squareGoal(int x, int y, int left, int right, int top, int bottom, int c, int c2, Blob & pole);
     float correct(Blob b, int c, int c2);
 
     // main method

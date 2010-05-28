@@ -141,6 +141,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
 		 ${VISION_INCLUDE_DIR}/VisualCrossbar
                  ${VISION_INCLUDE_DIR}/VisualCorner
                  ${VISION_INCLUDE_DIR}/VisualDetection
+		 ${VISION_INCLUDE_DIR}/VisualFieldEdge
                  ${VISION_INCLUDE_DIR}/VisualLandmark
 		 ${VISION_INCLUDE_DIR}/VisualFieldObject
 		 ${VISION_INCLUDE_DIR}/VisualRobot

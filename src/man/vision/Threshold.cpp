@@ -48,6 +48,7 @@
  */
 
 #include "Common.h"
+#include "Utility.h"
 
 #include <math.h>
 #include <assert.h>
@@ -186,6 +187,7 @@ void Threshold::thresholdAndRuns() {
  */
 void Threshold::threshold() {
 
+#ifndef USE_EDGES
     unsigned char *tPtr, *tEnd; // pointers into thresholded array
     const unsigned char *yPtr; // pointers into image array
 
@@ -205,6 +207,106 @@ void Threshold::threshold() {
         *tPtr++ = p[yPtr[YOFFSET2] >> 1];
         yPtr += 4;
 	}
+#else
+#ifdef OFFLINE
+	// this makes looking at images in the TOOL tolerable
+	for (int i = 0; i < IMAGE_HEIGHT; i++) {
+		for (int j = 0; j < IMAGE_WIDTH; j++) {
+			thresholded[i][j] = GREY;
+		}
+	}
+#endif
+#endif
+}
+
+/*  Returns the color at the sent in point.  If we aren't using color tables
+	it does a lookup in the big table, otherwise it just gets the thresholded
+	value.
+ */
+unsigned char Threshold::getColor(int x1, int y1) {
+#ifdef USE_EDGES
+	const unsigned char *yPtr = &yplane[0] +y1*IMAGE_ROW_OFFSET+2*x1;
+	int u = yPtr[UOFFSET + 2*(x1%2)];
+	if (u  > ORANGEU) {
+		return ORANGE;
+	}
+	int y = yPtr[0];
+	if (y > WHITEY) {
+		return WHITE;
+	} else if (y < LOWGREENY) {
+		return GREY;
+	}
+	int v = yPtr[VOFFSET+2*(x1%2)];
+	if (v > BLUEV) {
+		return BLUE;
+	} else if (v < YELLOWV) {
+		return YELLOW;
+	} else if (y > LOWGREENY && y < HIGHGREENY && u > LOWGREENU &&
+			   u < HIGHGREENU && v > LOWGREENV && v < HIGHGREENV) {
+		return GREEN;
+	}
+	return GREY;
+#else
+	return thresholded[y1][x1];
+#endif
+}
+
+/*  When we have identified a possible post we open up the color spectrum a
+	bit to get better coverage.
+ */
+
+unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
+#ifdef USE_EDGES
+	int v = getV(x, y);
+	int yy = getY(x, y);
+	if (yy < LOWGREENY) {
+		return GREY;
+	}
+	if (col == BLUE) {
+		if (v > BLUEV - FUDGEV) {
+			return BLUE;
+		}
+		return GREY;
+	}
+	if (col == YELLOW) {
+		if (v < YELLOWV + FUDGEV) {
+			return YELLOW;
+		}
+	}
+	return GREY;
+#else
+	return getColor(x, y);
+#endif
+
+}
+
+/*  A first attempt at doing true edge detection.  A work in progress
+ */
+
+int Threshold::getHorizontalEdge(int x1, int y1, int dir) {
+	const unsigned char *yPtr = &yplane[0] + y1*IMAGE_ROW_OFFSET+2*x1;
+	int oldy, oldv, oldu, newy, newu, newv, maxCount;
+	oldy = yPtr[0];
+	oldu = yPtr[UOFFSET + 2*(x1%2)];
+	oldv = yPtr[VOFFSET + 2*(x1%2)];
+	newy = oldy;
+	newu = oldu;
+	newv = oldv;
+	if (dir == 1) {
+		maxCount = IMAGE_WIDTH - x1 - 1;
+	} else {
+		maxCount = x1;
+	}
+	int count = 0;
+	while (abs(oldy - newy) < 20 && abs(oldu - newu) < 20 && abs(oldv < newv) < 20
+		   && ((dir == 1 && count < maxCount) || (dir == -1 && count > -1))) {
+		yPtr+= 4;
+		oldy = yPtr[0];
+		oldu = yPtr[UOFFSET];
+		oldv = yPtr[VOFFSET];
+		count++;
+	}
+	return count -1;
 }
 
 /* Image runs.  As explained in the comments for the threshold() method, I
@@ -217,14 +319,16 @@ void Threshold::threshold() {
  * balls will only be in the confines of the field).
  */
 void Threshold::runs() {
-  //detectSelf();
+#ifdef SHOULDERS
+	// back when the robots had colored shoulder pads we worried about seeing them
+	detectSelf();
+#endif
     // split up the loops
     for (int i = 0; i < IMAGE_WIDTH; i += 1) {
 		int topEdge = max(0, field->horizonAt(i));
 		findBallsCrosses(i, topEdge);
 		findGoals(i, topEdge);
     }
-
 }
 
 /** Ideally goals will be either right at the field edge, or will have part above
@@ -243,26 +347,27 @@ void Threshold::findGoals(int column, int topEdge) {
 	topEdge = min(topEdge, lowerBound[column]);
 	for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
 		// get the next pixel
-		/*if (getU(column, j)  > 145) {
-			thresholded[j][column] = ORANGE;
-		} else if (getY(column, j) > 145) {
-			thresholded[j][column] = WHITE;
-		} else if (getV(column, j) > 145) {
-			thresholded[j][column] = BLUE;
-			while (j >=1 && getV(column, j - 1) > 140) {
+#ifdef USE_EDGES
+		thresholded[j][column] = getColor(column, j);
+#endif
+		unsigned char pixel = thresholded[j][column];
+		if (pixel == BLUE) {
+			while (j >=1 && getExpandedColor(column, j - 1, BLUE) == BLUE) {
+#ifdef USE_EDGES
+				thresholded[j - 1][column] = BLUE;
+#endif
 				j--;
-				thresholded[j][column] = BLUE;
 				blues++;
 			}
-		} else if (getV(column, j) < 120) {
-			thresholded[j][column] = YELLOW;
-			while (j >=1 && getV(column, j - 1) < 125) {
+		} else if (pixel == YELLOW) {
+			while (j >=1 && getExpandedColor(column, j - 1, YELLOW) == YELLOW) {
 				j--;
+#ifdef USE_EDGES
 				thresholded[j][column] = YELLOW;
+#endif
 				yellows++;
 			}
-			}*/
-		unsigned char pixel = thresholded[j][column];
+		}
 		// otherwise, do stuff according to color
 		switch (pixel) {
 		case BLUE:
@@ -286,6 +391,7 @@ void Threshold::findGoals(int column, int topEdge) {
 	bad = 0;
 	for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
 		// get the next pixel
+		// note:  These were thresholded in the findBallsCrosses loop
 		unsigned char pixel = thresholded[j][column];
 		// otherwise, do stuff according to color
 		switch (pixel) {
@@ -331,37 +437,17 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 	int bound = lowerBound[column];
 	// if a ball is in the middle of the boundary, then look a little lower
 	if (bound < IMAGE_HEIGHT - 1) {
-		while (bound < IMAGE_HEIGHT && thresholded[bound][column] == ORANGE) {
+		//while (bound < IMAGE_HEIGHT && thresholded[bound][column] == ORANGE) {
+		while (bound < IMAGE_HEIGHT && getColor(column, bound) == ORANGE) {
 			bound++;
 		}
 	}
 	// scan down the column looking for ORANGE and WHITE
 	//int lasty = getY(column, bound), lastu = getU(column, bound), newu, newy;
 	for (int j = bound; j >= topEdge; j--) {
-		//cout << "Column " << column << " " << j << endl;
-		//cout << "U value " << getU(column, j) << " " << (getU(column, j) >> 1) << endl;
-		//newy = getY(column, j);
-		//newu = getU(column, j);
-		//if (j < IMAGE_HEIGHT - 1 && (abs(newy - lasty) > 10 ||
-		//							 abs(newu - lastu) > 10)) {
-		//	thresholded[j][column] = BLACK;
-		//}
-		//lasty = newy;
-		//lastu = newu;
-		/*if (getU(column, j)  > 145) {
-			thresholded[j][column] = ORANGE;
-		} else if (getY(column, j) > 145) {
-			thresholded[j][column] = WHITE;
-		} else if (getV(column, j) > 145) {
-			thresholded[j][column] = BLUE;
-		} else if (getV(column, j) < 120) {
-			thresholded[j][column] = YELLOW;
-			}*/
-		/*else if (getY(column, j) >> 1 < 67) {
-			thresholded[j][column] = GREEN;
-		} else if (getY(column, j) >> 1 > 70) {
-			thresholded[j][column] = WHITE;
-			}*/
+#ifdef USE_EDGES
+		thresholded[j][column] = getColor(column, j);
+#endif
 		// get the next pixel
 		unsigned char pixel = thresholded[j][column];
 		// for simplicity treat ORANGERED as ORANGE - we'll look
@@ -892,34 +978,59 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 			bool brp = vision->bgrp->getDistance() > 0.0f;
 			if (ylp || yrp) {
 				float dist = 0.0f;
+				float angle1 = 0.0f;
+				int postX = 0, postY = 0;
 				// get the relevant distances
 				if (ylp) {
 					dist = vision->yglp->getDistance();
-					if (yrp)
+					postX = vision->yglp->getLeftBottomX();
+					postY = vision->yglp->getLeftBottomY();
+					if (yrp) {
 						dist = min(dist, vision->ygrp->getDistance());
+					}
 				} else {
 					dist = vision->ygrp->getDistance();
+					postX = vision->ygrp->getLeftBottomX();
+					postY = vision->ygrp->getLeftBottomY();
 				}
 				// compare the distances
-				//cout << "Compare dist " << obj_est.dist << " " << dist << endl;
+				estimate pest = pose->pixEstimate(postX, postY, 0.0);
+				cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << endl;
+				cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
+				if (pest.dist > 0.1) {
+					dist = pest.dist;
+				}
 				if (fabs(obj_est.dist - dist) < 300.0) {
 					objPtr->setID(YELLOW_GOAL_CROSS);
-				} else
+				} else {
 					objPtr->setID(BLUE_GOAL_CROSS);
+				}
 			} else if (blp || brp) {
 				float dist = 0.0f;
+				int postX = 0, postY = 0;
 				if (blp) {
 					dist = vision->bglp->getDistance();
-					if (brp)
+					postX = vision->bglp->getLeftBottomX();
+					postY = vision->bglp->getLeftBottomY();
+					if (brp) {
 						dist = min(dist, vision->bgrp->getDistance());
+					}
 				} else {
 					dist = vision->bgrp->getDistance();
+					postX = vision->bgrp->getLeftBottomX();
+					postY = vision->bgrp->getLeftBottomY();
 				}
-				//cout << "Compare dist " << obj_est.dist << " " << dist << endl;
-				if (fabs(obj_est.dist - dist) < 300.0)
+				estimate pest = pose->pixEstimate(postX, postY, 0.0);
+				cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << endl;
+				cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
+				if (pest.dist > 0.1) {
+					dist = pest.dist;
+				}
+				if (fabs(obj_est.dist - dist) < 300.0) {
 					objPtr->setID(BLUE_GOAL_CROSS);
-				else
+				} else {
 					objPtr->setID(YELLOW_GOAL_CROSS);
+				}
 			} else {
 				objPtr->setID(ABSTRACT_CROSS);
 			}

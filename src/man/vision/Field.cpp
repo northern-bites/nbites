@@ -59,6 +59,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Field.h"
+#include "VisualFieldEdge.h"
 #include "debug.h"
 #include "Utility.h"
 
@@ -346,7 +347,7 @@ void Field::findFieldEdges(int poseHorizon) {
  */
 
 void Field::findConvexHull(int pH) {
-	int RUNSIZE = 3;
+	int RUNSIZE = 8;
 	int SCANSIZE = 10;
 	int NOISE = 2;
 	int HULLS = IMAGE_WIDTH / SCANSIZE + 1;
@@ -359,14 +360,17 @@ void Field::findConvexHull(int pH) {
 		good = 0;
 		ok = 0;
 		int poseProject = yProject(0, pH, i * SCANSIZE);
-		if (pH <= 0) poseProject = 0;
+		if (poseProject <= 0) {
+			poseProject = 0;
+		}
 		for (top = max(poseProject, 0);
 			 good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
 			// scan until we find a run of green pixels
 			int x = i * SCANSIZE;
 			if (i == HULLS - 1)
 				x--;
-			pixel = thresh->thresholded[top][x];
+			pixel = thresh->getColor(x, top);
+			//pixel = thresh->thresholded[top][x];
 			if (pixel == GREEN) {
 				good++;
 			} else if (pixel == BLUEGREEN || pixel == GREY) {
@@ -472,7 +476,8 @@ void Field::findConvexHull(int pH) {
 		e = vision->pose->pixEstimate(quarter * 3, topEdge[quarter * 3], 0.0f);
 		tDist = e.dist;
 	}
-	// cout << "Distances are " << qDist << " " << hDist << " " << tDist << endl;
+	vision->fieldEdge->setDistances(qDist, hDist, tDist);
+	//cout << "Distances are " << qDist << " " << hDist << " " << tDist << endl;
 	//cout << "Max dist is " << maxPix << endl;
 }
 
@@ -523,7 +528,8 @@ int Field::findGreenHorizon(int pH, float sl) {
 		// and we only look at every 10th pixel
         for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1
                  && greenPixels < 3; i+= SCAN_INTERVAL_X) {
-            pixel = thresh->thresholded[scanY][i];
+            //pixel = thresh->thresholded[scanY][i];
+			pixel = thresh->getColor(i, scanY);
             if (pixel == GREEN) {
                 greenPixels++;
             }
@@ -556,7 +562,8 @@ int Field::findGreenHorizon(int pH, float sl) {
 			if (debugHorizon) {
 				thresh->drawPoint(l, scanY, BLACK);
 			}
-            int newPixel = thresh->thresholded[scanY][l];
+			int newPixel = thresh->getColor(l, scanY);
+            //int newPixel = thresh->thresholded[scanY][l];
             if (newPixel == GREEN) {
 				// firstpix tracks where we saw the first green pixel
                 if (firstpix == -1) {
@@ -591,11 +598,13 @@ int Field::findGreenHorizon(int pH, float sl) {
                     scanY = IMAGE_HEIGHT;
                 }
 
-                int newPixel = thresh->thresholded[scanY][j];
+				//int newPixel = thresh->getColor(j, scanY);
+                //int newPixel = thresh->thresholded[scanY][j];
 				if (debugHorizon) {
 					thresh->drawPoint(j, scanY, BLACK);
 				}
-                if (newPixel == GREEN) {
+				pixel = thresh->getColor(j, scanY);
+                if (pixel == GREEN) {
                     run++;
                     greenPixels++;
                     firstpix = j;

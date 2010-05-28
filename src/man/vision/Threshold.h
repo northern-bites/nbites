@@ -12,6 +12,7 @@ class Threshold;  // forward reference
 #include "ObjectFragments.h"
 #include "Ball.h"
 #include "Field.h"
+#include "VisualFieldEdge.h"
 #include "Cross.h"
 #include "Robots.h"
 #ifndef NO_ZLIB
@@ -38,6 +39,51 @@ class Threshold;  // forward reference
 #define YMAX  128
 #define UMAX  128
 #define VMAX  128
+#endif
+
+#define SHOULDERS
+
+//#define USE_EDGES
+#define ROOM223
+#ifdef ROOM223
+#define BLUEV 141
+#define YELLOWV 108
+#define ORANGEU 145
+#define WHITEY  105
+#define FUDGEV 0
+#define HIGHGREENY 80
+#define LOWGREENY  32
+#define HIGHGREENU 122
+#define LOWGREENU  106
+#define HIGHGREENV 140
+#define LOWGREENV  124
+#else
+#define DARK
+#ifdef DARK
+#define BLUEV 145
+#define YELLOWV 128
+#define ORANGEU 135
+#define WHITEY  105
+#define FUDGEV 0
+#define HIGHGREENY 92
+#define LOWGREENY  44
+#define HIGHGREENU 120
+#define LOWGREENU  88
+#define HIGHGREENV 148
+#define LOWGREENV  128
+#else
+#define BLUEV 145
+#define YELLOWV 120
+#define ORANGEU 145
+#define WHITEY  145
+#define FUDGEV 5
+#define HIGHGREENY 92
+#define LOWGREENY  44
+#define HIGHGREENU 120
+#define LOWGREENU  88
+#define HIGHGREENV 148
+#define LOWGREENV  128
+#endif
 #endif
 
 //
@@ -85,6 +131,9 @@ public:
     void visionLoop();
     inline void threshold();
     inline void runs();
+	unsigned char getColor(int x, int y);
+	unsigned char getExpandedColor(int x, int y, unsigned char col);
+	int getHorizontalEdge(int x1, int y1, int dir);
     void thresholdAndRuns();
 	void findGoals(int column, int top);
 	void findBallsCrosses(int column, int top);
@@ -144,7 +193,7 @@ public:
 
 #if ROBOT(NAO_RL)
     inline uchar getY(int x, int y) {
-        return yplane[y*IMAGE_ROW_OFFSET+2*x];
+        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
     }
     inline uchar getU(int x, int y) {
 		return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + UOFFSET];
