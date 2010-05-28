@@ -44,8 +44,8 @@ using namespace std;
 //here are defined the lower bounds on the sizes of goals, posts, and balls
 //IMPORTANT: they are only guesses right now.
 
-#define MIN_GOAL_HEIGHT	25
-#define MIN_GOAL_WIDTH  5
+#define MIN_GOAL_HEIGHT	50
+#define MIN_GOAL_WIDTH  4
 
 // ID information on goal post constant
 static const int NOPOST = 0;   // don't know which
@@ -85,8 +85,8 @@ static const int DIST_POINT_FUDGE = 5;
 
 #ifdef OFFLINE
 static const bool PRINTOBJS = false;
-static const bool POSTDEBUG = true;
-static const bool POSTLOGIC = true;
+static const bool POSTDEBUG = false;
+static const bool POSTLOGIC = false;
 static const bool TOPFIND = false;
 static const bool CORNERDEBUG = false;
 static const bool SANITY = false;
@@ -450,6 +450,29 @@ bool ObjectFragments::checkEdge(int x, int y, int x2, int y2)
     return false;
 }
 
+/* Given an array of values pick the Nth biggest one.  Basically we just
+   scan the array repeatedly and pick the biggest each time stopping at N.
+   @param values        the array
+   @param n             the "n" in "nth"
+   @param s             the size of the array
+   @return              the nth largest integer
+ */
+int ObjectFragments::pickNth(int values[], int n, int s) {
+	// we don't really need to sort the values
+	int best = 0, index = 0;
+	for (int j = 0; j < n; j++) {
+		best = 0; index = 0;
+		for (int i = 0; i < s; i++) {
+			if (values[i] > best) {
+				best = values[i];
+				index = i;
+			}
+		}
+		values[index] = 0;
+	}
+	return best;
+}
+
 
 /*
  * Given two points that should define an edge of a structure, try and improve
@@ -470,41 +493,28 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
                                                  point <int>& bottom,
                                                  int c, int c2, bool left)
 {
+	const int NUMSCANS = 5;
+	const int WHICH = 3;
+	int values[NUMSCANS];
     int spanY = bottom.y - top.y;
     int dir = 1;
     if (left)
         dir = -1;
-    int shortSpan = spanY / 4;
+    int shortSpan = spanY / NUMSCANS;
     int qy = top.y + shortSpan;
     int qx = xProject(top.x, top.y, qy);
     stop scan;
 
-	// scan out a 1/4 of the way down the edge
-    horizontalScan(qx, qy, dir, 4, c, c2, 0, IMAGE_WIDTH - 1, scan);
-    int qs = abs(qx - scan.x);   // how far did we go?
-
-	// scan out halfway
-    qy += shortSpan;
-    qx = xProject(top.x, top.y, qy);
-    horizontalScan(qx, qy, dir, 4, c, c2, 0, IMAGE_WIDTH - 1, scan);
-	int q2 = abs(qx - scan.x);
-
-	// scan out 3/4 of the way
-	qy+= shortSpan;
-	qx = xProject(top.x, top.y, qy);
-    horizontalScan(qx, qy, dir, 4, c, c2, 0, IMAGE_WIDTH - 1, scan);
-    int q3 = abs(qx - scan.x);
-
-	// we'll take the middle of the three values
-	if (qs > q3) {
-		if (qs > q2) {
-			qs = max(q2, q3);
-		}
-	} else {
-		if (qs < q2) {
-			qs = min(q2, q3);
-		}
+	for (int i = 0; i < NUMSCANS; i++) {
+		// scan out a 1/4 of the way down the edge
+		horizontalScan(qx, qy, dir, 4, c, c2, 0, IMAGE_WIDTH - 1, scan);
+		values[i] = abs(qx - scan.x);   // how far did we go?
+		// set up the next scan
+		qy += shortSpan;
+		qx = xProject(top.x, top.y, qy);
 	}
+
+	int qs = pickNth(values, WHICH, NUMSCANS);
 
 	// reset the edge
     int te = top.x;
@@ -532,6 +542,9 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
                                                    point <int>& right, int c,
                                                    int c2, bool up)
 {
+	const int NUMSCANS = 4;
+	const int WHICH = 2;
+	int values[NUMSCANS];
     int spanX = right.x - left.x;
     int dir = 1;
     if (up)
@@ -543,36 +556,14 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
 
 	//thresh->drawPoint(left.x, left.y, BLUE);
 	// scan out a 1/4 of the way to the right the edge
-    vertScan(qx, qy, dir, 4, c, c2, scan);
-    int qs = abs(qy - scan.y);   // how far did we go?
-	//thresh->drawPoint(scan.x, scan.y, ORANGE);
-
-	// scan out halfway
-    qx += shortSpan;
-    qy = yProject(left.x, left.y, qx);
-    vertScan(qx, qy, dir, 4, c, c2, scan);
-    int q2 = abs(qy - scan.y);
-	//thresh->drawPoint(scan.x, scan.y, BLUE);
-
-	// scan out 3/4 of the way
-	qx+= shortSpan;
-	qy = yProject(left.x, left.y, qx);
-    vertScan(qx, qy, dir, 4, c, c2, scan);
-    int q3 = abs(qy - scan.y);
-	//thresh->drawPoint(scan.x, scan.y, WHITE);
-
-	// we'll take the middle of the three values
-	if (qs > q3) {
-		if (qs > q2) {
-			qs = max(q2, q3);
-		}
-	} else {
-		if (qs < q2) {
-			qs = min(q2, q3);
-		}
+	for (int i = 0; i < NUMSCANS; i++) {
+		vertScan(qx, qy, dir, 4, c, c2, scan);
+		values[i] = abs(qy - scan.y);   // how far did we go?
+		qx += shortSpan;
+		qy = yProject(left.x, left.y, qx);
 	}
-	cout << "Horizontal " << dir << " " << qs << " " << q2 << " " << q3 << endl;
 
+	int qs = pickNth(values, WHICH, NUMSCANS);
 	// reset the edge
     int te = left.y;
     left.y = left.y + dir * qs;
@@ -675,60 +666,25 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
  * @param c2        the secondary color
  * @param obj       blob to store the data in
  */
-void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
+void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
+								 int maxY, int c, int c2, Blob & obj)
 {
     const int ERROR_TOLERANCE = 5;
 
-	int count = 0;
-	bool looping = false;
     // set bad values so we can check for failure
     obj.setLeftTopX(BADVALUE); obj.setLeftTopY(BADVALUE);
-	drawPoint(x, y, RED);
+	//drawPoint(x, y, RED);
 	stop scan;
-	do {
-		// first we try going up from our start
-		vertScan(x, y, -1,  ERROR_TOLERANCE, c, c2, scan);
-		int h = scan.good;
-		// at this point we have a very rough idea of how tall the square is
-		int top = scan.y;
-		int topx = scan.x;
-		// now go down
-		vertScan(x, y, 1,  ERROR_TOLERANCE, c, c2, scan);
-		h += scan.good;
-		// if we have a really short strip, then punt
-		if (h < 2) {
-			// since this really shouldn't happen let's explor a little
-			if (x < IMAGE_WIDTH - 2) {
-				vertScan(x+1, y, -1, ERROR_TOLERANCE, c, c2, scan);
-				h = scan.good;
-				top = scan.y;
-				topx = scan.x;
-				vertScan(x+1, y, 1, ERROR_TOLERANCE, c, c2, scan);
-				h += scan.good;
-				if (h < 2 && x > 2) {
-					vertScan(x-1, y, -1, ERROR_TOLERANCE, c, c2, scan);
-					h = scan.good;
-					top = scan.y;
-					topx = scan.x;
-					vertScan(x-1, y, 1, ERROR_TOLERANCE, c, c2, scan);
-					h += scan.good;
-				}
-			}
-			if (h < 2) {
-				if (POSTDEBUG) {
-					cout << "Bad vertical scans only got " << h << endl;
-				}
-				return;
-			}
-		}
-		int bottom = scan.y;
-		int bottomx = scan.x;
-		// we have the starting points of our goal
-		point <int> leftTop = point<int>(topx, top);
-		point <int> rightTop = point<int>(topx, top);
-		point <int> leftBottom = point<int>(bottomx, bottom);
-		point <int> rightBottom = point<int>(bottomx, bottom);
-		// first expand the sides
+	int top = minY;
+	int spanY = maxY - minY;
+	int topx = xProject(left, maxY, minY);
+	int rightx = topx + (right - left);
+	int topry = yProject(topx, top, rightx);
+	point <int> leftTop = point<int>(topx, top);
+	point <int> rightTop = point<int>(rightx, topry);
+	point <int> leftBottom = point<int>(left, maxY);
+	point <int> rightBottom = point<int>(right, topry + spanY);
+	for (int i = 0; i < 2; i++) {
 		findVerticalEdge(leftTop, leftBottom, c, c2, true);
 		findVerticalEdge(rightTop, rightBottom, c, c2, false);
 		// now expand the top and bottom
@@ -739,19 +695,36 @@ void ObjectFragments::squareGoal(int x, int y, int c, int c2, Blob & obj)
 		obj.setRightTop(rightTop);
 		obj.setLeftBottom(leftBottom);
 		obj.setRightBottom(rightBottom);
+		// check if our estimated slope from pose is not right for this post
 		float newSlope = 0.0f;
-		if (count < 1) {
+		if (i == 0 && obj.height() > 100 && obj.getLeft() != 0 && obj.getRight() < IMAGE_WIDTH - 5) {
 		  newSlope = correct(obj, c, c2);
+		  // if we detected that the post was leaning then redo with a new slope
+		  if (newSlope != 0.0) {
+			  if (CORRECT) {
+				  cout << "Old slope was " << slope << " " << newSlope << endl;
+			  }
+			  slope = newSlope;
+			  drawBlob(obj, ORANGE);
+			  // we need to be very careful about placement here
+			  // determine the center of the blob
+			  int midTopx = (leftTop.x + rightTop.x) / 2;
+			  int midBottomx = (leftBottom.x + rightBottom.x) / 2;
+			  int midY = (leftTop.y + leftBottom.y) / 2;
+			  int newx = xProject((midBottomx + midTopx) / 2, midY, obj.getTop());
+			  leftTop = point<int>(newx, obj.getTop());
+			  rightTop = point<int>(newx, obj.getTop());
+			  newx = xProject((midBottomx, +midTopx) / 2, midY, obj.getBottom());
+			  leftBottom = point<int>(newx, obj.getBottom());
+			  rightBottom = point<int>(newx, obj.getBottom());
+			  // repeat the process fresh
+			  findVerticalEdge(leftTop, leftBottom, c, c2, true);
+			  findVerticalEdge(rightTop, rightBottom, c, c2, false);
+			  findHorizontalEdge(leftTop, rightTop, c, c2, true);
+			  findHorizontalEdge(leftBottom, rightBottom, c, c2, false);
+		  }
 		}
-		// if we detected that the post was leaning then redo with a new slope
-		if (newSlope != 0.0) {
-			if (CORRECT)
-				cout << "Old slope was " << slope << " " << newSlope << endl;
-			slope = newSlope;
-			looping = true;
-		}
-		count++;
-	} while (count < 2 && looping);
+	}
 }
 
 /* A collection of miscelaneous methods used in processing goals.
@@ -906,20 +879,43 @@ bool ObjectFragments::checkSize(Blob b, int c)
  * @param         indication of whether we found a decent candidate
  */
 
-int ObjectFragments::grabPost(int c, int c2, int left,
-							  int right, Blob & obj) {
+int ObjectFragments::grabPost(int c, int c2, int leftx,
+							  int rightx, Blob & obj) {
     int maxRun = 0, maxY = 0, maxX = 0, index = 0;
     // find the biggest Run
-    index = getBigRun(left, right);
+    index = getBigRun(leftx, rightx);
     if (index == BADVALUE) return NOPOST;
     maxRun = runs[index].h;  maxY = runs[index].y;  maxX = runs[index].x;
+
+	int need = max(10, min(30, maxRun / 3));
+	int left, right, smallY = maxY + maxRun / 2, bigY = smallY;
+	for (left = index -1; left > -1 && runs[left].h > need &&
+			 runs[left].x > runs[left+1].x - 3; left--) {
+		if (runs[left].y < smallY) {
+			smallY = runs[left].y;
+		} else if (runs[left].y+runs[left].h > bigY) {
+			bigY = runs[left].y+runs[left].h;
+		}
+	}
+	for (right = index+1; right < numberOfRuns && runs[right].h > need &&
+			 runs[right].x < runs[right-1].x + 3; right++) {
+		if (runs[right].y < smallY) {
+			smallY = runs[right].y;
+		} else if (runs[right].y+runs[right].h > bigY) {
+			bigY = runs[right].y+runs[right].h;
+		}
+	}
+
+	//drawLine(runs[left+1].x, smallY, runs[left+1].x, bigY, WHITE);
+	//drawLine(runs[right-1].x, smallY, runs[right-1].x, bigY, WHITE);
 
     // Try and figure out the true axis-parallel post dimensions - we're going
     // to try and start right in the middle
     int startX = maxX;
     int startY = maxY + maxRun / 2;
     // starts a scan in the middle of the tallest run.
-    squareGoal(startX, startY, c, c2, obj);
+    squareGoal(startX, startY, runs[left+1].x, runs[right - 1].x,
+			   smallY, bigY, c, c2, obj);
     // make sure we're looking at something big enough to be a post
     if (!postBigEnough(obj)) {
         return NOPOST;
@@ -1158,12 +1154,10 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 			nextY + nextH > horX - HORIZON_TOLERANCE) {
             if (nextX < left - mind) {
                 if (nextH > largel) {
-					cout << "Nextl " << nextX << endl;
                     largel = nextH;
 				}
             } else if (nextX > right + mind) {
                 if (nextH > larger) {
-					cout << "Nextr " << nextX << endl;
                     larger = nextH;
                 }
             }
@@ -1599,10 +1593,19 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
  * @return      true if its big enough, false otherwise
  */
 bool ObjectFragments::postBigEnough(Blob b) {
-    if (b.getLeftTopX() == BADVALUE || (b.getRightTopX() - b.getLeftTopX() + 1 <
-									MIN_GOAL_WIDTH) ||
-        b.getLeftBottomY() - b.getLeftTopY() + 1 < MIN_GOAL_HEIGHT) {
-        return false;
+    if (b.getLeftTopX() == BADVALUE) {
+		return false;
+	}
+	if (b.width() <	MIN_GOAL_WIDTH) {
+		return false;
+	}
+	if (b.height() < MIN_GOAL_HEIGHT) {
+		if (b.getTop() > 5) {
+			return false;
+		}
+		if (b.width() < 20) {
+			return false;
+		}
     }
     return true;
 }

@@ -43,7 +43,7 @@ class Threshold;  // forward reference
 
 #define SHOULDERS
 
-#define USE_EDGES
+//#define USE_EDGES
 #define ROOM223
 #ifdef ROOM223
 #define BLUEV 141
@@ -52,7 +52,7 @@ class Threshold;  // forward reference
 #define WHITEY  105
 #define FUDGEV 0
 #define HIGHGREENY 80
-#define LOWGREENY  28
+#define LOWGREENY  32
 #define HIGHGREENU 122
 #define LOWGREENU  106
 #define HIGHGREENV 140

@@ -48,6 +48,7 @@
  */
 
 #include "Common.h"
+#include "Utility.h"
 
 #include <math.h>
 #include <assert.h>
@@ -232,6 +233,8 @@ unsigned char Threshold::getColor(int x1, int y1) {
 	int y = yPtr[0];
 	if (y > WHITEY) {
 		return WHITE;
+	} else if (y < LOWGREENY) {
+		return GREY;
 	}
 	int v = yPtr[VOFFSET+2*(x1%2)];
 	if (v > BLUEV) {
@@ -244,7 +247,7 @@ unsigned char Threshold::getColor(int x1, int y1) {
 	}
 	return GREY;
 #else
-	return thresholded[c][r];
+	return thresholded[y1][x1];
 #endif
 }
 
@@ -255,12 +258,20 @@ unsigned char Threshold::getColor(int x1, int y1) {
 unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
 #ifdef USE_EDGES
 	int v = getV(x, y);
+	int yy = getY(x, y);
+	if (yy < LOWGREENY) {
+		return GREY;
+	}
 	if (col == BLUE) {
-		if (v > BLUEV - FUDGEV) return BLUE;
+		if (v > BLUEV - FUDGEV) {
+			return BLUE;
+		}
 		return GREY;
 	}
 	if (col == YELLOW) {
-		if (v < YELLOWV + FUDGEV) return YELLOW;
+		if (v < YELLOWV + FUDGEV) {
+			return YELLOW;
+		}
 	}
 	return GREY;
 #else
@@ -967,34 +978,59 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 			bool brp = vision->bgrp->getDistance() > 0.0f;
 			if (ylp || yrp) {
 				float dist = 0.0f;
+				float angle1 = 0.0f;
+				int postX = 0, postY = 0;
 				// get the relevant distances
 				if (ylp) {
 					dist = vision->yglp->getDistance();
-					if (yrp)
+					postX = vision->yglp->getLeftBottomX();
+					postY = vision->yglp->getLeftBottomY();
+					if (yrp) {
 						dist = min(dist, vision->ygrp->getDistance());
+					}
 				} else {
 					dist = vision->ygrp->getDistance();
+					postX = vision->ygrp->getLeftBottomX();
+					postY = vision->ygrp->getLeftBottomY();
 				}
 				// compare the distances
-				//cout << "Compare dist " << obj_est.dist << " " << dist << endl;
+				estimate pest = pose->pixEstimate(postX, postY, 0.0);
+				cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << endl;
+				cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
+				if (pest.dist > 0.1) {
+					dist = pest.dist;
+				}
 				if (fabs(obj_est.dist - dist) < 300.0) {
 					objPtr->setID(YELLOW_GOAL_CROSS);
-				} else
+				} else {
 					objPtr->setID(BLUE_GOAL_CROSS);
+				}
 			} else if (blp || brp) {
 				float dist = 0.0f;
+				int postX = 0, postY = 0;
 				if (blp) {
 					dist = vision->bglp->getDistance();
-					if (brp)
+					postX = vision->bglp->getLeftBottomX();
+					postY = vision->bglp->getLeftBottomY();
+					if (brp) {
 						dist = min(dist, vision->bgrp->getDistance());
+					}
 				} else {
 					dist = vision->bgrp->getDistance();
+					postX = vision->bgrp->getLeftBottomX();
+					postY = vision->bgrp->getLeftBottomY();
 				}
-				//cout << "Compare dist " << obj_est.dist << " " << dist << endl;
-				if (fabs(obj_est.dist - dist) < 300.0)
+				estimate pest = pose->pixEstimate(postX, postY, 0.0);
+				cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << endl;
+				cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
+				if (pest.dist > 0.1) {
+					dist = pest.dist;
+				}
+				if (fabs(obj_est.dist - dist) < 300.0) {
 					objPtr->setID(BLUE_GOAL_CROSS);
-				else
+				} else {
 					objPtr->setID(YELLOW_GOAL_CROSS);
+				}
 			} else {
 				objPtr->setID(ABSTRACT_CROSS);
 			}
