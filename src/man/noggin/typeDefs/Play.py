@@ -6,6 +6,7 @@ from ..playbook.PBConstants import (INIT_STRATEGY,
                                     FORMATIONS,
                                     ROLES,
                                     SUB_ROLES)
+from Location import RobotLocation
 
 class Play:
     def __init__(self,
@@ -13,28 +14,39 @@ class Play:
                  formation = INIT_FORMATION,
                  role = INIT_ROLE,
                  subRole = INIT_SUB_ROLE,
-                 position = [0,0]
+                 position = RobotLocation(0,0,0)
                  ):
         self.strategy = strategy
         self.formation = formation
         self.role = role
         self.subRole = subRole
-        self.position = position
+        self.position = RobotLocation(0,0,0)
+        self.changed = True
 
     def setStrategy(self, strategy):
-        self.strategy = strategy
+        if self.strategy != strategy:
+            self.strategy = strategy
+            self.changed = True
 
     def setFormation(self, formation):
-        self.formation = formation
+        if self.formation != formation:
+            self.formation = formation
+            self.changed = True
 
     def setRole(self, role):
-        self.role = role
+        if self.role != role:
+            self.role = role
+            self.changed = True
 
     def setSubRole(self, subRole):
-        self.subRole = subRole
+        if self.subRole != subRole:
+            self.subRole = subRole
+            self.changed = True
 
     def setPosition(self, position):
-        self.position = position
+        self.position.x = position[0]
+        self.position.y = position[1]
+        self.position.h = position[2]
 
     def isSubRole(self, subRoleToTest):
         return (self.subRole == subRoleToTest)

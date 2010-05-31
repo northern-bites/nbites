@@ -31,7 +31,7 @@ def penaltyBallInOppGoalbox(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.activeLoc()
-    if not player.ballInOppGoalBox():
+    if not player.ball.inOppGoalBox():
         return player.goLater('chase')
     return player.stay()
 

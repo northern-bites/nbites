@@ -9,6 +9,7 @@ import KickingConstants as constants
 import ChaseBallConstants
 from man.noggin.typeDefs.Location import Location, RobotLocation
 from .. import NogginConstants
+from ..typeDefs.LocationConstants import FACING_SIDELINE_ANGLE
 import ChaseBallTransitions
 from math import fabs
 from ..util import MyMath
@@ -82,9 +83,10 @@ def clearBall(player):
 
     # Things to do if we saw our own goal
     # Saw the opponent goal
+    my = player.brain.my
 
-    if abs(player.brain.my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH and \
-            (helpers.inTopOfField(player) or helpers.inBottomOfField(player) ):
+    if abs(my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH and \
+            (my.inTopOfField() or my.inBottomOfField() ):
         return player.goLater('orbitBeforeKick')
 
     if oppLeftPostBearing is not None and \
@@ -128,7 +130,7 @@ def clearBall(player):
         # use localization for kick
         my = player.brain.my
 
-        if helpers.inCenterOfField(player):
+        if my.inCenterOfField():
             if abs(my.h) <= constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter1")
                 player.bigKick = True
@@ -140,8 +142,8 @@ def clearBall(player):
                 if constants.DEBUG_KICKS: print ("\t\tcenter3")
                 return player.goLater('kickBallRight')
 
-        elif helpers.inTopOfField(player):
-            if constants.FACING_SIDELINE_ANGLE < my.h:
+        elif my.inTopOfField():
+            if FACING_SIDELINE_ANGLE < my.h:
                 if constants.DEBUG_KICKS: print ("\t\ttop1")
                 return player.goLater('kickBallRight')
             elif my.h < -90:
@@ -152,8 +154,8 @@ def clearBall(player):
                 player.bigKick = True
                 return player.goLater('kickBallStraight')
 
-        elif helpers.inBottomOfField(player):
-            if -constants.FACING_SIDELINE_ANGLE > my.h:
+        elif my.inBottomOfField():
+            if -FACING_SIDELINE_ANGLE > my.h:
                 if constants.DEBUG_KICKS: print ("\t\tbottom1")
                 return player.goLater('kickBallLeft')
             elif my.h > 90:
@@ -268,7 +270,7 @@ def shootBall(player):
     elif myLeftPostBearing is not None and myRightPostBearing is not None:
 
         avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
-        if helpers.inCenterOfField(player):
+        if my.inCenterOfField():
             if constants.DEBUG_KICKS: print ("\t\tcenterfieldkick")
             if avgMyGoalBearing > 0:
                 return player.goLater('kickBallRight')
@@ -282,7 +284,7 @@ def shootBall(player):
                 return player.goLater('kickBallLeft')
             else :
                 return player.goLater('kickBallStraight')
-        elif helpers.inBottomOfField(player):
+        elif my.inBottomOfField():
             if constants.DEBUG_KICKS: print ("\t\tbottomfieldkick")
             if -90 < avgMyGoalBearing < 30:
                 return player.goLater('kickBallRight')
@@ -459,7 +461,9 @@ def alignForSideKick(player):
     if player.firstFrame():
         player.brain.CoA.setRobotSlowGait(player.brain.motion)
         player.brain.tracker.trackBall()
+
     ball = player.brain.ball
+
     if ball.on and player.brain.nav.isStopped():
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
@@ -467,11 +471,9 @@ def alignForSideKick(player):
         if ballForeFoot == constants.MID_LEFT or \
                 ballForeFoot == constants.MID_RIGHT:
             player.stopWalking()
-            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:
-            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
 
         targetY = ball.relY
@@ -479,7 +481,6 @@ def alignForSideKick(player):
         player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
     if ChaseBallTransitions.shouldScanFindBall(player):
-        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
     return player.stay()
 
@@ -495,24 +496,22 @@ def stepForRightFootKick(player):
 
         if ballForeFoot == constants.RIGHT_FOOT:
             player.stopWalking()
-            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
+
         elif ballForeFoot == constants.LEFT_FOOT:
             player.stopWalking()
             player.chosenKick = SweetMoves.LEFT_FAR_KICK
-            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:
-            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
+
         if player.brain.nav.isStopped():
             targetY = ball.relY - constants.RIGHT_FOOT_CENTER_Y
             sY = MyMath.sign(targetY) * constants.SIDE_STEP_MAX_SPEED
             player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
     if ChaseBallTransitions.shouldScanFindBall(player):
-        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
     return player.stay()
 
@@ -528,17 +527,14 @@ def stepForLeftFootKick(player):
 
         if ballForeFoot == constants.LEFT_FOOT:
             player.stopWalking()
-            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
         # switch foot!
         elif ballForeFoot == constants.RIGHT_FOOT:
             player.stopWalking()
             player.chosenKick = SweetMoves.RIGHT_FAR_KICK
-            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:
-            player.brain.CoA.setRobotGait(player.brain.motion)
             return player.goLater('positionForKick')
 
         targetY = ball.relY - constants.LEFT_FOOT_CENTER_Y
@@ -546,7 +542,6 @@ def stepForLeftFootKick(player):
         player.setSteps(0, sY, 0, constants.NUM_ALIGN_KICK_STEPS)
 
     if ChaseBallTransitions.shouldScanFindBall(player):
-        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('scanFindBall')
     return player.stay()
 
@@ -561,14 +556,12 @@ def alignOnBallStraightKick(player):
 
     # Deal with ball changed positions?
     elif player.brain.nav.isStopped():
-        player.brain.CoA.setRobotGait(player.brain.motion)
         return player.goLater('positionForKick')
 
     return player.stay()
 
 def kickBallExecute(player):
     if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
         player.brain.tracker.trackBall()
         player.executeMove(player.chosenKick)
 
@@ -633,8 +626,6 @@ def kickAtPosition(player):
         player.standup()
 
         if player.brain.nav.isStopped():
-            player.brain.CoA.setRobotGait(player.brain.motion)
-            player.currentGait = ChaseBallConstants.FAST_GAIT
             return player.goLater('atPosition')
 
     return player.stay()
@@ -679,26 +670,26 @@ class KickDecider:
         if info.myGoalLeftPost.on:
             if info.myGoalLeftPost.certainty == NogginConstants.SURE:
                 self.sawOwnGoal = True
-                self.myGoalLeftPostBearings.append(info.myGoalLeftPost.bearing)
-                self.myGoalLeftPostDists.append(info.myGoalLeftPost.dist)
+                self.myGoalLeftPostBearings.append(info.myGoalLeftPost.visBearing)
+                self.myGoalLeftPostDists.append(info.myGoalLeftPost.visDist)
 
         if info.myGoalRightPost.on:
             if info.myGoalRightPost.certainty == NogginConstants.SURE:
                 self.sawOwnGoal = True
-                self.myGoalRightPostBearings.append(info.myGoalRightPost.bearing)
-                self.myGoalRightPostDists.append(info.myGoalRightPost.dist)
+                self.myGoalRightPostBearings.append(info.myGoalRightPost.visBearing)
+                self.myGoalRightPostDists.append(info.myGoalRightPost.visDist)
 
         if info.oppGoalLeftPost.on:
             if info.oppGoalLeftPost.certainty == NogginConstants.SURE:
                 self.sawOppGoal = True
-                self.oppGoalLeftPostBearings.append(info.oppGoalLeftPost.bearing)
-                self.oppGoalLeftPostDists.append(info.oppGoalLeftPost.dist)
+                self.oppGoalLeftPostBearings.append(info.oppGoalLeftPost.visBearing)
+                self.oppGoalLeftPostDists.append(info.oppGoalLeftPost.visDist)
 
         if info.oppGoalRightPost.on:
             if info.oppGoalRightPost.certainty == NogginConstants.SURE:
                 self.sawOppGoal = True
-                self.oppGoalRightPostBearings.append(info.oppGoalRightPost.bearing)
-                self.oppGoalRightPostDists.append(info.oppGoalRightPost.dist)
+                self.oppGoalRightPostBearings.append(info.oppGoalRightPost.visBearing)
+                self.oppGoalRightPostDists.append(info.oppGoalRightPost.visDist)
 
     def calculate(self):
         """

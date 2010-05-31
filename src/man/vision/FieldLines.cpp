@@ -1271,7 +1271,7 @@ void FieldLines::setLineCoordinates(shared_ptr<VisualLine> aLine) {
 
 	const float slopeX = endGroundX - startGroundX;
 	const float slopeY = endGroundY - startGroundY;
-	const float length = hypot(slopeY, slopeX);
+	const float length = hypotf(slopeY, slopeX);
 
 	const float unitSlopeX = slopeX / length;
 	const float unitSlopeY = slopeY / length;
@@ -1283,7 +1283,7 @@ void FieldLines::setLineCoordinates(shared_ptr<VisualLine> aLine) {
 	const float y_p = (-startGroundY * unitSlopeY +
 					   -startGroundX * unitSlopeX) * unitSlopeY + startGroundY;
 
-	aLine->setDistanceWithSD( hypot(x_p, y_p));
+	aLine->setDistanceWithSD( hypotf(x_p, y_p));
 	aLine->setBearingWithSD( NBMath::subPIAngle(NBMath::safe_atan2(y_p, x_p)) );
 }
 

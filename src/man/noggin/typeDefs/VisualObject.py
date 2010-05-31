@@ -13,8 +13,8 @@ class VisualObject(Location):
         self.width = 0
         self.height = 0
         self.focDist = 0
-        self.dist = 0
-        self.bearing = 0
+        self.visDist = 0
+        self.visBearing = 0
         self.framesOn = 0
         self.framesOff = 0
         self.on = False
@@ -25,11 +25,11 @@ class VisualObject(Location):
         self.width = visionInfos.width
         self.height = visionInfos.height
         self.focDist = visionInfos.focDist
-        self.dist = visionInfos.dist
-        self.bearing = visionInfos.bearing
+        self.visDist = visionInfos.dist
+        self.visBearing = visionInfos.bearing
 
         # obj is in this frame
-        if self.dist > 0:
+        if self.visDist > 0:
             self.on = True
             self.framesOn += 1
             self.framesOff = 0
@@ -48,7 +48,7 @@ class VisualObject(Location):
         """returns string with all class variables"""
         return ("dist: %g bearing: %g center: ""(%d,%d) w/h: %g/%g aX/aY: %g/%g \
         framesOn: %d framesOff: %d on: %s " %
-                (self.dist, self.bearing,
+                (self.visDist, self.visBearing,
                  self.centerX, self.centerY,
                  self.width, self.height,
                  self.angleX, self.angleY,
