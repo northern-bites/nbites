@@ -57,14 +57,12 @@
     description="build the man vision and sensors libraries">
     <ant antfile="ant/visionlink.xml" target="visionlink"/>
   </target>
-  
-  <target name="quick"
-    description="adds some parallelism to the whole visionlink libraries build 
-    and disables cache editing">
-    <property name="no.cache.edit" value="true"/>
-    <property name="quick.build" value="true"/>
+
+  <target name="config"
+    description="enables cache editing using cmake-gui by default; also builds with no parallelism">
+    <ant antfile="ant/visionlink.xml" target="visionlink.config"/>
   </target>
-    
+
 
   <target name="run"
       depends="compile,visionlink"
@@ -85,12 +83,13 @@
 
   <target name="clean.vision"
       description="clean VisionLink library">
+    <delete dir="${build.dir}/visionlink"/>
     <delete>
-      <fileset dir=".">
+      <fileset dir="${build.dir}">
         <!-- delete the TOOLVisionLink dynamic lib -->
         <include name="*TOOLVisionLink.*"/>
         <!-- delete the JNI header generated for the TOOLVisionLink -->
-        <include name="TOOL/**/*.h"/>
+        <include name="*.h"/>
       </fileset>
     </delete>
   </target>

@@ -19,11 +19,7 @@
   <property name="visionlink.file.def" value="-DVISIONLINK_FILE:FILEPATH=${visionlink.file}" />
   <!-- program definitions -->
   <property name="cmake" value="cmake"/>
-  <property name="cache-editor" value="CMake-GUI"/>
 
-
-  <property name="man.sensors.target" value="sensors"/>
-  <property name="man.vision.target" value="vision"/>
 
   <target name="platform.check" depends="win.check,unix.check"/>
 
@@ -31,12 +27,14 @@
     <echo message="configuring vision for Windows"/>
     <property name="makefile.type" value="MinGW Makefiles"/>
     <property name="make" value="mingw32-make"/>
+    <property name="cache-editor" value="CMake-GUI"/>
   </target>
   <!-- remember mac is still unix (albeit a bastard type) -->
   <target name="unix.check" if="isUnix">
     <echo message="configuring vision for Unix/Mac"/>
     <property name="makefile.type" value="Unix Makefiles"/>
     <property name="make" value="make"/>
+    <property name="cache-editor" value="cmake-gui"/>
   </target>
 
   <target name="cache.check">
@@ -62,7 +60,7 @@
     </exec>
   </target>
 
-  <target name="cache.edit" depends="cmake.generate" unless="${no.cache.edit}"
+  <target name="cache.edit" depends="cmake.generate"
     description="edits the cmake cache for the visionlink man build">
     <!-- edit the cache -->
     <exec executable="${cache-editor}" 
@@ -72,7 +70,7 @@
     </exec>
   </target>
 
-  <target name="build.libs.quick" if="${quick.build}" depends="cache.edit" 
+  <target name="build.libs.quick"
     description="builds the libraries with some degree of parallelism">
     <!-- run make -->
     <exec executable="${make}" dir="${visionlink.build.dir}" failonerror="True">
@@ -81,15 +79,15 @@
     </exec>
   </target>
 
-  <target name="build.libs.regular" unless="${quick.build}" depends="cache.edit" description="builds the libraries in a regular fashion">
+  <target name="build.libs.regular" 
+    description="builds the libraries in a regular fashion">
     <!-- run make -->
     <exec executable="${make}" dir="${visionlink.build.dir}" failonerror="True">
       <arg value="${visionlink.target}" />
     </exec>
   </target>
 
-  <target name="visionlink" depends="platform.check,build.libs.quick,build.libs.regular" 
-    description="build the man vision library">
+  <target name="copy.lib">
     <copy todir="${build.dir}" verbose="True">
       <fileset dir="${visionlink.target.dir}">
         <include name="*${visionlink.target}.*" />
@@ -97,5 +95,10 @@
       </fileset>
     </copy>
   </target>
+
+  <target name="visionlink" depends="platform.check,build.libs.quick,copy.lib" 
+    description="build the man vision library"/>
+
+  <target name="visionlink.config" depends="platform.check,cache.edit,build.libs.regular,copy.lib"/>
 
 </project>
