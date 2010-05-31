@@ -45,6 +45,9 @@ ENDIF(WEBOTS_BACKEND)
         SET( ALCOMMON_LIBRARIES
           ${OE_SYSROOT}/usr/lib/libalcommon.so )
     ELSE(OE_CROSS_BUILD )
+      IF( WIN32 )
+        SET( ALCOMMON_LIBRARIES ${AL_DIR}/lib/alcommon.lib)
+      ELSE( WIN32 )
         IF (APPLE)
             IF(WEBOTS_BACKEND)
                 SET( ALCOMMON_LIBRARIES
@@ -66,6 +69,7 @@ ENDIF(WEBOTS_BACKEND)
               )
             ENDIF(WEBOTS_BACKEND)
         ENDIF(APPLE)
+      ENDIF( WIN32 )
     ENDIF( OE_CROSS_BUILD )
 
 IF( ALCOMMON_LIBRARIES AND EXISTS ${ALCOMMON_LIBRARIES} )
