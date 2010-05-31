@@ -283,8 +283,8 @@ extern "C" {
              i != corners->end(); i++)
             env->CallVoidMethod(jobj, setVisualCornersInfo,
                                 i->getX(), i->getY(),
-								i->getDistance(), i->getBearing(),
-								i->getShape());
+                                i->getDistance(), i->getBearing(),
+                                i->getShape());
         //horizon line
         jmethodID setHorizonInfo = env->GetMethodID(javaClass, "setHorizonInfo",
                                                     "(IIIII)V");
