@@ -39,6 +39,7 @@ class Packet:
          self.ballUncertX,
          self.ballUncertY,
          self.ballDist,
+         self.ballBearing,
          self.role,
          self.subRole,
          self.chaseTime,
@@ -59,6 +60,7 @@ class Packet:
         self.ballUncertX = float(self.ballUncertX)
         self.ballUncertY = float(self.ballUncertY)
         self.ballDist = float(self.ballDist)
+        self.ballBearing = float(self.ballBearing)
         self.role = float(self.role)
         self.subRole = float(self.subRole)
         self.chaseTime = float(self.chaseTime)
@@ -89,6 +91,7 @@ class Packet:
          self.ballUncertX,
          self.ballUncertY,
          self.ballDist,
+         self.ballBearing,
          self.role,
          self.calledSubRole,
          self.chaseTime,

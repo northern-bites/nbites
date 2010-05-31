@@ -1,4 +1,4 @@
-import BrunswickSpeeds as speeds
+from ..navigator import BrunswickSpeeds as speeds
 
 MAX_X_SPEED = speeds.MAX_X_SPEED
 MAX_Y_SPEED = speeds.MAX_Y_SPEED
@@ -11,7 +11,7 @@ USE_DRIBBLE = False
 # Transitions' Constants
 # Ball on and off frame thresholds
 BALL_ON_THRESH = 2
-BALL_OFF_THRESH = 20
+BALL_OFF_THRESH = 30
 BALL_OFF_ACTIVE_LOC_THRESH = 200
 # Value to stop spinning to ball and approach
 BALL_APPROACH_BEARING_THRESH = 30
@@ -56,7 +56,7 @@ APPROACH_DIST_TO_BALL = 25
 APPROACH_NO_LOC_THRESH = 4
 APPROACH_NO_MORE_LOC_DIST = 150
 APPROACH_OMNI_DIST = 25
-APPROACH_ACTIVE_LOC_DIST = 70
+APPROACH_ACTIVE_LOC_DIST = 35
 APPROACH_ACTIVE_LOC_BEARING = 55
 
 # shouldKick()
@@ -100,11 +100,6 @@ TURN_LEFT = 1
 TURN_RIGHT = -1
 
 CHASE_AFTER_KICK_FRAMES = 100
-
-# chaseAroundBox
-GOALBOX_OFFSET = 10
-STOP_CHASING_AROUND_BOX = 5
-IGNORE_BALL_IN_BOX_DIST = 100
 
 # find ball
 WALK_TO_BALL_LOC_POS_FRAMES = 500

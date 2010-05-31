@@ -3,37 +3,21 @@ import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
 import KickingHelpers as helpers
 from .. import NogginConstants
-from ..util import MyMath
 
 ####### CHASING STUFF ##############
-
-def shouldTurnToBall_FoundBall(player):
-    """
-    Should we turn to the ball heading after searching for the ball
-    """
-    return( player.brain.ball.framesOn > constants.BALL_ON_THRESH)
-
-def shouldTurnToBall_ApproachBall(player):
-    """
-    Should turn to the ball, if we are currently approaching it
-    """
-    ball = player.brain.ball
-    return (ball.on and
-            abs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH)
 
 def shouldApproachBall(player):
     """
     Begin walking to the ball if it is close to straight in front of us
     """
     ball = player.brain.ball
-    return ( ball.on and
-             abs(ball.bearing) < constants.BALL_APPROACH_BEARING_THRESH )
+    return (ball.framesOn > 1)
 
 def shouldApproachBallWithLoc(player):
     return player.brain.ball.on and \
         player.brain.my.locScore >= NogginConstants.OK_LOC and \
         constants.USE_LOC_CHASE and \
-        player.brain.ball.locDist > 30
+        player.brain.ball.dist > 30
 
 def shouldApproachFromPositionForKick(player):
     """
@@ -42,7 +26,7 @@ def shouldApproachFromPositionForKick(player):
     ball = player.brain.ball
     return shouldApproachBall(player) and \
         not shouldPositionForKick(player) and \
-        ball.locDist > 50.0
+        ball.dist > 50.0
 
 def shouldTurnToBallFromPositionForKick(player):
     """
@@ -73,7 +57,7 @@ def shouldRepositionForKick(player):
     """
     Stop waiting for kick and realign on the ball instead
     """
-
+    ball = player.brain.ball
     return False
 
 def shouldApproachForKick(player):
@@ -90,9 +74,9 @@ def shouldKick(player):
     """
     ball = player.brain.ball
     return ball.on and \
-        constants.BALL_KICK_LEFT_Y_L > ball.locRelY > \
+        constants.BALL_KICK_LEFT_Y_L > ball.relY > \
         constants.BALL_KICK_RIGHT_Y_R and \
-        constants.BALL_KICK_LEFT_X_CLOSE < ball.locRelX < \
+        constants.BALL_KICK_LEFT_X_CLOSE < ball.relX < \
         constants.BALL_KICK_LEFT_X_FAR
 
 
@@ -108,7 +92,7 @@ def shouldDribble(player):
              0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
              0 < abs(player.brain.ball.relY) < constants.SHOULD_DRIBBLE_Y and
              abs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING and
-             not inOppGoalbox(player) and
+             not player.brain.my.inOppGoalbox() and
              player.brain.my.x > (
             NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
             NogginConstants.GREEN_PAD_X) )
@@ -121,45 +105,12 @@ def shouldStopDribbling(player):
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
     goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (player.penaltyKicking or
-            inOppGoalbox(player) or
+            player.brain.my.inOppGoalbox() or
             player.brain.ball.relX > constants.STOP_DRIBBLE_X or
             abs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
             abs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
             player.brain.my.x < ( NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
                                   NogginConstants.GREEN_PAD_X))
-
-
-def inOppGoalbox(player):
-    return (NogginConstants.OPP_GOALBOX_LEFT_X < player.brain.my.x and
-            NogginConstants.OPP_GOALBOX_BOTTOM_Y < player.brain.my.y <
-            NogginConstants.OPP_GOALBOX_TOP_Y)
-
-######### BALL IN BOX ###############
-
-def shouldChaseAroundBox(player):
-    ball = player.brain.ball
-    my = player.brain.my
-    intersect = MyMath.linesIntersect
-
-    return ( intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
-                    NogginConstants.MY_GOALBOX_LEFT_X,
-                    NogginConstants.MY_GOALBOX_BOTTOM_Y,
-                    NogginConstants.MY_GOALBOX_RIGHT_X,
-                    NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-         intersect( my.x, my.y, ball.x, ball.y, # LEFT_GOALBOX_LINE
-                    NogginConstants.MY_GOALBOX_RIGHT_X,
-                    NogginConstants.MY_GOALBOX_TOP_Y,
-                    NogginConstants.MY_GOALBOX_RIGHT_X,
-                    NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-         intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
-                    NogginConstants.MY_GOALBOX_LEFT_X,
-                    NogginConstants.MY_GOALBOX_TOP_Y,
-                    NogginConstants.MY_GOALBOX_RIGHT_X,
-                    NogginConstants.MY_GOALBOX_TOP_Y) )
-
-def shouldNotGoInBox(player):
-    return (False and player.ballInMyGoalBox() and \
-                player.brain.ball.locDist < constants.IGNORE_BALL_IN_BOX_DIST)
 
 ####### AVOIDANCE STUFF ##############
 
@@ -210,7 +161,7 @@ def shouldAvoidObstacle(player):
 
 def shouldAvoidObstacleDuringApproachBall(player):
     return shouldAvoidObstacle(player) and \
-        (player.brain.ball.locDist >
+        (player.brain.ball.dist >
          constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST)
 
 ####### FIND BALL STUFF ##############
@@ -247,12 +198,12 @@ def shouldWalkToBallLocPos(player):
 
 def shouldActiveLoc(player):
     if player.brain.ball.on:
-        return (player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST
-                and abs(player.brain.ball.locBearing) <
+        return (player.brain.ball.dist > constants.APPROACH_ACTIVE_LOC_DIST
+                and abs(player.brain.ball.bearing) <
                 constants.APPROACH_ACTIVE_LOC_BEARING)
 
     else:
-        return player.brain.ball.locDist > constants.APPROACH_ACTIVE_LOC_DIST
+        return player.brain.ball.dist > constants.APPROACH_ACTIVE_LOC_DIST
 
 def shouldStopPenaltyKickDribbling(player):
     """
@@ -273,4 +224,4 @@ def inPenaltyKickStrikezone(player):
 def shouldNotApproachWithLocAnymore(player):
     return (player.brain.my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH
             and
-            player.brain.ball.locDist > constants.APPROACH_NO_MORE_LOC_DIST )
+            player.brain.ball.dist > constants.APPROACH_NO_MORE_LOC_DIST )

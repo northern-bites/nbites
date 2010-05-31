@@ -19,7 +19,6 @@ class MyInfo(RobotLocation):
     """
     def __init__(self):
         RobotLocation.__init__(self)
-        self.h = 0.0
         self.uncertX = 0.0
         self.uncertY = 0.0
         self.uncertH = 0.0

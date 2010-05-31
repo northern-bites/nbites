@@ -9,6 +9,7 @@ import KickingConstants as constants
 import ChaseBallConstants
 from man.noggin.typeDefs.Location import Location, RobotLocation
 from .. import NogginConstants
+from ..typeDefs.LocationConstants import FACING_SIDELINE_ANGLE
 import ChaseBallTransitions
 from math import fabs
 from ..util import MyMath
@@ -82,9 +83,10 @@ def clearBall(player):
 
     # Things to do if we saw our own goal
     # Saw the opponent goal
+    my = player.brain.my
 
-    if abs(player.brain.my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH and \
-            (helpers.inTopOfField(player) or helpers.inBottomOfField(player) ):
+    if abs(my.h) > constants.ORBIT_OWN_GOAL_HEADING_THRESH and \
+            (my.inTopOfField() or my.inBottomOfField() ):
         return player.goLater('orbitBeforeKick')
 
     if oppLeftPostBearing is not None and \
@@ -128,7 +130,7 @@ def clearBall(player):
         # use localization for kick
         my = player.brain.my
 
-        if helpers.inCenterOfField(player):
+        if my.inCenterOfField():
             if abs(my.h) <= constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                 if constants.DEBUG_KICKS: print ("\t\tcenter1")
                 player.bigKick = True
@@ -140,8 +142,8 @@ def clearBall(player):
                 if constants.DEBUG_KICKS: print ("\t\tcenter3")
                 return player.goLater('kickBallRight')
 
-        elif helpers.inTopOfField(player):
-            if constants.FACING_SIDELINE_ANGLE < my.h:
+        elif my.inTopOfField():
+            if FACING_SIDELINE_ANGLE < my.h:
                 if constants.DEBUG_KICKS: print ("\t\ttop1")
                 return player.goLater('kickBallRight')
             elif my.h < -90:
@@ -152,8 +154,8 @@ def clearBall(player):
                 player.bigKick = True
                 return player.goLater('kickBallStraight')
 
-        elif helpers.inBottomOfField(player):
-            if -constants.FACING_SIDELINE_ANGLE > my.h:
+        elif my.inBottomOfField():
+            if -FACING_SIDELINE_ANGLE > my.h:
                 if constants.DEBUG_KICKS: print ("\t\tbottom1")
                 return player.goLater('kickBallLeft')
             elif my.h > 90:
@@ -268,7 +270,7 @@ def shootBall(player):
     elif myLeftPostBearing is not None and myRightPostBearing is not None:
 
         avgMyGoalBearing = (myRightPostBearing + myLeftPostBearing)/2
-        if helpers.inCenterOfField(player):
+        if my.inCenterOfField():
             if constants.DEBUG_KICKS: print ("\t\tcenterfieldkick")
             if avgMyGoalBearing > 0:
                 return player.goLater('kickBallRight')
@@ -282,7 +284,7 @@ def shootBall(player):
                 return player.goLater('kickBallLeft')
             else :
                 return player.goLater('kickBallStraight')
-        elif helpers.inBottomOfField(player):
+        elif my.inBottomOfField():
             if constants.DEBUG_KICKS: print ("\t\tbottomfieldkick")
             if -90 < avgMyGoalBearing < 30:
                 return player.goLater('kickBallRight')
@@ -679,26 +681,26 @@ class KickDecider:
         if info.myGoalLeftPost.on:
             if info.myGoalLeftPost.certainty == NogginConstants.SURE:
                 self.sawOwnGoal = True
-                self.myGoalLeftPostBearings.append(info.myGoalLeftPost.bearing)
-                self.myGoalLeftPostDists.append(info.myGoalLeftPost.dist)
+                self.myGoalLeftPostBearings.append(info.myGoalLeftPost.visBearing)
+                self.myGoalLeftPostDists.append(info.myGoalLeftPost.visDist)
 
         if info.myGoalRightPost.on:
             if info.myGoalRightPost.certainty == NogginConstants.SURE:
                 self.sawOwnGoal = True
-                self.myGoalRightPostBearings.append(info.myGoalRightPost.bearing)
-                self.myGoalRightPostDists.append(info.myGoalRightPost.dist)
+                self.myGoalRightPostBearings.append(info.myGoalRightPost.visBearing)
+                self.myGoalRightPostDists.append(info.myGoalRightPost.visDist)
 
         if info.oppGoalLeftPost.on:
             if info.oppGoalLeftPost.certainty == NogginConstants.SURE:
                 self.sawOppGoal = True
-                self.oppGoalLeftPostBearings.append(info.oppGoalLeftPost.bearing)
-                self.oppGoalLeftPostDists.append(info.oppGoalLeftPost.dist)
+                self.oppGoalLeftPostBearings.append(info.oppGoalLeftPost.visBearing)
+                self.oppGoalLeftPostDists.append(info.oppGoalLeftPost.visDist)
 
         if info.oppGoalRightPost.on:
             if info.oppGoalRightPost.certainty == NogginConstants.SURE:
                 self.sawOppGoal = True
-                self.oppGoalRightPostBearings.append(info.oppGoalRightPost.bearing)
-                self.oppGoalRightPostDists.append(info.oppGoalRightPost.dist)
+                self.oppGoalRightPostBearings.append(info.oppGoalRightPost.visBearing)
+                self.oppGoalRightPostDists.append(info.oppGoalRightPost.visDist)
 
     def calculate(self):
         """

@@ -7,9 +7,6 @@ DEBUG = False
 
 def goalieRunChecks(player):
 
-    setRelX(player)
-    setRelY(player)
-
     if shouldSave(player):
         player.shouldSaveCounter+=1
         if player.shouldSaveCounter >= 3:
@@ -62,7 +59,7 @@ def shouldPositionForSave(player):
     # No Time, Save now
     if (5  > timeUntilSave > goalCon.BALL_SAVE_LIMIT_TIME and
         ball.framesOn > 3. and relVelX < 0.
-        and player.ballRelX < goalCon.MOVE_TO_SAVE_DIST_THRESH):
+        and ball.relX < goalCon.MOVE_TO_SAVE_DIST_THRESH):
         if DEBUG: player.brain.sensors.saveFrame()
         #player.printf("relVelX = %g  timeUntilSave = %g" %
                       #(relVelX, timeUntilSave))
@@ -73,7 +70,7 @@ def strafeDirForSave(player):
     ball = player.brain.ball
     my = player.brain.my
     timeUntilSave = getTimeUntilSave(player)
-    anticipatedY = (player.ballRelY + ball.relVelY * timeUntilSave)
+    anticipatedY = (ball.relY + ball.relVelY * timeUntilSave)
     if anticipatedY < my.y - goalCon.CENTER_SAVE_THRESH:
         return -1
     elif anticipatedY > my.y + goalCon.CENTER_SAVE_THRESH:
@@ -83,29 +80,7 @@ def strafeDirForSave(player):
 
 
 def shouldSave(player):
-    """
-    ball = player.brain.ball
 
-    # Test velocity values as to which one would work:
-    relVelX = ball.relVelX
-    if player.saving :
-        return False
-
-    if relVelX < 0.0:
-        timeUntilSave = player.ballRelX / -relVelX
-        if DEBUG: player.printf(("relVelX = %g   timeUntilSave = %g") %
-                      (relVelX, timeUntilSave))
-    else:
-        timeUntilSave = -1
-    # No Time, Save now
-    if (timeUntilSave < goalCon.BALL_SAVE_LIMIT_TIME and
-        ball.framesOn > 3. and relVelX < 0.
-        and player.ballRelX < goalCon.MOVE_TO_SAVE_DIST_THRESH):
-        if DEBUG: player.brain.sensors.saveFrame()
-        #player.printf("relVelX = %g  timeUntilSave = %g" %
-                      #(relVelX, timeUntilSave))
-        return True;
-    """
     return False;
 
 def shouldHoldSave(player):
@@ -116,10 +91,9 @@ def shouldHoldSave(player):
 
     ball = player.brain.ball
 
-    relVelX = ball.relVelX
     timeUntilSave = getTimeUntilSave(player)
-    if timeUntilSave < goalCon.BALL_SAVE_LIMIT_TIME*2 and relVelX < 0 and\
-            0 < player.ballRelX < goalCon.MOVE_TO_SAVE_DIST_THRESH:
+    if timeUntilSave < goalCon.BALL_SAVE_LIMIT_TIME*2 and ball.relVelX < 0 and \
+            0 < ball.relX < goalCon.MOVE_TO_SAVE_DIST_THRESH:
         if DEBUG: player.brain.sensors.saveFrame()
         return True
     return False
@@ -158,13 +132,13 @@ def shouldStopChaseLoc(player):
     elif (my.x > Constants.MY_GOALBOX_RIGHT_X + goalCon.END_CLEAR_BUFFER
           or my.y > Constants.MY_GOALBOX_TOP_Y + goalCon.END_CLEAR_BUFFER
           or my.y < Constants.MY_GOALBOX_BOTTOM_Y + goalCon.END_CLEAR_BUFFER) and \
-          (ball.locDist >= 10 or ball.dist >= 10):
+          (ball.dist >= 10):
           return True
 
     elif (my.x > Constants.MY_GOALBOX_RIGHT_X
           or my.y > Constants.MY_GOALBOX_TOP_Y
           or my.y < Constants.MY_GOALBOX_BOTTOM_Y) and \
-          (ball.locDist >= 30 or ball.dist >= 30):
+          (ball.dist >= 30):
           return True
 
     return False
@@ -185,30 +159,16 @@ def dangerousBall(player):
     if (ball.x < player.brain.my.x or
         player.brain.myGoalLeftPost.on or
         player.brain.myGoalRightPost.on or
-        player.brain.myGoalCrossbar.on) and ball.locDist <= 40:
+        player.brain.myGoalCrossbar.on) and ball.dist <= 40:
         return True
     #idea: draw ray from me to ball, see if it intersects goal
     return False
-
-def setRelY(player):
-    ball = player.brain.ball
-    if ball.on:
-        player.ballRelY = ball.relY
-    else:
-        player.ballRelY = ball.locRelY
-
-def setRelX(player):
-    ball = player.brain.ball
-    if ball.on:
-        player.ballRelX = ball.relX
-    else:
-        player.ballRelX = ball.locRelX
 
 def getTimeUntilSave(player):
     ball = player.brain.ball
     time = 0
     if ball.relVelX < 0.0:
-        time = player.ballRelX/ -ball.relVelX
+        time = ball.relX/ -ball.relVelX
     else:
         time = -1
     return time

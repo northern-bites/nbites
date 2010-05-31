@@ -4,10 +4,12 @@ from . import Formations
 
 def sReady(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_READY)
+
     Formations.fReady(team, workingPlay)
 
 def sNoFieldPlayers(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_NO_FIELD_PLAYERS)
+
     Formations.fNoFieldPlayers(team, workingPlay)
 
 def sOneField(team, workingPlay):
@@ -16,9 +18,6 @@ def sOneField(team, workingPlay):
     # Formation for ball in our goal box
     if shouldUseDubD(team):
         Formations.fOneDubD(team, workingPlay)
-
-    elif useFinder(team):
-        Formations.fFinder(team, workingPlay)
     else:
         Formations.fOneField(team, workingPlay)
 
@@ -35,9 +34,6 @@ def sTwoField(team, workingPlay):
     elif shouldUseDubD(team):
         Formations.fTwoDubD(team, workingPlay)
 
-    # ball hasn't been seen by me or teammates in a while
-    elif useFinder(team):
-        Formations.fFinder(team, workingPlay)
     else:
         # Keep a defender and a chaser
         Formations.fDefensiveTwoField(team, workingPlay)
@@ -54,10 +50,6 @@ def sThreeField(team, workingPlay):
     # Formation for ball in our goal box
     elif shouldUseDubD(team):
         Formations.fThreeDubD(team, workingPlay)
-
-    # ball hasn't been seen by me or teammates in a while
-    elif useFinder(team):
-        Formations.fFinder(team, workingPlay)
 
     # Standard spread formation
     else:
@@ -80,11 +72,6 @@ def sWin(team, workingPlay):
     # Formation for ball in our goal box
     elif shouldUseDubD(team):
         Formations.fTwoDubD(team, workingPlay)
-
-    # ball hasn't been seen by me or teammates in a while
-    elif useFinder(team):
-        Formations.fFinder(team, workingPlay)
-
     # Move the defender forward if the ball is close enough to opp goal, then become a middie
     elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
         Formations.fNeutralDefenseTwoField(team, workingPlay)
@@ -115,14 +102,6 @@ def sTestChaser(team, workingPlay):
 def useKickoffFormation(team):
     if (team.brain.gameController.timeSincePlay() <
         PBConstants.KICKOFF_FORMATION_TIME):
-        return True
-    else:
-        return False
-
-def useFinder(team):
-    if (PBConstants.USE_FINDER and
-        team.brain.ball.timeSinceSeen() >
-        PBConstants.FINDER_TIME_THRESH):
         return True
     else:
         return False

@@ -1,4 +1,3 @@
-
 // This file is part of TOOL, a robotics interaction and development
 // package created by the Northern Bites RoboCup team of Bowdoin College
 // in Brunswick, Maine.
@@ -44,15 +43,16 @@ public class TOOLProtocol {
     public static final int NUM_MOTION_ENG = 4;
     public static final int NUM_HEAD_ENG   = 4;
 
-	private static final int NUM_POSSIBLE_OBJECTS = 120;
-	private static final float INIT_OBJECT_VALUE = -1.0f;
+    private static final int NUM_POSSIBLE_OBJECTS = 120;
+    private static final float INIT_OBJECT_VALUE = -1337.0f;
 
-	private static final int NUM_LOC_PACKET_VALUES = 17;
+    private static final int NUM_LOC_PACKET_VALUES = 17;
+    private static final int NUM_MM_VALUES = 300;
 
-	private static final int NUM_GC_VALUES = 3;
-	private static final int GC_TEAM_INDEX = 0;
-	private static final int GC_PLAYER_INDEX = 1;
-	private static final int GC_COLOR_INDEX = 2;
+    private static final int NUM_GC_VALUES = 3;
+    private static final int GC_TEAM_INDEX = 0;
+    private static final int GC_PLAYER_INDEX = 1;
+    private static final int GC_COLOR_INDEX = 2;
 
     private DataSerializer serial;
 
@@ -68,10 +68,11 @@ public class TOOLProtocol {
     private float[] joints;
     private float[] sensors;
     private float[] objects;
-	private float[] local;
+    private float[] local;
     private byte[] image;
     private byte[] thresh;
-	private int[] GCInfo;
+    private int[] GCInfo;
+    private float[] MMInfo;
 
     public TOOLProtocol(String remoteHost) {
         try {
@@ -98,6 +99,7 @@ public class TOOLProtocol {
         objects = null;
 		local = null;
 		GCInfo = null;
+		MMInfo = null;
     }
 
     public TOOLProtocol(InetAddress remoteHost) {
@@ -119,6 +121,7 @@ public class TOOLProtocol {
 		objects = null;
 		local = null;
 		GCInfo = null;
+		MMInfo = null;
     }
 
     public void connect(InetAddress host) {
@@ -249,6 +252,13 @@ public class TOOLProtocol {
 				serial.readInts(GCInfo);
 			}
 
+			if (r.mmekf()){
+				MMInfo = new float[NUM_MM_VALUES];
+				for (int i=0; i < MMInfo.length ; ++i)
+					MMInfo[i] = INIT_OBJECT_VALUE;
+				serial.readFloats(MMInfo, true);
+			}
+
         }catch (IOException e) {
             TOOL.CONSOLE.error(e);
             disconnect();
@@ -357,11 +367,12 @@ public class TOOLProtocol {
 
 	public LocalizationPacket getMyLocalization() {
 		if (connected) {
-			LocalizationPacket myLoc =LocalizationPacket.makeEstimateAndUncertPacket(
-																					 local[0], local[1],
-																					 local[2], local[3],
-																					 local[4], local[5]);
-			return myLoc;
+		    LocalizationPacket myLoc =
+			LocalizationPacket.makeEstimateAndUncertPacket(
+								       local[0], local[1],
+								       local[2], local[3],
+								       local[4], local[5]);
+		    return myLoc;
 		}
 		return null;
 	}
@@ -378,7 +389,28 @@ public class TOOLProtocol {
 		return null;
 	}
 
-    public void sendMotion(double[] motion) {
+	public Vector<LocalizationPacket> getMultimodalEKFInfo(){
+		if (connected){
+			Vector<LocalizationPacket> info = new Vector<LocalizationPacket>();
+			int i = 0;
+			while (MMInfo[i] != INIT_OBJECT_VALUE){
+				info.add(
+						 LocalizationPacket.
+						 makeEstimateAndUncertPacket(
+													 (double)MMInfo[i],
+													 (double)MMInfo[++i],
+													 (double)MMInfo[++i],
+													 (double)MMInfo[++i],
+													 (double)MMInfo[++i],
+													 (double)MMInfo[++i] ));
+				++i;
+			}
+			return info;
+		}
+		return null;
+	}
+
+	public void sendMotion(double[] motion) {
         try {
             serial.writeByte(COMMAND_MSG);
             serial.writeByte(CMD_MOTION);

@@ -218,11 +218,11 @@ const WalkVector Step::accelClipVelocities(const WalkVector & source,
 			    last.x - stepConfig[WP::MAX_ACC_X],
 			    last.x + stepConfig[WP::MAX_ACC_X]);
     result.y = NBMath::clip(source.y,
-			    last.y - stepConfig[WP::MAX_ACC_Y]*0.5,
-			    last.y + stepConfig[WP::MAX_ACC_Y]*0.5);
+			    last.y - stepConfig[WP::MAX_ACC_Y]*0.5f,
+			    last.y + stepConfig[WP::MAX_ACC_Y]*0.5f);
     result.theta = NBMath::clip(source.theta,
-				last.theta - stepConfig[WP::MAX_ACC_THETA]*0.5,
-				last.theta + stepConfig[WP::MAX_ACC_THETA]*0.5);
+				last.theta - stepConfig[WP::MAX_ACC_THETA]*0.5f,
+				last.theta + stepConfig[WP::MAX_ACC_THETA]*0.5f);
   }
   return result;
 }

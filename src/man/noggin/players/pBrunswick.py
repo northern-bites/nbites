@@ -12,7 +12,6 @@ from . import GoalieTransitions
 from . import ChaseBallTransitions
 from . import KickingHelpers
 
-from . import KickingConstants
 from .. import NogginConstants
 from ..playbook import PBConstants
 from . import ChaseBallConstants as ChaseConstants
@@ -36,10 +35,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.setName('pBrunswick')
         self.pb = None # must be init'd later, depends on player init
-        self.stoppedWalk = False
-        self.currentSpinDir = None
         self.currentGait = None
-        self.trackingBall = False
 
         self.chosenKick = None
         self.kickDecider = None
@@ -52,8 +48,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.posForSaveCounter = 0
         self.framesFromCenter = 0
         self.stepsOffCenter = 0
-        self.ballRelY = 0.0
-        self.ballRelX = 0.0
         self.isChasing = False
         self.saving = False
 
@@ -112,12 +106,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             state = GoalieTransitions.goalieRunChecks(self)
             return state
 
-        elif not self.brain.playbook.subRoleChanged():
+        elif self.brain.playbook.subRoleUnchanged():
             return self.currentState
 
-        # We don't stop chasing if we are in certain roles
-        elif (self.play.isRole(PBConstants.CHASER) and
-              ChaseBallTransitions.shouldntStopChasing(self)):
+        elif self.inKickingState:
             return self.currentState
 
         else:
@@ -126,15 +118,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def getRoleState(self):
         if self.play.isRole(PBConstants.CHASER):
             return 'chase'
-        elif ( self.play.isRole(PBConstants.OFFENDER) or
-               self.play.isRole(PBConstants.DEFENDER) ):
-            return 'playbookPosition'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
-        elif self.play.isRole(PBConstants.SEARCHER):
-            return 'scanFindBall'
         else:
-            return 'scanFindBall'
+            return 'playbookPosition'
+
 
     ###### HELPER METHODS ######
     def getSpinDirAfterKick(self):
@@ -144,16 +132,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return ChaseConstants.TURN_LEFT
         else :
             return ChaseConstants.TURN_LEFT
-
-
-    def inOppCorner(self):
-        my = self.brain.my
-        return my.x > KickingConstants.OPP_CORNER_LEFT_X and \
-            (my.y < KickingConstants.BOTTOM_OPP_CORNER_SLOPE * \
-                 (my.x - KickingConstants.OPP_CORNER_LEFT_X) or
-             my.y > KickingConstants.TOP_OPP_CORNER_SLOPE * \
-                 (my.x - KickingConstants.OPP_CORNER_LEFT_X) + \
-                 KickingConstants.TOP_OPP_CORNER_Y )
 
     def inFrontOfBall(self):
         ball = self.brain.ball
@@ -211,20 +189,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         return Location(NogginConstants.OPP_GOAL_MIDPOINT[0],
                         NogginConstants.OPP_GOAL_MIDPOINT[1] )
 
-    def ballInOppGoalBox(self):
-        ball = self.brain.ball
-        return NogginConstants.OPP_GOALBOX_LEFT_X < ball.x < \
-            NogginConstants.OPP_GOALBOX_RIGHT_X and \
-            NogginConstants.OPP_GOALBOX_TOP_Y > ball.y > \
-            NogginConstants.OPP_GOALBOX_BOTTOM_Y
-
-    def ballInMyGoalBox(self):
-        ball = self.brain.ball
-        return NogginConstants.MY_GOALBOX_LEFT_X < ball.x < \
-            NogginConstants.MY_GOALBOX_RIGHT_X and \
-            NogginConstants.MY_GOALBOX_TOP_Y > ball.y > \
-            NogginConstants.MY_GOALBOX_BOTTOM_Y
-
     def lookPostKick(self):
         tracker = self.brain.tracker
         if self.chosenKick == SweetMoves.LEFT_FAR_KICK or \
@@ -237,9 +201,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getNextOrbitPos(self):
         relX = -ChaseConstants.ORBIT_OFFSET_DIST * \
-            cos(radians(ChaseConstants.ORBIT_STEP_ANGLE)) + self.brain.ball.relX
+               ChaseConstants.COS_ORBIT_STEP_ANGLE + self.brain.ball.relX
         relY =  -ChaseConstants.ORBIT_OFFSET_DIST * \
-            sin(radians(ChaseConstants.ORBIT_STEP_ANGLE)) + self.brain.ball.relY
+               ChaseConstants.SIN_ORBIT_STEP_RADIANS + self.brain.ball.relY
         relTheta = ChaseConstants.ORBIT_STEP_ANGLE * 2 + self.brain.ball.bearing
         return RobotLocation(relX, relY, relTheta)
 

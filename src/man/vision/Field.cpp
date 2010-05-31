@@ -441,7 +441,7 @@ void Field::findConvexHull(int pH) {
 		float step = 0.0f;
 		if (convex[i].x != convex[i-1].x)
 		  step = (float)diff / (float)(convex[i].x - convex[i-1].x);
-		float cur = convex[i].y;
+		float cur = static_cast<float>(convex[i].y);
 		for (int j = convex[i].x; j > convex[i-1].x; j--) {
 			cur -= step;
 			topEdge[j] = (int)cur;
@@ -825,7 +825,7 @@ void Field::bestShot(VisualFieldObject* left,
 	middle->setRightBottomY(bottom);
 	middle->setLeftTopY(bottom - 10);
 	middle->setRightTopY(bottom - 10);
-	middle->setWidth(rightb - leftb + 1);
+	middle->setWidth(static_cast<float>(rightb - leftb + 1));
 	middle->setHeight(10);
 	setShot(middle, color);
 	/*

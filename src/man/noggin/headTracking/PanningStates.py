@@ -11,7 +11,7 @@ def scanBall(tracker):
 
 
     if not tracker.brain.motion.isHeadActive():
-        ballDist = ball.locDist
+        ballDist = ball.dist
 
         if ballDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.helper.executeHeadMove(HeadMoves.HIGH_SCAN_BALL)
