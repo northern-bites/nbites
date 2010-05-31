@@ -44,12 +44,7 @@ def gameReady(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-
-        if player.squatting:
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-            player.squatting = False
-        else:
-            player.standup()
+        player.standup()
 
     if player.brain.gameController.ownKickOff:
         player.hasKickedOffKick = False

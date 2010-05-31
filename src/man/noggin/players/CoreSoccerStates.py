@@ -27,7 +27,6 @@ def gameInitial(player):
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
-        player.squatting = False
 
     elif player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown:
         player.GAME_INITIAL_satDown = True
