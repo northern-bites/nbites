@@ -33,6 +33,9 @@ class Navigator(FSA.FSA):
         self.angleToOrbit = 0
         self.curSpinDir = 0
 
+        self.shouldAvoidObstacleLeftCounter = 0
+        self.shouldAvoidObstacleRightCounter = 0
+
     def performSweetMove(self, move):
         self.sweetMove = move
         self.switchTo('doingSweetMove')

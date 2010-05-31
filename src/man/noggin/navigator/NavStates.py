@@ -162,35 +162,116 @@ def avoidObstacle(nav):
     avoidLeft = navTrans.shouldAvoidObstacleLeft(nav)
     avoidRight = navTrans.shouldAvoidObstacleRight(nav)
 
+    # store previous state here, b/c lastDiffState gets
+    # replaced when we perform 'goNow'
+    nav.preAvoidState = nav.lastDiffState
+
+    if (avoidLeft and avoidRight):
+        return nav.goNow('avoidFrontObstacle')
+    elif avoidLeft:
+        return nav.goNow('avoidLeftObstacle')
+    elif avoidRight:
+        return nav.goNow('avoidRightObstacle')
+    else:
+        return nav.goNow(nav.lastDiffState)
+
+
+def avoidFrontObstacle(nav):
+    # Backup
+    # strafe away from the closer one?
+    # strafe towards dest?
+
+    # ever a good time to backup?
+    # we'll probably want to go forward again and most obstacle
+    # are moving, so pausing might make more sense
+
+
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
         nav.printf(nav.brain.sonar)
+        nav.printf("Avoid by backup");
+        helper.setSpeed(nav, 0, constants.DODGE_BACK_SPEED, 0)
 
-        if (avoidLeft and avoidRight):
-            # Backup
-            nav.printf("Avoid by backup");
-            helper.setSpeed(nav, constants.DODGE_BACK_SPEED, 0, 0)
+    avoidLeft = navTrans.shouldAvoidObstacleLeft(nav)
+    avoidRight = navTrans.shouldAvoidObstacleRight(nav)
 
-        elif avoidLeft:
-            # Dodge right
-            nav.printf("Avoid by right dodge");
-            helper.setSpeed(nav, 0, constants.DODGE_RIGHT_SPEED, 0)
-
-        elif avoidRight:
-            # Dodge left
-            nav.printf("Avoid by left dodge");
-            helper.setSpeed(nav, 0, constants.DODGE_LEFT_SPEED, 0)
-
-    if not (avoidLeft or avoidRight):
-        nav.doneAvoidingCounter += 1
-    else:
+    if (avoidLeft and avoidRight):
         nav.doneAvoidingCounter -= 1
         nav.doneAvoidingCounter = max(0, nav.doneAvoidingCounter)
+        return nav.stay()
+    elif avoidRight:
+        return nav.goNow('avoidRightObstacle')
+    elif avoidLeft:
+        return nav.goNow('avoidLeftObstacle')
+    else:
+        nav.doneAvoidingCounter += 1
 
     if nav.doneAvoidingCounter > constants.DONE_AVOIDING_FRAMES_THRESH:
         nav.shouldAvoidObstacleRight = 0
         nav.shouldAvoidObstacleLeft = 0
-        return nav.goLater(nav.lastDiffState)
+        return nav.goLater(nav.preAvoidState)
+
+def avoidLeftObstacle(nav):
+    """
+    dodges right if we only detect something to the left of us
+    """
+
+    if nav.firstFrame():
+        nav.doneAvoidingCounter = 0
+        nav.printf(nav.brain.sonar)
+        nav.printf("Avoid by right dodge");
+        helper.setSpeed(nav, 0, constants.DODGE_RIGHT_SPEED, 0)
+
+    avoidLeft = navTrans.shouldAvoidObstacleLeft(nav)
+    avoidRight = navTrans.shouldAvoidObstacleRight(nav)
+
+    if (avoidLeft and avoidRight):
+        return nav.goNow('avoidFrontObstacle')
+    elif avoidRight:
+        return nav.goNow('avoidRightObstacle')
+    elif avoidLeft:
+        nav.doneAvoidingCounter -= 1
+        nav.doneAvoidingCounter = max(0, nav.doneAvoidingCounter)
+        return nav.stay()
+    else:
+        nav.doneAvoidingCounter += 1
+
+    if nav.doneAvoidingCounter > constants.DONE_AVOIDING_FRAMES_THRESH:
+        nav.shouldAvoidObstacleRight = 0
+        nav.shouldAvoidObstacleLeft = 0
+        return nav.goLater(nav.preAvoidState)
+
+    return nav.stay()
+
+def avoidRightObstacle(nav):
+    """
+    dodges left if we only detect something to the left of us
+    """
+
+    if nav.firstFrame():
+        nav.doneAvoidingCounter = 0
+        nav.printf(nav.brain.sonar)
+        nav.printf("Avoid by left dodge");
+        helper.setSpeed(nav, 0, constants.DODGE_LEFT_SPEED, 0)
+
+    avoidLeft = navTrans.shouldAvoidObstacleLeft(nav)
+    avoidRight = navTrans.shouldAvoidObstacleRight(nav)
+
+    if (avoidLeft and avoidRight):
+        return nav.goNow('avoidFrontObstacle')
+    elif avoidLeft:
+        return nav.goNow('avoidLeftObstacle')
+    elif avoidRight:
+        nav.doneAvoidingCounter -= 1
+        nav.doneAvoidingCounter = max(0, nav.doneAvoidingCounter)
+        return nav.stay()
+    else:
+        nav.doneAvoidingCounter += 1
+
+    if nav.doneAvoidingCounter > constants.DONE_AVOIDING_FRAMES_THRESH:
+        nav.shouldAvoidObstacleRight = 0
+        nav.shouldAvoidObstacleLeft = 0
+        return nav.goLater(nav.preAvoidState)
 
     return nav.stay()
 
@@ -230,8 +311,8 @@ def stop(nav):
     """
     if nav.firstFrame():
         helper.setSpeed(nav, 0, 0, 0)
-        nav.walkX = nav.walkY = nav.walkTheta = nav.stepX = nav.stepY \
-                    = nav.stepTheta = nav.numSteps = 0
+        nav.walkX = nav.walkY = nav.walkTheta = \
+                    nav.stepX = nav.stepY = nav.stepTheta = nav.numSteps = 0
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
