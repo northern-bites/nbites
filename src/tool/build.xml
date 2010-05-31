@@ -5,11 +5,25 @@
     tool ant build file
   </description>
   <!-- set global properties for this build -->
+  <!-- TODO: load these from a file http://ant.apache.org/manual/CoreTasks/property.html -->
   <property name="nbites.dir" location="../.."/>
   <property name="build.dir" location="${nbites.dir}/build/tool"/>
   <property name="src.dir" location="${nbites.dir}/src"/>
+  <property name="tool.src.dir" location="${src.dir}/tool"/>
   <property name="man.dir" location="${src.dir}/man"/>
   <property name="classpath" location="${build.dir}"/>
+
+  <!-- check for platform -->
+  <condition property="isWin">
+    <os family="windows"/>
+  </condition>
+  <!-- careful! mac os x is considered both mac and unix ! -->
+  <condition property="isUnix">
+    <os family="unix"/>
+  </condition>
+  <condition property="isMac">
+    <os family="mac"/>
+  </condition>
 
   <!-- PATH structure that holds the classpath for the build-->
   <path id="tool.paths">
@@ -23,49 +37,42 @@
   <target name="compile"
           description="compile the source " >
     <mkdir dir="${build.dir}"/>
-    <mkdir dir="${classes.dir}"/>
     <javac srcdir="." destdir="${build.dir}">
       <classpath refid="tool.paths"/>
     </javac>
   </target>
 
-  <target name="vision"
-      description="compile the TOOLVisionLink">
-    <!-- at this point we just run an external calling make vision -->
-    <!-- TODO unify the build systems -->
+  <target name="visionlink.java.header" depends="compile">
     <javah destdir="${build.dir}">
-      <classpath refid="tool.paths"/>
-      <class name="TOOL.Vision.TOOLVisionLink"/>
+      <classpath refid="tool.paths" />
+      <class name="TOOL.Vision.TOOLVisionLink" />
     </javah>
-<!--exec executable="make">
-      <arg value="vision"/>
-    </exec-->
+  </target>
+
+  <target name="visionlink" depends="visionlink.java.header, man.visionlink"
+      description="compile the TOOLVisionLink">
+  </target>
+
+  <target name="man.visionlink"
+    description="build the man vision and sensors libraries">
+    <ant antfile="ant/visionlink.xml" target="visionlink"/>
   </target>
   
-  <property name="man.vision.build.dir" value="${build.dir}/man.vision"/>
-  <property name="straight.defs" value="-DOE_CROSS_BUILD=OFF -DSTRAIGHT=ON"/>
-  <property name="man.vision.dir" value="${man.dir}/vision"/>
-  <property name="man.vision.cmake.dir" value="${man.vision.dir}/cmake.vision"/>
-
-  <target name="man.vision"
-    description="build the man vision library">
-    <mkdir dir="${man.vision.build.dir}"/>
-    <exec executable="cmake" dir="${man.vision.build.dir}">
-      <arg value="${straight.defs}"/>
-      <arg value="${man.vision.cmake.dir}"/>
-    </exec>
-    <exec executable="command" dir="${man.vision.build.dir}" spawn="true">
-          <arg value="."/>
-    </exec>
+  <target name="quick"
+    description="adds some parallelism to the whole visionlink libraries build 
+    and disables cache editing">
+    <property name="no.cache.edit" value="true"/>
+    <property name="quick.build" value="true"/>
   </target>
+    
 
   <target name="run"
-      depends="compile,vision"
+      depends="compile,visionlink"
       description="runs the tool ">
     <java classname="TOOL.TOOL"
       fork="true"
       maxmemory="512m">
-      <sysproperty key="java.library.path" value="./"/>
+      <sysproperty key="java.library.path" value="${build.dir}"/>
       <classpath refid="tool.paths"/>
       <arg value="-d32"/>
     </java>
@@ -80,10 +87,10 @@
       description="clean VisionLink library">
     <delete>
       <fileset dir=".">
-    <!-- delete the TOOLVisionLink dynamic lib -->
-    <include name="*TOOLVisionLink.*"/>
-    <!-- delete the JNI header generated for the TOOLVisionLink -->
-    <include name="TOOL/**/*.h"/>
+        <!-- delete the TOOLVisionLink dynamic lib -->
+        <include name="*TOOLVisionLink.*"/>
+        <!-- delete the JNI header generated for the TOOLVisionLink -->
+        <include name="TOOL/**/*.h"/>
       </fileset>
     </delete>
   </target>
@@ -91,11 +98,7 @@
   <!-- Clean class files -->
   <target name="clean"
       description="clean .class files" >
-    <delete>
-      <fileset dir=".">
-    <include name="**/*.class"/>
-      </fileset>
-    </delete>
+    <delete dir="${build.dir}/TOOL"/>
   </target>
 
 </project>
