@@ -24,17 +24,13 @@ IF( OE_CROSS_BUILD )
   SET( PYTHON_LIBRARIES ${OE_SYSROOT}/usr/lib//libpython2.6.so )
 ELSE( OE_CROSS_BUILD )
   IF( WIN32 )
-    #GET_FILENAME_COMPONENT(PYTHON_INSTALL_DIR 
-    #    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath;] ABSOLUTE CACHE)
-    #SET( PYTHON_INCLUDE_DIR ${PYTHON_INSTALL_DIR}/include )
-    #looking for the library, whose location is different in win32/64
-    SET( PYTHON_INCLUDE_DIR /usr/include/python2.5 )
-    SET( PYTHON_LIBRARIES /usr/lib/libpython2.5.dll.a )
-    #TODO look for the windows environment variable in base_definitions
-    #SET( PYTHON_LIBRARIES C:/Windows/SysWOW64/python26.dll )
-    #IF( NOT PYTHON_LIBRARIES )
-    #    SET( PYTHON_LIBRARIES C:/Windows/python26.dll )
-    #ENDIF( NOT PYTHON_LIBRARIES )
+    GET_FILENAME_COMPONENT(PYTHON_INSTALL_DIR 
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath;] ABSOLUTE CACHE)
+    SET( PYTHON_INCLUDE_DIR ${PYTHON_INSTALL_DIR}/include )
+    SET( PYTHON_LIBRARIES C:/Windows/SysWOW64/python26.dll )
+    IF( NOT PYTHON_LIBRARIES )
+        SET( PYTHON_LIBRARIES C:/Windows/python26.dll )
+    ENDIF( NOT PYTHON_LIBRARIES )
   ELSE( WIN32 )
     SET( PYTHON_INCLUDE_DIR /usr/include/python2.6 )
     IF ( APPLE )
@@ -76,6 +72,7 @@ ENDIF( NOT PYTHON_FIND_QUIETLY )
 
 
 MARK_AS_ADVANCED(
+  PYTHON_INSTALL_DIR
   PYTHON_DEFINITIONS
   PYTHON_INCLUDE_DIR
   PYTHON_LIBRARIES
