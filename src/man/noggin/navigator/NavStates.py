@@ -199,10 +199,13 @@ def avoidFrontObstacle(nav):
         nav.doneAvoidingCounter -= 1
         nav.doneAvoidingCounter = max(0, nav.doneAvoidingCounter)
         return nav.stay()
+
     elif avoidRight:
         return nav.goNow('avoidRightObstacle')
+
     elif avoidLeft:
         return nav.goNow('avoidLeftObstacle')
+
     else:
         nav.doneAvoidingCounter += 1
 
@@ -210,6 +213,8 @@ def avoidFrontObstacle(nav):
         nav.shouldAvoidObstacleRight = 0
         nav.shouldAvoidObstacleLeft = 0
         return nav.goLater(nav.preAvoidState)
+
+    return nav.stay()
 
 def avoidLeftObstacle(nav):
     """

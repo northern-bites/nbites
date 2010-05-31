@@ -123,6 +123,9 @@ def shouldAvoidObstacle(nav):
     """
     Should avoid an obstacle
     """
+    # don't dodge an object in front when we're not going forward
+    if nav.walkX <= 0:
+        return False
     return ((shouldAvoidObstacleLeft(nav) or
              shouldAvoidObstacleRight(nav)) and
             not nav.brain.player.penaltyKicking)
