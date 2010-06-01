@@ -47,6 +47,13 @@ class BirthCertificate:
             self.current_gait = self.slow_gait
             motion_interface.setGait(self.slow_gait)
 
+    def setDynamicGait(self, motion_interface, dynGait):
+        print '\033[32m' + "BirthCertificates - Setting DYNAMIC gait" + '\033[0m'
+        self.current_gait = dynGait
+        motion_interface.setGait(dynGait)
+
+
+
     def __str__(self):
         s = "CoA: " + self.long_name
         if self.__doc__:
