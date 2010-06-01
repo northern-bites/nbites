@@ -140,13 +140,7 @@ cclean: $(CMAKE_DEPEND)
 	@$(MAKE) $(MAKE_OPTIONS) -C $(BUILD_DIR) clean
 
 clean:
-	$(RM) -r $(BUILD_DIR) $(CONFIG_FILE) $(INSTALL_SCRIPT)
-	@$(MAKE) -C corpus clean
-	@$(MAKE) -C motion clean
-	@$(MAKE) -C noggin clean
-	@$(MAKE) -C vision clean
-	@$(MAKE) -C comm   clean
-	$(RM) -r install/* $(PYC_FILES)
+	$(RM) -r $(BUILD_DIR)
 
 check:
 	@if [ -e $(CROSS_FILE) ]; then \
