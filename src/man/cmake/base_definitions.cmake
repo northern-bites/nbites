@@ -159,7 +159,8 @@ IF( APPLE )
 ENDIF( APPLE )
 
 IF( OE_CROSS_BUILD )
-  SET( OE_SYSROOT ${OE_CROSS_DIR}/staging/geode-linux/)
+  SET( OE_CROSS_DIR "${AL_DIR}/crosstoolchain" )
+  SET( OE_SYSROOT "${OE_CROSS_DIR}/staging/geode-linux/" )
 ENDIF (OE_CROSS_BUILD )
 
 IF( FINAL_RELEASE )

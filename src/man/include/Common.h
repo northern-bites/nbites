@@ -47,11 +47,8 @@ typedef unsigned char byte;
 #endif
 
 #include <time.h>
-#ifndef _WIN32
 #include <sys/time.h>
-#else
-#include <sys/timeb.h>
-#endif
+
 static const long long MICROS_PER_SECOND = 1000000;
 
 const static float MOTION_FRAME_LENGTH_S = 0.01f;
@@ -62,22 +59,11 @@ const float MOTION_FRAME_RATE = 1.0f / MOTION_FRAME_LENGTH_S;
 
 static long long micro_time (void)
 {
-#ifndef _WIN32
     // Needed for microseconds which we convert to milliseconds
     struct timeval tv;
     gettimeofday(&tv, NULL);
 
     return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
-#else
-    _timeb timebuffer;
-    time_t secondsSince1970;
-    unsigned short millis;
-
-    _ftime64_s( &timebuffer);
-    secondsSince1970 = timebuffer.time;
-    millis = timebuffer.millitm;
-    return (secondsSince1970 * 1000ul + millis) * 1000ul;
-#endif
 }
 
 #endif // Common_h_DEFINED

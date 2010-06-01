@@ -52,7 +52,7 @@ static const int INVALIDATED_INTERSECTION_POINT_COLOR = PURPLE;
 static const int FIT_UNUSED_POINTS_BOX_COLOR = MAROON;
 static const int JOIN_LINES_BOX_COLOR = PINK;
 
-static const Rectangle SCREEN = {0, IMAGE_WIDTH - 1,
+static const rectangle SCREEN = {0, IMAGE_WIDTH - 1,
                                  0, IMAGE_HEIGHT - 1};
 // More succinct.
 typedef std::list<linePoint>::iterator linePointNode;

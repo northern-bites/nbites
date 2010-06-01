@@ -17,15 +17,15 @@ SET(PTHREAD_LIBRARIES "PTHREAD_LIBRARIES-NOTFOUND" CACHE FILEPATH "Cleared." FOR
 # Find package requirements
 ##
 
-IF (${ROBOT_PREFIX} STREQUAL nao)
   IF ( OE_CROSS_BUILD )
-    SET( PTHREAD_INCLUDE_DIR ${OE_CROSS_DIR}/staging/geode-linux/usr/include )
-    SET( PTHREAD_LIBRARIES ${OE_CROSS_DIR}/staging/geode-linux/lib/libpthread.so.0 )
+    SET( PTHREAD_INCLUDE_DIR ${OE_SYSROOT}/usr/include )
+    SET( PTHREAD_LIBRARIES ${OE_SYSROOT}/lib/libpthread.so.0 )
   ELSE ( OE_CROSS_BUILD )
     IF( WIN32 )
-      SET( PTHREAD_INCLUDE_DIR ${AL_DIR}/extern/c/pthread/include/ )
-      SET( PTHREAD_LIBRARIES 
-          ${AL_DIR}/extern/c/pthread/lib/${TARGET_ARCH}/pthreadVCE2.lib )
+      SET( PTHREAD_ROOT $ENV{PTHREAD_ROOT})
+      SET( PTHREAD_INCLUDE_DIR ${PTHREAD_ROOT}/include/ )
+      SET( PTHREAD_LIBRARIES ${PTHREAD_ROOT}/lib/pthreadGCE2.dll )
+      SET( PTHREAD_DEFINITIONS "" )
     ELSE ( WIN32 )
       SET( PTHREAD_INCLUDE_DIR /usr/include/ )
       IF ( APPLE )
@@ -36,7 +36,6 @@ IF (${ROBOT_PREFIX} STREQUAL nao)
       ENDIF( APPLE )
     ENDIF( WIN32 )
   ENDIF ( OE_CROSS_BUILD )
-ENDIF (${ROBOT_PREFIX} STREQUAL nao)
 
 
 

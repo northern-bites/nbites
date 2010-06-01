@@ -26,7 +26,7 @@ PROJECT( VISION )
 
 ############################ VERSION
 # Check cMake version
-CMAKE_MINIMUM_REQUIRED( VERSION 2.2.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
 
 ############################ COLORIZE MAKEFILE
@@ -76,6 +76,7 @@ MESSAGE( STATUS "" )
 
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
+FIND_PACKAGE( BOOTS    REQUIRED)
 
 
 ############################ TESTS
@@ -114,8 +115,9 @@ ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS} ${PYTHON_DEFINITIONS}
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
                      ${VISION_INCLUDE_DIR}
+                     ${BOOST_INCLUDE_DIR}
                      )
-
+                     
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
@@ -128,27 +130,28 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ConcreteCross
                  ${VISION_INCLUDE_DIR}/ConcreteLine
                  ${VISION_INCLUDE_DIR}/Cross
-		 ${VISION_INCLUDE_DIR}/Field
+                 ${VISION_INCLUDE_DIR}/Field
                  ${VISION_INCLUDE_DIR}/FieldLines
                  ${VISION_INCLUDE_DIR}/ObjectFragments
                  ${VISION_INCLUDE_DIR}/Profiler
                  ${VISION_INCLUDE_DIR}/PyVision
-		 ${VISION_INCLUDE_DIR}/Robots
+                 ${VISION_INCLUDE_DIR}/Robots
                  ${VISION_INCLUDE_DIR}/Threshold
                  ${VISION_INCLUDE_DIR}/Utility
                  ${VISION_INCLUDE_DIR}/Vision
-		 ${VISION_INCLUDE_DIR}/VisualBall
-		 ${VISION_INCLUDE_DIR}/VisualCrossbar
+                 ${VISION_INCLUDE_DIR}/VisualBall
+                 ${VISION_INCLUDE_DIR}/VisualCrossbar
                  ${VISION_INCLUDE_DIR}/VisualCorner
                  ${VISION_INCLUDE_DIR}/VisualDetection
 		 ${VISION_INCLUDE_DIR}/VisualFieldEdge
                  ${VISION_INCLUDE_DIR}/VisualLandmark
-		 ${VISION_INCLUDE_DIR}/VisualFieldObject
-		 ${VISION_INCLUDE_DIR}/VisualRobot
-		 ${VISION_INCLUDE_DIR}/VisualCross
+                 ${VISION_INCLUDE_DIR}/VisualFieldObject
+                 ${VISION_INCLUDE_DIR}/VisualRobot
+                 ${VISION_INCLUDE_DIR}/VisualCross
                  ${VISION_INCLUDE_DIR}/VisualLine
-                 #${VISION_INCLUDE_DIR}/Zlib
                  )
+                 
+
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
 
@@ -188,7 +191,34 @@ INSTALL(
   )
 
 ############################ SET LIBRARIES TO LINK WITH
-TARGET_LINK_LIBRARIES( ${VISION_TARGET} ${PYTHON_LIBRARIES} z )
+#Note: I have no idea what the z lib is, but we can't use it to compile visionlink - Octavian
+IF( NO_ZLIB )
+  TARGET_LINK_LIBRARIES( ${VISION_TARGET} ${PYTHON_LIBRARIES} )
+ELSE( NO_ZLIB )
+  TARGET_LINK_LIBRARIES( ${VISION_TARGET} ${PYTHON_LIBRARIES} z )
+ENDIF( NO_ZLIB ) 
+
+############################ VISIONLINK
+IF( VISIONLINK )
+
+  FIND_PACKAGE( JAVA REQUIRED )
+
+  INCLUDE_DIRECTORIES( ${VISIONLINK_HEADER_DIR} 
+                       ${JAVA_INCLUDE_DIR} )
+  IF( WIN32 )
+  ADD_DEFINITIONS( -D_JNI_IMPLEMENTATION_ )
+  ENDIF( WIN32 )
+  SET( VISIONLINK_SRCS ${VISIONLINK_FILE})
+  ADD_LIBRARY(
+    ${VISIONLINK_TARGET}
+    SHARED
+    ${VISIONLINK_SRCS}
+    )
+  TARGET_LINK_LIBRARIES( ${VISIONLINK_TARGET} 
+                        ${VISION_TARGET} 
+                        ${SENSORS_TARGET}
+                        ${NBINCLUDE_TARGET} )
+ENDIF( VISIONLINK )
 
 
 ############################ (SUB)DIRECTORY COMPILATION

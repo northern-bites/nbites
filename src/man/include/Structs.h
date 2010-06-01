@@ -41,8 +41,11 @@ struct BoundingBox {
   point <int> corners[NUM_LINES_IN_BOUNDING_BOX];
 };
 
-struct Rectangle {
-  int left, right, top, bottom;
+struct rectangle {
+  int left;
+  int right;
+  int top;
+  int bottom;
 };
 
 struct plane {

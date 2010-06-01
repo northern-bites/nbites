@@ -38,6 +38,23 @@ inline static void sincosf(float _x, float * _sinx, float * _cosx) {
 
 #endif
 
+#ifdef WIN32
+#define M_PI 3.14159265358979323846
+inline static void sincosf(float _x, float * _sinx, float * _cosx) {
+    *_sinx = std::sin(_x);
+    *_cosx = std::cos(_x);
+}
+
+#define isnan(x) ((x)!=(x))
+
+#define isinf(x)                                                        \
+    (   sizeof (x) == sizeof(float )    ?   __inline_isinff((float)(x)) \
+        :   sizeof (x) == sizeof(double)    ?   __inline_isinfd((double)(x)) \
+        :   __inline_isinf ((long double)(x)))
+
+#endif
+
+
 namespace NBMath {
 
     const int ROUND(float x);
