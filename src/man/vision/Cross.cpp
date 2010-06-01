@@ -82,7 +82,6 @@ void Cross::createObject() {
 
     // loop through all the blobs and test the ones that are the right
     // basic size
-    int safety = 0;
     for (int i = 0; i < blobs->number(); i++) {
         Blob candidate = blobs->get(i);
         if (CROSSDEBUG) {
@@ -94,10 +93,6 @@ void Cross::createObject() {
             candidate.width() < maxRatio * candidate.height()  &&
             candidate.height() < maxRatio * candidate.width()) {
             checkForX(candidate);
-        }
-        safety++;
-        if (safety > 10000){
-            std::cout << "create object safety violation" << std::endl;
         }
     }
 }
@@ -121,7 +116,6 @@ void Cross::checkForX(Blob b) {
     // so finding white is very bad.
 
     // first scan the sides
-    int safety = 0;
     for (int i = max(0, y - 2); i < min(IMAGE_HEIGHT - 1, y + h + 2); i++) {
         if (x > 3) {
             if (thresh->thresholded[i][x - 4] == GREEN)
@@ -138,14 +132,8 @@ void Cross::checkForX(Blob b) {
                 count-=3;
             counter++;
         } else return;
-
-        safety++;
-        if (safety > 10000){
-            std::cout << "check for x safety violation" << std::endl;
-        }
     }
 
-    safety = 0;
     // now scan above and below
     for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
         if (y > 1) {
@@ -163,11 +151,6 @@ void Cross::checkForX(Blob b) {
                 count-=3;
             counter++;
         } else return;
-
-        safety++;
-        if (safety > 10000){
-            std::cout << "check for x 2 safety violation" << std::endl;
-        }
     }
 
     if (CROSSDEBUG) {
@@ -193,7 +176,6 @@ void Cross::checkForX(Blob b) {
         const vector <boost::shared_ptr<VisualLine> >* lines =
             vision->fieldLines->getLines();
 
-        safety = 0;
         for (vector <boost::shared_ptr<VisualLine> >::const_iterator k =
                  lines->begin();
              k != lines->end(); k++) {
@@ -207,12 +189,6 @@ void Cross::checkForX(Blob b) {
                     cout << "Throwing out blob that is part of a line" << endl;
                 return;
             }
-
-            safety++;
-            if (safety > 10000){
-                std::cout << "check for x 3 safety violation" << std::endl;
-            }
-
         }
 
         // Is the cross white enough?  At least half the pixels must be white.
@@ -315,7 +291,6 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
     int ny, nx, starty, startx;
     int good = 0, total = 0;
 
-    int safety = 0;
     for (int i = 0; i < spanY; i++) {
         starty = y + i;
         startx = x;
@@ -330,12 +305,6 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
                     good++;
                 }
             }
-
-            safety++;
-            if (safety > 10000){
-                std::cout << "right blob color safety violation" << std::endl;
-            }
-
         }
     }
 
