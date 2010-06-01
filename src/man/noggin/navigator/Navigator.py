@@ -2,8 +2,9 @@ from math import fabs
 from ..util import FSA
 from . import NavStates
 from . import PlaybookPositionStates
+from . import ChaseStates
 from . import NavConstants as constants
-from . import NavHelper as helper
+from . import NavTransitions as navTrans
 from man.noggin.typeDefs.Location import RobotLocation
 
 class Navigator(FSA.FSA):
@@ -14,6 +15,7 @@ class Navigator(FSA.FSA):
         self.brain = brain
         self.addStates(NavStates)
         self.addStates(PlaybookPositionStates)
+        self.addStates(ChaseStates)
         self.currentState = 'stopped'
         self.setName('Navigator')
         self.setPrintStateChanges(True)
@@ -24,7 +26,6 @@ class Navigator(FSA.FSA):
         self.dest = RobotLocation(0, 0, 0)
 
         # Walk controls
-        self.currentGait = None
         self.walkX = 0
         self.walkY = 0
         self.walkTheta = 0
@@ -32,17 +33,33 @@ class Navigator(FSA.FSA):
         self.angleToOrbit = 0
         self.curSpinDir = 0
 
+        self.shouldAvoidObstacleLeftCounter = 0
+        self.shouldAvoidObstacleRightCounter = 0
+
     def performSweetMove(self, move):
         self.sweetMove = move
         self.switchTo('doingSweetMove')
 
-    def positionPlaybook(self, dest):
-        self.dest = dest
+    def dribble(self):
+        self.switchTo('dribble')
 
-        if not self.currentState == 'playbookWalk'and \
-                not self.currentState == 'playbookOmni' and \
-                not self.currentState == 'playbookSpin':
-            self.switchTo('playbookWalk')
+    def chaseBall(self):
+        """
+        robot will walk to the ball with it centered at his feet.
+        if no ball is visible, localization will be usedn
+        """
+        self.switchTo('walkSpinToBall')
+
+    def kickPosition(self):
+        """
+        state to align on the ball once we are near it
+        """
+        self.switchTo('positionForKick')
+
+    def positionPlaybook(self):
+        """robot will walk to the x,y,h from playbook using a mix of omni,
+        straight walks and spins"""
+        self.switchTo('playbookWalk')
 
     def omniGoTo(self, dest):
         self.dest = dest
@@ -52,11 +69,11 @@ class Navigator(FSA.FSA):
         self.dest = dest
 
         if not self.currentState == 'spinToWalkHeading' and \
-                not self.currentState == 'walkStraightToPoint' and \
-                not self.currentState == 'spinToFinalHeading':
-            if not helper.atHeadingGoTo(self.brain.my, self.dest.h):
+               not self.currentState == 'walkStraightToPoint' and \
+               not self.currentState == 'spinToFinalHeading':
+            if not navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
                 self.switchTo('spinToWalkHeading')
-            elif helper.atHeadingGoTo(self.brain.my, self.dest.h):
+            elif navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
                 self.switchTo('walkStraightToPoint')
 
     def stop(self):
@@ -131,5 +148,3 @@ class Navigator(FSA.FSA):
         self.stepTheta = theta
         self.numSteps = numSteps
         self.switchTo('stepping')
-
-#######SHOULD NOT BE CALLED BY ANYTHING OUTSIDE NAVIGATOR FOLDER#######

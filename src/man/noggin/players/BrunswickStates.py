@@ -44,13 +44,7 @@ def gameReady(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        player.brain.CoA.setRobotGait(player.brain.motion)
-
-        if player.squatting:
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-            player.squatting = False
-        else:
-            player.standup()
+        player.standup()
 
     if player.brain.gameController.ownKickOff:
         player.hasKickedOffKick = False
@@ -76,7 +70,6 @@ def gameSet(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        player.brain.CoA.setRobotGait(player.brain.motion)
 
     if player.firstFrame() and player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
@@ -96,8 +89,6 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
-    if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
     if (player.firstFrame() and
         player.lastDiffState == 'gamePenalized'):
         player.brain.resetLocalization()
@@ -106,8 +97,6 @@ def gamePlaying(player):
     return player.goNow(roleState)
 
 def penaltyShotsGameReady(player):
-    if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
     if player.firstFrame():
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
@@ -119,8 +108,6 @@ def penaltyShotsGameReady(player):
     return player.stay()
 
 def penaltyShotsGameSet(player):
-    if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
     if player.firstFrame():
         player.stopWalking()
         player.brain.loc.resetBall()
@@ -137,8 +124,6 @@ def penaltyShotsGameSet(player):
     return player.stay()
 
 def penaltyShotsGamePlaying(player):
-    if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
     if player.lastDiffState == 'gamePenalized' and \
             player.firstFrame():
         player.brain.resetLocalization()

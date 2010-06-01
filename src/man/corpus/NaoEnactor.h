@@ -43,7 +43,6 @@ private: // Members
 private: // Helper methods
     void sendHardness();
     void sendJoints();
-    void sendUltraSound();
 
     void initDCMAliases();
     void initDCMCommands();

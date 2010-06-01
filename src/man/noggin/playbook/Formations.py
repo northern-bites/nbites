@@ -103,14 +103,6 @@ def fThreeDubD(team, workingPlay):
     """
     fTwoDubD(team, workingPlay)
 
-def fFinder(team, workingPlay):
-    '''no one knows where the ball is'''
-    workingPlay.setFormation(PBConstants.FINDER)
-    if team.me.isDefaultGoalie():
-        Roles.rGoalie(team, workingPlay)
-    else:
-        Roles.rSearcher(team, workingPlay)
-
 def fKickoff(team, workingPlay):
     '''time immediately after kickoff.
     chaser, defender, goalie. different than normal because roles are assigned

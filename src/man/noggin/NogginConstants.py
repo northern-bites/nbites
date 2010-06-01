@@ -1,4 +1,3 @@
-
 # Constants.py
 # This file holds all Constants which span multiple files
 
@@ -12,7 +11,7 @@ USE_VISION = True # Disable if you want faster processing
 
 ##--------------------COM HEADER -------------#
 PACKET_HEADER = "ilikeyoulots"
-NUM_PACKET_ELEMENTS = 19
+NUM_PACKET_ELEMENTS = 20
 ##
 ##--------------------WALK TIME CONSTANTS -------------#
 ##

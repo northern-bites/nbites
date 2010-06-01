@@ -1,8 +1,12 @@
 
 # Redirect standard error to standard out
+import time
 import sys
 _stderr = sys.stderr
 sys.stderr = sys.stdout
+## import cProfile
+## import pstats
+
 
 # Packages and modules from super-directories
 from man import comm
@@ -14,16 +18,16 @@ import sensors
 # Modules from this directory
 from . import GameController
 from . import FallController
-from .headTracking import HeadTracking
-from .navigator import Navigator
-from .util import NaoOutput
 from . import NogginConstants as Constants
-from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet, Play, TeamMember)
 from . import Loc
 from . import TeamConfig
 from . import Leds
-# Packages and modules from sub-directories
 from . import robots
+# Packages and modules from sub-directories
+from .headTracking import HeadTracking
+from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet, Play, TeamMember)
+from .navigator import Navigator
+from .util import NaoOutput
 from .playbook import PBInterface
 from .players import Switch
 
@@ -38,15 +42,19 @@ class Brain(object):
         """
         Class constructor
         """
+        self.counter = 0
+
         self.on = True
         # Output Class
         self.out = NaoOutput.NaoOutput(self)
+
         # Setup nao modules inside brain for easy access
         self.vision = vision.Vision()
         self.sensors = sensors.sensors
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
         self.comm.gc.player = TeamConfig.PLAYER_NUMBER
+
         #initalize the leds
         #print leds
         self.leds = Leds.Leds(self)
@@ -54,9 +62,11 @@ class Brain(object):
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
         self.motionModule = motion
+
         # Get the pointer to the C++ RoboGuardian object for use with Python
         self.roboguardian = _roboguardian.roboguardian
         self.roboguardian.enableFallProtection(True)
+
         # Get our reference to the C++ localization system
         self.loc = Loc()
 
@@ -71,14 +81,17 @@ class Brain(object):
 
         # Initialize various components
         self.my = MyInfo.MyInfo()
+
         # Functional Variables
         self.my.playerNumber = self.comm.gc.player
+
         # Information about the environment
         self.initFieldObjects()
         self.initTeamMembers()
         self.ball = Ball.Ball(self.vision.ball)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
+
         # workaround for slarti (now trillian) sonar problems
         if self.CoA.name == 'marvin':
             self.sonar.MIN_DIST = 30.0
@@ -96,22 +109,24 @@ class Brain(object):
         Build our set of Field Objects which are team specific compared
         to the generic forms used in the vision system
         """
+
         # Build instances of the vision based field objects
         # Yello goal left and right posts
         self.yglp = Landmarks.FieldObject(self.vision.yglp,
-                                         Constants.VISION_YGLP)
+                                          Constants.VISION_YGLP)
         self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
-                                         Constants.VISION_YGRP)
+                                          Constants.VISION_YGRP)
+
         # Blue Goal left and right posts
         self.bglp = Landmarks.FieldObject(self.vision.bglp,
-                                         Constants.VISION_BGLP)
+                                          Constants.VISION_BGLP)
         self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
-                                         Constants.VISION_BGRP)
+                                          Constants.VISION_BGRP)
 
         self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
-                                            Constants.VISION_BG_CROSSBAR)
+                                             Constants.VISION_BG_CROSSBAR)
         self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
-                                            Constants.VISION_YG_CROSSBAR)
+                                             Constants.VISION_YG_CROSSBAR)
 
         # Now we setup the corners
         self.corners = []
@@ -120,12 +135,12 @@ class Brain(object):
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
 
-
     def makeFieldObjectsRelative(self):
         """
         Builds a list of fieldObjects based on their relative names to the robot
         Needs to be called when team color is determined
         """
+
         # Blue team setup
         if self.my.teamColor == Constants.TEAM_BLUE:
             # Yellow goal
@@ -171,30 +186,55 @@ class Brain(object):
             mate.playerNumber = i + 1
             self.teamMembers.append(mate)
 
-
 ##
 ##--------------CONTROL METHODS---------------##
 ##
+    def profile(self):
+        if self.counter == 0:
+            cProfile.runctx('self.run()',  self.__dict__, locals(),
+                            'pythonStats')
+            self.p = pstats.Stats('pythonStats')
+
+        elif self.counter < 3000:
+            self.p.add('pythonStats')
+            cProfile.runctx('self.run()',  self.__dict__, locals(),
+                            'pythonStats')
+
+        elif self.counter == 3000:
+            self.p.strip_dirs()
+            self.p.sort_stats('cumulative')
+            ## print 'PYTHON STATS:'
+            ## self.p.print_stats()
+            ## print 'OUTGOING CALLEES:'
+            ## self.p.print_callees()
+            ## print 'OUTGOING CALLEES:'
+            ## self.p.print_callers()
+            self.p.dump_stats('pythonStats')
+
+        self.counter += 1
 
     def run(self):
         """
         Main control loop called every TIME_STEP milliseconds
         """
+
+        # order here is very important
         # Update Environment
-        self.ball.updateVision(self.vision.ball)
-        self.updateFieldObjects()
-        self.sonar.updateSensors(self.sensors, sensors.UltraSoundMode)
+        self.updateVisualObjects()
+        self.sonar.updateSensors(self.sensors)
 
         # Communications update
         self.updateComm()
 
         # Localization Update
         self.updateLocalization()
+        self.ball.updateBestValues(self.my)
 
         #Set LEDS
         self.leds.processLeds()
 
         # Behavior stuff
+        self.time = time.time()
         self.gameController.run()
         self.fallController.run()
         self.updatePlaybook()
@@ -208,10 +248,11 @@ class Brain(object):
         # Update any logs we have
         self.out.updateLogs()
 
-    def updateFieldObjects(self):
+    def updateVisualObjects(self):
         """
         Update information about seen objects
         """
+        self.ball.updateVision(self.vision.ball)
         self.yglp.updateVision(self.vision.yglp)
         self.ygrp.updateVision(self.vision.ygrp)
         self.bglp.updateVision(self.vision.bglp)
@@ -222,6 +263,7 @@ class Brain(object):
         # Update the corner information
         self.corners = []
 
+        self.time = time.time()
         # Now we get the latest list of lines
         self.lines = []
 
@@ -237,6 +279,7 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
+
         # Update global information to current estimates
         self.my.updateLoc(self.loc)
         self.ball.updateLoc(self.loc, self.my)
@@ -245,7 +288,7 @@ class Brain(object):
         """
         updates self.play to the new play
         """
-        self.play = self.playbook.update()
+        self.playbook.update(self.play)
 
     # move to comm
     def setPacketData(self):
@@ -263,6 +306,7 @@ class Brain(object):
                           loc.ballXUncert,
                           loc.ballYUncert,
                           self.ball.dist,
+                          self.ball.bearing,
                           self.play.role,
                           self.play.subRole,
                           self.playbook.pb.me.chaseTime,
@@ -273,6 +317,7 @@ class Brain(object):
         """
         Reset our localization
         """
+
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
@@ -282,6 +327,7 @@ class Brain(object):
         """
         Reset our localization
         """
+
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()

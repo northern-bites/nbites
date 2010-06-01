@@ -2,26 +2,6 @@ from .. import NogginConstants
 import KickingConstants as constants
 from ..typeDefs.Location import Location
 
-def inCenterOfField(player):
-    return NogginConstants.FIELD_HEIGHT *2/3 > player.brain.my.y > \
-        NogginConstants.FIELD_HEIGHT / 3
-
-def inTopOfField(player):
-    return NogginConstants.FIELD_HEIGHT*2/3 < player.brain.my.y
-
-def inBottomOfField(player):
-    return NogginConstants.FIELD_HEIGHT/3 > player.brain.my.y
-
-def isFacingSideline(player):
-    h = player.brain.my.h
-
-    return (inTopOfField(player) and
-            constants.FACING_SIDELINE_ANGLE > h >
-            180.0 - constants.FACING_SIDELINE_ANGLE ) or \
-            (inBottomOfField(player) and
-             -constants.FACING_SIDELINE_ANGLE > h >
-             -(180 - constants.FACING_SIDELINE_ANGLE) )
-
 def getShotCloseAimPoint(player):
     return Location(NogginConstants.FIELD_WIDTH,
                     NogginConstants.MIDFIELD_Y)
@@ -47,7 +27,7 @@ def getKickObjective(player):
     if my.x < NogginConstants.FIELD_WIDTH / 2:
         return constants.OBJECTIVE_CLEAR
 
-    elif my.dist( Location(NogginConstants.OPP_GOALBOX_RIGHT_X,
+    elif my.distTo( Location(NogginConstants.OPP_GOALBOX_RIGHT_X,
                            NogginConstants.OPP_GOALBOX_MIDDLE_Y )) > \
                            NogginConstants.FIELD_WIDTH / 3 :
         return constants.OBJECTIVE_CENTER

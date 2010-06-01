@@ -1,4 +1,3 @@
-
 #include <errno.h>       // errno
 #include <string.h>      // strerror(), memcpy()
 

@@ -1,4 +1,3 @@
-
 // This file is part of TOOL, a robotics interaction and development
 // package created by the Northern Bites RoboCup team of Bowdoin College
 // in Brunswick, Maine.
@@ -34,7 +33,7 @@ import TOOL.TOOLException;
  * in other Java implementations
  */
 public abstract class AbstractDataSet implements DataSet {
-    
+
     private DataSource set_source;
     private int    set_index;
     private String set_path;
@@ -70,7 +69,7 @@ public abstract class AbstractDataSet implements DataSet {
     public int index() {
         return set_index;
     }
-    
+
     protected void init(String name, String desc, int size) {
 
         // initialize vectors to unloaded Frame objects
@@ -89,7 +88,7 @@ public abstract class AbstractDataSet implements DataSet {
     }
 
     public int hasImages() {
-        
+
         int sum = NONE;
         for (Frame f : frames)
             if (f.hasImage())
@@ -181,7 +180,7 @@ public abstract class AbstractDataSet implements DataSet {
     public String name() {
         return set_name;
     }
-    
+
     public void setName(String s) {
         set_name = s;
     }
@@ -227,7 +226,7 @@ public abstract class AbstractDataSet implements DataSet {
                 return false;
         return true;
     }
-    
+
     public boolean loaded(int i) {
         return frameLoaded.get(i);
     }
@@ -304,7 +303,7 @@ public abstract class AbstractDataSet implements DataSet {
     }
 
     /**
-    * unload(i) removes data associated with the frame at index i, 
+    * unload(i) removes data associated with the frame at index i,
     * and removes it from the cache, if applicable.
     */
     public void unload(int i) throws TOOLException {

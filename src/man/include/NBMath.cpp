@@ -103,5 +103,5 @@ const float NBMath::safe_atan2(const float y, const float x)
             return -M_PI_FLOAT / 2.0f;
         }
     }
-    return atan2(y,x);
+    return static_cast<float>(atan2(y,x));
 }

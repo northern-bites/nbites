@@ -104,7 +104,10 @@ public:
           P_k(dimension,dimension), P_k_bar(dimension,dimension),
           dimensionIdentity(dimension), numStates(dimension),
           measurementSize(mSize), betas(dimension), gammas(dimension),
-          frameCounter(0) {
+          frameCounter(0), K_k(numStates, measurementSize, 0.0f),
+		  H_k(measurementSize, numStates, 0.0f),
+		  R_k(measurementSize, measurementSize, 0.0f),
+		  v_k(measurementSize){
 
         // Initialize all matrix values to 0
         for(unsigned i = 0; i < dimension; ++i) {
@@ -140,12 +143,15 @@ public:
 
     virtual ~EKF() {}
 
+	StateVector getState() const { return xhat_k; }
+	StateMatrix getStateUncertainty() const { return P_k; }
+
     // Core functions
     virtual void timeUpdate(UpdateModel u_k) {
         ++frameCounter;
         // Have the time update prediction incorporated
         // i.e. odometery, natural roll, etc.
-        StateVector deltas = associateTimeUpdate(u_k);
+        const StateVector deltas = associateTimeUpdate(u_k);
         xhat_k_bar = xhat_k + deltas;
 
         // Calculate the uncertainty growth for the current update
@@ -154,7 +160,7 @@ public:
         }
 
         // Update error covariance matrix
-        StateMatrix newP = prod(P_k, trans(A_k));
+        const StateMatrix newP = prod(P_k, trans(A_k));
         P_k_bar = prod(A_k, newP) + Q_k;
 
 #ifdef DEBUG_JACOBIAN_JUNK
@@ -183,57 +189,46 @@ public:
     }
 
     virtual void correctionStep(std::vector<Measurement> z_k) {
-        // Necessary computational matrices
-        // Kalman gain matrix
-        StateMeasurementMatrix K_k =
-            boost::numeric::ublas::scalar_matrix<float>(numStates,
-														measurementSize,
-														0.0f);
-        // Observation jacobian
-        StateMeasurementMatrix H_k =
-            boost::numeric::ublas::scalar_matrix<float>(measurementSize,
-                                        numStates, 0.0f);
-        // Assumed error in measurment sensors
-        MeasurementMatrix R_k = boost::numeric::ublas::scalar_matrix<float>(
-            measurementSize, measurementSize, 0.0f);
-        // Measurement invariance
-        MeasurementVector v_k(measurementSize);
 
         // Incorporate all correction observations
         for(unsigned int i = 0; i < z_k.size(); ++i) {
-            incorporateMeasurement(z_k[i], H_k, R_k, v_k);
-
-            if (R_k(0,0) == DONT_PROCESS_KEY) {
-                continue;
-            }
-            // Calculate the Kalman gain matrix
-            const StateMeasurementMatrix pTimesHTrans = prod(P_k_bar, trans(H_k));
-
-            if(measurementSize == 2){
-                K_k = prod(pTimesHTrans,
-                           NBMath::invert2by2(prod(H_k, pTimesHTrans) + R_k));
-            }else{
-                const MeasurementMatrix inv =
-                    NBMath::solve(prod(H_k, pTimesHTrans) + R_k,
-                                  boost::numeric::ublas::identity_matrix<float>(
-                                      measurementSize));
-                K_k = prod(pTimesHTrans, inv);
-            }
-
-            // Use the Kalman gain matrix to determine the next estimate
-            xhat_k_bar = xhat_k_bar + prod(K_k, v_k);
-
-            // Update associate uncertainty
-            P_k_bar = prod(dimensionIdentity - prod(K_k,H_k), P_k_bar);
+			correctionStep(z_k[i]);
         }
 
         // Allow implementing classes to do things before copying the vectors
         // For most implementations this should be ignored
         beforeCorrectionFinish();
 
-        xhat_k = xhat_k_bar;
-        P_k = P_k_bar;
+		// Copy the updated states onto the EKF's state
+		updateState();
     }
+
+	virtual void correctionStep(Measurement z_k){
+		incorporateMeasurement(z_k, H_k, R_k, v_k);
+
+		if (R_k(0,0) == DONT_PROCESS_KEY) {
+			return;
+		}
+		// Calculate the Kalman gain matrix
+		const StateMeasurementMatrix pTimesHTrans = prod(P_k_bar, trans(H_k));
+
+		if(measurementSize == 2){
+			K_k = prod(pTimesHTrans,
+					   NBMath::invert2by2(prod(H_k, pTimesHTrans) + R_k));
+		}else{
+			const MeasurementMatrix inv =
+				NBMath::solve(prod(H_k, pTimesHTrans) + R_k,
+							  boost::numeric::ublas::identity_matrix<float>(
+								  measurementSize));
+			K_k = prod(pTimesHTrans, inv);
+		}
+
+		// Use the Kalman gain matrix to determine the next estimate
+		xhat_k_bar = xhat_k_bar + prod(K_k, v_k);
+
+		// Update associate uncertainty
+		P_k_bar = prod(dimensionIdentity - prod(K_k,H_k), P_k_bar);
+	}
 
     virtual void noCorrectionStep(void) {
         // Set current estimates to a priori estimates
@@ -246,6 +241,11 @@ public:
      * For most implementations this should be ignored
      */
     virtual void beforeCorrectionFinish(void) {}
+
+	virtual void updateState() {
+        xhat_k = xhat_k_bar;
+        P_k = P_k_bar;
+	}
 
 protected:
     // Pure virtual methods to be specified by implementing class
@@ -271,6 +271,11 @@ protected:
         }
         return false;
     }
+
+	// Necessary computational matrices for correction step
+	StateMeasurementMatrix K_k, H_k;
+	MeasurementMatrix R_k;
+	MeasurementVector v_k;
 };
 
 #endif //EKF_h_DEFINED
