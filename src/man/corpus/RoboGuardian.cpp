@@ -11,6 +11,10 @@ using namespace std;
 #include "UnfreezeCommand.h"
 
 //#define DEBUG_GUARDIAN_CLICKS
+#define WIFI_CONNECTION NBITES
+#define WIFI_RECONNECTS_MAX 5
+//check for a connection once in 20 secs
+#define CONNECTION_CHECK_RATE 20*RoboGuardian::GUARDIAN_FRAME_RATE
 
 const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
@@ -68,7 +72,8 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       notFallingFrames(0),fallenCounter(0),
       registeredFalling(false),registeredShutdown(false),
       falling(false),fallen(false),
-      useFallProtection(false)
+      useFallProtection(false),
+      wifiReconnectTimeout(0)
 {
     pthread_mutex_init(&click_mutex,NULL);
     executeStartupAction();
@@ -83,9 +88,10 @@ void RoboGuardian::run(){
     Thread::running = true;
     Thread::trigger->on();
 
-	struct timespec interval, remainder;
-	interval.tv_sec = 0;
-	interval.tv_nsec = static_cast<long long int>(GUARDIAN_FRAME_LENGTH_uS * 1000);
+    struct timespec interval, remainder;
+    interval.tv_sec = 0;
+    interval.tv_nsec = static_cast<long long int> (GUARDIAN_FRAME_LENGTH_uS * 1000);
+    int connectionCheckCount = 0;
     while(Thread::running){
 
         countButtonPushes();
@@ -95,7 +101,13 @@ void RoboGuardian::run(){
         checkTemperatures();
         processFallingProtection();
         processChestButtonPushes();
-		nanosleep(&interval, &remainder);
+        if (connectionCheckCount == CONNECTION_CHECK_RATE) {
+            connectionCheckCount = 0;
+            checkConnection();
+        } else {
+            connectionCheckCount++;
+        }
+        nanosleep(&interval, &remainder);
     }
 
     Thread::trigger->off();
@@ -351,7 +363,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         enableGains();
         break;
     case 7:
-        resetWifiConnection();
+        reconnectWifiConnection();
         break;
     case 9:
         //Easter EGG!
@@ -418,7 +430,7 @@ const string RoboGuardian::discoverIP() const{
         fclose(ipf);
     }else{
         cout << "Unable to read IP from this platform"<<endl;
-        return "1.1.1.1";
+        return "0";
     }
 
 }
@@ -434,8 +446,6 @@ void RoboGuardian::speakIPAddress()const {
     speech_command += " "+mynameis_wav;
     speech_command += " "+nbsdir+host+wav;
     speech_command += " "+my_address_is_wav;
-
-
 
     for (unsigned int i = 0; i < IP.size(); i++){
         char digit = IP[i];
@@ -467,9 +477,63 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
         return chestButton;
     }
 }
+//TODO: comment
+void RoboGuardian::checkConnection(){
 
+    const string IP = discoverIP();
+    if (IP.size() >= 7 && (IP[0] == '1' || IP[0] == '2')) {
+        wifiReconnectTimeout = 0;
+        return;
+    } else {
+        if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
+            cout    << "No connection detected, trying to reconnect to NBITES, attempt "
+                    << wifiReconnectTimeout << endl;
+            reconnectWifiConnection();
+            wifiReconnectTimeout++;
+        }
+    }
+}
 
-void RoboGuardian::resetWifiConnection(){
+bool RoboGuardian::checkWired(){
+
+    FILE * f1 = popen("connman services | awk '/Wired/ {print $1}'", "r");
+    char status[3] = "";
+    fscanf(f1,"%s\n",status);
+    fclose(f1);
+    if(status[0] == '*') {
+        cout<<"wired "<<status<<endl;
+        return true;
+    }
+    return false;
+}
+
+bool RoboGuardian::checkWireless(){
+
+    FILE * f2 = popen("connman services | awk '/NBITES/ {print $1}'", "r");
+    char status[3] = "";
+    fscanf(f2,"%s\n",status);
+    fclose(f2);
+    if (status[0] == '*') {
+        cout<<"wireless"<<endl;
+        return true;
+    }
+    return false;
+}
+
+// we assume that autoconnect is on and that we already  have connected
+// to the network before
+void RoboGuardian::reconnectWifiConnection(){
     playFile(wifi_restart_wav);
-    int result = system("/etc/init.d/wireless restart &");
+    FILE * f3 = popen("connman services | awk '/NBITES/ {print $4}'", "r");
+    char service[100] = "";
+    int fscanfResult = fscanf(f3,"%s\n", service);
+    fclose(f3);
+
+    if (service[0] != ' ') {
+        char command[100] = "connman connect ";
+        strcat(command, service);
+        system(command);
+    } else {
+        cout<<"couldn't find specified wifi network to reconnect to";
+    }
 }
