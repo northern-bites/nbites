@@ -90,7 +90,7 @@ static const bool POSTLOGIC = false;
 static const bool TOPFIND = false;
 static const bool CORNERDEBUG = false;
 static const bool SANITY = false;
-static const bool CORRECT = false;
+static const bool CORRECT = true;
 #else
 static const bool PRINTOBJS = false;
 static const bool POSTDEBUG = false;
@@ -593,10 +593,11 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
     @param c2      secondary color
  */
 
-float ObjectFragments::correct(Blob b, int color, int c2) {
+float ObjectFragments::correct(Blob & b, int color, int c2) {
 	const float GOOD_SLOPE = 0.25f;
 
 	int points[3];
+	int corrections[3];
 	int diffy = (b.getLeftBottomY() - b.getLeftTopY()) / 4;
 	int midy = b.getLeftTopY();
 	int midsy = 0, bottomy = 0, topy = 0;
@@ -606,6 +607,7 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 	for (int k = 1; k > -2; k = k - 2) {
 		// loop at 1/4 2/4 and 3/4
 		for (int i = 1; i < 4; i++) {
+			corrections[i-1] = 0;
 			midy = midy + diffy;
 			if (k > 0) {
 				midx = b.getLeft();
@@ -630,10 +632,39 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 							count++;
 						}
 					}
-				} else count++;
+				} else {
+					count++;
+					corrections[i-1]++;
+				}
 				if (count >  2) correct = true;
 			}
 			points[i-1] = midx;
+		}
+		if (corrections[0] > 0 && corrections[1] > 0 && corrections[2] > 0) {
+			if (CORRECT) {
+				cout << "All negative corrections " << corrections[0] << " " << corrections[1] << " " <<
+					corrections[2] << " " << endl;
+			}
+			int magnitude = pickNth(corrections, 3, 3);
+			if (k > 0) {
+				drawLine(b.getLeftTopX(), b.getLeftTopY(), b.getLeftBottomX(), b.getLeftBottomY(), ORANGE);
+				// left side is too far out
+				int oldx = b.getLeftTopX();
+				b.setLeftTopX(oldx + magnitude);
+				b.setLeftTopY(max(0, yProject(oldx, b.getLeftTopY(), b.getLeftTopX())));
+				oldx = b.getLeftBottomX();
+				b.setLeftBottomX(oldx + magnitude);
+				b.setLeftBottomY(min(IMAGE_HEIGHT - 1, yProject(oldx, b.getLeftBottomY(), b.getLeftBottomX())));
+			} else {
+				drawLine(b.getRightTopX(), b.getRightTopY(), b.getRightBottomX(), b.getRightBottomY(), ORANGE);
+				// right side is too far out
+				int oldx = b.getRightTopX();
+				b.setRightTopX(oldx - magnitude);
+				b.setRightTopY(max(0, yProject(oldx, b.getRightTopY(), b.getRightTopX())));
+				oldx = b.getRightBottomX();
+				b.setRightBottomX(oldx - magnitude);
+				b.setRightBottomY(min(IMAGE_HEIGHT - 1, yProject(oldx, b.getRightBottomY(), b.getRightBottomX())));
+			}
 		}
 		float newSlope1 = -(float)(points[2] - points[1]) /
 			(float)(bottomy - midsy);
@@ -641,10 +672,17 @@ float ObjectFragments::correct(Blob b, int color, int c2) {
 			(float)(midsy - topy);
 		float newSlope3 = -(float)(points[2] - points[0]) /
 			(float)(bottomy - topy);
-		if (CORRECT)
-			cout << "Slopes " << newSlope1 << " " << newSlope2 << " " << newSlope3 << endl;
+		if (CORRECT) {
+			cout << "Slopes " << newSlope1 << " " << newSlope2 << " " << newSlope3 << " " << correct << endl;
+			if (correct) {
+				cout << "Correct is true" << endl;
+			} else {
+				cout << "Correct is false" << endl;
+			}
+		}
 		if (correct && abs(newSlope1 - newSlope2) < GOOD_SLOPE &&
-			abs(newSlope2 - newSlope3) < GOOD_SLOPE && abs(newSlope3 - slope) > 0.25) {
+			b.getLeft() > 5 && b.getRight() < IMAGE_WIDTH - 4 &&
+			abs(newSlope2 - newSlope3) < GOOD_SLOPE && abs(newSlope3 - slope) > 0.1) {
 			return newSlope3;
 		}
 		midy = b.getRightTopY();
@@ -697,21 +735,29 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 		obj.setRightBottom(rightBottom);
 		// check if our estimated slope from pose is not right for this post
 		float newSlope = 0.0f;
-		if (i == 0 && obj.height() > 100 && obj.getLeft() != 0 && obj.getRight() < IMAGE_WIDTH - 5) {
+		//if (i == 0 && obj.height() > 100 && obj.getLeft() != 0 && obj.getRight() < IMAGE_WIDTH - 5) {
+		if (i == 0) {
 		  newSlope = correct(obj, c, c2);
 		  // if we detected that the post was leaning then redo with a new slope
+		  leftTop = point<int>(obj.getLeftTopX(), obj.getLeftTopY());
+		  rightTop = point<int>(obj.getRightTopX(), obj.getRightTopY());
+		  leftBottom = point<int>(obj.getLeftBottomX(), obj.getLeftBottomY());
+		  rightBottom = point<int>(obj.getRightBottomX(), obj.getRightBottomY());
 		  if (newSlope != 0.0) {
 			  if (CORRECT) {
 				  cout << "Old slope was " << slope << " " << newSlope << endl;
 			  }
 			  slope = newSlope;
-			  drawBlob(obj, ORANGE);
 			  // we need to be very careful about placement here
 			  // determine the center of the blob
 			  int midTopx = (leftTop.x + rightTop.x) / 2;
 			  int midBottomx = (leftBottom.x + rightBottom.x) / 2;
 			  int midY = (leftTop.y + leftBottom.y) / 2;
 			  int newx = xProject((midBottomx + midTopx) / 2, midY, obj.getTop());
+			  if (CORRECT) {
+				  drawPoint(newx, midY, RED);
+				  cout << "New start " << newx << " " << midY << endl;
+			  }
 			  leftTop = point<int>(newx, obj.getTop());
 			  rightTop = point<int>(newx, obj.getTop());
 			  newx = xProject((midBottomx, +midTopx) / 2, midY, obj.getBottom());
