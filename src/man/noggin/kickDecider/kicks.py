@@ -1,7 +1,7 @@
 from man.motion import SweetMoves
-from KickingConstants import *
+from KickingConstants import DEFAULT_KICK_X_OFFSET
 
-class Kick:
+class Kick(object):
     """
     stores everything we need to know for a given kick
     """

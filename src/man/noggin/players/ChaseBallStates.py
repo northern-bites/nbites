@@ -109,13 +109,13 @@ def positionForKick(player):
 
     if player.firstFrame():
         player.brain.kickDecider.decideKick()
-        player.chosenKick = player.brain.kickDecider.currentKick
+        player.chosenKick = player.brain.kickDecider.currentKick.sweetMove
         player.brain.nav.kickPosition()
         player.inKickingState = True
 
     # Leave this state if necessary
     if transitions.shouldKick(player):
-        return player.goNow('executeBallKick')
+        return player.goNow('kickBallExecute')
 
     elif transitions.shouldScanFindBall(player):
         player.inKickingState = False

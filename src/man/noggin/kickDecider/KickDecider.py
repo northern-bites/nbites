@@ -1,16 +1,21 @@
+from .. import NogginConstants
 from . import kicks
-class KickDecider:
+from . import KickingConstants as constants
+from math import fabs
+
+class KickDecider(object):
     """
     uses current information when called to determine what the best possible
     kick is and where we need to be to execute it
     """
+
     def __init__(self, brain):
         self.brain = brain
         self.hasKickedOff = False
-        self.objDict = { constants.OBJECTIVE_CLEAR:kickoff(self),
-                          constants.OBJECTIVE_CENTER:center(self),
-                          constants.OBJECTIVE_SHOOT:shoot(self),
-                          constants.OBJECTIVE_KICKOFF:kickoff(self) }
+        self.objDict = { constants.OBJECTIVE_CLEAR:self.kickoff(),
+                          constants.OBJECTIVE_CENTER:self.center(),
+                          constants.OBJECTIVE_SHOOT:self.shoot(),
+                          constants.OBJECTIVE_KICKOFF:self.kickoff() }
         self.currentKick = None
 
     def decideKick(self):
@@ -18,7 +23,9 @@ class KickDecider:
         using objective and localization determines best kick to make
         """
 
-        objective = getObjective(self)
+        objective = self.getObjective()
+
+        # uses dictionary to retrieve and call proper method
         kickDest = self.objDict[objective]
         # take my position and destination of kick to decide which kick
         # need to consider: distance to kick, time needed to align for kick
@@ -38,8 +45,8 @@ class KickDecider:
             #kick straight
             # left or right foot?
             leftFootKick = False
-
-            if my.y < ball.y:
+            
+            if self.brain.my.y < self.brain.ball.y:
                 # right foot
                 leftFootKick = False
             else:
@@ -91,6 +98,7 @@ class KickDecider:
 
     def kickoff(self):
         """returns a destination for kickoff kick """
+        self.hasKickedOff = True
         return constants.LEFT_KICKOFF_POINT
 
     def clear(self):

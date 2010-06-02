@@ -101,7 +101,6 @@ def chaseAroundBox(nav):
 def ballInMyBox(nav):
     if nav.firstFrame():
         nav.brain.tracker.activeLoc()
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
 
     ball = nav.brain.ball
 
@@ -129,25 +128,42 @@ PFK_Y_GAIN = 0.6
 
 
 def positionForKick(nav):
-    ## nav.dest = kick.getKickPosition()
+    """
+    move to position relative to ball given by offset and heading calculated
+    by kick decider without running into the ball
+    """
+    (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
 
     ## sX,sY,sTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
 
     ball = nav.brain.ball
 
     # Determine approach speed
-    sY = MyMath.clip(ball.relY * PFK_Y_GAIN,
-                     PFK_MIN_Y_SPEED,
-                     PFK_MAX_Y_SPEED)
+    target_x = ball.relX - x_offset
 
-    sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
-
-    if ball.dist > 10.:
-        sX = MyMath.clip(ball.relX * PFK_X_GAIN,
+    if fabs(target_x) < 1.0:
+        sX = 0
+    else:
+        sX = MyMath.clip(target_x * PFK_X_GAIN,
                          PFK_MIN_X_SPEED,
                          PFK_MAX_X_SPEED)
+
+    target_y = ball.relY - y_offset
+
+    if fabs(target_y) < 1.0:
+        sY = 0
     else:
-        sX = 0.0
+        sY = MyMath.clip(target_y * PFK_Y_GAIN,
+                         PFK_MIN_Y_SPEED,
+                         PFK_MAX_Y_SPEED)
+
+        sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
+
+    print ("x_offset: %g y_offset:%g target_x:%g target_y:%g" %
+           (x_offset, y_offset, target_x, target_y))
+
+    if sX == 0.0 and sY == 0.0:
+        return nav.goNow('stop')
 
     helper.setSlowSpeed(nav,sX,sY,0)
 

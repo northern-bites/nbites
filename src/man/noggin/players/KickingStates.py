@@ -518,7 +518,7 @@ def alignOnBallStraightKick(player):
 def kickBallExecute(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.executeMove(player.brain.kickDecider.currentKick)
+        player.executeMove(player.chosenKick)
 
         if not player.penaltyMadeFirstKick:
             player.penaltyMadeFirstKick = True
@@ -530,7 +530,7 @@ def kickBallExecute(player):
         player.lookPostKick()
 
     if player.stateTime >= \
-            SweetMoves.getMoveTime(player.brain.kickDecider.currentKick):
+            SweetMoves.getMoveTime(player.chosenKick):
         return player.goLater('afterKick')
 
     return player.stay()
@@ -541,7 +541,6 @@ def afterKick(player):
     Currently exits after one frame.
     """
     tracker = player.brain.tracker
-    chosenKick = player.chosenKick
 
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
