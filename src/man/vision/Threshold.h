@@ -41,7 +41,7 @@ class Threshold;  // forward reference
 #define VMAX  128
 #endif
 
-#define SHOULDERS
+//#define SHOULDERS
 
 //#define USE_EDGES
 #define ROOM223

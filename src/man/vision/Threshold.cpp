@@ -980,11 +980,13 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 				float dist = 0.0f;
 				float angle1 = 0.0f;
 				int postX = 0, postY = 0;
+				float postAngle = 0.0f;
 				// get the relevant distances
 				if (ylp) {
 					dist = vision->yglp->getDistance();
 					postX = vision->yglp->getLeftBottomX();
 					postY = vision->yglp->getLeftBottomY();
+					postAngle = vision->yglp->getAngleXDeg();
 					if (yrp) {
 						dist = min(dist, vision->ygrp->getDistance());
 					}
@@ -992,18 +994,34 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 					dist = vision->ygrp->getDistance();
 					postX = vision->ygrp->getLeftBottomX();
 					postY = vision->ygrp->getLeftBottomY();
+					postAngle = vision->ygrp->getAngleXDeg();
 				}
 				// compare the distances
 				estimate pest = pose->pixEstimate(postX, postY, 0.0);
-				cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << endl;
-				cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
-				if (pest.dist > 0.1) {
+				float newDist = pose->getDistanceBetweenTwoObjects(pest, obj_est);
+				//cout << "Angles " << objPtr->getAngleXDeg() << " " << postAngle << endl;
+				//cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << " " << newDist << endl;
+				//cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
+				if (pest.dist > 0.1 && pest.dist < 300.0f) {
 					dist = pest.dist;
 				}
-				if (fabs(obj_est.dist - dist) < 300.0) {
+				// start simple if the goal is close enough it has to be the near cross
+				if (dist < 350.0f) {
+					objPtr->setID(YELLOW_GOAL_CROSS);
+				} else if (dist > 550.0f) {
+					if (obj_est.dist < 200.0f) {
+						objPtr->setID(BLUE_GOAL_CROSS);
+					} else {
+						objPtr->setID(YELLOW_GOAL_CROSS);
+					}
+				} else if (fabs(obj_est.dist - dist) < 300.0) {
 					objPtr->setID(YELLOW_GOAL_CROSS);
 				} else {
-					objPtr->setID(BLUE_GOAL_CROSS);
+					if (fabs(obj_est.dist - dist) < 400.0 && obj_est.dist > 200.0f) {
+						objPtr->setID(YELLOW_GOAL_CROSS);
+					} else {
+						objPtr->setID(BLUE_GOAL_CROSS);
+					}
 				}
 			} else if (blp || brp) {
 				float dist = 0.0f;
@@ -1021,15 +1039,27 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 					postY = vision->bgrp->getLeftBottomY();
 				}
 				estimate pest = pose->pixEstimate(postX, postY, 0.0);
-				cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << endl;
-				cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
-				if (pest.dist > 0.1) {
+				//cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << endl;
+				//cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
+				if (pest.dist > 0.1 && pest.dist < 300.0f) {
 					dist = pest.dist;
 				}
-				if (fabs(obj_est.dist - dist) < 300.0) {
+				if (dist < 350.0f) {
+					objPtr->setID(BLUE_GOAL_CROSS);
+				} else if (dist > 550.0f) {
+					if (obj_est.dist < 200.0f) {
+						objPtr->setID(YELLOW_GOAL_CROSS);
+					} else {
+						objPtr->setID(BLUE_GOAL_CROSS);
+					}
+				} else if (fabs(obj_est.dist - dist) < 300.0) {
 					objPtr->setID(BLUE_GOAL_CROSS);
 				} else {
-					objPtr->setID(YELLOW_GOAL_CROSS);
+					if (fabs(obj_est.dist - dist) < 400.0 && obj_est.dist > 200.0f) {
+						objPtr->setID(BLUE_GOAL_CROSS);
+					} else {
+						objPtr->setID(YELLOW_GOAL_CROSS);
+					}
 				}
 			} else {
 				objPtr->setID(ABSTRACT_CROSS);

@@ -1328,10 +1328,10 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
 
     int numPointsRemainining = remainingPoints.size();
 
-    if (debugFitUnusedPoints)
+    /*if (debugFitUnusedPoints)
         cout << "Beginning fitUnusedPoints with " << lines.size()
              << " lines and " << numPointsRemainining << " unused points."
-             << endl;
+             << endl;*/
 
     for (vector< shared_ptr<VisualLine> >::iterator i = lines.begin();
 		 i != lines.end(); ++i){
@@ -1352,12 +1352,12 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
 
             if (jDistFromI > maxDist) {
                 sanityChecksPass = false;
-                if (debugFitUnusedPoints)
+                /*if (debugFitUnusedPoints)
                     cout << "Point " << (*j) << " was too far away from the "
                          << (*i)->colorStr << " line to be "
                          << "included.  Was " << jDistFromI
                          << " pixels away, needed to " << "be at most "
-                         << maxDist << " away." << endl;
+                         << maxDist << " away." << endl;*/
             }
 
 
@@ -1369,7 +1369,7 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
             else if (j->foundWithScan == VERTICAL) {
                 float widthDiff = fabs(j->lineWidth - (*i)->avgVerticalWidth);
                 if (widthDiff > MAX_VERT_FIT_UNUSED_WIDTH_DIFFERENCE) {
-                    if (debugFitUnusedPoints) {
+                    /*if (debugFitUnusedPoints) {
                         cout << "Point " << (*j)
                              << " had a vertical width that differed "
                              << "too much from the line width of the "
@@ -1379,7 +1379,7 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                              << ", line point width was " << j->lineWidth
                              << ". Max width difference is "
                              << MAX_VERT_FIT_UNUSED_WIDTH_DIFFERENCE << endl;
-                    }
+							 }*/
                     sanityChecksPass = false;
                 }
             }
@@ -1401,17 +1401,17 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
 
                 // There are no horizontal points in the line
                 if ((*i)->avgHorizontalWidth == 0) {
-                    if (debugFitUnusedPoints) {
+                    /*if (debugFitUnusedPoints) {
                         cout << "Point " << (*j)
                              << " rejected because there were no "
                              << "horizontal points in the line." << endl;
-                    }
+							 }*/
                     sanityChecksPass = false;
                 }
                 // The line point is farther away so it should be thinner
                 else if (dist > thinnestDist) {
                     if (width > thinnestWidth) {
-                        if (debugFitUnusedPoints) {
+                        /*if (debugFitUnusedPoints) {
                             cout << setprecision(2)
                                  << "Point " << (*j)
                                  << " had a horizontal width that was wider "
@@ -1419,14 +1419,14 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                                  << "line despite being farther away.  Width: "
                                  << width << "; thinnest width: "
                                  << thinnestWidth << endl;
-                        }
+								 }*/
                         sanityChecksPass = false;
                     }
                 }
                 // Line point is closer, so it should be thicker
                 else if (dist < thickestDist) {
                     if (width < thickestWidth) {
-                        if (debugFitUnusedPoints) {
+                        /*if (debugFitUnusedPoints) {
                             cout << setprecision(2)
                                  << "Point " << (*j)
                                  << " had a horizontal width that "
@@ -1434,7 +1434,7 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                                  << "part of the line despite being closer.  "
                                  << "Width: " << width << "; thickest width: "
                                  << thickestWidth << endl;
-                        }
+								 }*/
                         sanityChecksPass = false;
                     }
                 }
@@ -1442,7 +1442,7 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                 // two line widths
                 else {
                     if (width < thinnestWidth || width > thickestWidth) {
-                        if (debugFitUnusedPoints) {
+                        /*if (debugFitUnusedPoints) {
                             cout << setprecision(2)
                                  << "Point " << (*j) << " had a horizontal "
                                  << "width that was not between the line "
@@ -1452,7 +1452,7 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                                  << "; expected to be between "
                                  << thinnestWidth << " and " << thickestWidth
                                  << endl;
-                        }
+								 }*/
                         sanityChecksPass = false;
                     }
                 }
@@ -1474,7 +1474,7 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                                         closerEndpoint.y, GREEN);
                 const float MAX_GREEN_BETWEEN = 5.0f;
                 if (percentGreenBetween > MAX_GREEN_BETWEEN) {
-                    if (debugFitUnusedPoints) {
+                    /*if (debugFitUnusedPoints) {
                         cout << setprecision(2)
                              << "Point " << (*j)
                              << " had too much green between it and "
@@ -1483,7 +1483,7 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                              << percentGreenBetween
                              << ", expected at most " << MAX_GREEN_BETWEEN
                              << endl;
-                    }
+							 }*/
                     sanityChecksPass = false;
                 }
             }
@@ -1528,7 +1528,7 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
     }
 
 
-    if (debugFitUnusedPoints) {
+    /*if (debugFitUnusedPoints) {
         for (vector< shared_ptr<VisualLine> >::iterator i = lines.begin();
              i != lines.end(); ++i) {
             drawSurroundingBox(*i, FIT_UNUSED_POINTS_BOX_COLOR);
@@ -1539,7 +1539,7 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
             static_cast<int>(remainingPoints.size());
         cout << "Successfully added " << numPointsAdded << " points to the lines. "
              << remainingPoints.size() << " points remain unfit. " << endl;
-    }
+			 }*/
 
 }
 
