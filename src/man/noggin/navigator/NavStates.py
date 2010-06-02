@@ -141,14 +141,20 @@ def omniWalkToPoint(nav):
     my = nav.brain.my
     dest = nav.dest
 
+    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
+
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+        # use backwardsGait if we are moving backwards
+        if walkX < 0:
+           nav.brain.CoA.setBackwardsGait(nav.brain.motion)
+        else:
+            nav.brain.CoA.setRobotGait(nav.brain.motion)
+
         nav.walkToPointCount = 0
 
     if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
         return nav.goNow('stop')
 
-    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     return nav.stay()
