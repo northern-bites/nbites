@@ -41,11 +41,12 @@ def shouldPositionForKick(player):
     Should begin aligning on the ball for a kick when close
     """
     ball = player.brain.ball
-    return (constants.BALL_POS_KICK_LEFT_Y > ball.relY > \
-            constants.BALL_POS_KICK_RIGHT_Y and \
-            constants.BALL_POS_KICK_MAX_X > ball.relX > \
-            constants.BALL_POS_KICK_MIN_X and \
-            ball.bearing < constants.POSITION_FOR_KICK_BEARING_THRESH)
+    return ball.on and \
+        constants.BALL_POS_KICK_LEFT_Y > ball.relY > \
+        constants.BALL_POS_KICK_RIGHT_Y and \
+        constants.BALL_POS_KICK_MAX_X > ball.relX > \
+        constants.BALL_POS_KICK_MIN_X and \
+        ball.bearing < constants.POSITION_FOR_KICK_BEARING_THRESH
 
 def shouldPositionForKickFromApproachLoc(player):
     return shouldPositionForKick(player) and \
@@ -71,10 +72,8 @@ def shouldKick(player):
     Ball is in the correct foot position to kick
     """
     ball = player.brain.ball
-    return (constants.BALL_KICK_LEFT_Y_L > ball.relY > \
-            constants.BALL_KICK_RIGHT_Y_R and \
-            constants.BALL_KICK_LEFT_X_CLOSE < ball.relX < \
-            constants.BALL_KICK_LEFT_X_FAR)
+    return player.brain.nav.isStopped() and \
+        player.counter > 1
 
 
 def shouldDribble(player):

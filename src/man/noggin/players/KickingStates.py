@@ -15,38 +15,6 @@ from math import fabs
 from ..util import MyMath
 import KickingHelpers as helpers
 
-
-def getKickInfo(player):
-    """
-    Decides which kick to use
-    """
-    player.inKickingState = True
-
-    if player.firstFrame():
-        player.stopWalking()
-        player.brain.tracker.stopHeadMoves()
-        player.kickScan()
-
-        player.kickDecider = KickDecider(player)
-
-    # If scanning, then collect data
-    if (player.stateTime < SweetMoves.getMoveTime(HeadMoves.KICK_SCAN)):
-        player.kickDecider.collectData(player.brain)
-        return player.stay()
-
-    # Done scanning time to act
-    player.brain.tracker.trackBall()
-    player.kickDecider.calculate()
-
-    if not player.brain.ball.on:
-        if player.brain.ball.framesOff < 100: # HACK, should be constant
-            return player.stay()
-        else :
-            player.inKickingState = False
-            return player.goLater('scanFindBall')
-
-    return player.goNow('decideKick')
-
 def decideKick(player):
 
     if ChaseBallTransitions.shouldScanFindBall(player):
@@ -406,7 +374,6 @@ def kickBallLeft(player):
     """
     Kick the ball to the left, with right foot
     """
-
     player.chosenKick = SweetMoves.RIGHT_SIDE_KICK
     return player.goNow('sideStepForSideKick')
 
@@ -415,14 +382,6 @@ def kickBallRight(player):
     Kick the ball to the right, using the left foot
     """
     player.chosenKick = SweetMoves.LEFT_SIDE_KICK
-    return player.goNow('sideStepForSideKick')
-
-def kickBallRightShort(player):
-    player.chosenKick = SweetMoves.SHORT_LEFT_SIDE_KICK
-    return player.goNow('sideStepForSideKick')
-
-def kickBallLeftShort(player):
-    player.chosenKick = SweetMoves.SHORT_RIGHT_SIDE_KICK
     return player.goNow('sideStepForSideKick')
 
 def sideStepForSideKick(player):
@@ -559,7 +518,7 @@ def alignOnBallStraightKick(player):
 def kickBallExecute(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.executeMove(player.chosenKick)
+        player.executeMove(player.brain.kickDecider.currentKick)
 
         if not player.penaltyMadeFirstKick:
             player.penaltyMadeFirstKick = True
@@ -570,7 +529,8 @@ def kickBallExecute(player):
             player.brain.ball.framesOff > constants.LOOK_POST_KICK_FRAMES_OFF:
         player.lookPostKick()
 
-    if player.stateTime >= SweetMoves.getMoveTime(player.chosenKick):
+    if player.stateTime >= \
+            SweetMoves.getMoveTime(player.brain.kickDecider.currentKick):
         return player.goLater('afterKick')
 
     return player.stay()
@@ -599,159 +559,5 @@ def afterKick(player):
 
     if not player.brain.motion.isHeadActive():
         player.inKickingState = False
-        return player.goLater('chase')
+        return player.goLater('scanFindBall')
     return player.stay()
-
-def kickAtPosition(player):
-    """
-    Method to simply kick while standing in position
-    Used for a very simple goalie behavior
-    """
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        player.executeStiffness(StiffnessModes.LEFT_FAR_KICK_STIFFNESS)
-    if player.counter == 2:
-        player.executeMove(SweetMoves.LEFT_FAR_KICK)
-
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.LEFT_FAR_KICK):
-        player.standup()
-
-        if player.brain.nav.isStopped():
-            return player.goLater('atPosition')
-
-    return player.stay()
-
-class KickDecider:
-    """
-    Class to hold all the things we need to decide a kick
-    """
-
-    def __init__(self,player):
-        self.oppGoalLeftPostBearings = []
-        self.oppGoalRightPostBearings = []
-        self.myGoalLeftPostBearings = []
-        self.myGoalRightPostBearings = []
-
-        self.oppGoalLeftPostDists = []
-        self.oppGoalRightPostDists = []
-        self.myGoalLeftPostDists = []
-        self.myGoalRightPostDists = []
-
-        self.oppLeftPostBearing = None
-        self.oppRightPostBearing = None
-        self.myLeftPostBearing = None
-        self.myRightPostBearing = None
-
-        self.oppLeftPostDist = 0.0
-        self.oppRightPostDist = 0.0
-        self.myLeftPostDist = 0.0
-        self.myRightPostDist = 0.0
-
-
-        self.sawOwnGoal = False
-        self.sawOppGoal = False
-
-        self.player = player
-        self.ballForeFoot = constants.LEFT_FOOT
-
-    def collectData(self, info):
-        """
-        Collect info on any observed goals
-        """
-        if info.myGoalLeftPost.on:
-            if info.myGoalLeftPost.certainty == NogginConstants.SURE:
-                self.sawOwnGoal = True
-                self.myGoalLeftPostBearings.append(info.myGoalLeftPost.visBearing)
-                self.myGoalLeftPostDists.append(info.myGoalLeftPost.visDist)
-
-        if info.myGoalRightPost.on:
-            if info.myGoalRightPost.certainty == NogginConstants.SURE:
-                self.sawOwnGoal = True
-                self.myGoalRightPostBearings.append(info.myGoalRightPost.visBearing)
-                self.myGoalRightPostDists.append(info.myGoalRightPost.visDist)
-
-        if info.oppGoalLeftPost.on:
-            if info.oppGoalLeftPost.certainty == NogginConstants.SURE:
-                self.sawOppGoal = True
-                self.oppGoalLeftPostBearings.append(info.oppGoalLeftPost.visBearing)
-                self.oppGoalLeftPostDists.append(info.oppGoalLeftPost.visDist)
-
-        if info.oppGoalRightPost.on:
-            if info.oppGoalRightPost.certainty == NogginConstants.SURE:
-                self.sawOppGoal = True
-                self.oppGoalRightPostBearings.append(info.oppGoalRightPost.visBearing)
-                self.oppGoalRightPostDists.append(info.oppGoalRightPost.visDist)
-
-    def calculate(self):
-        """
-        Get usable data from the collected data
-        """
-        if len(self.myGoalLeftPostBearings) > 0:
-            self.myLeftPostBearing = (sum(self.myGoalLeftPostBearings) /
-                                      len(self.myGoalLeftPostBearings))
-        if len(self.myGoalRightPostBearings) > 0:
-            self.myRightPostBearing = (sum(self.myGoalRightPostBearings) /
-                                       len(self.myGoalRightPostBearings))
-        if len(self.oppGoalLeftPostBearings) > 0:
-            self.oppLeftPostBearing = (sum(self.oppGoalLeftPostBearings) /
-                                       len(self.oppGoalLeftPostBearings))
-        if len(self.oppGoalRightPostBearings) > 0:
-            self.oppRightPostBearing = (sum(self.oppGoalRightPostBearings) /
-                                        len(self.oppGoalRightPostBearings))
-
-        if len(self.myGoalLeftPostDists) > 0:
-            self.myLeftPostDist = (sum(self.myGoalLeftPostDists) /
-                                   len(self.myGoalLeftPostDists))
-        if len(self.myGoalRightPostDists) > 0:
-            self.myRightPostDist = (sum(self.myGoalRightPostDists) /
-                                    len(self.myGoalRightPostDists))
-        if len(self.oppGoalLeftPostDists) > 0:
-            self.oppLeftPostDist = (sum(self.oppGoalLeftPostDists) /
-                                    len(self.oppGoalLeftPostDists))
-        if len(self.oppGoalRightPostDists) > 0:
-            self.oppRightPostDist = (sum(self.oppGoalRightPostDists) /
-                                     len(self.oppGoalRightPostDists))
-
-
-    # Make sure ball is on before doing this
-    def ballForeWhichFoot(self):
-        ball = self.player.brain.ball
-
-        if not (constants.MAX_KICK_X > ball.relX > constants.MIN_KICK_X) or \
-                not ball.on:
-            self.ballForeFoot = constants.INCORRECT_POS
-
-        elif constants.LEFT_FOOT_L_Y > ball.relY >= constants.LEFT_FOOT_R_Y:
-            self.ballForeFoot = constants.LEFT_FOOT
-
-        elif constants.LEFT_FOOT_R_Y > ball.relY >= 0:
-            self.ballForeFoot = constants.MID_LEFT
-
-        elif 0 > ball.relY > constants.RIGHT_FOOT_L_Y:
-            self.ballForeFoot = constants.MID_RIGHT
-
-        elif constants.RIGHT_FOOT_L_Y > ball.relY > constants.RIGHT_FOOT_R_Y:
-            self.ballForeFoot = constants.RIGHT_FOOT
-
-        else:
-            print "ball in incorrect pos, ball at %.2f, %.2f" % (ball.relX,
-                                                                 ball.relY)
-            self.ballForeFoot = constants.INCORRECT_POS
-
-    def __str__(self):
-        s = ""
-        if self.myLeftPostBearing is not None:
-            s += ("My left post bearing is: " + str(self.myLeftPostBearing) +
-                  " dist is: " + str(self.myLeftPostDist) + "\n")
-        if self.myRightPostBearing is not None:
-            s += ("My right post bearing is: " + str(self.myRightPostBearing) +
-                  " dist is: " + str(self.myRightPostDist) +  "\n")
-        if self.oppLeftPostBearing is not None:
-            s += ("Opp left post bearing is: " + str(self.oppLeftPostBearing) +
-                  " dist is: " + str(self.oppLeftPostDist) + "\n")
-        if self.oppRightPostBearing is not None:
-            s += ("Opp right post bearing is: " + str(self.oppRightPostBearing)
-                  + " dist is: " + str(self.oppRightPostDist) +  "\n")
-        if s == "":
-            s = "No goal posts observed"
-        return s

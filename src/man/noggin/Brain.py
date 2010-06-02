@@ -94,11 +94,12 @@ class Brain(object):
         self.sonar = Sonar.Sonar()
 
         # FSAs
-        self.gameController = GameController.GameController(self)
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
+        self.kickDecider = KickDecider.KickDecider(self)
+        self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
     def initFieldObjects(self):
