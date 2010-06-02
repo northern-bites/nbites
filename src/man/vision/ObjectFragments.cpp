@@ -1058,7 +1058,7 @@ int ObjectFragments::classifyByLineIntersection(Blob post) {
 				// roughly how far away is it?
 				estimate e = vision->pose->pixEstimate(x, y, 0.0);
 				// if it is in the right position we can figure out which post
-				cout << "Dist is " << e.dist << endl;
+				//cout << "Dist is " << e.dist << endl;
 				if (x <= post.getLeftBottomX()) {
 					if (e.dist < CLOSE_DIST)
 						return LEFT;
