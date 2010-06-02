@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <string>
+#include <string.h>
 #include <boost/shared_ptr.hpp>
 
 #include "synchro.h"
@@ -75,6 +76,9 @@ private:
     void checkFallen();
     void checkBatteryLevels();
     void checkTemperatures();
+    void checkConnection();
+    bool checkWired();
+    bool checkWireless();
     void countButtonPushes();
     void processFallingProtection();
     void processChestButtonPushes();
@@ -82,7 +86,7 @@ private:
     void executeFallProtection();
     void shutoffGains();
     void enableGains();
-    void resetWifiConnection();
+    void reconnectWifiConnection();
     //helpers
     std::string getHostName()const;
     void playFile(std::string filePath)const; //non-blocking
@@ -100,6 +104,7 @@ private:
     Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter;
     bool registeredFalling;
+    int wifiReconnectTimeout;
 
     bool registeredShutdown;
 
