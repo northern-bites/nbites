@@ -558,11 +558,10 @@ void Comm::discover_broadcast ()
             error(SOCKET_ERROR(errno));
         }
     } else if (result != 0) {
-        error(SOCKET_ERROR("Failed to discover broadcast address -- command "
-                           "returned error"));
+        //cout<<"Failed to discover broadcast address -- command returned error";
 
     } else if (len <= 0) {
-        cout<<"Failed to discover broadcast address -- find broadcast returned no output";
+        //cout<<"Failed to discover broadcast address -- find broadcast returned no output";
     }
 
 }
