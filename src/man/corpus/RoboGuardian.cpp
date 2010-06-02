@@ -13,7 +13,8 @@ using namespace std;
 //#define DEBUG_GUARDIAN_CLICKS
 #define WIFI_CONNECTION NBITES
 #define WIFI_RECONNECTS_MAX 5
-#define CONNECTION_CHECK_RATE 120
+//check for a connection once in 20 secs
+#define CONNECTION_CHECK_RATE 20*RoboGuardian::GUARDIAN_FRAME_RATE
 
 const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
@@ -476,7 +477,7 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
         return chestButton;
     }
 }
-
+//TODO: comment
 void RoboGuardian::checkConnection(){
 
     const string IP = discoverIP();
