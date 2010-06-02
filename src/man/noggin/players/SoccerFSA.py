@@ -102,10 +102,6 @@ class SoccerFSA(FSA.FSA):
         if not nav.isStopped():
             self.brain.nav.stop()
 
-    def atDestinationGoalie(self):
-        nav = self.brain.nav
-        return helper.atDestinationGoalie(self.brain.my, nav.dest)
-
     def atDestinationCloser(self):
         nav = self.brain.nav
         return helper.atDestinationCloser(self.brain.my, nav.dest)

@@ -7,6 +7,8 @@
 #include "PyLoc.h"
 #include "EKFStructs.h"
 #include <cstdlib>
+#include "MMLocEKF.h"
+#include "LocEKF.h"
 
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
@@ -128,7 +130,12 @@ void Noggin::initializeLocalization()
 #   endif
 
     // Initialize the localization modules
-    loc = shared_ptr<LocEKF>(new LocEKF());
+#ifdef USE_MM_LOC_EKF
+    loc = shared_ptr<LocSystem>(new MMLocEKF());
+#else
+    loc = shared_ptr<LocSystem>(new LocEKF());
+#endif
+
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers
@@ -424,7 +431,7 @@ void Noggin::updateLocalization()
         if (!(n.ballX == 0.0 && n.ballY == 0.0) &&
             !(gc->gameState() == STATE_INITIAL ||
               gc->gameState() == STATE_FINISHED)) {
-            m.distance = hypot(loc->getXEst() - n.ballX,
+            m.distance = hypotf(loc->getXEst() - n.ballX,
                                loc->getYEst() - n.ballY);
             m.bearing = subPIAngle(atan2(n.ballY - loc->getYEst(),
                                          n.ballX - loc->getXEst()) -

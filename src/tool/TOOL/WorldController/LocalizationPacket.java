@@ -7,21 +7,24 @@ public class LocalizationPacket {
     public double min_visible_distance, max_visible_distance;
     public double x_velocity, y_velocity;
 
-    private LocalizationPacket (double at_x_est, double at_y_est, double at_heading_est, double at_head_pan,
-                                double at_x_uncert, double at_y_uncert, double at_heading_uncert, boolean include_uncert,
-                                double at_min_distance, double at_max_distance, double at_x_velocity, double at_y_velocity) {
-        includes_uncert = include_uncert;
-        x_est = at_x_est;
-        y_est = at_y_est;
-        heading_est = at_heading_est;
-        head_pan = at_head_pan;
-        x_uncert = at_x_uncert;
-        y_uncert = at_y_uncert;
-        heading_uncert = at_heading_uncert;
+    private LocalizationPacket (double at_x_est, double at_y_est,
+								double at_heading_est, double at_head_pan,
+                                double at_x_uncert, double at_y_uncert,
+								double at_heading_uncert, boolean include_uncert,
+                                double at_min_distance, double at_max_distance,
+								double at_x_velocity, double at_y_velocity) {
+        includes_uncert		 = include_uncert;
+        x_est				 = at_x_est;
+        y_est				 = at_y_est;
+        heading_est			 = at_heading_est;
+        head_pan			 = at_head_pan;
+        x_uncert			 = at_x_uncert;
+        y_uncert			 = at_y_uncert;
+        heading_uncert		 = at_heading_uncert;
         min_visible_distance = at_min_distance;
         max_visible_distance = at_max_distance;
-	x_velocity = at_x_velocity;
-	y_velocity = at_y_velocity;
+		x_velocity			 = at_x_velocity;
+		y_velocity			 = at_y_velocity;
     }
 
     public static LocalizationPacket
@@ -50,11 +53,15 @@ public class LocalizationPacket {
     }
 
     public static LocalizationPacket
-		makeEstimateAndUncertPacket(double at_x_est, double at_y_est,
-									double at_heading_est, double at_x_uncert,
-									double at_y_uncert, double at_heading_uncert) {
+		makeEstimateAndUncertPacket(double at_x_est,
+									double at_y_est,
+									double at_heading_est,
+									double at_x_uncert,
+									double at_y_uncert,
+									double at_heading_uncert) {
         return new LocalizationPacket(at_x_est, at_y_est, at_heading_est, 0.0,
-									  at_x_uncert, at_y_uncert, at_heading_uncert, true, 0., 0., 0., 0.);
+									  at_x_uncert, at_y_uncert,
+									  at_heading_uncert, true, 0., 0., 0., 0.);
     }
 
     public double getXActual() {

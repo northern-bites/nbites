@@ -1,4 +1,3 @@
-
 #include <errno.h>       // errno
 #include <string.h>      // strerror(), memcpy()
 
@@ -562,8 +561,7 @@ void Comm::discover_broadcast ()
                            "returned error"));
 
     } else if (len <= 0) {
-        error(SOCKET_ERROR("Failed to discover broadcast address -- command "
-                           "returned no output"));
+        cout<<"Failed to discover broadcast address -- find broadcast returned no output";
     }
 
 }

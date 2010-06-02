@@ -63,13 +63,6 @@ BOOST_PYTHON_MODULE(sensors)
         .def_readonly("angleY", &Inertial::angleY)
         ;
 
-    enum_<UltraSoundMode>("UltraSoundMode")
-        .value("LL", LL)
-        .value("LR", LR)
-        .value("RL", RL)
-        .value("RR", RR)
-        ;
-
     // Wrapper for std::vector which will allow us to access angle vectors
     // from Sensors.
     class_< std::vector<float> >("AngleVector")
@@ -86,8 +79,8 @@ BOOST_PYTHON_MODULE(sensors)
         .add_property("leftFootBumper", &Sensors::getLeftFootBumper)
         .add_property("rightFootBumper", &Sensors::getRightFootBumper)
         .add_property("inertial", &Sensors::getInertial_degs)
-        .add_property("ultraSoundDistance", &Sensors::getUltraSound_cm)
-        .add_property("ultraSoundMode", &Sensors::getUltraSoundMode)
+        .add_property("ultraSoundDistanceLeft", &Sensors::getUltraSoundLeft_cm)
+        .add_property("ultraSoundDistanceRight", &Sensors::getUltraSoundRight_cm)
         .add_property("chestButton", &Sensors::getChestButton)
         .add_property("batteryCharge", &Sensors::getBatteryCharge)
         .add_property("batteryCurrent", &Sensors::getBatteryCurrent)

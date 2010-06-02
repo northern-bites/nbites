@@ -27,7 +27,7 @@ PYC_FILES = $(shell find . -name "*.pyc")
 CROSS_TOOLCHAIN = $(abspath $(CURDIR)/cmake/geode.cmake)
 CMAKE_STRAIGHT_DEFS = -DOE_CROSS_BUILD=OFF -DSTRAIGHT=ON
 CMAKE_CROSS_DEFS = -DCMAKE_TOOLCHAIN_FILE=$(CROSS_TOOLCHAIN) -DOE_CROSS_BUILD=ON
-CMAKE_WEBOTS_DEFS = -DOE_CROSS_BUILD=OFF -DMAN_IS_REMOTE_=ON -DWEBOTS_BACKEND=ON -DCOLOR_TABLE=tables/webots.mtb
+CMAKE_WEBOTS_DEFS = -DOE_CROSS_BUILD=OFF -DMAN_IS_REMOTE_=ON -DWEBOTS_BACKEND=ON -DCOLOR_TABLE=tables/uvy/webots/webots_6_2.mtb
 CCMAKE_CROSS_OPT = -DCMAKE_SHARED_LINKER_FLAGS:STRING="" -DCMAKE_MODULE_LINKER_FLAGS:STRING=""
 #Commands setup
 CD=cd
@@ -140,13 +140,7 @@ cclean: $(CMAKE_DEPEND)
 	@$(MAKE) $(MAKE_OPTIONS) -C $(BUILD_DIR) clean
 
 clean:
-	$(RM) -r $(BUILD_DIR) $(CONFIG_FILE) $(INSTALL_SCRIPT)
-	@$(MAKE) -C corpus clean
-	@$(MAKE) -C motion clean
-	@$(MAKE) -C noggin clean
-	@$(MAKE) -C vision clean
-	@$(MAKE) -C comm   clean
-	$(RM) -r install/* $(PYC_FILES)
+	$(RM) -r $(BUILD_DIR)
 
 check:
 	@if [ -e $(CROSS_FILE) ]; then \

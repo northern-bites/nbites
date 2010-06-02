@@ -1,5 +1,5 @@
 from .. import NogginConstants
-from man.noggin.typeDefs.Location import Location
+from ..typeDefs.Location import Location
 
 SUPER_SAFE_KICKS = False # Only kick straight when we see the goal
 MAX_FORWARD_KICK_ANGLE = 55
@@ -43,13 +43,6 @@ NUM_OBJECTIVES = 6
  OBJECTIVE_KICKOFF,
  OBJECTIVE_UNCLEAR) = range(NUM_OBJECTIVES)
 
-# inOppCorner constants
-TOP_OPP_CORNER_SLOPE = -1
-BOTTOM_OPP_CORNER_SLOPE = 1
-
-OPP_CORNER_LEFT_X = NogginConstants.FIELD_WIDTH - 100.
-TOP_OPP_CORNER_Y = NogginConstants.FIELD_HEIGHT
-
 # Penalty Kick
 ALIGN_FOR_KICK_MIN_ANGLE = 10
 
@@ -57,7 +50,6 @@ LOOK_POST_KICK_FRAMES_OFF = 10
 
 # clearBall constants
 CLEAR_CENTER_FIELD_STRAIGHT_ANGLE = 60
-FACING_SIDELINE_ANGLE = 30
 
 SHOOT_AT_LEFT_AIM_POINT = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
                                    NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y +

@@ -70,7 +70,7 @@
     </exec>
   </target>
 
-  <target name="build.libs.quick"
+  <target name="build.libs.quick" depends="cmake.generate"
     description="builds the libraries with some degree of parallelism">
     <!-- run make -->
     <exec executable="${make}" dir="${visionlink.build.dir}" failonerror="True">
@@ -79,7 +79,7 @@
     </exec>
   </target>
 
-  <target name="build.libs.regular" 
+  <target name="build.libs.regular"  depends="cmake.generate"
     description="builds the libraries in a regular fashion">
     <!-- run make -->
     <exec executable="${make}" dir="${visionlink.build.dir}" failonerror="True">

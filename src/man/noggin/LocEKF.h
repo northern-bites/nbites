@@ -38,9 +38,21 @@ public:
 
     // Update functions
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
+	void odometryUpdate(MotionModel u);
+	void applyObservations(vector<Observation> Z);
+	bool applyObservation(Observation Z);
+	void endFrame();
+
+	void copyEKF(const LocEKF& other);
+	void mergeEKF(const LocEKF& other);
+
+	void printAfterUpdateInfo();
+	void printBeforeUpdateInfo();
+
     virtual void reset();
     virtual void redGoalieReset();
     virtual void blueGoalieReset();
+	virtual inline void resetLocTo(float x, float y, float h);
 
     // Getters
     /**
@@ -62,7 +74,8 @@ public:
      * @return The current estimate of the loc heading in degrees
      */
     virtual const float getHEstDeg() const {
-        return subPIAngle(xhat_k(2)) * TO_DEG; }
+        return subPIAngle(xhat_k(2)) * TO_DEG;
+	}
 
 
     /**
@@ -106,6 +119,7 @@ public:
 	virtual const vector<Observation> getLastObservations() const {
 		return lastObservations;
 	}
+
     // Setters
     /**
      * @param val The new estimate of the loc x position
@@ -141,6 +155,7 @@ public:
      * @param _use True if we are to use ambiguous landmark observations
      */
     void setUseAmbiguous(bool _use) { useAmbiguous = _use; }
+
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
@@ -160,11 +175,15 @@ private:
 									   MeasurementVector &V_k);
 
 
-    int findBestLandmark(Observation * z);
-	int findMostLikelyLine(Observation *z);
-	float getMahalanobisDistance(Observation *z, LineLandmark ll);
-	int findNearestNeighbor(Observation *z);
-    float getDivergence(Observation * z, PointLandmark pt);
+    int findBestLandmark(const Observation& z);
+	int findMostLikelyLine(const Observation& z);
+	float getMahalanobisDistance(const Observation& z, const LineLandmark& ll);
+	int findNearestNeighbor(const Observation& z);
+    float getDivergence(const Observation& z, const PointLandmark& pt);
+
+#ifdef USE_MM_LOC_EKF
+	bool updateProbability(const Observation& Z);
+#endif
 
     void limitAPrioriUncert();
     void limitPosteriorUncert();
@@ -179,6 +198,7 @@ private:
     MotionModel lastOdo;
 	vector<Observation> lastObservations;
     bool useAmbiguous;
+	MeasurementMatrix R_pred_k;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;

@@ -1,5 +1,5 @@
 C++ = g++
-C++-FLAGS = -Wall -O3 -DNDEBUG
+C++-FLAGS = -Wall -O3 -DNDEBUG -pg
 RM = rm -f
 INCLUDE = -I ../../include/ -I ../../vision/ -I ./../ -I ./ -I /sw/include/
 
@@ -43,6 +43,8 @@ MCL_SRCS = ../MCL.cpp \
 	../MCL.h
 LOCEKF_SRCS = ../LocEKF.cpp \
 		../LocEKF.h
+MMLOCEKF_SRCS = ../MMLocEKF.cpp \
+		../MMLocEKF.h
 LOCSYSTEM_SRCS = ../LocSystem.h
 
 FAKER_IO_SRCS = fakerIO.cpp \
@@ -81,6 +83,7 @@ OBJS = NBMath.o \
        Observation.o \
        MCL.o \
        BallEKF.o \
+       MMLocEKF.o \
        LocEKF.o \
        fakerIO.o \
        fakerIterators.o
@@ -180,6 +183,8 @@ MCL.o : $(MCL_SRCS)
 BallEKF.o :$(BALLEKF_SRCS) EKF.o NBMath.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 LocEKF.o :$(LOCEKF_SRCS) EKF.o NBMath.o
+	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
+MMLocEKF.o :$(MMLOCEKF_SRCS) EKF.o NBMath.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@
 EKF.o : $(EKF_SRCS) NBMath.o
 	$(C++) $(C++-FLAGS) $(INCLUDE) -c $< -o $@

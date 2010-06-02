@@ -833,7 +833,11 @@ bool ObjectFragments::qualityPost(Blob b, int c)
         for (int j = b.getLeftTopY(); j < b.getLeftBottomY(); j++)
 			if (thresh->getExpandedColor(i, j, c) == c)
                 good++;
-    if (good < b.getArea() * PERCENT_NEEDED) return false;
+
+    if (static_cast<float>(good) <
+        static_cast<float>(b.getArea()) * PERCENT_NEEDED)
+        return false;
+
     return true;
 }
 
@@ -1621,8 +1625,10 @@ bool ObjectFragments::badDistance(Blob b) {
 	int bottom = b.getBottom();
 	estimate e = vision->pose->pixEstimate(x, y, 0.0);
 	distanceCertainty dc = checkDist(b);
-	float disth = thresh->getGoalPostDistFromHeight(b.height());
-	float distw = thresh->getGoalPostDistFromWidth(b.width());
+	float disth = thresh->getGoalPostDistFromHeight(static_cast<float>
+                                                    (b.height()));
+    float distw = thresh->getGoalPostDistFromWidth(static_cast<float>
+                                                   (b.width()));
 	float diste = e.dist;
 	// this is essentially the code from Threshold.h
 	float choose = thresh->chooseGoalDistance(dc, disth, distw, diste,
@@ -1806,11 +1812,13 @@ bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2,
 	const int SMALL_POST = 10;
 
     if (spanY2 > SECOND_IS_TALL) return true;
-    if (spanY2 > SPAN_MULTIPLIER * spanY * SPAN_PERCENT) return true;
+    if (static_cast<float>(spanY2) >
+        SPAN_MULTIPLIER * static_cast<float>(spanY) * SPAN_PERCENT) return true;
     // we need to get the "real" offset
     int f = max(yProject(0, t1, spanY), yProject(IMAGE_WIDTH - 1, t1,
 												 IMAGE_WIDTH - spanY));
-    if (abs(t1 - t2) > SPAN_MULTIPLIER * min(spanY, spanY2) * SPAN_PERCENT + f)
+    if (fabs(t1 - t2) > SPAN_MULTIPLIER * static_cast<float>(min(spanY, spanY2))
+        * SPAN_PERCENT + static_cast<float>(f))
 	{
         if (SANITY) {
             cout << "Bad top offsets" << endl;
@@ -1818,11 +1826,14 @@ bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2,
         return false;
     }
     if (spanY2 > SECOND_IS_TALL2) return true;
+
+    // the int cast maintains the same behavior as casting spanY2 to float
     if (spanX2 > 2
 		&& (spanY2 > spanY / 2 || spanY2 > BIGPOST ||
-			( (spanY2 > spanY * SPAN2_PERCENT && spanX2 > SMALL_POST) &&
+			( (spanY2 > (static_cast<float>(spanY) * SPAN2_PERCENT) &&
+               spanX2 > SMALL_POST) &&
 			  (spanX2 <= spanX / 2 || fudge != 0)) ) &&
-		(spanX2 > spanX * SPAN_PERCENT))  {
+		(spanX2 > static_cast<float>(spanX) * SPAN_PERCENT))  {
         return true;
     }
     if (t1 < 1 && t2 < 1) return true;

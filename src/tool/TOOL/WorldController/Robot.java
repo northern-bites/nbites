@@ -37,29 +37,40 @@ public class Robot {
     private Integer color;
     private Integer number;
     private RobotData data;
+	private boolean isJustModel;
 
-    public Robot(int team, int color, int number) {
-        this(team,color,number,new RobotData());
+    public Robot(int team, int color, int number, boolean isModel) {
+        this(team,color,number,new RobotData(), isModel);
     }
 
-    public Robot(int team, int color, int number, RobotData data) {
+    public Robot(int team, int color, int number,
+				 RobotData data, boolean isModel) {
         this.team = new Integer(team);
         this.color = new Integer(color);
         this.number = new Integer(number);
         this.data = data;
+		this.isJustModel = isModel;
     }
 
 	public void updateData(LocalizationPacket robotLoc,
-						   LocalizationPacket ballLoc) {
+						   LocalizationPacket ballLoc,
+						   boolean isJustModel) {
 		RobotData newData = new RobotData(0,
-										  (float)robotLoc.getXEst(), (float)robotLoc.getYEst(),
-										  (float)robotLoc.getHeadingEst(), (float)robotLoc.getXUncert(),
-										  (float)robotLoc.getYUncert(), (float)robotLoc.getHUncert(),
-										  (float)ballLoc.getXEst(), (float)ballLoc.getYEst(),
-										  (float)ballLoc.getXUncert(), (float)ballLoc.getYUncert(),
-										  (float)ballLoc.getXVelocity(), (float)ballLoc.getYVelocity(),
+										  (float)robotLoc.getXEst(),
+										  (float)robotLoc.getYEst(),
+										  (float)robotLoc.getHeadingEst(),
+										  (float)robotLoc.getXUncert(),
+										  (float)robotLoc.getYUncert(),
+										  (float)robotLoc.getHUncert(),
+										  (float)ballLoc.getXEst(),
+										  (float)ballLoc.getYEst(),
+										  (float)ballLoc.getXUncert(),
+										  (float)ballLoc.getYUncert(),
+										  (float)ballLoc.getXVelocity(),
+										  (float)ballLoc.getYVelocity(),
 										  0.0f, false, 0);
 		this.data = newData;
+		this.isJustModel = isJustModel;
 	}
 
     public Integer getTeam() {
@@ -118,7 +129,7 @@ public class Robot {
                                                 ));
 
             return new Robot(team, color, player,
-                             new RobotData(timeStamp, values));
+                             new RobotData(timeStamp, values), false);
 
         }catch(UnsupportedEncodingException e) {
             System.out.println("ASCII Encoding not supported!!!");

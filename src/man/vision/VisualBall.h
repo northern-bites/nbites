@@ -40,7 +40,11 @@ public:
     void setFocalDistanceFromRadius() { focDist = 100 * 24.5/(getRadius() *2); }
 #elif ROBOT(NAO_RL)
     //TODO: recompute this
-    void setFocalDistanceFromRadius() { focDist = ( 6.4/8.6) * (100.f / 83.f) * (50.f / 52.f ) * 2850 / (getRadius() * 2); }
+    void setFocalDistanceFromRadius()
+        {
+            focDist = ( 6.4f/8.6f) * (100.f / 83.f) * (50.f / 52.f ) *
+                2850.f / (getRadius() * 2.f);
+        }
 #else
     void setFocalDistanceFromRadius() {
         focDist = 2067.6f*pow(getRadius()*2.0f,-1.0595f);
@@ -56,10 +60,10 @@ public:
 
     // Member functions
     const float ballDistanceToSD(float _distance) const {
-        return sqrt(10 + _distance * 0.2f);
+        return static_cast<float>(sqrt(10.f + _distance * 0.2f));
     }
     const float ballBearingToSD(float _bearing) const {
-        return sqrt(static_cast<float>(M_PI) / 4.0f);
+        return static_cast<float>(sqrt(static_cast<float>(M_PI) / 4.0f));
     }
 
 private:
