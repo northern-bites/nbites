@@ -95,26 +95,25 @@ void NaoEnactor::sendHardness(){
     motionHardness = switchboard->getNextStiffness();
 
     bool diffStiff = false;
+    static float hardness = 0.0f;
     //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++) {
-        static float hardness =0.0f;
-        //if (hardness != -1.0f) //-1: yet to be implemented by AL decoupled mode
+
         hardness = NBMath::clip(motionHardness[i], -1.0f, 1.0f);
 
         //sets the value for hardness
-        //hardness_command[5][i].arraySetSize(1);
-        if(lastMotionHardness[i] != hardness)
+        if(lastMotionHardness[i] != hardness){
             diffStiff = true;
-        hardness_command[5][i][0] = hardness;
-
-        //store for next time
-        lastMotionHardness[i] = hardness;
+            hardness_command[5][i][0] = hardness;
+            //store for next time
+            lastMotionHardness[i] = hardness;
+        }
     }
-    hardness_command[4][0] = dcmProxy->getTime(0);
 
     if(!diffStiff)
         return;
 
+    hardness_command[4][0] = dcmProxy->getTime(0);
     // #ifdef ROBOT_NAME_zaphod
     //     // turn off broken neck
     //    hardness_command[5][Kinematics::HEAD_YAW][0] = -1.0f;
