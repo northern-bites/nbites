@@ -213,8 +213,12 @@ void NaoEnactor::initDCMCommands(){
     us_command[2].arraySetSize(1);
     us_command[2][0].arraySetSize(2);
     us_command[2][0][0] = (4.0 + 64.0);
-    us_command[2][0][1] = dcmProxy->getTime(0);
-    dcmProxy->set(us_command);
-
+    us_command[2][0][1] = dcmProxy->getTime(5);
+    try {
+        dcmProxy->set(us_command);
+    } catch(AL::ALError& a) {
+        std::cout << "DCM ultrasound set error" << a.toString() << "    "
+                  << us_command.toString() << std::endl;
+    }
 }
 
