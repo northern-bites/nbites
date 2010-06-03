@@ -44,7 +44,7 @@ using namespace std;
 //here are defined the lower bounds on the sizes of goals, posts, and balls
 //IMPORTANT: they are only guesses right now.
 
-#define MIN_GOAL_HEIGHT	50
+#define MIN_GOAL_HEIGHT	30
 #define MIN_GOAL_WIDTH  4
 
 // ID information on goal post constant
@@ -90,7 +90,7 @@ static const bool POSTLOGIC = false;
 static const bool TOPFIND = false;
 static const bool CORNERDEBUG = false;
 static const bool SANITY = false;
-static const bool CORRECT = true;
+static const bool CORRECT = false;
 #else
 static const bool PRINTOBJS = false;
 static const bool POSTDEBUG = false;
@@ -647,7 +647,7 @@ float ObjectFragments::correct(Blob & b, int color, int c2) {
 			}
 			int magnitude = pickNth(corrections, 3, 3);
 			if (k > 0) {
-				drawLine(b.getLeftTopX(), b.getLeftTopY(), b.getLeftBottomX(), b.getLeftBottomY(), ORANGE);
+				//drawLine(b.getLeftTopX(), b.getLeftTopY(), b.getLeftBottomX(), b.getLeftBottomY(), ORANGE);
 				// left side is too far out
 				int oldx = b.getLeftTopX();
 				b.setLeftTopX(oldx + magnitude);
@@ -656,7 +656,7 @@ float ObjectFragments::correct(Blob & b, int color, int c2) {
 				b.setLeftBottomX(oldx + magnitude);
 				b.setLeftBottomY(min(IMAGE_HEIGHT - 1, yProject(oldx, b.getLeftBottomY(), b.getLeftBottomX())));
 			} else {
-				drawLine(b.getRightTopX(), b.getRightTopY(), b.getRightBottomX(), b.getRightBottomY(), ORANGE);
+				//drawLine(b.getRightTopX(), b.getRightTopY(), b.getRightBottomX(), b.getRightBottomY(), ORANGE);
 				// right side is too far out
 				int oldx = b.getRightTopX();
 				b.setRightTopX(oldx - magnitude);
@@ -968,6 +968,9 @@ int ObjectFragments::grabPost(int c, int c2, int leftx,
 			   smallY, bigY, c, c2, obj);
     // make sure we're looking at something big enough to be a post
     if (!postBigEnough(obj)) {
+		if (POSTDEBUG) {
+			drawBlob(obj, ORANGE);
+		}
         return NOPOST;
     }
 	// check how big it is versus how big we think it should be
@@ -1321,7 +1324,7 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
     int nextH = 0;
     distanceCertainty dc = BOTH_UNSURE;
 	Blob pole;
-    int isItAPost = grabPost(c, c2, IMAGE_WIDTH, -1, pole);
+    int isItAPost = grabPost(c, c2, IMAGE_WIDTH - 3, 2, pole);
 
     // make sure we're looking at something big enough to be a post
     if (isItAPost == NOPOST) {

@@ -151,6 +151,7 @@ public:
     void setFieldObjectInfo(VisualFieldObject *objPtr);
     void setVisualRobotInfo(VisualRobot *objPtr);
 	void setVisualCrossInfo(VisualCross *objPtr);
+	void setShot(VisualCrossbar * one);
 	float chooseGoalDistance(distanceCertainty cert, float height, float width,
 							 float poseDist, int bottom);
     float getGoalPostDistFromHeight(float height);
@@ -249,6 +250,7 @@ private:
 
     bool greenBlue[IMAGE_WIDTH];
     bool greenYellow[IMAGE_WIDTH];
+	bool shoot[IMAGE_WIDTH];
     int yellowWhite[IMAGE_WIDTH];
     int blueWhite[IMAGE_WIDTH];
     int navyTops[IMAGE_WIDTH];
@@ -270,6 +272,7 @@ private:
     // Visual horizon debugging
     bool visualHorizonDebug;
 	bool debugSelf;
+	bool debugShot;
 #endif
 };
 

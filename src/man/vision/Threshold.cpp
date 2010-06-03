@@ -72,7 +72,8 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     // storing locally
 #ifdef OFFLINE
     visualHorizonDebug = false;
-	debugSelf = true;
+	debugSelf = false;
+	debugShot = false;
 #endif
 
     // loads the color table on the MS into memory
@@ -129,10 +130,10 @@ void Threshold::visionLoop() {
     vision->fieldLines->afterObjectFragments();
 	// For now we don't set shooting information
     if (vision->bgCrossbar->getWidth() > 0) {
-        //blue->setShot(vision->bgCrossbar);
+        setShot(vision->bgCrossbar);
     }
     if (vision->ygCrossbar->getWidth() > 0) {
-        //yellow->setShot(vision->ygCrossbar);
+        setShot(vision->ygCrossbar);
     }
 	// for now we also don't use open field information
     //field->openDirection(horizon, pose.get());
@@ -435,6 +436,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 	unsigned char lastPixel = GREEN;
 	int currentRun = 0;
 	int bound = lowerBound[column];
+	int robots = 0, greens = 0, greys = 0;
+	shoot[column] = true;
 	// if a ball is in the middle of the boundary, then look a little lower
 	if (bound < IMAGE_HEIGHT - 1) {
 		//while (bound < IMAGE_HEIGHT && thresholded[bound][column] == ORANGE) {
@@ -483,12 +486,102 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 					cross->newRun(column, j, currentRun);
 				}
 				break;
+			case GREY:
+				greys+= currentRun;
+				break;
+			case GREEN:
+				greens+= currentRun;
+				break;
+			case NAVY:
+			case RED:
+				robots+= currentRun;
+				break;
 			}
 			// since this loop runs when a run ends, restart # pixels in run counter
 			currentRun = 1;
 		}
 		lastPixel = pixel;
 	}
+	if (robots > 5 || greys > 15 || greens < (bound - topEdge) / 2) {
+		shoot[column] = false;
+		if (debugShot) {
+			drawPoint(column, IMAGE_HEIGHT - 4, RED);
+		}
+	}
+}
+
+/*
+ */
+
+void Threshold::setShot(VisualCrossbar* one) {
+    int bx = one->getLeftBottomX(), brx = one->getRightBottomX();
+    const int WIDTH_DIVISOR = 5;   // gives a percent of the width
+    int lx = one->getLeftTopX(), ly = one->getLeftTopY(),
+        rx = one->getRightTopX(), ry = one->getRightTopY();
+	if (debugShot) {
+		cout << "Looking for shot " << bx << " " << brx << endl;
+	}
+	if (brx < IMAGE_WIDTH / 2) {
+        one->setBackDir(MOVELEFT);
+		one->setShoot(false);
+		return;
+	}
+	if (bx > IMAGE_WIDTH / 2) {
+		one->setBackDir(MOVERIGHT);
+		one->setShoot(false);
+		return;
+	}
+    // now find the range of shooting
+    int r1 = IMAGE_WIDTH / 2;
+    int r2 = IMAGE_WIDTH / 2;
+    for ( ;r1 < brx && r1 >= bx && shoot[r1]; r1--) {}
+    for ( ;r2 > bx && r2 <= rx && shoot[r2]; r2++) {}
+    if (r2 - r1 < MINSHOTWIDTH || abs(r1 - IMAGE_WIDTH / 2) < MINSHOTWIDTH / 2||
+        abs(r2 - IMAGE_WIDTH / 2) < MINSHOTWIDTH) {
+        one->setShoot(false);
+        one->setBackLeft(-1);
+        one->setBackRight(-1);
+    } else {
+        one->setShoot(true);
+        if (debugShot) {
+            drawLine(r1, ly, r1, IMAGE_HEIGHT - 1, RED);
+            drawLine(r2, ly, r2, IMAGE_HEIGHT - 1, RED);
+        }
+    }
+    one->setBackLeft(r1);
+    one->setBackRight(r2);
+
+    if (debugShot) {
+        drawPoint(r1, ly, RED);
+        drawPoint(r2, ly, BLACK);
+    }
+    // now figure out the optimal direction
+    int left = 0, right = 0;
+    for (int i = lx; i < IMAGE_WIDTH / 2; i++) {
+        if (shoot[i]) left++;
+    }
+    for (int i = IMAGE_WIDTH / 2; i < rx; i++) {
+        if (shoot[i]) right++;
+    }
+    one->setLeftOpening(left);
+    one->setRightOpening(right);
+
+    if (left > right)
+        one->setBackDir(MOVELEFT);
+    else if (right > left)
+        one->setBackDir(MOVERIGHT);
+    else if (right == 0)
+        one->setBackDir(ALLBLOCKED);
+    else
+        one->setBackDir(EITHERWAY);
+    if (debugShot) {
+        cout << "Crossbar info: Left Col: " << r1 << " Right Col: " << r2
+             << " Dir: " << one->getBackDir();
+        if (one->shotAvailable())
+            cout << " Take the shot!" << endl;
+        else
+            cout << " Don't shoot!" << endl;
+    }
 }
 
 /** Given two lines defined by "detectSelf" set the lower bounds.  We have
