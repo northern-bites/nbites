@@ -108,6 +108,7 @@ static const int VOFFSET=1;
 static const int YOFFSET1=0;
 static const int YOFFSET2=2;
 
+static const int NUMBLOCKS = 3;
 
 //
 // DISTANCE ESTIMATES CONSTANTS
@@ -152,6 +153,7 @@ public:
     void setVisualRobotInfo(VisualRobot *objPtr);
 	void setVisualCrossInfo(VisualCross *objPtr);
 	void setShot(VisualCrossbar * one);
+	void setOpenFieldInformation();
 	float chooseGoalDistance(distanceCertainty cert, float height, float width,
 							 float poseDist, int bottom);
     float getGoalPostDistFromHeight(float height);
@@ -260,6 +262,8 @@ private:
 	int greenEdge[IMAGE_WIDTH];
 
 	int lowerBound[IMAGE_WIDTH];
+	int block[NUMBLOCKS];
+	int evidence[NUMBLOCKS];
 
     // thresholding variables
     int horizon;
@@ -273,6 +277,7 @@ private:
     bool visualHorizonDebug;
 	bool debugSelf;
 	bool debugShot;
+	bool debugOpenField;
 #endif
 };
 
