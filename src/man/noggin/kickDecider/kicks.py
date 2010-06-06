@@ -15,6 +15,9 @@ class Kick(object):
         """returns all position info as a tuple"""
         return (self.x_offset, self.y_offset, self.heading)
 
+    def __str__(self):
+        return ("x_offset: %g y_offset: %g heading: %g" %
+                (self.x_offset, self.y_offset, self.heading))
 # Some standard kicks. x,y and move should not be modified, h will be
 LEFT_SIDE_KICK = Kick(y=2, move=SweetMoves.LEFT_SIDE_KICK)
 RIGHT_SIDE_KICK = Kick(y=-2, move=SweetMoves.RIGHT_SIDE_KICK)
