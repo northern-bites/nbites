@@ -1,9 +1,5 @@
-
-from math import (hypot, degrees)
-
 from .Location import (RobotLocation, Location)
 from .. import NogginConstants
-from ..util import MyMath
 import time
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
