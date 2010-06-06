@@ -132,16 +132,19 @@ def positionForKick(nav):
     move to position relative to ball given by offset and heading calculated
     by kick decider without running into the ball
     """
+
     (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
 
-    ## sX,sY,sTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
+    # if we need to orbit, switch to orbit state
+    if not navTrans.atHeading(nav.brain.my, heading):
+        return nav.goNow('orbitBall')
 
     ball = nav.brain.ball
 
     # Determine approach speed
     target_x = ball.relX - x_offset
 
-    if fabs(target_x) < 1.0:
+    if -0.5 <= target_x < 1.0:
         sX = 0
     else:
         sX = MyMath.clip(target_x * PFK_X_GAIN,
@@ -159,13 +162,22 @@ def positionForKick(nav):
 
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
-    print ("x_offset: %g y_offset:%g target_x:%g target_y:%g" %
-           (x_offset, y_offset, target_x, target_y))
+    # calculate spin speed
+    spinDir = nav.brain.my.spinDirToHeading(heading)
+    hDiff = MyMath.sub180Angle(nav.brain.my.h - heading)
+    sTheta = spinDir * walker.getRotScale(hDiff) * \
+             constants.OMNI_MAX_SPIN_SPEED
+    sTheta = MyMath.clip(sTheta,
+                         constants.OMNI_MIN_SPIN_SPEED,
+                         constants.OMNI_MAX_SPIN_SPEED)
 
-    if sX == 0.0 and sY == 0.0:
+    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
+        sTheta = 0.0
+
+    if sX == 0.0 and sY == 0.0 and sTheta == 0.0:
         return nav.goNow('stop')
 
-    helper.setSlowSpeed(nav,sX,sY,0)
+    helper.setSpeed(nav,sX,sY,sTheta)
 
     return nav.stay()
 
@@ -186,4 +198,45 @@ def dribble(nav):
         elif navTrans.shouldChaseAroundBox(nav.brain.my, ball):
             return nav.goLater('chaseAroundBox')
 
+    return nav.stay()
+
+def orbitBall(nav):
+    """
+    Circles around a point in front of robot, for a certain angle
+    """
+    if nav.firstFrame():
+        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
+
+    (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
+
+    ball = nav.brain.ball
+    target_relX= 15.
+    target_relY = 0.
+    rel_buffer = 5.
+
+    if ball.relX <= target_relX:
+        sX = -5.
+        sY = 0.
+        sTheta = 0.
+
+    elif ball.relY <= (target_relY - rel_buffer):
+        sX = 0.
+        sY = -5.
+        sTheta = 0.
+
+    elif ball.relY >= (target_relY + rel_buffer):
+        sX = 0.
+        sY = 5.
+        sTheta = 0.
+
+    else:
+        nav.dest = ball
+        nav.dest.h = heading
+        sX, sY, sTheta = \
+               walker.getOmniWalkParam(nav.brain.my, nav.dest)
+
+    helper.setSpeed(nav, sX, sY, sTheta)
+
+    if navTrans.atHeading(nav.brain.my, heading):
+        return nav.goLater('positionForKick')
     return nav.stay()

@@ -38,15 +38,18 @@ class KickDecider(object):
         # prioritize time to align
         # calculate bearing to dest
         bearing = self.brain.my.getRelativeBearing(kickDest)
-        if fabs(bearing) >= 65.0:
+        if fabs(bearing) >= 180.:
             print "kick sideways"
+
             # kick sideways
             # left or right?
             # positive bearing means dest is to my left, so kick right
             if bearing > 0:
                 kick = kicks.RIGHT_SIDE_KICK
+                kick.heading = self.brain.ball.headingTo(kickDest) - 90.
             else:
                 kick = kicks.LEFT_SIDE_KICK
+                kick.heading = self.brain.ball.headingTo(kickDest) + 90.
 
         else:
             print "kick straight"
@@ -78,8 +81,8 @@ class KickDecider(object):
                     kick = kicks.LEFT_BIG_KICK
                 else:
                     kick = kicks.RIGHT_BIG_KICK
+            kick.heading = self.brain.ball.headingTo(kickDest)
 
-        kick.heading = self.brain.ball.headingTo(kickDest)
         self.currentKick = kick
         self.brain.out.printf(self.currentKick)
 

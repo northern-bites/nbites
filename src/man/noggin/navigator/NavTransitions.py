@@ -24,7 +24,7 @@ def atHeading(my, targetHeading):
     Returns true if we are at a heading close enough to what we want
     """
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
-
+    print "my.h: %g target.h: %g" % (my.h, targetHeading)
     return hDiff < constants.CLOSE_ENOUGH_H and \
            my.uncertH < constants.LOC_IS_ACTIVE_H
 
@@ -134,3 +134,9 @@ def shouldAvoidObstacleDuringApproachBall(nav):
     return (nav.brain.ball.dist >
             constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST and \
             shouldAvoidObstacle(nav))
+
+KICK_STRAIGHT_BEARING_THRESH = 20.
+########## CHASE STUFF ##############
+def shouldChaseOrbit(myH, destH):
+    hDiff = MyMath.sub180Angle(myH - destH)
+    return( fabs(hDiff) > KICK_STRAIGHT_BEARING_THRESH)
