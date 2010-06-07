@@ -5,6 +5,11 @@
 #include "manconfig.h"
 
 #include "ALImageTranscriber.h"
+#include "corpusconfig.h"
+
+#ifdef DEBUG_ALIMAGE
+#  define DEBUG_ALIMAGE_LOOP
+#endif
 
 using boost::shared_ptr;
 using namespace AL;
@@ -107,9 +112,12 @@ void ALImageTranscriber::run() {
 
 		lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
         if (processTime > VISION_FRAME_LENGTH_uS){
-			if (lastProcessTimeAvg > VISION_FRAME_LENGTH_PRINT_THRESH_uS)
+			if (lastProcessTimeAvg > VISION_FRAME_LENGTH_PRINT_THRESH_uS) {
+#ifdef DEBUG_ALIMAGE_LOOP
 				std::cout << "Time spent in ALImageTranscriber loop longer than"
 						  << " frame length: " << processTime <<std::endl;
+#endif
+			}
             //Don't sleep at all
         } else{
 			const long int microSleepTime = (VISION_FRAME_LENGTH_uS -
