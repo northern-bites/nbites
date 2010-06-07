@@ -12,8 +12,8 @@ from math import fabs
 DEBUG = False
 
 def walkSpinToBall(nav):
-    if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+    #if nav.firstFrame():
+    #    nav.brain.CoA.setRobotGait(nav.brain.motion)
 
     ball = nav.brain.ball
     nav.dest = ball
@@ -49,7 +49,7 @@ def chaseAroundBox(nav):
         # reset dest to new RobotLocation to avoid problems w/dist calculations
         nav.dest = RobotLocation()
         nav.shouldChaseAroundBox = 0
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+        #nav.brain.CoA.setRobotGait(nav.brain.motion)
 
     ball = nav.brain.ball
     my = nav.brain.my
@@ -136,8 +136,8 @@ def positionForKick(nav):
     ## nav.dest = kick.getKickPosition()
 
     ## sX,sY,sTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
-    if nav.firstFrame():
-        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
+    #if nav.firstFrame():
+    #    nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
 
     ball = nav.brain.ball
 
@@ -155,15 +155,11 @@ def positionForKick(nav):
     else:
         sX = 0.0
 
-    helper.setSpeed(nav,sX,sY,0)
+    helper.setSlowSpeed(nav,sX,sY,0)
 
     return nav.stay()
 
 def dribble(nav):
-
-    if nav.firstFrame():
-        nav.brain.CoA.setRobotDribbleGait(nav.brain.motion)
-
     ball = nav.brain.ball
     nav.dest = ball
     nav.dest.h = ball.heading
@@ -172,7 +168,7 @@ def dribble(nav):
     walkX, walkY, walkTheta = \
            walker.getWalkSpinParam(nav.brain.my, nav.dest)
 
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
+    helper.setDribbleSpeed(nav, walkX, walkY, walkTheta)
 
     if not nav.brain.play.isRole(GOALIE):
         if navTrans.shouldNotGoInBox(ball):

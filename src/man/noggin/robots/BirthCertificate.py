@@ -48,14 +48,14 @@ class BirthCertificate:
 			self.current_gait = self.slow_gait
 			motion_interface.setGait(self.slow_gait)
 
-	def setBackwardsGait(self, motion_interface):
+	def setRobotBackwardsGait(self, motion_interface):
 		if self.backwards_gait is not None and \
 				self.current_gait is not self.backwards_gait:
 			print '\033[32m' + "BirthCertificates - Setting backwards gait" + '\033[0m'
 			self.current_gait = self.backwards_gait
 			motion_interface.setGait(self.backwards_gait)
 
-	def setDynamicGait(self, motion_interface, dynGait):
+	def setRobotDynamicGait(self, motion_interface, dynGait):
 		print '\033[32m' + "BirthCertificates - Setting DYNAMIC gait" + '\033[0m'
 		self.current_gait = dynGait
 		motion_interface.setGait(dynGait)

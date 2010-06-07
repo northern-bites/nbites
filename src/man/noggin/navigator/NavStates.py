@@ -31,7 +31,7 @@ def walkStraightToPoint(nav):
     If we no longer are heading towards it change to the spin state.
     """
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+        #nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
 
@@ -69,7 +69,7 @@ def spinToWalkHeading(nav):
     newSpinDir = my.spinDirToHeading(targetH)
 
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+        #nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.changeSpinDirCounter = 0
         nav.stopSpinToWalkCount = 0
         nav.curSpinDir = newSpinDir
@@ -112,7 +112,7 @@ def spinToFinalHeading(nav):
     Stops when at heading
     """
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+        #nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.stopSpinToWalkCount = 0
 
     targetH = nav.dest.h
@@ -141,20 +141,13 @@ def omniWalkToPoint(nav):
     my = nav.brain.my
     dest = nav.dest
 
-    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
-
     if nav.firstFrame():
-        # use backwardsGait if we are moving backwards
-        if walkX < 0:
-           nav.brain.CoA.setBackwardsGait(nav.brain.motion)
-        else:
-            nav.brain.CoA.setRobotGait(nav.brain.motion)
-
         nav.walkToPointCount = 0
 
     if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
         return nav.goNow('stop')
 
+    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     return nav.stay()
@@ -191,12 +184,11 @@ def avoidFrontObstacle(nav):
     # we'll probably want to go forward again and most obstacle
     # are moving, so pausing might make more sense
 
-
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
         nav.printf(nav.brain.sonar)
         nav.printf("Avoid by backup");
-        helper.setSpeed(nav, 0, constants.DODGE_BACK_SPEED, 0)
+        helper.setSpeed(nav, constants.DODGE_BACK_SPEED, 0, 0)
 
     avoidLeft = navTrans.shouldAvoidObstacleLeft(nav)
     avoidRight = navTrans.shouldAvoidObstacleRight(nav)
@@ -292,8 +284,6 @@ def walking(nav):
     """
     State to be used when setSpeed is called
     """
-    if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
     if nav.updatedTrajectory:
         helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
@@ -307,7 +297,6 @@ def stepping(nav):
     This is different from walking.
     """
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         helper.step(nav, nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
 
     elif not nav.brain.motion.isWalkActive():
@@ -336,7 +325,7 @@ def stopped(nav):
 
 def orbitPoint(nav):
     if nav.updatedTrajectory:
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+        #nav.brain.CoA.setRobotGait(nav.brain.motion)
         helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
 

@@ -37,7 +37,7 @@ def playbookWalk(nav):
 
 def playbookOmni(nav):
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+    #    nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.stopOmniCount = 0
 
     my = nav.brain.my
