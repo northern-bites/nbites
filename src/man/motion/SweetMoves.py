@@ -74,13 +74,23 @@ GOALIE_POS = ((INITIAL_POS[0][0],
                1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
 #KICKS
-def DREW_KICK(y):
+def DREW_KICK(x,y,dist):
     if y<=0:
-        return mirrorMove(LEFT_D_KICK(-1*y))
+        return mirrorMove(LEFT_D_KICK(x,-1*y,dist))
     if y>0:
-        return LEFT_D_KICK(y)
+        return LEFT_D_KICK(x,y,dist)
 
-def LEFT_D_KICK(y):
+
+MAX_KICK_HIP_PITCH = -58.
+MIN_KICK_HIP_PITCH = -100.
+KICK_HIP_INTERVAL = MIN_KICK_HIP_PITCH - MAX_KICK_HIP_PITCH
+
+MAX_KICK_DIST = 380.
+MIN_KICK_DIST = 100.
+KICK_DIST_INTERVAL = MAX_KICK_DIST - MIN_KICK_DIST
+INTERVAL_RATIO = KICK_HIP_INTERVAL / KICK_DIST_INTERVAL
+
+def LEFT_D_KICK(x,y,dist):
     kick_leg_hip_roll=y*2.0;
 
     if kick_leg_hip_roll>20.0:
@@ -89,7 +99,19 @@ def LEFT_D_KICK(y):
     if kick_leg_hip_roll<5.0:
         kick_leg_hip_roll=5.0
 
+    # range from 15 to 60 to balance against kick
     support_arm_shoulder_roll = -3.*kick_leg_hip_roll
+
+    # range from -58 to -100
+    # relX goes from 9 to 15, aka 0 to 6
+    # dist goes from 100 to 380
+    if dist > MAX_KICK_DIST:
+        dist = MAX_KICK_DIST
+    elif dist < MIN_KICK_DIST:
+        dist = MIN_KICK_DIST
+
+    kick_hip_pitch = -((MIN_KICK_DIST - dist) * INTERVAL_RATIO - \
+        MAX_KICK_HIP_PITCH)
 
     return (
         #swing to the right
@@ -107,16 +129,16 @@ def LEFT_D_KICK(y):
 
         # kick left leg
         ((80.,0.,-50.,-90.),
-         (0.,kick_leg_hip_roll,-100.,80.,-20.,-20.),
+         (0.,kick_leg_hip_roll, kick_hip_pitch, 80.,-20.,-20.),
          (0.,0.,-40.,86.,-45.,-18.),
          (80.,support_arm_shoulder_roll,50.,70.),
          0.1,0, stiff.NORMAL_STIFFNESSES),
 
         # return to normal position
-        ((80.,20.,-50.,-70.),
+        ((60., 35., 0.,0.),
          (0.0,  0.0,  -22., 50., -30., 0.0),
          (0.0,  0.0,  -21., 52., -30., 0.0),
-         (80.,support_arm_shoulder_roll,50.,70.),
+         (60., -35, 0., 0.),
          1.,0, stiff.LOW_HEAD_STIFFNESSES)
         )
 
