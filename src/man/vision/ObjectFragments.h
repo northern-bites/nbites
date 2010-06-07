@@ -75,7 +75,7 @@ public:
 
     // finding square objects
     void squareGoal(int x, int y, int left, int right, int top, int bottom, int c, int c2, Blob & pole);
-    float correct(Blob b, int c, int c2);
+    float correct(Blob & b, int c, int c2);
 
     // main method
     void createObject();

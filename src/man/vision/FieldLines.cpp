@@ -2907,23 +2907,23 @@ void FieldLines::removeRiskyCorners(list<VisualCorner> &corners) {
 
         // We found at least one risky corner
         if (riskyTCorners != corners.end()) {
-            if (debugRiskyCorners || debugIdentifyCorners) {
+            /*if (debugRiskyCorners || debugIdentifyCorners) {
                 cout << "Removing " << numTByEdge
                      << " T corners that are within "
                      << T_NUM_PIXELS_CLOSE_TO_EDGE
                      << " pixels from the edge of the "
                      << "screen; likely a CC that is cut off." << endl;
-            }
+					 }*/
             corners.erase(riskyTCorners, corners.end());
-        }
+		}
     }
 
-    if (debugRiskyCorners || debugIdentifyCorners) {
+    /*if (debugRiskyCorners || debugIdentifyCorners) {
 		if (corners.size() > 0) {
 			cout << "\tRemoved " << oldNumCorners - corners.size()
 				 << " risky corner(s). "  << endl;
 		}
-    }
+		}*/
 }
 
 
