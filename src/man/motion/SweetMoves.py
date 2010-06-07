@@ -100,26 +100,24 @@ def LEFT_D_KICK(y):
 
         # Lift/cock leg
         ((80.,0.,-50.,-90.),
-         (0.,kick_leg_hip_roll,-70.,120.,-40.,-20.),
+         (0.,kick_leg_hip_roll,-60.,120.,-20.,-20.),
          (0.,0,-40.,86.,-45.,-18.),
          (80.,support_arm_shoulder_roll,50.,70.),
          0.8,0, stiff.NORMAL_STIFFNESSES),
 
         # kick left leg
         ((80.,0.,-50.,-90.),
-         (0.,kick_leg_hip_roll,-90.,80.,40.,-20.),
+         (0.,kick_leg_hip_roll,-100.,80.,-20.,-20.),
          (0.,0.,-40.,86.,-45.,-18.),
          (80.,support_arm_shoulder_roll,50.,70.),
          0.1,0, stiff.NORMAL_STIFFNESSES),
 
         # return to normal position
         ((80.,20.,-50.,-70.),
-         (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
-         (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
+         (0.0,  0.0,  -22., 50., -30., 0.0),
+         (0.0,  0.0,  -21., 52., -30., 0.0),
          (80.,support_arm_shoulder_roll,50.,70.),
-         1.5,0, stiff.LOW_HEAD_STIFFNESSES)
-
-
+         1.,0, stiff.LOW_HEAD_STIFFNESSES)
         )
 
 STAND_FOR_KICK_LEFT = (
