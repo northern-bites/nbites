@@ -31,7 +31,6 @@ def walkStraightToPoint(nav):
     If we no longer are heading towards it change to the spin state.
     """
     if nav.firstFrame():
-        #nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
 
@@ -69,7 +68,6 @@ def spinToWalkHeading(nav):
     newSpinDir = my.spinDirToHeading(targetH)
 
     if nav.firstFrame():
-        #nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.changeSpinDirCounter = 0
         nav.stopSpinToWalkCount = 0
         nav.curSpinDir = newSpinDir
@@ -112,7 +110,6 @@ def spinToFinalHeading(nav):
     Stops when at heading
     """
     if nav.firstFrame():
-        #nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.stopSpinToWalkCount = 0
 
     targetH = nav.dest.h
@@ -325,7 +322,6 @@ def stopped(nav):
 
 def orbitPoint(nav):
     if nav.updatedTrajectory:
-        #nav.brain.CoA.setRobotGait(nav.brain.motion)
         helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
 

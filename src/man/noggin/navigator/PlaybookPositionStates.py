@@ -8,7 +8,6 @@ DEBUG = False
 def playbookWalk(nav):
     """positions us in any state using position from playbook"""
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.omniWalkToCount = 0
 
     my = nav.brain.my
@@ -37,7 +36,6 @@ def playbookWalk(nav):
 
 def playbookOmni(nav):
     if nav.firstFrame():
-    #    nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.stopOmniCount = 0
 
     my = nav.brain.my
@@ -64,7 +62,6 @@ def playbookOmni(nav):
 
 def playbookAtPosition(nav):
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         helper.setSpeed(nav, 0, 0, 0)
 
     my = nav.brain.my

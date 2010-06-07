@@ -12,9 +12,6 @@ from math import fabs
 DEBUG = False
 
 def walkSpinToBall(nav):
-    #if nav.firstFrame():
-    #    nav.brain.CoA.setRobotGait(nav.brain.motion)
-
     ball = nav.brain.ball
     nav.dest = ball
     nav.dest.h = ball.heading
@@ -49,7 +46,6 @@ def chaseAroundBox(nav):
         # reset dest to new RobotLocation to avoid problems w/dist calculations
         nav.dest = RobotLocation()
         nav.shouldChaseAroundBox = 0
-        #nav.brain.CoA.setRobotGait(nav.brain.motion)
 
     ball = nav.brain.ball
     my = nav.brain.my
@@ -136,8 +132,6 @@ def positionForKick(nav):
     ## nav.dest = kick.getKickPosition()
 
     ## sX,sY,sTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
-    #if nav.firstFrame():
-    #    nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
 
     ball = nav.brain.ball
 
