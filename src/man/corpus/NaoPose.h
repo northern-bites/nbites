@@ -101,9 +101,11 @@
 #include <boost/numeric/ublas/lu.hpp>              // for lu_factorize
 #include <boost/numeric/ublas/io.hpp>              // for cout
 
-#include "Common.h"             // For ROUND
-#include "VisionDef.h"          // For camera parameters
+#include "Common.h"               // For ROUND
+#include "VisionDef.h"           // For camera parameters
 #include "Kinematics.h"         // For physical body parameters
+#include "CameraCalibrate.h"   //for camera calibraton, go figure
+#include "VisualLine.h" //for visual lines, helps in calibration
 
 #include "Sensors.h"
 #include "Structs.h"
@@ -177,6 +179,8 @@ public:
       return sensors->getHeadAngles()[0];
     }
     const float getDistanceBetweenTwoObjects(estimate e1, estimate e2);
+    std::vector<VisualLine> getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
+    const boost::numeric::ublas::vector <float> worldPointToPixel(boost::numeric::ublas::vector <float> point);
 
     const float getHeadPitch() {
       return sensors->getHeadAngles()[1];
