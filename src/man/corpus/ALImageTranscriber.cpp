@@ -118,7 +118,7 @@ void ALImageTranscriber::run() {
                         << " frame length: " << processTime <<std::endl;
 #endif
             }
-        //Don't sleep at all
+            //Don't sleep at all
         } else{
             const long int microSleepTime = (VISION_FRAME_LENGTH_uS -
                     processTime);
