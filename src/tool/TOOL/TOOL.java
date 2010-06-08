@@ -38,6 +38,7 @@ import TOOL.Data.SourceManager;
 import TOOL.Data.DataModule;
 import TOOL.Calibrate.Calibrate;
 import TOOL.Calibrate.CalibrateModule;
+import TOOL.Calibrate.CameraCalibratePanel;
 import TOOL.ColorEdit.ColorEditModule;
 import TOOL.ColorEdit.ColorEdit;
 import TOOL.Classifier.ClassifierModule;
@@ -98,7 +99,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     //temp menus to allow color table stuff
     JMenu actions;
     JMenuItem newColorTable, saveColorTable, saveColorTableAs,loadColorTable,
-        toggleAutoSave, toggleSoftColors, intersectColorTable;
+        toggleAutoSave, toggleSoftColors, intersectColorTable, cameraCalibrate;
     JMenuItem addPane, removePane;
     //modules
     private Calibrate calibrate;
@@ -315,6 +316,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 		intersectColorTable = new JMenuItem("Intersect Color Table");
         toggleAutoSave = new JCheckBoxMenuItem("Autosave enabled");
         toggleSoftColors = new JCheckBoxMenuItem("Softcolors enabled");
+        cameraCalibrate = new JMenuItem("Calibrate Camera");
         toggleSoftColors.setSelected(true);
 
         addPane = new JMenuItem("Add Pane");
@@ -327,6 +329,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         saveColorTableAs.addActionListener(this);
         toggleAutoSave.addActionListener(this);
         toggleSoftColors.addActionListener(this);
+        cameraCalibrate.addActionListener(this);
 
         addPane.addActionListener(this);
         removePane.addActionListener(this);
@@ -344,6 +347,9 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         actions.addSeparator();
         actions.add(addPane);
         actions.add(removePane);
+        
+        actions.addSeparator();
+        actions.add(cameraCalibrate);
 
         menuBar.add(actions);
 
@@ -467,6 +473,9 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             colorTable.setSoftColors(toggleSoftColors.isSelected());
             CONSOLE.println("Soft colors enabled: " +
                             toggleSoftColors.isSelected());
+        }
+        else if (e.getSource() == cameraCalibrate) {
+            CameraCalibratePanel cameraCalibrate = new CameraCalibratePanel(calibrate);
         }
 
     }
