@@ -522,7 +522,7 @@ void Noggin::processGCButtonClicks(){
             rightFootButton->getAndClearNumClicks();
 #ifdef DEBUG_NOGGIN_GC
             cout << " Button pushing switched GC to kickoff state : ";
-            if(gc->kickOffTeam() == gc->team())
+            if(gc->kickOffTeam() == gc->color())
                 cout << "ON KICKOFF" <<endl;
             else
                 cout << "OFF KICKOFF" <<endl;

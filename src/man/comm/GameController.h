@@ -41,28 +41,28 @@ public:
     const RoboCupGameControlData& getGameData() { return controlData; }
 
     void handle_packet(const char *msg, int len);
-	bool shouldResetTimer();
+    bool shouldResetTimer();
 
     // Public data access interface
     const uint32 timeRemaining();
     const uint8 team();
-    const TeamInfo teams(uint16 team);
+    const TeamInfo teams(uint8 team);
     const uint8 color();
-    const uint8 player();
+    const uint16 player();
     const uint8 kickOffTeam();
-    const GCGameState gameState();
-	const uint8 gameSecondaryState();
-    const GCPenalty penalty();
-    const GCPenalty penalties(uint16 player);
+    const uint8 gameState();
+    const uint8 gameSecondaryState();
+    const uint16 penalty();
+    const uint16 penalties(uint16 player);
     const uint16 penaltySeconds();
     const uint16 penaltySeconds(uint16 player);
     const bool isManuallyPenalized(void);
     void setTeam(uint8 team);
     void setColor(uint8 color);
-    void setPlayer(uint8 player);
+    void setPlayer(uint16 player);
     void setKickOffTeam(uint8 team);
-    void setGameState(GCGameState state);
-    void setPenalty(GCPenalty penalized);
+    void setGameState(uint8 state);
+    void setPenalty(uint16 penalized);
 
     // Button Click Methods
     void advanceButtonClickState();
@@ -84,7 +84,7 @@ private:
     /* local copy of the GameController data */
     RoboCupGameControlData controlData;
     TeamInfo* myTeam;
-    uint8 playerNumber;
+    uint16 playerNumber;
     bool justManuallyPenalized;
     bool manuallyPenalized;
 

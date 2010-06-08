@@ -46,7 +46,6 @@ static void printGCData(RoboCupGameControlData& packet)
 GameController::GameController()
     : controlData(), myTeam(&controlData.teams[TEAM_BLUE]), playerNumber(1),
       justManuallyPenalized(false), manuallyPenalized(false)
-
 {
     pthread_mutex_init (&mutex, NULL);
 }
@@ -57,8 +56,9 @@ void GameController::handle_packet(const char *msg, int len)
     if (!validatePacket(msg, len, packet))
         return;
 
-    if (packet.teams[TEAM_BLUE].teamColor != TEAM_BLUE)
+    if (packet.teams[TEAM_BLUE].teamColor != TEAM_BLUE){
         rawSwapTeams(packet);
+	}
 
     //beepOnUnfairPenalize(packet);
 
@@ -82,7 +82,7 @@ void GameController::handle_packet(const char *msg, int len)
 }
 
 bool GameController::validatePacket(const char *msg, int len,
-                               RoboCupGameControlData &packet)
+									RoboCupGameControlData &packet)
 {
     // ensure correct packet size
     if (len != sizeof(packet)) {
@@ -99,11 +99,14 @@ bool GameController::validatePacket(const char *msg, int len,
 
     // check header
     if (memcmp(packet.header, GAMECONTROLLER_STRUCT_HEADER,
-               sizeof(GAMECONTROLLER_STRUCT_HEADER)) != 0) {
+               sizeof(packet.header)) != 0) {
 #ifdef DEBUG_INVALID_PACKETS
         cerr << "GameController::validatePacket() -- invalid packet header";
         cerr << endl;
-        cerr << "  header == " << packet.header << endl;
+        cerr << "  packet header == " << packet.header << endl;
+        cerr << "  header == " << GAMECONTROLLER_STRUCT_HEADER << endl;
+		cerr << "sizeof(packet header): "<< sizeof(packet.header) <<endl;
+		cerr << "sizeof(STRUCT_HEADER): "<< sizeof(GAMECONTROLLER_STRUCT_HEADER) <<endl;
 #endif
         return false;
     }
@@ -172,7 +175,7 @@ const uint8 GameController::team()
     return team;
 }
 
-const TeamInfo GameController::teams(uint16 team)
+const TeamInfo GameController::teams(uint8 team)
 {
     pthread_mutex_lock(&mutex);
     const TeamInfo info = controlData.teams[team];
@@ -188,10 +191,10 @@ const uint8 GameController::color()
     return color;
 }
 
-const uint8 GameController::player()
+const uint16 GameController::player()
 {
     pthread_mutex_lock(&mutex);
-    const uint8 player = playerNumber;
+    const uint16 player = playerNumber;
     pthread_mutex_unlock(&mutex);
     return player;
 }
@@ -204,10 +207,10 @@ const uint8 GameController::kickOffTeam()
     return kickOff;
 }
 
-const GCGameState GameController::gameState()
+const uint8 GameController::gameState()
 {
     pthread_mutex_lock(&mutex);
-    const GCGameState state = static_cast<GCGameState>(controlData.state);
+    const uint8 state = controlData.state;
     pthread_mutex_unlock(&mutex);
     return state;
 }
@@ -221,20 +224,18 @@ const uint8 GameController::gameSecondaryState()
 }
 
 
-const GCPenalty GameController::penalty()
+const uint16 GameController::penalty()
 {
     pthread_mutex_lock(&mutex);
-    const GCPenalty penalized =
-        static_cast<GCPenalty>(myTeam->players[playerNumber-1].penalty);
+    const uint16 penalized = myTeam->players[playerNumber-1].penalty;
     pthread_mutex_unlock(&mutex);
     return penalized;
 }
 
-const GCPenalty GameController::penalties(uint16 player)
+const uint16 GameController::penalties(uint16 player)
 {
     pthread_mutex_lock(&mutex);
-    const GCPenalty penalized =
-        static_cast<GCPenalty>(myTeam->players[player-1].penalty);
+    const uint16 penalized = myTeam->players[player-1].penalty;
     pthread_mutex_unlock(&mutex);
     return penalized;
 }
@@ -269,7 +270,7 @@ void GameController::setColor(uint8 color)
     pthread_mutex_unlock(&mutex);
 }
 
-void GameController::setPlayer(uint8 player)
+void GameController::setPlayer(uint16 player)
 {
     pthread_mutex_lock(&mutex);
     playerNumber = player;
@@ -283,23 +284,23 @@ void GameController::setKickOffTeam(uint8 kickOff)
     pthread_mutex_unlock(&mutex);
 }
 
-void GameController::setGameState(GCGameState state)
+void GameController::setGameState(uint8 state)
 {
     pthread_mutex_lock(&mutex);
-    controlData.state = static_cast<uint8>(state);
+    controlData.state = state;
     pthread_mutex_unlock(&mutex);
 }
 
-void GameController::setPenalty(GCPenalty penalty)
+void GameController::setPenalty(uint16 penalty)
 {
     pthread_mutex_lock(&mutex);
-    myTeam->players[playerNumber-1].penalty = static_cast<uint8>(penalty);
+    myTeam->players[playerNumber-1].penalty = penalty;
     pthread_mutex_unlock(&mutex);
 }
 
 void GameController::advanceButtonClickState(){
-    const GCGameState currentState = gameState();
-    const GCPenalty currentPenalty  = penalty();
+    const uint8 currentState = gameState();
+    const uint16 currentPenalty  = penalty();
 
     //From the Nao Rules, when the chest button is pushed
     //We need to advance the states
@@ -333,23 +334,19 @@ void GameController::advanceButtonClickState(){
 }
 void GameController::toggleTeamColor(){
     //switch to the next team
-    setColor((color()+1) % NUM_TEAMS);
-
+	setColor(static_cast<uint8>((color()+1) % NUM_TEAMS));
 }
 
 void GameController::toggleKickoff(){
 
-    const uint8 team1 = (controlData.teams[0]).teamNumber;
-    const uint8 team2 = (controlData.teams[1]).teamNumber;
-
-    if(kickOffTeam() == team1){
-        setKickOffTeam(team2);
-    }else if(kickOffTeam() == team2){
-        setKickOffTeam(team1);
+    if(kickOffTeam() == TEAM_RED){
+        setKickOffTeam(TEAM_BLUE);
+    }else if(kickOffTeam() == TEAM_BLUE){
+        setKickOffTeam(TEAM_RED);
     }else{
-//         cout << "GameController:: kickOffTeam is not consistent with TeamInfo"
-//              << " Setting kickoff team to " << team()
-//              << endl;
+         cout << "GameController:: kickOffTeam is not consistent with TeamInfo"
+              << " Setting kickoff team to " << team()
+              << endl;
         setKickOffTeam(team());
     }
 }
@@ -406,7 +403,7 @@ enum PyGameController_attr {
     GC_KICKOFF,
     GC_STATE,
     GC_PENAL,
-	GC_SECOND
+    GC_SECOND
 };
 
 static PyGetSetDef PyGameController_getsetters[] = {
@@ -608,7 +605,7 @@ int PyGameController_set (PyGameController* self, PyObject* value, void* closure
             self->_gc->setColor(static_cast<uint8>(tmp));
         break;
     case GC_PLAYER:
-        self->_gc->setPlayer(static_cast<uint8>(PyInt_AsLong(value)));
+        self->_gc->setPlayer(static_cast<uint16>(PyInt_AsLong(value)));
         break;
     case GC_KICKOFF:
         tmp = PyInt_AsLong(value);
@@ -628,7 +625,7 @@ int PyGameController_set (PyGameController* self, PyObject* value, void* closure
                          STATE_INITIAL, STATE_FINISHED, tmp);
             result = -1;
         }else
-            self->_gc->setGameState(static_cast<GCGameState>(tmp));
+            self->_gc->setGameState(static_cast<uint8>(tmp));
         break;
     case GC_PENAL:
         tmp = PyInt_AsLong(value);
@@ -638,9 +635,9 @@ int PyGameController_set (PyGameController* self, PyObject* value, void* closure
                          PENALTY_NONE, PENALTY_MANUAL, tmp);
             result = -1;
         }else
-            self->_gc->setPenalty(static_cast<GCPenalty>(tmp));
+            self->_gc->setPenalty(static_cast<uint16>(tmp));
         break;
-		}
+	}
     Py_END_ALLOW_THREADS;
 
     return result;
@@ -673,13 +670,13 @@ PyObject* PyGameController_players (PyGameController* self, PyObject* args)
         return NULL;
     }
 
-    GCPenalty p;
+    uint16 p;
     uint16 s;
 
     Py_BEGIN_ALLOW_THREADS;
 
-    p = self->_gc->penalties(i);
-    s = self->_gc->penaltySeconds(i);
+    p = self->_gc->penalties(static_cast<uint16>(i));
+    s = self->_gc->penaltySeconds(static_cast<uint16>(i));
 
     Py_END_ALLOW_THREADS;
 
@@ -711,7 +708,7 @@ PyObject* PyGameController_teams (PyGameController* self, PyObject* args)
     TeamInfo info;
 
     Py_BEGIN_ALLOW_THREADS;
-    info = self->_gc->teams(i);
+    info = self->_gc->teams(static_cast<uint8>(i));
     Py_END_ALLOW_THREADS;
 
     PyObject *t = PyTuple_New(2);

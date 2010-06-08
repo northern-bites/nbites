@@ -45,7 +45,8 @@ typedef struct PyComm_t {
 #endif
 } PyComm;
 
-static PyObject * PyComm_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
+static PyObject * PyComm_new (PyTypeObject *type, PyObject *args,
+							  PyObject *kwds)
 {
     PyErr_SetString(PyExc_RuntimeError, "Cannot initialize a Python Comm from "
                     "Python; instances must be initialized from C++.");
@@ -373,31 +374,38 @@ bool c_init_comm (void)
                        PyInt_FromLong(STATE_PLAYING));
     PyModule_AddObject(comm_module, "STATE_FINISHED",
                        PyInt_FromLong(STATE_FINISHED));
-	PyModule_AddObject(comm_module, "STATE2_NORMAL",
-					   PyInt_FromLong(STATE2_NORMAL));
-	PyModule_AddObject(comm_module, "STATE2_PENALTYSHOOT",
-					   PyInt_FromLong(STATE2_PENALTYSHOOT));
+    PyModule_AddObject(comm_module, "STATE2_NORMAL",
+                       PyInt_FromLong(STATE2_NORMAL));
+    PyModule_AddObject(comm_module, "STATE2_PENALTYSHOOT",
+                       PyInt_FromLong(STATE2_PENALTYSHOOT));
 
     PyModule_AddObject(comm_module, "PENALTY_NONE",
                        PyInt_FromLong(PENALTY_NONE));
+
     PyModule_AddObject(comm_module, "PENALTY_BALL_HOLDING",
-                       PyInt_FromLong(PENALTY_BALL_HOLDING));
-    PyModule_AddObject(comm_module, "PENALTY_GOALIE_PUSHING",
-                       PyInt_FromLong(PENALTY_GOALIE_PUSHING));
+                       PyInt_FromLong(PENALTY_SPL_BALL_HOLDING));
+
     PyModule_AddObject(comm_module, "PENALTY_PLAYER_PUSHING",
-                       PyInt_FromLong(PENALTY_PLAYER_PUSHING));
-    PyModule_AddObject(comm_module, "PENALTY_ILLEGAL_DEFENDER",
-                       PyInt_FromLong(PENALTY_ILLEGAL_DEFENDER));
-    PyModule_AddObject(comm_module, "PENALTY_ILLEGAL_DEFENSE",
-                       PyInt_FromLong(PENALTY_ILLEGAL_DEFENSE));
+                       PyInt_FromLong(PENALTY_SPL_PLAYER_PUSHING));
+
     PyModule_AddObject(comm_module, "PENALTY_OBSTRUCTION",
-                       PyInt_FromLong(PENALTY_OBSTRUCTION));
-    PyModule_AddObject(comm_module, "PENALTY_REQ_FOR_PICKUP",
-                       PyInt_FromLong(PENALTY_REQ_FOR_PICKUP));
+                       PyInt_FromLong(PENALTY_SPL_OBSTRUCTION));
+
+    PyModule_AddObject(comm_module, "PENALTY_INACTIVE_PLAYER",
+                       PyInt_FromLong(PENALTY_SPL_INACTIVE_PLAYER));
+
+    PyModule_AddObject(comm_module, "PENALTY_ILLEGAL_DEFENDER",
+                       PyInt_FromLong(PENALTY_SPL_ILLEGAL_DEFENDER));
+
     PyModule_AddObject(comm_module, "PENALTY_LEAVING",
-                       PyInt_FromLong(PENALTY_LEAVING));
-    PyModule_AddObject(comm_module, "PENALTY_DAMAGE",
-                       PyInt_FromLong(PENALTY_DAMAGE));
+                       PyInt_FromLong(PENALTY_SPL_LEAVING_THE_FIELD));
+
+    PyModule_AddObject(comm_module, "PENALTY_PLAYING_WITH_HANDS",
+                       PyInt_FromLong(PENALTY_SPL_PLAYING_WITH_HANDS));
+
+    PyModule_AddObject(comm_module, "PENALTY_REQUEST_FOR_PICKUP",
+                       PyInt_FromLong(PENALTY_SPL_REQUEST_FOR_PICKUP));
+
     PyModule_AddObject(comm_module, "PENALTY_MANUAL",
                        PyInt_FromLong(PENALTY_MANUAL));
 
@@ -606,8 +614,6 @@ void Comm::bind () throw(socket_error)
 #ifdef USE_GAMECONTROLLER
     bind_gc();
 #endif
-
-
 }
 
 void Comm::bind_gc () throw(socket_error)
@@ -832,8 +838,8 @@ void Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw(
 {
 	gc->handle_packet(msg, len);
 	if (gc->shouldResetTimer()){
-			timer.reset();
-		}
+		timer.reset();
+	}
 }
 
 bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
