@@ -727,6 +727,14 @@ void Sensors::updateVisionAngles() {
     pthread_mutex_unlock (&angles_mutex);
 }
 
+void Sensors::lockVisionAngles() {
+    pthread_mutex_lock (&vision_angles_mutex);
+}
+
+void Sensors::releaseVisionAngles() {
+    pthread_mutex_unlock (&vision_angles_mutex);
+}
+
 const unsigned char* Sensors::getImage ()
 {
     return image;
@@ -759,23 +767,24 @@ void Sensors::saveFrame()
     FRAME_PATH << FRM_FOLDER << BASE << NUMBER << EXT;
     fstream fout(FRAME_PATH.str().c_str(), fstream::out);
 
-    // Retrive joints
-    vector<float> joints = getVisionBodyAngles();
-
-    // Lock and write imag1e
+    // Lock and write image
+    // possibility of deadlock if something has the image locked and is waiting for visionAngles
+    // to unlock - not happening in our code atm
+    lockVisionAngles();
     lockImage();
     fout.write(reinterpret_cast<const char*>(getImage()),
                IMAGE_BYTE_SIZE);
-    releaseImage();
-
     // write the version of the frame format at the end before joints/sensors
     fout << VERSION << " ";
 
     // Write joints
-    for (vector<float>::const_iterator i = joints.begin(); i < joints.end();
-         i++) {
+    for (vector<float>::const_iterator i = visionBodyAngles.begin(); i < visionBodyAngles.end(); i++) {
         fout << *i << " ";
     }
+    releaseImage();
+    releaseVisionAngles();
+
+
 
     // Write sensors
     vector<float> sensor_data = getAllSensors();
