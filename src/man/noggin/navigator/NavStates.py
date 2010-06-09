@@ -64,8 +64,8 @@ def spinToWalkHeading(nav):
     Spin to the heading needed to walk to a specific point
     """
     my = nav.brain.my
-    targetH = my.headingTo(nav.dest)
-    newSpinDir = my.spinDirToHeading(targetH)
+    headingDiff = my.getRelativeBearing(nav.dest)
+    newSpinDir = MyMath.sign(headingDiff)
 
     if nav.firstFrame():
         nav.changeSpinDirCounter = 0
@@ -82,7 +82,7 @@ def spinToWalkHeading(nav):
         nav.changeSpinDirCounter = 0
         if DEBUG: nav.printf("Switching spin directions my.h " +
                              str(nav.brain.my.h)+
-                             " and my target h: " + str(targetH))
+                             " and my h diff: " + str(headingDiff))
 
     if navTrans.atHeadingGoTo(my, targetH):
         nav.stopSpinToWalkCount += 1
@@ -92,7 +92,6 @@ def spinToWalkHeading(nav):
     else :
         nav.stopSpinToWalkCount = 0
 
-    headingDiff = fabs(nav.brain.my.h - targetH)
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
         walker.getRotScale(headingDiff)
 
@@ -113,13 +112,12 @@ def spinToFinalHeading(nav):
         nav.stopSpinToWalkCount = 0
 
     targetH = nav.dest.h
+    headingDiff = MyMath.sub180Angle(nav.brain.my.h - targetH)
 
-    #may be able to keep sign of this and eliminate spinDir
-    headingDiff = fabs(MyMath.sub180Angle(nav.brain.my.h - targetH))
     if DEBUG:
         nav.printf("Need to spin to %g, heading diff is %g,heading uncert is %g"
                    % (targetH, headingDiff, nav.brain.my.uncertH))
-    spinDir = nav.brain.my.spinDirToHeading(targetH)
+    spinDir = MyMath.sign(headingDiff)
 
     spin = spinDir*constants.GOTO_SPIN_SPEED*walker.getRotScale(headingDiff)
 

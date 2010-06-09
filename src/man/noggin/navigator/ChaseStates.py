@@ -25,7 +25,7 @@ def walkSpinToBall(nav):
     #if we're close to the ball...
     if navTrans.atDestinationCloser(nav.brain.my, nav.dest):
         # and facing  it, stop
-        if abs(ball.bearing) < 10:
+        if fabs(ball.bearing) < 10.:
             return nav.goNow('stop')
 
     if not nav.brain.play.isRole(GOALIE):

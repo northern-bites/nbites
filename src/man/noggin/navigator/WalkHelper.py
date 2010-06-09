@@ -13,10 +13,10 @@ def getOmniWalkParam(my, dest):
         relY = dest.relY
 
     else:
-        bearing = my.getRelativeBearing(dest)
+        bearingDeg = my.getRelativeBearing(dest)
         distToDest = my.distTo(dest)
-        relX = MyMath.getRelativeX(distToDest, bearing)
-        relY = MyMath.getRelativeY(distToDest, bearing)
+        relX = MyMath.getRelativeX(distToDest, bearingDeg)
+        relY = MyMath.getRelativeY(distToDest, bearingDeg)
 
     # calculate forward speed
     forwardGain = constants.OMNI_GOTO_X_GAIN * relX
@@ -38,10 +38,10 @@ def getOmniWalkParam(my, dest):
 
     # calculate spin speed
     spinGain = constants.GOTO_SPIN_GAIN
-    spinDir = my.spinDirToHeading(dest.h)
-    hDiff = MyMath.sub180Angle(my.h - dest.h)
-    sTheta = spinDir * getRotScale(hDiff) * constants.OMNI_MAX_SPIN_SPEED * \
-             spinGain
+    hDiff = MyMath.sub180Angle(dest.h - my.h)
+    sTheta = MyMath.sign(hDiff) * getRotScale(hDiff) * \
+        constants.OMNI_MAX_SPIN_SPEED * spinGain
+
     sTheta = MyMath.clip(sTheta,
                          constants.OMNI_MIN_SPIN_SPEED,
                          constants.OMNI_MAX_SPIN_SPEED)
@@ -49,16 +49,17 @@ def getOmniWalkParam(my, dest):
     if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
         sTheta = 0.0
 
+    print "hDiff:%g my.h:%g" % (hDiff, my.h)
     return (sX, sY, sTheta)
 
 def getWalkSpinParam(my, dest):
 
     relX = 0
+    bearingDeg = my.getRelativeBearing(dest)
 
     if hasattr(dest, "relX"):
         relX = dest.relX
     else:
-        bearingDeg = my.getRelativeBearing(dest)
         distToDest = my.distTo(dest)
         relX = MyMath.getRelativeX(distToDest, bearingDeg)
 
@@ -66,8 +67,7 @@ def getWalkSpinParam(my, dest):
     sX = constants.GOTO_FORWARD_SPEED * relX
 
     # calculate ideal max spin speed
-    hDiff = MyMath.sub180Angle(my.h - dest.h)
-    sTheta = (my.spinDirToHeading(dest.h) * getRotScale(hDiff) *
+    sTheta = (MyMath.sign(bearingDeg) * getRotScale(bearingDeg) *
               constants.OMNI_MAX_SPIN_SPEED)
 
     ## if any are below min thresholds, set to 0
@@ -124,10 +124,8 @@ def getSpinOnlyParam(my, dest):
     # Determine the speed to turn
     # see if getRotScale can go faster
 
-    spinDir = my.spinDirToHeading(dest.h)
-    # getRelativeBearing can be replaced w/simpler math
     headingDiff = my.getRelativeBearing(dest)
-    sTheta = spinDir * constants.GOTO_SPIN_SPEED * \
+    sTheta = MyMath.sign(headingDiff) * constants.GOTO_SPIN_SPEED * \
              getRotScale(headingDiff)
 
     sX, sY = 0, 0
