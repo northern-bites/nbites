@@ -163,9 +163,8 @@ def positionForKick(nav):
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     # calculate spin speed
-    spinDir = nav.brain.my.spinDirToHeading(heading)
     hDiff = MyMath.sub180Angle(nav.brain.my.h - heading)
-    sTheta = spinDir * walker.getRotScale(hDiff) * \
+    sTheta = MyMath.sign(hDiff) * walker.getRotScale(hDiff) * .1 *\
              constants.OMNI_MAX_SPIN_SPEED
     sTheta = MyMath.clip(sTheta,
                          constants.OMNI_MIN_SPIN_SPEED,
