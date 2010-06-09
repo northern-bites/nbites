@@ -69,19 +69,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def run(self):
         self.play = self.brain.play
         if self.currentState == 'afterKick' or \
-                self.lastDiffState == 'afterKick':
+               self.lastDiffState == 'afterKick':
             self.justKicked = True
         else:
             self.justKicked = False
 
         gcState = self.brain.gameController.currentState
-        if gcState == 'gamePlaying' or\
-                (gcState == 'penaltyShotsGamePlaying'
-                 and self.play.isRole(PBConstants.GOALIE)):
+        if not self.firstFrame() and (gcState == 'gamePlaying' or\
+               (gcState == 'penaltyShotsGamePlaying'
+                and self.play.isRole(PBConstants.GOALIE))):
             roleState = self.getNextState()
 
             if roleState != self.currentState:
-                self.brain.CoA.setRobotGait(self.brain.motion)
                 self.switchTo(roleState)
 
         SoccerFSA.SoccerFSA.run(self)
