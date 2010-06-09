@@ -1,5 +1,6 @@
 from math import (degrees,
-                  hypot)
+                  hypot,
+                  atan2)
 
 from ..util import MyMath
 from .. import NogginConstants
@@ -51,8 +52,8 @@ class Location (object):
                hasattr(other, "heading"):
             return other.heading
 
-        return MyMath.sub180Angle(degrees(MyMath.safe_atan2(other.y - self.y,
-                                                            other.x - self.x)))
+        return MyMath.sub180Angle(degrees(atan2(other.y - self.y,
+                                                other.x - self.x)))
     def inOppGoalBox(self):
 
         return NogginConstants.OPP_GOALBOX_LEFT_X < self.x < \
@@ -99,8 +100,8 @@ class RobotLocation(Location):
                hasattr(other, "bearing"):
             return other.bearing
 
-        return MyMath.sub180Angle((degrees(MyMath.safe_atan2(other.y - self.y,
-                                               other.x - self.x))) - self.h)
+        return MyMath.sub180Angle((degrees(atan2(other.y - self.y,
+                                                 other.x - self.x))) - self.h)
 
     def spinDirToPoint(self, other):
         """

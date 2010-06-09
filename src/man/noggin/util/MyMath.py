@@ -36,15 +36,6 @@ def sub180Diff(angle, from_angle):
             angle += 360
     return angle
 
-def safe_atan2(y, x):
-    if x == 0.0:
-        if y > 0:
-            return pi / 2.0
-        else:
-            return -pi / 2.0
-    else:
-        return atan2(y, x)
-
 def sign(x):
     """
     return the sign of a number

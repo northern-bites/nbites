@@ -1,7 +1,7 @@
 from . import PBConstants
 from .. import NogginConstants
 from ..util import MyMath
-from math import hypot
+from math import (hypot, atan2)
 
 # Game Playing SubRoles
 def pChaser(team, workingPlay):
@@ -280,8 +280,8 @@ def fancyGoaliePosition(team):
     if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
         # Use an ellipse just above the goalline to determine x and y position
         # We get the angle from goal center to the ball to determine our X,Y
-        theta = MyMath.safe_atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
-                                   ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
+        theta = atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
+                       ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
 
         thetaDeg = PBConstants.RAD_TO_DEG * theta
 
