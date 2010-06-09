@@ -64,6 +64,10 @@
  * @author George Slavov
  * @author Johannes Strom
  *
+ * @date June 2010
+ * @modified
+ * @author Octavian Neamtu
+ *
  * TODO:
  *   - Need to fix the world frame, since it currently relies on the rotation of
  *     the foot also about the Z axis, which means when we are turning, for
@@ -162,6 +166,8 @@ public:
 
     const estimate pixEstimate(const int pixelX, const int pixelY,
                                const float objectHeight);
+    const estimate sizeBasedEstimate(const int pixelX, const int pixelY, const float objectHeight,
+                                     const float pixelSize, const float realSize);
     const estimate bodyEstimate(const int x, const int y, const float dist);
 
     /********** Getters **********/

@@ -379,15 +379,22 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
     float beta = atan(pixelInWorldFrame(Y) / pixelInWorldFrame(X));
 
     float distance3D = alpha * (focalPointInWorldFrame.z + comHeight);
-    float distance2D = sqrt(distance3D * distance3D - (focalPointInWorldFrame.z + comHeight) *
-                            (focalPointInWorldFrame.z + comHeight));
+    float distance2D = sqrt(distance3D * distance3D - (focalPointInWorldFrame.z + comHeight - objectHeight) *
+                            (focalPointInWorldFrame.z + comHeight - objectHeight));
 
     estimate est;
+    est.bearing = beta;
     est.dist = distance2D * MM_TO_CM;
     float distX = distance2D * cos(beta) + focalPointInWorldFrame.x;
     float distY = distance2D * sin(beta) + focalPointInWorldFrame.y;
+
     est.x = distX*MM_TO_CM;
-    est.y = distX*MM_TO_CM;
+    est.y = distY*MM_TO_CM;
+    est.dist = sqrt(est.x * est.x + est.y * est.y);
+
+    const float temp2 = pixelInWorldFrame(Z) / distance3D;
+    if (temp2 <= 1.0)
+        est.elevation = NBMath::safe_asin(temp2);
 
     // SANITY CHECKS
     //If the plane where the target object is, is below the camera height,
@@ -398,6 +405,8 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
             && pixelInWorldFrame(Z) > focalPointInWorldFrame.z) {
         return NULL_ESTIMATE;
     }
+
+
 
     //estimate est = getEstimate(objectInWorldFrame);
     //est.dist = correctDistance(static_cast<float> (est.dist));
@@ -436,6 +445,7 @@ const estimate NaoPose::bodyEstimate(const int x, const int y, const float dist)
     return getEstimate(objectInWorldFrame);
 }
 
+/* OBSOLETE (yay)
 const float NaoPose::correctDistance(const float uncorrectedDist) {
     if (uncorrectedDist > 706.0f) {
         return uncorrectedDist - 387.0f;
@@ -443,6 +453,7 @@ const float NaoPose::correctDistance(const float uncorrectedDist) {
     return -0.000591972f * uncorrectedDist * uncorrectedDist + 0.858283f
             * uncorrectedDist + 2.18768F;
 }
+*/
 
 /**
  * Method to populate an estimate with an vector4D in homogenous coordinates.
@@ -684,3 +695,41 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
 
     return CoordFrame3D::vector3D(x, y);
 }
+
+const estimate NaoPose::sizeBasedEstimate(int pixelX, int pixelY, float objectHeight, float pixelSize, float realSize) {
+
+    float PIXEL_FOCAL_LENGTH = 385.54f;
+    float ratio = realSize/pixelSize;
+    ufvector4 pixelInCameraFrame =
+                vector4D( PIXEL_FOCAL_LENGTH,
+                          ((float)IMAGE_CENTER_X - (float)pixelX),
+                          ((float)IMAGE_CENTER_Y - (float)pixelY));
+
+    float pixelDistance = length(pixelInCameraFrame);
+
+    float distance3D = ratio * pixelDistance;
+
+    float distance2D = sqrt(distance3D * distance3D - (focalPointInWorldFrame.z + comHeight - objectHeight) *
+                                (focalPointInWorldFrame.z + comHeight - objectHeight));
+
+    ufmatrix4 cameraToWorldRotation = cameraToWorldFrame;
+    cameraToWorldRotation(0, 3) = 0;
+    cameraToWorldRotation(1, 3) = 0;
+    cameraToWorldRotation(2, 3) = 0;
+    //TODO: clean this up and comment
+    ufvector4 pixelInWorldFrame = prod(cameraToWorldRotation, pixelInCameraFrame);
+
+
+    float bearing = atan(pixelInWorldFrame(Y) / pixelInWorldFrame(X));
+    estimate est;
+    //est.dist = distance2D * MM_TO_CM;
+    est.bearing = bearing;
+    float distX = distance2D * cos(bearing) + focalPointInWorldFrame.x;
+    float distY = distance2D * sin(bearing) + focalPointInWorldFrame.y;
+    est.x = distX*MM_TO_CM;
+    est.y = distY*MM_TO_CM;
+    est.dist = sqrt(est.x * est.x + est.y * est.y);
+
+    return est;
+}
+
