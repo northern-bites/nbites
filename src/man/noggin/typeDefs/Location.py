@@ -97,7 +97,7 @@ class RobotLocation(Location):
         # if we're calculating bearing from us(has a team color) to the ball use stored value
         if not forceCalc and hasattr(self, "teamColor") and \
                hasattr(other, "bearing"):
-            return other.dist
+            return other.bearing
 
         return MyMath.sub180Angle((degrees(MyMath.safe_atan2(other.y - self.y,
                                                other.x - self.x))) - self.h)
