@@ -46,8 +46,6 @@ class Location (object):
 
     def headingTo(self, other, forceCalc = False):
         '''determine the heading facing a target x, y'''
-        ## print "other.y:%f my.y:%f other.x:%f my.x:%f" % (other.y, self.y,
-        ##                                                  other.x, self.x)
 
         if not forceCalc and hasattr(self, "teamColor") and \
                hasattr(other, "heading"):

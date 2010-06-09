@@ -49,7 +49,6 @@ def getOmniWalkParam(my, dest):
     if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
         sTheta = 0.0
 
-    print "hDiff:%g my.h:%g" % (hDiff, my.h)
     return (sX, sY, sTheta)
 
 def getWalkSpinParam(my, dest):
