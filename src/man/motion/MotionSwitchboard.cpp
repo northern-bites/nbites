@@ -223,7 +223,7 @@ void MotionSwitchboard::processStiffness(){
 }
 
 
-int MotionSwitchboard::postProcess(){
+bool MotionSwitchboard::postProcess(){
     pthread_mutex_lock(&next_provider_mutex);
 
     newJoints = true;
@@ -252,7 +252,7 @@ int MotionSwitchboard::postProcess(){
     pthread_mutex_unlock(&next_provider_mutex);
 
     //return if one of the enactors
-    return curProvider->isActive() ||  curHeadProvider->isActive();
+    return curProvider->isActive() || curHeadProvider->isActive();
 }
 
 
