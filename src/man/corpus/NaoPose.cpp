@@ -392,7 +392,8 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
     est.y = distY*MM_TO_CM;
     est.dist = sqrt(est.x * est.x + est.y * est.y);
 
-    const float temp2 = pixelInWorldFrame(Z) / distance3D;
+    //TODO: this is prolly not right
+    const float temp2 = (focalPointInWorldFrame.z + comHeight - objectHeight) / distance3D;
     if (temp2 <= 1.0)
         est.elevation = NBMath::safe_asin(temp2);
 
