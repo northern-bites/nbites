@@ -830,7 +830,6 @@ void StepGenerator::resetSteps(const bool startLeft){
                                   dummyFoot));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
-	cout << "fillZMP(firstSupportStep)";
     fillZMP(firstSupportStep);
     //addStartZMP(firstSupportStep);
     currentZMPDSteps.push_back(firstSupportStep);//left will be sup. during 0.0 zmp
