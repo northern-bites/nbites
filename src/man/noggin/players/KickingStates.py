@@ -15,10 +15,6 @@ def kickBallExecute(player):
         elif not player.penaltyMadeSecondKick:
             player.penaltyMadeSecondKick = True
 
-    if not player.brain.ball.on and \
-            player.brain.ball.framesOff > constants.LOOK_POST_KICK_FRAMES_OFF:
-        player.lookPostKick()
-
     if player.counter > 1 and player.brain.nav.isStopped():
         return player.goLater('afterKick')
 
@@ -41,8 +37,6 @@ def afterKick(player):
 
         if player.brain.ball.on:
             tracker.trackBall()
-        else:
-           player.lookPostKick()
         return player.stay()
 
     if player.chosenKick == SweetMoves.LEFT_SIDE_KICK or \

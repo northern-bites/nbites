@@ -22,11 +22,4 @@ class Kick(object):
 LEFT_SIDE_KICK = Kick(y=2, move=SweetMoves.LEFT_SIDE_KICK)
 RIGHT_SIDE_KICK = Kick(y=-2, move=SweetMoves.RIGHT_SIDE_KICK)
 
-LEFT_SHORT_KICK = Kick(y=5, move=SweetMoves.SHORT_QUICK_LEFT_KICK)
-RIGHT_SHORT_KICK = Kick(y=-5, move=SweetMoves.SHORT_QUICK_RIGHT_KICK)
-
-LEFT_BIG_KICK = Kick(y=5, move=SweetMoves.LEFT_BIG_KICK)
-RIGHT_BIG_KICK = Kick(y=-5, move=SweetMoves.RIGHT_BIG_KICK)
-
-LEFT_FAR_KICK = Kick(y=5, move=SweetMoves.LEFT_FAR_KICK)
-RIGHT_FAR_KICK = Kick(y=-5, move=SweetMoves.RIGHT_FAR_KICK)
+DYNAMIC_STRAIGHT_KICK = Kick(y=-5, move=SweetMoves.DREW_KICK)

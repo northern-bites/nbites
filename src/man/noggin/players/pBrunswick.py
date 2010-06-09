@@ -107,17 +107,3 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         return Location(NogginConstants.OPP_GOAL_MIDPOINT[0],
                         NogginConstants.OPP_GOAL_MIDPOINT[1] )
-
-    def lookPostKick(self):
-        tracker = self.brain.tracker
-        kick = self.brain.kickDecider.getSweetMove()
-        tracker.lookToDir(kickLookDirection[kick])
-
-kickLookDirection = {SweetMoves.LEFT_FAR_KICK:'up',
-                     SweetMoves.RIGHT_FAR_KICK:'up',
-                     SweetMoves.LEFT_BIG_KICK:'up',
-                     SweetMoves.RIGHT_BIG_KICK:'up',
-                     SweetMoves.SHORT_QUICK_LEFT_KICK:'up',
-                     SweetMoves.SHORT_QUICK_RIGHT_KICK:'up',
-                     SweetMoves.RIGHT_SIDE_KICK:'left',
-                     SweetMoves.LEFT_SIDE_KICK:'right'}

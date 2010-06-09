@@ -13,16 +13,20 @@ class KickDecider(object):
         self.brain = brain
         self.hasKickedOff = True
         self.objDict = { constants.OBJECTIVE_CLEAR:self.kickoff,
-                          constants.OBJECTIVE_CENTER:self.center,
-                          constants.OBJECTIVE_SHOOT:self.shoot,
-                          constants.OBJECTIVE_KICKOFF:self.kickoff }
+                         constants.OBJECTIVE_CENTER:self.center,
+                         constants.OBJECTIVE_SHOOT:self.shoot,
+                         constants.OBJECTIVE_KICKOFF:self.kickoff }
+        self.kickDest = None
+        self.destDist = 0.
         self.currentKick = None
 
     def getSweetMove(self):
         """
         returns the proper sweet move to execute to kick
         """
-        return self.currentKick.sweetMove
+        ball = self.brain.ball
+        return self.currentKick.sweetMove(ball.relX, ball.relY,
+                                          self.destDist)
 
     def decideKick(self):
         """
@@ -32,12 +36,12 @@ class KickDecider(object):
         objective = self.getObjective()
 
         # uses dictionary to retrieve and call proper method
-        kickDest = self.objDict[objective]()
+        self.kickDest = self.objDict[objective]()
         # take my position and destination of kick to decide which kick
         # need to consider: distance to kick, time needed to align for kick
         # prioritize time to align
         # calculate bearing to dest
-        bearing = self.brain.my.getRelativeBearing(kickDest)
+        bearing = self.brain.my.getRelativeBearing(self.kickDest)
         if fabs(bearing) >= 180.:
             print "kick sideways"
 
@@ -46,43 +50,18 @@ class KickDecider(object):
             # positive bearing means dest is to my left, so kick right
             if bearing > 0:
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.heading = self.brain.ball.headingTo(kickDest) - 90.
+                kick.heading = self.brain.ball.headingTo(self.kickDest) - 90.
             else:
                 kick = kicks.LEFT_SIDE_KICK
-                kick.heading = self.brain.ball.headingTo(kickDest) + 90.
+                kick.heading = self.brain.ball.headingTo(self.kickDest) + 90.
 
         else:
             print "kick straight"
             #kick straight
-            # left or right foot?
-            leftFootKick = False
+            kick = kicks.DYNAMIC_STRAIGHT_KICK
+            kick.heading = self.brain.ball.headingTo(self.kickDest)
 
-            if self.brain.my.y < self.brain.ball.y:
-                # right foot
-                leftFootKick = False
-            else:
-                # left
-                leftFootKick = True
-
-            # short, far, big?
-            dist = self.brain.my.distTo(kickDest)
-            if dist < 200.0:
-                if leftFootKick:
-                    kick = kicks.LEFT_SHORT_KICK
-                else:
-                    kick = kicks.RIGHT_SHORT_KICK
-            elif dist < 400.0:
-                if leftFootKick:
-                    kick = kicks.LEFT_FAR_KICK
-                else:
-                    kick = kicks.RIGHT_FAR_KICK
-            else:
-                if leftFootKick:
-                    kick = kicks.LEFT_BIG_KICK
-                else:
-                    kick = kicks.RIGHT_BIG_KICK
-            kick.heading = self.brain.ball.headingTo(kickDest)
-
+        self.destDist = self.brain.ball.distTo(self.kickDest)
         self.currentKick = kick
         self.brain.out.printf(self.currentKick)
 
