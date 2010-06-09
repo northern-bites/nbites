@@ -92,6 +92,7 @@ def gamePlaying(player):
     if (player.firstFrame() and
         player.lastDiffState == 'gamePenalized'):
         player.brain.resetLocalization()
+        return player.goNow('relocalize')
 
     roleState = player.getRoleState()
     return player.goNow(roleState)
