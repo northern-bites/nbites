@@ -20,7 +20,6 @@ public:
 
     // main methods
     int findGreenHorizon(int pH, float sl);
-	void findFieldEdges(int poseHorizon);
 	void findConvexHull(int pH);
 	int horizonAt(int x);
 	int ccw(point<int> p1, point<int> p2, point<int> p3);
@@ -31,8 +30,6 @@ public:
     int xProject(int startx, int starty, int newx);
     int xProject(point <int> point, int newx);
 
-    // shooting
-    void setShot(VisualCrossbar * one, int color);
     void bestShot(VisualFieldObject * left, VisualFieldObject * right,
                   VisualCrossbar * mid, int color);
     void openDirection(int h, NaoPose *p);

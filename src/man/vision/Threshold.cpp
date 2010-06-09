@@ -72,7 +72,9 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     // storing locally
 #ifdef OFFLINE
     visualHorizonDebug = false;
-	debugSelf = true;
+	debugSelf = false;
+	debugShot = false;
+	debugOpenField = false;
 #endif
 
     // loads the color table on the MS into memory
@@ -129,10 +131,10 @@ void Threshold::visionLoop() {
     vision->fieldLines->afterObjectFragments();
 	// For now we don't set shooting information
     if (vision->bgCrossbar->getWidth() > 0) {
-        //blue->setShot(vision->bgCrossbar);
+        setShot(vision->bgCrossbar);
     }
     if (vision->ygCrossbar->getWidth() > 0) {
-        //yellow->setShot(vision->ygCrossbar);
+        setShot(vision->ygCrossbar);
     }
 	// for now we also don't use open field information
     //field->openDirection(horizon, pose.get());
@@ -323,12 +325,21 @@ void Threshold::runs() {
 	// back when the robots had colored shoulder pads we worried about seeing them
 	detectSelf();
 #endif
+	for (int i = 0; i < NUMBLOCKS; i++) {
+		block[i] = 0;
+		evidence[i] = 0;
+	}
     // split up the loops
     for (int i = 0; i < IMAGE_WIDTH; i += 1) {
 		int topEdge = max(0, field->horizonAt(i));
 		findBallsCrosses(i, topEdge);
 		findGoals(i, topEdge);
     }
+	for (int i = 0; i < NUMBLOCKS; i++) {
+		if (evidence[i] < 3) {
+			block[i] = 0;
+		}
+	}
 }
 
 /** Ideally goals will be either right at the field edge, or will have part above
@@ -432,9 +443,13 @@ void Threshold::findGoals(int column, int topEdge) {
 
 void Threshold::findBallsCrosses(int column, int topEdge) {
 	// scan down finding balls and crosses
+	static const int divider = IMAGE_WIDTH / NUMBLOCKS;
 	unsigned char lastPixel = GREEN;
 	int currentRun = 0;
 	int bound = lowerBound[column];
+	int robots = 0, greens = 0, greys = 0;
+	int lastGood = IMAGE_HEIGHT - 1;
+	shoot[column] = true;
 	// if a ball is in the middle of the boundary, then look a little lower
 	if (bound < IMAGE_HEIGHT - 1) {
 		//while (bound < IMAGE_HEIGHT && thresholded[bound][column] == ORANGE) {
@@ -476,11 +491,45 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 				if (currentRun > 2) {
 					orange->newRun(column, j, currentRun);
 				}
+				greens += currentRun;
 				break;
 			case WHITE:
 				// add to the cross data structure
 				if (currentRun > 2) {
 					cross->newRun(column, j, currentRun);
+				}
+				break;
+			case GREY:
+				if (currentRun > greys) {
+					greys+= currentRun;
+				}
+				if (currentRun > 15 && shoot[column]) {
+					evidence[column / divider]++;
+					if (block[column / divider] < j + currentRun) {
+						block[column / divider] = j + currentRun;
+					}
+					shoot[column] = false;
+					if (debugShot) {
+						drawPoint(column, j + currentRun, MAROON);
+					}
+				}
+				break;
+			case GREEN:
+				greens+= currentRun;
+				lastGood = j;
+				break;
+			case NAVY:
+			case RED:
+				robots+= currentRun;
+				if (robots > 5 && shoot[column]) {
+					evidence[column / divider]++;
+					if (block[column / divider] < j + currentRun) {
+						block[column / divider] = j + currentRun;
+					}
+					shoot[column] = false;
+					if (debugShot) {
+						drawPoint(column, j + currentRun, MAROON);
+					}
 				}
 				break;
 			}
@@ -489,6 +538,129 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 		}
 		lastPixel = pixel;
 	}
+	if (shoot[column] && greens < (bound - topEdge) / 2) {
+		if (block[column / divider] == 0) {
+			block[column / divider] = lastGood;
+			evidence[column / divider]++;
+		}
+		shoot[column] = false;
+		if (debugShot) {
+			drawPoint(column, IMAGE_HEIGHT - 4, RED);
+		}
+	}
+	setOpenFieldInformation();
+}
+
+/*
+ */
+void Threshold::setOpenFieldInformation() {
+    // All distance estimates are to the HARD values
+    estimate e;
+	int start = IMAGE_WIDTH / (NUMBLOCKS * 2);
+	for (int i = 0; i < NUMBLOCKS; i++) {
+		e = pose->pixEstimate(start, block[i], 0.0);
+		vision->fieldOpenings[i].hard = block[i];
+		vision->fieldOpenings[i].horizonDiffHard = block[i] - horizon;
+		vision->fieldOpenings[i].dist = e.dist;
+		vision->fieldOpenings[i].bearing = e.bearing;
+		vision->fieldOpenings[i].elevation = e.elevation;
+		if (debugOpenField) {
+			drawPoint(start, block[i], RED);
+		}
+		start+= IMAGE_WIDTH / NUMBLOCKS;
+	}
+
+	if (debugOpenField) {
+		int chunk = IMAGE_WIDTH / NUMBLOCKS, start = 0;
+		for (int i = 0; i < NUMBLOCKS; i++) {
+			if (block[i] > 0) {
+				drawLine(start, block[i], start + chunk, block[i], MAROON);
+				drawLine(start, block[i]+1, start + chunk, block[i]+1, MAROON);
+			}
+			start += chunk;
+		}
+	}
+}
+
+/* Detects whether we can reasonably expect to score a goal on a straight kick.
+   Basically while we were scanning the field for balls and whatnot we also
+   collected a bunch of data on blockages.  We use these to find an open shooting
+   lane.  We assume our kick will go straight so we look at the center of the
+   image and work our way out.  The results indicate whether we should kick, and
+   also suggest a direction to move if the kick would be blocked.
+   @param   one         The "crossbar" which is our target area, also used to return
+                        results
+ */
+
+void Threshold::setShot(VisualCrossbar* one) {
+    int bx = one->getLeftBottomX(), brx = one->getRightBottomX();
+    const int WIDTH_DIVISOR = 5;   // gives a percent of the width
+    int lx = one->getLeftTopX(), ly = one->getLeftTopY(),
+        rx = one->getRightTopX(), ry = one->getRightTopY();
+	if (debugShot) {
+		cout << "Looking for shot " << bx << " " << brx << endl;
+	}
+	if (brx < IMAGE_WIDTH / 2) {
+        one->setBackDir(MOVELEFT);
+		one->setShoot(false);
+		return;
+	}
+	if (bx > IMAGE_WIDTH / 2) {
+		one->setBackDir(MOVERIGHT);
+		one->setShoot(false);
+		return;
+	}
+    // now find the range of shooting
+    int r1 = IMAGE_WIDTH / 2;
+    int r2 = IMAGE_WIDTH / 2;
+    for ( ;r1 < brx && r1 >= bx && shoot[r1]; r1--) {}
+    for ( ;r2 > bx && r2 <= rx && shoot[r2]; r2++) {}
+    if (r2 - r1 < MINSHOTWIDTH || abs(r1 - IMAGE_WIDTH / 2) < MINSHOTWIDTH / 2||
+        abs(r2 - IMAGE_WIDTH / 2) < MINSHOTWIDTH) {
+        one->setShoot(false);
+        one->setBackLeft(-1);
+        one->setBackRight(-1);
+    } else {
+        one->setShoot(true);
+        if (debugShot) {
+            drawLine(r1, ly, r1, IMAGE_HEIGHT - 1, RED);
+            drawLine(r2, ly, r2, IMAGE_HEIGHT - 1, RED);
+        }
+    }
+    one->setBackLeft(r1);
+    one->setBackRight(r2);
+
+    if (debugShot) {
+        drawPoint(r1, ly, RED);
+        drawPoint(r2, ly, BLACK);
+    }
+    // now figure out the optimal direction
+    int left = 0, right = 0;
+    for (int i = lx; i < IMAGE_WIDTH / 2; i++) {
+        if (shoot[i]) left++;
+    }
+    for (int i = IMAGE_WIDTH / 2; i < rx; i++) {
+        if (shoot[i]) right++;
+    }
+    one->setLeftOpening(left);
+    one->setRightOpening(right);
+
+    if (left > right)
+        one->setBackDir(MOVELEFT);
+    else if (right > left)
+        one->setBackDir(MOVERIGHT);
+    else if (right == 0)
+        one->setBackDir(ALLBLOCKED);
+    else
+        one->setBackDir(EITHERWAY);
+    if (debugShot) {
+        cout << "Crossbar info: Left Col: " << r1 << " Right Col: " << r2
+             << " Dir: " << one->getBackDir();
+        if (one->shotAvailable())
+            cout << " Take the shot!" << endl;
+        else
+            cout << " Don't shoot!" << endl;
+    }
 }
 
 /** Given two lines defined by "detectSelf" set the lower bounds.  We have
@@ -999,8 +1171,12 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 				// compare the distances
 				estimate pest = pose->pixEstimate(postX, postY, 0.0);
 				float newDist = pose->getDistanceBetweenTwoObjects(pest, obj_est);
+				float cDist = obj_est.dist;
+				if (cDist > 500.0f) {
+					cDist = 500.0f;
+				}
 				//cout << "Angles " << objPtr->getAngleXDeg() << " " << postAngle << endl;
-				//cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << " " << newDist << endl;
+				//cout << "Compare dist " << cDist << " " << dist << " " << pest.dist << " " << newDist << endl;
 				//cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
 				if (pest.dist > 0.1 && pest.dist < 300.0f) {
 					dist = pest.dist;
@@ -1009,15 +1185,15 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 				if (dist < 350.0f) {
 					objPtr->setID(YELLOW_GOAL_CROSS);
 				} else if (dist > 550.0f) {
-					if (obj_est.dist < 200.0f) {
+					if (cDist < 200.0f) {
 						objPtr->setID(BLUE_GOAL_CROSS);
 					} else {
 						objPtr->setID(YELLOW_GOAL_CROSS);
 					}
-				} else if (fabs(obj_est.dist - dist) < 300.0) {
+				} else if (fabs(cDist - dist) < 300.0) {
 					objPtr->setID(YELLOW_GOAL_CROSS);
 				} else {
-					if (fabs(obj_est.dist - dist) < 400.0 && obj_est.dist > 200.0f) {
+					if (fabs(cDist - dist) < 400.0 && cDist > 200.0f) {
 						objPtr->setID(YELLOW_GOAL_CROSS);
 					} else {
 						objPtr->setID(BLUE_GOAL_CROSS);
@@ -1026,6 +1202,11 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 			} else if (blp || brp) {
 				float dist = 0.0f;
 				int postX = 0, postY = 0;
+				float cDist = obj_est.dist;
+				// watch out for a crazy pixestimated distance - we can't see that far
+				if (cDist > 500.0f) {
+					cDist = 500.0f;
+				}
 				if (blp) {
 					dist = vision->bglp->getDistance();
 					postX = vision->bglp->getLeftBottomX();
@@ -1039,7 +1220,7 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 					postY = vision->bgrp->getLeftBottomY();
 				}
 				estimate pest = pose->pixEstimate(postX, postY, 0.0);
-				//cout << "Compare dist " << obj_est.dist << " " << dist << " " << pest.dist << endl;
+				//cout << "Compare dist " << cDist << " " << dist << " " << pest.dist << endl;
 				//cout << "Xs " << objPtr->getCenterX() << " " << postX << endl;
 				if (pest.dist > 0.1 && pest.dist < 300.0f) {
 					dist = pest.dist;
@@ -1047,15 +1228,15 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 				if (dist < 350.0f) {
 					objPtr->setID(BLUE_GOAL_CROSS);
 				} else if (dist > 550.0f) {
-					if (obj_est.dist < 200.0f) {
+					if (cDist < 200.0f) {
 						objPtr->setID(YELLOW_GOAL_CROSS);
 					} else {
 						objPtr->setID(BLUE_GOAL_CROSS);
 					}
-				} else if (fabs(obj_est.dist - dist) < 300.0) {
+				} else if (fabs(cDist - dist) < 300.0) {
 					objPtr->setID(BLUE_GOAL_CROSS);
 				} else {
-					if (fabs(obj_est.dist - dist) < 400.0 && obj_est.dist > 200.0f) {
+					if (fabs(cDist - dist) < 400.0 && cDist > 200.0f) {
 						objPtr->setID(BLUE_GOAL_CROSS);
 					} else {
 						objPtr->setID(YELLOW_GOAL_CROSS);
