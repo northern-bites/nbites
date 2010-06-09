@@ -33,8 +33,8 @@ using namespace boost::numeric;
 using namespace Kinematics;
 using namespace NBMath;
 
-#define DEBUG_STEPGENERATOR
-#define DEBUG_ZMP
+//#define DEBUG_STEPGENERATOR
+//#define DEBUG_ZMP
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
@@ -133,20 +133,20 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             currentZMPDSteps.push_back(nextStep);
 
         }
-    }
 #ifdef DEBUG_ZMP
-	cout << "generate_zmp_ref()\n";
-	list<float>::iterator it;
-	cout << "zmp_ref_x: ";
-	for (it=zmp_ref_x.begin(); it!=zmp_ref_x.end(); ++it)
-		cout << " " << *it;
-	cout << "\n";
+		cout << "generate_zmp_ref()\n";
+		list<float>::iterator it;
+		cout << "zmp_ref_x: " << zmp_ref_x.size();
+		for (it=zmp_ref_x.begin(); it!=zmp_ref_x.end(); ++it)
+			cout << " " << *it;
+		cout << "\n";
 
-	cout << "zmp_ref_y: ";
-	for (it=zmp_ref_y.begin(); it!=zmp_ref_y.end(); ++it)
-		cout << " " << *it;
-	cout << "\n";
+		cout << " zmp_ref_y: " << zmp_ref_y.size();
+		for (it=zmp_ref_y.begin(); it!=zmp_ref_y.end(); ++it)
+			cout << " " << *it;
+		cout << "\n";
 #endif
+    }
 
     return zmp_xy_tuple(&zmp_ref_x, &zmp_ref_y);
 }
@@ -242,13 +242,17 @@ void StepGenerator::tick_controller(){
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
 
+#ifdef DEBUG_ZMP
+	cout << "generate_zmp_ref() finished\n";
+#endif
+
     //The observer needs to know the current reference zmp
     const float cur_zmp_ref_x =  zmp_ref_x.front();
     const float cur_zmp_ref_y = zmp_ref_y.front();
     //clear the oldest (i.e. current) value from the preview list
     zmp_ref_x.pop_front();
     zmp_ref_y.pop_front();
-	// also clear the oldest stopping zmp value to keep queues in sync
+	// also clear the oldest stopping zmp values to keep queues in sync
 	zmp_ref_stop_x.pop_front();
 	zmp_ref_stop_y.pop_front();
 
@@ -447,15 +451,19 @@ void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
 
     switch(newSupportStep->type){
     case REGULAR_STEP:
+#ifdef DEBUG_ZMP
 		cout << "REGULAR: fillZMPEnd()\n";
-		fillZMPEnd(newSupportStep);
 		cout << "REGULAR: fillZMPRegular()\n";
+#endif
+		fillZMPEnd(newSupportStep);
 		fillZMPRegular(newSupportStep);
         break;
     case END_STEP: //END and NULL might be the same thing....?
 		// swap the queues over, we are stopping
-		if (zmp_ref_x.size() < 1) {
+		if (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES) {
+#ifdef DEBUG_ZMP
 			cout << "first time we've been called, fillZMPEnd() normally\n";
+#endif
 			fillZMPEnd(newSupportStep);
 		}
 		swapZMPQueues(zmp_ref_stop_x, zmp_ref_stop_y, last_zmp_stop_end_s);
@@ -615,10 +623,8 @@ void StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep) {
 
 	// copy current zmp queue to the stop queue
 	zmp_ref_stop_x.clear(); zmp_ref_stop_y.clear();
-	cout << "queues cleared ";
 	zmp_ref_stop_x.assign(zmp_ref_x.begin(), zmp_ref_x.end());
 	zmp_ref_stop_y.assign(zmp_ref_y.begin(), zmp_ref_y.end());
-	cout << " ref_stop_x/y updated ";
 
 	//Queue a starting step, where we step, but do nothing with the ZMP
 	//so push tons of zero ZMP values
@@ -1058,8 +1064,11 @@ void StepGenerator::resetQueues(){
  */
 void StepGenerator::swapZMPQueues(std::list<float> &zmp_x, std::list<float> &zmp_y,
 								  NBMath::ufvector3 &last_zmp) {
-	zmp_ref_x.assign(zmp_x.begin(), zmp_x.end());
-	zmp_ref_y.assign(zmp_y.begin(), zmp_y.end());
+#ifdef DEBUG_ZMP
+	cout << "swapping ZMP queues\n";
+#endif
+	zmp_ref_x = zmp_x;
+	zmp_ref_y = zmp_y;
 	last_zmp_end_s = last_zmp;
 }
 
