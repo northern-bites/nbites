@@ -176,13 +176,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def lookPostKick(self):
         tracker = self.brain.tracker
-        if self.chosenKick == SweetMoves.LEFT_FAR_KICK or \
-                self.chosenKick == SweetMoves.RIGHT_FAR_KICK:
-            tracker.lookToDir('up')
-        elif self.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
+        if self.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
             tracker.lookToDir('left')
         elif self.chosenKick == SweetMoves.LEFT_SIDE_KICK:
             tracker.lookToDir('right')
+        else:
+            tracker.lookToDir('up')
 
     def getNextOrbitPos(self):
         relX = -ChaseConstants.ORBIT_OFFSET_DIST * \

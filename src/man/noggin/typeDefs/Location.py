@@ -67,14 +67,14 @@ class Location (object):
                NogginConstants.MY_GOALBOX_BOTTOM_Y
 
     def inCenterOfField(self):
-        return NogginConstants.FIELD_HEIGHT *2/3 > self.y > \
-               NogginConstants.FIELD_HEIGHT / 3
+        return NogginConstants.FIELD_HEIGHT *2./3. > self.y > \
+               NogginConstants.FIELD_HEIGHT / 3.
 
     def inTopOfField(self):
-        return NogginConstants.FIELD_HEIGHT*2/3 < self.y
+        return NogginConstants.FIELD_HEIGHT*2./3. < self.y
 
     def inBottomOfField(self):
-        return NogginConstants.FIELD_HEIGHT/3 > self.y
+        return NogginConstants.FIELD_HEIGHT/3. > self.y
 
 class RobotLocation(Location):
 
@@ -100,8 +100,8 @@ class RobotLocation(Location):
         """
         Advanced function to get the spin direction for a given point.
         """
-        LEFT_SPIN = 1
-        RIGHT_SPIN = -1
+        LEFT_SPIN = 1.
+        RIGHT_SPIN = -1.
         spinDir = 0
 
         targetH = self.getRelativeBearing(other)

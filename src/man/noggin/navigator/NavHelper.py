@@ -56,7 +56,7 @@ def step(nav, x, y, theta, numSteps):
     if x < 0:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
     else:
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
 
     steps = motion.StepCommand(x=x,y=y,theta=theta,numSteps=numSteps)
     nav.brain.motion.sendStepCommand(steps)
