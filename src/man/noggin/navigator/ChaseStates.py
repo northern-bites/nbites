@@ -122,17 +122,14 @@ def ballInMyBox(nav):
 PFK_MAX_Y_SPEED = speeds.MAX_Y_SPEED
 PFK_MIN_Y_SPEED = speeds.MIN_Y_SPEED
 PFK_MAX_X_SPEED = speeds.MAX_X_SPEED
-PFK_MIN_X_SPEED = speeds.MIN_X_MAGNITUDE
+PFK_MIN_X_SPEED = -speeds.MIN_X_SPEED
 PFK_MIN_Y_MAGNITUDE = speeds.MIN_Y_MAGNITUDE
+PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
 PFK_X_GAIN = 0.12
 PFK_Y_GAIN = 0.6
 
 
 def positionForKick(nav):
-    ## nav.dest = kick.getKickPosition()
-
-    ## sX,sY,sTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
-
     ball = nav.brain.ball
 
     # Determine approach speed
@@ -142,10 +139,12 @@ def positionForKick(nav):
 
     sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
-    if ball.dist > 10.:
-        sX = MyMath.clip(ball.relX * PFK_X_GAIN,
+    targetX = ball.relX - 15.
+    if targetX > 5. or targetX < 0.:
+        sX = MyMath.clip(targetX * PFK_X_GAIN,
                          PFK_MIN_X_SPEED,
                          PFK_MAX_X_SPEED)
+        sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
     else:
         sX = 0.0
 

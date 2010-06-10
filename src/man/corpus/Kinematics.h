@@ -261,7 +261,7 @@ namespace Kinematics {
 
     //                                  (alpha,  a ,  theta ,   d  )
     const float HEAD_MDH_PARAMS[2][4] = {{0.0f , 0.0f,  0.0f , 0.0f},
-                                         {-M_PI_FLOAT/2, 0.0f, -M_PI_FLOAT/2 , 0.0f}};
+                                         {-M_PI_FLOAT/2, 0.0f, 0.0f , 0.0f}};
 
     const float LEFT_ARM_MDH_PARAMS[4][4] = {{-M_PI_FLOAT/2,0.0f,0.0f,0.0f},
                                              { M_PI_FLOAT/2,0.0f,M_PI_FLOAT/2,0.0f},
@@ -327,9 +327,8 @@ namespace Kinematics {
       &RIGHT_ARM_BASE_TRANSFORMS[0] };
 
     //Base transforms to get from body center to beg. of chain
-    static const boost::numeric::ublas::matrix <float> HEAD_END_TRANSFORMS[4]
+    static const boost::numeric::ublas::matrix <float> HEAD_END_TRANSFORMS[3]
     = { CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, M_PI_FLOAT/2),
-        CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS,M_PI_FLOAT/2),
         CoordFrame4D::translation4D(CAMERA_OFF_X, 0, CAMERA_OFF_Z),
         CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, CAMERA_PITCH_ANGLE) };
 
@@ -364,7 +363,7 @@ namespace Kinematics {
       &RIGHT_LEG_END_TRANSFORMS[0],
       &RIGHT_ARM_END_TRANSFORMS[0] };
     static const int NUM_BASE_TRANSFORMS[NUM_CHAINS] = {1,1,1,1,1};
-    static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {4,2,3,3,2};
+    static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {3,2,3,3,2};
     static const int NUM_JOINTS_CHAIN[NUM_CHAINS] = {2,4,6,6,4};
 
     //locally expressed constants (with respect to an individual joint

@@ -277,7 +277,7 @@ def shootBall(player):
                 return player.goLater('kickBallRight')
             else :
                 return player.goLater('kickBallLeft')
-        elif my.inTopOfField(player):
+        elif my.inTopOfField():
             if constants.DEBUG_KICKS: print ("\t\ttopfieldkick")
             if 90 > avgMyGoalBearing > -30:
                 return player.goLater('kickBallRight')
@@ -339,15 +339,15 @@ def kickBallStraightShort(player):
     ballForeFoot = player.kickDecider.ballForeFoot
     if (ballForeFoot == constants.LEFT_FOOT or
         ballForeFoot == constants.RIGHT_FOOT):
-        player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 150)
+        player.chosenKick = SweetMoves.DREW_KICK( ball.relY, 150)
         return player.goNow('kickBallExecute')
 
     elif ballForeFoot == constants.MID_RIGHT:
-        player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 150)
+        player.chosenKick = SweetMoves.DREW_KICK( ball.relY, 150)
         return player.goNow('stepForRightFootKick')
 
     elif ballForeFoot == constants.MID_LEFT:
-        player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 150)
+        player.chosenKick = SweetMoves.DREW_KICK( ball.relY, 150)
         return player.goNow('stepForLeftFootKick')
 
     else :                  # INCORRECT_POS
@@ -371,31 +371,19 @@ def kickBallStraight(player):
     ball = player.brain.ball
 
     if ballForeFoot == constants.LEFT_FOOT:
-        if player.bigKick:
-            player.chosenKick = SweetMoves.LEFT_BIG_KICK
-        else :
-            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
+        player.chosenKick = SweetMoves.DREW_KICK( ball.relY, 500)
         return player.goNow('kickBallExecute')
 
     elif ballForeFoot == constants.RIGHT_FOOT:
-        if player.bigKick:
-            player.chosenKick = SweetMoves.RIGHT_BIG_KICK
-        else :
-            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
+        player.chosenKick = SweetMoves.DREW_KICK( ball.relY, 500)
         return player.goNow('kickBallExecute')
 
     elif ballForeFoot == constants.MID_RIGHT:
-        if player.bigKick:
-            player.chosenKick = SweetMoves.RIGHT_BIG_KICK
-        else :
-            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
+        player.chosenKick = SweetMoves.DREW_KICK( ball.relY, 500)
         return player.goNow('stepForRightFootKick')
 
     elif ballForeFoot == constants.MID_LEFT:
-        if player.bigKick:
-            player.chosenKick = SweetMoves.LEFT_BIG_KICK
-        else :
-            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
+        player.chosenKick = SweetMoves.DREW_KICK( ball.relY, 500)
         return player.goNow('stepForLeftFootKick')
 
     else :                  # INCORRECT_POS
@@ -407,14 +395,14 @@ def kickBallLeft(player):
     Kick the ball to the left, with right foot
     """
 
-    player.chosenKick = SweetMoves.RIGHT_SIDE_KICK
+    player.chosenKick = SweetMoves.DREW_RIGHT_SIDE_KICK
     return player.goNow('sideStepForSideKick')
 
 def kickBallRight(player):
     """
     Kick the ball to the right, using the left foot
     """
-    player.chosenKick = SweetMoves.LEFT_SIDE_KICK
+    player.chosenKick = SweetMoves.DREW_LEFT_SIDE_KICK
     return player.goNow('sideStepForSideKick')
 
 def kickBallRightShort(player):
@@ -434,22 +422,19 @@ def sideStepForSideKick(player):
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
 
-        if ballForeFoot == constants.MID_RIGHT or \
-                ballForeFoot == constants.MID_LEFT:
+        if (ballForeFoot == constants.MID_RIGHT and
+            player.chosenKick == SweetMoves.DREW_RIGHT_SIDE_KICK) or \
+            (ballForeFoot == constants.MID_LEFT and
+             player.chosenKick == SweetMoves.DREW_LEFT_SIDE_KICK):
             return player.goNow('kickBallExecute')
 
-        # Ball too far outside to kick with
-        elif ballForeFoot == constants.RIGHT_FOOT:
-            return player.goNow('alignForSideKick')
-
-        # Ball in front of wrong foot
-        elif ballForeFoot == constants.LEFT_FOOT:
-            return player.goNow('alignForSideKick')
-
-        # Ball must be in wrong place
-        else :
+        # Ball in wrong place
+        elif ballForeFoot == constants.INCORRECT_POS:
             player.inKickingState = False
-            return player.goLater('chase')
+            return player.goLater('positionForKick')
+
+        else :
+            return player.goNow('alignForSideKick')
 
     elif player.brain.ball.framesOff > ChaseBallConstants.BALL_OFF_THRESH:
         player.inKickingState = False
@@ -467,8 +452,11 @@ def alignForSideKick(player):
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
 
-        if ballForeFoot == constants.MID_LEFT or \
-                ballForeFoot == constants.MID_RIGHT:
+        if (ballForeFoot == constants.MID_RIGHT and
+            player.chosenKick == SweetMoves.DREW_RIGHT_SIDE_KICK) or \
+            (ballForeFoot == constants.MID_LEFT and
+             player.chosenKick == SweetMoves.DREW_LEFT_SIDE_KICK):
+
             player.stopWalking()
             return player.goLater('kickBallExecute')
 
@@ -498,7 +486,7 @@ def stepForRightFootKick(player):
 
         elif ballForeFoot == constants.LEFT_FOOT:
             player.stopWalking()
-            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
+            player.chosenKick = SweetMoves.DREW_KICK( ball.relY, 500)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:
@@ -528,7 +516,7 @@ def stepForLeftFootKick(player):
         # switch foot!
         elif ballForeFoot == constants.RIGHT_FOOT:
             player.stopWalking()
-            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
+            player.chosenKick = SweetMoves.DREW_KICK( ball.relY, 500)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:

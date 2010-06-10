@@ -64,6 +64,10 @@
  * @author George Slavov
  * @author Johannes Strom
  *
+ * @date June 2010
+ * @modified
+ * @author Octavian Neamtu
+ *
  * TODO:
  *   - Need to fix the world frame, since it currently relies on the rotation of
  *     the foot also about the Z axis, which means when we are turning, for
@@ -101,9 +105,11 @@
 #include <boost/numeric/ublas/lu.hpp>              // for lu_factorize
 #include <boost/numeric/ublas/io.hpp>              // for cout
 
-#include "Common.h"             // For ROUND
-#include "VisionDef.h"          // For camera parameters
+#include "Common.h"               // For ROUND
+#include "VisionDef.h"           // For camera parameters
 #include "Kinematics.h"         // For physical body parameters
+#include "CameraCalibrate.h"   //for camera calibraton, go figure
+#include "VisualLine.h" //for visual lines, helps in calibration
 
 #include "Sensors.h"
 #include "Structs.h"
@@ -160,6 +166,8 @@ public:
 
     const estimate pixEstimate(const int pixelX, const int pixelY,
                                const float objectHeight);
+    const estimate sizeBasedEstimate(const int pixelX, const int pixelY, const float objectHeight,
+                                     const float pixelSize, const float realSize);
     const estimate bodyEstimate(const int x, const int y, const float dist);
 
     /********** Getters **********/
@@ -177,6 +185,8 @@ public:
       return sensors->getHeadAngles()[0];
     }
     const float getDistanceBetweenTwoObjects(estimate e1, estimate e2);
+    std::vector<VisualLine> getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
+    const boost::numeric::ublas::vector <float> worldPointToPixel(boost::numeric::ublas::vector <float> point);
 
     const float getHeadPitch() {
       return sensors->getHeadAngles()[1];

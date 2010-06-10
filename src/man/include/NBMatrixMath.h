@@ -56,6 +56,8 @@ namespace NBMath {
 //       We can get superior performance this way.
     const ufvector3 solve(ufmatrix3 &A,
                           const ufvector3 &b);
+
+    const float length(ufvector4 &v);
 }
 
 #endif

@@ -59,7 +59,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
   profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
 #ifdef USE_TIME_PROFILING
   profiler->profiling = true;
-  profiler->profileFrames(1500);
+  profiler->profileFrames(700);
 #endif
   // give python a pointer to the sensors structure. Method defined in
   // Sensors.h
@@ -198,16 +198,17 @@ void Man::notifyNextVisionImage() {
   // Synchronize noggin's information about joint angles with the motion
   // thread's information
 
-  sensors->updateVisionAngles();
+  //sensors->updateVisionAngles();
+
 
   transcriber->postVisionSensors();
 
   // Process current frame
   processFrame();
 
-  //Release the camera image
-  //if(camera_active)
-  imageTranscriber->releaseImage();
+    //Release the camera image
+    //if(camera_active)
+    //imageTranscriber->releaseImage();
 
   // Make sure messages are printed
   fflush(stdout);
