@@ -30,7 +30,6 @@ from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
 from .players import Switch
-from .kickDecider import KickDecider
 
 import _roboguardian
 
