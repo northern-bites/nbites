@@ -9,13 +9,17 @@ def playbookWalk(nav):
     """positions us in any state using position from playbook"""
     if nav.firstFrame():
         nav.omniWalkToCount = 0
+        nav.playbookAtPositionCount = 0
 
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    # TODO: buffer this switch
     if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
-        return nav.goNow('playbookAtPosition')
+        nav.playbookAtPositionCount += 1
+        if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
+            return nav.goNow('playbookAtPosition')
+    else:
+        nav.playbookAtPositionCount = 0
 
     dest.h = my.headingTo(dest)
 
@@ -37,13 +41,17 @@ def playbookWalk(nav):
 def playbookOmni(nav):
     if nav.firstFrame():
         nav.stopOmniCount = 0
+        nav.playbookAtPositionCount = 0
 
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    # TODO: buffer this switch
     if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
-        return nav.goNow('playbookAtPosition')
+        nav.playbookAtPositionCount += 1
+        if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
+            return nav.goNow('playbookAtPosition')
+    else:
+        nav.playbookAtPositionCount = 0
 
     walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
@@ -63,13 +71,18 @@ def playbookOmni(nav):
 def playbookAtPosition(nav):
     if nav.firstFrame():
         helper.setSpeed(nav, 0, 0, 0)
+        nav.startOmniCount = 0
 
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    # TODO: buffer this switch
     if navTrans.atDestination(my, dest) and navTrans.atHeading(my, dest.h):
+        nav.startOmniCount = 0
         return nav.stay()
 
     else:
-        return nav.goLater('playbookOmni')
+        nav.startOmniCount += 1
+        if nav.startOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
+            return nav.goLater('playbookOmni')
+        else:
+            return nav.stay()
