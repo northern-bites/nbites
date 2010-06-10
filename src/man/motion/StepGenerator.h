@@ -98,6 +98,9 @@
 #  define DEBUG_SENSOR_ZMP
 #endif
 
+// ZMP Preview Queue Debugging
+#define DEBUG_ZMP_REF
+
 typedef boost::tuple<const std::list<float>*,
                      const std::list<float>*> zmp_xy_tuple;
 typedef boost::tuple<LegJointStiffTuple,
@@ -163,6 +166,7 @@ private: // Helper methods
     void resetQueues();
 	void swapZMPQueues(std::list<float> &zmp_x, std::list<float> &zmp_y,
 					   NBMath::ufvector3 &last_zmp);
+	std::list<float> mergeZMPQueues(std::list<float> &currentQ, std::list<float> &newQ);
     void resetOdometry(const float initX, const float initY);
     void updateOdometry(const std::vector<float> &deltaOdo);
     void debugLogging();
@@ -243,6 +247,9 @@ private:
 #endif
 #ifdef DEBUG_SENSOR_ZMP
     FILE* zmp_log;
+#endif
+#ifdef DEBUG_ZMP_REF
+	FILE* zmp_ref_log;
 #endif
 
 };
