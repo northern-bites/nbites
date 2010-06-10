@@ -181,6 +181,8 @@ class Sensors {
     // current image. At the same time, the bodyAngles vector will still have the
     // most recent angles if some other module needs them.
     void updateVisionAngles();
+    void lockVisionAngles();
+    void releaseVisionAngles();
 
     // Save a vision frame with associated sensor data
     void saveFrame(void);

@@ -70,6 +70,7 @@ public class TOOLVisionLink {
     private VisualFieldObject bgrp, bglp, ygrp, yglp, bgBackstop, ygBackstop;
     private Vector<VisualFieldObject> visualFieldObjects;
     private Vector<VisualLine> visualLines;
+    private Vector<VisualLine> expectedVisualLines;
     private Vector<LinePoint> unusedPoints;
     private Vector<VisualCorner> visualCorners;
     private Horizon poseHorizon;
@@ -94,6 +95,7 @@ public class TOOLVisionLink {
           */
         visualFieldObjects = new Vector<VisualFieldObject>();
         visualLines = new Vector<VisualLine>(5, 5);
+        expectedVisualLines = new Vector<VisualLine>(5, 5);
         visualCorners = new Vector<VisualCorner>(10);
     }
 
@@ -168,6 +170,7 @@ public class TOOLVisionLink {
     public Ball getBall() { return ball; }
     public Vector<VisualFieldObject> getVisualFieldObjects() { return visualFieldObjects;}
     public Vector<VisualLine> getVisualLines() { return visualLines;}
+    public Vector<VisualLine> getExpectedVisualLines() { return expectedVisualLines;}
     public Vector<LinePoint> getUnusedPoints() { return unusedPoints;}
     public Vector<VisualCorner> getVisualCorners() { return visualCorners;}
     public Horizon getPoseHorizon(){ return poseHorizon;}
@@ -182,12 +185,16 @@ public class TOOLVisionLink {
     native private void cppPixEstimate(int pixelX, int pixelY,
                                        float objectHeight,
                                        double[] estimateResult);
+    
+    native private void cppGetCameraCalibrate(float[] calibrateArray);
+
+    native private void cppSetCameraCalibrate(float[] calibrateArray);
 
     //Load the cpp library that implements the native methods
     static
     {
         try{
-            System.loadLibrary("TOOLVisionLink");
+            System.loadLibrary("libTOOLVisionLink");
             visionLinkSuccessful = true;
 	    System.out.println("TOOLVisionLink lib loaded successfuly");
         }catch(UnsatisfiedLinkError e){
@@ -248,6 +255,19 @@ public class TOOLVisionLink {
         pointFWS = null;
         visualLines.add(new VisualLine(bx, by, ex, ey, linePoints));
     }
+    //similar to setVisualLineInfo, the use is for getting expected lines (see camera calibration)
+    public void setExpectedVisualLineInfo(int bx, int by, int ex, int ey){
+        Vector<LinePoint> linePoints = new Vector<LinePoint>(len);
+        for(int i = 0; i < len; i++)
+            linePoints.add(new LinePoint(pointX[i], pointY[i],
+                                         pointLineWidth[i], pointFWS[i]));
+        //flush the buffers
+        pointX = null;
+        pointY = null;
+        pointLineWidth = null;
+        pointFWS = null;
+        expectedVisualLines.add(new VisualLine(bx, by, ex, ey, linePoints));
+    }
     //set the points
     public void setPointInfo(int x, int y, double lw, int fws){
         pointX[curEl] = x;
@@ -270,10 +290,10 @@ public class TOOLVisionLink {
     }
     //set the corners
     public void setVisualCornersInfo(int x, int y,
-									 float distance, float bearing,
-									 int cornerShape){
+            float distance, float bearing,
+            int cornerShape){
         visualCorners.add(new VisualCorner(x, y, distance,
-										   bearing, cornerShape));
+                bearing, cornerShape));
     }
     //set the pose + vision horizon
     public void setHorizonInfo(int lx, int ly, int rx, int ry, int visHor){
@@ -282,6 +302,38 @@ public class TOOLVisionLink {
     }
     //set the processTime
     public void setProcessTime(int p) {
-	processTime = p;
+        processTime = p;
     }
+
+    public float[] getCameraCalibrate() {
+        float[] calibrateArray = new float[9];
+        if (visionLinkSuccessful) {
+            try {
+                cppGetCameraCalibrate(calibrateArray);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n"+
+                                   "   getCameraCalibrate failed.");
+            }
+        }
+        else
+            System.out.println("VisionLink inactive," +
+                               " so cameraCalibrate does not work");
+
+        return calibrateArray;
+    }
+    
+    public void setCameraCalibrate(float[] calibrateArray) {
+        if (visionLinkSuccessful) {
+            try {
+                cppSetCameraCalibrate(calibrateArray);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n"+
+                                   "   getCameraCalibrate failed.");
+            }
+        }
+        else
+            System.out.println("VisionLink inactive," +
+                               " so cameraCalibrate does not work");
+    }
+    
 }

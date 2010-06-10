@@ -115,10 +115,11 @@ void NaoEnactor::sendHardness(){
 
     hardness_command[4][0] = dcmProxy->getTime(0);
     // #ifdef ROBOT_NAME_zaphod
+    #ifdef ROBOT_NAME_zaphod
     //     // turn off broken neck
-    //    hardness_command[5][Kinematics::HEAD_YAW][0] = -1.0f;
-    //    hardness_command[5][Kinematics::HEAD_PITCH][0] = -1.0f;
-    // #endif
+    hardness_command[5][Kinematics::L_SHOULDER_PITCH][0] = -1.0f;
+    hardness_command[5][Kinematics::L_SHOULDER_ROLL][0] = -1.0f;
+    #endif
 
 #ifndef NO_ACTUAL_MOTION
     try {
