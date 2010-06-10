@@ -73,8 +73,8 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 #ifdef OFFLINE
     visualHorizonDebug = false;
 	debugSelf = false;
-	debugShot = true;
-	debugOpenField = true;
+	debugShot = false;
+	debugOpenField = false;
 #endif
 
     // loads the color table on the MS into memory
