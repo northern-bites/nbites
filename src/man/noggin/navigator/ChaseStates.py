@@ -136,6 +136,11 @@ def positionForKick(nav):
 
     (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
 
+    if not navTrans.atHeading(nav.brain.my, heading):
+        nav.angleToOrbit = MyMath.sub180Angle(nav.brain.my.h - heading)
+        print nav.angleToOrbit
+        return nav.goNow('orbitBallThruAngle')
+
     # if we need to orbit, switch to orbit state
     ball = nav.brain.ball
 
@@ -161,25 +166,21 @@ def positionForKick(nav):
 
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
-    ## # calculate spin speed
-    ## hDiff = MyMath.sub180Angle(nav.brain.my.h - heading)
-    ## sTheta = MyMath.sign(hDiff) * walker.getRotScale(hDiff) * .1 *\
-    ##          constants.OMNI_MAX_SPIN_SPEED
-    ## sTheta = MyMath.clip(sTheta,
-    ##                      constants.OMNI_MIN_SPIN_SPEED,
-    ##                      constants.OMNI_MAX_SPIN_SPEED)
+    # calculate spin speed
+    hDiff = MyMath.sub180Angle(nav.brain.my.h - heading)
+    sTheta = MyMath.sign(hDiff) * walker.getRotScale(hDiff) * .1 *\
+             constants.OMNI_MAX_SPIN_SPEED
+    sTheta = MyMath.clip(sTheta,
+                         constants.OMNI_MIN_SPIN_SPEED,
+                         constants.OMNI_MAX_SPIN_SPEED)
 
-    ## if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
-    ##     sTheta = 0.0
+    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
+        sTheta = 0.0
 
-    if sX == 0.0 and sY == 0.0:
-        if not navTrans.atHeading(nav.brain.my, heading):
-            nav.angleToOrbit = -MyMath.sub180Angle(heading - nav.brain.my.h)
-            return nav.goNow('orbitBallThruAngle')
-
+    if sX == 0.0 and sY == 0.0 and sTheta == 0.0:
         return nav.goNow('stop')
 
-    helper.setSpeed(nav,sX,sY,0)#sTheta)
+    helper.setSpeed(nav,sX,sY,sTheta)
 
     return nav.stay()
 
@@ -202,55 +203,59 @@ def dribble(nav):
 
     return nav.stay()
 
-def orbitBall(nav):
-    """
-    Circles around a point in front of robot, for a certain angle
-    """
-    if nav.firstFrame():
-        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
+MIN_ORBIT_REL_X = 14.
+MAX_ORBIT_REL_X = 16.
+MAX_DIFF_REL_Y = 2.
 
-    (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
-
+def orbitAdjust(nav):
+    # needs to adjust far, far less
+    # if we need to orbit, switch to orbit state
     ball = nav.brain.ball
-    target_relX= 15.
-    target_relY = 0.
-    rel_buffer = 5.
 
-    if ball.relX <= target_relX:
-        sX = -5.
-        sY = 0.
-        sTheta = 0.
-
-    elif ball.relY <= (target_relY - rel_buffer):
-        sX = 0.
-        sY = -5.
-        sTheta = 0.
-
-    elif ball.relY >= (target_relY + rel_buffer):
-        sX = 0.
-        sY = 5.
-        sTheta = 0.
+    if fabs(ball.relY) < (MAX_DIFF_REL_Y - .5) and \
+           ((MIN_ORBIT_REL_X + .5) < ball.relX < (MAX_ORBIT_REL_X - .5)):
+        return nav.goNow('orbitBallThruAngle')
 
     else:
-        nav.dest = ball
-        nav.dest.h = heading
-        sX, sY, sTheta = \
-               walker.getOmniWalkParam(nav.brain.my, nav.dest)
+        if fabs(ball.relY) >= (MAX_DIFF_REL_Y - .5):
+            sY = MyMath.clip(ball.relY * PFK_Y_GAIN,
+                             PFK_MIN_Y_SPEED,
+                             PFK_MAX_Y_SPEED)
 
-    helper.setSpeed(nav, sX, sY, sTheta)
+            sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
-    if navTrans.atHeading(nav.brain.my, heading):
-        return nav.goLater('positionForKick')
+        else:
+            sY = 0.0
+
+        if ((MIN_ORBIT_REL_X +.5) > ball.relX or
+            ball.relX >( MAX_ORBIT_REL_X - .5)):
+            sX = MyMath.clip((ball.relX - MIN_ORBIT_REL_X )* PFK_X_GAIN,
+                             PFK_MIN_X_SPEED,
+                             PFK_MAX_X_SPEED)
+            sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
+
+        else:
+            sX = 0.0
+
+    helper.setSpeed(nav,sX,sY,0)
     return nav.stay()
-
-
 
 def orbitBallThruAngle(nav):
     """
     Circles around a point in front of robot, for a certain angle
     """
-    if fabs(nav.angleToOrbit) < constants.MIN_ORBIT_ANGLE:
-        return nav.goNow('positionForKick')
+    ball = nav.brain.ball
+    # ball is too off-center to orbit, center on it
+    if nav.firstFrame() and nav.lastDiffState == 'positionForKick':
+        nav.orbitFrames = 0
+        if fabs(nav.angleToOrbit) < constants.MIN_ORBIT_ANGLE:
+            return nav.goNow('positionForKick')
+
+    if fabs(ball.relY) > MAX_DIFF_REL_Y or \
+           ball.relX <= MIN_ORBIT_REL_X or \
+           ball.relX >= MAX_ORBIT_REL_X:
+        print ball.relX
+        return nav.goNow('orbitAdjust')
 
     if nav.firstFrame():
         if nav.angleToOrbit < 0:
@@ -273,15 +278,16 @@ def orbitBallThruAngle(nav):
             sT = constants.ORBIT_SPIN_SPEED * \
                 constants.ORBIT_LARGE_GAIN
 
-        walkX = -0.5
+        walkX = -1.
         walkY = orbitDir*sY
         walkTheta = orbitDir*sT
         helper.setSpeed(nav, walkX, walkY, walkTheta )
 
-    #  (frames/second) / (degrees/second) * degrees
+    #  (frames/second) / (degrees/second) * degrees + a little b/c we run slow
     framesToOrbit = fabs((constants.FRAME_RATE / nav.walkTheta) *
                          nav.angleToOrbit)
+    nav.orbitFrames += 1
 
-    if nav.counter >= framesToOrbit:
+    if nav.orbitFrames >= framesToOrbit:
         return nav.goLater('positionForKick')
     return nav.stay()

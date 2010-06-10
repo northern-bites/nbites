@@ -113,6 +113,10 @@ def positionForKick(player):
         player.brain.nav.kickPosition()
         player.inKickingState = True
 
+    ## if transitions.shouldKickPositionPan(player):
+    ##     player.brain.tracker.lookToDir('up')
+    ## else:
+    ##     player.brain.tracker.trackBall()
     # Leave this state if necessary
     if transitions.shouldKick(player):
         return player.goNow('kickBallExecute')
