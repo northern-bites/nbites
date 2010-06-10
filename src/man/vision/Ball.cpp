@@ -127,7 +127,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 	const int MIN_AREA = 12;
 	const int MAX_AREA = 1000;
 	const int PIX_EST_DIV = 3;
-	const int BOTTOM_EDGE_BUFF = 3;
+	const int BOTTOM_EDGE_BUFF = 4;
 	const int HORIZON_THRESHOLD = 30;
 	const float OPTIMAL_COLOR_PERCENT = 0.85f;
 	const float CONVERT_TO_INT = 10.0f;
@@ -136,7 +136,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 	const int MEDIUM_BLOB = 150;
 	const int BIG_BLOB = 250;
 	const int HUGE_BLOB = 500;
-	const float PIXACC = 300;
+	const float PIXACC = 400;
 
     int confidence = 10;
     occlusion = NOOCCLUSION;
@@ -199,13 +199,13 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 					cout << "Screened one for horizon problems " << endl;
 					drawBlob(blobs->get(i), WHITE);
 				}
-			} else if (ar > MIN_AREA && perc > minpercent) {
+			} else if (ar >= MIN_AREA && perc > minpercent) {
 				// don't do anything
 				if (BALLDEBUG) {
 					cout << "Candidate ball " << endl;
 					printBlob(blobs->get(i));
 				}
-			} else if (ar > MAX_AREA && rightHalfColor(blobs->get(i)) > minpercent)
+			} else if (ar >= MAX_AREA && rightHalfColor(blobs->get(i)) > minpercent)
 			{
 				if (BALLDEBUG) {
 					cout << "Candidate ball " << endl;
@@ -331,7 +331,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 			// SORT OUT BALL INFORMATION
 			setBallInfo(w, h, thisBall, e);
 			done = true;
-			float distanceDifference = fabs(e.dist - thisBall->getDistance());
+			float distanceDifference = fabs(e.dist - thisBall->getFocDist());
 			const float DISTANCE_MISMATCH = 50.0f;
 			if (distanceDifference > DISTANCE_MISMATCH &&
 				(e.dist *2 <  thisBall->getDistance() ||
@@ -349,7 +349,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 	}
     // sometimes when we're close to the ball we catch reflections off
 	//the tape or posts
-    if (thisBall->getDistance() < 75.0f && abs(h - w) > 3) {
+    if (thisBall->getDistance() < 75.0f && abs(h - w) > 3 && occlusion == NOOCCLUSION) {
 		// we probably have misidentified the distance see if we can fix it.
 		if (BALLDISTDEBUG) {
 			cout << "Detected bad ball distance - trying to fix " << w <<
@@ -1286,7 +1286,7 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 	}
 	thisBall->setConfidence(SURE);
 	thisBall->findAngles();
-	if (occlusion == NOOCCLUSION) {
+	if (occlusion == NOOCCLUSION || e.dist == 0.0f) {
 		thisBall->setFocalDistanceFromRadius();
 		thisBall->setDistanceEst(vision->pose->
 								 bodyEstimate(thisBall->getCenterX(),
