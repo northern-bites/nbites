@@ -353,12 +353,47 @@ RIGHT_FAR_KICK = (
      (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),
      (80.0 , -40.0 , 50.0 , 70.0), 1.0 , 0, stiff.LOW_HEAD_STIFFNESSES) )
 
-LEFT_SIDE_KICK = (
-    ((80.,90.,-50.,-70.),
-     (0.,0.,-10.,20.,-10.,0.),
-     (0.,0.,-10.,20.,-10.,0.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+def DREW_SIDE_KICK(relY):
+    if relY<=0:
+        return mirrorMove(DREW_LEFT_SIDE_KICK())
+    if relY>0:
+        return DREW_LEFT_SIDE_KICK()
 
+def DREW_LEFT_SIDE_KICK():
+    #20:2
+    kick_hip_roll = 45
+    # limited to 45
+    # potentially adjust hip pitch for relX
+
+    return (
+        ((80.,40.,-50.,-70.),
+         (0.,0.,-35.,65.,-28.,-14.),
+         (0.,2,-38.,76.,-40.,-14.),
+         (80.,-40.,50.,70.),0.8,0, stiff.NORMAL_STIFFNESSES),
+
+        #lift left leg to side
+        ((80.,0.,-50.,-70.),
+         (0.,kick_hip_roll,-40.,65.,-10.,-10.),
+         (0.,5.,-38.,76.,-40.,-22.),
+         (80.,-40.,50.,70.),
+         0.5 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+        (2, (0.,kick_hip_roll,-55.,60.,-20.,0.),
+         0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+        ((80.,0.,-50.,-70.),
+         (0.,-22.,-70.,30.,23.,0.),
+         (0.,0.,-38.,76.,-40.,-14.),
+         (80.,-40.,50.,70.),
+         .2, 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+        ((80.,40.,-50.,-70.),
+         (0.,0.,-35.,65.,-28.,-10.),
+         (0.,2,-38.,76.,-40.,-14.),
+         (80.,-40.,50.,70.),0.8,0, stiff.NORMAL_STIFFNESSES))
+
+LEFT_SIDE_KICK = (
+    # lean right
     ((80.,40.,-50.,-70.),
      (0.,20.,-10.,20.,-10.,-20.),
      (0.,16.,-13.,20.,-10.,-22.),
