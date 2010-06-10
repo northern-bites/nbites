@@ -278,6 +278,10 @@ private:
 	bool debugSelf;
 	bool debugShot;
 	bool debugOpenField;
+#else
+	static const bool debugSelf = false;
+	static const bool debugShot = false;
+	static const bool debugOpenField = false;
 #endif
 };
 
