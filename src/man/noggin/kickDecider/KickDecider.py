@@ -18,25 +18,32 @@ class KickDecider(object):
                          constants.OBJECTIVE_KICKOFF:self.kickoff }
         self.kickDest = None
         self.destDist = 0.
+        self.currentObj = None
         self.currentKick = None
 
     def getSweetMove(self):
         """
         returns the proper sweet move to execute to kick
         """
-        ball = self.brain.ball
-        return self.currentKick.sweetMove(ball.relX, ball.relY,
-                                          self.destDist)
+        if self.currentKick == kicks.DYNAMIC_STRAIGHT_KICK:
+            ball = self.brain.ball
+            if self.currentObj == constants.OBJECTIVE_SHOOT:
+                dist = 500.
+            else:
+                dist = self.destDist
+            return self.currentKick.sweetMove(ball.relX, ball.relY, dist)
+        else:
+            return self.currentKick.sweetMove
 
     def decideKick(self):
         """
         using objective and localization determines best kick to make
         """
 
-        objective = self.getObjective()
+        self.currentObj= self.getObjective()
 
         # uses dictionary to retrieve and call proper method
-        self.kickDest = self.objDict[objective]()
+        self.kickDest = self.objDict[self.currentObj]()
         # take my position and destination of kick to decide which kick
         # need to consider: distance to kick, time needed to align for kick
         # prioritize time to align
