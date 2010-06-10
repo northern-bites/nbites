@@ -19,7 +19,8 @@ class Kick(object):
         return ("x_offset: %g y_offset: %g heading: %g" %
                 (self.x_offset, self.y_offset, self.heading))
 # Some standard kicks. x,y and move should not be modified, h will be
-LEFT_SIDE_KICK = Kick(y=2, move=SweetMoves.DREW_LEFT_SIDE_KICK)
-RIGHT_SIDE_KICK = Kick(y=-2, move=SweetMoves.DREW_RIGHT_SIDE_KICK)
+LEFT_SIDE_KICK = Kick(x = 12, y = 2, move=SweetMoves.DREW_LEFT_SIDE_KICK)
+RIGHT_SIDE_KICK = Kick(x = 12, y = -2, move=SweetMoves.DREW_RIGHT_SIDE_KICK)
 
-DYNAMIC_STRAIGHT_KICK = Kick(y=-5, move=SweetMoves.DREW_KICK)
+RIGHT_DYNAMIC_STRAIGHT_KICK = Kick(y = 8, move=SweetMoves.DREW_KICK)
+LEFT_DYNAMIC_STRAIGHT_KICK = Kick(y = -8, move=SweetMoves.DREW_KICK)

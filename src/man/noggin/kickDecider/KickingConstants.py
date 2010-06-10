@@ -26,7 +26,8 @@ LEFT_FOOT_L_Y = 8
 LEFT_FOOT_R_Y = 2
 RIGHT_FOOT_L_Y = -LEFT_FOOT_R_Y
 RIGHT_FOOT_R_Y = -LEFT_FOOT_L_Y
-DEFAULT_KICK_X_OFFSET = 12.5
+
+DEFAULT_KICK_X_OFFSET = 13
 
 MAX_KICK_X = 22
 MIN_KICK_X = 0
@@ -51,11 +52,11 @@ NUM_OBJECTIVES = 5
  OBJECTIVE_UNCLEAR) = range(NUM_OBJECTIVES)
 
 SIDELINE_CLEAR_OFFSET = 1.0
-LEFT_CLEAR_POINT = Location(NogginConstants.LANDMARK_OPP_FIELD_CROSS[0],
+LEFT_CLEAR_POINT = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
                             NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
                             SIDELINE_CLEAR_OFFSET)
 
-RIGHT_CLEAR_POINT = Location(NogginConstants.LANDMARK_OPP_FIELD_CROSS[0],
+RIGHT_CLEAR_POINT = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
                              NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y -
                              SIDELINE_CLEAR_OFFSET)
 

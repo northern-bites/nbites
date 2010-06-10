@@ -121,8 +121,9 @@ def ballInMyBox(nav):
 PFK_MAX_Y_SPEED = speeds.MAX_Y_SPEED
 PFK_MIN_Y_SPEED = speeds.MIN_Y_SPEED
 PFK_MAX_X_SPEED = speeds.MAX_X_SPEED
-PFK_MIN_X_SPEED = speeds.MIN_X_MAGNITUDE
+PFK_MIN_X_SPEED = speeds.MIN_X_SPEED
 PFK_MIN_Y_MAGNITUDE = speeds.MIN_Y_MAGNITUDE
+PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
 PFK_X_GAIN = 0.12
 PFK_Y_GAIN = 0.6
 
@@ -136,20 +137,21 @@ def positionForKick(nav):
     (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
 
     # if we need to orbit, switch to orbit state
-    if not navTrans.atHeading(nav.brain.my, heading):
-        return nav.goNow('orbitBall')
+    #if not navTrans.atHeading(nav.brain.my, heading):
+    #    return nav.goNow('orbitBall')
 
     ball = nav.brain.ball
 
     # Determine approach speed
     target_x = ball.relX - x_offset
 
-    if -0.5 <= target_x < 1.0:
+    if -1. <= target_x < 2.:
         sX = 0
     else:
         sX = MyMath.clip(target_x * PFK_X_GAIN,
                          PFK_MIN_X_SPEED,
                          PFK_MAX_X_SPEED)
+        sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
 
     target_y = ball.relY - y_offset
 

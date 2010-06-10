@@ -2,6 +2,7 @@ from .. import NogginConstants
 from . import kicks
 from . import KickingConstants as constants
 from math import fabs
+from ..util import MyMath
 
 class KickDecider(object):
     """
@@ -12,7 +13,7 @@ class KickDecider(object):
     def __init__(self, brain):
         self.brain = brain
         self.hasKickedOff = True
-        self.objDict = { constants.OBJECTIVE_CLEAR:self.kickoff,
+        self.objDict = { constants.OBJECTIVE_CLEAR:self.clear,
                          constants.OBJECTIVE_CENTER:self.center,
                          constants.OBJECTIVE_SHOOT:self.shoot,
                          constants.OBJECTIVE_KICKOFF:self.kickoff }
@@ -25,13 +26,14 @@ class KickDecider(object):
         """
         returns the proper sweet move to execute to kick
         """
-        if self.currentKick == kicks.DYNAMIC_STRAIGHT_KICK:
+        if self.currentKick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
+               self.currentKick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
             ball = self.brain.ball
             if self.currentObj == constants.OBJECTIVE_SHOOT:
                 dist = 500.
             else:
                 dist = self.destDist
-            return self.currentKick.sweetMove(ball.relX, ball.relY, dist)
+            return self.currentKick.sweetMove(ball.relY, dist)
         else:
             return self.currentKick.sweetMove
 
@@ -49,27 +51,35 @@ class KickDecider(object):
         # prioritize time to align
         # calculate bearing to dest
         bearing = self.brain.my.getRelativeBearing(self.kickDest)
-        if fabs(bearing) >= 180.:
+        print "bearing: %g" % bearing
+        if fabs(bearing) >= 75.:
             print "kick sideways"
-
             # kick sideways
             # left or right?
             # positive bearing means dest is to my left, so kick right
             if bearing > 0:
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.heading = self.brain.ball.headingTo(self.kickDest) - 90.
+                kick.heading = MyMath.sub180Angle(
+                    self.brain.ball.headingTo(self.kickDest) - 90.)
             else:
                 kick = kicks.LEFT_SIDE_KICK
-                kick.heading = self.brain.ball.headingTo(self.kickDest) + 90.
+                kick.heading = MyMath.sub180Angle(
+                    self.brain.ball.headingTo(self.kickDest) + 90.)
 
         else:
             print "kick straight"
             #kick straight
-            kick = kicks.DYNAMIC_STRAIGHT_KICK
+            # if my left foot is closer
+            #kick = kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+            # if my right foot is closer
+            kick = kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
             kick.heading = self.brain.ball.headingTo(self.kickDest)
 
         self.destDist = self.brain.ball.distTo(self.kickDest)
         self.currentKick = kick
+        print "dest:", self.kickDest
+        print "my.x:%g my.y:%g my.h:%g" % (self.brain.my.x, self.brain.my.y, self.brain.my.h)
+
         self.brain.out.printf(self.currentKick)
 
     def getObjective(self):

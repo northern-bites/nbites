@@ -82,7 +82,6 @@ class TeamMember(RobotLocation):
         ball = self.brain.ball
         pb = self.brain.playbook
 
-        #self.playerNumber = self.brain.my.playerNumber
         self.x = my.x
         self.y = my.y
         self.h = my.h
