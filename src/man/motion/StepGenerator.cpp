@@ -36,6 +36,9 @@ using namespace NBMath;
 //#define DEBUG_STEPGENERATOR
 //#define DEBUG_ZMP
 
+// flag to turn on multiple zmp queues (on by default)
+#define MULTIPLE_ZMP
+
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
     done(true),
@@ -243,7 +246,7 @@ void StepGenerator::tick_controller(){
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
 
 #ifdef DEBUG_ZMP
-	cout << "generate_zmp_ref() finished\n";
+	cout << "StepGenerator::generate_zmp_ref() finished\n";
 #endif
 
     //The observer needs to know the current reference zmp
@@ -253,8 +256,10 @@ void StepGenerator::tick_controller(){
     zmp_ref_x.pop_front();
     zmp_ref_y.pop_front();
 	// also clear the oldest stopping zmp values to keep queues in sync
+#ifdef MULTIPLE_ZMP
 	zmp_ref_stop_x.pop_front();
 	zmp_ref_stop_y.pop_front();
+#endif
 
     //Scale the sensor feedback according to the gait parameters
     est_zmp_i(0) = scaleSensors(zmp_filter.get_zmp_x(), cur_zmp_ref_x);
@@ -446,27 +451,32 @@ void StepGenerator::swapSupportLegs(){
  */
 void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
 
-	// HACK ALERT:
-	//
+	// HACK ALERT: the multiple ZMP queues in their current state are a hack
+	// Once we decouple ZMP generation from the step queues this won't be a problem
+	// GNM June 2010
 
     switch(newSupportStep->type){
     case REGULAR_STEP:
-#ifdef DEBUG_ZMP
-		cout << "REGULAR: fillZMPEnd()\n";
-		cout << "REGULAR: fillZMPRegular()\n";
-#endif
+#ifdef MULTIPLE_ZMP
 		fillZMPEnd(newSupportStep);
+#endif
 		fillZMPRegular(newSupportStep);
         break;
     case END_STEP: //END and NULL might be the same thing....?
-		// swap the queues over, we are stopping
+#ifdef MULTIPLE_ZMP
+		// swap the existing queues, we are stopping
 		if (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES) {
-#ifdef DEBUG_ZMP
-			cout << "first time we've been called, fillZMPEnd() normally\n";
-#endif
 			fillZMPEnd(newSupportStep);
 		}
 		swapZMPQueues(zmp_ref_stop_x, zmp_ref_stop_y, last_zmp_stop_end_s);
+#endif
+
+#ifndef MULTIPLE_ZMP
+		// immediately merge the two queues, slower than before but
+		// generates identical ZMP preview queues (safe)
+		fillZMPEnd(newSupportStep);
+		swapZMPQueues(zmp_ref_stop_x, zmp_ref_stop_y, last_zmp_stop_end_s);
+#endif
         break;
     default:
         throw "Unsupported Step type";
@@ -1063,8 +1073,8 @@ void StepGenerator::resetQueues(){
  */
 void StepGenerator::swapZMPQueues(std::list<float> &zmp_x, std::list<float> &zmp_y,
 								  NBMath::ufvector3 &last_zmp) {
-#ifdef DEBUG_ZMP
-	cout << "swapping ZMP queues\n";
+#ifdef DEBUG_STEPGENERATOR
+	cout << "StepGenerator::swapZMPQueues\n";
 #endif
 	zmp_ref_x = zmp_x;
 	zmp_ref_y = zmp_y;
