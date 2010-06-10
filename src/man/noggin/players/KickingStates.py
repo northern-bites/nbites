@@ -434,20 +434,14 @@ def sideStepForSideKick(player):
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
 
-        if ballForeFoot == constants.MID_RIGHT or \
-                ballForeFoot == constants.MID_LEFT:
+        if (ballForeFoot == constants.MID_RIGHT and
+            player.chosenKick == SweetMoves.DREW_RIGHT_SIDE_KICK) or \
+            (ballForeFoot == constants.MID_LEFT and
+             player.chosenKick == SweetMoves.DREW_LEFT_SIDE_KICK):
             return player.goNow('kickBallExecute')
 
-        # Ball too far outside to kick with
-        elif ballForeFoot == constants.RIGHT_FOOT:
-            return player.goNow('alignForSideKick')
-
-        # Ball in front of wrong foot
-        elif ballForeFoot == constants.LEFT_FOOT:
-            return player.goNow('alignForSideKick')
-
-        # Ball must be in wrong place
-        else :
+        # Ball in wrong place
+        elif ballForeFoot == constants.INCORRECT_POS:
             player.inKickingState = False
             return player.goLater('positionForKick')
 
@@ -467,8 +461,11 @@ def alignForSideKick(player):
         player.kickDecider.ballForeWhichFoot()
         ballForeFoot = player.kickDecider.ballForeFoot
 
-        if ballForeFoot == constants.MID_LEFT or \
-                ballForeFoot == constants.MID_RIGHT:
+        if (ballForeFoot == constants.MID_RIGHT and
+            player.chosenKick == SweetMoves.DREW_RIGHT_SIDE_KICK) or \
+            (ballForeFoot == constants.MID_LEFT and
+             player.chosenKick == SweetMoves.DREW_LEFT_SIDE_KICK):
+
             player.stopWalking()
             return player.goLater('kickBallExecute')
 
