@@ -449,7 +449,7 @@ def sideStepForSideKick(player):
         # Ball must be in wrong place
         else :
             player.inKickingState = False
-            return player.goLater('chase')
+            return player.goLater('positionForKick')
 
     elif player.brain.ball.framesOff > ChaseBallConstants.BALL_OFF_THRESH:
         player.inKickingState = False
