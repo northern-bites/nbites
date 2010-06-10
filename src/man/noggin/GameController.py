@@ -4,7 +4,6 @@ from man import comm
 from . import NogginConstants as Constants
 from . import GameStates
 from .util import FSA
-from . import TeamConfig
 from . import Leds
 
 STATE_INITIAL = comm.STATE_INITIAL
@@ -40,7 +39,7 @@ class GameController(FSA.FSA):
             self.brain.leds.executeLeds(Leds.TEAM_RED_LEDS)
 
         print  "kickoff:%g teamColor:%g" % (self.gc.kickOff, self.gc.color)
-        if self.gc.kickOff == self.gc.color:
+        if self.kickOff == self.gc.color:
             self.ownKickOff = True
             self.brain.leds.executeLeds(Leds.HAVE_KICKOFF_LEDS)
         else:

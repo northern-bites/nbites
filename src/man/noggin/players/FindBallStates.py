@@ -44,12 +44,9 @@ def spinFindBall(player):
         #else:
         #tracker.findBall()
 
-        if player.justKicked:
-            spinDir = player.getSpinDirAfterKick()
-        else:
-            my = player.brain.my
-            ball = player.brain.ball
-            spinDir = my.spinDirToPoint(ball)
+        my = player.brain.my
+        ball = player.brain.ball
+        spinDir = my.spinDirToPoint(ball)
 
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 

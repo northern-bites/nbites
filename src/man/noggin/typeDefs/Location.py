@@ -1,6 +1,7 @@
 from math import (degrees,
                   hypot,
-                  atan2)
+                  atan2,
+                  fabs)
 
 from ..util import MyMath
 from .. import NogginConstants
@@ -45,15 +46,13 @@ class Location (object):
 
     def headingTo(self, other, forceCalc = False):
         '''determine the heading facing a target x, y'''
-        ## print "other.y:%f my.y:%f other.x:%f my.x:%f" % (other.y, self.y,
-        ##                                                  other.x, self.x)
 
         if not forceCalc and hasattr(self, "teamColor") and \
                hasattr(other, "heading"):
             return other.heading
 
-        return MyMath.sub180Angle(degrees(atan2(other.y - self.y,
-                                                other.x - self.x)))
+        return degrees(atan2(other.y - self.y, other.x - self.x))
+
     def inOppGoalBox(self):
 
         return NogginConstants.OPP_GOALBOX_LEFT_X < self.x < \
@@ -68,19 +67,14 @@ class Location (object):
                NogginConstants.MY_GOALBOX_BOTTOM_Y
 
     def inCenterOfField(self):
-        return NogginConstants.FIELD_HEIGHT *2/3 > self.y > \
-               NogginConstants.FIELD_HEIGHT / 3
+        return NogginConstants.FIELD_HEIGHT *2./3. > self.y > \
+               NogginConstants.FIELD_HEIGHT / 3.
 
     def inTopOfField(self):
-        return NogginConstants.FIELD_HEIGHT*2/3 < self.y
+        return NogginConstants.FIELD_HEIGHT*2./3. < self.y
 
     def inBottomOfField(self):
-        return NogginConstants.FIELD_HEIGHT/3 > self.y
-
-    def visible():
-        pass
-    def inScanRange():
-        pass
+        return NogginConstants.FIELD_HEIGHT/3. > self.y
 
 class RobotLocation(Location):
 
@@ -100,23 +94,19 @@ class RobotLocation(Location):
                hasattr(other, "bearing"):
             return other.bearing
 
-        return MyMath.sub180Angle((degrees(atan2(other.y - self.y,
-                                                 other.x - self.x))) - self.h)
+        return MyMath.sub180Angle(self.headingTo(other) - self.h)
 
     def spinDirToPoint(self, other):
         """
         Advanced function to get the spin direction for a given point.
         """
-        LEFT_SPIN = 1
-        RIGHT_SPIN = -1
+        LEFT_SPIN = 1.
+        RIGHT_SPIN = -1.
         spinDir = 0
 
         targetH = self.getRelativeBearing(other)
 
-        if abs(self.h - targetH) < 5:
-            spinDir = 0
-
-        elif targetH == 0:
+        if targetH == 0:
             spinDir = -MyMath.sign(self.h)
 
         elif targetH == (180 or -180):
@@ -137,35 +127,6 @@ class RobotLocation(Location):
             else:
                 spinDir = RIGHT_SPIN
 
-        return spinDir
-
-    def spinDirToHeading(self, targetH):
-        """
-        Advanced function to get the spin direction for a given heading.
-        heading in degrees
-        """
-        LEFT_SPIN = 1
-        RIGHT_SPIN = -1
-        spinDir = 0
-
-        if abs(self.h - targetH) < 5:
-            spinDir = 0
-        elif targetH == 0:
-            spinDir = -MyMath.sign(self.h)
-        elif targetH == (180 or -180):
-            spinDir = MyMath.sign(self.h)
-        elif MyMath.sign(targetH) == MyMath.sign(self.h):
-            spinDir = MyMath.sign(targetH - self.h)
-        elif self.h < 0:
-            if (self.h + 180) >= targetH:
-                spinDir = LEFT_SPIN
-            else: # h+180 < targetH
-                spinDir = RIGHT_SPIN
-        else: # h>0
-            if (self.h - 180) >=targetH:
-                spinDir = LEFT_SPIN
-            else:
-                spinDir = RIGHT_SPIN
         return spinDir
 
     def isFacingSideline(self):

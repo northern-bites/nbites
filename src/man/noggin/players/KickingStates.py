@@ -23,6 +23,7 @@ def getKickInfo(player):
     player.inKickingState = True
 
     if player.firstFrame():
+        player.stopWalking()
         player.brain.tracker.stopHeadMoves()
         player.kickScan()
 
@@ -276,7 +277,7 @@ def shootBall(player):
                 return player.goLater('kickBallRight')
             else :
                 return player.goLater('kickBallLeft')
-        elif helpers.inTopOfField(player):
+        elif my.inTopOfField(player):
             if constants.DEBUG_KICKS: print ("\t\ttopfieldkick")
             if 90 > avgMyGoalBearing > -30:
                 return player.goLater('kickBallRight')
@@ -334,22 +335,19 @@ def kickBallStraightShort(player):
 
 
     player.brain.tracker.trackBall()
-
+    ball = player.brain.ball
     ballForeFoot = player.kickDecider.ballForeFoot
-    if ballForeFoot == constants.LEFT_FOOT:
-        player.chosenKick = SweetMoves.SHORT_QUICK_LEFT_KICK
-        return player.goNow('kickBallExecute')
-
-    elif ballForeFoot == constants.RIGHT_FOOT:
-        player.chosenKick = SweetMoves.SHORT_QUICK_RIGHT_KICK
+    if (ballForeFoot == constants.LEFT_FOOT or
+        ballForeFoot == constants.RIGHT_FOOT):
+        player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 150)
         return player.goNow('kickBallExecute')
 
     elif ballForeFoot == constants.MID_RIGHT:
-        player.chosenKick = SweetMoves.SHORT_QUICK_RIGHT_KICK
+        player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 150)
         return player.goNow('stepForRightFootKick')
 
     elif ballForeFoot == constants.MID_LEFT:
-        player.chosenKick = SweetMoves.SHORT_QUICK_LEFT_KICK
+        player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 150)
         return player.goNow('stepForLeftFootKick')
 
     else :                  # INCORRECT_POS
@@ -370,32 +368,34 @@ def kickBallStraight(player):
     player.brain.tracker.trackBall()
 
     ballForeFoot = player.kickDecider.ballForeFoot
+    ball = player.brain.ball
+
     if ballForeFoot == constants.LEFT_FOOT:
         if player.bigKick:
             player.chosenKick = SweetMoves.LEFT_BIG_KICK
         else :
-            player.chosenKick = SweetMoves.LEFT_FAR_KICK
+            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
         return player.goNow('kickBallExecute')
 
     elif ballForeFoot == constants.RIGHT_FOOT:
         if player.bigKick:
             player.chosenKick = SweetMoves.RIGHT_BIG_KICK
         else :
-            player.chosenKick = SweetMoves.RIGHT_FAR_KICK
+            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
         return player.goNow('kickBallExecute')
 
     elif ballForeFoot == constants.MID_RIGHT:
         if player.bigKick:
             player.chosenKick = SweetMoves.RIGHT_BIG_KICK
         else :
-            player.chosenKick = SweetMoves.RIGHT_FAR_KICK
+            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
         return player.goNow('stepForRightFootKick')
 
     elif ballForeFoot == constants.MID_LEFT:
         if player.bigKick:
             player.chosenKick = SweetMoves.LEFT_BIG_KICK
         else :
-            player.chosenKick = SweetMoves.LEFT_FAR_KICK
+            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
         return player.goNow('stepForLeftFootKick')
 
     else :                  # INCORRECT_POS
@@ -459,7 +459,6 @@ def sideStepForSideKick(player):
 
 def alignForSideKick(player):
     if player.firstFrame():
-        player.brain.CoA.setRobotSlowGait(player.brain.motion)
         player.brain.tracker.trackBall()
 
     ball = player.brain.ball
@@ -486,7 +485,6 @@ def alignForSideKick(player):
 
 def stepForRightFootKick(player):
     if player.firstFrame():
-        player.brain.CoA.setRobotSlowGait(player.brain.motion)
         player.brain.tracker.trackBall()
 
     ball = player.brain.ball
@@ -500,7 +498,7 @@ def stepForRightFootKick(player):
 
         elif ballForeFoot == constants.LEFT_FOOT:
             player.stopWalking()
-            player.chosenKick = SweetMoves.LEFT_FAR_KICK
+            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:
@@ -517,7 +515,6 @@ def stepForRightFootKick(player):
 
 def stepForLeftFootKick(player):
     if player.firstFrame():
-        player.brain.CoA.setRobotSlowGait(player.brain.motion)
         player.brain.tracker.trackBall()
 
     ball = player.brain.ball
@@ -531,7 +528,7 @@ def stepForLeftFootKick(player):
         # switch foot!
         elif ballForeFoot == constants.RIGHT_FOOT:
             player.stopWalking()
-            player.chosenKick = SweetMoves.RIGHT_FAR_KICK
+            player.chosenKick = SweetMoves.DREW_KICK(ball.relX, ball.relY, 500)
             return player.goLater('kickBallExecute')
 
         elif ballForeFoot == constants.INCORRECT_POS:
@@ -551,7 +548,6 @@ def alignOnBallStraightKick(player):
     """
     if player.firstFrame():
         player.hasAlignedOnce = True
-        player.brain.CoA.setRobotSlowGait(player.brain.motion)
         player.brain.nav.orbitAngle(-player.angleToAlign)
 
     # Deal with ball changed positions?
@@ -601,14 +597,9 @@ def afterKick(player):
            player.lookPostKick()
         return player.stay()
 
-    if player.chosenKick == SweetMoves.LEFT_SIDE_KICK or \
-            player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
-        player.inKickingState = False
-        return player.goLater('spinFindBall')
-
     if not player.brain.motion.isHeadActive():
         player.inKickingState = False
-        return player.goLater('scanFindBall')
+        return player.goLater('chase')
     return player.stay()
 
 def kickAtPosition(player):

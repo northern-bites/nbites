@@ -16,7 +16,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "TOOL_Vision_TOOLVisionLink.h"
+//#include "TOOL_Vision_TOOLVisionLink.h"
 #include "Vision.h"
 #include "NaoPose.h"
 #include "Sensors.h"

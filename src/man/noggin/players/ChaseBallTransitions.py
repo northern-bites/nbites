@@ -33,8 +33,7 @@ def shouldTurnToBallFromPositionForKick(player):
     Walk to the ball if its too far away
     """
     ball = player.brain.ball
-    return (ball.on and
-            abs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH +
+    return (fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH +
             constants.POSITION_FOR_KICK_BEARING_THRESH)
 
 def shouldPositionForKick(player):
@@ -42,12 +41,11 @@ def shouldPositionForKick(player):
     Should begin aligning on the ball for a kick when close
     """
     ball = player.brain.ball
-    return ball.on and \
-        constants.BALL_POS_KICK_LEFT_Y > ball.relY > \
-        constants.BALL_POS_KICK_RIGHT_Y and \
-        constants.BALL_POS_KICK_MAX_X > ball.relX > \
-        constants.BALL_POS_KICK_MIN_X and \
-        ball.bearing < constants.POSITION_FOR_KICK_BEARING_THRESH
+    return (constants.BALL_POS_KICK_LEFT_Y > ball.relY > \
+            constants.BALL_POS_KICK_RIGHT_Y and \
+            constants.BALL_POS_KICK_MAX_X > ball.relX > \
+            constants.BALL_POS_KICK_MIN_X and \
+            ball.bearing < constants.POSITION_FOR_KICK_BEARING_THRESH)
 
 def shouldPositionForKickFromApproachLoc(player):
     return shouldPositionForKick(player) and \
@@ -58,26 +56,25 @@ def shouldRepositionForKick(player):
     Stop waiting for kick and realign on the ball instead
     """
     ball = player.brain.ball
-    return False
+    return (ball.relX > constants.BALL_KICK_LEFT_X_FAR )
+
 
 def shouldApproachForKick(player):
     """
     While positioning for kick, we need to walk forward
     """
     ball = player.brain.ball
-    return (ball.on and
-            ball.relX > constants.BALL_KICK_LEFT_X_FAR ) # 5 is a BUFFER
+    return False
 
 def shouldKick(player):
     """
     Ball is in the correct foot position to kick
     """
     ball = player.brain.ball
-    return ball.on and \
-        constants.BALL_KICK_LEFT_Y_L > ball.relY > \
-        constants.BALL_KICK_RIGHT_Y_R and \
-        constants.BALL_KICK_LEFT_X_CLOSE < ball.relX < \
-        constants.BALL_KICK_LEFT_X_FAR
+    return (constants.BALL_KICK_LEFT_Y_L > ball.relY > \
+            constants.BALL_KICK_RIGHT_Y_R and \
+            constants.BALL_KICK_LEFT_X_CLOSE < ball.relX < \
+            constants.BALL_KICK_LEFT_X_FAR)
 
 
 def shouldDribble(player):

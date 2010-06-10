@@ -25,7 +25,7 @@ def walkSpinToBall(nav):
     #if we're close to the ball...
     if navTrans.atDestinationCloser(nav.brain.my, nav.dest):
         # and facing  it, stop
-        if abs(ball.bearing) < 10:
+        if fabs(ball.bearing) < 10.:
             return nav.goNow('stop')
 
     if not nav.brain.play.isRole(GOALIE):
@@ -142,7 +142,7 @@ def positionForKick(nav):
 
     sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
-    if ball.dist > 5:
+    if ball.dist > 10.:
         sX = MyMath.clip(ball.relX * PFK_X_GAIN,
                          PFK_MIN_X_SPEED,
                          PFK_MAX_X_SPEED)
