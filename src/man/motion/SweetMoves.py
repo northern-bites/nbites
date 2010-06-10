@@ -74,23 +74,23 @@ GOALIE_POS = ((INITIAL_POS[0][0],
                1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
 #KICKS
-def DREW_KICK(x,y,dist):
+def DREW_KICK(y,dist):
     if y<=0:
-        return mirrorMove(LEFT_D_KICK(x,-1*y,dist))
+        return mirrorMove(LEFT_D_KICK(-1*y,dist))
     if y>0:
-        return LEFT_D_KICK(x,y,dist)
+        return LEFT_D_KICK(y,dist)
 
 
 MAX_KICK_HIP_PITCH = -58.
 MIN_KICK_HIP_PITCH = -100.
 KICK_HIP_INTERVAL = MIN_KICK_HIP_PITCH - MAX_KICK_HIP_PITCH
 
-MAX_KICK_DIST = 380.
+MAX_KICK_DIST = 480.
 MIN_KICK_DIST = 100.
 KICK_DIST_INTERVAL = MAX_KICK_DIST - MIN_KICK_DIST
 INTERVAL_RATIO = KICK_HIP_INTERVAL / KICK_DIST_INTERVAL
 
-def LEFT_D_KICK(x,y,dist):
+def LEFT_D_KICK(y,dist):
     kick_leg_hip_roll=y*2.0;
 
     if kick_leg_hip_roll>20.0:
@@ -116,30 +116,30 @@ def LEFT_D_KICK(x,y,dist):
     return (
         #swing to the right
         ((80.,40.,-50.,-70.),
-         (0.,0.,-35.,73.,-40.,-15.),
-         (0.,0,-38.,76.,-40.,-15.),
-         (80.,-40.,50.,70.),0.8,0, stiff.NORMAL_STIFFNESSES),
+         (0.,0.,-35.,73.,-40.,-13.),
+         (0.,0,-38.,76.,-40.,-13.),
+         (80.,-40.,50.,70.),0.5,0, stiff.NORMAL_STIFFNESSES),
 
         # Lift/cock leg
         ((80.,0.,-50.,-90.),
          (0.,kick_leg_hip_roll,-60.,120.,-20.,-20.),
-         (0.,0,-40.,86.,-45.,-18.),
+         (0.,0,-40.,86.,-45.,-20.),
          (80.,support_arm_shoulder_roll,50.,70.),
-         0.8,0, stiff.NORMAL_STIFFNESSES),
+         0.6,0, stiff.NORMAL_STIFFNESSES),
 
         # kick left leg
         ((80.,0.,-50.,-90.),
          (0.,kick_leg_hip_roll, kick_hip_pitch, 80.,-20.,-20.),
-         (0.,0.,-40.,86.,-45.,-18.),
+         (0.,0.,-40.,86.,-45.,-20.),
          (80.,support_arm_shoulder_roll,50.,70.),
-         0.1,0, stiff.NORMAL_STIFFNESSES),
+         0.12,0, stiff.NORMAL_STIFFNESSES),
 
         # return to normal position
         ((60., 35., 0.,0.),
          (0.0,  0.0,  -22., 50., -30., 0.0),
          (0.0,  0.0,  -21., 52., -30., 0.0),
          (60., -35, 0., 0.),
-         1.,0, stiff.LOW_HEAD_STIFFNESSES)
+         .5,0, stiff.LOW_HEAD_STIFFNESSES)
         )
 
 STAND_FOR_KICK_LEFT = (
