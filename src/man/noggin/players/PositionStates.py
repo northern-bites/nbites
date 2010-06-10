@@ -38,7 +38,7 @@ def relocalize(player):
             player.brain.my.locScore == NogginConstants.OK_LOC:
         player.shouldRelocalizeCounter += 1
 
-        if player.shouldRelocalizeCounter > 15:
+        if player.shouldRelocalizeCounter > 30:
             player.shouldRelocalizeCounter = 0
             return player.goLater(player.lastDiffState)
 
