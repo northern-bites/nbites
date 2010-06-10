@@ -35,6 +35,7 @@ using namespace NBMath;
 
 //#define DEBUG_STEPGENERATOR
 //#define DEBUG_ZMP
+#define DEBUG_ZMP_REF
 
 // flag to turn on multiple zmp queues (on by default)
 #define MULTIPLE_ZMP
@@ -82,6 +83,9 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     fprintf(zmp_log,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
             "\taccX\taccY\taccZ\tangleX\tangleY\n");
 #endif
+#ifdef DEBUG_ZMP_REF
+	zmp_ref_log = fopen("/tmp/zmp_ref_log.xls","w");
+#endif
 
 }
 
@@ -92,6 +96,9 @@ StepGenerator::~StepGenerator()
 #endif
 #ifdef DEBUG_SENSOR_ZMP
     fclose(zmp_log);
+#endif
+#ifdef DEBUG_ZMP_REF
+	fclose(zmp_ref_log);
 #endif
     delete controller_x; delete controller_y;
 }
@@ -1076,6 +1083,20 @@ void StepGenerator::swapZMPQueues(std::list<float> &zmp_x, std::list<float> &zmp
 #ifdef DEBUG_STEPGENERATOR
 	cout << "StepGenerator::swapZMPQueues\n";
 #endif
+#ifdef DEBUG_ZMP_REF
+	list<float>::iterator it;
+	fprintf(zmp_ref_log, "\n----------\nzmp_ref_x: %f\n", (double)zmp_ref_x.size());
+	if (zmp_ref_x.size() > 0) {
+		for (it=zmp_ref_x.begin(); it!=zmp_ref_x.end(); ++it)
+			fprintf(zmp_ref_log, " %f,", *it);
+	}
+
+	fprintf(zmp_ref_log, "\n zmp_x: %f\n", (double)zmp_x.size());
+	for (it=zmp_x.begin(); it!=zmp_x.end(); ++it)
+		fprintf(zmp_ref_log, " %f,", *it);
+	fprintf(zmp_ref_log, "\n-----------\n");
+#endif
+
 	zmp_ref_x = zmp_x;
 	zmp_ref_y = zmp_y;
 	last_zmp_end_s = last_zmp;

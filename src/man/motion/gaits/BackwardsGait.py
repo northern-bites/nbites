@@ -12,13 +12,13 @@ MARVIN_STANCE_CONFIG = (31.00, # CoM height
                         10.0,  # Horizontal distance between feet
                         6.0,   # Body angle around y axis
                         0.0,   # Angle between feet
-                        0.1)   # Time to transition to/from this stance
+                        0.2)   # Time to transition to/from this stance
 
 STEP_CONFIG = (0.35, # step duration
                0.25,  # fraction in double support
                0.8,  # stepHeight
                0.0,  # step lift
-               7.0,  # max x speed
+               8.0,  # max x speed
                -7.0,  # max x speed
                7.0,  # max y speed
                20.0, # max theta speed()
