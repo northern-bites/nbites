@@ -335,8 +335,9 @@ void Threshold::runs() {
 		findBallsCrosses(i, topEdge);
 		findGoals(i, topEdge);
     }
+	setOpenFieldInformation();
 	for (int i = 0; i < NUMBLOCKS; i++) {
-		if (evidence[i] < 3) {
+		if (evidence[i] < 5) {
 			block[i] = 0;
 		}
 	}
@@ -356,6 +357,7 @@ void Threshold::findGoals(int column, int topEdge) {
 	int bad = 0, blues = 0, yellows = 0, blueGreen = 0;
 	int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge, lastYellow = topEdge;
 	topEdge = min(topEdge, lowerBound[column]);
+	int robots = 0;
 	for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
 		// get the next pixel
 #ifdef USE_EDGES
@@ -394,6 +396,10 @@ void Threshold::findGoals(int column, int topEdge) {
 			break;
 		case GREEN:
 			break;
+		case RED:
+		case NAVY:
+			robots++;
+			break;
 		default:
 			bad++;
 		}
@@ -420,6 +426,10 @@ void Threshold::findGoals(int column, int topEdge) {
 		case GREEN:
 			bad += 2;
 			break;
+		case RED:
+		case NAVY:
+			robots++;
+			break;
 		default:
 			bad++;
 		}
@@ -428,6 +438,9 @@ void Threshold::findGoals(int column, int topEdge) {
 		blue->newRun(column, lastBlue, firstBlue - lastBlue);
 	} else if (yellows > 10) {
 		yellow->newRun(column, lastYellow, firstYellow - lastYellow);
+	}
+	if (shoot[column] && robots > 5) {
+		shoot[column] = false;
 	}
 }
 
@@ -548,7 +561,6 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 			drawPoint(column, IMAGE_HEIGHT - 4, RED);
 		}
 	}
-	setOpenFieldInformation();
 }
 
 /*

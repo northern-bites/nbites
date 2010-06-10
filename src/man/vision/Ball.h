@@ -77,7 +77,7 @@ public:
     int roundness(Blob b);
     bool badSurround(Blob b);
     bool atBoundary(Blob b);
-	void setBallInfo(int w, int h, VisualBall *thisBall);
+	void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);
     int balls(int c, VisualBall *thisBall);
 
     // sanity checks

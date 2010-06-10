@@ -290,7 +290,7 @@ int Field::findGreenHorizon(int pH, float sl) {
 	if (debugHorizon) {
 		cout << "initial estimate is " << j << " " << pH << endl;
 	}
-	if (greenPixels == 0) {
+	/*if (greenPixels == 0) {
 		horizon = IMAGE_HEIGHT - 1;
 		for (i = 0; i < IMAGE_WIDTH; i++) {
 			topEdge[i] = IMAGE_HEIGHT - 1;
@@ -299,7 +299,7 @@ int Field::findGreenHorizon(int pH, float sl) {
 			cout << "No field seen" << endl;
 		}
 		return horizon;
-	}
+		}*/
 	// set our initial estimate
     horizon = j;
 	// now scan back toward the pose estimated horizon
