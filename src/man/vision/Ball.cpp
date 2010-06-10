@@ -329,7 +329,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 			}
 
 			// SORT OUT BALL INFORMATION
-			setBallInfo(w, h, thisBall);
+			setBallInfo(w, h, thisBall, e);
 			done = true;
 			float distanceDifference = fabs(e.dist - thisBall->getDistance());
 			const float DISTANCE_MISMATCH = 50.0f;
@@ -386,7 +386,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 				if (BALLDISTDEBUG) {
 					cout << "Resetting ball dimensions.  Count was " << count << endl;
 				}
-				setBallInfo(w, w, thisBall);
+				setBallInfo(w, w, thisBall, e);
 			}
 		} else {
 			/*
@@ -1258,7 +1258,7 @@ bool Ball::atBoundary(Blob b) {
         || b.getLeftBottomY() >= IMAGE_HEIGHT - 1;
 }
 
-void Ball::setBallInfo(int w, int h, VisualBall *thisBall) {
+void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 
 	const float radDiv = 2.0f;
 	// x, y, width, and height. Not up for debate.
@@ -1286,12 +1286,20 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall) {
 	}
 	thisBall->setConfidence(SURE);
 	thisBall->findAngles();
-	thisBall->setFocalDistanceFromRadius();
-	thisBall->setDistanceEst(vision->pose->
-							 bodyEstimate(thisBall->getCenterX(),
-										  thisBall->getCenterY(),
-										  static_cast<float>(thisBall->
-															 getFocDist())));
+	if (occlusion == NOOCCLUSION) {
+		thisBall->setFocalDistanceFromRadius();
+		thisBall->setDistanceEst(vision->pose->
+								 bodyEstimate(thisBall->getCenterX(),
+											  thisBall->getCenterY(),
+											  static_cast<float>(thisBall->
+																 getFocDist())));
+	} else {
+		// user our super swell updated pix estimate to do the distance
+		thisBall->setDistanceEst(e);
+		if (BALLDISTDEBUG) {
+			thisBall->setFocalDistanceFromRadius();
+		}
+	}
 }
 
 /* Sanity check routines for beacons and posts

@@ -103,6 +103,7 @@ def ballInMyBox(nav):
         nav.brain.tracker.activeLoc()
         nav.brain.CoA.setRobotGait(nav.brain.motion)
 
+
     ball = nav.brain.ball
 
     if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
