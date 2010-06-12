@@ -671,7 +671,7 @@ void Field::setShot(VisualCrossbar* one, int color)
              k != lines->end(); k++) {
             pair<int, int> foo = Utility::
                 plumbIntersection(plumbLineTop, plumbLineBottom,
-                                  (*k)->start, (*k)->end);
+                                  (*k)->getStartpoint(), (*k)->getEndpoint());
             if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
                 intersections[crossings] = foo.second;
                 crossings++;
@@ -977,7 +977,7 @@ void Field::openDirection(int horizon, NaoPose *pose)
              k != lines->end(); k++) {
             pair<int, int> foo = Utility::
                 plumbIntersection(plumbLineTop, plumbLineBottom,
-                                  (*k)->start, (*k)->end);
+                                  (*k)->getStartpoint(), (*k)->getEndpoint());
             if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
                 intersections[crossings] = foo.second;
                 crossings++;

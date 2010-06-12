@@ -75,12 +75,12 @@ public:
     // get length of line segment specified by (x1, y1), (x2, y2)
     static const float getLength(const float x1, const float y1,
                                  const float x2, const float y2);
-    static const float getLength(const point <const float> &p1,
-                                 const point <const float> &p2);
-    static const float getLength(const point <const int> &p1,
-                                 const point <const int> &p2);
-
-
+    static const double getLength(const double x1, const double y1,
+                                 const double x2, const double y2);
+    static const float getLength(const point <float> &p1,
+                                 const point <float> &p2);
+    static const float getLength(const point <int> &p1,
+                                 const point < int> &p2);
 
     // get angle between two lines
     // http://www.tpub.com/math2/5.htm

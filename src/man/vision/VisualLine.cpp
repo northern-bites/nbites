@@ -17,7 +17,7 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
-					ConcreteLine::concreteLines().end())
+                    ConcreteLine::concreteLines().end())
 {
     for (list<list<linePoint>::iterator>::iterator i = nodes.begin();
          i != nodes.end(); i++) {
@@ -29,18 +29,18 @@ VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
 
 VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
-					ConcreteLine::concreteLines().end())
+                    ConcreteLine::concreteLines().end())
 {
 
 }
 
 VisualLine::VisualLine(float _dist, float _bearing) :
-	VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
+    VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
-					ConcreteLine::concreteLines().end())
+                    ConcreteLine::concreteLines().end())
 {
-	setDistanceWithSD(_dist);
-	setBearingWithSD(_bearing);
+    setDistanceWithSD(_dist);
+    setBearingWithSD(_bearing);
 }
 
 
@@ -50,7 +50,7 @@ VisualLine::VisualLine(float _dist, float _bearing) :
 VisualLine::VisualLine(list<linePoint> &linePoints)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
-					ConcreteLine::concreteLines().end())
+                    ConcreteLine::concreteLines().end())
 {
     for (list<linePoint>::iterator i = linePoints.begin();
          i != linePoints.end(); i++) {
@@ -63,16 +63,20 @@ VisualLine::VisualLine(list<linePoint> &linePoints)
 
 VisualLine::VisualLine(const VisualLine& other)
     : VisualLandmark<lineID>(other),
-      start(other.start), end(other.end), left(other.left), right(other.right),
-      bottom(other.bottom), top(other.top), points(other.points),
-      angle(other.angle), a(other.a), b(other.b), length(other.length),
+      start(other.start), end(other.end), leftBound(other.leftBound),
+      rightBound(other.rightBound),
+      bottomBound(other.bottomBound),
+      topBound(other.topBound),
+      points(other.points),
+      angle(other.angle), length(other.length),
+      a(other.a), b(other.b),
       color(other.color), colorStr(other.colorStr),
       avgVerticalWidth(other.avgVerticalWidth),
       avgHorizontalWidth(other.avgHorizontalWidth),
-      thinnestHorPoint(other.thinnestHorPoint),
-      thickestHorPoint(other.thickestHorPoint),
-      thinnestVertPoint(other.thinnestVertPoint),
-      thickestVertPoint(other.thickestVertPoint),
+      thinnestHorPoint(other.getThinnestHorizontalPoint()),
+      thickestHorPoint(other.getThickestHorizontalPoint()),
+      thinnestVertPoint(other.getThinnestVerticalPoint()),
+      thickestVertPoint(other.getThickestVerticalPoint()),
       distance(other.getDistance()), bearing(other.getBearing()),
       distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
       ccLine(other.getCCLine()),
@@ -95,6 +99,14 @@ void VisualLine::addPoints(const list <linePoint> &additionalPoints)
     init();
 }
 
+// Do not use often, forces us to re-sort all the points!
+void VisualLine::addPoint(const linePoint& point)
+{
+    points.push_back(point);
+    sort(points.begin(), points.end());
+    init();
+}
+
 void VisualLine::addPoints(const vector <linePoint> &additionalPoints)
 {
     for (vector<linePoint>::const_iterator i = additionalPoints.begin();
@@ -106,67 +118,69 @@ void VisualLine::addPoints(const vector <linePoint> &additionalPoints)
     init();
 }
 
-
+/**
+ * Computes and sets the basic parameters of a VisualLine from its linePoints
+ */
 void VisualLine::init()
 {
     // Points are sorted by x
-    left = points[0].x;
-    right = points[points.size()-1].x;
+    leftBound = points[0].x;
+    rightBound = points[points.size()-1].x;
 
     // Unfortunately we can't get the top and bottom so easily
-    top = min_element(points.begin(), points.end(), YOrder())->y;
-    bottom = max_element(points.begin(), points.end(), YOrder())->y;
+    topBound = min_element(points.begin(), points.end(), YOrder())->y;
+    bottomBound = max_element(points.begin(), points.end(), YOrder())->y;
 
     pair <float, float> equation = leastSquaresFit(points);
     a = equation.first;
     b = equation.second;
 
     // We are calling this a vertical line
-    if (abs(right - left) < 2) {
-        right = left;
+    if (abs(rightBound - leftBound) < 2) {
+        rightBound = leftBound;
 
-        start.x = left;
-        end.x = left;
-        start.y = bottom;
-        end.y = top;
+        start.x = leftBound;
+        end.x = leftBound;
+        start.y = bottomBound;
+        end.y = topBound;
     }
-    // Line is more horizontally oriented, use left and right and calculate the
+    // Line is more horizontally oriented, use leftBound and rightBound and calculate the
     // endpoints
-    else if (right-left > bottom-top){
-        start.x = left;
-        end.x = right;
+    else if (rightBound-leftBound > bottomBound-topBound){
+        start.x = leftBound;
+        end.x = rightBound;
         start.y = Utility::getLineY(start.x, b, a);
         end.y = Utility::getLineY(end.x, b, a);
         // Since we are basing our end point's y values on the least squares
         // regression values, need to recalculate the top and bottom points
         if (start.y < end.y) {
-            top = start.y;
-            bottom = end.y;
+            topBound = start.y;
+            bottomBound = end.y;
         }
         else {
-            top = end.y;
-            bottom = start.y;
+            topBound = end.y;
+            bottomBound = start.y;
         }
     }
     // Line is more vertically oriented, use top and bottom to calculate the
     // other endpoints
     else {
-        start.y = bottom;
-        end.y = top;
+        start.y = bottomBound;
+        end.y = topBound;
         start.x = Utility::getLineX(start.y, b, a);
         end.x = Utility::getLineX(end.y, b, a);
         if (start.x < end.x) {
-            left = start.x;
-            right = end.x;
+            leftBound = start.x;
+            rightBound = end.x;
         }
         else {
-            left = end.x;
-            right = start.x;
+            leftBound = end.x;
+            rightBound = start.x;
         }
     }
 
-    angle = getAngle();
-    length = getLength();
+    angle = calculateAngle();
+    length = calculateLength();
 
     calculateWidths();
 }
@@ -237,17 +251,30 @@ void VisualLine::calculateWidths()
     }
 }
 
-
-const float VisualLine::getLength()
+/**
+ * Set the color value of the line. Also sets the string value of the color.
+ */
+void VisualLine::setColor(const int c)
 {
-    return Utility::getLength( static_cast<float>(start.x),
-							   static_cast<float>(start.y),
-                               static_cast<float>(end.x),
-							   static_cast<float>(end.y) );
+    color = c;
+    setColorString(Utility::getColorString(c));
 }
 
-// Get the angle from horizontal (in degrees) the line makes on the screen
-const float VisualLine::getAngle()
+/**
+ * Calculate the length of the line on screen from its endpoints.
+ */
+const float VisualLine::calculateLength() const
+{
+    return Utility::getLength( static_cast<float>(start.x),
+                               static_cast<float>(start.y),
+                               static_cast<float>(end.x),
+                               static_cast<float>(end.y) );
+}
+
+/**
+ * Calculate the angle from horizontal (in degrees) the line makes on the screen
+ */
+const float VisualLine::calculateAngle() const
 {
     return Utility::getAngle(start.x, start.y,
                              end.x, end.y);
@@ -257,19 +284,12 @@ const float VisualLine::getAngle()
 // than the change in x
 const bool VisualLine::isVerticallyOriented()
 {
-    return right - left < bottom - top;
+    return rightBound - leftBound < bottomBound - topBound;
 }
-
 
 const bool VisualLine::isPerfectlyVertical()
 {
-    return right == left;
-}
-
-// Return the slope of the line (returns NAN if vertical)
-const float VisualLine::getSlope() const
-{
-    return Utility::getSlope(*this);
+    return rightBound == leftBound;
 }
 
 // Given a line, returns (a, b) where the line can be represented by
@@ -280,7 +300,7 @@ const float VisualLine::getSlope() const
 pair<int, int> VisualLine::
 getLineComponents(const VisualLine &aLine)
 {
-    int i = aLine.right - aLine.left;
+    int i = aLine.rightBound - aLine.leftBound;
     // If y2 is above y1 in the image, y2 is smaller in image coordinates than
     // y1, so this would be a negative j value (as per our axis oriented towards
     // bottom of screen)
@@ -323,11 +343,11 @@ VisualLine::leastSquaresFit(const vector<linePoint> &thePoints)
       xSquaredSum += (thePoints[i].x * thePoints[i].x);
       }*/
 
-    float b = ((ySum * xSquaredSum) - (xSum * xYSum)) /
-		((numPoints * xSquaredSum) - (xSum * xSum)) ;
+    const float b = ((ySum * xSquaredSum) - (xSum * xYSum)) /
+        ((numPoints * xSquaredSum) - (xSum * xSum)) ;
 
-    float m =  ( (numPoints * xYSum) - (xSum * ySum) ) /
-		((numPoints * xSquaredSum) - (xSum * xSum)) ;
+    const float m =  ( (numPoints * xYSum) - (xSum * ySum) ) /
+        ((numPoints * xSquaredSum) - (xSum * xSum)) ;
 
     return pair<float, float>(m, b);
 }
@@ -370,27 +390,27 @@ void VisualLine::setBearingWithSD(float _bearing)
 void VisualLine::
 setPossibleLines( list <const ConcreteLine*> _possibleLines)
 {
-	list<const ConcreteLine*> updated(0);
+    list<const ConcreteLine*> updated(0);
 
-	for (list<const ConcreteLine*>::iterator
-			 currLine = possibleLines.begin();
-		 currLine != possibleLines.end(); currLine++) {
+    for (list<const ConcreteLine*>::iterator
+             currLine = possibleLines.begin();
+         currLine != possibleLines.end(); currLine++) {
 
-		for ( list<const ConcreteLine*>::iterator
-				  newLine = _possibleLines.begin();
-			  newLine != _possibleLines.end(); ) {
+        for ( list<const ConcreteLine*>::iterator
+                  newLine = _possibleLines.begin();
+              newLine != _possibleLines.end(); ) {
 
-			// If the line is in both sets
-			if (**newLine == **currLine) {
-				updated.push_back(*newLine);
-				newLine = _possibleLines.erase(newLine);
-			} else {
-				// Increment the iterator if we don't erase a line
-				newLine++;
-			}
-		}
-	}
-	possibleLines = updated;
+            // If the line is in both sets
+            if (**newLine == **currLine) {
+                updated.push_back(*newLine);
+                newLine = _possibleLines.erase(newLine);
+            } else {
+                // Increment the iterator if we don't erase a line
+                newLine++;
+            }
+        }
+    }
+    possibleLines = updated;
 }
 
 /**
@@ -401,30 +421,30 @@ setPossibleLines( list <const ConcreteLine*> _possibleLines)
 void VisualLine::
 setPossibleLines( vector <const ConcreteLine*> _possibleLines)
 {
-	list<const ConcreteLine*> updated(0);
+    list<const ConcreteLine*> updated(0);
 
-	for (list<const ConcreteLine*>::iterator
-			 currLine = possibleLines.begin();
-		 currLine != possibleLines.end(); currLine++) {
+    for (list<const ConcreteLine*>::iterator
+             currLine = possibleLines.begin();
+         currLine != possibleLines.end(); currLine++) {
 
-		for ( vector<const ConcreteLine*>::iterator
-				  newLine = _possibleLines.begin();
-			  newLine != _possibleLines.end(); ) {
+        for ( vector<const ConcreteLine*>::iterator
+                  newLine = _possibleLines.begin();
+              newLine != _possibleLines.end(); ) {
 
-			// If the line is in both sets
-			if (**newLine == **currLine) {
-				updated.push_back(*newLine);
-				newLine = _possibleLines.erase(newLine);
-			} else {
-				// Increment the iterator if we don't erase a line
-				newLine++;
-			}
-		}
-	}
-	possibleLines = updated;
+            // If the line is in both sets
+            if (**newLine == **currLine) {
+                updated.push_back(*newLine);
+                newLine = _possibleLines.erase(newLine);
+            } else {
+                // Increment the iterator if we don't erase a line
+                newLine++;
+            }
+        }
+    }
+    possibleLines = updated;
 }
 
 const bool VisualLine::hasPositiveID()
 {
-	return possibleLines.size() == 1;
+    return possibleLines.size() == 1;
 }
