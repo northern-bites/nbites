@@ -182,6 +182,18 @@ public class TOOLVisionLink {
     native private void cppPixEstimate(int pixelX, int pixelY,
                                        float objectHeight,
                                        double[] estimateResult);
+	native private void cppSetFieldLinesDebugVertEdgeDetect(boolean _bool);
+	native private void cppSetFieldLinesDebugHorEdgeDetect(boolean _bool);
+	native private void cppSetFieldLinesDebugSecondVertEdgeDetect(boolean _bool);
+	native private void cppSetFieldLinesDebugCreateLines(boolean _bool);
+	native private void cppSetFieldLinesDebugFitUnusedPoints(boolean _bool);
+	native private void cppSetFieldLinesDebugJoinLines(boolean _bool);
+	native private void cppSetFieldLinesDebugExtendLines(boolean _bool);
+	native private void cppSetFieldLinesDebugIntersectLines(boolean _bool);
+	native private void cppSetFieldLinesDebugIdentifyCorners(boolean _bool);
+	native private void cppSetFieldLinesDebugCcScan(boolean _bool);
+	native private void cppSetFieldLinesDebugRiskyCorners(boolean _bool);
+	native private void cppSetFieldLinesDebugCornerAndObjectDistances(boolean _bool);
 
     //Load the cpp library that implements the native methods
     static
@@ -189,7 +201,7 @@ public class TOOLVisionLink {
         try{
             System.loadLibrary("TOOLVisionLink");
             visionLinkSuccessful = true;
-	    System.out.println("TOOLVisionLink lib loaded successfuly");
+			System.out.println("TOOLVisionLink lib loaded successfuly");
         }catch(UnsatisfiedLinkError e){
             visionLinkSuccessful = false;
             System.err.print("Vision Link Failed to initialize: ");
@@ -282,6 +294,155 @@ public class TOOLVisionLink {
     }
     //set the processTime
     public void setProcessTime(int p) {
-	processTime = p;
+		processTime = p;
     }
+
+
+	/**
+	 * FieldLines cpp setters
+	 */
+    public void setFieldLinesDebugVertEdgeDetect(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugVertEdgeDetect(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugHorEdgeDetect(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugHorEdgeDetect(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugSecondVertEdgeDetect(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugSecondVertEdgeDetect(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugCreateLines(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugCreateLines(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugFitUnusedPoints(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugFitUnusedPoints(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugJoinLines(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugJoinLines(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugExtendLines(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugExtendLines(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugIntersectLines(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugIntersectLines(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugIdentifyCorners(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugIdentifyCorners(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugCcScan(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugCcScan(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugRiskyCorners(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugRiskyCorners(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
+    public void setFieldLinesDebugCornerAndObjectDistances(boolean _bool){
+	        if (visionLinkSuccessful) {
+            try {
+				cppSetFieldLinesDebugCornerAndObjectDistances(_bool);
+            } catch(Throwable e) {
+                System.err.println("Error in cpp sub system. \n");
+
+            }
+        } else {
+				System.out.println("Vision Link Inactive. Flag not set.");
+		}
+	}
 }

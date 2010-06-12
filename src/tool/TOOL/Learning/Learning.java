@@ -149,8 +149,9 @@ public class Learning implements DataListener, MouseListener,
 	private int missedYellow, missedRed;       // ditto
 	private int missedBlueRobot;               // ditto
 	private int goodL, badL, goodT, badT;      // ditto
-	private int missedL, missedT;              // ditto
-	private int falseT, falseL;
+	private int goodCC, badCC;
+	private int missedL, missedT, missedCC;    // ditto
+	private int falseT, falseL, falseCC;
 
 	private String curFrame;                   // current frame of batch job
 	private int    curFrameIndex;              // index
@@ -416,6 +417,7 @@ public class Learning implements DataListener, MouseListener,
 					.setBlueRobots(0)
 					.setTCorners(0)
 					.setLCorners(0)
+					.setCcCorners(0)
 					.build();
 				keys.addFrame(next);
 			}
@@ -474,6 +476,7 @@ public class Learning implements DataListener, MouseListener,
 				key.setBlueRobotStatus(current.getBlueRobots());
 				key.setTCornerStatus(current.getTCorners());
 				key.setLCornerStatus(current.getLCorners());
+				key.setCcCornerStatus(current.getCcCorners());
 				newKey =
 					KeyFrame.newBuilder()
 					.setHumanChecked(current.getHumanChecked())
@@ -484,7 +487,8 @@ public class Learning implements DataListener, MouseListener,
 					.setRedRobots(current.getRedRobots())
 					.setBlueRobots(current.getBlueRobots())
 					.setTCorners(current.getTCorners())
-					.setLCorners(current.getLCorners());
+					.setLCorners(current.getLCorners())
+					.setCcCorners(current.getCcCorners());
 			} else {
 				// set up based upon vision data
 				key.setHumanStatus(false);
@@ -496,6 +500,7 @@ public class Learning implements DataListener, MouseListener,
 				key.setBlueRobotStatus(getBlueRobots());
 				key.setTCornerStatus(getTCorners());
 				key.setLCornerStatus(getLCorners());
+				key.setCcCornerStatus(getCcCorners());
 				newKey =
 					KeyFrame.newBuilder()
 					.setHumanChecked(current.getHumanChecked())
@@ -506,7 +511,8 @@ public class Learning implements DataListener, MouseListener,
 					.setRedRobots(getRedRobots())
 					.setBlueRobots(getBlueRobots())
 					.setTCorners(getTCorners())
-					.setLCorners(getLCorners());
+					.setLCorners(getLCorners())
+					.setCcCorners(getCcCorners());
 			}
 			// write out the vision data in the GUI
 			key.setBall(getBallString());
@@ -517,6 +523,7 @@ public class Learning implements DataListener, MouseListener,
 			key.setBlueRobot(getBlueRobotString());
 			key.setTCorner(getTCornerString());
 			key.setLCorner(getLCornerString());
+			key.setCcCorner(getCcCornerString());
 			//learnPanel.setOverlays();
 			// set up the builder in case we decide to edit
 
@@ -553,6 +560,7 @@ public class Learning implements DataListener, MouseListener,
 		key.setBlueRobotStatus(current.getBlueRobots());
 		key.setTCornerStatus(current.getTCorners());
 		key.setLCornerStatus(current.getLCorners());
+		key.setCcCornerStatus(current.getCcCorners());
 		newKey =
 			KeyFrame.newBuilder()
 			.setHumanChecked(current.getHumanChecked())
@@ -563,7 +571,7 @@ public class Learning implements DataListener, MouseListener,
 			.setRedRobots(current.getRedRobots())
 			.setBlueRobots(current.getBlueRobots())
 			.setTCorners(current.getTCorners())
-			.setLCorners(current.getLCorners());
+			.setCcCorners(current.getCcCorners());
 	}
 
 	/** Run a "batch" learning job.  We're going to bootstrap this.
@@ -572,6 +580,7 @@ public class Learning implements DataListener, MouseListener,
 		for human approval.
 	 */
 	public void runBatch () {
+		System.out.println("Running a batch job");
 		initStats();
 		quietMode = true;
 		int framesProcessed = 0;
@@ -609,15 +618,12 @@ public class Learning implements DataListener, MouseListener,
 		long time depending on the amount of data contained.
 	 */
 	public void runRecursiveBatch() {
-		System.out.println("Running batch job");
+		System.out.println("Running recursive batch job");
 		initStats();
 		quietMode = true;
 		int framesProcessed = 0;
 		long t = System.currentTimeMillis();
 		String topPath = currentSet.path();
-		boolean screen = false;
-		screen = learnPanel.getOnlyBalls() || learnPanel.getOnlyGoals() ||
-			learnPanel.getOnlyCrosses() || learnPanel.getOnlyBots();
 		// We need to get rid of the current directory
 		int end = topPath.length() - 2;
 		for ( ; end > -1 && !topPath.substring(end, end+1).equals(System.getProperty("file.separator"));
@@ -647,13 +653,7 @@ public class Learning implements DataListener, MouseListener,
 							}
 							current = keys.getFrame(f.index());
 							curFrameIndex = f.index();
-							if (current.getHumanChecked() &&
-								(!screen || (learnPanel.getOnlyBalls() && current.getBall()) ||
-								 (learnPanel.getOnlyGoals() && (current.getBlueGoal().getNumber() != 0 ||
-																current.getYellowGoal().getNumber() != 0)) ||
-								 (learnPanel.getOnlyCrosses() && current.getCross().getNumber() != 0) ||
-								 (learnPanel.getOnlyBots() && (current.getRedRobots() != 0 ||
-															current.getBlueRobots() != 0)))) {
+							if (shouldProcessFrame(current)) {
 								// we have good data, so let's process the frame
 								visionState.newFrame(f, tool.getColorTable());
 								visionState.update(false, f);
@@ -681,6 +681,7 @@ public class Learning implements DataListener, MouseListener,
 		}
 		t = System.currentTimeMillis() - t;
 		quietMode = false;
+		System.out.println("Processed " + topPath);
 		printStats(framesProcessed, t);
 	}
 
@@ -976,9 +977,10 @@ public class Learning implements DataListener, MouseListener,
 		System.out.println("Cross Statistics:        Good: "+goodCross+" OK: "+okCross+
 						   "    False positives: "+falseCross+" badID: "+
 						   badCross+" missed: "+missedCross);
-		System.out.println("Corner Statistics:  GoodT: "+goodT+" GoodL: "+goodL+" False Ts: "+
-						   falseT+" False Ls: "+falseL+" Missed Ts: "+missedT+
-						   " Missed Ls: "+missedL);
+		System.out.println("Corner Statistics:"+
+						   "  GoodT: "+goodT+" GoodL: "+goodL+" GoodCC: "+goodCC+
+						   "\n\tFalse Ts: "+ falseT+" False Ls: "+falseL+" False CCs: "+falseCC+
+						   "\n\tMissed Ts: "+missedT+" Missed Ls: "+missedL+" Missed CCs: "+missedCC);
 	}
 
 	/** Compare our key file against vision and update stats accordingly
@@ -986,27 +988,80 @@ public class Learning implements DataListener, MouseListener,
 	public void updateCornerStats() {
 		int ells = current.getLCorners();
 		int tees = current.getTCorners();
+		int cees = current.getCcCorners();
 		int ellsV = visionState.getLCornersVision();
 		int teesV = visionState.getTCornersVision();
+		int ceesV = visionState.getCcCornersVision();
 		if (ells > ellsV) {
 			missedL += ells - ellsV;
 			goodL += ellsV;
+			printMissedLCornerMessage();
 		} else if (ellsV > ells) {
 			falseL += ellsV - ells;
+			printFalseLCornerMessage();
 			goodL += ells;
 		} else if (ells > 0) {
 			goodL+= ells;
 		}
+
 		if (tees > teesV) {
 			missedT += tees - teesV;
 			goodT += teesV;
+			printMissedTCornerMessage();
 		} else if (teesV > tees) {
 			falseT += teesV - tees;
 			goodT += tees;
+			printFalseTCornerMessage();
 		} else if (tees > 0) {
 			goodT += tees;
 		}
+
+		if (cees > ceesV) {
+			missedCC += cees - ceesV;
+			goodCC += ceesV;
+			printMissedCcCornerMessage();
+		} else if (ceesV > cees) {
+			falseCC += ceesV - cees;
+			goodCC += cees;
+			printFalseTCornerMessage();
+		} else if (cees > 0) {
+			goodCC += cees;
+		}
 	}
+
+	/**
+	 * Print respective messages for missed/false corners in frames
+	 */
+	public void printFalseLCornerMessage()
+	{
+		if (learnPanel.getFalseLCorners())
+			System.out.println("False LCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printFalseTCornerMessage()
+	{
+		if (learnPanel.getFalseTCorners())
+			System.out.println("False TCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printFalseCcCornerMessage()
+	{
+		if (learnPanel.getFalseCcCorners())
+			System.out.println("False CcCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printMissedLCornerMessage()
+	{
+		if (learnPanel.getMissedLCorners())
+			System.out.println("Missed LCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printMissedTCornerMessage()
+	{
+		if (learnPanel.getMissedTCorners())
+			System.out.println("Missed TCorner in "+curFrame+" frame "+curFrameIndex);
+	};
+	public void printMissedCcCornerMessage()
+	{
+		if (learnPanel.getMissedCcCorners())
+			System.out.println("Missed CcCorner in "+curFrame+" frame "+curFrameIndex);
+	};
 
 	/** Compare our key file against vision and update stats accordingly
 	 */
@@ -1345,6 +1400,37 @@ public class Learning implements DataListener, MouseListener,
 		}
 	}
 
+	/** Should we process this frame? Does it fit the requirements
+	 * set by the panel buttons
+	 *
+	 * @return boolean If the current frame has the required objects in it
+	 */
+	public boolean shouldProcessFrame(KeyFrame current){
+		final boolean screen = ( learnPanel.getOnlyBalls()		||
+								 learnPanel.getOnlyGoals()		||
+								 learnPanel.getOnlyCrosses()	||
+								 learnPanel.getOnlyBots() );
+
+		return current.getHumanChecked() &&
+			(!screen ||
+			 (learnPanel.getOnlyBalls() && current.getBall()) ||
+
+			 (learnPanel.getOnlyGoals() &&
+			  (current.getBlueGoal().getNumber() != 0 ||
+			   current.getYellowGoal().getNumber() != 0)) ||
+
+			 (learnPanel.getOnlyCrosses() && current.getCross().getNumber() != 0) ||
+
+			 (learnPanel.getOnlyBots() && (current.getRedRobots() != 0 ||
+										   current.getBlueRobots() != 0)) ||
+
+			 (learnPanel.getOnlyLCorners() && current.getLCorners() != 0) ||
+			 (learnPanel.getOnlyTCorners() && current.getTCorners() != 0) ||
+			 (learnPanel.getOnlyCcCorners() && current.getCcCorners() != 0)
+
+			 );
+	}
+
 	/** Someday we'll use this to collect robot stats.  But first we need to be
 		able to recognize them!
 	 */
@@ -1483,6 +1569,14 @@ public class Learning implements DataListener, MouseListener,
 			newKey.setTCorners(tees);
 	}
 
+	/** Used to set the information in the Key file.
+	 * @param tees    how many CC corners there are in the frame
+	 */
+	public void setCcCorners(int cees) {
+		if (newKey != null)
+			newKey.setCcCorners(cees);
+	}
+
 	/** Used to get information from vision.
 	 * @return    whether there is a ball or not
 	 */
@@ -1537,6 +1631,14 @@ public class Learning implements DataListener, MouseListener,
 	public int getLCorners() {
 		if (visionState == null) return 0;
 		return visionState.getLCornersVision();
+	}
+
+	/** Used to get information from vision.
+	 * @return    how many CC corners
+	 */
+	public int getCcCorners() {
+		if (visionState == null) return 0;
+		return visionState.getCcCornersVision();
 	}
 
 	/** Used to get information from vision.
@@ -1607,6 +1709,15 @@ public class Learning implements DataListener, MouseListener,
 	public String getTCornerString() {
 		if (visionState == null) return "No Frame Loaded";
 		return visionState.getTCornerString();
+	}
+
+	/** Based on current state returns an appropriate description for
+	 * display.
+	 * @return   cc corner descriptor
+	 */
+	public String getCcCornerString() {
+		if (visionState == null) return "No Frame Loaded";
+		return visionState.getCcCornerString();
 	}
 
 	/** Based on current state returns an appropriate description for

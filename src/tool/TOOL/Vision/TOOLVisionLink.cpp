@@ -12,7 +12,6 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
 
 #include <boost/shared_ptr.hpp>
 
@@ -68,7 +67,7 @@ extern "C" {
     JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
      jfloatArray jsensors, jbyteArray jtable, jobjectArray thresh_target){
-      
+
         //Size checking -- we expect the sizes of the arrays to match
         //Base these on the size cpp expects for the image
         unsigned int tlenw =
@@ -91,12 +90,12 @@ extern "C" {
         // number of sensors depending on which version of the frame format
         // is loaded.
         /*
-        if (numSensorsInFrame != NUM_SENSORS) {
-            cout << "Warning: This frame must be old because the number of "
-                    "sensors stored in it is\n"
-                    "wrong. The missing values will be initialized to 0."
-                 << endl;
-        }
+		  if (numSensorsInFrame != NUM_SENSORS) {
+		  cout << "Warning: This frame must be old because the number of "
+		  "sensors stored in it is\n"
+		  "wrong. The missing values will be initialized to 0."
+		  << endl;
+		  }
         */
         if (env->GetArrayLength(jtable) != YMAX*UMAX*VMAX) {
             cout << "Error: the color table had incorrect dimensions" << endl;
@@ -169,9 +168,9 @@ extern "C" {
         //get the id for the java class, so we can get method IDs
         jclass javaClass = env->GetObjectClass(jobj);
 
-	//push the processTime
-	jmethodID setProcessTime = env->GetMethodID(javaClass, "setProcessTime", "(I)V");
-	env->CallVoidMethod(jobj, setProcessTime, (int) processTime);
+		//push the processTime
+		jmethodID setProcessTime = env->GetMethodID(javaClass, "setProcessTime", "(I)V");
+		env->CallVoidMethod(jobj, setProcessTime, (int) processTime);
 
         //push the ball
         jmethodID setBallInfo = env->GetMethodID(javaClass, "setBallInfo", "(DDIIIID)V");
@@ -329,6 +328,71 @@ extern "C" {
 
         env->ReleaseDoubleArrayElements( estimateResult, buf_estimate, 0);
     }
+
+	/**
+	 * FieldLines debug flag functions
+	 */
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugVertEdgeDetect
+	(JNIEnv * env, jobject jobj, jboolean debugVertEdgeDetect){
+		vision.fieldLines->setDebugVertEdgeDetect(debugVertEdgeDetect);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugHorEdgeDetect
+	(JNIEnv * env, jobject jobj, jboolean debugHorEdgeDetect){
+		vision.fieldLines->setDebugHorEdgeDetect(debugHorEdgeDetect);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugSecondVertEdgeDetect
+	(JNIEnv * env, jobject jobj, jboolean debugSecondVertEdgeDetect){
+		vision.fieldLines->setDebugSecondVertEdgeDetect(debugSecondVertEdgeDetect);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugCreateLines
+	(JNIEnv * env, jobject jobj, jboolean debugCreateLines){
+		vision.fieldLines->setDebugCreateLines(debugCreateLines);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugJoinLines
+	(JNIEnv * env, jobject jobj, jboolean debugJoinLines){
+		vision.fieldLines->setDebugJoinLines(debugJoinLines);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugIntersectLines
+	(JNIEnv * env, jobject jobj, jboolean debugIntersectLines){
+		vision.fieldLines->setDebugIntersectLines(debugIntersectLines);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugExtendLines
+	(JNIEnv * env, jobject jobj, jboolean debugExtendLines){
+		vision.fieldLines->setDebugExtendLines(debugExtendLines);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugIdentifyCorners
+	(JNIEnv * env, jobject jobj, jboolean debugIdentifyCorners){
+		vision.fieldLines->setDebugIdentifyCorners(debugIdentifyCorners);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugCcScan
+	(JNIEnv * env, jobject jobj, jboolean debugCcScan){
+		vision.fieldLines->setDebugCcScan(debugCcScan);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugRiskyCorners
+	(JNIEnv * env, jobject jobj, jboolean debugRiskyCorners){
+		vision.fieldLines->setDebugRiskyCorners(debugRiskyCorners);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugCornerAndObjectDistances
+	(JNIEnv * env, jobject jobj, jboolean debugCornerAndObjectDistances){
+		vision.fieldLines->setDebugCornerAndObjectDistances(debugCornerAndObjectDistances);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugFitUnusedPoints
+	(JNIEnv * env, jobject jobj, jboolean debugFitUnusedPoints){
+		vision.fieldLines->setDebugFitUnusedPoints(debugFitUnusedPoints);
+	}
+
 
 #ifdef __cplusplus
 }
