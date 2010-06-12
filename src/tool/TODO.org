@@ -17,6 +17,9 @@
 **** TODO Remote control motion commands
 *** ColorEdit
 *** Data
+*** Learning
+***** TODO Add more keyboard shortcuts
+***** TODO Add autoupdate button to toggle on/off
 ** New Modules
 *** State debugging system
     Set a robot's state and information about the robot (localization, ball, etc.) and then see what the robot would do. Good for chaser decision and kick decision especially. Possibly also feed in a vision frame.

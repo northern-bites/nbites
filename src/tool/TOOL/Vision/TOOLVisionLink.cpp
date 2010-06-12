@@ -256,26 +256,33 @@ extern "C" {
         for (vector< shared_ptr<VisualLine> >::const_iterator i = lines->begin();
              i!= lines->end(); i++) {
             env->CallVoidMethod(jobj, prepPointBuffers,
-                                (*i)->points.size());
-            for(vector<linePoint>::const_iterator j = (*i)->points.begin();
-                j != (*i)->points.end(); j++) {
+                                (*i)->getPoints().size());
+			const vector<linePoint> points = (*i)->getPoints();
+            for(vector<linePoint>::const_iterator j = points.begin();
+				j != points.end(); j++) {
                 env->CallVoidMethod(jobj, setPointInfo,
                                     j->x, j->y,
                                     j->lineWidth, j->foundWithScan);
             }
             env->CallVoidMethod(jobj, setVisualLineInfo,
-                                (*i)->start.x, (*i)->start.y,
-                                (*i)->end.x, (*i)->end.y);
+                                (*i)->getStartpoint().x,
+								(*i)->getStartpoint().y,
+                                (*i)->getEndpoint().x,
+								(*i)->getEndpoint().y);
         }
         //push data from unusedPoints
         const list <linePoint> *unusedPoints = vision.fieldLines->getUnusedPoints();
+
         env->CallVoidMethod(jobj, prepPointBuffers, unusedPoints->size());
+
         for (list <linePoint>::const_iterator i = unusedPoints->begin();
              i != unusedPoints->end(); i++)
             env->CallVoidMethod(jobj, setPointInfo,
                                 i->x, i->y,
                                 i->lineWidth, i->foundWithScan);
+
         env->CallVoidMethod(jobj, setUnusedPointsInfo);
+
         //push data from visualCorners
         const list <VisualCorner>* corners = vision.fieldLines->getCorners();
         for (list <VisualCorner>::const_iterator i = corners->begin();
