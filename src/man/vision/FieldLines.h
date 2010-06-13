@@ -96,7 +96,7 @@ private:
 
     // If we have seen an edge within the past x pixels, then we say it's close
     // AIBOSPECIFIC
-    static const int ADJACENT_SAME_EDGE_SEPARATION = 3;
+    static const int ADJACENT_SAME_EDGE_SEPARATION = 10;
     // AIBO_SPECIFIC
     // if the edge detection goes bad on one end of the line, this is a check
     static const int NUM_NON_WHITE_SANITY_CHECK = 3;
@@ -318,42 +318,41 @@ public:
      * Sanity checks for field lines:
      */
     const bool isAngleTooSmall(boost::shared_ptr<VisualLine> i,
-                         boost::shared_ptr<VisualLine> j,
-                         const int& numChecksPassed) const;
+                               boost::shared_ptr<VisualLine> j,
+                               const int& numChecksPassed) const;
 
     const bool isIntersectionOnScreen(const point<int>& intersection,
-                                const int& numChecksPassed) const;
+                                      const int& numChecksPassed) const;
 
     const bool isAngleOnFieldOkay(boost::shared_ptr<VisualLine> i,
-                            boost::shared_ptr<VisualLine> j,
-                            const int& intersectX,
-                            const int& intersectY,
-                            const int& numChecksPassed) const;
+                                  boost::shared_ptr<VisualLine> j,
+                                  const point<int>& intersection,
+                                  const int& numChecksPassed) const;
 
     const bool tooMuchGreenAtCorner(const point<int>& intersection,
-                              const int& numChecksPassed);
+                                    const int& numChecksPassed);
 
     const bool areLinesTooSmall(boost::shared_ptr<VisualLine> i,
-                          boost::shared_ptr<VisualLine> j,
-                          const int& numChecksPassed) const;
-
-    const bool doLinesCross(boost::shared_ptr<VisualLine> i,
-                      boost::shared_ptr<VisualLine> j,
-                      const float& t_I, const float& t_J,
-                      const int& numChecksPassed)const ;
-
-    const bool isCornerTooFar(const float& distance,
-                        const int& numChecksPassed) const;
-
-    const bool areLineEndsCloseEnough(boost::shared_ptr<VisualLine> i,
                                 boost::shared_ptr<VisualLine> j,
-                                const point<int>& intersection,
                                 const int& numChecksPassed) const;
 
-    const bool tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
-                                      const point<int>& line2Closer,
+    const bool doLinesCross(boost::shared_ptr<VisualLine> i,
+                            boost::shared_ptr<VisualLine> j,
+                            const float& t_I, const float& t_J,
+                            const int& numChecksPassed)const ;
+
+    const bool isCornerTooFar(const float& distance,
+                              const int& numChecksPassed) const;
+
+    const bool areLineEndsCloseEnough(boost::shared_ptr<VisualLine> i,
+                                      boost::shared_ptr<VisualLine> j,
                                       const point<int>& intersection,
                                       const int& numChecksPassed) const;
+
+    const bool tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
+                                            const point<int>& line2Closer,
+                                            const point<int>& intersection,
+                                            const int& numChecksPassed) const;
 
     const bool isTActuallyCC(const VisualCorner& c,
                              boost::shared_ptr<VisualLine> i,
@@ -708,7 +707,8 @@ private:
 
 private:
 
-    // debug variables
+    // debug variables. If a new variable is added here, it must
+    // be disabled by default! See FieldLines constructor!
 #ifdef OFFLINE
     bool debugVertEdgeDetect;
     bool debugHorEdgeDetect;

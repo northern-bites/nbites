@@ -14,6 +14,7 @@ class Utility;
 #include "VisionDef.h"
 #include "VisualLandmark.h"
 #include "VisualLine.h"
+#include "NBMath.h"
 
 // This class contains static utility functions which are used in many different
 // parts of our code.
@@ -227,6 +228,9 @@ public:
 
 	static const point<int> findCloserEndpoint(const VisualLine&,
 											   const point<int>& intersection);
+
+    static float getGroundAngle(const VisualLine& line1,
+                                const VisualLine& line2);
 };
 
 

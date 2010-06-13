@@ -1040,5 +1040,32 @@ public class VisionState {
 		debugWindow.add(buttonPanel);
 		debugWindow.setSize(400,400);
 		debugWindow.setVisible(true);
+
+        // Disable all the debugging information by default
+        thresholdedImage.getVisionLink().setFieldLinesDebugVertEdgeDetect(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugHorEdgeDetect(false);
+
+        thresholdedImage.getVisionLink().
+            setFieldLinesDebugSecondVertEdgeDetect(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugCreateLines(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugFitUnusedPoints(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugJoinLines(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugExtendLines(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugIntersectLines(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugIdentifyCorners(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugCcScan(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugRiskyCorners(false);
+
+        thresholdedImage.getVisionLink().
+            setFieldLinesDebugCornerAndObjectDistances(false);
 	}
 }

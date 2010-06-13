@@ -742,3 +742,10 @@ const point<int> Utility::findCloserEndpoint(const VisualLine& line,
 		return end;
 	}
 }
+
+float Utility::getGroundAngle(const VisualLine& line1, const VisualLine& line2)
+{
+    return M_PI_FLOAT - NBMath::subPIAngle( fabs(line1.getBearing() -
+                                                 line2.getBearing()));
+}
+
