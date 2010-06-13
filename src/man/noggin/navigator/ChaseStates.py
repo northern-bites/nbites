@@ -133,7 +133,6 @@ def positionForKick(nav):
     move to position relative to ball given by offset and heading calculated
     by kick decider without running into the ball
     """
-
     (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
 
     if not navTrans.atHeading(nav.brain.my, heading):
@@ -174,13 +173,13 @@ def positionForKick(nav):
                          constants.OMNI_MIN_SPIN_SPEED,
                          constants.OMNI_MAX_SPIN_SPEED)
 
-    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
+    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE or hDiff < 5.:
         sTheta = 0.0
 
     if sX == 0.0 and sY == 0.0 and sTheta == 0.0:
         return nav.goNow('stop')
 
-    helper.setSpeed(nav,sX,sY,sTheta)
+    helper.setSpeed(nav,sX,sY,0)#sTheta)
 
     return nav.stay()
 
