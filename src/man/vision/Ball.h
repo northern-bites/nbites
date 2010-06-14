@@ -44,6 +44,7 @@ static const int MAX_NUM_BALL_RUNS = 500; //never use this!
 static const int BALL_RUNS_MALLOC_SIZE = 10000;
 static const int BAD_VALUE = -10000;
 static const int NOISE_SKIPS = 1;
+static const float ORANGE_BALL_RADIUS = 32.5; //mm
 
 class Ball {
 public:
