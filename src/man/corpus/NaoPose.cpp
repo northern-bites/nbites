@@ -315,10 +315,11 @@ ublas::vector<float> NaoPose::intersectLineWithXYPlane(const std::vector<
 const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
                                     const float objectHeight) {
 
-    if (pixelX >= IMAGE_WIDTH || pixelX < 0 || pixelY >= IMAGE_HEIGHT || pixelY
+    /*if (pixelX >= IMAGE_WIDTH || pixelX < 0 || pixelY >= IMAGE_HEIGHT || pixelY
             < 0) {
         return NULL_ESTIMATE;
     }
+    */
     /*
     // declare x,y,z coordinate of pixel in relation to focal point
     ublas::vector<float> pixelInCameraFrame =
@@ -369,31 +370,50 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
     cameraToWorldRotation(0, 3) = 0;
     cameraToWorldRotation(1, 3) = 0;
     cameraToWorldRotation(2, 3) = 0;
-    //TODO: clean this up and comment
+    //TODO:clean this up and comment
     ufvector4 pixelInWorldFrame = prod(cameraToWorldRotation, pixelInCameraFrame);
 
+    float beta = atan(pixelInWorldFrame(Y)/pixelInWorldFrame(X));
+
     float alpha = sqrt((pixelInWorldFrame(X)*pixelInWorldFrame(X)) + (pixelInWorldFrame(Y)*pixelInWorldFrame(Y))
-                      + (pixelInWorldFrame(Z)*pixelInWorldFrame(Z))) /
-            pixelInWorldFrame(Z);
+                      + (pixelInWorldFrame(Z)*pixelInWorldFrame(Z))) / pixelInWorldFrame(Z);
 
-    float beta = atan(pixelInWorldFrame(Y) / pixelInWorldFrame(X));
-
-    float distance3D = alpha * (focalPointInWorldFrame.z + comHeight);
+    float distance3D = alpha * (focalPointInWorldFrame.z + comHeight - objectHeight);
     float distance2D = sqrt(distance3D * distance3D - (focalPointInWorldFrame.z + comHeight - objectHeight) *
                             (focalPointInWorldFrame.z + comHeight - objectHeight));
 
     estimate est;
-    est.bearing = beta;
-    est.dist = distance2D * MM_TO_CM;
+//    est.bearing = beta;
+    //est.dist = distance2D * MM_TO_CM;
+
     float distX = distance2D * cos(beta) + focalPointInWorldFrame.x;
     float distY = distance2D * sin(beta) + focalPointInWorldFrame.y;
+
+    float bearing = 0.0f;
+    const bool yPos = pixelInWorldFrame(Y) >= 0;
+    const bool xPos = pixelInWorldFrame(X) >= 0;
+    const float r = distY / distX;
+    if (!isnan(r)) {
+        //quadrants +x,+y and +x-y
+        if (xPos && (yPos || !yPos)) {
+            bearing = std::atan(r);
+        } else if (yPos) { //quadrant -x+y
+            bearing = std::atan(r) + M_PI_FLOAT;
+        } else {//quadrant -x+y
+            bearing = std::atan(r) - M_PI_FLOAT;
+        }
+    } else {
+        bearing = 0.0f;
+    }
+
+    est.bearing = bearing;
 
     est.x = distX*MM_TO_CM;
     est.y = distY*MM_TO_CM;
     est.dist = sqrt(est.x * est.x + est.y * est.y);
 
     //TODO: this is prolly not right
-    const float temp2 = (focalPointInWorldFrame.z + comHeight - objectHeight) / distance3D;
+    const float temp2 = -(focalPointInWorldFrame.z + comHeight - objectHeight) / distance3D;
     if (temp2 <= 1.0)
         est.elevation = NBMath::safe_asin(temp2);
 
@@ -700,7 +720,11 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
 const estimate NaoPose::sizeBasedEstimate(int pixelX, int pixelY, float objectHeight, float pixelSize, float realSize) {
 
     float PIXEL_FOCAL_LENGTH = 385.54f;
-    float ratio = realSize/pixelSize;
+    if (pixelSize <= 0 || realSize <= 0)
+        return NULL_ESTIMATE;
+    float ratio = realSize / pixelSize;
+    //cout<<"ratio "<<ratio<<endl;
+
     ufvector4 pixelInCameraFrame =
                 vector4D( PIXEL_FOCAL_LENGTH,
                           ((float)IMAGE_CENTER_X - (float)pixelX),
@@ -710,8 +734,15 @@ const estimate NaoPose::sizeBasedEstimate(int pixelX, int pixelY, float objectHe
 
     float distance3D = ratio * pixelDistance;
 
-    float distance2D = sqrt(distance3D * distance3D - (focalPointInWorldFrame.z + comHeight - objectHeight) *
-                                (focalPointInWorldFrame.z + comHeight - objectHeight));
+    float distance2D = 0.0f;
+    //safe to assume that if the focal distance is smaller than the height, then the ball is a few pixel to big
+    if (distance3D < focalPointInWorldFrame.z + comHeight - objectHeight) {
+        return pixEstimate(pixelX, pixelY, objectHeight);
+    }
+
+    distance2D = sqrt(abs(distance3D * distance3D - (focalPointInWorldFrame.z + comHeight - objectHeight) *
+                          (focalPointInWorldFrame.z + comHeight - objectHeight)));
+    //cout<<"shit "<<distance3D<<" "<<(focalPointInWorldFrame.z + comHeight - objectHeight)<<endl;
 
     ufmatrix4 cameraToWorldRotation = cameraToWorldFrame;
     cameraToWorldRotation(0, 3) = 0;
@@ -720,13 +751,40 @@ const estimate NaoPose::sizeBasedEstimate(int pixelX, int pixelY, float objectHe
     //TODO: clean this up and comment
     ufvector4 pixelInWorldFrame = prod(cameraToWorldRotation, pixelInCameraFrame);
 
+    float beta = atan(pixelInWorldFrame(Y)/pixelInWorldFrame(X));
 
-    float bearing = atan(pixelInWorldFrame(Y) / pixelInWorldFrame(X));
+    float distX = distance2D * cos(beta) + focalPointInWorldFrame.x;
+    float distY = distance2D * sin(beta) + focalPointInWorldFrame.y;
+
+    //    float bearing = atan(pixelInWorldFrame(Y) / pixelInWorldFrame(X));
     estimate est;
     //est.dist = distance2D * MM_TO_CM;
+
+    float bearing = 0.0f;
+    const bool yPos = distY >= 0;
+    const bool xPos = distX >= 0;
+    const float r = distY / distX;
+    if (!isnan(r)) {
+        //quadrants +x,+y and +x-y
+        if (xPos && (yPos || !yPos)) {
+            bearing = std::atan(r);
+        } else if (yPos) { //quadrant -x+y
+            bearing = std::atan(r) + M_PI_FLOAT;
+        } else {//quadrant -x+y
+            bearing = std::atan(r) - M_PI_FLOAT;
+        }
+    } else {
+        bearing = 0.0f;
+    }
+
     est.bearing = bearing;
-    float distX = distance2D * cos(bearing) + focalPointInWorldFrame.x;
-    float distY = distance2D * sin(bearing) + focalPointInWorldFrame.y;
+
+
+    //TODO: this is prolly not important
+    const float temp2 = (focalPointInWorldFrame.z + comHeight - objectHeight) / distance3D;
+    if (temp2 <= 1.0) {
+        est.elevation = NBMath::safe_asin(temp2);
+    }
     est.x = distX*MM_TO_CM;
     est.y = distY*MM_TO_CM;
     est.dist = sqrt(est.x * est.x + est.y * est.y);
