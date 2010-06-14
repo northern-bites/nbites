@@ -28,7 +28,6 @@ def gamePlaying(player):
     """
     if player.firstFrame():
         player.gainsOn()
-        player.brain.CoA.setRobotGait(player.brain.motion)
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0

@@ -29,7 +29,6 @@ def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
     if player.firstFrame():
         player.gainsOn()
-        player.brain.CoA.setRobotGait(player.brain.motion)
         player.brain.tracker.trackBall()
 #        player.penalizeHeads();
 
@@ -51,7 +50,6 @@ def switchgaits1(player):
 
 def switchgaits2(player):
     if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
         player.setSpeed(10,-10,0)
 
     if player.counter == 240:
@@ -92,7 +90,7 @@ def walktest(player):
 
 def walkstraight(player):
     if player.firstFrame():
-        player.setSpeed(6,0,0)
+        player.setWalk(6,0,0)
 
     if player.counter == 400:
         return player.goLater('walkfast')
@@ -174,7 +172,7 @@ def stopandchangegait(player):
     '''Return our stability to the PSO
     set new gait, and start walking again'''
     if player.firstFrame():
-        player.setSpeed(0,0,0)
+        player.setWalk(0,0,0)
 
         # set gait from new particle
         gaitTuple = arrayToGaitTuple(swarm.getNextParticle().getPosition())
@@ -189,7 +187,6 @@ def stopandchangegait(player):
                                      gaitTuple[7])
 
         player.brain.CoA.setRobotDynamicGait(player.brain.motion, newGait)
-        #player.brain.CoA.setRobotGait(player.brain.motion)
 
         #print "gait in tuple form:"
         #for tuple in gaitTuple:

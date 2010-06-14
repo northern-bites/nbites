@@ -28,7 +28,6 @@ def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
     if player.firstFrame():
         player.gainsOn()
-        player.brain.CoA.setRobotGait(player.brain.motion)
         player.brain.tracker.trackBall()
 #        player.penalizeHeads();
 
@@ -58,13 +57,10 @@ def switchgaits2(player):
     return player.stay()
 def switchgaits3(player):
     if player.firstFrame():
-        player.brain.CoA.setRobotGait(player.brain.motion)
 
     if player.counter == 140:
         return player.goLater('sitdown')
     return player.stay()
-
-
 
 def walkleft(player):
     if player.firstFrame():
