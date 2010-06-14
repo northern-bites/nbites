@@ -101,7 +101,6 @@ def chaseAroundBox(nav):
 def ballInMyBox(nav):
     if nav.firstFrame():
         nav.brain.tracker.activeLoc()
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
 
 
     ball = nav.brain.ball

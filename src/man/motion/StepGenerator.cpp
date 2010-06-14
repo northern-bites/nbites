@@ -35,7 +35,7 @@ using namespace NBMath;
 
 //#define DEBUG_STEPGENERATOR
 //#define DEBUG_ZMP
-#define DEBUG_ZMP_REF
+//#define DEBUG_ZMP_REF
 
 // flag to turn on multiple zmp queues (on by default)
 #define MULTIPLE_ZMP
