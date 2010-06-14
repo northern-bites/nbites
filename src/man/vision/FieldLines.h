@@ -9,7 +9,6 @@
 #include <iomanip> // setprecision for cout
 #include <boost/shared_ptr.hpp>
 
-
 class FieldLines;
 
 #include "FieldConstants.h"
@@ -21,7 +20,7 @@ static const int BAD_DISTANCE = -23523134;
 
 // for percentColor(), ortho directions
 enum TestDirection {TEST_UP, TEST_DOWN, TEST_LEFT, TEST_RIGHT};
-enum ExtendDirection {EXTEND_DOWN, EXTEND_UP};
+enum ExtendDirection {EXTEND_DOWN, EXTEND_UP, EXTEND_RIGHT, EXTEND_LEFT};
 struct linePoint;
 
 #include "Common.h" //
@@ -177,12 +176,12 @@ private:
 
     static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 15;
     static const int LINE_HEIGHT = 0; // this refers to height off the ground
-    static const int MIN_CROSS_EXTEND = 20;
+    static const int MIN_CROSS_EXTEND = 10;
     // When estimating the angle between two lines on the field, anything less
     // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
-    // and disallowed; ideally our estimates would always be 90.0 degrees
-    static const int MIN_ANGLE_ON_FIELD = 55;
-    static const int MAX_ANGLE_ON_FIELD = 115;
+    // and disallowed; ideally our estimates would always be 1.57 radians
+    static const float MIN_ANGLE_ON_FIELD = .96f;
+    static const float MAX_ANGLE_ON_FIELD = 2.00f;
     static const int TWO_CORNER_LINES_MIN_LENGTH = 35;
 
     static const int DEBUG_GROUP_LINES_BOX_WIDTH = 4;
@@ -214,7 +213,7 @@ public:
     // the methods called from here use FieldObjects and as such must be
     // performed after the ObjectFragments loop is completed.
     void afterObjectFragments();
-
+private:
     // This method populates the points vector with line points it finds in
     // the image.  A line point ideally occurs in the middle of a line on the
     // screen.  We detect lines via a simple edge detection scheme -
@@ -363,7 +362,8 @@ public:
 
     // Checks if a corner is too dangerous when it is relatively near the edge
     // of the screen - scans the edge for a stripe of white
-    const bool tooClose(int x, int y);
+    const bool dangerousEdgeCorner(const VisualCorner& corner,
+                                   const point<int>& intersection);
 
     // Iterates over the corners and removes those that are too risky to
     // use for localization data
@@ -459,6 +459,14 @@ public:
                             point<int> lastPoint,
                             int startY, int endY);
 
+    void extendLineHorizScan(ExtendDirection _testDir,
+                             std::list<linePoint> * foundLinePoints,
+                             boost::shared_ptr<VisualLine> line,
+                             point<int> lastPoint,
+                             int startX,
+                             int endX);
+
+
     // Return true if it appears the T is out of bounds, false otherwise
     /*
       bool isOutOfBoundsT(corner &t, int i);
@@ -503,12 +511,6 @@ public:
     const bool isWhiteGreenEdge(int x, int y, int potentialMidPoint,
                                 const ScanDirection direction) const;
 
-
-
-    // Implementation can be found at revision 4518 if we ever want to get it
-    // again.
-    const int findCorrespondingBottom(const int x, const int y) const;
-
     static void updateLineCounters(const int threshColor, int &numWhite,
                                    int &numUndefined, int &numNonWhite);
 
@@ -528,6 +530,9 @@ public:
     void drawCorners(const std::list<VisualCorner> &toDraw, int color);
 
     bool isLegitVerticalLinePoint(int x, int y);
+
+    // Getters and setters for FieldLines
+public:
 #ifdef OFFLINE
     void setDebugVertEdgeDetect(bool _bool) { debugVertEdgeDetect = _bool; }
     void setDebugHorEdgeDetect(bool _bool) { debugHorEdgeDetect = _bool; }

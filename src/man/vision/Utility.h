@@ -229,8 +229,24 @@ public:
 	static const point<int> findCloserEndpoint(const VisualLine&,
 											   const point<int>& intersection);
 
+    // Returns the angle between two lines using their bearing from the robot
     static float getGroundAngle(const VisualLine& line1,
                                 const VisualLine& line2);
+
+    /**
+     * Returns true if pt2 is on the opposite side of the line from the pt1.
+     * If a point is on the line, the other point is not considered "across"
+     * from it.
+     */
+    static bool areAcrossLine(const VisualLine& line,
+                             const point<int>& p1,
+                             const point<int>& p2);
+
+    static const float distBetween(const point<int>& p1,
+                            const point<int>& p2){
+        return hypotf(p1.x - p2.x, p1.y - p2.y);
+    }
+
 };
 
 

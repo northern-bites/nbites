@@ -749,3 +749,17 @@ float Utility::getGroundAngle(const VisualLine& line1, const VisualLine& line2)
                                                  line2.getBearing()));
 }
 
+bool Utility::areAcrossLine(const VisualLine& line, const point<int>& p1,
+                            const point<int>& p2)
+{
+    const int y1 = getLineY(p1.x, line);
+    const int y2 = getLineY(p2.x, line);
+
+    if ((p1.y <= y1 && p2.y <= y2) ||
+        (p1.y >= y1 && p2.y >= y2)){
+        return false;
+    }
+    return true;
+}
+
+
