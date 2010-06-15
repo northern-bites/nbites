@@ -57,9 +57,10 @@ def pfk_all(nav):
 
     # calculate spin speed
     #hDiff = MyMath.sub180Angle(nav.brain.my.h - heading)
+    # rotate to ball here, we will strafe to aim kick later
     hDiff = MyMath.sub180Angle(ball.bearing)
 
-    if (fabs(hDiff) < 5.0):
+    if (fabs(hDiff) < PFK_CLOSE_ENOUGH_THETA):
         sTheta = 0.0
     else:
         sTheta = MyMath.sign(hDiff) * constants.GOTO_SPIN_SPEED * \
@@ -98,7 +99,7 @@ def pfk_all(nav):
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     if sY == 0.0 and sTheta == 0.0:
-        return nav.goLater('pfk_final')
+        return nav.goNow('pfk_final')
 
     x_diff = ball.relX - SAFE_BALL_REL_X
     # arbitrary
@@ -185,7 +186,11 @@ def pfk_final(nav):
 
     print "ball distance in final: ", ball.dist
 
+    # something has gone wrong, maybe the ball was moved?
     if ball.dist > PFK_BALL_CLOSE_ENOUGH:
+        print "pfk_final: too far away, deciding new kick"
+        nav.brain.kickDecider.decideKick()
+        nav.stopTheta = 0
         return nav.goNow('pfk_all')
 
     (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()

@@ -88,7 +88,9 @@ class KickDecider(object):
         """
         ball = self.brain.ball
 
-        if not self.hasKickedOff:
+        if self.brain.gameController.ownKickOff and \
+                self.brain.player.isChasing and \
+                not self.hasKickedOff:
             return constants.OBJECTIVE_KICKOFF
 
         # if ball on our side, get it out!
