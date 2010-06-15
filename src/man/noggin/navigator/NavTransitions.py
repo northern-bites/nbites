@@ -91,7 +91,6 @@ def shouldAvoidObstacleLeft(nav):
     """
     sonar = nav.brain.sonar
     if (sonar.leftDist != sonar.UNKNOWN_VALUE and
-        sonar.leftDist != constants.AVOID_OBSTACLE_SENSOR_BUG and
         sonar.leftDist < constants.AVOID_OBSTACLE_SIDE_DIST):
         nav.shouldAvoidObstacleLeftCounter += 1
     else :
@@ -108,7 +107,6 @@ def shouldAvoidObstacleRight(nav):
     """
     sonar = nav.brain.sonar
     if (sonar.rightDist != sonar.UNKNOWN_VALUE and
-        sonar.rightDist != constants.AVOID_OBSTACLE_SENSOR_BUG and
         sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST):
          nav.shouldAvoidObstacleRightCounter += 1
     else :
