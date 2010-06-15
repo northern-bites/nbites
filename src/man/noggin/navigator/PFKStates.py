@@ -39,7 +39,8 @@ PFK_CLOSE_ENOUGH_XY = 2.0
 PFK_CLOSE_ENOUGH_THETA = 11
 PFK_BALL_CLOSE_ENOUGH = 30
 # stop rotating after 4 consecutive frames with good hDiff
-ROTATE_THRESHOLD = 3
+BUFFER_FRAMES_THRESHOLD = 3
+PFK_BALL_VISION_FRAMES = 5
 
 def pfk_all(nav):
     """
@@ -50,6 +51,8 @@ def pfk_all(nav):
 
     if nav.firstFrame():
         nav.stopTheta = 0
+        nav.stopY_Theta = 0
+        print "entered from: ", nav.lastDiffState
 
     (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
 
@@ -73,7 +76,7 @@ def pfk_all(nav):
 
     if fabs(hDiff) < PFK_CLOSE_ENOUGH_THETA:
         nav.stopTheta += 1
-        if nav.stopTheta > ROTATE_THRESHOLD:
+        if nav.stopTheta > BUFFER_FRAMES_THRESHOLD:
             return nav.goNow('pfk_xy')
     else:
         nav.stopTheta = 0
@@ -99,7 +102,11 @@ def pfk_all(nav):
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     if sY == 0.0 and sTheta == 0.0:
-        return nav.goNow('pfk_final')
+        nav.stopY_Theta += 1
+        if nav.stopY_Theta > BUFFER_FRAMES_THRESHOLD:
+            return nav.goNow('pfk_final')
+    else:
+        nav.stopY_Theta = 0
 
     x_diff = ball.relX - SAFE_BALL_REL_X
     # arbitrary
@@ -128,9 +135,11 @@ def pfk_xy(nav):
            ball.dist < SAFE_TO_STRAFE_DIST:
         return nav.goNow('pfk_x')
 
+    """
     if fabs(ball.bearing) < START_SPIN_BEARING:
         print "bearing to ball: %g" % ball.bearing
-        #return nav.goNow('pfk_all')
+        return nav.goNow('pfk_all')
+    """
 
     (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
     target_y = ball.relY - y_offset
@@ -187,11 +196,17 @@ def pfk_final(nav):
     print "ball distance in final: ", ball.dist
 
     # something has gone wrong, maybe the ball was moved?
-    if ball.dist > PFK_BALL_CLOSE_ENOUGH:
-        print "pfk_final: too far away, deciding new kick"
-        nav.brain.kickDecider.decideKick()
-        nav.stopTheta = 0
-        return nav.goNow('pfk_all')
+    if (ball.dist > PFK_BALL_CLOSE_ENOUGH or
+        ball.framesOff > PFK_BALL_VISION_FRAMES):
+        nav.ballTooFar += 1
+        if nav.ballTooFar > BUFFER_FRAMES_THRESHOLD:
+            print "pfk_final: too far away, deciding new kick"
+            nav.brain.kickDecider.decideKick()
+            nav.stopTheta = 0
+            nav.stopY_Theta = 0
+            return nav.goNow('chaseBall')
+    else:
+        nav.ballTooFar = 0
 
     (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
 
