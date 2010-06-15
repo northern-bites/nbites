@@ -645,7 +645,7 @@ public class Learning implements DataListener, MouseListener,
         // now we need to start retrieving all of the data sets that contain it
         FileSource source = (FileSource)(tool.getSourceManager().addSource(topPath));
         if (source == null){
-            System.out.println("Recursive batch top directory was invalid.");
+            System.out.println("Recursive batch top directory " + topPath + " was invalid.");
             return;
         }
         List<DataSet> dataList = source.getDataSets();

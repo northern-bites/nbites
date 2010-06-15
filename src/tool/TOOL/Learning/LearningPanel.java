@@ -245,8 +245,9 @@ public class LearningPanel extends JPanel implements DataListener, KeyListener {
                     String topDir =
                         learn.getTool().
                         CONSOLE.promptDirOpen("Top Directory for Recursion",
-                                              "../man/frames/");
-                    System.out.println(topDir);
+                                              "../../data/frames/");
+                    if (topDir == null)
+                        return;
 					learn.runRecursiveBatch(topDir);
 				}
 			});
