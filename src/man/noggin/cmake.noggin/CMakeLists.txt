@@ -154,6 +154,7 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         )
 
 SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/headTracking
+     			   ${NOGGIN_INCLUDE_DIR}/kickDecider
                            ${NOGGIN_INCLUDE_DIR}/navigator
                            ${NOGGIN_INCLUDE_DIR}/playbook
                            ${NOGGIN_INCLUDE_DIR}/players

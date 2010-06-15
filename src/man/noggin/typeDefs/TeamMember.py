@@ -1,9 +1,5 @@
-
-from math import (hypot, degrees)
-
 from .Location import (RobotLocation, Location)
 from .. import NogginConstants
-from ..util import MyMath
 import time
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
@@ -86,7 +82,6 @@ class TeamMember(RobotLocation):
         ball = self.brain.ball
         pb = self.brain.playbook
 
-        #self.playerNumber = self.brain.my.playerNumber
         self.x = my.x
         self.y = my.y
         self.h = my.h
