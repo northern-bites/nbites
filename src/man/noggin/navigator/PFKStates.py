@@ -23,6 +23,7 @@ PFK_Y_GAIN = 0.6
 def pfk_all(nav):
     """
     ball bearing is inside safe margin for spinning
+    try to get almost all heading adjustment done here
     move x, y, and theta
     """
 
@@ -31,14 +32,16 @@ def pfk_all(nav):
     ball = nav.brain.ball
     # calculate spin speed
     hDiff = MyMath.sub180Angle(nav.brain.my.h - heading)
-    sTheta = MyMath.sign(hDiff) * walker.getRotScale(hDiff) * .2 *\
-             constants.OMNI_MAX_SPIN_SPEED
-    sTheta = MyMath.clip(sTheta,
-                         constants.OMNI_MIN_SPIN_SPEED,
-                         constants.OMNI_MAX_SPIN_SPEED)
-
-    if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
+    if (fabs(hDiff) < 5.0):
         sTheta = 0.0
+    else:
+        sTheta = MyMath.sign(hDiff) * constants.GOTO_SPIN_SPEED * \
+                 walker.getRotScale(hDiff)
+
+        #sTheta = hDiff * walker.getRotScale(hDiff)
+        #sTheta = MyMath.clip(sTheta,
+        #                     constants.OMNI_MIN_SPIN_SPEED,
+        #                     constants.OMNI_MAX_SPIN_SPEED)
 
     # if the ball is outside safe bearing and we're spinning away from it
     # or we're spinning towards it but we're likely to spin into it...
@@ -69,6 +72,8 @@ def pfk_all(nav):
                          PFK_MAX_X_SPEED)
         sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
 
+    print "hDiff:%g target_y:%g x_diff:%g" % (hDiff, target_y, x_diff)
+    print "sTheta:%g sY:%g sX:%g" % (sTheta, sY, sX)
     helper.setSpeed(nav,sX,sY,sTheta)
 
     return nav.stay()
