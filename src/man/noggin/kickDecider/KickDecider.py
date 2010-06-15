@@ -77,7 +77,7 @@ class KickDecider(object):
 
         self.destDist = self.brain.ball.distTo(self.kickDest)
         self.currentKick = kick
-        print "dest:", self.kickDest
+        print "kickDest:", self.kickDest
         print "my.x:%g my.y:%g my.h:%g" % (self.brain.my.x, self.brain.my.y, self.brain.my.h)
 
         self.brain.out.printf(self.currentKick)
