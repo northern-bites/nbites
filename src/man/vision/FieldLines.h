@@ -168,6 +168,7 @@ private:
     // for dupeCorner() checks
     static const int DUPE_MIN_X_SEPARATION = 15;
     static const int DUPE_MIN_Y_SEPARATION = 15;
+    static const int DUPE_MIN_DIST_SEPARATION = 30;
 
     static const int MAX_CORNER_DISTANCE = 600;
     static const int MIN_CORNER_DISTANCE = 10;
@@ -338,7 +339,13 @@ private:
     const bool doLinesCross(boost::shared_ptr<VisualLine> i,
                             boost::shared_ptr<VisualLine> j,
                             const float& t_I, const float& t_J,
-                            const int& numChecksPassed)const ;
+                            const int& numChecksPassed) const;
+
+    const bool isThereGreenAroundCorner(const VisualCorner& corner,
+                                        const VisualLine& i,
+                                        const VisualLine& j) const;
+    const bool isItGreenAcrossFromLine(const VisualCorner& corner,
+                                       const VisualLine& i) const;
 
     const bool isCornerTooFar(const float& distance,
                               const int& numChecksPassed) const;
@@ -425,6 +432,12 @@ private:
     // vectors
     float getEstimatedDistance(const VisualCorner *c,
                                const VisualFieldObject *obj) const;
+
+    float getEstimatedDistance(float dist1, float bearing1,
+                               float dist2, float bearing2) const;
+
+    float getEstimatedDistance(const VisualCorner& corner,
+                               const point<int>& p) const;
 
     float getEstimatedAngle(const VisualCorner &corner) const;
 

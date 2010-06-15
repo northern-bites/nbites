@@ -66,7 +66,7 @@ struct linePoint {
     //  http://www.daniweb.com/forums/thread69005.html
     friend std::ostream& operator<< (std::ostream &o, const linePoint &c)
         {
-            return o << "(" << c.x << "," << c.y << ")";
+            return o << "(" << c.x << "," << c.y << "), width: " << c.lineWidth;
         }
 };
 
