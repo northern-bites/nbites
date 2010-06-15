@@ -5,11 +5,25 @@ from . import NavConstants as constants
 from . import BrunswickSpeeds as speeds
 from math import fabs
 
+# arbitrary constant to reduce start/stop spinadjustments. even lower might be good
 START_SPIN_BEARING = 40.
+
+# near the limit of when we can stop seeing the ball with our head down
+# alternatively, the angle from body center to outside corner of foot
+# to reduce bumping into ball
+# higher miht be good
 STOP_SPIN_BEARING = 75.
+
+# dist to end of feet plus extra buffer
 SAFE_BALL_REL_X = 18.
+
+# dist to end of feet (make sure we don't bump ball when spinning)
 SAFE_TO_SPIN_DIST = 15.
+
+# make sure we don't bump into ball when strafing towards it
 SAFE_TO_STRAFE_DIST = 20.
+
+
 # Values for controlling the strafing
 PFK_MAX_Y_SPEED = speeds.MAX_Y_SPEED
 PFK_MIN_Y_SPEED = speeds.MIN_Y_SPEED
@@ -52,6 +66,7 @@ def pfk_all(nav):
 
     target_y = ball.relY - y_offset
 
+    # arbitrary
     if fabs(target_y) < 1.0:
         sY = 0
     else:
@@ -64,6 +79,7 @@ def pfk_all(nav):
         return nav.goLater('pfk_final')
 
     x_diff = ball.relX - SAFE_BALL_REL_X
+    # arbitrary
     if fabs(x_diff) < 1.5:
         sX = 0.0
     else:
@@ -95,6 +111,7 @@ def pfk_xy(nav):
     (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
     target_y = ball.relY - y_offset
 
+    # arbitrary
     if fabs(target_y) < 1.0:
         sY = 0
     else:
@@ -104,6 +121,7 @@ def pfk_xy(nav):
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     x_diff = ball.relX - SAFE_BALL_REL_X
+    # arbitrary
     if fabs(x_diff) < 1.5:
         sX = 0.0
     else:
@@ -138,6 +156,7 @@ def pfk_final(nav):
 
     ball = nav.brain.ball
 
+    # arbitrary, worth checking against the values for pfk in players/
     if ball.dist > 25.:
         return nav.goNow('pfk_all')
 
@@ -145,6 +164,7 @@ def pfk_final(nav):
 
     x_diff = ball.relX - x_offset
 
+    # arbitrary
     if fabs(x_diff) < 1.:
         sX = 0.0
     else:
