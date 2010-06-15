@@ -5,7 +5,7 @@ class Sonar:
     def __init__(self):
         # Class constants
         self.UNKNOWN_VALUE = -1 #"unknown distance"
-        self.MIN_DIST = 0.0 # minimum readable distance in cm
+        self.MIN_DIST = 2.0 # minimum readable distance in cm
         self.MAX_DIST = 150.0 # maximum readable distance in cm
 
         self.leftDist = self.UNKNOWN_VALUE
@@ -17,6 +17,11 @@ class Sonar:
         """
         self.leftDist = sensors.ultraSoundDistanceLeft
         self.rightDist = sensors.ultraSoundDistanceRight
+
+        #check for sonar bug, print big warning
+        if (self.leftDist < self.MIN_DIST and
+            self.rightDist < self.MIN_DIST):
+            print "*\n*\n*  possible sonar problem, restart robot!! *\n*\n*"
 
         if (self.leftDist <= self.MIN_DIST or
             self.leftDist >= self.MAX_DIST):
