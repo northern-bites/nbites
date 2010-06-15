@@ -39,11 +39,6 @@ def afterKick(player):
             tracker.trackBall()
         return player.stay()
 
-    if player.chosenKick == SweetMoves.LEFT_SIDE_KICK or \
-            player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
-        player.inKickingState = False
-        return player.goLater('spinFindBall')
-
     if not player.brain.motion.isHeadActive():
         player.inKickingState = False
         return player.goLater('scanFindBall')

@@ -37,29 +37,8 @@ def chase(player):
         return player.goNow('scanFindBall')
 
 def chaseAfterKick(player):
-    if player.firstFrame():
-
-        player.brain.tracker.trackBall()
-
-        if player.chosenKick == SweetMoves.LEFT_FAR_KICK or \
-                player.chosenKick == SweetMoves.RIGHT_FAR_KICK:
-            return player.goLater('chase')
-
-        if player.chosenKick == SweetMoves.LEFT_SIDE_KICK:
-            turnDir = constants.TURN_RIGHT
-
-        elif player.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
-            turnDir = constants.TURN_LEFT
-
-        player.setWalk(0, 0, turnDir * constants.BALL_SPIN_SPEED)
-        return player.stay()
-
-    if player.brain.ball.framesOn > constants.BALL_ON_THRESH:
-        return player.goLater('chase')
-    elif player.counter > constants.CHASE_AFTER_KICK_FRAMES:
-        return player.goLater('spinFindBall')
-    return player.stay()
-
+    player.brain.tracker.trackBall()
+    return player.goLater('chase')
 
 def approachBall(player):
     """
@@ -109,14 +88,10 @@ def positionForKick(player):
 
     if player.firstFrame():
         player.brain.kickDecider.decideKick()
-        player.chosenKick = player.brain.kickDecider.currentKick.sweetMove
         player.brain.nav.kickPosition()
         player.inKickingState = True
 
-    if transitions.shouldActiveLoc(player):
-        player.brain.tracker.activeLoc()
-    else:
-        player.brain.tracker.trackBall()
+    player.brain.tracker.trackBall()
 
     # Leave this state if necessary
     if transitions.shouldKick(player):
