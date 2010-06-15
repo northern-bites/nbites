@@ -40,7 +40,7 @@ def getOmniWalkParam(my, dest):
     spinGain = constants.GOTO_SPIN_GAIN
     hDiff = MyMath.sub180Angle(dest.h - my.h)
 
-    if (hDiff < 2.0):
+    if (fabs(hDiff) < 2.0):
         sTheta = 0.0
     else:
         sTheta = MyMath.sign(hDiff) * getRotScale(hDiff) * \
@@ -66,7 +66,7 @@ def getWalkSpinParam(my, dest):
     # calculate ideal max forward speed
     sX = constants.GOTO_FORWARD_SPEED * relX
 
-    if (bearingDeg < 2.0):
+    if (fabs(bearingDeg) < 2.0):
         sTheta = 0.0
     else:
         # calculate ideal max spin speed
@@ -110,7 +110,7 @@ def getWalkStraightParam(my, dest):
 
     bearingDeg= my.getRelativeBearing(dest)
 
-    if (bearingDeg < 2.0):
+    if (fabs(bearingDeg) < 2.0):
         sTheta = 0.0
     else:
         sTheta = MyMath.clip(MyMath.sign(bearingDeg) *
@@ -127,7 +127,7 @@ def getSpinOnlyParam(my, dest):
     # see if getRotScale can go faster
 
     headingDiff = my.getRelativeBearing(dest)
-    if (headingDiff < 2.0):
+    if (fabs(headingDiff) < 2.0):
         sTheta = 0.0
     else:
         sTheta = MyMath.sign(headingDiff) * constants.GOTO_SPIN_SPEED * \
