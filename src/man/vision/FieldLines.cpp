@@ -2270,7 +2270,7 @@ list< VisualCorner > FieldLines::intersectLines()
 			}
 
 			if (dangerousEdgeCorner(c, intersection) &&
-				c.getShape() != CIRCLE){
+                c.getShape() != CIRCLE){
 				if (debugIntersectLines){
 					cout << "Tossed a corner that may be a" <<
 						" CC near the screen edge" << endl;
@@ -2858,7 +2858,7 @@ const bool FieldLines::dangerousEdgeCorner(const VisualCorner& corner,
 
     // Minimum amount that must be green in order to accept this line, otherwise
     // it may be a false ID
-    static const float MAX_NON_GREEN_PERCENT = .5f;
+    static const float MAX_NON_GREEN_PERCENT = .25f;
 
 	// if we are near any edge, but not near enough to toss the point
 	// look out for a line continuation
@@ -2906,15 +2906,21 @@ const bool FieldLines::dangerousEdgeCorner(const VisualCorner& corner,
         return false;
     }
     if (corner.getShape() == T) {
+        const point<int> stemEnd = corner.getTStemEndpoint();
+
         // If the Stem of the TCorner is pointing into the danger zone, then
         // we'll probably just hit the stem while doing on search
-        if ((corner.getTStem()->getLeftEndpoint().x < LEFT_BORDER &&
+        if ((stemEnd.x < LEFT_BORDER &&
+             stemEnd.x < intersection.x &&
              intersection.x < LEFT_BORDER) ||
-            (corner.getTStem()->getRightEndpoint().x > RIGHT_BORDER &&
+            (stemEnd.x > RIGHT_BORDER &&
+             stemEnd.x > intersection.x &&
              intersection.x > RIGHT_BORDER) ||
-            (corner.getTStem()->getTopEndpoint().x < TOP_BORDER &&
+            (stemEnd.x < TOP_BORDER &&
+             stemEnd.x < intersection.x &&
              intersection.x < TOP_BORDER) ||
-            (corner.getTStem()->getBottomEndpoint().x > BOTTOM_BORDER &&
+            (stemEnd.x > BOTTOM_BORDER &&
+             stemEnd.x > intersection.x &&
              intersection.x > BOTTOM_BORDER)) {
             return false;
         }
@@ -3927,6 +3933,9 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
 						  const point<int>& line1Closer,
 						  const point<int>& line2Closer)
 {
+    if (c.getShape() != T)
+        return false;
+
 	int tX = line2Closer.x, tY = line2Closer.y;
 	if (c.getTStem()->getStartpoint().x == i->getStartpoint().x) {
 		tX = line1Closer.x;

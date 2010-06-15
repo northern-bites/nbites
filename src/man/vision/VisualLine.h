@@ -99,9 +99,9 @@ public:
     static const linePoint DUMMY_LINEPOINT;
 
     // Returns true if the line is more vertical on the screen than horizontal
-	const bool isVerticallyOriented();
+	const bool isVerticallyOriented() const;
 
-	const bool isPerfectlyVertical();
+	const bool isPerfectlyVertical() const;
 
     // Given a line, returns (a, b) where the line can be represented by
     // ai + bj (i being the unit vector parallel to the x axis, j being
@@ -186,6 +186,7 @@ public:
     inline const float getAngle() const;
     inline const float getAvgHorizontalWidth() const;
     inline const float getAvgVerticalWidth() const;
+    inline const float getAvgWidth() const; // Returns width based on orientation
     inline const float getBearing() const;
     inline const float getBearingSD() const;
     inline const float getDistance() const;
@@ -285,6 +286,12 @@ inline const float VisualLine::getAvgVerticalWidth() const
 inline const float VisualLine::getAvgHorizontalWidth() const
 {
     return avgHorizontalWidth;
+}
+
+inline const float VisualLine::getAvgWidth() const
+{
+    return (isVerticallyOriented() ?
+            getAvgHorizontalWidth() : getAvgVerticalWidth());
 }
 
 inline const point<int> VisualLine::getStartpoint() const

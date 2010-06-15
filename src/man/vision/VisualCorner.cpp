@@ -1,4 +1,5 @@
 #include "VisualCorner.h"
+#include <math.h>
 using namespace std;
 using namespace boost;
 
@@ -53,13 +54,16 @@ VisualCorner::VisualCorner(const VisualCorner& other)
  * constructed in FieldLines::interesctLines()
  */
 void VisualCorner::determineCornerShape() {
-    if (Utility::tValueInMiddleOfLine(t1, line1->getLength(), MIN_EXTEND_DIST)) {
+    if (Utility::tValueInMiddleOfLine(t1, line1->getLength(),
+                                      max(line2->getAvgWidth(),
+                                          MIN_EXTEND_DIST))) {
         cornerType = T;
         tBar = line1;
         tStem = line2;
         setID(T_CORNER);
     } else if(Utility::tValueInMiddleOfLine(t2, line2->getLength(),
-                                            MIN_EXTEND_DIST)) {
+                                            max(line1->getAvgWidth(),
+                                                MIN_EXTEND_DIST))) {
         cornerType = T;
         tBar = line2;
         tStem = line1;
@@ -425,4 +429,13 @@ setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
     }
     if (updated.size() > 0)
         possibleCorners = updated;
+}
+
+/**
+ * Returns the endpoint of the TStem which is farther from
+ * the corner. So the base of the stem, basically.
+ */
+const point<int> VisualCorner::getTStemEndpoint() const
+{
+    return Utility::getPointFartherFromCorner(*getTStem(), getX(), getY());
 }

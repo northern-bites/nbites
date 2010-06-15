@@ -244,8 +244,11 @@ public:
 
     static const float distBetween(const point<int>& p1,
                             const point<int>& p2){
-        return hypotf(p1.x - p2.x, p1.y - p2.y);
+        return hypotf(static_cast<float>(p1.x - p2.x),
+                      static_cast<float>(p1.y - p2.y));
     }
+
+    static float distToLine(const VisualLine& line, const point<int>& point);
 
 };
 

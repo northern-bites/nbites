@@ -282,12 +282,12 @@ const float VisualLine::calculateAngle() const
 
 // We define a line to be vertically oriented if the change in y is bigger
 // than the change in x
-const bool VisualLine::isVerticallyOriented()
+const bool VisualLine::isVerticallyOriented() const
 {
     return rightBound - leftBound < bottomBound - topBound;
 }
 
-const bool VisualLine::isPerfectlyVertical()
+const bool VisualLine::isPerfectlyVertical() const
 {
     return rightBound == leftBound;
 }
