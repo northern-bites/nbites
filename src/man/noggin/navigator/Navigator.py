@@ -52,10 +52,11 @@ class Navigator(FSA.FSA):
         """
         self.switchTo('walkSpinToBall')
 
-    def kickPosition(self):
+    def kickPosition(self, kick):
         """
         state to align on the ball once we are near it
         """
+        self.kick = kick
         self.switchTo('pfk_all')
 
     def positionPlaybook(self):

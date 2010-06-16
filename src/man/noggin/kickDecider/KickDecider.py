@@ -82,6 +82,7 @@ class KickDecider(object):
         print "my.x:%g my.y:%g my.h:%g" % (self.brain.my.x, self.brain.my.y, self.brain.my.h)
 
         self.brain.out.printf(self.currentKick)
+        return self.currentKick
 
     def getObjective(self):
         """

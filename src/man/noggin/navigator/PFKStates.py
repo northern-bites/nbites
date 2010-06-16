@@ -54,7 +54,7 @@ def pfk_all(nav):
         nav.stopY_Theta = 0
         print "entered from: ", nav.lastDiffState
 
-    (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
+    (x_offset, y_offset, heading) = nav.kick.getPosition()
 
     ball = nav.brain.ball
 
@@ -88,7 +88,7 @@ def pfk_all(nav):
        ((MyMath.sign(ball.bearing) != MyMath.sign(hDiff))
             or ball.relX < SAFE_BALL_REL_X \
             or sTheta == 0.0):
-            return nav.goNow('pfk_xy')
+        return nav.goNow('pfk_xy')
 
     target_y = ball.relY - y_offset
 
@@ -141,7 +141,7 @@ def pfk_xy(nav):
         return nav.goNow('pfk_all')
     """
 
-    (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
+    (x_offset, y_offset, heading) = nav.kick.getPosition()
     target_y = ball.relY - y_offset
 
     # arbitrary
@@ -195,20 +195,7 @@ def pfk_final(nav):
 
     print "ball distance in final: ", ball.dist
 
-    # something has gone wrong, maybe the ball was moved?
-    if (ball.dist > PFK_BALL_CLOSE_ENOUGH or
-        ball.framesOff > PFK_BALL_VISION_FRAMES):
-        nav.ballTooFar += 1
-        if nav.ballTooFar > BUFFER_FRAMES_THRESHOLD:
-            print "pfk_final: too far away, deciding new kick"
-            nav.brain.kickDecider.decideKick()
-            nav.stopTheta = 0
-            nav.stopY_Theta = 0
-            return nav.goNow('chaseBall')
-    else:
-        nav.ballTooFar = 0
-
-    (x_offset, y_offset, heading) = nav.brain.kickDecider.currentKick.getPosition()
+    (x_offset, y_offset, heading) = nav.kick.getPosition()
 
     x_diff = ball.relX - x_offset
 

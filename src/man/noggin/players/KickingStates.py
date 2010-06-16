@@ -25,8 +25,6 @@ def afterKick(player):
     State to follow up after a kick.
     Currently exits after one frame.
     """
-    tracker = player.brain.tracker
-
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
         player.hasAlignedOnce = False
@@ -36,7 +34,7 @@ def afterKick(player):
             return player.goLater('penaltyKickRelocalize')
 
         if player.brain.ball.on:
-            tracker.trackBall()
+            player.brain.tracker.trackBall()
         return player.stay()
 
     if not player.brain.motion.isHeadActive():

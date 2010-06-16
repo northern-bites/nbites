@@ -1,11 +1,7 @@
 """
 Here we house all of the state methods used for chasing the ball
 """
-from man.noggin.util import MyMath
-from man.motion import SweetMoves
-import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
-import KickingHelpers
 import GoalieTransitions as goalTran
 from ..playbook.PBConstants import GOALIE
 
@@ -77,17 +73,31 @@ def approachBall(player):
 
     return player.stay()
 
+PFK_BALL_CLOSE_ENOUGH = 30
+PFK_BALL_VISION_FRAMES = 15
+BUFFER_FRAMES_THRESHOLD = 3
+
 def positionForKick(player):
     """
     State to align on the ball once we are near it
     """
 
     if player.firstFrame():
-        player.brain.kickDecider.decideKick()
-        player.brain.nav.kickPosition()
+        kick = player.brain.kickDecider.decideKick()
+        player.brain.nav.kickPosition(kick)
         player.inKickingState = True
+        player.ballTooFar = 0
 
     player.brain.tracker.trackBall()
+
+    # something has gone wrong, maybe the ball was moved?
+    if (player.brain.ball.dist > PFK_BALL_CLOSE_ENOUGH or
+        player.brain.ball.framesOff > PFK_BALL_VISION_FRAMES):
+        player.ballTooFar += 1
+        if player.ballTooFar > BUFFER_FRAMES_THRESHOLD:
+            return player.goNow('chase')
+    else:
+        player.ballTooFar = 0
 
     # Leave this state if necessary
     if transitions.shouldKick(player):
@@ -131,7 +141,7 @@ def approachDangerousBall(player):
         player.stopWalking()
     #print "approach dangerous ball"
     #single steps towards ball and goal with spin
-    player.setSteps(0, 0, 0, 0)
+    player.stopWalking()
 
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')
