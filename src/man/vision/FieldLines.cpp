@@ -2897,16 +2897,16 @@ const bool FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Close
 											  const point<int>& intersection,
 											  const int& numChecksPassed) const
 {
-	float percent1 = percentSurrounding((line1Closer.x + intersection.x)/2,
-										(line1Closer.y + intersection.y)/2,
-										FIELD_COLORS,
-										NUM_FIELD_COLORS,
-										1);
-	float percent2 = percentSurrounding((line2Closer.x + intersection.x)/2,
-										(line2Closer.y + intersection.y)/2,
-										FIELD_COLORS,
-										NUM_FIELD_COLORS,
-										1);
+	const float percent1 = percentSurrounding((line1Closer.x + intersection.x)/2,
+                                              (line1Closer.y + intersection.y)/2,
+                                              FIELD_COLORS,
+                                              NUM_FIELD_COLORS,
+                                              1);
+	const float percent2 = percentSurrounding((line2Closer.x + intersection.x)/2,
+                                              (line2Closer.y + intersection.y)/2,
+                                              FIELD_COLORS,
+                                              NUM_FIELD_COLORS,
+                                              1);
 	if (debugIntersectLines)
 		cout << "Percent green in between line 1 and corner: "
 			 << percent1 << ". between line 2 --- : " << percent2
