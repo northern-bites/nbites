@@ -163,7 +163,7 @@ void FieldLines::lineLoop()
 	fitUnusedPoints(linesList, unusedPointsList);
 	PROF_EXIT(profiler,P_FIT_UNUSED);
 
-	//removeDuplicateLines();
+	removeDuplicateLines();
 
 	PROF_ENTER(profiler,P_INTERSECT_LINES);
     cornersList = intersectLines();
@@ -2018,7 +2018,7 @@ void FieldLines::removeDuplicateLines()
 				// Check if the two lines lie very close to each other
 				const BoundingBox box1 = Utility::
 					getBoundingBox(**j,
-								   INTERSECT_MAX_ORTHOGONAL_EXTENSION,
+                                   (*j)->getAvgWidth(),
 								   INTERSECT_MAX_PARALLEL_EXTENSION);
 
 				const bool box1Contains = Utility::
@@ -2041,7 +2041,7 @@ void FieldLines::removeDuplicateLines()
 				} else {
 					const BoundingBox box1 = Utility::
 						getBoundingBox(**i,
-									   INTERSECT_MAX_ORTHOGONAL_EXTENSION,
+									   (*i)->getAvgWidth(),
 									   INTERSECT_MAX_PARALLEL_EXTENSION);
 					const bool box1Contains = Utility::
 						boxContainsPoint(box1,
@@ -2053,10 +2053,10 @@ void FieldLines::removeDuplicateLines()
 										 (*j)->getEndpoint().y);
 
 					if (box1Contains || box1Contains2) {
-						if (debugIntersectLines) {
+                        if (debugIntersectLines) {
 							cout  << "Found duplicate line 2 - removing "
 								  << endl;
-						}
+                        }
 						j = linesList.erase(j);
 						break;
 					}
