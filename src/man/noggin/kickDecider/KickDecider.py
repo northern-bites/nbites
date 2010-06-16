@@ -50,7 +50,8 @@ class KickDecider(object):
         # need to consider: distance to kick, time needed to align for kick
         # prioritize time to align
         # calculate bearing to dest
-        bearing = self.brain.my.getRelativeBearing(self.kickDest)
+        bearing = MyMath.sub180Angle(self.brain.ball.headingTo(self.kickDest) -
+                                     self.brain.my.h)
         print "bearing: %g" % bearing
         if fabs(bearing) >= 75.:
             print "kick sideways"
