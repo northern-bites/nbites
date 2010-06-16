@@ -42,7 +42,7 @@ def chaseAfterKick(player):
 
 def approachBall(player):
     """
-    Once we are alligned with the ball, approach it
+    Once we are aligned with the ball, approach it
     """
     if player.firstFrame():
         player.brain.nav.chaseBall()
@@ -58,18 +58,14 @@ def approachBall(player):
            player.brain.ball.inOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
 
-    elif transitions.shouldKick(player):
-        return player.goNow('waitBeforeKick')
+    elif player.brain.play.isRole(GOALIE) and goalTran.dangerousBall(player):
+        return player.goNow('approachDangerousBall')
 
-    elif player.brain.play.isRole(GOALIE):
-        if goalTran.dangerousBall(player):
-            return player.goNow('approachDangerousBall')
+    elif transitions.shouldDribble(player):
+        return player.goNow('dribble')
 
-    else:
-        if transitions.shouldDribble(player):
-            return player.goNow('dribble')
-
-    if transitions.shouldPositionForKick(player):
+    elif transitions.shouldKick(player) or \
+             transitions.shouldPositionForKick(player):
         return player.goNow('positionForKick')
 
     if player.brain.tracker.activeLocOn:
@@ -97,7 +93,7 @@ def positionForKick(player):
     if transitions.shouldKick(player):
         return player.goNow('kickBallExecute')
 
-    elif transitions.shouldScanFindBallActiveLoc(player):
+    elif transitions.shouldScanFindBall(player):
         player.inKickingState = False
         return player.goLater('scanFindBall')
 
@@ -127,13 +123,6 @@ def dribble(player):
         elif transitions.shouldApproachBall(player):
             return player.goNow('approachBall')
 
-    return player.stay()
-
-def steps(player):
-    if player.brain.nav.isStopped():
-        player.setSteps(3,3,0,5)
-    elif player.brain.nav.currentState != "stepping":
-        player.stopWalking()
     return player.stay()
 
 # TODO
