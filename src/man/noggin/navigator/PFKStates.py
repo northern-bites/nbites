@@ -59,7 +59,7 @@ def pfk_all(nav):
     ball = nav.brain.ball
 
     # calculate spin speed
-    #hDiff = MyMath.sub180Angle(nav.brain.my.h - heading)
+    # hDiff = MyMath.sub180Angle(heading - nav.brain.my.h)
     # rotate to ball here, we will strafe to aim kick later
     hDiff = MyMath.sub180Angle(ball.bearing)
 
