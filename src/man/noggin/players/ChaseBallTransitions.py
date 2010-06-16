@@ -11,13 +11,7 @@ def shouldApproachBall(player):
     Begin walking to the ball if it is close to straight in front of us
     """
     ball = player.brain.ball
-    return (ball.framesOn > 1)
-
-def shouldApproachBallWithLoc(player):
-    return player.brain.ball.on and \
-        player.brain.my.locScore >= NogginConstants.OK_LOC and \
-        constants.USE_LOC_CHASE and \
-        player.brain.ball.dist > 30
+    return (ball.framesOn > 0)
 
 def shouldApproachFromPositionForKick(player):
     """
@@ -26,15 +20,7 @@ def shouldApproachFromPositionForKick(player):
     ball = player.brain.ball
     return shouldApproachBall(player) and \
         not shouldPositionForKick(player) and \
-        ball.dist > 50.0
-
-def shouldTurnToBallFromPositionForKick(player):
-    """
-    Walk to the ball if its too far away
-    """
-    ball = player.brain.ball
-    return (fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH +
-            constants.POSITION_FOR_KICK_BEARING_THRESH)
+        ball.dist > 30.0
 
 def shouldPositionForKick(player):
     """
@@ -47,25 +33,6 @@ def shouldPositionForKick(player):
             constants.BALL_POS_KICK_MIN_X and \
             ball.bearing < constants.POSITION_FOR_KICK_BEARING_THRESH)
 
-def shouldPositionForKickFromApproachLoc(player):
-    return shouldPositionForKick(player) and \
-        player.atHeading()
-
-def shouldRepositionForKick(player):
-    """
-    Stop waiting for kick and realign on the ball instead
-    """
-    ball = player.brain.ball
-    return (ball.relX > constants.BALL_KICK_LEFT_X_FAR )
-
-
-def shouldApproachForKick(player):
-    """
-    While positioning for kick, we need to walk forward
-    """
-    ball = player.brain.ball
-    return False
-
 def shouldKick(player):
     """
     Ball is in the correct foot position to kick
@@ -74,23 +41,22 @@ def shouldKick(player):
     return player.brain.nav.isStopped() and \
         player.counter > 1
 
-
 def shouldDribble(player):
     """
     Ball is in between us and the opp goal, let's dribble for a while
     """
-    my = player.brain.my
-    dribbleAimPoint = helpers.getShotCloseAimPoint(player)
-    goalBearing = my.getRelativeBearing(dribbleAimPoint)
-    return  (constants.USE_DRIBBLE and
-             not player.penaltyKicking and
-             0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
-             0 < fabs(player.brain.ball.relY) < constants.SHOULD_DRIBBLE_Y and
-             fabs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING and
-             not player.brain.my.inOppGoalbox() and
-             player.brain.my.x > (
-            NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
-            NogginConstants.GREEN_PAD_X) )
+    if constants.USE_DRIBBLE:
+        my = player.brain.my
+        dribbleAimPoint = helpers.getShotCloseAimPoint(player)
+        goalBearing = my.getRelativeBearing(dribbleAimPoint)
+        return  (not player.penaltyKicking and
+                 0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
+                 0 < fabs(player.brain.ball.relY) < constants.SHOULD_DRIBBLE_Y and
+                 fabs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING and
+                 not player.brain.my.inOppGoalbox() and
+                 player.brain.my.x > (
+                     NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
+                     NogginConstants.GREEN_PAD_X) )
 
 def shouldStopDribbling(player):
     """
@@ -163,8 +129,3 @@ def shouldStopPenaltyKickDribbling(player):
 
 def inPenaltyKickStrikezone(player):
     return (NogginConstants.OPP_GOALBOX_LEFT_X + 75. < player.brain.my.x)
-
-def shouldNotApproachWithLocAnymore(player):
-    return (player.brain.my.locScoreFramesBad > constants.APPROACH_NO_LOC_THRESH
-            and
-            player.brain.ball.dist > constants.APPROACH_NO_MORE_LOC_DIST )
