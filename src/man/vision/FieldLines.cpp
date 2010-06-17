@@ -2898,7 +2898,7 @@ const bool FieldLines::areLineEndsCloseEnough(shared_ptr<VisualLine> i,
 	if (!(box1Contains && box2Contains)) {
 		if (debugIntersectLines) {
 			cout <<"\t" << numChecksPassed
-				 << "-Point was not contained in both bounding boxes."
+				 << " - Point was not contained in both bounding boxes."
 				 << endl;
 		}
 		return false;
@@ -3035,6 +3035,11 @@ const bool FieldLines::dangerousEdgeCorner(const VisualCorner& corner,
             return false;
         }
     }
+
+    startX = max(0, startX);
+    startY = max(0, startY);
+    endX = min(IMAGE_WIDTH - 1, endX);
+    endY = min(IMAGE_HEIGHT - 1, endY);
 
     int numPixelsSeen = 0;
 	for (int dy = startY; dy < endY ; dy+=PIXELS_TO_SKIP){

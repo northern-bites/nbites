@@ -788,7 +788,7 @@ float Utility::getGroundAngle(const VisualLine& line1, const VisualLine& line2)
 {
     const float angle = NBMath::subPIAngle( fabs(line1.getBearing() -
                                                  line2.getBearing()));
-    return min(M_PI_FLOAT - angle, angle);
+    return min(fabs(M_PI_FLOAT - angle), fabs(angle));
 }
 
 bool Utility::areAcrossLine(const VisualLine& line, const point<int>& p1,

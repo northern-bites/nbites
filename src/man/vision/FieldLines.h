@@ -107,8 +107,8 @@ private:
     ////////////////////////////////////////////////////////////
 
     // AIBO_SPECIFIC
-    static const int MIN_PIXEL_WIDTH_FOR_GREEN_CHECK = 2;
-    static const int MIN_SEPARATION_TO_NOT_CHECK = 10;
+    static const int MIN_PIXEL_WIDTH_FOR_GREEN_CHECK = 5;
+    static const int MIN_SEPARATION_TO_NOT_CHECK = 20;
     // AIBOSPECIFIC
     // Two line points must have at least this Euclidean distance between
     // them in order for us to check their angle
