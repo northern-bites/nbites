@@ -184,7 +184,7 @@ void Cross::checkForX(Blob b) {
                                                             (*k)->getStartpoint(),
                                                             (*k)->getEndpoint());
 
-            if (foo.first != NO_INTERSECTION && foo.second != NO_INTERSECTION) {
+            if (foo.first != Utility::NO_INTERSECTION && foo.second != Utility::NO_INTERSECTION) {
                 if (CROSSDEBUG)
                     cout << "Throwing out blob that is part of a line" << endl;
                 return;

@@ -168,8 +168,8 @@ const shape VisualCorner::getLClassification() {
                         cornerLocation,
                         dogLocation);
     // Lines are parallel..
-    if ((intersection.x == NO_INTERSECTION) &&
-        (intersection.y == NO_INTERSECTION))
+    if ((intersection.x == Utility::NO_INTERSECTION) &&
+        (intersection.y == Utility::NO_INTERSECTION))
         return OUTER_L;
 
     int otherLineMinX = min(line1End.x, line2End.x);

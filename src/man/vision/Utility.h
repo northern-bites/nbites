@@ -1,11 +1,7 @@
 #ifndef Utility_hpp_DEFINED
 #define Utility_hpp_DEFINED
 
-
-
 #include <cmath>          // Uses fabs, trig functions like atan
-
-#define NO_INTERSECTION -13591295
 
 class Utility;
 #include "Common.h"
@@ -26,6 +22,7 @@ class Utility {
 
 public:
 
+    static const int NO_INTERSECTION = -13591295;
 
     // The following 5 methods come from Joseph O'Rourke's Computational
     // Geometry in C book, published in 1998.
@@ -57,6 +54,8 @@ public:
     // p.30.
     static const bool intersectProp(const point<int> &a, const point<int> &b,
                                     const point<int> &c, const point<int> &d);
+
+    static const bool intersectProp(const VisualLine& line1, const VisualLine& line2);
 
     static const point<int> getPointFartherFromCorner(const VisualLine &l, int cornerX, int cornerY);
 
@@ -93,6 +92,9 @@ public:
 
     static float getAngle(const VisualLine& line1);
 
+    static float getAbsoluteAngle(const point<int>& intersection,
+                                  const VisualLine& line1,
+                                  const VisualLine& line2);
 
     // get y-coord with given x-coord, slope, and y-intercept
     static int getLineY(int x, float y_intercept, float slope);
@@ -242,13 +244,10 @@ public:
                              const point<int>& p1,
                              const point<int>& p2);
 
-    static const float distBetween(const point<int>& p1,
-                            const point<int>& p2){
-        return hypotf(static_cast<float>(p1.x - p2.x),
-                      static_cast<float>(p1.y - p2.y));
-    }
-
     static float distToLine(const VisualLine& line, const point<int>& point);
+
+    static point<int> getClosestPointOnLine(const VisualLine& line,
+                                            const point<int>& pt);
 
 };
 

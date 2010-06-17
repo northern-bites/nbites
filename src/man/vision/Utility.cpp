@@ -138,6 +138,11 @@ const bool Utility::intersectProp(const point<int> &a, const point<int> &b,
         && (left(c,d,a) ^ left(c,d,b));
 }
 
+const bool Utility::intersectProp(const VisualLine& line1, const VisualLine& line2)
+{
+    return intersectProp(line1.getStartpoint(), line1.getEndpoint(),
+                         line2.getStartpoint(), line2.getEndpoint());
+}
 
 
 // get slope given x1,y1 and x2,y2
@@ -207,9 +212,7 @@ const float Utility::getLength(const point <int> &p1,
 					  static_cast<float>(p2.y) );
 }
 
-
-
-// get angle between two lines
+// get acute angle between two lines
 // http://www.tpub.com/math2/5.htm
 float Utility::getAngle(const VisualLine& line1, const VisualLine& line2) {
     const float denom = (1 + line1.getSlope() * line2.getSlope());
@@ -222,6 +225,25 @@ float Utility::getAngle(const VisualLine& line1, const VisualLine& line2) {
             return -M_PI_FLOAT * 0.5f * TO_DEG;
     }
     return TO_DEG * atan(quotient);
+}
+
+float Utility::getAbsoluteAngle(const point<int>& intersection,
+                                const VisualLine& line1,
+                                const VisualLine& line2)
+{
+    const point<int> end1 = getPointFartherFromCorner(line1,
+                                                      intersection.x,
+                                                      intersection.y);
+
+    const point<int> end2 = getPointFartherFromCorner(line2,
+                                                      intersection.x,
+                                                      intersection.y);
+
+    const float a = getLength(intersection, end1);
+    const float b = getLength(intersection, end2);
+    const float c = getLength(end1, end2);
+
+    return acos((a*a + b*b - c*c)/(2*a*b)) * TO_DEG;
 }
 
 float Utility::getAngle(int x1, int y1, int x2, int y2) {
@@ -760,10 +782,13 @@ const point<int> Utility::findCloserEndpoint(const VisualLine& line,
 	}
 }
 
+// Returns the angle in the world frame of the two lines.
+// Always returns a value between 0 and PI/2
 float Utility::getGroundAngle(const VisualLine& line1, const VisualLine& line2)
 {
-    return M_PI_FLOAT - NBMath::subPIAngle( fabs(line1.getBearing() -
+    const float angle = NBMath::subPIAngle( fabs(line1.getBearing() -
                                                  line2.getBearing()));
+    return min(M_PI_FLOAT - angle, angle);
 }
 
 bool Utility::areAcrossLine(const VisualLine& line, const point<int>& p1,
@@ -783,6 +808,12 @@ bool Utility::areAcrossLine(const VisualLine& line, const point<int>& p1,
 // from http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
 float Utility::distToLine(const VisualLine& line, const point<int>& pt)
 {
+    return getLength(getClosestPointOnLine(line, pt) , pt);
+}
+
+point<int> Utility::getClosestPointOnLine(const VisualLine& line,
+                                         const point<int>& pt)
+{
     const point<int> start = line.getStartpoint();
     const point<int> end = line.getEndpoint();
 
@@ -797,5 +828,5 @@ float Utility::distToLine(const VisualLine& line, const point<int>& pt)
                             static_cast<int>(
                                 static_cast<float>(start.y) +
                                 u * static_cast<float>(end.y - start.y)));
-    return distBetween(close, pt);
+    return close;
 }

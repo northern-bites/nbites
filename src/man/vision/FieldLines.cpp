@@ -638,8 +638,7 @@ void FieldLines::createLines(list <linePoint> &linePoints)
         // debug print
         if (debugCreateLines) {
             cout << "MAIN LOOP: Scanning for potential line #" << lines.size() <<
-                " with Point #" << counter << " (" << firstPoint->x
-                 << ", " << firstPoint->y << ")" << endl;
+                " with Point #" << counter << *firstPoint << endl;
         }
 
         list<linePointNode> legitimateLinePoints;
@@ -673,7 +672,8 @@ void FieldLines::createLines(list <linePoint> &linePoints)
             if (debugCreateLines)
                 cout << "\tSecond loop: " << " --- lineEndpointX: "
                      << lineEndpointX << " lineEndpointY: " << lineEndpointY
-                     << " NEW POINT: x: " << pointX << " y: " << pointY << endl;
+                     << " NEW POINT: x: " << pointX << " y: " << pointY <<
+                    " width: " << currentPoint->lineWidth << endl;
 
             ///// SECOND LOOP SANITY CHECKS //////
             // SANITY CHECK: X OFFSET
@@ -848,9 +848,13 @@ void FieldLines::joinLines()
 
     // Compare every pair of lines and merge pairs of lines if they are
     // close enough
-    for (vector < shared_ptr<VisualLine> >::iterator i = linesList.begin(); i != linesList.end();
+    for (vector < shared_ptr<VisualLine> >::iterator i = linesList.begin();
+         i != linesList.end();
          ++i) {
-        for (vector <shared_ptr<VisualLine> >::iterator j = i + 1; j != linesList.end(); ++j) {
+        for (vector <shared_ptr<VisualLine> >::iterator j = i + 1;
+             // Need to check i, since we might increment that too
+             j != linesList.end() && i != linesList.end();
+             ++j) {
             const string iColor = (*i)->getColorString();
             const string jColor = (*j)->getColorString();
 
@@ -862,14 +866,20 @@ void FieldLines::joinLines()
             // ANGLE sanity check
             // Vertical lines get an angle of 90 but near vertical lines often
             // have an angle of maybe -88 or something.  This is a workaround
-            const float angleBetween = min(fabs((*i)->getAngle() - (*j)->getAngle()),
-                                           fabs(180-(fabs((*i)->getAngle()-(*j)->getAngle()))));
-            if (angleBetween > MAX_ANGLE_TO_JOIN_LINES) {
-                if (MIN_ANGLE_TO_JOIN_CC_LINES < angleBetween &&
-                    angleBetween < MAX_ANGLE_TO_JOIN_CC_LINES &&
-                    fabs(Utility::getGroundAngle(**i, **j) - M_PI_FLOAT/2) >
-                    MAX_NON_PERP_ANGLE) {
+            const point<int> intersection = Utility::getIntersection(**i, **j);
 
+            if (intersection.x == Utility::NO_INTERSECTION)
+                continue;
+
+            const float angleBetween = Utility::getAbsoluteAngle(intersection,
+                                                                 **i, **j);
+            if (angleBetween > MAX_ANGLE_TO_JOIN_LINES &&
+                angleBetween < 180 - MAX_ANGLE_TO_JOIN_LINES) {
+
+                if (120 < angleBetween &&
+                    angleBetween < 170 &&
+                    (fabs(Utility::getGroundAngle(**i, **j) - M_PI_FLOAT/2)
+                     < MAX_NON_PERP_ANGLE)){
                     // The two lines possibly lie on the center circle
                     isCCLine = true;
                     if (debugJoinLines) {
@@ -898,48 +908,50 @@ void FieldLines::joinLines()
                 }
             }
 
+            if (!Utility::intersectProp(**i, **j)){
 
-            // DISTANCE sanity check: even if two lines have a very small angle
-            // between them, they might not be legitimately part of the same
-            // line; it could be the case that we have two parallel lines that
-            // lie apart on the screen
+                    // DISTANCE sanity check: even if two lines have a very small angle
+                    // between them, they might not be legitimately part of the same
+                    // line; it could be the case that we have two parallel lines that
+                    // lie apart on the screen
 
-            // Evaluate the value of the line i at j's start point to determine
-            // how far away the line deviates
-			const point<int> jStart = (*j)->getStartpoint();
-			const float jDistFromI =
-				Utility::getPointDeviation(**i, jStart.x, jStart.y);
+                    // Evaluate the value of the line i at j's start point to determine
+                    // how far away the line deviates
+                    const point<int> jStart = (*j)->getStartpoint();
+                    const float jDistFromI =
+                        Utility::getPointDeviation(**i, jStart.x, jStart.y);
 
-            // Evaluate the value of the line j at i's start point to determine
-            // how far away the line deviates
-			const point<int> iStart = (*i)->getStartpoint();
-            const float iDistFromJ = Utility::getPointDeviation(**j,
-																iStart.x,
-																iStart.y);
+                    // Evaluate the value of the line j at i's start point to determine
+                    // how far away the line deviates
+                    const point<int> iStart = (*i)->getStartpoint();
+                    const float iDistFromJ = Utility::getPointDeviation(**j,
+                                                                        iStart.x,
+                                                                        iStart.y);
 
-            const double avg = (jDistFromI + iDistFromJ) / 2.0;
-            // We allow more error in creating cc lines
-            if (isCCLine) {
-                if (avg > MAX_DIST_BETWEEN_TO_JOIN_CC_LINES) {
-                    if (debugJoinLines) {
-                        cout << "\tDistance from line sanity check failed: "
-                             << "lines had a difference of " << avg
-                             << " between them; "
-                             << "the max difference allowed for CC lines is "
-                             << MAX_DIST_BETWEEN_TO_JOIN_CC_LINES << endl;
+                    const double avg = (jDistFromI + iDistFromJ) / 2.0;
+                    // We allow more error in creating cc lines
+                    if (isCCLine) {
+                        if (avg > MAX_DIST_BETWEEN_TO_JOIN_CC_LINES) {
+                            if (debugJoinLines) {
+                                cout << "\tDistance from line sanity check failed: "
+                                     << "lines had a difference of " << avg
+                                     << " between them; "
+                                     << "the max difference allowed for CC lines is "
+                                     << MAX_DIST_BETWEEN_TO_JOIN_CC_LINES << endl;
+                            }
+                            continue;
+                        }
+                    } else if (jDistFromI > MAX_DIST_BETWEEN_TO_JOIN_LINES ||
+                               iDistFromJ > MAX_DIST_BETWEEN_TO_JOIN_LINES) {
+                        if (debugJoinLines) {
+                            cout << "\tDistance from line sanity check failed: lines "
+                                 << "had a difference of " << avg << " between them; "
+                                 << "the max difference allowed is "
+                                 << MAX_DIST_BETWEEN_TO_JOIN_LINES << endl;
+                        }
+                        continue;
                     }
-                    continue;
                 }
-            } else if (avg > MAX_DIST_BETWEEN_TO_JOIN_LINES) {
-                if (debugJoinLines) {
-                    cout << "\tDistance from line sanity check failed: lines "
-                         << "had a difference of " << avg << " between them; "
-                         << "the max difference allowed is "
-                         << MAX_DIST_BETWEEN_TO_JOIN_LINES << endl;
-                }
-                continue;
-            }
-
             // Passed all sanity checks
             if (debugJoinLines) {
                 cout << "\tPASSED all sanity checks; joining " << iColor
@@ -953,22 +965,33 @@ void FieldLines::joinLines()
             // recalculated the variables in the line struct
             const int oldColor = (*i)->getColor();
 
-            (*i)->addPoints( (*j)->getPoints() );
-            (*i)->setColor(oldColor);
-            if ((*j)->getCCLine() || (*i)->getCCLine()) {
-                (*i)->setCCLine(true);
-                if (debugJoinLines) {
-                    cout << "\tOne of the joined lines was already a CC line"
-                         << endl;
-                }
-            }
-            (*i)->setCCLine(isCCLine);
+            isCCLine = isCCLine || (*i)->getCCLine() || (*j)->getCCLine();
+
+
             ++numberOfJoinedLines;
             if (debugJoinLines)
                 drawSurroundingBox(*i, JOIN_LINES_BOX_COLOR );
-            // erase the redundant line and position our j pointer correctly
-            // tricky: do not change
-            j = linesList.erase(j) - 1;
+
+            if ((*i)->getLength() > (*j)->getLength()){
+                (*i)->addPoints( (*j)->getPoints() );
+                (*i)->setColor(oldColor);
+                (*i)->setCCLine(isCCLine);
+
+                // erase the redundant line and position our j pointer correctly
+                // tricky: do not change
+                j = linesList.erase(j) - 1;
+            } else {
+                (*j)->setColor(oldColor);
+                (*j)->addPoints((*i)->getPoints() );
+                (*j)->setCCLine(isCCLine);
+
+                // erase the redundant line and position our j pointer correctly
+                // _very_ tricky: do not change
+                i = linesList.erase(i);
+                if (i != linesList.begin())
+                    i--;
+                j = i;
+            }
         }
     }
 
@@ -1490,7 +1513,6 @@ shared_ptr<VisualLine> FieldLines::mergeLines(shared_ptr<VisualLine> line1,
 // line farther to both the right and the left in the case of mostly
 // horizontal lines, or to the top and bottom in the case of mostly
 // vertical lines
-// @TODO: document and improve these functions. Reduce code duplication.
 void FieldLines::extendLines(vector < shared_ptr<VisualLine> > &lines)
 {
     if (debugExtendLines) {
@@ -1578,7 +1600,6 @@ void FieldLines::extendLineVertScan(ExtendDirection _testDir,
     const float slope = line->getSlope();
     const float yIntercept = line->getYIntercept();
 
-    // @TODO Check out row skip values
     for (int curY = startY + scanDir * EXTEND_LINE_ROW_SKIP;
 		 scanDir * curY < scanDir * endY;
          curY += scanDir * EXTEND_LINE_ROW_SKIP) {
@@ -1626,8 +1647,6 @@ void FieldLines::extendLineVertScan(ExtendDirection _testDir,
 }
 
 // Currently not ready for prime time, I have some more work to do here.
-// @TODO Eliminate code duplication.
-// @TODO Make it work.
 void FieldLines::extendLineHorizontally(shared_ptr<VisualLine> line)
 {
     if (debugExtendLines) {
@@ -1691,7 +1710,6 @@ void FieldLines::extendLineHorizScan(ExtendDirection _testDir,
     const float slope = line->getSlope();
     const float yIntercept = line->getYIntercept();
 
-    // @TODO Check out col skip values
     int lastX = lastPoint.x;
     int lastY = lastPoint.y;
     for (int curX = startX + EXTEND_LINE_COL_SKIP;
@@ -2013,7 +2031,7 @@ void FieldLines::removeDuplicateLines()
             const float angleOnScreen = min(fabs((*i)->getAngle() - (*j)->getAngle()),
                                       fabs(180-(fabs((*i)->getAngle()-(*j)->getAngle()))));
 
-			if (angleOnScreen < OVERLAP || intersectX == NO_INTERSECTION) {
+			if (angleOnScreen < OVERLAP || intersectX == Utility::NO_INTERSECTION) {
 
 				// Check if the two lines lie very close to each other
 				const BoundingBox box1 = Utility::
@@ -2124,7 +2142,7 @@ list< VisualCorner > FieldLines::intersectLines()
                      << iColor << " and "  << jColor << " lines.." << endl;
             }
 
-            if (intersection.x == NO_INTERSECTION) {
+            if (intersection.x == Utility::NO_INTERSECTION) {
                 if (debugIntersectLines)
                     cout << "\t" << numChecksPassed
                          <<"- Lines are parallel. No intersection" << endl;
@@ -2730,10 +2748,10 @@ const bool FieldLines::doLinesCross(shared_ptr<VisualLine> i,
 							  const int& numChecksPassed) const
 {
 	if (Utility::tValueInMiddleOfLine(t_I, i->getLength(),
-									  static_cast<float>(
+                                      max(j->getAvgWidth(),
 										  MIN_CROSS_EXTEND)) &&
 		Utility::tValueInMiddleOfLine(t_J, j->getLength(),
-									  static_cast<float>(
+                                      max(i->getAvgWidth(),
 										  MIN_CROSS_EXTEND))) {
 		if (debugIntersectLines || debugCcScan){
 			cout <<"\t" << numChecksPassed
@@ -4038,76 +4056,92 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
 					   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
 					   INTERSECT_MAX_PARALLEL_EXTENSION -2);
 
-    static const float WIDTH_LIM = 1.5;
+    static const float WIDTH_LIM_MAX = 1.5;
+    static const float WIDTH_LIM_MIN = 0.3;
 
     int oppPointCount = 0;
     const point<int> stemEndpoint = c.getTStemEndpoint();
+    shared_ptr<VisualLine> stem = c.getTStem();
 
 	for (linePointNode firstPoint = unusedPointsList.begin();
 		 firstPoint != unusedPointsList.end(); firstPoint++) {
 
 
         if ((firstPoint->foundWithScan == VERTICAL &&
-             firstPoint->lineWidth > WIDTH_LIM * i->getAvgVerticalWidth()) ||
+
+             (firstPoint->lineWidth >
+              WIDTH_LIM_MAX * stem->getAvgVerticalWidth() ||
+
+              firstPoint->lineWidth <
+              WIDTH_LIM_MIN * stem->getAvgVerticalWidth())) ||
+
             (firstPoint->foundWithScan == HORIZONTAL &&
-             firstPoint->lineWidth > WIDTH_LIM * i->getAvgHorizontalWidth()) ||
-            (firstPoint->foundWithScan == VERTICAL &&
-             firstPoint->lineWidth > WIDTH_LIM * j->getAvgVerticalWidth()) ||
-            (firstPoint->foundWithScan == HORIZONTAL &&
-             firstPoint->lineWidth > WIDTH_LIM * j->getAvgHorizontalWidth())){
+
+             (firstPoint->lineWidth >
+             WIDTH_LIM_MAX * stem->getAvgHorizontalWidth()) ||
+
+             firstPoint->lineWidth <
+             WIDTH_LIM_MIN * stem->getAvgHorizontalWidth())){
+
+            if (debugIntersectLines){
+                cout << "Point " << *firstPoint << " is too wide."<< endl;
+            }
             continue;
         }
 
 
-		int pX = firstPoint->x;
-		int pY = firstPoint->y;
-		bool boxContains1 = Utility::
-			boxContainsPoint(box1c, pX, pY);
-		bool boxContains2 = Utility::
-			boxContainsPoint(box2c, pX, pY);
-		if (!(boxContains1 || boxContains2)) {
-			// get distance to the intersection
-			int diff = (pX - intersection.x) * (pX - intersection.x) +
-				(pY - intersection.y) * (pY - intersection.y);
-			// get distance to the nearest point on the stem
-			int diff2 = (pX - tX) * (pX - tX) + (pY - tY) * (pY - tY);
-			int distSq = static_cast<int>(firstPoint->lineWidth);
-			//diff = abs(diff - targetDist);
-			// idea - the point should also be about twice the distance to the line point
-			if (debugIntersectLines) {
-				cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
-					" " << distSq << endl;
-				cout << "Critical vals are: " << (distSq * distSq) << endl;
-			}
-			if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
-				diff > targetDist / 2 && diff > min(1600, distSq * distSq)) {
-				if (debugIntersectLines) {
-					cout << "Possible center intersection" << endl;
-				}
-				return true;
-			}
+		// int pX = firstPoint->x;
+		// int pY = firstPoint->y;
+		// bool boxContains1 = Utility::
+		// 	boxContainsPoint(box1c, pX, pY);
+		// bool boxContains2 = Utility::
+		// 	boxContainsPoint(box2c, pX, pY);
+		// if (!(boxContains1 || boxContains2)) {
+		// 	// get distance to the intersection
+		// 	int diff = (pX - intersection.x) * (pX - intersection.x) +
+		// 		(pY - intersection.y) * (pY - intersection.y);
+		// 	// get distance to the nearest point on the stem
+		// 	int diff2 = (pX - tX) * (pX - tX) + (pY - tY) * (pY - tY);
+		// 	int distSq = static_cast<int>(firstPoint->lineWidth);
+		// 	//diff = abs(diff - targetDist);
+		// 	// idea - the point should also be about twice the distance to the line point
+		// 	if (debugIntersectLines) {
+		// 		cout << "Testing with " << diff << " " << targetDist << " " << diff2 <<
+		// 			" " << distSq << endl;
+		// 		cout << "Critical vals are: " << (distSq * distSq) << endl;
+		// 	}
+		// 	if (diff < min(distSq * distSq * 9, 81000) && diff2 > targetDist  &&
+		// 		diff > targetDist / 2 && diff > min(1600, distSq * distSq)) {
+		// 		if (debugIntersectLines) {
+		// 			cout << "Possible center intersection" << endl;
+		// 		}
+		// 		return true;
+		// 	}
 
-		}
+		// }
         // Check if we can find a few stray points on the other side of
         // the TBar, relatively close.
         const point<int> strayPt(firstPoint->x, firstPoint->y);
         const int maxLineOffset = 100;
-        const int maxIntersectDist = 150;
-        const int minLineOffset = 8;
+        const int maxIntersectDist = 100;
+        const float minLineOffset = c.getTBar()->getAvgWidth()/3.0f;
 
         const float distFromLine = Utility::distToLine(*c.getTBar(), strayPt);
 
         if (Utility::areAcrossLine(*c.getTBar(), strayPt, stemEndpoint) &&
-            Utility::distBetween(intersection, strayPt) < maxIntersectDist &&
+            Utility::getLength(intersection, strayPt) < maxIntersectDist &&
             distFromLine < maxLineOffset &&
             distFromLine > minLineOffset){
 
             if (debugIntersectLines)
-                cout << endl<< "found point! " << *firstPoint << endl;
+                cout << endl<< "Found possible CC point at " << *firstPoint << endl;
 
             oppPointCount++;
         }
 	}
+    if (debugIntersectLines){
+        cout << "Found " << oppPointCount << " points across TCorner." << endl;
+    }
     if (oppPointCount >= 2)
         return true;
 	return false;
@@ -4166,11 +4200,14 @@ const bool FieldLines::dupeFakeCorner(const list<point<int> > &corners,
 									  const int x, const int y,
 									  const int testNumber) const
 {
+    const point<int> intersection(x,y);
 	unsigned int counter = 1;
 	for (list<point<int> >::const_iterator i = corners.begin();
 		 i != corners.end(); ++i, counter++) {
         if (abs(x - i->x) < DUPE_MIN_X_SEPARATION &&
-            abs(y - i->y) < DUPE_MIN_Y_SEPARATION && counter != corners.size()) {
+            abs(y - i->y) < DUPE_MIN_Y_SEPARATION &&
+            counter != corners.size() &&
+            getEstimatedDistance(*i, intersection) < DUPE_MIN_DIST_SEPARATION) {
             if (debugIntersectLines) {
                 cout <<"\t" << testNumber
                      << "-Failed due to duplication of fake corner " << *i
@@ -4182,7 +4219,6 @@ const bool FieldLines::dupeFakeCorner(const list<point<int> > &corners,
 
     return false;
 }
-
 
 // Tests all the pixels in a square centered at (x,y) which extends numPixels
 // in all directions.  Counts how many of those pixels are in the colors array
@@ -4402,10 +4438,8 @@ const bool FieldLines::linePointWidthsDifferent(const linePoint& last,
 {
     const static int MIN_WIDTH_DIFF = 2;
     const static int MAX_WIDTH_DIFF = 5;
-	const float lastPointDistance = pose->pixEstimate(last.x, last.y,
-												0).dist;
-	const float curPointDistance = pose->pixEstimate(current.x, current.y,
-											   0).dist;
+	const float lastPointDistance = last.distance;
+	const float curPointDistance = current.distance;
 
 	const float distanceDifference = curPointDistance - lastPointDistance;
 	const float lineWidthDifference = (current.lineWidth -

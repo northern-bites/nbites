@@ -177,7 +177,7 @@ private:
 
     static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 15;
     static const int LINE_HEIGHT = 0; // this refers to height off the ground
-    static const int MIN_CROSS_EXTEND = 10;
+    static const float MIN_CROSS_EXTEND = 10.0f;
     // When estimating the angle between two lines on the field, anything less
     // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
     // and disallowed; ideally our estimates would always be 1.57 radians
@@ -393,6 +393,7 @@ private:
     // Determines if the given L corner does not geometrically make sense for
     // its shape given the objects on the screen.
     const bool LCornerShouldBeTCorner(const VisualCorner &L) const;
+
 
     // In some Nao frames, robots obscure part of the goal and the bottom is not
     // visible.  We can only use pix estimates of goals whose bottoms are
