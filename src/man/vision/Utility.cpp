@@ -185,6 +185,16 @@ float Utility::getPointDeviation(const VisualLine &aLine, const linePoint &point
     return getPointDeviation(aLine, point.x, point.y);
 }
 
+
+// get length of line segment specified by (x1, y1), (x2, y2)
+const float Utility::getLength(const int x1, const int y1,
+                               const int x2, const int y2) {
+    return getLength( static_cast<float>(x1),
+					  static_cast<float>(y1),
+					  static_cast<float>(x2),
+					  static_cast<float>(y2) );
+}
+
 // get length of line segment specified by (x1, y1), (x2, y2)
 const float Utility::getLength(const float x1, const float y1,
                                const float x2, const float y2) {
@@ -211,6 +221,21 @@ const float Utility::getLength(const point <int> &p1,
 					  static_cast<float>(p2.x),
 					  static_cast<float>(p2.y) );
 }
+
+// get length of line segment specified by (x1, y1), (x2, y2)
+const float Utility::getLength2(const float x1, const float y1,
+                                const float x2, const float y2) {
+    return pow(y2-y1,2)+pow(x2-x1,2);
+}
+
+const float Utility::getLength2(const int x1, const int y1,
+                               const int x2, const int y2) {
+    return getLength2( static_cast<float>(x1),
+					  static_cast<float>(y1),
+					  static_cast<float>(x2),
+					  static_cast<float>(y2) );
+}
+
 
 // get acute angle between two lines
 // http://www.tpub.com/math2/5.htm
@@ -420,8 +445,9 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
         // Easy case, just add or subtract orthoBuff to x values, since
         // 90 degrees from a vertical line is simply up and down.  The paraBuff
         // serves to lengthen the y values.  Note:  since our coordinate system
-        // uses 0, 0 as top left corner, to increase the length of the line to the
-        // top, you *subtract*, whereas to extend on the bottom you *add*
+        // uses 0, 0 as top left corner, to increase the length of
+        // the line to the top, you *subtract*, whereas to
+        // extend on the bottom you *add*
         box.corners[0].x = x1 - orthoBuff;
         box.corners[0].y = top - paraBuff;
 
@@ -483,7 +509,7 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
     box.corners[0].x = x1 + static_cast<int>(deltaX - betaX);
     box.corners[0].y = y1 + static_cast<int>(deltaY - betaY);
 
-	box.corners[1].x = x1 + static_cast<int>(-deltaX - betaX);
+    box.corners[1].x = x1 + static_cast<int>(-deltaX - betaX);
     box.corners[1].y = y1 + static_cast<int>(-deltaY - betaY);
 
     box.corners[2].x = x2 + static_cast<int>(-deltaX + betaX);
@@ -503,10 +529,10 @@ BoundingBox Utility::getBoundingBox(int x1, int y1, int x2, int y2,
 BoundingBox Utility::getBoundingBox(const VisualLine& aLine,
                                     int orthogonalRadius,
                                     int parallelRadius) {
-	const point<int> start(aLine.getStartpoint());
-	const point<int> end(aLine.getEndpoint());
+    const point<int> start(aLine.getStartpoint());
+    const point<int> end(aLine.getEndpoint());
     return getBoundingBox(start.x, start.y,
-						  end.x, end.y,
+                          end.x, end.y,
                           orthogonalRadius, parallelRadius);
 }
 
@@ -519,7 +545,8 @@ BoundingBox Utility::getBoundingBox(const VisualLine& aLine,
 // line1start         the (x,y) coordinate of one of the endpoints of the line
 // line1end           the (x,y) coordinate of the second of the endpoints of
 //                    the line.
-// Returns (NO_INTERSECTION, NO_INTERSECTION) if no intersection, else (x, y) where x is x coord of
+// Returns (NO_INTERSECTION, NO_INTERSECTION) if no
+// intersection, else (x, y) where x is x coord of
 // intersection point, y is y coord.
 pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
                                           point <int> plumbBottom,
@@ -570,7 +597,8 @@ pair<int, int> Utility::plumbIntersection(point <int> plumbTop,
         intersection.first = plumbTop.x;
         intersection.second = static_cast<int>(y);
     }
-    // if y weren't in the range of the plumb line, then return NO_INTERSECTION, NO_INTERSECTION.
+    // if y weren't in the range of the plumb line,
+    // then return NO_INTERSECTION, NO_INTERSECTION.
     return intersection;
 }
 
@@ -590,7 +618,7 @@ float Utility::findLinePointDistanceFromStart(const point <int> &p,
                                               const VisualLine &aLine) {
 
     return findLinePointDistanceFromStart(p, aLine.getStartpoint(),
-										  aLine.getEndpoint(),
+                                          aLine.getEndpoint(),
                                           aLine.getLength());
 }
 
@@ -664,7 +692,8 @@ int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
     int i, j, c = 0;
     for (i = 0, j = nvert-1; i < nvert; j = i++) {
         if ( ((verty[i]>testy) != (verty[j]>testy)) &&
-             (testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
+             (testx < (vertx[j]-vertx[i]) * (testy-verty[i])
+              / (verty[j]-verty[i]) + vertx[i]) )
             c = !c;
     }
     return c;
@@ -672,18 +701,18 @@ int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
 
 bool Utility::boxContainsPoint(BoundingBox box, int x, int y) {
     float xCoords[] = { static_cast<float>(box.corners[0].x),
-						static_cast<float>(box.corners[1].x),
-						static_cast<float>(box.corners[2].x),
-						static_cast<float>(box.corners[3].x) };
+                        static_cast<float>(box.corners[1].x),
+                        static_cast<float>(box.corners[2].x),
+                        static_cast<float>(box.corners[3].x) };
 
     float yCoords[] = { static_cast<float>(box.corners[0].y),
-						static_cast<float>(box.corners[1].y),
-						static_cast<float>(box.corners[2].y),
-						static_cast<float>(box.corners[3].y) };
+                        static_cast<float>(box.corners[1].y),
+                        static_cast<float>(box.corners[2].y),
+                        static_cast<float>(box.corners[3].y) };
     // pnpoly returns 1 iff point is within the polygon described
     return static_cast<bool>(pnpoly(4, xCoords, yCoords,
-									static_cast<float>(x),
-									static_cast<float>(y)));
+                                    static_cast<float>(x),
+                                    static_cast<float>(y)));
 }
 
 
@@ -764,22 +793,22 @@ const string Utility::getDistCertaintyString(int _cert) {
 }
 
 const point<int> Utility::findCloserEndpoint(const VisualLine& line,
-											 const point<int>& intersection)
+                                             const point<int>& intersection)
 {
-	const point<int> start(line.getStartpoint());
-	const point<int> end(line.getEndpoint());
-	if (Utility::getLength(static_cast<float>(intersection.x),
-						   static_cast<float>(intersection.y),
-						   static_cast<float>(start.x),
-						   static_cast<float>(start.y) ) <
-		Utility::getLength(static_cast<float>(intersection.x),
-						   static_cast<float>(intersection.y),
-						   static_cast<float>(end.x),
-						   static_cast<float>(end.y)) ) {
-		return start;
-	} else {
-		return end;
-	}
+    const point<int> start(line.getStartpoint());
+    const point<int> end(line.getEndpoint());
+    if (Utility::getLength(static_cast<float>(intersection.x),
+                           static_cast<float>(intersection.y),
+                           static_cast<float>(start.x),
+                           static_cast<float>(start.y) ) <
+        Utility::getLength(static_cast<float>(intersection.x),
+                           static_cast<float>(intersection.y),
+                           static_cast<float>(end.x),
+                           static_cast<float>(end.y)) ) {
+        return start;
+    } else {
+        return end;
+    }
 }
 
 // Returns the angle in the world frame of the two lines.
@@ -829,4 +858,26 @@ point<int> Utility::getClosestPointOnLine(const VisualLine& line,
                                 static_cast<float>(start.y) +
                                 u * static_cast<float>(end.y - start.y)));
     return close;
+}
+
+// Returns the location of the closest line point on the given
+// line to the given point. Could be an endpoint or anywhere in between.
+point<int> Utility::getClosestLinePoint(const VisualLine& line,
+                                        const point<int>& pt)
+{
+    const vector<linePoint> points = line.getPoints();
+    vector<linePoint>::const_iterator i;
+
+    // No point is this far away...@TODO make it nicer
+    float minDist = 99999999;
+    point<int> closest;
+    for (i = points.begin(); i != points.end(); ++i){
+        const float length = getLength(i->x, i->y, pt.x, pt.y);
+        if ( length < minDist){
+            minDist = length;
+            closest.x = i->x;
+            closest.y = i->y;
+        }
+    }
+    return closest;
 }

@@ -287,9 +287,9 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points)
 													  distance, width)) {
 
                             // assign x, y, lineWidth
-                            linePoint point(x, linePointY,
-											static_cast<float>(width),
-											distance, bearing, VERTICAL);
+                            const linePoint point(x, linePointY,
+                                                  static_cast<float>(width),
+                                                  distance, bearing, VERTICAL);
                             if (debugVertEdgeDetect) {
                                 cout << "\t\t\tPoint " << point
                                      << " passed all checks!" << endl;
@@ -428,16 +428,16 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
     }
 
     // Slope is in image coordinates; a negative slope rises to the right
-    float horizonSlope = pose->getHorizonSlope();
+    const float horizonSlope = pose->getHorizonSlope();
     bool startAtHorizon = false;
     if (horizonSlope < 0) {
         startAtHorizon = true;
     }
     // scan bottom to top
-    int poseHorizon = min(pose->getHorizonY(0),
+    const int poseHorizon = min(pose->getHorizonY(0),
                           pose->getHorizonY(IMAGE_WIDTH - 1));
-    int visualHorizon = vision->thresh->getVisionHorizon();
-    int highestPoint = max(0, min(poseHorizon, visualHorizon));
+    const int visualHorizon = vision->thresh->getVisionHorizon();
+    const int highestPoint = max(0, min(poseHorizon, visualHorizon));
     for (int y = IMAGE_HEIGHT - 1; y > highestPoint; y -= ROW_SKIP) {
 
         int greenWhiteX = NO_EDGE;
@@ -456,11 +456,12 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
         // Start 1 pixel from left so we can test the pixel before to determine
         // starting edge value
         for (int x = 1; x < IMAGE_WIDTH - 1; x++) {
-            int current_y_value = vision->thresh->getY(x,y);
-            int thresholdedColor = vision->thresh->thresholded[y][x];
+            const int current_y_value = vision->thresh->getY(x,y);
+            const int thresholdedColor = vision->thresh->thresholded[y][x];
 
-            bool isAtAnUphillEdge = isUphillEdge(current_y_value, last_y_value,
-                                                 HORIZONTAL);
+            const bool isAtAnUphillEdge = isUphillEdge(current_y_value,
+                                                       last_y_value,
+                                                       HORIZONTAL);
             // Do some checks before we actively search for edges
             if (haveFound(greenWhiteX)) {
 
@@ -479,8 +480,8 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
 
                         // SANITY CHECK: lines have a much bigger width when
                         // they are up close
-                        int linePointX = (whiteGreenX + greenWhiteX) / 2;
-                        int width = whiteGreenX - greenWhiteX;
+                        const int linePointX = (whiteGreenX + greenWhiteX) / 2;
+                        const int width = whiteGreenX - greenWhiteX;
 						const estimate pixEst = pose->pixEstimate(linePointX,
 																  y, 0);
                         const float distance = pixEst.dist;
@@ -488,9 +489,9 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
                         if (isReasonableHorizontalWidth(linePointX, y, distance,
                                                         width)) {
                             // assign x, y, lineWidth
-                            linePoint point(linePointX, y,
-                                            static_cast<float>(width)
-											, distance, bearing, HORIZONTAL);
+                            const linePoint point(linePointX, y,
+                                                  static_cast<float>(width),
+                                                  distance, bearing, HORIZONTAL);
                             if (debugHorEdgeDetect) {
                                 cout << "\t\tPoint " << point << " accepted."
                                      << endl;
@@ -581,7 +582,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
                 if (haveFound(greenWhiteX)) {
                     // point position would be midway between left and right
                     // edge
-                    int potentialMidpointX = (greenWhiteX + x) / 2;
+                    const int potentialMidpointX = (greenWhiteX + x) / 2;
                     if (isWhiteGreenEdge(x, y, potentialMidpointX,HORIZONTAL)) {
                         // Even if we had already found a right edge, this one
                         // might be more suitable.
@@ -796,8 +797,8 @@ void FieldLines::createLines(list <linePoint> &linePoints)
             VisualLine::NUM_POINTS_TO_BE_VALID_LINE)
             firstPoint++;
         else {
-			shared_ptr<VisualLine> aLine(new VisualLine(legitimateLinePoints));
-			setLineCoordinates(aLine);
+            shared_ptr<VisualLine> aLine(new VisualLine(legitimateLinePoints));
+            setLineCoordinates(aLine);
             if (debugCreateLines) {
                 cout << "\tSecond loop: adding line " << lines.size()
                      << " with " << legitimateLinePoints.size()
@@ -876,8 +877,8 @@ void FieldLines::joinLines()
             if (angleBetween > MAX_ANGLE_TO_JOIN_LINES &&
                 angleBetween < 180 - MAX_ANGLE_TO_JOIN_LINES) {
 
-                if (120 < angleBetween &&
-                    angleBetween < 170 &&
+                if (MIN_ANGLE_TO_JOIN_CC_LINES < angleBetween &&
+                    angleBetween < MAX_ANGLE_TO_JOIN_CC_LINES &&
                     (fabs(Utility::getGroundAngle(**i, **j) - M_PI_FLOAT/2)
                      < MAX_NON_PERP_ANGLE)){
                     // The two lines possibly lie on the center circle
@@ -1237,6 +1238,8 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
 
 
             if (sanityChecksPass) {
+                if (debugFitUnusedPoints)
+                    cout << "Fit point " << *j << " to line " << **i << endl;
                 foundAdditionalPoints = true;
                 additionalPoints.push_back(*j);
                 if (j->foundWithScan == VERTICAL) {
@@ -1432,7 +1435,8 @@ void FieldLines::setLineCoordinates(shared_ptr<VisualLine> aLine)
 
 	const point<int> imgStart = aLine->getStartpoint();
 	const estimate startEst = pose->pixEstimate(imgStart.x, imgStart.y, 0.0f);
-	const linePoint startPt(imgStart.x, imgStart.y, 0.0, startEst.dist, startEst.bearing);
+	const linePoint startPt(imgStart.x, imgStart.y, 0.0,
+                            startEst.dist, startEst.bearing);
 
 	const point<int> imgEnd = aLine->getEndpoint();
 	const estimate endEst = pose->pixEstimate(imgEnd.x, imgEnd.y, 0.0f);
@@ -1767,6 +1771,13 @@ FieldLines::shouldStopExtendingLine(const int oldX, const int oldY,
                                     const int newX, const int newY) const
 {
 
+    static const int MAX_EXTEND_LENGTH_BETWEEN_POINTS = 40;
+
+    if (Utility::getLength(oldX, oldY, newX, newY) >
+        MAX_EXTEND_LENGTH_BETWEEN_POINTS){
+        return true;
+    }
+
     // A point off screen means that any extending we continue to do in that
     // direction will also yield points that are off screen
     if (!Utility::isPointOnScreen(newX, newY)) {
@@ -1797,23 +1808,6 @@ FieldLines::shouldStopExtendingLine(const int oldX, const int oldY,
     }
     return false;
 }
-
-// Helper method that just returns whether the thresholded color is a
-// line color
-const bool FieldLines::isLineColor(const int color)
-{
-    return Utility::isElementInArray(color, LINE_COLORS, NUM_LINE_COLORS);
-}
-
-// Helper method that just returns whether the thresholded color is a
-// green color
-const bool FieldLines::isGreenColor(int threshColor)
-{
-    return Utility::isElementInArray(threshColor, FIELD_COLORS,
-                                     NUM_GREEN_COLORS);
-}
-
-
 
 // Given an (x, y) location and a direction (horizontal or vertical) in which
 // to look, attempts to find edges on either side of the (x,y) location.  If
@@ -2116,7 +2110,8 @@ list< VisualCorner > FieldLines::intersectLines()
     int numDupes = 0;
 
     if (standardView) {
-        for (vector < shared_ptr<VisualLine> >::iterator i = linesList.begin(); i != linesList.end();
+        for (vector < shared_ptr<VisualLine> >::iterator i = linesList.begin();
+             i != linesList.end();
              ++i) {
             drawSurroundingBox(*i, BLACK);
             drawFieldLine(*i, (*i)->getColor());
@@ -2216,11 +2211,17 @@ list< VisualCorner > FieldLines::intersectLines()
             const point<int> line2Closer =
 				Utility::findCloserEndpoint(**j, intersection);
 
+
+            const point<int> line1Closest =
+                Utility::getClosestLinePoint(**i, intersection);
+            const point<int> line2Closest =
+                Utility::getClosestLinePoint(**j, intersection);
+
             if (debugIntersectLines)
                 cout << "Corner is close to line endpoint " << line1Closer
                      << " and " << line2Closer << endl;
 
-			if (tooMuchGreenEndpointToCorner(line1Closer, line2Closer,
+			if (tooMuchGreenEndpointToCorner(line1Closest, line2Closest,
 											 intersection, numChecksPassed) ){
 				continue;
 			}
@@ -2910,39 +2911,40 @@ const bool FieldLines::areLineEndsCloseEnough(shared_ptr<VisualLine> i,
  * Ensure that there is not too much green between the endpoints of the lines
  * and the corner itself.
  */
-const bool FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
-											  const point<int>& line2Closer,
-											  const point<int>& intersection,
-											  const int& numChecksPassed) const
+const bool
+FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
+                                         const point<int>& line2Closer,
+                                         const point<int>& intersection,
+                                         const int& numChecksPassed) const
 {
-	const float percent1 = percentSurrounding((line1Closer.x + intersection.x)/2,
-                                              (line1Closer.y + intersection.y)/2,
-                                              FIELD_COLORS,
-                                              NUM_FIELD_COLORS,
-                                              1);
-	const float percent2 = percentSurrounding((line2Closer.x + intersection.x)/2,
-                                              (line2Closer.y + intersection.y)/2,
-                                              FIELD_COLORS,
-                                              NUM_FIELD_COLORS,
-                                              1);
-	if (debugIntersectLines)
-		cout << "Percent green in between line 1 and corner: "
-			 << percent1 << ". between line 2 --- : " << percent2
-			 << endl;
+    const float percent1 = percentColorBetween(intersection.x, intersection.y,
+                                               line1Closer.x, line1Closer.y,
+                                               FIELD_COLORS,
+                                               NUM_FIELD_COLORS);
 
-	const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 50.0f;
-	if (percent1 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE ||
-		percent2 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE) {
-		if (debugIntersectLines) {
-			cout <<"\t" << numChecksPassed
-				 << "-There was too much green between the corner and"
-				" the endpoints of the two lines." << endl;
-			cout << "\t " << "b/w corner and line1: " << percent1
-				 << "\t " << " and line 2: " << percent2 << endl;
-		}
-		return true;
-	}
-	return false;
+    const float percent2 = percentColorBetween(intersection.x, intersection.y,
+                                               line2Closer.x, line2Closer.y,
+                                               FIELD_COLORS,
+                                               NUM_FIELD_COLORS);
+
+    if (debugIntersectLines)
+        cout << "Percent green in between line 1 and corner: "
+             << percent1 << ". between line 2 --- : " << percent2
+             << endl;
+
+    const float MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE = 51.0f;
+    if (percent1 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE ||
+        percent2 > MAX_PERCENT_GREEN_BETWEEN_CORNER_LINE) {
+        if (debugIntersectLines) {
+            cout <<"\t" << numChecksPassed
+                 << "-There was too much green between the corner and"
+                " the endpoints of the two lines." << endl;
+            cout << "\t " << "b/w corner and line1: " << percent1
+                           << "\t " << " and line 2: " << percent2 << endl;
+        }
+        return true;
+    }
+    return false;
 }
 
 // Checks if a corner is too dangerous when it is near the edge of the screen
@@ -2960,7 +2962,7 @@ const bool FieldLines::dangerousEdgeCorner(const VisualCorner& corner,
     static const int BOTTOM_BORDER = IMAGE_HEIGHT - DANGER_ZONE;
 
     static const int BADCOUNT = 50;
-	// These are half the depth of the box we scan (avoids a division)
+    // These are half the depth of the box we scan (avoids a division)
     static const int HALF_WIDTH_TO_SCAN = 10;
     static const int HALF_DEPTH_TO_SCAN = 10;
 
@@ -2970,14 +2972,14 @@ const bool FieldLines::dangerousEdgeCorner(const VisualCorner& corner,
     // it may be a false ID
     static const float MAX_NON_GREEN_PERCENT = .25f;
 
-	// if we are near any edge, but not near enough to toss the point
-	// look out for a line continuation
-	// simply scan from the point to the edge looking for white
-	int nonGreenCount = 0;
-	int startX = 0;
-	int startY = 0;
-	int endX = 0;
-	int endY = 0;
+    // if we are near any edge, but not near enough to toss the point
+    // look out for a line continuation
+    // simply scan from the point to the edge looking for white
+    int nonGreenCount = 0;
+    int startX = 0;
+    int startY = 0;
+    int endX = 0;
+    int endY = 0;
 
     if (intersection.x < AUTO_FAIL_ZONE ||
         intersection.y < AUTO_FAIL_ZONE ||
@@ -2986,33 +2988,33 @@ const bool FieldLines::dangerousEdgeCorner(const VisualCorner& corner,
         return true;
     }
 
-	if (intersection.x < DANGER_ZONE){
+    if (intersection.x < DANGER_ZONE){
 
-		startX = 0;
-		endX = intersection.x-1;
+        startX = 0;
+        endX = intersection.x-1;
 
-		startY = intersection.y - HALF_DEPTH_TO_SCAN;
-		endY = intersection.y + HALF_DEPTH_TO_SCAN;
+        startY = intersection.y - HALF_DEPTH_TO_SCAN;
+        endY = intersection.y + HALF_DEPTH_TO_SCAN;
 
-	} else if ( intersection.x > IMAGE_WIDTH - DANGER_ZONE) {
-		startX = intersection.x+1;
-		endX = IMAGE_WIDTH-1;
+    } else if ( intersection.x > IMAGE_WIDTH - DANGER_ZONE) {
+        startX = intersection.x+1;
+        endX = IMAGE_WIDTH-1;
 
-		startY = intersection.y - HALF_DEPTH_TO_SCAN;
-		endY = intersection.y + HALF_DEPTH_TO_SCAN;
-	} else if (intersection.y < DANGER_ZONE){
-		startX = intersection.x - HALF_WIDTH_TO_SCAN;
-		endX = intersection.x + HALF_WIDTH_TO_SCAN;
+        startY = intersection.y - HALF_DEPTH_TO_SCAN;
+        endY = intersection.y + HALF_DEPTH_TO_SCAN;
+    } else if (intersection.y < DANGER_ZONE){
+        startX = intersection.x - HALF_WIDTH_TO_SCAN;
+        endX = intersection.x + HALF_WIDTH_TO_SCAN;
 
-		startY = 0;
-		endY = intersection.y - 1;
-	} else if(intersection.y > IMAGE_HEIGHT - DANGER_ZONE) {
-		startX = intersection.x - HALF_WIDTH_TO_SCAN;
-		endX = intersection.x + HALF_WIDTH_TO_SCAN;
+        startY = 0;
+        endY = intersection.y - 1;
+    } else if(intersection.y > IMAGE_HEIGHT - DANGER_ZONE) {
+        startX = intersection.x - HALF_WIDTH_TO_SCAN;
+        endX = intersection.x + HALF_WIDTH_TO_SCAN;
 
-		startY = intersection.y + 1;
-		endY = IMAGE_HEIGHT -1;
-	} else {                    // Intersection is not in a danger zone
+        startY = intersection.y + 1;
+        endY = IMAGE_HEIGHT -1;
+    } else {                    // Intersection is not in a danger zone
         return false;
     }
     if (corner.getShape() == T) {
@@ -3479,24 +3481,14 @@ const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
 	// If we have already one good distance between this corner and a
 	// field object, we only require that the next objects have a small
 	// relative error.
-	const float MAX_RELATIVE_ERROR = 20.0f;
+	const float MAX_RELATIVE_ERROR = 70.0f;
 	const float USE_RELATIVE_DISTANCE = 250.0f;
+    const float MAX_ABSOLUTE_ERROR = 200.f;
 
-    if (absoluteError < getAllowedDistanceError(k)) {
-		if (debugIdentifyCorners) {
-			cout << "\tDistance between " << j->toString() << " and "
-				 << k->toString() << " too large." << endl
-				 << "\tReal: " << realDistance
-				 << "\tEstimated: " << estimatedDistance << endl
-				 << "\tAbsolute error: " << absoluteError
-				 << "\tRelative error: " << relativeErrorReal << "% , "
-				 << relativeErrorReal << "%"
-				 << endl;
-		}
-		return false;
-    } else if ( relativeErrorReal < MAX_RELATIVE_ERROR &&
-                k->getDistance() > USE_RELATIVE_DISTANCE &&
-                distToCorner > USE_RELATIVE_DISTANCE) {
+    if ( relativeErrorReal < MAX_RELATIVE_ERROR &&
+         k->getDistance() > USE_RELATIVE_DISTANCE &&
+         distToCorner > USE_RELATIVE_DISTANCE &&
+         absoluteError < MAX_ABSOLUTE_ERROR) {
 		if (debugIdentifyCorners) {
 			cout << "\tDistance between " << j->toString() << " and "
 				 << k->toString() << " was fine! Relative error of "
@@ -3509,15 +3501,28 @@ const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
 				 << k->getFieldY() << endl;
 		}
 		return true;
+    } else if (absoluteError > getAllowedDistanceError(k) ||
+        absoluteError > MAX_ABSOLUTE_ERROR) {
+		if (debugIdentifyCorners) {
+			cout << "\tDistance between " << j->toString() << " and "
+				 << k->toString() << " too large." << endl
+				 << "\tReal: " << realDistance
+				 << "\tEstimated: " << estimatedDistance << endl
+				 << "\tAbsolute error: " << absoluteError
+				 << "\tRelative error: " << relativeErrorReal << "% , "
+				 << relativeErrorReal << "%"
+				 << endl;
+		}
+		return false;
     } else {
 		if (debugIdentifyCorners) {
 			cout << "\tDistance between " << j->toString() << " and "
 				 << k->toString() << " was fine! Absolute error of "
 				 << absoluteError
 				 << " corner pos: (" << j->getFieldX() << ","
-				 << j->getFieldY()
+				 << j->getFieldY() << ")"
 				 << " goal pos: (" << k->getFieldX() << ","
-				 << k->getFieldY() << endl;
+				 << k->getFieldY() << ")" << endl;
 		}
 		return true;
 	}
@@ -4061,8 +4066,8 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
 					   INTERSECT_MAX_ORTHOGONAL_EXTENSION -2,
 					   INTERSECT_MAX_PARALLEL_EXTENSION -2);
 
-    static const float WIDTH_LIM_MAX = 1.5;
-    static const float WIDTH_LIM_MIN = 0.3;
+    static const float WIDTH_LIM_MAX = 1.5f;
+    static const float WIDTH_LIM_MIN = 0.3f;
 
     int oppPointCount = 0;
     const point<int> stemEndpoint = c.getTStemEndpoint();
@@ -4083,10 +4088,10 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
             (firstPoint->foundWithScan == HORIZONTAL &&
 
              (firstPoint->lineWidth >
-             WIDTH_LIM_MAX * stem->getAvgHorizontalWidth()) ||
+             WIDTH_LIM_MAX * stem->getAvgHorizontalWidth() ||
 
-             firstPoint->lineWidth <
-             WIDTH_LIM_MIN * stem->getAvgHorizontalWidth())){
+              firstPoint->lineWidth <
+              WIDTH_LIM_MIN * stem->getAvgHorizontalWidth()))){
 
             if (debugIntersectLines){
                 cout << "Point " << *firstPoint << " is too wide."<< endl;
@@ -4385,6 +4390,152 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
     return ( static_cast<float> (numFound) /
 			 static_cast<float> (totalPixels) * 100.0f );
 }
+
+const float FieldLines::isColorBetween(const int x1, const int y1,
+                                       const int x2, const int y2,
+                                       const int longestHoleAllowed,
+                                       const int color) const
+{
+    const int colors[] = {color};
+    return isColorBetween(x1,y1,x2,y2,longestHoleAllowed,colors,1);
+}
+
+const bool FieldLines::isColorBetween(const int x1, const int y1,
+                                      const int x2, const int y2,
+                                      const int longestHoleAllowed,
+                                      const int colors[],
+                                      const int numColors) const
+{
+    static const int SCAN_RADIUS = 1; // 3 pixels wide, thus
+    int numHoles = 0;
+
+    // Vertical line
+    if (x2 == x1) {
+        int sign = 1;
+        if (y2 < y1)
+            sign = -1;
+        for (int j = y1; j != y2; j += sign) {
+            bool foundInLine = false;
+            for (int testX = x2 - SCAN_RADIUS; testX <= x2 + SCAN_RADIUS; ++testX){
+                if (Utility::isElementInArray(vision->thresh->thresholded[j][x2],
+                                              colors, numColors)) {
+                    foundInLine = true;
+                }
+            }
+
+            if (!foundInLine){
+                if (debugCreateLines){
+                    cout << "Not enough color between (" << x1
+                         << ", " << y1 << ") & (" << x2 << ", " << y2 << ")" << endl;
+                }
+                numHoles++;
+                if (numHoles > longestHoleAllowed)
+                    return false;
+            } else {
+                numHoles = 0;
+            }
+        }
+    } else {
+
+        float slope = static_cast<float>(y2 - y1) /
+            static_cast<float>(x2 - x1);
+        int sign = 1;
+
+        // If the line is vertically oriented
+        if ((abs(y2 - y1)) > (abs(x2 - x1))) {
+            slope = 1.0f / slope;
+            if (y1 > y2) sign = -1;
+
+            for (int i = y1; i != y2; i += sign) {
+
+                bool foundInLine = false;
+
+                int newX = x1 +
+					static_cast<int>( (slope * static_cast<float>(i - y1)) );
+                for (int testX = newX - SCAN_RADIUS; testX <= newX + SCAN_RADIUS; ++testX){
+
+                    if (Utility::isElementInArray(vision->thresh->
+                                                  thresholded[i][testX],
+                                                  colors, numColors)){
+                        foundInLine = true;
+                        break;
+                    }
+                }
+            if (!foundInLine){
+                if (debugCreateLines){
+                    cout << "Not enough color between (" << x1
+                         << ", " << y1 << ") & (" << x2 << ", " << y2 << ")" << endl;
+                }
+                numHoles++;
+                if (numHoles > longestHoleAllowed)
+                    return false;
+            } else {
+                numHoles = 0;
+            }            }
+        } else if (slope != 0) {
+            //slope = 1.0 / slope;
+            if (x1 > x2) sign = -1;
+            for (int i = x1; i != x2; i += sign) {
+                bool foundInLine = false;
+
+                int newY = y1 +
+					static_cast<int>( (slope * static_cast<float>(i - x1)) );
+                for (int testY = newY - SCAN_RADIUS; testY <= newY + SCAN_RADIUS; ++testY){
+                    if (Utility::isElementInArray(vision->thresh->
+                                              thresholded[testY][i],
+                                                  colors, numColors)){
+                        foundInLine = true;
+                        break;
+                    }
+                }
+                if (!foundInLine){
+                    if (debugCreateLines){
+                        cout << "Not enough color between (" << x1
+                             << ", " << y1 << ") & (" << x2 << ", " << y2 << ")" << endl;
+                    }
+                    numHoles++;
+                    if (numHoles > longestHoleAllowed)
+                        return false;
+                } else {
+                    numHoles = 0;
+                }
+            }
+        }
+        // horizontal line, slope == 0
+        else {
+            int startX = min(x1,x2);
+            int endX = max(x1,x2);
+            for (int i = startX; i <= endX; ++i) {
+                bool foundInLine = false;
+                for (int testY = y2 - SCAN_RADIUS; testY <= y2 + SCAN_RADIUS; ++testY){
+                    if (Utility::isElementInArray(vision->thresh->
+                                                  thresholded[testY][i],
+                                                  colors, numColors)){
+                        foundInLine = true;
+                        break;
+                    }
+                }
+                if (!foundInLine){
+                    if (debugCreateLines){
+                        cout << "Not enough color between (" << x1
+                             << ", " << y1 << ") & (" << x2 << ", " << y2 << ")" << endl;
+                    }
+                    numHoles++;
+                    if (numHoles > longestHoleAllowed)
+                        return false;
+                } else {
+                    numHoles = 0;
+                }
+            }
+        }
+    }
+    if (debugCreateLines){
+        cout << "ENOUGH color between (" << x1
+             << ", " << y1 << ") & (" << x2 << ", " << y2 << ")" << endl;
+    }
+    return true;
+}
+
 
 
 const float FieldLines::percentColor(const int x, const int y,

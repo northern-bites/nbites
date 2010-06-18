@@ -390,6 +390,9 @@ void VisualLine::setBearingWithSD(float _bearing)
 void VisualLine::
 setPossibleLines( list <const ConcreteLine*> _possibleLines)
 {
+    if (_possibleLines.empty()){
+        return;
+    }
     list<const ConcreteLine*> updated(0);
 
     for (list<const ConcreteLine*>::iterator
@@ -410,7 +413,9 @@ setPossibleLines( list <const ConcreteLine*> _possibleLines)
             }
         }
     }
-    possibleLines = updated;
+    if (!updated.empty()){
+        possibleLines = updated;
+    }
 }
 
 /**
@@ -420,7 +425,10 @@ setPossibleLines( list <const ConcreteLine*> _possibleLines)
  */
 void VisualLine::
 setPossibleLines( vector <const ConcreteLine*> _possibleLines)
-{
+    if (_possibleLines.empty()){
+        return;
+    }
+
     list<const ConcreteLine*> updated(0);
 
     for (list<const ConcreteLine*>::iterator
@@ -441,7 +449,9 @@ setPossibleLines( vector <const ConcreteLine*> _possibleLines)
             }
         }
     }
-    possibleLines = updated;
+    if (!updated.empty()){
+        possibleLines = updated;
+    }
 }
 
 const bool VisualLine::hasPositiveID()

@@ -131,8 +131,8 @@ private:
     // static const int JOIN_MAX_X_OFFSET = static_cast<int>(.35 * IMAGE_WIDTH);
     // static const int JOIN_MAX_Y_OFFSET = static_cast<int>(.25 * IMAGE_WIDTH);
     static const int MAX_ANGLE_TO_JOIN_LINES = 9;
-    static const int MIN_ANGLE_TO_JOIN_CC_LINES = 10;
-    static const int MAX_ANGLE_TO_JOIN_CC_LINES = 45;
+    static const int MIN_ANGLE_TO_JOIN_CC_LINES = 135;
+    static const int MAX_ANGLE_TO_JOIN_CC_LINES = 170;
     static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 9;
     static const int MAX_DIST_BETWEEN_TO_JOIN_CC_LINES = 12;
 
@@ -267,13 +267,20 @@ private:
     // top and bottom, and the more horizontal ones to the left and right
     void extendLines(std::vector< boost::shared_ptr<VisualLine> > &lines);
 
-    // Helper method that returns true if the color is one we consider to be
-    // a line color
-    static const bool isLineColor(const int color);
-
-    // Helper method that retursn true if the color is one we consider to be a
+    // Helper method that just returns whether the thresholded color is a
     // line color
-    static const bool isGreenColor(int threshColor);
+    static inline const bool isLineColor(const int color)
+        {
+            return Utility::isElementInArray(color, LINE_COLORS, NUM_LINE_COLORS);
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // green color
+    static inline const bool isGreenColor(int threshColor)
+        {
+            return Utility::isElementInArray(threshColor, FIELD_COLORS,
+                                             NUM_GREEN_COLORS);
+        }
 
     // Given a line, attempts to extend it to both the left and right
     void extendLineHorizontally(boost::shared_ptr<VisualLine> line);
@@ -515,6 +522,18 @@ private:
     const float percentColorBetween(const int x1, const int y1,
                                     const int x2, const int y2,
                                     const int color) const;
+
+    const float isColorBetween(const int x1, const int y1,
+                               const int x2, const int y2,
+                               const int longestHoleAllowed,
+                               const int color) const;
+
+    const bool isColorBetween(const int x1, const int y1,
+                              const int x2, const int y2,
+                              const int longestHoleAllowed,
+                              const int colors[],
+                              const int numColors) const;
+
     const bool linePointWidthsDifferent(const linePoint& last,
                                         const linePoint& current) const;
 

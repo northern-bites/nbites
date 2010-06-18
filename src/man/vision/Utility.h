@@ -73,6 +73,8 @@ public:
     static float getPerpenSlope(float slope);
 
     // get length of line segment specified by (x1, y1), (x2, y2)
+    static const float getLength(const int x1, const int y1,
+                          const int x2, const int y2);
     static const float getLength(const float x1, const float y1,
                                  const float x2, const float y2);
     static const double getLength(const double x1, const double y1,
@@ -81,6 +83,12 @@ public:
                                  const point <float> &p2);
     static const float getLength(const point <int> &p1,
                                  const point < int> &p2);
+
+    // Returns the square of the length for efficiency purposes
+    static const float getLength2(const float x1, const float y1,
+                                  const float x2, const float y2);
+    static const float getLength2(const int x1, const int y1,
+                                  const int x2, const int y2);
 
     // get angle between two lines
     // http://www.tpub.com/math2/5.htm
@@ -248,6 +256,8 @@ public:
 
     static point<int> getClosestPointOnLine(const VisualLine& line,
                                             const point<int>& pt);
+    static point<int> getClosestLinePoint(const VisualLine& line,
+                                          const point<int>& pt);
 
 };
 
