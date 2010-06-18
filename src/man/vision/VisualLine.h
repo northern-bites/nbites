@@ -381,6 +381,8 @@ inline void VisualLine::setColorString(const std::string s)
 }
 
 inline void VisualLine::setPossibleLines(const ConcreteLine* _possible) {
+    if (_possible == NULL)
+        return;
     possibleLines.clear();
     possibleLines.push_back(_possible);
 }
