@@ -88,7 +88,10 @@ def positionForKick(player):
         player.inKickingState = True
         player.ballTooFar = 0
 
-    player.brain.tracker.trackBall()
+    if player.brain.nav.walkX <= 0:
+        player.brain.tracker.activeLoc()
+    else:
+        player.brain.tracker.trackBall()
 
     # something has gone wrong, maybe the ball was moved?
     if (player.brain.ball.dist > PFK_BALL_CLOSE_ENOUGH or
@@ -103,11 +106,16 @@ def positionForKick(player):
     if transitions.shouldKick(player):
         return player.goNow('kickBallExecute')
 
-    elif transitions.shouldScanFindBall(player):
-        player.inKickingState = False
-        return player.goLater('scanFindBall')
+    if player.brain.tracker.activeLocOn:
+        if transitions.shouldScanFindBallActiveLoc(player):
+            player.inKickingState = False
+            return player.goLater('scanFindBall')
+    else:
+        if transitions.shouldScanFindBall(player):
+            player.inKickingState = False
+            return player.goLater('scanFindBall')
 
-    elif transitions.shouldApproachFromPositionForKick(player):
+    if transitions.shouldApproachFromPositionForKick(player):
         player.inKickingState = False
         return player.goLater('approachBall')
 
