@@ -31,12 +31,12 @@ const int ALImageTranscriber::DEFAULT_CAMERA_BUFFERSIZE = 16;
 // Gain: 28 / Exp: 60
 // Gain: 35 / Exp: 40
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 26;
+const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 30;
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
 const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 128;
 const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 68;
-const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 140;
-const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 64;
+const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 154;
+const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 90;
 const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 128;
 const int ALImageTranscriber::DEFAULT_CAMERA_HUE = 0;
 // Lens correction
@@ -44,7 +44,7 @@ const int ALImageTranscriber::DEFAULT_CAMERA_LENSX = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSY = 0;
 // Exposure length
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 83;
+const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 60;
 // Image orientation
 const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
