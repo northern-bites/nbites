@@ -1,37 +1,39 @@
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
+import man.motion.StiffnessModes as StiffnessModes
 
 ####Change these for picture taking####
 FRAME_SAVE_RATE = 1
 NUM_FRAMES_TO_SAVE = 150
 
 def gameReady(player):
-    player.brain.resetLocalization()
-    return player.goNow('saveFrames')
+    if player.firstFrame():
+        player.gainsOn()
+        player.executeMove(SweetMoves.NO_HEAD_INITIAL_POS)
+        player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
+    return player.stay()
 
 def gameSet(player):
-    player.brain.resetLocalization()
-    return player.goNow('saveFrames')
+    if player.firstFrame:
+        player.numFramesSaved = 0
+    return player.stay()
 
 def gamePlaying(player):
-    player.brain.resetLocalization()
-    return player.goNow('saveFrames')
-
-def saveFrames(player):
     if player.firstFrame():
-        player.brain.tracker.startScan(HeadMoves.FORWARD_COMB_PAN)
-        ##replace <TYPE_SNAPSHOT_PAN> with any PHOTO PAN in
-        ##    man/motion/HeadMoves.py
-        player.standup()
-        player.savedFrames = 0
-    if player.brain.ball.on or player.brain.yglp.on or player.brain.ygrp.on or \
-            player.brain.ygCrossbar.on or player.brain.bglp.on or \
-            player.brain.bgrp.on or player.brain.bgCrossbar.on:         
-        player.brain.sensors.saveFrame()
-        player.savedFrames += 1
-    if player.savedFrames == NUM_FRAMES_TO_SAVE:
-        return player.goNow('doneState')
+        player.executeMove(SweetMoves.NO_HEAD_INITIAL_POS)
+        player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
 
+    player.brain.sensors.saveFrame()
+    player.numFramesSaved += 1
+
+    if player.numFramesSaved > 3000:
+        return player.goLater('doneState')
+
+    return player.stay()
+
+def gamePenalized(player):
+    if player.firstFrame():
+        player.executeMove(SweetMoves.SIT_POS)
     return player.stay()
 
 def doneState(player):
@@ -46,4 +48,6 @@ def doneState(player):
 
     return player.stay()
 
-#gameInitial = gameReady
+def gameInitial(player):
+    return player.stay()
+
