@@ -198,17 +198,16 @@ void Man::notifyNextVisionImage() {
   // Synchronize noggin's information about joint angles with the motion
   // thread's information
 
-  //sensors->updateVisionAngles();
-
+  sensors->updateVisionAngles();
 
   transcriber->postVisionSensors();
 
   // Process current frame
   processFrame();
 
-    //Release the camera image
-    //if(camera_active)
-    //imageTranscriber->releaseImage();
+  //Release the camera image
+  //if(camera_active)
+  imageTranscriber->releaseImage();
 
   // Make sure messages are printed
   fflush(stdout);
