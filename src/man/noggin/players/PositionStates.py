@@ -58,17 +58,28 @@ def relocalize(player):
     return player.stay()
 
 def afterPenalty(player):
+#Management State
 
+    #Catch in case relocalize is needed after this behavior
     if player.lastDiffState == 'relocalize':
-        return player.goNow('gamePlaying')
+        return player.goLater('gamePlaying')
+
+    if player.lastDiffState == 'penaltyLookLeft':
+        return player.goLater('penaltyLookRight')
+
+    if player.lastDiffState == 'penaltyLookRight':
+        return player.goLater('relocalize')
+
+    return player.goLater('penaltyLookLeft')
+
+def penaltyLookLeft(player):
 
     if player.firstFrame():
-        lookCount = 0 #0 for none, 1 for left, 2 for right
+        #setup counter
         frameCount = 0
         player.brain.tracker.performHeadMove(LOOK_UP_LEFT)
-        lookCount = 1
 
-    if not player.brain.motion.isHeadActive() and lookCount == 1:
+    if not player.brain.motion.isHeadActive():
         ##looking left
 
         if player.brain.yglp.on or player.brain.ygrp.on:
@@ -76,47 +87,66 @@ def afterPenalty(player):
             player.brain.loc.resetLocTo(player.brain.Constants.CENTER_FIELD_X, \
                             player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y, \
                             -90.0)
-            return player.goNow(player.lastDiffState)
+            #now you know where you are!
+            return player.goLater('gamePlaying')
 
         if player.brain.bglp.on or player.brain.bgrp.on:
+            #set loc info
             player.brain.loc.resetLocTo(player.brain.Constants.Center_FIELD_X, \
                             player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y \
                             90.0)
-            return player.goNow(player.lastDiffState)
+            #now you know where you are!
+            return player.goLater('gamePlaying')
 
         if player.brain.ball.on:
             #go to it and don't worry about loc
-            return player.goNow('chase')
+            return player.goLater('chase')
 
+        #increment counter
         frameCount += 1
 
+    #if we are looking for too long
     if frameCount > 10:
+        return player.goLater(player.lastDiffState)
+
+    return player.stay()
+
+def penaltyLookRight(player):
+
+    if player.firstFrame():
+        #setup counter
         frameCount = 0
-        lookCount = 2
         player.brain.tracker.performHeadMove(LOOK_UP_RIGHT)
 
-    if not player.brain.motion.isHeadActive() and lookCount == 2:
+    if not player.brain.motion.isHeadActive():
         ##looking right
 
         if player.brain.yglp.on or player.brain.ygrp.on:
+            #set loc info
             player.brain.loc.resetLocTo(player.brain.Constants.Center_FIELD_X, \
                             player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y \
                             90.0)
-            return player.goNow(player.lastDiffState)
+            #now you know where you are!
+            return player.goLater('gamePlaying')
 
         if player.brain.bglp.on or player.brain.bgrp.on:
+            #set loc info
             player.brain.loc.resetLocTo(player.brain.Constants.CENTER_FIELD_X, \
                             player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y, \
                             -90.0)
-            return player.goNow(player.lastDiffState)
+            #now you know where you are!
+            return player.goLater('gamePlaying')
 
         if player.brain.ball.on:
             #go to it and don't worry about loc
-            return player.goNow('chase')
+            return player.goLater('chase')
 
+        #increment counter
         frameCount += 1
 
+    #if we are looking for too long
     if frameCount > 10:
-        return player.goNow('relocalize')
+        #no luck
+        return player.goLater(player.lastDiffState)
 
     return player.stay()
