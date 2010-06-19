@@ -47,8 +47,10 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
     // connect to dcm using the static methods declared above
 
     // TODO: Should use specialized proxy created at start
-    broker->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&staticPostSensors,this));
-    broker->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&staticSendCommands,this));
+    broker->getProxy("DCM")->getModule()->
+        atPostProcess(boost::bind(&staticPostSensors,this));
+    broker->getProxy("DCM")->getModule()->
+        atPreProcess(boost::bind(&staticSendCommands,this));
 }
 
 void NaoEnactor::sendCommands(){
@@ -137,9 +139,6 @@ void NaoEnactor::postSensors(){
     //We also call this from the Motion run method
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
-
-    //TODO figure out if this is necessary since its done in switchboard
-    sensors->setMotionBodyAngles(motionValues);
     transcriber->postMotionSensors();
 
     if(!switchboard){

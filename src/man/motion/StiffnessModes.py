@@ -211,10 +211,10 @@ LOW_LEG_STIFFNESSES =  (GAINS_OFF_VALUE, # Head
 
 NO_HEAD_STIFFNESSES = (GAINS_OFF_VALUE, # Head
                           GAINS_OFF_VALUE,
-                          GAINS_ARMS_VALUE, # larm
-                          GAINS_ARMS_VALUE,
-                          GAINS_ARMS_VALUE,
-                          GAINS_ARMS_VALUE,
+                          GAINS_OFF_VALUE, # larm
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
                           GAINS_ON_VALUE, # lleg
                           GAINS_ON_VALUE,
                           GAINS_ON_VALUE,
@@ -227,10 +227,10 @@ NO_HEAD_STIFFNESSES = (GAINS_OFF_VALUE, # Head
                           GAINS_ON_VALUE,
                           GAINS_ON_VALUE,
                           GAINS_ON_VALUE,
-                          GAINS_ARMS_VALUE, # rarm
-                          GAINS_ARMS_VALUE,
-                          GAINS_ARMS_VALUE,
-                          GAINS_ARMS_VALUE,)
+                          GAINS_OFF_VALUE, # rarm
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,
+                          GAINS_OFF_VALUE,)
 
 LEFT_SIDE_KICK_STIFFNESSES = LOOSE_ARMS_STIFFNESSES
 
