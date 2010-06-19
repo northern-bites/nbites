@@ -56,3 +56,67 @@ def relocalize(player):
         player.setWalk(0 , 0, constants.RELOC_SPIN_SPEED * direction)
 
     return player.stay()
+
+def afterPenalty(player):
+
+    if player.lastDiffState == 'relocalize':
+        return player.goNow('gamePlaying')
+
+    if player.firstFrame():
+        lookCount = 0 #0 for none, 1 for left, 2 for right
+        frameCount = 0
+        player.brain.tracker.performHeadMove(LOOK_UP_LEFT)
+        lookCount = 1
+
+    if not player.brain.motion.isHeadActive() and lookCount == 1:
+        ##looking left
+
+        if player.brain.yglp.on or player.brain.ygrp.on:
+            #set loc info
+            player.brain.loc.resetLocTo(player.brain.Constants.CENTER_FIELD_X, \
+                            player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y, \
+                            -90.0)
+            return player.goNow(player.lastDiffState)
+
+        if player.brain.bglp.on or player.brain.bgrp.on:
+            player.brain.loc.resetLocTo(player.brain.Constants.Center_FIELD_X, \
+                            player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y \
+                            90.0)
+            return player.goNow(player.lastDiffState)
+
+        if player.brain.ball.on:
+            #go to it and don't worry about loc
+            return player.goNow('chase')
+
+        frameCount += 1
+
+    if frameCount > 10:
+        frameCount = 0
+        lookCount = 2
+        player.brain.tracker.performHeadMove(LOOK_UP_RIGHT)
+
+    if not player.brain.motion.isHeadActive() and lookCount == 2:
+        ##looking right
+
+        if player.brain.yglp.on or player.brain.ygrp.on:
+            player.brain.loc.resetLocTo(player.brain.Constants.Center_FIELD_X, \
+                            player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y \
+                            90.0)
+            return player.goNow(player.lastDiffState)
+
+        if player.brain.bglp.on or player.brain.bgrp.on:
+            player.brain.loc.resetLocTo(player.brain.Constants.CENTER_FIELD_X, \
+                            player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y, \
+                            -90.0)
+            return player.goNow(player.lastDiffState)
+
+        if player.brain.ball.on:
+            #go to it and don't worry about loc
+            return player.goNow('chase')
+
+        frameCount += 1
+
+    if frameCount > 10:
+        return player.goNow('relocalize')
+
+    return player.stay()

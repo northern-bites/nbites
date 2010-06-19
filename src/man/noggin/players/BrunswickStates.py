@@ -89,7 +89,7 @@ def gameSet(player):
 def gamePlaying(player):
     if player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
-        return player.goNow('relocalize')
+        return player.goNow('afterPenalty')
 
     roleState = player.getRoleState()
     return player.goNow(roleState)
