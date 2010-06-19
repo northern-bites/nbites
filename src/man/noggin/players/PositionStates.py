@@ -1,5 +1,6 @@
 from .. import NogginConstants
 from . import ChaseBallConstants as ChaseConstants
+import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionTransitions as transitions
 import PositionConstants as constants
@@ -75,26 +76,25 @@ def afterPenalty(player):
 def penaltyLookLeft(player):
 
     if player.firstFrame():
-        #setup counter
-        frameCount = 0
-        player.brain.tracker.performHeadMove(LOOK_UP_LEFT)
+        player.headCount = 0
+        player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
 
     if not player.brain.motion.isHeadActive():
         ##looking left
 
         if player.brain.yglp.on or player.brain.ygrp.on:
             #set loc info
-            player.brain.loc.resetLocTo(player.brain.Constants.CENTER_FIELD_X, \
-                            player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y, \
-                            -90.0)
+            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+                                        NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
+                                        -90.0)
             #now you know where you are!
             return player.goLater('gamePlaying')
 
         if player.brain.bglp.on or player.brain.bgrp.on:
             #set loc info
-            player.brain.loc.resetLocTo(player.brain.Constants.Center_FIELD_X, \
-                            player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y \
-                            90.0)
+            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+                                        NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
+                                        90.0)
             #now you know where you are!
             return player.goLater('gamePlaying')
 
@@ -102,11 +102,10 @@ def penaltyLookLeft(player):
             #go to it and don't worry about loc
             return player.goLater('chase')
 
-        #increment counter
-        frameCount += 1
+        player.headCount += 1
 
     #if we are looking for too long
-    if frameCount > 10:
+    if player.headCount > 10:
         return player.goLater(player.lastDiffState)
 
     return player.stay()
@@ -115,25 +114,25 @@ def penaltyLookRight(player):
 
     if player.firstFrame():
         #setup counter
-        frameCount = 0
-        player.brain.tracker.performHeadMove(LOOK_UP_RIGHT)
+        player.headCount = 0
+        player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
 
     if not player.brain.motion.isHeadActive():
         ##looking right
 
         if player.brain.yglp.on or player.brain.ygrp.on:
             #set loc info
-            player.brain.loc.resetLocTo(player.brain.Constants.Center_FIELD_X, \
-                            player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y \
-                            90.0)
+            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+                                        NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
+                                        90.0)
             #now you know where you are!
             return player.goLater('gamePlaying')
 
         if player.brain.bglp.on or player.brain.bgrp.on:
             #set loc info
-            player.brain.loc.resetLocTo(player.brain.Constants.CENTER_FIELD_X, \
-                            player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y, \
-                            -90.0)
+            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+                                        NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
+                                        -90.0)
             #now you know where you are!
             return player.goLater('gamePlaying')
 
@@ -142,10 +141,10 @@ def penaltyLookRight(player):
             return player.goLater('chase')
 
         #increment counter
-        frameCount += 1
+        player.headCount += 1
 
     #if we are looking for too long
-    if frameCount > 10:
+    if player.headCount > 10:
         #no luck
         return player.goLater(player.lastDiffState)
 
