@@ -1,11 +1,7 @@
 #ifndef Utility_hpp_DEFINED
 #define Utility_hpp_DEFINED
 
-
-
 #include <cmath>          // Uses fabs, trig functions like atan
-
-#define NO_INTERSECTION -13591295
 
 class Utility;
 #include "Common.h"
@@ -14,6 +10,7 @@ class Utility;
 #include "VisionDef.h"
 #include "VisualLandmark.h"
 #include "VisualLine.h"
+#include "NBMath.h"
 
 // This class contains static utility functions which are used in many different
 // parts of our code.
@@ -25,6 +22,7 @@ class Utility {
 
 public:
 
+    static const int NO_INTERSECTION = -13591295;
 
     // The following 5 methods come from Joseph O'Rourke's Computational
     // Geometry in C book, published in 1998.
@@ -57,6 +55,8 @@ public:
     static const bool intersectProp(const point<int> &a, const point<int> &b,
                                     const point<int> &c, const point<int> &d);
 
+    static const bool intersectProp(const VisualLine& line1, const VisualLine& line2);
+
     static const point<int> getPointFartherFromCorner(const VisualLine &l, int cornerX, int cornerY);
 
 
@@ -73,14 +73,22 @@ public:
     static float getPerpenSlope(float slope);
 
     // get length of line segment specified by (x1, y1), (x2, y2)
+    static const float getLength(const int x1, const int y1,
+                          const int x2, const int y2);
     static const float getLength(const float x1, const float y1,
                                  const float x2, const float y2);
-    static const float getLength(const point <const float> &p1,
-                                 const point <const float> &p2);
-    static const float getLength(const point <const int> &p1,
-                                 const point <const int> &p2);
+    static const double getLength(const double x1, const double y1,
+                                 const double x2, const double y2);
+    static const float getLength(const point <float> &p1,
+                                 const point <float> &p2);
+    static const float getLength(const point <int> &p1,
+                                 const point < int> &p2);
 
-
+    // Returns the square of the length for efficiency purposes
+    static const float getLength2(const float x1, const float y1,
+                                  const float x2, const float y2);
+    static const float getLength2(const int x1, const int y1,
+                                  const int x2, const int y2);
 
     // get angle between two lines
     // http://www.tpub.com/math2/5.htm
@@ -92,6 +100,9 @@ public:
 
     static float getAngle(const VisualLine& line1);
 
+    static float getAbsoluteAngle(const point<int>& intersection,
+                                  const VisualLine& line1,
+                                  const VisualLine& line2);
 
     // get y-coord with given x-coord, slope, and y-intercept
     static int getLineY(int x, float y_intercept, float slope);
@@ -227,6 +238,27 @@ public:
 
 	static const point<int> findCloserEndpoint(const VisualLine&,
 											   const point<int>& intersection);
+
+    // Returns the angle between two lines using their bearing from the robot
+    static float getGroundAngle(const VisualLine& line1,
+                                const VisualLine& line2);
+
+    /**
+     * Returns true if pt2 is on the opposite side of the line from the pt1.
+     * If a point is on the line, the other point is not considered "across"
+     * from it.
+     */
+    static bool areAcrossLine(const VisualLine& line,
+                             const point<int>& p1,
+                             const point<int>& p2);
+
+    static float distToLine(const VisualLine& line, const point<int>& point);
+
+    static point<int> getClosestPointOnLine(const VisualLine& line,
+                                            const point<int>& pt);
+    static point<int> getClosestLinePoint(const VisualLine& line,
+                                          const point<int>& pt);
+
 };
 
 

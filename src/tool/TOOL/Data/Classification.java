@@ -11,27 +11,27 @@ public final class Classification {
       com.google.protobuf.GeneratedMessage {
     // Use KeyFrame.newBuilder() to construct.
     private KeyFrame() {}
-    
+
     private static final KeyFrame defaultInstance = new KeyFrame();
     public static KeyFrame getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public KeyFrame getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return TOOL.Data.Classification.internal_static_classification_KeyFrame_descriptor;
     }
-    
+
     @Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return TOOL.Data.Classification.internal_static_classification_KeyFrame_fieldAccessorTable;
     }
-    
+
     public static enum GoalType
         implements com.google.protobuf.ProtocolMessageEnum {
       NO_POST(0, 0),
@@ -40,10 +40,10 @@ public final class Classification {
       BOTH(3, 3),
       LEFT(4, 4),
       ;
-      
-      
+
+
       public final int getNumber() { return value; }
-      
+
       public static GoalType valueOf(int value) {
         switch (value) {
           case 0: return NO_POST;
@@ -54,7 +54,7 @@ public final class Classification {
           default: return null;
         }
       }
-      
+
       public final com.google.protobuf.Descriptors.EnumValueDescriptor
           getValueDescriptor() {
         return getDescriptor().getValues().get(index);
@@ -67,9 +67,9 @@ public final class Classification {
           getDescriptor() {
         return TOOL.Data.Classification.KeyFrame.getDescriptor().getEnumTypes().get(0);
       }
-      
+
       private static final GoalType[] VALUES = {
-        NO_POST, RIGHT, UNSURE, BOTH, LEFT, 
+        NO_POST, RIGHT, UNSURE, BOTH, LEFT,
       };
       public static GoalType valueOf(
           com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
@@ -85,12 +85,12 @@ public final class Classification {
         this.index = index;
         this.value = value;
       }
-      
+
       static {
         TOOL.Data.Classification.getDescriptor();
       }
     }
-    
+
     public static enum CrossType
         implements com.google.protobuf.ProtocolMessageEnum {
       NO_CROSS(0, 0),
@@ -99,10 +99,10 @@ public final class Classification {
       DOUBLE_CROSS(3, 3),
       BLUE(4, 4),
       ;
-      
-      
+
+
       public final int getNumber() { return value; }
-      
+
       public static CrossType valueOf(int value) {
         switch (value) {
           case 0: return NO_CROSS;
@@ -113,7 +113,7 @@ public final class Classification {
           default: return null;
         }
       }
-      
+
       public final com.google.protobuf.Descriptors.EnumValueDescriptor
           getValueDescriptor() {
         return getDescriptor().getValues().get(index);
@@ -126,9 +126,9 @@ public final class Classification {
           getDescriptor() {
         return TOOL.Data.Classification.KeyFrame.getDescriptor().getEnumTypes().get(1);
       }
-      
+
       private static final CrossType[] VALUES = {
-        NO_CROSS, YELLOW, UNKNOWN, DOUBLE_CROSS, BLUE, 
+        NO_CROSS, YELLOW, UNKNOWN, DOUBLE_CROSS, BLUE,
       };
       public static CrossType valueOf(
           com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
@@ -144,82 +144,89 @@ public final class Classification {
         this.index = index;
         this.value = value;
       }
-      
+
       static {
         TOOL.Data.Classification.getDescriptor();
       }
     }
-    
+
     // required bool humanChecked = 1;
     public static final int HUMANCHECKED_FIELD_NUMBER = 1;
     private boolean hasHumanChecked;
     private boolean humanChecked_ = false;
     public boolean hasHumanChecked() { return hasHumanChecked; }
     public boolean getHumanChecked() { return humanChecked_; }
-    
+
     // required bool ball = 2;
     public static final int BALL_FIELD_NUMBER = 2;
     private boolean hasBall;
     private boolean ball_ = false;
     public boolean hasBall() { return hasBall; }
     public boolean getBall() { return ball_; }
-    
+
     // optional .classification.KeyFrame.GoalType blueGoal = 3;
     public static final int BLUEGOAL_FIELD_NUMBER = 3;
     private boolean hasBlueGoal;
     private TOOL.Data.Classification.KeyFrame.GoalType blueGoal_ = TOOL.Data.Classification.KeyFrame.GoalType.NO_POST;
     public boolean hasBlueGoal() { return hasBlueGoal; }
     public TOOL.Data.Classification.KeyFrame.GoalType getBlueGoal() { return blueGoal_; }
-    
+
     // optional .classification.KeyFrame.GoalType yellowGoal = 4;
     public static final int YELLOWGOAL_FIELD_NUMBER = 4;
     private boolean hasYellowGoal;
     private TOOL.Data.Classification.KeyFrame.GoalType yellowGoal_ = TOOL.Data.Classification.KeyFrame.GoalType.NO_POST;
     public boolean hasYellowGoal() { return hasYellowGoal; }
     public TOOL.Data.Classification.KeyFrame.GoalType getYellowGoal() { return yellowGoal_; }
-    
+
     // optional .classification.KeyFrame.CrossType cross = 5;
     public static final int CROSS_FIELD_NUMBER = 5;
     private boolean hasCross;
     private TOOL.Data.Classification.KeyFrame.CrossType cross_ = TOOL.Data.Classification.KeyFrame.CrossType.NO_CROSS;
     public boolean hasCross() { return hasCross; }
     public TOOL.Data.Classification.KeyFrame.CrossType getCross() { return cross_; }
-    
+
     // optional int32 redRobots = 6;
     public static final int REDROBOTS_FIELD_NUMBER = 6;
     private boolean hasRedRobots;
     private int redRobots_ = 0;
     public boolean hasRedRobots() { return hasRedRobots; }
     public int getRedRobots() { return redRobots_; }
-    
+
     // optional int32 blueRobots = 7;
     public static final int BLUEROBOTS_FIELD_NUMBER = 7;
     private boolean hasBlueRobots;
     private int blueRobots_ = 0;
     public boolean hasBlueRobots() { return hasBlueRobots; }
     public int getBlueRobots() { return blueRobots_; }
-    
+
     // optional int32 tCorners = 8;
     public static final int TCORNERS_FIELD_NUMBER = 8;
     private boolean hasTCorners;
     private int tCorners_ = 0;
     public boolean hasTCorners() { return hasTCorners; }
     public int getTCorners() { return tCorners_; }
-    
+
     // optional int32 lCorners = 9;
     public static final int LCORNERS_FIELD_NUMBER = 9;
     private boolean hasLCorners;
     private int lCorners_ = 0;
     public boolean hasLCorners() { return hasLCorners; }
     public int getLCorners() { return lCorners_; }
-    
+
+    // optional int32 ccCorners = 10;
+    public static final int CCCORNERS_FIELD_NUMBER = 10;
+    private boolean hasCcCorners;
+    private int ccCorners_ = 0;
+    public boolean hasCcCorners() { return hasCcCorners; }
+    public int getCcCorners() { return ccCorners_; }
+
     @Override
     public final boolean isInitialized() {
       if (!hasHumanChecked) return false;
       if (!hasBall) return false;
       return true;
     }
-    
+
     @Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
@@ -250,15 +257,18 @@ public final class Classification {
       if (hasLCorners()) {
         output.writeInt32(9, getLCorners());
       }
+      if (hasCcCorners()) {
+        output.writeInt32(10, getCcCorners());
+      }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     @Override
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       if (hasHumanChecked()) {
         size += com.google.protobuf.CodedOutputStream
@@ -296,11 +306,15 @@ public final class Classification {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(9, getLCorners());
       }
+      if (hasCcCorners()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(10, getCcCorners());
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     public static TOOL.Data.Classification.KeyFrame parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -358,47 +372,47 @@ public final class Classification {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    
+
     public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return new Builder(); }
     public static Builder newBuilder(TOOL.Data.Classification.KeyFrame prototype) {
       return new Builder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> {
       // Construct using TOOL.Data.Classification.KeyFrame.newBuilder()
       private Builder() {}
-      
+
       TOOL.Data.Classification.KeyFrame result = new TOOL.Data.Classification.KeyFrame();
-      
+
       @Override
       protected TOOL.Data.Classification.KeyFrame internalGetResult() {
         return result;
       }
-      
+
       @Override
       public Builder clear() {
         result = new TOOL.Data.Classification.KeyFrame();
         return this;
       }
-      
+
       @Override
       public Builder clone() {
         return new Builder().mergeFrom(result);
       }
-      
+
       @Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return TOOL.Data.Classification.KeyFrame.getDescriptor();
       }
-      
+
       public TOOL.Data.Classification.KeyFrame getDefaultInstanceForType() {
         return TOOL.Data.Classification.KeyFrame.getDefaultInstance();
       }
-      
+
       public TOOL.Data.Classification.KeyFrame build() {
         if (result != null && !isInitialized()) {
           throw new com.google.protobuf.UninitializedMessageException(
@@ -406,7 +420,7 @@ public final class Classification {
         }
         return buildPartial();
       }
-      
+
       private TOOL.Data.Classification.KeyFrame buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
         if (!isInitialized()) {
@@ -415,7 +429,7 @@ public final class Classification {
         }
         return buildPartial();
       }
-      
+
       public TOOL.Data.Classification.KeyFrame buildPartial() {
         if (result == null) {
           throw new IllegalStateException(
@@ -424,7 +438,7 @@ public final class Classification {
         result = null;
         return returnMe;
       }
-      
+
       @Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof TOOL.Data.Classification.KeyFrame) {
@@ -434,7 +448,7 @@ public final class Classification {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(TOOL.Data.Classification.KeyFrame other) {
         if (other == TOOL.Data.Classification.KeyFrame.getDefaultInstance()) return this;
         if (other.hasHumanChecked()) {
@@ -464,10 +478,13 @@ public final class Classification {
         if (other.hasLCorners()) {
           setLCorners(other.getLCorners());
         }
+        if (other.hasCcCorners()) {
+          setCcCorners(other.getCcCorners());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       @Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input)
@@ -475,7 +492,7 @@ public final class Classification {
         return mergeFrom(input,
           com.google.protobuf.ExtensionRegistry.getEmptyRegistry());
       }
-      
+
       @Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
@@ -552,11 +569,15 @@ public final class Classification {
               setLCorners(input.readInt32());
               break;
             }
+            case 80: {
+              setCcCorners(input.readInt32());
+              break;
+            }
           }
         }
       }
-      
-      
+
+
       // required bool humanChecked = 1;
       public boolean hasHumanChecked() {
         return result.hasHumanChecked();
@@ -574,7 +595,7 @@ public final class Classification {
         result.humanChecked_ = false;
         return this;
       }
-      
+
       // required bool ball = 2;
       public boolean hasBall() {
         return result.hasBall();
@@ -592,7 +613,7 @@ public final class Classification {
         result.ball_ = false;
         return this;
       }
-      
+
       // optional .classification.KeyFrame.GoalType blueGoal = 3;
       public boolean hasBlueGoal() {
         return result.hasBlueGoal();
@@ -613,7 +634,7 @@ public final class Classification {
         result.blueGoal_ = TOOL.Data.Classification.KeyFrame.GoalType.NO_POST;
         return this;
       }
-      
+
       // optional .classification.KeyFrame.GoalType yellowGoal = 4;
       public boolean hasYellowGoal() {
         return result.hasYellowGoal();
@@ -634,7 +655,7 @@ public final class Classification {
         result.yellowGoal_ = TOOL.Data.Classification.KeyFrame.GoalType.NO_POST;
         return this;
       }
-      
+
       // optional .classification.KeyFrame.CrossType cross = 5;
       public boolean hasCross() {
         return result.hasCross();
@@ -655,7 +676,7 @@ public final class Classification {
         result.cross_ = TOOL.Data.Classification.KeyFrame.CrossType.NO_CROSS;
         return this;
       }
-      
+
       // optional int32 redRobots = 6;
       public boolean hasRedRobots() {
         return result.hasRedRobots();
@@ -673,7 +694,7 @@ public final class Classification {
         result.redRobots_ = 0;
         return this;
       }
-      
+
       // optional int32 blueRobots = 7;
       public boolean hasBlueRobots() {
         return result.hasBlueRobots();
@@ -691,7 +712,7 @@ public final class Classification {
         result.blueRobots_ = 0;
         return this;
       }
-      
+
       // optional int32 tCorners = 8;
       public boolean hasTCorners() {
         return result.hasTCorners();
@@ -709,7 +730,7 @@ public final class Classification {
         result.tCorners_ = 0;
         return this;
       }
-      
+
       // optional int32 lCorners = 9;
       public boolean hasLCorners() {
         return result.hasLCorners();
@@ -727,38 +748,56 @@ public final class Classification {
         result.lCorners_ = 0;
         return this;
       }
+
+      // optional int32 ccCorners = 10;
+      public boolean hasCcCorners() {
+        return result.hasCcCorners();
+      }
+      public int getCcCorners() {
+        return result.getCcCorners();
+      }
+      public Builder setCcCorners(int value) {
+        result.hasCcCorners = true;
+        result.ccCorners_ = value;
+        return this;
+      }
+      public Builder clearCcCorners() {
+        result.hasCcCorners = false;
+        result.ccCorners_ = 0;
+        return this;
+      }
     }
-    
+
     static {
       TOOL.Data.Classification.getDescriptor();
     }
   }
-  
+
   public static final class Keys extends
       com.google.protobuf.GeneratedMessage {
     // Use Keys.newBuilder() to construct.
     private Keys() {}
-    
+
     private static final Keys defaultInstance = new Keys();
     public static Keys getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public Keys getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return TOOL.Data.Classification.internal_static_classification_Keys_descriptor;
     }
-    
+
     @Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return TOOL.Data.Classification.internal_static_classification_Keys_fieldAccessorTable;
     }
-    
+
     // repeated .classification.KeyFrame frame = 1;
     public static final int FRAME_FIELD_NUMBER = 1;
     private java.util.List<TOOL.Data.Classification.KeyFrame> frame_ =
@@ -770,7 +809,7 @@ public final class Classification {
     public TOOL.Data.Classification.KeyFrame getFrame(int index) {
       return frame_.get(index);
     }
-    
+
     @Override
     public final boolean isInitialized() {
       for (TOOL.Data.Classification.KeyFrame element : getFrameList()) {
@@ -778,7 +817,7 @@ public final class Classification {
       }
       return true;
     }
-    
+
     @Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
@@ -787,13 +826,13 @@ public final class Classification {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     @Override
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       for (TOOL.Data.Classification.KeyFrame element : getFrameList()) {
         size += com.google.protobuf.CodedOutputStream
@@ -803,7 +842,7 @@ public final class Classification {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     public static TOOL.Data.Classification.Keys parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -861,47 +900,47 @@ public final class Classification {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    
+
     public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return new Builder(); }
     public static Builder newBuilder(TOOL.Data.Classification.Keys prototype) {
       return new Builder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> {
       // Construct using TOOL.Data.Classification.Keys.newBuilder()
       private Builder() {}
-      
+
       TOOL.Data.Classification.Keys result = new TOOL.Data.Classification.Keys();
-      
+
       @Override
       protected TOOL.Data.Classification.Keys internalGetResult() {
         return result;
       }
-      
+
       @Override
       public Builder clear() {
         result = new TOOL.Data.Classification.Keys();
         return this;
       }
-      
+
       @Override
       public Builder clone() {
         return new Builder().mergeFrom(result);
       }
-      
+
       @Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return TOOL.Data.Classification.Keys.getDescriptor();
       }
-      
+
       public TOOL.Data.Classification.Keys getDefaultInstanceForType() {
         return TOOL.Data.Classification.Keys.getDefaultInstance();
       }
-      
+
       public TOOL.Data.Classification.Keys build() {
         if (result != null && !isInitialized()) {
           throw new com.google.protobuf.UninitializedMessageException(
@@ -909,7 +948,7 @@ public final class Classification {
         }
         return buildPartial();
       }
-      
+
       private TOOL.Data.Classification.Keys buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
         if (!isInitialized()) {
@@ -918,7 +957,7 @@ public final class Classification {
         }
         return buildPartial();
       }
-      
+
       public TOOL.Data.Classification.Keys buildPartial() {
         if (result == null) {
           throw new IllegalStateException(
@@ -931,7 +970,7 @@ public final class Classification {
         result = null;
         return returnMe;
       }
-      
+
       @Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof TOOL.Data.Classification.Keys) {
@@ -941,7 +980,7 @@ public final class Classification {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(TOOL.Data.Classification.Keys other) {
         if (other == TOOL.Data.Classification.Keys.getDefaultInstance()) return this;
         if (!other.frame_.isEmpty()) {
@@ -953,7 +992,7 @@ public final class Classification {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       @Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input)
@@ -961,7 +1000,7 @@ public final class Classification {
         return mergeFrom(input,
           com.google.protobuf.ExtensionRegistry.getEmptyRegistry());
       }
-      
+
       @Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
@@ -993,8 +1032,8 @@ public final class Classification {
           }
         }
       }
-      
-      
+
+
       // repeated .classification.KeyFrame frame = 1;
       public java.util.List<TOOL.Data.Classification.KeyFrame> getFrameList() {
         return java.util.Collections.unmodifiableList(result.frame_);
@@ -1046,12 +1085,12 @@ public final class Classification {
         return this;
       }
     }
-    
+
     static {
       TOOL.Data.Classification.getDescriptor();
     }
   }
-  
+
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_classification_KeyFrame_descriptor;
   private static
@@ -1062,7 +1101,7 @@ public final class Classification {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_classification_Keys_fieldAccessorTable;
-  
+
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
     return descriptor;
@@ -1071,20 +1110,20 @@ public final class Classification {
       descriptor;
   static {
     java.lang.String descriptorData =
-      "\n\016Classify.proto\022\016classification\"\254\003\n\010Key" +
+      "\n\016Classify.proto\022\016classification\"\277\003\n\010Key" +
       "Frame\022\024\n\014humanChecked\030\001 \002(\010\022\014\n\004ball\030\002 \002(" +
       "\010\0223\n\010blueGoal\030\003 \001(\0162!.classification.Key" +
       "Frame.GoalType\0225\n\nyellowGoal\030\004 \001(\0162!.cla" +
       "ssification.KeyFrame.GoalType\0221\n\005cross\030\005" +
       " \001(\0162\".classification.KeyFrame.CrossType" +
       "\022\021\n\tredRobots\030\006 \001(\005\022\022\n\nblueRobots\030\007 \001(\005\022" +
-      "\020\n\010tCorners\030\010 \001(\005\022\020\n\010lCorners\030\t \001(\005\"B\n\010G" +
-      "oalType\022\013\n\007NO_POST\020\000\022\t\n\005RIGHT\020\001\022\n\n\006UNSUR" +
-      "E\020\002\022\010\n\004BOTH\020\003\022\010\n\004LEFT\020\004\"N\n\tCrossType\022\014\n\010" +
-      "NO_CROSS\020\000\022\n\n\006YELLOW\020\001\022\013\n\007UNKNOWN\020\002\022\020\n\014D" +
-      "OUBLE_CROSS\020\003\022\010\n\004BLUE\020\004\"/\n\004Keys\022\'\n\005frame" +
-      "\030\001 \003(\0132\030.classification.KeyFrameB\033\n\tTOOL" +
-      ".DataB\016Classification";
+      "\020\n\010tCorners\030\010 \001(\005\022\020\n\010lCorners\030\t \001(\005\022\021\n\tc" +
+      "cCorners\030\n \001(\005\"B\n\010GoalType\022\013\n\007NO_POST\020\000\022" +
+      "\t\n\005RIGHT\020\001\022\n\n\006UNSURE\020\002\022\010\n\004BOTH\020\003\022\010\n\004LEFT" +
+      "\020\004\"N\n\tCrossType\022\014\n\010NO_CROSS\020\000\022\n\n\006YELLOW\020" +
+      "\001\022\013\n\007UNKNOWN\020\002\022\020\n\014DOUBLE_CROSS\020\003\022\010\n\004BLUE" +
+      "\020\004\"/\n\004Keys\022\'\n\005frame\030\001 \003(\0132\030.classificati" +
+      "on.KeyFrameB\033\n\tTOOL.DataB\016Classification";
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
         public com.google.protobuf.ExtensionRegistry assignDescriptors(
@@ -1095,7 +1134,7 @@ public final class Classification {
           internal_static_classification_KeyFrame_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_classification_KeyFrame_descriptor,
-              new java.lang.String[] { "HumanChecked", "Ball", "BlueGoal", "YellowGoal", "Cross", "RedRobots", "BlueRobots", "TCorners", "LCorners", },
+              new java.lang.String[] { "HumanChecked", "Ball", "BlueGoal", "YellowGoal", "Cross", "RedRobots", "BlueRobots", "TCorners", "LCorners", "CcCorners", },
               TOOL.Data.Classification.KeyFrame.class,
               TOOL.Data.Classification.KeyFrame.Builder.class);
           internal_static_classification_Keys_descriptor =

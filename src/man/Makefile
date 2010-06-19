@@ -8,7 +8,9 @@ WEBOTS_DIR = $(BUILD_DIR)/webots
 CROSS_INSTALL_DIR = $(BUILD_DIR)/cross_install
 WEBOTS_INSTALL_DIR = $(BUILD_DIR)/webots_install
 CMAKE_DIR = cmake.man
-CMAKE_DEPEND = $(BUILD_DIR)/Makefile
+CMAKE_STRAIGHT_DEPEND = $(STRAIGHT_DIR)/Makefile
+CMAKE_WEBOTS_DEPEND = $(WEBOTS_DIR)/Makefile
+CMAKE_CROSS_DEPEND = $(CROSS_DIR)/Makefile
 #Source setup
 CMAKE_SRCS = \
 	CMakeLists.txt \
@@ -45,8 +47,7 @@ MAKE_OPTIONS=--no-print-directory
 
 default_target: all
 
-all: $(CMAKE_DEPEND)
-	@#echo $(TRUNK_REVISION)
+all: $(CMAKE_STRAIGHT_DEPEND) $(CMAKE_WEBOTS_DEPEND) $(CMAKE_CROSS_DEPEND)
 	@if [ -e $(CROSS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR); \
 	elif [ -e $(STRAIGHT_FILE) ]; then \
@@ -55,17 +56,24 @@ all: $(CMAKE_DEPEND)
 		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR); \
 	fi
 
-$(CMAKE_DEPEND):
+$(CMAKE_WEBOTS_DEPEND):
 	@if [ -f $(WEBOTS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) webots; \
-	elif [ -f $(STRAIGHT_FILE) ]; then \
+	fi
+
+$(CMAKE_STRAIGHT_DEPEND):
+	@if [ -f $(STRAIGHT_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) straight; \
-	else \
+	fi
+
+$(CMAKE_CROSS_DEPEND):
+	@if [ -f $(CROSS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) cross; \
 	fi
 
+
 straight: $(STRAIGHT_FILE)
-	@set -e; \
+	@set -e;
 		$(CD) $(STRAIGHT_DIR); \
 		$(CCMAKE) .
 

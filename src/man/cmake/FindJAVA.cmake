@@ -25,7 +25,7 @@ SET( JAVA_INCLUDE_DIR "JAVA_INCLUDE_DIR-NOTFOUND" CACHE FILEPATH "Cleared." FORC
     IF ( APPLE )
       SET( JAVA_INCLUDE_DIR /System/Library/Frameworks/JavaVM.framework/Versions/1.5/Headers )
     ELSE ( APPLE )
-      SET( JAVA_INCLUDE_DIR /usr/lib/jvm/java-1.5.0-sun/include /usr/lib/jvm/java-1.5.0-sun/include/linux )
+      SET( JAVA_INCLUDE_DIR /usr/lib/jvm/java-6-sun/include /usr/lib/jvm/java-1.5.0-sun/include /usr/lib/jvm/java-6-sun/include/linux)
     ENDIF( APPLE )
   ENDIF( WIN32 )
 

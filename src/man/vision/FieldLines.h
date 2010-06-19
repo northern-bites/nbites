@@ -2,7 +2,7 @@
 #define FieldLines_h_DEFINED
 
 // System includes
-#include <cmath>                       // use fabs, max, min
+#include <math.h>                       // use fabs, max, min
 #include <vector>                      //
 #include <list>                        //
 #include <sstream>                     //
@@ -20,7 +20,7 @@ static const int BAD_DISTANCE = -23523134;
 
 // for percentColor(), ortho directions
 enum TestDirection {TEST_UP, TEST_DOWN, TEST_LEFT, TEST_RIGHT};
-
+enum ExtendDirection {EXTEND_DOWN, EXTEND_UP, EXTEND_RIGHT, EXTEND_LEFT};
 struct linePoint;
 
 #include "Common.h" //
@@ -59,10 +59,6 @@ typedef std::list<linePoint>::iterator linePointNode;
 
 class FieldLines {
 private:
-
-
-    // Miscellaneous
-
     ////////////////////////////////////////////////////////////
     // Find Line Points
     ////////////////////////////////////////////////////////////
@@ -99,7 +95,7 @@ private:
 
     // If we have seen an edge within the past x pixels, then we say it's close
     // AIBOSPECIFIC
-    static const int ADJACENT_SAME_EDGE_SEPARATION = 3;
+    static const int ADJACENT_SAME_EDGE_SEPARATION = 10;
     // AIBO_SPECIFIC
     // if the edge detection goes bad on one end of the line, this is a check
     static const int NUM_NON_WHITE_SANITY_CHECK = 3;
@@ -111,8 +107,8 @@ private:
     ////////////////////////////////////////////////////////////
 
     // AIBO_SPECIFIC
-    static const int MIN_PIXEL_WIDTH_FOR_GREEN_CHECK = 2;
-    static const int MIN_SEPARATION_TO_NOT_CHECK = 10;
+    static const int MIN_PIXEL_WIDTH_FOR_GREEN_CHECK = 5;
+    static const int MIN_SEPARATION_TO_NOT_CHECK = 20;
     // AIBOSPECIFIC
     // Two line points must have at least this Euclidean distance between
     // them in order for us to check their angle
@@ -135,8 +131,8 @@ private:
     // static const int JOIN_MAX_X_OFFSET = static_cast<int>(.35 * IMAGE_WIDTH);
     // static const int JOIN_MAX_Y_OFFSET = static_cast<int>(.25 * IMAGE_WIDTH);
     static const int MAX_ANGLE_TO_JOIN_LINES = 9;
-    static const int MIN_ANGLE_TO_JOIN_CC_LINES = 10;
-    static const int MAX_ANGLE_TO_JOIN_CC_LINES = 45;
+    static const int MIN_ANGLE_TO_JOIN_CC_LINES = 135;
+    static const int MAX_ANGLE_TO_JOIN_CC_LINES = 170;
     static const int MAX_DIST_BETWEEN_TO_JOIN_LINES = 9;
     static const int MAX_DIST_BETWEEN_TO_JOIN_CC_LINES = 12;
 
@@ -172,6 +168,7 @@ private:
     // for dupeCorner() checks
     static const int DUPE_MIN_X_SEPARATION = 15;
     static const int DUPE_MIN_Y_SEPARATION = 15;
+    static const int DUPE_MIN_DIST_SEPARATION = 30;
 
     static const int MAX_CORNER_DISTANCE = 600;
     static const int MIN_CORNER_DISTANCE = 10;
@@ -180,15 +177,23 @@ private:
 
     static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 15;
     static const int LINE_HEIGHT = 0; // this refers to height off the ground
-    static const int MIN_CROSS_EXTEND = 20;
+    static const float MIN_CROSS_EXTEND = 10.0f;
     // When estimating the angle between two lines on the field, anything less
     // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
-    // and disallowed; ideally our estimates would always be 90.0 degrees
-    static const int MIN_ANGLE_ON_FIELD = 55;
-    static const int MAX_ANGLE_ON_FIELD = 115;
+    // and disallowed; ideally our estimates would always be 1.57 radians
+    static const float MIN_ANGLE_ON_FIELD = .96f;
+    static const float MAX_ANGLE_ON_FIELD = 2.00f;
     static const int TWO_CORNER_LINES_MIN_LENGTH = 35;
 
     static const int DEBUG_GROUP_LINES_BOX_WIDTH = 4;
+
+    ///////////////////////////////////////////////////////////
+    // isWhiteGreenEdge constants
+    ///////////////////////////////////////////////////////////
+    static const float WHITE_PERCENT_CLEARANCE = 200.0f/9.0f;// 2/9 must be white
+    static const float MAX_YELLOW_IN_LINE = 300.0f/9.0f;    // 3/9 can be yellow
+    static const int MIN_GREEN_PIXELS_TO_TEST = 3;
+    static const int MAX_GREEN_PIXELS_TO_TEST = NUM_TEST_PIXELS;
 
     ////////////////////////////////////////////////////////////
     // Identify corners constants
@@ -197,8 +202,8 @@ private:
 public:
 
     FieldLines(Vision *visPtr,
-			   boost::shared_ptr<NaoPose> posePtr,
-			   boost::shared_ptr<Profiler> profilerPtr);
+               boost::shared_ptr<NaoPose> posePtr,
+               boost::shared_ptr<Profiler> profilerPtr);
     virtual ~FieldLines() {}
 
     // master loop
@@ -209,7 +214,7 @@ public:
     // the methods called from here use FieldObjects and as such must be
     // performed after the ObjectFragments loop is completed.
     void afterObjectFragments();
-
+private:
     // This method populates the points vector with line points it finds in
     // the image.  A line point ideally occurs in the middle of a line on the
     // screen.  We detect lines via a simple edge detection scheme -
@@ -256,19 +261,26 @@ public:
 
     // Copies the data from line1 and 2 into a new single line.
     boost::shared_ptr<VisualLine> mergeLines(boost::shared_ptr<VisualLine> line1,
-											 boost::shared_ptr<VisualLine> line2);
+                                             boost::shared_ptr<VisualLine> line2);
 
     // Given a vector of lines, attempts to extend the near vertical ones to the
     // top and bottom, and the more horizontal ones to the left and right
     void extendLines(std::vector< boost::shared_ptr<VisualLine> > &lines);
 
-    // Helper method that returns true if the color is one we consider to be
-    // a line color
-    static const bool isLineColor(const int color);
-
-    // Helper method that retursn true if the color is one we consider to be a
+    // Helper method that just returns whether the thresholded color is a
     // line color
-    static const bool isGreenColor(int threshColor);
+    static inline const bool isLineColor(const int color)
+        {
+            return Utility::isElementInArray(color, LINE_COLORS, NUM_LINE_COLORS);
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // green color
+    static inline const bool isGreenColor(int threshColor)
+        {
+            return Utility::isElementInArray(threshColor, FIELD_COLORS,
+                                             NUM_GREEN_COLORS);
+        }
 
     // Given a line, attempts to extend it to both the left and right
     void extendLineHorizontally(boost::shared_ptr<VisualLine> line);
@@ -295,7 +307,7 @@ public:
     const int findEdgeFromMiddleOfLine(int x, int y, int maxPixelsToSearch,
                                        TestDirection dir) const;
 
-	void removeDuplicateLines();
+    void removeDuplicateLines();
 
     // Pairwise tests each line on the screen against each other, calculates
     // where the intersection occurs, and then subjects the intersection
@@ -309,57 +321,63 @@ public:
     std::list<VisualCorner> intersectLines();
 
 
-	/**
-	 * Sanity checks for field lines:
-	 */
-	const bool isAngleTooSmall(boost::shared_ptr<VisualLine> i,
-						 boost::shared_ptr<VisualLine> j,
-						 const int& numChecksPassed) const;
+    /**
+     * Sanity checks for field lines:
+     */
+    const bool isAngleTooSmall(boost::shared_ptr<VisualLine> i,
+                               boost::shared_ptr<VisualLine> j,
+                               const int& numChecksPassed) const;
 
-	const bool isIntersectionOnScreen(const point<int>& intersection,
-								const int& numChecksPassed) const;
+    const bool isIntersectionOnScreen(const point<int>& intersection,
+                                      const int& numChecksPassed) const;
 
-	const bool isAngleOnFieldOkay(boost::shared_ptr<VisualLine> i,
-							boost::shared_ptr<VisualLine> j,
-							const int& intersectX,
-							const int& intersectY,
-							const int& numChecksPassed) const;
+    const bool isAngleOnFieldOkay(boost::shared_ptr<VisualLine> i,
+                                  boost::shared_ptr<VisualLine> j,
+                                  const point<int>& intersection,
+                                  const int& numChecksPassed) const;
 
-	const bool tooMuchGreenAtCorner(const point<int>& intersection,
-							  const int& numChecksPassed);
+    const bool tooMuchGreenAtCorner(const point<int>& intersection,
+                                    const int& numChecksPassed);
 
-	const bool areLinesTooSmall(boost::shared_ptr<VisualLine> i,
-						  boost::shared_ptr<VisualLine> j,
-						  const int& numChecksPassed) const;
+    const bool areLinesTooSmall(boost::shared_ptr<VisualLine> i,
+                                boost::shared_ptr<VisualLine> j,
+                                const int& numChecksPassed) const;
 
-	const bool doLinesCross(boost::shared_ptr<VisualLine> i,
-					  boost::shared_ptr<VisualLine> j,
-					  const float& t_I, const float& t_J,
-					  const int& numChecksPassed)const ;
+    const bool doLinesCross(boost::shared_ptr<VisualLine> i,
+                            boost::shared_ptr<VisualLine> j,
+                            const float& t_I, const float& t_J,
+                            const int& numChecksPassed) const;
 
-	const bool isCornerTooFar(const float& distance,
-						const int& numChecksPassed) const;
+    const bool isThereGreenAroundCorner(const VisualCorner& corner,
+                                        const VisualLine& i,
+                                        const VisualLine& j) const;
+    const bool isItGreenAcrossFromLine(const VisualCorner& corner,
+                                       const VisualLine& i) const;
 
-	const bool areLineEndsCloseEnough(boost::shared_ptr<VisualLine> i,
-								boost::shared_ptr<VisualLine> j,
-								const point<int>& intersection,
-								const int& numChecksPassed) const;
+    const bool isCornerTooFar(const float& distance,
+                              const int& numChecksPassed) const;
 
-	const bool tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
-									  const point<int>& line2Closer,
-									  const point<int>& intersection,
-									  const int& numChecksPassed) const;
+    const bool areLineEndsCloseEnough(boost::shared_ptr<VisualLine> i,
+                                      boost::shared_ptr<VisualLine> j,
+                                      const point<int>& intersection,
+                                      const int& numChecksPassed) const;
 
-	const bool isTActuallyCC(const VisualCorner& c,
-							 boost::shared_ptr<VisualLine> i,
-							 boost::shared_ptr<VisualLine> j,
-							 const point<int>& intersection,
-							 const point<int>& line1Closer,
-							 const point<int>& line2Closer);
+    const bool tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
+                                            const point<int>& line2Closer,
+                                            const point<int>& intersection,
+                                            const int& numChecksPassed) const;
 
-	// Checks if a corner is too dangerous when it is relatively near the edge
-	// of the screen - scans the edge for a stripe of white
-	const bool tooClose(int x, int y);
+    const bool isTActuallyCC(const VisualCorner& c,
+                             boost::shared_ptr<VisualLine> i,
+                             boost::shared_ptr<VisualLine> j,
+                             const point<int>& intersection,
+                             const point<int>& line1Closer,
+                             const point<int>& line2Closer);
+
+    // Checks if a corner is too dangerous when it is relatively near the edge
+    // of the screen - scans the edge for a stripe of white
+    const bool dangerousEdgeCorner(const VisualCorner& corner,
+                                   const point<int>& intersection);
 
     // Iterates over the corners and removes those that are too risky to
     // use for localization data
@@ -382,6 +400,7 @@ public:
     // Determines if the given L corner does not geometrically make sense for
     // its shape given the objects on the screen.
     const bool LCornerShouldBeTCorner(const VisualCorner &L) const;
+
 
     // In some Nao frames, robots obscure part of the goal and the bottom is not
     // visible.  We can only use pix estimates of goals whose bottoms are
@@ -422,6 +441,12 @@ public:
     float getEstimatedDistance(const VisualCorner *c,
                                const VisualFieldObject *obj) const;
 
+    float getEstimatedDistance(float dist1, float bearing1,
+                               float dist2, float bearing2) const;
+
+    float getEstimatedDistance(const VisualCorner& corner,
+                               const point<int>& p) const;
+
     float getEstimatedAngle(const VisualCorner &corner) const;
 
     float getEstimatedAngle(boost::shared_ptr<VisualLine> line1,
@@ -429,28 +454,38 @@ public:
                             const int intersectX,
                             const int intersectY) const;
 
-	void classifyCornerWithObjects(
-		const VisualCorner &corner,
-		const std::vector <const VisualFieldObject*> &visibleObjects,
-		list<const ConcreteCorner*>* classifications) const;
+    const list<const ConcreteCorner*> classifyCornerWithObjects(
+        const VisualCorner &corner,
+        const std::vector <const VisualFieldObject*> &visibleObjects) const;
 
-	std::list<const ConcreteCorner*>
-	compareObjsCorners(const VisualCorner& corner,
-					   const std::vector<const ConcreteCorner*>& possibleCorners,
-					   const std::vector<const VisualFieldObject*>& visibleObjects)
-		const;
+    std::list<const ConcreteCorner*>
+    compareObjsCorners(const VisualCorner& corner,
+                       const std::vector<const ConcreteCorner*>& possibleCorners,
+                       const std::vector<const VisualFieldObject*>& visibleObjects)
+        const;
 
-	const bool arePointsCloseEnough(const float estimatedDistance,
-									const ConcreteCorner* j,
-									const VisualFieldObject* k) const;
-
-
-    float getAllowedDistanceError(VisualFieldObject const *obj) const;
+    const bool arePointsCloseEnough(const float estimatedDistance,
+                                    const ConcreteCorner* j,
+                                    const VisualFieldObject* k,
+                                    const float distToCorner) const;
 
 
+    float getAllowedDistanceError(const VisualFieldObject* obj) const;
 
 
 
+    void extendLineVertScan(ExtendDirection dir,
+                            std::list<linePoint>* foundLinePoints,
+                            boost::shared_ptr<VisualLine> line,
+                            point<int> lastPoint,
+                            int startY, int endY);
+
+    void extendLineHorizScan(ExtendDirection _testDir,
+                             std::list<linePoint> * foundLinePoints,
+                             boost::shared_ptr<VisualLine> line,
+                             point<int> lastPoint,
+                             int startX,
+                             int endX);
 
 
     // Return true if it appears the T is out of bounds, false otherwise
@@ -459,12 +494,12 @@ public:
     */
 
     const bool dupeCorner(const std::list<VisualCorner> &corners,
-										const point<int>& intersection,
-										const int testNumber) const;
-	void removeDupeCorners(std::list<VisualCorner> &corners,
-						   const point<int>& intersection);
-	const bool dupeFakeCorner(const std::list<point <int> > &corners,
-							  const int x, const int y, const int testNumber) const;
+                                        const point<int>& intersection,
+                                        const int testNumber) const;
+    void removeDupeCorners(std::list<VisualCorner> &corners,
+                           const point<int>& intersection);
+    const bool dupeFakeCorner(const std::list<point <int> > &corners,
+                              const int x, const int y, const int testNumber) const;
     const float percentColor(const int x, const int y, const TestDirection dir,
                              const int color, const int numPixels) const;
     const float percentColor(const int x, const int y, const TestDirection dir,
@@ -488,6 +523,19 @@ public:
                                     const int x2, const int y2,
                                     const int color) const;
 
+    const float isColorBetween(const int x1, const int y1,
+                               const int x2, const int y2,
+                               const int longestHoleAllowed,
+                               const int color) const;
+
+    const bool isColorBetween(const int x1, const int y1,
+                              const int x2, const int y2,
+                              const int longestHoleAllowed,
+                              const int colors[],
+                              const int numColors) const;
+
+    const bool linePointWidthsDifferent(const linePoint& last,
+                                        const linePoint& current) const;
 
     void drawBox(BoundingBox box, int color) const;
     void drawSurroundingBox(boost::shared_ptr<VisualLine> aLine, int color) const;
@@ -495,12 +543,6 @@ public:
     const bool isGreenWhiteEdge(int x, int y, ScanDirection direction) const;
     const bool isWhiteGreenEdge(int x, int y, int potentialMidPoint,
                                 const ScanDirection direction) const;
-
-
-
-    // Implementation can be found at revision 4518 if we ever want to get it
-    // again.
-    const int findCorrespondingBottom(const int x, const int y) const;
 
     static void updateLineCounters(const int threshColor, int &numWhite,
                                    int &numUndefined, int &numNonWhite);
@@ -521,6 +563,9 @@ public:
     void drawCorners(const std::list<VisualCorner> &toDraw, int color);
 
     bool isLegitVerticalLinePoint(int x, int y);
+
+    // Getters and setters for FieldLines
+public:
 #ifdef OFFLINE
     void setDebugVertEdgeDetect(bool _bool) { debugVertEdgeDetect = _bool; }
     void setDebugHorEdgeDetect(bool _bool) { debugHorEdgeDetect = _bool; }
@@ -539,6 +584,7 @@ public:
     void setDebugCornerAndObjectDistances(bool _bool) {
         debugCornerAndObjectDistances = _bool;
     }
+
     void setStandardView(bool _bool) {
         standardView = _bool;
     }
@@ -593,7 +639,7 @@ private:
     // a vector of the pointers of the objects that are visible.
     std::vector<const VisualFieldObject*> getVisibleFieldObjects() const;
 
-	vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
+    vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
 
     // Returns whether there is a yellow post on screen that vision has not
     // identified the side of
@@ -603,18 +649,18 @@ private:
     const bool unsureBluePostOnScreen() const;
 
     // Returns whether there is a yellow post close to this corner
-    const bool yellowPostCloseToCorner(VisualCorner& c);
+    const bool yellowPostCloseToCorner(const VisualCorner& c);
 
     // Returns whether there is a blue post close to this corner
-    const bool bluePostCloseToCorner(VisualCorner& c);
+    const bool bluePostCloseToCorner(const VisualCorner& c);
 
     const bool postOnScreen() const;
 
 #ifdef OFFLINE
-    static const bool isUphillEdge(const int, const int,
-                                   const ScanDirection dir);
-    static const bool isDownhillEdge(const int, const int,
-                                     const ScanDirection dir);
+    static inline const bool isUphillEdge(const int, const int,
+                                          const ScanDirection dir);
+    static inline const bool isDownhillEdge(const int, const int,
+                                            const ScanDirection dir);
 
     // Check to see if a particular variable holds a valid edge or the special
     // value of NO_EDGE.
@@ -622,12 +668,14 @@ private:
         return edgeY != NO_EDGE;
     }
 
-    static const bool isAtTopOfImage(const int y, const int horizonY);
-    static const bool isAtRightOfImage(const int x, const int endX);
-    static const bool isWaitingForAnotherTopEdge(const int topEdgeY,
-                                                 const int currentY);
-    static const bool isWaitingForAnotherRightEdge(const int rightEdgeX,
-                                                   const int currentX);
+    static inline const bool isAtTopOfImage(const int y,
+                                            const int horizonY);
+    static inline const bool isAtRightOfImage(const int x,
+                                              const int endX);
+    static inline const bool isWaitingForAnotherTopEdge(const int topEdgeY,
+                                                        const int currentY);
+    static inline const bool isWaitingForAnotherRightEdge(const int rightEdgeX,
+                                                          const int currentX);
 
     // These cannot be static only because they access the debugging booleans.
     const bool isFirstUphillEdge(const int uphillEdgeLoc,
@@ -697,7 +745,8 @@ private:
 
 private:
 
-    // debug variables
+    // debug variables. If a new variable is added here, it must
+    // be disabled by default! See FieldLines constructor!
 #ifdef OFFLINE
     bool debugVertEdgeDetect;
     bool debugHorEdgeDetect;
