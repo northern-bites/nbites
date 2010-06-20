@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "Common.h"
+#include "manconfig.h"
 
 // Nao field constants
 

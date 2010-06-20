@@ -270,15 +270,12 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         mainWindow = new JFrame("TOOL - Main Window");
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        if (System.getProperty("os.name").contains("Mac")) {
-            mainWindow.setDefaultLookAndFeelDecorated(true);
-        }
-        else if (System.getProperty("os.name").contains("Windows")) {
-            try {
-            UIManager.setLookAndFeel(
-                                 "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            } catch (Exception e) { }
-        }
+		// Try to set the look and feel to the appropriate OS setting
+		try {
+			UIManager.setLookAndFeel(UIManager.
+									 getSystemLookAndFeelClassName());
+		} catch (Exception e) {}
+
 
         //init menu needs to happen here, but before everything else, or the
         //the menu doesnt display right

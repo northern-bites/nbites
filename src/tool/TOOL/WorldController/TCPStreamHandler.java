@@ -83,21 +83,21 @@ public class TCPStreamHandler extends Thread {
 					displayObservations();
 				}
 
-				// Update multimodal filter models
-				MMLocEKFInfo =
-					robotModule.getSelectedRobot().retrieveMMLocEKF();
+				// // Update multimodal filter models
+				// MMLocEKFInfo =
+				// 	robotModule.getSelectedRobot().retrieveMMLocEKF();
 
-				if (MMLocEKFInfo != null && locInfo != null){
-					LinkedList<RobotModel> models =
-						new LinkedList<RobotModel>();
-					for (LocalizationPacket lp : MMLocEKFInfo){
-						RobotModel m = new RobotModel(info.team, info.player,
-													  info.color);
-						m.updateData(lp, locInfo.get(1), true);
-						models.add(m);
-					}
-					painter.updateModels(models);
-				}
+				// if (MMLocEKFInfo != null && locInfo != null){
+				// 	LinkedList<RobotModel> models =
+				// 		new LinkedList<RobotModel>();
+				// 	for (LocalizationPacket lp : MMLocEKFInfo){
+				// 		RobotModel m = new RobotModel(info.team, info.player,
+				// 									  info.color);
+				// 		m.updateData(lp, locInfo.get(1), true);
+				// 		models.add(m);
+				// 	}
+				// 	painter.updateModels(models);
+				// }
 
 				timeSpent = System.currentTimeMillis() - startTime;
 				if (timeSpent < 80){

@@ -1,6 +1,15 @@
 package TOOL.Learning;
 
 import java.util.Vector;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import java.awt.GridLayout;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 
 import TOOL.TOOL;
 import TOOL.Vision.*;
@@ -71,7 +80,7 @@ public class VisionState {
 	private CrossType seeCross;
 	private GoalType seeBlue, seeYellow;
 	private int seeRedRobots, seeBlueRobots;
-	private int seeLCorners, seeTCorners;
+	private int seeLCorners, seeTCorners, seeCcCorners;
     private Vector<VisualFieldObject> visualFieldObjects;
     private Vector<VisualCorner> visualCorners;
 	private int tableSize = 128;
@@ -96,6 +105,9 @@ public class VisionState {
 		seeBlueRobots = 0;
 		seeLCorners = 0;
 		seeTCorners = 0;
+		seeCcCorners = 0;
+
+		createDebugWindow();
     }
 
 	/** We are going to collect stats on the pixels we see in a bunch of frames.  For any
@@ -729,6 +741,7 @@ public class VisionState {
 		int other = 0;
 		seeLCorners = 0;
 		seeTCorners = 0;
+		seeCcCorners = 0;
         for (int i = 0; i < visualCorners.size(); i++) {
             corner = visualCorners.elementAt(i);
 			VisualCorner.shape corn = corner.getShape();
@@ -736,6 +749,8 @@ public class VisionState {
 				seeLCorners++;
 			} else if (corn == VisualCorner.shape.T) {
 				seeTCorners++;
+			} else if (corn == VisualCorner.shape.CIRCLE ){
+				seeCcCorners++;
 			} else {
 				// current covers UNKNOWN and CIRCLE it is plausible that we'll want to process these
 				other++;
@@ -867,6 +882,7 @@ public class VisionState {
 	public CrossType getCrossVision() {return seeCross;}
 	public int getLCornersVision() {return seeLCorners;}
 	public int getTCornersVision() {return seeTCorners;}
+	public int getCcCornersVision() {return seeCcCorners;}
 
 	public String getBlueGoalString() {
 		switch (seeBlue) {
@@ -911,10 +927,145 @@ public class VisionState {
 	public String getTCornerString() {
 		return ""+seeTCorners;
 	}
+	public String getCcCornerString() {
+		return ""+seeCcCorners;
+	}
 
     //setters
     public void setImage(TOOLImage i) { rawImage = i; }
     public void setThreshImage(ProcessedImage i) { thresholdedImage = i;  }
     public void setColorTable(ColorTable c) { colorTable = c; }
     public void setBall(Ball b) { ball = b;  }
+
+
+	/**
+	 * Constructs the window with checkboxes to toggle on and off vision debugging flags.
+	 */
+	private void createDebugWindow()
+	{
+		JFrame debugWindow = new JFrame();
+		JPanel buttonPanel = new JPanel();
+
+		final JCheckBox fieldLinesDebugVertEdgeDetectBox = new JCheckBox(" Debug VertEdgeDetect");
+		fieldLinesDebugVertEdgeDetectBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugVertEdgeDetect(fieldLinesDebugVertEdgeDetectBox.isSelected());
+				}
+			});
+
+		final JCheckBox fieldLinesDebugHorEdgeDetectBox = new JCheckBox(" Debug Hor Edge Detect");
+		fieldLinesDebugHorEdgeDetectBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugHorEdgeDetect(fieldLinesDebugHorEdgeDetectBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugSecondVertEdgeDetectBox = new JCheckBox(" Debug Second Vert EdgeDetect");
+		fieldLinesDebugSecondVertEdgeDetectBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugSecondVertEdgeDetect(fieldLinesDebugSecondVertEdgeDetectBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugCreateLinesBox = new JCheckBox(" Debug Create Lines ");
+		fieldLinesDebugCreateLinesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugCreateLines(fieldLinesDebugCreateLinesBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugFitUnusedPointsBox = new JCheckBox(" Debug Fit Unused Points");
+		fieldLinesDebugFitUnusedPointsBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugFitUnusedPoints(fieldLinesDebugFitUnusedPointsBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugJoinLinesBox = new JCheckBox(" Debug Join Lines ");
+		fieldLinesDebugJoinLinesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugJoinLines(fieldLinesDebugJoinLinesBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugExtendLinesBox = new JCheckBox(" Debug Extend Lines ");
+		fieldLinesDebugExtendLinesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugExtendLines(fieldLinesDebugExtendLinesBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugIntersectLinesBox = new JCheckBox(" Debug Intersect Lines ");
+		fieldLinesDebugIntersectLinesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugIntersectLines(fieldLinesDebugIntersectLinesBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugIdentifyCornersBox = new JCheckBox(" Debug Identify Corners ");
+		fieldLinesDebugIdentifyCornersBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugIdentifyCorners(fieldLinesDebugIdentifyCornersBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugCcScanBox = new JCheckBox(" Debug Cc Scan ");
+		fieldLinesDebugCcScanBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugCcScan(fieldLinesDebugCcScanBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugRiskyCornersBox = new JCheckBox(" Debug Risky Corners ");
+		fieldLinesDebugRiskyCornersBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugRiskyCorners(fieldLinesDebugRiskyCornersBox.isSelected());}
+			});
+		final JCheckBox fieldLinesDebugCornerAndObjectDistancesBox = new JCheckBox(" Debug Corner And ObjectDistances");
+		fieldLinesDebugCornerAndObjectDistancesBox.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setFieldLinesDebugCornerAndObjectDistances(fieldLinesDebugCornerAndObjectDistancesBox.isSelected());}
+			});
+
+		buttonPanel.add(new JLabel("\tField Line Flags"));
+		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
+		buttonPanel.add(fieldLinesDebugHorEdgeDetectBox);
+		buttonPanel.add(fieldLinesDebugCornerAndObjectDistancesBox);
+		buttonPanel.add(fieldLinesDebugSecondVertEdgeDetectBox);
+		buttonPanel.add(fieldLinesDebugCreateLinesBox);
+		buttonPanel.add(fieldLinesDebugFitUnusedPointsBox);
+		buttonPanel.add(fieldLinesDebugJoinLinesBox);
+		buttonPanel.add(fieldLinesDebugExtendLinesBox);
+		buttonPanel.add(fieldLinesDebugIntersectLinesBox);
+		buttonPanel.add(fieldLinesDebugIdentifyCornersBox);
+		buttonPanel.add(fieldLinesDebugCcScanBox);
+		buttonPanel.add(fieldLinesDebugRiskyCornersBox);
+
+		buttonPanel.setLayout(new GridLayout(13,1));
+
+		debugWindow.add(buttonPanel);
+		debugWindow.setSize(400,400);
+		debugWindow.setVisible(true);
+
+        // Disable all the debugging information by default
+        thresholdedImage.getVisionLink().setFieldLinesDebugVertEdgeDetect(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugHorEdgeDetect(false);
+
+        thresholdedImage.getVisionLink().
+            setFieldLinesDebugSecondVertEdgeDetect(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugCreateLines(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugFitUnusedPoints(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugJoinLines(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugExtendLines(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugIntersectLines(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugIdentifyCorners(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugCcScan(false);
+
+        thresholdedImage.getVisionLink().setFieldLinesDebugRiskyCorners(false);
+
+        thresholdedImage.getVisionLink().
+            setFieldLinesDebugCornerAndObjectDistances(false);
+	}
 }

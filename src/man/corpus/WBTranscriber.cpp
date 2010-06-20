@@ -81,32 +81,28 @@ void WBTranscriber::postVisionSensors(){
     const float usd3 = static_cast<float>(wb_distance_sensor_get_value(us3));
     const float usd4 = static_cast<float>(wb_distance_sensor_get_value(us4));
 
-    const int ultraSoundMode =0;
-
-    const float usDist =  std::min(
-        std::min(usd1,usd2),
-        std::min(usd3,usd4));
+    const float usDist1 = std::min(usd3,usd4);
+    const float usDist2 = std::min(usd1,usd2);
 
     const float batteryCharge = 1.0;
     const float batteryCurrent = 0.0;
     sensors->
         setVisionSensors(FootBumper(lFBL, rFBL),
                          FootBumper(lFBR, rFBR),
-                         usDist,
-                         // UltraSoundMode is just an enum
-                         static_cast<UltraSoundMode> (ultraSoundMode),
+                         usDist1,
+                         usDist2,
                          batteryCharge,
                          batteryCurrent);
 }
 
 const boost::tuple<const float, const float>
- WBTranscriber::angleWrapper(const float accX, const float accY,
-                             const float gyroX,const float gyroY){
+WBTranscriber::angleWrapper(const float accX, const float accY,
+                            const float gyroX,const float gyroY){
 
-/*
- * This method still needs some serious work. TODO: fix implementation
- * of kalman filter, and fix Nan issue on webots reload
- */
+    /*
+     * This method still needs some serious work. TODO: fix implementation
+     * of kalman filter, and fix Nan issue on webots reload
+     */
 
 #ifdef COMPUTE_WEBOTS_ANGLE
 
@@ -121,30 +117,30 @@ const boost::tuple<const float, const float>
     float accAngleY = std::asin(ratioY);
 
     if (ratioX >= 1){
-      accAngleX = M_PI_FLOAT/2;
-      prevAngleX = M_PI_FLOAT/2;
+        accAngleX = M_PI_FLOAT/2;
+        prevAngleX = M_PI_FLOAT/2;
     }
     else
-      if (ratioX <= -1){
-	accAngleX = -M_PI_FLOAT/2;
-	prevAngleX = -M_PI_FLOAT/2;
-      }
+        if (ratioX <= -1){
+            accAngleX = -M_PI_FLOAT/2;
+            prevAngleX = -M_PI_FLOAT/2;
+        }
 
     if (ratioY >= 1){
-      accAngleY = M_PI_FLOAT/2;
-      prevAngleY = M_PI_FLOAT/2;
+        accAngleY = M_PI_FLOAT/2;
+        prevAngleY = M_PI_FLOAT/2;
     }
     else
-      if (ratioY <= -1){
-	accAngleY = -M_PI_FLOAT/2;
-	prevAngleY = -M_PI_FLOAT/2;
-      }
+        if (ratioY <= -1){
+            accAngleY = -M_PI_FLOAT/2;
+            prevAngleY = -M_PI_FLOAT/2;
+        }
     angleEKF.update(accAngleX, accAngleY);
 
     if (accAngleX <= .002 && accAngleX >= -.002)
-      prevAngleX = 0;
+        prevAngleX = 0;
     if (accAngleY <= .002 && accAngleY >= -.002)
-      prevAngleY = 0;
+        prevAngleY = 0;
 
     //multiplying with .02 since gyro gives you rad/s and
     //the updating happens every 20 ms
@@ -163,8 +159,8 @@ const boost::tuple<const float, const float>
     //HACK!!!! TODO compute angleX and angleY better (filter?)
     //Currently when the gravity accell is in one direction,
     //we use that to consider that the robot is rotated along the other axis
-//     const float angleX = accY/GRAVITY_mss * M_PI_FLOAT;
-//     const float angleY = -accX/GRAVITY_mss * M_PI_FLOAT;
+    //     const float angleX = accY/GRAVITY_mss * M_PI_FLOAT;
+    //     const float angleY = -accX/GRAVITY_mss * M_PI_FLOAT;
     //better approximation, for now
 
 
@@ -176,12 +172,12 @@ const boost::tuple<const float, const float>
 }
 
 void WBTranscriber::postMotionSensors(){
-//The following sensors need to be updated on the motion cycle:
-//Foot sensors
-//Button (always off)
-//Inertials (including angleX!)
-//Joints
-//Temperatures (always zero)
+    //The following sensors need to be updated on the motion cycle:
+    //Foot sensors
+    //Button (always off)
+    //Inertials (including angleX!)
+    //Joints
+    //Temperatures (always zero)
 
 
     //Inertials

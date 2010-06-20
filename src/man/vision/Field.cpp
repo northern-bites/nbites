@@ -384,8 +384,6 @@ int Field::findGreenHorizon(int pH, float sl) {
     return horizon;
 }
 
-
-
 void Field::bestShot(VisualFieldObject* left,
                      VisualFieldObject* right,
                      VisualCrossbar* middle, int color)
@@ -421,7 +419,6 @@ void Field::bestShot(VisualFieldObject* left,
     middle->setWidth(static_cast<float>(rightb - leftb + 1));
     middle->setHeight(10);
 }
-
 
 /* The horizon at the given x value.  Eventually we'll be changing this to
  * return a value based upon the field edges.

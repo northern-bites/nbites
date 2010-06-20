@@ -51,14 +51,16 @@ FINK_INCLUDE := -I/sw/include
 NATIVE_VISION_TARGET := $(META_DIR)/lib$(NATIVE_VISION_CLASS_FILE).jnilib
 VISION_SHARED_OPTS := -dynamiclib -m32
 else
-JAVA_INCLUDE:= -I/usr/lib/jvm/java-1.5.0-sun/include/ -I/usr/lib/jvm/java-1.5.0-sun/include/linux/
+
+JAVA_INCLUDE:= -I/usr/lib/jvm/java-1.5.0-sun/include/linux/ -I/usr/lib/jvm/java-1.5.0-sun/include/ -I/usr/lib/jvm/java-6-sun/include/ -I/usr/lib/jvm/java-6-sun/include/linux/
+
 VISION_SHARED_OPTS := -shared -fpic
 NATIVE_VISION_TARGET := $(META_DIR)/lib$(NATIVE_VISION_CLASS_FILE).so
 endif
 PYTHON_INCLUDE:= -I/usr/include/python2.5/
 PYLIBS := -lpython2.5
 
-NBITES_INCLUDE :=-I$(MAN_HOME)/vision -I$(MAN_HOME)/include -I$(MAN_HOME)/corpus -I$(MAN_HOME)/motion -I$(MAN_HOME)/noggin
+NBITES_INCLUDE :=-I$(MAN_HOME)/vision -I$(MAN_HOME)/include -I$(MAN_HOME)/corpus -I$(MAN_HOME)/motion -I$(MAN_HOME)/noggin -I$(MAN_HOME)/
 VISION_INCLUDE := $(JAVA_INCLUDE) $(NBITES_INCLUDE) $(PYTHON_INCLUDE)  $(FINK_INCLUDE)
 
 

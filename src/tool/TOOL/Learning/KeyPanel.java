@@ -66,12 +66,13 @@ public class KeyPanel extends JPanel implements ItemListener {
 	private JComboBox blueRobots;
 	private JComboBox lCorners;
 	private JComboBox tCorners;
+	private JComboBox ccCorners;
     private Learning learn;
 
 	// labels showing what the vision system has found for this frame
 	private JTextField visionHuman, visionBall, visionYellow, visionBlue;
 	private JTextField visionCross, visionRedRobot, visionBlueRobot;
-	private JTextField visionLCorner, visionTCorner;
+	private JTextField visionLCorner, visionTCorner, visionCcCorner;
 
 
 	/** Create the panel and set up the listeners.
@@ -103,9 +104,17 @@ public class KeyPanel extends JPanel implements ItemListener {
 
 		am.put("LCorner", new AbstractAction("LCorner"){
 				public void actionPerformed(ActionEvent e){
-					int index = lCorners.getSelectedIndex();
 					lCorners.setSelectedIndex((lCorners.getSelectedIndex() + 1) %
-											  (lCorners.getItemCount()-1));
+											  (lCorners.getItemCount()));
+				}
+			});
+
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0), "CcCorner");
+
+		am.put("CcCorner", new AbstractAction("CcCorner"){
+				public void actionPerformed(ActionEvent e){
+					ccCorners.setSelectedIndex((ccCorners.getSelectedIndex() + 1) %
+											  (ccCorners.getItemCount()));
 				}
 			});
 
@@ -113,9 +122,8 @@ public class KeyPanel extends JPanel implements ItemListener {
 
 		am.put("TCorner", new AbstractAction("TCorner"){
 				public void actionPerformed(ActionEvent e){
-					int index = tCorners.getSelectedIndex();
 					tCorners.setSelectedIndex((tCorners.getSelectedIndex() + 1) %
-											  (tCorners.getItemCount()-1));
+											  (tCorners.getItemCount()));
 				}
 			});
 	}
@@ -195,6 +203,16 @@ public class KeyPanel extends JPanel implements ItemListener {
 					setLCornerOverlay(sourceBox);
 				}});
 
+		ccCorners = new JComboBox();
+		ccCorners.addItem("No CC Corners");
+		ccCorners.addItem("One");
+		ccCorners.addItem("Two");
+		ccCorners.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JComboBox sourceBox = (JComboBox) e.getSource();
+					setCcCornerOverlay(sourceBox);
+				}});
+
 		tCorners = new JComboBox();
 		tCorners.addItem("No T Corners");
 		tCorners.addItem("One");
@@ -217,6 +235,7 @@ public class KeyPanel extends JPanel implements ItemListener {
 		visionBlueRobot = new JTextField(learn.getBlueRobotString());
 		visionLCorner = new JTextField(learn.getLCornerString());
 		visionTCorner = new JTextField(learn.getTCornerString());
+		visionCcCorner = new JTextField(learn.getCcCornerString());
 
 		add(ball);
 		add(visionBall);
@@ -234,10 +253,12 @@ public class KeyPanel extends JPanel implements ItemListener {
 		add(visionLCorner);
 		add(tCorners);
 		add(visionTCorner);
+		add(ccCorners);
+		add(visionCcCorner);
 		add(human);
 		add(visionHuman);
 
-        setLayout(new GridLayout(9,2));
+        setLayout(new GridLayout(10,2));
 	}
 
 
@@ -321,6 +342,14 @@ public class KeyPanel extends JPanel implements ItemListener {
 	 */
 	public void setLCorner(String s) {
 		visionLCorner.setText(s);
+	}
+
+	/** Displays the appropriate text for the field.  This is called by the
+		main learning object.
+		@param s      text to display in the cc corner field
+	 */
+	public void setCcCorner(String s) {
+		visionCcCorner.setText(s);
 	}
 
 	/** Displays the appropriate text for the field.  This is called by the
@@ -420,6 +449,15 @@ public class KeyPanel extends JPanel implements ItemListener {
 	public void setLCornerStatus(int num) {
 		if (num > 3) num = 3;
 		lCorners.setSelectedIndex(num);
+	}
+
+	/** Sets the input device to reflect either what the Key file says of what the
+		vision system says depending on if the key file exists.
+		@param num    how many corners
+	 */
+	public void setCcCornerStatus(int num) {
+		if (num > 2) num = 2;
+		ccCorners.setSelectedIndex(num);
 	}
 
 	/** Sets the input device to reflect either what the Key file says of what the
@@ -560,6 +598,22 @@ public class KeyPanel extends JPanel implements ItemListener {
 		}
 		else if (((String) sourceBox.getSelectedItem()).equals("Four")) {
 			learn.setLCorners(4);
+		}
+	}
+
+	/** The user has changed the value of this overlay so tell the learning system
+		about it.  Based on the value set the goal type.
+		@param sourceBox   the item that was set
+	 */
+	public void setCcCornerOverlay(JComboBox sourceBox) {
+		if (((String) sourceBox.getSelectedItem()).equals("No CC Corners")) {
+			learn.setCcCorners(0);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("One")) {
+			learn.setCcCorners(1);
+		}
+		else if (((String) sourceBox.getSelectedItem()).equals("Two")) {
+			learn.setCcCorners(2);
 		}
 	}
 

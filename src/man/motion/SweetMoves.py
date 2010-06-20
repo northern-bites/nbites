@@ -45,6 +45,11 @@ INITIAL_POS = (((60.0, 35.0, 0.0, 0.0),
                 (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
                 (60.0,-35.0, 0.0, 0.0),3.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
+NO_HEAD_INITIAL_POS = (((60.0, 35.0, 0.0, 0.0),
+                (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
+                (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
+                (60.0,-35.0, 0.0, 0.0),3.0,0,stiff.NO_HEAD_STIFFNESSES),)
+
 #Angles measured pretty exactly from the robot w/gains off.
 #might want to make them even different if we suspect the motors are weakening
 SIT_POS = (((0.,90.,0.,0.),

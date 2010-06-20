@@ -59,20 +59,20 @@ const int ALImageTranscriber::DEFAULT_CAMERA_BUFFERSIZE = 16;
 // Gain: 28 / Exp: 60
 // Gain: 35 / Exp: 40
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 26;
+const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 30;
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 128;
-const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 68;
-const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 140;
-const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 64;
-const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 128;
+const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 127;
+const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 67;
+const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 154;
+const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 90;
+const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 152;
 const int ALImageTranscriber::DEFAULT_CAMERA_HUE = 0;
 // Lens correction
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSX = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSY = 0;
 // Exposure length
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 83;
+const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 60;
 // Image orientation
 const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
@@ -139,11 +139,12 @@ void ALImageTranscriber::run() {
         //sleep until next frame
 
         lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
-        if (processTime > VISION_FRAME_LENGTH_uS){
-            if (lastProcessTimeAvg > VISION_FRAME_LENGTH_PRINT_THRESH_uS) {
+
+        if (processTime > VISION_FRAME_LENGTH_uS) {
+            if (processTime > VISION_FRAME_LENGTH_PRINT_THRESH_uS) {
 #ifdef DEBUG_ALIMAGE_LOOP
                 std::cout << "Time spent in ALImageTranscriber loop longer than"
-                        << " frame length: " << processTime <<std::endl;
+                          << " frame length: " << processTime <<std::endl;
 #endif
             }
             //Don't sleep at all
@@ -155,8 +156,8 @@ void ALImageTranscriber::run() {
 
             const long int secSleepTime = microSleepTime / (1000*1000);
 
-            // cout << "Sleeping for nano: " << nanoSleepTime <<
-            // 	" and sec:" << secSleepTime << endl;
+            // std::cout << "Sleeping for nano: " << nanoSleepTime <<
+            //  	" and sec:" << secSleepTime << std::endl;
 
             interval.tv_sec = secSleepTime;
             interval.tv_nsec = nanoSleepTime;
@@ -486,7 +487,6 @@ void ALImageTranscriber::waitForImage ()
                        "NaoCam module");
         }
         if (ALimage != NULL) {
-            sensors->updateVisionAngles();
             memcpy(&image[0], ALimage->getFrame(), IMAGE_BYTE_SIZE);
         }
         else
@@ -546,8 +546,6 @@ void ALImageTranscriber::waitForImage ()
             sensors->setImage(image);
             sensors->releaseImage();
         }
-
-        releaseImage();
 
     }catch (ALError &e) {
         log->error("NaoMain", "Caught an error in run():\n" + e.toString());

@@ -454,7 +454,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c) {
 
 // Convenience method to draw a VisualLine to the screen.
 void Vision::drawLine(boost::shared_ptr<VisualLine> line, const int color) {
-    drawLine(line->start.x, line->start.y, line->end.x, line->end.y, color);
+    drawLine(line->getStartpoint().x, line->getStartpoint().y, line->getEndpoint().x, line->getEndpoint().y, color);
 }
 
 /* drawPoint()
@@ -545,8 +545,9 @@ void Vision::drawFieldLines() {
         drawLine(*i, BLUE);
 
         // Draw all the line points in the line
-        for (vector<linePoint>::const_iterator j = (*i)->points.begin();
-             j != (*i)->points.end(); j++) {
+		const vector<linePoint> points = (*i)->getPoints();
+        for (vector<linePoint>::const_iterator j = points.begin();
+             j != points.end(); j++) {
             // Vertically found = black
             if (j->foundWithScan == VERTICAL) {
                 drawPoint(*j, BLACK);
