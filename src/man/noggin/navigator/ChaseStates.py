@@ -16,17 +16,14 @@ def walkSpinToBall(nav):
     nav.dest = ball
     nav.dest.h = ball.heading
 
+    if navTrans.atDestinationCloserAndFacing(nav.brain.my, nav.dest, ball.bearing):
+        return nav.goNow('stop')
+
     # Set our walk towards the ball
     walkX, walkY, walkTheta = \
            walker.getWalkSpinParam(nav.brain.my, nav.dest)
 
     helper.setSpeed(nav, walkX, walkY, walkTheta)
-
-    #if we're close to the ball...
-    if navTrans.atDestinationCloser(nav.brain.my, nav.dest):
-        # and facing  it, stop
-        if fabs(ball.bearing) < 10.:
-            return nav.goNow('stop')
 
     if not nav.brain.play.isRole(GOALIE):
         if navTrans.shouldNotGoInBox(ball):
@@ -38,6 +35,7 @@ def walkSpinToBall(nav):
 
     return nav.stay()
 
+# TODO: clean up!!
 def chaseAroundBox(nav):
     # does not work if we are in corner and ball is not- we'll run through box
     # would be nice to force spin towards ball at dest
@@ -51,11 +49,11 @@ def chaseAroundBox(nav):
     my = nav.brain.my
 
     if not navTrans.shouldChaseAroundBox(my, ball):
-        nav.shouldChaseAroundBox += 1
+        nav.shouldntChaseAroundBox += 1
     else:
-        nav.shouldChaseAroundBox = 0
+        nav.shouldntChaseAroundBox = 0
 
-    if nav.shouldChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
+    if nav.shouldntChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
         return nav.goNow('walkSpinToBall')
 
     elif navTrans.shouldAvoidObstacleDuringApproachBall(nav):
@@ -105,8 +103,8 @@ def ballInMyBox(nav):
     ball = nav.brain.ball
 
     if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
-        nav.setWalk(0, 0, constants.BALL_SPIN_SPEED *
-                    MyMath.sign(ball.bearing) )
+        nav.setWalk(0, 0,
+                    constants.BALL_SPIN_SPEED * MyMath.sign(ball.bearing) )
 
     elif fabs(ball.bearing) < constants.BALL_APPROACH_BEARING_OFF_THRESH :
         nav.stopWalking()
@@ -115,7 +113,6 @@ def ballInMyBox(nav):
         return nav.goLater('chase')
 
     return nav.stay()
-
 
 # Values for controlling the strafing
 PFK_MAX_Y_SPEED = speeds.MAX_Y_SPEED
@@ -126,20 +123,19 @@ PFK_MIN_Y_MAGNITUDE = speeds.MIN_Y_MAGNITUDE
 PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
 PFK_X_GAIN = 0.12
 PFK_Y_GAIN = 0.6
-
+PFK_X_SAFE_DISTANCE = 15.
+PFK_X_SAFE_THRESH = 5.
 
 def positionForKick(nav):
+    helper.setSlowSpeed(nav,approachForKickX(nav),approachForKickY(nav),0)
+
+    return nav.stay()
+
+def approachForKickX(nav):
     ball = nav.brain.ball
 
-    # Determine approach speed
-    sY = MyMath.clip(ball.relY * PFK_Y_GAIN,
-                     PFK_MIN_Y_SPEED,
-                     PFK_MAX_Y_SPEED)
-
-    sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
-
-    targetX = ball.relX - 15.
-    if targetX > 5. or targetX < 0.:
+    targetX = ball.relX - PFK_X_SAFE_DISTANCE
+    if targetX > PFK_X_SAFE_THRESH or targetX < 0.:
         sX = MyMath.clip(targetX * PFK_X_GAIN,
                          PFK_MIN_X_SPEED,
                          PFK_MAX_X_SPEED)
@@ -147,9 +143,21 @@ def positionForKick(nav):
     else:
         sX = 0.0
 
-    helper.setSlowSpeed(nav,sX,sY,0)
+    return sX
 
-    return nav.stay()
+def approachForKickY(nav):
+    ball = nav.brain.ball
+
+    sY = MyMath.clip(ball.relY * PFK_Y_GAIN,
+                     PFK_MIN_Y_SPEED,
+                     PFK_MAX_Y_SPEED)
+
+    sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
+
+    if fabs(sY) < PFK_MIN_Y_SPEED:
+        sY = 0.0
+
+    return sY
 
 def dribble(nav):
     ball = nav.brain.ball

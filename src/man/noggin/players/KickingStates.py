@@ -15,7 +15,6 @@ from math import fabs
 from ..util import MyMath
 import KickingHelpers as helpers
 
-
 def getKickInfo(player):
     """
     Decides which kick to use
