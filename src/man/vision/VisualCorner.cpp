@@ -8,6 +8,8 @@ using namespace boost;
 const point <int> VisualCorner::
 dogLocation(IMAGE_WIDTH/2, IMAGE_HEIGHT - 1);
 
+const float VisualCorner::MIN_EXTEND_DIST = 12.0f;
+
 VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _distance,
                            const float _bearing,

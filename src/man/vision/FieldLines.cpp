@@ -81,6 +81,17 @@ using namespace std;
 
 using boost::shared_ptr;
 
+const float FieldLines::MIN_CROSS_EXTEND = 10.0f;
+// When estimating the angle between two lines on the field, anything less
+// than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
+// and disallowed; ideally our estimates would always be 1.57 radians
+const float FieldLines::MIN_ANGLE_ON_FIELD = .96f;
+const float FieldLines::MAX_ANGLE_ON_FIELD = 2.00f;
+
+const float FieldLines::WHITE_PERCENT_CLEARANCE = 200.0f/9.0f;// 2/9 must be white
+const float FieldLines::MAX_YELLOW_IN_LINE = 300.0f/9.0f;    // 3/9 can be yellow
+
+
 const int FieldLines::FIELD_COLORS[NUM_GREEN_COLORS] =
 { GREEN, BLUEGREEN };
 const int FieldLines::LINE_COLORS[NUM_WHITE_COLORS] =

@@ -177,12 +177,12 @@ private:
 
     static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 15;
     static const int LINE_HEIGHT = 0; // this refers to height off the ground
-    static const float MIN_CROSS_EXTEND = 10.0f;
+    static const float MIN_CROSS_EXTEND;
     // When estimating the angle between two lines on the field, anything less
     // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
     // and disallowed; ideally our estimates would always be 1.57 radians
-    static const float MIN_ANGLE_ON_FIELD = .96f;
-    static const float MAX_ANGLE_ON_FIELD = 2.00f;
+    static const float MIN_ANGLE_ON_FIELD;
+    static const float MAX_ANGLE_ON_FIELD;
     static const int TWO_CORNER_LINES_MIN_LENGTH = 35;
 
     static const int DEBUG_GROUP_LINES_BOX_WIDTH = 4;
@@ -190,8 +190,8 @@ private:
     ///////////////////////////////////////////////////////////
     // isWhiteGreenEdge constants
     ///////////////////////////////////////////////////////////
-    static const float WHITE_PERCENT_CLEARANCE = 200.0f/9.0f;// 2/9 must be white
-    static const float MAX_YELLOW_IN_LINE = 300.0f/9.0f;    // 3/9 can be yellow
+    static const float WHITE_PERCENT_CLEARANCE;
+    static const float MAX_YELLOW_IN_LINE;
     static const int MIN_GREEN_PIXELS_TO_TEST = 3;
     static const int MAX_GREEN_PIXELS_TO_TEST = NUM_TEST_PIXELS;
 
