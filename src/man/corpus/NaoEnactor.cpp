@@ -118,12 +118,12 @@ void NaoEnactor::sendHardness(){
 
     hardness_command[4][0] = dcmProxy->getTime(0);
     // #ifdef ROBOT_NAME_zaphod
-    #ifdef ROBOT_NAME_zaphod
+/*    #ifdef ROBOT_NAME_zaphod
     //     // turn off broken shoulder
     hardness_command[5][Kinematics::L_SHOULDER_PITCH][0] = -1.0f;
     hardness_command[5][Kinematics::L_SHOULDER_ROLL][0] = -1.0f;
     #endif
-
+*/
 #ifndef NO_ACTUAL_MOTION
     try {
         dcmProxy->setAlias(hardness_command);
@@ -139,6 +139,7 @@ void NaoEnactor::postSensors(){
     //We also call this from the Motion run method
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
+    sensors->setMotionBodyAngles(motionValues);
     transcriber->postMotionSensors();
 
     if(!switchboard){

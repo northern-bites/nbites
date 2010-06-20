@@ -3,16 +3,16 @@
 //TODO: introduce an unified configure file system
 
 #ifdef ROBOT_NAME_zaphod
-float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {-0.01f, 0.056f};
+float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {-0.01f, 0.061f};
 #else
 #ifdef ROBOT_NAME_marvin
 float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.047f};
 #else
 #ifdef ROBOT_NAME_trillian
-float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.03f};
+float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.04f};
 #else
 #ifdef ROBOT_NAME_slarti
-float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.063f};
+float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.068f};
 #else
 float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.0f};
 #endif

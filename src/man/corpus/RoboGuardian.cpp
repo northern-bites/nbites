@@ -363,7 +363,8 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         enableGains();
         break;
     case 7:
-        reconnectWifiConnection();
+		// disabled for Singapore 2010
+        //reconnectWifiConnection();
         break;
     case 9:
         //Easter EGG!
@@ -479,6 +480,8 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
 }
 //TODO: comment
 void RoboGuardian::checkConnection(){
+	// disabled for Singapore 2010
+	return;
 
     const string IP = discoverIP();
     if (IP.size() >= 7 && (IP[0] == '1' || IP[0] == '2')) {

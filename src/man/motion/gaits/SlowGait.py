@@ -7,7 +7,7 @@ WALKING = constants.WALKING
 NON_WALKING = constants.NON_WALKING
 
 MARVIN_STANCE_CONFIG = (31.00, # CoM height
-                        1.45,  # Forward displacement of CoM
+                        1.35,  # Forward displacement of CoM
                         10.0,  # Horizontal distance between feet
                         6.0,   # Body angle around y axis
                         0.0,   # Angle between feet
@@ -15,14 +15,14 @@ MARVIN_STANCE_CONFIG = (31.00, # CoM height
 
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
-               0.9,  # stepHeight
+               0.95,  # stepHeight
                0.0,  # step lift
-               10.0,  # max x speed
-               -7.0,  # max x speed
-               7.0,  # max y speed
+               15.0,  # max x speed
+               -8.0,  # max x speed
+               12.0,  # max y speed
                20.0, # max theta speed()
-               7.0,  # max x accel
-               7.0,  # max y accel
+               6.0,  # max x accel
+               5.0,  # max y accel
                20.0, # max theta speed()
                WALKING)  # walking gait = true
 
