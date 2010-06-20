@@ -73,7 +73,7 @@ Field::Field(Vision* vis, Threshold * thr)
 #ifdef OFFLINE
     debugHorizon = false;
     debugFieldEdge = false;
-    openField = true;
+    openField = false;
 #else
     debugHorizon = false;
     debugFieldEdge = false;
@@ -251,7 +251,7 @@ int Field::findGreenHorizon(int pH, float sl) {
     // re init shooting info
     for (int i = 0; i < IMAGE_WIDTH; i++)
         shoot[i] = true;
-    if (pH < 0) {
+    if (pH < 100) {
       horizon = 0;
       return 0;
     }
