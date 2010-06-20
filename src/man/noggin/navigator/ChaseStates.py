@@ -124,14 +124,14 @@ PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
 PFK_X_GAIN = 0.12
 PFK_Y_GAIN = 0.6
 PFK_X_SAFE_DISTANCE = 15.
-PFK_X_SAFE_THRESH = 5.
+PFK_X_SAFE_THRESH = 4.
 
 def positionForKick(nav):
-    helper.setSlowSpeed(nav,approachForKickX(nav),approachForKickY(nav),0)
+    helper.setSlowSpeed(nav,positionForKickX(nav),positionForKickY(nav),0)
 
     return nav.stay()
 
-def approachForKickX(nav):
+def positionForKickX(nav):
     ball = nav.brain.ball
 
     targetX = ball.relX - PFK_X_SAFE_DISTANCE
@@ -145,7 +145,7 @@ def approachForKickX(nav):
 
     return sX
 
-def approachForKickY(nav):
+def positionForKickY(nav):
     ball = nav.brain.ball
 
     sY = MyMath.clip(ball.relY * PFK_Y_GAIN,
