@@ -40,7 +40,7 @@ def spinFindBall(player):
 
     if player.firstFrame():
         #if ball.on
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallSpin()
         #else:
         #tracker.findBall()
 
