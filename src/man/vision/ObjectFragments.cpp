@@ -1128,7 +1128,7 @@ int ObjectFragments::classifyByLineIntersection(Blob post) {
 	    return RIGHT;
 	  else if (e.dist > FAR_DIST) {
 	    estimate p = vision->pose->pixEstimate(post.getRightBottomX(), post.getRightBottomY(), 0.0);
-	    cout << "EDist is " << p.dist << endl;
+	    //cout << "EDist is " << p.dist << endl;
 	    if (p.dist < 40.0f)
 	      return RIGHT;
 	    else if (p.dist < 140.0f)

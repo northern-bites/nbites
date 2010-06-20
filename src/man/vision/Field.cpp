@@ -251,6 +251,10 @@ int Field::findGreenHorizon(int pH, float sl) {
     // re init shooting info
     for (int i = 0; i < IMAGE_WIDTH; i++)
         shoot[i] = true;
+    if (pH < 0) {
+      horizon = 0;
+      return 0;
+    }
     //variable definitions
     int run, greenPixels, scanY;
     register int i, j;
