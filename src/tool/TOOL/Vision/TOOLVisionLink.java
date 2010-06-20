@@ -206,7 +206,7 @@ public class TOOLVisionLink {
     static
     {
         try{
-            System.loadLibrary("libTOOLVisionLink");
+            System.loadLibrary("TOOLVisionLink");
             visionLinkSuccessful = true;
             System.out.println("TOOLVisionLink lib loaded successfuly");
         }catch(UnsatisfiedLinkError e){

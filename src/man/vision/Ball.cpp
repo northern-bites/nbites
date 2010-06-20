@@ -390,39 +390,6 @@ int Ball::balls(int horizon, VisualBall *thisBall)
                 setBallInfo(w, w, thisBall, e);
             }
         } else {
-            /*
-			int count = -2;
-			// scan the top/bottom to find the real ones
-			if (topBlob->rightTop.y - w > 0) {
-				for (int i = topBlob->rightTop.y - w; i < IMAGE_HEIGHT - 1; i++) {
-					for (int j = topBlob->leftTop.x; j < topBlob->rightBottom.x; j++) {
-						if (thresh->thresholded[i][j] == ORANGE) {
-							topBlob->rightTop.y = i;
-							j = IMAGE_WIDTH;
-							i = IMAGE_HEIGHT;
-						}
-					}
-					count++;
-				}
-			}
-			if (topBlob->leftTop.y + w < IMAGE_HEIGHT) {
-				for (int i = topBlob->leftTop.y + w; i > -1; i--) {
-					for (int j = topBlob->leftTop.x; j < topBlob->rightTop.x; j++) {
-						if (thresh->thresholded[i][j] == ORANGE) {
-							topBlob->rightTop.y = i;
-							j = IMAGE_WIDTH;
-							i = -1;
-						}
-					}
-					count++;
-				}
-				if (count > 1) {
-					if (BALLDISTDEBUG) {
-						cout << "Resetting ball dimensions.  Count was " << count << endl;
-					}
-					setBallInfo(h, h, thisBall);
-				}
-				} */
         }
         thisBall->setDistanceEst(e);
     }
