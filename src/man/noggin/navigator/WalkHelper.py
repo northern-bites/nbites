@@ -8,15 +8,19 @@ def getOmniWalkParam(my, dest):
     # for the ball. be nice not to recalculate it.
     relX, relY = 0, 0
 
-    if hasattr(dest, "relX"):
+    if hasattr(dest, "relX") and \
+            hasattr(dest, "relY") and \
+            hasattr(dest, "relH"):
         relX = dest.relX
         relY = dest.relY
+        relH = dest.relH
 
     else:
         bearingDeg = my.getRelativeBearing(dest)
         distToDest = my.distTo(dest)
         relX = MyMath.getRelativeX(distToDest, bearingDeg)
         relY = MyMath.getRelativeY(distToDest, bearingDeg)
+        relH = MyMath.sub180Angle(dest.h - my.h)
 
     # calculate forward speed
     forwardGain = constants.OMNI_GOTO_X_GAIN * relX
@@ -38,13 +42,12 @@ def getOmniWalkParam(my, dest):
 
     # calculate spin speed
     spinGain = constants.GOTO_SPIN_GAIN
-    hDiff = MyMath.sub180Angle(dest.h - my.h)
-    sTheta = MyMath.sign(hDiff) * getRotScale(hDiff) * \
+    sTheta = MyMath.sign(relH) * getRotScale(relH) * \
         constants.OMNI_MAX_SPIN_SPEED * spinGain
 
-    sTheta = MyMath.clip(sTheta,
-                         constants.OMNI_MIN_SPIN_SPEED,
-                         constants.OMNI_MAX_SPIN_SPEED)
+    # sTheta = MyMath.clip(sTheta,
+    #                      constants.OMNI_MIN_SPIN_SPEED,
+    #                      constants.OMNI_MAX_SPIN_SPEED)
 
     if fabs(sTheta) < constants.OMNI_MIN_SPIN_MAGNITUDE:
         sTheta = 0.0
