@@ -18,7 +18,7 @@ def scanBall(tracker):
 
         elif ballDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
                 ballDist < HeadMoves.MID_SCAN_FAR_BOUND:
-            tracker.helper.executeHeadMove(HeadMoves.MID_UP_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.MID_DOWN_SCAN_BALL)
         else:
             tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)
     return tracker.stay()
