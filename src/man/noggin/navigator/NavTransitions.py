@@ -15,6 +15,10 @@ def atDestinationCloser(my, dest):
     """
     return my.distTo(dest) < constants.CLOSER_XY
 
+def atDestinationCloserAndFacing(my, dest, bearing):
+    return (atDestinationCloser(my, dest) and \
+            fabs(bearing) < constants.CLOSE_ENOUGH_H)
+
 def atHeadingGoTo(my, targetHeading):
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
     return hDiff < constants.AT_HEADING_GOTO_DEG

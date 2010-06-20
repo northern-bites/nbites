@@ -12,21 +12,27 @@ from ..playbook.PBConstants import GOALIE
 def chase(player):
     """
     Method to determine which chase state should be used.
-    We dump the robot into this state when we our switching from something else.
+    We dump the robot into this state when we are switching from something else.
     """
     player.isChasing = True
     player.hasAlignedOnce = False
 
     if player.brain.play.isRole(GOALIE):
-        if transitions.shouldScanFindBall(player):
-            return player.goNow('scanFindBall')
-        elif transitions.shouldApproachBall(player):
-            return player.goNow('approachBall')
-        elif transitions.shouldKick(player):
-            return player.goNow('waitBeforeKick')
-        else:
-            return player.goNow('scanFindBall')
+        return player.goNow('goalieChase')
 
+    if transitions.shouldScanFindBall(player):
+        return player.goNow('scanFindBall')
+    elif transitions.shouldApproachBall(player):
+        return player.goNow('approachBall')
+    elif transitions.shouldKick(player):
+        return player.goNow('waitBeforeKick')
+    else:
+        return player.goNow('scanFindBall')
+
+def goalieChase(player):
+    """
+    TODO: make goalie more aggressive (different transitions?)
+    """
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
     elif transitions.shouldApproachBall(player):
@@ -106,7 +112,6 @@ def positionForKick(player):
     """
     State to align on the ball once we are near it
     """
-
     if player.firstFrame():
         player.brain.nav.kickPosition()
 
