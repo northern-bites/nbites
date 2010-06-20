@@ -472,7 +472,7 @@ void ConcreteCorner::assignTCornerLines()
 			tStem = line2;
 			break;
 		} else if (**i == *line2) {
-			tBar == line2;
+			tBar = line2;
 			tStem = line1;
 			break;
 		}

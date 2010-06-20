@@ -11,15 +11,19 @@
 
 template <typename T>
 struct point {
-  T x, y;
-  point() : x(0), y(0) { }
-  point(const T _x, const T _y)
-    : x(_x), y(_y) { }
+    T x, y;
+    point() : x(0), y(0) { }
+    point(const T _x, const T _y)
+        : x(_x), y(_y) { }
 
-  friend std::ostream& operator<< (std::ostream &o, const point &c)
-  {
-    return o << "(" << c.x << "," << c.y << ")";
-  }
+    bool operator== (const point& secondPt) const {
+        return (x == secondPt.x &&
+                y == secondPt.y);
+        }
+
+    friend std::ostream& operator<< (std::ostream &o, const point &c) {
+            return o << "(" << c.x << "," << c.y << ")";
+        }
 };
 
 template <typename T>

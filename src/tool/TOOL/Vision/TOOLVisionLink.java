@@ -185,10 +185,21 @@ public class TOOLVisionLink {
     native private void cppPixEstimate(int pixelX, int pixelY,
                                        float objectHeight,
                                        double[] estimateResult);
-    
     native private void cppGetCameraCalibrate(float[] calibrateArray);
 
     native private void cppSetCameraCalibrate(float[] calibrateArray);
+	native private void cppSetFieldLinesDebugVertEdgeDetect(boolean _bool);
+	native private void cppSetFieldLinesDebugHorEdgeDetect(boolean _bool);
+	native private void cppSetFieldLinesDebugSecondVertEdgeDetect(boolean _bool);
+	native private void cppSetFieldLinesDebugCreateLines(boolean _bool);
+	native private void cppSetFieldLinesDebugFitUnusedPoints(boolean _bool);
+	native private void cppSetFieldLinesDebugJoinLines(boolean _bool);
+	native private void cppSetFieldLinesDebugExtendLines(boolean _bool);
+	native private void cppSetFieldLinesDebugIntersectLines(boolean _bool);
+	native private void cppSetFieldLinesDebugIdentifyCorners(boolean _bool);
+	native private void cppSetFieldLinesDebugCcScan(boolean _bool);
+	native private void cppSetFieldLinesDebugRiskyCorners(boolean _bool);
+	native private void cppSetFieldLinesDebugCornerAndObjectDistances(boolean _bool);
 
     //Load the cpp library that implements the native methods
     static
@@ -196,7 +207,7 @@ public class TOOLVisionLink {
         try{
             System.loadLibrary("libTOOLVisionLink");
             visionLinkSuccessful = true;
-	    System.out.println("TOOLVisionLink lib loaded successfuly");
+			System.out.println("TOOLVisionLink lib loaded successfuly");
         }catch(UnsatisfiedLinkError e){
             visionLinkSuccessful = false;
             System.err.print("Vision Link Failed to initialize: ");
@@ -321,7 +332,7 @@ public class TOOLVisionLink {
 
         return calibrateArray;
     }
-    
+
     public void setCameraCalibrate(float[] calibrateArray) {
         if (visionLinkSuccessful) {
             try {
@@ -335,5 +346,4 @@ public class TOOLVisionLink {
             System.out.println("VisionLink inactive," +
                                " so cameraCalibrate does not work");
     }
-    
 }

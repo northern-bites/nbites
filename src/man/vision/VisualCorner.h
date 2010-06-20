@@ -20,7 +20,7 @@ class VisualCorner : public VisualDetection, public VisualLandmark<cornerID> {
 private: // Constants
     // Number of pixels that must extend beyond the intersection for a line to
     // be considered a T
-    static const int MIN_EXTEND_DIST = 12;
+    static const float MIN_EXTEND_DIST = 12.0f;
     // We consider ourselves to be towards the bottom of the screen and in the
     // middle in terms of whether we are inside or outside of a corner
     static const point <int> dogLocation;
@@ -72,15 +72,17 @@ public:
     // not yet hooked up the angle thing for T corners
     const float getAngleBetweenLines() const { return angleBetweenLines; }
 
+    const point<int> getTStemEndpoint() const;
+
     virtual const bool hasPositiveID();
 
     ////////////////////////////////////////////////////////////
     // SETTERS
     ////////////////////////////////////////////////////////////
     void setPossibleCorners(std::list <const ConcreteCorner *>
-    _possibleCorners);
+                            _possibleCorners);
     void setPossibleCorners(std::vector <const ConcreteCorner *>
-    _possibleCorners);
+                            _possibleCorners);
     void setShape(const shape s) { cornerType = s; }
     void setLine1(boost::shared_ptr<VisualLine> l1) { line1 = l1; }
     void setLine2(boost::shared_ptr<VisualLine> l2) { line2 = l2; }

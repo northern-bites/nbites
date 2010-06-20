@@ -565,7 +565,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     }
 
     public void notifyDataSet(DataSet s, Frame f) {
-
+        notifyFrame(f);
     }
 
     /** Set the text in the box to update the frame number. */
