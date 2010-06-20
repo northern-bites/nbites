@@ -139,6 +139,8 @@ void Cross::checkForX(Blob b) {
         if (y > 1) {
             if (thresh->thresholded[y - 2][i] == GREEN)
                 count++;
+	    else if (thresh->thresholded[y - 2][i] == GREY)
+	      count--;
             else if (thresh->thresholded[y - 2][i] == WHITE)
                 count-=3;
             counter++;
