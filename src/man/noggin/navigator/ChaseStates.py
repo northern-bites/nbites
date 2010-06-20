@@ -123,8 +123,8 @@ PFK_MIN_Y_MAGNITUDE = speeds.MIN_Y_MAGNITUDE
 PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
 PFK_X_GAIN = 0.12
 PFK_Y_GAIN = 0.6
-PFK_X_SAFE_DISTANCE = 15.
-PFK_X_SAFE_THRESH = 4.
+PFK_X_SAFE_DISTANCE = 12.
+PFK_X_SAFE_THRESH = 5.
 
 def positionForKick(nav):
     helper.setSlowSpeed(nav,positionForKickX(nav),positionForKickY(nav),0)
@@ -153,9 +153,6 @@ def positionForKickY(nav):
                      PFK_MAX_Y_SPEED)
 
     sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
-
-    if fabs(sY) < PFK_MIN_Y_SPEED:
-        sY = 0.0
 
     return sY
 
