@@ -38,7 +38,7 @@ using namespace NBMath;
 //#define DEBUG_ZMP_REF
 
 // flag to turn on multiple zmp queues (on by default)
-#define MULTIPLE_ZMP
+//#define MULTIPLE_ZMP
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
