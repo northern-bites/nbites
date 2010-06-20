@@ -1,5 +1,6 @@
 from .. import NogginConstants
 from . import ChaseBallConstants as ChaseConstants
+import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionTransitions as transitions
 import PositionConstants as constants
@@ -54,5 +55,97 @@ def relocalize(player):
             direction = 1
 
         player.setWalk(0 , 0, constants.RELOC_SPIN_SPEED * direction)
+
+    return player.stay()
+
+def afterPenalty(player):
+#Management State
+
+    #Catch in case relocalize is needed after this behavior
+    if player.lastDiffState == 'relocalize':
+        return player.goLater('gamePlaying')
+
+    if player.lastDiffState == 'penaltyLookLeft':
+        return player.goLater('penaltyLookRight')
+
+    if player.lastDiffState == 'penaltyLookRight':
+        return player.goLater('relocalize')
+
+    return player.goLater('penaltyLookLeft')
+
+def penaltyLookLeft(player):
+
+    if player.firstFrame():
+        player.headCount = 0
+        player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
+
+    if not player.brain.motion.isHeadActive():
+        ##looking left
+
+        if player.brain.yglp.on or player.brain.ygrp.on:
+            #set loc info
+            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+                                        NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
+                                        -90.0)
+            #now you know where you are!
+            return player.goLater('gamePlaying')
+
+        if player.brain.bglp.on or player.brain.bgrp.on:
+            #set loc info
+            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+                                        NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
+                                        90.0)
+            #now you know where you are!
+            return player.goLater('gamePlaying')
+
+        if player.brain.ball.on:
+            #go to it and don't worry about loc
+            return player.goLater('chase')
+
+        player.headCount += 1
+
+    #if we are looking for too long
+    if player.headCount > 10:
+        return player.goLater(player.lastDiffState)
+
+    return player.stay()
+
+def penaltyLookRight(player):
+
+    if player.firstFrame():
+        #setup counter
+        player.headCount = 0
+        player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
+
+    if not player.brain.motion.isHeadActive():
+        ##looking right
+
+        if player.brain.yglp.on or player.brain.ygrp.on:
+            #set loc info
+            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+                                        NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
+                                        90.0)
+            #now you know where you are!
+            return player.goLater('gamePlaying')
+
+        if player.brain.bglp.on or player.brain.bgrp.on:
+            #set loc info
+            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+                                        NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
+                                        -90.0)
+            #now you know where you are!
+            return player.goLater('gamePlaying')
+
+        if player.brain.ball.on:
+            #go to it and don't worry about loc
+            return player.goLater('chase')
+
+        #increment counter
+        player.headCount += 1
+
+    #if we are looking for too long
+    if player.headCount > 10:
+        #no luck
+        return player.goLater(player.lastDiffState)
 
     return player.stay()
