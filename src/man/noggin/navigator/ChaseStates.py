@@ -5,23 +5,60 @@ from . import NavConstants as constants
 from . import BrunswickSpeeds as speeds
 from man.noggin.util import MyMath
 from man.noggin.typeDefs.Location import RobotLocation
+from man.noggin.typeDefs.Location import RelLocation
+
 from man.noggin import NogginConstants
 from man.noggin.playbook.PBConstants import GOALIE
 from math import fabs
 
 DEBUG = False
 
-def walkSpinToBall(nav):
+def crossoverTowardsBall(nav):
+    CROSSOVER_DIST = 40         # Cross over for 40cm
+
+    brain = nav.brain
+    my = brain.my
     ball = nav.brain.ball
-    nav.dest = ball
-    nav.dest.h = ball.heading
+
+
+    # Get location 40cm away in line towards the ball
+    destH = my.headingTo(ball)
+    distToBall = my.distTo(ball)
+
+    relDestX = ball.relX * CROSSOVER_DIST / distToBall
+    relDestY = ball.relY * CROSSOVER_DIST / distToBall
+
+    nav.dest = RobotLocation(relDestX + my.x,
+                             relDestY + my.y,
+                             destH)
+
+def walkSpinToBall(nav):
+    CROSSOVER_DIST = 40         # Cross over for 40cm
+
+    brain = nav.brain
+    my = brain.my
+    ball = nav.brain.ball
+
+
+    # Get location 40cm away in line towards the ball
+    relDestH = my.getRelativeBearing(ball)
+    distToBall = my.distTo(ball)
+
+    relDestX = ball.relX * CROSSOVER_DIST / distToBall
+    relDestY = ball.relY * CROSSOVER_DIST / distToBall
+
+    nav.dest = RelLocation(my, relDestX, relDestY, relDestH)
+
+    print nav.dest
 
     if navTrans.atDestinationCloserAndFacing(nav.brain.my, nav.dest, ball.bearing):
         return nav.goNow('stop')
 
     # Set our walk towards the ball
     walkX, walkY, walkTheta = \
-           walker.getWalkSpinParam(nav.brain.my, nav.dest)
+           walker.getOmniWalkParam(nav.brain.my, nav.dest)
+
+    print "walkSpin params are: " , walkX, walkY, walkTheta
 
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
