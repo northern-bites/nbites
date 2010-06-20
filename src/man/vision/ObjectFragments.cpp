@@ -1088,7 +1088,9 @@ int ObjectFragments::classifyByLineIntersection(Blob post) {
       if (y < post.getLeftBottomY() + spany) closeEnough = true;
       // if the T is higher in the visual field than the bottom of the post
       // then we have an easy job - we can decide based on which side its on
+      //cout << "x " << x << " " << post.getLeftBottomX() << endl;
       if (closeEnough) {
+	//cout << "Was close enough" << endl;
 	if (x <= post.getLeftBottomX())
 	  return LEFT;
 	return RIGHT;
@@ -1116,17 +1118,23 @@ int ObjectFragments::classifyByLineIntersection(Blob post) {
 	    //cout << "Dist is " << p.dist << endl;
 	    if (p.dist < 40.0f)
 	      return LEFT;
-	    return RIGHT;
+	    else if (p.dist < 140.0f)
+	      return RIGHT;
+	    else
+	      return LEFT;
 	  }
 	} else {
 	  if (e.dist < CLOSE_DIST)
 	    return RIGHT;
 	  else if (e.dist > FAR_DIST) {
-	    estimate p = vision->pose->pixEstimate(post.getLeftBottomX(), post.getLeftBottomY(), 0.0);
-
+	    estimate p = vision->pose->pixEstimate(post.getRightBottomX(), post.getRightBottomY(), 0.0);
+	    cout << "EDist is " << p.dist << endl;
 	    if (p.dist < 40.0f)
 	      return RIGHT;
-	    return LEFT;
+	    else if (p.dist < 140.0f)
+	      return LEFT;
+	    else
+	      return RIGHT;
 	  }
 	}
       }
