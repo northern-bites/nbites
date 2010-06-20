@@ -32,10 +32,8 @@ def goaliePositionForSave(player):
         player.brain.tracker.trackBall()
 
     strafeDir = helper.strafeDirForSave(player)
-    if strafeDir == -1:
-        helper.strafeRightSpeed(player)
-    elif strafeDir == 1:
-        helper.strafeLeftSpeed(player)
+    if fabs(strafeDir) > 0:
+        player.setWalk(0, constants.STRAFE_SPEED * MyMath.sign(strafeDir), 0)
     else:
         player.stopWalking()
 
