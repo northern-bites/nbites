@@ -427,12 +427,12 @@ PyVisualLine_new (PyFieldLines *fl, int i, shared_ptr<VisualLine> line)
         self->fl = fl;
         self->i = i;
 
-        self->x1 = PyInt_FromLong(line->start.x);
-        self->y1 = PyInt_FromLong(line->start.y);
-        self->x2 = PyInt_FromLong(line->end.x);
-        self->y2 = PyInt_FromLong(line->end.y);
+        self->x1 = PyInt_FromLong(line->getStartpoint().x);
+        self->y1 = PyInt_FromLong(line->getStartpoint().y);
+        self->x2 = PyInt_FromLong(line->getEndpoint().x);
+        self->y2 = PyInt_FromLong(line->getEndpoint().y);
         self->slope = PyFloat_FromDouble(line->getSlope());
-        self->length = PyFloat_FromDouble(line->length);
+        self->length = PyFloat_FromDouble(line->getLength());
 
         if (self->x1 == NULL || self->y1 == NULL || self->x2 == NULL ||
             self->y2 == NULL || self->slope == NULL || self->length == NULL) {
@@ -455,22 +455,22 @@ extern void
 PyVisualLine_update (PyVisualLine *self, shared_ptr<VisualLine> line)
 {
     Py_XDECREF(self->x1);
-    self->x1 = PyInt_FromLong(line->start.x);
+    self->x1 = PyInt_FromLong(line->getStartpoint().x);
 
     Py_XDECREF(self->y1);
-    self->y1 = PyInt_FromLong(line->start.y);
+    self->y1 = PyInt_FromLong(line->getStartpoint().y);
 
     Py_XDECREF(self->x2);
-    self->x2 = PyInt_FromLong(line->end.x);
+    self->x2 = PyInt_FromLong(line->getEndpoint().x);
 
     Py_XDECREF(self->y2);
-    self->y2 = PyInt_FromLong(line->end.y);
+    self->y2 = PyInt_FromLong(line->getEndpoint().y);
 
     Py_XDECREF(self->slope);
     self->slope = PyFloat_FromDouble(line->getSlope());
 
     Py_XDECREF(self->length);
-    self->length = PyFloat_FromDouble(line->length);
+    self->length = PyFloat_FromDouble(line->getLength());
 }
 
 // backend methods

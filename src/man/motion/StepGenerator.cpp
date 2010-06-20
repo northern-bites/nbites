@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -35,6 +34,11 @@ using namespace Kinematics;
 using namespace NBMath;
 
 //#define DEBUG_STEPGENERATOR
+//#define DEBUG_ZMP
+#define DEBUG_ZMP_REF
+
+// flag to turn on multiple zmp queues (on by default)
+#define MULTIPLE_ZMP
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
@@ -43,7 +47,9 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
     est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
-    zmp_ref_x(list<float>()),zmp_ref_y(list<float>()), futureSteps(),
+    zmp_ref_x(list<float>()),zmp_ref_y(list<float>()),
+	zmp_ref_stop_x(list<float>()),zmp_ref_stop_y(list<float>()),
+	futureSteps(),
     currentZMPDSteps(),
     si_Transform(CoordFrame3D::identity3D()),
     last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
@@ -77,6 +83,9 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     fprintf(zmp_log,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
             "\taccX\taccY\taccZ\tangleX\tangleY\n");
 #endif
+#ifdef DEBUG_ZMP_REF
+	zmp_ref_log = fopen("/tmp/zmp_ref_log.xls","w");
+#endif
 
 }
 
@@ -87,6 +96,9 @@ StepGenerator::~StepGenerator()
 #endif
 #ifdef DEBUG_SENSOR_ZMP
     fclose(zmp_log);
+#endif
+#ifdef DEBUG_ZMP_REF
+	fclose(zmp_ref_log);
 #endif
     delete controller_x; delete controller_y;
 }
@@ -102,7 +114,7 @@ void StepGenerator::resetHard(){
 
 /**
  * Central method to get the previewed zmp_refernce values
- * In the process of getting these values, this method handles the following:    80
+ * In the process of getting these values, this method handles the following:
  *
  *  * Handles transfer from futureSteps list to the currentZMPDsteps list.
  *    When the Future ZMP values we want run out, we pop the next future step
@@ -131,7 +143,21 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             currentZMPDSteps.push_back(nextStep);
 
         }
+#ifdef DEBUG_ZMP
+		cout << "generate_zmp_ref()\n";
+		list<float>::iterator it;
+		cout << "zmp_ref_x: " << zmp_ref_x.size();
+		for (it=zmp_ref_x.begin(); it!=zmp_ref_x.end(); ++it)
+			cout << " " << *it;
+		cout << "\n";
+
+		cout << " zmp_ref_y: " << zmp_ref_y.size();
+		for (it=zmp_ref_y.begin(); it!=zmp_ref_y.end(); ++it)
+			cout << " " << *it;
+		cout << "\n";
+#endif
     }
+
     return zmp_xy_tuple(&zmp_ref_x, &zmp_ref_y);
 }
 
@@ -226,12 +252,21 @@ void StepGenerator::tick_controller(){
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
 
+#ifdef DEBUG_ZMP
+	cout << "StepGenerator::generate_zmp_ref() finished\n";
+#endif
+
     //The observer needs to know the current reference zmp
     const float cur_zmp_ref_x =  zmp_ref_x.front();
     const float cur_zmp_ref_y = zmp_ref_y.front();
     //clear the oldest (i.e. current) value from the preview list
     zmp_ref_x.pop_front();
     zmp_ref_y.pop_front();
+	// also clear the oldest stopping zmp values to keep queues in sync
+#ifdef MULTIPLE_ZMP
+	zmp_ref_stop_x.pop_front();
+	zmp_ref_stop_y.pop_front();
+#endif
 
     //Scale the sensor feedback according to the gait parameters
     est_zmp_i(0) = scaleSensors(zmp_filter.get_zmp_x(), cur_zmp_ref_x);
@@ -423,24 +458,44 @@ void StepGenerator::swapSupportLegs(){
  */
 void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
 
+	// HACK ALERT: the multiple ZMP queues in their current state are a hack
+	// Once we decouple ZMP generation from the step queues this won't be a problem
+	// GNM June 2010
+
     switch(newSupportStep->type){
     case REGULAR_STEP:
-        fillZMPRegular(newSupportStep);
+#ifdef MULTIPLE_ZMP
+		fillZMPEnd(newSupportStep);
+#endif
+		fillZMPRegular(newSupportStep);
         break;
     case END_STEP: //END and NULL might be the same thing....?
-        fillZMPEnd(newSupportStep);
+#ifdef MULTIPLE_ZMP
+		// swap the existing queues, we are stopping
+		if (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES) {
+			fillZMPEnd(newSupportStep);
+		}
+		swapZMPQueues(zmp_ref_stop_x, zmp_ref_stop_y, last_zmp_stop_end_s);
+#endif
+
+#ifndef MULTIPLE_ZMP
+		// immediately merge the two queues, slower than before but
+		// generates identical ZMP preview queues (safe)
+		fillZMPEnd(newSupportStep);
+		swapZMPQueues(zmp_ref_stop_x, zmp_ref_stop_y, last_zmp_stop_end_s);
+#endif
         break;
     default:
         throw "Unsupported Step type";
-    }
+		}
+
     newSupportStep->zmpd = true;
 }
 
 /**
  * Generates the ZMP reference pattern for a normal step
  */
-void
-StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
+void StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
     //update the lastZMPD Step
     const float sign = (newSupportStep->foot == LEFT_FOOT ? 1.0f : -1.0f);
     const float last_sign = -sign;
@@ -572,24 +627,46 @@ StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
 /**
  * Generates the ZMP reference pattern for a step when it is the support step
  * such that it will be the last step before stopping
+ *
+ * MODIFIED: Tracks a second ZMP reference pattern that always assumes we're
+ * about to stop. For an actual stopping step, the pointers are swapped.
+ * This is clearly a huge HACK.
  */
-void
-StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep ){
-    const ufvector3 end_s =
+void StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep) {
+	const ufvector3 end_s =
         CoordFrame3D::vector3D(gait->stance[WP::BODY_OFF_X],
                                0.0f);
-    const ufvector3 end_i = prod(si_Transform,end_s);
-    //Queue a starting step, where we step, but do nothing with the ZMP
-    //so push tons of zero ZMP values
-    for (unsigned int i = 0; i < newSupportStep->stepDurationFrames; i++){
-        zmp_ref_x.push_back(end_i(0));
-        zmp_ref_y.push_back(end_i(1));
-    }
+	const ufvector3 end_i = prod(si_Transform,end_s);
 
-    //An End step should never move the si_Transform!
-    //si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
-    //store the end of the zmp in the next s frame:
-    last_zmp_end_s = prod(get_sprime_s(newSupportStep),end_s);
+	// copy current zmp queue to the stop queue
+	zmp_ref_stop_x.clear(); zmp_ref_stop_y.clear();
+	zmp_ref_stop_x.assign(zmp_ref_x.begin(), zmp_ref_x.end());
+	zmp_ref_stop_y.assign(zmp_ref_y.begin(), zmp_ref_y.end());
+
+	//Queue a starting step, where we step, but do nothing with the ZMP
+	//so push tons of zero ZMP values
+	for (unsigned int i = 0; i < newSupportStep->stepDurationFrames; i++){
+		zmp_ref_stop_x.push_back(end_i(0));
+		zmp_ref_stop_y.push_back(end_i(1));
+	}
+
+#ifdef DEBUG_ZMP
+	list<float>::iterator it;
+	cout << "zmp_ref_x: ";
+	for (it=zmp_ref_x.begin(); it!=zmp_ref_x.end(); ++it)
+		cout << " " << *it;
+	cout << "\n";
+
+	cout << "zmp_ref_stop_x: ";
+	for (it=zmp_ref_stop_x.begin(); it!=zmp_ref_stop_x.end(); ++it)
+		cout << " " << *it;
+	cout << "\n";
+#endif
+
+	//An End step should never move the si_Transform!
+	//si_Transform = prod(si_Transform,get_s_sprime(newSupportStep));
+	//store the end of the zmp in the next s frame:
+	last_zmp_stop_end_s = prod(get_sprime_s(newSupportStep),end_s);
 }
 
 /**
@@ -763,7 +840,7 @@ void StepGenerator::resetSteps(const bool startLeft){
     shared_ptr<Step> firstSupportStep =
       shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
                                   *gait,
-                                  firstSupportFoot,ZERO_WALKVECTOR,END_STEP)); 
+                                  firstSupportFoot,ZERO_WALKVECTOR,END_STEP));
     shared_ptr<Step> dummyStep =
         shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
                                   *gait,
@@ -994,6 +1071,35 @@ void StepGenerator::resetQueues(){
     currentZMPDSteps.clear();
     zmp_ref_x.clear();
     zmp_ref_y.clear();
+    zmp_ref_stop_x.clear();
+    zmp_ref_stop_y.clear();
+}
+
+/**
+ * Replaces the  zmp_ref queues, for immediate change of direction
+ */
+void StepGenerator::swapZMPQueues(std::list<float> &zmp_x, std::list<float> &zmp_y,
+								  NBMath::ufvector3 &last_zmp) {
+#ifdef DEBUG_STEPGENERATOR
+	cout << "StepGenerator::swapZMPQueues\n";
+#endif
+#ifdef DEBUG_ZMP_REF
+	list<float>::iterator it;
+	fprintf(zmp_ref_log, "\n----------\nzmp_ref_x: %f\n", (double)zmp_ref_x.size());
+	if (zmp_ref_x.size() > 0) {
+		for (it=zmp_ref_x.begin(); it!=zmp_ref_x.end(); ++it)
+			fprintf(zmp_ref_log, " %f,", *it);
+	}
+
+	fprintf(zmp_ref_log, "\n zmp_x: %f\n", (double)zmp_x.size());
+	for (it=zmp_x.begin(); it!=zmp_x.end(); ++it)
+		fprintf(zmp_ref_log, " %f,", *it);
+	fprintf(zmp_ref_log, "\n-----------\n");
+#endif
+
+	zmp_ref_x = zmp_x;
+	zmp_ref_y = zmp_y;
+	last_zmp_end_s = last_zmp;
 }
 
 /**

@@ -12,9 +12,6 @@ from math import fabs
 DEBUG = False
 
 def walkSpinToBall(nav):
-    if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
-
     ball = nav.brain.ball
     nav.dest = ball
     nav.dest.h = ball.heading
@@ -28,7 +25,7 @@ def walkSpinToBall(nav):
     #if we're close to the ball...
     if navTrans.atDestinationCloser(nav.brain.my, nav.dest):
         # and facing  it, stop
-        if abs(ball.bearing) < 10:
+        if fabs(ball.bearing) < 10.:
             return nav.goNow('stop')
 
     if not nav.brain.play.isRole(GOALIE):
@@ -49,7 +46,6 @@ def chaseAroundBox(nav):
         # reset dest to new RobotLocation to avoid problems w/dist calculations
         nav.dest = RobotLocation()
         nav.shouldChaseAroundBox = 0
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
 
     ball = nav.brain.ball
     my = nav.brain.my
@@ -107,6 +103,7 @@ def ballInMyBox(nav):
         nav.brain.tracker.activeLoc()
         nav.brain.CoA.setRobotGait(nav.brain.motion)
 
+
     ball = nav.brain.ball
 
     if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
@@ -126,19 +123,14 @@ def ballInMyBox(nav):
 PFK_MAX_Y_SPEED = speeds.MAX_Y_SPEED
 PFK_MIN_Y_SPEED = speeds.MIN_Y_SPEED
 PFK_MAX_X_SPEED = speeds.MAX_X_SPEED
-PFK_MIN_X_SPEED = speeds.MIN_X_MAGNITUDE
+PFK_MIN_X_SPEED = -speeds.MIN_X_SPEED
 PFK_MIN_Y_MAGNITUDE = speeds.MIN_Y_MAGNITUDE
+PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
 PFK_X_GAIN = 0.12
 PFK_Y_GAIN = 0.6
 
 
 def positionForKick(nav):
-    ## nav.dest = kick.getKickPosition()
-
-    ## sX,sY,sTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
-    if nav.firstFrame():
-        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
-
     ball = nav.brain.ball
 
     # Determine approach speed
@@ -148,22 +140,20 @@ def positionForKick(nav):
 
     sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
-    if ball.dist > 5:
-        sX = MyMath.clip(ball.relX * PFK_X_GAIN,
+    targetX = ball.relX - 15.
+    if targetX > 5. or targetX < 0.:
+        sX = MyMath.clip(targetX * PFK_X_GAIN,
                          PFK_MIN_X_SPEED,
                          PFK_MAX_X_SPEED)
+        sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
     else:
         sX = 0.0
 
-    helper.setSpeed(nav,sX,sY,0)
+    helper.setSlowSpeed(nav,sX,sY,0)
 
     return nav.stay()
 
 def dribble(nav):
-
-    if nav.firstFrame():
-        nav.brain.CoA.setRobotDribbleGait(nav.brain.motion)
-
     ball = nav.brain.ball
     nav.dest = ball
     nav.dest.h = ball.heading
@@ -172,7 +162,7 @@ def dribble(nav):
     walkX, walkY, walkTheta = \
            walker.getWalkSpinParam(nav.brain.my, nav.dest)
 
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
+    helper.setDribbleSpeed(nav, walkX, walkY, walkTheta)
 
     if not nav.brain.play.isRole(GOALIE):
         if navTrans.shouldNotGoInBox(ball):

@@ -47,8 +47,10 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
     // connect to dcm using the static methods declared above
 
     // TODO: Should use specialized proxy created at start
-    broker->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&staticPostSensors,this));
-    broker->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&staticSendCommands,this));
+    broker->getProxy("DCM")->getModule()->
+        atPostProcess(boost::bind(&staticPostSensors,this));
+    broker->getProxy("DCM")->getModule()->
+        atPreProcess(boost::bind(&staticSendCommands,this));
 }
 
 void NaoEnactor::sendCommands(){
@@ -95,31 +97,32 @@ void NaoEnactor::sendHardness(){
     motionHardness = switchboard->getNextStiffness();
 
     bool diffStiff = false;
+    static float hardness = 0.0f;
     //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++) {
-        static float hardness =0.0f;
-        //if (hardness != -1.0f) //-1: yet to be implemented by AL decoupled mode
+
         hardness = NBMath::clip(motionHardness[i], -1.0f, 1.0f);
 
         //sets the value for hardness
-        //hardness_command[5][i].arraySetSize(1);
-        if(lastMotionHardness[i] != hardness)
+        if(lastMotionHardness[i] != hardness){
             diffStiff = true;
-        hardness_command[5][i][0] = hardness;
-
-        //store for next time
-        lastMotionHardness[i] = hardness;
+            hardness_command[5][i][0] = hardness;
+            //store for next time
+            lastMotionHardness[i] = hardness;
+        }
     }
-    hardness_command[4][0] = dcmProxy->getTime(0);
 
     if(!diffStiff)
         return;
 
+
+    hardness_command[4][0] = dcmProxy->getTime(0);
     // #ifdef ROBOT_NAME_zaphod
-    //     // turn off broken neck
-    //    hardness_command[5][Kinematics::HEAD_YAW][0] = -1.0f;
-    //    hardness_command[5][Kinematics::HEAD_PITCH][0] = -1.0f;
-    // #endif
+    #ifdef ROBOT_NAME_zaphod
+    //     // turn off broken shoulder
+    hardness_command[5][Kinematics::L_SHOULDER_PITCH][0] = -1.0f;
+    hardness_command[5][Kinematics::L_SHOULDER_ROLL][0] = -1.0f;
+    #endif
 
 #ifndef NO_ACTUAL_MOTION
     try {
@@ -136,9 +139,6 @@ void NaoEnactor::postSensors(){
     //We also call this from the Motion run method
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
-
-    //TODO figure out if this is necessary since its done in switchboard
-    sensors->setMotionBodyAngles(motionValues);
     transcriber->postMotionSensors();
 
     if(!switchboard){
@@ -213,8 +213,12 @@ void NaoEnactor::initDCMCommands(){
     us_command[2].arraySetSize(1);
     us_command[2][0].arraySetSize(2);
     us_command[2][0][0] = (4.0 + 64.0);
-    us_command[2][0][1] = dcmProxy->getTime(0);
-    dcmProxy->set(us_command);
-
+    us_command[2][0][1] = dcmProxy->getTime(5);
+    try {
+        dcmProxy->set(us_command);
+    } catch(AL::ALError& a) {
+        std::cout << "DCM ultrasound set error" << a.toString() << "    "
+                  << us_command.toString() << std::endl;
+    }
 }
 

@@ -69,19 +69,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def run(self):
         self.play = self.brain.play
         if self.currentState == 'afterKick' or \
-                self.lastDiffState == 'afterKick':
+               self.lastDiffState == 'afterKick':
             self.justKicked = True
         else:
             self.justKicked = False
 
         gcState = self.brain.gameController.currentState
-        if gcState == 'gamePlaying' or\
-                (gcState == 'penaltyShotsGamePlaying'
-                 and self.play.isRole(PBConstants.GOALIE)):
+        if not self.firstFrame() and (gcState == 'gamePlaying' or\
+               (gcState == 'penaltyShotsGamePlaying'
+                and self.play.isRole(PBConstants.GOALIE))):
             roleState = self.getNextState()
 
             if roleState != self.currentState:
-                self.brain.CoA.setRobotGait(self.brain.motion)
                 self.switchTo(roleState)
 
         SoccerFSA.SoccerFSA.run(self)
@@ -176,13 +175,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def lookPostKick(self):
         tracker = self.brain.tracker
-        if self.chosenKick == SweetMoves.LEFT_FAR_KICK or \
-                self.chosenKick == SweetMoves.RIGHT_FAR_KICK:
-            tracker.lookToDir('up')
-        elif self.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
+        if self.chosenKick == SweetMoves.RIGHT_SIDE_KICK:
             tracker.lookToDir('left')
         elif self.chosenKick == SweetMoves.LEFT_SIDE_KICK:
             tracker.lookToDir('right')
+        else:
+            tracker.lookToDir('up')
 
     def getNextOrbitPos(self):
         relX = -ChaseConstants.ORBIT_OFFSET_DIST * \

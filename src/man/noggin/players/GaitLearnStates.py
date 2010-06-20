@@ -188,7 +188,7 @@ def stopandchangegait(player):
                                      gaitTuple[6],
                                      gaitTuple[7])
 
-        player.brain.CoA.setDynamicGait(player.brain.motion, newGait)
+        player.brain.CoA.setRobotDynamicGait(player.brain.motion, newGait)
         #player.brain.CoA.setRobotGait(player.brain.motion)
 
         #print "gait in tuple form:"

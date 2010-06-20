@@ -31,7 +31,6 @@ def walkStraightToPoint(nav):
     If we no longer are heading towards it change to the spin state.
     """
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.walkToPointCount = 0
         nav.walkToPointSpinCount = 0
 
@@ -65,11 +64,10 @@ def spinToWalkHeading(nav):
     Spin to the heading needed to walk to a specific point
     """
     my = nav.brain.my
-    targetH = my.headingTo(nav.dest)
-    newSpinDir = my.spinDirToHeading(targetH)
+    headingDiff = my.getRelativeBearing(nav.dest)
+    newSpinDir = MyMath.sign(headingDiff)
 
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.changeSpinDirCounter = 0
         nav.stopSpinToWalkCount = 0
         nav.curSpinDir = newSpinDir
@@ -84,7 +82,7 @@ def spinToWalkHeading(nav):
         nav.changeSpinDirCounter = 0
         if DEBUG: nav.printf("Switching spin directions my.h " +
                              str(nav.brain.my.h)+
-                             " and my target h: " + str(targetH))
+                             " and my h diff: " + str(headingDiff))
 
     if navTrans.atHeadingGoTo(my, targetH):
         nav.stopSpinToWalkCount += 1
@@ -94,7 +92,6 @@ def spinToWalkHeading(nav):
     else :
         nav.stopSpinToWalkCount = 0
 
-    headingDiff = fabs(nav.brain.my.h - targetH)
     sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
         walker.getRotScale(headingDiff)
 
@@ -112,17 +109,15 @@ def spinToFinalHeading(nav):
     Stops when at heading
     """
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.stopSpinToWalkCount = 0
 
     targetH = nav.dest.h
+    headingDiff = MyMath.sub180Angle(nav.brain.my.h - targetH)
 
-    #may be able to keep sign of this and eliminate spinDir
-    headingDiff = fabs(MyMath.sub180Angle(nav.brain.my.h - targetH))
     if DEBUG:
         nav.printf("Need to spin to %g, heading diff is %g,heading uncert is %g"
                    % (targetH, headingDiff, nav.brain.my.uncertH))
-    spinDir = nav.brain.my.spinDirToHeading(targetH)
+    spinDir = MyMath.sign(headingDiff)
 
     spin = spinDir*constants.GOTO_SPIN_SPEED*walker.getRotScale(headingDiff)
 
@@ -142,7 +137,6 @@ def omniWalkToPoint(nav):
     dest = nav.dest
 
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         nav.walkToPointCount = 0
 
     if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
@@ -185,12 +179,11 @@ def avoidFrontObstacle(nav):
     # we'll probably want to go forward again and most obstacle
     # are moving, so pausing might make more sense
 
-
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
         nav.printf(nav.brain.sonar)
         nav.printf("Avoid by backup");
-        helper.setSpeed(nav, 0, constants.DODGE_BACK_SPEED, 0)
+        helper.setSpeed(nav, constants.DODGE_BACK_SPEED, 0, 0)
 
     avoidLeft = navTrans.shouldAvoidObstacleLeft(nav)
     avoidRight = navTrans.shouldAvoidObstacleRight(nav)
@@ -286,8 +279,6 @@ def walking(nav):
     """
     State to be used when setSpeed is called
     """
-    if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
     if nav.updatedTrajectory:
         helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
@@ -301,7 +292,6 @@ def stepping(nav):
     This is different from walking.
     """
     if nav.firstFrame():
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         helper.step(nav, nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
 
     elif not nav.brain.motion.isWalkActive():
@@ -330,7 +320,6 @@ def stopped(nav):
 
 def orbitPoint(nav):
     if nav.updatedTrajectory:
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
         helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
         nav.updatedTrajectory = False
 

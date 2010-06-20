@@ -98,6 +98,9 @@
 #  define DEBUG_SENSOR_ZMP
 #endif
 
+// ZMP Preview Queue Debugging
+#define DEBUG_ZMP_REF
+
 typedef boost::tuple<const std::list<float>*,
                      const std::list<float>*> zmp_xy_tuple;
 typedef boost::tuple<LegJointStiffTuple,
@@ -147,7 +150,7 @@ private: // Helper methods
                       float _theta);
     void fillZMP(const boost::shared_ptr<Step> newStep );
     void fillZMPRegular(const boost::shared_ptr<Step> newStep );
-    void fillZMPEnd(const boost::shared_ptr<Step> newStep );
+    void fillZMPEnd(const boost::shared_ptr<Step> newStep);
 
     void resetSteps(const bool startLeft);
 
@@ -161,6 +164,9 @@ private: // Helper methods
     void clearFutureSteps();
 
     void resetQueues();
+	void swapZMPQueues(std::list<float> &zmp_x, std::list<float> &zmp_y,
+					   NBMath::ufvector3 &last_zmp);
+	std::list<float> mergeZMPQueues(std::list<float> &currentQ, std::list<float> &newQ);
     void resetOdometry(const float initX, const float initY);
     void updateOdometry(const std::vector<float> &deltaOdo);
     void debugLogging();
@@ -183,6 +189,8 @@ private:
     //boost::numeric::ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     std::list<float> zmp_ref_x, zmp_ref_y;
+	// future zmp_ref values assuming we are about to stop
+	std::list<float> zmp_ref_stop_x, zmp_ref_stop_y;
     std::list<boost::shared_ptr<Step> > futureSteps; //stores steps not yet zmpd
     //Stores currently relevant steps that are zmpd but not yet completed.
     //A step is consider completed (obsolete/irrelevant) as soon as the foot
@@ -194,6 +202,8 @@ private:
     //These are updated when we ZMP a step - they are the 'future', if you will
     NBMath::ufmatrix3 si_Transform;
     NBMath::ufvector3 last_zmp_end_s;
+	// tracked so we can stop quicker
+	NBMath::ufvector3 last_zmp_stop_end_s;
 
     //Steps for the Walking Leg
     boost::shared_ptr<Step> lastStep_s;
@@ -237,6 +247,9 @@ private:
 #endif
 #ifdef DEBUG_SENSOR_ZMP
     FILE* zmp_log;
+#endif
+#ifdef DEBUG_ZMP_REF
+	FILE* zmp_ref_log;
 #endif
 
 };

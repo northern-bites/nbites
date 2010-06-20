@@ -68,16 +68,16 @@ using boost::shared_ptr;
 
 // Constructor for Field class. passed an instance of Vision and Pose
 Field::Field(Vision* vis, Threshold * thr)
-    : vision(vis), thresh(thr)
+: vision(vis), thresh(thr)
 {
 #ifdef OFFLINE
-	debugHorizon = false;
-	debugFieldEdge = false;
-	openField = true;
+    debugHorizon = false;
+    debugFieldEdge = false;
+    openField = true;
 #else
-	debugHorizon = false;
-	debugFieldEdge = false;
-	openField = false;
+    debugHorizon = false;
+    debugFieldEdge = false;
+    openField = false;
 #endif
 }
 
@@ -91,142 +91,142 @@ Field::Field(Vision* vis, Threshold * thr)
  */
 
 void Field::findConvexHull(int pH) {
-	int RUNSIZE = 8;
-	int SCANSIZE = 10;
-	int NOISE = 2;
-	int HULLS = IMAGE_WIDTH / SCANSIZE + 1;
+    int RUNSIZE = 8;
+    int SCANSIZE = 10;
+    int NOISE = 2;
+    int HULLS = IMAGE_WIDTH / SCANSIZE + 1;
 
-	int good, ok, top;
-	unsigned char pixel;
-	point<int> convex[HULLS];
-	// we need a better criteria for what the top is
-	for (int i = 0; i < HULLS; i++) {
-		good = 0;
-		ok = 0;
-		int poseProject = yProject(0, pH, i * SCANSIZE);
-		if (poseProject <= 0) {
-			poseProject = 0;
-		}
-		for (top = max(poseProject, 0);
-			 good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
-			// scan until we find a run of green pixels
-			int x = i * SCANSIZE;
-			if (i == HULLS - 1)
-				x--;
-			pixel = thresh->getColor(x, top);
-			//pixel = thresh->thresholded[top][x];
-			if (pixel == GREEN) {
-				good++;
-			} else if (pixel == BLUEGREEN || pixel == GREY) {
-				ok++;
-				if (ok > NOISE) {
-					good = 0;
-					ok = 0;
-				}
-			} else {
-				good = 0;
-				ok = 0;
-			}
-		}
-		if (good == RUNSIZE) {
-			convex[i] = point<int>(i * SCANSIZE, top - good);
-			if (poseProject < 0 && top - good < 10)
-				convex[i] = point<int>(i * SCANSIZE, 0);
-		} else {
-			convex[i] = point<int>(i * SCANSIZE, IMAGE_HEIGHT);
-		}
-	}
-	// now do the Graham scanning algorithm
-	int M = 2;
-	for (int i = 2; i < HULLS; i++) {
-		while (ccw(convex[M-1], convex[M], convex[i]) <= 0 && M >= 1) {
-			M--;
-		}
-		M++;
-		point<int> temp = convex[M];
-		convex[M] = convex[i];
-		convex[i] = temp;
-	}
-	// when we apply Graham scanning as we just did, there can be problems at each end
-	int diffy = convex[2].y - convex[1].y;
-	int diffx = convex[2].x - convex[1].x;
-	float steps = 0.0f;
-	// this shouldn't happen, but let's be sure
-	if (diffx != 0)
-	  steps = (float)diffy / (float)diffx;
-	int diffx2 = convex[1].x - convex[0].x;
-	float project = (float)convex[1].y - (float)diffx2 * steps;
-	if (convex[1].x < 50 && convex[0].y - (int)project > 5) {
-		//cout << "Init " << convex[0].y << " " << convex[1].y << " " << convex[2].y << endl;
-		//cout << "Initx " << convex[0].x << " " << convex[1].x << " " << convex[2].x << endl;
-		convex[0].y = (int)project;
-	}
-	// do the same for the right edge
-	if (M > 3) {
-		diffx = convex[M-1].x - convex[M-2].x;
-		diffy = convex[M-1].y - convex[M-2].y;
-		if (diffx != 0)
-		  steps = (float)diffy / (float)diffx;
-		else
-		  steps = 0.0f;
-		diffx2 = convex[M].x - convex[M-1].x;
-		project = (float)convex[M-1].y + (float)diffx2 * steps;
-		if (convex[M-1].x > IMAGE_WIDTH - 1 - 50 && convex[M].y - (int)project > 5) {
-			//cout << "Init Right " << convex[M-2].y << " " << convex[M-1].y << " " << convex[M].y << endl;
-			//cout << "Initx right " << convex[M-2].x << " " << convex[M-1].x << " " << convex[M].x << endl;
-			convex[M].y = (int)project;
-		}
-	}
+    int good, ok, top;
+    unsigned char pixel;
+    point<int> convex[HULLS];
+    // we need a better criteria for what the top is
+    for (int i = 0; i < HULLS; i++) {
+        good = 0;
+        ok = 0;
+        int poseProject = yProject(0, pH, i * SCANSIZE);
+        if (poseProject <= 0) {
+            poseProject = 0;
+        }
+        for (top = max(poseProject, 0);
+                good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
+            // scan until we find a run of green pixels
+            int x = i * SCANSIZE;
+            if (i == HULLS - 1)
+                x--;
+            pixel = thresh->getColor(x, top);
+            //pixel = thresh->thresholded[top][x];
+            if (pixel == GREEN) {
+                good++;
+            } else if (pixel == BLUEGREEN || pixel == GREY) {
+                ok++;
+                if (ok > NOISE) {
+                    good = 0;
+                    ok = 0;
+                }
+            } else {
+                good = 0;
+                ok = 0;
+            }
+        }
+        if (good == RUNSIZE) {
+            convex[i] = point<int>(i * SCANSIZE, top - good);
+            if (poseProject < 0 && top - good < 10)
+                convex[i] = point<int>(i * SCANSIZE, 0);
+        } else {
+            convex[i] = point<int>(i * SCANSIZE, IMAGE_HEIGHT);
+        }
+    }
+    // now do the Graham scanning algorithm
+    int M = 2;
+    for (int i = 2; i < HULLS; i++) {
+        while (ccw(convex[M-1], convex[M], convex[i]) <= 0 && M >= 1) {
+            M--;
+        }
+        M++;
+        point<int> temp = convex[M];
+        convex[M] = convex[i];
+        convex[i] = temp;
+    }
+    // when we apply Graham scanning as we just did, there can be problems at each end
+    int diffy = convex[2].y - convex[1].y;
+    int diffx = convex[2].x - convex[1].x;
+    float steps = 0.0f;
+    // this shouldn't happen, but let's be sure
+    if (diffx != 0)
+        steps = (float)diffy / (float)diffx;
+    int diffx2 = convex[1].x - convex[0].x;
+    float project = (float)convex[1].y - (float)diffx2 * steps;
+    if (convex[1].x < 50 && convex[0].y - (int)project > 5) {
+        //cout << "Init " << convex[0].y << " " << convex[1].y << " " << convex[2].y << endl;
+        //cout << "Initx " << convex[0].x << " " << convex[1].x << " " << convex[2].x << endl;
+        convex[0].y = (int)project;
+    }
+    // do the same for the right edge
+    if (M > 3) {
+        diffx = convex[M-1].x - convex[M-2].x;
+        diffy = convex[M-1].y - convex[M-2].y;
+        if (diffx != 0)
+            steps = (float)diffy / (float)diffx;
+        else
+            steps = 0.0f;
+        diffx2 = convex[M].x - convex[M-1].x;
+        project = (float)convex[M-1].y + (float)diffx2 * steps;
+        if (convex[M-1].x > IMAGE_WIDTH - 1 - 50 && convex[M].y - (int)project > 5) {
+            //cout << "Init Right " << convex[M-2].y << " " << convex[M-1].y << " " << convex[M].y << endl;
+            //cout << "Initx right " << convex[M-2].x << " " << convex[M-1].x << " " << convex[M].x << endl;
+            convex[M].y = (int)project;
+        }
+    }
 
-	// interpolate the points in the hull to determine values for every scanline
-	topEdge[0] = convex[0].y;
-	float maxPix = 0.0f;
-	//cout << "First is " << convex[0].x << " " << convex[0].y << endl;
-	estimate e;
-	for (int i = 1; i <= M; i++) {
-		//cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
-		int diff = convex[i].y - convex[i-1].y;
-		float step = 0.0f;
-		if (convex[i].x != convex[i-1].x)
-		  step = (float)diff / (float)(convex[i].x - convex[i-1].x);
-		float cur = static_cast<float>(convex[i].y);
-		for (int j = convex[i].x; j > convex[i-1].x; j--) {
-			cur -= step;
-			topEdge[j] = (int)cur;
-			/*if (cur > 10) {
-				e = vision->pose->pixEstimate(j, (int)cur, 0.0f);
-				if (e.dist > maxPix)
-					maxPix = e.dist;
-					}*/
-			if (debugFieldEdge)
-				thresh->drawPoint(j, (int)cur, BLACK);
-		}
-		if (debugFieldEdge)
-			thresh->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x, convex[i].y, ORANGE);
-	}
-	// calculate the distance to the edge of the field at three key points
-	const int quarter = IMAGE_WIDTH / 4;
-	const int TOPPING = 30;
-	float qDist = 1000.0f, hDist = 1000.0f, tDist = 1000.0f;
-	if (topEdge[quarter] > TOPPING) {
-		e = vision->pose->pixEstimate(quarter, topEdge[quarter], 0.0f);
-		qDist = e.dist;
-	}
-	if (topEdge[quarter * 2] > TOPPING) {
-		e = vision->pose->pixEstimate(quarter * 2, topEdge[quarter * 2], 0.0f);
-		hDist = e.dist;
-	}
-	if (topEdge[quarter * 3] > TOPPING) {
-		e = vision->pose->pixEstimate(quarter * 3, topEdge[quarter * 3], 0.0f);
-		tDist = e.dist;
-	}
-	vision->fieldEdge->setDistances(qDist, hDist, tDist);
-	//cout << "Distances are " << qDist << " " << hDist << " " << tDist << endl;
-	//cout << "Max dist is " << maxPix << endl;
+    // interpolate the points in the hull to determine values for every scanline
+    topEdge[0] = convex[0].y;
+    float maxPix = 0.0f;
+    //cout << "First is " << convex[0].x << " " << convex[0].y << endl;
+    estimate e;
+    for (int i = 1; i <= M; i++) {
+        //cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
+        int diff = convex[i].y - convex[i-1].y;
+        float step = 0.0f;
+        if (convex[i].x != convex[i-1].x)
+            step = (float)diff / (float)(convex[i].x - convex[i-1].x);
+        float cur = static_cast<float>(convex[i].y);
+        for (int j = convex[i].x; j > convex[i-1].x; j--) {
+            cur -= step;
+            topEdge[j] = (int)cur;
+            /*if (cur > 10) {
+                e = vision->pose->pixEstimate(j, (int)cur, 0.0f);
+                if (e.dist > maxPix)
+                    maxPix = e.dist;
+                }*/
+            if (debugFieldEdge)
+                thresh->drawPoint(j, (int)cur, BLACK);
+        }
+        if (debugFieldEdge)
+            thresh->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x, convex[i].y, ORANGE);
+    }
+    // calculate the distance to the edge of the field at three key points
+    const int quarter = IMAGE_WIDTH / 4;
+    const int TOPPING = 30;
+    float qDist = 1000.0f, hDist = 1000.0f, tDist = 1000.0f;
+    if (topEdge[quarter] > TOPPING) {
+        e = vision->pose->pixEstimate(quarter, topEdge[quarter], 0.0f);
+        qDist = e.dist;
+    }
+    if (topEdge[quarter * 2] > TOPPING) {
+        e = vision->pose->pixEstimate(quarter * 2, topEdge[quarter * 2], 0.0f);
+        hDist = e.dist;
+    }
+    if (topEdge[quarter * 3] > TOPPING) {
+        e = vision->pose->pixEstimate(quarter * 3, topEdge[quarter * 3], 0.0f);
+        tDist = e.dist;
+    }
+    vision->fieldEdge->setDistances(qDist, hDist, tDist);
+    //cout << "Distances are " << qDist << " " << hDist << " " << tDist << endl;
+    //cout << "Max dist is " << maxPix << endl;
 }
 
 int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {
-	return (p2.x - p1.x)*(p3.y - p1.y) - (p2.y - p1.y)*(p3.x - p1.x);
+    return (p2.x - p1.x)*(p3.y - p1.y) - (p2.y - p1.y)*(p3.x - p1.x);
 }
 
 /*
@@ -240,15 +240,15 @@ int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {
  */
 
 int Field::findGreenHorizon(int pH, float sl) {
-	const int MIN_PIXELS_INITIAL = 2;
-	const int SCAN_INTERVAL_X = 10;
-	const int SCAN_INTERVAL_Y = 4;
+    const int MIN_PIXELS_INITIAL = 2;
+    const int SCAN_INTERVAL_X = 10;
+    const int SCAN_INTERVAL_Y = 4;
     // we're more demanding of Green because there is so much
-	const int MIN_GREEN_SIZE = 10;
-	const int MIN_PIXELS_PRECISE = 20;
+    const int MIN_GREEN_SIZE = 10;
+    const int MIN_PIXELS_PRECISE = 20;
 
-	slope = sl;
-	// re init shooting info
+    slope = sl;
+    // re init shooting info
     for (int i = 0; i < IMAGE_WIDTH; i++)
         shoot[i] = true;
     //variable definitions
@@ -264,32 +264,32 @@ int Field::findGreenHorizon(int pH, float sl) {
     // we're going to do this backwards of how we used to - we start at the pose
     // horizon and scan down.  This will provide an initial estimate
     for (j = max(0, pH); j < IMAGE_HEIGHT && horizon == -1; j+=SCAN_INTERVAL_Y) {
-		// reset values for each scan
+        // reset values for each scan
         greenPixels = 0;
         run = 0;
         scanY = 0;
-		// we do a scan based on the slope provided by pose
-		// and we only look at every 10th pixel
+        // we do a scan based on the slope provided by pose
+        // and we only look at every 10th pixel
         for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1
-                 && greenPixels < 3; i+= SCAN_INTERVAL_X) {
+        && greenPixels < 3; i+= SCAN_INTERVAL_X) {
             //pixel = thresh->thresholded[scanY][i];
-			pixel = thresh->getColor(i, scanY);
+            pixel = thresh->getColor(i, scanY);
             if (pixel == GREEN) {
                 greenPixels++;
             }
-			// project the line to get the next y value
+            // project the line to get the next y value
             scanY = thresh->blue->yProject(0, j, i);
         }
-		// once we see enough green we're done
+        // once we see enough green we're done
         if (greenPixels > MIN_PIXELS_INITIAL) {
             break;
         }
     }
     // we should have a base estimate, let's move it up
     int k, l, minpix = IMAGE_WIDTH, minpixrow = -1;
-	if (debugHorizon) {
-		cout << "initial estimate is " << j << " " << pH << endl;
-	}
+    if (debugHorizon) {
+        cout << "initial estimate is " << j << " " << pH << endl;
+    }
 	/*if (greenPixels == 0) {
 		horizon = IMAGE_HEIGHT - 1;
 		for (i = 0; i < IMAGE_WIDTH; i++) {
@@ -302,27 +302,27 @@ int Field::findGreenHorizon(int pH, float sl) {
 		}*/
 	// set our initial estimate
     horizon = j;
-	// now scan back toward the pose estimated horizon
+    // now scan back toward the pose estimated horizon
     for (k = min(horizon, IMAGE_HEIGHT - 2); k > -1; k-=4) {
-		// this is basically identical to above except we're going up
-		// Also, since we're trying to be precise we scan more and
-		// have to worry about where the projection of the line goes
+        // this is basically identical to above except we're going up
+        // Also, since we're trying to be precise we scan more and
+        // have to worry about where the projection of the line goes
         greenPixels = 0;
         run = 0;
         scanY = 0;
         for (l = max(0, firstpix - 5), firstpix = -1; l < IMAGE_WIDTH && scanY <
-                 IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE &&
-                 greenPixels < MIN_PIXELS_PRECISE; l+=3) {
-			if (debugHorizon) {
-				thresh->drawPoint(l, scanY, BLACK);
-			}
-			int newPixel = thresh->getColor(l, scanY);
+        IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE &&
+        greenPixels < MIN_PIXELS_PRECISE; l+=3) {
+            if (debugHorizon) {
+                thresh->drawPoint(l, scanY, BLACK);
+            }
+            int newPixel = thresh->getColor(l, scanY);
             //int newPixel = thresh->thresholded[scanY][l];
             if (newPixel == GREEN) {
-				// firstpix tracks where we saw the first green pixel
+                // firstpix tracks where we saw the first green pixel
                 if (firstpix == -1) {
                     firstpix = l;
-					// now because of slopes the min location could be anywhere
+                    // now because of slopes the min location could be anywhere
                     if (l <= minpix) {
                         minpix = l;
                         minpixrow = k;
@@ -333,11 +333,11 @@ int Field::findGreenHorizon(int pH, float sl) {
             } else {
                 run = 0;
             }
-			// next Y value in this scan
+            // next Y value in this scan
             scanY = thresh->blue->yProject(0, k, l);
         }
-		// now check how we did in this scanline - remember now we are
-		// looking for the first line where we DON'T have lots of green
+        // now check how we did in this scanline - remember now we are
+        // looking for the first line where we DON'T have lots of green
         if (run < MIN_GREEN_SIZE && greenPixels < MIN_PIXELS_PRECISE) {
             // first make sure we didn't get fooled by firstpix
             run = 0;
@@ -352,12 +352,12 @@ int Field::findGreenHorizon(int pH, float sl) {
                     scanY = IMAGE_HEIGHT;
                 }
 
-				//int newPixel = thresh->getColor(j, scanY);
+                //int newPixel = thresh->getColor(j, scanY);
                 //int newPixel = thresh->thresholded[scanY][j];
-				if (debugHorizon) {
-					thresh->drawPoint(j, scanY, BLACK);
-				}
-				pixel = thresh->getColor(j, scanY);
+                if (debugHorizon) {
+                    thresh->drawPoint(j, scanY, BLACK);
+                }
+                pixel = thresh->getColor(j, scanY);
                 if (pixel == GREEN) {
                     run++;
                     greenPixels++;
@@ -365,34 +365,32 @@ int Field::findGreenHorizon(int pH, float sl) {
                 }
                 scanY = thresh->blue->yProject(0, k, j);
             }
-			// if we still meet the criteria then we are done
+            // if we still meet the criteria then we are done
             if (run < MIN_GREEN_SIZE && greenPixels < MIN_PIXELS_PRECISE) {
-				if (debugHorizon) {
-					cout << "Found horizon " << k << " " << run << " "
-						 << greenPixels << endl;
-					thresh->drawPoint(100, k + 1, BLACK);
-					thresh->drawLine(minpix, minpixrow, firstpix, k + 2, RED);
-				}
+                if (debugHorizon) {
+                    cout << "Found horizon " << k << " " << run << " "
+                            << greenPixels << endl;
+                    thresh->drawPoint(100, k + 1, BLACK);
+                    thresh->drawLine(minpix, minpixrow, firstpix, k + 2, RED);
+                }
                 horizon = k + 2;
-				findConvexHull(horizon);
+                findConvexHull(horizon);
                 return horizon;
             }
         }
     }
     horizon = 0;
-	findConvexHull(horizon);
-	return horizon;
+    findConvexHull(horizon);
+    return horizon;
 }
 
-
-
 void Field::bestShot(VisualFieldObject* left,
-					 VisualFieldObject* right,
-					 VisualCrossbar* middle, int color)
+                     VisualFieldObject* right,
+                     VisualCrossbar* middle, int color)
 {
     const int bigSize = 10;
-	const int topBuff = 20;
-	const int newHeight = 20;
+    const int topBuff = 20;
+    const int newHeight = 20;
 
     // start by setting boundaries
     int leftb = 0, rightb = IMAGE_WIDTH - 1, bottom = 0;
@@ -410,18 +408,17 @@ void Field::bestShot(VisualFieldObject* left,
             leftb = max(0, rightb - (int)right->getHeight());
         }
     }
-	middle->setLeftTopX(leftb);
-	middle->setLeftBottomX(leftb);
-	middle->setRightTopX(rightb);
-	middle->setRightBottomX(rightb);
-	middle->setLeftBottomY(bottom);
-	middle->setRightBottomY(bottom);
-	middle->setLeftTopY(bottom - 10);
-	middle->setRightTopY(bottom - 10);
-	middle->setWidth(static_cast<float>(rightb - leftb + 1));
-	middle->setHeight(10);
+    middle->setLeftTopX(leftb);
+    middle->setLeftBottomX(leftb);
+    middle->setRightTopX(rightb);
+    middle->setRightBottomX(rightb);
+    middle->setLeftBottomY(bottom);
+    middle->setRightBottomY(bottom);
+    middle->setLeftTopY(bottom - 10);
+    middle->setRightTopY(bottom - 10);
+    middle->setWidth(static_cast<float>(rightb - leftb + 1));
+    middle->setHeight(10);
 }
-
 
 /* The horizon at the given x value.  Eventually we'll be changing this to
  * return a value based upon the field edges.
@@ -430,7 +427,7 @@ void Field::bestShot(VisualFieldObject* left,
  */
 
 int Field::horizonAt(int x) {
-	return topEdge[x];
+    return topEdge[x];
     //return yProject(0, horizon, x);
 }
 

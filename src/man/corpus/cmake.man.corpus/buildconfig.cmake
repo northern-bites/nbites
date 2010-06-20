@@ -44,3 +44,9 @@ OPTION(
     "Turn on/off debugging information for the Thread class."
     ON
     )
+
+OPTION(
+    DEBUG_ALIMAGE
+    "Turn on/off debugging information for ALImageTranscriber"
+    OFF
+    )

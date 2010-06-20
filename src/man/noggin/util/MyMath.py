@@ -6,7 +6,6 @@ myMath.py - a number of methods for simple often used math
 from math import (atan2,
                   cos,
                   fabs,
-                  pi,
                   radians,
                   sin)
 
@@ -16,10 +15,9 @@ def sub180Angle(angle):
     Returns the angle identitical to the input angle that is between -180 and
     180 degrees.
     """
-    angle = angle % 360
-    if angle > 180:
+    if angle > 180.:
         angle -= 360.
-    if angle < -180:
+    if angle < -180.:
         angle += 360.
     return angle
 
@@ -31,28 +29,19 @@ def sub180Diff(angle, from_angle):
     """
     while (fabs(angle - from_angle) > 180.):
         if angle > 0.:
-            angle -= 360
+            angle -= 360.
         else:
-            angle += 360
+            angle += 360.
     return angle
-
-def safe_atan2(y, x):
-    if x == 0.0:
-        if y > 0:
-            return pi / 2.0
-        else:
-            return -pi / 2.0
-    else:
-        return atan2(y, x)
 
 def sign(x):
     """
     return the sign of a number
     """
     if x == 0:
-        return 0
+        return 0.
     else:
-        return x/abs(x)
+        return x/fabs(x)
 
 def clip(value,min,max):
     '''takes a value, plus a min and a max,

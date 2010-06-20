@@ -29,26 +29,24 @@ public:
     void setBearingWithSD(float b);
     void findAngles() {
         setAngleX((static_cast<float>(IMAGE_WIDTH)/2 -
-				   static_cast<float>(centerX) ) / MAX_BEARING_RAD);
+                static_cast<float>(centerX) ) / MAX_BEARING_RAD);
         setAngleY((static_cast<float>(IMAGE_HEIGHT)/2 -
-				   static_cast<float>(centerY) ) / MAX_ELEVATION_RAD);
+                static_cast<float>(centerY) ) / MAX_ELEVATION_RAD);
     }
 
     // calibration pre-huge chown changes
     //void setFocalDistance() {focDist = 2250*pow((getRadius()*2),-1.0917);}
+
+//obsolete - we don't use this anymore
+// TODO: change ball size for sim
 #if ROBOT(NAO_SIM)
     void setFocalDistanceFromRadius() { focDist = 100 * 24.5/(getRadius() *2); }
 #elif ROBOT(NAO_RL)
-    //TODO: recompute this
     void setFocalDistanceFromRadius()
         {
             focDist = ( 6.4f/8.6f) * (100.f / 83.f) * (50.f / 52.f ) *
                 2850.f / (getRadius() * 2.f);
         }
-#else
-    void setFocalDistanceFromRadius() {
-        focDist = 2067.6f*pow(getRadius()*2.0f,-1.0595f);
-    }
 #endif
     void findPinkBlobDist() {
         focDist = PinkBallAt1M * 100 / (getRadius() * 2);

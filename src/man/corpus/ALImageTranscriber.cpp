@@ -5,6 +5,11 @@
 #include "manconfig.h"
 
 #include "ALImageTranscriber.h"
+#include "corpusconfig.h"
+
+#ifdef DEBUG_ALIMAGE
+#  define DEBUG_ALIMAGE_LOOP
+#endif
 
 using boost::shared_ptr;
 using namespace AL;
@@ -26,20 +31,20 @@ const int ALImageTranscriber::DEFAULT_CAMERA_BUFFERSIZE = 16;
 // Gain: 28 / Exp: 60
 // Gain: 35 / Exp: 40
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 26;
+const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 30;
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 128;
-const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 68;
-const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 140;
-const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 64;
-const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 128;
+const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 127;
+const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 67;
+const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 154;
+const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 90;
+const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 152;
 const int ALImageTranscriber::DEFAULT_CAMERA_HUE = 0;
 // Lens correction
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSX = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSY = 0;
 // Exposure length
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 83;
+const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 60;
 // Image orientation
 const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
@@ -105,25 +110,29 @@ void ALImageTranscriber::run() {
         const long long processTime = micro_time() - startTime;
         //sleep until next frame
 
-		lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
-        if (processTime > VISION_FRAME_LENGTH_uS){
-			if (lastProcessTimeAvg > VISION_FRAME_LENGTH_PRINT_THRESH_uS)
-				std::cout << "Time spent in ALImageTranscriber loop longer than"
-						  << " frame length: " << processTime <<std::endl;
+        lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
+
+        if (processTime > VISION_FRAME_LENGTH_uS) {
+            if (processTime > VISION_FRAME_LENGTH_PRINT_THRESH_uS) {
+#ifdef DEBUG_ALIMAGE_LOOP
+                std::cout << "Time spent in ALImageTranscriber loop longer than"
+                          << " frame length: " << processTime <<std::endl;
+#endif
+            }
             //Don't sleep at all
         } else{
-			const long int microSleepTime = (VISION_FRAME_LENGTH_uS -
-											 processTime);
-			const long int nanoSleepTime =
-				(microSleepTime %(1000 * 1000)) * 1000;
+            const long int microSleepTime = (VISION_FRAME_LENGTH_uS -
+                    processTime);
+            const long int nanoSleepTime =
+                    (microSleepTime %(1000 * 1000)) * 1000;
 
-			const long int secSleepTime = microSleepTime / (1000*1000);
+            const long int secSleepTime = microSleepTime / (1000*1000);
 
-			// cout << "Sleeping for nano: " << nanoSleepTime <<
-			// 	" and sec:" << secSleepTime << endl;
+            // std::cout << "Sleeping for nano: " << nanoSleepTime <<
+            //  	" and sec:" << secSleepTime << std::endl;
 
-			interval.tv_sec = secSleepTime;
-			interval.tv_nsec = nanoSleepTime;
+            interval.tv_sec = secSleepTime;
+            interval.tv_nsec = nanoSleepTime;
 
             nanosleep(&interval, &remainder);
         }
@@ -225,16 +234,16 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set AutoExposition");
     }
-	int param = camera->call<int>("getParam", kCameraAutoExpositionID);
-	// if that didn't work, then try again
-	if (param != DEFAULT_CAMERA_AUTO_EXPOSITION) {
-		try {
-			camera->callVoid("setParam", kCameraAutoExpositionID,
-							 DEFAULT_CAMERA_AUTO_EXPOSITION);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set AutoExposition AGAIN");
-		}
-	}
+    int param = camera->call<int>("getParam", kCameraAutoExpositionID);
+    // if that didn't work, then try again
+    if (param != DEFAULT_CAMERA_AUTO_EXPOSITION) {
+        try {
+            camera->callVoid("setParam", kCameraAutoExpositionID,
+                             DEFAULT_CAMERA_AUTO_EXPOSITION);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set AutoExposition AGAIN");
+        }
+    }
     // Auto white balance
     try {
         camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
@@ -243,15 +252,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set AutoWhiteBalance");
     }
-	param = camera->call<int>("getParam", kCameraAutoWhiteBalanceID);
-	if (param != DEFAULT_CAMERA_AUTO_WHITEBALANCE) {
-		try {
-			camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
-							 DEFAULT_CAMERA_AUTO_WHITEBALANCE);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber","Couldn't set AutoWhiteBalance AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraAutoWhiteBalanceID);
+    if (param != DEFAULT_CAMERA_AUTO_WHITEBALANCE) {
+        try {
+            camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
+                             DEFAULT_CAMERA_AUTO_WHITEBALANCE);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber","Couldn't set AutoWhiteBalance AGAIN");
+        }
+    }
     // Auto gain
     try {
         camera->callVoid("setParam", kCameraAutoGainID,
@@ -259,15 +268,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set AutoGain");
     }
-	param = camera->call<int>("getParam", kCameraAutoGainID);
-	if (param != DEFAULT_CAMERA_AUTO_GAIN) {
-		try {
-			camera->callVoid("setParam", kCameraAutoGainID,
-							 DEFAULT_CAMERA_AUTO_GAIN);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set AutoGain AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraAutoGainID);
+    if (param != DEFAULT_CAMERA_AUTO_GAIN) {
+        try {
+            camera->callVoid("setParam", kCameraAutoGainID,
+                             DEFAULT_CAMERA_AUTO_GAIN);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set AutoGain AGAIN");
+        }
+    }
     // Set camera defaults
     // brightness
     try {
@@ -276,15 +285,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set Brightness ");
     }
-	param = camera->call<int>("getParam", kCameraBrightnessID);
-	if (param != DEFAULT_CAMERA_BRIGHTNESS) {
-		try {
-			camera->callVoid("setParam", kCameraBrightnessID,
-							 DEFAULT_CAMERA_BRIGHTNESS);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set BRIGHTNESS AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraBrightnessID);
+    if (param != DEFAULT_CAMERA_BRIGHTNESS) {
+        try {
+            camera->callVoid("setParam", kCameraBrightnessID,
+                             DEFAULT_CAMERA_BRIGHTNESS);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set BRIGHTNESS AGAIN");
+        }
+    }
     // contrast
     try {
         camera->callVoid("setParam", kCameraContrastID,
@@ -292,15 +301,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set Contrast");
     }
-	param = camera->call<int>("getParam", kCameraContrastID);
-	if (param != DEFAULT_CAMERA_CONTRAST) {
-		try {
-			camera->callVoid("setParam", kCameraContrastID,
-							 DEFAULT_CAMERA_CONTRAST);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set Contrast AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraContrastID);
+    if (param != DEFAULT_CAMERA_CONTRAST) {
+        try {
+            camera->callVoid("setParam", kCameraContrastID,
+                             DEFAULT_CAMERA_CONTRAST);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set Contrast AGAIN");
+        }
+    }
     // Red chroma
     try {
         camera->callVoid("setParam", kCameraRedChromaID,
@@ -308,15 +317,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set RedChroma");
     }
-	param = camera->call<int>("getParam", kCameraRedChromaID);
-	if (param != DEFAULT_CAMERA_REDCHROMA) {
-		try {
-			camera->callVoid("setParam", kCameraRedChromaID,
-							 DEFAULT_CAMERA_REDCHROMA);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set RedChroma AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraRedChromaID);
+    if (param != DEFAULT_CAMERA_REDCHROMA) {
+        try {
+            camera->callVoid("setParam", kCameraRedChromaID,
+                             DEFAULT_CAMERA_REDCHROMA);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set RedChroma AGAIN");
+        }
+    }
     // Blue chroma
     try {
         camera->callVoid("setParam", kCameraBlueChromaID,
@@ -324,15 +333,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set BlueChroma");
     }
-	param = camera->call<int>("getParam", kCameraBlueChromaID);
-	if (param != DEFAULT_CAMERA_BLUECHROMA) {
-		try {
-			camera->callVoid("setParam", kCameraBlueChromaID,
-							 DEFAULT_CAMERA_BLUECHROMA);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set BlueChroma AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraBlueChromaID);
+    if (param != DEFAULT_CAMERA_BLUECHROMA) {
+        try {
+            camera->callVoid("setParam", kCameraBlueChromaID,
+                             DEFAULT_CAMERA_BLUECHROMA);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set BlueChroma AGAIN");
+        }
+    }
     // Exposure length
     try {
         camera->callVoid("setParam",kCameraExposureID,
@@ -340,15 +349,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Exposure");
     }
-	param = camera->call<int>("getParam", kCameraExposureID);
-	if (param != DEFAULT_CAMERA_EXPOSURE) {
-		try {
-			camera->callVoid("setParam", kCameraExposureID,
-							 DEFAULT_CAMERA_EXPOSURE);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set Exposure AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraExposureID);
+    if (param != DEFAULT_CAMERA_EXPOSURE) {
+        try {
+            camera->callVoid("setParam", kCameraExposureID,
+                             DEFAULT_CAMERA_EXPOSURE);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set Exposure AGAIN");
+        }
+    }
     // Gain
     try {
         camera->callVoid("setParam",kCameraGainID,
@@ -356,15 +365,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Gain");
     }
-	param = camera->call<int>("getParam", kCameraGainID);
-	if (param != DEFAULT_CAMERA_GAIN) {
-		try {
-			camera->callVoid("setParam", kCameraGainID,
-							 DEFAULT_CAMERA_GAIN);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set Gain AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraGainID);
+    if (param != DEFAULT_CAMERA_GAIN) {
+        try {
+            camera->callVoid("setParam", kCameraGainID,
+                             DEFAULT_CAMERA_GAIN);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set Gain AGAIN");
+        }
+    }
     // Saturation
     try {
         camera->callVoid("setParam",kCameraSaturationID,
@@ -372,15 +381,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Saturation");
     }
-	param = camera->call<int>("getParam", kCameraSaturationID);
-	if (param != DEFAULT_CAMERA_SATURATION) {
-		try {
-			camera->callVoid("setParam", kCameraSaturationID,
-							 DEFAULT_CAMERA_SATURATION);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set Saturation AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraSaturationID);
+    if (param != DEFAULT_CAMERA_SATURATION) {
+        try {
+            camera->callVoid("setParam", kCameraSaturationID,
+                             DEFAULT_CAMERA_SATURATION);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set Saturation AGAIN");
+        }
+    }
     // Hue
     try {
         camera->callVoid("setParam",kCameraHueID,
@@ -388,15 +397,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Hue");
     }
-	param = camera->call<int>("getParam", kCameraHueID);
-	if (param != DEFAULT_CAMERA_HUE) {
-		try {
-			camera->callVoid("setParam", kCameraHueID,
-							 DEFAULT_CAMERA_HUE);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set Hue AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraHueID);
+    if (param != DEFAULT_CAMERA_HUE) {
+        try {
+            camera->callVoid("setParam", kCameraHueID,
+                             DEFAULT_CAMERA_HUE);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set Hue AGAIN");
+        }
+    }
     // Lens correction X
     try {
         camera->callVoid("setParam",kCameraLensXID,
@@ -404,15 +413,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Lens Correction X");
     }
-	param = camera->call<int>("getParam", kCameraLensXID);
-	if (param != DEFAULT_CAMERA_LENSX) {
-		try {
-			camera->callVoid("setParam", kCameraLensXID,
-							 DEFAULT_CAMERA_LENSX);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set Lens Correction X AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraLensXID);
+    if (param != DEFAULT_CAMERA_LENSX) {
+        try {
+            camera->callVoid("setParam", kCameraLensXID,
+                             DEFAULT_CAMERA_LENSX);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set Lens Correction X AGAIN");
+        }
+    }
     // Lens correction Y
     try {
         camera->callVoid("setParam",kCameraLensYID,
@@ -420,15 +429,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Lens Correction Y");
     }
-	param = camera->call<int>("getParam", kCameraLensYID);
-	if (param != DEFAULT_CAMERA_LENSY) {
-		try {
-			camera->callVoid("setParam", kCameraLensYID,
-							 DEFAULT_CAMERA_LENSY);
-		} catch (ALError &e){
-			log->error("ALImageTranscriber", "Couldn't set Lens Correction Y AGAIN");
-		}
-	}
+    param = camera->call<int>("getParam", kCameraLensYID);
+    if (param != DEFAULT_CAMERA_LENSY) {
+        try {
+            camera->callVoid("setParam", kCameraLensYID,
+                             DEFAULT_CAMERA_LENSY);
+        } catch (ALError &e){
+            log->error("ALImageTranscriber", "Couldn't set Lens Correction Y AGAIN");
+        }
+    }
 }
 
 
@@ -451,7 +460,6 @@ void ALImageTranscriber::waitForImage ()
         }
         if (ALimage != NULL) {
             memcpy(&image[0], ALimage->getFrame(), IMAGE_BYTE_SIZE);
-            //image = ALimage->getFrame();
         }
         else
             std::cout << "\tALImage from camera was null!!" << std::endl;

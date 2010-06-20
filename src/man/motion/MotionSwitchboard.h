@@ -105,7 +105,7 @@ private:
     void preProcess();
     void processJoints();
     void processStiffness();
-    int  postProcess();
+    bool postProcess();
     void preProcessHead();
     void preProcessBody();
     void processHeadJoints();

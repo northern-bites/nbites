@@ -38,6 +38,7 @@ import TOOL.Data.SourceManager;
 import TOOL.Data.DataModule;
 import TOOL.Calibrate.Calibrate;
 import TOOL.Calibrate.CalibrateModule;
+import TOOL.Calibrate.CameraCalibratePanel;
 import TOOL.ColorEdit.ColorEditModule;
 import TOOL.ColorEdit.ColorEdit;
 import TOOL.Classifier.ClassifierModule;
@@ -98,7 +99,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     //temp menus to allow color table stuff
     JMenu actions;
     JMenuItem newColorTable, saveColorTable, saveColorTableAs,loadColorTable,
-        toggleAutoSave, toggleSoftColors, intersectColorTable;
+        toggleAutoSave, toggleSoftColors, intersectColorTable, cameraCalibrate;
     JMenuItem addPane, removePane;
     //modules
     private Calibrate calibrate;
@@ -269,15 +270,12 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         mainWindow = new JFrame("TOOL - Main Window");
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        if (System.getProperty("os.name").contains("Mac")) {
-            mainWindow.setDefaultLookAndFeelDecorated(true);
-        }
-        else if (System.getProperty("os.name").contains("Windows")) {
-            try {
-            UIManager.setLookAndFeel(
-                                 "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            } catch (Exception e) { }
-        }
+		// Try to set the look and feel to the appropriate OS setting
+		try {
+			UIManager.setLookAndFeel(UIManager.
+									 getSystemLookAndFeelClassName());
+		} catch (Exception e) {}
+
 
         //init menu needs to happen here, but before everything else, or the
         //the menu doesnt display right
@@ -315,6 +313,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
 		intersectColorTable = new JMenuItem("Intersect Color Table");
         toggleAutoSave = new JCheckBoxMenuItem("Autosave enabled");
         toggleSoftColors = new JCheckBoxMenuItem("Softcolors enabled");
+        cameraCalibrate = new JMenuItem("Calibrate Camera");
         toggleSoftColors.setSelected(true);
 
         addPane = new JMenuItem("Add Pane");
@@ -327,6 +326,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         saveColorTableAs.addActionListener(this);
         toggleAutoSave.addActionListener(this);
         toggleSoftColors.addActionListener(this);
+        cameraCalibrate.addActionListener(this);
 
         addPane.addActionListener(this);
         removePane.addActionListener(this);
@@ -344,6 +344,9 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         actions.addSeparator();
         actions.add(addPane);
         actions.add(removePane);
+        
+        actions.addSeparator();
+        actions.add(cameraCalibrate);
 
         menuBar.add(actions);
 
@@ -467,6 +470,9 @@ public class TOOL implements ActionListener, PropertyChangeListener{
             colorTable.setSoftColors(toggleSoftColors.isSelected());
             CONSOLE.println("Soft colors enabled: " +
                             toggleSoftColors.isSelected());
+        }
+        else if (e.getSource() == cameraCalibrate) {
+            CameraCalibratePanel cameraCalibrate = new CameraCalibratePanel(calibrate);
         }
 
     }

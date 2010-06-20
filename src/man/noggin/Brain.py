@@ -92,16 +92,12 @@ class Brain(object):
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
 
-        # workaround for slarti (now trillian) sonar problems
-        if self.CoA.name == 'marvin':
-            self.sonar.MIN_DIST = 30.0
-
         # FSAs
+        self.gameController = GameController.GameController(self)
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
-        self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
     def initFieldObjects(self):

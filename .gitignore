@@ -1,5 +1,6 @@
 build*
 install/*
+data/*
 *config.h
 *.pyc
 *.ekf

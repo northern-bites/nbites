@@ -177,7 +177,7 @@ def waitBeforeKick(player):
     # Just don't get stuck here!
     if player.counter > 50:
         return player.goNow('scanFindBall')
-    return player.stay()
+    return player.goLater('getKickInfo')
 
 def steps(player):
     if player.brain.nav.isStopped():

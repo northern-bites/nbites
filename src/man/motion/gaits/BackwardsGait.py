@@ -1,3 +1,4 @@
+
 import man.motion as motion
 import GaitConstants as constants
 
@@ -7,17 +8,17 @@ WALKING = constants.WALKING
 NON_WALKING = constants.NON_WALKING
 
 MARVIN_STANCE_CONFIG = (31.00, # CoM height
-                        1.45,  # Forward displacement of CoM
+                        1.1,  # Forward displacement of CoM
                         10.0,  # Horizontal distance between feet
                         6.0,   # Body angle around y axis
                         0.0,   # Angle between feet
-                        0.1)   # Time to transition to/from this stance
+                        0.2)   # Time to transition to/from this stance
 
-STEP_CONFIG = (0.4, # step duration
+STEP_CONFIG = (0.35, # step duration
                0.25,  # fraction in double support
-               0.9,  # stepHeight
+               0.8,  # stepHeight
                0.0,  # step lift
-               10.0,  # max x speed
+               8.0,  # max x speed
                -7.0,  # max x speed
                7.0,  # max y speed
                20.0, # max theta speed()
@@ -53,7 +54,7 @@ STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.1)  #arm pitch
 
 #Put together all the parts to make a gait - ORDER MATTERS!
-SLOW_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
+BACKWARDS_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,
             STEP_CONFIG,
             ZMP_CONFIG,
             JOINT_HACK_CONFIG,

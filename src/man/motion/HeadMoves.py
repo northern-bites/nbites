@@ -6,6 +6,8 @@ HEAD_MOVE_LENGTH = 4
 
 ZERO_HEADS = (((0.0,0.0),1.0,0, stiff.LOW_HEAD_STIFFNESSES),)
 
+OFF_HEADS = (((0.0,0.0),1.0,1, stiff.NO_HEAD_STIFFNESSES),)
+
 NEUT_HEADS = (((0.,20.),2.0,0, stiff.LOW_HEAD_STIFFNESSES),)
 
 LOOK_DOWN = ( ((0.0,30.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
@@ -225,6 +227,9 @@ KICK_SCAN = (
     ((-90.,-20.),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0,40.),0.5,1,stiff.LOW_HEAD_STIFFNESSES))
 
+PAN_UP = (
+    ((0.,-40.),0.3,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.,-40.),0.3, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 PAN_LEFT_HEADS = ( 65.0, -20.0)
 

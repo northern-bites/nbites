@@ -132,14 +132,14 @@ public:
     void visionLoop();
     inline void threshold();
     inline void runs();
-	unsigned char getColor(int x, int y);
-	unsigned char getExpandedColor(int x, int y, unsigned char col);
-	int getHorizontalEdge(int x1, int y1, int dir);
+    unsigned char getColor(int x, int y);
+    unsigned char getExpandedColor(int x, int y, unsigned char col);
+    int getHorizontalEdge(int x1, int y1, int dir);
     void thresholdAndRuns();
-	void findGoals(int column, int top);
-	void findBallsCrosses(int column, int top);
-	void detectSelf();
-	void setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3);
+    void findGoals(int column, int top);
+    void findBallsCrosses(int column, int top);
+    void detectSelf();
+    void setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3);
     void objectRecognition();
     // helper methods
     void initObjects(void);
@@ -151,11 +151,11 @@ public:
     void storeFieldObjects();
     void setFieldObjectInfo(VisualFieldObject *objPtr);
     void setVisualRobotInfo(VisualRobot *objPtr);
-	void setVisualCrossInfo(VisualCross *objPtr);
-	void setShot(VisualCrossbar * one);
-	void setOpenFieldInformation();
-	float chooseGoalDistance(distanceCertainty cert, float height, float width,
-							 float poseDist, int bottom);
+    void setVisualCrossInfo(VisualCross *objPtr);
+    void setShot(VisualCrossbar * one);
+    void setOpenFieldInformation();
+    float chooseGoalDistance(distanceCertainty cert, float height, float width,
+                             float poseDist, int bottom);
     float getGoalPostDistFromHeight(float height);
     float getGoalPostDistFromWidth(float width);
     float getBeaconDistFromHeight(float height);
@@ -163,9 +163,9 @@ public:
     float getEuclidianDist(point <int> coord1, point <int> coord2);
     void findGreenHorizon();
     point <int> findIntersection(int col, int dir, int c);
-	int greenEdgePoint(int x);
-	int getRobotTop(int x, int c);
-	int getRobotBottom(int x, int c);
+    int greenEdgePoint(int x);
+    int getRobotTop(int x, int c);
+    int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
     point <int> backStopCheck(bool which, int left, int right);
     void setYUV(const uchar* newyuv);
@@ -199,10 +199,10 @@ public:
         return yplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
     }
     inline uchar getU(int x, int y) {
-		return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + UOFFSET];
+        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + UOFFSET];
     }
     inline uchar getV(int x, int y) {
-		return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + VOFFSET];
+        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + VOFFSET];
     }
 #elif ROBOT(NAO_SIM)
 #  error NAO_SIM robot type not implemented
@@ -213,16 +213,16 @@ public:
     int getVisionHorizon() { return horizon; }
 
     inline static int ROUND(float x) {
-		return static_cast<int>( std::floor(x + 0.5f) );
+        return static_cast<int>( std::floor(x + 0.5f) );
     }
 
 
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
 
-	Robots *red, *navyblue;
+    Robots *red, *navyblue;
     Ball* orange;
-	Cross* cross;
+    Cross* cross;
     // main array
     unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
 
@@ -236,7 +236,7 @@ private:
     // class pointers
     Vision* vision;
     boost::shared_ptr<NaoPose> pose;
-	Field* field;
+    Field* field;
 
     const uchar* yuv;
     const uchar* yplane, *uplane, *vplane;
@@ -252,18 +252,18 @@ private:
 
     bool greenBlue[IMAGE_WIDTH];
     bool greenYellow[IMAGE_WIDTH];
-	bool shoot[IMAGE_WIDTH];
+    bool shoot[IMAGE_WIDTH];
     int yellowWhite[IMAGE_WIDTH];
     int blueWhite[IMAGE_WIDTH];
     int navyTops[IMAGE_WIDTH];
     int redTops[IMAGE_WIDTH];
     int navyBottoms[IMAGE_WIDTH];
     int redBottoms[IMAGE_WIDTH];
-	int greenEdge[IMAGE_WIDTH];
+    int greenEdge[IMAGE_WIDTH];
 
-	int lowerBound[IMAGE_WIDTH];
-	int block[NUMBLOCKS];
-	int evidence[NUMBLOCKS];
+    int lowerBound[IMAGE_WIDTH];
+    int block[NUMBLOCKS];
+    int evidence[NUMBLOCKS];
 
     // thresholding variables
     int horizon;
@@ -275,13 +275,13 @@ private:
 #ifdef OFFLINE
     // Visual horizon debugging
     bool visualHorizonDebug;
-	bool debugSelf;
-	bool debugShot;
-	bool debugOpenField;
+    bool debugSelf;
+    bool debugShot;
+    bool debugOpenField;
 #else
-	static const bool debugSelf = false;
-	static const bool debugShot = false;
-	static const bool debugOpenField = false;
+    static const bool debugSelf = false;
+    static const bool debugShot = false;
+    static const bool debugOpenField = false;
 #endif
 };
 

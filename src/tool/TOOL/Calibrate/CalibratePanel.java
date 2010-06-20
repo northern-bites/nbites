@@ -49,7 +49,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     private JCheckBox undefineSpecific, smallTableMode;
     private ThreshSlider thresh;
     private JButton fillHoles, undo, redo, prevImage,
-		nextImage, jumpToButton, skipForward, skipBack;
+        nextImage, jumpToButton, skipForward, skipBack;
     private JTextField jumpToFrame;
     private JTextPane feedback, XYPosition;
     private InputMap im;
@@ -63,7 +63,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     private static final int NUM_COLUMNS = 20;
     private static final int NUM_ROWS = 2;
     private static final int DEFAULT_COLOR_SWATCH_WIDTH = 40;
-	private static final int NUM_SKIP_FRAMES = 10;
+    private static final int NUM_SKIP_FRAMES = 10;
 
     public CalibratePanel(Calibrate aCalibrate) {
         super();
@@ -90,7 +90,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         feedback.setParagraphAttributes(set,true);
 
         feedback.setEditable(false);
-        feedback.setText("Welcome to TOOL 1.0");
+        feedback.setText("Welcome to TOOL .10");
         // Make the background match in color
         feedback.setBackground(this.getBackground());
 
@@ -137,54 +137,54 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         drawColors.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     calibrate.getVisionState().setDrawThreshColors(
-																   !calibrate.getVisionState().getDrawThreshColors());
-					calibrate.getVisionState().update();
-					calibrate.getDisplayer().updateImage(calibrate.getVisionState().getThreshImage());
-					calibrate.getDisplayer().repaint();
+                               !calibrate.getVisionState().getDrawThreshColors());
+                    calibrate.getVisionState().update();
+                    calibrate.getDisplayer().updateImage(calibrate.getVisionState().getThreshImage());
+                    calibrate.getDisplayer().repaint();
                 }
             });
         drawColors.setFocusable(false);
         drawColors.setSelected(true);
 
 
-		selectorOverlayChoice = new JComboBox();
-		selectorOverlayChoice.addItem("Left Pane");
-		selectorOverlayChoice.addItem("Thresholded Edges");
-		selectorOverlayChoice.addItem("Visual Objects");
-		selectorOverlayChoice.addItem("none");
-		selectorOverlayChoice.setSelectedItem("Thresholded Edges");
-		selectorOverlayChoice.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					JComboBox sourceBox = (JComboBox) e.getSource();
-					setSelectorOverlay(sourceBox);
-				}
-			});
+        selectorOverlayChoice = new JComboBox();
+        selectorOverlayChoice.addItem("Left Pane");
+        selectorOverlayChoice.addItem("Thresholded Edges");
+        selectorOverlayChoice.addItem("Visual Objects");
+        selectorOverlayChoice.addItem("none");
+        selectorOverlayChoice.setSelectedItem("Thresholded Edges");
+        selectorOverlayChoice.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JComboBox sourceBox = (JComboBox) e.getSource();
+                setSelectorOverlay(sourceBox);
+            }
+        });
 
 
-		displayerOverlayChoice = new JComboBox();
-		displayerOverlayChoice.addItem("Right Pane");
-       	displayerOverlayChoice.addItem("Thresholded Edges");
-		displayerOverlayChoice.addItem("Visual Objects");
-		displayerOverlayChoice.addItem("none");
-		displayerOverlayChoice.setSelectedItem("Visual Objects");
-		displayerOverlayChoice.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					JComboBox sourceBox = (JComboBox) e.getSource();
-					setDisplayerOverlay(sourceBox);
-				}
-			});
+        displayerOverlayChoice = new JComboBox();
+        displayerOverlayChoice.addItem("Right Pane");
+        displayerOverlayChoice.addItem("Thresholded Edges");
+        displayerOverlayChoice.addItem("Visual Objects");
+        displayerOverlayChoice.addItem("none");
+        displayerOverlayChoice.setSelectedItem("Visual Objects");
+        displayerOverlayChoice.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JComboBox sourceBox = (JComboBox) e.getSource();
+                setDisplayerOverlay(sourceBox);
+            }
+        });
 
         JPanel navigation = new JPanel();
-		JPanel navigationButtons = new JPanel();
+        JPanel navigationButtons = new JPanel();
 
         XYPosition = new JTextPane();
         // Make the text centered
         SimpleAttributeSet xySet = new SimpleAttributeSet();
-		StyledDocument xyDoc = XYPosition.getStyledDocument();
+        StyledDocument xyDoc = XYPosition.getStyledDocument();
         StyleConstants.setAlignment(xySet,StyleConstants.ALIGN_CENTER);
         XYPosition.setParagraphAttributes(xySet,false);
 
-		XYPosition.setEditable(false);
+        XYPosition.setEditable(false);
         XYPosition.setText("");
         // Make the background match in color
         XYPosition.setBackground(this.getBackground());
@@ -192,9 +192,9 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 
 
         navigation.setLayout(new BoxLayout(navigation,
-										   BoxLayout.Y_AXIS));
-		navigation.add(XYPosition);
-		navigationButtons.setLayout(new GridLayout(0,2));
+                BoxLayout.Y_AXIS));
+        navigation.add(XYPosition);
+        navigationButtons.setLayout(new GridLayout(0,2));
 
         navigationButtons.add(prevImage);
         navigationButtons.add(nextImage);
@@ -206,29 +206,29 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         navigationButtons.add(jumpToButton);
         navigationButtons.add(fillHoles);
         navigationButtons.add(smallTableMode);
-		navigation.add(navigationButtons);
+        navigation.add(navigationButtons);
 
         // Size the navigation panel to only take up as much room as needed
         Dimension navigationButtonsSize =
-			new Dimension(2 * (int)
-						  smallTableMode.getPreferredSize().getWidth(),
-						  4 * (int) fillHoles.getPreferredSize().getHeight());
+            new Dimension(2 * (int)
+                    smallTableMode.getPreferredSize().getWidth(),
+                    4 * (int) fillHoles.getPreferredSize().getHeight());
         navigationButtons.setMinimumSize(navigationButtonsSize);
-		navigationButtons.setPreferredSize(navigationButtonsSize);
+        navigationButtons.setPreferredSize(navigationButtonsSize);
         navigationButtons.setMaximumSize(navigationButtonsSize);
 
 
         JPanel textAndSwatches = new JPanel();
         textAndSwatches.setLayout(new BoxLayout(textAndSwatches,
-                                                BoxLayout.Y_AXIS));
+                BoxLayout.Y_AXIS));
         textAndSwatches.add(feedback);
         textAndSwatches.add(undefineSpecific);
         textAndSwatches.add(colorSwatches);
-		JPanel auxPanel = new JPanel();
-		auxPanel.add(drawColors);
-		auxPanel.add(selectorOverlayChoice);
-		auxPanel.add(displayerOverlayChoice);
-		textAndSwatches.add(auxPanel);
+        JPanel auxPanel = new JPanel();
+        auxPanel.add(drawColors);
+        auxPanel.add(selectorOverlayChoice);
+        auxPanel.add(displayerOverlayChoice);
+        textAndSwatches.add(auxPanel);
 
         add(textAndSwatches);
         add(navigation);
@@ -270,21 +270,21 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "fillHoles");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "nextImage");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "lastImage");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D,
-									  KeyEvent.META_MASK), "skipForward");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D,
+                KeyEvent.META_MASK), "skipForward");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-									  KeyEvent.META_MASK), "skipBack");
+                KeyEvent.META_MASK), "skipBack");
 
 
 
         am = this.getActionMap();
         am.put("jumpToField", new AbstractAction("jumpToField") {
-                public void actionPerformed(ActionEvent e) {
-                    jumpToFrame.requestFocus();
-                    jumpToFrame.setSelectionStart(0);
-                    jumpToFrame.setSelectionEnd(jumpToFrame.getText().length());
-                }
-            });
+            public void actionPerformed(ActionEvent e) {
+                jumpToFrame.requestFocus();
+                jumpToFrame.setSelectionStart(0);
+                jumpToFrame.setSelectionEnd(jumpToFrame.getText().length());
+            }
+        });
 
         // Now register the action for the number pad stuff
         for (int i = 0; i <numColorSwatchShortcuts; i++) {
@@ -293,50 +293,50 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 
 
         am.put("undo", new AbstractAction("undo") {
-                public void actionPerformed(ActionEvent e) {
-                    undo.doClick();
-                }
-            });
+            public void actionPerformed(ActionEvent e) {
+                undo.doClick();
+            }
+        });
         am.put("redo", new AbstractAction("redo") {
-                public void actionPerformed(ActionEvent e) {
-                    redo.doClick();
-                }
-            });
+            public void actionPerformed(ActionEvent e) {
+                redo.doClick();
+            }
+        });
         am.put("undefineSpecific", new AbstractAction("undefine") {
-                public void actionPerformed(ActionEvent e) {
-                    undefineSpecific.doClick();
-                }
-            });
+            public void actionPerformed(ActionEvent e) {
+                undefineSpecific.doClick();
+            }
+        });
         am.put("edgeThresh", new AbstractAction("edgeThresh") {
-                public void actionPerformed(ActionEvent e) {
-                    thresh.clickEnabled();
-                }
-            });
+            public void actionPerformed(ActionEvent e) {
+                thresh.clickEnabled();
+            }
+        });
         am.put("fillHoles", new AbstractAction("fillHoles") {
-                public void actionPerformed(ActionEvent e) {
-                    fillHoles.doClick();
-                }
-            });
+            public void actionPerformed(ActionEvent e) {
+                fillHoles.doClick();
+            }
+        });
         am.put("nextImage", new AbstractAction("nextImage") {
-                public void actionPerformed(ActionEvent e) {
-                    calibrate.getTool().getDataManager().next();
-                }
-            });
+            public void actionPerformed(ActionEvent e) {
+                calibrate.getTool().getDataManager().next();
+            }
+        });
         am.put("lastImage", new AbstractAction("lastImage") {
-                public void actionPerformed(ActionEvent e) {
-                    calibrate.getTool().getDataManager().last();
-                }
-            });
-		am.put("skipForward", new AbstractAction("skipForward") {
-				public void actionPerformed(ActionEvent e) {
-					calibrate.getTool().getDataManager().skip(NUM_SKIP_FRAMES);
-				}
-			});
-		am.put("skipBack", new AbstractAction("skipBack") {
-				public void actionPerformed(ActionEvent e) {
-					calibrate.getTool().getDataManager().revert(NUM_SKIP_FRAMES);
-				}
-			});
+            public void actionPerformed(ActionEvent e) {
+                calibrate.getTool().getDataManager().last();
+            }
+        });
+        am.put("skipForward", new AbstractAction("skipForward") {
+            public void actionPerformed(ActionEvent e) {
+                calibrate.getTool().getDataManager().skip(NUM_SKIP_FRAMES);
+            }
+        });
+        am.put("skipBack", new AbstractAction("skipBack") {
+            public void actionPerformed(ActionEvent e) {
+                calibrate.getTool().getDataManager().revert(NUM_SKIP_FRAMES);
+            }
+        });
 
     }
 
@@ -444,71 +444,71 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     //
     public void setSelectorOverlay(JComboBox sourceBox)
     {
-		if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
-			calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
-			calibrate.getSelector().repaint();
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("none")) {
-			calibrate.getSelector().setOverlayImage(null);
-			calibrate.getSelector().repaint();
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
-			calibrate.getSelector().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
-			calibrate.getSelector().repaint();
-		}
+        if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+            calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
+            calibrate.getSelector().repaint();
+        }
+        else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+            calibrate.getSelector().setOverlayImage(null);
+            calibrate.getSelector().repaint();
+        }
+        else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+            calibrate.getSelector().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+            calibrate.getSelector().repaint();
+        }
     }
 
     //
     public void setSelectorOverlay()
     {
-		JComboBox sourceBox = selectorOverlayChoice;
-		if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
-			calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
-			calibrate.getSelector().repaint();
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("none")) {
-			calibrate.getSelector().setOverlayImage(null);
-			calibrate.getSelector().repaint();
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
-			calibrate.getSelector().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
-			calibrate.getSelector().repaint();
-		}
+        JComboBox sourceBox = selectorOverlayChoice;
+        if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+            calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
+            calibrate.getSelector().repaint();
+        }
+        else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+            calibrate.getSelector().setOverlayImage(null);
+            calibrate.getSelector().repaint();
+        }
+        else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+            calibrate.getSelector().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+            calibrate.getSelector().repaint();
+        }
     }
 
 
     //
     public void setDisplayerOverlay(JComboBox sourceBox) {
-		if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
-			calibrate.getDisplayer().setOverlayImage(calibrate.getEdgeOverlay());
-			calibrate.getDisplayer().repaint();
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("none")) {
-			calibrate.getDisplayer().setOverlayImage(null);
-			calibrate.getDisplayer().repaint();
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
-			calibrate.getDisplayer().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
-			calibrate.getDisplayer().repaint();
-		}
+        if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+            calibrate.getDisplayer().setOverlayImage(calibrate.getEdgeOverlay());
+            calibrate.getDisplayer().repaint();
+        }
+        else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+            calibrate.getDisplayer().setOverlayImage(null);
+            calibrate.getDisplayer().repaint();
+        }
+        else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+            calibrate.getDisplayer().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+            calibrate.getDisplayer().repaint();
+        }
     }
 
     //
     //
     public void setDisplayerOverlay() {
-		JComboBox sourceBox = displayerOverlayChoice;
-		if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
-			calibrate.getDisplayer().setOverlayImage(calibrate.getEdgeOverlay());
-			calibrate.getDisplayer().repaint();
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("none")) {
-			calibrate.getDisplayer().setOverlayImage(null);
-			calibrate.getDisplayer().repaint();
-		}
-		else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
-			calibrate.getDisplayer().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
-			calibrate.getDisplayer().repaint();
-		}
+        JComboBox sourceBox = displayerOverlayChoice;
+        if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
+            calibrate.getDisplayer().setOverlayImage(calibrate.getEdgeOverlay());
+            calibrate.getDisplayer().repaint();
+        }
+        else if (((String) sourceBox.getSelectedItem()).equals("none")) {
+            calibrate.getDisplayer().setOverlayImage(null);
+            calibrate.getDisplayer().repaint();
+        }
+        else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
+            calibrate.getDisplayer().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+            calibrate.getDisplayer().repaint();
+        }
     }
 
     /**
@@ -523,8 +523,8 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         redo.setEnabled(calibrate.canRedo());
         prevImage.setEnabled(calibrate.canGoBackward());
         nextImage.setEnabled(calibrate.canGoForward());
-		skipBack.setEnabled(calibrate.canGoBackward());
-		skipForward.setEnabled(calibrate.canGoForward());
+        skipBack.setEnabled(calibrate.canGoBackward());
+        skipForward.setEnabled(calibrate.canGoForward());
         fillHoles.setEnabled(calibrate.hasImage());
         jumpToFrame.setEnabled(calibrate.hasImage());
         jumpToButton.setEnabled(calibrate.hasImage());
@@ -536,36 +536,36 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     }
 
     public String getText() {
-		return feedback.getText();
+        return feedback.getText();
     }
 
-	public void setXYText(int x, int y) {
-		if (x < 0 || y < 0) {
-			XYPosition.setText("");
-		} else {
-			XYPosition.setText("(x,y): (" + x + " , " + y + ")");
-		}
-	}
+    public void setXYText(int x, int y) {
+        if (x < 0 || y < 0) {
+            XYPosition.setText("");
+        } else {
+            XYPosition.setText("(x,y): (" + x + " , " + y + ")");
+        }
+    }
 
-	public void setXYText(int x, int y, int pixie[]) {
-		if (x < 0 || y < 0) {
-			XYPosition.setText("");
-		} else {
-			XYPosition.setText("(x,y): (" + x + " , " + y + ") "+pixie[0]+
-							   ", "+pixie[1]+", "+pixie[2]);
-		}
-	}
+    public void setXYText(int x, int y, int pixie[]) {
+        if (x < 0 || y < 0) {
+            XYPosition.setText("");
+        } else {
+            XYPosition.setText("(x,y): (" + x + " , " + y + ") "+pixie[0]+
+                    ", "+pixie[1]+", "+pixie[2]);
+        }
+    }
 
-	public String getXYText() {
-		return XYPosition.getText();
-	}
+    public String getXYText() {
+        return XYPosition.getText();
+    }
 
     public void setColorSelected(byte color) {
         colorSwatches.setSelected(color);
     }
 
     public void notifyDataSet(DataSet s, Frame f) {
-
+        notifyFrame(f);
     }
 
     /** Set the text in the box to update the frame number. */

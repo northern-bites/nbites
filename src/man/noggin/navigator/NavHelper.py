@@ -5,6 +5,43 @@ def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
     """
+    # use backwards gait if appropriate
+    if x < 0:
+        nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
+    else:
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
+
+    walk = motion.WalkCommand(x=x,y=y,theta=theta)
+    nav.brain.motion.setNextWalkCommand(walk)
+
+    nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
+    nav.curSpinDir = MyMath.sign(theta)
+
+def setDribbleSpeed(nav, x, y, theta):
+    """
+    Wrapper to set walk vector while using dribble gait
+    """
+    if x < 0:
+        nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
+    else:
+        nav.brain.CoA.setDribbleGait(nav.brain.motion)
+
+    walk = motion.WalkCommand(x=x,y=y,theta=theta)
+    nav.brain.motion.setNextWalkCommand(walk)
+
+    nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
+    nav.curSpinDir = MyMath.sign(theta)
+
+def setSlowSpeed(nav, x, y, theta):
+    """
+    Wrapper to set walk vector while using slow gait
+    TODO: dynamic gait so this is unnecessary
+    """
+    if x < 0:
+        nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
+    else:
+        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
+
     walk = motion.WalkCommand(x=x,y=y,theta=theta)
     nav.brain.motion.setNextWalkCommand(walk)
 
@@ -16,6 +53,11 @@ def step(nav, x, y, theta, numSteps):
     """
     Wrapper method to easily change the walk vector of the robot
     """
+    if x < 0:
+        nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
+    else:
+        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
+
     steps = motion.StepCommand(x=x,y=y,theta=theta,numSteps=numSteps)
     nav.brain.motion.sendStepCommand(steps)
 
