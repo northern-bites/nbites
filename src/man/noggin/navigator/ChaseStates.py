@@ -102,7 +102,6 @@ def ballInMyBox(nav):
     if nav.firstFrame():
         nav.brain.tracker.activeLoc()
 
-
     ball = nav.brain.ball
 
     if fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_THRESH:
