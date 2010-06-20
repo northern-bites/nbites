@@ -23,6 +23,21 @@ def scanBall(tracker):
             tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)
     return tracker.stay()
 
+def spinScanBall(tracker):
+    ball = tracker.brain.ball
+
+    if tracker.target == ball and \
+            tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        tracker.activeLocOn = False
+        return tracker.goNow('ballTracking')
+
+
+    if not tracker.brain.motion.isHeadActive():
+        my = player.brain.my
+        spinDir = my.spinDirToPoint(ball)
+        tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)
+    return tracker.stay()
+
 def scanning(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
