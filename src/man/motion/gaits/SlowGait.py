@@ -7,7 +7,7 @@ WALKING = constants.WALKING
 NON_WALKING = constants.NON_WALKING
 
 MARVIN_STANCE_CONFIG = (31.00, # CoM height
-                        1.45,  # Forward displacement of CoM
+                        1.35,  # Forward displacement of CoM
                         10.0,  # Horizontal distance between feet
                         6.0,   # Body angle around y axis
                         0.0,   # Angle between feet
