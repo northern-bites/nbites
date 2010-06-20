@@ -139,6 +139,7 @@ void NaoEnactor::postSensors(){
     //We also call this from the Motion run method
     //This is important to ensure that the providers have access to the
     //actual joint post of the robot before any computation begins
+    sensors->setMotionBodyAngles(motionValues);
     transcriber->postMotionSensors();
 
     if(!switchboard){
