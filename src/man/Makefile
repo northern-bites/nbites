@@ -134,11 +134,14 @@ $(WEBOTS_FILE):
 install: $(CMAKE_DEPEND)
 	@if [ -e $(CROSS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) install; \
-	fi
-	@if [ -e $(WEBOTS_FILE) ]; then \
+		$(INSTALL_SCRIPT); \
+	elif [ -e $(WEBOTS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) install; \
+		$(INSTALL_SCRIPT); \
+	else \
+		echo "Must have CROSS or WEBOTS build configured to 'make install'"; \
 	fi
-	$(INSTALL_SCRIPT)
+
 
 clean_install:
 	$(RM) -r $(CROSS_INSTALL_DIR)/*
