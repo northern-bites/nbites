@@ -47,6 +47,10 @@ def activeTracking(tracker):
     if tracker.firstFrame():
         tracker.activeLocOn = True
 
+    if tracker.target.locDist > constants.MAX_ACTIVE_TRACKING_DIST and \
+            tracker.target.framesOn > 2:
+        return tracker.goLater('tracking')
+
     if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH \
             and not tracker.brain.motion.isHeadActive() \
             and not (tracker.activePanUp or tracker.activePanOut):

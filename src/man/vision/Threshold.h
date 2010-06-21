@@ -44,7 +44,7 @@ class Threshold;  // forward reference
 //#define SHOULDERS
 
 //#define USE_EDGES
-#define ROOM223
+//#define ROOM223
 #ifdef ROOM223
 #define BLUEV 141
 #define YELLOWV 108
@@ -60,17 +60,17 @@ class Threshold;  // forward reference
 #else
 #define DARK
 #ifdef DARK
-#define BLUEV 145
+#define BLUEV 148
 #define YELLOWV 128
 #define ORANGEU 135
-#define WHITEY  105
+#define WHITEY  130
 #define FUDGEV 0
-#define HIGHGREENY 92
-#define LOWGREENY  44
-#define HIGHGREENU 120
-#define LOWGREENU  88
-#define HIGHGREENV 148
-#define LOWGREENV  128
+#define HIGHGREENY 124
+#define LOWGREENY  64
+#define HIGHGREENU 116
+#define LOWGREENU  86
+#define HIGHGREENV 144
+#define LOWGREENV  126
 #else
 #define BLUEV 145
 #define YELLOWV 120

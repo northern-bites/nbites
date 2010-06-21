@@ -45,13 +45,8 @@ def gameReady(player):
         player.inKickingState = False
         player.justKicked = False
         player.standup()
+        player.brain.tracker.locPans()
 
-    if player.brain.gameController.ownKickOff:
-        player.hasKickedOffKick = False
-    else:
-        player.hasKickedOffKick = True
-
-    player.brain.tracker.locPans()
     if player.lastDiffState == 'gameInitial':
         return player.goLater('relocalize')
     if player.firstFrame() and \
@@ -68,21 +63,24 @@ def gameSet(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-
-    if player.firstFrame() and player.lastDiffState == 'gamePenalized':
-        player.brain.resetLocalization()
-
-    if player.firstFrame():
         player.stopWalking()
         player.brain.loc.resetBall()
+        player.brain.kickDecider.hasKickedOff = True
 
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
 
         if player.brain.play.isRole(CHASER):
             player.brain.tracker.trackBall()
+
+            if player.brain.gameController.ownKickOff:
+                player.brain.kickDecider.hasKickedOff = False
+
         else:
             player.brain.tracker.activeLoc()
+
+    if player.firstFrame() and player.lastDiffState == 'gamePenalized':
+        player.brain.resetLocalization()
 
     return player.stay()
 
