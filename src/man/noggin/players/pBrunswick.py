@@ -14,7 +14,6 @@ from .. import NogginConstants
 from ..playbook import PBConstants
 from . import ChaseBallConstants as ChaseConstants
 
-from man.motion import SweetMoves
 from man.noggin.typeDefs.Location import Location
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
