@@ -69,7 +69,7 @@ def approachBall(player):
 
     elif transitions.shouldKick(player) or \
              transitions.shouldPositionForKick(player):
-        return player.goNow('positionForKick')
+        return player.goNow('decideKick')
 
     if player.brain.tracker.activeLocOn:
         if transitions.shouldScanFindBallActiveLoc(player):
@@ -165,3 +165,4 @@ def approachDangerousBall(player):
         return player.goLater('spinFindBall')
 
     return player.stay()
+

@@ -26,7 +26,6 @@ FIND_BALL_HEADS_LEFT = (((45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
 FIND_BALL_HEADS_RIGHT =  (((-45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
                           ((-45.,200.),0.3,1, stiff.LOW_HEAD_STIFFNESSES))
 
-
 # Distance that can be seen at a certain head pitch
 # | degree | close | far |
 # |     20 |    15 |  53 |

@@ -57,10 +57,13 @@ def crossoverTowardsBall(nav):
 
     return nav.stay()
 
+LEFT_FOOT_OFFSET = 8
+
 def walkSpinToBall(nav):
     ball = nav.brain.ball
 
     nav.dest = ball
+    nav.dest.relX += LEFT_FOOT_OFFSET
     nav.dest.h = ball.heading
 
     if navTrans.atDestinationCloserAndFacing(nav.brain.my,

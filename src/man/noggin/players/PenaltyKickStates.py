@@ -43,7 +43,7 @@ def penaltyKickShortDribble(player):
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKick(player):
-            return player.goNow('positionForKick')
+            return player.goNow('decideKick')
         elif transitions.shouldApproachBall(player):
             return player.goNow('approachBall')
 
