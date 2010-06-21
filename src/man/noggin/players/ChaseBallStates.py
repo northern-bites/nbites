@@ -180,7 +180,7 @@ def waitBeforeKick(player):
         return player.goLater('positionForKick')
 
     # Just don't get stuck here!
-    if player.counter > 50:
+    if player.counter > 30:
         return player.goNow('scanFindBall')
     return player.goLater('getKickInfo')
 

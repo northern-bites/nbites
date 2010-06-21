@@ -124,10 +124,26 @@ PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
 PFK_X_GAIN = 0.12
 PFK_Y_GAIN = 0.6
 PFK_X_SAFE_DISTANCE = 12.
-PFK_X_SAFE_THRESH = 5.
+
+PFK_CLOSE_ENOUGH_THETA = 11
+PFK_CLOSE_ENOUGH_XY = 3.0
+PFK_BALL_CLOSE_ENOUGH = 30
+
+LEFT_KICK_OFFSET = 5.0  # taken from LEFT_FOOT_L_Y and R_Y, see: KickingConstants
 
 def positionForKick(nav):
-    helper.setSlowSpeed(nav,positionForKickX(nav),positionForKickY(nav),0)
+    ball = nav.brain.ball
+
+    if nav.firstFrame() or ball.dist > PFK_BALL_CLOSE_ENOUGH:
+        nav.doneTheta = False
+        nav.doneX = False
+        nav.doneY = False
+
+    if (nav.doneX and nav.doneY and nav.doneTheta):
+        return nav.goNow('stop')
+
+    helper.setSlowSpeed(nav,positionForKickX(nav),positionForKickY(nav),
+                        positionForKickTheta(nav))
 
     return nav.stay()
 
@@ -135,26 +151,47 @@ def positionForKickX(nav):
     ball = nav.brain.ball
 
     targetX = ball.relX - PFK_X_SAFE_DISTANCE
-    if targetX > PFK_X_SAFE_THRESH or targetX < 0.:
+    if fabs(targetX) < PFK_CLOSE_ENOUGH_XY:
+        sX = 0.0
+        nav.doneX = True
+    else:
         sX = MyMath.clip(targetX * PFK_X_GAIN,
                          PFK_MIN_X_SPEED,
                          PFK_MAX_X_SPEED)
         sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
-    else:
-        sX = 0.0
 
     return sX
 
 def positionForKickY(nav):
     ball = nav.brain.ball
+    target_y = ball.relY - LEFT_KICK_OFFSET
 
-    sY = MyMath.clip(ball.relY * PFK_Y_GAIN,
-                     PFK_MIN_Y_SPEED,
-                     PFK_MAX_Y_SPEED)
-
-    sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
+    if fabs(target_y) < PFK_CLOSE_ENOUGH_XY:
+        nav.doneY = True
+        sY = 0.0
+    else:
+        sY = MyMath.clip(target_y * PFK_Y_GAIN,
+                         PFK_MIN_Y_SPEED,
+                         PFK_MAX_Y_SPEED)
+        sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     return sY
+
+def positionForKickTheta(nav):
+    ball = nav.brain.ball
+    hDiff = MyMath.sub180Angle(ball.bearing)
+
+    if fabs(hDiff) < PFK_CLOSE_ENOUGH_THETA:
+        sTheta = 0.0
+        nav.doneTheta = True
+    else:
+        sTheta = MyMath.sign(hDiff) * constants.GOTO_SPIN_SPEED * \
+                 walker.getRotScale(hDiff)
+        sTheta = MyMath.clip(sTheta,
+                             constants.OMNI_MIN_SPIN_SPEED,
+                             constants.OMNI_MAX_SPIN_SPEED)
+
+    return sTheta
 
 def dribble(nav):
     ball = nav.brain.ball
