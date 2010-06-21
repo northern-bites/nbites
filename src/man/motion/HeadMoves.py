@@ -203,9 +203,14 @@ LOW_SCAN_BALL = (
     ((-65.,-5.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),)
 
 SPIN_RIGHT_SCAN_BALL = (
-    ((-65.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
-    ((65.,20.),1.0,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((55.,20.),1.0,1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-25.),1.2,1, stiff.LOW_HEAD_STIFFNESSES))
+
+SPIN_LEFT_SCAN_BALL = (
+    ((55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-55.,20.),1.0,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.,-25.),1.2,1, stiff.LOW_HEAD_STIFFNESSES))
 
 SQUAT_LOW_SCAN_BALL = (
     ((-65.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),

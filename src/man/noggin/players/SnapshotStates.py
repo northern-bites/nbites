@@ -22,10 +22,11 @@ def gamePlaying(player):
         player.setWalk(0,0,-30)
         player.brain.tracker.startScan(HeadMoves.SPIN_RIGHT_SCAN_BALL)
 
+    #if player.brain.ball.on:
     player.brain.sensors.saveFrame()
     player.numFramesSaved += 1
 
-    if player.numFramesSaved > 3000:
+    if player.numFramesSaved > 300:
         return player.goLater('doneState')
 
     return player.stay()
@@ -33,6 +34,7 @@ def gamePlaying(player):
 def gamePenalized(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)
+        player.brain.tracker.stopHeadMoves()
     return player.stay()
 
 def doneState(player):

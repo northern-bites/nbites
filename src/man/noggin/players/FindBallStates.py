@@ -40,7 +40,7 @@ def spinFindBall(player):
 
     if player.firstFrame():
         #if ball.on
-        player.brain.tracker.trackBallSpin()
+        #player.brain.tracker.trackBallSpin()
         #else:
         #tracker.findBall()
 
@@ -49,6 +49,8 @@ def spinFindBall(player):
         spinDir = my.spinDirToPoint(ball)
 
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
+
+        player.brain.tracker.trackBallSpin()
 
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldWalkToBallLocPos(player):
