@@ -1,10 +1,11 @@
 from .. import NogginConstants
 from . import kicks
 from . import KickingConstants as constants
+from . import KickInformation
 from math import fabs
 from ..util import MyMath
 
-class KickDecider(object):
+class KickDecide
     """
     uses current information when called to determine what the best possible
     kick is and where we need to be to execute it
@@ -16,11 +17,13 @@ class KickDecider(object):
         self.objDict = { constants.OBJECTIVE_CLEAR:self.clear,
                          constants.OBJECTIVE_CENTER:self.center,
                          constants.OBJECTIVE_SHOOT:self.shoot,
-                         constants.OBJECTIVE_KICKOFF:self.kickoff }
+                         constants.OBJECTIVE_KICKOFF:self.kickoff
         self.kickDest = None
         self.destDist = 0.
         self.currentObj = None
         self.currentKick = None
+
+        self.kickInfo = KickInformation()
 
     def getSweetMove(self):
         """
@@ -42,7 +45,11 @@ class KickDecider(object):
         using objective and localization determines best kick to make
         """
 
-        self.currentObj= self.getObjective()
+        self.currentObj = self.kickInfo.getKickObjective()
+
+        if self.currentObj == constants.OBJECTIVE_UNCLEAR:
+             print "objective unclear"
+             return None
 
         # uses dictionary to retrieve and call proper method
         self.kickDest = self.objDict[self.currentObj]()
