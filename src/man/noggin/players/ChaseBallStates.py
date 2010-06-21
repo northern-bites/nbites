@@ -180,7 +180,7 @@ def waitBeforeKick(player):
         return player.goLater('positionForKick')
 
     # Just don't get stuck here!
-    if player.counter > 50:
+    if player.counter > 30:
         return player.goNow('scanFindBall')
     return player.goLater('getKickInfo')
 
@@ -198,6 +198,7 @@ def approachDangerousBall(player):
     #print "approach dangerous ball"
     #single steps towards ball and goal with spin
     player.setSteps(0, 0, 0, 0)
+    
 
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')

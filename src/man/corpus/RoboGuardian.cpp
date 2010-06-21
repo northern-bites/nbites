@@ -538,8 +538,8 @@ void RoboGuardian::reconnectWifiConnection(){
 }
 
 void RoboGuardian::ifUpDown(){
-	char ifdown[] = "su -c 'ifdown -a'";
-	char ifup[] = "su -c 'ifup -a'&";
+	char ifdown[] = "su -c 'ifdown wlan0'";
+	char ifup[] = "su -c 'ifup wlan0'&";
 	cout << "RoboGuardian::ifUpDown() -- reconnecting interfaces\n";
 	system(ifdown);
 	system(ifup);

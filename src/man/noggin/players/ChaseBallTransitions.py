@@ -3,6 +3,8 @@ import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
 import KickingHelpers as helpers
 from .. import NogginConstants
+from ..playbook.PBConstants import GOALIE
+
 
 ####### CHASING STUFF ##############
 
@@ -142,7 +144,8 @@ def shouldWalkToBallLocPos(player):
         player.brain.ball.framesOff > constants.BALL_OFF_THRESH
 
 def shouldActiveLoc(player):
-    if player.brain.ball.on:
+    if player.brain.ball.on and \
+            not player.brain.play.isRole(GOALIE):
         return (player.brain.ball.dist > constants.APPROACH_ACTIVE_LOC_DIST
                 and abs(player.brain.ball.bearing) <
                 constants.APPROACH_ACTIVE_LOC_BEARING)
