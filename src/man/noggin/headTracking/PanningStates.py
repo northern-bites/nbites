@@ -1,5 +1,6 @@
 import man.motion.HeadMoves as HeadMoves
 from . import TrackingConstants as constants
+from man.motion import MotionConstants
 
 def scanBall(tracker):
     ball = tracker.brain.ball
@@ -71,7 +72,7 @@ def panUpOnce(tracker):
         tracker.helper.panTo(HeadMoves.PAN_UP_HEADS)
         return tracker.stay()
 
-    if not tracker.brain.motion.isHeadActive():
+    elif not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
 
@@ -116,3 +117,33 @@ def look(tracker):
     if tracker.brain.ball.on:
         return tracker.goNow('ballTracking')
     return tracker.stay()
+
+def scanQuickUp(tracker):
+    if tracker.firstFrame():
+        tracker.isPreKickScanning = True
+
+        if tracker.lastDiffState != 'panUpOnce' or \
+                tracker.lastDiffState != 'returnHeadsPan':
+            tracker.activePanUp = False
+            tracker.scanningUp = False
+            motionAngles = tracker.brain.sensors.motionAngles
+            tracker.preActivePanHeads = (
+                motionAngles[MotionConstants.HeadYaw],
+                motionAngles[MotionConstants.HeadPitch])
+
+
+    if tracker.activePanUp and \
+            not tracker.scanningUp:
+        tracker.activePanUp = False
+        tracker.isPreKickScanning = False
+        return tracker.goLater('stop')
+
+    elif tracker.activePanUp and \
+            tracker.scanningUp:
+        tracker.scanningUp = False
+        return tracker.goNow('returnHeadsPan')
+
+    else:
+        tracker.scanningUp = True
+        tracker.activePanUp = True
+        return tracker.goNow('panUpOnce')

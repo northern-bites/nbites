@@ -66,7 +66,14 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Kickoff kick
         self.hasKickedOffKick = True
 
+        self.donePreKickScanning = False
+        self.lastKickScanCounter = 0
+
     def run(self):
+        if self.currentState == 'getKickInfo':
+            self.lastKickScanCounter = 0
+        else:
+            self.lastKickScanCounter += 1
         self.play = self.brain.play
         if self.currentState == 'afterKick' or \
                self.lastDiffState == 'afterKick':

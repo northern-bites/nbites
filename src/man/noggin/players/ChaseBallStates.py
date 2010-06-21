@@ -66,7 +66,6 @@ def chaseAfterKick(player):
         return player.goLater('spinFindBall')
     return player.stay()
 
-
 def approachBall(player):
     """
     Once we are alligned with the ball, approach it
@@ -77,6 +76,7 @@ def approachBall(player):
 
     if transitions.shouldActiveLoc(player):
         player.brain.tracker.activeLoc()
+
     else:
         player.brain.tracker.trackBall()
 

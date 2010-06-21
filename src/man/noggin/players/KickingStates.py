@@ -19,13 +19,23 @@ def getKickInfo(player):
     """
     Decides which kick to use
     """
-    player.inKickingState = True
+    if player.lastKickScanCounter < 250:
+        return player.goNow('decideKick')
 
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.stopHeadMoves()
-        player.kickScan()
+        player.lastKickScanCounter = 0
 
+    if player.donePreKickScanning:
+        player.donePreKickScanning = False
+        player.brain.tracker.trackBall()
+        return player.goNow('decideKick')
+
+    player.inKickingState = True
+
+    if player.firstFrame():
+        player.kickScan()
         player.kickDecider = KickDecider(player)
 
     # If scanning, then collect data

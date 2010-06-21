@@ -28,6 +28,7 @@ class HeadTracking(FSA.FSA):
         self.activeLocOn = False
         self.activePanOut = False
         self.activePanUp = False
+        self.isPreKickScanning = False
         self.preActivePanHeads = None
         self.helper = helper.HeadTrackingHelper(self)
 
@@ -66,6 +67,12 @@ class HeadTracking(FSA.FSA):
         self.gain = 1.0
         if (not self.activeLocOn):
             self.switchTo('activeTracking')
+
+    def preKickScan(self):
+        """Scans up very quickly to see  """
+        if not self.isPreKickScanning:
+            self.isPreKickScanning = True
+            self.switchTo('scanQuickUp')
 
     def startScan(self,  newScan):
         """repeatedly performs passed in scan"""

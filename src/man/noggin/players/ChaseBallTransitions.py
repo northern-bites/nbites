@@ -33,7 +33,7 @@ def shouldTurnToBallFromPositionForKick(player):
     Walk to the ball if its too far away
     """
     ball = player.brain.ball
-    return (fabs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH +
+    return (abs(ball.bearing) > constants.BALL_APPROACH_BEARING_OFF_THRESH +
             constants.POSITION_FOR_KICK_BEARING_THRESH)
 
 def shouldPositionForKick(player):
@@ -129,7 +129,8 @@ def shouldSpinFindBall(player):
     """
     Should spin if we already tried searching
     """
-    return (player.stateTime >= SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL))
+    return (player.stateTime >=
+            SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL))
 
 def shouldntStopChasing(player):
     """
@@ -140,6 +141,14 @@ def shouldntStopChasing(player):
 def shouldWalkToBallLocPos(player):
     return player.counter > constants.WALK_TO_BALL_LOC_POS_FRAMES and \
         player.brain.ball.framesOff > constants.BALL_OFF_THRESH
+
+def shouldPreKickScan(player):
+    if player.brain.ball.on:
+        return (constants.PRE_KICK_SCAN_MIN_DIST < player.brain.ball.dist
+                < constants.PRE_KICK_SCAN_MAX_DIST and
+                abs(player.brain.ball.bearing) <
+                constants.APPROACH_ACTIVE_LOC_BEARING)
+    return False
 
 def shouldActiveLoc(player):
     if player.brain.ball.on:

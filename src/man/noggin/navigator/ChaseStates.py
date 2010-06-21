@@ -5,7 +5,6 @@ from . import NavConstants as constants
 from . import BrunswickSpeeds as speeds
 from man.noggin.util import MyMath
 from man.noggin.typeDefs.Location import RobotLocation
-from man.noggin.typeDefs.Location import RelLocation
 
 from man.noggin import NogginConstants
 from man.noggin.playbook.PBConstants import GOALIE
@@ -32,33 +31,39 @@ def crossoverTowardsBall(nav):
                              relDestY + my.y,
                              destH)
 
-def walkSpinToBall(nav):
-    CROSSOVER_DIST = 40         # Cross over for 40cm
+    if (navTrans.atDestinationCloserAndFacing(nav.brain.my,
+                                              nav.dest,
+                                              ball.bearing) or
+        (abs(ball.bearing) < 20)
+        and ball.on):
+        return nav.goNow('walkSpinToBall')
 
-    brain = nav.brain
-    my = brain.my
+    if not nav.brain.play.isRole(GOALIE):
+        if navTrans.shouldNotGoInBox(ball):
+            return nav.goLater('ballInMyBox')
+        elif navTrans.shouldChaseAroundBox(nav.brain.my, ball):
+            return nav.goLater('chaseAroundBox')
+        elif navTrans.shouldAvoidObstacleDuringApproachBall(nav):
+            return nav.goLater('avoidObstacle')
+
+    return nav.stay()
+
+def walkSpinToBall(nav):
     ball = nav.brain.ball
 
+    nav.dest = ball
+    nav.dest.h = ball.heading
 
-    # Get location 40cm away in line towards the ball
-    relDestH = my.getRelativeBearing(ball)
-    distToBall = my.distTo(ball)
-
-    relDestX = ball.relX * CROSSOVER_DIST / distToBall
-    relDestY = ball.relY * CROSSOVER_DIST / distToBall
-
-    nav.dest = RelLocation(my, relDestX, relDestY, relDestH)
-
-    print nav.dest
-
-    if navTrans.atDestinationCloserAndFacing(nav.brain.my, nav.dest, ball.bearing):
+    if navTrans.atDestinationCloserAndFacing(nav.brain.my,
+                                             nav.dest,
+                                             ball.bearing):
         return nav.goNow('stop')
+    elif abs(ball.bearing) > 60:
+        return nav.goLater('crossoverTowardsBall')
 
     # Set our walk towards the ball
     walkX, walkY, walkTheta = \
-           walker.getOmniWalkParam(nav.brain.my, nav.dest)
-
-    print "walkSpin params are: " , walkX, walkY, walkTheta
+           walker.getWalkSpinParam(nav.brain.my, nav.dest)
 
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
@@ -86,12 +91,12 @@ def chaseAroundBox(nav):
     my = nav.brain.my
 
     if not navTrans.shouldChaseAroundBox(my, ball):
-        nav.shouldntChaseAroundBox += 1
+        nav.shouldChaseAroundBox += 1
     else:
-        nav.shouldntChaseAroundBox = 0
+        nav.shouldChaseAroundBox = 0
 
-    if nav.shouldntChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
-        return nav.goNow('walkSpinToBall')
+    if nav.shouldChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
+        return nav.goNow('crossoverTowardsBall')
 
     elif navTrans.shouldAvoidObstacleDuringApproachBall(nav):
         return nav.goNow('avoidObstacle')
