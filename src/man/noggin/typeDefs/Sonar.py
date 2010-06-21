@@ -3,13 +3,15 @@ class Sonar:
     Holds the data from the ultrasound sonar sensors
     """
     def __init__(self):
-        # Class constants
+         # Class constants
         self.UNKNOWN_VALUE = -1 #"unknown distance"
-        self.MIN_DIST = 10.0 # minimum readable distance in cm
+        self.MIN_DIST = 30.0 # minimum readable distance in cm
         self.MAX_DIST = 150.0 # maximum readable distance in cm
 
         self.leftDist = self.UNKNOWN_VALUE
         self.rightDist = self.UNKNOWN_VALUE
+
+        self.hasPrintedError = False
 
     def updateSensors(self, sensors):
         """
@@ -20,7 +22,9 @@ class Sonar:
 
         #check for sonar bug, print big warning
         if (self.leftDist < self.MIN_DIST and
-            self.rightDist < self.MIN_DIST):
+            self.rightDist < self.MIN_DIST and
+            not self.hasPrintedError):
+            self.hasPrintedError = True
             print "*\n*\n*  possible sonar problem, restart robot!! *\n*\n*"
 
         if (self.leftDist <= self.MIN_DIST or

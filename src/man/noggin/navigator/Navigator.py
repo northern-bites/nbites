@@ -3,6 +3,7 @@ from ..util import FSA
 from . import NavStates
 from . import PlaybookPositionStates
 from . import ChaseStates
+from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from man.noggin.typeDefs.Location import RobotLocation
@@ -16,6 +17,7 @@ class Navigator(FSA.FSA):
         self.addStates(NavStates)
         self.addStates(PlaybookPositionStates)
         self.addStates(ChaseStates)
+        self.addStates(PFKStates)
         self.currentState = 'stopped'
         self.setName('Navigator')
         self.setPrintStateChanges(True)
@@ -48,13 +50,14 @@ class Navigator(FSA.FSA):
         robot will walk to the ball with it centered at his feet.
         if no ball is visible, localization will be usedn
         """
-        self.switchTo('walkSpinToBall')
+        self.switchTo('crossoverTowardsBall')
 
-    def kickPosition(self):
+    def kickPosition(self, kick):
         """
         state to align on the ball once we are near it
         """
-        self.switchTo('positionForKick')
+        self.kick = kick
+        self.switchTo('pfk_all')
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,

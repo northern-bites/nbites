@@ -1,7 +1,5 @@
 from .. import NogginConstants
-from . import ChaseBallConstants as ChaseConstants
 import man.noggin.util.MyMath as MyMath
-import PositionTransitions as transitions
 import PositionConstants as constants
 
 def positionLocalize(player):
