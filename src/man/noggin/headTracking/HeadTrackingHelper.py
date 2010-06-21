@@ -3,7 +3,7 @@ import man.motion as motion
 from man.motion import MotionConstants
 from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
-from math import (fabs, atan, pi, hypot)
+from math import (fabs, atan, radians, hypot)
 
 class HeadTrackingHelper(object):
     def __init__(self, tracker):
@@ -95,11 +95,7 @@ class HeadTrackingHelper(object):
         """returns the bearing to target in radians. usable as headYaw"""
         my = self.tracker.brain.my
 
-        bearingToPointInDeg = MyMath.getRelativeBearing( my.x, my.y, my.h,
-                                                         target.x, target.y )
-        bearingToPointInRad = bearingToPointInDeg * (pi/180.)
-
-        return bearingToPointInRad
+        return radians(my.getRelativeBearing(target))
 
     def calcHeadPitch(self, target):
         """returns the pitch to target in radians"""
@@ -113,7 +109,7 @@ class HeadTrackingHelper(object):
         relHeight = lensHeightInCM - target.height
 
         #b/c we use lower angled camera we need to adjust by constant angle
-        headPitch = atan(relHeight/dist) - 0.6981 #40 deg to rad (from reddoc)
+        headPitch = atan(relHeight/dist) - CAMERA_ANGLE
         return headPitch
 
     def getCameraHeight(self):
@@ -127,3 +123,5 @@ class HeadTrackingHelper(object):
 
         return lensHeightInCM
     """ already had to calculate bearing and groundDist to get xRelMe, yRelMe. those were stupid in the first place because they were used in CoordHeadCommand to calculate bearing again (doh!) with groundDist already calculated all that was needed was a single call to atan. """
+
+CAMERA_ANGLE = radians(40.0) # from reddoc

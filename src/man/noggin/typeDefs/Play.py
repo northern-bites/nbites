@@ -5,7 +5,8 @@ from ..playbook.PBConstants import (INIT_STRATEGY,
                                     STRATEGIES,
                                     FORMATIONS,
                                     ROLES,
-                                    SUB_ROLES)
+                                    SUB_ROLES,
+                                    CHASER)
 from Location import RobotLocation
 
 class Play:
@@ -53,6 +54,9 @@ class Play:
 
     def isRole(self, roleToTest):
         return (self.role == roleToTest)
+
+    def isChaser(self):
+        return (self.role == CHASER)
 
     def getPosition(self):
         return self.position
