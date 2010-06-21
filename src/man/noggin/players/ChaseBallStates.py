@@ -69,7 +69,7 @@ def approachBall(player):
 
     elif transitions.shouldKick(player) or \
              transitions.shouldPositionForKick(player):
-        return player.goNow('decideKick')
+        return player.goNow('positionForKick')
 
     if player.brain.tracker.activeLocOn:
         if transitions.shouldScanFindBallActiveLoc(player):

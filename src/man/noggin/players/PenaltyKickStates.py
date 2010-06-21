@@ -8,7 +8,7 @@ def penaltyKick(player):
     player.penaltyKicking = True
     player.penaltyMadeFirstKick = True
     player.penaltyMadeSecondKick = False
-    return player.goNow('approachBallWithLoc')
+    return player.goNow('chase')
 
 def penaltyKickRelocalize(player):
     my = player.brain.my
@@ -31,7 +31,7 @@ def penaltyBallInOppGoalbox(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.activeLoc()
-    if not player.ball.inOppGoalBox():
+    if not player.brain.ball.inOppGoalBox():
         return player.goLater('chase')
     return player.stay()
 
@@ -43,7 +43,7 @@ def penaltyKickShortDribble(player):
         if transitions.shouldKick(player):
             return player.goNow('waitBeforeKick')
         elif transitions.shouldPositionForKick(player):
-            return player.goNow('decideKick')
+            return player.goNow('positionForKick')
         elif transitions.shouldApproachBall(player):
             return player.goNow('approachBall')
 
