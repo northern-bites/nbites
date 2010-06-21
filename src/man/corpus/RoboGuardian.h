@@ -87,6 +87,7 @@ private:
     void shutoffGains();
     void enableGains();
     void reconnectWifiConnection();
+    void ifUpDown();
     //helpers
     std::string getHostName()const;
     void playFile(std::string filePath)const; //non-blocking
