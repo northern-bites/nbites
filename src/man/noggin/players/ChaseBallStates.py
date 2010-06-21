@@ -198,6 +198,7 @@ def approachDangerousBall(player):
     #print "approach dangerous ball"
     #single steps towards ball and goal with spin
     player.setSteps(0, 0, 0, 0)
+    
 
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')
