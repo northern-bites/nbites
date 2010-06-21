@@ -363,8 +363,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         enableGains();
         break;
     case 7:
-		// disabled for Singapore 2010
-        //reconnectWifiConnection();
+		ifUpDown();
         break;
     case 9:
         //Easter EGG!
@@ -422,6 +421,7 @@ string RoboGuardian::getHostName()const {
 }
 
 const string RoboGuardian::discoverIP() const{
+	// try ...|awk '{print $1 " " $2}' and grep -v inet6
     int result = system("ifconfig|grep 'inet'|cut -d':' -f2|awk '{print $1}'|grep -v 127.0.0.1 > /tmp/ip.txt");
     char ip[100];
     FILE * ipf = fopen("/tmp/ip.txt","r");
@@ -480,25 +480,21 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
 }
 //TODO: comment
 void RoboGuardian::checkConnection(){
-	// disabled for Singapore 2010
-	return;
-
     const string IP = discoverIP();
     if (IP.size() >= 7 && (IP[0] == '1' || IP[0] == '2')) {
         wifiReconnectTimeout = 0;
         return;
     } else {
         if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
-            cout    << "No connection detected, trying to reconnect to NBITES, attempt "
+            cout    << "No connection detected, trying to reconnect interfaces, attempt "
                     << wifiReconnectTimeout << endl;
-            reconnectWifiConnection();
+			ifUpDown();
             wifiReconnectTimeout++;
         }
     }
 }
 
 bool RoboGuardian::checkWired(){
-
     FILE * f1 = popen("connman services | awk '/Wired/ {print $1}'", "r");
     char status[3] = "";
     fscanf(f1,"%s\n",status);
@@ -539,4 +535,12 @@ void RoboGuardian::reconnectWifiConnection(){
     } else {
         cout<<"couldn't find specified wifi network to reconnect to";
     }
+}
+
+void RoboGuardian::ifUpDown(){
+	char ifdown[] = "su -c 'ifdown -a'";
+	char ifup[] = "su -c 'ifup -a'&";
+	cout << "RoboGuardian::ifUpDown() -- reconnecting interfaces\n";
+	system(ifdown);
+	system(ifup);
 }
