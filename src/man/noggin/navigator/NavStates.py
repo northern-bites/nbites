@@ -84,7 +84,7 @@ def spinToWalkHeading(nav):
                              str(nav.brain.my.h)+
                              " and my h diff: " + str(headingDiff))
 
-    if navTrans.atHeadingGoTo(my, targetH):
+    if headingDiff < 20.:
         nav.stopSpinToWalkCount += 1
         if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
             return nav.goLater('walkStraightToPoint')

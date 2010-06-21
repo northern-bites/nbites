@@ -73,7 +73,7 @@ Field::Field(Vision* vis, Threshold * thr)
 #ifdef OFFLINE
     debugHorizon = false;
     debugFieldEdge = false;
-    openField = true;
+    openField = false;
 #else
     debugHorizon = false;
     debugFieldEdge = false;
@@ -184,7 +184,7 @@ void Field::findConvexHull(int pH) {
     //cout << "First is " << convex[0].x << " " << convex[0].y << endl;
     estimate e;
     for (int i = 1; i <= M; i++) {
-        //cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
+      //cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
         int diff = convex[i].y - convex[i-1].y;
         float step = 0.0f;
         if (convex[i].x != convex[i-1].x)
@@ -193,6 +193,7 @@ void Field::findConvexHull(int pH) {
         for (int j = convex[i].x; j > convex[i-1].x; j--) {
             cur -= step;
             topEdge[j] = (int)cur;
+	    //cout << "computed " << topEdge[j] << " " << step << endl;
             /*if (cur > 10) {
                 e = vision->pose->pixEstimate(j, (int)cur, 0.0f);
                 if (e.dist > maxPix)
@@ -249,8 +250,14 @@ int Field::findGreenHorizon(int pH, float sl) {
 
     slope = sl;
     // re init shooting info
-    for (int i = 0; i < IMAGE_WIDTH; i++)
-        shoot[i] = true;
+    for (int i = 0; i < IMAGE_WIDTH; i++) {
+      topEdge[i] = 0;
+      shoot[i] = true;
+    }
+    if (pH < 100) {
+      horizon = 0;
+      return 0;
+    }
     //variable definitions
     int run, greenPixels, scanY;
     register int i, j;

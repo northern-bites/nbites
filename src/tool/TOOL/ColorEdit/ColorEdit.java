@@ -98,7 +98,7 @@ public class ColorEdit extends JPanel implements DataListener,
     private ColorTablePanel imagePanel;
 
     // Variables for colors
-    public static final int NUM_COLORS = 14;
+    public static final int NUM_COLORS = 16;
     
     public static final int FAKE_MIN = 300;
     public static final int FAKE_MAX = -300;

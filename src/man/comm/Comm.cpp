@@ -490,8 +490,8 @@ void Comm::run ()
                 nanosleep(&interval, &remainder);
             }
         }
-    }catch (socket_error &e) {
-        fprintf(stderr, "Error occurred in Comm, thread has stopped.\n");
+    } catch (socket_error &e) {
+        fprintf(stderr, "Error occurred in Comm, thread has paused.\n");
         fprintf(stderr, "%s\n", e.what());
     }
 
@@ -499,8 +499,8 @@ void Comm::run ()
     ::close(sockn);
 
     // Signal thread end
-    running = false;
-    trigger->off();
+    //running = false;
+    //trigger->off();
 }
 
 void Comm::stop ()

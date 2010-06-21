@@ -138,3 +138,12 @@ class RobotLocation(Location):
                  -constants.FACING_SIDELINE_ANGLE > self.h >
                  -(180 - constants.FACING_SIDELINE_ANGLE) )
 
+class RelLocation(RobotLocation):
+    def __init__(self, my, dx, dy, dh):
+        RobotLocation.__init__(self, my.x + dx, my.y + dy, my.h + dh)
+        self.relX = dx
+        self.relY = dy
+        self.relH = dh
+
+    def __str__(self):
+        return "relX: %g, relY: %g, relH: %g"%(self.relX, self.relY, self.relH)
