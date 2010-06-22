@@ -7,6 +7,16 @@ DEBUG = False
 
 def goalieRunChecks(player):
 
+    #if shouldGuardCorner(player) and not player.isChasing:
+    #    player.shouldGuardCornerCounter+=1
+    #    if player.shouldGuardCornerCounter >=3:
+    #        player.isChasing = False
+    #        player.shouldGuardCornerCounter = 0
+    #        return 'guardCorner'
+    #else:
+    #    player.shouldGuardCornerCounter = 0
+
+
     if not player.isChasing:
        if shouldChaseLoc(player):
            player.shouldChaseCounter+=1
@@ -20,16 +30,16 @@ def goalieRunChecks(player):
        else:
            player.shouldChaseCounter = 0
 
-    if shouldSave(player):
-        player.shouldSaveCounter+=1
-        if player.shouldSaveCounter >= 3:
-            player.isChasing = False
-            player.shouldChaseCounter = 0
-            player.shouldStopChaseCounter = 0
-            return 'goalieSave'
-    else:
-        player.shouldSaveCounter = 0
-
+    #if shouldSave(player) and not player.isChasing:
+    #    player.shouldSaveCounter+=1
+    #    if player.shouldSaveCounter >= 3:
+    #        player.isChasing = False
+    #        player.shouldChaseCounter = 0
+    #        player.shouldStopChaseCounter = 0
+    #        return 'goalieSave'
+    #else:
+    #    player.shouldSaveCounter = 0
+        
     if player.isChasing and not chaseTran.shouldntStopChasing(player):
         if shouldStopChaseLoc(player) :
             player.shouldStopChaseCounter+=1
@@ -86,7 +96,7 @@ def shouldSave(player):
     #    and ball.y < Constants.MY_GOALBOX_TOP_Y
     #    and ball.x < Constants.MY_GOALBOX_RIGHT_X +
     #        goalCon.SAVE_OFFSET_X and 
-    #        ball.velX > 3):
+    #        ball.velX > .5):
     #    return True
     return False;
 
@@ -117,6 +127,20 @@ def shouldChaseLoc(player):
         return True
     return False
 
+def shouldGuardCorner(player):
+    if player.penaltyKicking or player.saving:
+        return False
+    
+    ball = player.brain.ball
+    if ((ball.y > 0 and ball.y < Constants.MY_GOALBOX_BOTTOM_Y - 
+        goalCon.AGGRESSIVENESS_OFFSET_Y) or 
+        (ball.y < Constants.FIELD_HEIGHT and ball.y > Constants.MY_GOALBOX_TOP_Y + 
+        goalCon.AGGRESSIVENESS_OFFSET_Y)) and \
+        (ball.x < Constants.MY_GOALBOX_RIGHT_X +
+        goalCon.AGGRESSIVENESS_OFFSET_X):
+        return True
+    return False
+    
 def shouldStopChaseLoc(player):
     ball = player.brain.ball
     my = player.brain.my
@@ -165,7 +189,7 @@ def outOfPosition(player):
 
 def dangerousBall(player):
     ball = player.brain.ball
-    if (ball.x < player.brain.my.x) and ball.dist <= 40:
+    if ball.x < player.brain.my.x and ball.dist <= 30:
         return True
     #idea: draw ray from me to ball, see if it intersects goal
     return False

@@ -4,6 +4,8 @@ Here we house all of the state methods used for chasing the ball
 import ChaseBallTransitions as transitions
 import GoalieTransitions as goalTran
 from ..playbook.PBConstants import GOALIE
+from .. import NogginConstants as nogginConstants
+from man.noggin.typeDefs.Location import RobotLocation
 
 def chase(player):
     """
@@ -169,7 +171,15 @@ def approachDangerousBall(player):
         player.stopWalking()
     #print "approach dangerous ball"
     #single steps towards ball and goal with spin
-    player.stopWalking()
+    #player.setSteps(0, 0, 0, 0) 
+    #ball = player.brain.ball
+    #my = player.brain.my
+    #if player.brain.nav.isStopped():
+    #    if ball.dist >= 15:
+    #        player.brain.nav.takeSteps(-10, 0, 0, 1)
+    #    if ball.dist >= 10:
+    #        player.brain.nav.orbitAngle(180)
+    
 
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')
@@ -180,3 +190,13 @@ def approachDangerousBall(player):
 
     return player.stay()
 
+def guardCorner(player):
+    
+    ball = player.brain.ball
+    if player.brain.nav.isStopped():
+        if ball.y > nogginConstants.LANDMARK_LEFT_POST_Y:
+            player.brain.nav.goTo(RobotPosition(LANDMARK_LEFT_POST_X + 6, LANDMARK_LEFT_POST_Y, 0))
+        elif ball.y < nogginConstants.LANDMARK_RIGHT_POST_Y:
+            player.brain.nav.goTo(RobotPosition(LANDMARK_RIGHT_POST_X + 6, LANDMARK_RIGHT_POST_Y, 0))
+        
+    return player.stay() 
