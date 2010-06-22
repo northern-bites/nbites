@@ -74,6 +74,10 @@ class HeadTracking(FSA.FSA):
             self.isPreKickScanning = True
             self.switchTo('scanQuickUp')
 
+    def kickDecideScan(self):
+        if self.currentState != 'trianglePan':
+            self.switchTo('trianglePan')
+
     def startScan(self,  newScan):
         """repeatedly performs passed in scan"""
         if newScan != self.currentHeadScan:

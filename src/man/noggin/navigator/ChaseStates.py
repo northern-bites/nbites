@@ -2,7 +2,6 @@ from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
 from . import NavConstants as constants
-from . import BrunswickSpeeds as speeds
 from man.noggin.util import MyMath
 from man.noggin.typeDefs.Location import RobotLocation
 from man.noggin.typeDefs.Location import RelLocation
@@ -35,9 +34,6 @@ def crossoverTowardsBall(nav):
 
     (walkX, walkY, walkTheta) = walker.getOmniWalkParam(my, nav.dest)
 
-    print (walkX, walkY, walkTheta)
-    print "rel: ", relDestX, relDestY, ball.bearing
-
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     if (navTrans.atDestinationCloserAndFacing(nav.brain.my,
@@ -57,10 +53,13 @@ def crossoverTowardsBall(nav):
 
     return nav.stay()
 
+LEFT_FOOT_OFFSET = 8
+
 def walkSpinToBall(nav):
     ball = nav.brain.ball
 
     nav.dest = ball
+    nav.dest.relX += LEFT_FOOT_OFFSET
     nav.dest.h = ball.heading
 
     if navTrans.atDestinationCloserAndFacing(nav.brain.my,

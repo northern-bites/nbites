@@ -23,7 +23,7 @@ def shouldApproachFromPositionForKick(player):
     ball = player.brain.ball
     return shouldApproachBall(player) and \
         not shouldPositionForKick(player) and \
-        ball.dist > 30.0
+        ball.dist > 40.0
 
 def shouldPositionForKick(player):
     """
