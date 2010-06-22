@@ -50,9 +50,10 @@ class FieldObject(VisualObject):
 
     def __str__(self):
         """returns string with all class variables"""
-        return ("%s, %s at (%d,%d)s" %
+        return ("%s, %s at (%d,%d)" %
                 (Constants.visionObjectTuple[self.visionId],
-                 Constants.landmarkTuple[self.localId])) + VisualObject.__str__(self)
+                 Constants.landmarkTuple[self.localId],
+                 self.visDist, self.visBearing))
 
 
 class Line:
