@@ -82,6 +82,7 @@ static const float GOALBOX_WIDTH = 216.f;
 static const float GOALBOX_DEPTH = 65.f;
 static const float GOALBOX_WIDTH = 230.f;
 #endif // USING_LAB_FIELD
+#endif
 
 static const float YELLOW_GOAL_HEADING = 0;
 static const float BLUE_GOAL_HEADING = 180;
