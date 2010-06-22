@@ -53,6 +53,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.hasKickedOffKick = True
 
         self.lastKickScanCounter = 0
+        self.hasAlignedOnce = True
 
     def run(self):
         self.play = self.brain.play
@@ -92,6 +93,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'chase'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
+        elif self.play.isRole(PBConstants.GOALIE):
+            return 'goaliePosition'
         else:
             return 'playbookPosition'
 

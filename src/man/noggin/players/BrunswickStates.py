@@ -65,16 +65,12 @@ def gameSet(player):
         player.justKicked = False
         player.stopWalking()
         player.brain.loc.resetBall()
-        player.brain.kickDecider.hasKickedOff = True
 
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
 
         if player.brain.play.isRole(CHASER):
             player.brain.tracker.trackBall()
-
-            if player.brain.gameController.ownKickOff:
-                player.brain.kickDecider.hasKickedOff = False
 
         else:
             player.brain.tracker.activeLoc()

@@ -541,6 +541,7 @@ void RoboGuardian::ifUpDown(){
 	char ifdown[] = "su -c 'ifdown wlan0'";
 	char ifup[] = "su -c 'ifup wlan0'&";
 	cout << "RoboGuardian::ifUpDown() -- reconnecting interfaces\n";
+	playFile(wifi_restart_wav);
 	system(ifdown);
 	system(ifup);
 }

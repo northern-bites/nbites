@@ -4,6 +4,8 @@ Here we house all of the state methods used for chasing the ball
 import ChaseBallTransitions as transitions
 import GoalieTransitions as goalTran
 from ..playbook.PBConstants import GOALIE
+from .. import NogginConstants as nogginConstants
+from man.noggin.typeDefs.Location import RobotLocation
 
 def chase(player):
     """
@@ -52,7 +54,6 @@ def approachBall(player):
 
     if transitions.shouldActiveLoc(player):
         player.brain.tracker.activeLoc()
-
     else:
         player.brain.tracker.trackBall()
 
@@ -69,7 +70,7 @@ def approachBall(player):
 
     elif transitions.shouldKick(player) or \
              transitions.shouldPositionForKick(player):
-        return player.goNow('positionForKick')
+        return player.goNow('decideKick')
 
     if player.brain.tracker.activeLocOn:
         if transitions.shouldScanFindBallActiveLoc(player):
@@ -77,6 +78,18 @@ def approachBall(player):
     else:
         if transitions.shouldScanFindBall(player):
             return player.goLater('scanFindBall')
+
+    return player.stay()
+
+def decideKick(player):
+    if player.firstFrame():
+        player.stopWalking()
+        player.brain.tracker.kickDecideScan()
+
+    elif not player.brain.motion.isHeadActive():
+        return player.goLater('positionForKick')
+
+    player.brain.kickDecider.kickInfo.collectData(player.brain)
 
     return player.stay()
 
@@ -89,7 +102,10 @@ def positionForKick(player):
     State to align on the ball once we are near it
     """
     if player.firstFrame():
-        kick = player.brain.kickDecider.decideKick()
+        kick = player.brain.kickDecider.kickInfo.getKick()
+        player.brain.kickDecider.currentKick = kick
+        if kick is None:
+            return player.goLater('chase') # @TODO make this more sensible (orbit)
         player.brain.nav.kickPosition(kick)
         player.inKickingState = True
         player.ballTooFar = 0
@@ -155,7 +171,15 @@ def approachDangerousBall(player):
         player.stopWalking()
     #print "approach dangerous ball"
     #single steps towards ball and goal with spin
-    player.stopWalking()
+    #player.setSteps(0, 0, 0, 0) 
+    #ball = player.brain.ball
+    #my = player.brain.my
+    #if player.brain.nav.isStopped():
+    #    if ball.dist >= 15:
+    #        player.brain.nav.takeSteps(-10, 0, 0, 1)
+    #    if ball.dist >= 10:
+    #        player.brain.nav.orbitAngle(180)
+    
 
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')
@@ -165,3 +189,14 @@ def approachDangerousBall(player):
         return player.goLater('spinFindBall')
 
     return player.stay()
+
+def guardCorner(player):
+    
+    ball = player.brain.ball
+    if player.brain.nav.isStopped():
+        if ball.y > nogginConstants.LANDMARK_LEFT_POST_Y:
+            player.brain.nav.goTo(RobotPosition(LANDMARK_LEFT_POST_X + 6, LANDMARK_LEFT_POST_Y, 0))
+        elif ball.y < nogginConstants.LANDMARK_RIGHT_POST_Y:
+            player.brain.nav.goTo(RobotPosition(LANDMARK_RIGHT_POST_X + 6, LANDMARK_RIGHT_POST_Y, 0))
+        
+    return player.stay() 

@@ -70,13 +70,19 @@ static const float LANDMARK_YELLOW_GOAL_TOP_POST_Y =
 
 static const float CENTER_CIRCLE_RADIUS = 62.5f; // Not scaled
 
+#define SINGAPORE_FIELD_B
 #ifdef USING_LAB_FIELD
 static const float GOALBOX_DEPTH = 60.f;
 static const float GOALBOX_WIDTH = 200.f;
 #else
+#ifdef SINGAPORE_FIELD_B
+static const float GOALBOX_DEPTH = 56.f;
+static const float GOALBOX_WIDTH = 216.f;
+#else
 static const float GOALBOX_DEPTH = 65.f;
 static const float GOALBOX_WIDTH = 230.f;
 #endif // USING_LAB_FIELD
+#endif
 
 static const float YELLOW_GOAL_HEADING = 0;
 static const float BLUE_GOAL_HEADING = 180;

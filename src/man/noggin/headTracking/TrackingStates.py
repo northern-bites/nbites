@@ -32,6 +32,13 @@ def tracking(tracker):
 
     return tracker.stay()
 
+def ballSpinTracking(tracker):
+    '''Super state which handles following/refinding the ball'''
+    if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+        return tracker.goNow('tracking')
+    else:
+        return tracker.goNow('spinScanBall')
+
 
 def activeTracking(tracker):
     """
@@ -40,40 +47,31 @@ def activeTracking(tracker):
     if tracker.firstFrame():
         tracker.activeLocOn = True
 
-    if tracker.target.locDist > constants.MAX_ACTIVE_TRACKING_DIST and \
+    if tracker.target.locDist < constants.MAX_ACTIVE_TRACKING_DIST and \
             tracker.target.framesOn > 2:
         return tracker.goLater('tracking')
 
     if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH \
             and not tracker.brain.motion.isHeadActive() \
-            and not (tracker.activePanUp or tracker.activePanOut):
+            and not (tracker.activePanOut):
         return tracker.goLater('activeLocScan')
 
-    elif not (tracker.activePanOut or tracker.activePanUp) and \
+    elif not tracker.activePanOut and \
             tracker.counter <= constants.ACTIVE_LOC_STARE_THRESH:
         tracker.helper.trackObject()
-        tracker.activePanOut = tracker.activePanUp = False
+        tracker.activePanOut = False
         return tracker.stay()
 
-    elif tracker.activePanOut and tracker.activePanUp:
-        tracker.activePanUp = tracker.activePanOut = False
+    elif tracker.activePanOut:
+        tracker.activePanOut = False
         return tracker.goLater('returnHeadsPan')
-
-    elif not tracker.activePanUp:
-        tracker.activePanUp = True
+    else :
+        tracker.activePanOut = True
         motionAngles = tracker.brain.sensors.motionAngles
         tracker.preActivePanHeads = (
             motionAngles[MotionConstants.HeadYaw],
             motionAngles[MotionConstants.HeadPitch])
-        return tracker.goLater('panUpOnce')
 
-    elif not tracker.activePanOut:
-        tracker.activePanOut = True
-        tracker.activePanDir = (tracker.activePanDir + 1) % \
-            constants.NUM_ACTIVE_PANS
+        return tracker.goLater('trianglePan')
 
-        if tracker.activePanDir == constants.PAN_RIGHT:
-            return tracker.goLater('panRightOnce')
-        elif tracker.activePanDir == constants.PAN_LEFT:
-            return tracker.goLater('panLeftOnce')
     return tracker.stay()

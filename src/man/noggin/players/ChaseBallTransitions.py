@@ -23,7 +23,7 @@ def shouldApproachFromPositionForKick(player):
     ball = player.brain.ball
     return shouldApproachBall(player) and \
         not shouldPositionForKick(player) and \
-        ball.dist > 30.0
+        ball.dist > 40.0
 
 def shouldPositionForKick(player):
     """
@@ -118,8 +118,7 @@ def shouldPreKickScan(player):
     return False
 
 def shouldActiveLoc(player):
-    if player.brain.ball.on and \
-            not player.brain.play.isRole(GOALIE):
+    if player.brain.ball.on:
         return (player.brain.ball.dist > constants.APPROACH_ACTIVE_LOC_DIST
                 and fabs(player.brain.ball.bearing) <
                 constants.APPROACH_ACTIVE_LOC_BEARING)

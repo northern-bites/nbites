@@ -56,6 +56,14 @@ class HeadTracking(FSA.FSA):
             and (not self.currentState == 'scanBall') ):
             self.switchTo('ballTracking')
 
+    def trackBallSpin(self):
+        """automatically tracks the ball. spins if not in view"""
+        self.target = self.brain.ball
+        self.gain = 1.0
+        if ( (not self.currentState == 'tracking')
+            and (not self.currentState == 'spinScanBall') ):
+            self.switchTo('ballSpinTracking')
+
     def locPans(self):
         """repeatedly performs quick pan"""
         self.activeLocOn = False
@@ -73,6 +81,10 @@ class HeadTracking(FSA.FSA):
         if not self.isPreKickScanning:
             self.isPreKickScanning = True
             self.switchTo('scanQuickUp')
+
+    def kickDecideScan(self):
+        if self.currentState != 'trianglePan':
+            self.switchTo('trianglePan')
 
     def startScan(self,  newScan):
         """repeatedly performs passed in scan"""

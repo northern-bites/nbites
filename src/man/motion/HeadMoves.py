@@ -30,7 +30,6 @@ FIND_BALL_HEADS_LEFT = (((45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
 FIND_BALL_HEADS_RIGHT =  (((-45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
                           ((-45.,20.),0.3,1, stiff.LOW_HEAD_STIFFNESSES))
 
-
 # Distance that can be seen at a certain head pitch
 # | degree | close | far |
 # |     20 |    15 |  53 |
@@ -205,6 +204,24 @@ LOW_SCAN_BALL = (
     (( 65.0, -25.0),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((65.,-5.),0.2,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-5.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),)
+
+SPIN_RIGHT_SCAN_BALL = (
+    ((-55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((50.,20.),0.8,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-60.,-25.),1.0,1, stiff.LOW_HEAD_STIFFNESSES))
+
+RIGHT_EDGE_SCAN_BALL = (
+    ((-55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-60.,-25.),0.6,1, stiff.LOW_HEAD_STIFFNESSES))
+
+SPIN_LEFT_SCAN_BALL = (
+    ((55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-50.,20.),1.0,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((60.,-25.),1.2,1, stiff.LOW_HEAD_STIFFNESSES))
+
+LEFT_EDGE_SCAN_BALL = (
+    ((55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((60.,-25.),0.6,1, stiff.LOW_HEAD_STIFFNESSES))
 
 SQUAT_LOW_SCAN_BALL = (
     ((-65.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),

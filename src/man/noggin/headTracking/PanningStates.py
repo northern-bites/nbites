@@ -19,9 +19,28 @@ def scanBall(tracker):
 
         elif ballDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
                 ballDist < HeadMoves.MID_SCAN_FAR_BOUND:
-            tracker.helper.executeHeadMove(HeadMoves.MID_UP_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.MID_DOWN_SCAN_BALL)
         else:
             tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)
+    return tracker.stay()
+
+def spinScanBall(tracker):
+    ball = tracker.brain.ball
+    nav = tracker.brain.nav
+
+    if tracker.target == ball and \
+            tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        tracker.activeLocOn = False
+        return tracker.goNow('ballSpinTracking')
+
+    if nav.walkTheta > 0:
+        tracker.headMove = HeadMoves.SPIN_LEFT_SCAN_BALL
+    else:
+        tracker.headMove = HeadMoves.SPIN_RIGHT_SCAN_BALL
+
+    if not tracker.brain.motion.isHeadActive():
+        tracker.helper.executeHeadMove(tracker.headMove)
+
     return tracker.stay()
 
 def scanning(tracker):
@@ -147,3 +166,24 @@ def scanQuickUp(tracker):
         tracker.scanningUp = True
         tracker.activePanUp = True
         return tracker.goNow('panUpOnce')
+
+def trianglePan(tracker):
+    if tracker.firstFrame():
+        motionAngles = tracker.brain.sensors.motionAngles
+        prePanHeads = (
+            motionAngles[MotionConstants.HeadYaw],
+            motionAngles[MotionConstants.HeadPitch])
+
+        if tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw] > 0:
+            tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
+            tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
+            tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
+        else:
+            tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
+            tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
+            tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
+
+    elif not tracker.brain.motion.isHeadActive() or \
+            tracker.counter > 40:
+        return tracker.goLater(tracker.lastDiffState)
+    return tracker.stay()
