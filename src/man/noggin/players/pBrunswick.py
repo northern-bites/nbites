@@ -75,7 +75,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if self.play.isRole(PBConstants.GOALIE):
+        if self.brain.me.isDefaultGoalie():
             state = GoalieTransitions.goalieRunChecks(self)
             return state
 
@@ -93,7 +93,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'chase'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
-        elif self.play.isRole(PBConstants.GOALIE):
+        if self.brain.me.isDefaultGoalie():
             return 'goaliePosition'
         else:
             return 'playbookPosition'
