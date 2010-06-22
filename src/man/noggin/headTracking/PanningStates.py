@@ -19,9 +19,28 @@ def scanBall(tracker):
 
         elif ballDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
                 ballDist < HeadMoves.MID_SCAN_FAR_BOUND:
-            tracker.helper.executeHeadMove(HeadMoves.MID_UP_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.MID_DOWN_SCAN_BALL)
         else:
             tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)
+    return tracker.stay()
+
+def spinScanBall(tracker):
+    ball = tracker.brain.ball
+    nav = tracker.brain.nav
+
+    if tracker.target == ball and \
+            tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        tracker.activeLocOn = False
+        return tracker.goNow('ballSpinTracking')
+
+    if nav.walkTheta > 0:
+        tracker.headMove = HeadMoves.SPIN_LEFT_SCAN_BALL
+    else:
+        tracker.headMove = HeadMoves.SPIN_RIGHT_SCAN_BALL
+
+    if not tracker.brain.motion.isHeadActive():
+        tracker.helper.executeHeadMove(tracker.headMove)
+
     return tracker.stay()
 
 def scanning(tracker):
