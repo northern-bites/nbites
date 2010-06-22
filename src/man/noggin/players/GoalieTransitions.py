@@ -189,7 +189,7 @@ def outOfPosition(player):
 
 def dangerousBall(player):
     ball = player.brain.ball
-    if ball.x < player.brain.my.x and ball.dist <= 30:
+    if ball.x < player.brain.my.x and ball.dist <= 40:
         return True
     #idea: draw ray from me to ball, see if it intersects goal
     return False
