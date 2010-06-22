@@ -172,14 +172,14 @@ def approachDangerousBall(player):
     #print "approach dangerous ball"
     #single steps towards ball and goal with spin
     #player.setSteps(0, 0, 0, 0) 
-    #ball = player.brain.ball
-    #my = player.brain.my
-    #if player.brain.nav.isStopped():
-    #    if ball.dist >= 15:
-    #        player.brain.nav.takeSteps(-10, 0, 0, 1)
-    #    if ball.dist >= 10:
-    #        player.brain.nav.orbitAngle(180)
-    
+    ball = player.brain.ball
+    my = player.brain.my
+    if player.brain.nav.isStopped():
+        if ball.dist >= 10:
+            if ball.y > my.y + 7:
+                player.brain.nav.walk(0, 10, 0)
+            elif ball.y < my.y - 7:
+                player.brain.nav.walk(0, -10, 0)
 
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')
