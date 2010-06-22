@@ -186,7 +186,7 @@ READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 # READY_NON_KICKOFF
 
 READY_NON_KICKOFF_MAX_X = (NogginConstants.GREEN_PAD_X +
-                                NogginConstants.FIELD_GREEN_WIDTH * 1./4.)
+                                NogginConstants.FIELD_GREEN_WIDTH * 1./4. - 10.)
 
 READY_NON_KICKOFF_DEFENDER_X = READY_NON_KICKOFF_MAX_X
 READY_NON_KICKOFF_DEFENDER_Y = NogginConstants.GREEN_PAD_Y + \
