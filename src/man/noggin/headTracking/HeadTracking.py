@@ -75,7 +75,7 @@ class HeadTracking(FSA.FSA):
             self.switchTo('scanQuickUp')
 
     def kickDecideScan(self):
-        if self.state != 'trianglePan':
+        if self.currentState != 'trianglePan':
             self.switchTo('trianglePan')
 
     def startScan(self,  newScan):

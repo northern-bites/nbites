@@ -53,6 +53,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.hasKickedOffKick = True
 
         self.lastKickScanCounter = 0
+        self.hasAlignedOnce = True
 
     def run(self):
         self.play = self.brain.play

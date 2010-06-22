@@ -4,7 +4,7 @@ LOC_PANS = 'locPans'
 
 PAN_LEFT_ONCE = 'panLeftOnce'
 
-MAX_PAN_SPEED = 115              # deg/sec
+MAX_PAN_SPEED = 90              # deg/sec
 
 TRACKER_FRAMES_ON_TRACK_THRESH = 1
 TRACKER_FRAMES_OFF_REFIND_THRESH = 25
@@ -25,3 +25,4 @@ NUM_LOOK_DIRS = 4
  LOOK_UP,
  LOOK_RIGHT,
  LOOK_DOWN) = range(NUM_LOOK_DIRS)
+

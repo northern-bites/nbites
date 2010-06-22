@@ -150,13 +150,20 @@ def scanQuickUp(tracker):
 
 def trianglePan(tracker):
     if tracker.firstFrame():
-        if tracker.brain.sensors.motionAngles.\
-                motionAngles[MotionConstants.HeadYaw] > 0:
+        motionAngles = tracker.brain.sensors.motionAngles
+        prePanHeads = (
+            motionAngles[MotionConstants.HeadYaw],
+            motionAngles[MotionConstants.HeadPitch])
+
+        if tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw] > 0:
             tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
             tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
+            tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
         else:
             tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
             tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
+            tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
+
     elif not tracker.brain.motion.isHeadActive():
         tracker.goLater(tracker.lastDiffState)
     return tracker.stay()

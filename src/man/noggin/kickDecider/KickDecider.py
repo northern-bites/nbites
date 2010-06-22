@@ -5,7 +5,7 @@ from . import KickInformation
 from math import fabs
 from ..util import MyMath
 
-class KickDecide
+class KickDecider(object):
     """
     uses current information when called to determine what the best possible
     kick is and where we need to be to execute it
@@ -17,13 +17,13 @@ class KickDecide
         self.objDict = { constants.OBJECTIVE_CLEAR:self.clear,
                          constants.OBJECTIVE_CENTER:self.center,
                          constants.OBJECTIVE_SHOOT:self.shoot,
-                         constants.OBJECTIVE_KICKOFF:self.kickoff
+                         constants.OBJECTIVE_KICKOFF:self.kickoff}
         self.kickDest = None
         self.destDist = 0.
         self.currentObj = None
         self.currentKick = None
 
-        self.kickInfo = KickInformation()
+        self.kickInfo = KickInformation.KickInformation(brain.player)
 
     def getSweetMove(self):
         """
@@ -32,10 +32,7 @@ class KickDecide
         if self.currentKick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
                self.currentKick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
             ball = self.brain.ball
-            if self.currentObj == constants.OBJECTIVE_SHOOT:
-                dist = 500.
-            else:
-                dist = self.destDist
+            dist = 500.
             return self.currentKick.sweetMove(ball.relY, dist)
         else:
             return self.currentKick.sweetMove

@@ -60,6 +60,11 @@ def activeTracking(tracker):
         return tracker.goLater('returnHeadsPan')
     else :
         tracker.activePanOut = True
+        motionAngles = tracker.brain.sensors.motionAngles
+        tracker.preActivePanHeads = (
+            motionAngles[MotionConstants.HeadYaw],
+            motionAngles[MotionConstants.HeadPitch])
+
         return tracker.goLater('trianglePan')
 
     return tracker.stay()
