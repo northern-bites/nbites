@@ -164,6 +164,7 @@ def trianglePan(tracker):
             tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
             tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
 
-    elif not tracker.brain.motion.isHeadActive():
-        tracker.goLater(tracker.lastDiffState)
+    elif not tracker.brain.motion.isHeadActive() or \
+            tracker.counter > 40:
+        return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
