@@ -1,5 +1,6 @@
 from .Location import (RobotLocation, Location)
 from .. import NogginConstants
+from math import fabs
 import time
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
@@ -16,7 +17,6 @@ SEC_TO_MILLIS = 1000.0
 PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
 # penalty is: (ball_dist*ball_bearing)/scale
 BALL_BEARING_PENALTY_SCALE = 200.0 # max 90% of distance
-NO_VISUAL_BALL_PENALTY = 2 # centimeter penalty for not seeing the ball
 
 
 class TeamMember(RobotLocation):
@@ -61,15 +61,17 @@ class TeamMember(RobotLocation):
         # calculates ball localization distance, bearing
         self.bearingToGoal = self.getBearingToGoal()
         self.active = True
-        self.grabbing = self.ballDist <= \
-                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING
+        self.grabbing = (self.ballDist <=
+                         NogginConstants.BALL_TEAMMATE_DIST_GRABBING) and \
+                         (fabs(self.ballBearing) <
+                          NogginConstants.BALL_TEAMMATE_BEARING_GRABBING)
 
         #potential problem when goalie is grabbing?
         #only going to be dribbling or grabbing if you see the ball
         self.dribbling = self.ballDist <= \
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING
 
-        self.lastPacketTime = time.time()#self.brain.playbook.pb.time
+        self.lastPacketTime = time.time()
 
 
     def updateMe(self):
@@ -86,7 +88,7 @@ class TeamMember(RobotLocation):
         self.y = my.y
         self.h = my.h
         self.ballDist = ball.dist
-        self.ballBearing = 0
+        self.ballBearing = ball.bearing
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
@@ -96,8 +98,12 @@ class TeamMember(RobotLocation):
 
         self.dribbling = self.ballDist <= \
                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING
-        self.grabbing = self.ballDist <= \
-                        NogginConstants.BALL_TEAMMATE_DIST_GRABBING
+
+        self.grabbing = (self.ballDist <=
+                         NogginConstants.BALL_TEAMMATE_DIST_GRABBING) and \
+                         (fabs(self.ballBearing) <
+                          NogginConstants.BALL_TEAMMATE_BEARING_GRABBING)
+
         self.lastPacketTime = self.brain.time
 
     def reset(self):
@@ -187,9 +193,6 @@ class TeamMember(RobotLocation):
         """
         return (PACKET_DEAD_PERIOD <
                 (self.brain.time - self.lastPacketTime))
-
-        return (PACKET_DEAD_PERIOD <
-                (self.brain.playbook.pb.time - self.lastPacketTime))
 
     def __str__(self):
         return "I am player number " + self.playerNumber
