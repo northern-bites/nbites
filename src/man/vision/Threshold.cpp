@@ -1040,7 +1040,8 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             //TODO: remove the old code, make new code better on distances
             dist = chooseGoalDistance(cert, disth, distw, poseDist,
                                       static_cast<int>(bottomOfObjectY));
-            float distnew = chooseGoalDistance(cert, disthnew, distwnew, poseDist,
+            //TODO: hack
+            float distnew = chooseGoalDistance(cert, disthnew, distw, poseDist,
                                                   static_cast<int>(bottomOfObjectY));
             //cout<<"dist old w: "<<distw<<" h: "<<disth<<endl;
 //            cout<<"poseDist b: "<<poseDist<<" c: "<<poseDistCenter<<endl;
