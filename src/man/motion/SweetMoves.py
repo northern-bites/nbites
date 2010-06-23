@@ -82,7 +82,7 @@ GOALIE_POS = ((INITIAL_POS[0][0],
 def DREW_KICK(y,dist):
     if y<=0:
         return mirrorMove(LEFT_D_KICK(-1*y,dist))
-    if y>0:
+    elif y>0:
         return LEFT_D_KICK(y,dist)
 
 
@@ -101,8 +101,8 @@ def LEFT_D_KICK(y,dist):
     if kick_leg_hip_roll>20.0:
         kick_leg_hip_roll=20.0
 
-    if kick_leg_hip_roll<5.0:
-        kick_leg_hip_roll=5.0
+    if kick_leg_hip_roll<0.0:
+        kick_leg_hip_roll=0.0
 
     # range from 15 to 60 to balance against kick
     support_arm_shoulder_roll = -3.*kick_leg_hip_roll
@@ -127,17 +127,17 @@ def LEFT_D_KICK(y,dist):
 
         # Lift/cock leg
         ((80.,0.,-50.,-90.),
-         (0.,kick_leg_hip_roll,-20.,120.,-68.,-20.),
+         (0.,kick_leg_hip_roll-10., -20.,120.,-68.,-20.),
          (0.,0,-40.,86.,-45.,-20.),
          (80.,support_arm_shoulder_roll,50.,70.),
-         1.,0, stiff.NORMAL_STIFFNESSES),
+         .5,0, stiff.NORMAL_STIFFNESSES),
 
         # kick left leg
         ((80.,0.,-50.,-90.),
-         (0.,kick_leg_hip_roll, kick_hip_pitch, 60.,10.,-20.),
+         (0.,kick_leg_hip_roll, kick_hip_pitch-10., 60.,10.,-20.),
          (0.,0.,-40.,86.,-45.,-20.),
          (80.,support_arm_shoulder_roll,50.,70.),
-         .25,0, stiff.NORMAL_STIFFNESSES),
+         .15,0, stiff.NORMAL_STIFFNESSES),
 
         # return to normal position
         ((60., 35., 0.,0.),
