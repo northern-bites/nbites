@@ -42,6 +42,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.isChasing = False
         self.saving = False
 
+        self.frameCounter = 0
+
         self.shouldRelocalizeCounter = 0
 
         # Penalty kick player variables
@@ -54,6 +56,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.lastKickScanCounter = 0
         self.hasAlignedOnce = True
+        self.angleToOrbit = 0.0
 
     def run(self):
         self.play = self.brain.play

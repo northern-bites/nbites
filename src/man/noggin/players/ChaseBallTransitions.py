@@ -99,6 +99,9 @@ def shouldSpinFindBall(player):
     return (player.stateTime >=
             SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL))
 
+def shouldSpinFindBallAgain(player):
+    return player.brain.ball.framesOff > 200
+
 def shouldntStopChasing(player):
     """
     Dont switch out of chaser in certain circumstances

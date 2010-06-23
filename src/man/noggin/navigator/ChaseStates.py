@@ -20,6 +20,9 @@ def crossoverTowardsBall(nav):
     my = brain.my
     ball = nav.brain.ball
 
+    if ball.dist < 100:
+        return nav.stay()
+
     # Get location 40cm away in line towards the ball
     destH = my.headingTo(ball)
     distToBall = ball.dist
@@ -28,8 +31,8 @@ def crossoverTowardsBall(nav):
     relDestY = ball.relY * CROSSOVER_DIST / distToBall
 
     nonRelDest = RobotLocation(relDestX + my.x,
-                             relDestY + my.y,
-                             destH)
+                               relDestY + my.y,
+                               destH)
     nav.dest = RelLocation(my, relDestX, relDestY, ball.bearing)
 
     (walkX, walkY, walkTheta) = walker.getOmniWalkParam(my, nav.dest)
@@ -67,7 +70,7 @@ def walkSpinToBall(nav):
                                              ball.bearing):
         return nav.goNow('stop')
     elif abs(ball.bearing) > 60 and ball.on:
-        return nav.goLater('crossoverTowardsBall')
+        return nav.goLater('walkSpinToBall')
 
     # Set our walk towards the ball
     walkX, walkY, walkTheta = \
@@ -104,7 +107,7 @@ def chaseAroundBox(nav):
         nav.shouldChaseAroundBox = 0
 
     if nav.shouldChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
-        return nav.goNow('crossoverTowardsBall')
+        return nav.goNow('walkSpinToBall')
 
     elif navTrans.shouldAvoidObstacleDuringApproachBall(nav):
         return nav.goNow('avoidObstacle')

@@ -41,7 +41,6 @@ class KickDecider(object):
         """
         using objective and localization determines best kick to make
         """
-
         self.currentObj = self.kickInfo.getKickObjective()
 
         if self.currentObj == constants.OBJECTIVE_UNCLEAR:

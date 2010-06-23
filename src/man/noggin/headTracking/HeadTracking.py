@@ -123,3 +123,6 @@ class HeadTracking(FSA.FSA):
         #allows us to update target values but not confuse FSA
         if not self.currentState == 'lookToPoint':
             self.switchTo('lookToPoint')
+
+    def bounceHead(self):
+        self.switchTo('bounceUp')

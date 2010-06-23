@@ -190,3 +190,19 @@ def trianglePan(tracker):
             tracker.counter > 40:
         return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
+
+def bounceUp(tracker):
+    if tracker.firstFrame():
+        tracker.helper.panTo(HeadMoves.PAN_UP_HEADS)
+    elif not tracker.brain.motion.isHeadActive():
+        return tracker.goLater('bounceDown')
+    return tracker.stay()
+
+def bounceDown(tracker):
+    if tracker.firstFrame():
+        tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
+    elif not tracker.brain.motion.isHeadActive():
+        return tracker.goLater('bounceUp')
+    return tracker.stay()
+
+
