@@ -60,15 +60,14 @@ def getWalkSpinParam(my, dest):
 
     relX = 0
     bearingDeg = my.getRelativeBearing(dest)
-
+    distToDest = my.distTo(dest)
     if hasattr(dest, "relX"):
         relX = dest.relX
     else:
-        distToDest = my.distTo(dest)
         relX = MyMath.getRelativeX(distToDest, bearingDeg)
 
     # calculate ideal max forward speed
-    sX = constants.GOTO_FORWARD_SPEED * relX
+    sX = constants.GOTO_FORWARD_SPEED * MyMath.sign(relX)
 
     if (fabs(bearingDeg) < 2.0):
         sTheta = 0.0
@@ -77,27 +76,23 @@ def getWalkSpinParam(my, dest):
         sTheta = (MyMath.sign(bearingDeg) * getRotScale(bearingDeg) *
                   constants.OMNI_MAX_SPIN_SPEED)
 
-    ## if any are below min thresholds, set to 0
-    if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
-        sX = 0
-
-    if fabs(sTheta) < constants.MIN_SPIN_SPEED:
-        sTheta = 0.0
-
     absSTheta = fabs(sTheta)
 
-    if absSTheta == 0:
-        sX = MyMath.clip(sX, constants.WALK_TO_MIN_X_SPEED,
-                         constants.WALK_TO_MAX_X_SPEED)
+    if  fabs(bearingDeg) > 20:
+        sX = MyMath.clip(sX,
+                         constants.OMNI_MIN_X_SPEED,
+                         constants.OMNI_MAX_X_SPEED)
+        sTheta = MyMath.sign(sTheta)* constants.OMNI_MAX_SPIN_SPEED
 
-    elif absSTheta <= (constants.HEADING_MEDIUM_SCALE *
-                       constants.OMNI_MAX_SPIN_SPEED): #18
-        sX = MyMath.clip(sX, -9, 9)
-
-    else: #if we make getRotScale finer grained we could
+    elif fabs(bearingDeg)  > 35:
         sX = 0
+        sTheta = constants.MAX_SPIN_SPEED * MyMath.sign(sTheta)
 
-    return (sX, 0, sTheta)
+    gain = 1.0
+    if distToDest < ChaseBallConstants.APPROACH_WITH_GAIN_DIST:
+        gain = constants.GOTO_CLOSE_GAIN
+
+    return (sX * gain, 0, sTheta * gain)
 
 def getWalkStraightParam(my, dest):
 
@@ -142,9 +137,5 @@ def getSpinOnlyParam(my, dest):
 
 def getRotScale(headingDiff):
     absHDiff = fabs(headingDiff)
-    if absHDiff < constants.HEADING_NEAR_THRESH:
-        return constants.HEADING_NEAR_SCALE
-    elif absHDiff < constants.HEADING_MEDIUM_THRESH:
-        return constants.HEADING_MEDIUM_SCALE
-    else:
-        return constants.HEADING_FAR_SCALE
+
+    return absHDiff / 90.0

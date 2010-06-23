@@ -69,8 +69,6 @@ def walkSpinToBall(nav):
                                              nav.dest,
                                              ball.bearing):
         return nav.goNow('stop')
-    elif abs(ball.bearing) > 60 and ball.on:
-        return nav.goLater('walkSpinToBall')
 
     # Set our walk towards the ball
     walkX, walkY, walkTheta = \

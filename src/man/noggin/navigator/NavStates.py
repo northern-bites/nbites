@@ -339,29 +339,18 @@ def orbitPointThruAngle(nav):
         else:
             orbitDir = constants.ORBIT_RIGHT
 
-        if fabs(nav.angleToOrbit) <= constants.ORBIT_SMALL_ANGLE:
-            sY = constants.ORBIT_STRAFE_SPEED * constants.ORBIT_SMALL_GAIN
-            sT = constants.ORBIT_SPIN_SPEED * constants.ORBIT_SMALL_GAIN
+        sY = constants.ORBIT_STRAFE_SPEED
 
-        elif fabs(nav.angleToOrbit) <= constants.ORBIT_LARGE_ANGLE:
-            sY = constants.ORBIT_STRAFE_SPEED * \
-                constants.ORBIT_MID_GAIN
-            sT = constants.ORBIT_SPIN_SPEED * \
-                constants.ORBIT_MID_GAIN
-        else :
-            sY = constants.ORBIT_STRAFE_SPEED * \
-                constants.ORBIT_LARGE_GAIN
-            sT = constants.ORBIT_SPIN_SPEED * \
-                constants.ORBIT_LARGE_GAIN
+        sT = constants.ORBIT_SPIN_SPEED
 
-        walkX = -0.5
-        walkY = orbitDir*sY
-        walkTheta = orbitDir*sT
+        walkX = (nav.brain.ball.relX - 25) * .8
+        walkY = -1 * MyMath.sign(nav.angleToOrbit) * 10
+        walkTheta = MyMath.sign(nav.angleToOrbit) * 20
+
         helper.setSpeed(nav, walkX, walkY, walkTheta )
 
     #  (frames/second) / (degrees/second) * degrees
-    framesToOrbit = fabs((constants.FRAME_RATE / nav.walkTheta) *
-                         nav.angleToOrbit)
+    framesToOrbit = 100
 
     if nav.counter >= framesToOrbit:
         return nav.goLater('stop')

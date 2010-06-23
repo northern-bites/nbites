@@ -108,11 +108,13 @@ class Navigator(FSA.FSA):
 
     def orbitAngle(self, angleToOrbit):
 
-        if (self.angleToOrbit == angleToOrbit):
+        if (self.angleToOrbit == angleToOrbit and \
+                self.currentState == 'orbitPointThruAngle'):
             self.updatedTrajectory = False
             return
 
         self.angleToOrbit = angleToOrbit
+
         self.updatedTrajectory = True
 
         self.switchTo('orbitPointThruAngle')
