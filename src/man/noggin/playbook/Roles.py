@@ -47,8 +47,7 @@ def rGoalie(team, workingPlay):
     if (team.brain.gameController.currentState == 'gameReady' or
         team.brain.gameController.currentState =='gameSet'):
         SubRoles.pGoalieReady(team, workingPlay)
-    if team.goalieShouldChase():
-        SubRoles.pGoalieChaser(team, workingPlay)
+
     else:
         SubRoles.pGoalieNormal(team, workingPlay)
 
