@@ -70,19 +70,9 @@ POSITION_FOR_KICK_BEARING_THRESH = 10.
 PFK_X_FAR = 25.
 PFK_X_CLOSE = 4.
 
-
-# Values for controlling the strafing
-PFK_MAX_Y_SPEED = speeds.MAX_Y_SPEED
-PFK_MIN_Y_SPEED = speeds.MIN_Y_SPEED
-PFK_MAX_X_SPEED = speeds.MAX_X_SPEED
-PFK_MIN_X_SPEED = speeds.MIN_X_MAGNITUDE
-PFK_MIN_Y_MAGNITUDE = speeds.MIN_Y_MAGNITUDE
-PFK_X_GAIN = 0.12
-PFK_Y_GAIN = 0.6
-
 # Keep track of what gait we're using
 FAST_GAIT = "fastGait"
-NORMAL_GAIT = "normalGait"
+NORMAL_GAIT = "slowGait"
 
 TURN_LEFT = 1
 TURN_RIGHT = -1
