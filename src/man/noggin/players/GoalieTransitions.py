@@ -123,7 +123,11 @@ def shouldChaseLoc(player):
     if (ball.y > Constants.MY_GOALBOX_BOTTOM_Y - goalCon.AGGRESSIVENESS_OFFSET_Y
         and ball.y < Constants.MY_GOALBOX_TOP_Y + goalCon.AGGRESSIVENESS_OFFSET_Y 
         and ball.x < Constants.MY_GOALBOX_RIGHT_X +
-        goalCon.AGGRESSIVENESS_OFFSET_X):
+        goalCon.AGGRESSIVENESS_OFFSET_X) or \
+        (ball.y > Constants.MY_GOALBOX_BOTTOM_Y + 10
+        and ball.y < Constants.MY_GOALBOX_TOP_Y - 10
+        and ball.x < Constants.MY_GOALBOX_RIGHT_X +
+        150):
         return True
     return False
 

@@ -3,8 +3,8 @@ from ..typeDefs import LocationConstants as locConst
 from ..typeDefs import Location
 import KickingConstants as constants
 import kicks
-from man.motion import SweetMoves
 from math import fabs
+from ..util import MyMath
 
 SHOT_AIM_POINT = Location.Location(NogginConstants.FIELD_WIDTH,
                                    NogginConstants.MIDFIELD_Y)
@@ -44,8 +44,12 @@ class KickInformation:
 
         self.kickObjective = None
 
+        self.orbitAngle = 0.0
+
     def getKick(self):
         self.kickObjective = self.getKickObjective()
+        #if self.kickObjective == constants.OBJECTIVE_ORBIT:
+            #return None
         return self.decideKick()
 
     def getKickObjective(self):
@@ -57,6 +61,20 @@ class KickInformation:
 
         if self.sawOwnGoal:
             # kick out of bounds
+            MIN_ORBIT_ANGLE = 60
+
+            if self.myLeftPostBearing is not None and \
+                    self.myRightPostBearing is not None:
+                myPostBearing = min(fabs(self.myLeftPostBearing),
+                                fabs(self.myRightPostBearing))
+            elif self.myLeftPostBearing is not None:
+                myPostBearing = fabs(self.myLeftPostBearing)
+            elif self.myRightPostBearing is not None:
+                myPostBearing = fabs(self.myRightPostBearing)
+            if abs(myPostBearing) < MIN_ORBIT_ANGLE:
+                self.orbitAngle = MyMath.sign(myPostBearing) * \
+                    (180 - fabs(myPostBearing))
+                return constants.OBJECTIVE_ORBIT
             return constants.OBJECTIVE_CLEAR
 
         elif self.sawOppGoal:
@@ -64,7 +82,7 @@ class KickInformation:
 
         # we don't see any goalposts
         else:
-            return constants.OBJECTIVE_CLEAR
+            return constants.OBJECTIVE_ORBIT
 
     def collectData(self, info):
         """
@@ -373,4 +391,3 @@ class KickInformation:
         # use localization for kick
         if self.kickObjective == constants.OBJECTIVE_SHOOT:
             return self.shootBallFar()
-

@@ -50,7 +50,7 @@ class Navigator(FSA.FSA):
         robot will walk to the ball with it centered at his feet.
         if no ball is visible, localization will be usedn
         """
-        self.switchTo('crossoverTowardsBall')
+        self.switchTo('walkSpinToBall')
 
     def kickPosition(self, kick):
         """

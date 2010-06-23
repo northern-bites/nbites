@@ -177,13 +177,32 @@ def trianglePan(tracker):
         if tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw] > 0:
             tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
             tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
-            tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
         else:
             tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
             tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
+
+        if tracker.lastDiffState == 'activeTracking':
+            tracker.helper.panTo(prePanHeads)
+        else:
             tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
 
     elif not tracker.brain.motion.isHeadActive() or \
             tracker.counter > 40:
         return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
+
+def bounceUp(tracker):
+    if tracker.firstFrame():
+        tracker.helper.panTo(HeadMoves.PAN_UP_HEADS)
+    elif not tracker.brain.motion.isHeadActive():
+        return tracker.goLater('bounceDown')
+    return tracker.stay()
+
+def bounceDown(tracker):
+    if tracker.firstFrame():
+        tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
+    elif not tracker.brain.motion.isHeadActive():
+        return tracker.goLater('bounceUp')
+    return tracker.stay()
+
+

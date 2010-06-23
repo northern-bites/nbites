@@ -120,7 +120,7 @@ def pfk_all(nav):
 
     print "hDiff:%g target_y:%g x_diff:%g" % (hDiff, target_y, x_diff)
     print "sTheta:%g sY:%g sX:%g" % (sTheta, sY, sX)
-    helper.setSpeed(nav,sX,sY,sTheta)
+    helper.setSlowSpeed(nav,sX,sY,sTheta)
 
     return nav.stay()
 
@@ -167,7 +167,7 @@ def pfk_xy(nav):
     if (sX == 0.0 and sY == 0.0):
         return nav.goNow('stop')
 
-    helper.setSpeed(nav,sX,sY,0.0)
+    helper.setSlowSpeed(nav,sX,sY,0.0)
 
     return nav.stay()
 
@@ -180,7 +180,7 @@ def pfk_x(nav):
        nav.brain.ball.dist > SAFE_TO_STRAFE_DIST:
         return nav.goNow('pfk_xy')
 
-    helper.setSpeed(nav, -PFK_MIN_X_SPEED, 0.0, 0.0)
+    helper.setSlowSpeed(nav, -PFK_MIN_X_SPEED, 0.0, 0.0)
 
     return nav.stay()
 
@@ -192,8 +192,6 @@ def pfk_final(nav):
     """
 
     ball = nav.brain.ball
-
-    print "ball distance in final: ", ball.dist
 
     (x_offset, y_offset, heading) = nav.kick.getPosition()
 
@@ -208,7 +206,7 @@ def pfk_final(nav):
                          PFK_MAX_X_SPEED)
         sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
 
-    helper.setSpeed(nav,sX, 0.0, 0.0)
+    helper.setSlowSpeed(nav,sX, 0.0, 0.0)
 
     # kicking time!
     if sX == 0.0:
