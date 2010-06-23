@@ -193,8 +193,6 @@ def pfk_final(nav):
 
     ball = nav.brain.ball
 
-    print "ball distance in final: ", ball.dist
-
     (x_offset, y_offset, heading) = nav.kick.getPosition()
 
     x_diff = ball.relX - x_offset
