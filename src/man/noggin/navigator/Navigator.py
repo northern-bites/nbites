@@ -57,7 +57,7 @@ class Navigator(FSA.FSA):
         state to align on the ball once we are near it
         """
         self.kick = kick
-        self.switchTo('pfk_all')
+        self.switchTo('pfk_xy')
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,

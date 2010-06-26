@@ -85,7 +85,7 @@ def decideKick(player):
         player.stopWalking()
         player.brain.tracker.kickDecideScan()
 
-    elif not player.brain.motion.isHeadActive():
+    elif player.counter > 43:
         return player.goLater('positionForKick')
 
     player.brain.kickDecider.kickInfo.collectData(player.brain)

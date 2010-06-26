@@ -188,7 +188,7 @@ def trianglePan(tracker):
 
     elif not tracker.brain.motion.isHeadActive() or \
             tracker.counter > 40:
-        return tracker.goLater(tracker.lastDiffState)
+        return tracker.goLater('tracking')
     return tracker.stay()
 
 def bounceUp(tracker):

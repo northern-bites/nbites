@@ -139,3 +139,8 @@ def getRotScale(headingDiff):
     absHDiff = fabs(headingDiff)
 
     return absHDiff / 90.0
+
+def getCloseRotScale(headingDiff):
+    absHDiff = fabs(headingDiff)
+
+    return absHDiff / 50.0
