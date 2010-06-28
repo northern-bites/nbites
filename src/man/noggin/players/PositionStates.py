@@ -60,7 +60,7 @@ def relocalize(player):
 def afterPenalty(player):
 #Management State
 
-    #Catch in case relocalize is needed after this behavior
+    #Catch in case relocalize is called
     if player.lastDiffState == 'relocalize':
         return player.goLater('gamePlaying')
 
@@ -68,7 +68,7 @@ def afterPenalty(player):
         return player.goLater('penaltyLookRight')
 
     if player.lastDiffState == 'penaltyLookRight':
-        return player.goLater('relocalize')
+        return player.goLater('penaltyRelocalize')
 
     return player.goLater('penaltyLookLeft')
 
@@ -98,8 +98,9 @@ def penaltyLookLeft(player):
             return player.goLater('gamePlaying')
 
         if player.brain.ball.on:
-            #go to it and don't worry about loc
-            return player.goLater('chase')
+            #deal with ball and don't worry about loc
+            player.brain.tracker.trackBall()
+            return player.goLater('gamePlaying')
 
         player.headCount += 1
 
@@ -136,8 +137,9 @@ def penaltyLookRight(player):
             return player.goLater('gamePlaying')
 
         if player.brain.ball.on:
-            #go to it and don't worry about loc
-            return player.goLater('chase')
+            #deal with ball and don't worry about loc
+            player.brain.tracker.trackBall()
+            return player.goLater('gamePlaying')
 
         #increment counter
         player.headCount += 1
@@ -146,5 +148,36 @@ def penaltyLookRight(player):
     if player.headCount > 10:
         #no luck
         return player.goLater(player.lastDiffState)
+
+    return player.stay()
+
+def penaltyRelocalize(player):
+    if player.firstFrame():
+        player.setWalk(10 , 0, 0)
+
+    if player.brain.ball.on:
+        player.brain.tracker.trackBall()
+        return player.goLater('gamePlaying')
+
+    if player.brain.my.locScore == NogginConstants.GOOD_LOC or \
+            player.brain.my.locScore == NogginConstants.OK_LOC:
+        player.shouldRelocalizeCounter += 1
+
+        if player.shouldRelocalizeCounter > 30:
+            player.shouldRelocalizeCounter = 0
+            return player.goLater('gamePlaying')
+
+    else:
+        player.shouldRelocalizeCounter = 0
+
+    if not player.brain.motion.isHeadActive():
+        player.brain.tracker.locPans()
+
+    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
+        direction = MyMath.sign(player.getWalk()[2])
+        if direction == 0:
+            direction = 1
+
+        player.setWalk(0 , 0, constants.RELOC_SPIN_SPEED * direction)
 
     return player.stay()
