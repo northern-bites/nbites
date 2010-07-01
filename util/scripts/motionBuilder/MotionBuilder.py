@@ -1,5 +1,5 @@
 #needed to grab Matrix.py in other folder
-manDir = "../../../../branches/nao_robocup/controllers/nao_soccer_player_red"
+manDir = "../../../../branches/robotstadium/controllers/nao_team_1"
 import sys
 sys.path.append(manDir)
 import Motion.MotionConstants
