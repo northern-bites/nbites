@@ -19,7 +19,7 @@ if [ "$WEBOTS" = "" ]; then
     WEBOTS="OFF"
 fi
 
-NAO_CONTROLLER=projects/contests/nao_robocup/controllers/nao_soccer_player_red
+NAO_CONTROLLER=projects/contests/robotstadium/controllers/nao_team_1
 
 if [ $WEBOTS = "ON" ]; then
 echo "Setting local install to WEBOT"
