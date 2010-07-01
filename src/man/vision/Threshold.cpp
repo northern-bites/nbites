@@ -83,8 +83,8 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     initTable("/home/nao/naoqi/etc/table.mtb");
 # elif defined WEBOTS_BACKEND
     initTable(string(string(getenv("WEBOTS_HOME"))+
-                     "/projects/contests/nao_robocup/" +
-                     "controllers/nao_soccer_player_red/etc/table.mtb"));
+                     "/projects/contests/robotstadium/" +
+                     "controllers/nao_team_1/etc/table.mtb"));
 
 # endif
 

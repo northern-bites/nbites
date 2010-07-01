@@ -548,7 +548,7 @@ void Noggin::modifySysPath ()
 #  ifdef WEBOTS_BACKEND
      const string test = std::string(getenv("WEBOTS_HOME")) +
          std::string("/projects/contests") +
-         std::string("/nao_robocup/controllers/nao_soccer_player_red/lib");
+         std::string("/robotstadium/controllers/nao_team_1/lib");
      const char *cwd = test.c_str();
 #  else //WEBOTS
 #    if defined OFFLINE || defined STRAIGHT
