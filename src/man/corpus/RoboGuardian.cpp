@@ -51,7 +51,7 @@ static const boost::shared_ptr<UnfreezeCommand> ENABLE_GAINS =
 
 //Non blocking!!
 void RoboGuardian::playFile(string str)const{
-    int result = system((sout+str+" &").c_str()); // system returns an int. 
+    system((sout+str+" &").c_str()); // system returns an int. 
 }
 
 
@@ -66,8 +66,8 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       leftFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
       rightFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
       // buttonOnCounter(0),buttonOffCounter(0),
-//       lastButtonOnCounter(0),lastButtonOffCounter(0),
-//       buttonClicks(0),
+      //       lastButtonOnCounter(0),lastButtonOffCounter(0),
+      //       buttonClicks(0),
       lastInertial(sensors->getInertial()), fallingFrames(0),
       notFallingFrames(0),fallenCounter(0),
       registeredFalling(false),registeredShutdown(false),
@@ -209,9 +209,9 @@ void RoboGuardian::checkFalling(){
         fallingFrames = 0;
         notFallingFrames +=1;
     }
-//     cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
-//          << "  fallingFrames is " << fallingFrames 
-//          << " and critical angle is "<< falling_critical_angle<< endl;
+    //     cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
+    //          << "  fallingFrames is " << fallingFrames 
+    //          << " and critical angle is "<< falling_critical_angle<< endl;
 
     //If the robot has been falling for a while, and the robot is inclined
     //already at a 45 degree angle, than we know we are falling
@@ -235,17 +235,17 @@ void RoboGuardian::processFallingProtection(){
         registeredFalling = false;
     }
 
-//     if(fallingFrames == FALLING_FRAMES_THRESH && falling_critical_angle){
-//         if(useFallProtection){
-//             shutoffGains();
-//             cout << "Disabling Gains!!! due to falling" <<endl;
-//         }
-// #define DEBUG_GUARDIAN_FALLING
-// #ifdef DEBUG_GUARDIAN_FALLING
-//         cout << Thread::name <<": OH NO! I think I'm falling" <<endl;
-//         playFile(falling_wav);
-// #endif
-//     }
+    //     if(fallingFrames == FALLING_FRAMES_THRESH && falling_critical_angle){
+    //         if(useFallProtection){
+    //             shutoffGains();
+    //             cout << "Disabling Gains!!! due to falling" <<endl;
+    //         }
+    // #define DEBUG_GUARDIAN_FALLING
+    // #ifdef DEBUG_GUARDIAN_FALLING
+    //         cout << Thread::name <<": OH NO! I think I'm falling" <<endl;
+    //         playFile(falling_wav);
+    // #endif
+    //     }
 }
 
 // We print each time the battery looses ten percent of charge
@@ -260,7 +260,7 @@ void RoboGuardian::checkBatteryLevels(){
     if(newBatteryCharge < 0 || newBatteryCharge > 1.0){
 #ifdef GUARDIAN_DEBUG_BATTERY
         cout<< Thread::name<<": Got bad battery charge of "<< newBatteryCharge
-        <<endl;
+            <<endl;
 #endif
         return;
     }
@@ -271,7 +271,7 @@ void RoboGuardian::checkBatteryLevels(){
         const float newLevel = floor(newBatteryCharge*10.0f);
         const float oldLevel = floor(lastBatteryCharge*10.0f);
         if(oldLevel != newLevel && oldLevel > newLevel &&
-            oldLevel - newLevel <= 1.0f){
+           oldLevel - newLevel <= 1.0f){
             cout << Thread::name << ": Battery charge is now at "
                  << 10.0f * newBatteryCharge
                  << " (was "<<oldLevel<<")"<<endl;
@@ -331,8 +331,8 @@ void RoboGuardian::processChestButtonPushes(){
     if(chestButton->getClickLength() == 0.0f ){
         registeredShutdown  = false;
     }else if(chestButton->getClickLength() > SHUTDOWN_THRESH &&
-        !registeredShutdown){
-       registeredShutdown = true;
+             !registeredShutdown){
+        registeredShutdown = true;
         executeShutdownAction();
     }
 
@@ -363,7 +363,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         enableGains();
         break;
     case 7:
-		ifUpDown();
+        ifUpDown();
         break;
     case 9:
         //Easter EGG!
@@ -389,7 +389,7 @@ void RoboGuardian::executeFallProtection(){
 #endif
 }
 
-    //     if(fallingFrames == FALLING_FRAMES_THRESH && falling_critical_angle){
+//     if(fallingFrames == FALLING_FRAMES_THRESH && falling_critical_angle){
 //         if(useFallProtection){
 //             shutoffGains();
 //             cout << "Disabling Gains!!! due to falling" <<endl;
@@ -403,14 +403,14 @@ void RoboGuardian::executeFallProtection(){
 
 
 void RoboGuardian::executeStartupAction() const{
-//Blank for now
+    //Blank for now
 
 }
 
 void RoboGuardian::executeShutdownAction()const {
     cout << Thread::name<<" is shutting down the robot NOW!!!"<<endl;
     playFile(shutdown_wav);
-    int result = system("shutdown -h now &");
+    system("shutdown -h now &");
 }
 
 string RoboGuardian::getHostName()const {
@@ -421,12 +421,12 @@ string RoboGuardian::getHostName()const {
 }
 
 const string RoboGuardian::discoverIP() const{
-	// try ...|awk '{print $1 " " $2}' and grep -v inet6
-    int result = system("ifconfig|grep 'inet'|cut -d':' -f2|awk '{print $1}'|grep -v 127.0.0.1 > /tmp/ip.txt");
+    // try ...|awk '{print $1 " " $2}' and grep -v inet6
+    system("ifconfig|grep 'inet'|cut -d':' -f2|awk '{print $1}'|grep -v 127.0.0.1 > /tmp/ip.txt");
     char ip[100];
     FILE * ipf = fopen("/tmp/ip.txt","r");
     if(ipf != NULL){
-        int fscanfResult = fscanf(ipf,"%s\n",ip);
+        fscanf(ipf,"%s\n",ip);
         return ip;
         fclose(ipf);
     }else{
@@ -461,7 +461,7 @@ void RoboGuardian::speakIPAddress()const {
          << " my internet address is "
          <<IP<<endl;
 
-    int result = system(speech_command.c_str());
+    system(speech_command.c_str());
 }
 
 
@@ -488,7 +488,7 @@ void RoboGuardian::checkConnection(){
         if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
             cout    << "No connection detected, trying to reconnect interfaces, attempt "
                     << wifiReconnectTimeout << endl;
-			ifUpDown();
+            ifUpDown();
             wifiReconnectTimeout++;
         }
     }
@@ -498,7 +498,7 @@ bool RoboGuardian::checkWired(){
     FILE * f1 = popen("connman services | awk '/Wired/ {print $1}'", "r");
     char status[3] = "";
     fscanf(f1,"%s\n",status);
-    fclose(f1);
+    pclose(f1);
     if(status[0] == '*') {
         cout<<"wired "<<status<<endl;
         return true;
@@ -511,7 +511,7 @@ bool RoboGuardian::checkWireless(){
     FILE * f2 = popen("connman services | awk '/NBITES/ {print $1}'", "r");
     char status[3] = "";
     fscanf(f2,"%s\n",status);
-    fclose(f2);
+    pclose(f2);
     if (status[0] == '*') {
         cout<<"wireless"<<endl;
         return true;
@@ -525,8 +525,8 @@ void RoboGuardian::reconnectWifiConnection(){
     playFile(wifi_restart_wav);
     FILE * f3 = popen("connman services | awk '/NBITES/ {print $4}'", "r");
     char service[100] = "";
-    int fscanfResult = fscanf(f3,"%s\n", service);
-    fclose(f3);
+    fscanf(f3,"%s\n", service);
+    pclose(f3);
 
     if (service[0] != ' ') {
         char command[100] = "connman connect ";
@@ -538,10 +538,10 @@ void RoboGuardian::reconnectWifiConnection(){
 }
 
 void RoboGuardian::ifUpDown(){
-	char ifdown[] = "su -c 'ifdown wlan0'";
-	char ifup[] = "su -c 'ifup wlan0'&";
-	cout << "RoboGuardian::ifUpDown() -- reconnecting interfaces\n";
-	playFile(wifi_restart_wav);
-	system(ifdown);
-	system(ifup);
+    char ifdown[] = "su -c 'ifdown wlan0'";
+    char ifup[] = "su -c 'ifup wlan0'&";
+    cout << "RoboGuardian::ifUpDown() -- reconnecting interfaces\n";
+    playFile(wifi_restart_wav);
+    system(ifdown);
+    system(ifup);
 }
