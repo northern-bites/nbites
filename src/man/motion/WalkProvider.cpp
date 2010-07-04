@@ -30,7 +30,7 @@ using namespace Kinematics;
 //#define DEBUG_WALKPROVIDER
 
 WalkProvider::WalkProvider(shared_ptr<Sensors> s,
-						   shared_ptr<Profiler> p)
+                           shared_ptr<Profiler> p)
     : MotionProvider(WALK_PROVIDER, p),
       sensors(s),
       metaGait(),
@@ -65,7 +65,7 @@ void WalkProvider::hardReset(){
 }
 
 void WalkProvider::calculateNextJointsAndStiffnesses() {
-	PROF_ENTER(profiler,P_WALK);
+    PROF_ENTER(profiler,P_WALK);
 
 #ifdef DEBUG_WALKPROVIDER
     cout << "WalkProvider::calculateNextJointsAndStiffnesses()"<<endl;
@@ -110,9 +110,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     stepGenerator.tick_controller();
 
     // Now ask the step generator to get the leg angles
-	PROF_ENTER(profiler,P_TICKLEGS);
+    PROF_ENTER(profiler,P_TICKLEGS);
     WalkLegsTuple legs_result = stepGenerator.tick_legs();
-	PROF_EXIT(profiler,P_TICKLEGS);
+    PROF_EXIT(profiler,P_TICKLEGS);
 
     //Finally, ask the step generator for the arm angles
     WalkArmsTuple arms_result = stepGenerator.tick_arms();
@@ -144,15 +144,14 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);
-	PROF_EXIT(profiler,P_WALK);
+    PROF_EXIT(profiler,P_WALK);
 }
 
 void WalkProvider::setCommand(const WalkCommand * command){
     //grab the velocities in mm/second rad/second from WalkCommand
     pthread_mutex_lock(&walk_provider_mutex);
-    if(nextCommand)
-        delete nextCommand;
-    nextCommand =command;
+    delete nextCommand;
+    nextCommand = command;
     pendingCommands = true;
 
     setActive();
@@ -191,13 +190,10 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     pendingStartGaitCommands = true;
 
     float max_change = -M_PI_FLOAT*10.0f;
-    int max_index = -1;
-    for(unsigned int i = 0; i < gaitJoints->size(); i++){
 
-        if (max_change < abs(gaitJoints->at(i) - curJoints.at(i+HEAD_JOINTS)))
-            max_index = i;
+    for(unsigned int i = 0; i < gaitJoints->size(); i++){
         max_change = max(max_change,
-						 fabs(gaitJoints->at(i) - curJoints.at(i+HEAD_JOINTS)));
+                         fabs(gaitJoints->at(i) - curJoints.at(i+HEAD_JOINTS)));
     }
 
     // this is the max we allow, not the max the hardware can do
@@ -206,8 +202,9 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
 
     vector<BodyJointCommand *> commands;
 
-    if(time <= MOTION_FRAME_LENGTH_S)
+    if(time <= MOTION_FRAME_LENGTH_S){
         return commands;
+    }
 
     //larm: (0.,90.,0.,0.)
     //rarm: (0.,-90.,0.,0.)
@@ -219,18 +216,18 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     vector<float> * safe_rarm =new vector<float>(rarm_angles,
                                                  &rarm_angles[ARM_JOINTS]);
 
-	// HACK @joho get gait stiffness params. nextGait->maxStiffness
-	vector<float> * stiffness = new vector<float>(Kinematics::NUM_JOINTS,
-												  0.85f);
-	vector<float> * stiffness2 = new vector<float>(Kinematics::NUM_JOINTS,
-												  0.85f);
+    // HACK @joho get gait stiffness params. nextGait->maxStiffness
+    vector<float> * stiffness = new vector<float>(Kinematics::NUM_JOINTS,
+                                                  0.85f);
+    vector<float> * stiffness2 = new vector<float>(Kinematics::NUM_JOINTS,
+                                                   0.85f);
 
     commands.push_back(new BodyJointCommand(0.5f,safe_larm,NULL,NULL,safe_rarm,
-											stiffness,
+                                            stiffness,
                                             Kinematics::INTERPOLATION_SMOOTH));
 
     commands.push_back(new BodyJointCommand(time,gaitJoints,
-											stiffness2,
+                                            stiffness2,
                                             Kinematics::INTERPOLATION_SMOOTH));
     pthread_mutex_unlock(&walk_provider_mutex);
     return commands;

@@ -9,14 +9,14 @@ AbstractGait::~AbstractGait(){}
 
 
 void AbstractGait::setGaitFromArrays(
-    const float _stance[WP::LEN_STANCE_CONFIG],
-    const float _step[WP::LEN_STEP_CONFIG],
-    const float _zmp[WP::LEN_ZMP_CONFIG],
-    const float _hack[WP::LEN_HACK_CONFIG],
-    const float _sensor[WP::LEN_SENSOR_CONFIG],
-    const float _stiffness[WP::LEN_STIFF_CONFIG],
-    const float _odo[WP::LEN_ODO_CONFIG],
-    const float _arm[WP::LEN_ARM_CONFIG]){
+                                     const float _stance[WP::LEN_STANCE_CONFIG],
+                                     const float _step[WP::LEN_STEP_CONFIG],
+                                     const float _zmp[WP::LEN_ZMP_CONFIG],
+                                     const float _hack[WP::LEN_HACK_CONFIG],
+                                     const float _sensor[WP::LEN_SENSOR_CONFIG],
+                                     const float _stiffness[WP::LEN_STIFF_CONFIG],
+                                     const float _odo[WP::LEN_ODO_CONFIG],
+                                     const float _arm[WP::LEN_ARM_CONFIG]){
     memcpy(stance,_stance,WP::LEN_STANCE_CONFIG*sizeof(float));
     memcpy(step,_step,WP::LEN_STEP_CONFIG*sizeof(float));
     memcpy(zmp,_zmp,WP::LEN_ZMP_CONFIG*sizeof(float));
@@ -43,8 +43,8 @@ void AbstractGait::setGaitFromGait(const AbstractGait &other){
 
 template<const unsigned int length>
 void AbstractGait::addSubComponent(float target[length],
-                     const float array1[length],
-                     const float array2[length]){
+                                   const float array1[length],
+                                   const float array2[length]){
     for(unsigned int i =0; i < length; i++){
         target[i] = array1[i] + array2[i];
     }
@@ -104,9 +104,9 @@ void AbstractGait::interpolateGaits(AbstractGait &targetGait,
 
 template<const unsigned int length>
 void AbstractGait::combineSubComponents(float target[length],
-                                    const float source1[length],
-                                    const float source2[length],
-                                    const float percentSwitched){
+                                        const float source1[length],
+                                        const float source2[length],
+                                        const float percentSwitched){
     float temp1[length];
     float temp2[length];
 
