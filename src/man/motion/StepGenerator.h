@@ -120,7 +120,7 @@ public:
     WalkLegsTuple tick_legs();
     WalkArmsTuple tick_arms();
 
-    bool isDone() { return done; }
+    bool isDone() const { return done; }
 
     void setSpeed(const float _x, const float _y, const float _theta);
     void takeSteps(const float _x, const float _y, const float _theta,
@@ -142,7 +142,7 @@ private: // Helper methods
     void generate_steps();
 
     void findSensorZMP();
-    float scaleSensors(const float sensorZMP, const float perfectZMP);
+    float scaleSensors(const float sensorZMP, const float perfectZMP) const;
 
     void swapSupportLegs();
 
