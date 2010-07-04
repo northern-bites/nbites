@@ -37,8 +37,8 @@ public:
     /* interface functions for RoboCupGameControlData
        use these for on demand information rather than waiting
        for the updates */
-    const TeamInfo* getMyTeam() { return myTeam; }
-    const RoboCupGameControlData& getGameData() { return controlData; }
+    const TeamInfo* getMyTeam() const { return myTeam; }
+    const RoboCupGameControlData& getGameData() const { return controlData; }
 
     void handle_packet(const char *msg, int len);
     bool shouldResetTimer();
@@ -56,7 +56,7 @@ public:
     const uint16 penalties(uint16 player);
     const uint16 penaltySeconds();
     const uint16 penaltySeconds(uint16 player);
-    const bool isManuallyPenalized(void);
+    const bool isManuallyPenalized(void) const;
     void setTeam(uint8 team);
     void setColor(uint8 color);
     void setPlayer(uint16 player);
@@ -69,7 +69,7 @@ public:
     void toggleTeamColor();
     void toggleKickoff();
     void manualPenalize(bool penalize);
-    bool shouldSendManualPenalty();
+    bool shouldSendManualPenalty() const;
     void sentManualPenalty();
 
 private:
