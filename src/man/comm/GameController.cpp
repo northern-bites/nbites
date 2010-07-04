@@ -357,7 +357,7 @@ void GameController::manualPenalize(bool penalize)
     manuallyPenalized = penalize;
 }
 
-bool GameController::shouldSendManualPenalty()
+bool GameController::shouldSendManualPenalty() const
 {
     return justManuallyPenalized;
 }
@@ -367,7 +367,7 @@ void GameController::sentManualPenalty()
     justManuallyPenalized = false;
 }
 
-const bool GameController::isManuallyPenalized(void)
+const bool GameController::isManuallyPenalized(void) const
 {
     return manuallyPenalized;
 }
