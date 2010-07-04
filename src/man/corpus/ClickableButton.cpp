@@ -45,8 +45,6 @@ void ClickableButton::setNumClicks(int _numClicks){
 }
 
 void ClickableButton::updateFrame(float buttonValue){
-    bool push_done =false;
-    bool unpush_done = false;
 
     if(buttonValue == PUSHED){
 
@@ -75,10 +73,10 @@ void ClickableButton::updateFrame(float buttonValue){
         cout << "Registered a click, waiting to see if there are more"<<endl;
 #endif
         registeredClickThisTime = true;
-   }
+    }
 
     if( buttonOffCounter > SINGLE_CLICK_INACTIVE_MAX &&
-         buttonClicks > 0){
+        buttonClicks > 0){
 #ifdef DEBUG_GUARDIAN_CLICKS
         cout << "Processing " <<buttonClicks <<" clicks"<<endl;
 #endif
