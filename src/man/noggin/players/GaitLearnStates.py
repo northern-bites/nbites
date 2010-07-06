@@ -40,85 +40,23 @@ if WEBOTS_ACTIVE:
 else:
     print "Webots is in-active!!!!"
 
-def switchgaits1(player):
-    if player.firstFrame():
-        player.setSpeed(6,-4,0)
-
-    if player.counter == 140:
-        return player.goLater('switchgaits2')
-    return player.stay()
-
-def switchgaits2(player):
-    if player.firstFrame():
-        player.setSpeed(10,-10,0)
-
-    if player.counter == 240:
-        return player.goLater('switchgaits3')
-    return player.stay()
-
-def walkleft(player):
-    if player.firstFrame():
-        player.setSpeed(0,4,0)
-
-    if player.counter == 100:
-        return player.goLater('turnright')
-    return player.stay()
-
-def walkright(player):
-    if player.firstFrame():
-        player.setSpeed(0,-4,0)
-
-    if player.counter == 100:
-        return player.goLater('walkleft')
-    return player.stay()
-
-def walktest(player):
-    if player.firstFrame():
-        player.setSpeed(4,0,0)
-
-    if player.counter  == 100:
-        player.brain.motion.resetWalk()
-        #player.executeMove(SweetMoves.ZERO_POS)
-
-    if player.counter == 200:
-        player.setSpeed(4,0,0)
-
-    if player.counter == 300:
-        return player.goLater('stopwalking')
-
-    return player.stay()
-
-def walkstraight(player):
-    if player.firstFrame():
-        player.setWalk(6,0,0)
-
-    if player.counter == 400:
-        return player.goLater('walkfast')
-    return player.stay()
-
-def walkfast(player):
-    if player.firstFrame():
-        player.setSpeed(10,0,0)
-
-    if player.counter == 400:
-        return player.goLater('walkright')
-    return player.stay()
-
 def walkstraightstop(player):
     if player.firstFrame():
         player.setSpeed(7,0,0)
 
     if player.counter == 400:
         # stability is number of frames we stood plus accX/Y stats (higher is better)
-        stability = player.counter # + something involving avgX/Y
+        frames_stood = player.counter
+
+        stability = frames_stood
 
         swarm.getCurrParticle().setStability(stability)
         swarm.tickCurrParticle()
 
         return player.goLater('stopandchangegait')
 
-    # collect inertial data every 10 frames
-    if player.counter % 10 == 0:
+    # collect inertial data every 5 frames
+    if player.counter % 5 == 0:
         accX = player.brain.sensors.inertial.accX
         accY = player.brain.sensors.inertial.accY
         accZ = player.brain.sensors.inertial.accZ
@@ -133,30 +71,6 @@ def walkstraightstop(player):
             return player.goLater('standuplearn')
 
     return player.stay()
-
-def walkturnstop(player):
-    if player.firstFrame():
-        player.setSpeed(0.0,0,10)
-
-    if player.counter == 500:
-        return player.goLater('stopwalking')
-    return player.stay()
-
-def turnleft(player):
-    if player.firstFrame():
-        player.setSpeed(0,0,15)
-
-    if player.counter == 180:
-        return player.goLater('stopwalking')
-    return player.stay()
-
-def turnright(player):
-    if player.firstFrame():
-        player.setSpeed(0,0,-15)
-    if player.counter == 180:
-        return player.goLater('turnleft')
-    return player.stay()
-
 
 def stopwalking(player):
     ''' Do nothing'''
@@ -192,7 +106,7 @@ def stopandchangegait(player):
         #for tuple in gaitTuple:
         #    print tuple
 
-    if player.counter == 50:
+    if player.counter == 30:
         return player.goLater('walkstraightstop')
 
     return player.stay()
@@ -223,25 +137,6 @@ def shutoffgains(player):
         player.brain.motion.sendStiffness(shutoff)
 
     return player.goLater('nothing')
-
-
-def odotune(player):
-    if player.firstFrame():
-        player.brain.loc.reset()
-        player.setSpeed(6.0,0,10)
-
-    if player.counter == 400:
-        return player.goLater('odostop')
-    return player.stay()
-
-def odostop(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.SIT_POS)
-
-    elif not  player.brain.motion.isBodyActive():
-        return player.goLater("printloc")
-
-    return player.stay()
 
 def printloc(player):
     if player.firstFrame():
