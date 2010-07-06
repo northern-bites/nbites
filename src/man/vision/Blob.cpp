@@ -24,7 +24,7 @@
  * as necessary.  Sometimes we calculate height and width, but it
  * is important to note that in these circumstances we do not
  * attempt to account for the the orientation of the blob.
-*/
+ */
 
 #include <iostream>
 #include "Blob.h"
@@ -32,31 +32,31 @@
 using namespace std;
 
 Blob::Blob() {
-	init();
+    init();
 }
 
 void Blob::init() {
-	setLeftTopX(0);
-	setLeftTopY(0);
-	setRightTopX(0);
-	setRightTopY(0);
-	setLeftBottomX(0);
-	setLeftBottomY(0);
-	setRightBottomX(0);
-	setRightBottomY(0);
-	setArea(0);
-	setPixels(0);
+    setLeftTopX(0);
+    setLeftTopY(0);
+    setRightTopX(0);
+    setRightTopY(0);
+    setLeftBottomX(0);
+    setLeftBottomY(0);
+    setRightBottomX(0);
+    setRightBottomY(0);
+    setArea(0);
+    setPixels(0);
 }
 
-int Blob::getArea() {
+int Blob::getArea() const{
     return width() * height();
 }
 
-int Blob::width() {
+int Blob::width() const{
     return rightTop.x - leftTop.x + 1;
 }
 
-int Blob::height() {
+int Blob::height() const{
     return leftBottom.y - leftTop.y + 1;
 }
 
@@ -77,7 +77,7 @@ void Blob::merge(Blob other) {
 
 /* Print debugging information for a blob.
  */
-void Blob::printBlob() {
+void Blob::printBlob() const {
 #if defined OFFLINE
     cout << "Outputting blob" << endl;
     cout << leftTop.x << " " << leftTop.y << " " << rightTop.x << " "

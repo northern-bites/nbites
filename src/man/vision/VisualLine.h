@@ -23,23 +23,23 @@ struct linePoint {
     int y; // y coordinate on the image screen
     float lineWidth; // the width of the line where the point was found
     float distance; // The distance pose estimates the point to be from robot's
-	float bearing;
+    float bearing;
 
     // center
     ScanDirection foundWithScan;
 
     linePoint (int _x = 0, int _y = 0, float _lineWidth = 0.0,
                float _distance = 0.0,
-			   float _bearing = 0.0,
+               float _bearing = 0.0,
                ScanDirection _scanFound = VERTICAL) :
-        x(_x), y(_y), lineWidth(_lineWidth),
+    x(_x), y(_y), lineWidth(_lineWidth),
         distance(_distance), bearing(_bearing), foundWithScan(_scanFound) {
     }
 
-    linePoint(const linePoint& l) : x(l.x), y(l.y), lineWidth(l.lineWidth),
-                                    distance(l.distance), bearing(l.bearing),
-                                    foundWithScan(l.foundWithScan) {
-    }
+linePoint(const linePoint& l) : x(l.x), y(l.y), lineWidth(l.lineWidth),
+        distance(l.distance), bearing(l.bearing),
+        foundWithScan(l.foundWithScan) {
+}
 
     // define one line point as less than another if its x coord is less than
     // the other.  Otherwise, break the tie by comparing y values
@@ -51,12 +51,12 @@ struct linePoint {
     }
     bool operator== (const linePoint &secondLinePoint) const {
         return
-            x == secondLinePoint.x &&
-            y == secondLinePoint.y &&
-            lineWidth == secondLinePoint.lineWidth &&
-            distance == secondLinePoint.distance &&
-			bearing == secondLinePoint.bearing &&
-            foundWithScan == secondLinePoint.foundWithScan;
+        x == secondLinePoint.x &&
+        y == secondLinePoint.y &&
+        lineWidth == secondLinePoint.lineWidth &&
+        distance == secondLinePoint.distance &&
+        bearing == secondLinePoint.bearing &&
+        foundWithScan == secondLinePoint.foundWithScan;
     }
     bool operator!= (const linePoint &secondLinePoint) const {
         return !(*this == secondLinePoint);
@@ -65,13 +65,13 @@ struct linePoint {
 
     //  http://www.daniweb.com/forums/thread69005.html
     friend std::ostream& operator<< (std::ostream &o, const linePoint &c)
-        {
-            return o << "(" << c.x << "," << c.y << "), width: " << c.lineWidth;
-        }
+    {
+        return o << "(" << c.x << "," << c.y << "), width: " << c.lineWidth;
+    }
 };
 
 class YOrder {
-public:
+ public:
     const bool operator() (const linePoint& first, const linePoint& second) const;
 };
 
@@ -80,15 +80,15 @@ public:
 #include "Utility.h"
 
 class VisualLine : public VisualLandmark<lineID> {
-public: // Constants
+ public: // Constants
     // number of points to be a valid line
     static const unsigned int NUM_POINTS_TO_BE_VALID_LINE = 3;
 
-public:
+ public:
     VisualLine(std::list<std::list<linePoint>::iterator> &listOfIterators);
     VisualLine(std::list<linePoint> &listOfPoints);
     VisualLine();
-	VisualLine(float _dist, float _bearing);
+    VisualLine(float _dist, float _bearing);
     VisualLine(const VisualLine& other);
     ~VisualLine();
 
@@ -99,9 +99,9 @@ public:
     static const linePoint DUMMY_LINEPOINT;
 
     // Returns true if the line is more vertical on the screen than horizontal
-	const bool isVerticallyOriented() const;
+    const bool isVerticallyOriented() const;
 
-	const bool isPerfectlyVertical() const;
+    const bool isPerfectlyVertical() const;
 
     // Given a line, returns (a, b) where the line can be represented by
     // ai + bj (i being the unit vector parallel to the x axis, j being
@@ -117,7 +117,7 @@ public:
     // Define equality to be if the endpoints of the line are the same
     bool operator== (const VisualLine &secondLine) const {
         return start.x == secondLine.start.x && start.y == secondLine.start.y &&
-            end.x == secondLine.end.x && end.y == secondLine.end.y;
+        end.x == secondLine.end.x && end.y == secondLine.end.y;
     }
     // Prints out the endpoints of the line
     friend std::ostream& operator<< (std::ostream &o, const VisualLine &l)
@@ -131,11 +131,11 @@ public:
             */
         }
 
-private: // Member functions
+ private: // Member functions
     void init();
     void calculateWidths();
-	const float calculateAngle() const;
-	const float calculateLength() const;
+    const float calculateAngle() const;
+    const float calculateLength() const;
 
     // Use least squares to fit the line to the points
     // from http://www.efunda.com/math/leastsquares/lstsqr1dcurve.cfm
@@ -156,7 +156,7 @@ private: // Member functions
     }
 
 
-private:                        // Member variables
+ private:                        // Member variables
     point <int> start, end;
     // left, right x values, bottom, top y values
     int leftBound, rightBound, bottomBound, topBound;
@@ -179,7 +179,7 @@ private:                        // Member variables
     bool ccLine;                // Is this line part of the center circle?
     std::list <const ConcreteLine*> possibleLines; // Possible ConcreteLines
 
-public:
+ public:
     // Getters
     inline const bool getCCLine() const;
 
