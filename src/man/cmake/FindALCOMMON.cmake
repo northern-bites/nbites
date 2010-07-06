@@ -6,16 +6,13 @@ SET( ALCOMMON_DEFINITIONS "" )
 
 INCLUDE( "${CMAKE_MODULE_PATH}/base_definitions.cmake" )
 IF(WEBOTS_BACKEND)
-  SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/extern/c/aldebaran/alcommon/include
-    ${AL_DIR}/extern/c/aldebaran/alcommon/interface
-    ${AL_DIR}/extern/c/aldebaran/alcommon/soap
-    ${AL_DIR}/modules/proxies
+  SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include/alcommon
+    ${AL_DIR}/lib
+    ${AL_DIR}/include/alproxies
     )
 ELSE(WEBOTS_BACKEND)
   IF(OE_CROSS_BUILD)
   SET( ALCOMMON_INCLUDE_DIR ${OE_SYSROOT}/usr/include/alcommon/include
-    ${OE_SYSROOT}/usr/include/alcommon/interface
-    ${OE_SYSROOT}/usr/include/alcommon/soap
     ${OE_SYSROOT}/usr/include/alproxies
     ${OE_SYSROOT}/usr/include/alcommon
     ${OE_SYSROOT}/usr/include/alcore
@@ -27,8 +24,6 @@ ELSE(WEBOTS_BACKEND)
     )
   ELSE(OE_CROSS_BUILD)
   SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include/alcommon/include
-    ${AL_DIR}/include/alcommon/interface
-    ${AL_DIR}/include/alcommon/soap
     ${AL_DIR}/include/alproxies
     ${AL_DIR}/include/alcommon
     ${AL_DIR}/include/alcore
@@ -49,19 +44,13 @@ ENDIF(WEBOTS_BACKEND)
         SET( ALCOMMON_LIBRARIES ${AL_DIR}/lib/alcommon.lib)
       ELSE( WIN32 )
         IF (APPLE)
-            IF(WEBOTS_BACKEND)
-                SET( ALCOMMON_LIBRARIES
-                  ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/libalcommon.a
-                  )
-            ELSE(WEBOTS_BACKEND)
-                SET( ALCOMMON_LIBRARIES
-              ${AL_DIR}/lib/libalcommon.a
-              )
-            ENDIF(WEBOTS_BACKEND)
+          SET( ALCOMMON_LIBRARIES
+            ${AL_DIR}/lib/libalcommon.a
+            )
         ELSE(APPLE)
             IF(WEBOTS_BACKEND)
                 SET( ALCOMMON_LIBRARIES
-                  ${AL_DIR}/extern/c/aldebaran/alcommon/lib/${TARGET_ARCH}/libalcommon.a
+                  ${AL_DIR}/lib/libalcommon.a
                   )
             ELSE(WEBOTS_BACKEND)
                 SET( ALCOMMON_LIBRARIES
