@@ -67,8 +67,11 @@ cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME
 echo "rsync -rcLv $SRC $DEST/"
 rsync -rcLv $SRC $DEST/
 
-ETC_SRC=${MAN_INSTALL_PREFIX}/etc/*
-ETC_DEST=$DEST/../../etc
-rsync -rcLv $ETC_SRC $ETC_DEST/
-#echo "scp -rv $SRC $DEST/"
-#scp -r $SRC $DEST/
+
+if [  $WEBOTS = "OFF" ] ; then
+    ETC_SRC=${MAN_INSTALL_PREFIX}/etc/*
+    ETC_DEST=$DEST/../../etc
+    echo "rsync -rcLv $ETC_SRC $ETC_DEST"
+    rsync -rcLv $ETC_SRC $ETC_DEST/
+fi
+
