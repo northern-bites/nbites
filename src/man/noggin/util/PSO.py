@@ -22,7 +22,8 @@
 #       will search through an N-dimensional space
 
 import random
-import math
+from math import fabs
+import MyMath
 
 DEBUG = False
 
@@ -33,6 +34,7 @@ SOC = 1.4
 
 # particle motion may not exceed abs(V_CAP) in any tick
 VELOCITY_CAP = 2
+VELOCITY_MINIMUM_MAGNITUDE = 0.001
 
 class Particle:
     def __init__(self, nSpace, searchMins, searchMaxs):
@@ -58,9 +60,6 @@ class Particle:
         self.stability = 0
 
     def tick(self, gBest, gBest_vars):
-        # wait for the motion system to try gait parameters
-        # self.stability = self.getStability()
-
         # Update local best and its fitness
         if self.stability > self.pBest:
             self.pBest = self.stability
@@ -74,43 +73,48 @@ class Particle:
             self.gBest = self.stability
             self.gBest_vars = self.getPosition()
 
-        # Update the particle velocity :
-        # Random component to avoid local minima
-        self.R1 = random.random()
-        self.R2 = random.random()
-
-        # Apply velocities to positions
-        # make sure to stay in bound of (searchMins[i], searchMaxs[i])
-        for i in range(0, self.dimension):
-            # if mins[i] == maxs[i] then ignore, it's a placeholder variable
-            if self.searchMins[i] == self.searchMaxs[i]:
-                continue
-
-            self.curr_velocity[i] = self.INERTIAL*self.curr_velocity[i] \
-                + self.R1*COG*(self.pBest_vars[i] - self.curr_position[i]) \
-                + self.R2*SOC*(self.gBest_vars[i] - self.curr_position[i])
-
-            if self.curr_velocity[i] > VELOCITY_CAP:
-                self.curr_velocity[i] = VELOCITY_CAP
-            elif self.curr_velocity[i] < -VELOCITY_CAP:
-                self.curr_velocity[i] = -VELOCITY_CAP
-
-            new_position = self.curr_position[i] + self.curr_velocity[i]
-
-            if new_position > self.searchMaxs[i]:
-                new_position = self.searchMaxs[i]
-            elif new_position < self.searchMins[i]:
-                new_position = self.searchMins[i]
-
-            self.curr_position[i] = new_position
+        self.updateParticleVelocity()
+        self.updateParticlePosition()
 
         # pass our gBest, gBest_vars back to the swarm controller
         return (self.gBest, self.gBest_vars)
 
+    def updateParticleVelocity(self):
+        # Random component to avoid local minima
+        R1 = random.random()
+        R2 = random.random()
+
+        # Apply velocities to positions
+        # make sure to stay in bound of (searchMins[i], searchMaxs[i])
+        for i in range(0, self.dimension):
+            # if mins[i] == maxs[i] then ignore, we aren't optimizing it
+            if self.searchMins[i] == self.searchMaxs[i]:
+                continue
+
+            self.curr_velocity[i] = self.INERTIAL*self.curr_velocity[i] \
+                + R1*COG*(self.pBest_vars[i] - self.curr_position[i]) \
+                + R2*SOC*(self.gBest_vars[i] - self.curr_position[i])
+
+            MyMath.clip(self.curr_velocity[i],
+                        -VELOCITY_CAP,
+                        VELOCITY_CAP)
+
+            if fabs(self.curr_velocity[i]) < VELOCITY_MINIMUM_MAGNITUDE:
+                self.curr_velocity[i] = 0
+
+
+    def updateParticlePosition(self):
+        new_position = self.curr_position[i] + self.curr_velocity[i]
+
+        if new_position > self.searchMaxs[i]:
+            new_position = self.searchMaxs[i]
+        elif new_position < self.searchMins[i]:
+            new_position = self.searchMins[i]
+
+        self.curr_position[i] = new_position
+
     # used to decide how stable our most recent set of parameters were
     def getStability(self):
-        # return distance from 5,5 (for testing)
-        #return math.sqrt((self.curr_position[0] - 5)**2 + (self.curr_position[1] - 5)**2)
 
         return 0
 
@@ -183,8 +187,10 @@ class Swarm:
         if DEBUG:
             self.particles[self.partIndex].printState()
 
+    # TODO
     def saveSwarm(output_file):
         return
 
+    # TODO
     def loadSwarm(input_file):
         return
