@@ -1,4 +1,3 @@
-
 import math
 
 import man.motion as motion
@@ -47,7 +46,7 @@ def walkstraightstop(player):
 
     if player.firstFrame():
         # TODO :: make this more flexible
-        player.setWalk(15,0,0)
+        setWalkVector(player, 15,0,0)
         player.brain.stability.resetData()
 
     if player.counter == 400:
@@ -61,7 +60,7 @@ def walkstraightstop(player):
 
         return player.goNow('stopandchangegait')
 
-    if player.counter % 5 == 0 && False:
+    if player.counter % 5 == 0 and False:
         print "X stability variance: ", \
             player.brain.stability.getStability_X()
         print "Y stability variance: ", \
@@ -148,3 +147,11 @@ def printloc(player):
                        player.brain.my.y,
                        player.brain.my.h))
     return player.stay()
+
+def setWalkVector(player, x, y, theta):
+    """
+    Use this guy because all the wrappings through Nav tend
+    to reset our gait parameters
+    """
+    walk = motion.WalkCommand(x=x,y=y,theta=theta)
+    player.brain.motion.setNextWalkCommand(walk)
