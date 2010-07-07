@@ -41,34 +41,37 @@ else:
     print "Webots is in-active!!!!"
 
 def walkstraightstop(player):
+    # TODO
+    #X_STABILITY_WEIGHT
+    #Y_STABILITY_WEIGHT
+
     if player.firstFrame():
-        player.setSpeed(7,0,0)
+        # TODO :: make this more flexible
+        player.setWalk(15,0,0)
+        player.brain.stability.resetData()
 
     if player.counter == 400:
-        # stability is number of frames we stood plus accX/Y stats (higher is better)
+        # we optimize towards high stability
         frames_stood = player.counter
 
-        stability = frames_stood
+        stability = frames_stood #+
 
         swarm.getCurrParticle().setStability(stability)
         swarm.tickCurrParticle()
 
-        return player.goLater('stopandchangegait')
+        return player.goNow('stopandchangegait')
 
-    # collect inertial data every 5 frames
-    if player.counter % 5 == 0:
-        accX = player.brain.sensors.inertial.accX
-        accY = player.brain.sensors.inertial.accY
-        accZ = player.brain.sensors.inertial.accZ
+    if player.counter % 5 == 0 && False:
+        print "X stability variance: ", \
+            player.brain.stability.getStability_X()
+        print "Y stability variance: ", \
+            player.brain.stability.getStability_Y()
 
-        #print "accX/Y/Z: %.3f / %.3f / %.3f" % (accX, accY, accZ)
-
-        # we have fallen down! report stability as the number of frames we stayed up
-        if accZ > -5:
-            print "(GaitLearning):: we've fallen down!"
-            swarm.getCurrParticle().setStability(player.counter)
-            swarm.tickCurrParticle()
-            return player.goLater('standuplearn')
+    if player.brain.fallController.isFallen():
+        print "(GaitLearning):: we've fallen down!"
+        swarm.getCurrParticle().setStability(player.counter)
+        swarm.tickCurrParticle()
+        return player.goLater('standuplearn')
 
     return player.stay()
 

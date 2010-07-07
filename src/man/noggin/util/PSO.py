@@ -23,7 +23,7 @@
 
 import random
 from math import fabs
-import MyMath
+from MyMath import clip
 
 DEBUG = False
 
@@ -34,7 +34,7 @@ SOC = 1.4
 
 # particle motion may not exceed abs(V_CAP) in any tick
 VELOCITY_CAP = 2
-VELOCITY_MINIMUM_MAGNITUDE = 0.001
+VELOCITY_MINIMUM_MAGNITUDE = 0.01
 
 class Particle:
     def __init__(self, nSpace, searchMins, searchMaxs):
@@ -50,8 +50,8 @@ class Particle:
         self.searchMaxs = searchMaxs
 
         # our positions and velocities in N-space
-        self.curr_position = [0]*nSpace
-        self.curr_velocity = [0]*nSpace
+        self.position = [0]*nSpace
+        self.velocity = [0]*nSpace
 
         # inertia constant for velocity updates
         # initialized randomly per-particle as suggested by PSO wikipedia article
@@ -84,34 +84,31 @@ class Particle:
         R1 = random.random()
         R2 = random.random()
 
-        # Apply velocities to positions
         # make sure to stay in bound of (searchMins[i], searchMaxs[i])
         for i in range(0, self.dimension):
             # if mins[i] == maxs[i] then ignore, we aren't optimizing it
             if self.searchMins[i] == self.searchMaxs[i]:
                 continue
 
-            self.curr_velocity[i] = self.INERTIAL*self.curr_velocity[i] \
-                + R1*COG*(self.pBest_vars[i] - self.curr_position[i]) \
-                + R2*SOC*(self.gBest_vars[i] - self.curr_position[i])
+            self.velocity[i] = self.INERTIAL*self.velocity[i] \
+                + R1*COG*(self.pBest_vars[i] - self.position[i]) \
+                + R2*SOC*(self.gBest_vars[i] - self.position[i])
 
-            MyMath.clip(self.curr_velocity[i],
-                        -VELOCITY_CAP,
-                        VELOCITY_CAP)
+            clip(self.velocity[i],
+                 -VELOCITY_CAP,
+                 VELOCITY_CAP)
 
-            if fabs(self.curr_velocity[i]) < VELOCITY_MINIMUM_MAGNITUDE:
-                self.curr_velocity[i] = 0
+            if fabs(self.velocity[i]) < VELOCITY_MINIMUM_MAGNITUDE:
+                self.velocity[i] = 0
 
 
     def updateParticlePosition(self):
-        new_position = self.curr_position[i] + self.curr_velocity[i]
+        for i in range(0, self.dimension):
+            self.position[i] = self.position[i] + self.velocity[i]
 
-        if new_position > self.searchMaxs[i]:
-            new_position = self.searchMaxs[i]
-        elif new_position < self.searchMins[i]:
-            new_position = self.searchMins[i]
-
-        self.curr_position[i] = new_position
+            clip(self.position[i],
+                 self.searchMins[i],
+                 self.searchMins[i])
 
     # used to decide how stable our most recent set of parameters were
     def getStability(self):
@@ -124,13 +121,13 @@ class Particle:
         return
 
     def getPosition(self):
-        return self.curr_position
+        return self.position
 
     # debug output for a particle
     def printState(self):
         print "pBest: %s gBest: %s nSpace: %s" % (self.pBest, self.gBest, self.dimension)
-        print "Positions in N-Space: %s" % self.curr_position
-        print "Velocity: %s" % self.curr_velocity
+        print "Positions in N-Space: %s" % self.position
+        print "Velocity: %s" % self.velocity
 
 class Swarm:
     def __init__(self, numParticles, nSpace, searchMins, searchMaxs):
@@ -147,13 +144,13 @@ class Swarm:
             for j in range(0, nSpace):
                 # don't optimize this parameter
                 if searchMins[j] == searchMaxs[j]:
-                    self.particles[i].curr_position[j] = searchMins[j]
-                    self.particles[i].curr_velocity[j] = 0
+                    self.particles[i].position[j] = searchMins[j]
+                    self.particles[i].velocity[j] = 0
                     continue
 
-                self.particles[i].curr_position[j] = random.uniform(searchMins[j], \
+                self.particles[i].position[j] = random.uniform(searchMins[j], \
                                                                     searchMaxs[j])
-                self.particles[i].curr_velocity[j] = random.uniform(-VELOCITY_CAP*.5, \
+                self.particles[i].velocity[j] = random.uniform(-VELOCITY_CAP*.5, \
                                                                      VELOCITY_CAP*.5)
         if DEBUG:
             for p in self.particles:
