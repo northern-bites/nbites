@@ -134,7 +134,7 @@ def shutoffgains(player):
 
 def printloc(player):
     if player.firstFrame():
-        player.printf("Loc (X,Y,H) (%g,%g,%g"% 
+        player.printf("Loc (X,Y,H) (%g,%g,%g"%
                       (player.brain.my.x,
                        player.brain.my.y,
                        player.brain.my.h))
@@ -148,13 +148,13 @@ def startPSO(player):
         player.swarm = PSO.Swarm(25, 44, gaitToArray(gaitMins), gaitToArray(gaitMaxs))
 
 def savePSO(player):
-    print "Saving PSO state to ", PSO_STATE_FILE
+    print "Saving PSO state to: ", PSO_STATE_FILE
     f = open(PSO_STATE_FILE, 'w')
     pickle.dump(player.swarm, f)
     f.close()
 
 def loadPSO(player):
-    print "Loading PSO state from: " PSO_STATE_FILE
+    print "Loading PSO state from: ", PSO_STATE_FILE
     f = open(PSO_STATE_FILE, 'r')
     player.swarm = pickle.load(f)
     f.close()

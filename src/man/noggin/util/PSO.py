@@ -25,7 +25,7 @@ import random
 from math import fabs
 from MyMath import clip
 
-DEBUG = True
+DEBUG = False
 
 # how much we trend towards pBest, gBest (cog/soc biases)
 # both set to ~2 per the PSO wikipedia article
