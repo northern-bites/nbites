@@ -44,7 +44,7 @@ class Particle:
         self.pBest_vars = [0]*nSpace
 
         self.gBest = 0
-        self.gBest_vars = []
+        self.gBest_position = []
 
         self.searchMins = searchMins
         self.searchMaxs = searchMaxs
@@ -59,7 +59,7 @@ class Particle:
 
         self.stability = 0
 
-    def tick(self, gBest, gBest_vars):
+    def tick(self, gBest, gBest_position):
         # Update local best and its fitness
         if self.stability > self.pBest:
             self.pBest = self.stability
@@ -67,17 +67,17 @@ class Particle:
 
         # Update the global best and its fitness
         self.gBest = gBest
-        self.gBest_vars = gBest_vars
+        self.gBest_position = gBest_position
 
         if self.stability > self.gBest:
             self.gBest = self.stability
-            self.gBest_vars = self.getPosition()
+            self.gBest_position = self.getPosition()
 
         self.updateParticleVelocity()
         self.updateParticlePosition()
 
-        # pass our gBest, gBest_vars back to the swarm controller
-        return (self.gBest, self.gBest_vars)
+        # pass our gBest, gBest_position back to the swarm controller
+        return (self.gBest, self.gBest_position)
 
     def updateParticleVelocity(self):
         # Random component to avoid local minima
@@ -92,7 +92,7 @@ class Particle:
 
             self.velocity[i] = self.INERTIAL*self.velocity[i] \
                 + R1*COG*(self.pBest_vars[i] - self.position[i]) \
-                + R2*SOC*(self.gBest_vars[i] - self.position[i])
+                + R2*SOC*(self.gBest_position[i] - self.position[i])
 
             clip(self.velocity[i],
                  -VELOCITY_CAP,
@@ -136,7 +136,7 @@ class Swarm:
         self.numParticles = numParticles
 
         self.gBest = 0
-        self.gBest_vars = [0]*nSpace
+        self.gBest_position = [0]*nSpace
 
         for i in range(0, numParticles):
             self.particles.append(Particle(nSpace, searchMins, searchMaxs))
@@ -160,7 +160,7 @@ class Swarm:
     def solve_swarm(self, iterations):
         for i in range(0, iterations):
             for p in self.particles:
-                (self.gBest, self.gBest_vars) = p.tick(self.gBest, self.gBest_vars)
+                (self.gBest, self.gBest_position) = p.tick(self.gBest, self.gBest_position)
 
                 if DEBUG:
                     p.printState()
@@ -178,8 +178,8 @@ class Swarm:
             return self.particles[0]
 
     def tickCurrParticle(self):
-        (self.gBest, self.gBest_vars) = \
-               self.particles[self.partIndex].tick(self.gBest, self.gBest_vars)
+        (self.gBest, self.gBest_position) = \
+               self.particles[self.partIndex].tick(self.gBest, self.gBest_position)
 
         if DEBUG:
             self.particles[self.partIndex].printState()

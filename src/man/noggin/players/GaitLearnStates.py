@@ -40,33 +40,36 @@ else:
     print "Webots is in-active!!!!"
 
 def walkstraightstop(player):
-    # TODO
-    #X_STABILITY_WEIGHT
-    #Y_STABILITY_WEIGHT
+    # unstable walks that do not fall have accelerometer variance
+    # on the order of 1.5-3, stable walks are < 1
+    X_STABILITY_WEIGHT = 100
+    Y_STABILITY_WEIGHT = 100
 
     if player.firstFrame():
         # TODO :: make this more flexible
         setWalkVector(player, 15,0,0)
         player.brain.stability.resetData()
 
-    if player.counter == 400:
+    if player.counter == 800:
         # we optimize towards high stability
         frames_stood = player.counter
 
-        stability = frames_stood #+
+        stability = frames_stood - X_STABILITY_WEIGHT*player.brain.stability.getStability_X() \
+            - Y_STABILITY_WEIGHT*player.brain.stability.getStability_Y()
 
         swarm.getCurrParticle().setStability(stability)
         swarm.tickCurrParticle()
 
         return player.goNow('stopandchangegait')
 
-    if player.counter % 5 == 0 and False:
+    if player.counter % 100 == 0:
         print "X stability variance: ", \
             player.brain.stability.getStability_X()
         print "Y stability variance: ", \
             player.brain.stability.getStability_Y()
 
-    if player.brain.fallController.isFallen():
+    #if player.brain.fallController.isFallen():
+    if player.brain.stability.isWBFallen():
         print "(GaitLearning):: we've fallen down!"
         swarm.getCurrParticle().setStability(player.counter)
         swarm.tickCurrParticle()
@@ -77,7 +80,7 @@ def walkstraightstop(player):
 def stopwalking(player):
     ''' Do nothing'''
     if player.firstFrame():
-        player.setSpeed(0,0,0)
+        setWalkVector(player, 0,0,0)
 
     if player.counter == 200:
         return player.goLater('walkstraightstop')
@@ -88,7 +91,7 @@ def stopandchangegait(player):
     '''Return our stability to the PSO
     set new gait, and start walking again'''
     if player.firstFrame():
-        player.setWalk(0,0,0)
+        setWalkVector(player, 0,0,0)
 
         # set gait from new particle
         gaitTuple = arrayToGaitTuple(swarm.getNextParticle().getPosition())
@@ -120,7 +123,7 @@ def standup(player):
 
 def standuplearn(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.ZERO_POS)
+        player.executeMove(SweetMoves.STAND_UP_FRONT)
 
     return player.goLater('stopandchangegait')
 

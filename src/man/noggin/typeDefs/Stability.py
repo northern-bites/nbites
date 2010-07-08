@@ -1,4 +1,8 @@
 from .. import NogginConstants as Constants
+from math import fabs
+
+FALL_ACCZ_THRESHOLD = 5
+FALL_FRAMES_THRESHOLD = 15
 
 class Stability:
     """
@@ -11,12 +15,14 @@ class Stability:
         self.accelX = []
         self.accelY = []
 
+        self.fallCounter = 0
+
         return
 
     def resetData(self):
         del self.accelX[:]
         del self.accelY[:]
-        return
+        self.fallCounter = 0
 
     def updateStability(self):
         inertial = self.sensors.inertial
@@ -25,6 +31,19 @@ class Stability:
         self.accelY.append(inertial.accY)
 
         return
+
+    def isWBFallen(self):
+        inertial = self.sensors.inertial
+
+        if fabs(inertial.accZ) < FALL_ACCZ_THRESHOLD:
+            self.fallCounter += 1
+        else:
+            self.fallCounter = 0
+
+        if self.fallCounter > FALL_FRAMES_THRESHOLD:
+            return True
+        else:
+            return False
 
     def getStability_X(self):
         return self.calculateStabilityVariance(self.accelX)
