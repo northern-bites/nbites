@@ -25,7 +25,7 @@ import random
 from math import fabs
 from MyMath import clip
 
-DEBUG = False
+DEBUG = True
 
 # how much we trend towards pBest, gBest (cog/soc biases)
 # both set to ~2 per the PSO wikipedia article
@@ -184,10 +184,3 @@ class Swarm:
         if DEBUG:
             self.particles[self.partIndex].printState()
 
-    # TODO
-    def saveSwarm(output_file):
-        return
-
-    # TODO
-    def loadSwarm(input_file):
-        return

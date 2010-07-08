@@ -7,29 +7,22 @@ import man.motion.MotionConstants as MotionConstants
 from ..WebotsConfig import WEBOTS_ACTIVE
 import man.noggin.util.PSO as PSO
 from man.motion.gaits.GaitLearnBoundaries import gaitMins, gaitMaxs, gaitToArray, arrayToGaitTuple
+from os.path import isfile
 
-#def gameInitial(player):
-#    return player.stay()
+try:
+   import cPickle as pickle
+except:
+   import pickle
 
-# def gameReady(player):
-#     if player.firstFrame():
-#         walkcmd = motion.WalkCommand(x=0,y=0,theta=0)
-#         player.brain.motion.setNextWalkCommand(walkcmd)
-
-#     return player.stay()
-
-# set up the PSO!
-#
-
-# Swarm(#particles, dimensionality, [mins], [maxs])
-swarm = PSO.Swarm(20, 44, gaitToArray(gaitMins), gaitToArray(gaitMaxs))
+PSO_STATE_FILE = "PSO_pGaitLearner.pickle"
 
 def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
     if player.firstFrame():
         player.gainsOn()
         player.brain.tracker.trackBall()
-#        player.penalizeHeads();
+
+        startPSO(player)
 
     return player.goLater('stopandchangegait')
 
@@ -57,22 +50,15 @@ def walkstraightstop(player):
         stability = frames_stood - X_STABILITY_WEIGHT*player.brain.stability.getStability_X() \
             - Y_STABILITY_WEIGHT*player.brain.stability.getStability_Y()
 
-        swarm.getCurrParticle().setStability(stability)
-        swarm.tickCurrParticle()
+        player.swarm.getCurrParticle().setStability(stability)
+        player.swarm.tickCurrParticle()
 
         return player.goNow('stopandchangegait')
 
-    if player.counter % 100 == 0:
-        print "X stability variance: ", \
-            player.brain.stability.getStability_X()
-        print "Y stability variance: ", \
-            player.brain.stability.getStability_Y()
-
-    #if player.brain.fallController.isFallen():
     if player.brain.stability.isWBFallen():
         print "(GaitLearning):: we've fallen down!"
-        swarm.getCurrParticle().setStability(player.counter)
-        swarm.tickCurrParticle()
+        player.swarm.getCurrParticle().setStability(player.counter)
+        player.swarm.tickCurrParticle()
         return player.goLater('standuplearn')
 
     return player.stay()
@@ -88,13 +74,16 @@ def stopwalking(player):
     return player.stay()
 
 def stopandchangegait(player):
-    '''Return our stability to the PSO
-    set new gait, and start walking again'''
+    '''Save the PSO state, set new gait
+    and start walking again'''
+
     if player.firstFrame():
         setWalkVector(player, 0,0,0)
 
+        savePSO(player)
+
         # set gait from new particle
-        gaitTuple = arrayToGaitTuple(swarm.getNextParticle().getPosition())
+        gaitTuple = arrayToGaitTuple(player.swarm.getNextParticle().getPosition())
 
         newGait = motion.GaitCommand(gaitTuple[0],
                                      gaitTuple[1],
@@ -150,6 +139,25 @@ def printloc(player):
                        player.brain.my.y,
                        player.brain.my.h))
     return player.stay()
+
+def startPSO(player):
+    if isfile(PSO_STATE_FILE):
+        loadPSO(player)
+    else:
+        print "Initializing new PSO"
+        player.swarm = PSO.Swarm(25, 44, gaitToArray(gaitMins), gaitToArray(gaitMaxs))
+
+def savePSO(player):
+    print "Saving PSO state to ", PSO_STATE_FILE
+    f = open(PSO_STATE_FILE, 'w')
+    pickle.dump(player.swarm, f)
+    f.close()
+
+def loadPSO(player):
+    print "Loading PSO state from: " PSO_STATE_FILE
+    f = open(PSO_STATE_FILE, 'r')
+    player.swarm = pickle.load(f)
+    f.close()
 
 def setWalkVector(player, x, y, theta):
     """
