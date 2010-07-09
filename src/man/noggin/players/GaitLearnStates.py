@@ -16,6 +16,8 @@ except:
 
 PSO_STATE_FILE = "PSO_pGaitLearner.pickle"
 
+RUN_ONCE_STOP = True
+
 def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
     if player.firstFrame():
@@ -55,16 +57,24 @@ def walkstraightstop(player):
         player.swarm.tickCurrParticle()
         savePSO(player)
 
-        return player.goNow('stopandchangegait')
+        player.goLater('newOptimizeParameters')
 
     if player.brain.stability.isWBFallen():
         print "(GaitLearning):: we've fallen down!"
         player.swarm.getCurrParticle().setStability(player.counter)
         player.swarm.tickCurrParticle()
         savePSO(player)
-        return player.goLater('stopwalking')
+
+        return player.goLater('newOptimizeParameters')
 
     return player.stay()
+
+def newOptimizeParameters(player):
+   if RUN_ONCE_STOP:
+      print "stopping optimization, restart webots"
+      return player.goLater('stopwalking')
+   else:
+      return player.goLater('stopandchangegait')
 
 def stopwalking(player):
     ''' Do nothing'''
@@ -72,6 +82,7 @@ def stopwalking(player):
         setWalkVector(player, 0,0,0)
 
     return player.stay()
+
 
 def stopandchangegait(player):
     '''Set new gait and start walking again'''
@@ -92,7 +103,7 @@ def stopandchangegait(player):
 
         player.brain.CoA.setRobotDynamicGait(player.brain.motion, newGait)
 
-    if player.counter == 30:
+    if player.counter == 20:
         return player.goLater('walkstraightstop')
 
     return player.stay()

@@ -20,6 +20,7 @@
 
 # PSO.py: an implementation of a Particle-Swarm Optimizer
 #       will search through an N-dimensional space
+# @author Nathan Merritt
 
 import random
 from math import fabs
@@ -89,7 +90,6 @@ class Particle:
         R1 = random.random()
         R2 = random.random()
 
-        # make sure to stay in bound of (searchMins[i], searchMaxs[i])
         for i in range(0, self.dimension):
             # if mins[i] == maxs[i] then ignore, we aren't optimizing it
             if self.searchMins[i] == self.searchMaxs[i]:
