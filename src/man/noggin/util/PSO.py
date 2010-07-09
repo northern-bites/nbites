@@ -26,6 +26,8 @@ from math import fabs
 from MyMath import clip
 
 DEBUG = True
+DEBUG_POSITION = False
+DEBUG_PROGRESS = True
 
 # how much we trend towards pBest, gBest (cog/soc biases)
 # both set to ~2 per the PSO wikipedia article
@@ -58,6 +60,7 @@ class Particle:
         self.INERTIAL = random.random()
 
         self.stability = 0
+        self.moves = 0
 
     def tick(self, gBest, gBest_position):
         # Update local best and its fitness
@@ -75,6 +78,8 @@ class Particle:
 
         self.updateParticleVelocity()
         self.updateParticlePosition()
+
+        self.moves += 1
 
         # pass our gBest, gBest_position back to the swarm controller
         return (self.gBest, self.gBest_position)
@@ -125,9 +130,12 @@ class Particle:
 
     # debug output for a particle
     def printState(self):
-        print "pBest: %s gBest: %s nSpace: %s" % (self.pBest, self.gBest, self.dimension)
-        print "Positions in N-Space: %s" % self.position
-        print "Velocity: %s" % self.velocity
+        if DEBUG_PROGRESS:
+            print "pBest: %s gBest: %s nSpace: %s" % (self.pBest, self.gBest, self.dimension)
+            print "particle has moved %s times" % self.moves
+        if DEBUG_POSITION:
+            print "Positions in N-Space: %s" % self.position
+            print "Velocity: %s" % self.velocity
 
 class Swarm:
     def __init__(self, numParticles, nSpace, searchMins, searchMaxs):

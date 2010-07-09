@@ -39,19 +39,21 @@ def walkstraightstop(player):
     Y_STABILITY_WEIGHT = 100
 
     if player.firstFrame():
-        # TODO :: make this more flexible
-        setWalkVector(player, 15,0,0)
+       # actual motion command clipped by gait parameter
+        setWalkVector(player, 30,0,0)
         player.brain.stability.resetData()
 
     if player.counter == 800:
         # we optimize towards high stability
         frames_stood = player.counter
 
+        # TODO: add distance traveled into heuristic
         stability = frames_stood - X_STABILITY_WEIGHT*player.brain.stability.getStability_X() \
             - Y_STABILITY_WEIGHT*player.brain.stability.getStability_Y()
 
         player.swarm.getCurrParticle().setStability(stability)
         player.swarm.tickCurrParticle()
+        savePSO(player)
 
         return player.goNow('stopandchangegait')
 
@@ -59,7 +61,8 @@ def walkstraightstop(player):
         print "(GaitLearning):: we've fallen down!"
         player.swarm.getCurrParticle().setStability(player.counter)
         player.swarm.tickCurrParticle()
-        return player.goLater('standuplearn')
+        savePSO(player)
+        return player.goLater('stopwalking')
 
     return player.stay()
 
@@ -68,21 +71,14 @@ def stopwalking(player):
     if player.firstFrame():
         setWalkVector(player, 0,0,0)
 
-    if player.counter == 200:
-        return player.goLater('walkstraightstop')
-
     return player.stay()
 
 def stopandchangegait(player):
-    '''Save the PSO state, set new gait
-    and start walking again'''
+    '''Set new gait and start walking again'''
 
     if player.firstFrame():
         setWalkVector(player, 0,0,0)
 
-        savePSO(player)
-
-        # set gait from new particle
         gaitTuple = arrayToGaitTuple(player.swarm.getNextParticle().getPosition())
 
         newGait = motion.GaitCommand(gaitTuple[0],
@@ -95,10 +91,6 @@ def stopandchangegait(player):
                                      gaitTuple[7])
 
         player.brain.CoA.setRobotDynamicGait(player.brain.motion, newGait)
-
-        #print "gait in tuple form:"
-        #for tuple in gaitTuple:
-        #    print tuple
 
     if player.counter == 30:
         return player.goLater('walkstraightstop')

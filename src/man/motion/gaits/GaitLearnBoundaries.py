@@ -41,10 +41,10 @@ stanceMax = (31.00, # CoM height
              0.1)   # Time to transition to/from this stance
 
 stepMin = (0.15,   #** step duration
-           0.1,  #** fraction in double support
+           0.1,   #** fraction in double support
            0.1,   #** stepHeight
            -20.0, #** step lift
-           25.0,  # max x speed
+           10.0,  #** max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
@@ -57,7 +57,7 @@ stepMax = (0.4,   #** step duration
            0.9,   #** fraction in double support
            5.0,   #** stepHeight
            0.0,   #** step lift
-           25.0,  # max x speed
+           30.0,  #** max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
@@ -76,12 +76,12 @@ zmpMin = zmpMax = (0.0,   # footCenterLocX
 hackMin = (0.0,   #** joint hack
            0.0)   #** joint hack
 
-hackMax =  (10.0,  #** joint hack
-           10.0)  #** joint hack
+hackMax =  (8.0,  #** joint hack
+           8.0)  #** joint hack
 
 sensorMin = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
-             0.0,   #** angle X scale (gamma)
-             0.0,   #** angle Y scale (gamma)
+             0.0,   # angle X scale (gamma)
+             0.0,   # angle Y scale (gamma)
              250.0, # X spring constant k (kg/s^2)
              100.0, # Y spring constant k (kg/s^2)
              7.0,   # max angle X (compensation)
@@ -89,8 +89,8 @@ sensorMin = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
              45.0)  # max angle vel (change in compensation)
 
 sensorMax = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
-             1.0,   #** angle X scale (gamma)
-             1.0,   #** angle Y scale (gamma)
+             0.0,   # angle X scale (gamma)
+             0.0,   # angle Y scale (gamma)
              250.0, # X spring constant k (kg/s^2)
              100.0, # Y spring constant k (kg/s^2)
              7.0,   # max angle X (compensation)
