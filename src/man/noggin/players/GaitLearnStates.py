@@ -7,7 +7,9 @@ import man.motion.MotionConstants as MotionConstants
 import man.noggin.typeDefs.Location as Location
 from ..WebotsConfig import WEBOTS_ACTIVE
 import man.noggin.util.PSO as PSO
-from man.motion.gaits.GaitLearnBoundaries import gaitMins, gaitMaxs, gaitToArray, arrayToGaitTuple
+from man.motion.gaits.GaitLearnBoundaries import \
+    gaitMins, gaitMaxs, \
+    gaitToArray, arrayToGaitTuple
 from os.path import isfile
 
 try:
@@ -16,8 +18,10 @@ except:
    import pickle
 
 PSO_STATE_FILE = "PSO_pGaitLearner.pickle"
+FALLING_PENALTY = 200
 
 RUN_ONCE_STOP = True
+
 
 def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
@@ -36,39 +40,32 @@ else:
     print "Webots is in-active!!!!"
 
 def walkstraightstop(player):
-    # unstable walks that do not fall have accelerometer variance
-    # on the order of 1.5-3, stable walks are < 1
-    X_STABILITY_WEIGHT = 100
-    Y_STABILITY_WEIGHT = 100
+    stability = player.brain.stability
+    isFallen = stability.isWBFallen()
 
     if player.firstFrame():
        # actual motion command clipped by gait parameter
-        setWalkVector(player, 30,0,0)
-        player.brain.stability.resetData()
+       setWalkVector(player, 30,0,0)
+       stability.resetData()
 
-        player.startOptimizeLocation = getCurrentLocation(player)
+       player.startOptimizeLocation = getCurrentLocation(player)
 
-    if player.counter == 800:
-        # we maximize on the heuristic
+    if player.counter == 800 or isFallen:
         frames_stood = player.counter
         endOptimizeLocation = getCurrentLocation(player)
         # TODO: save path points ever n frames, calculate a linear regression
         # to determine how linear our path was (as an additional heuristic)
         distance_traveled = endOptimizeLocation.distTo(player.startOptimizeLocation)
+        stability_penalty = stability.getStabilityHeuristic()
 
-        heuristic = frames_stood - X_STABILITY_WEIGHT*player.brain.stability.getStability_X() \
-            - Y_STABILITY_WEIGHT*player.brain.stability.getStability_Y() \
-            + distance_traveled
+        # we maximize on the heuristic
+        heuristic = frames_stood + distance_traveled - stability_penalty
+
+        if isFallen:
+           print "(GaitLearning):: we've fallen down!"
+           heuristic -= FALLING_PENALTY
 
         player.swarm.getCurrParticle().setHeuristic(heuristic)
-        player.swarm.tickCurrParticle()
-        savePSO(player)
-
-        return player.goLater('newOptimizeParameters')
-
-    if player.brain.stability.isWBFallen():
-        print "(GaitLearning):: we've fallen down!"
-        player.swarm.getCurrParticle().setHeuristic(player.counter)
         player.swarm.tickCurrParticle()
         savePSO(player)
 

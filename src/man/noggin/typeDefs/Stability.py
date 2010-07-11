@@ -4,6 +4,11 @@ from math import fabs
 FALL_ACCZ_THRESHOLD = 5
 FALL_FRAMES_THRESHOLD = 15
 
+# unstable walks that do not fall have accelerometer variance
+# on the order of 1.5-3, stable walks are < 1
+X_STABILITY_WEIGHT = 100
+Y_STABILITY_WEIGHT = 100
+
 class Stability:
     """
     Collects stability data measured by accelerometers
@@ -50,6 +55,12 @@ class Stability:
 
     def getStability_Y(self):
         return self.calculateStabilityVariance(self.accelY)
+
+    def getStabilityHeuristic(self):
+        xStabilityHeuristic = X_STABILITY_WEIGHT * self.getStability_X()
+        yStabilityHeuristic = Y_STABILITY_WEIGHT * self.getStability_Y()
+
+        return xStabilityHeuristic + yStabilityHeuristic
 
     def calculateStabilityVariance(self, data):
         sampleMean = self.calculateSampleMean(data)
