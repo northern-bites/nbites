@@ -18,7 +18,7 @@ except:
    import pickle
 
 PSO_STATE_FILE = "PSO_pGaitLearner.pickle"
-FALLING_PENALTY = 200
+OPTIMIZE_FRAMES = 800
 
 RUN_ONCE_STOP = True
 
@@ -50,7 +50,7 @@ def walkstraightstop(player):
 
        player.startOptimizeLocation = getCurrentLocation(player)
 
-    if player.counter == 800 or isFallen:
+    if player.counter == OPTIMIZE_FRAMES or isFallen:
         frames_stood = player.counter
         endOptimizeLocation = getCurrentLocation(player)
         # TODO: save path points ever n frames, calculate a linear regression
@@ -63,7 +63,8 @@ def walkstraightstop(player):
 
         if isFallen:
            print "(GaitLearning):: we've fallen down!"
-           heuristic -= FALLING_PENALTY
+
+        print "total distance traveled with this gait is ", distance_traveled
 
         player.swarm.getCurrParticle().setHeuristic(heuristic)
         player.swarm.tickCurrParticle()
