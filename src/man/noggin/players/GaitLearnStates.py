@@ -4,6 +4,7 @@ import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import man.motion.RobotGaits as RobotGaits
 import man.motion.MotionConstants as MotionConstants
+import man.noggin.typeDefs.Location as Location
 from ..WebotsConfig import WEBOTS_ACTIVE
 import man.noggin.util.PSO as PSO
 from man.motion.gaits.GaitLearnBoundaries import gaitMins, gaitMaxs, gaitToArray, arrayToGaitTuple
@@ -45,23 +46,29 @@ def walkstraightstop(player):
         setWalkVector(player, 30,0,0)
         player.brain.stability.resetData()
 
+        player.startOptimizeLocation = getCurrentLocation(player)
+
     if player.counter == 800:
-        # we optimize towards high stability
+        # we maximize on the heuristic
         frames_stood = player.counter
+        endOptimizeLocation = getCurrentLocation(player)
+        # TODO: save path points ever n frames, calculate a linear regression
+        # to determine how linear our path was (as an additional heuristic)
+        distance_traveled = endOptimizeLocation.distTo(player.startOptimizeLocation)
 
-        # TODO: add distance traveled into heuristic
-        stability = frames_stood - X_STABILITY_WEIGHT*player.brain.stability.getStability_X() \
-            - Y_STABILITY_WEIGHT*player.brain.stability.getStability_Y()
+        heuristic = frames_stood - X_STABILITY_WEIGHT*player.brain.stability.getStability_X() \
+            - Y_STABILITY_WEIGHT*player.brain.stability.getStability_Y() \
+            + distance_traveled
 
-        player.swarm.getCurrParticle().setStability(stability)
+        player.swarm.getCurrParticle().setHeuristic(heuristic)
         player.swarm.tickCurrParticle()
         savePSO(player)
 
-        player.goLater('newOptimizeParameters')
+        return player.goLater('newOptimizeParameters')
 
     if player.brain.stability.isWBFallen():
         print "(GaitLearning):: we've fallen down!"
-        player.swarm.getCurrParticle().setStability(player.counter)
+        player.swarm.getCurrParticle().setHeuristic(player.counter)
         player.swarm.tickCurrParticle()
         savePSO(player)
 
@@ -142,6 +149,11 @@ def printloc(player):
                        player.brain.my.y,
                        player.brain.my.h))
     return player.stay()
+
+def getCurrentLocation(player):
+   return Location.Location(player.brain.my.x,
+                            player.brain.my.y,
+                            player.brain.my.h)
 
 def startPSO(player):
     if isfile(PSO_STATE_FILE):

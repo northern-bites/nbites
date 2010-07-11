@@ -28,7 +28,7 @@ def arrayToGaitTuple(array):
 
 stanceMin = (31.00, # CoM height
             -5.0,   #** Forward displacement of CoM
-            8.0,  #** Horizontal distance between feet
+            8.0,   #** Horizontal distance between feet
             0.0,   #** Body angle around y axis
             0.0,   # Angle between feet
             0.1)   # Time to transition to/from this stance

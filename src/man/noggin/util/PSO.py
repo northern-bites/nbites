@@ -60,21 +60,21 @@ class Particle:
         # initialized randomly per-particle as suggested by PSO wikipedia article
         self.INERTIAL = random.random()
 
-        self.stability = 0
+        self.heuristic = 0
         self.moves = 0
 
     def tick(self, gBest, gBest_position):
         # Update local best and its fitness
-        if self.stability > self.pBest:
-            self.pBest = self.stability
+        if self.heuristic > self.pBest:
+            self.pBest = self.heuristic
             self.pBest_vars = self.getPosition()
 
         # Update the global best and its fitness
         self.gBest = gBest
         self.gBest_position = gBest_position
 
-        if self.stability > self.gBest:
-            self.gBest = self.stability
+        if self.heuristic > self.gBest:
+            self.gBest = self.heuristic
             self.gBest_position = self.getPosition()
 
         self.updateParticleVelocity()
@@ -116,13 +116,13 @@ class Particle:
                  self.searchMins[i])
 
     # used to decide how stable our most recent set of parameters were
-    def getStability(self):
+    def getHeuristic(self):
 
         return 0
 
-    # when we set stability from outside the swarm, use this
-    def setStability(self, outside_stability):
-        self.stability = outside_stability
+    # when we set heuristic from outside the swarm, use this
+    def setHeuristic(self, outside_heuristic):
+        self.heuristic = outside_heuristic
         return
 
     def getPosition(self):
