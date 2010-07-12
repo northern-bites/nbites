@@ -8,7 +8,8 @@ set -e
 while :
 do
     webots &
-    sleep 80s
+    sleep 70s
     killall nao_team_1
     killall webots-bin
+    sleep 3s
 done
