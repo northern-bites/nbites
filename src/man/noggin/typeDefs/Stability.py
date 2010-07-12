@@ -1,5 +1,6 @@
 from .. import NogginConstants as Constants
 from math import fabs
+from . import Location
 
 FALL_ACCZ_THRESHOLD = 5
 FALL_FRAMES_THRESHOLD = 15
@@ -12,6 +13,7 @@ Y_STABILITY_WEIGHT = 100
 class Stability:
     """
     Collects stability data measured by accelerometers
+    and checks to see how linear our path was
     """
 
     def __init__(self, sensors):
@@ -19,14 +21,14 @@ class Stability:
 
         self.accelX = []
         self.accelY = []
+        self.pastPositions = []
 
         self.fallCounter = 0
-
-        return
 
     def resetData(self):
         del self.accelX[:]
         del self.accelY[:]
+        del self.pastPositions[:]
         self.fallCounter = 0
 
     def updateStability(self):
@@ -35,7 +37,8 @@ class Stability:
         self.accelX.append(inertial.accX)
         self.accelY.append(inertial.accY)
 
-        return
+    def updatePosition(self, frameCount, currentLocation):
+        self.pastPositions.append( (frameCount, currentLocation) )
 
     def isWBFallen(self):
         inertial = self.sensors.inertial
@@ -61,6 +64,10 @@ class Stability:
         yStabilityHeuristic = Y_STABILITY_WEIGHT * self.getStability_Y()
 
         return xStabilityHeuristic + yStabilityHeuristic
+
+    def getPathLinearity(self):
+        # TODO
+        return 0
 
     def calculateStabilityVariance(self, data):
         sampleMean = self.calculateSampleMean(data)

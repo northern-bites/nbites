@@ -25,7 +25,7 @@ from . import Leds
 from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
-from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet, 
+from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet,
                        Play, TeamMember, Stability)
 from .navigator import Navigator
 from .util import NaoOutput
@@ -231,9 +231,6 @@ class Brain(object):
         # Localization Update
         self.updateLocalization()
         self.ball.updateBestValues(self.my)
-
-        # Stability update
-        self.stability.updateStability()
 
         #Set LEDS
         self.leds.processLeds()

@@ -1,5 +1,3 @@
-import math
-
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import man.motion.RobotGaits as RobotGaits
@@ -19,9 +17,9 @@ except:
 
 PSO_STATE_FILE = "PSO_pGaitLearner.pickle"
 OPTIMIZE_FRAMES = 800
+POSITION_UPDATE_FRAMES = 15
 
 RUN_ONCE_STOP = True
-
 
 def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
@@ -41,6 +39,8 @@ else:
 
 def walkstraightstop(player):
     stability = player.brain.stability
+
+    stability.updateStability()
     isFallen = stability.isWBFallen()
 
     if player.firstFrame():
@@ -50,29 +50,37 @@ def walkstraightstop(player):
 
        player.startOptimizeLocation = getCurrentLocation(player)
 
+    # too computationally expensive to use every point
+    if player.counter % POSITION_UPDATE_FRAMES == 0:
+       stability.updatePosition(player.counter, getCurrentLocation(player))
+
     if player.counter == OPTIMIZE_FRAMES or isFallen:
-        frames_stood = player.counter
-        endOptimizeLocation = getCurrentLocation(player)
-        # TODO: save path points ever n frames, calculate a linear regression
-        # to determine how linear our path was (as an additional heuristic)
-        distance_traveled = endOptimizeLocation.distTo(player.startOptimizeLocation)
-        stability_penalty = stability.getStabilityHeuristic()
+       scoreGaitPerformance(player)
 
-        # we maximize on the heuristic
-        heuristic = frames_stood + distance_traveled - stability_penalty
+       if isFallen:
+          print "(GaitLearning):: we've fallen down!"
 
-        if isFallen:
-           print "(GaitLearning):: we've fallen down!"
-
-        print "total distance traveled with this gait is ", distance_traveled
-
-        player.swarm.getCurrParticle().setHeuristic(heuristic)
-        player.swarm.tickCurrParticle()
-        savePSO(player)
-
-        return player.goLater('newOptimizeParameters')
+       return player.goLater('newOptimizeParameters')
 
     return player.stay()
+
+def scoreGaitPerformance(player):
+   stability = player.brain.stability
+
+   frames_stood = player.counter
+   endOptimizeLocation = getCurrentLocation(player)
+   distance_traveled = endOptimizeLocation.distTo(player.startOptimizeLocation)
+   path_linearity = stability.getPathLinearity()
+   stability_penalty = stability.getStabilityHeuristic()
+
+   # we maximize on the heuristic
+   heuristic = frames_stood + distance_traveled + path_linearity - stability_penalty
+
+   print "total distance traveled with this gait is ", distance_traveled
+
+   player.swarm.getCurrParticle().setHeuristic(heuristic)
+   player.swarm.tickCurrParticle()
+   savePSO(player)
 
 def newOptimizeParameters(player):
    if RUN_ONCE_STOP:
@@ -148,11 +156,6 @@ def printloc(player):
                        player.brain.my.h))
     return player.stay()
 
-def getCurrentLocation(player):
-   return Location.Location(player.brain.my.x,
-                            player.brain.my.y,
-                            player.brain.my.h)
-
 def startPSO(player):
     if isfile(PSO_STATE_FILE):
         loadPSO(player)
@@ -179,3 +182,10 @@ def setWalkVector(player, x, y, theta):
     """
     walk = motion.WalkCommand(x=x,y=y,theta=theta)
     player.brain.motion.setNextWalkCommand(walk)
+
+def getCurrentLocation(player):
+   return Location.Location(player.brain.my.x,
+                            player.brain.my.y,
+                            player.brain.my.h)
+
+

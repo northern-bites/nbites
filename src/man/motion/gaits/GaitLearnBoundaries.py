@@ -28,7 +28,7 @@ def arrayToGaitTuple(array):
 
 stanceMin = (31.00, # CoM height
             -5.0,   #** Forward displacement of CoM
-            8.0,   #** Horizontal distance between feet
+            10.0,   #** Horizontal distance between feet
             0.0,   #** Body angle around y axis
             0.0,   # Angle between feet
             0.1)   # Time to transition to/from this stance
@@ -54,7 +54,7 @@ stepMin = (0.15,   #** step duration
            1.0)   # walk gait = true
 
 stepMax = (0.4,   #** step duration
-           0.9,   #** fraction in double support
+           0.5,   #** fraction in double support
            5.0,   #** stepHeight
            0.0,   #** step lift
            30.0,  #** max x speed
