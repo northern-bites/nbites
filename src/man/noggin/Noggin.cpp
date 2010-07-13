@@ -552,9 +552,8 @@ void Noggin::modifySysPath ()
      const char *cwd = test.c_str();
 #  else //WEBOTS
 #    if defined OFFLINE || defined STRAIGHT
-       const char *cwd = "/usr/local/nao/modules/lib";
+       const char *cwd = "/usr/local/nao-1.6/modules/lib";
 #    else
-       //    const char *cwd = "/opt/naoqi/modules/lib";
        const char *cwd = "/home/nao/naoqi/lib/naoqi";
 #    endif
 #  endif
