@@ -52,7 +52,7 @@ def walkstraightstop(player):
 
     # too computationally expensive to use every point
     if player.counter % POSITION_UPDATE_FRAMES == 0:
-       stability.updatePosition(player.counter, getCurrentLocation(player))
+       stability.updatePosition(getCurrentLocation(player))
 
     if player.counter == OPTIMIZE_FRAMES or isFallen:
        scoreGaitPerformance(player)

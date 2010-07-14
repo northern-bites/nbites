@@ -1,6 +1,7 @@
 from .. import NogginConstants as Constants
 from math import fabs
 from . import Location
+from numpy import corrcoef
 
 FALL_ACCZ_THRESHOLD = 5
 FALL_FRAMES_THRESHOLD = 15
@@ -9,6 +10,7 @@ FALL_FRAMES_THRESHOLD = 15
 # on the order of 1.5-3, stable walks are < 1
 X_STABILITY_WEIGHT = 100
 Y_STABILITY_WEIGHT = 100
+XY_CORRELATION_WEIGHT = 200
 
 class Stability:
     """
@@ -37,8 +39,8 @@ class Stability:
         self.accelX.append(inertial.accX)
         self.accelY.append(inertial.accY)
 
-    def updatePosition(self, frameCount, currentLocation):
-        self.pastPositions.append( (frameCount, currentLocation) )
+    def updatePosition(self, currentLocation):
+        self.pastPositions.append(currentLocation)
 
     def isWBFallen(self):
         inertial = self.sensors.inertial
@@ -66,8 +68,24 @@ class Stability:
         return xStabilityHeuristic + yStabilityHeuristic
 
     def getPathLinearity(self):
-        # TODO
-        return 0
+        xPositions, yPositions = self.getPositionsFromPath()
+
+        corr = corrcoef([xPositions, yPositions])
+
+        print "X/Y path correlation is ", corr[0][1]
+
+        # we only care about how linear the path is, not the direction
+        return fabs(corr[0][1]) * XY_CORRELATION_WEIGHT
+
+    def getPositionsFromPath(self):
+        xPos = []
+        yPos = []
+
+        for location in self.pastPositions:
+            xPos.append(location.x)
+            yPos.append(location.y)
+
+        return xPos, yPos
 
     def calculateStabilityVariance(self, data):
         sampleMean = self.calculateSampleMean(data)
