@@ -185,6 +185,9 @@ class Swarm:
             self.partIndex = 0
             return self.particles[0]
 
+    def getBestSolution(self):
+        return self.gBest_position
+
     def tickCurrParticle(self):
         (self.gBest, self.gBest_position) = \
                self.particles[self.partIndex].tick(self.gBest, self.gBest_position)
