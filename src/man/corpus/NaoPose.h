@@ -130,7 +130,7 @@ struct mDHParam{
 };
 
 class NaoPose {
-protected: // Constants
+ protected: // Constants
     static const float IMAGE_WIDTH_MM;
     static const float IMAGE_HEIGHT_MM;
     static const float FOCAL_LENGTH_MM;
@@ -157,7 +157,7 @@ protected: // Constants
         Z = 2
     };
 
-public:
+ public:
     NaoPose(boost::shared_ptr<Sensors> s);
     ~NaoPose() { }
 
@@ -182,34 +182,34 @@ public:
     const float pixHeightToDistance(float pixHeight, float cmHeight) const;
     const float pixWidthToDistance(float pixWidth, float cmWidth) const;
     const float getHeadYaw() {
-      return sensors->getHeadAngles()[0];
+        return sensors->getHeadAngles()[0];
     }
     const float getDistanceBetweenTwoObjects(estimate e1, estimate e2);
     std::vector<VisualLine> getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
     const boost::numeric::ublas::vector <float> worldPointToPixel(boost::numeric::ublas::vector <float> point);
 
     const float getHeadPitch() {
-      return sensors->getHeadAngles()[1];
+        return sensors->getHeadAngles()[1];
     }
-	const float getBodyCenterHeight() { return comHeight; }
-	const float getFocalPointInWorldFrameZ() { return focalPointInWorldFrame.z;}
+    const float getBodyCenterHeight() const { return comHeight; }
+    const float getFocalPointInWorldFrameZ() const { return focalPointInWorldFrame.z;}
 
-protected: // helper methods
+ protected: // helper methods
     static const boost::numeric::ublas::matrix <float>
-      calculateForwardTransform(const Kinematics::ChainID id,
-                              const std::vector <float> &angles);
+        calculateForwardTransform(const Kinematics::ChainID id,
+                                  const std::vector <float> &angles);
     static const boost::numeric::ublas::vector <float>
-      calcFocalPointInBodyFrame();
+        calcFocalPointInBodyFrame();
 
     void calcImageHorizonLine();
     // This method solves a system of linear equations and return a 3-d vector
     // in homogeneous coordinates representing the point of intersection
     static boost::numeric::ublas::vector <float>
-      intersectLineWithXYPlane(const std::vector<
-                               boost::numeric::ublas::vector <float> > &aLine);
+        intersectLineWithXYPlane(const std::vector<
+                                 boost::numeric::ublas::vector <float> > &aLine);
     // In homogeneous coordinates, get the length of a n-dimensional vector.
     static const float
-      getHomLength(const boost::numeric::ublas::vector <float> &vec);
+        getHomLength(const boost::numeric::ublas::vector <float> &vec);
 
     // takes in two sides of a triangle, returns hypotenuse
     static const float getHypotenuse(const float x, const float y) {
@@ -224,7 +224,7 @@ protected: // helper methods
     // that function.
     static const float correctDistance(const float uncorrectedDist);
 
-protected: // members
+ protected: // members
     float bodyInclinationX;
     float bodyInclinationY;
     boost::shared_ptr<Sensors> sensors;
@@ -235,7 +235,7 @@ protected: // members
     // In this array we hold the matrix transformation which takes us from the
     // originn to the end of each chain of the body.
     boost::numeric::ublas::matrix <float>
-      forwardTransforms[Kinematics::NUM_CHAINS];
+        forwardTransforms[Kinematics::NUM_CHAINS];
     // World frame is defined as the coordinate frame centered at the center of
     // mass and parallel to the ground plane.
     boost::numeric::ublas::matrix <float> cameraToWorldFrame;

@@ -98,14 +98,14 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
     registerCamera(broker);
     if(camera_active) {
         try{
-        initCameraSettings(BOTTOM_CAMERA);
+            initCameraSettings(BOTTOM_CAMERA);
         }catch(ALError &e){
-			std::cout << "Failed to init the camera settings:"<<e.toString()<<std::endl;
+            std::cout << "Failed to init the camera settings:"<<e.toString()<<std::endl;
             camera_active = false;
         }
     }
     else
-      std::cout << "\tCamera is inactive!" << std::endl;
+        std::cout << "\tCamera is inactive!" << std::endl;
 #endif
 }
 
@@ -123,9 +123,9 @@ void ALImageTranscriber::run() {
     Thread::running = true;
     Thread::trigger->on();
 
-	long long lastProcessTimeAvg = VISION_FRAME_LENGTH_uS;
+    long long lastProcessTimeAvg = VISION_FRAME_LENGTH_uS;
 
-	struct timespec interval, remainder;
+    struct timespec interval, remainder;
     while (Thread::running) {
         //start timer
         const long long startTime = micro_time();
@@ -150,9 +150,9 @@ void ALImageTranscriber::run() {
             //Don't sleep at all
         } else{
             const long int microSleepTime = (VISION_FRAME_LENGTH_uS -
-                    processTime);
+                                             processTime);
             const long int nanoSleepTime =
-                    (microSleepTime %(1000 * 1000)) * 1000;
+                (microSleepTime %(1000 * 1000)) * 1000;
 
             const long int secSleepTime = microSleepTime / (1000*1000);
 
@@ -169,11 +169,11 @@ void ALImageTranscriber::run() {
 }
 
 void ALImageTranscriber::stop() {
-	std::cout << "Stopping ALImageTranscriber" << std::endl;
+    std::cout << "Stopping ALImageTranscriber" << std::endl;
     running = false;
 #ifdef USE_VISION
     if(camera_active){
-		std::cout << "lem_name = " << lem_name << std::endl;
+        std::cout << "lem_name = " << lem_name << std::endl;
         try {
             camera->callVoid("unregister", lem_name);
         }catch (ALError &e) {
@@ -202,10 +202,6 @@ void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker) {
     int colorSpace = NAO_COLOR_SPACE;
     int fps = DEFAULT_CAMERA_FRAMERATE;
 
-    int resolution = format;
-
-
-
 #ifdef DEBUG_MAN_INITIALIZATION
     printf("  Registering LEM with format=%i colorSpace=%i fps=%i\n", format,
            colorSpace, fps);
@@ -218,17 +214,17 @@ void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker) {
     } catch (ALError &e) {
         std::cout << "Failed to register camera" << lem_name << std::endl;
         camera_active = false;
-//         SleepMs(500);
+        //         SleepMs(500);
 
-//         try {
-//             printf("LEM failed once, trying again\n");
-//             lem_name = camera->call<std::string>("register", lem_name, format,
-//                                                  colorSpace, fps);
-//         }catch (ALError &e2) {
-//             log->error("ALImageTranscriber", "Could not call the register method of the NaoCam "
-//                        "module\n" + e2.toString());
-//             return;
-//         }
+        //         try {
+        //             printf("LEM failed once, trying again\n");
+        //             lem_name = camera->call<std::string>("register", lem_name, format,
+        //                                                  colorSpace, fps);
+        //         }catch (ALError &e2) {
+        //             log->error("ALImageTranscriber", "Could not call the register method of the NaoCam "
+        //                        "module\n" + e2.toString());
+        //             return;
+        //         }
     }
 
 }
@@ -242,12 +238,12 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
         currentCam =  camera->call<int>( "getParam", kCameraSelectID );
         if (whichCam != currentCam){
             std::cout << "Failed to switch to camera "<<whichCam
-                 <<" retry in " << CAMERA_SLEEP_TIME <<" ms" <<std::endl;
+                      <<" retry in " << CAMERA_SLEEP_TIME <<" ms" <<std::endl;
             SleepMs(CAMERA_SLEEP_TIME);
             currentCam =  camera->call<int>( "getParam", kCameraSelectID );
             if (whichCam != currentCam){
                 std::cout << "Failed to switch to camera "<<whichCam
-                     <<" ... returning, no parameters initialized" <<std::endl;
+                          <<" ... returning, no parameters initialized" <<std::endl;
                 return;
             }
         }
@@ -560,12 +556,12 @@ void ALImageTranscriber::releaseImage(){
 
     //Now you have finished with the image, you have to release it in the V.I.M.
     try
-    {
-        camera->call<int>( "releaseDirectRawImage", lem_name );
-    }catch( ALError& e)
-    {
-        log->error( "ALImageTranscriber",
-                    "could not call the releaseImage method of the NaoCam module" );
-    }
+        {
+            camera->call<int>( "releaseDirectRawImage", lem_name );
+        }catch( ALError& e)
+        {
+            log->error( "ALImageTranscriber",
+                        "could not call the releaseImage method of the NaoCam module" );
+        }
 #endif
 }

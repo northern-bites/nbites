@@ -28,8 +28,8 @@ public:
 	void mergeBlobs(int first, int second);
 
 // getters
-	int number() {return numBlobs;}
-	Blob get(int which) {return blobs[which];}
+	int number() const {return numBlobs;}
+	Blob get(int which) const {return blobs[which];}
 
 private:
 	int total;

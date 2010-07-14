@@ -37,9 +37,9 @@ class Sensors;
 
 
 struct FSR {
-    FSR(const float fl, const float fr,
-        const float rl, const float rr)
-        : frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
+FSR(const float fl, const float fr,
+    const float rl, const float rr)
+: frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
 
     float frontLeft;
     float frontRight;
@@ -61,11 +61,11 @@ struct FootBumper {
 };
 
 struct Inertial {
-    Inertial(const float _accX, const float _accY, const float _accZ,
-             const float _gyrX, const float _gyrY,
-             const float _angleX, const float _angleY)
-        : accX(_accX), accY(_accY), accZ(_accZ),
-          gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
+Inertial(const float _accX, const float _accY, const float _accZ,
+         const float _gyrX, const float _gyrY,
+         const float _angleX, const float _angleY)
+: accX(_accX), accY(_accY), accZ(_accZ),
+        gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
 
     float accX;
     float accY;
@@ -78,8 +78,8 @@ struct Inertial {
 
 
 class Sensors {
-  //friend class Man;
-  public:
+    //friend class Man;
+ public:
     Sensors();
     ~Sensors();
 
@@ -91,11 +91,11 @@ class Sensors {
     const std::vector<float> getBodyAngles_degs() const;
     const std::vector<float> getVisionBodyAngles() const;
     const std::vector<float> getMotionBodyAngles() const;
-	const std::vector<float> getMotionBodyAngles_degs() const;
+    const std::vector<float> getMotionBodyAngles_degs() const;
     const std::vector<float> getBodyTemperatures() const;
     const float getBodyAngle(const int index) const;
     const std::vector<float> getBodyAngleErrors() const ;
-	const float getBodyAngleError(int index) const;
+    const float getBodyAngleError(int index) const;
     const FSR getLeftFootFSR() const;
     const FSR getRightFootFSR() const;
     const FootBumper getLeftFootBumper() const;
@@ -171,10 +171,10 @@ class Sensors {
     //   its own, and there is no way, even with locking, to guarantee that the
     //   underlying data at the image pointer location is not modified while
     //   the image is locked in Sensors.
-    const unsigned char* getImage();
+    const unsigned char* getImage() const;
     void setImage(const unsigned char* img);
-    void lockImage();
-    void releaseImage();
+    void lockImage() const;
+    void releaseImage() const;
 
     // The following method will internally save a snapshot of the current body
     // angles. This way we can save joints that are synchronized to the most
@@ -188,7 +188,7 @@ class Sensors {
     void saveFrame(void);
     void resetSaveFrame(void);
 
-private:
+ private:
 
     void add_to_module();
 

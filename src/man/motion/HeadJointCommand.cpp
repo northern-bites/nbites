@@ -23,36 +23,35 @@ using namespace MotionConstants;
 using namespace Kinematics;
 
 HeadJointCommand::HeadJointCommand(const float time,
-								   const std::vector<float> *joints,
-								   const std::vector<float> *head_stiffness,
-								   const Kinematics::InterpolationType _type)
-	: JointCommand(HEAD_JOINT, time, _type, head_stiffness),
-	  headJoints(joints), noJoints(0)
+                                   const std::vector<float> *joints,
+                                   const std::vector<float> *head_stiffness,
+                                   const Kinematics::InterpolationType _type)
+    : JointCommand(HEAD_JOINT, time, _type, head_stiffness),
+      headJoints(joints), noJoints(0)
 {
-	setChainList();
+    setChainList();
 }
 
 HeadJointCommand::HeadJointCommand(const HeadJointCommand &other)
-	: JointCommand(HEAD_JOINT,
-				   other.getDuration(),
-				   other.getInterpolation(),
-				   other.getStiffness()),
-	  noJoints(0)
+    : JointCommand(HEAD_JOINT,
+                   other.getDuration(),
+                   other.getInterpolation(),
+                   other.getStiffness()),
+      noJoints(0)
 {
-	setChainList();
+    setChainList();
 
-	if(other.headJoints)
-		headJoints = new std::vector<float>(*other.headJoints);
+    if(other.headJoints){
+        headJoints = new std::vector<float>(*other.headJoints);
+    }
 }
 
 HeadJointCommand::~HeadJointCommand() {
-  if (headJoints != NULL)
     delete headJoints;
 }
-
 void
 HeadJointCommand::setChainList() {
-	chainList.insert(chainList.end(),
-					 HEAD_JOINT_CHAINS,
-					 HEAD_JOINT_CHAINS + HEAD_JOINT_NUM_CHAINS);
+    chainList.insert(chainList.end(),
+                     HEAD_JOINT_CHAINS,
+                     HEAD_JOINT_CHAINS + HEAD_JOINT_NUM_CHAINS);
 }

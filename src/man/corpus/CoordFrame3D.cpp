@@ -78,7 +78,7 @@ const NBMath::ufvector3 CoordFrame3D::vector3D(const float x, const float y,
 const NBMath::ufrowVector3 CoordFrame3D::rowVector3D(const float x,
                                                   const float y,
                                                   const float z) {
-    NBMath::ufrowVector3 p;
+    NBMath::ufrowVector3 p = boost::numeric::ublas::zero_matrix <float> (1,3);
     p(0,0) = x;
     p(0,1) = y;
     p(0,2) = z;

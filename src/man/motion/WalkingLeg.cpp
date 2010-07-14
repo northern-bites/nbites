@@ -169,7 +169,6 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
 		  static_cast<float>(singleSupportFrames));
 
     float theta = percent_complete*2.0f*M_PI_FLOAT;
-    float stepHeight = gait->step[WP::STEP_HEIGHT];
     float percent_to_dest_horizontal = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
 
     //Then we can express the destination as the proportionate distance to cover
@@ -209,7 +208,6 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     float dest_x = dest_c(0);
     float dest_y = dest_c(1);
 
-    float physicalHipOffY = 0;
     goal(0) = dest_x; //targetX for this leg
     goal(1) = dest_y;  //targetY
     goal(2) = -gait->stance[WP::BODY_HEIGHT];         //targetZ

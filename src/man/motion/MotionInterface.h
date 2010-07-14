@@ -69,32 +69,34 @@ class MotionInterface
         return switchboard->getOdometryUpdate();
     }
 
-    int postGotoCom(float pX, float pY, float pZ, float pTime, int pType) {
+    int postGotoCom(float pX, float pY, float pZ,
+                    float pTime, int pType) const{
         return DUMMY_I;
     }
-    int postGotoTorsoOrientation(float pX, float pY, float pTime, int pType) {
+    int postGotoTorsoOrientation(float pX, float pY,
+                                 float pTime, int pType) const {
         return DUMMY_I;
     }
 
-    float getHeadSpeed();
+    float getHeadSpeed() const ;
 
-    void setBodyStiffness(float percentStiffness, float time) {
+    void setBodyStiffness(float percentStiffness, float time) const {
     }
     void setHead(float time, float yaw, float pitch,
-                 Kinematics::InterpolationType type) { }
+                 Kinematics::InterpolationType type) const { }
     void setWalkConfig ( float pMaxStepLength, float pMaxStepHeight,
 			 float pMaxStepSide, float pMaxStepTurn,
-			 float pZmpOffsetX, float pZmpOffsetY);
+			 float pZmpOffsetX, float pZmpOffsetY) const ;
     void setWalkArmsConfig ( float pShoulderMedian, float pShoulderAmplitude,
-			     float pElbowMedian, float pElbowAmplitude);
+			     float pElbowMedian, float pElbowAmplitude) const ;
     void setWalkExtraConfig( float pLHipRollBacklashCompensator,
 			     float pRHipRollBacklashCompensator,
-			     float pHipHeight , float pTorsoYOrientation);
+			     float pHipHeight , float pTorsoYOrientation) const;
 
-    void setSupportMode( int pSupportMode );
-    int getSupportMode();
-    void setBalanceMode( int pBalanceMode );
-    int getBalanceMode();
+    void setSupportMode( int pSupportMode ) const ;
+    int getSupportMode() const;
+    void setBalanceMode( int pBalanceMode ) const ;
+    int getBalanceMode() const;
 
   private:
     MotionSwitchboard *switchboard;

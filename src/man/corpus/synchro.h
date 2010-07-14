@@ -167,7 +167,7 @@ class Thread
     virtual void run() = 0;
 
     // These are/should only fired once!  be careful, or deadlock could ensue
-    const boost::shared_ptr<TriggeredEvent> getTrigger() { return trigger; }
+    const boost::shared_ptr<TriggeredEvent> getTrigger() const{ return trigger;}
 
   private:
     static void* runThread(void* _thread);

@@ -14,21 +14,21 @@ struct YUV {
 
 
 class WBImageTranscriber : public ImageTranscriber{
-public:
+ public:
     WBImageTranscriber(boost::shared_ptr<Sensors> s);
     ~WBImageTranscriber();
 
     void releaseImage();
 
-public:
+ public:
     void waitForImage();
 
-private:
+ private:
     void setTwoYUV(unsigned char *image, const int baseIndex,
                    const YUV yuv1, const YUV yuv2);
     const YUV getWBYUVFromRGB(const unsigned char image[], const int baseIndex);
 
-private: //members
+ private: //members
     WbDeviceTag camera;
     unsigned char *image;
 

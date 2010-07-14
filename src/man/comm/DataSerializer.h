@@ -115,8 +115,8 @@ class DataSerializer {
     void closeAll() throw();
     void setblocking(bool toBlock) throw(socket_error&);
 
-    bool bound();
-    bool connected();
+    bool bound() const;
+    bool connected() const;
 
     void write_int   (int value)    throw(socket_error&);
     void write_byte  (byte value)   throw(socket_error&);

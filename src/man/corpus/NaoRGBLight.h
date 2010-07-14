@@ -6,7 +6,7 @@
 #include "ALLedNames.h"
 
 class NaoRGBLight{
-public:
+ public:
     NaoRGBLight(const std::string _NBLedName,
                 const unsigned int _NBLedID,
                 const unsigned int numSubLeds,
@@ -17,15 +17,15 @@ public:
 
     bool updateCommand(const int newRgbHex);
 
-	AL::ALValue * getAlias(){return &alias;}
-	AL::ALValue * getCommand(){return &command;}
+    AL::ALValue * getAlias(){return &alias;}
+    AL::ALValue * getCommand(){return &command;}
 
-private:
+ private:
     void makeAlias();
     void makeCommand();
-    const float getColor(const ALNames::LedColor c, const int rgbHex);
+    const float getColor(const ALNames::LedColor c, const int rgbHex) const;
 
-private:
+ private:
     AL::ALValue command;
     AL::ALValue alias;
     bool newValue;
@@ -37,7 +37,7 @@ private:
     const unsigned int startColor;
     const unsigned int endColor;
 
-public:
+ public:
     static const float LED_ON;
     static const float LED_OFF;
 
