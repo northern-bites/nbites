@@ -42,9 +42,9 @@ stanceMax = (31.00, # CoM height
 
 stepMin = (0.15,   #** step duration
            0.1,   #** fraction in double support
-           0.1,   #** stepHeight
+           1.0,   #** stepHeight
            -20.0, #** step lift
-           10.0,  #** max x speed
+           15.0,  # max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
@@ -54,10 +54,10 @@ stepMin = (0.15,   #** step duration
            1.0)   # walk gait = true
 
 stepMax = (0.4,   #** step duration
-           0.5,   #** fraction in double support
+           0.4,   #** fraction in double support
            5.0,   #** stepHeight
-           0.0,   #** step lift
-           30.0,  #** max x speed
+           10.0,   #** step lift
+           15.0,  # max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
