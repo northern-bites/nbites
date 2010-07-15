@@ -77,6 +77,7 @@ def scoreGaitPerformance(player):
    heuristic = frames_stood + distance_traveled + path_linearity - stability_penalty
 
    print "total distance traveled with this gait is ", distance_traveled
+   print "heuristic for this run is ", heuristic
 
    player.swarm.getCurrParticle().setHeuristic(heuristic)
    player.swarm.tickCurrParticle()

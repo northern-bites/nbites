@@ -8,9 +8,9 @@ FALL_FRAMES_THRESHOLD = 15
 
 # unstable walks that do not fall have accelerometer variance
 # on the order of 1.5-3, stable walks are < 1
-X_STABILITY_WEIGHT = 100
-Y_STABILITY_WEIGHT = 100
-XY_CORRELATION_WEIGHT = 200
+X_STABILITY_WEIGHT = 50
+Y_STABILITY_WEIGHT = 50
+XY_CORRELATION_WEIGHT = 300
 
 class Stability:
     """
