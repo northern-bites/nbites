@@ -53,8 +53,8 @@ stepMin = (0.15,   #** step duration
            20.0,  # max theta speed()
            1.0)   # walk gait = true
 
-stepMax = (0.4,   #** step duration
-           0.4,   #** fraction in double support
+stepMax = (0.3,   #** step duration
+           0.5,   #** fraction in double support
            5.0,   #** stepHeight
            10.0,   #** step lift
            15.0,  # max x speed

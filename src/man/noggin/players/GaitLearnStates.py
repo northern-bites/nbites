@@ -10,6 +10,14 @@ from man.motion.gaits.GaitLearnBoundaries import \
     gaitToArray, arrayToGaitTuple
 from os.path import isfile
 
+# Webots Controller functions, so we can do supervisor stuff
+# for the import to work you must also copy add Webots/lib/ to
+# your library search path. Hack Hack Hack.
+# -Nathan
+import sys
+sys.path.append('/Applications/Webots/lib/python')
+from controller import *
+
 try:
    import cPickle as pickle
 except:
@@ -25,9 +33,14 @@ def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
     if player.firstFrame():
         player.gainsOn()
-        player.brain.tracker.trackBall()
+        #player.brain.tracker.trackBall()
 
         startPSO(player)
+
+    if WEBOTS_ACTIVE:
+       enableGPS(player)
+    else:
+       player.haveWbGPS = False
 
     return player.goLater('stopandchangegait')
 
@@ -53,6 +66,7 @@ def walkstraightstop(player):
     # too computationally expensive to use every point
     if player.counter % POSITION_UPDATE_FRAMES == 0:
        stability.updatePosition(getCurrentLocation(player))
+       print "current location: ", getCurrentLocation(player)
 
     if player.counter == OPTIMIZE_FRAMES or isFallen:
        scoreGaitPerformance(player)
@@ -74,7 +88,10 @@ def scoreGaitPerformance(player):
    stability_penalty = stability.getStabilityHeuristic()
 
    # we maximize on the heuristic
-   heuristic = frames_stood + distance_traveled + path_linearity - stability_penalty
+   heuristic = frames_stood \
+       + distance_traveled * distanceWeight(player) \
+       + path_linearity \
+       - stability_penalty
 
    print "total distance traveled with this gait is ", distance_traveled
    print "heuristic for this run is ", heuristic
@@ -85,8 +102,11 @@ def scoreGaitPerformance(player):
 
 def newOptimizeParameters(player):
    if RUN_ONCE_STOP:
-      print "stopping optimization, restart webots"
-      return player.goLater('stopwalking')
+      if WEBOTS_ACTIVE:
+         print "stopping optimization, reverting webots states"
+         return player.goLater('revertWebots')
+      else:
+         return player.goLater('stopwalking')
    else:
       return player.goLater('stopandchangegait')
 
@@ -97,6 +117,13 @@ def stopwalking(player):
 
     return player.stay()
 
+def revertWebots(player):
+   '''Uses WB supervisor calls to revert the simulator'''
+   if player.firstFrame():
+      supervisor = Supervisor()
+      supervisor.simulationRevert()
+
+   return player.stay()
 
 def stopandchangegait(player):
     '''Set new gait and start walking again'''
@@ -121,33 +148,6 @@ def stopandchangegait(player):
         return player.goLater('walkstraightstop')
 
     return player.stay()
-
-def standup(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.ZERO_POS)
-    return player.stay()
-
-def standuplearn(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.STAND_UP_FRONT)
-
-    return player.goLater('stopandchangegait')
-
-def sitdown(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.SIT_POS)
-
-    elif player.brain.motion.isBodyActive():
-        return player.goLater("printloc")
-
-    return player.stay()
-
-def shutoffgains(player):
-    if player.firstFrame():
-        shutoff = motion.StiffnessCommand(0.0)
-        player.brain.motion.sendStiffness(shutoff)
-
-    return player.goLater('nothing')
 
 def printloc(player):
     if player.firstFrame():
@@ -176,6 +176,15 @@ def loadPSO(player):
     player.swarm = pickle.load(f)
     f.close()
 
+def enableGPS(player):
+   print "Enabled Webots GPS"
+   try:
+      player.wbGPS = GPS('gps')
+      player.wbGPS.enable(30)
+      player.haveWbGPS = True
+   except:
+      player.haveWbGPS = False
+
 def setWalkVector(player, x, y, theta):
     """
     Use this guy because all the wrappings through Nav tend
@@ -185,8 +194,19 @@ def setWalkVector(player, x, y, theta):
     player.brain.motion.setNextWalkCommand(walk)
 
 def getCurrentLocation(player):
-   return Location.Location(player.brain.my.x,
-                            player.brain.my.y,
-                            player.brain.my.h)
+   if player.haveWbGPS:
+      wbPosition = player.wbGPS.getValues()
+      return Location.Location(wbPosition[0],
+                               wbPosition[1],
+                               player.brain.my.h)
+   else:
+      return Location.Location(player.brain.my.x,
+                               player.brain.my.y,
+                               player.brain.my.h)
 
 
+def distanceWeight(player):
+   if player.haveWbGPS:
+      return 100
+   else:
+      return 1
