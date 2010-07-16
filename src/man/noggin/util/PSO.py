@@ -39,14 +39,16 @@ SOC = 1.4
 VELOCITY_CAP = 2
 VELOCITY_MINIMUM_MAGNITUDE = 0.01
 
+INFINITY = float(1e3000)
+
 class Particle:
     def __init__(self, nSpace, searchMins, searchMaxs):
         self.dimension = nSpace
 
-        self.pBest = 0
+        self.pBest = -INFINITY
         self.pBest_vars = [0]*nSpace
 
-        self.gBest = 0
+        self.gBest = -INFINITY
         self.gBest_position = []
 
         self.searchMins = searchMins
@@ -117,8 +119,7 @@ class Particle:
 
     # used to decide how stable our most recent set of parameters were
     def getHeuristic(self):
-
-        return 0
+        return
 
     # when we set heuristic from outside the swarm, use this
     def setHeuristic(self, outside_heuristic):
@@ -143,7 +144,7 @@ class Swarm:
         self.partIndex = 0
         self.numParticles = numParticles
 
-        self.gBest = 0
+        self.gBest = -INFINITY
         self.gBest_position = [0]*nSpace
 
         for i in range(0, numParticles):
