@@ -70,15 +70,6 @@ using boost::shared_ptr;
 Field::Field(Vision* vis, Threshold * thr)
 : vision(vis), thresh(thr)
 {
-#ifdef OFFLINE
-    debugHorizon = false;
-    debugFieldEdge = false;
-    openField = false;
-#else
-    debugHorizon = false;
-    debugFieldEdge = false;
-    openField = false;
-#endif
 }
 
 
@@ -254,7 +245,7 @@ int Field::findGreenHorizon(int pH, float sl) {
       topEdge[i] = 0;
       shoot[i] = true;
     }
-    if (pH < 100) {
+    if (pH < -100) {
       horizon = 0;
       return 0;
     }

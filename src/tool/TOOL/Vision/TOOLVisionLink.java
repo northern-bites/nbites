@@ -209,6 +209,8 @@ public class TOOLVisionLink {
 	native private void cppSetPostLogicDebug(boolean _bool);
 	native private void cppSetPostSanityDebug(boolean _bool);
 	native private void cppSetPostCorrectDebug(boolean _bool);
+	native private void cppSetFieldHorizonDebug(boolean _bool);
+	native private void cppSetFieldEdgeDebug(boolean _bool);
 
     //Load the cpp library that implements the native methods
     static
@@ -584,6 +586,28 @@ public class TOOLVisionLink {
         if (visionLinkSuccessful) {
             try {
                 cppSetPostCorrectDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugFieldHorizon(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetFieldHorizonDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugFieldEdge(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetFieldEdgeDebug(_bool);
             } catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n");
             }

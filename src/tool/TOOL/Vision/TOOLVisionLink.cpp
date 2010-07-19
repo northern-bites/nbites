@@ -482,6 +482,16 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 		vision.thresh->yellow->setCorrect(debugCorrect);
 		vision.thresh->blue->setCorrect(debugCorrect);
 	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldHorizonDebug
+	(JNIEnv * env, jobject jobj, jboolean debugHorizon){
+		vision.thresh->field->setDebugHorizon(debugHorizon);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldEdgeDebug
+	(JNIEnv * env, jobject jobj, jboolean debugEdge){
+		vision.thresh->field->setDebugFieldEdge(debugEdge);
+	}
 
 
 #ifdef __cplusplus

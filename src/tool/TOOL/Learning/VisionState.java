@@ -1070,6 +1070,18 @@ public class VisionState {
 					thresholdedImage.getVisionLink().
 						setDebugPostCorrect(postCorrectBox.isSelected());}
 			});
+		final JCheckBox fieldHorizonBox = new JCheckBox(" Debug Field Horizon");
+		fieldHorizonBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugFieldHorizon(fieldHorizonBox.isSelected());}
+			});
+		final JCheckBox fieldEdgeBox = new JCheckBox(" Debug Field Edge");
+		fieldEdgeBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugFieldEdge(fieldEdgeBox.isSelected());}
+			});
 
 		buttonPanel.add(new JLabel("\tField Line Flags"));
 		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
@@ -1084,17 +1096,17 @@ public class VisionState {
 		buttonPanel.add(fieldLinesDebugIdentifyCornersBox);
 		buttonPanel.add(fieldLinesDebugCcScanBox);
 		buttonPanel.add(fieldLinesDebugRiskyCornersBox);
-		ballPanel.add(new JLabel("\tBall Flags"));
+		ballPanel.add(new JLabel("\tVision Flags"));
 		ballPanel.add(ballDebugBallBox);
 		ballPanel.add(ballDebugBallDistanceBox);
-		ballPanel.add(new JLabel("\tCross Flag"));
 		ballPanel.add(crossDebugBox);
-		ballPanel.add(new JLabel("\tGoal Post Flags"));
 		ballPanel.add(postPrintBox);
 		ballPanel.add(postDebugBox);
 		ballPanel.add(postLogicBox);
 		ballPanel.add(postSanityBox);
 		ballPanel.add(postCorrectBox);
+		ballPanel.add(fieldHorizonBox);
+		ballPanel.add(fieldEdgeBox);
 		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
 		JPanel debugPanel = new JPanel();
@@ -1140,5 +1152,7 @@ public class VisionState {
 		thresholdedImage.getVisionLink().setDebugPostLogic(false);
 		thresholdedImage.getVisionLink().setDebugPostSanity(false);
 		thresholdedImage.getVisionLink().setDebugPostCorrect(false);
+		thresholdedImage.getVisionLink().setDebugFieldHorizon(false);
+		thresholdedImage.getVisionLink().setDebugFieldEdge(false);
 	}
 }

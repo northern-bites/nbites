@@ -35,6 +35,10 @@ public:
     void openDirection(int h, NaoPose *p);
     void drawLess(int x, int y, int c);
     void drawMore(int x, int y, int c);
+#ifdef OFFLINE
+	void setDebugHorizon(bool debug) {debugHorizon = debug;}
+	void setDebugFieldEdge(bool debug) {debugFieldEdge = debug;}
+#endif
 
 private:
 
@@ -44,15 +48,17 @@ private:
 
 	// the field horizon
 	int horizon;
-	bool debugHorizon;
-	bool debugFieldEdge;
-	bool debugShot;
-	bool openField;
-
 	float slope;
 
     bool shoot[IMAGE_WIDTH];
 	int  topEdge[IMAGE_WIDTH+1];
+#ifdef OFFLINE
+    bool debugHorizon;
+    bool debugFieldEdge;
+#else
+    static const bool debugHorizon = false;
+    static const bool debugFieldEdge = false;
+#endif
 };
 
 #endif // Field_h_DEFINED
