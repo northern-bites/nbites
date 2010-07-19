@@ -66,16 +66,6 @@ static const float THINBALL = 0.5f;
 
 static const int DIST_POINT_FUDGE = 5;
 
-#ifdef OFFLINE
-static const bool BALLDISTDEBUG = false;
-static const bool BALLDEBUG = false;
-static const bool DEBUGBALLPOINTS = false;
-#else
-static const bool BALLDISTDEBUG = false;
-static const bool BALLDEBUG = false;
-static const bool DEBUGBALLPOINTS = false;
-#endif
-
 //previous constants inserted from .h class
 
 
@@ -814,94 +804,6 @@ bool Ball::greenSide(Blob b)
     return false;
 }
 
-/* Scan from a point in the ball, in a certain direction to find a point.
- * TODO: Use this.  It would be especially usefor for occluded balls.
- * @param start_x     the x location of the point
- * @param start_y     the y location of the point
- * @param slopel      the slope of the scanline
- * @param dir         positive or negative direction
- * @return            whether the point is good (0) or bad (1)
- */
-int Ball::scanOut(int start_x, int start_y, float slopel, int dir){
-    if(DEBUGBALLPOINTS) {
-        printf("Passed start_x %d, start_y %d, slopel %g, dir %d \n",
-               start_x,start_y,slopel,dir);
-    }
-    //thresh->drawPoint(start_x,start_y,PINK);
-
-    bool yOrX = true; //which axis do we scan on?
-
-    int NOISE_SKIPS = 4;
-    int EDGE_DEPTH = 3;
-    int x = start_x;
-    int y = start_y;
-    int good = 0;
-    int bad = 0;
-    int goodEdge = 0;
-    int lastGoodX = x;
-    int lastGoodY = y;
-
-    if(slopel> 1 || slopel<-1){ //when the slope is big, we must switch axis.
-        yOrX = false;
-        slopel = 1/slopel;
-        //dir = -dir;
-    }
-
-    //scan for orange, or other ball colors
-    while(x < IMAGE_WIDTH && x >= 0
-            &&y < IMAGE_HEIGHT && y >= 0
-            && bad <= NOISE_SKIPS && goodEdge <= EDGE_DEPTH){
-        int thisPix = thresh->thresholded[y][x];
-        //printf("new pix:%d good:%d bad:%d\n",thisPix,good,bad);
-        if(thisPix == ORANGE || thisPix == ORANGERED || thisPix == ORANGEYELLOW)
-        {
-            good++;
-            if(good > NOISE_SKIPS){
-                bad = 0;
-                goodEdge = 0;
-            }
-            lastGoodX = x;
-            lastGoodY = y;
-            if (DEBUGBALLPOINTS) {
-                //thresh->debugImage[y][x] = NAVY;
-            }
-        }else if(thisPix == GREEN || thisPix == BLACK){
-            good  = 0;
-            bad++;
-            goodEdge++;
-            //if (DEBUGBALLPOINTS)
-            //thresh->debugImage[y][x] = WHITE;
-        }else{
-            good  = 0;
-            bad++;
-            //if (DEBUGBALLPOINTS)
-            //thresh->debugImage[y][x] = BLACK;
-        }
-
-        //update position for both y, x
-        if(yOrX){
-            x = x + dir;
-            y = start_y  +ROUND2(slopel*(float)(x - (start_x)));
-        }else{
-            y = y + dir;
-            x = start_x  +ROUND2(slopel*(float)(y - (start_y)));
-        }
-    }
-    if(goodEdge < EDGE_DEPTH){ // bad point
-        //printf("EDGE point == no good!\n");
-        if(DEBUGBALLPOINTS)
-            drawPoint(lastGoodX,lastGoodY,RED);
-        return 1;
-    }else{ //good point
-        if(DEBUGBALLPOINTS)
-            drawPoint(lastGoodX,lastGoodY,BLUE);
-        addPoint(static_cast<float>(lastGoodX),
-                 static_cast<float>(lastGoodY) );
-        return 0;
-    }
-
-}
-
 /*  It probably goes without saying that the ideal ball is round.  So let's see
  * how round our current candidate is.  Among other things we check its
  * height/width ratio (should be about 1) and where the orange is (shouldn't
@@ -1164,7 +1066,7 @@ bool Ball::badSurround(Blob b) {
         }
         return true;
     }
-    if (realred > greens) {
+    if (realred > greens && b.width() * b.height() < 500) {
         if (BALLDEBUG) {
             cout << "Too much real red versus green" << endl;
         }

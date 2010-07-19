@@ -201,6 +201,8 @@ public class TOOLVisionLink {
     native private void cppSetFieldLinesDebugCcScan(boolean _bool);
     native private void cppSetFieldLinesDebugRiskyCorners(boolean _bool);
     native private void cppSetFieldLinesDebugCornerAndObjectDistances(boolean _bool);
+	native private void cppSetBallDebugBall(boolean _bool);
+	native private void cppSetBallDebugBallDistance(boolean _bool);
 
     //Load the cpp library that implements the native methods
     static
@@ -488,6 +490,28 @@ public class TOOLVisionLink {
         if (visionLinkSuccessful) {
             try {
                 cppSetFieldLinesDebugCornerAndObjectDistances(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugBall(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetBallDebugBall(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugBallDistance(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetBallDebugBallDistance(_bool);
             } catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n");
             }

@@ -437,6 +437,16 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 	(JNIEnv * env, jobject jobj, jboolean debugFitUnusedPoints){
 		vision.fieldLines->setDebugFitUnusedPoints(debugFitUnusedPoints);
 	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetBallDebugBall
+	(JNIEnv * env, jobject jobj, jboolean debugBall){
+		vision.thresh->orange->setDebugBall(debugBall);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetBallDebugBallDistance
+	(JNIEnv * env, jobject jobj, jboolean debugBallDistance){
+		vision.thresh->orange->setDebugBallDistance(debugBallDistance);
+	}
 
 
 #ifdef __cplusplus

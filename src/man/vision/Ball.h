@@ -95,7 +95,10 @@ public:
     void printBlob(Blob b);
     void paintRun(int x,int y, int h, int c);
     void drawRun(const run& run, int c);
-
+#ifdef OFFLINE
+	void setDebugBall(bool debugBall) {BALLDEBUG = debugBall;}
+	void setDebugBallDistance(bool debug) {BALLDISTDEBUG = debug;}
+#endif
 
 private:
     // class pointers
@@ -122,7 +125,13 @@ private:
     point <int> spot;
     int numPoints;
     float points[MAX_BALL_POINTS*2];
-
+#ifdef OFFLINE
+	bool BALLDISTDEBUG;
+	bool BALLDEBUG;
+#else
+	static const bool BALLDISTDEBUG = false;
+	static const bool BALLDEBUG = false;
+#endif
 };
 
 #endif // Ball_h_DEFINED

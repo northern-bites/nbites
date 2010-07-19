@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import java.awt.GridLayout;
+import javax.swing.BoxLayout;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -945,6 +946,7 @@ public class VisionState {
 	{
 		JFrame debugWindow = new JFrame();
 		JPanel buttonPanel = new JPanel();
+		JPanel ballPanel = new JPanel();
 
 		final JCheckBox fieldLinesDebugVertEdgeDetectBox = new JCheckBox(" Debug VertEdgeDetect");
 		fieldLinesDebugVertEdgeDetectBox.addActionListener(new ActionListener(){
@@ -1020,6 +1022,18 @@ public class VisionState {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugCornerAndObjectDistances(fieldLinesDebugCornerAndObjectDistancesBox.isSelected());}
 			});
+		final JCheckBox ballDebugBallBox = new JCheckBox(" Debug Balls");
+		ballDebugBallBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugBall(ballDebugBallBox.isSelected());}
+			});
+		final JCheckBox ballDebugBallDistanceBox = new JCheckBox(" Debug Ball Distance");
+		ballDebugBallDistanceBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugBallDistance(ballDebugBallDistanceBox.isSelected());}
+			});
 
 		buttonPanel.add(new JLabel("\tField Line Flags"));
 		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
@@ -1034,11 +1048,17 @@ public class VisionState {
 		buttonPanel.add(fieldLinesDebugIdentifyCornersBox);
 		buttonPanel.add(fieldLinesDebugCcScanBox);
 		buttonPanel.add(fieldLinesDebugRiskyCornersBox);
+		ballPanel.add(new JLabel("\tBall Flags"));
+		ballPanel.add(ballDebugBallBox);
+		ballPanel.add(ballDebugBallDistanceBox);
+		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
-		buttonPanel.setLayout(new GridLayout(13,1));
-
-		debugWindow.add(buttonPanel);
-		debugWindow.setSize(400,400);
+		JPanel debugPanel = new JPanel();
+		debugPanel.setLayout(new GridLayout(1,1));
+		debugPanel.add(buttonPanel);
+		debugPanel.add(ballPanel);
+		debugWindow.add(debugPanel);
+		debugWindow.setSize(500, 500);
 		debugWindow.setVisible(true);
 
         // Disable all the debugging information by default
@@ -1067,5 +1087,8 @@ public class VisionState {
 
         thresholdedImage.getVisionLink().
             setFieldLinesDebugCornerAndObjectDistances(false);
+
+		thresholdedImage.getVisionLink().setDebugBall(false);
+		thresholdedImage.getVisionLink().setDebugBallDistance(false);
 	}
 }
