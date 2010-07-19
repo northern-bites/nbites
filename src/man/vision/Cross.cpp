@@ -29,12 +29,6 @@
 
 //using namespace std;
 
-#ifdef OFFLINE
-static bool CROSSDEBUG = false;
-#else
-static bool CROSSDEBUG = false;
-#endif
-
 Cross::Cross(Vision* vis, Threshold* thr, Field* fie)
     : vision(vis), thresh(thr), field(fie)
 {

@@ -447,6 +447,11 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 	(JNIEnv * env, jobject jobj, jboolean debugBallDistance){
 		vision.thresh->orange->setDebugBallDistance(debugBallDistance);
 	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetCrossDebug
+	(JNIEnv * env, jobject jobj, jboolean debugCross){
+		vision.thresh->cross->setCrossDebug(debugCross);
+	}
 
 
 #ifdef __cplusplus

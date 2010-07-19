@@ -43,6 +43,9 @@ public:
 	void newRun(int x, int y, int h);
 	void allocateColorRuns();
 	bool rightBlobColor(Blob b, float perc);
+#ifdef OFFLINE
+	void setCrossDebug(bool debug) {CROSSDEBUG = debug;}
+#endif
 
 private:
     // class pointers
@@ -53,5 +56,10 @@ private:
 	Blobs* blobs;
 	int numberOfRuns, runsize;
 	run* runs;
+#ifdef OFFLINE
+	bool CROSSDEBUG;
+#else
+	static const bool CROSSDEBUG = false;
+#endif
 };
 #endif

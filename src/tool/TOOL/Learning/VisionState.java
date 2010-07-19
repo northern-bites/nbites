@@ -1034,6 +1034,12 @@ public class VisionState {
 					thresholdedImage.getVisionLink().
 						setDebugBallDistance(ballDebugBallDistanceBox.isSelected());}
 			});
+		final JCheckBox crossDebugBox = new JCheckBox(" Debug Cross");
+		crossDebugBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugCross(crossDebugBox.isSelected());}
+			});
 
 		buttonPanel.add(new JLabel("\tField Line Flags"));
 		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
@@ -1051,6 +1057,8 @@ public class VisionState {
 		ballPanel.add(new JLabel("\tBall Flags"));
 		ballPanel.add(ballDebugBallBox);
 		ballPanel.add(ballDebugBallDistanceBox);
+		ballPanel.add(new JLabel("\tCross Flag"));
+		ballPanel.add(crossDebugBox);
 		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
 		JPanel debugPanel = new JPanel();
@@ -1090,5 +1098,6 @@ public class VisionState {
 
 		thresholdedImage.getVisionLink().setDebugBall(false);
 		thresholdedImage.getVisionLink().setDebugBallDistance(false);
+		thresholdedImage.getVisionLink().setDebugCross(false);
 	}
 }
