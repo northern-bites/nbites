@@ -90,5 +90,5 @@ rm -rf boost_1_43_0 && tar -xjf boost_1_43_0.tar.gz || exit 1
 echo "building boost"
 pushd boost_1_43_0 && \
     ./bootstrap.sh --with-libraries=python,signals && \
-    sudo ./bjam address-model=32_64 install && \
+    sudo ./bjam address-model=32_64 architecture=x86 install && \
     popd || exit 1
