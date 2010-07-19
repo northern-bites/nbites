@@ -54,7 +54,6 @@ class Particle:
         self.searchMins = searchMins
         self.searchMaxs = searchMaxs
 
-        # our positions and velocities in N-space
         self.position = [0]*nSpace
         self.velocity = [0]*nSpace
 
