@@ -1040,6 +1040,36 @@ public class VisionState {
 					thresholdedImage.getVisionLink().
 						setDebugCross(crossDebugBox.isSelected());}
 			});
+		final JCheckBox postPrintBox = new JCheckBox(" Debug Posts Print");
+		postPrintBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPostPrint(postPrintBox.isSelected());}
+			});
+		final JCheckBox postDebugBox = new JCheckBox(" Debug Posts");
+		postDebugBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPost(postDebugBox.isSelected());}
+			});
+		final JCheckBox postLogicBox = new JCheckBox(" Debug Posts Logic");
+		postLogicBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPostLogic(postLogicBox.isSelected());}
+			});
+		final JCheckBox postSanityBox = new JCheckBox(" Debug Posts Sanity");
+		postSanityBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPostSanity(postSanityBox.isSelected());}
+			});
+		final JCheckBox postCorrectBox = new JCheckBox(" Debug Posts Correct");
+		postCorrectBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPostCorrect(postCorrectBox.isSelected());}
+			});
 
 		buttonPanel.add(new JLabel("\tField Line Flags"));
 		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
@@ -1059,6 +1089,12 @@ public class VisionState {
 		ballPanel.add(ballDebugBallDistanceBox);
 		ballPanel.add(new JLabel("\tCross Flag"));
 		ballPanel.add(crossDebugBox);
+		ballPanel.add(new JLabel("\tGoal Post Flags"));
+		ballPanel.add(postPrintBox);
+		ballPanel.add(postDebugBox);
+		ballPanel.add(postLogicBox);
+		ballPanel.add(postSanityBox);
+		ballPanel.add(postCorrectBox);
 		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
 		JPanel debugPanel = new JPanel();
@@ -1099,5 +1135,10 @@ public class VisionState {
 		thresholdedImage.getVisionLink().setDebugBall(false);
 		thresholdedImage.getVisionLink().setDebugBallDistance(false);
 		thresholdedImage.getVisionLink().setDebugCross(false);
+		thresholdedImage.getVisionLink().setDebugPostPrint(false);
+		thresholdedImage.getVisionLink().setDebugPost(false);
+		thresholdedImage.getVisionLink().setDebugPostLogic(false);
+		thresholdedImage.getVisionLink().setDebugPostSanity(false);
+		thresholdedImage.getVisionLink().setDebugPostCorrect(false);
 	}
 }

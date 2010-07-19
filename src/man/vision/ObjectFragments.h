@@ -137,6 +137,13 @@ public:
     void printObject(VisualFieldObject * objs);
     void paintRun(int x,int y, int h, int c);
     void drawRun(const run& run, int c);
+#ifdef OFFLINE
+	void setPrintObjs(bool debug) {PRINTOBJS = debug;}
+	void setPostDebug(bool debug) {POSTDEBUG = debug;}
+	void setPostLogic(bool debug) {POSTLOGIC = debug;}
+	void setSanity(bool debug) {SANITY = debug;}
+	void setCorrect(bool debug) {CORRECT = debug;}
+#endif
 
 
 private:
@@ -151,6 +158,20 @@ private:
     int numberOfRuns;
     run* runs;
     float slope;
+#ifdef OFFLINE
+	bool PRINTOBJS;
+	bool POSTDEBUG;
+	bool POSTLOGIC;
+	bool SANITY;
+	bool CORRECT;
+#else
+	static const bool PRINTOBJS = false;
+	static const bool POSTDEBUG = false;
+	static const bool POSTLOGIC = false;
+	static const bool SANITY = false;
+	static const bool CORRECT = false;
+#endif
+
 };
 
 #endif // ObjectFragments_h_DEFINED

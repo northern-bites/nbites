@@ -452,6 +452,36 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 	(JNIEnv * env, jobject jobj, jboolean debugCross){
 		vision.thresh->cross->setCrossDebug(debugCross);
 	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostPrintDebug
+	(JNIEnv * env, jobject jobj, jboolean debugPostPrint){
+		vision.thresh->yellow->setPrintObjs(debugPostPrint);
+		vision.thresh->blue->setPrintObjs(debugPostPrint);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostDebug
+	(JNIEnv * env, jobject jobj, jboolean debugPost){
+		vision.thresh->yellow->setPostDebug(debugPost);
+		vision.thresh->blue->setPostDebug(debugPost);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostLogicDebug
+	(JNIEnv * env, jobject jobj, jboolean debugLogic){
+		vision.thresh->yellow->setPostLogic(debugLogic);
+		vision.thresh->blue->setPostLogic(debugLogic);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostSanityDebug
+	(JNIEnv * env, jobject jobj, jboolean debugSanity){
+		vision.thresh->yellow->setSanity(debugSanity);
+		vision.thresh->blue->setSanity(debugSanity);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostCorrectDebug
+	(JNIEnv * env, jobject jobj, jboolean debugCorrect){
+		vision.thresh->yellow->setCorrect(debugCorrect);
+		vision.thresh->blue->setCorrect(debugCorrect);
+	}
 
 
 #ifdef __cplusplus

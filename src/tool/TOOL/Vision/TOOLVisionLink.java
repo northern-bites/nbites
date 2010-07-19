@@ -204,6 +204,11 @@ public class TOOLVisionLink {
 	native private void cppSetBallDebugBall(boolean _bool);
 	native private void cppSetBallDebugBallDistance(boolean _bool);
 	native private void cppSetCrossDebug(boolean _bool);
+	native private void cppSetPostPrintDebug(boolean _bool);
+	native private void cppSetPostDebug(boolean _bool);
+	native private void cppSetPostLogicDebug(boolean _bool);
+	native private void cppSetPostSanityDebug(boolean _bool);
+	native private void cppSetPostCorrectDebug(boolean _bool);
 
     //Load the cpp library that implements the native methods
     static
@@ -524,6 +529,61 @@ public class TOOLVisionLink {
         if (visionLinkSuccessful) {
             try {
                 cppSetCrossDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugPostPrint(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetPostPrintDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugPost(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetPostDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugPostLogic(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetPostLogicDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugPostSanity(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetPostSanityDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugPostCorrect(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetPostCorrectDebug(_bool);
             } catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n");
             }

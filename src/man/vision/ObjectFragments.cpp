@@ -83,24 +83,6 @@ static const float NORMALPOST = 0.45f;
 static const float QUESTIONABLEPOST = 0.85f;
 static const int DIST_POINT_FUDGE = 5;
 
-#ifdef OFFLINE
-static const bool PRINTOBJS = false;
-static const bool POSTDEBUG = false;
-static const bool POSTLOGIC = false;
-static const bool TOPFIND = false;
-static const bool CORNERDEBUG = false;
-static const bool SANITY = false;
-static const bool CORRECT = false;
-#else
-static const bool PRINTOBJS = false;
-static const bool POSTDEBUG = false;
-static const bool POSTLOGIC = false;
-static const bool TOPFIND = false;
-static const bool CORNERDEBUG = false;
-static const bool SANITY = false;
-static const bool CORRECT = false;
-#endif
-
 //previous constants inserted from .h class
 
 
