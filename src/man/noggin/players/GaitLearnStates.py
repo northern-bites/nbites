@@ -24,8 +24,9 @@ except:
    import pickle
 
 PSO_STATE_FILE = "PSO_pGaitLearner.pickle"
-OPTIMIZE_FRAMES = 800
+OPTIMIZE_FRAMES = 1000
 POSITION_UPDATE_FRAMES = 15
+MINIMUM_REQUIRED_DISTANCE = 75
 
 RUN_ONCE_STOP = True
 
@@ -88,11 +89,12 @@ def scoreGaitPerformance(player):
 
    # we maximize on the heuristic
    heuristic = frames_stood \
-       + distance_traveled * distanceWeight(player) \
+       + distancePenalty(player, distance_traveled) \
        + path_linearity \
        - stability_penalty
 
-   print "total distance traveled with this gait is ", distance_traveled
+   print "total distance traveled with this gait is ", \
+       fabs(distancePenalty(player, distance_traveled))
    print "heuristic for this run is ", heuristic
 
    player.swarm.getCurrParticle().setHeuristic(heuristic)
@@ -102,7 +104,6 @@ def scoreGaitPerformance(player):
 def newOptimizeParameters(player):
    if RUN_ONCE_STOP:
       if WEBOTS_ACTIVE:
-         print "stopping optimization, reverting webots states"
          return player.goLater('revertWebots')
       else:
          return player.goLater('stopwalking')
@@ -176,11 +177,11 @@ def loadPSO(player):
     f.close()
 
 def enableGPS(player):
-   print "Enabled Webots GPS"
    try:
       player.wbGPS = GPS('gps')
       player.wbGPS.enable(30)
       player.haveWbGPS = True
+      print "Enabled Webots GPS"
    except:
       player.haveWbGPS = False
 
@@ -196,7 +197,7 @@ def getCurrentLocation(player):
    if player.haveWbGPS:
       wbPosition = player.wbGPS.getValues()
       return Location.Location(wbPosition[0],
-                               wbPosition[1],
+                               wbPosition[2],
                                player.brain.my.h)
    else:
       return Location.Location(player.brain.my.x,
@@ -204,8 +205,18 @@ def getCurrentLocation(player):
                                player.brain.my.h)
 
 
-def distanceWeight(player):
+def distancePenalty(player, distance_traveled):
+   weight = 1
+
+   # webots uses different units than our localization
    if player.haveWbGPS:
-      return 100
+      weight = 100
+
+   weightedDistance = weight * distance_traveled
+
+   # prevents gaits that don't move at all
+   if weightedDistance < MINIMUM_REQUIRED_DISTANCE:
+      return - weightedDistance
+
    else:
-      return 1
+      return weightedDistance
