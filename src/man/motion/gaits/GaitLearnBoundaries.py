@@ -27,7 +27,7 @@ def arrayToGaitTuple(array):
     return (stance, step, zmp, hack, sensor, stiffness, odo, arm)
 
 stanceMin = (31.00, # CoM height
-            -5.0,   #** Forward displacement of CoM
+            0.0,   #** Forward displacement of CoM
             10.0,   #** Horizontal distance between feet
             0.0,   #** Body angle around y axis
             0.0,   # Angle between feet
@@ -41,10 +41,10 @@ stanceMax = (31.00, # CoM height
              0.1)   # Time to transition to/from this stance
 
 stepMin = (0.15,   #** step duration
-           0.1,   #** fraction in double support
+           0.2,   #** fraction in double support
            1.0,   #** stepHeight
            -20.0, #** step lift
-           15.0,  # max x speed
+           25.0,  # max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
@@ -57,7 +57,7 @@ stepMax = (0.3,   #** step duration
            0.5,   #** fraction in double support
            5.0,   #** stepHeight
            10.0,   #** step lift
-           15.0,  # max x speed
+           25.0,  # max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
@@ -76,8 +76,8 @@ zmpMin = zmpMax = (0.0,   # footCenterLocX
 hackMin = (0.0,   #** joint hack
            0.0)   #** joint hack
 
-hackMax =  (8.0,  #** joint hack
-           8.0)  #** joint hack
+hackMax =  (5.0,  #** joint hack
+           5.0)  #** joint hack
 
 sensorMin = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
              0.0,   # angle X scale (gamma)
