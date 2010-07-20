@@ -42,7 +42,7 @@ def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
     if player.firstFrame():
         player.gainsOn()
-        #player.brain.tracker.trackBall()
+        player.brain.tracker.stopHeadMoves()
 
         startPSO(player)
 
@@ -149,16 +149,7 @@ def stopandchangegait(player):
 
         gaitTuple = arrayToGaitTuple(player.swarm.getNextParticle().getPosition())
 
-        newGait = motion.GaitCommand(gaitTuple[0],
-                                     gaitTuple[1],
-                                     gaitTuple[2],
-                                     gaitTuple[3],
-                                     gaitTuple[4],
-                                     gaitTuple[5],
-                                     gaitTuple[6],
-                                     gaitTuple[7])
-
-        player.brain.CoA.setRobotDynamicGait(player.brain.motion, newGait)
+        setGait(player, gaitTuple)
 
     if player.counter == 20:
         return player.goLater('walkstraightstop')
@@ -240,6 +231,18 @@ def setWalkVector(player, x, y, theta):
     """
     walk = motion.WalkCommand(x=x,y=y,theta=theta)
     player.brain.motion.setNextWalkCommand(walk)
+
+def setGait(player, gaitTuple):
+        newGait = motion.GaitCommand(gaitTuple[0],
+                                     gaitTuple[1],
+                                     gaitTuple[2],
+                                     gaitTuple[3],
+                                     gaitTuple[4],
+                                     gaitTuple[5],
+                                     gaitTuple[6],
+                                     gaitTuple[7])
+
+        player.brain.CoA.setRobotDynamicGait(player.brain.motion, newGait)
 
 def getCurrentLocation(player):
    if player.haveWbGPS:
