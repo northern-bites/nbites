@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Script to sync frames between robocup and your local frames folder
-# Adapted for Gait PSO pickle files 
+# Adapted for Gait PSO pickle files
 
 
 USAGE="./sync [up-down] <folder-name> \nExample: $> ./sync down watson"
@@ -29,31 +28,32 @@ read username
 
 SERVER=$username@robocup.bowdoin.edu:
 ROBOCUP_DIR=/mnt/research/robocup
-FRAMES_DIR=gait-pso/
+GAITS_DIR=gait-pso/
 
-SYNC_UP="$RSYNC $RSYNC_OPTS $REMOTE_FOLDER $SERVER/$ROBOCUP_DIR/$FRAMES_DIR"
-SYNC_DOWN="$RSYNC $RSYNC_OPTS $SERVER/$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/* ./$FRAMES_DIR/$REMOTE_FOLDER"
-DIFF="$RSYNC $RSYNC_OPTS -n ./* $SERVER/$ROBOCUP_DIR/$TABLES_DIR/"
+SYNC_UP="$RSYNC $RSYNC_OPTS $REMOTE_FOLDER $SERVER/$ROBOCUP_DIR/$GAITS_DIR"
+
+SYNC_DOWN="$RSYNC $RSYNC_OPTS ${SERVER}${ROBOCUP_DIR}/$GAITS_DIR/$REMOTE_FOLDER/* ./$GAITS_DIR/$REMOTE_FOLDER"
 
 if [ "$UP_OR_DOWN" = "up" ]; then
 
-    echo "Syncing FROM `pwd`/$REMOTE_FOLDER TO $SERVER/$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER"
+    echo "Syncing FROM `pwd`/$REMOTE_FOLDER TO $SERVER/$ROBOCUP_DIR/$GAITS_DIR/$REMOTE_FOLDER"
     echo $SYNC_UP
     $SYNC_UP
 
 elif [ "$UP_OR_DOWN" = "down" ]; then
 
-    echo "Syncing FROM $SERVER/$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER TO `pwd`/$REMOTE_FOLDER "
+    echo "Syncing FROM $SERVER/$ROBOCUP_DIR/$GAITS_DIR/$REMOTE_FOLDER TO `pwd`/$REMOTE_FOLDER "
     echo $SYNC_DOWN
     cd ../
     $SYNC_DOWN
 
 elif [ "$UP_OR_DOWN"="diff" ]; then
     echo "Getting diff"
-    echo $DIFF
-    $DIFF
+    RSYNC_OPTS=${RSYNC_OPTS}n
+    echo $SYNC_UP
+    $SYNC_UP
 else
-echo "Invalid parameters"
-echo $USAGE
-exit 1
+    echo "Invalid parameters"
+    echo $USAGE
+    exit 1
 fi
