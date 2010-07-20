@@ -225,6 +225,7 @@ public:
     Cross* cross;
     // main array
     unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
+	Field* field;
 
 #ifdef OFFLINE
     //write lines, points, boxes to this array to avoid changing the real image
@@ -236,7 +237,6 @@ private:
     // class pointers
     Vision* vision;
     boost::shared_ptr<NaoPose> pose;
-    Field* field;
 
     const uchar* yuv;
     const uchar* yplane, *uplane, *vplane;
