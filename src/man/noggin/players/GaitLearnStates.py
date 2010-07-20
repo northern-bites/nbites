@@ -8,7 +8,9 @@ import man.noggin.util.PSO as PSO
 from man.motion.gaits.GaitLearnBoundaries import \
     gaitMins, gaitMaxs, \
     gaitToArray, arrayToGaitTuple
+
 from os.path import isfile
+from math import fabs
 
 # Webots Controller functions, so we can do supervisor stuff
 # for the import to work you must also copy add Webots/lib/ to
@@ -24,9 +26,15 @@ except:
    import pickle
 
 PSO_STATE_FILE = "PSO_pGaitLearner.pickle"
+BEST_GAIT_FILE = "PSO_endGait.pickle."
 OPTIMIZE_FRAMES = 1000
+
+SWARM_ITERATION_LIMIT = 20 # wikipedia says this should be enough to converge
+NUM_PARTICLES = 30
+
 POSITION_UPDATE_FRAMES = 15
 MINIMUM_REQUIRED_DISTANCE = 75
+DISTANCE_PENALTY = -300
 
 RUN_ONCE_STOP = True
 
@@ -90,11 +98,11 @@ def scoreGaitPerformance(player):
    # we maximize on the heuristic
    heuristic = frames_stood \
        + distancePenalty(player, distance_traveled) \
-       + path_linearity \
-       - stability_penalty
+       + path_linearity
+       #- stability_penalty
 
    print "total distance traveled with this gait is ", \
-       fabs(distancePenalty(player, distance_traveled))
+       distancePenalty(player, distance_traveled)
    print "heuristic for this run is ", heuristic
 
    player.swarm.getCurrParticle().setHeuristic(heuristic)
@@ -102,7 +110,15 @@ def scoreGaitPerformance(player):
    savePSO(player)
 
 def newOptimizeParameters(player):
-   if RUN_ONCE_STOP:
+   """
+   Controls what we do after every optimization run
+   pointer state to more interesting places
+   """
+   if player.swarm.getIterations() > SWARM_ITERATION_LIMIT:
+      print "Swarm is done optimizing!"
+      return player.goLater('reportBestGait')
+
+   elif RUN_ONCE_STOP:
       if WEBOTS_ACTIVE:
          return player.goLater('revertWebots')
       else:
@@ -149,6 +165,34 @@ def stopandchangegait(player):
 
     return player.stay()
 
+def reportBestGait(player):
+   if player.firstFrame():
+      (bestGaitArray, gaitScore) = player.swarm.getBestSolution()
+      bestGaitTuple = arrayToGaitTuple(bestGaitArray)
+
+      print "best found gait's heuristic score was: ", gaitScore
+
+      try:
+         gaitScore = int(gaitScore)
+         output = BEST_GAIT_FILE + str(gaitScore)
+
+         print "best gait saved to file: ", output
+         f = open(output, 'w')
+         pickle.dump(bestGaitTuple, f)
+         f.close()
+
+      except:
+         print "error pickling gait"
+
+   return player.goLater('restartOptimization')
+
+def restartOptimization(player):
+   if player.firstFrame():
+      newPSO(player)
+      savePSO(player)
+
+   return player.goLater('newOptimizeParameters')
+
 def printloc(player):
     if player.firstFrame():
         player.printf("Loc (X,Y,H) (%g,%g,%g"%
@@ -161,14 +205,18 @@ def startPSO(player):
     if isfile(PSO_STATE_FILE):
         loadPSO(player)
     else:
-        print "Initializing new PSO"
-        player.swarm = PSO.Swarm(25, 44, gaitToArray(gaitMins), gaitToArray(gaitMaxs))
+        newPSO(player)
 
 def savePSO(player):
     print "Saving PSO state to: ", PSO_STATE_FILE
     f = open(PSO_STATE_FILE, 'w')
     pickle.dump(player.swarm, f)
     f.close()
+
+def newPSO(player):
+   print "Initializing new PSO"
+   player.swarm = PSO.Swarm(NUM_PARTICLES,
+                            44, gaitToArray(gaitMins), gaitToArray(gaitMaxs))
 
 def loadPSO(player):
     print "Loading PSO state from: ", PSO_STATE_FILE
@@ -197,7 +245,7 @@ def getCurrentLocation(player):
    if player.haveWbGPS:
       wbPosition = player.wbGPS.getValues()
       return Location.Location(wbPosition[0],
-                               wbPosition[2],
+                               wbPosition[1],
                                player.brain.my.h)
    else:
       return Location.Location(player.brain.my.x,
@@ -216,7 +264,7 @@ def distancePenalty(player, distance_traveled):
 
    # prevents gaits that don't move at all
    if weightedDistance < MINIMUM_REQUIRED_DISTANCE:
-      return - weightedDistance
+      return DISTANCE_PENALTY
 
    else:
       return weightedDistance

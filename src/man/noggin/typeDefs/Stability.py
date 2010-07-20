@@ -10,14 +10,13 @@ FALL_FRAMES_THRESHOLD = 15
 # on the order of 1.5-3, stable walks are < 1
 X_STABILITY_WEIGHT = 50
 Y_STABILITY_WEIGHT = 10
-XY_CORRELATION_WEIGHT = 300
+XY_CORRELATION_WEIGHT = 200
 
 class Stability:
     """
     Collects stability data measured by accelerometers
     and checks to see how linear our path was
     """
-
     def __init__(self, sensors):
         self.sensors = sensors
 

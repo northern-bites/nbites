@@ -36,7 +36,7 @@ COG = 0.7
 SOC = 1.4
 
 # particle motion may not exceed abs(V_CAP) in any tick
-VELOCITY_CAP = 2
+VELOCITY_CAP = 1
 VELOCITY_MINIMUM_MAGNITUDE = 0.01
 
 INFINITY = float(1e3000)
@@ -146,16 +146,20 @@ class Swarm:
         self.gBest = -INFINITY
         self.gBest_position = [0]*nSpace
 
+        self.iterations = 0 # how many times every particle has moved
+
         for i in range(0, numParticles):
             self.particles.append(Particle(nSpace, searchMins, searchMaxs))
-            # uniformly distribute particles across search space and randomize velocity
+
             for j in range(0, nSpace):
-                # don't optimize this parameter
+                # don't optimize any parameter where min == max
                 if searchMins[j] == searchMaxs[j]:
                     self.particles[i].position[j] = searchMins[j]
                     self.particles[i].velocity[j] = 0
                     continue
 
+                # uniformly distribute particles across search space
+                # and randomize initial velocity
                 self.particles[i].position[j] = random.uniform(searchMins[j], \
                                                                     searchMaxs[j])
                 self.particles[i].velocity[j] = random.uniform(-VELOCITY_CAP*.5, \
@@ -173,6 +177,9 @@ class Swarm:
                 if DEBUG:
                     p.printState()
 
+    def getIterations(self):
+        return self.iterations
+
     def getCurrParticle(self):
         return self.particles[self.partIndex]
 
@@ -182,11 +189,12 @@ class Swarm:
         if self.partIndex < self.numParticles:
             return self.particles[self.partIndex]
         else:
+            self.iterations += 1
             self.partIndex = 0
             return self.particles[0]
 
     def getBestSolution(self):
-        return self.gBest_position
+        return (self.gBest_position, self.gBest)
 
     def tickCurrParticle(self):
         (self.gBest, self.gBest_position) = \
