@@ -1,5 +1,8 @@
-MAX_X_SPEED = 20.
-MIN_X_SPEED = -10.
+# don't clip speed here, annoying to keep updating this file
+# speed should be clipped in the Gait file or explicitly by the behavior
+
+MAX_X_SPEED = 50.
+MIN_X_SPEED = -20.
 MIN_X_MAGNITUDE = 1.5
 
 MAX_Y_SPEED = 15.

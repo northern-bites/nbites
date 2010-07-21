@@ -120,7 +120,7 @@ def newOptimizeParameters(player):
 
    elif RUN_ONCE_STOP:
       if WEBOTS_ACTIVE:
-         return player.goLater('revertWebots')
+         revertWebots(player)
       else:
          return player.goLater('stopwalking')
    else:
@@ -132,14 +132,6 @@ def stopwalking(player):
         setWalkVector(player, 0,0,0)
 
     return player.stay()
-
-def revertWebots(player):
-   '''Uses WB supervisor calls to revert the simulator'''
-   if player.firstFrame():
-      supervisor = Supervisor()
-      supervisor.simulationRevert()
-
-   return player.stay()
 
 def stopandchangegait(player):
     '''Set new gait and start walking again'''
@@ -166,6 +158,11 @@ def reportBestGait(player):
       try:
          gaitScore = int(gaitScore)
          output = BEST_GAIT_FILE + str(gaitScore)
+
+         i = 1
+         while isfile(output):
+            output = BEST_GAIT_FILE + str(gaitScore) + "." + str(i)
+            i += 1
 
          print "best gait saved to file: ", output
          f = open(output, 'w')
@@ -214,6 +211,11 @@ def loadPSO(player):
     f = open(PSO_STATE_FILE, 'r')
     player.swarm = pickle.load(f)
     f.close()
+
+def revertWebots(player):
+   '''Uses WB supervisor calls to revert the simulator'''
+   supervisor = Supervisor()
+   supervisor.simulationRevert()
 
 def enableGPS(player):
    try:

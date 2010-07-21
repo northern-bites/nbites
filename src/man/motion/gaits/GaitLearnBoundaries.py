@@ -44,7 +44,7 @@ stepMin = (0.15,   #** step duration
            0.2,   #** fraction in double support
            1.5,   #** stepHeight
            -20.0, #** step lift
-           25.0,  # max x speed
+           20.0,  #** max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
@@ -57,7 +57,7 @@ stepMax = (0.3,   #** step duration
            0.5,   #** fraction in double support
            5.0,   #** stepHeight
            20.0,   #** step lift
-           25.0,  # max x speed
+           25.0,  #** max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
@@ -68,23 +68,23 @@ stepMax = (0.3,   #** step duration
 
 zmpMin = (0.0,   # footCenterLocX
           0.1,   # **zmp static percentage
-          0.45,  # left zmp off
-          0.45,  # right zmp off
+          0.2,  # ** left zmp off
+          0.2,  # ** right zmp off
           0.01,  # strafe zmp offse
           6.6)   # turn zmp offset
 
 zmpMax = (0.0,   # footCenterLocX
           0.5,   # ** zmp static percentage
-          0.45,  # left zmp off
-          0.45,  # right zmp off
+          0.8,  # ** left zmp off
+          0.8,  # ** right zmp off
           0.01,  # strafe zmp offse
           6.6)   # turn zmp offset
 
 hackMin = (0.0,   #** joint hack
            0.0)   #** joint hack
 
-hackMax =  (5.0,  #** joint hack
-           5.0)  #** joint hack
+hackMax =  (7.0,  #** joint hack
+           7.0)  #** joint hack
 
 sensorMin = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
              0.0,   # angle X scale (gamma)

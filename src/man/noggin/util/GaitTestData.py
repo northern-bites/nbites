@@ -1,9 +1,7 @@
+# Simple container class so we can pickle our Gait Testing
+# state easily and cleanly(ish)
 
 class GaitTestData:
-"""
-Simple container class so we can pickle our Gait Testing
-state easily and cleanly(ish)
-"""
     def __init__(self, gaits, walks):
         self.gaitTest = gaits
         self.unitTest = walks

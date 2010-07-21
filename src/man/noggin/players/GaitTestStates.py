@@ -7,7 +7,7 @@ without falling then it is considered stable and passes
 import man.motion as motion
 from ..WebotsConfig import WEBOTS_ACTIVE
 from .GaitLearnStates import setWalkVector, setGait, revertWebots
-import man.noggin.util.GaitTest as GaitTest
+import man.noggin.util.GaitTestData as data
 
 from os.path import isfile
 
@@ -19,15 +19,24 @@ except:
 #Types (see WalkTestStates.py)
 WALK = 0
 
-DURATION = 200
+DURATION = 250
 
-GAITS = ('PSO_endGait.pickle.1395',
-         'PSO_endGait.pickle.1445',
-         'PSO_endGait.pickle.1446',
+GAITS = ('PSO_endGait.pickle.1400',
+         'PSO_endGait.pickle.1429',
+         'PSO_endGait.pickle.1431',
+         'PSO_endGait.pickle.1469',
+         'PSO_endGait.pickle.1481',
+         'PSO_endGait.pickle.1488',
+         'PSO_endGait.pickle.1490',
+         'PSO_endGait.pickle.1507',
+         'PSO_endGait.pickle.1526',
+         'PSO_endGait.pickle.1540',
+         'PSO_endGait.pickle.1542',
          )
 
-UNIT_TEST1 = ((WALK, (15,0,0), DURATION),
+UNIT_TEST1 = ((WALK, (15,0,0), 2*DURATION),
               (WALK, (0,10,0), DURATION),
+              (WALK, (0,-10,0), DURATION),
               (WALK, (6,6,0), DURATION),
               (WALK, (6,-6,0), DURATION),
               (WALK, (8,0,20), DURATION),
@@ -53,9 +62,9 @@ else:
     print "Webots is in-active!!!!"
 
 def gaitTest(player):
-    if player.firstFrame():
+    if player.counter == 100:
         if player.gaitCounter >= len(player.gaitTest):
-            return player.goLater('printResultsSitdown')
+            return player.goLater('printResultsStop')
 
         try:
             gaitFile = player.gaitTest[player.gaitCounter]
@@ -68,7 +77,7 @@ def gaitTest(player):
         player.gaitCounter += 1
         player.testCounter = 0
 
-    if player.counter == 20:
+    if player.counter == 200:
         return player.goLater('walkTest')
 
     return player.stay()
@@ -85,13 +94,15 @@ def walkTest(player):
             setWalkVector(player, 0, 0, 0)
 
             player.gaitTestResults.append(True)
-            return player.goLater('gaitTest')
+            return player.goLater('saveAndEnd')
 
         setTestDirection(player)
 
     if isFallen:
+        print "(GaitUnitTest):: we've fallen down!"
         player.gaitTestResults.append(False)
-        return player.goLater('gaitTest')
+
+        return player.goLater('saveAndEnd')
 
     if player.counter == player.testFrames:
         return player.goNow('switchDirections')
@@ -101,33 +112,49 @@ def walkTest(player):
 def switchDirections(player):
     return player.goNow('walkTest')
 
-def printResultsSitDown(player):
+def printResultsStop(player):
    if player.firstFrame():
       i = 0
       for gait in player.gaitTest:
          print "gait file ", gait, \
-             " stability ", player.gaitTestResults[i]
+             " basically stable -> ", player.gaitTestResults[i]
          i += 1
 
-   #return player.goNow('sitdown')
+   return player.goNow('saveAndStop')
+
    return player.stay()
 
 def sitdown(player):
     if player.firstFrame():
-       if WEBOTS_ACTIVE:
-          return player.goNow('saveAndRevert')
-
-       else:
-          setWalkVector(player, 0,0,0)
-          player.executeMove(SweetMoves.SIT_POS)
-          player.brain.tracker.stopHeadMoves()
+       setWalkVector(player, 0,0,0)
+       player.executeMove(SweetMoves.SIT_POS)
+       player.brain.tracker.stopHeadMoves()
 
     return player.stay()
 
+def saveAndEnd(player):
+    if WEBOTS_ACTIVE:
+        return player.goLater('saveAndRevert')
+    else:
+        return player.goLater('saveAndStop')
+
 def saveAndRevert(player):
-   syncDataToClass(player)
-   saveTestData(player)
-   player.goNow('revertWebots')
+   if player.firstFrame():
+      syncDataToClass(player)
+      saveTestData(player)
+
+      revertWebots(player)
+
+   return player.stay()
+
+def saveAndStop(player):
+   if player.firstFrame():
+      player.printf("Stopping GaitUnitTest, need a manual restart\n")
+      syncDataToClass(player)
+      saveTestData(player)
+      player.setWalk(0, 0, 0)
+
+   return player.stay()
 
 def loadAndSetGait(player, gaitPickleFile):
     if isfile(gaitPickleFile):
@@ -147,6 +174,7 @@ def initTestData(player):
       loadTestData(player)
    else:
       newTestData(player)
+      saveTestData(player)
 
 def loadTestData(player):
    try:
@@ -158,10 +186,11 @@ def loadTestData(player):
 
 def newTestData(player):
    print "Initializing new Gait Unit Test Data"
-   player.testData = GaitTestData(GAITS,
-                                  UNIT_TEST1)
+   player.testData = data.GaitTestData(GAITS,
+                                       UNIT_TEST1)
 
 def saveTestData(player):
+   print "Saving test data file: ", TEST_DATA_FILE
    try:
       f = open(TEST_DATA_FILE, 'w')
       pickle.dump(player.testData, f)
@@ -171,7 +200,7 @@ def saveTestData(player):
 
 # Ugly, ugly, ugly.
 def syncDataToClass(player):
-   player.testData = td
+   td = player.testData
 
    td.gaitTest = player.gaitTest
    td.unitTest = player.unitTest
@@ -180,7 +209,7 @@ def syncDataToClass(player):
    td.gaitCounter = player.gaitCounter
 
 def getDataFromClass(player):
-   player.testData = td
+   td = player.testData
 
    player.gaitTest = td.gaitTest
    player.unitTest = td.unitTest
