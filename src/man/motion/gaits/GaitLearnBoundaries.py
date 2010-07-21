@@ -26,29 +26,29 @@ def arrayToGaitTuple(array):
 
     return (stance, step, zmp, hack, sensor, stiffness, odo, arm)
 
-stanceMin = (31.00, # CoM height
-            0.0,   #** Forward displacement of CoM
-            10.0,   #** Horizontal distance between feet
-            0.0,   #** Body angle around y axis
-            0.0,   # Angle between feet
-            0.1)   # Time to transition to/from this stance
+stanceMin = (31.00,  # CoM height
+             0.0,    #** Forward displacement of CoM
+             10.0,   #** Horizontal distance between feet
+             0.0,    #** Body angle around y axis
+             -10.0,  #** Angle between feet
+             0.2)    # Time to transition to/from this stance
 
 stanceMax = (31.00, # CoM height
-             6.0,  #** Forward displacement of CoM
+             6.0,   #** Forward displacement of CoM
              12.0,  #** Horizontal distance between feet
              10.0,  #** Body angle around y axis
-             0.0,   # Angle between feet
-             0.1)   # Time to transition to/from this stance
+             15.0,  #** Angle between feet
+             0.2)   # Time to transition to/from this stance
 
 stepMin = (0.15,   #** step duration
            0.2,   #** fraction in double support
-           1.0,   #** stepHeight
+           1.5,   #** stepHeight
            -20.0, #** step lift
            25.0,  # max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
-           7.0,   # max x accel
+           5.0,   # **max x accel
            7.0,   # max y accel
            20.0,  # max theta speed()
            1.0)   # walk gait = true
@@ -56,22 +56,29 @@ stepMin = (0.15,   #** step duration
 stepMax = (0.3,   #** step duration
            0.5,   #** fraction in double support
            5.0,   #** stepHeight
-           10.0,   #** step lift
+           20.0,   #** step lift
            25.0,  # max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
-           7.0,   # max x accel
+           15.0,   #** max x accel
            7.0,   # max y accel
            20.0,  # max theta speed()
            1.0)   # walk gait = true
 
-zmpMin = zmpMax = (0.0,   # footCenterLocX
-                   0.3,   # zmp static percentage
-                   0.45,  # left zmp off
-                   0.45,  # right zmp off
-                   0.01,  # strafe zmp offse
-                   6.6)   # turn zmp offset
+zmpMin = (0.0,   # footCenterLocX
+          0.1,   # **zmp static percentage
+          0.45,  # left zmp off
+          0.45,  # right zmp off
+          0.01,  # strafe zmp offse
+          6.6)   # turn zmp offset
+
+zmpMax = (0.0,   # footCenterLocX
+          0.5,   # ** zmp static percentage
+          0.45,  # left zmp off
+          0.45,  # right zmp off
+          0.01,  # strafe zmp offse
+          6.6)   # turn zmp offset
 
 hackMin = (0.0,   #** joint hack
            0.0)   #** joint hack

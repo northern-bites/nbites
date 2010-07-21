@@ -29,11 +29,11 @@ PSO_STATE_FILE = "PSO_pGaitLearner.pickle"
 BEST_GAIT_FILE = "PSO_endGait.pickle."
 OPTIMIZE_FRAMES = 1000
 
-SWARM_ITERATION_LIMIT = 20 # wikipedia says this should be enough to converge
+SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge
 NUM_PARTICLES = 30
 
 POSITION_UPDATE_FRAMES = 15
-MINIMUM_REQUIRED_DISTANCE = 75
+MINIMUM_REQUIRED_DISTANCE = 100
 DISTANCE_PENALTY = -300
 
 RUN_ONCE_STOP = True
@@ -151,7 +151,7 @@ def stopandchangegait(player):
 
         setGait(player, gaitTuple)
 
-    if player.counter == 20:
+    if player.counter == 100:
         return player.goLater('walkstraightstop')
 
     return player.stay()
