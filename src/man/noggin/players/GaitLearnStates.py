@@ -31,6 +31,7 @@ OPTIMIZE_FRAMES = 1000
 
 SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge
 NUM_PARTICLES = 30
+MINIMUM_GLOBAL_BEST = 1500 # arbitrary
 
 POSITION_UPDATE_FRAMES = 15
 MINIMUM_REQUIRED_DISTANCE = 100
@@ -114,7 +115,10 @@ def newOptimizeParameters(player):
    Controls what we do after every optimization run
    pointer state to more interesting places
    """
-   if player.swarm.getIterations() > SWARM_ITERATION_LIMIT:
+   swarmBestHeuristic = player.swarm.getBestSolution()[1]
+
+   if player.swarm.getIterations() > SWARM_ITERATION_LIMIT and \
+          swarmBestHeuristic > MINIMUM_GLOAL_BEST:
       print "Swarm is done optimizing!"
       return player.goLater('reportBestGait')
 

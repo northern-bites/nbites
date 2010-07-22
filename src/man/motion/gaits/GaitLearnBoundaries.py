@@ -77,14 +77,14 @@ zmpMax = (0.0,   # footCenterLocX
           0.5,   # ** zmp static percentage
           0.8,  # ** left zmp off
           0.8,  # ** right zmp off
-          0.01,  # strafe zmp offse
+          0.01,  # strafe zmp offset
           6.6)   # turn zmp offset
 
 hackMin = (0.0,   #** joint hack
            0.0)   #** joint hack
 
 hackMax =  (7.0,  #** joint hack
-           7.0)  #** joint hack
+           0.0)   # joint hack (L/R should be same)
 
 sensorMin = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
              0.0,   # angle X scale (gamma)
