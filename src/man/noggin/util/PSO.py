@@ -31,13 +31,13 @@ DEBUG_POSITION = False
 DEBUG_PROGRESS = True
 
 # how much we trend towards pBest, gBest (cog/soc biases)
-# both set to ~2 per the PSO wikipedia article
-COG = 0.7
-SOC = 1.4
+# both set to <2 per the PSO wikipedia article
+COG = 0.3
+SOC = 0.6
 
 # particle motion may not exceed abs(V_CAP) in any tick
 VELOCITY_CAP = 1
-VELOCITY_MINIMUM_MAGNITUDE = 0.01
+VELOCITY_MINIMUM_MAGNITUDE = 0.001
 
 INFINITY = float(1e3000)
 
@@ -114,7 +114,7 @@ class Particle:
 
             clip(self.position[i],
                  self.searchMins[i],
-                 self.searchMins[i])
+                 self.searchMaxs[i])
 
     # used to decide how stable our most recent set of parameters were
     def getHeuristic(self):
