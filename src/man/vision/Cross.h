@@ -39,6 +39,9 @@ public:
 
 	void init();
 	void createObject();
+    bool checkSizeAgainstPixEstimate(Blob b);
+    bool scanAroundPerimeter(Blob b);
+    bool checkForLineIntersection(Blob b);
 	void checkForX(Blob b);
 	void newRun(int x, int y, int h);
 	void allocateColorRuns();

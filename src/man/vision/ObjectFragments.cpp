@@ -1182,6 +1182,7 @@ int ObjectFragments::cornerClassifier(float diff, float dist, int x, int y,
             return class1;
         }
     }
+    return NOPOST;
 }
 
 

@@ -91,40 +91,50 @@ void Cross::createObject() {
     }
 }
 
-/* This method takes in a candidate field cross and decides if it is good enough.
-   We run it through a series of sanity checks.  If it passes them all then
-   it is called a cross.
-*/
+/* Returns whether true when the size of the cross is reasonable when tested
+   against the pixEstimated distance.
+   @param b     the candidate cross
+   @return      if the size is reasonable
+ */
+bool Cross::checkSizeAgainstPixEstimate(Blob b) {
+    int x = b.getLeftTopX();
+    int y = b.getLeftTopY();
+    int w = b.width();
+    int h = b.height();
+	// before we spend a lot of time processing, let's see if it is a reasonable size
+	if (w > 3 * h || h > 2 * w) {
+		return false;
+	}
+	estimate e = vision->pose->pixEstimate(x, y, 0.0);
+	if (e.dist < 100.0f && w < 20) {
+		return false;
+	} else if (e.dist < 150.0f && w < 12) {
+		return false;
+	} else if (e.dist < 200.0f && w < 8) {
+		return false;
+	}
+	if (e.dist > 200.0f && w > 12) {
+		return false;
+	}
+    return true;
+}
 
-
-void Cross::checkForX(Blob b) {
-
+/* Scans around the outside of the blob looking for green.  Ideally the
+   cross will have only green around it.  White is a big problem, so is
+   having the cross near the edge.  This is because our version of the
+   cross is so simple - we don't look at its shape at all!  Instead we
+   just look for white blobs with the right general properties.
+   @param b   the candidate cross
+   @return    the amount of green in the perimeter (white gives a huge
+                negative penalty)
+ */
+bool Cross::scanAroundPerimeter(Blob b) {
     const float greenThreshold = 0.75f;
     int x = b.getLeftTopX();
     int y = b.getLeftTopY();
     int w = b.width();
     int h = b.height();
-    int count = 0, counter = 0;
-	// before we spend a lot of time processing, let's see if it is a reasonable size
-	if (w > 2 * h || h > 2 * w) {
-		return;
-	}
-	estimate e = vision->pose->pixEstimate(x, y, 0.0);
-	if (e.dist < 100.0f && w < 20) {
-		return;
-	} else if (e.dist < 150.0f && w < 12) {
-		return;
-	} else if (e.dist < 200.0f && w < 8) {
-		return;
-	}
-	if (e.dist > 200.0f && w > 12) {
-		return;
-	}
-
-    // First we scan the outside of the blob.  It should basically be all
-    // green.  What we don't want are line fragments or robot fragments
-    // so finding white is very bad.
-
+    int counter = 0, count = 0;
     // first scan the sides
     for (int i = max(0, y - 2); i < min(IMAGE_HEIGHT - 1, y + h + 2); i++) {
         if (x > 3) {
@@ -133,7 +143,7 @@ void Cross::checkForX(Blob b) {
             else if (thresh->thresholded[i][x - 4] == WHITE)
                 count-=3;
             counter++;
-        } else return;
+        } else return false;
 
         if (x + w + 4 < IMAGE_WIDTH) {
             if (thresh->thresholded[i][x + w+ 4] == GREEN)
@@ -141,7 +151,7 @@ void Cross::checkForX(Blob b) {
             else if (thresh->thresholded[i][x + w+ 4] == WHITE)
                 count-=3;
             counter++;
-        } else return;
+        } else return false;
     }
 
     // now scan above and below
@@ -154,7 +164,7 @@ void Cross::checkForX(Blob b) {
             else if (thresh->thresholded[y - 2][i] == WHITE)
                 count-=3;
             counter++;
-        } else return;
+        } else return false;
 
         if (y + h + 2 < IMAGE_HEIGHT) {
             if (thresh->thresholded[y+h+2][i] == GREEN)
@@ -162,11 +172,77 @@ void Cross::checkForX(Blob b) {
             else if (thresh->thresholded[y+h+2][i] == WHITE)
                 count-=3;
             counter++;
-        } else return;
+        } else return false;
+    }
+    if (count > (float)counter * greenThreshold) {
+        if (CROSSDEBUG) {
+            cout << "White stats: " << count << " " << counter << endl;
+        }
+        return true;
+    }
+    return false;
+}
+
+/* Determines if a line intersects the candidate cross, if so it
+   is thrown out.
+   @param b   the candidate cross
+   @return    whether a line intersects
+ */
+bool Cross::checkForLineIntersection(Blob b) {
+    int x = b.getLeftTopX();
+    int y = b.getLeftTopY();
+    int w = b.width();
+    int h = b.height();
+    point <int> plumbLineTop, plumbLineBottom, line1start, line1end;
+    plumbLineTop.x = x + w / 2; plumbLineTop.y = y;
+    plumbLineBottom.x = x; plumbLineBottom.y = y + h;
+    const vector <boost::shared_ptr<VisualLine> >* lines =
+        vision->fieldLines->getLines();
+
+    for (vector <boost::shared_ptr<VisualLine> >::const_iterator k =
+             lines->begin();
+         k != lines->end(); k++) {
+        pair<int, int> foo = Utility::plumbIntersection(plumbLineTop,
+                                                        plumbLineBottom,
+                                                        (*k)->getStartpoint(),
+                                                        (*k)->getEndpoint());
+
+        if (foo.first != Utility::NO_INTERSECTION && foo.second != Utility::NO_INTERSECTION) {
+            if (CROSSDEBUG)
+                cout << "Throwing out blob that is part of a line" << endl;
+            return true;
+        }
+    }
+    return false;
+}
+
+/* This method takes in a candidate field cross and decides if it is good enough.
+   We run it through a series of sanity checks.  If it passes them all then
+   it is called a cross.
+   @param b       the candidate cross
+*/
+
+void Cross::checkForX(Blob b) {
+
+    int x = b.getLeftTopX();
+    int y = b.getLeftTopY();
+    int w = b.width();
+    int h = b.height();
+    int count = 0, counter = 0;
+	// before we spend a lot of time processing, let's see if it is a reasonable size
+    if (!checkSizeAgainstPixEstimate(b)) {
+        return;
     }
 
     if (CROSSDEBUG) {
         cout << "Have a candidate white blob " << x << " " << y << endl;
+    }
+
+    // First we scan the outside of the blob.  It should basically be all
+    // green.  What we don't want are line fragments or robot fragments
+    // so finding white is very bad.
+    if (!scanAroundPerimeter(b)) {
+        return;
     }
 
     const int HORIZONCHECK = 15;
@@ -176,66 +252,45 @@ void Cross::checkForX(Blob b) {
 
     if (CROSSDEBUG) {
         cout << "Passed Horizon checks " << endl;
-        cout << "White green information " << count << " " << counter << endl;
     }
 
-    // if we pass the basic threshold then make sure it isn't a line
-    if (count > (float)counter * greenThreshold) {
-        // first make sure this isn't really a line
-        point <int> plumbLineTop, plumbLineBottom, line1start, line1end;
-        plumbLineTop.x = x + w / 2; plumbLineTop.y = y;
-        plumbLineBottom.x = x; plumbLineBottom.y = y + h;
-        const vector <boost::shared_ptr<VisualLine> >* lines =
-            vision->fieldLines->getLines();
+    // first make sure this isn't really a line
+    if (checkForLineIntersection(b)) {
+        return;
+    }
 
-        for (vector <boost::shared_ptr<VisualLine> >::const_iterator k =
-                 lines->begin();
-             k != lines->end(); k++) {
-            pair<int, int> foo = Utility::plumbIntersection(plumbLineTop,
-                                                            plumbLineBottom,
-                                                            (*k)->getStartpoint(),
-                                                            (*k)->getEndpoint());
-
-            if (foo.first != Utility::NO_INTERSECTION && foo.second != Utility::NO_INTERSECTION) {
-                if (CROSSDEBUG)
-                    cout << "Throwing out blob that is part of a line" << endl;
-                return;
-            }
-        }
-
-        // Is the cross white enough?  At least half the pixels must be white.
-        if (!rightBlobColor(b, 0.5f)) {
-            if (CROSSDEBUG) {
-                cout << "Tossing a blob for not being white enough " << endl;
-            }
-            return;
-        }
-
-        // passed all of our current sanity checks
+    // Is the cross white enough?  At least half the pixels must be white.
+    if (!rightBlobColor(b, 0.5f)) {
         if (CROSSDEBUG) {
-            cout << "Found a cross " << endl;
-            b.printBlob();
+            cout << "Tossing a blob for not being white enough " << endl;
         }
+        return;
+    }
 
-        // Make sure we don't have more than one candidate cross.  Note:  we
-        // actually can see two crosses at some places on the field, but for
-        // now we just will ID one of them.
-        // TODO:  allow seeing two crosses - but must test whether they are
-        // correctly aligned with each other, etc.
-        if (vision->cross->getWidth() > 0) {
-            if (w * h > vision->cross->getWidth() * vision->cross->getHeight()) {
-                vision->cross->updateCross(&b);
-                if (CROSSDEBUG) {
-                    cout << "Larger than previous cross." << endl;
-                }
-            } else {
-                if (CROSSDEBUG) {
-                    cout << "Threw out extra cross - smaller " << endl;
-                }
+    // passed all of our current sanity checks
+    if (CROSSDEBUG) {
+        cout << "Found a cross " << endl;
+        b.printBlob();
+    }
+
+    // Make sure we don't have more than one candidate cross.  Note:  we
+    // actually can see two crosses at some places on the field, but for
+    // now we just will ID one of them.
+    // TODO:  allow seeing two crosses - but must test whether they are
+    // correctly aligned with each other, etc.
+    if (vision->cross->getWidth() > 0) {
+        if (w * h > vision->cross->getWidth() * vision->cross->getHeight()) {
+            vision->cross->updateCross(&b);
+            if (CROSSDEBUG) {
+                cout << "Larger than previous cross." << endl;
             }
         } else {
-            vision->cross->updateCross(&b);
+            if (CROSSDEBUG) {
+                cout << "Threw out extra cross - smaller " << endl;
+            }
         }
+    } else {
+        vision->cross->updateCross(&b);
     }
 }
 
