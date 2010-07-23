@@ -39,7 +39,6 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "MCL.h"
 #include "MotionProvider.h"
 #include "WalkingConstants.h"
 #include "StepGenerator.h"

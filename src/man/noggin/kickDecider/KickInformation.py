@@ -49,7 +49,7 @@ class KickInformation:
     def getKick(self):
         self.kickObjective = self.getKickObjective()
         #if self.kickObjective == constants.OBJECTIVE_ORBIT:
-            #return None
+         #   return None
         return self.decideKick()
 
     def getKickObjective(self):
@@ -82,7 +82,7 @@ class KickInformation:
 
         # we don't see any goalposts
         else:
-            return constants.OBJECTIVE_ORBIT
+            return constants.OBJECTIVE_CLEAR
 
     def collectData(self, info):
         """
@@ -237,7 +237,7 @@ class KickInformation:
             avgOppBearing = (oppLeftPostBearing + oppRightPostBearing)/2
             if fabs(avgOppBearing) < constants.ALIGN_FOR_KICK_BEARING_THRESH:
                 if constants.DEBUG_KICKS: print ("\t\t Straight 1")
-                return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+                return self.chooseDynamicKick()
 
             elif avgOppBearing > constants.ALIGN_FOR_KICK_BEARING_THRESH:
                 if constants.DEBUG_KICKS: print ("\t\t Left 5")
@@ -274,7 +274,7 @@ class KickInformation:
             if my.inCenterOfField():
                 if abs(my.h) <= constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                     if constants.DEBUG_KICKS: print ("\t\tcenter1")
-                    return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+                    return self.chooseDynamicKick()
                 elif my.h < -constants.CLEAR_CENTER_FIELD_STRAIGHT_ANGLE:
                     if constants.DEBUG_KICKS: print ("\t\tcenter2")
                     return kicks.RIGHT_SIDE_KICK
@@ -291,7 +291,7 @@ class KickInformation:
                     return kicks.RIGHT_SIDE_KICK
                 else :
                     if constants.DEBUG_KICKS: print ("\t\ttop4")
-                    return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+                    return self.chooseDynamicKick()
 
             elif my.inBottomOfField():
                 if -locConst.FACING_SIDELINE_ANGLE > my.h:
@@ -302,9 +302,7 @@ class KickInformation:
                     return kicks.LEFT_SIDE_KICK
                 else :
                     if constants.DEBUG_KICKS: print ("\t\tbottom4")
-                    return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
-
-        return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+                    return self.chooseDynamicKick()
 
     def shootBallFar(self):
         """
@@ -318,13 +316,13 @@ class KickInformation:
                 constants.SHOOT_BALL_FAR_LOC_ALIGN_ANGLE and \
                 not self.player.hasAlignedOnce:
             self.player.angleToAlign = bearingToGoal
-            return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+            return self.chooseDynamicKick()
         elif bearingToGoal > constants.SHOOT_BALL_SIDE_KICK_ANGLE:
             return kicks.RIGHT_SIDE_KICK
         elif bearingToGoal < -constants.SHOOT_BALL_SIDE_KICK_ANGLE:
             return kicks.LEFT_SIDE_KICK
         else :
-            return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+            return self.chooseDynamicKick()
 
     def shootBall(self):
         """
@@ -342,17 +340,17 @@ class KickInformation:
 
             if (oppRightPostBearing < -constants.KICK_STRAIGHT_POST_BEARING and
                 oppLeftPostBearing > constants.KICK_STRAIGHT_POST_BEARING):
-                return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+                return self.chooseDynamicKick()
 
             avgOppBearing = (oppLeftPostBearing + oppRightPostBearing)/2
             if fabs(avgOppBearing) < constants.KICK_STRAIGHT_BEARING_THRESH:
                 if constants.DEBUG_KICKS: print ("\t\t Straight 1")
-                return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+                return self.chooseDynamicKick()
 
             elif fabs(avgOppBearing) < constants.ALIGN_FOR_KICK_BEARING_THRESH and \
                     not self.player.hasAlignedOnce:
                 if constants.DEBUG_KICKS: print ("\t\t Align 1")
-                return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+                return self.chooseDynamicKick()
 
             elif avgOppBearing > constants.ALIGN_FOR_KICK_BEARING_THRESH:
                 if constants.DEBUG_KICKS: print ("\t\t Left 5")
@@ -377,7 +375,7 @@ class KickInformation:
                 elif avgMyGoalBearing < -30:
                     return kicks.RIGHT_SIDE_KICK
                 else :
-                    return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+                    return self.chooseDynamicKick()
             elif my.inBottomOfField():
                 if constants.DEBUG_KICKS: print ("\t\tbottomfieldkick")
                 if -90 < avgMyGoalBearing < 30:
@@ -385,9 +383,15 @@ class KickInformation:
                 elif avgMyGoalBearing > 30:
                     return kicks.RIGHT_SIDE_KICK
                 else :
-                    return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+                    return self.chooseDynamicKick()
 
         # if somehow we didn't return already with our kick choice,
         # use localization for kick
-        if self.kickObjective == constants.OBJECTIVE_SHOOT:
-            return self.shootBallFar()
+        return self.shootBallFar()
+
+    def chooseDynamicKick(self):
+        ball = self.player.brain.ball
+        if ball.relY > 0:
+            return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+        return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
+
