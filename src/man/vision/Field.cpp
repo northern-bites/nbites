@@ -178,8 +178,10 @@ void Field::findConvexHull(int pH) {
       //cout << "Next is " << convex[i].x << " " << convex[i].y << endl;
         int diff = convex[i].y - convex[i-1].y;
         float step = 0.0f;
-        if (convex[i].x != convex[i-1].x)
+        if (convex[i].x != convex[i-1].x) {
             step = (float)diff / (float)(convex[i].x - convex[i-1].x);
+			//cout << "Step " << i << " is " << step << endl;
+		}
         float cur = static_cast<float>(convex[i].y);
         for (int j = convex[i].x; j > convex[i-1].x; j--) {
             cur -= step;
@@ -190,11 +192,17 @@ void Field::findConvexHull(int pH) {
                 if (e.dist > maxPix)
                     maxPix = e.dist;
                 }*/
-            if (debugFieldEdge)
-                thresh->drawPoint(j, (int)cur, BLACK);
+            if (debugFieldEdge) {
+				if (j < convex[i].x - 2) {
+					thresh->drawPoint(j, (int)cur, BLACK);
+				} else {
+					thresh->drawPoint(j, (int)cur, RED);
+				}
+			}
         }
-        if (debugFieldEdge)
+        if (debugFieldEdge) {
             thresh->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x, convex[i].y, ORANGE);
+		}
     }
     // calculate the distance to the edge of the field at three key points
     const int quarter = IMAGE_WIDTH / 4;
@@ -213,8 +221,11 @@ void Field::findConvexHull(int pH) {
         tDist = e.dist;
     }
     vision->fieldEdge->setDistances(qDist, hDist, tDist);
-    //cout << "Distances are " << qDist << " " << hDist << " " << tDist << endl;
-    //cout << "Max dist is " << maxPix << endl;
+	if (debugFieldEdge) {
+		cout << "Distances are " << qDist << " " << hDist << " " << tDist <<
+			" there are " << M << " points." << endl;
+		//cout << "Max dist is " << maxPix << endl;
+	}
 }
 
 int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {
@@ -232,7 +243,7 @@ int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {
  */
 
 int Field::findGreenHorizon(int pH, float sl) {
-    const int MIN_PIXELS_INITIAL = 2;
+    const int MIN_PIXELS_INITIAL = 4;
     const int SCAN_INTERVAL_X = 10;
     const int SCAN_INTERVAL_Y = 4;
     // we're more demanding of Green because there is so much
@@ -269,7 +280,7 @@ int Field::findGreenHorizon(int pH, float sl) {
         // we do a scan based on the slope provided by pose
         // and we only look at every 10th pixel
         for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1
-        && greenPixels < 3; i+= SCAN_INTERVAL_X) {
+				 && greenPixels <= MIN_PIXELS_INITIAL; i+= SCAN_INTERVAL_X) {
             //pixel = thresh->thresholded[scanY][i];
             pixel = thresh->getColor(i, scanY);
             if (pixel == GREEN) {

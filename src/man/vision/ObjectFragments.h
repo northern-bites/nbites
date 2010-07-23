@@ -91,8 +91,26 @@ public:
     // post recognition routines
     int classifyByCrossbar(Blob b);
     int classifyByOtherRuns(int left, int right, int height);
-    int classifyByLineIntersection(Blob b);
+    int classifyByTCorner(Blob b);
     int classifyByCheckingCorners(Blob b);
+    int cornerClassifier(float diff, float dist, int x, int y,int class1, int class2);
+    int classifyGoalBoxLineThatAbutsPost(int y, float diff, float dist,
+                                         int classification);
+    bool withinEdgeMargin(int x, int margin);
+    int classifyByLengthOfGoalline(float dist, int x, int y,
+                                   int class1, int class2);
+    int classifyByGoalline(const point<int> linel, const point<int> liner,
+                           point<int> left, point<int> right);
+    int classifyByGoalBoxFrontline(pair<int, int> foo,
+                                   point<int> left, point<int> right);
+    int getFrontlineClassification(point<int> post,
+                                   pair<int, int> foo,
+                                   int classification);
+
+
+
+
+	int classifyByCheckingLines(Blob post);
 
     int characterizeSize(Blob b);
 
@@ -123,6 +141,7 @@ public:
 
     // misc.
     int distance(int x1, int x2, int x3, int x4);
+	float realDistance(int x1, int y1, int x2, int y2);
     float getSlope() { return slope; }
 	bool greenCheck(Blob b);
 

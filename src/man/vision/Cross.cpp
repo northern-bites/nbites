@@ -105,6 +105,22 @@ void Cross::checkForX(Blob b) {
     int w = b.width();
     int h = b.height();
     int count = 0, counter = 0;
+	// before we spend a lot of time processing, let's see if it is a reasonable size
+	if (w > 2 * h || h > 2 * w) {
+		return;
+	}
+	estimate e = vision->pose->pixEstimate(x, y, 0.0);
+	if (e.dist < 100.0f && w < 20) {
+		return;
+	} else if (e.dist < 150.0f && w < 12) {
+		return;
+	} else if (e.dist < 200.0f && w < 8) {
+		return;
+	}
+	if (e.dist > 200.0f && w > 12) {
+		return;
+	}
+
     // First we scan the outside of the blob.  It should basically be all
     // green.  What we don't want are line fragments or robot fragments
     // so finding white is very bad.
