@@ -21,18 +21,27 @@ WALK = 0
 
 DURATION = 250
 
-GAITS = ('PSO_endGait.pickle.1400',
-         'PSO_endGait.pickle.1429',
-         'PSO_endGait.pickle.1431',
-         'PSO_endGait.pickle.1469',
-         'PSO_endGait.pickle.1481',
-         'PSO_endGait.pickle.1488',
-         'PSO_endGait.pickle.1490',
-         'PSO_endGait.pickle.1507',
+if WEBOTS_ACTIVE:
+    PICKLE_FILE_PREFIX = ''
+    START_DELAY = 100
+else:
+    PICKLE_FILE_PREFIX = '/home/nao/gaits/'
+    START_DELAY = 30
+
+GAITS = ('PSO_endGait.pickle.1507',
+         'PSO_endGait.pickle.1524',
+         'PSO_endGait.pickle.1521',
          'PSO_endGait.pickle.1526',
+         'PSO_endGait.pickle.1537',
          'PSO_endGait.pickle.1540',
          'PSO_endGait.pickle.1542',
+         'PSO_endGait.pickle.1558',
+         'PSO_endGait.pickle.1627',
          )
+
+GAITS_THAT_WORK = ('PSO_endGait.pickle.1542',
+                   'PSO_endGait.pickle.1540',
+                   )
 
 UNIT_TEST1 = ((WALK, (15,0,0), 2*DURATION),
               (WALK, (0,10,0), DURATION),
@@ -43,7 +52,7 @@ UNIT_TEST1 = ((WALK, (15,0,0), 2*DURATION),
               (WALK, (8,0,-20), DURATION),
               )
 
-TEST_DATA_FILE = 'gaitUnitTest.pickle'
+TEST_DATA_FILE = PICKLE_FILE_PREFIX + 'gaitUnitTest.pickle'
 
 def gamePlaying(player):
     if player.firstFrame():
@@ -61,13 +70,21 @@ if WEBOTS_ACTIVE:
 else:
     print "Webots is in-active!!!!"
 
+def gamePenalized(player):
+    if player.firstFrame():
+        player.stopWalking()
+        player.penalizeHeads()
+
+    return player.stay()
+
 def gaitTest(player):
-    if player.counter == 100:
+    if player.counter == START_DELAY:
         if player.gaitCounter >= len(player.gaitTest):
             return player.goLater('printResultsStop')
 
         try:
-            gaitFile = player.gaitTest[player.gaitCounter]
+            gaitFile = PICKLE_FILE_PREFIX + \
+                player.gaitTest[player.gaitCounter]
             print "gaitFile: ", gaitFile
             loadAndSetGait(player, gaitFile)
         except:
@@ -77,7 +94,7 @@ def gaitTest(player):
         player.gaitCounter += 1
         player.testCounter = 0
 
-    if player.counter == 200:
+    if player.counter == START_DELAY*2:
         return player.goLater('walkTest')
 
     return player.stay()
@@ -157,17 +174,11 @@ def saveAndStop(player):
    return player.stay()
 
 def loadAndSetGait(player, gaitPickleFile):
-    if isfile(gaitPickleFile):
-        try:
-            f = open(gaitPickleFile, 'r')
-            newGait = pickle.load(f)
-            f.close()
+    f = open(gaitPickleFile, 'r')
+    newGait = pickle.load(f)
+    f.close()
 
-            setGait(player, newGait)
-        except:
-            print "error loading pickle file: ", gaitPickleFile
-    else:
-        print "bad file name: ", gaitPickleFile
+    setGait(player, newGait)
 
 def initTestData(player):
    if isfile(TEST_DATA_FILE):

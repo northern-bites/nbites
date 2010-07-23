@@ -40,7 +40,7 @@ stanceMax = (31.00, # CoM height
              15.0,  #** Angle between feet
              0.2)   # Time to transition to/from this stance
 
-stepMin = (0.15,   #** step duration
+stepMin = (0.25,   #** step duration
            0.2,   #** fraction in double support
            1.5,   #** stepHeight
            -20.0, #** step lift
@@ -53,7 +53,7 @@ stepMin = (0.15,   #** step duration
            20.0,  # max theta speed()
            1.0)   # walk gait = true
 
-stepMax = (0.3,   #** step duration
+stepMax = (0.4,   #** step duration
            0.5,   #** fraction in double support
            5.0,   #** stepHeight
            20.0,   #** step lift

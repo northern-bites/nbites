@@ -14,19 +14,26 @@ from math import fabs
 
 # Webots Controller functions, so we can do supervisor stuff
 # for the import to work you must also copy add Webots/lib/ to
-# your library search path. Hack Hack Hack.
-# -Nathan
-import sys
-sys.path.append('/Applications/Webots/lib/python')
-from controller import *
+# your library search path. Hack Hack Hack.  -Nathan
+
+if WEBOTS_ACTIVE:
+    PICKLE_FILE_PREFIX = ''
+    try:
+        import sys
+        sys.path.append('/Applications/Webots/lib/python')
+        from controller import *
+    except:
+        print "could not load webots controller libraries"
+else:
+    PICKLE_FILE_PREFIX = '/home/nao/gaits/'
 
 try:
    import cPickle as pickle
 except:
    import pickle
 
-PSO_STATE_FILE = "PSO_pGaitLearner.pickle"
-BEST_GAIT_FILE = "PSO_endGait.pickle."
+PSO_STATE_FILE = PICKLE_FILE_PREFIX + "PSO_pGaitLearner.pickle"
+BEST_GAIT_FILE = PICKLE_FILE_PREFIX + "PSO_endGait.pickle."
 OPTIMIZE_FRAMES = 1000
 
 SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge
@@ -59,6 +66,13 @@ if WEBOTS_ACTIVE:
     print "Webots is active!!!!"
 else:
     print "Webots is in-active!!!!"
+
+def gamePenalized(player):
+    if player.firstFrame():
+        player.stopWalking()
+        player.penalizeHeads()
+
+    return player.stay()
 
 def walkstraightstop(player):
     stability = player.brain.stability

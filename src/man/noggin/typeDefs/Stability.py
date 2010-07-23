@@ -1,7 +1,10 @@
 from .. import NogginConstants as Constants
 from math import fabs
 from . import Location
-from numpy import corrcoef
+try:
+    from numpy import corrcoef
+except:
+    print "could not load numpy, please install it"
 
 FALL_ACCZ_THRESHOLD = 5
 FALL_FRAMES_THRESHOLD = 15
