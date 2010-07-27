@@ -1,10 +1,13 @@
 import man.motion as motion
 from man.noggin.util import MyMath
+from math import fabs
 
 def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
     """
+    checkWalkVector(x, y, theta)
+
     # use backwards gait if appropriate
     if x < 0:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
@@ -21,6 +24,8 @@ def setDribbleSpeed(nav, x, y, theta):
     """
     Wrapper to set walk vector while using dribble gait
     """
+    checkWalkVector(x, y, theta)
+
     if x < 0:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
     else:
@@ -37,6 +42,8 @@ def setSlowSpeed(nav, x, y, theta):
     Wrapper to set walk vector while using slow gait
     TODO: dynamic gait so this is unnecessary
     """
+    checkWalkVector(x, y, theta)
+
     if x < 0:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
     else:
@@ -53,6 +60,8 @@ def step(nav, x, y, theta, numSteps):
     """
     Wrapper method to easily change the walk vector of the robot
     """
+    checkWalkVector(x, y, theta)
+
     if x < 0:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
     else:
@@ -94,3 +103,8 @@ def executeMove(motionInst, sweetMove):
             print("What kind of sweet ass-Move is this?")
 
         motionInst.enqueue(move)
+
+def checkWalkVector(x, y, theta):
+    assert fabs(x) <= 1
+    assert fabs(y) <= 1
+    assert fabs(theta) <= 1
