@@ -28,14 +28,15 @@ else:
     PICKLE_FILE_PREFIX = '/home/nao/gaits/'
     START_DELAY = 30
 
-GAITS = ('PSO_endGait.pickle.1473',
-         'PSO_endGait.pickle.1534',
+GAITS = ('PSO_endGait.pickle.1534',
+         'PSO_endGait.pickle.1473',
+         'PSO_endGait.pickle.1466',
          )
 
-UNIT_TEST1 = ((WALK, (.75, 0, 0), 2*DURATION),
-              (WALK, (0, .75, 0), DURATION),
-              (WALK, (0, -.75, 0), DURATION),
-              (WALK, (.4, .4, 0), DURATION),
+UNIT_TEST1 = ((WALK, (.3, 0, 0), 2*DURATION),
+              (WALK, (0, .3, 0), DURATION),
+              (WALK, (0, -.3, 0), DURATION),
+              (WALK, (.2, .2, 0), DURATION),
               (WALK, (.4, -.4, 0), DURATION),
               (WALK, (.5, 0, .5), DURATION),
               (WALK, (.5, 0, -.5), DURATION),

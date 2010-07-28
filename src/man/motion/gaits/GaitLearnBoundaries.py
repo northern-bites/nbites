@@ -42,9 +42,9 @@ stanceMax = (31.00, # CoM height
 
 stepMin = (0.25,   #** step duration
            0.2,   #** fraction in double support
-           1.5,   #** stepHeight
-           -20.0, #** step lift
-           20.0,  #** max x speed
+           1.25,   #** stepHeight
+           -15.0, #** step lift
+           15.0,  #** max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
@@ -56,8 +56,8 @@ stepMin = (0.25,   #** step duration
 stepMax = (0.4,   #** step duration
            0.5,   #** fraction in double support
            5.0,   #** stepHeight
-           20.0,   #** step lift
-           25.0,  #** max x speed
+           15.0,   #** step lift
+           20.0,  #** max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
@@ -86,23 +86,14 @@ hackMin = (0.0,   #** joint hack
 hackMax =  (7.0,  #** joint hack
            0.0)   # joint hack (L/R should be same)
 
-sensorMin = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
-             0.0,   # angle X scale (gamma)
-             0.0,   # angle Y scale (gamma)
-             250.0, # X spring constant k (kg/s^2)
-             100.0, # Y spring constant k (kg/s^2)
-             7.0,   # max angle X (compensation)
-             7.0,   # max angle Y
-             45.0)  # max angle vel (change in compensation)
-
-sensorMax = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
-             0.0,   # angle X scale (gamma)
-             0.0,   # angle Y scale (gamma)
-             250.0, # X spring constant k (kg/s^2)
-             100.0, # Y spring constant k (kg/s^2)
-             7.0,   # max angle X (compensation)
-             7.0,   # max angle Y
-             45.0)  # max angle vel (change in compensation)
+sensorMin = sensorMax = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
+                         0.5,  # angle X scale (gamma)
+                         0.3,  # angle Y scale (gamma)
+                         0.00,  # spring constant k (kg/s^2)
+                         0.00,  # spring constant k (kg/s^2)
+                         7.0,   # max angle X (compensation)
+                         3.0,   # max angle Y
+                         45.0)   # max angle vel (change in compensation)
 
 stiffnessMin = stiffnessMax = (0.85,  # hipStiffness
                                0.3,   # kneeStiffness
