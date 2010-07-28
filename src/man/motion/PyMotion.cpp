@@ -83,7 +83,6 @@ public:
         fillArray<float,WP::LEN_STANCE_CONFIG>
             (stance,_stance_config,WP::STANCE_CONVERSION);
 
-        float step[WP::LEN_STEP_CONFIG];
         fillArray<float,WP::LEN_STEP_CONFIG>
         (step,_step_config,WP::STEP_CONVERSION);
 
@@ -130,9 +129,17 @@ public:
             target[i] = extract<T>(t[i])*convert_units[i];
         }
     }
+
+	float getStepValue(int i) {
+		if (i < WP::LEN_STEP_CONFIG) {
+			return step[i];
+		}
+		return 0;
+	}
+
 private:
     boost::shared_ptr<Gait> command;
-
+	float step[WP::LEN_STEP_CONFIG];
 };
 
 class PyWalkCommand {
@@ -375,14 +382,16 @@ BOOST_PYTHON_MODULE(_motion)
                                init<float, tuple, tuple, int>(
  "A container for a head joint command passed to the motion engine"))
         ;
-    class_<PyGaitCommand>("GaitCommand",init<
+    class_<PyGaitCommand>("GaitCommand",
+						  init<
                            tuple, tuple, tuple, tuple,
-                           tuple, tuple, tuple, tuple
-                           >(args("stance,step,zmp,"
-                                  "joint_hack,sensor,"
+                           tuple, tuple, tuple, tuple>
+						  (args("stance,step,zmp,joint_hack,sensor,"
                                   "stiffness,odo,arms"),
                              "Parameterization of the"
-                             " walk engine"));
+                             " walk engine"))
+        .def("getStepValue", &PyGaitCommand::getStepValue)
+		;
     class_<PyBodyJointCommand>("BodyJointCommand",
                                init<float, tuple, tuple, tuple,
 							        tuple, tuple, int>(

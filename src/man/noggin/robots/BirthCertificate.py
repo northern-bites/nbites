@@ -37,8 +37,10 @@ class BirthCertificate:
 			motion_interface.setGait(self.gait)
 
 	def setRobotDribbleGait(self, motion_interface):
-		if self.dribble_gait is not None:
+		if self.dribble_gait is not None and \
+					self.current_gait is not self.dribble_gait:
 			print '\033[32m' + "BirthCertificates - Setting dribble gait" + '\033[0m'
+			self.current_gait = self.dribble_gait
 			motion_interface.setGait(self.dribble_gait)
 
 	def setRobotSlowGait(self, motion_interface):
@@ -59,7 +61,6 @@ class BirthCertificate:
 		print '\033[32m' + "BirthCertificates - Setting DYNAMIC gait" + '\033[0m'
 		self.current_gait = dynGait
 		motion_interface.setGait(dynGait)
-
 
 	def __str__(self):
 		s = "CoA: " + self.long_name
