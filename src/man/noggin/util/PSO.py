@@ -34,6 +34,7 @@ DEBUG_PROGRESS = True
 # both set to <2 per the PSO wikipedia article
 COG = 0.3
 SOC = 0.6
+MAX_INERTIAL = 0.5
 
 # particle motion may not exceed abs(V_CAP) in any tick
 VELOCITY_CAP = 1
@@ -59,7 +60,7 @@ class Particle:
 
         # inertia constant for velocity updates
         # initialized randomly per-particle as suggested by PSO wikipedia article
-        self.INERTIAL = random.random()
+        self.INERTIAL = MAX_INERTIAL * random.random()
 
         self.heuristic = 0
         self.moves = 0

@@ -3,6 +3,7 @@ import man.motion.SweetMoves as SweetMoves
 import man.motion.RobotGaits as RobotGaits
 import man.motion.MotionConstants as MotionConstants
 import man.noggin.typeDefs.Location as Location
+import man.noggin.navigator.NavHelper as helper
 from ..WebotsConfig import WEBOTS_ACTIVE
 import man.noggin.util.PSO as PSO
 from man.motion.gaits.GaitLearnBoundaries import \
@@ -38,7 +39,6 @@ OPTIMIZE_FRAMES = 1000
 
 SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge
 NUM_PARTICLES = 30
-MINIMUM_GLOBAL_BEST = 1500 # arbitrary
 
 POSITION_UPDATE_FRAMES = 15
 MINIMUM_REQUIRED_DISTANCE = 100
@@ -81,8 +81,7 @@ def walkstraightstop(player):
     isFallen = stability.isWBFallen()
 
     if player.firstFrame():
-       # actual motion command clipped by gait parameter
-       setWalkVector(player, 30,0,0)
+       setWalkVector(player, 1,0,0)
        stability.resetData()
 
        player.startOptimizeLocation = getCurrentLocation(player)
@@ -113,8 +112,8 @@ def scoreGaitPerformance(player):
    # we maximize on the heuristic
    heuristic = frames_stood \
        + distancePenalty(player, distance_traveled) \
-       + path_linearity
-       #- stability_penalty
+       + path_linearity \
+       - stability_penalty
 
    print "total distance traveled with this gait is ", \
        distancePenalty(player, distance_traveled)
@@ -131,8 +130,7 @@ def newOptimizeParameters(player):
    """
    swarmBestHeuristic = player.swarm.getBestSolution()[1]
 
-   if player.swarm.getIterations() > SWARM_ITERATION_LIMIT and \
-          swarmBestHeuristic > MINIMUM_GLOAL_BEST:
+   if player.swarm.getIterations() > SWARM_ITERATION_LIMIT:
       print "Swarm is done optimizing!"
       return player.goLater('reportBestGait')
 
@@ -231,63 +229,65 @@ def loadPSO(player):
     f.close()
 
 def revertWebots(player):
-   '''Uses WB supervisor calls to revert the simulator'''
-   supervisor = Supervisor()
-   supervisor.simulationRevert()
+    '''Uses WB supervisor calls to revert the simulator'''
+    supervisor = Supervisor()
+    supervisor.simulationRevert()
 
 def enableGPS(player):
-   try:
-      player.wbGPS = GPS('gps')
-      player.wbGPS.enable(30)
-      player.haveWbGPS = True
-      print "Enabled Webots GPS"
-   except:
-      player.haveWbGPS = False
+    try:
+        player.wbGPS = GPS('gps')
+        player.wbGPS.enable(30)
+        player.haveWbGPS = True
+        print "Enabled Webots GPS"
+    except:
+        player.haveWbGPS = False
 
 def setWalkVector(player, x, y, theta):
     """
     Use this guy because all the wrappings through Nav tend
     to reset our gait parameters
     """
-    walk = motion.WalkCommand(x=x,y=y,theta=theta)
+    x_cms, y_cms, theta_degs = helper.convertWalkVector(player.brain, x, y, theta)
+
+    walk = motion.WalkCommand(x=x_cms,y=y_cms,theta=theta_degs)
     player.brain.motion.setNextWalkCommand(walk)
 
 def setGait(player, gaitTuple):
-        newGait = motion.GaitCommand(gaitTuple[0],
-                                     gaitTuple[1],
-                                     gaitTuple[2],
-                                     gaitTuple[3],
-                                     gaitTuple[4],
-                                     gaitTuple[5],
-                                     gaitTuple[6],
-                                     gaitTuple[7])
+    newGait = motion.GaitCommand(gaitTuple[0],
+                                 gaitTuple[1],
+                                 gaitTuple[2],
+                                 gaitTuple[3],
+                                 gaitTuple[4],
+                                 gaitTuple[5],
+                                 gaitTuple[6],
+                                 gaitTuple[7])
 
-        player.brain.CoA.setRobotDynamicGait(player.brain.motion, newGait)
+    player.brain.CoA.setRobotDynamicGait(player.brain.motion, newGait)
 
 def getCurrentLocation(player):
-   if player.haveWbGPS:
-      wbPosition = player.wbGPS.getValues()
-      return Location.Location(wbPosition[0],
-                               wbPosition[1],
-                               player.brain.my.h)
-   else:
-      return Location.Location(player.brain.my.x,
-                               player.brain.my.y,
-                               player.brain.my.h)
+    if player.haveWbGPS:
+        wbPosition = player.wbGPS.getValues()
+        return Location.Location(wbPosition[0],
+                                 wbPosition[1],
+                                 player.brain.my.h)
+    else:
+        return Location.Location(player.brain.my.x,
+                                 player.brain.my.y,
+                                 player.brain.my.h)
 
 
 def distancePenalty(player, distance_traveled):
-   weight = 1
+    weight = 1
 
-   # webots uses different units than our localization
-   if player.haveWbGPS:
-      weight = 100
+    # webots uses different units than our localization
+    if player.haveWbGPS:
+        weight = 100
 
-   weightedDistance = weight * distance_traveled
+    weightedDistance = weight * distance_traveled
 
-   # prevents gaits that don't move at all
-   if weightedDistance < MINIMUM_REQUIRED_DISTANCE:
-      return DISTANCE_PENALTY
+    # prevents gaits that don't move at all
+    if weightedDistance < MINIMUM_REQUIRED_DISTANCE:
+        return DISTANCE_PENALTY
 
-   else:
-      return weightedDistance
+    else:
+        return weightedDistance

@@ -48,7 +48,7 @@ stepMin = (0.25,   #** step duration
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()
-           5.0,   # **max x accel
+           3.0,   # **max x accel
            7.0,   # max y accel
            20.0,  # max theta speed()
            1.0)   # walk gait = true

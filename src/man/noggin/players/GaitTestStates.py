@@ -28,28 +28,17 @@ else:
     PICKLE_FILE_PREFIX = '/home/nao/gaits/'
     START_DELAY = 30
 
-GAITS = ('PSO_endGait.pickle.1507',
-         'PSO_endGait.pickle.1524',
-         'PSO_endGait.pickle.1521',
-         'PSO_endGait.pickle.1526',
-         'PSO_endGait.pickle.1537',
-         'PSO_endGait.pickle.1540',
-         'PSO_endGait.pickle.1542',
-         'PSO_endGait.pickle.1558',
-         'PSO_endGait.pickle.1627',
+GAITS = ('PSO_endGait.pickle.1473',
+         'PSO_endGait.pickle.1534',
          )
 
-GAITS_THAT_WORK = ('PSO_endGait.pickle.1542',
-                   'PSO_endGait.pickle.1540',
-                   )
-
-UNIT_TEST1 = ((WALK, (15,0,0), 2*DURATION),
-              (WALK, (0,10,0), DURATION),
-              (WALK, (0,-10,0), DURATION),
-              (WALK, (6,6,0), DURATION),
-              (WALK, (6,-6,0), DURATION),
-              (WALK, (8,0,20), DURATION),
-              (WALK, (8,0,-20), DURATION),
+UNIT_TEST1 = ((WALK, (.75, 0, 0), 2*DURATION),
+              (WALK, (0, .75, 0), DURATION),
+              (WALK, (0, -.75, 0), DURATION),
+              (WALK, (.4, .4, 0), DURATION),
+              (WALK, (.4, -.4, 0), DURATION),
+              (WALK, (.5, 0, .5), DURATION),
+              (WALK, (.5, 0, -.5), DURATION),
               )
 
 TEST_DATA_FILE = PICKLE_FILE_PREFIX + 'gaitUnitTest.pickle'
@@ -63,6 +52,9 @@ def gamePlaying(player):
         getDataFromClass(player)
 
     return player.goLater('gaitTest')
+
+def gameReady(player):
+   return player.goLater('gamePlaying')
 
 if WEBOTS_ACTIVE:
     gameInitial=gamePlaying
