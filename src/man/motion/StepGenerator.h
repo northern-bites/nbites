@@ -189,8 +189,6 @@ private:
     //boost::numeric::ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     std::list<float> zmp_ref_x, zmp_ref_y;
-	// future zmp_ref values assuming we are about to stop
-	std::list<float> zmp_ref_stop_x, zmp_ref_stop_y;
     std::list<boost::shared_ptr<Step> > futureSteps; //stores steps not yet zmpd
     //Stores currently relevant steps that are zmpd but not yet completed.
     //A step is consider completed (obsolete/irrelevant) as soon as the foot
@@ -202,8 +200,6 @@ private:
     //These are updated when we ZMP a step - they are the 'future', if you will
     NBMath::ufmatrix3 si_Transform;
     NBMath::ufvector3 last_zmp_end_s;
-	// tracked so we can stop quicker
-	NBMath::ufvector3 last_zmp_stop_end_s;
 
     //Steps for the Walking Leg
     boost::shared_ptr<Step> lastStep_s;

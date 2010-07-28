@@ -1,6 +1,7 @@
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import man.motion.StiffnessModes as StiffnessModes
+from ..navigator import BrunswickSpeeds as speeds
 
 ####Change these for picture taking####
 FRAME_SAVE_RATE = 1
@@ -19,7 +20,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
-        player.setWalk(0,0,-30)
+        player.setWalk(0,0, speeds.MAX_SPIN_SPEED)
         player.brain.tracker.startScan(HeadMoves.SPIN_RIGHT_SCAN_BALL)
 
     #if player.brain.ball.on:

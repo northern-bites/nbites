@@ -1,18 +1,24 @@
-# don't clip speed here, annoying to keep updating this file
-# speed should be clipped in the Gait file or explicitly by the behavior
+# values in this file changed to range [-1,1] for each component of the walk vector
+# converted to the appropriate cm/s value by the walk engine according to gait limits
 
-MAX_X_SPEED = 50.
-MIN_X_SPEED = -20.
-MIN_X_MAGNITUDE = 1.5
+MAX_X_SPEED = 1
+MIN_X_SPEED = -1
+MIN_X_MAGNITUDE = 0.05
 
-MAX_Y_SPEED = 15.
+MAX_Y_SPEED = 1
 MIN_Y_SPEED = -MAX_Y_SPEED
-MIN_Y_MAGNITUDE = 4.
+MIN_Y_MAGNITUDE = 0.1
 
-MAX_SPIN_SPEED = 40.0
+MAX_SPIN_SPEED = 1
 MIN_SPIN_SPEED = -MAX_SPIN_SPEED
-MIN_SPIN_MAGNITUDE = 4.0
+MIN_SPIN_MAGNITUDE = 0.1
 
-MAX_SPIN_WHILE_X_SPEED = 30.0
+OMNI_MAX_X = 0.75
+OMNI_MIN_X = -OMNI_MAX_X
+OMNI_MAX_Y = 0.75
+OMNI_MIN_Y = -OMNI_MAX_Y
+MIN_OMNI_MAGNITUDE = 0.1
+
+MAX_SPIN_WHILE_X_SPEED = 0.75
 MIN_SPIN_WHILE_X_SPEED = -MAX_SPIN_WHILE_X_SPEED
-MIN_SPIN_WHILE_X_MAGNITUDE = 4.0
+MIN_SPIN_WHILE_X_MAGNITUDE = MIN_SPIN_MAGNITUDE

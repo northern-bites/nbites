@@ -16,11 +16,13 @@ import man.motion.SweetMoves as SweetMoves
 STEP = 1 #currently broken in Nav.
 WALK = 0
 
-UNIT_TEST1 = ((WALK, (6,0,0),100),
-              (WALK, (0,6,0,5),50),
-              (WALK, (10.5,-10,30),75),
-              (WALK, (-4,6,15,5),50),
-              (WALK, (1.1,2.4,4.5),50),)
+# all walk vector values must be in the range [-1,1]
+UNIT_TEST1 = ((WALK, (.5, 0, 0), 100),
+              (WALK, (0, .5, 0), 100),
+              (WALK, (.5, -.5, .75), 75),
+              (WALK, (-.4, .5, .5), 50),
+              (WALK, (.2, .2, .2), 50),
+              )
 
 def gamePlaying(player):
     """

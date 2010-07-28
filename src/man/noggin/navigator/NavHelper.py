@@ -1,5 +1,7 @@
 import man.motion as motion
 from man.noggin.util import MyMath
+from math import fabs
+import NavConstants as constants
 
 def setSpeed(nav, x, y, theta):
     """
@@ -11,8 +13,9 @@ def setSpeed(nav, x, y, theta):
     else:
         nav.brain.CoA.setRobotGait(nav.brain.motion)
 
-    walk = motion.WalkCommand(x=x,y=y,theta=theta)
-    nav.brain.motion.setNextWalkCommand(walk)
+    x_cms, y_cms, theta_degs = convertWalkVector(nav, x, y, theta)
+
+    createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
 
     nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
     nav.curSpinDir = MyMath.sign(theta)
@@ -26,8 +29,9 @@ def setDribbleSpeed(nav, x, y, theta):
     else:
         nav.brain.CoA.setDribbleGait(nav.brain.motion)
 
-    walk = motion.WalkCommand(x=x,y=y,theta=theta)
-    nav.brain.motion.setNextWalkCommand(walk)
+    x_cms, y_cms, theta_degs = convertWalkVector(nav, x, y, theta)
+
+    createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
 
     nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
     nav.curSpinDir = MyMath.sign(theta)
@@ -42,12 +46,12 @@ def setSlowSpeed(nav, x, y, theta):
     else:
         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
 
-    walk = motion.WalkCommand(x=x,y=y,theta=theta)
-    nav.brain.motion.setNextWalkCommand(walk)
+    x_cms, y_cms, theta_degs = convertWalkVector(nav, x, y, theta)
+
+    createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
 
     nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
     nav.curSpinDir = MyMath.sign(theta)
-
 
 def step(nav, x, y, theta, numSteps):
     """
@@ -58,8 +62,9 @@ def step(nav, x, y, theta, numSteps):
     else:
         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
 
-    steps = motion.StepCommand(x=x,y=y,theta=theta,numSteps=numSteps)
-    nav.brain.motion.sendStepCommand(steps)
+    x_cms, y_cms, theta_degs = convertWalkVector(nav, x, y, theta)
+
+    createAndSendStepVector(nav, x_cms, y_cms, theta_degs)
 
     nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
     nav.curSpinDir = MyMath.sign(theta)
@@ -94,3 +99,40 @@ def executeMove(motionInst, sweetMove):
             print("What kind of sweet ass-Move is this?")
 
         motionInst.enqueue(move)
+
+def convertWalkVector(nav, x_abs, y_abs, theta_abs):
+    checkWalkVector(x_abs, y_abs, theta_abs)
+
+    gait = nav.brain.CoA.current_gait
+
+    x_mms = y_mms = theta_rads = 0
+
+    if x_abs > 0:
+        x_mms = x_abs * gait.getStepValue(4) # max X speed
+    elif x_abs < 0:
+        x_mms = x_abs * gait.getStepValue(5) # min X speed
+
+    # max Y speed (same in both directions)
+    y_mms = y_abs * gait.getStepValue(6)
+
+    # max theta speed (same in both directions)
+    theta_rads = theta_abs * gait.getStepValue(7)
+ 
+    x_cms = x_mms * constants.TO_CMS  # convert back from motion engine's units
+    y_cms = y_mms * constants.TO_CMS
+    theta_degs = theta_rads * constants.TO_DEGS
+
+    return x_cms, y_cms, theta_degs
+
+def checkWalkVector(x, y, theta):
+    assert fabs(x) <= 1
+    assert fabs(y) <= 1
+    assert fabs(theta) <= 1
+
+def createAndSendStepsVector(nav, x, y, theta):
+    steps = motion.StepCommand(x=x, y=y, theta=theta, numSteps=numSteps)
+    nav.brain.motion.sendStepCommand(steps)
+
+def createAndSendWalkVector(nav, x, y, theta):
+    walk = motion.WalkCommand(x=x,y=y,theta=theta)
+    nav.brain.motion.setNextWalkCommand(walk)
