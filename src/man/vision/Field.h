@@ -11,6 +11,14 @@ class Field;  // forward reference
 #endif
 #include "Profiler.h"
 #include "NaoPose.h"
+
+// constants for Graham scanning to find convex hull
+static const int RUNSIZE = 8;
+static const int SCANSIZE = 10;
+static const int SCANNOISE = 2;
+static const int HULLS = IMAGE_WIDTH / SCANSIZE + 1;
+
+
 class Field
 {
     friend class Vision;
@@ -21,6 +29,10 @@ public:
     // main methods
     int findGreenHorizon(int pH, float sl);
 	void findConvexHull(int pH);
+    void initialScanForTopGreenPoints(int pH);
+    void findTopEdges(int M);
+    int getInitialHorizonEstimate(int pH);
+    int getImprovedEstimate(int pH);
 	int horizonAt(int x);
 	int ccw(point<int> p1, point<int> p2, point<int> p3);
 
@@ -52,6 +64,7 @@ private:
 
     bool shoot[IMAGE_WIDTH];
 	int  topEdge[IMAGE_WIDTH+1];
+    point<int> convex[HULLS];
 #ifdef OFFLINE
     bool debugHorizon;
     bool debugFieldEdge;
