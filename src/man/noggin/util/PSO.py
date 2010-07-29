@@ -37,7 +37,7 @@ SOC = 0.6
 MAX_INERTIAL = 0.5
 
 # particle motion may not exceed abs(V_CAP) in any tick
-VELOCITY_CAP = 1
+VELOCITY_CAP = 1.5
 VELOCITY_MINIMUM_MAGNITUDE = 0.001
 
 INFINITY = float(1e3000)

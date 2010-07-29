@@ -28,18 +28,24 @@ else:
     PICKLE_FILE_PREFIX = '/home/nao/gaits/'
     START_DELAY = 30
 
-GAITS = ('PSO_endGait.pickle.1534',
-         'PSO_endGait.pickle.1473',
-         'PSO_endGait.pickle.1466',
+GAITS = ('PSO_endGait.pickle.1271',
+         'PSO_endGait.pickle.1534',
          )
 
-UNIT_TEST1 = ((WALK, (.3, 0, 0), 2*DURATION),
-              (WALK, (0, .3, 0), DURATION),
-              (WALK, (0, -.3, 0), DURATION),
+WORK_ON_NAO = ('PSO_endGait.pickle.1271',
+               )
+
+UNIT_TEST1 = ((WALK, (.4, 0, 0), 2*DURATION),
+              (WALK, (0, .4, 0), DURATION),
               (WALK, (.2, .2, 0), DURATION),
               (WALK, (.4, -.4, 0), DURATION),
               (WALK, (.5, 0, .5), DURATION),
-              (WALK, (.5, 0, -.5), DURATION),
+              (WALK, (0, 0, 0), DURATION/4),
+              (WALK, (.6, 0, 0), DURATION), # higher speeds if it gets this far
+              (WALK, (0, 0, 0), DURATION/4),
+              (WALK, (.8, 0, 0), DURATION),
+              (WALK, (0, 0, 0), DURATION/4),
+              (WALK, (1, 0, 0), DURATION),
               )
 
 TEST_DATA_FILE = PICKLE_FILE_PREFIX + 'gaitUnitTest.pickle'
