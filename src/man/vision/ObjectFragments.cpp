@@ -125,10 +125,11 @@ void ObjectFragments::createObject() {
     // these are in the relative order that they should be called
     switch (color) {
     case BLUE:
-        goalScan(vision->bglp, vision->bgrp, vision->bgCrossbar, BLUE, BLUEGREEN);
+        lookForFirstPost(vision->bglp, vision->bgrp, vision->bgCrossbar, BLUE,
+                         BLUEGREEN);
         break;
     case YELLOW:
-        goalScan(vision->yglp, vision->ygrp, vision->ygCrossbar, YELLOW,
+        lookForFirstPost(vision->yglp, vision->ygrp, vision->ygCrossbar, YELLOW,
                  ORANGEYELLOW);
         break;
     }
@@ -731,23 +732,20 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
         findHorizontalEdge(leftTop, rightTop, c, c2, true);
         findHorizontalEdge(leftBottom, rightBottom, c, c2, false);
         // store the information into our blob
-        obj.setLeftTop(leftTop);
-        obj.setRightTop(rightTop);
-        obj.setLeftBottom(leftBottom);
-        obj.setRightBottom(rightBottom);
+        obj.setBlob(leftTop, rightTop, leftBottom, rightBottom);
         // check if our estimated slope from pose is not right for this post
         float newSlope = 0.0f;
         if (i == 0) {
             newSlope = correct(obj, c, c2);
             // if we detected that the post was leaning then redo
-            leftTop = point<int>(obj.getLeftTopX(), obj.getLeftTopY());
-            rightTop = point<int>(obj.getRightTopX(), obj.getRightTopY());
-            leftBottom = point<int>(obj.getLeftBottomX(), obj.getLeftBottomY());
-            rightBottom = point<int>(obj.getRightBottomX(),
-                                     obj.getRightBottomY());
+            leftTop = obj.getLeftTop();
+            rightTop = obj.getRightTop();
+            leftBottom = obj.getLeftBottom();
+            rightBottom = obj.getRightBottom();
             if (newSlope != 0.0) {
                 if (CORRECT) {
-                    cout << "Old slope was " << slope << " " << newSlope << endl;
+                    cout << "Old slope was " << slope << " " << newSlope <<
+                        endl;
                 }
                 slope = newSlope;
                 // we need to be very careful about placement here
@@ -972,9 +970,6 @@ int ObjectFragments::grabPost(int c, int c2, int leftx,
             bigY = runs[right].y+runs[right].h;
         }
     }
-
-    //drawLine(runs[left+1].x, smallY, runs[left+1].x, bigY, WHITE);
-    //drawLine(runs[right-1].x, smallY, runs[right-1].x, bigY, WHITE);
 
     // Try and figure out the true axis-parallel post dimensions - we're going
     // to try and start right in the middle
@@ -1329,6 +1324,18 @@ bool ObjectFragments::withinEdgeMargin(int x, int margin) {
     return false;
 }
 
+/* Returns true if the given x value is within margin of either image edge.
+ * @param x      the value to check
+ * @param margin how much tolerance
+ * @return       whether or not x is within the margin
+ */
+bool ObjectFragments::withinVerticalEdgeMargin(int y, int margin) {
+    if (y < margin || y > IMAGE_HEIGHT - margin - 1) {
+        return true;
+    }
+    return false;
+}
+
 /* We have a nice long line that intersects the post.  We usually can use
  * it to id the post by looking at how long it is on either side.  The
  * idea is that we have already checked corners at this point, so we know
@@ -1348,13 +1355,22 @@ int ObjectFragments::classifyByLengthOfGoalline(float dist, int x, int y,
         return NOPOST;
     }
     if (POSTLOGIC) {
-        cout << "Got a big goalline to the side of the post " << dist << endl;
+        cout << "Got a big goalline to the side of the post " << dist <<
+            " " << x << " " << y << endl;
+        if (class1 == RIGHT) {
+            cout << "On right side" << endl;
+        } else {
+            cout << "On left side" << endl;
+        }
     }
     // under some conditions we miss the T next to the post - look out for that
     // if the line ends in the middle of the frame and is near the horizon line
-    if (withinEdgeMargin(x, 10) && horizonAt(x) > 5 && y - horizonAt(x) < 20) {
+    if (!withinEdgeMargin(x, 10) && horizonAt(x) > 5 && y - horizonAt(x) < 20) {
         return class1;
     } else {
+        if (POSTLOGIC) {
+            cout << "Swapping classification " << x << " " << y << endl;
+        }
         return class2;
     }
 }
@@ -1387,12 +1403,13 @@ int ObjectFragments::classifyByGoalline(const point<int> linel,
     }
     // if either of the endpoints are far enough away we can classify the line
     float linedist1 = realDistance(right.x, right.y, liner.x, liner.y);
-    if (linedist1 > GOALBOX_OVERAGE + 2 * BOX_FUDGE) {
-        return classifyByLengthOfGoalline(linedist1, liner.x, liner.y,
-                                          RIGHT, LEFT);
-    }
     float linedist2 = realDistance(left.x, left.y, linel.x, linel.y);
-    if (linedist2 > GOALBOX_OVERAGE + 2 * BOX_FUDGE) {
+    if (linedist1 > linedist2) {
+        if (linedist1 > GOALBOX_OVERAGE + 2 * BOX_FUDGE) {
+            return classifyByLengthOfGoalline(linedist1, liner.x, liner.y,
+                                              RIGHT, LEFT);
+        }
+    } else if (linedist2 > GOALBOX_OVERAGE + 2 * BOX_FUDGE) {
         return classifyByLengthOfGoalline(linedist2, linel.x, linel.y,
                                           LEFT, RIGHT);
     }
@@ -1521,27 +1538,20 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
  * @return				 classification
  */
 
-int ObjectFragments::classifyFirstPost(int c,int c2,
-									   VisualFieldObject* left,
-									   VisualFieldObject* right,
-									   VisualCrossbar* mid, Blob pole)
+int ObjectFragments::classifyFirstPost(int c,int c2, Blob pole)
 {
     const int MIN_BLOB_SIZE = 10;
 
-    int trueLeft = pole.getLeft();  // leftmost value
-    int trueRight = pole.getRight(); // rightmost value
-    int trueTop = pole.getTop();
-    int trueBottom = pole.getBottom();
-    int horizonLeft = horizonAt(trueLeft);
-    int fakeBottom = max(trueBottom, horizonLeft);
+    int horizonLeft = horizonAt(pole.getLeft());
+    int fakeBottom = max(pole.getBottom(), horizonLeft);
 
     // start the process of figuring out which post we've got - fortunately
     // with the Naos it is easier
 
     // Our first test is whether we see a big blob of the same color
     // somewhere else
-    int post = classifyByOtherRuns(trueLeft, trueRight,
-                                   fakeBottom - trueTop);
+    int post = classifyByOtherRuns(pole.getLeft(), pole.getRight(),
+                                   fakeBottom - pole.getTop());
     if (post != NOPOST) {
         if (POSTLOGIC) {
             cout << "Found from checkOther" << endl;
@@ -1584,118 +1594,52 @@ int ObjectFragments::classifyFirstPost(int c,int c2,
     return post;
 }
 
-/* Look for goal posts.	 This is the biggest method we've got and probably the
- * hardest and most complicated.
- * However, the basic idea is pretty simple.  We start by looking for the
- * biggest run of color we can find.
- * We then build a rectangular blob out of that color.	From there we need to
- * determine if the rectangular blob
- * is a post, and if so, then which post it is.	 If that all goes well we look
- * to see if there is a second post,
- * and potentially a backstop.
- * @param left		  the left goal post
- * @param right		  the right post
- * @param mid		  the backstop
- * @param c			  the color we're processing
- * @param c2		  the soft color closest to it (e.g. bluegreen for blue)
+/* Checks is a perspective goal post has reasonable size and shape parameters.
+ * @param post    the post to check
+ * @return        whether it passed the tests
  */
-// Look for posts and goals given the runs we've collected
-void ObjectFragments::goalScan(VisualFieldObject* left,
-							   VisualFieldObject* right,
-							   VisualCrossbar* mid, int c, int c2)
-{
-    const int IMAGE_EDGE = 3;
-    const int NEAR_DISTANCE = 10;
-    const int POST_NEAR_DIST = 5;
-    const int MAX_Y_VALUE = 10;
-
-    // if we don't have any runs there is nothing to do
-    if (numberOfRuns <= 1) return;
-
-    int nextX = 0;
-    int nextH = 0;
-    distanceCertainty dc = BOTH_UNSURE;
-    Blob pole;
-    int isItAPost = grabPost(c, c2, IMAGE_WIDTH - 3, 2, pole);
-
-    // make sure we're looking at something big enough to be a post
-    if (isItAPost == NOPOST) {
-        if (POSTDEBUG) {
-            cout << "Not a post" << endl;
-        }
-        return;
-    }
-
-    // ok now we're going to try and figure out which post it is and where
-    // the other one might be
-
-    int trueLeft = pole.getLeft();	   // leftmost value
-    int trueRight = pole.getRight();	   // rightmost value
-    int trueTop = pole.getTop();		   // topmost
-    int trueBottom = pole.getBottom();   // bottommost
-    int lx = pole.getLeftTopX();		   // save these values in case we need
-    int ly = pole.getLeftTopY();		   // to look for the crossbar
-    int rx = pole.getRightTopX();
+bool ObjectFragments::isPostReasonableSizeShapeAndPlace(Blob post) {
     // before proclaiming this a post, let's make sure its boundaries
     // are in reasonable places
-    int horizonLeft = horizonAt(trueLeft);
-    int fakeBottom = max(trueBottom, horizonLeft);
-    int spanX = rx - lx + 1;
-    int spanY = pole.getLeftBottomY() - ly;
-    int pspanY = fakeBottom - trueTop;
-
+    int horizonLeft = horizonAt(post.getLeft());
+    int fakeBottom = max(post.getBottom(), horizonLeft);
     // do some sanity checking - this one makes sure the blob is ok
-    if (!locationOk(pole)) {
+    if (!locationOk(post)) {
         if (POSTLOGIC)
             cout << "Bad location on post" << endl;
-        return;
+        return false;
     }
     // make sure we have some size to our post
-    if (spanY + 1 == 0) {
-        return;
+    if (post.height() == 0) {
+        return false;
     }
 
     if (POSTDEBUG) {
-	drawBlob(pole, BLACK);
+        drawBlob(post, BLACK);
     }
     // make sure that the ratio of height to width is reasonable
-    float rat = (float)(spanX) / (float)(spanY);
-    if (!postRatiosOk(rat) && spanY < IMAGE_HEIGHT / 2 && spanX < 30) {
-        return;
+    float rat = (float)(post.width()) / (float)(post.height());
+    if (!postRatiosOk(rat) && post.height() < IMAGE_HEIGHT / 2 &&
+        post.getTop() > 0) {
+        return false;
     }
 
-    dc = checkDist(pole);
-    // first characterize the size of the possible pole
-    int howbig = characterizeSize(pole);
-    // now see if we can figure out whether it is a right or left post
-    int post = classifyFirstPost(c, c2, left, right,
-                                 mid, pole);
-    // based on those results update the proper data structure
-    if (post == LEFT) {
-        updateObject(right, pole, _SURE, dc);
-    } else if (post == RIGHT) {
-        updateObject(left, pole, _SURE, dc);
-    } else if (post == BACKSTOP) {
-        // should no longer happen with the Naos
-    } else if (pole.getRightTopX() - pole.getLeftTopX()
-               > IMAGE_WIDTH - IMAGE_EDGE) {
-        // in this case we'll continue on
-    } else {
-        // if we have a big post and no idea what it is, then stop
-        // we'll mark it as uncertain for the localization system
-        if (howbig == LARGE)
-            updateObject(right, pole, NOT_SURE, dc);
-        if (POSTLOGIC) {
-            cout << "Post not classified" << endl;
-        }
-        return;
-    }
+    return true;
 
-    // at this point we have a post and it is normally classified
-    // if we feel pretty good about this, then prepare for the next post
+}
 
+/* Resets the run data after we've identified our first post.  Clears out the
+ * runs that are associated with the first post, or are close to it.  Makes
+ * room to find the next post.
+ * @param pole     the post we identified
+ * @param post     its identification - which allows us to clear other stuff
+ */
+void ObjectFragments::updateRunsAfterFirstPost(Blob pole, int post) {
+    const int NEAR_DISTANCE = 10;
+    int nextX = 0, nextH = 0;
+    int trueLeft = pole.getLeft();
+    int trueRight = pole.getRight();
     // first get rid of all the color that corresponds to this post
-    bool questions = howbig == SMALL;
     for (int i = 0; i < numberOfRuns; i++) {
         nextX = runs[i].x;
         if (nextX >= trueLeft && nextX <= trueRight) {
@@ -1715,17 +1659,95 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
             runs[i].h = 0;
         }
     }
+}
 
+/* Look for goal posts.
+ * The basic idea is pretty simple.  We start by looking for the
+ * biggest run of color we can find.
+ * We then build a rectangular blob out of that color.	From there we need to
+ * determine if the rectangular blob
+ * is a post, and if so, then which post it is.	 If that all goes well we look
+ * to see if there is a second post,
+ * and potentially a backstop.
+ * @param left		  the left goal post
+ * @param right		  the right post
+ * @param mid		  the backstop
+ * @param c			  the color we're processing
+ * @param c2		  the soft color closest to it (e.g. bluegreen for blue)
+ */
+// Look for posts and goals given the runs we've collected
+void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
+							   VisualFieldObject* right,
+							   VisualCrossbar* mid, int c, int c2)
+{
+    // if we don't have any runs there is nothing to do
+    if (numberOfRuns <= 1) {
+        return;
+    }
+    distanceCertainty dc = BOTH_UNSURE;
+    Blob pole;
+    int isItAPost = grabPost(c, c2, IMAGE_WIDTH - 3, 2, pole);
+    // make sure we're looking at something big enough to be a post
+    if (isItAPost == NOPOST) {
+        return;
+    }
+    if (!isPostReasonableSizeShapeAndPlace(pole)) {
+        return;
+    }
+
+    dc = checkDist(pole);
+    // first characterize the size of the possible post
+    int howbig = characterizeSize(pole);
+    // now see if we can figure out whether it is a right or left post
+    int post = classifyFirstPost(c, c2, pole);
+    // based on those results update the proper data structure
+    if (post == LEFT) {
+        updateObject(right, pole, _SURE, dc);
+    } else if (post == RIGHT) {
+        updateObject(left, pole, _SURE, dc);
+    } else {
+        // if we have a big post and no idea what it is, then stop
+        // we'll mark it as uncertain for the localization system
+        if (howbig == LARGE)
+            updateObject(right, pole, NOT_SURE, dc);
+        if (POSTLOGIC) {
+            cout << "Post not classified" << endl;
+        }
+        return;
+    }
+    lookForSecondPost(pole, post, left, right, mid, c, c2);
+}
+
+/* We have found one good post, here we look for a second.  The procedure
+ * is similar to the methodology for the first post except that we
+ * don't have to worry about classification, and we have some extra
+ * sanity checks having to do with the posts relative to each other.
+ * @param pole        the first post
+ * @param post        the first post's classification
+ * @param left		  the left goal post
+ * @param right		  the right post
+ * @param mid		  the backstop
+ * @param c			  the color we're processing
+ * @param c2		  the soft color closest to it (e.g. bluegreen for blue)
+ */
+void ObjectFragments::lookForSecondPost(Blob pole, int post,
+                                        VisualFieldObject* left,
+                                        VisualFieldObject* right,
+                                        VisualCrossbar* mid, int c, int c2) {
+    const int POST_NEAR_DIST = 5;
+    // at this point we have a post and it is normally classified
+    // if we feel pretty good about this, then prepare for the next post
+    updateRunsAfterFirstPost(pole, post);
     // find the other post if possible - the process is basically identical to
     // the first post
-    point <int> leftP = pole.getLeftTop();
-    point <int> rightP = pole.getRightTop();
-    point <int> leftB = pole.getLeftBottom();
-    point <int> rightB = pole.getRightBottom();
+    distanceCertainty dc = checkDist(pole);
+    int howbig = characterizeSize(pole);
+    bool questions = howbig == SMALL;
+    Blob secondPost;
     // ready to grab the potential post
-    isItAPost = grabPost(c, c2, trueLeft - POST_NEAR_DIST,
-                         trueRight + POST_NEAR_DIST, pole);
-    if (isItAPost == NOPOST) {
+    bool isItAPost = grabPost(c, c2, pole.getLeft() - POST_NEAR_DIST,
+                         pole.getRight() + POST_NEAR_DIST, secondPost);
+    if (isItAPost == NOPOST || !isPostReasonableSizeShapeAndPlace(secondPost)) {
         // we didn't get one
         // before returning make sure we don't need to screen the previous post
         if (questions) {
@@ -1740,83 +1762,29 @@ void ObjectFragments::goalScan(VisualFieldObject* left,
         return;
     } else {
         // we managed to grab a second post - lets do more sanity checks
-        int trueLeft2 = pole.getLeft();
-        int trueRight2 = pole.getRight();
-        int trueTop2 = pole.getTop();
-        int trueBottom2 = pole.getBottom();
-        int spanX2 = pole.width();
-        int spanY2 = pole.height();
-        dc = checkDist(pole);
-        rat = (float)spanX2 / (float)spanY2;
-        bool ratOk = postRatiosOk(rat) || (!greenCheck(pole) && rat < SQUATRAT);
-        bool goodSecondPost = checkSize(pole, c);
-        if (SANITY) {
-            if (ratOk && goodSecondPost) {
-                cout << "Ratio and second are ok" << endl;
-            } else {
-                cout << "Problem with ratio or second" << endl;
-            }
-        }
-        if (POSTDEBUG) {
-            if (ratOk && goodSecondPost) {
-                cout << "First two ok on 2d" << endl;
-                if (secondPostFarEnough(leftP, rightP,
-                                        pole.getLeftTop(), pole.getRightTop(),
-                                        post)) {
-                    cout << "separation is fine" << endl;
-                } else {
-                    cout << "Not far enough apart" << endl;
-                }
-            } else {
-                cout << "First two not ok on 2d" << endl;
-            }
-        }
-        // if things look ok, then we have ourselves a second post
-        int fudge = 0;
-        // allow a fudge factor when we're near the image edge
-        if (trueLeft < 1 || trueRight > IMAGE_WIDTH - 2) {
-            fudge = spanX / 2;
-        }
-        // sanity checks: post must be reasonably placed with regard
+        dc = checkDist(secondPost);
+        float rat = (float)secondPost.width() / (float)secondPost.height();
+        bool ratOk = postRatiosOk(rat) || (!greenCheck(secondPost) &&
+                                           rat < SQUATRAT);
+        bool goodSecondPost = checkSize(secondPost, c);
+        // extra sanity checks: post must be reasonably placed with regard
         // to the field, and must not be too close to the other post
         // also its size relative to the other post must be ok
-        if (locationOk(pole) && ratOk && goodSecondPost &&
-            secondPostFarEnough(leftP, rightP, pole.getLeftTop(),
-                                pole.getRightTop(), post) &&
-            secondPostFarEnough(leftB, rightB, pole.getLeftBottom(),
-                                pole.getRightBottom(), post) &&
-            relativeSizesOk(spanX, pspanY, spanX2, spanY2, trueTop, trueTop2,
-                            fudge)) {
+        if (ratOk && goodSecondPost && secondPostFarEnough(pole, secondPost,
+                                                           post) &&
+            relativeSizesOk(pole, secondPost)) {
             if (post == LEFT) {
-                updateObject(left, pole, _SURE, dc);
+                updateObject(left, secondPost, _SURE, dc);
                 // make sure the certainty was set on the other post
                 right->setIDCertainty(_SURE);
             } else {
-                updateObject(right, pole, _SURE, dc);
+                updateObject(right, secondPost, _SURE, dc);
                 left->setIDCertainty(_SURE);
             }
         } else {
             // we failed at least one sanity check
             if (SANITY) {
-                drawBlob(pole, ORANGE);
-            }
-            // before punting let's check if the post came from a side-goal
-            // situation where the relative locations and distances could
-            // be quite awkward
-            if (locationOk(pole) && ratOk && goodSecondPost &&
-                pole.getLeftTopX() > trueRight) {
-                // maybe it really is a side-goal situation
-                if (abs(trueTop - trueTop2) < MAX_Y_VALUE &&
-                    qualityPost(pole, c)) {
-                    if (post == LEFT) {
-                        updateObject(left, pole, _SURE, dc);
-                        // make sure the certainty was set on the other post
-                        right->setIDCertainty(_SURE);
-                    } else {
-                        updateObject(right, pole, _SURE, dc);
-                        left->setIDCertainty(_SURE);
-                    }
-                }
+                drawBlob(secondPost, ORANGE);
             }
         }
     }
@@ -2111,9 +2079,12 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight,
  * @param r2	  right x of the other post
  * @return		  true when there is enough separation.
  */
-bool ObjectFragments::secondPostFarEnough(point <int> left1, point <int> right1,
-										  point <int> left2, point <int> right2,
-										  int post) {
+bool ObjectFragments::secondPostFarEnough(Blob post1, Blob post2, int post) {
+
+    point <int> left1 = post1.getLeftBottom();
+    point <int> right1 = post1.getRightBottom();
+    point <int> left2 = post2.getLeftBottom();
+    point <int> right2 = post2.getRightBottom();
     if (SANITY) {
         cout << "Separations " << (dist(left1.x, left1.y, right2.x, right2.y))
              << " " << (dist(left2.x, left2.y, right1.x, right1.y)) << endl;
@@ -2149,64 +2120,77 @@ bool ObjectFragments::blobOk(Blob b) {
     return false;
 }
 
+bool ObjectFragments::withinMargin(float n, float n2, float margin) {
+    if (n > n2 - margin && n < n2 + margin) {
+        return true;
+    }
+    return false;
+}
+
+bool ObjectFragments::withinMarginInt(int n, int n2, int margin) {
+    if (n > n2 - margin && n < n2 + margin) {
+        return true;
+    }
+    return false;
+}
+
 /*	When we have two candidate posts we don't want one to be huge and the other
  * tiny.  So we need to make
- * sure that the size ratios are within reason.
- * TODO:  THis needs to be rethought and redone for the Naos.  It is very much
- * a product of the Aibos.
- * @param spanX	   the width of one post
- * @param spanY	   its height
- * @param spanX2   the width of the other post
- * @param spanY2   its height
+ * sure that the size ratios are within reason. Now that we have decent pixEstimates
+ * we can do it that way.
+ * @param post1    the original post
+ * @param post2    the potential new one
  * @return		   are the ratios reasonable?
  */
 
-bool ObjectFragments::relativeSizesOk(int spanX, int spanY, int spanX2,
-					  int spanY2, int t1, int t2, int fudge)
-{
-    const int SECOND_IS_TALL = 100;
-    const int SPAN_MULTIPLIER = 3;
-    const float SPAN_PERCENT = 0.25f;
-    const float SPAN2_PERCENT = 0.33f;
-    const int SECOND_IS_TALL2 = 70;
-    const int SMALL_POST = 10;
-
-    if (spanY2 > SECOND_IS_TALL) {
+bool ObjectFragments::relativeSizesOk(Blob post1, Blob post2) {
+    const float fudge = 20.0f;
+    int x1 = post1.getMidBottomX();
+    int y1 = post1.getMidBottomY();
+    int x2 = post2.getMidBottomX();
+    int y2 = post2.getMidBottomY();
+    // if posts are the same basic shape and size, let's just be done with it
+    if (withinMarginInt(post1.height(), post2.height(), post1.height() / 3) &&
+        withinMarginInt(post1.width(), post2.width(), min(post1.width(),
+                                                          post2.width()))) {
         return true;
     }
-    if (static_cast<float>(spanY2) >
-        SPAN_MULTIPLIER * static_cast<float>(spanY) * SPAN_PERCENT) {
-        return true;
-    }
-    // we need to get the "real" offset
-    int f = max(yProject(0, t1, spanY), yProject(IMAGE_WIDTH - 1, t1,
-                                                 IMAGE_WIDTH - spanY));
-    if (fabs(t1 - t2) > SPAN_MULTIPLIER * static_cast<float>(min(spanY, spanY2))
-        * SPAN_PERCENT + static_cast<float>(f))
-	{
+    if (!withinVerticalEdgeMargin(post1.getBottom(), 3) &&
+        !withinVerticalEdgeMargin(post2.getBottom(), 3)) {
+        // both posts are in full view - just check the distance between them
+        float dist = realDistance(x1, y1, x2, y2);
+        if (withinMargin(dist, CROSSBAR_CM_WIDTH, 2 * fudge)) {
+            return true;
+        }
+        // if we're far away our pixEstimate may be off
+        estimate e = vision->pose->pixEstimate(x1, y1, 0.0);
+        estimate e1 = vision->pose->pixEstimate(x2, y2, 0.0);
+        if (e.dist > 400.0f || e1.dist > 400.0f) {
+            if (withinMargin(dist, CROSSBAR_CM_WIDTH, fudge * 3)) {
+                return true;
+            }
+        }
         if (SANITY) {
-            cout << "Bad top offsets" << endl;
+            cout << "Failed relative size check 1 dist was " << dist <<
+                " " << x1 << " " << y1 << " " << x2 << " " << y2 <<
+                " " << e.dist << " " << e1.dist << endl;
         }
         return false;
-	}
-    if (spanY2 > SECOND_IS_TALL2) {
-        return true;
     }
-    // the int cast maintains the same behavior as casting spanY2 to float
-    if (spanX2 > 2
-        && (spanY2 > spanY / 2 || spanY2 > BIGPOST ||
-            ( (spanY2 > (static_cast<float>(spanY) * SPAN2_PERCENT) &&
-               spanX2 > SMALL_POST) &&
-              (spanX2 <= spanX / 2 || fudge != 0)) ) &&
-        (spanX2 > static_cast<float>(spanX) * SPAN_PERCENT))	{
-        return true;
-    }
-    if (t1 < 1 && t2 < 1) {
-        return true;
+    // one post is very close, the other should be relatively close too
+    if (withinEdgeMargin(post1.getBottom(), 2)) {
+        estimate e1 = vision->pose->pixEstimate(x2, y2, 0.0);
+        if (withinMargin(e1.dist, CROSSBAR_CM_WIDTH, fudge * 3)) {
+            return true;
+        }
+    } else {
+        estimate e1 = vision->pose->pixEstimate(x1, y1, 0.0);
+        if (withinMargin(e1.dist, CROSSBAR_CM_WIDTH, fudge * 3)) {
+            return true;
+        }
     }
     if (SANITY) {
-        cout << "Bad relative sizes" << endl;
-        cout << spanX << " "  << spanY << " " << spanX2 << " " << spanY2 << endl;
+        cout << "Failed relative size check" << endl;
     }
     return false;
 }

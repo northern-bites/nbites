@@ -22,6 +22,9 @@ public:
 		{leftBottom.x = lb.x; leftBottom.y = lb.y;}
 	void setRightBottom(point <int> rb)
 		{rightBottom.x = rb.x; rightBottom.y = rb.y;}
+    void setBlob(point <int> tl, point <int> tr, point <int> bl,
+                 point <int> br) {setLeftTop(tl); setRightTop(tr);
+        setLeftBottom(bl); setRightBottom(br);}
 	void setLeftTopX(int x) {leftTop.x = x;}
 	void setLeftTopY(int y) {leftTop.y = y;}
 	void setRightTopX(int x) {rightTop.x = x;}
@@ -50,6 +53,8 @@ public:
 	int getRight() const {return max(rightTop.x, rightBottom.x);}
 	int getTop() const {return min(leftTop.y, rightTop.y);}
 	int getBottom() const {return max(leftBottom.y, rightBottom.y);}
+    int getMidBottomX() const {return (leftBottom.x + rightBottom.x) / 2;}
+    int getMidBottomY() const {return (leftBottom.y + rightBottom.y) / 2;}
 	int width() const;
 	int height() const;
 	int getArea() const;

@@ -97,6 +97,7 @@ public:
     int classifyGoalBoxLineThatAbutsPost(int y, float diff, float dist,
                                          int classification);
     bool withinEdgeMargin(int x, int margin);
+    bool withinVerticalEdgeMargin(int y, int margin);
     int classifyByLengthOfGoalline(float dist, int x, int y,
                                    int class1, int class2);
     int classifyByGoalline(const point<int> linel, const point<int> liner,
@@ -114,32 +115,39 @@ public:
 
     int characterizeSize(Blob b);
 
-    int classifyFirstPost(int c, int c2,
-                          VisualFieldObject* left, VisualFieldObject* right,
-                          VisualCrossbar* mid, Blob pole);
+    int classifyFirstPost(int c, int c2, Blob pole);
 
     // the big kahuna
-    void goalScan(VisualFieldObject *left, VisualFieldObject *right,
+    void lookForFirstPost(VisualFieldObject *left, VisualFieldObject *right,
                   VisualCrossbar *mid, int c, int c2);
+    void lookForSecondPost(Blob pole, int post,
+                                            VisualFieldObject* left,
+                                            VisualFieldObject* right,
+                           VisualCrossbar* mid, int c, int c2);
+
+    void updateRunsAfterFirstPost(Blob pole, int post);
     int grabPost(int c, int c2, int left, int right, Blob & pole);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
     void transferTopBlob(VisualFieldObject * one, certainty cert,
                          distanceCertainty dc);
 
     // sanity checks
+    bool isPostReasonableSizeShapeAndPlace(Blob post);
+
     bool rightBlobColor(Blob obj, float per);
     bool postBigEnough(Blob b);
     bool horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right,
                          int bottom, int top);
     bool postRatiosOk(float ratio);
-    bool secondPostFarEnough(point <int> l1, point <int> r1,
-                             point <int> l2, point <int> r2, int p);
+    bool secondPostFarEnough(Blob a, Blob b, int p);
     bool blobOk(Blob b);
 	bool badDistance(Blob b);
     bool locationOk(Blob b);
-    bool relativeSizesOk(int x1, int y1, int s2, int y2, int t1, int t2, int f);
+    bool relativeSizesOk(Blob a, Blob b);
 
     // misc.
+    bool withinMargin(float n, float n1, float n2);
+    bool withinMarginInt(int n, int n1, int n2);
     int distance(int x1, int x2, int x3, int x4);
 	float realDistance(int x1, int y1, int x2, int y2);
     float getSlope() { return slope; }
