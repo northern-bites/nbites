@@ -12,6 +12,7 @@ from man.motion.gaits.GaitLearnBoundaries import \
 
 from os.path import isfile
 from math import fabs
+import random
 
 # Webots Controller functions, so we can do supervisor stuff
 # for the import to work you must also copy add Webots/lib/ to
@@ -36,13 +37,14 @@ except:
 PSO_STATE_FILE = PICKLE_FILE_PREFIX + "PSO_pGaitLearner.pickle"
 BEST_GAIT_FILE = PICKLE_FILE_PREFIX + "PSO_endGait.pickle."
 OPTIMIZE_FRAMES = 1000
+RANDOM_WALK_DURATION = 150
 
 SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge
 NUM_PARTICLES = 30
 
 POSITION_UPDATE_FRAMES = 15
 MINIMUM_REQUIRED_DISTANCE = 100
-DISTANCE_PENALTY = -300
+DISTANCE_PENALTY = -400
 
 RUN_ONCE_STOP = True
 
@@ -78,36 +80,81 @@ def walkstraightstop(player):
     stability = player.brain.stability
 
     stability.updateStability()
-    isFallen = stability.isWBFallen()
 
     if player.firstFrame():
-       setWalkVector(player, 1,0,0)
-       stability.resetData()
+        setWalkVector(player, 1,0,0)
+        stability.resetData()
+        player.straightWalkCounter = 0
 
-       player.startOptimizeLocation = getCurrentLocation(player)
+        player.startOptimizeLocation = getCurrentLocation(player)
 
     # too computationally expensive to use every point
     if player.counter % POSITION_UPDATE_FRAMES == 0:
-       stability.updatePosition(getCurrentLocation(player))
+        stability.updatePosition(getCurrentLocation(player))
 
-    if player.counter == OPTIMIZE_FRAMES or isFallen:
-       scoreGaitPerformance(player)
+    if robotFellOver(player):
+        player.endStraightWalkLoc = getCurrentLocation(player)
+        player.straightWalkCounter = player.counter
 
-       if isFallen:
-          print "(GaitLearning):: we've fallen down!"
+        scoreGaitPerformance(player)
 
-       return player.goLater('newOptimizeParameters')
+        print "(GaitLearning):: we've fallen down!"
+
+        return player.goLater('newOptimizeParameters')
+
+    if player.counter == OPTIMIZE_FRAMES:
+        player.endStraightWalkLoc = getCurrentLocation(player)
+        player.straightWalkCounter = player.counter
+
+        return player.goLater('timedRandomWalk')
+
+    return player.stay()
+
+def timedRandomWalk(player):
+    stability = player.brain.stability
+
+    stability.updateStability()
+
+    if robotFellOver(player):
+        scoreGaitPerformance(player)
+
+        print "(GaitLearning):: we've fallen down!"
+
+        return player.goLater('newOptimizeParameters')
+
+    if player.counter % RANDOM_WALK_DURATION == 0 or \
+            player.firstFrame():
+        r_x = random.uniform(.5, 1) # we're making forwards gaits
+        r_y = random.uniform(-1, 1)
+        r_theta = random.uniform(-1, 1)
+
+        print "set random walk vector to :", r_x, r_y, r_theta
+
+        setWalkVector(player,
+                      r_x,
+                      r_y,
+                      r_theta)
+
+    if player.counter == OPTIMIZE_FRAMES:
+        scoreGaitPerformance(player)
+        return player.goLater('newOptimizeParameters')
 
     return player.stay()
 
 def scoreGaitPerformance(player):
    stability = player.brain.stability
 
-   frames_stood = player.counter
-   endOptimizeLocation = getCurrentLocation(player)
-   distance_traveled = endOptimizeLocation.distTo(player.startOptimizeLocation)
+   frames_stood = player.counter + player.straightWalkCounter # (sometimes 0)
    path_linearity = stability.getPathLinearity()
    stability_penalty = stability.getStabilityHeuristic()
+
+## TODO:
+# use ball or post distance to determine distance traveled on Nao
+   if WEBOTS_ACTIVE:
+       distance_traveled = player.endStraightWalkLoc.distTo \
+           (player.startOptimizeLocation)
+   else:
+       distance_traveled = 0
 
    # we maximize on the heuristic
    heuristic = frames_stood \
@@ -117,7 +164,9 @@ def scoreGaitPerformance(player):
 
    print "total distance traveled with this gait is ", \
        distancePenalty(player, distance_traveled)
-   print "heuristic for this run is ", heuristic
+   print "robot stood for %s frames during random walk period" % \
+       (frames_stood - player.straightWalkCounter)
+   print "heuristic for this run is %s" % heuristic
 
    player.swarm.getCurrParticle().setHeuristic(heuristic)
    player.swarm.tickCurrParticle()
@@ -128,8 +177,6 @@ def newOptimizeParameters(player):
    Controls what we do after every optimization run
    pointer state to more interesting places
    """
-   swarmBestHeuristic = player.swarm.getBestSolution()[1]
-
    if player.swarm.getIterations() > SWARM_ITERATION_LIMIT:
       print "Swarm is done optimizing!"
       return player.goLater('reportBestGait')
@@ -251,6 +298,12 @@ def setWalkVector(player, x, y, theta):
 
     walk = motion.WalkCommand(x=x_cms,y=y_cms,theta=theta_degs)
     player.brain.motion.setNextWalkCommand(walk)
+
+def robotFellOver(player):
+    if WEBOTS_ACTIVE:
+        return player.brain.stability.isWBFallen()
+    else:
+        return player.brain.fallController.isFallen()
 
 def setGait(player, gaitTuple):
     newGait = motion.GaitCommand(gaitTuple[0],

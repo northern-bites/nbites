@@ -46,7 +46,7 @@ stepMin = (0.25,   #** step duration
            -15.0, #** step lift
            15.0,  #** max x speed
            -5.0,  # max x speed
-           15.0,  # max y speed
+           10.0,  # max y speed
            30.0,  # max theta speed()
            3.0,   # **max x accel
            7.0,   # max y accel
@@ -57,7 +57,7 @@ stepMax = (0.4,   #** step duration
            0.5,   #** fraction in double support
            5.0,   #** stepHeight
            15.0,   #** step lift
-           20.0,  #** max x speed
+           15.0,  #** max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
            30.0,  # max theta speed()

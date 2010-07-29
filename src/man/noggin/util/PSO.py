@@ -129,10 +129,28 @@ class Particle:
     def getPosition(self):
         return self.position
 
+    def avgAbsVelocity(self):
+        velocitySum = optimizeDimensions = 0
+        i = -1
+
+        for velocity in self.velocity:
+            i += 1
+            if self.searchMins[i] == self.searchMaxs[i]:
+                continue
+
+            optimizeDimensions += 1
+            velocitySum += fabs(velocity)
+
+        if optimizeDimensions == 0:
+            return 0
+
+        return velocitySum / optimizeDimensions
+
     # debug output for a particle
     def printState(self):
         if DEBUG_PROGRESS:
             print "pBest: %s gBest: %s nSpace: %s" % (self.pBest, self.gBest, self.dimension)
+            print "particle's average abs(velocity) is %s" % self.avgAbsVelocity()
             print "particle has moved %s times" % self.moves
         if DEBUG_POSITION:
             print "Positions in N-Space: %s" % self.position
