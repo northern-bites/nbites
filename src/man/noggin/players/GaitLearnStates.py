@@ -106,6 +106,14 @@ def walkstraightstop(player):
         player.endStraightWalkLoc = getCurrentLocation(player)
         player.straightWalkCounter = player.counter
 
+        # gaits that don't move at all can sometimes crash webots when it 
+        # tells them to omni walk - there is a malloc() bug in the motion
+        # engine somewhere that needs to be tracked down
+        if distancePenalty(player,
+                           player.endStraightWalkLoc.distTo(player.startOptimizeLocation)) < 0:
+            scoreGaitPerformance(player)
+            return player.goLater('newOptimizeParameters')
+
         return player.goLater('timedRandomWalk')
 
     return player.stay()
@@ -126,7 +134,7 @@ def timedRandomWalk(player):
             player.firstFrame():
         r_x = random.uniform(.5, 1) # we're making forwards gaits
         r_y = random.uniform(-1, 1)
-        r_theta = random.uniform(-1, 1)
+        r_theta = random.uniform(-.5, .5)
 
         print "set random walk vector to :", r_x, r_y, r_theta
 
