@@ -143,14 +143,14 @@ namespace Kinematics {
 
     static const float SHOULDER_OFFSET_Y = 98.0f;
     static const float UPPER_ARM_LENGTH = 90.0f;
-    static const float LOWER_ARM_LENGTH = 145.0f;
+    static const float LOWER_ARM_LENGTH = 108.5f;
     static const float SHOULDER_OFFSET_Z = 100.0f;
     static const float THIGH_LENGTH = 100.0f;
-    static const float TIBIA_LENGTH = 100.0f;
+    static const float TIBIA_LENGTH = 102.75f;
     static const float NECK_OFFSET_Z = 126.5f;
     static const float HIP_OFFSET_Y = 50.0f;
     static const float HIP_OFFSET_Z = 85.0f;
-    static const float FOOT_HEIGHT = 46.0f;
+    static const float FOOT_HEIGHT = 45.11f;
 
     // Camera
     static const float CAMERA_OFF_X = 48.80f; // in millimeters
@@ -369,38 +369,56 @@ namespace Kinematics {
     //locally expressed constants (with respect to an individual joint
     //and the GLOBAL coordinate frame)
 
-    static const float CHEST_MASS_Z = 46.466f;
-    static const float CHEST_MASS_X = -7.8f;
+    static const float CHEST_MASS_X = -4.8f;
+	static const float CHEST_MASS_Y = 0.06f;
+    static const float CHEST_MASS_Z = 42.27f;
 
-    static const float HEAD_MASS_Z = 170.9f - NECK_OFFSET_Z;
+	static const float HEAD_MASS_X = 3.83f;
+	static const float HEAD_MASS_Y = -0.93f;
+    static const float HEAD_MASS_Z = 51.56f;
+
+	static const float NECK_MASS_Z = -25.73f;
+
+	// constants for the RIGHT side of the robot
     static const float UPPER_ARM_MASS_X = 59.5f;
-    static const float LOWER_ARM_MASS_X = 166.15f - UPPER_ARM_LENGTH;
-    static const float THIGH_MASS_Z = 123.0f - HIP_OFFSET_Z;
-    static const float TIBIA_MASS_Z = 251.1f - HIP_OFFSET_Z - THIGH_LENGTH;
-    static const float FOOT_MASS_Z = 315.0f - HIP_OFFSET_Z -
-        THIGH_LENGTH - TIBIA_LENGTH;
-    static const float FOOT_MASS_X = 18.015f;
 
-    //Weight constants
-    static const float CHEST_MASS_g = 1217.1f;
-    static const float HEAD_MASS_g = 401.0f;
-    static const float UPPER_ARM_MASS_g = 87.0f;
-    static const float LOWER_ARM_MASS_g = 163.0f;
-    static const float THIGH_MASS_g  = 533.0f;
-    static const float TIBIA_MASS_g  = 423.0f;
-    static const float FOOT_MASS_g  = 158.0f;
-    static const float TOTAL_MASS  =
+    static const float LOWER_ARM_MASS_X = 69.92f;
+
+    static const float THIGH_MASS_Z = -53.86f;
+    static const float TIBIA_MASS_Z = -48.91f;
+
+	static const float ANKLE_MASS_X = 1.42f;
+	static const float ANKLE_MASS_Z = 6.38f;
+
+    static const float FOOT_MASS_X = 24.89f;
+    static const float FOOT_MASS_Z = -32.08f;
+
+    //Weight constants (grams)
+    static const float CHEST_MASS_g = 1026.28f;
+	static const float NECK_MASS_g = 59.59f;
+    static const float HEAD_MASS_g = 476.71f + NECK_MASS_g;
+    static const float UPPER_ARM_MASS_g = 251.09f;  //shoulder, bicep & elbow
+	static const float LOWER_ARM_MASS_g = 112.82f;
+	static const float PELVIS_MASS_g = 72.44f;
+	static const float HIP_MASS_g = 135.3f;
+    static const float THIGH_MASS_g  = 397.98f + PELVIS_MASS_g + HIP_MASS_g;
+    static const float TIBIA_MASS_g  = 297.06f;
+	static const float ANKLE_MASS_g = 138.92f;
+    static const float FOOT_MASS_g  = 163.04f + ANKLE_MASS_g;
+    static const float TOTAL_MASS  = // 4698.52g according to aldebaran
         CHEST_MASS_g + HEAD_MASS_g +
-        2.0f*(UPPER_ARM_MASS_g + LOWER_ARM_MASS_g + THIGH_MASS_g +
-              TIBIA_MASS_g + FOOT_MASS_g);
+        2.0f*(UPPER_ARM_MASS_g + LOWER_ARM_MASS_g +
+			  THIGH_MASS_g + TIBIA_MASS_g + FOOT_MASS_g);
 
     //The locations of the massses are translated from their
     //global coordinate frame into the local frame in tuples like
     // {X,Y,Z,WEIGHT}
 
-    static const float HEAD_INERTIAL_POS[2][4] = {
+    static const float HEAD_INERTIAL_POS[4][4] = {
         {0.0f, 0.0f, 0.0f, 0.0f},
-        {HEAD_MASS_Z, 0.0f, 0.0f, HEAD_MASS_g}};
+        {HEAD_MASS_Z, 0.0f, 0.0f, HEAD_MASS_g},
+		{0.0f, 0.0f, 0.0f, 0.0f},
+		{NECK_MASS_Z, 0.0f, 0.0f, NECK_MASS_g}};
 
     static const float LEFT_ARM_INERTIAL_POS[4][4] = {
         {0.0f, 0.0f, 0.0f, 0.0f},
@@ -415,7 +433,8 @@ namespace Kinematics {
         {-THIGH_MASS_Z, 0.0f, 0.0f, THIGH_MASS_g},
         {-TIBIA_MASS_Z, 0.0f, 0.0f, TIBIA_MASS_g},
         {0.0f, 0.0f, 0.0f, 0.0f},
-        {-FOOT_MASS_Z,  0.0f, FOOT_MASS_X, FOOT_MASS_g}}; 
+        {-FOOT_MASS_Z,  0.0f, FOOT_MASS_X, FOOT_MASS_g}};
+
     static const float RIGHT_LEG_INERTIAL_POS[6][4] = {
         {0.0f, 0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f, 0.0f},
@@ -423,6 +442,7 @@ namespace Kinematics {
         {-TIBIA_MASS_Z, 0.0f, 0.0f, TIBIA_MASS_g},
         {0.0f, 0.0f, 0.0f, 0.0f},
         {-FOOT_MASS_Z, 0.0f, FOOT_MASS_X, FOOT_MASS_g}};
+
     static const float RIGHT_ARM_INERTIAL_POS[4][4] = {
         {0.0f, 0.0f, 0.0f, 0.0f},
         { 0.0f, -UPPER_ARM_MASS_X, 0.0f, UPPER_ARM_MASS_g},
