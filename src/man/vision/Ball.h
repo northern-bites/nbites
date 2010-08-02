@@ -74,10 +74,8 @@ public:
     bool greenCheck(Blob b);
     bool greenSide(Blob b);
     void setOcclusionInformation();
-    int ballNearGreen(Blob b);
     int roundness(Blob b);
     bool badSurround(Blob b);
-    bool atBoundary(Blob b);
 	void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);
     void checkForReflections(int h, int w, VisualBall * thisBall,
                              estimate e);
@@ -89,7 +87,6 @@ public:
     // sanity checks
     void preScreenBlobsBasedOnSizeAndColor();
     bool sanityChecks(int w, int h, estimate e, VisualBall * thisBall);
-    bool rightBlobColor(Blob obj, float per);
 	bool blobOk(Blob b);
 
     // debugging methods

@@ -639,7 +639,9 @@ float Ball::rightColor(Blob tempobj, int col)
 	int y = tempobj.getLeftTopY();
 	int spanY = tempobj.height();
 	int spanX = tempobj.width();
-	if (spanX < 2 || spanY < 2) return false;
+	if (spanX < 2 || spanY < 2) {
+        return false;
+    }
 	int good = 0;
 	int ogood = 0;
 	int orgood = 0;
@@ -672,29 +674,26 @@ float Ball::rightColor(Blob tempobj, int col)
 		cout << "Orange " << ogood << " ORed " << orgood << " " << red << " OYel "
 				<< oygood << " " << pink << " " << tempobj.getArea() << endl;
 	}
-	if (tempobj.getArea() > MIN_BLOB_SIZE) return (float) good /
-			(float) tempobj.getArea();
-	//if (ogood < 2 * orgood) return 0.1; // at least two thirds of the "orange"
+	if (tempobj.getArea() > MIN_BLOB_SIZE) {
+        return (float) good / (float) tempobj.getArea();
+    }
 	// pixels should be orange
 	if (red > static_cast<float>(spanX * spanY) * RED_PERCENT) {
-		if (BALLDEBUG)
+		if (BALLDEBUG) {
 			cout << "Too much red" << endl;
-		// before giving up let's try and salvage this one
-		if (ogood < static_cast<float>(spanX * spanY) * ORANGE_PERCENT)
-			return RED_PERCENT;
-		if (greenCheck(tempobj) && greenSide(tempobj) && roundness(tempobj) !=
-				BAD_VALUE) {
-			return GOOD_PERCENT;
-		}
+        }
 		return RED_PERCENT;
 	}
 	if (tempobj.getArea() > MIN_BLOB_SIZE &&
-			ogood + oygood > (static_cast<float>(spanX * spanY) * ORANGEYELLOW_PERCENT)
-			&& good < ( static_cast<float>(spanX * spanY) * GOOD_PERCENT))
+        ogood + oygood > (static_cast<float>(spanX * spanY) *
+                          ORANGEYELLOW_PERCENT) &&
+        good < ( static_cast<float>(spanX * spanY) * GOOD_PERCENT)) {
 		return GOOD_PERCENT;
+    }
 	float percent = (float)good / (float) (spanX * spanY);
-	if (col == GREEN)
+	if (col == GREEN) {
 		return (float)good;
+    }
 	return percent;
 }
 
@@ -720,47 +719,21 @@ bool Ball::greenCheck(Blob b)
 	for (int i = 0; i < w; i+= 2) {
 		y = b.getLeftBottomY();
 		vertScan(x + i, y, 1, ERROR_TOLERANCE, GREEN, GREEN, scan);
-		if (scan.good > 1)
+		if (scan.good > 1) {
 			return true;
+        }
 	}
 	// try one more in case its a white line
 	int bad = 0;
 	for (int i = 0; i < EXTRA_LINES && bad < MAX_BAD_PIXELS; i++) {
 		int pix = thresh->thresholded[min(IMAGE_HEIGHT - 1,
 										  b.getLeftBottomY() + i)][x];
-		if (pix == GREEN) return true;
-		if (pix != WHITE) bad++;
-	}
-	return false;
-}
-
-/*	When we're looking for balls it is helpful if they are surrounded by green.
- * The best place to look is underneath, but that doesn't always work.	So let's
- * try the other sides.
- * @param b	   the potential ball
- * @return	   did we find some green?
- */
-bool Ball::greenSide(Blob b)
-{
-	const int ERROR_TOLERANCE = 5;
-	const int X_EXTRA = 8;
-
-	int x = b.getRightBottomX();
-	int y = b.getRightBottomY();
-	stop scan;
-	for (int i = y; i > (b.height()) / 2; i = i - 2) {
-		horizontalScan(x, i, 1, ERROR_TOLERANCE, GREEN, GREEN, x - 1,
-					   x + X_EXTRA, scan);
-		if (scan.good > 0)
-			return true;
-	}
-	x = b.getLeftBottomX();
-	y = b.getLeftBottomY();
-	for (int i = y; i > (b.height()) / 2; i = i - 2) {
-		horizontalScan(x, i, -1, ERROR_TOLERANCE, GREEN, GREEN,
-					   x - X_EXTRA, x + 1, scan);
-		if	(scan.good == 0)
-			return true;
+		if (pix == GREEN) {
+            return true;
+        }
+		if (pix != WHITE) {
+            bad++;
+        }
 	}
 	return false;
 }
@@ -906,61 +879,6 @@ int	 Ball::roundness(Blob b)
 	return 0;
 }
 
-/* Checks all around the ball for green.  Returns all of the sides that is on.
- * Does this by multiplying
- * a base value by various prime numbers representing different cases.
- * @param b	  the candidate ball
- * @return	  where the green is
- */
-
-int Ball::ballNearGreen(Blob b)
-{
-	const int EXTRA_LINES = 6;
-
-	// first check the bottom
-	int w = b.width();
-	int h = b.height();
-	int where = NOGREEN;
-	if (greenCheck(b))
-		where = where * GREENBELOW;
-	// now try the sides - happily the ball is round so we don't have to worry
-	// about scan angles
-	int x = b.getLeftTopX();
-	int y = b.getLeftTopY();
-	for (int i = 0; i < h && y + i < IMAGE_HEIGHT && where % GREENLEFT != 0;
-			i= i+2) {
-		for (int j =-1; j < EXTRA_LINES && x + j > -1 && where % GREENLEFT != 0;
-				j++) {
-			if (thresh->thresholded[i+y][x - j] == GREEN) {
-				where = where * GREENLEFT;
-			}
-		}
-	}
-	for (int i = 0; i < w && x + i < IMAGE_WIDTH && where % GREENABOVE != 0;
-			i= i+2) {
-		for (int j = 0; j < EXTRA_LINES && y - j > 0 && where % GREENABOVE != 0;
-				j++) {
-			if (thresh->thresholded[i+y][j+x] == GREEN) {
-				where = where * GREENABOVE;
-			}
-		}
-	}
-
-	x = b.getRightTopX();
-	y = b.getRightTopY();
-	for (int i = 0; i < h && y + i < IMAGE_HEIGHT && where % GREENRIGHT != 0;
-			i= i+2) {
-		for (int j = 0; j < EXTRA_LINES && x + j < IMAGE_WIDTH &&
-		where % GREENRIGHT != 0; j++) {
-			if (thresh->thresholded[i+y][j+x] == GREEN) {
-				where = where * GREENRIGHT;
-			}
-		}
-	}
-	// put in the case where we don't have any, but want to check the corners
-	return where;
-}
-
 /*	Check the information surrounding the ball and look to see if it might be a
  * false ball.	Since our main candidate for false balls is the red uniform, the
  * main thing we worry about is a preponderance of red.
@@ -1079,16 +997,6 @@ bool Ball::badSurround(Blob b) {
 	return false;
 }
 
-/*	Is the ball at the boundary of the screen?
- * @param b	   the ball
- * @return	   whether or not it borders a boundary
- */
-bool Ball::atBoundary(Blob b) {
-	return b.getLeftTopX() == 0 || b.getRightTopX() >= IMAGE_WIDTH -1 ||
-			b.getLeftTopY() == 0
-			|| b.getLeftBottomY() >= IMAGE_HEIGHT - 1;
-}
-
 /* Once we have determined a ball is a blob we want to set it up for
    the rest of the world (localization, behavior, etc.).
    @param w         ball width
@@ -1150,41 +1058,6 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 																	  ORANGE_BALL_RADIUS,
 																	  thisBall->getRadius(),
 																	  ORANGE_BALL_RADIUS).dist<<endl;*/
-}
-
-/* Checks out how much of the blob is of the right color.
- * If it is enough returns true, if not false.
- * @param tempobj	  the blob we're checking (usually a post)
- * @param minpercent  how good it needs to be
- * @return			  was it good enough?
- */
-bool Ball::rightBlobColor(Blob tempobj, float minpercent) {
-	int x = tempobj.getLeftTopX();
-	int y = tempobj.getLeftTopY();
-	int spanX = tempobj.width();
-	int spanY = tempobj.height();
-	if (spanX < 2 || spanY < 2) return false;
-	int ny, nx, starty, startx;
-	int good = 0, total = 0;
-	for (int i = 0; i < spanY; i++) {
-		starty = y + i;
-		startx = x;
-		for (int j = 0; j < spanX; j++) {
-			nx = startx + j;
-			ny = starty;
-			if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
-				total++;
-				if (thresh->thresholded[ny][nx] == color) {
-					good++;
-				}
-			}
-		}
-	}
-	float percent = (float)good / (float) (total);
-	if (percent > minpercent) {
-		return true;
-	}
-	return false;
 }
 
 /* Misc. routines
