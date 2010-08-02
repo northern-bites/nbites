@@ -73,17 +73,23 @@ public:
     float rightHalfColor(Blob obj);
     bool greenCheck(Blob b);
     bool greenSide(Blob b);
-    int scanOut(int start_x, int start_y, float slope,int dir);
+    void setOcclusionInformation();
     int ballNearGreen(Blob b);
     int roundness(Blob b);
     bool badSurround(Blob b);
     bool atBoundary(Blob b);
 	void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);
+    void checkForReflections(int h, int w, VisualBall * thisBall,
+                             estimate e);
+    bool ballIsClose(VisualBall * thisBall);
+    bool ballIsNotSquare(int h, int w);
+
     int balls(int c, VisualBall *thisBall);
 
     // sanity checks
+    void preScreenBlobsBasedOnSizeAndColor();
+    bool sanityChecks(int w, int h, estimate e, VisualBall * thisBall);
     bool rightBlobColor(Blob obj, float per);
-    void addPoint(float x, float y);
 	bool blobOk(Blob b);
 
     // debugging methods
