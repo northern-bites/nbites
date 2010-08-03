@@ -74,6 +74,9 @@ public:
     bool greenCheck(Blob b);
     bool greenSide(Blob b);
     void setOcclusionInformation();
+    bool ballIsReasonablySquare(int x, int y, int w, int h);
+    bool nearImageEdgeX(int x, int margin);
+    bool nearImageEdgeY(int y, int margin);
     int roundness(Blob b);
     bool badSurround(Blob b);
 	void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);

@@ -181,7 +181,17 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
     float distanceDifference = fabs(e.dist - thisBall->getDistance());
     int horb = horizonAt(topBlob->getLeftBottomX());
 
-    if (badSurround(*topBlob)) {
+    if (!ballIsReasonablySquare(topBlob->getLeftTopX(), topBlob->getLeftTopY(),
+                                w, h)) {
+		if (BALLDEBUG) {
+			drawBlob(*topBlob, BLACK);
+            float ratio = (float)w / (float) h;
+			cout << "Screening for ratios " << ratio << endl;
+		}
+        thisBall->init();
+        topBlob->init();
+        return false;
+    } else if (badSurround(*topBlob)) {
         if (BALLDEBUG) {
             drawBlob(*topBlob, BLACK);
             cout << "Screening for lack of green and bad surround" << endl;
@@ -274,16 +284,17 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 /* Determines on which side the ball is obviously occluded.
  */
 void Ball::setOcclusionInformation() {
-    if (topBlob->getLeftBottomY() > IMAGE_HEIGHT - 3) {
+    const int OCCLUSION_MARGIN = 2;
+    if (nearImageEdgeY(topBlob->getLeft(), OCCLUSION_MARGIN)) {
         occlusion = BOTTOMOCCLUSION;
     }
-    if (topBlob->getLeftTopY() < 1) {
+    if (nearImageEdgeY(topBlob->getTop(), OCCLUSION_MARGIN)) {
         occlusion *= TOPOCCLUSION;
     }
-    if (topBlob->getLeftTopX() < 1) {
+    if (nearImageEdgeX(topBlob->getLeft(), OCCLUSION_MARGIN)) {
         occlusion *= LEFTOCCLUSION;
     }
-    if (topBlob->getRightTopX() > IMAGE_WIDTH - 2) {
+    if (nearImageEdgeX(topBlob->getRight(), OCCLUSION_MARGIN)) {
         occlusion *= RIGHTOCCLUSION;
     }
 }
@@ -738,6 +749,75 @@ bool Ball::greenCheck(Blob b)
 	return false;
 }
 
+/* Check is the blob representing the ball is basically square.  Sometimes
+   it isn't square because it is occluded, so be carefull about those cases.
+   @param    x        x value of upper left corner of blob
+   @param    y        y value of upper left corner of blob
+   @param    w        width of blob
+   @param    h        height of blob
+   @return            whether the blob is reasonably square or not
+ */
+
+bool Ball::ballIsReasonablySquare(int x, int y, int w, int h) {
+	const int IMAGE_EDGE = 3;
+	const int BIG_ENOUGH = 4;
+	const int TOO_BIG_TO_CHECK = 20;
+	const int WIDTH_AT_SCREEN_BOTTOM = 15;
+	float ratio = static_cast<float>(w) / static_cast<float>(h);
+    int margin = IMAGE_EDGE;
+
+	if ((h < SMALLBALLDIM && w < SMALLBALLDIM && ratio > BALLTOOTHIN &&
+			ratio < BALLTOOFAT)) {
+        return true;
+	} else if (ratio > THINBALL && ratio < FATBALL) {
+        return true;
+    } else if (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin) ||
+               nearImageEdgeY(y, margin) || nearImageEdgeY(y+h, margin)) {
+		// we're on an edge so allow for streching
+		if (h > BIG_ENOUGH && w > BIG_ENOUGH && (y + h > IMAGE_HEIGHT - 2 ||
+                                                 y == 0) &&
+            ratio < MIDFAT && ratio > 1) {
+            return true;
+			// then sides
+		} else if (h > BIG_ENOUGH && w > BIG_ENOUGH &&
+                   (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin))
+                   && ratio > MIDTHIN && ratio < 1) {
+            return true;
+		} else if ((h > TOO_BIG_TO_CHECK || w > TOO_BIG_TO_CHECK)
+                   && (ratio > OCCLUDEDTHIN && ratio < OCCLUDEDFAT) ) {
+            return true;
+			// when we have big slivers then allow for extra
+        } else if ((nearImageEdgeY(y+h, margin) || nearImageEdgeY(y, margin)) &&
+                   w > WIDTH_AT_SCREEN_BOTTOM) {
+            return true;
+			// the bottom is a really special case
+		} else {
+            return false;
+		}
+	} else {
+		return false;
+	}
+    return true;
+}
+
+/* Is the x value near the image edge?
+   @param x      the x value
+   @param margin how close we allow
+   @return       whether it is close enough
+ */
+bool Ball::nearImageEdgeX(int x, int margin) {
+    return x < margin || x > IMAGE_WIDTH - margin - 1;
+}
+
+/* Is the y value near the image edge?
+   @param y      the y value
+   @param margin how close we allow
+   @return       whether it is close enough
+ */
+bool Ball::nearImageEdgeY(int y, int margin) {
+    return y < margin || y > IMAGE_HEIGHT - margin - 1;
+}
+
 /*	It probably goes without saying that the ideal ball is round.  So let's see
  * how round our current candidate is.	Among other things we check its
  * height/width ratio (should be about 1) and where the orange is (shouldn't
@@ -750,10 +830,7 @@ bool Ball::greenCheck(Blob b)
 
 int	 Ball::roundness(Blob b)
 {
-	const int IMAGE_EDGE = 3;
-	const int BIG_ENOUGH = 4;
-	const int TOO_BIG_TO_CHECK = 20;
-	const int WIDTH_AT_SCREEN_BOTTOM = 15;
+    const int   IMAGE_EDGE = 3;
 	const float RATIO_TO_INT = 10.0f;
 	const float CORNER_CHUNK_DIV = 6.0f;
 
@@ -761,56 +838,15 @@ int	 Ball::roundness(Blob b)
 	int h = b.height();
 	int x = b.getLeftTopX();
 	int y = b.getLeftTopY();
-	float ratio = static_cast<float>(w) / static_cast<float>(h);
-	int r = 10;
 
-	if ((h < SMALLBALLDIM && w < SMALLBALLDIM && ratio > BALLTOOTHIN &&
-			ratio < BALLTOOFAT)) {
-	} else if (ratio > THINBALL && ratio < FATBALL) {
-	} else if (y + h > IMAGE_HEIGHT - IMAGE_EDGE || x == 0 || (x + w) >
-	IMAGE_WIDTH - 2 || y == 0) {
-		if (BALLDEBUG)
-			cout << "Checking ratio on occluded ball:  " << ratio << endl;
-		// we're on an edge so allow for streching
-		if (h > BIG_ENOUGH && w > BIG_ENOUGH && (y + h > IMAGE_HEIGHT - 2 ||
-				y == 0) &&
-				ratio < MIDFAT && ratio > 1) {
-			// then sides
-		} else if (h > BIG_ENOUGH && w > BIG_ENOUGH
-				&& (x == 0 || x + w > IMAGE_WIDTH - 2)
-				&& ratio > MIDTHIN && ratio < 1) {
-		} else if ((h > TOO_BIG_TO_CHECK || w > TOO_BIG_TO_CHECK)
-				&& (ratio > OCCLUDEDTHIN && ratio < OCCLUDEDFAT) ) {
-			// when we have big slivers then allow for extra
-		} else if (b.getLeftBottomY() > IMAGE_HEIGHT - IMAGE_EDGE &&
-				w > WIDTH_AT_SCREEN_BOTTOM) {
-			// the bottom is a really special case
-		} else {
-			if (BALLDEBUG)
-				//cout << "Screening for ratios" << endl;
-				return BAD_VALUE;
-		}
-	} else {
-		if (BALLDEBUG) {
-			drawBlob(b, BLACK);
-			printBlob(b);
-			cout << "Screening for ratios " << ratio << endl;
-		}
-		return BAD_VALUE;
-	}
-	if (ratio < 1.0) {
-		int offRat = ROUND2((1.0f - ratio) * RATIO_TO_INT);
-		r -= offRat;
-	} else {
-		int offRat = ROUND2((1.0f - 1.0f/ratio) * RATIO_TO_INT);
-		r -= offRat;
-	}
 	if (w * h > SMALLBALL) {
 		// now make some scans through the blob - horizontal, vertical, diagonal
 		int pix;
 		int goodPix = 0, badPix = 0;
-		if (y + h > IMAGE_HEIGHT - IMAGE_EDGE || x == 0 || (x + w) >
-		IMAGE_WIDTH - 2 || y == 0) {
+        int margin = IMAGE_EDGE;
+        if (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin) ||
+            nearImageEdgeY(y, margin) || nearImageEdgeY(y+h, margin)) {
+            // do nothing
 		} else {
 			// we're in the screen
 			int d = ROUND2(static_cast<float>(std::max(w, h)) /
@@ -846,13 +882,10 @@ int	 Ball::roundness(Blob b)
 					goodPix++;
 				else if (pix != GREY) {
 					badPix++;
-					//drawPoint(x+w-i, y+i, BLACK);
 				}
 			}
-			//cout << "here" << endl;
 			for (int i = 0; i < h; i++) {
 				pix = thresh->thresholded[y+i][x + w/2];
-				//drawPoint(x + w/2, y+i, BLACK);
 				if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
 					goodPix++;
 				} else if (pix != GREY)
@@ -861,18 +894,19 @@ int	 Ball::roundness(Blob b)
 		}
 		for (int i = 0; i < w; i++) {
 			pix = thresh->thresholded[y+h/2][x + i];
-			//drawPoint(x+i, y+h/2, BLACK);
 			if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
 				goodPix++;
 			} else if (pix != GREY)
 				badPix++;
 		}
-		if (BALLDEBUG)
+		if (BALLDEBUG) {
 			cout << "Roundness: Good " << goodPix << " " << badPix << endl;
+        }
 		// if more than 20% or so of our pixels tested are bad, then we toss it out
 		if (goodPix < badPix * 5) {
-			if (BALLDEBUG)
+			if (BALLDEBUG) {
 				cout << "Screening for bad roundness" << endl;
+            }
 			return BAD_VALUE;
 		}
 	}
@@ -986,7 +1020,8 @@ bool Ball::badSurround(Blob b) {
 		}
 		x = b.getLeftTopX();
 		y = b.getLeftBottomY();
-		if ((x < 1 || x + w > IMAGE_WIDTH - 2) && y	 > IMAGE_HEIGHT - 2) {
+        if (nearImageEdgeX(x, 2) || nearImageEdgeX(x+w, 2) ||
+            nearImageEdgeY(y, 2)) {
 			if (BALLDEBUG) {
 				cout << "Dangerous corner location detected " << x << " " << y <<  endl;
 			}
