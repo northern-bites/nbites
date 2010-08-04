@@ -55,7 +55,7 @@ static const float OCCLUDEDFAT = 4.0f;
 static const float MIDFAT = 3.0f;
 static const float MIDTHIN = 0.3f;
 // at least this much of the blob should be orange normally
-static const float MINORANGEPERCENTSMALL = 0.5f;
+static const float MINORANGEPERCENTSMALL = 0.44f;
 static const float MINORANGEPERCENT = 0.5f;
 static const float MINGOODBALL = 0.5f;
 static const float MAXGOODBALL = 3.0f;
@@ -112,6 +112,15 @@ void Ball::createBall(int h) {
 	balls(h, vision->ball);
 }
 
+/* Are the dimensions of a candidate blob worthy of further study?
+   @param w     the blob's width
+   @param h     the blob's height
+   @return      whether it meets the minimum criteria
+ */
+bool Ball::blobIsBigEnoughToBeABall(int w, int h) {
+    return !(w < 3 || h < 3);
+}
+
 /*  Before we just take the biggest blob, we do some initial screening
     based upon basic blob information.  The main things we look at here
     are the color of the blob and its size.  When we find a blob that
@@ -121,53 +130,60 @@ void Ball::createBall(int h) {
 void Ball::preScreenBlobsBasedOnSizeAndColor() {
     const int MIN_AREA = 12;
     const int MAX_AREA = 1000;
+    float minpercent = MINORANGEPERCENT;
 
 	// pre-screen blobs that don't meet our criteria
 	for (int i = 0; i < blobs->number(); i++) {
-		int ar = blobs->get(i).getArea();
-		float perc = rightColor(blobs->get(i), ORANGE);
-		int diam = max(blobs->get(i).width(), blobs->get(i).height());
-		float minpercent = MINORANGEPERCENT;
-		// For now we are going to allow very small balls to be a bit less orange
-		// obviously this is dangerous, so we'll have to keep an eye on it.
-		if (ar < MIN_AREA * 3) {
-			minpercent = MINORANGEPERCENTSMALL;
-		}
-		if (blobs->get(i).getArea() > 0) {
-			if (blobs->get(i).getLeftBottomY() + diam <
-					horizonAt(blobs->get(i).getLeftTopX())) {
-				blobs->init(i);
-				if (BALLDEBUG) {
-					cout << "Screened one for horizon problems " << endl;
-					drawBlob(blobs->get(i), WHITE);
-				}
-			} else if (ar > MIN_AREA && perc > minpercent) {
-				// don't do anything
-				if (BALLDEBUG) {
-					cout << "Candidate ball " << endl;
-					printBlob(blobs->get(i));
-				}
-			} else if (ar > MAX_AREA && rightHalfColor(blobs->get(i)) > minpercent)
-			{
-				if (BALLDEBUG) {
-					cout << "Candidate ball " << endl;
-					printBlob(blobs->get(i));
-				}
-			} else {
-				if (BALLDEBUG) {
-					drawBlob(blobs->get(i), BLACK);
-					printBlob(blobs->get(i));
-					if (perc < minpercent) {
-						cout << "Screened one for not being orange enough, its percentage is "
-								<< perc << endl;
-					} else {
-						cout << "Screened one for being too small - its area is " << ar << endl;
-					}
-				}
-				blobs->init(i);
-			}
-		}
-	}
+        int ar = blobs->get(i).getArea();
+        float perc = blobs->get(i).getPixels() / (float)ar;
+        int w = blobs->get(i).width();
+        int h = blobs->get(i).height();
+        int diam = max(w, h);
+        // For now we are going to allow very small balls to be a bit less orange
+        // obviously this is dangerous, so we'll have to keep an eye on it.
+        if (ar < MIN_AREA * 3) {
+            minpercent = MINORANGEPERCENTSMALL;
+        } else {
+            minpercent = MINORANGEPERCENT;
+        }
+        if (!blobIsBigEnoughToBeABall(w, h)) {
+            blobs->init(i);
+        } else if (ar > 0) {
+            if (blobs->get(i).getBottom() + diam <
+                horizonAt(blobs->get(i).getLeft())) {
+                blobs->init(i);
+                if (BALLDEBUG) {
+                    cout << "Screened one for horizon problems " << endl;
+                    drawBlob(blobs->get(i), WHITE);
+                }
+            } else if (ar > MIN_AREA && perc > minpercent) {
+                if (BALLDEBUG) {
+                    cout << "Candidate ball " << endl;
+                    printBlob(blobs->get(i));
+                }
+            } else if (ar > MAX_AREA &&
+                       rightHalfColor(blobs->get(i)) > minpercent)
+            {
+                if (BALLDEBUG) {
+                    cout << "Candidate ball2 " << endl;
+                    printBlob(blobs->get(i));
+                }
+            } else {
+                if (BALLDEBUG) {
+                    drawBlob(blobs->get(i), BLACK);
+                    printBlob(blobs->get(i));
+                    if (perc < minpercent) {
+                        cout << "Screened one for not being orange enough: "
+                             << perc << "%" << endl;
+                    } else {
+                        cout << "Screened one for being too small - its area is "
+                             << ar << endl;
+                    }
+                }
+                blobs->init(i);
+            }
+        }
+    }
 }
 
 /* Do more sanity checks on the ball returning false if any fail.
@@ -247,6 +263,9 @@ int Ball::balls(int horizon, VisualBall *thisBall)
         // the conditions when we know we don't have a ball
 		if (topBlob == NULL || !blobOk(*topBlob)) {
             return 0;
+        }
+        if (BALLDEBUG) {
+            cout << endl << "Examining next top blob " << endl;
         }
 		w = topBlob->width();
 		h = topBlob->height();
@@ -587,11 +606,10 @@ float Ball::rightHalfColor(Blob tempobj)
 
 	int x = tempobj.getLeftTopX();
 	int y = tempobj.getLeftTopY();
-	int spanY = tempobj.height() - 1;
-	int spanX = tempobj.width() - 1;
+	int spanY = tempobj.height();
+	int spanX = tempobj.width();
 	int good = 0, good1 = 0, good2 = 0;
 	int pix;
-	if (rightColor(tempobj, ORANGE) < COLOR_THRESH) return POOR_VALUE;
 	for (int i = spanY / 2; i < spanY; i++) {
 		for (int j = 0; j < spanX; j++) {
 			pix = thresh->thresholded[y + i][x + j];
@@ -631,124 +649,6 @@ float Ball::rightHalfColor(Blob tempobj)
 	return percent;
 }
 
-/* Checks out how much of the current blob is orange.
- * Also looks for too much red.
- * @param tempobj	  the candidate ball blob
- * @param col		  ???
- * @return			  the percentage (unless a special situation occurred)
- */
-
-float Ball::rightColor(Blob tempobj, int col)
-{
-	const int MIN_BLOB_SIZE = 1000;
-	const float RED_PERCENT = 0.10f;
-	const float ORANGE_PERCENT = 0.20f;
-	const float ORANGEYELLOW_PERCENT = 0.40f;
-	const float GOOD_PERCENT = 0.65f;
-
-	int x = tempobj.getLeftTopX();
-	int y = tempobj.getLeftTopY();
-	int spanY = tempobj.height();
-	int spanX = tempobj.width();
-	if (spanX < 2 || spanY < 2) {
-        return false;
-    }
-	int good = 0;
-	int ogood = 0;
-	int orgood = 0;
-	int oygood = 0;
-	int red = 0;
-	int pink = 0;
-	for (int i = 0; i < spanY; i++) {
-		for (int j = 0; j < spanX; j++) {
-			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
-					x + j < IMAGE_WIDTH) {
-				int pix = thresh->thresholded[y + i][x + j];
-				if (pix == ORANGE || pix == ORANGERED ||
-						pix == ORANGEYELLOW) {
-					good++;
-					if (pix == ORANGE)
-						ogood++;
-					else if (pix == ORANGEYELLOW)
-						oygood++;
-					else
-						orgood++;
-				} else if (pix == RED) {
-					red++;
-				}
-			}
-		}
-	}
-	// here's a big hack - if we have a ton of orange, let's say it is enough
-	// unless the percentage is really low
-	if (BALLDEBUG) {
-		cout << "Orange " << ogood << " ORed " << orgood << " " << red << " OYel "
-				<< oygood << " " << pink << " " << tempobj.getArea() << endl;
-	}
-	if (tempobj.getArea() > MIN_BLOB_SIZE) {
-        return (float) good / (float) tempobj.getArea();
-    }
-	// pixels should be orange
-	if (red > static_cast<float>(spanX * spanY) * RED_PERCENT) {
-		if (BALLDEBUG) {
-			cout << "Too much red" << endl;
-        }
-		return RED_PERCENT;
-	}
-	if (tempobj.getArea() > MIN_BLOB_SIZE &&
-        ogood + oygood > (static_cast<float>(spanX * spanY) *
-                          ORANGEYELLOW_PERCENT) &&
-        good < ( static_cast<float>(spanX * spanY) * GOOD_PERCENT)) {
-		return GOOD_PERCENT;
-    }
-	float percent = (float)good / (float) (spanX * spanY);
-	if (col == GREEN) {
-		return (float)good;
-    }
-	return percent;
-}
-
-/*	When we're looking for balls it is helpful if they are surrounded by green.
- * The best place to look is underneath.  So let's do that.
- * @param b	   the potential ball
- * @return	   did we find some green?
- */
-bool Ball::greenCheck(Blob b)
-{
-	const int ERROR_TOLERANCE = 5;
-	const int EXTRA_LINES = 10;
-	const int MAX_BAD_PIXELS = 4;
-
-	if (b.getRightBottomY() >= IMAGE_HEIGHT - 1 ||
-			b.getLeftBottomY() >= IMAGE_HEIGHT-1)
-		return true;
-	if (b.width() > IMAGE_WIDTH / 2) return true;
-	int w = b.width();
-	int y = 0;
-	int x = b.getLeftBottomX();
-	stop scan;
-	for (int i = 0; i < w; i+= 2) {
-		y = b.getLeftBottomY();
-		vertScan(x + i, y, 1, ERROR_TOLERANCE, GREEN, GREEN, scan);
-		if (scan.good > 1) {
-			return true;
-        }
-	}
-	// try one more in case its a white line
-	int bad = 0;
-	for (int i = 0; i < EXTRA_LINES && bad < MAX_BAD_PIXELS; i++) {
-		int pix = thresh->thresholded[min(IMAGE_HEIGHT - 1,
-										  b.getLeftBottomY() + i)][x];
-		if (pix == GREEN) {
-            return true;
-        }
-		if (pix != WHITE) {
-            bad++;
-        }
-	}
-	return false;
-}
-
 /* Check is the blob representing the ball is basically square.  Sometimes
    it isn't square because it is occluded, so be carefull about those cases.
    @param    x        x value of upper left corner of blob
@@ -773,22 +673,24 @@ bool Ball::ballIsReasonablySquare(int x, int y, int w, int h) {
         return true;
     } else if (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin) ||
                nearImageEdgeY(y, margin) || nearImageEdgeY(y+h, margin)) {
+        bool nearX = nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin);
+        bool nearY = nearImageEdgeY(y, margin) || nearImageEdgeY(y+h, margin);
 		// we're on an edge so allow for streching
-		if (h > BIG_ENOUGH && w > BIG_ENOUGH && (y + h > IMAGE_HEIGHT - 2 ||
-                                                 y == 0) &&
+		if (h > BIG_ENOUGH && w > BIG_ENOUGH && nearY &&
             ratio < MIDFAT && ratio > 1) {
             return true;
 			// then sides
-		} else if (h > BIG_ENOUGH && w > BIG_ENOUGH &&
-                   (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin))
+		} else if (h > BIG_ENOUGH && w > BIG_ENOUGH && nearX
                    && ratio > MIDTHIN && ratio < 1) {
             return true;
-		} else if ((h > TOO_BIG_TO_CHECK || w > TOO_BIG_TO_CHECK)
-                   && (ratio > OCCLUDEDTHIN && ratio < OCCLUDEDFAT) ) {
+        } else if (h > TOO_BIG_TO_CHECK && nearX && ratio > OCCLUDEDTHIN &&
+            ratio < 1.0f) {
+            return true;
+        } else if (w > TOO_BIG_TO_CHECK && nearY && ratio < OCCLUDEDFAT &&
+            ratio > 1.0f) {
             return true;
 			// when we have big slivers then allow for extra
-        } else if ((nearImageEdgeY(y+h, margin) || nearImageEdgeY(y, margin)) &&
-                   w > WIDTH_AT_SCREEN_BOTTOM) {
+        } else if (nearY && w > WIDTH_AT_SCREEN_BOTTOM) {
             return true;
 			// the bottom is a really special case
 		} else {
@@ -914,8 +816,9 @@ int	 Ball::roundness(Blob b)
 }
 
 /*	Check the information surrounding the ball and look to see if it might be a
- * false ball.	Since our main candidate for false balls is the red uniform, the
- * main thing we worry about is a preponderance of red.
+ * false ball.	Since our main candidate for false balls is the red/pink uniform, the
+ * main thing we worry about is a preponderance of red.  In many ways this is the
+ * key sanity check.
  *
  * @param b	   our ball candidate
  * @return	   true if the surround looks bad, false if its ok
@@ -936,19 +839,7 @@ bool Ball::badSurround(Blob b) {
 	int greens = 0, orange = 0, red = 0, borange = 0, pix, realred = 0,
 			yellows = 0;
 
-	// first collect information on the ball itself
-	for (int i = -1; i < w+1; i++) {
-		for (int j = -1; j < h+1; j++) {
-			if (x + i > -1 && x + i < IMAGE_WIDTH && y + j > -1 &&
-					y + j < IMAGE_HEIGHT) {
-				pix = thresh->thresholded[y + j][x + i];
-				if (pix == ORANGE)
-					borange++;
-			}
-		}
-	}
-
-	// now collect information on the area surrounding the ball
+	// now collect information on the area surrounding the ball and the ball
 	x = max(0, x - surround);
 	y = max(0, y - surround);
 	w = w + surround * 2;
@@ -956,16 +847,21 @@ bool Ball::badSurround(Blob b) {
 	for (int i = 0; i < w && x + i < IMAGE_WIDTH; i++) {
 		for (int j = 0; j < h && y + j < IMAGE_HEIGHT; j++) {
 			pix = thresh->thresholded[y + j][x + i];
-			if (pix == ORANGE || pix == ORANGEYELLOW)
+			if (pix == ORANGE || pix == ORANGEYELLOW) {
 				orange++;
-			else if (pix == RED)
+                if (x + i >= b.getLeft() && x + i <= b.getRight() &&
+                    y + j >= b.getTop() && y + j <= b.getBottom()) {
+                    borange++;
+                }
+			} else if (pix == RED) {
 				realred++;
-			else if (pix == ORANGERED)
+			} else if (pix == ORANGERED) {
 				red++;
-			else if (pix == GREEN)
+			} else if (pix == GREEN) {
 				greens++;
-			else if (pix == YELLOW && j < surround)
+			} else if (pix == YELLOW && j < surround) {
 				yellows++;
+            }
 		}
 	}
 	if (BALLDEBUG) {
@@ -979,7 +875,7 @@ bool Ball::badSurround(Blob b) {
 		}
 		return true;
 	}
-	if (realred > greens && b.width() * b.height() < 500) {
+	if (realred > greens && w * h < 2000) {
 		if (BALLDEBUG) {
 			cout << "Too much real red versus green" << endl;
 		}
@@ -1014,7 +910,8 @@ bool Ball::badSurround(Blob b) {
 		}
 		return true;
 	}
-	if (red > orange)  {
+	if (red > orange || (realred > greens && realred > 2 * w &&
+            realred > borange * 0.1))  {
 		if (BALLDEBUG) {
 			cout << "Too much real red - doing more checking" << endl;
 		}
@@ -1116,11 +1013,10 @@ bool Ball::blobOk(Blob b) {
  */
 void Ball::printBlob(Blob b) {
 #if defined OFFLINE
-	cout << "Outputting blob" << endl;
-	cout << b.getLeftTopX() << " " << b.getLeftTopY() << " " << b.getRightTopX()
-				 << " " << b.getRightTopY() << endl;
-	cout << b.getLeftBottomX() << " " << b.getLeftBottomY() << " "
-			<< b.getRightBottomX() << " " << b.getRightBottomY() << endl;
+	cout << "Blob Top Left Corner " << b.getLeftTopX() << " " << b.getLeftTopY()
+         << endl;
+    cout << "Width/height " << b.width() << " " << b.height();
+    cout << " Amount of orange " << b.getPixels() << endl;
 #endif
 }
 

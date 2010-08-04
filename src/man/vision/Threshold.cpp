@@ -550,6 +550,25 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             currentRun = 1;
         }
         lastPixel = pixel;
+        if (pixel == ORANGE) {
+            int lastu = getU(column, j);
+            int initu = lastu;
+            while (j >= 0 && abs(getU(column, j) - lastu) < 8 &&
+                   abs(initu - lastu) < 12) {
+                currentRun++;
+                j--;
+#ifdef USE_EDGES
+                thresholded[j][column] = getColor(column, j);
+#endif
+            }
+            currentRun--;
+            j++;
+            if ((j == 0 || j >= topEdge) && currentRun > 2) {
+                orange->newRun(column, j, currentRun);
+            }
+            greens+= currentRun;
+            lastPixel = ORANGE;
+        }
     }
     if (shoot[column] && greens < (bound - topEdge) / 2) {
         if (block[column / divider] == 0) {

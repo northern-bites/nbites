@@ -69,10 +69,7 @@ public:
     void createBall(int c);
 
     // ball stuff
-    float rightColor(Blob obj, int c);
     float rightHalfColor(Blob obj);
-    bool greenCheck(Blob b);
-    bool greenSide(Blob b);
     void setOcclusionInformation();
     bool ballIsReasonablySquare(int x, int y, int w, int h);
     bool nearImageEdgeX(int x, int margin);
@@ -91,6 +88,7 @@ public:
     void preScreenBlobsBasedOnSizeAndColor();
     bool sanityChecks(int w, int h, estimate e, VisualBall * thisBall);
 	bool blobOk(Blob b);
+    bool blobIsBigEnoughToBeABall(int w, int h);
 
     // debugging methods
     void printBall(Blob b, int c, float p, int o);
