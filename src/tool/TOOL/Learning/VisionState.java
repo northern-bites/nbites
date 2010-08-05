@@ -608,6 +608,18 @@ public class VisionState {
 					thresholdedImage.getVisionLink().
 						setDebugFieldEdge(fieldEdgeBox.isSelected());}
 			});
+		final JCheckBox openFieldBox = new JCheckBox(" Debug Open Field");
+		openFieldBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugOpenField(openFieldBox.isSelected());}
+			});
+		final JCheckBox shootingBox = new JCheckBox(" Debug Shooting");
+		shootingBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugShooting(shootingBox.isSelected());}
+			});
 
 		buttonPanel.add(new JLabel("\tField Line Flags"));
 		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
@@ -633,6 +645,8 @@ public class VisionState {
 		ballPanel.add(postCorrectBox);
 		ballPanel.add(fieldHorizonBox);
 		ballPanel.add(fieldEdgeBox);
+        ballPanel.add(openFieldBox);
+        ballPanel.add(shootingBox);
 		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
 		JPanel debugPanel = new JPanel();
