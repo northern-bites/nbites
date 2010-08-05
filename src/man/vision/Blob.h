@@ -33,6 +33,10 @@ public:
 	void setLeftBottomY(int y) {leftBottom.y = y;}
 	void setRightBottomX(int x) {rightBottom.x = x;}
 	void setRightBottomY(int y) {rightBottom.y = y;}
+    void setLeft(int x) {setLeftTopX(x); setLeftBottomX(x);}
+    void setRight(int x) {setRightTopX(x); setRightBottomX(x);}
+    void setTop(int y) {setLeftTopY(y); setRightTopY(y);}
+    void setBottom(int y) {setLeftBottomY(y); setRightBottomY(y);}
 	void setArea(int a) {area = a;}
 	void setPixels(int p) {pixels = p;}
 

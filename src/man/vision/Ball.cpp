@@ -63,6 +63,9 @@ static const int BIGAREA = 400;
 static const int BIGGERAREA = 600;
 static const float FATBALL = 2.0f;
 static const float THINBALL = 0.5f;
+static const int DIAMETERMISMATCH = 5;
+static const int EDGEMISMATCH = 10;
+static const int EDGECENTERMISMATCH = 16;
 
 static const int DIST_POINT_FUDGE = 5;
 
@@ -207,6 +210,9 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
         thisBall->init();
         topBlob->init();
         return false;
+    } else if (roundness(*topBlob) != 0) {
+        topBlob->init();
+        thisBall->init();
     } else if (badSurround(*topBlob)) {
         if (BALLDEBUG) {
             drawBlob(*topBlob, BLACK);
@@ -267,8 +273,13 @@ int Ball::balls(int horizon, VisualBall *thisBall)
         if (BALLDEBUG) {
             cout << endl << "Examining next top blob " << endl;
         }
-		w = topBlob->width();
-		h = topBlob->height();
+        w = topBlob->width();
+        h = topBlob->height();
+        if (abs(w - h) > DIAMETERMISMATCH && !nearEdge(*topBlob)) {
+            adjustBallDimensions();
+            w = topBlob->width();
+            h = topBlob->height();
+        }
 		const float BALL_REAL_HEIGHT = 6.5f;
 		e = vision->pose->pixEstimate(topBlob->getLeftTopX() + (w / 2),
 									  topBlob->getLeftTopY() + 2 * h / PIX_EST_DIV,
@@ -315,6 +326,132 @@ void Ball::setOcclusionInformation() {
     }
     if (nearImageEdgeX(topBlob->getRight(), OCCLUSION_MARGIN)) {
         occlusion *= RIGHTOCCLUSION;
+    }
+}
+
+/* From a given coordinate scan out in a given direction until the apparent
+   edge of the ball is found.  We check for the edge using the difference
+   in the U dimension.
+   @param x        x coord
+   @param y        y coord
+   @param dir      direction of scanning (1 or -1)
+   @return         x value of the edge
+ */
+int Ball::findBallEdgeX(int x, int y, int dir) {
+    int lastu = thresh->getU(x, y);
+    int midu = lastu;
+    int newx = x;
+    int changex = topBlob->getLeft();
+    if (dir > 0) {
+        changex = topBlob->getRight();
+    }
+    for (int i = -3; i < 4; i++) {
+        newx = x;
+        if (y + i >= 0 && y + i < IMAGE_HEIGHT) {
+            for (bool done = false; !done && newx >= 0 && newx < IMAGE_WIDTH;
+                 newx+=dir) {
+                int newu = thresh->getU(newx, y + i);
+                if (abs(newu - lastu) > EDGEMISMATCH
+                    || abs(newu - midu) > EDGECENTERMISMATCH) {
+                    done = true;
+                }
+                lastu = newu;
+            }
+            if (dir < 0) {
+                if (newx + dir < changex) {
+                    changex = newx + dir;
+                }
+            } else {
+                if (newx + dir > changex) {
+                    changex = newx + dir;
+                }
+            }
+        }
+    }
+    return changex;
+}
+
+/* From a given coordinate scan out in a given direction until the apparent
+   edge of the ball is found.  We check for the edge using the difference
+   in the U dimension.
+   @param x        x coord
+   @param y        y coord
+   @param dir      direction of scanning (1 or -1)
+   @return         y value of the edge
+ */
+int Ball::findBallEdgeY(int x, int y, int dir) {
+    int lastu = thresh->getU(x, y);
+    int midu = lastu;
+    int newy = y;
+    int changey = topBlob->getTop();
+    if (dir > 0) {
+        changey = topBlob->getBottom();
+    }
+    for (int i = -3; i < 4; i++) {
+        newy = y;
+        if (x + i >= 0 && x + i < IMAGE_WIDTH) {
+            for (bool done = false; !done && newy >= 0 && newy < IMAGE_HEIGHT;
+                 newy+=dir) {
+                int newu = thresh->getU(x + i, newy);
+                if (abs(newu - lastu) > EDGEMISMATCH
+                    || abs(newu - midu) > EDGECENTERMISMATCH) {
+                    done = true;
+                }
+                lastu = newu;
+            }
+            if (dir < 0) {
+                if (newy + dir < changey) {
+                    changey = newy + dir;
+                }
+            } else {
+                if (newy + dir > changey) {
+                    changey = newy + dir;
+                }
+            }
+        }
+    }
+    return changey;
+}
+
+/* We'd like the ball blob to be square.  It often isn't.  Usually
+   its width is a little too small compared to the height due to the
+   camera and the way we scan the image.  Sometimes the differences
+   are more pronounced.  In those cases we do some extra scanning to
+   see if we can fix the smaller dimension.  We do that here.
+ */
+void Ball::adjustBallDimensions() {
+    int w = topBlob->width();
+    int h = topBlob->height();
+    if (w > h) {
+        int x = topBlob->getLeft() + w / 2;
+        int y = topBlob->getTop() + h / 5;
+        int newtop = findBallEdgeY(x, y, -1);
+        y = topBlob->getBottom() - h / 5;
+        int newbottom = findBallEdgeY(x, y, 1);
+        int change = topBlob->getTop() - newtop +
+            newbottom - topBlob->getBottom();
+        if (abs(change - (w - h)) < DIAMETERMISMATCH) {
+            if (BALLDEBUG) {
+                cout << "Adjusting height of blob" << endl;
+            }
+            topBlob->setTop(newtop);
+            topBlob->setBottom(newbottom);
+        }
+    } else {
+        int x = topBlob->getLeft() + w / 5;
+        int y = topBlob->getTop() + h / 2;
+        int newleft = findBallEdgeX(x, y, -1);
+        x = topBlob->getRight() - w / 5;
+        int newright = findBallEdgeX(x, y, 1);
+        int change = newright - topBlob->getRight() +
+            topBlob->getLeft() - newleft;
+        if (abs(change - (h - w)) < DIAMETERMISMATCH) {
+            if (BALLDEBUG) {
+                cout << "Adjusting width of blob" << endl;
+            }
+            topBlob->setLeft(newleft);
+            topBlob->setRight(newright);
+        }
     }
 }
 
@@ -509,7 +646,6 @@ void Ball::vertScan(int x, int y, int dir, int stopper, int c,
 	int height = IMAGE_HEIGHT;
 	// go until we hit enough bad pixels
 	for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
-		//cout << "Vert scan " << x << " " << y << endl;
 		// if it is the color we're looking for - good
 		if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
 			good++;
@@ -700,6 +836,15 @@ bool Ball::ballIsReasonablySquare(int x, int y, int w, int h) {
 		return false;
 	}
     return true;
+}
+
+/* Returns true is the blob abuts any image edge
+   @param b      the blob to check
+   @return       true when the blob is near an edge
+ */
+bool Ball::nearEdge(Blob b) {
+    return nearImageEdgeX(b.getLeft(), 1) || nearImageEdgeX(b.getRight(), 1) ||
+        nearImageEdgeY(b.getTop(), 1) || nearImageEdgeY(b.getBottom(), 2);
 }
 
 /* Is the x value near the image edge?
@@ -917,10 +1062,11 @@ bool Ball::badSurround(Blob b) {
 		}
 		x = b.getLeftTopX();
 		y = b.getLeftBottomY();
-        if (nearImageEdgeX(x, 2) || nearImageEdgeX(x+w, 2) ||
+        if (nearImageEdgeX(x, 2) || nearImageEdgeX(x+b.width(), 2) ||
             nearImageEdgeY(y, 2)) {
 			if (BALLDEBUG) {
-				cout << "Dangerous corner location detected " << x << " " << y <<  endl;
+				cout << "Dangerous corner location detected " << x << " "
+                     << y << " " << w << endl;
 			}
 			return true;
 		}

@@ -69,11 +69,15 @@ public:
     void createBall(int c);
 
     // ball stuff
+    void adjustBallDimensions();
+    int findBallEdgeX(int x, int y, int dir);
+    int findBallEdgeY(int x, int y, int dir);
     float rightHalfColor(Blob obj);
     void setOcclusionInformation();
     bool ballIsReasonablySquare(int x, int y, int w, int h);
     bool nearImageEdgeX(int x, int margin);
     bool nearImageEdgeY(int y, int margin);
+    bool nearEdge(Blob b);
     int roundness(Blob b);
     bool badSurround(Blob b);
 	void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);
@@ -87,7 +91,7 @@ public:
     // sanity checks
     void preScreenBlobsBasedOnSizeAndColor();
     bool sanityChecks(int w, int h, estimate e, VisualBall * thisBall);
-	bool blobOk(Blob b);
+    bool blobOk(Blob b);
     bool blobIsBigEnoughToBeABall(int w, int h);
 
     // debugging methods
