@@ -211,6 +211,9 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
         topBlob->init();
         return false;
     } else if (roundness(*topBlob) != 0) {
+        if (BALLDEBUG) {
+            cout << "Screening for roundness " << endl;
+        }
         topBlob->init();
         thisBall->init();
     } else if (badSurround(*topBlob)) {
@@ -612,113 +615,10 @@ void Ball::newRun(int x, int y, int h)
 	}
 }
 
-
-/* Scan from the point along the line until you have hit "stopper" points that
- * aren't color "c" return the last good point found and how many good and bad
- * points seen.	 Though this is a void function it actually "returns"
- * information in the scan variable. scan.x and scan.y represent the finish
- * points of the line (last point of appropriate color) and bad and good
- * represent how many bad and good pixels (pixels that are of the right color
- * or not) along the way.
- *
- * Note:  Since we are doing this for balls we are always scanning along
- * the true vertical!  This is different than for other classes.
- * @param x		   the x point to start at
- * @param y		   the y point to start at
- * @param dir	   the direction of the scan (positive or negative)
- * @param stopper  how many incorrectly colored pixels we can live with
- * @param c		   color we are most interested in
- * @param c2	   soft color that could also work
+/* Returns the field horizon at the given x coordinate
+   @param x     x value we want to check
+   @return      y value of horizon
  */
-void Ball::vertScan(int x, int y, int dir, int stopper, int c,
-					int c2, stop &scan)
-{
-	scan.good = 0;
-	scan.bad = 0;
-	scan.x = x;
-	scan.y = y;
-	int bad = 0;
-	int good = 0;
-	int startX = x;
-	int startY = y;
-	int run = 1;
-	int width = IMAGE_WIDTH;
-	int height = IMAGE_HEIGHT;
-	// go until we hit enough bad pixels
-	for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
-		// if it is the color we're looking for - good
-		if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
-			good++;
-			run++;
-			if (run > 1) {
-				scan.x = x;
-				scan.y = y;
-			}
-		} else {
-			bad++;
-			run = 0;
-		}
-		y = y + dir;
-	}
-	scan.bad = bad;
-	scan.good = good;
-	//cout << " out vert " << endl;
-}
-
-/* Scan from the point along the line until you have hit "stopper" points that
- * aren't color "c"
- * return the last good point found and how many good and bad points seen.
- * Though this is a void function it actually "returns" information in the scan
- * variable. scan.x and scan.y represent the finish points of the line (last
- * point of appropriate color) and bad and good represent how many bad and good
- * pixels (pixels that are of the right color or not) along the way.
- *
- * Note always horizontal, since we are scanning with regard to ball.
- *
- * @param x			 the x point to start at
- * @param y			 the y point to start at
- * @param dir		 the direction of the scan (positive or negative)
- * @param stopper	 how many incorrectly colored pixels we can live with
- * @param c			 color we are most interested in
- * @param c2		 soft color that could also work
- * @param leftBound	 furthest left we can go
- * @param rightBound further right we can go
- */
-void Ball::horizontalScan(int x, int y, int dir, int stopper, int c,
-						  int c2, int leftBound, int rightBound,
-						  stop & scan) {
-	scan.good = 0;
-	scan.bad = 0;
-	scan.x = x;
-	scan.y = y;
-	int bad = 0;
-	int good = 0;
-	int run = 0;
-	int startX = x;
-	int startY = y;
-	int height = IMAGE_HEIGHT;
-	// go until we hit enough bad pixels
-	for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH
-	&& y < height && bad < stopper; ) {
-		if (thresh->thresholded[y][x] == c || thresh->thresholded[y][x] == c2) {
-			// if it is either of the colors we're looking for - good
-			good++;
-			run++;
-			if (run > 1) {
-				scan.x = x;
-				scan.y = y;
-			}
-		} else {
-			bad++;
-			run = 0;
-		}
-		x = x + dir;
-	}
-	scan.bad = bad;
-	scan.good = good;
-	//cout << "return with " << temp.x << endl;
-}
-
 int Ball::horizonAt(int x) {
 	return field->horizonAt(x);
 }
@@ -871,93 +771,119 @@ bool Ball::nearImageEdgeY(int y, int margin) {
  * be in the corners, should be in the middle)
  * TODO:  This needs LOTS of work.	Especially if we move to nontraditional
  * colors or multi-colored balls.
+ * TODO:  Handle cases where screen occludes ball
  * @param b		 the candidate ball
  * @return		 a constant result - BAD_VALUE, or 0 for round
  */
 
 int	 Ball::roundness(Blob b)
 {
-    const int   IMAGE_EDGE = 3;
-	const float RATIO_TO_INT = 10.0f;
-	const float CORNER_CHUNK_DIV = 6.0f;
-
 	int w = b.width();
 	int h = b.height();
-	int x = b.getLeftTopX();
-	int y = b.getLeftTopY();
-
 	if (w * h > SMALLBALL) {
 		// now make some scans through the blob - horizontal, vertical, diagonal
-		int pix;
-		int goodPix = 0, badPix = 0;
-        int margin = IMAGE_EDGE;
-        if (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin) ||
-            nearImageEdgeY(y, margin) || nearImageEdgeY(y+h, margin)) {
-            // do nothing
-		} else {
-			// we're in the screen
-			int d = ROUND2(static_cast<float>(std::max(w, h)) /
-						   CORNER_CHUNK_DIV);
-			int d3 = min(w, h);
-			for (int i = 0; i < d3; i++) {
-				pix = thresh->thresholded[y+i][x+i];
-				if (i < d || (i > d3 - d)) {
-					if (pix == ORANGE || pix == ORANGERED) {
-						//drawPoint(x+i, y+i, BLACK);
-						badPix++;
-					}
-					else
-						goodPix++;
-				} else {
-					if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW)
-						goodPix++;
-					else if (pix != GREY) {
-						badPix++;
-						//drawPoint(x+i, y+i, PINK);
-					}
-				}
-				pix = thresh->thresholded[y+i][x+w-i];
-				if (i < d || (i > d3 - d)) {
-					if (pix == ORANGE || pix == ORANGERED) {
-						//drawPoint(x+w-i, y+i, BLACK);
-						badPix++;
-					}
-					else
-						goodPix++;
-				} else if (pix == ORANGE || pix == ORANGERED ||
-						pix == ORANGEYELLOW)
-					goodPix++;
-				else if (pix != GREY) {
-					badPix++;
-				}
-			}
-			for (int i = 0; i < h; i++) {
-				pix = thresh->thresholded[y+i][x + w/2];
-				if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
-					goodPix++;
-				} else if (pix != GREY)
-					badPix++;
-			}
-		}
-		for (int i = 0; i < w; i++) {
-			pix = thresh->thresholded[y+h/2][x + i];
-			if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
-				goodPix++;
-			} else if (pix != GREY)
-				badPix++;
-		}
+        pair<int, int> diagonal = scanDiagonalsForRoundnessInformation(b);
+        pair<int, int> midlines = scanMidlinesForRoundnessInformation(b);
+        int goodPix = diagonal.first + midlines.first;
+        int badPix = diagonal.second + midlines.second;
 		if (BALLDEBUG) {
 			cout << "Roundness: Good " << goodPix << " " << badPix << endl;
         }
 		// if more than 20% or so of our pixels tested are bad, then we toss it out
 		if (goodPix < badPix * 5) {
-			if (BALLDEBUG) {
-				cout << "Screening for bad roundness" << endl;
-            }
 			return BAD_VALUE;
 		}
 	}
 	return 0;
+}
+
+/*  As part of our roundness checking we scan the midlines of the blob.
+    In principle every pixel should be the right color.
+    @param b        candidate blob
+    @return         a pair containing the number of good and bad pixels
+ */
+pair<int, int> Ball::scanMidlinesForRoundnessInformation(Blob b) {
+	int w = b.width();
+	int h = b.height();
+	int x = b.getLeftTopX();
+	int y = b.getLeftTopY();
+    int pix;
+    int goodPix = 0, badPix = 0;
+    for (int i = 0; i < h; i++) {
+        pix = thresh->thresholded[y+i][x + w/2];
+        if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
+            goodPix++;
+        } else if (pix != GREY)
+            badPix++;
+    }
+    for (int i = 0; i < w; i++) {
+        pix = thresh->thresholded[y+h/2][x + i];
+        if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
+            goodPix++;
+        } else if (pix != GREY) {
+            badPix++;
+        }
+    }
+    pair<int, int> info;
+    info.first = goodPix;
+    info.second = badPix;
+    return info;
+}
+
+/* As part of roundness checking we scan the diagonals of the blob.
+   We know that there is a predictible transition point from no ball
+   to ball and categorize each pixel accordingly
+   @param b      the blob
+   @return       a pair containing the number of good pixels, and bad ones
+ */
+pair<int, int> Ball::scanDiagonalsForRoundnessInformation(Blob b) {
+	const float CORNER_CHUNK_DIV = 6.0f;
+	int w = b.width();
+	int h = b.height();
+	int x = b.getLeftTopX();
+	int y = b.getLeftTopY();
+    int pix;
+    int goodPix = 0, badPix = 0;
+    int d = ROUND2(static_cast<float>(std::max(w, h)) /
+                   CORNER_CHUNK_DIV);
+    int d3 = min(w, h);
+    pair<int, int> info;
+    for (int i = 0; i < d3; i++) {
+        pix = thresh->thresholded[y+i][x+i];
+        if (i < d || (i > d3 - d)) {
+            if (pix == ORANGE || pix == ORANGERED) {
+                //drawPoint(x+i, y+i, BLACK);
+                badPix++;
+            } else {
+                goodPix++;
+            }
+        } else {
+            if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
+                goodPix++;
+            } else if (pix != GREY) {
+                badPix++;
+                //drawPoint(x+i, y+i, PINK);
+            }
+        }
+        pix = thresh->thresholded[y+i][x+w-i];
+        if (i < d || (i > d3 - d)) {
+            if (pix == ORANGE || pix == ORANGERED) {
+                //drawPoint(x+w-i, y+i, BLACK);
+                badPix++;
+            }
+            else {
+                goodPix++;
+            }
+        } else if (pix == ORANGE || pix == ORANGERED ||
+                   pix == ORANGEYELLOW) {
+            goodPix++;
+        } else if (pix != GREY) {
+            badPix++;
+        }
+    }
+    info.first = goodPix;
+    info.second = badPix;
+    return info;
 }
 
 /*	Check the information surrounding the ball and look to see if it might be a
