@@ -59,10 +59,6 @@ public:
     // Making object
     void init(float s);
 
-    // scan operations
-    void vertScan(int x, int y, int dir, int stopper, int c, int c2, stop & scan);
-    void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
-                        int r, stop & scan);
     int horizonAt(int x);
 
     // main methods
@@ -79,6 +75,8 @@ public:
     bool nearImageEdgeY(int y, int margin);
     bool nearEdge(Blob b);
     int roundness(Blob b);
+    pair<int, int> scanMidlinesForRoundnessInformation(Blob b);
+    pair<int, int> scanDiagonalsForRoundnessInformation(Blob b);
     bool badSurround(Blob b);
 	void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);
     void checkForReflections(int h, int w, VisualBall * thisBall,
