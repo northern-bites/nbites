@@ -355,7 +355,8 @@ void Threshold::findGoals(int column, int topEdge) {
     const int BADSIZE = 5;
     // scan up for goals
     int bad = 0, blues = 0, yellows = 0, blueGreen = 0;
-    int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge, lastYellow = topEdge;
+    int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge,
+        lastYellow = topEdge;
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
     for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
@@ -465,13 +466,11 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
     shoot[column] = true;
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
-        //while (bound < IMAGE_HEIGHT && thresholded[bound][column] == ORANGE) {
         while (bound < IMAGE_HEIGHT && getColor(column, bound) == ORANGE) {
             bound++;
         }
     }
     // scan down the column looking for ORANGE and WHITE
-    //int lasty = getY(column, bound), lastu = getU(column, bound), newu, newy;
     for (int j = bound; j >= topEdge; j--) {
 #ifdef USE_EDGES
         thresholded[j][column] = getColor(column, j);
@@ -550,6 +549,25 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             currentRun = 1;
         }
         lastPixel = pixel;
+        if (pixel == ORANGE) {
+            int lastu = getU(column, j);
+            int initu = lastu;
+            while (j >= topEdge && abs(getU(column, j) - lastu) < 8 &&
+                   abs(initu - lastu) < 12) {
+                currentRun++;
+                j--;
+#ifdef USE_EDGES
+                thresholded[j][column] = getColor(column, j);
+#endif
+            }
+            currentRun--;
+            j++;
+            if ((j == 0 || j >= topEdge) && currentRun > 2) {
+                orange->newRun(column, j, currentRun);
+            }
+            greens+= currentRun;
+            lastPixel = ORANGE;
+        }
     }
     if (shoot[column] && greens < (bound - topEdge) / 2) {
         if (block[column / divider] == 0) {
@@ -657,21 +675,23 @@ void Threshold::setShot(VisualCrossbar* one) {
     one->setLeftOpening(left);
     one->setRightOpening(right);
 
-    if (left > right)
+    if (left > right) {
         one->setBackDir(MOVELEFT);
-    else if (right > left)
+    } else if (right > left) {
         one->setBackDir(MOVERIGHT);
-    else if (right == 0)
+    } else if (right == 0) {
         one->setBackDir(ALLBLOCKED);
-    else
+    } else {
         one->setBackDir(EITHERWAY);
+    }
     if (debugShot) {
         cout << "Crossbar info: Left Col: " << r1 << " Right Col: " << r2
                 << " Dir: " << one->getBackDir();
-        if (one->shotAvailable())
+        if (one->shotAvailable()) {
             cout << " Take the shot!" << endl;
-        else
+        } else {
             cout << " Don't shoot!" << endl;
+        }
     }
 }
 
@@ -825,41 +845,6 @@ void Threshold::objectRecognition() {
     bool blp = vision->bglp->getWidth() > 0;
     bool brp = vision->bgrp->getWidth() > 0;
 
-    // HACK:  This will have to do until we can properly model the shoulders
-    // for blue posts that run down into our shoulder boundary, disallow
-    // some based on the ratio of the height to how much is below the boundary
-    if (brp) {
-        int x = max(0, vision->bgrp->getLeftBottomX());
-        int y = min(vision->bgrp->getLeftBottomY(), IMAGE_HEIGHT -1);
-        int x1 = min(IMAGE_WIDTH - 1, vision->bgrp->getRightBottomX());
-        int y1 = min(IMAGE_HEIGHT - 1, vision->bgrp->getRightBottomY());
-        int h = (int)vision->bgrp->getHeight();
-        if ((y  > lowerBound[x] && lowerBound[x] < IMAGE_HEIGHT - 1 &&
-                y - lowerBound[x] > h /2)
-                || (y1 > lowerBound[x1] && lowerBound[x1] < IMAGE_HEIGHT - 1 &&
-                        y1 - lowerBound[x1] > h / 2)) {
-            vision->bgrp->init();
-            //cout << "Screen " << x << " " << y << " " << x1 << " " << y1 << " " << h << endl;
-            brp = false;
-        }
-    }
-    if (blp) {
-        int x = max(0, vision->bglp->getLeftBottomX());
-        int y = min(vision->bglp->getLeftBottomY(), IMAGE_HEIGHT -1);
-        int x1 = min(IMAGE_WIDTH - 1, vision->bglp->getRightBottomX());
-        int y1 = min(IMAGE_HEIGHT - 1, vision->bglp->getRightBottomY());
-        int h = (int)vision->bglp->getHeight();
-        if ((y  > lowerBound[x] && lowerBound[x] < IMAGE_HEIGHT - 1 &&
-                y - lowerBound[x] > h / 2)
-                || (y1 > lowerBound[x1] && lowerBound[x1] < IMAGE_HEIGHT - 1 &&
-                        y1 - lowerBound[x1] > h / 2)) {
-            vision->bglp->init();
-            //cout << "Screen1 " << x << " " << y << endl;
-            blp = false;
-        }
-    }
-
-
     if ((ylp || yrp) && (blp || brp)) {
         // we see one of each, so pick the biggest one
         float ylpw = vision->yglp->getWidth();
@@ -926,11 +911,11 @@ void Threshold::objectRecognition() {
         vision->ygCrossbar->init();
     }
 
-    if (horizon < IMAGE_HEIGHT)
+    if (horizon < IMAGE_HEIGHT) {
         orange->createBall(horizon);
-    else
+    } else {
         orange->createBall(pose->getHorizonY(0));
-
+    }
     if (ylp || yrp) {
         field->bestShot(vision->ygrp, vision->yglp, vision->ygCrossbar, YELLOW);
     }
@@ -941,8 +926,6 @@ void Threshold::objectRecognition() {
     storeFieldObjects();
 
 }
-
-//right post
 
 /*
   RLE Helper Methods
@@ -1043,19 +1026,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             //TODO: hack
             float distnew = chooseGoalDistance(cert, disthnew, distw, poseDist,
                                                   static_cast<int>(bottomOfObjectY));
-            //cout<<"dist old w: "<<distw<<" h: "<<disth<<endl;
-//            cout<<"poseDist b: "<<poseDist<<" c: "<<poseDistCenter<<endl;
-            //cout<<"dist new w: "<<distwnew<<"dist new h: "<<disthnew<<endl;
-            //cout<<"old "<<dist<<endl;
-            //cout<<"new "<<distnew<<endl;
             dist = distnew;
-
-#if defined OFFLINE && defined PRINT_VISION_INFO
-
-            //print("{%g,%g},", poseDist, dist);
-
-            //print("goal post dist: %g %g %g\n", dist, distw, disth);
-#endif
 
             // sanity check: throw ridiculous distance estimates out
             // constants in Threshold.h
@@ -1501,10 +1472,12 @@ void Threshold::setYUV(const uchar* newyuv) {
  */
 
 int Threshold::distance(int x1, int x2, int x3, int x4) {
-    if (x2 < x3)
+    if (x2 < x3) {
         return x3 - x2;
-    if (x1 > x4)
+    }
+    if (x1 > x4) {
         return x1 - x4;
+    }
     return 0;
 }
 
@@ -1681,23 +1654,29 @@ void Threshold::drawLine(int x, int y, int x1, int y1, int c) {
     int sign = 1;
     if ((abs(y - y1)) > (abs(x - x1))) {
         slope = 1.0f / slope;
-        if (y > y1) sign = -1;
+        if (y > y1)  {
+            sign = -1;
+        }
         for (int i = y; i != y1; i += sign) {
             int newx = x +
                     static_cast<int>(slope * static_cast<float>(i - y) );
 
-            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT)
+            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT) {
                 debugImage[i][newx] = static_cast<unsigned char>(c);
+            }
         }
     } else if (slope != 0) {
         //slope = 1.0 / slope;
-        if (x > x1) sign = -1;
+        if (x > x1) {
+            sign = -1;
+        }
         for (int i = x; i != x1; i += sign) {
             int newy = y +
                     static_cast<int>(slope * static_cast<float>(i - x) );
 
-            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH)
+            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
                 debugImage[newy][i] = static_cast<unsigned char>(c);
+            }
         }
     }
     else if (slope == 0) {
