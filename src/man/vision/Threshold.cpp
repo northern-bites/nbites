@@ -69,14 +69,6 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 : vision(vis), pose(posPtr)
 {
 
-    // storing locally
-#ifdef OFFLINE
-    visualHorizonDebug = false;
-    debugSelf = false;
-    debugShot = false;
-    debugOpenField = false;
-#endif
-
     // loads the color table on the MS into memory
 #if ROBOT(NAO_RL)
 # if ! defined WEBOTS_BACKEND && ! defined OFFLINE

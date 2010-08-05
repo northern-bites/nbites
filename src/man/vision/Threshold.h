@@ -180,6 +180,8 @@ public:
     void setConstant(int c);
     void setHorizonDebug(bool _bool) { visualHorizonDebug = _bool; }
     bool getHorizonDebug() { return visualHorizonDebug; }
+    void setDebugShooting(bool _bool) {debugShot = _bool;}
+    void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
 #endif
 
     void initDebugImage();

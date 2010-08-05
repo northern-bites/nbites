@@ -188,7 +188,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     //push each field object
     VisualFieldObject *obj;
     VisualCrossbar * cb;
-    VisualCross *cross;
+    VisualCross *cross = NULL;
     int k = 0;
     while(k != -1) {
         //loop through all the objects we want to pass
@@ -491,6 +491,16 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldEdgeDebug
 	(JNIEnv * env, jobject jobj, jboolean debugEdge){
 		vision.thresh->field->setDebugFieldEdge(debugEdge);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetShootingDebug
+	(JNIEnv * env, jobject jobj, jboolean debugShot){
+		vision.thresh->setDebugShooting(debugShot);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetOpenFieldDebug
+	(JNIEnv * env, jobject jobj, jboolean debugField){
+		vision.thresh->setDebugOpenField(debugField);
 	}
 
 
