@@ -113,8 +113,9 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		}
 		if (good == RUNSIZE) {
 			convex[i] = point<int>(i * SCANSIZE, top - good);
-			if (poseProject < 0 && top - good < 10)
+			if (poseProject < 0 && top - good < 10) {
 				convex[i] = point<int>(i * SCANSIZE, 0);
+            }
 		} else {
 			convex[i] = point<int>(i * SCANSIZE, IMAGE_HEIGHT);
 		}
@@ -188,7 +189,7 @@ void Field::findTopEdges(int M) {
  */
 
 void Field::findConvexHull(int pH) {
-    point<int> convex[HULLS];
+    //point<int> convex[HULLS];
     initialScanForTopGreenPoints(pH);
 	// now do the Graham scanning algorithm
 	int M = 2;
@@ -401,6 +402,15 @@ int Field::findGreenHorizon(int pH, float sl) {
         horizon = 0;
         return 0;
 	}
+    /*estimate e = vision->pose->pixEstimate(IMAGE_WIDTH / 2, pH, 0.0f);
+    cout << "Dist is " << e.dist << " " << pH << endl;
+    if (e.dist > 1000.0) {
+        while (e.dist > 1000.0) {
+            pH = pH + 5;
+            e = vision->pose->pixEstimate(IMAGE_WIDTH / 2, pH, 0.0f);
+        }
+        cout << "new Ph is " << pH << endl;
+        }*/
     // get an initial estimate
     int initialEstimate = getInitialHorizonEstimate(pH);
 	if (debugHorizon) {

@@ -346,7 +346,7 @@ void Threshold::runs() {
 void Threshold::findGoals(int column, int topEdge) {
     const int BADSIZE = 5;
     // scan up for goals
-    int bad = 0, blues = 0, yellows = 0, blueGreen = 0;
+    int bad = 0, blues = 0, yellows = 0;
     int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge,
         lastYellow = topEdge;
     topEdge = min(topEdge, lowerBound[column]);
@@ -357,24 +357,6 @@ void Threshold::findGoals(int column, int topEdge) {
         thresholded[j][column] = getColor(column, j);
 #endif
         unsigned char pixel = thresholded[j][column];
-        if (pixel == BLUE) {
-            while (j >=1 && getExpandedColor(column, j - 1, BLUE) == BLUE) {
-#ifdef USE_EDGES
-                thresholded[j - 1][column] = BLUE;
-#endif
-                j--;
-                blues++;
-            }
-        } else if (pixel == YELLOW) {
-            while (j >=1 && getExpandedColor(column, j - 1, YELLOW) == YELLOW) {
-                j--;
-#ifdef USE_EDGES
-                thresholded[j][column] = YELLOW;
-#endif
-                yellows++;
-            }
-        }
-        // otherwise, do stuff according to color
         switch (pixel) {
         case BLUE:
             lastBlue = j;
@@ -385,8 +367,6 @@ void Threshold::findGoals(int column, int topEdge) {
             yellows++;
             break;
         case BLUEGREEN:
-            blueGreen++;
-            break;
         case GREEN:
             break;
         case RED:
@@ -400,10 +380,8 @@ void Threshold::findGoals(int column, int topEdge) {
     // now do the same going down from the horizon
     bad = 0;
     for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
-        // get the next pixel
         // note:  These were thresholded in the findBallsCrosses loop
         unsigned char pixel = thresholded[j][column];
-        // otherwise, do stuff according to color
         switch (pixel) {
         case BLUE:
             firstBlue = j;
@@ -414,7 +392,6 @@ void Threshold::findGoals(int column, int topEdge) {
             yellows++;
             break;
         case BLUEGREEN:
-            blueGreen++;
             break;
         case GREEN:
             bad += 2;
