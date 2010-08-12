@@ -45,3 +45,5 @@ docs*
 /noggin/offline/fakerData/*
 *~
 docs/*
+*.wav
+*.so
