@@ -26,18 +26,18 @@ def arrayToGaitTuple(array):
 
     return (stance, step, zmp, hack, sensor, stiffness, odo, arm)
 
-stanceMin = (29.00,  #** CoM height
+stanceMin = (31.00,  # CoM height
              0.0,    #** Forward displacement of CoM
-             9.0,   #** Horizontal distance between feet
+             9.0,    #** Horizontal distance between feet
              0.0,    #** Body angle around y axis
-             -10.0,  #** Angle between feet
+             0.0,    #** Angle between feet
              0.2)    # Time to transition to/from this stance
 
-stanceMax = (33.00, #** CoM height
+stanceMax = (31.00, # CoM height
              5.0,   #** Forward displacement of CoM
              12.0,  #** Horizontal distance between feet
              10.0,  #** Body angle around y axis
-             15.0,  #** Angle between feet
+             10.0,  #** Angle between feet
              0.2)   # Time to transition to/from this stance
 
 stepMin = (0.25,   #** step duration

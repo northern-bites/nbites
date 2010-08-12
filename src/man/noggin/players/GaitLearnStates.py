@@ -152,7 +152,7 @@ def timedRandomWalk(player):
 def scoreGaitPerformance(player):
    stability = player.brain.stability
 
-   frames_stood = player.counter + player.straightWalkCounter # (sometimes 0)
+   frames_stood = player.counter + player.straightWalkCounter
    path_linearity = stability.getPathLinearity()
    stability_penalty = stability.getStabilityHeuristic()
 
@@ -342,7 +342,7 @@ def distancePenalty(player, distance_traveled):
 
     # webots uses different units than our localization
     if player.haveWbGPS:
-        weight = 100
+        weight = 200
 
     weightedDistance = weight * distance_traveled
 
