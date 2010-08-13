@@ -3,7 +3,7 @@
 # Since the "/home/nao" and the "/" are different partitions, we must ask for both.
 if [ $# -ne 2 ] ; then
     echo "Bad number of arguments"
-    echo "usage: setup-usb-key usb_root_partition usb_home_partition hostname"
+    echo "usage: setup-usb-key usb_root_partition hostname"
     exit 1
 fi
 
