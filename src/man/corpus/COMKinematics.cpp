@@ -4,6 +4,8 @@ using namespace NBMath;
 using namespace std;
 using namespace boost::numeric;
 
+#define DEBUG_COM
+
 const ufvector4
 Kinematics::getCOMc(const vector<float> bodyAngles){
 
@@ -13,17 +15,29 @@ Kinematics::getCOMc(const vector<float> bodyAngles){
     angles[i] = bodyAngles[i];
   }
 
-  ufvector4 chestCOM =
-    CoordFrame4D::vector4D(CHEST_MASS_X,0,CHEST_MASS_Z)*(CHEST_MASS_g/TOTAL_MASS);
+  ufvector4 partialComPos = calculateChestCOM();
 
-  ufvector4 partialComPos = chestCOM;
   for(unsigned int i = 0; i < NUM_CHAINS; i++){
     partialComPos+= slowCalculateChainCom((ChainID)i, &angles[chain_first_joint[i]]);
   }
 
-  cout << "Body Com " << partialComPos<<endl;
+#ifdef DEBUG_COM
+  cout << "Body Com " << partialComPos <<endl;
+#endif
 
   return partialComPos;
+}
+
+const ufvector4 Kinematics::calculateChestCOM() {
+	ufvector4 chestCom = CoordFrame4D::vector4D(CHEST_MASS_X,
+												CHEST_MASS_Y,
+												CHEST_MASS_Z)
+		*(CHEST_MASS_g/TOTAL_MASS);
+#ifdef DEBUG_COM
+	cout << "Chest COM " << chestCom << endl;
+#endif
+
+	return chestCom;
 }
 
 const ufvector4

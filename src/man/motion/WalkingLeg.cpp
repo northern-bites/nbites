@@ -27,6 +27,8 @@ using namespace NBMath;
 
 //#define DEBUG_WALKINGLEG
 
+#define USE_COM_CONTROL
+
 WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
                        const MetaGait * _gait,
                        const SensorAngles * _sensorAngles,
@@ -279,18 +281,17 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
 
 }
 
-const boost::tuple <const float, const float > 
+const boost::tuple <const float, const float >
 WalkingLeg::getAnkleAngles(){
   if(state != SWINGING){
     return boost::tuple<const float, const float>(0.0f,0.0f);
   }
-  
+
   const float angle = static_cast<float>(frameCounter)/
     static_cast<float>(singleSupportFrames)*M_PI_FLOAT;
 
   const float scale = std::sin(angle);
 
-  
   const float ANKLE_LIFT_ANGLE = swing_dest->stepConfig[WP::FOOT_LIFT_ANGLE]*scale;
 
   return boost::tuple<const float, const float>(0.0f,ANKLE_LIFT_ANGLE);
