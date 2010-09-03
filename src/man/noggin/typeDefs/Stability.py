@@ -3,7 +3,9 @@ from math import fabs
 from . import Location
 try:
     from numpy import corrcoef
+    haveNumpy = True
 except:
+    haveNumpy = False
     print "could not load numpy, please install it"
 
 FALL_ACCZ_THRESHOLD = 5
@@ -70,6 +72,10 @@ class Stability:
         return xStabilityHeuristic + yStabilityHeuristic
 
     def getPathLinearity(self):
+        # sanity check so we don't crash when running on the Nao
+        if not haveNumpy:
+            return 0
+
         xPositions, yPositions = self.getPositionsFromPath()
 
         corr = corrcoef([xPositions, yPositions])

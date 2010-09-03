@@ -4,13 +4,16 @@ import man.motion.RobotGaits as RobotGaits
 import man.motion.MotionConstants as MotionConstants
 import man.noggin.typeDefs.Location as Location
 import man.noggin.navigator.NavHelper as helper
+import man.noggin.navigator.WalkHelper as walkhelper
 from ..WebotsConfig import WEBOTS_ACTIVE
+
 import man.noggin.util.PSO as PSO
 from man.motion.gaits.GaitLearnBoundaries import \
     gaitMins, gaitMaxs, \
     gaitToArray, arrayToGaitTuple
 
-from os.path import isfile
+from os.path import isfile, dirname, exists
+from os import makedirs
 from math import fabs
 import random
 
@@ -20,6 +23,8 @@ import random
 
 if WEBOTS_ACTIVE:
     PICKLE_FILE_PREFIX = ''
+    OPTIMIZE_FRAMES = 1000
+
     try:
         import sys
         sys.path.append('/Applications/Webots/lib/python')
@@ -28,6 +33,7 @@ if WEBOTS_ACTIVE:
         print "could not load webots controller libraries"
 else:
     PICKLE_FILE_PREFIX = '/home/nao/gaits/'
+    OPTIMIZE_FRAMES = 200
 
 try:
    import cPickle as pickle
@@ -36,11 +42,11 @@ except:
 
 PSO_STATE_FILE = PICKLE_FILE_PREFIX + "PSO_pGaitLearner.pickle"
 BEST_GAIT_FILE = PICKLE_FILE_PREFIX + "PSO_endGait.pickle."
-OPTIMIZE_FRAMES = 1000
-RANDOM_WALK_DURATION = 150
 
 SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge
-NUM_PARTICLES = 30
+NUM_PARTICLES = 20
+
+RANDOM_WALK_DURATION = 150
 
 POSITION_UPDATE_FRAMES = 15
 MINIMUM_REQUIRED_DISTANCE = 100
@@ -52,14 +58,15 @@ def gamePlaying(player):
     print "In the players version of game controller state (overridden)"
     if player.firstFrame():
         player.gainsOn()
-        player.brain.tracker.stopHeadMoves()
+        player.brain.tracker.trackBall()
 
         startPSO(player)
 
-    if WEBOTS_ACTIVE:
-       enableGPS(player)
-    else:
-       player.haveWbGPS = False
+        if WEBOTS_ACTIVE:
+            enableGPS(player)
+            player.brain.tracker.stopHeadMoves()
+        else:
+            player.haveWbGPS = False
 
     return player.goLater('stopandchangegait')
 
@@ -82,14 +89,22 @@ def walkstraightstop(player):
     stability.updateStability()
 
     if player.firstFrame():
-        setWalkVector(player, 1,0,0)
         stability.resetData()
         player.straightWalkCounter = 0
 
-        player.startOptimizeLocation = getCurrentLocation(player)
+        if WEBOTS_ACTIVE:
+            setWalkVector(player, 1,0,0)
+            player.startOptimizeLocation = getCurrentLocation(player)
+        else:
+            # on a real robot, walk towards the ball at a slower speed
+            ball_x = 0.75
+            ball_y = ball_theta = 0              # TODO
+            setWalkVector(player, ball_x, ball_y, ball_theta)
+
+            player.startBallDistance = player.brain.ball.lastSeenDist
 
     # too computationally expensive to use every point
-    if player.counter % POSITION_UPDATE_FRAMES == 0:
+    if player.counter % POSITION_UPDATE_FRAMES == 0 and WEBOTS_ACTIVE:
         stability.updatePosition(getCurrentLocation(player))
 
     if robotFellOver(player):
@@ -106,15 +121,14 @@ def walkstraightstop(player):
         player.endStraightWalkLoc = getCurrentLocation(player)
         player.straightWalkCounter = player.counter
 
-        # gaits that don't move at all can sometimes crash webots when it 
-        # tells them to omni walk - there is a malloc() bug in the motion
-        # engine somewhere that needs to be tracked down
-        if distancePenalty(player,
-                           player.endStraightWalkLoc.distTo(player.startOptimizeLocation)) < 0:
-            scoreGaitPerformance(player)
-            return player.goLater('newOptimizeParameters')
+        scoreGaitPerformance(player)
 
-        return player.goLater('timedRandomWalk')
+        if WEBOTS_ACTIVE:
+            # in webots we need to avoid shuffling walks so
+            # we stress test with a period of random walk vectors
+            return player.goLater('timedRandomWalk')
+
+        return player.goLater('newOptimizeParameters')
 
     return player.stay()
 
@@ -152,17 +166,23 @@ def timedRandomWalk(player):
 def scoreGaitPerformance(player):
    stability = player.brain.stability
 
-   frames_stood = player.counter + player.straightWalkCounter
-   path_linearity = stability.getPathLinearity()
    stability_penalty = stability.getStabilityHeuristic()
+   path_linearity = stability.getPathLinearity()
 
-## TODO:
-# use ball or post distance to determine distance traveled on Nao
    if WEBOTS_ACTIVE:
+       frames_stood = player.counter + player.straightWalkCounter
+
        distance_traveled = player.endStraightWalkLoc.distTo \
            (player.startOptimizeLocation)
    else:
-       distance_traveled = 0
+       frames_stood = player.straightWalkCounter # no random walk on the Nao
+
+       # on the Nao, use distance to a stationary ball
+       distance_traveled = player.startBallDistance - player.brain.ball.lastSeenDist
+       print "difference in ball distance %s - %s = %s " % \
+           (player.startBallDistance,
+            player.brain.ball.lastSeenDist,
+            distance_traveled)
 
    # we maximize on the heuristic
    heuristic = frames_stood \
@@ -172,6 +192,7 @@ def scoreGaitPerformance(player):
 
    print "total distance traveled with this gait is ", \
        distancePenalty(player, distance_traveled)
+   print "stability penalty is %s" % stability_penalty
    print "robot stood for %s frames during random walk period" % \
        (frames_stood - player.straightWalkCounter)
    print "heuristic for this run is %s" % heuristic
@@ -214,7 +235,7 @@ def stopandchangegait(player):
 
         setGait(player, gaitTuple)
 
-    if player.counter == 100:
+    if player.counter == 50:
         return player.goLater('walkstraightstop')
 
     return player.stay()
@@ -268,6 +289,7 @@ def startPSO(player):
 
 def savePSO(player):
     print "Saving PSO state to: ", PSO_STATE_FILE
+    ensure_dir(PSO_STATE_FILE)
     f = open(PSO_STATE_FILE, 'w')
     pickle.dump(player.swarm, f)
     f.close()
@@ -279,6 +301,7 @@ def newPSO(player):
 
 def loadPSO(player):
     print "Loading PSO state from: ", PSO_STATE_FILE
+    ensure_dir(PSO_STATE_FILE)
     f = open(PSO_STATE_FILE, 'r')
     player.swarm = pickle.load(f)
     f.close()
@@ -338,11 +361,11 @@ def getCurrentLocation(player):
 
 
 def distancePenalty(player, distance_traveled):
-    weight = 1
-
     # webots uses different units than our localization
     if player.haveWbGPS:
         weight = 200
+    else:
+        weight = 1
 
     weightedDistance = weight * distance_traveled
 
@@ -352,3 +375,11 @@ def distancePenalty(player, distance_traveled):
 
     else:
         return weightedDistance
+
+# makes any necessary directories so our file writes won't fail
+def ensure_dir(filename):
+    d = dirname(filename)
+
+    if not exists(d):
+        makedirs(d)
+

@@ -106,7 +106,9 @@ odoMin = odoMax = (1.0,   # xOdoScale
                    1.0,   # yOdoScale
                    1.0)   # thetaOdoScale
 
-armMin = armMax = (0.0,)  # arm config
+armMin = (0.0,) # arm config
+
+armMax = (15.0,)
 
 gaitMins = (stanceMin,
             stepMin,
