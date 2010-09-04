@@ -39,6 +39,10 @@ def standup(guard):
     if guard.firstFrame():
         guard.brain.tracker.setNeutralHead()
 
+    if not guard.executeStandup:
+        guard.printf("not executing a standup routine")
+        return guard.goLater('doneStanding')
+
     # If on back, perform back stand up
     if ( inertial.angleY < -guard.FALLEN_THRESH ):
         return guard.goLater('standFromBack')

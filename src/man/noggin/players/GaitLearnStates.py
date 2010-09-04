@@ -17,15 +17,16 @@ from os import makedirs
 from math import fabs
 import random
 
-# Webots Controller functions, so we can do supervisor stuff
-# for the import to work you must also copy add Webots/lib/ to
-# your library search path. Hack Hack Hack.  -Nathan
-
 if WEBOTS_ACTIVE:
     PICKLE_FILE_PREFIX = ''
     OPTIMIZE_FRAMES = 1000
+    NUM_PARTICLES = 20
 
     try:
+        # Webots Controller functions, so we can do supervisor stuff
+        # for the import to work you must also copy add Webots/lib/ to
+        # your library search path. Hack Hack Hack.  -Nathan
+
         import sys
         sys.path.append('/Applications/Webots/lib/python')
         from controller import *
@@ -34,6 +35,7 @@ if WEBOTS_ACTIVE:
 else:
     PICKLE_FILE_PREFIX = '/home/nao/gaits/'
     OPTIMIZE_FRAMES = 200
+    NUM_PARTICLES = 10
 
 try:
    import cPickle as pickle
@@ -43,8 +45,7 @@ except:
 PSO_STATE_FILE = PICKLE_FILE_PREFIX + "PSO_pGaitLearner.pickle"
 BEST_GAIT_FILE = PICKLE_FILE_PREFIX + "PSO_endGait.pickle."
 
-SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge
-NUM_PARTICLES = 20
+SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to convereg
 
 RANDOM_WALK_DURATION = 150
 
@@ -59,6 +60,9 @@ def gamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.tracker.trackBall()
+
+        # we don't want to auto-stand after falling
+        player.brain.fallController.executeStandup = False
 
         startPSO(player)
 
@@ -101,13 +105,15 @@ def walkstraightstop(player):
             ball_y = ball_theta = 0              # TODO
             setWalkVector(player, ball_x, ball_y, ball_theta)
 
-            player.startBallDistance = player.brain.ball.lastSeenDist
+            player.startBallDistance = player.brain.ball.lastVisionDist
 
     # too computationally expensive to use every point
     if player.counter % POSITION_UPDATE_FRAMES == 0 and WEBOTS_ACTIVE:
         stability.updatePosition(getCurrentLocation(player))
 
     if robotFellOver(player):
+        player.gainsOff()
+
         player.endStraightWalkLoc = getCurrentLocation(player)
         player.straightWalkCounter = player.counter
 
@@ -178,10 +184,10 @@ def scoreGaitPerformance(player):
        frames_stood = player.straightWalkCounter # no random walk on the Nao
 
        # on the Nao, use distance to a stationary ball
-       distance_traveled = player.startBallDistance - player.brain.ball.lastSeenDist
+       distance_traveled = player.startBallDistance - player.brain.ball.lastVisionDist
        print "difference in ball distance %s - %s = %s " % \
            (player.startBallDistance,
-            player.brain.ball.lastSeenDist,
+            player.brain.ball.lastVisionDist,
             distance_traveled)
 
    # we maximize on the heuristic
