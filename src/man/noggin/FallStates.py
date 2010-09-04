@@ -40,8 +40,9 @@ def standup(guard):
         guard.brain.tracker.setNeutralHead()
 
     if not guard.executeStandup:
-        guard.printf("not executing a standup routine")
-        return guard.goLater('doneStanding')
+        guard.printf("FallController: not executing a standup routine")
+        guard.standupMoveTime = 150 # keep stiffness off for 5s
+        return guard.goLater('standing')
 
     # If on back, perform back stand up
     if ( inertial.angleY < -guard.FALLEN_THRESH ):
