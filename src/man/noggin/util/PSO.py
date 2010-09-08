@@ -20,113 +20,156 @@
 
 # PSO.py: an implementation of a Particle-Swarm Optimizer
 #       will search through an N-dimensional space
+# @author Nathan Merritt
 
 import random
-import math
+from math import fabs
+from MyMath import clip
 
-DEBUG = False
+DEBUG = True
+DEBUG_POSITION = False
+DEBUG_PROGRESS = True
 
 # how much we trend towards pBest, gBest (cog/soc biases)
-# both set to ~2 per the PSO wikipedia article
-COG = 0.7
-SOC = 1.4
+# both set to <2 per the PSO wikipedia article
+COG = 0.3
+SOC = 0.7
+MAX_INERTIAL = 0.75
 
-# particle motion may not exceed abs(V_CAP) in any tick
-VELOCITY_CAP = 2
+VELOCITY_MINIMUM_MAGNITUDE = 0.001
+
+INFINITY = float(1e3000)
 
 class Particle:
     def __init__(self, nSpace, searchMins, searchMaxs):
         self.dimension = nSpace
 
-        self.pBest = 0
+        self.pBest = -INFINITY
         self.pBest_vars = [0]*nSpace
 
-        self.gBest = 0
-        self.gBest_vars = []
+        self.gBest = -INFINITY
+        self.gBest_position = []
 
         self.searchMins = searchMins
         self.searchMaxs = searchMaxs
 
-        # our positions and velocities in N-space
-        self.curr_position = [0]*nSpace
-        self.curr_velocity = [0]*nSpace
+        self.position = [0]*nSpace
+        self.velocity = [0]*nSpace
 
-        # inertia constant for velocity updates
+        # particles can cross the entire search space in one tick
+        self.velocityCap = [sMax - sMin for sMax, sMin in zip(searchMaxs, searchMins)]
+
         # initialized randomly per-particle as suggested by PSO wikipedia article
-        self.INERTIAL = random.random()
+        self.INERTIAL = MAX_INERTIAL * random.random()
 
-        self.stability = 0
+        self.heuristic = 0
+        self.moves = 0
 
-    def tick(self, gBest, gBest_vars):
-        # wait for the motion system to try gait parameters
-        # self.stability = self.getStability()
+    def initializeParticle(self):
+        for j in range(0, self.dimension):
+            # don't optimize any parameter where min == max
+            if self.searchMins[j] == self.searchMaxs[j]:
+                self.position[j] = self.searchMins[j]
+                self.velocity[j] = 0
+                continue
 
+            self.position[j] = random.uniform(self.searchMins[j],
+                                              self.searchMaxs[j])
+            self.velocity[j] = random.uniform(-self.velocityCap[j],
+                                               self.velocityCap[j])
+
+        self.gBest_position = self.position
+
+    def tick(self, gBest, gBest_position):
         # Update local best and its fitness
-        if self.stability > self.pBest:
-            self.pBest = self.stability
+        if self.heuristic > self.pBest:
+            self.pBest = self.heuristic
             self.pBest_vars = self.getPosition()
 
         # Update the global best and its fitness
         self.gBest = gBest
-        self.gBest_vars = gBest_vars
+        self.gBest_position = gBest_position
 
-        if self.stability > self.gBest:
-            self.gBest = self.stability
-            self.gBest_vars = self.getPosition()
+        if self.heuristic > self.gBest:
+            self.gBest = self.heuristic
+            self.gBest_position = self.getPosition()
 
-        # Update the particle velocity :
-        # Random component to avoid local minima
-        self.R1 = random.random()
-        self.R2 = random.random()
+        self.updateParticleVelocity()
+        self.updateParticlePosition()
 
-        # Apply velocities to positions
-        # make sure to stay in bound of (searchMins[i], searchMaxs[i])
+        self.moves += 1
+
+        # pass our gBest, gBest_position back to the swarm controller
+        return (self.gBest, self.gBest_position)
+
+    def updateParticleVelocity(self):
         for i in range(0, self.dimension):
-            # if mins[i] == maxs[i] then ignore, it's a placeholder variable
+            # if mins[i] == maxs[i] then ignore, we aren't optimizing it
             if self.searchMins[i] == self.searchMaxs[i]:
                 continue
 
-            self.curr_velocity[i] = self.INERTIAL*self.curr_velocity[i] \
-                + self.R1*COG*(self.pBest_vars[i] - self.curr_position[i]) \
-                + self.R2*SOC*(self.gBest_vars[i] - self.curr_position[i])
+            # Random component to avoid local minima
+            R1 = random.random()
+            R2 = random.random()
 
-            if self.curr_velocity[i] > VELOCITY_CAP:
-                self.curr_velocity[i] = VELOCITY_CAP
-            elif self.curr_velocity[i] < -VELOCITY_CAP:
-                self.curr_velocity[i] = -VELOCITY_CAP
+            self.velocity[i] = self.INERTIAL*self.velocity[i] \
+                + COG * R1 * (self.pBest_vars[i] - self.position[i]) \
+                + SOC * R2 * (self.gBest_position[i] - self.position[i])
 
-            new_position = self.curr_position[i] + self.curr_velocity[i]
+            clip(self.velocity[i],
+                 -self.velocityCap[i],
+                 self.velocityCap[i])
 
-            if new_position > self.searchMaxs[i]:
-                new_position = self.searchMaxs[i]
-            elif new_position < self.searchMins[i]:
-                new_position = self.searchMins[i]
+            if fabs(self.velocity[i]) < VELOCITY_MINIMUM_MAGNITUDE:
+                self.velocity[i] = 0
 
-            self.curr_position[i] = new_position
 
-        # pass our gBest, gBest_vars back to the swarm controller
-        return (self.gBest, self.gBest_vars)
+    def updateParticlePosition(self):
+        for i in range(0, self.dimension):
+            self.position[i] = self.position[i] + self.velocity[i]
+
+            clip(self.position[i],
+                 self.searchMins[i],
+                 self.searchMaxs[i])
 
     # used to decide how stable our most recent set of parameters were
-    def getStability(self):
-        # return distance from 5,5 (for testing)
-        #return math.sqrt((self.curr_position[0] - 5)**2 + (self.curr_position[1] - 5)**2)
+    def getHeuristic(self):
+        return
 
-        return 0
-
-    # when we set stability from outside the swarm, use this
-    def setStability(self, outside_stability):
-        self.stability = outside_stability
+    # when we set heuristic from outside the swarm, use this
+    def setHeuristic(self, outside_heuristic):
+        self.heuristic = outside_heuristic
         return
 
     def getPosition(self):
-        return self.curr_position
+        return self.position
+
+    def avgAbsVelocity(self):
+        velocitySum = optimizeDimensions = 0
+        i = -1
+
+        for velocity in self.velocity:
+            i += 1
+            if self.searchMins[i] == self.searchMaxs[i]:
+                continue
+
+            optimizeDimensions += 1
+            velocitySum += fabs(velocity)
+
+        if optimizeDimensions == 0:
+            return 0
+
+        return velocitySum / optimizeDimensions
 
     # debug output for a particle
     def printState(self):
-        print "pBest: %s gBest: %s nSpace: %s" % (self.pBest, self.gBest, self.dimension)
-        print "Positions in N-Space: %s" % self.curr_position
-        print "Velocity: %s" % self.curr_velocity
+        if DEBUG_PROGRESS:
+            print "pBest: %s gBest: %s nSpace: %s" % (self.pBest, self.gBest, self.dimension)
+            print "particle's average abs(velocity) is %s" % self.avgAbsVelocity()
+            print "particle has moved %s times" % self.moves
+        if DEBUG_POSITION:
+            print "Positions in N-Space: %s" % self.position
+            print "Velocity: %s" % self.velocity
 
 class Swarm:
     def __init__(self, numParticles, nSpace, searchMins, searchMaxs):
@@ -134,35 +177,32 @@ class Swarm:
         self.partIndex = 0
         self.numParticles = numParticles
 
-        self.gBest = 0
-        self.gBest_vars = [0]*nSpace
+        self.gBest = -INFINITY
+        self.gBest_position = [0]*nSpace
+
+        self.iterations = 0 # how many times every particle has moved
 
         for i in range(0, numParticles):
             self.particles.append(Particle(nSpace, searchMins, searchMaxs))
-            # uniformly distribute particles across search space and randomize velocity
-            for j in range(0, nSpace):
-                # don't optimize this parameter
-                if searchMins[j] == searchMaxs[j]:
-                    self.particles[i].curr_position[j] = searchMins[j]
-                    self.particles[i].curr_velocity[j] = 0
-                    continue
 
-                self.particles[i].curr_position[j] = random.uniform(searchMins[j], \
-                                                                    searchMaxs[j])
-                self.particles[i].curr_velocity[j] = random.uniform(-VELOCITY_CAP*.5, \
-                                                                     VELOCITY_CAP*.5)
-        if DEBUG:
-            for p in self.particles:
+        for p in self.particles:
+            p.initializeParticle()
+
+            if DEBUG:
                 p.printState()
 
     # probably not useful in actual RoboCup situations...
     def solve_swarm(self, iterations):
         for i in range(0, iterations):
             for p in self.particles:
-                (self.gBest, self.gBest_vars) = p.tick(self.gBest, self.gBest_vars)
+                (self.gBest, self.gBest_position) = \
+                    p.tick(self.gBest, self.gBest_position)
 
                 if DEBUG:
                     p.printState()
+
+    def getIterations(self):
+        return self.iterations
 
     def getCurrParticle(self):
         return self.particles[self.partIndex]
@@ -173,18 +213,17 @@ class Swarm:
         if self.partIndex < self.numParticles:
             return self.particles[self.partIndex]
         else:
+            self.iterations += 1
             self.partIndex = 0
             return self.particles[0]
 
+    def getBestSolution(self):
+        return (self.gBest_position, self.gBest)
+
     def tickCurrParticle(self):
-        (self.gBest, self.gBest_vars) = \
-               self.particles[self.partIndex].tick(self.gBest, self.gBest_vars)
+        (self.gBest, self.gBest_position) = \
+               self.particles[self.partIndex].tick(self.gBest, self.gBest_position)
 
         if DEBUG:
             self.particles[self.partIndex].printState()
 
-    def saveSwarm(output_file):
-        return
-
-    def loadSwarm(input_file):
-        return

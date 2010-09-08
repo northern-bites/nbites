@@ -13,7 +13,7 @@ def setSpeed(nav, x, y, theta):
     else:
         nav.brain.CoA.setRobotGait(nav.brain.motion)
 
-    x_cms, y_cms, theta_degs = convertWalkVector(nav, x, y, theta)
+    x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
 
     createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
 
@@ -29,7 +29,7 @@ def setDribbleSpeed(nav, x, y, theta):
     else:
         nav.brain.CoA.setDribbleGait(nav.brain.motion)
 
-    x_cms, y_cms, theta_degs = convertWalkVector(nav, x, y, theta)
+    x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
 
     createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
 
@@ -46,7 +46,7 @@ def setSlowSpeed(nav, x, y, theta):
     else:
         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
 
-    x_cms, y_cms, theta_degs = convertWalkVector(nav, x, y, theta)
+    x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
 
     createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
 
@@ -62,7 +62,7 @@ def step(nav, x, y, theta, numSteps):
     else:
         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
 
-    x_cms, y_cms, theta_degs = convertWalkVector(nav, x, y, theta)
+    x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
 
     createAndSendStepVector(nav, x_cms, y_cms, theta_degs)
 
@@ -100,10 +100,10 @@ def executeMove(motionInst, sweetMove):
 
         motionInst.enqueue(move)
 
-def convertWalkVector(nav, x_abs, y_abs, theta_abs):
+def convertWalkVector(brain, x_abs, y_abs, theta_abs):
     checkWalkVector(x_abs, y_abs, theta_abs)
 
-    gait = nav.brain.CoA.current_gait
+    gait = brain.CoA.current_gait
 
     x_mms = y_mms = theta_rads = 0
 
@@ -117,7 +117,7 @@ def convertWalkVector(nav, x_abs, y_abs, theta_abs):
 
     # max theta speed (same in both directions)
     theta_rads = theta_abs * gait.getStepValue(7)
- 
+
     x_cms = x_mms * constants.TO_CMS  # convert back from motion engine's units
     y_cms = y_mms * constants.TO_CMS
     theta_degs = theta_rads * constants.TO_DEGS

@@ -26,6 +26,10 @@
     Chown: Vision?
 *** DONE Get more people. duh.
 
+
+Investigate FALLEN_THRESH (angle) and FALLEN_COUNT_THRESH (number of frames before we report 
+being fallen) in FallController.isFallen() / RoboGuardian
+
 * NEW FEATURES
 ** High Level and biggest goals
    1. Significantly better localization
@@ -211,3 +215,4 @@
 ** General
 *** Systematically ensure all method declarations are not in headers
 *** Systematically make sure GPL license is everywhere
+
