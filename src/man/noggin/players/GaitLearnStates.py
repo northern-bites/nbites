@@ -63,6 +63,8 @@ def gamePlaying(player):
 
         # we don't want to auto-stand after falling
         player.brain.fallController.executeStandup = False
+        player.brain.fallController.FALLEN_THRESH = 60
+        player.brain.fallController.FALL_COUNT_THRESH = 10
 
         startPSO(player)
 
