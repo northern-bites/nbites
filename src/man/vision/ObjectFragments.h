@@ -91,38 +91,65 @@ public:
     // post recognition routines
     int classifyByCrossbar(Blob b);
     int classifyByOtherRuns(int left, int right, int height);
-    int classifyByLineIntersection(Blob b);
+    int classifyByTCorner(Blob b);
     int classifyByCheckingCorners(Blob b);
+    int cornerClassifier(float diff, float dist, int x, int y,int class1, int class2);
+    int classifyGoalBoxLineThatAbutsPost(int y, float diff, float dist,
+                                         int classification);
+    bool withinEdgeMargin(int x, int margin);
+    bool withinVerticalEdgeMargin(int y, int margin);
+    int classifyByLengthOfGoalline(float dist, int x, int y,
+                                   int class1, int class2);
+    int classifyByGoalline(const point<int> linel, const point<int> liner,
+                           point<int> left, point<int> right);
+    int classifyByGoalBoxFrontline(pair<int, int> foo,
+                                   point<int> left, point<int> right);
+    int getFrontlineClassification(point<int> post,
+                                   pair<int, int> foo,
+                                   int classification);
+
+
+
+
+	int classifyByCheckingLines(Blob post);
 
     int characterizeSize(Blob b);
 
-    int classifyFirstPost(int c, int c2,
-                          VisualFieldObject* left, VisualFieldObject* right,
-                          VisualCrossbar* mid, Blob pole);
+    int classifyFirstPost(int c, int c2, Blob pole);
 
     // the big kahuna
-    void goalScan(VisualFieldObject *left, VisualFieldObject *right,
+    void lookForFirstPost(VisualFieldObject *left, VisualFieldObject *right,
                   VisualCrossbar *mid, int c, int c2);
+    void lookForSecondPost(Blob pole, int post,
+                                            VisualFieldObject* left,
+                                            VisualFieldObject* right,
+                           VisualCrossbar* mid, int c, int c2);
+
+    void updateRunsAfterFirstPost(Blob pole, int post);
     int grabPost(int c, int c2, int left, int right, Blob & pole);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
     void transferTopBlob(VisualFieldObject * one, certainty cert,
                          distanceCertainty dc);
 
     // sanity checks
+    bool isPostReasonableSizeShapeAndPlace(Blob post);
+
     bool rightBlobColor(Blob obj, float per);
     bool postBigEnough(Blob b);
     bool horizonBottomOk(int spanX, int spanY, int minHeight, int left, int right,
                          int bottom, int top);
     bool postRatiosOk(float ratio);
-    bool secondPostFarEnough(point <int> l1, point <int> r1,
-                             point <int> l2, point <int> r2, int p);
+    bool secondPostFarEnough(Blob a, Blob b, int p);
     bool blobOk(Blob b);
 	bool badDistance(Blob b);
     bool locationOk(Blob b);
-    bool relativeSizesOk(int x1, int y1, int s2, int y2, int t1, int t2, int f);
+    bool relativeSizesOk(Blob a, Blob b);
 
     // misc.
+    bool withinMargin(float n, float n1, float n2);
+    bool withinMarginInt(int n, int n1, int n2);
     int distance(int x1, int x2, int x3, int x4);
+	float realDistance(int x1, int y1, int x2, int y2);
     float getSlope() { return slope; }
 	bool greenCheck(Blob b);
 
@@ -137,6 +164,13 @@ public:
     void printObject(VisualFieldObject * objs);
     void paintRun(int x,int y, int h, int c);
     void drawRun(const run& run, int c);
+#ifdef OFFLINE
+	void setPrintObjs(bool debug) {PRINTOBJS = debug;}
+	void setPostDebug(bool debug) {POSTDEBUG = debug;}
+	void setPostLogic(bool debug) {POSTLOGIC = debug;}
+	void setSanity(bool debug) {SANITY = debug;}
+	void setCorrect(bool debug) {CORRECT = debug;}
+#endif
 
 
 private:
@@ -151,6 +185,20 @@ private:
     int numberOfRuns;
     run* runs;
     float slope;
+#ifdef OFFLINE
+	bool PRINTOBJS;
+	bool POSTDEBUG;
+	bool POSTLOGIC;
+	bool SANITY;
+	bool CORRECT;
+#else
+	static const bool PRINTOBJS = false;
+	static const bool POSTDEBUG = false;
+	static const bool POSTLOGIC = false;
+	static const bool SANITY = false;
+	static const bool CORRECT = false;
+#endif
+
 };
 
 #endif // ObjectFragments_h_DEFINED

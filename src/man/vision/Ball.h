@@ -59,32 +59,38 @@ public:
     // Making object
     void init(float s);
 
-    // scan operations
-    void vertScan(int x, int y, int dir, int stopper, int c, int c2, stop & scan);
-    void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
-                        int r, stop & scan);
     int horizonAt(int x);
 
     // main methods
     void createBall(int c);
 
     // ball stuff
-    float rightColor(Blob obj, int c);
+    void adjustBallDimensions();
+    int findBallEdgeX(int x, int y, int dir);
+    int findBallEdgeY(int x, int y, int dir);
     float rightHalfColor(Blob obj);
-    bool greenCheck(Blob b);
-    bool greenSide(Blob b);
-    int scanOut(int start_x, int start_y, float slope,int dir);
-    int ballNearGreen(Blob b);
+    void setOcclusionInformation();
+    bool ballIsReasonablySquare(int x, int y, int w, int h);
+    bool nearImageEdgeX(int x, int margin);
+    bool nearImageEdgeY(int y, int margin);
+    bool nearEdge(Blob b);
     int roundness(Blob b);
+    pair<int, int> scanMidlinesForRoundnessInformation(Blob b);
+    pair<int, int> scanDiagonalsForRoundnessInformation(Blob b);
     bool badSurround(Blob b);
-    bool atBoundary(Blob b);
 	void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);
+    void checkForReflections(int h, int w, VisualBall * thisBall,
+                             estimate e);
+    bool ballIsClose(VisualBall * thisBall);
+    bool ballIsNotSquare(int h, int w);
+
     int balls(int c, VisualBall *thisBall);
 
     // sanity checks
-    bool rightBlobColor(Blob obj, float per);
-    void addPoint(float x, float y);
-	bool blobOk(Blob b);
+    void preScreenBlobsBasedOnSizeAndColor();
+    bool sanityChecks(int w, int h, estimate e, VisualBall * thisBall);
+    bool blobOk(Blob b);
+    bool blobIsBigEnoughToBeABall(int w, int h);
 
     // debugging methods
     void printBall(Blob b, int c, float p, int o);
@@ -95,7 +101,10 @@ public:
     void printBlob(Blob b);
     void paintRun(int x,int y, int h, int c);
     void drawRun(const run& run, int c);
-
+#ifdef OFFLINE
+	void setDebugBall(bool debugBall) {BALLDEBUG = debugBall;}
+	void setDebugBallDistance(bool debug) {BALLDISTDEBUG = debug;}
+#endif
 
 private:
     // class pointers
@@ -122,7 +131,13 @@ private:
     point <int> spot;
     int numPoints;
     float points[MAX_BALL_POINTS*2];
-
+#ifdef OFFLINE
+	bool BALLDISTDEBUG;
+	bool BALLDEBUG;
+#else
+	static const bool BALLDISTDEBUG = false;
+	static const bool BALLDEBUG = false;
+#endif
 };
 
 #endif // Ball_h_DEFINED

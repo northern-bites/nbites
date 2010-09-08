@@ -70,7 +70,6 @@ static const float LANDMARK_YELLOW_GOAL_TOP_POST_Y =
 
 static const float CENTER_CIRCLE_RADIUS = 62.5f; // Not scaled
 
-#define SINGAPORE_FIELD_B
 #ifdef USING_LAB_FIELD
 static const float GOALBOX_DEPTH = 60.f;
 static const float GOALBOX_WIDTH = 200.f;
@@ -83,6 +82,13 @@ static const float GOALBOX_DEPTH = 65.f;
 static const float GOALBOX_WIDTH = 230.f;
 #endif // USING_LAB_FIELD
 #endif
+
+// These are used by the vision system
+// The distance the goalie box extends out past each goal post
+static const float GOALBOX_OVERAGE = 40.0f;
+// The distance from any goal post to the goalie box corner nearest it
+static const float POST_CORNER = sqrt(GOALBOX_DEPTH * GOALBOX_DEPTH +
+                                      GOALBOX_OVERAGE * GOALBOX_OVERAGE);
 
 static const float YELLOW_GOAL_HEADING = 0;
 static const float BLUE_GOAL_HEADING = 180;

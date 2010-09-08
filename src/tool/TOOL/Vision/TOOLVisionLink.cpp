@@ -188,7 +188,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     //push each field object
     VisualFieldObject *obj;
     VisualCrossbar * cb;
-    VisualCross *cross;
+    VisualCross *cross = NULL;
     int k = 0;
     while(k != -1) {
         //loop through all the objects we want to pass
@@ -436,6 +436,71 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugFitUnusedPoints
 	(JNIEnv * env, jobject jobj, jboolean debugFitUnusedPoints){
 		vision.fieldLines->setDebugFitUnusedPoints(debugFitUnusedPoints);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetBallDebugBall
+	(JNIEnv * env, jobject jobj, jboolean debugBall){
+		vision.thresh->orange->setDebugBall(debugBall);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetBallDebugBallDistance
+	(JNIEnv * env, jobject jobj, jboolean debugBallDistance){
+		vision.thresh->orange->setDebugBallDistance(debugBallDistance);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetCrossDebug
+	(JNIEnv * env, jobject jobj, jboolean debugCross){
+		vision.thresh->cross->setCrossDebug(debugCross);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostPrintDebug
+	(JNIEnv * env, jobject jobj, jboolean debugPostPrint){
+		vision.thresh->yellow->setPrintObjs(debugPostPrint);
+		vision.thresh->blue->setPrintObjs(debugPostPrint);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostDebug
+	(JNIEnv * env, jobject jobj, jboolean debugPost){
+		vision.thresh->yellow->setPostDebug(debugPost);
+		vision.thresh->blue->setPostDebug(debugPost);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostLogicDebug
+	(JNIEnv * env, jobject jobj, jboolean debugLogic){
+		vision.thresh->yellow->setPostLogic(debugLogic);
+		vision.thresh->blue->setPostLogic(debugLogic);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostSanityDebug
+	(JNIEnv * env, jobject jobj, jboolean debugSanity){
+		vision.thresh->yellow->setSanity(debugSanity);
+		vision.thresh->blue->setSanity(debugSanity);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetPostCorrectDebug
+	(JNIEnv * env, jobject jobj, jboolean debugCorrect){
+		vision.thresh->yellow->setCorrect(debugCorrect);
+		vision.thresh->blue->setCorrect(debugCorrect);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldHorizonDebug
+	(JNIEnv * env, jobject jobj, jboolean debugHorizon){
+		vision.thresh->field->setDebugHorizon(debugHorizon);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldEdgeDebug
+	(JNIEnv * env, jobject jobj, jboolean debugEdge){
+		vision.thresh->field->setDebugFieldEdge(debugEdge);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetShootingDebug
+	(JNIEnv * env, jobject jobj, jboolean debugShot){
+		vision.thresh->setDebugShooting(debugShot);
+	}
+	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetOpenFieldDebug
+	(JNIEnv * env, jobject jobj, jboolean debugField){
+		vision.thresh->setDebugOpenField(debugField);
 	}
 
 
