@@ -70,7 +70,7 @@ NUM_FIELD_OBJECT_DIST_CERTAINTIES = 4
 ##
 
 # Switch to tell us if we are using the lab field or not
-USING_LAB_FIELD = False
+USING_LAB_FIELD = True
 
 #---Landmark Constants------#
 # Notes:
@@ -261,5 +261,6 @@ BAD_LOC_THETA_UNCERT_THRESH = 40
 ##
 ##--------------------BEHAVIOR CONSTANTS -------------#
 ##
-BALL_TEAMMATE_DIST_GRABBING = 50
+BALL_TEAMMATE_DIST_GRABBING = 35
+BALL_TEAMMATE_BEARING_GRABBING = 85.
 BALL_TEAMMATE_DIST_DRIBBLING = 20

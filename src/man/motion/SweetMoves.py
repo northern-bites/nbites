@@ -82,7 +82,7 @@ GOALIE_POS = ((INITIAL_POS[0][0],
 def DREW_KICK(y,dist):
     if y<=0:
         return mirrorMove(LEFT_D_KICK(-1*y,dist))
-    if y>0:
+    elif y>0:
         return LEFT_D_KICK(y,dist)
 
 
@@ -101,8 +101,8 @@ def LEFT_D_KICK(y,dist):
     if kick_leg_hip_roll>20.0:
         kick_leg_hip_roll=20.0
 
-    if kick_leg_hip_roll<5.0:
-        kick_leg_hip_roll=5.0
+    if kick_leg_hip_roll<0.0:
+        kick_leg_hip_roll=0.0
 
     # range from 15 to 60 to balance against kick
     support_arm_shoulder_roll = -3.*kick_leg_hip_roll
@@ -127,17 +127,17 @@ def LEFT_D_KICK(y,dist):
 
         # Lift/cock leg
         ((80.,0.,-50.,-90.),
-         (0.,kick_leg_hip_roll,-60.,120.,-20.,-20.),
+         (0.,kick_leg_hip_roll-10., -20.,120.,-68.,-20.),
          (0.,0,-40.,86.,-45.,-20.),
          (80.,support_arm_shoulder_roll,50.,70.),
-         0.6,0, stiff.NORMAL_STIFFNESSES),
+         .5,0, stiff.NORMAL_STIFFNESSES),
 
         # kick left leg
         ((80.,0.,-50.,-90.),
-         (0.,kick_leg_hip_roll, kick_hip_pitch, 80.,10.,-20.),
+         (0.,kick_leg_hip_roll-5., kick_hip_pitch-5, 60.,10.,-20.),
          (0.,0.,-40.,86.,-45.,-20.),
          (80.,support_arm_shoulder_roll,50.,70.),
-         0.12,0, stiff.NORMAL_STIFFNESSES),
+         .20,0, stiff.NORMAL_STIFFNESSES),
 
         # return to normal position
         ((60., 35., 0.,0.),
@@ -368,21 +368,21 @@ DREW_LEFT_SIDE_KICK = (
 
     #lift left leg to side
     ((80.,0.,-50.,-70.),
-     (0.,45.,-40.,65.,-10.,-10.),
+     (0.,45.,-35.,65.,-10.,-10.),
      (0.,5.,-38.,76.,-40.,-22.),
      (80.,-40.,50.,70.),
      0.5 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     # move leg forward
     ((80.,0.,-50.,-70.),
-     (0.,45.,-65.,60.,-20.,0.),
+     (0.,45.,-65.,55.,-20.,0.),
      (0.,10.,-38.,76.,-40.,-22.),
      (90.,-90.,50.,70.),
      0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     # kick across body
     ((80.,0.,-50.,-70.),
-     (0.,-22.,-70.,30.,23.,0.),
+     (0.,-22.,-70.,25.,23.,0.),
      (0.,15.,-38.,76.,-40.,-22.),
      (90.,-90.,50.,70.),
      .2, 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
@@ -403,19 +403,19 @@ DREW_RIGHT_SIDE_KICK = (
 
     ((80.0, 40.0, -50.0, -70.0),
      (0.0, -5.0, -38.0, 76.0, -40.0, 22.0),
-     (0.0, -45.0, -40.0, 65.0, -10.0, 10.0),
+     (0.0, -45.0, -35.0, 65.0, -10.0, 10.0),
      (80.0, -0.0, 50.0, 70.0),
      0.5, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
 
     ((90.0, 90.0, -50.0, -70.0),
      (0.0, -10.0, -38.0, 76.0, -40.0, 22.0),
-     (0.0, -45.0, -55.0, 60.0, -20.0, -0.0),
+     (0.0, -45.0, -55.0, 55.0, -20.0, -0.0),
      (80.0, -0.0, 50.0, 70.0),
      0.4, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
 
     ((90.0, 90.0, -50.0, -70.0),
      (0.0, -15.0, -38.0, 76.0, -40.0, 22.0),
-     (0.0, 22.0, -70.0, 30.0, 23.0, -0.0),
+     (0.0, 22.0, -70.0, 25.0, 23.0, -0.0),
      (80.0, -0.0, 50.0, 70.0),
      0.2, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
 

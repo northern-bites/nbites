@@ -695,14 +695,14 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
 }
 
 
-void Sensors::lockImage()
+void Sensors::lockImage() const
 {
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_lock (&image_mutex);
 #endif
 }
 
-void Sensors::releaseImage()
+void Sensors::releaseImage() const
 {
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_unlock (&image_mutex);
@@ -735,7 +735,7 @@ void Sensors::releaseVisionAngles() {
     pthread_mutex_unlock (&vision_angles_mutex);
 }
 
-const unsigned char* Sensors::getImage ()
+const unsigned char* Sensors::getImage () const
 {
     return image;
 }

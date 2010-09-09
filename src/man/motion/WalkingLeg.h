@@ -107,15 +107,15 @@ public:
     void startRight();
 
     //Public FSA methods
-    SupportMode getSupportMode(){return state;}
+    SupportMode getSupportMode() const {return state;}
     //True if the next call to tick() will be in a different support mode
     bool isSwitchingSupportMode(){return firstFrame();}
 
-    bool stateIsDoubleSupport(){
+    bool stateIsDoubleSupport() const {
         return state == DOUBLE_SUPPORT ||
             state == PERSISTENT_DOUBLE_SUPPORT;
     };
-    bool isSupporting(){
+    bool isSupporting() const {
         return state == DOUBLE_SUPPORT ||
             state == PERSISTENT_DOUBLE_SUPPORT || state == SUPPORTING;
     };
@@ -141,7 +141,7 @@ private:
     void switchToNextState();
     SupportMode nextState();
     bool shouldSwitchStates();
-    bool firstFrame(){return frameCounter == 0;}
+    bool firstFrame() const {return frameCounter == 0;}
     void assignStateTimes(boost::shared_ptr<Step> step);
     const boost::tuple<const float, const float> getSensorFeedback();
     void debugProcessing();

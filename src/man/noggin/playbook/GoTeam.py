@@ -35,7 +35,6 @@ class GoTeam:
         self.numActiveFieldPlayers = 0
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
-        self.pulledGoalie = False
         self.ellipse = Ellipse(PBConstants.LARGE_ELLIPSE_CENTER_X,
                                PBConstants.LARGE_ELLIPSE_CENTER_Y,
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
@@ -99,10 +98,6 @@ class GoTeam:
         # This is the important area, what is usually used during play
         elif self.numActiveFieldPlayers == 2:
             Strategies.sWin(self, play)
-
-        # This can only be used right now if the goalie is pulled
-        elif self.numActiveFieldPlayers == 3:
-            Strategies.sThreeField(self, play)
 
     def updateStateInfo(self, play):
         """
@@ -237,7 +232,7 @@ class GoTeam:
         # update my own information for role switching
         self.time = time.time()
         self.me.updateMe()
-        self.pulledGoalie = self.pullTheGoalie()
+
         # loop through teammates
         self.activeFieldPlayers = []
         append = self.activeFieldPlayers.append
@@ -247,8 +242,7 @@ class GoTeam:
             if (mate.active and mate.isDead()): #no need to check inactive mates
                 #we set to True when we get a new packet from mate
                 mate.active = False
-            elif (mate.active and (not mate.isTeammateRole(PBConstants.GOALIE)
-                                   or (mate.isDefaultGoalie() and self.pulledGoalie))):
+            elif (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
                 append(mate)
                 self.numActiveFieldPlayers += 1
 
@@ -296,12 +290,6 @@ class GoTeam:
                 return False
 
         return True
-
-    def pullTheGoalie(self):
-        if PBConstants.PULL_THE_GOALIE:
-            if self.brain.gameController.getScoreDifferential() <= -3:
-                return True
-        return False
 
 ################################################################################
 #####################     Utility Functions      ###############################

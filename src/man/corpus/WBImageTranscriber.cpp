@@ -42,7 +42,7 @@ void WBImageTranscriber::releaseImage(){}
 
 
 const YUV WBImageTranscriber::getWBYUVFromRGB(const unsigned char * wimage,
-                                       const int baseIndex){
+                                              const int baseIndex){
 
     const int R = wimage[baseIndex + 0];
     const int G = wimage[baseIndex + 1];
@@ -59,10 +59,10 @@ const YUV WBImageTranscriber::getWBYUVFromRGB(const unsigned char * wimage,
     const unsigned char U =
         static_cast<unsigned char>(128+ (( -18 * R + -94 * G + 112*B)>>8));
 
-//This is the old "correct" forumla
-//     const unsigned char Y =16  + (( 66 * R + 129 * G + 25  *   + 128)) >> 8;
-//     const unsigned char U =128 + ((-38 * R - 74  * G + 112 * B + 128)) >> 8;
-//     const unsigned char V =128 + ((112 * R - 94  * G - 18  * B + 128)) >> 8;
+    //This is the old "correct" forumla
+    //     const unsigned char Y =16  + (( 66 * R + 129 * G + 25  *   + 128)) >> 8;
+    //     const unsigned char U =128 + ((-38 * R - 74  * G + 112 * B + 128)) >> 8;
+    //     const unsigned char V =128 + ((112 * R - 94  * G - 18  * B + 128)) >> 8;
 
     const YUV result = {Y,U,V};
     return result;
@@ -70,7 +70,7 @@ const YUV WBImageTranscriber::getWBYUVFromRGB(const unsigned char * wimage,
 
 //must guarantee j is always even..
 void WBImageTranscriber::setTwoYUV(unsigned char *image, const int baseIndex,
-                                const YUV yuv1, const YUV yuv2){
+                                   const YUV yuv1, const YUV yuv2){
     image[ baseIndex + Y1_OFFSET] = yuv1.Y;
     image[ baseIndex + U_OFFSET]  = yuv1.U;
     image[ baseIndex + Y2_OFFSET] = yuv2.Y;
@@ -85,7 +85,6 @@ void WBImageTranscriber::waitForImage(){
 
     //next we need to translate the buffer to YUV, and make it
     //the correct size (half VGA) (it comes in quarter VGA)
-    int maxIndex = 0;
     for(int i = 0; i < WEBOTS_IMAGE_HEIGHT; i++){
         for(int j = 0; j < WEBOTS_IMAGE_WIDTH; j+=2){//read two at a time
 

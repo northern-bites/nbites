@@ -427,8 +427,6 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
         return NULL_ESTIMATE;
     }
 
-
-
     //estimate est = getEstimate(objectInWorldFrame);
     //est.dist = correctDistance(static_cast<float> (est.dist));
 

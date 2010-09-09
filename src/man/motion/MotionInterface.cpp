@@ -67,42 +67,42 @@ void MotionInterface::resetScriptedProvider(){
     switchboard->resetScriptedProvider();
 }
 
-float MotionInterface::getHeadSpeed() {
+float MotionInterface::getHeadSpeed() const {
     return DUMMY_F;
 }
 
 void MotionInterface::setWalkConfig ( float pMaxStepLength, float pMaxStepHeight,
 				      float pMaxStepSide, float pMaxStepTurn,
-				      float pZmpOffsetX, float pZmpOffsetY) {
+				      float pZmpOffsetX, float pZmpOffsetY) const {
 }
 
 void MotionInterface::setWalkArmsConfig ( float pShoulderMedian,
 					  float pShoulderApmlitude,
 					  float pElbowMedian,
-					  float pElbowAmplitude) {
+					  float pElbowAmplitude) const {
 }
 
 void MotionInterface::setWalkExtraConfig( float pLHipRollBacklashCompensator,
 					  float pRHipRollBacklashCompensator,
 					  float pHipHeight,
-					  float pTorsoYOrientation) {
+					  float pTorsoYOrientation) const {
 }
 
 void MotionInterface::setGait(const boost::shared_ptr<Gait> command){
     switchboard->sendMotionCommand(command);
 }
 
-void MotionInterface::setSupportMode(int pSupportMode) {
+void MotionInterface::setSupportMode(int pSupportMode) const {
 }
 
-int MotionInterface::getSupportMode() {
+int MotionInterface::getSupportMode() const {
     return DUMMY_I;
 }
 
 
-void MotionInterface::setBalanceMode(int pBalanceMode) {
+void MotionInterface::setBalanceMode(int pBalanceMode) const {
 }
 
-int MotionInterface::getBalanceMode() {
+int MotionInterface::getBalanceMode() const {
     return DUMMY_I;
 }

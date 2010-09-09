@@ -53,10 +53,7 @@ def approachBall(player):
         player.brain.nav.chaseBall()
         player.hasAlignedOnce = False
 
-    if transitions.shouldActiveLoc(player):
-        player.brain.tracker.activeLoc()
-    else:
-        player.brain.tracker.trackBall()
+    player.brain.tracker.trackBall()
 
     # Switch to other states if we should
     if player.penaltyKicking and \
@@ -88,7 +85,7 @@ def decideKick(player):
         player.stopWalking()
         player.brain.tracker.kickDecideScan()
 
-    elif not player.brain.motion.isHeadActive():
+    elif player.counter > 43:
         return player.goLater('positionForKick')
 
     player.brain.kickDecider.kickInfo.collectData(player.brain)
@@ -106,19 +103,19 @@ def positionForKick(player):
     if player.firstFrame():
         kick = player.brain.kickDecider.kickInfo.getKick()
         player.brain.kickDecider.currentKick = kick
+
+        if kick is None:
+            player.angleToOrbit = player.brain.kickDecider.kickInfo.orbitAngle
+            return player.goLater('orbitBall')
+
         player.brain.kickDecider.kickInfo = \
             KickInformation.KickInformation(player)
-        #if kick is None:
-            #player.angleToOrbit = player.brain.kickDecider.kickInfo.orbitAngle
-            #return player.goLater('orbitBall')
+
         player.brain.nav.kickPosition(kick)
         player.inKickingState = True
         player.ballTooFar = 0
 
-    if player.brain.nav.walkX <= 0:
-        player.brain.tracker.activeLoc()
-    else:
-        player.brain.tracker.trackBall()
+    player.brain.tracker.trackBall()
 
     # something has gone wrong, maybe the ball was moved?
     if (player.brain.ball.dist > PFK_BALL_CLOSE_ENOUGH or
@@ -214,6 +211,6 @@ def orbitBall(player):
     if transitions.shouldApproachFromPositionForKick(player):
         return player.goLater('approachBall')
 
-    if player.brain.nav.isStopped():
+    elif player.brain.nav.isStopped():
         return player.goLater('approachBall')
     return player.stay()

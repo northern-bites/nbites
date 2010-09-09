@@ -33,24 +33,24 @@
 #include "MotionConstants.h"
 
 class BodyJointCommand : public JointCommand {
-  public:
+ public:
     BodyJointCommand(const float time,
-					 const std::vector<float> *body_joints,
-					 const std::vector<float> *body_stiffness,
-					 const Kinematics::InterpolationType _type);
+                     const std::vector<float> *body_joints,
+                     const std::vector<float> *body_stiffness,
+                     const Kinematics::InterpolationType _type);
 
     BodyJointCommand(const float time,
-					 Kinematics::ChainID chainId,
-					 const std::vector<float> *joints,
-					 const std::vector<float> *body_stiffness,
-					 const Kinematics::InterpolationType _type);
+                     Kinematics::ChainID chainId,
+                     const std::vector<float> *joints,
+                     const std::vector<float> *body_stiffness,
+                     const Kinematics::InterpolationType _type);
     BodyJointCommand(const float time,
-					 const std::vector<float> *larm,
-					 const std::vector<float> *lleg,
-					 const std::vector<float> *rleg,
-					 const std::vector<float> *rarm,
-					 const std::vector<float> *body_stiffness,
-					 const Kinematics::InterpolationType _type);
+                     const std::vector<float> *larm,
+                     const std::vector<float> *lleg,
+                     const std::vector<float> *rleg,
+                     const std::vector<float> *rarm,
+                     const std::vector<float> *body_stiffness,
+                     const Kinematics::InterpolationType _type);
 
     BodyJointCommand(const BodyJointCommand &other);
     virtual ~BodyJointCommand(void);
@@ -64,8 +64,8 @@ class BodyJointCommand : public JointCommand {
     const bool conflicts(const BodyJointCommand &other) const;
     const bool conflicts(const float chainTimeRemaining[Kinematics::NUM_CHAINS]) const;
 
-  private:
-	virtual void setChainList();
+ private:
+    virtual void setChainList();
     const std::vector<float> *larm_joints;
     const std::vector<float> *lleg_joints;
     const std::vector<float> *rleg_joints;

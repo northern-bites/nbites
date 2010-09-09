@@ -102,8 +102,8 @@ public:
         }
         return nextStiffnesses[id];
     }
-    const std::string getName(){return provider_name;}
-    const ProviderType getType(){return provider_type;}
+    const std::string getName() const {return provider_name;}
+    const ProviderType getType() const {return provider_type;}
 
     virtual const SupportFoot getSupportFoot() const {
         // the default return value for all providers is left foot

@@ -210,13 +210,13 @@ DataSerializer::setblocking (bool toBlock) throw(socket_error&)
 }
 
 bool
-DataSerializer::bound ()
+DataSerializer::bound () const
 {
   return bind_sockn != -1;
 }
 
 bool
-DataSerializer::connected ()
+DataSerializer::connected () const
 {
   return sockn != -1;
 }

@@ -72,9 +72,6 @@ def gameSet(player):
         if player.brain.play.isRole(CHASER):
             player.brain.tracker.trackBall()
 
-        else:
-            player.brain.tracker.activeLoc()
-
     if player.firstFrame() and player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
 

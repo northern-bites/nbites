@@ -67,9 +67,8 @@ def pfk_all(nav):
         sTheta = 0.0
     else:
         sTheta = MyMath.sign(hDiff) * constants.GOTO_SPIN_SPEED * \
-                 walker.getRotScale(hDiff)
+                 walker.getCloseRotScale(hDiff)
 
-        #sTheta = hDiff * walker.getRotScale(hDiff)
         sTheta = MyMath.clip(sTheta,
                              constants.OMNI_MIN_SPIN_SPEED,
                              constants.OMNI_MAX_SPIN_SPEED)

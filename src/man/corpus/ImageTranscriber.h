@@ -7,9 +7,9 @@
 #include "ImageSubscriber.h"
 
 class ImageTranscriber {
-public:
-    ImageTranscriber(boost::shared_ptr<Sensors> s)
-        : sensors(s) { }
+ public:
+ ImageTranscriber(boost::shared_ptr<Sensors> s)
+     : sensors(s) { }
     virtual ~ImageTranscriber() { }
 
     virtual void setSubscriber(ImageSubscriber *_subscriber) {
@@ -18,7 +18,7 @@ public:
 
     virtual void releaseImage() = 0;
 
-protected:
+ protected:
     boost::shared_ptr<Sensors> sensors;
     //void(ImageSubscriber::*imageCallback)();
     ImageSubscriber *subscriber;

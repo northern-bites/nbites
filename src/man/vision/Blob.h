@@ -22,6 +22,9 @@ public:
 		{leftBottom.x = lb.x; leftBottom.y = lb.y;}
 	void setRightBottom(point <int> rb)
 		{rightBottom.x = rb.x; rightBottom.y = rb.y;}
+    void setBlob(point <int> tl, point <int> tr, point <int> bl,
+                 point <int> br) {setLeftTop(tl); setRightTop(tr);
+        setLeftBottom(bl); setRightBottom(br);}
 	void setLeftTopX(int x) {leftTop.x = x;}
 	void setLeftTopY(int y) {leftTop.y = y;}
 	void setRightTopX(int x) {rightTop.x = x;}
@@ -30,35 +33,41 @@ public:
 	void setLeftBottomY(int y) {leftBottom.y = y;}
 	void setRightBottomX(int x) {rightBottom.x = x;}
 	void setRightBottomY(int y) {rightBottom.y = y;}
+    void setLeft(int x) {setLeftTopX(x); setLeftBottomX(x);}
+    void setRight(int x) {setRightTopX(x); setRightBottomX(x);}
+    void setTop(int y) {setLeftTopY(y); setRightTopY(y);}
+    void setBottom(int y) {setLeftBottomY(y); setRightBottomY(y);}
 	void setArea(int a) {area = a;}
 	void setPixels(int p) {pixels = p;}
 
 	// GETTERS
-	point<int> getLeftTop() {return leftTop;}
-	int getLeftTopX() {return leftTop.x;}
-	int getLeftTopY() {return leftTop.y;}
-	point<int> getRightTop() {return rightTop;}
-	int getRightTopX() {return rightTop.x;}
-	int getRightTopY() {return rightTop.y;}
-	point<int> getLeftBottom() {return leftBottom;}
-	int getLeftBottomX() {return leftBottom.x;}
-	int getLeftBottomY() {return leftBottom.y;}
-	point<int> getRightBottom() {return rightBottom;}
-	int getRightBottomX() {return rightBottom.x;}
-	int getRightBottomY() {return rightBottom.y;}
-	int getLeft() {return min(leftTop.x, leftBottom.x);}
-	int getRight() {return max(rightTop.x, rightBottom.x);}
-	int getTop() {return min(leftTop.y, rightTop.y);}
-	int getBottom() {return max(leftBottom.y, rightBottom.y);}
-	int width();
-	int height();
-	int getArea();
-	int getPixels() {return pixels;}
+	point<int> getLeftTop() const {return leftTop;}
+	int getLeftTopX() const {return leftTop.x;}
+	int getLeftTopY() const {return leftTop.y;}
+	point<int> getRightTop() const {return rightTop;}
+	int getRightTopX() const {return rightTop.x;}
+	int getRightTopY() const {return rightTop.y;}
+	point<int> getLeftBottom() const {return leftBottom;}
+	int getLeftBottomX() const {return leftBottom.x;}
+	int getLeftBottomY() const {return leftBottom.y;}
+	point<int> getRightBottom() const {return rightBottom;}
+	int getRightBottomX() const {return rightBottom.x;}
+	int getRightBottomY() const {return rightBottom.y;}
+	int getLeft() const {return min(leftTop.x, leftBottom.x);}
+	int getRight() const {return max(rightTop.x, rightBottom.x);}
+	int getTop() const {return min(leftTop.y, rightTop.y);}
+	int getBottom() const {return max(leftBottom.y, rightBottom.y);}
+    int getMidBottomX() const {return (leftBottom.x + rightBottom.x) / 2;}
+    int getMidBottomY() const {return (leftBottom.y + rightBottom.y) / 2;}
+	int width() const;
+	int height() const;
+	int getArea() const;
+	int getPixels() const {return pixels;}
 
     // blobbing
 	void init();
 	void merge(Blob other);
-	void printBlob();
+	void printBlob() const;
 
 private:
     // bounding coordinates of the blob

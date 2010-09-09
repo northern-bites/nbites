@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import java.awt.GridLayout;
+import javax.swing.BoxLayout;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -84,7 +85,6 @@ public class VisionState {
     private Vector<VisualFieldObject> visualFieldObjects;
     private Vector<VisualCorner> visualCorners;
 	private int tableSize = 128;
-	private int stats[][][][] = new int[tableSize][tableSize][tableSize][7];
 
     //gets the image from the data frame, inits colortable
     public VisionState(Frame f, ColorTable c) {
@@ -115,176 +115,13 @@ public class VisionState {
 		concerned with.
 	 */
 	public void initStats() {
-		for (int i = 0; i < tableSize; i++) {
-			for (int j = 0; j < tableSize; j++) {
-				for (int k = 0; k < tableSize; k++) {
-					for (int l = 0; l < 7; l++) {
-						stats[i][j][k][l] = 0;
-					}
-				}
-			}
-		}
 	}
 
 	public void reviseStats(boolean orange, boolean yellow, boolean blue, boolean white,
 							boolean red, boolean navy) {
-		// we need to find out where any errors are
-		//update(true);
-		updateObjects();
-		int MISSED = 1, CORRECT = 0, FALSEPOS = 2;
-		int org = CORRECT, yell = CORRECT, blew = CORRECT;
-		if (orange != seeBall) {
-			if (orange)
-				org = FALSEPOS;
-			else
-				org = MISSED;
-		}
-		if (seeYellow != GoalType.NO_POST) {
-			if (yellow)
-				yell = CORRECT;
-			else
-				yell = MISSED;
-		} else {
-			if (yellow)
-				yell = FALSEPOS;
-			else
-				yell = CORRECT;
-		}
-		if (seeBlue != GoalType.NO_POST) {
-			if (blue)
-				blew = CORRECT;
-			else
-				blew = MISSED;
-		} else {
-			if (blue)
-				blew = FALSEPOS;
-			else
-				blew = CORRECT;
-		}
-		// sometimes we don't need to process the frame
-		if (blew + yell + org == CORRECT) return;
-		frms++;
-		if (frms % 50 == 0) System.out.println("Processed "+frms+" frames");
-		// now go through the image and process accordingly
-        int Y_SHIFT =colorTable.getYShift();
-        int CB_SHIFT =colorTable.getCBShift();
-        int CR_SHIFT =colorTable.getCRShift();
-
-		int h = rawImage.getHeight();
-		int w = rawImage.getWidth();
-		Horizon poseHorizon = thresholdedImage.getVisionLink().getPoseHorizon();
-		int horizon = 100;
-		if (poseHorizon != null)
-			horizon = Math.max(0, poseHorizon.getLeftY());
-		for (int i = 0; i < w; i++) {
-			for (int j = horizon; j < h; j++) {
-				int[] current = rawImage.getPixel(i,j);
-				current[0] = current[0] >> Y_SHIFT;
-				current[1] = current[1] >> CB_SHIFT;
-				current[2] = current[2] >> CR_SHIFT;
-				if (org == MISSED) {
-					//stats[current[0]][current[1]][current[2]][ORANGE]++;
-				} else if (org == FALSEPOS) {
-					stats[current[0]][current[1]][current[2]][ORANGE]--;
-				}
-				if (yell == MISSED) {
-					//stats[current[0]][current[1]][current[2]][YELLOW]++;
-				} else if (yell == FALSEPOS) {
-					stats[current[0]][current[1]][current[2]][YELLOW]--;
-				}
-				if (blew == MISSED) {
-					//stats[current[0]][current[1]][current[2]][BLUE]++;
-				} else if (blew == FALSEPOS) {
-					stats[current[0]][current[1]][current[2]][BLUE]--;
-				}
-			}
-		}
 	}
 
 	public int learnGreenWhite() {
-        int Y_SHIFT =colorTable.getYShift();
-        int CB_SHIFT =colorTable.getCBShift();
-        int CR_SHIFT =colorTable.getCRShift();
-
-		int h = rawImage.getHeight();
-		int w = rawImage.getWidth();
-		int yes = 0;
-		int start = 0;
-		boolean sawStuff = false;
-		byte colors = Vision.BLACK, previousColor = Vision.BLACK;
-		Horizon poseHorizon = thresholdedImage.getVisionLink().getPoseHorizon();
-		int horizon = 100;
-		if (poseHorizon != null) {
-			horizon = Math.max(0, poseHorizon.getLeftY());
-		}
-		for (int j = 0; j < w; j++) {
-			for (int i = h - 5; i > horizon + 20; i--) {
-				if (i == h - 50) {
-					if (start == 0) {
-						start++;
-						previousColor = Vision.YELLOW;
-					}
-				}
-				if (Math.abs(rawImage.getComponent(j, i, 0) - rawImage.getComponent(j, i - 1, 0)) > 30) {
-					if (yes > 5) {
-						//if (start == 0) {
-						//	colors = Vision.BLACK;
-						//} else
-						// transition from darker to lighter suggests possibility of green to white
-						if (rawImage.getComponent(j, i, 0) > rawImage.getComponent(j, i - 1, 0)) {
-							colors = Vision.YELLOW;
-							if (previousColor == Vision.ORANGE && start > 0) {
-								for (int k = 1; k < yes; k++) {
-									int[] current = rawImage.getPixel(j, i + k);
-									current[0] = current[0] >> Y_SHIFT;
-									current[1] = current[1] >> CB_SHIFT;
-									current[2] = current[2] >> CR_SHIFT;
-									stats[current[0]][current[1]][current[2]][GREEN]--;
-									stats[current[0]][current[1]][current[2]][WHITE]++;
-								}
-								sawStuff = true;
-							}
-						} else {
-							// probably white to green
-							colors = Vision.ORANGE;
-							if (previousColor == Vision.YELLOW && start > 0) {
-								for (int k = 1; k < yes; k++) {
-									int[] current = rawImage.getPixel(j, i +k);
-									current[0] = current[0] >> Y_SHIFT;
-									current[1] = current[1] >> CB_SHIFT;
-									current[2] = current[2] >> CR_SHIFT;
-									stats[current[0]][current[1]][current[2]][GREEN]++;
-									stats[current[0]][current[1]][current[2]][WHITE]--;
-								}
-								sawStuff = true;
-							}
-						}
-						//thresholdedOverlay.drawCross(j, i, (byte)3, (byte)1, colors);
-						previousColor = colors;
-					} else {
-						previousColor = Vision.BLACK;
-					}
-					yes = 0;
-					start++;
-				} else {
-					yes++;
-				}
-			}
-			yes = 0;
-			start = 0;
-			previousColor = Vision.BLACK;
-		}
-		// we don't like green over the horizon
-		for (int i = 0; i < horizon - 10; i++) {
-			for (int j = 0; j < w; j+= 5) {
-					int[] current = rawImage.getPixel(j,i);
-					current[0] = current[0] >> Y_SHIFT;
-					current[1] = current[1] >> CB_SHIFT;
-					current[2] = current[2] >> CR_SHIFT;
-					stats[current[0]][current[1]][current[2]][GREEN]--;
-			}
-		}
-		if (sawStuff) return 1;
 		return 0;
 	}
 
@@ -293,91 +130,7 @@ public class VisionState {
 	 */
 	public int moreLearnGreenWhite(int yMin, int yMax, int uMin, int uMax, int vMin,
 									int vMax) {
-		// remember to re-initialize the stats
-        int Y_SHIFT =colorTable.getYShift();
-        int CB_SHIFT =colorTable.getCBShift();
-        int CR_SHIFT =colorTable.getCRShift();
-
-		int h = rawImage.getHeight();
-		int w = rawImage.getWidth();
-		int yes = 0;
-		int start = 0;
-		byte colors = Vision.BLACK, previousColor = Vision.BLACK;
-		byte cur = Vision.GREEN, previous = Vision.GREEN;
-		int evidence = 0;
-		int horizon = thresholdedImage.getVisionLink().getVisionHorizon();
-		int updated = 0;
-		int run, badones;
-		int startrun = 0;
-		int lastone = 0;
-		int total = 0;
-		for (int j = 0; j < w; j++) {
-			previous = Vision.GREEN;
-			run = 0;
-			total = 0;
-			badones = 0;
-			for (int i = h - 5; i > horizon + 20; i--) {
-				// get the color of the new pixel
-				int[] current = rawImage.getPixel(j, i);
-				current[0] = current[0] >> Y_SHIFT;
-				current[1] = current[1] >> CB_SHIFT;
-				current[2] = current[2] >> CR_SHIFT;
-				cur = colorTable.getRawColor(current);
-				if (cur == previous) {
-					if (run == 0)
-						startrun = i;
-					run++;
-					total++;
-					lastone = i;
-				} else {
-					if (cur == Vision.GREY) {
-						badones++;
-						total++;
-						if (badones > 4) {
-							run = 0;
-							total = 0;
-						}
-					} else {
-						if (previous == Vision.GREEN && run > 8) {
-							// we had a run of GREEN
-							for (int k = lastone; k < startrun; k++) {
-								current = rawImage.getPixel(j, k);
-								current[0] = current[0] >> Y_SHIFT;
-								current[1] = current[1] >> CB_SHIFT;
-								current[2] = current[2] >> CR_SHIFT;
-								if (current[0] > yMin - 10 && current[0] < yMin + 8) {
-									stats[current[0]][current[1]][current[2]][GREEN]++;
-									stats[current[0]][current[1]][current[2]][WHITE]--;
-								}
-							}
-						} else if (previous == Vision.WHITE && run > 8) {
-							for (int k = lastone; k < startrun; k++) {
-								current = rawImage.getPixel(j, k);
-								current[0] = current[0] >> Y_SHIFT;
-								current[1] = current[1] >> CB_SHIFT;
-								current[2] = current[2] >> CR_SHIFT;
-								stats[current[0]][current[1]][current[2]][GREEN]--;
-								stats[current[0]][current[1]][current[2]][WHITE]++;
-							}
-						} else {
-							run = 0;
-							startrun = i;
-						}
-					}
-				}
-			}
-		}
-		// we don't like green over the horizon
-		for (int i = 0; i < horizon - 10; i++) {
-			for (int j = 0; j < w; j+= 5) {
-					int[] current = rawImage.getPixel(j,i);
-					current[0] = current[0] >> Y_SHIFT;
-					current[1] = current[1] >> CB_SHIFT;
-					current[2] = current[2] >> CR_SHIFT;
-					stats[current[0]][current[1]][current[2]][GREEN]--;
-			}
-		}
-		return updated;
+		return 0;
 	}
 
 	public boolean between(int x, int y, int z) {
@@ -385,242 +138,16 @@ public class VisionState {
 	}
 
 	public void updateGreenWhite(int frames) {
-		int pixie[] = new int[3];
-		byte cur = Vision.GREY;
-		System.out.println("Doing green and white with "+frames);
-		int count = 0;
-		int changed = 0;
-		int start = 0;
-		for (int i = 0; i < tableSize; i++) {
-			for (int j = 0; j < tableSize; j++) {
-				for (int k = 0; k < tableSize; k++) {
-					//if (!revision) {
-						pixie[0] = i; pixie[1] = j; pixie[2] = k;
-						for (int l = start; l < 2; l++) {
-							int need = 5;
-							if (l == GREEN) {
-								if (frames > 0) {
-									need = frames / 20;
-									if (stats[i][j][k][l] > 5 && stats[i][j][k][l] <= need)
-										count++;
-								} else {
-									need = 200;
-								}
-							}
-							if (stats[i][j][k][l] > need && colorTable.getRawColor(pixie) == Vision.GREY) {
-								byte col = Vision.GREY;
-								switch (l) {
-								case WHITE:
-									col = Vision.WHITE; break;
-								case GREEN:
-									changed++;
-									col = Vision.GREEN; break;
-								}
-								colorTable.setRawColor(pixie, col);
-								l = 12;
-							}
-						}
-				}
-			}
-		}
-		System.out.println("Ignored "+count+" potential green pixels while changing "+changed);
-		// now let's improve the colors a bit
-		colorTable.loseIslands(Vision.WHITE);
-		colorTable.loseIslands(Vision.GREEN);
-		byte col = Vision.GREEN;
-		for (int i = 0; i < 2; i++) {
-			switch (i) {
-			case WHITE:
-				col = Vision.WHITE; break;
-			case GREEN:
-				col = Vision.GREEN; break;
-			}
-			ColorTableUpdate up;
-			do {
-				up = colorTable.fillHoles(col);
-			} while (up.getSize() > 0);
-		}
 	}
 
 	/** Go through the current
 	 */
 	public void updateStats(boolean orange, boolean yellow, boolean blue, boolean white,
 							boolean red, boolean navy) {
-        int Y_SHIFT =colorTable.getYShift();
-        int CB_SHIFT =colorTable.getCBShift();
-        int CR_SHIFT =colorTable.getCRShift();
-
-		int h = rawImage.getHeight();
-		int w = rawImage.getWidth();
-		int yes = 0;
-		int start = 0;
-		byte colors = Vision.BLACK, previousColor = Vision.BLACK;
-		Horizon poseHorizon = thresholdedImage.getVisionLink().getPoseHorizon();
-		int horizon = 100;
-		if (poseHorizon != null) {
-			horizon = Math.max(0, poseHorizon.getLeftY());
-		}
-		int max[]  = new int[w];
-		for (int i = 0; i < w; i++) {
-			max[i] = h;
-		}
-		// determine the top green edge for the field
-		for (int i = 0; i < w; i++) {
-			for (int j = h - 1; j > horizon; j--) {
-				int[] pix = rawImage.getPixel(i,j);
-				pix[0] = pix[0] >> Y_SHIFT;
-				pix[1] = pix[1] >> CB_SHIFT;
-				pix[2] = pix[2] >> CR_SHIFT;
-				byte col = colorTable.getRawColor(pix);
-				if (col == Vision.GREEN) {
-					max[i] = j;
-				}
-			}
-		}
-
-		for (int i = 0; i < w; i++) {
-			for (int j = horizon; j < h; j++) {
-				int[] current = rawImage.getPixel(i,j);
-				current[0] = current[0] >> Y_SHIFT;
-				current[1] = current[1] >> CB_SHIFT;
-				current[2] = current[2] >> CR_SHIFT;
-				if (orange) {
-					stats[current[0]][current[1]][current[2]][ORANGE]++;
-				} else {
-					stats[current[0]][current[1]][current[2]][ORANGE]-=2;
-				}
-				if (yellow && j < max[i]) {
-					stats[current[0]][current[1]][current[2]][YELLOW]++;
-				} else  {
-					stats[current[0]][current[1]][current[2]][YELLOW]--;
-				}
-				if (blue) {
-					stats[current[0]][current[1]][current[2]][BLUE]++;
-				} else {
-					stats[current[0]][current[1]][current[2]][BLUE]--;
-				}
-				if (red) {
-					stats[current[0]][current[1]][current[2]][RED]++;
-				} else {
-					stats[current[0]][current[1]][current[2]][RED]--;
-				}
-				if (navy) {
-					stats[current[0]][current[1]][current[2]][NAVY]++;
-				} else {
-					stats[current[0]][current[1]][current[2]][NAVY]--;
-				}
-			}
-		}
 	}
 
 	public void printStats(int frames, int balls, int yposts, int bposts, int crosses,
 						   int rrobots, int brobots, boolean revision) {
-		int pixie[] = new int[3];
-		int avg[][] = new int[3][7];
-		int tots[] = new int[7];
-		byte cur = Vision.GREY;
-		int need = 0;
-		for (int i = 0; i < 7; i++) {
-			avg[0][i] = 0;
-			avg[1][i] = 0;
-			avg[2][i] = 0;
-			tots[0] = 0;
-		}
-		for (int i = 0; i < tableSize; i++) {
-			for (int j = 0; j < tableSize; j++) {
-				for (int k = 0; k < tableSize; k++) {
-					//if (!revision) {
-						pixie[0] = i; pixie[1] = j; pixie[2] = k;
-						//colorTable.setRawColor(pixie, Vision.GREY);
-						if (colorTable.getRawColor(pixie) == Vision.GREY) {
-							for (int l = 2; l < 7; l++) {
-								switch (l) {
-									case ORANGE:
-										need = balls / 20; break;
-									case YELLOW:
-										need = yposts / 20; break;
-									case BLUE:
-										need = bposts / 20; break;
-									case NAVY:
-										need = brobots / 10; break;
-									case RED:
-										need = rrobots / 10; break;
-								}
-								if (stats[i][j][k][l] > need) {
-									avg[0][l] += i; avg[1][l] += j; avg[2][l] += k;
-									tots[l]++;
-									byte col = Vision.GREY;
-									switch (l) {
-									case ORANGE:
-										col = Vision.ORANGE; break;
-									case YELLOW:
-										col = Vision.YELLOW; break;
-									case BLUE:
-										col = Vision.BLUE; break;
-									case NAVY:
-										col = Vision.NAVY; break;
-									case RED:
-										col = Vision.RED; break;
-									}
-									colorTable.setRawColor(pixie, col);
-									l = 12;
-								}
-							}
-						}
-				}
-			}
-		}
-		// now let's improve the colors a bit
-		colorTable.loseIslands(Vision.ORANGE);
-		colorTable.loseIslands(Vision.BLUE);
-		colorTable.loseIslands(Vision.YELLOW);
-		byte col = Vision.GREEN;
-		for (int i = 2; i < 7; i++) {
-			switch (i) {
-			case ORANGE:
-				col = Vision.ORANGE; break;
-			case YELLOW:
-				col = Vision.YELLOW; break;
-			case BLUE:
-				col = Vision.BLUE; break;
-			case NAVY:
-				col = Vision.NAVY; break;
-			case RED:
-				col = Vision.RED; break;
-			}
-			ColorTableUpdate up;
-			do {
-				up = colorTable.fillHoles(col);
-			} while (up.getSize() > 0);
-		}
-		/*for (int l = 0; l < 7; l++) {
-			avg[0][l] = avg[0][l] / tots[l];
-			avg[1][l] = avg[1][l] / tots[l];
-			avg[2][l] = avg[2][l] / tots[l];
-			pixie[0] = avg[0][l];
-			pixie[1] = avg[1][l];
-			pixie[2] = avg[2][l];
-			byte col = Vision.GREY;
-			switch (l) {
-			case ORANGE:
-				col = Vision.ORANGE; break;
-			case WHITE:
-				col = Vision.WHITE; break;
-			case YELLOW:
-				col = Vision.YELLOW; break;
-			case BLUE:
-				col = Vision.BLUE; break;
-			case NAVY:
-				col = Vision.NAVY; break;
-			case RED:
-				col = Vision.RED; break;
-			case GREEN:
-				col = Vision.GREEN; break;
-			}
-			System.out.println("Color "+l+" "+pixie[0]+" "+pixie[1]+" "+pixie[2]);
-			colorTable.setRawColor(pixie, col);
-			}*/
-
 	}
 
     public void newFrame(Frame f, ColorTable c) {
@@ -945,6 +472,7 @@ public class VisionState {
 	{
 		JFrame debugWindow = new JFrame();
 		JPanel buttonPanel = new JPanel();
+		JPanel ballPanel = new JPanel();
 
 		final JCheckBox fieldLinesDebugVertEdgeDetectBox = new JCheckBox(" Debug VertEdgeDetect");
 		fieldLinesDebugVertEdgeDetectBox.addActionListener(new ActionListener(){
@@ -1020,6 +548,78 @@ public class VisionState {
 					thresholdedImage.getVisionLink().
 						setFieldLinesDebugCornerAndObjectDistances(fieldLinesDebugCornerAndObjectDistancesBox.isSelected());}
 			});
+		final JCheckBox ballDebugBallBox = new JCheckBox(" Debug Balls");
+		ballDebugBallBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugBall(ballDebugBallBox.isSelected());}
+			});
+		final JCheckBox ballDebugBallDistanceBox = new JCheckBox(" Debug Ball Distance");
+		ballDebugBallDistanceBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugBallDistance(ballDebugBallDistanceBox.isSelected());}
+			});
+		final JCheckBox crossDebugBox = new JCheckBox(" Debug Cross");
+		crossDebugBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugCross(crossDebugBox.isSelected());}
+			});
+		final JCheckBox postPrintBox = new JCheckBox(" Debug Posts Print");
+		postPrintBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPostPrint(postPrintBox.isSelected());}
+			});
+		final JCheckBox postDebugBox = new JCheckBox(" Debug Posts");
+		postDebugBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPost(postDebugBox.isSelected());}
+			});
+		final JCheckBox postLogicBox = new JCheckBox(" Debug Posts Logic");
+		postLogicBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPostLogic(postLogicBox.isSelected());}
+			});
+		final JCheckBox postSanityBox = new JCheckBox(" Debug Posts Sanity");
+		postSanityBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPostSanity(postSanityBox.isSelected());}
+			});
+		final JCheckBox postCorrectBox = new JCheckBox(" Debug Posts Correct");
+		postCorrectBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugPostCorrect(postCorrectBox.isSelected());}
+			});
+		final JCheckBox fieldHorizonBox = new JCheckBox(" Debug Field Horizon");
+		fieldHorizonBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugFieldHorizon(fieldHorizonBox.isSelected());}
+			});
+		final JCheckBox fieldEdgeBox = new JCheckBox(" Debug Field Edge");
+		fieldEdgeBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugFieldEdge(fieldEdgeBox.isSelected());}
+			});
+		final JCheckBox openFieldBox = new JCheckBox(" Debug Open Field");
+		openFieldBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugOpenField(openFieldBox.isSelected());}
+			});
+		final JCheckBox shootingBox = new JCheckBox(" Debug Shooting");
+		shootingBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugShooting(shootingBox.isSelected());}
+			});
 
 		buttonPanel.add(new JLabel("\tField Line Flags"));
 		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
@@ -1034,11 +634,27 @@ public class VisionState {
 		buttonPanel.add(fieldLinesDebugIdentifyCornersBox);
 		buttonPanel.add(fieldLinesDebugCcScanBox);
 		buttonPanel.add(fieldLinesDebugRiskyCornersBox);
+		ballPanel.add(new JLabel("\tVision Flags"));
+		ballPanel.add(ballDebugBallBox);
+		ballPanel.add(ballDebugBallDistanceBox);
+		ballPanel.add(crossDebugBox);
+		ballPanel.add(postPrintBox);
+		ballPanel.add(postDebugBox);
+		ballPanel.add(postLogicBox);
+		ballPanel.add(postSanityBox);
+		ballPanel.add(postCorrectBox);
+		ballPanel.add(fieldHorizonBox);
+		ballPanel.add(fieldEdgeBox);
+        ballPanel.add(openFieldBox);
+        ballPanel.add(shootingBox);
+		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
-		buttonPanel.setLayout(new GridLayout(13,1));
-
-		debugWindow.add(buttonPanel);
-		debugWindow.setSize(400,400);
+		JPanel debugPanel = new JPanel();
+		debugPanel.setLayout(new GridLayout(1,1));
+		debugPanel.add(buttonPanel);
+		debugPanel.add(ballPanel);
+		debugWindow.add(debugPanel);
+		debugWindow.setSize(500, 500);
 		debugWindow.setVisible(true);
 
         // Disable all the debugging information by default
@@ -1067,5 +683,16 @@ public class VisionState {
 
         thresholdedImage.getVisionLink().
             setFieldLinesDebugCornerAndObjectDistances(false);
+
+		thresholdedImage.getVisionLink().setDebugBall(false);
+		thresholdedImage.getVisionLink().setDebugBallDistance(false);
+		thresholdedImage.getVisionLink().setDebugCross(false);
+		thresholdedImage.getVisionLink().setDebugPostPrint(false);
+		thresholdedImage.getVisionLink().setDebugPost(false);
+		thresholdedImage.getVisionLink().setDebugPostLogic(false);
+		thresholdedImage.getVisionLink().setDebugPostSanity(false);
+		thresholdedImage.getVisionLink().setDebugPostCorrect(false);
+		thresholdedImage.getVisionLink().setDebugFieldHorizon(false);
+		thresholdedImage.getVisionLink().setDebugFieldEdge(false);
 	}
 }

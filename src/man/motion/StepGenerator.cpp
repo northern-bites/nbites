@@ -232,7 +232,8 @@ void StepGenerator::findSensorZMP(){
 
 }
 
-float StepGenerator::scaleSensors(const float sensorZMP, const float perfectZMP){
+float StepGenerator::scaleSensors(const float sensorZMP,
+                                  const float perfectZMP) const {
     const float sensorWeight = 0.0f;//gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }

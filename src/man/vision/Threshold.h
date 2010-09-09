@@ -180,6 +180,8 @@ public:
     void setConstant(int c);
     void setHorizonDebug(bool _bool) { visualHorizonDebug = _bool; }
     bool getHorizonDebug() { return visualHorizonDebug; }
+    void setDebugShooting(bool _bool) {debugShot = _bool;}
+    void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
 #endif
 
     void initDebugImage();
@@ -225,6 +227,7 @@ public:
     Cross* cross;
     // main array
     unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
+	Field* field;
 
 #ifdef OFFLINE
     //write lines, points, boxes to this array to avoid changing the real image
@@ -236,7 +239,6 @@ private:
     // class pointers
     Vision* vision;
     boost::shared_ptr<NaoPose> pose;
-    Field* field;
 
     const uchar* yuv;
     const uchar* yplane, *uplane, *vplane;

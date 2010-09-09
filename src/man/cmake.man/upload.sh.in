@@ -19,7 +19,7 @@ if [ "$WEBOTS" = "" ]; then
     WEBOTS="OFF"
 fi
 
-NAO_CONTROLLER=projects/contests/nao_robocup/controllers/nao_soccer_player_red
+NAO_CONTROLLER=projects/contests/robotstadium/controllers/nao_team_1
 
 if [ $WEBOTS = "ON" ]; then
 echo "Setting local install to WEBOT"
@@ -29,13 +29,13 @@ else
 fi
 
 COLOR_TABLE_PATH=${COLOR_TABLE}
-COLOR_TABLE_DIR=${MAN_INSTALL_PREFIX}/etc
+COLOR_TABLE_DIR=${MAN_INSTALL_PREFIX}/lib
 TABLE_STD_NAME=table.mtb
 
 if [ $REMOTE = "ON" ] && [  $WEBOTS = "OFF" ] ; then
 
   echo "Installing remotely"
-  SRC=${MAN_INSTALL_PREFIX}/lib/* #cross_install/lib/*
+  SRC=${MAN_INSTALL_PREFIX}/lib/*
   DEST=/home/nao/naoqi/lib/naoqi
 
   if [ ! -n "$ROBOT" ]; then
@@ -63,12 +63,6 @@ echo "echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt"
 echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt
 echo "cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME"
 cp $COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TABLE_STD_NAME
-#TODO make this only one rsync call
+
 echo "rsync -rcLv $SRC $DEST/"
 rsync -rcLv $SRC $DEST/
-
-ETC_SRC=${MAN_INSTALL_PREFIX}/etc/*
-ETC_DEST=$DEST/../../etc
-rsync -rcLv $ETC_SRC $ETC_DEST/
-#echo "scp -rv $SRC $DEST/"
-#scp -r $SRC $DEST/

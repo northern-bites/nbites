@@ -27,27 +27,27 @@
 
 class CoordHeadCommand : public MotionCommand
 {
-public:
-    CoordHeadCommand( const float _yaw,
-					  const float _pitch,
-					  const float _maxSpeedYaw =
-                      Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
-                      const float _maxSpeedPitch =
-                      Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
-		)
-        : MotionCommand( MotionConstants::COORD_HEAD ),
-		  yaw( _yaw ),
-		  pitch( _pitch ),
-		  maxSpeedYaw( _maxSpeedYaw ),
-		  maxSpeedPitch( _maxSpeedPitch )
+ public:
+ CoordHeadCommand( const float _yaw,
+                   const float _pitch,
+                   const float _maxSpeedYaw =
+                   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
+                   const float _maxSpeedPitch =
+                   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
+                   )
+     : MotionCommand( MotionConstants::COORD_HEAD ),
+        yaw( _yaw ),
+        pitch( _pitch ),
+        maxSpeedYaw( _maxSpeedYaw ),
+        maxSpeedPitch( _maxSpeedPitch )
         {
             setChainList();
         }
-	const float getMaxSpeedYaw() const { return maxSpeedYaw; }
-	const float getMaxSpeedPitch() const { return maxSpeedPitch; }
-	const float getPitch() const { return pitch; }
-	const float getYaw() const { return yaw; }
-private:
+    const float getMaxSpeedYaw() const { return maxSpeedYaw; }
+    const float getMaxSpeedPitch() const { return maxSpeedPitch; }
+    const float getPitch() const { return pitch; }
+    const float getYaw() const { return yaw; }
+ private:
 
     virtual void setChainList() {
         chainList.insert(chainList.end(),
@@ -55,9 +55,9 @@ private:
                          MotionConstants::HEAD_JOINT_CHAINS
                          + MotionConstants::HEAD_JOINT_NUM_CHAINS);
     }
-private:
-	const float yaw, pitch;
-	const float maxSpeedYaw, maxSpeedPitch;
+ private:
+    const float yaw, pitch;
+    const float maxSpeedYaw, maxSpeedPitch;
 };
 
 #endif
