@@ -21,7 +21,7 @@ SET( CMAKE_COLOR_MAKEFILE TRUE )
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   GET_FILENAME_COMPONENT( TRUNK_PATH ../../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
@@ -109,11 +109,11 @@ ELSE(WEBOTS_BACKEND)
 
 ENDIF(WEBOTS_BACKEND)
 
-############################ PROJECT SOURCES FILES 
+############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
   ${CORPUS_INCLUDE_DIR}/PySensors
-  ${CORPUS_INCLUDE_DIR}/NaoPose 
+  ${CORPUS_INCLUDE_DIR}/NaoPose
   ${CORPUS_INCLUDE_DIR}/CameraCalibrate)
 
 
