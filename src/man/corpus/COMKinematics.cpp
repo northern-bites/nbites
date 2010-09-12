@@ -4,7 +4,7 @@ using namespace NBMath;
 using namespace std;
 using namespace boost::numeric;
 
-#define DEBUG_COM
+//#define DEBUG_COM
 
 const ufvector4
 Kinematics::getCOMc(const vector<float> bodyAngles){
