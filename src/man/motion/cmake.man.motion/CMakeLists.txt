@@ -122,8 +122,7 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/WalkingArm
 		     ${MOTION_INCLUDE_DIR}/PreviewController
 		     ${MOTION_INCLUDE_DIR}/Observer
-		     ${MOTION_INCLUDE_DIR}/ZmpEKF
-		     ${MOTION_INCLUDE_DIR}/ZmpAccEKF
+		     ${MOTION_INCLUDE_DIR}/ZmpExp
 		     ${MOTION_INCLUDE_DIR}/ZmpAccExp
 		     ${MOTION_INCLUDE_DIR}/StepGenerator
                      ${CORPUS_INCLUDE_DIR}/InverseKinematics

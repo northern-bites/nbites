@@ -57,8 +57,6 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     rightLeg(s,gait,&sensorAngles,RLEG_CHAIN),
     leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),
     supportFoot(LEFT_SUPPORT),
-    //controller_x(new PreviewController()),
-    //controller_y(new PreviewController())
     controller_x(new Observer()),
     controller_y(new Observer()),
     zmp_filter(),
@@ -175,8 +173,6 @@ void StepGenerator::generate_steps(){
  * example data.
  */
 void StepGenerator::findSensorZMP(){
-
-    //TODO: Figure out how to use unfiltered
     Inertial inertial = sensors->getInertial();
 
     //The robot may or may not be tilted with respect to vertical,
@@ -184,7 +180,6 @@ void StepGenerator::findSensorZMP(){
     //we would like to rotate the sensor measurements appropriately.
     //We will use angleX, and angleY:
 
-    //TODO: Rotate with angleX,etc
     const ufmatrix4 bodyToWorldTransform =
         prod(CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, -inertial.angleX),
              CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -inertial.angleY));
@@ -193,17 +188,19 @@ void StepGenerator::findSensorZMP(){
                                                           inertial.accY,
                                                           inertial.accZ);
 
-    accInWorldFrame = accInBodyFrame;
+    //accInWorldFrame = accInBodyFrame;
     //TODO: Currently rotating the coordinate frames exacerbates the problem
     //      but theoretically it should get the sensor zmp curve to more closely
     //      mimic the reference zmp.
     //global
-//     accInWorldFrame = prod(bodyToWorldTransform,
-//                            accInBodyFrame);
-//     cout << endl<< "########################"<<endl;
-//     cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
-//     cout << "Accel in world frame: "<< accInWorldFrame <<endl;
-//     cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
+
+     accInWorldFrame = prod(bodyToWorldTransform,
+                            accInBodyFrame);
+
+     //cout << endl<< "########################"<<endl;
+	 //cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
+     //cout << "Accel in world frame: "<< accInWorldFrame <<endl;
+     //cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
 
     acc_filter.update(accInWorldFrame(0),
                       accInWorldFrame(1),
@@ -225,12 +222,13 @@ void StepGenerator::findSensorZMP(){
          accel_i(0),accel_i(1)};
 
     zmp_filter.update(tUp,pMeasure);
-
 }
 
 float StepGenerator::scaleSensors(const float sensorZMP,
                                   const float perfectZMP) const {
-    const float sensorWeight = 0.0f;//gait->sensor[WP::OBSERVER_SCALE];
+
+	// TODO: find a better value for this!
+    const float sensorWeight = 0.25f; //gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
@@ -243,6 +241,7 @@ void StepGenerator::tick_controller(){
     cout << "StepGenerator::tick_controller" << endl;
 #endif
 
+	// update the acc/gyro filters
     findSensorZMP();
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
@@ -712,7 +711,7 @@ void StepGenerator::resetSteps(const bool startLeft){
     controller_y->initState(0.0f,0.0f,0.0f);
 
     //Each time we restart, we need to reset the estimated sensor ZMP:
-    zmp_filter = ZmpEKF();
+    zmp_filter = ZmpExp();
 
     sensorAngles.reset();
 

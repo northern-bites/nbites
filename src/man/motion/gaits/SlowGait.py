@@ -17,7 +17,7 @@ STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
                1.0,  # stepHeight
                0.0,  # step lift
-               15.0,  # max x speed
+               1.0,  # max x speed
                -8.0,  # max x speed
                12.0,  # max y speed
                25.0, # max theta speed()

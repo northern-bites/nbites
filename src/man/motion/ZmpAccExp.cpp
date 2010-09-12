@@ -2,7 +2,7 @@
 #include "ExponentialFilter.h"
 
 ZmpAccExp::ZmpAccExp()
-	: ExponentialFilter<AccelMeasurement, num_dimensions> (alpha)
+	: ExponentialFilter<AccelMeasurement, num_dimensions> ()
 {
 }
 
@@ -18,8 +18,7 @@ void ZmpAccExp::update(const float accX,
 
 void ZmpAccExp::incorporateMeasurement(AccelMeasurement m) {
 	// maintain the x, y & z components of the AccelMeasurement
-	updateDimension(0, m.x);
-	updateDimension(1, m.y);
-	updateDimension(2, m.z);
+	updateDimension(ZMP_ACCEXP_X, m.x);
+	updateDimension(ZMP_ACCEXP_Y, m.y);
+	updateDimension(ZMP_ACCEXP_Z, m.z);
 }
-
