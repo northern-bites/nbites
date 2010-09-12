@@ -204,7 +204,7 @@ void StepGenerator::findSensorZMP(){
 //     cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
 //     cout << "Accel in world frame: "<< accInWorldFrame <<endl;
 //     cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
-    //acc_filter.update(inertial.accX,inertial.accY,inertial.accZ);
+
     acc_filter.update(accInWorldFrame(0),
                       accInWorldFrame(1),
                       accInWorldFrame(2));
@@ -243,9 +243,7 @@ void StepGenerator::tick_controller(){
     cout << "StepGenerator::tick_controller" << endl;
 #endif
 
-    //Turned off sensor zmp for now since we have a better method
-    //JS June 2009
-    //findSensorZMP();
+    findSensorZMP();
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
 
@@ -268,12 +266,7 @@ void StepGenerator::tick_controller(){
 
     const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x,
                                            est_zmp_i(0));
-    /*
-    // TODO! for now we are disabling the observer for the x direction
-    // by reporting a sensor zmp equal to the planned/expected value
-    const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x,
-                                           cur_zmp_ref_x); // NOTE!
-    */
+
     const float com_y = controller_y->tick(zmp_ref.get<1>(),cur_zmp_ref_y,
                                            est_zmp_i(1));
     com_i = CoordFrame3D::vector3D(com_x,com_y);

@@ -90,7 +90,7 @@
 #include "Sensors.h"
 #include "NBMatrixMath.h"
 #include "ZmpEKF.h"
-#include "ZmpAccEKF.h"
+#include "ZmpAccExp.h"
 
 //Debugging flags:
 #ifdef WALK_DEBUG
@@ -233,7 +233,7 @@ private:
     WalkController *controller_x, *controller_y;
 
     ZmpEKF zmp_filter;
-    ZmpAccEKF acc_filter;
+	ZmpAccExp acc_filter;
 
     NBMath::ufvector4 accInWorldFrame;
 
