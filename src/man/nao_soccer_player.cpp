@@ -53,6 +53,22 @@ void WBCreateMan(){
     man->startSubThreads();
 }
 
+void WBTickMan(int time_step) {
+   wb_robot_step(time_step);
+
+   //step motion
+   enactor->sendCommands();
+   enactor->postSensors();
+   //step vision
+   transcriber->postVisionSensors();
+   imageTranscriber->waitForImage();
+
+   //step motion (2nd time)
+   usleep(2000);
+   enactor->sendCommands();
+   enactor->postSensors();
+}
+
 void WBDestroyMan(){
     man->stopSubThreads();
 }
@@ -67,20 +83,7 @@ int main() {
 
   // forever
   for (;;) {
-    wb_robot_step(time_step);
-
-    //step motion
-    enactor->sendCommands();
-    enactor->postSensors();
-    //step vision
-    transcriber->postVisionSensors();
-    imageTranscriber->waitForImage();
-
-    //step motion (2nd time)
-    usleep(2000);
-    enactor->sendCommands();
-    enactor->postSensors();
-
+	  WBTickMan(time_step);
   }
 
   WBDestroyMan();

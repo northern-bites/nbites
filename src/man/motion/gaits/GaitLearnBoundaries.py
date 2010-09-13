@@ -26,76 +26,74 @@ def arrayToGaitTuple(array):
 
     return (stance, step, zmp, hack, sensor, stiffness, odo, arm)
 
-stanceMin = (31.00, # CoM height
-            0.0,   #** Forward displacement of CoM
-            10.0,  # Horizontal distance between feet
-            0.0,   #** Body angle around y axis
-            0.0,   # Angle between feet
-            0.1)   # Time to transition to/from this stance
+stanceMin = (31.00,  # CoM height
+             0.0,    #** Forward displacement of CoM
+             9.0,    #** Horizontal distance between feet
+             0.0,    #** Body angle around y axis
+             0.0,    #** Angle between feet
+             0.2)    # Time to transition to/from this stance
 
 stanceMax = (31.00, # CoM height
-             10.0,  #** Forward displacement of CoM
-             10.0,  # Horizontal distance between feet
+             5.0,   #** Forward displacement of CoM
+             12.0,  #** Horizontal distance between feet
              10.0,  #** Body angle around y axis
-             0.0,   # Angle between feet
-             0.1)   # Time to transition to/from this stance
+             10.0,  #** Angle between feet
+             0.2)   # Time to transition to/from this stance
 
-stepMin = (0.2,   #** step duration
-           0.05,  #** fraction in double support
-           0.1,   #** stepHeight
-           -20.0, #** step lift
-           15.0,  # max x speed
+stepMin = (0.25,   #** step duration
+           0.2,   #** fraction in double support
+           1.5,   #** stepHeight
+           -15.0, #** step lift
+           15.0,  #** max x speed
            -5.0,  # max x speed
-           15.0,  # max y speed
-           45.0,  # max theta speed()
-           7.0,   # max x accel
+           10.0,  # max y speed
+           30.0,  # max theta speed()
+           3.0,   # **max x accel
            7.0,   # max y accel
            20.0,  # max theta speed()
            1.0)   # walk gait = true
 
-stepMax = (1.0,   #** step duration
-           0.9,   #** fraction in double support
+stepMax = (0.4,   #** step duration
+           0.5,   #** fraction in double support
            5.0,   #** stepHeight
-           0.0,   #** step lift
-           15.0,  # max x speed
+           15.0,   #** step lift
+           15.0,  #** max x speed
            -5.0,  # max x speed
            15.0,  # max y speed
-           45.0,  # max theta speed()
-           7.0,   # max x accel
+           30.0,  # max theta speed()
+           7.0,   #** max x accel
            7.0,   # max y accel
            20.0,  # max theta speed()
            1.0)   # walk gait = true
 
-zmpMin = zmpMax = (0.0,   # footCenterLocX
-                   0.3,   # zmp static percentage
-                   0.45,  # left zmp off
-                   0.45,  # right zmp off
-                   0.01,  # strafe zmp offse
-                   6.6)   # turn zmp offset
+zmpMin = (0.0,   # footCenterLocX
+          0.1,   # **zmp static percentage
+          0.2,  # ** left zmp off
+          0.2,  # ** right zmp off
+          0.01,  # strafe zmp offse
+          6.6)   # turn zmp offset
 
-hackMin = (0.0,   #** joint hack
-           0.0)   #** joint hack
+zmpMax = (0.0,   # footCenterLocX
+          0.5,   # ** zmp static percentage
+          0.8,  # ** left zmp off
+          0.8,  # ** right zmp off
+          0.01,  # strafe zmp offset
+          6.6)   # turn zmp offset
 
-hackMax =  (10.0,  #** joint hack
-           10.0)  #** joint hack
+hackMin = (5.5,   # joint hack
+           5.5)   # joint hack
 
-sensorMin = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
-             0.0,   #** angle X scale (gamma)
-             0.0,   #** angle Y scale (gamma)
-             250.0, # X spring constant k (kg/s^2)
-             100.0, # Y spring constant k (kg/s^2)
-             7.0,   # max angle X (compensation)
-             7.0,   # max angle Y
-             45.0)  # max angle vel (change in compensation)
+hackMax =  (5.5,  # joint hack
+           5.5)   # joint hack (L/R should be same)
 
-sensorMax = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
-             1.0,   #** angle X scale (gamma)
-             1.0,   #** angle Y scale (gamma)
-             250.0, # X spring constant k (kg/s^2)
-             100.0, # Y spring constant k (kg/s^2)
-             7.0,   # max angle X (compensation)
-             7.0,   # max angle Y
-             45.0)  # max angle vel (change in compensation)
+sensorMin = sensorMax = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
+                         0.5,  # angle X scale (gamma)
+                         0.3,  # angle Y scale (gamma)
+                         0.00,  # spring constant k (kg/s^2)
+                         0.00,  # spring constant k (kg/s^2)
+                         7.0,   # max angle X (compensation)
+                         3.0,   # max angle Y
+                         45.0)   # max angle vel (change in compensation)
 
 stiffnessMin = stiffnessMax = (0.85,  # hipStiffness
                                0.3,   # kneeStiffness
@@ -108,7 +106,9 @@ odoMin = odoMax = (1.0,   # xOdoScale
                    1.0,   # yOdoScale
                    1.0)   # thetaOdoScale
 
-armMin = armMax = (0.0,)  # arm config
+armMin = (0.0,) # arm config
+
+armMax = (15.0,)
 
 gaitMins = (stanceMin,
             stepMin,

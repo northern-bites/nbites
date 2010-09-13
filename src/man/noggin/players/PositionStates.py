@@ -30,7 +30,7 @@ def playbookPosition(player):
 
 def relocalize(player):
     if player.firstFrame():
-        player.setWalk(10 , 0, 0)
+        player.setWalk(constants.RELOC_X_SPEED, 0, 0)
 
     if player.brain.my.locScore == NogginConstants.GOOD_LOC or \
             player.brain.my.locScore == NogginConstants.OK_LOC:
@@ -51,6 +51,6 @@ def relocalize(player):
         if direction == 0:
             direction = 1
 
-        player.setWalk(0 , 0, constants.RELOC_SPIN_SPEED * direction)
+        player.setWalk(0, 0, constants.RELOC_SPIN_SPEED * direction)
 
     return player.stay()

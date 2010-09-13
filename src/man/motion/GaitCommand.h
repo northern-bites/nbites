@@ -18,6 +18,9 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+// note: this object is NOT USED as of 7/27/10
+// see PyMotion::PyGaitCommand instead
+
 #ifndef _GaitCommand_h_DEFINED
 #define _GaitCommand_h_DEFINED
 
