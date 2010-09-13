@@ -1651,9 +1651,9 @@ void FieldLines::extendLineVertScan(ExtendDirection _testDir,
             }
 
             if (standardView) {
-                vision->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
+                vision->thresh->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
             } else {
-                vision->drawPoint(newPoint.x, newPoint.y, YELLOW);
+                vision->thresh->drawPoint(newPoint.x, newPoint.y, YELLOW);
             }
 
             foundLinePoints->push_back(newPoint);
@@ -1761,9 +1761,9 @@ void FieldLines::extendLineHorizScan(ExtendDirection _testDir,
             }
 
             if (standardView) {
-                vision->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
+                vision->thresh->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
             } else {
-                vision->drawPoint(newPoint.x, newPoint.y, YELLOW);
+                vision->thresh->drawPoint(newPoint.x, newPoint.y, YELLOW);
             }
 
             foundLinePoints->push_back(newPoint);
@@ -2250,7 +2250,7 @@ list< VisualCorner > FieldLines::intersectLines()
                              << " duplicate intersections; max allowed is "
                              << MAX_NUM_DUPES << endl;
                     }
-                    vision->drawPoint(intersection.x, intersection.y,
+                    vision->thresh->drawPoint(intersection.x, intersection.y,
                                       INVALIDATED_INTERSECTION_POINT_COLOR);
                     // at this point, we are by a center and so we discard all
                     // corners after recoloring them so we can tell they are

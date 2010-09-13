@@ -34,6 +34,9 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 # Colorized output
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
+############################ SET CONFIG FILE DIR
+SET( MAN_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
+SET( INCLUDE_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
@@ -107,7 +110,7 @@ ENDIF(WEBOTS_BACKEND)
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   ${MAN_CMAKE_DIR}/manconfig.in
-  ${MAN_INCLUDE_DIR}/manconfig.h
+  ${CMAKE_CURRENT_BINARY_DIR}/manconfig.h
   ESCAPE_QUOTES
   )
 
@@ -166,14 +169,14 @@ SET( COLOR_TABLE
 #upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(
   ${MAN_CMAKE_DIR}/upload.sh.in
-  ${MAN_INCLUDE_DIR}/upload.sh
+  ${MAN_CONFIG_DIR}/upload.sh
   ESCAPE_QUOTES
   )
 
 
 CONFIGURE_FILE(
   ${MAN_CMAKE_DIR}/nameconfig.in
-  ${NBCOMMON_INCLUDE_DIR}/nameconfig.h
+  ${INCLUDE_CONFIG_DIR}/nameconfig.h
   ESCAPE_QUOTES
   )
 
@@ -203,6 +206,8 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${MAN_INCLUDE_DIR}
   ${WEBOTS_INCLUDE_DIR}
+  ${INCLUDE_CONFIG_DIR}
+  ${MAN_CONFIG_DIR}
   )
 
 ############################ PROJECT SOURCES FILES

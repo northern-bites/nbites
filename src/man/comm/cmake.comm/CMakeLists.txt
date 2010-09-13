@@ -34,6 +34,9 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
 
+############################ SET CONFIG FILE DIR
+SET( COMM_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/comm )
+
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
@@ -93,8 +96,8 @@ ENDIF( ROBOT_NAO )
 
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
-  "${COMM_CMAKE_DIR}/commconfig.in"
-  "${COMM_INCLUDE_DIR}/commconfig.h"
+  ${COMM_CMAKE_DIR}/commconfig.in
+  ${COMM_CONFIG_DIR}/commconfig.h
     ESCAPE_QUOTES
   )
 
@@ -123,6 +126,7 @@ INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${COMM_INCLUDE_DIR}
+  ${COMM_CONFIG_DIR}
   )
 IF( ROBOT_NAO )
   INCLUDE_DIRECTORIES(

@@ -19,7 +19,7 @@ CMAKE_SRCS = \
 CMAKE_SRCS := $(addprefix $(CMAKE_DIR),$(CMAKE_SRCS))
 #File setup
 CONFIG_FILE = manconfig.h
-INSTALL_SCRIPT = ./upload.sh
+INSTALL_SCRIPT = upload.sh
 CROSS_FILE = $(BUILD_DIR)/cross_file
 STRAIGHT_FILE = $(BUILD_DIR)/straight_file
 WEBOTS_FILE = $(BUILD_DIR)/webots_file
@@ -134,10 +134,10 @@ $(WEBOTS_FILE):
 install: $(CMAKE_DEPEND)
 	@if [ -e $(CROSS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) install; \
-		$(INSTALL_SCRIPT); \
+		$(CROSS_DIR)/$(INSTALL_SCRIPT); \
 	elif [ -e $(WEBOTS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) install; \
-		$(INSTALL_SCRIPT); \
+		$(WEBOTS_DIR)/$(INSTALL_SCRIPT); \
 	else \
 		echo "Must have CROSS or WEBOTS build configured to 'make install'"; \
 	fi
