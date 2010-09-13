@@ -252,7 +252,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points)
         if (debugVertEdgeDetect)
             printf("\tColumn #%d:\n", x);
 
-        const int stopY = vision->thresh->getVisionHorizon();
+        const int stopY = vision->thresh->field->horizonAt(x);
 
         // We start at the second to last pixel because we will be examining
         // transitions between adjacent pixels, so the first step would be to
