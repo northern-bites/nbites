@@ -60,10 +60,6 @@ def relocalize(player):
 def afterPenalty(player):
 #Management State
 
-    #Catch in case relocalize is called
-    if player.lastDiffState == 'relocalize':
-        return player.goLater('gamePlaying')
-
     if player.lastDiffState == 'penaltyLookLeft':
         return player.goLater('penaltyLookRight')
 
@@ -76,31 +72,44 @@ def penaltyLookLeft(player):
 
     if player.firstFrame():
         player.headCount = 0
+        player.yellowCount = 0
+        player.blueCount = 0
+        player.ballCount = 0
         player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
+
+    if player.brain.ball.on:
+        player.ballCount +=1
+        if player.ballCount == 3:
+            #deal with ball and don't worry about loc
+            player.brain.tracker.trackBall()
+            return player.goLater('gamePlaying')
 
     if not player.brain.motion.isHeadActive():
         ##looking left
 
         if player.brain.yglp.on or player.brain.ygrp.on:
-            #set loc info
-            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+            #see the goal posts in multiple frames for safety
+            player.blueCount = 0
+            player.yellowCount += 1
+            if player.yellowCount == 5:
+                #set loc info
+                player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                                         NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
                                         -90.0)
-            #now you know where you are!
-            return player.goLater('gamePlaying')
+                #now you know where you are!
+                return player.goLater('gamePlaying')
 
         if player.brain.bglp.on or player.brain.bgrp.on:
-            #set loc info
-            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+            #see the goal posts in multiple frames for safety
+            player.yellowCount = 0
+            player.blueCount += 1
+            if player.blueCount == 5:
+                #set loc info
+                player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                                         NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
                                         90.0)
-            #now you know where you are!
-            return player.goLater('gamePlaying')
-
-        if player.brain.ball.on:
-            #deal with ball and don't worry about loc
-            player.brain.tracker.trackBall()
-            return player.goLater('gamePlaying')
+                #now you know where you are!
+                return player.goLater('gamePlaying')
 
         player.headCount += 1
 
@@ -113,35 +122,47 @@ def penaltyLookLeft(player):
 def penaltyLookRight(player):
 
     if player.firstFrame():
-        #setup counter
         player.headCount = 0
+        player.yellowCount = 0
+        player.blueCount = 0
+        player.ballCount = 0
         player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
+
+
+    if player.brain.ball.on:
+        player.ballCount += 1
+        if player.ballCount == 3:
+            #deal with ball and don't worry about loc
+            player.brain.tracker.trackBall()
+            return player.goLater('gamePlaying')
 
     if not player.brain.motion.isHeadActive():
         ##looking right
 
         if player.brain.yglp.on or player.brain.ygrp.on:
-            #set loc info
-            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+            #see the goal posts in multiple frames for safety
+            player.blueCount = 0
+            player.yellowCount += 1
+            if player.yellowCount == 5:
+                #set loc info
+                player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                                         NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
                                         90.0)
-            #now you know where you are!
-            return player.goLater('gamePlaying')
+                #now you know where you are!
+                return player.goLater('gamePlaying')
 
         if player.brain.bglp.on or player.brain.bgrp.on:
-            #set loc info
-            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+            #see the goal posts in multiple frames for safety
+            player.yellowCount = 0
+            player.blueCount += 1
+            if player.blueCount == 5:
+                #set loc info
+                player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                                         NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
                                         -90.0)
-            #now you know where you are!
-            return player.goLater('gamePlaying')
+                #now you know where you are!
+                return player.goLater('gamePlaying')
 
-        if player.brain.ball.on:
-            #deal with ball and don't worry about loc
-            player.brain.tracker.trackBall()
-            return player.goLater('gamePlaying')
-
-        #increment counter
         player.headCount += 1
 
     #if we are looking for too long
