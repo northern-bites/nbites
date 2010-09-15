@@ -3,13 +3,15 @@ import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants #TODO: create a PenaltyConstants file instead
 
+BALL_SEEN_THRESH = 5
+
 def afterPenalty(player):
 
     if player.firstFrame():
         initPenaltyReloc(player)
         player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
 
-    if ballCheck(player) == 1:
+    if player.brain.ball.framesOn > BALL_SEEN_THRESH
         #deal with ball and don't worry about loc
         player.brain.tracker.trackBall()
         return player.goLater('gamePlaying')
@@ -58,14 +60,6 @@ def initPenaltyReloc(player):
     player.headCount = 0
     player.yellowCount = 0
     player.blueCount = 0
-    player.ballCount = 0
-
-def ballCheck(player):
-    if player.brain.ball.on:
-        player.ballCount += 1
-        if player.ballCount == 3:
-            return 1
-    return 0
 
 def seeYellow(player):
     player.blueCount = 0
@@ -102,7 +96,7 @@ def setLocInfo(player):
 
 def penaltyRelocalize(player):
     if player.firstFrame():
-        player.setWalk(10 , 0, 0)
+        player.setWalk(1, 0, 0)
 
     if player.brain.ball.on:
         player.brain.tracker.trackBall()
