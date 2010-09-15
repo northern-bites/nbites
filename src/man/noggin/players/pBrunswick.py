@@ -1,6 +1,7 @@
 from . import SoccerFSA
 from . import ChaseBallStates
 from . import PositionStates
+from . import PenaltyStates
 from . import FindBallStates
 from . import KickingStates
 from . import PenaltyKickStates
@@ -23,6 +24,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(GoaliePositionStates)
         self.addStates(GoalieSaveStates)
         self.addStates(PositionStates)
+        self.addStates(PenaltyStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
         self.addStates(ChaseBallStates)
