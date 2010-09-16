@@ -11,7 +11,7 @@ def afterPenalty(player):
         initPenaltyReloc(player)
         player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
 
-    if player.brain.ball.framesOn > BALL_SEEN_THRESH
+    if player.brain.ball.framesOn > BALL_SEEN_THRESH:
         #deal with ball and don't worry about loc
         player.brain.tracker.trackBall()
         return player.goLater('gamePlaying')
