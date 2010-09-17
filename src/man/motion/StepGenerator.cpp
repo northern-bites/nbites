@@ -171,6 +171,10 @@ void StepGenerator::generate_steps(){
  * can calculate the sensor ZMP -- we are having trouble with it. We
  * probably just need to be more careful about how we filter, and get more
  * example data.
+ *
+ * Not sure if Joho's problems were due to the old Nao version or what,
+ * but from the graphs I've looked at we are very close to calculating the
+ * sensor ZMP such that it's useful. -Nathan, September 2010
  */
 void StepGenerator::findSensorZMP(){
     Inertial inertial = sensors->getInertial();
@@ -194,8 +198,8 @@ void StepGenerator::findSensorZMP(){
     //      mimic the reference zmp.
     //global
 
-     accInWorldFrame = prod(bodyToWorldTransform,
-                            accInBodyFrame);
+	accInWorldFrame = prod(bodyToWorldTransform,
+						   accInBodyFrame);
 
      //cout << endl<< "########################"<<endl;
 	 //cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
@@ -228,7 +232,7 @@ float StepGenerator::scaleSensors(const float sensorZMP,
                                   const float perfectZMP) const {
 
 	// TODO: find a better value for this!
-    const float sensorWeight = 0.25f; //gait->sensor[WP::OBSERVER_SCALE];
+    const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
@@ -653,6 +657,19 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
 }
 
+/*
+ * Move the robot from it's current position to the destionation rel_x,
+ * rel_y, rel_theta on the field. This method will move at the maximum speed
+ * allowed by the gait parameters
+ *
+ * Note: this method works by calling takeSteps several times with appropriate values
+ */
+void StepGenerator::setDestination(const float rel_x, const float rel_y,
+								   const float rel_theta) {
+	clearFutureSteps();
+
+
+}
 
 /**
  * Method to enqueue a specific number of steps and then stop
@@ -711,7 +728,7 @@ void StepGenerator::resetSteps(const bool startLeft){
     controller_y->initState(0.0f,0.0f,0.0f);
 
     //Each time we restart, we need to reset the estimated sensor ZMP:
-    zmp_filter = ZmpExp();
+    zmp_filter = ZmpEKF();
 
     sensorAngles.reset();
 

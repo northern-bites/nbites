@@ -89,7 +89,7 @@
 #include "CoordFrame.h"
 #include "Sensors.h"
 #include "NBMatrixMath.h"
-#include "ZmpExp.h"
+#include "ZmpEKF.h"
 #include "ZmpAccExp.h"
 
 //Debugging flags:
@@ -123,6 +123,7 @@ public:
     bool isDone() const { return done; }
 
     void setSpeed(const float _x, const float _y, const float _theta);
+	void setDestination(const float rel_x, const float rel_y, const float rel_theta);
     void takeSteps(const float _x, const float _y, const float _theta,
                    const int _numSteps);
 
@@ -232,7 +233,7 @@ private:
 
     WalkController *controller_x, *controller_y;
 
-    ZmpExp zmp_filter;
+    ZmpEKF zmp_filter;
 	ZmpAccExp acc_filter;
 
     NBMath::ufvector4 accInWorldFrame;
