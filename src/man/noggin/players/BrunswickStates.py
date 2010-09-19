@@ -33,6 +33,7 @@ def gamePenalized(player):
         player.justKicked = False
         player.stopWalking()
         player.penalizeHeads()
+        player.numFrames = 0
 
     return player.stay()
 
@@ -65,6 +66,7 @@ def gameSet(player):
         player.justKicked = False
         player.stopWalking()
         player.brain.loc.resetBall()
+        player.numFrames = 0
 
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()

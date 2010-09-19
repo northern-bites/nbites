@@ -46,6 +46,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.frameCounter = 0
 
+        self.numFrames = 0
+
         self.shouldRelocalizeCounter = 0
 
         # Penalty kick player variables
@@ -76,6 +78,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             if roleState != self.currentState:
                 self.switchTo(roleState)
+
+        if gcState == 'gamePlaying':
+            self.numFrames += 1
+            if self.numFrames %5 == 0:
+                self.brain.sensors.saveFrame()
 
         SoccerFSA.SoccerFSA.run(self)
 
