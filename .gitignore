@@ -39,7 +39,6 @@ noggin/util/fakeData/*
 /motion/README.log
 /motion/README.toc
 /motion/README.pdf
-docs*
 /noggin/offline/c++filt
 /noggin/offline/faker
 /noggin/offline/fakerData/*
@@ -47,3 +46,4 @@ docs*
 docs/*
 *.wav
 *.so
+src/remote/dist/javadoc/

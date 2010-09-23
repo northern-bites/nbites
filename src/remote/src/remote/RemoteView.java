@@ -16,11 +16,12 @@ package remote;
  * @author Dani
  */
 public class RemoteView extends javax.swing.JFrame {
-
+    RemoteController controller;
     /** Creates new form RemoteView */
-    public RemoteView() {
+    public RemoteView(RemoteController controller) {
         initComponents();
         setVisible(true);
+        this.controller = controller;
     }
 
     /** This method is called from within the constructor to
@@ -33,10 +34,11 @@ public class RemoteView extends javax.swing.JFrame {
     private void initComponents() {
 
         jInternalFrame1 = new javax.swing.JInternalFrame();
-        jRadioButton1 = new javax.swing.JRadioButton();
+        nameChooser = new javax.swing.JComboBox();
         info = new javax.swing.JPanel();
         robotNameLabel = new javax.swing.JLabel();
-        nameChooser = new javax.swing.JComboBox();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
         robotIPLabel = new javax.swing.JLabel();
         ipTextField = new javax.swing.JTextField();
         Build = new javax.swing.JPanel();
@@ -47,11 +49,6 @@ public class RemoteView extends javax.swing.JFrame {
         compileButton = new javax.swing.JButton();
         installButton = new javax.swing.JButton();
         Controller = new javax.swing.JPanel();
-        statusPanel = new javax.swing.JPanel();
-        statusLabel = new javax.swing.JLabel();
-        statusTextField = new javax.swing.JTextField();
-        startButton = new javax.swing.JButton();
-        runButton = new javax.swing.JButton();
         restartButton = new javax.swing.JButton();
         stopButton = new javax.swing.JButton();
         File = new javax.swing.JPanel();
@@ -74,7 +71,12 @@ public class RemoteView extends javax.swing.JFrame {
             .add(0, 19, Short.MAX_VALUE)
         );
 
-        jRadioButton1.setText("jRadioButton1");
+        nameChooser.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Marvin", "Slartibartfast", "Trillian", "Zaphod" }));
+        nameChooser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nameChooserActionPerformed(evt);
+            }
+        });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Remote");
@@ -87,13 +89,15 @@ public class RemoteView extends javax.swing.JFrame {
         robotNameLabel.setText("Robot Name:");
         info.add(robotNameLabel);
 
-        nameChooser.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Marvin", "Slartibartfast", "Trillian", "Zaphod" }));
-        nameChooser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nameChooserActionPerformed(evt);
-            }
+        jList1.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "marvin", "slarti", "trillian", "zaphod" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
         });
-        info.add(nameChooser);
+        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(jList1);
+
+        info.add(jScrollPane1);
 
         robotIPLabel.setText("Robot IP:");
         info.add(robotIPLabel);
@@ -154,31 +158,15 @@ public class RemoteView extends javax.swing.JFrame {
         Controller.setPreferredSize(new java.awt.Dimension(150, 150));
         Controller.setLayout(new java.awt.GridLayout(0, 1));
 
-        statusPanel.setLayout(new java.awt.GridLayout(1, 0));
-
-        statusLabel.setText("Status:");
-        statusPanel.add(statusLabel);
-
-        statusTextField.setEditable(false);
-        statusPanel.add(statusTextField);
-
-        Controller.add(statusPanel);
-
-        startButton.setText("Start");
-        Controller.add(startButton);
-
-        runButton.setText("Run");
-        runButton.addActionListener(new java.awt.event.ActionListener() {
+        restartButton.setText("Restart NaoQi");
+        restartButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                runButtonActionPerformed(evt);
+                restartButtonActionPerformed(evt);
             }
         });
-        Controller.add(runButton);
-
-        restartButton.setText("Restart");
         Controller.add(restartButton);
 
-        stopButton.setText("Stop");
+        stopButton.setText("Stop NaoQi");
         stopButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 stopButtonActionPerformed(evt);
@@ -230,10 +218,6 @@ public class RemoteView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_compileButtonActionPerformed
 
-    private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_runButtonActionPerformed
-
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_editButtonActionPerformed
@@ -247,27 +231,21 @@ public class RemoteView extends javax.swing.JFrame {
     }//GEN-LAST:event_typeChooserActionPerformed
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
-        // TODO add your handling code here:
+        controller.stopNaoQi(ipTextField.getText());
     }//GEN-LAST:event_stopButtonActionPerformed
 
     private void fileNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileNameTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_fileNameTextFieldActionPerformed
 
+    private void restartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restartButtonActionPerformed
+        controller.restartNaoQi(ipTextField.getText());
+    }//GEN-LAST:event_restartButtonActionPerformed
+
     private void nameChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameChooserActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_nameChooserActionPerformed
+}//GEN-LAST:event_nameChooserActionPerformed
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new RemoteView().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Build;
@@ -283,16 +261,12 @@ public class RemoteView extends javax.swing.JFrame {
     private javax.swing.JButton installButton;
     private javax.swing.JTextField ipTextField;
     private javax.swing.JInternalFrame jInternalFrame1;
-    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JList jList1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox nameChooser;
     private javax.swing.JButton restartButton;
     private javax.swing.JLabel robotIPLabel;
     private javax.swing.JLabel robotNameLabel;
-    private javax.swing.JButton runButton;
-    private javax.swing.JButton startButton;
-    private javax.swing.JLabel statusLabel;
-    private javax.swing.JPanel statusPanel;
-    private javax.swing.JTextField statusTextField;
     private javax.swing.JButton stopButton;
     private javax.swing.JComboBox typeChooser;
     private javax.swing.JLabel typeLabel;
