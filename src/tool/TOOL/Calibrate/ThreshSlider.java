@@ -39,7 +39,7 @@ public class ThreshSlider extends IncrementalSlider {
         enabled = new JCheckBox("Edge Thresholding Enabled (E)");
 
         //enabled.setAlignmentX(Component.RIGHT_ALIGNMENT);
-	
+
         super.add(enabled, BorderLayout.PAGE_END);
         enabled.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -47,24 +47,25 @@ public class ThreshSlider extends IncrementalSlider {
                     calibrate.setThresholded(enabled.isSelected());
                 }
             });
-	
+
 
         // Don't allow the checkbox to consume focus, but start it selected
         // by default
         enabled.setFocusable(false);
         enabled.setSelected(true);
-	
+
         // Make sure the ticks are drawn correctly
         slider.setMajorTickSpacing(MAJOR_TICK_SPACING);
         slider.setMinorTickSpacing(MINOR_TICK_SPACING);
         slider.setPaintTicks(true);
-        slider.setPaintLabels(true);
+        slider.setPaintLabels(false);
         slider.setValue(THRESH_INIT);
+		slider.setSnapToTicks(true);
     }
-    
+
     public void clickEnabled() {
         enabled.doClick();
     }
-    
+
 
 }

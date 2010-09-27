@@ -205,6 +205,7 @@ public class Calibrate implements DataListener, MouseListener,
             overlay.setEdgeThresh(thresh);
             overlay.regenerateEdgeImage(rawImage);
             selector.repaint();
+			displayer.repaint();
         }
     }
 
@@ -432,6 +433,7 @@ public class Calibrate implements DataListener, MouseListener,
         //lastly, need to repaint
         // simply repaint the selector, as underlying image hasn't changed
         selector.repaint();
+
         // displayer needs to be updated to reflect the new thresholded changes
         displayer.updateImage(thresholdedImage);
         displayer.repaint();
@@ -790,6 +792,7 @@ public class Calibrate implements DataListener, MouseListener,
             overlay.setThresholding(choice);
             overlay.regenerateEdgeImage(rawImage);
             selector.repaint();
+			displayer.repaint();
         }
     }
 
@@ -838,7 +841,7 @@ public class Calibrate implements DataListener, MouseListener,
         }
         selector.setBrushSize(brushSize);
         selector.repaint();
-
+        displayer.repaint();
     }
     /**
      * Updates the currentColor variable which changes the
@@ -857,6 +860,7 @@ public class Calibrate implements DataListener, MouseListener,
         }
         selector.setCalibrateColor(currentColor);
         selector.repaint();
+        displayer.repaint();
 
         calibratePanel.setColorSelected(currentColor);
     }
