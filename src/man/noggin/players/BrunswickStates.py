@@ -78,9 +78,20 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
+
     if player.lastDiffState == 'gamePenalized':
-        player.brain.resetLocalization()
-        return player.goLater('afterPenalty')
+        # 15 is arbitrary. This check is meant to catch human error and
+        # possible 0 sec. penalties for the goalie
+        if player.lastStateTime > 15:
+            player.brain.resetLocalization()
+            return player.goLater('afterPenalty')
+
+        #if you are the goalie then it may have been 0 sec.
+        elif player.brain.my.playerNumber == 1:
+            # TODO: Make this smarter. Is there already a goalie reloc?
+            player.brain.resetLocalization()
+
+        #else human error
 
     roleState = player.getRoleState()
     return player.goNow(roleState)
