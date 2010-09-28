@@ -146,6 +146,20 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         drawColors.setFocusable(false);
         drawColors.setSelected(true);
 
+		JSlider houghAcceptThresh = new JSlider(JSlider.HORIZONTAL,
+												0, 100, 25);
+		houghAcceptThresh.addChangeListener(new ChangeListener(){
+				public void stateChanged(ChangeEvent e) {
+					JSlider source = (JSlider)e.getSource();
+					// if (!source.getValueIsAdjusting()) {
+						int thresh = (int)source.getValue();
+						calibrate.setHoughAcceptThresh(thresh);
+					// }
+				}
+			});
+
+		houghAcceptThresh.setMajorTickSpacing(10);
+		houghAcceptThresh.setPaintTicks(true);
 
         selectorOverlayChoice = new JComboBox();
         selectorOverlayChoice.addItem("Left Pane");
@@ -228,6 +242,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         auxPanel.add(drawColors);
         auxPanel.add(selectorOverlayChoice);
         auxPanel.add(displayerOverlayChoice);
+		auxPanel.add(houghAcceptThresh);
         textAndSwatches.add(auxPanel);
 
         add(textAndSwatches);

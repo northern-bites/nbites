@@ -30,7 +30,7 @@ import TOOL.TOOL;
  *
  * Avoid calling any drawing methods explicitly.  The class is designed to
  * update the image any time and only when it is needed.
- * 
+ *
  * The ImagePanel was written with the YCbCrImage class in mind, as that is what
  * most images in the TOOL will be on the back-end.  However, any BufferedImage
  * should be useable.  Java provides many facilities for loading different
@@ -104,7 +104,7 @@ public class ImagePanel extends JPanel implements ActionListener,
         fixedWidth = DEFAULT_FIXED_WIDTH;
         fixedHeight = DEFAULT_FIXED_HEIGHT;
 
-       
+
         lastWidth = getWidth();
         lastHeight = getHeight();
 
@@ -116,13 +116,13 @@ public class ImagePanel extends JPanel implements ActionListener,
         addMouseListener(this);
     }
 
-    
+
 
 
 
     public void createPopupMenu() {
         popupMenu = new JPopupMenu("Settings");
-        
+
         JMenuItem item;
         JMenu menu;
 
@@ -130,7 +130,7 @@ public class ImagePanel extends JPanel implements ActionListener,
         item.setActionCommand(String.valueOf(SCALE_NONE));
         item.addActionListener(this);
         popupMenu.add(item);
-        
+
         menu = new JMenu("Fixed");
         item = new JMenuItem("Size");
         item.setActionCommand(String.valueOf(SCALE_FIXED_SIZE));
@@ -159,7 +159,7 @@ public class ImagePanel extends JPanel implements ActionListener,
         item.setActionCommand(String.valueOf(SCALE_RATIO_SIZE_HYBRID));
         item.addActionListener(this);
         menu.add(item);
-        
+
 
         menu.add(item);
         popupMenu.add(menu);
@@ -189,7 +189,7 @@ public class ImagePanel extends JPanel implements ActionListener,
         updateAffineTransform();
         repaint();
     }
-    
+
     public void setOverlayImage(BufferedImage o){
 	overlay = o;
     }
@@ -199,14 +199,14 @@ public class ImagePanel extends JPanel implements ActionListener,
     }
 
     public void paint(Graphics g) {
-	
+
         super.paint(g);
-       
+
         Graphics2D g2d = (Graphics2D)g;
 
 	// Window has been resized, calculate the new scale
         if (getWidth() != lastWidth || getHeight() != lastHeight) {
-	    
+
             calculateScaling();
             updateAffineTransform();
         }
@@ -221,12 +221,12 @@ public class ImagePanel extends JPanel implements ActionListener,
         lastHeight = getHeight();
     }
 
-   
+
 
     protected void calculateScaling() {
 	if (image == null)
 	    return;
-	
+
         double oldXScale = xScale;
         double oldYScale = yScale;
         switch (scaleSetting) {
@@ -267,14 +267,14 @@ public class ImagePanel extends JPanel implements ActionListener,
             // fixedWidth, similarly with yScale
             xScale = ((double)fixedWidth) / (double)image.getWidth();
             yScale = ((double)fixedHeight) / (double)image.getHeight();
-            
+
             // Now we determine how much we need to stretch the "fixed width"
             // and "fixed height" to match the screen size, using same rationale
             // as SCALE_AUTO_BOTH
             double scalingFactor1 = getWidth()/(double)fixedWidth;
             double scalingFactor2 = getHeight()/(double)fixedHeight;
             double scale = Math.min(scalingFactor1, scalingFactor2);
-            
+
             // Scale the x and y scale by the new scaling factor
             xScale *= scale;
             yScale *= scale;
@@ -293,7 +293,7 @@ public class ImagePanel extends JPanel implements ActionListener,
             firePropertyChange(Y_SCALE_CHANGE, new Double(oldYScale),
                 new Double(yScale));
     }
-    
+
     public double getXScale(){
 	return xScale;
     }
@@ -375,7 +375,7 @@ public class ImagePanel extends JPanel implements ActionListener,
 
     /**
      * Returns the image's value at a given image xy coordinate.
-    
+
     public int getImageValue(int x, int y){
 	return image.getRGB(x,y);
     }
@@ -387,7 +387,7 @@ public class ImagePanel extends JPanel implements ActionListener,
 		     cm.getGreen(rgbValue),
 		     cm.getBlue(rgbValue)};
 
-	int[] yuv = new int[3]; 
+	int[] yuv = new int[3];
 	YCbCrImage.COLOR_SPACE.fromRGB(rgb[0],rgb[1],rgb[2], yuv);
 	return yuv;
 	}*/

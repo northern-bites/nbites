@@ -8,10 +8,13 @@ import java.awt.image.BufferedImage;
 
 import java.awt.AlphaComposite;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import TOOL.TOOL;
 import TOOL.Calibrate.Pair;
 import TOOL.Vision.Vision;
+import TOOL.Misc.HoughSpace;
+import TOOL.Misc.HoughLine;
 
 
 /**
@@ -33,6 +36,8 @@ public class ImageOverlay extends BufferedImage{
 
     protected boolean thresholding;
 
+    private int acceptThreshold = 25;
+
     int width, height, edgeThresh;
     byte[][] pixels;
 
@@ -46,13 +51,13 @@ public class ImageOverlay extends BufferedImage{
      */
     public ImageOverlay(int width, int height){
 
-		super(width, height, BufferedImage.TYPE_INT_ARGB);
+        super(width, height, BufferedImage.TYPE_INT_ARGB);
 
-		this.width = width;
-		this.height = height;
-		edgeThresh = DEFAULT_THRESH;
-		thresholding = true;
-		resetPixels();
+        this.width = width;
+        this.height = height;
+        edgeThresh = DEFAULT_THRESH;
+        thresholding = true;
+        resetPixels();
     }
 
 
@@ -67,13 +72,13 @@ public class ImageOverlay extends BufferedImage{
      * literally transparent
      */
     public void resetPixels(){
-		pixels  = new byte[width][height];
-		for(int w = 0; w < width; w++){
-			for(int h = 0; h < height; h++){
-				pixels[w][h] = TRANSPARENT;
-				setRGB(w,h,0x0);
-			}
-		}
+        pixels  = new byte[width][height];
+        for(int w = 0; w < width; w++){
+            for(int h = 0; h < height; h++){
+                pixels[w][h] = TRANSPARENT;
+                setRGB(w,h,0x0);
+            }
+        }
     }
 
 
@@ -87,14 +92,14 @@ public class ImageOverlay extends BufferedImage{
      * manually thresholded
      */
     public void resetEdgePixels() {
-		for(int w = 0; w < width; w++){
-			for(int h = 0; h < height; h++){
-				if (pixels[w][h] == EDGE) {
-					pixels[w][h] = TRANSPARENT;
-					setRGB(w,h,0x0);
-				}
-			}
-		}
+        for(int w = 0; w < width; w++){
+            for(int h = 0; h < height; h++){
+                if (pixels[w][h] == EDGE || pixels[w][h] == Vision.PINK) {
+                    pixels[w][h] = TRANSPARENT;
+                    setRGB(w,h,0x0);
+                }
+            }
+        }
     }
 
 
@@ -107,7 +112,7 @@ public class ImageOverlay extends BufferedImage{
      * filled in on each click.
      */
     public void setEdgeThresh(int edgeThresh) {
-		this.edgeThresh = edgeThresh;
+        this.edgeThresh = edgeThresh;
     }
 
     /**
@@ -116,8 +121,8 @@ public class ImageOverlay extends BufferedImage{
      * when a new image is being drawn and a new ImageOverlay needs to be drawn.
      */
     public void generateNewEdgeImage(TOOLImage rawImage) {
-		resetPixels();
-		generateEdgeImage(rawImage);
+        resetPixels();
+        generateEdgeImage(rawImage);
     }
 
     /**
@@ -127,8 +132,8 @@ public class ImageOverlay extends BufferedImage{
      * you want to redraw just the edges
      */
     public void regenerateEdgeImage(TOOLImage rawImage) {
-		resetEdgePixels();
-		generateEdgeImage(rawImage);
+        resetEdgePixels();
+        generateEdgeImage(rawImage);
     }
 
     /**
@@ -140,65 +145,105 @@ public class ImageOverlay extends BufferedImage{
 
         if (!thresholding) { return; }
 
-		//check to make sure we are the same size as rawImage
-		if(rawImage.getWidth() != width ||
-		   rawImage.getHeight() != height){
+        //check to make sure we are the same size as rawImage
+        if(rawImage.getWidth() != width ||
+           rawImage.getHeight() != height){
             TOOL.CONSOLE.error("EdgeImage cannot be generated for"+
-							   "an incompatible size");
-			return;
-		}
+                               "an incompatible size");
+            return;
+        }
 
-		int[] lastPixel = new int[3];
+        int[] lastPixel = new int[3];
 
-		int[][] imgGradientX = new int[height][width];
-		int[][] imgGradientY = new int[height][width];
-		int[][] imgGradientMag = new int[height][width];
+        int[][] imgGradientX = new int[height][width];
+        int[][] imgGradientY = new int[height][width];
+        int[][] imgGradientMag = new int[height][width];
 
-		for(int y = 1; y < height-1; y++){
-			for(int x = 1; x < width-1; x++){
+        for(int y = 1; y < height-1; y++){
+            for(int x = 1; x < width-1; x++){
 
-				// Apply Sobel kernel for gradient estimation
-				// rawImage.getYCbCr(x,y)[2]; // Y Value from pixel
-				int u = ((rawImage.getYCbCr(x+1,y+1)[0] + 2 * rawImage.getYCbCr(x+1,y)[0] +
-						  rawImage.getYCbCr(x+1,y+1)[0]) -
-						 (rawImage.getYCbCr(x-1,y+1)[0] + 2 * rawImage.getYCbCr(x-1,y)[0] +
-						  rawImage.getYCbCr(x-1,y-1)[0]));
+                // Apply Sobel kernel for gradient estimation
+                // rawImage.getYCbCr(x,y)[2]; // Y Value from pixel
+                int u = ((rawImage.getYCbCr(x+1,y+1)[0] +
+                          2 * rawImage.getYCbCr(x+1,y)[0] +
+                          rawImage.getYCbCr(x+1,y+1)[0]) -
+                         (rawImage.getYCbCr(x-1,y+1)[0] +
+                          2 * rawImage.getYCbCr(x-1,y)[0] +
+                          rawImage.getYCbCr(x-1,y-1)[0]));
 
-				int v = ((rawImage.getYCbCr(x-1,y-1)[0] + 2 * rawImage.getYCbCr(x,y-1)[0] +
-						  rawImage.getYCbCr(x+1,y-1)[0]) -
-						 (rawImage.getYCbCr(x-1,y+1)[0] + 2 * rawImage.getYCbCr(x,y+1)[0] +
-						  rawImage.getYCbCr(x+1,y+1)[0]));
+                int v = ((rawImage.getYCbCr(x-1,y-1)[0] +
+                          2 * rawImage.getYCbCr(x,y-1)[0] +
+                          rawImage.getYCbCr(x+1,y-1)[0]) -
+                         (rawImage.getYCbCr(x-1,y+1)[0] +
+                          2 * rawImage.getYCbCr(x,y+1)[0] +
+                          rawImage.getYCbCr(x+1,y+1)[0]));
 
-				imgGradientX[y][x] = u;
-				imgGradientY[y][x] = v;
-				imgGradientMag[y][x] = u * u + v * v;
+                imgGradientX[y][x] = u;
+                imgGradientY[y][x] = v;
+                imgGradientMag[y][x] = u * u + v * v;
+            }
+        }
 
-			}
-		}
+        // Tables that specify the + neighbor of a pixel indexed by
+        // gradient direction octant (the high 3 bits of direction).
+        int[] dxTab = { 1,  1,  0, -1, -1, -1,  0,  1};
+        int[] dyTab = { 0,  1,  1,  1,  0, -1, -1, -1};
 
-		// Tables that specify the + neighbor of a pixel indexed by gradient direction octant (the high
-		// 3 bits of direction).
-		int[] dxTab = { 1,  1,  0, -1, -1, -1,  0,  1};
-		int[] dyTab = { 0,  1,  1,  1,  0, -1, -1, -1};
-		int thresh = edgeThresh * edgeThresh << 4;
-		for(int y = 2; y < height-2; y++){
-			for(int x = 2; x < width-2; x++){
-				int z = imgGradientMag[y][x];
+        // Match the threshold to the squared magnitude
+        int thresh = edgeThresh * edgeThresh << 4;
 
+        for(int y = 2; y < height-2; y++){
+            for(int x = 2; x < width-2; x++){
+                int z = imgGradientMag[y][x];
 
-				if ( z > thresh){
-					int a = (int)(Math.atan2(imgGradientY[y][x], imgGradientX[y][x]) /
-								  Math.PI * 128.0) & 0xff;
+                if ( z > thresh){
 
-					a = a >> 5;
-					if (z > imgGradientMag[y + dyTab[a]][x+dxTab[a]] &&
-						z >= imgGradientMag[y - dyTab[a]][x-dxTab[a]]){
-						setOverlay(x,y,EDGE);//then its an edge
-					}
-				}
-			}
-		}
+                    // Calculate the direction of the gradient
+                    int a = (int)(Math.atan2(imgGradientY[y][x],
+                                             imgGradientX[y][x]) /
+                                  Math.PI * 128.0) & 0xff;
 
+                    // Get the highest 3 bits of the direction
+                    a = a >> 5;
+
+                    // The asymmetric peak test
+                    if (z > imgGradientMag[y + dyTab[a]][x+dxTab[a]] &&
+                        z >= imgGradientMag[y - dyTab[a]][x-dxTab[a]]){
+                        setOverlay(x,y,EDGE);//then its an edge
+                    } else {
+                        imgGradientMag[y][x] = 0;
+                        imgGradientY[y][x] = 0;
+                        imgGradientX[y][x] = 0;
+                    }
+                } else {
+                        imgGradientMag[y][x] = 0;
+                        imgGradientY[y][x] = 0;
+                        imgGradientX[y][x] = 0;
+                }
+            }
+        }
+
+        HoughSpace hs = new HoughSpace();
+        hs.acceptThreshold = acceptThreshold;
+        hs.run(imgGradientX, imgGradientY, imgGradientMag);
+
+        for(int i=0; i < hs.lines.size(); ++i){
+            HoughLine line = hs.lines.get(i);
+            for (double u = -200.0; u <= 200.0; u += 1.0)
+                {
+                    double sn = Math.sin(line.t);
+                    double cs = Math.cos(line.t);
+                    double x0 = line.r * cs;
+                    double y0 = line.r * sn;
+
+                    int x = (int)Math.round(x0 - u * sn) + width  / 2;
+                    int y = -(int)Math.round(y0 + u * cs) + height / 2;
+
+                    if (0 <= x && x < width &&
+                        0 <= y && y < height)
+                        setOverlay(x, y, Vision.PINK);
+                }
+        }
     }
 
     /**
@@ -214,18 +259,18 @@ public class ImageOverlay extends BufferedImage{
         else { threshold = DEFAULT_THRESH; }
 
 
-		if(oldPixel.length == newPixel.length)
-			return (Math.abs(oldPixel[0] - newPixel[0]) > edgeThresh ||
-					Math.abs(oldPixel[1] - newPixel[1]) > edgeThresh ||
-					Math.abs(oldPixel[2] - newPixel[2]) > edgeThresh);
-		return false;
+        if(oldPixel.length == newPixel.length)
+            return (Math.abs(oldPixel[0] - newPixel[0]) > edgeThresh ||
+                    Math.abs(oldPixel[1] - newPixel[1]) > edgeThresh ||
+                    Math.abs(oldPixel[2] - newPixel[2]) > edgeThresh);
+        return false;
     }
 
 
 
     public boolean isDefined(int x, int y){
 
-		return pixels[x][y] != TRANSPARENT;
+        return pixels[x][y] != TRANSPARENT;
     }
 
     /**
@@ -233,36 +278,36 @@ public class ImageOverlay extends BufferedImage{
      * @precondition 0 <= x < width, 0 <= y < height
      */
     public byte getThreshColor(int x, int y) {
-		return pixels[x][y];
+        return pixels[x][y];
     }
 
 
 
     public boolean isEdge(int x, int y){
-		return pixels[x][y] == EDGE;
+        return pixels[x][y] == EDGE;
     }
 
 
     public boolean isOverlayColor(int x, int y, byte color) {
-		return pixels[x][y] == color;
+        return pixels[x][y] == color;
     }
 
     //draws a box
     /*public void setRectOverlay(int x, int y, int w, int h, int thickness, byte color){
-	  if ( w == 0 || h == 0) return;
-	  //horizontal lines
-	  for (int k = 1; k <= thickness; k++)
-	  for (int i = x; i <= x+w && i <= this.width; i++) {
-	  if (y-k > 0) setOverlay(i, y-k, color);
-	  if (y+h+k < height) setOverlay(i, y+h+k, color);
-	  }
-	  //vertical lines
-	  for (int k = 1; k <= thickness; k++)
-	  for (int i = y; i <= y+h && i <= this.height; i++) {
-	  if (x-k > 0) setOverlay(x-k, i, color);
-	  if (x+w+k > width) setOverlay(x+w+k, i, color);
-	  }
-	  }*/
+      if ( w == 0 || h == 0) return;
+      //horizontal lines
+      for (int k = 1; k <= thickness; k++)
+      for (int i = x; i <= x+w && i <= this.width; i++) {
+      if (y-k > 0) setOverlay(i, y-k, color);
+      if (y+h+k < height) setOverlay(i, y+h+k, color);
+      }
+      //vertical lines
+      for (int k = 1; k <= thickness; k++)
+      for (int i = y; i <= y+h && i <= this.height; i++) {
+      if (x-k > 0) setOverlay(x-k, i, color);
+      if (x+w+k > width) setOverlay(x+w+k, i, color);
+      }
+      }*/
 
 
     /**
@@ -276,19 +321,19 @@ public class ImageOverlay extends BufferedImage{
      *
      */
     public void setOverlay(int x, int y, byte color){
-		pixels[x][y] = color;
-		int rgbVal;
+        pixels[x][y] = color;
+        int rgbVal;
 
-		if (color == TRANSPARENT) {
-			rgbVal = 0x0;
-		}
-		else if (color == EDGE) {
-			rgbVal = Color.black.getRGB();
-		}
-		else {
-			rgbVal = COLORS[color].getRGB();
-		}
-		setRGB(x, y, rgbVal);
+        if (color == TRANSPARENT) {
+            rgbVal = 0x0;
+        }
+        else if (color == EDGE) {
+            rgbVal = Color.black.getRGB();
+        }
+        else {
+            rgbVal = COLORS[color].getRGB();
+        }
+        setRGB(x, y, rgbVal);
 
     }
 
@@ -307,27 +352,27 @@ public class ImageOverlay extends BufferedImage{
      * (x,y) coords and pairs of (old, new) colors.
      */
     @SuppressWarnings("unchecked")
-		public void execute(ImageOverlayAction toExecute) {
+        public void execute(ImageOverlayAction toExecute) {
 
-		if (toExecute == null) {
-			return;
-		}
+        if (toExecute == null) {
+            return;
+        }
 
-		Iterator coords = toExecute.getCoordinateIterator();
-		Iterator theColors = toExecute.getColorsIterator();
+        Iterator coords = toExecute.getCoordinateIterator();
+        Iterator theColors = toExecute.getColorsIterator();
 
 
-		while (coords.hasNext()) {
+        while (coords.hasNext()) {
 
-			Pair <Integer, Integer> coord = (Pair <Integer, Integer>)
-				coords.next();
-			int x = coord.getFirst();
-			int y = coord.getSecond();
-			Pair <Byte, Byte> theColorPair =
-				(Pair <Byte, Byte>) theColors.next();
-			byte newColor = theColorPair.getSecond();
-			setOverlay(x, y, newColor);
-		}
+            Pair <Integer, Integer> coord = (Pair <Integer, Integer>)
+                coords.next();
+            int x = coord.getFirst();
+            int y = coord.getSecond();
+            Pair <Byte, Byte> theColorPair =
+                (Pair <Byte, Byte>) theColors.next();
+            byte newColor = theColorPair.getSecond();
+            setOverlay(x, y, newColor);
+        }
     }
 
     /**
@@ -336,27 +381,30 @@ public class ImageOverlay extends BufferedImage{
      * @param toUndo the ImageOverlayAction to undo.
      */
     @SuppressWarnings("unchecked")
-		public void revert(ImageOverlayAction toUndo) {
+        public void revert(ImageOverlayAction toUndo) {
 
-		if (toUndo == null) {
-			return;
-		}
+        if (toUndo == null) {
+            return;
+        }
 
-		Iterator coords = toUndo.getCoordinateIterator();
-		Iterator theColors = toUndo.getColorsIterator();
-		while (coords.hasNext()) {
-			Pair <Integer, Integer> coord = (Pair <Integer, Integer>)
-				coords.next();
-			int x = coord.getFirst();
-			int y = coord.getSecond();
-			Pair <Byte, Byte> theColorPair =
-				(Pair <Byte, Byte>) theColors.next();
-			byte oldColor = theColorPair.getFirst();
-			setOverlay(x, y, oldColor);
+        Iterator coords = toUndo.getCoordinateIterator();
+        Iterator theColors = toUndo.getColorsIterator();
+        while (coords.hasNext()) {
+            Pair <Integer, Integer> coord = (Pair <Integer, Integer>)
+                coords.next();
+            int x = coord.getFirst();
+            int y = coord.getSecond();
+            Pair <Byte, Byte> theColorPair =
+                (Pair <Byte, Byte>) theColors.next();
+            byte oldColor = theColorPair.getFirst();
+            setOverlay(x, y, oldColor);
 
-		}
+        }
 
     }
 
+    public void setHoughAcceptThresh(int thresh){
+        acceptThreshold = thresh;
+    }
 
 }
