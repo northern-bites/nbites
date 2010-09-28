@@ -175,7 +175,7 @@
         </Container>
         <Component class="javax.swing.JButton" name="configureButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Configure"/>
+            <Property name="text" type="java.lang.String" value="Configure man"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="configureButtonActionPerformed"/>
@@ -183,7 +183,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="compileButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Compile"/>
+            <Property name="text" type="java.lang.String" value="Compile man"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="compileButtonActionPerformed"/>
@@ -191,7 +191,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="installButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Install"/>
+            <Property name="text" type="java.lang.String" value="Install man"/>
           </Properties>
         </Component>
       </SubComponents>

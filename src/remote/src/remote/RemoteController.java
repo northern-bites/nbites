@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.*;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -88,13 +89,14 @@ public class RemoteController {
 		};
 	}
 
-	private void runShellCommand(String command){
+	private void runShellCommand(String command, boolean blocks){
 		try{
 			// using the Runtime exec method:
 			Process p = Runtime.getRuntime().exec(command);
-			try{
-				p.waitFor();
-			} catch (InterruptedException e){
+			if (blocks) {
+				try{
+					p.waitFor();
+				} catch (InterruptedException e){}
 			}
 			System.out.println(command);
 			printProcessOutput(p);
@@ -111,20 +113,30 @@ public class RemoteController {
 			BufferedReader stdErr = new
 				BufferedReader(new InputStreamReader(p.getErrorStream()));
 
-			// read the output from the command
+			// print the output from the command
 			String s;
-			System.out.println("Here is the standard output of the command:\n");
 			while ((s = stdInput.readLine()) != null) {
-				System.out.println(s);
-			}
-			System.out.println("Here is the standard error of the command:\n");
-			while ((s = stdErr.readLine()) != null) {
 				System.out.println(s);
 			}
 
 		} catch (java.io.IOException exc) {
 
 		}
+	}
+
+
+	/**
+	 * Use a GUI to configure the build.
+	 */
+	public void configure(String buildType){
+		runShellCommand("make " + buildType + "_gui -C ../../src/man/", false);
+	}
+
+	/**
+	 * Compile the man source.
+	 */
+	public void compile(String buildType){
+		runShellCommand("make build_" + buildType + " -C ../../src/man/ -j3", false);
 	}
 
     /**

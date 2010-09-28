@@ -133,7 +133,7 @@ public class RemoteView extends javax.swing.JFrame {
 
         Build.add(typePanel);
 
-        configureButton.setText("Configure");
+        configureButton.setText("Configure man");
         configureButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 configureButtonActionPerformed(evt);
@@ -141,7 +141,7 @@ public class RemoteView extends javax.swing.JFrame {
         });
         Build.add(configureButton);
 
-        compileButton.setText("Compile");
+        compileButton.setText("Compile man");
         compileButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 compileButtonActionPerformed(evt);
@@ -149,7 +149,7 @@ public class RemoteView extends javax.swing.JFrame {
         });
         Build.add(compileButton);
 
-        installButton.setText("Install");
+        installButton.setText("Install man");
         Build.add(installButton);
 
         getContentPane().add(Build);
@@ -211,11 +211,11 @@ public class RemoteView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void configureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_configureButtonActionPerformed
-        // TODO add your handling code here:
+        controller.configure((String)typeChooser.getSelectedItem());
     }//GEN-LAST:event_configureButtonActionPerformed
 
     private void compileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_compileButtonActionPerformed
-        // TODO add your handling code here:
+        controller.compile((String)typeChooser.getSelectedItem());
     }//GEN-LAST:event_compileButtonActionPerformed
 
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
