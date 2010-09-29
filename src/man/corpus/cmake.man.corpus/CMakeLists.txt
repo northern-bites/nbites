@@ -14,6 +14,8 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 # Colorized output
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
+############################ SET CONFIGURATION FILE DIR
+SET( CORPUS_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/ )
 
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
@@ -72,7 +74,7 @@ ENDIF(WEBOTS_BACKEND)
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   ${CORPUS_CMAKE_DIR}/corpusconfig.h.in
-  ${CORPUS_INCLUDE_DIR}/corpusconfig.h
+  ${CORPUS_CONFIG_DIR}/corpusconfig.h
   ESCAPE_QUOTES
   )
 
@@ -92,6 +94,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
   ${PYTHON_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${CORPUS_INCLUDE_DIR}
+  ${CORPUS_CONFIG_DIR}
   )
 
 

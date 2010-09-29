@@ -201,7 +201,7 @@ void Vision::drawBoxes(void)
              BLUE);
 
     // vision horizon line
-    drawPoint(IMAGE_WIDTH/2, thresh->getVisionHorizon(), RED);
+    thresh->drawPoint(IMAGE_WIDTH/2, thresh->getVisionHorizon(), RED);
 
 } // drawBoxes
 
@@ -290,7 +290,7 @@ void Vision::drawCenters() {
     if (ball->getCenterX() >= 2 && ball->getCenterY() >= 2
         && ball->getCenterX() <= (IMAGE_WIDTH-2)
         && ball->getCenterY() <= (IMAGE_HEIGHT-2)) {
-        drawPoint(ball->getCenterX(), ball->getCenterY(), YELLOW);
+        thresh->drawPoint(ball->getCenterX(), ball->getCenterY(), YELLOW);
     }
 
 } // drawCenters
@@ -457,40 +457,6 @@ void Vision::drawLine(boost::shared_ptr<VisualLine> line, const int color) {
     drawLine(line->getStartpoint().x, line->getStartpoint().y, line->getEndpoint().x, line->getEndpoint().y, color);
 }
 
-/* drawPoint()
-   -draws a crosshair or a 'point' at some given x, y, and with a given color
-*/
-void Vision::drawPoint(int x, int y, int c) {
-    if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        thresh->thresholded[y][x] = static_cast<unsigned char>(c);
-    }if (y+1 > 0 && x > 0 && y+1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        thresh->thresholded[y+1][x] = static_cast<unsigned char>(c);
-    }if (y+2 > 0 && x > 0 && y+2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        thresh->thresholded[y+2][x] = static_cast<unsigned char>(c);
-    }if (y-1 > 0 && x > 0 && y-1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        thresh->thresholded[y-1][x] = static_cast<unsigned char>(c);
-    }if (y-2 > 0 && x > 0 && y-2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        thresh->thresholded[y-2][x] = static_cast<unsigned char>(c);
-    }if (y > 0 && x+1 > 0 && y < (IMAGE_HEIGHT) && x+1 < (IMAGE_WIDTH)) {
-        thresh->thresholded[y][x+1] = static_cast<unsigned char>(c);
-    }if (y > 0 && x+2 > 0 && y < (IMAGE_HEIGHT) && x+2 < (IMAGE_WIDTH)) {
-        thresh->thresholded[y][x+2] = static_cast<unsigned char>(c);
-    }if (y > 0 && x-1 > 0 && y < (IMAGE_HEIGHT) && x-1 < (IMAGE_WIDTH)) {
-        thresh->thresholded[y][x-1] = static_cast<unsigned char>(c);
-    }if (y > 0 && x-2 > 0 && y < (IMAGE_HEIGHT) && x-2 < (IMAGE_WIDTH)) {
-        thresh->thresholded[y][x-2] = static_cast<unsigned char>(c);
-    }
-}
-
-// Convenience method to draw linePoints
-void Vision::drawPoint(const linePoint &p, const int color) {
-    drawPoint(p.x, p.y, color);
-}
-// Convenience method to draw corners
-void Vision::drawPoint(const VisualCorner &c, const int color) {
-    drawPoint(c.getX(), c.getY(), color);
-}
-
 /* drawVerticalLine()
    --helper method to visualize a vertical line on the screen given a x-value
    --given a color as well
@@ -528,7 +494,7 @@ void Vision::drawCrossHairs(int x, int y, int c) {
 /* drawVerticalLine()
    --helper method to visualize a single point on the screen given a x-value
    --given a color as well
-   --use drawPoint() if you really want to see the point well.
+   --use thresh->drawPoint() if you really want to see the point well.
 */
 void Vision::drawDot(int x, int y, int c) {
     if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
@@ -537,7 +503,6 @@ void Vision::drawDot(int x, int y, int c) {
 }
 
 void Vision::drawFieldLines() {
-
     const vector< shared_ptr<VisualLine> >* lines = fieldLines->getLines();
 
     for (vector< shared_ptr<VisualLine> >::const_iterator i = lines->begin();
@@ -550,11 +515,11 @@ void Vision::drawFieldLines() {
              j != points.end(); j++) {
             // Vertically found = black
             if (j->foundWithScan == VERTICAL) {
-                drawPoint(*j, BLACK);
+                thresh->drawPoint(j->x, j->y, BLACK);
             }
             // Horizontally found = red
             else {
-                drawPoint(*j, RED);
+                thresh->drawPoint(j->x, j->y, RED);
             }
         }
     }
@@ -564,17 +529,17 @@ void Vision::drawFieldLines() {
          i != unusedPoints->end(); i++) {
         // Unused vertical = PINK
         if (i->foundWithScan == VERTICAL) {
-            drawPoint(*i, PINK);
+            thresh->drawPoint(i->x, i->y, PINK);
         }
         // Unused horizontal = Yellow
         else {
-            drawPoint(*i, YELLOW);
+            thresh->drawPoint(i->x, i->y, YELLOW);
         }
     }
 
     const list <VisualCorner>* corners = fieldLines->getCorners();
     for (list <VisualCorner>::const_iterator i = corners->begin();
          i != corners->end(); i++) {
-        drawPoint(*i, ORANGE);
+        thresh->drawPoint(i->getX(), i->getY(), ORANGE);
     }
 }
