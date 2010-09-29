@@ -28,7 +28,6 @@
 
 namespace Kinematics {
 
-
     enum ChainID {
         HEAD_CHAIN = 0,
         LARM_CHAIN,
@@ -326,7 +325,6 @@ namespace Kinematics {
       &RIGHT_LEG_BASE_TRANSFORMS[0],
       &RIGHT_ARM_BASE_TRANSFORMS[0] };
 
-    //Base transforms to get from body center to beg. of chain
     static const boost::numeric::ublas::matrix <float> HEAD_END_TRANSFORMS[3]
     = { CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, M_PI_FLOAT/2),
         CoordFrame4D::translation4D(CAMERA_OFF_X, 0, CAMERA_OFF_Z),
@@ -364,7 +362,7 @@ namespace Kinematics {
       &RIGHT_ARM_END_TRANSFORMS[0] };
     static const int NUM_BASE_TRANSFORMS[NUM_CHAINS] = {1,1,1,1,1};
     static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {3,2,3,3,2};
-    static const int NUM_JOINTS_CHAIN[NUM_CHAINS] = {4,4,6,6,4};
+    static const int NUM_JOINTS_CHAIN[NUM_CHAINS] = {2,4,6,6,4};
 
     // locally expressed constants (with respect to an individual joint
     // and the GLOBAL coordinate frame)
@@ -444,54 +442,43 @@ namespace Kinematics {
 			  PELVIS_MASS_g + HIP_MASS_g + THIGH_MASS_g + TIBIA_MASS_g +
 			  ANKLE_MASS_g + FOOT_MASS_g);
 
-	// TODO: remove these place holders
-	static const float UPPER_ARM_MASS_g = SHOULDER_MASS_g + BICEP_MASS_g
-		+ ELBOW_MASS_g;
-	static const float UPPER_ARM_MASS_X = SHOULDER_MASS_X;
-
-	static const float LOWER_ARM_MASS_g = FOREARM_MASS_g;
-
-	static const float UPPER_LEG_MASS_g = PELVIS_MASS_g + HIP_MASS_g + THIGH_MASS_g;
-	static const float LOWER_LEG_MASS_g = TIBIA_MASS_g + ANKLE_MASS_g;
-
-
     //The locations of the massses are translated from their
     //global coordinate frame into the local frame in tuples like
     // {X,Y,Z,WEIGHT}
 
-	// TODO: CHECK ALL THESE, MAY NOT BE RIGHT!!!
-    static const float HEAD_INERTIAL_POS[4][4] = {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {HEAD_MASS_Z, HEAD_MASS_X, HEAD_MASS_Y, HEAD_MASS_g},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-		{NECK_MASS_Z, NECK_MASS_X, NECK_MASS_Y, NECK_MASS_g}};
+    static const float HEAD_INERTIAL_POS[2][4] = {
+        {NECK_MASS_X, NECK_MASS_Y, NECK_MASS_Z, NECK_MASS_g},
+		{HEAD_MASS_X, HEAD_MASS_Y, HEAD_MASS_Z, HEAD_MASS_g}};
 
     static const float LEFT_ARM_INERTIAL_POS[4][4] = {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        { 0.0f, -UPPER_ARM_MASS_X, 0.0f, UPPER_ARM_MASS_g},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        { 0.0f,-UPPER_ARM_MASS_X, 0.0f, LOWER_ARM_MASS_g}};
+        {0.0f, 0.0f, 0.0f, SHOULDER_MASS_g},
+        {0.0f, 0.0f, 0.0f, BICEP_MASS_g},
+        {0.0f, 0.0f, 0.0f, ELBOW_MASS_g},
+        {0.0f, 0.0f, 0.0f, FOREARM_MASS_g}};
 
     //Z,X,Y is the correct order for most of the leg
+	// TODO: figure out why!
     static const float LEFT_LEG_INERTIAL_POS[6][4] = {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {-THIGH_MASS_Z, 0.0f, 0.0f, UPPER_LEG_MASS_g},
-        {-TIBIA_MASS_Z, 0.0f, 0.0f, LOWER_LEG_MASS_g},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {-FOOT_MASS_Z,  0.0f, FOOT_MASS_X, FOOT_MASS_g}};
+        {0.0f, 0.0f, 0.0f, PELVIS_MASS_g},
+        {0.0f, 0.0f, 0.0f, HIP_MASS_g},
+		{0.0f, 0.0f, 0.0f, THIGH_MASS_g},
+        {0.0f, 0.0f, 0.0f, TIBIA_MASS_g},
+        {0.0f, 0.0f, 0.0f, ANKLE_MASS_g},
+        {0.0f, 0.0f, 0.0f, FOOT_MASS_g}};
+
     static const float RIGHT_LEG_INERTIAL_POS[6][4] = {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {-THIGH_MASS_Z, 0.0f, 0.0f, UPPER_LEG_MASS_g},
-        {-TIBIA_MASS_Z, 0.0f, 0.0f, LOWER_LEG_MASS_g},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {-FOOT_MASS_Z, 0.0f, FOOT_MASS_X, FOOT_MASS_g}};
+		{0.0f, 0.0f, 0.0f, PELVIS_MASS_g},
+        {0.0f, 0.0f, 0.0f, HIP_MASS_g},
+		{0.0f, 0.0f, 0.0f, THIGH_MASS_g},
+        {0.0f, 0.0f, 0.0f, TIBIA_MASS_g},
+        {0.0f, 0.0f, 0.0f, ANKLE_MASS_g},
+        {0.0f, 0.0f, 0.0f, FOOT_MASS_g}};
+
     static const float RIGHT_ARM_INERTIAL_POS[4][4] = {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        { 0.0f, -UPPER_ARM_MASS_X, 0.0f, UPPER_ARM_MASS_g},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        { 0.0f,-UPPER_ARM_MASS_X, 0.0f, LOWER_ARM_MASS_g}};
+        {0.0f, 0.0f, 0.0f, SHOULDER_MASS_g},
+        {0.0f, 0.0f, 0.0f, BICEP_MASS_g},
+        {0.0f, 0.0f, 0.0f, ELBOW_MASS_g},
+        {0.0f, 0.0f, 0.0f, FOREARM_MASS_g}};
 
     static const float* INERTIAL_POS[NUM_CHAINS] = {&HEAD_INERTIAL_POS[0][0],
                                                     &LEFT_ARM_INERTIAL_POS[0][0],

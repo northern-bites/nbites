@@ -262,14 +262,10 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
                                                              footAngleY,
                                                              footAngleZ);
 
-
-
     const ufvector3 bodyGoal =
 		CoordFrame3D::vector3D( -com_c(0)*COM_SCALE,
 								-com_c(1)*COM_SCALE,
 								COM_Z_OFF*COM_SCALE);
-
-
     IKLegResult result =
         Kinematics::legIK(chainID,comFootGoal,footOrientation,
                           bodyGoal,bodyOrientation);

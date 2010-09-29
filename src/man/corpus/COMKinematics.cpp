@@ -46,7 +46,12 @@ Kinematics::slowCalculateChainCom(const ChainID id,
   ufmatrix4 fullTransform = ublas::identity_matrix <float> (4);
   ufvector4 comPos = CoordFrame4D::vector4D(0,0,0,0);
 
+  // See: NaoPose.cpp::calculateForwardTransform
+  // we use the same method here, but we need to apply joint weights
+  // as we traverse down each joint chain
+
   const ufvector4 origin = CoordFrame4D::vector4D(0,0,0);
+
   // Do base transforms
   const int numBaseTransforms = NUM_BASE_TRANSFORMS[id];
   for (int i = 0; i < numBaseTransforms; i++) {
@@ -76,6 +81,7 @@ Kinematics::slowCalculateChainCom(const ChainID id,
 			       currentmDHParameters[i*4 + ALPHA]);
       fullTransform = prod(fullTransform, rotX);
     }
+
     //theta - rotate about the Z(i) axis
     if (currentmDHParameters[i*4 + THETA] + angles[i] != 0) {
       const ufmatrix4 rotZ =
@@ -84,6 +90,7 @@ Kinematics::slowCalculateChainCom(const ChainID id,
 			       angles[i]);
       fullTransform = prod(fullTransform, rotZ);
     }
+
     //offset D movement along the Z(i) axis
     if (currentmDHParameters[i*4 + D] != 0) {
       const ufmatrix4 transZ =
@@ -91,6 +98,8 @@ Kinematics::slowCalculateChainCom(const ChainID id,
       fullTransform = prod(fullTransform, transZ);
     }
 
+	// add the local mass to the calculated CoM based on where
+	// we are on our way down the joint chain
     const float *curInertialPos = INERTIAL_POS[id];
 
     const ufmatrix4 massEndTrans =
@@ -101,13 +110,8 @@ Kinematics::slowCalculateChainCom(const ChainID id,
     const float curMassProportion = curInertialPos[i*4 + MASS_INDEX]/TOTAL_MASS;
     const ufvector4 thisSegmentWeightedPos =
         prod(curMassTrans,origin)*curMassProportion;
-    comPos += thisSegmentWeightedPos;
-  }
 
-  // Do the end transforms
-  const int numEndTransforms = NUM_END_TRANSFORMS[id];
-  for (int i = 0; i < numEndTransforms; i++) {
-    fullTransform = prod(fullTransform, END_TRANSFORMS[id][i]);
+    comPos += thisSegmentWeightedPos;
   }
   return comPos;
 }
