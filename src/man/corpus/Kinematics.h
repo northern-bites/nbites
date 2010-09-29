@@ -439,8 +439,8 @@ namespace Kinematics {
     static const float TOTAL_MASS  =  // ~4699.88g
         CHEST_MASS_g + HEAD_MASS_g + NECK_MASS_g +
         2.0f*(SHOULDER_MASS_g + BICEP_MASS_g + ELBOW_MASS_g + FOREARM_MASS_g +
-			  PELVIS_MASS_g + HIP_MASS_g + THIGH_MASS_g + TIBIA_MASS_g +
-			  ANKLE_MASS_g + FOOT_MASS_g);
+              PELVIS_MASS_g + HIP_MASS_g + THIGH_MASS_g + TIBIA_MASS_g +
+              ANKLE_MASS_g + FOOT_MASS_g);
 
     //The locations of the massses are translated from their
     //global coordinate frame into the local frame in tuples like
@@ -448,7 +448,7 @@ namespace Kinematics {
 
     static const float HEAD_INERTIAL_POS[2][4] = {
         {NECK_MASS_X, NECK_MASS_Y, NECK_MASS_Z, NECK_MASS_g},
-		{HEAD_MASS_X, HEAD_MASS_Y, HEAD_MASS_Z, HEAD_MASS_g}};
+        {HEAD_MASS_X, HEAD_MASS_Y, HEAD_MASS_Z, HEAD_MASS_g}};
 
     static const float LEFT_ARM_INERTIAL_POS[4][4] = {
         {0.0f, 0.0f, 0.0f, SHOULDER_MASS_g},
@@ -457,11 +457,11 @@ namespace Kinematics {
         {0.0f, 0.0f, 0.0f, FOREARM_MASS_g}};
 
     //Z,X,Y is the correct order for most of the leg
-	// TODO: figure out why!
+    // TODO: figure out why!
     static const float LEFT_LEG_INERTIAL_POS[6][4] = {
         {0.0f, 0.0f, 0.0f, PELVIS_MASS_g},
         {0.0f, 0.0f, 0.0f, HIP_MASS_g},
-		{0.0f, 0.0f, 0.0f, THIGH_MASS_g},
+        {0.0f, 0.0f, 0.0f, THIGH_MASS_g},
         {0.0f, 0.0f, 0.0f, TIBIA_MASS_g},
         {0.0f, 0.0f, 0.0f, ANKLE_MASS_g},
         {0.0f, 0.0f, 0.0f, FOOT_MASS_g}};
