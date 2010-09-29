@@ -21,36 +21,56 @@ import ch.ethz.ssh2.StreamGobbler;
 
 
 /**
+ * A Deployer controller for the Nao Robot and the Northern Bites nbites repository.
  *
+ * Gives a GUI Front to common command line tasks to simplify robot setup and control.
+ *
+ * This RemoteController is the backend for the GUI application.
  */
 public class RemoteController {
 
 	private static final String NAO_USERNAME = "nao";
 
+	// The GUI front-end
 	private RemoteView view;
 
 	public RemoteController() {
         view = new RemoteView(this);
 	}
 
+	/**
+	 * Update our knowledge of whether NaoQi is running or not.
+	 */
 	public void updateNaoQiStatus(String ip){
 
 	}
 
+	/**
+	 * Restart NaoQi on the robot at the given IP Address.
+	 */
 	public void restartNaoQi(String ip){
 		executeRemoteNaoCommand(ip, "/etc/init.d/naoqi restart");
 	}
 
+	/**
+	 * Stop NaoQi on the robot at the given IP Address.
+	 */
 	public void stopNaoQi(String ip){
 		executeRemoteNaoCommand(ip, "/etc/init.d/naoqi stop");
 	}
 
+	/**
+	 * @param ip        IP Address of the robot to execute the command on.
+	 * @param command   Shell command to execute remotely on the Nao.
+	 */
 	public void executeRemoteNaoCommand(String ip, String command){
-		// Ask for password to Nao
+
+		// We must be given a robot to execute a command on
 		if (ip == null || ip.length() == 0){
 			System.out.println("No IP Address given, cannot execute remote command.");
 
 		} else {
+			// Ask for password to Nao
 			String password = (String)JOptionPane.showInputDialog(view,
 																  "Please enter password for nao@" + ip);
 
@@ -60,11 +80,16 @@ public class RemoteController {
 		}
 	}
 
+	/**
+	 * SSH into the given host and execute the given shell command.
+	 *
+	 * Uses Ganymed-SSH2 Java Library for SSH interaction with robot
+	 */
 	public void sshExecCommand(String host, String username, String password,
 							   String command){
 		try{
-			Connection conn = new Connection(host);
 
+			Connection conn = new Connection(host);
 			conn.connect();
 
 			boolean isAuthenticated = conn.authenticateWithPassword(username, password);
@@ -89,6 +114,10 @@ public class RemoteController {
 		};
 	}
 
+
+	/**
+	 * Run a local shell command and print the output.
+	 */
 	private void runShellCommand(String command, boolean blocks){
 		try{
 			// using the Runtime exec method:
@@ -105,6 +134,9 @@ public class RemoteController {
 		}
 	}
 
+	/**
+	 * @param Process    The process from which output is to be gathered and printed.
+	 */
 	private void printProcessOutput(Process p){
 		try {
 			BufferedReader stdInput = new
