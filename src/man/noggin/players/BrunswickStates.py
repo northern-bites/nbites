@@ -45,10 +45,13 @@ def gameReady(player):
         player.inKickingState = False
         player.justKicked = False
         player.standup()
-        player.brain.tracker.locPans()
 
     if player.lastDiffState == 'gameInitial':
-        return player.goLater('relocalize')
+        return player.goLater('initialLocalize')
+
+    else:
+        player.brain.tracker.locPans()
+
     if player.firstFrame() and \
             player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()

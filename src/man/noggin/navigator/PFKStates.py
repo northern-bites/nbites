@@ -25,10 +25,10 @@ SAFE_TO_SPIN_DIST = 15.
 SAFE_TO_STRAFE_DIST = 20.
 
 # Values for controlling the strafing
-PFK_MAX_Y_SPEED = speeds.MAX_Y_SPEED
-PFK_MIN_Y_SPEED = speeds.MIN_Y_SPEED
-PFK_MAX_X_SPEED = speeds.MAX_X_SPEED
-PFK_MIN_X_SPEED = speeds.MIN_X_SPEED
+PFK_LEFT_SPEED = speeds.LEFT_MAX_SPEED
+PFK_RIGHT_SPEED = speeds.RIGHT_MAX_SPEED
+PFK_FWD_SPEED = speeds.FWD_MAX_SPEED
+PFK_REV_SPEED = speeds.REV_MAX_SPEED
 PFK_MIN_Y_MAGNITUDE = speeds.MIN_Y_MAGNITUDE
 PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
 PFK_X_GAIN = 0.12
@@ -66,12 +66,12 @@ def pfk_all(nav):
     if (fabs(hDiff) < PFK_CLOSE_ENOUGH_THETA):
         sTheta = 0.0
     else:
-        sTheta = MyMath.sign(hDiff) * constants.GOTO_SPIN_SPEED * \
+        sTheta = MyMath.sign(hDiff) * constants.MAX_SPIN_MAGNITUDE * \
                  walker.getCloseRotScale(hDiff)
 
         sTheta = MyMath.clip(sTheta,
-                             constants.OMNI_MIN_SPIN_SPEED,
-                             constants.OMNI_MAX_SPIN_SPEED)
+                             constants.OMNI_MAX_RIGHT_SPIN_SPEED,
+                             constants.OMNI_MAX_LEFT_SPIN_SPEED)
 
     if fabs(hDiff) < PFK_CLOSE_ENOUGH_THETA:
         nav.stopTheta += 1

@@ -30,6 +30,42 @@ def playbookPosition(player):
 
     return player.stay()
 
+
+def initialLocalize(player):
+
+    if player.firstFrame():
+        player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
+
+    if player.brain.my.teamColor == NogginConstants.TEAM_RED:
+        if player.brain.yglp.on and player.brain.ygrp.on:
+            #both post give better loc. They will be unobstructed.
+            player.brain.tracker.stopHeadMoves()
+            #YOU FOUND YOUR GOAL!
+        elif player.brain.bglp.framesOn > 1 or player.brain.bgrp.framesOn > 1:
+            #look the other way early
+            player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
+        else:
+            #look the other way (Something's wrong)
+            player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
+    else:
+        if player.brain.bglp.on and player.brain.bgrp.on:
+            #both post give better loc. They will be unobstructed.
+            player.brain.tracker.stopHeadMoves()
+            #YOU FOUND YOUR GOAL!
+        elif player.brain.yglp.framesOn > 1 or player.brain.ygrp.framesOn > 1:
+            #look the other way early
+            player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
+        else:
+            #look the other way (Something's wrong)
+            player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
+
+player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+                              NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
+                                        -90.0)
+
+    return player.stay()
+
+
 def relocalize(player):
     if player.firstFrame():
         player.setWalk(constants.RELOC_X_SPEED, 0, 0)

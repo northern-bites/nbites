@@ -20,7 +20,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
-        player.setWalk(0,0, speeds.MAX_SPIN_SPEED)
+        player.setWalk(0,0, speeds.RIGHT_SPIN_MAX_SPEED)
         player.brain.tracker.startScan(HeadMoves.SPIN_RIGHT_SCAN_BALL)
 
     #if player.brain.ball.on:
