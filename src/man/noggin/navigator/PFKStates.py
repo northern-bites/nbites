@@ -96,8 +96,8 @@ def pfk_all(nav):
         sY = 0
     else:
         sY = MyMath.clip(target_y * PFK_Y_GAIN,
-                         PFK_MIN_Y_SPEED,
-                         PFK_MAX_Y_SPEED)
+                         PFK_RIGHT_SPEED,
+                         PFK_LEFT_SPEED)
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     if sY == 0.0 and sTheta == 0.0:
@@ -113,8 +113,8 @@ def pfk_all(nav):
         sX = 0.0
     else:
         sX = MyMath.clip(x_diff * PFK_X_GAIN,
-                         PFK_MIN_X_SPEED,
-                         PFK_MAX_X_SPEED)
+                         PFK_REV_SPEED,
+                         PFK_FWD_SPEED)
         sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
 
     print "hDiff:%g target_y:%g x_diff:%g" % (hDiff, target_y, x_diff)
@@ -148,18 +148,19 @@ def pfk_xy(nav):
         return nav.goNow('pfk_final')
     else:
         sY = MyMath.clip(target_y * PFK_Y_GAIN,
-                         PFK_MIN_Y_SPEED,
-                         PFK_MAX_Y_SPEED)
+                         PFK_RIGHT_SPEED,
+                         PFK_LEFT_SPEED)
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     x_diff = ball.relX - SAFE_BALL_REL_X
+
     # arbitrary
     if fabs(x_diff) < PFK_CLOSE_ENOUGH_XY:
         sX = 0.0
     else:
         sX = MyMath.clip(x_diff * PFK_X_GAIN,
-                         PFK_MIN_X_SPEED,
-                         PFK_MAX_X_SPEED)
+                         PFK_REV_SPEED,
+                         PFK_FWD_SPEED)
         sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
 
     # in position, let's kick the ball!
@@ -179,7 +180,7 @@ def pfk_x(nav):
        nav.brain.ball.dist > SAFE_TO_STRAFE_DIST:
         return nav.goNow('pfk_xy')
 
-    helper.setSlowSpeed(nav, -PFK_MIN_X_SPEED, 0.0, 0.0)
+    helper.setSlowSpeed(nav, PFK_MIN_X_MAGNITUDE, 0.0, 0.0)
 
     return nav.stay()
 
@@ -201,8 +202,8 @@ def pfk_final(nav):
         sX = 0.0
     else:
         sX = MyMath.clip(x_diff * PFK_X_GAIN,
-                         PFK_MIN_X_SPEED,
-                         PFK_MAX_X_SPEED)
+                         PFK_REV_SPEED,
+                         PFK_FWD_SPEED)
         sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
 
     helper.setSlowSpeed(nav,sX, 0.0, 0.0)
