@@ -35,7 +35,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#include "motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
+#include "cmake.man.motion/motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
 
 #include "MCL.h"
 #include "Kinematics.h"

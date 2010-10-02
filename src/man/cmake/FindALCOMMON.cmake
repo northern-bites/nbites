@@ -48,15 +48,9 @@ ENDIF(WEBOTS_BACKEND)
             ${AL_DIR}/lib/libalcommon.a
             )
         ELSE(APPLE)
-            IF(WEBOTS_BACKEND)
-                SET( ALCOMMON_LIBRARIES
-                  ${AL_DIR}/lib/libalcommon.a
-                  )
-            ELSE(WEBOTS_BACKEND)
-                SET( ALCOMMON_LIBRARIES
-              ${AL_DIR}/lib/libalcommon.so
-              )
-            ENDIF(WEBOTS_BACKEND)
+          SET( ALCOMMON_LIBRARIES
+	    ${AL_DIR}/lib/libalcommon.so
+            )
         ENDIF(APPLE)
       ENDIF( WIN32 )
     ENDIF( OE_CROSS_BUILD )

@@ -634,6 +634,7 @@ public class VisionState {
 		buttonPanel.add(fieldLinesDebugIdentifyCornersBox);
 		buttonPanel.add(fieldLinesDebugCcScanBox);
 		buttonPanel.add(fieldLinesDebugRiskyCornersBox);
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		ballPanel.add(new JLabel("\tVision Flags"));
 		ballPanel.add(ballDebugBallBox);
 		ballPanel.add(ballDebugBallDistanceBox);

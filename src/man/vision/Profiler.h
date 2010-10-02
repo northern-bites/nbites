@@ -2,7 +2,7 @@
 #ifndef _Profiler_h_DEFINED
 #define _Profiler_h_DEFINED
 
-#include "profileconfig.h"
+#include "cmake.vision/profileconfig.h"
 
 
 #ifdef USE_TIME_PROFILING
