@@ -34,6 +34,10 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
 
+############################ SET CONFIG FILE DIR
+SET( VISION_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
+
+
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
@@ -92,14 +96,14 @@ FIND_PACKAGE( BOOTS    REQUIRED)
 ############################ CONFIG.H GENERATION
 # Generate the config.h file, inserting values of CMake cache variable
 CONFIGURE_FILE(
-  "${VISION_CMAKE_DIR}/profileconfig.h.in"
-  "${VISION_INCLUDE_DIR}/profileconfig.h"
+  ${VISION_CMAKE_DIR}/profileconfig.h.in
+  ${VISION_CONFIG_DIR}/profileconfig.h
     ESCAPE_QUOTES
   )
 
 CONFIGURE_FILE(
-  "${VISION_CMAKE_DIR}/visionconfig.h.in"
-  "${VISION_INCLUDE_DIR}/visionconfig.h"
+  ${VISION_CMAKE_DIR}/visionconfig.h.in
+  ${VISION_CONFIG_DIR}/visionconfig.h
     ESCAPE_QUOTES
   )
 
@@ -116,8 +120,9 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
                      ${VISION_INCLUDE_DIR}
                      ${BOOST_INCLUDE_DIR}
+		     ${VISION_CONFIG_DIR}/
                      )
-                     
+
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
@@ -150,7 +155,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/VisualCross
                  ${VISION_INCLUDE_DIR}/VisualLine
                  )
-                 
+
 
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )

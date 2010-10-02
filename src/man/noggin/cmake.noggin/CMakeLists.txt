@@ -34,6 +34,9 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
 
+############################ SET CONFIGURATION FILE DIR
+SET( NOGGIN_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/noggin )
+
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
@@ -93,22 +96,22 @@ SET(@GC_PLAYER_NUMBER@
 SET( GC_PLAYER_NUMBER ${@GC_PLAYER_NUMBER@} )
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
-  "${NOGGIN_CMAKE_DIR}/nogginconfig.in"
-  "${NOGGIN_INCLUDE_DIR}/nogginconfig.h"
-    ESCAPE_QUOTES
+  ${NOGGIN_CMAKE_DIR}/nogginconfig.in
+  ${NOGGIN_CONFIG_DIR}/nogginconfig.h
+  ESCAPE_QUOTES
   )
 CONFIGURE_FILE(
-  "${NOGGIN_CMAKE_DIR}/Switch.py.in"
-  "${NOGGIN_INCLUDE_DIR}/players/Switch.py"
+  ${NOGGIN_CMAKE_DIR}/Switch.py.in
+  ${NOGGIN_INCLUDE_DIR}/players/Switch.py
   )
 CONFIGURE_FILE(
-  "${NOGGIN_CMAKE_DIR}/TeamConfig.py.in"
-  "${NOGGIN_INCLUDE_DIR}/TeamConfig.py"
+  ${NOGGIN_CMAKE_DIR}/TeamConfig.py.in
+  ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
   )
 
 CONFIGURE_FILE(
-  "${NOGGIN_CMAKE_DIR}/WebotsConfig.py.in"
-  "${NOGGIN_INCLUDE_DIR}/WebotsConfig.py"
+  ${NOGGIN_CMAKE_DIR}/WebotsConfig.py.in
+  ${NOGGIN_INCLUDE_DIR}/WebotsConfig.py
   )
 
 ############################ DEFINITION
@@ -124,6 +127,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${VISION_INCLUDE_DIR}
                      ${CORPUS_INCLUDE_DIR}
                      ${NOGGIN_INCLUDE_DIR}
+                     ${NOGGIN_CONFIG_DIR}
                      )
 
 
