@@ -140,12 +140,10 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
 
     return result;
 }
-//#define SENSOR_SCALE 0.75f
-#define SENSOR_SCALE 0.0f
+
 LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     ufvector3 src_f = CoordFrame3D::vector3D(swing_src->x,swing_src->y);
-
 
     ufvector3 dest_c = prod(fc_Transform,dest_f);
     ufvector3 src_c = prod(fc_Transform,src_f);
@@ -167,8 +165,8 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
 
     //HORIZONTAL PROGRESS:
     float percent_complete =
-		( static_cast<float>(frameCounter) /
-		  static_cast<float>(singleSupportFrames));
+        ( static_cast<float>(frameCounter) /
+          static_cast<float>(singleSupportFrames));
 
     float theta = percent_complete*2.0f*M_PI_FLOAT;
     float percent_to_dest_horizontal = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
@@ -223,10 +221,9 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     const float startStopSensorScale = getEndStepSensorScale();
 
-
-	//Center of mass control
+    //Center of mass control
 #ifdef USE_COM_CONTROL
-	const float COM_SCALE = startStopSensorScale;
+    const float COM_SCALE = startStopSensorScale;
     const ufvector4 com_c = Kinematics::getCOMc(sensors->getMotionBodyAngles());
 #else
 	const float COM_SCALE = startStopSensorScale;

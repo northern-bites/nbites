@@ -5,6 +5,7 @@ using namespace std;
 using namespace boost::numeric;
 
 #define DEBUG_COM
+//#define DEBUG_COM_VERBOSE
 
 const ufvector4
 Kinematics::getCOMc(const vector<float> bodyAngles){
@@ -33,7 +34,7 @@ const ufvector4 Kinematics::calculateChestCOM() {
 												CHEST_MASS_Y,
 												CHEST_MASS_Z)
 		*(CHEST_MASS_g/TOTAL_MASS);
-#ifdef DEBUG_COM
+#ifdef DEBUG_COM_VERBOSE
 	cout << "Chest COM " << chestCom << endl;
 #endif
 
@@ -74,7 +75,7 @@ Kinematics::slowCalculateChainCom(const ChainID id,
       fullTransform = prod(fullTransform, transX);
     }
 
-    //twist: - rotate about the X(i-1) axis
+    //twist ALPHA: - rotate about the X(i-1) axis
     if (currentmDHParameters[i*4 + ALPHA] != 0) {
       const ufmatrix4 rotX =
 	CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
@@ -83,13 +84,14 @@ Kinematics::slowCalculateChainCom(const ChainID id,
     }
 
     //theta - rotate about the Z(i) axis
-    if (currentmDHParameters[i*4 + THETA] + angles[i] != 0) {
-      const ufmatrix4 rotZ =
-	CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS,
-			       currentmDHParameters[i*4 + THETA] +
-			       angles[i]);
-      fullTransform = prod(fullTransform, rotZ);
-    }
+	//may need to run transform even if THETA=0
+	if (currentmDHParameters[i*4 + THETA] + angles[i] != 0) {
+		const ufmatrix4 rotZ =
+			CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS,
+									 currentmDHParameters[i*4 + THETA] +
+									 angles[i]);
+		fullTransform = prod(fullTransform, rotZ);
+	}
 
     //offset D movement along the Z(i) axis
     if (currentmDHParameters[i*4 + D] != 0) {
@@ -111,8 +113,19 @@ Kinematics::slowCalculateChainCom(const ChainID id,
     const ufvector4 thisSegmentWeightedPos =
         prod(curMassTrans,origin)*curMassProportion;
 
+#ifdef DEBUG_COM_VERBOSE
+	cout << "added joint: " << i << "--"<< thisSegmentWeightedPos << endl;
+
+	const ufvector4 thisSegmentPosition =
+		prod(curMassTrans,origin);
+	cout << "position " << thisSegmentPosition << endl;
+#endif
     comPos += thisSegmentWeightedPos;
   }
+#ifdef DEBUG_COM_VERBOSE
+  cout << "chain id: " << id <<endl;
+  cout << "weight: " << comPos <<endl;
+#endif
   return comPos;
 }
 
