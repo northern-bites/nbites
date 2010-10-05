@@ -26,14 +26,14 @@ Kinematics::getCOMc(const vector<float> bodyAngles){
   cout << "Body Com " << partialComPos <<endl;
 #endif
 
-  return partialComPos;
+  return partialComPos/TOTAL_MASS;
 }
 
 const ufvector4 Kinematics::calculateChestCOM() {
 	ufvector4 chestCom = CoordFrame4D::vector4D(CHEST_MASS_X,
 												CHEST_MASS_Y,
 												CHEST_MASS_Z)
-		*(CHEST_MASS_g/TOTAL_MASS);
+		*(CHEST_MASS_g);
 #ifdef DEBUG_COM_VERBOSE
 	cout << "Chest COM " << chestCom << endl;
 #endif
@@ -109,9 +109,9 @@ Kinematics::slowCalculateChainCom(const ChainID id,
                                     curInertialPos[i*4 + 1],
                                     curInertialPos[i*4 + 2]);
     const ufmatrix4 curMassTrans = prod(fullTransform,massEndTrans);
-    const float curMassProportion = curInertialPos[i*4 + MASS_INDEX]/TOTAL_MASS;
+    const float jointMass = curInertialPos[i*4 + MASS_INDEX];
     const ufvector4 thisSegmentWeightedPos =
-        prod(curMassTrans,origin)*curMassProportion;
+        prod(curMassTrans,origin)*jointMass;
 
 #ifdef DEBUG_COM_VERBOSE
 	cout << "added joint: " << i << "--"<< thisSegmentWeightedPos << endl;
