@@ -160,16 +160,23 @@ public class RemoteController {
 	/**
 	 * Use a GUI to configure the build.
 	 */
-	public void configure(String buildType){
-		runShellCommand("make " + buildType + "_gui -C ../../src/man/", false);
+	public void configure(String buildType, String robotName, String ip){
+            runShellCommand("make " + buildType + "_gui -C ../../src/man/", false);
 	}
 
 	/**
 	 * Compile the man source.
 	 */
 	public void compile(String buildType){
-		runShellCommand("make build_" + buildType + " -C ../../src/man/ -j3", false);
+            runShellCommand("make build_" + buildType + " -C ../../src/man/ -j3", false);
 	}
+
+        /**
+         * Install the compiled libman and Python to the robot.
+         */
+        public void install(String buildType){
+            runShellCommand("../../build/man/" + buildType + "/upload.sh", false);
+        }
 
     /**
     * @param args the command line arguments

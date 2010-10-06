@@ -34,11 +34,10 @@ public class RemoteView extends javax.swing.JFrame {
     private void initComponents() {
 
         jInternalFrame1 = new javax.swing.JInternalFrame();
-        nameChooser = new javax.swing.JComboBox();
         info = new javax.swing.JPanel();
         robotNameLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        nameChooser = new javax.swing.JList();
         robotIPLabel = new javax.swing.JLabel();
         ipTextField = new javax.swing.JTextField();
         Build = new javax.swing.JPanel();
@@ -53,10 +52,6 @@ public class RemoteView extends javax.swing.JFrame {
         stopButton = new javax.swing.JButton();
         File = new javax.swing.JPanel();
         fileNamePanel = new javax.swing.JPanel();
-        fileNameLabel = new javax.swing.JLabel();
-        fileNameTextField = new javax.swing.JTextField();
-        editButton = new javax.swing.JButton();
-        updateButton = new javax.swing.JButton();
 
         jInternalFrame1.setVisible(true);
 
@@ -71,13 +66,6 @@ public class RemoteView extends javax.swing.JFrame {
             .add(0, 19, Short.MAX_VALUE)
         );
 
-        nameChooser.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Marvin", "Slartibartfast", "Trillian", "Zaphod" }));
-        nameChooser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nameChooserActionPerformed(evt);
-            }
-        });
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Remote");
         getContentPane().setLayout(new java.awt.GridLayout(2, 2));
@@ -89,13 +77,13 @@ public class RemoteView extends javax.swing.JFrame {
         robotNameLabel.setText("Robot Name:");
         info.add(robotNameLabel);
 
-        jList1.setModel(new javax.swing.AbstractListModel() {
+        nameChooser.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "marvin", "slarti", "trillian", "zaphod" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane1.setViewportView(jList1);
+        nameChooser.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(nameChooser);
 
         info.add(jScrollPane1);
 
@@ -150,6 +138,11 @@ public class RemoteView extends javax.swing.JFrame {
         Build.add(compileButton);
 
         installButton.setText("Install man");
+        installButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                installButtonActionPerformed(evt);
+            }
+        });
         Build.add(installButton);
 
         getContentPane().add(Build);
@@ -181,29 +174,7 @@ public class RemoteView extends javax.swing.JFrame {
         File.setLayout(new java.awt.GridLayout(0, 1));
 
         fileNamePanel.setLayout(new java.awt.GridLayout(1, 0));
-
-        fileNameLabel.setText("File Name:");
-        fileNamePanel.add(fileNameLabel);
-
-        fileNameTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fileNameTextFieldActionPerformed(evt);
-            }
-        });
-        fileNamePanel.add(fileNameTextField);
-
         File.add(fileNamePanel);
-
-        editButton.setText("Edit");
-        editButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editButtonActionPerformed(evt);
-            }
-        });
-        File.add(editButton);
-
-        updateButton.setText("Update");
-        File.add(updateButton);
 
         getContentPane().add(File);
 
@@ -211,16 +182,14 @@ public class RemoteView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void configureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_configureButtonActionPerformed
-        controller.configure((String)typeChooser.getSelectedItem());
+        controller.configure((String)typeChooser.getSelectedItem(),
+                            (String)nameChooser.getSelectedValue(),
+                            (String)ipTextField.getText());
     }//GEN-LAST:event_configureButtonActionPerformed
 
     private void compileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_compileButtonActionPerformed
         controller.compile((String)typeChooser.getSelectedItem());
     }//GEN-LAST:event_compileButtonActionPerformed
-
-    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_editButtonActionPerformed
 
     private void ipTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ipTextFieldActionPerformed
         // TODO add your handling code here:
@@ -234,17 +203,13 @@ public class RemoteView extends javax.swing.JFrame {
         controller.stopNaoQi(ipTextField.getText());
     }//GEN-LAST:event_stopButtonActionPerformed
 
-    private void fileNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileNameTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fileNameTextFieldActionPerformed
-
     private void restartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restartButtonActionPerformed
         controller.restartNaoQi(ipTextField.getText());
     }//GEN-LAST:event_restartButtonActionPerformed
 
-    private void nameChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameChooserActionPerformed
-        // TODO add your handling code here:
-}//GEN-LAST:event_nameChooserActionPerformed
+    private void installButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_installButtonActionPerformed
+        controller.install((String)typeChooser.getSelectedItem());
+    }//GEN-LAST:event_installButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -253,17 +218,13 @@ public class RemoteView extends javax.swing.JFrame {
     private javax.swing.JPanel File;
     private javax.swing.JButton compileButton;
     private javax.swing.JButton configureButton;
-    private javax.swing.JButton editButton;
-    private javax.swing.JLabel fileNameLabel;
     private javax.swing.JPanel fileNamePanel;
-    private javax.swing.JTextField fileNameTextField;
     private javax.swing.JPanel info;
     private javax.swing.JButton installButton;
     private javax.swing.JTextField ipTextField;
     private javax.swing.JInternalFrame jInternalFrame1;
-    private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox nameChooser;
+    private javax.swing.JList nameChooser;
     private javax.swing.JButton restartButton;
     private javax.swing.JLabel robotIPLabel;
     private javax.swing.JLabel robotNameLabel;
@@ -271,7 +232,6 @@ public class RemoteView extends javax.swing.JFrame {
     private javax.swing.JComboBox typeChooser;
     private javax.swing.JLabel typeLabel;
     private javax.swing.JPanel typePanel;
-    private javax.swing.JButton updateButton;
     // End of variables declaration//GEN-END:variables
 
 }
