@@ -33,7 +33,6 @@ public class RemoteView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jInternalFrame1 = new javax.swing.JInternalFrame();
         info = new javax.swing.JPanel();
         robotNameLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -52,19 +51,6 @@ public class RemoteView extends javax.swing.JFrame {
         stopButton = new javax.swing.JButton();
         File = new javax.swing.JPanel();
         fileNamePanel = new javax.swing.JPanel();
-
-        jInternalFrame1.setVisible(true);
-
-        org.jdesktop.layout.GroupLayout jInternalFrame1Layout = new org.jdesktop.layout.GroupLayout(jInternalFrame1.getContentPane());
-        jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
-        jInternalFrame1Layout.setHorizontalGroup(
-            jInternalFrame1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 126, Short.MAX_VALUE)
-        );
-        jInternalFrame1Layout.setVerticalGroup(
-            jInternalFrame1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 19, Short.MAX_VALUE)
-        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Remote");
@@ -222,7 +208,6 @@ public class RemoteView extends javax.swing.JFrame {
     private javax.swing.JPanel info;
     private javax.swing.JButton installButton;
     private javax.swing.JTextField ipTextField;
-    private javax.swing.JInternalFrame jInternalFrame1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList nameChooser;
     private javax.swing.JButton restartButton;
