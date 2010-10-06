@@ -42,4 +42,25 @@ public class HoughLine {
 
     }
 
+    // returns  true iff this line and the other line intersect
+    // effect   set px, py to the intersection of this line and the other line
+    public boolean intersect(HoughLine other, double rx, double ry)
+    {
+        double px, py;
+        double cs1 = Math.cos(t);
+        double sn1 = Math.sin(t);
+        double cs2 = Math.cos(other.t);
+        double sn2 = Math.sin(other.t);
+        double g = cs1 * sn2 - sn1 * cs2;
+        if (g == 0)
+            {
+                px = py = 0;
+                return false;
+            }
+
+        px = ( sn2 * r - sn1 * other.r) / g;
+        py = (-cs2 * r + cs1 * other.r) / g;
+        return (Math.abs(px) <= rx && Math.abs(py) <= ry);
+    }
+
 }

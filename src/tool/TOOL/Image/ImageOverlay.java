@@ -164,19 +164,21 @@ public class ImageOverlay extends BufferedImage{
 
                 // Apply Sobel kernel for gradient estimation
                 // rawImage.getYCbCr(x,y)[2]; // Y Value from pixel
-                int u = ((rawImage.getYCbCr(x+1,y+1)[0] +
+                int u = ((rawImage.getYCbCr(x+1,y-1)[0] +
                           2 * rawImage.getYCbCr(x+1,y)[0] +
                           rawImage.getYCbCr(x+1,y+1)[0]) -
-                         (rawImage.getYCbCr(x-1,y+1)[0] +
-                          2 * rawImage.getYCbCr(x-1,y)[0] +
-                          rawImage.getYCbCr(x-1,y-1)[0]));
 
-                int v = ((rawImage.getYCbCr(x-1,y-1)[0] +
-                          2 * rawImage.getYCbCr(x,y-1)[0] +
-                          rawImage.getYCbCr(x+1,y-1)[0]) -
-                         (rawImage.getYCbCr(x-1,y+1)[0] +
+                         (rawImage.getYCbCr(x-1,y-1)[0] +
+                          2 * rawImage.getYCbCr(x-1,y)[0] +
+                          rawImage.getYCbCr(x-1,y+1)[0]));
+
+                int v = ((rawImage.getYCbCr(x-1,y+1)[0] +
                           2 * rawImage.getYCbCr(x,y+1)[0] +
-                          rawImage.getYCbCr(x+1,y+1)[0]));
+                          rawImage.getYCbCr(x+1,y+1)[0]) -
+
+                         (rawImage.getYCbCr(x-1,y-1)[0] +
+                          2 * rawImage.getYCbCr(x,y-1)[0] +
+                          rawImage.getYCbCr(x+1,y-1)[0]));
 
                 imgGradientX[y][x] = u;
                 imgGradientY[y][x] = v;
@@ -190,12 +192,12 @@ public class ImageOverlay extends BufferedImage{
         int[] dyTab = { 0,  1,  1,  1,  0, -1, -1, -1};
 
         // Match the threshold to the squared magnitude
-        int thresh = edgeThresh * edgeThresh << 4;
+        int thresh = (edgeThresh * edgeThresh) << 4;
 
         for(int y = 2; y < height-2; y++){
             for(int x = 2; x < width-2; x++){
-                int z = imgGradientMag[y][x];
 
+                int z = imgGradientMag[y][x];
                 if ( z > thresh){
 
                     // Calculate the direction of the gradient
@@ -216,9 +218,9 @@ public class ImageOverlay extends BufferedImage{
                         imgGradientX[y][x] = 0;
                     }
                 } else {
-                        imgGradientMag[y][x] = 0;
-                        imgGradientY[y][x] = 0;
-                        imgGradientX[y][x] = 0;
+                    imgGradientMag[y][x] = 0;
+                    imgGradientY[y][x] = 0;
+                    imgGradientX[y][x] = 0;
                 }
             }
         }
@@ -226,6 +228,7 @@ public class ImageOverlay extends BufferedImage{
         HoughSpace hs = new HoughSpace();
         hs.acceptThreshold = acceptThreshold;
         hs.run(imgGradientX, imgGradientY, imgGradientMag);
+
 
         for(int i=0; i < hs.lines.size(); ++i){
             HoughLine line = hs.lines.get(i);

@@ -39,6 +39,7 @@ public class HoughSpace {
     }
 
     public static int getR(int x, int y, int t){
+
         double a = (t & 0xFF) * Math.PI / 128.0;
         return (int)Math.floor(x * Math.cos(a) + y * Math.sin(a));
     }
@@ -101,7 +102,7 @@ public class HoughSpace {
         int[] dtTab = {  0,  1,  1,  1,  1,  0, -1, -2, -2, -2};
 
         int peakPoints = 4;
-        int thr = 3 * acceptThreshold;  // smoothing has gain 4
+        int thr = 4 * acceptThreshold;  // smoothing has gain 4
 
         for (int t = 0; t < T_SPAN; ++t)
             for (int r = 2; r < R_SPAN - 2; ++r) {
@@ -159,13 +160,42 @@ public class HoughSpace {
         //             System.out.print(0 + " ");
         //     System.out.print("\n");
         // }
-        // suppress(x0, y0);
+        suppress(x0, y0);
+    }
+
+    private void suppress(int rx, int ry){
+    	// First mark lines for deletion
+        boolean[] markForDelete = new boolean[lines.size()];
+        for (int i = 0; i < lines.size() - 1; ++i)
+            for (int j = i + 1; j < lines.size(); ++j)
+                {
+                    double px, py;
+                    int ijAngle = Math.abs((lines.get(i).tIndex - lines.get(j).tIndex & 0xFF) << 24 >> 24);
+                    if (0 < ijAngle && ijAngle <= angleSpread &&
+                        lines.get(i).intersect(lines.get(j), rx, ry))
+                        {
+                            if (lines.get(i).score < lines.get(j).score)
+                                markForDelete[i] = true;
+                            if (lines.get(j).score < lines.get(i).score)
+                                markForDelete[j] = true;
+                        }
+                }
+
+        // Then delete marked lines
+        int n = 0;
+        for (int i = 0; i < markForDelete.length; ++i){
+            if (markForDelete[i])
+                lines.remove(n);
+            else
+                ++n;
+        }
+
     }
 
     public static int dir(int[][] xArray, int[][] yArray, int x, int y){
         // Calculate the direction of the gradient
         return (int)(Math.atan2(yArray[y][x], xArray[y][x]) /
-                     Math.PI * 128.0) & 0xff;
+                     Math.PI * 128.0) & 0xFF;
 
     }
 }
