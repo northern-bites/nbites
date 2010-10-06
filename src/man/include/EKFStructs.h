@@ -86,7 +86,7 @@ struct ZmpTimeUpdate{
 };
 
 /**
- * AccelMeasurement - A non-generic class for holding accelerometer values
+ * ZmpMeasurement - A non-generic class for holding accelerometer values
  *                    required (by motion) for filtering accel sensor values.
  */
 struct ZmpMeasurement {
