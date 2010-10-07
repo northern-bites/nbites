@@ -42,12 +42,11 @@ def getOmniWalkParam(my, dest):
 
     # calculate spin speed
     spinGain = constants.GOTO_SPIN_GAIN
-    hDiff = MyMath.sub180Angle(dest.h - my.h)
 
-    if (fabs(hDiff) < 2.0):
+    if (fabs(relH) < 2.0):
         sTheta = 0.0
     else:
-        sTheta = MyMath.sign(hDiff) * getRotScale(hDiff) * \
+        sTheta = MyMath.sign(relH) * getRotScale(relH) * \
                  constants.OMNI_MAX_SPIN_MAGNITUDE * spinGain
 
         sTheta = MyMath.clip(sTheta,

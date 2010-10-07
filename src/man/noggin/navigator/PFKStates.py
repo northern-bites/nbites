@@ -5,211 +5,143 @@ from . import NavConstants as constants
 from . import BrunswickSpeeds as speeds
 from math import fabs
 
-# arbitrary constant to reduce start/stop spinadjustments. even lower might be good
-START_SPIN_BEARING = 20.
-
-# near the limit of when we can stop seeing the ball with our head down
-# alternatively, the angle from body center to outside corner of foot
-# to reduce bumping into ball
-# higher miht be good
-STOP_SPIN_BEARING = 75.
-
-# dist to end of feet plus extra buffer
-# changed to be lower (weren't getting close enough to ball)
-SAFE_BALL_REL_X = 12.
-
-# dist to end of feet (make sure we don't bump ball when spinning)
-SAFE_TO_SPIN_DIST = 15.
-
-# make sure we don't bump into ball when strafing towards it
-SAFE_TO_STRAFE_DIST = 20.
-
-# Values for controlling the strafing
-PFK_LEFT_SPEED = speeds.LEFT_MAX_SPEED
-PFK_RIGHT_SPEED = speeds.RIGHT_MAX_SPEED
-PFK_FWD_SPEED = speeds.FWD_MAX_SPEED
-PFK_REV_SPEED = speeds.REV_MAX_SPEED
-PFK_MIN_Y_MAGNITUDE = speeds.MIN_Y_MAGNITUDE
-PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
-PFK_X_GAIN = 0.12
-PFK_Y_GAIN = 0.6
+# Values for controlling the speeds
+PFK_LEFT_SPIN_SPEED = speeds.LEFT_SPIN_WHILE_X_MAX_SPEED
+PFK_RIGHT_SPIN_SPEED = speeds.RIGHT_SPIN_WHILE_X_MAX_SPEED
+PFK_LEFT_SPEED = speeds.OMNI_LEFT_MAX_SPEED
+PFK_RIGHT_SPEED = speeds.OMNI_RIGHT_MAX_SPEED
+PFK_FWD_SPEED = speeds.OMNI_FWD_MAX_SPEED
+PFK_REV_SPEED = speeds.OMNI_REV_MAX_SPEED
+PFK_MIN_Y_MAGNITUDE = speeds.MIN_OMNI_Y_MAGNITUDE
+PFK_MIN_X_MAGNITUDE = speeds.MIN_OMNI_X_MAGNITUDE
+PFK_MIN_SPIN_MAGNITUDE = speeds.MIN_SPIN_WHILE_X_MAGNITUDE
 
 # Buffering values, insure that we eventually kick the ball
 PFK_CLOSE_ENOUGH_XY = 2.0
 PFK_CLOSE_ENOUGH_THETA = 11
-PFK_BALL_CLOSE_ENOUGH = 30
-# stop rotating after 4 consecutive frames with good hDiff
-BUFFER_FRAMES_THRESHOLD = 3
-PFK_BALL_VISION_FRAMES = 5
 
+"""
+Control State for PFK. Breaks up the problem into
+Theta, Y, and X. We want to make sure that we kick
+and don't try to get perfect position, so we get
+each direction good enough and then don't look at
+it again.
+"""
 def pfk_all(nav):
-    """
-    ball bearing is inside safe margin for spinning
-    try to get almost all heading adjustment done here
-    move x, y, and theta
-    """
+
+    sX = 0.0            # speed in the x direction
+    sY = 0.0            # speed in the y direction
+    sTheta = 0.0        # speed in the theta direction
 
     if nav.firstFrame():
-        nav.stopTheta = 0
-        nav.stopY_Theta = 0
+        nav.stopTheta = False
+        nav.stopY = False
+        nav.stopX = False
         print "entered from: ", nav.lastDiffState
 
+    # get our ideal relative positionings from the kick
     (x_offset, y_offset, heading) = nav.kick.getPosition()
 
     ball = nav.brain.ball
 
-    # calculate spin speed
-    # hDiff = MyMath.sub180Angle(heading - nav.brain.my.h)
-    # rotate to ball here, we will strafe to aim kick later
-    hDiff = MyMath.sub180Angle(ball.bearing)
-
-    if (fabs(hDiff) < PFK_CLOSE_ENOUGH_THETA):
-        sTheta = 0.0
-    else:
-        sTheta = MyMath.sign(hDiff) * constants.MAX_SPIN_MAGNITUDE * \
-                 walker.getCloseRotScale(hDiff)
-
-        sTheta = MyMath.clip(sTheta,
-                             constants.OMNI_MAX_RIGHT_SPIN_SPEED,
-                             constants.OMNI_MAX_LEFT_SPIN_SPEED)
-
-    if fabs(hDiff) < PFK_CLOSE_ENOUGH_THETA:
-        nav.stopTheta += 1
-        if nav.stopTheta > BUFFER_FRAMES_THRESHOLD:
-            return nav.goNow('pfk_xy')
-    else:
-        nav.stopTheta = 0
-
-    # if the ball is outside safe bearing and we're spinning away from it
-    # or we're spinning towards it but we're likely to spin into it...
-    # or we're close enough to the correct bearing
-    if fabs(ball.bearing) > STOP_SPIN_BEARING and \
-       ((MyMath.sign(ball.bearing) != MyMath.sign(hDiff))
-            or ball.relX < SAFE_BALL_REL_X \
-            or sTheta == 0.0):
-        return nav.goNow('pfk_xy')
-
-    target_y = ball.relY - y_offset
-
-    # arbitrary
-    if fabs(target_y) < PFK_CLOSE_ENOUGH_XY:
-        sY = 0
-    else:
-        sY = MyMath.clip(target_y * PFK_Y_GAIN,
-                         PFK_RIGHT_SPEED,
-                         PFK_LEFT_SPEED)
-        sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
-
-    if sY == 0.0 and sTheta == 0.0:
-        nav.stopY_Theta += 1
-        if nav.stopY_Theta > BUFFER_FRAMES_THRESHOLD:
-            return nav.goNow('pfk_final')
-    else:
-        nav.stopY_Theta = 0
-
-    x_diff = ball.relX - SAFE_BALL_REL_X
-    # arbitrary
-    if fabs(x_diff) < PFK_CLOSE_ENOUGH_XY:
-        sX = 0.0
-    else:
-        sX = MyMath.clip(x_diff * PFK_X_GAIN,
-                         PFK_REV_SPEED,
-                         PFK_FWD_SPEED)
-        sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
-
-    print "hDiff:%g target_y:%g x_diff:%g" % (hDiff, target_y, x_diff)
-    print "sTheta:%g sY:%g sX:%g" % (sTheta, sY, sX)
-    helper.setSlowSpeed(nav,sX,sY,sTheta)
-
-    return nav.stay()
-
-def pfk_xy(nav):
     """
-    ball bearing is outside safe limit, we're in danger of losing the ball.
-    position x,y only
+    # determine the theta speed if our position isn't good enough
+    if not nav.stopTheta:
+        sTheta = pfk_theta(nav, ball, heading)
     """
 
-    ball = nav.brain.ball
-    if ball.relX < SAFE_BALL_REL_X and \
-           ball.dist < SAFE_TO_STRAFE_DIST:
-        return nav.goNow('pfk_x')
+    # determine the y speed if our position isn't good enough
+    if not nav.stopY:
+        sY = pfk_y(nav, ball, y_offset)
+        #if sY interferes with what sTheta says, dangerous ball.
+            #Move X and Y only?
 
-    """
-    if fabs(ball.bearing) < START_SPIN_BEARING:
-        print "bearing to ball: %g" % ball.bearing
-        return nav.goNow('pfk_all')
-    """
+    # determine the x speed if our position isn't good enough
+    if not nav.stopX:
+        sX = pfk_x(nav, ball, x_offset)
+        if (sX < 0):
+            # possible dangerous ball move back slowly
+            helper.setSpeed(nav, sX, 0, 0)
+            return nav.stay()
 
-    (x_offset, y_offset, heading) = nav.kick.getPosition()
-    target_y = ball.relY - y_offset
-
-    # arbitrary
-    if fabs(target_y) < PFK_CLOSE_ENOUGH_XY:
-        return nav.goNow('pfk_final')
-    else:
-        sY = MyMath.clip(target_y * PFK_Y_GAIN,
-                         PFK_RIGHT_SPEED,
-                         PFK_LEFT_SPEED)
-        sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
-
-    x_diff = ball.relX - SAFE_BALL_REL_X
-
-    # arbitrary
-    if fabs(x_diff) < PFK_CLOSE_ENOUGH_XY:
-        sX = 0.0
-    else:
-        sX = MyMath.clip(x_diff * PFK_X_GAIN,
-                         PFK_REV_SPEED,
-                         PFK_FWD_SPEED)
-        sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
-
-    # in position, let's kick the ball!
-    if (sX == 0.0 and sY == 0.0):
+    if (nav.stopX and nav.stopY and nav.stopTheta):
+        # in good position for kick
         return nav.goNow('stop')
 
-    helper.setSlowSpeed(nav,sX,sY,0.0)
+    helper.setSpeed(nav, sX, sY, sTheta)
 
     return nav.stay()
 
-def pfk_x(nav):
-    """
-    ball is in a dangerous location next to our foot. move x only!
-    """
+"""
+Determines the speed in the theta direction to position
+accurately on the ball and returns that value
+"""
+#def pfk_theta(nav, ball, targetTheta)
+#
+# NOT IMPLEMENTED!!!
+#
+# Must use a global heading target based on a global robot heading.
+# Currently loc is unreliable so this cannot be done well.
+# Ideally, the kick would be determined at the time we decide to chase
+# the ball, maybe changed dynamically if we start recognizing other
+# robots, or if we have to avoid along the way. This would mean
+# positioning along a good theta direction. When motion has a good
+# OmniWalk, or walking along a path functionality, this would be more
+# achievable, maybe included in the motion system.
 
-    if nav.brain.ball.relX >= SAFE_BALL_REL_X or \
-       nav.brain.ball.dist > SAFE_TO_STRAFE_DIST:
-        return nav.goNow('pfk_xy')
+"""
+Determines the speed in the y direction to position
+accurately on the ball and returns that value
+"""
+def pfk_y(nav, ball, targetY):
 
-    helper.setSlowSpeed(nav, PFK_MIN_X_MAGNITUDE, 0.0, 0.0)
+    targetDist = ball.relY - targetY
 
-    return nav.stay()
+    if (fabs(targetDist) <= PFK_CLOSE_ENOUGH_XY):
+        nav.stopY = True
+        return 0
 
-def pfk_final(nav):
-    """
-    we're done spinning and aligned for y.
-    approach to final relX with x only.
-    (may need to accept minor y changes in future)
-    """
+    # Edge of acceptable area for kicking
+    distToSpeedModifier = targetY + PFK_CLOSE_ENOUGH_XY
 
-    ball = nav.brain.ball
+    if (targetDist > 0):
+        # Move left to match ball with target
+        # Change the distance to a speed and clip within vector limits
+        return MyMath.clip(targetDist/distToSpeedModifier - 1,
+                           PFK_MIN_Y_MAGNITUDE,
+                           PFK_LEFT_SPEED)
 
-    (x_offset, y_offset, heading) = nav.kick.getPosition()
-
-    x_diff = ball.relX - x_offset
-
-    # arbitrary
-    if fabs(x_diff) < PFK_CLOSE_ENOUGH_XY:
-        sX = 0.0
     else:
-        sX = MyMath.clip(x_diff * PFK_X_GAIN,
-                         PFK_REV_SPEED,
-                         PFK_FWD_SPEED)
-        sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
+        # Move right to match ball with target
+        # Change the distance to a speed and clip within vector limits
+        return MyMath.clip(targetDist/distToSpeedModifier + 1,
+                           PFK_RIGHT_SPEED,
+                           -PFK_MIN_Y_MAGNITUDE)
 
-    helper.setSlowSpeed(nav,sX, 0.0, 0.0)
+"""
+Determines the speed in the x direction to position
+accurately on the ball and returns that value
+"""
+def pfk_x(nav, ball, targetX):
 
-    # kicking time!
-    if sX == 0.0:
-        return nav.goNow('stop')
+    targetDist = ball.relX - targetX
 
-    return nav.stay()
+    if (fabs(targetDist) <= PFK_CLOSE_ENOUGH_XY):
+        nav.stopX = True
+        return 0
+
+    # Edge of acceptable area for kicking
+    distToSpeedModifier = targetX + PFK_CLOSE_ENOUGH_XY
+
+    if (targetDist > 0):
+        # Move foward to match ball with target
+        # Change the distance to a speed and clip within vector limits
+        return MyMath.clip(targetDist/distToSpeedModifier - 1,
+                           PFK_MIN_X_MAGNITUDE,
+                           PFK_FWD_SPEED)
+
+    else:
+        # Move Backwards
+        print "dangerous ball detected during PFK"
+        # Move back slowly
+        return -PFK_MIN_X_MAGNITUDE

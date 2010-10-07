@@ -7,6 +7,7 @@ def kickBallExecute(player):
         player.brain.tracker.trackBall()
         player.executeMove(player.brain.kickDecider.getSweetMove())
 
+        #if player.penaltyKicking:
         if not player.penaltyMadeFirstKick:
             player.penaltyMadeFirstKick = True
         elif not player.penaltyMadeSecondKick:
