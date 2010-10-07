@@ -25,10 +25,10 @@ SAFE_TO_SPIN_DIST = 15.
 SAFE_TO_STRAFE_DIST = 20.
 
 # Values for controlling the strafing
-PFK_MAX_Y_SPEED = speeds.MAX_Y_SPEED
-PFK_MIN_Y_SPEED = speeds.MIN_Y_SPEED
-PFK_MAX_X_SPEED = speeds.MAX_X_SPEED
-PFK_MIN_X_SPEED = speeds.MIN_X_SPEED
+PFK_LEFT_SPEED = speeds.LEFT_MAX_SPEED
+PFK_RIGHT_SPEED = speeds.RIGHT_MAX_SPEED
+PFK_FWD_SPEED = speeds.FWD_MAX_SPEED
+PFK_REV_SPEED = speeds.REV_MAX_SPEED
 PFK_MIN_Y_MAGNITUDE = speeds.MIN_Y_MAGNITUDE
 PFK_MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE
 PFK_X_GAIN = 0.12
@@ -66,12 +66,12 @@ def pfk_all(nav):
     if (fabs(hDiff) < PFK_CLOSE_ENOUGH_THETA):
         sTheta = 0.0
     else:
-        sTheta = MyMath.sign(hDiff) * constants.GOTO_SPIN_SPEED * \
+        sTheta = MyMath.sign(hDiff) * constants.MAX_SPIN_MAGNITUDE * \
                  walker.getCloseRotScale(hDiff)
 
         sTheta = MyMath.clip(sTheta,
-                             constants.OMNI_MIN_SPIN_SPEED,
-                             constants.OMNI_MAX_SPIN_SPEED)
+                             constants.OMNI_MAX_RIGHT_SPIN_SPEED,
+                             constants.OMNI_MAX_LEFT_SPIN_SPEED)
 
     if fabs(hDiff) < PFK_CLOSE_ENOUGH_THETA:
         nav.stopTheta += 1
@@ -96,8 +96,8 @@ def pfk_all(nav):
         sY = 0
     else:
         sY = MyMath.clip(target_y * PFK_Y_GAIN,
-                         PFK_MIN_Y_SPEED,
-                         PFK_MAX_Y_SPEED)
+                         PFK_RIGHT_SPEED,
+                         PFK_LEFT_SPEED)
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     if sY == 0.0 and sTheta == 0.0:
@@ -113,8 +113,8 @@ def pfk_all(nav):
         sX = 0.0
     else:
         sX = MyMath.clip(x_diff * PFK_X_GAIN,
-                         PFK_MIN_X_SPEED,
-                         PFK_MAX_X_SPEED)
+                         PFK_REV_SPEED,
+                         PFK_FWD_SPEED)
         sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
 
     print "hDiff:%g target_y:%g x_diff:%g" % (hDiff, target_y, x_diff)
@@ -148,18 +148,19 @@ def pfk_xy(nav):
         return nav.goNow('pfk_final')
     else:
         sY = MyMath.clip(target_y * PFK_Y_GAIN,
-                         PFK_MIN_Y_SPEED,
-                         PFK_MAX_Y_SPEED)
+                         PFK_RIGHT_SPEED,
+                         PFK_LEFT_SPEED)
         sY = max(PFK_MIN_Y_MAGNITUDE,sY) * MyMath.sign(sY)
 
     x_diff = ball.relX - SAFE_BALL_REL_X
+
     # arbitrary
     if fabs(x_diff) < PFK_CLOSE_ENOUGH_XY:
         sX = 0.0
     else:
         sX = MyMath.clip(x_diff * PFK_X_GAIN,
-                         PFK_MIN_X_SPEED,
-                         PFK_MAX_X_SPEED)
+                         PFK_REV_SPEED,
+                         PFK_FWD_SPEED)
         sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
 
     # in position, let's kick the ball!
@@ -179,7 +180,7 @@ def pfk_x(nav):
        nav.brain.ball.dist > SAFE_TO_STRAFE_DIST:
         return nav.goNow('pfk_xy')
 
-    helper.setSlowSpeed(nav, -PFK_MIN_X_SPEED, 0.0, 0.0)
+    helper.setSlowSpeed(nav, PFK_MIN_X_MAGNITUDE, 0.0, 0.0)
 
     return nav.stay()
 
@@ -201,8 +202,8 @@ def pfk_final(nav):
         sX = 0.0
     else:
         sX = MyMath.clip(x_diff * PFK_X_GAIN,
-                         PFK_MIN_X_SPEED,
-                         PFK_MAX_X_SPEED)
+                         PFK_REV_SPEED,
+                         PFK_FWD_SPEED)
         sX = max(PFK_MIN_X_MAGNITUDE,sX) * MyMath.sign(sX)
 
     helper.setSlowSpeed(nav,sX, 0.0, 0.0)

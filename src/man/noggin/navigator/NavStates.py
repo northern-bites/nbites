@@ -92,7 +92,7 @@ def spinToWalkHeading(nav):
     else :
         nav.stopSpinToWalkCount = 0
 
-    sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
+    sTheta = nav.curSpinDir * constants.MAX_SPIN_MAGNITUDE * \
         walker.getRotScale(headingDiff)
 
     if sTheta != nav.walkTheta:
@@ -119,7 +119,7 @@ def spinToFinalHeading(nav):
                    % (targetH, headingDiff, nav.brain.my.uncertH))
     spinDir = MyMath.sign(headingDiff)
 
-    spin = spinDir*constants.GOTO_SPIN_SPEED*walker.getRotScale(headingDiff)
+    spin = spinDir*constants.MAX_SPIN_MAGNITUDE*walker.getRotScale(headingDiff)
 
     if navTrans.atHeading(nav.brain.my, targetH):
         nav.stopSpinToWalkCount += 1
