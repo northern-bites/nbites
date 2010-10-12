@@ -240,7 +240,7 @@ public class ImageOverlay extends BufferedImage{
                     double y0 = line.r * sn;
 
                     int x = (int)Math.round(x0 - u * sn) + width  / 2;
-                    int y = -(int)Math.round(y0 + u * cs) + height / 2;
+                    int y = (int)Math.round(y0 + u * cs) + height / 2;
 
                     if (0 <= x && x < width &&
                         0 <= y && y < height)
