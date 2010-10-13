@@ -18,7 +18,7 @@ public class HoughSpace {
     // Operating parameters
     public int          acceptThreshold = 24;
     public boolean      extendedPeak    = false;
-    public int          angleSpread     = 5;
+    public int          angleSpread     = 9;
 
     public LinkedList<HoughLine> lines;
 
@@ -136,8 +136,8 @@ public class HoughSpace {
         int height = mag.length;
         int width = mag[0].length;
 
-        int x0 = height/2;
-        int y0 = width/2;
+        int x0 = width/2;
+        int y0 = height/2;
 
         for (int y = 0; y < height; ++y){
             for (int x = 0; x < width; ++x){
@@ -152,14 +152,6 @@ public class HoughSpace {
 
         smooth();
         peaks();
-        // for (int r=0; r < R_SPAN; r++){
-        //     for (int t=0; t < T_SPAN; t++)
-        //         if (peak[r][t])
-        //             System.out.print(1 + " ");
-        //         else
-        //             System.out.print(0 + " ");
-        //     System.out.print("\n");
-        // }
         suppress(x0, y0);
     }
 
