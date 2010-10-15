@@ -18,13 +18,17 @@ LOOK_RIGHT = ( ((-70.0,25.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
 LOOK_LEFT =  ( ((70.0,25.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
+LOOK_UP_LEFT = (((50.0,-25.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
+
+LOOK_UP_RIGHT = (((-50.0,-25.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
+
 PENALIZED_HEADS = (((0.0,25.0),0.5,0,stiff.LOW_HEAD_STIFFNESSES),)
 
 FIND_BALL_HEADS_LEFT = (((45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
                         ((45.,20.),0.3,1, stiff.LOW_HEAD_STIFFNESSES))
 
 FIND_BALL_HEADS_RIGHT =  (((-45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
-                          ((-45.,200.),0.3,1, stiff.LOW_HEAD_STIFFNESSES))
+                          ((-45.,20.),0.3,1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Distance that can be seen at a certain head pitch
 # | degree | close | far |

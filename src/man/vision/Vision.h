@@ -27,7 +27,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#include  "visionconfig.h"
+#include  "cmake.vision/visionconfig.h"
 // including info header files
 #include "Common.h"
 #include "VisionDef.h"
@@ -87,9 +87,6 @@ public:
     virtual void drawBox(int left, int right, int bottom, int top, int c);
     virtual void drawCenters(void);
     virtual void drawRect(int left, int top, int width, int height, int c);
-    virtual void drawPoint(int x, int y,int c);
-    virtual void drawPoint(const linePoint &p, const int color);
-    virtual void drawPoint(const VisualCorner &c, const int color);
     virtual void drawLine(int x, int y, int x1, int y1, int c);
     virtual void drawLine(boost::shared_ptr<VisualLine> line, const int color);
     virtual void drawVerticalLine(int x, int c);

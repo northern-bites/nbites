@@ -57,8 +57,6 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     rightLeg(s,gait,&sensorAngles,RLEG_CHAIN),
     leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),
     supportFoot(LEFT_SUPPORT),
-    //controller_x(new PreviewController()),
-    //controller_y(new PreviewController())
     controller_x(new Observer()),
     controller_y(new Observer()),
     zmp_filter(),
@@ -173,10 +171,12 @@ void StepGenerator::generate_steps(){
  * can calculate the sensor ZMP -- we are having trouble with it. We
  * probably just need to be more careful about how we filter, and get more
  * example data.
+ *
+ * Not sure if Joho's problems were due to the old Nao version or what,
+ * but from the graphs I've looked at we are very close to calculating the
+ * sensor ZMP such that it's useful. -Nathan, September 2010
  */
 void StepGenerator::findSensorZMP(){
-
-    //TODO: Figure out how to use unfiltered
     Inertial inertial = sensors->getInertial();
 
     //The robot may or may not be tilted with respect to vertical,
@@ -184,7 +184,6 @@ void StepGenerator::findSensorZMP(){
     //we would like to rotate the sensor measurements appropriately.
     //We will use angleX, and angleY:
 
-    //TODO: Rotate with angleX,etc
     const ufmatrix4 bodyToWorldTransform =
         prod(CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, -inertial.angleX),
              CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -inertial.angleY));
@@ -193,18 +192,20 @@ void StepGenerator::findSensorZMP(){
                                                           inertial.accY,
                                                           inertial.accZ);
 
-    accInWorldFrame = accInBodyFrame;
+    //accInWorldFrame = accInBodyFrame;
     //TODO: Currently rotating the coordinate frames exacerbates the problem
     //      but theoretically it should get the sensor zmp curve to more closely
     //      mimic the reference zmp.
     //global
-//     accInWorldFrame = prod(bodyToWorldTransform,
-//                            accInBodyFrame);
-//     cout << endl<< "########################"<<endl;
-//     cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
-//     cout << "Accel in world frame: "<< accInWorldFrame <<endl;
-//     cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
-    //acc_filter.update(inertial.accX,inertial.accY,inertial.accZ);
+
+	accInWorldFrame = prod(bodyToWorldTransform,
+						   accInBodyFrame);
+
+     //cout << endl<< "########################"<<endl;
+	 //cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
+     //cout << "Accel in world frame: "<< accInWorldFrame <<endl;
+     //cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
+
     acc_filter.update(accInWorldFrame(0),
                       accInWorldFrame(1),
                       accInWorldFrame(2));
@@ -225,12 +226,13 @@ void StepGenerator::findSensorZMP(){
          accel_i(0),accel_i(1)};
 
     zmp_filter.update(tUp,pMeasure);
-
 }
 
 float StepGenerator::scaleSensors(const float sensorZMP,
                                   const float perfectZMP) const {
-    const float sensorWeight = 0.0f;//gait->sensor[WP::OBSERVER_SCALE];
+
+	// TODO: find a better value for this!
+    const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
@@ -243,9 +245,8 @@ void StepGenerator::tick_controller(){
     cout << "StepGenerator::tick_controller" << endl;
 #endif
 
-    //Turned off sensor zmp for now since we have a better method
-    //JS June 2009
-    //findSensorZMP();
+	// update the acc/gyro filters
+    findSensorZMP();
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
 
@@ -268,12 +269,7 @@ void StepGenerator::tick_controller(){
 
     const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x,
                                            est_zmp_i(0));
-    /*
-    // TODO! for now we are disabling the observer for the x direction
-    // by reporting a sensor zmp equal to the planned/expected value
-    const float com_x = controller_x->tick(zmp_ref.get<0>(),cur_zmp_ref_x,
-                                           cur_zmp_ref_x); // NOTE!
-    */
+
     const float com_y = controller_y->tick(zmp_ref.get<1>(),cur_zmp_ref_y,
                                            est_zmp_i(1));
     com_i = CoordFrame3D::vector3D(com_x,com_y);
@@ -661,6 +657,19 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
 }
 
+/*
+ * Move the robot from it's current position to the destionation rel_x,
+ * rel_y, rel_theta on the field. This method will move at the maximum speed
+ * allowed by the gait parameters
+ *
+ * Note: this method works by calling takeSteps several times with appropriate values
+ */
+void StepGenerator::setDestination(const float rel_x, const float rel_y,
+								   const float rel_theta) {
+	clearFutureSteps();
+
+
+}
 
 /**
  * Method to enqueue a specific number of steps and then stop

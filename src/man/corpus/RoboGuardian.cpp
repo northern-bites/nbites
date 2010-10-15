@@ -363,7 +363,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         enableGains();
         break;
     case 7:
-        ifUpDown();
+		checkConnection();
         break;
     case 9:
         //Easter EGG!
@@ -488,7 +488,7 @@ void RoboGuardian::checkConnection(){
         if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
             cout    << "No connection detected, trying to reconnect interfaces, attempt "
                     << wifiReconnectTimeout << endl;
-            ifUpDown();
+			reconnectWifiConnection();
             wifiReconnectTimeout++;
         }
     }
@@ -508,7 +508,7 @@ bool RoboGuardian::checkWired(){
 
 bool RoboGuardian::checkWireless(){
 
-    FILE * f2 = popen("connman services | awk '/NBITES/ {print $1}'", "r");
+    FILE * f2 = popen("connman services | awk '/ROBOTICS/ {print $1}'", "r");
     char status[3] = "";
     fscanf(f2,"%s\n",status);
     pclose(f2);
@@ -523,7 +523,7 @@ bool RoboGuardian::checkWireless(){
 // to the network before
 void RoboGuardian::reconnectWifiConnection(){
     playFile(wifi_restart_wav);
-    FILE * f3 = popen("connman services | awk '/NBITES/ {print $4}'", "r");
+    FILE * f3 = popen("connman services | awk '/ROBOTICS/ {print $4}'", "r");
     char service[100] = "";
     fscanf(f3,"%s\n", service);
     pclose(f3);

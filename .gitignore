@@ -1,4 +1,4 @@
-build*
+build/*
 install/*
 data/*
 *config.h
@@ -39,9 +39,11 @@ noggin/util/fakeData/*
 /motion/README.log
 /motion/README.toc
 /motion/README.pdf
-docs*
 /noggin/offline/c++filt
 /noggin/offline/faker
 /noggin/offline/fakerData/*
 *~
 docs/*
+*.wav
+*.so
+src/remote/dist/javadoc/

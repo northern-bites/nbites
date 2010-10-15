@@ -65,6 +65,8 @@ const Kinematics::IKLegResult
 #else
     #error "JACOBIAN IK NOT SETUP RIGHT NOW"
 #endif
+
+#ifdef DEBUG_IK
     if(result.outcome != Kinematics::SUCCESS){
         cout << "IK ERROR with leg"<<chainID <<" :"
              <<"    tried to put foot to "<<footGoal
@@ -72,8 +74,9 @@ const Kinematics::IKLegResult
              <<"    tried to put body to "<<bodyGoal
              << "      with orientation  "<<bodyOrientation<<endl;
     }
-    return result;
+#endif
 
+    return result;
 }
 
 /**

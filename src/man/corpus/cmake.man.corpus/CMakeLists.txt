@@ -14,6 +14,8 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 # Colorized output
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
+############################ SET CONFIGURATION FILE DIR
+SET( CORPUS_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/ )
 
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
@@ -21,7 +23,7 @@ SET( CMAKE_COLOR_MAKEFILE TRUE )
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   GET_FILENAME_COMPONENT( TRUNK_PATH ../../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
+  MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
@@ -72,7 +74,7 @@ ENDIF(WEBOTS_BACKEND)
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   ${CORPUS_CMAKE_DIR}/corpusconfig.h.in
-  ${CORPUS_INCLUDE_DIR}/corpusconfig.h
+  ${CORPUS_CONFIG_DIR}/corpusconfig.h
   ESCAPE_QUOTES
   )
 
@@ -92,6 +94,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
   ${PYTHON_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${CORPUS_INCLUDE_DIR}
+  ${CORPUS_CONFIG_DIR}
   )
 
 
@@ -109,11 +112,11 @@ ELSE(WEBOTS_BACKEND)
 
 ENDIF(WEBOTS_BACKEND)
 
-############################ PROJECT SOURCES FILES 
+############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
   ${CORPUS_INCLUDE_DIR}/PySensors
-  ${CORPUS_INCLUDE_DIR}/NaoPose 
+  ${CORPUS_INCLUDE_DIR}/NaoPose
   ${CORPUS_INCLUDE_DIR}/CameraCalibrate)
 
 

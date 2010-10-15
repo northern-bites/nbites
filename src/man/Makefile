@@ -19,7 +19,7 @@ CMAKE_SRCS = \
 CMAKE_SRCS := $(addprefix $(CMAKE_DIR),$(CMAKE_SRCS))
 #File setup
 CONFIG_FILE = manconfig.h
-INSTALL_SCRIPT = ./upload.sh
+INSTALL_SCRIPT = upload.sh
 CROSS_FILE = $(BUILD_DIR)/cross_file
 STRAIGHT_FILE = $(BUILD_DIR)/straight_file
 WEBOTS_FILE = $(BUILD_DIR)/webots_file
@@ -29,13 +29,14 @@ PYC_FILES = $(shell find . -name "*.pyc")
 CROSS_TOOLCHAIN = $(abspath $(CURDIR)/cmake/geode.cmake)
 CMAKE_STRAIGHT_DEFS = -DOE_CROSS_BUILD=OFF -DSTRAIGHT=ON
 CMAKE_CROSS_DEFS = -DCMAKE_TOOLCHAIN_FILE=$(CROSS_TOOLCHAIN) -DOE_CROSS_BUILD=ON
-CMAKE_WEBOTS_DEFS = -DOE_CROSS_BUILD=OFF -DMAN_IS_REMOTE_=ON -DWEBOTS_BACKEND=ON -DCOLOR_TABLE=tables/uvy/webots/webots_6_2.mtb
+CMAKE_WEBOTS_DEFS = -DOE_CROSS_BUILD=OFF -DMAN_IS_REMOTE_=ON -DWEBOTS_BACKEND=ON -DCOLOR_TABLE=../../tables/uvy/webots/webots_6_2.mtb
 CCMAKE_CROSS_OPT = -DCMAKE_SHARED_LINKER_FLAGS:STRING="" -DCMAKE_MODULE_LINKER_FLAGS:STRING=""
 #Commands setup
 CD=cd
 RM=rm
 CMAKE=cmake
 CCMAKE=ccmake
+CCMAKE_GUI=cmake-gui
 MKDIR=mkdir
 TOUCH=touch
 MAKE_OPTIONS=--no-print-directory
@@ -71,11 +72,19 @@ $(CMAKE_CROSS_DEPEND):
 		$(MAKE) $(MAKE_OPTIONS) cross; \
 	fi
 
+build_straight:
+	$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR); \
+
 
 straight: $(STRAIGHT_FILE)
 	@set -e;
 		$(CD) $(STRAIGHT_DIR); \
 		$(CCMAKE) .
+
+straight_gui: $(STRAIGHT_FILE)
+	@set -e;
+		$(CD) $(STRAIGHT_DIR); \
+		$(CCMAKE_GUI) .
 
 $(STRAIGHT_FILE):
 	@if [ -e $(CROSS_FILE) ]; then \
@@ -91,10 +100,19 @@ $(STRAIGHT_FILE):
 		$(CD) $(STRAIGHT_DIR); \
 		$(CMAKE) $(CMAKE_STRAIGHT_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
+build_cross:
+	$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR); \
+
+
 cross: $(CROSS_FILE)
 	@set -e ; \
 		$(CD) $(CROSS_DIR); \
 		$(CCMAKE) $(CCMAKE_CROSS_OPT) .
+
+cross_gui: $(CROSS_FILE)
+	@set -e ; \
+		$(CD) $(CROSS_DIR); \
+		$(CCMAKE_GUI) $(CCMAKE_CROSS_OPT) .
 
 $(CROSS_FILE):
 	@if [ -e $(STRAIGHT_FILE) ]; then \
@@ -110,11 +128,18 @@ $(CROSS_FILE):
 		$(CD) $(CROSS_DIR); \
 		$(CMAKE) $(CMAKE_CROSS_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
+build_webots:
+	$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR); \
 
 webots: $(WEBOTS_FILE)
 	@set -e;
 		$(CD) $(WEBOTS_DIR); \
 		$(CCMAKE) .
+
+webots_gui: $(WEBOTS_FILE)
+	@set -e;
+		$(CD) $(WEBOTS_DIR); \
+		$(CCMAKE_GUI) .
 
 $(WEBOTS_FILE):
 	@if [ -e $(STRAIGHT_FILE) ]; then \
@@ -134,10 +159,10 @@ $(WEBOTS_FILE):
 install: $(CMAKE_DEPEND)
 	@if [ -e $(CROSS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) install; \
-		$(INSTALL_SCRIPT); \
+		$(CROSS_DIR)/$(INSTALL_SCRIPT); \
 	elif [ -e $(WEBOTS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) install; \
-		$(INSTALL_SCRIPT); \
+		$(WEBOTS_DIR)/$(INSTALL_SCRIPT); \
 	else \
 		echo "Must have CROSS or WEBOTS build configured to 'make install'"; \
 	fi

@@ -15,6 +15,9 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.2.0 )
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
 
+############################ SET CONFIG FILE DIR
+SET( MOTION_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
@@ -67,7 +70,7 @@ ENDIF( APPLE )
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   ${MOTION_CMAKE_DIR}/motionconfig.in
-  ${MOTION_INCLUDE_DIR}/motionconfig.h
+  ${MOTION_CONFIG_DIR}/motionconfig.h
   ESCAPE_QUOTES
   )
 
@@ -88,7 +91,8 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
                      ${MOTION_INCLUDE_DIR}
                      ${CORPUS_INCLUDE_DIR}
-                     )
+		     ${MOTION_CONFIG_DIR}
+		     )
 
 
 ############################ PROJECT SOURCES FILES 
@@ -122,6 +126,8 @@ SET( MOTION_SRCS
 		     ${MOTION_INCLUDE_DIR}/WalkingArm
 		     ${MOTION_INCLUDE_DIR}/PreviewController
 		     ${MOTION_INCLUDE_DIR}/Observer
+		     ${MOTION_INCLUDE_DIR}/ZmpExp
+		     ${MOTION_INCLUDE_DIR}/ZmpAccExp
 		     ${MOTION_INCLUDE_DIR}/ZmpEKF
 		     ${MOTION_INCLUDE_DIR}/ZmpAccEKF
 		     ${MOTION_INCLUDE_DIR}/StepGenerator

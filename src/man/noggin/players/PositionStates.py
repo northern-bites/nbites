@@ -1,4 +1,6 @@
 from .. import NogginConstants
+from . import ChaseBallConstants as ChaseConstants
+import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
 
@@ -54,3 +56,4 @@ def relocalize(player):
         player.setWalk(0, 0, constants.RELOC_SPIN_SPEED * direction)
 
     return player.stay()
+

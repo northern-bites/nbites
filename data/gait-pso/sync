@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# Adapted for Gait PSO pickle files
+
+
+USAGE="./sync [up-down] \nExample: $> ./sync down"
+
+ACTION=$1
+
+RSYNC=rsync
+RSYNC_OPTS=-rvz
+
+if [ "$1" = "" ]; then
+    echo "No push direction specified"
+    echo $USAGE
+    exit 1
+fi
+
+echo "Type username for RoboCup server, followed by [ENTER]"
+read username
+
+SERVER=$username@robocup.bowdoin.edu:
+ROBOCUP_DIR=/mnt/research/robocup
+GAITS_DIR=gait-pso/
+
+SYNC_UP="$RSYNC $RSYNC_OPTS `pwd`/ $SERVER/$ROBOCUP_DIR/$GAITS_DIR"
+SYNC_DOWN="$RSYNC $RSYNC_OPTS $SERVER/$ROBOCUP_DIR/$GAITS_DIR/* ./"
+
+if [ "$ACTION" = "up" ]; then
+    echo "Syncing FROM `pwd`/ TO $SERVER/$ROBOCUP_DIR/$GAITS_DIR/$REMOTE_FOLDER"
+    echo $SYNC_UP
+    $SYNC_UP
+
+elif [ "$ACTION" = "down" ]; then
+    echo "Syncing FROM $SERVER/$ROBOCUP_DIR/$GAITS_DIR/$REMOTE_FOLDER TO `pwd`/$REMOTE_FOLDER "
+    echo $SYNC_DOWN
+    cd ../
+    $SYNC_DOWN
+
+    echo "Invalid parameters"
+    echo $USAGE
+    exit 1
+fi
