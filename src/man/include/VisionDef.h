@@ -109,7 +109,7 @@ static const float MAX_ELEVATION_RAD = MAX_ELEVATION_DEG*TO_RAD;
 #define YELLOWWHITE 6
 #define BLUEGREEN 7
 #define ORANGERED 8
-#define ORANGEYELLOW 9re
+#define ORANGEYELLOW 9
 #define RED 10
 #define NAVY 11
 #define BLACK 12
