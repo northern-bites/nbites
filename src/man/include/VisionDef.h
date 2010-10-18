@@ -15,7 +15,7 @@ Vision Constants that span multiple classes and systems.
 #define QVGA  1  // equivalent to kQVGA
 #define VGA   2  // equivalent to kVGA
 #ifndef NAO_IMAGE_SIZE
-#  define NAO_IMAGE_SIZE QVGA
+#  define NAO_IMAGE_SIZE VGA
 #endif
 
 #define YUV422INTER_CS  9 // equivalent to kYUV422InterlaceColorSpace
@@ -109,7 +109,7 @@ static const float MAX_ELEVATION_RAD = MAX_ELEVATION_DEG*TO_RAD;
 #define YELLOWWHITE 6
 #define BLUEGREEN 7
 #define ORANGERED 8
-#define ORANGEYELLOW 9
+#define ORANGEYELLOW 9re
 #define RED 10
 #define NAVY 11
 #define BLACK 12

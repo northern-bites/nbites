@@ -32,7 +32,7 @@ teamColorDict = dict(zip(range(NUM_GAME_TEAM_COLORS),\
 ##
 ##--------------------VISION CONNECTION CONSTANTS------#
 ##
-IMAGE_SIZE = "QVGA"
+IMAGE_SIZE = "VGA"
 CAMERA_FPS = 15
 # image constants, used for angle x,y setters
 if IMAGE_SIZE == "VGA":
