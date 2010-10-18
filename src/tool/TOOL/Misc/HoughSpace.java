@@ -8,10 +8,10 @@ import java.util.LinkedList;
 // *               *
 // *****************
 //
-// A cylindrical Hough space covering the range -128 <= R < 128 pixels,
+// A cylindrical Hough space covering the range -200 <= R < 200 pixels,
 // with direction T covering a full 8-bit binary angle.
 public class HoughSpace {
-    public static final int R_SPAN = 256, T_SPAN = 256;
+    public static final int R_SPAN = 400, T_SPAN = 256;
     int[][] hs;
     boolean[][] peak;
 
