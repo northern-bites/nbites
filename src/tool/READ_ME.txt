@@ -1,14 +1,8 @@
-This tool (no pun intended) is going to house all of our offline debugging needs including:
+TOOL
+====
 
- *Localization debuging
- *Behavioral debugging
- *Vision debugging
- *Color table generation 
+To run the tool, open a terminal prompt and type:
 
+    ant
 
-to run, type 
-
-make run
-
-
-By Jeremy Fishman, and Joho Strom NBites 2008.
+This will compile the Java TOOL files and the C++ VisionLink library.
