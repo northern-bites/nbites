@@ -1,0 +1,3 @@
+[submodule "src/ganymed-ssh2"]
+	path = src/ganymed-ssh2
+	url = git://github.com/northern-bites/ganymed-ssh2.git

@@ -36,6 +36,7 @@ CD=cd
 RM=rm
 CMAKE=cmake
 CCMAKE=ccmake
+CCMAKE_GUI=cmake-gui
 MKDIR=mkdir
 TOUCH=touch
 MAKE_OPTIONS=--no-print-directory
@@ -71,11 +72,19 @@ $(CMAKE_CROSS_DEPEND):
 		$(MAKE) $(MAKE_OPTIONS) cross; \
 	fi
 
+build_straight:
+	$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR); \
+
 
 straight: $(STRAIGHT_FILE)
 	@set -e;
 		$(CD) $(STRAIGHT_DIR); \
 		$(CCMAKE) .
+
+straight_gui: $(STRAIGHT_FILE)
+	@set -e;
+		$(CD) $(STRAIGHT_DIR); \
+		$(CCMAKE_GUI) .
 
 $(STRAIGHT_FILE):
 	@if [ -e $(CROSS_FILE) ]; then \
@@ -91,10 +100,19 @@ $(STRAIGHT_FILE):
 		$(CD) $(STRAIGHT_DIR); \
 		$(CMAKE) $(CMAKE_STRAIGHT_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
+build_cross:
+	$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR); \
+
+
 cross: $(CROSS_FILE)
 	@set -e ; \
 		$(CD) $(CROSS_DIR); \
 		$(CCMAKE) $(CCMAKE_CROSS_OPT) .
+
+cross_gui: $(CROSS_FILE)
+	@set -e ; \
+		$(CD) $(CROSS_DIR); \
+		$(CCMAKE_GUI) $(CCMAKE_CROSS_OPT) .
 
 $(CROSS_FILE):
 	@if [ -e $(STRAIGHT_FILE) ]; then \
@@ -110,11 +128,18 @@ $(CROSS_FILE):
 		$(CD) $(CROSS_DIR); \
 		$(CMAKE) $(CMAKE_CROSS_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
+build_webots:
+	$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR); \
 
 webots: $(WEBOTS_FILE)
 	@set -e;
 		$(CD) $(WEBOTS_DIR); \
 		$(CCMAKE) .
+
+webots_gui: $(WEBOTS_FILE)
+	@set -e;
+		$(CD) $(WEBOTS_DIR); \
+		$(CCMAKE_GUI) .
 
 $(WEBOTS_FILE):
 	@if [ -e $(STRAIGHT_FILE) ]; then \
