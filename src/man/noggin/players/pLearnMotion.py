@@ -13,7 +13,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.brain = brain
         self.addStates(LearnMotionStates)
         self.setName('pLearnMotion')
-        self.currentState = 'gameInitial'
 
     def executeLearnedMove(self, sweetMove):
         """
