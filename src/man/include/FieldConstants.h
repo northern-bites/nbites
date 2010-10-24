@@ -87,7 +87,7 @@ static const float GOALBOX_WIDTH = 230.f;
 // The distance the goalie box extends out past each goal post
 static const float GOALBOX_OVERAGE = 40.0f;
 // The distance from any goal post to the goalie box corner nearest it
-static const float POST_CORNER = sqrt(GOALBOX_DEPTH * GOALBOX_DEPTH +
+static const float POST_CORNER = sqrtf(GOALBOX_DEPTH * GOALBOX_DEPTH +
                                       GOALBOX_OVERAGE * GOALBOX_OVERAGE);
 
 static const float YELLOW_GOAL_HEADING = 0;
