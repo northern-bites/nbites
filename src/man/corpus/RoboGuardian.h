@@ -105,12 +105,13 @@ private:
     Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter;
     bool registeredFalling;
-    int wifiReconnectTimeout;
 
     bool registeredShutdown;
 
     bool falling, fallen;
     mutable bool useFallProtection;
+
+    int wifiReconnectTimeout;
 
     mutable pthread_mutex_t click_mutex;
     static const int GUARDIAN_FRAME_RATE;
