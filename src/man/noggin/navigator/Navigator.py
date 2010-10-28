@@ -57,16 +57,12 @@ class Navigator(FSA.FSA):
         state to align on the ball once we are near it
         """
         self.kick = kick
-        self.switchTo('pfk_xy')
+        self.switchTo('pfk_all')
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
         self.switchTo('playbookWalk')
-
-    def omniGoTo(self, dest):
-        self.dest = dest
-        self.switchTo('omniWalkToPoint')
 
     def goTo(self,dest):
         self.dest = dest
@@ -87,9 +83,6 @@ class Navigator(FSA.FSA):
 
     def isStopped(self):
         return self.currentState == 'stopped'
-
-    def movingOmni(self):
-        return self.currentState == 'omniWalkToPoint'
 
     def orbit(self, orbitDir):
 

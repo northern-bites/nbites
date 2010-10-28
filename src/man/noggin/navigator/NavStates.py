@@ -132,21 +132,6 @@ def spinToFinalHeading(nav):
     helper.setSpeed(nav, 0, 0, spin)
     return nav.stay()
 
-def omniWalkToPoint(nav):
-    my = nav.brain.my
-    dest = nav.dest
-
-    if nav.firstFrame():
-        nav.walkToPointCount = 0
-
-    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
-        return nav.goNow('stop')
-
-    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
-
-    return nav.stay()
-
 # WARNING: avoidObstacle could possibly go into our own box
 def avoidObstacle(nav):
     """

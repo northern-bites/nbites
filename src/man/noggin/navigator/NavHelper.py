@@ -108,9 +108,9 @@ def convertWalkVector(brain, x_abs, y_abs, theta_abs):
     x_mms = y_mms = theta_rads = 0
 
     if x_abs > 0:
-        x_mms = x_abs * gait.getStepValue(4) # max X speed
+        x_mms = x_abs * gait.getStepValue(4) # max fwd X speed
     elif x_abs < 0:
-        x_mms = x_abs * gait.getStepValue(5) # min X speed
+        x_mms = x_abs * gait.getStepValue(5) # max rev X speed
 
     # max Y speed (same in both directions)
     y_mms = y_abs * gait.getStepValue(6)

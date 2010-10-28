@@ -34,15 +34,21 @@ def shouldPositionForKick(player):
             constants.BALL_POS_KICK_RIGHT_Y and \
             constants.BALL_POS_KICK_MAX_X > ball.relX > \
             constants.BALL_POS_KICK_MIN_X and \
-            ball.bearing < constants.POSITION_FOR_KICK_BEARING_THRESH)
+            fabs(ball.bearing) < constants.BALL_POS_KICK_BEARING_THRESH)
 
 def shouldKick(player):
     """
-    Ball is in the correct foot position to kick
+    Ball is in the correct position to kick
     """
     ball = player.brain.ball
+    # Ensure we are stopped, we see the ball,
+    # and the ball is in the "kicking region"
     return player.brain.nav.isStopped() and \
-        player.counter > 1
+        ball.on and \
+        ball.relX > constants.SHOULD_KICK_CLOSE_X and \
+        ball.relX < constants.SHOULD_KICK_FAR_X and \
+        fabs(ball.relY) < 10
+        # and player.counter < 1 ??
 
 def shouldDribble(player):
     """

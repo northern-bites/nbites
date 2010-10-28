@@ -61,6 +61,9 @@ class KickInformation:
 
         if self.sawOwnGoal:
             # kick out of bounds
+
+            # TODO: Don't kick out of bounds. It puts us in bad loop behavior.
+
             MIN_ORBIT_ANGLE = 60
 
             if self.myLeftPostBearing is not None and \
@@ -228,9 +231,10 @@ class KickInformation:
         oppLeftPostBearing = self.oppLeftPostBearing
         oppRightPostBearing = self.oppRightPostBearing
 
-        # Things to do if we saw our own goal
-        # Saw the opponent goal
+        # Things to do if we saw goals
         my = self.player.brain.my
+
+        #Sanity Check, do we need this?
         if oppLeftPostBearing is not None and \
                 oppRightPostBearing is not None:
 
