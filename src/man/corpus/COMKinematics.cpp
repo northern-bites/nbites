@@ -7,126 +7,127 @@ using namespace boost::numeric;
 #define DEBUG_COM
 //#define DEBUG_COM_VERBOSE
 
-const ufvector4
-Kinematics::getCOMc(const vector<float> bodyAngles){
-
-  //copy the body angles to an array
-  float angles[NUM_JOINTS];
-  for(unsigned int i =0; i< NUM_JOINTS; i++){
-    angles[i] = bodyAngles[i];
-  }
-
-  ufvector4 partialComPos = calculateChestCOM();
-
-  for(unsigned int i = 0; i < NUM_CHAINS; i++){
-    partialComPos+= slowCalculateChainCom((ChainID)i, &angles[chain_first_joint[i]]);
-  }
-
-#ifdef DEBUG_COM
-  cout << "Body Com " << partialComPos <<endl;
-#endif
-
-  return partialComPos/TOTAL_MASS;
-}
-
-const ufvector4 Kinematics::calculateChestCOM() {
-	ufvector4 chestCom = CoordFrame4D::vector4D(CHEST_MASS_X,
-												CHEST_MASS_Y,
-												CHEST_MASS_Z)
-		*(CHEST_MASS_g);
-#ifdef DEBUG_COM_VERBOSE
-	cout << "Chest COM " << chestCom << endl;
-#endif
-
-	return chestCom;
-}
+ufmatrix4 limbs[Kinematics::NUM_JOINTS]; // transform to the origin of each limb
 
 const ufvector4
-Kinematics::slowCalculateChainCom(const ChainID id,
-		      const float angles[]) {
-  ufmatrix4 fullTransform = ublas::identity_matrix <float> (4);
-  ufvector4 comPos = CoordFrame4D::vector4D(0,0,0,0);
-
-  // See: NaoPose.cpp::calculateForwardTransform
-  // we use the same method here, but we need to apply joint weights
-  // as we traverse down each joint chain
-
-  const ufvector4 origin = CoordFrame4D::vector4D(0,0,0);
-
-  // Do base transforms
-  const int numBaseTransforms = NUM_BASE_TRANSFORMS[id];
-  for (int i = 0; i < numBaseTransforms; i++) {
-    fullTransform = prod(fullTransform, BASE_TRANSFORMS[id][i]);
-  }
-
-  // Do mDH transforms
-  const int numTransforms = NUM_JOINTS_CHAIN[id];
-  for (int i = 0; i < numTransforms; i++) {
-    // Right before we do a transformation, we are in the correct coordianate
-    // frame and we need to store it, so we know where all the links of a
-    // chain are. We only need to do this if the transformation gives us a new
-    // link
-    const float *currentmDHParameters = MDH_PARAMS[id];
-
-    //length L - movement along the X(i-1) axis
-    if (currentmDHParameters[i*4 + L] != 0) {
-      const ufmatrix4 transX =
-	CoordFrame4D::translation4D(currentmDHParameters[i*4 + L],0.0f,0.0f);
-      fullTransform = prod(fullTransform, transX);
-    }
-
-    //twist ALPHA: - rotate about the X(i-1) axis
-    if (currentmDHParameters[i*4 + ALPHA] != 0) {
-      const ufmatrix4 rotX =
-	CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
-			       currentmDHParameters[i*4 + ALPHA]);
-      fullTransform = prod(fullTransform, rotX);
-    }
-
-    //theta - rotate about the Z(i) axis
-	//may need to run transform even if THETA=0
-	if (currentmDHParameters[i*4 + THETA] + angles[i] != 0) {
-		const ufmatrix4 rotZ =
-			CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS,
-									 currentmDHParameters[i*4 + THETA] +
-									 angles[i]);
-		fullTransform = prod(fullTransform, rotZ);
+Kinematics::getCOMc(const vector<float> bodyAngles) {
+	//copy the body angles to an array
+	float angles[NUM_JOINTS];
+	for(unsigned int i = 0; i< NUM_JOINTS; i++){
+		angles[i] = bodyAngles[i];
 	}
 
-    //offset D movement along the Z(i) axis
-    if (currentmDHParameters[i*4 + D] != 0) {
-      const ufmatrix4 transZ =
-	CoordFrame4D::translation4D(0.0f,0.0f,currentmDHParameters[i*4 + D]);
-      fullTransform = prod(fullTransform, transZ);
-    }
+	buildJointTransforms(angles);
 
-	// add the local mass to the calculated CoM based on where
-	// we are on our way down the joint chain
-    const float *curInertialPos = INERTIAL_POS[id];
-
-    const ufmatrix4 massEndTrans =
-        CoordFrame4D::translation4D(curInertialPos[i*4 + 0],
-                                    curInertialPos[i*4 + 1],
-                                    curInertialPos[i*4 + 2]);
-    const ufmatrix4 curMassTrans = prod(fullTransform,massEndTrans);
-    const float jointMass = curInertialPos[i*4 + MASS_INDEX];
-    const ufvector4 thisSegmentWeightedPos =
-        prod(curMassTrans,origin)*jointMass;
+	// start with the chest CoM
+	ufvector4 partialComPos = chestMass.offset * chestMass.mass;
 
 #ifdef DEBUG_COM_VERBOSE
-	cout << "added joint: " << i << "--"<< thisSegmentWeightedPos << endl;
+	cout << "Chest COM " << partialComPos/chestMass.mass << endl;
+#endif
 
-	const ufvector4 thisSegmentPosition =
-		prod(curMassTrans,origin);
-	cout << "position " << thisSegmentPosition << endl;
+	// add each joint's mass relative to origin (0,0,0)
+	for(unsigned int joint = 0; joint < NUM_JOINTS; joint++) {
+		partialComPos += (prod(limbs[joint], jointMass[joint].offset)
+						  *jointMass[joint].mass);
+	}
+
+#ifdef DEBUG_COM
+	cout << "Body Com " << partialComPos/TOTAL_MASS <<endl;
 #endif
-    comPos += thisSegmentWeightedPos;
-  }
-#ifdef DEBUG_COM_VERBOSE
-  cout << "chain id: " << id <<endl;
-  cout << "weight: " << comPos <<endl;
-#endif
-  return comPos;
+
+	return partialComPos/TOTAL_MASS;
 }
 
+/*
+ * Builds full transforms from the robot origin (0,0,0) to the local
+ * origin of each joint, based on a given set of joint angles this
+ * allows us to add each limb's mass as the product
+ * transform(matrix) * localOffset(vector) * mass(scalar)
+ * The sum of these divided by the total mass is the CoM
+ */
+void Kinematics::buildJointTransforms(const float angles[]) {
+	float side = 1.0f; // Left Side ? 1 : -1
+	int start = 0;
 
+	// head & neck
+	buildHeadNeck(start, angles);
+
+	// left arm chain
+	start = 2;
+	buildArmChain(start, side, angles);
+
+	// left leg chain
+	start = 6;
+	buildLegChain(start, side, angles);
+
+	// right leg chain
+	side = -1.0f;
+	start = 12;
+	buildLegChain(start, side, angles);
+
+	// right arm chain
+	start = 18;
+	buildArmChain(start, side, angles);
+}
+
+void Kinematics::buildHeadNeck(const int start, const float angles[]) {
+	using namespace CoordFrame4D;
+
+	// neck (head yaw)
+	limbs[start] = prod(translation4D(0, 0, NECK_OFFSET_Z),
+						rotation4D(Z_AXIS, angles[0]));
+	// head (head pitch)
+	limbs[start + 1] = prod(limbs[start], rotation4D(Y_AXIS, -angles[1]));
+}
+
+void Kinematics::buildArmChain(const int start, const float side, const float angles[]) {
+	using namespace CoordFrame4D;
+	ufmatrix4 temp; // for multiple transformations, ublas hates nested prod calls
+
+	// shoulder pitch
+	limbs[start] = prod(translation4D(0, SHOULDER_OFFSET_Y*side, SHOULDER_OFFSET_Z),
+						rotation4D(Y_AXIS, -angles[start]));
+	// shoulder roll
+	limbs[start + 1] = prod(limbs[start],
+							rotation4D(Z_AXIS, angles[start + 1]*side));
+	// elbow yaw
+	temp = prod(limbs[start + 1],
+				translation4D(UPPER_ARM_LENGTH, 0, 0));
+	limbs[start + 2] = prod(temp,
+							rotation4D(X_AXIS, angles[start + 2]*side));
+	// elbow roll
+	limbs[start + 3] = prod(limbs[start + 2],
+							rotation4D(Z_AXIS, -angles[start + 3]*side));
+}
+
+// See: buildArmChain
+void Kinematics::buildLegChain(const int start, const float side, const float angles[]) {
+	using namespace CoordFrame4D;
+	ufmatrix4 temp; // for multiple transformations, ublas hates nested prod calls
+
+	// hip yaw pitch
+	temp = prod(translation4D(0, HIP_OFFSET_Y*side, -HIP_OFFSET_Z),
+				rotation4D(X_AXIS, M_PI_FLOAT/4*-side));
+    limbs[start] = prod(temp,
+						rotation4D(Z_AXIS, angles[start]*-side));
+	// hip roll
+	limbs[start + 1] = prod(limbs[start],
+							rotation4D(X_AXIS, (angles[start + 1] + M_PI_FLOAT/4)*-side));
+	// hip pitch
+	limbs[start + 2] = prod(limbs[start + 1],
+							rotation4D(Y_AXIS, angles[start + 2]));
+	// knee pitch
+	temp = prod(limbs[start + 2],
+				translation4D(0, 0, -THIGH_LENGTH));
+	limbs[start + 3] = prod(temp,
+							rotation4D(Y_AXIS, angles[start + 3]));
+	// ankle pitch
+	temp = prod(limbs[start + 3],
+				translation4D(0, 0, -TIBIA_LENGTH));
+	limbs[start + 4] = prod(temp,
+							rotation4D(Y_AXIS, angles[start + 4]));
+	// ankle roll
+	limbs[start + 5] = prod(limbs[start + 4],
+							rotation4D(X_AXIS, angles[start + 5] * -side));
+}

@@ -4,17 +4,14 @@
 #include "Kinematics.h"
 
 namespace Kinematics{
-
-  const NBMath::ufvector4
+	const NBMath::ufvector4
     getCOMc(const std::vector<float> bodyAngles);
 
-  const NBMath::ufvector4
-    calculateChestCOM();
+	void buildJointTransforms(const float angles[]);
 
-  const NBMath::ufvector4
-    slowCalculateChainCom(const ChainID id,
-			  const float angles[]);
-
+	void buildHeadNeck(const int start, const float angles[]);
+	void buildArmChain(const int start, const float side, const float angles[]);
+	void buildLegChain(const int start, const float side, const float angles[]);
 };
 
 #endif
