@@ -1,59 +1,64 @@
 #include "EdgeDetector.h"
 #include <cmath>
 
+const int EdgeDetector::dxTab[8] = { 1,  1,  0, -1, -1, -1,  0,  1};
+const int EdgeDetector::dyTab[8] = { 0,  1,  1,  1,  0, -1, -1, -1};
+
+
+EdgeDetector::EdgeDetector(int thresh) : threshold(thresh)
+{
+
+}
 
 /**
  * Find the edges in a channel of an image.
  *
- * @param image      The entire YUV image
- * @param startIndex The starting index of the image to use for edge detection
- * @param imageSize  Number of elements in the given image.
- * @param chanOffset The offset for each value in the given image
+ * @param channel      The entire channel (one of Y, U, or V)
  */
-void EdgeDetector::detectEdges(const uchar[][] * image,
+void EdgeDetector::detectEdges(const Channel& channel,
                                Gradient& gradient)
 {
-    sobelOperator(image, gradient);
+    sobelOperator(channel, gradient);
     findPeaks(gradient);
 }
 
 /**
- * Apply the Sobel Operator to the given image and fill a given struct
+ * Apply the Sobel Operator to the given channel and fill a given struct
  * with the gradient information (x, y, absolute magnitude)
  *
  * / -1 0 +1 \   / -1 -2 -1 \
  * | -2 0 +2 |   |  0  0  0 |
  * \ -1 0 +1 /   \ +1 +2 +1 /
  *      Gx           Gy
- * @param image     The image with edges to be detected.
+ * @param channel     The channel with edges to be detected.
  * @param gradient    Gradient struct to be populated.
  */
-void EdgeDetector::sobelOperator(const uchar[][] * image,
+void EdgeDetector::sobelOperator(const Channel& channel,
                                  Gradient& gradient)
 {
 
-    for (int i=0; i < gradient.rows; i++){
-        for (int j=0; j < gradient.cols; ++j) {
+    for (int i=1; i < gradient.rows-1; i++){
+        for (int j=1; j < gradient.cols-1; ++j) {
 
             int xGrad = (
                 // Column j+1
-                (image[i-1][j+1] +
-                 2 * image[i][j+1] +
-                 image[i+1][j+1]) -
+                (channel.val[i-1][j+1] +
+                 2 * channel.val[i][j+1] +
+                 channel.val[i+1][j+1]) -
                 // Column j-1
-                (image[i-1][j-1] +
-                 2 * image[i][j-1] +
-                 image[i+1][j-1]));
+                (channel.val[i-1][j-1] +
+                 2 * channel.val[i][j-1] +
+                 channel.val[i+1][j-1]));
 
             int yGrad = (
                 // Row i+1
-                (image[i+1][j-1] +
-                 2 * image[i+1][j] +
-                 image[i+1][j+1]) -
+                (channel.val[i+1][j-1] +
+                 2 * channel.val[i+1][j] +
+                 channel.val[i+1][j+1]) -
                 // Row i -1
-                (image[i-1][j-1] +
-                 2 * image[i-1][j] +
-                 image[i-1][j+1])
+                (channel.val[i-1][j-1] +
+                 2 * channel.val[i-1][j] +
+                 channel.val[i-1][j+1])
                 );
             gradient.x[i][j] = xGrad;
             gradient.y[i][j] = yGrad;
@@ -81,36 +86,35 @@ void EdgeDetector::sobelOperator(const uchar[][] * image,
  */
 void EdgeDetector::findPeaks(Gradient& gradient)
 {
-    bool isPeak = false;
-    for (int i=0; i < gradient.height; ++i) {
-        for (int j=0; j < gradient.width; ++j){
+    for (int i=0; i < gradient.rows; ++i) {
+        for (int j=0; j < gradient.cols; ++j){
 
-            isPeak = false;
+            gradient.peaks[i][j] = false;
             const int z = gradient.mag[i][j];
 
             if (z > threshold){
                 const int y = gradient.y[i][j];
                 const int x = gradient.x[i][j];
 
-                byte a = dir(y,x);
+                int a = static_cast<int>(dir(y,x));
 
                 // Get the highest 3 bits of the direction
                 a = a >> 5;
 
                 if (z >  gradient.mag[i + dyTab[a]][j + dxTab[a]] &&
                     z >= gradient.mag[i + dyTab[a]][j + dxTab[a]]){
-                    isPeak = true;
+                    gradient.peaks[i][j] = true;
                 }
             }
-            peaks[i][j] = isPeak;
-            if (!isPeak){
+            if (!gradient.peaks[i][j]){
                 gradient.x[i][j] = gradient.y[i][j] = gradient.mag[i][j] = 0;
             }
         }
     }
 }
 
-byte EdgeDetector::dir(int y, int x)
+int EdgeDetector::dir(int y, int x)
 {
-    return atan2(y, x) / M_PI * 128.0 & 0xff;
+    return static_cast<int>(atan2(y, x) / M_PI * 128.0) & 0xff;
 }
+

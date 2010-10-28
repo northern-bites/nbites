@@ -121,6 +121,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${VISION_INCLUDE_DIR}
                      ${BOOST_INCLUDE_DIR}
 		     ${VISION_CONFIG_DIR}/
+		     test/
                      )
 
 
@@ -154,6 +155,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/VisualRobot
                  ${VISION_INCLUDE_DIR}/VisualCross
                  ${VISION_INCLUDE_DIR}/VisualLine
+                 ${VISION_INCLUDE_DIR}/EdgeDetector
                  )
 
 
@@ -237,3 +239,7 @@ ENDIF( VISIONLINK )
 #  ${CORPUS_CMAKE_DIR}
 #  )
 
+add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp ${VISION_INCLUDE_DIR}/test/EdgeDetectorTest.cpp )
+
+enable_testing()
+add_test( EdgeDetectorTest  EdgeDetectorTest )
