@@ -150,6 +150,10 @@ def positionForKick(player):
         if transitions.shouldDribble(player):
             return player.goNow('dribble')
 
+    if player.brain.nav.isStopped():
+        kick = player.brain.kickDecider.kickInfo.getKick()
+        player.brain.nav.kickPosition(kick)
+
     return player.stay()
 
 def dribble(player):

@@ -17,8 +17,11 @@ PFK_MIN_X_MAGNITUDE = speeds.MIN_OMNI_X_MAGNITUDE
 PFK_MIN_SPIN_MAGNITUDE = speeds.MIN_SPIN_WHILE_X_MAGNITUDE
 
 # Buffering values, insure that we eventually kick the ball
-PFK_CLOSE_ENOUGH_XY = 2.0
+PFK_CLOSE_ENOUGH_X = 2.0
+PFK_CLOSE_ENOUGH_Y = 5.0
 PFK_CLOSE_ENOUGH_THETA = 11
+PFK_MAX_X_SPEED_DIST = 30
+PFK_MAX_Y_SPEED_DIST = 16
 
 """
 Control State for PFK. Breaks up the problem into
@@ -34,7 +37,7 @@ def pfk_all(nav):
     sTheta = 0.0        # speed in the theta direction
 
     if nav.firstFrame():
-        nav.stopTheta = False
+        nav.stopTheta = True
         nav.stopY = False
         nav.stopX = False
         print "entered from: ", nav.lastDiffState
@@ -60,15 +63,15 @@ def pfk_all(nav):
     if not nav.stopX:
         sX = pfk_x(nav, ball, x_offset)
         if (sX < 0):
-            # possible dangerous ball move back slowly
-            helper.setSpeed(nav, sX, 0, 0)
+            print "dangerous ball detected during PFK"
+            helper.setSlowSpeed(nav, sX, 0, 0)
             return nav.stay()
 
     if (nav.stopX and nav.stopY and nav.stopTheta):
         # in good position for kick
         return nav.goNow('stop')
 
-    helper.setSpeed(nav, sX, sY, sTheta)
+    helper.setSlowSpeed(nav, sX, sY, sTheta)
 
     return nav.stay()
 
@@ -97,27 +100,26 @@ def pfk_y(nav, ball, targetY):
 
     targetDist = ball.relY - targetY
 
-    if (fabs(targetDist) <= PFK_CLOSE_ENOUGH_XY):
+    if (fabs(targetDist) <= PFK_CLOSE_ENOUGH_Y):
         nav.stopY = True
         return 0
-
-    # Edge of acceptable area for kicking
-    distToSpeedModifier = targetY + PFK_CLOSE_ENOUGH_XY
 
     if (targetDist > 0):
         # Move left to match ball with target
         # Change the distance to a speed and clip within vector limits
-        return MyMath.clip(targetDist/distToSpeedModifier - 1,
+        sY = MyMath.clip(targetDist/PFK_MAX_Y_SPEED_DIST,
                            PFK_MIN_Y_MAGNITUDE,
                            PFK_LEFT_SPEED)
+        return sY
 
     else:
         # Move right to match ball with target
         # Change the distance to a speed and clip within vector limits
-        return MyMath.clip(targetDist/distToSpeedModifier + 1,
+        sY = MyMath.clip(targetDist/PFK_MAX_Y_SPEED_DIST,
                            PFK_RIGHT_SPEED,
                            -PFK_MIN_Y_MAGNITUDE)
 
+        return sY
 """
 Determines the speed in the x direction to position
 accurately on the ball and returns that value
@@ -126,22 +128,19 @@ def pfk_x(nav, ball, targetX):
 
     targetDist = ball.relX - targetX
 
-    if (fabs(targetDist) <= PFK_CLOSE_ENOUGH_XY):
+    if (fabs(targetDist) <= PFK_CLOSE_ENOUGH_X):
         nav.stopX = True
         return 0
-
-    # Edge of acceptable area for kicking
-    distToSpeedModifier = targetX + PFK_CLOSE_ENOUGH_XY
 
     if (targetDist > 0):
         # Move foward to match ball with target
         # Change the distance to a speed and clip within vector limits
-        return MyMath.clip(targetDist/distToSpeedModifier - 1,
+        sX = MyMath.clip(targetDist/PFK_MAX_X_SPEED_DIST,
                            PFK_MIN_X_MAGNITUDE,
                            PFK_FWD_SPEED)
 
+        return sX
+
     else:
-        # Move Backwards
-        print "dangerous ball detected during PFK"
-        # Move back slowly
-        return -PFK_MIN_X_MAGNITUDE
+        # Move Backwards Slowly
+        return -.5
