@@ -254,7 +254,7 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
         + static_cast<float>(leg_sign) * gait->stance[WP::LEG_ROT_Z] * 0.5f;
 
     const ufvector3 bodyOrientation = CoordFrame3D::vector3D(bodyAngleX,
-                                                       bodyAngleY, 0.0f);
+															 bodyAngleY, 0.0f);
     const ufvector3 footOrientation = CoordFrame3D::vector3D(footAngleX,
                                                              footAngleY,
                                                              footAngleZ);
