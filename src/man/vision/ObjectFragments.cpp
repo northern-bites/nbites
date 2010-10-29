@@ -332,10 +332,12 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
     for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
         //cout << "Vert scan " << x << " " << y << endl;
         // if it is the color we're looking for - good
-        if (c == GREEN)
+        if (c == GREEN) {
             pixel = thresh->getColor(x, y);
-        else
+        }
+        else {
             pixel = thresh->getExpandedColor(x, y, c);
+        }
         if (pixel == c || pixel == c2) {
             good++;
             run++;
@@ -1880,7 +1882,7 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
     int y = tempobj.getLeftTopY();
     int spanX = tempobj.width();
     int spanY = tempobj.height();
-    int goal = (int)((spanX * spanY) * minpercent);
+    int goal = (int)(static_cast<float>(spanX * spanY) * minpercent);
     if (spanX < 1 || spanY < 1) {
         if (POSTDEBUG) {
             cout << "Invalid size in color check" << endl;

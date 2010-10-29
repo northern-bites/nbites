@@ -2041,7 +2041,7 @@ void FieldLines::removeDuplicateLines()
 				// Check if the two lines lie very close to each other
 				const BoundingBox box1 = Utility::
 					getBoundingBox(**j,
-                                   (*j)->getAvgWidth(),
+                                   static_cast<int>((*j)->getAvgWidth()),
 								   INTERSECT_MAX_PARALLEL_EXTENSION);
 
 				const bool box1Contains = Utility::
@@ -2064,7 +2064,7 @@ void FieldLines::removeDuplicateLines()
 				} else {
 					const BoundingBox box1 = Utility::
 						getBoundingBox(**i,
-									   (*i)->getAvgWidth(),
+									   static_cast<int>((*i)->getAvgWidth()),
 									   INTERSECT_MAX_PARALLEL_EXTENSION);
 					const bool box1Contains = Utility::
 						boxContainsPoint(box1,
@@ -2802,9 +2802,11 @@ const bool FieldLines::isThereGreenAroundCorner(const VisualCorner& corner,
 const bool FieldLines::isItGreenAcrossFromLine(const VisualCorner& corner,
                                                const VisualLine& i) const
 {
-    const int GREEN_CHECK_OFFSET = max(10.0f,
-                                       max(corner.getLine1()->getAvgWidth(),
-                                           corner.getLine2()->getAvgWidth()));
+    const int GREEN_CHECK_OFFSET = static_cast<int>(max(10.0f,
+                                                        max(corner.getLine1()->
+                                                            getAvgWidth(),
+                                                            corner.getLine2()->
+                                                            getAvgWidth())));
     static const int GREEN_AROUND_TEST_RADIUS = 3;
     static const float MIN_GREEN_AROUND_PERCENT = 10;
     const int cornerX = corner.getX();

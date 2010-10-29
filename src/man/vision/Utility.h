@@ -2,6 +2,7 @@
 #define Utility_hpp_DEFINED
 
 #include <cmath>          // Uses fabs, trig functions like atan
+#include <limits>
 
 class Utility;
 #include "Common.h"

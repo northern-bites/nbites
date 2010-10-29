@@ -138,7 +138,7 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
 	// pre-screen blobs that don't meet our criteria
 	for (int i = 0; i < blobs->number(); i++) {
         int ar = blobs->get(i).getArea();
-        float perc = blobs->get(i).getPixels() / (float)ar;
+        float perc = static_cast<float>(blobs->get(i).getPixels()) / (float)ar;
         int w = blobs->get(i).width();
         int h = blobs->get(i).height();
         int diam = max(w, h);
