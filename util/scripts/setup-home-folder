@@ -7,7 +7,7 @@ if [ $# -ne 2 ]; then
 fi
 
 # Create directories in home partition of nao
-ssh $2@$1 'mkdir -p naoqi/preferences naoqi/etc/audio naoqi/lib/naoqi naoqi/log'
+ssh $2@$1 'mkdir -p naoqi/preferences naoqi/etc/audio naoqi/lib/naoqi naoqi/log naoqi/frames'
 
 # Copy autoload.ini file over.
 scp ../config/autoload.ini $2@$1:naoqi/preferences/
