@@ -1,8 +1,8 @@
 #include "EdgeDetector.h"
 #include <cmath>
 
-const int EdgeDetector::dxTab[8] = { 1,  1,  0, -1, -1, -1,  0,  1};
-const int EdgeDetector::dyTab[8] = { 0,  1,  1,  1,  0, -1, -1, -1};
+const int EdgeDetector::dxTab[DIRECTIONS] = { 1,  1,  0, -1, -1, -1,  0,  1};
+const int EdgeDetector::dyTab[DIRECTIONS] = { 0,  1,  1,  1,  0, -1, -1, -1};
 
 
 EdgeDetector::EdgeDetector(int thresh) : threshold(thresh)
@@ -96,7 +96,7 @@ void EdgeDetector::findPeaks(Gradient& gradient)
                 const int y = gradient.y[i][j];
                 const int x = gradient.x[i][j];
 
-                int a = static_cast<int>(dir(y,x));
+                int a = static_cast<int>(gradient.dir(y,x));
 
                 // Get the highest 3 bits of the direction
                 a = a >> 5;
@@ -111,10 +111,5 @@ void EdgeDetector::findPeaks(Gradient& gradient)
             }
         }
     }
-}
-
-int EdgeDetector::dir(int y, int x)
-{
-    return static_cast<int>(atan2(y, x) / M_PI * 128.0) & 0xff;
 }
 

@@ -66,7 +66,7 @@ using boost::shared_ptr;
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
-: vision(vis), pose(posPtr)
+    : edges(50), gradient(), vision(vis), pose(posPtr)
 {
 
     // loads the color table on the MS into memory
@@ -108,13 +108,15 @@ void Threshold::visionLoop() {
     thresholdAndRuns();
 
 
+    
+
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
     // will be able to supply information about them through getLines() and
     // getCorners().
-    PROF_ENTER(vision->profiler, P_LINES);
-    vision->fieldLines->lineLoop();
-    PROF_EXIT(vision->profiler, P_LINES);
+    // PROF_ENTER(vision->profiler, P_LINES);
+    // vision->fieldLines->lineLoop();
+    // PROF_EXIT(vision->profiler, P_LINES);
     // do recognition
     PROF_ENTER(vision->profiler, P_OBJECT);
     objectRecognition();
@@ -156,6 +158,8 @@ void Threshold::thresholdAndRuns() {
     PROF_ENTER(vision->profiler, P_THRESHOLD);
     threshold();
     PROF_EXIT(vision->profiler, P_THRESHOLD);
+
+    edges.detectEdges(y, gradient);
 
     initColors();
 
@@ -201,6 +205,25 @@ void Threshold::threshold() {
         *tPtr++ = p[yPtr[YOFFSET2] >> 1];
         yPtr += 4;
     }
+
+    // Copy all the y, u, v values into 3 separate
+    // channel objects for edge detection
+    yPtr = &yplane[0];
+    for (int i=0; i < IMAGE_HEIGHT; ++i){
+        for (int j=0; j < IMAGE_WIDTH; j += 2){
+            y.val[i][j] = yPtr[YOFFSET1];
+            u.val[i][j] = yPtr[UOFFSET];
+            v.val[i][j] = yPtr[VOFFSET];
+
+            y.val[i][j+1] = yPtr[YOFFSET2];
+            u.val[i][j+1] = yPtr[UOFFSET];
+            v.val[i][j+1] = yPtr[VOFFSET];
+            yPtr += 4;
+        }
+    }
+
+
+
 #else
 #ifdef OFFLINE
     // this makes looking at images in the TOOL tolerable

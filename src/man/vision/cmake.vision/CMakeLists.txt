@@ -156,6 +156,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/VisualCross
                  ${VISION_INCLUDE_DIR}/VisualLine
                  ${VISION_INCLUDE_DIR}/EdgeDetector
+                 ${VISION_INCLUDE_DIR}/Gradient
                  )
 
 

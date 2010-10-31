@@ -20,6 +20,10 @@ class Threshold;  // forward reference
 #endif
 #include "Profiler.h"
 #include "NaoPose.h"
+#include "Gradient.h"
+#include "EdgeDetector.h"
+
+
 //
 // COLOR TABLE CONSTANTS
 // remember to change both values when chaning the color tables
@@ -222,6 +226,9 @@ public:
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
 
+    EdgeDetector edges;
+    Gradient gradient;
+    Channel u, v, y;
     Robots *red, *navyblue;
     Ball* orange;
     Cross* cross;

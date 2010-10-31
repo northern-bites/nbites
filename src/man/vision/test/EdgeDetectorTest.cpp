@@ -29,25 +29,26 @@ EdgeDetectorTest::EdgeDetectorTest() : edges(100)
 // Test the direction function in the edge detector
 int EdgeDetectorTest::test_dir()
 {
+    Gradient g;
     // Test 4 cardinal directions for dir
     const double BYTE_PI = M_PI * BYTE_TO_RAD;
-    EQ_INT(edges.dir(0,1), 0);
+    EQ_INT(g.dir(0,1), 0);
     passed(DIR_RIGHT);
 
-    EQ_FLOAT(edges.dir(1,0) , BYTE_PI/2.);
+    EQ_FLOAT(g.dir(1,0) , BYTE_PI/2.);
     passed(DIR_UP);
 
-    EQ_FLOAT(edges.dir(0,-1) , BYTE_PI);
+    EQ_FLOAT(g.dir(0,-1) , BYTE_PI);
     passed(DIR_LEFT);
 
-    EQ_FLOAT(edges.dir(-1,0) , 1.5 * BYTE_PI);
+    EQ_FLOAT(g.dir(-1,0) , 1.5 * BYTE_PI);
     passed(DIR_DOWN);
 
     // Ensure that dir() only returns values between 0 and 256 for all
     // image points
     for (int x= -IMAGE_WIDTH/2; x < IMAGE_WIDTH/2; ++x )
         for (int y= -IMAGE_HEIGHT/2; y < IMAGE_HEIGHT/2; ++y){
-            int a = edges.dir(x,y);
+            int a = g.dir(x,y);
             LTE(a , 256);
             GTE(a, 0);
         }
@@ -67,8 +68,6 @@ int EdgeDetectorTest::test_sobel()
             c.val[i][j] = 0;
 
     Gradient g;
-    g.rows = IMAGE_HEIGHT;
-    g.cols = IMAGE_WIDTH;
     edges.sobelOperator(c, g);
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
@@ -85,8 +84,6 @@ int EdgeDetectorTest::test_sobel()
         for (int j=0; j < IMAGE_WIDTH; ++j)
             c.val[i][j] = i + j;
     Gradient g2;
-    g2.rows = IMAGE_HEIGHT;
-    g2.cols = IMAGE_WIDTH;
     edges.sobelOperator(c, g);
     for (int i=1; i < IMAGE_HEIGHT-1; ++i)
         for (int j=1; j < IMAGE_WIDTH-1; ++j){
@@ -124,8 +121,6 @@ int EdgeDetectorTest::test_peaks()
         for (int j=0; j < IMAGE_WIDTH; ++j)
             c.val[i][j] = i + j;
     Gradient g2;
-    g2.rows = IMAGE_HEIGHT;
-    g2.cols = IMAGE_WIDTH;
     edges.sobelOperator(c, g);
     edges.findPeaks(g);
 
@@ -154,7 +149,7 @@ int EdgeDetectorTest::test_peaks()
             const int y = g.y[i][j];
             const int x = g.x[i][j];
 
-            int a = static_cast<int>(edges.dir(y,x));
+            int a = static_cast<int>(g.dir(y,x));
 
             // Get the highest 3 bits of the direction
             a = a >> 5;
