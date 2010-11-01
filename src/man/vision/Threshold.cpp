@@ -66,8 +66,8 @@ using boost::shared_ptr;
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
-    : edgeDetector(DEFAULT_EDGE_VALUE), gradient(),
-      vision(vis), pose(posPtr)
+    : vision(vis), pose(posPtr),
+      edgeDetector(DEFAULT_EDGE_VALUE), gradient()
 {
 
     // loads the color table on the MS into memory
@@ -237,14 +237,24 @@ void Threshold::threshold() {
 #endif
 }
 
+/**
+ * Detect the edges in an image based on the channel gradients
+ */
 void Threshold::edgeDetection()
 {
     edgeDetector.detectEdges(y, gradient);
+    drawDetectedEdges(gradient);
+}
 
+/**
+ * Draw the edges in a given gradient on the thresholded image
+ */
+void Threshold::drawDetectedEdges(shared_ptr<Gradient> g)
+{
 #ifdef OFFLINE
     if (debugEdgeDetection){
-        for(int i=0; i < gradient->rows; ++i){
-            for (int j=0; j < gradient->cols; ++j){
+        for(int i=0; i < g->rows; ++i){
+            for (int j=0; j < g->cols; ++j){
                 if (gradient->peaks[i][j])
                     vision->drawDot(j, i, PURPLE);
             }
@@ -1368,9 +1378,10 @@ void Threshold::initTable(std::string filename) {
     }
 
     //actually read the table into memory
+    int return_val;
     for(int i=0; i< UMAX; i++)
         for(int j=0; j<VMAX; j++){
-            fread(bigTable[i][j], sizeof(unsigned char), YMAX, fp);
+            return_val = fread(bigTable[i][j], sizeof(unsigned char), YMAX, fp);
         }
 
 #ifndef OFFLINE

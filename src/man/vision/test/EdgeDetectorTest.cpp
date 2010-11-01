@@ -7,7 +7,6 @@
 
 #include "boost/shared_ptr.hpp"
 
-
 #define CLOSE_ENOUGH_EQ_FLOAT .0000001
 
 #define EQ_FLOAT(x,y) (assert(x - CLOSE_ENOUGH_EQ_FLOAT < y \
@@ -36,7 +35,7 @@ int EdgeDetectorTest::test_dir()
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
     // Test 4 cardinal directions for dir
     const double BYTE_PI = M_PI * BYTE_TO_RAD;
-    EQ_INT(g->dir(0,1), 0);
+    EQ_INT(g->dir(0,1) , 0);
     passed(DIR_RIGHT);
 
     EQ_FLOAT(g->dir(1,0) , BYTE_PI/2.);
@@ -110,13 +109,15 @@ int EdgeDetectorTest::test_sobel()
             EQ_INT(g->x[i][j] , gx);
             EQ_INT(g->y[i][j] , gy);
             EQ_INT(g->mag[i][j] , gx * gx + gy * gy);
-            GTE(g->mag[i][j] , 0);
-
+            GTE(g->mag[i][j] , 0); // Detect an overflow or incorrect magnitude
         }
     passed(SOBEL_ALL);
     return 0;
 }
 
+/**
+ * Ensure that the peaks of the edge detection are correct.
+ */
 int EdgeDetectorTest::test_peaks()
 {
     Channel c;
@@ -129,8 +130,6 @@ int EdgeDetectorTest::test_peaks()
                 c.val[i][j] = 250;
 
     edges.detectEdges(c,g);
-    // edges.sobelOperator(c, g);
-    // edges.findPeaks(g);
 
     // Ensure that everywhere peaks is false, the gradient is set to zero
     // and everywhere peaks is true, the gradient is not zero

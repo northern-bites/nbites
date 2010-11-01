@@ -1,6 +1,9 @@
 #ifndef _Gradient_h_DEFINED
 #define _Gradient_h_DEFINED
 
+#include <iostream>
+
+
 typedef struct channel_t {
     int val[IMAGE_HEIGHT][IMAGE_WIDTH];
 } Channel;

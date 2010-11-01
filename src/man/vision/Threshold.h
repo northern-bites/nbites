@@ -194,6 +194,7 @@ public:
 
     void initDebugImage();
     void transposeDebugImage();
+    void drawDetectedEdges(boost::shared_ptr<Gradient> g);
     void drawX(int x, int y, int c);
     void drawPoint(int x, int y, int c);
     void drawLine(const point<int> start, const point<int> end,

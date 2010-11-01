@@ -90,21 +90,20 @@ void EdgeDetector::sobelOperator(const Channel& channel,
  */
 void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
 {
+    // The magnitudes were not square rooted and are rather large
     const int edgeThreshold = (threshold * threshold) << 4;
     for (int i=0; i < gradient->rows; ++i) {
         for (int j=0; j < gradient->cols; ++j){
 
-            gradient->peaks[i][j] = false;
+            gradient->peaks[i][j] = false; // Not a peak yet
             const int z = gradient->mag[i][j];
 
             if (z > edgeThreshold){
                 const int y = gradient->y[i][j];
                 const int x = gradient->x[i][j];
 
-                int a = static_cast<int>(gradient->dir(y,x));
-
                 // Get the highest 3 bits of the direction
-                a = a >> 5;
+                const int a = (gradient->dir(y,x) >> 5);
 
                 if (z >  gradient->mag[i + dyTab[a]][j + dxTab[a]] &&
                     z >= gradient->mag[i + dyTab[a]][j + dxTab[a]]){
