@@ -7,6 +7,10 @@
 #include "boost/shared_ptr.hpp"
 
 
+/**
+ * Used to find the step edges in a given channel of an image according to a
+ * preset, fixed threshold.
+ */
 class EdgeDetector
 {
 public:
@@ -29,12 +33,6 @@ private:
     void findPeaks(boost::shared_ptr<Gradient> gradient);
 
 private:
-    // Tables that specify the + neighbor of a pixel indexed by
-    // gradient direction octant (the high 3 bits of direction).
-    const static int DIRECTIONS = 8;
-    const static int dxTab[DIRECTIONS];
-    const static int dyTab[DIRECTIONS];
-
     int threshold;
 };
 

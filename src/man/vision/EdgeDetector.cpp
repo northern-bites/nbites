@@ -3,9 +3,6 @@
 #include <iostream>
 
 
-const int EdgeDetector::dxTab[DIRECTIONS] = { 1,  1,  0, -1, -1, -1,  0,  1};
-const int EdgeDetector::dyTab[DIRECTIONS] = { 0,  1,  1,  1,  0, -1, -1, -1};
-
 using boost::shared_ptr;
 using namespace std;
 
@@ -105,8 +102,10 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
                 // Get the highest 3 bits of the direction
                 const int a = (gradient->dir(y,x) >> 5);
 
-                if (z >  gradient->mag[i + dyTab[a]][j + dxTab[a]] &&
-                    z >= gradient->mag[i + dyTab[a]][j + dxTab[a]]){
+                if (z > gradient->mag
+                    [i + Gradient::dyTab[a]] [j + Gradient::dxTab[a]] &&
+                    z >= gradient->mag
+                    [i + Gradient::dyTab[a]][j + Gradient::dxTab[a]]){
                     gradient->peaks[i][j] = true;
                 }
             }

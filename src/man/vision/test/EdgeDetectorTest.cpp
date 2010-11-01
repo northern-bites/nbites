@@ -161,10 +161,10 @@ int EdgeDetectorTest::test_peaks()
             a = a >> 5;
 
             if (g->peaks[i][j] && (
-                g->peaks[i + EdgeDetector::dyTab[a]][j +
-                                                     EdgeDetector::dxTab[a]] ||
-                g->peaks[i + EdgeDetector::dyTab[a]][j +
-                                                    EdgeDetector::dxTab[a]])){
+                    g->peaks[i + Gradient::dyTab[a]][j +
+                                                     Gradient::dxTab[a]] ||
+                    g->peaks[i + Gradient::dyTab[a]][j +
+                                                    Gradient::dxTab[a]])){
                 assert(false);
             }
         }

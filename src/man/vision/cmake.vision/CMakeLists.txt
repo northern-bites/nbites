@@ -157,6 +157,8 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/VisualLine
                  ${VISION_INCLUDE_DIR}/EdgeDetector
                  ${VISION_INCLUDE_DIR}/Gradient
+                 ${VISION_INCLUDE_DIR}/HoughSpace
+                 ${VISION_INCLUDE_DIR}/geom/HoughLine
                  )
 
 
@@ -240,7 +242,8 @@ ENDIF( VISIONLINK )
 #  ${CORPUS_CMAKE_DIR}
 #  )
 
-add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp ${VISION_INCLUDE_DIR}/test/EdgeDetectorTest.cpp )
+add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp ${VISION_INCLUDE_DIR}/test/EdgeDetectorTest.cpp
+  ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
 enable_testing()
 add_test( EdgeDetectorTest  EdgeDetectorTest )
