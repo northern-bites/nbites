@@ -12,7 +12,7 @@ class EdgeDetectorTest
 {
 
     enum tests {
-        DIR_UP,
+        DIR_UP,                 // 0
         DIR_DOWN,
         DIR_RIGHT,
         DIR_LEFT,
@@ -20,7 +20,7 @@ class EdgeDetectorTest
         SOBEL_ZERO,
         SOBEL_ALL,
         PEAKS_ZERO,
-        PEAKS_DIR
+        PEAKS_DIR               // 8
     };
 public:
     EdgeDetectorTest();

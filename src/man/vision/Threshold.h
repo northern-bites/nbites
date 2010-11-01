@@ -95,6 +95,8 @@ class Threshold;  // forward reference
 // Constants pertaining to object detection and horizon detection
 static const int MIN_RUN_SIZE = 5;
 
+static const int DEFAULT_EDGE_VALUE = 50;
+
 /* The following two constants are used in the traversal of the image
    inside thresholdAndRuns. We start at the bottom left of the image which
    is (IMAGE_HEIGHT-1)*IMAGE_ROW_OFFSET. ADDRESS_JUMP means we want to move to
@@ -135,6 +137,7 @@ public:
     // main methods
     void visionLoop();
     inline void threshold();
+    inline void edgeDetection();
     inline void runs();
     unsigned char getColor(int x, int y);
     unsigned char getExpandedColor(int x, int y, unsigned char col);
@@ -186,6 +189,7 @@ public:
     bool getHorizonDebug() { return visualHorizonDebug; }
     void setDebugShooting(bool _bool) {debugShot = _bool;}
     void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
+    void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
 #endif
 
     void initDebugImage();
@@ -199,6 +203,8 @@ public:
     void drawBox(int left, int right, int bottom, int top, int c);
     void drawRect(int left, int top, int width, int height, int c);
 
+    void setEdgeThreshold(int _thresh);
+    int getEdgeThreshold();
 
 #if ROBOT(NAO_RL)
     inline uchar getY(int x, int y) {
@@ -226,8 +232,6 @@ public:
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
 
-    EdgeDetector edges;
-    Gradient gradient;
     Channel u, v, y;
     Robots *red, *navyblue;
     Ball* orange;
@@ -249,6 +253,10 @@ private:
 
     const uchar* yuv;
     const uchar* yplane, *uplane, *vplane;
+
+    // Edge detection objects
+    EdgeDetector edgeDetector;
+    boost::shared_ptr<Gradient> gradient;
 
     unsigned char bigTable[UMAX][VMAX][YMAX];
 
@@ -287,10 +295,12 @@ private:
     bool debugSelf;
     bool debugShot;
     bool debugOpenField;
+    bool debugEdgeDetection;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;
     static const bool debugOpenField = false;
+    static const bool debugEdgeDetection = false;
 #endif
 };
 

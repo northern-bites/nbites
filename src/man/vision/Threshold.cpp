@@ -66,7 +66,8 @@ using boost::shared_ptr;
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
-    : edges(50), gradient(), vision(vis), pose(posPtr)
+    : edgeDetector(DEFAULT_EDGE_VALUE), gradient(),
+      vision(vis), pose(posPtr)
 {
 
     // loads the color table on the MS into memory
@@ -85,6 +86,9 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 #else
 #  error Undefined robot type
 #endif // OFFLINE
+
+    gradient = shared_ptr<Gradient>(new Gradient());
+
     // Set up object recognition object pointers
     field = new Field(vision, this);
     blue = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
@@ -107,8 +111,7 @@ void Threshold::visionLoop() {
     // threshold image and create runs
     thresholdAndRuns();
 
-
-    
+    edgeDetection();
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
@@ -122,7 +125,7 @@ void Threshold::visionLoop() {
     objectRecognition();
     PROF_EXIT(vision->profiler, P_OBJECT);
 
-    vision->fieldLines->afterObjectFragments();
+    // vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
     if (vision->bgCrossbar->getWidth() > 0) {
         setShot(vision->bgCrossbar);
@@ -158,8 +161,6 @@ void Threshold::thresholdAndRuns() {
     PROF_ENTER(vision->profiler, P_THRESHOLD);
     threshold();
     PROF_EXIT(vision->profiler, P_THRESHOLD);
-
-    edges.detectEdges(y, gradient);
 
     initColors();
 
@@ -233,6 +234,22 @@ void Threshold::threshold() {
         }
     }
 #endif
+#endif
+}
+
+void Threshold::edgeDetection()
+{
+    edgeDetector.detectEdges(y, gradient);
+
+#ifdef OFFLINE
+    if (debugEdgeDetection){
+        for(int i=0; i < gradient->rows; ++i){
+            for (int j=0; j < gradient->cols; ++j){
+                if (gradient->peaks[i][j])
+                    vision->drawDot(j, i, PURPLE);
+            }
+        }
+    }
 #endif
 }
 
@@ -1760,3 +1777,12 @@ const char* Threshold::getShortColor(int _id) {
     }
 }
 
+void Threshold::setEdgeThreshold(int _thresh)
+{
+    edgeDetector.setThreshold(_thresh);
+}
+
+int Threshold::getEdgeThreshold()
+{
+    return edgeDetector.getThreshold();
+}

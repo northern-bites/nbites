@@ -1,9 +1,13 @@
 #include "EdgeDetector.h"
 #include <cmath>
+#include <iostream>
+
 
 const int EdgeDetector::dxTab[DIRECTIONS] = { 1,  1,  0, -1, -1, -1,  0,  1};
 const int EdgeDetector::dyTab[DIRECTIONS] = { 0,  1,  1,  1,  0, -1, -1, -1};
 
+using boost::shared_ptr;
+using namespace std;
 
 EdgeDetector::EdgeDetector(int thresh) : threshold(thresh)
 {
@@ -16,7 +20,7 @@ EdgeDetector::EdgeDetector(int thresh) : threshold(thresh)
  * @param channel      The entire channel (one of Y, U, or V)
  */
 void EdgeDetector::detectEdges(const Channel& channel,
-                               Gradient& gradient)
+                               shared_ptr<Gradient> gradient)
 {
     sobelOperator(channel, gradient);
     findPeaks(gradient);
@@ -34,11 +38,11 @@ void EdgeDetector::detectEdges(const Channel& channel,
  * @param gradient    Gradient struct to be populated.
  */
 void EdgeDetector::sobelOperator(const Channel& channel,
-                                 Gradient& gradient)
+                                 shared_ptr<Gradient> gradient)
 {
 
-    for (int i=1; i < gradient.rows-1; i++){
-        for (int j=1; j < gradient.cols-1; ++j) {
+    for (int i=1; i < gradient->rows-1; ++i){
+        for (int j=1; j < gradient->cols-1; ++j) {
 
             int xGrad = (
                 // Column j+1
@@ -60,9 +64,9 @@ void EdgeDetector::sobelOperator(const Channel& channel,
                  2 * channel.val[i-1][j] +
                  channel.val[i-1][j+1])
                 );
-            gradient.x[i][j] = xGrad;
-            gradient.y[i][j] = yGrad;
-            gradient.mag[i][j] = xGrad * xGrad + yGrad * yGrad;
+            gradient->x[i][j] = xGrad;
+            gradient->y[i][j] = yGrad;
+            gradient->mag[i][j] = xGrad * xGrad + yGrad * yGrad;
         }
     }
 }
@@ -84,30 +88,31 @@ void EdgeDetector::sobelOperator(const Channel& channel,
  *
  * @param gradient Gradient to check for points.
  */
-void EdgeDetector::findPeaks(Gradient& gradient)
+void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
 {
-    for (int i=0; i < gradient.rows; ++i) {
-        for (int j=0; j < gradient.cols; ++j){
+    const int edgeThreshold = (threshold * threshold) << 4;
+    for (int i=0; i < gradient->rows; ++i) {
+        for (int j=0; j < gradient->cols; ++j){
 
-            gradient.peaks[i][j] = false;
-            const int z = gradient.mag[i][j];
+            gradient->peaks[i][j] = false;
+            const int z = gradient->mag[i][j];
 
-            if (z > threshold){
-                const int y = gradient.y[i][j];
-                const int x = gradient.x[i][j];
+            if (z > edgeThreshold){
+                const int y = gradient->y[i][j];
+                const int x = gradient->x[i][j];
 
-                int a = static_cast<int>(gradient.dir(y,x));
+                int a = static_cast<int>(gradient->dir(y,x));
 
                 // Get the highest 3 bits of the direction
                 a = a >> 5;
 
-                if (z >  gradient.mag[i + dyTab[a]][j + dxTab[a]] &&
-                    z >= gradient.mag[i + dyTab[a]][j + dxTab[a]]){
-                    gradient.peaks[i][j] = true;
+                if (z >  gradient->mag[i + dyTab[a]][j + dxTab[a]] &&
+                    z >= gradient->mag[i + dyTab[a]][j + dxTab[a]]){
+                    gradient->peaks[i][j] = true;
                 }
             }
-            if (!gradient.peaks[i][j]){
-                gradient.x[i][j] = gradient.y[i][j] = gradient.mag[i][j] = 0;
+            if (!gradient->peaks[i][j]){
+                gradient->x[i][j] = gradient->y[i][j] = gradient->mag[i][j] = 0;
             }
         }
     }

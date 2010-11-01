@@ -4,6 +4,9 @@
 #include "VisionDef.h"
 #include "Gradient.h"
 
+#include "boost/shared_ptr.hpp"
+
+
 class EdgeDetector
 {
 public:
@@ -15,15 +18,15 @@ public:
  */
 public:
     void detectEdges(const Channel& channel,
-                     Gradient& gradient);
+                     boost::shared_ptr<Gradient> gradient);
 
     int  getThreshold()           { return threshold; }
     void setThreshold(int thresh) { threshold = thresh; }
 
 private:
     void sobelOperator(const Channel& channel,
-                       Gradient& gradient);
-    void findPeaks(Gradient& gradient);
+                       boost::shared_ptr<Gradient> gradient);
+    void findPeaks(boost::shared_ptr<Gradient> gradient);
 
 private:
     // Tables that specify the + neighbor of a pixel indexed by

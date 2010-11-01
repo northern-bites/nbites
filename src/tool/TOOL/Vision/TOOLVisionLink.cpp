@@ -508,6 +508,12 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 		vision.thresh->setDebugOpenField(debugField);
 	}
 
+    JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetEdgeDetectionDebug
+	(JNIEnv * env, jobject jobj, jboolean debugEdgeDetection){
+		vision.thresh->setDebugEdgeDetection(debugEdgeDetection);
+	}
+
 
 #ifdef __cplusplus
     }

@@ -213,6 +213,7 @@ public class TOOLVisionLink {
 	native private void cppSetFieldEdgeDebug(boolean _bool);
     native private void cppSetShootingDebug(boolean _bool);
     native private void cppSetOpenFieldDebug(boolean _bool);
+    native private void cppSetEdgeDetectionDebug(boolean _bool);
 
     //Load the cpp library that implements the native methods
     static
@@ -632,6 +633,18 @@ public class TOOLVisionLink {
         if (visionLinkSuccessful) {
             try {
                 cppSetShootingDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+
+    public void setDebugEdgeDetection(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetEdgeDetectionDebug(_bool);
             } catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n");
             }
