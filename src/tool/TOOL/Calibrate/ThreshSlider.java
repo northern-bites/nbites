@@ -38,12 +38,9 @@ public class ThreshSlider extends IncrementalSlider {
 
         enabled = new JCheckBox("Edge Thresholding Enabled (E)");
 
-        //enabled.setAlignmentX(Component.RIGHT_ALIGNMENT);
-
         super.add(enabled, BorderLayout.PAGE_END);
         enabled.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    setEnabled(enabled.isSelected());
                     calibrate.setThresholded(enabled.isSelected());
                 }
             });

@@ -282,4 +282,7 @@ public class VisionState {
     public void setColorTable(ColorTable c) { colorTable = c; }
     public void setBall(Ball b) { ball = b;  }
     public void setDrawThreshColors(boolean dr){ drawThreshColors = dr;}
+    public void setEdgeThreshold(int thresh){
+        thresholdedImage.getVisionLink().setEdgeThreshold(thresh);
+    }
 }

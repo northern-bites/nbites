@@ -379,6 +379,12 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
             env->ReleaseFloatArrayElements( cameraCalibrate, cam_calibrate, 0);
         }
 
+    JNIEXPORT void JNICALL
+    Java_TOOL_Vision_TOOLVisionLink_cppSetEdgeThreshold
+        (JNIEnv * env, jobject jobj, jint thresh){
+        vision.thresh->setEdgeThreshold(thresh);
+    }
+
 	/**
 	 * FieldLines debug flag functions
 	 */
@@ -512,8 +518,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 	Java_TOOL_Vision_TOOLVisionLink_cppSetEdgeDetectionDebug
 	(JNIEnv * env, jobject jobj, jboolean debugEdgeDetection){
 		vision.thresh->setDebugEdgeDetection(debugEdgeDetection);
-	}
-
+    }
 
 #ifdef __cplusplus
     }

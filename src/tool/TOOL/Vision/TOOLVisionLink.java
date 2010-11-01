@@ -215,6 +215,10 @@ public class TOOLVisionLink {
     native private void cppSetOpenFieldDebug(boolean _bool);
     native private void cppSetEdgeDetectionDebug(boolean _bool);
 
+
+    // Set edge detection threshold
+    native private void cppSetEdgeThreshold(int _t);
+
     //Load the cpp library that implements the native methods
     static
     {
@@ -328,6 +332,17 @@ public class TOOLVisionLink {
     //set the processTime
     public void setProcessTime(int p) {
         processTime = p;
+    }
+
+    public void setEdgeThreshold(int t) {
+        if (visionLinkSuccessful) {
+            try{
+                cppSetEdgeThreshold(t);
+            } catch (Throwable e){
+                System.err.println("Error in cpp sub system. \n "+
+                                   "\tsetEdgeThreshold failed.");
+            }
+        }
     }
 
     public float[] getCameraCalibrate() {

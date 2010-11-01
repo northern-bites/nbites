@@ -202,10 +202,10 @@ public class Calibrate implements DataListener, MouseListener,
      */
     protected void setEdgeThresh(int thresh) {
         if (overlay != null) {
-            overlay.setEdgeThresh(thresh);
-            overlay.regenerateEdgeImage(rawImage);
+            visionState.setEdgeThreshold(thresh);
+            notifyFrame(currentFrame);
             selector.repaint();
-			displayer.repaint();
+            displayer.repaint();
         }
     }
 
@@ -799,7 +799,6 @@ public class Calibrate implements DataListener, MouseListener,
     public void setThresholded(boolean choice) {
         if (overlay != null) {
             overlay.setThresholding(choice);
-            overlay.regenerateEdgeImage(rawImage);
             selector.repaint();
 			displayer.repaint();
         }
