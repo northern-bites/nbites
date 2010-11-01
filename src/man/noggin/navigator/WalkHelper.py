@@ -26,8 +26,8 @@ def getOmniWalkParam(my, dest):
     forwardGain = constants.OMNI_GOTO_X_GAIN * relX
     sX = constants.OMNI_GOTO_FORWARD_SPEED * forwardGain
     sX = MyMath.clip(sX,
-                     constants.OMNI_MIN_X_SPEED,
-                     constants.OMNI_MAX_X_SPEED)
+                     constants.OMNI_REV_MAX_SPEED,
+                     constants.OMNI_FWD_MAX_SPEED)
     if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
         sX = 0
 
@@ -35,24 +35,23 @@ def getOmniWalkParam(my, dest):
     strafeGain = constants.OMNI_GOTO_Y_GAIN * relY
     sY = constants.OMNI_GOTO_STRAFE_SPEED  * strafeGain
     sY = MyMath.clip(sY,
-                     constants.OMNI_MIN_Y_SPEED,
-                     constants.OMNI_MAX_Y_SPEED,)
+                     constants.OMNI_RIGHT_MAX_SPEED,
+                     constants.OMNI_LEFT_MAX_SPEED,)
     if fabs(sY) < constants.OMNI_MIN_Y_MAGNITUDE:
         sY = 0
 
     # calculate spin speed
     spinGain = constants.GOTO_SPIN_GAIN
-    hDiff = MyMath.sub180Angle(dest.h - my.h)
 
-    if (fabs(hDiff) < 2.0):
+    if (fabs(relH) < 2.0):
         sTheta = 0.0
     else:
-        sTheta = MyMath.sign(hDiff) * getRotScale(hDiff) * \
-                 constants.OMNI_MAX_SPIN_SPEED * spinGain
+        sTheta = MyMath.sign(relH) * getRotScale(relH) * \
+                 constants.OMNI_MAX_SPIN_MAGNITUDE * spinGain
 
         sTheta = MyMath.clip(sTheta,
-                             constants.OMNI_MIN_SPIN_SPEED,
-                             constants.OMNI_MAX_SPIN_SPEED)
+                             constants.OMNI_MAX_RIGHT_SPIN_SPEED,
+                             constants.OMNI_MAX_LEFT_SPIN_SPEED)
 
     return (sX, sY, sTheta)
 
@@ -74,19 +73,19 @@ def getWalkSpinParam(my, dest):
     else:
         # calculate ideal max spin speed
         sTheta = (MyMath.sign(bearingDeg) * getRotScale(bearingDeg) *
-                  constants.OMNI_MAX_SPIN_SPEED)
+                  constants.OMNI_MAX_SPIN_MAGNITUDE)
 
     absSTheta = fabs(sTheta)
 
     if  fabs(bearingDeg) > 20:
         sX = MyMath.clip(sX,
-                         constants.OMNI_MIN_X_SPEED,
-                         constants.OMNI_MAX_X_SPEED)
-        sTheta = MyMath.sign(sTheta)* constants.OMNI_MAX_SPIN_SPEED
+                         constants.OMNI_REV_MAX_SPEED,
+                         constants.OMNI_FWD_MAX_SPEED)
+        sTheta = MyMath.sign(sTheta)* constants.OMNI_MAX_SPIN_MAGNITUDE
 
     elif fabs(bearingDeg)  > 35:
         sX = 0
-        sTheta = constants.MAX_SPIN_SPEED * MyMath.sign(sTheta)
+        sTheta = constants.MAX_SPIN_MAGNITUDE * MyMath.sign(sTheta)
 
     gain = 1.0
     if distToDest < ChaseBallConstants.APPROACH_WITH_GAIN_DIST:
@@ -104,8 +103,8 @@ def getWalkStraightParam(my, dest):
         gain = 1.0
 
     sX = MyMath.clip(constants.GOTO_FORWARD_SPEED*gain,
-                     constants.WALK_TO_MIN_X_SPEED,
-                     constants.WALK_TO_MAX_X_SPEED)
+                     constants.WALK_TO_REV_MAX_SPEED,
+                     constants.WALK_TO_FWD_MAX_SPEED)
 
     bearingDeg= my.getRelativeBearing(dest)
 
@@ -129,7 +128,7 @@ def getSpinOnlyParam(my, dest):
     if (fabs(headingDiff) < 2.0):
         sTheta = 0.0
     else:
-        sTheta = MyMath.sign(headingDiff) * constants.GOTO_SPIN_SPEED * \
+        sTheta = MyMath.sign(headingDiff) * constants.MAX_SPIN_MAGNITUDE * \
                  getRotScale(headingDiff)
 
     sX, sY = 0, 0

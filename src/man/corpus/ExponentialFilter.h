@@ -30,6 +30,8 @@
 
 #include <boost/numeric/ublas/vector.hpp>
 
+const float DEFAULT_ALPHA = 0.75;
+
 template <class Measurement, unsigned int dimension>
 
 class ExponentialFilter
@@ -46,13 +48,16 @@ protected:
 
 public:
 	// Constructors & Destructors
+	ExponentialFilter()
+		: alpha(DEFAULT_ALPHA), currentState(dimension)
+	{
+		zeroCurrentState();
+	}
+
 	ExponentialFilter(float _alpha)
 		: alpha(_alpha), currentState(dimension)
 	{
-		// initialize currentState to all zeroes
-		for (unsigned i = 0; i < dimension; i++) {
-			currentState(i) = 0;
-		}
+		zeroCurrentState();
 	}
 
 	virtual ~ExponentialFilter() {}
@@ -86,6 +91,14 @@ protected:
 		const float withObservation = current * alpha + (1-alpha) * observation;
 
 		currentState(index) = withObservation;
+	}
+
+private:
+	// called by constructors
+	void zeroCurrentState() {
+		for (unsigned i = 0; i < dimension; i++) {
+			currentState(i) = 0;
+		}
 	}
 };
 

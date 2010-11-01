@@ -92,7 +92,7 @@ def spinToWalkHeading(nav):
     else :
         nav.stopSpinToWalkCount = 0
 
-    sTheta = nav.curSpinDir * constants.GOTO_SPIN_SPEED * \
+    sTheta = nav.curSpinDir * constants.MAX_SPIN_MAGNITUDE * \
         walker.getRotScale(headingDiff)
 
     if sTheta != nav.walkTheta:
@@ -119,7 +119,7 @@ def spinToFinalHeading(nav):
                    % (targetH, headingDiff, nav.brain.my.uncertH))
     spinDir = MyMath.sign(headingDiff)
 
-    spin = spinDir*constants.GOTO_SPIN_SPEED*walker.getRotScale(headingDiff)
+    spin = spinDir*constants.MAX_SPIN_MAGNITUDE*walker.getRotScale(headingDiff)
 
     if navTrans.atHeading(nav.brain.my, targetH):
         nav.stopSpinToWalkCount += 1
@@ -130,21 +130,6 @@ def spinToFinalHeading(nav):
         return nav.goLater('stop')
 
     helper.setSpeed(nav, 0, 0, spin)
-    return nav.stay()
-
-def omniWalkToPoint(nav):
-    my = nav.brain.my
-    dest = nav.dest
-
-    if nav.firstFrame():
-        nav.walkToPointCount = 0
-
-    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
-        return nav.goNow('stop')
-
-    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
-
     return nav.stay()
 
 # WARNING: avoidObstacle could possibly go into our own box

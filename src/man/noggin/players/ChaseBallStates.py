@@ -19,12 +19,13 @@ def chase(player):
     if player.brain.play.isRole(GOALIE):
         return player.goNow('goalieChase')
 
+    # Check in order of importance
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
+    elif transitions.shouldKick(player):
+        return player.goNow('decideKick')
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
-    elif transitions.shouldKick(player):
-        return player.goNow('waitBeforeKick')
     else:
         return player.goNow('scanFindBall')
 
@@ -32,12 +33,14 @@ def goalieChase(player):
     """
     TODO: make goalie more aggressive (different transitions?)
     """
+
+    # Check in order of importance
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
+    elif transitions.shouldKick(player):
+        return player.goNow('decideKick')
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
-    elif transitions.shouldKick(player):
-        return player.goNow('waitBeforeKick')
     else:
         return player.goNow('scanFindBall')
 
@@ -82,7 +85,6 @@ def approachBall(player):
 
 def decideKick(player):
     if player.firstFrame():
-        player.stopWalking()
         player.brain.tracker.kickDecideScan()
 
     elif player.counter > 43:
@@ -92,7 +94,7 @@ def decideKick(player):
 
     return player.stay()
 
-PFK_BALL_CLOSE_ENOUGH = 30
+PFK_BALL_CLOSE_ENOUGH = 40
 PFK_BALL_VISION_FRAMES = 15
 BUFFER_FRAMES_THRESHOLD = 3
 
@@ -108,6 +110,7 @@ def positionForKick(player):
             player.angleToOrbit = player.brain.kickDecider.kickInfo.orbitAngle
             return player.goLater('orbitBall')
 
+        # Re-initialize to clear data from decideKick???
         player.brain.kickDecider.kickInfo = \
             KickInformation.KickInformation(player)
 
@@ -146,6 +149,10 @@ def positionForKick(player):
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldDribble(player):
             return player.goNow('dribble')
+
+    if player.brain.nav.isStopped():
+        kick = player.brain.kickDecider.kickInfo.getKick()
+        player.brain.nav.kickPosition(kick)
 
     return player.stay()
 
