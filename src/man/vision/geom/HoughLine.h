@@ -1,6 +1,8 @@
 #ifndef _HoughLine_h_DEFINED
 #define _HoughLine_h_DEFINED
 
+#include <ostream>
+
 
 /**
  * A line defined in polar coordinates, also storing information from the
@@ -8,7 +10,7 @@
  */
 class HoughLine
 {
-public: 
+public:
    HoughLine(int _rIndex, int _tIndex,
               float _r, float _t, int _score);
     virtual ~HoughLine() { };
@@ -19,6 +21,12 @@ public:
     int getRIndex()   { return rIndex; }
     int getTIndex()   { return tIndex; }
     int getScore()    { return score;  }
+
+    friend std::ostream& operator<< (std::ostream &o,
+                                     const HoughLine &l){
+        return o << "Line: rIndex: " << l.rIndex << " tIndex: " << l.tIndex <<
+            "\n\tr: " << l.r << " t:" << l.t << " score: " << l.score;
+    }
 
 private:
     float r, t;                 // Radius and angle of line in polar coords

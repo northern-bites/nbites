@@ -3,6 +3,10 @@
 using namespace std;
 using boost::shared_ptr;
 
+const int HoughSpace::drTab[PEAK_POINTS] = {  1,  1,  0, -1 };
+const int HoughSpace::dtTab[PEAK_POINTS] = {  0,  1,  1,  1 };
+
+
 HoughSpace::HoughSpace() : acceptThreshold(DEFAULT_ACCEPT_THRESH),
                            angleSpread(DEFAULT_ANGLE_SPREAD)
 {
@@ -19,6 +23,8 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
     markEdges(g);
     smooth();
     list<HoughLine> lines = peaks();
+
+    list<HoughLine>::iterator i = lines.begin();
     suppress(lines);
     return lines;
 }
@@ -57,11 +63,9 @@ void HoughSpace::edge(int x, int y, int t0, int t1)
     for (int t=t0; t <= t1; ++t){
         int t8 = t & 0xff;
         int r1 = getR(x, y, t8 + 1);
-        // cout << "t8: " << t8 << "\tr0: " << r0 << "\tr1: " << r1 << endl;
 
         for (int r = min(r0, r1); r <= max(r0, r1); ++r){
             int ri = r + R_SPAN / 2;
-            // cout <<"\t\tri: " <<ri<<endl;
             if (0 <=ri && ri <R_SPAN){
                 ++hs[ri][t8];
             }
@@ -112,7 +116,35 @@ void HoughSpace::smooth()
  */
 list<HoughLine> HoughSpace::peaks()
 {
+    int thresh = 4 * acceptThreshold; // smoothing has a gain of 4
 
+    list<HoughLine> lines;
+
+    for (int r=0; r < R_SPAN-1; ++r) {
+        for (int t=0; t < T_SPAN; ++t) {
+            const int z = hs[r][t];
+            if (z >= thresh){
+                bool shouldCreate = true;
+                for (int i=0; shouldCreate && i < PEAK_POINTS; ++i) {
+
+                    if ( ! ( z >  hs[r + drTab[i]][(t + dtTab[i]) & 0xff] &&
+                             z >= hs[r - drTab[i]][(t - dtTab[i]) & 0xff])){
+                        shouldCreate = false;
+                    }
+                }
+                peak[r][t] = shouldCreate;
+                if (shouldCreate){
+                    HoughLine line = HoughLine(r, t,
+                                               static_cast<float>(r) -
+                                               R_SPAN / 2.0f + 0.5f,
+                                               (static_cast<float>(t) + 0.5f) *
+                                               M_PI_FLOAT / 128.0f, z >> 2);
+                    lines.push_back(line);
+                }
+            }
+        }
+    }
+    return lines;
 }
 
 /**
@@ -128,5 +160,10 @@ void HoughSpace::suppress(list<HoughLine>& lines)
  */
 void HoughSpace::reset()
 {
-
+    for (int r=0; r < R_SPAN; ++r) {
+        for (int t=0; t < T_SPAN; ++t) {
+            peak[r][t] = false;
+            hs[r][t] = 0;
+        }
+    }
 }

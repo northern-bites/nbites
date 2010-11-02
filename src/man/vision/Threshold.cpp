@@ -67,7 +67,7 @@ using boost::shared_ptr;
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     : vision(vis), pose(posPtr),
-      edgeDetector(DEFAULT_EDGE_VALUE), gradient()
+      edgeDetector(DEFAULT_EDGE_VALUE), hough(), gradient()
 {
 
     // loads the color table on the MS into memory
@@ -112,6 +112,7 @@ void Threshold::visionLoop() {
     thresholdAndRuns();
 
     edgeDetection();
+    findLines();
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
@@ -244,6 +245,29 @@ void Threshold::edgeDetection()
 {
     edgeDetector.detectEdges(y, gradient);
     drawDetectedEdges(gradient);
+}
+
+void Threshold::findLines()
+{
+    list<HoughLine> lines = hough.findLines(gradient);
+
+    list<HoughLine>::iterator line = lines.begin();
+    while (line != lines.end()){
+        for (double u = -200.; u <= 200.; u+=1.){
+            double sn = sin(line->getAngle());
+            double cs = cos(line->getAngle());
+            double x0 = line->getRadius() * cs;
+            double y0 = line->getRadius() * sn;
+
+            int x = (int)round(x0 - u * sn) + IMAGE_WIDTH  / 2;
+            int y = (int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
+
+            if (0 <= x && x < IMAGE_WIDTH &&
+                0 <= y && y < IMAGE_HEIGHT)
+                vision->drawDot(x,y, LIGHT_SKY_BLUE);
+        }
+        line++;
+    }
 }
 
 /**

@@ -6,3 +6,4 @@ HoughLine::HoughLine(int _rIndex, int _tIndex,
 {
 
 }
+

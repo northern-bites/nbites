@@ -22,19 +22,7 @@ public:
 
     std::list<HoughLine> findLines(boost::shared_ptr<Gradient> g);
 
-private:
-    // Hough Space size parameters
-    // 256 for full 8 bit angle, width is for 320x240 image
-    const static int R_SPAN = 400, T_SPAN  = 256;
-    const static int DEFAULT_ACCEPT_THRESH = 20;
-    const static int DEFAULT_ANGLE_SPREAD  = 5;
-
-    int acceptThreshold, angleSpread;
-
-    // allocate an extra T for the smoothing neighborhood
-    int hs[R_SPAN][T_SPAN + 1];
-    bool peak[R_SPAN][T_SPAN];
-
+private:                        // Member functions
     void markEdges(boost::shared_ptr<Gradient> g);
     void edge(int x, int y, int t0, int t1);
     int getR(int x, int y, int t);
@@ -45,6 +33,26 @@ private:
     void suppress(std::list<HoughLine>& lines);
 
     void reset();
+
+
+private:       // Member variables
+    // Hough Space size parameters
+    // 256 for full 8 bit angle, width is for 320x240 image
+    const static int R_SPAN = 400, T_SPAN  = 256;
+    const static int DEFAULT_ACCEPT_THRESH = 75;
+    const static int DEFAULT_ANGLE_SPREAD  = 5;
+    const static int PEAK_POINTS = 4;
+
+    int acceptThreshold, angleSpread;
+
+    // allocate an extra T for the smoothing neighborhood
+    int hs[R_SPAN][T_SPAN + 1];
+    bool peak[R_SPAN][T_SPAN];
+
+
+    const static int drTab[PEAK_POINTS];
+    const static int dtTab[PEAK_POINTS];
+
 };
 
 #endif /* HoughSpace_h_DEFINED */

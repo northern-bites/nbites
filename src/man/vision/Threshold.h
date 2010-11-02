@@ -22,6 +22,7 @@ class Threshold;  // forward reference
 #include "NaoPose.h"
 #include "Gradient.h"
 #include "EdgeDetector.h"
+#include "HoughSpace.h"
 
 
 //
@@ -138,6 +139,7 @@ public:
     void visionLoop();
     inline void threshold();
     inline void edgeDetection();
+    inline void findLines();
     inline void runs();
     unsigned char getColor(int x, int y);
     unsigned char getExpandedColor(int x, int y, unsigned char col);
@@ -257,6 +259,7 @@ private:
 
     // Edge detection objects
     EdgeDetector edgeDetector;
+    HoughSpace hough;
     boost::shared_ptr<Gradient> gradient;
 
     unsigned char bigTable[UMAX][VMAX][YMAX];

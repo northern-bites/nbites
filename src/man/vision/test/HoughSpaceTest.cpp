@@ -69,9 +69,32 @@ void HoughSpaceTest::test_hs()
 
 }
 
+void HoughSpaceTest::test_lines()
+{
+    shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
+    for (int i=0; i < IMAGE_HEIGHT; ++i){
+        for (int j=0; j < IMAGE_WIDTH; ++j){
+            if (j < IMAGE_WIDTH *3./4.){
+                g->x[i][j] = 0;
+                g->y[i][j] = 0;
+                g->mag[i][j] = 0;
+                g->peaks[i][j] = false;
+            } else {
+                g->x[i][j] = 5;
+                g->y[i][j] = 0;
+                g->mag[i][j] = 25;
+                g->peaks[i][j] = true;
+            }
+        }
+    }
+
+    hs.findLines(g);
+}
+
 int HoughSpaceTest::runTests()
 {
     test_hs();
+    test_lines();
     return 0;
 }
 

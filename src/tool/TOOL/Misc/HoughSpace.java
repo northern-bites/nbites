@@ -162,7 +162,9 @@ public class HoughSpace {
             for (int j = i + 1; j < lines.size(); ++j)
                 {
                     double px, py;
-                    int ijAngle = Math.abs((lines.get(i).tIndex - lines.get(j).tIndex & 0xFF) << 24 >> 24);
+                    int ijAngle = Math.abs((lines.get(i).tIndex -
+                                            lines.get(j).tIndex & 0xFF)
+                                           << 24 >> 24);
                     if (0 < ijAngle && ijAngle <= angleSpread &&
                         lines.get(i).intersect(lines.get(j), rx, ry))
                         {

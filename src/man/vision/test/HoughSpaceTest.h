@@ -30,8 +30,7 @@ private:
     HoughSpace hs;
 
     void test_hs();
-
-
+    void test_lines();
 };
 
 #endif /* _HoughSpaceTest_h_DEFINED */
