@@ -372,7 +372,7 @@ namespace Kinematics {
 	//    Z is direction of joint axis
 	//    X-axis parallel to common normal
 	//    Y-axis follows from X,Z and is right-handed
-
+	// NOTE: these are unused currently except by ktest/COM.cpp
     static const float HEAD_INERTIAL_POS[2][4] = {
         {NECK_MASS_X, NECK_MASS_Y, NECK_MASS_Z, NECK_MASS_g}, //HY
         {HEAD_MASS_X, HEAD_MASS_Z, HEAD_MASS_Y, HEAD_MASS_g}}; //HP
