@@ -245,5 +245,8 @@ ENDIF( VISIONLINK )
 add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp ${VISION_INCLUDE_DIR}/test/EdgeDetectorTest.cpp
   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
+add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp ${VISION_INCLUDE_DIR}/test/HoughSpaceTest.cpp
+  ${VISION_INCLUDE_DIR}/Gradient.cpp )
+
 enable_testing()
 add_test( EdgeDetectorTest  EdgeDetectorTest )

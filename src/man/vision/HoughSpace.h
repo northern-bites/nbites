@@ -18,7 +18,7 @@ class HoughSpace
 {
 public:
     HoughSpace();
-    virtual ~HoughSpace();
+    virtual ~HoughSpace() { };
 
     std::list<HoughLine> findLines(boost::shared_ptr<Gradient> g);
 
@@ -36,9 +36,13 @@ private:
     bool peak[R_SPAN][T_SPAN];
 
     void markEdges(boost::shared_ptr<Gradient> g);
+    void edge(int x, int y, int t0, int t1);
+    int getR(int x, int y, int t);
+
+
     void smooth();
-    void peaks();
-    void suppress();
+    std::list<HoughLine> peaks();
+    void suppress(std::list<HoughLine>& lines);
 
     void reset();
 };

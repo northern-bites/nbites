@@ -7,6 +7,7 @@
 #undef private
 #undef protected
 
+#include "Tests.h"
 
 class EdgeDetectorTest
 {
@@ -32,7 +33,6 @@ private:
     int test_sobel();
     int test_dir();
     int test_peaks();
-    void passed(int a);
 
 private:
     EdgeDetector edges;
