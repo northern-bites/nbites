@@ -11,18 +11,6 @@
 
 class EdgeDetectorTest
 {
-
-    enum tests {
-        DIR_UP,                 // 0
-        DIR_DOWN,
-        DIR_RIGHT,
-        DIR_LEFT,
-        DIR_ALL,
-        SOBEL_ZERO,
-        SOBEL_ALL,
-        PEAKS_ZERO,
-        PEAKS_DIR               // 8
-    };
 public:
     EdgeDetectorTest();
     virtual ~EdgeDetectorTest() { }

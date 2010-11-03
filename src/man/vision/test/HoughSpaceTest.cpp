@@ -40,12 +40,12 @@ void HoughSpaceTest::test_hs()
             GTE(hs.hs[i][j] , 0);
         }
     }
-    passed(MORE_THAN_ZERO);
+    PASSED(MORE_THAN_ZERO);
 
     // Check to make sure there is a point at r = 3/.4, theta = 0
     // which is where the above gradient has a line, roughly.
     GT(hs.hs[static_cast<int>(HoughSpace::R_SPAN * 3./4.)][0] , 0);
-    passed(EDGE_AT_BOUND);
+    PASSED(EDGE_AT_BOUND);
 
     // Notice that it is T_SPAN +1. This is the same as in the
     // Hough Space.
@@ -67,7 +67,7 @@ void HoughSpaceTest::test_hs()
                                   pre[r+1][t] + pre[r+1][t+1]));
         }
     }
-    passed(SMOOTH_CORRECT);
+    PASSED(SMOOTH_CORRECT);
 
 }
 
@@ -123,6 +123,56 @@ void HoughSpaceTest::test_lines()
 
 void HoughSpaceTest::test_suppress()
 {
+    list<HoughLine> lines;
+
+    // test three identical lines to make sure that only one of the
+    // duplicate lines survives suppress()
+    HoughLine a1 = HoughSpace::createLine(100, 180, 50);
+    HoughLine a2 = HoughSpace::createLine(101, 182, 2);
+    HoughLine a3 = HoughSpace::createLine(99, 182, 4);
+
+    lines.push_back(a1);
+    lines.push_back(a2);
+    lines.push_back(a3);
+
+    int x0 = IMAGE_HEIGHT /2;
+    int y0 = IMAGE_WIDTH /2;
+    hs.suppress(x0, y0, lines);
+
+    EQ_INT(lines.size() , 1);   // Ensure that only one duplicate line remains
+    TRUE(lines.front() == a1);
+
+    PASSED(NO_DUPE_LINES);
+
+    // Make sure that suppress doesn't delete lines needlessly
+    HoughLine a = HoughSpace::createLine(100, 180, 50);
+    HoughLine b = HoughSpace::createLine(10,200,400);
+    HoughLine c = HoughSpace::createLine(100,10,4);
+    HoughLine b2 = HoughSpace::createLine(10,203,4);
+
+    lines.clear();
+    lines.push_back(a);
+    lines.push_back(b);
+    lines.push_back(c);
+    lines.push_back(b2);
+
+    hs.suppress(x0, y0, lines);
+    EQ_INT( lines.size() , 3 );
+    bool at = false, bt = false, ct = false;
+
+    list<HoughLine>::iterator i = lines.begin();
+    while (i != lines.end()){
+        if (*i == a)
+            at = true;
+        if (*i == b)
+            bt = true;
+        if (*i == c)
+            ct = true;
+        i++;
+    }
+
+    TRUE(at && bt && ct);
+    PASSED(DONT_DELETE_GOOD_LINES);
 
 }
 

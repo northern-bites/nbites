@@ -18,12 +18,6 @@ public:
     HoughSpaceTest();
     virtual ~HoughSpaceTest() { };
 
-    enum tests {
-        MORE_THAN_ZERO,
-        EDGE_AT_BOUND,
-        SMOOTH_CORRECT
-    };
-
     int runTests();
 
     // Member functions

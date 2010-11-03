@@ -3,7 +3,6 @@
 
 #include <ostream>
 
-
 /**
  * A line defined in polar coordinates, also storing information from the
  * Hough Space in which it was found.
@@ -29,6 +28,9 @@ public:
         return o << "Line: rIndex: " << l.rIndex << " tIndex: " << l.tIndex <<
             "\n\tr: " << l.r << " t:" << l.t << " score: " << l.score;
     }
+
+    bool operator==(const HoughLine &other);
+    bool operator!=(const HoughLine &other);
 
 private:
     float r, t;                 // Radius and angle of line in polar coords

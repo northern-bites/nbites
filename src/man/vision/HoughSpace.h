@@ -33,6 +33,7 @@ private:                        // Member functions
     void suppress(int x0, int y0, std::list<HoughLine>& lines);
 
     void reset();
+    static HoughLine createLine(int r, int t, int z);
 
     void setAcceptThreshold(int t) { acceptThreshold = t;    }
     int  getAcceptThreshold()      { return acceptThreshold; }

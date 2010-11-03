@@ -135,11 +135,7 @@ list<HoughLine> HoughSpace::peaks()
                 }
                 peak[r][t] = shouldCreate;
                 if (shouldCreate){
-                    HoughLine line = HoughLine(r, t,
-                                               static_cast<float>(r) -
-                                               R_SPAN / 2.0f + 0.5f,
-                                               (static_cast<float>(t) + 0.5f) *
-                                               M_PI_FLOAT / 128.0f, z >> 2);
+                    HoughLine line = createLine(r,t,z);
                     lines.push_back(line);
                 }
             }
@@ -216,3 +212,11 @@ void HoughSpace::reset()
     }
 }
 
+HoughLine HoughSpace::createLine(int r, int t, int z)
+{
+    return HoughLine(r, t,
+                     static_cast<float>(r) -
+                     R_SPAN / 2.0f + 0.5f,
+                     (static_cast<float>(t) + 0.5f) *
+                     M_PI_FLOAT / 128.0f, z >> 2);
+}

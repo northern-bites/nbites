@@ -17,10 +17,6 @@
 #define TRUE(x) assert( (x) )
 #define FALSE(x) assert( !(x) )
 
-
-void passed(int a)
-{
-    std::cout << "passed test " << a << std::endl;
-}
+#define PASSED(x) std::cout << "passed " << #x << " test!" << std::endl;
 
 

@@ -24,16 +24,16 @@ int EdgeDetectorTest::test_dir()
     // Test 4 cardinal directions for dir
     const double BYTE_PI = M_PI * BYTE_TO_RAD;
     EQ_INT(g->dir(0,1) , 0);
-    passed(DIR_RIGHT);
+    PASSED(DIR_RIGHT);
 
     EQ_FLOAT(g->dir(1,0) , BYTE_PI/2.);
-    passed(DIR_UP);
+    PASSED(DIR_UP);
 
     EQ_FLOAT(g->dir(0,-1) , BYTE_PI);
-    passed(DIR_LEFT);
+    PASSED(DIR_LEFT);
 
     EQ_FLOAT(g->dir(-1,0) , 1.5 * BYTE_PI);
-    passed(DIR_DOWN);
+    PASSED(DIR_DOWN);
 
     // Ensure that dir() only returns values between 0 and 256 for all
     // image points
@@ -43,7 +43,7 @@ int EdgeDetectorTest::test_dir()
             LTE(a , 256);
             GTE(a, 0);
         }
-    passed(DIR_ALL);
+    PASSED(DIR_ALL);
 
     return 0;
 }
@@ -63,7 +63,7 @@ int EdgeDetectorTest::test_sobel()
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
             EQ_INT(g->mag[i][j] , 0);
-    passed(SOBEL_ZERO);
+    PASSED(SOBEL_ZERO);
 
 
     /**
@@ -99,7 +99,7 @@ int EdgeDetectorTest::test_sobel()
             EQ_INT(g->mag[i][j] , gx * gx + gy * gy);
             GTE(g->mag[i][j] , 0); // Detect an overflow or incorrect magnitude
         }
-    passed(SOBEL_ALL);
+    PASSED(SOBEL_ALL);
     return 0;
 }
 
@@ -132,7 +132,7 @@ int EdgeDetectorTest::test_peaks()
                 EQ_INT(g->y[i][j] , 0);
             }
         }
-    passed(PEAKS_ZERO);
+    PASSED(PEAKS_ZERO);
 
     // Test to see that no peak follows in the same direction as another
     for (int i=0; i < g->rows; ++i) {
@@ -157,7 +157,7 @@ int EdgeDetectorTest::test_peaks()
             }
         }
     }
-    passed(PEAKS_DIR);
+    PASSED(PEAKS_DIR);
     return 0;
 }
 

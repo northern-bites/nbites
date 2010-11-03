@@ -31,3 +31,18 @@ bool HoughLine::intersect(int x0, int y0,
     const float intY = (-cs2 * a.getRadius()  + cs1 * b.getRadius()) / g;
     return (abs(intX) <= x0 && abs(intY) <= y0);
 }
+
+bool HoughLine::operator==(const HoughLine &other)
+{
+    return (other.getAngle() == t &&
+            other.getRadius() == r &&
+            other.getScore() == score &&
+            other.getRIndex() == rIndex &&
+            other.getTIndex() == tIndex
+        );
+}
+
+bool HoughLine::operator!=(const HoughLine &other)
+{
+    return !(*this == other);
+}
