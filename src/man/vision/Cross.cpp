@@ -35,6 +35,10 @@ Cross::Cross(Vision* vis, Threshold* thr, Field* fie)
     const int MAX_CROSS_RUNS = 400;
 	blobs = new Blobs(MAX_CROSS_RUNS);
 	allocateColorRuns();
+
+#ifdef OFFLINE
+    CROSSDEBUG = false;
+#endif
 }
 
 

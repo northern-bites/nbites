@@ -78,6 +78,10 @@ Ball::Ball(Vision* vis, Threshold* thr, Field* fie, int _color)
 	blobs = new Blobs(MAX_BALLS);
 	init(0.0);
 	allocateColorRuns();
+#ifdef OFFLINE
+    BALLDEBUG = false;
+    BALLDISTDEBUG = false;
+#endif
 }
 
 
