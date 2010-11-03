@@ -15,13 +15,15 @@ public:
               float _r, float _t, int _score);
     virtual ~HoughLine() { };
 
-    float getRadius() { return r;      }
-    float getAngle()  { return t;      }
+    float getRadius() const { return r;      }
+    float getAngle()  const { return t;      }
 
-    int getRIndex()   { return rIndex; }
-    int getTIndex()   { return tIndex; }
-    int getScore()    { return score;  }
+    int getRIndex()   const { return rIndex; }
+    int getTIndex()   const { return tIndex; }
+    int getScore()    const { return score;  }
 
+    static bool intersect(int x0, int y0,
+                          const HoughLine& a, const HoughLine& b);
     friend std::ostream& operator<< (std::ostream &o,
                                      const HoughLine &l){
         return o << "Line: rIndex: " << l.rIndex << " tIndex: " << l.tIndex <<

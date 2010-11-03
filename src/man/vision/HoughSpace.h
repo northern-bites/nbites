@@ -30,16 +30,21 @@ private:                        // Member functions
 
     void smooth();
     std::list<HoughLine> peaks();
-    void suppress(std::list<HoughLine>& lines);
+    void suppress(int x0, int y0, std::list<HoughLine>& lines);
 
     void reset();
 
+    void setAcceptThreshold(int t) { acceptThreshold = t;    }
+    int  getAcceptThreshold()      { return acceptThreshold; }
+
+    void setAngleSpread(int t) { angleSpread = t;    }
+    int  getAngleSpread()      { return angleSpread; }
 
 private:       // Member variables
     // Hough Space size parameters
     // 256 for full 8 bit angle, width is for 320x240 image
     const static int R_SPAN = 400, T_SPAN  = 256;
-    const static int DEFAULT_ACCEPT_THRESH = 75;
+    const static int DEFAULT_ACCEPT_THRESH = 90;
     const static int DEFAULT_ANGLE_SPREAD  = 5;
     const static int PEAK_POINTS = 4;
 

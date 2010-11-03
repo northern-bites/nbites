@@ -6,7 +6,6 @@ using boost::shared_ptr;
 const int HoughSpace::drTab[PEAK_POINTS] = {  1,  1,  0, -1 };
 const int HoughSpace::dtTab[PEAK_POINTS] = {  0,  1,  1,  1 };
 
-
 HoughSpace::HoughSpace() : acceptThreshold(DEFAULT_ACCEPT_THRESH),
                            angleSpread(DEFAULT_ANGLE_SPREAD)
 {
@@ -24,8 +23,10 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
     smooth();
     list<HoughLine> lines = peaks();
 
-    list<HoughLine>::iterator i = lines.begin();
-    suppress(lines);
+    int x0 = static_cast<int>(g->cols/2);
+    int y0 = static_cast<int>(g->rows/2);
+
+    suppress(x0, y0, lines);
     return lines;
 }
 
@@ -37,12 +38,12 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
 {
     const int height = g->rows;
     const int width  = g->cols;
-    const int x0     = g->cols/2;
-    const int y0     = g->rows/2;
+    const int x0     = width/2;
+    const int y0     = height/2;
 
     for (int y = 0; y < height; ++y){
         for (int x = 0; x < width; ++x){
-            if (g->peaks[y][x] > 0){
+            if (g->peaks[y][x]){
                 int t = Gradient::dir(g->y[y][x], g->x[y][x]);
                 edge(x - x0, y - y0,
                      t - angleSpread,
@@ -150,9 +151,56 @@ list<HoughLine> HoughSpace::peaks()
 /**
  * Combine/remove duplicate lines and lines which are not right.
  */
-void HoughSpace::suppress(list<HoughLine>& lines)
+void HoughSpace::suppress(int x0, int y0, list<HoughLine>& lines)
 {
+    bool toDelete[lines.size()];
+    for (unsigned int i = 0; i < lines.size(); ++i) {
+        toDelete[i] = false;
+    }
+    list<HoughLine>::iterator line = lines.begin();
+    list<HoughLine>::iterator line2;
+    int index = 0;
+    while (line != lines.end()){
 
+        // Set the second point to point at the next line
+        line2 = line;
+        int index2 = index;
+        line2++;
+        index2++;
+
+        while (line2 != lines.end()){
+
+            const int tDiff = abs(((line->getTIndex() -
+                                    line2->getTIndex()) & 0xff)
+                                  << 24 >> 24);
+            const int rDiff = abs(line->getRIndex() - line2->getRIndex());
+
+            if ( 0 < tDiff && tDiff <= angleSpread &&
+                 (rDiff <= 4 || HoughLine::intersect(x0, y0, *line, *line2))) {
+
+                if (line->getScore() < line2->getScore()){
+                    toDelete[index] = true;
+                } else {
+                    toDelete[index2] = true;
+                }
+            }
+            index2++;
+            line2++;
+        }
+        index++;
+        line++;
+    }
+
+    line = lines.begin();
+    int i = 0;
+    while (line != lines.end()){
+        if (toDelete[i]){
+            line = lines.erase(line);
+        } else {
+            line++;
+        }
+        i++;
+    }
 }
 
 /**
@@ -167,3 +215,4 @@ void HoughSpace::reset()
         }
     }
 }
+

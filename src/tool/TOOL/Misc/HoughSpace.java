@@ -161,7 +161,6 @@ public class HoughSpace {
         for (int i = 0; i < lines.size() - 1; ++i)
             for (int j = i + 1; j < lines.size(); ++j)
                 {
-                    double px, py;
                     int ijAngle = Math.abs((lines.get(i).tIndex -
                                             lines.get(j).tIndex & 0xFF)
                                            << 24 >> 24);

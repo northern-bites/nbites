@@ -14,6 +14,9 @@
 #define GT(x,y) assert(x > y)
 #define GTE(x,y) assert(x >= y)
 
+#define TRUE(x) assert( (x) )
+#define FALSE(x) assert( !(x) )
+
 
 void passed(int a)
 {

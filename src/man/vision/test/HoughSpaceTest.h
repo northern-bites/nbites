@@ -19,18 +19,26 @@ public:
     virtual ~HoughSpaceTest() { };
 
     enum tests {
-        NO_ZERO,
+        MORE_THAN_ZERO,
         EDGE_AT_BOUND,
         SMOOTH_CORRECT
     };
 
     int runTests();
 
+    // Member functions
+private:
+    void test_hs();
+    void test_lines();
+    void test_suppress();
+
+    // Member variables
 private:
     HoughSpace hs;
 
-    void test_hs();
-    void test_lines();
+    // arbitrary acceptance thresholds
+    const static float ACCEPT_ANGLE = 0.05f; // approx. 3 degrees in radians
+    const static int ACCEPT_RADIUS = 3;
 };
 
 #endif /* _HoughSpaceTest_h_DEFINED */
