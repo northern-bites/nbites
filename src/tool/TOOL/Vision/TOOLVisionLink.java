@@ -219,6 +219,9 @@ public class TOOLVisionLink {
     // Set edge detection threshold
     native private void cppSetEdgeThreshold(int _t);
 
+    // Set hough line acceptance threshold
+    native private void cppSetHoughAcceptThreshold(int _t);
+
     //Load the cpp library that implements the native methods
     static
     {
@@ -341,6 +344,17 @@ public class TOOLVisionLink {
             } catch (Throwable e){
                 System.err.println("Error in cpp sub system. \n "+
                                    "\tsetEdgeThreshold failed.");
+            }
+        }
+    }
+
+    public void setHoughAcceptThreshold(int t) {
+        if (visionLinkSuccessful) {
+            try{
+                cppSetHoughAcceptThreshold(t);
+            } catch (Throwable e){
+                System.err.println("Error in cpp sub system. \n "+
+                                   "\tsetHoughAcceptThreshold failed.");
             }
         }
     }

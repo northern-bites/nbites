@@ -21,25 +21,24 @@ public:
     virtual ~HoughSpace() { };
 
     std::list<HoughLine> findLines(boost::shared_ptr<Gradient> g);
+    void setAcceptThreshold(int t) { acceptThreshold = t;    }
+    int  getAcceptThreshold()      { return acceptThreshold; }
+
+    void setAngleSpread(int t) { angleSpread = t;    }
+    int  getAngleSpread()      { return angleSpread; }
+    static HoughLine createLine(int r, int t, int z);
 
 private:                        // Member functions
     void markEdges(boost::shared_ptr<Gradient> g);
     void edge(int x, int y, int t0, int t1);
     int getR(int x, int y, int t);
 
-
     void smooth();
     std::list<HoughLine> peaks();
     void suppress(int x0, int y0, std::list<HoughLine>& lines);
 
     void reset();
-    static HoughLine createLine(int r, int t, int z);
 
-    void setAcceptThreshold(int t) { acceptThreshold = t;    }
-    int  getAcceptThreshold()      { return acceptThreshold; }
-
-    void setAngleSpread(int t) { angleSpread = t;    }
-    int  getAngleSpread()      { return angleSpread; }
 
 private:       // Member variables
     // Hough Space size parameters

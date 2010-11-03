@@ -455,7 +455,6 @@ public class Learning implements DataListener, MouseListener,
             imageHeight = rawImage.getHeight();
             imageWidth = rawImage.getWidth();
 
-            overlay.generateNewEdgeImage(rawImage);
             selector.updateImage(rawImage);
             visionState.update(false, f);
             visionState.updateObjects();

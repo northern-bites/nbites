@@ -209,15 +209,15 @@ public class Calibrate implements DataListener, MouseListener,
         }
     }
 
-	// Acceptance level for Hough Transform
-	public void setHoughAcceptThresh(int thresh){
-		if (overlay != null){
-			overlay.setHoughAcceptThresh(thresh);
-			overlay.regenerateEdgeImage(rawImage);
-			selector.repaint();
-			displayer.repaint();
-		}
-	}
+    // Acceptance level for Hough Transform
+    public void setHoughAcceptThresh(int thresh){
+        if (overlay != null){
+            visionState.setHoughAcceptThresh(thresh);
+            notifyFrame(currentFrame);
+            selector.repaint();
+            displayer.repaint();
+        }
+    }
 
     /**
      * @param choice whether or not to be in undefine mode, where
@@ -1103,7 +1103,6 @@ public class Calibrate implements DataListener, MouseListener,
         imageHeight = rawImage.getHeight();
         imageWidth = rawImage.getWidth();
 
-        overlay.generateNewEdgeImage(rawImage);
         selector.updateImage(rawImage);
         calibratePanel.setSelectorOverlay();
 

@@ -224,29 +224,6 @@ public class ImageOverlay extends BufferedImage{
                 }
             }
         }
-
-        HoughSpace hs = new HoughSpace();
-        hs.acceptThreshold = acceptThreshold;
-        hs.run(imgGradientX, imgGradientY, imgGradientMag);
-
-
-        for(int i=0; i < hs.lines.size(); ++i){
-            HoughLine line = hs.lines.get(i);
-            for (double u = -200.0; u <= 200.0; u += 1.0)
-                {
-                    double sn = Math.sin(line.t);
-                    double cs = Math.cos(line.t);
-                    double x0 = line.r * cs;
-                    double y0 = line.r * sn;
-
-                    int x = (int)Math.round(x0 - u * sn) + width  / 2;
-                    int y = (int)Math.round(y0 + u * cs) + height / 2;
-
-                    if (0 <= x && x < width &&
-                        0 <= y && y < height)
-                        setOverlay(x, y, Vision.PINK);
-                }
-        }
     }
 
     /**

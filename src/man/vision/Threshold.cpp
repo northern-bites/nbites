@@ -251,6 +251,15 @@ void Threshold::findLines()
 {
     list<HoughLine> lines = hough.findLines(gradient);
 
+#ifdef OFFLINE
+    if (debugHoughTransform){
+        drawHoughLines(lines);
+    }
+#endif
+}
+
+void Threshold::drawHoughLines(list<HoughLine> &lines)
+{
     list<HoughLine>::iterator line = lines.begin();
     while (line != lines.end()){
         for (double u = -200.; u <= 200.; u+=1.){
@@ -1820,4 +1829,9 @@ void Threshold::setEdgeThreshold(int _thresh)
 int Threshold::getEdgeThreshold()
 {
     return edgeDetector.getThreshold();
+}
+
+void Threshold::setHoughAcceptThreshold(int _thresh)
+{
+    hough.setAcceptThreshold(_thresh);
 }

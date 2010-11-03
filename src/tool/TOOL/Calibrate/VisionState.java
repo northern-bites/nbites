@@ -285,4 +285,7 @@ public class VisionState {
     public void setEdgeThreshold(int thresh){
         thresholdedImage.getVisionLink().setEdgeThreshold(thresh);
     }
+    public void setHoughAcceptThresh(int thresh){
+        thresholdedImage.getVisionLink().setHoughAcceptThreshold(thresh);
+    }
 }

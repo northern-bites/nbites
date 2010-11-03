@@ -192,11 +192,13 @@ public:
     void setDebugShooting(bool _bool) {debugShot = _bool;}
     void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
     void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
+    void setDebugHoughTransform(bool _bool) {debugHoughTransform = _bool;}
 #endif
 
     void initDebugImage();
     void transposeDebugImage();
     void drawDetectedEdges(boost::shared_ptr<Gradient> g);
+    void drawHoughLines(list<HoughLine> &lines);
     void drawX(int x, int y, int c);
     void drawPoint(int x, int y, int c);
     void drawLine(const point<int> start, const point<int> end,
@@ -208,6 +210,7 @@ public:
 
     void setEdgeThreshold(int _thresh);
     int getEdgeThreshold();
+    void setHoughAcceptThreshold(int _thresh);
 
 #if ROBOT(NAO_RL)
     inline uchar getY(int x, int y) {
@@ -300,11 +303,13 @@ private:
     bool debugShot;
     bool debugOpenField;
     bool debugEdgeDetection;
+    bool debugHoughTransform;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;
     static const bool debugOpenField = false;
     static const bool debugEdgeDetection = false;
+    static const bool debugHoughTransform = false;
 #endif
 };
 
