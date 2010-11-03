@@ -628,6 +628,14 @@ public class VisionState {
 						setDebugEdgeDetection(edgeDetectionBox.isSelected());}
 			});
 
+        final JCheckBox houghTransformBox = new
+            JCheckBox(" Debug Hough Transform");
+        houghTransformBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    thresholdedImage.getVisionLink().
+                        setDebugHoughTransform(houghTransformBox.isSelected());}
+            });
+
 		buttonPanel.add(new JLabel("\tField Line Flags"));
 		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
 		buttonPanel.add(fieldLinesDebugHorEdgeDetectBox);
@@ -656,6 +664,7 @@ public class VisionState {
         ballPanel.add(openFieldBox);
         ballPanel.add(shootingBox);
         ballPanel.add(edgeDetectionBox);
+        ballPanel.add(houghTransformBox);
 		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
 		JPanel debugPanel = new JPanel();
@@ -704,5 +713,6 @@ public class VisionState {
 		thresholdedImage.getVisionLink().setDebugFieldHorizon(false);
 		thresholdedImage.getVisionLink().setDebugFieldEdge(false);
 		thresholdedImage.getVisionLink().setDebugEdgeDetection(false);
+		thresholdedImage.getVisionLink().setDebugHoughTransform(false);
 	}
 }
