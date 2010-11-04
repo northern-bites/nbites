@@ -151,7 +151,7 @@ int EdgeDetectorTest::test_peaks()
             if (g->peaks[i][j] && (
                     g->peaks[i + Gradient::dyTab[a]][j +
                                                      Gradient::dxTab[a]] ||
-                    g->peaks[i + Gradient::dyTab[a]][j +
+                    g->peaks[i - Gradient::dyTab[a]][j -
                                                     Gradient::dxTab[a]])){
                 assert(false);
             }

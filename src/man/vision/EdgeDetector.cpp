@@ -105,7 +105,7 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
                 if (z > gradient->mag
                     [i + Gradient::dyTab[a]] [j + Gradient::dxTab[a]] &&
                     z >= gradient->mag
-                    [i + Gradient::dyTab[a]][j + Gradient::dxTab[a]]){
+                    [i - Gradient::dyTab[a]][j - Gradient::dxTab[a]]){
                     gradient->peaks[i][j] = true;
                 }
             }
