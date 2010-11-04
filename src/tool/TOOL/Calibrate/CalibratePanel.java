@@ -100,10 +100,10 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         nextImage = new JButton("Next (D)");
         nextImage.setFocusable(false);
 
-		skipForward = new JButton("Skip " + NUM_SKIP_FRAMES + " (Meta + D)");
+		skipForward = new JButton("Skip " + NUM_SKIP_FRAMES + " (Alt + D)");
 		skipForward.setFocusable(false);
 
-		skipBack = new JButton("Back " + (NUM_SKIP_FRAMES) + " (Meta + S)");
+		skipBack = new JButton("Back " + (NUM_SKIP_FRAMES) + " (Alt + S)");
 		skipBack.setFocusable(false);
 
         fillHoles = new JButton("Fill Holes (H)");
@@ -147,7 +147,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         drawColors.setSelected(true);
 
         JSlider houghAcceptThresh = new JSlider(JSlider.HORIZONTAL,
-                                                50, 200, 100);
+                                                0, 200, 100);
         houghAcceptThresh.addChangeListener(new ChangeListener(){
                 public void stateChanged(ChangeEvent e) {
                     JSlider source = (JSlider)e.getSource();
@@ -263,9 +263,9 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 
     private void setupShortcuts() {
         im = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        KeyStroke metaJ = KeyStroke.getKeyStroke(KeyEvent.VK_J,
-                                                 InputEvent.META_MASK);
-        im.put(metaJ, "jumpToField");
+        KeyStroke altJ = KeyStroke.getKeyStroke(KeyEvent.VK_J,
+                                                 InputEvent.ALT_MASK);
+        im.put(altJ, "jumpToField");
 
         int numColorSwatchShortcuts = 10;
         for (int i = 0; i < numColorSwatchShortcuts; i++) {
@@ -278,17 +278,17 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         }
 
 
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.META_MASK), "undo");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.META_MASK), "redo");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.ALT_MASK), "undo");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.ALT_MASK), "redo");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "undefineSpecific");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "edgeThresh");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "fillHoles");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "nextImage");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "lastImage");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D,
-                KeyEvent.META_MASK), "skipForward");
+                KeyEvent.ALT_MASK), "skipForward");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-                KeyEvent.META_MASK), "skipBack");
+                KeyEvent.ALT_MASK), "skipBack");
 
 
 

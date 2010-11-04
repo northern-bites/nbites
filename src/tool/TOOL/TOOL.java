@@ -298,7 +298,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         quit.setActionCommand("quit");
         quit.addActionListener(this);
         quit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-                                                   InputEvent.META_MASK ));
+                                                   InputEvent.CTRL_MASK ));
         fileMenu.add(quit);
 
         menuBar.add(fileMenu);
