@@ -6,6 +6,7 @@ using namespace boost::numeric;
 
 //#define DEBUG_COM
 //#define DEBUG_COM_VERBOSE
+//#define DEBUG_COM_TRANSFORMS
 
 ufmatrix4 limbs[Kinematics::NUM_JOINTS]; // transform to the origin of each limb
 
@@ -27,9 +28,18 @@ Kinematics::getCOMc(const vector<float> bodyAngles) {
 #endif
 
 	// add each joint's mass relative to origin (0,0,0)
-	for(unsigned int joint = 0; joint < NUM_JOINTS; joint++) {
+	for(unsigned int joint = 0; joint < NUM_JOINTS; ++joint) {
+#ifdef DEBUG_COM_TRANSFORMS
+// will give us access to the position in x,y,z space each transform goes to
+// without adding in the mass at the joint's (local) CoM
+		const ufvector4 no_offset = CoordFrame4D::vector4D(1.0f, 1.0f, 1.0f);
+		const ufvector4 partial = (prod(limbs[joint], no_offset)
+								   *jointMass[joint].mass);
+#else
 		const ufvector4 partial = (prod(limbs[joint], jointMass[joint].offset)
 								   *jointMass[joint].mass);
+#endif
+
 		partialComPos += partial;
 
 #ifdef DEBUG_COM_VERBOSE
@@ -91,6 +101,10 @@ void Kinematics::buildHeadNeck(const int start, const float angles[]) {
 							limbs[start]);
 }
 
+/*
+ * The Z coordinate is likely wrong here, but we're more concerned with the x/y
+ * so at the moment I'm not going to worry about it -Nathan 11/8/10
+ */
 void Kinematics::buildArmChain(const int start, const float side, const float angles[]) {
 	using namespace CoordFrame4D;
 	ufmatrix4 temp; // for multiple transformations, ublas hates nested prod calls
@@ -104,7 +118,7 @@ void Kinematics::buildArmChain(const int start, const float side, const float an
 	// elbow yaw
 	temp = prod(rotation4D(X_AXIS, angles[start + 2]*side),
 				limbs[start + 1]);
-	limbs[start + 2] = prod(translation4D(UPPER_ARM_LENGTH, 0, 0),
+	limbs[start + 2] = prod(translation4D(UPPER_ARM_LENGTH, 0.0f, 0.0f),
 							temp);
 	// elbow roll
 	limbs[start + 3] = prod(rotation4D(Z_AXIS, -angles[start + 3]*side),
