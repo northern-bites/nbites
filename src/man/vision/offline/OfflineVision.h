@@ -17,7 +17,7 @@ public:
     OfflineVision();
     virtual ~OfflineVision();
 
-    int runOnDirectory(std::string path);
+    int runOnDirectory(std::string path, int first, int last);
 
 private:
     Vision * vision;
