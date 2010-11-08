@@ -110,7 +110,7 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
                 const int x = gradient->x[i][j];
 
                 // Get the highest 3 bits of the direction
-                const int a = (gradient->dir(y,x) >> 5);
+                const int a = (gradient->dir3(y,x));;
 
                 if (z > gradient->mag
                     [i + Gradient::dyTab[a]] [j + Gradient::dxTab[a]] &&
