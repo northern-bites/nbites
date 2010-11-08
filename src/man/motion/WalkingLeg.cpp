@@ -28,7 +28,7 @@ using namespace NBMath;
 //#define DEBUG_WALKINGLEG
 //#define USE_COM_CONTROL
 
-#define USE_COM_CONTROL
+//#define USE_COM_CONTROL
 
 WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
                        const MetaGait * _gait,
