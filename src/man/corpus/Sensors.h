@@ -186,6 +186,7 @@ class Sensors {
 
     // Save a vision frame with associated sensor data
     void saveFrame(void);
+    void loadFrame(std::string path);
     void resetSaveFrame(void);
 
  private:

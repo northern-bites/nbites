@@ -37,7 +37,6 @@ void EdgeDetector::detectEdges(const Channel& channel,
 void EdgeDetector::sobelOperator(const Channel& channel,
                                  shared_ptr<Gradient> gradient)
 {
-
     for (int i=1; i < gradient->rows-1; ++i){
         for (int j=1; j < gradient->cols-1; ++j) {
 
@@ -89,8 +88,19 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
 {
     // The magnitudes were not square rooted and are rather large
     const int edgeThreshold = (threshold * threshold) << 4;
-    for (int i=0; i < gradient->rows; ++i) {
-        for (int j=0; j < gradient->cols; ++j){
+
+    /**************** IMPORTANT NOTE: **********************
+     *
+     * These checks exclude the last 2 rows and columns because
+     * 1. the gradient in the last column/row is undefined (it's on the edge)
+     * 2. the value next to the last column/row cannot be a peak since
+     *    you cannot compare its gradient to the gradient of the last row/column
+     *
+     * This has the effect of shrinking the image in by 4 rows and
+     * columns, but oh well.
+     */
+    for (int i=2; i < gradient->rows-2; ++i) {
+        for (int j=2; j < gradient->cols-2; ++j){
 
             gradient->peaks[i][j] = false; // Not a peak yet
             const int z = gradient->mag[i][j];

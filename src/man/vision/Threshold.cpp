@@ -286,8 +286,9 @@ void Threshold::drawDetectedEdges(shared_ptr<Gradient> g)
 {
 #ifdef OFFLINE
     if (debugEdgeDetection){
-        for(int i=0; i < g->rows; ++i){
-            for (int j=0; j < g->cols; ++j){
+        // See comments in EdgeDetector as to why this is shrunk in.
+        for(int i=1; i < g->rows-1; ++i){
+            for (int j=1; j < g->cols-1; ++j){
                 if (gradient->peaks[i][j])
                     vision->drawDot(j, i, PURPLE);
             }

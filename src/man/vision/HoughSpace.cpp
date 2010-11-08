@@ -41,8 +41,10 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
     const int x0     = width/2;
     const int y0     = height/2;
 
-    for (int y = 0; y < height; ++y){
-        for (int x = 0; x < width; ++x){
+    // See comment in FindPeaks re: why this is shrunk in by 2
+    // rows/columns on each side
+    for (int y = 2; y < height-2; ++y){
+        for (int x = 2; x < width-2; ++x){
             if (g->peaks[y][x]){
                 int t = Gradient::dir(g->y[y][x], g->x[y][x]);
                 edge(x - x0, y - y0,
@@ -217,6 +219,6 @@ HoughLine HoughSpace::createLine(int r, int t, int z)
     return HoughLine(r, t,
                      static_cast<float>(r) -
                      R_SPAN / 2.0f + 0.5f,
-                     (static_cast<float>(t) + 0.5f) *
+                     (static_cast<float>(t) + 1.0f) * // @TODO: WHY IS THIS +1.0f
                      M_PI_FLOAT / 128.0f, z >> 2);
 }

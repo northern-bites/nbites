@@ -685,7 +685,7 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
     ultraSoundDistanceRight = sensorValues[20];
 
     supportFoot = static_cast<SupportFoot>(
-                                           static_cast<int>(sensorValues[22]));
+                                           static_cast<int>(sensorValues[21]));
 
     pthread_mutex_unlock (&support_foot_mutex);
     pthread_mutex_unlock (&ultra_sound_mutex);
@@ -778,7 +778,8 @@ void Sensors::saveFrame()
     fout << VERSION << " ";
 
     // Write joints
-    for (vector<float>::const_iterator i = visionBodyAngles.begin(); i < visionBodyAngles.end(); i++) {
+    for (vector<float>::const_iterator i = visionBodyAngles.begin();
+         i < visionBodyAngles.end(); i++) {
         fout << *i << " ";
     }
     releaseImage();
@@ -795,4 +796,46 @@ void Sensors::saveFrame()
 
     fout.close();
     cout << "Saved frame #" << saved_frames++ << endl;
+}
+
+/**
+ * Load a frame from a file and set the sensors and image data as
+ * appropriate. Useful for running offline.
+ */
+void Sensors::loadFrame(string path)
+{
+    fstream fin(path.c_str() , fstream::in);
+
+    lockImage();
+    // Load the image from the file, puts it straight into Sensors'
+    // image buffer so it doesn't have to allocate its own buffer and
+    // worry about deleting it
+    unsigned char * img = const_cast<unsigned char*>(image);
+    fin.read(reinterpret_cast<char *>(img), IMAGE_BYTE_SIZE);
+    releaseImage();
+
+    float v;
+    int version;
+    string space;
+    fin >> version;
+
+    vector<float> vba;
+
+    // Read in the body angles
+    for (unsigned int i = 0; i < NUM_ACTUATORS; ++i) {
+        fin >> v;
+        vba += v;
+    }
+    setVisionBodyAngles(vba);
+
+    // Read sensor values
+    vector<float> sensor_data;
+
+    for (int i = 0; i < NUM_SENSORS; ++i) {
+        fin >> v;
+        sensor_data += v;
+    }
+    setAllSensors(sensor_data);
+
+    fin.close();
 }

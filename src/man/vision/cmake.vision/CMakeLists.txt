@@ -248,5 +248,8 @@ add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp ${VISION
 add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp ${VISION_INCLUDE_DIR}/test/HoughSpaceTest.cpp ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
+add_executable( OfflineVision ${VISION_INCLUDE_DIR}/offline/OfflineVision.cpp )
+target_link_libraries( OfflineVision ${VISION_TARGET} ${SENSORS_TARGET} ${NBINCLUDE_TARGET})
+
 enable_testing()
 add_test( EdgeDetectorTest  EdgeDetectorTest )
