@@ -28,6 +28,8 @@ using namespace NBMath;
 //#define DEBUG_WALKINGLEG
 //#define USE_COM_CONTROL
 
+#define USE_COM_CONTROL
+
 WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
                        const MetaGait * _gait,
                        const SensorAngles * _sensorAngles,
@@ -139,12 +141,10 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
 
     return result;
 }
-//#define SENSOR_SCALE 0.75f
-#define SENSOR_SCALE 0.0f
+
 LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     ufvector3 src_f = CoordFrame3D::vector3D(swing_src->x,swing_src->y);
-
 
     ufvector3 dest_c = prod(fc_Transform,dest_f);
     ufvector3 src_c = prod(fc_Transform,src_f);
@@ -166,8 +166,8 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
 
     //HORIZONTAL PROGRESS:
     float percent_complete =
-		( static_cast<float>(frameCounter) /
-		  static_cast<float>(singleSupportFrames));
+        ( static_cast<float>(frameCounter) /
+          static_cast<float>(singleSupportFrames));
 
     float theta = percent_complete*2.0f*M_PI_FLOAT;
     float percent_to_dest_horizontal = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
@@ -222,10 +222,9 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     const float startStopSensorScale = getEndStepSensorScale();
 
-
-	//Center of mass control
+    //Center of mass control
 #ifdef USE_COM_CONTROL
-	const float COM_SCALE = startStopSensorScale;
+    const float COM_SCALE = startStopSensorScale;
     const ufvector4 com_c = Kinematics::getCOMc(sensors->getMotionBodyAngles());
 #else
 	const float COM_SCALE = startStopSensorScale;
@@ -256,19 +255,15 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
         + static_cast<float>(leg_sign) * gait->stance[WP::LEG_ROT_Z] * 0.5f;
 
     const ufvector3 bodyOrientation = CoordFrame3D::vector3D(bodyAngleX,
-                                                       bodyAngleY, 0.0f);
+															 bodyAngleY, 0.0f);
     const ufvector3 footOrientation = CoordFrame3D::vector3D(footAngleX,
                                                              footAngleY,
                                                              footAngleZ);
-
-
 
     const ufvector3 bodyGoal =
 		CoordFrame3D::vector3D( -com_c(0)*COM_SCALE,
 								-com_c(1)*COM_SCALE,
 								COM_Z_OFF*COM_SCALE);
-
-
     IKLegResult result =
         Kinematics::legIK(chainID,comFootGoal,footOrientation,
                           bodyGoal,bodyOrientation);
@@ -280,18 +275,17 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
 
 }
 
-const boost::tuple <const float, const float > 
+const boost::tuple <const float, const float >
 WalkingLeg::getAnkleAngles(){
   if(state != SWINGING){
     return boost::tuple<const float, const float>(0.0f,0.0f);
   }
-  
+
   const float angle = static_cast<float>(frameCounter)/
     static_cast<float>(singleSupportFrames)*M_PI_FLOAT;
 
   const float scale = std::sin(angle);
 
-  
   const float ANKLE_LIFT_ANGLE = swing_dest->stepConfig[WP::FOOT_LIFT_ANGLE]*scale;
 
   return boost::tuple<const float, const float>(0.0f,ANKLE_LIFT_ANGLE);
