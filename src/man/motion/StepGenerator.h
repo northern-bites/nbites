@@ -215,8 +215,11 @@ private:
     //that are being sent to the WalkingLegs
     //Translation matrix to transfer points in the non-changing 'i'
     //coord. frame into points in the 'f' coord frame
+	//We also maintain their inverses
     NBMath::ufmatrix3 if_Transform;
+	NBMath::ufmatrix3 fi_Transform;
     NBMath::ufmatrix3 fc_Transform;
+	NBMath::ufmatrix3 cf_Transform;
     NBMath::ufmatrix3 cc_Transform; //odometry
 
     boost::shared_ptr<Sensors> sensors;
@@ -240,7 +243,6 @@ private:
 
 #ifdef DEBUG_CONTROLLER_COM
     FILE* com_log;
-    NBMath::ufmatrix3 fi_Transform;
 #endif
 #ifdef DEBUG_SENSOR_ZMP
     FILE* zmp_log;

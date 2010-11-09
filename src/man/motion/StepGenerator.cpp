@@ -29,6 +29,7 @@ using boost::shared_ptr;
 #include "NBMath.h"
 #include "Observer.h"
 #include "BasicWorldConstants.h"
+#include "COMKinematics.h"
 using namespace boost::numeric;
 using namespace Kinematics;
 using namespace NBMath;
@@ -36,6 +37,7 @@ using namespace NBMath;
 //#define DEBUG_STEPGENERATOR
 //#define DEBUG_ZMP
 //#define DEBUG_ZMP_REF
+//#define DEBUG_COM_TRANSFORMS
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
@@ -50,7 +52,9 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     si_Transform(CoordFrame3D::identity3D()),
     last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
     if_Transform(CoordFrame3D::identity3D()),
+    fi_Transform(CoordFrame3D::identity3D()),
     fc_Transform(CoordFrame3D::identity3D()),
+    cf_Transform(CoordFrame3D::identity3D()),
     cc_Transform(CoordFrame3D::identity3D()),
     sensors(s),gait(_gait),nextStepIsLeft(true),waitForController(0),
     leftLeg(s,gait,&sensorAngles,LLEG_CHAIN),
@@ -219,13 +223,28 @@ void StepGenerator::findSensorZMP(){
     ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                       tot_angle),
                              accel_c);
+	// translate com_c (from joint angles) to I frame
+	const ufvector4 com_c_xyz = getCOMc(sensors->getMotionBodyAngles());
+	const ufvector3 joints_com_c = CoordFrame3D::vector3D(com_c_xyz(0),
+														  com_c_xyz(1));
+	const ufvector3 joints_com_f = prod(cf_Transform, joints_com_c);
+	const ufvector3 joints_com_i = prod(fi_Transform, joints_com_f);
+	const float joint_com_i_x = joints_com_i(0);
+	const float joint_com_i_y = joints_com_i(1);
 
-    ZmpTimeUpdate tUp = {controller_x->getZMP(),controller_y->getZMP()};
+	// TODO: use joint com here instead!
+    ZmpTimeUpdate tUp = {controller_x->getZMP(), controller_y->getZMP()};
     ZmpMeasurement pMeasure =
-        {controller_x->getPosition(),controller_y->getPosition(),
-         accel_i(0),accel_i(1)};
+        {joint_com_i_x, joint_com_i_y,
+         accel_i(0), accel_i(1)};
+	zmp_filter.update(tUp,pMeasure);
 
-    zmp_filter.update(tUp,pMeasure);
+#ifdef DEBUG_COM_TRANSFORMS
+	cout << "controller_x com: " << controller_x->getPosition();
+	cout << "com_c -> com_i (x): " << joint_com_i_x << endl;
+	cout << " controller_y com: " << controller_y->getPosition();
+	cout << "com_c -> com_i (y): " << joint_com_i_y << endl;
+#endif
 }
 
 float StepGenerator::scaleSensors(const float sensorZMP,
@@ -245,7 +264,7 @@ void StepGenerator::tick_controller(){
     cout << "StepGenerator::tick_controller" << endl;
 #endif
 
-	// update the acc/gyro filters
+	// update the acc/gyro filters (in (ZmpEKF)zmp_filter)
     findSensorZMP();
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
@@ -321,6 +340,10 @@ WalkLegsTuple StepGenerator::tick_legs(){
     fc_Transform = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                  body_rot_angle_fc),
                         CoordFrame3D::translation3D(-com_f(0),-com_f(1)));
+	// and oppositely, a transform from c to f
+	cf_Transform = prod(CoordFrame3D::translation3D(com_f(0),com_f(1)),
+						CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
+												 -body_rot_angle_fc));
 
     //Now we need to determine which leg to send the coorect footholds/Steps to
     shared_ptr<Step> leftStep_f,rightStep_f;
@@ -387,7 +410,7 @@ void StepGenerator::swapSupportLegs(){
         //update the translation matrix between i and f coord. frames
         ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
         if_Transform = prod(stepTransform,if_Transform);
-        updateDebugMatrix();
+		updateDebugMatrix();
 
         //Express the  destination  and source for the supporting foot and
         //swinging foots locations in f coord. Since the supporting foot doesn't
@@ -1128,11 +1151,9 @@ void StepGenerator::clearFutureSteps(){
 }
 
 void StepGenerator::updateDebugMatrix(){
-#ifdef DEBUG_CONTROLLER_COM
     static ublas::matrix<float> identity(ublas::identity_matrix<float>(3));
     ublas::matrix<float> test (if_Transform);
     fi_Transform = solve(test,identity);
-#endif
 }
 
 void StepGenerator::debugLogging(){
