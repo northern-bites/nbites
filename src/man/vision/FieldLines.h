@@ -639,7 +639,7 @@ private:
     // a vector of the pointers of the objects that are visible.
     std::vector<const VisualFieldObject*> getVisibleFieldObjects() const;
 
-    vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
+	std::vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
 
     // Returns whether there is a yellow post on screen that vision has not
     // identified the side of
