@@ -187,6 +187,9 @@ void Threshold::thresholdAndRuns() {
  */
 void Threshold::threshold() {
 
+#ifdef MMX_ACQUISITION
+    acquireImage();
+#else
 #ifndef USE_EDGES
     unsigned char *tPtr, *tEnd; // pointers into thresholded array
     const unsigned char *yPtr; // pointers into image array
@@ -234,8 +237,9 @@ void Threshold::threshold() {
             thresholded[i][j] = GREY;
         }
     }
-#endif
-#endif
+#endif  /* OFFLINE   */
+#endif /* USE_EDGES  */
+#endif /* MMX_ACQUISITION */
 }
 
 /**
