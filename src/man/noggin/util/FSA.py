@@ -197,7 +197,7 @@ class FSA:
                             " frames in state \'"+self.lastState+"\'", self.stateChangeColor)
             self.lastDiffState = self.lastState
             self.counter = 0
-            self.lastStateTime = stateTime
+            self.lastStateTime = self.stateTime
             self.startTime = self.getTime()
             self.stateTime = 0
         else:

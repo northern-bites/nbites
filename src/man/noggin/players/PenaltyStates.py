@@ -35,7 +35,7 @@ def afterPenalty(player):
                 #now you know where you are!
                 return player.goLater('gamePlaying')
         """
-        Note: the way that yellowCount and blueCount are set, is such that if a
+        Note: the way that yellowCount and blueCount are set is:  if a
         post of a different color is seen after the first color, the first
         counter will reset. So if I see a blue post in frame 1, nothing in
         frame 2, and a yellow post in frame 3, and nothing in frame 4,
