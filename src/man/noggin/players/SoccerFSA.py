@@ -27,34 +27,11 @@ class SoccerFSA(FSA.FSA):
 
     def executeMove(self,sweetMove):
         """
-        Method to enqueue a SweetMove
+        Method to do a SweetMove from the behavior
         Can either take in a head move or a body command
         (see SweetMove files for descriptions of command tuples)
         """
         self.brain.nav.performSweetMove(sweetMove)
-        ## for position in sweetMove:
-        ##     if len(position) == 7:
-        ##         move = motion.BodyJointCommand(position[4], #time
-        ##                                        position[0], #larm
-        ##                                        position[1], #lleg
-        ##                                        position[2], #rleg
-        ##                                        position[3], #rarm
-        ##                                        position[6], # Chain Stiffnesses
-        ##                                        position[5], #interpolation type
-        ##                                        )
-
-        ##     elif len(position) == 5:
-        ##         move = motion.BodyJointCommand(position[2], # time
-        ##                                        position[0], # chainID
-        ##                                        position[1], # chain angles
-        ##                                        position[4], # chain stiffnesses
-        ##                                        position[3], # interpolation type
-        ##                                        )
-
-        ##     else:
-        ##         self.printf("What kind of sweet ass-Move is this?")
-
-        ##     self.brain.motion.enqueue(move)
 
     def setWalk(self,x,y,theta):
         """

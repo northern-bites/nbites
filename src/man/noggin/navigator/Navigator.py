@@ -6,6 +6,7 @@ from . import ChaseStates
 from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
+from . import NavHelper as helper
 from man.noggin.typeDefs.Location import RobotLocation
 
 class Navigator(FSA.FSA):
@@ -39,7 +40,12 @@ class Navigator(FSA.FSA):
         self.shouldAvoidObstacleRightCounter = 0
 
     def performSweetMove(self, move):
+        """
+        Navigator function to do the sweet move
+        """
         self.sweetMove = move
+        self.brain.player.stopWalking()
+        helper.executeMove(self.brain.motion, self.sweetMove)
         self.switchTo('doingSweetMove')
 
     def dribble(self):

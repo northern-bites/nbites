@@ -10,13 +10,11 @@ from math import fabs
 DEBUG = False
 
 def doingSweetMove(nav):
-    '''executes the currently set sweetmove'''
-    motion = nav.brain.motion
+    '''State that we stay in while doing sweet moves'''
     if nav.firstFrame():
-        helper.setSpeed(nav, 0, 0, 0)
-        helper.executeMove(motion, nav.sweetMove)
+        return nav.stay()
 
-    if not motion.isBodyActive():
+    if not nav.brain.motion.isBodyActive():
         return nav.goNow('stopped')
 
     return nav.stay()
