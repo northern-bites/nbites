@@ -60,6 +60,14 @@
 #include "Threshold.h"
 #include "debug.h"
 
+#include "ColorParams.h"
+
+
+extern "C" int _acquire_image(const uchar * colorTable,
+                              ColorParams * colorParams,
+                              const uchar * yuvImage,
+                              uchar * outputImage);
+
 using namespace std;
 using boost::shared_ptr;
 #define PRINT_VISION_INFO
@@ -186,9 +194,12 @@ void Threshold::thresholdAndRuns() {
  * method here.
  */
 void Threshold::threshold() {
-
+//#define MMX_ACQUISITION
 #ifdef MMX_ACQUISITION
-    acquireImage();
+    ColorParams* colorParams = new ColorParams();
+    uchar * outImage = (uchar*)malloc(320*240*3*sizeof(uchar));
+    // NOT RIGHT, TO BE CHANGED SOON
+    _acquire_image(outImage, colorParams, yplane, outImage);
 #else
 #ifndef USE_EDGES
     unsigned char *tPtr, *tEnd; // pointers into thresholded array
