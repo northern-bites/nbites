@@ -56,10 +56,23 @@
 # acquire_image arguments ( byte* colorTable, ColorParams* params, byte* yuvImage, byte* outputImage)
 _acquire_image:
 
-# Preserve the required registers
+# Preserve the required registers: ebp, ebx, esi, edi
 	push	ebp
 	mov	ebp, esp
 
+	push	ebx
+	push	esi
+	push	edi
+
+	# Move stack pointer and push rowCount to it
+	sub 	esp, 4
+	mov 	dword ptr[ebp-4], 480
+
+	# Load arguments into registers
+	mov	ebx, [ebp+8]	# Color table *
+	mov	edx, [ebp+12]	# Color params *
+	mov	esi, [ebp+16]	# Input YUV Image address
+	mov	edi, [ebp+20]	# Output (color segmented) image address
 
         # set mm7 to 0x00FF00FF00FF00FF for y pixel mask
         pcmpeqb	mm7, mm7                        # set to all 1s
@@ -144,5 +157,5 @@ xLoop:  movq    mm0, [esi+ecx*4]
         # test for end of image
         add     esi, 640*2*2                    # next source rows
         add     edi, 320                        # next output rows
-        dec     rowCount
+        dec     dword ptr[ebp-4]
         jne     yLoop

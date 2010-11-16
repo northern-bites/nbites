@@ -159,9 +159,11 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/Gradient
                  ${VISION_INCLUDE_DIR}/HoughSpace
                  ${VISION_INCLUDE_DIR}/geom/HoughLine
+                 ${VISION_INCLUDE_DIR}/ImageAcquisition.s
                  )
 
 
+set_property(SOURCE ${VISION_INCLUDE_DIR}/ImageAcquisition.s PROPERTY LANGUAGE C)
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
 
