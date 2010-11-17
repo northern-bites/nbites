@@ -12,7 +12,7 @@
 #                 for (ecx = -320; ecx < 0; ecx += 2)
 #       edx     address of struct ColorParams, defined below
 #       esi     address of end of current yuv source image row
-#       edi     address of end of current output image row
+#       edi     address of end of current output image row in the y value section
 #
 #  The mapping from y pixel values to y table indicies is:
 #
@@ -66,13 +66,17 @@ _acquire_image:
 
 	# Move stack pointer and push rowCount to it
 	sub 	esp, 4
-	mov 	dword ptr[ebp-4], 480
+	mov 	dword ptr[esp], 240	# Row Count is only 240 bc it skips every other row.
 
 	# Load arguments into registers
 	mov	ebx, [ebp+8]	# Color table *
 	mov	edx, [ebp+12]	# Color params *
+
 	mov	esi, [ebp+16]	# Input YUV Image address
+	add	esi, 640*2	# Move to end of source image row
+
 	mov	edi, [ebp+20]	# Output (color segmented) image address
+	add	edi, 320	# Move to end of y row
 
         # set mm7 to 0x00FF00FF00FF00FF for y pixel mask
         pcmpeqb	mm7, mm7                        # set to all 1s
@@ -92,18 +96,18 @@ yLoop:
         # Fetch next 8 pixels from upper (0) source row, split into y and uv words
         # mm0:  | y30 | y20 | y10 | y00 |
         # mm1:  | v20 | u20 | v00 | u00 |
-xLoop:  movq    mm0, [esi+ecx*4]
+xLoop:  movq    mm0, [esi+ecx*4]	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 0)
         movq    mm1, mm0
         pand    mm0, mm7
-        psrlw  mm1, 8
+        psrlw  	mm1, 8
 
         # Fetch next 8 pixels from lower (1) source row, split into y and uv words
         # mm2:  | y31 | y21 | y11 | y01 |
         # mm3:  | v21 | u21 | v01 | u01 |
-        movq    mm2, [esi+ecx*4+(640*2)]
+        movq    mm2, [esi+ecx*4+(640*2)]	# row = 640 pixels * 2 bytes per pixel
         movq    mm3, mm2
         pand    mm2, mm7
-        psrlw  mm3, 8
+        psrlw 	mm3, 8
 
         # Sum 2x2 y values (words, 10 bits used)
         # mm0: | xxx | y20 + y30 + y21 + y31 | xxx | y00 + y10 + y01 + y11 |
@@ -157,5 +161,18 @@ xLoop:  movq    mm0, [esi+ecx*4]
         # test for end of image
         add     esi, 640*2*2                    # next source rows
         add     edi, 320                        # next output rows
-        dec     dword ptr[ebp-4]
+        dec     dword ptr[esp]
         jne     yLoop
+
+	# Restore esp to on top of rowCount
+	add	esp, 4
+
+	# Restore necessary _cdecl calling convention registers
+	pop	edi
+	pop	esi
+	pop	ebx
+
+	# Restore ebp
+	pop 	ebp
+
+	ret

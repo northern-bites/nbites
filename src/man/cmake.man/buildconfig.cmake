@@ -44,6 +44,8 @@ SET( CMAKE_C_FLAGS_RELEASE
 # Debug build flags
 SET( CMAKE_CXX_FLAGS_DEBUG
   " -g3 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing" )
+SET( CMAKE_C_FLAGS_DEBUG
+  " -g3 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing" )
 
 
 ############################ Configure Options

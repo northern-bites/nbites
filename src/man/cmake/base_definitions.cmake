@@ -1,6 +1,6 @@
 # .:: Basic Definitions ::::::::::::::::::::::::::::::::::::::::::::::::
 #
-# The basic diefinitions for the Northern Bites cmake packages, used
+# The basic definitions for the Northern Bites cmake packages, used
 # throughout different packages' configurations
 
 ############################ TRUNK PATH
