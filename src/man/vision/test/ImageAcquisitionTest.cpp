@@ -78,24 +78,17 @@ void ImageAcquisitionTest::test_avg()
     PASSED(PRESERVE_IMAGE);
 
 
-    for (int i = 0; i < 480; i+=2) {
-        for (int j=0; j < 640; j+=2) {
+    for (int i = 0; i < 480; i += 2) {
+        for (int j=0; j < 640; j += 4) {
 
-            int inputAvg = ((int)yuv[i*640+j] + (int)yuv[i*640+j+1] +
-                            (int)yuv[(i+1)*640+j] +
-                            (int)yuv[(i+1)*640+j+1]) >> 2;
+            int inputAvg = ((int)yuv[i*640*2+j] +
+                            (int)yuv[i*640*2+j+2] +
+                            (int)yuv[(i+1)*640*2+j] +
+                            (int)yuv[(i+1)*640*2+j+2]) >> 2;
 
-            int output = (int)out[(i>>1)*320 + (j>>1)];
+            int output = (int)out[(i>>1)*320 + (j>>2)];
 
-            cout << "vals: " << (int)yuv[i*640<<j] << " " <<
-                (int)yuv[i*640+j+1] << " " <<
-                (int)yuv[(i+1)*640+j] << " " <<
-                (int)yuv[(i+1)*640+j+1] << endl;
-
-            cout << "ij " << i << " " << j << endl;
-
-            cout << inputAvg << " " << output << endl;
-            // EQ_INT( inputAvg, output);
+            EQ_INT( inputAvg, output);
 
         }
     }
@@ -131,7 +124,7 @@ void ImageAcquisitionTest::test_out_sane_values()
     uchar * yuv = (uchar*)malloc(640*480*2*sizeof(uchar));
     assert(yuv != NULL);
     for (int i = 0; i < 640*480*2; ++i) {
-        yuv[i] = 3;
+        yuv[i] = static_cast<uchar>(i/(i+3)*4+7); // Fill in a random value
     }
 
     const int OUT_IMG_SIZE = 320 * 240 * 2;
@@ -166,7 +159,7 @@ void ImageAcquisitionTest::test_out_sane_values()
 
 int ImageAcquisitionTest::runTests()
 {
-    // test_out_sane_values();
+    test_out_sane_values();
     test_avg();
     return 0;
 }
