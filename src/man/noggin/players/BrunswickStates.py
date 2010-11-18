@@ -52,6 +52,7 @@ def gameReady(player):
     if player.firstFrame() and \
             player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
+        return player.goLater('afterPenalty')
 
     return player.goLater('playbookPosition')
 

@@ -8,6 +8,8 @@ LOOK_DIR_THRESH = 10
 
 def afterPenalty(player):
 
+    gcState = player.brain.gameController.currentState
+
     if player.firstFrame():
         initPenaltyReloc(player)
         player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
@@ -15,7 +17,7 @@ def afterPenalty(player):
     if player.brain.ball.framesOn > OBJ_SEEN_THRESH:
         #deal with ball and don't worry about loc
         player.brain.tracker.trackBall()
-        return player.goLater('gamePlaying')
+        return player.goLater(gcState)
 
     if not player.brain.motion.isHeadActive():
         ##looking to the side
@@ -25,7 +27,7 @@ def afterPenalty(player):
             if player.yellowCount >= OBJ_SEEN_THRESH:
                 setLocInfo(player)
                 #now you know where you are!
-                return player.goLater('gamePlaying')
+                return player.goLater(gcState)
 
         if player.brain.bglp.on or player.brain.bgrp.on:
             #see the goal posts in multiple frames for safety
@@ -33,7 +35,7 @@ def afterPenalty(player):
             if player.blueCount >= OBJ_SEEN_THRESH:
                 setLocInfo(player)
                 #now you know where you are!
-                return player.goLater('gamePlaying')
+                return player.goLater(gcState)
         """
         Note: the way that yellowCount and blueCount are set is:  if a
         post of a different color is seen after the first color, the first
@@ -76,36 +78,39 @@ def setLocInfo(player):
         if player.yellowCount > 0:
             player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                               NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
-                                        -90.0)
+                              -90.0)
             return
-        #must see blue
+            #must see blue
         player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
-                              NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
-                                        90.0)
+                          NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
+                          90.0)
         return
-    #must be looking right
+        #must be looking right
     if player.yellowCount > 0:
         player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
-                              NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
-                                        90.0)
+                          NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
+                          90.0)
         return
-    #must see blue
+        #must see blue
     player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
-                              NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
-                                        -90.0)
+                      NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
+                      -90.0)
     return
 
+def penaltyRelocalize(player):
 """
 Note: This is the old code that I'm using as a back-up in case we can't
       see any goal posts. It may be possible to make this smarter. -Wils
 """
-def penaltyRelocalize(player):
+
+    gcState = player.brain.gameController.currentState
+
     if player.firstFrame():
         player.setWalk(1, 0, 0)
 
     if player.brain.ball.framesOn >= OBJ_SEEN_THRESH:
         player.brain.tracker.trackBall()
-        return player.goLater('gamePlaying')
+        return player.goLater(gcState)
 
     if player.brain.my.locScore == NogginConstants.GOOD_LOC or \
             player.brain.my.locScore == NogginConstants.OK_LOC:
@@ -113,7 +118,7 @@ def penaltyRelocalize(player):
 
         if player.shouldRelocalizeCounter > 30:
             player.shouldRelocalizeCounter = 0
-            return player.goLater('gamePlaying')
+            return player.goLater(gcState)
 
     else:
         player.shouldRelocalizeCounter = 0
