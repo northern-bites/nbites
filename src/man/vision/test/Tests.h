@@ -1,7 +1,6 @@
 #include <iostream>
 #include <assert.h>
 
-
 #define CLOSE_ENOUGH_EQ_FLOAT .0000001
 
 #define EQ_FLOAT(x,y) (assert(x - CLOSE_ENOUGH_EQ_FLOAT < y \
@@ -17,6 +16,6 @@
 #define TRUE(x) assert( (x) )
 #define FALSE(x) assert( !(x) )
 
-#define PASSED(x) std::cout << "passed " << #x << " test!" << std::endl;
+#define PASSED(x) std::cout << "Passed test: \n\t" << #x << std::endl;
 
 
