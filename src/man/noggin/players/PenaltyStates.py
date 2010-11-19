@@ -98,10 +98,10 @@ def setLocInfo(player):
     return
 
 def penaltyRelocalize(player):
-"""
-Note: This is the old code that I'm using as a back-up in case we can't
-      see any goal posts. It may be possible to make this smarter. -Wils
-"""
+    """
+    Note: This is the old code that I'm using as a back-up in case we can't
+    see any goal posts. It may be possible to make this smarter. -Wils
+    """
 
     gcState = player.brain.gameController.currentState
 
