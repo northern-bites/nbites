@@ -23,8 +23,8 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
     smooth();
     list<HoughLine> lines = peaks();
 
-    int x0 = static_cast<int>(g->cols/2);
-    int y0 = static_cast<int>(g->rows/2);
+    int x0 = static_cast<int>(Gradient::cols/2);
+    int y0 = static_cast<int>(Gradient::rows/2);
 
     suppress(x0, y0, lines);
     return lines;
@@ -36,8 +36,8 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
  */
 void HoughSpace::markEdges(shared_ptr<Gradient> g)
 {
-    const int height = g->rows;
-    const int width  = g->cols;
+    const int height = Gradient::rows;
+    const int width  = Gradient::cols;
     const int x0     = width/2;
     const int y0     = height/2;
 

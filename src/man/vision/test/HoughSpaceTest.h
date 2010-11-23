@@ -31,7 +31,7 @@ private:
     HoughSpace hs;
 
     // arbitrary acceptance thresholds
-    const static float ACCEPT_ANGLE = 0.05f; // approx. 3 degrees in radians
+    const static float ACCEPT_ANGLE;
     const static int ACCEPT_RADIUS = 3;
 };
 

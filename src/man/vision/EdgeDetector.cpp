@@ -37,8 +37,8 @@ void EdgeDetector::detectEdges(const Channel& channel,
 void EdgeDetector::sobelOperator(const Channel& channel,
                                  shared_ptr<Gradient> gradient)
 {
-    for (int i=1; i < gradient->rows-1; ++i){
-        for (int j=1; j < gradient->cols-1; ++j) {
+    for (int i=1; i < Gradient::rows-1; ++i){
+        for (int j=1; j < Gradient::cols-1; ++j) {
 
             int xGrad = (
                 // Column j+1
@@ -99,8 +99,8 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
      * This has the effect of shrinking the image in by 4 rows and
      * columns, but oh well.
      */
-    for (int i=2; i < gradient->rows-2; ++i) {
-        for (int j=2; j < gradient->cols-2; ++j){
+    for (int i=2; i < Gradient::rows-2; ++i) {
+        for (int j=2; j < Gradient::cols-2; ++j){
 
             gradient->peaks[i][j] = false; // Not a peak yet
             const int z = gradient->mag[i][j];

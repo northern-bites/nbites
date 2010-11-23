@@ -121,8 +121,8 @@ int EdgeDetectorTest::test_peaks()
 
     // Ensure that everywhere peaks is false, the gradient is set to zero
     // and everywhere peaks is true, the gradient is not zero
-    for (int i=0; i < g->rows; ++i)
-        for (int j=0; j < g->cols; ++j){
+    for (int i=0; i < Gradient::rows; ++i)
+        for (int j=0; j < Gradient::cols; ++j){
             if (g->peaks[i][j]){
                 NE_INT(g->mag[i][j] , 0);
                 assert(g->x[i][j] != 0 || g->y[i][j] != 0);
@@ -135,8 +135,8 @@ int EdgeDetectorTest::test_peaks()
     PASSED(PEAKS_ZERO);
 
     // Test to see that no peak follows in the same direction as another
-    for (int i=0; i < g->rows; ++i) {
-        for (int j=0; j < g->cols; ++j){
+    for (int i=0; i < Gradient::rows; ++i) {
+        for (int j=0; j < Gradient::cols; ++j){
 
             const int z = g->mag[i][j];
 

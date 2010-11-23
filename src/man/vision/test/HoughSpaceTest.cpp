@@ -6,6 +6,9 @@
 using namespace std;
 using boost::shared_ptr;
 
+ // approx. 3 degrees in radians
+const float HoughSpaceTest::ACCEPT_ANGLE = 0.05f;
+
 HoughSpaceTest::HoughSpaceTest() : hs()
 {
 
@@ -16,9 +19,9 @@ void HoughSpaceTest::test_hs()
 {
     // Create gradient map such that it has a known line
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
-    for (int i=0; i < g->rows; ++i){
-        for (int j=0; j < g->cols; ++j){
-            if (j < g->cols *3./4.){
+    for (int i=0; i < Gradient::rows; ++i){
+        for (int j=0; j < Gradient::cols; ++j){
+            if (j < Gradient::cols *3./4.){
                 g->x[i][j] = 0;
                 g->y[i][j] = 0;
                 g->mag[i][j] = 0;

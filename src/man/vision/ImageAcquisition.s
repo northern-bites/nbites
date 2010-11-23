@@ -129,12 +129,12 @@ xLoop:  movq    mm0, [esi+ecx*4]	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 
 
         # Convert two y sums in words 0 and 2 to two table indicies
         psubusw mm0, [edx]                      # zero point
-        pmulhrw mm0, [edx+8]                    # slope
+        pmulhw mm0, [edx+8]                    # slope
         pminsw  mm0, [edx+16]                   # limit to maximum value
 
         # Convert four u,v sums to four table indicies
         psubusw mm1, [edx+24]                   # zero point
-        pmulhrw mm1, [edx+32]                   # slope
+        pmulhw mm1, [edx+32]                   # slope
         pminsw  mm1, [edx+40]                   # limit to maximum value
 
         # Calculate two table offsets from y, u, and v table indicies (dwords)
@@ -144,7 +144,8 @@ xLoop:  movq    mm0, [esi+ecx*4]	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 
 
         # Lookup color pixel 0 in table, write to output image
         pextrw  eax, mm0, 0
-        movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than just moving a byte to al
+        movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
+	                                        # just moving a byte to al
         mov     [edi+ecx+(320*240)], al         # color image is just after y image in memory,
                                                 # so displacement is (320*240)
 
