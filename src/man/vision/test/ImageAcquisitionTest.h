@@ -19,7 +19,9 @@ private:
     void test_avg();
 
     void init();
-    void setup();
+    void setup(int y0, int u0, int v0,
+               int y1, int u1, int v1,
+               int yn, int un, int vn);
     void allocate();
     void deallocate();
 

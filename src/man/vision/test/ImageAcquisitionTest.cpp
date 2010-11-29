@@ -21,7 +21,9 @@ ImageAcquisitionTest::ImageAcquisitionTest() :
     c(0,0,0, 256, 256, 256, 128, 128, 128) // Default old table size
 {
     init();
-    setup();
+    setup(0,0,0,
+          16,16,16,
+          10,10,10 );
 }
 
 ImageAcquisitionTest::~ImageAcquisitionTest()
@@ -34,13 +36,17 @@ void ImageAcquisitionTest::init()
     table = yuv = yuvCopy = out = NULL;
 }
 
-void ImageAcquisitionTest::setup()
+/**
+ * Fill the input image and the ColorParams struct
+ */
+void ImageAcquisitionTest::setup(int y0, int u0, int v0,
+                                 int y1, int u1, int v1,
+                                 int yn, int un, int vn)
 {
     allocate();
-    c = ColorParams(54, 24, 100,
-                    253, 25, 140,
-                    100,10,12);
-    c.printParams();
+    c = ColorParams(y0, u0, v0,
+                    y1, u1, v1,
+                    yn, un, vn);
 
     // Seed the random number generator
     srand ( time(NULL) );
@@ -51,7 +57,7 @@ void ImageAcquisitionTest::setup()
     }
 
     for (int i = 0; i < yuvImgSize; ++i) {
-        yuv[i] = static_cast<uchar>(rand() % 255);
+        yuv[i] = static_cast<uchar>(100 + rand() % 32);
     }
 
     for (int i = 0; i < yuvImgSize; ++i) {
@@ -138,7 +144,7 @@ int ImageAcquisitionTest::vAvgValue(int i, int j) const
 
 
 /**
- * Find the color table y index of a pixel using the ColorParams space values
+ * Find the color table y index of a pixel using the ColorParams space values.
  *
  * @param i Row of pixel in output image
  * @param j Column of pixel in output image
@@ -179,7 +185,7 @@ int ImageAcquisitionTest::tableLookup(int y, int u, int v) const
     int index = y +
         u * static_cast<int>(c.uvDim & 0xFFFF) +
         v * static_cast<int>( (c.uvDim >> 16) & 0xFFFF);
-return table[index];
+    return table[index];
 }
 
 /**
