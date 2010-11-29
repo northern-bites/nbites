@@ -160,6 +160,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/HoughSpace
                  ${VISION_INCLUDE_DIR}/geom/HoughLine
                  ${VISION_INCLUDE_DIR}/ImageAcquisition.s
+                 ${VISION_INCLUDE_DIR}/ColorParams
                  )
 
 
@@ -251,7 +252,7 @@ add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp ${VISION_INC
   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
 add_executable( ImageAcquisitionTest ${VISION_INCLUDE_DIR}/test/ImageAcquisitionTest.cpp
-  ${VISION_INCLUDE_DIR}/ImageAcquisition.s)
+  ${VISION_INCLUDE_DIR}/ImageAcquisition.s ${VISION_INCLUDE_DIR}/ColorParams.cpp )
 
 add_executable( OfflineVision ${VISION_INCLUDE_DIR}/offline/OfflineVision.cpp )
 target_link_libraries( OfflineVision ${VISION_TARGET} ${SENSORS_TARGET} ${NBINCLUDE_TARGET})

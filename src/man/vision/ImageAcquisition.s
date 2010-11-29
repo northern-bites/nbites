@@ -143,14 +143,21 @@ xLoop:  movq    mm0, [esi+ecx*4]	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 
         paddd   mm0, mm1                        # add y index
 
         # Lookup color pixel 0 in table, write to output image
-        pextrw  eax, mm0, 0
+        movd    eax, mm0
         movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
 	                                        # just moving a byte to al
         mov     [edi+ecx+(320*240)], al         # color image is just after y image in memory,
                                                 # so displacement is (320*240)
 
-        # Lookup color pixel 1 in table, write to output image
-        pextrw  eax, mm0, 2
+        # Lookup color pixel 1 in table, write to output image We need
+        # to extract the higher order 32 bits from mm0, so we first
+        # move the words into the correct order then pull out the
+        # lower 2 words. Since we do not use mm0 any more before it is
+        # refilled, we can save a step and not reshuffle the words.
+        pshufw  mm0, mm0, 0x4E
+        movd    eax, mm0
+
+
         movzx   eax, byte ptr[ebx+eax]
         mov     [edi+ecx+(320*240 + 1)], al
 

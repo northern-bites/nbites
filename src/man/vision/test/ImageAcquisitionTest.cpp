@@ -11,70 +11,209 @@
 
 using namespace std;
 
-
 typedef unsigned char uchar;
 
 // Our function to test!
 extern "C" void _acquire_image(uchar * colorTable, ColorParams* params,
                                uchar* yuvImage, uchar* outImage);
 
-ImageAcquisitionTest::ImageAcquisitionTest()
+ImageAcquisitionTest::ImageAcquisitionTest() :
+    c(0,0,0, 256, 256, 256, 128, 128, 128) // Default old table size
 {
+    init();
+    setup();
+}
 
+ImageAcquisitionTest::~ImageAcquisitionTest()
+{
+    deallocate();
+}
+
+void ImageAcquisitionTest::init()
+{
+    table = yuv = yuvCopy = out = NULL;
+}
+
+void ImageAcquisitionTest::setup()
+{
+    allocate();
+    c = ColorParams(54, 24, 100,
+                    253, 25, 140,
+                    100,10,12);
+    c.printParams();
+
+    // Seed the random number generator
+    srand ( time(NULL) );
+
+    // Fill the table and images with random values
+    for (int i = 0; i < tableMaxSize; ++i) {
+        table[i] = static_cast<uchar>(rand()% 255);
+    }
+
+    for (int i = 0; i < yuvImgSize; ++i) {
+        yuv[i] = static_cast<uchar>(rand() % 255);
+    }
+
+    for (int i = 0; i < yuvImgSize; ++i) {
+        yuvCopy[i] = yuv[i];
+    }
+
+}
+
+/**
+ * Allocate memory for the table and image arrays
+ */
+void ImageAcquisitionTest::allocate()
+{
+    if (table == NULL){
+        table = new uchar[tableMaxSize];
+    }
+
+    if (yuv == NULL){
+        yuv = new uchar[yuvImgSize];
+    }
+
+    // Copy the image for later checking
+    if (yuvCopy == NULL){
+        yuvCopy = new uchar[yuvImgSize];
+    }
+
+    // Allocate the output image.
+    if (out == NULL){
+        out = new uchar[outImgSize];
+    }
+}
+
+/**
+ * Free the memory from the images and tables
+ */
+void ImageAcquisitionTest::deallocate()
+{
+    delete table;
+    delete yuv;
+    delete yuvCopy;
+    delete out;
+}
+
+/**
+ * @param i Row of pixel in output image
+ * @param j Column of pixel in output image
+ * @return Averaged value of 4 y pixels around given (i,j) location
+ */
+int ImageAcquisitionTest::yAvgValue(int i, int j) const
+{
+    // Get location of pixel in full size (double width) YUV image x4
+    // is for 2 bytes per pixel and double YUV image size compared to
+    // output image
+    uchar* p = yuv + 4 * (i * yuvImgWidth + j);
+    return (static_cast<int>(p[0]) +
+            static_cast<int>(p[2]) +
+            static_cast<int>(p[yuvImgWidth * 2]) +
+            static_cast<int>(p[yuvImgWidth * 2 + 2]));
+}
+
+/**
+ * @param i Row of pixel in output image
+ * @param j Column of pixel in output image
+ * @return Averaged value of 2 u pixels (at and below) given (i,j) location
+ */
+int ImageAcquisitionTest::uAvgValue(int i, int j) const
+{
+    uchar * p = yuv + 4 * (i * yuvImgWidth + j);
+    return (static_cast<int>(p[1]) +
+            static_cast<int>(p[yuvImgWidth * 2 + 1]));
+}
+
+/**
+ * @param i Row of pixel in output image
+ * @param j Column of pixel in output image
+ * @return Averaged value of 2 v pixels (at and below) given (i,j) location
+ */
+int ImageAcquisitionTest::vAvgValue(int i, int j) const
+{
+    uchar * p = yuv + 4 * (i * yuvImgWidth + j);
+    return (static_cast<int>(p[3]) +
+            static_cast<int>(p[yuvImgWidth * 2 + 3]));
+}
+
+
+/**
+ * Find the color table y index of a pixel using the ColorParams space values
+ *
+ * @param i Row of pixel in output image
+ * @param j Column of pixel in output image
+ * @return Y index of given (i,j) pixel in color table space
+ */
+int ImageAcquisitionTest::yIndex(int i, int j) const
+{
+    int y = max( yAvgValue(i,j) - yZero(), 0);
+    y = min( (y * ySlope()) >> 16 , yLimit());
+    return y;
+}
+
+/**
+ * See yIndex for details. Does same but for u index.
+ */
+int ImageAcquisitionTest::uIndex(int i, int j) const
+{
+    int u = max( uAvgValue(i, j) - uZero(), 0);
+    u = min( (u * uSlope()) >> 16 , uLimit());
+    return u;
+}
+
+/**
+ * See yIndex for details. Does same but for v index.
+ */
+int ImageAcquisitionTest::vIndex(int i, int j) const
+{
+    int v = max( vAvgValue(i, j) - vZero(), 0);
+    v = min( (v * vSlope()) >> 16 , vLimit());
+    return v;
+}
+
+/**
+ * @return Color in table according to given YUV values.
+ */
+int ImageAcquisitionTest::tableLookup(int y, int u, int v) const
+{
+    int index = y +
+        u * static_cast<int>(c.uvDim & 0xFFFF) +
+        v * static_cast<int>( (c.uvDim >> 16) & 0xFFFF);
+return table[index];
+}
+
+/**
+ * @param i Row in output image of pixel
+ * @param j Column in output image of given pixel
+ * @return Color in output image at given location.
+ */
+int ImageAcquisitionTest::colorValue(int i, int j) const
+{
+    // Color image is just past Y Image in array
+    return out[outImgWidth * i + j + outImgYSize];
+}
+
+void ImageAcquisitionTest::test_color_segmentation()
+{
+    for (int i=0; i < outImgHeight; ++i){
+        for (int j=0; j < outImgWidth; ++j){
+            EQ_INT( colorValue(i,j) ,
+                    tableLookup( yIndex(i,j),
+                                 uIndex(i,j),
+                                 vIndex(i,j) ));
+        }
+    }
+    PASSED(COLOR_SEGMENTATION);
 }
 
 /**
  * Test the averaging of the pixels by the image acquistion.
  */
-
 void ImageAcquisitionTest::test_avg()
 {
-    // Allocate and fill the color table
-    uchar * table = (uchar*)malloc(128*128*128*sizeof(uchar));
-    for (int i = 0; i < 128*128*128; ++i) {
-        table[i] = 1;
-    }
-
-    // Create the ColorParams object
-    unsigned long long ySlopeOne = 0x0000400000004000ULL;
-    unsigned long long uvSlopeOne = 0x4000400040004000ULL;
-    unsigned long long fourOnes = 0x0001000100010001ULL;
-    unsigned long long four128s = 0x8000800080008000ULL;
-    // | 128^2 | 128 | 128^2 | 128 |
-    unsigned long long uvDimVal = 0x4000008040000080ULL;
-
-    ColorParams c = {0,
-                     ySlopeOne,
-                     four128s,
-                     0ULL,
-                     uvSlopeOne,
-                     four128s,
-                     uvDimVal};
-    ColorParams * cp = &c;
-
-    // Create the "image"
-    uchar * yuv = (uchar*)malloc(640*480*2*sizeof(uchar));
-    assert(yuv != NULL);
-    for (int i = 0; i < 640*480*2; ++i) {
-        yuv[i] = static_cast<uchar>((i * i +7*i)%255);
-    }
-
-    // Copy the image for later checking
-    uchar * yuvCopy = (uchar*)malloc(640*480*2*sizeof(uchar));
-    assert(yuvCopy != NULL);
-    for (int i = 0; i < 640*480*2; ++i) {
-        yuvCopy[i] = yuv[i];
-    }
-
-    // Allocate the output image.
-    // Does not need to be initialized, since it gets filled by _acquire_image
-    const int OUT_IMG_SIZE = 320 * 240 * 2;
-    const int OUT_IMG_Y_SIZE = 320 * 240;
-    uchar * out = (uchar*)malloc(OUT_IMG_SIZE*sizeof(uchar));
-    assert(out != NULL);
 
     // Run it!
-    _acquire_image(table, cp, yuv, out);
+    _acquire_image(table, &c, yuv, out);
 
     // Make sure that the run didn't affect the initial image
     for (int i = 0; i < 640*480*2; ++i) {
@@ -83,77 +222,20 @@ void ImageAcquisitionTest::test_avg()
     PASSED(PRESERVE_IMAGE);
 
     // Check that the average works properly.
-    for (int i = 0; i < 480; i += 2) {
-        for (int j=0; j < 640; j += 4) {
+    for (int i = 0; i < outImgHeight; ++i) {
+        for (int j=0; j < outImgWidth; ++j){
 
-            // Remember the image is YUV422 so you need to skip a
-            // pixel for y values
-            int inputAvg = ((int)yuv[i*640*2+j] +
-                            (int)yuv[i*640*2+j+2] +
-                            (int)yuv[(i+1)*640*2+j] +
-                            (int)yuv[(i+1)*640*2+j+2]) >> 2;
-
-            // The output is 320x240 not 640x480
-            int output = (int)out[(i>>1)*320 + (j>>2)];
-
-            EQ_INT( inputAvg, output);
+            int output = (int)out[i*outImgWidth + j];
+            EQ_INT( yAvgValue(i, j) >> 2, output);
         }
     }
-}
-
-// Make sure that the 0 <= output values <= 255
-void ImageAcquisitionTest::test_out_sane_values()
-{
-    // Create the "color table" (it's fake)
-    uchar * table = (uchar*)malloc(128*128*128*sizeof(uchar));
-    for (int i = 0; i < 128*128*128; ++i) {
-        table[i] = 1;
-    }
-
-    // Create color params struct
-    unsigned long long ySlopeOne = 0x0000400000004000ULL;
-    unsigned long long uvSlopeOne = 0x4000400040004000ULL;
-    // 0001 0001 0001 0001
-    unsigned long long fourOnes = 0x0001000100010001ULL;
-    // 1(15 0s...)(repeated 4 times)
-    unsigned long long four128s = 0x8000800080008000ULL;
-    // | 128^2 | 128 | 128^2 | 128 |
-    unsigned long long uvDimVal = 0x4000008040000080ULL;
-
-    ColorParams c = {0,
-                     ySlopeOne,
-                     four128s,
-                     0ULL,
-                     uvSlopeOne,
-                     four128s,
-                     uvDimVal};
-    ColorParams * cp = &c;
-
-    // Create image
-    uchar * yuv = (uchar*)malloc(640*480*2*sizeof(uchar));
-    assert(yuv != NULL);
-    for (int i = 0; i < 640*480*2; ++i) {
-        yuv[i] = static_cast<uchar>(i/(i+3)*4+7); // Fill in a random value
-    }
-
-    const int OUT_IMG_SIZE = 320 * 240 * 2;
-    uchar * out = (uchar*)malloc(OUT_IMG_SIZE*sizeof(uchar));
-    assert(out != NULL);
-
-    _acquire_image(table, cp, yuv, out);
-
-    // Ensure that the values of the output image are all <255 and >0
-    for (int i = 0; i < OUT_IMG_SIZE; ++i) {
-        GTE((int)out[i] , 0);
-        LTE((int)out[i] , 255);
-    }
-    PASSED(TEST_OUT_SANE_VALUES);
+    PASSED(AVERAGES);
 }
 
 int ImageAcquisitionTest::runTests()
 {
-    test_out_sane_values();
     test_avg();
+    test_color_segmentation();
     return 0;
 }
 

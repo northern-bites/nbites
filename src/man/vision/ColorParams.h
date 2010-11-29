@@ -1,5 +1,9 @@
 #ifndef _ColorParams_h_DEFINED
 #define _ColorParams_h_DEFINED
+
+#include <stdio.h>
+#include <assert.h>
+
 /*
   The mapping from y pixel values to y table indicies is:
 
@@ -24,16 +28,31 @@
       vk = (vn << 15) / (v1 - v0)
 */
 
-struct ColorParams
-{                           // words:      3         2         1         0
-unsigned long long   yZero;              // | y0 << 2 | y0 << 2 | y0 << 2 | y0 << 2 |
-unsigned long long   ySlope;             // |    0    |   yk    |    0    |   yk    |
-unsigned long long   yLimit;             // |  yn-1   |  yn-1   |  yn-1   |  yn-1   |
+#define MMX4(n) ((n) * 0x0001000100010001ULL)
+#define MMX0101(n) ( (n) * 0x0000000100000001ULL)
 
-unsigned long long   uvZero;             // | v0 << 1 | u0 << 1 | v0 << 1 | u0 << 1 |
-unsigned long long   uvSlope;            // |   vk    |   uk    |   vk    |   uk    |
-unsigned long long   uvLimit;            // |  vn-1   |  un-1   |  vn-1   |  un-1   |
-unsigned long long   uvDim;              // | un * yn |   yn    | un * yn |   yn    |
+#define MMX22(u,v) ( ((v) * 0x0001000000010000ULL) | \
+                     ( (u) * 0x0000000100000001ULL))
+
+typedef unsigned long long MMXWord;
+
+struct ColorParams
+{
+    ColorParams(int y0, int u0, int v0,
+                int y1, int u1, int v1,
+                int yn, int un, int vn);
+    void printParams();
+
+                       // words:      3         2         1         0
+    MMXWord yZero;              // | y0 << 2 | y0 << 2 | y0 << 2 | y0 << 2 |
+    MMXWord ySlope;             // |    0    |   yk    |    0    |   yk    |
+    MMXWord yLimit;             // |  yn-1   |  yn-1   |  yn-1   |  yn-1   |
+
+    MMXWord uvZero;             // | v0 << 1 | u0 << 1 | v0 << 1 | u0 << 1 |
+    MMXWord uvSlope;            // |   vk    |   uk    |   vk    |   uk    |
+    MMXWord uvLimit;            // |  vn-1   |  un-1   |  vn-1   |  un-1   |
+    MMXWord uvDim;              // | un * yn |   yn    | un * yn |   yn    |
+
 };
 
 #endif /* _ColorParams_h_DEFINED */
