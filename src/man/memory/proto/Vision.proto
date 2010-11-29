@@ -1,0 +1,17 @@
+package Proto;
+
+message Vision {
+
+    optional VisualBall visual_ball = 1;
+
+    message VisualBall {
+
+        optional float distance = 1;
+        optional sint32 x = 2;
+        optional sint32 y = 3;
+        optional sint32 center_x = 4;
+        optional sint32 center_y = 5;
+        optional float radius = 6;
+
+    }
+}
