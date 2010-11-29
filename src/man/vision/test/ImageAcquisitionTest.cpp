@@ -56,11 +56,11 @@ void ImageAcquisitionTest::setup(int y0, int u0, int v0,
         table[i] = static_cast<uchar>(rand()% 255);
     }
 
-    for (int i = 0; i < yuvImgSize; ++i) {
-        yuv[i] = static_cast<uchar>(100 + rand() % 32);
+    for (int i = 0; i < NAO_IMAGE_BYTE_SIZE; ++i) {
+        yuv[i] = static_cast<uchar>(rand() % 255);
     }
 
-    for (int i = 0; i < yuvImgSize; ++i) {
+    for (int i = 0; i < NAO_IMAGE_BYTE_SIZE; ++i) {
         yuvCopy[i] = yuv[i];
     }
 
@@ -76,17 +76,18 @@ void ImageAcquisitionTest::allocate()
     }
 
     if (yuv == NULL){
-        yuv = new uchar[yuvImgSize];
+        yuv = new uchar[NAO_IMAGE_BYTE_SIZE];
     }
 
     // Copy the image for later checking
     if (yuvCopy == NULL){
-        yuvCopy = new uchar[yuvImgSize];
+        yuvCopy = new uchar[NAO_IMAGE_BYTE_SIZE];
     }
 
     // Allocate the output image.
     if (out == NULL){
-        out = new uchar[outImgSize];
+        // There are two images, the Y and the color
+        out = new uchar[IMAGE_BYTE_SIZE * 2];
     }
 }
 
@@ -111,11 +112,11 @@ int ImageAcquisitionTest::yAvgValue(int i, int j) const
     // Get location of pixel in full size (double width) YUV image x4
     // is for 2 bytes per pixel and double YUV image size compared to
     // output image
-    uchar* p = yuv + 4 * (i * yuvImgWidth + j);
-    return (static_cast<int>(p[0]) +
-            static_cast<int>(p[2]) +
-            static_cast<int>(p[yuvImgWidth * 2]) +
-            static_cast<int>(p[yuvImgWidth * 2 + 2]));
+    uchar* p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
+    return (static_cast<int>(p[YOFFSET1]) +
+            static_cast<int>(p[YOFFSET2]) +
+            static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + YOFFSET1]) +
+            static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + YOFFSET2]));
 }
 
 /**
@@ -125,9 +126,9 @@ int ImageAcquisitionTest::yAvgValue(int i, int j) const
  */
 int ImageAcquisitionTest::uAvgValue(int i, int j) const
 {
-    uchar * p = yuv + 4 * (i * yuvImgWidth + j);
-    return (static_cast<int>(p[1]) +
-            static_cast<int>(p[yuvImgWidth * 2 + 1]));
+    uchar * p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
+    return (static_cast<int>(p[UOFFSET]) +
+            static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + UOFFSET]));
 }
 
 /**
@@ -137,9 +138,9 @@ int ImageAcquisitionTest::uAvgValue(int i, int j) const
  */
 int ImageAcquisitionTest::vAvgValue(int i, int j) const
 {
-    uchar * p = yuv + 4 * (i * yuvImgWidth + j);
-    return (static_cast<int>(p[3]) +
-            static_cast<int>(p[yuvImgWidth * 2 + 3]));
+    uchar * p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
+    return (static_cast<int>(p[VOFFSET]) +
+            static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + VOFFSET]));
 }
 
 
@@ -182,9 +183,10 @@ int ImageAcquisitionTest::vIndex(int i, int j) const
  */
 int ImageAcquisitionTest::tableLookup(int y, int u, int v) const
 {
+    // Table is in UVY ordering
     int index = y +
-        u * static_cast<int>(c.uvDim & 0xFFFF) +
-        v * static_cast<int>( (c.uvDim >> 16) & 0xFFFF);
+        v * static_cast<int>(c.uvDim & 0xFFFF) +
+        u * static_cast<int>( (c.uvDim >> 16) & 0xFFFF);
     return table[index];
 }
 
@@ -196,13 +198,13 @@ int ImageAcquisitionTest::tableLookup(int y, int u, int v) const
 int ImageAcquisitionTest::colorValue(int i, int j) const
 {
     // Color image is just past Y Image in array
-    return out[outImgWidth * i + j + outImgYSize];
+    return out[IMAGE_WIDTH * i + j + IMAGE_BYTE_SIZE];
 }
 
 void ImageAcquisitionTest::test_color_segmentation()
 {
-    for (int i=0; i < outImgHeight; ++i){
-        for (int j=0; j < outImgWidth; ++j){
+    for (int i=0; i < IMAGE_HEIGHT; ++i){
+        for (int j=0; j < IMAGE_WIDTH; ++j){
             EQ_INT( colorValue(i,j) ,
                     tableLookup( yIndex(i,j),
                                  uIndex(i,j),
@@ -228,10 +230,10 @@ void ImageAcquisitionTest::test_avg()
     PASSED(PRESERVE_IMAGE);
 
     // Check that the average works properly.
-    for (int i = 0; i < outImgHeight; ++i) {
-        for (int j=0; j < outImgWidth; ++j){
+    for (int i = 0; i < IMAGE_HEIGHT; ++i) {
+        for (int j=0; j < IMAGE_WIDTH; ++j){
 
-            int output = (int)out[i*outImgWidth + j];
+            int output = (int)out[i*IMAGE_WIDTH + j];
             EQ_INT( yAvgValue(i, j) >> 2, output);
         }
     }

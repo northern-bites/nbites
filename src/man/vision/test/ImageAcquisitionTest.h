@@ -3,6 +3,7 @@
 
 #include "Tests.h"
 #include "ColorParams.h"
+#include "VisionDef.h"
 
 typedef unsigned char uchar;
 
@@ -51,16 +52,6 @@ private:
     int colorValue(int i, int j) const;
 
     enum {
-        yuvImgWidth = 640,
-        yuvImgHeight = 480,
-        outImgWidth = 320,
-        outImgHeight = 240,
-    };
-
-    enum {
-        yuvImgSize = yuvImgWidth * yuvImgHeight * 2,
-        outImgSize = outImgWidth * outImgHeight * 2,
-        outImgYSize = outImgWidth * outImgHeight,
         tableMaxSize = 128 * 128 * 128,
     };
 

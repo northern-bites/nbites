@@ -1,4 +1,4 @@
-/* 
+/*
 
 Vision Constants that span multiple classes and systems.
 -NOTE: please only put constants here that cannot be put in one class header.
@@ -51,6 +51,14 @@ Vision Constants that span multiple classes and systems.
 #define NAO_IMAGE_ROW_OFFSET          (NAO_IMAGE_WIDTH * 2)
 #define NAO_SIM_IMAGE_ROW_OFFSET      (NAO_SIM_IMAGE_WIDTH * 3)
 
+#define AVERAGED_IMAGE_WIDTH  320
+#define AVERAGED_IMAGE_HEIGHT 240
+
+// Y Image and color image are EACH this size
+#define AVERAGED_IMAGE_SIZE AVERAGED_IMAGE_WIDTH * AVERAGED_IMAGE_HEIGHT
+
+// One byte per pixel in EACH (y/color) image
+#define AVERAGED_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE
 
 #define VISION_FRAME_LENGTH_MS 34
 #define VISION_FRAME_LENGTH_uS 34000
@@ -59,22 +67,22 @@ Vision Constants that span multiple classes and systems.
 
 #if ROBOT(NAO_SIM)
 
-#  define IMAGE_WIDTH NAO_SIM_IMAGE_WIDTH
-#  define IMAGE_HEIGHT NAO_SIM_IMAGE_HEIGHT
+#  define IMAGE_WIDTH AVERAGED_IMAGE_WIDTH
+#  define IMAGE_HEIGHT AVERAGED_IMAGE_HEIGHT
 #  define FOV_X_DEG NAO_SIM_FOV_X_DEG
 #  define FOV_Y_DEG NAO_SIM_FOV_Y_DEG
-#  define IMAGE_BYTE_SIZE NAO_SIM_IMAGE_BYTE_SIZE
+#  define IMAGE_BYTE_SIZE AVERAGED_IMAGE_BYTE_SIZE
 
 #  define IMAGE_ROW_OFFSET NAO_SIM_IMAGE_ROW_OFFSET
 #  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
 
 #elif ROBOT(NAO_RL)
 
-#  define IMAGE_WIDTH NAO_IMAGE_WIDTH
-#  define IMAGE_HEIGHT NAO_IMAGE_HEIGHT
+#  define IMAGE_WIDTH AVERAGED_IMAGE_WIDTH
+#  define IMAGE_HEIGHT AVERAGED_IMAGE_HEIGHT
 #  define FOV_X_DEG NAO_FOV_X_DEG
 #  define FOV_Y_DEG NAO_FOV_Y_DEG
-#  define IMAGE_BYTE_SIZE NAO_IMAGE_BYTE_SIZE
+#  define IMAGE_BYTE_SIZE AVERAGED_IMAGE_BYTE_SIZE
 
 #  define IMAGE_ROW_OFFSET NAO_IMAGE_ROW_OFFSET
 #  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
@@ -93,7 +101,17 @@ static const float RAD_TO_PIX_X = static_cast<float>(IMAGE_WIDTH) / static_cast<
 #define HALF_IMAGE_WIDTH  (IMAGE_WIDTH / 2)
 #define HALF_IMAGE_HEIGHT (IMAGE_HEIGHT / 2)
 
-// Core Image Constants
+/**
+ * Core Image Constants
+ */
+
+// Image byte layout constants
+#define UOFFSET  3
+#define VOFFSET  1
+#define YOFFSET1 0
+#define YOFFSET2 2
+
+
 static const float MAX_BEARING_DEG = IMAGE_WIDTH / FOV_X_DEG; // relative to cam
 static const float MAX_ELEVATION_DEG = IMAGE_HEIGHT / FOV_Y_DEG; // ''
 static const float MAX_BEARING_RAD = MAX_BEARING_DEG*TO_RAD;
@@ -162,7 +180,6 @@ static const float MAX_ELEVATION_RAD = MAX_ELEVATION_DEG*TO_RAD;
 #define ALLBLOCKED         4
 #define EITHERWAY          5
 #define MINSHOTWIDTH       10
-
 
 // Math helper functions
 //

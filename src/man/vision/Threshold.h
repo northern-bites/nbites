@@ -110,11 +110,6 @@ static const int MIN_X_OPEN = 40;
 
 static const int VISUAL_HORIZON_COLOR = BROWN;
 
-static const int UOFFSET=3;
-static const int VOFFSET=1;
-static const int YOFFSET1=0;
-static const int YOFFSET2=2;
-
 static const int NUMBLOCKS = 3;
 
 //
