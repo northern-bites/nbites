@@ -365,54 +365,6 @@ namespace Kinematics {
     static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {3,2,3,3,2};
     static const int NUM_JOINTS_CHAIN[NUM_CHAINS] = {2,4,6,6,4};
 
-    //The locations of the massses are translated from their
-    //global coordinate frame into the local frame in tuples like
-    // {X,Y,Z,WEIGHT}
-	// use mDH parameters such that
-	//    Z is direction of joint axis
-	//    X-axis parallel to common normal
-	//    Y-axis follows from X,Z and is right-handed
-	// NOTE: these are unused currently except by ktest/COM.cpp
-    static const float HEAD_INERTIAL_POS[2][4] = {
-        {NECK_MASS_X, NECK_MASS_Y, NECK_MASS_Z, NECK_MASS_g}, //HY
-        {HEAD_MASS_X, HEAD_MASS_Z, HEAD_MASS_Y, HEAD_MASS_g}}; //HP
-
-    static const float LEFT_ARM_INERTIAL_POS[4][4] = {
-        {SHOULDER_MASS_X, SHOULDER_MASS_Z, SHOULDER_MASS_Y, SHOULDER_MASS_g}, //SP
-        {BICEP_MASS_Z, BICEP_MASS_Y, BICEP_MASS_X, BICEP_MASS_g}, //SR
-        {0.0f, 0.0f, 0.0f, ELBOW_MASS_g}, //EY
-        {0.0f, 0.0f, 0.0f, FOREARM_MASS_g}}; //EP
-
-    static const float LEFT_LEG_INERTIAL_POS[6][4] = {
-        {0.0f, 0.0f, 0.0f, PELVIS_MASS_g},
-        {0.0f, 0.0f, 0.0f, HIP_MASS_g},
-        {0.0f, 0.0f, 0.0f, THIGH_MASS_g},
-        {0.0f, 0.0f, 0.0f, TIBIA_MASS_g},
-        {0.0f, 0.0f, 0.0f, ANKLE_MASS_g},
-        {0.0f, 0.0f, 0.0f, FOOT_MASS_g}};
-
-    static const float RIGHT_LEG_INERTIAL_POS[6][4] = {
-		{0.0f, 0.0f, 0.0f, PELVIS_MASS_g},
-        {0.0f, 0.0f, 0.0f, HIP_MASS_g},
-		{0.0f, 0.0f, 0.0f, THIGH_MASS_g},
-        {0.0f, 0.0f, 0.0f, TIBIA_MASS_g},
-        {0.0f, 0.0f, 0.0f, ANKLE_MASS_g},
-        {0.0f, 0.0f, 0.0f, FOOT_MASS_g}};
-
-    static const float RIGHT_ARM_INERTIAL_POS[4][4] = {
-        {SHOULDER_MASS_X, -SHOULDER_MASS_Z, SHOULDER_MASS_Y, SHOULDER_MASS_g},
-        {BICEP_MASS_Z, -BICEP_MASS_Y, BICEP_MASS_X, BICEP_MASS_g},
-        {0.0f, 0.0f, 0.0f, ELBOW_MASS_g},
-        {0.0f, 0.0f, 0.0f, FOREARM_MASS_g}};
-
-    static const float* INERTIAL_POS[NUM_CHAINS] = {&HEAD_INERTIAL_POS[0][0],
-                                                    &LEFT_ARM_INERTIAL_POS[0][0],
-                                                    &LEFT_LEG_INERTIAL_POS[0][0],
-                                                    &RIGHT_LEG_INERTIAL_POS[0][0],
-                                                    &RIGHT_ARM_INERTIAL_POS[0][0]};
-
-    static const unsigned int MASS_INDEX = 3;
-
 };
 
 #endif
