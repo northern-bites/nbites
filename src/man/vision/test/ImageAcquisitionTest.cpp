@@ -96,10 +96,10 @@ void ImageAcquisitionTest::allocate()
  */
 void ImageAcquisitionTest::deallocate()
 {
-    delete table;
-    delete yuv;
-    delete yuvCopy;
-    delete out;
+    delete [] table;
+    delete [] yuv;
+    delete [] yuvCopy;
+    delete [] out;
 }
 
 /**
