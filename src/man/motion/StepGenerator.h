@@ -67,6 +67,9 @@
  * @author George Slavov
  * @date Jan 7 2009
  * @updated August 2009
+ *
+ * @author Nathan Merritt
+ * @updated November 2010
  */
 
 #ifndef _StepGenerator_h_DEFINED
@@ -165,13 +168,10 @@ private: // Helper methods
     void clearFutureSteps();
 
     void resetQueues();
-	void swapZMPQueues(std::list<float> &zmp_x, std::list<float> &zmp_y,
-					   NBMath::ufvector3 &last_zmp);
-	std::list<float> mergeZMPQueues(std::list<float> &currentQ, std::list<float> &newQ);
     void resetOdometry(const float initX, const float initY);
     void updateOdometry(const std::vector<float> &deltaOdo);
     void debugLogging();
-    void updateDebugMatrix();
+    void update_FtoI_transform();
 private:
     // Walk vector:
     //  * x - forward
@@ -225,9 +225,6 @@ private:
     boost::shared_ptr<Sensors> sensors;
     const MetaGait *gait;
     bool nextStepIsLeft;
-    // HACK: this variable holds the number of frames we have to wait before
-    //       we can start walking (NUM_PREVIEW_FRAMES).
-    int waitForController;
 
     WalkingLeg leftLeg, rightLeg;
     WalkingArm leftArm, rightArm;
