@@ -143,7 +143,6 @@ public:
 
 private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
-    void generate_steps();
 
     void findSensorZMP();
     float scaleSensors(const float sensorZMP, const float perfectZMP) const;

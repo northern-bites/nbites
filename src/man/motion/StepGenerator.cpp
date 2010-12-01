@@ -160,25 +160,13 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 }
 
 /**
- * Method called to ensure that there are sufficient steps for the walking legs
- * to operate on. This isn't called annymore!
- */
-void StepGenerator::generate_steps(){
-    while(futureSteps.size() + currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
-        generateStep(x,y,theta);
-    }
-}
-
-/**
- * This method calculates the sensor ZMP. This code is highly experimental,
- * and probably not even being used right now.  The NaoDevils say they
- * can calculate the sensor ZMP -- we are having trouble with it. We
- * probably just need to be more careful about how we filter, and get more
- * example data.
- *
- * Not sure if Joho's problems were due to the old Nao version or what,
- * but from the graphs I've looked at we are very close to calculating the
- * sensor ZMP such that it's useful. -Nathan, September 2010
+ * This method calculates the sensor ZMP. We build a body to world transform using
+ * Aldebaran's filtered angleX/angleY. We then use this to rotate the unfiltered
+ * accX/Y/Z from the accelerometers. The transformed values are fed into an
+ * exponential filter (acc_filter), and the filtered values are used in an EKF
+ * that maintains our sensor ZMP (zmp_filter). The ZMP EKF also takes in the CoM
+ * as calculated by the joint angles of the robot (see JointMassConstants.h and
+ * COKKinematics.cpp for implementation details)
  */
 void StepGenerator::findSensorZMP(){
     const Inertial inertial = sensors->getInertial();
@@ -193,10 +181,15 @@ void StepGenerator::findSensorZMP(){
         prod(CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, -inertial.angleX),
              CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -inertial.angleY));
 
-    const ufvector4 accInBodyFrame = CoordFrame4D::vector4D(unfiltered.accX,
-															unfiltered.accY,
-															unfiltered.accZ);
+	// update the filter
+    acc_filter.update(unfiltered.accX,
+					  unfiltered.accY,
+					  unfiltered.accZ);
 
+    const ufvector4 accInBodyFrame = CoordFrame4D::vector4D(acc_filter.getX(),
+															acc_filter.getY(),
+															acc_filter.getZ());
+	// and rotate the filtered acceleration
 	accInWorldFrame = prod(bodyToWorldTransform,
 						   accInBodyFrame);
 
@@ -205,13 +198,9 @@ void StepGenerator::findSensorZMP(){
      //cout << "Accel in world frame: "<< accInWorldFrame <<endl;
      //cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
 
-    acc_filter.update(accInWorldFrame(0),
-                      accInWorldFrame(1),
-                      accInWorldFrame(2));
-
     //Rotate from the local C to the global I frame
-	const ufvector3 accel_c = CoordFrame3D::vector3D(acc_filter.getX(),
-													 acc_filter.getY());
+	const ufvector3 accel_c = CoordFrame3D::vector3D(accInWorldFrame(0),
+													 accInWorldFrame(1));
 	const float angle_fc = safe_asin(fc_Transform(1,0));
     const float angle_if = safe_asin(if_Transform(1,0));
     const float tot_angle = -(angle_fc+angle_if);
@@ -257,7 +246,7 @@ void StepGenerator::tick_controller(){
     cout << "StepGenerator::tick_controller" << endl;
 #endif
 
-	// update the acc/gyro filters (in (ZmpEKF)zmp_filter)
+	// update the acc/gyro based ZMP (in (ZmpEKF)zmp_filter)
     findSensorZMP();
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
@@ -1202,7 +1191,6 @@ void StepGenerator::debugLogging(){
 #endif
 
 
-
 #ifdef DEBUG_SENSOR_ZMP
     const float preX = zmp_ref_x.front();
     const float preY = zmp_ref_y.front();
@@ -1213,7 +1201,7 @@ void StepGenerator::debugLogging(){
     const float comPX = controller_x->getZMP();
     const float comPY = controller_y->getZMP();
 
-     Inertial acc = sensors->getUnfilteredInertial();
+	Inertial acc = sensors->getUnfilteredInertial();
 //     const float accX = acc.accX;
 //     const float accY = acc.accY;
 //     const float accZ = acc.accZ;
