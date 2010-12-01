@@ -30,7 +30,7 @@
 
 #include <boost/numeric/ublas/vector.hpp>
 
-const float DEFAULT_ALPHA = 0.75;
+const float DEFAULT_ALPHA = 0.85;
 
 template <class Measurement, unsigned int dimension>
 
