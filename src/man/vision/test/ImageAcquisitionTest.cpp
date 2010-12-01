@@ -86,8 +86,7 @@ void ImageAcquisitionTest::allocate()
 
     // Allocate the output image.
     if (out == NULL){
-        // There are two images, the Y and the color
-        out = new uchar[IMAGE_BYTE_SIZE * 2];
+        out = new uchar[IMAGE_BYTE_SIZE];
     }
 }
 
@@ -198,7 +197,7 @@ int ImageAcquisitionTest::tableLookup(int y, int u, int v) const
 int ImageAcquisitionTest::colorValue(int i, int j) const
 {
     // Color image is just past Y Image in array
-    return out[IMAGE_WIDTH * i + j + IMAGE_BYTE_SIZE];
+    return out[IMAGE_WIDTH * i + j + Y_IMAGE_BYTE_SIZE];
 }
 
 void ImageAcquisitionTest::test_color_segmentation()

@@ -171,7 +171,9 @@ class Sensors {
     //   its own, and there is no way, even with locking, to guarantee that the
     //   underlying data at the image pointer location is not modified while
     //   the image is locked in Sensors.
+    const unsigned char* getYImage() const;
     const unsigned char* getImage() const;
+    const unsigned char* getColorImage() const;
     void setImage(const unsigned char* img);
     void lockImage() const;
     void releaseImage() const;
@@ -231,7 +233,7 @@ class Sensors {
     float ultraSoundDistanceLeft;
     float ultraSoundDistanceRight;
 
-    const unsigned char *image;
+    const unsigned char *yImage, *colorImage;
 
     // Pose needs to know which foot is on the ground during a vision frame
     // If both are on the ground (DOUBLE_SUPPORT_MODE/not walking), we assume

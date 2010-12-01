@@ -1,4 +1,5 @@
 
+#include <stdio.h>
 #include "alvision/alimage.h"
 #include "alvision/alvisiondefinitions.h"
 
@@ -13,6 +14,10 @@
 
 using boost::shared_ptr;
 using namespace AL;
+using namespace std;
+
+extern "C" void _acquire_image(unsigned char *table, ColorParams *params,
+                               unsigned char *yuv, unsigned char *out );
 
 const int ALImageTranscriber::TOP_CAMERA = 0;
 const int ALImageTranscriber::BOTTOM_CAMERA = 1;
@@ -83,7 +88,9 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
                                        ALPtr<ALBroker> broker)
     : ThreadedImageTranscriber(s,synchro,"ALImageTranscriber"),
       log(), camera(), lem_name(""), camera_active(false),
-      image(new unsigned char[IMAGE_BYTE_SIZE])
+      image(new unsigned char[IMAGE_BYTE_SIZE]),
+      table(new unsigned char[yLimit * uLimit * vLimit]),
+      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
 {
     try {
         log = broker->getLoggerProxy();
@@ -91,7 +98,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
         // lowDebug, debug, lowInfo, info, warning, error, fatal
         log->setVerbosity("error");
     }catch (ALError &e) {
-        std::cerr << "Could not create a proxy to ALLogger module" << std::endl;
+        cerr << "Could not create a proxy to ALLogger module" << endl;
     }
 
 #ifdef USE_VISION
@@ -100,26 +107,35 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
         try{
             initCameraSettings(BOTTOM_CAMERA);
         }catch(ALError &e){
-            std::cout << "Failed to init the camera settings:"<<e.toString()<<std::endl;
+            cout << "Failed to init the camera settings:"<<
+                e.toString()<< endl;
             camera_active = false;
         }
+    } else {
+        cout << "\tCamera is inactive!" << endl;
     }
-    else
-        std::cout << "\tCamera is inactive!" << std::endl;
 #endif
+
+    // initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
+    srand(time(NULL));
+    for (int i=0; i < tableByteSize; ++i)
+        table[i] = static_cast<unsigned char>(rand() % 255);
 }
 
-ALImageTranscriber::~ALImageTranscriber() {
+ALImageTranscriber::~ALImageTranscriber()
+{
     delete [] image;
     stop();
 }
 
 
-int ALImageTranscriber::start() {
+int ALImageTranscriber::start()
+{
     return Thread::start();
 }
 
-void ALImageTranscriber::run() {
+void ALImageTranscriber::run()
+{
     Thread::running = true;
     Thread::trigger->on();
 
@@ -143,23 +159,24 @@ void ALImageTranscriber::run() {
         if (processTime > VISION_FRAME_LENGTH_uS) {
             if (processTime > VISION_FRAME_LENGTH_PRINT_THRESH_uS) {
 #ifdef DEBUG_ALIMAGE_LOOP
-                std::cout << "Time spent in ALImageTranscriber loop longer than"
-                          << " frame length: " << processTime <<std::endl;
+                cout << "Time spent in ALImageTranscriber loop longer than"
+                          << " frame length: " << processTime <<endl;
 #endif
             }
             //Don't sleep at all
-        } else{
-            const long int microSleepTime = (VISION_FRAME_LENGTH_uS -
+        } else {
+            const long long int microSleepTime = (VISION_FRAME_LENGTH_uS -
                                              processTime);
             const long int nanoSleepTime =
-                (microSleepTime %(1000 * 1000)) * 1000;
+                static_cast<long int>((microSleepTime %(1000 * 1000)) * 1000);
 
-            const long int secSleepTime = microSleepTime / (1000*1000);
+            const long int secSleepTime =
+                static_cast<long int>(microSleepTime / (1000*1000));
 
-            // std::cout << "Sleeping for nano: " << nanoSleepTime <<
-            //  	" and sec:" << secSleepTime << std::endl;
+            cout << "Sleeping for nano: " << nanoSleepTime
+                 << " and sec:" << secSleepTime << endl;
 
-            interval.tv_sec = secSleepTime;
+            interval.tv_sec = static_cast<__time_t>(secSleepTime);
             interval.tv_nsec = nanoSleepTime;
 
             nanosleep(&interval, &remainder);
@@ -168,12 +185,13 @@ void ALImageTranscriber::run() {
     Thread::trigger->off();
 }
 
-void ALImageTranscriber::stop() {
-    std::cout << "Stopping ALImageTranscriber" << std::endl;
+void ALImageTranscriber::stop()
+{
+    cout << "Stopping ALImageTranscriber" << endl;
     running = false;
 #ifdef USE_VISION
     if(camera_active){
-        std::cout << "lem_name = " << lem_name << std::endl;
+        cout << "lem_name = " << lem_name << endl;
         try {
             camera->callVoid("unregister", lem_name);
         }catch (ALError &e) {
@@ -186,7 +204,8 @@ void ALImageTranscriber::stop() {
     Thread::stop();
 }
 
-void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker) {
+void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker)
+{
     try {
         camera = broker->getProxy("ALVideoDevice");
         camera_active =true;
@@ -208,28 +227,20 @@ void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker) {
 #endif
 
     try {
-        lem_name = camera->call<std::string>("subscribe", lem_name, format,
+        lem_name = camera->call<string>("subscribe", lem_name, format,
                                              colorSpace, fps);
-        std::cout << "Registered Camera: " << lem_name << " successfully"<<std::endl;
+        cout << "Registered Camera: " << lem_name << " successfully"<<endl;
     } catch (ALError &e) {
-        std::cout << "Failed to register camera" << lem_name << std::endl;
+        cout << "Failed to register camera" << lem_name << endl;
         camera_active = false;
-        //         SleepMs(500);
-
-        //         try {
-        //             printf("LEM failed once, trying again\n");
-        //             lem_name = camera->call<std::string>("register", lem_name, format,
-        //                                                  colorSpace, fps);
-        //         }catch (ALError &e2) {
-        //             log->error("ALImageTranscriber", "Could not call the register method of the NaoCam "
-        //                        "module\n" + e2.toString());
-        //             return;
-        //         }
+        cout << "ALImageTranscriber: Could not call the" <<
+            " register method of the NaoCam module\n\t" <<  e.toString();
     }
 
 }
 
-void ALImageTranscriber::initCameraSettings(int whichCam){
+void ALImageTranscriber::initCameraSettings(int whichCam)
+{
 
     int currentCam =  camera->call<int>( "getParam", kCameraSelectID );
     if (whichCam != currentCam){
@@ -237,17 +248,17 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
         SleepMs(CAMERA_SLEEP_TIME);
         currentCam =  camera->call<int>( "getParam", kCameraSelectID );
         if (whichCam != currentCam){
-            std::cout << "Failed to switch to camera "<<whichCam
-                      <<" retry in " << CAMERA_SLEEP_TIME <<" ms" <<std::endl;
+            cout << "Failed to switch to camera "<<whichCam
+                      <<" retry in " << CAMERA_SLEEP_TIME <<" ms" <<endl;
             SleepMs(CAMERA_SLEEP_TIME);
             currentCam =  camera->call<int>( "getParam", kCameraSelectID );
             if (whichCam != currentCam){
-                std::cout << "Failed to switch to camera "<<whichCam
-                          <<" ... returning, no parameters initialized" <<std::endl;
+                cout << "Failed to switch to camera "<<whichCam
+                          <<" ... returning, no parameters initialized" <<endl;
                 return;
             }
         }
-        std::cout << "Switched to camera " << whichCam <<" successfully"<<std::endl;
+        cout << "Switched to camera " << whichCam <<" successfully"<<endl;
     }
 
     // Turn off auto settings
@@ -464,6 +475,41 @@ void ALImageTranscriber::initCameraSettings(int whichCam){
     }
 }
 
+void ALImageTranscriber::initTable(string filename)
+{
+    FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
+
+    if (fp == NULL) {
+        printf("initTable() FAILED to open filename: %s", filename.c_str());
+#ifdef OFFLINE
+        exit(0);
+#else
+        return;
+#endif
+    }
+
+    // actually read the table into memory
+    // Color table is in UVY ordering
+    int rval;
+    for(int u=0; u< uLimit; ++u){
+        for(int v=0; v < vLimit; ++v){
+            rval = fread(&table[u * vLimit * yLimit + v * yLimit],
+                         sizeof(unsigned char), yLimit, fp);
+        }
+    }
+
+#ifndef OFFLINE
+    printf("Loaded colortable %s",filename.c_str());
+#endif
+
+    fclose(fp);
+}
+
+void ALImageTranscriber::initTable(unsigned char* buffer)
+{
+    memcpy(table, buffer, yLimit * uLimit * vLimit);
+}
+
 
 void ALImageTranscriber::waitForImage ()
 {
@@ -482,11 +528,14 @@ void ALImageTranscriber::waitForImage ()
             log->error("NaoMain", "Could not call the getImageLocal method of the "
                        "NaoCam module");
         }
-        if (ALimage != NULL) {
-            memcpy(&image[0], ALimage->getFrame(), IMAGE_BYTE_SIZE);
+
+        if (ALimage != NULL){
+            sensors->lockImage();
+            _acquire_image(table, &params, ALimage->getData(), image);
+            sensors->releaseImage();
+        } else {
+            cout << "\tALImage from camera was null!!" << endl;
         }
-        else
-            std::cout << "\tALImage from camera was null!!" << std::endl;
 
 #ifdef DEBUG_IMAGE_REQUESTS
         //You can get some informations of the image.

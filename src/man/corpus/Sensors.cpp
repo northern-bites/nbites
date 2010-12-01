@@ -57,7 +57,7 @@ Sensors::Sensors ()
       rightFootBumper(0.0f, 0.0f),
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
-      image(&global_image[0]),
+      yImage(&global_image[0]), colorImage(&global_image[0]),
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
@@ -735,14 +735,25 @@ void Sensors::releaseVisionAngles() {
     pthread_mutex_unlock (&vision_angles_mutex);
 }
 
+const unsigned char* Sensors::getYImage () const
+{
+    return yImage;
+}
+
 const unsigned char* Sensors::getImage () const
 {
-    return image;
+    return yImage;
+}
+
+const unsigned char* Sensors::getColorImage() const
+{
+    return colorImage;
 }
 
 void Sensors::setImage (const unsigned char *img)
 {
-    image = img;
+    yImage = img;
+    colorImage = img + Y_IMAGE_BYTE_SIZE;
 }
 
 
@@ -754,6 +765,7 @@ void Sensors::resetSaveFrame()
 // The version for the frame format
 static const int VERSION = 0;
 
+// @TODO move this to Transcriber to write out from full size image...
 void Sensors::saveFrame()
 {
     int MAX_FRAMES = 3000;
@@ -810,7 +822,7 @@ void Sensors::loadFrame(string path)
     // Load the image from the file, puts it straight into Sensors'
     // image buffer so it doesn't have to allocate its own buffer and
     // worry about deleting it
-    unsigned char * img = const_cast<unsigned char*>(image);
+    unsigned char * img = const_cast<unsigned char*>(getImage());
     fin.read(reinterpret_cast<char *>(img), IMAGE_BYTE_SIZE);
     releaseImage();
 
