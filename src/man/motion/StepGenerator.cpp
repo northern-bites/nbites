@@ -44,6 +44,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     done(true),
     sensorAngles(s,_gait),
     com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+	joints_com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
     est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     zmp_ref_x(list<float>()),zmp_ref_y(list<float>()),
@@ -71,8 +72,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\t"
-            "sensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tangleX\t"
-            "angleY\taccX\taccY\taccZ\t"
+            "sensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tjoints_com_x\t"
+			"joints_com_y\tangleX\tangleY\taccX\taccY\taccZ\t"
             "lfl\tlfr\tlrl\tlrr\trfl\trfr\trrl\trrr\t"
             "state\n");
 #endif
@@ -211,9 +212,9 @@ void StepGenerator::findSensorZMP(){
     const ufvector4 com_c_xyz = getCOMc(sensors->getMotionBodyAngles());
     const ufvector3 joints_com_c = CoordFrame3D::vector3D(com_c_xyz(0), com_c_xyz(1));
     const ufvector3 joints_com_f = prod(cf_Transform, joints_com_c);
-    const ufvector3 joints_com_i = prod(fi_Transform, joints_com_f);
-    const float joint_com_i_x = joints_com_i(0);
-    const float joint_com_i_y = joints_com_i(1);
+	joints_com_i = prod(fi_Transform, joints_com_f);
+	const float joint_com_i_x = joints_com_i(0);
+	const float joint_com_i_y = joints_com_i(1);
 
     ZmpTimeUpdate tUp = {controller_x->getZMP(), controller_y->getZMP()};
     ZmpMeasurement pMeasure =
@@ -233,7 +234,8 @@ float StepGenerator::scaleSensors(const float sensorZMP,
                                   const float perfectZMP) const {
 
 	// TODO: find a better value for this!
-    const float sensorWeight = 0.5f; //gait->sensor[WP::OBSERVER_SCALE];
+    const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
+    //const float sensorWeight = 1.0f; //gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
@@ -1169,6 +1171,8 @@ void StepGenerator::debugLogging(){
     ufvector3 leg_dest_i = prod(fi_Transform,leg_dest_c);
     float real_com_x = leg_dest_i(0);
     float real_com_y = leg_dest_i(1);// + 2*HIP_OFFSET_Y;
+	float joint_com_i_x = joints_com_i(0);
+	float joint_com_i_y = joints_com_i(1);
 
     Inertial inertial = sensors->getInertial();
     FSR leftFoot = sensors->getLeftFootFSR();
@@ -1176,11 +1180,11 @@ void StepGenerator::debugLogging(){
 
     static float ttime = 0;
     fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t"
-            "%f\t%f\t%f\t"
+            "%f\t%f\t%f\t%f\t%f\t"
             "%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
             ttime,com_i(0),com_i(1),pre_x,pre_y,zmp_x,zmp_y,
             est_zmp_i(0),est_zmp_i(1),
-            real_com_x,real_com_y,
+            real_com_x,real_com_y,joint_com_i_x,joint_com_i_y,
             inertial.angleX, inertial.angleY,
             inertial.accX,inertial.accY,inertial.accZ,
             // FSRs
