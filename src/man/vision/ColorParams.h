@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <stdint.h>
 
 /*
   The mapping from y pixel values to y table indicies is:
@@ -34,7 +35,7 @@
 #define MMX22(u,v) ( ((v) * 0x0001000000010000ULL) | \
                      ( (u) * 0x0000000100000001ULL))
 
-typedef unsigned long long MMXWord;
+typedef uint64_t MMXWord;
 
 struct ColorParams
 {
