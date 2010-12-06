@@ -72,15 +72,18 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\t"
-            "sensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tjoints_com_x\t"
-			"joints_com_y\tangleX\tangleY\taccX\taccY\taccZ\t"
+            "sensor_zmp_x\tsensor_zmp_y\tekf_zmp_x\tekf_zmp_y\t"
+			"real_com_x\treal_com_y\tjoints_com_x\tjoints_com_y\t"
+			"angleX\tangleY\taccX\taccY\taccZ\t"
             "lfl\tlfr\tlrl\tlrr\trfl\trfr\trrl\trrr\t"
             "state\n");
 #endif
 #ifdef DEBUG_SENSOR_ZMP
     zmp_log = fopen("/tmp/zmp_log.xls","w");
     fprintf(zmp_log,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
-            "\taccX\taccY\taccZ\tangleX\tangleY\n");
+            "\taccX\taccY\taccZ\t"
+			"ekf_zmp_x\tekf_zmp_y\t"
+			"angleX\tangleY\n");
 #endif
 #ifdef DEBUG_ZMP_REF
 	zmp_ref_log = fopen("/tmp/zmp_ref_log.xls","w");
@@ -234,8 +237,8 @@ float StepGenerator::scaleSensors(const float sensorZMP,
                                   const float perfectZMP) const {
 
 	// TODO: find a better value for this!
-    const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
-    //const float sensorWeight = 1.0f; //gait->sensor[WP::OBSERVER_SCALE];
+    //const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
+    const float sensorWeight = 1.0f; //gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
@@ -1180,13 +1183,14 @@ void StepGenerator::debugLogging(){
 
     static float ttime = 0;
     fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t"
-            "%f\t%f\t%f\t%f\t%f\t"
+            "%f\t%f\t%f\t%f\t%f\t%f\t%f\t"
             "%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
             ttime,com_i(0),com_i(1),pre_x,pre_y,zmp_x,zmp_y,
             est_zmp_i(0),est_zmp_i(1),
+			zmp_filter.get_zmp_x(),zmp_filter.get_zmp_y(),
             real_com_x,real_com_y,joint_com_i_x,joint_com_i_y,
             inertial.angleX, inertial.angleY,
-            inertial.accX,inertial.accY,inertial.accZ,
+            acc_filter.getX(),acc_filter.getY(),acc_filter.getZ(),
             // FSRs
             leftFoot.frontLeft,leftFoot.frontRight,leftFoot.rearLeft,leftFoot.rearRight,
             rightFoot.frontLeft,rightFoot.frontRight,rightFoot.rearLeft,rightFoot.rearRight,
@@ -1206,15 +1210,14 @@ void StepGenerator::debugLogging(){
     const float comPY = controller_y->getZMP();
 
 	Inertial acc = sensors->getUnfilteredInertial();
-//     const float accX = acc.accX;
-//     const float accY = acc.accY;
-//     const float accZ = acc.accZ;
     const float accX = accInWorldFrame(0);
     const float accY = accInWorldFrame(1);
     const float accZ = accInWorldFrame(2);
     static float stime = 0;
-    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
+
+    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
             stime,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ,
+			zmp_filter.get_zmp_x(),zmp_filter.get_zmp_y(),
             acc.angleX,acc.angleY);
     stime+= MOTION_FRAME_LENGTH_S;
 #endif

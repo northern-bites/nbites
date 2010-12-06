@@ -15,14 +15,14 @@ dat = read.table(file,header=T,na.strings=c("-"))
 
 pdf(paste(name,"-x",PDF,sep=""),width=80, height=20)
 plot(dat$time,dat$pre_x,pch="",main="",xlab="s",ylab="mm")
-names = c("com_x","pre_x","zmp_x","real_com_x","sensor_zmp_x","joint_com_x")
-cols = c("2","3","4","5","6","7")
-
+names = c("ekf_zmp_x","com_x","pre_x","zmp_x","real_com_x","est_zmp_x","joint_com_x")
+cols = c("1","2","3","4","5","6","7")
 
 zeros = dat$time
 zeros[zeros > -100] = mean(dat$pre_x,na.rm=T) +5
 points(dat$time,zeros,pch=1,col=dat$state+2)
 
+points(dat$time,dat$ekf_zmp_x,type="l",col=1)
 points(dat$time,dat$com_x,type="l",col=2)
 points(dat$time,dat$pre_x,type="l",col=3)
 points(dat$time,dat$zmp_x,type="l",col=4)
@@ -36,20 +36,20 @@ dev.off()
 
 pdf(paste(name,"-y",PDF,sep=""),width=80, height=20)
 plot(dat$time,dat$pre_y,pch="",main="",xlab="s",ylab="mm")
-names = c("com_y","pre_y","zmp_y","real_com_y","sensor_zmp_y","joint_com_y")
-cols = c("2","3","4","5","6","1","7")
+names = c("ekf_zmp_y","com_y","pre_y","zmp_y","real_com_y","est_zmp_y","joint_com_y")
+cols = c("1","2","3","4","5","6","7")
 
 zeros = dat$time
 zeros[zeros > -100] = mean(dat$pre_y,na.rm=T) +5
 points(dat$time,zeros,pch=18,col=dat$state+2)
 
+points(dat$time,dat$ekf_zmp_y,type="l",col=1)
 points(dat$time,dat$com_y,type="l",col=2)
 points(dat$time,dat$pre_y,type="l",col=3)
 points(dat$time,dat$zmp_y,type="l",col=4)
 points(dat$time,dat$real_com_y,type="p",col=5)
 points(dat$time,dat$sensor_zmp_y,type="l",col=6)
 points(dat$time,dat$joints_com_y,type="l",col=7)
-points(dat$time,dat$com_y +(310./9.8)*dat$accY,type="l",col=1)
 legend("top",lwd=2,legend=names,col=cols)
 dev.off()
 
