@@ -186,6 +186,7 @@ void StepGenerator::findSensorZMP(){
              CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -inertial.angleY));
 
 	// update the filter
+	// TODO: calibrate!!
     acc_filter.update(unfiltered.accX,
 					  unfiltered.accY,
 					  unfiltered.accZ);
@@ -237,8 +238,7 @@ float StepGenerator::scaleSensors(const float sensorZMP,
                                   const float perfectZMP) const {
 
 	// TODO: find a better value for this!
-    //const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
-    const float sensorWeight = 1.0f; //gait->sensor[WP::OBSERVER_SCALE];
+    const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 

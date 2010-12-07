@@ -32,8 +32,6 @@ points(dat$time,dat$joints_com_x,type="l",col=7)
 legend("top",lwd=2,legend=names,col=cols)
 dev.off()
 
-# FIX THE LEGENDS HERE
-
 pdf(paste(name,"-y",PDF,sep=""),width=80, height=20)
 plot(dat$time,dat$pre_y,pch="",main="",xlab="s",ylab="mm")
 names = c("ekf_zmp_y","com_y","pre_y","zmp_y","real_com_y","est_zmp_y","joint_com_y")
@@ -54,7 +52,6 @@ legend("top",lwd=2,legend=names,col=cols)
 dev.off()
 
 
-
 pdf(paste(name,"-xy",PDF,sep=""))
 plot(dat$pre_x,dat$pre_y,pch="",main="",xlab="x",ylab="y")
 names = c("com","pre","zmp")
@@ -65,7 +62,6 @@ points(dat$pre_x,dat$pre_y,type="l",col=3)
 points(dat$zmp_x,dat$zmp_y,type="l",col=4)
 legend("top",lwd=2,legend=names,col=cols)
 dev.off()
-
 
 dat$accel_x = -((-9.8)/.31)*(dat$sensor_zmp_x - dat$com_x)
 dat$accel_y = -((-9.8)/.31)*(dat$sensor_zmp_y - dat$com_y)
