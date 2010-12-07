@@ -225,6 +225,34 @@ const vector <const ConcreteCorner*>& ConcreteCorner::lCorners()
 	return corners;
 }
 
+const vector <const ConcreteCorner*>& ConcreteCorner::lGoalCorners()
+{
+	static const ConcreteCorner* corners_array[NUM_L_GOAL_CORNERS] = {
+		&blue_goal_left_l(),
+		&blue_goal_right_l(),
+		&yellow_goal_left_l(),
+		&yellow_goal_right_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::fourCorners()
+{
+	static const ConcreteCorner* corners_array[NUM_L_FOUR_CORNERS] = {
+		&blue_corner_top_l(),
+		&blue_corner_bottom_l(),
+		&yellow_corner_bottom_l(),
+		&yellow_corner_top_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
 const vector <const ConcreteCorner*>& ConcreteCorner::tCorners()
 {
 	const ConcreteCorner* corners_array[NUM_T_CORNERS] = {
@@ -232,6 +260,32 @@ const vector <const ConcreteCorner*>& ConcreteCorner::tCorners()
 		&blue_goal_right_t(),
 		&yellow_goal_left_t(),
 		&yellow_goal_right_t(),
+		&center_top_t(),
+		&center_bottom_t()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::tGoalCorners()
+{
+	const ConcreteCorner* corners_array[NUM_T_GOAL_CORNERS] = {
+		&blue_goal_left_t(),
+		&blue_goal_right_t(),
+		&yellow_goal_left_t(),
+		&yellow_goal_right_t()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::tSideCorners()
+{
+	const ConcreteCorner* corners_array[NUM_T_SIDE_CORNERS] = {
 		&center_top_t(),
 		&center_bottom_t()
 	};
@@ -487,14 +541,24 @@ void ConcreteCorner::assignTCornerLines()
  * corner could possibly be.
  */
 const vector <const ConcreteCorner*>& ConcreteCorner::
-getPossibleCorners(shape corner_type) {
+getPossibleCorners(shape corner_type, shape secondary_type) {
     vector <const ConcreteCorner*> possible;
     switch (corner_type) {
     case INNER_L:
         // intentional fall through
     case OUTER_L:
+		if (secondary_type == GOAL_L) {
+			return lGoalCorners();
+		} else if (secondary_type == CORNER_L) {
+			return fourCorners();
+		}
         return lCorners();
     case T:
+		if (secondary_type == GOAL_T) {
+			return tGoalCorners();
+		} else if (secondary_type == SIDE_T) {
+			return tSideCorners();
+		}
         return tCorners();
     case CIRCLE:
         return ccCorners();

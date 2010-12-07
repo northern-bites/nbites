@@ -394,7 +394,7 @@ private:
     // shape is changed accordingly).
     void identifyCorners(std::list<VisualCorner> &corners);
 
-    void findCornerRelationship(VisualCorner first, VisualCorner second);
+    void findCornerRelationship(VisualCorner & first, VisualCorner & second);
 
     const bool nearGoalTCornerLocation(const VisualCorner& corner,
                                        const VisualFieldObject * post) const;

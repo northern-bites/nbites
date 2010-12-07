@@ -1334,6 +1334,7 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
 				numLs++;
 			}
             // find out if the current corner is connected to any other
+			bool wasConnected = false;
             list <VisualCorner>::iterator j = corners.begin();
             for (int k = 1; j != corners.end(); j++, k++) {
                 if (k > cornerNumber) {
@@ -1341,8 +1342,8 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
                         i->getLine1() == j->getLine2() ||
                         i->getLine2() == j->getLine1() ||
                         i->getLine2() == j->getLine2()) {
-                        cout << "Found corners that connect" << endl;
                         findCornerRelationship(*i, *j);
+						wasConnected = true;
                     }
                 }
             }
@@ -1359,10 +1360,18 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
 
     // No explicit movement of iterator; will do it manually
     for (list <VisualCorner>::iterator i = corners.begin();i != corners.end();){
+		// before we start, analyze the corner a bit more
+		if (i->getSecondaryShape() == UNKNOWN && i->getShape() == T) {
+			// really long TStems indicate that we have a center T
+			if (i->getTStem()->getLength() > 2 * GOALBOX_DEPTH) {
+				i->setSecondaryShape(SIDE_T);
+			}
+		}
 
         if (debugIdentifyCorners) {
             cout << endl << "Before identification: Corner: "
                  << endl << "\t" << *i << endl;
+			cout << "Shape info: " << i->getSecondaryShape() << endl;
         }
 
         const list <const ConcreteCorner*> possibleClassifications =
@@ -1371,7 +1380,7 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
         // Keep it completely abstract
         if (possibleClassifications.empty()) {
             i->setPossibleCorners(ConcreteCorner::getPossibleCorners(
-                                      i->getShape()));
+                                      i->getShape(), i->getSecondaryShape()));
             if (debugIdentifyCorners) {
                 cout << "No matches were found for this corner; going to keep "
                      << "it completely abstract." << endl;
@@ -1446,7 +1455,8 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
     for (list <VisualCorner>::iterator i = corners.begin();
 		 i != corners.end(); ++i){
 		if (i->getPossibleCorners().empty()) {
-			i->setPossibleCorners(ConcreteCorner::getPossibleCorners(i->getShape()));
+			i->setPossibleCorners(ConcreteCorner::getPossibleCorners(i->getShape(),
+																	 i->getSecondaryShape()));
         }
 	}
 }
@@ -1456,7 +1466,7 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
     possible corners each can be and ultimately help the identification
     process.
  */
-void FieldLines::findCornerRelationship(VisualCorner first, VisualCorner second) {
+void FieldLines::findCornerRelationship(VisualCorner & first, VisualCorner & second) {
     boost::shared_ptr<VisualLine> common;
     if (first.getLine1() == second.getLine1()) {
         common = first.getLine1();
@@ -1475,6 +1485,7 @@ void FieldLines::findCornerRelationship(VisualCorner first, VisualCorner second)
         } else {
             // T to CIRCLE or T to T
             cout << "T to something weird" << endl;
+			return;
         }
     } else if (second.getShape() == T) {
         t = &second;
@@ -1490,6 +1501,8 @@ void FieldLines::findCornerRelationship(VisualCorner first, VisualCorner second)
         return;
     }
     if (t->getTStem() == common) {
+		t->setSecondaryShape(GOAL_T);
+		l1->setSecondaryShape(GOAL_L);
         // looks very good - ultimately we should check line length too
         cout << "T connect to an L, should be goal box " <<
              t->getTStem()->getLength() << endl;
@@ -1503,6 +1516,9 @@ void FieldLines::findCornerRelationship(VisualCorner first, VisualCorner second)
     } else {
         cout << "T connect to an L should be goal line to corner " <<
             t->getTBar()->getLength() << endl;
+		l1->setSecondaryShape(CORNER_L);
+		// check length  -- it its REALLY long to corner then we know
+		// its a sideline T
     }
 }
 
@@ -3562,7 +3578,7 @@ const list<const ConcreteCorner*> FieldLines::classifyCornerWithObjects(
 
 	// Get all the possible corners given the shape of the corner
 	vector <const ConcreteCorner*> possibleCorners =
-		ConcreteCorner::getPossibleCorners(corner.getShape());
+		ConcreteCorner::getPossibleCorners(corner.getShape(), corner.getSecondaryShape());
 
     if (debugIdentifyCorners) {
         cout << endl

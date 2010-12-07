@@ -52,14 +52,8 @@ enum cornerID {
     YELLOW_GOAL_RIGHT_L,
     CORNER_NO_IDEA_ID,
     TOP_CC, // 30
-    BOTTOM_CC,
+    BOTTOM_CC
 
-    // secondary shapes
-    LEFT_GOAL_L,
-    RIGHT_GOAL_L,
-    GOAL_T,
-    LEFT_GOAL_T,
-    RIGHT_GOAL_T
 };
 
 enum shape {
@@ -67,6 +61,15 @@ enum shape {
     OUTER_L,
     T,
     CIRCLE,
+    // secondary shapes
+	GOAL_L,
+	CORNER_L,
+    LEFT_GOAL_L,
+    RIGHT_GOAL_L,
+    GOAL_T,
+	SIDE_T,
+    LEFT_GOAL_T,
+    RIGHT_GOAL_T,
     UNKNOWN
 };
 
@@ -87,6 +90,10 @@ private:
 
 public: // Constants
     static const unsigned int NUM_L_CORNERS = 8;
+	static const unsigned int NUM_L_GOAL_CORNERS = 4;
+	static const unsigned int NUM_L_FOUR_CORNERS = 4;
+	static const unsigned int NUM_T_GOAL_CORNERS = 4;
+	static const unsigned int NUM_T_SIDE_CORNERS = 2;
     static const unsigned int NUM_T_CORNERS = 6;
     static const unsigned int NUM_CC_CORNERS = 2;
     static const unsigned int NUM_CORNERS = (NUM_L_CORNERS +
@@ -121,7 +128,7 @@ public:
     virtual const std::string toString() const;
 
     static const std::vector <const ConcreteCorner*>&
-	getPossibleCorners(shape corner_type);
+	getPossibleCorners(shape corner_type, shape secondary_type);
 
 	const std::vector<const ConcreteLine*> getLines() const {
 		return lines;
@@ -163,7 +170,11 @@ public:
 public:
 	static const std::vector <const ConcreteCorner*>& concreteCorners();
     static const std::vector <const ConcreteCorner*>& lCorners();
+    static const std::vector <const ConcreteCorner*>& lGoalCorners();
+    static const std::vector <const ConcreteCorner*>& fourCorners();
     static const std::vector <const ConcreteCorner*>& tCorners();
+    static const std::vector <const ConcreteCorner*>& tGoalCorners();
+    static const std::vector <const ConcreteCorner*>& tSideCorners();
     static const std::vector <const ConcreteCorner*>& ccCorners();
 
     static const std::vector <const ConcreteCorner*>& yellowGoalCorners();
