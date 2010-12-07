@@ -75,6 +75,7 @@ void VisualCorner::determineCornerShape() {
         cornerType = getLClassification();
     }
 
+    secondaryShape = UNKNOWN;
     determineCornerIDFromShape();
 }
 

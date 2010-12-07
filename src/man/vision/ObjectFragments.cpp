@@ -92,8 +92,10 @@ static const int DIST_POINT_FUDGE = 5;
 //previous constants inserted from .h class
 
 
-ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie, int _color)
-  : vision(vis), thresh(thr), field(fie), color(_color), runsize(1)
+ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie,
+                                 Context* con, int _color)
+    : vision(vis), thresh(thr), field(fie), context(con), color(_color),
+      runsize(1)
 {
     init(0.0);
     allocateColorRuns();
@@ -1567,20 +1569,31 @@ int ObjectFragments::classifyFirstPost(int c,int c2, Blob pole)
         return post;
     }
 
-    post = classifyByTCorner(pole);
-    if (post != NOPOST) {
-        if (POSTLOGIC) {
-            cout << "Found from T Intersection" << endl;
-        }
-        return post;
+    //  Corners are an excellent way to ID posts
+    int tCorners = context->getTCorner();
+    int lCorners = context->getLCorner();
+    if (POSTLOGIC) {
+        cout << "Corners: " << tCorners << " " << lCorners << endl;
     }
 
-    post = classifyByCheckingCorners(pole);
-    if (post != NOPOST) {
-        if (POSTLOGIC) {
-            cout << "Found from Corners" << endl;
+    if (tCorners > 0) {
+        post = classifyByTCorner(pole);
+        if (post != NOPOST) {
+            if (POSTLOGIC) {
+                cout << "Found from T Intersection" << endl;
+            }
+            return post;
         }
-        return post;
+    }
+
+    if (lCorners > 0) {
+        post = classifyByCheckingCorners(pole);
+        if (post != NOPOST) {
+            if (POSTLOGIC) {
+                cout << "Found from Corners" << endl;
+            }
+            return post;
+        }
     }
 
     post = classifyByCheckingLines(pole);
@@ -1700,6 +1713,7 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
     int howbig = characterizeSize(pole);
     // now see if we can figure out whether it is a right or left post
     int post = classifyFirstPost(c, c2, pole);
+    //setContext(post);
     // based on those results update the proper data structure
     if (post == LEFT) {
         updateObject(right, pole, _SURE, dc);
@@ -1708,8 +1722,9 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
     } else {
         // if we have a big post and no idea what it is, then stop
         // we'll mark it as uncertain for the localization system
-        if (howbig == LARGE)
+        if (howbig == LARGE) {
             updateObject(right, pole, NOT_SURE, dc);
+        }
         if (POSTLOGIC) {
             cout << "Post not classified" << endl;
         }
@@ -1752,11 +1767,13 @@ void ObjectFragments::lookForSecondPost(Blob pole, int post,
         // before returning make sure we don't need to screen the previous post
         if (questions) {
             if (post == LEFT) {
-                if (right->getIDCertainty() != _SURE)
+                if (right->getIDCertainty() != _SURE) {
                     right->init();
+                }
             } else {
-                if (left->getIDCertainty() != _SURE)
+                if (left->getIDCertainty() != _SURE) {
                     left->init();
+                }
             }
         }
         return;

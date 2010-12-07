@@ -1323,14 +1323,29 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
 	int numCorners = corners.size(), numTs = 0, numLs = 0;
 	if (numCorners > 1) {
 
+        int cornerNumber = 0;
 		list <VisualCorner>::iterator i = corners.begin();
 		for ( ; i != corners.end(); i++){
+            cornerNumber++;
 			if (i->getShape() == T) {
 				numTs++;
 			}
 			if (i->getShape() == INNER_L || i->getShape() == OUTER_L) {
 				numLs++;
 			}
+            // find out if the current corner is connected to any other
+            list <VisualCorner>::iterator j = corners.begin();
+            for (int k = 1; j != corners.end(); j++, k++) {
+                if (k > cornerNumber) {
+                    if (i->getLine1() == j->getLine1() ||
+                        i->getLine1() == j->getLine2() ||
+                        i->getLine2() == j->getLine1() ||
+                        i->getLine2() == j->getLine2()) {
+                        cout << "Found corners that connect" << endl;
+                        findCornerRelationship(*i, *j);
+                    }
+                }
+            }
 		}
 	}
 
@@ -1422,16 +1437,73 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
 		 i != corners.end(); ++i){
 		i->identifyFromLines();
 		i->identifyLinesInCorner();
-		if (debugIdentifyCorners)
+		if (debugIdentifyCorners) {
 			printPossibilities(i->getPossibleCorners());
+        }
 	}
 
 	// If our corners have no identity, set them to their shape possibilities
     for (list <VisualCorner>::iterator i = corners.begin();
 		 i != corners.end(); ++i){
-		if (i->getPossibleCorners().empty())
+		if (i->getPossibleCorners().empty()) {
 			i->setPossibleCorners(ConcreteCorner::getPossibleCorners(i->getShape()));
+        }
 	}
+}
+
+/** Given two corners that we know are connected, explor to find out the
+    possible relationships.  This should help us reduce the number of
+    possible corners each can be and ultimately help the identification
+    process.
+ */
+void FieldLines::findCornerRelationship(VisualCorner first, VisualCorner second) {
+    boost::shared_ptr<VisualLine> common;
+    if (first.getLine1() == second.getLine1()) {
+        common = first.getLine1();
+    } else if (first.getLine1() == second.getLine2()) {
+        common = first.getLine1();
+    } else {
+        common = first.getLine2();
+    }
+    VisualCorner* t;
+    VisualCorner* l1;
+    if (first.getShape() == T) {
+        t = &first;
+        if (second.getShape() == OUTER_L ||
+            second.getShape() == INNER_L) {
+            l1 = &second;
+        } else {
+            // T to CIRCLE or T to T
+            cout << "T to something weird" << endl;
+        }
+    } else if (second.getShape() == T) {
+        t = &second;
+        if (first.getShape() == OUTER_L ||
+            first.getShape() == INNER_L) {
+            l1 = &first;
+        } else {
+            cout << "T to something weird" << endl;
+            return;
+        }
+    } else {
+        cout << "Two non T corners" << endl;
+        return;
+    }
+    if (t->getTStem() == common) {
+        // looks very good - ultimately we should check line length too
+        cout << "T connect to an L, should be goal box " <<
+             t->getTStem()->getLength() << endl;
+        // can we determine which side?
+        if (l1->getShape() == OUTER_L) {
+            // look at the non-common line, figure out which direction it goes
+            if (l1->getLine1() == common) {
+                cout << "Got common " << endl;
+            }
+        }
+    } else {
+        cout << "T connect to an L should be goal line to corner " <<
+            t->getTBar()->getLength() << endl;
+    }
 }
 
 /**
@@ -2114,6 +2186,10 @@ list< VisualCorner > FieldLines::intersectLines()
         cout <<"Beginning intersectLines() with " << linesList.size() << " lines.."
              << endl;
     }
+
+    // Reset all of the context variables
+    vision->thresh->context->init();
+
     // Keep track of the number of duplicate intersections (where two
     // intersection points occur very close to each other on the screen).
     // In places not near the center circle, there should be very few
@@ -2193,7 +2269,7 @@ list< VisualCorner > FieldLines::intersectLines()
 				findLinePointDistanceFromStart(intersection, **j);
 
 			if (doLinesCross(*i, *j, t_I, t_J, numChecksPassed)) {
-				isCCIntersection = true;
+                cout << "Lines cross" << endl;
 			}
             ++numChecksPassed;
 
@@ -2304,7 +2380,11 @@ list< VisualCorner > FieldLines::intersectLines()
 					// could it really be a center circle intersection?
 				} else if (isTActuallyCC(c, *i, *j, intersection,
 										 line1Closer, line2Closer)){
-					c.setShape(CIRCLE);
+					//c.setShape(CIRCLE);
+                    if (debugIntersectLines){
+                        cout << "Tossed a corner that confused me" << endl;
+                    }
+                    continue;
 				}
 			}
 
@@ -2318,6 +2398,15 @@ list< VisualCorner > FieldLines::intersectLines()
 			}
 
             corners.push_back(c);
+
+            // while we're at it, set the context variables for the corner
+            if (c.getShape() == T) {
+                vision->thresh->context->setTCorner();
+            } else if (c.getShape() == OUTER_L) {
+                vision->thresh->context->setILCorner();
+            } else if (c.getShape() == INNER_L) {
+                vision->thresh->context->setOLCorner();
+            }
 
             // Add the intersection point to both lines.
             // Has 0 lineWidth. As a corner, hard to figure out its "the width"
@@ -3513,32 +3602,50 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
     // For each field object that we see, calculate its real distance to
     // each possible concrete corner and compare with the visual estimated
     // distance. If it fits, add it to the list of possibilities.
-	for (vector <const VisualFieldObject*>::const_iterator k =
-			 visibleObjects.begin(); k != visibleObjects.end(); ++k) {
+    vector<const ConcreteCorner*>::const_iterator j =
+        possibleCorners.begin();
 
-		const float estimatedDistance = getEstimatedDistance(&corner, *k);
-		const float distanceToCorner = corner.getDistance();
-		vector<const ConcreteCorner*>::const_iterator j =
-			possibleCorners.begin();
+    // Note: changed the order of the loops 12/3/2010 so we can check
+    // every object against the corner instead of just finding one good one
+    for (; j != possibleCorners.end(); ++j) {
+        for (vector <const VisualFieldObject*>::const_iterator k =
+                 visibleObjects.begin(); k != visibleObjects.end(); ++k) {
 
-		for (; j != possibleCorners.end(); ++j) {
+            // outerls are never going to be corners of the field
+            if (corner.getShape() == OUTER_L) {
+                if ((*j)->getID() == BLUE_CORNER_TOP_L ||
+                    (*j)->getID() == BLUE_CORNER_BOTTOM_L) {
+                    continue;
+                }
+            }
+            const float estimatedDistance = getEstimatedDistance(&corner, *k);
+            const float distanceToCorner = corner.getDistance();
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
 			// and add all the possibilities up.
 			list<const ConcreteFieldObject*>::const_iterator i =
 				(*k)->getPossibleFieldObjects()->begin();
 
-			for (; i != (*k)->getPossibleFieldObjects()->end() ; ++i) {
+            bool allGood = true;
+			for (; i != (*k)->getPossibleFieldObjects()->end() && allGood; ++i) {
 
-				if (arePointsCloseEnough(estimatedDistance, *j, *k,
+				if (!arePointsCloseEnough(estimatedDistance, *j, *k,
 										 distanceToCorner)) {
-					possibleClassifications.push_back(*j);
-
-					if (debugIdentifyCorners) {
-						cout << "Corner is possibly a " << (*j)->toString() << endl;
-					}
-				}
+                    allGood = false;
+                }
 			}
+            if (allGood) {
+                // watch out for misidentified center circle corners
+                if (corner.getShape() == CIRCLE) {
+                    if ((*j)->getID() != TOP_CC &&
+                        (*j)->getID() != BOTTOM_CC) {
+                    }
+                }
+                possibleClassifications.push_back(*j);
+                if (debugIdentifyCorners) {
+                    cout << "Corner is possibly a " << (*j)->toString() << endl;
+                }
+            }
 		}
 	}
 	return possibleClassifications;

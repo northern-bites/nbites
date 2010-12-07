@@ -29,6 +29,7 @@
 
 class ObjectFragments; // forward reference
 #include "Threshold.h"
+#include "Context.h"
 #include "VisualFieldObject.h"
 #include "ConcreteFieldObject.h"
 #include "VisualBall.h"
@@ -41,7 +42,8 @@ static const int MAX_POINTS = 100;
 
 class ObjectFragments {
 public:
-    ObjectFragments(Vision* vis, Threshold* thr, Field* fie, int _color);
+    ObjectFragments(Vision* vis, Threshold* thr, Field* fie, Context* con,
+                    int _color);
     virtual ~ObjectFragments() {}
 
     // SETTERS
@@ -178,6 +180,7 @@ private:
     Vision* vision;
     Threshold* thresh;
 	Field* field;
+    Context* context;
 
     int color;
     int runsize;

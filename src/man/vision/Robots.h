@@ -25,6 +25,7 @@
 
 class Robots; // forward reference
 #include "Threshold.h"
+#include "Context.h"
 #include "VisionStructs.h"
 #include "VisualLine.h"
 #include "Blob.h"
@@ -34,7 +35,7 @@ class Robots; // forward reference
 
 class Robots {
 public:
-    Robots(Vision* vis, Threshold* thr, Field* fie, int c);
+    Robots(Vision* vis, Threshold* thr, Field* fie, Context* con, int c);
     virtual ~Robots() {}
 
 	void init();
@@ -65,6 +66,7 @@ private:
     Vision* vision;
     Threshold* thresh;
 	Field* field;
+    Context* context;
 
 	Blobs* blobs;
 	int numberOfRuns, runsize;

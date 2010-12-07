@@ -32,6 +32,7 @@
 
 class Ball; // forward reference
 #include "Threshold.h"
+#include "Context.h"
 #include "Field.h"
 #include "VisualBall.h"
 #include "Vision.h"
@@ -48,7 +49,7 @@ static const float ORANGE_BALL_RADIUS = 32.5; //mm
 
 class Ball {
 public:
-    Ball(Vision* vis, Threshold* thr, Field* fie, int _color);
+    Ball(Vision* vis, Threshold* thr, Field* fie, Context* con, int _color);
     virtual ~Ball() {}
 
     // SETTERS
@@ -111,6 +112,7 @@ private:
     Vision* vision;
     Threshold* thresh;
 	Field* field;
+    Context* context;
 
     int topSpot; //keeps track of best blob -> global var for debugging purposes
     int color;

@@ -67,6 +67,7 @@ public:
     const float getT1() const { return t1; }
     const float getT2() const { return t2; }
     const shape getShape() const { return cornerType; }
+    const shape getSecondaryShape() const { return secondaryShape; }
 
     // DO NOT USE THIS UNLESS getShape() returns inner or outer L; I have
     // not yet hooked up the angle thing for T corners
@@ -84,6 +85,7 @@ public:
     void setPossibleCorners(std::vector <const ConcreteCorner *>
                             _possibleCorners);
     void setShape(const shape s) { cornerType = s; }
+    void setSecondaryShape(const shape s) {secondaryShape = s; }
     void setLine1(boost::shared_ptr<VisualLine> l1) { line1 = l1; }
     void setLine2(boost::shared_ptr<VisualLine> l2) { line2 = l2; }
     void setDistanceWithSD(float _distance);
@@ -113,6 +115,7 @@ private:
     // It will get set from within FieldLines.cc.
     std::list <const ConcreteCorner *> possibleCorners;
     shape cornerType;
+    shape secondaryShape;
 
     boost::shared_ptr<VisualLine> line1;
     boost::shared_ptr<VisualLine> line2;

@@ -52,7 +52,14 @@ enum cornerID {
     YELLOW_GOAL_RIGHT_L,
     CORNER_NO_IDEA_ID,
     TOP_CC, // 30
-    BOTTOM_CC
+    BOTTOM_CC,
+
+    // secondary shapes
+    LEFT_GOAL_L,
+    RIGHT_GOAL_L,
+    GOAL_T,
+    LEFT_GOAL_T,
+    RIGHT_GOAL_T
 };
 
 enum shape {
