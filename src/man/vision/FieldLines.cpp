@@ -3634,6 +3634,11 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
                     continue;
                 }
             }
+			// if we have a T corner and a goal post, then we can determine which
+			// one it is definitely - look at whether the Stem is going up or down
+			// if it is down (normal case) just look at whether T is left or right
+			// if it is up, then reverse the results because you are over the endline
+
             const float estimatedDistance = getEstimatedDistance(&corner, *k);
             const float distanceToCorner = corner.getDistance();
 			// The visual object might be abstract, so we should check
