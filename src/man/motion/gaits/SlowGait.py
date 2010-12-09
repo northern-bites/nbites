@@ -8,16 +8,16 @@ NON_WALKING = constants.NON_WALKING
 
 MARVIN_STANCE_CONFIG = (31.00, # CoM height
                         1.35,  # Forward displacement of CoM
-                        10.0,  # Horizontal distance between feet
+                        11.0,  # Horizontal distance between feet
                         6.0,   # Body angle around y axis
                         0.0,   # Angle between feet
                         0.1)   # Time to transition to/from this stance
 
 STEP_CONFIG = (0.4, # step duration
                0.25,  # fraction in double support
-               1.2,  # stepHeight
-               0.0,  # step lift
-               20.0,  # max x speed
+               1.35,  # stepHeight
+               -4.0,  # step lift
+               15.0,  # max x speed
                -9.0,  # max x speed
                12.0,  # max y speed
                25.0, # max theta speed()
@@ -33,8 +33,8 @@ ZMP_CONFIG = (0.0,  # footCenterLocX
               0.01,  # strafe zmp offse
               6.6)   # turn zmp offset
 
-JOINT_HACK_CONFIG = (5.5, # left swing hip roll addition
-                     5.5) # right swing hip roll addition
+JOINT_HACK_CONFIG = (6.5, # left swing hip roll addition
+                     6.5) # right swing hip roll addition
 
 MARVIN_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
                         0.5,  # angle X scale (gamma)

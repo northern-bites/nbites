@@ -221,8 +221,9 @@ void StepGenerator::findSensorZMP(){
 	const float joint_com_i_y = joints_com_i(1);
 
     ZmpTimeUpdate tUp = {controller_x->getZMP(), controller_y->getZMP()};
+	// TODO: fix joints_com_i in x !!
     ZmpMeasurement pMeasure =
-        {joint_com_i_x, joint_com_i_y,
+        {controller_x->getPosition(), joint_com_i_y,
          accel_i(0), accel_i(1)};
     zmp_filter.update(tUp,pMeasure);
 
@@ -236,7 +237,6 @@ void StepGenerator::findSensorZMP(){
 
 float StepGenerator::scaleSensors(const float sensorZMP,
                                   const float perfectZMP) const {
-
 	// TODO: find a better value for this!
     const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
@@ -279,7 +279,6 @@ void StepGenerator::tick_controller(){
     const float com_y = controller_y->tick(zmp_ref.get<1>(),cur_zmp_ref_y,
                                            est_zmp_i(1));
     com_i = CoordFrame3D::vector3D(com_x,com_y);
-
 }
 
 /** Central method for moving the walking legs. It handles important stuff like:
