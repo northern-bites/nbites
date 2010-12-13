@@ -47,18 +47,22 @@ void VisualFieldObject::init(){
     switch (id) {
     case BLUE_GOAL_LEFT_POST:
         fieldLocation = BLUE_GOAL_TOP_POST_LOC;
+        fieldLocation2 = BLUE_GOAL_BOTTOM_POST_LOC;
         setPossibleFieldObjects(&ConcreteFieldObject::blueGoalPosts);
         break;
     case BLUE_GOAL_RIGHT_POST:
         fieldLocation = BLUE_GOAL_BOTTOM_POST_LOC;
+        fieldLocation2 = BLUE_GOAL_TOP_POST_LOC;
         setPossibleFieldObjects(&ConcreteFieldObject::blueGoalPosts);
         break;
     case YELLOW_GOAL_LEFT_POST:
         fieldLocation = YELLOW_GOAL_BOTTOM_POST_LOC;
+        fieldLocation2 = YELLOW_GOAL_TOP_POST_LOC;
         setPossibleFieldObjects(&ConcreteFieldObject::yellowGoalPosts);
         break;
     case YELLOW_GOAL_RIGHT_POST:
         fieldLocation = YELLOW_GOAL_TOP_POST_LOC;
+        fieldLocation2 = YELLOW_GOAL_BOTTOM_POST_LOC;
         setPossibleFieldObjects(&ConcreteFieldObject::yellowGoalPosts);
         break;
     case UNKNOWN_FIELD_OBJECT:

@@ -428,7 +428,7 @@ private:
     // Uses the actual objects' locations on the field to calculate straight
     // line distance
     float getRealDistance(const ConcreteCorner *c,
-                          const VisualFieldObject *obj) const;
+                          const VisualFieldObject *obj, int w) const;
 
     // Estimates how long the line is on the field
     float getEstimatedLength(boost::shared_ptr<VisualLine> line) const;
@@ -469,7 +469,7 @@ private:
     const bool arePointsCloseEnough(const float estimatedDistance,
                                     const ConcreteCorner* j,
                                     const VisualFieldObject* k,
-                                    const float distToCorner) const;
+                                    const float distToCorner, int n) const;
 
 
     float getAllowedDistanceError(const VisualFieldObject* obj) const;

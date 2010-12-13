@@ -1364,6 +1364,8 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
 		if (i->getSecondaryShape() == UNKNOWN && i->getShape() == T) {
 			// really long TStems indicate that we have a center T
             cout << "Testing T " << i->getTStem()->getLength() << endl;
+			// in this particular case sometimes we should be able to absolutely
+			// identify the T - if the stem is pointing relatively left or right
 			if (i->getTStem()->getLength() > 2 * GOALBOX_DEPTH) {
                 cout << "Setting to center with length " << i->getTStem()->getLength() << endl;
 				i->setSecondaryShape(SIDE_T);
@@ -1380,6 +1382,11 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
             classifyCornerWithObjects(*i, visibleObjects);
 
         // Keep it completely abstract
+		// NOTE: this is dumb - we need to be smarter.  E.g. at least
+		// eliminate posts that are WAY off
+		// Sometimes the distances fail because the object is occluded
+		// so we need another method for this case
+		// also, this may be a chance to detect a bad post
         if (possibleClassifications.empty()) {
             i->setPossibleCorners(ConcreteCorner::getPossibleCorners(
                                       i->getShape(), i->getSecondaryShape()));
@@ -3427,7 +3434,7 @@ FieldLines::nearGoalTCornerLocation(const VisualCorner& corner,
                  ConcreteCorner::blueGoalTCorners().begin();
              i != ConcreteCorner::blueGoalTCorners().end(); ++i) {
             if (fabs(getEstimatedDistance(&corner, post) -
-                     getRealDistance(*i, post)) < ALLOWABLE_ERROR) {
+                     getRealDistance(*i, post, 0)) < ALLOWABLE_ERROR) {
                 return true;
             }
         }
@@ -3437,7 +3444,7 @@ FieldLines::nearGoalTCornerLocation(const VisualCorner& corner,
                  ConcreteCorner::yellowGoalTCorners().begin();
              i != ConcreteCorner::yellowGoalTCorners().end(); ++i) {
             if (fabs(getEstimatedDistance(&corner, post) -
-                     getRealDistance(*i, post)) < ALLOWABLE_ERROR) {
+                     getRealDistance(*i, post, 0)) < ALLOWABLE_ERROR) {
                 return true;
             }
         }
@@ -3640,8 +3647,9 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
     // Note: changed the order of the loops 12/3/2010 so we can check
     // every object against the corner instead of just finding one good one
     for (; j != possibleCorners.end(); ++j) {
+		bool isOk = true;
         for (vector <const VisualFieldObject*>::const_iterator k =
-                 visibleObjects.begin(); k != visibleObjects.end(); ++k) {
+                 visibleObjects.begin(); k != visibleObjects.end() && isOk; ++k) {
 
             // outerls are never going to be corners of the field
             if (corner.getShape() == OUTER_L) {
@@ -3649,6 +3657,7 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
                     (*j)->getID() == BLUE_CORNER_BOTTOM_L ||
                     (*j)->getID() == YELLOW_CORNER_TOP_L ||
                     (*j)->getID() == YELLOW_CORNER_BOTTOM_L) {
+					isOk = false;
                     continue;
                 }
             } else if (corner.getShape() == T) {
@@ -3669,11 +3678,13 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
                     if (right) {
                         if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
                             (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
+							isOk = false;
                             continue;
                         }
                     } else {
                         if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
                             (*j)->getID() == YELLOW_GOAL_LEFT_T) {
+							isOk = false;
                             continue;
                         }
                     }
@@ -3682,11 +3693,13 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
                     if (!right) {
                         if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
                             (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
+							isOk = false;
                             continue;
                         }
                     } else {
                         if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
                             (*j)->getID() == YELLOW_GOAL_LEFT_T) {
+							isOk = false;
                             continue;
                         }
                     }
@@ -3701,28 +3714,25 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
 			list<const ConcreteFieldObject*>::const_iterator i =
 				(*k)->getPossibleFieldObjects()->begin();
 
-            cout << "About to iterate through possible objects" << endl;
-			for (; i != (*k)->getPossibleFieldObjects()->end(); ++i) {
+			bool close = false;
+			for (int p = 0; i != (*k)->getPossibleFieldObjects()->end() && !close; ++i, ++p) {
 
 				if (arePointsCloseEnough(estimatedDistance, *j, *k,
-										 distanceToCorner)) {
-                    // watch out for misidentified center circle corners
-                    if (corner.getShape() == CIRCLE) {
-                        if ((*j)->getID() != TOP_CC &&
-                            (*j)->getID() != BOTTOM_CC) {
-                        }
-                    }
-                    // ack!  This isn't really correct, all we have established
-                    // is that the corner is close enough to 1 landmark, it really
-                    // needs to be close enough to ALL of them.  This makes a big
-                    // difference when we see two goalposts
-                    possibleClassifications.push_back(*j);
-                    if (debugIdentifyCorners) {
-                        cout << "Corner is possibly a " << (*j)->toString() << endl;
-                    }
+										 distanceToCorner, p)) {
+					close = true;
                 }
             }
-            cout << "Done iterating" << endl;
+			// if the corner wasn't close enough to any possible object
+			if (!close) {
+				isOk = false;
+			}
+		}
+		// if we made it through all possible field objects
+		if (isOk) {
+			possibleClassifications.push_back(*j);
+			if (debugIdentifyCorners) {
+				cout << "Corner is possibly a " << (*j)->toString() << endl;
+			}
 		}
 	}
 	return possibleClassifications;
@@ -3741,9 +3751,9 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
 const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
 											const ConcreteCorner* j,
 											const VisualFieldObject* k,
-											const float distToCorner) const
+											const float distToCorner, int n) const
 {
-	const float realDistance = getRealDistance(j, k);
+	const float realDistance = getRealDistance(j, k, n);
 	const float absoluteError = fabs(realDistance - estimatedDistance);
 
 	const float relativeErrorReal = absoluteError / realDistance * 100.0f;
@@ -4005,10 +4015,14 @@ void FieldLines::drawSurroundingBox(shared_ptr<VisualLine> line, int color) cons
 // Calculates the length of the straight line between the two objects on the
 // field
 float FieldLines::getRealDistance(const ConcreteCorner *c,
-                                  const VisualFieldObject *obj) const
+                                  const VisualFieldObject *obj, int which) const
 {
-    return Utility::getLength(c->getFieldX(), c->getFieldY(),
-                              obj->getFieldX(), obj->getFieldY());
+	if (which == 0) {
+		return Utility::getLength(c->getFieldX(), c->getFieldY(),
+								  obj->getFieldX(), obj->getFieldY());
+	}
+	return Utility::getLength(c->getFieldX(), c->getFieldY(),
+								  obj->getFieldX2(), obj->getFieldY2());
 }
 
 #ifdef OFFLINE
