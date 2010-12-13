@@ -1363,7 +1363,9 @@ void FieldLines::identifyCorners(list <VisualCorner> &corners)
 		// before we start, analyze the corner a bit more
 		if (i->getSecondaryShape() == UNKNOWN && i->getShape() == T) {
 			// really long TStems indicate that we have a center T
+            cout << "Testing T " << i->getTStem()->getLength() << endl;
 			if (i->getTStem()->getLength() > 2 * GOALBOX_DEPTH) {
+                cout << "Setting to center with length " << i->getTStem()->getLength() << endl;
 				i->setSecondaryShape(SIDE_T);
 			}
 		}
@@ -1485,6 +1487,20 @@ void FieldLines::findCornerRelationship(VisualCorner & first, VisualCorner & sec
         } else {
             // T to CIRCLE or T to T
             cout << "T to something weird" << endl;
+            if (second.getShape() == T) {
+                // T to T, one is almost certainly the center circle
+                if (common == first.getTStem()) {
+                    if (first.getTStem()->getLength() > GOALBOX_DEPTH * 2) {
+                        first.setSecondaryShape(SIDE_T);
+                        second.setShape(CIRCLE);
+                    }
+                } else {
+                    if (second.getTStem()->getLength() > GOALBOX_DEPTH * 2) {
+                        second.setSecondaryShape(SIDE_T);
+                        first.setShape(CIRCLE);
+                    }
+                }
+            }
 			return;
         }
     } else if (second.getShape() == T) {
@@ -2396,7 +2412,7 @@ list< VisualCorner > FieldLines::intersectLines()
 					// could it really be a center circle intersection?
 				} else if (isTActuallyCC(c, *i, *j, intersection,
 										 line1Closer, line2Closer)){
-					//c.setShape(CIRCLE);
+					c.setShape(CIRCLE);
                     if (debugIntersectLines){
                         cout << "Tossed a corner that confused me" << endl;
                     }
@@ -3070,7 +3086,7 @@ const bool FieldLines::dangerousEdgeCorner(const VisualCorner& corner,
     // If corner is right against screen edge, we must fail it since
     // we can't see anything on the other side.
     static const int AUTO_FAIL_ZONE = 5;
-    static const int DANGER_ZONE = 20;
+    static const int DANGER_ZONE = 25;
 
     static const int LEFT_BORDER = DANGER_ZONE;
     static const int RIGHT_BORDER = IMAGE_WIDTH - DANGER_ZONE;
@@ -3630,14 +3646,52 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
             // outerls are never going to be corners of the field
             if (corner.getShape() == OUTER_L) {
                 if ((*j)->getID() == BLUE_CORNER_TOP_L ||
-                    (*j)->getID() == BLUE_CORNER_BOTTOM_L) {
+                    (*j)->getID() == BLUE_CORNER_BOTTOM_L ||
+                    (*j)->getID() == YELLOW_CORNER_TOP_L ||
+                    (*j)->getID() == YELLOW_CORNER_BOTTOM_L) {
                     continue;
                 }
+            } else if (corner.getShape() == T) {
+                // if we have a T corner and a goal post, then we can determine which
+                // one it is definitely - look at whether the Stem is going up or down
+                // if it is down (normal case) just look at whether T is left or right
+                // if it is up, then reverse the results because you are over the endline
+                // Is stem pointing up or down?
+                bool down = corner.doesTPointDown();
+                bool right;
+                if (corner.getX() > (*k)->getX()) {
+                    right = true;
+                } else {
+                    right = false;
+                }
+                if (down) {
+                    cout << "T points down" << endl;
+                    if (right) {
+                        if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
+                            (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
+                            continue;
+                        }
+                    } else {
+                        if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
+                            (*j)->getID() == YELLOW_GOAL_LEFT_T) {
+                            continue;
+                        }
+                    }
+                } else {
+                    cout << "T points up we are off the field!" << endl;
+                    if (!right) {
+                        if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
+                            (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
+                            continue;
+                        }
+                    } else {
+                        if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
+                            (*j)->getID() == YELLOW_GOAL_LEFT_T) {
+                            continue;
+                        }
+                    }
+                }
             }
-			// if we have a T corner and a goal post, then we can determine which
-			// one it is definitely - look at whether the Stem is going up or down
-			// if it is down (normal case) just look at whether T is left or right
-			// if it is up, then reverse the results because you are over the endline
 
             const float estimatedDistance = getEstimatedDistance(&corner, *k);
             const float distanceToCorner = corner.getDistance();
@@ -3647,26 +3701,28 @@ list <const ConcreteCorner*> FieldLines::compareObjsCorners(
 			list<const ConcreteFieldObject*>::const_iterator i =
 				(*k)->getPossibleFieldObjects()->begin();
 
-            bool allGood = true;
-			for (; i != (*k)->getPossibleFieldObjects()->end() && allGood; ++i) {
+            cout << "About to iterate through possible objects" << endl;
+			for (; i != (*k)->getPossibleFieldObjects()->end(); ++i) {
 
-				if (!arePointsCloseEnough(estimatedDistance, *j, *k,
+				if (arePointsCloseEnough(estimatedDistance, *j, *k,
 										 distanceToCorner)) {
-                    allGood = false;
-                }
-			}
-            if (allGood) {
-                // watch out for misidentified center circle corners
-                if (corner.getShape() == CIRCLE) {
-                    if ((*j)->getID() != TOP_CC &&
-                        (*j)->getID() != BOTTOM_CC) {
+                    // watch out for misidentified center circle corners
+                    if (corner.getShape() == CIRCLE) {
+                        if ((*j)->getID() != TOP_CC &&
+                            (*j)->getID() != BOTTOM_CC) {
+                        }
+                    }
+                    // ack!  This isn't really correct, all we have established
+                    // is that the corner is close enough to 1 landmark, it really
+                    // needs to be close enough to ALL of them.  This makes a big
+                    // difference when we see two goalposts
+                    possibleClassifications.push_back(*j);
+                    if (debugIdentifyCorners) {
+                        cout << "Corner is possibly a " << (*j)->toString() << endl;
                     }
                 }
-                possibleClassifications.push_back(*j);
-                if (debugIdentifyCorners) {
-                    cout << "Corner is possibly a " << (*j)->toString() << endl;
-                }
             }
+            cout << "Done iterating" << endl;
 		}
 	}
 	return possibleClassifications;
@@ -4291,7 +4347,7 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
 		 firstPoint != unusedPointsList.end(); firstPoint++) {
 
 
-        if ((firstPoint->foundWithScan == VERTICAL &&
+        /*if ((firstPoint->foundWithScan == VERTICAL &&
 
              (firstPoint->lineWidth >
               WIDTH_LIM_MAX * stem->getAvgVerticalWidth() ||
@@ -4309,9 +4365,12 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
 
             if (debugIntersectLines){
                 cout << "Point " << *firstPoint << " is too wide."<< endl;
+                cout << "    " <<  stem->getAvgHorizontalWidth() << " " <<
+                    stem->getAvgVerticalWidth() << endl;
+
             }
             continue;
-        }
+            }*/
 
 
 		// int pX = firstPoint->x;
@@ -4366,8 +4425,17 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
     if (debugIntersectLines){
         cout << "Found " << oppPointCount << " points across TCorner." << endl;
     }
-    if (oppPointCount >= 2)
+    if (oppPointCount >= 2) {
         return true;
+    } else if (oppPointCount == 1) {
+        // still worrisome
+        if (linesList.size() > 5 && unusedPointsList.size() > 10) {
+            if (debugIntersectLines) {
+                cout << "Too much worrisome information" << endl;
+            }
+            return true;
+        }
+    }
 	return false;
 }
 

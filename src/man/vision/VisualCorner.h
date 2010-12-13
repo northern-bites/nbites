@@ -74,6 +74,7 @@ public:
     const float getAngleBetweenLines() const { return angleBetweenLines; }
 
     const point<int> getTStemEndpoint() const;
+    const bool doesTPointDown() const;
 
     virtual const bool hasPositiveID();
 

@@ -48,7 +48,7 @@ VisualCorner::VisualCorner(const VisualCorner& other)
       tBar(other.tBar), tStem(other.tStem),
       angleBetweenLines(other.angleBetweenLines)
 {
-
+    secondaryShape = UNKNOWN;
 }
 
 /* This method will assign a value to the variable cornerType. It assumes
@@ -362,6 +362,9 @@ void VisualCorner::determineCornerIDFromShape()
     case UNKNOWN:
         setID(CORNER_NO_IDEA_ID);
         break;
+    default:
+        setID(CORNER_NO_IDEA_ID);
+        break;
     }
 
 }
@@ -441,4 +444,13 @@ setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
 const point<int> VisualCorner::getTStemEndpoint() const
 {
     return Utility::getPointFartherFromCorner(*getTStem(), getX(), getY());
+}
+
+/**
+ * Returns true when the endpoint is below the corner on the screen.
+ */
+const bool VisualCorner::doesTPointDown() const
+{
+    point<int> endpoint = getTStemEndpoint();
+    return endpoint.y > getY();
 }
