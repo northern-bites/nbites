@@ -75,6 +75,8 @@ public:
 
     const point<int> getTStemEndpoint() const;
     const bool doesTPointDown() const;
+    const bool doesTPointRight() const;
+    const bool doesTPointLeft() const;
 
     virtual const bool hasPositiveID();
 

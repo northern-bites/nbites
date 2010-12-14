@@ -454,3 +454,21 @@ const bool VisualCorner::doesTPointDown() const
     point<int> endpoint = getTStemEndpoint();
     return endpoint.y > getY();
 }
+
+/**
+ * Returns true when the endpoint is below the corner on the screen.
+ */
+const bool VisualCorner::doesTPointRight() const
+{
+    point<int> endpoint = getTStemEndpoint();
+    return endpoint.x > getX();
+}
+
+/**
+ * Returns true when the endpoint is below the corner on the screen.
+ */
+const bool VisualCorner::doesTPointLeft() const
+{
+    point<int> endpoint = getTStemEndpoint();
+    return endpoint.x < getX();
+}

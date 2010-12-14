@@ -384,16 +384,6 @@ private:
     void removeRiskyCorners(//vector<VisualLine> &lines,
         std::list<VisualCorner> &corners);
 
-    // Given a list of VisualCorners, attempts to assign ConcreteCorners
-    // (ideally one, but sometimes multiple) that correspond with where the
-    // corner could possibly be on the field.  For instance, if we have a T
-    // corner and it is right next to the blue goal left post, then it is the
-    // blue goal right T. Modifies the corners passed in by calling the
-    // setPossibleCorners method; in certain cases the shape of a corner might
-    // be switched too (if an L corner is determined to be a T instead, its
-    // shape is changed accordingly).
-    void identifyCorners(std::list<VisualCorner> &corners);
-
     void findCornerRelationship(VisualCorner & first, VisualCorner & second);
 
     const bool nearGoalTCornerLocation(const VisualCorner& corner,
@@ -414,10 +404,6 @@ private:
                               const VisualFieldObject * post) const;
 
     void printFieldObjectsInformation();
-
-    // Helper method that iterates over a list of ConcreteCorner pointers and
-    // prints their string representations
-    void printPossibilities(const std::list <const ConcreteCorner*> &list)const;
 
     int numPixelsToHitColor(const int x, const int y, const int colors[],
                             const int numColors,
@@ -455,22 +441,6 @@ private:
                             boost::shared_ptr<VisualLine> line2,
                             const int intersectX,
                             const int intersectY) const;
-
-    const list<const ConcreteCorner*> classifyCornerWithObjects(
-        const VisualCorner &corner,
-        const std::vector <const VisualFieldObject*> &visibleObjects) const;
-
-    std::list<const ConcreteCorner*>
-    compareObjsCorners(const VisualCorner& corner,
-                       const std::vector<const ConcreteCorner*>& possibleCorners,
-                       const std::vector<const VisualFieldObject*>& visibleObjects)
-        const;
-
-    const bool arePointsCloseEnough(const float estimatedDistance,
-                                    const ConcreteCorner* j,
-                                    const VisualFieldObject* k,
-                                    const float distToCorner, int n) const;
-
 
     float getAllowedDistanceError(const VisualFieldObject* obj) const;
 

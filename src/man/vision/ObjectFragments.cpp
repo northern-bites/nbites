@@ -1154,8 +1154,8 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
     // iterate through all of the corners, skipping all of the T Corners
     for (list <VisualCorner>::const_iterator k = corners->begin();
          k != corners->end(); k++) {
-        // we already processed T Corners so skip them
-        if (k->getShape() != T) {
+        // we already processed T Corners so skip them, skip others too
+        if (k->getShape() == INNER_L) {
             int x = k->getX();
             int y = k->getY();
             // if we can't see the bottom of the post it is too dangerous
