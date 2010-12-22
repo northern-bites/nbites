@@ -791,6 +791,37 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
 								   certainty _certainty,
 								   distanceCertainty _distCertainty) {
     one->updateObject(&two, _certainty, _distCertainty);
+    // update the context variables too
+    if (!_certainty) {
+        if (color == BLUE) {
+            context->setUnknownBluePost();
+        } else {
+            context->setUnknownYellowPost();
+        }
+    } else {
+        switch (one->getID()) {
+        case BLUE_GOAL_LEFT_POST:
+            context->setLeftBluePost();
+            break;
+        case BLUE_GOAL_RIGHT_POST:
+            context->setRightBluePost();
+            break;
+        case YELLOW_GOAL_LEFT_POST:
+            context->setLeftYellowPost();
+            break;
+        case YELLOW_GOAL_RIGHT_POST:
+            context->setRightYellowPost();
+            break;
+        case YELLOW_GOAL_POST:
+            context->setUnknownYellowPost();
+            break;
+        case BLUE_GOAL_POST:
+            context->setUnknownBluePost();
+            break;
+        default:
+            break;
+        }
+    }
     return true;
 }
 
@@ -1373,7 +1404,9 @@ int ObjectFragments::classifyByLengthOfGoalline(float dist, int x, int y,
         if (POSTLOGIC) {
             cout << "Swapping classification " << x << " " << y << endl;
         }
-        return class2;
+        // this seems to get fouled up a lot
+        //return class2;
+        return NOPOST;
     }
 }
 

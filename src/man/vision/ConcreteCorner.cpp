@@ -239,6 +239,118 @@ const vector <const ConcreteCorner*>& ConcreteCorner::lGoalCorners()
 	return corners;
 }
 
+const vector <const ConcreteCorner*>& ConcreteCorner::rightBlueLCorner()
+{
+	static const ConcreteCorner* corners_array[1] = {
+		&blue_goal_right_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::leftYellowLCorner()
+{
+	static const ConcreteCorner* corners_array[1] = {
+		&yellow_goal_left_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::leftBlueLCorner()
+{
+	static const ConcreteCorner* corners_array[1] = {
+		&blue_goal_left_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::rightYellowLCorner()
+{
+	static const ConcreteCorner* corners_array[1] = {
+		&yellow_goal_right_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::leftGoalCorners()
+{
+	static const ConcreteCorner* corners_array[NUM_L_LEFT_GOAL_CORNERS] = {
+		&blue_corner_top_l(),
+		&yellow_corner_bottom_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::rightGoalCorners()
+{
+	static const ConcreteCorner* corners_array[NUM_L_RIGHT_GOAL_CORNERS] = {
+		&blue_corner_bottom_l(),
+		&yellow_corner_top_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::yellowBottom()
+{
+	static const ConcreteCorner* corners_array[1] = {
+		&yellow_corner_bottom_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::yellowTop()
+{
+	static const ConcreteCorner* corners_array[1] = {
+		&yellow_corner_top_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::blueBottom()
+{
+	static const ConcreteCorner* corners_array[1] = {
+		&blue_corner_bottom_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::blueTop()
+{
+	static const ConcreteCorner* corners_array[1] = {
+		&blue_corner_top_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
 const vector <const ConcreteCorner*>& ConcreteCorner::fourCorners()
 {
 	static const ConcreteCorner* corners_array[NUM_L_FOUR_CORNERS] = {
@@ -246,6 +358,30 @@ const vector <const ConcreteCorner*>& ConcreteCorner::fourCorners()
 		&blue_corner_bottom_l(),
 		&yellow_corner_bottom_l(),
 		&yellow_corner_top_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::rightLCorners()
+{
+	static const ConcreteCorner* corners_array[NUM_L_RIGHT_CORNERS] = {
+		&blue_goal_right_l(),
+		&yellow_goal_right_l()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::leftLCorners()
+{
+	static const ConcreteCorner* corners_array[NUM_L_LEFT_CORNERS] = {
+		&blue_goal_left_l(),
+		&yellow_goal_left_l()
 	};
 	static const vector<const ConcreteCorner*>
 		corners(corners_array,
@@ -262,6 +398,31 @@ const vector <const ConcreteCorner*>& ConcreteCorner::tCorners()
 		&yellow_goal_right_t(),
 		&center_top_t(),
 		&center_bottom_t()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::rightTCorners()
+{
+	const ConcreteCorner* corners_array[NUM_T_RIGHT_CORNERS] = {
+		&blue_goal_right_t(),
+		&yellow_goal_right_t()
+	};
+    cout << "In right T" << endl;
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::leftTCorners()
+{
+	const ConcreteCorner* corners_array[NUM_T_LEFT_CORNERS] = {
+		&blue_goal_left_t(),
+		&yellow_goal_left_t()
 	};
 	static const vector<const ConcreteCorner*>
 		corners(corners_array,
@@ -551,14 +712,42 @@ getPossibleCorners(shape corner_type, shape secondary_type) {
 			return lGoalCorners();
 		} else if (secondary_type == CORNER_L) {
 			return fourCorners();
-		}
+		} else if (secondary_type == RIGHT_GOAL_L) {
+            return rightLCorners();
+        } else if (secondary_type == LEFT_GOAL_L) {
+            return leftLCorners();
+        } else if (secondary_type == LEFT_GOAL_CORNER) {
+            return leftGoalCorners();
+        } else if (secondary_type == RIGHT_GOAL_CORNER) {
+            return rightGoalCorners();
+        } else if (secondary_type == LEFT_GOAL_YELLOW_L) {
+            return leftYellowLCorner();
+        } else if (secondary_type == LEFT_GOAL_BLUE_L) {
+            return leftBlueLCorner();
+        } else if (secondary_type == RIGHT_GOAL_YELLOW_L) {
+            return rightYellowLCorner();
+        } else if (secondary_type == RIGHT_GOAL_BLUE_L) {
+            return rightBlueLCorner();
+        } else if (secondary_type == YELLOW_GOAL_TOP) {
+            return yellowTop();
+        } else if (secondary_type == YELLOW_GOAL_BOTTOM) {
+            return yellowBottom();
+        } else if (secondary_type == BLUE_GOAL_TOP) {
+            return blueTop();
+        } else if (secondary_type == BLUE_GOAL_BOTTOM) {
+            return blueBottom();
+        }
         return lCorners();
     case T:
 		if (secondary_type == GOAL_T) {
 			return tGoalCorners();
 		} else if (secondary_type == SIDE_T) {
 			return tSideCorners();
-		}
+		} else if (secondary_type == LEFT_GOAL_T) {
+            return leftTCorners();
+        } else if (secondary_type == RIGHT_GOAL_T) {
+            return rightTCorners();
+        }
         return tCorners();
     case CIRCLE:
         return ccCorners();

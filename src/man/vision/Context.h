@@ -39,6 +39,19 @@ class Context; // forward reference
 #include "Vision.h"
 #include "Field.h"
 
+enum facing {
+    FACING_BLUE_GOAL = 0,
+    FACING_YELLOW_GOAL,
+    FACING_SIDELINE,
+    FACING_UNKNOWN
+};
+
+enum half {
+    HALF_BLUE = 0,
+    HALF_YELLOW,
+    HALF_UNKNOWN
+};
+
 
 class Context {
 public:
@@ -53,18 +66,20 @@ public:
     void setLCorner() {lCorner++;}
     void setOLCorner() {oCorner++; lCorner++;}
     void setILCorner() {iCorner++; lCorner++;}
+    void setCCCorner() {cCorner++; seeCenterCircle = true;}
     void setRightYellowPost() {rightYellowPost = true; yellowPost = true;}
     void setLeftYellowPost() {leftYellowPost = true; yellowPost = true;}
     void setUnknownYellowPost() {unknownYellowPost = true; yellowPost = true;}
     void setRightBluePost() {rightBluePost = true; bluePost = true;}
     void setLeftBluePost() {leftBluePost = true; bluePost = true;}
-    void setUknownBluePost() {unknownBluePost = true; bluePost = true;}
+    void setUnknownBluePost() {unknownBluePost = true; bluePost = true;}
     void setUnknownCross() {unknownCross = true; cross = true;}
     void setYellowCross() {yellowCross = true; cross = true;}
     void setBlueCross() {blueCross = true; cross = true;}
     void setCross() {cross = true;}
     void setBall() {ball = true;}
-    void setGoalBoxLines() {seeGoalBoxLines = true; cout << "See goal box lines" << endl;}
+    void setGoalBoxLines() {seeGoalBoxLines = true;}
+    void setSeeCenterCircle(){seeCenterCircle = true;}
 
     // getters
     int  getTCorner() {return tCorner;}
@@ -95,8 +110,14 @@ public:
     // be switched too (if an L corner is determined to be a T instead, its
     // shape is changed accordingly).
     void identifyCorners(std::list<VisualCorner> &corners);
+    void checkForConnectedCorners(std::list<VisualCorner> &corners);
+    void checkForSidelineInformation(std::list<VisualCorner> &corners);
 
+    void unconnectedInnerLs(VisualCorner & inner, VisualCorner & outer);
+    void findUnconnectedCornerRelationship(VisualCorner & first,
+                                           VisualCorner & second);
     void findCornerRelationship(VisualCorner & first, VisualCorner & second);
+    void classifyInnerL(VisualCorner & first);
 
     const list<const ConcreteCorner*> classifyCornerWithObjects(
         const VisualCorner &corner,
@@ -139,11 +160,19 @@ public:
     void printPossibilities(const std::list <const ConcreteCorner*> &list)const;
     // Determines which field objects are visible on the screen and returns
     // a vector of the pointers of the objects that are visible.
-    std::vector<const VisualFieldObject*> getVisibleFieldObjects() const;
+    std::vector<const VisualFieldObject*> getVisibleFieldObjects();
 
     vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
 
     const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
+    void setFacing();
+    void setFieldHalf();
+    void printContext();
+
+#ifdef OFFLINE
+    void setDebugIdentifyCorners(bool _bool) {debugIdentifyCorners = _bool;}
+    const bool getDebugIdentifyCorners() const { return debugIdentifyCorners;}
+#endif
 
 
 private:
@@ -153,6 +182,9 @@ private:
 
     static const int NUM_FIELD_OBJECTS_WITH_DIST_INFO = 4;
     VisualFieldObject const * allFieldObjects[NUM_FIELD_OBJECTS_WITH_DIST_INFO];
+
+    facing face;
+    half fieldHalf;
 
     bool rightYellowPost;
     bool leftYellowPost;
@@ -166,13 +198,22 @@ private:
     int  lCorner;
     int  iCorner;
     int  oCorner;
+    int  cCorner;
     bool cross;
     bool unknownCross;
     bool yellowCross;
     bool blueCross;
     bool ball;
     bool seeGoalBoxLines;
+    bool sameHalf;
+    bool seeCenterCircle;
+    int objectRightX;
+    int objectRightY;
+#ifdef OFFLINE
     bool debugIdentifyCorners;
+#else
+    static const bool debugIdentifyCorners = false;
+#endif
 };
 
 #endif // Context_h_DEFINED

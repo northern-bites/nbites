@@ -19,14 +19,14 @@ VisualCorner::VisualCorner(const int _x, const int _y,
       VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
       possibleCorners(ConcreteCorner::concreteCorners().begin(),
                       ConcreteCorner::concreteCorners().end()),
-      cornerType(UNKNOWN), line1(l1), line2(l2),
+      cornerType(UNKNOWN), secondaryShape(UNKNOWN), line1(l1), line2(l2),
       lines(), t1(_t1), t2(_t2),
       // Technically the initialization of tBar and tStem is incorrect here for
       // which we apologize. It's a hack, but the true values of tBar and tStem
       // will get assigned in determineCornerShape which is right here in the
       // constructor.
       tBar(line1), tStem(line2),
-      angleBetweenLines(0)
+      angleBetweenLines(0), orientation(0)
 {
     lines.push_back(line1);
     lines.push_back(line2);
@@ -42,13 +42,12 @@ VisualCorner::~VisualCorner() {}
 VisualCorner::VisualCorner(const VisualCorner& other)
     : VisualDetection(other), VisualLandmark<cornerID>(other),
       possibleCorners(other.possibleCorners),
-      cornerType(other.cornerType),
+      cornerType(other.cornerType), secondaryShape(other.secondaryShape),
       line1(other.line1), line2(other.line2), lines(other.lines),
       t1(other.t1), t2(other.t2),
       tBar(other.tBar), tStem(other.tStem),
-      angleBetweenLines(other.angleBetweenLines)
+      angleBetweenLines(other.angleBetweenLines), orientation(other.orientation)
 {
-    secondaryShape = UNKNOWN;
 }
 
 /* This method will assign a value to the variable cornerType. It assumes

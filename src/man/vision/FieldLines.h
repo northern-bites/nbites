@@ -549,7 +549,7 @@ public:
     void setDebugJoinLines(bool _bool) { debugJoinLines = _bool; }
     void setDebugExtendLines(bool _bool) { debugExtendLines = _bool; }
     void setDebugIntersectLines(bool _bool) { debugIntersectLines = _bool; }
-    void setDebugIdentifyCorners(bool _bool) { debugIdentifyCorners = _bool; }
+    void setDebugIdentifyCorners(bool _bool);
     void setDebugCcScan(bool _bool) { debugCcScan = _bool; }
     void setDebugRiskyCorners(bool _bool) { debugRiskyCorners = _bool; }
 

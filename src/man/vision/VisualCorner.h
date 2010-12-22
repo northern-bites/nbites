@@ -73,6 +73,8 @@ public:
     // not yet hooked up the angle thing for T corners
     const float getAngleBetweenLines() const { return angleBetweenLines; }
 
+    const float getOrientation() const { return orientation; }
+
     const point<int> getTStemEndpoint() const;
     const bool doesTPointDown() const;
     const bool doesTPointRight() const;
@@ -136,6 +138,8 @@ private:
     // In the case of a T corner, we report the smaller angle (the second
     // angle can be found by subtracting this angle from 180)
     float angleBetweenLines;
+    // the orientation of the corner
+    float orientation;
 };
 
 // functor that checks if the shape of one corner equals the given shape

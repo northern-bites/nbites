@@ -202,6 +202,13 @@ void FieldLines::afterObjectFragments()
 #endif
 }
 
+#ifdef OFFLINE
+void FieldLines::setDebugIdentifyCorners(bool _bool) {
+    debugIdentifyCorners = _bool;
+    vision->thresh->context->setDebugIdentifyCorners(_bool);
+}
+#endif
+
 
 // This method populates the points vector with line points it finds in
 // the image.  A line point ideally occurs in the middle of a line on the
@@ -978,7 +985,9 @@ void FieldLines::joinLines()
             const int oldColor = (*i)->getColor();
 
             isCCLine = isCCLine || (*i)->getCCLine() || (*j)->getCCLine();
-
+            if (isCCLine) {
+                vision->thresh->context->setSeeCenterCircle();
+            }
 
             ++numberOfJoinedLines;
             if (debugJoinLines)
@@ -2208,6 +2217,8 @@ list< VisualCorner > FieldLines::intersectLines()
                 vision->thresh->context->setILCorner();
             } else if (c.getShape() == INNER_L) {
                 vision->thresh->context->setOLCorner();
+            } else {
+                vision->thresh->context->setCCCorner();
             }
 
             // Add the intersection point to both lines.
