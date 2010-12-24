@@ -254,6 +254,8 @@ add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp ${VISION_INC
 add_executable( ImageAcquisitionTest ${VISION_INCLUDE_DIR}/test/ImageAcquisitionTest.cpp
   ${VISION_INCLUDE_DIR}/ImageAcquisition.s ${VISION_INCLUDE_DIR}/ColorParams.cpp )
 
+target_link_libraries( ImageAcquisitionTest ${NBCOMMON_LIBRARIES})
+
 add_executable( OfflineVision ${VISION_INCLUDE_DIR}/offline/OfflineVision.cpp )
 target_link_libraries( OfflineVision ${VISION_TARGET} ${SENSORS_TARGET} ${NBINCLUDE_TARGET})
 

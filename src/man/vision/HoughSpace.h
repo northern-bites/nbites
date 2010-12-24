@@ -43,10 +43,11 @@ private:                        // Member functions
 private:       // Member variables
     // Hough Space size parameters
     // 256 for full 8 bit angle, width is for 320x240 image
-    const static int R_SPAN = 400, T_SPAN  = 256;
-    const static int DEFAULT_ACCEPT_THRESH = 90;
-    const static int DEFAULT_ANGLE_SPREAD  = 5;
-    const static int PEAK_POINTS = 4;
+    enum { R_SPAN = 256,
+           T_SPAN = 256,
+           DEFAULT_ACCEPT_THRESH = 90,
+           DEFAULT_ANGLE_SPREAD  = 5,
+           PEAK_POINTS = 4 };
 
     int acceptThreshold, angleSpread;
 

@@ -176,7 +176,7 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Image data request
     if (r.image) {
         sensors->lockImage();
-		serial.write_bytes(sensors->getImage(), IMAGE_BYTE_SIZE);
+		serial.write_bytes(sensors->getImage(), Y_IMAGE_BYTE_SIZE);
 		sensors->releaseImage();
     }
 
