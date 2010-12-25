@@ -52,6 +52,12 @@
 
 .globl _acquire_image
 
+.macro COPY_SHIFT_R dest, source
+
+	movq	\dest, \source
+	psrld	\dest, 2
+.endm
+
 .macro LOOP phase
 	movq    mm0, [esi+(ecx + (\phase * 2))*4]	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 0)
         movq    mm1, mm0
@@ -76,27 +82,29 @@
 	## mm0: | 0000 | sum1 | 0000 | sum0 |
 	pand	mm0, mm6
 
-        # Divide y sums by 4 to get 8 bits, write 2 y pixels to output y image
-        movq    mm2, mm0                        # make a copy of the y sums
-        psrld	mm2, 2                          # unsigned divide by 4
-
+	## COPY_SHIFT_R used to copy into various MMX registers and
+	## divide the Y sum by 4 to get the average.
+	## COPY_SHIFT_R avoids copying into mm2 register unless necessary, so
+	## phase 0 and 2 just skip mm2 register copy.
 	.ifeq (\phase)
-	movq	mm4, mm2
+	COPY_SHIFT_R mm4, mm0
 	.endif
 
-	.ifeq (\phase - 2)
-	movq	mm5, mm2
-	.endif
-
+	## Pack values from first two phases together as 4 words in mm4
 	.ifeq (\phase - 1)
+	COPY_SHIFT_R mm2, mm0
 	packssdw mm4, mm2
 	.endif
 
-	.ifeq (\phase - 3)
-	packssdw mm5, mm2
+	.ifeq (\phase - 2)
+	COPY_SHIFT_R mm5, mm0
 	.endif
 
+	## Last phase, pack phase 2 & 3 into an array, then pack all 8
+	## bytes together and write them out
 	.ifeq (\phase - 3)
+	COPY_SHIFT_R mm2, mm0
+	packssdw mm5, mm2
 	packuswb mm4, mm5
 	movq	[edi+ecx], mm4
 	.endif
