@@ -57,6 +57,13 @@ private:
 
     uchar * out, *yuv,* yuvCopy,* table;
     ColorParams c;
+
+    unsigned long long int sumTime_thread, sumTime_mono, sumTime_process;
+    unsigned long long int sum_clocks;
+    unsigned int min_clocks;
+    int numFrames;
+    struct timespec startT_thread, startT_mono, startT_process,
+        finishT_thread, finishT_mono, finishT_process;
 };
 
 #endif /* _ImageAcquisitionTest_h_DEFINED */

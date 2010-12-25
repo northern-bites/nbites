@@ -8,21 +8,25 @@
 
 #include <iostream>
 #include <fstream>
+#include <time.h>
+#include <sys/time.h>
 
 using namespace std;
 
 typedef unsigned char uchar;
 
 // Our function to test!
-extern "C" void _acquire_image(uchar * colorTable, ColorParams* params,
+extern "C" unsigned int _acquire_image(uchar * colorTable, ColorParams* params,
                                uchar* yuvImage, uchar* outImage);
 
 ImageAcquisitionTest::ImageAcquisitionTest() :
-    c(0,0,0, 256, 256, 256, 128, 128, 128) // Default old table size
+    c(0,0,0, 256, 256, 256, 128, 128, 128), // Default old table size
+    sumTime_process(0), sumTime_thread(0), sumTime_mono(0),
+    sum_clocks(0), min_clocks(0xFFFFFFF), numFrames(500)
 {
     init();
     setup(0,0,0,
-          16,16,16,
+          255,255,255,
           10,10,10 );
 }
 
@@ -219,30 +223,79 @@ void ImageAcquisitionTest::test_color_segmentation()
 void ImageAcquisitionTest::test_avg()
 {
 
-    // Run it!
-    _acquire_image(table, &c, yuv, out);
+    clock_gettime(CLOCK_MONOTONIC, &startT_mono);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startT_process);
+    clock_gettime(CLOCK_THREAD_CPUTIME_ID, &startT_thread);
 
-    // Make sure that the run didn't affect the initial image
-    for (int i = 0; i < 640*480*2; ++i) {
-        EQ_INT((int)yuvCopy[i] , (int)yuv[i]);
+    unsigned int clockTicks = _acquire_image(table, &c, yuv, out);
+
+    clock_gettime(CLOCK_MONOTONIC, &finishT_mono);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &finishT_process);
+    clock_gettime(CLOCK_THREAD_CPUTIME_ID, &finishT_thread);
+
+
+    sum_clocks += clockTicks;
+    min_clocks = min(min_clocks, clockTicks);
+
+    sumTime_thread += (finishT_thread.tv_sec -
+                       startT_thread.tv_sec) * MICROS_PER_SECOND;
+    sumTime_thread += (finishT_thread.tv_nsec -
+                       startT_thread.tv_nsec) / 1000;
+
+    sumTime_mono += (finishT_mono.tv_sec -
+                     startT_mono.tv_sec) * MICROS_PER_SECOND;
+    sumTime_mono += (finishT_mono.tv_nsec -
+                     startT_mono.tv_nsec) / 1000;
+
+    sumTime_process += (finishT_process.tv_sec -
+                        startT_process.tv_sec) * MICROS_PER_SECOND;
+    sumTime_process += (finishT_process.tv_nsec -
+                        startT_process.tv_nsec) / 1000;
+
+    numFrames--;
+    if (numFrames == 0){
+        cout << "RUN TIMES:" << endl;
+        cout << "\tAverage THREAD run time for _acquire_image: " <<
+            sumTime_thread / 500 << endl;
+        // cout << "\tAverage PROCESS run time for _acquire_image: " <<
+        //     sumTime_process / 500 << endl;
+        // cout << "\tAverage MONO run time for _acquire_image: " <<
+        //     sumTime_mono / 500 << endl;
+        cout << "\tAverage clock ticks: " << sum_clocks/500 << endl;
+        cout << "\tMinimum clock ticks: " << min_clocks << endl;
+        cout << "\tMinimum clock ticks per iteration: " <<
+            (min_clocks)/(160*240) << endl;
+
+        numFrames = 500;
+        sumTime_thread = sumTime_mono = sumTime_process =
+            sum_clocks = 0;
+        min_clocks = 0xFFFFFFF;
     }
-    PASSED(PRESERVE_IMAGE);
+    // // Make sure that the run didn't affect the initial image
+    // for (int i = 0; i < 640*480*2; ++i) {
+    //     EQ_INT((int)yuvCopy[i] , (int)yuv[i]);
+    // }
+    // PASSED(PRESERVE_IMAGE);
 
-    // Check that the average works properly.
-    for (int i = 0; i < IMAGE_HEIGHT; ++i) {
-        for (int j=0; j < IMAGE_WIDTH; ++j){
+    // // Check that the average works properly.
+    // for (int i = 0; i < IMAGE_HEIGHT; ++i) {
+    //     for (int j=0; j < IMAGE_WIDTH; ++j){
 
-            int output = (int)out[i*IMAGE_WIDTH + j];
-            EQ_INT( yAvgValue(i, j) >> 2, output);
-        }
-    }
-    PASSED(AVERAGES);
+    //         int output = (int)out[i*IMAGE_WIDTH + j];
+    //         EQ_INT( yAvgValue(i, j) >> 2, output);
+    //     }
+    // }
+    // PASSED(AVERAGES);
 }
 
 int ImageAcquisitionTest::runTests()
 {
-    test_avg();
+    setup(0,0,0,256,256,256,10,10,10);
+
+    while(true)
+        test_avg();
     test_color_segmentation();
+
     return 0;
 }
 
@@ -250,4 +303,17 @@ int main(int argc, char * argv[])
 {
     ImageAcquisitionTest * iat = new ImageAcquisitionTest();
     return iat->runTests();
+}
+
+timespec diff(timespec start, timespec end)
+{
+    timespec temp;
+    if ((end.tv_nsec-start.tv_nsec)<0) {
+        temp.tv_sec = end.tv_sec-start.tv_sec-1;
+        temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+    } else {
+        temp.tv_sec = end.tv_sec-start.tv_sec;
+        temp.tv_nsec = end.tv_nsec-start.tv_nsec;
+    }
+    return temp;
 }
