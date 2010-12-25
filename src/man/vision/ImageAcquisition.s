@@ -153,23 +153,11 @@
         pmaddwd mm1, [edx+48]                   # combine u and v indicies
         paddd   mm0, mm1                        # add y index
 
-        # Lookup color pixel 0 in table, write to output image
-	movq	[esp+8], mm0
-
-	mov	eax, [esp+8]
-        movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
-	                                        # just moving a byte to al
-        mov     [edi+ecx+(\phase*2)+(320*240)], al         # color image is just after y image in memory,
-                                                # so displacement is (320*240)
-
-        # Lookup color pixel 1 in table, write to output image We need
-        # to extract the higher order 32 bits from mm0, so we first
-        # move the words into the correct order then pull out the
-        # lower 2 words. Since we do not use mm0 any more before it is
-        # refilled, we can save a step and not reshuffle the words.
-	mov	eax, [esp+12]
-        movzx   eax, byte ptr[ebx+eax]
-        mov     [edi+ecx+(\phase*2)+(320*240 + 1)], al
+	## Write color address for 2 pixels to the stack, we'll look
+	## it up in the table later
+	mov	eax, ecx
+	imul	eax, 4
+	movq	[esp + 1288 + eax + \phase * 8], mm0
 .endm
 
 # acquire_image arguments ( byte* colorTable, ColorParams* params, byte* yuvImage, byte* outputImage)
@@ -184,7 +172,8 @@ _acquire_image:
 	push	edi
 
 	# Move stack pointer and push rowCount to it
-	sub 	esp, 16
+	sub 	esp, 1288 	# 4 bytes for rdtsc, 4 for rowCount
+				# 320 * 4 bytes per color addresses
 
 	# Ensure that the stack pointer is 8 byte aligned
 	and	esp, 0xFFFFFFF8
@@ -228,6 +217,24 @@ xLoop:
         # Update loop/offset counter, test for end of row
         add     ecx, 8
         jne     xLoop
+
+
+	mov	ecx, -320
+colorLoop:
+	## Lookup and write color pixels to output image
+	## Loop from 0 to 320 in ecx
+
+	## Load pixel color address
+	imul	eax, ecx, 4
+	mov	eax, dword ptr[esp+1288+eax]
+
+	## Lookup color in table
+        movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
+	                                        # just moving a byte to al
+        mov     [edi+ecx+(320*240)], al         # color image is just after y image in memory,
+                                                # so displacement is (320*240)
+	add	ecx, 1
+	jne	colorLoop
 
         # End of x loop. Decrement outer loop counter, update row pointers,
         # test for end of image
