@@ -58,7 +58,13 @@
 	psrld	\dest, 2
 .endm
 
+	## The inner loop of the image copy, averaging, and color segmentation
+	## Performs all the averaging, and calculates all the table indices, but
+	## leaves the table lookups to another loop.
 .macro LOOP phase
+        # Fetch next 8 pixels from upper (0) source row, split into y and uv words
+        # mm0:  | y30 | y20 | y10 | y00 |
+        # mm1:  | v20 | u20 | v00 | u00 |
 	movq    mm0, [esi+(ecx + (\phase * 2))*4]	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 0)
         movq    mm1, mm0
         pand    mm0, mm7
@@ -67,11 +73,16 @@
         # Fetch next 8 pixels from lower (1) source row, split into y and uv words
         # mm2:  | y31 | y21 | y11 | y01 |
         # mm3:  | v21 | u21 | v01 | u01 |
-
         movq    mm2, [esi+(ecx + (\phase * 2))*4+(640*2)]	# row = 640 pixels * 2 bytes per pixel
         movq    mm3, mm2
         pand    mm2, mm7
         psrlw 	mm3, 8
+
+	##
+	##
+	## Y AVERAGING SECTION
+	##
+	##
 
         # Sum 2x2 y values (words, 10 bits used)
         # mm0: | xxx | y20 + y30 + y21 + y31 | xxx | y00 + y10 + y01 + y11 |
@@ -90,9 +101,11 @@
 	COPY_SHIFT_R mm4, mm0
 	.endif
 
-	## Pack values from first two phases together as 4 words in mm4
+
 	.ifeq (\phase - 1)
 	COPY_SHIFT_R mm2, mm0
+
+	## Pack values from first two phases together as 4 words in mm4
 	packssdw mm4, mm2
 	.endif
 
@@ -104,10 +117,22 @@
 	## bytes together and write them out
 	.ifeq (\phase - 3)
 	COPY_SHIFT_R mm2, mm0
+
+	## mm2 before: | 0 | y7 | 0 | y6|
+	## mm5 after:  | y7 | y6 | y5 | y4 | all 16 bit words
 	packssdw mm5, mm2
+
+	## Pack results from all 4 phases together, result is:
+	## mm4: | y7 | y6 | y5 | y4 | y3 | y2 | y1 | y0 |
 	packuswb mm4, mm5
 	movq	[edi+ecx], mm4
 	.endif
+
+	##
+	##
+	## UV-COLOR SECTION
+	##
+	##
 
         # Sum 1x2 uv values (words, 9 bits used)
         # mm1: | v20 + v21 | u20 + u21 | v00 + v01 | u00 + u01 |
@@ -130,7 +155,7 @@
 
         # Lookup color pixel 0 in table, write to output image
 	movq	[esp+8], mm0
-        ## movd    eax, mm0
+
 	mov	eax, [esp+8]
         movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
 	                                        # just moving a byte to al
@@ -142,9 +167,6 @@
         # move the words into the correct order then pull out the
         # lower 2 words. Since we do not use mm0 any more before it is
         # refilled, we can save a step and not reshuffle the words.
-        ## pshufw  mm0, mm0, 0x4E
-        ## movd    eax, mm0
-
 	mov	eax, [esp+12]
         movzx   eax, byte ptr[ebx+eax]
         mov     [edi+ecx+(\phase*2)+(320*240 + 1)], al
@@ -195,14 +217,8 @@ yLoop:
 
 # Start of inner (x) loop
 #
-# Source image pixels in memory, processed by each iteration:
-#
-#   y00  u00  y10  v00  y20  u20  y30  v20
-#   y01  u01  y11  v01  y21  u21  y31  v21
-
-        # Fetch next 8 pixels from upper (0) source row, split into y and uv words
-        # mm0:  | y30 | y20 | y10 | y00 |
-        # mm1:  | v20 | u20 | v00 | u00 |
+# Processes 8 pixels total in each xLoop.
+# Y Values get written to memory, color values are written to the stack then processed.
 xLoop:
 	LOOP 0
 	LOOP 1
