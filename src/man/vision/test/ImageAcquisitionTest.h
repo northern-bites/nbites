@@ -18,6 +18,7 @@ public:
 private:
     void test_color_segmentation();
     void test_avg();
+    void run_average_test();
 
     void init();
     void setup(int y0, int u0, int v0,

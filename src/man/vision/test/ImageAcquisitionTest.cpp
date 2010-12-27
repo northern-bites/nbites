@@ -11,6 +11,8 @@
 #include <time.h>
 #include <sys/time.h>
 
+#define PROFILE_ACQUIRE
+
 using namespace std;
 
 typedef unsigned char uchar;
@@ -264,35 +266,43 @@ void ImageAcquisitionTest::test_avg()
         cout << "\tAverage clock ticks: " << sum_clocks/500 << endl;
         cout << "\tMinimum clock ticks: " << min_clocks << endl;
         cout << "\tMinimum clock ticks per iteration: " <<
-            (min_clocks)/(160*240) << endl;
+            (min_clocks)/(160.*240.) << endl;
 
         numFrames = 500;
         sumTime_thread = sumTime_mono = sumTime_process =
             sum_clocks = 0;
         min_clocks = 0xFFFFFFF;
     }
-    // // Make sure that the run didn't affect the initial image
-    // for (int i = 0; i < 640*480*2; ++i) {
-    //     EQ_INT((int)yuvCopy[i] , (int)yuv[i]);
-    // }
-    // PASSED(PRESERVE_IMAGE);
+#ifndef PROFILE_ACQUIRE
+    run_average_test();
+#endif
+}
 
-    // // Check that the average works properly.
-    // for (int i = 0; i < IMAGE_HEIGHT; ++i) {
-    //     for (int j=0; j < IMAGE_WIDTH; ++j){
+void ImageAcquisitionTest::run_average_test(){
+    // Make sure that the run didn't affect the initial image
+    for (int i = 0; i < 640*480*2; ++i) {
+        EQ_INT((int)yuvCopy[i] , (int)yuv[i]);
+    }
+    PASSED(PRESERVE_IMAGE);
 
-    //         int output = (int)out[i*IMAGE_WIDTH + j];
-    //         EQ_INT( yAvgValue(i, j) >> 2, output);
-    //     }
-    // }
-    // PASSED(AVERAGES);
+    // Check that the average works properly.
+    for (int i = 0; i < IMAGE_HEIGHT; ++i) {
+        for (int j=0; j < IMAGE_WIDTH; ++j){
+
+            int output = (int)out[i*IMAGE_WIDTH + j];
+            EQ_INT( yAvgValue(i, j) >> 2, output);
+        }
+    }
+    PASSED(AVERAGES);
 }
 
 int ImageAcquisitionTest::runTests()
 {
     setup(0,0,0,256,256,256,10,10,10);
 
+#ifdef PROFILE_ACQUIRE
     while(true)
+#endif
         test_avg();
     test_color_segmentation();
 
@@ -303,17 +313,4 @@ int main(int argc, char * argv[])
 {
     ImageAcquisitionTest * iat = new ImageAcquisitionTest();
     return iat->runTests();
-}
-
-timespec diff(timespec start, timespec end)
-{
-    timespec temp;
-    if ((end.tv_nsec-start.tv_nsec)<0) {
-        temp.tv_sec = end.tv_sec-start.tv_sec-1;
-        temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
-    } else {
-        temp.tv_sec = end.tv_sec-start.tv_sec;
-        temp.tv_nsec = end.tv_nsec-start.tv_nsec;
-    }
-    return temp;
 }
