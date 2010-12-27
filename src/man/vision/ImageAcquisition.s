@@ -58,6 +58,19 @@
 	psrld	\dest, 2
 .endm
 
+## Inner loop of the color processing
+.macro COLOR_LOOP phase
+
+	## Load the color address from the stack
+	mov	eax, dword ptr[esp+1280 + 8 + 4+eax + \phase * 4]
+
+	## Lookup color in table
+        movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
+	                                        # just moving a byte to al
+        mov     [edi+ecx+\phase+(320*240)], al		# color image is just after y image in memory,
+                                			# so displacement is (320*240)
+.endm
+
 	## The inner loop of the image copy, averaging, and color segmentation
 	## Performs all the averaging, and calculates all the table indices, but
 	## leaves the table lookups to another loop.
@@ -65,9 +78,7 @@
         # Fetch next 8 pixels from upper (0) source row, split into y and uv words
         # mm0:  | y30 | y20 | y10 | y00 |
         # mm1:  | v20 | u20 | v00 | u00 |
-	mov 	eax, ecx
-	imul	eax, 4
-	movq    mm0, [esi+eax + (\phase * 8)]	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 0)
+	movq    mm0, [esi+eax + (\phase * 8)]
         movq    mm1, mm0
         pand    mm0, mm7
         psrlw  	mm1, 8
@@ -157,9 +168,7 @@
 
 	## Write color address for 2 pixels to the stack, we'll look
 	## it up in the table later
-	mov	eax, ecx
-	imul	eax, 4
-	movq	[esp + 1288 + eax + \phase * 8], mm0
+	movq	[esp + 1280 + 8 + 4 + eax + \phase * 8], mm0
 .endm
 
 # acquire_image arguments ( byte* colorTable, ColorParams* params, byte* yuvImage, byte* outputImage)
@@ -174,8 +183,9 @@ _acquire_image:
 	push	edi
 
 	# Move stack pointer and push rowCount to it
-	sub 	esp, 1288 	# 4 bytes for rdtsc, 4 for rowCount
-				# 320 * 4 bytes per color addresses
+	sub 	esp, 1280 + 8 + 4 	# 4 bytes for rdtsc, 4 for rowCount
+					# 320 * 4 bytes per color addresses
+					# 4 bytes for ecx * 4 calculation
 
 	# Ensure that the stack pointer is 8 byte aligned
 	and	esp, 0xFFFFFFF8
@@ -211,6 +221,11 @@ yLoop:
 # Processes 8 pixels total in each xLoop.
 # Y Values get written to memory, color values are written to the stack then processed.
 xLoop:
+	## Calculate the offset for the pixel accesses
+	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 0)
+	# Only perform once since ecx only changes at the end of the loop
+	mov 	eax, ecx
+	imul	eax, 4
 	LOOP 0
 	LOOP 1
 	LOOP 2
@@ -221,21 +236,38 @@ xLoop:
         jne     xLoop
 
 
+
+## Lookup and write color pixels to output image
+## Loop from 0 to 320 in ecx
 	mov	ecx, -320
 colorLoop:
-	## Lookup and write color pixels to output image
-	## Loop from 0 to 320 in ecx
-
 	## Load pixel color address
 	imul	eax, ecx, 4
-	mov	eax, dword ptr[esp+1288+eax]
+	mov	[esp+8], eax
 
-	## Lookup color in table
-        movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
-	                                        # just moving a byte to al
-        mov     [edi+ecx+(320*240)], al         # color image is just after y image in memory,
-                                                # so displacement is (320*240)
-	add	ecx, 1
+	COLOR_LOOP 0
+	mov	eax, [esp+8]
+	COLOR_LOOP 1
+	mov	eax, [esp+8]
+	COLOR_LOOP 2
+	mov	eax, [esp+8]
+	COLOR_LOOP 3
+	mov	eax, [esp+8]
+	COLOR_LOOP 4
+	mov	eax, [esp+8]
+	COLOR_LOOP 5
+	mov	eax, [esp+8]
+	COLOR_LOOP 6
+	mov	eax, [esp+8]
+	COLOR_LOOP 7
+	mov	eax, [esp+8]
+	COLOR_LOOP 8
+	mov	eax, [esp+8]
+	COLOR_LOOP 9
+	mov	eax, [esp+8]
+	COLOR_LOOP 10
+
+	add	ecx, 10
 	jne	colorLoop
 
         # End of x loop. Decrement outer loop counter, update row pointers,
