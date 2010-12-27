@@ -264,8 +264,6 @@ colorLoop:
 	COLOR_LOOP 8
 	mov	eax, [esp+8]
 	COLOR_LOOP 9
-	mov	eax, [esp+8]
-	COLOR_LOOP 10
 
 	add	ecx, 10
 	jne	colorLoop
