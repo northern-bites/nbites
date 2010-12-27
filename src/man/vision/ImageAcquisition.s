@@ -65,7 +65,9 @@
         # Fetch next 8 pixels from upper (0) source row, split into y and uv words
         # mm0:  | y30 | y20 | y10 | y00 |
         # mm1:  | v20 | u20 | v00 | u00 |
-	movq    mm0, [esi+(ecx + (\phase * 2))*4]	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 0)
+	mov 	eax, ecx
+	imul	eax, 4
+	movq    mm0, [esi+eax + (\phase * 8)]	# ecx * 2 bytes/pixel * 2 pixels (-320 <= ecx< 0)
         movq    mm1, mm0
         pand    mm0, mm7
         psrlw  	mm1, 8
@@ -73,7 +75,7 @@
         # Fetch next 8 pixels from lower (1) source row, split into y and uv words
         # mm2:  | y31 | y21 | y11 | y01 |
         # mm3:  | v21 | u21 | v01 | u01 |
-        movq    mm2, [esi+(ecx + (\phase * 2))*4+(640*2)]	# row = 640 pixels * 2 bytes per pixel
+        movq    mm2, [esi+eax+ (\phase * 8)+(640*2)]	# row = 640 pixels * 2 bytes per pixel
         movq    mm3, mm2
         pand    mm2, mm7
         psrlw 	mm3, 8
