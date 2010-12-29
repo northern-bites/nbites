@@ -6,6 +6,7 @@
 
 #include "Gradient.h"
 #include "geom/HoughLine.h"
+#include "Profiler.h"
 
 
 /**
@@ -17,7 +18,7 @@
 class HoughSpace
 {
 public:
-    HoughSpace();
+    HoughSpace(boost::shared_ptr<Profiler> p);
     virtual ~HoughSpace() { };
 
     std::list<HoughLine> findLines(boost::shared_ptr<Gradient> g);
@@ -43,13 +44,15 @@ private:                        // Member functions
 private:       // Member variables
     // Hough Space size parameters
     // 256 for full 8 bit angle, width is for 320x240 image
-    enum { R_SPAN = 256,
+    enum { R_SPAN = 400,
            T_SPAN = 256,
-           DEFAULT_ACCEPT_THRESH = 90,
+           DEFAULT_ACCEPT_THRESH = 43,
            DEFAULT_ANGLE_SPREAD  = 5,
            PEAK_POINTS = 4 };
 
+    boost::shared_ptr<Profiler> profiler;
     int acceptThreshold, angleSpread;
+
 
     // allocate an extra T for the smoothing neighborhood
     int hs[R_SPAN][T_SPAN + 1];

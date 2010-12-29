@@ -11,7 +11,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define PROFILE_ACQUIRE
+// #define PROFILE_ACQUIRE
 
 using namespace std;
 

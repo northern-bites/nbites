@@ -96,7 +96,7 @@ class Threshold;  // forward reference
 // Constants pertaining to object detection and horizon detection
 static const int MIN_RUN_SIZE = 5;
 
-static const int DEFAULT_EDGE_VALUE = 50;
+static const int DEFAULT_EDGE_VALUE = 30;
 
 /* The following two constants are used in the traversal of the image
    inside thresholdAndRuns. We start at the bottom left of the image which

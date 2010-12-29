@@ -817,6 +817,10 @@ void Sensors::saveFrame()
 void Sensors::loadFrame(string path)
 {
     fstream fin(path.c_str() , fstream::in);
+    if (fin.fail()){
+        cout << "Frame load failed: " << path << endl;
+        return ;
+    }
 
     lockImage();
     // Load the image from the file, puts it straight into Sensors'

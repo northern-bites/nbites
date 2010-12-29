@@ -167,8 +167,6 @@ Man::processFrame ()
     PROF_EXIT(profiler.get(), P_GETIMAGE);
 
 #ifdef USE_VISION
-    PROF_ENTER(profiler, P_VISION);
-
     // Need to lock image and vision angles for duration of
     // vision processing to ensure consistency.
     sensors->lockVisionAngles();
@@ -178,8 +176,6 @@ Man::processFrame ()
 
     sensors->releaseImage();
     sensors->releaseVisionAngles();
-
-    PROF_EXIT(profiler, P_VISION);
 #endif
 
 #ifdef USE_NOGGIN

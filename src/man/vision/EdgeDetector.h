@@ -3,6 +3,7 @@
 
 #include "VisionDef.h"
 #include "Gradient.h"
+#include "Profiler.h"
 
 #include "boost/shared_ptr.hpp"
 
@@ -14,7 +15,7 @@
 class EdgeDetector
 {
 public:
-    EdgeDetector(int thresh);
+    EdgeDetector(boost::shared_ptr<Profiler> p, int thresh);
     virtual ~EdgeDetector(){ };
 
 /**
@@ -33,6 +34,7 @@ private:
     void findPeaks(boost::shared_ptr<Gradient> gradient);
 
 private:
+    boost::shared_ptr<Profiler> profiler;
     int threshold;
 };
 

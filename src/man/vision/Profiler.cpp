@@ -15,6 +15,16 @@ static const char *PCOMPONENT_NAMES[] = {
   "Runs",
   "Object",
 
+  "Edges",
+  "Sobel",
+  "Edge Peaks",
+
+  "Hough Transform",
+  "Mark Hough Edges",
+  "Smooth",
+  "Hough Peaks",
+  "Suppress",
+
   "Lines",
   "Vert Lines",
   "Hor Lines",
@@ -53,6 +63,16 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 	/*P_FGHORIZON				--> */ P_THRESHRUNS,
 	/*P_RUNS					--> */ P_THRESHRUNS,
 	/*P_OBJECT					--> */ P_VISION,
+
+    /*P_EDGES,                  --> */ P_VISION,
+    /*P_SOBEL,                  --> */ P_EDGES,
+    /*P_EDGE_PEAKS,             --> */ P_EDGES,
+
+    /*P_HOUGH,                  --> */ P_VISION,
+    /*P_MARK_EDGES,             --> */ P_HOUGH,
+    /*P_SMOOTH,                 --> */ P_HOUGH,
+    /*P_HOUGH_PEAKS,            --> */ P_HOUGH,
+    /*P_SUPPRESS,               --> */ P_HOUGH,
 
 	/*P_LINES					--> */ P_VISION,
 	/*P_VERT_LINES,				--> */ P_LINES,
@@ -121,7 +141,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
  */
 
 Profiler::Profiler (long long (*f) ())
-  : timeFunction(f)
+    : timeFunction(f), printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS)
 {
   reset();
 }
@@ -222,6 +242,12 @@ Profiler::printSummary ()
   for (int i = 0; i < NUM_PCOMPONENTS; i++) {
     comp = PCOMPONENT_SUB_ORDER[i];
     parent_sum = (float)sumTime[comp];
+
+    // Don't print those times which are zero, i.e. they weren't run.
+    if ((!printEmpty && sumTime[i] == 0) ||
+        (maxPrintDepth != PRINT_ALL_DEPTHS && depths[i] > maxPrintDepth))
+        continue;
+
     // depth-based indentation
     printf("%*s", depths[i]*2, "");
     if (sumTime[i] == 0)

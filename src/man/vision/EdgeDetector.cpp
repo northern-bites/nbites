@@ -6,7 +6,8 @@
 using boost::shared_ptr;
 using namespace std;
 
-EdgeDetector::EdgeDetector(int thresh) : threshold(thresh)
+EdgeDetector::EdgeDetector(boost::shared_ptr<Profiler> p, int thresh):
+    profiler(p), threshold(thresh)
 {
 
 }
@@ -19,8 +20,10 @@ EdgeDetector::EdgeDetector(int thresh) : threshold(thresh)
 void EdgeDetector::detectEdges(const Channel& channel,
                                shared_ptr<Gradient> gradient)
 {
+    PROF_ENTER(profiler, P_EDGES);
     sobelOperator(channel, gradient);
     findPeaks(gradient);
+    PROF_EXIT(profiler,P_EDGES);
 }
 
 /**
@@ -37,6 +40,7 @@ void EdgeDetector::detectEdges(const Channel& channel,
 void EdgeDetector::sobelOperator(const Channel& channel,
                                  shared_ptr<Gradient> gradient)
 {
+    PROF_ENTER(profiler, P_SOBEL);
     for (int i=1; i < Gradient::rows-1; ++i){
         for (int j=1; j < Gradient::cols-1; ++j) {
 
@@ -65,6 +69,7 @@ void EdgeDetector::sobelOperator(const Channel& channel,
             gradient->mag[i][j] = xGrad * xGrad + yGrad * yGrad;
         }
     }
+    PROF_EXIT(profiler, P_SOBEL);
 }
 
 
@@ -86,6 +91,7 @@ void EdgeDetector::sobelOperator(const Channel& channel,
  */
 void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
 {
+    PROF_ENTER(profiler, P_EDGE_PEAKS);
     // The magnitudes were not square rooted and are rather large
     const int edgeThreshold = (threshold * threshold) << 4;
 
@@ -124,5 +130,6 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
             }
         }
     }
+    PROF_EXIT(profiler, P_EDGE_PEAKS);
 }
 

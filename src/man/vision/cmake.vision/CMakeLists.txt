@@ -245,13 +245,22 @@ ENDIF( VISIONLINK )
 #  ${CORPUS_CMAKE_DIR}
 #  )
 
-add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp ${VISION_INCLUDE_DIR}/test/EdgeDetectorTest.cpp
+########################### VISION TEST EXECUTABLES
+set( VISION_TEST_DIR ${VISION_INCLUDE_DIR}/test)
+add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp ${VISION_TEST_DIR}/EdgeDetectorTest.cpp
   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
-add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp ${VISION_INCLUDE_DIR}/test/HoughSpaceTest.cpp ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
+target_link_libraries( EdgeDetectorTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
+
+
+add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp ${VISION_TEST_DIR}/HoughSpaceTest.cpp ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
-add_executable( ImageAcquisitionTest ${VISION_INCLUDE_DIR}/test/ImageAcquisitionTest.cpp
+target_link_libraries( HoughSpaceTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
+
+
+
+add_executable( ImageAcquisitionTest ${VISION_TEST_DIR}/ImageAcquisitionTest.cpp
   ${VISION_INCLUDE_DIR}/ImageAcquisition.s ${VISION_INCLUDE_DIR}/ColorParams.cpp )
 
 target_link_libraries( ImageAcquisitionTest ${NBCOMMON_LIBRARIES})
@@ -262,3 +271,5 @@ target_link_libraries( OfflineVision ${VISION_TARGET} ${SENSORS_TARGET} ${NBINCL
 enable_testing()
 add_test( EdgeDetectorTest  EdgeDetectorTest )
 add_test( HoughSpaceTest  HoughSpaceTest )
+
+

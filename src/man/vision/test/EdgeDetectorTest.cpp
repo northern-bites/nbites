@@ -7,12 +7,16 @@
 
 #include "boost/shared_ptr.hpp"
 
+#include "Profiler.h"
+
+
 #define BYTE_TO_RAD 128./M_PI
 
 using namespace std;
 using boost::shared_ptr;
 
-EdgeDetectorTest::EdgeDetectorTest() : edges(100)
+EdgeDetectorTest::EdgeDetectorTest() :
+    edges(shared_ptr<Profiler>(new Profiler(&micro_time)), 100)
 {
 
 }

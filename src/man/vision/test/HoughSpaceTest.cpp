@@ -2,6 +2,8 @@
 #include "HoughSpaceTest.h"
 #include <list>
 
+#include "Profiler.h"
+
 
 using namespace std;
 using boost::shared_ptr;
@@ -9,7 +11,8 @@ using boost::shared_ptr;
  // approx. 3 degrees in radians
 const float HoughSpaceTest::ACCEPT_ANGLE = 0.05f;
 
-HoughSpaceTest::HoughSpaceTest() : hs()
+HoughSpaceTest::HoughSpaceTest() :
+    hs(shared_ptr<Profiler>(new Profiler(&micro_time)))
 {
 
 }

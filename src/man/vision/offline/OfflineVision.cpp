@@ -11,14 +11,23 @@
 using namespace std;
 using boost::shared_ptr;
 
-OfflineVision::OfflineVision()
+OfflineVision::OfflineVision(int _iterations, int _first, int _last) :
+    numIterations(_iterations), first(_first), last(_last)
 {
+    assert(last >= first);
     sensors = shared_ptr<Sensors>(new Sensors());
     pose = shared_ptr<NaoPose>(new NaoPose(sensors));
     profiler =
         shared_ptr<Profiler>(new Profiler(micro_time));
 
     vision = new Vision(pose, profiler);
+
+#ifdef USE_TIME_PROFILING
+    profiler->profiling = true;
+    profiler->profileFrames((last-first+1) * numIterations);
+    profiler->printEmpty = false;
+    profiler->maxPrintDepth = 2;
+#endif
 }
 
 OfflineVision::~OfflineVision()
@@ -33,27 +42,21 @@ OfflineVision::~OfflineVision()
  * @note Only works with VERSIONED Nao images and requires that the
  *       images be numbered continuously from first to last
  */
-int OfflineVision::runOnDirectory(std::string path, int first, int last)
+int OfflineVision::runOnDirectory(std::string path)
 {
-    assert(last >= first);
     cout << "Running vision processing on " << path << endl;
 
-    long long int t0;
-    long long int runTime = 0;
-    for (int i = first; i <= last; ++i){
-        stringstream framePath;
-        framePath << path << "/" << i << ".NBFRM";
-        sensors->loadFrame(framePath.str());
+    for (int c=0; c < numIterations; ++c){
+        for (int i = first; i <= last; ++i){
+            stringstream framePath;
+            framePath << path << "/" << i << ".NBFRM";
+            sensors->loadFrame(framePath.str());
 
-        // We only want to time the vision processing, not the frame loading
-        t0 = micro_time();
-        vision->notifyImage(sensors->getImage());
-        runTime += micro_time() - t0;
+            vision->notifyImage(sensors->getImage());
+            PROF_NFRAME(profiler);
+        }
     }
-    cout << "Total Run time was: " << runTime << endl;
-    // Runs from first -> last inclusive, so must add 1
-    cout << "Average Run time was: " << runTime/(last-first+1) << endl;
-
+    PROF_NFRAME(profiler);
     cout << endl;
     return 0;
 }
@@ -66,11 +69,19 @@ void printUsage()
 
 int main(int argv, char * argc[])
 {
-    if (argv != 4){
+    if (argv < 4){
         printUsage();
         return 1;
     }
 
-    OfflineVision * off = new OfflineVision();
-    return off->runOnDirectory(argc[1], atoi(argc[2]), atoi(argc[3]));
+    int numIterations;
+    if (argv == 4){
+        numIterations = 1;
+    } else {
+        numIterations = atoi(argc[4]);
+    }
+
+    OfflineVision * off = new OfflineVision(numIterations,
+                                            atoi(argc[2]), atoi(argc[3]));
+    return off->runOnDirectory(argc[1]);
 }

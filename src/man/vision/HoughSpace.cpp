@@ -6,8 +6,10 @@ using boost::shared_ptr;
 const int HoughSpace::drTab[PEAK_POINTS] = {  1,  1,  0, -1 };
 const int HoughSpace::dtTab[PEAK_POINTS] = {  0,  1,  1,  1 };
 
-HoughSpace::HoughSpace() : acceptThreshold(DEFAULT_ACCEPT_THRESH),
-                           angleSpread(DEFAULT_ANGLE_SPREAD)
+HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
+    profiler(p),
+    acceptThreshold(DEFAULT_ACCEPT_THRESH),
+    angleSpread(DEFAULT_ANGLE_SPREAD)
 {
 
 }
@@ -18,6 +20,7 @@ HoughSpace::HoughSpace() : acceptThreshold(DEFAULT_ACCEPT_THRESH),
  */
 list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
 {
+    PROF_ENTER(profiler, P_HOUGH);
     reset();
     markEdges(g);
     smooth();
@@ -27,6 +30,8 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
     int y0 = static_cast<int>(Gradient::rows/2);
 
     suppress(x0, y0, lines);
+
+    PROF_EXIT(profiler, P_HOUGH);
     return lines;
 }
 
@@ -36,6 +41,7 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
  */
 void HoughSpace::markEdges(shared_ptr<Gradient> g)
 {
+    PROF_ENTER(profiler, P_MARK_EDGES);
     const int height = Gradient::rows;
     const int width  = Gradient::cols;
     const int x0     = width/2;
@@ -53,7 +59,7 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
             }
         }
     }
-
+    PROF_EXIT(profiler, P_MARK_EDGES);
 }
 
 /**
@@ -98,6 +104,7 @@ int HoughSpace::getR(int x, int y, int t)
  */
 void HoughSpace::smooth()
 {
+    PROF_ENTER(profiler, P_SMOOTH);
     // Make a copy of the row t=0 at t=T_SPAN. t=0 and t=T_SPAN-1 are
     // neighbors in the cylindrical Hough Space, but t=0 gets written
     // over before T=T_SPAN - 1 is smoothed so we copy it now.
@@ -112,6 +119,7 @@ void HoughSpace::smooth()
                 hs[r][t + 1] + hs[r + 1][t + 1];
         }
     }
+    PROF_EXIT(profiler, P_SMOOTH);
 }
 
 /**
@@ -119,6 +127,7 @@ void HoughSpace::smooth()
  */
 list<HoughLine> HoughSpace::peaks()
 {
+    PROF_ENTER(profiler, P_HOUGH_PEAKS);
     int thresh = 4 * acceptThreshold; // smoothing has a gain of 4
 
     list<HoughLine> lines;
@@ -143,6 +152,7 @@ list<HoughLine> HoughSpace::peaks()
             }
         }
     }
+    PROF_EXIT(profiler, P_HOUGH_PEAKS);
     return lines;
 }
 
@@ -151,6 +161,7 @@ list<HoughLine> HoughSpace::peaks()
  */
 void HoughSpace::suppress(int x0, int y0, list<HoughLine>& lines)
 {
+    PROF_ENTER(profiler, P_SUPPRESS);
     bool toDelete[lines.size()];
     for (unsigned int i = 0; i < lines.size(); ++i) {
         toDelete[i] = false;
@@ -199,7 +210,9 @@ void HoughSpace::suppress(int x0, int y0, list<HoughLine>& lines)
         }
         i++;
     }
+    PROF_EXIT(profiler, P_SUPPRESS);
 }
+
 
 /**
  * Reset the accumulator and peak arrays to their initial values.

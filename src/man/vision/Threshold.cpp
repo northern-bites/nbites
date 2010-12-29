@@ -75,7 +75,8 @@ using boost::shared_ptr;
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     : vision(vis), pose(posPtr),
-      edgeDetector(DEFAULT_EDGE_VALUE), hough(), gradient()
+      edgeDetector(vision->profiler,DEFAULT_EDGE_VALUE),
+      hough(vision->profiler), gradient()
 {
 
     // loads the color table on the MS into memory
@@ -130,18 +131,18 @@ void Threshold::visionLoop() {
     // vision->fieldLines->lineLoop();
     // PROF_EXIT(vision->profiler, P_LINES);
     // do recognition
-    PROF_ENTER(vision->profiler, P_OBJECT);
-    objectRecognition();
-    PROF_EXIT(vision->profiler, P_OBJECT);
+    // PROF_ENTER(vision->profiler, P_OBJECT);
+    // objectRecognition();
+    // PROF_EXIT(vision->profiler, P_OBJECT);
 
     // vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
-    if (vision->bgCrossbar->getWidth() > 0) {
-        setShot(vision->bgCrossbar);
-    }
-    if (vision->ygCrossbar->getWidth() > 0) {
-        setShot(vision->ygCrossbar);
-    }
+    // if (vision->bgCrossbar->getWidth() > 0) {
+    //     setShot(vision->bgCrossbar);
+    // }
+    // if (vision->ygCrossbar->getWidth() > 0) {
+    //     setShot(vision->ygCrossbar);
+    // }
     // for now we also don't use open field information
     //field->openDirection(horizon, pose.get());
 
@@ -180,9 +181,9 @@ void Threshold::thresholdAndRuns() {
     PROF_EXIT(vision->profiler, P_FGHORIZON);
 
     // 'Run' up the image to find color-grouped pixel sequences
-    PROF_ENTER(vision->profiler, P_RUNS);
-    runs();
-    PROF_EXIT(vision->profiler, P_RUNS);
+    // PROF_ENTER(vision->profiler, P_RUNS);
+    // runs();
+    // PROF_EXIT(vision->profiler, P_RUNS);
 
     PROF_EXIT(vision->profiler, P_THRESHRUNS);
 }
