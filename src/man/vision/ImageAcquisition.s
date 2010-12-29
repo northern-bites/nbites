@@ -138,7 +138,7 @@
 	## Pack results from all 4 phases together, result is:
 	## mm4: | y7 | y6 | y5 | y4 | y3 | y2 | y1 | y0 |
 	packuswb mm4, mm5
-	movq	[edi+ecx], mm4
+	movntq	[edi+ecx], mm4
 	.endif
 
 	##
@@ -168,7 +168,7 @@
 
 	## Write color address for 2 pixels to the stack, we'll look
 	## it up in the table later
-	movq	[esp + 1280 + 8 + 4 + eax + \phase * 8], mm0
+	movntq	[esp + 1280 + 8 + 4 + eax + \phase * 8], mm0
 .endm
 
 # acquire_image arguments ( byte* colorTable, ColorParams* params, byte* yuvImage, byte* outputImage)
