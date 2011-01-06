@@ -110,6 +110,10 @@ void Context::identifyCorners(list <VisualCorner> &corners)
         list <VisualCorner>::iterator one = corners.begin();
         if (one->getShape() == INNER_L) {
             classifyInnerL(*one);
+        } else if (one->getShape() == OUTER_L) {
+            classifyOuterL(*one);
+        } else if (one->getShape() == T) {
+            classifyT(*one);
         }
     }
 
@@ -128,6 +132,7 @@ void Context::identifyCorners(list <VisualCorner> &corners)
             cout << endl << "Before identification: Corner: "
                  << endl << "\t" << *i << endl;
 			cout << "     Shape info: " << i->getSecondaryShape() << endl;
+            cout << "     Orientation: " << i->getOrientation() << endl;
         }
 
         const list <const ConcreteCorner*> possibleClassifications =
@@ -187,18 +192,23 @@ void Context::identifyCorners(list <VisualCorner> &corners)
 
             // If either of the lines forming the corner are cc lines, then
             // the corner must be a cc intersection
+            /* THis should have been done before
             if (i->getShape() == CIRCLE ||
                 i->getLine1()->getCCLine() ||
                 i->getLine2()->getCCLine()) {
+                if (debugIdentifyCorners) {
+                    cout << "Turning corner into circle" << endl;
+                }
                 i->setPossibleCorners(ConcreteCorner::ccCorners());
                 i->setShape(CIRCLE);
-            } else {
+                } else {
                 i->setPossibleCorners(possibleClassifications);
-				i->identifyLinesInCorner();
-            }
-            if (debugIdentifyCorners) {
+                i->identifyLinesInCorner();
+                if (debugIdentifyCorners) {
                 printPossibilities(i->getPossibleCorners());
-            }
+                }*/
+            i->setPossibleCorners(possibleClassifications);
+            i->identifyLinesInCorner();
             ++i;
         }
     }
@@ -233,11 +243,7 @@ void Context::checkForSidelineInformation(list<VisualCorner> &corners) {
 			// really long TStems indicate that we have a center T
 			// in this particular case sometimes we should be able to absolutely
 			// identify the T - if the stem is pointing relatively left or right
-			if (i->getTStem()->getLength() > 2 * GOALBOX_DEPTH) {
-                if (debugIdentifyCorners) {
-                    cout << "Setting to center with length " <<
-                        i->getTStem()->getLength() << endl;
-                }
+            if (realLineDistance(i->getTStem()) > 1.5 * GOALBOX_DEPTH) {
 				i->setSecondaryShape(SIDE_T);
                 if (face == FACING_UNKNOWN) {
                     if (debugIdentifyCorners) {
@@ -292,6 +298,172 @@ void Context::checkForConnectedCorners(list<VisualCorner> &corners) {
     }
 }
 
+/** If we have a single T corner we can often glean a lot of information
+    about what it might be - especially if it is connected to a field object.
+ */
+void Context::classifyT(VisualCorner & first) {
+    float l1 = realLineDistance(first.getTStem());
+    float l2 = realLineDistance(first.getTBar());
+    if (l1 > 2 * GOALBOX_DEPTH) {
+        if (face == FACING_BLUE_GOAL) {
+            if (first.doesItPointRight()) {
+                first.setSecondaryShape(CENTER_T_BOTTOM);
+            } else {
+                first.setSecondaryShape(CENTER_T_TOP);
+            }
+        } else if (face == FACING_YELLOW_GOAL) {
+            if (first.doesItPointRight()) {
+                first.setSecondaryShape(CENTER_T_TOP);
+            } else {
+                first.setSecondaryShape(CENTER_T_BOTTOM);
+            }
+        } else {
+            first.setSecondaryShape(SIDE_T);
+            face = FACING_SIDELINE;
+        }
+    } else {
+        if (face == FACING_BLUE_GOAL) {
+            // This could be made more robust
+            if (first.getX() > objectRightX) {
+                first.setSecondaryShape(LEFT_GOAL_BLUE_T);
+            } else {
+                first.setSecondaryShape(RIGHT_GOAL_BLUE_T);
+            }
+        } else if (face == FACING_YELLOW_GOAL) {
+            if (first.getX() > objectRightX) {
+                first.setSecondaryShape(LEFT_GOAL_YELLOW_T);
+            } else {
+                first.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
+            }
+        } else if (l2 * 2 > FIELD_HEIGHT) {
+            first.setSecondaryShape(SIDE_T);
+        }
+    }
+}
+
+/** If we have a single OUTER_L corner we can often glean a lot of information
+    about what it might be - especially if it is connected to a field object.
+    Our main goal here is to see if we can tell if it is a left or a right
+    corner.
+ */
+void Context::classifyOuterL(VisualCorner & first) {
+    float l1 = realLineDistance(first.getLine1());
+    float l2 = realLineDistance(first.getLine2());
+    if (debugIdentifyCorners) {
+        cout << "Lines " << l1 << " " << l2 << endl;
+    }
+    // eventually we should be able to figure some stuff out anyway
+    // but let's get the low-hanging fruit first
+    if (l1 < 1.5 * GOALBOX_DEPTH && l2 < 1.5 * GOALBOX_DEPTH) {
+        return;
+    } else if (l1 > 1.5 * GOALBOX_DEPTH && l2 > 1.5 * GOALBOX_DEPTH &&
+               !sameHalf) {
+        // our "L" is actually a T unfortunately it isn't set up right
+        first.setShape(T);
+        first.setSecondaryShape(SIDE_T);
+        return;
+    }
+    bool line1IsLonger = l1 > l2;
+    bool pointsMostlyUp = abs(first.getOrientation()) < 45.0;
+    if (!pointsMostlyUp) {
+        // determine which endpoint is higher up on screen
+        int line1YMax = first.getLine1()->getTopEndpoint().y;
+        if (abs(first.getLine1()->getTopEndpoint().y - first.getY()) <
+            abs(first.getLine1()->getBottomEndpoint().y - first.getY())) {
+            line1YMax = first.getLine1()->getBottomEndpoint().y;
+        }
+        int line2YMax = first.getLine2()->getTopEndpoint().y;
+        if (abs(first.getLine2()->getTopEndpoint().y - first.getY()) <
+            abs(first.getLine2()->getBottomEndpoint().y - first.getY())) {
+            line2YMax = first.getLine2()->getBottomEndpoint().y;
+        }
+        bool line1IsUp = line1YMax < line2YMax;
+        if (abs(line1YMax-line2YMax) < 5) {
+            line1IsUp = first.getLine1()->getAngle() >
+                first.getLine2()->getAngle();
+        }
+        bool topIsLonger = ((line1IsUp && line1IsLonger) ||
+                            (!line1IsUp && !line1IsLonger));
+        if (debugIdentifyCorners) {
+            cout << "Single Outer L" << endl;
+            cout << "Line1: " << l1 << " " << line1YMax << endl;
+            cout << "Line2: " << l2 << " " << line2YMax << endl;
+            cout << "angles " << first.getLine1()->getAngle() <<
+                " " << first.getLine2()->getAngle() << endl;
+            if (first.doesItPointRight()) {
+                cout << "Corner points to the right" << endl;
+            } else {
+                cout << "Corner points to the left" << endl;
+            }
+            if (topIsLonger) {
+                cout << "Top is longer " << endl;
+            } else {
+                cout << "Bottom is longer " << endl;
+            }
+        }
+        bool left;
+        if (first.doesItPointRight()) {
+            if (topIsLonger) {
+                first.setSecondaryShape(LEFT_GOAL_L);
+                left = true;
+            } else {
+                first.setSecondaryShape(RIGHT_GOAL_L);
+                left = false;
+            }
+        } else {
+            if (topIsLonger) {
+                first.setSecondaryShape(RIGHT_GOAL_L);
+                left = false;
+            } else {
+                first.setSecondaryShape(LEFT_GOAL_L);
+                left = true;
+            }
+        }
+        if (face == FACING_BLUE_GOAL) {
+            if (left) {
+                first.setSecondaryShape(LEFT_GOAL_BLUE_L);
+            } else {
+                first.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+            }
+        } else if (face == FACING_YELLOW_GOAL) {
+            if (left) {
+                first.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+            } else {
+                first.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+            }
+        }
+    }
+}
+
+/** We have identified an innerl as a field corner.  Set it accordingly
+ *  based on other information like whether we see goals or not.
+ */
+void Context::setFieldCorner(VisualCorner & corner) {
+    corner.setSecondaryShape(CORNER_L);
+    switch (face) {
+    case FACING_BLUE_GOAL:
+        if (objectRightX > -1 && objectRightX < IMAGE_WIDTH) {
+            if (corner.getX() < objectRightX) {
+                corner.setSecondaryShape(BLUE_GOAL_BOTTOM);
+            } else {
+                corner.setSecondaryShape(BLUE_GOAL_TOP);
+            }
+        }
+        break;
+    case FACING_YELLOW_GOAL:
+        if (objectRightX > -1 && objectRightX < IMAGE_WIDTH) {
+            if (corner.getX() < objectRightX) {
+                corner.setSecondaryShape(YELLOW_GOAL_TOP);
+            } else {
+                corner.setSecondaryShape(YELLOW_GOAL_BOTTOM);
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 /** If we have a single INNER_L corner we can often glean a lot of information
     about what it might be - especially if it is connected to a field object.
     Things we can check:
@@ -300,12 +472,37 @@ void Context::checkForConnectedCorners(list<VisualCorner> &corners) {
           How long are the lines in the corner?
  */
 void Context::classifyInnerL(VisualCorner & first) {
+    float l1 = realLineDistance(first.getLine1());
+    float l2 = realLineDistance(first.getLine2());
+    int horizon = field->horizonAt(first.getX());
+    float dist = realDistance(first.getX(), first.getY(), first.getX(), horizon);
+
     // punt (for now) when we can be sure about what we see
     if (!seeGoalBoxLines && face == FACING_UNKNOWN) {
+        // if both lines are long then its a corner
+        if (l1 > GOALBOX_DEPTH * 1.5 && l2 > GOALBOX_DEPTH * 1.5) {
+            if (debugIdentifyCorners) {
+                cout << "Classifying InnerL as Field Corner " << l1 <<
+                    " " << l2 << endl;
+            }
+            setFieldCorner(first);
+            return;
+        }
+        if (debugIdentifyCorners) {
+            cout << "Lone InnerL, Distance to horizon is " << dist << endl;
+            cout << "      " << horizon << " " << first.getY() << endl;
+            cout << "Lengths: " << l1 << " " << l2 << endl;
+        }
         return;
     }
-    float l1 = first.getLine1()->getLength();
-    float l2 = first.getLine2()->getLength();
+    // Watch out for seeing a corner, but a part of goalbox too, but
+    // the T of the goalbox is too close to edge to recognize
+    // replace 70 with GREEN_PAD_X
+    if (dist < 70.0 * 2.0 && first.getDistance() > 175) {
+        // could indicate this is actually a corner
+        // punt for now
+        return;
+    }
     int l1x1 = first.getLine1()->getLeftEndpoint().x;
     int l2x1 = first.getLine2()->getLeftEndpoint().x;
     int l1y1, l2y1;
@@ -324,32 +521,13 @@ void Context::classifyInnerL(VisualCorner & first) {
     // determine which endpoint is higher up on screen
     bool l1IsHigher = l1y1 < l2y1;
     bool l1IsLonger = l1 > l2;
-    if (debugIdentifyCorners) {
-        if (l1IsLeft) {
-            cout << "The left line has length " << l1 <<
-                " the right " << l2 << endl;
-            if (l1IsHigher) {
-                cout << "The left line is higher up" << endl;
-            } else {
-                cout << "The right line is higher up" << endl;
-            }
-        } else {
-            cout << "The left line has length " << l2 <<
-                " the right " << l1 << endl;
-            if (l1IsHigher) {
-                cout << "The right line is higher up" << endl;
-            } else {
-                cout << "The left line is higher up" << endl;
-            }
-        }
-    }
     // determine general facing
     if (face == FACING_UNKNOWN) {
         // we have one corner and no field objects
         first.setSecondaryShape(GOAL_L);
         // now see if we can figure out exactly which L
         if (l1IsLonger) {
-            if (l1 > 2.5 * GOALBOX_DEPTH) {
+            if (l1 > 1.5 * GOALBOX_DEPTH) {
                 // we have enough information - is big line to left or right?
                 if (l1IsLeft) {
                     first.setSecondaryShape(RIGHT_GOAL_L);
@@ -357,7 +535,7 @@ void Context::classifyInnerL(VisualCorner & first) {
                     first.setSecondaryShape(LEFT_GOAL_L);
                 }
             }
-        } else if (l2 > 2 * GOALBOX_DEPTH) {
+        } else if (l2 > 1.5 * GOALBOX_DEPTH) {
             if (!l1IsLeft) {
                 first.setSecondaryShape(RIGHT_GOAL_L);
             } else {
@@ -367,7 +545,8 @@ void Context::classifyInnerL(VisualCorner & first) {
     } else {
         shape leftColor = LEFT_GOAL_YELLOW_L;
         shape rightColor = RIGHT_GOAL_YELLOW_L;
-        if (face == FACING_BLUE_GOAL) {
+        if ((face == FACING_BLUE_GOAL && sameHalf) ||
+            (face == FACING_YELLOW_GOAL && !sameHalf)) {
             leftColor = LEFT_GOAL_BLUE_L;
             rightColor = RIGHT_GOAL_BLUE_L;
         }
@@ -451,8 +630,8 @@ void Context::unconnectedInnerLs(VisualCorner & inner, VisualCorner & outer) {
  */
 void Context::findUnconnectedCornerRelationship(VisualCorner & first,
                                                 VisualCorner & second) {
-    VisualCorner* inner;
-    VisualCorner* outer;
+    VisualCorner* inner = &first;
+    VisualCorner* outer = &second;
     cout << "Testing non connected" << endl;
     if (first.getShape() == INNER_L) {
         if (second.getShape() == OUTER_L) {
@@ -477,25 +656,28 @@ void Context::findUnconnectedCornerRelationship(VisualCorner & first,
     } else {
         return;
     }
-    // if both of the endpoints of the outerl are on the same side of the corner
-    // then this is easy
-    int left1 = outer->getLine1()->getLeftEndpoint().x;
-    int left2 = outer->getLine2()->getLeftEndpoint().x;
-    int right1 = outer->getLine1()->getRightEndpoint().x;
-    int right2 = outer->getLine2()->getRightEndpoint().x;
-    int cx = outer->getLocation().x;
-    if (left1 < cx && left2 < cx) {
+    // check the orientation of the outer-l
+    if (outer->doesItPointRight()) {
         inner->setSecondaryShape(RIGHT_GOAL_CORNER);
-        outer->setSecondaryShape(RIGHT_GOAL_L);
+        if (face == FACING_BLUE_GOAL) {
+            outer->setSecondaryShape(RIGHT_GOAL_BLUE_L);
+        } else if (face == FACING_YELLOW_GOAL) {
+            outer->setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+        } else {
+            outer->setSecondaryShape(RIGHT_GOAL_L);
+        }
         return;
-    } else if (right1 > cx && right2 > cx) {
+    } else {
         inner->setSecondaryShape(LEFT_GOAL_CORNER);
-        outer->setSecondaryShape(LEFT_GOAL_L);
+        if (face == FACING_BLUE_GOAL) {
+            outer->setSecondaryShape(LEFT_GOAL_BLUE_L);
+        } else if (face == FACING_YELLOW_GOAL) {
+            outer->setSecondaryShape(LEFT_GOAL_YELLOW_L);
+        } else {
+            outer->setSecondaryShape(LEFT_GOAL_L);
+        }
         return;
     }
-    // when we get orientation information we'll be able to do better than this
-    inner->setSecondaryShape(CORNER_L);
-    outer->setSecondaryShape(GOAL_L);
 }
 
 /** Given two corners that we know are connected, explore to find out the
@@ -526,18 +708,40 @@ void Context::findCornerRelationship(VisualCorner & first, VisualCorner & second
             }
             if (second.getShape() == T) {
                 // T to T, one is almost certainly the center circle
+                // need a check to make sure both don't have long stems
                 if (common == first.getTStem()) {
-                    if (first.getTStem()->getLength() > GOALBOX_DEPTH * 2) {
-                        first.setSecondaryShape(SIDE_T);
-                        second.setShape(CIRCLE);
+                    if (realLineDistance(first.getTStem()) > GOALBOX_DEPTH * 1.5) {
+                        classifyT(first);
+                        if (first.getSecondaryShape() == CENTER_T_TOP) {
+                            second.setSecondaryShape(CENTER_CIRCLE_TOP);
+                        } else if (first.getSecondaryShape() == CENTER_T_BOTTOM) {
+                            second.setSecondaryShape(CENTER_CIRCLE_BOTTOM);
+                        } else {
+                            second.setShape(CIRCLE);
+                        }
                         tCorner--;
                     }
                 } else {
-                    if (second.getTStem()->getLength() > GOALBOX_DEPTH * 2) {
+                    if (realLineDistance(second.getTStem()) > GOALBOX_DEPTH * 1.5) {
                         second.setSecondaryShape(SIDE_T);
-                        first.setShape(CIRCLE);
+                        classifyT(second);
+                        if (second.getSecondaryShape() == CENTER_T_TOP) {
+                            first.setSecondaryShape(CENTER_CIRCLE_TOP);
+                        } else if (second.getSecondaryShape() == CENTER_T_BOTTOM) {
+                            first.setSecondaryShape(CENTER_CIRCLE_BOTTOM);
+                        } else {
+                            second.setShape(CIRCLE);
+                        }
                         tCorner--;
                     }
+                }
+            } else if (second.getShape() == CIRCLE) {
+                // we have a side T - classify the T, see if it helps
+                classifyT(first);
+                if (first.getSecondaryShape() == CENTER_T_TOP) {
+                    second.setSecondaryShape(CENTER_CIRCLE_TOP);
+                } else if (first.getSecondaryShape() == CENTER_T_BOTTOM) {
+                    second.setSecondaryShape(CENTER_CIRCLE_BOTTOM);
                 }
             }
 			return;
@@ -551,11 +755,13 @@ void Context::findCornerRelationship(VisualCorner & first, VisualCorner & second
             if (debugIdentifyCorners) {
                 cout << "T to something weird" << endl;
             }
+            second.setSecondaryShape(SIDE_T);
             return;
         }
     } else {
         if (debugIdentifyCorners) {
-            cout << "Two non T corners with common length " << common->getLength() << endl;
+            cout << "Two non T corners with common length " <<
+                realLineDistance(common) << endl;
         }
         // it is likely that one of the corners is actually a T
         return;
@@ -567,7 +773,7 @@ void Context::findCornerRelationship(VisualCorner & first, VisualCorner & second
         // looks very good - ultimately we should check line length too
         if (debugIdentifyCorners) {
             cout << "T connect to an L, should be goal box " <<
-                t->getTStem()->getLength() << endl;
+                realLineDistance(t->getTStem()) << " " << l1->getX() << endl;
         }
         // can we determine which side?
         if (l1->getShape() == OUTER_L) {
@@ -583,40 +789,71 @@ void Context::findCornerRelationship(VisualCorner & first, VisualCorner & second
                 left = l1->getLine1()->getLeftEndpoint();
                 right = l1->getLine1()->getRightEndpoint();
             }
-            // unfortunately the tendpoint doesn't always equal the corner
+            // unfortunately the t-endpoint doesn't always equal the corner
             int close = abs(left.x - tpoint.x) + abs(left.y - tpoint.y);
             int close2 = abs(right.x - tpoint.x) + abs(right.y - tpoint.y);
             if (close > close2) {
                 // Line goes to right of T
-                l1->setSecondaryShape(LEFT_GOAL_L);
-                t->setSecondaryShape(LEFT_GOAL_T);
+                if (face == FACING_BLUE_GOAL) {
+                    l1->setSecondaryShape(LEFT_GOAL_BLUE_L);
+                    t->setSecondaryShape(LEFT_GOAL_BLUE_T);
+                } else if (face == FACING_YELLOW_GOAL) {
+                    l1->setSecondaryShape(LEFT_GOAL_YELLOW_L);
+                    t->setSecondaryShape(LEFT_GOAL_YELLOW_T);
+                } else {
+                    l1->setSecondaryShape(LEFT_GOAL_L);
+                    t->setSecondaryShape(LEFT_GOAL_T);
+                }
             } else {
-                l1->setSecondaryShape(RIGHT_GOAL_L);
-                t->setSecondaryShape(RIGHT_GOAL_T);
+                if (face == FACING_BLUE_GOAL) {
+                    l1->setSecondaryShape(RIGHT_GOAL_BLUE_L);
+                    t->setSecondaryShape(RIGHT_GOAL_BLUE_T);
+                } else if (face == FACING_YELLOW_GOAL) {
+                    l1->setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+                    t->setSecondaryShape(RIGHT_GOAL_YELLOW_T);
+                } else {
+                    l1->setSecondaryShape(RIGHT_GOAL_L);
+                    t->setSecondaryShape(RIGHT_GOAL_T);
+                }
             }
         }
     } else {
         if (debugIdentifyCorners) {
             cout << "T connect to an L should be goal line to corner " <<
-                t->getTBar()->getLength() << endl;
+                realLineDistance(t->getTBar()) << endl;
         }
 		l1->setSecondaryShape(CORNER_L);
         if (lCorner > 1) {
             // we should be able to narrow the choices down to 2
             // compare the location of the L corner to the T corner
             if (l1->getX() < t->getX()) {
-                l1->setSecondaryShape(RIGHT_GOAL_CORNER);
-                t->setSecondaryShape(RIGHT_GOAL_T);
+                if (face == FACING_BLUE_GOAL) {
+                    t->setSecondaryShape(RIGHT_GOAL_BLUE_T);
+                    l1->setSecondaryShape(BLUE_GOAL_BOTTOM);
+                } else if (face == FACING_YELLOW_GOAL) {
+                    t->setSecondaryShape(RIGHT_GOAL_YELLOW_T);
+                    l1->setSecondaryShape(YELLOW_GOAL_TOP);
+                } else {
+                    t->setSecondaryShape(RIGHT_GOAL_T);
+                    l1->setSecondaryShape(RIGHT_GOAL_CORNER);
+                }
             } else {
-                l1->setSecondaryShape(LEFT_GOAL_CORNER);
-                t->setSecondaryShape(LEFT_GOAL_T);
+                if (face == FACING_BLUE_GOAL) {
+                    t->setSecondaryShape(LEFT_GOAL_BLUE_T);
+                    l1->setSecondaryShape(BLUE_GOAL_TOP);
+                } else if (face == FACING_YELLOW_GOAL) {
+                    t->setSecondaryShape(LEFT_GOAL_YELLOW_T);
+                    l1->setSecondaryShape(YELLOW_GOAL_BOTTOM);
+                } else {
+                    l1->setSecondaryShape(LEFT_GOAL_CORNER);
+                    t->setSecondaryShape(LEFT_GOAL_T);
+                }
             }
         } else {
             // check length  -- it its REALLY long to corner then we know
             // its a sideline T
             float dist = getEstimatedDistance(l1->getDistance(), l1->getBearing(),
                                               t->getDistance(), t->getBearing());
-            cout << "Distance " << dist << endl;
             // figure out if lcorner is left or right of T
             bool left = false;
             if (t->getLocation().x < l1->getLocation().x) {
@@ -679,20 +916,313 @@ const list<const ConcreteCorner*> Context::classifyCornerWithObjects(
     }
 
 	// Get all the possible corners given the shape of the corner
-	list<const ConcreteCorner*> possibleClassifications =
-        compareObjsCorners(corner, possibleCorners, visibleObjects);
+	list<const ConcreteCorner*> possibleClassifications;
+    switch(corner.getShape()) {
+    case T:
+        possibleClassifications =
+            compareObjsT(corner, possibleCorners, visibleObjects);
+        break;
+    case OUTER_L:
+        possibleClassifications =
+            compareObjsOuterL(corner, possibleCorners, visibleObjects);
+        break;
+    case INNER_L:
+        possibleClassifications =
+            compareObjsInnerL(corner, possibleCorners, visibleObjects);
+        break;
+    default:
+        possibleClassifications =
+            compareObjsCorners(corner, possibleCorners, visibleObjects);
+        break;
+    }
 
 	// If we found nothing that time, try again with all the corners to
 	// see if possibly the corner was misidentified (e.g. saw an L, but
 	// actually a T)
 	if (possibleClassifications.empty()){
 
-		possibleCorners = ConcreteCorner::concreteCorners();
-		possibleClassifications =
-			compareObjsCorners(corner, possibleCorners, visibleObjects);
+		//possibleCorners = ConcreteCorner::concreteCorners();
+		//possibleClassifications =
+		//	compareObjsCorners(corner, possibleCorners, visibleObjects);
+        if (possibleClassifications.empty()) {
+            // reset to the best we've got
+            possibleCorners =
+                ConcreteCorner::getPossibleCorners(corner.getShape(),
+                                                   corner.getSecondaryShape());
+            list<const ConcreteCorner*> classification;
+            vector<const ConcreteCorner*>::const_iterator j =
+                possibleCorners.begin();
+            for (; j != possibleCorners.end(); ++j) {
+                classification.push_back(*j);
+            }
+            return classification;
+        }
 	}
 
     return possibleClassifications;
+}
+
+// Given a list of concrete corners that the Outer_L could possibly be,
+// weeds out the bad ones based on distances to visible objects and returns
+// those that are still in the running.
+list <const ConcreteCorner*> Context::compareObjsOuterL(
+	const VisualCorner& corner,
+	const vector<const ConcreteCorner*>& possibleCorners,
+	const vector<const VisualFieldObject*>& visibleObjects) const
+{
+	list<const ConcreteCorner*> possibleClassifications;
+
+    // For each field object that we see, calculate its real distance to
+    // each possible concrete corner and compare with the visual estimated
+    // distance. If it fits, add it to the list of possibilities.
+    vector<const ConcreteCorner*>::const_iterator j =
+        possibleCorners.begin();
+
+    for (; j != possibleCorners.end(); ++j) {
+		bool isOk = true;
+        for (vector <const VisualFieldObject*>::const_iterator k =
+                 visibleObjects.begin(); k != visibleObjects.end() && isOk; ++k) {
+
+            if (face == FACING_BLUE_GOAL) {
+                if ((*j)->getID() == YELLOW_GOAL_LEFT_L ||
+                    (*j)->getID() == YELLOW_GOAL_RIGHT_L) {
+                    isOk = false;
+                    continue;
+                }
+            } else if (face == FACING_YELLOW_GOAL) {
+                if ((*j)->getID() == BLUE_GOAL_LEFT_L ||
+                    (*j)->getID() == BLUE_GOAL_RIGHT_L) {
+                    isOk = false;
+                    continue;
+                }
+            }
+            const float estimatedDistance = getEstimatedDistance(&corner, *k);
+            const float distanceToCorner = corner.getDistance();
+			// The visual object might be abstract, so we should check
+			// all of its possible objects to see if we're close enough to one
+			// and add all the possibilities up.
+			list<const ConcreteFieldObject*>::const_iterator i =
+				(*k)->getPossibleFieldObjects()->begin();
+
+			bool close = false;
+			for (int p = 0; i != (*k)->getPossibleFieldObjects()->end() && !close; ++i, ++p) {
+
+				if (arePointsCloseEnough(estimatedDistance, *j, *k,
+										 distanceToCorner, p)) {
+					close = true;
+                }
+            }
+			// if the corner wasn't close enough to any possible object
+			if (!close) {
+				isOk = false;
+			}
+		}
+		// if we made it through all possible field objects
+		if (isOk) {
+			possibleClassifications.push_back(*j);
+			if (debugIdentifyCorners) {
+				cout << "Corner is possibly a " << (*j)->toString() << endl;
+			}
+		}
+	}
+	return possibleClassifications;
+}
+
+// Given a list of concrete corners that the visual corner could possibly be,
+// weeds out the bad ones based on distances to visible objects and returns
+// those that are still in the running.
+list <const ConcreteCorner*> Context::compareObjsT(
+	const VisualCorner& corner,
+	const vector<const ConcreteCorner*>& possibleCorners,
+	const vector<const VisualFieldObject*>& visibleObjects) const
+{
+	list<const ConcreteCorner*> possibleClassifications;
+
+    // For each field object that we see, calculate its real distance to
+    // each possible concrete corner and compare with the visual estimated
+    // distance. If it fits, add it to the list of possibilities.
+    vector<const ConcreteCorner*>::const_iterator j =
+        possibleCorners.begin();
+
+    // Note: changed the order of the loops 12/3/2010 so we can check
+    // every object against the corner instead of just finding one good one
+    for (; j != possibleCorners.end(); ++j) {
+		bool isOk = true;
+        for (vector <const VisualFieldObject*>::const_iterator k =
+                 visibleObjects.begin(); k != visibleObjects.end() && isOk; ++k) {
+
+            const float estimatedDistance = getEstimatedDistance(&corner, *k);
+            // if we have a T corner and a goal post, then we can determine which
+            // one it is definitely - look at whether the Stem is going up or down
+            // if it is down (normal case) just look at whether T is left or right
+            // if it is up, then reverse the results because you are over the endline
+            // Is stem pointing up or down?
+            if ((*j)->getID() == CENTER_TOP_T ||
+                (*j)->getID() == CENTER_BOTTOM_T) {
+                // needs to be related to some field constant
+                if (estimatedDistance > 250.0) {
+                    // we can tell which one by looking at the direction of the T
+                    if (corner.getOrientation() > 0.0) {
+                        if (face == FACING_BLUE_GOAL) {
+                            if ((*j)->getID() == CENTER_BOTTOM_T) {
+                                continue;
+                            } else {
+                                isOk = false;
+                                continue;
+                            }
+                        } else {
+                            if ((*j)->getID() == CENTER_TOP_T) {
+                                continue;
+                            } else {
+                                isOk = false;
+                                continue;
+                            }
+                        }
+                    } else {
+                        if (face == FACING_BLUE_GOAL) {
+                            if ((*j)->getID() == CENTER_TOP_T) {
+                                continue;
+                            } else {
+                                isOk = false;
+                                continue;
+                            }
+                        } else {
+                            if ((*j)->getID() == CENTER_BOTTOM_T) {
+                                continue;
+                            } else {
+                                isOk = false;
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+            bool down = abs(corner.getOrientation()) > 90.0;
+            bool right;
+            if (corner.getX() > (*k)->getX()) {
+                right = true;
+                cout << "T is right " << estimatedDistance << endl;
+            } else {
+                right = false;
+                cout << "T is left " << estimatedDistance << endl;
+            }
+            if (down) {
+                if (right) {
+                    if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
+                        (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
+                        isOk = false;
+                        continue;
+                    }
+                } else {
+                    if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
+                        (*j)->getID() == YELLOW_GOAL_LEFT_T) {
+                        isOk = false;
+                        continue;
+                    }
+                }
+            } else {
+                if (!right) {
+                    if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
+                        (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
+                        isOk = false;
+                        continue;
+                    }
+                } else {
+                    if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
+                        (*j)->getID() == YELLOW_GOAL_LEFT_T) {
+                        isOk = false;
+                        continue;
+                    }
+                }
+            }
+            // need a constant related to field constants here
+            if (estimatedDistance < 100.0f && getRealDistance(*j, *k, 0) < 100.0f) {
+                continue;
+            }
+            const float distanceToCorner = corner.getDistance();
+			// The visual object might be abstract, so we should check
+			// all of its possible objects to see if we're close enough to one
+			// and add all the possibilities up.
+			list<const ConcreteFieldObject*>::const_iterator i =
+				(*k)->getPossibleFieldObjects()->begin();
+
+			bool close = false;
+			for (int p = 0; i != (*k)->getPossibleFieldObjects()->end() && !close; ++i, ++p) {
+
+				if (arePointsCloseEnough(estimatedDistance, *j, *k,
+										 distanceToCorner, p)) {
+					close = true;
+                }
+            }
+			// if the corner wasn't close enough to any possible object
+			if (!close) {
+				isOk = false;
+			}
+		}
+		// if we made it through all possible field objects
+		if (isOk) {
+			possibleClassifications.push_back(*j);
+			if (debugIdentifyCorners) {
+				cout << "Corner is possibly a " << (*j)->toString() << endl;
+			}
+		}
+	}
+	return possibleClassifications;
+}
+
+// Given a list of concrete corners that the visual corner could possibly be,
+// weeds out the bad ones based on distances to visible objects and returns
+// those that are still in the running.
+list <const ConcreteCorner*> Context::compareObjsInnerL(
+	const VisualCorner& corner,
+	const vector<const ConcreteCorner*>& possibleCorners,
+	const vector<const VisualFieldObject*>& visibleObjects) const
+{
+	list<const ConcreteCorner*> possibleClassifications;
+
+    // For each field object that we see, calculate its real distance to
+    // each possible concrete corner and compare with the visual estimated
+    // distance. If it fits, add it to the list of possibilities.
+    vector<const ConcreteCorner*>::const_iterator j =
+        possibleCorners.begin();
+
+    // Note: changed the order of the loops 12/3/2010 so we can check
+    // every object against the corner instead of just finding one good one
+    for (; j != possibleCorners.end(); ++j) {
+		bool isOk = true;
+        for (vector <const VisualFieldObject*>::const_iterator k =
+                 visibleObjects.begin(); k != visibleObjects.end() && isOk; ++k) {
+
+            const float estimatedDistance = getEstimatedDistance(&corner, *k);
+            const float distanceToCorner = corner.getDistance();
+			// The visual object might be abstract, so we should check
+			// all of its possible objects to see if we're close enough to one
+			// and add all the possibilities up.
+			list<const ConcreteFieldObject*>::const_iterator i =
+				(*k)->getPossibleFieldObjects()->begin();
+
+			bool close = false;
+			for (int p = 0; i != (*k)->getPossibleFieldObjects()->end() && !close; ++i, ++p) {
+
+				if (arePointsCloseEnough(estimatedDistance, *j, *k,
+										 distanceToCorner, p)) {
+					close = true;
+                }
+            }
+			// if the corner wasn't close enough to any possible object
+			if (!close) {
+				isOk = false;
+			}
+		}
+		// if we made it through all possible field objects
+		if (isOk) {
+			possibleClassifications.push_back(*j);
+			if (debugIdentifyCorners) {
+				cout << "Corner is possibly a " << (*j)->toString() << endl;
+			}
+		}
+	}
+	return possibleClassifications;
 }
 
 // Given a list of concrete corners that the visual corner could possibly be,
@@ -717,108 +1247,6 @@ list <const ConcreteCorner*> Context::compareObjsCorners(
 		bool isOk = true;
         for (vector <const VisualFieldObject*>::const_iterator k =
                  visibleObjects.begin(); k != visibleObjects.end() && isOk; ++k) {
-
-            // outerls are never going to be corners of the field
-            if (corner.getShape() == OUTER_L) {
-                if ((*j)->getID() == BLUE_CORNER_TOP_L ||
-                    (*j)->getID() == BLUE_CORNER_BOTTOM_L ||
-                    (*j)->getID() == YELLOW_CORNER_TOP_L ||
-                    (*j)->getID() == YELLOW_CORNER_BOTTOM_L) {
-					isOk = false;
-                    continue;
-                }
-            } else if (corner.getShape() == T) {
-                const float estimatedDistance = getEstimatedDistance(&corner, *k);
-                // if we have a T corner and a goal post, then we can determine which
-                // one it is definitely - look at whether the Stem is going up or down
-                // if it is down (normal case) just look at whether T is left or right
-                // if it is up, then reverse the results because you are over the endline
-                // Is stem pointing up or down?
-                if ((*j)->getID() == CENTER_TOP_T ||
-                    (*j)->getID() == CENTER_BOTTOM_T) {
-                    // needs to be related to some field constant
-                    if (estimatedDistance > 250.0) {
-                        // we can tell which one by looking at the direction of the T
-                        if (corner.doesTPointRight()) {
-                            if ((*k)->getID() == BLUE_GOAL_LEFT_POST ||
-                                (*k)->getID() == BLUE_GOAL_RIGHT_POST) {
-                                if ((*j)->getID() == CENTER_BOTTOM_T) {
-                                    continue;
-                                } else {
-                                    isOk = false;
-                                    continue;
-                                }
-                            } else {
-                                if ((*j)->getID() == CENTER_TOP_T) {
-                                    continue;
-                                } else {
-                                    isOk = false;
-                                    continue;
-                                }
-                            }
-                        } else {
-                            if ((*k)->getID() == BLUE_GOAL_LEFT_POST ||
-                                (*k)->getID() == BLUE_GOAL_RIGHT_POST) {
-                                if ((*j)->getID() == CENTER_TOP_T) {
-                                    continue;
-                                } else {
-                                    isOk = false;
-                                    continue;
-                                }
-                            } else {
-                                if ((*j)->getID() == CENTER_BOTTOM_T) {
-                                    continue;
-                                } else {
-                                    isOk = false;
-                                    continue;
-                                }
-                            }
-                        }
-                    }
-                }
-                bool down = corner.doesTPointDown();
-                bool right;
-                if (corner.getX() > (*k)->getX()) {
-                    right = true;
-                    cout << "T is right " << estimatedDistance << endl;
-                } else {
-                    right = false;
-                    cout << "T is left " << estimatedDistance << endl;
-                }
-                if (down) {
-                    if (right) {
-                        if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
-                            (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
-							isOk = false;
-                            continue;
-                        }
-                    } else {
-                        if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
-                            (*j)->getID() == YELLOW_GOAL_LEFT_T) {
-							isOk = false;
-                            continue;
-                        }
-                    }
-                } else {
-                    if (!right) {
-                        if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
-                            (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
-							isOk = false;
-                            continue;
-                        }
-                    } else {
-                        if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
-                            (*j)->getID() == YELLOW_GOAL_LEFT_T) {
-							isOk = false;
-                            continue;
-                        }
-                    }
-                }
-                // need a constant related to field constants here
-                if (estimatedDistance < 100.0f && getRealDistance(*j, *k, 0) < 100.0f) {
-                    continue;
-                }
-            }
 
             const float estimatedDistance = getEstimatedDistance(&corner, *k);
             const float distanceToCorner = corner.getDistance();
@@ -931,22 +1359,13 @@ float Context::getAllowedDistanceError(const VisualFieldObject * obj) const
 
 // Given two points on the screen, estimates the straight line distance
 // between them, on the field
-float Context::getEstimatedDistance(const point<int> &point1,
+/*float Context::getEstimatedDistance(const point<int> &point1,
                                        const point<int> &point2) const
 {
 
-    const estimate point1Est = vision->pose->pixEstimate(point1.x, point1.y, 0);
-    const estimate point2Est = vision->pose->pixEstimate(point2.x, point2.y, 0);
-
-    const float point1Dist = point1Est.dist;
-    const float point2Dist = point2Est.dist;
-    // We cannot accurately calculate the distance because the pix estimate
-    // is too bad
-    if (point1Dist <= 0 || point2Dist <= 0) { return BAD_DISTANCE; }
-
-    return Utility::getLength(point1Est.x, point1Est.y,
-                              point2Est.x, point2Est.y);
-}
+    return realDistance(point1.x, point1.y,
+                              point2.x, point2.y);
+                              }*/
 
 // Uses vector subtraction in order to determine distance between corner and
 // field object.
@@ -1076,6 +1495,32 @@ const bool Context::goalSuitableForPixEstimate(const VisualFieldObject * goal) c
     // higher values are lower in the image
     return greenHorizon - midBottomY < MAX_PIXEL_DIFF;
 }
+
+/*	Calculate the actual distance between two points.  Uses functions
+	from NaoPose.cpp in Noggin
+	@param x1	x coord of object 1
+	@param y1	y coord of object 1
+	@param x2	x coord of object 2
+	@param y2	y coord of object 2
+	@return		the distance in centimeters
+ */
+
+float Context::realDistance(int x1, int y1, int x2, int y2) {
+	estimate r = vision->pose->pixEstimate(x1, y1, 0.0);
+	estimate l = vision->pose->pixEstimate(x2, y2, 0.0);
+	return vision->pose->getDistanceBetweenTwoObjects(l, r);
+}
+
+
+/* Get the actual length of a line.  VisualLine actually just calculates
+   the length on the screen.  Here we need the real thing.
+ */
+float Context::realLineDistance(boost::shared_ptr<VisualLine> line) {
+    const point<int> end1 = line->getEndpoint();
+    const point<int> end2 = line->getStartpoint();
+    return realDistance(end1.x, end1.y, end2.x, end2.y);
+}
+
 
 /* Set facing information.  Initially this is based on whether we see a goal
    post or not.  If we do then we are facing one.  Eventually we may realize

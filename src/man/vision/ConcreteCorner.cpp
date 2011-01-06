@@ -456,10 +456,54 @@ const vector <const ConcreteCorner*>& ConcreteCorner::tSideCorners()
 	return corners;
 }
 
+const vector <const ConcreteCorner*>& ConcreteCorner::centerBottomCorner()
+{
+	const ConcreteCorner* corners_array[1] = {
+		&center_bottom_t()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::centerTopCorner()
+{
+	const ConcreteCorner* corners_array[1] = {
+		&center_top_t()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
 const vector <const ConcreteCorner*>& ConcreteCorner::ccCorners()
 {
 	const ConcreteCorner* corners_array[NUM_CC_CORNERS] = {
 		&top_cc(),
+		&bottom_cc()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::centerCircleTop()
+{
+	const ConcreteCorner* corners_array[1] = {
+		&top_cc()
+	};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::centerCircleBottom()
+{
+	const ConcreteCorner* corners_array[1] = {
 		&bottom_cc()
 	};
 	static const vector<const ConcreteCorner*>
@@ -515,6 +559,32 @@ const vector <const ConcreteCorner*>& ConcreteCorner::blueGoalTCorners()
 	return corners;
 }
 
+const vector <const ConcreteCorner*>& ConcreteCorner::leftBlueTCorner()
+{
+	const ConcreteCorner* corners_array[
+		1] =
+		{
+			&blue_goal_left_t()
+		};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::rightBlueTCorner()
+{
+	const ConcreteCorner* corners_array[
+		1] =
+		{
+			&blue_goal_right_t()
+		};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
 const vector <const ConcreteCorner*>& ConcreteCorner::yellowGoalTCorners()
 {
 	const ConcreteCorner* corners_array[
@@ -522,6 +592,32 @@ const vector <const ConcreteCorner*>& ConcreteCorner::yellowGoalTCorners()
 		{
 			&yellow_goal_left_t(),
 			&yellow_goal_right_t()
+		};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::rightYellowTCorner()
+{
+	const ConcreteCorner* corners_array[
+		1] =
+		{
+			&yellow_goal_right_t()
+		};
+	static const vector<const ConcreteCorner*>
+		corners(corners_array,
+				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
+	return corners;
+}
+
+const vector <const ConcreteCorner*>& ConcreteCorner::leftYellowTCorner()
+{
+	const ConcreteCorner* corners_array[
+		1] =
+		{
+			&yellow_goal_left_t()
 		};
 	static const vector<const ConcreteCorner*>
 		corners(corners_array,
@@ -704,56 +800,47 @@ void ConcreteCorner::assignTCornerLines()
 const vector <const ConcreteCorner*>& ConcreteCorner::
 getPossibleCorners(shape corner_type, shape secondary_type) {
     vector <const ConcreteCorner*> possible;
-    switch (corner_type) {
-    case INNER_L:
-        // intentional fall through
-    case OUTER_L:
-		if (secondary_type == GOAL_L) {
-			return lGoalCorners();
-		} else if (secondary_type == CORNER_L) {
-			return fourCorners();
-		} else if (secondary_type == RIGHT_GOAL_L) {
-            return rightLCorners();
-        } else if (secondary_type == LEFT_GOAL_L) {
-            return leftLCorners();
-        } else if (secondary_type == LEFT_GOAL_CORNER) {
-            return leftGoalCorners();
-        } else if (secondary_type == RIGHT_GOAL_CORNER) {
-            return rightGoalCorners();
-        } else if (secondary_type == LEFT_GOAL_YELLOW_L) {
-            return leftYellowLCorner();
-        } else if (secondary_type == LEFT_GOAL_BLUE_L) {
-            return leftBlueLCorner();
-        } else if (secondary_type == RIGHT_GOAL_YELLOW_L) {
-            return rightYellowLCorner();
-        } else if (secondary_type == RIGHT_GOAL_BLUE_L) {
-            return rightBlueLCorner();
-        } else if (secondary_type == YELLOW_GOAL_TOP) {
-            return yellowTop();
-        } else if (secondary_type == YELLOW_GOAL_BOTTOM) {
-            return yellowBottom();
-        } else if (secondary_type == BLUE_GOAL_TOP) {
-            return blueTop();
-        } else if (secondary_type == BLUE_GOAL_BOTTOM) {
-            return blueBottom();
-        }
-        return lCorners();
-    case T:
-		if (secondary_type == GOAL_T) {
-			return tGoalCorners();
-		} else if (secondary_type == SIDE_T) {
-			return tSideCorners();
-		} else if (secondary_type == LEFT_GOAL_T) {
-            return leftTCorners();
-        } else if (secondary_type == RIGHT_GOAL_T) {
-            return rightTCorners();
-        }
-        return tCorners();
-    case CIRCLE:
-        return ccCorners();
+    switch (secondary_type) {
+    case GOAL_L: return lGoalCorners();
+    case CORNER_L: return fourCorners();
+    case RIGHT_GOAL_L: return rightLCorners();
+    case LEFT_GOAL_L: return leftLCorners();
+    case LEFT_GOAL_CORNER: return leftGoalCorners();
+    case RIGHT_GOAL_CORNER: return rightGoalCorners();
+    case LEFT_GOAL_YELLOW_L: return leftYellowLCorner();
+    case LEFT_GOAL_BLUE_L: return leftBlueLCorner();
+    case RIGHT_GOAL_YELLOW_L: return rightYellowLCorner();
+    case RIGHT_GOAL_BLUE_L: return rightBlueLCorner();
+    case YELLOW_GOAL_TOP: return yellowTop();
+    case YELLOW_GOAL_BOTTOM: return yellowBottom();
+    case BLUE_GOAL_BOTTOM: return blueBottom();
+    case BLUE_GOAL_TOP: return blueTop();
+    case GOAL_T: return tGoalCorners();
+    case SIDE_T: return tSideCorners();
+    case LEFT_GOAL_T: return leftTCorners();
+    case RIGHT_GOAL_T: return rightTCorners();
+    case RIGHT_GOAL_YELLOW_T: return rightYellowTCorner();
+    case RIGHT_GOAL_BLUE_T: return rightBlueTCorner();
+    case LEFT_GOAL_YELLOW_T: return leftYellowTCorner();
+    case LEFT_GOAL_BLUE_T: return leftBlueTCorner();
+    case CENTER_T_TOP: return centerTopCorner();
+    case CENTER_T_BOTTOM: return centerBottomCorner();
+    case CENTER_CIRCLE_TOP: return centerCircleTop();
+    case CENTER_CIRCLE_BOTTOM: return centerCircleBottom();
     default:
-        // Should never be reached
-        throw -1;
+        switch (corner_type) {
+        case INNER_L:
+            return lCorners();
+        case OUTER_L:
+            return lGoalCorners();
+        case T:
+            return tCorners();
+        case CIRCLE:
+            return ccCorners();
+        default:
+            // Should never be reached
+            throw -1;
+        }
     }
 }
 

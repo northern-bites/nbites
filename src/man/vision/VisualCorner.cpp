@@ -62,6 +62,7 @@ void VisualCorner::determineCornerShape() {
         tBar = line1;
         tStem = line2;
         setID(T_CORNER);
+        setTOrientation();
     } else if(Utility::tValueInMiddleOfLine(t2, line2->getLength(),
                                             max(line1->getAvgWidth(),
                                                 MIN_EXTEND_DIST))) {
@@ -69,6 +70,7 @@ void VisualCorner::determineCornerShape() {
         tBar = line2;
         tStem = line1;
         setID(T_CORNER);
+        setTOrientation();
     } else {
         // Temporary side effect - set angleBetweenLines
         cornerType = getLClassification();
@@ -162,6 +164,24 @@ const shape VisualCorner::getLClassification() {
     //cout << " Theta calculated via dot products is " << theta << endl;
     angleBetweenLines = theta;
 
+    // in theory we should be able to get the angle's orientation
+    // step 1:  normalize the vectors
+    // step 2:  average them to get a new vector between them
+    // step 3:  take the angle between that vector and the one pointing "north"
+    // This is all greatly simplified by two things: 1) we don't care about
+    // magnitude, and 2) using a "north" vector simplifies the equations
+
+    // we have the length of the lines already
+    // step 1:  we don't have to "normalize" in the traditional sense, just
+    // get equivalent length vectors
+    float normalize = line1->getLength() / line2->getLength();
+    pair <float, float> line3Basis;
+    // we don't need to average since we don't care about the magnitude of the vector
+    line3Basis.first = static_cast<float>(line1Basis.first) +
+        normalize * static_cast<float>(line2Basis.first);
+    line3Basis.second = static_cast<float>(line1Basis.second) +
+        normalize * static_cast<float>(line2Basis.second);
+    orientation = TO_DEG * atan2(line3Basis.first, -line3Basis.second);
 
     // We draw a line between the endpoints of our lines forming the corner,
     // and another
@@ -373,6 +393,26 @@ const bool VisualCorner::hasPositiveID()
     return possibleCorners.size() == 1;
 }
 
+
+/* The secondary shape represents a refining of what the corner
+   might be.  Since there are several possible steps in this process
+   we do not want to go backwards at any step (e.g. we already know
+   what corner it is, don't try and classify it again)
+ */
+void VisualCorner::setSecondaryShape(const shape s) {
+    if (secondaryShape == UNKNOWN || s > secondaryShape) {
+        secondaryShape = s;
+    }
+}
+
+/* Once we have identified a corner as a T we can set its orientation
+   according to the line that forms the stem.
+ */
+void VisualCorner::setTOrientation() {
+    point<int> end = getTStemEndpoint();
+    orientation = TO_DEG * atan2(end.x - getX(), getY() - end.y);
+}
+
 void VisualCorner::setPossibleCorners(
     std::list <const ConcreteCorner *> _possibleCorners)
 {
@@ -448,26 +488,28 @@ const point<int> VisualCorner::getTStemEndpoint() const
 /**
  * Returns true when the endpoint is below the corner on the screen.
  */
-const bool VisualCorner::doesTPointDown() const
+const bool VisualCorner::doesItPointDown()
 {
-    point<int> endpoint = getTStemEndpoint();
-    return endpoint.y > getY();
+    return abs(orientation) > 90.0;
+}
+
+const bool VisualCorner::doesItPointUp()
+{
+    return abs(orientation) < 90.0;
 }
 
 /**
  * Returns true when the endpoint is below the corner on the screen.
  */
-const bool VisualCorner::doesTPointRight() const
+const bool VisualCorner::doesItPointRight()
 {
-    point<int> endpoint = getTStemEndpoint();
-    return endpoint.x > getX();
+    return orientation >= 0.0;
 }
 
 /**
  * Returns true when the endpoint is below the corner on the screen.
  */
-const bool VisualCorner::doesTPointLeft() const
+const bool VisualCorner::doesItPointLeft()
 {
-    point<int> endpoint = getTStemEndpoint();
-    return endpoint.x < getX();
+    return orientation < 0.0;
 }

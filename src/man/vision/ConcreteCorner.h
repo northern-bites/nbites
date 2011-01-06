@@ -57,30 +57,38 @@ enum cornerID {
 };
 
 enum shape {
+    UNKNOWN,
     INNER_L,
     OUTER_L,
     T,
     CIRCLE,
-    // secondary shapes
-	GOAL_L,
+    // secondary shapes - arranged from most general to most specific
+	GOAL_L,   // 5
 	CORNER_L,
     LEFT_GOAL_L,
     RIGHT_GOAL_L,
-    RIGHT_GOAL_CORNER, // 8
+    RIGHT_GOAL_CORNER, // 9
     LEFT_GOAL_CORNER,
     GOAL_T,
 	SIDE_T,
-    LEFT_GOAL_T,      // 12
+    LEFT_GOAL_T,      // 13
     RIGHT_GOAL_T,
-    LEFT_GOAL_YELLOW_L,
-    LEFT_GOAL_BLUE_L,
-    RIGHT_GOAL_YELLOW_L, // 16
-    RIGHT_GOAL_BLUE_L,
     YELLOW_GOAL_BOTTOM,
     YELLOW_GOAL_TOP,
-    BLUE_GOAL_BOTTOM, // 20
+    BLUE_GOAL_BOTTOM, // 17
     BLUE_GOAL_TOP,
-    UNKNOWN
+    LEFT_GOAL_YELLOW_L,
+    LEFT_GOAL_BLUE_L,
+    RIGHT_GOAL_YELLOW_L, // 21
+    RIGHT_GOAL_BLUE_L,
+    RIGHT_GOAL_YELLOW_T,
+    LEFT_GOAL_YELLOW_T,
+    RIGHT_GOAL_BLUE_T, // 25
+    LEFT_GOAL_BLUE_T,
+    CENTER_T_TOP,
+    CENTER_T_BOTTOM,
+    CENTER_CIRCLE_TOP,  // 29
+    CENTER_CIRCLE_BOTTOM
 };
 
 
@@ -212,6 +220,14 @@ public:
 
     static const std::vector <const ConcreteCorner*>& yellowGoalTCorners();
     static const std::vector <const ConcreteCorner*>& blueGoalTCorners();
+    static const std::vector <const ConcreteCorner*>& rightBlueTCorner();
+    static const std::vector <const ConcreteCorner*>& leftBlueTCorner();
+    static const std::vector <const ConcreteCorner*>& rightYellowTCorner();
+    static const std::vector <const ConcreteCorner*>& leftYellowTCorner();
+    static const std::vector <const ConcreteCorner*>& centerBottomCorner();
+    static const std::vector <const ConcreteCorner*>& centerTopCorner();
+    static const std::vector <const ConcreteCorner*>& centerCircleTop();
+    static const std::vector <const ConcreteCorner*>& centerCircleBottom();
 
 private: // Instance variables recording location on field and identifier
     cornerID id;

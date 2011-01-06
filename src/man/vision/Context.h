@@ -117,7 +117,10 @@ public:
     void findUnconnectedCornerRelationship(VisualCorner & first,
                                            VisualCorner & second);
     void findCornerRelationship(VisualCorner & first, VisualCorner & second);
+    void setFieldCorner(VisualCorner & corner);
     void classifyInnerL(VisualCorner & first);
+    void classifyOuterL(VisualCorner &first);
+    void classifyT(VisualCorner &first);
 
     const list<const ConcreteCorner*> classifyCornerWithObjects(
         const VisualCorner &corner,
@@ -125,6 +128,21 @@ public:
 
     std::list<const ConcreteCorner*>
     compareObjsCorners(const VisualCorner& corner,
+                       const std::vector<const ConcreteCorner*>& possibleCorners,
+                       const std::vector<const VisualFieldObject*>& visibleObjects)
+        const;
+    std::list<const ConcreteCorner*>
+    compareObjsT(const VisualCorner& corner,
+                       const std::vector<const ConcreteCorner*>& possibleCorners,
+                       const std::vector<const VisualFieldObject*>& visibleObjects)
+        const;
+    std::list<const ConcreteCorner*>
+    compareObjsOuterL(const VisualCorner& corner,
+                       const std::vector<const ConcreteCorner*>& possibleCorners,
+                       const std::vector<const VisualFieldObject*>& visibleObjects)
+        const;
+    std::list<const ConcreteCorner*>
+    compareObjsInnerL(const VisualCorner& corner,
                        const std::vector<const ConcreteCorner*>& possibleCorners,
                        const std::vector<const VisualFieldObject*>& visibleObjects)
         const;
@@ -165,6 +183,9 @@ public:
     vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
 
     const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
+
+    float realDistance(int x1, int y1, int x2, int y2);
+    float realLineDistance(boost::shared_ptr<VisualLine> line);
     void setFacing();
     void setFieldHalf();
     void printContext();

@@ -76,9 +76,10 @@ public:
     const float getOrientation() const { return orientation; }
 
     const point<int> getTStemEndpoint() const;
-    const bool doesTPointDown() const;
-    const bool doesTPointRight() const;
-    const bool doesTPointLeft() const;
+    const bool doesItPointDown();
+    const bool doesItPointUp();
+    const bool doesItPointRight();
+    const bool doesItPointLeft();
 
     virtual const bool hasPositiveID();
 
@@ -90,12 +91,13 @@ public:
     void setPossibleCorners(std::vector <const ConcreteCorner *>
                             _possibleCorners);
     void setShape(const shape s) { cornerType = s; }
-    void setSecondaryShape(const shape s) {secondaryShape = s; }
+    void setSecondaryShape(const shape s);
     void setLine1(boost::shared_ptr<VisualLine> l1) { line1 = l1; }
     void setLine2(boost::shared_ptr<VisualLine> l2) { line2 = l2; }
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     void setID(cornerID _id) { id = _id; }
+    void setTOrientation();
 
 
 private: // private methods
@@ -140,6 +142,8 @@ private:
     float angleBetweenLines;
     // the orientation of the corner
     float orientation;
+    bool up;       // does the bisector point up?
+    bool right;    // does the bisector point right?
 };
 
 // functor that checks if the shape of one corner equals the given shape
