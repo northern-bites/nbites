@@ -1141,11 +1141,11 @@ int ObjectFragments::classifyByTCorner(Blob post) {
 	if (post.height() < MAXIMUM_Y_DIFF) {
 		return NOPOST;
 	}
-	const list <VisualCorner>* corners = vision->fieldLines->getCorners();
+	list <VisualCorner>* corners = vision->fieldLines->getCorners();
 	int spanx = post.width();
 	int spany = post.height();
 	// iterate through all of the corners looking for T Corners
-	for (list <VisualCorner>::const_iterator k = corners->begin();
+	for (list <VisualCorner>::iterator k = corners->begin();
 		 k != corners->end(); k++) {
 		if (k->getShape() == T) {
 			int x = k->getX();
@@ -1160,6 +1160,19 @@ int ObjectFragments::classifyByTCorner(Blob post) {
 				if (POSTLOGIC) {
 					cout << "Got a T that was close enough " << endl;
 				}
+                if (k->doesItPointUp() && y < post.getLeftBottomY()) {
+                    if (k->doesItPointLeft()) {
+                        return LEFT;
+                    } else {
+                        return RIGHT;
+                    }
+                } else if (k->doesItPointUp() && y > post.getLeftBottomY()) {
+                    if (k->doesItPointLeft()) {
+                        return LEFT;
+                    } else {
+                        return RIGHT;
+                    }
+                }
 				if (x <= post.getLeftBottomX()) {
 					return LEFT;
 				}
@@ -1179,11 +1192,11 @@ int ObjectFragments::classifyByTCorner(Blob post) {
 int ObjectFragments::classifyByCheckingCorners(Blob post)
 {
     // get all of the corners
-    const list <VisualCorner>* corners = vision->fieldLines->getCorners();
+    list <VisualCorner>* corners = vision->fieldLines->getCorners();
     int spanx = post.width();
     int spany = post.height();
     // iterate through all of the corners, skipping all of the T Corners
-    for (list <VisualCorner>::const_iterator k = corners->begin();
+    for (list <VisualCorner>::iterator k = corners->begin();
          k != corners->end(); k++) {
         // we already processed T Corners so skip them, skip others too
         if (k->getShape() == INNER_L) {
@@ -1197,13 +1210,29 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
                 estimate e = vision->pose->pixEstimate(x, y, 0.0);
                 // if it is in the right position we can figure out which post
                 if (x <= post.getLeftBottomX()) {
-                    return cornerClassifier(diff, e.dist, post.getLeftBottomX(),
-                                            post.getLeftBottomX(), LEFT, RIGHT);
+                    if (k->doesItPointRight()) {
+                        return cornerClassifier(diff, e.dist,
+                                                post.getLeftBottomX(),
+                                                post.getLeftBottomX(),
+                                                LEFT, RIGHT, true);
+                    } else {
+                        return cornerClassifier(diff, e.dist,
+                                                post.getLeftBottomX(),
+                                                post.getLeftBottomX(),
+                                                LEFT, RIGHT, false);
+                    }
                 } else {
-                    return cornerClassifier(diff, e.dist,
-                                            post.getRightBottomX(),
-                                            post.getRightBottomY(), RIGHT,
-                                            LEFT);
+                    if (k->doesItPointRight()) {
+                        return cornerClassifier(diff, e.dist,
+                                                post.getRightBottomX(),
+                                                post.getRightBottomY(), RIGHT,
+                                                LEFT, false);
+                    } else {
+                        return cornerClassifier(diff, e.dist,
+                                                post.getRightBottomX(),
+                                                post.getRightBottomY(), RIGHT,
+                                                LEFT, true);
+                    }
                 }
             }
         }
@@ -1222,10 +1251,14 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
  * @return             the id of the post
  */
 int ObjectFragments::cornerClassifier(float diff, float dist, int x, int y,
-                                      int class1, int class2) {
+                                      int class1, int class2, bool goal) {
 
+    cout << "Dists " << diff << " " << dist << " " << POST_CORNER << endl;
     // if the post is close to the corner, then we know it we are good
-    if (diff < POST_CORNER + 10.0f) {
+    if (goal && diff < POST_CORNER * 1.5) {
+        return class1;
+    }
+    if (!goal && diff < (FIELD_WHITE_HEIGHT - CROSSBAR_CM_WIDTH) * 0.6) {
         return class1;
     }
     if (dist < CLOSE_DIST) {

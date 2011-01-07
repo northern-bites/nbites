@@ -95,7 +95,8 @@ public:
     int classifyByOtherRuns(int left, int right, int height);
     int classifyByTCorner(Blob b);
     int classifyByCheckingCorners(Blob b);
-    int cornerClassifier(float diff, float dist, int x, int y,int class1, int class2);
+    int cornerClassifier(float diff, float dist, int x, int y,int class1,
+                         int class2, bool goal);
     int classifyGoalBoxLineThatAbutsPost(int y, float diff, float dist,
                                          int classification);
     bool withinEdgeMargin(int x, int margin);

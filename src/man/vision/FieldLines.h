@@ -581,7 +581,7 @@ public:
 #endif
 
     const std::vector < boost::shared_ptr<VisualLine> >* getLines() const { return &linesList; }
-    const std::list <VisualCorner>* getCorners() const {return &cornersList; }
+    std::list <VisualCorner>* getCorners() {return &cornersList; }
     const int getNumCorners() { return cornersList.size(); }
     const std::list<linePoint>* getUnusedPoints() const {
         return &unusedPointsList;

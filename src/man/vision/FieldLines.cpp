@@ -2033,6 +2033,8 @@ list< VisualCorner > FieldLines::intersectLines()
 
             if (intersection.x == Utility::NO_INTERSECTION) {
                 vision->thresh->context->setGoalBoxLines();
+                (*i)->setParallel();
+                (*j)->setParallel();
                 if (debugIntersectLines)
                     cout << "\t" << numChecksPassed
                          <<"- Lines are parallel. No intersection" << endl;
@@ -2043,6 +2045,8 @@ list< VisualCorner > FieldLines::intersectLines()
                     cout << "\tIntersection occurs at " << intersection << endl;
                 }
                 if (intersection.x < -200 || intersection.x > IMAGE_WIDTH + 200) {
+                    (*i)->setParallel();
+                    (*j)->setParallel();
                     vision->thresh->context->setGoalBoxLines();
                 }
             }
