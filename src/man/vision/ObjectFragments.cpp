@@ -1253,7 +1253,6 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
 int ObjectFragments::cornerClassifier(float diff, float dist, int x, int y,
                                       int class1, int class2, bool goal) {
 
-    cout << "Dists " << diff << " " << dist << " " << POST_CORNER << endl;
     // if the post is close to the corner, then we know it we are good
     if (goal && diff < POST_CORNER * 1.5) {
         return class1;

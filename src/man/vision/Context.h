@@ -123,6 +123,11 @@ public:
     void checkTToFieldCorner(VisualCorner & t, VisualCorner & l1);
     void findCornerRelationship(VisualCorner & first, VisualCorner & second);
     void setFieldCorner(VisualCorner & corner);
+    void checkUnknownGoalCorner(VisualCorner & corner, float l1, float l2,
+                                bool l1IsLeft);
+    void checkGoalCornerWithPost(VisualCorner & corner, int y1, int y2,
+                                 bool l1IsLeft);
+    void checkLowOuterL(VisualCorner & corner, bool line1IsLonger);
     void lookForFieldCorner(VisualCorner & first, float l1, float l2);
     void classifyInnerL(VisualCorner & first);
     void classifyOuterL(VisualCorner &first);
@@ -133,7 +138,7 @@ public:
         const std::vector <const VisualFieldObject*> &visibleObjects) const;
 
     std::list<const ConcreteCorner*>
-    compareObjsCorners(const VisualCorner& corner,
+    compareObjsCenterCorners(const VisualCorner& corner,
                        const std::vector<const ConcreteCorner*>& possibleCorners,
                        const std::vector<const VisualFieldObject*>& visibleObjects)
         const;

@@ -2084,7 +2084,7 @@ list< VisualCorner > FieldLines::intersectLines()
 				findLinePointDistanceFromStart(intersection, **j);
 
 			if (doLinesCross(*i, *j, t_I, t_J, numChecksPassed)) {
-                cout << "Lines cross" << endl;
+                //cout << "Lines cross" << endl;
 			}
             ++numChecksPassed;
 
