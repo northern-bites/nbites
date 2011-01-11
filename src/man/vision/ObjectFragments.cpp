@@ -1168,9 +1168,9 @@ int ObjectFragments::classifyByTCorner(Blob post) {
                     }
                 } else if (k->doesItPointUp() && y > post.getLeftBottomY()) {
                     if (k->doesItPointLeft()) {
-                        return LEFT;
-                    } else {
                         return RIGHT;
+                    } else {
+                        return LEFT;
                     }
                 }
 				if (x <= post.getLeftBottomX()) {

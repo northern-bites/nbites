@@ -116,8 +116,14 @@ public:
     void unconnectedInnerLs(VisualCorner & inner, VisualCorner & outer);
     void findUnconnectedCornerRelationship(VisualCorner & first,
                                            VisualCorner & second);
+    void checkConnectedTs(VisualCorner & first, VisualCorner & second);
+    void checkTToCenter(VisualCorner & first, VisualCorner & second);
+    void checkTToGoal(VisualCorner & t, VisualCorner & l1,
+                      boost::shared_ptr<VisualLine> common);
+    void checkTToFieldCorner(VisualCorner & t, VisualCorner & l1);
     void findCornerRelationship(VisualCorner & first, VisualCorner & second);
     void setFieldCorner(VisualCorner & corner);
+    void lookForFieldCorner(VisualCorner & first, float l1, float l2);
     void classifyInnerL(VisualCorner & first);
     void classifyOuterL(VisualCorner &first);
     void classifyT(VisualCorner &first);
