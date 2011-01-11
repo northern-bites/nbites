@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ $# != 2 ]; then
+    echo "Usage: ./hough_test_suite.sh <test image directory> <OffflineVision exec. directory>"
+    exit
+fi
+
 # First argument is the directory containing test images
 IMAGE_DIR=$1
 
@@ -8,10 +13,12 @@ BIN_DIR=$2
 
 ITERATIONS=500
 
-for folder in "zero" "one" "couple"
+for folder in "zero" "one" "couple" "clutter"
 do
-    $BIN_DIR/OfflineVision $IMAGE_DIR/$folder 1 3 $ITERATIONS
+    NUM_IMAGES=`find $IMAGE_DIR/$folder/ -name *.NBFRM | wc -l`
+    echo $NUM_IMAGES
+    $BIN_DIR/OfflineVision $IMAGE_DIR/$folder 1 $NUM_IMAGES $ITERATIONS
 done
 
-$BIN_DIR/OfflineVision $IMAGE_DIR/"clutter" 1 6 $ITERATIONS
+
 
