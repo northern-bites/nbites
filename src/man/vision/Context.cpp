@@ -19,8 +19,18 @@
 
 
 /*
- * Context - holds context information on field objects in order to
- * better recognize them and identify them.
+ * Context - holds context information on field objects  and corners
+ * in order to better recognize them and identify them.
+ *
+ * Here's how we recognize corners.  We start with the fact that
+ * goal posts have already been found and identified (if possible).
+ * Our first goal is to find corners that have a common line.  If that
+ * is the case it highly constrains what each corner might be.  Further,
+ * if we also have a goal post in site it is normally enough to tell
+ * exactly what the corners are.  Also, if we have two corners that
+ * aren't connected it often provides enough information to positively
+ * ID each of the corners.  Mainly what we use in identifying things
+ * is a combination of knowledge about the field layout and geometry.
  */
 
 #include <iostream>
@@ -34,6 +44,7 @@
 
 using namespace std;
 
+// Used in discriminating Ts that are part of goalbox or not
 static const float GOALBOX_FUDGE = 1.5;
 
 Context::Context(Vision *vis, Threshold* thr, Field* fie)
@@ -52,6 +63,8 @@ Context::Context(Vision *vis, Threshold* thr, Field* fie)
     init();
 }
 
+/* Initialize all of the ivars.
+ */
 void Context::init() {
     rightYellowPost = false;
     leftYellowPost = false;
@@ -90,6 +103,7 @@ void Context::init() {
  * Note: 1/11/2010 - This method is still pretty similar to what we used
  * in the past.  It should probably be udpated even more.  I have not gotten
  * rid of some things simply because I'm not sure why they were there.
+ * Its an ongoing process.
  * Chown
  *
  * @param corners      The list of all corners found in fieldLines
@@ -936,8 +950,7 @@ void Context::checkTToFieldCorner(VisualCorner & t, VisualCorner & l1) {
     } else {
         // check length  -- it its REALLY long to corner then we know
         // its a sideline T
-        float dist = getEstimatedDistance(l1.getDistance(), l1.getBearing(),
-                                          t.getDistance(), t.getBearing());
+        float dist = realDistance(t.getX(), t.getY(), l1.getX(), l1.getY());
         // figure out if lcorner is left or right of T
         bool left = false;
         if (t.getLocation().x < l1.getLocation().x) {
@@ -1161,7 +1174,10 @@ list <const ConcreteCorner*> Context::compareObjsOuterL(
                     continue;
                 }
             }
-            const float estimatedDistance = getEstimatedDistance(&corner, *k);
+            const float estimatedDistance = realDistance(corner.getX(),
+                                                         corner.getY(),
+                                                         (*k)->getX(),
+                                                         (*k)->getY());
             const float distanceToCorner = corner.getDistance();
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
@@ -1222,7 +1238,10 @@ list <const ConcreteCorner*> Context::compareObjsT(
                  visibleObjects.begin(); k != visibleObjects.end() && isOk;
              ++k) {
 
-            const float estimatedDistance = getEstimatedDistance(&corner, *k);
+            const float estimatedDistance = realDistance(corner.getX(),
+                                                         corner.getY(),
+                                                         (*k)->getX(),
+                                                         (*k)->getY());
             /* if we have a T corner and a goal post, then we can determine
                which one it is definitely - look at whether the Stem is going up
                or down if it is down (normal case) just look at whether T is
@@ -1235,48 +1254,32 @@ list <const ConcreteCorner*> Context::compareObjsT(
                     // we can tell which one by looking at the direction
                     if (corner.getOrientation() > 0.0) {
                         if (face == FACING_BLUE_GOAL) {
-                            if ((*j)->getID() == CENTER_BOTTOM_T) {
-                                continue;
-                            } else {
+                            if ((*j)->getID() != CENTER_BOTTOM_T) {
                                 isOk = false;
-                                continue;
                             }
                         } else {
-                            if ((*j)->getID() == CENTER_TOP_T) {
-                                continue;
-                            } else {
+                            if ((*j)->getID() != CENTER_TOP_T) {
                                 isOk = false;
-                                continue;
                             }
                         }
                     } else {
                         if (face == FACING_BLUE_GOAL) {
-                            if ((*j)->getID() == CENTER_TOP_T) {
-                                continue;
-                            } else {
+                            if ((*j)->getID() != CENTER_TOP_T) {
                                 isOk = false;
-                                continue;
                             }
                         } else {
-                            if ((*j)->getID() == CENTER_BOTTOM_T) {
-                                continue;
-                            } else {
+                            if ((*j)->getID() != CENTER_BOTTOM_T) {
                                 isOk = false;
-                                continue;
                             }
                         }
                     }
                 }
+                continue;
             }
+            // At this point we have an object relatively close
+            // weed out the corners that are obviously wrong
             bool down = abs(corner.getOrientation()) > 90.0;
-            bool right;
-            if (corner.getX() > (*k)->getX()) {
-                right = true;
-                cout << "T is right " << estimatedDistance << endl;
-            } else {
-                right = false;
-                cout << "T is left " << estimatedDistance << endl;
-            }
+            bool right = corner.getX() > (*k)->getX();
             if (down) {
                 if (right) {
                     if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
@@ -1372,7 +1375,10 @@ list <const ConcreteCorner*> Context::compareObjsInnerL(
                  visibleObjects.begin(); k != visibleObjects.end() && isOk;
              ++k) {
 
-            const float estimatedDistance = getEstimatedDistance(&corner, *k);
+            const float estimatedDistance = realDistance(corner.getX(),
+                                                         corner.getY(),
+                                                         (*k)->getX(),
+                                                         (*k)->getY());
             const float distanceToCorner = corner.getDistance();
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
@@ -1433,7 +1439,10 @@ list <const ConcreteCorner*> Context::compareObjsCorners(
                  visibleObjects.begin(); k != visibleObjects.end() && isOk;
              ++k) {
 
-            const float estimatedDistance = getEstimatedDistance(&corner, *k);
+            const float estimatedDistance = realDistance(corner.getX(),
+                                                         corner.getY(),
+                                                         (*k)->getX(),
+                                                         (*k)->getY());
             const float distanceToCorner = corner.getDistance();
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
@@ -1549,76 +1558,11 @@ float Context::getAllowedDistanceError(const VisualFieldObject * obj) const
 }
 
 
-/* Uses vector subtraction in order to determine distance between corner and
-   field object.
-   If the field object is very close (<100 cm away) we can use pose to estimate
-   bearing and distance to the field object rather than the distance and bearing
-   provided by the VisualFieldObject obj itself.
-   @TODO  This may no longer be needed with the improvements in pose estimates
-   @param c         the corner we are testing
-   @param obj       the object we are testing the corner's distance to
-   @return          the estimated distance between them
-*/
-float Context::getEstimatedDistance(const VisualCorner *c,
-                                       const VisualFieldObject *obj) const
-{
-	const float objDist = obj->getDistance();
-	const float objBearing = obj->getBearing();
-
-    const float cornerDist = c->getDistance();
-    // Convert degrees to radians for the sin/cos formulas
-    const float cornerBearing = c->getBearing();
-
-    const float dist = getEstimatedDistance(objDist, objBearing,
-                                            cornerDist, cornerBearing);
-    return dist;
-}
-
-/* Uses geometry to determine Distances.
-   NOTE: This function looks like it should be punted.  EC 1/11/2010
-   If the field object is very close (<100 cm away) we can use pose to estimate
-   bearing and distance to the field object rather than the distance and bearing
-   provided by the VisualFieldObject obj itself.
-   @TODO  This may no longer be needed with the improvements in pose estimates
-   @param c         the corner we are testing
-   @param obj       the object we are testing the corner's distance to
-   @return          the estimated distance between them
-*/
-float Context::getEstimatedDistance(const float dist1, const float bearing1,
-                                 const float dist2, const float bearing2) const
-{
-    const float x1 = dist1 * sin(bearing1);
-    const float y1 = dist1 * cos(bearing1);
-
-    const float x2 = dist2 * sin(bearing2);
-    const float y2 = dist2 * cos(bearing2);
-
-    return Utility::getLength(x1, y1,
-                              x2, y2);
-}
-
-/* Another questionable distance function from the old code.
-   If the field object is very close (<100 cm away) we can use pose to estimate
-   bearing and distance to the field object rather than the distance and bearing
-   provided by the VisualFieldObject obj itself.
-   @TODO  This may no longer be needed with the improvements in pose estimates
-   @param c         the corner we are testing
-   @param obj       the object we are testing the corner's distance to
-   @return          the estimated distance between them
-*/
-float Context::getEstimatedDistance(const VisualCorner& corner,
-                                       const point<int>& p) const
-{
-    const estimate pixEst = vision->pose->pixEstimate(p.x, p.y, 0);
-
-    return getEstimatedDistance(pixEst.dist, pixEst.bearing,
-                                corner.getDistance(), corner.getBearing());
-}
-
 /* This method should only be called with a VisualFieldObject object that has a
    concrete location on the field (YGLP, YGRP, BGLP, BGRP, BY, and YB).
    Calculates the length of the straight line between the two objects on the
-   field
+   field.  The key here is that we only deal with actual objects as we are
+   looking at the true physical distances, not the camera distances.
    @param c       A concrete (real) corner
    @param obj     A goal post
    @param which   Which goal post (if it is abstract)
@@ -1728,7 +1672,7 @@ const bool Context::goalSuitableForPixEstimate(const VisualFieldObject * goal)
 	@return		the distance in centimeters
  */
 
-float Context::realDistance(int x1, int y1, int x2, int y2) {
+float Context::realDistance(int x1, int y1, int x2, int y2)  const {
 	estimate r = vision->pose->pixEstimate(x1, y1, 0.0);
 	estimate l = vision->pose->pixEstimate(x2, y2, 0.0);
 	return vision->pose->getDistanceBetweenTwoObjects(l, r);

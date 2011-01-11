@@ -160,21 +160,7 @@ public:
 
 
     float getAllowedDistanceError(const VisualFieldObject* obj) const;
-    // Given two points on the screen, estimates the straight line distance
-    // between them, on the field
-    float getEstimatedDistance(const point<int> &point1,
-                               const point<int> &point2) const;
 
-    // Estimates the distance between the corner and the object based on
-    // vectors
-    float getEstimatedDistance(const VisualCorner *c,
-                               const VisualFieldObject *obj) const;
-
-    float getEstimatedDistance(float dist1, float bearing1,
-                               float dist2, float bearing2) const;
-
-    float getEstimatedDistance(const VisualCorner& corner,
-                               const point<int>& p) const;
     // Uses the actual objects' locations on the field to calculate straight
     // line distance
     float getRealDistance(const ConcreteCorner *c,
@@ -190,7 +176,7 @@ public:
 
     const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
 
-    float realDistance(int x1, int y1, int x2, int y2);
+    float realDistance(int x1, int y1, int x2, int y2) const;
     float realLineDistance(boost::shared_ptr<VisualLine> line);
     void setFacing();
     void setFieldHalf();
