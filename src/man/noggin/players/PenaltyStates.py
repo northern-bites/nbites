@@ -1,7 +1,7 @@
 from .. import NogginConstants
 import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
-import PositionConstants as constants #TODO: create a PenaltyConstants file instead
+import PositionConstants as constants
 
 OBJ_SEEN_THRESH = 5
 LOOK_DIR_THRESH = 10
@@ -36,17 +36,6 @@ def afterPenalty(player):
                 setLocInfo(player)
                 #now you know where you are!
                 return player.goLater(gcState)
-        """
-        Note: the way that yellowCount and blueCount are set is:  if a
-        post of a different color is seen after the first color, the first
-        counter will reset. So if I see a blue post in frame 1, nothing in
-        frame 2, and a yellow post in frame 3, and nothing in frame 4,
-        my counters will be:
-        blueCount == 0
-        yellowCount == 1
-        This should never happen if vision is set correctly, but just in
-        case it isn't...
-        """
         player.headCount += 1
 
     #if we are looking left too long
@@ -63,6 +52,18 @@ def initPenaltyReloc(player):
     player.headCount = 0
     player.yellowCount = 0
     player.blueCount = 0
+
+"""
+Note: the way that yellowCount and blueCount are set is:  if a
+post of a different color is seen after the first color, the first
+counter will reset. So if I see a blue post in frame 1, nothing in
+frame 2, and a yellow post in frame 3, and nothing in frame 4,
+my counters will be:
+blueCount == 0
+yellowCount == 1
+This should never happen if vision is set correctly, but just in
+case it isn't...
+"""
 
 def seeYellow(player):
     player.blueCount = 0
