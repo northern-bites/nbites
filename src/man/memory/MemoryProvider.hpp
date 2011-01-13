@@ -6,14 +6,14 @@
  * @author Octavian Neamtu
  * @email <oneamtu@bowdoin.edu>
  */
+#pragma once
 
-#ifndef MEMORYPROVIDER_HPP_
-#define MEMORYPROVIDER_HPP_
+#include "MObject.hpp"
+#include <boost/shared_ptr.hpp>
 
-template <typename T>
+template <class T>
 class MemoryProvider {
 
+protected:
+    virtual void updateMemory(boost::shared_ptr<T> obj) = 0;
 };
-
-
-#endif /* MEMORYPROVIDER_HPP_ */

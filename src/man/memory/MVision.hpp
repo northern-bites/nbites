@@ -2,23 +2,19 @@
 
 #include "boost/shared_ptr.hpp"
 
-#include "pb/Vision.pb.h"
-#include "Vision.h"
+#include "gen/Vision.pb.h"
 #include "MObject.hpp"
+#include "Vision.h"
 
 class MVision;
 
-using boost::shared_ptr;
-
-class MVision: public MObject {
-    friend class Vision;
-
-private:
-    void update();
+class MVision: public Proto::PVision, public MObject {
 
 public:
-    MVision(shared_ptr<Vision> vision_ptr);
+    MVision(boost::shared_ptr<Vision> v);
+    void update();
 
 private:
-    shared_ptr<Vision> vision;
+    boost::shared_ptr<Vision> vision;
+
 };

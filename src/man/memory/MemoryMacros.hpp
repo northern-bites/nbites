@@ -10,7 +10,7 @@
 #pragma once
 
 //macros for memory "linking"
-#define memory_link_objects(src,dest) \
+#define memory_link_classes(src,dest) \
     bool src::updateMemory(dest obj)
 #define memory_link(src,dest) \
     set_dest(obj.src);

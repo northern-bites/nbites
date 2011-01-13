@@ -89,6 +89,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
                                          sensors, motion->getInterface()));
 #endif// USE_NOGGIN
+  memory = shared_ptr<Memory>(new Memory(vision));
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 

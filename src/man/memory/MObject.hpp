@@ -1,8 +1,9 @@
 /*
  * MObject.hpp
  *
- * Class MObject, short for Memory Object, is intended to be a wrapper class
- * to the protobuffer subsystem we employ to manage important data
+ * Class MObject, short for Memory Object, is intended to be the interface
+ * to the generic wrapper class to the protobuffer subsystem we employ to
+ * manage important data
  *
  *      Author: oneamtu
  */
@@ -14,6 +15,5 @@ class MObject;
 class MObject {
 
 public:
-    MObject();
-    //TODO: ok, populate this with stuff
+    virtual void update() = 0;
 };

@@ -1,6 +1,6 @@
 package Proto;
 
-message Vision {
+message PVision {
 
     optional VisualBall visual_ball = 1;
 

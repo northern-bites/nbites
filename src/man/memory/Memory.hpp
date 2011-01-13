@@ -22,6 +22,7 @@ class Memory {
 
 public:
     Memory(shared_ptr<Vision> vision_ptr);
+    void updateVision();
 
 public:
     shared_ptr<MVision> vision;
