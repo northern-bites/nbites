@@ -3,6 +3,7 @@
 #define _Profiler_h_DEFINED
 
 #include "cmake.vision/profileconfig.h"
+#include <algorithm>
 
 
 #ifdef USE_TIME_PROFILING
@@ -74,6 +75,8 @@ class Profiler {
     }
     inline bool exitComponent(ProfiledComponent c) {
       lastTime[c] = timeFunction() - enterTime[c];
+      minTime[c] = std::min(lastTime[c], minTime[c]);
+      maxTime[c] = std::max(lastTime[c], maxTime[c]);
       return profiling;
     }
 
@@ -88,6 +91,8 @@ class Profiler {
     int current_frame;
     long long enterTime[NUM_PCOMPONENTS];
     long long lastTime[NUM_PCOMPONENTS];
+    long long minTime[NUM_PCOMPONENTS];
+    long long maxTime[NUM_PCOMPONENTS];
     long long sumTime[NUM_PCOMPONENTS];
 };
 
