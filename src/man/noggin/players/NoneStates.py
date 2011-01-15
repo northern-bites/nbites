@@ -6,16 +6,17 @@ import man.motion.SweetMoves as SweetMoves
 import man.motion.MotionConstants as MotionConstants
 
 
-def gamePlaying(player):
-    ''' Overwritting the gameInital State'''
+def gameInitial(player):
     return player.stay()
 
 def gameReady(player):
-    if player.firstFrame():
-        player.brain.tracker.switchTo('locPans')
-        player.standup()
-
-    if player.counter < 100:
-        player.brain.sensors.saveFrame()
-
     return player.stay()
+def gameSet(player):
+    return player.stay()
+def gamePlaying(player):
+    return player.stay()
+def gamePenalized(player):
+    return player.stay()
+def gameFinished(player):
+    return player.stay()
+
