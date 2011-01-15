@@ -116,7 +116,7 @@ private:
     static const int GUARDIAN_FRAME_RATE;
     static const int GUARDIAN_FRAME_LENGTH_uS;
 
-    unsigned long long int lastHeatWarning;
+    unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
     static const unsigned long long int TIME_BETWEEN_HEAT_WARNINGS =
         MICROS_PER_SECOND * 60;
 
