@@ -490,7 +490,7 @@ void RoboGuardian::checkConnection(){
         if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
             cout    << "No connection detected, trying to reconnect interfaces, attempt "
                     << wifiReconnectTimeout << endl;
-			reconnectWifiConnection();
+            reconnectWifiConnection();
             wifiReconnectTimeout++;
         }
     }
@@ -524,7 +524,7 @@ bool RoboGuardian::checkWireless(){
 // we assume that autoconnect is on and that we already  have connected
 // to the network before
 void RoboGuardian::reconnectWifiConnection(){
-    playFile(wifi_restart_wav);
+    // playFile(wifi_restart_wav);
     FILE * f3 = popen("connman services | awk '/ROBOTICS/ {print $4}'", "r");
     char service[100] = "";
     fscanf(f3,"%s\n", service);
