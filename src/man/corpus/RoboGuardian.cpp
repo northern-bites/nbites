@@ -228,7 +228,7 @@ void RoboGuardian::checkFalling(){
 
 
 void RoboGuardian::processFallingProtection(){
-    if(falling && !registeredFalling){
+    if(useFallProtection && falling && !registeredFalling){
         registeredFalling = true;
         executeFallProtection();
     }else if(notFallingFrames > FALLING_RESET_FRAMES_THRESH){
