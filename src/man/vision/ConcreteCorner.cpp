@@ -411,7 +411,6 @@ const vector <const ConcreteCorner*>& ConcreteCorner::rightTCorners()
 		&blue_goal_right_t(),
 		&yellow_goal_right_t()
 	};
-    cout << "In right T" << endl;
 	static const vector<const ConcreteCorner*>
 		corners(corners_array,
 				corners_array + sizeof(corners_array) / sizeof(corners_array[0]));
