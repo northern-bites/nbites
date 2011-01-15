@@ -25,6 +25,7 @@
 
 class Cross; // forward reference
 #include "Threshold.h"
+#include "Context.h"
 #include "VisionStructs.h"
 #include "VisualLine.h"
 #include "Blob.h"
@@ -34,7 +35,7 @@ static const int NOISE = 4;
 
 class Cross {
 public:
-    Cross(Vision* vis, Threshold* thr, Field* fie);
+    Cross(Vision* vis, Threshold* thr, Field* fie, Context* con);
     virtual ~Cross() {}
 
 	void init();
@@ -55,6 +56,7 @@ private:
     Vision* vision;
     Threshold* thresh;
 	Field* field;
+    Context* context;
 
 	Blobs* blobs;
 	int numberOfRuns, runsize;

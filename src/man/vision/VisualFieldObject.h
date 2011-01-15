@@ -78,6 +78,8 @@ public:
     const point<float> getFieldLocation() const { return fieldLocation; }
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
+	const float getFieldX2() const { return fieldLocation2.x; }
+	const float getFieldY2() const { return fieldLocation2.y; }
     const std::list <const ConcreteFieldObject *> * getPossibleFieldObjects()
 		const { return possibleFieldObjects; }
 
@@ -90,6 +92,7 @@ private: // Class Variables
     point <int> leftBottom;
     point <int> rightBottom;
     point <float> fieldLocation;
+	point <float> fieldLocation2; // for abstract field objects
     // This list will hold all the possibilities for this objects's specific ID
     const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
 

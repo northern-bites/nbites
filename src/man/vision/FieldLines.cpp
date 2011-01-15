@@ -189,7 +189,7 @@ void FieldLines::lineLoop()
 void FieldLines::afterObjectFragments()
 {
 
-    identifyCorners(cornersList);
+    vision->thresh->context->identifyCorners(cornersList);
 
 #ifdef OFFLINE
     if (debugVertEdgeDetect || debugHorEdgeDetect ||
@@ -201,6 +201,13 @@ void FieldLines::afterObjectFragments()
     }
 #endif
 }
+
+#ifdef OFFLINE
+void FieldLines::setDebugIdentifyCorners(bool _bool) {
+    debugIdentifyCorners = _bool;
+    vision->thresh->context->setDebugIdentifyCorners(_bool);
+}
+#endif
 
 
 // This method populates the points vector with line points it finds in
@@ -978,7 +985,9 @@ void FieldLines::joinLines()
             const int oldColor = (*i)->getColor();
 
             isCCLine = isCCLine || (*i)->getCCLine() || (*j)->getCCLine();
-
+            if (isCCLine) {
+                vision->thresh->context->setSeeCenterCircle();
+            }
 
             ++numberOfJoinedLines;
             if (debugJoinLines)
@@ -1302,136 +1311,6 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
              << remainingPoints.size() << " points remain unfit. " << endl;
     }
 
-}
-
-/**
- * Given a list of VisualCorners, attempts to assign ConcreteCorners (ideally
- * one, but sometimes multiple) that correspond with where the corner could
- * possibly be on the field.  For instance, if we have a T corner and it is
- * right next to the blue goal left post, then it is the blue goal right T.
- * Modifies the corners passed in by calling the setPossibleCorners method;
- * in certain cases the shape of a corner might be switched too (if an L
- * corner is determined to be a T instead, its shape is changed accordingly).
- */
-void FieldLines::identifyCorners(list <VisualCorner> &corners)
-{
-
-    if (debugIdentifyCorners)
-        cout << "Beginning identifyCorners() with " << corners.size()
-             << " corners" << endl;
-
-	int numCorners = corners.size(), numTs = 0, numLs = 0;
-	if (numCorners > 1) {
-
-		list <VisualCorner>::iterator i = corners.begin();
-		for ( ; i != corners.end(); i++){
-			if (i->getShape() == T) {
-				numTs++;
-			}
-			if (i->getShape() == INNER_L || i->getShape() == OUTER_L) {
-				numLs++;
-			}
-		}
-	}
-
-    vector <const VisualFieldObject*> visibleObjects = getVisibleFieldObjects();
-
-	// We might later use uncertain objects, but they cause problems. e.g. if you see
-	// one post as 2 posts (both the left and right), you get really bad things or
-	// if one post is badly estimated.
-	if (visibleObjects.empty())
-		visibleObjects = getAllVisibleFieldObjects();
-
-    // No explicit movement of iterator; will do it manually
-    for (list <VisualCorner>::iterator i = corners.begin();i != corners.end();){
-
-        if (debugIdentifyCorners) {
-            cout << endl << "Before identification: Corner: "
-                 << endl << "\t" << *i << endl;
-        }
-
-        const list <const ConcreteCorner*> possibleClassifications =
-            classifyCornerWithObjects(*i, visibleObjects);
-
-        // Keep it completely abstract
-        if (possibleClassifications.empty()) {
-            i->setPossibleCorners(ConcreteCorner::getPossibleCorners(
-                                      i->getShape()));
-            if (debugIdentifyCorners) {
-                cout << "No matches were found for this corner; going to keep "
-                     << "it completely abstract." << endl;
-                printPossibilities(i->getPossibleCorners());
-            }
-            ++i;
-        }
-
-        // It is unique, append to the front of the list
-        // For localization we want the positively identified corners to come
-        // first so  that  they can inform the localization system and help
-        // identify abstract corners that might be in the frame
-        else if (possibleClassifications.size() == 1) {
-            if (debugIdentifyCorners) {
-                cout << "Only one possibility; appending to the front of the "
-                     << "list " << endl;
-                printPossibilities(possibleClassifications);
-            }
-
-            VisualCorner copy = *i;
-            copy.setPossibleCorners(possibleClassifications);
-            // This has the effect of incrementing our iterator and deleting the
-            // corner from our list.
-            i = corners.erase(i);
-            corners.push_front(copy);
-        }
-        // More than 1 possibility for the corner
-        else {
-			// if we have more corners then those may help us ID the corner
-			if (numCorners > 1) {
-				if 	(i->getShape() == T) {
-					if (numTs > 1) {
-						// for now we'll just toss these
-						// @TODO: Theoretically we can classify these
-						if (debugIdentifyCorners) {
-							cout << "Two Ts found - for now we throw them both out" << endl;
-						}
-						corners.clear();
-						return;
-					}
-				}
-			}
-
-            // If either of the lines forming the corner are cc lines, then
-            // the corner must be a cc intersection
-            if (i->getShape() == CIRCLE ||
-                i->getLine1()->getCCLine() ||
-                i->getLine2()->getCCLine()) {
-                i->setPossibleCorners(ConcreteCorner::ccCorners());
-                i->setShape(CIRCLE);
-            } else {
-                i->setPossibleCorners(possibleClassifications);
-				i->identifyLinesInCorner();
-            }
-            if (debugIdentifyCorners) {
-                printPossibilities(i->getPossibleCorners());
-            }
-            ++i;
-        }
-    }
-
-    for (list <VisualCorner>::iterator i = corners.begin();
-		 i != corners.end(); ++i){
-		i->identifyFromLines();
-		i->identifyLinesInCorner();
-		if (debugIdentifyCorners)
-			printPossibilities(i->getPossibleCorners());
-	}
-
-	// If our corners have no identity, set them to their shape possibilities
-    for (list <VisualCorner>::iterator i = corners.begin();
-		 i != corners.end(); ++i){
-		if (i->getPossibleCorners().empty())
-			i->setPossibleCorners(ConcreteCorner::getPossibleCorners(i->getShape()));
-	}
 }
 
 /**
@@ -2041,7 +1920,7 @@ void FieldLines::removeDuplicateLines()
 				// Check if the two lines lie very close to each other
 				const BoundingBox box1 = Utility::
 					getBoundingBox(**j,
-                                   (*j)->getAvgWidth(),
+                                   (int)(*j)->getAvgWidth(),
 								   INTERSECT_MAX_PARALLEL_EXTENSION);
 
 				const bool box1Contains = Utility::
@@ -2064,7 +1943,7 @@ void FieldLines::removeDuplicateLines()
 				} else {
 					const BoundingBox box1 = Utility::
 						getBoundingBox(**i,
-									   (*i)->getAvgWidth(),
+									   (int)(*i)->getAvgWidth(),
 									   INTERSECT_MAX_PARALLEL_EXTENSION);
 					const bool box1Contains = Utility::
 						boxContainsPoint(box1,
@@ -2114,6 +1993,10 @@ list< VisualCorner > FieldLines::intersectLines()
         cout <<"Beginning intersectLines() with " << linesList.size() << " lines.."
              << endl;
     }
+
+    // Reset all of the context variables
+    vision->thresh->context->init();
+
     // Keep track of the number of duplicate intersections (where two
     // intersection points occur very close to each other on the screen).
     // In places not near the center circle, there should be very few
@@ -2149,6 +2032,9 @@ list< VisualCorner > FieldLines::intersectLines()
             }
 
             if (intersection.x == Utility::NO_INTERSECTION) {
+                vision->thresh->context->setGoalBoxLines();
+                (*i)->setParallel();
+                (*j)->setParallel();
                 if (debugIntersectLines)
                     cout << "\t" << numChecksPassed
                          <<"- Lines are parallel. No intersection" << endl;
@@ -2157,6 +2043,11 @@ list< VisualCorner > FieldLines::intersectLines()
             else {
                 if (debugIntersectLines) {
                     cout << "\tIntersection occurs at " << intersection << endl;
+                }
+                if (intersection.x < -200 || intersection.x > IMAGE_WIDTH + 200) {
+                    (*i)->setParallel();
+                    (*j)->setParallel();
+                    vision->thresh->context->setGoalBoxLines();
                 }
             }
             vision->thresh->drawPoint(intersection.x, intersection.y,
@@ -2193,7 +2084,7 @@ list< VisualCorner > FieldLines::intersectLines()
 				findLinePointDistanceFromStart(intersection, **j);
 
 			if (doLinesCross(*i, *j, t_I, t_J, numChecksPassed)) {
-				isCCIntersection = true;
+                //cout << "Lines cross" << endl;
 			}
             ++numChecksPassed;
 
@@ -2305,6 +2196,10 @@ list< VisualCorner > FieldLines::intersectLines()
 				} else if (isTActuallyCC(c, *i, *j, intersection,
 										 line1Closer, line2Closer)){
 					c.setShape(CIRCLE);
+                    if (debugIntersectLines){
+                        cout << "Tossed a corner that confused me" << endl;
+                    }
+                    continue;
 				}
 			}
 
@@ -2318,6 +2213,17 @@ list< VisualCorner > FieldLines::intersectLines()
 			}
 
             corners.push_back(c);
+
+            // while we're at it, set the context variables for the corner
+            if (c.getShape() == T) {
+                vision->thresh->context->setTCorner();
+            } else if (c.getShape() == OUTER_L) {
+                vision->thresh->context->setILCorner();
+            } else if (c.getShape() == INNER_L) {
+                vision->thresh->context->setOLCorner();
+            } else {
+                vision->thresh->context->setCCCorner();
+            }
 
             // Add the intersection point to both lines.
             // Has 0 lineWidth. As a corner, hard to figure out its "the width"
@@ -2802,7 +2708,7 @@ const bool FieldLines::isThereGreenAroundCorner(const VisualCorner& corner,
 const bool FieldLines::isItGreenAcrossFromLine(const VisualCorner& corner,
                                                const VisualLine& i) const
 {
-    const int GREEN_CHECK_OFFSET = max(10.0f,
+    const int GREEN_CHECK_OFFSET = (int)max(10.0f,
                                        max(corner.getLine1()->getAvgWidth(),
                                            corner.getLine2()->getAvgWidth()));
     static const int GREEN_AROUND_TEST_RADIUS = 3;
@@ -2965,7 +2871,7 @@ const bool FieldLines::dangerousEdgeCorner(const VisualCorner& corner,
     // If corner is right against screen edge, we must fail it since
     // we can't see anything on the other side.
     static const int AUTO_FAIL_ZONE = 5;
-    static const int DANGER_ZONE = 20;
+    static const int DANGER_ZONE = 25;
 
     static const int LEFT_BORDER = DANGER_ZONE;
     static const int RIGHT_BORDER = IMAGE_WIDTH - DANGER_ZONE;
@@ -3306,7 +3212,7 @@ FieldLines::nearGoalTCornerLocation(const VisualCorner& corner,
                  ConcreteCorner::blueGoalTCorners().begin();
              i != ConcreteCorner::blueGoalTCorners().end(); ++i) {
             if (fabs(getEstimatedDistance(&corner, post) -
-                     getRealDistance(*i, post)) < ALLOWABLE_ERROR) {
+                     getRealDistance(*i, post, 0)) < ALLOWABLE_ERROR) {
                 return true;
             }
         }
@@ -3316,7 +3222,7 @@ FieldLines::nearGoalTCornerLocation(const VisualCorner& corner,
                  ConcreteCorner::yellowGoalTCorners().begin();
              i != ConcreteCorner::yellowGoalTCorners().end(); ++i) {
             if (fabs(getEstimatedDistance(&corner, post) -
-                     getRealDistance(*i, post)) < ALLOWABLE_ERROR) {
+                     getRealDistance(*i, post, 0)) < ALLOWABLE_ERROR) {
                 return true;
             }
         }
@@ -3365,22 +3271,6 @@ const bool FieldLines::LWorksWithPost(const VisualCorner& c,
             Utility::left(fartherPoint2, cornerLoc, leftPostLoc)) &&
         (Utility::left(fartherPoint1, cornerLoc, rightPostLoc) ^
          Utility::left(fartherPoint2, cornerLoc, rightPostLoc));
-}
-/*
-  void FieldLines::goalieSpecificCheck(list <VisualCorner>& corners) {
-  // If we see an inner L and an outer L in the same frame, chances are
-  // the outer L is a T
-
-  }*/
-
-void
-FieldLines::printPossibilities(const list <const ConcreteCorner*> &_list) const
-{
-    cout << "Possibilities: " << endl;
-    for (list<const ConcreteCorner*>::const_iterator i = _list.begin();
-         i != _list.end(); ++i) {
-        cout << (*i)->toString() << endl;
-    }
 }
 
 void FieldLines::printFieldObjectsInformation()
@@ -3456,162 +3346,6 @@ const bool FieldLines::postOnScreen() const
          vision->yglp->getIDCertainty() == _SURE) ||
         (vision->ygrp->getDistance() > 0 &&
          vision->ygrp->getIDCertainty() == _SURE);
-}
-/**
- * Compare the given VisualCorner with other visible objects
- *  to see if the distances fit any sort of ConcreteCorners.
- *  Sets the possiblilities of the VisualCorner.
- *
- *  @param corner Corner to compare with VisualFieldObjects
- *  @param visibleObjects Visible objects to compare corner dists to.
- *  @return List of all ConcreteCorners whose distances fit the given objects.
- */
-const list<const ConcreteCorner*> FieldLines::classifyCornerWithObjects(
-    const VisualCorner &corner,
-    const vector <const VisualFieldObject*> &visibleObjects) const
-{
-
-	// Get all the possible corners given the shape of the corner
-	vector <const ConcreteCorner*> possibleCorners =
-		ConcreteCorner::getPossibleCorners(corner.getShape());
-
-    if (debugIdentifyCorners) {
-        cout << endl
-             << "Beginning to get possible classifications for corner given "
-             << visibleObjects.size() << " visible objects and "
-             << possibleCorners.size() << " corner possibilities" << endl
-             << endl;
-    }
-
-	// Get all the possible corners given the shape of the corner
-	list<const ConcreteCorner*> possibleClassifications =
-        compareObjsCorners(corner, possibleCorners, visibleObjects);
-
-	// If we found nothing that time, try again with all the corners to
-	// see if possibly the corner was misidentified (e.g. saw an L, but
-	// actually a T)
-	if (possibleClassifications.empty()){
-
-		possibleCorners = ConcreteCorner::concreteCorners();
-		possibleClassifications =
-			compareObjsCorners(corner, possibleCorners, visibleObjects);
-	}
-
-    return possibleClassifications;
-}
-
-// Given a list of concrete corners that the visual corner could possibly be,
-// weeds out the bad ones based on distances to visible objects and returns
-// those that are still in the running.
-list <const ConcreteCorner*> FieldLines::compareObjsCorners(
-	const VisualCorner& corner,
-	const vector<const ConcreteCorner*>& possibleCorners,
-	const vector<const VisualFieldObject*>& visibleObjects) const
-{
-	list<const ConcreteCorner*> possibleClassifications;
-
-    // For each field object that we see, calculate its real distance to
-    // each possible concrete corner and compare with the visual estimated
-    // distance. If it fits, add it to the list of possibilities.
-	for (vector <const VisualFieldObject*>::const_iterator k =
-			 visibleObjects.begin(); k != visibleObjects.end(); ++k) {
-
-		const float estimatedDistance = getEstimatedDistance(&corner, *k);
-		const float distanceToCorner = corner.getDistance();
-		vector<const ConcreteCorner*>::const_iterator j =
-			possibleCorners.begin();
-
-		for (; j != possibleCorners.end(); ++j) {
-			// The visual object might be abstract, so we should check
-			// all of its possible objects to see if we're close enough to one
-			// and add all the possibilities up.
-			list<const ConcreteFieldObject*>::const_iterator i =
-				(*k)->getPossibleFieldObjects()->begin();
-
-			for (; i != (*k)->getPossibleFieldObjects()->end() ; ++i) {
-
-				if (arePointsCloseEnough(estimatedDistance, *j, *k,
-										 distanceToCorner)) {
-					possibleClassifications.push_back(*j);
-
-					if (debugIdentifyCorners) {
-						cout << "Corner is possibly a " << (*j)->toString() << endl;
-					}
-				}
-			}
-		}
-	}
-	return possibleClassifications;
-}
-
-/**
- * Compares the given estimated distance against the actual distance between
- * the given concrete corner and the field object's true field position. Returns
- * true if the estimated distance is acceptable.
- *
- * @param estimatedDistance Estimated distance between VisualCorner and VisualFieldObject
- * @param j Corner whose distance from the FieldObject is being measured
- * @param k FieldObject used for measuremnts
- * @param distToCorner Distance from robot to corner.
- */
-const bool FieldLines::arePointsCloseEnough(const float estimatedDistance,
-											const ConcreteCorner* j,
-											const VisualFieldObject* k,
-											const float distToCorner) const
-{
-	const float realDistance = getRealDistance(j, k);
-	const float absoluteError = fabs(realDistance - estimatedDistance);
-
-	const float relativeErrorReal = absoluteError / realDistance * 100.0f;
-
-	// If we have already one good distance between this corner and a
-	// field object, we only require that the next objects have a small
-	// relative error.
-	const float MAX_RELATIVE_ERROR = 70.0f;
-	const float USE_RELATIVE_DISTANCE = 250.0f;
-    const float MAX_ABSOLUTE_ERROR = 200.f;
-
-    if ( relativeErrorReal < MAX_RELATIVE_ERROR &&
-         k->getDistance() > USE_RELATIVE_DISTANCE &&
-         distToCorner > USE_RELATIVE_DISTANCE &&
-         absoluteError < MAX_ABSOLUTE_ERROR) {
-		if (debugIdentifyCorners) {
-			cout << "\tDistance between " << j->toString() << " and "
-				 << k->toString() << " was fine! Relative error of "
-                 << relativeErrorReal
-				 << " and absolute error of "
-				 << absoluteError
-				 << " corner pos: (" << j->getFieldX() << ","
-				 << j->getFieldY()
-				 << " goal pos: (" << k->getFieldX() << ","
-				 << k->getFieldY() << endl;
-		}
-		return true;
-    } else if (absoluteError > getAllowedDistanceError(k) ||
-        absoluteError > MAX_ABSOLUTE_ERROR) {
-		if (debugIdentifyCorners) {
-			cout << "\tDistance between " << j->toString() << " and "
-				 << k->toString() << " too large." << endl
-				 << "\tReal: " << realDistance
-				 << "\tEstimated: " << estimatedDistance << endl
-				 << "\tAbsolute error: " << absoluteError
-				 << "\tRelative error: " << relativeErrorReal << "% , "
-				 << relativeErrorReal << "%"
-				 << endl;
-		}
-		return false;
-    } else {
-		if (debugIdentifyCorners) {
-			cout << "\tDistance between " << j->toString() << " and "
-				 << k->toString() << " was fine! Absolute error of "
-				 << absoluteError
-				 << " corner pos: (" << j->getFieldX() << ","
-				 << j->getFieldY() << ")"
-				 << " goal pos: (" << k->getFieldX() << ","
-				 << k->getFieldY() << ")" << endl;
-		}
-		return true;
-	}
 }
 
 // @TODO A real distance error calculation. For now, just uses 2 times
@@ -3821,10 +3555,14 @@ void FieldLines::drawSurroundingBox(shared_ptr<VisualLine> line, int color) cons
 // Calculates the length of the straight line between the two objects on the
 // field
 float FieldLines::getRealDistance(const ConcreteCorner *c,
-                                  const VisualFieldObject *obj) const
+                                  const VisualFieldObject *obj, int which) const
 {
-    return Utility::getLength(c->getFieldX(), c->getFieldY(),
-                              obj->getFieldX(), obj->getFieldY());
+	if (which == 0) {
+		return Utility::getLength(c->getFieldX(), c->getFieldY(),
+								  obj->getFieldX(), obj->getFieldY());
+	}
+	return Utility::getLength(c->getFieldX(), c->getFieldY(),
+								  obj->getFieldX2(), obj->getFieldY2());
 }
 
 #ifdef OFFLINE
@@ -4163,7 +3901,7 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
 		 firstPoint != unusedPointsList.end(); firstPoint++) {
 
 
-        if ((firstPoint->foundWithScan == VERTICAL &&
+        /*if ((firstPoint->foundWithScan == VERTICAL &&
 
              (firstPoint->lineWidth >
               WIDTH_LIM_MAX * stem->getAvgVerticalWidth() ||
@@ -4181,9 +3919,12 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
 
             if (debugIntersectLines){
                 cout << "Point " << *firstPoint << " is too wide."<< endl;
+                cout << "    " <<  stem->getAvgHorizontalWidth() << " " <<
+                    stem->getAvgVerticalWidth() << endl;
+
             }
             continue;
-        }
+            }*/
 
 
 		// int pX = firstPoint->x;
@@ -4238,8 +3979,17 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
     if (debugIntersectLines){
         cout << "Found " << oppPointCount << " points across TCorner." << endl;
     }
-    if (oppPointCount >= 2)
+    if (oppPointCount >= 2) {
         return true;
+    } else if (oppPointCount == 1) {
+        // still worrisome
+        if (linesList.size() > 5 && unusedPointsList.size() > 10) {
+            if (debugIntersectLines) {
+                cout << "Too much worrisome information" << endl;
+            }
+            return true;
+        }
+    }
 	return false;
 }
 
