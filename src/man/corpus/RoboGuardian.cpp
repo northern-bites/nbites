@@ -307,8 +307,10 @@ void RoboGuardian::checkTemperatures(){
             }
         }
     }
-    if(sayWarning){
+    if(sayWarning &&
+       micro_time() - lastHeatWarning > TIME_BETWEEN_HEAT_WARNINGS){
         playFile(heat_wav);
+        lastHeatWarning = micro_time();
     }
     lastTemps = newTemps;
 }
