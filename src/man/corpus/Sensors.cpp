@@ -22,6 +22,8 @@
 #include <fstream>
 #include <algorithm>
 #include <cstdlib>
+#include <sys/stat.h>
+
 using namespace std;
 
 #include <boost/assign/std/vector.hpp>
@@ -78,6 +80,9 @@ Sensors::Sensors ()
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
 #endif
+
+    // THIS IS AN OCTAL NUMBER, must start with 0
+    mkdir(FRM_FOLDER.c_str(), 0755); // permissions: u+rwx, og+rx
 }
 
 Sensors::~Sensors ()
@@ -767,9 +772,9 @@ void Sensors::saveFrame()
     FRAME_PATH << FRM_FOLDER << BASE << NUMBER << EXT;
     fstream fout(FRAME_PATH.str().c_str(), fstream::out);
 
-    // Lock and write image
-    // possibility of deadlock if something has the image locked and is waiting for visionAngles
-    // to unlock - not happening in our code atm
+    // Lock and write image possibility of deadlock if something has
+    // the image locked and is waiting for visionAngles to unlock -
+    // not happening in our code atm
     lockVisionAngles();
     lockImage();
     fout.write(reinterpret_cast<const char*>(getImage()),
@@ -778,7 +783,8 @@ void Sensors::saveFrame()
     fout << VERSION << " ";
 
     // Write joints
-    for (vector<float>::const_iterator i = visionBodyAngles.begin(); i < visionBodyAngles.end(); i++) {
+    for (vector<float>::const_iterator i = visionBodyAngles.begin();
+         i < visionBodyAngles.end(); i++) {
         fout << *i << " ";
     }
     releaseImage();
