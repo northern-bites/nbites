@@ -43,14 +43,17 @@ import TOOL.Vision.Vision;
  * @author Joho Strom
  * @author Nicholas Dunn modified for undo/redo functionality.
  * @author Jack Morrison changed yuv ordering to uvy ordering
+ * @author Wils Dawson changed load/save paths to appropriate destination.
  * @see ColorTableUpdate, Calibrate, ThresholdedImage
  * @version 1.0
  */
 public class ColorTable {
     //default table locations,
     //which get statically updated each time we save a new table
-    public static String LOAD_TABLE_PATH = System.getProperty("user.dir");
-    public static String SAVE_TABLE_PATH = System.getProperty("user.dir");
+    public static String LOAD_TABLE_PATH = System.getProperty("user.home")+
+											"/nbites/data/tables";
+    public static String SAVE_TABLE_PATH = System.getProperty("user.home")+
+											"/nbites/data/tables";
 
     public static final byte GREEN = Vision.GREEN;
     public static final byte BLUE = Vision.BLUE;
