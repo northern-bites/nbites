@@ -33,87 +33,30 @@ public class RemoteController {
 
 	// The GUI front-end
 	private RemoteView view;
+    private RemoteModel model;
 
 	public RemoteController() {
-        view = new RemoteView(this);
-	}
-
-	/**
-	 * Update our knowledge of whether NaoQi is running or not.
-	 */
-	public void updateNaoQiStatus(String ip){
-
-	}
+            model = new RemoteModel();
+            view = new RemoteView(this, model);
+    }
 
 	/**
 	 * Restart NaoQi on the robot at the given IP Address.
 	 */
-	public void restartNaoQi(String ip){
-		executeRemoteNaoCommand(ip, "/etc/init.d/naoqi restart");
+	public void restartNaoQi(String host){
+		model.restartNaoQi(host);
 	}
 
 	/**
 	 * Stop NaoQi on the robot at the given IP Address.
 	 */
-	public void stopNaoQi(String ip){
-		executeRemoteNaoCommand(ip, "/etc/init.d/naoqi stop");
+	public void stopNaoQi(String host){
+        model.stopNaoQi(host);
 	}
 
-	/**
-	 * @param ip        IP Address of the robot to execute the command on.
-	 * @param command   Shell command to execute remotely on the Nao.
-	 */
-	public void executeRemoteNaoCommand(String ip, String command){
-
-		// We must be given a robot to execute a command on
-		if (ip == null || ip.length() == 0){
-			System.out.println("No IP Address given, cannot execute remote command.");
-
-		} else {
-			// Ask for password to Nao
-			String password = (String)JOptionPane.showInputDialog(view,
-																  "Please enter password for nao@" + ip);
-
-			if (password != null && password.length() > 0){
-				sshExecCommand(ip, NAO_USERNAME, password, command);
-			}
-		}
-	}
-
-	/**
-	 * SSH into the given host and execute the given shell command.
-	 *
-	 * Uses Ganymed-SSH2 Java Library for SSH interaction with robot
-	 */
-	public void sshExecCommand(String host, String username, String password,
-							   String command){
-		try{
-
-			Connection conn = new Connection(host);
-			conn.connect();
-
-			boolean isAuthenticated = conn.authenticateWithPassword(username, password);
-
-			if (isAuthenticated == false)
-				throw new IOException("Authentication failed.");
-
-			Session sess = conn.openSession();
-			sess.execCommand(command);
-
-			/* Show exit status, if available (otherwise "null") */
-			if (sess.getExitStatus() != null && sess.getExitStatus() != 0){
-				System.out.println("Command exited with code: " + sess.getExitStatus());
-			}
-
-			// Terminate
-			sess.close();
-			conn.close();
-
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		};
-	}
-
+    public void shutdownRobot(String host){
+        model.shutdown(host);
+    }
 
 	/**
 	 * Run a local shell command and print the output.
@@ -181,21 +124,4 @@ public class RemoteController {
     /**
     * @param args the command line arguments
     */
-    public static void main(String args[]) {
-		try {
-			// Set System L&F
-			UIManager.setLookAndFeel(
-									 UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException excp){
-
-		} catch (InstantiationException exc) {
-		} catch (IllegalAccessException exc) {
-		} catch (UnsupportedLookAndFeelException exc) {}
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new RemoteController();
-            }
-        });
-    }
-
 }
