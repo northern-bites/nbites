@@ -2,7 +2,8 @@ package Proto;
 
 message PVision {
 
-    optional VisualBall visual_ball = 1;
+    optional uint64 timestamp = 1;
+    optional VisualBall visual_ball = 2;
 
     message VisualBall {
 

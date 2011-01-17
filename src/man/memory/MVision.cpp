@@ -6,7 +6,11 @@
 
 #include "MVision.hpp"
 
+#include "Common.h" //for micro_time
+
 using boost::shared_ptr;
+
+extern long long int birth_time;
 
 MVision::MVision(shared_ptr<Vision> v) : vision(v) {
     fileLogger = new FileLogger("Vision.log", this);
@@ -17,6 +21,10 @@ MVision::~MVision() {
 }
 
 void MVision::update() {
+
+    //TODO: should we make this do milisecs instead of
+    //micro to save space?
+    this->set_timestamp(micro_time() - birth_time);
 
     Proto::PVision::VisualBall* visual_ball;
     visual_ball = this->mutable_visual_ball();

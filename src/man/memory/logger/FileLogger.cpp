@@ -10,6 +10,7 @@
 
 #include "FileLogger.hpp"
 
+using namespace std;
 
 FileLogger::FileLogger(char* fileName, ProtoMessage* m) : Logger(m) {
     int file_descriptor = open(fileName,
