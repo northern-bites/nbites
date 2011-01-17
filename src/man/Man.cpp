@@ -178,6 +178,7 @@ Man::processFrame ()
   PROF_ENTER(profiler, P_VISION);
   vision->notifyImage(sensors->getImage());
   PROF_EXIT(profiler, P_VISION);
+  memory->updateVision();
   //vision->notifyImage();
 #endif
 

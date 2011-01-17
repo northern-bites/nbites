@@ -42,7 +42,7 @@ SET( INCLUDE_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/include)
 # Ensure the TRUNK_PATH variable is set
 
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH . ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
@@ -53,7 +53,7 @@ ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
 
 ############################ BUILDCONFIG
 # Include the config file for this build
-INCLUDE( buildconfig.cmake )
+INCLUDE( cmake.man/buildconfig.cmake )
 
 
 ############################ BASE DEFINITIONS
@@ -109,7 +109,7 @@ ENDIF(WEBOTS_BACKEND)
 
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
-  ${MAN_CMAKE_DIR}/manconfig.in
+  ${MAN_CMAKE_DIR}/cmake.man/manconfig.in
   ${CMAKE_CURRENT_BINARY_DIR}/manconfig.h
   ESCAPE_QUOTES
   )
@@ -168,14 +168,14 @@ SET( COLOR_TABLE
 
 #upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(
-  ${MAN_CMAKE_DIR}/upload.sh.in
+  ${MAN_CMAKE_DIR}/cmake.man/upload.sh.in
   ${MAN_CONFIG_DIR}/upload.sh
   ESCAPE_QUOTES
   )
 
 
 CONFIGURE_FILE(
-  ${MAN_CMAKE_DIR}/nameconfig.in
+  ${MAN_CMAKE_DIR}/cmake.man/nameconfig.in
   ${INCLUDE_CONFIG_DIR}/nameconfig.h
   ESCAPE_QUOTES
   )
@@ -287,7 +287,7 @@ SUBDIRS(
   ${MOTION_CMAKE_DIR}
   ${NOGGIN_CMAKE_DIR}
   ${VISION_CMAKE_DIR}
-  ${MEMORY_CMAKE_DIR}
+  memory
   )
 
 

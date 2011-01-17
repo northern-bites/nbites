@@ -8,18 +8,18 @@
 #include "Memory.hpp"
 
 Memory::Memory(shared_ptr<Vision> vision_ptr) {
-    this->vision = shared_ptr<MVision>(new MVision(vision_ptr));
+    this->vision = new MVision(vision_ptr);
 }
 
-/**
- * function updateVision()
- *
- * calls the update function on the vision memory object
- * which in turn
- * updates the vision memory object with all the relevant data
- * from the Man vision object
- *
- */
+Memory::~Memory() {
+    delete vision;
+}
+
+void Memory::update(MObject* obj) {
+    obj->update();
+    obj->log();
+}
+
 void Memory::updateVision() {
-    vision->update();
+    update(vision);
 }

@@ -9,9 +9,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-
-//class Memory::Memory;
-#include "MemoryMacros.hpp"
+class Memory;
+//#include "MemoryMacros.hpp"
 #include "MVision.hpp"
 
 #include "Vision.h"
@@ -22,9 +21,11 @@ class Memory {
 
 public:
     Memory(shared_ptr<Vision> vision_ptr);
+    ~Memory();
+    void update(MObject* obj);
     void updateVision();
 
 public:
-    shared_ptr<MVision> vision;
+    MVision* vision;
 
 };

@@ -12,8 +12,12 @@
 
 class MObject;
 
+#include "logger/FileLogger.hpp"
+
 class MObject {
 
 public:
     virtual void update() = 0;
+    virtual void log() const = 0;
+
 };

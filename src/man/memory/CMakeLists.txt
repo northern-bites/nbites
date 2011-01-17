@@ -86,6 +86,7 @@ ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
+
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${PROTOBUF_INCLUDE_DIR}
                      ${MEMORY_INCLUDE_DIR}
@@ -96,14 +97,19 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-set( MEMORY_SRCS ${MEMORY_INCLUDE_DIR}/Memory
-                 ${MEMORY_INCLUDE_DIR}/MVision
+
+set( MEMORY_SRCS Memory
+                 MVision
                                   )
 ############################ (SUB)DIRECTORY COMPILATION
-# add the pb subdirectory
+# add the protobuffer C++ source subdirectory
 # it's where we house all our generated protobuggers
+
 set( PROTOS_TARGET protos )
+set( LOGGER_TARGET logger )
+
 add_subdirectory( gen )
+add_subdirectory( logger )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output executable or shared library, and the install
@@ -112,7 +118,7 @@ add_subdirectory( gen )
   # Add static library target
   add_library(
     ${MEMORY_TARGET}
-    SHARED
+    STATIC
     ${MEMORY_SRCS}
     )
 
@@ -120,6 +126,7 @@ add_subdirectory( gen )
 target_link_libraries(
   ${MEMORY_TARGET}
   ${PROTOS_TARGET}
+  ${LOGGER_TARGET}
   )
 
 

@@ -12,9 +12,12 @@ class MVision: public Proto::PVision, public MObject {
 
 public:
     MVision(boost::shared_ptr<Vision> v);
+    ~MVision();
     void update();
+    void log() const;
 
 private:
     boost::shared_ptr<Vision> vision;
+    FileLogger* fileLogger;
 
 };

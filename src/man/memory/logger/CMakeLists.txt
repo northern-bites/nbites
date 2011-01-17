@@ -1,7 +1,5 @@
-##############################
 #
 # Welcome
-#
 #
 
 ############################ Version
@@ -33,7 +31,7 @@ INCLUDE( ${CMAKE_MODULE_PATH}/base_definitions.cmake )
 # Display summary of options
 
 MESSAGE( STATUS "" )
-MESSAGE( STATUS "...:::: Configuration - Protos ::::..." )
+MESSAGE( STATUS "...:::: Configuration - Logger ::::..." )
 MESSAGE( STATUS "" )
 
 ############################ FIND PACKAGE
@@ -41,7 +39,6 @@ MESSAGE( STATUS "" )
 # cmake packages we use
 
 FIND_PACKAGE( NBCOMMON REQUIRED )
-FIND_PACKAGE( PROTOBUF REQUIRED )
 
 ############################ DEFINITION
 # Add here definition needed.
@@ -52,26 +49,22 @@ add_definitions( ${NBCOMMON_DEFINITIONS}
 ############################ INCLUDE DIRECTORY
 # Define include directories
 include_directories( ${NBCOMMON_INCLUDE_DIR}/
-                     ${PROTOBUF_INCLUDE_DIR}/
-                     ${MEMORY_INCLUDE_DIR}/
                      ${MEMORY_CONFIG_DIR}/
                      )
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-# TODO: just make it compile everything that has .pb in it
-set( PROTOS_SRCS Vision.pb )
+set( LOGGER_SRCS FileLogger.cpp )
 
 ############################ Add sources
 
   # Add static library target
   add_library(
-    ${PROTOS_TARGET}
+    ${LOGGER_TARGET}
     STATIC
-    ${PROTOS_SRCS}
+    ${LOGGER_SRCS}
     )
 
 target_link_libraries(
-    ${PROTOS_TARGET}
-    ${PROTOBUF_LIBRARIES}
+    ${LOGGER_TARGET}
     )

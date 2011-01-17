@@ -40,7 +40,7 @@ SET( MEMORY_INCLUDE_DIR ${MAN_INCLUDE_DIR}/memory )
 
 SET( COMM_CMAKE_DIR       ${COMM_INCLUDE_DIR}/cmake.comm         )
 SET( CORPUS_CMAKE_DIR     ${CORPUS_INCLUDE_DIR}/cmake.man.corpus )
-SET( MAN_CMAKE_DIR        ${MAN_INCLUDE_DIR}/cmake.man           )
+SET( MAN_CMAKE_DIR        ${MAN_INCLUDE_DIR}/                    )
 SET( MOTION_CMAKE_DIR     ${MOTION_INCLUDE_DIR}/cmake.man.motion )
 SET( NOGGIN_CMAKE_DIR     ${NOGGIN_INCLUDE_DIR}/cmake.noggin     )
 SET( VISION_CMAKE_DIR     ${VISION_INCLUDE_DIR}/cmake.vision     )
