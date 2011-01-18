@@ -15,11 +15,9 @@
 
 using namespace std;
 
-typedef unsigned char uchar;
-
 // Our function to test!
-extern "C" unsigned int _acquire_image(uchar * colorTable, ColorParams* params,
-                               uchar* yuvImage, uchar* outImage);
+extern "C" unsigned int _acquire_image(uint8_t * colorTable, ColorParams* params,
+                                       uint8_t* yuvImage, uint16_t* outImage);
 
 ImageAcquisitionTest::ImageAcquisitionTest() :
     c(0,0,0, 256, 256, 256, 128, 128, 128), // Default old table size
@@ -39,7 +37,8 @@ ImageAcquisitionTest::~ImageAcquisitionTest()
 
 void ImageAcquisitionTest::init()
 {
-    table = yuv = yuvCopy = out = NULL;
+    yuv = table = yuvCopy = NULL;
+    out = NULL;
 }
 
 /**
@@ -59,11 +58,11 @@ void ImageAcquisitionTest::setup(int y0, int u0, int v0,
 
     // Fill the table and images with random values
     for (int i = 0; i < tableMaxSize; ++i) {
-        table[i] = static_cast<uchar>(rand()% 255);
+        table[i] = static_cast<uint8_t>(rand()% 255);
     }
 
     for (int i = 0; i < NAO_IMAGE_BYTE_SIZE; ++i) {
-        yuv[i] = static_cast<uchar>(rand() % 255);
+        yuv[i] = static_cast<uint8_t>(rand() % 255);
     }
 
     for (int i = 0; i < NAO_IMAGE_BYTE_SIZE; ++i) {
@@ -78,21 +77,22 @@ void ImageAcquisitionTest::setup(int y0, int u0, int v0,
 void ImageAcquisitionTest::allocate()
 {
     if (table == NULL){
-        table = new uchar[tableMaxSize];
+        table = new uint8_t[tableMaxSize];
     }
 
     if (yuv == NULL){
-        yuv = new uchar[NAO_IMAGE_BYTE_SIZE];
+        yuv = new uint8_t[NAO_IMAGE_BYTE_SIZE];
     }
 
     // Copy the image for later checking
     if (yuvCopy == NULL){
-        yuvCopy = new uchar[NAO_IMAGE_BYTE_SIZE];
+        yuvCopy = new uint8_t[NAO_IMAGE_BYTE_SIZE];
     }
 
     // Allocate the output image.
     if (out == NULL){
-        out = new uchar[IMAGE_BYTE_SIZE];
+        // 2 bytes per Y value and 1 per color value
+        out = new uint16_t[320*240*2];
     }
 }
 
@@ -117,7 +117,7 @@ int ImageAcquisitionTest::yAvgValue(int i, int j) const
     // Get location of pixel in full size (double width) YUV image x4
     // is for 2 bytes per pixel and double YUV image size compared to
     // output image
-    uchar* p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
+    uint8_t* p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
     return (static_cast<int>(p[YOFFSET1]) +
             static_cast<int>(p[YOFFSET2]) +
             static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + YOFFSET1]) +
@@ -131,7 +131,7 @@ int ImageAcquisitionTest::yAvgValue(int i, int j) const
  */
 int ImageAcquisitionTest::uAvgValue(int i, int j) const
 {
-    uchar * p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
+    uint8_t * p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
     return (static_cast<int>(p[UOFFSET]) +
             static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + UOFFSET]));
 }
@@ -143,7 +143,7 @@ int ImageAcquisitionTest::uAvgValue(int i, int j) const
  */
 int ImageAcquisitionTest::vAvgValue(int i, int j) const
 {
-    uchar * p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
+    uint8_t * p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
     return (static_cast<int>(p[VOFFSET]) +
             static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + VOFFSET]));
 }
@@ -289,8 +289,8 @@ void ImageAcquisitionTest::run_average_test(){
     for (int i = 0; i < IMAGE_HEIGHT; ++i) {
         for (int j=0; j < IMAGE_WIDTH; ++j){
 
-            int output = (int)out[i*IMAGE_WIDTH + j];
-            EQ_INT( yAvgValue(i, j) >> 2, output);
+            uint16_t output = out[i*IMAGE_WIDTH + j];
+            EQ_INT ( (yAvgValue(i, j) >> 2), output);
         }
     }
     PASSED(AVERAGES);

@@ -67,8 +67,10 @@
 	## Lookup color in table
         movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
 	                                        # just moving a byte to al
-        mov     [edi+ecx+\phase+(320*240)], al		# color image is just after y image in memory,
-                                			# so displacement is (320*240)
+        mov     word ptr[edi+ecx*2+\phase*2+(320*240*2)], ax
+				# color image is just after y image in memory,
+				# so displacement is (320*240*2)
+				# since Y and color values 16 bits each
 .endm
 
 	## The inner loop of the image copy, averaging, and color segmentation
@@ -119,7 +121,9 @@
 	COPY_SHIFT_R mm2, mm0
 
 	## Pack values from first two phases together as 4 words in mm4
+	## mm4 after pack: | y3 | y2 | y1 | y0 |
 	packssdw mm4, mm2
+	movntq [edi+ecx*2], mm4
 	.endif
 
 	.ifeq (\phase - 2)
@@ -134,11 +138,7 @@
 	## mm2 before: | 0 | y7 | 0 | y6|
 	## mm5 after:  | y7 | y6 | y5 | y4 | all 16 bit words
 	packssdw mm5, mm2
-
-	## Pack results from all 4 phases together, result is:
-	## mm4: | y7 | y6 | y5 | y4 | y3 | y2 | y1 | y0 |
-	packuswb mm4, mm5
-	movntq	[edi+ecx], mm4
+	movntq [edi+ecx*2+8], mm5
 	.endif
 
 	##
@@ -168,7 +168,7 @@
 
 	## Write color address for 2 pixels to the stack, we'll look
 	## it up in the table later
-	movntq	[esp + 1280 + 8 + ecx*4 + \phase * 8], mm0
+	movq	[esp + 1280 + 8 + ecx*4 + \phase * 8], mm0
 .endm
 
 # acquire_image arguments ( byte* colorTable, ColorParams* params, byte* yuvImage, byte* outputImage)
@@ -201,7 +201,7 @@ _acquire_image:
 	add	esi, 640*2	# Move to end of source image row
 
 	mov	edi, [ebp+20]	# Output (color segmented) image address
-	add	edi, 320	# Move to end of y row
+	add	edi, 320*2	# Move to end of y row, 640 = 320 pixels * 2 bytes per Y value
 
         # set mm7 to 0x00FF00FF00FF00FF for y pixel mask
         pcmpeqb	mm7, mm7                        # set to all 1s
@@ -256,7 +256,7 @@ colorLoop:
         # End of x loop. Decrement outer loop counter, update row pointers,
         # test for end of image
         add     esi, 640*2*2                    # next source rows
-        add     edi, 320                        # next output rows
+        add     edi, 320*2                      # next output rows
         dec     dword ptr[esp]
         jne     yLoop
 

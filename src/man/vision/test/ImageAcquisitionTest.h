@@ -5,8 +5,6 @@
 #include "ColorParams.h"
 #include "VisionDef.h"
 
-typedef unsigned char uchar;
-
 class ImageAcquisitionTest
 {
 public:
@@ -56,7 +54,8 @@ private:
         tableMaxSize = 128 * 128 * 128,
     };
 
-    uchar * out, *yuv,* yuvCopy,* table;
+    uint8_t *yuv,* yuvCopy, *table;
+    uint16_t *out;
     ColorParams c;
 
     unsigned long long int sumTime_thread, sumTime_mono, sumTime_process;
