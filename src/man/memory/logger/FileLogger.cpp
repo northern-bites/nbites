@@ -1,7 +1,16 @@
-/*
+/**
  * FileLogger.cpp
  *
- *      Author: oneamtu
+ *  The structure for a log file:
+ *  -- ID number for the type of object logged
+ *  -- the birth_time timestamp of the man process that parents the logger
+ *
+ *  -- for each message
+ *  ---- size of serialized message
+ *  ---- serialized message
+ *
+ *      Author: Octavian Neamtu
+ *      E-mail: oneamtu@bowdoin.edu
  */
 
 #include <fcntl.h>
@@ -12,7 +21,8 @@
 
 using namespace std;
 
-FileLogger::FileLogger(char* fileName, ProtoMessage* m) : Logger(m) {
+FileLogger::FileLogger(char* fileName, int logTypeID, ProtoMessage* m) :
+        Logger(m) {
     int file_descriptor = open(fileName,
                                O_WRONLY | O_CREAT,
                                S_IRWXU | S_IRWXG | S_IRWXO);
@@ -22,9 +32,7 @@ FileLogger::FileLogger(char* fileName, ProtoMessage* m) : Logger(m) {
     }
     raw_output = new FileOutputStream(file_descriptor);
     coded_output = new CodedOutputStream(raw_output);
-
-    int magic_number = 1234;
-    coded_output->WriteLittleEndian32(magic_number);
+    coded_output->WriteLittleEndian32(logTypeID);
 }
 
 void FileLogger::write() {

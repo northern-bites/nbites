@@ -13,7 +13,7 @@ using boost::shared_ptr;
 extern long long int birth_time;
 
 MVision::MVision(shared_ptr<Vision> v) : vision(v) {
-    fileLogger = new FileLogger("Vision.log", this);
+    fileLogger = new FileLogger("Vision.log", MVISION_ID, this);
 }
 
 MVision::~MVision() {
