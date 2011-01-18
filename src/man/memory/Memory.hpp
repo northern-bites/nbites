@@ -30,6 +30,5 @@ public:
 
 public:
     MVision* vision;
-
 };
 }

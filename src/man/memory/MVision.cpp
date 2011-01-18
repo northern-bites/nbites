@@ -8,11 +8,11 @@
 
 #include "MVision.hpp"
 
-extern long long int birth_time;
-
 namespace memory {
 
 using boost::shared_ptr;
+
+extern long long int birth_time;
 
 MVision::MVision(shared_ptr<Vision> v) : vision(v) {
     fileLogger = new log::FileLogger("Vision.log", MVISION_ID, this);

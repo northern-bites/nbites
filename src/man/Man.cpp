@@ -36,9 +36,6 @@ using namespace boost::assign;
 using namespace std;
 using boost::shared_ptr;
 
-long long int birth_time; //the time we started man
-//everything else is timestamped relative to this
-
 /////////////////////////////////////////
 //                                     //
 //  Module class function definitions  //
@@ -57,7 +54,6 @@ Man::Man (shared_ptr<Sensors> _sensors,
     enactor(_enactor),
     lights(_lights)
 {
-    birth_time = micro_time();
 
   // initialize system helper modules
   profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
