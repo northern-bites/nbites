@@ -106,10 +106,10 @@ set( MEMORY_SRCS Memory
 # it's where we house all our generated protobuggers
 
 set( PROTOS_TARGET protos )
-set( LOGGER_TARGET logger )
+set( LOGGER_TARGET log )
 
 add_subdirectory( gen )
-add_subdirectory( logger )
+add_subdirectory( log )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output executable or shared library, and the install

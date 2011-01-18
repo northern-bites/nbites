@@ -1,14 +1,16 @@
 #pragma once
 
-#include "boost/shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 
 #include "gen/Vision.pb.h"
 #include "MObject.hpp"
 #include "Vision.h"
+#include "log/FileLogger.hpp"
 
-class MVision;
+//class MVision;
 
-class MVision: public Proto::PVision, public MObject {
+namespace memory {
+class MVision: public proto::PVision, public MObject {
 
 public:
     MVision(boost::shared_ptr<Vision> v);
@@ -18,6 +20,7 @@ public:
 
 private:
     boost::shared_ptr<Vision> vision;
-    FileLogger* fileLogger;
+    log::FileLogger* fileLogger;
 
 };
+}

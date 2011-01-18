@@ -4,16 +4,18 @@
  *      Author: oneamtu
  */
 
-#include "MVision.hpp"
-
 #include "Common.h" //for micro_time
 
-using boost::shared_ptr;
+#include "MVision.hpp"
 
 extern long long int birth_time;
 
+namespace memory {
+
+using boost::shared_ptr;
+
 MVision::MVision(shared_ptr<Vision> v) : vision(v) {
-    fileLogger = new FileLogger("Vision.log", MVISION_ID, this);
+    fileLogger = new log::FileLogger("Vision.log", MVISION_ID, this);
 }
 
 MVision::~MVision() {
@@ -26,7 +28,7 @@ void MVision::update() {
     //micro to save space?
     this->set_timestamp(micro_time() - birth_time);
 
-    Proto::PVision::VisualBall* visual_ball;
+    proto::PVision::VisualBall* visual_ball;
     visual_ball = this->mutable_visual_ball();
     visual_ball->set_distance(vision->ball->getDistance());
     visual_ball->set_center_x(vision->ball->getCenterX());
@@ -39,4 +41,5 @@ void MVision::update() {
 
 void MVision::log() const {
     fileLogger->write();
+}
 }

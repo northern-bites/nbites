@@ -1,4 +1,4 @@
-package Proto;
+package memory.proto;
 
 message PVision {
 

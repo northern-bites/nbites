@@ -49,6 +49,8 @@
 #include "PySensors.h"
 #include "PyLights.h"
 
+using memory::Memory;
+
 /**
  * The Naoqi module to run our main Nao robot system.
  *

@@ -10,13 +10,11 @@
 
 #pragma once
 
-class MObject;
+namespace memory {
 
 enum MObject_ID {
     MVISION_ID = 1
 };
-
-#include "logger/FileLogger.hpp"
 
 class MObject {
 
@@ -25,3 +23,4 @@ public:
     virtual void log() const = 0;
 
 };
+}

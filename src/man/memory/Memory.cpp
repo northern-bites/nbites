@@ -7,6 +7,8 @@
 
 #include "Memory.hpp"
 
+namespace memory{
+
 Memory::Memory(shared_ptr<Vision> vision_ptr) {
     this->vision = new MVision(vision_ptr);
 }
@@ -22,4 +24,6 @@ void Memory::update(MObject* obj) {
 
 void Memory::updateVision() {
     update(vision);
+}
+
 }

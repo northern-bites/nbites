@@ -1,5 +1,5 @@
 /*
- * Memory.h
+ * Memory.hpp
  *
  *
  *      Author: oneamtu
@@ -9,11 +9,14 @@
 
 #include <boost/shared_ptr.hpp>
 
-class Memory;
-//#include "MemoryMacros.hpp"
-#include "MVision.hpp"
+namespace memory {
+class Memory; //forward declaration
+}
 
+#include "MVision.hpp"
 #include "Vision.h"
+
+namespace memory {
 
 using boost::shared_ptr;
 
@@ -29,3 +32,4 @@ public:
     MVision* vision;
 
 };
+}
