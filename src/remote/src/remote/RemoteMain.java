@@ -20,13 +20,12 @@ public class RemoteMain {
     public static void main(String args[]) {
         try {
             // Set System L&F
-            UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException excp) {
         } catch (InstantiationException exc) {
         } catch (IllegalAccessException exc) {
         } catch (UnsupportedLookAndFeelException exc) {
         }
         new RemoteController();
-     }
+    }
 }

@@ -28,6 +28,7 @@ public class RemoteModel {
     private Connection connection;
     private Session sesh;
     private BufferedWriter stdinWriter;
+    private StreamGobbler stdout;
 
     // Robot identifiers
     private String host;
@@ -143,7 +144,7 @@ public class RemoteModel {
             stdinWriter.newLine();
             stdinWriter.flush();
 
-            StreamGobbler stdout = new StreamGobbler(sesh.getStdout());
+            stdout = new StreamGobbler(sesh.getStdout());
             
             /* Show exit status, if available (otherwise "null") */
             if (sesh.getExitStatus() != null && sesh.getExitStatus() != 0) {
@@ -155,9 +156,14 @@ public class RemoteModel {
         }
     }
 
-    public InputStream getStdout(){
-        return sesh.getStdout();
+    public StreamGobbler getStdout(){
+        return stdout;
     }
+
+    public boolean isOutputAvailable(){
+        return (sesh != null && sesh.getStdout() != null);
+    }
+
 
     public boolean isConnected(){
         return hasConnection && sesh != null;
