@@ -9,18 +9,19 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import ch.ethz.ssh2.StreamGobbler;
 
 /**
- *
- * @author jack
+ * Controls interaction between stream and terminal display view.
  */
 public class TerminalDisplayController extends Thread{
-    RemoteModel model;
+
+    StreamGobbler stream;
     TerminalDisplayView view;
 
-    public TerminalDisplayController(RemoteModel model){
-        this.model = model;
-        view = new TerminalDisplayView(model);
+    public TerminalDisplayController(StreamGobbler stream, String host){
+        this.stream = stream;
+        view = new TerminalDisplayView(stream, host);
         view.setVisible(true);
         this.start();
     }
@@ -28,9 +29,9 @@ public class TerminalDisplayController extends Thread{
     public void run(){
         try {
             while(true){
-                if (model.isOutputAvailable() &&
-                    model.getStdout().available() > 0) {
-                            view.update();
+                if (stream != null &&
+                    stream.available() > 0) {
+                    view.update();
                 }
                 sleep(100);
             }

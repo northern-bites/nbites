@@ -56,8 +56,9 @@ public class RemoteView extends javax.swing.JFrame {
         compileButton = new javax.swing.JButton();
         installButton = new javax.swing.JButton();
         Controller = new javax.swing.JPanel();
-        restartButton = new javax.swing.JButton();
-        stopButton = new javax.swing.JButton();
+        logNaoQiButton = new javax.swing.JButton();
+        restartNaoQiButton = new javax.swing.JButton();
+        stopNaoQiButton = new javax.swing.JButton();
         shutdownButton = new javax.swing.JButton();
         File = new javax.swing.JPanel();
         fileNamePanel = new javax.swing.JPanel();
@@ -122,10 +123,10 @@ public class RemoteView extends javax.swing.JFrame {
             }
         });
         ipTextField.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
                 ipTextFieldInputMethodTextChanged(evt);
-            }
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -144,10 +145,10 @@ public class RemoteView extends javax.swing.JFrame {
             }
         });
         username.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
                 usernameInputMethodTextChanged(evt);
-            }
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -214,21 +215,29 @@ public class RemoteView extends javax.swing.JFrame {
         Controller.setPreferredSize(new java.awt.Dimension(150, 150));
         Controller.setLayout(new java.awt.GridLayout(0, 1));
 
-        restartButton.setText("Restart NaoQi");
-        restartButton.addActionListener(new java.awt.event.ActionListener() {
+        logNaoQiButton.setText("Log NaoQi");
+        logNaoQiButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                restartButtonActionPerformed(evt);
+                logNaoQiButtonActionPerformed(evt);
             }
         });
-        Controller.add(restartButton);
+        Controller.add(logNaoQiButton);
 
-        stopButton.setText("Stop NaoQi");
-        stopButton.addActionListener(new java.awt.event.ActionListener() {
+        restartNaoQiButton.setText("Restart NaoQi");
+        restartNaoQiButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stopButtonActionPerformed(evt);
+                restartNaoQiButtonActionPerformed(evt);
             }
         });
-        Controller.add(stopButton);
+        Controller.add(restartNaoQiButton);
+
+        stopNaoQiButton.setText("Stop NaoQi");
+        stopNaoQiButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                stopNaoQiButtonActionPerformed(evt);
+            }
+        });
+        Controller.add(stopNaoQiButton);
 
         shutdownButton.setText("Shutdown Nao");
         shutdownButton.addActionListener(new java.awt.event.ActionListener() {
@@ -269,15 +278,15 @@ public class RemoteView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_typeChooserActionPerformed
 
-    private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
+    private void stopNaoQiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopNaoQiButtonActionPerformed
         model.setUsername(username.getText());
         controller.stopNaoQi(ipTextField.getText());
-    }//GEN-LAST:event_stopButtonActionPerformed
+    }//GEN-LAST:event_stopNaoQiButtonActionPerformed
 
-    private void restartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restartButtonActionPerformed
+    private void restartNaoQiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restartNaoQiButtonActionPerformed
         model.setUsername(username.getText());
         controller.restartNaoQi(ipTextField.getText());
-    }//GEN-LAST:event_restartButtonActionPerformed
+    }//GEN-LAST:event_restartNaoQiButtonActionPerformed
 
     private void installButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_installButtonActionPerformed
         controller.install((String)typeChooser.getSelectedItem());
@@ -304,6 +313,11 @@ public class RemoteView extends javax.swing.JFrame {
         model.setHost(ipTextField.getText());
     }//GEN-LAST:event_ipTextFieldInputMethodTextChanged
 
+    private void logNaoQiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logNaoQiButtonActionPerformed
+        model.setUsername(username.getText());
+        controller.logNaoQi(ipTextField.getText());
+    }//GEN-LAST:event_logNaoQiButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Build;
@@ -316,12 +330,13 @@ public class RemoteView extends javax.swing.JFrame {
     private javax.swing.JButton installButton;
     private javax.swing.JTextField ipTextField;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton logNaoQiButton;
     private javax.swing.JList nameChooser;
-    private javax.swing.JButton restartButton;
+    private javax.swing.JButton restartNaoQiButton;
     private javax.swing.JLabel robotIPLabel;
     private javax.swing.JLabel robotNameLabel;
     private javax.swing.JButton shutdownButton;
-    private javax.swing.JButton stopButton;
+    private javax.swing.JButton stopNaoQiButton;
     private javax.swing.JComboBox typeChooser;
     private javax.swing.JLabel typeLabel;
     private javax.swing.JPanel typePanel;

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package remote;
 
 import java.io.BufferedReader;
@@ -21,9 +17,11 @@ import ch.ethz.ssh2.StreamGobbler;
 
 
 /**
- * A Deployer controller for the Nao Robot and the Northern Bites nbites repository.
+ * A Deployer controller for the Nao Robot and the Northern Bites
+ * nbites repository.
  *
- * Gives a GUI Front to common command line tasks to simplify robot setup and control.
+ * Gives a GUI Front to common command line tasks to simplify robot
+ * setup and control.
  *
  * This RemoteController is the backend for the GUI application.
  */
@@ -34,12 +32,10 @@ public class RemoteController {
     // The GUI front-end
     private RemoteView view;
     private RemoteModel model;
-    private TerminalDisplayController outputDisplay;
 
     public RemoteController() {
         model = new RemoteModel();
         view = new RemoteView(this, model);
-        outputDisplay = new TerminalDisplayController(model);
     }
 
     /**
@@ -60,6 +56,10 @@ public class RemoteController {
         model.shutdown(host);
     }
 
+    public void logNaoQi(String host){
+        model.logNaoQi(host);
+    }
+
     /**
      * Run a local shell command and print the output.
      */
@@ -73,7 +73,7 @@ public class RemoteController {
                 } catch (InterruptedException e){}
             }
             System.out.println(command);
-            printProcessOutput(p);
+            printProcessOutput(p,command);
         } catch (java.io.IOException exc){
 
         }
@@ -82,23 +82,17 @@ public class RemoteController {
     /**
      * @param Process    The process from which output is to be gathered and printed.
      */
-    private void printProcessOutput(Process p){
-        try {
+    private void printProcessOutput(Process p, String command){
+
             BufferedReader stdInput = new
                 BufferedReader(new InputStreamReader(p.getInputStream()));
 
             BufferedReader stdErr = new
                 BufferedReader(new InputStreamReader(p.getErrorStream()));
 
-            // print the output from the command
-            String s;
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
-
-        } catch (java.io.IOException exc) {
-
-        }
+            TerminalDisplayController displayController =
+                new TerminalDisplayController(new StreamGobbler(p.getInputStream()),
+                                              command);
     }
 
 

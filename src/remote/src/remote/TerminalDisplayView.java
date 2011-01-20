@@ -13,6 +13,7 @@ package remote;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import ch.ethz.ssh2.StreamGobbler;
 
 /**
  *
@@ -20,20 +21,25 @@ import java.util.logging.Logger;
  */
 public class TerminalDisplayView extends javax.swing.JFrame {
 
-    RemoteModel model;
+    StreamGobbler stream;
 
     private static final int DESIRED_WIDTH = 400, DESIRED_HEIGHT = 400;
 
     /** Creates new form TerminalDisplayView */
-    public TerminalDisplayView(RemoteModel model) {
-        initComponents();
-        this.model = model;
-        setSize(DESIRED_WIDTH,DESIRED_HEIGHT);
+    public TerminalDisplayView(StreamGobbler stream, String host) {
+        initProperties();
+        this.stream = stream;
+        setTitle(host);
     }
 
     public TerminalDisplayView() {
+        initProperties();
+    }
+
+    public void initProperties(){
         initComponents();
         setSize(DESIRED_WIDTH,DESIRED_HEIGHT);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     /** This method is called from within the constructor to
@@ -49,7 +55,11 @@ public class TerminalDisplayView extends javax.swing.JFrame {
         display = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        getContentPane().setLayout(new java.awt.GridLayout(1, 0));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         display.setColumns(20);
         display.setEditable(false);
@@ -58,10 +68,13 @@ public class TerminalDisplayView extends javax.swing.JFrame {
         display.setPreferredSize(new java.awt.Dimension(300, 400));
         jScrollPane1.setViewportView(display);
 
-        getContentPane().add(jScrollPane1);
+        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+    }//GEN-LAST:event_formWindowClosed
 
     /**
      * @param args the command line arguments
@@ -81,9 +94,9 @@ public class TerminalDisplayView extends javax.swing.JFrame {
 
     public void update() {
         try {
-            int numAvailable = model.getStdout().available();
+            int numAvailable = stream.available();
             byte[] letters = new byte[numAvailable];
-            model.getStdout().read(letters, 0, numAvailable);
+            stream.read(letters, 0, numAvailable);
             display.append(new String(letters));
         } catch (IOException ex) {
             Logger.getLogger(TerminalDisplayView.class.getName()).log(Level.SEVERE, null, ex);
