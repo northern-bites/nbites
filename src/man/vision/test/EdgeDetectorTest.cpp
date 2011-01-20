@@ -60,7 +60,7 @@ int EdgeDetectorTest::test_sobel()
     Channel c;
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
-            c.val[i][j] = 0;
+            c.val[(i) * IMAGE_WIDTH + j] = 0;
 
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
     edges.sobelOperator(c, g);
@@ -77,26 +77,26 @@ int EdgeDetectorTest::test_sobel()
 
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
-            c.val[i][j] = i + j;
+            c.val[(i) * IMAGE_WIDTH + j] = i + j;
     shared_ptr<Gradient> g2 = shared_ptr<Gradient>(new Gradient());
     edges.sobelOperator(c, g);
     for (int i=1; i < IMAGE_HEIGHT-1; ++i)
         for (int j=1; j < IMAGE_WIDTH-1; ++j){
-            int gx = ((c.val[i-1][j+1] +
-                      c.val[i][j+1] * 2 +
-                      c.val[i+1][j+1]) -
+            int gx = ((c.val[(i-1) * IMAGE_WIDTH + j+1] +
+                       c.val[(i) * IMAGE_WIDTH + j+1] * 2 +
+                       c.val[(i+1) * IMAGE_WIDTH + j+1]) -
 
-                      (c.val[i-1][j-1] +
-                       c.val[i][j-1] * 2 +
-                       c.val[i+1][j-1]));
+                      (c.val[(i-1) * IMAGE_WIDTH + j-1] +
+                       c.val[(i) * IMAGE_WIDTH + j-1] * 2 +
+                       c.val[(i+1) * IMAGE_WIDTH + j-1]));
 
-            int gy = ((c.val[i+1][j-1] +
-                      c.val[i+1][j] * 2 +
-                      c.val[i+1][j+1]) -
+            int gy = ((c.val[(i+1) * IMAGE_WIDTH + j-1] +
+                       c.val[(i+1) * IMAGE_WIDTH + j] * 2 +
+                       c.val[(i+1) * IMAGE_WIDTH + j+1]) -
 
-                      (c.val[i-1][j-1] +
-                       c.val[i-1][j] * 2 +
-                       c.val[i-1][j+1]));
+                      (c.val[(i-1) * IMAGE_WIDTH + j-1] +
+                       c.val[(i-1) * IMAGE_WIDTH + j] * 2 +
+                       c.val[(i-1) * IMAGE_WIDTH + j+1]));
 
             EQ_INT(g->x[i][j] , gx);
             EQ_INT(g->y[i][j] , gy);
@@ -117,23 +117,19 @@ int EdgeDetectorTest::test_peaks()
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
             if (j < IMAGE_HEIGHT *3./4.)
-                c.val[i][j] = 0;
+                c.val[(i) * IMAGE_WIDTH + j] = 0;
             else
-                c.val[i][j] = 250;
+                c.val[(i) * IMAGE_WIDTH + j] = 250;
 
     edges.detectEdges(c,g);
 
-    // Ensure that everywhere peaks is false, the gradient is set to zero
-    // and everywhere peaks is true, the gradient is not zero
+    // Everywhere peaks is true, the gradient is not zero. If it's not
+    // a peak, we don't really care what the gradient values are.
     for (int i=0; i < Gradient::rows; ++i)
         for (int j=0; j < Gradient::cols; ++j){
             if (g->peaks[i][j]){
                 NE_INT(g->mag[i][j] , 0);
                 assert(g->x[i][j] != 0 || g->y[i][j] != 0);
-            } else {
-                EQ_INT(g->mag[i][j] , 0);
-                EQ_INT(g->x[i][j] , 0);
-                EQ_INT(g->y[i][j] , 0);
             }
         }
     PASSED(PEAKS_ZERO);

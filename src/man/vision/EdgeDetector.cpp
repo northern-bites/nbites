@@ -46,23 +46,23 @@ void EdgeDetector::sobelOperator(const Channel& channel,
 
             int xGrad = (
                 // Column j+1
-                (channel.val[i-1][j+1] +
-                 2 * channel.val[i][j+1] +
-                 channel.val[i+1][j+1]) -
+                (channel.val[(i-1) * IMAGE_WIDTH + (j+1)] +
+                 2 * channel.val[(i) * IMAGE_WIDTH + (j+1)] +
+                 channel.val[(i+1) * IMAGE_WIDTH + (j+1)]) -
                 // Column j-1
-                (channel.val[i-1][j-1] +
-                 2 * channel.val[i][j-1] +
-                 channel.val[i+1][j-1]));
+                (channel.val[(i-1) * IMAGE_WIDTH + (j-1)] +
+                 2 * channel.val[(i) * IMAGE_WIDTH + (j-1)] +
+                 channel.val[(i+1) * IMAGE_WIDTH + (j-1)]));
 
             int yGrad = (
                 // Row i+1
-                (channel.val[i+1][j-1] +
-                 2 * channel.val[i+1][j] +
-                 channel.val[i+1][j+1]) -
+                (channel.val[(i+1) * IMAGE_WIDTH + (j-1)] +
+                 2 * channel.val[(i+1) * IMAGE_WIDTH + (j)] +
+                 channel.val[(i+1) * IMAGE_WIDTH + (j+1)]) -
                 // Row i -1
-                (channel.val[i-1][j-1] +
-                 2 * channel.val[i-1][j] +
-                 channel.val[i-1][j+1])
+                (channel.val[(i-1) * IMAGE_WIDTH + (j-1)] +
+                 2 * channel.val[(i-1) * IMAGE_WIDTH + (j)] +
+                 channel.val[(i-1) * IMAGE_WIDTH + (j+1)])
                 );
             gradient->x[i][j] = xGrad;
             gradient->y[i][j] = yGrad;

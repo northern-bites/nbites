@@ -228,13 +228,13 @@ void Threshold::threshold() {
     yPtr = &yplane[0];
     for (int i=0; i < IMAGE_HEIGHT; ++i){
         for (int j=0; j < IMAGE_WIDTH; j += 2){
-            y.val[i][j] = yPtr[YOFFSET1];
-            u.val[i][j] = yPtr[UOFFSET];
-            v.val[i][j] = yPtr[VOFFSET];
+            y.val[i * IMAGE_WIDTH + j] = yPtr[YOFFSET1];
+            u.val[i * IMAGE_WIDTH + j] = yPtr[UOFFSET];
+            v.val[i * IMAGE_WIDTH + j] = yPtr[VOFFSET];
 
-            y.val[i][j+1] = yPtr[YOFFSET2];
-            u.val[i][j+1] = yPtr[UOFFSET];
-            v.val[i][j+1] = yPtr[VOFFSET];
+            y.val[i * IMAGE_WIDTH + j+1] = yPtr[YOFFSET2];
+            u.val[i * IMAGE_WIDTH + j+1] = yPtr[UOFFSET];
+            v.val[i * IMAGE_WIDTH + j+1] = yPtr[VOFFSET];
             yPtr += 4;
         }
     }

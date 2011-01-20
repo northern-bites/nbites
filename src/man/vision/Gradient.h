@@ -9,7 +9,7 @@
 
 
 typedef struct channel_t {
-    int val[IMAGE_HEIGHT][IMAGE_WIDTH];
+    int val[IMAGE_HEIGHT * IMAGE_WIDTH];
 } Channel;
 
 /**
