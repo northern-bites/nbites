@@ -52,8 +52,29 @@
 
 .globl _acquire_image
 
-.macro COPY_SHIFT_R dest, source
+.section .data
 
+.equiv INIT_LOOP_COUNT, -320
+.equiv OUT_IMG_WIDTH, 320
+.equiv OUT_IMG_HEIGHT, 240
+.equiv Y_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2
+
+## STACK STRUCTURE, esp offsets
+	.struct 0
+row_count:
+	.struct	row_count + 4
+rdtsc_output:
+	.struct rdtsc_output + 4
+y_out_img:
+	.struct y_out_img + 4
+color_out_img:
+	.struct color_out_img + 1280 + 4 # End of row of written
+color_stack_row_end:
+
+.equiv end_of_stack, color_stack_row_end
+
+.section .text
+ .macro COPY_SHIFT_R dest, source
 	movq	\dest, \source
 	psrld	\dest, 2
 .endm
@@ -62,12 +83,12 @@
 .macro COLOR_LOOP phase
 
 	## Load the color address from the stack
-	mov	eax, dword ptr[esp+1280 + 8 +ecx*4 + \phase * 4]
+	mov	eax, dword ptr[esp+ color_stack_row_end +ecx*4 + \phase * 4]
 
 	## Lookup color in table
         movzx   eax, byte ptr[ebx+eax]          # movzx may be faster than
 	                                        # just moving a byte to al
-        mov     word ptr[edi+ecx*2+\phase*2+(320*240*2)], ax
+        mov     byte ptr[edi+ecx+\phase], al
 				# color image is just after y image in memory,
 				# so displacement is (320*240*2)
 				# since Y and color values 16 bits each
@@ -168,7 +189,7 @@
 
 	## Write color address for 2 pixels to the stack, we'll look
 	## it up in the table later
-	movq	[esp + 1280 + 8 + ecx*4 + \phase * 8], mm0
+	movq	[esp + color_stack_row_end + ecx*4 + \phase * 8], mm0
 .endm
 
 # acquire_image arguments ( byte* colorTable, ColorParams* params, byte* yuvImage, byte* outputImage)
@@ -183,25 +204,32 @@ _acquire_image:
 	push	edi
 
 	# Move stack pointer and push rowCount to it
-	sub 	esp, 1280 + 8 	# 4 bytes for rdtsc, 4 for rowCount
-				# 320 * 4 bytes per color addresses
+	sub 	esp, end_of_stack 	# 4 bytes for rdtsc, 4 for rowCount
+					# 320 * 4 bytes per color addresses
 
 	# Ensure that the stack pointer is 8 byte aligned
 	and	esp, 0xFFFFFFF8
 
-	mov 	dword ptr[esp], 240	# Row Count is only 240 bc it skips every other row.
+	mov 	dword ptr[esp + row_count], OUT_IMG_HEIGHT	# Row Count is only 240 bc it skips every other row.
 	rdtsc
-	mov	[esp+4],eax
+	mov	[esp + rdtsc_output],eax
 
 	# Load arguments into registers
-	mov	ebx, [ebp+8]	# Color table *
-	mov	edx, [ebp+12]	# Color params *
+	mov	ebx, [ebp+8]	# Color table
+	mov	edx, [ebp+12]	# Color params
 
 	mov	esi, [ebp+16]	# Input YUV Image address
 	add	esi, 640*2	# Move to end of source image row
 
 	mov	edi, [ebp+20]	# Output (color segmented) image address
-	add	edi, 320*2	# Move to end of y row, 640 = 320 pixels * 2 bytes per Y value
+	add	edi, OUT_IMG_WIDTH*2	# Move to end of y row, 640 = 320 pixels * 2 bytes per Y value
+
+	## Put end of row pointers on stack
+	mov	[esp + y_out_img], edi
+
+	## Move forward entire y image, then back half a y-image row
+	add	edi, Y_IMG_BYTE_SIZE - 320
+	mov	[esp + color_out_img], edi
 
         # set mm7 to 0x00FF00FF00FF00FF for y pixel mask
         pcmpeqb	mm7, mm7                        # set to all 1s
@@ -213,7 +241,8 @@ _acquire_image:
 
 # Start of outer (y) loop
 yLoop:
-        mov     ecx, -320                       # x loop count
+        mov     ecx, INIT_LOOP_COUNT                       # x loop count
+	mov	edi, [esp + y_out_img]
 
 # Start of inner (x) loop
 #
@@ -232,11 +261,11 @@ xLoop:
         add     ecx, 8
         jne     xLoop
 
-
+	mov	edi, [esp + color_out_img]
 
 ## Lookup and write color pixels to output image
 ## Loop from 0 to 320 in ecx
-	mov	ecx, -320
+	mov	ecx, INIT_LOOP_COUNT
 colorLoop:
 	## Load pixel color address
 	COLOR_LOOP 0
@@ -253,15 +282,21 @@ colorLoop:
 	add	ecx, 10
 	jne	colorLoop
 
+
+
         # End of x loop. Decrement outer loop counter, update row pointers,
         # test for end of image
         add     esi, 640*2*2                    # next source rows
-        add     edi, 320*2                      # next output rows
-        dec     dword ptr[esp]
+
+	## Move pointers to end of next output image rows
+	add     dword ptr[esp + y_out_img], OUT_IMG_WIDTH * 2
+	add	dword ptr[esp + color_out_img], OUT_IMG_WIDTH
+
+        dec     dword ptr[esp + row_count]
         jne     yLoop
 
 	rdtsc
-	sub	eax, [esp+4]
+	sub	eax, [esp + rdtsc_output]
 
 	# Restore esp to original position
 	mov 	esp, ebp

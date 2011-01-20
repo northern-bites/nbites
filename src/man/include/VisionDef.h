@@ -57,8 +57,8 @@ Vision Constants that span multiple classes and systems.
 // Y Image and color image are EACH this size
 #define AVERAGED_IMAGE_SIZE AVERAGED_IMAGE_WIDTH * AVERAGED_IMAGE_HEIGHT
 
-// One byte per pixel in EACH (y/color) image
-#define AVERAGED_Y_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE
+// _Two_ bytes per pixel in EACH (y/color) image
+#define AVERAGED_Y_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE * 2
 
 #define VISION_FRAME_LENGTH_MS 34
 #define VISION_FRAME_LENGTH_uS 34000
@@ -72,7 +72,7 @@ Vision Constants that span multiple classes and systems.
 #  define FOV_X_DEG NAO_SIM_FOV_X_DEG
 #  define FOV_Y_DEG NAO_SIM_FOV_Y_DEG
 #  define Y_IMAGE_BYTE_SIZE AVERAGED_Y_IMAGE_BYTE_SIZE
-#  define IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE * 2
+#  define IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE * 3
 
 #  define IMAGE_ROW_OFFSET NAO_SIM_IMAGE_ROW_OFFSET
 #  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
@@ -83,8 +83,8 @@ Vision Constants that span multiple classes and systems.
 #  define IMAGE_HEIGHT AVERAGED_IMAGE_HEIGHT
 #  define FOV_X_DEG NAO_FOV_X_DEG
 #  define FOV_Y_DEG NAO_FOV_Y_DEG
-#  define Y_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE
-#  define IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE * 2
+#  define Y_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE * 2
+#  define IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE * 3
 
 #  define IMAGE_ROW_OFFSET NAO_IMAGE_ROW_OFFSET
 #  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET

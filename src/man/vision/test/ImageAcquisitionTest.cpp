@@ -17,11 +17,11 @@ using namespace std;
 
 // Our function to test!
 extern "C" unsigned int _acquire_image(uint8_t * colorTable, ColorParams* params,
-                                       uint8_t* yuvImage, uint16_t* outImage);
+                                       uint8_t* yuvImage, uint8_t* outImage);
 
 ImageAcquisitionTest::ImageAcquisitionTest() :
     c(0,0,0, 256, 256, 256, 128, 128, 128), // Default old table size
-    sumTime_process(0), sumTime_thread(0), sumTime_mono(0),
+    sumTime_thread(0), sumTime_process(0), sumTime_mono(0),
     sum_clocks(0), min_clocks(0xFFFFFFF), numFrames(500)
 {
     init();
@@ -37,8 +37,7 @@ ImageAcquisitionTest::~ImageAcquisitionTest()
 
 void ImageAcquisitionTest::init()
 {
-    yuv = table = yuvCopy = NULL;
-    out = NULL;
+    yuv = table = yuvCopy = out = NULL;
 }
 
 /**
@@ -92,7 +91,7 @@ void ImageAcquisitionTest::allocate()
     // Allocate the output image.
     if (out == NULL){
         // 2 bytes per Y value and 1 per color value
-        out = new uint16_t[320*240*2];
+        out = new uint8_t[320*240*3];
     }
 }
 
@@ -285,11 +284,12 @@ void ImageAcquisitionTest::run_average_test(){
     }
     PASSED(PRESERVE_IMAGE);
 
+    uint16_t* y_out = reinterpret_cast<uint16_t*>(out);
     // Check that the average works properly.
     for (int i = 0; i < IMAGE_HEIGHT; ++i) {
         for (int j=0; j < IMAGE_WIDTH; ++j){
 
-            uint16_t output = out[i*IMAGE_WIDTH + j];
+            uint16_t output = y_out[i*IMAGE_WIDTH + j];
             EQ_INT ( (yAvgValue(i, j) >> 2), output);
         }
     }
