@@ -4,6 +4,7 @@
 #include "VisionDef.h"
 #include "Gradient.h"
 #include "Profiler.h"
+#include <stdint.h>
 
 #include "boost/shared_ptr.hpp"
 
@@ -22,14 +23,14 @@ public:
  * Public interface
  */
 public:
-    void detectEdges(const Channel& channel,
+    void detectEdges(const uint16_t* channel,
                      boost::shared_ptr<Gradient> gradient);
 
     int  getThreshold()           { return threshold; }
     void setThreshold(int thresh) { threshold = thresh; }
 
 private:
-    void sobelOperator(const Channel& channel,
+    void sobelOperator(const uint16_t* channel,
                        boost::shared_ptr<Gradient> gradient);
     void findPeaks(boost::shared_ptr<Gradient> gradient);
 

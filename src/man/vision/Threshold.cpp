@@ -223,24 +223,6 @@ void Threshold::threshold() {
         yPtr += 4;
     }
 
-    // Copy all the y, u, v values into 3 separate
-    // channel objects for edge detection
-    yPtr = &yplane[0];
-    for (int i=0; i < IMAGE_HEIGHT; ++i){
-        for (int j=0; j < IMAGE_WIDTH; j += 2){
-            y.val[i * IMAGE_WIDTH + j] = yPtr[YOFFSET1];
-            u.val[i * IMAGE_WIDTH + j] = yPtr[UOFFSET];
-            v.val[i * IMAGE_WIDTH + j] = yPtr[VOFFSET];
-
-            y.val[i * IMAGE_WIDTH + j+1] = yPtr[YOFFSET2];
-            u.val[i * IMAGE_WIDTH + j+1] = yPtr[UOFFSET];
-            v.val[i * IMAGE_WIDTH + j+1] = yPtr[VOFFSET];
-            yPtr += 4;
-        }
-    }
-
-
-
 #else
 #ifdef OFFLINE
     // this makes looking at images in the TOOL tolerable
@@ -259,7 +241,7 @@ void Threshold::threshold() {
  */
 void Threshold::edgeDetection()
 {
-    edgeDetector.detectEdges(y, gradient);
+    edgeDetector.detectEdges(reinterpret_cast<const uint16_t*>(yuv), gradient);
     drawDetectedEdges(gradient);
 }
 

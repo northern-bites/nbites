@@ -233,7 +233,6 @@ public:
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
 
-    Channel u, v, y;
     Robots *red, *navyblue;
     Ball* orange;
     Cross* cross;

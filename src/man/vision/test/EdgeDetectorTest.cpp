@@ -57,10 +57,13 @@ int EdgeDetectorTest::test_sobel()
 {
     // Make sure that if all points are zero, then all points in the
     // gradient are zero
-    Channel c;
+    uint16_t * c;
+    c =
+        new uint16_t[IMAGE_WIDTH * IMAGE_HEIGHT];
+
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
-            c.val[(i) * IMAGE_WIDTH + j] = 0;
+            c[(i) * IMAGE_WIDTH + j] = 0;
 
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
     edges.sobelOperator(c, g);
@@ -77,26 +80,26 @@ int EdgeDetectorTest::test_sobel()
 
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
-            c.val[(i) * IMAGE_WIDTH + j] = i + j;
+            c[(i) * IMAGE_WIDTH + j] = i + j;
     shared_ptr<Gradient> g2 = shared_ptr<Gradient>(new Gradient());
     edges.sobelOperator(c, g);
     for (int i=1; i < IMAGE_HEIGHT-1; ++i)
         for (int j=1; j < IMAGE_WIDTH-1; ++j){
-            int gx = ((c.val[(i-1) * IMAGE_WIDTH + j+1] +
-                       c.val[(i) * IMAGE_WIDTH + j+1] * 2 +
-                       c.val[(i+1) * IMAGE_WIDTH + j+1]) -
+            int gx = ((c[(i-1) * IMAGE_WIDTH + j+1] +
+                       c[(i) * IMAGE_WIDTH + j+1] * 2 +
+                       c[(i+1) * IMAGE_WIDTH + j+1]) -
 
-                      (c.val[(i-1) * IMAGE_WIDTH + j-1] +
-                       c.val[(i) * IMAGE_WIDTH + j-1] * 2 +
-                       c.val[(i+1) * IMAGE_WIDTH + j-1]));
+                      (c[(i-1) * IMAGE_WIDTH + j-1] +
+                       c[(i) * IMAGE_WIDTH + j-1] * 2 +
+                       c[(i+1) * IMAGE_WIDTH + j-1]));
 
-            int gy = ((c.val[(i+1) * IMAGE_WIDTH + j-1] +
-                       c.val[(i+1) * IMAGE_WIDTH + j] * 2 +
-                       c.val[(i+1) * IMAGE_WIDTH + j+1]) -
+            int gy = ((c[(i+1) * IMAGE_WIDTH + j-1] +
+                       c[(i+1) * IMAGE_WIDTH + j] * 2 +
+                       c[(i+1) * IMAGE_WIDTH + j+1]) -
 
-                      (c.val[(i-1) * IMAGE_WIDTH + j-1] +
-                       c.val[(i-1) * IMAGE_WIDTH + j] * 2 +
-                       c.val[(i-1) * IMAGE_WIDTH + j+1]));
+                      (c[(i-1) * IMAGE_WIDTH + j-1] +
+                       c[(i-1) * IMAGE_WIDTH + j] * 2 +
+                       c[(i-1) * IMAGE_WIDTH + j+1]));
 
             EQ_INT(g->x[i][j] , gx);
             EQ_INT(g->y[i][j] , gy);
@@ -112,14 +115,14 @@ int EdgeDetectorTest::test_sobel()
  */
 int EdgeDetectorTest::test_peaks()
 {
-    Channel c;
+    uint16_t * c = new uint16_t[IMAGE_WIDTH * IMAGE_HEIGHT];
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
             if (j < IMAGE_HEIGHT *3./4.)
-                c.val[(i) * IMAGE_WIDTH + j] = 0;
+                c[(i) * IMAGE_WIDTH + j] = 0;
             else
-                c.val[(i) * IMAGE_WIDTH + j] = 250;
+                c[(i) * IMAGE_WIDTH + j] = 250;
 
     edges.detectEdges(c,g);
 

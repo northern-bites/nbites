@@ -8,10 +8,6 @@
 #include "Common.h"
 
 
-typedef struct channel_t {
-    int val[IMAGE_HEIGHT * IMAGE_WIDTH];
-} Channel;
-
 /**
  * Image channel gradient information struct
  */

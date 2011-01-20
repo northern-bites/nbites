@@ -17,7 +17,7 @@ EdgeDetector::EdgeDetector(boost::shared_ptr<Profiler> p, int thresh):
  *
  * @param channel      The entire channel (one of Y, U, or V)
  */
-void EdgeDetector::detectEdges(const Channel& channel,
+void EdgeDetector::detectEdges(const uint16_t* channel,
                                shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_EDGES);
@@ -37,7 +37,7 @@ void EdgeDetector::detectEdges(const Channel& channel,
  * @param channel     The channel with edges to be detected.
  * @param gradient    Gradient struct to be populated.
  */
-void EdgeDetector::sobelOperator(const Channel& channel,
+void EdgeDetector::sobelOperator(const uint16_t* channel,
                                  shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_SOBEL);
@@ -46,23 +46,23 @@ void EdgeDetector::sobelOperator(const Channel& channel,
 
             int xGrad = (
                 // Column j+1
-                (channel.val[(i-1) * IMAGE_WIDTH + (j+1)] +
-                 2 * channel.val[(i) * IMAGE_WIDTH + (j+1)] +
-                 channel.val[(i+1) * IMAGE_WIDTH + (j+1)]) -
+                (channel[(i-1) * IMAGE_WIDTH + (j+1)] +
+                 2 * channel[(i) * IMAGE_WIDTH + (j+1)] +
+                 channel[(i+1) * IMAGE_WIDTH + (j+1)]) -
                 // Column j-1
-                (channel.val[(i-1) * IMAGE_WIDTH + (j-1)] +
-                 2 * channel.val[(i) * IMAGE_WIDTH + (j-1)] +
-                 channel.val[(i+1) * IMAGE_WIDTH + (j-1)]));
+                (channel[(i-1) * IMAGE_WIDTH + (j-1)] +
+                 2 * channel[(i) * IMAGE_WIDTH + (j-1)] +
+                 channel[(i+1) * IMAGE_WIDTH + (j-1)]));
 
             int yGrad = (
                 // Row i+1
-                (channel.val[(i+1) * IMAGE_WIDTH + (j-1)] +
-                 2 * channel.val[(i+1) * IMAGE_WIDTH + (j)] +
-                 channel.val[(i+1) * IMAGE_WIDTH + (j+1)]) -
+                (channel[(i+1) * IMAGE_WIDTH + (j-1)] +
+                 2 * channel[(i+1) * IMAGE_WIDTH + (j)] +
+                 channel[(i+1) * IMAGE_WIDTH + (j+1)]) -
                 // Row i -1
-                (channel.val[(i-1) * IMAGE_WIDTH + (j-1)] +
-                 2 * channel.val[(i-1) * IMAGE_WIDTH + (j)] +
-                 channel.val[(i-1) * IMAGE_WIDTH + (j+1)])
+                (channel[(i-1) * IMAGE_WIDTH + (j-1)] +
+                 2 * channel[(i-1) * IMAGE_WIDTH + (j)] +
+                 channel[(i-1) * IMAGE_WIDTH + (j+1)])
                 );
             gradient->x[i][j] = xGrad;
             gradient->y[i][j] = yGrad;
