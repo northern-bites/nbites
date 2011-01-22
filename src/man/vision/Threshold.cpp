@@ -127,13 +127,14 @@ void Threshold::visionLoop() {
     // This will form all lines and all corners. After this call, fieldLines
     // will be able to supply information about them through getLines() and
     // getCorners().
-    // PROF_ENTER(vision->profiler, P_LINES);
-    // vision->fieldLines->lineLoop();
-    // PROF_EXIT(vision->profiler, P_LINES);
+    PROF_ENTER(vision->profiler, P_LINES);
+    vision->fieldLines->lineLoop();
+    PROF_EXIT(vision->profiler, P_LINES);
+
     // do recognition
-    // PROF_ENTER(vision->profiler, P_OBJECT);
-    // objectRecognition();
-    // PROF_EXIT(vision->profiler, P_OBJECT);
+    PROF_ENTER(vision->profiler, P_OBJECT);
+    objectRecognition();
+    PROF_EXIT(vision->profiler, P_OBJECT);
 
     // vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
@@ -167,11 +168,6 @@ void Threshold::visionLoop() {
 void Threshold::thresholdAndRuns() {
     PROF_ENTER(vision->profiler, P_THRESHRUNS); // profiling
 
-    // Perform image thresholding
-    PROF_ENTER(vision->profiler, P_THRESHOLD);
-    threshold();
-    PROF_EXIT(vision->profiler, P_THRESHOLD);
-
     initColors();
 
     // Determine where the field horizon is
@@ -181,59 +177,11 @@ void Threshold::thresholdAndRuns() {
     PROF_EXIT(vision->profiler, P_FGHORIZON);
 
     // 'Run' up the image to find color-grouped pixel sequences
-    // PROF_ENTER(vision->profiler, P_RUNS);
-    // runs();
-    // PROF_EXIT(vision->profiler, P_RUNS);
+    PROF_ENTER(vision->profiler, P_RUNS);
+    runs();
+    PROF_EXIT(vision->profiler, P_RUNS);
 
     PROF_EXIT(vision->profiler, P_THRESHRUNS);
-}
-
-
-/* Thresholding.  Since there's no real benefit (and in fact can it can be a
- * detriment with compiler optimizations on) to combine the thresholding and
- * the runs loops, I (Jeremy) have split out the thresholding into it's own
- * method here.
- */
-void Threshold::threshold() {
-//#define MMX_ACQUISITION
-#ifdef MMX_ACQUISITION
-    ColorParams* colorParams = new ColorParams();
-    uchar * outImage = (uchar*)malloc(320*240*3*sizeof(uchar));
-    // NOT RIGHT, TO BE CHANGED SOON
-    _acquire_image(outImage, colorParams, yplane, outImage);
-#else
-#ifndef USE_EDGES
-    unsigned char *tPtr, *tEnd; // pointers into thresholded array
-    const unsigned char *yPtr; // pointers into image array
-
-    // My loop variable initializations
-    yPtr = &yplane[0];
-
-    tPtr = &thresholded[0][0];
-    tEnd = &thresholded[IMAGE_HEIGHT-1][IMAGE_WIDTH-1] + 1;
-
-    // Loop optimizations thanks to Bill Silver. Uses constant offesets to
-    // speed up the table lookups. Operates on bigTable in UVY order for
-    // more optimizations.
-    while (tPtr < tEnd)
-    {
-        unsigned char* p = bigTable[yPtr[UOFFSET] >> 1][yPtr[VOFFSET] >> 1];
-        *tPtr++ = p[yPtr[YOFFSET1] >> 1];
-        *tPtr++ = p[yPtr[YOFFSET2] >> 1];
-        yPtr += 4;
-    }
-
-#else
-#ifdef OFFLINE
-    // this makes looking at images in the TOOL tolerable
-    for (int i = 0; i < IMAGE_HEIGHT; i++) {
-        for (int j = 0; j < IMAGE_WIDTH; j++) {
-            thresholded[i][j] = GREY;
-        }
-    }
-#endif  /* OFFLINE   */
-#endif /* USE_EDGES  */
-#endif /* MMX_ACQUISITION */
 }
 
 /**
@@ -248,33 +196,32 @@ void Threshold::edgeDetection()
 void Threshold::findLines()
 {
     list<HoughLine> lines = hough.findLines(gradient);
-
-#ifdef OFFLINE
-    if (debugHoughTransform){
-        drawHoughLines(lines);
-    }
-#endif
+    drawHoughLines(lines);
 }
 
 void Threshold::drawHoughLines(list<HoughLine> &lines)
 {
-    list<HoughLine>::iterator line = lines.begin();
-    while (line != lines.end()){
-        for (double u = -200.; u <= 200.; u+=1.){
-            double sn = sin(line->getAngle());
-            double cs = cos(line->getAngle());
-            double x0 = line->getRadius() * cs;
-            double y0 = line->getRadius() * sn;
+#ifdef OFFLINE
+    if (debugHoughTransform){
+        list<HoughLine>::iterator line = lines.begin();
+        while (line != lines.end()){
+            for (double u = -200.; u <= 200.; u+=1.){
+                double sn = sin(line->getAngle());
+                double cs = cos(line->getAngle());
+                double x0 = line->getRadius() * cs;
+                double y0 = line->getRadius() * sn;
 
-            int x = (int)round(x0 - u * sn) + IMAGE_WIDTH  / 2;
-            int y = (int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
+                int x = (int)round(x0 - u * sn) + IMAGE_WIDTH  / 2;
+                int y = (int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
 
-            if (0 <= x && x < IMAGE_WIDTH &&
-                0 <= y && y < IMAGE_HEIGHT)
-                vision->drawDot(x,y, LIGHT_SKY_BLUE);
+                if (0 <= x && x < IMAGE_WIDTH &&
+                    0 <= y && y < IMAGE_HEIGHT)
+                    vision->drawDot(x,y, LIGHT_SKY_BLUE);
+            }
+            line++;
         }
-        line++;
     }
+#endif
 }
 
 /**

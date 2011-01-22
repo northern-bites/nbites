@@ -160,11 +160,13 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/HoughSpace
                  ${VISION_INCLUDE_DIR}/geom/HoughLine
                  ${VISION_INCLUDE_DIR}/ImageAcquisition.s
+                 ${VISION_INCLUDE_DIR}/EdgeDetection.s
                  ${VISION_INCLUDE_DIR}/ColorParams
                  )
 
 
 set_property(SOURCE ${VISION_INCLUDE_DIR}/ImageAcquisition.s PROPERTY LANGUAGE C)
+set_property(SOURCE ${VISION_INCLUDE_DIR}/EdgeDetection.s PROPERTY LANGUAGE C)
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
 
@@ -247,13 +249,18 @@ ENDIF( VISIONLINK )
 
 ########################### VISION TEST EXECUTABLES
 set( VISION_TEST_DIR ${VISION_INCLUDE_DIR}/test)
-add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp ${VISION_TEST_DIR}/EdgeDetectorTest.cpp
+add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp
+  ${VISION_TEST_DIR}/EdgeDetectorTest.cpp
+  ${VISION_INCLUDE_DIR}/EdgeDetection.s
   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
 target_link_libraries( EdgeDetectorTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
 
 
-add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp ${VISION_TEST_DIR}/HoughSpaceTest.cpp ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
+add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp
+  ${VISION_TEST_DIR}/HoughSpaceTest.cpp
+  ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
+  ${VISION_INCLUDE_DIR}/EdgeDetection.s
   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
 target_link_libraries( HoughSpaceTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})

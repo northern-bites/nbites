@@ -2,6 +2,7 @@
 #define _Gradient_h_DEFINED
 
 #include <stdlib.h>
+#include <stdint.h>
 
 #include <iostream>
 #include "VisionDef.h"
@@ -57,8 +58,8 @@ public:
 
     // Public member variables
 public:
-    int x[IMAGE_HEIGHT][IMAGE_WIDTH];
-    int y[IMAGE_HEIGHT][IMAGE_WIDTH];
+    int16_t x[IMAGE_HEIGHT][IMAGE_WIDTH];
+    int16_t y[IMAGE_HEIGHT][IMAGE_WIDTH];
     int mag[IMAGE_HEIGHT][IMAGE_WIDTH];
     bool peaks[IMAGE_HEIGHT][IMAGE_WIDTH];
 

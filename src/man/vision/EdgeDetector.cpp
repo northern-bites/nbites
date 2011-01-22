@@ -1,7 +1,12 @@
 #include "EdgeDetector.h"
+#include "visionconfig.h"
+
 #include <cmath>
 #include <iostream>
+#include <stdio.h>
 
+extern "C" void _sobel_operator(const uint16_t *yimg,
+                                int16_t *outX, int16_t *outY);
 
 using boost::shared_ptr;
 using namespace std;
@@ -21,7 +26,13 @@ void EdgeDetector::detectEdges(const uint16_t* channel,
                                shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_EDGES);
+
+#ifdef USE_MMX
+    _sobel_operator(&channel[0], &gradient->x[0][0], &gradient->y[0][0]);
+#else
     sobelOperator(channel, gradient);
+#endif
+
     findPeaks(gradient);
     PROF_EXIT(profiler,P_EDGES);
 }
@@ -126,7 +137,8 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
                 }
             }
             if (!gradient->peaks[i][j]){
-                gradient->x[i][j] = gradient->y[i][j] = gradient->mag[i][j] = 0;
+                gradient->x[i][j] = gradient->y[i][j] = 0;
+                gradient->mag[i][j] = 0;
             }
         }
     }
