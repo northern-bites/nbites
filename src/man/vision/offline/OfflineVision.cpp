@@ -44,14 +44,11 @@ OfflineVision::~OfflineVision()
  */
 int OfflineVision::runOnDirectory(std::string path)
 {
-    cout << "Running vision processing on " << path << endl;
-
     for (int c=0; c < numIterations; ++c){
         for (int i = first; i <= last; ++i){
             stringstream framePath;
             framePath << path << "/" << i << ".NBFRM";
             sensors->loadFrame(framePath.str());
-
             vision->notifyImage(sensors->getImage());
             PROF_NFRAME(profiler);
         }

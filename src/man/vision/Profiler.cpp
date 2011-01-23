@@ -5,6 +5,8 @@
 
 #include "Profiler.h"
 
+#define PRINT_CSV
+
 static const char *PCOMPONENT_NAMES[] = {
   "GetImage",
   "Vision",
@@ -217,6 +219,31 @@ Profiler::printCurrent ()
 void
 Profiler::printSummary ()
 {
+#ifdef PRINT_CSV
+    printCSVSummary();
+#else
+    printIndentedSummary();
+#endif /* PRINT_CSV */
+}
+
+void
+Profiler::printCSVSummary()
+{
+    printf("%s,%s,%s", "Component Name", "Sum Time", "Avg. Time\n");
+    for (int i = 0; i < NUM_PCOMPONENTS; ++i) {
+        if (shouldNotPrintLine(i))
+            continue;
+        printf("%s,%.10llu,%.6llu\n",
+               PCOMPONENT_NAMES[i],
+               sumTime[i],
+               (sumTime[i]/(current_frame+1) )
+            );
+    }
+}
+
+void
+Profiler::printIndentedSummary()
+{
   printf("Profiler Summary: %i Frames\n", (current_frame+1));
 
   // Calculate depths of sub-components, for indented display
@@ -243,8 +270,7 @@ Profiler::printSummary ()
     comp = PCOMPONENT_SUB_ORDER[i];
     parent_sum = (float)sumTime[comp];
 
-    // Don't print those times which are zero, i.e. they weren't run.
-    if ((!printEmpty && sumTime[i] == 0) ||
+    if (shouldNotPrintLine(i) &&
         (maxPrintDepth != PRINT_ALL_DEPTHS && depths[i] > maxPrintDepth))
         continue;
 

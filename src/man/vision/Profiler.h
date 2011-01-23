@@ -75,6 +75,8 @@ class Profiler {
 
     void printCurrent();
     void printSummary();
+    void printCSVSummary();
+    void printIndentedSummary();
 
     bool nextFrame();
 
@@ -85,6 +87,11 @@ class Profiler {
     inline bool exitComponent(ProfiledComponent c) {
       lastTime[c] = timeFunction() - enterTime[c];
       return profiling;
+    }
+
+    inline bool shouldNotPrintLine(int i) {
+        // Don't print those times which are zero, i.e. they weren't run.
+        return (!printEmpty && sumTime[i] == 0);
     }
 
   public:
@@ -101,6 +108,7 @@ class Profiler {
     int current_frame;
     long long enterTime[NUM_PCOMPONENTS];
     long long lastTime[NUM_PCOMPONENTS];
+public:
     long long sumTime[NUM_PCOMPONENTS];
 };
 
