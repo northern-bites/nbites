@@ -5,7 +5,7 @@
 
 #include "Profiler.h"
 
-#define PRINT_CSV
+// #define PRINT_CSV
 
 static const char *PCOMPONENT_NAMES[] = {
   "GetImage",

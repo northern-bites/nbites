@@ -28,7 +28,9 @@ void EdgeDetector::detectEdges(const uint16_t* channel,
     PROF_ENTER(profiler, P_EDGES);
 
 #ifdef USE_MMX
+    PROF_ENTER(profiler, P_SOBEL);
     _sobel_operator(&channel[0], &gradient->x[0][0], &gradient->y[0][0]);
+    PROF_EXIT(profiler, P_SOBEL);
 #else
     sobelOperator(channel, gradient);
 #endif
