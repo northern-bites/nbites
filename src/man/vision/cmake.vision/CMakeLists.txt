@@ -161,12 +161,15 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/geom/HoughLine
                  ${VISION_INCLUDE_DIR}/ImageAcquisition.s
                  ${VISION_INCLUDE_DIR}/EdgeDetection.s
+                 ${VISION_INCLUDE_DIR}/CopyImage.s
                  ${VISION_INCLUDE_DIR}/ColorParams
                  )
 
 
-set_property(SOURCE ${VISION_INCLUDE_DIR}/ImageAcquisition.s PROPERTY LANGUAGE C)
-set_property(SOURCE ${VISION_INCLUDE_DIR}/EdgeDetection.s PROPERTY LANGUAGE C)
+set_property(SOURCE
+  ${VISION_INCLUDE_DIR}/ImageAcquisition.s
+  ${VISION_INCLUDE_DIR}/EdgeDetection.s
+  ${VISION_INCLUDE_DIR}/CopyImage.s PROPERTY LANGUAGE C)
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
 
