@@ -5,29 +5,21 @@
 
 .section .data
 
-	.struct 0
-x_output:
-	.struct x_output + 4
-y_output:
-	.struct y_output + 4
-row_count:
-
-.equiv top_of_stack, row_count + 4
-
 
 .section .text
 
-	## _sobel_operator(uint16_t *yimg, uint16_t  *outX, uint16_t *outY)
+	## _sobel_operator(uint16_t *yimg, int16_t  *outX, int16_t *outY, uint16_t *mag)
 _sobel_operator:
 	push 	ebp
 	mov	ebp, esp
 
 	push 	esi
 	push 	edi
+	push	ebx
 
-	sub	esp, top_of_stack
+	sub 	esp, 4
 
-	## Load arguments into registers and onto the stack
+	## Load arguments into registers
 
 	## We have to move destination registers to the ends of the next row
 	##
@@ -37,30 +29,28 @@ _sobel_operator:
 	mov	esi, [ebp+8]
 	add	esi, 320 * 2	# Move pointer to end of row
 
-	mov	eax, [ebp+12]
-	add	eax, 320 * 2 * 2 + 2
-	mov	dword ptr[esp + x_output], eax
+	mov	ebx, [ebp+12]
+	add	ebx, 320 * 2 * 2 + 2
 
-	mov	eax, [ebp+16]
-	add	eax, 320 * 2 * 2 + 2
-	mov	dword ptr[esp + y_output], eax
+	mov	edi, [ebp+16]
+	add	edi, 320 * 2 * 2 + 2
 
-	mov	dword ptr[esp + row_count], 238 # Actually only does from top row through third to bottom
+	mov	eax, [ebp+20]
+	add	eax, 320 * 2 * 2 + 2
+
+	mov	dword ptr[esp], 238 # Actually only does from top row through third to bottom
 yLoop:
 
 	## Two pixels processed each time
 	mov	ecx, -636
 xLoop:
 
-	## Put y gradient output destination in register
-	mov	edi, [esp + y_output]
-
-	## Assumes that eax has the address of where we write to memory
 yGradient:
 	## Load upper row and unpack
 	## mm1: | y03 | y02 | y01 | y00 |
 	movq 	mm0, [esi + ecx-4]
 	movq	mm1, mm0
+
 
 	## Load the lower row
 	## mm3: | y13 | y12 | y11 | y10 |
@@ -88,14 +78,14 @@ yGradient:
 	## Each time write out the 2 LSW
 	movd	[edi + ecx-4], mm3
 
-	## Put x gradient output destination in register
-	mov	edi, [esp + x_output]
-
 xGradient:
 	## top row in mm0
 	## bottom row in mm2
 	## Unpack middle row
 	movq	mm4, [esi + ecx-4 + 320*2]
+
+	## Prefetch row after bottom
+	prefetch [esi + ecx-4 + 320*2*3]
 
 	## Add middle to top, twice
 	paddw	mm0, mm4
@@ -105,14 +95,54 @@ xGradient:
 	paddw	mm0, mm2
 
 	## Shuffle words and subtract to get gradient value
-	pshufw	mm3, mm0, 0b01001110 # Rearrange from |4|3|2|1| to |2|1|4|3|
+	pshufw	mm4, mm0, 0b01001110 # Rearrange from |4|3|2|1| to |2|1|4|3|
 
-	## mm3 after subtract:
+	## mm4 after subtract:
 	## | xxx | xxx | 4 - 2 (diff over 3) | 3 - 1 (diff over 2) |
-	psubsw	mm3, mm0
+	psubsw	mm4, mm0
 
 	## Write out to memmory
-	movd	[edi + ecx-4], mm3
+	movd	[ebx + ecx-4], mm4
+
+	##
+	##
+	## MAGNITUDE CALCULATION
+	##
+	##
+magnitude:
+	movq	mm0, mm4	# mm4 = abs(x gradient), sign bit in mm0
+	psraw	mm0, 15
+	pxor	mm4, mm0
+	psubw	mm4, mm0
+
+	movq	mm1, mm3	# mm3 = abs(y gradient), sign bit in mm1
+	psraw	mm1, 15
+	pxor	mm3, mm1
+	psubw	mm3, mm1
+
+	paddw	mm1, mm1	# combine x and y signs ; range 0 to -3
+	paddw	mm0, mm1
+
+	movq	mm1, mm4	# Compare x and y gradient magnitudes
+	pcmpgtw mm1, mm3
+	paddw	mm0, mm0	# combine x >= y bit with sign bits to make octant
+	paddw	mm0, mm1
+	packsswb mm0, mm7	# write octants (bytes); range 0 to -7
+	## movd	[octant], mm0
+
+	psraw	mm4, 2		# make x and y gradient magnitudes fit in 8 bits
+	psraw	mm3, 2
+	movq	mm0, mm4	# mm0 gets larger magnitude
+	pmaxsw	mm0, mm3
+	movq	mm1, mm4	# mm1 gets smaller magnitude
+	pminsw	mm1, mm3
+	packsswb mm0, mm1	# write magnitudes (tangent of angle within octant)
+	## movq	[tangent], mm0
+
+	pmullw	mm4, mm4	# compute and write squared magnitude
+	pmullw	mm3, mm3
+	pavgw	mm4, mm3	# average is used to avoid 16-bit overflow
+	movd	[eax + ecx - 4], mm4
 
 	## xLoop finish
 	add	ecx, 4
@@ -122,16 +152,18 @@ xGradient:
 	add	esi, 320 * 2	# next source row (2 bytes * 320 pixels)
 
 	# next dest rows
-	add	dword ptr[esp + x_output], 320 * 2
-	add	dword ptr[esp + y_output], 320 * 2
+	add	ebx, 320 * 2
+	add	edi, 320 * 2
+	add	eax, 320 * 2
 
-	dec	dword ptr[esp + row_count]
+	dec	dword ptr[esp]
 	jne 	yLoop
 
 	## Fix stack
 	mov	esp, ebp
-	sub	esp, 8
+	sub	esp, 12
 
+	pop	ebx
 	pop	edi
 	pop	esi
 

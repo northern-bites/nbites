@@ -60,7 +60,7 @@ public:
 public:
     int16_t x[IMAGE_HEIGHT][IMAGE_WIDTH];
     int16_t y[IMAGE_HEIGHT][IMAGE_WIDTH];
-    int mag[IMAGE_HEIGHT][IMAGE_WIDTH];
+    uint16_t mag[IMAGE_HEIGHT][IMAGE_WIDTH];
     bool peaks[IMAGE_HEIGHT][IMAGE_WIDTH];
 
     const static int rows = IMAGE_HEIGHT;

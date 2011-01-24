@@ -1,13 +1,13 @@
 #include "EdgeDetectorTest.h"
-#include <iostream>
-#include <cmath>
+#include "Profiler.h"
+#include "visionconfig.h"
 
-#include <stdio.h>
 #include <assert.h>
+#include <cmath>
+#include <iostream>
+#include <stdio.h>
 
 #include "boost/shared_ptr.hpp"
-
-#include "Profiler.h"
 
 
 #define BYTE_TO_RAD 128./M_PI
@@ -77,12 +77,18 @@ int EdgeDetectorTest::test_sobel()
      * Fill the channel with a bunch of values and make sure the sobel
      * operator spits out the correct gradients.
      */
-
+    srand(time(NULL));
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
-            c[(i) * IMAGE_WIDTH + j] = rand() % 255;
+            c[(i) * IMAGE_WIDTH + j] = static_cast<uint8_t>(rand()%255);
+
     shared_ptr<Gradient> g2 = shared_ptr<Gradient>(new Gradient());
+
+#ifdef USE_MMX
+    _sobel_operator(&c[0],&g->x[0][0], &g->y[0][0], &g->mag[0][0]);
+#else
     edges.sobelOperator(c, g);
+#endif
     for (int i=1; i < IMAGE_HEIGHT-1; ++i)
         for (int j=1; j < IMAGE_WIDTH-1; ++j){
             int gx = ((c[(i-1) * IMAGE_WIDTH + j+1] +
@@ -102,8 +108,13 @@ int EdgeDetectorTest::test_sobel()
                        c[(i-1) * IMAGE_WIDTH + j+1]));
             EQ_INT(g->x[i][j] , gx);
             EQ_INT(g->y[i][j] , gy);
-            // EQ_INT(g->mag[i][j] , gx * gx + gy * gy);
-            // GTE(g->mag[i][j] , 0); // Detect an overflow or incorrect magnitude
+
+            gx = abs(gx) >> 2;
+            gy = abs(gy) >> 2;
+            int mag = (gx * gx + gy * gy + 1) >> 1;
+
+            EQ_INT(g->mag[i][j] , mag);
+            GTE(g->mag[i][j] , 0); // Detect an overflow or incorrect magnitude
         }
     PASSED(SOBEL_ALL);
     return 0;

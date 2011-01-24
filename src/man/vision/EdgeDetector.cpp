@@ -5,9 +5,6 @@
 #include <iostream>
 #include <stdio.h>
 
-extern "C" void _sobel_operator(const uint16_t *yimg,
-                                int16_t *outX, int16_t *outY);
-
 using boost::shared_ptr;
 using namespace std;
 
@@ -29,7 +26,9 @@ void EdgeDetector::detectEdges(const uint16_t* channel,
 
 #ifdef USE_MMX
     PROF_ENTER(profiler, P_SOBEL);
-    _sobel_operator(&channel[0], &gradient->x[0][0], &gradient->y[0][0]);
+    _sobel_operator(&channel[0],
+                    &gradient->x[0][0], &gradient->y[0][0],
+                    &gradient->mag[0][0]);
     PROF_EXIT(profiler, P_SOBEL);
 #else
     sobelOperator(channel, gradient);
@@ -77,9 +76,16 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
                  2 * channel[(i-1) * IMAGE_WIDTH + (j)] +
                  channel[(i-1) * IMAGE_WIDTH + (j+1)])
                 );
-            gradient->x[i][j] = xGrad;
-            gradient->y[i][j] = yGrad;
-            gradient->mag[i][j] = xGrad * xGrad + yGrad * yGrad;
+
+
+            gradient->x[i][j] = static_cast<int16_t>(xGrad);
+            gradient->y[i][j] = static_cast<int16_t>(yGrad);
+
+            xGrad = abs(xGrad) >> 2;
+            yGrad = abs(yGrad) >> 2;
+
+            int mag = ((xGrad * xGrad + yGrad * yGrad + 1) >> 1);
+            gradient->mag[i][j] = static_cast<uint16_t>(mag);
         }
     }
     PROF_EXIT(profiler, P_SOBEL);

@@ -8,6 +8,8 @@
 
 #include "boost/shared_ptr.hpp"
 
+extern "C" void _sobel_operator(const uint16_t *yimg,
+                                int16_t *outX, int16_t *outY, uint16_t *mag);
 
 /**
  * Used to find the step edges in a given channel of an image according to a
