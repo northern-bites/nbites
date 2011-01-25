@@ -23,9 +23,9 @@ static const char *PCOMPONENT_NAMES[] = {
 
   "Hough Transform",
   "Mark Hough Edges",
-  "Smooth",
+  "Smooth Hough Space",
   "Hough Peaks",
-  "Suppress",
+  "Suppress Hough Lines",
 
   "Lines",
   "Vert Lines",

@@ -25,7 +25,6 @@ OfflineVision::OfflineVision(int _iterations, int _first, int _last) :
 #ifdef USE_TIME_PROFILING
     profiler->profiling = true;
     profiler->profileFrames((last-first+1) * numIterations);
-    profiler->printEmpty = false;
     profiler->maxPrintDepth = 2;
 #endif
 }

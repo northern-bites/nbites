@@ -11,7 +11,7 @@ IMAGE_DIR=$1
 # Second argument gives location of OfflineVision executable
 BIN_DIR=$2
 
-ITERATIONS=500
+ITERATIONS=200
 
 for folder in "zero" "one" "couple" "clutter"
 do
@@ -21,6 +21,9 @@ do
     $BIN_DIR/OfflineVision $IMAGE_DIR/$folder 1 $NUM_IMAGES $ITERATIONS > $OUT_FILE
 done
 
-
+echo "Done running tests, creating graphs!"
 
 # Create graphs
+R CMD BATCH hough_graphs.R
+
+echo "Done!"
