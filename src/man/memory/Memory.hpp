@@ -1,8 +1,15 @@
-/*
+/**
  * Memory.hpp
  *
+ * @class Memory
  *
- *      Author: oneamtu
+ * This class keeps instances of all the different memory objects and provides
+ * an interface through which they get updated (each memory object pulls data
+ * from its corresponding object
+ *
+ * Future work: we will be able to keep multiple instances of selected objects
+ *
+ *      Author: Octavian Neamtu
  */
 
 #pragma once
