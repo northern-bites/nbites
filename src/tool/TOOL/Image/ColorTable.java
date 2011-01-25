@@ -50,10 +50,10 @@ import TOOL.Vision.Vision;
 public class ColorTable {
     //default table locations,
     //which get statically updated each time we save a new table
-    public static String LOAD_TABLE_PATH = System.getProperty("user.home")+
-											"/nbites/data/tables";
-    public static String SAVE_TABLE_PATH = System.getProperty("user.home")+
-											"/nbites/data/tables";
+    public static String LOAD_TABLE_PATH = System.getProperty("user.dir")+
+											"/../../data/tables";
+    public static String SAVE_TABLE_PATH = System.getProperty("user.dir")+
+											"/../../data/tables";
 
     public static final byte GREEN = Vision.GREEN;
     public static final byte BLUE = Vision.BLUE;

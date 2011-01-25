@@ -10,7 +10,7 @@
  * @modified 2010
  */
 
-#include </Library/Java/JavaVirtualMachines/1.6.0_22-b04-307.jdk/Contents/Headers/jni.h>
+#include <jni.h>
 
 #include <iostream>
 #include <vector>
