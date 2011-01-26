@@ -143,7 +143,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
  */
 
 Profiler::Profiler (long long (*f) ())
-    : timeFunction(f), printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS)
+    : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),timeFunction(f)
 {
   reset();
 }

@@ -21,9 +21,9 @@ do
     $BIN_DIR/OfflineVision $IMAGE_DIR/$folder 1 $NUM_IMAGES $ITERATIONS > $OUT_FILE
 done
 
-echo "Done running tests, creating graphs!"
+# echo "Done running tests, creating graphs!"
 
 # Create graphs
-R CMD BATCH hough_graphs.R
+# R CMD BATCH hough_graphs.R
 
 echo "Done!"
