@@ -542,15 +542,15 @@ GOALIE_DIVE_RIGHT = ( ((45.88,38.93,-122.88,-32.43),
                         (-59.06,21.54,-17.49,122.69,-69.70,-5.01),
                         (-59.06,-37.44,-16.00,123.84,-69.17,5.54),
                         (41.31,-38.85,120.23,41.93),
-                        1.5, 0, stiff.LOW_HEAD_STIFFNESSES),
+                        1.0, 0, stiff.LOW_HEAD_STIFFNESSES),
                       #squats down with legs spread
                       #arms bent with hands above elbow
 
                        ((53.44,66.62,-122.61,-42.98),
-                        (0,45.77,-69.26,122.78,-69.70,24.45),
+                        (0,45.77,-87.00,122.78,-69.70,24.45),
                         (0,12.92,29.70,38.85,9.41,22.15),
                         (47.46,-30.33,120.06,41.93),
-                        1.5, 0, stiff.LOW_HEAD_STIFFNESSES),
+                        1.0, 0, stiff.LOW_HEAD_STIFFNESSES),
                       #this move has changed he turns his hips in while off the
                       #right foot so that he is facing more left.
                       #a different lean of the upper body and a slight
@@ -560,15 +560,15 @@ GOALIE_DIVE_RIGHT = ( ((45.88,38.93,-122.88,-32.43),
                         (-30.17,-19.16,16.53,22.32,23.03,24.42),
                         (-30.17,11.16,-40.34,48.87,-10.46,24.52),
                         (-36.38,0.17,-59.77,8.53),
-                        1.5, 0, stiff.LOW_HEAD_STIFFNESSES),
-
-                      # ((-71.28,14.76,-5.36,-8.70),
-                       # (-62.75,44.65,-31.64,62.84,-69.88,5.89),
-                       # (-62.75,18.81,27.07,38.94,9.49,19.78),
-                       # (47.90,-30.50,119.79,42.10),
-                       # 1.5, 0, stiff.LOW_HEAD_STIFFNESSES),
+                       1.5, 0, stiff.LOW_HEAD_STIFFNESSES),
                       #dives right
 
+                       ((-85.70,13.80,50.36,0.27),
+                        (-30.17,-19.16,16.53,22.32,23.03,24.42),
+                        (-30.17,11.16,-40.34,48.87,-10.46,24.52),
+                        (-36.38,0.17,-59.77,8.53),
+                        0.1, 0, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
+                      #makes robot lie flat
                        )
 
 
