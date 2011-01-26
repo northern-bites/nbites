@@ -12,7 +12,6 @@ def goaliePosition(player):
 
     if player.firstFrame():
         player.isChasing = False
-        player.changeOmniGoToCounter = 0
         nav.positionPlaybook()
 
     if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
