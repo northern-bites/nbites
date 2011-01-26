@@ -756,7 +756,7 @@ static const int VERSION = 0;
 
 void Sensors::saveFrame()
 {
-    int MAX_FRAMES = 3000;
+    int MAX_FRAMES = 5000;
     if (saved_frames > MAX_FRAMES)
         return;
     string EXT(".NBFRM");

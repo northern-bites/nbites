@@ -77,6 +77,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             if roleState != self.currentState:
                 self.switchTo(roleState)
 
+
+        if NogginConstants.SAVE_FRAMES:
+            if gcState == 'gamePlaying':
+                self.brain.sensors.saveFrame()
+            ##### IF 3000 IMAGES TAKEN, GO TO FINISH #####
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
