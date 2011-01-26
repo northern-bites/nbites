@@ -50,3 +50,9 @@ OPTION(
     "Turn on/off debugging information for ALImageTranscriber"
     OFF
     )
+
+OPTION(
+    SAVE_ALL_FRAMES
+    "Turn on/off saving every frame in-game."
+    OFF
+    )
