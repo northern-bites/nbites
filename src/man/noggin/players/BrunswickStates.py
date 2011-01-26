@@ -46,6 +46,7 @@ def gameReady(player):
         player.justKicked = False
         player.standup()
         player.brain.tracker.locPans()
+        player.brain.sensors.resetSaveFrame()
 
     if player.lastDiffState == 'gameInitial':
         return player.goLater('relocalize')

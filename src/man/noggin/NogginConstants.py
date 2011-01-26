@@ -8,7 +8,6 @@ LOG_LOC = True
 
 ##### MODULE SWITCHES ####
 USE_VISION = True # Disable for faster processing
-SAVE_FRAMES = False # Disable for faster processing
 
 ##--------------------COM HEADER -------------#
 PACKET_HEADER = "ilikeyoulots"
