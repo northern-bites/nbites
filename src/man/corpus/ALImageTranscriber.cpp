@@ -134,6 +134,10 @@ void ALImageTranscriber::run() {
             waitForImage();
         subscriber->notifyNextVisionImage();
 
+#ifdef SAVE_ALL_FRAMES
+		sensors->saveFrame();
+#endif
+
         //stop timer
         const long long processTime = micro_time() - startTime;
         //sleep until next frame
