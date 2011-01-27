@@ -5,8 +5,58 @@
 
 .section .data
 
-
 .section .text
+
+.macro Y_GRAD phase, reg
+	## Load the lower row
+	## mm3: | y13 | y12 | y11 | y10 |
+	movq	mm2, [esi + ecx-4 + 320 * 2 * 2 + (\phase * 4)] # Two rows after top row
+	movq	mm\reg, mm2
+
+	## Compute the difference between the rows
+	## mm\reg: | y3 | y2 | y1 | y0 | diffs
+	psubsw	mm\reg, qword ptr[esi + ecx-4 + (\phase * 4)]
+
+	## mm1 after pshufw: | y0 | y3 | y2 | y1 |
+	pshufw	mm1, mm\reg, 0b00111001
+
+	## mm1 after addition:
+	## 	 | y0 + y3 | y3 + y2 | y2 + y1 | y0 + y1 |
+	paddw	mm1, mm\reg
+
+	## mm\reg after 2nd pshufw:
+	## 	| xxx | y2 + y1 | xxx | y2 + y1 |
+	pshufw	mm\reg, mm1, 0b00111001
+
+	## mm\reg:	| xxx | xxx | y1 + 2*y2 +  y3 | y2 + 2*y1 + y0 |
+	paddw	mm\reg, mm1
+
+	## Each time write out the 2 LSW
+	movd	[edi + ecx-4 + (\phase * 4)], mm\reg
+
+.endm
+
+.macro X_GRAD phase, reg
+	## top row in mm0
+	## bottom row in mm2
+
+	## Add middle to top, twice
+	paddw	mm2, [esi + ecx-4 + 320*2 + (\phase * 4)]
+	paddw	mm2, [esi + ecx-4 + 320*2 + (\phase * 4)]
+
+	## Add bottom to accumulator
+	paddw	mm2, [esi + ecx-4 + (\phase * 4)]
+
+	## Shuffle words and subtract to get gradient value
+	pshufw	mm\reg, mm2, 0b01001110 # Rearrange from |4|3|2|1| to |2|1|4|3|
+
+	## mm\reg after subtract:
+	## | xxx | xxx | 4 - 2 (diff over 3) | 3 - 1 (diff over 2) |
+	psubsw	mm\reg, mm2
+
+	## Write out to memmory
+	movd	[ebx + ecx-4 + (\phase * 4)], mm\reg
+.endm
 
 	## _sobel_operator(uint16_t *yimg, int16_t  *outX, int16_t *outY, uint16_t *mag)
 _sobel_operator:
@@ -46,63 +96,14 @@ yLoop:
 xLoop:
 
 yGradient:
-	## Load upper row and unpack
-	## mm1: | y03 | y02 | y01 | y00 |
-	movq 	mm0, [esi + ecx-4]
-	movq	mm1, mm0
-
-
-	## Load the lower row
-	## mm3: | y13 | y12 | y11 | y10 |
-	movq	mm2, [esi + ecx-4 + 320 * 2 * 2] # Two rows after top row
-	movq	mm3, mm2
-
-	## Compute the difference between the rows
-	## mm3: | y3 | y2 | y1 | y0 | diffs
-	psubsw	mm3, mm1
-
-	## mm1 after pshufw: | y0 | y3 | y2 | y1 |
-	pshufw	mm1, mm3, 0b00111001
-
-	## mm1 after addition:
-	## 	 | y0 + y3 | y3 + y2 | y2 + y1 | y0 + y1 |
-	paddw	mm1, mm3
-
-	## mm3 after 2nd pshufw:
-	## 	| y0 + y1 | y0 + y3 | y3 + y2 | y2 + y1 |
-	pshufw	mm3, mm1, 0b00111001
-
-	## mm3:	| xxx | xxx | y1 + 2*y2 +  y3 | y2 + 2*y1 + y0 |
-	paddw	mm3, mm1
-
-	## Each time write out the 2 LSW
-	movd	[edi + ecx-4], mm3
-
 xGradient:
-	## top row in mm0
-	## bottom row in mm2
-	## Unpack middle row
-	movq	mm4, [esi + ecx-4 + 320*2]
+	Y_GRAD 0, 3
+	X_GRAD 0, 4
+	## Y_GRAD 1, 5
+	## X_GRAD 1, 6
 
 	## Prefetch row after bottom
 	prefetch [esi + ecx-4 + 320*2*3]
-
-	## Add middle to top, twice
-	paddw	mm0, mm4
-	paddw	mm0, mm4
-
-	## Add bottom to accumulator
-	paddw	mm0, mm2
-
-	## Shuffle words and subtract to get gradient value
-	pshufw	mm4, mm0, 0b01001110 # Rearrange from |4|3|2|1| to |2|1|4|3|
-
-	## mm4 after subtract:
-	## | xxx | xxx | 4 - 2 (diff over 3) | 3 - 1 (diff over 2) |
-	psubsw	mm4, mm0
-
-	## Write out to memmory
-	movd	[ebx + ecx-4], mm4
 
 	##
 	##
