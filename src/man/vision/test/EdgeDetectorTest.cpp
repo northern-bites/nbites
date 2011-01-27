@@ -106,15 +106,17 @@ int EdgeDetectorTest::test_sobel()
                       (c[(i-1) * IMAGE_WIDTH + j-1] +
                        c[(i-1) * IMAGE_WIDTH + j] * 2 +
                        c[(i-1) * IMAGE_WIDTH + j+1]));
-            EQ_INT(g->x[i][j] , gx);
-            EQ_INT(g->y[i][j] , gy);
+            // Disabled these tests for now because the MMX
+            // instruction no longer writes out x and y values
+            // EQ_INT(g->x[i][j] , gx);
+            // EQ_INT(g->y[i][j] , gy);
 
             gx = abs(gx) >> 2;
             gy = abs(gy) >> 2;
             int mag = (gx * gx + gy * gy + 1) >> 1;
-
             EQ_INT(g->mag[i][j] , mag);
-            GTE(g->mag[i][j] , 0); // Detect an overflow or incorrect magnitude
+            GTE(g->mag[i][j] , 0); // Useless with unsigned integers,
+                                   // but kept around for austerity
         }
     PASSED(SOBEL_ALL);
     return 0;
