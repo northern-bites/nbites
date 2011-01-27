@@ -55,21 +55,34 @@ include_directories( ${NBCOMMON_INCLUDE_DIR}/
                      ${PROTOBUF_INCLUDE_DIR}/
                      ${MEMORY_INCLUDE_DIR}/
                      ${MEMORY_CONFIG_DIR}/
+#                     ${CMAKE_CURRENT_BINARY_DIR}
                      )
+
+########################### PROTOBUF GENERATION
+find_program(PROTOC protoc)
+set(PROTOC_C_OUT_FLAG --cpp_out)
+
+# add the custom command that will generate all the files
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/Vision.pb.cc ${CMAKE_CURRENT_BINARY_DIR}/Vision.pb.h
+  COMMAND ${PROTOC} Vision.proto ${PROTOC_C_OUT_FLAG} ${CMAKE_CURRENT_BINARY_DIR}
+  DEPENDS ${PROTOC}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 # TODO: just make it compile everything that has .pb in it
-set( PROTOS_SRCS Vision.pb )
+set( PROTOS_SRCS ${CMAKE_CURRENT_BINARY_DIR}/Vision.pb.cc ${CMAKE_CURRENT_BINARY_DIR}/Vision.pb.h )
 
 ############################ Add sources
 
-  # Add static library target
-  add_library(
-    ${PROTOS_TARGET}
-    STATIC
-    ${PROTOS_SRCS}
-    )
+# Add static library target
+add_library(
+  ${PROTOS_TARGET}
+  STATIC
+  ${PROTOS_SRCS}
+  )
 
 target_link_libraries(
     ${PROTOS_TARGET}

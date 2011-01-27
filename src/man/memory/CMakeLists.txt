@@ -87,11 +87,12 @@ ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
 ############################ INCLUDE DIRECTORY
 # Define include directories
 
-INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
-                     ${PROTOBUF_INCLUDE_DIR}
-                     ${MEMORY_INCLUDE_DIR}
-                     ${BOOST_INCLUDE_DIR}
+INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}/
+                     ${PROTOBUF_INCLUDE_DIR}/
+                     ${MEMORY_INCLUDE_DIR}/
+                     ${BOOST_INCLUDE_DIR}/
                      ${MEMORY_CONFIG_DIR}/
+                     ${CMAKE_CURRENT_BUILD_DIR}/
                      )
 
 
@@ -108,7 +109,7 @@ set( MEMORY_SRCS Memory
 set( PROTOS_TARGET protos )
 set( LOGGER_TARGET log )
 
-add_subdirectory( gen )
+add_subdirectory( protos )
 add_subdirectory( log )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
