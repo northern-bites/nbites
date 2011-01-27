@@ -8,9 +8,9 @@
 
 .macro Y_GRAD phase, reg
 	## Load the lower row
-	## mm3: | y13 | y12 | y11 | y10 |
-	movq	mm2, [esi + ecx + 320 * 2 * 2 + (\phase * 4)] # Two rows after top row
-	movq	mm\reg, mm2
+	## mm0: | y13 | y12 | y11 | y10 |
+	movq	mm0, [esi + ecx + 320 * 2 * 2 + (\phase * 4)] # Two rows after top row
+	movq	mm\reg, mm0
 
 	## Compute the difference between the rows
 	## mm\reg: | y3 | y2 | y1 | y0 | diffs
@@ -40,27 +40,30 @@
 .endm
 
 .macro X_GRAD phase, reg
-	## top row in mm0
-	## bottom row in mm2
+	## bottom row in mm0
 	## Add middle to top, twice
-	paddw	mm2, [esi + ecx + 320*2 + (\phase * 4)]
-	paddw	mm2, [esi + ecx + 320*2 + (\phase * 4)]
+	paddw	mm0, [esi + ecx + 320*2 + (\phase * 4)]
+	paddw	mm0, [esi + ecx + 320*2 + (\phase * 4)]
 
-	## Add bottom to accumulator
-	paddw	mm2, [esi + ecx + (\phase * 4)]
+	## Add top to accumulator
+	paddw	mm0, [esi + ecx + (\phase * 4)]
 
+	movq	mm\reg, mm0
 	## Shuffle words and subtract to get gradient value
-	pshufw	mm\reg, mm2, 0b01001110 # Rearrange from |4|3|2|1| to |2|1|4|3|
+	## pshufw	mm\reg, mm0, 0b01001110 # Rearrange from |4|3|2|1| to |2|1|4|3|
 
 	## mm\reg after subtract:
 	## | xxx | xxx | 4 - 2 (diff over 3) | 3 - 1 (diff over 2) |
-	psubsw	mm\reg, mm2
+	## psubsw	mm\reg, mm0
 
 	## Write out to memmory
 	## movntq	[ebx + ecx + (\phase * 4)], mm\reg
 
 	.ifeq (\phase -1)
-	punpckldq mm4, mm6
+	movq	mm1, mm4
+	punpckldq mm1, mm6
+	punpckhdq mm4, mm6
+	psubsw	mm4, mm1
 	.endif
 .endm
 
