@@ -2,7 +2,6 @@
 #
 # Welcome
 #
-#
 
 ############################ Version
 # Check cMake version
@@ -55,17 +54,34 @@ include_directories( ${NBCOMMON_INCLUDE_DIR}/
                      ${PROTOBUF_INCLUDE_DIR}/
                      ${MEMORY_INCLUDE_DIR}/
                      ${MEMORY_CONFIG_DIR}/
-#                     ${CMAKE_CURRENT_BINARY_DIR}
                      )
 
 ########################### PROTOBUF GENERATION
+
+#protobuf input - finds all .proto files in the current dir
+file(GLOB PROTO_INPUT
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  "*.proto")
+
+#protobuf compiler
 find_program(PROTOC protoc)
 set(PROTOC_C_OUT_FLAG --cpp_out)
 
+#protobuf output
+set(PROTO_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR})
+foreach(PROTO_FILE ${PROTO_INPUT})
+  #get the name of the file without extension
+  get_filename_component(PROTO_NAME PROTO_FILE NAME_WE)
+  #add the generated files
+  set(PROTO_GEN ${PROTO_GEN}
+  ${PROTO_GEN_DIR}/${PROTO_NAME}.pb.h
+  ${PROTO_GEN_DIR}/${PROTO_NAME}.pb.cc)
+endforeach(PROTO_FILE ${PROTO_INPUT})
+
 # add the custom command that will generate all the files
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/Vision.pb.cc ${CMAKE_CURRENT_BINARY_DIR}/Vision.pb.h
-  COMMAND ${PROTOC} Vision.proto ${PROTOC_C_OUT_FLAG} ${CMAKE_CURRENT_BINARY_DIR}
+  OUTPUT ${PROTO_GEN}
+  COMMAND ${PROTOC} ${PROTO_INPUT} ${PROTOC_C_OUT_FLAG} ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${PROTOC}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
