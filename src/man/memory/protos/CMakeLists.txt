@@ -71,7 +71,7 @@ set(PROTOC_C_OUT_FLAG --cpp_out)
 set(PROTO_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 foreach(PROTO_FILE ${PROTO_INPUT})
   #get the name of the file without extension
-  get_filename_component(PROTO_NAME PROTO_FILE NAME_WE)
+  get_filename_component(PROTO_NAME ${PROTO_FILE} NAME_WE)
   #add the generated files
   set(PROTO_GEN ${PROTO_GEN}
   ${PROTO_GEN_DIR}/${PROTO_NAME}.pb.h
@@ -82,14 +82,13 @@ endforeach(PROTO_FILE ${PROTO_INPUT})
 add_custom_command(
   OUTPUT ${PROTO_GEN}
   COMMAND ${PROTOC} ${PROTO_INPUT} ${PROTOC_C_OUT_FLAG} ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS ${PROTOC}
+  DEPENDS ${PROTOC} ${PROTO_INPUT}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-# TODO: just make it compile everything that has .pb in it
-set( PROTOS_SRCS ${CMAKE_CURRENT_BINARY_DIR}/Vision.pb.cc ${CMAKE_CURRENT_BINARY_DIR}/Vision.pb.h )
+set( PROTOS_SRCS ${PROTO_GEN} )
 
 ############################ Add sources
 
@@ -101,6 +100,6 @@ add_library(
   )
 
 target_link_libraries(
-    ${PROTOS_TARGET}
-    ${PROTOBUF_LIBRARIES}
-    )
+  ${PROTOS_TARGET}
+  ${PROTOBUF_LIBRARIES}
+  )
