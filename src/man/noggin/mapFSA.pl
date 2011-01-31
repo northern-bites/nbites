@@ -23,7 +23,7 @@ my $lastBehavior;
 my %states;
 my %subStates;
 
-my @temp_ToParse;
+our @temp_ToParse;
 
 # Reads the initial behavior file in
 # sets behaviorName, finds stateFiles
@@ -79,13 +79,11 @@ sub readBehavior {
 
 	  # legal ways to exit a state
 	  if (/return\ player\.go(Now|Later)\(\'(\w+)/ ) {
-	      print "$2\n";
 	      $found_legal_return = 1;
 	  }
 
 	  # marks a state that can loop on itself
 	  if (/return\ player\.stay\(\)/) {
-	      print "$line\n";
 	      $found_legal_return = 1;
 	  }
       }
@@ -102,6 +100,8 @@ sub readBehavior {
 
 	# DEBUG: print out all the @foundStates, @foundSubStates
 	if ($DEBUG) {
+	    print "currentBehavior = $currentBehavior\n";
+
 	    print "foundStates\n";
 	    foreach my $state (@foundStates) {
 		print "  $state\n";
@@ -120,7 +120,7 @@ sub readBehavior {
 # finds a state file given it's Python-friendly reference
 # usually this means just looking for a .py file somewhere downstream
 sub findFile ($) {
-    my $file_final;
+    our $file_final;
 
     my $behavior = shift;
     our $behaviorFile = $behavior . '.py';
@@ -129,13 +129,12 @@ sub findFile ($) {
 
     # `find ./ -name $behaviorFile"
     sub matchesName {
-	my $file = shift;
-	if (/$file/) {
-	    $behaviorFile = $File::find::name;
+	if ($behaviorFile eq $_) {
+	    $file_final = $File::Find::name;
 	}
     }
 
-    find(\&matchesName($behaviorFile), $dir);
+    File::Find::find({wanted => \&matchesName,}, "$dir");
 
     undef $behaviorFile;
     return $file_final;
@@ -151,13 +150,17 @@ foreach my $behaviorFile (@ARGV) {
     # read it, add its states and further traverse if necessary
     die "not a top level behavior file!" if (not $lastBehavior);
 
+    print "reading sub state files\n";
+
     foreach my $subBehavior (@temp_ToParse) {
-	print "$subBehavior\n";
+	print "  $subBehavior\n";
 
 	my $subBehavior_file = findFile($subBehavior);
 
-	print "$subBehavior_file\n";
+	if ($subBehavior_file) {
+	    print "$subBehavior_file\n";
+	}
 
-	#readBehavior($subBehavior_file, $subBehavior);
+	readBehavior($subBehavior_file, $subBehavior);
    }
 }
