@@ -61,14 +61,11 @@
 
 ## STACK STRUCTURE, esp offsets
 	.struct 0
-row_count:
-	.struct	row_count + 4
-rdtsc_output:
-	.struct rdtsc_output + 4
-y_out_img:
-	.struct y_out_img + 4
-color_out_img:
-	.struct color_out_img + 1280 + 4 # End of row of written
+row_count:	.skip 4
+rdtsc_output: 	.skip 4
+y_out_img: 	.skip 4
+color_out_img: 	.skip 1280
+		.skip 4 	# make color_out_row qword aligned
 color_stack_row_end:
 
 .equiv end_of_stack, color_stack_row_end
