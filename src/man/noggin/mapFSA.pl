@@ -15,7 +15,7 @@ use File::Find;
 use Env '@PATH';
 
 my $DEBUG = "";
-
+my $BUILD = "yes";
 my $DOT_OPTS = '-Tpng -O'; # outputs in png format
 
 my @addedStateFiles;
@@ -101,14 +101,14 @@ sub readBehavior {
 	  }
 
 	  # legal ways to exit a state
-	  if (/return\ player\.go(Now|Later)\(\'(\w+)/ ) {
+	  if (/return\ (nav|player)\.go(Now|Later)\(\'(\w+)/ ) {
 	      $found_legal_return = 1;
-	      push @currentTransitions, $2;
+	      push @currentTransitions, $3;
 	      next LINE;
 	  }
 
 	  # marks a state that can loop on itself
-	  if (/return\ player\.stay\(\)/) {
+	  if (/return\ (nav|player)\.stay\(\)/) {
 	      $found_legal_return = 1;
 	      $current_can_loop = 1;
 	      next LINE;
@@ -208,7 +208,8 @@ sub buildDOT {
     # now make a PNG file out of the .dot file we just built
     my $dot = 'dot';
     my $exec_exists = grep -x "$_/$dot", @PATH;
-    if ($exec_exists) {
+
+    if ($exec_exists && $BUILD) {
 	`$dot $DOT_OPTS $graphFile`;
     }
     else {
