@@ -12,18 +12,28 @@
 use strict;
 use warnings;
 use File::Find;
-use Cwd;
 
 my $DEBUG = "yes";
 
 my @addedStateFiles;
 my $lastBehavior;
 
-# access each state by its behaviorName
-my %states;
-my %subStates;
+# access each StateFile by its behaviorName (eg pBrunswick)
+# 
+our %stateFiles;
 
-our @temp_ToParse;
+# pushes an element to an array iff the element doesn't exist already
+sub uniqueAdd {
+    my $arrayRef = shift;
+    my $toAdd = shift;
+
+    foreach my $i (@$arrayRef) {
+	if ($toAdd eq $i) {
+	    return;
+	}
+    }
+    push @$arrayRef, $toAdd;
+}
 
 # Reads the initial behavior file in
 # sets behaviorName, finds stateFiles
@@ -34,14 +44,16 @@ sub readBehavior {
 
     ($file, $currentBehavior) = @_;
 
-    my @foundStates;
-    my @foundSubStates;
+    my @foundFiles;
+
+    # transitions inside the state we're reading currently
+    my @currentTransitions;
 
     # state variables used to avoid adding helper methods
     my $past_def;
     my $found_legal_return;
     my $currentFunction;
-
+    my $current_can_loop;
 
     if  (-f $file)  {
 	open(BEHAVIOR, "$file") or die "cant open $file";
@@ -51,7 +63,7 @@ sub readBehavior {
 
 	  $_ = $line;
 
-	  # found the behavior name!
+	  # found the behavior name
 	  if (/setName\(\'(\w+)\'/) {
 	      $currentBehavior = $1;
 	      next LINE;
@@ -59,57 +71,67 @@ sub readBehavior {
 
 	  # this line adds states from other files so note it
 	  if (/addStates\((\w+)\)/) {
-	      push @foundSubStates, $1;
+	      uniqueAdd(\@foundFiles, $1);
 	      next LINE;
 	  }
 
 	  # this line defines a function, set state variables accordingly
 	  if (/def\ (\w+)/) {
 	      # we were already parsing a function, it must have ended
-	      if ($currentFunction)  {
-		  # currentFunction is a state, so add it
-		  if ($found_legal_return) {
-		      push @foundStates, $currentFunction;
-		      $found_legal_return = "";
+	      # currentFunction is a state? if so add its transitions
+	      if ($currentFunction && $found_legal_return)  {
+		  # add the transitions
+		  foreach my $transition (@currentTransitions) {
+		      uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}}, $transition);
 		  }
-	      }
+
+		  # and note if the state contains a loop
+		  if ($current_can_loop) {
+		      push @{$stateFiles{$currentBehavior}{$currentFunction}}, "player.stay()";
+		      $current_can_loop = "";
+		  }
+		  $found_legal_return = "";
+	     }
 
 	      $currentFunction = $1;
+	      next LINE;
 	  }
 
 	  # legal ways to exit a state
 	  if (/return\ player\.go(Now|Later)\(\'(\w+)/ ) {
 	      $found_legal_return = 1;
+	      push @currentTransitions, $2;
+	      next LINE;
 	  }
 
 	  # marks a state that can loop on itself
 	  if (/return\ player\.stay\(\)/) {
 	      $found_legal_return = 1;
+	      $current_can_loop = 1;
+	      next LINE;
 	  }
       }
 
-	# assign back to the data structure
-	if ($currentBehavior) {
-	    $states{currentBehavior} = @foundStates;
-	    $subStates{currentBehavior} = @foundSubStates;
-	    $lastBehavior = $currentBehavior;
+	die "currentBehavior not set, this is bad" if (not $currentBehavior);
+	# update the behavior we're on
+	$lastBehavior = $currentBehavior;
 
-	    # TODO: remove this!
-	    @temp_ToParse = @foundSubStates;
+	# add any new files we found that need parsing
+	foreach my $new (@foundFiles) {
+	    uniqueAdd(\@addedStateFiles, $new);
 	}
 
-	# DEBUG: print out all the @foundStates, @foundSubStates
+	# DEBUG: print out all the @foundFiles, @foundSubStates
 	if ($DEBUG) {
 	    print "currentBehavior = $currentBehavior\n";
 
 	    print "foundStates\n";
-	    foreach my $state (@foundStates) {
+	    foreach my $state ( keys %{$stateFiles{$currentBehavior}}) {
 		print "  $state\n";
-	    }
 
-	    print "foundSubStates\n";
-	    foreach my $state (@foundSubStates) {
-		print "  $state\n";
+		foreach my $transition (@{$stateFiles{$currentBehavior}{$state}}) {
+		    print "     to $transition\n";
+		}
 	    }
 	}
 
@@ -117,7 +139,7 @@ sub readBehavior {
     }
 }
 
-# finds a state file given it's Python-friendly reference
+# find a behavior state file given it's Python-friendly reference
 # usually this means just looking for a .py file somewhere downstream
 sub findFile ($) {
     our $file_final;
@@ -140,27 +162,27 @@ sub findFile ($) {
     return $file_final;
 }
 
+# execution starts here
 foreach my $behaviorFile (@ARGV) {
 
     print ":::${behaviorFile}:::\n\n";
 
     readBehavior($behaviorFile, "");
 
+    print "foundSubState Files\n";
+    foreach my $stateFile (@addedStateFiles) {
+	print "  $stateFile\n";
+    }
+
     # for each sub-behavior found (state file)
     # read it, add its states and further traverse if necessary
     die "not a top level behavior file!" if (not $lastBehavior);
 
-    print "reading sub state files\n";
+    print "\n:::reading sub state files:::\n\n";
 
-    foreach my $subBehavior (@temp_ToParse) {
-	print "  $subBehavior\n";
-
-	my $subBehavior_file = findFile($subBehavior);
-
-	if ($subBehavior_file) {
-	    print "$subBehavior_file\n";
-	}
-
-	readBehavior($subBehavior_file, $subBehavior);
-   }
+    foreach my $new_file (@addedStateFiles) {
+	my $new_file_loc = findFile($new_file);
+	#print "opening [${new_file}] at $new_file_loc\n";
+	readBehavior($new_file_loc, $new_file);
+    }
 }
