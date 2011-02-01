@@ -3,8 +3,8 @@
 # Small utility script to parse a behavior file (ex: pBrunswick.py) and
 # extract a mapping of all FSA states and which states they transition to.
 #
-# Generates this data as a text file (ex: pBrunswick.py.states) and as
-# a PDF graph using TikZ.
+# Generates this data as a DOT language file file (ex: pBrunswick.py.dot),
+# and builds a .png image of the directed graph. 
 #
 # Date: January 21, 2011
 # Author: Nathan Merritt
@@ -12,8 +12,11 @@
 use strict;
 use warnings;
 use File::Find;
+use Env '@PATH';
 
-my $DEBUG = "yes";
+my $DEBUG = "";
+
+my $DOT_OPTS = '-Tpng -O'; # outputs in png format
 
 my @addedStateFiles;
 my $lastBehavior;
@@ -162,27 +165,86 @@ sub findFile ($) {
     return $file_final;
 }
 
+# Creates a graph description using the DOT language
+# Basically once we've got the layout into a .dot file,
+# we can visualize it any way that we want to (xml, png...)
+# see: www.graphviz.org
+# and http://www.graphviz.org/doc/info/lang.html
+sub buildDOT {
+    my $graphFile = shift;
+    $graphFile = $graphFile . ".dot"; # fixes ambiguous order of ops
+    my $graphName = shift;
+
+    open(DOT, ">$graphFile") or die $!;
+
+    print DOT "digraph $graphName {\n\n";
+
+    # make all of the nodes
+    foreach my $file ( keys %stateFiles ) {
+	print DOT "subgraph $file {\n";
+
+	foreach my $state ( keys %{$stateFiles{$file}}) {
+	    #print "  $state\n";
+	    print DOT "  $state [label=\"$state\"];\n";
+	}
+
+	print DOT "\n}\n";
+    }
+
+    # and add connections between nodes
+    foreach my $file ( keys %stateFiles ) {
+	foreach my $state ( keys %{$stateFiles{$file}}) {
+	    TRANSITION: foreach my $toState (@{$stateFiles{$file}{$state}}) {
+		if ($toState !~ /player\.stay/) {
+		    print DOT "$state -> $toState\;\n";
+		}
+	    }
+	}
+    }
+
+    print DOT "\n}\n";
+    close (DOT);
+
+    # now make a PNG file out of the .dot file we just built
+    my $dot = 'dot';
+    my $exec_exists = grep -x "$_/$dot", @PATH;
+    if ($exec_exists) {
+	`$dot $DOT_OPTS $graphFile`;
+    }
+    else {
+	print "You need to install dot to build the .dot file\n";
+	print "get it at http://www.graphviz.org/\n";
+    }
+}
+
 # execution starts here
 foreach my $behaviorFile (@ARGV) {
 
-    print ":::${behaviorFile}:::\n\n";
+    print ":::${behaviorFile}:::";
 
     readBehavior($behaviorFile, "");
 
-    print "foundSubState Files\n";
-    foreach my $stateFile (@addedStateFiles) {
-	print "  $stateFile\n";
+    if ($DEBUG) {
+	print "foundSubState Files\n";
+	foreach my $stateFile (@addedStateFiles) {
+	    print "  $stateFile\n";
+	}
     }
 
     # for each sub-behavior found (state file)
     # read it, add its states and further traverse if necessary
     die "not a top level behavior file!" if (not $lastBehavior);
 
-    print "\n:::reading sub state files:::\n\n";
+    my $initialBehavior = $lastBehavior;
+
+    print "\n:::reading sub state files:::";
 
     foreach my $new_file (@addedStateFiles) {
 	my $new_file_loc = findFile($new_file);
 	#print "opening [${new_file}] at $new_file_loc\n";
 	readBehavior($new_file_loc, $new_file);
     }
+
+    print "\n:::building .dot and .png files:::\n";
+    buildDOT($behaviorFile, $initialBehavior);
 }
