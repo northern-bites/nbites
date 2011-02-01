@@ -4,7 +4,14 @@
 # extract a mapping of all FSA states and which states they transition to.
 #
 # Generates this data as a DOT language file file (ex: pBrunswick.py.dot),
-# and builds a .png image of the directed graph. 
+# and builds a .png image of the directed graph.
+#
+# States from each file are assigned a unique color. "goNow"
+# transitions are marked with solid lines while "goLater" transitions
+# use dotted lines.
+#
+# Note: the syntax error that pops up (usually near line 4) appears to
+# be harmless. Not sure why dot is complaining.
 #
 # Date: January 21, 2011
 # Author: Nathan Merritt
@@ -21,8 +28,16 @@ my $DOT_OPTS = '-Tpng -O'; # outputs in png format
 my @addedStateFiles;
 my $lastBehavior;
 
+my $nowChar = '*';
+my $laterChar = '^';
+
+# colors chosen in no particular order
+my @stateFileColors = qw ( blue Brown Crimson Green Indigo
+Peru deeppink goldenrod firebrick dodgerblue cyan4 chocolate4 yellow4 );
+
 # access each StateFile by its behaviorName (eg pBrunswick)
-# 
+# for example, @{$stateFiles{PenaltyKickStates}{penaltyBallInOppGoalbox}{chase}}
+# is the array of transitions from the chase state to other states
 our %stateFiles;
 
 # pushes an element to an array iff the element doesn't exist already
@@ -101,14 +116,21 @@ sub readBehavior {
 	  }
 
 	  # legal ways to exit a state
-	  if (/return\ (nav|player)\.go(Now|Later)\(\'(\w+)/ ) {
+	  if (/return\ \w+\.go(Now|Later)\(\'(\w+)/ ) {
 	      $found_legal_return = 1;
-	      push @currentTransitions, $3;
+	      my $toState = $2;
+	      # mark the transition as "now" or "later"
+	      if ($1 =~ /Later/) {
+		  push @currentTransitions, ($toState . $laterChar);
+	      }
+	      else {
+		  push @currentTransitions, ($toState . $nowChar);
+	      }
 	      next LINE;
 	  }
 
 	  # marks a state that can loop on itself
-	  if (/return\ (nav|player)\.stay\(\)/) {
+	  if (/return\ \w+\.stay\(\)/) {
 	      $found_legal_return = 1;
 	      $current_can_loop = 1;
 	      next LINE;
@@ -133,7 +155,14 @@ sub readBehavior {
 		print "  $state\n";
 
 		foreach my $transition (@{$stateFiles{$currentBehavior}{$state}}) {
-		    print "     to $transition\n";
+		    my $timing;
+		    if ($transition =~ /\*/) {
+			$timing = " (now)";
+		    }
+		    else {
+			$timing = " (later)";
+		    }
+		    print "     to $transition $timing\n";
 		}
 	    }
 	}
@@ -177,17 +206,20 @@ sub buildDOT {
 
     open(DOT, ">$graphFile") or die $!;
 
-    print DOT "digraph $graphName {\n\n";
+    print DOT "digraph $graphName {\n\n"; # directed graph
+
+    my $subgraph_number = 0;
 
     # make all of the nodes
     foreach my $file ( keys %stateFiles ) {
-	print DOT "subgraph $file {\n";
+	print DOT "subgraph cluster${file} {\n"; # states from each file
+	print DOT "[label=\"$file\", fontcolor=\"$stateFileColors[$subgraph_number]\"];\n";
 
 	foreach my $state ( keys %{$stateFiles{$file}}) {
-	    #print "  $state\n";
-	    print DOT "  $state [label=\"$state\"];\n";
+	    print DOT "  $state [label=\"$state\", fontcolor=\"$stateFileColors[$subgraph_number]\"];\n";
 	}
 
+	$subgraph_number++;
 	print DOT "\n}\n";
     }
 
@@ -196,7 +228,14 @@ sub buildDOT {
 	foreach my $state ( keys %{$stateFiles{$file}}) {
 	    TRANSITION: foreach my $toState (@{$stateFiles{$file}{$state}}) {
 		if ($toState !~ /player\.stay/) {
-		    print DOT "$state -> $toState\;\n";
+		    if ($toState =~ /\*/) { # nowChar marker
+			$toState =~ s/\*//;
+			print DOT "$state -> $toState;\n";
+		    }
+		    else {
+			$toState =~ s/\^//; # goLater transitions are dotted
+			print DOT "$state -> $toState [style=\"dotted\"];\n";
+		    }
 		}
 	    }
 	}
