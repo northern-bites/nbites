@@ -39,6 +39,7 @@ Peru deeppink goldenrod firebrick dodgerblue cyan4 chocolate4 yellow4 );
 # for example, @{$stateFiles{PenaltyKickStates}{penaltyBallInOppGoalbox}{chase}}
 # is the array of transitions from the chase state to other states
 our %stateFiles;
+our %stateFileUsedColors;
 
 # pushes an element to an array iff the element doesn't exist already
 sub uniqueAdd {
@@ -68,7 +69,6 @@ sub readBehavior {
     my @currentTransitions;
 
     # state variables used to avoid adding helper methods
-    my $past_def;
     my $found_legal_return;
     my $currentFunction;
     my $current_can_loop;
@@ -94,9 +94,10 @@ sub readBehavior {
 	  }
 
 	  # this line defines a function, set state variables accordingly
-	  if (/def\ (\w+)/) {
+	  if (/def\ (\w+)/ || eof) {
 	      # we were already parsing a function, it must have ended
 	      # currentFunction is a state? if so add its transitions
+	      # "|| eof" guarantees that we add the last state in each file
 	      if ($currentFunction && $found_legal_return)  {
 		  # add the transitions
 		  foreach my $transition (@currentTransitions) {
@@ -135,7 +136,7 @@ sub readBehavior {
 	      $current_can_loop = 1;
 	      next LINE;
 	  }
-      }
+      } # end of while <BEHAVIOR>
 
 	die "currentBehavior not set, this is bad" if (not $currentBehavior);
 	# update the behavior we're on
@@ -212,8 +213,12 @@ sub buildDOT {
 
     # make all of the nodes
     foreach my $file ( keys %stateFiles ) {
-	print DOT "subgraph cluster${file} {\n"; # states from each file
-	print DOT "[label=\"$file\", fontcolor=\"$stateFileColors[$subgraph_number]\"];\n";
+	print DOT "subgraph ${file} {\n"; # states from each file
+	# use this if you want to label cluster subgraphs
+	#print DOT "[label=\"$file\", fontcolor=\"$stateFileColors[$subgraph_number]\"];\n";
+
+	# remember which color goes with which file, for the legend
+	$stateFileUsedColors{$file} = $stateFileColors[$subgraph_number];
 
 	foreach my $state ( keys %{$stateFiles{$file}}) {
 	    print DOT "  $state [label=\"$state\", fontcolor=\"$stateFileColors[$subgraph_number]\"];\n";
@@ -241,6 +246,22 @@ sub buildDOT {
 	}
     }
 
+    # add a legend to the graph: each file name in its color
+    print DOT "\n\nedge [style=invis];\n";
+    print DOT "Legend [shape=box,width=2];\n";
+
+    my $last;
+    foreach my $file (keys %stateFiles ) {
+	print DOT "$file [shape=box,width=2,fontcolor=\"$stateFileUsedColors{$file}\"];\n";
+	if ($last) {
+	    print DOT "$last -> $file;\n";
+	}
+	else {
+	    print DOT "Legend -> $file;\n";
+	}
+	$last = $file;
+    }
+
     print DOT "\n}\n";
     close (DOT);
 
@@ -259,7 +280,6 @@ sub buildDOT {
 
 # execution starts here
 foreach my $behaviorFile (@ARGV) {
-
     print ":::${behaviorFile}:::";
 
     readBehavior($behaviorFile, "");
