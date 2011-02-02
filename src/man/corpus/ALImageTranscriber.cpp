@@ -135,7 +135,10 @@ void ALImageTranscriber::run() {
         subscriber->notifyNextVisionImage();
 
 #ifdef SAVE_ALL_FRAMES
-		sensors->saveFrame();
+		if (sensors->isSavingFrames())
+		{
+			sensors->saveFrame();
+		}
 #endif
 
         //stop timer

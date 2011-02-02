@@ -33,6 +33,9 @@ def gamePenalized(player):
         player.justKicked = False
         player.stopWalking()
         player.penalizeHeads()
+        print "Is PENALIZED executing?"
+
+    player.brain.sensors.stopSavingFrames()
 
     return player.stay()
 
@@ -46,9 +49,11 @@ def gameReady(player):
         player.justKicked = False
         player.standup()
         player.brain.tracker.locPans()
-        player.brain.sensors.resetSaveFrame()
+
+    player.brain.sensors.startSavingFrames()
 
     if player.lastDiffState == 'gameInitial':
+        print "Is READY executing?"
         return player.goLater('relocalize')
     if player.firstFrame() and \
             player.lastDiffState == 'gamePenalized':
@@ -85,7 +90,10 @@ def gamePlaying(player):
             # 25 is arbitrary. This check is meant to catch human error and
             # possible 0 sec. penalties for the goalie
             player.brain.resetLocalization()
+            print "Is PLAYING executing?"
             return player.goLater('afterPenalty')
+
+    player.brain.sensors.startSavingFrames()
 
         #2010 rules have no 0 second penalties for any robot,
         # but check should be here if there is.
@@ -154,7 +162,10 @@ def gameFinished(player):
 
         player.zeroHeads()
         player.GAME_FINISHED_satDown = False
+        print "Is Finished executing?"
         return player.stay()
+
+    player.brain.sensors.stopSavingFrames()
 
     # Sit down once we've finished walking
     if (player.brain.nav.isStopped() and not player.GAME_FINISHED_satDown

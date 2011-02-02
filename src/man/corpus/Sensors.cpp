@@ -63,7 +63,8 @@ Sensors::Sensors ()
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
-      FRM_FOLDER("/home/nao/naoqi/frames")
+      FRM_FOLDER("/home/nao/naoqi/frames"),
+	  saving_frames_on(false)
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
@@ -758,6 +759,23 @@ void Sensors::resetSaveFrame()
 
 // The version for the frame format
 static const int VERSION = 0;
+
+void Sensors::startSavingFrames()
+{
+	saving_frames_on = true;
+    cout << "****Started Saving Frames****" << endl;
+}
+
+void Sensors::stopSavingFrames()
+{
+	saving_frames_on = false;
+    cout << "****Stopped Saving Frames****" << endl;
+}
+
+bool Sensors::isSavingFrames() const
+{
+	return saving_frames_on;
+}
 
 void Sensors::saveFrame()
 {
