@@ -15,6 +15,7 @@ CHAIN_MOVE_LENGTH = 5
 #    Usage:
 #    ------
 #    KICK_RIGHT = mirrorMove(KICK_LEFT)
+#    GOALIE_DIVE_LEFT = mirrorMove(GOALIE_DIVE_RIGHT)
 #===============================================================================
 
 def mirrorMove(positions):
@@ -484,39 +485,6 @@ RIGHT_SIDE_KICK = (
 
 # GOALIE SAVING
 
-SAVE_LEFT_DEBUG = ( ((-90,0,0,0),
-                     (GOALIE_POS[0][1]),
-                     (GOALIE_POS[0][2]),
-                     (GOALIE_POS[0][3]), .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
-
-SAVE_RIGHT_DEBUG = ( ((GOALIE_POS[0][0]),
-                      (GOALIE_POS[0][1]),
-                      (GOALIE_POS[0][2]),
-                      (-90,0,0,0), .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
-
-SAVE_CENTER_DEBUG = ( ((-90,0,0,0),
-                       (GOALIE_POS[0][1]),
-                       (GOALIE_POS[0][2]),
-                       (-90,0,0,0), .5,0, stiff.NORMAL_STIFFNESSES), )
-
-SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0),
-                          (GOALIE_POS[0][1]),
-                          (GOALIE_POS[0][2]),
-                          (GOALIE_POS[0][3]),
-                          0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
-
-SAVE_RIGHT_HOLD_DEBUG = ( ((GOALIE_POS[0][0]),
-                           (GOALIE_POS[0][1]),
-                           (GOALIE_POS[0][2]),
-                           (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
-
-SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0),
-                            (GOALIE_POS[0][1]),
-                            (GOALIE_POS[0][2]),
-                            (-90,0,0,0),
-                            0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
-
-
 #Squats with legs in M shape and arms at a 45 degree angle
 GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0), 
                   ( -76.0, 14.0, -54.0, 86.0, 0.0, -11),
@@ -536,8 +504,8 @@ GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0),
                   1., 0, stiff.LOW_LEG_STIFFNESSES)
                  )
 
-#goalie dives right (when looking at him)
-# but needs to dive and fall a little less right now
+#Working goalie right dive.Needs to be faster but lies flat and dives
+#straight right.
 GOALIE_DIVE_RIGHT = ( ((45.88,38.93,-122.88,-32.43),
                         (-59.06,21.54,-17.49,122.69,-69.70,-5.01),
                         (-59.06,-37.44,-16.00,123.84,-69.17,5.54),
@@ -551,10 +519,8 @@ GOALIE_DIVE_RIGHT = ( ((45.88,38.93,-122.88,-32.43),
                         (0,12.92,29.70,38.85,9.41,22.15),
                         (47.46,-30.33,120.06,41.93),
                         1.0, 0, stiff.LOW_HEAD_STIFFNESSES),
-                      #this move has changed he turns his hips in while off the
-                      #right foot so that he is facing more left.
-                      #a different lean of the upper body and a slight
-                      #change in extension of the leg may make this work
+                      #turns his hips in while standing on his
+                      #left foot so that he is facing more left.
 
                        ((-85.70,13.80,50.36,0.27),
                         (-30.17,-19.16,16.53,22.32,23.03,24.42),
@@ -571,10 +537,33 @@ GOALIE_DIVE_RIGHT = ( ((45.88,38.93,-122.88,-32.43),
                       #makes robot lie flat
                        )
 
+#same as GOALIE_DIVE_RIGHT except dives left when looking at robot
+GOALIE_DIVE_LEFT = mirrorMove(GOALIE_DIVE_RIGHT)
+
+#Points left when would dive left
+GOALIE_TEST_DIVE_LEFT = ( ((0, 0, 0, 0),
+                            INITIAL_POS[0][1],
+                            INITIAL_POS[0][2],
+                            (0, -70.0, 0, 0),
+                            1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+
+#Points right when would dive right
+GOALIE_TEST_DIVE_RIGHT = ( ((0, 70.0, 0, 0),
+                            INITIAL_POS[0][1],
+                            INITIAL_POS[0][2],
+                            (0, 0, 0, 0),
+                            1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+
+#Both arms point forward when would save center
+GOALIE_TEST_CENTER_SAVE = ( ((0, 0, 0, 0),
+                             INITIAL_POS[0][1],
+                             INITIAL_POS[0][2],
+                             (0, 0, 0, 0),
+                             1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
 
 #Stand up for GOALIE_SQUAT
-GOALIE_SQUAT_STAND_UP = ( ((0.0, 55.0, 0.0, -0), 
+GOALIE_SQUAT_STAND_UP = ( ((0.0, 55.0, 0.0, -0),
                            ( -76.0, 10.0, -75.0, 125.0,  -10.7, -0),
                            ( -76.0, -10.0, -75.0, 125.0, -10.7, 0),
                            (0.0, -55.0, 0.0, 0),
@@ -583,7 +572,7 @@ GOALIE_SQUAT_STAND_UP = ( ((0.0, 55.0, 0.0, -0),
                           ((0.0, 45.0, 0.0, -0),
                            ( -46.0, 4.0, -50.0, 125.0,  -45., -5),
                            ( -46.0, -4.0, -50.0, 125.0, -45., 5),
-                           (0.0, -45.0, 0.0, 0), 
+                           (0.0, -45.0, 0.0, 0),
                            .5, 0, stiff.STANDUP_STIFFNESSES) ,
 
                           (INITIAL_POS[0][0],
