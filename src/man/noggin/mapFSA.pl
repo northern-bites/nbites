@@ -47,9 +47,9 @@ sub uniqueAdd {
     my $toAdd = shift;
 
     foreach my $i (@$arrayRef) {
-	if ($toAdd eq $i) {
-	    return;
-	}
+        if ($toAdd eq $i) {
+            return;
+        }
     }
     push @$arrayRef, $toAdd;
 }
@@ -74,101 +74,101 @@ sub readBehavior {
     my $current_can_loop;
 
     if  (-f $file)  {
-	open(BEHAVIOR, "$file") or die "cant open $file";
+        open(BEHAVIOR, "$file") or die "cant open $file";
 
       LINE: while (my $line = <BEHAVIOR>) {
-	  chomp $line;
+          chomp $line;
 
-	  $_ = $line;
+          $_ = $line;
 
-	  # found the behavior name
-	  if (/setName\(\'(\w+)\'/) {
-	      $currentBehavior = $1;
-	      next LINE;
-	  }
+          # found the behavior name
+          if (/setName\(\'(\w+)\'/) {
+              $currentBehavior = $1;
+              next LINE;
+          }
 
-	  # this line adds states from other files so note it
-	  if (/addStates\((\w+)\)/) {
-	      uniqueAdd(\@foundFiles, $1);
-	      next LINE;
-	  }
+          # this line adds states from other files so note it
+          if (/addStates\((\w+)\)/) {
+              uniqueAdd(\@foundFiles, $1);
+              next LINE;
+          }
 
-	  # this line defines a function, set state variables accordingly
-	  if (/def\ (\w+)/ || eof) {
-	      # we were already parsing a function, it must have ended
-	      # currentFunction is a state? if so add its transitions
-	      # "|| eof" guarantees that we add the last state in each file
-	      if ($currentFunction && $found_legal_return)  {
-		  # add the transitions
-		  foreach my $transition (@currentTransitions) {
-		      uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}}, $transition);
-		  }
+          # this line defines a function, set state variables accordingly
+          if (/def\ (\w+)/ || eof) {
+              # we were already parsing a function, it must have ended
+              # currentFunction is a state? if so add its transitions
+              # "|| eof" guarantees that we add the last state in each file
+              if ($currentFunction && $found_legal_return)  {
+                  # add the transitions
+                  foreach my $transition (@currentTransitions) {
+                      uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}}, $transition);
+                  }
 
-		  # and note if the state contains a loop
-		  if ($current_can_loop) {
-		      push @{$stateFiles{$currentBehavior}{$currentFunction}}, "player.stay()";
-		      $current_can_loop = "";
-		  }
-		  $found_legal_return = "";
-	     }
+                  # and note if the state contains a loop
+                  if ($current_can_loop) {
+                      push @{$stateFiles{$currentBehavior}{$currentFunction}}, "player.stay()";
+                      $current_can_loop = "";
+                  }
+                  $found_legal_return = "";
+              }
 
-	      $currentFunction = $1;
-	      next LINE;
-	  }
+              $currentFunction = $1;
+              next LINE;
+          }
 
-	  # legal ways to exit a state
-	  if (/return\ \w+\.go(Now|Later)\(\'(\w+)/ ) {
-	      $found_legal_return = 1;
-	      my $toState = $2;
-	      # mark the transition as "now" or "later"
-	      if ($1 =~ /Later/) {
-		  push @currentTransitions, ($toState . $laterChar);
-	      }
-	      else {
-		  push @currentTransitions, ($toState . $nowChar);
-	      }
-	      next LINE;
-	  }
+          # legal ways to exit a state
+          if (/return\ \w+\.go(Now|Later)\(\'(\w+)/ ) {
+              $found_legal_return = 1;
+              my $toState = $2;
+              # mark the transition as "now" or "later"
+              if ($1 =~ /Later/) {
+                  push @currentTransitions, ($toState . $laterChar);
+              }
+              else {
+                  push @currentTransitions, ($toState . $nowChar);
+              }
+              next LINE;
+          }
 
-	  # marks a state that can loop on itself
-	  if (/return\ \w+\.stay\(\)/) {
-	      $found_legal_return = 1;
-	      $current_can_loop = 1;
-	      next LINE;
-	  }
+          # marks a state that can loop on itself
+          if (/return\ \w+\.stay\(\)/) {
+              $found_legal_return = 1;
+              $current_can_loop = 1;
+              next LINE;
+          }
       } # end of while <BEHAVIOR>
 
-	die "currentBehavior not set, this is bad" if (not $currentBehavior);
-	# update the behavior we're on
-	$lastBehavior = $currentBehavior;
+        die "currentBehavior not set, this is bad" if (not $currentBehavior);
+        # update the behavior we're on
+        $lastBehavior = $currentBehavior;
 
-	# add any new files we found that need parsing
-	foreach my $new (@foundFiles) {
-	    uniqueAdd(\@addedStateFiles, $new);
-	}
+        # add any new files we found that need parsing
+        foreach my $new (@foundFiles) {
+            uniqueAdd(\@addedStateFiles, $new);
+        }
 
-	# DEBUG: print out all the @foundFiles, @foundSubStates
-	if ($DEBUG) {
-	    print "currentBehavior = $currentBehavior\n";
+        # DEBUG: print out all the @foundFiles, @foundSubStates
+        if ($DEBUG) {
+            print "currentBehavior = $currentBehavior\n";
 
-	    print "foundStates\n";
-	    foreach my $state ( keys %{$stateFiles{$currentBehavior}}) {
-		print "  $state\n";
+            print "foundStates\n";
+            foreach my $state ( keys %{$stateFiles{$currentBehavior}}) {
+                print "  $state\n";
 
-		foreach my $transition (@{$stateFiles{$currentBehavior}{$state}}) {
-		    my $timing;
-		    if ($transition =~ /\*/) {
-			$timing = " (now)";
-		    }
-		    else {
-			$timing = " (later)";
-		    }
-		    print "     to $transition $timing\n";
-		}
-	    }
-	}
+                foreach my $transition (@{$stateFiles{$currentBehavior}{$state}}) {
+                    my $timing;
+                    if ($transition =~ /\*/) {
+                        $timing = " (now)";
+                    }
+                    else {
+                        $timing = " (later)";
+                    }
+                    print "     to $transition $timing\n";
+                }
+            }
+        }
 
-	close (BEHAVIOR);
+        close (BEHAVIOR);
     }
 }
 
@@ -184,9 +184,9 @@ sub findFile ($) {
 
     # `find ./ -name $behaviorFile"
     sub matchesName {
-	if ($behaviorFile eq $_) {
-	    $file_final = $File::Find::name;
-	}
+        if ($behaviorFile eq $_) {
+            $file_final = $File::Find::name;
+        }
     }
 
     File::Find::find({wanted => \&matchesName,}, "$dir");
@@ -213,37 +213,37 @@ sub buildDOT {
 
     # make all of the nodes
     foreach my $file ( keys %stateFiles ) {
-	print DOT "subgraph ${file} {\n"; # states from each file
-	# use this if you want to label cluster subgraphs
-	#print DOT "[label=\"$file\", fontcolor=\"$stateFileColors[$subgraph_number]\"];\n";
+        print DOT "subgraph ${file} {\n"; # states from each file
+        # use this if you want to label cluster subgraphs
+        #print DOT "[label=\"$file\", fontcolor=\"$stateFileColors[$subgraph_number]\"];\n";
 
-	# remember which color goes with which file, for the legend
-	$stateFileUsedColors{$file} = $stateFileColors[$subgraph_number];
+        # remember which color goes with which file, for the legend
+        $stateFileUsedColors{$file} = $stateFileColors[$subgraph_number];
 
-	foreach my $state ( keys %{$stateFiles{$file}}) {
-	    print DOT "  $state [label=\"$state\", fontcolor=\"$stateFileColors[$subgraph_number]\"];\n";
-	}
+        foreach my $state ( keys %{$stateFiles{$file}}) {
+            print DOT "  $state [label=\"$state\", fontcolor=\"$stateFileColors[$subgraph_number]\"];\n";
+        }
 
-	$subgraph_number++;
-	print DOT "\n}\n";
+        $subgraph_number++;
+        print DOT "\n}\n";
     }
 
     # and add connections between nodes
     foreach my $file ( keys %stateFiles ) {
-	foreach my $state ( keys %{$stateFiles{$file}}) {
-	    TRANSITION: foreach my $toState (@{$stateFiles{$file}{$state}}) {
-		if ($toState !~ /player\.stay/) {
-		    if ($toState =~ /\*/) { # nowChar marker
-			$toState =~ s/\*//;
-			print DOT "$state -> $toState;\n";
-		    }
-		    else {
-			$toState =~ s/\^//; # goLater transitions are dotted
-			print DOT "$state -> $toState [style=\"dotted\"];\n";
-		    }
-		}
-	    }
-	}
+        foreach my $state ( keys %{$stateFiles{$file}}) {
+          TRANSITION: foreach my $toState (@{$stateFiles{$file}{$state}}) {
+              if ($toState !~ /player\.stay/) {
+                  if ($toState =~ /\*/) { # nowChar marker
+                      $toState =~ s/\*//;
+                      print DOT "$state -> $toState;\n";
+                  }
+                  else {
+                      $toState =~ s/\^//; # goLater transitions are dotted
+                      print DOT "$state -> $toState [style=\"dotted\"];\n";
+                  }
+              }
+          }
+        }
     }
 
     # add a legend to the graph: each file name in its color
@@ -252,14 +252,14 @@ sub buildDOT {
 
     my $last;
     foreach my $file (keys %stateFiles ) {
-	print DOT "$file [shape=box,width=2,fontcolor=\"$stateFileUsedColors{$file}\"];\n";
-	if ($last) {
-	    print DOT "$last -> $file;\n";
-	}
-	else {
-	    print DOT "Legend -> $file;\n";
-	}
-	$last = $file;
+        print DOT "$file [shape=box,width=2,fontcolor=\"$stateFileUsedColors{$file}\"];\n";
+        if ($last) {
+            print DOT "$last -> $file;\n";
+        }
+        else {
+            print DOT "Legend -> $file;\n";
+        }
+        $last = $file;
     }
 
     print DOT "\n}\n";
@@ -270,11 +270,11 @@ sub buildDOT {
     my $exec_exists = grep -x "$_/$dot", @PATH;
 
     if ($exec_exists && $BUILD) {
-	`$dot $DOT_OPTS $graphFile`;
+        `$dot $DOT_OPTS $graphFile`;
     }
     else {
-	print "You need to install dot to build the .dot file\n";
-	print "get it at http://www.graphviz.org/\n";
+        print "You need to install dot to build the .dot file\n";
+        print "get it at http://www.graphviz.org/\n";
     }
 }
 
@@ -285,10 +285,10 @@ foreach my $behaviorFile (@ARGV) {
     readBehavior($behaviorFile, "");
 
     if ($DEBUG) {
-	print "foundSubState Files\n";
-	foreach my $stateFile (@addedStateFiles) {
-	    print "  $stateFile\n";
-	}
+        print "foundSubState Files\n";
+        foreach my $stateFile (@addedStateFiles) {
+            print "  $stateFile\n";
+        }
     }
 
     # for each sub-behavior found (state file)
@@ -300,9 +300,9 @@ foreach my $behaviorFile (@ARGV) {
     print "\n:::reading sub state files:::";
 
     foreach my $new_file (@addedStateFiles) {
-	my $new_file_loc = findFile($new_file);
-	#print "opening [${new_file}] at $new_file_loc\n";
-	readBehavior($new_file_loc, $new_file);
+        my $new_file_loc = findFile($new_file);
+        #print "opening [${new_file}] at $new_file_loc\n";
+        readBehavior($new_file_loc, $new_file);
     }
 
     print "\n:::building .dot and .png files:::\n";
