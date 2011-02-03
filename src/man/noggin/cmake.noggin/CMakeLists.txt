@@ -102,16 +102,16 @@ CONFIGURE_FILE(
   )
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/Switch.py.in
-  ${NOGGIN_INCLUDE_DIR}/players/Switch.py
+  ${NOGGIN_CONFIG_DIR}/players/Switch.py
   )
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/TeamConfig.py.in
-  ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
+   ${NOGGIN_CONFIG_DIR}/TeamConfig.py
   )
 
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/WebotsConfig.py.in
-  ${NOGGIN_INCLUDE_DIR}/WebotsConfig.py
+  ${NOGGIN_CONFIG_DIR}/WebotsConfig.py
   )
 
 ############################ DEFINITION
@@ -153,8 +153,8 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_INCLUDE_DIR}/FallStates.py
                         ${NOGGIN_INCLUDE_DIR}/NogginConstants.py
                         ${NOGGIN_INCLUDE_DIR}/Leds.py
-                        ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
-                        ${NOGGIN_INCLUDE_DIR}/WebotsConfig.py
+                        ${NOGGIN_CONFIG_DIR}/TeamConfig.py
+                        ${NOGGIN_CONFIG_DIR}/WebotsConfig.py
                         )
 
 SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/headTracking

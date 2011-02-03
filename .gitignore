@@ -47,3 +47,5 @@ docs/*
 *.wav
 *.so
 src/remote/dist/javadoc/
+*.pdf
+*.o 
