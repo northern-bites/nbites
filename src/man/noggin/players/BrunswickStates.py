@@ -48,11 +48,10 @@ def gameReady(player):
         player.standup()
         player.brain.tracker.locPans()
 
-    if player.lastDiffState == 'gameInitial':
+    if player.lastDiffState == 'gameInitial' and player.firstFrame():
         player.brain.sensors.startSavingFrames()
         return player.goLater('relocalize')
-    if player.firstFrame() and \
-            player.lastDiffState == 'gamePenalized':
+    if player.firstFrame() and player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
 
     return player.goLater('playbookPosition')
@@ -81,7 +80,7 @@ def gameSet(player):
 
 def gamePlaying(player):
 
-    if player.lastDiffState == 'gamePenalized':
+    if player.lastDiffState == 'gamePenalized' and player.firstFrame():
         player.brain.sensors.startSavingFrames()
 
         if player.lastStateTime > 25:
@@ -153,10 +152,8 @@ def gameFinished(player):
         player.inKickingState = False
         player.justKicked = False
         player.stopWalking()
-
         player.zeroHeads()
         player.GAME_FINISHED_satDown = False
-        print "Is Finished executing?"
         player.brain.sensors.stopSavingFrames()
         return player.stay()
 
