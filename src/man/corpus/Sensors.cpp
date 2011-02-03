@@ -774,6 +774,7 @@ void Sensors::stopSavingFrames()
 
 bool Sensors::isSavingFrames() const
 {
+	cout << "+++++Checking Boolean+++++" << endl;
 	return saving_frames_on;
 }
 

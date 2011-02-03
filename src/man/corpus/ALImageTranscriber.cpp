@@ -134,9 +134,13 @@ void ALImageTranscriber::run() {
             waitForImage();
         subscriber->notifyNextVisionImage();
 
+		std::cout << "WORKING????????????????????" << std::endl;
+
 #ifdef SAVE_ALL_FRAMES
+		std::cout << "INSIDE!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 		if (sensors->isSavingFrames())
 		{
+			std::cout << "SAVING FRAME%%%%%%%%%%%%%%%%%%%%%" << std::endl;
 			sensors->saveFrame();
 		}
 #endif
