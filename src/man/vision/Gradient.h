@@ -16,9 +16,8 @@ class Gradient
 {
     // Public member functions
 public:
-    Gradient() { };
+    Gradient();
     virtual ~Gradient() { };
-
 
     static inline int dir(int y, int x) {
         return static_cast<int>(atan2(y, x) / M_PI * 128.0) & 0xff;
@@ -56,11 +55,41 @@ public:
         return (d);
     }
 
+    uint16_t getMagnitude(int i, int j){
+        return values[i * IMAGE_WIDTH + j + magnitudes];
+    }
+
+    int16_t getX(int i, int j){
+        return values[i * IMAGE_WIDTH + j + x_grads];
+    }
+
+    int16_t getY(int i, int j){
+        return values[i * IMAGE_WIDTH + j + y_grads];
+    }
+
+    void setMagnitude(uint16_t v, int i, int j){
+        values[i * IMAGE_WIDTH + j + magnitudes] = v;
+    }
+
+    void setX(int16_t v, int i, int j){
+        values[i * IMAGE_WIDTH + j + x_grads] = v;
+    }
+
+    void setY(int16_t v, int i, int j){
+        values[i * IMAGE_WIDTH + j + y_grads] = v;
+    }
+
     // Public member variables
-public:
-    int16_t x[IMAGE_HEIGHT][IMAGE_WIDTH];
-    int16_t y[IMAGE_HEIGHT][IMAGE_WIDTH];
-    uint16_t mag[IMAGE_HEIGHT][IMAGE_WIDTH];
+
+    // Values is all the arrays in one, the others get pointers within
+    // 'values'
+    uint16_t *values;
+    enum {
+        magnitudes = 0,
+        x_grads = IMAGE_WIDTH * IMAGE_HEIGHT,
+        y_grads = IMAGE_WIDTH * IMAGE_HEIGHT * 2
+    };
+
     bool peaks[IMAGE_HEIGHT][IMAGE_WIDTH];
 
     const static int rows = IMAGE_HEIGHT;

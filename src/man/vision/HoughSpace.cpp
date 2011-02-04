@@ -52,7 +52,7 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
     for (int y = 2; y < height-2; ++y){
         for (int x = 2; x < width-2; ++x){
             if (g->peaks[y][x]){
-                int t = Gradient::dir(g->y[y][x], g->x[y][x]);
+                int t = Gradient::dir(g->getY(y,x), g->getX(y,x));
                 edge(x - x0, y - y0,
                      t - angleSpread,
                      t + angleSpread);

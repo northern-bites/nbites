@@ -25,14 +25,14 @@ void HoughSpaceTest::test_hs()
     for (int i=0; i < Gradient::rows; ++i){
         for (int j=0; j < Gradient::cols; ++j){
             if (j < Gradient::cols *3./4.){
-                g->x[i][j] = 0;
-                g->y[i][j] = 0;
-                g->mag[i][j] = 0;
+                g->setX(0,i,j);
+                g->setY(0,i,j);
+                g->setMagnitude(0,i,j);
                 g->peaks[i][j] = false;
             } else {
-                g->x[i][j] = 5;
-                g->y[i][j] = 0;
-                g->mag[i][j] = 25;
+                g->setX(0,i,j);
+                g->setY(0,i,j);
+                g->setMagnitude(0,i,j);
                 g->peaks[i][j] = true;
             }
         }
@@ -86,14 +86,14 @@ void HoughSpaceTest::test_lines()
     for (int i=0; i < IMAGE_HEIGHT; ++i){
         for (int j=0; j < IMAGE_WIDTH; ++j){
             if (j < IMAGE_WIDTH *3./4.){
-                g->x[i][j] = 0;
-                g->y[i][j] = 0;
-                g->mag[i][j] = 0;
+                g->setX(0,i,j);
+                g->setY(0,i,j);
+                g->setMagnitude(0,i,j);
                 g->peaks[i][j] = false;
             } else {
-                g->x[i][j] = 5;
-                g->y[i][j] = 0;
-                g->mag[i][j] = 25;
+                g->setX(0,i,j);
+                g->setY(0,i,j);
+                g->setMagnitude(0,i,j);
                 g->peaks[i][j] = true;
             }
         }

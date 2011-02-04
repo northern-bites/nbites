@@ -26,9 +26,7 @@ void EdgeDetector::detectEdges(const uint16_t* channel,
 
 #ifdef USE_MMX
     PROF_ENTER(profiler, P_SOBEL);
-    _sobel_operator(&channel[0],
-                    &gradient->x[0][0], &gradient->y[0][0],
-                    &gradient->mag[0][0]);
+    _sobel_operator(&channel[0], gradient->values);
     PROF_EXIT(profiler, P_SOBEL);
 #else
     sobelOperator(channel, gradient);
@@ -78,14 +76,14 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
                 );
 
 
-            gradient->x[i][j] = static_cast<int16_t>(xGrad);
-            gradient->y[i][j] = static_cast<int16_t>(yGrad);
+            gradient->setX(static_cast<int16_t>(xGrad), i, j);
+            gradient->setY(static_cast<int16_t>(yGrad), i, j);
 
             xGrad = abs(xGrad) >> 2;
             yGrad = abs(yGrad) >> 2;
 
             int mag = ((xGrad * xGrad + yGrad * yGrad + 1) >> 1);
-            gradient->mag[i][j] = static_cast<uint16_t>(mag);
+            gradient->setMagnitude(static_cast<uint16_t>(mag), i, j);
         }
     }
     PROF_EXIT(profiler, P_SOBEL);
@@ -128,25 +126,25 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
         for (int j=2; j < Gradient::cols-2; ++j){
 
             gradient->peaks[i][j] = false; // Not a peak yet
-            const int z = gradient->mag[i][j];
-
+            const int z = gradient->getMagnitude(i,j);
             if (z > edgeThreshold){
-                const int y = gradient->y[i][j];
-                const int x = gradient->x[i][j];
+                const int y = gradient->getY(i,j);
+                const int x = gradient->getX(i,j);
 
                 // Get the highest 3 bits of the direction
                 const int a = (gradient->dir3(y,x));;
 
-                if (z > gradient->mag
-                    [i + Gradient::dyTab[a]] [j + Gradient::dxTab[a]] &&
-                    z >= gradient->mag
-                    [i - Gradient::dyTab[a]][j - Gradient::dxTab[a]]){
+                if (z > gradient->getMagnitude(i + Gradient::dyTab[a],
+                                               j + Gradient::dxTab[a]) &&
+                    z >= gradient->getMagnitude(i - Gradient::dyTab[a],
+                                                j - Gradient::dxTab[a])){
                     gradient->peaks[i][j] = true;
                 }
             }
             if (!gradient->peaks[i][j]){
-                gradient->x[i][j] = gradient->y[i][j] = 0;
-                gradient->mag[i][j] = 0;
+                gradient->setX(0,i,j);
+                gradient->setY(0,i,j);
+                gradient->setMagnitude(0,i,j);
             }
         }
     }

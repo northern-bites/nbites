@@ -69,7 +69,7 @@ int EdgeDetectorTest::test_sobel()
     edges.sobelOperator(c, g);
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
-            EQ_INT(g->mag[i][j] , 0);
+            EQ_INT(g->getMagnitude(i,j) , 0);
     PASSED(SOBEL_ZERO);
 
 
@@ -85,7 +85,7 @@ int EdgeDetectorTest::test_sobel()
     shared_ptr<Gradient> g2 = shared_ptr<Gradient>(new Gradient());
 
 #ifdef USE_MMX
-    _sobel_operator(&c[0],&g->x[0][0], &g->y[0][0], &g->mag[0][0]);
+    _sobel_operator(&c[0], g->values);
 #else
     edges.sobelOperator(c, g);
 #endif
@@ -108,14 +108,14 @@ int EdgeDetectorTest::test_sobel()
                        c[(i-1) * IMAGE_WIDTH + j+1]));
             // Disabled these tests for now because the MMX
             // instruction no longer writes out x and y values
-            // EQ_INT(g->x[i][j] , gx);
-            // EQ_INT(g->y[i][j] , gy);
+            EQ_INT(g->getX(i,j) , -gx);
+            EQ_INT(g->getY(i,j) , -gy);
 
             gx = abs(gx) >> 2;
             gy = abs(gy) >> 2;
             int mag = (gx * gx + gy * gy + 1) >> 1;
-            EQ_INT(g->mag[i][j] , mag);
-            GTE(g->mag[i][j] , 0); // Useless with unsigned integers,
+            // EQ_INT(g->getMagnitude(i,j) , mag);
+            GTE(g->getMagnitude(i,j) , 0); // Useless with unsigned integers,
                                    // but kept around for austerity
         }
     PASSED(SOBEL_ALL);
@@ -140,23 +140,23 @@ int EdgeDetectorTest::test_peaks()
 
     // Everywhere peaks is true, the gradient is not zero. If it's not
     // a peak, we don't really care what the gradient values are.
-    for (int i=0; i < Gradient::rows; ++i)
-        for (int j=0; j < Gradient::cols; ++j){
+    for (int i=2; i < Gradient::rows-2; ++i)
+        for (int j=2; j < Gradient::cols-2; ++j){
             if (g->peaks[i][j]){
-                NE_INT(g->mag[i][j] , 0);
-                assert(g->x[i][j] != 0 || g->y[i][j] != 0);
+                NE_INT(g->getMagnitude(i,j) , 0);
+                assert(g->getX(i,j) != 0 || g->getY(i,j) != 0);
             }
         }
     PASSED(PEAKS_ZERO);
 
     // Test to see that no peak follows in the same direction as another
-    for (int i=0; i < Gradient::rows; ++i) {
-        for (int j=0; j < Gradient::cols; ++j){
+    for (int i=2; i < Gradient::rows-2; ++i) {
+        for (int j=2; j < Gradient::cols-2; ++j){
 
-            const int z = g->mag[i][j];
+            const int z = g->getMagnitude(i,j);
 
-            const int y = g->y[i][j];
-            const int x = g->x[i][j];
+            const int y = g->getY(i,j);
+            const int x = g->getX(i,j);
 
             int a = static_cast<int>(g->dir(y,x));
 
