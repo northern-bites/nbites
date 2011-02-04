@@ -106,15 +106,25 @@ int EdgeDetectorTest::test_sobel()
                       (c[(i-1) * IMAGE_WIDTH + j-1] +
                        c[(i-1) * IMAGE_WIDTH + j] * 2 +
                        c[(i-1) * IMAGE_WIDTH + j+1]));
-            // Disabled these tests for now because the MMX
-            // instruction no longer writes out x and y values
-            EQ_INT(g->getX(i,j) , -gx);
-            EQ_INT(g->getY(i,j) , -gy);
+            // The MMX subtracts in the opposite direction of the
+            // above gradient calculation
+            gx = -gx;
+            gy = -gy;
 
-            gx = abs(gx) >> 2;
-            gy = abs(gy) >> 2;
-            int mag = (gx * gx + gy * gy + 1) >> 1;
-            // EQ_INT(g->getMagnitude(i,j) , mag);
+            EQ_INT(g->getX(i,j) , gx);
+            EQ_INT(g->getY(i,j) , gy);
+
+            gx = gx << 3;
+            gy = gy << 3;
+
+            gx = gx * gx;
+            gy = gy * gy;
+
+            gx = gx >> 16;
+            gy = gy >> 16;
+
+            int mag = gx + gy;
+            EQ_INT(g->getMagnitude(i,j) , mag);
             GTE(g->getMagnitude(i,j) , 0); // Useless with unsigned integers,
                                    // but kept around for austerity
         }

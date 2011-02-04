@@ -102,8 +102,8 @@ xLoop:
         movq    mm2, [esi + bot]
 
         ## Fetch next row into L1 cache and adjust source pointer
-        prefetch [esi + nxt]
         add     esi, 8
+        prefetch [esi + nxt]
 
         ## X GRADIENT calculation
 	# mm3 = | - | - | z3 | z2| from previous iteration.
@@ -114,10 +114,6 @@ xLoop:
         punpckldq mm3, mm1
         psubw   mm3, mm1
         movntq [edi + xGrad], mm3
-
-        ## Set up x sums for next iteration
-        # mm3 = | - | - | z7 | z6 |
-        pshufw  mm3, mm1, 0b01001110
 
         ## Y GRADIENT calculation
 	# mm4 = | z3 | z2 | - | - | from previous iteration.
@@ -135,52 +131,29 @@ xLoop:
 	paddw	mm0, mm2		# mm0 = | z5 + 2*z6 + z7 | z4 + 2*z5 + z6 | z3 + 2*z4 + z5 | z2 + 2*z3 + z4 |
 	movntq	[edi + yGrad], mm0
 
-        ##
-        ##
-        ## MAGNITUDE CALCULATION
-        ##
-        ##
-magnitude:
-        ## movq    mm0, mm6        # mm6 = abs(x gradient), sign bit in mm0
-        ## psraw   mm0, 15
-        ## pxor    mm6, mm0
-        ## psubw   mm6, mm0
+        ## MAGNITUDE calculation
+	psllw	mm3, 3			# x gradient becomes 16 bits signed
+	psllw	mm0, 3			# y gradient becomes 16 bits signed
+	pmulhw	mm3, mm3		# x squared, 14 bits unsigned
+	pmulhw	mm0, mm0		# y squared, 14 bits unsigned
+	paddw	mm0, mm3		# magnitude squared
 
-        ## movq    mm1, mm3        # mm3 = abs(y gradient), sign bit in mm1
-        ## psraw   mm1, 15
-        ## pxor    mm3, mm1
-        ## psubw   mm3, mm1
+        # subtract noise threshold (mm6), force to 0 if below threshold
+	## psubusw	mm0, mm6
+	movntq	[edi + sqMag], mm0
 
-        ## paddw   mm1, mm1        # combine x and y signs ; range 0 to -3
-        ## paddw   mm0, mm1
+        ## We're done with the destination pointer,
+        ## so increment it to next line of pixels.
+        add     edi, 8
 
-        ## movq    mm1, mm6        # Compare x and y gradient magnitudes
-        ## pcmpgtw mm1, mm3
-        ## paddw   mm0, mm0        # combine x >= y bit with sign bits to make octant
-        ## paddw   mm0, mm1
-        ## packsswb mm0, mm7       # write octants (bytes); range 0 to -7
-        ## ## movd [octant], mm0
+        ## Set up x sums for next iteration
+        # mm3 = | - | - | z7 | z6 |
+        pshufw  mm3, mm1, 0b01001110
 
-        ## psraw   mm6, 2          # make x and y gradient magnitudes fit in 8 bits
-        ## psraw   mm3, 2
-        ## movq    mm0, mm6        # mm0 gets larger magnitude
-        ## pmaxsw  mm0, mm3
-        ## movq    mm1, mm6        # mm1 gets smaller magnitude
-        ## pminsw  mm1, mm3
-        ## packsswb mm0, mm1       # write magnitudes (tangent of angle within octant)
-        ## ## movq [tangent], mm0
-
-        ## pmullw  mm6, mm6        # compute and write squared magnitude
-        ## pmullw  mm3, mm3
-        ## pavgw   mm6, mm3        # average is used to avoid 16-bit overflow
-        ## movntq  [edi], mm6
-
-        ## Prefetch row after bottom
-        prefetch [esi + nxt]
         prefetchw [edi + yPitch]
 
         ## xLoop finish
-        add     edi, 8
+
         dec     ecx
         jne     xLoop
 
