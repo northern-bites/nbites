@@ -8,7 +8,9 @@
 
 #include "boost/shared_ptr.hpp"
 
-extern "C" void _sobel_operator(const uint16_t *input, uint16_t *out);
+extern "C" void _sobel_operator(const uint16_t thresh,
+                                const uint16_t *input,
+                                uint16_t *out);
 
 /**
  * Used to find the step edges in a given channel of an image according to a

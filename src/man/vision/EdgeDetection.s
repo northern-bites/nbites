@@ -18,56 +18,14 @@
 .equiv  xGrad, imgHt * yPitch
 .equiv  yGrad, imgHt * yPitch * 2
 
+        .struct 8
+thresh: .skip 4
+inImg:  .skip 4
+outImg:
+
 .section .text
 
-.macro Y_GRAD phase, reg
-        ## Load the lower row
-        ## mm\phase: | y13 | y12 | y11 | y10 |
-        movq    mm\phase, [esi + bot + (\phase * 4)] # Two rows after top row
-        movq    mm\reg, mm\phase
-
-        ## Compute the difference between the rows
-        ## mm\reg: | y3 | y2 | y1 | y0 | diffs
-        psubsw  mm\reg, qword ptr[esi + top + (\phase * 4)]
-
-        ## mm2 after pshufw: | y0 | y3 | y2 | y1 |
-        pshufw  mm2, mm\reg, 0b00111001
-
-        ## mm2 after addition:
-        ##       | y0 + y3 | y3 + y2 | y2 + y1 | y0 + y1 |
-        paddw   mm2, mm\reg
-
-        ## mm\reg after 2nd pshufw:
-        ##      | y0 + y1 | y0 + y3 | y3 + y2 | y2 + y1 |
-        pshufw  mm\reg, mm2, 0b00111001
-
-        ## mm\reg:      | xxx | xxx | y1 + 2*y2 +  y3 | y2 + 2*y1 + y0 |
-        paddw   mm\reg, mm2
-.endm
-
-.macro X_GRAD phase, reg
-        movq    mm0, [esi + top]
-        movq    mm1, [esi + mid]
-        movq    mm2, [esi + bot]
-
-        ## bottom row in mm\phase
-        ## Add middle to top, twice
-        paddw   mm0, mm1
-        paddw   mm0, mm1
-
-        ## Add top to accumulator
-        paddw   mm\phase, [esi + top + (\phase * 4)]
-
-        .ifeq (\phase -1)
-        movq    mm\reg, mm0
-        punpckldq mm0, mm1
-        punpckhdq mm\reg, mm1
-        psubw  mm\reg, mm0
-        movntq  [edi + xGrad], mm\reg
-        .endif
-.endm
-
-        ## _sobel_operator(uint16_t *yimg, int16_t  *outX, int16_t *outY, uint16_t *mag)
+        ## _sobel_operator(uint16_t thresh, uint16_t *yimg, int16_t  *outX, int16_t *outY, uint16_t *mag)
 _sobel_operator:
         push    ebp
         mov     ebp, esp
@@ -85,9 +43,14 @@ _sobel_operator:
         ## | o | o | o | <- source comes from this row
         ## | o | Q | o | <- destination needs to write to this row,
         ## | o | o | o | plus one byte forward for 'Q' gradient value
-        mov     esi, [ebp+8]
+        pinsrw  mm6, [ebp + thresh], 0b00
+        mov     esi, [ebp + inImg]
+        pshufw  mm6, mm6, 0b00000000
 
-        mov     edi, [ebp+12]
+        pcmpeqb mm7, mm7
+        pandn   mm7, mm7
+
+        mov     edi, [ebp + outImg]
         add     edi, yPitch - 2 # Adjust destination pointer
 
         # Actually only does from top row through third to bottom
@@ -139,7 +102,7 @@ xLoop:
 	paddw	mm0, mm3		# magnitude squared
 
         # subtract noise threshold (mm6), force to 0 if below threshold
-	## psubusw	mm0, mm6
+	psubusw	mm0, mm6
 	movntq	[edi + sqMag], mm0
 
         ## We're done with the destination pointer,

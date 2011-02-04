@@ -12,6 +12,8 @@
 
 #define BYTE_TO_RAD 128./M_PI
 
+#define DEFAULT_EDGE_VALUE 30
+
 using namespace std;
 using boost::shared_ptr;
 
@@ -85,7 +87,7 @@ int EdgeDetectorTest::test_sobel()
     shared_ptr<Gradient> g2 = shared_ptr<Gradient>(new Gradient());
 
 #ifdef USE_MMX
-    _sobel_operator(&c[0], g->values);
+    _sobel_operator(DEFAULT_EDGE_VALUE, &c[0], g->values);
 #else
     edges.sobelOperator(c, g);
 #endif
@@ -124,6 +126,10 @@ int EdgeDetectorTest::test_sobel()
             gy = gy >> 16;
 
             int mag = gx + gy;
+
+            // All non above threshold points are zero
+            mag = max(0, mag-DEFAULT_EDGE_VALUE);
+
             EQ_INT(g->getMagnitude(i,j) , mag);
             GTE(g->getMagnitude(i,j) , 0); // Useless with unsigned integers,
                                    // but kept around for austerity
