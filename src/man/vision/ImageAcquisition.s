@@ -72,10 +72,6 @@ color_stack_row_end:
 .equiv end_of_stack, color_stack_row_end
 
 .section .text
- .macro COPY_SHIFT_R dest, source
-        movq    \dest, \source
-        psrld   \dest, 2
-.endm
 
 ## Inner loop of the color processing
 .macro COLOR_LOOP phase
@@ -127,17 +123,13 @@ color_stack_row_end:
         ## mm0: | 0000 | sum1 | 0000 | sum0 |
         pand    mm0, mm6
 
-        ## COPY_SHIFT_R used to copy into various MMX registers and
-        ## divide the Y sum by 4 to get the average.
-        ## COPY_SHIFT_R avoids copying into mm2 register unless necessary, so
-        ## phase 0 and 2 just skip mm2 register copy.
         .ifeq (\phase)
-        COPY_SHIFT_R mm4, mm0
+        movq    mm4, mm0
         .endif
 
 
         .ifeq (\phase - 1)
-        COPY_SHIFT_R mm2, mm0
+        movq    mm2, mm0
 
         ## Pack values from first two phases together as 4 words in mm4
         ## mm4 after pack: | y3 | y2 | y1 | y0 |
@@ -146,13 +138,13 @@ color_stack_row_end:
         .endif
 
         .ifeq (\phase - 2)
-        COPY_SHIFT_R mm5, mm0
+        movq    mm5, mm0
         .endif
 
         ## Last phase, pack phase 2 & 3 into an array, then pack all 8
         ## bytes together and write them out
         .ifeq (\phase - 3)
-        COPY_SHIFT_R mm2, mm0
+        movq     mm2, mm0
 
         ## mm2 before: | 0 | y7 | 0 | y6|
         ## mm5 after:  | y7 | y6 | y5 | y4 | all 16 bit words

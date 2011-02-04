@@ -290,7 +290,7 @@ void ImageAcquisitionTest::run_average_test(){
         for (int j=0; j < IMAGE_WIDTH; ++j){
 
             uint16_t output = y_out[i*IMAGE_WIDTH + j];
-            EQ_INT ( (yAvgValue(i, j) >> 2), output);
+            EQ_INT ( (yAvgValue(i, j)), output);
         }
     }
     PASSED(AVERAGES);
