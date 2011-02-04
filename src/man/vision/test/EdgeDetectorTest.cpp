@@ -108,13 +108,17 @@ int EdgeDetectorTest::test_sobel()
                       (c[(i-1) * IMAGE_WIDTH + j-1] +
                        c[(i-1) * IMAGE_WIDTH + j] * 2 +
                        c[(i-1) * IMAGE_WIDTH + j+1]));
+
             // The MMX subtracts in the opposite direction of the
             // above gradient calculation
             gx = -gx;
             gy = -gy;
 
-            EQ_INT(g->getX(i,j) , gx);
-            EQ_INT(g->getY(i,j) , gy);
+            // The output gradients are shifted in by 1 value
+            int output_j = j+1;
+
+            EQ_INT(g->getX(i,output_j) , gx);
+            EQ_INT(g->getY(i,output_j) , gy);
 
             gx = gx << 3;
             gy = gy << 3;
@@ -128,10 +132,10 @@ int EdgeDetectorTest::test_sobel()
             int mag = gx + gy;
 
             // All non above threshold points are zero
-            mag = max(0, mag-DEFAULT_EDGE_VALUE);
+            mag = max(0, mag-((DEFAULT_EDGE_VALUE*DEFAULT_EDGE_VALUE) >> 10));
 
-            EQ_INT(g->getMagnitude(i,j) , mag);
-            GTE(g->getMagnitude(i,j) , 0); // Useless with unsigned integers,
+            EQ_INT(g->getMagnitude(i,output_j) , mag);
+            GTE(g->getMagnitude(i,output_j) , 0); // Useless with unsigned integers,
                                    // but kept around for austerity
         }
     PASSED(SOBEL_ALL);

@@ -8,7 +8,7 @@
 
 #include "boost/shared_ptr.hpp"
 
-extern "C" void _sobel_operator(const uint16_t thresh,
+extern "C" void _sobel_operator(const uint8_t thresh,
                                 const uint16_t *input,
                                 uint16_t *out);
 

@@ -25,7 +25,7 @@ outImg:
 
 .section .text
 
-        ## _sobel_operator(uint16_t thresh, uint16_t *yimg, int16_t  *outX, int16_t *outY, uint16_t *mag)
+        ## _sobel_operator(uint8_t thresh, uint16_t *yimg, int16_t  *outX, int16_t *outY, uint16_t *mag)
 _sobel_operator:
         push    ebp
         mov     ebp, esp
@@ -43,30 +43,34 @@ _sobel_operator:
         ## | o | o | o | <- source comes from this row
         ## | o | Q | o | <- destination needs to write to this row,
         ## | o | o | o | plus one byte forward for 'Q' gradient value
+        ## Load threshold into register
         pinsrw  mm6, [ebp + thresh], 0b00
-        mov     esi, [ebp + inImg]
         pshufw  mm6, mm6, 0b00000000
+        pmullw  mm6, mm6
+        psrlw   mm6, 10
+
+        mov     esi, [ebp + inImg]
 
         pcmpeqb mm7, mm7
         pandn   mm7, mm7
 
         mov     edi, [ebp + outImg]
-        add     edi, yPitch - 2 # Adjust destination pointer
+        add     edi, yPitch # Adjust destination pointer to second row
 
         # Actually only does from top row through third to bottom
         mov     ebx, 238
-yLoop:
+sobel_yLoop:
         ## 4 pixels processed each iteration (320 per row / 4 = 80 iterations)
         mov     ecx, 80
-xLoop:
+sobel_xLoop:
         ## Load rows into registers to save memory accesses
 	movq    mm0, [esi + top]
         movq    mm1, [esi + mid]
         movq    mm2, [esi + bot]
 
         ## Fetch next row into L1 cache and adjust source pointer
-        add     esi, 8
         prefetch [esi + nxt]
+        add     esi, 8
 
         ## X GRADIENT calculation
 	# mm3 = | - | - | z3 | z2| from previous iteration.
@@ -113,15 +117,11 @@ xLoop:
         # mm3 = | - | - | z7 | z6 |
         pshufw  mm3, mm1, 0b01001110
 
-        prefetchw [edi + yPitch]
-
-        ## xLoop finish
-
         dec     ecx
-        jne     xLoop
+        jne     sobel_xLoop
 
         dec     ebx
-        jne     yLoop
+        jne     sobel_yLoop
 
         ## Fix stack
         mov     esp, ebp
