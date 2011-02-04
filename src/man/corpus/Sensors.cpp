@@ -762,14 +762,22 @@ static const int VERSION = 0;
 
 void Sensors::startSavingFrames()
 {
+#ifdef SAVE_ALL_FRAMES
+	if (isSavingFrames())
+		return;
 	saving_frames_on = true;
     cout << "****Started Saving Frames****" << endl;
+#endif
 }
 
 void Sensors::stopSavingFrames()
 {
+#ifdef SAVE_ALL_FRAMES
+	if (!isSavingFrames())
+		return;
 	saving_frames_on = false;
     cout << "****Stopped Saving Frames****" << endl;
+#endif
 }
 
 bool Sensors::isSavingFrames() const
