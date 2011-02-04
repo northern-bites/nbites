@@ -171,6 +171,7 @@ class VisualLine : public VisualLandmark<lineID> {
     float avgVerticalWidth, avgHorizontalWidth;
     linePoint thinnestHorPoint, thickestHorPoint;
     linePoint thinnestVertPoint, thickestVertPoint;
+    bool parallel;
 
     float distance;             // Distance to the closest point on the line
     float bearing;              // Bearing to the closest point on the line
@@ -211,6 +212,8 @@ class VisualLine : public VisualLandmark<lineID> {
     inline const point<int> getStartpoint() const;
     inline const point<int> getTopEndpoint() const;
 
+    inline const bool isParallel() const;
+
     inline const std::string getColorString() const;
     inline const std::list <const ConcreteLine *> getPossibleLines() const;
     inline const std::vector<linePoint> getPoints() const;
@@ -226,6 +229,7 @@ class VisualLine : public VisualLandmark<lineID> {
     inline void setDistanceSD(float _distanceSD);
     inline void setPossibleLines(const ConcreteLine* _possible);
 
+    void setParallel() {parallel = true;}
     void setBearingWithSD(float _bearing);
     void setColor(const int c);
     void setDistanceWithSD(float _distance);
@@ -354,6 +358,11 @@ inline const linePoint VisualLine::getThickestVerticalPoint() const
 inline const std::vector<linePoint> VisualLine::getPoints() const
 {
     return points;
+}
+
+inline const bool VisualLine::isParallel() const
+{
+    return parallel;
 }
 
 inline const int VisualLine::getColor() const

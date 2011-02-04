@@ -72,8 +72,9 @@ static const int DIST_POINT_FUDGE = 5;
 //previous constants inserted from .h class
 
 
-Ball::Ball(Vision* vis, Threshold* thr, Field* fie, int _color)
-: vision(vis), thresh(thr), field(fie), color(_color), runsize(1)
+Ball::Ball(Vision* vis, Threshold* thr, Field* fie, Context* con, int _color)
+    : vision(vis), thresh(thr), field(fie), context(con), color(_color),
+      runsize(1)
 {
 	blobs = new Blobs(MAX_BALLS);
 	init(0.0);
@@ -220,6 +221,7 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
         }
         topBlob->init();
         thisBall->init();
+        return false;
     } else if (badSurround(*topBlob)) {
         if (BALLDEBUG) {
             drawBlob(*topBlob, BLACK);
@@ -274,7 +276,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 	do {
 		topBlob = blobs->getTopAndMerge(horizon);
         // the conditions when we know we don't have a ball
-		if (topBlob == NULL || !blobOk(*topBlob)) {
+		if (topBlob == NULL || !blobOk(*topBlob) || topBlob->getArea() == 0) {
             return 0;
         }
         if (BALLDEBUG) {
@@ -782,6 +784,9 @@ bool Ball::nearImageEdgeY(int y, int margin) {
 
 int	 Ball::roundness(Blob b)
 {
+    if (nearEdge(b)) {
+        return 0;
+    }
 	int w = b.width();
 	int h = b.height();
 	if (w * h > SMALLBALL) {

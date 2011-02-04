@@ -53,14 +53,42 @@ enum cornerID {
     CORNER_NO_IDEA_ID,
     TOP_CC, // 30
     BOTTOM_CC
+
 };
 
 enum shape {
+    UNKNOWN,
     INNER_L,
     OUTER_L,
     T,
     CIRCLE,
-    UNKNOWN
+    // secondary shapes - arranged from most general to most specific
+	GOAL_L,   // 5
+	CORNER_L,
+    LEFT_GOAL_L,
+    RIGHT_GOAL_L,
+    RIGHT_GOAL_CORNER, // 9
+    LEFT_GOAL_CORNER,
+    GOAL_T,
+	SIDE_T,
+    LEFT_GOAL_T,      // 13
+    RIGHT_GOAL_T,
+    YELLOW_GOAL_BOTTOM,
+    YELLOW_GOAL_TOP,
+    BLUE_GOAL_BOTTOM, // 17
+    BLUE_GOAL_TOP,
+    LEFT_GOAL_YELLOW_L,
+    LEFT_GOAL_BLUE_L,
+    RIGHT_GOAL_YELLOW_L, // 21
+    RIGHT_GOAL_BLUE_L,
+    RIGHT_GOAL_YELLOW_T,
+    LEFT_GOAL_YELLOW_T,
+    RIGHT_GOAL_BLUE_T, // 25
+    LEFT_GOAL_BLUE_T,
+    CENTER_T_TOP,
+    CENTER_T_BOTTOM,
+    CENTER_CIRCLE_TOP,  // 29
+    CENTER_CIRCLE_BOTTOM
 };
 
 
@@ -80,6 +108,16 @@ private:
 
 public: // Constants
     static const unsigned int NUM_L_CORNERS = 8;
+	static const unsigned int NUM_L_GOAL_CORNERS = 4;
+	static const unsigned int NUM_L_FOUR_CORNERS = 4;
+	static const unsigned int NUM_T_GOAL_CORNERS = 4;
+    static const unsigned int NUM_L_LEFT_GOAL_CORNERS = 2;
+    static const unsigned int NUM_L_RIGHT_GOAL_CORNERS = 2;
+    static const unsigned int NUM_L_LEFT_CORNERS = 2;
+    static const unsigned int NUM_L_RIGHT_CORNERS = 2;
+    static const unsigned int NUM_T_RIGHT_CORNERS = 2;
+    static const unsigned int NUM_T_LEFT_CORNERS = 2;
+	static const unsigned int NUM_T_SIDE_CORNERS = 2;
     static const unsigned int NUM_T_CORNERS = 6;
     static const unsigned int NUM_CC_CORNERS = 2;
     static const unsigned int NUM_CORNERS = (NUM_L_CORNERS +
@@ -114,7 +152,7 @@ public:
     virtual const std::string toString() const;
 
     static const std::vector <const ConcreteCorner*>&
-	getPossibleCorners(shape corner_type);
+	getPossibleCorners(shape corner_type, shape secondary_type);
 
 	const std::vector<const ConcreteLine*> getLines() const {
 		return lines;
@@ -156,14 +194,40 @@ public:
 public:
 	static const std::vector <const ConcreteCorner*>& concreteCorners();
     static const std::vector <const ConcreteCorner*>& lCorners();
+    static const std::vector <const ConcreteCorner*>& lGoalCorners();
+    static const std::vector <const ConcreteCorner*>& rightGoalCorners();
+    static const std::vector <const ConcreteCorner*>& leftGoalCorners();
+    static const std::vector <const ConcreteCorner*>& fourCorners();
+    static const std::vector <const ConcreteCorner*>& leftLCorners();
+    static const std::vector <const ConcreteCorner*>& rightLCorners();
+    static const std::vector <const ConcreteCorner*>& rightTCorners();
+    static const std::vector <const ConcreteCorner*>& leftTCorners();
     static const std::vector <const ConcreteCorner*>& tCorners();
+    static const std::vector <const ConcreteCorner*>& tGoalCorners();
+    static const std::vector <const ConcreteCorner*>& tSideCorners();
     static const std::vector <const ConcreteCorner*>& ccCorners();
+    static const std::vector <const ConcreteCorner*>& rightBlueLCorner();
+    static const std::vector <const ConcreteCorner*>& rightYellowLCorner();
+    static const std::vector <const ConcreteCorner*>& leftBlueLCorner();
+    static const std::vector <const ConcreteCorner*>& leftYellowLCorner();
+    static const std::vector <const ConcreteCorner*>& yellowBottom();
+    static const std::vector <const ConcreteCorner*>& yellowTop();
+    static const std::vector <const ConcreteCorner*>& blueBottom();
+    static const std::vector <const ConcreteCorner*>& blueTop();
 
     static const std::vector <const ConcreteCorner*>& yellowGoalCorners();
     static const std::vector <const ConcreteCorner*>& blueGoalCorners();
 
     static const std::vector <const ConcreteCorner*>& yellowGoalTCorners();
     static const std::vector <const ConcreteCorner*>& blueGoalTCorners();
+    static const std::vector <const ConcreteCorner*>& rightBlueTCorner();
+    static const std::vector <const ConcreteCorner*>& leftBlueTCorner();
+    static const std::vector <const ConcreteCorner*>& rightYellowTCorner();
+    static const std::vector <const ConcreteCorner*>& leftYellowTCorner();
+    static const std::vector <const ConcreteCorner*>& centerBottomCorner();
+    static const std::vector <const ConcreteCorner*>& centerTopCorner();
+    static const std::vector <const ConcreteCorner*>& centerCircleTop();
+    static const std::vector <const ConcreteCorner*>& centerCircleBottom();
 
 private: // Instance variables recording location on field and identifier
     cornerID id;

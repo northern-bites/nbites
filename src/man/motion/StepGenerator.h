@@ -123,6 +123,7 @@ public:
     bool isDone() const { return done; }
 
     void setSpeed(const float _x, const float _y, const float _theta);
+	void setDestination(const float rel_x, const float rel_y, const float rel_theta);
     void takeSteps(const float _x, const float _y, const float _theta,
                    const int _numSteps);
 

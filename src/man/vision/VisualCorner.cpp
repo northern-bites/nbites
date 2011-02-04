@@ -19,14 +19,14 @@ VisualCorner::VisualCorner(const int _x, const int _y,
       VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
       possibleCorners(ConcreteCorner::concreteCorners().begin(),
                       ConcreteCorner::concreteCorners().end()),
-      cornerType(UNKNOWN), line1(l1), line2(l2),
+      cornerType(UNKNOWN), secondaryShape(UNKNOWN), line1(l1), line2(l2),
       lines(), t1(_t1), t2(_t2),
       // Technically the initialization of tBar and tStem is incorrect here for
       // which we apologize. It's a hack, but the true values of tBar and tStem
       // will get assigned in determineCornerShape which is right here in the
       // constructor.
       tBar(line1), tStem(line2),
-      angleBetweenLines(0)
+      angleBetweenLines(0), orientation(0)
 {
     lines.push_back(line1);
     lines.push_back(line2);
@@ -42,13 +42,12 @@ VisualCorner::~VisualCorner() {}
 VisualCorner::VisualCorner(const VisualCorner& other)
     : VisualDetection(other), VisualLandmark<cornerID>(other),
       possibleCorners(other.possibleCorners),
-      cornerType(other.cornerType),
+      cornerType(other.cornerType), secondaryShape(other.secondaryShape),
       line1(other.line1), line2(other.line2), lines(other.lines),
       t1(other.t1), t2(other.t2),
       tBar(other.tBar), tStem(other.tStem),
-      angleBetweenLines(other.angleBetweenLines)
+      angleBetweenLines(other.angleBetweenLines), orientation(other.orientation)
 {
-
 }
 
 /* This method will assign a value to the variable cornerType. It assumes
@@ -63,6 +62,7 @@ void VisualCorner::determineCornerShape() {
         tBar = line1;
         tStem = line2;
         setID(T_CORNER);
+        setTOrientation();
     } else if(Utility::tValueInMiddleOfLine(t2, line2->getLength(),
                                             max(line1->getAvgWidth(),
                                                 MIN_EXTEND_DIST))) {
@@ -70,11 +70,13 @@ void VisualCorner::determineCornerShape() {
         tBar = line2;
         tStem = line1;
         setID(T_CORNER);
+        setTOrientation();
     } else {
         // Temporary side effect - set angleBetweenLines
         cornerType = getLClassification();
     }
 
+    secondaryShape = UNKNOWN;
     determineCornerIDFromShape();
 }
 
@@ -162,6 +164,24 @@ const shape VisualCorner::getLClassification() {
     //cout << " Theta calculated via dot products is " << theta << endl;
     angleBetweenLines = theta;
 
+    // in theory we should be able to get the angle's orientation
+    // step 1:  normalize the vectors
+    // step 2:  average them to get a new vector between them
+    // step 3:  take the angle between that vector and the one pointing "north"
+    // This is all greatly simplified by two things: 1) we don't care about
+    // magnitude, and 2) using a "north" vector simplifies the equations
+
+    // we have the length of the lines already
+    // step 1:  we don't have to "normalize" in the traditional sense, just
+    // get equivalent length vectors
+    float normalize = line1->getLength() / line2->getLength();
+    pair <float, float> line3Basis;
+    // we don't need to average since we don't care about the magnitude of the vector
+    line3Basis.first = static_cast<float>(line1Basis.first) +
+        normalize * static_cast<float>(line2Basis.first);
+    line3Basis.second = static_cast<float>(line1Basis.second) +
+        normalize * static_cast<float>(line2Basis.second);
+    orientation = TO_DEG * atan2(line3Basis.first, -line3Basis.second);
 
     // We draw a line between the endpoints of our lines forming the corner,
     // and another
@@ -361,6 +381,9 @@ void VisualCorner::determineCornerIDFromShape()
     case UNKNOWN:
         setID(CORNER_NO_IDEA_ID);
         break;
+    default:
+        setID(CORNER_NO_IDEA_ID);
+        break;
     }
 
 }
@@ -368,6 +391,26 @@ void VisualCorner::determineCornerIDFromShape()
 const bool VisualCorner::hasPositiveID()
 {
     return possibleCorners.size() == 1;
+}
+
+
+/* The secondary shape represents a refining of what the corner
+   might be.  Since there are several possible steps in this process
+   we do not want to go backwards at any step (e.g. we already know
+   what corner it is, don't try and classify it again)
+ */
+void VisualCorner::setSecondaryShape(const shape s) {
+    if (secondaryShape == UNKNOWN || s > secondaryShape) {
+        secondaryShape = s;
+    }
+}
+
+/* Once we have identified a corner as a T we can set its orientation
+   according to the line that forms the stem.
+ */
+void VisualCorner::setTOrientation() {
+    point<int> end = getTStemEndpoint();
+    orientation = TO_DEG * atan2(end.x - getX(), getY() - end.y);
 }
 
 void VisualCorner::setPossibleCorners(
@@ -440,4 +483,33 @@ setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
 const point<int> VisualCorner::getTStemEndpoint() const
 {
     return Utility::getPointFartherFromCorner(*getTStem(), getX(), getY());
+}
+
+/**
+ * Returns true when the endpoint is below the corner on the screen.
+ */
+const bool VisualCorner::doesItPointDown()
+{
+    return abs(orientation) > 90.0;
+}
+
+const bool VisualCorner::doesItPointUp()
+{
+    return abs(orientation) < 90.0;
+}
+
+/**
+ * Returns true when the endpoint is below the corner on the screen.
+ */
+const bool VisualCorner::doesItPointRight()
+{
+    return orientation >= 0.0;
+}
+
+/**
+ * Returns true when the endpoint is below the corner on the screen.
+ */
+const bool VisualCorner::doesItPointLeft()
+{
+    return orientation < 0.0;
 }

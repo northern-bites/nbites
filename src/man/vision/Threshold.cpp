@@ -100,14 +100,17 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 
     // Set up object recognition object pointers
     field = new Field(vision, this);
+    context = new Context(vision, this, field);
     blue = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                           field, BLUE));
+                                                           field, context,
+                                                           BLUE));
     yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                             field, YELLOW));
-    navyblue = new Robots(vision, this, field, NAVY);
-    red = new Robots(vision, this, field, RED);
-    orange = new Ball(vision, this, field, ORANGE);
-    cross = new Cross(vision, this, field);
+                                                             field, context,
+                                                             YELLOW));
+    navyblue = new Robots(vision, this, field, context, NAVY);
+    red = new Robots(vision, this, field, context, RED);
+    orange = new Ball(vision, this, field, context, ORANGE);
+    cross = new Cross(vision, this, field, context);
     for (int i = 0; i < IMAGE_WIDTH; i++) {
         lowerBound[i] = IMAGE_HEIGHT - 1;
     }
@@ -121,7 +124,7 @@ void Threshold::visionLoop() {
     thresholdAndRuns();
 
     edgeDetection();
-    findLines();
+    // findLines();
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines

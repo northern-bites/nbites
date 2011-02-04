@@ -22,7 +22,7 @@ LINEAR_INTERPOLATION = 0
 SMOOTH_INTERPOLATION = 1
 
 
-# 
+#
 WALK_FOREVER = None
 
 # Convert our units for localization
@@ -32,7 +32,7 @@ MM_TO_CM = .10
 ### Chain Constants
 ###
 #import Kinematics
-#Chain order is clockwise about nao's x axis: 
+#Chain order is clockwise about nao's x axis:
 #HEAD, L_ARM, L_LEG, R_LEG, R_ARM
 NUM_JOINT_CHAINS = 5
 #dictionary for joint chains
@@ -122,8 +122,8 @@ HIP_OFFSET_Z = 80.
 #maximum speeds
 M_TYPE_1_1 = 188.67 * SECONDS_PER_FRAME #degrees /second -> deg/frame
 M_TYPE_1_2 = 290.25 * SECONDS_PER_FRAME #degrees /second
-M_TYPE_2_1 = 351.77 * SECONDS_PER_FRAME #degrees /second #100.00 * SECONDS_PER_FRAME 
-M_TYPE_2_2 = 305.16 * SECONDS_PER_FRAME #degrees /second #100.00 * SECONDS_PER_FRAME 
+M_TYPE_2_1 = 351.77 * SECONDS_PER_FRAME #degrees /second #100.00 * SECONDS_PER_FRAME
+M_TYPE_2_2 = 305.16 * SECONDS_PER_FRAME #degrees /second #100.00 * SECONDS_PER_FRAME
 
 
 

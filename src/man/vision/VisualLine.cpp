@@ -123,6 +123,7 @@ void VisualLine::addPoints(const vector <linePoint> &additionalPoints)
  */
 void VisualLine::init()
 {
+    parallel = false;
     // Points are sorted by x
     leftBound = points[0].x;
     rightBound = points[points.size()-1].x;

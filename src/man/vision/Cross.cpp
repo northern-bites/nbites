@@ -29,8 +29,8 @@
 
 //using namespace std;
 
-Cross::Cross(Vision* vis, Threshold* thr, Field* fie)
-	: vision(vis), thresh(thr), field(fie)
+Cross::Cross(Vision* vis, Threshold* thr, Field* fie, Context* con)
+	: vision(vis), thresh(thr), field(fie), context(con)
 {
     const int MAX_CROSS_RUNS = 400;
 	blobs = new Blobs(MAX_CROSS_RUNS);

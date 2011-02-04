@@ -135,6 +135,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ConcreteFieldObject
                  ${VISION_INCLUDE_DIR}/ConcreteCross
                  ${VISION_INCLUDE_DIR}/ConcreteLine
+                 ${VISION_INCLUDE_DIR}/Context
                  ${VISION_INCLUDE_DIR}/Cross
                  ${VISION_INCLUDE_DIR}/Field
                  ${VISION_INCLUDE_DIR}/FieldLines

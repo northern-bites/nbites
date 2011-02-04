@@ -15,6 +15,7 @@ class Threshold;  // forward reference
 #include "VisualFieldEdge.h"
 #include "Cross.h"
 #include "Robots.h"
+#include "Context.h"
 #ifndef NO_ZLIB
 #include "Zlib.h"
 #endif
@@ -239,6 +240,7 @@ public:
     // main array
     unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
 	Field* field;
+    Context* context;
 
 #ifdef OFFLINE
     //write lines, points, boxes to this array to avoid changing the real image

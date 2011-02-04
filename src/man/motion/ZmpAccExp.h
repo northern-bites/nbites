@@ -9,8 +9,11 @@
 #include "ExponentialFilter.h"
 #include "EKFStructs.h"
 
+#define ZMP_ACCEXP_X 0
+#define ZMP_ACCEXP_Y 1
+#define ZMP_ACCEXP_Z 2
+
 const unsigned int num_dimensions = 3;
-const float alpha = 0.75;
 
 class ZmpAccExp : public ExponentialFilter<AccelMeasurement, num_dimensions>
 {
@@ -23,11 +26,11 @@ public:
 				const float accZ);
 
 	// getters
-	const float getX() { return getFilteredElement(0); }
-    const float getY() { return getFilteredElement(1); }
-    const float getZ() { return getFilteredElement(2); }
+	const float getX() { return getFilteredElement(ZMP_ACCEXP_X); }
+    const float getY() { return getFilteredElement(ZMP_ACCEXP_Y); }
+    const float getZ() { return getFilteredElement(ZMP_ACCEXP_Z); }
 
-protected:
+private:
 	void incorporateMeasurement(AccelMeasurement m);
 
 };
