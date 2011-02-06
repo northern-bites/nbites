@@ -3,7 +3,7 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( NOGGIN )
-
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
 ############################ CMAKE VERSION
 # Check cMake version

@@ -17,55 +17,19 @@
 # 3. Edit project option : ccmake .
 # 4. Build it : make
 
-
-
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( MAN )
-
-
-############################ VERSION
-CMAKE_POLICY(SET CMP0011 OLD)
-# Check cMake version
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
-
-
-############################ NBCOMMON
-# Ensure the TRUNK_PATH variable is set
-
-IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ./ ABSOLUTE)
-  SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS
-    "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
-ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  SET( TRUNK_PATH $ENV{TRUNK_PATH} )
-ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
-INCLUDE( ${TRUNK_PATH}/cmake/base_definitions.cmake )
-
-
-############################ DEFAULT BUILD TYPE
-# Set which build type will be used by default, if none is set
-#IF( "x${CMAKE_BUILD_TYPE}x" STREQUAL "xx" )
-SET( CMAKE_BUILD_TYPE CACHE FORCE "Release")
-#ENDIF( "x${CMAKE_BUILD_TYPE}x" STREQUAL "xx" )
-
-
-############################ DISPLAY
-# Display summary of options
-
-MESSAGE( STATUS "" )
-MESSAGE( STATUS "...:::: Configuration -  MAN ::::..." )
-MESSAGE( STATUS "" )
+INCLUDE( cmake/base_definitions.cmake )
 
 
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
-
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
 FIND_PACKAGE( PTHREAD  REQUIRED )
@@ -105,14 +69,11 @@ CONFIGURE_FILE(
 
 
 ############################ OFFLINE
-
 SET( OFFLINE_NAOQI_PATH
   $ENV{AL_DIR}
   CACHE STRING
   "The local path of the naoqi distribution to use with Webots"
   )
-
-
 
 ############################ REMOTE INSTALLATION
 # Define this to remotely install the binary or library on the robot.
@@ -200,7 +161,6 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-
 SET( MAN_SRCS Man
               TMan
               TTMan
@@ -275,5 +235,3 @@ SUBDIRS(
   motion
   noggin
   )
-
-

@@ -1,49 +1,18 @@
 
+
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( VISION )
-
-
-############################ VERSION
-# Check cMake version
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
-
-
-############################ NBCOMMON
-# Ensure the TRUNK_PATH variable is set
-
-IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
-  SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS
-    "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
-ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  SET( TRUNK_PATH $ENV{TRUNK_PATH} )
-ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-
-
-############################ CMAKE PACKAGE DIRECTORY
-# Set cmakeModules folder
-SET( CMAKE_MODULE_PATH $ENV{TRUNK_PATH}/cmake )
-
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
-INCLUDE( ${CMAKE_MODULE_PATH}/base_definitions.cmake )
-
-
-############################ DISPLAY
-# Display summary of options
-
-MESSAGE( STATUS "" )
-MESSAGE( STATUS "...:::: Configuration -  VISION ::::..." )
-MESSAGE( STATUS "" )
+INCLUDE( ../cmake/base_definitions.cmake )
 
 
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
-# usefull to your project
-
+# useful to your project
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
 FIND_PACKAGE( BOOTS    REQUIRED)
@@ -81,8 +50,7 @@ CONFIGURE_FILE(
 
 ############################ DEFINITION
 # Add here definition needed.
-ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS} ${PYTHON_DEFINITIONS}
-                 -Wno-write-strings )
+ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS} ${PYTHON_DEFINITIONS} )
 
 
 ############################ INCLUDE DIRECTORY
@@ -166,12 +134,8 @@ INSTALL(
   )
 
 ############################ SET LIBRARIES TO LINK WITH
-#Note: I have no idea what the z lib is, but we can't use it to compile visionlink - Octavian
-IF( NO_ZLIB )
-  TARGET_LINK_LIBRARIES( ${VISION_TARGET} ${PYTHON_LIBRARIES} )
-ELSE( NO_ZLIB )
-  TARGET_LINK_LIBRARIES( ${VISION_TARGET} ${PYTHON_LIBRARIES} z )
-ENDIF( NO_ZLIB ) 
+TARGET_LINK_LIBRARIES( ${VISION_TARGET} ${PYTHON_LIBRARIES} )
+
 
 ############################ VISIONLINK
 IF( VISIONLINK )

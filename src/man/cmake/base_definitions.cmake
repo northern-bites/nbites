@@ -3,11 +3,29 @@
 # The basic diefinitions for the Northern Bites cmake packages, used
 # throughout different packages' configurations
 
+############################ DISPLAY
+# Display summary of options
+
+MESSAGE( STATUS "" )
+MESSAGE( STATUS "...:::: Configuration -  ${PROJECT_NAME} ::::..." )
+MESSAGE( STATUS "" )
+
+############################ VERSION
+# Check cMake version
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+
+############################### COMPILER STUFF
+
+############################ DEFAULT BUILD TYPE
+# Set which build type will be used by default, if none is set
+SET( CMAKE_BUILD_TYPE CACHE FORCE "Release")
+
+
 ############################ TRUNK PATH
 # Ensure the TRUNK_PATH variable is set
 
 IF( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH ${PROJECT_SOURCE_DIR}/ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
@@ -68,13 +86,6 @@ ELSE( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
   SET( MAN_INSTALL_PREFIX $ENV{MAN_INSTALL_PREFIX} )
 ENDIF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
 
-# Make it an editable cache variable
-#  ** Right now, can't figure this out, not editable ** - jfishman@
-#SET(
-#  MAN_INSTALL_PREFIX ${MAN_INSTALL_PREFIX}
-#  CACHE STRING "Install prefix."
-#  )
-
 
 ############################ CMAKE POLICY
 # Settings regarding various cmake policy changes from 2.6
@@ -98,22 +109,14 @@ SET( CMAKE_MODULE_PATH ${TRUNK_PATH}/cmake )
 ############################ ROBOT TYPE
 # Definitions for the type of robot (for compilation definitions), and
 # prefixes for library, executable, and path names
-# TODO: get rid of AIBO code 
 IF( NOT DEFINED ROBOT_TYPE )
   SET( ROBOT_TYPE NAO_RL )
 ENDIF( NOT DEFINED ROBOT_TYPE )
 SET( ROBOT_TYPE ${ROBOT_TYPE} CACHE STRING "Robot type" )
 
-IF( ${ROBOT_TYPE} STREQUAL AIBO_ERS7 OR ${ROBOT_TYPE} STREQUAL AIBO_220)
-  SET( ROBOT_PREFIX aibo )
-  SET( ROBOT_AIBO TRUE  )
-  SET( ROBOT_NAO  FALSE )
-ELSE( ${ROBOT_TYPE} STREQUAL AIBO_ERS7 OR ${ROBOT_TYPE} STREQUAL AIBO_220)
-  SET( ROBOT_PREFIX nao )
-  SET( ROBOT_AIBO FALSE )
-  SET( ROBOT_NAO  TRUE  )
-ENDIF( ${ROBOT_TYPE} STREQUAL AIBO_ERS7 OR ${ROBOT_TYPE} STREQUAL AIBO_220)
-
+SET( ROBOT_PREFIX nao )
+SET( ROBOT_AIBO FALSE )
+SET( ROBOT_NAO  TRUE  )
 
 ############################ OUTPUT LOCATION
 # Define output directories.  Binaries, documentation, and libraries are
@@ -176,4 +179,3 @@ MARK_AS_ADVANCED(
   LIBRARY_OUTPUT_PATH
   AL_PERF_CALCULATION
   )
-

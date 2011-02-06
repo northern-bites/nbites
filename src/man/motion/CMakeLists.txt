@@ -3,43 +3,16 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( MOTION )
-
-
-############################ VERSION
-# Check cMake version
-CMAKE_MINIMUM_REQUIRED( VERSION 2.2.0 )
-
-
-############################ NBCOMMON
-# Ensure the TRUNK_PATH variable is set
-
-IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
-  SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
-    "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
-ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  SET( TRUNK_PATH $ENV{TRUNK_PATH} )
-ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
-INCLUDE( ${TRUNK_PATH}/cmake/base_definitions.cmake )
-
-
-############################ DISPLAY
-# Display summary of options
-
-MESSAGE( STATUS "" )
-MESSAGE( STATUS "...:::: Configuration -  MOTION ::::..." )
-MESSAGE( STATUS "" )
+INCLUDE( ../cmake/base_definitions.cmake )
 
 
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
-
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PTHREAD  REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
@@ -215,5 +188,3 @@ TARGET_LINK_LIBRARIES(
 #SUBDIRS(
 #  ${CORPUS_CMAKE_DIR}
 #  )
-
-

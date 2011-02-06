@@ -3,37 +3,11 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( CORPUS )
-
-
-############################ VERSION
-# Check cMake version
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
-
-
-############################ NBCOMMON
-# Ensure the TRUNK_PATH variable is set
-
-IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
-  SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS
-    "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
-ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  SET( TRUNK_PATH $ENV{TRUNK_PATH} )
-ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
-INCLUDE( ${TRUNK_PATH}/cmake/base_definitions.cmake )
-
-
-############################ DISPLAY
-# Display summary of options
-
-MESSAGE( STATUS "" )
-MESSAGE( STATUS "...:::: Configuration -  CORPUS ::::..." )
-MESSAGE( STATUS "" )
+INCLUDE( ../cmake/base_definitions.cmake )
 
 
 ############################ FIND PACKAGE
@@ -93,14 +67,10 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 # since we may inherit it from man
 IF(WEBOTS_BACKEND)
   INCLUDE_DIRECTORIES(${WEBOTS_INCLUDE_DIR})
-
   ADD_DEFINITIONS( ${WEBOTS_DEFINITIONS})
-
 ELSE(WEBOTS_BACKEND)
   INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR})
-
   ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS})
-
 ENDIF(WEBOTS_BACKEND)
 
 ############################ PROJECT SOURCES FILES
@@ -108,7 +78,8 @@ ENDIF(WEBOTS_BACKEND)
 SET( SENSORS_SRCS Sensors
   PySensors
   NaoPose
-  CameraCalibrate)
+  CameraCalibrate
+  )
 
 
 ###### SYNCHRO ############
@@ -118,7 +89,7 @@ SET( SYNCHRO_SRCS synchro
   messaging
   )
 
-########### ROBOT CONNET #########
+########### ROBOT CONNECT #########
 SET( ROBOT_CONNECT_SRCS AccEKF
   RoboGuardian
   ClickableButton
@@ -256,11 +227,8 @@ INSTALL(
 
 
 ############################ LINKER LANGUAGE
-# For Mac's, set the target link language to use
-
-#IF( APPLE )
+# For Macs, set the target link language to use
 SET_TARGET_PROPERTIES( ${SENSORS_TARGET} PROPERTIES LINKER_LANGUAGE CXX )
-#ENDIF( APPLE )
 
 
 ############################ SET LIBRARIES TO LINK WITH
@@ -290,5 +258,3 @@ TARGET_LINK_LIBRARIES( ${NBINCLUDE_TARGET} ${NBCOMMON_LIBRARIES}
 # include in this package
 #SUBDIRS(
 #  )
-
-

@@ -2,48 +2,16 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( COMM )
-
-
-############################ VERSION
-# Check cMake version
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
-
-
-############################ NBCOMMON
-# Ensure the TRUNK_PATH variable is set
-
-IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
-  SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS 
-    "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
-ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  SET( TRUNK_PATH $ENV{TRUNK_PATH} )
-ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-
-
-############################ CMAKE PACKAGE DIRECTORY
-# Set cmakeModules folder
-SET( CMAKE_MODULE_PATH $ENV{TRUNK_PATH}/cmake )
-
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
-INCLUDE( ${CMAKE_MODULE_PATH}/base_definitions.cmake )
-
-
-############################ DISPLAY
-# Display summary of options
-
-MESSAGE( STATUS "" )
-MESSAGE( STATUS "...:::: Configuration -  COMM ::::..." )
-MESSAGE( STATUS "" )
+INCLUDE( ../cmake/base_definitions.cmake )
 
 
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
-
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
 FIND_PACKAGE( PTHREAD  REQUIRED )
@@ -73,18 +41,11 @@ CONFIGURE_FILE(
 
 ############################ DEFINITION
 # Add here definition needed.
-IF( ROBOT_NAO )
-  ADD_DEFINITIONS(
-    ${NBCOMMON_DEFINITIONS}
-    ${PTHREAD_DEFINITIONS}
-    ${PYTHON_DEFINITIONS}
-    )
-ELSE( ROBOT_NAO )
-  ADD_DEFINITIONS(
-    ${NBCOMMON_DEFINITIONS}
-    ${PYTHON_DEFINITIONS}
-    )
-ENDIF( ROBOT_NAO )
+ADD_DEFINITIONS(
+  ${NBCOMMON_DEFINITIONS}
+  ${PTHREAD_DEFINITIONS}
+  ${PYTHON_DEFINITIONS}
+  )
 
 
 ############################ INCLUDE DIRECTORY
@@ -95,13 +56,9 @@ INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${CFG_DIR}
+  ${PTHREAD_INCLUDE_DIR}
+  ${MAN_MOTION_INCLUDE_DIR}
   )
-IF( ROBOT_NAO )
-  INCLUDE_DIRECTORIES(
-    ${PTHREAD_INCLUDE_DIR}
-    ${MAN_MOTION_INCLUDE_DIR}
-    )
-ENDIF( ROBOT_NAO )
 
 
 ############################ PROJECT SOURCES FILES 
@@ -158,28 +115,18 @@ INSTALL(
   )
 
 ############################ SET LIBRARIES TO LINK WITH
-IF( ROBOT_NAO )
-  TARGET_LINK_LIBRARIES(
-    ${COMM_TARGET}
-      ${PTHREAD_LIBRARIES}
-      ${PYTHON_LIBRARIES}
-      ${VISION_TARGET}
-      ${SYNCHRO_TARGET}
-    )
-ELSE( ROBOT_NAO )
-  TARGET_LINK_LIBRARIES(
-    ${COMM_TARGET}
-      ${PYTHON_LIBRARIES}
-      ${VISION_TARGET}
-    )
-ENDIF( ROBOT_NAO )
+TARGET_LINK_LIBRARIES(
+  ${COMM_TARGET}
+  ${PTHREAD_LIBRARIES}
+  ${PYTHON_LIBRARIES}
+  ${VISION_TARGET}
+  ${SYNCHRO_TARGET}
+  )
 
 
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories (some may not actually be subdirectories) to
 # include in this package
-#IF( PYTHON_SHARED_COMM AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
 #  SUBDIRS(
 #    ${VISION_CMAKE_DIR}
 #    )
-#ENDIF( PYTHON_SHARED_COMM AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
