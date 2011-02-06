@@ -9,11 +9,6 @@ PROJECT( VISION )
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
 
-############################ COLORIZE MAKEFILE
-# Colorized output
-SET( CMAKE_COLOR_MAKEFILE TRUE )
-
-
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
