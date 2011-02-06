@@ -1,23 +1,3 @@
-##############################
-#
-# WELCOME
-#
-# This is the main cmake configuration file
-# associate to your projects
-# You can define here specific compilation options
-#
-# More about cmake : www.cmake.org
-#
-# Using cmake command line :
-# 1. Create a build directory : mkdir build
-# 2. Configure cmake project : cd build; cmake ..
-#   You can also generate project with your favorite IDE :
-#   Example : Under Mac osx use "cmake .. -G XCode"
-#   see cmake help for more information
-# 3. Edit project option : ccmake .
-# 4. Build it : make
-
-
 
 ############################ PROJECT NAME
 # The name of this cmake project
@@ -34,15 +14,11 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
 
-############################ SET CONFIG FILE DIR
-SET( VISION_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/)
-
-
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../../ ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
@@ -54,11 +30,6 @@ ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
 ############################ CMAKE PACKAGE DIRECTORY
 # Set cmakeModules folder
 SET( CMAKE_MODULE_PATH $ENV{TRUNK_PATH}/cmake )
-
-
-############################ BUILDCONFIG
-# Include the config file for this build
-INCLUDE( buildconfig.cmake )
 
 
 ############################ BASE DEFINITIONS
@@ -83,6 +54,11 @@ FIND_PACKAGE( PYTHON   REQUIRED )
 FIND_PACKAGE( BOOTS    REQUIRED)
 
 
+############################ BUILDCONFIG
+# Include the config file for this build
+INCLUDE( ${VISION_CMAKE_DIR}/buildconfig.cmake )
+
+
 ############################ TESTS
 # Define main test script location
 #SET( TEST_RUN "${AL_DIR}/extern/python/aldebaran/test_run.py" )
@@ -97,13 +73,13 @@ FIND_PACKAGE( BOOTS    REQUIRED)
 # Generate the config.h file, inserting values of CMake cache variable
 CONFIGURE_FILE(
   ${VISION_CMAKE_DIR}/profileconfig.h.in
-  ${VISION_CONFIG_DIR}/profileconfig.h
+  ${CFG_DIR}/profileconfig.h
     ESCAPE_QUOTES
   )
 
 CONFIGURE_FILE(
   ${VISION_CMAKE_DIR}/visionconfig.h.in
-  ${VISION_CONFIG_DIR}/visionconfig.h
+  ${CFG_DIR}/visionconfig.h
     ESCAPE_QUOTES
   )
 
@@ -118,48 +94,46 @@ ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS} ${PYTHON_DEFINITIONS}
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
-                     ${VISION_INCLUDE_DIR}
                      ${BOOST_INCLUDE_DIR}
-		     ${VISION_CONFIG_DIR}/
+		     ${CFG_DIR}
                      )
-
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
-                 ${VISION_INCLUDE_DIR}/Blob
-                 ${VISION_INCLUDE_DIR}/Blobs
-                 ${VISION_INCLUDE_DIR}/ConcreteCorner
-                 ${VISION_INCLUDE_DIR}/ConcreteLandmark
-                 ${VISION_INCLUDE_DIR}/ConcreteFieldObject
-                 ${VISION_INCLUDE_DIR}/ConcreteCross
-                 ${VISION_INCLUDE_DIR}/ConcreteLine
-                 ${VISION_INCLUDE_DIR}/Context
-                 ${VISION_INCLUDE_DIR}/Cross
-                 ${VISION_INCLUDE_DIR}/Field
-                 ${VISION_INCLUDE_DIR}/FieldLines
-                 ${VISION_INCLUDE_DIR}/ObjectFragments
-                 ${VISION_INCLUDE_DIR}/Profiler
-                 ${VISION_INCLUDE_DIR}/PyVision
-                 ${VISION_INCLUDE_DIR}/Robots
-                 ${VISION_INCLUDE_DIR}/Threshold
-                 ${VISION_INCLUDE_DIR}/Utility
-                 ${VISION_INCLUDE_DIR}/Vision
-                 ${VISION_INCLUDE_DIR}/VisualBall
-                 ${VISION_INCLUDE_DIR}/VisualCrossbar
-                 ${VISION_INCLUDE_DIR}/VisualCorner
-                 ${VISION_INCLUDE_DIR}/VisualDetection
-		 ${VISION_INCLUDE_DIR}/VisualFieldEdge
-                 ${VISION_INCLUDE_DIR}/VisualLandmark
-                 ${VISION_INCLUDE_DIR}/VisualFieldObject
-                 ${VISION_INCLUDE_DIR}/VisualRobot
-                 ${VISION_INCLUDE_DIR}/VisualCross
-                 ${VISION_INCLUDE_DIR}/VisualLine
+SET( VISION_SRCS Ball
+                 Blob
+                 Blobs
+                 ConcreteCorner
+                 ConcreteLandmark
+                 ConcreteFieldObject
+                 ConcreteCross
+                 ConcreteLine
+                 Context
+                 Cross
+                 Field
+                 FieldLines
+                 ObjectFragments
+                 Profiler
+                 PyVision
+                 Robots
+                 Threshold
+                 Utility
+                 Vision
+                 VisualBall
+                 VisualCrossbar
+                 VisualCorner
+                 VisualDetection
+		 VisualFieldEdge
+                 VisualLandmark
+                 VisualFieldObject
+                 VisualRobot
+                 VisualCross
+                 VisualLine
                  )
 
 
 
-SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
+SET( VISION_PYTHON_SRCS __init__.py )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install

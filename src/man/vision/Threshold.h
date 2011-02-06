@@ -16,9 +16,6 @@ class Threshold;  // forward reference
 #include "Cross.h"
 #include "Robots.h"
 #include "Context.h"
-#ifndef NO_ZLIB
-#include "Zlib.h"
-#endif
 #include "Profiler.h"
 #include "NaoPose.h"
 //

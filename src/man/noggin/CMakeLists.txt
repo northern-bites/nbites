@@ -1,22 +1,3 @@
-##############################
-#
-# WELCOME
-#
-# This is the main cmake configuration file
-# associate to your projects
-# You can define here specific compilation options
-#
-# More about cmake : www.cmake.org
-#
-# Using cmake command line :
-# 1. Create a build directory : mkdir build
-# 2. Configure cmake project : cd build; cmake ..
-#   You can also generate project with your favorite IDE :
-#   Example : Under Mac osx use "cmake .. -G XCode"
-#   see cmake help for more information
-# 3. Edit project option : ccmake .
-# 4. Build it : make
-
 
 
 ############################ PROJECT NAME
@@ -34,14 +15,11 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
 
-############################ SET CONFIGURATION FILE DIR
-SET( NOGGIN_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/noggin )
-
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../../../ ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
@@ -53,11 +31,6 @@ ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
 ############################ CMAKE PACKAGE DIRECTORY
 # Set cmakeModules folder
 SET( CMAKE_MODULE_PATH $ENV{TRUNK_PATH}/cmake )
-
-
-############################ BUILDCONFIG
-# Include the config file for this build
-INCLUDE( buildconfig.cmake )
 
 
 ############################ BASE DEFINITIONS
@@ -81,6 +54,11 @@ FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
 
 
+############################ BUILDCONFIG
+# Include the config file for this build
+INCLUDE( ${NOGGIN_CMAKE_DIR}/buildconfig.cmake )
+
+
 ############################ TeamConfig.py variables
 SET(@GC_TEAM_NUMBER@
   "101"
@@ -97,21 +75,21 @@ SET( GC_PLAYER_NUMBER ${@GC_PLAYER_NUMBER@} )
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/nogginconfig.in
-  ${NOGGIN_CONFIG_DIR}/nogginconfig.h
+  ${CFG_DIR}/nogginconfig.h
   ESCAPE_QUOTES
   )
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/Switch.py.in
-  ${NOGGIN_INCLUDE_DIR}/players/Switch.py
+  players/Switch.py
   )
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/TeamConfig.py.in
-  ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
+  TeamConfig.py
   )
 
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/WebotsConfig.py.in
-  ${NOGGIN_INCLUDE_DIR}/WebotsConfig.py
+  WebotsConfig.py
   )
 
 ############################ DEFINITION
@@ -126,45 +104,44 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
                      ${VISION_INCLUDE_DIR}
                      ${CORPUS_INCLUDE_DIR}
-                     ${NOGGIN_INCLUDE_DIR}
-                     ${NOGGIN_CONFIG_DIR}
+                     ${CFG_DIR}
                      )
 
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 
-SET( NOGGIN_SRCS ${NOGGIN_INCLUDE_DIR}/Noggin
-                 ${NOGGIN_INCLUDE_DIR}/Observation
-                 # ${NOGGIN_INCLUDE_DIR}/MCL
-                 ${NOGGIN_INCLUDE_DIR}/BallEKF
-                 ${NOGGIN_INCLUDE_DIR}/PyLoc
-                 ${NOGGIN_INCLUDE_DIR}/LocEKF
-                 ${NOGGIN_INCLUDE_DIR}/MMLocEKF
-                 ${NOGGIN_INCLUDE_DIR}/NogginStructs.h
+SET( NOGGIN_SRCS Noggin
+                 Observation
+                 # MCL
+                 BallEKF
+                 PyLoc
+                 LocEKF
+                 MMLocEKF
+                 NogginStructs.h
                  )
 
 
-SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
-                        ${NOGGIN_INCLUDE_DIR}/Brain.py
-                        ${NOGGIN_INCLUDE_DIR}/GameController.py
-                        ${NOGGIN_INCLUDE_DIR}/GameStates.py
-                        ${NOGGIN_INCLUDE_DIR}/FallController.py
-                        ${NOGGIN_INCLUDE_DIR}/FallStates.py
-                        ${NOGGIN_INCLUDE_DIR}/NogginConstants.py
-                        ${NOGGIN_INCLUDE_DIR}/Leds.py
-                        ${NOGGIN_INCLUDE_DIR}/TeamConfig.py
-                        ${NOGGIN_INCLUDE_DIR}/WebotsConfig.py
+SET( NOGGIN_PYTHON_SRCS __init__.py
+                        Brain.py
+                        GameController.py
+                        GameStates.py
+                        FallController.py
+                        FallStates.py
+                        NogginConstants.py
+                        Leds.py
+                        TeamConfig.py
+                        WebotsConfig.py
                         )
 
-SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/headTracking
-     			   ${NOGGIN_INCLUDE_DIR}/kickDecider
-                           ${NOGGIN_INCLUDE_DIR}/navigator
-                           ${NOGGIN_INCLUDE_DIR}/playbook
-                           ${NOGGIN_INCLUDE_DIR}/players
-                           ${NOGGIN_INCLUDE_DIR}/robots
-                           ${NOGGIN_INCLUDE_DIR}/typeDefs
-                           ${NOGGIN_INCLUDE_DIR}/util )
+SET( NOGGIN_PYTHON_SUBDIRS headTracking
+     			   kickDecider
+                           navigator
+                           playbook
+                           players
+                           robots
+                           typeDefs
+                           util )
 
 
 ############################ BUILD TARGETS

@@ -14,25 +14,17 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 # Colorized output
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
-############################ SET CONFIGURATION FILE DIR
-SET( CORPUS_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/ )
-
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../../ ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
 ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-
-
-############################ BUILDCONFIG
-# Include the config file for this build
-INCLUDE( buildconfig.cmake )
 
 
 ############################ BASE DEFINITIONS
@@ -71,10 +63,14 @@ ELSE(WEBOTS_BACKEND)
   ENDIF( APPLE )
 ENDIF(WEBOTS_BACKEND)
 
+############################ BUILDCONFIG
+# Include the config file for this build
+INCLUDE( ${CORPUS_CMAKE_DIR}/buildconfig.cmake )
+
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   ${CORPUS_CMAKE_DIR}/corpusconfig.h.in
-  ${CORPUS_CONFIG_DIR}/corpusconfig.h
+  ${CFG_DIR}/corpusconfig.h
   ESCAPE_QUOTES
   )
 
@@ -93,8 +89,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
   ${PTHREAD_INCLUDE_DIR}
   ${PYTHON_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
-  ${CORPUS_INCLUDE_DIR}
-  ${CORPUS_CONFIG_DIR}
+  ${CFG_DIR}
   )
 
 
@@ -114,40 +109,40 @@ ENDIF(WEBOTS_BACKEND)
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-SET( SENSORS_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
-  ${CORPUS_INCLUDE_DIR}/PySensors
-  ${CORPUS_INCLUDE_DIR}/NaoPose
-  ${CORPUS_INCLUDE_DIR}/CameraCalibrate)
+SET( SENSORS_SRCS Sensors
+  PySensors
+  NaoPose
+  CameraCalibrate)
 
 
 ###### SYNCHRO ############
 
-SET( SYNCHRO_SRCS ${CORPUS_INCLUDE_DIR}/synchro
-  ${CORPUS_INCLUDE_DIR}/_synchromodule
-  ${CORPUS_INCLUDE_DIR}/messaging
+SET( SYNCHRO_SRCS synchro
+  _synchromodule
+  messaging
   )
 
 ########### ROBOT CONNET #########
-SET( ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/AccEKF
-  ${CORPUS_INCLUDE_DIR}/RoboGuardian
-  ${CORPUS_INCLUDE_DIR}/ClickableButton
-  ${CORPUS_INCLUDE_DIR}/PyRoboGuardian
-  ${CORPUS_INCLUDE_DIR}/Lights
-  ${CORPUS_INCLUDE_DIR}/PyLights)
+SET( ROBOT_CONNECT_SRCS AccEKF
+  RoboGuardian
+  ClickableButton
+  PyRoboGuardian
+  Lights
+  PyLights)
 
 IF(WEBOTS_BACKEND)
-  LIST( APPEND ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/WBEnactor
-    ${CORPUS_INCLUDE_DIR}/AngleEKF
-    ${CORPUS_INCLUDE_DIR}/WBTranscriber
-    ${CORPUS_INCLUDE_DIR}/WBImageTranscriber
+  LIST( APPEND ROBOT_CONNECT_SRCS WBEnactor
+    AngleEKF
+    WBTranscriber
+    WBImageTranscriber
     )
 ELSE(WEBOTS_BACKEND)
-  LIST( APPEND ROBOT_CONNECT_SRCS ${CORPUS_INCLUDE_DIR}/ALEnactor
-    ${CORPUS_INCLUDE_DIR}/NaoEnactor
-    ${CORPUS_INCLUDE_DIR}/ALTranscriber
-    ${CORPUS_INCLUDE_DIR}/ALImageTranscriber
-    ${CORPUS_INCLUDE_DIR}/NaoLights
-    ${CORPUS_INCLUDE_DIR}/NaoRGBLight)
+  LIST( APPEND ROBOT_CONNECT_SRCS ALEnactor
+    NaoEnactor
+    ALTranscriber
+    ALImageTranscriber
+    NaoLights
+    NaoRGBLight)
 ENDIF(WEBOTS_BACKEND)
 
 
@@ -157,21 +152,21 @@ ENDIF(WEBOTS_BACKEND)
 #                            )
 #ENDIF( PYTHON_SHARED_CORPUS )
 
-SET( CORPUS_PYTHON_SRCS ${CORPUS_INCLUDE_DIR}/__init__.py
-  ${CORPUS_INCLUDE_DIR}/leds.py
-  ${CORPUS_INCLUDE_DIR}/sensors.py
-  ${CORPUS_INCLUDE_DIR}/synchro.py
+SET( CORPUS_PYTHON_SRCS __init__.py
+  leds.py
+  sensors.py
+  synchro.py
   )
 
-SET( CORPUS_TEST_DIR ${CORPUS_INCLUDE_DIR}/test )
+SET( CORPUS_TEST_DIR test )
 
 
 ###### NBINCLUDE STUFF ####
 
 SET( NBINCLUDE_SRCS ${NBCOMMON_INCLUDE_DIR}/NBMatrixMath
   ${NBCOMMON_INCLUDE_DIR}/NBMath
-  ${CORPUS_INCLUDE_DIR}/CoordFrame4D
-  ${CORPUS_INCLUDE_DIR}/CoordFrame3D
+  CoordFrame4D
+  CoordFrame3D
   )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION

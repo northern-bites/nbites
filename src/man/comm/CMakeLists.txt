@@ -1,23 +1,3 @@
-##############################
-#
-# WELCOME 
-#
-# This is the main cmake configuration file 
-# associate to your projects
-# You can define here specific compilation options
-# 
-# More about cmake : www.cmake.org
-#
-# Using cmake command line : 
-# 1. Create a build directory : mkdir build
-# 2. Configure cmake project : cd build; cmake ..
-#   You can also generate project with your favorite IDE : 
-#   Example : Under Mac osx use "cmake .. -G XCode"
-#   see cmake help for more information
-# 3. Edit project option : ccmake .
-# 4. Build it : make 
-
-
 
 ############################ PROJECT NAME
 # The name of this cmake project
@@ -34,14 +14,11 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
 
-############################ SET CONFIG FILE DIR
-SET( COMM_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/comm )
-
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../../ ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS 
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
@@ -53,11 +30,6 @@ ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
 ############################ CMAKE PACKAGE DIRECTORY
 # Set cmakeModules folder
 SET( CMAKE_MODULE_PATH $ENV{TRUNK_PATH}/cmake )
-
-
-############################ BUILDCONFIG
-# Include the config file for this build
-INCLUDE( buildconfig.cmake )
 
 
 ############################ BASE DEFINITIONS
@@ -79,10 +51,12 @@ MESSAGE( STATUS "" )
 
 FIND_PACKAGE( NBCOMMON REQUIRED )
 FIND_PACKAGE( PYTHON   REQUIRED )
-IF( ROBOT_NAO )
-  FIND_PACKAGE( PTHREAD  REQUIRED )
-ENDIF( ROBOT_NAO )
+FIND_PACKAGE( PTHREAD  REQUIRED )
 
+
+############################ BUILDCONFIG
+# Include the config file for this build
+INCLUDE( ${COMM_CMAKE_DIR}/buildconfig.cmake )
 
 ############################ TESTS
 # Define main test script location
@@ -97,7 +71,7 @@ ENDIF( ROBOT_NAO )
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   ${COMM_CMAKE_DIR}/commconfig.in
-  ${COMM_CONFIG_DIR}/commconfig.h
+  ${CFG_DIR}/commconfig.h
     ESCAPE_QUOTES
   )
 
@@ -125,8 +99,7 @@ INCLUDE_DIRECTORIES(
   ${NBCOMMON_INCLUDE_DIR}
   ${PYTHON_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
-  ${COMM_INCLUDE_DIR}
-  ${COMM_CONFIG_DIR}
+  ${CFG_DIR}
   )
 IF( ROBOT_NAO )
   INCLUDE_DIRECTORIES(
@@ -138,12 +111,12 @@ ENDIF( ROBOT_NAO )
 
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
-SET( COMM_SRCS ${COMM_INCLUDE_DIR}/Comm
-               ${COMM_INCLUDE_DIR}/CommTimer
-               ${COMM_INCLUDE_DIR}/DataSerializer
-               ${COMM_INCLUDE_DIR}/GameController
-               ${COMM_INCLUDE_DIR}/RoboCupGameControlData
-               ${COMM_INCLUDE_DIR}/TOOLConnect
+SET( COMM_SRCS Comm
+               CommTimer
+               DataSerializer
+               GameController
+               RoboCupGameControlData
+               TOOLConnect
                )
 
 IF( PYTHON_SHARED_COMM )
@@ -152,7 +125,7 @@ IF( PYTHON_SHARED_COMM )
                          )
 ENDIF( PYTHON_SHARED_COMM )
 
-SET( COMM_PYTHON_SRCS ${COMM_INCLUDE_DIR}/__init__.py )
+SET( COMM_PYTHON_SRCS __init__.py )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install

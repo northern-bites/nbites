@@ -15,25 +15,17 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.2.0 )
 SET( CMAKE_COLOR_MAKEFILE TRUE )
 
 
-############################ SET CONFIG FILE DIR
-SET( MOTION_CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
-
 ############################ NBCOMMON
 # Ensure the TRUNK_PATH variable is set
 
 IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../../ ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS 
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
 ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
   SET( TRUNK_PATH $ENV{TRUNK_PATH} )
 ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-
-
-############################ BUILDCONFIG
-# Include the config file for this build
-INCLUDE( buildconfig.cmake )
 
 
 ############################ BASE DEFINITIONS
@@ -67,10 +59,15 @@ ELSE( APPLE )
 ENDIF( APPLE )
 
 
+############################ BUILDCONFIG
+# Include the config file for this build
+INCLUDE( ${MOTION_CMAKE_DIR}/buildconfig.cmake )
+
+
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
   ${MOTION_CMAKE_DIR}/motionconfig.in
-  ${MOTION_CONFIG_DIR}/motionconfig.h
+  ${CFG_DIR}/motionconfig.h
   ESCAPE_QUOTES
   )
 
@@ -89,51 +86,50 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${ALCOMMON_INCLUDE_DIR}
                      ${PTHREAD_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
-                     ${MOTION_INCLUDE_DIR}
                      ${CORPUS_INCLUDE_DIR}
-		     ${MOTION_CONFIG_DIR}
+		     ${CFG_DIR}
 		     )
 
 
 ############################ PROJECT SOURCES FILES 
 # Add here source files needed to compile this project
 SET( MOTION_SRCS
-  #${MOTION_INCLUDE_DIR}/CallbackAction
-                     ${MOTION_INCLUDE_DIR}/BodyJointCommand
-		     ${MOTION_INCLUDE_DIR}/HeadJointCommand
-		     ${MOTION_INCLUDE_DIR}/JointCommand
-		     ${MOTION_INCLUDE_DIR}/MotionCommand
-                     ${MOTION_INCLUDE_DIR}/MotionConstants
-                     ${MOTION_INCLUDE_DIR}/Motion.cpp
-                     ${MOTION_INCLUDE_DIR}/MotionInterface
-		     ${MOTION_INCLUDE_DIR}/MotionSwitchboard
-		     ${MOTION_INCLUDE_DIR}/ScriptedProvider
-		     ${MOTION_INCLUDE_DIR}/ChoppedCommand
-		     ${MOTION_INCLUDE_DIR}/LinearChoppedCommand
-		     ${MOTION_INCLUDE_DIR}/SmoothChoppedCommand
-		     ${MOTION_INCLUDE_DIR}/BaseFreezeCommand
-		     ${MOTION_INCLUDE_DIR}/HeadProvider
-		     ${MOTION_INCLUDE_DIR}/ChopShop
-		     ${MOTION_INCLUDE_DIR}/NullProvider
-		     ${MOTION_INCLUDE_DIR}/WalkProvider
-		     ${MOTION_INCLUDE_DIR}/Step
-		     ${MOTION_INCLUDE_DIR}/Gait
-		     ${MOTION_INCLUDE_DIR}/AbstractGait
-		     ${MOTION_INCLUDE_DIR}/MetaGait
-		     ${MOTION_INCLUDE_DIR}/SensorAngles
-		     ${MOTION_INCLUDE_DIR}/SpringSensor
-		     ${MOTION_INCLUDE_DIR}/WalkingLeg
-		     ${MOTION_INCLUDE_DIR}/WalkingArm
-		     ${MOTION_INCLUDE_DIR}/PreviewController
-		     ${MOTION_INCLUDE_DIR}/Observer
-		     ${MOTION_INCLUDE_DIR}/ZmpExp
-		     ${MOTION_INCLUDE_DIR}/ZmpAccExp
-		     ${MOTION_INCLUDE_DIR}/ZmpEKF
-		     ${MOTION_INCLUDE_DIR}/ZmpAccEKF
-		     ${MOTION_INCLUDE_DIR}/StepGenerator
+  #CallbackAction
+                     BodyJointCommand
+		     HeadJointCommand
+		     JointCommand
+		     MotionCommand
+                     MotionConstants
+                     Motion.cpp
+                     MotionInterface
+		     MotionSwitchboard
+		     ScriptedProvider
+		     ChoppedCommand
+		     LinearChoppedCommand
+		     SmoothChoppedCommand
+		     BaseFreezeCommand
+		     HeadProvider
+		     ChopShop
+		     NullProvider
+		     WalkProvider
+		     Step
+		     Gait
+		     AbstractGait
+		     MetaGait
+		     SensorAngles
+		     SpringSensor
+		     WalkingLeg
+		     WalkingArm
+		     PreviewController
+		     Observer
+		     ZmpExp
+		     ZmpAccExp
+		     ZmpEKF
+		     ZmpAccEKF
+		     StepGenerator
                      ${CORPUS_INCLUDE_DIR}/InverseKinematics
                      ${CORPUS_INCLUDE_DIR}/COMKinematics
-                     ${MOTION_INCLUDE_DIR}/PyMotion
+                     PyMotion
                      )
 
 IF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
@@ -141,15 +137,15 @@ IF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
   LIST( APPEND MOTION_SRCS ${MAN_INCLUDE_DIR}/Sensors )
 ENDIF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
 
-SET( MOTION_PYTHON_SRCS ${MOTION_INCLUDE_DIR}/__init__.py
-                        ${MOTION_INCLUDE_DIR}/MotionConstants.py
-                        ${MOTION_INCLUDE_DIR}/SweetMoves.py
-                        ${MOTION_INCLUDE_DIR}/HeadMoves.py
-                        ${MOTION_INCLUDE_DIR}/RobotGaits.py
-                        ${MOTION_INCLUDE_DIR}/StiffnessModes.py
+SET( MOTION_PYTHON_SRCS __init__.py
+                        MotionConstants.py
+                        SweetMoves.py
+                        HeadMoves.py
+                        RobotGaits.py
+                        StiffnessModes.py
                         )
 
-SET( MOTION_PYTHON_SUBDIRS ${MOTION_INCLUDE_DIR}/gaits )
+SET( MOTION_PYTHON_SUBDIRS gaits )
 
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
