@@ -104,6 +104,9 @@ sub readBehavior {
                       uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}}, $transition);
                   }
 
+		  # clear the transitions so we don't add them in wrong places
+		  @currentTransitions = ();
+
                   # and note if the state contains a loop
                   if ($current_can_loop) {
                       push @{$stateFiles{$currentBehavior}{$currentFunction}}, "player.stay()";
@@ -242,6 +245,9 @@ sub buildDOT {
                       print DOT "$state -> $toState [style=\"dotted\"];\n";
                   }
               }
+	      else { # add loops to ourselves
+		  print DOT "$state -> $state;\n";
+	      }
           }
         }
     }
