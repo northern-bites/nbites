@@ -10,14 +10,20 @@
 #define MANMODULE_H
 
 // ..::: Headers ::
-// Add it here to be sure every file includes it
-#include "alxplatform.h"
-#include "manconfig.h"
 #include <fstream>
 #include <sstream>
-#include <albroker.h>
-#include <almodule.h>
-#include <altools.h>
+
+#include "alcommon/albroker.h"
+#include "alcommon/albrokermanager.h"
+#include "alcommon/almodule.h"
+#include "alcommon/alproxy.h"
+#include "alcore/alerror.h"
+#include "alcore/alptr.h"
+#include "alcore/altypes.h"
+#include "alproxies/alsentinelproxy.h"
+#include "altools/alxplatform.h"
+
+#include "manconfig.h"
 
 // ..::: Version Information ::
 /** Major release version */

@@ -22,11 +22,11 @@
 #define _ALTranscriber_h_DEFINED
 
 #include "boost/shared_ptr.hpp"
-#include "almemoryproxy.h"
-#include "albroker.h"
-#include "alptr.h"
 
-#include "almemoryfastaccess.h"
+#include "alcommon/albroker.h"
+#include "alcore/alptr.h"
+#include "almemoryfastaccess/almemoryfastaccess.h"
+#include "alproxies/almemoryproxy.h"
 
 #include "Transcriber.h"
 #include "Sensors.h"
