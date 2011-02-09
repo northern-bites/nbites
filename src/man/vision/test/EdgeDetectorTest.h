@@ -21,6 +21,7 @@ private:
     int test_sobel();
     int test_dir();
     int test_peaks();
+    bool peaks_list_contains(boost::shared_ptr<Gradient> g, int i, int j);
 
 private:
     EdgeDetector edges;

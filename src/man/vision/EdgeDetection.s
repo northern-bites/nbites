@@ -1,7 +1,9 @@
 /* -*- mode: asm; indent-tabs-mode: nil -*- */
 .intel_syntax noprefix
 
+        ## Expose these routines to the linker
 .globl _sobel_operator
+.globl _find_edge_peaks
 
 .section .data
 
@@ -23,9 +25,133 @@ thresh: .skip 4
 inImg:  .skip 4
 outImg:
 
+# Tables and structs for Edge Peak Loop
+#
+        ## Parameter struct
+                .struct 8
+gradients:      .skip 4
+angles:
+
+        ## Stack layout
+                .struct 0
+row_count:      .skip 4
+angles_ptr:     .skip 4
+end_of_peak_stack:
+
+        .section .data
+#
+# Octant code in edx:
+#       \ -1  -2|2   3  /
+#       -3\     |     / 1
+#           \   |   /
+#       -4    \ | /     0
+#       -----------------
+#      -12    / | \    -8
+#           /   |   \
+#      -11/     |     \-7
+#       / -9 -10|-6  -5 \
+                                        # edx (octant code)
+        .int            - xPitch        # -12
+        .int    -yPitch - xPitch        # -11
+        .int    -yPitch                 # -10
+        .int    -yPitch - xPitch        #  -9
+        .int              xPitch        #  -8
+        .int    -yPitch + xPitch        #  -7
+        .int    -yPitch                 #  -6
+        .int    -yPitch + xPitch        #  -5
+        .int            - xPitch        #  -4
+        .int     yPitch - xPitch        #  -3
+        .int     yPitch                 #  -2
+        .int     yPitch - xPitch        #  -1
+neighborTable:
+        .int              xPitch        #   0
+        .int     yPitch + xPitch        #   1
+        .int     yPitch                 #   2
+        .int     yPitch + xPitch        #   3
+
+        .byte   0x80                    # -12
+        .byte   0x80                    # -11
+        .byte   0xC0                    # -10
+        .byte   0xC0                    #  -9
+        .byte   0x00                    #  -8
+        .byte   0x00                    #  -7
+        .byte   0xC0                    #  -6
+        .byte   0xC0                    #  -5
+        .byte   0x80                    #  -4
+        .byte   0x80                    #  -3
+        .byte   0x40                    #  -2
+        .byte   0x40                    #  -1
+quadrantTable:
+        .byte   0x00                    #   0
+        .byte   0x00                    #   1
+        .byte   0x40                    #   2
+        .byte   0x40                    #   3
+
+        .byte    0                      # -12
+        .byte    0                      # -11
+        .byte   -1                      # -10
+        .byte   -1                      #  -9
+        .byte   -1                      #  -8
+        .byte   -1                      #  -7
+        .byte    0                      #  -6
+        .byte    0                      #  -5
+        .byte   -1                      #  -4
+        .byte   -1                      #  -3
+        .byte    0                      #  -2
+        .byte    0                      #  -1
+octantTable:
+        .byte    0                      #   0
+        .byte    0                      #   1
+        .byte   -1                      #   2
+        .byte   -1                      #   3
+
+## The reciprocal table is a 256-word table that for an index i gives
+## 1/x as a U16.16, i.e. an unsigned integer with 16 bits to the
+## right of the binary point. More accurately, it gives
+##
+##       min((int)round(65536.0 / (i + 0.5)), 0xFFFF)
+##
+## The idea is that an index i is obtained from the high 8 bits of a
+## 12-bit number by truncating (i.e. just a right shift 4), so
+## that index i represents the range [i .. i+1), which is i+0.5
+## on average. The min operation prevents 16-bit overflow, which
+## can only happen for i = 0, and which will never occur in
+## practice because if the largest gradient component is that
+## small, the gradient magnitude won't be above any reasonable
+## noise threshold. But even if it happens, clamping to 0xFFFF is
+## reasonable. The integer version of the above floating point
+## expression that is actually used below gets i+0.5 by using one
+## bit to the right of the binary point, so it steps i from 1 to
+## 0x1FF. This means that the 65536.0 also has to be
+## doubled. It's doubled again to get 0x40000 because we want 17
+## bits of reciprocal so that we can then round off the result to
+## the final 16 bits we want.
+recipTable:
+        .word   0xFFFF          # i = 0.5 will overflow, so just use the max value
+        index = 3               # start at i = 1.5
+        .rept   255             # step i from 1.5 to 255.5
+          .word (0x40000 / index + 1) >> 1
+          index = index + 2
+        .endr
+
+# 129-byte arctangent table covering the range 0 - 45 degrees and containing
+# 5 bits of binary angle
+atanTable:
+        .byte    0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  5
+        .byte    5,  5,  6,  6,  6,  7,  7,  7,  8,  8,  8,  8,  9,  9,  9, 10
+        .byte   10, 10, 11, 11, 11, 11, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14
+        .byte   15, 15, 15, 15, 16, 16, 16, 17, 17, 17, 17, 18, 18, 18, 18, 19
+        .byte   19, 19, 19, 20, 20, 20, 20, 21, 21, 21, 21, 22, 22, 22, 22, 23
+        .byte   23, 23, 23, 23, 24, 24, 24, 24, 25, 25, 25, 25, 25, 26, 26, 26
+        .byte   26, 26, 27, 27, 27, 27, 27, 28, 28, 28, 28, 28, 29, 29, 29, 29
+        .byte   29, 29, 30, 30, 30, 30, 30, 31, 31, 31, 31, 31, 31, 32, 32, 32
+        .byte   32
+
+
 .section .text
 
-        ## _sobel_operator(uint8_t thresh, uint16_t *yimg, int16_t  *outX, int16_t *outY, uint16_t *mag)
+        ## _sobel_operator(uint8_t thresh, uint16_t *yimg, int16_t  *outX,
+        ##                 int16_t *outY, uint16_t *mag)
 _sobel_operator:
         push    ebp
         mov     ebp, esp
@@ -34,7 +160,7 @@ _sobel_operator:
         push    edi
         push    ebx
 
-        sub     esp, 4
+        sub     esp, 8
 
         ## Load arguments into registers
 
@@ -64,7 +190,7 @@ sobel_yLoop:
         mov     ecx, 80
 sobel_xLoop:
         ## Load rows into registers to save memory accesses
-	movq    mm0, [esi + top]
+        movq    mm0, [esi + top]
         movq    mm1, [esi + mid]
         movq    mm2, [esi + bot]
 
@@ -73,8 +199,8 @@ sobel_xLoop:
         add     esi, 8
 
         ## X GRADIENT calculation
-	# mm3 = | - | - | z3 | z2| from previous iteration.
-	# Each z is top + 2 * middle + bottom
+        # mm3 = | - | - | z3 | z2| from previous iteration.
+        # Each z is top + 2 * middle + bottom
         paddw   mm1, mm1
         paddw   mm1, mm0
         paddw   mm1, mm2
@@ -83,31 +209,31 @@ sobel_xLoop:
         movntq [edi + xGrad], mm3
 
         ## Y GRADIENT calculation
-	# mm4 = | z3 | z2 | - | - | from previous iteration.
-	# Each z is top - bottom
-	psubw	mm0, mm2		# mm0 = | z7 | z6 | z5 | z4 |
-	pshufw	mm2, mm4, 0b01001110	# mm2 = |  - |  - | z3 | z2 |
-	punpckldq mm2, mm0		# mm2 = | z5 | z4 | z3 | z2 |
-	paddw	mm2, mm0		# mm2 = | z5 + z7 | z4 + z6 | z3 + z5 | z2 + z4 |
-	movq	mm5, mm4		# mm5 = | z3 | z2 |  - |  - |
-	psrlq	mm5, 48			# mm5 = |  0 |  0 |  0 | z3 |
-	movq	mm4, mm0		# mm4 = | z7 | z6 |  - |  - | for next iteration
-	psllq	mm0, 16			# mm0 = | z6 | z5 | z4 |  0 |
-	por	mm0, mm5		# mm0 = | z6 | z5 | z4 | z3 |
-	paddw	mm0, mm0		# mm0 = | 2*z6 | 2*z5 | 2*z4 | 2*z3 |
-	paddw	mm0, mm2		# mm0 = | z5 + 2*z6 + z7 | z4 + 2*z5 + z6 | z3 + 2*z4 + z5 | z2 + 2*z3 + z4 |
-	movntq	[edi + yGrad], mm0
+        # mm4 = | z3 | z2 | - | - | from previous iteration.
+        # Each z is top - bottom
+        psubw   mm0, mm2                # mm0 = | z7 | z6 | z5 | z4 |
+        pshufw  mm2, mm4, 0b01001110    # mm2 = |  - |  - | z3 | z2 |
+        punpckldq mm2, mm0              # mm2 = | z5 | z4 | z3 | z2 |
+        paddw   mm2, mm0                # mm2 = | z5 + z7 | z4 + z6 | z3 + z5 | z2 + z4 |
+        movq    mm5, mm4                # mm5 = | z3 | z2 |  - |  - |
+        psrlq   mm5, 48                 # mm5 = |  0 |  0 |  0 | z3 |
+        movq    mm4, mm0                # mm4 = | z7 | z6 |  - |  - | for next iteration
+        psllq   mm0, 16                 # mm0 = | z6 | z5 | z4 |  0 |
+        por     mm0, mm5                # mm0 = | z6 | z5 | z4 | z3 |
+        paddw   mm0, mm0                # mm0 = | 2*z6 | 2*z5 | 2*z4 | 2*z3 |
+        paddw   mm0, mm2                # mm0 = | z5 + 2*z6 + z7 | z4 + 2*z5 + z6 | z3 + 2*z4 + z5 | z2 + 2*z3 + z4 |
+        movntq  [edi + yGrad], mm0
 
         ## MAGNITUDE calculation
-	psllw	mm3, 3			# x gradient becomes 16 bits signed
-	psllw	mm0, 3			# y gradient becomes 16 bits signed
-	pmulhw	mm3, mm3		# x squared, 14 bits unsigned
-	pmulhw	mm0, mm0		# y squared, 14 bits unsigned
-	paddw	mm0, mm3		# magnitude squared
+        psllw   mm3, 3                  # x gradient becomes 16 bits signed
+        psllw   mm0, 3                  # y gradient becomes 16 bits signed
+        pmulhw  mm3, mm3                # x squared, 14 bits unsigned
+        pmulhw  mm0, mm0                # y squared, 14 bits unsigned
+        paddw   mm0, mm3                # magnitude squared
 
         # subtract noise threshold (mm6), force to 0 if below threshold
-	psubusw	mm0, mm6
-	movntq	[edi + sqMag], mm0
+        psubusw mm0, mm6
+        movntq  [edi + sqMag], mm0
 
         ## We're done with the destination pointer,
         ## so increment it to next line of pixels.
@@ -134,5 +260,167 @@ sobel_xLoop:
         pop     ebp
 
         emms
+
+        ret
+
+################################################
+        ## Edge peak detection loop ##
+################################################
+
+.section        .text
+
+        ## _find_edge_peaks(int16_t *gradients, uint16_t *output)
+        ##
+        ## General Registers:
+        ##      eax     y gradient, then max(xGrad, yGrad), then binary angle
+        ##      ebx     x gradient for a time, then min(xGrad, yGrad)
+        ##      edx     ends up with octant bits
+        ##      ecx     x index counter
+        ##      edi     gradient values pointer
+        ##      esi
+        ##      ebp     offset to gradient direction neigbhors for peak test
+        ##
+        ## Stack:
+        ##      [esp]       y index counter
+
+_find_edge_peaks:
+
+        push    ebp
+
+        push    esi
+        push    edi
+        push    ebx
+
+        ## Load output address
+        mov     esi, [esp + gradients]
+        mov     eax, [esp + angles]
+
+        sub     esp, end_of_peak_stack
+        mov     dword ptr[esp + angles_ptr], eax
+
+        ## 240 rows, 238 gradient magnitudes, 236 possible peak rows
+        mov     dword ptr[esp + row_count], 236
+
+        cld                             # search increasing addresses
+
+peaks_yLoop:
+
+        mov     ecx, 316                # 320 pixels, 318 gradient magnitudes,
+                                        # 316 possible peak positions
+peaks_xLoop:
+        xor     eax, eax                # looking for non-zero
+        repe scasw                      # search for non-zero squared magnitude,
+                                        # or until end of row
+        jz      peaks_xLoop_end         # end of row or non-zero value found?
+
+        # Found next magnitude above noise threshold. Here
+        #       edi     -> one word past the non-zero
+        #                  (i.e. >= noise threshold) squared magnitude.
+        #       ecx     count remaining in current row
+        #               (x coordinate is offset from this value)
+
+        # Fetch y gradient, compute absolute value, save sign bit in edx
+        movsx   eax, word ptr [edi - xPitch + yGrad]
+        cdq
+        xor     eax, edx
+        sub     eax, edx
+
+        # Fetch x gradient, compute absolute value, shift sign bit into edx
+        movsx   ebx, word ptr [edi - xPitch + xGrad]
+        mov     esi, ebx                # using cdq would require saving
+                                        # eax and edx somewhere, so this
+        sar     esi, 16                 # seems 1 tick faster
+        xor     ebx, esi
+        sub     ebx, esi
+        add     edx, edx                # shift in sign bit
+        add     edx, esi
+
+        # eax = max(xGrad, yGrad) ;  ebx = min(xGrad, yGrad);
+        # shift octant bit into edx
+        cmp     eax, ebx
+        cmovb   esi, eax
+        cmovb   eax, ebx
+        cmovb   ebx, esi
+        adc     edx, edx                # shift in octant bit
+
+        # One more bit of gradient direction into edx
+        add     ebx, ebx
+        cmp     eax, ebx
+        adc     edx, edx
+
+        # Lookup offset of neighbors
+        mov     ebp, [neighborTable + edx]
+
+        # Peak?
+        movzx   esi, word ptr[edi + ebp*2 - xPitch]
+        neg     ebp
+        cmp     si, word ptr[edi + ebp*2 - xPitch]
+        cmovb   si, word ptr[edi + ebp*2 - xPitch]
+        cmp     si, word ptr[edi - xPitch]
+        jb      peaks_xLoop
+
+        ## Yes, we have a new edge point. Compute gradient direction. x
+        ## component is in eax, 12 bits unsigned. y component is in ebx,
+        ## and has been multiplied by 2, so it's 13 bits
+        ## unsigned. Tangent of angle, 0 - 45 deg, is y/2x. High 3 bits
+        ## of binary angle are looked up from octant code in edx.
+        shr     eax, 4
+        movzx   eax, word ptr [recipTable + eax*2]      # lookup reciprocal,
+                                                        # U16.16
+        imul    eax, ebx                # y/x, U32.21
+        shr     eax, 14                 # y/x, U32.7 (129-element table)
+        movzx   eax, byte ptr [atanTable + eax] # lookup arc tangent
+        xor     al, byte ptr[octantTable + edx] # negate arc tangent for
+                                                # appropriate octants
+        sub     al, byte ptr[octantTable + edx]
+        add     al, byte ptr[quadrantTable + edx]       # get 8-bit binary angle
+
+        # Write binary angle (in a, also eax),
+        # x coord (from ecx), y coord (on stack)
+
+        ## edx, esi are no longer needed so we use them as temp registers
+        ## Load in pointer to angles array
+        mov     esi, [esp + angles_ptr]
+
+        ## Write out 16 bits of binary (actually only 8 bit) angle
+        mov     word ptr[esi], ax
+
+        ## Write out x coordinate
+        mov     word ptr[esi + 2], cx
+
+        ## Load y coordinate and write it out
+        mov     edx, dword ptr[esp + row_count]
+        mov     word ptr[esi + 4], dx
+
+        ## Move angles ptr forward to the next location in the array
+        add     dword ptr[esp + angles_ptr], 6
+
+        ## Adjust counters
+        dec     ecx
+        jmp     peaks_xLoop
+
+peaks_xLoop_end:
+        dec     dword ptr[esp + row_count]
+        jne     peaks_yLoop
+
+        ## Load in pointer to angles array
+        mov     esi, [esp + angles_ptr]
+
+        ## Put zeros in the x,y, angle spots for the element after the
+        ## last in the list of edge peaks. Signals end of list to user.
+        mov     word ptr[esi], 0
+        mov     word ptr[esi+2], 0
+        mov     word ptr[esi+4], 0
+
+        ## Clean up and return
+        add     esp, end_of_peak_stack
+
+        pop    ebx
+        pop    edi
+        pop    esi
+
+        pop    ebp
+
+        ## emms
 
         ret

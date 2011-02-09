@@ -8,10 +8,12 @@
 extern "C" void _sobel_operator(const uint8_t thresh,
                                 const uint16_t *input,
                                 uint16_t *out);
+extern "C" void _find_edge_peaks(const uint16_t *gradients,
+                                 uint16_t *angles);
 using boost::shared_ptr;
 using namespace std;
 
-EdgeDetector::EdgeDetector(boost::shared_ptr<Profiler> p, int thresh):
+EdgeDetector::EdgeDetector(boost::shared_ptr<Profiler> p, uint8_t thresh):
     profiler(p), threshold(thresh)
 {
 
@@ -26,6 +28,7 @@ void EdgeDetector::detectEdges(const uint16_t* channel,
                                shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_EDGES);
+    sobelOperator(channel, gradient);
     findPeaks(gradient);
     PROF_EXIT(profiler,P_EDGES);
 }
@@ -46,7 +49,7 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
 {
     PROF_ENTER(profiler, P_SOBEL);
 #ifdef USE_MMX
-    _sobel_operator(default_edge_value, &channel[0], gradient->values);
+    _sobel_operator(threshold, &channel[0], gradient->values);
 #else
     for (int i=1; i < Gradient::rows-1; ++i){
         for (int j=1; j < Gradient::cols-1; ++j) {
@@ -72,14 +75,26 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
                  channel[(i-1) * IMAGE_WIDTH + (j+1)])
                 );
 
+            xGrad = -xGrad;
+            yGrad = -yGrad;
 
             gradient->setX(static_cast<int16_t>(xGrad), i, j);
             gradient->setY(static_cast<int16_t>(yGrad), i, j);
 
-            xGrad = abs(xGrad) >> 2;
-            yGrad = abs(yGrad) >> 2;
+            xGrad = xGrad << 3;
+            yGrad = yGrad << 3;
 
-            int mag = ((xGrad * xGrad + yGrad * yGrad + 1) >> 1);
+            xGrad = xGrad * xGrad;
+            yGrad = yGrad * yGrad;
+
+            xGrad = xGrad >> 16;
+            yGrad = yGrad >> 16;
+
+            int mag = xGrad + yGrad;
+
+            // All non above threshold points are zero
+            mag = max(0, mag-((threshold*threshold) >> 10));
+
             gradient->setMagnitude(static_cast<uint16_t>(mag), i, j);
         }
     }
@@ -107,9 +122,6 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
 void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_EDGE_PEAKS);
-    // The magnitudes were not square rooted and are rather large
-    const int edgeThreshold = (threshold * threshold) << 4;
-
     /**************** IMPORTANT NOTE: **********************
      *
      * These checks exclude the last 2 rows and columns because
@@ -125,7 +137,7 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
 
             gradient->peaks[i][j] = false; // Not a peak yet
             const int z = gradient->getMagnitude(i,j);
-            if (z > edgeThreshold){
+            if (z > 0){
                 const int y = gradient->getY(i,j);
                 const int x = gradient->getX(i,j);
 

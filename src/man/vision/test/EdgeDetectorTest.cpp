@@ -129,7 +129,8 @@ int EdgeDetectorTest::test_sobel()
             int mag = gx + gy;
 
             // All non above threshold points are zero
-            mag = max(0, mag-((DEFAULT_EDGE_VALUE*DEFAULT_EDGE_VALUE) >> 10));
+            mag = max(0,
+                      mag-((edges.getThreshold() * edges.getThreshold()) >> 10));
 
             EQ_INT(g->getMagnitude(i,j) , mag);
             GTE(g->getMagnitude(i,j) , 0); // Useless with unsigned integers,
@@ -148,12 +149,27 @@ int EdgeDetectorTest::test_peaks()
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
-            if (j < IMAGE_HEIGHT *3./4.)
+            if (j < IMAGE_WIDTH *3./4.)
                 c[(i) * IMAGE_WIDTH + j] = 0;
             else
                 c[(i) * IMAGE_WIDTH + j] = 250;
 
     edges.detectEdges(c,g);
+
+#ifdef USE_MMX
+    for (int i = 0; i < Gradient::num_angles_limit; ++i) {
+        if (g->getAnglesXCoord(i)){
+            int x = g->getAnglesXCoord(i);
+            int y = g->getAnglesYCoord(i);
+            NE_INT(g->getMagnitude(y,x) , 0);
+            assert(g->getX(y,x) != 0 || g->getY(y,x) != 0);
+
+       // If we find an angle of zero, there are no more angles to be found
+        } else {
+            break;
+        }
+    }
+#else  /* USE_MMX */
 
     // Everywhere peaks is true, the gradient is not zero. If it's not
     // a peak, we don't really care what the gradient values are.
@@ -164,12 +180,23 @@ int EdgeDetectorTest::test_peaks()
                 assert(g->getX(i,j) != 0 || g->getY(i,j) != 0);
             }
         }
+#endif  /* USE_MMX */
     PASSED(PEAKS_ZERO);
 
-    // Test to see that no peak follows in the same direction as another
+#ifdef USE_MMX
+    for (int n = 0; n < Gradient::num_angles_limit; ++n) {
+        // No point has an x coordinate of zero because there cannot
+        // be a peak there, so we use this to know when we have
+        // reached the end of the edge points.
+        if (!g->getAnglesXCoord(n)){
+            break;
+        } else {
+            int i = g->getAnglesYCoord(n);
+            int j = g->getAnglesXCoord(n);
+#else
     for (int i=2; i < Gradient::rows-2; ++i) {
         for (int j=2; j < Gradient::cols-2; ++j){
-
+#endif
             const int z = g->getMagnitude(i,j);
 
             const int y = g->getY(i,j);
@@ -190,7 +217,43 @@ int EdgeDetectorTest::test_peaks()
         }
     }
     PASSED(PEAKS_DIR);
+
+#ifdef USE_MMX
+    for (int i = 2; i < Gradient::rows-2; ++i) {
+        for (int j = 2; j < Gradient::cols-2; ++j) {
+            if (j == IMAGE_WIDTH * 3/4){
+                assert(peaks_list_contains(g,i,j));
+            } else {
+                assert(!peaks_list_contains(g,i,j));
+            }
+        }
+    }
+#else
+    for (int i = 2; i < Gradient::rows-2; ++i) {
+        for (int j = 2; j < Gradient::cols-2; ++j) {
+            if (j == IMAGE_WIDTH * 3/4){
+                assert(g->peaks[i][j]);
+            } else {
+                assert(!g->peaks[i][j]);
+            }
+        }
+    }
+#endif
+    PASSED(CORRECT_PEAK);
     return 0;
+}
+
+bool EdgeDetectorTest::peaks_list_contains(shared_ptr<Gradient> g,
+                                           int i, int j){
+    int n = 0;
+    while (g->getAnglesXCoord(n) != 0){
+        if (g->getAnglesXCoord(n) == j &&
+            g->getAnglesYCoord(n) == i){
+            return true;
+        }
+        n++;
+    }
+    return false;
 }
 
 int EdgeDetectorTest::runTests()

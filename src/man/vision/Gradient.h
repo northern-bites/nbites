@@ -80,6 +80,21 @@ public:
         values[i * IMAGE_WIDTH + j + y_grads + 1] = v;
     }
 
+    // Return the nth angle in the angles array
+    uint8_t getAngle(int n){
+        return static_cast<uint8_t>(angles[n*3 + angles_offset]);
+    }
+
+    // Return the nth x coordinate in the angles array
+    uint16_t getAnglesXCoord(int n){
+        return angles[n*3 + angles_x_offset];
+    }
+
+    // Return the nth y coordinate in the angles array
+    uint16_t getAnglesYCoord(int n){
+        return angles[n*3 + angles_y_offset];
+    }
+
     // Public member variables
 
     // Values is all the arrays in one, the others get pointers within
@@ -91,7 +106,16 @@ public:
         y_grads = IMAGE_WIDTH * IMAGE_HEIGHT * 2
     };
 
-    uint8_t *tangents;
+    // Each angle has 3 values: angle, x coordinate, and y coordinate
+    uint16_t *angles;
+
+    enum {
+        num_angles_limit = IMAGE_WIDTH * IMAGE_HEIGHT /2,
+        angles_size = num_angles_limit * 3,
+        angles_offset = 0,
+        angles_x_offset = 1,
+        angles_y_offset = 2,
+    };
 
     bool peaks[IMAGE_HEIGHT][IMAGE_WIDTH];
 

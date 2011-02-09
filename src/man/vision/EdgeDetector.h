@@ -15,7 +15,7 @@
 class EdgeDetector
 {
 public:
-    EdgeDetector(boost::shared_ptr<Profiler> p, int thresh);
+    EdgeDetector(boost::shared_ptr<Profiler> p, uint8_t thresh);
     virtual ~EdgeDetector(){ };
 
 /**
@@ -25,8 +25,8 @@ public:
     void detectEdges(const uint16_t* channel,
                      boost::shared_ptr<Gradient> gradient);
 
-    int  getThreshold()           { return threshold; }
-    void setThreshold(int thresh) { threshold = thresh; }
+    uint8_t  getThreshold()           { return threshold; }
+    void setThreshold(uint8_t thresh) { threshold = thresh; }
 
 private:
     void sobelOperator(const uint16_t* channel,
@@ -39,7 +39,7 @@ private:
 
 private:
     boost::shared_ptr<Profiler> profiler;
-    int threshold;
+    uint8_t threshold;
 };
 
 #endif /* EdgeDetector_h_DEFINED */
