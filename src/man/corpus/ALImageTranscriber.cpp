@@ -505,8 +505,7 @@ void ALImageTranscriber::waitForImage ()
 
         // Attempt to retrive the next image
         try {
-            ALimage = camera->call<ALValue>("getDirectRawImageRemote",
-                                            lem_name);
+            ALimage = camera->getDirectRawImageRemote(lem_name);
         }catch (ALError &e) {
             log->error("NaoMain", "Could not call the getImageRemote method of the "
                        "NaoCam module");

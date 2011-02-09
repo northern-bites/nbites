@@ -18,7 +18,8 @@ ENDIF( WEBOTS_BACKEND )
 
 IF( OE_CROSS_BUILD )
   SET( ALCOMMON_LIBRARIES
-    ${OE_SYSROOT}/usr/lib/libalcommon.so )
+    ${OE_SYSROOT}/usr/lib/libalcommon.so
+    ${OE_SYSROOT}/usr/lib/libalmemoryfastaccess.so)
 ELSE(OE_CROSS_BUILD )
   IF( WIN32 )
     SET( ALCOMMON_LIBRARIES ${AL_DIR}/lib/alcommon.lib)
