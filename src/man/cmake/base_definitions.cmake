@@ -20,6 +20,32 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 # Set which build type will be used by default, if none is set
 SET( CMAKE_BUILD_TYPE CACHE FORCE "Release")
 
+########SETTING UP THE COMPILER FLAGS ##########
+# Notes: -JS, GS Feb. 2009
+# Note: gcc 4.2 doesnt have a geode processor type.
+#       k6-2 has a similar instruction set, so we use it instead
+#       this is important for allowing linkage and running of -O1,2,3 bins/libs
+#
+# Note: The default flags never get set by cmake.
+# Note: We override the default CMAKE release and debug flags with our own
+# Note: We set the C flags to be the same as the CXX flags
+
+# Default (no release specific) build flags
+SET( CMAKE_CXX_FLAGS
+  "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing" )
+SET( CMAKE_C_FLAGS 
+  "${CMAKE_CXX_FLAGS}" )
+# Release build flags
+SET( CMAKE_CXX_FLAGS_RELEASE
+  "-O3 -DNDEBUG")
+SET( CMAKE_C_FLAGS_RELEASE
+  "${CMAKE_CXX_FLAGS_RELEASE}" )
+# Debug build flags
+SET( CMAKE_CXX_FLAGS_DEBUG
+  "-g3" )
+SET( CMAKE_C_FLAGS_DEBUG
+  "${CMAKE_CXX_FLAGS_DEBUG}" )
+
 
 ############################ TRUNK PATH
 # Ensure the TRUNK_PATH variable is set
