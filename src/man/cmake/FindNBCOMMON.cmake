@@ -4,7 +4,7 @@
 # Includes
 ##
 
-INCLUDE ( ${CMAKE_MODULE_PATH}/base_definitions.cmake )
+#INCLUDE ( ${CMAKE_MODULE_PATH}/base_definitions.cmake )
 
 
 ##

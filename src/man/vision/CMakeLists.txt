@@ -13,9 +13,8 @@ INCLUDE( ../cmake/base_definitions.cmake )
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # useful to your project
-FIND_PACKAGE( NBCOMMON REQUIRED )
-FIND_PACKAGE( PYTHON   REQUIRED )
-FIND_PACKAGE( BOOTS    REQUIRED)
+FIND_PACKAGE( PythonLibs   REQUIRED )
+FIND_PACKAGE( Boost        REQUIRED )
 
 
 ############################ BUILDCONFIG

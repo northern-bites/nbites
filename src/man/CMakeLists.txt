@@ -22,6 +22,7 @@
 PROJECT( MAN )
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
+
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
 INCLUDE( cmake/base_definitions.cmake )
@@ -30,10 +31,11 @@ INCLUDE( cmake/base_definitions.cmake )
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
-FIND_PACKAGE( NBCOMMON REQUIRED )
-FIND_PACKAGE( PYTHON   REQUIRED )
-FIND_PACKAGE( PTHREAD  REQUIRED )
-FIND_PACKAGE( BOOTS    REQUIRED )
+#FIND_PACKAGE( NBCOMMON REQUIRED )
+include ( cmake/FindNBCOMMON.cmake )
+FIND_PACKAGE( PythonLibs  REQUIRED )
+FIND_PACKAGE( Threads  REQUIRED )
+FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
 
 IF(APPLE)
   FIND_PACKAGE( FINK )
@@ -50,9 +52,9 @@ ELSE(WEBOTS_BACKEND)
     MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
     #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
     #when we want to compile just the vision/sensors libraries for the TOOL
-    FIND_PACKAGE( ALCOMMON )
+    include ( cmake/FindALCOMMON.cmake )
   ELSE( APPLE )
-    FIND_PACKAGE( ALCOMMON REQUIRED )
+    include ( cmake/FindALCOMMON.cmake )
   ENDIF( APPLE )
 ENDIF(WEBOTS_BACKEND)
 

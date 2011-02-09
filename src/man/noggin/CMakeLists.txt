@@ -10,43 +10,15 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
 
-############################ NBCOMMON
-# Ensure the TRUNK_PATH variable is set
-
-IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../ ABSOLUTE)
-  SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS
-    "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
-ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  SET( TRUNK_PATH $ENV{TRUNK_PATH} )
-ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-
-
-############################ CMAKE PACKAGE DIRECTORY
-# Set cmakeModules folder
-SET( CMAKE_MODULE_PATH $ENV{TRUNK_PATH}/cmake )
-
-
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
-INCLUDE( ${CMAKE_MODULE_PATH}/base_definitions.cmake )
-
-
-############################ DISPLAY
-# Display summary of options
-
-MESSAGE( STATUS "" )
-MESSAGE( STATUS "...:::: Configuration -  NOGGIN ::::..." )
-MESSAGE( STATUS "" )
+INCLUDE( ../cmake/base_definitions.cmake )
 
 
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
-
-FIND_PACKAGE( NBCOMMON REQUIRED )
-FIND_PACKAGE( PYTHON   REQUIRED )
+FIND_PACKAGE( PythonLibs   REQUIRED )
 
 
 ############################ BUILDCONFIG

@@ -13,17 +13,16 @@ INCLUDE( ../cmake/base_definitions.cmake )
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
-FIND_PACKAGE( NBCOMMON REQUIRED )
-FIND_PACKAGE( PTHREAD  REQUIRED )
-FIND_PACKAGE( PYTHON   REQUIRED )
+FIND_PACKAGE( Threads  REQUIRED )
+FIND_PACKAGE( PythonLibs   REQUIRED )
 
 IF( APPLE )
   MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
  #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
  #when we want to compile just the vision/sensors libraries for the TOOL
-  FIND_PACKAGE( ALCOMMON )
+#  FIND_PACKAGE( ALCOMMON )
 ELSE( APPLE )
-  FIND_PACKAGE( ALCOMMON REQUIRED )
+#  FIND_PACKAGE( ALCOMMON REQUIRED )
 ENDIF( APPLE )
 
 

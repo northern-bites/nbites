@@ -1,11 +1,5 @@
 
 ##
-# Includes
-##
-
-INCLUDE( ${CMAKE_MODULE_PATH}/base_definitions.cmake )
-
-##
 # Clear variables/caches
 ##
 

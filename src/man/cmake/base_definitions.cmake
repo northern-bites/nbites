@@ -129,7 +129,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 ########################### MODULE PATH
 # Set the path from which CMake should load modules
-SET( CMAKE_MODULE_PATH ${TRUNK_PATH}/cmake )
+#SET( CMAKE_MODULE_PATH ${TRUNK_PATH}/cmake )
 
 
 ############################ ROBOT TYPE
@@ -154,34 +154,9 @@ SET( OUTPUT_ROOT_DIR_BIN "${CMAKE_INSTALL_PREFIX}/bin" )
 SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc" )
 SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
 
-
-############################ PREFIX CONFIRUGATION
-# Depending on the robot and whether cross-compiling, the include and
-# library prefixes must be adjusted
-
-  # Nao
-IF( AL_DIR STREQUAL "" )
-  MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
-ENDIF( AL_DIR STREQUAL "" )
-
-IF( WIN32 )
-  SET( TARGET_ARCH "windows" )
-  SET( TARGET_HOST "TARGET_HOST_WINDOWS")
-ENDIF( WIN32 )
-
-IF( UNIX )
-  SET( TARGET_ARCH "linux")
-  SET( TARGET_HOST "TARGET_HOST_LINUX")
-  SET( PLATFORM_X86 1 )
-ENDIF( UNIX )
-
-IF( APPLE )
-  SET( TARGET_ARCH "macosx" )
-  SET( TARGET_HOST "TARGET_HOST_MACOSX")
-ENDIF( APPLE )
-
-
-INCLUDE( "${CMAKE_MODULE_PATH}/proxies.cmake" )
+#INCLUDE( "cmake/proxies.cmake" )
+########################### NB Common definitions
+include ( $ENV{NBITES_ROOT}/src/man/cmake/FindNBCOMMON.cmake )
 
 ########################## ADVANCED SETTINGS PREFERENCES
 # Set the cache variable that we would rather not appear on the normal
