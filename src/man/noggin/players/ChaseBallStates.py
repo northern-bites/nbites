@@ -7,11 +7,11 @@ from ..playbook.PBConstants import GOALIE
 from .. import NogginConstants as nogginConstants
 from man.noggin.typeDefs.Location import RobotLocation
 from man.noggin.kickDecider import KickInformation
+import ChaseBallConstants as constants
 
 def chase(player):
     """
-    Method to determine which chase state should be used.
-    We dump the robot into this state when we are switching from something else.
+    Super State to determine what to do from various situations
     """
     player.isChasing = True
     player.hasAlignedOnce = False
@@ -23,6 +23,9 @@ def chase(player):
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
     elif transitions.shouldKick(player):
+        player.stopWalking()
+        return player.goNow('decideKick')
+    elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
@@ -33,11 +36,13 @@ def goalieChase(player):
     """
     TODO: make goalie more aggressive (different transitions?)
     """
-
     # Check in order of importance
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
     elif transitions.shouldKick(player):
+        player.stopWalking();
+        return player.goNow('decideKick')
+    elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
@@ -55,8 +60,7 @@ def approachBall(player):
     if player.firstFrame():
         player.brain.nav.chaseBall()
         player.hasAlignedOnce = False
-
-    player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall()
 
     # Switch to other states if we should
     if player.penaltyKicking and \
@@ -69,8 +73,11 @@ def approachBall(player):
     elif transitions.shouldDribble(player):
         return player.goNow('dribble')
 
-    elif transitions.shouldKick(player) or \
-             transitions.shouldPositionForKick(player):
+    elif transitions.shouldKick(player):
+        player.stopWalking()
+        return player.goNow('decideKick')
+
+    elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
 
     elif player.brain.tracker.activeLocOn:
@@ -78,8 +85,6 @@ def approachBall(player):
             return player.goLater('scanFindBall')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif transitions.shouldSpinFindBallAgain(player):
-        return player.goLater('spinFindBall')
 
     return player.stay()
 
@@ -94,7 +99,7 @@ def decideKick(player):
 
     return player.stay()
 
-PFK_BALL_CLOSE_ENOUGH = 40
+PFK_BALL_CLOSE_ENOUGH = constants.BALL_PFK_MAX_X -10
 PFK_BALL_VISION_FRAMES = 15
 BUFFER_FRAMES_THRESHOLD = 3
 
@@ -106,13 +111,17 @@ def positionForKick(player):
         kick = player.brain.kickDecider.kickInfo.getKick()
         player.brain.kickDecider.currentKick = kick
 
+        # Re-initialize to clear data from decideKick???
+        player.brain.kickDecider.kickInfo = \
+            KickInformation.KickInformation(player)
+
         if kick is None:
             player.angleToOrbit = player.brain.kickDecider.kickInfo.orbitAngle
             return player.goLater('orbitBall')
 
-        # Re-initialize to clear data from decideKick???
-        player.brain.kickDecider.kickInfo = \
-            KickInformation.KickInformation(player)
+        if transitions.shouldKick(player):
+            player.stopWalking()
+            return player.goLater('kickBallExecute')
 
         player.brain.nav.kickPosition(kick)
         player.inKickingState = True
@@ -131,6 +140,7 @@ def positionForKick(player):
 
     # Leave this state if necessary
     if transitions.shouldKick(player):
+        player.stopWalking()
         return player.goNow('kickBallExecute')
 
     if player.brain.tracker.activeLocOn:
@@ -142,9 +152,9 @@ def positionForKick(player):
             player.inKickingState = False
             return player.goLater('scanFindBall')
 
-    if transitions.shouldApproachFromPositionForKick(player):
+    if transitions.shouldChaseFromPositionForKick(player):
         player.inKickingState = False
-        return player.goLater('approachBall')
+        return player.goLater('chase')
 
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldDribble(player):
@@ -163,14 +173,18 @@ def dribble(player):
     if player.firstFrame():
         player.brain.nav.dribble()
 
+    if transitions.shouldScanFindBall(player):
+        return player.goNow('scanFindBall')
     # if we should stop dribbling, see what else we should do
     if transitions.shouldStopDribbling(player):
-
         # may not be appropriate due to turned out feet...
+        if transitions.shouldKick(player):
+            player.stopWalking()
+            return player.goNow('decideKick')
         if transitions.shouldPositionForKick(player):
-            return player.goNow('positionForKick')
-        elif transitions.shouldApproachBall(player):
-            return player.goNow('approachBall')
+            return player.goNow('decideKick')
+        elif transitions.shouldChaseBall(player):
+            return player.goNow('chase')
 
     return player.stay()
 
@@ -191,11 +205,9 @@ def approachDangerousBall(player):
                 player.brain.nav.walk(0, -10, 0)
 
     if not goalTran.dangerousBall(player):
-        return player.goLater('approachBall')
+        return player.goLater('chase')
     if transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif transitions.shouldSpinFindBall(player):
-        return player.goLater('spinFindBall')
 
     return player.stay()
 
@@ -215,9 +227,12 @@ def orbitBall(player):
         player.brain.nav.orbitAngle(player.angleToOrbit)
         player.brain.tracker.trackBall()
 
-    if transitions.shouldApproachFromPositionForKick(player):
-        return player.goLater('approachBall')
+    if transitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+
+    if transitions.shouldChaseFromPositionForKick(player):
+        return player.goLater('chase')
 
     elif player.brain.nav.isStopped():
-        return player.goLater('approachBall')
+        return player.goLater('chase')
     return player.stay()

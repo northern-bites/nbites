@@ -9,32 +9,39 @@ from math import fabs
 
 ####### CHASING STUFF ##############
 
-def shouldApproachBall(player):
+def shouldChaseBall(player):
     """
-    Begin walking to the ball if it is close to straight in front of us
+    We see the ball. So go get it.
     """
     ball = player.brain.ball
     return (ball.framesOn > 0)
 
-def shouldApproachFromPositionForKick(player):
+def shouldApproachBall(player):
+    """
+    Go into Approach Ball if the ball is far away.
+    """
+    ball = player.brain.ball
+    return (ball.dist > constants.BALL_PFK_MAX_X)
+
+def shouldChaseFromPositionForKick(player):
     """
     Walk to the ball if its too far away
     """
     ball = player.brain.ball
-    return shouldApproachBall(player) and \
+    return shouldChaseBall(player) and \
         not shouldPositionForKick(player) and \
-        ball.dist > 40.0
+        ball.dist > constants.BALL_PFK_MAX_X
 
 def shouldPositionForKick(player):
     """
     Should begin aligning on the ball for a kick when close
     """
     ball = player.brain.ball
-    return (constants.BALL_POS_KICK_LEFT_Y > ball.relY > \
-            constants.BALL_POS_KICK_RIGHT_Y and \
-            constants.BALL_POS_KICK_MAX_X > ball.relX > \
-            constants.BALL_POS_KICK_MIN_X and \
-            fabs(ball.bearing) < constants.BALL_POS_KICK_BEARING_THRESH)
+    return (constants.BALL_PFK_LEFT_Y > ball.relY > \
+            constants.BALL_PFK_RIGHT_Y and \
+            constants.BALL_PFK_MAX_X > ball.relX > \
+            constants.BALL_PFK_MIN_X and \
+            fabs(ball.bearing) < constants.BALL_PFK_BEARING_THRESH)
 
 def shouldKick(player):
     """
@@ -47,7 +54,7 @@ def shouldKick(player):
         ball.on and \
         ball.relX > constants.SHOULD_KICK_CLOSE_X and \
         ball.relX < constants.SHOULD_KICK_FAR_X and \
-        fabs(ball.relY) < 10
+        fabs(ball.relY) < constants.SHOULD_KICK_Y
         # and player.counter < 1 ??
 
 def shouldDribble(player):

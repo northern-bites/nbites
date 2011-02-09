@@ -12,8 +12,8 @@ def scanFindBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
 
-    if transitions.shouldApproachBall(player):
-        return player.goNow('approachBall')
+    if transitions.shouldChaseBall(player):
+        return player.goNow('chase')
 
     # a time based check. may be a problem for goalie. if it's not good for him to
     # spin, he should prbly not be chaser anymore, so this wouldn't get reached
@@ -32,11 +32,11 @@ def scanFindBall(player):
 def spinFindBall(player):
     """
     State to spin to find the ball. If we find the ball, we
-    move to align on it. If we don't find it, we go to a garbage state
+    move to align on it. If we don't find it, we walk to look for it
     """
 
-    if transitions.shouldApproachBall(player):
-        return player.goNow('approachBall')
+    if transitions.shouldChaseBall(player):
+        return player.goNow('chase')
 
     if player.firstFrame():
         #if ball.on
@@ -54,6 +54,20 @@ def spinFindBall(player):
 
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldWalkToBallLocPos(player):
-            return player.goLater('approachBall')
+            # TODO: should have other state for this
+            return player.goLater('walkFindBall')
+
+    return player.stay()
+
+def walkFindBall(player):
+    """
+    State to walk to find the ball. If we find the ball we chase it.
+    """
+    if transitions.shouldChaseBall(player):
+        return player.goNow('chase')
+
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.brain.nav.chaseBall()
 
     return player.stay()
