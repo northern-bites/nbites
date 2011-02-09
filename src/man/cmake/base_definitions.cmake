@@ -139,10 +139,7 @@ IF( NOT DEFINED ROBOT_TYPE )
   SET( ROBOT_TYPE NAO_RL )
 ENDIF( NOT DEFINED ROBOT_TYPE )
 SET( ROBOT_TYPE ${ROBOT_TYPE} CACHE STRING "Robot type" )
-
 SET( ROBOT_PREFIX nao )
-SET( ROBOT_AIBO FALSE )
-SET( ROBOT_NAO  TRUE  )
 
 ############################ OUTPUT LOCATION
 # Define output directories.  Binaries, documentation, and libraries are
@@ -183,14 +180,6 @@ IF( APPLE )
   SET( TARGET_HOST "TARGET_HOST_MACOSX")
 ENDIF( APPLE )
 
-IF( OE_CROSS_BUILD )
-  SET( OE_CROSS_DIR "${AL_DIR}/crosstoolchain" )
-  SET( OE_SYSROOT "${OE_CROSS_DIR}/staging/geode-linux/" )
-ENDIF (OE_CROSS_BUILD )
-
-IF( FINAL_RELEASE )
-  ADD_DEFINITIONS(-DFINAL_RELEASE)
-ENDIF( FINAL_RELEASE )
 
 INCLUDE( "${CMAKE_MODULE_PATH}/proxies.cmake" )
 
