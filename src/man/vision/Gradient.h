@@ -55,28 +55,29 @@ public:
         return (d);
     }
 
+    // Values are all offset by one (see EdgeDetection.s)
     uint16_t getMagnitude(int i, int j){
-        return values[i * IMAGE_WIDTH + j + magnitudes];
+        return values[i * IMAGE_WIDTH + j + magnitudes + 1];
     }
 
     int16_t getX(int i, int j){
-        return values[i * IMAGE_WIDTH + j + x_grads];
+        return values[i * IMAGE_WIDTH + j + x_grads + 1];
     }
 
     int16_t getY(int i, int j){
-        return values[i * IMAGE_WIDTH + j + y_grads];
+        return values[i * IMAGE_WIDTH + j + y_grads + 1];
     }
 
     void setMagnitude(uint16_t v, int i, int j){
-        values[i * IMAGE_WIDTH + j + magnitudes] = v;
+        values[i * IMAGE_WIDTH + j + magnitudes + 1] = v;
     }
 
     void setX(int16_t v, int i, int j){
-        values[i * IMAGE_WIDTH + j + x_grads] = v;
+        values[i * IMAGE_WIDTH + j + x_grads + 1] = v;
     }
 
     void setY(int16_t v, int i, int j){
-        values[i * IMAGE_WIDTH + j + y_grads] = v;
+        values[i * IMAGE_WIDTH + j + y_grads + 1] = v;
     }
 
     // Public member variables
@@ -89,6 +90,8 @@ public:
         x_grads = IMAGE_WIDTH * IMAGE_HEIGHT,
         y_grads = IMAGE_WIDTH * IMAGE_HEIGHT * 2
     };
+
+    uint8_t *tangents;
 
     bool peaks[IMAGE_HEIGHT][IMAGE_WIDTH];
 

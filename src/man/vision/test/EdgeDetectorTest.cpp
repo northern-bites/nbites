@@ -68,10 +68,13 @@ int EdgeDetectorTest::test_sobel()
             c[(i) * IMAGE_WIDTH + j] = 0;
 
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
+
     edges.sobelOperator(c, g);
-    for (int i=0; i < IMAGE_HEIGHT; ++i)
-        for (int j=0; j < IMAGE_WIDTH; ++j)
+    for (int i=1; i < IMAGE_HEIGHT-1; ++i){
+        for (int j=1; j < IMAGE_WIDTH-1; ++j){
             EQ_INT(g->getMagnitude(i,j) , 0);
+        }
+    }
     PASSED(SOBEL_ZERO);
 
 
@@ -86,11 +89,7 @@ int EdgeDetectorTest::test_sobel()
 
     shared_ptr<Gradient> g2 = shared_ptr<Gradient>(new Gradient());
 
-#ifdef USE_MMX
-    _sobel_operator(DEFAULT_EDGE_VALUE, &c[0], g->values);
-#else
     edges.sobelOperator(c, g);
-#endif
     for (int i=1; i < IMAGE_HEIGHT-1; ++i)
         for (int j=1; j < IMAGE_WIDTH-1; ++j){
             int gx = ((c[(i-1) * IMAGE_WIDTH + j+1] +
@@ -115,10 +114,8 @@ int EdgeDetectorTest::test_sobel()
             gy = -gy;
 
             // The output gradients are shifted in by 1 value
-            int output_j = j+1;
-
-            EQ_INT(g->getX(i,output_j) , gx);
-            EQ_INT(g->getY(i,output_j) , gy);
+            EQ_INT(g->getX(i,j) , gx);
+            EQ_INT(g->getY(i,j) , gy);
 
             gx = gx << 3;
             gy = gy << 3;
@@ -134,8 +131,8 @@ int EdgeDetectorTest::test_sobel()
             // All non above threshold points are zero
             mag = max(0, mag-((DEFAULT_EDGE_VALUE*DEFAULT_EDGE_VALUE) >> 10));
 
-            EQ_INT(g->getMagnitude(i,output_j) , mag);
-            GTE(g->getMagnitude(i,output_j) , 0); // Useless with unsigned integers,
+            EQ_INT(g->getMagnitude(i,j) , mag);
+            GTE(g->getMagnitude(i,j) , 0); // Useless with unsigned integers,
                                    // but kept around for austerity
         }
     PASSED(SOBEL_ALL);

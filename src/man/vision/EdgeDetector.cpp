@@ -5,6 +5,9 @@
 #include <iostream>
 #include <stdio.h>
 
+extern "C" void _sobel_operator(const uint8_t thresh,
+                                const uint16_t *input,
+                                uint16_t *out);
 using boost::shared_ptr;
 using namespace std;
 
@@ -23,15 +26,6 @@ void EdgeDetector::detectEdges(const uint16_t* channel,
                                shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_EDGES);
-
-#ifdef USE_MMX
-    PROF_ENTER(profiler, P_SOBEL);
-    _sobel_operator(40, &channel[0], gradient->values);
-    PROF_EXIT(profiler, P_SOBEL);
-#else
-    sobelOperator(channel, gradient);
-#endif
-
     findPeaks(gradient);
     PROF_EXIT(profiler,P_EDGES);
 }
@@ -51,6 +45,9 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
                                  shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_SOBEL);
+#ifdef USE_MMX
+    _sobel_operator(default_edge_value, &channel[0], gradient->values);
+#else
     for (int i=1; i < Gradient::rows-1; ++i){
         for (int j=1; j < Gradient::cols-1; ++j) {
 
@@ -86,6 +83,7 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
             gradient->setMagnitude(static_cast<uint16_t>(mag), i, j);
         }
     }
+#endif /* USE_MMX */
     PROF_EXIT(profiler, P_SOBEL);
 }
 
