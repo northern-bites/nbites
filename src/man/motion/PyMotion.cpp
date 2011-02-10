@@ -35,6 +35,7 @@ using namespace boost::python;
 #include "SetHeadCommand.h"
 #include "CoordHeadCommand.h"
 #include "WalkCommand.h"
+#include "DestinationCommand.h"
 #include "Gait.h"
 #include "MotionInterface.h"
 #include "Kinematics.h"
@@ -46,7 +47,7 @@ static MotionInterface* interface_reference = 0;
 class PyHeadJointCommand {
 public:
     PyHeadJointCommand(float time, tuple joints,
-					   tuple stiffness, int interpolationType) {
+                       tuple stiffness, int interpolationType) {
 
         vector<float> * jointsVector = new vector<float>;
         vector<float> * head_stiffness = new vector<float>;
@@ -55,8 +56,8 @@ public:
         for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
             jointsVector->push_back(extract<float>(joints[i]) * TO_RAD);
 
-		for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
-			head_stiffness->push_back(extract<float>(stiffness[i]));
+        for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
+            head_stiffness->push_back(extract<float>(stiffness[i]));
 
         command = new HeadJointCommand(time, jointsVector, head_stiffness,
                       static_cast<InterpolationType>(interpolationType));
@@ -130,16 +131,16 @@ public:
         }
     }
 
-	float getStepValue(int i) {
-		if (i < WP::LEN_STEP_CONFIG) {
-			return step[i];
-		}
-		return 0;
-	}
+    float getStepValue(int i) {
+        if (i < WP::LEN_STEP_CONFIG) {
+            return step[i];
+        }
+        return 0;
+    }
 
 private:
     boost::shared_ptr<Gait> command;
-	float step[WP::LEN_STEP_CONFIG];
+    float step[WP::LEN_STEP_CONFIG];
 };
 
 class PyWalkCommand {
@@ -156,6 +157,23 @@ public:
 
 private:
     WalkCommand *command;
+};
+
+class PyDestinationCommand {
+public:
+    PyDestinationCommand(float x_cm, float m_cm, float theta_degs) {
+        //All python units should be in CM and DEG
+        //C++ is in mm and rads, so we need to convert
+        command = boost::shared_ptr<DestinationCommand>
+			(new DestinationCommand(x_cm*CM_TO_MM,
+									m_cm*CM_TO_MM,
+									theta_degs*TO_RAD));
+    }
+
+	boost::shared_ptr<DestinationCommand> getCommand() const { return command; }
+
+private:
+	boost::shared_ptr<DestinationCommand> command;
 };
 
 class PyStepCommand {
@@ -181,13 +199,13 @@ public:
     PyBodyJointCommand(float time,
                        tuple larmJoints, tuple llegJoints,
                        tuple rlegJoints, tuple rarmJoints,
-					   tuple stiffness,
+                       tuple stiffness,
                        int interpolationType) {
         vector<float> * larm = new vector<float>;
         vector<float> * lleg = new vector<float>;
         vector<float> * rleg = new vector<float>;
         vector<float> * rarm = new vector<float>;
-		vector<float> * body_stiffness = new vector<float>;
+        vector<float> * body_stiffness = new vector<float>;
 
         // The joints come in in degrees. Convert them to radians here
         for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++)
@@ -202,33 +220,33 @@ public:
         for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++)
             rarm->push_back(extract<float>(rarmJoints[i]) * TO_RAD);
 
-		for (unsigned int i=0; i < Kinematics::NUM_JOINTS; i++)
-			body_stiffness->push_back(extract<float>(stiffness[i]));
+        for (unsigned int i=0; i < Kinematics::NUM_JOINTS; i++)
+            body_stiffness->push_back(extract<float>(stiffness[i]));
 
         command = new BodyJointCommand(time, larm, lleg, rleg, rarm,
-									   body_stiffness,
-									   static_cast<InterpolationType>(interpolationType));
+                                       body_stiffness,
+                                       static_cast<InterpolationType>(interpolationType));
     }
 
-	// Single chain command
-	PyBodyJointCommand(float time,
-					   int chainID, tuple chainJoints,
-					   tuple stiffness,
-					   int interpolationType) {
+    // Single chain command
+    PyBodyJointCommand(float time,
+                       int chainID, tuple chainJoints,
+                       tuple stiffness,
+                       int interpolationType) {
         vector<float> * chain = new vector<float>;
-		vector<float> * body_stiffness = new vector<float>;
+        vector<float> * body_stiffness = new vector<float>;
 
         // The joints come in in degrees. Convert them to radians here
         for (unsigned int i=0; i < chain_lengths[chainID] ; i++)
             chain->push_back(extract<float>(chainJoints[i]) * TO_RAD);
 
-		for (unsigned int i=0; i < Kinematics::NUM_BODY_JOINTS; i++)
-			body_stiffness->push_back(extract<float>(stiffness[i]));
+        for (unsigned int i=0; i < Kinematics::NUM_BODY_JOINTS; i++)
+            body_stiffness->push_back(extract<float>(stiffness[i]));
 
         command = new BodyJointCommand(time, static_cast<ChainID>(chainID),
-									   chain, body_stiffness,
-									   static_cast<InterpolationType>(interpolationType));
-	}
+                                       chain, body_stiffness,
+                                       static_cast<InterpolationType>(interpolationType));
+    }
 
 
     BodyJointCommand* getCommand() const { return command; }
@@ -244,10 +262,10 @@ public:
         command = new SetHeadCommand(yaw * TO_RAD, pitch * TO_RAD);
     }
 
-	PySetHeadCommand(const float yaw, const float pitch,
-					 const float maxYawSpeed, const float maxPitchSpeed) {
+    PySetHeadCommand(const float yaw, const float pitch,
+                     const float maxYawSpeed, const float maxPitchSpeed) {
         command = new SetHeadCommand(yaw * TO_RAD, pitch * TO_RAD,
-									 maxYawSpeed * TO_RAD, maxPitchSpeed * TO_RAD);
+                                     maxYawSpeed * TO_RAD, maxPitchSpeed * TO_RAD);
     }
 
     SetHeadCommand* getCommand() const { return command; }
@@ -257,12 +275,12 @@ private:
 
 class PyCoordHeadCommand {
 public:
-	PyCoordHeadCommand( const float yaw,
-						const float pitch ) {
+    PyCoordHeadCommand( const float yaw,
+                        const float pitch ) {
         command = new CoordHeadCommand( yaw, pitch );
     }
-	PyCoordHeadCommand( const float yaw,
-						const float pitch,
+    PyCoordHeadCommand( const float yaw,
+                        const float pitch,
                         const float maxYawSpeed,
                         const float maxPitchSpeed ) {
         command = new CoordHeadCommand( yaw, pitch,
@@ -310,6 +328,9 @@ public:
     void setNextWalkCommand(const PyWalkCommand *command) {
         motionInterface->setNextWalkCommand(command->getCommand());
     }
+	void sendDestCommand(const PyDestinationCommand *command) {
+		motionInterface->sendDestCommand(command->getCommand());
+	}
     void sendStepCommand(const PyStepCommand *command) {
         motionInterface->sendStepCommand(command->getCommand());
     }
@@ -332,9 +353,9 @@ public:
         return motionInterface->isWalkActive();
     }
 
-	bool isBodyActive() {
-		return motionInterface->isBodyActive();
-	}
+    bool isBodyActive() {
+        return motionInterface->isBodyActive();
+    }
 
     void resetWalkProvider(){
         motionInterface->resetWalkProvider();
@@ -383,48 +404,55 @@ BOOST_PYTHON_MODULE(_motion)
  "A container for a head joint command passed to the motion engine"))
         ;
     class_<PyGaitCommand>("GaitCommand",
-						  init<
+                          init<
                            tuple, tuple, tuple, tuple,
                            tuple, tuple, tuple, tuple>
-						  (args("stance,step,zmp,joint_hack,sensor,"
+                          (args("stance,step,zmp,joint_hack,sensor,"
                                   "stiffness,odo,arms"),
                              "Parameterization of the"
                              " walk engine"))
         .def("getStepValue", &PyGaitCommand::getStepValue)
-		;
+        ;
     class_<PyBodyJointCommand>("BodyJointCommand",
                                init<float, tuple, tuple, tuple,
-							        tuple, tuple, int>(
-								   "A container for a body joint command passed to the motion engine"))
-		.def(init<float, int, tuple, tuple, int>( // Single chain command
-				 args("time","chainID", "joints","body_stiffness","interpolation"),
-				 "A container for a body joint command passed to the motion engine"))
-		;
+                                    tuple, tuple, int>(
+                                   "A container for a body joint command passed to the motion engine"))
+        .def(init<float, int, tuple, tuple, int>( // Single chain command
+                 args("time","chainID", "joints","body_stiffness","interpolation"),
+                 "A container for a body joint command passed to the motion engine"))
+        ;
     class_<PySetHeadCommand>("SetHeadCommand",
                              init<float, float>(args("yaw", "pitch"),
  "A container for a set head command. Holds yaw and pitch angles in degrees."))
-		.def(init<float,float,float,float>(args("yaw","pitch",
-												"maxYawSpeed","maxPitchSpeed")))
+        .def(init<float,float,float,float>(args("yaw","pitch",
+                                                "maxYawSpeed","maxPitchSpeed")))
         ;
 
     class_<PyCoordHeadCommand>("CoordHeadCommand",
-							   init<float, float>
-							   (args("yaw", "bearing"),
-								"A container for a coord head command."))
-		.def(init<float, float, float, float> (
+                               init<float, float>
+                               (args("yaw", "bearing"),
+                                "A container for a coord head command."))
+        .def(init<float, float, float, float> (
                  args( "yaw", "bearing",
                        "maxYawSpeed", "maxPitchSpeed")))
-		;
+        ;
 
     class_<PyWalkCommand>("WalkCommand",
                           init<float, float, float>(args("x","y","theta"),
  "A container for a walk command. Holds an x, y and theta which represents a"
  " walk vector"))
         ;
+
+    class_<PyDestinationCommand>("DestinationCommand",
+                          init<float, float, float>(args("x","y","theta"),
+ "A container for a destination command. Holds an x, y and theta which represent a"
+ " destination relative to the origin of the robot"))
+        ;
+
     class_<PyStepCommand>("StepCommand",
                           init<float, float, float, int>(args("x","y","theta",
                                                               "numSteps"),
- "A container for a step command. Holds an x, y and theta which represents a"
+ "A container for a step command. Holds an x, y and theta which represent a"
  " walk vector, in addition to the number of desired steps."))
         ;
 
@@ -444,14 +472,15 @@ BOOST_PYTHON_MODULE(_motion)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("sendStepCommand", &PyMotionInterface::sendStepCommand)
+		.def("sendDestCommand", &PyMotionInterface::sendDestCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead", &PyMotionInterface::setHead)
-		.def("coordHead", &PyMotionInterface::coordHead)
+        .def("coordHead", &PyMotionInterface::coordHead)
         .def("sendFreezeCommand",frz1)
         .def("sendFreezeCommand",frz2)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
         .def("isHeadActive", &PyMotionInterface::isHeadActive)
-		.def("isBodyActive", &PyMotionInterface::isBodyActive)
+        .def("isBodyActive", &PyMotionInterface::isBodyActive)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
         .def("resetWalk", &PyMotionInterface::resetWalkProvider)

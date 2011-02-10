@@ -51,6 +51,7 @@
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
 #include "WalkCommand.h"
+#include "DestinationCommand.h"
 #include "Gait.h"
 #include "SetHeadCommand.h"
 #include "CoordHeadCommand.h"
@@ -78,6 +79,7 @@ public:
 	void sendMotionCommand(const boost::shared_ptr<Gait> command);
 	void sendMotionCommand(const SetHeadCommand* command);
 	void sendMotionCommand(const CoordHeadCommand* command);
+	void sendMotionCommand(const boost::shared_ptr<DestinationCommand> command);
 	void sendMotionCommand(const boost::shared_ptr<FreezeCommand> command);
 	void sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command);
 	void sendMotionCommand(const boost::shared_ptr<StepCommand> command);

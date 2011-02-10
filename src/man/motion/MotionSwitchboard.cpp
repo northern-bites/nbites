@@ -730,6 +730,14 @@ void MotionSwitchboard::sendMotionCommand(const WalkCommand *command){
     pthread_mutex_unlock(&next_provider_mutex);
 
 }
+void MotionSwitchboard::sendMotionCommand(
+	const boost::shared_ptr<DestinationCommand> command) {
+    pthread_mutex_lock(&next_provider_mutex);
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
+
+}
 void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
     pthread_mutex_lock(&next_provider_mutex);
 	noWalkTransitionCommand = true;

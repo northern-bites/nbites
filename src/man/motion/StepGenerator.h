@@ -183,6 +183,8 @@ private:
 
     bool done;
 
+	bool hasDestination;
+
     SensorAngles sensorAngles;
 
     NBMath::ufvector3 com_i,joints_com_i,last_com_c,com_f,est_zmp_i;

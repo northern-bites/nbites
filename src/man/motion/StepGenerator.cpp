@@ -42,6 +42,7 @@ using namespace NBMath;
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
     done(true),
+	hasDestination(false),
     sensorAngles(s,_gait),
     com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     joints_com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
@@ -132,8 +133,9 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     while (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES ||
            // VERY IMPORTANT: make sure we have enough ZMPed steps
            currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS) {
-        if (futureSteps.size() == 0){
-            generateStep(x, y, theta); // replenish with the current walk vector
+        if (futureSteps.size() == 0 && !hasDestination){
+			// replenish with the current walk vector, when we don't have a destination
+            generateStep(x, y, theta);
         }
         else {
             shared_ptr<Step> nextStep = futureSteps.front();
@@ -668,10 +670,10 @@ void StepGenerator::setSpeed(const float _x, const float _y,
  * Note: this method works by calling takeSteps several times with appropriate values
  */
 void StepGenerator::setDestination(const float rel_x, const float rel_y,
-                                   const float rel_theta) {
-    clearFutureSteps();
-
-
+								   const float rel_theta) {
+	hasDestination = true;
+	clearFutureSteps();
+	cout << "StepGenerator::setDestination() called" << endl;
 }
 
 /**

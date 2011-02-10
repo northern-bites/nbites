@@ -142,6 +142,19 @@ class Navigator(FSA.FSA):
         self.updatedTrajectory = True
         self.switchTo('walking')
 
+    def setDest(self, x, y, theta):
+        """
+        Sets a new destination
+        Always does something, since destinations are relative and time sensitive
+        """
+
+        self.destX = x
+        self.destY = y
+        self.destTheta = theta
+
+        self.hasDestination = True
+        self.switchTo('destWalking')
+
     def takeSteps(self, x, y, theta, numSteps):
         """
         Set the step commands

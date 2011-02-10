@@ -46,9 +46,9 @@
 #include "MetaGait.h"
 #include "BodyJointCommand.h"
 #include "StepCommand.h"
+#include "DestinationCommand.h"
 
 #include "Profiler.h"
-
 
 //NOTE: we need to get passed a reference to the switchboard so we can
 //know the length of a motion frame!!
@@ -70,6 +70,7 @@ public:
             pthread_mutex_unlock(&walk_provider_mutex);
         }
 	void setCommand(const WalkCommand * command);
+	void setCommand(const boost::shared_ptr<DestinationCommand> command);
 	void setCommand(const boost::shared_ptr<Gait> command);
 	void setCommand(const boost::shared_ptr<StepCommand> command);
 
@@ -95,12 +96,14 @@ private:
     StepGenerator stepGenerator;
     bool pendingCommands;
     bool pendingStepCommands;
+	bool pendingDestCommands;
     bool pendingGaitCommands;
     bool pendingStartGaitCommands;
 
     mutable pthread_mutex_t walk_provider_mutex;
     const WalkCommand * nextCommand;
-     boost::shared_ptr<StepCommand> nextStepCommand;
+    boost::shared_ptr<StepCommand> nextStepCommand;
+	boost::shared_ptr<DestinationCommand> nextDestCommand;
 
 };
 
