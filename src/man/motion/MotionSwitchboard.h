@@ -37,7 +37,6 @@
 
 #include "motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
 
-#include "MCL.h"
 #include "Kinematics.h"
 #include "WalkProvider.h"
 #include "WalkingConstants.h"
@@ -59,7 +58,6 @@
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
 #endif
-
 
 class MotionSwitchboard {
 public:
@@ -110,7 +108,7 @@ private:
     void preProcessBody();
     void processHeadJoints();
     void processBodyJoints();
-    void clipHeadJoints(vector<float>& joints);
+    void clipHeadJoints(std::vector<float>& joints);
     void safetyCheckJoints();
     void swapBodyProvider();
     void swapHeadProvider();

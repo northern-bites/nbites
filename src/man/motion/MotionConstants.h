@@ -29,6 +29,7 @@ namespace MotionConstants {
 	enum MotionType {
 		WALK = 0,
         STEP,
+		DESTINATION,
 		BODY_JOINT,
 		HEAD_JOINT,
         GAIT,
