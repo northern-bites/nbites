@@ -33,18 +33,42 @@ def gamePenalized(player):
 def goalieDecisionTest(player):
     ball = player.brain.ball
     my = player.brain.my
+    dx = 0
+    frameNum = -1
+    framesTillLevel = -1
 
-    if player.counter % 100 != 0:
+    if ball.framesOn > 0 :
+        currentX = ball.relX
+        currentY = ball.relY
+        previousX = ball.lastRelX
+        previousY = ball.lastRelY
+        frameNum = player.counter
+        
+        dx = previousX - currentX
+        dy = previousY - currentY
+        
+    if (dx != 0 and ball.framesOn > 0):
+        changesX = currentX/dx
+        framesTillLevel = 1 * int(changesX)
+        endY = currentY - (changesX * dy)
+    
+    if player.counter != (frameNum + framesTillLevel):
         return player.stay()
-
-    if( ball.relY > goalCon.CENTER_SAVE_THRESH):
-        print "Should be saving right "
-        player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
-    elif( ball.relY <  -goalCon.CENTER_SAVE_THRESH):
-        print "Should be saving left "
-        player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
     else:
-        print "Should be saving center "
-        player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE) 
-
+        if( endY > goalCon.CENTER_SAVE_THRESH):
+            print "Should be saving right "
+            print endY
+            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
+            frameNum = 0
+        elif( endY  <  -goalCon.CENTER_SAVE_THRESH):
+            print "Should be saving left "
+            print endY
+            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
+            frameNum = 0
+        else:
+            print "Should be saving center "
+            print endY
+            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE) 
+            frameNum = 0
+                
     return player.stay()

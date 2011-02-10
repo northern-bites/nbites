@@ -58,6 +58,8 @@ class Ball(VisualObject):
          self.lastVisionCenterY,
          self.lastVisionAngleX,
          self.lastVisionAngleY,
+         self.lastRelX,
+         self.lastRelY,
          self.lastSeenDist,
          self.lastSeenBearing) = [0]*Constants.NUM_TOTAL_BALL_VALUES
 
@@ -132,6 +134,9 @@ class Ball(VisualObject):
             self.dist = self.locDist
             # uses my.x, my.y which are loc determined to get heading
             self.heading = my.headingTo(self, forceCalc=True)
+
+        self.lastRelX = self.relX
+        self.lastRelY = self.relY
 
         self.relX = getRelativeX(self.dist, self.bearing)
         self.relY = getRelativeY(self.dist, self.bearing)
