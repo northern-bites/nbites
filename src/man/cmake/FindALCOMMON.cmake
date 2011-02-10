@@ -1,4 +1,3 @@
-SET( ALCOMMON_DEFINITIONS "" )
 
 ##
 # Includes

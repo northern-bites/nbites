@@ -127,11 +127,6 @@ IF(COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 
-########################### MODULE PATH
-# Set the path from which CMake should load modules
-#SET( CMAKE_MODULE_PATH ${TRUNK_PATH}/cmake )
-
-
 ############################ ROBOT TYPE
 # Definitions for the type of robot (for compilation definitions), and
 # prefixes for library, executable, and path names
@@ -154,7 +149,6 @@ SET( OUTPUT_ROOT_DIR_BIN "${CMAKE_INSTALL_PREFIX}/bin" )
 SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc" )
 SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
 
-#INCLUDE( "cmake/proxies.cmake" )
 ########################### NB Common definitions
 include ( $ENV{NBITES_ROOT}/src/man/cmake/FindNBCOMMON.cmake )
 

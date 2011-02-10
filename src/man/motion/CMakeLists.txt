@@ -15,15 +15,9 @@ INCLUDE( ../cmake/base_definitions.cmake )
 # usefull to your project
 FIND_PACKAGE( Threads  REQUIRED )
 FIND_PACKAGE( PythonLibs   REQUIRED )
+FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
 
-IF( APPLE )
-  MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
- #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
- #when we want to compile just the vision/sensors libraries for the TOOL
-#  FIND_PACKAGE( ALCOMMON )
-ELSE( APPLE )
-#  FIND_PACKAGE( ALCOMMON REQUIRED )
-ENDIF( APPLE )
+include( ../cmake/FindALCOMMON.cmake )
 
 
 ############################ BUILDCONFIG
@@ -40,18 +34,15 @@ CONFIGURE_FILE(
 
 ############################ DEFINITIONS
 # Add here definition needed.
-ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
-                 ${ALCOMMON_DEFINITIONS}
-                 ${PTHREAD_DEFINITIONS}
-                 ${PYTHON_DEFINITIONS}
-                 )
+ADD_DEFINITIONS( 
+               ${CMAKE_THREAD_LIBS_INIT}
+               )
 
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${ALCOMMON_INCLUDE_DIR}
-                     ${PTHREAD_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_DIR}
                      ${CORPUS_INCLUDE_DIR}
 		     ${CFG_DIR}
@@ -173,11 +164,10 @@ INSTALL(
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES(
   ${MOTION_TARGET}
-  ${NBCOMMON_LIBRARIES}
   ${ALCOMMON_LIBRARIES}
-  ${PTHREAD_LIBRARIES}
-  ${PYTHON_LIBRARIES}
+  ${PYTHON_LIBRARY}
   ${SENSORS_TARGET}
+  ${Boost_PYTHON_LIBRARY}
   )
 
 

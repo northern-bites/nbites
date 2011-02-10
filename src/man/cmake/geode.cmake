@@ -16,6 +16,9 @@ IF( NOT EXISTS ${AL_DIR} )
     )
 ENDIF( NOT EXISTS ${AL_DIR} )
 
+############################ DEFINES && DEFINITIONS
+SET( OE_CROSS_BUILD ON )
+
 ############################# CROSS-COMPILATION VARIABLES
 # Set the variable for the cross-compilation directory, cmake variables
 

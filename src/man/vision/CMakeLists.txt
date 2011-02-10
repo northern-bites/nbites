@@ -47,11 +47,6 @@ CONFIGURE_FILE(
   )
 
 
-############################ DEFINITION
-# Add here definition needed.
-ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS} ${PYTHON_DEFINITIONS} )
-
-
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
@@ -133,16 +128,18 @@ INSTALL(
   )
 
 ############################ SET LIBRARIES TO LINK WITH
-TARGET_LINK_LIBRARIES( ${VISION_TARGET} ${PYTHON_LIBRARIES} )
+TARGET_LINK_LIBRARIES( 
+  ${VISION_TARGET} 
+  ${PYTHON_LIBRARY} )
 
 
 ############################ VISIONLINK
 IF( VISIONLINK )
 
-  FIND_PACKAGE( JAVA REQUIRED )
+  FIND_PACKAGE( JNI REQUIRED )
 
   INCLUDE_DIRECTORIES( ${VISIONLINK_HEADER_DIR} 
-                       ${JAVA_INCLUDE_DIR} )
+                       ${JNI_INCLUDE_DIRS} )
   
   SET( VISIONLINK_SRCS ${VISIONLINK_FILE})
   ADD_LIBRARY(

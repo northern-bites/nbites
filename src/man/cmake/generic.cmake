@@ -16,6 +16,9 @@ IF( NOT EXISTS ${AL_DIR} )
     )
 ENDIF( NOT EXISTS ${AL_DIR} )
 
+########################## DEFINES & DEFINITIONS
+SET( STRAIGHT_BUILD ON )
+
 ########################## PLATFORM
 IF( WIN32 )
   SET( TARGET_ARCH "windows" )
@@ -31,17 +34,18 @@ ENDIF( UNIX )
 IF( APPLE )
   SET( TARGET_ARCH "macosx" )
   SET( TARGET_HOST "TARGET_HOST_MACOSX")
+  include( FindFINK.cmake )
 ENDIF( APPLE )
 
 ########################## FIND PATH
 # we should look in the naoqi sdk folder for the libraries we need first
 # so we use the same version as on the robot
-SET(CMAKE_FIND_ROOT_PATH  ${AL_DIR} )
+SET( CMAKE_FIND_ROOT_PATH  ${AL_DIR} )
 
 # search for programs in the system root
-SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+SET( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER )
 # for libraries and headers in the nao sdk preferably, if not defaults to
 # system root
-SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
-SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
-SET(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+SET( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH )
+SET( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH )
+SET( CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH )

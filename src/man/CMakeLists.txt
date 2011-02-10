@@ -31,31 +31,19 @@ INCLUDE( cmake/base_definitions.cmake )
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
-#FIND_PACKAGE( NBCOMMON REQUIRED )
-include ( cmake/FindNBCOMMON.cmake )
 FIND_PACKAGE( PythonLibs  REQUIRED )
+
+SET(CMAKE_THREADS_PREFER_PTHREADS ON)
 FIND_PACKAGE( Threads  REQUIRED )
-FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
 
-IF(APPLE)
-  FIND_PACKAGE( FINK )
-ENDIF(APPLE)
-
-IF(WIN32 AND NOT OE_CROSS_BUILD)
-  FIND_PACKAGE( MINGW )
-ENDIF(WIN32 AND NOT OE_CROSS_BUILD)
+SET(Boost_USE_MULTITHREADED ON)
+SET(Boost_USE_STATIC_LIBS OFF)
+FIND_PACKAGE( Boost REQUIRED )
 
 IF(WEBOTS_BACKEND)
-  FIND_PACKAGE(WEBOTS)
+  include ( cmake/FindWEBOTS.cmake )
 ELSE(WEBOTS_BACKEND)
-  IF( APPLE )
-    MESSAGE( STATUS "WARNING - Apple OS, some compilation may fail")
-    #On MAC OS X, we need to build w/o linking against non-existant ALCOMMON libs
-    #when we want to compile just the vision/sensors libraries for the TOOL
-    include ( cmake/FindALCOMMON.cmake )
-  ELSE( APPLE )
-    include ( cmake/FindALCOMMON.cmake )
-  ENDIF( APPLE )
+  include ( cmake/FindALCOMMON.cmake )
 ENDIF(WEBOTS_BACKEND)
 
 ############################ BUILDCONFIG
@@ -121,7 +109,7 @@ SET( COLOR_TABLE
 #upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(
   ${MAN_CMAKE_DIR}/upload.sh.in
-  ${CFG_DIR}/upload.sh
+  ${CMAKE_CURRENT_BINARY_DIR}/upload.sh
   ESCAPE_QUOTES
   )
 
@@ -134,22 +122,19 @@ CONFIGURE_FILE(
 
 ############################ DEFINITIONS
 # Add here definition needed.
-ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS}
-  ${ALCOMMON_DEFINITIONS}
-  ${PTHREAD_DEFINITIONS}
-  ${PYTHON_DEFINITIONS}
+ADD_DEFINITIONS(
+  ${CMAKE_THREAD_LIBS_INIT}
   ${WEBOTS_DEFINITIONS}
   )
 
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
-INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
-  ${PTHREAD_INCLUDE_DIR}
+INCLUDE_DIRECTORIES( 
+  ${NBCOMMON_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIR}
   ${PYTHON_INCLUDE_DIR}
-  ${BOOST_INCLUDE_DIR}
   ${ALCOMMON_INCLUDE_DIR}
-  ${FINK_INCLUDE_DIR}
   ${MINGW_INCLUDE_DIR}
   ${COMM_INCLUDE_DIR}
   ${CORPUS_INCLUDE_DIR}
@@ -157,7 +142,6 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
   ${NOGGIN_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${WEBOTS_INCLUDE_DIR}
-  ${INCLUDE_CONFIG_DIR}
   ${CFG_DIR}
   )
 
@@ -208,12 +192,11 @@ INSTALL(
   CONFIGURATIONS "" Debug Release
   )
 
+MESSAGE( STATUS "poop ${BOOST_PYTHON_LIBRARY}" )
+
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES(
   ${MAN_TARGET}
-  ${NBCOMMON_LIBRARIES}
-  ${PTHREAD_LIBRARIES}
-  ${PYTHON_LIBRARIES}
   ${ALCOMMON_LIBRARIES}
   ${COMM_TARGET}
   ${SENSORS_TARGET}
@@ -224,7 +207,6 @@ TARGET_LINK_LIBRARIES(
   ${MOTION_TARGET}
   ${NOGGIN_TARGET}
   ${WEBOTS_LIBRARIES}
-  ${BOOST_LIBRARIES}
   )
 
 ############################ (SUB)DIRECTORY COMPILATION

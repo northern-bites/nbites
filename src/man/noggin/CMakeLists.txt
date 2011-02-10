@@ -19,7 +19,7 @@ INCLUDE( ../cmake/base_definitions.cmake )
 # Libraries specifics. Define here cmake packages
 # usefull to your project
 FIND_PACKAGE( PythonLibs   REQUIRED )
-
+FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
 
 ############################ BUILDCONFIG
 # Include the config file for this build
@@ -59,12 +59,6 @@ CONFIGURE_FILE(
   WebotsConfig.py
   )
 
-############################ DEFINITION
-# Add here definition needed.
-ADD_DEFINITIONS( ${NBCOMMON_DEFINITIONS} ${PYTHON_DEFINITIONS}
-                 ${VISION_DEFINITIONS} )
-
-
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
@@ -72,6 +66,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${VISION_INCLUDE_DIR}
                      ${CORPUS_INCLUDE_DIR}
                      ${CFG_DIR}
+		     ${BOOST_INCLUDE_DIR}
                      )
 
 
@@ -140,7 +135,7 @@ INSTALL(
 # For Mac's, set the target link language to use
 
 #IF( APPLE )
-  SET_TARGET_PROPERTIES(
+SET_TARGET_PROPERTIES(
     ${NOGGIN_TARGET}
     PROPERTIES LINKER_LANGUAGE CXX
     )
@@ -150,10 +145,10 @@ INSTALL(
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES(
   ${NOGGIN_TARGET}
-  ${NBCOMMON_LIBRARIES}
-  ${PYTHON_LIBRARIES}
+  ${PYTHON_LIBRARY}
   ${VISION_TARGET}
   ${SENSORS_TARGET}
+  ${Boost_PYTHON_LIBRARY}
   )
 
 
