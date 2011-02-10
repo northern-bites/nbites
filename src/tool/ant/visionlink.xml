@@ -7,11 +7,12 @@
   <property name="visionlink.header.dir" location="${build.dir}"/>
   <property name="visionlink.build.dir" location="${build.dir}/visionlink"/>
   <property name="visionlink.target" value="TOOLVisionLink"/>
-  <property name="visionlink.target.dir" value="${visionlink.build.dir}/cmake.vision"/>
-  <property name="man.cmake.dir" value="${man.dir}/cmake.man"/>
+  <property name="visionlink.target.dir" value="${visionlink.build.dir}"/>
+  <property name="man.cmake.dir" value="${man.dir}"/>
+  <property name="straight.toolchain" value="${man.dir}/cmake/generic.cmake" />
   <!-- cmake definitions -->
   <property name="crossoff.def" value="-DOE_CROSS_BUILD:BOOL=OFF"/>
-  <property name="straight.def" value="-DSTRAIGHT:BOOL=ON"/>
+  <property name="straight.def" value="-DCMAKE_TOOLCHAIN_FILE=${straight.toolchain}"/>
   <property name="nozlib.def" value="-DNO_ZLIB:BOOL=ON"/>
   <property name="offline.def" value="-DOFFLINE:BOOL=ON"/>
   <property name="visionlink.def" value="-DVISIONLINK:BOOL=ON" />
