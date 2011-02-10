@@ -122,6 +122,9 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
 void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_EDGE_PEAKS);
+#ifdef USE_MMX
+    _find_edge_peaks(gradient->values, gradient->angles);
+#else
     /**************** IMPORTANT NOTE: **********************
      *
      * These checks exclude the last 2 rows and columns because
@@ -158,6 +161,7 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
             }
         }
     }
+#endif
     PROF_EXIT(profiler, P_EDGE_PEAKS);
 }
 

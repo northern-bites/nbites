@@ -29,8 +29,8 @@ outImg:
 #
         ## Parameter struct
                 .struct 8
-gradients:      .skip 4
-angles:
+gradients_param:      .skip 4
+angles_param:
 
         ## Stack layout
                 .struct 0
@@ -38,7 +38,7 @@ row_count:      .skip 4
 angles_ptr:     .skip 4
 end_of_peak_stack:
 
-        .section .data
+        .section        .data
 #
 # Octant code in edx:
 #       \ -1  -2|2   3  /
@@ -50,7 +50,9 @@ end_of_peak_stack:
 #           /   |   \
 #      -11/     |     \-7
 #       / -9 -10|-6  -5 \
+        .equiv neighborOffset, 13*4
                                         # edx (octant code)
+neighborTable: .long .
         .int            - xPitch        # -12
         .int    -yPitch - xPitch        # -11
         .int    -yPitch                 # -10
@@ -63,12 +65,15 @@ end_of_peak_stack:
         .int     yPitch - xPitch        #  -3
         .int     yPitch                 #  -2
         .int     yPitch - xPitch        #  -1
-neighborTable:
+
         .int              xPitch        #   0
         .int     yPitch + xPitch        #   1
         .int     yPitch                 #   2
         .int     yPitch + xPitch        #   3
 
+        .equiv quadrantOffset, 13
+
+quadrantTable: .long .
         .byte   0x80                    # -12
         .byte   0x80                    # -11
         .byte   0xC0                    # -10
@@ -81,12 +86,15 @@ neighborTable:
         .byte   0x80                    #  -3
         .byte   0x40                    #  -2
         .byte   0x40                    #  -1
-quadrantTable:
+
         .byte   0x00                    #   0
         .byte   0x00                    #   1
         .byte   0x40                    #   2
         .byte   0x40                    #   3
 
+        .equiv octantOffset, 13
+
+octantTable: .long .
         .byte    0                      # -12
         .byte    0                      # -11
         .byte   -1                      # -10
@@ -99,7 +107,7 @@ quadrantTable:
         .byte   -1                      #  -3
         .byte    0                      #  -2
         .byte    0                      #  -1
-octantTable:
+
         .byte    0                      #   0
         .byte    0                      #   1
         .byte   -1                      #   2
@@ -126,7 +134,7 @@ octantTable:
 ## doubled. It's doubled again to get 0x40000 because we want 17
 ## bits of reciprocal so that we can then round off the result to
 ## the final 16 bits we want.
-recipTable:
+recipTable: .long .
         .word   0xFFFF          # i = 0.5 will overflow, so just use the max value
         index = 3               # start at i = 1.5
         .rept   255             # step i from 1.5 to 255.5
@@ -278,22 +286,21 @@ sobel_xLoop:
         ##      ecx     x index counter
         ##      edi     gradient values pointer
         ##      esi
-        ##      ebp     offset to gradient direction neigbhors for peak test
+        ##      ebp     offset to gradient direction neighbors for peak test
         ##
         ## Stack:
         ##      [esp]       y index counter
 
 _find_edge_peaks:
-
+        ## Load output address
         push    ebp
+
+        mov     edi, dword ptr[esp + gradients_param]
+        mov     eax, dword ptr[esp + angles_param]
 
         push    esi
         push    edi
         push    ebx
-
-        ## Load output address
-        mov     esi, [esp + gradients]
-        mov     eax, [esp + angles]
 
         sub     esp, end_of_peak_stack
         mov     dword ptr[esp + angles_ptr], eax
@@ -349,13 +356,13 @@ peaks_xLoop:
         adc     edx, edx
 
         # Lookup offset of neighbors
-        mov     ebp, [neighborTable + edx]
+        mov     ebp, [neighborTable + edx*4 + neighborOffset]
 
         # Peak?
-        movzx   esi, word ptr[edi + ebp*2 - xPitch]
+        movzx   esi, word ptr[edi + ebp - xPitch]
         neg     ebp
-        cmp     si, word ptr[edi + ebp*2 - xPitch]
-        cmovb   si, word ptr[edi + ebp*2 - xPitch]
+        cmp     si, word ptr[edi + ebp - xPitch]
+        cmovb   si, word ptr[edi + ebp - xPitch]
         cmp     si, word ptr[edi - xPitch]
         jb      peaks_xLoop
 
@@ -366,14 +373,14 @@ peaks_xLoop:
         ## of binary angle are looked up from octant code in edx.
         shr     eax, 4
         movzx   eax, word ptr [recipTable + eax*2]      # lookup reciprocal,
-                                                        # U16.16
+_seg:                                                        # U16.16
         imul    eax, ebx                # y/x, U32.21
         shr     eax, 14                 # y/x, U32.7 (129-element table)
         movzx   eax, byte ptr [atanTable + eax] # lookup arc tangent
-        xor     al, byte ptr[octantTable + edx] # negate arc tangent for
+        xor     al, byte ptr[octantTable + edx + octantOffset] # negate arc tangent for
                                                 # appropriate octants
-        sub     al, byte ptr[octantTable + edx]
-        add     al, byte ptr[quadrantTable + edx]       # get 8-bit binary angle
+        sub     al, byte ptr[octantTable + edx + octantOffset]
+        add     al, byte ptr[quadrantTable + edx + quadrantOffset]       # get 8-bit binary angle
 
         # Write binary angle (in a, also eax),
         # x coord (from ecx), y coord (on stack)
@@ -396,7 +403,6 @@ peaks_xLoop:
         add     dword ptr[esp + angles_ptr], 6
 
         ## Adjust counters
-        dec     ecx
         jmp     peaks_xLoop
 
 peaks_xLoop_end:
