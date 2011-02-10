@@ -157,6 +157,8 @@ SET( NOGGIN_PYTHON_SRCS ${NOGGIN_INCLUDE_DIR}/__init__.py
                         ${NOGGIN_CONFIG_DIR}/WebotsConfig.py
                         )
 
+SET ( NOGGIN_SWITCH ${NOGGIN_CONFIG_DIR}/players/Switch.py)
+
 SET( NOGGIN_PYTHON_SUBDIRS ${NOGGIN_INCLUDE_DIR}/headTracking
      			   ${NOGGIN_INCLUDE_DIR}/kickDecider
                            ${NOGGIN_INCLUDE_DIR}/navigator
@@ -182,6 +184,11 @@ ADD_LIBRARY(
 INSTALL(
   FILES ${NOGGIN_PYTHON_SRCS}
   DESTINATION ${NOGGIN_PYTHON_TARGET_DIR}
+  CONFIGURATIONS "" Debug Release
+  )
+INSTALL(
+  FILES ${NOGGIN_SWITCH}
+  DESTINATION ${NOGGIN_PYTHON_TARGET_DIR}/players/
   CONFIGURATIONS "" Debug Release
   )
 INSTALL(
