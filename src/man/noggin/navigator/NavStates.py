@@ -272,7 +272,8 @@ def destWalking(nav):
     """
     State to be used when we are walking to a destination
     """
-    helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta)
+    if nav.firstFrame():
+        helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta)
 
     return nav.stay()
 

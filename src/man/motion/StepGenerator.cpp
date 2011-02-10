@@ -133,7 +133,13 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     while (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES ||
            // VERY IMPORTANT: make sure we have enough ZMPed steps
            currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS) {
-        if (futureSteps.size() == 0 && !hasDestination){
+        if (futureSteps.size() == 0) {
+			if (hasDestination) {
+				x = y = theta = 0; // stop the robot
+				hasDestination = false;
+				done = true;
+			}
+
 			// replenish with the current walk vector, when we don't have a destination
             generateStep(x, y, theta);
         }
@@ -628,7 +634,7 @@ void StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep) {
  * Set the speed of the walk eninge in mm/s and rad/s
  */
 void StepGenerator::setSpeed(const float _x, const float _y,
-                                  const float _theta)  {
+							 const float _theta)  {
 
     //Regardless, we are changing the walk vector, so we need to scrap any future plans
     clearFutureSteps();
@@ -664,16 +670,71 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
 /*
  * Move the robot from it's current position to the destionation rel_x,
- * rel_y, rel_theta on the field. This method will move at the maximum speed
- * allowed by the gait parameters
+ * rel_y, rel_theta on the field. This method will move at the highest speed
+ * possible, based on StepGenerator's current x,y,theta speeds.
  *
- * Note: this method works by calling takeSteps several times with appropriate values
  */
 void StepGenerator::setDestination(const float rel_x, const float rel_y,
 								   const float rel_theta) {
 	hasDestination = true;
 	clearFutureSteps();
-	cout << "StepGenerator::setDestination() called" << endl;
+#ifdef DEBUG_STEPGENERATOR
+	cout << "StepGenerator::setDestination() new destination x=" << rel_x
+		 << " y=" << rel_y << " theta=" rel_theta << endl;
+#endif
+
+	if (x == 0 && y == 0 && theta == 0) {
+		cout << "Warning!! You must call setSpeed before setDestination!!" << endl;
+		// TODO: load these default values from somewhere smarter, the gait?
+		x = 150;
+		y = 100;
+	}
+
+	int numberSteps = -1;
+	float x_vel, y_vel, thetaPerStep;
+
+	// find the limiting component of our speeds (x or y)
+	float x_time = rel_x / x;
+	float y_time = rel_y / y;
+
+	printf("x time: %f y time: %f\n", x_time, y_time);
+
+	// figure out how long it will take at the limiting speeds
+	float timeToDest;
+
+	// x is limiting direction
+	if (x_time > y_time) {
+		cout << "x limiting!" << endl;
+		timeToDest = x_time;
+		x_vel = x;
+		y_vel = x * rel_y/rel_x;   // (y/x) = (destY/destX)
+	}
+	else {
+		cout << "y limiting!" << endl;
+		timeToDest = y_time;
+		y_vel = y;
+		x_vel = y * rel_x/rel_y;
+	}
+
+	// calculate number of steps
+	// TODO: pull duration from gait, or make it variable
+	float stepDuration = 0.4f;
+	numberSteps = timeToDest / stepDuration;
+
+	// slow down, run calculations again (since takeSteps sucks for <3 steps)
+	if (numberSteps < 3) {
+		x *= .95f;
+		y *= .95f;
+		return setDestination(rel_x, rel_y, rel_theta);
+	}
+
+	thetaPerStep = rel_theta / numberSteps;
+
+	// calculate size per step, sanity Check
+	printf("Making %d steps of (%f,%f,%f)\n", numberSteps+1, x_vel, y_vel, thetaPerStep);
+
+	// use takeSteps to do the dirty work
+	takeSteps(x_vel, y_vel, thetaPerStep, numberSteps+1);
 }
 
 /**
@@ -709,11 +770,9 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
 
     }
 
-
     for(int i =0; i < _numSteps; i++){
         generateStep(_x, _y, _theta);
     }
-
 
     //skip generating the end step, because it will be generated automatically:
     x = 0.0f; y =0.0f; theta = 0.0f;
@@ -892,7 +951,6 @@ void StepGenerator::generateStep( float _x,
 
     //The input here is in velocities. We need to convert it to distances perstep
     //Also, we need to scale for the fact that we can only turn or strafe every other step
-
 
     const WalkVector new_walk = {_x,_y,_theta};
 
