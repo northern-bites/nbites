@@ -26,17 +26,6 @@ def gameInitial(player):
 
     return player.stay()
 
-def gamePenalized(player):
-    if player.firstFrame():
-        player.isChasing = False
-        player.inKickingState = False
-        player.justKicked = False
-        player.stopWalking()
-        player.penalizeHeads()
-        player.brain.sensors.stopSavingFrames()
-
-    return player.stay()
-
 def gameReady(player):
     """
     Stand up, and pan for localization
@@ -48,11 +37,12 @@ def gameReady(player):
         player.standup()
         player.brain.tracker.locPans()
 
-    if player.lastDiffState == 'gameInitial' and player.firstFrame():
-        player.brain.sensors.startSavingFrames()
-        return player.goLater('relocalize')
-    if player.firstFrame() and player.lastDiffState == 'gamePenalized':
-        player.brain.resetLocalization()
+    if player.firstFrame():
+        if player.lastDiffState == 'gameInitial':
+            player.brain.sensors.startSavingFrames()
+            return player.goLater('relocalize')
+        if player.lastDiffState == 'gamePenalized':
+            player.brain.resetLocalization()
 
     return player.goLater('playbookPosition')
 
@@ -73,8 +63,8 @@ def gameSet(player):
         if player.brain.play.isRole(CHASER):
             player.brain.tracker.trackBall()
 
-    if player.firstFrame() and player.lastDiffState == 'gamePenalized':
-        player.brain.resetLocalization()
+        if player.lastDiffState == 'gamePenalized':
+            player.brain.resetLocalization()
 
     return player.stay()
 
@@ -95,6 +85,56 @@ def gamePlaying(player):
 
     roleState = player.getRoleState()
     return player.goNow(roleState)
+
+
+def gamePenalized(player):
+    if player.firstFrame():
+        player.isChasing = False
+        player.inKickingState = False
+        player.justKicked = False
+        player.stopWalking()
+        player.penalizeHeads()
+        player.brain.sensors.stopSavingFrames()
+
+    return player.stay()
+
+def fallen(player):
+    """
+    Stops the player when the robot has fallen
+    """
+    player.isChasing = False
+    player.inKickingState = False
+    player.justKicked = False
+    return player.stay()
+
+def gameFinished(player):
+    """
+    Ensure we are sitting down and head is snapped forward.
+    In the future, we may wish to make the head move a bit slower here
+    Also, in the future, gameInitial may be responsible for turning off the gains
+    """
+    if player.firstFrame():
+        player.isChasing = False
+        player.inKickingState = False
+        player.justKicked = False
+        player.stopWalking()
+        player.zeroHeads()
+        player.GAME_FINISHED_satDown = False
+        player.brain.sensors.stopSavingFrames()
+        return player.stay()
+
+    # Sit down once we've finished walking
+    if (player.brain.nav.isStopped() and not player.GAME_FINISHED_satDown
+        and not player.motion.isBodyActive()):
+        player.GAME_FINISHED_satDown = True
+        player.executeMove(SweetMoves.SIT_POS)
+        return player.stay()
+
+    if not player.motion.isBodyActive() and  player.GAME_FINISHED_satDown:
+        player.gainsOff()
+    return player.stay()
+
+########### PENALTY SHOTS STATES ############
 
 def penaltyShotsGameReady(player):
     if player.firstFrame():
@@ -131,39 +171,4 @@ def penaltyShotsGamePlaying(player):
         return player.goNow('penaltyGoalie')
     return player.goNow('penaltyKick')
 
-def fallen(player):
-    """
-    Stops the player when the robot has fallen
-    """
-    player.isChasing = False
-    player.inKickingState = False
-    player.justKicked = False
-    return player.stay()
 
-
-def gameFinished(player):
-    """
-    Ensure we are sitting down and head is snapped forward.
-    In the future, we may wish to make the head move a bit slower here
-    Also, in the future, gameInitial may be responsible for turning off the gains
-    """
-    if player.firstFrame():
-        player.isChasing = False
-        player.inKickingState = False
-        player.justKicked = False
-        player.stopWalking()
-        player.zeroHeads()
-        player.GAME_FINISHED_satDown = False
-        player.brain.sensors.stopSavingFrames()
-        return player.stay()
-
-    # Sit down once we've finished walking
-    if (player.brain.nav.isStopped() and not player.GAME_FINISHED_satDown
-        and not player.motion.isBodyActive()):
-        player.GAME_FINISHED_satDown = True
-        player.executeMove(SweetMoves.SIT_POS)
-        return player.stay()
-
-    if not player.motion.isBodyActive() and  player.GAME_FINISHED_satDown:
-        player.gainsOff()
-    return player.stay()

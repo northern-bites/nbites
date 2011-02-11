@@ -49,10 +49,6 @@ def goalieChase(player):
     else:
         return player.goNow('scanFindBall')
 
-def chaseAfterKick(player):
-    player.brain.tracker.trackBall()
-    return player.goLater('chase')
-
 def approachBall(player):
     """
     Once we are aligned with the ball, approach it
@@ -89,6 +85,10 @@ def approachBall(player):
     return player.stay()
 
 def decideKick(player):
+    """
+    Do a scan to determine where the goal is.
+    Decide which kick to do accordingly.
+    """
     if player.firstFrame():
         player.brain.tracker.kickDecideScan()
 
@@ -223,6 +223,9 @@ def guardCorner(player):
     return player.stay()
 
 def orbitBall(player):
+    """
+    State to orbit the ball
+    """
     if player.firstFrame():
         player.brain.nav.orbitAngle(player.angleToOrbit)
         player.brain.tracker.trackBall()

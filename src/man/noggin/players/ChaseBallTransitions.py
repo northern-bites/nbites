@@ -18,14 +18,14 @@ def shouldChaseBall(player):
 
 def shouldApproachBall(player):
     """
-    Go into Approach Ball if the ball is far away.
+    Approach the ball if it is far away.
     """
     ball = player.brain.ball
     return (ball.dist > constants.BALL_PFK_MAX_X)
 
 def shouldChaseFromPositionForKick(player):
     """
-    Walk to the ball if its too far away
+    Exit PFK if the ball is too far away.
     """
     ball = player.brain.ball
     return shouldChaseBall(player) and \
@@ -113,7 +113,10 @@ def shouldSpinFindBall(player):
             SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL))
 
 def shouldSpinFindBallAgain(player):
-    return player.brain.ball.framesOff > 200
+    """
+    If we have been walkFindBall-ing too long we should spin.
+    """
+    return player.stateTime > 300
 
 def shouldntStopChasing(player):
     """
@@ -121,8 +124,11 @@ def shouldntStopChasing(player):
     """
     return player.inKickingState
 
-def shouldWalkToBallLocPos(player):
-    return player.counter > constants.WALK_TO_BALL_LOC_POS_FRAMES and \
+def shouldWalkFindBall(player):
+    """
+    If we've been spinFindBall-ing too long we should walk
+    """
+    return player.counter > constants.WALK_FIND_BALL_FRAMES_THRESH and \
         player.brain.ball.framesOff > constants.BALL_OFF_THRESH
 
 def shouldPreKickScan(player):
@@ -156,4 +162,7 @@ def shouldStopPenaltyKickDribbling(player):
             player.counter > constants.STOP_PENALTY_DRIBBLE_COUNT)
 
 def inPenaltyKickStrikezone(player):
+    """
+    If we are in a good place to kick
+    """
     return (NogginConstants.OPP_GOALBOX_LEFT_X + 75. < player.brain.my.x)
