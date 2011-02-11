@@ -23,6 +23,8 @@ public:
         return static_cast<int>(atan2(y, x) / M_PI * 128.0) & 0xff;
     }
 
+    void reset();
+
     /**
      * Calculate the highest three bits of an angle for the given y and x
      */

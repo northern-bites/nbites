@@ -22,6 +22,7 @@ private:
     int test_dir();
     int test_peaks();
     bool peaks_list_contains(boost::shared_ptr<Gradient> g, int i, int j);
+    void create_circle_image(uint16_t * img, int r, double e, int i_0, int j_0);
 
 private:
     EdgeDetector edges;

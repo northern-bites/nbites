@@ -9,4 +9,15 @@ Gradient::Gradient() {
     angles = new uint16_t[angles_size];
 }
 
+void Gradient::reset()
+{
+    for (int i = 0; i < angles_size; ++i) {
+        angles[i] = 0;
+    }
+
+    for (int i = 0; i < IMAGE_HEIGHT * IMAGE_WIDTH * 3; ++i) {
+        values[i] = 0;
+    }
+}
+
 

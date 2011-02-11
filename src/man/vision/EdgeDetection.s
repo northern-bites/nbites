@@ -296,6 +296,7 @@ _find_edge_peaks:
         push    ebp
 
         mov     edi, dword ptr[esp + gradients_param]
+        add     edi, 4 + yPitch         # Move foward to first usable gradient point
         mov     eax, dword ptr[esp + angles_param]
 
         push    esi
@@ -373,7 +374,7 @@ peaks_xLoop:
         ## of binary angle are looked up from octant code in edx.
         shr     eax, 4
         movzx   eax, word ptr [recipTable + eax*2]      # lookup reciprocal,
-_seg:                                                        # U16.16
+                                                        # U16.16
         imul    eax, ebx                # y/x, U32.21
         shr     eax, 14                 # y/x, U32.7 (129-element table)
         movzx   eax, byte ptr [atanTable + eax] # lookup arc tangent
@@ -393,10 +394,16 @@ _seg:                                                        # U16.16
         mov     word ptr[esi], ax
 
         ## Write out x coordinate
-        mov     word ptr[esi + 2], cx
+        ## 316 >= ecx >= 0, should write out 2 --> 318, ecx is one past the last non-zero
+        mov     edx, 316
+        sub     edx, ecx
+        mov     word ptr[esi + 2], dx
 
         ## Load y coordinate and write it out
-        mov     edx, dword ptr[esp + row_count]
+        mov     edx, 238
+        sub     edx, dword ptr[esp + row_count]
+
+        ## 236 >= row_count >= 0, must write out starting from 2 --> 238
         mov     word ptr[esi + 4], dx
 
         ## Move angles ptr forward to the next location in the array
@@ -406,6 +413,7 @@ _seg:                                                        # U16.16
         jmp     peaks_xLoop
 
 peaks_xLoop_end:
+        add     edi, 8          # Advance to beginning of next row
         dec     dword ptr[esp + row_count]
         jne     peaks_yLoop
 
