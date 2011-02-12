@@ -23,6 +23,7 @@ WEBOTS_FILE = $(BUILD_DIR)/webots_file
 PYC_FILES = $(shell find . -name "*.pyc")
 
 #general definitions
+#TODO: in cmake make everything relative to NBITES_ROOT
 CMAKE_DEFS = -DNBITES_ROOT=$(NBITES_DIR)
 #toolchains
 CROSS_TOOLCHAIN = $(abspath $(CURDIR)/cmake/geode.cmake)
