@@ -150,7 +150,7 @@ SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc" )
 SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
 
 ########################### NB Common definitions
-include ( $ENV{NBITES_ROOT}/src/man/cmake/FindNBCOMMON.cmake )
+include ( ${NBITES_DIR}/src/man/cmake/FindNBCOMMON.cmake )
 
 ########################## ADVANCED SETTINGS PREFERENCES
 # Set the cache variable that we would rather not appear on the normal
