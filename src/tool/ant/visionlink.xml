@@ -13,7 +13,7 @@
   <!-- cmake definitions -->
   <property name="crossoff.def" value="-DOE_CROSS_BUILD:BOOL=OFF"/>
   <property name="straight.def" value="-DCMAKE_TOOLCHAIN_FILE=${straight.toolchain}"/>
-  <property name="nbitesroot.def" value="$-DNBITES_ROOT={man.dir}/../.."/>
+  <property name="nbitesroot.def" value="-DNBITES_ROOT=${man.dir}/../.."/>
   <property name="offline.def" value="-DOFFLINE:BOOL=ON"/>
   <property name="visionlink.def" value="-DVISIONLINK:BOOL=ON" />
   <property name="visionlink.header.def" value="-DVISIONLINK_HEADER_DIR:PATH=${visionlink.header.dir}"/>
