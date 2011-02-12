@@ -34,7 +34,7 @@ ENDIF( UNIX )
 IF( APPLE )
   SET( TARGET_ARCH "macosx" )
   SET( TARGET_HOST "TARGET_HOST_MACOSX")
-  include( FindFINK.cmake )
+  include( ${NBITES_ROOT}/src/man/cmake/FindFINK.cmake )
 ENDIF( APPLE )
 
 ########################## FIND PATH
