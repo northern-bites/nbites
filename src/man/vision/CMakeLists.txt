@@ -50,7 +50,7 @@ CONFIGURE_FILE(
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
-                     ${PYTHON_INCLUDE_DIR}
+                     ${PYTHON_INCLUDE_PATH}
                      ${BOOST_INCLUDE_DIR}
 		     ${CFG_DIR}
                      )

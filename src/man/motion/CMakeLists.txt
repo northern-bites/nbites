@@ -43,7 +43,7 @@ ADD_DEFINITIONS(
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${ALCOMMON_INCLUDE_DIR}
-                     ${PYTHON_INCLUDE_DIR}
+                     ${PYTHON_INCLUDE_PATH}
                      ${CORPUS_INCLUDE_DIR}
 		     ${CFG_DIR}
 		     )
