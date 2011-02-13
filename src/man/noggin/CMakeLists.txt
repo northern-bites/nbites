@@ -48,17 +48,17 @@ CONFIGURE_FILE(
 
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/Switch.py.in
-  ${NOGGIN_CONFIG_DIR}/players/Switch.py
+  ${CMAKE_CURRENT_BINARY_DIR}/players/Switch.py
   )
 
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/TeamConfig.py.in
-  ${NOGGIN_CONFIG_DIR}/TeamConfig.py
+  ${CMAKE_CURRENT_BINARY_DIR}/TeamConfig.py
   )
 
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/WebotsConfig.py.in
-  ${NOGGIN_CONFIG_DIR}/WebotsConfig.py
+  ${CMAKE_CURRENT_BINARY_DIR}/WebotsConfig.py
   )
 
 ############################ INCLUDE DIRECTORY
@@ -94,11 +94,11 @@ SET( NOGGIN_PYTHON_SRCS __init__.py
                         FallStates.py
                         NogginConstants.py
                         Leds.py
-                        TeamConfig.py
-                        WebotsConfig.py
+                        ${CMAKE_CURRENT_BINARY_DIR}/TeamConfig.py
+                        ${CMAKE_CURRENT_BINARY_DIR}/WebotsConfig.py
                         )
 
-SET ( NOGGIN_SWITCH ${NOGGIN_CONFIG_DIR}/players/Switch.py)
+SET ( NOGGIN_SWITCH ${CMAKE_CURRENT_BINARY_DIR}/players/Switch.py)
 
 SET( NOGGIN_PYTHON_SUBDIRS headTracking
      			   kickDecider
@@ -141,7 +141,7 @@ INSTALL(
 
 
 ############################ LINKER LANGUAGE
-# For Mac's, set the target link language to use
+# For Macs, set the target link language to use
 
 #IF( APPLE )
 SET_TARGET_PROPERTIES(
