@@ -2,7 +2,7 @@
 #ifndef _Profiler_h_DEFINED
 #define _Profiler_h_DEFINED
 
-#include "cmake.vision/profileconfig.h"
+#include "profileconfig.h"
 #include <algorithm>
 
 
