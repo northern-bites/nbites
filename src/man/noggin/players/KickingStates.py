@@ -33,6 +33,8 @@ def afterKick(player):
 
         if player.brain.ball.on:
             player.brain.tracker.trackBall()
+            return player.goLater('chase')
+
         return player.stay()
 
     if not player.brain.motion.isHeadActive():
