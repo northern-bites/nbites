@@ -1,16 +1,21 @@
 from .. import NogginConstants
 from ..playbook.PBConstants import GOALIE
-import ChaseBallStates
 import ChaseBallTransitions as transitions
 PENALTY_RELOCALIZE_FRAMES = 100
 
 def penaltyKick(player):
+    """
+    Set penalty kicking variables. Acts as a layer above 'chase'
+    """
     player.penaltyKicking = True
     player.penaltyMadeFirstKick = True
     player.penaltyMadeSecondKick = False
-    return player.goLater('chase')
+    return player.goNow('chase')
 
 def penaltyKickRelocalize(player):
+    """
+    Since you will be facing the goal, do loc pans if you are lost
+    """
     my = player.brain.my
     if player.firstFrame():
         player.brain.tracker.locPans()
@@ -20,6 +25,9 @@ def penaltyKickRelocalize(player):
     return player.goLater('scanFindBall')
 
 def penaltyGoalie(player):
+    """
+    Set penalty kicking variables. Acts as a layer above 'goaliePosition'
+    """
     player.penaltyKicking = True
     player.penaltyMadeFirstKick = True
     player.penaltyMadeSecondKick = False
@@ -28,6 +36,9 @@ def penaltyGoalie(player):
     return player.goLater(roleState)
 
 def penaltyBallInOppGoalbox(player):
+    """
+    We can't do anything if the ball is in the opponent's goalbox
+    """
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.activeLoc()
@@ -36,6 +47,9 @@ def penaltyBallInOppGoalbox(player):
     return player.stay()
 
 def penaltyKickShortDribble(player):
+    """
+    Acts as a layer above dribble for penalty shots.
+    """
     if player.firstFrame():
         player.penaltyMadeFirstKick = True
     if transitions.shouldStopPenaltyKickDribbling(player):
@@ -47,4 +61,4 @@ def penaltyKickShortDribble(player):
         elif transitions.shouldChaseBall(player):
             return player.goLater('chase')
 
-    return ChaseBallStates.approachBallWalk(player)
+    return player.goLater('dribble')
