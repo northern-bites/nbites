@@ -84,16 +84,34 @@ sub readBehavior {
           # found the behavior name
           if (/setName\(\'(\w+)\'/) {
               $currentBehavior = $1;
-              next LINE;
           }
 
           # this line adds states from other files so note it
-          if (/addStates\((\w+)\)/) {
+          elsif (/addStates\((\w+)\)/) {
               uniqueAdd(\@foundFiles, $1);
-              next LINE;
+          }
+
+          # legal ways to exit a state
+          elsif (/return\ \w+\.go(Now|Later)\(\'(\w+)/ ) {
+              $found_legal_return = 1;
+              my $toState = $2;
+              # mark the transition as "now" or "later"
+              if ($1 =~ /Later/) {
+                  push @currentTransitions, ($toState . $laterChar);
+              }
+              else {
+                  push @currentTransitions, ($toState . $nowChar);
+              }
+          }
+
+          # marks a state that can loop on itself
+          elsif (/return\ \w+\.stay\(\)/) {
+              $found_legal_return = 1;
+              $current_can_loop = 1;
           }
 
           # this line defines a function, set state variables accordingly
+	  # don't use elsif here incase eof is in one of the lines already found
           if (/def\ (\w+)/ || eof) {
               # we were already parsing a function, it must have ended
               # currentFunction is a state? if so add its transitions
@@ -114,30 +132,7 @@ sub readBehavior {
                   }
                   $found_legal_return = "";
               }
-
               $currentFunction = $1;
-              next LINE;
-          }
-
-          # legal ways to exit a state
-          if (/return\ \w+\.go(Now|Later)\(\'(\w+)/ ) {
-              $found_legal_return = 1;
-              my $toState = $2;
-              # mark the transition as "now" or "later"
-              if ($1 =~ /Later/) {
-                  push @currentTransitions, ($toState . $laterChar);
-              }
-              else {
-                  push @currentTransitions, ($toState . $nowChar);
-              }
-              next LINE;
-          }
-
-          # marks a state that can loop on itself
-          if (/return\ \w+\.stay\(\)/) {
-              $found_legal_return = 1;
-              $current_can_loop = 1;
-              next LINE;
           }
       } # end of while <BEHAVIOR>
 
