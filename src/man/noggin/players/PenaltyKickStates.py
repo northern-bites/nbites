@@ -8,7 +8,7 @@ def penaltyKick(player):
     player.penaltyKicking = True
     player.penaltyMadeFirstKick = True
     player.penaltyMadeSecondKick = False
-    return player.goNow('chase')
+    return player.goLater('chase')
 
 def penaltyKickRelocalize(player):
     my = player.brain.my
@@ -17,7 +17,7 @@ def penaltyKickRelocalize(player):
     if my.locScore == NogginConstants.BAD_LOC and \
             player.counter < PENALTY_RELOCALIZE_FRAMES:
         return player.stay()
-    return player.goNow('scanFindBall')
+    return player.goLater('scanFindBall')
 
 def penaltyGoalie(player):
     player.penaltyKicking = True
@@ -25,7 +25,7 @@ def penaltyGoalie(player):
     player.penaltyMadeSecondKick = False
 
     roleState = player.getRoleState(GOALIE)
-    return player.goNow(roleState)
+    return player.goLater(roleState)
 
 def penaltyBallInOppGoalbox(player):
     if player.firstFrame():
@@ -41,10 +41,10 @@ def penaltyKickShortDribble(player):
     if transitions.shouldStopPenaltyKickDribbling(player):
 
         if transitions.shouldKick(player):
-            return player.goNow('chase')
+            return player.goLater('chase')
         elif transitions.shouldPositionForKick(player):
-            return player.goNow('positionForKick')
+            return player.goLater('positionForKick')
         elif transitions.shouldChaseBall(player):
-            return player.goNow('chase')
+            return player.goLater('chase')
 
     return ChaseBallStates.approachBallWalk(player)

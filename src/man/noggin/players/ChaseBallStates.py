@@ -134,14 +134,14 @@ def positionForKick(player):
         player.brain.ball.framesOff > PFK_BALL_VISION_FRAMES):
         player.ballTooFar += 1
         if player.ballTooFar > BUFFER_FRAMES_THRESHOLD:
-            return player.goNow('chase')
+            return player.goLater('chase')
     else:
         player.ballTooFar = 0
 
     # Leave this state if necessary
     if transitions.shouldKick(player):
         player.stopWalking()
-        return player.goNow('kickBallExecute')
+        return player.goLater('kickBallExecute')
 
     if player.brain.tracker.activeLocOn:
         if transitions.shouldScanFindBallActiveLoc(player):
@@ -158,7 +158,7 @@ def positionForKick(player):
 
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldDribble(player):
-            return player.goNow('dribble')
+            return player.goLater('dribble')
 
     if player.brain.nav.isStopped():
         kick = player.brain.kickDecider.kickInfo.getKick()
@@ -174,17 +174,17 @@ def dribble(player):
         player.brain.nav.dribble()
 
     if transitions.shouldScanFindBall(player):
-        return player.goNow('scanFindBall')
+        return player.goLater('scanFindBall')
     # if we should stop dribbling, see what else we should do
     if transitions.shouldStopDribbling(player):
         # may not be appropriate due to turned out feet...
         if transitions.shouldKick(player):
             player.stopWalking()
-            return player.goNow('decideKick')
+            return player.goLater('decideKick')
         if transitions.shouldPositionForKick(player):
-            return player.goNow('decideKick')
+            return player.goLater('decideKick')
         elif transitions.shouldChaseBall(player):
-            return player.goNow('chase')
+            return player.goLater('chase')
 
     return player.stay()
 
