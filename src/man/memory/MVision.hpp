@@ -14,8 +14,6 @@
 #include "Vision.h"
 #include "log/FileLogger.hpp"
 
-//class MVision;
-
 namespace memory {
 class MVision: public proto::PVision, public MObject {
 

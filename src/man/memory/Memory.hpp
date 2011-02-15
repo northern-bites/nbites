@@ -32,7 +32,15 @@ class Memory {
 public:
     Memory(shared_ptr<Vision> vision_ptr);
     ~Memory();
+    /**
+     * calls the update function on @obj
+     * this will usually make the MObject pull data
+     * from its corresponding man object and maybe log it
+     */
     void update(MObject* obj);
+    /**
+     * calls update(MVision)
+     */
     void updateVision();
 
 public:
