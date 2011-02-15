@@ -1,16 +1,16 @@
 /*
  * MemoryMacros.hpp
  *
- * This is where we define all the memory macros we use to
- * link objects to their corresponding memory objects
+ * This is where we define useful memory macros
  *
  *      Author: oneamtu
  */
 
+#include "Common.h" //for micro_time
+
 #pragma once
 
-//macros for memory "linking"
-#define memory_link_classes(src,dest) \
-    bool src::updateMemory(dest obj)
-#define memory_link(src,dest) \
-    set_dest(obj.src);
+//TODO: should we make this do milisecs instead of
+//micro to save space?
+#define ADD_PROTO_TIMESTAMP extern long long int birth_time; \
+        this->set_timestamp(micro_time() - birth_time);

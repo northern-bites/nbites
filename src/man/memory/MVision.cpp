@@ -4,18 +4,15 @@
  *      Author: oneamtu
  */
 
-#include "Common.h" //for micro_time
-
+#include "MemoryMacros.hpp"
 #include "MVision.hpp"
 
 namespace memory {
 
 using boost::shared_ptr;
 
-extern long long int birth_time;
-
 MVision::MVision(shared_ptr<Vision> v) : vision(v) {
-    fileLogger = new log::FileLogger("Vision.log", MVISION_ID, this);
+    fileLogger = new log::FileLogger("/home/nao/Vision.log", MVISION_ID, this);
 }
 
 MVision::~MVision() {
@@ -24,9 +21,7 @@ MVision::~MVision() {
 
 void MVision::update() {
 
-    //TODO: should we make this do milisecs instead of
-    //micro to save space?
-    this->set_timestamp(micro_time() - birth_time);
+    ADD_PROTO_TIMESTAMP;
 
     proto::PVision::VisualBall* visual_ball;
     visual_ball = this->mutable_visual_ball();
@@ -36,7 +31,7 @@ void MVision::update() {
     visual_ball->set_x(vision->ball->getX());
     visual_ball->set_y(vision->ball->getY());
     visual_ball->set_radius(vision->ball->getRadius());
-    cout << this->DebugString() << endl;
+
 }
 
 void MVision::log() const {
