@@ -212,11 +212,9 @@ TARGET_LINK_LIBRARIES(
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories to
 # include in this package
-SUBDIRS(
-  memory
-  comm
-  corpus
-  vision
-  motion
-  noggin
-  )
+add_subdirectory( memory )
+add_subdirectory( comm )
+add_subdirectory( corpus )
+add_subdirectory( vision )
+add_subdirectory( motion )
+add_subdirectory( noggin )
