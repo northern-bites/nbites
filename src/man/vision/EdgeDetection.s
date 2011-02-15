@@ -38,7 +38,13 @@ row_count:      .skip 4
 angles_ptr:     .skip 4
 end_of_peak_stack:
 
-        .section        .data
+        .equiv neighborOffset, 12*4 + 4
+        .equiv quadrantOffset, 12+4
+        .equiv octantOffset, 12+4
+        .equiv atanOffset, 4
+        .equiv recipOffset, 4
+
+        .data
 #
 # Octant code in edx:
 #       \ -1  -2|2   3  /
@@ -50,7 +56,6 @@ end_of_peak_stack:
 #           /   |   \
 #      -11/     |     \-7
 #       / -9 -10|-6  -5 \
-        .equiv neighborOffset, 13*4
                                         # edx (octant code)
 neighborTable: .long .
         .int            - xPitch        # -12
@@ -71,8 +76,6 @@ neighborTable: .long .
         .int     yPitch                 #   2
         .int     yPitch + xPitch        #   3
 
-        .equiv quadrantOffset, 13
-
 quadrantTable: .long .
         .byte   0x80                    # -12
         .byte   0x80                    # -11
@@ -86,13 +89,10 @@ quadrantTable: .long .
         .byte   0x80                    #  -3
         .byte   0x40                    #  -2
         .byte   0x40                    #  -1
-
         .byte   0x00                    #   0
         .byte   0x00                    #   1
         .byte   0x40                    #   2
         .byte   0x40                    #   3
-
-        .equiv octantOffset, 13
 
 octantTable: .long .
         .byte    0                      # -12
@@ -107,7 +107,6 @@ octantTable: .long .
         .byte   -1                      #  -3
         .byte    0                      #  -2
         .byte    0                      #  -1
-
         .byte    0                      #   0
         .byte    0                      #   1
         .byte   -1                      #   2
@@ -144,7 +143,7 @@ recipTable: .long .
 
 # 129-byte arctangent table covering the range 0 - 45 degrees and containing
 # 5 bits of binary angle
-atanTable:
+atanTable: .long .
         .byte    0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  5
         .byte    5,  5,  6,  6,  6,  7,  7,  7,  8,  8,  8,  8,  9,  9,  9, 10
         .byte   10, 10, 11, 11, 11, 11, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14
@@ -345,10 +344,10 @@ peaks_xLoop:
 
         # eax = max(xGrad, yGrad) ;  ebx = min(xGrad, yGrad);
         # shift octant bit into edx
-        cmp     eax, ebx
-        cmovb   esi, eax
-        cmovb   eax, ebx
-        cmovb   ebx, esi
+        cmp     ebx, eax
+        cmova   esi, eax
+        cmova   eax, ebx
+        cmova   ebx, esi
         adc     edx, edx                # shift in octant bit
 
         # One more bit of gradient direction into edx
@@ -357,7 +356,7 @@ peaks_xLoop:
         adc     edx, edx
 
         # Lookup offset of neighbors
-        mov     ebp, [neighborTable + edx*4 + neighborOffset]
+        mov     ebp, dword ptr[neighborTable + edx*4 + neighborOffset]
 
         # Peak?
         movzx   esi, word ptr[edi + ebp - xPitch]
@@ -366,20 +365,20 @@ peaks_xLoop:
         cmovb   si, word ptr[edi + ebp - xPitch]
         cmp     si, word ptr[edi - xPitch]
         jb      peaks_xLoop
-
+_tan:
         ## Yes, we have a new edge point. Compute gradient direction. x
         ## component is in eax, 12 bits unsigned. y component is in ebx,
         ## and has been multiplied by 2, so it's 13 bits
         ## unsigned. Tangent of angle, 0 - 45 deg, is y/2x. High 3 bits
         ## of binary angle are looked up from octant code in edx.
         shr     eax, 4
-        movzx   eax, word ptr [recipTable + eax*2]      # lookup reciprocal,
+        movzx   eax, word ptr [recipTable + eax*2 + recipOffset]      # lookup reciprocal,
                                                         # U16.16
         imul    eax, ebx                # y/x, U32.21
         shr     eax, 14                 # y/x, U32.7 (129-element table)
-        movzx   eax, byte ptr [atanTable + eax] # lookup arc tangent
-        xor     al, byte ptr[octantTable + edx + octantOffset] # negate arc tangent for
-                                                # appropriate octants
+        movzx   eax, byte ptr [atanTable + eax + atanOffset] # lookup arc tangent
+        xor     al, byte ptr[octantTable + edx + octantOffset]  # negate arc tangent for
+                                                                # appropriate octants
         sub     al, byte ptr[octantTable + edx + octantOffset]
         add     al, byte ptr[quadrantTable + edx + quadrantOffset]       # get 8-bit binary angle
 
