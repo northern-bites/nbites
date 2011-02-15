@@ -72,8 +72,9 @@ static const int DIST_POINT_FUDGE = 5;
 //previous constants inserted from .h class
 
 
-Ball::Ball(Vision* vis, Threshold* thr, Field* fie, int _color)
-: vision(vis), thresh(thr), field(fie), color(_color), runsize(1)
+Ball::Ball(Vision* vis, Threshold* thr, Field* fie, Context* con, int _color)
+    : vision(vis), thresh(thr), field(fie), context(con), color(_color),
+      runsize(1)
 {
 	blobs = new Blobs(MAX_BALLS);
 	init(0.0);

@@ -33,6 +33,7 @@ def gamePenalized(player):
         player.justKicked = False
         player.stopWalking()
         player.penalizeHeads()
+        player.brain.sensors.stopSavingFrames()
 
     return player.stay()
 
@@ -47,10 +48,10 @@ def gameReady(player):
         player.standup()
         player.brain.tracker.locPans()
 
-    if player.lastDiffState == 'gameInitial':
+    if player.lastDiffState == 'gameInitial' and player.firstFrame():
+        player.brain.sensors.startSavingFrames()
         return player.goLater('relocalize')
-    if player.firstFrame() and \
-            player.lastDiffState == 'gamePenalized':
+    if player.firstFrame() and player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalization()
 
     return player.goLater('playbookPosition')
@@ -78,9 +79,19 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
-    if player.lastDiffState == 'gamePenalized':
-        player.brain.resetLocalization()
-        return player.goLater('afterPenalty')
+
+    if player.lastDiffState == 'gamePenalized' and player.firstFrame():
+        player.brain.sensors.startSavingFrames()
+
+        if player.lastStateTime > 25:
+            # 25 is arbitrary. This check is meant to catch human error and
+            # possible 0 sec. penalties for the goalie
+            player.brain.resetLocalization()
+            return player.goLater('afterPenalty')
+        #2010 rules have no 0 second penalties for any robot,
+        # but check should be here if there is.
+
+        #else human error
 
     roleState = player.getRoleState()
     return player.goNow(roleState)
@@ -141,9 +152,9 @@ def gameFinished(player):
         player.inKickingState = False
         player.justKicked = False
         player.stopWalking()
-
         player.zeroHeads()
         player.GAME_FINISHED_satDown = False
+        player.brain.sensors.stopSavingFrames()
         return player.stay()
 
     # Sit down once we've finished walking

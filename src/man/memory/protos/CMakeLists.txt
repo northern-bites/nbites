@@ -1,59 +1,19 @@
-##############################
-#
-# Welcome
-#
+
 
 ############################ Version
 # Check cMake version
 cmake_minimum_required( VERSION 2.6.0 )
 
-############################ Colorize Makefile
-# Colorized output
-SET( CMAKE_COLOR_MAKEFILE TRUE )
-
-############################ NBCOMMON
-# Ensure the TRUNK_PATH variable is set
-
-IF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ../../ ABSOLUTE)
-  SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
-  MESSAGE( STATUS
-    "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
-ELSE ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  SET( TRUNK_PATH $ENV{TRUNK_PATH} )
-ENDIF ("x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-
-
-############################ Base definitions
-# Include  the basic definitions accross all projects
-INCLUDE( ${CMAKE_MODULE_PATH}/base_definitions.cmake )
-
-############################ DISPLAY
-# Display summary of options
-
-MESSAGE( STATUS "" )
-MESSAGE( STATUS "...:::: Configuration - Protos ::::..." )
-MESSAGE( STATUS "" )
 
 ############################ FIND PACKAGE
 # Libraries specifics.
 # cmake packages we use
-
-FIND_PACKAGE( NBCOMMON REQUIRED )
-FIND_PACKAGE( PROTOBUF REQUIRED )
-
-############################ DEFINITION
-# Add here definition needed.
-add_definitions( ${NBCOMMON_DEFINITIONS}
-                 -Wno-write-strings )
+FIND_PACKAGE( Protobuf REQUIRED )
 
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
-include_directories( ${NBCOMMON_INCLUDE_DIR}/
-                     ${PROTOBUF_INCLUDE_DIR}/
-                     ${MEMORY_INCLUDE_DIR}/
-                     ${MEMORY_CONFIG_DIR}/
+include_directories( ${PROTOBUF_INCLUDE_DIR}/
                      )
 
 ########################### PROTOBUF GENERATION
@@ -101,5 +61,5 @@ add_library(
 
 target_link_libraries(
   ${PROTOS_TARGET}
-  ${PROTOBUF_LIBRARIES}
+  ${PROTOBUF_LIBRARY}
   )

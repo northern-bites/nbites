@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <climits>
 
 #include "Profiler.h"
 
@@ -149,6 +150,8 @@ Profiler::reset ()
     enterTime[i] = 0;
     lastTime[i] = 0;
     sumTime[i] = 0;
+    maxTime[i] = 0;
+    minTime[i] = INT_MAX;
   }
 }
 
@@ -228,14 +231,16 @@ Profiler::printSummary ()
       printf("  %-*s:      0%% (0000000000us total, 000000us avg.)\n",
           (max_length-depths[i]*2), PCOMPONENT_NAMES[i]);
     else if (parent_sum == 0)
-      printf("  %-*s: 100.00%% (%.10llu total, %.6llu avg.)\n",
-          (max_length-depths[i]*2), PCOMPONENT_NAMES[i], sumTime[i],
-          (sumTime[i] / (current_frame+1)));
+      printf("  %-*s: 100.00%% (%.10llu total, %.6llu avg.,"
+             " %llu min, %.6llu max )\n",
+             (max_length-depths[i]*2), PCOMPONENT_NAMES[i], sumTime[i],
+             (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
     else
-      printf("  %-*s: %6.2f%% (%.10llu total, %.6llu avg.)\n",
+      printf("  %-*s: %6.2f%% (%.10llu total, %.6llu avg.,"
+             " %.6llu min, %.6llu max)\n",
           (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
           ((float)sumTime[i] / parent_sum * 100), sumTime[i],
-          (sumTime[i] / (current_frame+1)));
+             (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
   }
 }
 

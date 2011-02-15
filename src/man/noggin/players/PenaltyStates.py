@@ -3,7 +3,8 @@ import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants #TODO: create a PenaltyConstants file instead
 
-BALL_SEEN_THRESH = 5
+OBJ_SEEN_THRESH = 5
+LOOK_DIR_THRESH = 10
 
 def afterPenalty(player):
 
@@ -11,7 +12,7 @@ def afterPenalty(player):
         initPenaltyReloc(player)
         player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
 
-    if player.brain.ball.framesOn > BALL_SEEN_THRESH:
+    if player.brain.ball.framesOn > OBJ_SEEN_THRESH:
         #deal with ball and don't worry about loc
         player.brain.tracker.trackBall()
         return player.goLater('gamePlaying')
@@ -21,7 +22,7 @@ def afterPenalty(player):
         if player.brain.yglp.on or player.brain.ygrp.on:
             #see the goal posts in multiple frames for safety
             seeYellow(player)
-            if player.yellowCount == 5:
+            if player.yellowCount >= OBJ_SEEN_THRESH:
                 setLocInfo(player)
                 #now you know where you are!
                 return player.goLater('gamePlaying')
@@ -29,12 +30,12 @@ def afterPenalty(player):
         if player.brain.bglp.on or player.brain.bgrp.on:
             #see the goal posts in multiple frames for safety
             seeBlue(player)
-            if player.blueCount == 5:
+            if player.blueCount >= OBJ_SEEN_THRESH:
                 setLocInfo(player)
                 #now you know where you are!
                 return player.goLater('gamePlaying')
         """
-        Note: the way that yellowCount and blueCount are set, is such that if a
+        Note: the way that yellowCount and blueCount are set is:  if a
         post of a different color is seen after the first color, the first
         counter will reset. So if I see a blue post in frame 1, nothing in
         frame 2, and a yellow post in frame 3, and nothing in frame 4,
@@ -47,11 +48,11 @@ def afterPenalty(player):
         player.headCount += 1
 
     #if we are looking left too long
-    if player.headCount == 10:
+    if player.headCount == LOOK_DIR_THRESH:
         player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
 
     #if we are looking right too long
-    if player.headCount == 20:
+    if player.headCount == 2*LOOK_DIR_THRESH:
         return player.goLater('penaltyRelocalize')
 
     return player.stay()
@@ -70,7 +71,7 @@ def seeBlue(player):
     player.blueCount += 1
 
 def setLocInfo(player):
-    if player.headCount <= 10:
+    if player.headCount <= LOOK_DIR_THRESH:
         #looking left
         if player.yellowCount > 0:
             player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
@@ -94,11 +95,15 @@ def setLocInfo(player):
                                         -90.0)
     return
 
+"""
+Note: This is the old code that I'm using as a back-up in case we can't
+      see any goal posts. It may be possible to make this smarter. -Wils
+"""
 def penaltyRelocalize(player):
     if player.firstFrame():
         player.setWalk(1, 0, 0)
 
-    if player.brain.ball.on:
+    if player.brain.ball.framesOn >= OBJ_SEEN_THRESH:
         player.brain.tracker.trackBall()
         return player.goLater('gamePlaying')
 

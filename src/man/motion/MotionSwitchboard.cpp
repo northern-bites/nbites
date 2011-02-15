@@ -533,10 +533,12 @@ void MotionSwitchboard::swapHeadProvider(){
 const vector <float> MotionSwitchboard::getNextJoints() const {
     pthread_mutex_lock(&next_joints_mutex);
 #ifndef WEBOTS_BACKEND
+#ifdef DEBUG_SWITCHBOARD
     if(!newJoints && readyToSend){
         cout << "An enactor is grabbing old joints from switchboard."
              <<" Must have missed a frame!" <<endl;
     }
+#endif
 #endif
     const vector <float> vec(nextJoints);
     newJoints = false;

@@ -73,7 +73,7 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       registeredFalling(false),registeredShutdown(false),
       falling(false),fallen(false),
       useFallProtection(false),
-      wifiReconnectTimeout(0)
+      wifiReconnectTimeout(0), lastHeatAudioWarning(0), lastHeatPrintWarning(0)
 {
     pthread_mutex_init(&click_mutex,NULL);
     executeStartupAction();
@@ -297,7 +297,9 @@ void RoboGuardian::checkTemperatures(){
     bool sayWarning = false;
     for(unsigned int joint = 0; joint < Kinematics::NUM_JOINTS; joint++){
         const float tempDiff = newTemps[joint] - lastTemps[joint];
-        if(newTemps[joint] >= HIGH_TEMP && tempDiff >= TEMP_THRESHOLD){
+        if(newTemps[joint] >= HIGH_TEMP && tempDiff >= TEMP_THRESHOLD &&
+           micro_time() - lastHeatPrintWarning > TIME_BETWEEN_HEAT_WARNINGS){
+            lastHeatPrintWarning = micro_time();
             cout << Thread::name << "::" << "TEMP-WARNING: "
                  << Kinematics::JOINT_STRINGS[joint]
                  << " is at " << setprecision(1)
@@ -307,8 +309,10 @@ void RoboGuardian::checkTemperatures(){
             }
         }
     }
-    if(sayWarning){
+    if(sayWarning &&
+       micro_time() - lastHeatAudioWarning > TIME_BETWEEN_HEAT_WARNINGS){
         playFile(heat_wav);
+        lastHeatAudioWarning = micro_time();
     }
     lastTemps = newTemps;
 }
@@ -488,7 +492,7 @@ void RoboGuardian::checkConnection(){
         if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
             cout    << "No connection detected, trying to reconnect interfaces, attempt "
                     << wifiReconnectTimeout << endl;
-			reconnectWifiConnection();
+            reconnectWifiConnection();
             wifiReconnectTimeout++;
         }
     }
@@ -522,7 +526,7 @@ bool RoboGuardian::checkWireless(){
 // we assume that autoconnect is on and that we already  have connected
 // to the network before
 void RoboGuardian::reconnectWifiConnection(){
-    playFile(wifi_restart_wav);
+    // playFile(wifi_restart_wav);
     FILE * f3 = popen("connman services | awk '/ROBOTICS/ {print $4}'", "r");
     char service[100] = "";
     fscanf(f3,"%s\n", service);

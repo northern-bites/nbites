@@ -22,6 +22,8 @@
 #include <fstream>
 #include <algorithm>
 #include <cstdlib>
+#include <sys/stat.h>
+
 using namespace std;
 
 #include <boost/assign/std/vector.hpp>
@@ -61,7 +63,8 @@ Sensors::Sensors ()
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
-      FRM_FOLDER("/home/nao/naoqi/frames")
+      FRM_FOLDER("/home/nao/naoqi/frames"),
+	  saving_frames_on(false)
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
@@ -78,6 +81,9 @@ Sensors::Sensors ()
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
 #endif
+
+    // THIS IS AN OCTAL NUMBER, must start with 0
+    mkdir(FRM_FOLDER.c_str(), 0755); // permissions: u+rwx, og+rx
 }
 
 Sensors::~Sensors ()
@@ -754,9 +760,36 @@ void Sensors::resetSaveFrame()
 // The version for the frame format
 static const int VERSION = 0;
 
+void Sensors::startSavingFrames()
+{
+#ifdef SAVE_ALL_FRAMES
+	if (!isSavingFrames())
+    {
+        saving_frames_on = true;
+	    cout << "****Started Saving Frames****" << endl;
+	}
+#endif
+}
+
+void Sensors::stopSavingFrames()
+{
+#ifdef SAVE_ALL_FRAMES
+	if (isSavingFrames())
+	{
+	    saving_frames_on = false;
+        cout << "****Stopped Saving Frames****" << endl;
+	}
+#endif
+}
+
+bool Sensors::isSavingFrames() const
+{
+	return saving_frames_on;
+}
+
 void Sensors::saveFrame()
 {
-    int MAX_FRAMES = 3000;
+    int MAX_FRAMES = 5000;
     if (saved_frames > MAX_FRAMES)
         return;
     string EXT(".NBFRM");
@@ -767,9 +800,9 @@ void Sensors::saveFrame()
     FRAME_PATH << FRM_FOLDER << BASE << NUMBER << EXT;
     fstream fout(FRAME_PATH.str().c_str(), fstream::out);
 
-    // Lock and write image
-    // possibility of deadlock if something has the image locked and is waiting for visionAngles
-    // to unlock - not happening in our code atm
+    // Lock and write image possibility of deadlock if something has
+    // the image locked and is waiting for visionAngles to unlock -
+    // not happening in our code atm
     lockVisionAngles();
     lockImage();
     fout.write(reinterpret_cast<const char*>(getImage()),
@@ -778,7 +811,8 @@ void Sensors::saveFrame()
     fout << VERSION << " ";
 
     // Write joints
-    for (vector<float>::const_iterator i = visionBodyAngles.begin(); i < visionBodyAngles.end(); i++) {
+    for (vector<float>::const_iterator i = visionBodyAngles.begin();
+         i < visionBodyAngles.end(); i++) {
         fout << *i << " ";
     }
     releaseImage();

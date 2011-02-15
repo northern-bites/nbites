@@ -87,14 +87,17 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 #endif // OFFLINE
     // Set up object recognition object pointers
     field = new Field(vision, this);
+    context = new Context(vision, this, field);
     blue = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                           field, BLUE));
+                                                           field, context,
+                                                           BLUE));
     yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                             field, YELLOW));
-    navyblue = new Robots(vision, this, field, NAVY);
-    red = new Robots(vision, this, field, RED);
-    orange = new Ball(vision, this, field, ORANGE);
-    cross = new Cross(vision, this, field);
+                                                             field, context,
+                                                             YELLOW));
+    navyblue = new Robots(vision, this, field, context, NAVY);
+    red = new Robots(vision, this, field, context, RED);
+    orange = new Ball(vision, this, field, context, ORANGE);
+    cross = new Cross(vision, this, field, context);
     for (int i = 0; i < IMAGE_WIDTH; i++) {
         lowerBound[i] = IMAGE_HEIGHT - 1;
     }
@@ -1361,6 +1364,7 @@ void Threshold::initTableFromBuffer(byte * tbfr)
  * it means the merged.mtb file in the root directory of the Memory stick
  * @param filename      the file to load
  */
+/*
 void Threshold::initCompressedTable(std::string filename){
 #ifndef NO_ZLIB
     FILE* fp;
@@ -1415,8 +1419,8 @@ void Threshold::initCompressedTable(std::string filename){
     free(fileData);
 
     fclose(fp);
-#endif /* NO_ZLIB */
-}
+#endif 
+}*/
 
 const uchar* Threshold::getYUV() {
     return yuv;

@@ -48,8 +48,8 @@ static const bool ROBOTSDEBUG = false;
 static const bool ROBOTSDEBUG = false;
 #endif
 
-Robots::Robots(Vision* vis, Threshold* thr, Field* fie, int col)
-    : vision(vis), thresh(thr), field(fie), color(col)
+Robots::Robots(Vision* vis, Threshold* thr, Field* fie, Context* con, int col)
+    : vision(vis), thresh(thr), field(fie), context(con), color(col)
 {
 	const int MAX_ROBOT_RUNS = 400;
 	blobs = new Blobs(MAX_ROBOT_RUNS);

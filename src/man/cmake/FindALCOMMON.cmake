@@ -1,10 +1,8 @@
-SET( ALCOMMON_DEFINITIONS "" )
 
 ##
 # Includes
 ##
 
-INCLUDE( "${CMAKE_MODULE_PATH}/base_definitions.cmake" )
 IF(WEBOTS_BACKEND)
   SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include/alcommon
     ${AL_DIR}/lib

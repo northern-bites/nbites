@@ -5,7 +5,9 @@
 import man.motion.SweetMoves as SweetMoves
 
 def gameInitial(player):
-    player.gainsOn()
+    if player.firstFrame():
+        player.gainsOn()
+        player.standup()
     return player.stay()
 
 def gameReady(player):
@@ -20,7 +22,8 @@ def gamePenalized(player):
 def doMove(player):
     if player.firstFrame():
         player.gainsOn()
-        player.executeMove(SweetMoves.ZERO_POS)
+        player.executeMove(SweetMoves.LEFT_BIG_KICK)
+        player.executeMove(SweetMoves.RIGHT_BIG_KICK)
 
     if player.counter == 1:
         return player.goLater('done')
