@@ -152,8 +152,7 @@ atanTable: .long .
         .byte   23, 23, 23, 23, 24, 24, 24, 24, 25, 25, 25, 25, 25, 26, 26, 26
         .byte   26, 26, 27, 27, 27, 27, 27, 28, 28, 28, 28, 28, 29, 29, 29, 29
         .byte   29, 29, 30, 30, 30, 30, 30, 31, 31, 31, 31, 31, 31, 32, 32, 32
-        .byte   32
-
+        .byte   32, 32, 32, 32, 33, 33, 33, 33, 33, 33, 34, 34, 34, 34, 34, 34
 
 .section .text
 
@@ -372,15 +371,22 @@ _tan:
         ## unsigned. Tangent of angle, 0 - 45 deg, is y/2x. High 3 bits
         ## of binary angle are looked up from octant code in edx.
         shr     eax, 4
-        movzx   eax, word ptr [recipTable + eax*2 + recipOffset]      # lookup reciprocal,
-                                                        # U16.16
+
+        # lookup reciprocal, U16.16
+        movzx   eax, word ptr [recipTable + eax*2 + recipOffset]
+
         imul    eax, ebx                # y/x, U32.21
         shr     eax, 14                 # y/x, U32.7 (129-element table)
-        movzx   eax, byte ptr [atanTable + eax + atanOffset] # lookup arc tangent
-        xor     al, byte ptr[octantTable + edx + octantOffset]  # negate arc tangent for
-                                                                # appropriate octants
+
+        # lookup arc tangent
+        movzx   eax, byte ptr [atanTable + eax + atanOffset]
+
+        # negate arc tangent for appropriate octants
+        xor     al, byte ptr[octantTable + edx + octantOffset]
         sub     al, byte ptr[octantTable + edx + octantOffset]
-        add     al, byte ptr[quadrantTable + edx + quadrantOffset]       # get 8-bit binary angle
+
+        # get 8-bit binary angle
+        add     al, byte ptr[quadrantTable + edx + quadrantOffset]
 
         # Write binary angle (in a, also eax),
         # x coord (from ecx), y coord (on stack)
@@ -393,7 +399,8 @@ _tan:
         mov     word ptr[esi], ax
 
         ## Write out x coordinate
-        ## 316 >= ecx >= 0, should write out 2 --> 318, ecx is one past the last non-zero
+        ## 316 >= ecx >= 0, should write out 2 --> 318, ecx is one
+        ## past the last non-zero
         mov     edx, 316
         sub     edx, ecx
         mov     word ptr[esi + 2], dx
