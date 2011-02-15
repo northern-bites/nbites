@@ -45,7 +45,8 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}/
 
 set( MEMORY_SRCS Memory
                  MVision
-                                  )
+                 MSensors
+                 )
 ############################ (SUB)DIRECTORY COMPILATION
 # add the protobuffer C++ source subdirectory
 # it's where we house all our generated protobuggers

@@ -19,7 +19,8 @@ namespace memory {
  *
  */
 enum MObject_ID {
-    MVISION_ID = 1//!< MVISION_ID
+    MVISION_ID = 1,//!< MVISION_ID
+    MSENSORS_ID = 2//!< MSENSORS_ID
 };
 
 class MObject {

@@ -22,6 +22,8 @@ class Memory; //forward declaration
 
 #include "MVision.hpp"
 #include "Vision.h"
+#include "MSensors.hpp"
+#include "Sensors.h"
 
 namespace memory {
 
@@ -30,7 +32,8 @@ using boost::shared_ptr;
 class Memory {
 
 public:
-    Memory(shared_ptr<Vision> vision_ptr);
+    Memory(shared_ptr<Vision> vision_ptr,
+           shared_ptr<Sensors> sensors_ptr);
     ~Memory();
     /**
      * calls the update function on @obj
@@ -42,8 +45,13 @@ public:
      * calls update(MVision)
      */
     void updateVision();
+    /**
+     * calls update(MSensors)
+     */
+    void updateSensors();
 
 public:
-    MVision* vision;
+    MVision* mvision;
+    MSensors* msensors;
 };
 }
