@@ -23,7 +23,7 @@ private: // Constants
     static const float MIN_EXTEND_DIST;
     // We consider ourselves to be towards the bottom of the screen and in the
     // middle in terms of whether we are inside or outside of a corner
-    static const point <int> dogLocation;
+    static const point <int> naoLocation;
 
 public:
     VisualCorner(const int _x, const int _y, const float _distance,
