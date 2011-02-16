@@ -239,6 +239,10 @@ sobel_xLoop:
 
         # subtract noise threshold (mm6), force to 0 if below threshold
         psubusw mm0, mm6
+
+        ## The first time we write out an MMX register, the first two
+	## values are garbage. They are initialized with garbage data
+	## so they are wrong.
         movntq  [edi + sqMag], mm0
 
         ## We're done with the destination pointer,
@@ -294,7 +298,16 @@ _find_edge_peaks:
         push    ebp
 
         mov     edi, dword ptr[esp + gradients_param]
-        add     edi, 4 + yPitch         # Move foward to first usable gradient point
+
+        ## Move foward to first usable gradient point
+        ## This is 2 rows down (since row 0 has no gradient values and
+        ## row 1 has no gradient values above it, so it can't be peak)
+        ##
+        ## 6 bytes in because first 2 bytes are garbage, second two bytes are
+        ## "gradient" over pixel 0 (aka garbage), and bytes 5,6 are the
+        ## gradient over pixel 1. We need a pixel to our left, so we
+	## start by looking at the gradient across pixel 2.
+        add     edi, 6 + yPitch + yPitch
         mov     eax, dword ptr[esp + angles_param]
 
         push    esi
@@ -401,7 +414,10 @@ _tan:
         ## Write out x coordinate
         ## 316 >= ecx >= 0, should write out 2 --> 318, ecx is one
         ## past the last non-zero
-        mov     edx, 316
+        ## for instance, on first pixel in image,
+        ## ecx will be at 315 (not 316 still, since it gets decremented once
+        ## in the 'repe scasw' instruction)
+        mov     edx, 317
         sub     edx, ecx
         mov     word ptr[esi + 2], dx
 
@@ -415,7 +431,6 @@ _tan:
         ## Move angles ptr forward to the next location in the array
         add     dword ptr[esp + angles_ptr], 6
 
-        ## Adjust counters
         jmp     peaks_xLoop
 
 peaks_xLoop_end:
