@@ -154,7 +154,7 @@ int EdgeDetectorTest::test_peaks()
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
             if (j < IMAGE_WIDTH *3./4.)
-                c[(i) * IMAGE_WIDTH + j] = 0;
+                c[(i) * IMAGE_WIDTH + j] = (uint16_t)rand()%10;
             else
                 c[(i) * IMAGE_WIDTH + j] = 250;
     g->reset();
@@ -248,8 +248,9 @@ int EdgeDetectorTest::test_peaks()
     for (int i = 2; i < Gradient::rows-2; ++i) {
         for (int j = 2; j < Gradient::cols-2; ++j) {
             if (j == IMAGE_WIDTH * 3/4 ||
-                (j == IMAGE_WIDTH * 3/4 - 1 && i != 2)){
-                assert(peaks_list_contains(g,i,j));
+                j == IMAGE_WIDTH * 3/4 - 1){
+                assert(peaks_list_contains(g,i, IMAGE_WIDTH * 3/4) |
+                       peaks_list_contains(g,i, IMAGE_WIDTH * 3/4 - 1));
             } else {
                 assert(!peaks_list_contains(g,i,j));
             }

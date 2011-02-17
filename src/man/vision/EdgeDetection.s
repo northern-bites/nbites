@@ -307,7 +307,7 @@ _find_edge_peaks:
         ## "gradient" over pixel 0 (aka garbage), and bytes 5,6 are the
         ## gradient over pixel 1. We need a pixel to our left, so we
 	## start by looking at the gradient across pixel 2.
-        add     edi, 6 + yPitch + yPitch
+        add     edi, 6 + yPitch
         mov     eax, dword ptr[esp + angles_param]
 
         push    esi
@@ -318,7 +318,7 @@ _find_edge_peaks:
         mov     dword ptr[esp + angles_ptr], eax
 
         ## 240 rows, 238 gradient magnitudes, 236 possible peak rows
-        mov     dword ptr[esp + row_count], 236
+        mov     dword ptr[esp + row_count], 237
 
         cld                             # search increasing addresses
 
