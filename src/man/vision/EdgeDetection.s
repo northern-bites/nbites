@@ -297,7 +297,11 @@ _find_edge_peaks:
         ## Load output address
         push    ebp
 
-        mov     edi, dword ptr[esp + gradients_param]
+        push    esi
+        push    edi
+        push    ebx
+
+        mov     edi, dword ptr[esp + gradients_param + 12]
 
         ## Move foward to first usable gradient point
         ## This is 2 rows down (since row 0 has no gradient values and
@@ -308,11 +312,7 @@ _find_edge_peaks:
         ## gradient over pixel 1. We need a pixel to our left, so we
 	## start by looking at the gradient across pixel 2.
         add     edi, 6 + yPitch
-        mov     eax, dword ptr[esp + angles_param]
-
-        push    esi
-        push    edi
-        push    ebx
+        mov     eax, dword ptr[esp + angles_param + 12]
 
         sub     esp, end_of_peak_stack
         mov     dword ptr[esp + angles_ptr], eax
