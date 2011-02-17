@@ -14,14 +14,14 @@ def shouldChaseBall(player):
     We see the ball. So go get it.
     """
     ball = player.brain.ball
-    return (ball.framesOn > 0)
+    return (ball.on)
 
 def shouldApproachBall(player):
     """
     Approach the ball if it is far away.
     """
     ball = player.brain.ball
-    return (ball.dist > constants.BALL_PFK_MAX_X)
+    return (ball.on and not shouldPositionForKick(player))
 
 def shouldChaseFromPositionForKick(player):
     """
@@ -30,7 +30,7 @@ def shouldChaseFromPositionForKick(player):
     ball = player.brain.ball
     return shouldChaseBall(player) and \
         not shouldPositionForKick(player) and \
-        ball.dist > constants.BALL_PFK_MAX_X
+        ball.dist > constants.BALL_PFK_MAX_X+10
 
 def shouldPositionForKick(player):
     """
@@ -43,9 +43,20 @@ def shouldPositionForKick(player):
             constants.BALL_PFK_MIN_X and \
             fabs(ball.bearing) < constants.BALL_PFK_BEARING_THRESH)
 
-def shouldKick(player):
+def shouldStopAndKick(player):
     """
-    Ball is in the correct position to kick
+    Ball is in the correct position to kick but we aren't stopped
+    """
+    ball = player.brain.ball
+    return ball.on and \
+        ball.relX > constants.SHOULD_KICK_CLOSE_X and \
+        ball.relX < constants.SHOULD_KICK_FAR_X and \
+        fabs(ball.relY) < constants.SHOULD_KICK_Y
+        # and player.counter < 1 ??
+
+def shouldKickNow(player):
+    """
+    Ball is in the correct position to kick and we are stopped
     """
     ball = player.brain.ball
     # Ensure we are stopped, we see the ball,
