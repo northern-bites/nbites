@@ -10,7 +10,8 @@ def scanFindBall(player):
     """
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.trackBall()
+
+    player.brain.tracker.trackBall()
 
     if transitions.shouldChaseBall(player):
         return player.goNow('chase')
@@ -38,8 +39,7 @@ def spinFindBall(player):
     if transitions.shouldChaseBall(player):
         return player.goNow('chase')
 
-    if player.firstFrame():
-        player.brain.tracker.trackBallSpin()
+    player.brain.tracker.trackBallSpin()
 
     if player.brain.nav.isStopped():
         my = player.brain.my
@@ -62,8 +62,9 @@ def walkFindBall(player):
         return player.goNow('chase')
 
     if player.firstFrame():
-        player.brain.tracker.trackBall()
         player.brain.nav.chaseBall()
+
+    player.brain.tracker.trackBall()
 
     if transitions.shouldSpinFindBallAgain(player):
         return player.goLater('spinFindBall')

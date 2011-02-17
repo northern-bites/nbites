@@ -127,13 +127,7 @@ def shouldSpinFindBallAgain(player):
     """
     If we have been walkFindBall-ing too long we should spin.
     """
-    return player.stateTime > 300
-
-def shouldntStopChasing(player):
-    """
-    Dont switch out of chaser in certain circumstances
-    """
-    return player.inKickingState
+    return player.stateTime > constants.WALK_FIND_BALL_FRAMES_THRESH
 
 def shouldWalkFindBall(player):
     """
@@ -141,6 +135,12 @@ def shouldWalkFindBall(player):
     """
     return player.counter > constants.WALK_FIND_BALL_FRAMES_THRESH and \
         player.brain.ball.framesOff > constants.BALL_OFF_THRESH
+
+def shouldntStopChasing(player):
+    """
+    Dont switch out of chaser in certain circumstances
+    """
+    return player.inKickingState
 
 def shouldPreKickScan(player):
     if player.brain.ball.on:

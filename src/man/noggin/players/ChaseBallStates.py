@@ -28,7 +28,6 @@ def chase(player):
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
     else:
-        print "Oops! My transitions in 'chase' aren't working right."
         return player.goNow('scanFindBall')
 
 def goalieChase(player):
@@ -45,7 +44,6 @@ def goalieChase(player):
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
     else:
-        print "Oops! My transitions in 'goalieChase' aren't working right."
         return player.goNow('scanFindBall')
 
 def approachBall(player):
@@ -129,11 +127,12 @@ def positionForKick(player):
             player.angleToOrbit = player.brain.kickDecider.kickInfo.orbitAngle
             return player.goLater('orbitBall')
 
+        player.inKickingState = True
+
         if transitions.shouldKickNow(player):
             return player.goLater('kickBallExecute')
 
         player.brain.nav.kickPosition(kick)
-        player.inKickingState = True
 
     player.brain.tracker.trackBall()
 
