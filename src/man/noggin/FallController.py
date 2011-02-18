@@ -56,3 +56,9 @@ class FallController(FSA.FSA):
             return 0
         else:
             return SweetMoves.getMoveTime(SweetMoves.STAND_UP_FRONT)
+
+    def enable(self):
+        self.switchTo('on')
+
+    def disable(self):
+        self.switchTo('off')

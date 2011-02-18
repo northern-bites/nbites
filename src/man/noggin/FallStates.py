@@ -93,4 +93,15 @@ def notFallen(guard):
     """
     return guard.stay()
 
+def off(guard):
+    if guard.firstFrame():
+        guard.brain.roboguardian.enableFallProtection(False)
 
+    return guard.stay()
+
+def on(guard):
+    if guard.firstFrame():
+        guard.standingUp = False
+        guard.brain.roboguardian.enableFallProtection(True)
+
+    return guard.stay()

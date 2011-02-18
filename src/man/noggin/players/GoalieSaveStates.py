@@ -1,6 +1,7 @@
 import man.motion.SweetMoves as SweetMoves
 import GoalieTransitions as helper
 
+
 CENTER_SAVE_THRESH = 15
 
 def goalieSave(player):
@@ -20,15 +21,16 @@ def goalieSave(player):
 
 def saveRight(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.SAVE_RIGHT_DEBUG)
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.SAVE_RIGHT_DEBUG):
+        player.brain.guard.disable()
+        player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.GOALIE_DIVE_RIGHT):
         return player.goLater('holdRightSave')
     return player.stay()
 
 def saveLeft(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.SAVE_LEFT_DEBUG)
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.SAVE_LEFT_DEBUG):
+        player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.GOALIE_DIVE_LEFT):
         return player.goLater('holdLeftSave')
     return player.stay()
 
@@ -40,31 +42,36 @@ def saveCenter(player):
     return player.stay()
 
 def holdRightSave(player):
-    if helper.shouldHoldSave(player):
-        player.executeMove(SweetMoves.SAVE_RIGHT_HOLD_DEBUG)
-    else:
+    if player.brain.nav.isStopped():
+        player.brain.guard.enable()
+        player.saving = False
+        player.brain.tracker.trackBall()
         return player.goLater('postSave')
+
     return player.stay()
+
 
 def holdLeftSave(player):
-    if helper.shouldHoldSave(player):
-        player.executeMove(SweetMoves.SAVE_LEFT_HOLD_DEBUG)
-    else:
+    #when dive works want wait time for now just go
+    if player.brain.nav.isStopped():
+        player.brain.guard.enable()
+        player.saving = False
+        player.brain.tracker.trackBall()
         return player.goLater('postSave')
+
     return player.stay()
+
 
 def holdCenterSave(player):
-    if helper.shouldHoldSave(player):
-        pass # player.executeMove(SweetMoves.SAVE_CENTER_HOLD_DEBUG)
-    else:
-        return player.goLater('postSave')
-    return player.stay()
-
-def postSave(player):
-    if player.brain.nav.isStopped():
+    if player.brain.nav.isStopped():# what does this do?
         player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
         player.saving = False
         player.brain.tracker.trackBall()
-        return player.goLater('goalieAtPosition')
+        return player.goLater('postSave')
+    
+    return player.stay()
 
+def postSave(player):
+    if firstFrame():
+        player.brain.guard.enable()
     return player.stay()

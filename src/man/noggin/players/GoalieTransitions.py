@@ -16,7 +16,7 @@ def goalieRunChecks(player):
     #else:
     #    player.shouldGuardCornerCounter = 0
 
-
+    # what is shouldChaseLoc(player)?
     if not player.isChasing:
        if shouldChaseLoc(player):
            player.shouldChaseCounter+=1
@@ -29,7 +29,9 @@ def goalieRunChecks(player):
                return 'chase'
        else:
            player.shouldChaseCounter = 0
-
+    
+    #why is this commented out? With this commented it out will the goalie
+    #ever save?
     #if shouldSave(player) and not player.isChasing:
     #    player.shouldSaveCounter+=1
     #    if player.shouldSaveCounter >= 3:
@@ -39,7 +41,8 @@ def goalieRunChecks(player):
     #        return 'goalieSave'
     #else:
     #    player.shouldSaveCounter = 0
-        
+    
+    #Does he chase? Does he need to be stopped?
     if player.isChasing and not chaseTran.shouldntStopChasing(player):
         if shouldStopChaseLoc(player) :
             player.shouldStopChaseCounter+=1
@@ -53,6 +56,7 @@ def goalieRunChecks(player):
         else:
             player.shouldStopChaseCounter = 0
 
+    #this keeps the goalie in goalie position at all times right?
     if player.currentState == 'gamePlaying':
         player.isChasing = False
         return 'goaliePosition'
@@ -63,6 +67,7 @@ def shouldPositionForSave(player):
     ball = player.brain.ball
 
     # Test velocity values as to which one would work:
+    # WHAT?  I GET THIS SENSE THIS DOESNT WORK EITHER
     relVelX = ball.relVelX
 
     timeUntilSave = getTimeUntilSave(player)
