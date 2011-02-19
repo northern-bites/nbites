@@ -18,7 +18,7 @@ using namespace std;
 using boost::shared_ptr;
 
 EdgeDetectorTest::EdgeDetectorTest() :
-    edges(shared_ptr<Profiler>(new Profiler(&micro_time)), 40)
+    edges(shared_ptr<Profiler>(new Profiler(&micro_time)))
 {
 
 }
@@ -249,10 +249,10 @@ int EdgeDetectorTest::test_peaks()
         for (int j = 2; j < Gradient::cols-2; ++j) {
             if (j == IMAGE_WIDTH * 3/4 ||
                 j == IMAGE_WIDTH * 3/4 - 1){
-                assert(peaks_list_contains(g,i, IMAGE_WIDTH * 3/4) |
-                       peaks_list_contains(g,i, IMAGE_WIDTH * 3/4 - 1));
+                assert(g->peaks_list_contains(i, IMAGE_WIDTH * 3/4) |
+                       g->peaks_list_contains(i, IMAGE_WIDTH * 3/4 - 1));
             } else {
-                assert(!peaks_list_contains(g,i,j));
+                assert(!g->peaks_list_contains(i,j));
             }
         }
     }
@@ -287,7 +287,7 @@ int EdgeDetectorTest::test_peaks()
             // Uncomment here (and cout << endl; below) to get ASCII edge image
             // printEdgePeak(g,i,j);
 
-            if( (n = peaks_list_contains(g,i,j)) ){
+            if( (n = g->peaks_list_contains(i,j)) ){
                 int x = g->getAnglesXCoord(n);
                 int y = g->getAnglesYCoord(n);
                 double d = r - (sqrt((x-j_0)*(x-j_0) + (y-i_0)*(y-i_0)));
@@ -300,8 +300,10 @@ int EdgeDetectorTest::test_peaks()
 
     for (int i = 2; i < Gradient::rows-2; ++i) {
         for (int j = 2; j < Gradient::cols-2; ++j) {
-            double d = r - (sqrt((j-j_0)*(j-j_0) + (i-i_0)*(i-i_0)));
-            LTE(abs(d), e*2);
+            if (g->peaks[i][j]){
+                double d = r - (sqrt((j-j_0)*(j-j_0) + (i-i_0)*(i-i_0)));
+                LTE(abs(d), e*2);
+            }
         }
     }
 
@@ -406,7 +408,7 @@ void EdgeDetectorTest::printEdgePeakInfo(shared_ptr<Gradient> g, int n)
 void EdgeDetectorTest::printEdgePeak(shared_ptr<Gradient> g, int i, int j)
 {
     int index;
-    if ((index = peaks_list_contains(g,i,j))){
+    if ((index = g->peaks_list_contains(i,j))){
         int angle = g->getAngle(index);
         if (angle > 128){
             angle -= 128;
@@ -425,21 +427,6 @@ void EdgeDetectorTest::printEdgePeak(shared_ptr<Gradient> g, int i, int j)
         cout << ".";
     }
     cout << " ";
-}
-
-// Looks for the given coordinates in the peak list of the gradient
-// and returns the index of it, if present. If not present, returns 0.
-int EdgeDetectorTest::peaks_list_contains(shared_ptr<Gradient> g,
-                                           int i, int j){
-    int n = 0;
-    while (g->getAnglesXCoord(n) != 0){
-        if (g->getAnglesXCoord(n) == j &&
-            g->getAnglesYCoord(n) == i){
-            return n;
-        }
-        n++;
-    }
-    return 0;
 }
 
 int EdgeDetectorTest::runTests()

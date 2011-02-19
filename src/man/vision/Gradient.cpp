@@ -9,6 +9,7 @@ Gradient::Gradient() {
     angles = new uint16_t[angles_size];
 }
 
+// @TODO: Profile and rewrite using MMX intrinsics to do this 64bits at once
 void Gradient::reset()
 {
     for (int i = 0; i < angles_size; ++i) {
@@ -21,3 +22,16 @@ void Gradient::reset()
 }
 
 
+// Looks for the given coordinates in the peak list of the gradient
+// and returns the index of it, if present. If not present, returns 0.
+int Gradient::peaks_list_contains(int i, int j){
+    int n = 0;
+    while (getAnglesXCoord(n) != 0){
+        if (getAnglesXCoord(n) == j &&
+            getAnglesYCoord(n) == i){
+            return n;
+        }
+        n++;
+    }
+    return 0;
+}

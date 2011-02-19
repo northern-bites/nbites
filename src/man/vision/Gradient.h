@@ -97,6 +97,8 @@ public:
         return angles[n*3 + angles_y_offset];
     }
 
+    int peaks_list_contains(int i, int j);
+
     // Public member variables
 
     // Values is all the arrays in one, the others get pointers within
