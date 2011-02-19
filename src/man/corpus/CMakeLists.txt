@@ -13,7 +13,7 @@ INCLUDE( ../cmake/base_definitions.cmake )
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
-FIND_PACKAGE( Threads  REQUIRED )
+#FIND_PACKAGE( Threads  REQUIRED )
 FIND_PACKAGE( PythonLibs   REQUIRED )
 FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
 

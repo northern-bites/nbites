@@ -13,7 +13,7 @@ INCLUDE( ../cmake/base_definitions.cmake )
 # Libraries specifics. Define here cmake packages
 # usefull to your project
 FIND_PACKAGE( PythonLibs   REQUIRED )
-FIND_PACKAGE( Threads  REQUIRED )
+#FIND_PACKAGE( Threads  REQUIRED )
 
 
 ############################ BUILDCONFIG
