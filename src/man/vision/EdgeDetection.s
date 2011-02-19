@@ -38,11 +38,9 @@ row_count:      .skip 4
 angles_ptr:     .skip 4
 end_of_peak_stack:
 
-        .equiv neighborOffset, 12*4 + 4
-        .equiv quadrantOffset, 12+4
-        .equiv octantOffset, 12+4
-        .equiv atanOffset, 4
-        .equiv recipOffset, 4
+        .equiv neighborOffset, 12*4
+        .equiv quadrantOffset, 12
+        .equiv octantOffset, 12
 
         .data
 #
@@ -57,7 +55,7 @@ end_of_peak_stack:
 #      -11/     |     \-7
 #       / -9 -10|-6  -5 \
                                         # edx (octant code)
-neighborTable: .long .
+neighborTable:
         .int            - xPitch        # -12
         .int    -yPitch - xPitch        # -11
         .int    -yPitch                 # -10
@@ -76,7 +74,7 @@ neighborTable: .long .
         .int     yPitch                 #   2
         .int     yPitch + xPitch        #   3
 
-quadrantTable: .long .
+quadrantTable:
         .byte   0x80                    # -12
         .byte   0x80                    # -11
         .byte   0xC0                    # -10
@@ -94,7 +92,7 @@ quadrantTable: .long .
         .byte   0x40                    #   2
         .byte   0x40                    #   3
 
-octantTable: .long .
+octantTable:
         .byte    0                      # -12
         .byte    0                      # -11
         .byte   -1                      # -10
@@ -133,7 +131,7 @@ octantTable: .long .
 ## doubled. It's doubled again to get 0x40000 because we want 17
 ## bits of reciprocal so that we can then round off the result to
 ## the final 16 bits we want.
-recipTable: .long .
+recipTable:
         .word   0xFFFF          # i = 0.5 will overflow, so just use the max value
         index = 3               # start at i = 1.5
         .rept   255             # step i from 1.5 to 255.5
@@ -143,7 +141,7 @@ recipTable: .long .
 
 # 129-byte arctangent table covering the range 0 - 45 degrees and containing
 # 5 bits of binary angle
-atanTable: .long .
+atanTable:
         .byte    0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  5
         .byte    5,  5,  6,  6,  6,  7,  7,  7,  8,  8,  8,  8,  9,  9,  9, 10
         .byte   10, 10, 11, 11, 11, 11, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14
@@ -152,7 +150,8 @@ atanTable: .long .
         .byte   23, 23, 23, 23, 24, 24, 24, 24, 25, 25, 25, 25, 25, 26, 26, 26
         .byte   26, 26, 27, 27, 27, 27, 27, 28, 28, 28, 28, 28, 29, 29, 29, 29
         .byte   29, 29, 30, 30, 30, 30, 30, 31, 31, 31, 31, 31, 31, 32, 32, 32
-        .byte   32, 32, 32, 32, 33, 33, 33, 33, 33, 33, 34, 34, 34, 34, 34, 34
+        .byte   32, 32          # Table extended by 1 (to 130 bytes) to compensate for
+                                # rounding error in reciprocal calculation.
 
 .section .text
 
@@ -339,10 +338,12 @@ peaks_xLoop:
         #               (x coordinate is offset from this value)
 
         # Fetch y gradient, compute absolute value, save sign bit in edx
+        prefetch [edi - xPitch]
         movsx   eax, word ptr [edi - xPitch + yGrad]
         cdq
         xor     eax, edx
         sub     eax, edx
+        prefetch [edi - xPitch + yPitch]
 
         # Fetch x gradient, compute absolute value, shift sign bit into edx
         movsx   ebx, word ptr [edi - xPitch + xGrad]
@@ -372,12 +373,11 @@ peaks_xLoop:
 
         # Peak?
         movzx   esi, word ptr[edi + ebp - xPitch]
-        neg     ebp
-        cmp     si, word ptr[edi + ebp - xPitch]
-        cmovb   si, word ptr[edi + ebp - xPitch]
-        cmp     si, word ptr[edi - xPitch]
-        jb      peaks_xLoop
-_tan:
+        neg     ebp             # Find opposite of gradient
+
+        ## INTERLACED instructions (watch out, could get confusing,
+        ##                                      don't hurt yourself)
+
         ## Yes, we have a new edge point. Compute gradient direction. x
         ## component is in eax, 12 bits unsigned. y component is in ebx,
         ## and has been multiplied by 2, so it's 13 bits
@@ -385,14 +385,20 @@ _tan:
         ## of binary angle are looked up from octant code in edx.
         shr     eax, 4
 
+        ## Do peak comparisons
+        cmp     si, word ptr[edi + ebp - xPitch]
+        cmovb   si, word ptr[edi + ebp - xPitch]
+        cmp     si, word ptr[edi - xPitch]
+        jb      peaks_xLoop
+
         # lookup reciprocal, U16.16
-        movzx   eax, word ptr [recipTable + eax*2 + recipOffset]
+        movzx   eax, word ptr [recipTable + eax*2]
 
         imul    eax, ebx                # y/x, U32.21
         shr     eax, 14                 # y/x, U32.7 (129-element table)
 
         # lookup arc tangent
-        movzx   eax, byte ptr [atanTable + eax + atanOffset]
+        movzx   eax, byte ptr [atanTable + eax]
 
         # negate arc tangent for appropriate octants
         xor     al, byte ptr[octantTable + edx + octantOffset]
@@ -456,6 +462,6 @@ peaks_xLoop_end:
 
         pop    ebp
 
-        ## emms
+        emms
 
         ret
