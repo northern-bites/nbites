@@ -78,6 +78,20 @@ Krikkit robots.''',
 			slow_gait = gaits.ZAPHOD_SLOW_GAIT,
 			)
 
+spock = BirthCertificate.BirthCertificate(
+		   name='spock',
+		   long_name='Spock',
+		   tts_name='spock',
+		   doc='''\
+I am Spock. My first name is unpronounceable by you humans. I am the son of a
+Vulcan, Ambassador Sarek, and a human Amanda Grayson. I declined studying at the
+Vulcan Science Academy and joined Starfleet instead. My actions really pissed off
+my father. I provide an emotionally detached, logical perspective to the crew.''',
+		   gait = gaits.SPOCK_GAIT,
+		   dribble_gait = gaits.SPOCK_DRIBBLE_GAIT,
+		   backwards_gait = gaits.SPOCK_BACKWARDS_GAIT,
+		   slow_gait = gaits.SPOCK_SLOW_GAIT,
+		   )
 
 robot_map = { marvin.name	: marvin,
 			  slarti.name	: slarti,
