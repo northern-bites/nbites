@@ -43,6 +43,13 @@ class CoordHeadCommand : public SetHeadCommand
     {
       setChainList();
     }
+ private:
+  virtual void setChainList() {
+    chainList.insert(chainList.end(),
+		     MotionConstants::HEAD_JOINT_CHAINS,
+		     MotionConstants::HEAD_JOINT_CHAINS
+		     + MotionConstants::HEAD_JOINT_NUM_CHAINS);
+  }
 };
 
 #endif
