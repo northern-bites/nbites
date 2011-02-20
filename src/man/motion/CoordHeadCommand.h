@@ -28,13 +28,18 @@
 class CoordHeadCommand : public SetHeadCommand
 {
  public:
- CoordHeadCommand(const float _x, const float _y, const float _z,
+ CoordHeadCommand(const float _x, const float _y,
+		  const float _z,//_z is relative to ground
 		  const float _maxSpeedYaw =
 		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
 		  const float _maxSpeedPitch = 
 		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		  )
-   : SetHeadCommand(_yaw, _pitch, _maxSpeedYaw, _MaxSpeedPitch)
+   : SetHeadCommand(atan(_y, _x-NaoPose::getFocalPointInWorldFrameX()),
+		    atan(_z-NaoPose::getFocalPointInWorldFrameZ(),
+			 sqrt(pow(_x-NaoPose::getFocalPointInWorldFrameX(),2) + 
+			      pow(_y-NaoPose::getFocalPointInWorldFrameY(),2))),
+		    _maxSpeedYaw, _MaxSpeedPitch)
     {
       setChainList();
     }
