@@ -7,6 +7,7 @@
 
 #include "ALImageTranscriber.h"
 #include "corpusconfig.h"
+#include "ImageAcquisition.h"
 
 #ifdef DEBUG_ALIMAGE
 #  define DEBUG_ALIMAGE_LOOP
@@ -15,10 +16,6 @@
 using boost::shared_ptr;
 using namespace AL;
 using namespace std;
-
-extern "C" int _acquire_image(unsigned char *table, ColorParams *params,
-                               unsigned char *yuv, uint16_t *out );
-extern "C" int _copy_image(unsigned char *camera, unsigned char *local);
 
 const int ALImageTranscriber::TOP_CAMERA = 0;
 const int ALImageTranscriber::BOTTOM_CAMERA = 1;

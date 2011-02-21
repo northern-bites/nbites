@@ -54,7 +54,8 @@ private:
         tableMaxSize = 128 * 128 * 128,
     };
 
-    uint8_t *yuv,* yuvCopy, *table, *out;
+    uint8_t *yuv,* yuvCopy, *table;
+    uint16_t *out;
     ColorParams c;
 
     unsigned long long int sumTime_thread, sumTime_process, sumTime_mono;

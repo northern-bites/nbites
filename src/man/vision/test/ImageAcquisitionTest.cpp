@@ -2,6 +2,7 @@
 
 #include "ColorParams.h"
 #include "VisionDef.h"
+#include "ImageAcquisition.h"
 
 #include <stdlib.h>
 #include <cstdio>
@@ -14,10 +15,6 @@
 // #define PROFILE_ACQUIRE
 
 using namespace std;
-
-// Our function to test!
-extern "C" unsigned int _acquire_image(uint8_t * colorTable, ColorParams* params,
-                                       uint8_t* yuvImage, uint8_t* outImage);
 
 ImageAcquisitionTest::ImageAcquisitionTest() :
     c(0,0,0, 256, 256, 256, 128, 128, 128), // Default old table size
@@ -37,7 +34,8 @@ ImageAcquisitionTest::~ImageAcquisitionTest()
 
 void ImageAcquisitionTest::init()
 {
-    yuv = table = yuvCopy = out = NULL;
+    yuv = table = yuvCopy = NULL;
+    out = NULL;
 }
 
 /**
@@ -91,7 +89,7 @@ void ImageAcquisitionTest::allocate()
     // Allocate the output image.
     if (out == NULL){
         // 2 bytes per Y value and 1 per color value
-        out = new uint8_t[320*240*3];
+        out = reinterpret_cast<uint16_t*>(new uint8_t[320*240*3]);
     }
 }
 
@@ -201,8 +199,9 @@ int ImageAcquisitionTest::tableLookup(int y, int u, int v) const
  */
 int ImageAcquisitionTest::colorValue(int i, int j) const
 {
+    uint8_t *out_color = reinterpret_cast<uint8_t*>(out) + Y_IMAGE_BYTE_SIZE;
     // Color image is just past Y Image in array
-    return out[IMAGE_WIDTH * i + j + Y_IMAGE_BYTE_SIZE];
+    return out_color[IMAGE_WIDTH * i + j];
 }
 
 void ImageAcquisitionTest::test_color_segmentation()
