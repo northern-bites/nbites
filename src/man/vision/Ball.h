@@ -84,6 +84,10 @@ public:
 
     int balls(int c, VisualBall *thisBall);
 
+    void adjustBallDimensions();
+    int findBallEdgeY(int x, int y, int dir);
+    int findBallEdgeX(int x, int y, int dir);
+
     // sanity checks
     void preScreenBlobsBasedOnSizeAndColor();
     bool sanityChecks(int w, int h, estimate e, VisualBall * thisBall);

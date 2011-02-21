@@ -179,39 +179,43 @@ void Threshold::thresholdAndRuns() {
  * the runs loops, I (Jeremy) have split out the thresholding into it's own
  * method here.
  */
-// void Threshold::threshold() {
-// #ifndef USE_EDGES
-//     unsigned char *tPtr, *tEnd; // pointers into thresholded array
-//     const unsigned char *yPtr; // pointers into image array
+// THIS IS OUR OLD THRESHOLD (COLOR SEGMENTATION) METHOD
+// CURRENTLY USED TO ACCOMODATE OLD FRAMES
+void Threshold::thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg) {
+#ifndef USE_EDGES
+    uint16_t *yPtr = newImg; // pointers into image array
 
-//     // My loop variable initializations
-//     yPtr = &yplane[0];
+    uint8_t *newColor =
+        reinterpret_cast<uint8_t*>(newImg) + Y_IMAGE_BYTE_SIZE;
 
-//     tPtr = &thresholded[0][0];
-//     tEnd = &thresholded[IMAGE_HEIGHT-1][IMAGE_WIDTH-1] + 1;
+    const uint8_t *oldEnd = oldImg + 320 * 240 * 2; // Size of old image
 
-//     // Loop optimizations thanks to Bill Silver. Uses constant offesets to
-//     // speed up the table lookups. Operates on bigTable in UVY order for
-//     // more optimizations.
-//     while (tPtr < tEnd)
-//     {
-//         unsigned char* p = bigTable[yPtr[UOFFSET] >> 1][yPtr[VOFFSET] >> 1];
-//         *tPtr++ = p[yPtr[YOFFSET1] >> 1];
-//         *tPtr++ = p[yPtr[YOFFSET2] >> 1];
-//         yPtr += 4;
-//     }
+    // Loop optimizations thanks to Bill Silver. Uses constant offsets to
+    // speed up the table lookups. Operates on bigTable in UVY order for
+    // more optimizations.
+    while (oldImg < oldEnd)
+    {
+        unsigned char* p = bigTable[oldImg[UOFFSET] >> 1][oldImg[VOFFSET] >> 1];
+        *newColor++ = p[oldImg[YOFFSET1] >> 1];
+        *newColor++ = p[oldImg[YOFFSET2] >> 1];
 
-// #else
-// #ifdef OFFLINE
-//     // this makes looking at images in the TOOL tolerable
-//     for (int i = 0; i < IMAGE_HEIGHT; i++) {
-//         for (int j = 0; j < IMAGE_WIDTH; j++) {
-//             thresholded[i][j] = GREY;
-//         }
-//     }
-// #endif  /* OFFLINE   */
-// #endif /* USE_EDGES  */
-// }
+        *yPtr++ = oldImg[YOFFSET1];
+        *yPtr++ = oldImg[YOFFSET2];
+
+        oldImg += 4;
+    }
+
+#else
+#ifdef OFFLINE
+    // this makes looking at images in the TOOL tolerable
+    for (int i = 0; i < IMAGE_HEIGHT; i++) {
+        for (int j = 0; j < IMAGE_WIDTH; j++) {
+            thresholded[i][j] = GREY;
+        }
+    }
+#endif  /* OFFLINE   */
+#endif /* USE_EDGES  */
+}
 
 /*  Returns the color at the sent in point.  If we aren't using color tables
 	it does a lookup in the big table, otherwise it just gets the thresholded
@@ -489,7 +493,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             currentRun = 1;
         }
         lastPixel = pixel;
-        if (pixel == ORANGE) {
+        // if (pixel == ORANGE) {
             // @TODO: This probably shouldn't just be commented out...
 //             int lastu = getU(column, j);
 //             int initu = lastu;
@@ -501,14 +505,16 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 //                 thresholded[j][column] = getColor(column, j);
 // #endif
 //             }
-            currentRun--;
-            j++;
-            if ((j == 0 || j >= topEdge) && currentRun > 2) {
-                orange->newRun(column, j, currentRun);
-            }
-            greens+= currentRun;
-            lastPixel = ORANGE;
-        }
+        //     currentRun--;
+        //     // j++;
+
+        //     if ((j == 0 || j >= topEdge) && currentRun > 2) {
+        //         orange->newRun(column, j, currentRun);
+        //     }
+
+        //     greens+= currentRun;
+        //     lastPixel = ORANGE;
+        // }
     }
     if (shoot[column] && greens < (bound - topEdge) / 2) {
         if (block[column / divider] == 0) {
@@ -1710,3 +1716,6 @@ const char* Threshold::getShortColor(int _id) {
     }
 }
 
+int Threshold::getY(int j, int i) const {
+    return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
+}

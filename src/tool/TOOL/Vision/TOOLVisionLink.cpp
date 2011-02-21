@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <vector>
+#include <stdint.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -76,7 +77,8 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
             env->GetObjectArrayElement(thresh_target,0));
     unsigned int numSensorsInFrame = env->GetArrayLength(jsensors);
     //If one of the dimensions is wrong, we exit
-    if(env->GetArrayLength(jimg) != IMAGE_BYTE_SIZE) {
+    if(env->GetArrayLength(jimg) !=
+       320 * 240 * 2) { // Old image size
         cout << "Error: the image had the wrong byte size" << endl;
         cout << "Image byte size should be " << IMAGE_BYTE_SIZE << endl;
         cout << "Detected byte size of " << env->GetArrayLength(jimg)
@@ -136,13 +138,19 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     // Clear the debug image on which the vision algorithm can draw
     vision.thresh->initDebugImage();
 
+
     //get pointer access to the java image array
     jbyte *buf_img = env->GetByteArrayElements( jimg, 0);
     byte * img = (byte *)buf_img; //convert it to a reg. byte array
+
+    uint16_t *newImg = reinterpret_cast<uint16_t*>(new uint8_t[320*240*3]);
+    vision.thresh->thresholdOldImage(img, newImg);
+
     //timing the vision process
     long startTime = micro_time();
     //PROCESS VISION!!
-    vision.notifyImage(img);
+    vision.notifyImage(newImg);
+
     long processTime = micro_time() - startTime;
     //vision.drawBoxes();
     env->ReleaseByteArrayElements( jimg, buf_img, 0);
@@ -156,7 +164,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         jbyte* row = env->GetByteArrayElements(row_target,0);
 
         for(int j = 0; j < IMAGE_WIDTH; j++) {
-            row[j]= vision.thresh->thresholded[i][j];
+            row[j]= vision.thresh->getThresholded(i,j);
 #ifdef OFFLINE
             if (vision.thresh->debugImage[i][j] != GREY) {
                 row[j]= vision.thresh->debugImage[i][j];

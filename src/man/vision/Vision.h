@@ -158,6 +158,9 @@ public:
     // Profiling
     boost::shared_ptr<Profiler> profiler;
 
+    const uint16_t * yImg;
+    const uint8_t * colorImg;
+
 protected:
     //
     // Protected Variable
@@ -204,8 +207,6 @@ private:
     int player;
     std::string colorTable;
 
-    const uint16_t * yImg;
-    const uint8_t * colorImg;
     FieldLinesDetector linesDetector;
 };
 

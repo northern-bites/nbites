@@ -131,6 +131,7 @@ public:
     // main methods
     void visionLoop();
     // inline void threshold();
+    void thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg);
     inline void runs();
     unsigned char getColor(int x, int y);
     unsigned char getExpandedColor(int x, int y, unsigned char col);
@@ -203,9 +204,7 @@ public:
     void setHoughAcceptThreshold(int _thresh);
 
 #if ROBOT(NAO_RL)
-    inline uint16_t getY(int x, int y) {
-        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
-    }
+    int getY(int j, int i) const;
 #elif ROBOT(NAO_SIM)
 #  error NAO_SIM robot type not implemented
 #else
