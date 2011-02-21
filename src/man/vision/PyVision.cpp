@@ -1162,7 +1162,7 @@ PyVision_notifyImage (PyObject *self, PyObject *args)
             return NULL;
         }
 
-        v->notifyImage((byte *)PyString_AsString(s));
+        v->notifyImage((uint16_t *)PyString_AsString(s));
 
     }else {
         PyErr_SetObject(PyExc_TypeError,

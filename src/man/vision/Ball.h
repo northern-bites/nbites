@@ -66,9 +66,6 @@ public:
     void createBall(int c);
 
     // ball stuff
-    void adjustBallDimensions();
-    int findBallEdgeX(int x, int y, int dir);
-    int findBallEdgeY(int x, int y, int dir);
     float rightHalfColor(Blob obj);
     void setOcclusionInformation();
     bool ballIsReasonablySquare(int x, int y, int w, int h);

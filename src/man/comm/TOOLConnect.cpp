@@ -176,14 +176,16 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Image data request
     if (r.image) {
         sensors->lockImage();
-		serial.write_bytes(sensors->getImage(), Y_IMAGE_BYTE_SIZE);
+		serial.write_bytes(
+            reinterpret_cast<const uint8_t*>(sensors->getImage()),
+            Y_IMAGE_BYTE_SIZE);
 		sensors->releaseImage();
     }
 
     if (r.thresh)
         // send thresholded image
-        serial.write_bytes(&vision->thresh->thresholded[0][0],
-                           IMAGE_WIDTH * IMAGE_HEIGHT);
+        serial.write_bytes((uint8_t*)vision->thresh->thresholded,
+                           COLOR_IMAGE_BYTE_SIZE);
 
 	if (r.objects) {
 		if (loc.get()) {

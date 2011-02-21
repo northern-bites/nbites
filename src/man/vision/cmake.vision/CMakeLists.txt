@@ -164,6 +164,8 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/EdgeDetection.s
                  ${VISION_INCLUDE_DIR}/CopyImage.s
                  ${VISION_INCLUDE_DIR}/ColorParams
+                 ${VISION_INCLUDE_DIR}/VisualDetector
+                 ${VISION_INCLUDE_DIR}/FieldLinesDetector
                  )
 
 

@@ -16,8 +16,9 @@ using boost::shared_ptr;
 using namespace AL;
 using namespace std;
 
-extern "C" void _acquire_image(unsigned char *table, ColorParams *params,
-                               unsigned char *yuv, unsigned char *out );
+extern "C" int _acquire_image(unsigned char *table, ColorParams *params,
+                               unsigned char *yuv, uint16_t *out );
+extern "C" int _copy_image(unsigned char *camera, unsigned char *local);
 
 const int ALImageTranscriber::TOP_CAMERA = 0;
 const int ALImageTranscriber::BOTTOM_CAMERA = 1;
@@ -83,15 +84,21 @@ const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
 #endif
 
+#define NUM_FRAMES_TIMER 100
+
+
 ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
                                        shared_ptr<Sensors> s,
                                        ALPtr<ALBroker> broker)
     : ThreadedImageTranscriber(s,synchro,"ALImageTranscriber"),
       log(), camera(), lem_name(""), camera_active(false),
-      image(new unsigned char[IMAGE_BYTE_SIZE]),
+      image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
       table(new unsigned char[yLimit * uLimit * vLimit]),
-      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
+      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
+      sumTime_thread(0), sumTime_mono(0), sumTime_process(0),
+      sumTicks(0), minTicks(999999999),numFrames(NUM_FRAMES_TIMER)
 {
+
     try {
         log = broker->getLoggerProxy();
         // Possible values are
@@ -116,10 +123,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
     }
 #endif
 
-    // initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
-    srand(time(NULL));
-    for (int i=0; i < tableByteSize; ++i)
-        table[i] = static_cast<unsigned char>(rand() % 255);
+    initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
 }
 
 ALImageTranscriber::~ALImageTranscriber()
@@ -173,8 +177,8 @@ void ALImageTranscriber::run()
             const long int secSleepTime =
                 static_cast<long int>(microSleepTime / (1000*1000));
 
-            cout << "Sleeping for nano: " << nanoSleepTime
-                 << " and sec:" << secSleepTime << endl;
+            // cout << "Sleeping for nano: " << nanoSleepTime
+            //      << " and sec:" << secSleepTime << endl;
 
             interval.tv_sec = static_cast<__time_t>(secSleepTime);
             interval.tv_nsec = nanoSleepTime;
@@ -531,13 +535,65 @@ void ALImageTranscriber::waitForImage ()
                        "NaoCam module");
         }
 
+
+
         if (ALimage != NULL){
             sensors->lockImage();
+            // naoCamera->setCamera((WhichCamera)TOP_CAMERA);
+            // memcpy(bigImg, ALimage->getData(), 640*480*2);
+            // startTime = micro_time();
+
+            // clock_gettime(CLOCK_MONOTONIC, &startT_mono);
+            // clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startT_process);
+            // clock_gettime(CLOCK_THREAD_CPUTIME_ID, &startT_thread);
+
             _acquire_image(table, &params, ALimage->getData(), image);
+
+            // clock_gettime(CLOCK_MONOTONIC, &finishT_mono);
+            // clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &finishT_process);
+            // clock_gettime(CLOCK_THREAD_CPUTIME_ID, &finishT_thread);
             sensors->releaseImage();
+
         } else {
             cout << "\tALImage from camera was null!!" << endl;
         }
+
+        // sumTime_thread += (finishT_thread.tv_sec -
+        //                    startT_thread.tv_sec) * MICROS_PER_SECOND;
+        // sumTime_thread += (finishT_thread.tv_nsec -
+        //                    startT_thread.tv_nsec) / 1000;
+
+        // sumTime_mono += (finishT_mono.tv_sec -
+        //                    startT_mono.tv_sec) * MICROS_PER_SECOND;
+        // sumTime_mono += (finishT_mono.tv_nsec -
+        //                    startT_mono.tv_nsec) / 1000;
+
+        // sumTime_process += (finishT_process.tv_sec -
+        //                    startT_process.tv_sec) * MICROS_PER_SECOND;
+        // sumTime_process += (finishT_process.tv_nsec -
+        //                    startT_process.tv_nsec) / 1000;
+
+        // numFrames--;
+
+        // if (numFrames == 0){
+        //     cout << "RUN TIMES:" << endl;
+        //     cout << "\tAverage THREAD run time for _acquire_image: " <<
+        //         sumTime_thread / NUM_FRAMES_TIMER << endl;
+        //     // cout << "\tAverage PROCESS run time for _acquire_image: " <<
+        //     //     sumTime_process / NUM_FRAMES_TIMER << endl;
+        //     // cout << "\tAverage MONO run time for _acquire_image: " <<
+        //     //     sumTime_mono / NUM_FRAMES_TIMER << endl;
+        //     cout << "\tAverage TICKS for _copy_image: " <<
+        //         sumTicks/NUM_FRAMES_TIMER << endl;
+        //     cout << "\tMinimum TICKS for _copy_image: " <<
+        //         minTicks << endl;
+        //     cout << "\tMinimum TICKS per byte: " <<
+        //         minTicks/(640*480*2.) << endl;
+
+        //     numFrames = NUM_FRAMES_TIMER;
+        //     sumTime_thread = sumTime_mono = sumTime_process = 0;
+        // }
+
 
 #ifdef DEBUG_IMAGE_REQUESTS
         //You can get some informations of the image.

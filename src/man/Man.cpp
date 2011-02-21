@@ -169,13 +169,11 @@ Man::processFrame ()
 #ifdef USE_VISION
     // Need to lock image and vision angles for duration of
     // vision processing to ensure consistency.
-    sensors->lockVisionAngles();
     sensors->lockImage();
 
     vision->notifyImage(sensors->getImage());
 
     sensors->releaseImage();
-    sensors->releaseVisionAngles();
 #endif
 
 #ifdef USE_NOGGIN

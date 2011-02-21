@@ -38,13 +38,15 @@
 using namespace std;
 using boost::shared_ptr;
 
-static byte global_image[IMAGE_BYTE_SIZE];
-
+static uint8_t global_8_image[IMAGE_BYTE_SIZE];
+static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 
 // Vision Class Constructor
 Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
     : pose(_pose), profiler(_prof),
-      frameNumber(0), id(-1), name(), player(1), colorTable("table.mtb")
+      frameNumber(0), id(-1), name(), player(1), colorTable("table.mtb"),
+      yImg(&global_16_image[0]), colorImg(&global_8_image[0]),
+      linesDetector(profiler)
 {
     // variable initialization
 
@@ -65,7 +67,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
 
     thresh = new Threshold(this, pose);
     fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose, profiler));
-    thresh->setYUV(&global_image[0]);
+    thresh->setYUV(&global_16_image[0]);
 }
 
 // Vision Class Deconstructor
@@ -86,13 +88,16 @@ Vision::~Vision()
 }
 
 void Vision::copyImage(const byte* image) {
-    memcpy(&global_image[0], image, IMAGE_BYTE_SIZE);
-    thresh->setYUV(&global_image[0]);
+    memcpy(&global_16_image[0], image, IMAGE_BYTE_SIZE);
+    thresh->setYUV(&global_16_image[0]);
 }
 
-void Vision::notifyImage(const byte* image) {
+void Vision::notifyImage(const uint16_t* y) {
+    yImg = y;
+    colorImg = reinterpret_cast<const uint8_t*>(&y[AVERAGED_IMAGE_SIZE]);
+
     // Set the current image pointer in Threshold
-    thresh->setYUV(image);
+    thresh->setYUV(y);
     notifyImage();
 }
 
@@ -127,10 +132,11 @@ void Vision::notifyImage() {
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
+    // linesDetector.detect(yImg);
     PROF_EXIT(profiler, P_VISION);
 }
 
-void Vision::setImage(const byte *image) {
+void Vision::setImage(const uint16_t *image) {
     thresh->setYUV(image);
 }
 
@@ -250,13 +256,13 @@ void Vision::drawBox(int left, int right, int bottom, int top, int c) {
             top < IMAGE_HEIGHT &&
             i >= 0 &&
             i < IMAGE_WIDTH) {
-            thresh->thresholded[top][i] = static_cast<unsigned char>(c);
+            thresh->setThresholded(top,i, static_cast<unsigned char>(c));
         }
         if ((top + height) >= 0 &&
             (top + height) < IMAGE_HEIGHT &&
             i >= 0 &&
             i < IMAGE_WIDTH) {
-            thresh->thresholded[top + height][i] = static_cast<unsigned char>(c);
+            thresh->setThresholded(top + height,i, static_cast<unsigned char>(c));
         }
     }
     for (int i = top; i < top + height; i++) {
@@ -264,13 +270,13 @@ void Vision::drawBox(int left, int right, int bottom, int top, int c) {
             i < IMAGE_HEIGHT &&
             left >= 0 &&
             left < IMAGE_WIDTH) {
-            thresh->thresholded[i][left] = static_cast<unsigned char>(c);
+            thresh->setThresholded(i,left, static_cast<unsigned char>(c));
         }
         if (i >= 0 &&
             i < IMAGE_HEIGHT &&
             (left+width) >= 0 &&
             (left+width) < IMAGE_WIDTH) {
-            thresh->thresholded[i][left + width] = static_cast<unsigned char>(c);
+            thresh->setThresholded(i,left + width, static_cast<unsigned char>(c));
         }
     }
 } // drawBox
@@ -316,13 +322,13 @@ void Vision::drawRect(int left, int top, int width, int height, int c) {
 
     for (int i = left; i < left + width; i++) {
         if (top >= 0 && top < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-            thresh->thresholded[top][i] = static_cast<unsigned char>(c);
+            thresh->setThresholded(top,i, static_cast<unsigned char>(c));
         }
         if ((top + height) >= 0 &&
             (top + height) < IMAGE_HEIGHT &&
             i >= 0 &&
             i < IMAGE_WIDTH) {
-            thresh->thresholded[top + height][i] = static_cast<unsigned char>(c);
+            thresh->setThresholded(top + height,i, static_cast<unsigned char>(c));
         }
     }
     for (int i = top; i < top + height; i++) {
@@ -330,13 +336,13 @@ void Vision::drawRect(int left, int top, int width, int height, int c) {
             i < IMAGE_HEIGHT &&
             left >= 0 &&
             left < IMAGE_WIDTH) {
-            thresh->thresholded[i][left] = static_cast<unsigned char>(c);
+            thresh->setThresholded(i,left, static_cast<unsigned char>(c));
         }
         if (i >= 0 &&
             i < IMAGE_HEIGHT &&
             (left+width) >= 0 &&
             (left+width) < IMAGE_WIDTH) {
-            thresh->thresholded[i][left + width] = static_cast<unsigned char>(c);
+            thresh->setThresholded(i,left + width, static_cast<unsigned char>(c));
         }
     }
 #if ROBOT(NAO)
@@ -354,13 +360,13 @@ void Vision::drawRect(int left, int top, int width, int height, int c) {
     }
     for (int i = left; i < left + width; i++) {
         if (top >= 0 && top < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-            thresh->thresholded[top][i] = static_cast<unsigned char>(c);
+            thresh->setThresholded(top,i, static_cast<unsigned char>(c));
         }
         if ((top + height) >= 0 &&
             (top + height) < IMAGE_HEIGHT &&
             i >= 0 &&
             i < IMAGE_WIDTH) {
-            thresh->thresholded[top + height][i] = static_cast<unsigned char>(c);
+            thresh->setThresholded(top + height,i, static_cast<unsigned char>(c));
         }
     }
     for (int i = top; i < top + height; i++) {
@@ -368,13 +374,13 @@ void Vision::drawRect(int left, int top, int width, int height, int c) {
             i < IMAGE_HEIGHT &&
             left >= 0 &&
             left < IMAGE_WIDTH) {
-            thresh->thresholded[i][left] = static_cast<unsigned char>(c);
+            thresh->setThresholded(i,left, static_cast<unsigned char>(c));
         }
         if (i >= 0 &&
             i < IMAGE_HEIGHT &&
             (left+width) >= 0 &&
             (left+width) < IMAGE_WIDTH) {
-            thresh->thresholded[i][left + width] = static_cast<unsigned char>(c);
+            thresh->setThresholded(i,left + width, static_cast<unsigned char>(c));
         }
     }
 #endif
@@ -392,7 +398,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c) {
         for (int i = y; i != y1; i += sign) {
             int newx = x + static_cast<int>(slope * static_cast<float>(i - y) );
             if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT)
-                thresh->thresholded[i][newx] = static_cast<unsigned char>(c);
+                thresh->setThresholded(i,newx, static_cast<unsigned char>(c));
         }
     } else if (slope != 0) {
         //slope = 1.0 / slope;
@@ -400,7 +406,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c) {
         for (int i = x; i != x1; i += sign) {
             int newy = y + static_cast<int>(slope * static_cast<float>(i - x));
             if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH)
-                thresh->thresholded[newy][i] = static_cast<unsigned char>(c);
+                thresh->setThresholded(newy,i, static_cast<unsigned char>(c));
         }
     }
     else if (slope == 0) {
@@ -408,7 +414,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c) {
         int endX = max(x, x1);
         for (int i = startX; i <= endX; i++) {
             if (y >= 0 && y < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                thresh->thresholded[y][i] = static_cast<unsigned char>(c);
+                thresh->setThresholded(y,i, static_cast<unsigned char>(c));
             }
         }
     }
@@ -464,7 +470,7 @@ void Vision::drawLine(boost::shared_ptr<VisualLine> line, const int color) {
 void Vision::drawVerticalLine(int x, int c) {
     if (x >= 0 && x < IMAGE_WIDTH) {
         for (int i = 0; i < IMAGE_HEIGHT; i++) {
-            thresh->thresholded[i][x] = static_cast<unsigned char>(c);
+            thresh->setThresholded(i,x, static_cast<unsigned char>(c));
         }
     }
 }
@@ -476,9 +482,9 @@ void Vision::drawVerticalLine(int x, int c) {
 void Vision::drawHorizontalLine(int y, int c) {
     if (y >= 0 && y < IMAGE_HEIGHT) {
         for (int i = 0; i < IMAGE_WIDTH; i++) {
-            thresh->thresholded[y][i] = static_cast<unsigned char>(c);
+            thresh->setThresholded(y,i, static_cast<unsigned char>(c));
             if (y + 1 < IMAGE_HEIGHT - 1) {
-                thresh->thresholded[y+1][i] = static_cast<unsigned char>(c);
+                thresh->setThresholded(y+1,i, static_cast<unsigned char>(c));
             }
         }
     }
@@ -498,7 +504,7 @@ void Vision::drawCrossHairs(int x, int y, int c) {
 */
 void Vision::drawDot(int x, int y, int c) {
     if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        thresh->thresholded[y][x] = static_cast<unsigned char>(c);
+        thresh->setThresholded(y,x, static_cast<unsigned char>(c));
     }
 }
 

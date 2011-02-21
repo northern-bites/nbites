@@ -41,7 +41,7 @@ using namespace Kinematics;
 
 // static base image array, so we don't crash on image access if the setImage()
 // method is never called
-static unsigned char global_image[IMAGE_BYTE_SIZE];
+static uint16_t global_image[IMAGE_BYTE_SIZE];
 
 //
 // C++ Sensors class methods
@@ -59,7 +59,8 @@ Sensors::Sensors ()
       rightFootBumper(0.0f, 0.0f),
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
-      yImage(&global_image[0]), colorImage(&global_image[0]),
+      yImage(&global_image[0]),
+      colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
@@ -740,25 +741,25 @@ void Sensors::releaseVisionAngles() {
     pthread_mutex_unlock (&vision_angles_mutex);
 }
 
-const unsigned char* Sensors::getYImage () const
+const uint16_t* Sensors::getYImage () const
 {
     return yImage;
 }
 
-const unsigned char* Sensors::getImage () const
+const uint16_t* Sensors::getImage () const
 {
     return yImage;
 }
 
-const unsigned char* Sensors::getColorImage() const
+const uint8_t* Sensors::getColorImage() const
 {
     return colorImage;
 }
 
-void Sensors::setImage (const unsigned char *img)
+void Sensors::setImage (const uint16_t *img)
 {
     yImage = img;
-    colorImage = img + Y_IMAGE_BYTE_SIZE;
+    colorImage = reinterpret_cast<const uint8_t*>(img + AVERAGED_IMAGE_SIZE);
 }
 
 
@@ -789,8 +790,10 @@ void Sensors::saveFrame()
     // not happening in our code atm
     lockVisionAngles();
     lockImage();
+
+    // @TODO Write out entire 640x480 image
     fout.write(reinterpret_cast<const char*>(getImage()),
-               IMAGE_BYTE_SIZE);
+               Y_IMAGE_BYTE_SIZE);
     // write the version of the frame format at the end before joints/sensors
     fout << VERSION << " ";
 
@@ -831,10 +834,22 @@ void Sensors::loadFrame(string path)
     // Load the image from the file, puts it straight into Sensors'
     // image buffer so it doesn't have to allocate its own buffer and
     // worry about deleting it
-    unsigned char * img = const_cast<unsigned char*>(getImage());
-    fin.read(reinterpret_cast<char *>(img), IMAGE_BYTE_SIZE);
+    uint16_t * img = const_cast<uint16_t*>(getImage());
+    uint8_t * byte_img = new uint8_t[320 * 240 * 2];
+    fin.read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
     releaseImage();
 
+    lockImage();
+
+    // Translate the loaded image into the proper format.
+    // @TODO: Convert images to new format.
+    for (int i=0; i < 320*240; i++){
+        img[i] = 0;
+        img[i] = static_cast<uint16_t>(byte_img[i<<1]);
+    }
+    delete byte_img;
+
+    releaseImage();
     float v;
     int version;
     string space;

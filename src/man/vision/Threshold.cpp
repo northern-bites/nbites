@@ -62,21 +62,13 @@
 
 #include "ColorParams.h"
 
-
-extern "C" int _acquire_image(const uchar * colorTable,
-                              ColorParams * colorParams,
-                              const uchar * yuvImage,
-                              uchar * outputImage);
-
 using namespace std;
 using boost::shared_ptr;
 #define PRINT_VISION_INFO
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
-    : vision(vis), pose(posPtr),
-      edgeDetector(vision->profiler,DEFAULT_EDGE_VALUE),
-      hough(vision->profiler), gradient()
+    : vision(vis), pose(posPtr)
 {
 
     // loads the color table on the MS into memory
@@ -95,8 +87,6 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 #else
 #  error Undefined robot type
 #endif // OFFLINE
-
-    gradient = shared_ptr<Gradient>(new Gradient());
 
     // Set up object recognition object pointers
     field = new Field(vision, this);
@@ -123,23 +113,20 @@ void Threshold::visionLoop() {
     // threshold image and create runs
     thresholdAndRuns();
 
-    edgeDetection();
-    // findLines();
-
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
     // will be able to supply information about them through getLines() and
     // getCorners().
-    // PROF_ENTER(vision->profiler, P_LINES);
-    // vision->fieldLines->lineLoop();
-    // PROF_EXIT(vision->profiler, P_LINES);
+    PROF_ENTER(vision->profiler, P_LINES);
+    vision->fieldLines->lineLoop();
+    PROF_EXIT(vision->profiler, P_LINES);
 
     // do recognition
     PROF_ENTER(vision->profiler, P_OBJECT);
     objectRecognition();
     PROF_EXIT(vision->profiler, P_OBJECT);
 
-    // vision->fieldLines->afterObjectFragments();
+    vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
     // if (vision->bgCrossbar->getWidth() > 0) {
     //     setShot(vision->bgCrossbar);
@@ -148,7 +135,7 @@ void Threshold::visionLoop() {
     //     setShot(vision->ygCrossbar);
     // }
     // for now we also don't use open field information
-    //field->openDirection(horizon, pose.get());
+    // field->openDirection(horizon, pose.get());
 
 #ifdef OFFLINE
     if (visualHorizonDebug) {
@@ -171,11 +158,6 @@ void Threshold::visionLoop() {
 void Threshold::thresholdAndRuns() {
     PROF_ENTER(vision->profiler, P_THRESHRUNS); // profiling
 
-    // Perform image thresholding
-    PROF_ENTER(vision->profiler, P_THRESHOLD);
-    threshold();
-    PROF_EXIT(vision->profiler, P_THRESHOLD);
-
     initColors();
 
     // Determine where the field horizon is
@@ -197,105 +179,39 @@ void Threshold::thresholdAndRuns() {
  * the runs loops, I (Jeremy) have split out the thresholding into it's own
  * method here.
  */
-void Threshold::threshold() {
-//#define MMX_ACQUISITION
-#ifdef MMX_ACQUISITION
-    ColorParams* colorParams = new ColorParams();
-    uchar * outImage = (uchar*)malloc(320*240*3*sizeof(uchar));
-    // NOT RIGHT, TO BE CHANGED SOON
-    _acquire_image(outImage, colorParams, yplane, outImage);
-#else
-#ifndef USE_EDGES
-    unsigned char *tPtr, *tEnd; // pointers into thresholded array
-    const unsigned char *yPtr; // pointers into image array
+// void Threshold::threshold() {
+// #ifndef USE_EDGES
+//     unsigned char *tPtr, *tEnd; // pointers into thresholded array
+//     const unsigned char *yPtr; // pointers into image array
 
-    // My loop variable initializations
-    yPtr = &yplane[0];
+//     // My loop variable initializations
+//     yPtr = &yplane[0];
 
-    tPtr = &thresholded[0][0];
-    tEnd = &thresholded[IMAGE_HEIGHT-1][IMAGE_WIDTH-1] + 1;
+//     tPtr = &thresholded[0][0];
+//     tEnd = &thresholded[IMAGE_HEIGHT-1][IMAGE_WIDTH-1] + 1;
 
-    // Loop optimizations thanks to Bill Silver. Uses constant offesets to
-    // speed up the table lookups. Operates on bigTable in UVY order for
-    // more optimizations.
-    while (tPtr < tEnd)
-    {
-        unsigned char* p = bigTable[yPtr[UOFFSET] >> 1][yPtr[VOFFSET] >> 1];
-        *tPtr++ = p[yPtr[YOFFSET1] >> 1];
-        *tPtr++ = p[yPtr[YOFFSET2] >> 1];
-        yPtr += 4;
-    }
+//     // Loop optimizations thanks to Bill Silver. Uses constant offesets to
+//     // speed up the table lookups. Operates on bigTable in UVY order for
+//     // more optimizations.
+//     while (tPtr < tEnd)
+//     {
+//         unsigned char* p = bigTable[yPtr[UOFFSET] >> 1][yPtr[VOFFSET] >> 1];
+//         *tPtr++ = p[yPtr[YOFFSET1] >> 1];
+//         *tPtr++ = p[yPtr[YOFFSET2] >> 1];
+//         yPtr += 4;
+//     }
 
-#else
-#ifdef OFFLINE
-    // this makes looking at images in the TOOL tolerable
-    for (int i = 0; i < IMAGE_HEIGHT; i++) {
-        for (int j = 0; j < IMAGE_WIDTH; j++) {
-            thresholded[i][j] = GREY;
-        }
-    }
-#endif  /* OFFLINE   */
-#endif /* USE_EDGES  */
-#endif /* MMX_ACQUISITION */
-}
-
-/**
- * Detect the edges in an image based on the channel gradients
- */
-void Threshold::edgeDetection()
-{
-    edgeDetector.detectEdges(reinterpret_cast<const uint16_t*>(yuv), gradient);
-    drawDetectedEdges(gradient);
-}
-
-void Threshold::findLines()
-{
-    list<HoughLine> lines = hough.findLines(gradient);
-    drawHoughLines(lines);
-}
-
-void Threshold::drawHoughLines(list<HoughLine> &lines)
-{
-#ifdef OFFLINE
-    if (debugHoughTransform){
-        list<HoughLine>::iterator line = lines.begin();
-        while (line != lines.end()){
-            for (double u = -200.; u <= 200.; u+=1.){
-                double sn = sin(line->getAngle());
-                double cs = cos(line->getAngle());
-                double x0 = line->getRadius() * cs;
-                double y0 = line->getRadius() * sn;
-
-                int x = (int)round(x0 - u * sn) + IMAGE_WIDTH  / 2;
-                int y = (int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
-
-                if (0 <= x && x < IMAGE_WIDTH &&
-                    0 <= y && y < IMAGE_HEIGHT)
-                    vision->drawDot(x,y, LIGHT_SKY_BLUE);
-            }
-            line++;
-        }
-    }
-#endif
-}
-
-/**
- * Draw the edges in a given gradient on the thresholded image
- */
-void Threshold::drawDetectedEdges(shared_ptr<Gradient> g)
-{
-#ifdef OFFLINE
-    if (debugEdgeDetection){
-        // See comments in EdgeDetector as to why this is shrunk in.
-        for(int i=1; i < Gradient::rows-1; ++i){
-            for (int j=1; j < Gradient::cols-1; ++j){
-                if (gradient->peaks[i][j])
-                    vision->drawDot(j, i, PURPLE);
-            }
-        }
-    }
-#endif
-}
+// #else
+// #ifdef OFFLINE
+//     // this makes looking at images in the TOOL tolerable
+//     for (int i = 0; i < IMAGE_HEIGHT; i++) {
+//         for (int j = 0; j < IMAGE_WIDTH; j++) {
+//             thresholded[i][j] = GREY;
+//         }
+//     }
+// #endif  /* OFFLINE   */
+// #endif /* USE_EDGES  */
+// }
 
 /*  Returns the color at the sent in point.  If we aren't using color tables
 	it does a lookup in the big table, otherwise it just gets the thresholded
@@ -325,7 +241,7 @@ unsigned char Threshold::getColor(int x1, int y1) {
     }
     return GREY;
 #else
-    return thresholded[y1][x1];
+    return getThresholded(y1,x1);
 #endif
 }
 
@@ -356,35 +272,6 @@ unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
     return getColor(x, y);
 #endif
 
-}
-
-/*  A first attempt at doing true edge detection.  A work in progress
- */
-
-int Threshold::getHorizontalEdge(int x1, int y1, int dir) {
-    const unsigned char *yPtr = &yplane[0] + y1*IMAGE_ROW_OFFSET+2*x1;
-    int oldy, oldv, oldu, newy, newu, newv, maxCount;
-    oldy = yPtr[0];
-    oldu = yPtr[UOFFSET + 2*(x1%2)];
-    oldv = yPtr[VOFFSET + 2*(x1%2)];
-    newy = oldy;
-    newu = oldu;
-    newv = oldv;
-    if (dir == 1) {
-        maxCount = IMAGE_WIDTH - x1 - 1;
-    } else {
-        maxCount = x1;
-    }
-    int count = 0;
-    while (abs(oldy - newy) < 20 && abs(oldu - newu) < 20 && abs(oldv < newv) < 20
-            && ((dir == 1 && count < maxCount) || (dir == -1 && count > -1))) {
-        yPtr+= 4;
-        oldy = yPtr[0];
-        oldu = yPtr[UOFFSET];
-        oldv = yPtr[VOFFSET];
-        count++;
-    }
-    return count -1;
 }
 
 /* Image runs.  As explained in the comments for the threshold() method, I
@@ -440,7 +327,7 @@ void Threshold::findGoals(int column, int topEdge) {
 #ifdef USE_EDGES
         thresholded[j][column] = getColor(column, j);
 #endif
-        unsigned char pixel = thresholded[j][column];
+        unsigned char pixel = getThresholded(j,column);
         switch (pixel) {
         case BLUE:
             lastBlue = j;
@@ -465,7 +352,7 @@ void Threshold::findGoals(int column, int topEdge) {
     bad = 0;
     for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
         // note:  These were thresholded in the findBallsCrosses loop
-        unsigned char pixel = thresholded[j][column];
+        unsigned char pixel = getThresholded(j,column);
         switch (pixel) {
         case BLUE:
             firstBlue = j;
@@ -529,7 +416,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         thresholded[j][column] = getColor(column, j);
 #endif
         // get the next pixel
-        unsigned char pixel = thresholded[j][column];
+        unsigned char pixel = getThresholded(j,column);
         // for simplicity treat ORANGERED as ORANGE - we'll look
         // more carefully when we check whether or not it is a ball
         if (pixel == ORANGERED) {
@@ -548,7 +435,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             case ORANGE:
                 // add to Ball data structure
                 if (j == topEdge) {
-                    while (j > 0 && thresholded[j][column] == ORANGE) {
+                    while (j > 0 && getThresholded(j,column) == ORANGE) {
                         currentRun++;
                         j--;
                     }
@@ -603,16 +490,17 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         }
         lastPixel = pixel;
         if (pixel == ORANGE) {
-            int lastu = getU(column, j);
-            int initu = lastu;
-            while (j >= topEdge && abs(getU(column, j) - lastu) < 8 &&
-                   abs(initu - lastu) < 12) {
-                currentRun++;
-                j--;
-#ifdef USE_EDGES
-                thresholded[j][column] = getColor(column, j);
-#endif
-            }
+            // @TODO: This probably shouldn't just be commented out...
+//             int lastu = getU(column, j);
+//             int initu = lastu;
+//             while (j >= topEdge && abs(getU(column, j) - lastu) < 8 &&
+//                    abs(initu - lastu) < 12) {
+//                 currentRun++;
+//                 j--;
+// #ifdef USE_EDGES
+//                 thresholded[j][column] = getColor(column, j);
+// #endif
+//             }
             currentRun--;
             j++;
             if ((j == 0 || j >= topEdge) && currentRun > 2) {
@@ -1503,18 +1391,18 @@ void Threshold::initCompressedTable(std::string filename){
 #endif /* NO_ZLIB */
 }
 
-const uchar* Threshold::getYUV() {
+const uint16_t* Threshold::getYUV() {
     return yuv;
 }
 
 /* I haven't a clue what this method is for.
  * @param newyuv     presumably a new yuv value in bytes or something
  */
-void Threshold::setYUV(const uchar* newyuv) {
+void Threshold::setYUV(const uint16_t* newyuv) {
     yuv = newyuv;
+    thresholded = const_cast<uint8_t*>(
+        reinterpret_cast<const uint8_t*>(yuv + AVERAGED_IMAGE_SIZE));
     yplane = yuv;
-    uplane = yplane + 1;
-    vplane = yplane + 3;
 }
 
 /* Calculate the distance between two objects (x distance only).
@@ -1822,17 +1710,3 @@ const char* Threshold::getShortColor(int _id) {
     }
 }
 
-void Threshold::setEdgeThreshold(int _thresh)
-{
-    edgeDetector.setThreshold(_thresh);
-}
-
-int Threshold::getEdgeThreshold()
-{
-    return edgeDetector.getThreshold();
-}
-
-void Threshold::setHoughAcceptThreshold(int _thresh)
-{
-    hough.setAcceptThreshold(_thresh);
-}

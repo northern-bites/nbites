@@ -22,9 +22,6 @@ class Threshold;  // forward reference
 #include "Profiler.h"
 #include "NaoPose.h"
 #include "Gradient.h"
-#include "EdgeDetector.h"
-#include "HoughSpace.h"
-
 
 //
 // COLOR TABLE CONSTANTS
@@ -133,9 +130,7 @@ public:
 
     // main methods
     void visionLoop();
-    inline void threshold();
-    inline void edgeDetection();
-    inline void findLines();
+    // inline void threshold();
     inline void runs();
     unsigned char getColor(int x, int y);
     unsigned char getExpandedColor(int x, int y, unsigned char col);
@@ -173,8 +168,8 @@ public:
     int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
     point <int> backStopCheck(bool which, int left, int right);
-    void setYUV(const uchar* newyuv);
-    const uchar* getYUV();
+    void setYUV(const uint16_t* newyuv);
+    const uint16_t* getYUV();
     static const char * getShortColor(int _id);
 
     int getPixelBoundaryLeft();
@@ -194,7 +189,6 @@ public:
     void initDebugImage();
     void transposeDebugImage();
     void drawDetectedEdges(boost::shared_ptr<Gradient> g);
-    void drawHoughLines(list<HoughLine> &lines);
     void drawX(int x, int y, int c);
     void drawPoint(int x, int y, int c);
     void drawLine(const point<int> start, const point<int> end,
@@ -209,14 +203,8 @@ public:
     void setHoughAcceptThreshold(int _thresh);
 
 #if ROBOT(NAO_RL)
-    inline uchar getY(int x, int y) {
+    inline uint16_t getY(int x, int y) {
         return yplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
-    }
-    inline uchar getU(int x, int y) {
-        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + UOFFSET];
-    }
-    inline uchar getV(int x, int y) {
-        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + VOFFSET];
     }
 #elif ROBOT(NAO_SIM)
 #  error NAO_SIM robot type not implemented
@@ -238,13 +226,20 @@ public:
     Ball* orange;
     Cross* cross;
     // main array
-    unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
+    uint8_t* thresholded;
+    inline uint8_t getThresholded(int i, int j){
+        return thresholded[i * IMAGE_WIDTH + j];
+    }
+    inline void setThresholded(int i, int j, uint8_t value){
+        thresholded[i * IMAGE_WIDTH + j] = value;
+    }
+
 	Field* field;
     Context* context;
 
 #ifdef OFFLINE
     //write lines, points, boxes to this array to avoid changing the real image
-    unsigned char debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
+    uint8_t debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
 #endif
 
 private:
@@ -253,13 +248,8 @@ private:
     Vision* vision;
     boost::shared_ptr<NaoPose> pose;
 
-    const uchar* yuv;
-    const uchar* yplane, *uplane, *vplane;
-
-    // Edge detection objects
-    EdgeDetector edgeDetector;
-    HoughSpace hough;
-    boost::shared_ptr<Gradient> gradient;
+    const uint16_t* yuv;
+    const uint16_t* yplane;
 
     unsigned char bigTable[UMAX][VMAX][YMAX];
 

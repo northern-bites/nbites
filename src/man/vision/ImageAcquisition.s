@@ -84,8 +84,7 @@ color_stack_row_end:
                                                 # just moving a byte to al
         mov     byte ptr[edi+ecx+\phase], al
                                 # color image is just after y image in memory,
-                                # so displacement is (320*240*2)
-                                # since Y and color values 16 bits each
+                                # Y values are 16 bits, color are bytes
 .endm
 
         ## The inner loop of the image copy, averaging, and color segmentation

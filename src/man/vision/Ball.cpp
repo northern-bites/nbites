@@ -285,7 +285,9 @@ int Ball::balls(int horizon, VisualBall *thisBall)
         w = topBlob->width();
         h = topBlob->height();
         if (abs(w - h) > DIAMETERMISMATCH && !nearEdge(*topBlob)) {
-            adjustBallDimensions();
+            // getU no longer exists, so we've put a hold on this
+            // @TODO delete it.
+            // adjustBallDimensions();
             w = topBlob->width();
             h = topBlob->height();
         }
@@ -346,39 +348,39 @@ void Ball::setOcclusionInformation() {
    @param dir      direction of scanning (1 or -1)
    @return         x value of the edge
  */
-int Ball::findBallEdgeX(int x, int y, int dir) {
-    int lastu = thresh->getU(x, y);
-    int midu = lastu;
-    int newx = x;
-    int changex = topBlob->getLeft();
-    if (dir > 0) {
-        changex = topBlob->getRight();
-    }
-    for (int i = -3; i < 4; i++) {
-        newx = x;
-        if (y + i >= 0 && y + i < IMAGE_HEIGHT) {
-            for (bool done = false; !done && newx >= 0 && newx < IMAGE_WIDTH;
-                 newx+=dir) {
-                int newu = thresh->getU(newx, y + i);
-                if (abs(newu - lastu) > EDGEMISMATCH
-                    || abs(newu - midu) > EDGECENTERMISMATCH) {
-                    done = true;
-                }
-                lastu = newu;
-            }
-            if (dir < 0) {
-                if (newx + dir < changex) {
-                    changex = newx + dir;
-                }
-            } else {
-                if (newx + dir > changex) {
-                    changex = newx + dir;
-                }
-            }
-        }
-    }
-    return changex;
-}
+// int Ball::findBallEdgeX(int x, int y, int dir) {
+//     int lastu = thresh->getU(x, y);
+//     int midu = lastu;
+//     int newx = x;
+//     int changex = topBlob->getLeft();
+//     if (dir > 0) {
+//         changex = topBlob->getRight();
+//     }
+//     for (int i = -3; i < 4; i++) {
+//         newx = x;
+//         if (y + i >= 0 && y + i < IMAGE_HEIGHT) {
+//             for (bool done = false; !done && newx >= 0 && newx < IMAGE_WIDTH;
+//                  newx+=dir) {
+//                 int newu = thresh->getU(newx, y + i);
+//                 if (abs(newu - lastu) > EDGEMISMATCH
+//                     || abs(newu - midu) > EDGECENTERMISMATCH) {
+//                     done = true;
+//                 }
+//                 lastu = newu;
+//             }
+//             if (dir < 0) {
+//                 if (newx + dir < changex) {
+//                     changex = newx + dir;
+//                 }
+//             } else {
+//                 if (newx + dir > changex) {
+//                     changex = newx + dir;
+//                 }
+//             }
+//         }
+//     }
+//     return changex;
+// }
 
 /* From a given coordinate scan out in a given direction until the apparent
    edge of the ball is found.  We check for the edge using the difference
@@ -388,39 +390,39 @@ int Ball::findBallEdgeX(int x, int y, int dir) {
    @param dir      direction of scanning (1 or -1)
    @return         y value of the edge
  */
-int Ball::findBallEdgeY(int x, int y, int dir) {
-    int lastu = thresh->getU(x, y);
-    int midu = lastu;
-    int newy = y;
-    int changey = topBlob->getTop();
-    if (dir > 0) {
-        changey = topBlob->getBottom();
-    }
-    for (int i = -3; i < 4; i++) {
-        newy = y;
-        if (x + i >= 0 && x + i < IMAGE_WIDTH) {
-            for (bool done = false; !done && newy >= 0 && newy < IMAGE_HEIGHT;
-                 newy+=dir) {
-                int newu = thresh->getU(x + i, newy);
-                if (abs(newu - lastu) > EDGEMISMATCH
-                    || abs(newu - midu) > EDGECENTERMISMATCH) {
-                    done = true;
-                }
-                lastu = newu;
-            }
-            if (dir < 0) {
-                if (newy + dir < changey) {
-                    changey = newy + dir;
-                }
-            } else {
-                if (newy + dir > changey) {
-                    changey = newy + dir;
-                }
-            }
-        }
-    }
-    return changey;
-}
+// int Ball::findBallEdgeY(int x, int y, int dir) {
+//     int lastu = thresh->getU(x, y);
+//     int midu = lastu;
+//     int newy = y;
+//     int changey = topBlob->getTop();
+//     if (dir > 0) {
+//         changey = topBlob->getBottom();
+//     }
+//     for (int i = -3; i < 4; i++) {
+//         newy = y;
+//         if (x + i >= 0 && x + i < IMAGE_WIDTH) {
+//             for (bool done = false; !done && newy >= 0 && newy < IMAGE_HEIGHT;
+//                  newy+=dir) {
+//                 int newu = thresh->getU(x + i, newy);
+//                 if (abs(newu - lastu) > EDGEMISMATCH
+//                     || abs(newu - midu) > EDGECENTERMISMATCH) {
+//                     done = true;
+//                 }
+//                 lastu = newu;
+//             }
+//             if (dir < 0) {
+//                 if (newy + dir < changey) {
+//                     changey = newy + dir;
+//                 }
+//             } else {
+//                 if (newy + dir > changey) {
+//                     changey = newy + dir;
+//                 }
+//             }
+//         }
+//     }
+//     return changey;
+// }
 
 /* We'd like the ball blob to be square.  It often isn't.  Usually
    its width is a little too small compared to the height due to the
@@ -428,41 +430,41 @@ int Ball::findBallEdgeY(int x, int y, int dir) {
    are more pronounced.  In those cases we do some extra scanning to
    see if we can fix the smaller dimension.  We do that here.
  */
-void Ball::adjustBallDimensions() {
-    int w = topBlob->width();
-    int h = topBlob->height();
-    if (w > h) {
-        int x = topBlob->getLeft() + w / 2;
-        int y = topBlob->getTop() + h / 5;
-        int newtop = findBallEdgeY(x, y, -1);
-        y = topBlob->getBottom() - h / 5;
-        int newbottom = findBallEdgeY(x, y, 1);
-        int change = topBlob->getTop() - newtop +
-            newbottom - topBlob->getBottom();
-        if (abs(change - (w - h)) < DIAMETERMISMATCH) {
-            if (BALLDEBUG) {
-                cout << "Adjusting height of blob" << endl;
-            }
-            topBlob->setTop(newtop);
-            topBlob->setBottom(newbottom);
-        }
-    } else {
-        int x = topBlob->getLeft() + w / 5;
-        int y = topBlob->getTop() + h / 2;
-        int newleft = findBallEdgeX(x, y, -1);
-        x = topBlob->getRight() - w / 5;
-        int newright = findBallEdgeX(x, y, 1);
-        int change = newright - topBlob->getRight() +
-            topBlob->getLeft() - newleft;
-        if (abs(change - (h - w)) < DIAMETERMISMATCH) {
-            if (BALLDEBUG) {
-                cout << "Adjusting width of blob" << endl;
-            }
-            topBlob->setLeft(newleft);
-            topBlob->setRight(newright);
-        }
-    }
-}
+// void Ball::adjustBallDimensions() {
+//     int w = topBlob->width();
+//     int h = topBlob->height();
+//     if (w > h) {
+//         int x = topBlob->getLeft() + w / 2;
+//         int y = topBlob->getTop() + h / 5;
+//         int newtop = findBallEdgeY(x, y, -1);
+//         y = topBlob->getBottom() - h / 5;
+//         int newbottom = findBallEdgeY(x, y, 1);
+//         int change = topBlob->getTop() - newtop +
+//             newbottom - topBlob->getBottom();
+//         if (abs(change - (w - h)) < DIAMETERMISMATCH) {
+//             if (BALLDEBUG) {
+//                 cout << "Adjusting height of blob" << endl;
+//             }
+//             topBlob->setTop(newtop);
+//             topBlob->setBottom(newbottom);
+//         }
+//     } else {
+//         int x = topBlob->getLeft() + w / 5;
+//         int y = topBlob->getTop() + h / 2;
+//         int newleft = findBallEdgeX(x, y, -1);
+//         x = topBlob->getRight() - w / 5;
+//         int newright = findBallEdgeX(x, y, 1);
+//         int change = newright - topBlob->getRight() +
+//             topBlob->getLeft() - newleft;
+//         if (abs(change - (h - w)) < DIAMETERMISMATCH) {
+//             if (BALLDEBUG) {
+//                 cout << "Adjusting width of blob" << endl;
+//             }
+//             topBlob->setLeft(newleft);
+//             topBlob->setRight(newright);
+//         }
+//     }
+// }
 
 /* Sometimes we get a reflection off a post or other robot and it skews how
    we see the ball.  A good clue is that the ball is close and isn't very
@@ -489,7 +491,7 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
                  i++) {
                 for (int j = topBlob->getLeftTopY();
                      j < topBlob->getLeftBottomY(); j++) {
-                    if (thresh->thresholded[j][i] == ORANGE) {
+                    if (thresh->getThresholded(j,i) == ORANGE) {
                         topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;
                         i = IMAGE_WIDTH;
@@ -502,7 +504,7 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
             for (int i = topBlob->getLeftTopX() + h; i > -1; i--) {
                 for (int j = topBlob->getLeftTopY();
                      j < topBlob->getLeftBottomY(); j++) {
-                    if (thresh->thresholded[j][i] == ORANGE) {
+                    if (thresh->getThresholded(j,i) == ORANGE) {
                         topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;
                         i = -1;
@@ -654,7 +656,7 @@ float Ball::rightHalfColor(Blob tempobj)
 	int pix;
 	for (int i = spanY / 2; i < spanY; i++) {
 		for (int j = 0; j < spanX; j++) {
-			pix = thresh->thresholded[y + i][x + j];
+			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
 					x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED ||
 							pix == ORANGEYELLOW)) {
@@ -664,7 +666,7 @@ float Ball::rightHalfColor(Blob tempobj)
 	}
 	for (int i = 0; i < spanY; i++) {
 		for (int j = 0; j < spanX / 2; j++) {
-			pix = thresh->thresholded[y + i][x + j];
+			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
 					x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED ||
 							pix == ORANGEYELLOW)) {
@@ -674,7 +676,7 @@ float Ball::rightHalfColor(Blob tempobj)
 	}
 	for (int i = 0; i < spanY; i++) {
 		for (int j = spanX / 2; j < spanX; j++) {
-			pix = thresh->thresholded[y + i][x + j];
+			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
 					x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED ||
 							pix == ORANGEYELLOW)) {
@@ -819,14 +821,14 @@ pair<int, int> Ball::scanMidlinesForRoundnessInformation(Blob b) {
     int pix;
     int goodPix = 0, badPix = 0;
     for (int i = 0; i < h; i++) {
-        pix = thresh->thresholded[y+i][x + w/2];
+        pix = thresh->getThresholded(y+i,x + w/2);
         if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
             goodPix++;
         } else if (pix != GREY)
             badPix++;
     }
     for (int i = 0; i < w; i++) {
-        pix = thresh->thresholded[y+h/2][x + i];
+        pix = thresh->getThresholded(+h/2,x + i);
         if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
             goodPix++;
         } else if (pix != GREY) {
@@ -858,7 +860,7 @@ pair<int, int> Ball::scanDiagonalsForRoundnessInformation(Blob b) {
     int d3 = min(w, h);
     pair<int, int> info;
     for (int i = 0; i < d3; i++) {
-        pix = thresh->thresholded[y+i][x+i];
+        pix = thresh->getThresholded(y+i,x+i);
         if (i < d || (i > d3 - d)) {
             if (pix == ORANGE || pix == ORANGERED) {
                 //drawPoint(x+i, y+i, BLACK);
@@ -874,7 +876,7 @@ pair<int, int> Ball::scanDiagonalsForRoundnessInformation(Blob b) {
                 //drawPoint(x+i, y+i, PINK);
             }
         }
-        pix = thresh->thresholded[y+i][x+w-i];
+        pix = thresh->getThresholded(y+i,x+w-i);
         if (i < d || (i > d3 - d)) {
             if (pix == ORANGE || pix == ORANGERED) {
                 //drawPoint(x+w-i, y+i, BLACK);
@@ -926,7 +928,7 @@ bool Ball::badSurround(Blob b) {
 	h = h + surround * 2;
 	for (int i = 0; i < w && x + i < IMAGE_WIDTH; i++) {
 		for (int j = 0; j < h && y + j < IMAGE_HEIGHT; j++) {
-			pix = thresh->thresholded[y + j][x + i];
+			pix = thresh->getThresholded(y + j,x + i);
 			if (pix == ORANGE || pix == ORANGEYELLOW) {
 				orange++;
                 if (x + i >= b.getLeft() && x + i <= b.getRight() &&
