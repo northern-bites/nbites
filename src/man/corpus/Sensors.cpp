@@ -805,8 +805,6 @@ void Sensors::saveFrame()
     releaseImage();
     releaseVisionAngles();
 
-
-
     // Write sensors
     vector<float> sensor_data = getAllSensors();
     for (vector<float>::const_iterator i = sensor_data.begin();

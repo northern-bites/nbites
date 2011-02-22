@@ -286,3 +286,5 @@ add_test( EdgeDetectorTest  EdgeDetectorTest )
 add_test( HoughSpaceTest  HoughSpaceTest )
 
 
+add_executable( ConvertFrame ${VISION_INCLUDE_DIR}/offline/ConvertFrames.cpp )
+target_link_libraries( ConvertFrame ${VISION_TARGET} ${SENSORS_TARGET} ${NBINCLUDE_TARGET})
