@@ -45,9 +45,13 @@ STOP_CHASE_BUFFER = 3
 #Buffer for size of the goalie box so that the
 #Goalie will clear a ball in his box
 BOX_BUFFER = 15
+SAVE_BUFFER = 10
 CHASE_RIGHT_X_LIMIT = NogCon.MY_GOABOX_RIGHT_X + 70
 CHASE_LEFT__X_LIMIT = NogCon.MY_GOALBOX_LEFT_X - 7
 CHASE_UPPER_Y_LIMIT = NogCon.FIELD_HEIGHT + 10
 CHASE_LOWER_Y_LIMIT = 0 - 10
 
 CLOSE_BEHIND_GOALIE = -10
+
+VEL_THRES = 10
+#test these constanst soon!

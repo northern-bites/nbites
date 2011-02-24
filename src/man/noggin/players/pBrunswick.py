@@ -36,18 +36,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.inKickingState = False
 
         # Counters for goalie dive decision making
-        self.countRightSave = 0
-        self.countLeftSave = 0
-        self.countCenterSave = 0
+        self.counterRightSave = 0
+        self.counterLeftSave = 0
+        self.counterCenterSave = 0
 
         self.shouldSaveCounter = 0
         self.shouldChaseCounter = 0
-        self.shouldStopCaseCounter = 0
+        self.shouldStopChaseCounter = 0
         self.posForSaveCounter = 0
         self.framesFromCenter = 0
         self.stepsOffCenter = 0
         self.isChasing = False
-        self.saving = False
+        self.isSaving = False
 
         self.frameCounter = 0
 
@@ -85,11 +85,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if self.brain.my.playerNumber == 1:
-            state = GoalieTransitions.goalieRunChecks(self)
-            return state
+        #if self.brain.my.playerNumber == 1:
+            #state = GoalieTransitions.goalieRunChecks(self)
+            #return self.currentState
 
-        elif self.brain.playbook.subRoleUnchanged():
+        if self.brain.playbook.subRoleUnchanged():
             return self.currentState
 
         elif self.inKickingState:

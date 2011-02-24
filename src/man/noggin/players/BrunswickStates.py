@@ -14,6 +14,7 @@ def gameInitial(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.isSaving = False
         player.stopWalking()
         player.gainsOn()
         player.zeroHeads()
@@ -31,6 +32,7 @@ def gamePenalized(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.isSaving = False
         player.stopWalking()
         player.penalizeHeads()
 
@@ -44,6 +46,7 @@ def gameReady(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.isSaving = False
         player.standup()
         player.brain.tracker.locPans()
 
@@ -63,6 +66,7 @@ def gameSet(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.isSaving = False
         player.stopWalking()
         player.brain.loc.resetBall()
 
@@ -136,6 +140,7 @@ def fallen(player):
     player.isChasing = False
     player.inKickingState = False
     player.justKicked = False
+    #do I want isSaving here?
     return player.stay()
 
 
@@ -149,6 +154,7 @@ def gameFinished(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.isSaving = False
         player.stopWalking()
 
         player.zeroHeads()

@@ -26,6 +26,8 @@ class Ball(VisualObject):
     -locDist -- euclidian distance between (x,y) of self to (x,y) of ball (ekf)
     -locBearing -- relative bearing between self (x,y) and ball (x,y) via ekf
     -on -- simple bool if ball is on vision frame or not
+    -lastRel keeps track of the last relX and Y values
+    -dx and dy are the difference between lastRel and Rel values
     """
     def __init__(self, visionBall):
         VisualObject.__init__(self)
@@ -60,6 +62,9 @@ class Ball(VisualObject):
          self.lastVisionAngleY,
          self.lastRelX,
          self.lastRelY,
+         self.dx,
+         self.dy,
+         self.endY,
          self.lastSeenDist,
          self.lastSeenBearing) = [0]*Constants.NUM_TOTAL_BALL_VALUES
 
@@ -140,6 +145,15 @@ class Ball(VisualObject):
 
         self.relX = getRelativeX(self.dist, self.bearing)
         self.relY = getRelativeY(self.dist, self.bearing)
+
+        self.dx = self.lastRelX - self.relX
+        self.dy = self.lastRelY - self.relY
+        
+        # calculation for the goalie to figure out
+        # what the y value of the ball will be when it
+        # gets to the goalie
+        if(self.dx != 0):
+            self.endY = self.relY - (self.dy*(self.RelX/self.dx))
 
     def __str__(self):
         """returns string with all class variables"""

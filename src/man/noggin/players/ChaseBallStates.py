@@ -174,21 +174,21 @@ def dribble(player):
 
     return player.stay()
 
-# TODO
+#adjusts position to be farther away from the ball
+#if the goalie is too close to the ball while in
+#the goal box
 def approachDangerousBall(player):
-    if player.firstFrame():
-        player.stopWalking()
-    #print "approach dangerous ball"
-    #single steps towards ball and goal with spin
-    #player.setSteps(0, 0, 0, 0)
     ball = player.brain.ball
     my = player.brain.my
+    if player.firstFrame():
+        player.stopWalking()
+
+    #move away from the ball so it is no longer dangerous
     if player.brain.nav.isStopped():
-        if ball.dist >= 10:
-            if ball.y > my.y + 7:
-                player.brain.nav.walk(0, 10, 0)
-            elif ball.y < my.y - 7:
-                player.brain.nav.walk(0, -10, 0)
+        if ball.relY > 0:
+            player.brain.nav.walk(0, -15, 0)
+        else:
+            player.brain.nav.walk(0, 15, 0)
 
     if not goalTran.dangerousBall(player):
         return player.goLater('approachBall')
