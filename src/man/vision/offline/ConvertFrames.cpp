@@ -31,7 +31,13 @@ int main(int argc, char *argv[])
 
         Frame f;
         loadFrame(path, f);
-        convertFrame(f);
+
+        uint8_t *newImg = new uint8_t[640*480*2];
+
+        convertFrame(f.image, newImg);
+
+        delete f.image;
+        f.image = newImg;
 
         path += ".NEW";
         saveFrame(path, f);
@@ -80,30 +86,29 @@ void loadFrame(string path, Frame& frame)
     fin.close();
 }
 
-void convertFrame(Frame& f)
-{
-    uint8_t *newImg = new uint8_t[640*480*2];
 
-    /**
-     * Convert
-     * |y1|u|y2|v|
-     *
-     * into
-     *
-     * |y1|u|y1|v|y2|u|y2|v|
-     * |y1|u|y1|v|y2|u|y2|v|
-     *
-     * So that the averaging done by _acquire_image ends up with the
-     * original 320x240 image.
-     **/
+/**
+ * Convert
+ * |y1|u|y2|v|
+ *
+ * into
+ *
+ * |y1|u|y1|v|y2|u|y2|v|
+ * |y1|u|y1|v|y2|u|y2|v|
+ *
+ * So that the averaging done by _acquire_image ends up with the
+ * original 320x240 image.
+ */
+void convertFrame(uint8_t *old, uint8_t *newImg)
+{
     for (int i = 0; i < 240; ++i) {
         for (int j = 0; j < 320 * 2; j += 4) { // Each row is 320 * 2 bytes long
             int oldIndex = i * 320 * 2 + j;
 
-            uint8_t y1 = f.image[oldIndex + YOFFSET1];
-            uint8_t y2 = f.image[oldIndex + YOFFSET2];
-            uint8_t u = f.image[oldIndex + UOFFSET];
-            uint8_t v = f.image[oldIndex + VOFFSET];
+            uint8_t y1 = old[oldIndex + YOFFSET1];
+            uint8_t y2 = old[oldIndex + YOFFSET2];
+            uint8_t u = old[oldIndex + UOFFSET];
+            uint8_t v = old[oldIndex + VOFFSET];
 
             // We write out 4 new pixels for each old so we need to
             // double the rows /and/ cols of the old index
@@ -140,8 +145,6 @@ void convertFrame(Frame& f)
             newImg[newIndex + VOFFSET] = v;
         }
     }
-    delete f.image;
-    f.image = newImg;
 }
 
 void saveFrame(string path, Frame& f)

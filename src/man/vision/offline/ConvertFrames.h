@@ -13,7 +13,7 @@ typedef struct _frame_struct {
 
 void loadFrame(std::string path, Frame& frame);
 
-void convertFrame(Frame& f);
+void convertFrame(uint8_t *old, uint8_t *newImg);
 void saveFrame(std::string path, Frame& f);
 
 
