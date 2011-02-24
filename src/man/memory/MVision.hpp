@@ -33,6 +33,11 @@ public:
     void log() const;
 
 private:
+    //update helper methods
+    void update(PVision::PVisualDetection* visual_detection,
+            VisualDetection* visualDetection);
+
+private:
     boost::shared_ptr<Vision> vision;
     log::FileLogger* fileLogger;
 
