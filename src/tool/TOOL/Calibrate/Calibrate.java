@@ -164,7 +164,7 @@ public class Calibrate implements DataListener, MouseListener,
         setupWindowsAndListeners();
 
 
-		// Will take care of the cursor
+        // Will take care of the cursor
         updateSelectedColor(0);
         updateBrushSize(0);
 
@@ -817,7 +817,7 @@ public class Calibrate implements DataListener, MouseListener,
         if (overlay != null) {
             overlay.setThresholding(choice);
             selector.repaint();
-			displayer.repaint();
+            displayer.repaint();
         }
     }
 
@@ -1165,21 +1165,16 @@ public class Calibrate implements DataListener, MouseListener,
         if (!f.hasImage())
             return;
         //if visionState is null, initialize, else just load the frame
-		if (visionState == null)
-			visionState = new VisionState(f, tool.getColorTable());
-		else
-			visionState.newFrame(f, tool.getColorTable());
+        if (visionState == null)
+            visionState = new VisionState(f, tool.getColorTable());
+        else
+            visionState.newFrame(f, tool.getColorTable());
 
         thresholdedImage = visionState.getThreshImage();//sync the thresholded images
         rawImage = visionState.getImage();
         imageID = rawImage.hashCode();
 
         colorTable = visionState.getColorTable();
-		/*
-		  if (drawThreshColors) {
-		  thresholdedImage.thresholdImage(colorTable, rawImage);
-		  }
-		*/
 
         // Since we now handle different sized frames, it's possible
         // to switch between modes, changing the image's size without
@@ -1193,9 +1188,9 @@ public class Calibrate implements DataListener, MouseListener,
         selector.updateImage(rawImage);
         calibratePanel.setSelectorOverlay();
 
-		visionState.update();
-		calibratePanel.setDisplayerOverlay();
-		displayer.updateImage(thresholdedImage);
+        visionState.update();
+        calibratePanel.setDisplayerOverlay();
+        displayer.updateImage(thresholdedImage);
 
         selector.repaint();
         displayer.repaint();
@@ -1207,8 +1202,8 @@ public class Calibrate implements DataListener, MouseListener,
         // 0 based indexing.
         calibratePanel.setText("Image " + (f.index()) + " of " +
                                (f.dataSet().size() - 1) +
-							   " -  processed in " + visionState.getProcessTime() +
-							   " micro secs");
+                               " -  processed in " + visionState.getProcessTime() +
+                               " micro secs");
     }
 
 
@@ -1227,17 +1222,17 @@ public class Calibrate implements DataListener, MouseListener,
     }
 
     public CalibrationDrawingPanel getDisplayer() {
-		return displayer;
+        return displayer;
     }
 
     public PixelSelectionPanel getSelector() {
-		return selector;
+        return selector;
     }
 
     public ImageOverlay getEdgeOverlay() {
-		return overlay;
+        return overlay;
     }
     public VisionState getVisionState() {
-		return visionState;
+        return visionState;
     }
 }
