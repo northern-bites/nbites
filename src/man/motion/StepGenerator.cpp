@@ -29,6 +29,7 @@ using boost::shared_ptr;
 #include "NBMath.h"
 #include "Observer.h"
 #include "BasicWorldConstants.h"
+#include "COMKinematics.h"
 using namespace boost::numeric;
 using namespace Kinematics;
 using namespace NBMath;
@@ -36,12 +37,14 @@ using namespace NBMath;
 //#define DEBUG_STEPGENERATOR
 //#define DEBUG_ZMP
 //#define DEBUG_ZMP_REF
+//#define DEBUG_COM_TRANSFORMS
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
     done(true),
     sensorAngles(s,_gait),
     com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+	joints_com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
     est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     zmp_ref_x(list<float>()),zmp_ref_y(list<float>()),
@@ -50,9 +53,11 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     si_Transform(CoordFrame3D::identity3D()),
     last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
     if_Transform(CoordFrame3D::identity3D()),
+    fi_Transform(CoordFrame3D::identity3D()),
     fc_Transform(CoordFrame3D::identity3D()),
+    cf_Transform(CoordFrame3D::identity3D()),
     cc_Transform(CoordFrame3D::identity3D()),
-    sensors(s),gait(_gait),nextStepIsLeft(true),waitForController(0),
+    sensors(s),gait(_gait),nextStepIsLeft(true),
     leftLeg(s,gait,&sensorAngles,LLEG_CHAIN),
     rightLeg(s,gait,&sensorAngles,RLEG_CHAIN),
     leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),
@@ -67,15 +72,18 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
 #ifdef DEBUG_CONTROLLER_COM
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\t"
-            "sensor_zmp_x\tsensor_zmp_y\treal_com_x\treal_com_y\tangleX\t"
-            "angleY\taccX\taccY\taccZ\t"
+            "sensor_zmp_x\tsensor_zmp_y\tekf_zmp_x\tekf_zmp_y\t"
+			"real_com_x\treal_com_y\tjoints_com_x\tjoints_com_y\t"
+			"angleX\tangleY\taccX\taccY\taccZ\t"
             "lfl\tlfr\tlrl\tlrr\trfl\trfr\trrl\trrr\t"
             "state\n");
 #endif
 #ifdef DEBUG_SENSOR_ZMP
     zmp_log = fopen("/tmp/zmp_log.xls","w");
     fprintf(zmp_log,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
-            "\taccX\taccY\taccZ\tangleX\tangleY\n");
+            "\taccX\taccY\taccZ\t"
+			"ekf_zmp_x\tekf_zmp_y\t"
+			"angleX\tangleY\n");
 #endif
 #ifdef DEBUG_ZMP_REF
 	zmp_ref_log = fopen("/tmp/zmp_ref_log.xls","w");
@@ -156,28 +164,17 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 }
 
 /**
- * Method called to ensure that there are sufficient steps for the walking legs
- * to operate on. This isn't called annymore!
- */
-void StepGenerator::generate_steps(){
-    while(futureSteps.size() + currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS){
-        generateStep(x,y,theta);
-    }
-}
-
-/**
- * This method calculates the sensor ZMP. This code is highly experimental,
- * and probably not even being used right now.  The NaoDevils say they
- * can calculate the sensor ZMP -- we are having trouble with it. We
- * probably just need to be more careful about how we filter, and get more
- * example data.
- *
- * Not sure if Joho's problems were due to the old Nao version or what,
- * but from the graphs I've looked at we are very close to calculating the
- * sensor ZMP such that it's useful. -Nathan, September 2010
+ * This method calculates the sensor ZMP. We build a body to world transform using
+ * Aldebaran's filtered angleX/angleY. We then use this to rotate the unfiltered
+ * accX/Y/Z from the accelerometers. The transformed values are fed into an
+ * exponential filter (acc_filter), and the filtered values are used in an EKF
+ * that maintains our sensor ZMP (zmp_filter). The ZMP EKF also takes in the CoM
+ * as calculated by the joint angles of the robot (see JointMassConstants.h and
+ * COKKinematics.cpp for implementation details)
  */
 void StepGenerator::findSensorZMP(){
-    Inertial inertial = sensors->getInertial();
+    const Inertial inertial = sensors->getInertial();
+    const Inertial unfiltered = sensors->getUnfilteredInertial();
 
     //The robot may or may not be tilted with respect to vertical,
     //so, since walking is conducted from a bird's eye perspective
@@ -188,16 +185,16 @@ void StepGenerator::findSensorZMP(){
         prod(CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, -inertial.angleX),
              CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -inertial.angleY));
 
-    const ufvector4 accInBodyFrame = CoordFrame4D::vector4D(inertial.accX,
-                                                          inertial.accY,
-                                                          inertial.accZ);
+	// update the filter
+	// TODO: calibrate!!
+    acc_filter.update(unfiltered.accX,
+					  unfiltered.accY,
+					  unfiltered.accZ);
 
-    //accInWorldFrame = accInBodyFrame;
-    //TODO: Currently rotating the coordinate frames exacerbates the problem
-    //      but theoretically it should get the sensor zmp curve to more closely
-    //      mimic the reference zmp.
-    //global
-
+    const ufvector4 accInBodyFrame = CoordFrame4D::vector4D(acc_filter.getX(),
+															acc_filter.getY(),
+															acc_filter.getZ());
+	// and rotate the filtered acceleration
 	accInWorldFrame = prod(bodyToWorldTransform,
 						   accInBodyFrame);
 
@@ -206,31 +203,40 @@ void StepGenerator::findSensorZMP(){
      //cout << "Accel in world frame: "<< accInWorldFrame <<endl;
      //cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
 
-    acc_filter.update(accInWorldFrame(0),
-                      accInWorldFrame(1),
-                      accInWorldFrame(2));
-
     //Rotate from the local C to the global I frame
-    ufvector3 accel_c = CoordFrame3D::vector3D(acc_filter.getX(),
-                                               acc_filter.getY());
-    float angle_fc = safe_asin(fc_Transform(1,0));
-    float angle_if = safe_asin(if_Transform(1,0));
-    float tot_angle = -(angle_fc+angle_if);
-    ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
-                                                      tot_angle),
-                             accel_c);
+	const ufvector3 accel_c = CoordFrame3D::vector3D(accInWorldFrame(0),
+													 accInWorldFrame(1));
+	const float angle_fc = safe_asin(fc_Transform(1,0));
+    const float angle_if = safe_asin(if_Transform(1,0));
+    const float tot_angle = -(angle_fc+angle_if);
+    const ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
+															tot_angle),
+								   accel_c);
+    // translate com_c (from joint angles) to I frame
+    const ufvector4 com_c_xyz = getCOMc(sensors->getMotionBodyAngles());
+    const ufvector3 joints_com_c = CoordFrame3D::vector3D(com_c_xyz(0), com_c_xyz(1));
+    const ufvector3 joints_com_f = prod(cf_Transform, joints_com_c);
+	joints_com_i = prod(fi_Transform, joints_com_f);
+	const float joint_com_i_x = joints_com_i(0);
+	const float joint_com_i_y = joints_com_i(1);
 
-    ZmpTimeUpdate tUp = {controller_x->getZMP(),controller_y->getZMP()};
+    ZmpTimeUpdate tUp = {controller_x->getZMP(), controller_y->getZMP()};
+	// TODO: fix joints_com_i in x !!
     ZmpMeasurement pMeasure =
-        {controller_x->getPosition(),controller_y->getPosition(),
-         accel_i(0),accel_i(1)};
-
+        {controller_x->getPosition(), joint_com_i_y,
+         accel_i(0), accel_i(1)};
     zmp_filter.update(tUp,pMeasure);
+
+#ifdef DEBUG_COM_TRANSFORMS
+	cout << "controller_x com: " << controller_x->getPosition();
+	cout << "com_c -> com_i (x): " << joint_com_i_x << endl;
+	cout << " controller_y com: " << controller_y->getPosition();
+	cout << "com_c -> com_i (y): " << joint_com_i_y << endl;
+#endif
 }
 
 float StepGenerator::scaleSensors(const float sensorZMP,
                                   const float perfectZMP) const {
-
 	// TODO: find a better value for this!
     const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
@@ -245,7 +251,7 @@ void StepGenerator::tick_controller(){
     cout << "StepGenerator::tick_controller" << endl;
 #endif
 
-	// update the acc/gyro filters
+	// update the acc/gyro based ZMP (in (ZmpEKF)zmp_filter)
     findSensorZMP();
 
     zmp_xy_tuple zmp_ref = generate_zmp_ref();
@@ -273,7 +279,6 @@ void StepGenerator::tick_controller(){
     const float com_y = controller_y->tick(zmp_ref.get<1>(),cur_zmp_ref_y,
                                            est_zmp_i(1));
     com_i = CoordFrame3D::vector3D(com_x,com_y);
-
 }
 
 /** Central method for moving the walking legs. It handles important stuff like:
@@ -321,6 +326,10 @@ WalkLegsTuple StepGenerator::tick_legs(){
     fc_Transform = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
                                                  body_rot_angle_fc),
                         CoordFrame3D::translation3D(-com_f(0),-com_f(1)));
+	// and oppositely, a transform from c to f
+	cf_Transform = prod(CoordFrame3D::translation3D(com_f(0),com_f(1)),
+						CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
+												 -body_rot_angle_fc));
 
     //Now we need to determine which leg to send the coorect footholds/Steps to
     shared_ptr<Step> leftStep_f,rightStep_f;
@@ -387,7 +396,7 @@ void StepGenerator::swapSupportLegs(){
         //update the translation matrix between i and f coord. frames
         ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
         if_Transform = prod(stepTransform,if_Transform);
-        updateDebugMatrix();
+		update_FtoI_transform();
 
         //Express the  destination  and source for the supporting foot and
         //swinging foots locations in f coord. Since the supporting foot doesn't
@@ -790,7 +799,7 @@ void StepGenerator::resetSteps(const bool startLeft){
                                     supportSign*(HIP_OFFSET_Y));
     if_Transform.assign(initStart);
 
-    updateDebugMatrix();
+    update_FtoI_transform();
 
 
     //When we start out again, we need to let odometry know to store
@@ -1127,12 +1136,10 @@ void StepGenerator::clearFutureSteps(){
     }
 }
 
-void StepGenerator::updateDebugMatrix(){
-#ifdef DEBUG_CONTROLLER_COM
+void StepGenerator::update_FtoI_transform(){
     static ublas::matrix<float> identity(ublas::identity_matrix<float>(3));
     ublas::matrix<float> test (if_Transform);
     fi_Transform = solve(test,identity);
-#endif
 }
 
 void StepGenerator::debugLogging(){
@@ -1166,6 +1173,8 @@ void StepGenerator::debugLogging(){
     ufvector3 leg_dest_i = prod(fi_Transform,leg_dest_c);
     float real_com_x = leg_dest_i(0);
     float real_com_y = leg_dest_i(1);// + 2*HIP_OFFSET_Y;
+	float joint_com_i_x = joints_com_i(0);
+	float joint_com_i_y = joints_com_i(1);
 
     Inertial inertial = sensors->getInertial();
     FSR leftFoot = sensors->getLeftFootFSR();
@@ -1173,20 +1182,20 @@ void StepGenerator::debugLogging(){
 
     static float ttime = 0;
     fprintf(com_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t"
-            "%f\t%f\t%f\t"
+            "%f\t%f\t%f\t%f\t%f\t%f\t%f\t"
             "%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\n",
             ttime,com_i(0),com_i(1),pre_x,pre_y,zmp_x,zmp_y,
             est_zmp_i(0),est_zmp_i(1),
-            real_com_x,real_com_y,
+			zmp_filter.get_zmp_x(),zmp_filter.get_zmp_y(),
+            real_com_x,real_com_y,joint_com_i_x,joint_com_i_y,
             inertial.angleX, inertial.angleY,
-            inertial.accX,inertial.accY,inertial.accZ,
+            acc_filter.getX(),acc_filter.getY(),acc_filter.getZ(),
             // FSRs
             leftFoot.frontLeft,leftFoot.frontRight,leftFoot.rearLeft,leftFoot.rearRight,
             rightFoot.frontLeft,rightFoot.frontRight,rightFoot.rearLeft,rightFoot.rearRight,
             leftLeg.getSupportMode());
     ttime += MOTION_FRAME_LENGTH_S;
 #endif
-
 
 
 #ifdef DEBUG_SENSOR_ZMP
@@ -1199,16 +1208,15 @@ void StepGenerator::debugLogging(){
     const float comPX = controller_x->getZMP();
     const float comPY = controller_y->getZMP();
 
-     Inertial acc = sensors->getUnfilteredInertial();
-//     const float accX = acc.accX;
-//     const float accY = acc.accY;
-//     const float accZ = acc.accZ;
+	Inertial acc = sensors->getUnfilteredInertial();
     const float accX = accInWorldFrame(0);
     const float accY = accInWorldFrame(1);
     const float accZ = accInWorldFrame(2);
     static float stime = 0;
-    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
+
+    fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
             stime,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ,
+			zmp_filter.get_zmp_x(),zmp_filter.get_zmp_y(),
             acc.angleX,acc.angleY);
     stime+= MOTION_FRAME_LENGTH_S;
 #endif
