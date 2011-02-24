@@ -4,12 +4,6 @@
 ##  Build configurations for Comm. ##
 #####################################
 
-# .:: General configurations for the Northern Bites Comm cmake package :::::
-
-IF( NOT DEFINED ROBOT_TYPE )
-  SET( ROBOT_TYPE NAO_RL )
-ENDIF( NOT DEFINED ROBOT_TYPE )
-
 
 ############################ Configure Options
 # Definitions for the CMake configurable build options.  Defined here, they
