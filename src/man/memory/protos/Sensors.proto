@@ -1,0 +1,7 @@
+package memory.proto;
+
+message PSensors {
+
+    optional uint64 timestamp = 1;
+
+}
