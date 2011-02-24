@@ -23,6 +23,10 @@ public:
     std::list<VisualLine> getLines(){ return std::list<VisualLine>(); }
     std::list<VisualCorner> getCorners(){ return std::list<VisualCorner>(); }
 
+    // Parameter Interface
+    void setEdgeThreshold(int thresh);
+    void setHoughAcceptThreshold(int thresh);
+
 private:
     void findHoughLines(const uint16_t *img);
     void findFieldLines();

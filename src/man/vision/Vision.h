@@ -161,6 +161,7 @@ public:
     const uint16_t * yImg;
     const uint8_t * colorImg;
 
+    FieldLinesDetector linesDetector;
 protected:
     //
     // Protected Variable
@@ -207,7 +208,7 @@ private:
     int player;
     std::string colorTable;
 
-    FieldLinesDetector linesDetector;
+
 };
 
 #endif // _Vision_h_DEFINED

@@ -398,13 +398,13 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     JNIEXPORT void JNICALL
     Java_TOOL_Vision_TOOLVisionLink_cppSetEdgeThreshold
         (JNIEnv * env, jobject jobj, jint thresh){
-        vision.thresh->setEdgeThreshold(thresh);
+        vision.linesDetector.setEdgeThreshold(thresh);
     }
 
     JNIEXPORT void JNICALL
     Java_TOOL_Vision_TOOLVisionLink_cppSetHoughAcceptThreshold
         (JNIEnv * env, jobject jobj, jint thresh){
-        vision.thresh->setHoughAcceptThreshold(thresh);
+        vision.linesDetector.setHoughAcceptThreshold(thresh);
     }
 
 	/**

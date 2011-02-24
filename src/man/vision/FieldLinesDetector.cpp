@@ -43,3 +43,12 @@ void FieldLinesDetector::findFieldLines()
 
 }
 
+void FieldLinesDetector::setEdgeThreshold(int thresh)
+{
+    edges.setThreshold(static_cast<uint8_t>(thresh));
+}
+
+void FieldLinesDetector::setHoughAcceptThreshold(int thresh)
+{
+    hough.setAcceptThreshold(thresh);
+}
