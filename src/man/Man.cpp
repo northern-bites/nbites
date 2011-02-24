@@ -89,7 +89,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
                                          sensors, motion->getInterface()));
 #endif// USE_NOGGIN
-  memory = shared_ptr<Memory>(new Memory(vision, sensors));
+  //memory = shared_ptr<Memory>(new Memory(vision, sensors));
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
@@ -178,7 +178,7 @@ Man::processFrame ()
   PROF_ENTER(profiler, P_VISION);
   vision->notifyImage(sensors->getImage());
   PROF_EXIT(profiler, P_VISION);
-  memory->updateVision();
+  //memory->updateVision();
   //vision->notifyImage();
 #endif
 
