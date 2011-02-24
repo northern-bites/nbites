@@ -22,53 +22,32 @@ import java.awt.Dimension;
 
 public class RobotDef {
 
-    public static final int AIBO_ERS7 = 0;
-    public static final int AIBO_220  = 1;
-    public static final int AIBO      = 2;
-    public static final int NAO_RL    = 3;
-    public static final int NAO_SIM   = 4;
-    public static final int NAO       = 5;
-    // This is the latest frame format which includes a version number in its
-    // header. That will allow us to parse it differently according to version.
-    public static final int NAO_VER   = 6;
+    public enum ImageType {
+        NAO_RL("NAO_RL", "A simulated Nao robot", NAO_DEF_VERSIONED),
+            NAO_SIM("NAO_SIM", "A simulated Nao robot", NAO_SIM_DEF),
+            NAO("NAO", "A Nao robot of unspecified nature", NAO_DEF_VERSIONED),
 
-    public static final String ROBOT_TYPES[] = {
-        "AIBO_ERS7",
-        "AIBO_220",
-        "AIBO",
-        "NAO_RL",
-        "NAO_SIM",
-        "NAO",
-        "NAO_VERSIONED",
-        };
+            // This is the latest frame format which includes a version number
+            // in its header. That will allow us to parse it differently
+            // according to version.
+            NAO_VER("NAO_VERSIONED",
+                    "A real-life Nao robot. Frame supports version number",
+                    NAO_DEF_VERSIONED);
 
-    public static final String ROBOT_DESCS[] = {
-        "An Aibo model ERS-7",
-        "An Aibo model 220",
-        "An Aibo of unspecified type",
-        "A real-life Nao robot",
-        "A simulated Nao robot",
-        "A Nao robot of unspecified nature",
-        "A real-life Nao robot. Frame supports version number.",
-        };
+        private final String type;
+        private final String desc;
+        private final RobotDef def;
 
-    public static final RobotDef ERS7_DEF =
-        new RobotDef(AIBO_ERS7, 208, 160, 18, 16);
-    public static final RobotDef ERS220_DEF =
-        new RobotDef(AIBO_220, 208, 160, 15, 16);
-    /**
-     * The NAO_DEF_HIGH extension is not used by anyone and is currently not a
-     * valid frame format. In order to make it functional, it would need to be
-     * registered as having its own extension.
-     **/
-    public static final RobotDef NAO_DEF_HIGH =
-        new RobotDef(NAO_RL, 640, 480, 640*480*2, 22, 22);
+        ImageType(String type, String description, RobotDef def){
+            this.type = type;
+            this.desc = description;
+            this.def = def;
+        }
 
-    public static final RobotDef NAO_DEF =
-        new RobotDef(NAO_RL, 320, 240, 320*240*2, 22, 22);
-    public static final RobotDef NAO_SIM_DEF =
-        new RobotDef(NAO_SIM, 160, 120, 22, 15);
-
+        public String getType() { return type; }
+        public String getDescription() { return desc; }
+        public RobotDef getRobotDef() { return def;}
+    }
 
     /**
      * Versions should allow us to change the number of sensors. I think we can
@@ -79,24 +58,19 @@ public class RobotDef {
      **/
     private static int [] sensorsForVersions = {22};
     public static final RobotDef NAO_DEF_VERSIONED =
-        new RobotDef(NAO_RL,
-                     /*320*/320, /*240*/240, /*320*240*2*/320*240*2, 22,
+        new RobotDef(ImageType.NAO_RL,
+                     640, 480,
+                     320, 240, 22,
                      // sensor number version 1
                      sensorsForVersions
                      );
+    public static final RobotDef NAO_SIM_DEF =
+        new RobotDef(ImageType.NAO_SIM, 160, 120,
+                     160, 120,
+                     22, 15);
 
-    public static final RobotDef ROBOT_DEFS[] = {
-        ERS7_DEF,
-        ERS7_DEF,
-        ERS220_DEF,
-        NAO_DEF,
-        NAO_SIM_DEF,
-        NAO_DEF_VERSIONED,
-		NAO_DEF_VERSIONED
-    };
-
-    private int type;
-    private Dimension imageDim;
+    private ImageType type;
+    private Dimension inputImageDim, outputImageDim;
     private int joints;
 
     private int sensors;
@@ -104,52 +78,67 @@ public class RobotDef {
     private boolean hasVersions;
     private int version;
 
-    private int imageSize;
+    private int inputImageSize, outputImageSize;
 
-    private RobotDef(int raw_type, int width, int height, int numJoints,
-            int numSensors) {
-        this(raw_type, width, height, width*height*3, numJoints, numSensors);
-    }
-
-    private RobotDef(int raw_type, int width, int height, int size,
-            int numJoints, int numSensors) {
-
-        type = raw_type;
-        imageDim = new Dimension(width, height);
-        joints = numJoints;
+    // Version-less sensor constructor
+    private RobotDef(ImageType raw_type,
+                     int inputWidth, int inputHeight,
+                     int outputWidth, int outputHeight,
+                     int numJoints, int numSensors) {
+        this(raw_type, inputWidth, inputHeight,
+             outputWidth, outputHeight,
+             numJoints);
         sensors = numSensors;
         hasVersions = false;
-        imageSize = size;
     }
 
-    // Constructor that deals with versions
-    private RobotDef(int raw_type, int width, int height, int size,
+    // Constructor that deals with sensors for versions
+    private RobotDef(ImageType raw_type,
+                     int inputWidth, int inputHeight,
+                     int outputWidth, int outputHeight,
                      int numJoints, int [] numSensors) {
-        type = raw_type;
-        imageDim = new Dimension(width, height);
-        joints = numJoints;
+        this(raw_type, inputWidth, inputHeight,
+             outputWidth, outputHeight,
+             numJoints);
+
         versionSensors = numSensors;
         hasVersions = true;
+
         // this is a default value. you should call setVersion before you ask
         // the class how many sensors there are.
         version = -1;
-        imageSize = size;
     }
 
-    public int imageWidth() {
-        return imageDim.width;
+    // Constructor for all non-sensor data
+    private RobotDef(ImageType raw_type,
+                     int inputWidth, int inputHeight,
+                     int outputWidth, int outputHeight,
+                     int numJoints){
+        type = raw_type;
+
+        inputImageDim = new Dimension(inputWidth, inputHeight);
+        outputImageDim = new Dimension(outputWidth, outputHeight);
+
+        joints = numJoints;
+
+        inputImageSize = inputWidth * inputHeight;
+        outputImageSize = outputWidth * outputHeight;
     }
 
-    public int imageHeight() {
-        return imageDim.height;
+    public Dimension inputImageDimensions() {
+        return inputImageDim;
     }
 
-    public int rawImageSize() {
-        return imageSize;
+    public Dimension outputImageDimensions(){
+        return outputImageDim;
     }
 
-    public Dimension imageDimensions() {
-        return new Dimension(imageDim);
+    public int inputImageSize() {
+        return inputImageSize;
+    }
+
+    public int outputImageSize(){
+        return outputImageSize;
     }
 
     public int numJoints() {
@@ -167,8 +156,5 @@ public class RobotDef {
             return sensors;
     }
 
-    public String toString() {
-        return ROBOT_TYPES[type];
-    }
 }
 

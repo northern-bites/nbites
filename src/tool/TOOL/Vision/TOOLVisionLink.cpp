@@ -28,6 +28,8 @@
 #include "VisualFieldObject.h"
 #include "VisualLine.h"
 #include "Common.h"
+#include "ImageAcquisition.h"
+#include "ColorParams.h"
 
 using namespace std;
 using namespace boost;
@@ -78,7 +80,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     unsigned int numSensorsInFrame = env->GetArrayLength(jsensors);
     //If one of the dimensions is wrong, we exit
     if(env->GetArrayLength(jimg) !=
-       320 * 240 * 2) { // Old image size
+       640 * 480 * 2) { // Image size
         cout << "Error: the image had the wrong byte size" << endl;
         cout << "Image byte size should be " << IMAGE_BYTE_SIZE << endl;
         cout << "Detected byte size of " << env->GetArrayLength(jimg)
@@ -113,8 +115,6 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     //load the table
     jbyte *buf_table = env->GetByteArrayElements( jtable, 0);
     byte * table = (byte *)buf_table; //convert it to a reg. byte array
-    vision.thresh->initTableFromBuffer(table);
-    env->ReleaseByteArrayElements( jtable, buf_table, 0);
 
     // Set the joints data - Note: set visionBodyAngles not bodyAngles
     float * joints = env->GetFloatArrayElements(jjoints,0);
@@ -138,21 +138,24 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     // Clear the debug image on which the vision algorithm can draw
     vision.thresh->initDebugImage();
 
-
-    //get pointer access to the java image array
     jbyte *buf_img = env->GetByteArrayElements( jimg, 0);
     byte * img = (byte *)buf_img; //convert it to a reg. byte array
 
     uint16_t *newImg = reinterpret_cast<uint16_t*>(new uint8_t[320*240*3]);
-    vision.thresh->thresholdOldImage(img, newImg);
+
+    ColorParams * cp = new ColorParams(0,0,0,256,256,256,128,128,128);
 
     //timing the vision process
     long startTime = micro_time();
+
+    // Shrink (by averaging) the image, and do color segmentation
+    _acquire_image(table, cp, img, newImg);
+
     //PROCESS VISION!!
     vision.notifyImage(newImg);
 
     long processTime = micro_time() - startTime;
-    //vision.drawBoxes();
+    vision.drawBoxes();
     env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
     //copy results from vision thresholded to the array passed in from java
@@ -174,6 +177,11 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         }
         env->ReleaseByteArrayElements(row_target, row, 0);
     }
+
+    delete cp;
+    delete newImg;
+    env->ReleaseByteArrayElements( jtable, buf_table, 0);
+
     //get the id for the java class, so we can get method IDs
     jclass javaClass = env->GetObjectClass(jobj);
 

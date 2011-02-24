@@ -113,8 +113,6 @@ public class Calibrate implements DataListener, MouseListener,
     private LinkedList <ImageOverlayAction> redoStack;
 
     protected JPanel main_panel;
-    protected int imageHeight, imageWidth;
-
 
     protected static enum Mode { THRESHOLD, DEFINING_EDGE, UNDEFINE };
     protected Mode mode;
@@ -419,7 +417,7 @@ public class Calibrate implements DataListener, MouseListener,
         int h = y;
 
         //check to make sure our bounding box doesnt leave the image
-        if(inImage(w,h)){
+        if(inRawImage(w,h)){
             recurseCalibrate(w,h,w,h,rawImage.getYCbCr(w,h),updates, currentMove);
         }
 
@@ -514,7 +512,7 @@ public class Calibrate implements DataListener, MouseListener,
      * @param replacementColor the thresholded color value with which to replace
      *        startColor
      */
-    public void swapColor(int x, int y, byte startColor,
+    public void swapColor(int rawX, int rawY, byte startColor,
                           byte replacementColor) {
 
 
@@ -528,45 +526,54 @@ public class Calibrate implements DataListener, MouseListener,
         int xStart, xStop, yStart, yStop;
 
         // We clicked near left size of image, can't fit whole rect on image
-        if (x - brushSize/2 < 0) {
+        if (rawX - brushSize/2 < 0) {
             xStart = 0;
-            xStop = x + brushSize/2;
+            xStop = rawX + brushSize/2;
         }
         // We clicked near right edge of image
-        else if (x + brushSize/2 > rawImage.getWidth() - 1) {
-            xStart = x - brushSize/2;
+        else if (rawX + brushSize/2 > rawImage.getWidth() - 1) {
+            xStart = rawX - brushSize/2;
             xStop = rawImage.getWidth();
         }
         // Somewhere in middle
         else {
-            xStart = x - brushSize/2;
-            xStop = x + brushSize/2;
+            xStart = rawX - brushSize/2;
+            xStop = rawX + brushSize/2;
         }
 
         // Clicked near top, can't fit whole rect
-        if (y - brushSize/2 < 0) {
+        if (rawY - brushSize/2 < 0) {
             yStart = 0;
-            yStop = y + brushSize/2;
+            yStop = rawY + brushSize/2;
         }
         // Near bottom of screen
-        else if (y + brushSize/2 > rawImage.getHeight() - 1) {
-            yStart = y - brushSize/2;
+        else if (rawY + brushSize/2 > rawImage.getHeight() - 1) {
+            yStart = rawY - brushSize/2;
             yStop = rawImage.getHeight();
         }
         else {
-            yStart = y - brushSize/2;
-            yStop = y + brushSize/2;
+            yStart = rawY - brushSize/2;
+            yStop = rawY + brushSize/2;
         }
 
         // Iterate over the rectangular region.
         for (int i = xStart; i < xStop; i++) {
+            int threshI = i * thresholdedImage.getHeight() /
+                rawImage.getHeight();
             for (int j = yStart; j < yStop; j++) {
+
+                int threshJ = j * thresholdedImage.getWidth() /
+                    rawImage.getWidth();
+
                 // The color table has the start color at this pixel, swap
                 // it with the new color
-                if (thresholdedImage.getThresholded(i, j) == startColor) {
+                if (thresholdedImage.
+                    getThresholded(threshI, threshJ) == startColor) {
+
                     int[] currPixel = rawImage.getYCbCr(i,j);
                     updates.addPixel(currPixel, startColor);
                 }
+
                 // Even if the thresholded value in color table is not the
                 // right color, if the overlay is still that color, remove
                 // the color from the overlay.  This is a much more pleasing
@@ -590,7 +597,8 @@ public class Calibrate implements DataListener, MouseListener,
         redoStack.clear();
 
 
-        //update the vision state (which thresholds the whole image again, and updates the objects)
+        // update the vision state (which thresholds the whole image
+        // again, and updates the objects)
         visionState.update();
         //lastly, need to repaint
         // displayer needs to be updated to reflect the new thresholded changes
@@ -622,27 +630,28 @@ public class Calibrate implements DataListener, MouseListener,
      * @param updates DS to add new pixels too
      * @param overlay keeps track of changes made to the overlay, for undoing
      */
-    public void recurseCalibrate(int x, int y, int xorig, int yorig,
+    public void recurseCalibrate(int rawX, int rawY,
+                                 int xorig, int yorig,
                                  int[] origPixel,
                                  ColorTableUpdate updates,
                                  ImageOverlayAction overlayAction){
 
         // We've already thresholded it
-        if (currentSelections.contains(new Point(x, y))) {
+        if (currentSelections.contains(new Point(rawX, rawY))) {
             return;
         }
 
         //check to make sure we are still within orig. brush size
-        if(Math.abs(x-xorig) > brushSize/2 ||
-           Math.abs(y-yorig) > brushSize/2 )
+        if(Math.abs(rawX-xorig) > brushSize/2 ||
+           Math.abs(rawY-yorig) > brushSize/2 )
             return;
 
         //make sure this pixel is in the image
-        if(!inImage(x,y))
+        if(!inRawImage(rawX, rawY))
             return;
 
         //since it's in the image, and in the brush size, get new pix
-        int[] currPixel = rawImage.getYCbCr(x,y);
+        int[] currPixel = rawImage.getYCbCr(rawX,rawY);
 
         //check to see if we are making a jump from the orig pixel
         if(isTransition(origPixel,currPixel))
@@ -654,11 +663,16 @@ public class Calibrate implements DataListener, MouseListener,
 
         //so its an ok pixel, lets threshold it
         // keep track that we've already seen it
-        currentSelections.add(new Point(x, y));
+        currentSelections.add(new Point(rawX, rawY));
+
+        int threshX = rawX * thresholdedImage.getWidth() /
+            rawImage.getWidth();
+        int threshY = rawY * thresholdedImage.getHeight() /
+            rawImage.getHeight();
 
         // Find out the old threshold value (if any)
-        byte oldColor = thresholdedImage.getThresholded(x, y);
-        byte oldOverlayColor = overlay.getThreshColor(x, y);
+        byte oldColor = thresholdedImage.getThresholded(threshX, threshY);
+        byte oldOverlayColor = overlay.getThreshColor(threshX, threshY);
 
         if(small_table_mode){
 
@@ -667,27 +681,30 @@ public class Calibrate implements DataListener, MouseListener,
         }else{
             updates.addPixel(currPixel, oldColor);
         }
-        overlayAction.add(x, y, oldOverlayColor, currentColor);
+        overlayAction.add(rawX, rawY, oldOverlayColor, currentColor);
 
         //overlay.setOverlay(x,y,currentColor);
 
         //figure out where to look next
-        int left = x - 1;
-        int right = x + 1;
-        int up = y -1;
-        int down = y +1;
+        int left = rawX - 1;
+        int right = rawX + 1;
+        int up = rawY -1;
+        int down = rawY +1;
 
         //check to the left
-        recurseCalibrate(left,y,xorig,yorig, origPixel,updates, overlayAction);
+        recurseCalibrate(left,rawY,xorig,yorig,
+                         origPixel,updates, overlayAction);
 
         //check to the right
-        recurseCalibrate(right,y,xorig,yorig,origPixel,updates, overlayAction);
+        recurseCalibrate(right,rawY,xorig,yorig,
+                         origPixel,updates, overlayAction);
 
         //check up
-        recurseCalibrate(x,up,xorig,yorig,origPixel,updates, overlayAction);
+        recurseCalibrate(rawX,up,xorig,yorig,origPixel,updates, overlayAction);
 
         //check down
-        recurseCalibrate(x,down,xorig,yorig,origPixel,updates, overlayAction);
+        recurseCalibrate(rawX,down,xorig,yorig,
+                         origPixel,updates, overlayAction);
 
 
     }
@@ -874,11 +891,20 @@ public class Calibrate implements DataListener, MouseListener,
     }
 
     /**
-     * Checks if a point is within the image.
+     * Checks if a point is within the thresholded image.
      */
-    public boolean inImage(int x, int y){
-        return (x < imageWidth &&
-                y < imageHeight &&
+    public boolean inThreshImage(int x, int y){
+        return (x < thresholdedImage.getWidth() &&
+                y < thresholdedImage.getHeight() &&
+                y >= 0 && x >= 0);
+    }
+
+    /**
+     * Checks if a point is within the raw image.
+     */
+    public boolean inRawImage(int x, int y){
+        return (x < rawImage.getWidth() &&
+                y < rawImage.getHeight() &&
                 y >= 0 && x >= 0);
     }
 
@@ -950,30 +976,63 @@ public class Calibrate implements DataListener, MouseListener,
 
     public void mouseReleased(MouseEvent e) {
 
+        int displayerX=0, displayerY=0, selectorX=0, selectorY=0;
+
+        int x = e.getX();
+        int y = e.getY();
+
+        // Set the appropriate cursor values in each It matters,
+        // because the displayer has the thresholded image and the
+        // selector has the raw image and they can be different sizes
+        if (e.getSource() == selector && rawImage != null) {
+            displayerX = (selector.getImageX(x) *
+                          displayer.getImage().getWidth()/
+                          selector.getImage().getWidth());
+            displayerY = (selector.getImageY(y) *
+                          displayer.getImage().getHeight()/
+                          selector.getImage().getHeight());
+            selectorX = selector.getImageX(x);
+            selectorY = selector.getImageY(y);
+        } else if (e.getSource() == displayer && rawImage != null) {
+            selectorX = (displayer.getImageX(x) *
+                         selector.getImage().getWidth() /
+                         displayer.getImage().getWidth());
+            selectorY = (displayer.getImageY(y) *
+                         selector.getImage().getHeight() /
+                         displayer.getImage().getHeight());
+
+            displayerX = displayer.getImageX(x);
+            displayerY = displayer.getImageY(y);
+        }
+
         //when the mouse is clicked, look up the
         //place in the image where it was clicked,
         if(e.getButton() == MouseEvent.BUTTON1 && !e.isControlDown()){
-            int x = ((ImagePanel)e.getSource()).getImageX(e.getX());
-            int y = ((ImagePanel)e.getSource()).getImageY(e.getY());
 
-            if (inImage(x,y)) { // make sure we clicked inside the image
+            // make sure we clicked inside the image
+            if (inThreshImage(displayerX, displayerY)) {
                 if (e.isShiftDown()) {
+
                     // get the pix est on this pixel assuming object height=0
-                    Estimate est = thresholdedImage.pixEstimate(x,y,0);
-                    // we want to print a pixEstimate on this pixel if shift is down
+                    Estimate est = thresholdedImage.pixEstimate(displayerX,
+                                                                displayerY,0);
+
+                    // we want to print a pixEstimate on this pixel if
+                    // shift is down
                     System.out.printf(
-									  "pixel (%d,%d) dist: %.2f bearing: %.2f\n",
-									  x, y, est.dist, est.bearing);
-                }
-                else{
+                                      "pixel (%d,%d) dist: %.2f" +
+                                      " bearing: %.2f\n",
+                                      x, y, est.dist, est.bearing);
+                } else{
                     // Undefine the color underneath the cursor if in that mode.
                     if (undefineColor) {
-                        undefineColor(x, y, currentColor);
+                        undefineColor(selectorX, selectorY, currentColor);
                     }
                     // Otherwise, do the normal process of thresholding
                     // the area under the cursor to be the currentColor.
-                    else
-                        pixelSelected(x,y);
+                    else {
+                        pixelSelected(selectorX, selectorY);
+                    }
                 }
             }
         }
@@ -1010,36 +1069,64 @@ public class Calibrate implements DataListener, MouseListener,
         //move the marker around in the respective windows, even
         //when the mouse is not there
         if (e.getSource() == selector) {
-			if (rawImage != null) {
-				displayer.setMarkerImagePosition(selector.getImageX(x),
-												 selector.getImageY(y));
-				int tempx = selector.getImageX(x);
-				int tempy = selector.getImageY(y);
-				if (tempy < rawImage.getHeight() && tempy > 0 && tempx > 0 &&
-					tempx < rawImage.getWidth()) {
-					int pixie[] = rawImage.getPixel(selector.getImageX(x),
-													selector.getImageY(y));
-					int Y_SHIFT =colorTable.getYShift();
-					int CB_SHIFT =colorTable.getCBShift();
-					int CR_SHIFT =colorTable.getCRShift();
-					pixie[0] = pixie[0] >> Y_SHIFT;
-					pixie[1] = pixie[1] >> CB_SHIFT;
-					pixie[2] = pixie[2] >> CR_SHIFT;
-					calibratePanel.setXYText(selector.getImageX(x),
-											 selector.getImageY(y), pixie);
-				}
-			} else {
-				calibratePanel.setXYText(selector.getImageX(x),
-										 selector.getImageY(y));
-			}
+
+                int selectorX = selector.getImageX(x);
+                int selectorY = selector.getImageY(y);
+
+            if (rawImage != null) {
+
+                int displayerX = (selector.getImageX(x) *
+                                 displayer.getImage().getWidth()/
+                                 selector.getImage().getWidth());
+                int displayerY = (selector.getImageY(y) *
+                                 displayer.getImage().getHeight()/
+                                 selector.getImage().getHeight());
+
+                displayer.setMarkerImagePosition(displayerX,
+                                                 displayerY);
+
+                int tempx = selectorX;
+                int tempy = selectorY;
+
+                if (tempy < rawImage.getHeight() && tempy > 0 && tempx > 0 &&
+                    tempx < rawImage.getWidth()) {
+                    int pixie[] = rawImage.getPixel(selectorX,
+                                                    selectorY);
+                    int Y_SHIFT =colorTable.getYShift();
+                    int CB_SHIFT =colorTable.getCBShift();
+                    int CR_SHIFT =colorTable.getCRShift();
+
+                    pixie[0] = pixie[0] >> Y_SHIFT;
+                    pixie[1] = pixie[1] >> CB_SHIFT;
+                    pixie[2] = pixie[2] >> CR_SHIFT;
+
+                    calibratePanel.setXYText(displayerX,
+                                             displayerY,
+                                             pixie);
+                }
+            } else {
+                calibratePanel.setXYText(selectorX,
+                                         selectorY);
+            }
         }else if (e.getSource() == displayer) {
-            selector.setMarkerImagePosition(displayer.getImageX(x),
-                                            displayer.getImageY(y));
-			calibratePanel.setXYText(displayer.getImageX(x),
-									 displayer.getImageY(y));
+
+            if (rawImage != null){
+                int selectorX = (displayer.getImageX(x) *
+                                 selector.getImage().getWidth() /
+                                 displayer.getImage().getWidth());
+                int selectorY = (displayer.getImageY(y) *
+                                 selector.getImage().getHeight() /
+                                 displayer.getImage().getHeight());
+
+                selector.setMarkerImagePosition(selectorX,
+                                                selectorY);
+            }
+
+            calibratePanel.setXYText(displayer.getImageX(x),
+                                     displayer.getImageY(y));
         } else {
-			calibratePanel.setXYText(-1,-1);
-		}
+            calibratePanel.setXYText(-1,-1);
+        }
     }
 
     //mouseWheelListener Methods
@@ -1094,15 +1181,15 @@ public class Calibrate implements DataListener, MouseListener,
 		  }
 		*/
 
-        // Since we now handle different sized frames, it's possible to
-        // switch between modes, changing the image's size without updating
-        // the overlay.  This will catch that
+        // Since we now handle different sized frames, it's possible
+        // to switch between modes, changing the image's size without
+        // updating the overlay.  This will catch that
         if(overlay == null || overlay.getWidth() != rawImage.getWidth()) {
-            overlay = new ImageOverlay(rawImage.getWidth(),rawImage.getHeight());
+            overlay =
+                new ImageOverlay(rawImage.getWidth(),rawImage.getHeight());
+        } else {
+            overlay.resetPixels();
         }
-        imageHeight = rawImage.getHeight();
-        imageWidth = rawImage.getWidth();
-
         selector.updateImage(rawImage);
         calibratePanel.setSelectorOverlay();
 

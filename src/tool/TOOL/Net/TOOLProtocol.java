@@ -166,26 +166,9 @@ public class TOOLProtocol {
 
     public void processInfo() {
         gotInfo = true;
-        switch (robotType) {
-		case RobotDef.AIBO:
-		case RobotDef.AIBO_ERS7:
-			robotDef = RobotDef.ERS7_DEF;
-			break;
-		case RobotDef.AIBO_220:
-			robotDef = RobotDef.ERS220_DEF;
-			break;
-		case RobotDef.NAO:
-		case RobotDef.NAO_RL:
-		case RobotDef.NAO_VER:
-			robotDef = RobotDef.NAO_DEF_VERSIONED;
-			robotDef.setVersion(0);
-			break;
-		case RobotDef.NAO_SIM:
-			robotDef = RobotDef.NAO_SIM_DEF;
-			break;
-		default:
-			robotDef = null;
-			gotInfo = false;
+        robotDef = RobotDef.ImageType.values()[robotType].getRobotDef();
+        if (robotDef == RobotDef.NAO_DEF_VERSIONED) {
+            robotDef.setVersion(0);
         }
 
         if (robotDef != null) {
@@ -208,9 +191,7 @@ public class TOOLProtocol {
 
             if (r.info()) {
                 robotType = serial.readByte();
-				if (robotType == RobotDef.NAO_RL || robotType == RobotDef.NAO){
-					robotType = RobotDef.NAO_VER;
-				}
+
                 byte buf[] = new byte[1024];
                 int length = serial.readBytes(buf, true);
                 robotName = new String(buf, 0, length, "US-ASCII");
