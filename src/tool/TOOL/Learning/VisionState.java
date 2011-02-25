@@ -94,8 +94,9 @@ public class VisionState {
         //init the objects
         if (rawImage != null && colorTable != null)  {
             thresholdedImage = new ProcessedImage(frame, colorTable);
-            thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
-                                                             thresholdedImage.getHeight());
+            thresholdedOverlay =
+                new ThresholdedImageOverlay(thresholdedImage.getWidth(),
+                                            thresholdedImage.getHeight());
         }
 		seeBall = false;
 		seeBlue = GoalType.NO_POST;

@@ -1232,6 +1232,7 @@ public class Calibrate implements DataListener, MouseListener,
     public ImageOverlay getEdgeOverlay() {
         return overlay;
     }
+
     public VisionState getVisionState() {
         return visionState;
     }

@@ -73,15 +73,14 @@ public class ImagePanel extends JPanel implements ActionListener,
     public static final int POPUP_MENU_CTL_BUTTON = MouseEvent.BUTTON1;
 
     protected BufferedImage image;
-    protected BufferedImageOp imageOp;
-    protected AffineTransform transform;
+    protected BufferedImageOp imageOp, overlayOp;
+    protected AffineTransform imageTransform, overlayTransform;
 
     protected BufferedImage overlay;
 
     protected int xOffset;
     protected int yOffset;
-    protected double xScale;
-    protected double yScale;
+    protected double xImageScale, yImageScale, xOverlayScale, yOverlayScale;
     protected int scaleSetting;
 
     protected int fixedWidth;
@@ -97,8 +96,8 @@ public class ImagePanel extends JPanel implements ActionListener,
 
         xOffset = 0;
         yOffset = 0;
-        xScale = 1;
-        yScale = 1;
+        xImageScale = yImageScale = xOverlayScale = yOverlayScale = 1;
+
         scaleSetting = DEFAULT_SCALE_SETTING;
 
         fixedWidth = DEFAULT_FIXED_WIDTH;
@@ -108,8 +107,11 @@ public class ImagePanel extends JPanel implements ActionListener,
         lastWidth = getWidth();
         lastHeight = getHeight();
 
-        transform = new AffineTransform();
-        imageOp = new AffineTransformOp(transform, INTERPOLATION_TYPE);
+        imageTransform = new AffineTransform();
+        overlayTransform = new AffineTransform();
+
+        imageOp = new AffineTransformOp(imageTransform, INTERPOLATION_TYPE);
+        overlayOp = new AffineTransformOp(overlayTransform, INTERPOLATION_TYPE);
 
         createPopupMenu();
 
@@ -191,7 +193,11 @@ public class ImagePanel extends JPanel implements ActionListener,
     }
 
     public void setOverlayImage(BufferedImage o){
-	overlay = o;
+        overlay = o;
+
+        calculateScaling();
+        updateAffineTransform();
+        repaint();
     }
 
     public BufferedImageOp getImageOp() {
@@ -214,8 +220,8 @@ public class ImagePanel extends JPanel implements ActionListener,
         if (image != null) {
             g2d.drawImage(image, imageOp, 0, 0);
         }
-	if (overlay != null) {
-            g2d.drawImage(overlay, imageOp, 0, 0);
+        if (overlay != null) {
+            g2d.drawImage(overlay, overlayOp, 0, 0);
         }
         lastWidth = getWidth();
         lastHeight = getHeight();
@@ -224,86 +230,159 @@ public class ImagePanel extends JPanel implements ActionListener,
 
 
     protected void calculateScaling() {
-	if (image == null)
-	    return;
+        if (image != null) {
 
-        double oldXScale = xScale;
-        double oldYScale = yScale;
-        switch (scaleSetting) {
-        case SCALE_NONE:
-            xScale = 1;
-            yScale = 1;
-            break;
-        case SCALE_FIXED_SIZE:
-            xScale = ((double)fixedWidth) / image.getWidth();
-            yScale = ((double)fixedHeight) / image.getHeight();
-            break;
-        case SCALE_FIXED_RATIO:
-            break;
-        case SCALE_AUTO_WIDTH:
-            xScale = ((double)(getWidth() - xOffset)) / image.getWidth();
-            yScale = xScale;
-            break;
-        case SCALE_AUTO_HEIGHT:
-            yScale = ((double)(getHeight() - yOffset)) / image.getHeight();
-            xScale = yScale;
-            break;
-        case SCALE_AUTO_BOTH:
-            xScale = ((double)(getWidth() - xOffset)) / image.getWidth();
-            yScale = ((double)(getHeight() - yOffset)) / image.getHeight();
-            // actually, scale to the smaller dimension
-            xScale = yScale = Math.min(xScale, yScale);
-            break;
+            double oldXImageScale = xImageScale;
+            double oldYImageScale = yImageScale;
+            switch (scaleSetting) {
+            case SCALE_NONE:
+                xImageScale = 1;
+                yImageScale = 1;
+                break;
+            case SCALE_FIXED_SIZE:
+                xImageScale = ((double)fixedWidth) / image.getWidth();
+                yImageScale = ((double)fixedHeight) / image.getHeight();
+                break;
+            case SCALE_FIXED_RATIO:
+                break;
+            case SCALE_AUTO_WIDTH:
+                xImageScale = ((double)(getWidth() - xOffset)) / image.getWidth();
+                yImageScale = xImageScale;
+                break;
+            case SCALE_AUTO_HEIGHT:
+                yImageScale = ((double)(getHeight() - yOffset)) / image.getHeight();
+                xImageScale = yImageScale;
+                break;
+            case SCALE_AUTO_BOTH:
+                xImageScale = ((double)(getWidth() - xOffset)) / image.getWidth();
+                yImageScale = ((double)(getHeight() - yOffset)) / image.getHeight();
+                // actually, scale to the smaller dimension
+                xImageScale = yImageScale = Math.min(xImageScale, yImageScale);
+                break;
 
 
-            // This allows a buffered image to keep an arbitrary
-            // aspect ratio, as defined by the fixedWidth and fixedHeight,
-            // yet scale this fixed ratio with the screen.  For instance,
-            // in ColorEdit, the scales vary widely on the amount of entries
-            // displayed, but I want all the entries to be shown on the same
-            // size rectangle; this is the mode to use.
-        case SCALE_RATIO_SIZE_HYBRID:
-            // xScale is the amount we need to scale the raw image to be the
-            // fixedWidth, similarly with yScale
-            xScale = ((double)fixedWidth) / (double)image.getWidth();
-            yScale = ((double)fixedHeight) / (double)image.getHeight();
+                // This allows a buffered image to keep an arbitrary
+                // aspect ratio, as defined by the fixedWidth and fixedHeight,
+                // yet scale this fixed ratio with the screen.  For instance,
+                // in ColorEdit, the scales vary widely on the amount of entries
+                // displayed, but I want all the entries to be shown on the same
+                // size rectangle; this is the mode to use.
+            case SCALE_RATIO_SIZE_HYBRID:
+                // xImageScale is the amount we need to scale the raw image to be the
+                // fixedWidth, similarly with yImageScale
+                xImageScale = ((double)fixedWidth) / (double)image.getWidth();
+                yImageScale = ((double)fixedHeight) / (double)image.getHeight();
 
-            // Now we determine how much we need to stretch the "fixed width"
-            // and "fixed height" to match the screen size, using same rationale
-            // as SCALE_AUTO_BOTH
-            double scalingFactor1 = getWidth()/(double)fixedWidth;
-            double scalingFactor2 = getHeight()/(double)fixedHeight;
-            double scale = Math.min(scalingFactor1, scalingFactor2);
+                // Now we determine how much we need to stretch the "fixed width"
+                // and "fixed height" to match the screen size, using same rationale
+                // as SCALE_AUTO_BOTH
+                double scalingFactor1 = getWidth()/(double)fixedWidth;
+                double scalingFactor2 = getHeight()/(double)fixedHeight;
+                double scale = Math.min(scalingFactor1, scalingFactor2);
 
-            // Scale the x and y scale by the new scaling factor
-            xScale *= scale;
-            yScale *= scale;
-            break;
+                // ImageScale the x and y scale by the new scaling factor
+                xImageScale *= scale;
+                yImageScale *= scale;
+                break;
+            }
+
+            if (xImageScale == 0)
+                xImageScale = 1;
+            if (yImageScale == 0)
+                yImageScale = 1;
+
+            if (xImageScale != oldXImageScale)
+                firePropertyChange(X_SCALE_CHANGE, new Double(oldXImageScale),
+                                   new Double(xImageScale));
+            if (yImageScale != oldYImageScale)
+                firePropertyChange(Y_SCALE_CHANGE, new Double(oldYImageScale),
+                                   new Double(yImageScale));
+
         }
 
-        if (xScale == 0)
-            xScale = 1;
-        if (yScale == 0)
-            yScale = 1;
+        if (overlay != null) {
 
-        if (xScale != oldXScale)
-            firePropertyChange(X_SCALE_CHANGE, new Double(oldXScale),
-                new Double(xScale));
-        if (yScale != oldYScale)
-            firePropertyChange(Y_SCALE_CHANGE, new Double(oldYScale),
-                new Double(yScale));
+            double oldXOverlayScale = xOverlayScale;
+            double oldYOverlayScale = yOverlayScale;
+            switch (scaleSetting) {
+            case SCALE_NONE:
+                xOverlayScale = 1;
+                yOverlayScale = 1;
+                break;
+            case SCALE_FIXED_SIZE:
+                xOverlayScale = ((double)fixedWidth) / overlay.getWidth();
+                yOverlayScale = ((double)fixedHeight) / overlay.getHeight();
+                break;
+            case SCALE_FIXED_RATIO:
+                break;
+            case SCALE_AUTO_WIDTH:
+                xOverlayScale = ((double)(getWidth() - xOffset)) / overlay.getWidth();
+                yOverlayScale = xOverlayScale;
+                break;
+            case SCALE_AUTO_HEIGHT:
+                yOverlayScale = ((double)(getHeight() - yOffset)) / overlay.getHeight();
+                xOverlayScale = yOverlayScale;
+                break;
+            case SCALE_AUTO_BOTH:
+                xOverlayScale = ((double)(getWidth() - xOffset)) / overlay.getWidth();
+                yOverlayScale = ((double)(getHeight() - yOffset)) / overlay.getHeight();
+                // actually, scale to the smaller dimension
+                xOverlayScale = yOverlayScale = Math.min(xOverlayScale, yOverlayScale);
+                break;
+
+
+                // This allows a buffered overlay to keep an arbitrary
+                // aspect ratio, as defined by the fixedWidth and fixedHeight,
+                // yet scale this fixed ratio with the screen.  For instance,
+                // in ColorEdit, the scales vary widely on the amount of entries
+                // displayed, but I want all the entries to be shown on the same
+                // size rectangle; this is the mode to use.
+            case SCALE_RATIO_SIZE_HYBRID:
+                // xOverlayScale is the amount we need to scale the raw overlay to be the
+                // fixedWidth, similarly with yOverlayScale
+                xOverlayScale = ((double)fixedWidth) / (double)overlay.getWidth();
+                yOverlayScale = ((double)fixedHeight) / (double)overlay.getHeight();
+
+                // Now we determine how much we need to stretch the "fixed width"
+                // and "fixed height" to match the screen size, using same rationale
+                // as SCALE_AUTO_BOTH
+                double scalingFactor1 = getWidth()/(double)fixedWidth;
+                double scalingFactor2 = getHeight()/(double)fixedHeight;
+                double scale = Math.min(scalingFactor1, scalingFactor2);
+
+                // OverlayScale the x and y scale by the new scaling factor
+                xOverlayScale *= scale;
+                yOverlayScale *= scale;
+                break;
+            }
+
+            if (xOverlayScale == 0)
+                xOverlayScale = 1;
+            if (yOverlayScale == 0)
+                yOverlayScale = 1;
+
+            if (xOverlayScale != oldXOverlayScale)
+                firePropertyChange(X_SCALE_CHANGE, new Double(oldXOverlayScale),
+                                   new Double(xOverlayScale));
+            if (yOverlayScale != oldYOverlayScale)
+                firePropertyChange(Y_SCALE_CHANGE, new Double(oldYOverlayScale),
+                                   new Double(yOverlayScale));
+        }
     }
 
     public double getXScale(){
-	return xScale;
+        return xImageScale;
     }
     public double getYScale(){
-	return yScale;
+	return yImageScale;
     }
 
     private void updateAffineTransform() {
-        transform.setToScale(xScale, yScale);
-        imageOp = new AffineTransformOp(transform, INTERPOLATION_TYPE);
+        imageTransform.setToScale(xImageScale, yImageScale);
+        imageOp = new AffineTransformOp(imageTransform, INTERPOLATION_TYPE);
+
+        overlayTransform.setToScale(xOverlayScale, yOverlayScale);
+        overlayOp = new AffineTransformOp(overlayTransform, INTERPOLATION_TYPE);
     }
 
     public void changeSettings(int setting) {
@@ -332,7 +411,7 @@ public class ImagePanel extends JPanel implements ActionListener,
         if (x < 0)
             return -1;
         else {
-            x = (int)(x / xScale);
+            x = (int)(x / xImageScale);
             if (x >= image.getWidth()) {
 	    	return -1;
 	    }
@@ -349,7 +428,7 @@ public class ImagePanel extends JPanel implements ActionListener,
         if (y < 0)
             return -1;
         else {
-            y = (int)(y / yScale);
+            y = (int)(y / yImageScale);
             if (y >= image.getHeight())
                 return -1;
             else
@@ -358,7 +437,7 @@ public class ImagePanel extends JPanel implements ActionListener,
     }
 
     public int getPanelX(int x) {
-        x = (int)(x * xScale) - xOffset;
+        x = (int)(x * xImageScale) - xOffset;
 
         if (x < 0 || x > getWidth())
             return -1;
@@ -366,7 +445,7 @@ public class ImagePanel extends JPanel implements ActionListener,
     }
 
     public int getPanelY(int y) {
-        y = (int)(y * yScale) - yOffset;
+        y = (int)(y * yImageScale) - yOffset;
 
         if (y < 0 || y > getWidth())
             return -1;

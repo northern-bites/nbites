@@ -37,6 +37,7 @@ import java.awt.Dimension;
 import java.awt.Cursor;
 
 import TOOL.Image.ImageOverlay;
+import TOOL.Image.ThresholdedImageOverlay;
 
 import TOOL.Calibrate.ColorSwatchParent;
 import TOOL.TOOL;
@@ -460,7 +461,8 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     public void setSelectorOverlay(JComboBox sourceBox)
     {
         if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
-            calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
+            calibrate.getSelector().
+                setOverlayImage(calibrate.getEdgeOverlay());
             calibrate.getSelector().repaint();
         }
         else if (((String) sourceBox.getSelectedItem()).equals("none")) {
@@ -468,7 +470,9 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
             calibrate.getSelector().repaint();
         }
         else if (((String) sourceBox.getSelectedItem()).equals("Visual Objects")) {
-            calibrate.getSelector().setOverlayImage(calibrate.getVisionState().getThreshOverlay());
+            calibrate.getSelector().
+                setOverlayImage(calibrate.getVisionState().
+                                             getThreshOverlay());
             calibrate.getSelector().repaint();
         }
     }
@@ -478,7 +482,8 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     {
         JComboBox sourceBox = selectorOverlayChoice;
         if (((String) sourceBox.getSelectedItem()).equals("Thresholded Edges")) {
-            calibrate.getSelector().setOverlayImage(calibrate.getEdgeOverlay());
+            calibrate.getSelector().setOverlayImage(
+                                                    calibrate.getEdgeOverlay());
             calibrate.getSelector().repaint();
         }
         else if (((String) sourceBox.getSelectedItem()).equals("none")) {

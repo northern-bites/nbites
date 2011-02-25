@@ -65,6 +65,7 @@ import TOOL.Image.CalibrationDrawingPanel;
 import TOOL.Image.DrawingPanel;
 
 
+import TOOL.Image.ThresholdedImageOverlay;
 import TOOL.Image.ImageOverlay;
 import TOOL.Image.ImageOverlayAction;
 
