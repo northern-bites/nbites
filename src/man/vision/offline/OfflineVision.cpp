@@ -46,7 +46,7 @@ int OfflineVision::runOnDirectory(std::string path)
     for (int c=0; c < numIterations; ++c){
         for (int i = first; i <= last; ++i){
             stringstream framePath;
-            framePath << path << "/" << i << ".NBFRM";
+            framePath << path << "/" << i << ".frm";
             sensors->loadFrame(framePath.str());
             vision->notifyImage(sensors->getImage());
             PROF_NFRAME(profiler);

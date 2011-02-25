@@ -19,23 +19,6 @@ public class FrameLoader implements FileFilter {
 
     public static final FileFilter FILTER = new FrameLoader();
 
-    public static final String NAO_EXT = ".NFRM";
-    public static final String NAO_SIM_EXT = ".NSFRM";
-    public static final String NAO_VERSIONED = ".NBFRM.NEW";
-
-    public static final String EXTENSIONS[] = {
-        NAO_EXT,
-        NAO_SIM_EXT,
-        NAO_VERSIONED,
-    };
-
-    public static final String ROBOT_EXTS[] = {
-        NAO_EXT,
-        NAO_EXT,
-        NAO_SIM_EXT,
-        NAO_VERSIONED,
-    };
-
     public static void loadFrame(File f, Frame frm) throws TOOLException {
         loadFrame(f.getPath(), frm);
     }
@@ -52,7 +35,7 @@ public class FrameLoader implements FileFilter {
             byte[] footer;
 
             // This is the latest frame format.
-            if (upper.endsWith(NAO_VERSIONED)) {
+            if (upper.endsWith(RobotDef.NAO_VERSIONED_EXT)) {
                 RobotDef def = RobotDef.NAO_DEF_VERSIONED;
                 frm.setImage
                     (new YUV422Image(input,
@@ -104,7 +87,7 @@ public class FrameLoader implements FileFilter {
                                        path);
 
             }
-            else if (upper.endsWith(NAO_EXT)) {
+            else if (upper.endsWith(RobotDef.NAO_EXT)) {
                 RobotDef def = RobotDef.NAO_DEF_VERSIONED;
                 frm.setImage(new YUV422Image(input,
                                              def.inputImageDimensions().width,
@@ -150,7 +133,7 @@ public class FrameLoader implements FileFilter {
                     System.out.println("Couldn't read sensors from file " +
                                        path);
 
-            }else if (upper.endsWith(NAO_SIM_EXT)) {
+            }else if (upper.endsWith(RobotDef.NAO_SIM_EXT)) {
 
                 RobotDef def = RobotDef.NAO_SIM_DEF;
                 frm.setImage(new RGBImage(input,
@@ -263,12 +246,9 @@ public class FrameLoader implements FileFilter {
 
         String upper = imagePath.toUpperCase();
 
-        for (int i = 0; i < EXTENSIONS.length; i++)
-            if (upper.endsWith(EXTENSIONS[i]))
-                return true;
-
-        return false;
-
+        return (upper.endsWith(RobotDef.NAO_EXT) ||
+                upper.endsWith(RobotDef.NAO_SIM_EXT) ||
+                upper.endsWith(RobotDef.NAO_VERSIONED_EXT));
     }
 
     /**

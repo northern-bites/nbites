@@ -777,7 +777,7 @@ void Sensors::saveFrame()
     int MAX_FRAMES = 3000;
     if (saved_frames > MAX_FRAMES)
         return;
-    string EXT(".NBFRM");
+    string EXT(".frm");
     string BASE("/");
     int NUMBER = saved_frames;
     stringstream FRAME_PATH;

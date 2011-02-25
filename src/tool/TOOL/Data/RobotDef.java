@@ -22,30 +22,49 @@ import java.awt.Dimension;
 
 public class RobotDef {
 
+    public static final String NAO_EXT = ".NFRM";
+    public static final String NAO_SIM_EXT = ".NSFRM";
+    public static final String NAO_VERSIONED_EXT = ".FRM";
+
     public enum ImageType {
-        NAO_RL("NAO_RL", "A simulated Nao robot", NAO_DEF_VERSIONED),
-            NAO_SIM("NAO_SIM", "A simulated Nao robot", NAO_SIM_DEF),
-            NAO("NAO", "A Nao robot of unspecified nature", NAO_DEF_VERSIONED),
+        NAO_RL("NAO_RL",
+               "A simulated Nao robot",
+               NAO_DEF_VERSIONED,
+               NAO_VERSIONED_EXT),
+
+            NAO_SIM("NAO_SIM",
+                    "A simulated Nao robot",
+                    NAO_SIM_DEF,
+                    NAO_SIM_EXT),
+
+            NAO("NAO",
+                "A Nao robot of unspecified nature",
+                NAO_DEF_VERSIONED,
+                NAO_VERSIONED_EXT),
 
             // This is the latest frame format which includes a version number
             // in its header. That will allow us to parse it differently
             // according to version.
             NAO_VER("NAO_VERSIONED",
                     "A real-life Nao robot. Frame supports version number",
-                    NAO_DEF_VERSIONED);
+                    NAO_DEF_VERSIONED,
+                    NAO_VERSIONED_EXT);
 
         private final String type;
         private final String desc;
+        private final String ext;
         private final RobotDef def;
 
-        ImageType(String type, String description, RobotDef def){
+        ImageType(String type, String description, RobotDef def, String ext){
             this.type = type;
             this.desc = description;
             this.def = def;
+            this.ext = ext;
         }
 
         public String getType() { return type; }
         public String getDescription() { return desc; }
+        public String getExtension() { return ext; }
         public RobotDef getRobotDef() { return def;}
     }
 

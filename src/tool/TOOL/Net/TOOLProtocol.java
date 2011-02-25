@@ -174,8 +174,8 @@ public class TOOLProtocol {
         if (robotDef != null) {
             joints = new float[robotDef.numJoints()];
             sensors = new float[robotDef.numSensors()];
-            image = new byte[robotDef.rawImageSize()];
-            thresh = new byte[robotDef.imageWidth() * robotDef.imageHeight()];
+            image = new byte[robotDef.inputImageSize()];
+            thresh = new byte[robotDef.outputImageSize()];
         }
     }
 
@@ -264,8 +264,8 @@ public class TOOLProtocol {
         return null;
     }
 
-    public int getRobotType() {
-        return robotType;
+    public RobotDef.ImageType getRobotType() {
+        return RobotDef.ImageType.values()[robotType];
     }
 
     public RobotDef getRobotDef() {

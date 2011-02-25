@@ -17,7 +17,7 @@ for folder in "zero" "one" "couple" "clutter"
 do
     OUT_FILE=$folder"_timing_results.txt"
     echo $OUT_FILE
-    NUM_IMAGES=`find $IMAGE_DIR/$folder/ -name *.NBFRM | wc -l`
+    NUM_IMAGES=`find $IMAGE_DIR/$folder/ -name *.frm | wc -l`
     $BIN_DIR/OfflineVision $IMAGE_DIR/$folder 1 $NUM_IMAGES $ITERATIONS > $OUT_FILE
 done
 

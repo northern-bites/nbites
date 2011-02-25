@@ -8,7 +8,6 @@
 #include "SensorDef.h"
 #include "MotionDef.h"
 
-
 using namespace std;
 
 /**

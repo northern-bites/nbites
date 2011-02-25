@@ -183,7 +183,6 @@ public class Frame {
         return 0;
     }
 
-
     public void setType(RobotDef.ImageType robotType) {
         frame_type = robotType;
     }
@@ -195,7 +194,7 @@ public class Frame {
     public void setJoints(List<Float> j) {
         frame_joints = j;
     }
-    
+
     public void setSensors(List<Float> s) {
         frame_sensors = s;
     }
