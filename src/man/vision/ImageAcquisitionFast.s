@@ -96,12 +96,8 @@ color_stack_row_end:
         movq    mm0, [esi+ecx*4 + (\phase * 8)]
         movq    mm1, mm0
 
-        prefetchw [edi+ecx*2]
-
         pand    mm0, mm7
         psrlw   mm1, 8
-
-        prefetch [edx]
 
         ##
         ##
@@ -118,6 +114,10 @@ color_stack_row_end:
         pand    mm0, mm6
 
         .ifeq (\phase)
+        ## Prefetch the Y-out segment
+        prefetchw [edi+ecx*2]
+
+        ## Copy the y values for later packing
         movq    mm4, mm0
         .endif
 
