@@ -24,6 +24,7 @@ import java.util.Vector;
 
 import TOOL.TOOL;
 import TOOL.Data.RobotDef;
+import TOOL.Data.DataTypes;
 import TOOL.WorldController.Observation;
 import TOOL.WorldController.LocalizationPacket;
 
@@ -182,6 +183,16 @@ public class TOOLProtocol {
     public void request(DataRequest r) {
         if (!connected)
             return;
+        byte[] data = r.getBytes();
+        for (int i=0; i < data.length; i++){
+            byte type = data[i];
+
+            if (type == 1 &&
+                !DataRequest.isImplemented(DataTypes.DataType.values()[i])){
+                System.out.println("Data Request is not implemented");
+                return;
+            }
+        }
 
         try {
 
