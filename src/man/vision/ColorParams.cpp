@@ -19,11 +19,22 @@ ColorParams::ColorParams(int y0, int u0, int v0,
            vn <= v1 - v0);
 
     // See ColorParams.h for details on values and their layouts.
-    yZero = MMX4(y0 << 2);
-    ySlope = MMX0101( (yn << 14) / (y1 - y0));
+    // For use with full resolution _acquire_image
+    // yZero = MMX4(y0 << 2);
+    // ySlope = MMX0101( (yn << 14) / (y1 - y0));
+    // yLimit = MMX4(yn-1);
+
+    // uvZero = MMX22(u0 << 1, v0 << 1);
+    // uvSlope = MMX22( (un << 15) / (u1 - u0), (vn << 15) / (v1 - v0));
+    // uvLimit = MMX22(un-1, vn-1);
+    // uvDim = MMX22(yn, un * yn);
+
+    // For use with _acquire_image_fast (does half the summing):
+    yZero = MMX4(y0 << 1);
+    ySlope = MMX0101( (yn << 15) / (y1 - y0));
     yLimit = MMX4(yn-1);
 
-    uvZero = MMX22(u0 << 1, v0 << 1);
+    uvZero = MMX22(u0, v0);
     uvSlope = MMX22( (un << 15) / (u1 - u0), (vn << 15) / (v1 - v0));
     uvLimit = MMX22(un-1, vn-1);
     uvDim = MMX22(yn, un * yn);

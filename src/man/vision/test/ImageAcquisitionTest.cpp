@@ -22,7 +22,7 @@ ImageAcquisitionTest::ImageAcquisitionTest() :
     sum_clocks(0), min_clocks(0xFFFFFFF), numFrames(500)
 {
     init();
-    setup(0,0,0,
+    setup(45, 20, 33,
           255,255,255,
           10,10,10 );
 }
@@ -116,9 +116,9 @@ int ImageAcquisitionTest::yAvgValue(int i, int j) const
     // output image
     uint8_t* p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
     return (static_cast<int>(p[YOFFSET1]) +
-            static_cast<int>(p[YOFFSET2]) +
-            static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + YOFFSET1]) +
-            static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + YOFFSET2]));
+            static_cast<int>(p[YOFFSET2]));
+            // static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + YOFFSET1]) +
+            // static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + YOFFSET2]));
 }
 
 /**
@@ -129,8 +129,8 @@ int ImageAcquisitionTest::yAvgValue(int i, int j) const
 int ImageAcquisitionTest::uAvgValue(int i, int j) const
 {
     uint8_t * p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
-    return (static_cast<int>(p[UOFFSET]) +
-            static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + UOFFSET]));
+    return (static_cast<int>(p[UOFFSET]));
+            // static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + UOFFSET]));
 }
 
 /**
@@ -141,8 +141,8 @@ int ImageAcquisitionTest::uAvgValue(int i, int j) const
 int ImageAcquisitionTest::vAvgValue(int i, int j) const
 {
     uint8_t * p = yuv + 4 * (i * NAO_IMAGE_WIDTH + j);
-    return (static_cast<int>(p[VOFFSET]) +
-            static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + VOFFSET]));
+    return (static_cast<int>(p[VOFFSET]));
+            // static_cast<int>(p[NAO_IMAGE_ROW_OFFSET + VOFFSET]));
 }
 
 
@@ -167,7 +167,7 @@ int ImageAcquisitionTest::uIndex(int i, int j) const
 {
     int u = max( uAvgValue(i, j) - uZero(), 0);
     u = min( (u * uSlope()) >> 16 , uLimit());
-    return u;
+    return u * 2;               // @TODO why times 2?
 }
 
 /**
@@ -177,7 +177,7 @@ int ImageAcquisitionTest::vIndex(int i, int j) const
 {
     int v = max( vAvgValue(i, j) - vZero(), 0);
     v = min( (v * vSlope()) >> 16 , vLimit());
-    return v;
+    return v * 2;
 }
 
 /**
@@ -208,10 +208,12 @@ void ImageAcquisitionTest::test_color_segmentation()
 {
     for (int i=0; i < IMAGE_HEIGHT; ++i){
         for (int j=0; j < IMAGE_WIDTH; ++j){
-            EQ_INT( colorValue(i,j) ,
-                    tableLookup( yIndex(i,j),
+            int a = colorValue(i,j);
+            int b = tableLookup( yIndex(i,j),
                                  uIndex(i,j),
-                                 vIndex(i,j) ));
+                                 vIndex(i,j) );
+            GTE(a+1, b);
+            LTE(a-1, b);
         }
     }
     PASSED(COLOR_SEGMENTATION);
@@ -227,7 +229,7 @@ void ImageAcquisitionTest::test_avg()
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startT_process);
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &startT_thread);
 
-    unsigned int clockTicks = _acquire_image(table, &c, yuv, out);
+    unsigned int clockTicks = _acquire_image_fast(table, &c, yuv, out);
 
     clock_gettime(CLOCK_MONOTONIC, &finishT_mono);
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &finishT_process);

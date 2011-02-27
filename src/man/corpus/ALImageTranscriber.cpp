@@ -81,8 +81,7 @@ const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
 #endif
 
-#define NUM_FRAMES_TIMER 100
-
+#define NUM_FRAMES_TIMER 300
 
 ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
                                        shared_ptr<Sensors> s,
@@ -544,7 +543,7 @@ void ALImageTranscriber::waitForImage ()
             // clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startT_process);
             // clock_gettime(CLOCK_THREAD_CPUTIME_ID, &startT_thread);
 
-            _acquire_image(table, &params, ALimage->getData(), image);
+            _acquire_image_fast(table, &params, ALimage->getData(), image);
 
             // clock_gettime(CLOCK_MONOTONIC, &finishT_mono);
             // clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &finishT_process);

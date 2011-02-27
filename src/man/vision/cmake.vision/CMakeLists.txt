@@ -161,6 +161,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/HoughSpace
                  ${VISION_INCLUDE_DIR}/geom/HoughLine
                  ${VISION_INCLUDE_DIR}/ImageAcquisition.s
+                 ${VISION_INCLUDE_DIR}/ImageAcquisitionFast.s
                  ${VISION_INCLUDE_DIR}/EdgeDetection.s
                  ${VISION_INCLUDE_DIR}/CopyImage.s
                  ${VISION_INCLUDE_DIR}/ColorParams
@@ -171,6 +172,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
 
 set_property(SOURCE
   ${VISION_INCLUDE_DIR}/ImageAcquisition.s
+  ${VISION_INCLUDE_DIR}/ImageAcquisitionFast.s
   ${VISION_INCLUDE_DIR}/EdgeDetection.s
   ${VISION_INCLUDE_DIR}/CopyImage.s PROPERTY LANGUAGE C)
 
@@ -274,7 +276,8 @@ target_link_libraries( HoughSpaceTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
 
 
 add_executable( ImageAcquisitionTest ${VISION_TEST_DIR}/ImageAcquisitionTest.cpp
-  ${VISION_INCLUDE_DIR}/ImageAcquisition.s ${VISION_INCLUDE_DIR}/ColorParams.cpp )
+  ${VISION_INCLUDE_DIR}/ImageAcquisition.s
+  ${VISION_INCLUDE_DIR}/ImageAcquisitionFast.s ${VISION_INCLUDE_DIR}/ColorParams.cpp )
 
 target_link_libraries( ImageAcquisitionTest ${NBCOMMON_LIBRARIES})
 
