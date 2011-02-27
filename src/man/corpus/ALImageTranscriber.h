@@ -80,15 +80,6 @@ private: // nBites Camera Constants
     static const int DEFAULT_CAMERA_HFLIP ;
     static const int DEFAULT_CAMERA_VFLIP ;
 
-    unsigned long long int sumTime_thread, sumTime_mono, sumTime_process,
-        sumTicks;
-    int minTicks;
-    int numFrames;
-
-    unsigned char* bigImg;
-    struct timespec startT_thread, startT_mono, startT_process,
-        finishT_thread, finishT_mono, finishT_process;
-
     enum {
         y0 = 0,
         u0 = 0,
