@@ -254,7 +254,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
             "()V");
     jmethodID setVisualCornersInfo = env->GetMethodID(javaClass, "setVisualCornersInfo",
             "(IIFFI)V");
-#define CALIBRATE_CAMERA
+//#define CALIBRATE_CAMERA
 #ifdef CALIBRATE_CAMERA
     //push stuff from expected lines
     const vector<VisualLine> expectedLines =
