@@ -3,10 +3,12 @@
 const int Gradient::dxTab[DIRECTIONS] = { 1,  1,  0, -1, -1, -1,  0,  1};
 const int Gradient::dyTab[DIRECTIONS] = { 0,  1,  1,  1,  0, -1, -1, -1};
 
-Gradient::Gradient() {
-    values = new uint16_t[(IMAGE_HEIGHT * 3) * (IMAGE_WIDTH)];
-    // Tangent array is made of triplets of (tangent, x coord, y coord)
-    angles = new uint16_t[angles_size];
+Gradient::Gradient() :
+    values(new uint16_t[(IMAGE_HEIGHT * 3) * (IMAGE_WIDTH)]),
+    angles(new int16_t[angles_size]),
+    numPeaks(0)
+{
+
 }
 
 // @TODO: Profile and rewrite using MMX intrinsics to do this 64bits at once
@@ -26,7 +28,7 @@ void Gradient::reset()
 // and returns the index of it, if present. If not present, returns 0.
 int Gradient::peaks_list_contains(int i, int j){
     int n = 0;
-    while (getAnglesXCoord(n) != 0){
+    while (isPeak(n)){
         if (getAnglesXCoord(n) == j &&
             getAnglesYCoord(n) == i){
             return n;

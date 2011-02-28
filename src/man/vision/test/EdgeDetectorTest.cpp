@@ -162,9 +162,10 @@ int EdgeDetectorTest::test_peaks()
 
 #ifdef USE_MMX
     for (int i = 0; i < Gradient::num_angles_limit; ++i) {
-        if (g->getAnglesXCoord(i)){
+        if (g->isPeak(i)){
             int x = g->getAnglesXCoord(i);
             int y = g->getAnglesYCoord(i);
+
             NE_INT(g->getMagnitude(y,x) , 0);
             assert(g->getX(y,x) != 0 || g->getY(y,x) != 0);
 
@@ -325,7 +326,7 @@ int EdgeDetectorTest::test_angles()
     g->reset();
     edges.detectEdges(c,g);
     for (int i = 0; i < Gradient::num_angles_limit; ++i) {
-        if (g->getAnglesXCoord(i)){
+        if (g->isPeak(i)){
             int x = g->getAnglesXCoord(i);
             int y = g->getAnglesYCoord(i);
             NE_INT(g->getMagnitude(y,x) , 0);
@@ -339,9 +340,7 @@ int EdgeDetectorTest::test_angles()
 
 #ifdef USE_MMX
     int i = 0;
-    long long int diffSum = 0;
-    int numPeaks = 0;
-    while (g->getAnglesXCoord(i) != 0){
+    while (g->isPeak(i)){
         int y = g->getAnglesYCoord(i);
         int x = g->getAnglesXCoord(i);
 
@@ -356,8 +355,11 @@ int EdgeDetectorTest::test_angles()
         LTE((a-d)%256, 10);
         ++i;
     }
-
     PASSED(PEAK_ANGLES);
+
+    EQ_INT(i, g->numPeaks);
+    PASSED(NUM_PEAKS);
+
 #endif
     delete c;
     return 0;

@@ -36,6 +36,7 @@ angles_param:
                 .struct 0
 row_count:      .skip 4
 angles_ptr:     .skip 4
+num_peaks:      .skip 4
 end_of_peak_stack:
 
         .equiv neighborOffset, 12*4
@@ -290,7 +291,9 @@ sobel_xLoop:
         ##      ebp     offset to gradient direction neighbors for peak test
         ##
         ## Stack:
-        ##      [esp]       y index counter
+        ##      [esp + row_count]       y index counter
+        ##      [esp + angles_ptr]      pointer to output (angles) array
+        ##      [esp + num_peaks]       number of peaks found
 
 _find_edge_peaks:
         ## Load output address
@@ -315,6 +318,8 @@ _find_edge_peaks:
 
         sub     esp, end_of_peak_stack
         mov     dword ptr[esp + angles_ptr], eax
+
+        mov     dword ptr[esp + num_peaks], 0
 
         ## 240 rows, 238 gradient magnitudes, 236 possible peak rows
         mov     dword ptr[esp + row_count], 237
@@ -423,12 +428,15 @@ peaks_xLoop:
         ## for instance, on first pixel in image,
         ## ecx will be at 315 (not 316 still, since it gets decremented once
         ## in the 'repe scasw' instruction)
-        mov     edx, 317
+
+        ## Calculate the coordinate relative to the image center, also
+        mov     edx, 317 - imgWd/2
         sub     edx, ecx
         mov     word ptr[esi + 2], dx
 
         ## Load y coordinate and write it out
-        mov     edx, 238
+        ## Calculate the coordinate relative to the image center
+        mov     edx, 238 - imgHt/2
         sub     edx, dword ptr[esp + row_count]
 
         ## 236 >= row_count >= 0, must write out starting from 2 --> 238
@@ -436,6 +444,8 @@ peaks_xLoop:
 
         ## Move angles ptr forward to the next location in the array
         add     dword ptr[esp + angles_ptr], 6
+
+        inc     dword ptr[esp + num_peaks]
 
         jmp     peaks_xLoop
 
@@ -450,8 +460,10 @@ peaks_xLoop_end:
         ## Put zeros in the x,y, angle spots for the element after the
         ## last in the list of edge peaks. Signals end of list to user.
         mov     word ptr[esi], 0
-        mov     word ptr[esi+2], 0
-        mov     word ptr[esi+4], 0
+        mov     word ptr[esi+2], 0 - imgWd/2 # Relative to image center
+        mov     word ptr[esi+4], 0 - imgHt/2
+
+        mov     eax, [esp + num_peaks]
 
         ## Clean up and return
         add     esp, end_of_peak_stack
