@@ -5,16 +5,23 @@
 
 .section .data
 
+        ## Parameter layout
         .struct 8
 num_peaks:      .skip 4
 angle_spread:   .skip 4
 peaks:          .skip 4
 hough_space:
 
+        ## Peak list layout
         .struct 0
 angle_offset:   .skip 2
 x_offset:       .skip 2
 y_offset:
+
+        ## Stack layout
+        .struct 0
+spread: .skip 4
+end_of_stack:
 
 sinTable:
 
@@ -25,26 +32,24 @@ cosTable:
 .section .text
 
 .macro GET_R x, y, t
-        ## x * cos(t) + y * sin(t)
-        imul    \x, [sinTable + t]
-        imul    \y, [cosTable + t]
-
+        ## r = x * cos(t) + y * sin(t)
+        ## Possibly more code needed here to process multiplication results
+        imul    \x, [cosTable + t]
+        imul    \y, [sinTable + t]
         add     \x, \y
 
-        ## Set \y to all zeros for later use
-        mov     \y, R_SPAN
-
-        ## Put the R value in the Hough Space coordinates
-        add     \x, R_SPAN_OVER_2
-
-        ## Ensure 0 <= R < R_SPAN
-        cmp     \x, \y
-        cmovae  \x, \y
-
+        ## Set \y to zero
         xor     \y,\y
 
-        cmp     \x, \y
-        cmovb   \x, \y
+        ## Put the R value in the Hough Space coordinates
+        add     \x, R_SPAN/2
+
+        ## Ensure R >= 0
+        ## If \x + R_SPAN/2 < 0 (less than, than set it to zero)
+        cmovl   \x, \y
+
+        ## Ensure R < R_SPAN
+        and     \x, R_SPAN-1
 .endm
 
         ## _mark_edges(int numPeaks, int angleSpread,
@@ -57,20 +62,30 @@ _mark_edges:
         push    edi
         push    ebx
 
+        sub     esp, end_of_stack
+
 peakLoop:
+        ## Load pointer to peak list
         mov     edi, dword ptr[ebp + peaks]
+
+        ## Load angleSpread parameter
+        mov     eax, [ebp + angle_spread]
 
         ## Get gradient angle lower bound
         mov     esi, [edi + angle_offset]
 
         ## esi = t0 - angleSpread
-        sub     esi, [ebp + angle_spread]
+        sub     esi, eax
 
-        ## Get radius at gradient lower bound
+        ## Double spread param and store it on the stack as a counter
+        shl     eax, 1
+        mov     dword ptr[esp + spread], eax
+
+        ## Load peak's x and y values
         mov     ebx, [edi + x_offset]
         mov     eax, [edi + y_offset]
 
-        ## put r0 in ebx
+        ## put r0, radius at t-angleSpread in ebx
         GET_R   ebx, eax, esi
 
         ## Iterate from lower gradient angle to upper
@@ -90,7 +105,7 @@ gradientLoop:
         ## Calculate hough space address
         mov     eax, esi
         imul    eax, R_SPAN * 4 # 4 bytes per hough bin
-        add     eax, [ebp + hough_space]
+        add     eax, dword ptr[ebp + hough_space]
 
         ## edi = min(r0,r1), ecx = max(r0, r1)
         cmp     edx, ebx
@@ -110,7 +125,7 @@ gradientLoop:
         ## Iterate from minR to maxR
         ## for ( ; rDiff < 0; rDiff++)
 radiiLoop:
-        inc     dword ptr[eax + edi * 4] # ti * R_SPAN + ri
+        inc     dword ptr[eax + edi * 4] # ti * R_SPAN + ri * (4 bytes per bin)
 
         ## radiiLoop
         inc     edi             # Increment ri
@@ -122,13 +137,13 @@ radiiLoop:
 
         ## gradientLoop
         inc     esi             # Increment ti
-        dec     dword ptr[ebp + angle_spread]
+        dec     dword ptr[esp + spread]
         jne     gradientLoop
 
         ## 6 bytes per x,y,angle triple
         add     dword ptr[ebp + peaks], 6
 
-        dec     [ebp + num_peaks]
+        dec     dword ptr[ebp + num_peaks]
         jne     peakLoop
 
         pop     ebx
@@ -139,3 +154,4 @@ radiiLoop:
         pop     ebp
 
         ret
+
