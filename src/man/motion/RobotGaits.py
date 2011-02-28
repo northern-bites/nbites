@@ -12,6 +12,7 @@ from .gaits.SlowGait import SLOW_GAIT
 from .gaits.ZaphodSlowGait import ZAPHOD_SLOW_GAIT
 from .gaits.WebotsGait import WEBOTS_GAIT, WEBOTS_GAIT2
 from .gaits.BackwardsGait import BACKWARDS_GAIT
+from .gaits.ZmpGait import ZMP_GAIT
 
 # disabled / unused gaits
 #from .gaits.ComGait import COM_GAIT 
@@ -20,7 +21,7 @@ from .gaits.BackwardsGait import BACKWARDS_GAIT
 
 ############# DEFAULT GAIT ASSIGNMENTS ##################
 
-CUR_GAIT = SLOW_GAIT
+CUR_GAIT = ZMP_GAIT
 CUR_DRIBBLE_GAIT = DUCK_GAIT
 CUR_BACKWARDS_GAIT = BACKWARDS_GAIT
 CUR_SLOW_GAIT = SLOW_GAIT
