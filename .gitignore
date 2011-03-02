@@ -1,16 +1,11 @@
 build/*
 install/*
 data/*
-*config.h
 *.pyc
 *.ekf
 *.mcl
 *.obs
 /data/tables/*
-upload.sh
-noggin/players/Switch.py
-noggin/WebotsConfig.py
-noggin/TeamConfig.py
 noggin/util/fakeData/*
 /noggin/util/navToObs
 /noggin/util/obsToLoc
