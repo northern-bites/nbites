@@ -1,8 +1,24 @@
 """
 Here we house all of the state methods used for kicking the ball
 """
+def preKickStop(player):
+    """
+    If we have already decided the kick but need to stop before
+    we make the kick, stop
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.stopWalking()
+
+    if player.brain.nav.isStopped():
+        return player.goLater('kickBallExecute')
+
+    return player.stay()
 
 def kickBallExecute(player):
+    """
+    Kick the ball
+    """
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.executeMove(player.brain.kickDecider.getSweetMove())
@@ -31,9 +47,11 @@ def afterKick(player):
         if player.penaltyKicking:
             return player.goLater('penaltyKickRelocalize')
 
-        if player.brain.ball.on:
-            player.brain.tracker.trackBall()
         return player.stay()
+
+    if player.brain.ball.on:
+        player.brain.tracker.trackBall()
+        return player.goLater('chase')
 
     if not player.brain.motion.isHeadActive():
         player.inKickingState = False

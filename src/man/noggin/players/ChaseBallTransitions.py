@@ -9,36 +9,54 @@ from math import fabs
 
 ####### CHASING STUFF ##############
 
+def shouldChaseBall(player):
+    """
+    We see the ball. So go get it.
+    """
+    ball = player.brain.ball
+    return (ball.on)
+
 def shouldApproachBall(player):
     """
-    Begin walking to the ball if it is close to straight in front of us
+    Approach the ball if it is far away.
     """
     ball = player.brain.ball
-    return (ball.framesOn > 0)
+    return (ball.on and not shouldPositionForKick(player))
 
-def shouldApproachFromPositionForKick(player):
+def shouldChaseFromPositionForKick(player):
     """
-    Walk to the ball if its too far away
+    Exit PFK if the ball is too far away.
     """
     ball = player.brain.ball
-    return shouldApproachBall(player) and \
+    return shouldChaseBall(player) and \
         not shouldPositionForKick(player) and \
-        ball.dist > 40.0
+        ball.dist > constants.BALL_PFK_MAX_X+10
 
 def shouldPositionForKick(player):
     """
     Should begin aligning on the ball for a kick when close
     """
     ball = player.brain.ball
-    return (constants.BALL_POS_KICK_LEFT_Y > ball.relY > \
-            constants.BALL_POS_KICK_RIGHT_Y and \
-            constants.BALL_POS_KICK_MAX_X > ball.relX > \
-            constants.BALL_POS_KICK_MIN_X and \
-            fabs(ball.bearing) < constants.BALL_POS_KICK_BEARING_THRESH)
+    return (constants.BALL_PFK_LEFT_Y > ball.relY > \
+            constants.BALL_PFK_RIGHT_Y and \
+            constants.BALL_PFK_MAX_X > ball.relX > \
+            constants.BALL_PFK_MIN_X and \
+            fabs(ball.bearing) < constants.BALL_PFK_BEARING_THRESH)
 
-def shouldKick(player):
+def shouldStopAndKick(player):
     """
-    Ball is in the correct position to kick
+    Ball is in the correct position to kick but we aren't stopped
+    """
+    ball = player.brain.ball
+    return ball.on and \
+        ball.relX > constants.SHOULD_KICK_CLOSE_X and \
+        ball.relX < constants.SHOULD_KICK_FAR_X and \
+        fabs(ball.relY) < constants.SHOULD_KICK_Y
+        # and player.counter < 1 ??
+
+def shouldKickNow(player):
+    """
+    Ball is in the correct position to kick and we are stopped
     """
     ball = player.brain.ball
     # Ensure we are stopped, we see the ball,
@@ -47,7 +65,7 @@ def shouldKick(player):
         ball.on and \
         ball.relX > constants.SHOULD_KICK_CLOSE_X and \
         ball.relX < constants.SHOULD_KICK_FAR_X and \
-        fabs(ball.relY) < 10
+        fabs(ball.relY) < constants.SHOULD_KICK_Y
         # and player.counter < 1 ??
 
 def shouldDribble(player):
@@ -106,17 +124,23 @@ def shouldSpinFindBall(player):
             SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL))
 
 def shouldSpinFindBallAgain(player):
-    return player.brain.ball.framesOff > 200
+    """
+    If we have been walkFindBall-ing too long we should spin.
+    """
+    return player.stateTime > constants.WALK_FIND_BALL_FRAMES_THRESH
+
+def shouldWalkFindBall(player):
+    """
+    If we've been spinFindBall-ing too long we should walk
+    """
+    return player.counter > constants.WALK_FIND_BALL_FRAMES_THRESH and \
+        player.brain.ball.framesOff > constants.BALL_OFF_THRESH
 
 def shouldntStopChasing(player):
     """
     Dont switch out of chaser in certain circumstances
     """
     return player.inKickingState
-
-def shouldWalkToBallLocPos(player):
-    return player.counter > constants.WALK_TO_BALL_LOC_POS_FRAMES and \
-        player.brain.ball.framesOff > constants.BALL_OFF_THRESH
 
 def shouldPreKickScan(player):
     if player.brain.ball.on:
@@ -149,4 +173,7 @@ def shouldStopPenaltyKickDribbling(player):
             player.counter > constants.STOP_PENALTY_DRIBBLE_COUNT)
 
 def inPenaltyKickStrikezone(player):
+    """
+    If we are in a good place to kick
+    """
     return (NogginConstants.OPP_GOALBOX_LEFT_X + 75. < player.brain.my.x)

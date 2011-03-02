@@ -22,14 +22,14 @@
 #define _ALEnactor_h_DEFINED
 
 #include <boost/shared_ptr.hpp>
-#include "alerror.h"
-#include "almotionproxy.h"
-#include "almemoryproxy.h"
-#include "alptr.h"
-#include "albroker.h"
-#include "alproxy.h"
-#include "dcmproxy.h"
-#include "almemoryfastaccess.h"
+#include "alcommon/albroker.h"
+#include "alcore/alerror.h"
+#include "alcore/alptr.h"
+#include "almemoryfastaccess/almemoryfastaccess.h"
+#include "alproxies/almemoryproxy.h"
+#include "alproxies/almotionproxy.h"
+#include "alcommon/alproxy.h"
+#include "alproxies/dcmproxy.h"
 
 #include "motionconfig.h"
 #include "Sensors.h"

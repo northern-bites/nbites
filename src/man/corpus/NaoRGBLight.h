@@ -2,7 +2,7 @@
 #define NaoRGBLight_h_DEFINED
 
 #include <string>
-#include "alvalue.h"
+#include "alvalue/alvalue.h"
 #include "ALLedNames.h"
 
 class NaoRGBLight{

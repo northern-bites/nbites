@@ -33,7 +33,7 @@ SET( CMAKE_BUILD_TYPE CACHE FORCE "Release")
 # Default (no release specific) build flags
 SET( CMAKE_CXX_FLAGS
   "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-write-strings")
-SET( CMAKE_C_FLAGS 
+SET( CMAKE_C_FLAGS
   "${CMAKE_CXX_FLAGS}" )
 # Release build flags
 SET( CMAKE_CXX_FLAGS_RELEASE
@@ -75,7 +75,7 @@ SET( BUILD_DIR ${NBITES_DIR}/build/man )
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-  SET( AL_DIR "/usr/local/nao-1.6" )
+  SET( AL_DIR "/usr/local/nao-1.10" )
   SET( ENV{AL_DIR} ${AL_DIR} )
   MESSAGE( STATUS
     "reseting Environment variable AL_DIR to default ${AL_DIR}" )

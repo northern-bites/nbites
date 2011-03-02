@@ -3,59 +3,39 @@
 # Includes
 ##
 
-IF(WEBOTS_BACKEND)
-  SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include/alcommon
-    ${AL_DIR}/lib
-    ${AL_DIR}/include/alproxies
-    )
-ELSE(WEBOTS_BACKEND)
-  IF(OE_CROSS_BUILD)
-  SET( ALCOMMON_INCLUDE_DIR ${OE_SYSROOT}/usr/include/alcommon/include
-    ${OE_SYSROOT}/usr/include/alproxies
-    ${OE_SYSROOT}/usr/include/alcommon
-    ${OE_SYSROOT}/usr/include/alcore
-    ${OE_SYSROOT}/usr/include/libthread
-    ${OE_SYSROOT}/usr/include/alvalue
-    ${OE_SYSROOT}/usr/include/altools
-    ${OE_SYSROOT}/usr/include/alfactory
-    ${OE_SYSROOT}/usr/include
-    )
-  ELSE(OE_CROSS_BUILD)
-  SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include/alcommon/include
-    ${AL_DIR}/include/alproxies
-    ${AL_DIR}/include/alcommon
-    ${AL_DIR}/include/alcore
-    ${AL_DIR}/include/libthread
-    ${AL_DIR}/include/alvalue
-    ${AL_DIR}/include/altools
-    ${AL_DIR}/include/alfactory
-    ${AL_DIR}/include
-    )
-  ENDIF(OE_CROSS_BUILD)
-ENDIF(WEBOTS_BACKEND)
+IF( WEBOTS_BACKEND )
+  SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include)
+ELSE( WEBOTS_BACKEND )
+  IF( OE_CROSS_BUILD )
+    SET( ALCOMMON_INCLUDE_DIR ${OE_SYSROOT}/usr/include/ )
+  ELSE ( OE_CROSS_BUILD )
+    SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include )
+  ENDIF( OE_CROSS_BUILD )
+ENDIF( WEBOTS_BACKEND )
 
-    IF( OE_CROSS_BUILD )
-        SET( ALCOMMON_LIBRARIES
-          ${OE_SYSROOT}/usr/lib/libalcommon.so )
-    ELSE(OE_CROSS_BUILD )
-      IF( WIN32 )
-        SET( ALCOMMON_LIBRARIES ${AL_DIR}/lib/alcommon.lib)
-      ELSE( WIN32 )
-        IF (APPLE)
-          SET( ALCOMMON_LIBRARIES
-            ${AL_DIR}/lib/libalcommon.a
-            )
-        ELSE(APPLE)
-          SET( ALCOMMON_LIBRARIES
-	    ${AL_DIR}/lib/libalcommon.so
-            )
-        ENDIF(APPLE)
-      ENDIF( WIN32 )
-    ENDIF( OE_CROSS_BUILD )
+IF( OE_CROSS_BUILD )
+  SET( ALCOMMON_LIBRARIES
+    ${OE_SYSROOT}/usr/lib/libalcommon.so
+    ${OE_SYSROOT}/usr/lib/libalmemoryfastaccess.so)
+ELSE(OE_CROSS_BUILD )
+  IF( WIN32 )
+    SET( ALCOMMON_LIBRARIES ${AL_DIR}/lib/alcommon.lib)
+  ELSE( WIN32 )
+    IF (APPLE)
+      SET( ALCOMMON_LIBRARIES
+        ${AL_DIR}/lib/libalcommon.a
+        )
+    ELSE(APPLE)
+      SET( ALCOMMON_LIBRARIES
+	${AL_DIR}/lib/libalcommon.so
+        )
+    ENDIF(APPLE)
+  ENDIF( WIN32 )
+ENDIF( OE_CROSS_BUILD )
 
-IF( ALCOMMON_LIBRARIES AND EXISTS ${ALCOMMON_LIBRARIES} )
+IF( EXISTS "${ALCOMMON_LIBRARIES}" AND ALCOMMON_LIBRARIES )
     SET( ALCOMMON_FOUND TRUE )
-ENDIF( ALCOMMON_LIBRARIES AND EXISTS ${ALCOMMON_LIBRARIES} )
+ENDIF( EXISTS "${ALCOMMON_LIBRARIES}" AND ALCOMMON_LIBRARIES )
 
 IF( NOT ALCOMMON_FOUND_TRUE AND ALCOMMON_FIND_REQUIRED )
     IF( NOT ALCOMMON_INCLUDE_DIR )

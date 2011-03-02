@@ -4,7 +4,7 @@
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-    SET( AL_DIR "/usr/local/nao-1.6" )
+    SET( AL_DIR "/usr/local/nao-1.10" )
   SET( ENV{AL_DIR} ${AL_DIR} )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
@@ -15,6 +15,23 @@ IF( NOT EXISTS ${AL_DIR} )
     "Cannot find the path to Nao directory, configuration halted."
     )
 ENDIF( NOT EXISTS ${AL_DIR} )
+
+########################## PLATFORM
+IF( WIN32 )
+  SET( TARGET_ARCH "windows" )
+  SET( TARGET_HOST "TARGET_HOST_WINDOWS")
+ENDIF( WIN32 )
+
+IF( UNIX )
+  SET( TARGET_ARCH "linux")
+  SET( TARGET_HOST "TARGET_HOST_LINUX")
+  SET( PLATFORM_X86 1 )
+ENDIF( UNIX )
+
+IF( APPLE )
+  SET( SDK_ARCH "macosx" )
+  SET( TARGET_HOST "TARGET_HOST_MACOSX")
+ENDIF( APPLE )
 
 ############################ DEFINES && DEFINITIONS
 SET( OE_CROSS_BUILD ON )

@@ -1,3 +1,4 @@
+#include "alcore/alerror.h"
 #include "NaoLights.h"
 #include "ALLedNames.h"
 

@@ -1,4 +1,4 @@
-
+#!/bin/bash
 # Get mounted partition names and new desired hostname
 # Since the "/home/nao" and the "/" are different partitions, we must ask for both.
 if [ $# -ne 2 ] ; then
@@ -30,4 +30,5 @@ cp $LIB_DIR/nao/libboost_python-mt.so $ROOT_PART/usr/lib/
 echo $HOSTNAME > $ROOT_PART/etc/hostname
 
 # Add aliases to /etc/profile
-cp $CONFIG_DIR/profile $ROOT_PART/etc/profile
+cp  $ROOT_PART/etc/profile $ROOT_PART/etc/profile.dist
+cat $CONFIG_DIR/profile >> $ROOT_PART/etc/profile
