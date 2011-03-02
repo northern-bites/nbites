@@ -14,7 +14,27 @@ float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.04f};
 #ifdef ROBOT_NAME_slarti
 float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.068f};
 #else
+#ifdef ROBOT_NAME_spock
+float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.068f};
+#else
+#ifdef ROBOT_NAME_annika
+float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.068f};
+#else
+#ifdef ROBOT_NAME_dax
+float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.068f};
+#else
+#ifdef ROBOT_NAME_scotty
+float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.068f};
+#else
+#ifdef ROBOT_NAME_data
+float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.068f};
+#else
 float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.0f};
+#endif
+#endif
+#endif
+#endif
+#endif
 #endif
 #endif
 #endif
