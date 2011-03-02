@@ -4,4 +4,56 @@ message PSensors {
 
     optional uint64 timestamp = 1;
 
+	message PFSR {
+
+		optional float front_left = 1;
+		optional float front_right = 2;
+		optional float rear_left = 3;
+		optional float rear_right = 4;
+
+	}
+
+	message PFootBumper {
+
+		optional bool left = 1;
+		optional bool right = 2;
+
+	}
+
+	message PInertial {
+
+		optional float acc_x = 1;
+		optional float acc_y = 2;
+		optional float acc_z = 3;
+		optional float gyr_x = 4;
+		optional float gyr_y = 5;
+		optional float angle_x = 6;
+		optional float angle_y = 7;
+
+	}
+
+	optional bytes image = 2;
+
+	repeated float body_angles = 3;
+	repeated float vision_body_angles = 4;
+	repeated float motion_body_angles = 5;
+	repeated float body_angles_error= 6;
+	repeated float body_temperatures = 7;
+
+	optional PFSR left_foot_FSR = 8;
+	optional PFSR right_foot_FSR = 9;
+	optional PFootBumper left_foot_bumper = 10;
+	optional PFootBumper right_foot_bumper = 11;
+	optional PInertial inertial = 12;
+
+	optional float ultra_sound_distance_left = 13;
+	optional float ultra_sound_distance_right = 14;
+
+	optional uint32 support_foot = 15;
+	optional uint32 unfiltered_inertial = 16;
+
+	optional float chest_button = 17;
+	optional float battery_charge = 18;
+	optional float battery_current = 19;
+
 }
