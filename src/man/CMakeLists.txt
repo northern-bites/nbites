@@ -91,7 +91,7 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 # Define this to remotely install the binary or library on the robot.
 # Cannot be selected unless OE_CROSS_BUILD is set to ON.
 SET( @ROBOT_NAME@
-  "zaphod"
+  "spock"
   CACHE STRING
   "The NAME of the robot"
   )
@@ -101,7 +101,7 @@ SET( ROBOT_NAME ${@ROBOT_NAME@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( COLOR_TABLE
-  "../../data/tables/lab120/andrewPostSingapore.mtb"
+  "../../data/tables/lab120/nathanWils.mtb"
   CACHE STRING
   "Path relative to man directory for the desired color table"
   )

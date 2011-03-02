@@ -3,6 +3,8 @@ import man.motion.HeadMoves as HeadMoves
 
 def gameInitial(player):
     if player.firstFrame():
+        player.stopWalking()
+        player.gainsOn()
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
     return player.stay()
@@ -14,7 +16,7 @@ def gameReady(player):
 
 def gameSet(player):
     if player.firstFrame():
-        player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP)
+        player.brain.tracker.performHeadMove(HeadMoves.LOOK_FWD_UP_LEFT)
     return player.stay()
 
 def gamePlaying(player):
