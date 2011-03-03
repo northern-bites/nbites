@@ -22,6 +22,12 @@ void HoughSpaceTest::test_hs()
 {
     // Create gradient map such that it has a known line
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
+#ifdef USE_MMX
+    for (int i = 1; i < IMAGE_HEIGHT; ++i) {
+         // Make x and y relative to the image center
+        g->addAngle(0, IMAGE_WIDTH * 3/4, i);
+    }
+#else
     for (int i=0; i < Gradient::rows; ++i){
         for (int j=0; j < Gradient::cols; ++j){
             if (j < Gradient::cols *3./4.){
@@ -37,6 +43,7 @@ void HoughSpaceTest::test_hs()
             }
         }
     }
+#endif
 
     // Run the gradient through the Hough Space
     hs.markEdges(g);
@@ -48,9 +55,9 @@ void HoughSpaceTest::test_hs()
     }
     PASSED(MORE_THAN_ZERO);
 
-    // Check to make sure there is a point at r = 3/.4, theta = 0
+    // Check to make sure there is a point at r = 80 = img_width/4 , theta = 0
     // which is where the above gradient has a line, roughly.
-    GT(hs.hs[static_cast<int>(HoughSpace::R_SPAN * 3./4.)][0] , 0);
+    GT(hs.hs[IMAGE_WIDTH * 1/4 + HoughSpace::R_SPAN/2][0] , 0);
     PASSED(EDGE_AT_BOUND);
 
     // Notice that it is T_SPAN +1. This is the same as in the
@@ -83,21 +90,27 @@ void HoughSpaceTest::test_hs()
 void HoughSpaceTest::test_lines()
 {
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
+#ifdef USE_MMX
+    for (int i = 1; i < IMAGE_HEIGHT; ++i) {
+        g->addAngle(0, IMAGE_WIDTH * 3/4, i);
+    }
+#else
     for (int i=0; i < IMAGE_HEIGHT; ++i){
         for (int j=0; j < IMAGE_WIDTH; ++j){
-            if (j < IMAGE_WIDTH *3./4.){
+            if (j != IMAGE_WIDTH *3/4){
                 g->setX(0,i,j);
                 g->setY(0,i,j);
                 g->setMagnitude(0,i,j);
                 g->peaks[i][j] = false;
-            } else {
-                g->setX(0,i,j);
+            } else if (j == IMAGE_WIDTH * 3/4) {
+                g->setX(10,i,j);
                 g->setY(0,i,j);
-                g->setMagnitude(0,i,j);
+                g->setMagnitude(10,i,j);
                 g->peaks[i][j] = true;
             }
         }
     }
+#endif
 
     list<HoughLine> lines = hs.findLines(g);
     list<HoughLine>::iterator l = lines.begin();
@@ -107,18 +120,18 @@ void HoughSpaceTest::test_lines()
     bool foundFixedLine = false;
 
     while (l != lines.end()){
+
         LTE(l->getRadius() , maxRadius); // Line must be in image
-        GTE(l->getRadius() , 0);         // Line radius must be positive
+        GTE(l->getRadius(), -maxRadius); // in either direction
         GTE(l->getAngle() , 0);          // 0 <= Angle <= 2 * pi
-        LTE(l->getAngle() , 2 * M_PI);
+        LTE(l->getAngle() , 2 * M_PI + ACCEPT_ANGLE);
         GTE(l->getScore() , 0);
 
         // Make sure the system found the one line in the gradient
-        if (l->getAngle() < ACCEPT_ANGLE &&
-            (l->getAngle() > 0 ||
-             l->getAngle() > -ACCEPT_ANGLE + 2*M_PI) &&
+        if ((l->getAngle() < ACCEPT_ANGLE ||
+            l->getAngle() > 2 * M_PI - ACCEPT_ANGLE) &&
             l->getRadius() > IMAGE_WIDTH / 4. - ACCEPT_RADIUS &&
-            l->getRadius() > IMAGE_WIDTH / 4. + ACCEPT_RADIUS) {
+            l->getRadius() < IMAGE_WIDTH / 4. + ACCEPT_RADIUS) {
             foundFixedLine = true;
         }
 

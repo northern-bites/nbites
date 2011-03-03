@@ -6,6 +6,9 @@ using boost::shared_ptr;
 const int HoughSpace::drTab[PEAK_POINTS] = {  1,  1,  0, -1 };
 const int HoughSpace::dtTab[PEAK_POINTS] = {  0,  1,  1,  1 };
 
+extern "C" void _mark_edges(int numPeaks, int angleSpread,
+                            uint16_t *peaks, int *houghSpace);
+
 HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
     profiler(p),
     acceptThreshold(DEFAULT_ACCEPT_THRESH),
@@ -22,7 +25,9 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
 {
     PROF_ENTER(profiler, P_HOUGH);
     reset();
+
     markEdges(g);
+
     smooth();
     list<HoughLine> lines = peaks();
 
@@ -47,6 +52,15 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
     const int x0     = width/2;
     const int y0     = height/2;
 
+#ifdef USE_MMX
+    for (int i=0; g->isPeak(i); ++i){
+        int t = g->getAngle(i);
+        edge(g->getAnglesXCoord(i) - 160,
+             g->getAnglesYCoord(i) - 120,
+             t - angleSpread,
+             t + angleSpread);
+    }
+#else
     // See comment in FindPeaks re: why this is shrunk in by 2
     // rows/columns on each side
     for (int y = 2; y < height-2; ++y){
@@ -59,6 +73,7 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
             }
         }
     }
+#endif
     PROF_EXIT(profiler, P_MARK_EDGES);
 }
 

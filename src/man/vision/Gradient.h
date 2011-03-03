@@ -97,6 +97,19 @@ public:
         return static_cast<int16_t>(angles[n*3 + angles_y_offset] + 120);
     }
 
+    void addAngle(uint8_t angle, int16_t x, int16_t y){
+        angles[numPeaks*3 + angles_offset] = angle;
+        angles[numPeaks*3 + angles_x_offset] = static_cast<uint16_t>(x - 160);
+        angles[numPeaks*3 + angles_y_offset] = static_cast<uint16_t>(y - 120);
+
+        numPeaks++;
+
+        // Mark as end
+        angles[numPeaks*3 + angles_offset] = 0;
+        angles[numPeaks*3 + angles_x_offset] = -160;
+        angles[numPeaks*3 + angles_y_offset] = -120;
+    }
+
     bool isPeak(int n){
         return (getAnglesXCoord(n) != 0 &&
                 getAnglesYCoord(n) != 0);

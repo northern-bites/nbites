@@ -232,12 +232,11 @@ int EdgeDetectorTest::test_peaks()
             // Get the highest 3 bits of the direction
             a = a >> 5;
 
-            if (g->peaks[i][j] && (
-                    g->peaks[i + Gradient::dyTab[a]][j +
-                                                     Gradient::dxTab[a]] ||
-                    g->peaks[i - Gradient::dyTab[a]][j -
-                                                    Gradient::dxTab[a]])){
-                assert(false);
+            if (g->peaks[i][j]){
+                FALSE(g->peaks[i + Gradient::dyTab[a]][j +
+                                                 Gradient::dxTab[a]] ||
+                      g->peaks[i - Gradient::dyTab[a]][j -
+                                                       Gradient::dxTab[a]]);
             }
         }
     }
