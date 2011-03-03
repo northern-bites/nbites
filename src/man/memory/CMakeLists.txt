@@ -46,6 +46,8 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}/
 set( MEMORY_SRCS Memory
                  MVision
                  MSensors
+                 MVisionSensors
+                 MMotionSensors
                  )
 ############################ (SUB)DIRECTORY COMPILATION
 # add the protobuffer C++ source subdirectory

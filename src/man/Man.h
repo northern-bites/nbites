@@ -49,8 +49,6 @@
 #include "PySensors.h"
 #include "PyLights.h"
 
-using memory::Memory;
-
 /**
  * The Naoqi module to run our main Nao robot system.
  *
@@ -118,7 +116,7 @@ public:
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
-    boost::shared_ptr<Memory> memory;
+    boost::shared_ptr<memory::Memory> memory;
 #ifdef USE_NOGGIN
     boost::shared_ptr<Noggin> noggin;
 #endif// USE_NOGGIN

@@ -6,7 +6,7 @@
 
 #include "Common.h" //for micro_time
 #include "MemoryMacros.hpp"
-#include "MSensors.hpp"
+#include "MMotionSensors.hpp"
 
 #include <vector>
 
@@ -15,19 +15,15 @@ namespace memory {
 using boost::shared_ptr;
 using namespace std;
 
-MSensors::MSensors(shared_ptr<Sensors> s) :
-        MMotionSensors(s),
-        MVisionSensors(s),
-        sensors(s) {
-
-    //fileLogger = new log::FileLogger("/home/nao/Sensors.log", MSENSORS_ID, this);
+MMotionSensors::MMotionSensors(shared_ptr<Sensors> s) : sensors(s) {
+    fileLogger = new log::FileLogger("/home/nao/MotionSensors.log", MMOTION_SENSORS_ID, this);
 }
 
-MSensors::~MSensors() {
-    //delete fileLogger;
+MMotionSensors::~MMotionSensors() {
+    delete fileLogger;
 }
 
-/*void MSensors::update() {
+void MMotionSensors::update() {
 
     ADD_PROTO_TIMESTAMP;
 
@@ -39,7 +35,7 @@ MSensors::~MSensors() {
     std::cout << this->DebugString() << std::endl;
 }
 
-void MSensors::log() const {
+void MMotionSensors::log() const {
     fileLogger->write();
-}*/
+}
 }

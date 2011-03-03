@@ -34,8 +34,12 @@ void Memory::updateVision() {
     update(mvision);
 }
 
-void Memory::updateSensors() {
-    update(msensors);
+void Memory::updateMotionSensors() {
+    update((MMotionSensors*) msensors);
+}
+
+void Memory::updateVisionSensors() {
+    update((MVisionSensors*) msensors);
 }
 
 }

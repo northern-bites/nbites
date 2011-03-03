@@ -2,7 +2,12 @@ package memory.proto;
 
 message PSensors {
 
-    optional uint64 timestamp = 1;
+	message PFootBumper {
+
+		optional bool left = 1;
+		optional bool right = 2;
+
+	}
 
 	message PFSR {
 
@@ -10,13 +15,6 @@ message PSensors {
 		optional float front_right = 2;
 		optional float rear_left = 3;
 		optional float rear_right = 4;
-
-	}
-
-	message PFootBumper {
-
-		optional bool left = 1;
-		optional bool right = 2;
 
 	}
 
@@ -32,28 +30,43 @@ message PSensors {
 
 	}
 
+}
+
+message PMotionSensors {
+
+    optional uint64 timestamp = 1;
+
 	optional bytes image = 2;
 
 	repeated float body_angles = 3;
-	repeated float vision_body_angles = 4;
-	repeated float motion_body_angles = 5;
-	repeated float body_angles_error= 6;
-	repeated float body_temperatures = 7;
+	repeated float motion_body_angles = 4;
+	repeated float body_angles_error= 5;
+	repeated float body_temperatures = 6;
 
-	optional PFSR left_foot_FSR = 8;
-	optional PFSR right_foot_FSR = 9;
-	optional PFootBumper left_foot_bumper = 10;
-	optional PFootBumper right_foot_bumper = 11;
-	optional PInertial inertial = 12;
+	optional PSensors.PFSR left_foot_FSR = 7;
+	optional PSensors.PFSR right_foot_FSR = 8;
 
-	optional float ultra_sound_distance_left = 13;
-	optional float ultra_sound_distance_right = 14;
+	optional PSensors.PInertial inertial = 9;
+	optional float chest_button = 10;
 
-	optional uint32 support_foot = 15;
-	optional uint32 unfiltered_inertial = 16;
+	optional uint32 support_foot = 11;
+	optional uint32 unfiltered_inertial = 12;
+}
 
-	optional float chest_button = 17;
-	optional float battery_charge = 18;
-	optional float battery_current = 19;
+message PVisionSensors {
+
+	optional uint64 timestamp = 1;
+
+	repeated float vision_body_angles = 2;
+	optional PSensors.PFootBumper left_foot_bumper = 3;
+	optional PSensors.PFootBumper right_foot_bumper = 4;
+
+
+	optional float ultra_sound_distance_left = 5;
+	optional float ultra_sound_distance_right = 6;
+
+
+	optional float battery_charge = 7;
+	optional float battery_current = 8;
 
 }

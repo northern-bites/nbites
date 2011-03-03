@@ -42,13 +42,17 @@ public:
      */
     void update(MObject* obj);
     /**
-     * calls update(MVision)
+     * calls update(mvision)
      */
     void updateVision();
     /**
-     * calls update(MSensors)
+     * calls update((MMotionSensors) msensors)
      */
-    void updateSensors();
+    void updateMotionSensors();
+    /**
+     * calls update((MVisionSensors) msensors)
+     */
+    void updateVisionSensors();
 
 public:
     MVision* mvision;

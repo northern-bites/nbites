@@ -11,11 +11,13 @@
 
 #include "protos/Sensors.pb.h"
 #include "MObject.hpp"
+#include "MVisionSensors.hpp"
+#include "MMotionSensors.hpp"
 #include "Sensors.h"
 #include "log/FileLogger.hpp"
 
 namespace memory {
-class MSensors: public proto::PSensors, public MObject {
+class MSensors: public MMotionSensors, public MVisionSensors {
 
 public:
     /**
@@ -29,12 +31,12 @@ public:
      * Updates all the fields of the underlying proto::PSensors with values
      * from the Sensors object
      */
-    void update();
-    void log() const;
+    //void update();
+    //void log() const;
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    log::FileLogger* fileLogger;
+    //log::FileLogger* fileLogger;
 
 };
 }

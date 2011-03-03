@@ -42,7 +42,6 @@ void MVision::update() {
 
     //VisualCorners
     list<VisualCorner>* visualCorners = vision->fieldLines->getCorners();
-    cout << visualCorners->size();
     for (list<VisualCorner>::iterator i = visualCorners->begin(); i
             != visualCorners->end(); i++) {
         //VisualCorner
