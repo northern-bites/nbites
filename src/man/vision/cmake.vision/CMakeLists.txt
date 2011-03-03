@@ -164,6 +164,7 @@ SET( VISION_SRCS ${VISION_INCLUDE_DIR}/Ball
                  ${VISION_INCLUDE_DIR}/ImageAcquisitionFast.s
                  ${VISION_INCLUDE_DIR}/EdgeDetection.s
                  ${VISION_INCLUDE_DIR}/CopyImage.s
+                 ${VISION_INCLUDE_DIR}/Hough.s
                  ${VISION_INCLUDE_DIR}/ColorParams
                  ${VISION_INCLUDE_DIR}/VisualDetector
                  ${VISION_INCLUDE_DIR}/FieldLinesDetector
@@ -174,6 +175,7 @@ set_property(SOURCE
   ${VISION_INCLUDE_DIR}/ImageAcquisition.s
   ${VISION_INCLUDE_DIR}/ImageAcquisitionFast.s
   ${VISION_INCLUDE_DIR}/EdgeDetection.s
+  ${VISION_INCLUDE_DIR}/Hough.s
   ${VISION_INCLUDE_DIR}/CopyImage.s PROPERTY LANGUAGE C)
 
 SET( VISION_PYTHON_SRCS ${VISION_INCLUDE_DIR}/__init__.py )
