@@ -35,7 +35,7 @@ using namespace boost::assign;
 
 using namespace std;
 using boost::shared_ptr;
-
+using memory::Memory;
 
 /////////////////////////////////////////
 //                                     //
@@ -55,6 +55,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
     enactor(_enactor),
     lights(_lights)
 {
+
   // initialize system helper modules
   profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
 #ifdef USE_TIME_PROFILING
@@ -89,6 +90,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
                                          sensors, motion->getInterface()));
 #endif// USE_NOGGIN
+  memory = shared_ptr<Memory>(new Memory(vision, sensors));
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
@@ -177,6 +179,7 @@ Man::processFrame ()
   PROF_ENTER(profiler, P_VISION);
   vision->notifyImage(sensors->getImage());
   PROF_EXIT(profiler, P_VISION);
+  memory->updateVision();
   //vision->notifyImage();
 #endif
 
@@ -201,6 +204,7 @@ void Man::notifyNextVisionImage() {
   sensors->updateVisionAngles();
 
   transcriber->postVisionSensors();
+  memory->updateVisionSensors();
 
   // Process current frame
   processFrame();

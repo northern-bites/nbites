@@ -13,6 +13,8 @@ using namespace std;
 
 using boost::shared_ptr;
 
+//TODO: this is nigh unreadable, could be refactored using boost::python anyone? - Octavian
+
 static map<const ConcreteCorner*, PyObject*> py_concrete_corners;
 
 #if 0
