@@ -111,8 +111,7 @@ public:
     }
 
     bool isPeak(int n){
-        return (getAnglesXCoord(n) != 0 &&
-                getAnglesYCoord(n) != 0);
+        return (n < numPeaks);
     }
 
     int peaks_list_contains(int i, int j);
