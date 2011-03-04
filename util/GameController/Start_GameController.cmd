@@ -14,4 +14,4 @@ set broadcast=-broadcast %1
 echo Broadcasting to subnet %1
 :label
 
-java -jar GameController.jar -spl %broadcast% -numplayers 3 %blue% %red%
+java -jar GameController.jar -spl %broadcast% %blue% %red%
