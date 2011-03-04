@@ -1364,6 +1364,7 @@ void Threshold::initTableFromBuffer(byte * tbfr)
  * it means the merged.mtb file in the root directory of the Memory stick
  * @param filename      the file to load
  */
+/*
 void Threshold::initCompressedTable(std::string filename){
 #ifndef NO_ZLIB
     FILE* fp;
@@ -1418,8 +1419,8 @@ void Threshold::initCompressedTable(std::string filename){
     free(fileData);
 
     fclose(fp);
-#endif /* NO_ZLIB */
-}
+#endif 
+}*/
 
 const uchar* Threshold::getYUV() {
     return yuv;

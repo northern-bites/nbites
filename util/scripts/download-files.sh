@@ -16,7 +16,7 @@ lib_dir=../../lib
 audio_dir=../audio
 
 echo "Copying libraries from RoboCup."
-scp -r $1@$robocup/lib/* lib_dir/
+rsync -vr $1@$robocup/lib/* $lib_dir/
 
 echo "Copying audio files from RoboCup."
-scp -r $1@$robocup/random/audio $audio_dir/
+rsync -rv $1@$robocup/random/audio/* $audio_dir/

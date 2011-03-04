@@ -1,33 +1,44 @@
 from .. import NogginConstants
 from ..playbook.PBConstants import GOALIE
-import ChaseBallStates
 import ChaseBallTransitions as transitions
 PENALTY_RELOCALIZE_FRAMES = 100
 
 def penaltyKick(player):
+    """
+    Set penalty kicking variables. Acts as a layer above 'chase'
+    """
     player.penaltyKicking = True
     player.penaltyMadeFirstKick = True
     player.penaltyMadeSecondKick = False
     return player.goNow('chase')
 
 def penaltyKickRelocalize(player):
+    """
+    Since you will be facing the goal, do loc pans if you are lost
+    """
     my = player.brain.my
     if player.firstFrame():
         player.brain.tracker.locPans()
     if my.locScore == NogginConstants.BAD_LOC and \
             player.counter < PENALTY_RELOCALIZE_FRAMES:
         return player.stay()
-    return player.goNow('scanFindBall')
+    return player.goLater('scanFindBall')
 
 def penaltyGoalie(player):
+    """
+    Set penalty kicking variables. Acts as a layer above 'goaliePosition'
+    """
     player.penaltyKicking = True
     player.penaltyMadeFirstKick = True
     player.penaltyMadeSecondKick = False
 
     roleState = player.getRoleState(GOALIE)
-    return player.goNow(roleState)
+    return player.goLater(roleState)
 
 def penaltyBallInOppGoalbox(player):
+    """
+    We can't do anything if the ball is in the opponent's goalbox
+    """
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.activeLoc()
@@ -36,15 +47,18 @@ def penaltyBallInOppGoalbox(player):
     return player.stay()
 
 def penaltyKickShortDribble(player):
+    """
+    Acts as a layer above dribble for penalty shots.
+    """
     if player.firstFrame():
         player.penaltyMadeFirstKick = True
     if transitions.shouldStopPenaltyKickDribbling(player):
 
-        if transitions.shouldKick(player):
-            return player.goNow('waitBeforeKick')
+        if transitions.shouldStopAndKick(player):
+            return player.goLater('chase')
         elif transitions.shouldPositionForKick(player):
-            return player.goNow('positionForKick')
-        elif transitions.shouldApproachBall(player):
-            return player.goNow('approachBall')
+            return player.goLater('positionForKick')
+        elif transitions.shouldChaseBall(player):
+            return player.goLater('chase')
 
-    return ChaseBallStates.approachBallWalk(player)
+    return player.goLater('dribble')

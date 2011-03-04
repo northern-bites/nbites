@@ -3,12 +3,16 @@ from man.noggin.util import MyMath
 from math import fabs
 import NavConstants as constants
 
+# this will prevent us from rapidly switching back and forth between
+# forwards & backwards gaits (happens in spinFindBall sometimes, bad)
+BACKWARDS_GAIT_THRESH = -0.2
+
 def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
     """
     # use backwards gait if appropriate
-    if x < 0:
+    if x < BACKWARDS_GAIT_THRESH:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
     else:
         nav.brain.CoA.setRobotGait(nav.brain.motion)
@@ -24,7 +28,7 @@ def setDribbleSpeed(nav, x, y, theta):
     """
     Wrapper to set walk vector while using dribble gait
     """
-    if x < 0:
+    if x < BACKWARDS_GAIT_THRESH:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
     else:
         nav.brain.CoA.setDribbleGait(nav.brain.motion)
@@ -41,7 +45,7 @@ def setSlowSpeed(nav, x, y, theta):
     Wrapper to set walk vector while using slow gait
     TODO: dynamic gait so this is unnecessary
     """
-    if x < 0:
+    if x < BACKWARDS_GAIT_THRESH:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
     else:
         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
@@ -57,7 +61,7 @@ def step(nav, x, y, theta, numSteps):
     """
     Wrapper method to easily change the walk vector of the robot
     """
-    if x < 0:
+    if x < BACKWARDS_GAIT_THRESH:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
     else:
         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)

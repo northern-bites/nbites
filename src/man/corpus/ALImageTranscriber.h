@@ -1,10 +1,11 @@
 #ifndef ALIMAGE_TRANSCRIBER_H
 #define ALIMAGE_TRANSCRIBER_H
 
-#include "almemoryproxy.h"
-#include "albroker.h"
-#include "alptr.h"
-#include "alloggerproxy.h"
+#include "alproxies/almemoryproxy.h"
+#include "alcommon/albroker.h"
+#include "alcore/alptr.h"
+#include "alproxies/alloggerproxy.h"
+#include "alproxies/alvideodeviceproxy.h"
 
 #include "ThreadedImageTranscriber.h"
 #include "synchro.h"
@@ -36,7 +37,7 @@ private: // member variables
     // Interfaces/Proxies to robot
 
     AL::ALPtr<AL::ALLoggerProxy> log;
-    AL::ALPtr<AL::ALProxy> camera;
+    AL::ALPtr<AL::ALVideoDeviceProxy> camera;
 
     std::string lem_name;
 

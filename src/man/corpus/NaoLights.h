@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 #include "Lights.h"
-#include "dcmproxy.h"
+#include "alproxies/dcmproxy.h"
 #include "ALLedNames.h"
 #include "NaoRGBLight.h"
 /**
