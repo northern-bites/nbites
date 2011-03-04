@@ -21,13 +21,18 @@ public:
     HoughSpace(boost::shared_ptr<Profiler> p);
     virtual ~HoughSpace() { };
 
-    std::list<HoughLine> findLines(boost::shared_ptr<Gradient> g);
+    std::list<HoughLine> findLines  (boost::shared_ptr<Gradient> g);
+    static HoughLine     createLine (int r, int t, int z);
+
+
     void setAcceptThreshold(int t) { acceptThreshold = t;    }
+    void setAngleSpread(int t)     { angleSpread     = t;    }
+
+    int  getAngleSpread()          { return angleSpread;     }
     int  getAcceptThreshold()      { return acceptThreshold; }
 
-    void setAngleSpread(int t) { angleSpread = t;    }
-    int  getAngleSpread()      { return angleSpread; }
-    static HoughLine createLine(int r, int t, int z);
+    bool isPeak(int r, int t);
+    int  getHoughBin(int r, int t);
 
 private:                        // Member functions
     void markEdges(boost::shared_ptr<Gradient> g);
@@ -44,23 +49,27 @@ private:                        // Member functions
 private:       // Member variables
     // Hough Space size parameters
     // 256 for full 8 bit angle, width is for 320x240 image
-    enum { R_SPAN = 400,
-           T_SPAN = 256,
-           DEFAULT_ACCEPT_THRESH = 43,
-           DEFAULT_ANGLE_SPREAD  = 5,
-           PEAK_POINTS = 4 };
+    enum { r_span = 400,
+           t_span = 256,
+           default_accept_thresh = 43,
+           default_angle_spread  = 5,
+           peak_points = 4 };
 
     boost::shared_ptr<Profiler> profiler;
     int acceptThreshold, angleSpread;
 
-
     // allocate an extra T for the smoothing neighborhood
-    int hs[R_SPAN][T_SPAN + 1];
-    bool peak[R_SPAN][T_SPAN];
+#ifdef USE_MMX
+    // arranged opposite the non-asm version, rows are theta, cols are radius
+    uint16_t hs[r_span * (t_span + 1)];
+    bool peak[r_span * t_span];
+#else
+    int hs[r_span][t_span + 1];
+    bool peak[r_span][t_span];
+#endif
 
-
-    const static int drTab[PEAK_POINTS];
-    const static int dtTab[PEAK_POINTS];
+    const static int drTab[peak_points];
+    const static int dtTab[peak_points];
 
 };
 

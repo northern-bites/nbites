@@ -48,40 +48,42 @@ void HoughSpaceTest::test_hs()
     // Run the gradient through the Hough Space
     hs.markEdges(g);
 
-    for (int i=0; i < HoughSpace::R_SPAN; ++i){
-        for (int j=0; j < HoughSpace::T_SPAN; ++j){
-            GTE(hs.hs[i][j] , 0);
+    for (int r=0; r < HoughSpace::r_span; ++r){
+        for (int t=0; t < HoughSpace::t_span; ++t){
+            GTE(hs.getHoughBin(r,t) , 0);
         }
     }
     PASSED(MORE_THAN_ZERO);
 
     // Check to make sure there is a point at r = 80 = img_width/4 , theta = 0
     // which is where the above gradient has a line, roughly.
-    GT(hs.hs[IMAGE_WIDTH * 1/4 + HoughSpace::R_SPAN/2][0] , 0);
+    GT(hs.getHoughBin(IMAGE_WIDTH * 1/4 + HoughSpace::r_span/2,0) , 0);
     PASSED(EDGE_AT_BOUND);
 
-    // Notice that it is T_SPAN +1. This is the same as in the
+#ifdef USE_MMX
+#else
+    // Notice that it is t_span +1. This is the same as in the
     // Hough Space.
-    int pre[HoughSpace::R_SPAN][HoughSpace::T_SPAN+1];
-    for (int r=0; r < HoughSpace::R_SPAN; ++r){
-        for (int t=0; t < HoughSpace::T_SPAN; ++t){
-            pre[r][t] = hs.hs[r][t];
+    int pre[HoughSpace::r_span][HoughSpace::t_span+1];
+    for (int r=0; r < HoughSpace::r_span; ++r){
+        for (int t=0; t < HoughSpace::t_span; ++t){
+            pre[r][t] = hs.getHoughBin(r,t);
         }
     }
 
-    for (int r=0; r < HoughSpace::R_SPAN; ++r)
-        pre[r][HoughSpace::T_SPAN] = pre[r][0];
+    for (int r=0; r < HoughSpace::r_span; ++r)
+        pre[r][HoughSpace::t_span] = pre[r][0];
 
     hs.smooth();
 
-    for (int r=0; r < HoughSpace::R_SPAN-1; ++r){
-        for (int t=0; t < HoughSpace::T_SPAN; ++t){
-            EQ_INT(hs.hs[r][t] , (pre[r][t]   + pre[r][t+1] +
+    for (int r=0; r < HoughSpace::r_span-1; ++r){
+        for (int t=0; t < HoughSpace::t_span; ++t){
+            EQ_INT(hs.getHoughBin(r,t) , (pre[r][t]   + pre[r][t+1] +
                                   pre[r+1][t] + pre[r+1][t+1]));
         }
     }
     PASSED(SMOOTH_CORRECT);
-
+#endif
 }
 
 /**

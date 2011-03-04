@@ -6,7 +6,7 @@
 .section .data
 
         ## Parameter layout
-        .struct 8
+                .struct 8
 num_peaks:      .skip 4
 angle_spread:   .skip 4
 peaks:          .skip 4
@@ -26,7 +26,9 @@ y_offset:
 spread: .skip 4
 end_of_stack:
 
-        .equiv R_SPAN, 256
+        .equiv  r_span, 400
+        .equiv  t_span, 256
+        .equiv  bytes_per_bin, 2 # hough space has uint16_t bins
 
         .data
 
@@ -83,6 +85,7 @@ cosTable:
 ##########################
         ## Alters \x, \y, and \empty
         ## Does not alter \t
+        ## \x, \y, and \t MUST be 32-bit registers
 ##########################
 
         ## Load cosine into a 32-bit register and multiply by 32 bit x
@@ -100,14 +103,16 @@ cosTable:
         xor     \y,\y
 
         ## Put the R value in the Hough Space coordinates
-        add     \x, R_SPAN/2
+        add     \x, r_span/2
 
         ## Ensure R >= 0
-        ## If \x + R_SPAN/2 < 0 (less than, than set it to zero)
+        ## If \x + r_span/2 < 0 (less than, than set it to zero)
         cmovl   \x, \y
 
-        ## Ensure R < R_SPAN
-        and     \x, R_SPAN-1
+        ## Ensure R < r_span
+        mov     \y, r_span - 1
+        cmp     \x, \y
+        cmova   \x, \y
 .endm
 
         ## _mark_edges(int numPeaks, int angleSpread,
@@ -130,28 +135,34 @@ peakLoop:
         mov     eax, [ebp + angle_spread]
 
         ## Get gradient angle lower bound
-        mov     esi, [edi + angle_offset]
+        movzx   esi, word ptr[edi + angle_offset]
 
         ## esi = t0 - angleSpread
         sub     esi, eax
+
+        ## Make sure esi is 0 <= t < t_span (angles are only positive)
+        and     esi, t_span-1
 
         ## Double spread param and store it on the stack as a counter
         shl     eax, 1
         mov     dword ptr[esp + spread], eax
 
         ## Load peak's x and y values
-        mov     ebx, [edi + x_offset]
-        mov     eax, [edi + y_offset]
+        movsx   ebx, word ptr[edi + x_offset]
+        movsx   eax, word ptr[edi + y_offset]
 
         ## put r0, radius at t-angleSpread in ebx
         GET_R   ebx, eax, esi, ecx
 
         ## Iterate from lower gradient angle to upper
 gradientLoop:
+        ## Load pointer to peak list
+        mov     edi, dword ptr[ebp + peaks]
+
         ## edx = x
         ## eax = y
-        mov     edx, [edi + x_offset]
-        mov     eax, [edi + y_offset]
+        movsx   edx, word ptr[edi + x_offset]
+        movsx   eax, word ptr[edi + y_offset]
 
         ## Get radius at current angle + 1
         mov     ecx, esi
@@ -162,7 +173,7 @@ gradientLoop:
 
         ## Calculate hough space address
         mov     eax, esi
-        imul    eax, R_SPAN * 4 # 4 bytes per hough bin
+        imul    eax, r_span * bytes_per_bin
         add     eax, dword ptr[ebp + hough_space]
 
         ## edi = min(r0,r1), ecx = max(r0, r1)
@@ -183,7 +194,8 @@ gradientLoop:
         ## Iterate from minR to maxR
         ## for ( ; rDiff < 0; rDiff++)
 radiiLoop:
-        inc     dword ptr[eax + edi * 4] # ti * R_SPAN + ri * (4 bytes per bin)
+        # ti * r_span + ri * bytes_per_bin
+        inc     word ptr[eax + edi * bytes_per_bin]
 
         ## radiiLoop
         inc     edi             # Increment ri
@@ -203,6 +215,8 @@ radiiLoop:
 
         dec     dword ptr[ebp + num_peaks]
         jne     peakLoop
+
+        add     esp, end_of_stack
 
         pop     ebx
         pop     edi
