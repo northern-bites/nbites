@@ -106,9 +106,6 @@ public:
     inline void setTimeLines(long _l) { timeLines = _l; }
 
     inline void setColorTablePath(std::string path) { colorTable = path; }
-    inline void setPlayerNumber(int n) { player = n; }
-    inline void setDogID(int _id) { id = _id; }
-    inline void setRobotName(std::string _name) { name = _name; }
 
     //
     // GETTERS
@@ -122,9 +119,6 @@ public:
 
 
     // information
-    inline int getDogID() { return id; }
-    std::string getRobotName();
-    inline int getPlayerNumber() { return player; }
     inline std::string getColorTablePath() { return colorTable; }
 
     // misc
@@ -196,9 +190,6 @@ private:
     long int frameNumber;
 
     // information
-    int id;
-    std::string name;
-    int player;
     std::string colorTable;
 
 };
