@@ -59,7 +59,7 @@ void ImageAcquisitionTest::setup(int y0, int u0, int v0,
     }
 
     for (int i = 0; i < NAO_IMAGE_BYTE_SIZE; ++i) {
-        yuv[i] = static_cast<uint8_t>(rand() % 255);
+        yuv[i] = static_cast<uint8_t>(rand()%255);
     }
 
     for (int i = 0; i < NAO_IMAGE_BYTE_SIZE; ++i) {
@@ -88,8 +88,8 @@ void ImageAcquisitionTest::allocate()
 
     // Allocate the output image.
     if (out == NULL){
-        // 2 bytes per Y value and 1 per color value
-        out = reinterpret_cast<uint16_t*>(new uint8_t[320*240*3]);
+        // 6 bytes per YUV triple, and 1 per color value
+        out = reinterpret_cast<uint16_t*>(new uint8_t[320*240*7]);
     }
 }
 
@@ -199,7 +199,9 @@ int ImageAcquisitionTest::tableLookup(int y, int u, int v) const
  */
 int ImageAcquisitionTest::colorValue(int i, int j) const
 {
-    uint8_t *out_color = reinterpret_cast<uint8_t*>(out) + Y_IMAGE_BYTE_SIZE;
+    uint8_t *out_color =
+        reinterpret_cast<uint8_t*>(out) + Y_IMAGE_BYTE_SIZE * 3;
+
     // Color image is just past Y Image in array
     return out_color[IMAGE_WIDTH * i + j];
 }
@@ -294,7 +296,21 @@ void ImageAcquisitionTest::run_average_test(){
             EQ_INT ( (yAvgValue(i, j)), output);
         }
     }
-    PASSED(AVERAGES);
+    PASSED(Y_AVERAGES);
+
+    uint16_t* uv_out = y_out + IMAGE_WIDTH * IMAGE_HEIGHT;
+
+    for (int i = 0; i < IMAGE_HEIGHT; i++) {
+        for (int j=0; j < IMAGE_WIDTH; j++){
+
+            uint16_t u_output = uv_out[i*IMAGE_WIDTH*2 + j*2];
+            uint16_t v_output = uv_out[i*IMAGE_WIDTH*2 + j*2 + 1];
+            EQ_INT ( (vAvgValue(i, j)), u_output);
+            EQ_INT ( (uAvgValue(i, j)), v_output);
+
+        }
+    }
+    PASSED(UV_AVERAGES);
 }
 
 int ImageAcquisitionTest::runTests()

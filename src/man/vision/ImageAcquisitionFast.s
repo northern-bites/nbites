@@ -59,12 +59,21 @@
 .equiv OUT_IMG_WIDTH, 320
 .equiv OUT_IMG_HEIGHT, 240
 .equiv Y_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2
+.equiv UV_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 4
+
+
+        ## Output image layout
+        .struct 0
+yImg:   .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2 # 16 bit Y values
+uvImg:  .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 4 # 16 bit U and V values
+colorImg:
 
 ## STACK STRUCTURE, esp offsets
         .struct 0
 row_count:      .skip 4
 rdtsc_output:   .skip 4
 y_out_img:      .skip 4
+uv_out_img:     .skip 4
 color_out_img:  .skip 1280
                 .skip 4         # make color_out_row qword aligned
 color_stack_row_end:
@@ -127,6 +136,7 @@ color_stack_row_end:
 
         ## Pack values from first two phases together as 4 words in mm4
         ## mm4 after pack: | y3 | y2 | y1 | y0 |
+        mov     edi, [esp + y_out_img] # Replace y image ptr
         packssdw mm4, mm2
         movntq [edi+ecx*2], mm4
         .endif
@@ -142,6 +152,7 @@ color_stack_row_end:
 
         ## mm2 before: | 0 | y7 | 0 | y6|
         ## mm5 after:  | y7 | y6 | y5 | y4 | all 16 bit words
+        mov     edi, [esp + y_out_img] # Replace y image ptr
         packssdw mm5, mm2
         movntq [edi+ecx*2+8], mm5
         .endif
@@ -151,6 +162,12 @@ color_stack_row_end:
         ## UV-COLOR SECTION
         ##
         ##
+
+        ## Load uv img ptr
+        mov     edi, [esp + uv_out_img]
+
+        # Write out uv values, 8 bytes each phase
+        movntq [edi+ecx*4 + \phase * 8], mm1
 
         # Convert two y sums in words 0 and 2 to two table indicies
         psubusw mm0, [edx]                      # zero point
@@ -202,14 +219,19 @@ _acquire_image_fast:
         mov     esi, [ebp+16]   # Input YUV Image address
         add     esi, 640*2      # Move to end of source image row
 
-        mov     edi, [ebp+20]   # Output (color segmented) image address
+        mov     edi, [ebp+20]   # Output image address
         add     edi, OUT_IMG_WIDTH*2    # Move to end of y row, 640 = 320 pixels * 2 bytes per Y value
 
         ## Put end of row pointers on stack
         mov     [esp + y_out_img], edi
 
-        ## Move forward entire y image, then back half a y-image row
-        add     edi, Y_IMG_BYTE_SIZE - 320
+        ## Put uv image pointer on stack
+        add     edi, Y_IMG_BYTE_SIZE + OUT_IMG_WIDTH * 2
+        mov     [esp + uv_out_img], edi
+
+        ## Set color image pointer forward entire y image, and uv image, then back half a y-image row
+        mov     edi, [esp + y_out_img]
+        add     edi, Y_IMG_BYTE_SIZE + UV_IMG_BYTE_SIZE - 320
         mov     [esp + color_out_img], edi
 
         # set mm7 to 0x00FF00FF00FF00FF for y pixel mask
@@ -271,6 +293,7 @@ colorLoop:
 
         ## Move pointers to end of next output image rows
         add     dword ptr[esp + y_out_img], OUT_IMG_WIDTH * 2
+        add     dword ptr[esp + uv_out_img], OUT_IMG_WIDTH * 2 * 2
         add     dword ptr[esp + color_out_img], OUT_IMG_WIDTH
 
         dec     dword ptr[esp + row_count]
