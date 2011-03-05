@@ -179,7 +179,9 @@ Man::processFrame ()
   PROF_ENTER(profiler, P_VISION);
   vision->notifyImage(sensors->getImage());
   PROF_EXIT(profiler, P_VISION);
+  PROF_ENTER(profiler.get(), P_MEMORY_VISION);
   memory->updateVision();
+  PROF_EXIT(profiler.get(), P_MEMORY_VISION);
   //vision->notifyImage();
 #endif
 
@@ -204,7 +206,9 @@ void Man::notifyNextVisionImage() {
   sensors->updateVisionAngles();
 
   transcriber->postVisionSensors();
+  PROF_ENTER(profiler.get(), P_MEMORY_VISION_SENSORS);
   memory->updateVisionSensors();
+  PROF_EXIT(profiler.get(), P_MEMORY_VISION_SENSORS);
 
   // Process current frame
   processFrame();
