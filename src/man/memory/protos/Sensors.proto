@@ -36,37 +36,37 @@ message PMotionSensors {
 
     optional uint64 timestamp = 1;
 
-	optional bytes image = 2;
+	repeated float body_angles = 2;
+	repeated float motion_body_angles = 3;
+	repeated float body_angles_error= 4;
+	repeated float body_temperatures = 5;
 
-	repeated float body_angles = 3;
-	repeated float motion_body_angles = 4;
-	repeated float body_angles_error= 5;
-	repeated float body_temperatures = 6;
+	optional PSensors.PFSR left_foot_FSR = 6;
+	optional PSensors.PFSR right_foot_FSR = 7;
 
-	optional PSensors.PFSR left_foot_FSR = 7;
-	optional PSensors.PFSR right_foot_FSR = 8;
+	optional PSensors.PInertial inertial = 8;
+	optional float chest_button = 9;
 
-	optional PSensors.PInertial inertial = 9;
-	optional float chest_button = 10;
-
-	optional uint32 support_foot = 11;
-	optional uint32 unfiltered_inertial = 12;
+	optional uint32 support_foot = 10;
+	optional uint32 unfiltered_inertial = 11;
 }
 
 message PVisionSensors {
 
 	optional uint64 timestamp = 1;
 
-	repeated float vision_body_angles = 2;
-	optional PSensors.PFootBumper left_foot_bumper = 3;
-	optional PSensors.PFootBumper right_foot_bumper = 4;
+	optional bytes image = 2;
+
+	repeated float vision_body_angles = 3;
+	optional PSensors.PFootBumper left_foot_bumper = 4;
+	optional PSensors.PFootBumper right_foot_bumper = 5;
 
 
-	optional float ultra_sound_distance_left = 5;
-	optional float ultra_sound_distance_right = 6;
+	optional float ultra_sound_distance_left = 6;
+	optional float ultra_sound_distance_right = 7;
 
 
-	optional float battery_charge = 7;
-	optional float battery_current = 8;
+	optional float battery_charge = 8;
+	optional float battery_current = 9;
 
 }

@@ -41,6 +41,7 @@ void MVision::update() {
     visual_ball->set_confidence(vision->ball->getConfidence());
 
     //VisualCorners
+    this->clear_visual_corner();
     list<VisualCorner>* visualCorners = vision->fieldLines->getCorners();
     for (list<VisualCorner>::iterator i = visualCorners->begin(); i
             != visualCorners->end(); i++) {

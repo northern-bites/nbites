@@ -28,6 +28,7 @@ void MVisionSensors::update() {
 
     ADD_PROTO_TIMESTAMP;
 
+    this->clear_vision_body_angles();
     vector<float> bodyAngles = sensors->getVisionBodyAngles();
     for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end(); i++) {
         this->add_vision_body_angles(*i);
@@ -48,7 +49,7 @@ void MVisionSensors::update() {
     this->set_battery_charge(sensors->getBatteryCharge());
     this->set_battery_current(sensors->getBatteryCurrent());
 
-    std::cout << this->DebugString() << std::endl;
+    //std::cout << this->DebugString() << std::endl;
 }
 
 void MVisionSensors::log() const {
