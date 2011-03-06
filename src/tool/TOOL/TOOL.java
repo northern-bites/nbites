@@ -549,16 +549,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
                                              ColorTable.LOAD_TABLE_PATH);
 
         if (path != null) {
-            ColorTable temp = new ColorTable(path);
-
-            colorTable = temp;
-            colorEdit.setTable(colorTable);
-
-            colorTable.setSoftColors(toggleSoftColors.isSelected());
-            // If they had been editing a table earlier, clear out their
-            // undos
-            calibrate.clearHistory();
-            dataManager.notifyDependants();
+            loadColorTable(path);
         }
 
     }

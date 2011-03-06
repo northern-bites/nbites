@@ -20,17 +20,9 @@
 #include <signal.h>
 #endif
 
-#include "altypes.h"
-#include "alxplatform.h"
 #include "manmodule.h"
-#include "alptr.h"
-#include "albroker.h"
-#include "almodule.h"
-#include "albrokermanager.h"
-#include "alerror.h"
 
 //NBites includes
-#include "alproxy.h"
 
 #ifdef USE_DCM
 #  if defined USE_DCM && defined MAN_IS_REMOTE
@@ -54,14 +46,9 @@ typedef TTMan ALMan;
 
 #include "NaoLights.h"
 
-#include "almodule.h"
-#include "alsentinelproxy.h"
 using namespace std;
 using namespace AL;
 using boost::shared_ptr;
-
-
-
 
 
 static shared_ptr<ALMan> man;

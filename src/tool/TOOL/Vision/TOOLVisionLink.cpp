@@ -278,9 +278,9 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
             for (vector<VisualLine>::const_iterator i = expectedLines.begin();
                     i!= expectedLines.end(); i++) {
                 env->CallVoidMethod(jobj, prepPointBuffers,
-                        i->points.size());
-                for(vector<linePoint>::const_iterator j = i->points.begin();
-                        j != i->points.end(); j++) {
+                        i->getPoints().size());
+                for(vector<linePoint>::const_iterator j = i->getPoints().begin();
+                        j != i->getPoints().end(); j++) {
                     env->CallVoidMethod(jobj, setPointInfo,
                             j->x, j->y,
                             j->lineWidth, j->foundWithScan);
@@ -301,17 +301,17 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
                 const vector<linePoint> points = (*i)->getPoints();
                 for(vector<linePoint>::const_iterator j = points.begin();
                         j != points.end(); j++) {
-                  
+
                     env->CallVoidMethod(jobj, setPointInfo,
                             j->x, j->y,
                             j->lineWidth, j->foundWithScan);
                 }
-                
+
                 env->CallVoidMethod(jobj, setVisualLineInfo,
                         (*i)->getStartpoint().x, (*i)->getStartpoint().y,
                         (*i)->getEndpoint().x, (*i)->getEndpoint().y);
             }
-            
+
             //push data from unusedPoints
             const list <linePoint> *unusedPoints = vision.fieldLines->getUnusedPoints();
             env->CallVoidMethod(jobj, prepPointBuffers, unusedPoints->size());

@@ -64,7 +64,8 @@ Sensors::Sensors ()
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
-      FRM_FOLDER("/home/nao/naoqi/frames")
+      FRM_FOLDER("/home/nao/naoqi/frames"),
+	  saving_frames_on(false)
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
@@ -777,10 +778,37 @@ void Sensors::resetSaveFrame()
 // The version for the frame format
 static const int VERSION = 0;
 
+void Sensors::startSavingFrames()
+{
+#ifdef SAVE_ALL_FRAMES
+	if (!isSavingFrames())
+    {
+        saving_frames_on = true;
+	    cout << "****Started Saving Frames****" << endl;
+	}
+#endif
+}
+
+void Sensors::stopSavingFrames()
+{
+#ifdef SAVE_ALL_FRAMES
+	if (isSavingFrames())
+	{
+	    saving_frames_on = false;
+        cout << "****Stopped Saving Frames****" << endl;
+	}
+#endif
+}
+
+bool Sensors::isSavingFrames() const
+{
+	return saving_frames_on;
+}
+
 // @TODO move this to Transcriber to write out from full size image...
 void Sensors::saveFrame()
 {
-    int MAX_FRAMES = 3000;
+    int MAX_FRAMES = 5000;
     if (saved_frames > MAX_FRAMES)
         return;
     string EXT(".frm");

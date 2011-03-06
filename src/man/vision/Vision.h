@@ -28,7 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <stdint.h>
 
-#include  "cmake.vision/visionconfig.h"
+#include  "visionconfig.h"
 // including info header files
 #include "Common.h"
 #include "VisionDef.h"

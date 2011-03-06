@@ -10,43 +10,8 @@
 #
 ###
 
-
-# .:: General configurations for the Northern Bites Man cmake package :::::
-
-IF( NOT DEFINED ROBOT_TYPE )
-  SET( ROBOT_TYPE NAO_RL )
-ENDIF( NOT DEFINED ROBOT_TYPE )
-
-ADD_DEFINITIONS( -DNO_ZLIB )
 #ADD_DEFINITIONS( -DUNROLLED_LOOPS_THRESHOLD )
 #ADD_DEFINITIONS( -DUSE_TIME_PROFILING )
-ADD_DEFINITIONS( -Wno-write-strings )
-
-
-########SETTING UP THE COMPILER FLAGS ##########
-# Notes: -JS, GS Feb. 2009
-# Note: gcc 4.2 doesnt have a geode processor type.
-#       k6-2 has a similar instruction set, so we use it instead
-#       this is important for allowing linkage and running of -O1,2,3 bins/libs
-#
-# Note: The default flags never get set by cmake.
-# Note: We override the default CMAKE release and debug flags with our own
-# Note: We set the C flags to be the same as the CXX flags
-
-# Default (no release specific) build flags
-SET( CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} -O2 -m32 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing" )
-# Release build flags
-SET( CMAKE_CXX_FLAGS_RELEASE
-  "-O3 -DNDEBUG -Wall -Wconversion -Wno-unused -Wno-strict-aliasing")
-SET( CMAKE_C_FLAGS_RELEASE
-  "${CMAKE_CXX_FLAGS_RELEASE}" )
-# Debug build flags
-SET( CMAKE_CXX_FLAGS_DEBUG
-  " -g3 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing" )
-SET( CMAKE_C_FLAGS_DEBUG
-  " -g3 -Wall -Wconversion -Wno-unused -Wno-strict-aliasing" )
-
 
 ############################ Configure Options
 # Definitions for the CMake configurable build options.  Defined here, they

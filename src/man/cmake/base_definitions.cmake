@@ -3,11 +3,55 @@
 # The basic definitions for the Northern Bites cmake packages, used
 # throughout different packages' configurations
 
+############################ DISPLAY
+# Display summary of options
+
+MESSAGE( STATUS "" )
+MESSAGE( STATUS "...:::: Configuration -  ${PROJECT_NAME} ::::..." )
+MESSAGE( STATUS "" )
+
+############################ VERSION
+# Check cMake version
+CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+
+############################### COMPILER STUFF
+
+############################ DEFAULT BUILD TYPE
+# Set which build type will be used by default, if none is set
+SET( CMAKE_BUILD_TYPE CACHE FORCE "Release")
+
+########SETTING UP THE COMPILER FLAGS ##########
+# Notes: -JS, GS Feb. 2009
+# Note: gcc 4.2 doesnt have a geode processor type.
+#       k6-2 has a similar instruction set, so we use it instead
+#       this is important for allowing linkage and running of -O1,2,3 bins/libs
+#
+# Note: The default flags never get set by cmake.
+# Note: We override the default CMAKE release and debug flags with our own
+# Note: We set the C flags to be the same as the CXX flags
+
+# Default (no release specific) build flags
+SET( CMAKE_CXX_FLAGS
+  "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-write-strings -lrt")
+SET( CMAKE_C_FLAGS
+  "${CMAKE_CXX_FLAGS}" )
+# Release build flags
+SET( CMAKE_CXX_FLAGS_RELEASE
+  "-O3 -DNDEBUG")
+SET( CMAKE_C_FLAGS_RELEASE
+  "${CMAKE_CXX_FLAGS_RELEASE}" )
+# Debug build flags
+SET( CMAKE_CXX_FLAGS_DEBUG
+  "-g3" )
+SET( CMAKE_C_FLAGS_DEBUG
+  "${CMAKE_CXX_FLAGS_DEBUG}" )
+
+
 ############################ TRUNK PATH
 # Ensure the TRUNK_PATH variable is set
 
 IF( "x$ENV{TRUNK_PATH}x" STREQUAL "xx")
-  GET_FILENAME_COMPONENT( TRUNK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
+  GET_FILENAME_COMPONENT( TRUNK_PATH ${PROJECT_SOURCE_DIR}/ ABSOLUTE)
   SET( ENV{TRUNK_PATH} ${TRUNK_PATH} )
   MESSAGE( STATUS
     "Environment variable TRUNK_PATH was not set, reseting to default ${TRUNK_PATH}!" )
@@ -31,7 +75,7 @@ SET( BUILD_DIR ${NBITES_DIR}/build/man )
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-  SET( AL_DIR "/usr/local/nao-1.6" )
+  SET( AL_DIR "/usr/local/nao-1.10" )
   SET( ENV{AL_DIR} ${AL_DIR} )
   MESSAGE( STATUS
     "reseting Environment variable AL_DIR to default ${AL_DIR}" )
@@ -68,13 +112,6 @@ ELSE( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
   SET( MAN_INSTALL_PREFIX $ENV{MAN_INSTALL_PREFIX} )
 ENDIF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
 
-# Make it an editable cache variable
-#  ** Right now, can't figure this out, not editable ** - jfishman@
-#SET(
-#  MAN_INSTALL_PREFIX ${MAN_INSTALL_PREFIX}
-#  CACHE STRING "Install prefix."
-#  )
-
 
 ############################ CMAKE POLICY
 # Settings regarding various cmake policy changes from 2.6
@@ -90,30 +127,14 @@ IF(COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 
-########################### MODULE PATH
-# Set the path from which CMake should load modules
-SET( CMAKE_MODULE_PATH ${TRUNK_PATH}/cmake )
-
-
 ############################ ROBOT TYPE
 # Definitions for the type of robot (for compilation definitions), and
 # prefixes for library, executable, and path names
-# TODO: get rid of AIBO code 
 IF( NOT DEFINED ROBOT_TYPE )
   SET( ROBOT_TYPE NAO_RL )
 ENDIF( NOT DEFINED ROBOT_TYPE )
 SET( ROBOT_TYPE ${ROBOT_TYPE} CACHE STRING "Robot type" )
-
-IF( ${ROBOT_TYPE} STREQUAL AIBO_ERS7 OR ${ROBOT_TYPE} STREQUAL AIBO_220)
-  SET( ROBOT_PREFIX aibo )
-  SET( ROBOT_AIBO TRUE  )
-  SET( ROBOT_NAO  FALSE )
-ELSE( ${ROBOT_TYPE} STREQUAL AIBO_ERS7 OR ${ROBOT_TYPE} STREQUAL AIBO_220)
-  SET( ROBOT_PREFIX nao )
-  SET( ROBOT_AIBO FALSE )
-  SET( ROBOT_NAO  TRUE  )
-ENDIF( ${ROBOT_TYPE} STREQUAL AIBO_ERS7 OR ${ROBOT_TYPE} STREQUAL AIBO_220)
-
+SET( ROBOT_PREFIX nao )
 
 ############################ OUTPUT LOCATION
 # Define output directories.  Binaries, documentation, and libraries are
@@ -128,42 +149,8 @@ SET( OUTPUT_ROOT_DIR_BIN "${CMAKE_INSTALL_PREFIX}/bin" )
 SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc" )
 SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
 
-
-############################ PREFIX CONFIRUGATION
-# Depending on the robot and whether cross-compiling, the include and
-# library prefixes must be adjusted
-
-  # Nao
-IF( AL_DIR STREQUAL "" )
-  MESSAGE( FATAL_ERROR "Environment variable 'AL_DIR' is not set !" )
-ENDIF( AL_DIR STREQUAL "" )
-
-IF( WIN32 )
-  SET( TARGET_ARCH "windows" )
-  SET( TARGET_HOST "TARGET_HOST_WINDOWS")
-ENDIF( WIN32 )
-
-IF( UNIX )
-  SET( TARGET_ARCH "linux")
-  SET( TARGET_HOST "TARGET_HOST_LINUX")
-  SET( PLATFORM_X86 1 )
-ENDIF( UNIX )
-
-IF( APPLE )
-  SET( TARGET_ARCH "macosx" )
-  SET( TARGET_HOST "TARGET_HOST_MACOSX")
-ENDIF( APPLE )
-
-IF( OE_CROSS_BUILD )
-  SET( OE_CROSS_DIR "${AL_DIR}/crosstoolchain" )
-  SET( OE_SYSROOT "${OE_CROSS_DIR}/staging/geode-linux/" )
-ENDIF (OE_CROSS_BUILD )
-
-IF( FINAL_RELEASE )
-  ADD_DEFINITIONS(-DFINAL_RELEASE)
-ENDIF( FINAL_RELEASE )
-
-INCLUDE( "${CMAKE_MODULE_PATH}/proxies.cmake" )
+########################### NB Common definitions
+include ( ${NBITES_DIR}/src/man/cmake/FindNBCOMMON.cmake )
 
 ########################## ADVANCED SETTINGS PREFERENCES
 # Set the cache variable that we would rather not appear on the normal
@@ -176,4 +163,3 @@ MARK_AS_ADVANCED(
   LIBRARY_OUTPUT_PATH
   AL_PERF_CALCULATION
   )
-

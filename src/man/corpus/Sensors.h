@@ -193,6 +193,9 @@ class Sensors {
     void saveFrame(void);
     void loadFrame(std::string path);
     void resetSaveFrame(void);
+	void startSavingFrames(void);
+	void stopSavingFrames(void);
+	bool isSavingFrames() const;
 
  private:
 
@@ -258,6 +261,7 @@ class Sensors {
 
     static int saved_frames;
     std::string FRM_FOLDER;
+	bool saving_frames_on;
 };
 
 
