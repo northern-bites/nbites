@@ -141,7 +141,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     jbyte *buf_img = env->GetByteArrayElements( jimg, 0);
     byte * img = (byte *)buf_img; //convert it to a reg. byte array
 
-    uint16_t *newImg = reinterpret_cast<uint16_t*>(new uint8_t[320*240*3]);
+    uint16_t *newImg = reinterpret_cast<uint16_t*>(new uint8_t[320*240*7]);
 
     ColorParams * cp = new ColorParams(0,0,0,256,256,256,128,128,128);
 

@@ -128,12 +128,12 @@ void Threshold::visionLoop() {
 
     vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
-    // if (vision->bgCrossbar->getWidth() > 0) {
-    //     setShot(vision->bgCrossbar);
-    // }
-    // if (vision->ygCrossbar->getWidth() > 0) {
-    //     setShot(vision->ygCrossbar);
-    // }
+    if (vision->bgCrossbar->getWidth() > 0) {
+        setShot(vision->bgCrossbar);
+    }
+    if (vision->ygCrossbar->getWidth() > 0) {
+        setShot(vision->ygCrossbar);
+    }
     // for now we also don't use open field information
     // field->openDirection(horizon, pose.get());
 
@@ -493,28 +493,28 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             currentRun = 1;
         }
         lastPixel = pixel;
-        // if (pixel == ORANGE) {
-            // @TODO: This probably shouldn't just be commented out...
-//             int lastu = getU(column, j);
-//             int initu = lastu;
-//             while (j >= topEdge && abs(getU(column, j) - lastu) < 8 &&
-//                    abs(initu - lastu) < 12) {
-//                 currentRun++;
-//                 j--;
-// #ifdef USE_EDGES
-//                 thresholded[j][column] = getColor(column, j);
-// #endif
-//             }
-        //     currentRun--;
-        //     // j++;
+        if (pixel == ORANGE) {
+            int lastu = getU(column, j);
+            int initu = lastu;
+            while (j >= topEdge && abs(getU(column, j) - lastu) < 8 &&
+                   abs(initu - lastu) < 12) {
+                currentRun++;
+                j--;
+#ifdef USE_EDGES
+                thresholded[j][column] = getColor(column, j);
+#endif
+            }
 
-        //     if ((j == 0 || j >= topEdge) && currentRun > 2) {
-        //         orange->newRun(column, j, currentRun);
-        //     }
+            currentRun--;
+            j++;
 
-        //     greens+= currentRun;
-        //     lastPixel = ORANGE;
-        // }
+            if ((j == 0 || j >= topEdge) && currentRun > 2) {
+                orange->newRun(column, j, currentRun);
+            }
+
+            greens+= currentRun;
+            lastPixel = ORANGE;
+        }
     }
     if (shoot[column] && greens < (bound - topEdge) / 2) {
         if (block[column / divider] == 0) {
@@ -1407,7 +1407,8 @@ const uint16_t* Threshold::getYUV() {
 void Threshold::setYUV(const uint16_t* newyuv) {
     yuv = newyuv;
     thresholded = const_cast<uint8_t*>(
-        reinterpret_cast<const uint8_t*>(yuv + AVERAGED_IMAGE_SIZE));
+        reinterpret_cast<const uint8_t*>(yuv) +
+        Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE);
     yplane = yuv;
 }
 
@@ -1718,4 +1719,17 @@ const char* Threshold::getShortColor(int _id) {
 
 int Threshold::getY(int j, int i) const {
     return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
+}
+
+
+// These two are backwards, because our constants are backwards in
+// VisionDef.h. The real order is |U|V|U|V|, not |V|U|V|U|
+//
+// @TODO Fix these... (need to fix color tables first)
+int Threshold::getU(int x, int y) const {
+    return static_cast<int>(vision->uvImg[y*IMAGE_WIDTH*2 + x*2 + 1]);
+}
+
+int Threshold::getV(int j, int i) const {
+    return static_cast<int>(vision->uvImg[i*IMAGE_WIDTH*2 + j*2]);
 }

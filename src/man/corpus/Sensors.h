@@ -175,6 +175,7 @@ class Sensors {
     //   the image is locked in Sensors.
     const uint16_t* getYImage() const;
     const uint16_t* getImage() const;
+    const uint16_t* getUVImage() const;
     const uint8_t* getColorImage() const;
     void setImage(const uint16_t* img);
     void lockImage() const;
@@ -235,7 +236,7 @@ class Sensors {
     float ultraSoundDistanceLeft;
     float ultraSoundDistanceRight;
 
-    const uint16_t *yImage;
+    const uint16_t *yImage, *uvImage;
     const uint8_t *colorImage;
 
     // Pose needs to know which foot is on the ground during a vision frame

@@ -158,8 +158,7 @@ public:
     // Profiling
     boost::shared_ptr<Profiler> profiler;
 
-    const uint16_t * yImg;
-    const uint8_t * colorImg;
+    const uint16_t * yImg, *uvImg;
 
     FieldLinesDetector linesDetector;
 protected:

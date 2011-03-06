@@ -45,8 +45,7 @@ static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
     : pose(_pose), profiler(_prof),
       frameNumber(0), id(-1), name(), player(1), colorTable("table.mtb"),
-      yImg(&global_16_image[0]), colorImg(&global_8_image[0]),
-      linesDetector(profiler)
+      yImg(&global_16_image[0]), linesDetector(profiler)
 {
     // variable initialization
 
@@ -94,7 +93,7 @@ void Vision::copyImage(const byte* image) {
 
 void Vision::notifyImage(const uint16_t* y) {
     yImg = y;
-    colorImg = reinterpret_cast<const uint8_t*>(&y[AVERAGED_IMAGE_SIZE]);
+    uvImg = y + AVERAGED_IMAGE_SIZE;
 
     // Set the current image pointer in Threshold
     thresh->setYUV(y);

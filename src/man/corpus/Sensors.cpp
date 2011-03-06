@@ -59,7 +59,7 @@ Sensors::Sensors ()
       rightFootBumper(0.0f, 0.0f),
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
-      yImage(&global_image[0]),
+      yImage(&global_image[0]), uvImage(&global_image[0]),
       colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
@@ -751,6 +751,11 @@ const uint16_t* Sensors::getImage () const
     return yImage;
 }
 
+const uint16_t* Sensors::getUVImage() const
+{
+    return uvImage;
+}
+
 const uint8_t* Sensors::getColorImage() const
 {
     return colorImage;
@@ -759,7 +764,8 @@ const uint8_t* Sensors::getColorImage() const
 void Sensors::setImage (const uint16_t *img)
 {
     yImage = img;
-    colorImage = reinterpret_cast<const uint8_t*>(img + AVERAGED_IMAGE_SIZE);
+    uvImage = img + AVERAGED_IMAGE_SIZE;
+    colorImage = reinterpret_cast<const uint8_t*>(img + AVERAGED_IMAGE_SIZE*3);
 }
 
 

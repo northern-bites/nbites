@@ -285,8 +285,6 @@ int Ball::balls(int horizon, VisualBall *thisBall)
         w = topBlob->width();
         h = topBlob->height();
         if (abs(w - h) > DIAMETERMISMATCH && !nearEdge(*topBlob)) {
-            // getU no longer exists, so we've put a hold on this
-            // @TODO delete it.
             adjustBallDimensions();
             w = topBlob->width();
             h = topBlob->height();
@@ -349,36 +347,36 @@ void Ball::setOcclusionInformation() {
    @return         x value of the edge
  */
 int Ball::findBallEdgeX(int x, int y, int dir) {
-    // int lastu = thresh->getU(x, y);
-    // int midu = lastu;
+    int lastu = thresh->getU(x,y);
+    int midu = lastu;
     int newx = x;
     int changex = topBlob->getLeft();
     if (dir > 0) {
         changex = topBlob->getRight();
     }
-    // for (int i = -3; i < 4; i++) {
-    //     newx = x;
-    //     if (y + i >= 0 && y + i < IMAGE_HEIGHT) {
-    //         for (bool done = false; !done && newx >= 0 && newx < IMAGE_WIDTH;
-    //              newx+=dir) {
-    //             int newu = thresh->getU(newx, y + i);
-    //             if (abs(newu - lastu) > EDGEMISMATCH
-    //                 || abs(newu - midu) > EDGECENTERMISMATCH) {
-    //                 done = true;
-    //             }
-    //             lastu = newu;
-    //         }
-    //         if (dir < 0) {
-    //             if (newx + dir < changex) {
-    //                 changex = newx + dir;
-    //             }
-    //         } else {
-    //             if (newx + dir > changex) {
-    //                 changex = newx + dir;
-    //             }
-    //         }
-    //     }
-    // }
+    for (int i = -3; i < 4; i++) {
+        newx = x;
+        if (y + i >= 0 && y + i < IMAGE_HEIGHT) {
+            for (bool done = false; !done && newx >= 0 && newx < IMAGE_WIDTH;
+                 newx+=dir) {
+                int newu = thresh->getU(newx, y + i);
+                if (abs(newu - lastu) > EDGEMISMATCH
+                    || abs(newu - midu) > EDGECENTERMISMATCH) {
+                    done = true;
+                }
+                lastu = newu;
+            }
+            if (dir < 0) {
+                if (newx + dir < changex) {
+                    changex = newx + dir;
+                }
+            } else {
+                if (newx + dir > changex) {
+                    changex = newx + dir;
+                }
+            }
+        }
+    }
     return changex;
 }
 
@@ -391,36 +389,36 @@ int Ball::findBallEdgeX(int x, int y, int dir) {
    @return         y value of the edge
  */
 int Ball::findBallEdgeY(int x, int y, int dir) {
-    // int lastu = thresh->getU(x, y);
-    // int midu = lastu;
+    int lastu = thresh->getU(x,y);
+    int midu = lastu;
     int newy = y;
     int changey = topBlob->getTop();
     if (dir > 0) {
         changey = topBlob->getBottom();
     }
-    // for (int i = -3; i < 4; i++) {
-    //     newy = y;
-    //     if (x + i >= 0 && x + i < IMAGE_WIDTH) {
-    //         for (bool done = false; !done && newy >= 0 && newy < IMAGE_HEIGHT;
-    //              newy+=dir) {
-    //             int newu = thresh->getU(x + i, newy);
-    //             if (abs(newu - lastu) > EDGEMISMATCH
-    //                 || abs(newu - midu) > EDGECENTERMISMATCH) {
-    //                 done = true;
-    //             }
-    //             lastu = newu;
-    //         }
-    //         if (dir < 0) {
-    //             if (newy + dir < changey) {
-    //                 changey = newy + dir;
-    //             }
-    //         } else {
-    //             if (newy + dir > changey) {
-    //                 changey = newy + dir;
-    //             }
-    //         }
-    //     }
-    // }
+    for (int i = -3; i < 4; i++) {
+        newy = y;
+        if (x + i >= 0 && x + i < IMAGE_WIDTH) {
+            for (bool done = false; !done && newy >= 0 && newy < IMAGE_HEIGHT;
+                 newy+=dir) {
+                int newu = thresh->getU(x + i,newy);
+                if (abs(newu - lastu) > EDGEMISMATCH
+                    || abs(newu - midu) > EDGECENTERMISMATCH) {
+                    done = true;
+                }
+                lastu = newu;
+            }
+            if (dir < 0) {
+                if (newy + dir < changey) {
+                    changey = newy + dir;
+                }
+            } else {
+                if (newy + dir > changey) {
+                    changey = newy + dir;
+                }
+            }
+        }
+    }
     return changey;
 }
 
@@ -828,7 +826,7 @@ pair<int, int> Ball::scanMidlinesForRoundnessInformation(Blob b) {
             badPix++;
     }
     for (int i = 0; i < w; i++) {
-        pix = thresh->getThresholded(+h/2,x + i);
+        pix = thresh->getThresholded(y+h/2,x + i);
         if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
             goodPix++;
         } else if (pix != GREY) {
