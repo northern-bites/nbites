@@ -795,6 +795,8 @@ PyBall_new (VisualBall *b)
         self->bearing = PyFloat_FromDouble(b->getBearingDeg());
         self->elevation = PyFloat_FromDouble(b->getElevationDeg());
         self->confidence = PyInt_FromLong(b->getConfidence());
+        self->angleX = PyFloat_FromDouble(b->getAngleXDeg());
+        self->angleY = PyFloat_FromDouble(b->getAngleYDeg());
 
         if (self->centerX == NULL || self->centerY == NULL ||
             self->width == NULL || self->height == NULL ||
@@ -839,6 +841,12 @@ PyBall_update (PyBall *self)
 
     Py_XDECREF(self->confidence);
     self->confidence = PyInt_FromLong(self->ball->getConfidence());
+
+    Py_XDECREF(self->angleX);
+    self->angleX = PyFloat_FromDouble(self->ball->getAngleXDeg());
+
+    Py_XDECREF(self->angleY);
+    self->angleY = PyFloat_FromDouble(self->ball->getAngleYDeg());
 }
 
 // backend methods
@@ -904,6 +912,8 @@ PyFieldObject_new (VisualFieldObject *o)
         self->bearing = PyFloat_FromDouble(o->getBearingDeg());
         self->certainty = PyInt_FromLong(o->getIDCertainty());
         self->distCertainty = PyInt_FromLong(o->getDistanceCertainty());
+        self->angleX = PyFloat_FromDouble(o->getAngleXDeg());
+        self->angleY = PyFloat_FromDouble(o->getAngleYDeg());
 
         if (self->centerX == NULL || self->centerY == NULL ||
             self->width == NULL || self->height == NULL ||
@@ -948,6 +958,12 @@ PyFieldObject_update (PyFieldObject *self)
 
     Py_XDECREF(self->distCertainty);
     self->distCertainty = PyInt_FromLong(self->object->getDistanceCertainty());
+
+    Py_XDECREF(self->angleX);
+    self->angleX = PyFloat_FromDouble(self->object->getAngleXDeg());
+
+    Py_XDECREF(self->angleY);
+    self->angleY = PyFloat_FromDouble(self->object->getAngleYDeg());
 }
 
 // backend methods
