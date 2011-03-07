@@ -175,7 +175,8 @@ public class TOOLProtocol {
         if (robotDef != null) {
             joints = new float[robotDef.numJoints()];
             sensors = new float[robotDef.numSensors()];
-            image = new byte[robotDef.inputImageSize()];
+
+            image = new byte[robotDef.inputImageByteSize()];
             thresh = new byte[robotDef.outputImageSize()];
         }
     }

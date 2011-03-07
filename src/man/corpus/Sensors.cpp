@@ -41,7 +41,7 @@ using namespace Kinematics;
 
 // static base image array, so we don't crash on image access if the setImage()
 // method is never called
-static uint16_t global_image[IMAGE_BYTE_SIZE];
+static uint16_t global_image[NAO_IMAGE_BYTE_SIZE];
 
 //
 // C++ Sensors class methods
@@ -61,6 +61,7 @@ Sensors::Sensors ()
       ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
       yImage(&global_image[0]), uvImage(&global_image[0]),
       colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+      naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
@@ -742,6 +743,12 @@ void Sensors::releaseVisionAngles() {
     pthread_mutex_unlock (&vision_angles_mutex);
 }
 
+// Get a pointer to the full size Nao image
+const uint8_t* Sensors::getNaoImage () const
+{
+    return naoImage;
+}
+
 const uint16_t* Sensors::getYImage () const
 {
     return yImage;
@@ -760,6 +767,11 @@ const uint16_t* Sensors::getUVImage() const
 const uint8_t* Sensors::getColorImage() const
 {
     return colorImage;
+}
+
+void Sensors::setNaoImage(const uint8_t *img)
+{
+    naoImage = img;
 }
 
 void Sensors::setImage (const uint16_t *img)
@@ -781,28 +793,28 @@ static const int VERSION = 0;
 void Sensors::startSavingFrames()
 {
 #ifdef SAVE_ALL_FRAMES
-	if (!isSavingFrames())
+    if (!isSavingFrames())
     {
         saving_frames_on = true;
-	    cout << "****Started Saving Frames****" << endl;
-	}
+        cout << "****Started Saving Frames****" << endl;
+    }
 #endif
 }
 
 void Sensors::stopSavingFrames()
 {
 #ifdef SAVE_ALL_FRAMES
-	if (isSavingFrames())
-	{
-	    saving_frames_on = false;
+    if (isSavingFrames())
+    {
+        saving_frames_on = false;
         cout << "****Stopped Saving Frames****" << endl;
-	}
+    }
 #endif
 }
 
 bool Sensors::isSavingFrames() const
 {
-	return saving_frames_on;
+    return saving_frames_on;
 }
 
 // @TODO move this to Transcriber to write out from full size image...
@@ -826,8 +838,8 @@ void Sensors::saveFrame()
     lockImage();
 
     // @TODO Write out entire 640x480 image
-    fout.write(reinterpret_cast<const char*>(getImage()),
-               Y_IMAGE_BYTE_SIZE);
+    fout.write(reinterpret_cast<const char*>(getNaoImage()),
+               NAO_IMAGE_BYTE_SIZE);
     // write the version of the frame format at the end before joints/sensors
     fout << VERSION << " ";
 

@@ -44,8 +44,9 @@ static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 // Vision Class Constructor
 Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
     : pose(_pose), profiler(_prof),
-      frameNumber(0), id(-1), name(), player(1), colorTable("table.mtb"),
-      yImg(&global_16_image[0]), linesDetector(profiler)
+      yImg(&global_16_image[0]), linesDetector(profiler),
+      frameNumber(0), id(-1), name(), player(1),
+      colorTable("table.mtb")
 {
     // variable initialization
 

@@ -156,6 +156,10 @@ public class RobotDef {
         return inputImageSize;
     }
 
+    public int inputImageByteSize() {
+        return inputImageSize * 2; // Only true for YUV422! Bit of a HACK
+    }
+
     public int outputImageSize(){
         return outputImageSize;
     }
@@ -175,5 +179,8 @@ public class RobotDef {
             return sensors;
     }
 
+    public ImageType imageType(){
+        return type;
+    }
 }
 

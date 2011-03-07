@@ -70,7 +70,9 @@ public class Frame {
     }
 
     public Frame() {
-		// TODO Auto-generated constructor stub
+        frame_robot = "Unknown";
+        frame_type = RobotDef.ImageType.NAO_VER;
+        frame_def = RobotDef.NAO_DEF_VERSIONED;
 	}
 
 	public boolean hasImage() {
