@@ -115,6 +115,7 @@ public:
     }
 
     int peaks_list_contains(int i, int j);
+    void printAnglesList();
 
     // Public member variables
 

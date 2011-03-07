@@ -1,4 +1,7 @@
 #include "Gradient.h"
+#include <iostream>
+
+using namespace std;
 
 const int Gradient::dxTab[DIRECTIONS] = { 1,  1,  0, -1, -1, -1,  0,  1};
 const int Gradient::dyTab[DIRECTIONS] = { 0,  1,  1,  1,  0, -1, -1, -1};
@@ -36,4 +39,13 @@ int Gradient::peaks_list_contains(int i, int j){
         n++;
     }
     return 0;
+}
+
+void Gradient::printAnglesList()
+{
+    for (int n = 0; isPeak(n); n++){
+        cout << "x,y,t:\t" << (int)getAnglesXCoord(n)
+             << "\t" << (int)getAnglesYCoord(n)
+             << "\t" << (int)getAngle(n) << endl;
+    }
 }
