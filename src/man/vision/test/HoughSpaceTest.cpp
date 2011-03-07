@@ -23,9 +23,11 @@ void HoughSpaceTest::test_hs()
     // Create gradient map such that it has a known line
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
 #ifdef USE_MMX
-    for (int i = 1; i < IMAGE_HEIGHT; ++i) {
+    for (int16_t i = 1; i < IMAGE_HEIGHT; ++i) {
          // Make x and y relative to the image center
-        g->addAngle(0, IMAGE_WIDTH * 3/4, i);
+        g->addAngle(0,
+                    static_cast<int16_t>(IMAGE_WIDTH * 3/4),
+                    i);
     }
 #else
     for (int i=0; i < Gradient::rows; ++i){
@@ -93,8 +95,10 @@ void HoughSpaceTest::test_lines()
 {
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
 #ifdef USE_MMX
-    for (int i = 1; i < IMAGE_HEIGHT; ++i) {
-        g->addAngle(0, IMAGE_WIDTH * 3/4, i);
+    for (int16_t i = 1; i < IMAGE_HEIGHT; ++i) {
+        g->addAngle(0,
+                    static_cast<int16_t>(IMAGE_WIDTH * 3/4),
+                    i);
     }
 #else
     for (int i=0; i < IMAGE_HEIGHT; ++i){
