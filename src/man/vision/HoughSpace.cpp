@@ -49,14 +49,14 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
 void HoughSpace::markEdges(shared_ptr<Gradient> g)
 {
     PROF_ENTER(profiler, P_MARK_EDGES);
+#ifdef USE_MMX
+    _mark_edges(g->numPeaks, angleSpread, g->angles, &hs[0]);
+#else
     const int height = Gradient::rows;
     const int width  = Gradient::cols;
     const int x0     = width/2;
     const int y0     = height/2;
 
-#ifdef USE_MMX
-    _mark_edges(g->numPeaks, angleSpread, g->angles, &hs[0]);
-#else
     // See comment in FindPeaks re: why this is shrunk in by 2
     // rows/columns on each side
     for (int y = 2; y < height-2; ++y){
@@ -146,16 +146,17 @@ list<HoughLine> HoughSpace::peaks()
     int thresh = 4 * acceptThreshold; // smoothing has a gain of 4
 
     list<HoughLine> lines = list<HoughLine>();
-#ifndef USE_MMX
     for (int r=0; r < r_span-1; ++r) {
         for (int t=0; t < t_span; ++t) {
-            const int z = hs[r][t];
+            const int z = getHoughBin(r,t);
             if (z >= thresh){
                 bool shouldCreate = true;
                 for (int i=0; shouldCreate && i < peak_points; ++i) {
 
-                    if ( ! ( z >  hs[r + drTab[i]][(t + dtTab[i]) & 0xff] &&
-                             z >= hs[r - drTab[i]][(t - dtTab[i]) & 0xff])){
+                    if ( ! ( z >  getHoughBin(r + drTab[i],
+                                              (t + dtTab[i]) & 0xff) &&
+                             z >= getHoughBin(r - drTab[i],
+                                              (t - dtTab[i]) & 0xff))) {
                         shouldCreate = false;
                     }
                 }
@@ -167,7 +168,6 @@ list<HoughLine> HoughSpace::peaks()
             }
         }
     }
-#endif
     PROF_EXIT(profiler, P_HOUGH_PEAKS);
     return lines;
 }
@@ -268,7 +268,7 @@ bool HoughSpace::isPeak(int r, int t)
 int HoughSpace::getHoughBin(int r, int t)
 {
 #ifdef USE_MMX
-    return static_cast<int>(hs[t * r_span + r]);
+    return static_cast<int>(hs[t * (r_span+1) + r]);
 #else
     return hs[r][t];
 #endif

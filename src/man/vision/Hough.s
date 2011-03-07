@@ -19,7 +19,7 @@ x_offset:       .skip 2
 y_offset:
 
 # sin(0 + 0x40) = cos(x) (0x40 = 90 degrees, btw)
-        .equiv sin_offset,     0x40
+        .equiv sin_offset,     0x40*2 # needs to offset for words (2 bytes each)
 
         ## Stack layout
         .struct 0
@@ -89,15 +89,17 @@ cosTable:
 ##########################
 
         ## Load cosine into a 32-bit register and multiply by 32 bit x
-        movsx   \empty, word ptr[cosTable + \t]
+        movsx   \empty, word ptr[cosTable + \t*2] # table is 16-bit values
         imul    \x, \empty
 
         ## Load sine into a 32-bit register and multiply by 32 bit x
-        movsx   eax, word ptr[cosTable + sin_offset + \t]
+	## table vals are 16-bits
+        movsx   \empty, word ptr[cosTable + sin_offset + \t*2]
         imul    \y, \empty
 
         ## Sum x*cos(t) + y*sin(t)
         add     \x, \y
+        shr     \x, 14
 
         ## Set \y to zero
         xor     \y,\y
@@ -173,7 +175,7 @@ gradientLoop:
 
         ## Calculate hough space address
         mov     eax, esi
-        imul    eax, r_span * bytes_per_bin
+        imul    eax, (r_span + 1) * bytes_per_bin # width is r_span + 1, actually
         add     eax, dword ptr[ebp + hough_space]
 
         ## edi = min(r0,r1), ecx = max(r0, r1)
@@ -207,6 +209,8 @@ radiiLoop:
 
         ## gradientLoop
         inc     esi             # Increment ti
+        and     esi, t_span-1   # 0 <= t < t_span
+
         dec     dword ptr[esp + spread]
         jne     gradientLoop
 

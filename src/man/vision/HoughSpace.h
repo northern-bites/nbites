@@ -62,11 +62,11 @@ private:       // Member variables
 #ifdef USE_MMX
     // arranged opposite the non-asm version, rows are theta, cols are radius
     uint16_t hs[r_span * (t_span + 1)];
-    bool peak[r_span * t_span];
+    // bool peak[r_span * t_span];
 #else
     int hs[r_span][t_span + 1];
-    bool peak[r_span][t_span];
 #endif
+    bool peak[r_span][t_span];
 
     const static int drTab[peak_points];
     const static int dtTab[peak_points];
