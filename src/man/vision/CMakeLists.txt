@@ -209,7 +209,11 @@ add_executable( ImageAcquisitionTest ${VISION_TEST_DIR}/ImageAcquisitionTest.cpp
 target_link_libraries( ImageAcquisitionTest ${NBCOMMON_LIBRARIES})
 
 add_executable( OfflineVision ${VISION_INCLUDE_DIR}/offline/OfflineVision.cpp )
-target_link_libraries( OfflineVision ${VISION_TARGET} ${SENSORS_TARGET} ${NBINCLUDE_TARGET})
+target_link_libraries( OfflineVision
+  ${VISION_TARGET}
+  ${SENSORS_TARGET}
+  ${NBINCLUDE_TARGET}
+  )
 
 enable_testing()
 add_test( EdgeDetectorTest  EdgeDetectorTest )
