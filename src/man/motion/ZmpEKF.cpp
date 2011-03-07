@@ -1,5 +1,4 @@
 
-
 #include "ZmpEKF.h"
 #include "BasicWorldConstants.h"
 #include "Kinematics.h"
@@ -82,12 +81,13 @@ void ZmpEKF::incorporateMeasurement(ZmpMeasurement z,
                                     MeasurementVector &V_k)
 {
     static const float com_height  = 310; //TODO: Move this
+	float zheight_div_G = com_height/GRAVITY_mss;
     static MeasurementVector last_measurement(
         ublas::scalar_vector<float>(measurementSize, 0.0f));
 
     MeasurementVector z_x(measurementSize);
-    z_x(0) = z.comX + com_height/GRAVITY_mss * z.accX;
-    z_x(1) = z.comY + com_height/GRAVITY_mss * z.accY;
+    z_x(0) = z.comX + zheight_div_G * z.accX;
+    z_x(1) = z.comY + zheight_div_G * z.accY;
 
     // The Jacobian is the identity because the observation space is the same
     // as the state space.
@@ -95,7 +95,6 @@ void ZmpEKF::incorporateMeasurement(ZmpMeasurement z,
     H_k(1,1) = 1.0f;
 
     V_k = z_x - xhat_k; // divergence
-
 
     //MeasurementVector deltaS = z_x - last_measurement;
 

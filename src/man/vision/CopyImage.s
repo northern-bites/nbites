@@ -1,3 +1,4 @@
+/* -*- mode: asm; indent-tabs-mode: nil -*- */
 .intel_syntax noprefix
 
 .globl	_copy_image

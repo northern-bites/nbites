@@ -65,6 +65,6 @@ def postSave(player):
         player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
         player.saving = False
         player.brain.tracker.trackBall()
-        return player.goLater('goalieAtPosition')
+        return player.goLater('goaliePosition')
 
     return player.stay()

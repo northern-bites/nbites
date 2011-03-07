@@ -81,7 +81,7 @@ accurately on the ball and returns that value
 """
 #def pfk_theta(nav, ball, targetTheta)
 #
-# NOT IMPLEMENTED!!!
+# NOT IMPLEMENTED!!! Curently all theta positioning is done by approach ball.
 #
 # Must use a global heading target based on a global robot heading.
 # Currently loc is unreliable so this cannot be done well.

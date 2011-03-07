@@ -1,6 +1,8 @@
 //TODO: look into replacing DCM->getTime with local time tracking
 
 #include "alvalue/alvalue.h"
+#include "alcommon/alproxy.h"
+
 #include "NaoEnactor.h"
 #include <iostream>
 using namespace std;

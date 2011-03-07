@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "alvision/alimage.h"
 #include "alvision/alvisiondefinitions.h"
+#include "altools/alxplatform.h"
 
 #include "manconfig.h"
 
@@ -87,6 +88,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
     : ThreadedImageTranscriber(s,synchro,"ALImageTranscriber"),
       log(), camera(), lem_name(""), camera_active(false),
       image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
+      naoImage(new uint8_t[NAO_IMAGE_BYTE_SIZE]),
       table(new unsigned char[yLimit * uLimit * vLimit]),
       params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
 {
@@ -146,6 +148,13 @@ void ALImageTranscriber::run()
             waitForImage();
         subscriber->notifyNextVisionImage();
 
+#ifdef SAVE_ALL_FRAMES
+		if (sensors->isSavingFrames())
+		{
+			sensors->saveFrame();
+		}
+#endif
+
         //stop timer
         const long long processTime = micro_time() - startTime;
         //sleep until next frame
@@ -160,9 +169,9 @@ void ALImageTranscriber::run()
 #endif
             }
             //Don't sleep at all
-        } else {
-            const long long int microSleepTime = (VISION_FRAME_LENGTH_uS -
-                                             processTime);
+        } else{
+            const long int microSleepTime =
+                static_cast<long int>(VISION_FRAME_LENGTH_uS - processTime);
             const long int nanoSleepTime =
                 static_cast<long int>((microSleepTime %(1000 * 1000)) * 1000);
 
@@ -189,7 +198,7 @@ void ALImageTranscriber::stop()
     if(camera_active){
         cout << "lem_name = " << lem_name << endl;
         try {
-            camera->callVoid("unregister", lem_name);
+            camera->unsubscribe(lem_name);
         }catch (ALError &e) {
             log->error("Man", "Could not call the unregister method of the NaoCam "
                        "module");
@@ -203,7 +212,7 @@ void ALImageTranscriber::stop()
 void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker)
 {
     try {
-        camera = broker->getProxy("ALVideoDevice");
+        camera = ALPtr<ALVideoDeviceProxy>(new ALVideoDeviceProxy(broker));
         camera_active =true;
     }catch (ALError &e) {
         log->error("ALImageTranscriber",
@@ -223,14 +232,12 @@ void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker)
 #endif
 
     try {
-        lem_name = camera->call<string>("subscribe", lem_name, format,
-                                             colorSpace, fps);
-        cout << "Registered Camera: " << lem_name << " successfully"<<endl;
+        lem_name = camera->subscribe(lem_name, format,
+                                     colorSpace, fps);
+        std::cout << "Registered Camera: " << lem_name << " successfully"<<std::endl;
     } catch (ALError &e) {
         cout << "Failed to register camera" << lem_name << endl;
         camera_active = false;
-        cout << "ALImageTranscriber: Could not call the" <<
-            " register method of the NaoCam module\n\t" <<  e.toString();
     }
 
 }
@@ -238,16 +245,18 @@ void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker)
 void ALImageTranscriber::initCameraSettings(int whichCam)
 {
 
-    int currentCam =  camera->call<int>( "getParam", kCameraSelectID );
+    int currentCam =  camera->getParam(kCameraSelectID);
+
     if (whichCam != currentCam){
-        camera->callVoid( "setParam", kCameraSelectID,whichCam);
+        camera->setParam(kCameraSelectID,whichCam);
         SleepMs(CAMERA_SLEEP_TIME);
-        currentCam =  camera->call<int>( "getParam", kCameraSelectID );
+        currentCam =  camera->getParam(kCameraSelectID);
+
         if (whichCam != currentCam){
             cout << "Failed to switch to camera "<<whichCam
                       <<" retry in " << CAMERA_SLEEP_TIME <<" ms" <<endl;
             SleepMs(CAMERA_SLEEP_TIME);
-            currentCam =  camera->call<int>( "getParam", kCameraSelectID );
+            currentCam =  camera->getParam(kCameraSelectID);
             if (whichCam != currentCam){
                 cout << "Failed to switch to camera "<<whichCam
                           <<" ... returning, no parameters initialized" <<endl;
@@ -260,16 +269,16 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     // Turn off auto settings
     // Auto exposure
     try {
-        camera->callVoid("setParam", kCameraAutoExpositionID,
+        camera->setParam(kCameraAutoExpositionID,
                          DEFAULT_CAMERA_AUTO_EXPOSITION);
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set AutoExposition");
     }
-    int param = camera->call<int>("getParam", kCameraAutoExpositionID);
+    int param = camera->getParam(kCameraAutoExpositionID);
     // if that didn't work, then try again
     if (param != DEFAULT_CAMERA_AUTO_EXPOSITION) {
         try {
-            camera->callVoid("setParam", kCameraAutoExpositionID,
+            camera->setParam(kCameraAutoExpositionID,
                              DEFAULT_CAMERA_AUTO_EXPOSITION);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set AutoExposition AGAIN");
@@ -277,16 +286,16 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Auto white balance
     try {
-        camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
+        camera->setParam(kCameraAutoWhiteBalanceID,
                          DEFAULT_CAMERA_AUTO_WHITEBALANCE);
 
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set AutoWhiteBalance");
     }
-    param = camera->call<int>("getParam", kCameraAutoWhiteBalanceID);
+    param = camera->getParam(kCameraAutoWhiteBalanceID);
     if (param != DEFAULT_CAMERA_AUTO_WHITEBALANCE) {
         try {
-            camera->callVoid("setParam", kCameraAutoWhiteBalanceID,
+            camera->setParam(kCameraAutoWhiteBalanceID,
                              DEFAULT_CAMERA_AUTO_WHITEBALANCE);
         } catch (ALError &e){
             log->error("ALImageTranscriber","Couldn't set AutoWhiteBalance AGAIN");
@@ -294,15 +303,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Auto gain
     try {
-        camera->callVoid("setParam", kCameraAutoGainID,
+        camera->setParam(kCameraAutoGainID,
                          DEFAULT_CAMERA_AUTO_GAIN);
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set AutoGain");
     }
-    param = camera->call<int>("getParam", kCameraAutoGainID);
+    param = camera->getParam(kCameraAutoGainID);
     if (param != DEFAULT_CAMERA_AUTO_GAIN) {
         try {
-            camera->callVoid("setParam", kCameraAutoGainID,
+            camera->setParam(kCameraAutoGainID,
                              DEFAULT_CAMERA_AUTO_GAIN);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set AutoGain AGAIN");
@@ -311,15 +320,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     // Set camera defaults
     // brightness
     try {
-        camera->callVoid("setParam", kCameraBrightnessID,
+        camera->setParam(kCameraBrightnessID,
                          DEFAULT_CAMERA_BRIGHTNESS);
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set Brightness ");
     }
-    param = camera->call<int>("getParam", kCameraBrightnessID);
+    param = camera->getParam(kCameraBrightnessID);
     if (param != DEFAULT_CAMERA_BRIGHTNESS) {
         try {
-            camera->callVoid("setParam", kCameraBrightnessID,
+            camera->setParam(kCameraBrightnessID,
                              DEFAULT_CAMERA_BRIGHTNESS);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set BRIGHTNESS AGAIN");
@@ -327,15 +336,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // contrast
     try {
-        camera->callVoid("setParam", kCameraContrastID,
+        camera->setParam(kCameraContrastID,
                          DEFAULT_CAMERA_CONTRAST);
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set Contrast");
     }
-    param = camera->call<int>("getParam", kCameraContrastID);
+    param = camera->getParam(kCameraContrastID);
     if (param != DEFAULT_CAMERA_CONTRAST) {
         try {
-            camera->callVoid("setParam", kCameraContrastID,
+            camera->setParam(kCameraContrastID,
                              DEFAULT_CAMERA_CONTRAST);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set Contrast AGAIN");
@@ -343,15 +352,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Red chroma
     try {
-        camera->callVoid("setParam", kCameraRedChromaID,
+        camera->setParam(kCameraRedChromaID,
                          DEFAULT_CAMERA_REDCHROMA);
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set RedChroma");
     }
-    param = camera->call<int>("getParam", kCameraRedChromaID);
+    param = camera->getParam(kCameraRedChromaID);
     if (param != DEFAULT_CAMERA_REDCHROMA) {
         try {
-            camera->callVoid("setParam", kCameraRedChromaID,
+            camera->setParam(kCameraRedChromaID,
                              DEFAULT_CAMERA_REDCHROMA);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set RedChroma AGAIN");
@@ -359,15 +368,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Blue chroma
     try {
-        camera->callVoid("setParam", kCameraBlueChromaID,
+        camera->setParam(kCameraBlueChromaID,
                          DEFAULT_CAMERA_BLUECHROMA);
     } catch (ALError &e){
         log->error("ALImageTranscriber", "Couldn't set BlueChroma");
     }
-    param = camera->call<int>("getParam", kCameraBlueChromaID);
+    param = camera->getParam(kCameraBlueChromaID);
     if (param != DEFAULT_CAMERA_BLUECHROMA) {
         try {
-            camera->callVoid("setParam", kCameraBlueChromaID,
+            camera->setParam(kCameraBlueChromaID,
                              DEFAULT_CAMERA_BLUECHROMA);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set BlueChroma AGAIN");
@@ -375,15 +384,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Exposure length
     try {
-        camera->callVoid("setParam",kCameraExposureID,
+        camera->setParam(kCameraExposureID,
                          DEFAULT_CAMERA_EXPOSURE);
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Exposure");
     }
-    param = camera->call<int>("getParam", kCameraExposureID);
+    param = camera->getParam(kCameraExposureID);
     if (param != DEFAULT_CAMERA_EXPOSURE) {
         try {
-            camera->callVoid("setParam", kCameraExposureID,
+            camera->setParam(kCameraExposureID,
                              DEFAULT_CAMERA_EXPOSURE);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set Exposure AGAIN");
@@ -391,15 +400,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Gain
     try {
-        camera->callVoid("setParam",kCameraGainID,
+        camera->setParam(kCameraGainID,
                          DEFAULT_CAMERA_GAIN);
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Gain");
     }
-    param = camera->call<int>("getParam", kCameraGainID);
+    param = camera->getParam(kCameraGainID);
     if (param != DEFAULT_CAMERA_GAIN) {
         try {
-            camera->callVoid("setParam", kCameraGainID,
+            camera->setParam(kCameraGainID,
                              DEFAULT_CAMERA_GAIN);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set Gain AGAIN");
@@ -407,15 +416,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Saturation
     try {
-        camera->callVoid("setParam",kCameraSaturationID,
+        camera->setParam(kCameraSaturationID,
                          DEFAULT_CAMERA_SATURATION);
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Saturation");
     }
-    param = camera->call<int>("getParam", kCameraSaturationID);
+    param = camera->getParam(kCameraSaturationID);
     if (param != DEFAULT_CAMERA_SATURATION) {
         try {
-            camera->callVoid("setParam", kCameraSaturationID,
+            camera->setParam(kCameraSaturationID,
                              DEFAULT_CAMERA_SATURATION);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set Saturation AGAIN");
@@ -423,15 +432,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Hue
     try {
-        camera->callVoid("setParam",kCameraHueID,
+        camera->setParam(kCameraHueID,
                          DEFAULT_CAMERA_HUE);
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Hue");
     }
-    param = camera->call<int>("getParam", kCameraHueID);
+param = camera->getParam(kCameraHueID);
     if (param != DEFAULT_CAMERA_HUE) {
         try {
-            camera->callVoid("setParam", kCameraHueID,
+            camera->setParam(kCameraHueID,
                              DEFAULT_CAMERA_HUE);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set Hue AGAIN");
@@ -439,15 +448,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Lens correction X
     try {
-        camera->callVoid("setParam",kCameraLensXID,
+        camera->setParam(kCameraLensXID,
                          DEFAULT_CAMERA_LENSX);
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Lens Correction X");
     }
-    param = camera->call<int>("getParam", kCameraLensXID);
+    param = camera->getParam(kCameraLensXID);
     if (param != DEFAULT_CAMERA_LENSX) {
         try {
-            camera->callVoid("setParam", kCameraLensXID,
+            camera->setParam(kCameraLensXID,
                              DEFAULT_CAMERA_LENSX);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set Lens Correction X AGAIN");
@@ -455,15 +464,15 @@ void ALImageTranscriber::initCameraSettings(int whichCam)
     }
     // Lens correction Y
     try {
-        camera->callVoid("setParam",kCameraLensYID,
+        camera->setParam(kCameraLensYID,
                          DEFAULT_CAMERA_LENSY);
     } catch (ALError &e) {
         log->error("ALImageTranscriber", "Couldn't set Lens Correction Y");
     }
-    param = camera->call<int>("getParam", kCameraLensYID);
+    param = camera->getParam(kCameraLensYID);
     if (param != DEFAULT_CAMERA_LENSY) {
         try {
-            camera->callVoid("setParam", kCameraLensYID,
+            camera->setParam(kCameraLensYID,
                              DEFAULT_CAMERA_LENSY);
         } catch (ALError &e){
             log->error("ALImageTranscriber", "Couldn't set Lens Correction Y AGAIN");
@@ -519,8 +528,9 @@ void ALImageTranscriber::waitForImage ()
 
         // Attempt to retrieve the next image
         try {
-            ALimage = (ALImage*)
-                (camera->call<int>("getDirectRawImageLocal",lem_name));
+            ALimage =
+                reinterpret_cast<ALImage*>(
+                    camera->getDirectRawImageLocal( lem_name));
         }catch (ALError &e) {
             log->error("NaoMain",
                        "Could not call the getImageLocal method of the "
@@ -530,9 +540,13 @@ void ALImageTranscriber::waitForImage ()
 
 
         if (ALimage != NULL){
-
             sensors->lockImage();
+#ifdef CAN_SAVE_FRAMES
+            _copy_image(ALimage->getData(), naoImage);
+            _acquire_image_fast(table, &params, naoImage, image);
+#else
             _acquire_image_fast(table, &params, ALimage->getData(), image);
+#endif
             sensors->releaseImage();
 
         } else {
@@ -562,8 +576,7 @@ void ALImageTranscriber::waitForImage ()
 
         // Attempt to retrive the next image
         try {
-            ALimage = camera->call<ALValue>("getDirectRawImageRemote",
-                                            lem_name);
+            ALimage = camera->getDirectRawImageRemote(lem_name);
         }catch (ALError &e) {
             log->error("NaoMain",
                        "Could not call the getImageRemote method of the "
@@ -592,6 +605,9 @@ void ALImageTranscriber::waitForImage ()
             // Update Sensors image pointer
             sensors->lockImage();
             sensors->setImage(image);
+#ifdef CAN_SAVE_FRAMES
+            sensors->setNaoImage(naoImage);
+#endif
             sensors->releaseImage();
         }
 
@@ -609,7 +625,7 @@ void ALImageTranscriber::releaseImage(){
     //Now you have finished with the image, you have to release it in the V.I.M.
     try
         {
-            camera->call<int>( "releaseDirectRawImage", lem_name );
+            camera-> releaseDirectRawImage( lem_name );
         }catch( ALError& e)
         {
             log->error( "ALImageTranscriber",

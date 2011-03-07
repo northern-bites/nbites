@@ -7,7 +7,7 @@
 LOG_LOC = True
 
 ##### MODULE SWITCHES ####
-USE_VISION = True # Disable if you want faster processing
+USE_VISION = True # Disable for faster processing
 
 ##--------------------COM HEADER -------------#
 PACKET_HEADER = "ilikeyoulots"
@@ -32,7 +32,7 @@ teamColorDict = dict(zip(range(NUM_GAME_TEAM_COLORS),\
 ##
 ##--------------------VISION CONNECTION CONSTANTS------#
 ##
-IMAGE_SIZE = "VGA"
+IMAGE_SIZE = "QVGA"             # 320x240 is what gets processed by vision
 CAMERA_FPS = 15
 # image constants, used for angle x,y setters
 if IMAGE_SIZE == "VGA":

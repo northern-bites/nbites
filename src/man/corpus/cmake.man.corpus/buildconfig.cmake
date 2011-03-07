@@ -4,12 +4,6 @@
 ##  Build configurations for Corpus. ##
 #######################################
 
-# .:: General configurations for the Northern Bites Corpus cmake package :::::
-
-IF( NOT DEFINED ROBOT_TYPE )
-  SET( ROBOT_TYPE NAO_RL )
-ENDIF( NOT DEFINED ROBOT_TYPE )
-
 
 ############################ Configure Options
 # Definitions for the CMake configurable build options.  Defined here, they
@@ -50,3 +44,14 @@ OPTION(
     "Turn on/off debugging information for ALImageTranscriber"
     OFF
     )
+
+OPTION(
+    SAVE_ALL_FRAMES
+    "Turn on/off saving every frame in-game."
+    OFF
+    )
+OPTION(
+  CAN_SAVE_FRAMES
+  "Enable the ability to save or stream frames. Slower performance."
+  ON
+  )

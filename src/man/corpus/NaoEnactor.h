@@ -1,18 +1,20 @@
 #ifndef _NaoEnactor_h_DEFINED
 #define _NaoEnactor_h_DEFINED
 
-#include "dcmproxy.h"
-#include "almemoryproxy.h"
-#include "almemoryfastaccess.h"
-#include "MotionEnactor.h"
-#include "albroker.h"
-#include "alptr.h"
-#include "almemoryfastaccess.h"
-#include "Sensors.h"
-#include "NaoDef.h"
 #include <string>
-#include "Transcriber.h"
+
+#include "alcommon/albroker.h"
+#include "alcore/alptr.h"
+#include "almemoryfastaccess/almemoryfastaccess.h"
+#include "alproxies/almemoryproxy.h"
+#include "alproxies/dcmproxy.h"
+
 #include "Common.h"
+#include "MotionEnactor.h"
+#include "NaoDef.h"
+#include "Sensors.h"
+#include "Transcriber.h"
+
 
 class NaoEnactor : public MotionEnactor {
 

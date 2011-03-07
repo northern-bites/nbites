@@ -1,7 +1,7 @@
 #ifndef EdgeDetector_h_DEFINED
 #define EdgeDetector_h_DEFINED
 
-#include "cmake.vision/visionconfig.h"
+#include "visionconfig.h"
 #include "VisionDef.h"
 #include "Gradient.h"
 #include "Profiler.h"

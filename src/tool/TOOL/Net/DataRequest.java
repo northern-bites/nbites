@@ -72,7 +72,7 @@ public class DataRequest {
 		case INFO:         return true;
 		case JOINTS:       return true;
 		case SENSORS:      return true;
-		case IMAGE:        return false;
+		case IMAGE:        return true;
 		case THRESH:       return true;
 		case JPEG:         return false;
 		case OBJECTS:      return true;

@@ -84,8 +84,10 @@ Vision Constants that span multiple classes and systems.
 #  define FOV_X_DEG NAO_FOV_X_DEG
 #  define FOV_Y_DEG NAO_FOV_Y_DEG
 #  define Y_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE * 2 // uint16 values
+#  define UV_IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE * 2
 #  define COLOR_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE // Byte values
-#  define IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE + COLOR_IMAGE_BYTE_SIZE
+#  define IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE \
+    + COLOR_IMAGE_BYTE_SIZE
 
 #  define IMAGE_ROW_OFFSET NAO_IMAGE_ROW_OFFSET
 #  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
@@ -109,6 +111,8 @@ static const float RAD_TO_PIX_X = static_cast<float>(IMAGE_WIDTH) / static_cast<
  */
 
 // Image byte layout constants
+// @TODO: THESE ARE WRONG! The correct order is |Y|U|Y|V|,
+// color tables need fixing then, too
 #define UOFFSET  3
 #define VOFFSET  1
 #define YOFFSET1 0

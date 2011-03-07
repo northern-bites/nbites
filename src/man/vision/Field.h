@@ -6,9 +6,6 @@
 class Field;  // forward reference
 
 #include "Threshold.h"
-#ifndef NO_ZLIB
-#include "Zlib.h"
-#endif
 #include "Profiler.h"
 #include "NaoPose.h"
 

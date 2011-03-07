@@ -7,7 +7,7 @@
 #include "Gradient.h"
 #include "geom/HoughLine.h"
 #include "Profiler.h"
-#include "cmake.vision/visionconfig.h"
+#include "visionconfig.h"
 
 /**
  * The accumulator space and associated functions for performing

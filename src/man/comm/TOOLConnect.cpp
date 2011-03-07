@@ -177,8 +177,8 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     if (r.image) {
         sensors->lockImage();
         serial.write_bytes(
-            reinterpret_cast<const uint8_t*>(sensors->getImage()),
-            Y_IMAGE_BYTE_SIZE);
+            reinterpret_cast<const uint8_t*>(sensors->getNaoImage()),
+            NAO_IMAGE_BYTE_SIZE);
         sensors->releaseImage();
     }
 
