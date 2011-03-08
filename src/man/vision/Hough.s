@@ -2,6 +2,7 @@
 .intel_syntax noprefix
 
 .globl _mark_edges
+.globl _smooth_hough
 
 .section .data
 
@@ -231,3 +232,72 @@ radiiLoop:
 
         ret
 
+        ## Smooth the Hough space accumulator to reduce noisy peaks
+	## using an inplace 2x2 boxcar kernel:
+        ## |1 1|
+        ## |1 1|
+
+        ## _smooth_hough(int16_t *hs)
+_smooth_hough:
+        push    ebp
+        mov     ebp, esp
+
+        ## Load hough space pointer
+        mov     esi, [ebp + 8]
+
+        ## xLoop counter
+        mov     ecx, r_span
+	mov     edx, t_span
+
+        ## Smooths over the entire image
+smooth_yLoop:
+
+        ## First copy the first element to the end of the image
+        ## so it doesn't get overwritten by the smoothing, since t0 and t_span are
+        ## next to each other in the cylndrical Hough space
+        movzx   eax, word ptr[esi]
+
+        ## hs[t][r_span] = hs[t][0];
+	mov     word ptr[esi + (r_span) * bytes_per_bin], ax
+
+smooth_xLoop:
+        ## Load first row pixels
+        ## mm0 = |03|02|01|00|
+        movq    mm0, [esi]
+
+        ## Load second row pixels
+        ## mm1 = |13|12|11|10|
+        movq    mm1, [esi + (r_span+1)]
+
+        ## Sum
+        ## mm0 = |03+13|02+12|01+11|00+10|
+        paddw   mm0, mm1
+
+        ## Shuffle for next addition
+        ##          3     2     1     0
+        ## mm1 = |xxxxx|xxxxx|02+12|01+11|
+        pshufw  mm1, mm0, 0b00001001
+
+	## Add again
+        ## |xxx|xxx|01+02+11+12|00+01+10+11|
+        paddw   mm0, mm1
+
+        ## Write
+        movd [esi], mm0
+
+        ## Move along two hough bins
+        add     esi, bytes_per_bin * 2
+        ## xLoop counter
+        dec     ecx
+        jne     smooth_xLoop
+
+        ## yLoop counter
+        dec     edx
+        jge     smooth_yLoop
+
+        mov     esp, ebp
+        pop     ebp
+
+        emms
+
+        ret
