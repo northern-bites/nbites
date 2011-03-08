@@ -26,7 +26,7 @@ from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
 from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet,
-                       Play, TeamMember, Stability)
+                       Play, TeamMember, Stability, FieldLines)
 from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
@@ -132,9 +132,9 @@ class Brain(object):
 
         # Now we setup the corners
         self.corners = []
-        self.lines = self.vision.fieldLines.lines
+        self.fieldLines = FieldLines.FieldLines(self.vision.fieldLines)
         print "I initialized lines: "
-        print self.lines
+        print self.fieldLines
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
@@ -269,8 +269,8 @@ class Brain(object):
 
         self.time = time.time()
         # Now we get the latest list of lines
-        self.lines = self.vision.fieldLines.lines
-        print "Number of lines: " + str(self.vision.fieldLines.numLines)
+        self.fieldLines.updateVision(self.vision.fieldLines)
+        print self.fieldLines
         
 
     def updateComm(self):
