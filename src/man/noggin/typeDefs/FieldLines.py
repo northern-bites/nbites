@@ -1,4 +1,6 @@
-class FieldLines():
+# Contains Line and Corner information for Python classes.
+
+class FieldLines:
     """
     A Python class that contains all of the information from
     the corresponding PyFieldLines class in PyVision. 
@@ -15,6 +17,9 @@ class FieldLines():
         self.updateVision(visionInfos)
 
     def updateVision(self, visionInfos):
+        """
+        Update all of the info based on a PyVision fieldLines object
+        """
         self.numLines = visionInfos.numLines
         self.lines = visionInfos.lines
         self.numCorners =  visionInfos.numCorners
@@ -23,3 +28,4 @@ class FieldLines():
     def __str__(self): 
         """toString"""
         return "There are " + str(self.numLines) + " lines."
+

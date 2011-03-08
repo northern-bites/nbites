@@ -130,11 +130,9 @@ class Brain(object):
         self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
                                              Constants.VISION_YG_CROSSBAR)
 
-        # Now we setup the corners
-        self.corners = []
+        # LINES: list of lines is fieldLines.lines
+        # CORNERS: list of corners is fieldLines.corners
         self.fieldLines = FieldLines.FieldLines(self.vision.fieldLines)
-        print "I initialized lines: "
-        print self.fieldLines
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
@@ -264,13 +262,9 @@ class Brain(object):
         self.ygCrossbar.updateVision(self.vision.ygCrossbar)
         self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
-        # Update the corner information
-        self.corners = []
-
         self.time = time.time()
-        # Now we get the latest list of lines
+        # Now update the fieldLines
         self.fieldLines.updateVision(self.vision.fieldLines)
-        print self.fieldLines
         
 
     def updateComm(self):
