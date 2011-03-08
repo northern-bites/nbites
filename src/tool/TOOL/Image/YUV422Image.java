@@ -51,6 +51,7 @@ public class YUV422Image extends TOOLImage {
         readInputStream(input);
     }
 
+    // Number of bytes in the raw image
     public int rawImageSize() {
         return getWidth() * getHeight() * 2;
     }

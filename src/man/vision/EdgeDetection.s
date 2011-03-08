@@ -342,13 +342,15 @@ peaks_xLoop:
         #       ecx     count remaining in current row
         #               (x coordinate is offset from this value)
 
-        # Fetch y gradient, compute absolute value, save sign bit in edx
         prefetch [edi - xPitch]
+        prefetch [edi - xPitch - yPitch]
+        prefetch [edi - xPitch + yPitch]
+
+        # Fetch y gradient, compute absolute value, save sign bit in edx
         movsx   eax, word ptr [edi - xPitch + yGrad]
         cdq
         xor     eax, edx
         sub     eax, edx
-        prefetch [edi - xPitch + yPitch]
 
         # Fetch x gradient, compute absolute value, shift sign bit into edx
         movsx   ebx, word ptr [edi - xPitch + xGrad]
