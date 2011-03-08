@@ -265,6 +265,10 @@ class Brain(object):
         self.time = time.time()
         # Now update the fieldLines
         self.fieldLines.updateVision(self.vision.fieldLines)
+        print "There are " + str(self.fieldLines.numLines) + " lines:"
+        for line in self.fieldLines.lines:
+            thisline = FieldLines.Line(line)
+            print thisline
         
 
     def updateComm(self):
