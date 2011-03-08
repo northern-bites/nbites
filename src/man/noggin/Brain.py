@@ -132,7 +132,9 @@ class Brain(object):
 
         # Now we setup the corners
         self.corners = []
-        self.lines = []
+        self.lines = self.vision.fieldLines.lines
+        print "I initialized lines: "
+        print self.lines
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
@@ -267,7 +269,9 @@ class Brain(object):
 
         self.time = time.time()
         # Now we get the latest list of lines
-        self.lines = []
+        self.lines = self.vision.fieldLines.lines
+        print "Number of lines: " + str(self.vision.fieldLines.numLines)
+        
 
     def updateComm(self):
         temp = self.comm.latestComm()
