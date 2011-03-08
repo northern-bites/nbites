@@ -50,7 +50,9 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
 {
     PROF_ENTER(profiler, P_MARK_EDGES);
 #ifdef USE_MMX
-    _mark_edges(g->numPeaks, angleSpread, g->angles, &hs[0]);
+    if (g->numPeaks > 0){
+        _mark_edges(g->numPeaks, angleSpread, g->angles, &hs[0]);
+    }
 #else
     const int height = Gradient::rows;
     const int width  = Gradient::cols;

@@ -36,7 +36,7 @@ private:
     void findPeaks(boost::shared_ptr<Gradient> gradient);
 
     enum {
-        default_edge_value = 30
+        default_edge_value = 40
     };
 
 private:

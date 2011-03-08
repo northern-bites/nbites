@@ -27,6 +27,8 @@ public:
     void setEdgeThreshold(int thresh);
     void setHoughAcceptThreshold(int thresh);
 
+    Gradient getEdges() { return *gradient; }
+
 private:
     void findHoughLines(const uint16_t *img);
     void findFieldLines();

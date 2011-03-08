@@ -549,3 +549,16 @@ void Vision::drawFieldLines() {
         thresh->drawPoint(i->getX(), i->getY(), ORANGE);
     }
 }
+
+void Vision::drawEdges(Gradient g)
+{
+#ifdef OFFLINE
+    if (thresh->debugEdgeDetection){
+        for (int i=0; g.isPeak(i); ++i) {
+            drawDot(g.getAnglesXCoord(i),
+                    g.getAnglesYCoord(i),
+                    PINK);
+        }
+    }
+#endif
+}

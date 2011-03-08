@@ -97,7 +97,7 @@ public:
     virtual void drawDot(int x, int y, int c);
     virtual void drawCrossHairs(int x, int y, int c);
     virtual void drawFieldLines();
-
+    virtual void drawEdges(Gradient g);
 
     //
     // SETTERS
