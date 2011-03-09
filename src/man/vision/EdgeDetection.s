@@ -396,7 +396,7 @@ peaks_xLoop:
         cmp     si, word ptr[edi + ebp - xPitch]
         cmovb   si, word ptr[edi + ebp - xPitch]
         cmp     si, word ptr[edi - xPitch]
-        jb      peaks_xLoop
+        ja      peaks_xLoop     # If curpix.mag > max(neighbor1.mag, neighbor2.mag)
 
         # lookup reciprocal, U16.16
         movzx   eax, word ptr [recipTable + eax*2]
