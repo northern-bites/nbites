@@ -267,9 +267,7 @@ class Brain(object):
         self.fieldLines.updateVision(self.vision.fieldLines)
         print "There are " + str(self.fieldLines.numLines) + " lines:"
         for line in self.fieldLines.lines:
-            thisline = FieldLines.Line(line)
-            print thisline
-        
+            print line
 
     def updateComm(self):
         temp = self.comm.latestComm()
