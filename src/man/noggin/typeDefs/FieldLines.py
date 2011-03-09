@@ -27,7 +27,10 @@ class FieldLines:
         Update all of the info based on a PyVision fieldLines object
         """
         self.numLines = visionInfos.numLines
-        self.lines = visionInfos.lines
+        self.lines = []
+        for line in visionInfos.lines:
+            thisLine = Line(line)
+            self.lines.append(thisLine)
         self.numCorners =  visionInfos.numCorners
         self.corners = visionInfos.corners
 
@@ -51,7 +54,7 @@ class Line:
         self.y2 = 0
         self.slope = 0
         self.length = 0
-        self.update
+        self.update(visionLine)
 
     def update(self, visionLine):
         self.x1 = visionLine.x1
