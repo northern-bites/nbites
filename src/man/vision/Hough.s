@@ -31,6 +31,8 @@ end_of_stack:
         .equiv  t_span, 256
         .equiv  bytes_per_bin, 2 # hough space has uint16_t bins
 
+        .equiv  yPitch, r_span+1
+
         .data
 
         ## Calculated in Excel as ROUND( SIN(angle * PI/128) * 2^14)
@@ -176,7 +178,7 @@ gradientLoop:
 
         ## Calculate hough space address
         mov     eax, esi
-        imul    eax, (r_span + 1) * bytes_per_bin # width is r_span + 1, actually
+        imul    eax, (yPitch) * bytes_per_bin
         add     eax, dword ptr[ebp + hough_space]
 
         ## edi = min(r0,r1), ecx = max(r0, r1)
@@ -237,17 +239,17 @@ radiiLoop:
         ## |1 1|
         ## |1 1|
 
-        ## _smooth_hough(int16_t *hs)
+        ## _smooth_hough(uint16_t *hs)
 _smooth_hough:
         push    ebp
         mov     ebp, esp
 
-        ## Load hough space pointer
-        mov     esi, [ebp + 8]
+        push    esi
 
-        ## xLoop counter
-        mov     ecx, r_span
-	mov     edx, t_span
+        ## Load hough space pointer
+        mov     esi, dword ptr[ebp + 8]
+
+	mov     edx, t_span-1
 
         ## Smooths over the entire image
 smooth_yLoop:
@@ -255,19 +257,26 @@ smooth_yLoop:
         ## First copy the first element to the end of the image
         ## so it doesn't get overwritten by the smoothing, since t0 and t_span are
         ## next to each other in the cylndrical Hough space
-        movzx   eax, word ptr[esi]
 
         ## hs[t][r_span] = hs[t][0];
+        movzx   eax, word ptr[esi]
 	mov     word ptr[esi + (r_span) * bytes_per_bin], ax
+
+        ## hs[t+1][r_span] = hs[t+1][0];
+        movzx   eax, word ptr[esi + yPitch]
+	mov     word ptr[esi + yPitch + (r_span) * bytes_per_bin], ax
+
+        ## xLoop counter
+        mov     ecx, r_span
 
 smooth_xLoop:
         ## Load first row pixels
         ## mm0 = |03|02|01|00|
-        movq    mm0, [esi]
+        ## movq    mm0, [esi]
 
         ## Load second row pixels
         ## mm1 = |13|12|11|10|
-        movq    mm1, [esi + (r_span+1)]
+        ## movq    mm1, [esi + (r_span+1)]
 
         ## Sum
         ## mm0 = |03+13|02+12|01+11|00+10|
@@ -283,7 +292,7 @@ smooth_xLoop:
         paddw   mm0, mm1
 
         ## Write
-        movd [esi], mm0
+        ## movd [esi], mm0
 
         ## Move along two hough bins
         add     esi, bytes_per_bin * 2
@@ -291,9 +300,15 @@ smooth_xLoop:
         dec     ecx
         jne     smooth_xLoop
 
+        ## We need to increment past the last bin which is a repeat of
+	## the first column
+        add     esi, bytes_per_bin
+
         ## yLoop counter
         dec     edx
-        jge     smooth_yLoop
+        jne     smooth_yLoop
+
+        pop     esi
 
         mov     esp, ebp
         pop     ebp

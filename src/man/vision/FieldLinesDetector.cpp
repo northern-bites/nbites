@@ -31,7 +31,7 @@ void FieldLinesDetector::findHoughLines(const uint16_t *img)
 {
     gradient->reset();
     edges.detectEdges(img, gradient);
-    // houghLines = hough.findLines(gradient);
+    houghLines = hough.findLines(gradient);
 }
 
 /**

@@ -52,8 +52,10 @@ void HoughSpaceTest::test_hs()
 
     for (int r=0; r < HoughSpace::r_span; ++r){
         for (int t=0; t < HoughSpace::t_span; ++t){
-            GTE(hs.getHoughBin(r,t) , 0);
+            // GTE(hs.getHoughBin(r,t) , 0);
+            cout << hs.getHoughBin(r,t) << " ";
         }
+        cout << endl;
     }
     PASSED(MORE_THAN_ZERO);
 
@@ -62,8 +64,6 @@ void HoughSpaceTest::test_hs()
     GT(hs.getHoughBin(IMAGE_WIDTH * 1/4 + HoughSpace::r_span/2,0) , 0);
     PASSED(EDGE_AT_BOUND);
 
-#ifdef USE_MMX
-#else
     // Notice that it is t_span +1. This is the same as in the
     // Hough Space.
     int pre[HoughSpace::r_span][HoughSpace::t_span+1];
@@ -81,11 +81,10 @@ void HoughSpaceTest::test_hs()
     for (int r=0; r < HoughSpace::r_span-1; ++r){
         for (int t=0; t < HoughSpace::t_span; ++t){
             EQ_INT(hs.getHoughBin(r,t) , (pre[r][t]   + pre[r][t+1] +
-                                  pre[r+1][t] + pre[r+1][t+1]));
+                                          pre[r+1][t] + pre[r+1][t+1]));
         }
     }
     PASSED(SMOOTH_CORRECT);
-#endif
 }
 
 /**

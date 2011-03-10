@@ -61,7 +61,7 @@ private:       // Member variables
     // allocate an extra T for the smoothing neighborhood
 #ifdef USE_MMX
     // arranged opposite the non-asm version, rows are theta, cols are radius
-    uint16_t hs[r_span * (t_span + 1)];
+    uint16_t hs[(r_span+1) * t_span];
     // bool peak[r_span * t_span];
 #else
     int hs[r_span][t_span + 1];

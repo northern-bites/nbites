@@ -10,6 +10,7 @@ const int HoughSpace::dtTab[peak_points] = {  0,  1,  1,  1 };
 
 extern "C" void _mark_edges(int numPeaks, int angleSpread,
                             int16_t *peaks, uint16_t *houghSpace);
+extern "C" void _smooth_hough(uint16_t *hs);
 
 HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
     profiler(p),
@@ -30,13 +31,13 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
 
     markEdges(g);
 
-    smooth();
-    list<HoughLine> lines = peaks();
+    // smooth();
+    list<HoughLine> lines;//  = peaks();
 
-    int x0 = static_cast<int>(Gradient::cols/2);
-    int y0 = static_cast<int>(Gradient::rows/2);
+    // int x0 = static_cast<int>(Gradient::cols/2);
+    // int y0 = static_cast<int>(Gradient::rows/2);
 
-    suppress(x0, y0, lines);
+    // suppress(x0, y0, lines);
 
     PROF_EXIT(profiler, P_HOUGH);
     return lines;
@@ -119,7 +120,9 @@ int HoughSpace::getR(int x, int y, int t)
  */
 void HoughSpace::smooth()
 {
-#ifndef USE_MMX
+#ifdef USE_MMX
+    _smooth_hough(hs);
+#else
     PROF_ENTER(profiler, P_SMOOTH);
     // Make a copy of the row t=0 at t=t_span. t=0 and t=t_span-1 are
     // neighbors in the cylindrical Hough Space, but t=0 gets written
