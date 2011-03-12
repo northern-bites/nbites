@@ -31,7 +31,7 @@ end_of_stack:
         .equiv  t_span, 256
         .equiv  bytes_per_bin, 2 # hough space has uint16_t bins
 
-        .equiv  yPitch, (r_span+1) * bytes_per_bin
+        .equiv  yPitch, (r_span) * bytes_per_bin
 
         .data
 
