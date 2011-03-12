@@ -27,17 +27,16 @@ class FieldLines:
         Update all of the info based on a PyVision fieldLines object
         """
         self.numLines = visionInfos.numLines
-        self.lines = []
-        for line in visionInfos.lines:
-            thisLine = Line(line)
-            self.lines.append(thisLine)
+        self.lines = visionInfos.lines
         self.numCorners =  visionInfos.numCorners
         self.corners = visionInfos.corners
 
     def __str__(self): 
         """toString"""
-        return "There are " + str(self.numLines) + " lines."
+        return "# of Lines: " + str(self.numLines) + " # of Corners: " + str(self.numCorners)
 
+
+###Two unused classes, for now
 class Line:
     """
     class for one single line, contains:
