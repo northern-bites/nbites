@@ -31,7 +31,7 @@ end_of_stack:
         .equiv  t_span, 256
         .equiv  bytes_per_bin, 2 # hough space has uint16_t bins
 
-        .equiv  yPitch, r_span+1
+        .equiv  yPitch, (r_span+1) * bytes_per_bin
 
         .data
 
@@ -178,7 +178,7 @@ gradientLoop:
 
         ## Calculate hough space address
         mov     eax, esi
-        imul    eax, (yPitch) * bytes_per_bin
+        imul    eax, yPitch
         add     eax, dword ptr[ebp + hough_space]
 
         ## edi = min(r0,r1), ecx = max(r0, r1)
@@ -245,41 +245,65 @@ _smooth_hough:
         mov     ebp, esp
 
         push    esi
+        push    edi
 
         ## Load hough space pointer
         mov     esi, dword ptr[ebp + 8]
 
-	mov     edx, t_span-1
-
-        ## Smooths over the entire image
-smooth_yLoop:
+################### BEGIN FIRST ROW COPYING #####################
 
         ## First copy the first element to the end of the image
         ## so it doesn't get overwritten by the smoothing, since t0 and t_span are
         ## next to each other in the cylndrical Hough space
+        ## hs[0][*] is next to hs[t_span -1 ][*] in the Hough space
 
-        ## hs[t][r_span] = hs[t][0];
-        movzx   eax, word ptr[esi]
-	mov     word ptr[esi + (r_span) * bytes_per_bin], ax
+	## Copy esi to edi for initial copy loop
+        mov     edi, esi
 
-        ## hs[t+1][r_span] = hs[t+1][0];
-        movzx   eax, word ptr[esi + yPitch]
-	mov     word ptr[esi + yPitch + (r_span) * bytes_per_bin], ax
+        ## Move across r_span 8 bytes at a time
+        mov     ecx, -1 * r_span/8
+
+        ## @TODO: Macro and unroll
+copy_first_row:
+        ## Load 8 bytes from top row
+        movq    mm0, [edi]
+
+        ## Write to last row
+        movq    [edi + yPitch * t_span], mm0
+
+        add     edi, 8
+
+	## Loop control ##
+        inc     ecx
+        jne     copy_first_row
+
+################### END FIRST ROW COPYING #####################
+
+        .equiv  pixels_per_smooth, 2
+
+        ## Row count: from 0 -> t_span-1 (which loads values from t_span row)
+	mov     edx, t_span
+
+        ## Smooths over the entire image
+smooth_yLoop:
 
         ## xLoop counter
-        mov     ecx, r_span
+        mov     ecx, r_span / pixels_per_smooth
 
+        ## @TODO: Replace with shuffles, packs, or writing out three pixels simultaneously?
+        ## @TODO: Replace with one loop since we don't really need two loop controls
 smooth_xLoop:
         ## Load first row pixels
         ## mm0 = |03|02|01|00|
-        ## movq    mm0, [esi]
+        movq    mm0, [esi]
 
         ## Load second row pixels
         ## mm1 = |13|12|11|10|
-        ## movq    mm1, [esi + (r_span+1)]
+        movq    mm1, [esi + yPitch]
 
         ## Sum
         ## mm0 = |03+13|02+12|01+11|00+10|
+        ## @TODO: Replace with add from memory location?
         paddw   mm0, mm1
 
         ## Shuffle for next addition
@@ -292,22 +316,20 @@ smooth_xLoop:
         paddw   mm0, mm1
 
         ## Write
-        ## movd [esi], mm0
+        movd [esi], mm0
 
-        ## Move along two hough bins
-        add     esi, bytes_per_bin * 2
-        ## xLoop counter
+        ## Move ptr forward
+        add     esi, bytes_per_bin * pixels_per_smooth
+
+        ## Column count
         dec     ecx
         jne     smooth_xLoop
 
-        ## We need to increment past the last bin which is a repeat of
-	## the first column
-        add     esi, bytes_per_bin
-
-        ## yLoop counter
+        ## Row Count
         dec     edx
         jne     smooth_yLoop
 
+	pop     edi
         pop     esi
 
         mov     esp, ebp
