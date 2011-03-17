@@ -235,6 +235,18 @@ radiiLoop:
 
         ret
 
+
+
+
+.macro LOAD ptr, phase
+        movq    mm\phase, [\ptr + 8 * \phase]
+.endm
+
+.macro STORE_END ptr, phase
+        movq    [\ptr + yPitch * t_span + 8 * \phase], mm\phase
+.endm
+
+
         ## Smooth the Hough space accumulator to reduce noisy peaks
 	## using an inplace 2x2 boxcar kernel:
         ## |1 1|
@@ -261,21 +273,27 @@ _smooth_hough:
 	## Copy esi to edi for initial copy loop
         mov     edi, esi
 
-        ## Move across r_span 8 bytes at a time
         mov     ecx, r_span
 
-        ## @TODO: Macro and unroll
 copy_first_row:
-        ## Load 8 bytes from top row
-        movq    mm0, [edi]
+        ## Load from top row
+        LOAD    edi, 0
+        LOAD    edi, 1
+        LOAD    edi, 2
+        LOAD    edi, 3
+        LOAD    edi, 4
 
-        ## Write to last row
-        movq    [edi + yPitch * t_span], mm0
+        ## Store at the end of the image
+        STORE_END edi, 0
+        STORE_END edi, 1
+        STORE_END edi, 2
+        STORE_END edi, 3
+        STORE_END edi, 4
 
-        add     edi, 8
+        add     edi, 8 * 5      # 8 bytes per load, 8x
 
 	## Loop control ##
-        sub     ecx, 4
+        sub     ecx, 4 * 5      # 4 values with each load/store, 8x
         jne     copy_first_row
 
 ################### END FIRST ROW COPYING #####################
