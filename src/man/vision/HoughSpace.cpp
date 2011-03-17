@@ -153,6 +153,7 @@ list<HoughLine> HoughSpace::peaks()
     list<HoughLine> lines = list<HoughLine>();
     for (int r=0; r < r_span-1; ++r) {
         for (int t=0; t < t_span; ++t) {
+
             const int z = getHoughBin(r,t);
             if (z >= thresh){
                 bool shouldCreate = true;
@@ -240,7 +241,12 @@ void HoughSpace::suppress(int x0, int y0, list<HoughLine>& lines)
  */
 void HoughSpace::reset()
 {
-#ifndef USE_MMX
+#ifdef USE_MMX
+    // @TODO: Rewrite with MMX intrinsics or inline ASM
+    for (int i=0; i < r_span * (t_span+1); ++i) {
+        hs[i] = 0;
+    }
+#else
     for (int r=0; r < r_span; ++r) {
         for (int t=0; t < t_span; ++t) {
             peak[r][t] = false;
