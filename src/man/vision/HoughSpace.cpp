@@ -31,8 +31,8 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
 
     markEdges(g);
 
-    // smooth();
-    list<HoughLine> lines;//  = peaks();
+    smooth();
+    list<HoughLine> lines = peaks();
 
     // int x0 = static_cast<int>(Gradient::cols/2);
     // int y0 = static_cast<int>(Gradient::rows/2);
@@ -273,7 +273,7 @@ bool HoughSpace::isPeak(int r, int t)
 int HoughSpace::getHoughBin(int r, int t)
 {
 #ifdef USE_MMX
-    return static_cast<int>(hs[t * (r_span+1) + r]);
+    return static_cast<int>(hs[t * r_span + r]);
 #else
     return hs[r][t];
 #endif

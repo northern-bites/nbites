@@ -50,12 +50,10 @@ void HoughSpaceTest::test_hs()
     // Run the gradient through the Hough Space
     hs.markEdges(g);
 
-    for (int r=0; r < HoughSpace::r_span; ++r){
-        for (int t=0; t < HoughSpace::t_span; ++t){
-            // GTE(hs.getHoughBin(r,t) , 0);
-            cout << hs.getHoughBin(r,t) << " ";
+    for (int t=0; t < HoughSpace::t_span; ++t){
+        for (int r=0; r < HoughSpace::r_span; ++r){
+            GTE(hs.getHoughBin(r,t) , 0);
         }
-        cout << endl;
     }
     PASSED(MORE_THAN_ZERO);
 
@@ -66,22 +64,26 @@ void HoughSpaceTest::test_hs()
 
     // Notice that it is t_span +1. This is the same as in the
     // Hough Space.
-    int pre[HoughSpace::r_span][HoughSpace::t_span+1];
+    int pre[HoughSpace::t_span+1][HoughSpace::r_span];
     for (int r=0; r < HoughSpace::r_span; ++r){
-        for (int t=0; t < HoughSpace::t_span; ++t){
-            pre[r][t] = hs.getHoughBin(r,t);
+        for (int t=0; t < HoughSpace::t_span+1; ++t){
+            pre[t][r] = hs.getHoughBin(r,t);
         }
     }
 
-    for (int r=0; r < HoughSpace::r_span; ++r)
-        pre[r][HoughSpace::t_span] = pre[r][0];
+    for (int r=0; r < HoughSpace::r_span; ++r){
+        pre[HoughSpace::t_span][r] = pre[0][r];
+    }
 
     hs.smooth();
 
-    for (int r=0; r < HoughSpace::r_span-1; ++r){
-        for (int t=0; t < HoughSpace::t_span; ++t){
-            EQ_INT(hs.getHoughBin(r,t) , (pre[r][t]   + pre[r][t+1] +
-                                          pre[r+1][t] + pre[r+1][t+1]));
+    for (int t=0; t < HoughSpace::t_span; ++t){
+        for (int r=0; r < HoughSpace::r_span-1; ++r){
+
+            int preSum = (pre[t][r]   + pre[t+1][r] +
+                          pre[t][r+1] + pre[t+1][r+1]);
+            int smoothed = hs.getHoughBin(r,t);
+            EQ_INT( smoothed, preSum);
         }
     }
     PASSED(SMOOTH_CORRECT);
@@ -118,6 +120,10 @@ void HoughSpaceTest::test_lines()
 #endif
 
     list<HoughLine> lines = hs.findLines(g);
+
+    // We only want one line to be found in this fake image
+    EQ_INT(lines.size(), 1);
+
     list<HoughLine>::iterator l = lines.begin();
     float maxRadius = sqrtf(IMAGE_WIDTH * IMAGE_WIDTH +
                            IMAGE_HEIGHT * IMAGE_HEIGHT);
@@ -125,7 +131,6 @@ void HoughSpaceTest::test_lines()
     bool foundFixedLine = false;
 
     while (l != lines.end()){
-
         LTE(l->getRadius() , maxRadius); // Line must be in image
         GTE(l->getRadius(), -maxRadius); // in either direction
         GTE(l->getAngle() , 0);          // 0 <= Angle <= 2 * pi
@@ -142,7 +147,9 @@ void HoughSpaceTest::test_lines()
 
         l++;
     }
+    // We better have found that line
     TRUE(foundFixedLine);
+    PASSED(FOUND_FIXED_LINE);
 }
 
 void HoughSpaceTest::test_suppress()

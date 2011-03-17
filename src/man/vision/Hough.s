@@ -169,19 +169,20 @@ gradientLoop:
         movsx   edx, word ptr[edi + x_offset]
         movsx   eax, word ptr[edi + y_offset]
 
-        ## Get radius at current angle + 1
+        ## esi = theta; ecx = theta + 1
         mov     ecx, esi
         add     ecx, 1
 
+        ## Get radius at current angle + 1
         ## ebx = r0, edx = r1
         GET_R   edx, eax, ecx, edi
 
-        ## Calculate hough space address
-        mov     eax, esi
-        imul    eax, yPitch
+        ## Calculate hough space row address
+        imul    eax, esi, yPitch
         add     eax, dword ptr[ebp + hough_space]
 
-        ## edi = min(r0,r1), ecx = max(r0, r1)
+        ## ecx = max(r0, r1)
+        ## edi = min(r0,r1)
         cmp     edx, ebx
 
         ## If edx > ebx
@@ -197,14 +198,14 @@ gradientLoop:
         sub     ecx, edi
 
         ## Iterate from minR to maxR
-        ## for ( ; rDiff < 0; rDiff++)
+        ## for ( rDiff = (maxR - minR); rDiff >= 0; rDiff--)
 radiiLoop:
         # ti * r_span + ri * bytes_per_bin
         inc     word ptr[eax + edi * bytes_per_bin]
 
         ## radiiLoop
-        inc     edi             # Increment ri
-        dec     ecx             # Increment rDiff counter
+        inc     edi             # Increment column index
+        dec     ecx             # rDiff counter update
         jge     radiiLoop       # rDiff >= 0, means minR < ri <= maxR
 
         ## r0 = r1
@@ -255,13 +256,13 @@ _smooth_hough:
         ## First copy the first element to the end of the image
         ## so it doesn't get overwritten by the smoothing, since t0 and t_span are
         ## next to each other in the cylndrical Hough space
-        ## hs[0][*] is next to hs[t_span -1 ][*] in the Hough space
+        ## hs[0][*] is next to hs[t_span-1][*] in the Hough space
 
 	## Copy esi to edi for initial copy loop
         mov     edi, esi
 
         ## Move across r_span 8 bytes at a time
-        mov     ecx, -1 * r_span/8
+        mov     ecx, r_span
 
         ## @TODO: Macro and unroll
 copy_first_row:
@@ -274,7 +275,7 @@ copy_first_row:
         add     edi, 8
 
 	## Loop control ##
-        inc     ecx
+        sub     ecx, 4
         jne     copy_first_row
 
 ################### END FIRST ROW COPYING #####################
