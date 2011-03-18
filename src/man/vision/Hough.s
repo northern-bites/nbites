@@ -306,34 +306,28 @@ copy_first_row:
         .equiv  pixels_per_smooth, 2
 
         ## Row count: from 0 -> t_span-1 (which loads values from t_span row)
-	mov     edx, t_span
+	mov     ecx, t_span * r_span/ pixels_per_smooth
 
         ## Smooths over the entire image
+        ## @TODO: Replace with shuffles, packs, or writing out three pixels simultaneously?
 smooth_yLoop:
 
-        ## xLoop counter
-        mov     ecx, r_span / pixels_per_smooth
-
-        ## @TODO: Replace with shuffles, packs, or writing out three pixels simultaneously?
-        ## @TODO: Replace with one loop since we don't really need two loop controls
-smooth_xLoop:
         ## Load first row pixels
         ## mm0 = |03|02|01|00|
         movq    mm0, [esi]
 
-        ## Load second row pixels
-        ## mm1 = |13|12|11|10|
-        movq    mm1, [esi + yPitch]
-
         ## Sum
+        ## Add second row pixels
+        ## 2nd row = |13|12|11|10|
+
+        ## After addition:
         ## mm0 = |03+13|02+12|01+11|00+10|
-        ## @TODO: Replace with add from memory location?
-        paddw   mm0, mm1
+        paddw   mm0, [esi + yPitch]
 
         ## Shuffle for next addition
         ##          3     2     1     0
         ## mm1 = |xxxxx|xxxxx|02+12|01+11|
-        pshufw  mm1, mm0, 0b00001001
+        pshufw  mm1, mm0, 0b00111001
 
 	## Add again
         ## |xxx|xxx|01+02+11+12|00+01+10+11|
@@ -345,12 +339,8 @@ smooth_xLoop:
         ## Move ptr forward
         add     esi, bytes_per_bin * pixels_per_smooth
 
-        ## Column count
-        dec     ecx
-        jne     smooth_xLoop
-
         ## Row Count
-        dec     edx
+        dec     ecx
         jne     smooth_yLoop
 
 	pop     edi
