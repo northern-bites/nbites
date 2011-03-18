@@ -251,6 +251,28 @@ radiiLoop:
         movq    [\ptr + yPitch * t_span + 8 * \phase], mm\phase
 .endm
 
+.macro BOXCAR ptr, reg0, reg1
+        ## Load first row pixels
+        ## \reg0 = |03|02|01|00|
+        movq    \reg0, [\ptr]
+
+        ## Sum
+        ## Add second row pixels
+        ## 2nd row = |13|12|11|10|
+
+        ## After addition:
+        ## \reg0 = |03+13|02+12|01+11|00+10|
+        paddw   \reg0, [\ptr + yPitch]
+
+        ## Shuffle for next addition
+        ##          3     2     1     0
+        ## \reg1 = |xxxxx|xxxxx|02+12|01+11|
+        pshufw  \reg1, \reg0, 0b00111001
+
+	## Add again
+        ## |xxx|xxx|01+02+11+12|00+01+10+11|
+        paddw   \reg0, \reg1
+ .endm
 
         ## Smooth the Hough space accumulator to reduce noisy peaks
 	## using an inplace 2x2 boxcar kernel:
@@ -303,45 +325,28 @@ copy_first_row:
 
 ################### END FIRST ROW COPYING #####################
 
-        .equiv  pixels_per_smooth, 2
+        .equiv  pixels_per_smooth, 4
 
         ## Row count: from 0 -> t_span-1 (which loads values from t_span row)
 	mov     ecx, t_span * r_span/ pixels_per_smooth
 
         ## Smooths over the entire image
         ## @TODO: Replace with shuffles, packs, or writing out three pixels simultaneously?
-smooth_yLoop:
+smoothLoop:
+        BOXCAR esi, mm0, mm1
+        BOXCAR esi + 4, mm2, mm3
 
-        ## Load first row pixels
-        ## mm0 = |03|02|01|00|
-        movq    mm0, [esi]
-
-        ## Sum
-        ## Add second row pixels
-        ## 2nd row = |13|12|11|10|
-
-        ## After addition:
-        ## mm0 = |03+13|02+12|01+11|00+10|
-        paddw   mm0, [esi + yPitch]
-
-        ## Shuffle for next addition
-        ##          3     2     1     0
-        ## mm1 = |xxxxx|xxxxx|02+12|01+11|
-        pshufw  mm1, mm0, 0b00111001
-
-	## Add again
-        ## |xxx|xxx|01+02+11+12|00+01+10+11|
-        paddw   mm0, mm1
+        punpckldq mm0, mm2
 
         ## Write
-        movd [esi], mm0
+        movntq [esi], mm0
 
         ## Move ptr forward
         add     esi, bytes_per_bin * pixels_per_smooth
 
         ## Row Count
         dec     ecx
-        jne     smooth_yLoop
+        jne     smoothLoop
 
 	pop     edi
         pop     esi
