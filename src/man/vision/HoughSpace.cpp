@@ -10,7 +10,7 @@ const int HoughSpace::dtTab[peak_points] = {  0,  1,  1,  1 };
 
 extern "C" void _mark_edges(int numPeaks, int angleSpread,
                             int16_t *peaks, uint16_t *houghSpace);
-extern "C" void _smooth_hough(uint16_t *hs);
+extern "C" void _smooth_hough(uint16_t *hs, uint32_t threshold);
 
 HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
     profiler(p),
@@ -126,7 +126,7 @@ void HoughSpace::smooth()
     PROF_ENTER(profiler, P_SMOOTH);
 
 #ifdef USE_MMX
-    _smooth_hough(hs);
+    _smooth_hough(hs, acceptThreshold);
 #else
 
     // Make a copy of the row t=0 at t=t_span. t=0 and t=t_span-1 are
@@ -154,7 +154,6 @@ void HoughSpace::smooth()
 void HoughSpace::peaks()
 {
     PROF_ENTER(profiler, P_HOUGH_PEAKS);
-    int thresh = 4 * acceptThreshold; // smoothing has a gain of 4
 
     numPeaks = 0;
 
@@ -162,7 +161,7 @@ void HoughSpace::peaks()
         for (int t=0; t < t_span; ++t) {
 
             const int z = getHoughBin(r,t);
-            if (z >= thresh){
+            if (z >= 0){
 
                 bool shouldCreate = true;
 

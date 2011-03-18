@@ -81,8 +81,12 @@ void HoughSpaceTest::test_hs()
         for (int r=0; r < HoughSpace::r_span-1; ++r){
 
             int preSum = (pre[t][r]   + pre[t+1][r] +
-                          pre[t][r+1] + pre[t+1][r+1]);
+                          pre[t][r+1] + pre[t+1][r+1]) -
+                hs.getAcceptThreshold()*4;
+
+            preSum = max(preSum, 0);
             int smoothed = hs.getHoughBin(r,t);
+
             EQ_INT( smoothed, preSum);
         }
     }

@@ -279,7 +279,7 @@ radiiLoop:
         ## |1 1|
         ## |1 1|
 
-        ## _smooth_hough(uint16_t *hs)
+        ## _smooth_hough(uint16_t *hs, uint32_t threshold)
 _smooth_hough:
         push    ebp
         mov     ebp, esp
@@ -289,6 +289,13 @@ _smooth_hough:
 
         ## Load hough space pointer
         mov     esi, dword ptr[ebp + 8]
+
+        ## Load peak threshold
+        pinsrw  mm7, [ebp + 12], 0b00
+        pshufw  mm7, mm7, 0b00000000
+
+        ## Multiply threshold by 4 since the space is smoothed (sum of 4 values)
+        psllw   mm7, 2
 
 ################### BEGIN FIRST ROW COPYING #####################
 
@@ -325,18 +332,22 @@ copy_first_row:
 
 ################### END FIRST ROW COPYING #####################
 
+        ## r_span * t_span must be a multiple of 4!
         .equiv  pixels_per_smooth, 4
 
         ## Row count: from 0 -> t_span-1 (which loads values from t_span row)
 	mov     ecx, t_span * r_span/ pixels_per_smooth
 
         ## Smooths over the entire image
-        ## @TODO: Replace with shuffles, packs, or writing out three pixels simultaneously?
 smoothLoop:
         BOXCAR esi, mm0, mm1
         BOXCAR esi + 4, mm2, mm3
 
+        ## Unpack the 2 sums in each lower double word into one register
         punpckldq mm0, mm2
+
+        # subtract threshold (mm7), force to 0 if below threshold
+        psubusw mm0, mm7
 
         ## Write
         movntq [esi], mm0
