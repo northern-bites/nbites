@@ -58,14 +58,11 @@ void loadFrame(string path, Frame& frame)
     // worry about deleting it
     fin.read((char*)frame.image, 320 * 240 * 2);
 
-    // Translate the loaded image into the proper format.
-    // @TODO: Convert images to new format.
-    float v;
-    int version;
-    string space;
-    fin >> version;
+
+    fin >> frame.version;
 
     vector<float> vba;
+    float v;
 
     // Read in the body angles
     for (unsigned int i = 0; i < NUM_ACTUATORS; ++i) {
