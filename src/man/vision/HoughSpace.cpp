@@ -15,7 +15,8 @@ extern "C" void _smooth_hough(uint16_t *hs);
 HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
     profiler(p),
     acceptThreshold(default_accept_thresh),
-    angleSpread(default_angle_spread)
+    angleSpread(default_angle_spread),
+    numPeaks(0)
 {
 
 }
@@ -30,14 +31,16 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
     reset();
 
     markEdges(g);
-
     smooth();
-    list<HoughLine> lines = peaks();
+    peaks();
 
-    // int x0 = static_cast<int>(Gradient::cols/2);
-    // int y0 = static_cast<int>(Gradient::rows/2);
+    list<HoughLine> lines;
+    createLinesFromPeaks(lines);
 
-    // suppress(x0, y0, lines);
+    int x0 = static_cast<int>(Gradient::cols/2);
+    int y0 = static_cast<int>(Gradient::rows/2);
+
+    suppress(x0, y0, lines);
 
     PROF_EXIT(profiler, P_HOUGH);
     return lines;
@@ -120,10 +123,12 @@ int HoughSpace::getR(int x, int y, int t)
  */
 void HoughSpace::smooth()
 {
+    PROF_ENTER(profiler, P_SMOOTH);
+
 #ifdef USE_MMX
     _smooth_hough(hs);
 #else
-    PROF_ENTER(profiler, P_SMOOTH);
+
     // Make a copy of the row t=0 at t=t_span. t=0 and t=t_span-1 are
     // neighbors in the cylindrical Hough Space, but t=0 gets written
     // over before T=t_span - 1 is smoothed so we copy it now.
@@ -138,25 +143,29 @@ void HoughSpace::smooth()
                 hs[r][t + 1] + hs[r + 1][t + 1];
         }
     }
-    PROF_EXIT(profiler, P_SMOOTH);
 #endif
+
+    PROF_EXIT(profiler, P_SMOOTH);
 }
 
 /**
  * Find the peaks of the accumulator and create the list of lines in the space.
  */
-list<HoughLine> HoughSpace::peaks()
+void HoughSpace::peaks()
 {
     PROF_ENTER(profiler, P_HOUGH_PEAKS);
     int thresh = 4 * acceptThreshold; // smoothing has a gain of 4
 
-    list<HoughLine> lines = list<HoughLine>();
+    numPeaks = 0;
+
     for (int r=0; r < r_span-1; ++r) {
         for (int t=0; t < t_span; ++t) {
 
             const int z = getHoughBin(r,t);
             if (z >= thresh){
+
                 bool shouldCreate = true;
+
                 for (int i=0; shouldCreate && i < peak_points; ++i) {
 
                     if ( ! ( z >  getHoughBin(r + drTab[i],
@@ -166,18 +175,31 @@ list<HoughLine> HoughSpace::peaks()
                         shouldCreate = false;
                     }
                 }
-                peak[r][t] = shouldCreate;
+
                 if (shouldCreate){
-                    HoughLine line = createLine(r,t,z);
-                    lines.push_back(line);
+                    addPeak(numPeaks, r, t, z);
                 }
             }
         }
     }
+
     PROF_EXIT(profiler, P_HOUGH_PEAKS);
-    return lines;
 }
 
+/**
+ * Using the list of peaks found in the Hough Transform, create line objects
+ *
+ * @param lines List to be filled with lines
+ */
+void HoughSpace::createLinesFromPeaks(list<HoughLine>& lines)
+{
+    for (int i=0; i <= numPeaks; ++i){
+        HoughLine line = createLine(getPeakR(i),
+                                    getPeakT(i),
+                                    getPeakZ(i) );
+        lines.push_back(line);
+    }
+}
 /**
  * Combine/remove duplicate lines and lines which are not right.
  */
@@ -235,7 +257,6 @@ void HoughSpace::suppress(int x0, int y0, list<HoughLine>& lines)
     PROF_EXIT(profiler, P_SUPPRESS);
 }
 
-
 /**
  * Reset the accumulator and peak arrays to their initial values.
  */
@@ -249,7 +270,6 @@ void HoughSpace::reset()
 #else
     for (int r=0; r < r_span; ++r) {
         for (int t=0; t < t_span; ++t) {
-            peak[r][t] = false;
             hs[r][t] = 0;
         }
     }
