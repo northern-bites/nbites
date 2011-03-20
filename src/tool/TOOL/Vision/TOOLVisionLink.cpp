@@ -155,7 +155,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     vision.notifyImage(newImg);
 
     long processTime = micro_time() - startTime;
-    vision.drawBoxes();
+    // vision.drawBoxes();
     env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
     //copy results from vision thresholded to the array passed in from java
