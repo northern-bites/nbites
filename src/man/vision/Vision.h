@@ -98,6 +98,7 @@ public:
     virtual void drawCrossHairs(int x, int y, int c);
     virtual void drawFieldLines();
     virtual void drawEdges(Gradient g);
+    virtual void drawHoughLines(const std::list<HoughLine>& lines);
 
     //
     // SETTERS

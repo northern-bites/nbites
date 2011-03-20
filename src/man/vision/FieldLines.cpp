@@ -128,7 +128,7 @@ FieldLines::FieldLines(Vision *visPtr, shared_ptr<NaoPose> posePtr,
     debugRiskyCorners = false;
     debugCornerAndObjectDistances = false;
     debugFitUnusedPoints = false;
-    standardView = true;
+    standardView = false;
 #endif
 
     // Makes setprecision dictate number of decimal places
@@ -319,8 +319,11 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points)
                             }
 
                             points.push_back(point);
-                            vision->thresh->drawPoint(point.x, point.y,
-                                                      UNUSED_VERT_POINT_COLOR);
+                            if (debugVertEdgeDetect){
+                                vision->thresh->
+                                    drawPoint(point.x, point.y,
+                                              UNUSED_VERT_POINT_COLOR);
+                            }
                         }
 
                         resetLineCounters(numWhite, numUndefined, numNonWhite);
@@ -520,8 +523,11 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
                                         linePointX,y);
                             }
 
-                            vision->thresh->drawPoint(point.x, point.y,
-                                                      UNUSED_HOR_POINT_COLOR);
+                            if (debugHorEdgeDetect){
+                                vision->thresh->
+                                    drawPoint(point.x, point.y,
+                                              UNUSED_HOR_POINT_COLOR);
+                            }
                             points.push_back(point);
                         }
                         else {
@@ -567,7 +573,9 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
                     // We missed the last line. Start anew from this point
                     else if (isSecondFarUphillEdge(greenWhiteX, y, x, y,
                                                    HORIZONTAL)) {
-                        vision->thresh->drawPoint(x, y, YELLOW);
+                        if (debugHorEdgeDetect){
+                            vision->thresh->drawPoint(x, y, YELLOW);
+                        }
                         resetLineCounters(numWhite, numUndefined, numNonWhite);
                         greenWhiteX = x;
                     }
@@ -823,7 +831,6 @@ void FieldLines::createLines(list <linePoint> &linePoints)
                      << " line points.\n";
             }
 
-            drawLinePoints(legitimateLinePoints);
             aLine->setColor(static_cast<int>(lines.size()) + BLUEGREEN);
             lines.push_back(aLine);
 
@@ -839,6 +846,7 @@ void FieldLines::createLines(list <linePoint> &linePoints)
             if (debugCreateLines) {
                 // Draw a bounding box around the line points we put into the
                 // line
+                drawLinePoints(legitimateLinePoints);
                 drawSurroundingBox(aLine, CYAN);
                 drawFieldLine(aLine, aLine->getColor());
             }
@@ -1262,26 +1270,28 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                     cout << "Fit point " << *j << " to line " << **i << endl;
                 foundAdditionalPoints = true;
                 additionalPoints.push_back(*j);
-                if (j->foundWithScan == VERTICAL) {
-                    // Standard users do not care about how the point was fit to
-                    // the line
-                    if (standardView) {
-                        vision->thresh->drawPoint(j->x, j->y,
-                                                  USED_VERT_POINT_COLOR);
+                if (debugFitUnusedPoints){
+                    if (j->foundWithScan == VERTICAL) {
+                        // Standard users do not care about how the
+                        // point was fit to the line
+                        if (standardView) {
+                            vision->thresh->drawPoint(j->x, j->y,
+                                                      USED_VERT_POINT_COLOR);
+                        }
+                        else {
+                            vision->thresh->drawPoint(j->x, j->y,
+                                                      FIT_VERT_POINT_COLOR);
+                        }
                     }
                     else {
-                        vision->thresh->drawPoint(j->x, j->y,
-                                                  FIT_VERT_POINT_COLOR);
-                    }
-                }
-                else {
-                    if (standardView) {
-                        vision->thresh->drawPoint(j->x, j->y,
-                                                  USED_HOR_POINT_COLOR);
-                    }
-                    else {
-                        vision->thresh->drawPoint(j->x, j->y,
-                                                  FIT_HOR_POINT_COLOR);
+                        if (standardView) {
+                            vision->thresh->drawPoint(j->x, j->y,
+                                                      USED_HOR_POINT_COLOR);
+                        }
+                        else {
+                            vision->thresh->drawPoint(j->x, j->y,
+                                                      FIT_HOR_POINT_COLOR);
+                        }
                     }
                 }
                 j = remainingPoints.erase(j);
@@ -1358,23 +1368,27 @@ void FieldLines::setLineCoordinates(shared_ptr<VisualLine> aLine)
 
 void FieldLines::drawLinePoints(const list<linePointNode> &toDraw) const
 {
-    for (list<linePointNode>::const_iterator i = toDraw.begin();
-         i != toDraw.end(); ++i) {
-        if ((*i)->foundWithScan == VERTICAL)
-            drawLinePoint(**i, BLACK);
-        else
-            drawLinePoint(**i, RED);
+    if (debugCreateLines){
+        for (list<linePointNode>::const_iterator i = toDraw.begin();
+             i != toDraw.end(); ++i) {
+            if ((*i)->foundWithScan == VERTICAL)
+                drawLinePoint(**i, BLACK);
+            else
+                drawLinePoint(**i, RED);
+        }
     }
 }
 
 void FieldLines::drawLinePoints(const list<linePoint> &toDraw) const
 {
-    for (list<linePoint>::const_iterator i = toDraw.begin();
-         i != toDraw.end(); ++i) {
-        if (i->foundWithScan == VERTICAL)
-            drawLinePoint(*i, BLACK);
-        else
-            drawLinePoint(*i, RED);
+    if (debugCreateLines){
+        for (list<linePoint>::const_iterator i = toDraw.begin();
+             i != toDraw.end(); ++i) {
+            if (i->foundWithScan == VERTICAL)
+                drawLinePoint(*i, BLACK);
+            else
+                drawLinePoint(*i, RED);
+        }
     }
 }
 
@@ -1527,12 +1541,12 @@ void FieldLines::extendLineVertScan(ExtendDirection _testDir,
 
             if (debugExtendLines) {
                 cout << "\tAdding point " << newPoint << endl;
-            }
 
-            if (standardView) {
-                vision->thresh->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
-            } else {
-                vision->thresh->drawPoint(newPoint.x, newPoint.y, YELLOW);
+                if (standardView) {
+                    vision->thresh->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
+                } else {
+                    vision->thresh->drawPoint(newPoint.x, newPoint.y, YELLOW);
+                }
             }
 
             foundLinePoints->push_back(newPoint);
@@ -1637,12 +1651,12 @@ void FieldLines::extendLineHorizScan(ExtendDirection _testDir,
 
             if (debugExtendLines) {
                 cout << "\tAdding point " << newPoint << endl;
-            }
 
-            if (standardView) {
-                vision->thresh->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
-            } else {
-                vision->thresh->drawPoint(newPoint.x, newPoint.y, YELLOW);
+                if (standardView) {
+                    vision->thresh->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
+                } else {
+                    vision->thresh->drawPoint(newPoint.x, newPoint.y, YELLOW);
+                }
             }
 
             foundLinePoints->push_back(newPoint);
@@ -2003,7 +2017,7 @@ list< VisualCorner > FieldLines::intersectLines()
     // duplicates, if any.
     int numDupes = 0;
 
-    if (standardView) {
+    if (standardView && debugIntersectLines) {
         for (vector < shared_ptr<VisualLine> >::iterator i = linesList.begin();
              i != linesList.end();
              ++i) {
@@ -2050,8 +2064,10 @@ list< VisualCorner > FieldLines::intersectLines()
                     vision->thresh->context->setGoalBoxLines();
                 }
             }
-            vision->thresh->drawPoint(intersection.x, intersection.y,
-                                      TENTATIVE_INTERSECTION_POINT_COLOR);
+            if (debugIntersectLines){
+                vision->thresh->drawPoint(intersection.x, intersection.y,
+                                          TENTATIVE_INTERSECTION_POINT_COLOR);
+            }
 
             bool isCCIntersection = false, isDupe = false;;
 
@@ -2140,9 +2156,10 @@ list< VisualCorner > FieldLines::intersectLines()
                              << numDupes
                              << " duplicate intersections; max allowed is "
                              << MAX_NUM_DUPES << endl;
-                    }
+
                     vision->thresh->drawPoint(intersection.x, intersection.y,
                                       INVALIDATED_INTERSECTION_POINT_COLOR);
+                    }
                     // at this point, we are by a center and so we discard all
                     // corners after recoloring them so we can tell they are
                     // illegitimate
@@ -2160,12 +2177,14 @@ list< VisualCorner > FieldLines::intersectLines()
             ++numChecksPassed;
 
             // Make sure the intersection point stands out, even against balls
-            vision->thresh->drawPoint(intersection.x - 1, intersection.y, BLACK);
-            vision->thresh->drawPoint(intersection.x + 1, intersection.y, BLACK);
-            vision->thresh->drawPoint(intersection.x, intersection.y + 1, BLACK);
-            vision->thresh->drawPoint(intersection.x, intersection.y - 1, BLACK);
-            vision->thresh->drawPoint(intersection.x, intersection.y,
-                                      LEGIT_INTERSECTION_POINT_COLOR);
+            if (debugIntersectLines){
+                vision->thresh->drawPoint(intersection.x - 1, intersection.y, BLACK);
+                vision->thresh->drawPoint(intersection.x + 1, intersection.y, BLACK);
+                vision->thresh->drawPoint(intersection.x, intersection.y + 1, BLACK);
+                vision->thresh->drawPoint(intersection.x, intersection.y - 1, BLACK);
+                vision->thresh->drawPoint(intersection.x, intersection.y,
+                                          LEGIT_INTERSECTION_POINT_COLOR);
+            }
             // assign x, y, dist, bearing, line i, line j, t value for line i,
             // t value for line 2
             VisualCorner c(intersection.x, intersection.y, intersectDist, intersectBearing,

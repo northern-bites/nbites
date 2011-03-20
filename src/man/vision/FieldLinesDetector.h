@@ -28,6 +28,7 @@ public:
     void setHoughAcceptThreshold(int thresh);
 
     Gradient getEdges() { return *gradient; }
+    std::list<HoughLine> getHoughLines() { return houghLines; }
 
 private:
     void findHoughLines(const uint16_t *img);

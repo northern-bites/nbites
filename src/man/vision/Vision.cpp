@@ -135,6 +135,7 @@ void Vision::notifyImage() {
     linesDetector.detect(yImg);
 
     drawEdges(linesDetector.getEdges());
+    drawHoughLines(linesDetector.getHoughLines());
     PROF_EXIT(profiler, P_VISION);
 }
 
@@ -560,6 +561,36 @@ void Vision::drawEdges(Gradient g)
             drawDot(g.getAnglesXCoord(i),
                     g.getAnglesYCoord(i),
                     PINK);
+        }
+    }
+#endif
+}
+
+void Vision::drawHoughLines(const list<HoughLine>& lines)
+{
+#ifdef OFFLINE
+    if (thresh->debugHoughTransform){
+        list<HoughLine>::const_iterator line = lines.begin();
+
+        while (line != lines.end()){
+            for (double u = -200.; u <= 200.; u+=1.){
+
+                double sn = sin(line->getAngle());
+                double cs = cos(line->getAngle());
+
+                double x0 = line->getRadius() * cs;
+                double y0 = line->getRadius() * sn;
+
+                int x = (int)round(x0 + u * sn) + IMAGE_WIDTH  / 2;
+                int y = -(int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
+
+                if (0 <= x && x < IMAGE_WIDTH &&
+                    0 <= y && y < IMAGE_HEIGHT){
+
+                    drawDot(x,y, BLUE);
+                }
+            }
+            line++;
         }
     }
 #endif

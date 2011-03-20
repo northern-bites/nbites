@@ -24,7 +24,12 @@ public:
 private:
     void test_hs();
     void test_lines();
+    void test_for_line(uint8_t angle, float radius);
     void test_suppress();
+
+    void setupGradient(Gradient& g);
+    void createLineAtPoint(Gradient& g, uint8_t angle, float radius);
+    bool isDesiredLine(float goalR, float goalT, const HoughLine& line);
 
     // Member variables
 private:

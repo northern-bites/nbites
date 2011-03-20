@@ -46,22 +46,18 @@ private:                        // Member functions
 
     void reset();
 
-    void addPeak(int numPeaks, int r, int t, int z){
-        peak[numPeaks * 2]     = static_cast<uint16_t>(r);
-        peak[numPeaks * 2 + 1] = static_cast<uint16_t>(t);
-        peak[numPeaks * 2 + 2] = static_cast<uint16_t>(z);
-        numPeaks++;
-    }
+    inline void addPeak(int r, int t, int z);
 
-    int getPeakR(int i) { return peak[numPeaks * 2 + r_peak_offset]; }
-    int getPeakT(int i) { return peak[numPeaks * 2 + t_peak_offset]; }
-    int getPeakZ(int i) { return peak[numPeaks * 2 + z_peak_offset]; }
+    inline int getPeakR(int i) { return peak[i * peak_values + r_peak_offset]; }
+    inline int getPeakT(int i) { return peak[i * peak_values + t_peak_offset]; }
+    inline int getPeakZ(int i) { return peak[i * peak_values + z_peak_offset]; }
 
 private:       // Member variables
     // Hough Space size parameters
     // 256 for full 8 bit angle, radius is for 320x240 image
     enum { r_span = 400,
            t_span = 256,
+           hs_size = r_span * (t_span+1),
            default_accept_thresh = 43,
            default_angle_spread  = 5,
            peak_points = 4 };
@@ -76,14 +72,11 @@ private:       // Member variables
     int acceptThreshold, angleSpread, numPeaks;
 
     // allocate an extra T for the smoothing neighborhood
+    // aka t(0) is next to t(t_span-1)
 #ifdef USE_MMX
-
-    // arranged opposite the non-asm version
-    // Index is hs[theta][radius]
-    uint16_t hs[r_span * (t_span+1)];
-
+    uint16_t hs[hs_size];
 #else
-    int hs[r_span][t_span + 1];
+    uint16_t hs[t_span + 1][r_span];
 #endif
     uint16_t peak[hough_max_peaks*peak_values];
 

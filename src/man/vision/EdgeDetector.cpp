@@ -151,13 +151,10 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
                                                j + Gradient::dxTab[a]) &&
                     z >= gradient->getMagnitude(i - Gradient::dyTab[a],
                                                 j - Gradient::dxTab[a])){
-                    gradient->peaks[i][j] = true;
+                    gradient->addAngle(Gradient::dir(y,x),
+                                       j,
+                                       i);
                 }
-            }
-            if (!gradient->peaks[i][j]){
-                gradient->setX(0,i,j);
-                gradient->setY(0,i,j);
-                gradient->setMagnitude(0,i,j);
             }
         }
     }

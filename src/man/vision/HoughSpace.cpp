@@ -58,22 +58,16 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
         _mark_edges(g->numPeaks, angleSpread, g->angles, &hs[0]);
     }
 #else
-    const int height = Gradient::rows;
-    const int width  = Gradient::cols;
-    const int x0     = width/2;
-    const int y0     = height/2;
+    int x0 = Gradient::cols/2;
+    int y0  = Gradient::rows/2;
 
     // See comment in FindPeaks re: why this is shrunk in by 2
     // rows/columns on each side
-    for (int y = 2; y < height-2; ++y){
-        for (int x = 2; x < width-2; ++x){
-            if (g->peaks[y][x]){
-                int t = Gradient::dir(g->getY(y,x), g->getX(y,x));
-                edge(x - x0, y - y0,
-                     t - angleSpread,
-                     t + angleSpread);
-            }
-        }
+    for (int i = 0; g->isPeak(i); ++i) {
+        edge(g->getAnglesXCoord(i) - x0,
+             g->getAnglesYCoord(i) - y0,
+             g->getAngle(i) - angleSpread,
+             g->getAngle(i) + angleSpread);
     }
 #endif /* USE_MMX */
     PROF_EXIT(profiler, P_MARK_EDGES);
@@ -94,7 +88,7 @@ void HoughSpace::edge(int x, int y, int t0, int t1)
         for (int r = min(r0, r1); r <= max(r0, r1); ++r){
             int ri = r + r_span / 2;
             if (0 <=ri && ri <r_span){
-                ++hs[ri][t8];
+                ++hs[t8][ri];
             }
         }
         r0 = r1;
@@ -133,14 +127,16 @@ void HoughSpace::smooth()
     // neighbors in the cylindrical Hough Space, but t=0 gets written
     // over before T=t_span - 1 is smoothed so we copy it now.
     for (int r=0; r < r_span; ++r) {
-        hs[r][t_span] = hs[r][0];
+        hs[t_span][r] = hs[0][r];
     }
 
     // In-place 2x2 boxcar smoothing
     for (int r=0; r < r_span-1; ++r) {
         for (int t=0; t < t_span; ++t) {
-            hs[r][t] = hs[r][t] + hs[r + 1][t] +
-                hs[r][t + 1] + hs[r + 1][t + 1];
+            hs[t][r] = max((hs[t][r]     + hs[t][r + 1] +
+                            hs[t + 1][r] + hs[t + 1][r + 1]) -
+                           getAcceptThreshold() * 4,
+                           0);
         }
     }
 #endif
@@ -155,14 +151,11 @@ void HoughSpace::peaks()
 {
     PROF_ENTER(profiler, P_HOUGH_PEAKS);
 
-    numPeaks = 0;
+    for (int t=0; t < t_span; ++t) {
+        for (int r=1; r < r_span-1; ++r) {
 
-    for (int r=0; r < r_span-1; ++r) {
-        for (int t=0; t < t_span; ++t) {
-
-            const int z = getHoughBin(r,t);
-            if (z >= 0){
-
+            uint16_t z = getHoughBin(r,t);
+            if (z > 0){
                 bool shouldCreate = true;
 
                 for (int i=0; shouldCreate && i < peak_points; ++i) {
@@ -176,7 +169,7 @@ void HoughSpace::peaks()
                 }
 
                 if (shouldCreate){
-                    addPeak(numPeaks, r, t, z);
+                    addPeak(r, t, z);
                 }
             }
         }
@@ -192,7 +185,7 @@ void HoughSpace::peaks()
  */
 void HoughSpace::createLinesFromPeaks(list<HoughLine>& lines)
 {
-    for (int i=0; i <= numPeaks; ++i){
+    for (int i=0; i < numPeaks; ++i){
         HoughLine line = createLine(getPeakR(i),
                                     getPeakT(i),
                                     getPeakZ(i) );
@@ -261,15 +254,16 @@ void HoughSpace::suppress(int x0, int y0, list<HoughLine>& lines)
  */
 void HoughSpace::reset()
 {
+    numPeaks = 0;
 #ifdef USE_MMX
     // @TODO: Rewrite with MMX intrinsics or inline ASM
     for (int i=0; i < r_span * (t_span+1); ++i) {
         hs[i] = 0;
     }
 #else
-    for (int r=0; r < r_span; ++r) {
-        for (int t=0; t < t_span; ++t) {
-            hs[r][t] = 0;
+    for (int t=0; t < t_span; ++t) {
+        for (int r=0; r < r_span; ++r) {
+            hs[t][r] = 0;
         }
     }
 #endif
@@ -280,7 +274,7 @@ HoughLine HoughSpace::createLine(int r, int t, int z)
     return HoughLine(r, t,
                      static_cast<float>(r) -
                      r_span / 2.0f + 0.5f,
-                     (static_cast<float>(t) + 1.0f) * // @TODO: WHY IS THIS +1.0f
+                     (static_cast<float>(t)) *
                      M_PI_FLOAT / 128.0f, z >> 2);
 }
 
@@ -288,11 +282,7 @@ HoughLine HoughSpace::createLine(int r, int t, int z)
 // is a peak.
 bool HoughSpace::isPeak(int r, int t)
 {
-#ifdef USE_MMX
     return peak[t * r_span + r];
-#else
-    return peak[r][t];
-#endif
 }
 
 int HoughSpace::getHoughBin(int r, int t)
@@ -300,6 +290,15 @@ int HoughSpace::getHoughBin(int r, int t)
 #ifdef USE_MMX
     return static_cast<int>(hs[t * r_span + r]);
 #else
-    return hs[r][t];
+    return hs[t][r];
 #endif
+}
+
+
+void HoughSpace::addPeak(int r, int t, int z)
+{
+    peak[numPeaks * peak_values + r_peak_offset] = static_cast<uint16_t>(r);
+    peak[numPeaks * peak_values + t_peak_offset] = static_cast<uint16_t>(t);
+    peak[numPeaks * peak_values + z_peak_offset] = static_cast<uint16_t>(z);
+    numPeaks++;
 }

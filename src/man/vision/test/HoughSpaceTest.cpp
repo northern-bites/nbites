@@ -1,6 +1,7 @@
 
 #include "HoughSpaceTest.h"
 #include <list>
+#include <string.h>
 
 #include "Profiler.h"
 
@@ -17,35 +18,11 @@ HoughSpaceTest::HoughSpaceTest() :
 
 }
 
-
 void HoughSpaceTest::test_hs()
 {
     // Create gradient map such that it has a known line
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
-#ifdef USE_MMX
-    for (int16_t i = 1; i < IMAGE_HEIGHT; ++i) {
-         // Make x and y relative to the image center
-        g->addAngle(0,
-                    static_cast<int16_t>(IMAGE_WIDTH * 3/4),
-                    i);
-    }
-#else
-    for (int i=0; i < Gradient::rows; ++i){
-        for (int j=0; j < Gradient::cols; ++j){
-            if (j < Gradient::cols *3./4.){
-                g->setX(0,i,j);
-                g->setY(0,i,j);
-                g->setMagnitude(0,i,j);
-                g->peaks[i][j] = false;
-            } else {
-                g->setX(0,i,j);
-                g->setY(0,i,j);
-                g->setMagnitude(0,i,j);
-                g->peaks[i][j] = true;
-            }
-        }
-    }
-#endif
+    setupGradient(*g);
 
     // Run the gradient through the Hough Space
     hs.markEdges(g);
@@ -64,27 +41,33 @@ void HoughSpaceTest::test_hs()
 
     // Notice that it is t_span +1. This is the same as in the
     // Hough Space.
-    int pre[HoughSpace::t_span+1][HoughSpace::r_span];
-    for (int r=0; r < HoughSpace::r_span; ++r){
-        for (int t=0; t < HoughSpace::t_span+1; ++t){
-            pre[t][r] = hs.getHoughBin(r,t);
+    uint16_t pre[HoughSpace::t_span+1][HoughSpace::r_span];
+#ifdef USE_MMX
+    memcpy(pre, hs.hs, HoughSpace::hs_size * sizeof(uint16_t));
+#else
+    for (int i=0; i < HoughSpace::t_span+1; ++i)
+        for (int j = 0; j < HoughSpace::r_span; ++j) {
+            pre[i][j] = hs.hs[i][j];
         }
-    }
-
+#endif
+    // Copy the first row of the pre image to the last (just like the
+    // smoothing should)
     for (int r=0; r < HoughSpace::r_span; ++r){
         pre[HoughSpace::t_span][r] = pre[0][r];
     }
 
     hs.smooth();
 
+    // Test if smoothing worked
     for (int t=0; t < HoughSpace::t_span; ++t){
         for (int r=0; r < HoughSpace::r_span-1; ++r){
 
             int preSum = (pre[t][r]   + pre[t+1][r] +
                           pre[t][r+1] + pre[t+1][r+1]) -
-                hs.getAcceptThreshold()*4;
+                hs.getAcceptThreshold()*4; // Smoothing grows mag by 4x
 
-            preSum = max(preSum, 0);
+            preSum = max(preSum, 0); // Bound it at zero
+
             int smoothed = hs.getHoughBin(r,t);
 
             EQ_INT( smoothed, preSum);
@@ -93,59 +76,53 @@ void HoughSpaceTest::test_hs()
     PASSED(SMOOTH_CORRECT);
 }
 
+void HoughSpaceTest::setupGradient(Gradient& g)
+{
+    for (int16_t i = 1; i < IMAGE_HEIGHT; ++i) {
+        // Make x and y relative to the image center
+        g.addAngle(0,
+                   static_cast<int16_t>(IMAGE_WIDTH * 3/4),
+                   i);
+    }
+}
+
 /**
  * Test for known lines in an image
  */
 void HoughSpaceTest::test_lines()
 {
+    test_for_line(0,80);
+    test_for_line(64, 20);
+}
+
+void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
+{
+    float radAngle = static_cast<float>(angle) * M_PI_FLOAT / 128.f;
+
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
-#ifdef USE_MMX
-    for (int16_t i = 1; i < IMAGE_HEIGHT; ++i) {
-        g->addAngle(0,
-                    static_cast<int16_t>(IMAGE_WIDTH * 3/4),
-                    i);
-    }
-#else
-    for (int i=0; i < IMAGE_HEIGHT; ++i){
-        for (int j=0; j < IMAGE_WIDTH; ++j){
-            if (j != IMAGE_WIDTH *3/4){
-                g->setX(0,i,j);
-                g->setY(0,i,j);
-                g->setMagnitude(0,i,j);
-                g->peaks[i][j] = false;
-            } else if (j == IMAGE_WIDTH * 3/4) {
-                g->setX(10,i,j);
-                g->setY(0,i,j);
-                g->setMagnitude(10,i,j);
-                g->peaks[i][j] = true;
-            }
-        }
-    }
-#endif
+    g->reset();
+    createLineAtPoint(*g, angle, radius);
 
     list<HoughLine> lines = hs.findLines(g);
 
-    // We only want one line to be found in this fake image
+    // We only want one line to be found in this fake image since we
+    // only created one
     EQ_INT(lines.size(), 1);
 
-    list<HoughLine>::iterator l = lines.begin();
     float maxRadius = sqrtf(IMAGE_WIDTH * IMAGE_WIDTH +
                            IMAGE_HEIGHT * IMAGE_HEIGHT);
 
     bool foundFixedLine = false;
-
+    list<HoughLine>::iterator l = lines.begin();
     while (l != lines.end()){
         LTE(l->getRadius() , maxRadius); // Line must be in image
         GTE(l->getRadius(), -maxRadius); // in either direction
         GTE(l->getAngle() , 0);          // 0 <= Angle <= 2 * pi
-        LTE(l->getAngle() , 2 * M_PI + ACCEPT_ANGLE);
+        LTE(l->getAngle() , 2 * M_PI_FLOAT + ACCEPT_ANGLE);
         GTE(l->getScore() , 0);
 
         // Make sure the system found the one line in the gradient
-        if ((l->getAngle() < ACCEPT_ANGLE ||
-            l->getAngle() > 2 * M_PI - ACCEPT_ANGLE) &&
-            l->getRadius() > IMAGE_WIDTH / 4. - ACCEPT_RADIUS &&
-            l->getRadius() < IMAGE_WIDTH / 4. + ACCEPT_RADIUS) {
+        if (isDesiredLine(radius, radAngle, *l)){
             foundFixedLine = true;
         }
 
@@ -209,6 +186,56 @@ void HoughSpaceTest::test_suppress()
     TRUE(at && bt && ct);
     PASSED(DONT_DELETE_GOOD_LINES);
 
+}
+
+bool HoughSpaceTest::isDesiredLine(float goalR, float goalT,
+                                   const HoughLine& line)
+{
+    float lineR = line.getRadius();
+    float lineT = line.getAngle();
+
+    LTE(lineT, 2*M_PI_FLOAT);
+    GTE(lineT, 0);
+
+    float goalLowerT = goalT - ACCEPT_ANGLE;
+    float goalUpperT = goalT + ACCEPT_ANGLE;
+
+    float tDiff = fabs(lineT - goalT);
+
+    return (
+        // Correct radius
+        (lineR > goalR - ACCEPT_RADIUS) &&
+        (lineR < goalR + ACCEPT_RADIUS) &&
+
+        // Correct angle
+        // Greater than lower bound
+        (tDiff < ACCEPT_ANGLE ||
+         fabs(2*M_PI_FLOAT - tDiff) < ACCEPT_ANGLE));
+
+}
+
+void HoughSpaceTest::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
+{
+    float radAngle = static_cast<float>(angle) * M_PI_FLOAT/128.f;
+
+    for (double u = -200.; u <= 200.; u+=1.){
+
+        double sn = sin(radAngle);
+        double cs = cos(radAngle);
+
+        double x0 = radius * cs;
+        double y0 = radius * sn;
+
+        int x = (int)round(x0 + u * sn) + IMAGE_WIDTH  / 2;
+        int y = -(int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
+
+        if (0 <= x && x < IMAGE_WIDTH &&
+            0 <= y && y < IMAGE_HEIGHT){
+            g.addAngle(angle,
+                       static_cast<uint16_t>(x),
+                       static_cast<uint16_t>(y));
+        }
+    }
 }
 
 int HoughSpaceTest::runTests()

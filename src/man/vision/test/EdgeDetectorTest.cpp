@@ -160,32 +160,13 @@ int EdgeDetectorTest::test_peaks()
     g->reset();
     edges.detectEdges(c,g);
 
-#ifdef USE_MMX
-    for (int i = 0; i < Gradient::num_angles_limit; ++i) {
-        if (g->isPeak(i)){
-            int x = g->getAnglesXCoord(i);
-            int y = g->getAnglesYCoord(i);
+    for (int i = 0; g->isPeak(i); ++i) {
+        int x = g->getAnglesXCoord(i);
+        int y = g->getAnglesYCoord(i);
 
-            NE_INT(g->getMagnitude(y,x) , 0);
-            assert(g->getX(y,x) != 0 || g->getY(y,x) != 0);
-
-       // If we find an angle of zero, there are no more angles to be found
-        } else {
-            break;
-        }
+        NE_INT(g->getMagnitude(y,x) , 0);
+        assert(g->getX(y,x) != 0 || g->getY(y,x) != 0);
     }
-#else  /* USE_MMX */
-
-    // Everywhere peaks is true, the gradient is not zero. If it's not
-    // a peak, we don't really care what the gradient values are.
-    for (int i=2; i < Gradient::rows-2; ++i)
-        for (int j=2; j < Gradient::cols-2; ++j){
-            if (g->peaks[i][j]){
-                NE_INT(g->getMagnitude(i,j) , 0);
-                assert(g->getX(i,j) != 0 || g->getY(i,j) != 0);
-            }
-        }
-#endif  /* USE_MMX */
     PASSED(PEAKS_ZERO);
 
 #ifdef USE_MMX
