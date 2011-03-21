@@ -19,8 +19,8 @@ public:
     Gradient();
     virtual ~Gradient() { };
 
-    static inline int dir(int y, int x) {
-        return static_cast<int>(atan2(y, x) / M_PI * 128.0) & 0xff;
+    static inline uint8_t dir(int y, int x) {
+        return static_cast<uint8_t>(atan2(y, x) / M_PI * 128.0) & 0xff;
     }
 
     void reset();
@@ -28,7 +28,7 @@ public:
     /**
      * Calculate the highest three bits of an angle for the given y and x
      */
-    static inline int dir3(int y, int x) {
+    static inline uint8_t dir3(int y, int x) {
         unsigned int d = 0x0;
         //http://www-graphics.stanford.edu/~seander/bithacks.html#ConditionalSetOrClearBitsWithoutBranching
         // w = (w & ~m) | (-f & m);
@@ -54,7 +54,7 @@ public:
         d = (d & 0x2) ? ((d & 0x1) | (- (abs(x) > abs(y)) & 0x1)) :
                          (d & 0x1) | (- (abs(x) < abs(y)) & 0x1);
 
-        return (d);
+        return static_cast<uint8_t>(d);
     }
 
     // Values are all offset by one (see EdgeDetection.s)
@@ -89,25 +89,22 @@ public:
 
     // Return the nth x coordinate in the angles array
     int16_t getAnglesXCoord(int n){
-        return static_cast<int16_t>(angles[n*3 + angles_x_offset] + 160);
+        return static_cast<int16_t>(angles[n*3 + angles_x_offset]);
     }
 
     // Return the nth y coordinate in the angles array
     int16_t getAnglesYCoord(int n){
-        return static_cast<int16_t>(angles[n*3 + angles_y_offset] + 120);
+        return static_cast<int16_t>(angles[n*3 + angles_y_offset]);
     }
 
     void addAngle(uint8_t angle, int16_t x, int16_t y){
         angles[numPeaks*3 + angles_offset] = angle;
-        angles[numPeaks*3 + angles_x_offset] = static_cast<uint16_t>(x - 160);
-        angles[numPeaks*3 + angles_y_offset] = static_cast<uint16_t>(y - 120);
+        angles[numPeaks*3 + angles_x_offset] =
+            static_cast<uint16_t>(x - IMAGE_WIDTH/2);
+        angles[numPeaks*3 + angles_y_offset] =
+            static_cast<uint16_t>(y - IMAGE_HEIGHT/2);
 
         numPeaks++;
-
-        // Mark as end
-        angles[numPeaks*3 + angles_offset] = 0;
-        angles[numPeaks*3 + angles_x_offset] = -160;
-        angles[numPeaks*3 + angles_y_offset] = -120;
     }
 
     bool isPeak(int n){

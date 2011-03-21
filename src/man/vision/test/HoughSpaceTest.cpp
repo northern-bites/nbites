@@ -227,7 +227,7 @@ void HoughSpaceTest::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
         double y0 = radius * sn;
 
         int x = (int)round(x0 + u * sn) + IMAGE_WIDTH  / 2;
-        int y = -(int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
+        int y = (int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
 
         if (0 <= x && x < IMAGE_WIDTH &&
             0 <= y && y < IMAGE_HEIGHT){

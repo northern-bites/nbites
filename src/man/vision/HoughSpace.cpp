@@ -64,8 +64,8 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
     // See comment in FindPeaks re: why this is shrunk in by 2
     // rows/columns on each side
     for (int i = 0; g->isPeak(i); ++i) {
-        edge(g->getAnglesXCoord(i) - x0,
-             g->getAnglesYCoord(i) - y0,
+        edge(g->getAnglesXCoord(i),
+             g->getAnglesYCoord(i),
              g->getAngle(i) - angleSpread,
              g->getAngle(i) + angleSpread);
     }
@@ -133,10 +133,12 @@ void HoughSpace::smooth()
     // In-place 2x2 boxcar smoothing
     for (int r=0; r < r_span-1; ++r) {
         for (int t=0; t < t_span; ++t) {
-            hs[t][r] = max((hs[t][r]     + hs[t][r + 1] +
-                            hs[t + 1][r] + hs[t + 1][r + 1]) -
-                           getAcceptThreshold() * 4,
-                           0);
+            hs[t][r] = static_cast<int16_t>(
+                max((hs[t][r]     + hs[t][r + 1] +
+                     hs[t + 1][r] + hs[t + 1][r + 1]) -
+                    getAcceptThreshold() * 4,
+                    0)
+                );
         }
     }
 #endif

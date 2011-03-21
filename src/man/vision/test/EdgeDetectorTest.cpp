@@ -161,8 +161,9 @@ int EdgeDetectorTest::test_peaks()
     edges.detectEdges(c,g);
 
     for (int i = 0; g->isPeak(i); ++i) {
-        int x = g->getAnglesXCoord(i);
-        int y = g->getAnglesYCoord(i);
+        // x,y are in image center relative coords
+        int x = g->getAnglesXCoord(i) + IMAGE_WIDTH/2;
+        int y = g->getAnglesYCoord(i) + IMAGE_HEIGHT/2;
 
         NE_INT(g->getMagnitude(y,x) , 0);
         assert(g->getX(y,x) != 0 || g->getY(y,x) != 0);
@@ -177,8 +178,9 @@ int EdgeDetectorTest::test_peaks()
         if (!g->getAnglesXCoord(n)){
             break;
         } else {
-            int i = g->getAnglesYCoord(n);
-            int j = g->getAnglesXCoord(n);
+            // x,y are in image center relative coords
+            int i = g->getAnglesYCoord(n) + IMAGE_HEIGHT/2;
+            int j = g->getAnglesXCoord(n) + IMAGE_WIDTH/2;
             const int z = g->getMagnitude(i,j);
 
             const int y = g->getY(i,j);
@@ -228,12 +230,16 @@ int EdgeDetectorTest::test_peaks()
 #ifdef USE_MMX
     for (int i = 2; i < Gradient::rows-2; ++i) {
         for (int j = 2; j < Gradient::cols-2; ++j) {
-            if (j == IMAGE_WIDTH * 3/4 ||
-                j == IMAGE_WIDTH * 3/4 - 1){
-                assert(g->peaks_list_contains(i, IMAGE_WIDTH * 3/4) ||
-                       g->peaks_list_contains(i, IMAGE_WIDTH * 3/4 - 1));
+
+            int x = j - IMAGE_WIDTH/2;
+            int y = i - IMAGE_HEIGHT/2;
+
+            if (x == IMAGE_WIDTH * 1/4 ||
+                x == IMAGE_WIDTH * 1/4 - 1){
+                assert(g->peaks_list_contains(y, IMAGE_WIDTH * 1/4) ||
+                       g->peaks_list_contains(y, IMAGE_WIDTH * 1/4 - 1));
             } else {
-                assert(!g->peaks_list_contains(i,j));
+                assert(!g->peaks_list_contains(y,x));
             }
         }
     }
@@ -272,7 +278,7 @@ int EdgeDetectorTest::test_peaks()
             if( (n = g->peaks_list_contains(i,j)) ){
                 int x = g->getAnglesXCoord(n);
                 int y = g->getAnglesYCoord(n);
-                double d = r - (sqrt((x-j_0)*(x-j_0) + (y-i_0)*(y-i_0)));
+                double d = r - (sqrt(x*x + y*y));
                 LTE(abs(d), e*2);
             }
         }
@@ -306,14 +312,18 @@ int EdgeDetectorTest::test_angles()
     create_circle_image(c, r, e, i_0, j_0);
     g->reset();
     edges.detectEdges(c,g);
+
     for (int i = 0; i < Gradient::num_angles_limit; ++i) {
         if (g->isPeak(i)){
-            int x = g->getAnglesXCoord(i);
-            int y = g->getAnglesYCoord(i);
+
+            int x = g->getAnglesXCoord(i) + IMAGE_WIDTH/2;
+            int y = g->getAnglesYCoord(i) + IMAGE_HEIGHT/2;
+
             NE_INT(g->getMagnitude(y,x) , 0);
             assert(g->getX(y,x) != 0 || g->getY(y,x) != 0);
 
-       // If we find an x coordinate of zero, there are no more angles to be found
+       // If we find an x coordinate of zero, there are no more angles
+       // to be found
         } else {
             break;
         }
@@ -322,8 +332,8 @@ int EdgeDetectorTest::test_angles()
 #ifdef USE_MMX
     int i = 0;
     while (g->isPeak(i)){
-        int y = g->getAnglesYCoord(i);
-        int x = g->getAnglesXCoord(i);
+        int y = g->getAnglesYCoord(i) + IMAGE_HEIGHT/2;
+        int x = g->getAnglesXCoord(i) + IMAGE_WIDTH/2;
 
         int yMag = g->getY(y,x);
         int xMag = g->getX(y,x);

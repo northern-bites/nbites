@@ -135,8 +135,8 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
      * This has the effect of shrinking the image in by 4 rows and
      * columns, but oh well.
      */
-    for (int i=2; i < Gradient::rows-2; ++i) {
-        for (int j=2; j < Gradient::cols-2; ++j){
+    for (int16_t i=2; i < Gradient::rows-2; ++i) {
+        for (int16_t j=2; j < Gradient::cols-2; ++j){
 
             gradient->peaks[i][j] = false; // Not a peak yet
             const int z = gradient->getMagnitude(i,j);
