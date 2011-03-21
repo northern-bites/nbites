@@ -558,8 +558,8 @@ void Vision::drawEdges(Gradient g)
 #ifdef OFFLINE
     if (thresh->debugEdgeDetection){
         for (int i=0; g.isPeak(i); ++i) {
-            drawDot(g.getAnglesXCoord(i),
-                    g.getAnglesYCoord(i),
+            drawDot(g.getAnglesXCoord(i) + IMAGE_WIDTH/2,
+                    g.getAnglesYCoord(i) + IMAGE_HEIGHT/2,
                     PINK);
         }
     }
@@ -582,7 +582,7 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
                 double y0 = line->getRadius() * sn;
 
                 int x = (int)round(x0 + u * sn) + IMAGE_WIDTH  / 2;
-                int y = -(int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
+                int y = (int)round(y0 - u * cs) + IMAGE_HEIGHT / 2;
 
                 if (0 <= x && x < IMAGE_WIDTH &&
                     0 <= y && y < IMAGE_HEIGHT){

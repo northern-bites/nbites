@@ -276,7 +276,7 @@ HoughLine HoughSpace::createLine(int r, int t, int z)
     return HoughLine(r, t,
                      static_cast<float>(r) -
                      r_span / 2.0f + 0.5f,
-                     (static_cast<float>(t)) *
+                     (static_cast<float>(t+1)) *
                      M_PI_FLOAT / 128.0f, z >> 2);
 }
 

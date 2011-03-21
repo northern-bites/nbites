@@ -91,8 +91,12 @@ void HoughSpaceTest::setupGradient(Gradient& g)
  */
 void HoughSpaceTest::test_lines()
 {
-    test_for_line(0,80);
-    test_for_line(64, 20);
+    for(int t=0; t < 255; t += 5){
+        for (float r=0; r < 120; r += 10){
+            test_for_line(static_cast<uint8_t>(t), r);
+        }
+    }
+    PASSED(FOUND_GOOD_LINES);
 }
 
 void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
@@ -130,7 +134,6 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
     }
     // We better have found that line
     TRUE(foundFixedLine);
-    PASSED(FOUND_FIXED_LINE);
 }
 
 void HoughSpaceTest::test_suppress()
@@ -218,16 +221,16 @@ void HoughSpaceTest::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
 {
     float radAngle = static_cast<float>(angle) * M_PI_FLOAT/128.f;
 
+
+    double sn = sin(radAngle);
+    double cs = cos(radAngle);
+
+    double x0 = radius * cs;
+    double y0 = radius * sn;
+
     for (double u = -200.; u <= 200.; u+=1.){
-
-        double sn = sin(radAngle);
-        double cs = cos(radAngle);
-
-        double x0 = radius * cs;
-        double y0 = radius * sn;
-
         int x = (int)round(x0 + u * sn) + IMAGE_WIDTH  / 2;
-        int y = (int)round(y0 + u * cs) + IMAGE_HEIGHT / 2;
+        int y = (int)round(y0 - u * cs) + IMAGE_HEIGHT / 2;
 
         if (0 <= x && x < IMAGE_WIDTH &&
             0 <= y && y < IMAGE_HEIGHT){
