@@ -4,11 +4,11 @@ using namespace NBMath;
 using namespace std;
 using namespace boost::numeric;
 
-//#define DEBUG_COM
+#define DEBUG_COM
 //#define DEBUG_COM_VERBOSE
 //#define DEBUG_COM_TRANSFORMS
 
-ufmatrix4 limbs[Kinematics::NUM_JOINTS]; // transform to the origin of each limb
+ufmatrix4 limbs[Kinematics::NUM_MASS_PIECES]; // transform to the origin of each limb
 
 const ufvector4
 Kinematics::getCOMc(const vector<float> bodyAngles) {
@@ -28,7 +28,7 @@ Kinematics::getCOMc(const vector<float> bodyAngles) {
 #endif
 
 	// add each joint's mass relative to origin (0,0,0)
-	for(unsigned int joint = 0; joint < NUM_JOINTS; ++joint) {
+	for(unsigned int joint = 0; joint < NUM_MASS_PIECES; ++joint) {
 #ifdef DEBUG_COM_TRANSFORMS
 // will give us access to the position in x,y,z space each transform goes to
 // without adding in the mass at the joint's (local) CoM
@@ -44,7 +44,10 @@ Kinematics::getCOMc(const vector<float> bodyAngles) {
 
 #ifdef DEBUG_COM_VERBOSE
 		cout << "joint: " << joint <<" pos " << partial/jointMass[joint].mass;
-		cout << " angle: " << angles[joint] << endl;
+		// b/c there is no joint angle for hands
+		if (joint < NUM_JOINTS) {
+			cout << " angle: " << angles[joint] << endl;
+		}
 #endif
 	}
 
@@ -77,16 +80,16 @@ void Kinematics::buildJointTransforms(const float angles[]) {
 	buildArmChain(start, side, angles);
 
 	// left leg chain
-	start = 6;
+	start = 7;
 	buildLegChain(start, side, angles);
 
 	// right leg chain
 	side = -1.0f;
-	start = 12;
+	start = 13;
 	buildLegChain(start, side, angles);
 
 	// right arm chain
-	start = 18;
+	start = 19;
 	buildArmChain(start, side, angles);
 }
 
@@ -123,6 +126,9 @@ void Kinematics::buildArmChain(const int start, const float side, const float an
 	// elbow roll
 	limbs[start + 3] = prod(rotation4D(Z_AXIS, -angles[start + 3]*side),
 							limbs[start + 2]);
+	// hand (no joint)
+	limbs[start + 4] = prod(translation4D(HAND_OFFSET_X, 0.0f, HAND_OFFSET_Z),
+							limbs[start + 3]);
 }
 
 // See: buildArmChain
