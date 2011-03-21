@@ -35,6 +35,13 @@ def goalieChase(player):
     TODO: make goalie more aggressive (different transitions?)
     """
     # Check in order of importance
+
+    #tells the goalie what state its in
+    if player.firstFrame():
+        player.isChasing = True
+        player.isPositioning = False
+        player.isSaving = False
+
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
     elif transitions.shouldStopAndKick(player):
@@ -212,9 +219,11 @@ def guardCorner(player):
     ball = player.brain.ball
     if player.brain.nav.isStopped():
         if ball.y > nogginConstants.LANDMARK_LEFT_POST_Y:
-            player.brain.nav.goTo(RobotLocation(LANDMARK_LEFT_POST_X + 6, LANDMARK_LEFT_POST_Y, 0))
+            player.brain.nav.goTo(RobotLocation(nogginConstansts.LANDMARK_LEFT_POST_X + 6, 
+                                                nogginConstants.LANDMARK_LEFT_POST_Y, 0))
         elif ball.y < nogginConstants.LANDMARK_RIGHT_POST_Y:
-            player.brain.nav.goTo(RobotLocation(LANDMARK_RIGHT_POST_X + 6, LANDMARK_RIGHT_POST_Y, 0))
+            player.brain.nav.goTo(RobotLocation(nogginConstantsLANDMARK_RIGHT_POST_X + 6,
+                                                noggin.ContantsLANDMARK_RIGHT_POST_Y, 0))
 
     return player.stay()
 

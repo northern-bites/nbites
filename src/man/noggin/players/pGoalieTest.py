@@ -9,3 +9,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(GoalieTestStates)
         self.setName('Player pGoalieTest')
+
+        self.counterCenterSave = 0
+        self.counterRightSave = 0
+        self.counterLeftSave = 0

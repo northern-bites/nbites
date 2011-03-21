@@ -1,59 +1,69 @@
 
-import GoalieTransitions as helper
-import GoalieConstants as constants
+import GoalieTransitions as goalTran
+from ..import NogginConstants as nogCon
+import GoalieConstants as goalCon
+import ChaseBallStates as chaseBall
+from man.noggin.typeDefs.Location import RobotLocation
 
 def goaliePosition(player):
     """
     Have the robot navigate to the position reported to it from playbook
     """
-    brain = player.brain
-    nav = brain.nav
-    my = brain.my
+    nav = player.brain.nav
+    my = player.brain.my
+    ball = player.brain.ball
+    heading = None
 
     if player.firstFrame():
+        player.isPositioning = True
         player.isChasing = False
-        nav.positionPlaybook()
+        player.isSaving = False
+        nav.goTo(RobotLocation(nogCon.LANDMARK_LEFT_POST_X + 20,
+                               ((nogCon.LANDMARK_LEFT_POST_Y + 
+                                 nogCon.LANDMARK_RIGHT_POST_Y)/2)))
+        #nav.positionPlaybook()
 
-    if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
+    if goalTran.inBox(player):
+        player.stopWalking()
+
+    if ball.dist >= goalCon.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLoc()
     else:
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall() 
 
-    #if helper.shouldPositionRight(player):
-        #return player.goLater('goaliePositionRight')
-    #elif helper.shouldPositionLeft(player):
-        #return player.goLater('goaliePositionLeft')
+   # if player.brain.nav.isStopped():
+        #if goalTran.shouldPositionLeft(player):
+            #player.goNow('goaliePositionLeft')
 
-    if helper.shouldPositionForSave(player):
-        return player.goNow('goaliePositionForSave')
-
-
-    heading = None
-    ball = brain.ball
+        #elif goalTran.shouldPositionRight(player):
+            #player.goNow('goaliePositionRight')
 
     return player.stay()
 
 def goaliePositionRight(player):
-#move to the right position.  need to add this position to the playbook
+#move to the right position.
+    if player.firstFrame():
+        nav.goTo(RobotLocation(nogCon.LANDMARK_LEFT_POST_X + 20,
+                               nogCon.LANDMARK_LEFT_POST_Y- 10, 0))
+
+    elif player.shouldPositionCenter(player):
+        player.goNow('goaliePosition')
+
+    #for now dont try to get across the whole goal in one go
+    elif player.shouldPositionLeft(player):
+        player.goNow('goaliePosition')
+
 
 def goaliePositionLeft(player):
-#move to the left position. need to add this position to the playbook
-
-def goaliePositionForSave(player):
+#move to the left position.
     if player.firstFrame():
-        player.stopWalking()
-        player.brain.tracker.trackBall()
+        nav.goTo(RobotLocation(nogCon.LANDMARK_RIGHT_POST_X + 20,
+                               nogCon.LANDMARK_RIGHT_POST_Y + 10, 0))
 
-    if helper.shouldSave(player):
-        return player.goNow('goalieSave')
+    elif player.shouldPositionCenter(player):
+        player.goNow('goaliePosition')
 
-    #need to check if havent saved and need to move
+    #for now dont try to get across the whole goal in one go
+    elif player.shouldPositionRight(player):
+        player.goNow('goaliePosition')
 
-    #Right now do not need to move side to side for saving
-    #strafeDir = helper.strafeDirForSave(player)
-    # if fabs(strafeDir) > 0:
-        #player.setWalk(0, constants.STRAFE_SPEED * MyMath.sign(strafeDir), 0)
-    # else:
-        # player.stopWalking()
-
-    return player.stay()

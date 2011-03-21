@@ -11,6 +11,9 @@ CENTER_SAVE_THRESH = 15
 TESTING = True
 
 def goalieSave(player):
+
+#going to want it to get in a squat to prepare at somepoint in here
+
     brain = player.brain
     if player.firstFrame():
         player.isSaving = True
@@ -18,9 +21,24 @@ def goalieSave(player):
         brain.motion.stopHeadMoves()
         player.stopWalking()
         brain.tracker.trackBall()
-    if not brain.nav.isStopped():
-        return player.stay()
-    
+
+    if helper.shouldSave(player):
+        return player.goNow('goaliePickSave')
+
+    return player.stay()
+
+    #need to check if havent saved and need to move
+
+    #Right now do not need to move side to side for saving
+    #strafeDir = helper.strafeDirForSave(player)
+    # if fabs(strafeDir) > 0:
+        #player.setWalk(0, constants.STRAFE_SPEED * MyMath.sign(strafeDir), 0)
+    # else:
+        # player.stopWalking()
+
+def goaliePickSave(player):   
+    player.brain.fallController.disable()
+
     if(TESTING):
         if helper.shouldSaveRight(player):
             return player.goNow('testSaveRight')
@@ -83,37 +101,34 @@ def testSaveCenter(player):
         return player.goNow('goalieSave')
     return player.stay()
 
+#not sure how to decide this yet
 def holdRightSave(player):
     #if helper.shouldHoldSave(player):
     #else:
-        return player.goLater('postSave')
+        return player.goLater('postDiveSave')
     #return player.stay()
 
 def holdLeftSave(player):
     #if helper.shouldHoldSave(player):
     #else:
-        return player.goLater('postSave')
+        return player.goLater('postDiveSave')
     #return player.stay()
 
 def holdCenterSave(player):
     #if helper.shouldHoldSave(player):
     #else:
-        return player.goLater('postSave')
+        return player.goLater('postCenterSave')
     #return player.stay()
 
 def postCenterSave(player):
     if player.brain.nav.isStopped():
         player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
         player.isSaving = False
-        return player.goLater('goaliePosition')
+        return player.stay()
 
     return player.stay()
 def postDiveSave(player):
     if player.brain.nav.isStopped():
-        
+        player.brain.fallController.enable()
         player.isSaving = False
-        return player.goLater('goaliePosition')
-        
-
-# Will want to use enable and disable methods in fall Controller so that
-#the robot will stand up from dives.
+        return player.stay()

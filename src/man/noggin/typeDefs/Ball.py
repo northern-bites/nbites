@@ -153,7 +153,7 @@ class Ball(VisualObject):
         # what the y value of the ball will be when it
         # gets to the goalie
         if(self.dx != 0):
-            self.endY = self.relY - (self.dy*(self.RelX/self.dx))
+            self.endY = self.relY - (self.dy*(self.relX/self.dx))
 
     def __str__(self):
         """returns string with all class variables"""
