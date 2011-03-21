@@ -107,7 +107,7 @@ cosTable:
 
         ## Sum x*cos(t) + y*sin(t)
         add     \x, \y
-        shr     \x, 14
+        sar     \x, 14
 
         ## Set \y to zero
         xor     \y,\y
