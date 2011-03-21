@@ -22,7 +22,7 @@ void HoughSpaceTest::test_hs()
 {
     // Create gradient map such that it has a known line
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
-    setupGradient(*g);
+    createLineAtPoint(*g, 0, 80);
 
     // Run the gradient through the Hough Space
     hs.markEdges(g);
@@ -42,14 +42,8 @@ void HoughSpaceTest::test_hs()
     // Notice that it is t_span +1. This is the same as in the
     // Hough Space.
     uint16_t pre[HoughSpace::t_span+1][HoughSpace::r_span];
-#ifdef USE_MMX
     memcpy(pre, hs.hs, HoughSpace::hs_size * sizeof(uint16_t));
-#else
-    for (int i=0; i < HoughSpace::t_span+1; ++i)
-        for (int j = 0; j < HoughSpace::r_span; ++j) {
-            pre[i][j] = hs.hs[i][j];
-        }
-#endif
+
     // Copy the first row of the pre image to the last (just like the
     // smoothing should)
     for (int r=0; r < HoughSpace::r_span; ++r){
@@ -74,16 +68,6 @@ void HoughSpaceTest::test_hs()
         }
     }
     PASSED(SMOOTH_CORRECT);
-}
-
-void HoughSpaceTest::setupGradient(Gradient& g)
-{
-    for (int16_t i = 1; i < IMAGE_HEIGHT; ++i) {
-        // Make x and y relative to the image center
-        g.addAngle(0,
-                   static_cast<int16_t>(IMAGE_WIDTH * 3/4),
-                   i);
-    }
 }
 
 /**
@@ -204,11 +188,11 @@ bool HoughSpaceTest::isDesiredLine(float goalR, float goalT,
     float goalUpperT = goalT + ACCEPT_ANGLE;
 
     float tDiff = fabs(lineT - goalT);
+    float rDiff = fabs(lineR - goalR);
 
     return (
         // Correct radius
-        (lineR > goalR - ACCEPT_RADIUS) &&
-        (lineR < goalR + ACCEPT_RADIUS) &&
+        (rDiff < ACCEPT_RADIUS) &&
 
         // Correct angle
         // Greater than lower bound
