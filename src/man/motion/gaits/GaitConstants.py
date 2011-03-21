@@ -10,3 +10,5 @@ ODO_CONFIG = (1.0,   #xOdoScale
               1.0)   #thetaOdoScale
 
 ARM_CONFIG = (0.0,)   #armAmplitude (degs)
+
+USE_ARMS = (45.0,)
