@@ -164,32 +164,32 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 }
 
 /**
- * This method calculates the sensor ZMP. We build a body to world transform using
- * Aldebaran's filtered angleX/angleY. We then use this to rotate the unfiltered
- * accX/Y/Z from the accelerometers. The transformed values are fed into an
- * exponential filter (acc_filter), and the filtered values are used in an EKF
- * that maintains our sensor ZMP (zmp_filter). The ZMP EKF also takes in the CoM
- * as calculated by the joint angles of the robot (see JointMassConstants.h and
- * COKKinematics.cpp for implementation details)
+ * This method calculates the sensor ZMP. We build a body to world
+ * transform using Aldebaran's filtered angleX/angleY. We then use
+ * this to rotate the Aldebaran-filtered accX/Y/Z from the
+ * accelerometers. The transformed values are fed into an exponential
+ * filter (acc_filter, to reduce jitter from the rotation), and the
+ * filtered values are used in an EKF that maintains our sensor ZMP
+ * (zmp_filter). The ZMP EKF also takes in the CoM as calculated by
+ * the joint angles of the robot (see JointMassConstants.h and
+ * COKKinematics.cpp for implementation details of that)
  */
 void StepGenerator::findSensorZMP(){
     const Inertial inertial = sensors->getInertial();
-    const Inertial unfiltered = sensors->getUnfilteredInertial();
 
     //The robot may or may not be tilted with respect to vertical,
     //so, since walking is conducted from a bird's eye perspective
     //we would like to rotate the sensor measurements appropriately.
     //We will use angleX, and angleY:
-
     const ufmatrix4 bodyToWorldTransform =
         prod(CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, -inertial.angleX),
              CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -inertial.angleY));
 
 	// update the filter
 	// TODO: calibrate!!
-    acc_filter.update(unfiltered.accX,
-					  unfiltered.accY,
-					  unfiltered.accZ);
+    acc_filter.update(inertial.accX,
+					  inertial.accY,
+					  inertial.accZ);
 
     const ufvector4 accInBodyFrame = CoordFrame4D::vector4D(acc_filter.getX(),
 															acc_filter.getY(),
@@ -221,9 +221,9 @@ void StepGenerator::findSensorZMP(){
 	const float joint_com_i_y = joints_com_i(1);
 
     ZmpTimeUpdate tUp = {controller_x->getZMP(), controller_y->getZMP()};
-	// TODO: fix joints_com_i in x !!
+	// TODO: fix joints_com_i in x,y and re-enable
     ZmpMeasurement pMeasure =
-        {controller_x->getPosition(), joint_com_i_y,
+        {joint_com_i_x, controller_y->getPosition(),
          accel_i(0), accel_i(1)};
     zmp_filter.update(tUp,pMeasure);
 

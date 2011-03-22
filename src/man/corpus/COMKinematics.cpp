@@ -12,10 +12,20 @@ ufmatrix4 limbs[Kinematics::NUM_MASS_PIECES]; // transform to the origin of each
 
 const ufvector4
 Kinematics::getCOMc(const vector<float> bodyAngles) {
-	//copy the body angles to an array
-	float angles[NUM_JOINTS];
-	for(unsigned int i = 0; i< NUM_JOINTS; i++){
-		angles[i] = bodyAngles[i];
+	// copy the body angles to an array
+	float angles[NUM_MASS_PIECES];
+
+	unsigned int joint = 0;
+	for(unsigned int i = 0; i < NUM_MASS_PIECES; i++){
+		// add two dummy values for the hands
+		// leave the rest of the angles intact
+		if (i == 6 || i == 23) {
+			angles[i] = 0.0f;
+			continue;
+		}
+
+		angles[i] = bodyAngles[joint];
+		joint++;
 	}
 
 	buildJointTransforms(angles);
