@@ -11,4 +11,4 @@ ODO_CONFIG = (1.0,   #xOdoScale
 
 ARM_CONFIG = (0.0,)   #armAmplitude (degs)
 
-USE_ARMS = (45.0,)
+USE_ARMS = (12.0,)

@@ -20,7 +20,7 @@ Kinematics::getCOMc(const vector<float> bodyAngles) {
 		// add two dummy values for the hands
 		// leave the rest of the angles intact
 		if (i == 6 || i == 23) {
-			angles[i] = 0.0f;
+			angles[i] = -1.0f;
 			continue;
 		}
 
@@ -54,10 +54,7 @@ Kinematics::getCOMc(const vector<float> bodyAngles) {
 
 #ifdef DEBUG_COM_VERBOSE
 		cout << "joint: " << joint <<" pos " << partial/jointMass[joint].mass;
-		// b/c there is no joint angle for hands
-		if (joint < NUM_JOINTS) {
-			cout << " angle: " << angles[joint] << endl;
-		}
+		cout << " angle: " << angles[joint] << endl;
 #endif
 	}
 
