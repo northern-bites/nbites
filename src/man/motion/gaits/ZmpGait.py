@@ -8,14 +8,14 @@ NON_WALKING = constants.NON_WALKING
 
 MARVIN_STANCE_CONFIG = (31.0, # CoM height
                         1.0,  # Forward displacement of CoM
-                        11.0,  # Horizontal distance between feet
-                        5.0,   # Body angle around y axis
+                        11.5,  # Horizontal distance between feet
+                        0.0,   # Body angle around y axis
                         0.0,   # Angle between feet
                         0.1)   # Time to transition to/from this stance
 
 STEP_CONFIG = (0.375, # step duration
                0.3,  # fraction in double support
-               1.85,  # stepHeight
+               1.95,  # stepHeight
                -3.25,  # step lift
                18.0,  # max x speed
                -9.0,  # max x speed (backwards)
