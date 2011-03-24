@@ -5,7 +5,8 @@
 #include <iostream>
 #include <stdio.h>
 
-extern "C" void _sobel_operator(const uint8_t thresh,
+extern "C" void _sobel_operator(int bound,
+                                const uint8_t thresh,
                                 const uint16_t *input,
                                 uint16_t *out);
 extern "C" int _find_edge_peaks(const uint16_t *gradients,
@@ -24,12 +25,13 @@ EdgeDetector::EdgeDetector(boost::shared_ptr<Profiler> p, uint8_t thresh):
  *
  * @param channel      The entire channel (one of Y, U, or V)
  */
-void EdgeDetector::detectEdges(const uint16_t* channel,
+void EdgeDetector::detectEdges(int upperBound,
+                               const uint16_t* channel,
                                shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_EDGES);
-    sobelOperator(channel, gradient);
-    findPeaks(gradient);
+    sobelOperator(upperBound, channel, gradient);
+    findPeaks(upperBound, gradient);
     PROF_EXIT(profiler,P_EDGES);
 }
 
@@ -44,12 +46,13 @@ void EdgeDetector::detectEdges(const uint16_t* channel,
  * @param channel     The channel with edges to be detected.
  * @param gradient    Gradient struct to be populated.
  */
-void EdgeDetector::sobelOperator(const uint16_t* channel,
+void EdgeDetector::sobelOperator(int upperBound,
+                                 const uint16_t* channel,
                                  shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_SOBEL);
 #ifdef USE_MMX
-    _sobel_operator(threshold, &channel[0], gradient->values);
+    _sobel_operator(upperBound, threshold, &channel[0], gradient->values);
 #else
     for (int i=1; i < Gradient::rows-1; ++i){
         for (int j=1; j < Gradient::cols-1; ++j) {
@@ -119,7 +122,7 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
  *
  * @param gradient Gradient to check for points.
  */
-void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
+void EdgeDetector::findPeaks(int upperBound, shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_EDGE_PEAKS);
 #ifdef USE_MMX

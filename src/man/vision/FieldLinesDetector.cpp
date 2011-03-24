@@ -13,9 +13,16 @@ FieldLinesDetector::FieldLinesDetector(shared_ptr<Profiler> p) :
 /**
  * Detect field lines and their intersections (aka corners) in the given image
  */
-void FieldLinesDetector::detect(const uint16_t *img)
+void FieldLinesDetector::detect(int upperBound, const uint16_t *img)
 {
-    findHoughLines(img);
+    // For safety (in case horizon is too low), scan from above the
+    // given upperbound
+    upperBound -= 10;
+
+    // Only use values within the image
+    upperBound = min(max(0, upperBound), IMAGE_HEIGHT-3);
+
+    findHoughLines(upperBound, img);
     findFieldLines();
 }
 
@@ -27,10 +34,10 @@ void FieldLinesDetector::detect(const uint16_t *img)
  * Side effects: Updates gradient with current image's gradient values,
  *               updates list of hough space lines
  */
-void FieldLinesDetector::findHoughLines(const uint16_t *img)
+void FieldLinesDetector::findHoughLines(int upperBound, const uint16_t *img)
 {
     gradient->reset();
-    edges.detectEdges(img, gradient);
+    edges.detectEdges(upperBound, img, gradient);
     houghLines = hough.findLines(gradient);
 }
 

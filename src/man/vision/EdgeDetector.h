@@ -24,16 +24,18 @@ public:
  * Public interface
  */
 public:
-    void detectEdges(const uint16_t* channel,
+    void detectEdges(int upperBound,
+                     const uint16_t* channel,
                      boost::shared_ptr<Gradient> gradient);
 
     uint8_t  getThreshold()           { return threshold; }
     void setThreshold(uint8_t thresh) { threshold = thresh; }
 
 private:
-    void sobelOperator(const uint16_t* channel,
+    void sobelOperator(int upperBound,
+                       const uint16_t* channel,
                        boost::shared_ptr<Gradient> gradient);
-    void findPeaks(boost::shared_ptr<Gradient> gradient);
+    void findPeaks(int upperBound, boost::shared_ptr<Gradient> gradient);
 
     enum {
         default_edge_value = 60

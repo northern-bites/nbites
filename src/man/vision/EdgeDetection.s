@@ -21,6 +21,7 @@
 .equiv  yGrad, imgHt * yPitch * 2
 
         .struct 8
+bound:  .skip 4
 thresh: .skip 4
 inImg:  .skip 4
 outImg:
@@ -156,8 +157,7 @@ atanTable:
 
 .section .text
 
-        ## _sobel_operator(uint8_t thresh, uint16_t *yimg, int16_t  *outX,
-        ##                 int16_t *outY, uint16_t *mag)
+        ## _sobel_operator(int bound, uint8_t thresh, uint16_t *in, int16_t* out);
 _sobel_operator:
         push    ebp
         mov     ebp, esp
@@ -170,6 +170,9 @@ _sobel_operator:
 
         ## Load arguments into registers
 
+        ## Load bound on starting row
+        mov     eax, [ebp + bound]
+
         ## We have to move destination registers to the ends of the next row
         ##
         ## | o | o | o | <- source comes from this row
@@ -181,16 +184,22 @@ _sobel_operator:
         pmullw  mm6, mm6
         psrlw   mm6, 10
 
+
+        imul    eax, yPitch
         mov     esi, [ebp + inImg]
+        add     esi, eax        # Move forward to bound-th row
 
         pcmpeqb mm7, mm7
         pandn   mm7, mm7
 
         mov     edi, [ebp + outImg]
-        add     edi, yPitch # Adjust destination pointer to second row
+        add     edi, yPitch     # Adjust destination pointer to second row
+        add     edi, eax        # Move dest pointer forward by 'bound' rows
 
         # Actually only does from top row through third to bottom
         mov     ebx, 238
+        sub     ebx, dword ptr[ebp+bound] # We start at the "bound" row, so do fewer
+
 sobel_yLoop:
         ## 4 pixels processed each iteration (320 per row / 4 = 80 iterations)
         mov     ecx, 80

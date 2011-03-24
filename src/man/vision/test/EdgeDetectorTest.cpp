@@ -69,7 +69,7 @@ int EdgeDetectorTest::test_sobel()
 
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
 
-    edges.sobelOperator(c, g);
+    edges.sobelOperator(0, c, g);
     for (int i=1; i < IMAGE_HEIGHT-1; ++i){
         for (int j=1; j < IMAGE_WIDTH-1; ++j){
             EQ_INT(g->getMagnitude(i,j) , 0);
@@ -89,7 +89,7 @@ int EdgeDetectorTest::test_sobel()
 
     shared_ptr<Gradient> g2 = shared_ptr<Gradient>(new Gradient());
 
-    edges.sobelOperator(c, g);
+    edges.sobelOperator(0, c, g);
     for (int i=1; i < IMAGE_HEIGHT-1; ++i)
         for (int j=1; j < IMAGE_WIDTH-1; ++j){
             int gx = ((c[(i-1) * IMAGE_WIDTH + j+1] +
@@ -158,7 +158,7 @@ int EdgeDetectorTest::test_peaks()
             else
                 c[(i) * IMAGE_WIDTH + j] = 250;
     g->reset();
-    edges.detectEdges(c,g);
+    edges.detectEdges(0, c,g);
 
     for (int i = 0; g->isPeak(i); ++i) {
         // x,y are in image center relative coords
@@ -265,7 +265,7 @@ int EdgeDetectorTest::test_peaks()
 /*************** CIRCLE TESTS ************************************/
     create_circle_image(c, r, e, i_0, j_0);
     g->reset();
-    edges.detectEdges(c,g);
+    edges.detectEdges(0, c,g);
     int n = 0;
 
 #ifdef USE_MMX
@@ -311,7 +311,7 @@ int EdgeDetectorTest::test_angles()
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
     create_circle_image(c, r, e, i_0, j_0);
     g->reset();
-    edges.detectEdges(c,g);
+    edges.detectEdges(0, c,g);
 
     for (int i = 0; i < Gradient::num_angles_limit; ++i) {
         if (g->isPeak(i)){

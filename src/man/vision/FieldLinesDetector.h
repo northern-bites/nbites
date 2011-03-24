@@ -17,7 +17,7 @@ public:
     virtual ~FieldLinesDetector() { };
 
     // VisualDetector interface
-    virtual void detect(const uint16_t *img);
+    virtual void detect(int upperBound, const uint16_t *img);
 
     // FieldLines interface
     std::list<VisualLine> getLines(){ return std::list<VisualLine>(); }
@@ -31,7 +31,7 @@ public:
     std::list<HoughLine> getHoughLines() { return houghLines; }
 
 private:
-    void findHoughLines(const uint16_t *img);
+    void findHoughLines(int upperBound, const uint16_t *img);
     void findFieldLines();
 
 private:
