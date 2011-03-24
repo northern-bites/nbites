@@ -15,12 +15,19 @@ public:
 	Joint(const float _mass, const float x_off, const float y_off,
 		  const float z_off)
 		: mass(_mass)
-		{
-			offset = CoordFrame4D::vector4D(x_off, y_off, z_off);
-		}
+        {
+            offset = CoordFrame4D::vector4D(x_off, y_off, z_off);
+        }
 };
 
 namespace Kinematics {
+
+    /* Not sure why we need this, CoM transformations seemed to be working
+     * before the 3.3 upgrade. In any case, when moving from the C frame to
+     * the I frame there is a 20mm offset in the y direction. If joint_com_y
+     * looks broken in the debug graphs, tweak this (or find the real problem).
+     */
+    static const float COM_I_Y_OFFSET = -20.0f;
 
 // All masses in grams
 // locally expressed constants (with respect to an individual joint
@@ -106,7 +113,7 @@ namespace Kinematics {
 			  ANKLE_MASS_g + FOOT_MASS_g);
 
 // put the constants and offsets together into Joint objects
-// invert Y offset for right arm & leg
+// invert Y offset for left arm & leg
 	const Joint chestMass = Joint(CHEST_MASS_g, CHEST_MASS_X,
 								  CHEST_MASS_Y, CHEST_MASS_Z);
 
