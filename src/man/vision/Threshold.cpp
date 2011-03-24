@@ -74,7 +74,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     // loads the color table on the MS into memory
 #if ROBOT(NAO_RL)
 # if ! defined WEBOTS_BACKEND && ! defined OFFLINE
-    initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
+    // initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
 # elif defined WEBOTS_BACKEND
     initTable(string(string(getenv("WEBOTS_HOME"))+
                      "/projects/contests/robotstadium/" +
@@ -1395,7 +1395,7 @@ void Threshold::initCompressedTable(std::string filename){
     free(fileData);
 
     fclose(fp);
-#endif 
+#endif
 }*/
 
 const uint16_t* Threshold::getYUV() {

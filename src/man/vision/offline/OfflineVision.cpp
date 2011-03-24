@@ -30,8 +30,6 @@ OfflineVision::OfflineVision(int _iterations, int _first, int _last) :
     profiler->profileFrames((last-first+1) * numIterations);
     profiler->printEmpty = false;
 #endif
-
-    // initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
 }
 
 OfflineVision::~OfflineVision()
@@ -102,9 +100,7 @@ void OfflineVision::initTable(string filename)
         }
     }
 
-#ifndef OFFLINE
     printf("Loaded colortable %s",filename.c_str());
-#endif
 
     fclose(fp);
 }
@@ -126,7 +122,6 @@ int main(int argv, char * argc[])
     int numIterations = 1;
     if (argv > OfflineVision::iterations){
         numIterations = atoi(argc[OfflineVision::iterations]);
-        cout << numIterations << endl;
     }
 
     OfflineVision * off =
