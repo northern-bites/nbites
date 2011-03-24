@@ -28,10 +28,10 @@ OfflineVision::OfflineVision(int _iterations, int _first, int _last) :
 #ifdef USE_TIME_PROFILING
     profiler->profiling = true;
     profiler->profileFrames((last-first+1) * numIterations);
-    profiler->maxPrintDepth = 2;
+    profiler->printEmpty = false;
 #endif
 
-    initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
+    // initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
 }
 
 OfflineVision::~OfflineVision()

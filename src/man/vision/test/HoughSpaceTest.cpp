@@ -41,19 +41,19 @@ void HoughSpaceTest::test_hs()
 
     // Notice that it is t_span +1. This is the same as in the
     // Hough Space.
-    uint16_t pre[HoughSpace::t_span+1][HoughSpace::r_span];
-    memcpy(pre, hs.hs, HoughSpace::hs_size * sizeof(uint16_t));
+    uint16_t pre[HoughSpace::t_span+10][HoughSpace::r_span];
 
-    // Copy the first row of the pre image to the last (just like the
-    // smoothing should)
-    for (int r=0; r < HoughSpace::r_span; ++r){
-        pre[HoughSpace::t_span][r] = pre[0][r];
+    for (int t=0; t < HoughSpace::t_span+10; ++t){
+        for(int r=0; r < HoughSpace::r_span; ++r){
+            pre[t][r] = hs.hs[t][r];
+        }
     }
 
     hs.smooth();
 
     // Test if smoothing worked
-    for (int t=0; t < HoughSpace::t_span; ++t){
+    for (int t=HoughSpace::first_smoothing_row;
+         t < HoughSpace::t_span + HoughSpace::first_smoothing_row; ++t){
         for (int r=0; r < HoughSpace::r_span-1; ++r){
 
             int preSum = (pre[t][r]   + pre[t+1][r] +
@@ -63,7 +63,6 @@ void HoughSpaceTest::test_hs()
             preSum = max(preSum, 0); // Bound it at zero
 
             int smoothed = hs.getHoughBin(r,t);
-
             EQ_INT( smoothed, preSum);
         }
     }

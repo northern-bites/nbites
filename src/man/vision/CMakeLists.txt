@@ -98,6 +98,7 @@ SET( VISION_SRCS Ball
                  EdgeDetection.s
                  CopyImage.s
 		 Hough.s
+		 HoughAlt.s
                  )
 
 set_property(SOURCE
@@ -106,6 +107,7 @@ set_property(SOURCE
   EdgeDetection.s
   CopyImage.s
   Hough.s
+  HoughAlt.s
   PROPERTY LANGUAGE C)
 
 SET( VISION_PYTHON_SRCS __init__.py )
@@ -146,8 +148,8 @@ INSTALL(
   )
 
 ############################ SET LIBRARIES TO LINK WITH
-TARGET_LINK_LIBRARIES( 
-  ${VISION_TARGET} 
+TARGET_LINK_LIBRARIES(
+  ${VISION_TARGET}
   ${PYTHON_LIBRARY} )
 
 
@@ -156,23 +158,23 @@ IF( VISIONLINK )
 
   FIND_PACKAGE( JNI REQUIRED )
 
-  INCLUDE_DIRECTORIES( ${VISIONLINK_HEADER_DIR} 
+  INCLUDE_DIRECTORIES( ${VISIONLINK_HEADER_DIR}
                        ${JNI_INCLUDE_DIRS} )
-  
+
   SET( VISIONLINK_SRCS ${VISIONLINK_FILE})
   ADD_LIBRARY(
     ${VISIONLINK_TARGET}
     SHARED
     ${VISIONLINK_SRCS}
     )
-    
+
   IF( WIN32 )
     ADD_DEFINITIONS( -D_JNI_IMPLEMENTATION_ )
     SET_TARGET_PROPERTIES(${VISIONLINK_TARGET} PROPERTIES LINK_FLAGS -Wl,--kill-at)
   ENDIF( WIN32 )
-  
-  TARGET_LINK_LIBRARIES( ${VISIONLINK_TARGET} 
-                        ${VISION_TARGET} 
+
+  TARGET_LINK_LIBRARIES( ${VISIONLINK_TARGET}
+                        ${VISION_TARGET}
                         ${SENSORS_TARGET}
                         ${NBINCLUDE_TARGET} )
 ENDIF( VISIONLINK )

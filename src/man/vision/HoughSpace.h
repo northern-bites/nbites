@@ -32,7 +32,7 @@ public:
     int  getAcceptThreshold()      { return acceptThreshold; }
 
     bool isPeak(int r, int t);
-    int  getHoughBin(int r, int t);
+    uint16_t getHoughBin(int r, int t);
 
 private:                        // Member functions
     void markEdges(boost::shared_ptr<Gradient> g);
@@ -55,9 +55,15 @@ private:                        // Member functions
 private:       // Member variables
     // Hough Space size parameters
     // 256 for full 8 bit angle, radius is for 320x240 image
-    enum { r_span = 400,
+    enum { r_span = 320,
            t_span = 256,
-           hs_size = r_span * (t_span+1),
+
+           // 5 rows on either side of the hough space to account for
+           // angle wrap around in edge marking.
+           hs_t_dim = t_span+10,
+           first_smoothing_row = 3,
+           first_peak_row = first_smoothing_row + 1,
+
            default_accept_thresh = 43,
            default_angle_spread  = 5,
            peak_points = 4 };
@@ -71,13 +77,7 @@ private:       // Member variables
     boost::shared_ptr<Profiler> profiler;
     int acceptThreshold, angleSpread, numPeaks;
 
-    // allocate an extra T for the smoothing neighborhood
-    // aka t(0) is next to t(t_span-1)
-#ifdef USE_MMX
-    uint16_t hs[hs_size];
-#else
-    uint16_t hs[t_span + 1][r_span];
-#endif
+    uint16_t hs[hs_t_dim][r_span];
     uint16_t peak[hough_max_peaks*peak_values];
 
     const static int drTab[peak_points];

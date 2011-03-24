@@ -273,7 +273,7 @@ Profiler::printIndentedSummary()
     comp = PCOMPONENT_SUB_ORDER[i];
     parent_sum = (float)sumTime[comp];
 
-    if (shouldNotPrintLine(i) &&
+    if (shouldNotPrintLine(i) ||
         (maxPrintDepth != PRINT_ALL_DEPTHS && depths[i] > maxPrintDepth))
         continue;
 

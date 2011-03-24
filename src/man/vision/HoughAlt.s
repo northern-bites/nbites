@@ -50,6 +50,7 @@
 #
 	.equiv	angleSpread, 5
 	.equiv	angleCount, 2 * angleSpread
+        .equiv  pfEnable, 0
 
 	.equiv	houghWd, 320	# all values allowed
 	.equiv	houghSize, 2	# some code assumes this value
@@ -410,7 +411,7 @@ sincosTable:				# Hough space rows
 
 	.macro	NextEdge live
 	movd	mm0, [ebp + edgeX]			# mm0 = edge location  | y | x | y | x |
-	punpckld mm0, mm0
+	punpckldq mm0, mm0
 
 	movzx	eax, byte ptr[ebp + edgeT]		# fetch angle (T)
 	add	ebp, edgeSize				# update edge pointer
@@ -420,7 +421,7 @@ sincosTable:				# Hough space rows
 	.endif
 	lea	edx, [sincosTable + eax*4]		# get sin/cos table address for starting T
 
-	.if	\live					# if live, prefetch first and last word
+	.if	\live && pfEnable			# if live, prefetch first and last word
 	prefetch [ebx]
 	prefetch [ebx + ecx]
 	.endif
@@ -434,7 +435,7 @@ sincosTable:				# Hough space rows
 
 	imul	eax, houghPitch				# calculate address for first R-run of next edge
 	add	eax, [esp + houghSpace]
-	lea	ecx, [eax + ecx * houghSize + houghWidth / 2 * houghSize]
+	lea	ecx, [eax + ecx * houghSize + houghWd / 2 * houghSize]
 	.if	\live					# store address for next stage
 	mov	[edi + ppAddr], ecx
 	.else
@@ -453,6 +454,7 @@ rl\@:	inc	word ptr [ebx]
 
 ####
 # T loop, pipe fill for first edge.
+#
 # These are the MMX instructions used to calculate the span and increment for a pair of
 # R-runs for a given T. Two are done in parallel. The values are stored in one of the
 # ping-pong buffers, for later use by the second stage of the pipeline. The version of
@@ -464,19 +466,24 @@ rl\@:	inc	word ptr [ebx]
 # instructions are duplicated in TLoop0 and TLoop1, since each set does one R-run. The
 # mmx instructions are divided into two parts, one for each macro, since the complete
 # set does two R-runs in parallel.
+#
 	.macro	TLoopFill
 	movq	mm1, [edx + ecx*8 + 4]			# | sin[p+1] | cos[p+1] | sin[p] | cos[p] | S16.14
+
 	pmaddwd	mm1, mm0				# | R[p+1] |  R[p]  |  S32.14
 	psrad	mm1, 14					# | R[p+1] |  R[p]  |  S32.0
 	pmaxsw	mm1, mm4				# clamp R at lower edge of Hough space
 	pminsw	mm1, mm5				# clamp R at upper edge of Hough space
-	punpckld mm2, mm1				# |  R[p]  | R[p-1] |
+
+	punpckldq mm2, mm1				# |  R[p]  | R[p-1] |
 	psubd	mm1, mm2				# | span[p+1] |  span[p]  |
 	paddd	mm2, mm1				# | R[p+1] |  R[p]  |
 
 	psrlq	mm2, 32					# |  ---   | R[p+1] | for next time
 	paddd	mm1, mm1				# span *= 2 since houghSize = 2
+
 	movq	[esi + ppSpan + ecx*8], mm1		# store span pair
+
 	psrad	mm1, 31					# make positive spans 0, negative spans -1
 	por	mm1, mm3				# make positive spans 1, negative spans -1
 	paddd	mm1, mm1				# make positive spans 2, negative spans -2
@@ -490,25 +497,34 @@ rl\@:	inc	word ptr [ebx]
 	# integer unit					# integer unit comments
 				# mmx unit					# mmx unit comments
 	.if	\phase
-	sub	ebx, eax				# back up Hough address to point to last bin acessed
-	add	ebx, houghPitch				# update Hough poinnter to current T
+	sub	ebx, eax				# back up Hough address to point to last bin accessed
+	add	ebx, houghPitch				# update Hough pointer to current T
 	.endif
+
 	mov	ecx, [esi + ppSpan + 4 * \phase]	# fetch span for current set of R values
+
 				movq	mm1, [edx + 4 * \phase + 4]		# | sin[p+1] | cos[p+1] | sin[p] | cos[p] | S16.14
 				pmaddwd	mm1, mm0				# | R[p+1] |  R[p]  |  S32.14
+
+        .if     pfEnable
 	prefetch [ebx + ecx + houghPitch]		# prefetch byte at start of next set of R
 	mov	eax, [esi + ppSpan + 4 * (\phase + 1)]	# fetch next span
 	add	eax, ecx				# current + next span
+        .endif
+
 				psrad	mm1, 14					# | R[p+1] |  R[p]  |  S32.0
 				pmaxsw	mm1, mm4				# clamp R at lower edge of Hough space
 				pminsw	mm1, mm5				# clamp R at upper edge of Hough space
+        .if     pfEnable
 	prefetch [ebx + eax + houghPitch]		# prefetch byte at end of next set of R
-				punpckld mm2, mm1				# |  R[p]  | R[p-1] |
+        .endif
+				punpckldq mm2, mm1				# |  R[p]  | R[p-1] |
 	mov	eax, [esi + ppInc + 4 * \phase]		# fetch increment for current set of R
-				psubd	mm1, mm2				# | span[p+1] |  span[p]  |
-	add	ecx, eax				# span + increment is the starting count
+
+	                        psubd	mm1, mm2				# | span[p+1] |  span[p]  |
+        add	ecx, eax				# span + increment is the starting count
 				paddd	mm2, mm1				# | R[p+1] |  R[p]  |
-	.endm
+ 	.endm
 
 #
 # T loop, odd phases
@@ -519,22 +535,27 @@ rl\@:	inc	word ptr [ebx]
 	sub	ebx, eax				# back up Hough address to point to last bin acessed
 	add	ebx, houghPitch				# update Hough poinnter to current T
 	mov	ecx, [esi + ppSpan + 4 * \phase]	# fetch span for current set of R values
-				psrlq	mm2, 32					# |  ---   | R[p+1] | for next time
+
+	                        psrlq	mm2, 32					# |  ---   | R[p+1] | for next time
 				paddd	mm1, mm1				# span *= 2 since houghSize = 2
 
-	.if	\phase - angleCount + 1
-	prefetch [ebx + ecx + 2 * houghPitch]		# prefetch byte at start of next set of R
+	.if	\phase - angleCount + 1 && pfEnable     # If not the last phase (phase = angleCount-1),
+	prefetch [ebx + ecx + houghPitch]		# prefetch byte at start of next set of R
 	mov	eax, [esi + ppSpan + 4 * (\phase + 1)]	# fetch next span
 	add	eax, ecx				# current + next span
 	.endif
 				movq	[edi + ppSpan + 4 * (\phase - 1)], mm1	# store span pair
 				psrad	mm1, 31					# make positive spans 0, negative spans -1
-	.if	\phase - angleCount + 1
+
+	.if	\phase - angleCount + 1 && pfEnable
 	prefetch [ebx + eax + houghPitch]		# prefetch byte at end of next set of R
 	.endif
+
 				por	mm1, mm3				# make positive spans 1, negative spans -1
 	mov	eax, [esi + ppInc + 4 * \phase]		# fetch increment for current set of R
+
 				paddd	mm1, mm1				# make positive spans 2, negative spans -2
+
 	add	ecx, eax				# span + increment is the starting count
 				movq	[edi + ppInc + 4 * (\phase - 1)], mm1	# store increment pair
 	.endm
@@ -562,6 +583,9 @@ rl\@:	inc	word ptr [ebx]
 # any following neighborhood processing, since houghSpace wraps around in angle.
 
 	.section .text
+break:
+        nop
+        ret
 
 	.globl	_houghMain
 _houghMain:
@@ -575,23 +599,23 @@ _houghMain:
 	lea	esi, [esp + ppBuf0]
 	lea	edi, [esp + ppBuf1]
 	mov	ebp, [esp + edgeList]
-	pcmpeqw	mm3, mm3
-	psrlw	mm3, 15
-	mov	eax, -(houghWidth / 2)
+	pcmpeqd	mm3, mm3
+	psrld	mm3, 31
+	mov	eax, -(houghWd / 2)
 	movd	mm4, eax
-	punpckld mm4, mm4
-	mov	eax, houghWidth / 2
+	punpckldq mm4, mm4
+	mov	eax, houghWd / 2
 	movd	mm5, eax
-	punpckld mm5, mm5
+	punpckldq mm5, mm5
 
 # Zero Hough space
 	mov	eax, [esp + houghSpace]
 	mov	ecx, houghPitch * (256 + angleCount - 1)
 	pxor	mm0, mm0
-zero:	movntq	[eax], mm0
+zero:   movntq	[eax], mm0
 	add	eax, 8
 	sub	ecx, 8
-	jgt	zero
+	jg	zero
 
 # Fill first stage of pipeline
 	NextEdge 0
@@ -608,12 +632,13 @@ edgeLoop:
 	NextEdge 1
 
 	phase = 0
+        nop
 	.rept	angleSpread
 	TLoop0	phase
-	RLoop
+        RLoop
 	TLoop1	(phase + 1)
 	RLoop
-	phase = phase + 2
+        phase = phase + 2
 	.endr
 
 	# exchange ping/pong buffers
@@ -622,21 +647,21 @@ edgeLoop:
 	xor	edi, esi
 
 	# loop control
-	dec	[esp + edgeCount]
+	dec	dword ptr[esp + edgeCount]
 	jne	edgeLoop
 
 #
 # Done processing edges, handle Hough space angle wrap-around
 #
 	mov	eax, [esp + houghSpace]
-	mov	ecx, houghSize * (angleCount - 1)
+	mov	ecx, houghWd * (angleCount - 1)
 wrap:	movq	mm0, [eax]
 	paddw	mm0, [eax + 256 * houghPitch]
 	movq	[eax], mm0
 	movq	[eax + 256 * houghPitch], mm0
 	add	eax, 8
-	sub	ecx, 4
-	jgt	wrap
+	sub	ecx, 8/houghSize
+	jg	wrap
 
 #
 # return

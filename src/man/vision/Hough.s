@@ -6,7 +6,9 @@
 
 .section .data
 
-        ## Parameter layout
+###################################
+        ## Parameter layout ##
+###################################
                 .struct 8
 num_peaks:      .skip 4
 angle_spread:   .skip 4
@@ -19,19 +21,34 @@ angle_offset:   .skip 2
 x_offset:       .skip 2
 y_offset:
 
-# sin(0 + 0x40) = cos(x) (0x40 = 90 degrees, btw)
-        .equiv cos_offset,     0x40*2 # needs to offset for words (2 bytes each)
-
         ## Stack layout
         .struct 0
 spread: .skip 4
 end_of_stack:
 
-        .equiv  r_span, 400
+###############################
+        ## Constants ##
+###############################
+
+        # sin(0 + 0x40) = cos(x) (0x40 = 90 degrees, btw)
+        .equiv cos_offset, 0x40*2 # needs to offset for words (2 bytes each)
+
+        .equiv  r_span, 320
         .equiv  t_span, 256
         .equiv  bytes_per_bin, 2 # hough space has uint16_t bins
 
         .equiv  yPitch, (r_span) * bytes_per_bin
+
+        ## We smooth starting with the 3rd row, because then row 4 can
+	## be the first peak row with angle=0
+        .equiv  first_smooth_row, 3
+
+        ## Some hough edge versions need us to copy the first row to
+	## the bottom, some don't
+        .equiv  copy_first_row_enabled, 0
+
+        ## r_span * t_span must be a multiple of 4!
+        .equiv  pixels_per_smooth, 4
 
         .data
 
@@ -284,6 +301,7 @@ _smooth_hough:
 
         ## Load hough space pointer
         mov     esi, dword ptr[ebp + 8]
+        add     esi, yPitch * first_smooth_row
 
         ## Load peak threshold
         pinsrw  mm7, [ebp + 12], 0b00
@@ -302,8 +320,9 @@ _smooth_hough:
 	## Copy esi to edi for initial copy loop
         mov     edi, esi
 
-        mov     ecx, r_span
+        ## mov     ecx, r_span
 
+        .if copy_first_row_enabled
 copy_first_row:
         ## Load from top row
         LOAD    edi, 0
@@ -324,17 +343,19 @@ copy_first_row:
 	## Loop control ##
         sub     ecx, 4 * 5      # 4 values with each load/store, 8x
         jne     copy_first_row
+        .endif
 
 ################### END FIRST ROW COPYING #####################
 
-        ## r_span * t_span must be a multiple of 4!
-        .equiv  pixels_per_smooth, 4
-
-        ## Row count: from 0 -> t_span-1 (which loads values from t_span row)
-	mov     ecx, t_span * r_span/ pixels_per_smooth
+        ## Smoothing counter:
+        ##     Covers the entire Hough Space (r_span*t_span),
+        ##     plus 2 extra rows above the space (row 3 and 4)
+	mov     ecx, (t_span+2) * r_span/ pixels_per_smooth
 
         ## Smooths over the entire image
 smoothLoop:
+        prefetch [esi + yPitch + 64]
+
         BOXCAR esi, mm0, mm1
         BOXCAR esi + 4, mm2, mm3
 
@@ -345,7 +366,7 @@ smoothLoop:
         psubusw mm0, mm7
 
         ## Write
-        movntq [esi], mm0
+        movq [esi], mm0
 
         ## Move ptr forward
         add     esi, bytes_per_bin * pixels_per_smooth
