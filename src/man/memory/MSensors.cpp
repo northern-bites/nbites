@@ -4,10 +4,8 @@
  *      Author: oneamtu
  */
 
-#include "Common.h" //for micro_time
 #include "MemoryMacros.hpp"
 #include "MSensors.hpp"
-
 #include <vector>
 
 namespace memory {
@@ -27,19 +25,21 @@ MSensors::~MSensors() {
     //delete fileLogger;
 }
 
-/*void MSensors::update() {
+void MSensors::update(const ProviderEvent e) {
 
-    ADD_PROTO_TIMESTAMP;
-
-    vector<float> bodyAngles = sensors->getBodyAngles();
-    for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end(); i++) {
-        this->add_body_angles(*i);
+    if (e.getType() == NEW_MOTION_SENSORS) {
+        this->MMotionSensors::update();
+        this->MMotionSensors::log();
     }
 
-    std::cout << this->DebugString() << std::endl;
+    if (e.getType() == NEW_VISION_SENSORS) {
+        this->MVisionSensors::update();
+        this->MVisionSensors::log();
+    }
 }
-
+/*
 void MSensors::log() const {
     fileLogger->write();
 }*/
 }
+

@@ -635,6 +635,8 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
     pthread_mutex_unlock(&inertial_mutex);
     pthread_mutex_unlock(&fsr_mutex);
     pthread_mutex_unlock(&button_mutex);
+
+    this->notify(ProviderEvent(this, NEW_MOTION_SENSORS));
 }
 
 /**
@@ -660,7 +662,7 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
     pthread_mutex_unlock(&ultra_sound_mutex);
     pthread_mutex_unlock (&button_mutex);
     pthread_mutex_unlock (&battery_mutex);
-
+    this->notify(ProviderEvent(this, NEW_VISION_SENSORS));
 }
 
 void Sensors::setAllSensors (vector<float> sensorValues) {

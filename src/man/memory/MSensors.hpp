@@ -15,9 +15,10 @@
 #include "MMotionSensors.hpp"
 #include "Sensors.h"
 #include "log/FileLogger.hpp"
+#include "Subscriber.h"
 
 namespace memory {
-class MSensors: public MMotionSensors, public MVisionSensors {
+class MSensors: public MMotionSensors, public MVisionSensors, public Subscriber {
 
 public:
     /**
@@ -31,7 +32,7 @@ public:
      * Updates all the fields of the underlying proto::PSensors with values
      * from the Sensors object
      */
-    //void update();
+    void update(const ProviderEvent e);
     //void log() const;
 
 private:

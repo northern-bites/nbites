@@ -27,6 +27,7 @@
 #include "SensorDef.h"
 #include "NaoDef.h"
 #include "VisionDef.h"
+#include "Provider.h"
 
 enum SupportFoot {
     LEFT_SUPPORT = 0,
@@ -35,6 +36,10 @@ enum SupportFoot {
 
 class Sensors;
 
+enum SENSORS_EVENT {
+    NEW_MOTION_SENSORS = 1,
+    NEW_VISION_SENSORS
+};
 
 struct FSR {
 FSR(const float fl, const float fr,
@@ -77,7 +82,7 @@ Inertial(const float _accX, const float _accY, const float _accZ,
 };
 
 
-class Sensors {
+class Sensors : public Provider{
     //friend class Man;
  public:
     Sensors();

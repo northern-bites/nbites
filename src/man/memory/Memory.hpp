@@ -57,5 +57,7 @@ public:
 public:
     MVision* mvision;
     MSensors* msensors;
+
+    MSensors* getMSensors() const {return msensors;}
 };
 }
