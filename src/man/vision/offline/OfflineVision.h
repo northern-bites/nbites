@@ -19,9 +19,17 @@ public:
     virtual ~OfflineVision();
 
     int runOnDirectory(std::string path);
-
-private:
     void initTable(string filename);
+private:
+
+public:
+    enum {
+        directory = 1,
+        first_img,
+        last_img,
+        iterations,
+        table_name
+    };
 
 private:
     Vision * vision;

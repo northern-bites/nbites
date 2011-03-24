@@ -112,7 +112,8 @@ void OfflineVision::initTable(string filename)
 void printUsage()
 {
     cout << "Usage: ./OfflineVision <path-to-directory>"
-         << " <# first frame> <# last frame>" << endl;
+         << " <# first frame> <# last frame> "
+         << "\n\tOPTIONAL: <# iterations> <color table>" << endl;
 }
 
 int main(int argv, char * argc[])
@@ -122,14 +123,20 @@ int main(int argv, char * argc[])
         return 1;
     }
 
-    int numIterations;
-    if (argv == 4){
-        numIterations = 1;
-    } else {
-        numIterations = atoi(argc[4]);
+    int numIterations = 1;
+    if (argv > OfflineVision::iterations){
+        numIterations = atoi(argc[OfflineVision::iterations]);
+        cout << numIterations << endl;
     }
 
-    OfflineVision * off = new OfflineVision(numIterations,
-                                            atoi(argc[2]), atoi(argc[3]));
-    return off->runOnDirectory(argc[1]);
+    OfflineVision * off =
+        new OfflineVision(numIterations,
+                          atoi(argc[OfflineVision::first_img]),
+                          atoi(argc[OfflineVision::last_img]));
+
+    if (argv == OfflineVision::table_name+1){
+        off->initTable(argc[OfflineVision::table_name]);
+    }
+
+    return off->runOnDirectory(argc[OfflineVision::directory]);
 }
