@@ -9,8 +9,9 @@ extern "C" void _sobel_operator(int bound,
                                 const uint8_t thresh,
                                 const uint16_t *input,
                                 uint16_t *out);
-extern "C" int _find_edge_peaks(const uint16_t *gradients,
-                                 int16_t *angles);
+extern "C" int _find_edge_peaks(int bound,
+                                const uint16_t *gradients,
+                                int16_t *angles);
 using boost::shared_ptr;
 using namespace std;
 
@@ -126,7 +127,9 @@ void EdgeDetector::findPeaks(int upperBound, shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(profiler, P_EDGE_PEAKS);
 #ifdef USE_MMX
-    gradient->numPeaks = _find_edge_peaks(gradient->values, gradient->angles);
+    gradient->numPeaks = _find_edge_peaks(upperBound,
+                                          gradient->values,
+                                          gradient->angles);
 #else
     /**************** IMPORTANT NOTE: **********************
      *

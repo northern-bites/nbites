@@ -21,7 +21,7 @@
 .equiv  yGrad, imgHt * yPitch * 2
 
         .struct 8
-bound:  .skip 4
+bound_sobel_param:  .skip 4
 thresh: .skip 4
 inImg:  .skip 4
 outImg:
@@ -29,15 +29,17 @@ outImg:
 # Tables and structs for Edge Peak Loop
 #
         ## Parameter struct
-                .struct 8
-gradients_param:      .skip 4
-angles_param:
+                        .struct 8
+bound_peak_param:       .skip 4
+gradients_param:        .skip 4
+angles_param:           .skip 4
 
         ## Stack layout
                 .struct 0
 row_count:      .skip 4
 angles_ptr:     .skip 4
 num_peaks:      .skip 4
+bound_val:         .skip 4
 end_of_peak_stack:
 
         .equiv neighborOffset, 12*4
@@ -171,7 +173,7 @@ _sobel_operator:
         ## Load arguments into registers
 
         ## Load bound on starting row
-        mov     eax, [ebp + bound]
+        mov     eax, [ebp + bound_sobel_param]
 
         ## We have to move destination registers to the ends of the next row
         ##
@@ -198,7 +200,8 @@ _sobel_operator:
 
         # Actually only does from top row through third to bottom
         mov     ebx, 238
-        sub     ebx, dword ptr[ebp+bound] # We start at the "bound" row, so do fewer
+        # We start at the "bound" row, so do fewer
+        sub     ebx, dword ptr[ebp+bound_sobel_param]
 
 sobel_yLoop:
         ## 4 pixels processed each iteration (320 per row / 4 = 80 iterations)
@@ -288,7 +291,7 @@ sobel_xLoop:
 
 .section        .text
 
-        ## _find_edge_peaks(int16_t *gradients, uint16_t *output)
+        ## _find_edge_peaks(int bound, int16_t *gradients, uint16_t *output)
         ##
         ## General Registers:
         ##      eax     y gradient, then max(xGrad, yGrad), then binary angle
@@ -312,7 +315,11 @@ _find_edge_peaks:
         push    edi
         push    ebx
 
+        mov     ecx, dword ptr[esp + bound_peak_param + 12]
+        imul    ebx, ecx, yPitch # move forward by 'bound' rows
+
         mov     edi, dword ptr[esp + gradients_param + 12]
+        add     edi, ebx
 
         ## Move foward to first usable gradient point
         ## This is 2 rows down (since row 0 has no gradient values and
@@ -326,12 +333,15 @@ _find_edge_peaks:
         mov     eax, dword ptr[esp + angles_param + 12]
 
         sub     esp, end_of_peak_stack
+        mov     dword ptr[esp + bound_val], ecx
         mov     dword ptr[esp + angles_ptr], eax
 
         mov     dword ptr[esp + num_peaks], 0
 
         ## 240 rows, 238 gradient magnitudes, 236 possible peak rows
-        mov     dword ptr[esp + row_count], 237
+        mov     ebx, 237
+        sub     ebx, dword ptr[esp + bound_val]
+        mov     dword ptr[esp + row_count], ebx
 
         cld                             # search increasing addresses
 
