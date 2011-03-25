@@ -5,6 +5,11 @@
 
 using namespace std;
 
+HoughLine::HoughLine() :
+    r(0), t(0), rIndex(0), tIndex(0), score(0)
+{
+
+}
 
 HoughLine::HoughLine(int _rIndex, int _tIndex,
                      float _r, float _t, int _score) :

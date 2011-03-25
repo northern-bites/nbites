@@ -36,7 +36,7 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
     smooth();
     peaks();
 
-    list<HoughLine> lines;
+    ActiveArray<HoughLine> lines = ActiveArray<HoughLine>(10);
     createLinesFromPeaks(lines);
 
     int x0 = static_cast<int>(Gradient::cols/2);
@@ -45,7 +45,13 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
     suppress(x0, y0, lines);
 
     PROF_EXIT(profiler, P_HOUGH);
-    return lines;
+    list<HoughLine> lines_list;
+    for (int i=0; i < lines.size(); ++i){
+        if (lines.active(i)){
+            lines_list.push_back(lines[i]);
+        }
+    }
+    return lines_list;
 }
 
 /**
@@ -180,68 +186,62 @@ void HoughSpace::peaks()
  *
  * @param lines List to be filled with lines
  */
-void HoughSpace::createLinesFromPeaks(list<HoughLine>& lines)
+void HoughSpace::createLinesFromPeaks(ActiveArray<HoughLine>& lines)
 {
     for (int i=0; i < numPeaks; ++i){
         HoughLine line = createLine(getPeakR(i),
                                     getPeakT(i),
                                     getPeakZ(i) );
-        lines.push_back(line);
+        lines.add(line);
     }
 }
 /**
  * Combine/remove duplicate lines and lines which are not right.
  */
-void HoughSpace::suppress(int x0, int y0, list<HoughLine>& lines)
+void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
 {
     PROF_ENTER(profiler, P_SUPPRESS);
     bool toDelete[lines.size()];
-    for (unsigned int i = 0; i < lines.size(); ++i) {
+
+    for (int i = 0; i < lines.size(); ++i) {
         toDelete[i] = false;
     }
-    list<HoughLine>::iterator line = lines.begin();
-    list<HoughLine>::iterator line2;
-    int index = 0;
-    while (line != lines.end()){
 
-        // Set the second point to point at the next line
-        line2 = line;
+    int index = 0;
+    while (index < lines.size()){
+
         int index2 = index;
-        line2++;
         index2++;
 
-        while (line2 != lines.end()){
+        while (index2 < lines.size()){
 
-            const int tDiff = abs(((line->getTIndex() -
-                                    line2->getTIndex()) & 0xff)
+            const int tDiff = abs(((lines[index].getTIndex() -
+                                    lines[index2].getTIndex()) & 0xff)
                                   << 24 >> 24);
-            const int rDiff = abs(line->getRIndex() - line2->getRIndex());
+            const int rDiff = abs(lines[index].getRIndex() -
+                                  lines[index2].getRIndex());
 
             if ( 0 < tDiff && tDiff <= angleSpread &&
-                 (rDiff <= 4 || HoughLine::intersect(x0, y0, *line, *line2))) {
+                 (rDiff <= 4 ||
+                  HoughLine::intersect(x0, y0, lines[index], lines[index2]))) {
 
-                if (line->getScore() < line2->getScore()){
+                if (lines[index].getScore() < lines[index2].getScore()){
                     toDelete[index] = true;
                 } else {
                     toDelete[index2] = true;
                 }
             }
             index2++;
-            line2++;
         }
         index++;
-        line++;
     }
 
-    line = lines.begin();
-    int i = 0;
-    while (line != lines.end()){
-        if (toDelete[i]){
-            line = lines.erase(line);
-        } else {
-            line++;
+    index = 0;
+    while (index < lines.size()){
+        if (toDelete[index]){
+            lines.deactivate(index);
         }
-        i++;
+        index++;
     }
     PROF_EXIT(profiler, P_SUPPRESS);
 }

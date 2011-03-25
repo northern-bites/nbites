@@ -8,6 +8,7 @@
 #include "geom/HoughLine.h"
 #include "Profiler.h"
 #include "visionconfig.h"
+#include "ActiveArray.h"
 
 /**
  * The accumulator space and associated functions for performing
@@ -41,8 +42,8 @@ private:                        // Member functions
 
     void smooth();
     void peaks();
-    void createLinesFromPeaks(std::list<HoughLine>& lines);
-    void suppress(int x0, int y0, std::list<HoughLine>& lines);
+    void createLinesFromPeaks(ActiveArray<HoughLine>& lines);
+    void suppress(int x0, int y0, ActiveArray<HoughLine>& lines);
 
     void reset();
 

@@ -2,6 +2,7 @@
 #include "HoughSpaceTest.h"
 #include <list>
 #include <string.h>
+#include "ActiveArray.h"
 
 #include "Profiler.h"
 
@@ -121,7 +122,7 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
 
 void HoughSpaceTest::test_suppress()
 {
-    list<HoughLine> lines;
+    ActiveArray<HoughLine> lines(10);
 
     // test three identical lines to make sure that only one of the
     // duplicate lines survives suppress()
@@ -129,16 +130,17 @@ void HoughSpaceTest::test_suppress()
     HoughLine a2 = HoughSpace::createLine(101, 182, 2);
     HoughLine a3 = HoughSpace::createLine(99, 182, 4);
 
-    lines.push_back(a1);
-    lines.push_back(a2);
-    lines.push_back(a3);
+    lines.add(a1);
+    lines.add(a2);
+    lines.add(a3);
 
     int x0 = IMAGE_HEIGHT /2;
     int y0 = IMAGE_WIDTH /2;
     hs.suppress(x0, y0, lines);
 
-    EQ_INT(lines.size() , 1);   // Ensure that only one duplicate line remains
-    TRUE(lines.front() == a1);
+    // Ensure that only one duplicate line remains
+    EQ_INT(lines.numActive(), 1);
+    TRUE(lines[0] == a1);
 
     PASSED(NO_DUPE_LINES);
 
@@ -149,24 +151,22 @@ void HoughSpaceTest::test_suppress()
     HoughLine b2 = HoughSpace::createLine(10,203,4);
 
     lines.clear();
-    lines.push_back(a);
-    lines.push_back(b);
-    lines.push_back(c);
-    lines.push_back(b2);
+    lines.add(a);
+    lines.add(b);
+    lines.add(c);
+    lines.add(b2);
 
     hs.suppress(x0, y0, lines);
-    EQ_INT( lines.size() , 3 );
+    EQ_INT( lines.numActive() , 3 );
     bool at = false, bt = false, ct = false;
 
-    list<HoughLine>::iterator i = lines.begin();
-    while (i != lines.end()){
-        if (*i == a)
+    for (int i=0; i < lines.size(); ++i){
+        if (lines[i] == a)
             at = true;
-        if (*i == b)
+        if (lines[i] == b)
             bt = true;
-        if (*i == c)
+        if (lines[i] == c)
             ct = true;
-        i++;
     }
 
     TRUE(at && bt && ct);
@@ -227,8 +227,8 @@ void HoughSpaceTest::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
 int HoughSpaceTest::runTests()
 {
     test_hs();
-    test_lines();
     test_suppress();
+    test_lines();
     return 0;
 }
 

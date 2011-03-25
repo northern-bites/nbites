@@ -12,14 +12,15 @@ class HoughLine
 public:
    HoughLine(int _rIndex, int _tIndex,
               float _r, float _t, int _score);
+    HoughLine();
     virtual ~HoughLine() { };
 
-    float getRadius() const { return r;      }
-    float getAngle()  const { return t;      }
+    inline float getRadius() const { return r;      }
+    inline float getAngle()  const { return t;      }
 
-    int getRIndex()   const { return rIndex; }
-    int getTIndex()   const { return tIndex; }
-    int getScore()    const { return score;  }
+    inline int getRIndex()   const { return rIndex; }
+    inline int getTIndex()   const { return tIndex; }
+    inline int getScore()    const { return score;  }
 
     static bool intersect(int x0, int y0,
                           const HoughLine& a, const HoughLine& b);
