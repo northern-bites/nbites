@@ -14,16 +14,48 @@
  */
 class Gradient
 {
+    // Structures and constants
+public:
+    struct AnglePeak {
+        uint16_t angle;
+        int16_t x;
+        int16_t y;
+    };
+
+    enum {
+        // Row Offsets in value array
+        magnitudes = 0,
+        x_grads = IMAGE_HEIGHT,
+        y_grads = IMAGE_HEIGHT * 2,
+
+        num_angles_limit = IMAGE_WIDTH * IMAGE_HEIGHT /2,
+    };
+
     // Public member functions
 public:
     Gradient();
     virtual ~Gradient() { };
 
+    void reset();
+    void clear();
+    int peaks_list_contains(int i, int j);
+    void printAnglesList();
+
+
+    inline void addAngle(uint8_t angle, int16_t x, int16_t y){
+        angles[numPeaks].angle = angle;
+        angles[numPeaks].x     = static_cast<uint16_t>(x - IMAGE_WIDTH/2);
+        angles[numPeaks].y     = static_cast<uint16_t>(y - IMAGE_HEIGHT/2);
+        numPeaks++;
+    }
+
+    inline bool isPeak(int n){
+        return (n < numPeaks);
+    }
+
     static inline uint8_t dir(int y, int x) {
         return static_cast<uint8_t>(atan2(y, x) / M_PI * 128.0) & 0xff;
     }
-
-    void reset();
 
     /**
      * Calculate the highest three bits of an angle for the given y and x
@@ -52,93 +84,70 @@ public:
         //     d |= 0x1;
         // }
         d = (d & 0x2) ? ((d & 0x1) | (- (abs(x) > abs(y)) & 0x1)) :
-                         (d & 0x1) | (- (abs(x) < abs(y)) & 0x1);
+            (d & 0x1) | (- (abs(x) < abs(y)) & 0x1);
 
         return static_cast<uint8_t>(d);
     }
 
+// **********************************************
+//                    Getters
+// **********************************************
+
     // Values are all offset by one (see EdgeDetection.s)
-    uint16_t getMagnitude(int i, int j){
-        return values[i * IMAGE_WIDTH + j + magnitudes + 1];
+    inline uint16_t getMagnitude(int i, int j){
+        return (values[i + magnitudes][j+1]);
     }
 
-    int16_t getX(int i, int j){
-        return values[i * IMAGE_WIDTH + j + x_grads + 1];
+    inline int16_t getX(int i, int j){
+        return values[i + x_grads][j+1];
     }
 
-    int16_t getY(int i, int j){
-        return values[i * IMAGE_WIDTH + j + y_grads + 1];
-    }
-
-    void setMagnitude(uint16_t v, int i, int j){
-        values[i * IMAGE_WIDTH + j + magnitudes + 1] = v;
-    }
-
-    void setX(int16_t v, int i, int j){
-        values[i * IMAGE_WIDTH + j + x_grads + 1] = v;
-    }
-
-    void setY(int16_t v, int i, int j){
-        values[i * IMAGE_WIDTH + j + y_grads + 1] = v;
+    inline int16_t getY(int i, int j){
+        return values[i + y_grads][j + 1];
     }
 
     // Return the nth angle in the angles array
-    uint8_t getAngle(int n){
-        return static_cast<uint8_t>(angles[n*3 + angles_offset]);
+    inline uint8_t getAngle(int n){
+        return static_cast<uint8_t>(angles[n].angle);
     }
 
     // Return the nth x coordinate in the angles array
-    int16_t getAnglesXCoord(int n){
-        return static_cast<int16_t>(angles[n*3 + angles_x_offset]);
+    inline int16_t getAnglesXCoord(int n){
+        return angles[n].x;
     }
 
     // Return the nth y coordinate in the angles array
-    int16_t getAnglesYCoord(int n){
-        return static_cast<int16_t>(angles[n*3 + angles_y_offset]);
+    inline int16_t getAnglesYCoord(int n){
+        return angles[n].y;
     }
 
-    void addAngle(uint8_t angle, int16_t x, int16_t y){
-        angles[numPeaks*3 + angles_offset] = angle;
-        angles[numPeaks*3 + angles_x_offset] =
-            static_cast<uint16_t>(x - IMAGE_WIDTH/2);
-        angles[numPeaks*3 + angles_y_offset] =
-            static_cast<uint16_t>(y - IMAGE_HEIGHT/2);
+// **********************************************
+//                    Setters
+// **********************************************
 
-        numPeaks++;
+    void setMagnitude(uint16_t v, int i, int j){
+        values[i + magnitudes][j + 1] = v;
     }
 
-    bool isPeak(int n){
-        return (n < numPeaks);
+    void setX(int16_t v, int i, int j){
+        values[i + x_grads][j + 1] = v;
     }
 
-    int peaks_list_contains(int i, int j);
-    void printAnglesList();
+    void setY(int16_t v, int i, int j){
+        values[i + y_grads][j + 1] = v;
+    }
+
 
     // Public member variables
-
-    // Values is all the arrays in one, the others
-    // get pointers within 'values'
-    uint16_t *values;
-
-    // Each angle has 3 values: angle, x coordinate, and y coordinate
-    int16_t *angles;
+public:
     int numPeaks;
-    bool peaks[IMAGE_HEIGHT][IMAGE_WIDTH];
-
-    enum {
-        magnitudes = 0,
-        x_grads = IMAGE_WIDTH * IMAGE_HEIGHT,
-        y_grads = IMAGE_WIDTH * IMAGE_HEIGHT * 2,
-
-        num_angles_limit = IMAGE_WIDTH * IMAGE_HEIGHT /2,
-        angles_size = num_angles_limit * 3,
-        angles_offset = 0,
-        angles_x_offset = 1,
-        angles_y_offset = 2,
-    };
-
     const static int rows = IMAGE_HEIGHT;
     const static int cols = IMAGE_WIDTH;
+
+    // Values is the 3 magnitude, x, & y gradient value arrays in one
+    uint16_t values[IMAGE_HEIGHT*3][IMAGE_WIDTH];
+    AnglePeak angles[num_angles_limit];
+
     // Tables that specify the + neighbor of a pixel indexed by
     // gradient direction octant (the high 3 bits of direction).
     const static int DIRECTIONS = 8;

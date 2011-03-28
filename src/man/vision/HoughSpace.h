@@ -22,7 +22,7 @@ public:
     HoughSpace(boost::shared_ptr<Profiler> p);
     virtual ~HoughSpace() { };
 
-    std::list<HoughLine> findLines  (boost::shared_ptr<Gradient> g);
+    std::list<HoughLine> findLines  (Gradient& g);
     static HoughLine     createLine (int r, int t, int z);
 
 
@@ -32,13 +32,12 @@ public:
     int  getAngleSpread()          { return angleSpread;     }
     int  getAcceptThreshold()      { return acceptThreshold; }
 
-    bool isPeak(int r, int t);
     uint16_t getHoughBin(int r, int t);
 
 private:                        // Member functions
-    void markEdges(boost::shared_ptr<Gradient> g);
+    void markEdges(Gradient& g);
     void edge(int x, int y, int t0, int t1);
-    int getR(int x, int y, int t);
+    int  getR(int x, int y, int t);
 
     void smooth();
     void peaks();
@@ -47,43 +46,46 @@ private:                        // Member functions
 
     void reset();
 
-    inline void addPeak(int r, int t, int z);
+    inline void addPeak(uint16_t r, uint16_t t, uint16_t z);
 
-    inline int getPeakR(int i) { return peak[i * peak_values + r_peak_offset]; }
-    inline int getPeakT(int i) { return peak[i * peak_values + t_peak_offset]; }
-    inline int getPeakZ(int i) { return peak[i * peak_values + z_peak_offset]; }
+    inline int getPeakR(int i) { return peak[i].r; }
+    inline int getPeakT(int i) { return peak[i].t; }
+    inline int getPeakZ(int i) { return peak[i].z; }
 
 private:       // Member variables
-    // Hough Space size parameters
-    // 256 for full 8 bit angle, radius is for 320x240 image
-    enum { r_span = 320,
-           t_span = 256,
 
-           // 5 rows on either side of the hough space to account for
-           // angle wrap around in edge marking.
-           hs_t_dim = t_span+10,
-           first_smoothing_row = 3,
-           first_peak_row = first_smoothing_row + 1,
+    enum {
 
-           default_accept_thresh = 43,
-           default_angle_spread  = 5,
-           peak_points = 4 };
+        // Hough Space size parameters
+        // 256 for full 8 bit angle, radius is for 320x240 image
+        r_span = 320,
+        t_span = 256,
 
-    enum { r_peak_offset = 0,
-           t_peak_offset = 1,
-           z_peak_offset = 2,
-           peak_values = 3,
-           hough_max_peaks = r_span * t_span / 4 };
+        // 5 rows on either side of the hough space to account for
+        // angle wrap around in edge marking.
+        hs_t_dim = t_span+10,
+        first_smoothing_row = 3,
+        first_peak_row = first_smoothing_row + 1,
+
+        default_accept_thresh = 43,
+        default_angle_spread  = 5,
+        peak_points = 4,
+        hough_max_peaks = r_span * t_span / 4};
+
+    struct HoughPeak {
+        uint16_t r;
+        uint16_t t;
+        uint16_t z;
+    };
 
     boost::shared_ptr<Profiler> profiler;
     int acceptThreshold, angleSpread, numPeaks;
 
     uint16_t hs[hs_t_dim][r_span];
-    uint16_t peak[hough_max_peaks*peak_values];
+    HoughPeak peak[hough_max_peaks];
 
     const static int drTab[peak_points];
     const static int dtTab[peak_points];
-
 };
 
 #endif /* HoughSpace_h_DEFINED */

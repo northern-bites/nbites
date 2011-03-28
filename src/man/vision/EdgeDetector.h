@@ -26,22 +26,23 @@ public:
 public:
     void detectEdges(int upperBound,
                      const uint16_t* channel,
-                     boost::shared_ptr<Gradient> gradient);
+                     Gradient& gradient);
 
-    uint8_t  getThreshold()           { return threshold; }
-    void setThreshold(uint8_t thresh) { threshold = thresh; }
+    void    setThreshold(uint8_t thresh) { threshold = thresh; }
+    uint8_t getThreshold() { return threshold; }
 
 private:
     void sobelOperator(int upperBound,
                        const uint16_t* channel,
-                       boost::shared_ptr<Gradient> gradient);
-    void findPeaks(int upperBound, boost::shared_ptr<Gradient> gradient);
+                       Gradient& gradient);
 
+    void findPeaks(int upperBound, Gradient& gradient);
+
+private:
     enum {
         default_edge_value = 60
     };
 
-private:
     boost::shared_ptr<Profiler> profiler;
     uint8_t threshold;
 };

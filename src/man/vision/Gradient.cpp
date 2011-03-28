@@ -8,8 +8,6 @@ const int Gradient::dxTab[DIRECTIONS] = { 1,  1,  0, -1, -1, -1,  0,  1};
 const int Gradient::dyTab[DIRECTIONS] = { 0,  1,  1,  1,  0, -1, -1, -1};
 
 Gradient::Gradient() :
-    values(new uint16_t[IMAGE_HEIGHT * IMAGE_WIDTH * 3]),
-    angles(new int16_t[angles_size]),
     numPeaks(0)
 {
 
@@ -22,11 +20,15 @@ Gradient::Gradient() :
 // overwritten every time, but good to have
 void Gradient::reset()
 {
+    numPeaks = 0;
+}
+
+void Gradient::clear()
+{
     __m64* ptr = (__m64*)values;
     __m64 zero;
     zero ^= zero;
     for (int i = -IMAGE_HEIGHT * IMAGE_WIDTH * 3; i < 0; i += 16) {
-        __builtin_prefetch(ptr+8,1);
         *ptr = zero;
         *(ptr+1) = zero;
         *(ptr+2) = zero;

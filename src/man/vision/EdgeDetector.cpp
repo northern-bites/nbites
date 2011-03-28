@@ -11,7 +11,7 @@ extern "C" void _sobel_operator(int bound,
                                 uint16_t *out);
 extern "C" int _find_edge_peaks(int bound,
                                 const uint16_t *gradients,
-                                int16_t *angles);
+                                Gradient::AnglePeak *angles);
 using boost::shared_ptr;
 using namespace std;
 
@@ -28,7 +28,7 @@ EdgeDetector::EdgeDetector(boost::shared_ptr<Profiler> p, uint8_t thresh):
  */
 void EdgeDetector::detectEdges(int upperBound,
                                const uint16_t* channel,
-                               shared_ptr<Gradient> gradient)
+                               Gradient& gradient)
 {
     PROF_ENTER(profiler, P_EDGES);
     sobelOperator(upperBound, channel, gradient);
@@ -49,11 +49,12 @@ void EdgeDetector::detectEdges(int upperBound,
  */
 void EdgeDetector::sobelOperator(int upperBound,
                                  const uint16_t* channel,
-                                 shared_ptr<Gradient> gradient)
+                                 Gradient& gradient)
 {
     PROF_ENTER(profiler, P_SOBEL);
 #ifdef USE_MMX
-    _sobel_operator(upperBound, threshold, &channel[0], gradient->values);
+    _sobel_operator(upperBound, threshold,
+                    &channel[0], &gradient.values[0][0]);
 #else
     for (int i=1; i < Gradient::rows-1; ++i){
         for (int j=1; j < Gradient::cols-1; ++j) {
@@ -82,8 +83,8 @@ void EdgeDetector::sobelOperator(int upperBound,
             xGrad = -xGrad;
             yGrad = -yGrad;
 
-            gradient->setX(static_cast<int16_t>(xGrad), i, j);
-            gradient->setY(static_cast<int16_t>(yGrad), i, j);
+            gradient.setX(static_cast<int16_t>(xGrad), i, j);
+            gradient.setY(static_cast<int16_t>(yGrad), i, j);
 
             xGrad = xGrad << 3;
             yGrad = yGrad << 3;
@@ -99,7 +100,7 @@ void EdgeDetector::sobelOperator(int upperBound,
             // All non above threshold points are zero
             mag = max(0, mag-((threshold*threshold) >> 10));
 
-            gradient->setMagnitude(static_cast<uint16_t>(mag), i, j);
+            gradient.setMagnitude(static_cast<uint16_t>(mag), i, j);
         }
     }
 #endif /* USE_MMX */
@@ -123,13 +124,13 @@ void EdgeDetector::sobelOperator(int upperBound,
  *
  * @param gradient Gradient to check for points.
  */
-void EdgeDetector::findPeaks(int upperBound, shared_ptr<Gradient> gradient)
+void EdgeDetector::findPeaks(int upperBound, Gradient& gradient)
 {
     PROF_ENTER(profiler, P_EDGE_PEAKS);
 #ifdef USE_MMX
-    gradient->numPeaks = _find_edge_peaks(upperBound,
-                                          gradient->values,
-                                          gradient->angles);
+    gradient.numPeaks = _find_edge_peaks(upperBound,
+                                         &gradient.values[0][0],
+                                         gradient.angles);
 #else
     /**************** IMPORTANT NOTE: **********************
      *
@@ -144,20 +145,20 @@ void EdgeDetector::findPeaks(int upperBound, shared_ptr<Gradient> gradient)
     for (int16_t i=2; i < Gradient::rows-2; ++i) {
         for (int16_t j=2; j < Gradient::cols-2; ++j){
 
-            gradient->peaks[i][j] = false; // Not a peak yet
-            const int z = gradient->getMagnitude(i,j);
+            gradient.peaks[i][j] = false; // Not a peak yet
+            const int z = gradient.getMagnitude(i,j);
             if (z > 0){
-                const int y = gradient->getY(i,j);
-                const int x = gradient->getX(i,j);
+                const int y = gradient.getY(i,j);
+                const int x = gradient.getX(i,j);
 
                 // Get the highest 3 bits of the direction
-                const int a = (gradient->dir3(y,x));;
+                const int a = (Gradient::dir3(y,x));;
 
-                if (z > gradient->getMagnitude(i + Gradient::dyTab[a],
+                if (z > gradient.getMagnitude(i + Gradient::dyTab[a],
                                                j + Gradient::dxTab[a]) &&
-                    z >= gradient->getMagnitude(i - Gradient::dyTab[a],
+                    z >= gradient.getMagnitude(i - Gradient::dyTab[a],
                                                 j - Gradient::dxTab[a])){
-                    gradient->addAngle(Gradient::dir(y,x),
+                    gradient.addAngle(Gradient::dir(y,x),
                                        j,
                                        i);
                 }

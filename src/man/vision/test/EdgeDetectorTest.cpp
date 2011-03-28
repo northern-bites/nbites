@@ -27,37 +27,46 @@ void EdgeDetectorTest::test_gradient()
 {
     Gradient g = Gradient();
     srand(time(NULL));
-    for (int i=0; i < IMAGE_WIDTH * IMAGE_HEIGHT * 3; ++i)
-        g.values[i] = rand();
-    g.reset();
-    for (int i=0; i < IMAGE_WIDTH * IMAGE_HEIGHT * 3; ++i)
-        EQ_INT(g.values[i], 0);
+    for (int i=0; i < IMAGE_HEIGHT * 3; ++i){
+        for (int j=0; j < IMAGE_WIDTH; ++j){
+            g.values[i][j] = static_cast<uint16_t>(rand());
+        }
+    }
+
+    g.clear();
+
+    for (int i=0; i < IMAGE_HEIGHT * 3; ++i){
+        for (int j=0; j < IMAGE_WIDTH; ++j){
+            EQ_INT(g.values[i][j], 0);
+        }
+    }
     PASSED(GRADIENT_RESET);
 }
 
 // Test the direction function in the edge detector
 int EdgeDetectorTest::test_dir()
 {
-    shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
+    Gradient g;
+
     // Test 4 cardinal directions for dir
     const double BYTE_PI = M_PI * BYTE_TO_RAD;
-    EQ_INT(g->dir(0,1) , 0);
+    EQ_INT(g.dir(0,1) , 0);
     PASSED(DIR_RIGHT);
 
-    EQ_FLOAT(g->dir(1,0) , BYTE_PI/2.);
+    EQ_FLOAT(g.dir(1,0) , BYTE_PI/2.);
     PASSED(DIR_UP);
 
-    EQ_FLOAT(g->dir(0,-1) , BYTE_PI);
+    EQ_FLOAT(g.dir(0,-1) , BYTE_PI);
     PASSED(DIR_LEFT);
 
-    EQ_FLOAT(g->dir(-1,0) , 1.5 * BYTE_PI);
+    EQ_FLOAT(g.dir(-1,0) , 1.5 * BYTE_PI);
     PASSED(DIR_DOWN);
 
     // Ensure that dir() only returns values between 0 and 256 for all
     // image points
     for (int x= -IMAGE_WIDTH/2; x < IMAGE_WIDTH/2; ++x )
         for (int y= -IMAGE_HEIGHT/2; y < IMAGE_HEIGHT/2; ++y){
-            int a = g->dir(x,y);
+            int a = g.dir(x,y);
             LTE(a , 256);
             GTE(a, 0);
         }
@@ -79,12 +88,12 @@ int EdgeDetectorTest::test_sobel()
         for (int j=0; j < IMAGE_WIDTH; ++j)
             c[(i) * IMAGE_WIDTH + j] = 0;
 
-    shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
+    Gradient g;
 
     edges.sobelOperator(0, c, g);
     for (int i=1; i < IMAGE_HEIGHT-1; ++i){
         for (int j=1; j < IMAGE_WIDTH-1; ++j){
-            EQ_INT(g->getMagnitude(i,j) , 0);
+            EQ_INT(g.getMagnitude(i,j) , 0);
         }
     }
     PASSED(SOBEL_ZERO);
@@ -98,8 +107,6 @@ int EdgeDetectorTest::test_sobel()
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
             c[(i) * IMAGE_WIDTH + j] = static_cast<uint8_t>(rand()%255);
-
-    shared_ptr<Gradient> g2 = shared_ptr<Gradient>(new Gradient());
 
     edges.sobelOperator(0, c, g);
     for (int i=1; i < IMAGE_HEIGHT-1; ++i)
@@ -126,8 +133,8 @@ int EdgeDetectorTest::test_sobel()
             gy = -gy;
 
             // The output gradients are shifted in by 1 value
-            EQ_INT(g->getX(i,j) , gx);
-            EQ_INT(g->getY(i,j) , gy);
+            EQ_INT(g.getX(i,j) , gx);
+            EQ_INT(g.getY(i,j) , gy);
 
             gx = gx << 3;
             gy = gy << 3;
@@ -145,8 +152,8 @@ int EdgeDetectorTest::test_sobel()
                       mag -
                       ((edges.getThreshold() * edges.getThreshold()) >> 10));
 
-            EQ_INT(g->getMagnitude(i,j) , mag);
-            GTE(g->getMagnitude(i,j) , 0); // Useless with unsigned integers,
+            EQ_INT(g.getMagnitude(i,j) , mag);
+            GTE(g.getMagnitude(i,j) , 0); // Useless with unsigned integers,
                                    // but kept around for austerity
         }
     PASSED(SOBEL_ALL);
@@ -161,7 +168,7 @@ int EdgeDetectorTest::test_peaks()
 {
     uint16_t * c = new uint16_t[IMAGE_WIDTH * IMAGE_HEIGHT];
 
-    shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
+    Gradient g;
 
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
@@ -171,74 +178,39 @@ int EdgeDetectorTest::test_peaks()
                 c[(i) * IMAGE_WIDTH + j] = 250;
     edges.detectEdges(0, c,g);
 
-    for (int i = 0; g->isPeak(i); ++i) {
+    for (int i = 0; g.isPeak(i); ++i) {
         // x,y are in image center relative coords
-        int x = g->getAnglesXCoord(i) + IMAGE_WIDTH/2;
-        int y = g->getAnglesYCoord(i) + IMAGE_HEIGHT/2;
+        int x = g.getAnglesXCoord(i) + IMAGE_WIDTH/2;
+        int y = g.getAnglesYCoord(i) + IMAGE_HEIGHT/2;
 
-        NE_INT(g->getMagnitude(y,x) , 0);
-        assert(g->getX(y,x) != 0 || g->getY(y,x) != 0);
+        NE_INT(g.getMagnitude(y,x) , 0);
+        assert(g.getX(y,x) != 0 || g.getY(y,x) != 0);
     }
     PASSED(PEAKS_ZERO);
 
-#ifdef USE_MMX
-    for (int n = 0; n < Gradient::num_angles_limit; ++n) {
-        // No point has an x coordinate of zero because there cannot
-        // be a peak there, so we use this to know when we have
-        // reached the end of the edge points.
-        if (!g->getAnglesXCoord(n)){
-            break;
-        } else {
-            // x,y are in image center relative coords
-            int i = g->getAnglesYCoord(n) + IMAGE_HEIGHT/2;
-            int j = g->getAnglesXCoord(n) + IMAGE_WIDTH/2;
-            const int z = g->getMagnitude(i,j);
+    for (int n = 0; n < g.numPeaks; ++n) {
 
-            const int y = g->getY(i,j);
-            const int x = g->getX(i,j);
+        TRUE(g.isPeak(n));
 
-            int a = static_cast<int>(g->dir(y,x));
+        // x,y are in image center relative coords
+        int i = g.getAnglesYCoord(n) + IMAGE_HEIGHT/2;
+        int j = g.getAnglesXCoord(n) + IMAGE_WIDTH/2;
 
-            // Get the highest 3 bits of the direction
-            a = a >> 5;
+        const int x = g.getX(i,j);
+        const int y = g.getY(i,j);
+        const int z = g.getMagnitude(i,j);
 
-            if (g->peaks[i][j] && (
-                    g->peaks[i + Gradient::dyTab[a]][j +
-                                                     Gradient::dxTab[a]] ||
-                    g->peaks[i - Gradient::dyTab[a]][j -
-                                                     Gradient::dxTab[a]])){
-                assert(false);
-            }
-        }
+        int a = static_cast<int>(g.dir(y,x));
+        // Get the highest 3 bits of the direction
+        a = a >> 5;
+
+        FALSE(g.peaks_list_contains(i + Gradient::dyTab[a],
+                                    j + Gradient::dxTab[a]) ||
+              g.peaks_list_contains(i - Gradient::dyTab[a],
+                                    j - Gradient::dxTab[a]));
     }
-
-#else
-    for (int i=2; i < Gradient::rows-2; ++i) {
-        for (int j=2; j < Gradient::cols-2; ++j){
-
-            const int z = g->getMagnitude(i,j);
-
-            const int y = g->getY(i,j);
-            const int x = g->getX(i,j);
-
-            int a = static_cast<int>(g->dir(y,x));
-
-            // Get the highest 3 bits of the direction
-            a = a >> 5;
-
-            if (g->peaks[i][j]){
-                FALSE(g->peaks[i + Gradient::dyTab[a]][j +
-                                                 Gradient::dxTab[a]] &&
-                      g->peaks[i - Gradient::dyTab[a]][j -
-                                                       Gradient::dxTab[a]]);
-            }
-        }
-    }
-#endif
-
     PASSED(PEAKS_DIR);
 
-#ifdef USE_MMX
     for (int i = 2; i < Gradient::rows-2; ++i) {
         for (int j = 2; j < Gradient::cols-2; ++j) {
 
@@ -247,25 +219,13 @@ int EdgeDetectorTest::test_peaks()
 
             if (x == IMAGE_WIDTH * 1/4 ||
                 x == IMAGE_WIDTH * 1/4 - 1){
-                assert(g->peaks_list_contains(y, IMAGE_WIDTH * 1/4) ||
-                       g->peaks_list_contains(y, IMAGE_WIDTH * 1/4 - 1));
+                assert(g.peaks_list_contains(y, IMAGE_WIDTH * 1/4) ||
+                       g.peaks_list_contains(y, IMAGE_WIDTH * 1/4 - 1));
             } else {
-                assert(!g->peaks_list_contains(y,x));
+                assert(!g.peaks_list_contains(y,x));
             }
         }
     }
-#else
-    // THE C++ Version of this doesn't quite work...
-    // for (int i = 2; i < Gradient::rows-2; ++i) {
-    //     for (int j = 2; j < Gradient::cols-2; ++j) {
-    //         if (j == IMAGE_WIDTH * 3/4){
-    //             assert(g->peaks[i][j]);
-    //         } else {
-    //             assert(!g->peaks[i][j]);
-    //         }
-    //     }
-    // }
-#endif
     PASSED(CORRECT_PEAK);
 
     int r = 30;
@@ -278,34 +238,22 @@ int EdgeDetectorTest::test_peaks()
     edges.detectEdges(0, c,g);
     int n = 0;
 
-#ifdef USE_MMX
     for (int i = 2; i < Gradient::rows-2; ++i) {
         for (int j = 2; j < Gradient::cols-2; ++j) {
 
             // Uncomment here (and cout << endl; below) to get ASCII edge image
             // printEdgePeak(g,i,j);
 
-            if( (n = g->peaks_list_contains(i,j)) ){
-                int x = g->getAnglesXCoord(n);
-                int y = g->getAnglesYCoord(n);
+            if( (n = g.peaks_list_contains(i,j)) ){
+                int x = g.getAnglesXCoord(n);
+                int y = g.getAnglesYCoord(n);
                 double d = r - (sqrt(x*x + y*y));
                 LTE(abs(d), e*2);
             }
         }
         // cout << endl;
     }
-#else
 
-    for (int i = 2; i < Gradient::rows-2; ++i) {
-        for (int j = 2; j < Gradient::cols-2; ++j) {
-            if (g->peaks[i][j]){
-                double d = r - (sqrt((j-j_0)*(j-j_0) + (i-i_0)*(i-i_0)));
-                LTE(abs(d), e*2);
-            }
-        }
-    }
-
-#endif
     delete[] c;
     return 0;
 }
@@ -318,18 +266,19 @@ int EdgeDetectorTest::test_angles()
 
     uint16_t *c = new uint16_t[IMAGE_WIDTH * IMAGE_HEIGHT];
 
-    shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
+    Gradient g;
+
     create_circle_image(c, r, e, i_0, j_0);
     edges.detectEdges(0, c,g);
 
     for (int i = 0; i < Gradient::num_angles_limit; ++i) {
-        if (g->isPeak(i)){
+        if (g.isPeak(i)){
 
-            int x = g->getAnglesXCoord(i) + IMAGE_WIDTH/2;
-            int y = g->getAnglesYCoord(i) + IMAGE_HEIGHT/2;
+            int x = g.getAnglesXCoord(i) + IMAGE_WIDTH/2;
+            int y = g.getAnglesYCoord(i) + IMAGE_HEIGHT/2;
 
-            NE_INT(g->getMagnitude(y,x) , 0);
-            assert(g->getX(y,x) != 0 || g->getY(y,x) != 0);
+            NE_INT(g.getMagnitude(y,x) , 0);
+            assert(g.getX(y,x) != 0 || g.getY(y,x) != 0);
 
        // If we find an x coordinate of zero, there are no more angles
        // to be found
@@ -338,29 +287,27 @@ int EdgeDetectorTest::test_angles()
         }
     }
 
-#ifdef USE_MMX
     int i = 0;
-    while (g->isPeak(i)){
-        int y = g->getAnglesYCoord(i) + IMAGE_HEIGHT/2;
-        int x = g->getAnglesXCoord(i) + IMAGE_WIDTH/2;
+    while (g.isPeak(i)){
+        int y = g.getAnglesYCoord(i) + IMAGE_HEIGHT/2;
+        int x = g.getAnglesXCoord(i) + IMAGE_WIDTH/2;
 
-        int yMag = g->getY(y,x);
-        int xMag = g->getX(y,x);
+        int yMag = g.getY(y,x);
+        int xMag = g.getX(y,x);
 
         int d =  Gradient::dir(yMag,xMag);
 
-        int a = g->getAngle(i);
+        int a = g.getAngle(i);
 
         // Check that angles computed match angle from gradients
-        LTE((a-d)%256, 10);
+        LTE(abs(a-d), 2);
         ++i;
     }
     PASSED(PEAK_ANGLES);
 
-    EQ_INT(i, g->numPeaks);
+    EQ_INT(i, g.numPeaks);
     PASSED(NUM_PEAKS);
 
-#endif
     delete[] c;
     return 0;
 }
@@ -383,22 +330,22 @@ void EdgeDetectorTest::create_circle_image(uint16_t * img, int r,
 /**
  * Print all the information about an edge peak.
  */
-void EdgeDetectorTest::printEdgePeakInfo(shared_ptr<Gradient> g, int n)
+void EdgeDetectorTest::printEdgePeakInfo(Gradient& g, int n)
 {
-    int angle = g->getAngle(n);
-    int x = g->getAnglesXCoord(n);
-    int y = g->getAnglesYCoord(n);
+    int angle = g.getAngle(n);
+    int x = g.getAnglesXCoord(n);
+    int y = g.getAnglesYCoord(n);
 
-    int xMag = g->getX(y,x);
-    int yMag = g->getY(y,x);
+    int xMag = g.getX(y,x);
+    int yMag = g.getY(y,x);
 
     cout << (int)x << " "
          << (int)y << " "
-         << (int)g->getAngle(n) << " "
-         << (int)g->dir(yMag,xMag) << " "
+         << (int)g.getAngle(n) << " "
+         << (int)g.dir(yMag,xMag) << " "
          << (int16_t)xMag << " "
          << (int16_t)yMag << " "
-         << (int)g->getMagnitude(y,x)
+         << (int)g.getMagnitude(y,x)
          << endl;
 
 }
@@ -407,11 +354,11 @@ void EdgeDetectorTest::printEdgePeakInfo(shared_ptr<Gradient> g, int n)
  * Prints an edge peak represented as a character in the direction of
  * its gradient
  */
-void EdgeDetectorTest::printEdgePeak(shared_ptr<Gradient> g, int i, int j)
+void EdgeDetectorTest::printEdgePeak(Gradient& g, int i, int j)
 {
     int index;
-    if ((index = g->peaks_list_contains(i,j))){
-        int angle = g->getAngle(index);
+    if ((index = g.peaks_list_contains(i,j))){
+        int angle = g.getAngle(index);
         if (angle > 128){
             angle -= 128;
         }

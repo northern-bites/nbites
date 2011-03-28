@@ -20,15 +20,20 @@ public:
     virtual void detect(int upperBound, const uint16_t *img);
 
     // FieldLines interface
-    std::list<VisualLine> getLines(){ return std::list<VisualLine>(); }
-    std::list<VisualCorner> getCorners(){ return std::list<VisualCorner>(); }
+    std::list<VisualLine> getLines() const {
+        return std::list<VisualLine>();
+    }
+
+    std::list<VisualCorner> getCorners() const {
+        return std::list<VisualCorner>();
+    }
 
     // Parameter Interface
     void setEdgeThreshold(int thresh);
     void setHoughAcceptThreshold(int thresh);
 
-    Gradient getEdges() { return *gradient; }
-    std::list<HoughLine> getHoughLines() { return houghLines; }
+    Gradient getEdges() const { return gradient; }
+    std::list<HoughLine> getHoughLines() const { return houghLines; }
 
 private:
     void findHoughLines(int upperBound, const uint16_t *img);
@@ -37,7 +42,7 @@ private:
 private:
     EdgeDetector edges;
     HoughSpace hough;
-    boost::shared_ptr<Gradient> gradient;
+    Gradient gradient;
     std::list<HoughLine> houghLines;
 };
 

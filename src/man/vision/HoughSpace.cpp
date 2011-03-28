@@ -12,7 +12,8 @@ extern "C" void _mark_edges(int numPeaks, int angleSpread,
                             int16_t *peaks, uint16_t *houghSpace);
 extern "C" void _smooth_hough(uint16_t *hs, uint32_t threshold);
 
-extern "C" void _houghMain(uint16_t* hs, int16_t* edges, int numEdges);
+extern "C" void _houghMain(uint16_t* hs,
+                           Gradient::AnglePeak* edges, int numEdges);
 
 HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
     profiler(p),
@@ -27,7 +28,7 @@ HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
  * The main public interface for the HoughSpace class.
  * Finds all the lines in the image using the Hough Transform.
  */
-list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
+list<HoughLine> HoughSpace::findLines(Gradient& g)
 {
     PROF_ENTER(profiler, P_HOUGH);
     reset();
@@ -58,12 +59,12 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
  * Pass through the given Gradient and mark all potential edges
  * in the accumulator.
  */
-void HoughSpace::markEdges(shared_ptr<Gradient> g)
+void HoughSpace::markEdges(Gradient& g)
 {
     PROF_ENTER(profiler, P_MARK_EDGES);
 #ifdef USE_MMX
-    if (g->numPeaks > 0){
-        _houghMain(&hs[0][0], g->angles, g->numPeaks);
+    if (g.numPeaks > 0){
+        _houghMain(&hs[0][0], g.angles, g.numPeaks);
     }
 #else
     int x0 = Gradient::cols/2;
@@ -71,11 +72,11 @@ void HoughSpace::markEdges(shared_ptr<Gradient> g)
 
     // See comment in FindPeaks re: why this is shrunk in by 2
     // rows/columns on each side
-    for (int i = 0; g->isPeak(i); ++i) {
-        edge(g->getAnglesXCoord(i),
-             g->getAnglesYCoord(i),
-             g->getAngle(i) - angleSpread,
-             g->getAngle(i) + angleSpread);
+    for (int i = 0; g.isPeak(i); ++i) {
+        edge(g.getAnglesXCoord(i),
+             g.getAnglesYCoord(i),
+             g.getAngle(i) - angleSpread,
+             g.getAngle(i) + angleSpread);
     }
 #endif /* USE_MMX */
     PROF_EXIT(profiler, P_MARK_EDGES);
@@ -154,11 +155,11 @@ void HoughSpace::peaks()
 {
     PROF_ENTER(profiler, P_HOUGH_PEAKS);
 
-    for (int t=first_peak_row; t < t_span+first_peak_row; ++t) {
+    for (uint16_t t=first_peak_row; t < t_span+first_peak_row; ++t) {
 
         // First and last columns are not accurate, so they shouldn't
-        // be queried
-        for (int r=2; r < r_span-2; ++r) {
+        // be queried, so we skip to third row as first possible peak
+        for (uint16_t r=2; r < r_span-2; ++r) {
 
             const uint16_t z = getHoughBin(r,t);
             if (z){
@@ -171,7 +172,7 @@ void HoughSpace::peaks()
                         goto notALine;
                     }
                 }
-                addPeak(r, t - first_peak_row, z);
+                addPeak(r, static_cast<uint16_t>(t - first_peak_row), z);
             }
         notALine:
             continue;
@@ -272,23 +273,17 @@ HoughLine HoughSpace::createLine(int r, int t, int z)
                      M_PI_FLOAT / 128.0f, z >> 2);
 }
 
-// Check to see if the HoughSpace value at the given radius and theta
-// is a peak.
-bool HoughSpace::isPeak(int r, int t)
-{
-    return peak[t * r_span + r];
-}
-
 uint16_t HoughSpace::getHoughBin(int r, int t)
 {
     return hs[t][r];
 }
 
-
-void HoughSpace::addPeak(int r, int t, int z)
+void HoughSpace::addPeak(uint16_t r, uint16_t t, uint16_t z)
 {
-    peak[numPeaks * peak_values + r_peak_offset] = static_cast<uint16_t>(r);
-    peak[numPeaks * peak_values + t_peak_offset] = static_cast<uint16_t>(t);
-    peak[numPeaks * peak_values + z_peak_offset] = static_cast<uint16_t>(z);
+    HoughPeak& p = peak[numPeaks];
     numPeaks++;
+
+    p.r = r;
+    p.t = t;
+    p.z = z;
 }

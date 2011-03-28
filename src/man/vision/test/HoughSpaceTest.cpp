@@ -21,9 +21,10 @@ HoughSpaceTest::HoughSpaceTest() :
 
 void HoughSpaceTest::test_hs()
 {
+    Gradient g;
+
     // Create gradient map such that it has a known line
-    shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
-    createLineAtPoint(*g, 0, 80);
+    createLineAtPoint(g, 0, 80);
 
     // Run the gradient through the Hough Space
     hs.markEdges(g);
@@ -87,9 +88,10 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
 {
     float radAngle = static_cast<float>(angle) * M_PI_FLOAT / 128.f;
 
-    shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
-    g->reset();
-    createLineAtPoint(*g, angle, radius);
+    Gradient g;
+
+    g.reset();
+    createLineAtPoint(g, angle, radius);
 
     list<HoughLine> lines = hs.findLines(g);
 
