@@ -1,5 +1,6 @@
 #include "Gradient.h"
 #include <iostream>
+#include <mmintrin.h>
 
 using namespace std;
 
@@ -15,13 +16,24 @@ Gradient::Gradient() :
 }
 
 // Restore the gradient to its original state so we can reuse the same
-// gradient object
+// gradient object,
+//
+// @note: Useless really, since the gradients get
+// overwritten every time, but good to have
 void Gradient::reset()
 {
-    // @TODO: Rewrite inner loop to use MMX instrinsics or inline asm
-    for (int i = 0; i < IMAGE_HEIGHT * IMAGE_WIDTH * 3; ++i) {
-        values[i] = 0;
+    __m64* ptr = (__m64*)values;
+    __m64 zero;
+    zero ^= zero;
+    for (int i = -IMAGE_HEIGHT * IMAGE_WIDTH * 3; i < 0; i += 16) {
+        __builtin_prefetch(ptr+8,1);
+        *ptr = zero;
+        *(ptr+1) = zero;
+        *(ptr+2) = zero;
+        *(ptr+3) = zero;
+        ptr += 4;
     }
+    _mm_empty();
 }
 
 

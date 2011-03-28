@@ -18,10 +18,11 @@ public:
     int runTests();
 
 private:
-    int test_sobel();
+    int test_angles();
     int test_dir();
     int test_peaks();
-    int test_angles();
+    int test_sobel();
+    void test_gradient();
 
     void create_circle_image(uint16_t * img, int r, double e, int i_0, int j_0);
     void printEdgePeak(boost::shared_ptr<Gradient> g, int i, int j);

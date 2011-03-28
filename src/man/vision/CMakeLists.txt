@@ -20,7 +20,7 @@ FIND_PACKAGE( Boost        REQUIRED )
 ############################ BUILDCONFIG
 # Include the config file for this build
 INCLUDE( ${VISION_CMAKE_DIR}/buildconfig.cmake )
-
+ADD_DEFINITIONS( -mmmx )
 
 ############################ TESTS
 # Define main test script location

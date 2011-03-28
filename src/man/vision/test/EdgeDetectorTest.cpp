@@ -23,6 +23,18 @@ EdgeDetectorTest::EdgeDetectorTest() :
 
 }
 
+void EdgeDetectorTest::test_gradient()
+{
+    Gradient g = Gradient();
+    srand(time(NULL));
+    for (int i=0; i < IMAGE_WIDTH * IMAGE_HEIGHT * 3; ++i)
+        g.values[i] = rand();
+    g.reset();
+    for (int i=0; i < IMAGE_WIDTH * IMAGE_HEIGHT * 3; ++i)
+        EQ_INT(g.values[i], 0);
+    PASSED(GRADIENT_RESET);
+}
+
 // Test the direction function in the edge detector
 int EdgeDetectorTest::test_dir()
 {
@@ -157,7 +169,6 @@ int EdgeDetectorTest::test_peaks()
                 c[(i) * IMAGE_WIDTH + j] = (uint16_t)rand()%10;
             else
                 c[(i) * IMAGE_WIDTH + j] = 250;
-    g->reset();
     edges.detectEdges(0, c,g);
 
     for (int i = 0; g->isPeak(i); ++i) {
@@ -264,7 +275,6 @@ int EdgeDetectorTest::test_peaks()
 
 /*************** CIRCLE TESTS ************************************/
     create_circle_image(c, r, e, i_0, j_0);
-    g->reset();
     edges.detectEdges(0, c,g);
     int n = 0;
 
@@ -310,7 +320,6 @@ int EdgeDetectorTest::test_angles()
 
     shared_ptr<Gradient> g = shared_ptr<Gradient>(new Gradient());
     create_circle_image(c, r, e, i_0, j_0);
-    g->reset();
     edges.detectEdges(0, c,g);
 
     for (int i = 0; i < Gradient::num_angles_limit; ++i) {
@@ -424,6 +433,7 @@ void EdgeDetectorTest::printEdgePeak(shared_ptr<Gradient> g, int i, int j)
 
 int EdgeDetectorTest::runTests()
 {
+    test_gradient();
     test_dir();
     test_sobel();
     test_peaks();
