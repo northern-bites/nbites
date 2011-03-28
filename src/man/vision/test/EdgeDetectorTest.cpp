@@ -138,7 +138,7 @@ int EdgeDetectorTest::test_sobel()
                                    // but kept around for austerity
         }
     PASSED(SOBEL_ALL);
-    delete c;
+    delete[] c;
     return 0;
 }
 
@@ -296,7 +296,7 @@ int EdgeDetectorTest::test_peaks()
     }
 
 #endif
-    delete c;
+    delete[] c;
     return 0;
 }
 
@@ -352,7 +352,7 @@ int EdgeDetectorTest::test_angles()
     PASSED(NUM_PEAKS);
 
 #endif
-    delete c;
+    delete[] c;
     return 0;
 }
 
