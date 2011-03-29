@@ -9,7 +9,7 @@ const int HoughSpace::drTab[peak_points] = {  1,  1,  0, -1 };
 const int HoughSpace::dtTab[peak_points] = {  0,  1,  1,  1 };
 
 extern "C" void _mark_edges(int numPeaks, int angleSpread,
-                            int16_t *peaks, uint16_t *houghSpace);
+                            Gradient::AnglePeak *peaks, uint16_t *houghSpace);
 extern "C" void _smooth_hough(uint16_t *hs, uint32_t threshold);
 
 extern "C" void _houghMain(uint16_t* hs,
@@ -44,6 +44,7 @@ list<HoughLine> HoughSpace::findLines(Gradient& g)
     int y0 = static_cast<int>(Gradient::rows/2);
 
     suppress(x0, y0, lines);
+    // list<pair<int, int> > pairs = pairLines(lines);
 
     PROF_EXIT(profiler, P_HOUGH);
     list<HoughLine> lines_list;
@@ -64,6 +65,8 @@ void HoughSpace::markEdges(Gradient& g)
     PROF_ENTER(profiler, P_MARK_EDGES);
 #ifdef USE_MMX
     if (g.numPeaks > 0){
+        // _mark_edges(g.numPeaks, angleSpread, g.angles, &hs[0][0]);
+
         _houghMain(&hs[0][0], g.angles, g.numPeaks);
     }
 #else
@@ -246,6 +249,22 @@ void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
     }
     PROF_EXIT(profiler, P_SUPPRESS);
 }
+
+list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
+{
+    list<pair<int, int> > pairs;
+    int size = lines.size();
+    for(int i=0; i < size; ++i){
+        for(int j=i; j < size; ++j){
+            if (lines.active(i) && lines.active(j) &&
+                (lines[i].getTIndex() - lines[j].getTIndex())%255 < 5){
+                pairs.push_back(pair<int,int>(i,j));
+            }
+        }
+    }
+    return pairs;
+}
+
 
 /**
  * Reset the accumulator and peak arrays to their initial values.

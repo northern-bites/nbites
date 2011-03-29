@@ -43,6 +43,7 @@ private:                        // Member functions
     void peaks();
     void createLinesFromPeaks(ActiveArray<HoughLine>& lines);
     void suppress(int x0, int y0, ActiveArray<HoughLine>& lines);
+    std::list<std::pair<int, int> > pairLines(ActiveArray<HoughLine>& lines);
 
     void reset();
 
