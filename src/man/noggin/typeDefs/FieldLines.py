@@ -3,13 +3,26 @@
 class FieldLines:
     """
     A Python class that contains all of the information from
-    the corresponding PyFieldLines class in PyVision. Contains:
+    the corresponding PyFieldLines class in PyVision. See vision/PyVision
+    files for info corners and lines. 
+
+    Contains:
+
     numLines = number of lines in the image
     lines = a list of lines in the image. Note that these lines are
     not the "Line" class included later but can be used as a 
     template to create a Line
+      each line has:
+        -x1,y1 -- left coordinate on image screen
+        -x2,y2 -- right coordinate on image screen
+        -slope -- slope of line. remember that (0,0) is top-left corner of image
+        -length -- length of the line
     numCorners = number of corners in the image
     corners = a list of corners in the image. Note: same as for lines
+      each corner has:
+            - dist -- distance to the center of the corner
+            - bearing -- bearing to the center of the corner
+            - possibilities -- list of possible ConcreteCorners it could be
     """
 
     def __init__(self, visionInfos):
@@ -36,7 +49,7 @@ class FieldLines:
         return "# of Lines: " + str(self.numLines) + " # of Corners: " + str(self.numCorners)
 
 
-###Two unused classes, for now
+###Two unused classes. Not sure what we would use these for. 
 class Line:
     """
     class for one single line, contains:
@@ -74,11 +87,11 @@ class VisualCorner:
     - bearing -- bearing to the center of the corner
     - possibilities -- list of possible ConcreteCorners it could be
     """
-    def __init__(self):
+    def __init__(self, visionCorner):
         self.dist = 0
         self.bearing = 0
         self.possibilities = []
-        self.update
+        self.update(visionCorner)
 
     def update(self, visionCorner):
         self.dist = visionCorner.dist
