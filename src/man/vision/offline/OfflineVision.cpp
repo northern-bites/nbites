@@ -71,7 +71,7 @@ int OfflineVision::runOnDirectory(std::string path)
     PROF_NFRAME(profiler);
     cout << endl;
 
-    delete image;
+    delete[] image;
 
     return 0;
 }
@@ -133,5 +133,7 @@ int main(int argv, char * argc[])
         off->initTable(argc[OfflineVision::table_name]);
     }
 
-    return off->runOnDirectory(argc[OfflineVision::directory]);
+    off->runOnDirectory(argc[OfflineVision::directory]);
+    delete off;
+    return 0;
 }

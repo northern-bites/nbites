@@ -32,7 +32,7 @@ public:
     void setEdgeThreshold(int thresh);
     void setHoughAcceptThreshold(int thresh);
 
-    Gradient getEdges() const { return gradient; }
+    Gradient* getEdges() { return &gradient; }
     std::list<HoughLine> getHoughLines() const { return houghLines; }
 
 private:

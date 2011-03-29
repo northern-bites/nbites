@@ -70,6 +70,14 @@ using boost::shared_ptr;
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     : vision(vis), pose(posPtr)
 {
+#ifdef OFFLINE
+    visualHorizonDebug = false;
+    debugSelf = false;
+    debugShot = false;
+    debugOpenField = false;
+    debugEdgeDetection = true;
+    debugHoughTransform = true;
+#endif
 
     // loads the color table on the MS into memory
 #if ROBOT(NAO_RL)

@@ -1,6 +1,6 @@
 #include "HoughSpace.h"
 #include <stdio.h>
-
+#include <climits>
 
 using namespace std;
 using boost::shared_ptr;
@@ -19,7 +19,7 @@ HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
     profiler(p),
     acceptThreshold(default_accept_thresh),
     angleSpread(default_angle_spread),
-    numPeaks(0)
+    numPeaks(0), activeLines(active_line_buffer)
 {
 
 }
@@ -37,23 +37,29 @@ list<HoughLine> HoughSpace::findLines(Gradient& g)
     smooth();
     peaks();
 
-    ActiveArray<HoughLine> lines = ActiveArray<HoughLine>(10);
-    createLinesFromPeaks(lines);
+    createLinesFromPeaks(activeLines);
 
     int x0 = static_cast<int>(Gradient::cols/2);
     int y0 = static_cast<int>(Gradient::rows/2);
 
-    suppress(x0, y0, lines);
-    // list<pair<int, int> > pairs = pairLines(lines);
+    suppress(x0, y0, activeLines);
+    list<pair<int, int> > pairs = pairLines(activeLines);
 
     PROF_EXIT(profiler, P_HOUGH);
-    list<HoughLine> lines_list;
-    for (int i=0; i < lines.size(); ++i){
-        if (lines.active(i)){
-            lines_list.push_back(lines[i]);
-        }
+    list<HoughLine> lines;
+
+    list<pair<int, int> >::iterator i;
+    for (i = pairs.begin(); i != pairs.end(); ++i){
+        lines.push_back(activeLines[(*i).first]);
+        lines.push_back(activeLines[(*i).second]);
     }
-    return lines_list;
+
+    // for (int i=0; i < activeLines.size(); ++i){
+    //     if (activeLines.active(i)){
+    //         lines.push_back(activeLines[i]);
+    //     }
+    // }
+    return lines;
 }
 
 /**
@@ -214,19 +220,26 @@ void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
     int index = 0;
     while (index < lines.size()){
 
-        int index2 = index;
-        index2++;
+        int index2 = index+1;
 
         while (index2 < lines.size()){
 
             const int tDiff = abs(((lines[index].getTIndex() -
                                     lines[index2].getTIndex()) & 0xff)
                                   << 24 >> 24);
+
             const int rDiff = abs(lines[index].getRIndex() -
                                   lines[index2].getRIndex());
 
-            if ( 0 < tDiff && tDiff <= angleSpread &&
-                 (rDiff <= 4 ||
+            // Since the lines are ordered by T value, if the tDiff is
+            // too great, we should stop going any further with the
+            // current line. This keeps us from looking at every pair
+            // of lines, every time.
+            if (tDiff > angleSpread){
+                goto inner_suppress_loop;
+            }
+
+            if ( (rDiff <= suppress_r_bound ||
                   HoughLine::intersect(x0, y0, lines[index], lines[index2]))) {
 
                 if (lines[index].getScore() < lines[index2].getScore()){
@@ -235,6 +248,7 @@ void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
                     toDelete[index2] = true;
                 }
             }
+        inner_suppress_loop:
             index2++;
         }
         index++;
@@ -253,18 +267,61 @@ void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
 list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
 {
     list<pair<int, int> > pairs;
-    int size = lines.size();
+    const int size = lines.size();
+
+    int pair_array[size];
+    int min_pair_r[size];
+
+    // Init arrays
     for(int i=0; i < size; ++i){
-        for(int j=i; j < size; ++j){
-            if (lines.active(i) && lines.active(j) &&
-                (lines[i].getTIndex() - lines[j].getTIndex())%255 < 5){
-                pairs.push_back(pair<int,int>(i,j));
+        pair_array[i] = -1;
+        min_pair_r[i] = INT_MAX;
+    }
+
+    for(int i=0; i < size; ++i){
+        if(!lines.active(i)){
+            continue;
+        }
+
+        for(int j=i+1; j < size; ++j){
+
+            // These inner loops look awkward, yes. I'm avoiding
+            // computation of tDiff and rSum by exiting early.
+            if (!lines.active(j)){
+                continue;
+            }
+
+            const int tDiff = abs(abs(lines[i].getTIndex() -
+                                      lines[j].getTIndex())-t_span/2);
+
+            if (tDiff >= opp_line_thresh){
+                continue;
+            }
+
+            const int rSum = abs(lines[i].getRIndex() +
+                                 lines[j].getRIndex() - r_span);
+            if (rSum < min_pair_r[i] &&
+                rSum < min_pair_r[j]){
+
+                pair_array[i] = j;
+                pair_array[j] = i;
+
+                min_pair_r[i] = min_pair_r[j] = rSum;
             }
         }
     }
+
+    for(int i=0; i < size; ++i){
+        // If this line hasn't been paired up with a line after it,
+        // this keeps us from duplicating line pairs.
+        if (pair_array[i] < i){
+            continue;
+        }
+
+        pairs.push_back(pair<int,int>(i, pair_array[i]));
+    }
     return pairs;
 }
-
 
 /**
  * Reset the accumulator and peak arrays to their initial values.
@@ -272,6 +329,8 @@ list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
 void HoughSpace::reset()
 {
     numPeaks = 0;
+    activeLines.clear();
+
 #ifdef USE_MMX
     // Array resetting done in edge marking
 #else

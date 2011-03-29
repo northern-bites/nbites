@@ -135,7 +135,7 @@ void Vision::notifyImage() {
 
     linesDetector.detect(thresh->getVisionHorizon(), yImg);
 
-    drawEdges(linesDetector.getEdges());
+    drawEdges(*linesDetector.getEdges());
     drawHoughLines(linesDetector.getHoughLines());
     PROF_EXIT(profiler, P_VISION);
 }
@@ -554,7 +554,7 @@ void Vision::drawFieldLines() {
     }
 }
 
-void Vision::drawEdges(Gradient g)
+void Vision::drawEdges(Gradient& g)
 {
 #ifdef OFFLINE
     if (thresh->debugEdgeDetection){

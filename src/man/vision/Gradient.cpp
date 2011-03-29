@@ -1,6 +1,7 @@
 #include "Gradient.h"
 #include <iostream>
 #include <mmintrin.h>
+#include <string.h>
 
 using namespace std;
 
@@ -11,6 +12,13 @@ Gradient::Gradient() :
     numPeaks(0)
 {
 
+}
+
+Gradient::Gradient(const Gradient& other) :
+    numPeaks(other.numPeaks)
+{
+    memcpy(angles, other.angles, sizeof(AnglePeak)*num_angles_limit);
+    memcpy(values, other.values, sizeof(uint16_t)*IMAGE_HEIGHT*3*IMAGE_WIDTH);
 }
 
 // Restore the gradient to its original state so we can reuse the same

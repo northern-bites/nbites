@@ -33,7 +33,7 @@ public:
 
     // Public member functions
 public:
-    Gradient();
+    explicit Gradient();
     virtual ~Gradient() { };
 
     void reset();
@@ -153,7 +153,8 @@ public:
     const static int DIRECTIONS = 8;
     const static int dxTab[DIRECTIONS];
     const static int dyTab[DIRECTIONS];
-
+private:
+    Gradient(const Gradient& other);
 };
 
 #endif /* _Gradient_h_DEFINED */

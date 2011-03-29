@@ -1,21 +1,25 @@
 #ifndef _ActiveArray_h_DEFINED
 #define _ActiveArray_h_DEFINED
 
-template <class Type>
+template <class T>
 struct ActiveArray
 {
     ActiveArray(int _max) :
         _reserve(_max), _size(0),
-        _elements(new Type[_max]),
+        _elements(new T[_max]),
         _active(new bool[_max])
         { }
 
     ~ActiveArray() {
-        delete[] _elements;
-        delete[] _active;
+        delete [] _elements;
+        delete [] _active;
+        _elements = NULL;
+        _active = NULL;
     }
 
-    inline void add(Type _t){
+    inline void add(T _t){
+        assert(_size < _reserve);
+
         _elements[_size] = _t;
         _active[_size] = true;
         _size++;
@@ -47,7 +51,7 @@ struct ActiveArray
         return _active[i];
     }
 
-    inline Type& operator[](int i){
+    inline T& operator[](int i){
         return _elements[i];
     }
 
@@ -61,8 +65,8 @@ struct ActiveArray
 private:
     int _reserve;
     int _size;
-    Type * _elements;
-    bool * _active;
+    T* _elements;
+    bool* _active;
 
 };
 

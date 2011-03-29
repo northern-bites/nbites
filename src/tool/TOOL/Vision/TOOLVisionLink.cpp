@@ -179,6 +179,8 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     }
 
     delete[] newImg;
+    newImg = NULL;
+
     env->ReleaseByteArrayElements( jtable, buf_table, 0);
 
     //get the id for the java class, so we can get method IDs

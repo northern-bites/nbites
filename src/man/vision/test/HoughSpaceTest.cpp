@@ -77,7 +77,7 @@ void HoughSpaceTest::test_hs()
 void HoughSpaceTest::test_lines()
 {
     for(int t=0; t < 255; t += 5){
-        for (float r=0; r < 120; r += 10){
+        for (float r=5; r < 120; r += 10){
             test_for_line(static_cast<uint8_t>(t), r);
         }
     }
@@ -147,16 +147,18 @@ void HoughSpaceTest::test_suppress()
     PASSED(NO_DUPE_LINES);
 
     // Make sure that suppress doesn't delete lines needlessly
-    HoughLine a = HoughSpace::createLine(100, 180, 50);
-    HoughLine b = HoughSpace::createLine(10,200,400);
-    HoughLine c = HoughSpace::createLine(100,10,4);
-    HoughLine b2 = HoughSpace::createLine(10,203,4);
+    //
+    // ***** THESE MUST BE ADDED IN INCREASING T ORDER ******
+    HoughLine a = HoughSpace::createLine(100,10,4);
+    HoughLine b = HoughSpace::createLine(100,180, 50);
+    HoughLine c = HoughSpace::createLine(10,200,400);
+    HoughLine c2 = HoughSpace::createLine(10,203,4);
 
     lines.clear();
     lines.add(a);
     lines.add(b);
     lines.add(c);
-    lines.add(b2);
+    lines.add(c2);
 
     hs.suppress(x0, y0, lines);
     EQ_INT( lines.numActive() , 3 );

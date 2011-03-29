@@ -56,7 +56,6 @@ private:                        // Member functions
 private:       // Member variables
 
     enum {
-
         // Hough Space size parameters
         // 256 for full 8 bit angle, radius is for 320x240 image
         r_span = 320,
@@ -71,7 +70,10 @@ private:       // Member variables
         default_accept_thresh = 43,
         default_angle_spread  = 5,
         peak_points = 4,
-        hough_max_peaks = r_span * t_span / 4};
+        hough_max_peaks = r_span * t_span / 4,
+        active_line_buffer = 200,
+        opp_line_thresh = 5,
+        suppress_r_bound = 4};
 
     struct HoughPeak {
         uint16_t r;
@@ -81,8 +83,13 @@ private:       // Member variables
 
     boost::shared_ptr<Profiler> profiler;
     int acceptThreshold, angleSpread, numPeaks;
+    ActiveArray<HoughLine> activeLines;
 
+#ifdef USE_MMX
     uint16_t hs[hs_t_dim][r_span];
+#else
+    uint16_t hs[t_span+1][r_span];
+#endif
     HoughPeak peak[hough_max_peaks];
 
     const static int drTab[peak_points];

@@ -145,7 +145,6 @@ void EdgeDetector::findPeaks(int upperBound, Gradient& gradient)
     for (int16_t i=2; i < Gradient::rows-2; ++i) {
         for (int16_t j=2; j < Gradient::cols-2; ++j){
 
-            gradient.peaks[i][j] = false; // Not a peak yet
             const int z = gradient.getMagnitude(i,j);
             if (z > 0){
                 const int y = gradient.getY(i,j);
