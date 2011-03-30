@@ -91,13 +91,18 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
     Gradient g;
 
     g.reset();
+    g.clear();
     createLineAtPoint(g, angle, radius);
 
-    list<HoughLine> lines = hs.findLines(g);
+    hs.reset();
+    hs.findHoughLines(g);
 
-    // We only want one line to be found in this fake image since we
-    // only created one
-    EQ_INT(lines.size(), 1);
+    list<HoughLine> lines;
+    for (int i=0; i < hs.activeLines.size(); ++i){
+        if (hs.activeLines.active(i)){
+            lines.push_back(hs.activeLines[i]);
+        }
+    }
 
     float maxRadius = sqrtf(IMAGE_WIDTH * IMAGE_WIDTH +
                            IMAGE_HEIGHT * IMAGE_HEIGHT);
