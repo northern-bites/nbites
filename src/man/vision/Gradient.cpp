@@ -23,14 +23,16 @@ Gradient::Gradient(const Gradient& other) :
 
 // Restore the gradient to its original state so we can reuse the same
 // gradient object,
-//
-// @note: Useless really, since the gradients get
-// overwritten every time, but good to have
+// *****************************************
+// MUST BE CALLED EVERY FRAME BEFORE REUSING A GRADIENT OBJECT
+// *****************************************
 void Gradient::reset()
 {
     numPeaks = 0;
 }
 
+// @note: Not needed for ASM edge detection, since the gradients get
+// overwritten every time, but good to have
 void Gradient::clear()
 {
     __m64* ptr = (__m64*)values;
@@ -48,15 +50,16 @@ void Gradient::clear()
 
 
 // Looks for the given coordinates in the peak list of the gradient
-// and returns the index of it, if present. If not present, returns 0.
+// and returns the index+1 of it, if present. If not present, returns 0.
+//
+// Adds 1 to index so that the zero _index_ is returned as true, not false
 int Gradient::peaks_list_contains(int i, int j){
-    int n = 0;
-    while (isPeak(n)){
+
+    for( int n = 0; isPeak(n); ++n){
         if (getAnglesXCoord(n) == j &&
             getAnglesYCoord(n) == i){
-            return n;
+            return n+1;
         }
-        n++;
     }
     return 0;
 }

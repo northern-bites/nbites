@@ -11,7 +11,7 @@ using namespace std;
 using boost::shared_ptr;
 
  // approx. 3 degrees in radians
-const float HoughSpaceTest::ACCEPT_ANGLE = 0.05f;
+const float HoughSpaceTest::ACCEPT_ANGLE = 0.1f;
 
 HoughSpaceTest::HoughSpaceTest() :
     hs(shared_ptr<Profiler>(new Profiler(&micro_time)))
@@ -216,11 +216,11 @@ void HoughSpaceTest::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
     double y0 = radius * sn;
 
     for (double u = -200.; u <= 200.; u+=1.){
-        int x = (int)round(x0 + u * sn) + IMAGE_WIDTH  / 2;
-        int y = (int)round(y0 - u * cs) + IMAGE_HEIGHT / 2;
+        int x = (int)round(x0 + u * sn);
+        int y = (int)round(y0 - u * cs);
 
-        if (0 <= x && x < IMAGE_WIDTH &&
-            0 <= y && y < IMAGE_HEIGHT){
+        if ( abs(x) < IMAGE_WIDTH/2 &&
+             abs(y) < IMAGE_HEIGHT/2){
             g.addAngle(angle,
                        static_cast<uint16_t>(x),
                        static_cast<uint16_t>(y));

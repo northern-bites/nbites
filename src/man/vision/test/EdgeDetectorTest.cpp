@@ -64,12 +64,27 @@ int EdgeDetectorTest::test_dir()
 
     // Ensure that dir() only returns values between 0 and 256 for all
     // image points
-    for (int x= -IMAGE_WIDTH/2; x < IMAGE_WIDTH/2; ++x )
+    for (int x= -IMAGE_WIDTH/2; x < IMAGE_WIDTH/2; ++x ){
         for (int y= -IMAGE_HEIGHT/2; y < IMAGE_HEIGHT/2; ++y){
-            int a = g.dir(x,y);
+
+            int a = g.dir(y,x);
+            uint8_t trigDir = static_cast<uint8_t>(atan2(y,x) * 128/M_PI_FLOAT);
+
+            // Make sure the direction is correct!
+            LTE(g.dir(y,x),
+               trigDir + 1);
+            GTE(g.dir(y,x),
+                trigDir - 1);
+
+            uint8_t trigDir3 = static_cast<uint8_t>(trigDir >> 5);
+
+            int diff3 = g.dir3(y,x) - trigDir3;
+            LTE(abs(diff3%7), 1); // Handle wrap around values
+
             LTE(a , 256);
             GTE(a, 0);
         }
+    }
     PASSED(DIR_ALL);
 
     return 0;
@@ -173,7 +188,7 @@ int EdgeDetectorTest::test_peaks()
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
             if (j < IMAGE_WIDTH *3./4.)
-                c[(i) * IMAGE_WIDTH + j] = (uint16_t)rand()%10;
+                c[(i) * IMAGE_WIDTH + j] = 0;
             else
                 c[(i) * IMAGE_WIDTH + j] = 250;
     edges.detectEdges(0, c,g);
@@ -219,10 +234,10 @@ int EdgeDetectorTest::test_peaks()
 
             if (x == IMAGE_WIDTH * 1/4 ||
                 x == IMAGE_WIDTH * 1/4 - 1){
-                assert(g.peaks_list_contains(y, IMAGE_WIDTH * 1/4) ||
-                       g.peaks_list_contains(y, IMAGE_WIDTH * 1/4 - 1));
+                TRUE((g.peaks_list_contains(y, IMAGE_WIDTH * 1/4) ||
+                      g.peaks_list_contains(y, IMAGE_WIDTH * 1/4 - 1)));
             } else {
-                assert(!g.peaks_list_contains(y,x));
+                FALSE(g.peaks_list_contains(y,x));
             }
         }
     }
@@ -234,6 +249,8 @@ int EdgeDetectorTest::test_peaks()
 
 
 /*************** CIRCLE TESTS ************************************/
+    g.reset();
+
     create_circle_image(c, r, e, i_0, j_0);
     edges.detectEdges(0, c,g);
     int n = 0;
@@ -242,9 +259,12 @@ int EdgeDetectorTest::test_peaks()
         for (int j = 2; j < Gradient::cols-2; ++j) {
 
             // Uncomment here (and cout << endl; below) to get ASCII edge image
-            // printEdgePeak(g,i,j);
+            // printEdgePeak(g,i-IMAGE_HEIGHT/2,j-IMAGE_WIDTH/2);
 
             if( (n = g.peaks_list_contains(i,j)) ){
+                // cout << i << " " << j << endl;
+                // The index is 1 too great
+                n--;
                 int x = g.getAnglesXCoord(n);
                 int y = g.getAnglesYCoord(n);
                 double d = r - (sqrt(x*x + y*y));
@@ -358,6 +378,7 @@ void EdgeDetectorTest::printEdgePeak(Gradient& g, int i, int j)
 {
     int index;
     if ((index = g.peaks_list_contains(i,j))){
+        index--;
         int angle = g.getAngle(index);
         if (angle > 128){
             angle -= 128;

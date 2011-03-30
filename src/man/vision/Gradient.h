@@ -36,7 +36,9 @@ public:
     explicit Gradient();
     virtual ~Gradient() { };
 
+    // MUST BE CALLED EVERY FRAME BEFORE REUSING A GRADIENT OBJECT
     void reset();
+
     void clear();
     int peaks_list_contains(int i, int j);
     void printAnglesList();
@@ -44,8 +46,8 @@ public:
 
     inline void addAngle(uint8_t angle, int16_t x, int16_t y){
         angles[numPeaks].angle = angle;
-        angles[numPeaks].x     = static_cast<uint16_t>(x - IMAGE_WIDTH/2);
-        angles[numPeaks].y     = static_cast<uint16_t>(y - IMAGE_HEIGHT/2);
+        angles[numPeaks].x     = x;
+        angles[numPeaks].y     = y;
         numPeaks++;
     }
 
@@ -61,32 +63,25 @@ public:
      * Calculate the highest three bits of an angle for the given y and x
      */
     static inline uint8_t dir3(int y, int x) {
-        unsigned int d = 0x0;
-        //http://www-graphics.stanford.edu/~seander/bithacks.html#ConditionalSetOrClearBitsWithoutBranching
-        // w = (w & ~m) | (-f & m);
+        uint8_t d = 0x0;
+        if (y <0){
+            d |= 0x4;
+        }
 
-        // if (y <0){
-        //     d |= 0x4;
-        // }
-        d = ( d & ~0x4) | ( -(y<0) & 0x4);
-
-        // if ((x^y) < 0){
-        //     d |= 0x2;
-        // }
-        d = (d & ~0x2) | ( -((x^y) < 0) & 0x2);
+        if ((x^y) < 0){
+            d |= 0x2;
+        }
 
 
-        // if (d & 0x2) {
-        //     if (abs(x) > abs(y)){
-        //         d |= 0x1;
-        //     }
-        // } else if (abs(x) < abs(y)){
-        //     d |= 0x1;
-        // }
-        d = (d & 0x2) ? ((d & 0x1) | (- (abs(x) > abs(y)) & 0x1)) :
-            (d & 0x1) | (- (abs(x) < abs(y)) & 0x1);
+        if (d & 0x2) {
+            if (abs(x) > abs(y)){
+                d |= 0x1;
+            }
+        } else if (abs(x) < abs(y)){
+            d |= 0x1;
+        }
 
-        return static_cast<uint8_t>(d);
+        return d;
     }
 
 // **********************************************
@@ -95,15 +90,27 @@ public:
 
     // Values are all offset by one (see EdgeDetection.s)
     inline uint16_t getMagnitude(int i, int j){
+#ifdef USE_MMX
         return (values[i + magnitudes][j+1]);
+#else
+        return (values[i + magnitudes][j]);
+#endif
     }
 
     inline int16_t getX(int i, int j){
+#ifdef USE_MMX
         return values[i + x_grads][j+1];
+#else
+        return values[i + x_grads][j];
+#endif
     }
 
     inline int16_t getY(int i, int j){
+#ifdef USE_MMX
         return values[i + y_grads][j + 1];
+#else
+        return values[i + y_grads][j];
+#endif
     }
 
     // Return the nth angle in the angles array
@@ -126,15 +133,27 @@ public:
 // **********************************************
 
     void setMagnitude(uint16_t v, int i, int j){
+#ifdef USE_MMX
         values[i + magnitudes][j + 1] = v;
+#else
+        values[i + magnitudes][j] = v;
+#endif
     }
 
     void setX(int16_t v, int i, int j){
+#ifdef USE_MMX
         values[i + x_grads][j + 1] = v;
+#else
+        values[i + x_grads][j] = v;
+#endif
     }
 
     void setY(int16_t v, int i, int j){
+#ifdef USE_MMX
         values[i + y_grads][j + 1] = v;
+#else
+        values[i + y_grads][j] = v;
+#endif
     }
 
 

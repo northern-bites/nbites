@@ -32,33 +32,43 @@ list<HoughLine> HoughSpace::findLines(Gradient& g)
 {
     PROF_ENTER(profiler, P_HOUGH);
     reset();
+    findHoughLines(g);
+    list<HoughLine> lines = narrowHoughLines();
 
+    PROF_EXIT(profiler, P_HOUGH);
+    return lines;
+}
+
+/**
+ * Locate the lines in the image using a Hough Transform
+ */
+void HoughSpace::findHoughLines(Gradient& g)
+{
     markEdges(g);
     smooth();
     peaks();
 
     createLinesFromPeaks(activeLines);
+}
 
+/**
+ * Process hough lines to eliminate duplicate lines
+ * and pair up the lines.
+ */
+list<HoughLine> HoughSpace::narrowHoughLines()
+{
     int x0 = static_cast<int>(Gradient::cols/2);
     int y0 = static_cast<int>(Gradient::rows/2);
 
     suppress(x0, y0, activeLines);
     list<pair<int, int> > pairs = pairLines(activeLines);
 
-    PROF_EXIT(profiler, P_HOUGH);
     list<HoughLine> lines;
-
     list<pair<int, int> >::iterator i;
     for (i = pairs.begin(); i != pairs.end(); ++i){
         lines.push_back(activeLines[(*i).first]);
         lines.push_back(activeLines[(*i).second]);
     }
-
-    // for (int i=0; i < activeLines.size(); ++i){
-    //     if (activeLines.active(i)){
-    //         lines.push_back(activeLines[i]);
-    //     }
-    // }
     return lines;
 }
 
@@ -76,9 +86,6 @@ void HoughSpace::markEdges(Gradient& g)
         _houghMain(&hs[0][0], g.angles, g.numPeaks);
     }
 #else
-    int x0 = Gradient::cols/2;
-    int y0  = Gradient::rows/2;
-
     // See comment in FindPeaks re: why this is shrunk in by 2
     // rows/columns on each side
     for (int i = 0; g.isPeak(i); ++i) {
@@ -181,7 +188,11 @@ void HoughSpace::peaks()
                         goto notALine;
                     }
                 }
+#ifdef USE_MMX
                 addPeak(r, static_cast<uint16_t>(t - first_peak_row), z);
+#else
+                addPeak(r, t, z);
+#endif
             }
         notALine:
             continue;

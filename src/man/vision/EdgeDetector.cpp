@@ -99,7 +99,6 @@ void EdgeDetector::sobelOperator(int upperBound,
 
             // All non above threshold points are zero
             mag = max(0, mag-((threshold*threshold) >> 10));
-
             gradient.setMagnitude(static_cast<uint16_t>(mag), i, j);
         }
     }
@@ -156,10 +155,10 @@ void EdgeDetector::findPeaks(int upperBound, Gradient& gradient)
                 if (z > gradient.getMagnitude(i + Gradient::dyTab[a],
                                                j + Gradient::dxTab[a]) &&
                     z >= gradient.getMagnitude(i - Gradient::dyTab[a],
-                                                j - Gradient::dxTab[a])){
+                                               j - Gradient::dxTab[a])){
                     gradient.addAngle(Gradient::dir(y,x),
-                                       j,
-                                       i);
+                                      static_cast<int16_t>(j - IMAGE_WIDTH/2),
+                                      static_cast<int16_t>(i - IMAGE_HEIGHT/2));
                 }
             }
         }

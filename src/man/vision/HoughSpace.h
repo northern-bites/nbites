@@ -35,6 +35,9 @@ public:
     uint16_t getHoughBin(int r, int t);
 
 private:                        // Member functions
+    void findHoughLines(Gradient& g);
+    std::list<HoughLine> narrowHoughLines();
+
     void markEdges(Gradient& g);
     void edge(int x, int y, int t0, int t1);
     int  getR(int x, int y, int t);
@@ -64,7 +67,11 @@ private:       // Member variables
         // 5 rows on either side of the hough space to account for
         // angle wrap around in edge marking.
         hs_t_dim = t_span+10,
+#ifdef USE_MMX
         first_smoothing_row = 3,
+#else
+        first_smoothing_row = 0,
+#endif
         first_peak_row = first_smoothing_row + 1,
 
         default_accept_thresh = 43,
