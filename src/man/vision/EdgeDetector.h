@@ -40,7 +40,7 @@ private:
 
 private:
     enum {
-        default_edge_value = 60
+        default_edge_value = 75
     };
 
     boost::shared_ptr<Profiler> profiler;
