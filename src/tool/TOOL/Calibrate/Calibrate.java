@@ -1142,4 +1142,9 @@ public class Calibrate implements DataListener, MouseListener,
     public VisionState getVisionState() {
 		return visionState;
     }
+
+    public void resetSet(){
+        tool.getDataManager().useFrame(0);
+        tool.newColorTable();
+    }
 }
