@@ -24,22 +24,25 @@
 #include "Kinematics.h"
 #include "NaoPose.h"
 #include <cmath>
+//#include "NBMath.h"
+//include math
 
 class CoordHeadCommand : public SetHeadCommand
 {
  public:
  CoordHeadCommand(const float _x, const float _y,
-		  const float _z,//_z is relative to ground
+		  //_x, _y relative to robot center
+		  const float _z,
+		  //_z relative to ground
+		  NaoPose pose,
 		  const float _maxSpeedYaw =
 		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
 		  const float _maxSpeedPitch = 
 		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		  )
-   : SetHeadCommand(atan(_y, _x-NaoPose::getFocalPointInWorldFrameX()),
-		    atan(_z-NaoPose::getFocalPointInWorldFrameZ(),
-			 sqrt(pow(_x-NaoPose::getFocalPointInWorldFrameX(),2) + 
-			      pow(_y-NaoPose::getFocalPointInWorldFrameY(),2))),
-		    _maxSpeedYaw, _MaxSpeedPitch)
+   : SetHeadCommand(atan(_y/_x-pose.getFocalPointInWorldFrameX()),
+		    atan((pose.getFocalPointInWorldFrameZ()-_z)/sqrt(pow(_x-pose.getFocalPointInWorldFrameX(),2) + pow(_y-pose.getFocalPointInWorldFrameY(),2)))-((static_cast<float>(3.141592))*40.0/180.0f), //adjust by constant angle for lower camera
+		    _maxSpeedYaw, _maxSpeedPitch)
     {
       setChainList();
     }
@@ -50,6 +53,7 @@ class CoordHeadCommand : public SetHeadCommand
 		     MotionConstants::HEAD_JOINT_CHAINS
 		     + MotionConstants::HEAD_JOINT_NUM_CHAINS);
   }
+  //const float CAMERA_ANGLE = NBMath::TO_RAD*40.0; // from reddoc
 };
 
 #endif

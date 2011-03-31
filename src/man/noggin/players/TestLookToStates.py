@@ -24,7 +24,7 @@ def lookRightClose(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(my.x, my.y - 50, 0)
+    brain.tracker.lookToPoint(my.x, my.y - 10, 0)
 
     if player.counter == 50:
         player.brain.tracker.stopHeadMoves()
