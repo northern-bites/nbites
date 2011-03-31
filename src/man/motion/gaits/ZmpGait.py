@@ -8,14 +8,14 @@ NON_WALKING = constants.NON_WALKING
 
 MARVIN_STANCE_CONFIG = (31.0, # CoM height
                         1.0,  # Forward displacement of CoM
-                        10.5,  # Horizontal distance between feet
-                        5.0,   # Body angle around y axis
+                        11.5,  # Horizontal distance between feet
+                        0.0,   # Body angle around y axis
                         0.0,   # Angle between feet
                         0.1)   # Time to transition to/from this stance
 
 STEP_CONFIG = (0.375, # step duration
-               0.25,  # fraction in double support
-               1.75,  # stepHeight
+               0.3,  # fraction in double support
+               1.95,  # stepHeight
                -3.25,  # step lift
                18.0,  # max x speed
                -9.0,  # max x speed (backwards)
@@ -45,12 +45,12 @@ MARVIN_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
                         3.0,   # max angle Y
                         45.0)   # max angle vel (change in compensation)
 
-STIFFNESS_CONFIG = (0.85, #hipStiffness
-                    0.7,  #kneeStiffness
+STIFFNESS_CONFIG = (0.9, #hipStiffness
+                    0.8,  #kneeStiffness
                     0.6,  #anklePitchStiffness
                     0.7,  #ankleRollStiffness
-                    0.1,  #armStiffness
-                    0.1)  #arm pitch
+                    0.4,  #armStiffness
+                    0.4)  #arm pitch
 
 #Put together all the parts to make a gait - ORDER MATTERS!
 ZMP_GAIT = motion.GaitCommand(MARVIN_STANCE_CONFIG,

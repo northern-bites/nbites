@@ -4,7 +4,7 @@ using namespace NBMath;
 using namespace std;
 using namespace boost::numeric;
 
-#define DEBUG_COM
+//#define DEBUG_COM
 //#define DEBUG_COM_VERBOSE
 //#define DEBUG_COM_TRANSFORMS
 
@@ -12,10 +12,20 @@ ufmatrix4 limbs[Kinematics::NUM_MASS_PIECES]; // transform to the origin of each
 
 const ufvector4
 Kinematics::getCOMc(const vector<float> bodyAngles) {
-	//copy the body angles to an array
-	float angles[NUM_JOINTS];
-	for(unsigned int i = 0; i< NUM_JOINTS; i++){
-		angles[i] = bodyAngles[i];
+	// copy the body angles to an array
+	float angles[NUM_MASS_PIECES];
+
+	unsigned int joint = 0;
+	for(unsigned int i = 0; i < NUM_MASS_PIECES; i++){
+		// add two dummy values for the hands
+		// leave the rest of the angles intact
+		if (i == 6 || i == 23) {
+			angles[i] = -1.0f;
+			continue;
+		}
+
+		angles[i] = bodyAngles[joint];
+		joint++;
 	}
 
 	buildJointTransforms(angles);
@@ -44,10 +54,7 @@ Kinematics::getCOMc(const vector<float> bodyAngles) {
 
 #ifdef DEBUG_COM_VERBOSE
 		cout << "joint: " << joint <<" pos " << partial/jointMass[joint].mass;
-		// b/c there is no joint angle for hands
-		if (joint < NUM_JOINTS) {
-			cout << " angle: " << angles[joint] << endl;
-		}
+		cout << " angle: " << angles[joint] << endl;
 #endif
 	}
 
@@ -60,7 +67,7 @@ Kinematics::getCOMc(const vector<float> bodyAngles) {
 
 /*
  * Builds full transforms from the robot origin (0,0,0) to the local
- * origin of each joint, based on a given set of joint angles this
+ * origin of each joint, based on a given set of joint angles. This
  * allows us to add each limb's mass as the product
  * transform(matrix) * localOffset(vector) * mass(scalar)
  * The sum of these divided by the total mass is the CoM
@@ -70,7 +77,7 @@ Kinematics::getCOMc(const vector<float> bodyAngles) {
  */
 void Kinematics::buildJointTransforms(const float angles[]) {
 	float side = 1.0f; // Left Side ? 1 : -1
-	int start = 0;
+	int start = 0; // indicates where in limbs[] each function starts
 
 	// head & neck
 	buildHeadNeck(start, angles);
@@ -121,43 +128,43 @@ void Kinematics::buildArmChain(const int start, const float side, const float an
 	// elbow yaw
 	temp = prod(rotation4D(X_AXIS, angles[start + 2]*side),
 				limbs[start + 1]);
-	limbs[start + 2] = prod(translation4D(UPPER_ARM_LENGTH, 0.0f, 0.0f),
-							temp);
-	// elbow roll
-	limbs[start + 3] = prod(rotation4D(Z_AXIS, -angles[start + 3]*side),
-							limbs[start + 2]);
-	// hand (no joint)
-	limbs[start + 4] = prod(translation4D(HAND_OFFSET_X, 0.0f, HAND_OFFSET_Z),
-							limbs[start + 3]);
+    limbs[start + 2] = prod(translation4D(UPPER_ARM_LENGTH, 0.0f, 0.0f),
+                            temp);
+    // elbow roll
+    limbs[start + 3] = prod(rotation4D(Z_AXIS, -angles[start + 3]*side),
+                            limbs[start + 2]);
+    // hand (no joint angle here)
+    limbs[start + 4] = prod(translation4D(HAND_OFFSET_X, 0.0f, HAND_OFFSET_Z),
+                            limbs[start + 3]);
 }
 
 // See: buildArmChain
 void Kinematics::buildLegChain(const int start, const float side, const float angles[]) {
-	using namespace CoordFrame4D;
-	ufmatrix4 temp; // for multiple transformations, ublas hates nested prod calls
+    using namespace CoordFrame4D;
+    ufmatrix4 temp; // for multiple transformations, ublas hates nested prod calls
 
-	// hip yaw pitch
-	temp = prod(rotation4D(X_AXIS, M_PI_FLOAT/4*-side),
-				rotation4D(Z_AXIS, angles[start]*-side));
+    // hip yaw pitch
+    temp = prod(rotation4D(X_AXIS, M_PI_FLOAT/4*-side),
+                rotation4D(Z_AXIS, angles[start]*-side));
     limbs[start] = prod(translation4D(0.0f, HIP_OFFSET_Y*side, -HIP_OFFSET_Z),
-						temp);
-	// hip roll
-	limbs[start + 1] = prod(rotation4D(X_AXIS, (angles[start + 1] + M_PI_FLOAT/4)*side),
-							limbs[start]);
-	// hip pitch
-	limbs[start + 2] = prod(rotation4D(Y_AXIS, angles[start + 2]),
-							limbs[start + 1]);
-	// knee pitch
-	temp = prod(rotation4D(Y_AXIS, angles[start + 3]),
-				limbs[start + 2]);
-	limbs[start + 3] = prod(translation4D(0.0f, 0.0f, -THIGH_LENGTH),
-							temp);
- 	// ankle pitch
-	temp = prod(rotation4D(Y_AXIS, angles[start + 4]),
-				limbs[start + 3]);
-	limbs[start + 4] = prod(translation4D(0.0f, 0.0f, -TIBIA_LENGTH),
-							temp);
-	// ankle roll
+                        temp);
+    // hip roll
+    limbs[start + 1] = prod(rotation4D(X_AXIS, (angles[start + 1] + M_PI_FLOAT/4)*side),
+                            limbs[start]);
+    // hip pitch
+    limbs[start + 2] = prod(rotation4D(Y_AXIS, angles[start + 2]),
+                            limbs[start + 1]);
+    // knee pitch
+    temp = prod(rotation4D(Y_AXIS, angles[start + 3]),
+                limbs[start + 2]);
+    limbs[start + 3] = prod(translation4D(0.0f, 0.0f, -THIGH_LENGTH),
+                            temp);
+    // ankle pitch
+    temp = prod(rotation4D(Y_AXIS, angles[start + 4]),
+                limbs[start + 3]);
+    limbs[start + 4] = prod(translation4D(0.0f, 0.0f, -TIBIA_LENGTH),
+                            temp);
+    // ankle roll
 	limbs[start + 5] = prod(rotation4D(X_AXIS, angles[start + 5] * -side),
 							limbs[start + 4]);
 }
