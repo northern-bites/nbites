@@ -47,7 +47,6 @@ void HoughSpace::findHoughLines(Gradient& g)
     markEdges(g);
     smooth();
     peaks();
-
     createLinesFromPeaks(activeLines);
 }
 

@@ -183,6 +183,48 @@ void HoughSpaceTest::test_suppress()
 
 }
 
+void HoughSpaceTest::test_pairing()
+{
+    // Insert random lines into list
+    hs.activeLines.clear();
+    srand(time(NULL));
+    for (int i = 0; i < 40; ++i) {
+        int r = rand()%319;
+        int t = rand()%255;
+        int z = rand();
+        HoughLine l(r, t,
+                     static_cast<float>(r) -
+                    HoughSpace::r_span / 2.0f + 0.5f,
+                     (static_cast<float>(t+.5)) *
+                     M_PI_FLOAT / 128.0f, z >> 2);
+        hs.activeLines.add(l);
+    }
+
+    // Run them through narrowing
+    list<HoughLine> lines = hs.narrowHoughLines();
+
+    // Ensure that the only lines which return are parallel
+    list<HoughLine>::iterator l, l2;
+
+    for(l = lines.begin(); l != lines.end(); ++l){
+        bool foundParallel = false;
+        for(l2 = lines.begin(); l2 != lines.end() && !foundParallel; ++l2){
+            if (*l != *l2 &&
+                isParallel(*l, *l2)){
+                foundParallel = true;
+            }
+        }
+        TRUE(foundParallel);
+    }
+    PASSED(CORRECT_PAIRING);
+}
+
+bool HoughSpaceTest::isParallel(HoughLine& l, HoughLine& l2)
+{
+    int tDiff = abs(l.getTIndex() - l2.getTIndex()) - HoughSpace::t_span/2;
+    return (abs(tDiff) < max_parallel_tdiff);
+}
+
 bool HoughSpaceTest::isDesiredLine(float goalR, float goalT,
                                    const HoughLine& line)
 {
@@ -236,8 +278,9 @@ void HoughSpaceTest::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
 int HoughSpaceTest::runTests()
 {
     test_hs();
-    test_suppress();
     test_lines();
+    test_suppress();
+    test_pairing();
     return 0;
 }
 
