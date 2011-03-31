@@ -125,7 +125,7 @@ public class ClassifierDrawingPanel extends ImagePanel implements
         undoStack = new Stack<ClassifierObject>();
         redoStack = new Stack<ClassifierObject>();
                         
-        lineWeight = (int) (DEFAULT_LINE_WIDTH * xScale);
+        lineWeight = (int) (DEFAULT_LINE_WIDTH * xImageScale);
         anchor = new Point();
         endPt1 = new Point();
         endPt2 = new Point();
@@ -145,7 +145,7 @@ public class ClassifierDrawingPanel extends ImagePanel implements
     // also update our transformation
     protected void calculateScaling() {
         super.calculateScaling();
-        lineWeight = (int) (DEFAULT_LINE_WIDTH * xScale);
+        lineWeight = (int) (DEFAULT_LINE_WIDTH * xImageScale);
     }
     
     /**
@@ -249,25 +249,25 @@ public class ClassifierDrawingPanel extends ImagePanel implements
         int minX, minY, maxX, maxY;
         minX = min((int) old1.getX(), (int) old2.getX(),
                    (int) new1.getX(), (int) new2.getX());
-        minX = clip(minX, 0, (int) (xScale*imageWidth));
+        minX = clip(minX, 0, (int) (xImageScale*imageWidth));
 
         
         minY = min((int) old1.getY(), (int) old2.getY(),
                    (int) new1.getY(), (int) new2.getY());
-        minY = clip(minY, 0, (int) (yScale*imageHeight));
+        minY = clip(minY, 0, (int) (yImageScale*imageHeight));
 
         
         maxX = max((int) old1.getX(), (int) old2.getX(),
                    (int) new1.getX(), (int) new2.getX());
-        maxX = clip(maxX, 0, (int) (xScale*imageWidth));
+        maxX = clip(maxX, 0, (int) (xImageScale*imageWidth));
 
 
         maxY = max((int) old1.getY(), (int) old2.getY(),
                    (int) new1.getY(), (int) new2.getY());
-        maxY = clip(maxY, 0, (int) (yScale*imageHeight));
+        maxY = clip(maxY, 0, (int) (yImageScale*imageHeight));
 
         int padding = (drawMode == DrawingMode.POINT) ? 
-            (int) (LINE_LENGTH * xScale) : lineWeight;
+            (int) (LINE_LENGTH * xImageScale) : lineWeight;
         
         // Pad the line weight values to ensure we refresh enough
         coords[0] = minX - 2*padding;
@@ -295,7 +295,7 @@ public class ClassifierDrawingPanel extends ImagePanel implements
         Graphics2D g2 = (Graphics2D) g;
         
         // Draw all the shapes previously specified
-        g2.scale(xScale, yScale);
+        g2.scale(xImageScale, yImageScale);
         Font curFont = new Font("SansSerif", Font.PLAIN, 8);
         g2.setFont(curFont);
         
@@ -316,7 +316,7 @@ public class ClassifierDrawingPanel extends ImagePanel implements
         if (curSelected != null) {
             g2.setTransform(new AffineTransform());
             g2.translate(xTranslate, yTranslate);
-            g2.scale(xScale, yScale);
+            g2.scale(xImageScale, yImageScale);
 
             // thick line
             g2.setStroke(new BasicStroke(THICK_LINE_WEIGHT));
@@ -377,11 +377,11 @@ public class ClassifierDrawingPanel extends ImagePanel implements
             break;
         case POINT:
             // Horizontal segment
-            g2.drawLine(x2-(int)(xScale*LINE_LENGTH/2),y2,
-                        x2+(int)(xScale*LINE_LENGTH/2),y2);
+            g2.drawLine(x2-(int)(xImageScale*LINE_LENGTH/2),y2,
+                        x2+(int)(xImageScale*LINE_LENGTH/2),y2);
             // Vertical segment
-            g2.drawLine(x2,y2-(int)(yScale*LINE_LENGTH/2),
-                        x2,y2+(int)(yScale*LINE_LENGTH/2));
+            g2.drawLine(x2,y2-(int)(yImageScale*LINE_LENGTH/2),
+                        x2,y2+(int)(yImageScale*LINE_LENGTH/2));
             break;
         case ARC:
 
@@ -538,8 +538,8 @@ public class ClassifierDrawingPanel extends ImagePanel implements
     public void mouseMoved(MouseEvent e) {
         int x, y;
         // Convert screen coordinates into image coordinates
-        x = (int)(e.getX() / xScale);
-        y = (int)(e.getY() / yScale);
+        x = (int)(e.getX() / xImageScale);
+        y = (int)(e.getY() / yImageScale);
         // Create a small box around the cursor in order to check if
         // we're mousing over the shape or not
         Rectangle boundingBox = new Rectangle(x - 1, y - 1, 3, 3);
@@ -618,8 +618,8 @@ public class ClassifierDrawingPanel extends ImagePanel implements
         // We have a selected object; if the user has moved it,
         // call the corresponding method to update the object.
         if (curSelected != null) { 
-            curSelected.move((int)(xTranslate/xScale),
-                             (int)(yTranslate/yScale));
+            curSelected.move((int)(xTranslate/xImageScale),
+                             (int)(yTranslate/yImageScale));
             // reset x and y translate amounts
             xTranslate = 0;
             yTranslate = 0;

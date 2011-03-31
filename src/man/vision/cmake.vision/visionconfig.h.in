@@ -25,5 +25,12 @@
 #  undef OFFLINE
 #endif
 
+#define USE_MMX_${USE_MMX}
+#ifdef USE_MMX_ON
+#  define USE_MMX
+#else
+#  undef USE_MMX
+#endif
+
 #endif // !_visionconfig_h_DEFINED
 

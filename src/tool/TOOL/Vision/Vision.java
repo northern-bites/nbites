@@ -26,9 +26,6 @@ import TOOL.Data.RobotDef;
 
 public interface Vision {
 
-    public static Vision[] VISION_BINARIES =
-            new Vision[RobotDef.ROBOT_DEFS.length];
-
     //current color encodings.
     public static final byte GREY = 0;
     public static final byte WHITE = 1;

@@ -195,7 +195,7 @@ public class PlayBookEditorViewer extends ImagePanel implements
         // Paint the zones previously defined
         // draw as semi transparent
 
-        g2.scale(xScale, yScale);
+        g2.scale(xImageScale, yImageScale);
         for (PlayBookObject unselected: curZones) {
             // Don't paint the currently selected ones until afterwards so that
             // they appear on top of these unselected ones
@@ -394,8 +394,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
         mousePressed = true;
 
 	if (testMode) {
-	    int x = (int)(e.getX()/xScale),
-		y = (int)(e.getY()/yScale);
+	    int x = (int)(e.getX()/xImageScale),
+		y = (int)(e.getY()/yImageScale);
 	    x = field.screenToFieldX(x);
 	    y = field.screenToFieldY(y);
 	    editor.getTestPanel().changeBallLoc(new Point(x, y));
@@ -417,8 +417,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
         // Check to see if they clicked within any of the zones
         for (PlayBookObject cur: curZones) {
 
-            if (cur.contains((int) (e.getX()/xScale),
-                             (int) (e.getY()/yScale))) {
+            if (cur.contains((int) (e.getX()/xImageScale),
+                             (int) (e.getY()/yImageScale))) {
                 tool.setCursor(HAND_CURSOR);
                 movingGroup = true;
 
@@ -496,8 +496,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
     public void mouseReleased(MouseEvent e) {
         mousePressed = false;
 	if (testMode) {
-	    int x = (int)(e.getX()/xScale),
-		y = (int)(e.getY()/yScale);
+	    int x = (int)(e.getX()/xImageScale),
+		y = (int)(e.getY()/yImageScale);
 	    x = field.screenToFieldX(x);
 	    y = field.screenToFieldY(y);
 	    editor.getTestPanel().changeBallLoc(new Point(x, y));
@@ -519,8 +519,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
             //System.out.println("Finished resizing");
 
             curResizing.fixCoords();
-            int fieldX = field.fixXCoord(e.getX() / xScale);
-            int fieldY = field.fixYCoord(e.getY() / yScale);
+            int fieldX = field.fixXCoord(e.getX() / xImageScale);
+            int fieldY = field.fixYCoord(e.getY() / yImageScale);
             Point curPoint = new Point(fieldX, fieldY);
             Direction d = getDirection(curResizing, curPoint);
             if (d != null) { tool.setCursor(d.getCursor()); }
@@ -537,8 +537,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
             int dy = endY - startY;
 
             if (dx == 0 && dy == 0) {
-                if (!contains(curSelections, (int) (x2/xScale),
-                              (int) (y2/yScale))) {
+                if (!contains(curSelections, (int) (x2/xImageScale),
+                              (int) (y2/yImageScale))) {
                     curSelections.clear();
                     repaint();
                     updateLabel();
@@ -556,10 +556,10 @@ public class PlayBookEditorViewer extends ImagePanel implements
         else {
             //System.out.println("Finished drawing a zone");
 
-            x1 = field.fixXCoord(x1 / xScale);
-            x2 = field.fixXCoord(x2 / xScale);
-            y1 = field.fixYCoord(y1 / yScale);
-            y2 = field.fixYCoord(y2 / yScale);
+            x1 = field.fixXCoord(x1 / xImageScale);
+            x2 = field.fixXCoord(x2 / xImageScale);
+            y1 = field.fixYCoord(y1 / yImageScale);
+            y2 = field.fixYCoord(y2 / yImageScale);
             PlayBookObject newZone = null;
             int leftX = Math.min(x1, x2);
             int rightX = Math.max(x1, x2);
@@ -623,10 +623,10 @@ public class PlayBookEditorViewer extends ImagePanel implements
         int width = (int) r.getWidth() + 4 * HANDLE_WIDTH;
         int height = (int) r.getHeight() + 4 * HANDLE_WIDTH;
 
-        repaint((int) (xScale * x1),
-                (int) (yScale * y1),
-                (int) (xScale * width),
-                (int) (yScale * height));
+        repaint((int) (xImageScale * x1),
+                (int) (yImageScale * y1),
+                (int) (xImageScale * width),
+                (int) (yImageScale * height));
 
     }
 
@@ -776,8 +776,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
 
         PlayBookObject curSelected = curSelections.get(0);
 
-        int fieldX = field.fixXCoord(e.getX() / xScale);
-        int fieldY = field.fixYCoord(e.getY() / yScale);
+        int fieldX = field.fixXCoord(e.getX() / xImageScale);
+        int fieldY = field.fixYCoord(e.getY() / yImageScale);
         Point curPoint = new Point(fieldX, fieldY);
         dir = getDirection(curSelected, curPoint);
 
@@ -791,8 +791,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
 
         // We weren't near any resizing handles; if we've left confines of
         // the object, fix the cursor
-        if (!curSelected.contains((int) (e.getX()/xScale),
-                                  (int) (e.getY()/yScale))) {
+        if (!curSelected.contains((int) (e.getX()/xImageScale),
+                                  (int) (e.getY()/yImageScale))) {
             tool.setCursor(DEFAULT_CURSOR);
         }
         else {
@@ -803,8 +803,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
 
     public void mouseDragged(MouseEvent e) {
 	if (testMode) {
-	    int x = (int)(e.getX()/xScale),
-		y = (int)(e.getY()/yScale);
+	    int x = (int)(e.getX()/xImageScale),
+		y = (int)(e.getY()/yImageScale);
 	    x = field.screenToFieldX(x);
 	    y = field.screenToFieldY(y);
 	    editor.getTestPanel().changeBallLoc(new Point(x, y));
@@ -822,8 +822,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
         if (curResizing != null) {
             Shape old = curResizing.getShape();
 
-            curResizing.resize(new Point(field.fixXCoord(x2/xScale),
-                                         field.fixYCoord(y2/yScale)),
+            curResizing.resize(new Point(field.fixXCoord(x2/xImageScale),
+                                         field.fixYCoord(y2/yImageScale)),
                                dir.getDirection());
             // Take the union of the bounding boxes of the previous shape
             // and the new shape, then repaint that area
@@ -838,8 +838,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
 
             // Due to the reversal of the axes, we take the negative of the
             // y difference.
-            moveGroup(curSelections, (int)((x2 - x1) / xScale),
-                      - (int)((y2 - y1) / yScale));
+            moveGroup(curSelections, (int)((x2 - x1) / xImageScale),
+                      - (int)((y2 - y1) / yImageScale));
             repaint();
             // Update coords so that we calculate the differences correctly
             x1 = x2; y1 = y2;
@@ -848,10 +848,10 @@ public class PlayBookEditorViewer extends ImagePanel implements
         // Defining the shape
         else {
             // Calculate the current field coordinates to display
-            int x1_ = field.fixXCoord(x1 / xScale);
-            int x2_ = field.fixXCoord(x2 / xScale);
-            int y1_ = field.fixYCoord(y1 / yScale);
-            int y2_ = field.fixYCoord(y2 / yScale);
+            int x1_ = field.fixXCoord(x1 / xImageScale);
+            int x2_ = field.fixXCoord(x2 / xImageScale);
+            int y1_ = field.fixYCoord(y1 / yImageScale);
+            int y2_ = field.fixYCoord(y2 / yImageScale);
             int leftX = Math.min(x1_, x2_);
             int rightX = Math.max(x1_, x2_);
             int topY = Math.max(y1_, y2_);
@@ -871,8 +871,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
      */
     public int clipX(double x) {
         if (x < 0) { return 0; }
-        else if (x > field.FIELD_WIDTH * xScale) {
-            return (int) (field.FIELD_WIDTH * xScale);
+        else if (x > field.FIELD_WIDTH * xImageScale) {
+            return (int) (field.FIELD_WIDTH * xImageScale);
         }
         else {
             return (int) x;
@@ -885,8 +885,8 @@ public class PlayBookEditorViewer extends ImagePanel implements
      */
     public int clipY(double y) {
         if (y < 0) { return 0; }
-        else if (y > field.FIELD_HEIGHT * yScale) {
-            return (int) (field.FIELD_HEIGHT * yScale);
+        else if (y > field.FIELD_HEIGHT * yImageScale) {
+            return (int) (field.FIELD_HEIGHT * yImageScale);
         }
         else {
             return (int) y;

@@ -79,6 +79,10 @@ Ball::Ball(Vision* vis, Threshold* thr, Field* fie, Context* con, int _color)
 	blobs = new Blobs(MAX_BALLS);
 	init(0.0);
 	allocateColorRuns();
+#ifdef OFFLINE
+    BALLDEBUG = false;
+    BALLDISTDEBUG = false;
+#endif
 }
 
 
@@ -343,7 +347,7 @@ void Ball::setOcclusionInformation() {
    @return         x value of the edge
  */
 int Ball::findBallEdgeX(int x, int y, int dir) {
-    int lastu = thresh->getU(x, y);
+    int lastu = thresh->getU(x,y);
     int midu = lastu;
     int newx = x;
     int changex = topBlob->getLeft();
@@ -385,7 +389,7 @@ int Ball::findBallEdgeX(int x, int y, int dir) {
    @return         y value of the edge
  */
 int Ball::findBallEdgeY(int x, int y, int dir) {
-    int lastu = thresh->getU(x, y);
+    int lastu = thresh->getU(x,y);
     int midu = lastu;
     int newy = y;
     int changey = topBlob->getTop();
@@ -397,7 +401,7 @@ int Ball::findBallEdgeY(int x, int y, int dir) {
         if (x + i >= 0 && x + i < IMAGE_WIDTH) {
             for (bool done = false; !done && newy >= 0 && newy < IMAGE_HEIGHT;
                  newy+=dir) {
-                int newu = thresh->getU(x + i, newy);
+                int newu = thresh->getU(x + i,newy);
                 if (abs(newu - lastu) > EDGEMISMATCH
                     || abs(newu - midu) > EDGECENTERMISMATCH) {
                     done = true;
@@ -485,7 +489,7 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
                  i++) {
                 for (int j = topBlob->getLeftTopY();
                      j < topBlob->getLeftBottomY(); j++) {
-                    if (thresh->thresholded[j][i] == ORANGE) {
+                    if (thresh->getThresholded(j,i) == ORANGE) {
                         topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;
                         i = IMAGE_WIDTH;
@@ -498,7 +502,7 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
             for (int i = topBlob->getLeftTopX() + h; i > -1; i--) {
                 for (int j = topBlob->getLeftTopY();
                      j < topBlob->getLeftBottomY(); j++) {
-                    if (thresh->thresholded[j][i] == ORANGE) {
+                    if (thresh->getThresholded(j,i) == ORANGE) {
                         topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;
                         i = -1;
@@ -650,7 +654,7 @@ float Ball::rightHalfColor(Blob tempobj)
 	int pix;
 	for (int i = spanY / 2; i < spanY; i++) {
 		for (int j = 0; j < spanX; j++) {
-			pix = thresh->thresholded[y + i][x + j];
+			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
 					x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED ||
 							pix == ORANGEYELLOW)) {
@@ -660,7 +664,7 @@ float Ball::rightHalfColor(Blob tempobj)
 	}
 	for (int i = 0; i < spanY; i++) {
 		for (int j = 0; j < spanX / 2; j++) {
-			pix = thresh->thresholded[y + i][x + j];
+			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
 					x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED ||
 							pix == ORANGEYELLOW)) {
@@ -670,7 +674,7 @@ float Ball::rightHalfColor(Blob tempobj)
 	}
 	for (int i = 0; i < spanY; i++) {
 		for (int j = spanX / 2; j < spanX; j++) {
-			pix = thresh->thresholded[y + i][x + j];
+			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
 					x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED ||
 							pix == ORANGEYELLOW)) {
@@ -815,14 +819,14 @@ pair<int, int> Ball::scanMidlinesForRoundnessInformation(Blob b) {
     int pix;
     int goodPix = 0, badPix = 0;
     for (int i = 0; i < h; i++) {
-        pix = thresh->thresholded[y+i][x + w/2];
+        pix = thresh->getThresholded(y+i,x + w/2);
         if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
             goodPix++;
         } else if (pix != GREY)
             badPix++;
     }
     for (int i = 0; i < w; i++) {
-        pix = thresh->thresholded[y+h/2][x + i];
+        pix = thresh->getThresholded(y+h/2,x + i);
         if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
             goodPix++;
         } else if (pix != GREY) {
@@ -854,7 +858,7 @@ pair<int, int> Ball::scanDiagonalsForRoundnessInformation(Blob b) {
     int d3 = min(w, h);
     pair<int, int> info;
     for (int i = 0; i < d3; i++) {
-        pix = thresh->thresholded[y+i][x+i];
+        pix = thresh->getThresholded(y+i,x+i);
         if (i < d || (i > d3 - d)) {
             if (pix == ORANGE || pix == ORANGERED) {
                 //drawPoint(x+i, y+i, BLACK);
@@ -870,7 +874,7 @@ pair<int, int> Ball::scanDiagonalsForRoundnessInformation(Blob b) {
                 //drawPoint(x+i, y+i, PINK);
             }
         }
-        pix = thresh->thresholded[y+i][x+w-i];
+        pix = thresh->getThresholded(y+i,x+w-i);
         if (i < d || (i > d3 - d)) {
             if (pix == ORANGE || pix == ORANGERED) {
                 //drawPoint(x+w-i, y+i, BLACK);
@@ -922,7 +926,7 @@ bool Ball::badSurround(Blob b) {
 	h = h + surround * 2;
 	for (int i = 0; i < w && x + i < IMAGE_WIDTH; i++) {
 		for (int j = 0; j < h && y + j < IMAGE_HEIGHT; j++) {
-			pix = thresh->thresholded[y + j][x + i];
+			pix = thresh->getThresholded(y + j,x + i);
 			if (pix == ORANGE || pix == ORANGEYELLOW) {
 				orange++;
                 if (x + i >= b.getLeft() && x + i <= b.getRight() &&

@@ -23,7 +23,7 @@ public class WorldControllerViewer extends ImagePanel {
         Graphics2D g2 = (Graphics2D) g;
         // Scale the graphics context to match the scale of the buffered image;
         // otherwise the field graphics will not line up
-        g2.scale(xScale, yScale);
+        g2.scale(xImageScale, yImageScale);
         painter.paintInfoOnField(g2);
     }
 

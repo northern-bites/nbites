@@ -94,9 +94,12 @@ public class ThresholdedImage extends TOOLImage {
     }
 
     protected void initImage(BufferedImage img) {
-        for (int y = 0; y < getHeight(); y++)
-            for (int x = 0; x < getWidth(); x++)
-                img.setRGB(x, y, COLORS[thresholded[y][x]].getRGB());
+        for (int y = 0; y < getHeight(); y++){
+            for (int x = 0; x < getWidth(); x++){
+                if (thresholded[y][x] < COLORS.length)
+                    img.setRGB(x, y, COLORS[thresholded[y][x]].getRGB());
+            }
+        }
     }
 
     public void readByteArray(byte[] rawImage) {
