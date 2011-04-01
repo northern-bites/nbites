@@ -164,6 +164,8 @@ void EdgeDetector::findPeaks(int upperBound, Gradient& gradient)
         }
     }
 #endif
+
+    gradient.updatePeakGrid();
     PROF_EXIT(profiler, P_EDGE_PEAKS);
 }
 

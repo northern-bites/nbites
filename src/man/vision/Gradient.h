@@ -40,9 +40,10 @@ public:
     void reset();
 
     void clear();
+    void clearPeakGrid();
     int peaks_list_contains(int i, int j);
     void printAnglesList();
-
+    void updatePeakGrid();
 
     inline void addAngle(uint8_t angle, int16_t x, int16_t y){
         angles[numPeaks].angle = angle;
@@ -160,11 +161,14 @@ public:
     // Public member variables
 public:
     int numPeaks;
-    const static int rows = IMAGE_HEIGHT;
-    const static int cols = IMAGE_WIDTH;
+    enum {
+        rows = IMAGE_HEIGHT,
+        cols = IMAGE_WIDTH
+    };
 
     // Values is the 3 magnitude, x, & y gradient value arrays in one
-    uint16_t values[IMAGE_HEIGHT*3][IMAGE_WIDTH];
+    uint16_t  values[rows*3][cols];
+    int16_t  peaks [rows][cols];
     AnglePeak angles[num_angles_limit];
 
     // Tables that specify the + neighbor of a pixel indexed by

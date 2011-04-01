@@ -48,6 +48,17 @@ void Gradient::clear()
     _mm_empty();
 }
 
+void Gradient::clearPeakGrid()
+{
+    for(int i=0; i < IMAGE_HEIGHT; ++i){
+        for(int j=0; j < IMAGE_WIDTH; j+=4){
+            peaks[i][j] = -1;
+            peaks[i][j+1] = -1;
+            peaks[i][j+2] = -1;
+            peaks[i][j+3] = -1;
+        }
+    }
+}
 
 // Looks for the given coordinates in the peak list of the gradient
 // and returns the index+1 of it, if present. If not present, returns 0.
@@ -70,5 +81,20 @@ void Gradient::printAnglesList()
         cout << "x,y,t:\t" << (int)getAnglesXCoord(n)
              << "\t" << (int)getAnglesYCoord(n)
              << "\t" << (int)getAngle(n) << endl;
+    }
+}
+
+/**
+ * Update the 2D grid of peak angles
+ */
+void Gradient::updatePeakGrid()
+{
+    clearPeakGrid();
+
+    // Write angle to grid for each peak in list
+    for(int i=0; isPeak(i); ++i){
+        peaks[getAnglesYCoord(i) + Gradient::rows/2]
+            [getAnglesXCoord(i) + Gradient::cols/2] =
+            getAngle(i);
     }
 }

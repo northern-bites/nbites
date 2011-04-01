@@ -274,6 +274,19 @@ int EdgeDetectorTest::test_peaks()
         // cout << endl;
     }
 
+    int index = 0;
+    for(int i=0; i < IMAGE_HEIGHT; ++i){
+        for (int j=0; j < IMAGE_WIDTH; ++j) {
+            if ((index = g.peaks_list_contains(i - IMAGE_HEIGHT/2,
+                                               j - IMAGE_WIDTH/2) )){
+                EQ_INT(g.peaks[i][j], g.getAngle(index-1));
+            } else{
+                LTE(g.peaks[i][j], 0);
+            }
+        }
+    }
+    PASSED(CORRECT_PEAKS_GRID);
+
     delete[] c;
     return 0;
 }
