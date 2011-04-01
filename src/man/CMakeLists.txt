@@ -91,7 +91,7 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 # Define this to remotely install the binary or library on the robot.
 # Cannot be selected unless OE_CROSS_BUILD is set to ON.
 SET( @ROBOT_NAME@
-  "zaphod"
+  "spock"
   CACHE STRING
   "The NAME of the robot"
   )
@@ -113,7 +113,6 @@ CONFIGURE_FILE(
   ESCAPE_QUOTES
   )
 
-
 CONFIGURE_FILE(
   ${MAN_CMAKE_DIR}/nameconfig.in
   ${CFG_DIR}/nameconfig.h
@@ -130,7 +129,7 @@ ADD_DEFINITIONS(
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
-INCLUDE_DIRECTORIES( 
+INCLUDE_DIRECTORIES(
   ${NBCOMMON_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${PYTHON_INCLUDE_PATH}

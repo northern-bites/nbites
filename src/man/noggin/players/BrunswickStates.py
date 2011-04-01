@@ -38,13 +38,13 @@ def gameReady(player):
         player.isSaving = False
         player.standup()
         player.brain.tracker.locPans()
+        player.brain.sensors.startSavingFrames()
 
-    if player.firstFrame():
         if player.lastDiffState == 'gameInitial':
-            player.brain.sensors.startSavingFrames()
             return player.goLater('relocalize')
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
+            return player.goLater('afterPenalty')
 
     return player.goLater('playbookPosition')
 
