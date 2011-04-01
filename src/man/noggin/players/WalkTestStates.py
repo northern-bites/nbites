@@ -24,6 +24,9 @@ UNIT_TEST1 = ((WALK, (.5, 0, 0), 100),
               (WALK, (.2, .2, .2), 50),
               )
 
+STRAIGHT_ONLY = ((WALK, (.75, 0, 0), 150),
+                 )
+
 def gamePlaying(player):
     """
     This method must be overriden by interested SoccerPlayers
