@@ -2,6 +2,8 @@
 #define _HoughLine_h_DEFINED
 
 #include <ostream>
+#include <cmath>
+
 
 /**
  * A line defined in polar coordinates, also storing information from the
@@ -22,6 +24,22 @@ public:
     inline int getTIndex()   const { return tIndex; }
     inline int getScore()    const { return score;  }
 
+    inline float getSinT()  const {
+        if (!didSin){
+            didSin = true;
+            sinT = sinf(t);
+        }
+        return sinT;
+    }
+
+    inline float getCosT()   const {
+        if (!didCos){
+            didCos = true;
+            cosT = cosf(t);
+        }
+        return cosT;
+    }
+
     static bool intersect(int x0, int y0,
                           const HoughLine& a, const HoughLine& b);
     friend std::ostream& operator<< (std::ostream &o,
@@ -37,6 +55,9 @@ private:
     int rIndex, tIndex;    // Radius, angle indices in HoughSpace table
     float r, t;            // Radius and angle of line in polar coords
     int score;             // Hough accumulator count
+
+    mutable float sinT, cosT;   // These get computed on the fly, if needed
+    mutable bool didSin, didCos;
 };
 
 #endif /* _HoughLine_h_DEFINED */

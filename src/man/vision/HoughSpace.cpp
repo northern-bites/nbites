@@ -223,61 +223,66 @@ void HoughSpace::createLinesFromPeaks(ActiveArray<HoughLine>& lines)
 void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
 {
     PROF_ENTER(profiler, P_SUPPRESS);
-    bool toDelete[lines.size()];
+    const int size = lines.size();
+    bool toDelete[size];
 
-    for (int i = 0; i < lines.size(); ++i) {
+    for (int i = 0; i < size; ++i) {
         toDelete[i] = false;
     }
 
-    int index = 0;
-    while (index < lines.size()){
+    for(int i=0; i < size; i++){
 
-        int index2 = index+1;
+        // We don't need to keep checking if this one is already
+        // going to be deleted
+        if (toDelete[i]){
+            continue;
+        }
 
-        while (index2 < lines.size()){
+        for (int j = i+1; j < size; j++){
 
-            const int tDiff = abs(((lines[index].getTIndex() -
-                                    lines[index2].getTIndex()) & 0xff)
+            if (toDelete[j]){
+                continue;
+            }
+            const int tDiff = abs(((lines[i].getTIndex() -
+                                    lines[j].getTIndex()) & 0xff)
                                   << 24 >> 24);
-
-            const int rDiff = abs(lines[index].getRIndex() -
-                                  lines[index2].getRIndex());
 
             // Since the lines are ordered by T value, if the tDiff is
             // too great, we should stop going any further with the
             // current line. This keeps us from looking at every pair
             // of lines, every time.
-            if (tDiff > angleSpread){
-                goto inner_suppress_loop;
+            if (tDiff > angleSpread+1){
+                break;
+            } else if (tDiff > angleSpread+1){
+                continue;
             }
+
+            const int rDiff = abs(lines[i].getRIndex() -
+                                  lines[j].getRIndex());
 
             if ( (rDiff <= suppress_r_bound ||
-                  HoughLine::intersect(x0, y0, lines[index], lines[index2]))) {
+                  HoughLine::intersect(x0, y0, lines[i], lines[j]))) {
 
-                if (lines[index].getScore() < lines[index2].getScore()){
-                    toDelete[index] = true;
+                if (lines[i].getScore() < lines[j].getScore()){
+                    toDelete[i] = true;
                 } else {
-                    toDelete[index2] = true;
+                    toDelete[j] = true;
                 }
             }
-        inner_suppress_loop:
-            index2++;
         }
-        index++;
     }
 
-    index = 0;
-    while (index < lines.size()){
-        if (toDelete[index]){
-            lines.deactivate(index);
+    for(int i=0; i < size; i++){
+        if (toDelete[i]){
+            lines.deactivate(i);
         }
-        index++;
     }
     PROF_EXIT(profiler, P_SUPPRESS);
 }
 
 list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
 {
+    PROF_ENTER(profiler, P_PAIR_LINES);
     list<pair<int, int> > pairs;
     const int size = lines.size();
 
@@ -295,10 +300,10 @@ list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
             continue;
         }
 
+        // This inner loop look awkward, yes. I'm avoiding
+        // computation of tDiff and rSum by exiting early.
         for(int j=i+1; j < size; ++j){
 
-            // These inner loops look awkward, yes. I'm avoiding
-            // computation of tDiff and rSum by exiting early.
             if (!lines.active(j)){
                 continue;
             }
@@ -306,6 +311,8 @@ list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
             const int tDiff = abs(abs(lines[i].getTIndex() -
                                       lines[j].getTIndex())-t_span/2);
 
+            // The lines are in order by T, so they won't be any
+            // closer after this
             if (tDiff >= opp_line_thresh){
                 continue;
             }
@@ -332,6 +339,7 @@ list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
 
         pairs.push_back(pair<int,int>(i, pair_array[i]));
     }
+    PROF_EXIT(profiler, P_PAIR_LINES);
     return pairs;
 }
 

@@ -129,13 +129,13 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
 
 void HoughSpaceTest::test_suppress()
 {
-    ActiveArray<HoughLine> lines(10);
+    ActiveArray<HoughLine> lines(200);
 
     // test three identical lines to make sure that only one of the
     // duplicate lines survives suppress()
     HoughLine a1(100, 180, 50);
-    HoughLine a2(101, 182, 2);
     HoughLine a3(99, 182, 4);
+    HoughLine a2(101, 182, 2);
 
     lines.add(a1);
     lines.add(a2);
@@ -149,17 +149,55 @@ void HoughSpaceTest::test_suppress()
     EQ_INT(lines.numActive(), 1);
     TRUE(lines[0] == a1);
 
+    lines.clear();
+
+    srand(time(NULL));
+    int lastT = 0, t;
+    for (int i = 0; i < 100; ++i) {
+        int r = rand()%319;
+
+        // The lines must be in sorted order by T!
+        do{
+            t = rand()%255;
+        } while (lastT > t);
+
+        int z = rand();
+        HoughLine l(r, t, z);
+        lastT = t;
+        lines.add(l);
+    }
+
+    hs.suppress(x0, y0, lines);
+    for (int i=0; i < lines.size(); ++i){
+        if (!lines.active(i)){
+            continue;
+        }
+
+        for (int j=i+1; j < lines.size(); ++j){
+            if (!lines.active(j)){
+                continue;
+            }
+
+            int rDiff = abs(lines[i].getRIndex() - lines[j].getRIndex());
+
+            int tDiff = abs(abs(lines[i].getTIndex() -
+                                lines[j].getTIndex()) & 255);
+            FALSE (rDiff <= HoughSpace::suppress_r_bound &&
+                   tDiff <= hs.angleSpread);
+        }
+    }
+
     PASSED(NO_DUPE_LINES);
 
     // Make sure that suppress doesn't delete lines needlessly
     //
     // ***** THESE MUST BE ADDED IN INCREASING T ORDER ******
+    lines.clear();
     HoughLine a(100,10,4);
     HoughLine b(100,180, 50);
     HoughLine c(10,200,400);
     HoughLine c2(10,203,4);
 
-    lines.clear();
     lines.add(a);
     lines.add(b);
     lines.add(c);

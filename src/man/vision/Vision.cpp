@@ -574,10 +574,10 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
         list<HoughLine>::const_iterator line = lines.begin();
 
         while (line != lines.end()){
-            for (double u = -200.; u <= 200.; u+=1.){
+            const double sn = line->getSinT();
+            const double cs = line->getCosT();
 
-                double sn = sin(line->getAngle());
-                double cs = cos(line->getAngle());
+            for (double u = -200.; u <= 200.; u+=1.){
 
                 double x0 = line->getRadius() * cs;
                 double y0 = line->getRadius() * sn;
