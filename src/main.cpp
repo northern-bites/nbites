@@ -1,4 +1,4 @@
-#include <QtGui/QApplication>
+#include <QtGui>
 #include "mainwindow.h"
 #include "MessageModel.h"
 #include "/home/oneamtu/nbites/build/man/straight/memory/protos/Sensors.pb.h"
@@ -15,9 +15,9 @@ int main(int argc, char *argv[])
     ProtoView::MessageModel messageModel(ms);
 
 
-//        QTreeView view;
-//        view.setModel(&model);
-//        view.setWindowTitle(QObject::tr("Simple Tree Model"));
-//        view.show();
+    QTreeView view;
+    view.setModel(&messageModel);
+    view.setWindowTitle(QObject::tr("Proto Viewer"));
+    view.show();
     return app.exec();
 }
