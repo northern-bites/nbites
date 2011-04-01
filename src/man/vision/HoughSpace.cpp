@@ -209,12 +209,14 @@ void HoughSpace::peaks()
 void HoughSpace::createLinesFromPeaks(ActiveArray<HoughLine>& lines)
 {
     for (int i=0; i < numPeaks; ++i){
-        HoughLine line = createLine(getPeakR(i),
-                                    getPeakT(i),
-                                    getPeakZ(i) );
+        HoughLine line(getPeakR(i),
+                       getPeakT(i),
+                       getPeakZ(i) );
+
         lines.add(line);
     }
 }
+
 /**
  * Combine/remove duplicate lines and lines which are not right.
  */
@@ -350,15 +352,6 @@ void HoughSpace::reset()
         }
     }
 #endif
-}
-
-HoughLine HoughSpace::createLine(int r, int t, int z)
-{
-    return HoughLine(r, t,
-                     static_cast<float>(r) -
-                     r_span / 2.0f + 0.5f,
-                     (static_cast<float>(t+0.5f)) *
-                     M_PI_FLOAT / 128.0f, z >> 2);
 }
 
 uint16_t HoughSpace::getHoughBin(int r, int t)

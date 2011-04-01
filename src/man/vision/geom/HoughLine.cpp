@@ -3,17 +3,20 @@
 #include <cmath>
 #include <iostream>
 
+#include "HoughSpace.h"
+
 using namespace std;
 
 HoughLine::HoughLine() :
-    r(0), t(0), rIndex(0), tIndex(0), score(0)
+    rIndex(0), tIndex(0), r(0), t(0), score(0)
 {
 
 }
-
-HoughLine::HoughLine(int _rIndex, int _tIndex,
-                     float _r, float _t, int _score) :
-    r(_r), t(_t), rIndex(_rIndex), tIndex(_tIndex), score(_score)
+HoughLine::HoughLine(int _r_Indexbit, int _t_Indexbit, int _score) :
+    rIndex(_r_Indexbit), tIndex(_t_Indexbit),
+    r(static_cast<float>(rIndex) - HoughSpace::r_span/2.0f + 0.5f),
+    t(static_cast<float>(tIndex+0.5) * M_PI_FLOAT /128.0f),
+    score(_score)
 {
 
 }
@@ -39,9 +42,8 @@ bool HoughLine::intersect(int x0, int y0,
 
 bool HoughLine::operator==(const HoughLine &other)
 {
-    return (other.getAngle() == t &&
-            other.getRadius() == r &&
-            other.getScore() == score &&
+    // t,r follow from tIndex,rIndex; no need to compare
+    return (other.getScore() == score &&
             other.getRIndex() == rIndex &&
             other.getTIndex() == tIndex
         );

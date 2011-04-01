@@ -22,6 +22,7 @@
 PROJECT( MAN )
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
+ENABLE_TESTING()
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
@@ -130,7 +131,7 @@ ADD_DEFINITIONS(
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
-INCLUDE_DIRECTORIES( 
+INCLUDE_DIRECTORIES(
   ${NBCOMMON_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${PYTHON_INCLUDE_PATH}

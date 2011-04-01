@@ -196,7 +196,6 @@ add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp
 
 target_link_libraries( EdgeDetectorTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
 
-
 add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp
   ${VISION_TEST_DIR}/HoughSpaceTest.cpp
   ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
@@ -204,8 +203,6 @@ add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp
   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
 target_link_libraries( HoughSpaceTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
-
-
 
 add_executable( ImageAcquisitionTest ${VISION_TEST_DIR}/ImageAcquisitionTest.cpp
   ${VISION_INCLUDE_DIR}/ImageAcquisition.s
@@ -220,9 +217,8 @@ target_link_libraries( OfflineVision
   ${NBINCLUDE_TARGET}
   )
 
-enable_testing()
-add_test( EdgeDetectorTest  EdgeDetectorTest )
-add_test( HoughSpaceTest  HoughSpaceTest )
-
+add_test( NAME EdgeTest COMMAND EdgeDetectorTest )
+add_test( NAME HoughTest COMMAND HoughSpaceTest )
+add_test( NAME ImageAcquisitionTest COMMAND ImageAcquisitionTest )
 
 add_executable( ConvertFrame ${VISION_INCLUDE_DIR}/offline/ConvertFrames.cpp )

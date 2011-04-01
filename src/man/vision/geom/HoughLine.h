@@ -10,8 +10,8 @@
 class HoughLine
 {
 public:
-   HoughLine(int _rIndex, int _tIndex,
-              float _r, float _t, int _score);
+    HoughLine(int _rIndex, int _tIndex, int _score);
+
     HoughLine();
     virtual ~HoughLine() { };
 
@@ -34,10 +34,9 @@ public:
     bool operator!=(const HoughLine &other);
 
 private:
-    float r, t;                 // Radius and angle of line in polar coords
-    int rIndex,                 // Radius index in HoughSpace
-        tIndex,                 // Theta index in HoughSpace
-        score;                  // Hough accumulator count
+    int rIndex, tIndex;    // Radius, angle indices in HoughSpace table
+    float r, t;            // Radius and angle of line in polar coords
+    int score;             // Hough accumulator count
 };
 
 #endif /* _HoughLine_h_DEFINED */

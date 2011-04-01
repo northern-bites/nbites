@@ -133,9 +133,9 @@ void HoughSpaceTest::test_suppress()
 
     // test three identical lines to make sure that only one of the
     // duplicate lines survives suppress()
-    HoughLine a1 = HoughSpace::createLine(100, 180, 50);
-    HoughLine a2 = HoughSpace::createLine(101, 182, 2);
-    HoughLine a3 = HoughSpace::createLine(99, 182, 4);
+    HoughLine a1(100, 180, 50);
+    HoughLine a2(101, 182, 2);
+    HoughLine a3(99, 182, 4);
 
     lines.add(a1);
     lines.add(a2);
@@ -154,10 +154,10 @@ void HoughSpaceTest::test_suppress()
     // Make sure that suppress doesn't delete lines needlessly
     //
     // ***** THESE MUST BE ADDED IN INCREASING T ORDER ******
-    HoughLine a = HoughSpace::createLine(100,10,4);
-    HoughLine b = HoughSpace::createLine(100,180, 50);
-    HoughLine c = HoughSpace::createLine(10,200,400);
-    HoughLine c2 = HoughSpace::createLine(10,203,4);
+    HoughLine a(100,10,4);
+    HoughLine b(100,180, 50);
+    HoughLine c(10,200,400);
+    HoughLine c2(10,203,4);
 
     lines.clear();
     lines.add(a);
@@ -192,11 +192,8 @@ void HoughSpaceTest::test_pairing()
         int r = rand()%319;
         int t = rand()%255;
         int z = rand();
-        HoughLine l(r, t,
-                     static_cast<float>(r) -
-                    HoughSpace::r_span / 2.0f + 0.5f,
-                     (static_cast<float>(t+.5)) *
-                     M_PI_FLOAT / 128.0f, z >> 2);
+        HoughLine l(r, t, z);
+
         hs.activeLines.add(l);
     }
 

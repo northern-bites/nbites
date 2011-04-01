@@ -23,8 +23,6 @@ public:
     virtual ~HoughSpace() { };
 
     std::list<HoughLine> findLines  (Gradient& g);
-    static HoughLine     createLine (int r, int t, int z);
-
 
     void setAcceptThreshold(int t) { acceptThreshold = t;    }
     void setAngleSpread(int t)     { angleSpread     = t;    }
@@ -57,6 +55,7 @@ private:                        // Member functions
     inline int getPeakZ(int i) { return peak[i].z; }
 
 private:       // Member variables
+    friend class HoughLine;     // Hough Line needs the HoughSpace private vars
 
     enum {
         // Hough Space size parameters
