@@ -35,24 +35,28 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.justKicked = False
         self.inKickingState = False
 
+        #GOALIE COUNTERS AND BOOLEANS
         # Counters for goalie dive decision making
         self.counterRightSave = 0
         self.counterLeftSave = 0
         self.counterCenterSave = 0
+        self.shouldSaveCounter = 0
 
+        #Counters for goalie positioning
         self.shouldPositionRightCounter = 0
         self.shouldPositionLeftCounter = 0
         self.shouldPositionCenterCounter = 0
 
-        self.shouldSaveCounter = 0
+        #Goalie Chasing Counters
         self.shouldChaseCounter = 0
         self.shouldStopChaseCounter = 0
-        self.posForSaveCounter = 0
-        self.framesFromCenter = 0
-        self.stepsOffCenter = 0
+
+        #Boolean for Goalie Current State
         self.isChasing = False
         self.isSaving = False
         self.isPositioning = False
+
+        #END GOALIE COUNTERS AND BOOLEANS
 
         self.frameCounter = 0
 

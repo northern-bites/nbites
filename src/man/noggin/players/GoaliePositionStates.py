@@ -18,13 +18,10 @@ def goaliePosition(player):
         player.isPositioning = True
         player.isChasing = False
         player.isSaving = False
-        nav.goTo(RobotLocation(nogCon.LANDMARK_LEFT_POST_X + 20,
-                               ((nogCon.LANDMARK_LEFT_POST_Y + 
-                                 nogCon.LANDMARK_RIGHT_POST_Y)/2)))
+        nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_LEFT_POST_X + 20,
+                               ((nogCon.LANDMARK_MY_GOAL_LEFT_POST_Y + 
+                                 nogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y)/2)))
         #nav.positionPlaybook()
-
-    if goalTran.inBox(player):
-        player.stopWalking()
 
     if ball.dist >= goalCon.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLoc()
@@ -43,8 +40,8 @@ def goaliePosition(player):
 def goaliePositionRight(player):
 #move to the right position.
     if player.firstFrame():
-        nav.goTo(RobotLocation(nogCon.LANDMARK_LEFT_POST_X + 20,
-                               nogCon.LANDMARK_LEFT_POST_Y- 10, 0))
+        nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_LEFT_POST_X + 20,
+                               nogCon.LANDMARK_MY_GOAL_LEFT_POST_Y- 10, 0))
 
     elif player.shouldPositionCenter(player):
         player.goNow('goaliePosition')
@@ -57,8 +54,8 @@ def goaliePositionRight(player):
 def goaliePositionLeft(player):
 #move to the left position.
     if player.firstFrame():
-        nav.goTo(RobotLocation(nogCon.LANDMARK_RIGHT_POST_X + 20,
-                               nogCon.LANDMARK_RIGHT_POST_Y + 10, 0))
+        nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_RIGHT_POST_X + 20,
+                               nogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y + 10, 0))
 
     elif player.shouldPositionCenter(player):
         player.goNow('goaliePosition')

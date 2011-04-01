@@ -5,7 +5,6 @@ import ChaseBallTransitions as transitions
 import GoalieTransitions as goalTran
 from ..playbook.PBConstants import GOALIE
 from .. import NogginConstants as nogginConstants
-from man.noggin.typeDefs.Location import RobotLocation
 from man.noggin.kickDecider import KickInformation
 
 def chase(player):
@@ -211,19 +210,6 @@ def approachDangerousBall(player):
         return player.goLater('chase')
     if transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-
-    return player.stay()
-
-def guardCorner(player):
-
-    ball = player.brain.ball
-    if player.brain.nav.isStopped():
-        if ball.y > nogginConstants.LANDMARK_LEFT_POST_Y:
-            player.brain.nav.goTo(RobotLocation(nogginConstansts.LANDMARK_LEFT_POST_X + 6, 
-                                                nogginConstants.LANDMARK_LEFT_POST_Y, 0))
-        elif ball.y < nogginConstants.LANDMARK_RIGHT_POST_Y:
-            player.brain.nav.goTo(RobotLocation(nogginConstantsLANDMARK_RIGHT_POST_X + 6,
-                                                noggin.ContantsLANDMARK_RIGHT_POST_Y, 0))
 
     return player.stay()
 

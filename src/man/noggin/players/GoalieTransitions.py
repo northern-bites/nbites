@@ -148,10 +148,6 @@ def shouldHoldSave(player):
 def outOfPosition(player):
     if player.penaltyKicking:
         return False
-    if player.isSaving:
-        return False
-    if player.isChasing:
-        return False
 
     #I need to figure out what this does
     my = player.brain.my
@@ -296,9 +292,10 @@ def shouldStopChase(player):
         player.shouldStopChaseCounter += 1
         print "2"
 
-    elif(chaseTran.shouldntStopChasing(player)):
-        print "3"
-        return False
+    #i dont think this works right now?
+    #elif(chaseTran.shouldntStopChasing(player)):
+        #print "3"
+        #return False
 
 
     

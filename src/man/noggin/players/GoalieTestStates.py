@@ -1,5 +1,5 @@
 #
-# For testing new goalie logic for saving.
+#Tests for the different areas of goalie actions.
 #
 
 import math
@@ -20,17 +20,18 @@ def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.fallController.disable()
-        #player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall()
         #player.brain.tracker.activeLoc()
         player.standup()
 
     return player.stay()
 
 def gameSet(player):
+    player.brain.resetGoalieLocalization()
     return player.stay()
 
 def gamePlaying(player):
-    return player.goNow('testDX')
+    return player.goNow('testChase')
 
 def gamePenalized(player):
     angles = player.brain.sensors.angles
@@ -108,8 +109,6 @@ def testSaveDecision(player):
     return player.stay()
 
 
-
-
 # not using below here for now
 def testDangerousBall(player):
     if player.counter % 100 == 0:
@@ -140,18 +139,25 @@ def testShouldPositionRight(player):
         elif goalTran.shouldPositionCenter(player):
             print "postion center"
 
+    return player.stay()
+
 def testChase(player):
-    if player.counter % 100 == 0:
-        if goalTran.shouldChase(player):
-            print "chase"
-        else:
-            print "staying"
+    player.isSaving = False
+    player.penaltyKicking = False
+
+    if goalTran.shouldChase(player):
+        print "chase"
+    else:
+        print "staying"
+
+    return player.stay()
 
 def testStopChase(player):
     player.isChasing = True
 
-    if player.counter % 100 == 0:
-        if goalTran.shouldStopChase(player):
-            print "stop"
-        else:
-            print "not stopping"
+    if goalTran.shouldStopChase(player):
+        print "stop"
+    else:
+        print "not stopping"
+
+    return player.stay()

@@ -12,11 +12,12 @@ import GoalieTransitions as goalTran
 def goalieStateChoice(player):
     ball = player.brain.ball
 
-    #for simplicity to start off with we just want the goalie to chase
-    #the ball as long as it is close enough and it isnt dangerous
+    # for simplicity to start off with we just want the goalie to chase
+    # the ball as long as it is close enough and it isnt dangerous
     
     if player.isChasing:
         if goalTran.shouldStopChase(player):
+            print "position"
             return 'goaliePosition'
  #probably should return the state but need to fix
         else:
@@ -24,10 +25,12 @@ def goalieStateChoice(player):
 
     if player.isPositioning:
         if goalTran.outOfPosition(player):
+            print "out"
             return player.currentState
         #elif goalTran.shouldSave(player):
             #return 'goalieSave'
         elif goalTran.shouldChase(player):
+            print "chase"
             return 'goalieChase'
 
     #if player.isSaving:
