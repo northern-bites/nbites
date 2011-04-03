@@ -1,4 +1,5 @@
 #include "FieldLinesDetector.h"
+#include <stdio.h>
 
 using namespace std;
 using boost::shared_ptr;
@@ -45,7 +46,7 @@ void FieldLinesDetector::findHoughLines(int upperBound, const uint16_t *img)
  * Using the found hough lines and the gradient image, find the actual
  * field lines in the image.
  */
-list<VisualLine> FieldLinesDetector::findFieldLines()
+void FieldLinesDetector::findFieldLines()
 {
     lines.clear();
     list<pair<HoughLine, HoughLine> >::const_iterator hl;

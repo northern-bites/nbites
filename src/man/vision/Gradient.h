@@ -44,6 +44,8 @@ public:
     int peaks_list_contains(int i, int j);
     void printAnglesList();
     void updatePeakGrid();
+    static void createLineAtPoint(Gradient& g, uint8_t angle, float radius);
+
 
     inline void addAngle(uint8_t angle, int16_t x, int16_t y){
         angles[numPeaks].angle = angle;

@@ -24,7 +24,7 @@ void HoughSpaceTest::test_hs()
     Gradient g;
 
     // Create gradient map such that it has a known line
-    createLineAtPoint(g, 0, 80);
+    Gradient::createLineAtPoint(g, 0, 80);
 
     // Run the gradient through the Hough Space
     hs.markEdges(g);
@@ -92,7 +92,7 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
 
     g.reset();
     g.clear();
-    createLineAtPoint(g, angle, radius);
+    Gradient::createLineAtPoint(g, angle, radius);
 
     hs.reset();
     hs.findHoughLines(g);
@@ -278,30 +278,6 @@ bool HoughSpaceTest::isDesiredLine(float goalR, float goalT,
         (tDiff < ACCEPT_ANGLE ||
          fabs(2*M_PI_FLOAT - tDiff) < ACCEPT_ANGLE));
 
-}
-
-void HoughSpaceTest::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
-{
-    float radAngle = static_cast<float>(angle) * M_PI_FLOAT/128.f;
-
-
-    double sn = sin(radAngle);
-    double cs = cos(radAngle);
-
-    double x0 = radius * cs;
-    double y0 = radius * sn;
-
-    for (double u = -200.; u <= 200.; u+=1.){
-        int x = (int)round(x0 + u * sn);
-        int y = (int)round(y0 - u * cs);
-
-        if ( abs(x) < IMAGE_WIDTH/2 &&
-             abs(y) < IMAGE_HEIGHT/2){
-            g.addAngle(angle,
-                       static_cast<uint16_t>(x),
-                       static_cast<uint16_t>(y));
-        }
-    }
 }
 
 int HoughSpaceTest::runTests()

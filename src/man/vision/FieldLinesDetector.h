@@ -38,7 +38,7 @@ public:
 
 private:
     void findHoughLines(int upperBound, const uint16_t *img);
-    std::list<VisualLine> findFieldLines();
+    void findFieldLines();
 
 private:
     EdgeDetector edges;

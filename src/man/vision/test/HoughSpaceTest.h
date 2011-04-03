@@ -20,6 +20,9 @@ public:
 
     int runTests();
 
+    static bool isParallel(HoughLine& l, HoughLine& l2);
+    static bool isDesiredLine(float goalR, float goalT, const HoughLine& line);
+
     // Member functions
 private:
     void test_hs();
@@ -27,10 +30,6 @@ private:
     void test_for_line(uint8_t angle, float radius);
     void test_suppress();
     void test_pairing();
-
-    void createLineAtPoint(Gradient& g, uint8_t angle, float radius);
-    bool isParallel(HoughLine& l, HoughLine& l2);
-    bool isDesiredLine(float goalR, float goalT, const HoughLine& line);
 
     // Member variables
 private:

@@ -98,3 +98,27 @@ void Gradient::updatePeakGrid()
             getAngle(i);
     }
 }
+
+void Gradient::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
+{
+    float radAngle = static_cast<float>(angle) * M_PI_FLOAT/128.f;
+
+
+    double sn = sin(radAngle);
+    double cs = cos(radAngle);
+
+    double x0 = radius * cs;
+    double y0 = radius * sn;
+
+    for (double u = -200.; u <= 200.; u+=1.){
+        int x = (int)round(x0 + u * sn);
+        int y = (int)round(y0 - u * cs);
+
+        if ( abs(x) < IMAGE_WIDTH/2 &&
+             abs(y) < IMAGE_HEIGHT/2){
+            g.addAngle(angle,
+                       static_cast<uint16_t>(x),
+                       static_cast<uint16_t>(y));
+        }
+    }
+}
