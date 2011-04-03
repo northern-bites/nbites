@@ -28,12 +28,12 @@ HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
  * The main public interface for the HoughSpace class.
  * Finds all the lines in the image using the Hough Transform.
  */
-list<HoughLine> HoughSpace::findLines(Gradient& g)
+list<pair<HoughLine, HoughLine> > HoughSpace::findLines(Gradient& g)
 {
     PROF_ENTER(profiler, P_HOUGH);
     reset();
     findHoughLines(g);
-    list<HoughLine> lines = narrowHoughLines();
+    list<pair<HoughLine, HoughLine> > lines = narrowHoughLines();
 
     PROF_EXIT(profiler, P_HOUGH);
     return lines;
@@ -54,7 +54,7 @@ void HoughSpace::findHoughLines(Gradient& g)
  * Process hough lines to eliminate duplicate lines
  * and pair up the lines.
  */
-list<HoughLine> HoughSpace::narrowHoughLines()
+list<pair<HoughLine, HoughLine> > HoughSpace::narrowHoughLines()
 {
     int x0 = static_cast<int>(Gradient::cols/2);
     int y0 = static_cast<int>(Gradient::rows/2);
@@ -62,11 +62,11 @@ list<HoughLine> HoughSpace::narrowHoughLines()
     suppress(x0, y0, activeLines);
     list<pair<int, int> > pairs = pairLines(activeLines);
 
-    list<HoughLine> lines;
+    list<pair<HoughLine, HoughLine> > lines;
     list<pair<int, int> >::iterator i;
     for (i = pairs.begin(); i != pairs.end(); ++i){
-        lines.push_back(activeLines[(*i).first]);
-        lines.push_back(activeLines[(*i).second]);
+        lines.push_back(pair<HoughLine, HoughLine>(activeLines[(*i).first],
+                                                   activeLines[(*i).second]));
     }
     return lines;
 }

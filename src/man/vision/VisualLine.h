@@ -8,6 +8,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "ConcreteLine.h"
+#include "geom/HoughLine.h"
+#include "Gradient.h"
 #include "VisualLandmark.h"
 
 class VisualLine;
@@ -88,6 +90,15 @@ class VisualLine : public VisualLandmark<lineID> {
     VisualLine(std::list<std::list<linePoint>::iterator> &listOfIterators);
     VisualLine(std::list<linePoint> &listOfPoints);
     VisualLine();
+    VisualLine(const HoughLine& a, const HoughLine& b, const Gradient& g);
+
+    void findEndpoints(const HoughLine& a,
+                       const HoughLine& b,
+                       const Gradient& g);
+    void findDimensions();
+    void find3DCoords();
+
+
     VisualLine(float _dist, float _bearing);
     VisualLine(const VisualLine& other);
     ~VisualLine();

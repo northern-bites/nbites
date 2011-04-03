@@ -45,9 +45,15 @@ void FieldLinesDetector::findHoughLines(int upperBound, const uint16_t *img)
  * Using the found hough lines and the gradient image, find the actual
  * field lines in the image.
  */
-void FieldLinesDetector::findFieldLines()
+list<VisualLine> FieldLinesDetector::findFieldLines()
 {
-
+    lines.clear();
+    list<pair<HoughLine, HoughLine> >::const_iterator hl;
+    for(hl = houghLines.begin(); hl != houghLines.end(); ++hl){
+        lines.push_back(VisualLine(hl->first,
+                                   hl->second,
+                                   gradient));
+    }
 }
 
 void FieldLinesDetector::setEdgeThreshold(int thresh)
@@ -58,4 +64,15 @@ void FieldLinesDetector::setEdgeThreshold(int thresh)
 void FieldLinesDetector::setHoughAcceptThreshold(int thresh)
 {
     hough.setAcceptThreshold(thresh);
+}
+
+list<HoughLine> FieldLinesDetector::getHoughLines() const
+{
+    list<HoughLine> lines;
+    list<pair<HoughLine, HoughLine> >::const_iterator i;
+    for(i = houghLines.begin(); i != houghLines.end(); ++i){
+        lines.push_back(i->first);
+        lines.push_back(i->second);
+    }
+    return lines;
 }

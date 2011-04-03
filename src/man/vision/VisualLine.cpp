@@ -14,6 +14,50 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 }
 
 
+VisualLine::VisualLine(const HoughLine& a,
+                       const HoughLine& b,
+                       const Gradient& g) :
+    VisualLandmark<lineID>(UNKNOWN_LINE)
+{
+    findEndpoints(a,b,g);
+    findDimensions();
+    find3DCoords();
+}
+
+/**
+ * Find the endpoints of the line from the given HoughLines.
+ *
+ */
+void VisualLine::findEndpoints(const HoughLine& a,
+                               const HoughLine& b,
+                               const Gradient& g)
+{
+
+}
+
+/**
+ * Find various line dimensions:
+ *                            - Height
+ *                            - Width
+ *                            - Length
+ */
+void VisualLine::findDimensions()
+{
+
+}
+
+/**
+ * Calculate the position of the line relative to the robot rather
+ * than just in the image frame
+ */
+void VisualLine::find3DCoords()
+{
+
+}
+
+
+
+
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),

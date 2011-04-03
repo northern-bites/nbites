@@ -22,7 +22,7 @@ public:
     HoughSpace(boost::shared_ptr<Profiler> p);
     virtual ~HoughSpace() { };
 
-    std::list<HoughLine> findLines  (Gradient& g);
+    std::list<std::pair<HoughLine, HoughLine> > findLines(Gradient& g);
 
     void setAcceptThreshold(int t) { acceptThreshold = t;    }
     void setAngleSpread(int t)     { angleSpread     = t;    }
@@ -34,7 +34,7 @@ public:
 
 private:                        // Member functions
     void findHoughLines(Gradient& g);
-    std::list<HoughLine> narrowHoughLines();
+    std::list<std::pair<HoughLine, HoughLine> > narrowHoughLines();
 
     void markEdges(Gradient& g);
     void edge(int x, int y, int t0, int t1);

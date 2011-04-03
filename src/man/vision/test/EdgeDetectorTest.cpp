@@ -280,7 +280,7 @@ int EdgeDetectorTest::test_peaks()
             if ((index = g.peaks_list_contains(i - IMAGE_HEIGHT/2,
                                                j - IMAGE_WIDTH/2) )){
                 EQ_INT(g.peaks[i][j], g.getAngle(index-1));
-            } else{
+            } else {
                 LTE(g.peaks[i][j], 0);
             }
         }

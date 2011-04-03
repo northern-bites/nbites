@@ -236,20 +236,14 @@ void HoughSpaceTest::test_pairing()
     }
 
     // Run them through narrowing
-    list<HoughLine> lines = hs.narrowHoughLines();
+    list<pair<HoughLine, HoughLine> > lines = hs.narrowHoughLines();
 
     // Ensure that the only lines which return are parallel
-    list<HoughLine>::iterator l, l2;
+    list<pair<HoughLine, HoughLine> >::iterator l;
 
     for(l = lines.begin(); l != lines.end(); ++l){
-        bool foundParallel = false;
-        for(l2 = lines.begin(); l2 != lines.end() && !foundParallel; ++l2){
-            if (*l != *l2 &&
-                isParallel(*l, *l2)){
-                foundParallel = true;
-            }
-        }
-        TRUE(foundParallel);
+        TRUE(l->first != l->second &&
+              isParallel(l->first, l->second));
     }
     PASSED(CORRECT_PAIRING);
 }
