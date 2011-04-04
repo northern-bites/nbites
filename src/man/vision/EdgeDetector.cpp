@@ -56,7 +56,7 @@ void EdgeDetector::sobelOperator(int upperBound,
     _sobel_operator(upperBound, threshold,
                     &channel[0], &gradient.values[0][0]);
 #else
-    for (int i=1; i < Gradient::rows-1; ++i){
+    for (int i=1+upperBound; i < Gradient::rows-1; ++i){
         for (int j=1; j < Gradient::cols-1; ++j) {
 
             int xGrad = (
@@ -141,7 +141,7 @@ void EdgeDetector::findPeaks(int upperBound, Gradient& gradient)
      * This has the effect of shrinking the image in by 4 rows and
      * columns, but oh well.
      */
-    for (int16_t i=2; i < Gradient::rows-2; ++i) {
+    for (int16_t i=2+upperBound; i < Gradient::rows-2; ++i) {
         for (int16_t j=2; j < Gradient::cols-2; ++j){
 
             const int z = gradient.getMagnitude(i,j);
