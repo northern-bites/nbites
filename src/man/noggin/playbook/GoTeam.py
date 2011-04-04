@@ -149,34 +149,27 @@ class GoTeam:
                 else:
                     chaseTimeScale = mate.chaseTime
 
-                #TO-DO: break into a separate function call
-                if ((self.me.chaseTime - mate.chaseTime <
-                     PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
-                     (self.me.chaseTime - mate.chaseTime <
-                      PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
-                      self.me.isTeammateRole(PBConstants.CHASER))) and
-                    mate.playerNumber < self.me.playerNumber):
-
+                if self.shouldCallOff(mate, chaser_mate, chaseTimeScale):
                     if PBConstants.DEBUG_DET_CHASER:
-                        self.printf("\t #%d @ %g >= #%d @ %g" %
+                        self.printf("\t #%d @ %g >= #%d @ %g, shouldCallOff" %
                                (mate.playerNumber, mate.chaseTime,
                                 chaser_mate.playerNumber,
                                 chaser_mate.chaseTime))
 
-                #TO-DO: break into a separate function call
-                elif (mate.playerNumber > self.me.playerNumber and
-                      mate.chaseTime - self.me.chaseTime <
-                      PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
-                      mate.isTeammateRole(PBConstants.CHASER)):
+                elif self.shouldListen(mate, chaser_mate, chaseTimeScale):
+                    if PBConstants.DEBUG_DET_CHASER:
+                        self.printf(("\t #%d @ %g <= #%d @ %g, shouldListen" %
+                                      (mate.playerNumber, mate.chaseTime,
+                                       chaser_mate.playerNumber,
+                                       chaser_mate.chaseTime)))
                     chaser_mate = mate
 
                 # else pick the lowest chaseTime
                 else:
                     if mate.chaseTime < chaser_mate.chaseTime:
                         chaser_mate = mate
-
                     if PBConstants.DEBUG_DET_CHASER:
-                        self.printf (("\t #%d @ %g >= #%d @ %g" %
+                        self.printf (("\t #%d @ %g >= #%d @ %g, normal comparison" %
                                       (mate.playerNumber, mate.chaseTime,
                                        chaser_mate.playerNumber,
                                        chaser_mate.chaseTime)))
@@ -185,6 +178,31 @@ class GoTeam:
             self.printf ("\t ---- MATE %g WINS" % (chaser_mate.playerNumber))
         # returns teammate instance (could be mine)
         return chaser_mate
+
+    def shouldCallOff(self, mate, chaser_mate, chaseTimeScale):
+        """Helper method for determineChaser"""
+        # chaser_mate = A, mate = B.
+        # A will still be chaser_mate if:
+        # [ (chaseTime(A) - minChaseTime(A,B) < e) or
+        #   (chaseTime(A) - minChaseTime(A,B) < d and already chasing)]
+        # and no higher robot calling off A.
+        return((self.me.chaseTime - mate.chaseTime <
+                PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
+                (self.me.chaseTime - mate.chaseTime <
+                 PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
+                 self.me.isTeammateRole(PBConstants.CHASER))) and
+               mate.playerNumber < self.me.playerNumber)
+
+    def shouldListen(self, mate, chaser_mate, chaseTimeScale):
+        """Helper method for determineChaser"""
+        # mate = A, chaser_mate = B.
+        # A will become chaser_mate if:
+        # chaseTime(A) < chaseTime(B) - m and
+        # A is higher robot that is already chaser.
+        return (mate.playerNumber > self.me.playerNumber and
+                mate.chaseTime - self.me.chaseTime <
+                PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
+                mate.isTeammateRole(PBConstants.CHASER))
 
     def getLeastWeightPosition(self, positions, mates = None):
         """Gets the position for the robot such that the distance
@@ -270,6 +288,7 @@ class GoTeam:
 
             # chosen Postitions is an array of size 4 where 1,2,3 are the positions
             return chosenPositions[self.me.playerNumber -1]
+
 
 
     ######################################################
