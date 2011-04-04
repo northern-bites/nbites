@@ -5,13 +5,19 @@ import time
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
                     NogginConstants.OPP_GOALBOX_MIDDLE_Y)
+OPP_GOAL_LEFT_POST = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
+                              NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
+OPP_GOAL_RIGHT_POST = Location(NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_X,
+                              NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y)
 PACKET_DEAD_PERIOD = 2
 DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
-DEFAULT_CHASER_NUMBER = 3
+DEFAULT_OFFENDER_NUMBER = 3
+DEFAULT_CHASER_NUMBER = 4
 DEBUG_DETERMINE_CHASE_TIME = False
 BALL_ON_BONUS = 1000.
-CHASE_SPEED = 7.00
+CHASE_SPEED = 15.00 #cm/sec
+BALL_GOAL_LINE_BONUS = CHASE_SPEED*10 #takes a little less than 10 secs to orbit 180
 SEC_TO_MILLIS = 1000.0
 # penalty is: (ball_dist*heading)/scale
 PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
@@ -29,6 +35,8 @@ class TeamMember(RobotLocation):
         self.playerNumber = 0
         self.ballDist = 0
         self.ballBearing = 0
+        self.ballX = 0
+        self.ballY = 0
         self.role = None
         self.subRole = None
         self.chaseTime = 0
@@ -54,12 +62,15 @@ class TeamMember(RobotLocation):
         self.h = packet.playerH
         self.ballDist = packet.ballDist
         self.ballBearing = packet.ballBearing
+        self.ballX = packet.ballX
+        self.ballY = packet.ballY
         self.role = packet.role
         self.subRole = packet.subRole
         self.chaseTime = packet.chaseTime
 
         # calculates ball localization distance, bearing
         self.bearingToGoal = self.getBearingToGoal()
+        # if we are recieving packets, teammate is active
         self.active = True
         self.grabbing = (self.ballDist <=
                          NogginConstants.BALL_TEAMMATE_DIST_GRABBING) and \
@@ -89,6 +100,8 @@ class TeamMember(RobotLocation):
         self.h = my.h
         self.ballDist = ball.dist
         self.ballBearing = ball.bearing
+        self.ballX = ball.x
+        self.ballY = ball.y
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
@@ -121,7 +134,6 @@ class TeamMember(RobotLocation):
 
     def getBearingToGoal(self):
         """returns bearing to goal"""
-
         return self.getRelativeBearing(OPP_GOAL)
 
     def determineChaseTime(self):
@@ -135,8 +147,7 @@ class TeamMember(RobotLocation):
         ## if DEBUG_DETERMINE_CHASE_TIME:
         ##     self.printf("DETERMINE CHASE TIME DEBUG")
 
-        time += (self.ballDist / CHASE_SPEED) *\
-            SEC_TO_MILLIS
+        time += (self.ballDist / CHASE_SPEED)*SEC_TO_MILLIS
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time base is " + str(time))
@@ -148,9 +159,17 @@ class TeamMember(RobotLocation):
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after ball on bonus " + str(time))
 
+        # Give a bonus for lining up along the ball-goal line
+        lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
+        rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
+        if (lpb < self.ballBearing < rpb):
+            time -= BALL_GOAL_LINE_BONUS
+
+        if DEBUG_DETERMINE_CHASE_TIME:
+            self.brain.out.printf("\tChase time after ball-goal-line bonus " +str(time))
+
         # Add a penalty for being fallen over
-        time += (self.brain.fallController.getTimeRemainingEst() *
-                 SEC_TO_MILLIS)
+        time += (self.brain.fallController.getTimeRemainingEst()*SEC_TO_MILLIS)
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after fallen over penalty " + str(time))
@@ -169,6 +188,9 @@ class TeamMember(RobotLocation):
 
     def isDefaultChaser(self):
         return (self.playerNumber == DEFAULT_CHASER_NUMBER)
+
+    def isDefaultOffender(self):
+        return (self.playerNumber == DEFAULT_OFFENDER_NUMBER)
 
     def isDefaultDefender(self):
         return (self.playerNumber == DEFAULT_DEFENDER_NUMBER)
