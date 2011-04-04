@@ -144,8 +144,8 @@ class GoTeam:
 
             else:
                 # Tie break stuff
-                if self.me.chaseTime < mate.chaseTime:
-                    chaseTimeScale = self.me.chaseTime
+                if chaser_mate.chaseTime < mate.chaseTime:
+                    chaseTimeScale = chaser_mate.chaseTime
                 else:
                     chaseTimeScale = mate.chaseTime
 
@@ -186,12 +186,12 @@ class GoTeam:
         # [ (chaseTime(A) - minChaseTime(A,B) < e) or
         #   (chaseTime(A) - minChaseTime(A,B) < d and already chasing)]
         # and no higher robot calling off A.
-        return((self.me.chaseTime - mate.chaseTime <
+        return((chaser_mate.chaseTime - mate.chaseTime <
                 PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
-                (self.me.chaseTime - mate.chaseTime <
+                (chaser_mate.chaseTime - mate.chaseTime <
                  PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
-                 self.me.isTeammateRole(PBConstants.CHASER))) and
-               mate.playerNumber < self.me.playerNumber)
+                 chaser_mate.isTeammateRole(PBConstants.CHASER))) and
+               mate.playerNumber < chaser_mate.playerNumber)
 
     def shouldListen(self, mate, chaser_mate, chaseTimeScale):
         """Helper method for determineChaser"""
@@ -199,8 +199,8 @@ class GoTeam:
         # A will become chaser_mate if:
         # chaseTime(A) < chaseTime(B) - m and
         # A is higher robot that is already chaser.
-        return (mate.playerNumber > self.me.playerNumber and
-                mate.chaseTime - self.me.chaseTime <
+        return (mate.playerNumber > chaser_mate.playerNumber and
+                mate.chaseTime - chaser_mate.chaseTime <
                 PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
                 mate.isTeammateRole(PBConstants.CHASER))
 
