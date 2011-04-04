@@ -21,7 +21,7 @@ TIME_PER_STEP = TIME_STEP/1000.
 ##
 ##--------------------TEAM STUFF-----------------------#
 ##
-NUM_PLAYERS_PER_TEAM = 3
+NUM_PLAYERS_PER_TEAM = 4
 LENGTH_OF_HALF = 600 #in seconds
 # Setup colors
 NUM_GAME_TEAM_COLORS = 2
@@ -144,6 +144,9 @@ else:
 
 MIDFIELD_X = CENTER_FIELD_X
 MIDFIELD_Y = CENTER_FIELD_Y
+
+# y distance between sidelines and goalbox
+OUTSIDE_GOALBOX_Y = MIDFIELD_Y - GOALBOX_WIDTH*0.5
 
 # my goal box constants relative to (0,0) on my team
 MY_GOALBOX_LEFT_X = GREEN_PAD_X
