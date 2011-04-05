@@ -355,12 +355,22 @@ peaks_xLoop:
                                         # or until end of row
         jz      peaks_xLoop_end         # end of row or non-zero value found?
 
+############################################
+### Functionally equivalent, but slower loop, here for explanation of
+###      what is going on in 'repe scasw'
+############################################
+## above:  add     edi, 2
+##         dec     ecx
+##         jz      peaks_xLoop_end
+
+##         cmp     eax, [edi-2]
+##         je      above
+
         # Found next magnitude above noise threshold. Here
         #       edi     -> one word past the non-zero
         #                  (i.e. >= noise threshold) squared magnitude.
         #       ecx     count remaining in current row
         #               (x coordinate is offset from this value)
-
         prefetch [edi - xPitch]
         prefetch [edi - xPitch - yPitch]
         prefetch [edi - xPitch + yPitch]
