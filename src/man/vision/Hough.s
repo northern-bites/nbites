@@ -263,29 +263,6 @@ radiiLoop:
         movq    [\ptr + yPitch * t_span + 8 * \phase], mm\phase
 .endm
 
-.macro BOXCAR ptr, reg0, reg1
-        ## Load first row pixels
-        ## \reg0 = |03|02|01|00|
-        movq    \reg0, [\ptr]
-
-        ## Sum
-        ## Add second row pixels
-        ## 2nd row = |13|12|11|10|
-
-        ## After addition:
-        ## \reg0 = |03+13|02+12|01+11|00+10|
-        paddw   \reg0, [\ptr + yPitch]
-
-        ## Shuffle for next addition
-        ##          3     2     1     0
-        ## \reg1 = |xxxxx|xxxxx|02+12|01+11|
-        pshufw  \reg1, \reg0, 0b00111001
-
-	## Add again
-        ## |xxx|xxx|01+02+11+12|00+01+10+11|
-        paddw   \reg0, \reg1
- .endm
-
         ## Smooth the Hough space accumulator to reduce noisy peaks
 	## using an inplace 2x2 boxcar kernel:
         ## |1 1|
@@ -356,16 +333,25 @@ copy_first_row:
 smoothLoop:
         prefetch [esi + yPitch + 64]
 
-        BOXCAR esi, mm0, mm1
-        BOXCAR esi + 4, mm2, mm3
+        ## Load mm0= |00|01|02|03|
+        ##      mm1=    |01|02|03|04|
+        movq    mm0, [esi]
+        movq    mm1, [esi+2]
 
-        ## Unpack the 2 sums in each lower double word into one register
-        punpckldq mm0, mm2
+        ## Add mm0= |00+10|01+11|02+12|03+13|
+        ##     mm1= |01+11|02+12|03+13|04+14|
+        paddw   mm0, [esi + yPitch]
+        paddw   mm1, [esi + yPitch + 2]
+
+        ## Sum to get final values
+        ## Add mm0= | 00+10+ | 01+11+ | 02+12+ | 03+13+ |
+        ##          | 01+11  | 02+12  | 03+13  | 04+14  |
+        paddw   mm0, mm1
 
         # subtract threshold (mm7), force to 0 if below threshold
         psubusw mm0, mm7
 
-        ## Write
+        ## Write out all four pixel sums
         movq [esi], mm0
 
         ## Move ptr forward
