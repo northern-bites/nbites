@@ -435,7 +435,7 @@ class GoTeam:
     ############   Positioning Stuff     #################
     ######################################################
 
-def getPointBetweenBallAndGoal(ball,dist_from_ball):
+def getPointBetweenBallAndGoal(self, ball, dist_from_ball):
     """returns defensive position between ball (x,y) and goal (x,y)
     at <dist_from_ball> centimeters away from ball"""
     delta_y = ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
@@ -454,14 +454,14 @@ def getPointBetweenBallAndGoal(ball,dist_from_ball):
 
     return pos_x,pos_y
 
-def fancyGoaliePosition(team):
+def fancyGoaliePosition(self):
     """returns a goalie position using ellipse"""
 
     position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y)
 
     # lets try maintaining home position until the ball is closer in
     # might help us stay localized better
-    ball = team.brain.ball
+    ball = self.brain.ball
     if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
         # Use an ellipse just above the goalline to determine x and y position
         # We get the angle from goal center to the ball to determine our X,Y
@@ -477,7 +477,7 @@ def fancyGoaliePosition(team):
             theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
 
         # Determine X,Y of ellipse based on theta, set heading on the ball
-        x, y = team.ellipse.getPositionFromTheta(theta)
+        x, y = self.ellipse.getPositionFromTheta(theta)
         h = ball.heading
         position = (x,y,h)
 
