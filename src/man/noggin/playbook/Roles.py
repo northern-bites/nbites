@@ -85,15 +85,19 @@ def rOffender(team, workingPlay):
     workingPlay.setRole(PBConstants.OFFENDER)
     ballX = team.brain.ball.x
     ballY = team.brain.ball.y
-    if ballX > PBConstants.WING_X_THRESH:
+    if ballX > PBConstants.PICKER_X_THRESH:
+        subRoleOnDeck = PBConstants.PICKER
+        if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
+            SubRoles.pPicker(team, workingPlay)
+    elif ballX > PBConstants.WING_X_THRESH:
         if ballY < NogginConstants.CENTER_FIELD_Y:
-            subRoleOnDeck = PBConstants.RIGHT_WING
-            if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
-                SubRoles.pRightWing(team, workingPlay)
-        else:
             subRoleOnDeck = PBConstants.LEFT_WING
             if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
                 SubRoles.pLeftWing(team, workingPlay)
+        else:
+            subRoleOnDeck = PBConstants.RIGHT_WING
+            if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
+                SubRoles.pRightWing(team, workingPlay)
     elif ballX > PBConstants.STRIKER_X_THRESH:
         subRoleOnDeck = PBConstants.STRIKER
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
