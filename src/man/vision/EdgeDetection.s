@@ -409,7 +409,12 @@ peaks_xLoop:
 
         # Peak?
         movzx   esi, word ptr[edi + ebp - xPitch]
-        neg     ebp             # Find opposite of gradient
+
+        # It's an asymmetric peak test
+        # (neighbor-1 < peak < otherNeighbor) equiv (neighbor <= peak < otherNeighbor)
+        # since we're using integers
+        dec     esi
+        neg     ebp             # Find opposite neighbor offset
 
         ## INTERLACED instructions (watch out, could get confusing,
         ##                                      don't hurt yourself)
