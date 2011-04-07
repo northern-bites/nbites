@@ -15,10 +15,12 @@ add_definitions(${QT_DEFINITIONS})
 
 set( ProtoViewer_srcs main.cpp
   mainwindow.cpp
-  MessageModel.cpp )
+  TreeModel.cpp
+  Node.cpp
+  ProtoNode.cpp )
 
 set(ProtoViewer_headers mainwindow.h
-  MessageModel.h )
+  TreeModel.h )
 
 set(ProtoViewer_forms mainwindow.ui)
 

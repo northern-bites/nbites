@@ -1,11 +1,11 @@
-#ifndef MESSAGEMODEL_H
-#define MESSAGEMODEL_H
+#ifndef TreeModel_H
+#define TreeModel_H
 
 /**
  *
  * @author Octavian Neamtu
  *
- * @class MessageModel
+ * @class TreeModel
  *
  * It is an implementation of QAbstractItemModel that handles a Google Protocol
  * Buffer message and displays its information accordingly.
@@ -21,18 +21,16 @@
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
-#include <google/protobuf/message.h>
 
 namespace ProtoView {
 
-    using ::google::protobuf::Message;
-
-class MessageModel : public QAbstractItemModel
+class TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    MessageModel(Message* message, QObject *parent = 0);
-    ~MessageModel();
+    class Node;
+    TreeModel(Node* root, QObject *parent = 0);
+    ~TreeModel();
 
     // QAbstractItemModel overloaded functions - check out
     // http://doc.qt.nokia.com/latest/qmodelindex.html
@@ -52,14 +50,11 @@ signals:
 public slots:
 
 private:
-    Message* message;
-
-private:
-    //utilitary function to get the corresponding FielDescriptor for a nested
-    //Descriptor
-    const google::protobuf::FieldDescriptor* getFieldByDescriptor(
-            const google::protobuf::Descriptor* descriptor) const;
+    Node* root;
 
 };
 }
-#endif // MESSAGEMODEL_H
+
+#include "Node.h"
+
+#endif // TreeModel_H

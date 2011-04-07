@@ -1,6 +1,7 @@
 #include <QtGui>
 #include "mainwindow.h"
-#include "MessageModel.h"
+#include "TreeModel.h"
+#include "ProtoNode.h"
 #include "/home/oneamtu/nbites/build/man/straight/memory/protos/Sensors.pb.h"
 
 int main(int argc, char *argv[])
@@ -12,7 +13,8 @@ int main(int argc, char *argv[])
     memory::proto::PMotionSensors* ms =
             new memory::proto::PMotionSensors();
     ms->set_timestamp(42);
-    ProtoView::MessageModel messageModel(ms);
+    ProtoView::ProtoNode* root = new ProtoView::ProtoNode(NULL, NULL, ms);
+    ProtoView::TreeModel messageModel(root);
 
 
     QTreeView view;
