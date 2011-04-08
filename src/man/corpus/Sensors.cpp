@@ -41,7 +41,7 @@ using namespace Kinematics;
 
 // static base image array, so we don't crash on image access if the setImage()
 // method is never called
-static unsigned char global_image[IMAGE_BYTE_SIZE];
+static uint16_t global_image[NAO_IMAGE_BYTE_SIZE];
 
 //
 // C++ Sensors class methods
@@ -59,7 +59,9 @@ Sensors::Sensors ()
       rightFootBumper(0.0f, 0.0f),
       inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
-      image(&global_image[0]),
+      yImage(&global_image[0]), uvImage(&global_image[0]),
+      colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+      naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
@@ -691,7 +693,7 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
     ultraSoundDistanceRight = sensorValues[20];
 
     supportFoot = static_cast<SupportFoot>(
-                                           static_cast<int>(sensorValues[22]));
+                                           static_cast<int>(sensorValues[21]));
 
     pthread_mutex_unlock (&support_foot_mutex);
     pthread_mutex_unlock (&ultra_sound_mutex);
@@ -741,14 +743,42 @@ void Sensors::releaseVisionAngles() {
     pthread_mutex_unlock (&vision_angles_mutex);
 }
 
-const unsigned char* Sensors::getImage () const
+// Get a pointer to the full size Nao image
+const uint8_t* Sensors::getNaoImage () const
 {
-    return image;
+    return naoImage;
 }
 
-void Sensors::setImage (const unsigned char *img)
+const uint16_t* Sensors::getYImage () const
 {
-    image = img;
+    return yImage;
+}
+
+const uint16_t* Sensors::getImage () const
+{
+    return yImage;
+}
+
+const uint16_t* Sensors::getUVImage() const
+{
+    return uvImage;
+}
+
+const uint8_t* Sensors::getColorImage() const
+{
+    return colorImage;
+}
+
+void Sensors::setNaoImage(const uint8_t *img)
+{
+    naoImage = img;
+}
+
+void Sensors::setImage (const uint16_t *img)
+{
+    yImage = img;
+    uvImage = img + AVERAGED_IMAGE_SIZE;
+    colorImage = reinterpret_cast<const uint8_t*>(img + AVERAGED_IMAGE_SIZE*3);
 }
 
 
@@ -763,36 +793,37 @@ static const int VERSION = 0;
 void Sensors::startSavingFrames()
 {
 #ifdef SAVE_ALL_FRAMES
-	if (!isSavingFrames())
+    if (!isSavingFrames())
     {
         saving_frames_on = true;
-	    cout << "****Started Saving Frames****" << endl;
-	}
+        cout << "****Started Saving Frames****" << endl;
+    }
 #endif
 }
 
 void Sensors::stopSavingFrames()
 {
 #ifdef SAVE_ALL_FRAMES
-	if (isSavingFrames())
-	{
-	    saving_frames_on = false;
+    if (isSavingFrames())
+    {
+        saving_frames_on = false;
         cout << "****Stopped Saving Frames****" << endl;
-	}
+    }
 #endif
 }
 
 bool Sensors::isSavingFrames() const
 {
-	return saving_frames_on;
+    return saving_frames_on;
 }
 
+// @TODO move this to Transcriber to write out from full size image...
 void Sensors::saveFrame()
 {
     int MAX_FRAMES = 5000;
     if (saved_frames > MAX_FRAMES)
         return;
-    string EXT(".NBFRM");
+    string EXT(".frm");
     string BASE("/");
     int NUMBER = saved_frames;
     stringstream FRAME_PATH;
@@ -805,8 +836,10 @@ void Sensors::saveFrame()
     // not happening in our code atm
     lockVisionAngles();
     lockImage();
-    fout.write(reinterpret_cast<const char*>(getImage()),
-               IMAGE_BYTE_SIZE);
+
+    // @TODO Write out entire 640x480 image
+    fout.write(reinterpret_cast<const char*>(getNaoImage()),
+               NAO_IMAGE_BYTE_SIZE);
     // write the version of the frame format at the end before joints/sensors
     fout << VERSION << " ";
 
@@ -818,8 +851,6 @@ void Sensors::saveFrame()
     releaseImage();
     releaseVisionAngles();
 
-
-
     // Write sensors
     vector<float> sensor_data = getAllSensors();
     for (vector<float>::const_iterator i = sensor_data.begin();
@@ -829,4 +860,62 @@ void Sensors::saveFrame()
 
     fout.close();
     cout << "Saved frame #" << saved_frames++ << endl;
+}
+
+/**
+ * Load a frame from a file and set the sensors and image data as
+ * appropriate. Useful for running offline.
+ */
+void Sensors::loadFrame(string path)
+{
+    fstream fin(path.c_str() , fstream::in);
+    if (fin.fail()){
+        cout << "Frame load failed: " << path << endl;
+        return ;
+    }
+
+    lockImage();
+    // Load the image from the file, puts it straight into Sensors'
+    // image buffer so it doesn't have to allocate its own buffer and
+    // worry about deleting it
+    uint16_t * img = const_cast<uint16_t*>(getImage());
+    uint8_t * byte_img = new uint8_t[320 * 240 * 2];
+    fin.read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
+    releaseImage();
+
+    lockImage();
+
+    // Translate the loaded image into the proper format.
+    // @TODO: Convert images to new format.
+    for (int i=0; i < 320*240; i++){
+        img[i] = 0;
+        img[i] = static_cast<uint16_t>(byte_img[i<<1]);
+    }
+    delete byte_img;
+
+    releaseImage();
+    float v;
+    int version;
+    string space;
+    fin >> version;
+
+    vector<float> vba;
+
+    // Read in the body angles
+    for (unsigned int i = 0; i < NUM_ACTUATORS; ++i) {
+        fin >> v;
+        vba += v;
+    }
+    setVisionBodyAngles(vba);
+
+    // Read sensor values
+    vector<float> sensor_data;
+
+    for (int i = 0; i < NUM_SENSORS; ++i) {
+        fin >> v;
+        sensor_data += v;
+    }
+    setAllSensors(sensor_data);
+
+    fin.close();
 }

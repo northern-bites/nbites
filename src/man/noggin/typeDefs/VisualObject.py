@@ -27,17 +27,14 @@ class VisualObject(Location):
         self.focDist = visionInfos.focDist
         self.visDist = visionInfos.dist
         self.visBearing = visionInfos.bearing
+        self.angleX = visionInfos.angleX
+        self.angleY = visionInfos.angleY
 
         # obj is in this frame
         if self.visDist > 0:
             self.on = True
             self.framesOn += 1
             self.framesOff = 0
-            # set angleX, angleY so that we don't create c->python object overhead
-            self.angleX = (((Constants.IMAGE_WIDTH/2.-1) - self.centerX)/
-                           Constants.IMAGE_ANGLE_X)
-            self.angleY = (((Constants.IMAGE_HEIGHT/2.-1) - self.centerY)/
-                           Constants.IMAGE_ANGLE_Y)
         # obj not in this frame
         else:
             self.on = False

@@ -1939,8 +1939,8 @@ bool ObjectFragments::greenCheck(Blob b)
     int bad = 0;
     for (int i = 0; i < EXTRA_LINES && bad < MAX_BAD_PIXELS; i++) {
         x = max(0, xProject(x, b.getLeftBottomY(), b.getLeftBottomY() + i));
-        int pix = thresh->thresholded[min(IMAGE_HEIGHT - 1,
-                                          b.getLeftBottomY() + i)][x];
+        int pix = thresh->getThresholded(min(IMAGE_HEIGHT - 1,
+                                             b.getLeftBottomY() + i),x);
         if (pix == GREEN) {
             return true;
         }

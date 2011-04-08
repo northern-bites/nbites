@@ -26,16 +26,17 @@
 #include <fstream>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <stdint.h>
 
 #include  "visionconfig.h"
 // including info header files
 #include "Common.h"
 #include "VisionDef.h"
-#include "CortexDef.h"
 #include "Profiler.h"
 #if defined(OFFLINE) || !ROBOT(NAO_RL)
 #  include "MotionDef.h"
 #endif
+#include "FieldLinesDetector.h"
 
 class Vision;   // forward reference
 
@@ -67,6 +68,8 @@ private:
     Vision(const Vision& other);
     Vision& operator=(const Vision& other);
 
+    void detectObjects();
+
 public:
     // Main Vision methods
     //   virtual, to allow overloading
@@ -74,11 +77,11 @@ public:
     virtual void copyImage(const byte *image);
     // utilize the given image pointer for vision processing
     //   equivalent to setImage(image), followed by notifyImage()
-    virtual void notifyImage(const unsigned char *image);
+    virtual void notifyImage(const uint16_t *image);
     // utilize the current image pointer for vision processing
     virtual void notifyImage();
     // set the current image pointer to the given pointer
-    virtual void setImage(const byte* image);
+    virtual void setImage(const uint16_t* image);
 
     // visualization methods
     virtual void drawBoxes(void);
@@ -155,6 +158,9 @@ public:
     // Profiling
     boost::shared_ptr<Profiler> profiler;
 
+    const uint16_t * yImg, *uvImg;
+
+    FieldLinesDetector linesDetector;
 protected:
     //
     // Protected Variable
@@ -200,6 +206,7 @@ private:
     std::string name;
     int player;
     std::string colorTable;
+
 
 };
 

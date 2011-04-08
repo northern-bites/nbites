@@ -23,6 +23,7 @@ import java.util.List;
 
 import TOOL.TOOLException;
 import TOOL.Image.TOOLImage;
+import TOOL.Data.RobotDef;
 
 /**
  * Holds all data specific to one recorded frame in a robot's log.  May contain
@@ -38,7 +39,7 @@ public class Frame {
     protected DataSet frame_dataSet;
 
     private String frame_robot;
-    private int frame_type;
+    private RobotDef.ImageType frame_type;
     private RobotDef frame_def;
 
     protected TOOLImage frame_image;
@@ -55,8 +56,8 @@ public class Frame {
         frame_dataSet = set;
 
         frame_robot = "Unknown";
-        frame_type = RobotDef.AIBO_ERS7;
-        frame_def = RobotDef.ERS7_DEF;
+        frame_type = RobotDef.ImageType.NAO_VER;
+        frame_def = RobotDef.NAO_DEF_VERSIONED;
 
         frame_image = null;
         frame_preview = null;
@@ -69,7 +70,9 @@ public class Frame {
     }
 
     public Frame() {
-		// TODO Auto-generated constructor stub
+        frame_robot = "Unknown";
+        frame_type = RobotDef.ImageType.NAO_VER;
+        frame_def = RobotDef.NAO_DEF_VERSIONED;
 	}
 
 	public boolean hasImage() {
@@ -132,9 +135,12 @@ public class Frame {
         return dataSet().changed(index());
     }
 
-
-    public int type() {
+    public RobotDef.ImageType type() {
         return frame_type;
+    }
+
+    public RobotDef robotDef(){
+        return frame_def;
     }
 
     public String robot() {
@@ -179,8 +185,7 @@ public class Frame {
         return 0;
     }
 
-
-    public void setType(int robotType) {
+    public void setType(RobotDef.ImageType robotType) {
         frame_type = robotType;
     }
 
@@ -191,7 +196,7 @@ public class Frame {
     public void setJoints(List<Float> j) {
         frame_joints = j;
     }
-    
+
     public void setSensors(List<Float> s) {
         frame_sensors = s;
     }

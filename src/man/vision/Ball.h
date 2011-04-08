@@ -66,9 +66,6 @@ public:
     void createBall(int c);
 
     // ball stuff
-    void adjustBallDimensions();
-    int findBallEdgeX(int x, int y, int dir);
-    int findBallEdgeY(int x, int y, int dir);
     float rightHalfColor(Blob obj);
     void setOcclusionInformation();
     bool ballIsReasonablySquare(int x, int y, int w, int h);
@@ -86,6 +83,10 @@ public:
     bool ballIsNotSquare(int h, int w);
 
     int balls(int c, VisualBall *thisBall);
+
+    void adjustBallDimensions();
+    int findBallEdgeY(int x, int y, int dir);
+    int findBallEdgeX(int x, int y, int dir);
 
     // sanity checks
     void preScreenBlobsBasedOnSizeAndColor();
