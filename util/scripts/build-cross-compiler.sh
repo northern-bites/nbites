@@ -6,7 +6,7 @@ echo "Configuring and compiling the cross-compiler for the nao. Please enter you
 
 TMP_DIR=/tmp/nao-cross-build
 ####
-AL_DIR=/usr/local/nao2 # TEMP
+AL_DIR=/usr/local/nao
 ####
 CROSS_BASE=$AL_DIR/crosstoolchain
 
@@ -16,7 +16,7 @@ read USER
 echo "Please enter your ldap password: "
 read -s PASSWORD
 
-PREFIX=$AL_DIR
+PREFIX=$AL_DIR/crosstoolchain/cross/
 TARGET=i586-linux
 SYSROOT=$CROSS_BASE/staging/geode-linux
 
@@ -59,7 +59,7 @@ test -e $GCC_FILE || curl -Oku $USER:$PASSWORD ${SOURCES_PATH}/${GCC_FILE}
 echo "Unpacking SDK"
 if [ ! -e $AL_DIR ]; then
   mkdir -p $AL_DIR && \
-    tar --strip 1 -C $AL_DIR -xzf $SDK_FILE || exit 1
+    tar --strip 1 -C $AL_DIR -xzf $SDK_FILE || exit 1 # this might not be right
 fi
 echo "Unpacking Cross Compiler base"
 if [ ! -e $CROSS_BASE ]; then
@@ -140,5 +140,8 @@ pushd build-gcc && ../gcc-4.5.2/configure --prefix=$PREFIX \
                    make $MAKE_OPTIONS && \
                    make install && \
                    popd || exit 1
+
+echo "Setting up final symlinks"
+ln -s $PREFIX/. $PREFIX/geode || exit 1
 
 echo "Done!"
