@@ -5,6 +5,7 @@
 #include <QBrush>
 #include <QPen>
 #include <QPixmap>
+#include <QLabel>
 #include "roboimage.h"
 #include "math.h"
 
@@ -12,11 +13,13 @@ class RenderArea : public QWidget
 {
     Q_OBJECT
 public:
-    enum Shape { Y, U, V, Blue, Red, Green, H, S, Z, WHEEL, Pixmap };
+    enum Shape { Y, U, V, Blue, Red, Green, H, S, Z, EDGE, WHEEL, Pixmap };
 
-    RenderArea(RoboImage r1, QWidget *parent = 0);
+    RenderArea(RoboImage r1, QLabel *lab, QWidget *parent = 0);
 
     void  setRoboImage(RoboImage img) { r = img;}
+    void mouseMoveEvent(QMouseEvent *event);
+    int max(int a, int b) {if (a < b) return b; return a;}
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
@@ -34,6 +37,7 @@ private:
     Shape shape;
     QPen pen;
     QBrush brush;
+    QLabel *info;
     bool antialiased;
     bool transformed;
     QPixmap pixmap;

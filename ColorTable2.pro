@@ -17,7 +17,10 @@ SOURCES += main.cpp\
     colorzone.cpp \
     renderarea.cpp \
     window.cpp \
-    coloredit.cpp
+    coloredit.cpp \
+    colortable.cpp \
+    linefit.cpp \
+    stats.cpp
 
 HEADERS  += colorcreator.h \
     roboimage.h \
@@ -25,6 +28,9 @@ HEADERS  += colorcreator.h \
     colorzone.h \
     renderarea.h \
     window.h \
-    coloredit.h
+    coloredit.h \
+    colortable.h \
+    linefit.h \
+    stats.h
 
 FORMS    += colorcreator.ui

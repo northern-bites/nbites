@@ -28,6 +28,7 @@ private slots:
 private:
     RenderArea *renderArea;
     QLabel *shapeLabel;
+    QLabel *infoLabel;
     QComboBox *shapeComboBox;
     RoboImage r;
 

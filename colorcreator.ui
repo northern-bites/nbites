@@ -389,6 +389,19 @@
     <string>Z Max</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="getColorTable">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>660</y>
+     <width>114</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Get Table</string>
+   </property>
+  </widget>
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>

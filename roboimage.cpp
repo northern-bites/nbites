@@ -8,9 +8,9 @@ RoboImage::RoboImage(int wd, int ht)
     uImg = new int*[wd];
     vImg = new int*[wd];
     for (int i = 0; i < wd; i++) {
-        yImg[i] = new int[wd * ht];
-        vImg[i] = new int[wd * ht];
-        uImg[i] = new int[wd * ht];
+        yImg[i] = new int[ht];
+        vImg[i] = new int[ht];
+        uImg[i] = new int[ht];
     }
 }
 

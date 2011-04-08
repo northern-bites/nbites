@@ -6,6 +6,7 @@
 #include "renderarea.h"
 #include "window.h"
 #include "coloredit.h"
+#include "colortable.h"
 #define  COLORS 8
 
 namespace Ui {
@@ -18,7 +19,7 @@ class ColorCreator : public QWidget
 
 public:
     enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black};
-    enum Choices {Single, Multiple};
+    enum Choices {Single, Multiple, Table};
     explicit ColorCreator(QWidget *parent = 0);
     ~ColorCreator();
     void updateDisplays();
@@ -61,13 +62,18 @@ private slots:
 
     void on_zMax_valueChanged(int value);
 
+    void on_getColorTable_clicked();
+
 private:
     Ui::ColorCreator *ui;
-    RoboImage r;
+    RoboImage roboimage;
+    ColorTable *table;
     RenderArea *renderArea;
     Window imageWindow;
     QString baseDirectory;
     QString currentDirectory;
+    QString baseColorTable;
+    QString currentColorDirectory;
     QString nextFrame;
     QString previousFrame;
     int currentFrameNumber;

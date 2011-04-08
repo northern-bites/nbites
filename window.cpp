@@ -10,7 +10,8 @@ Window::Window(RoboImage r1, QWidget *parent) :
     r(r1),
     QWidget(parent)
 {
-    renderArea = new RenderArea(r);
+    infoLabel = new QLabel(tr("Information"));
+    renderArea = new RenderArea(r, infoLabel);
 
     shapeComboBox = new QComboBox;
     shapeComboBox->addItem(tr("Pixmap"), RenderArea::Pixmap);
@@ -23,6 +24,7 @@ Window::Window(RoboImage r1, QWidget *parent) :
     shapeComboBox->addItem(tr("H"), RenderArea::H);
     shapeComboBox->addItem(tr("S"), RenderArea::S);
     shapeComboBox->addItem(tr("Z"), RenderArea::Z);
+    shapeComboBox->addItem(tr("Edge"), RenderArea::EDGE);
     shapeComboBox->addItem(tr("W"), RenderArea::WHEEL);
 
     shapeLabel = new QLabel(tr("&View:"));
@@ -39,6 +41,7 @@ Window::Window(RoboImage r1, QWidget *parent) :
     mainLayout->setRowMinimumHeight(1, 6);
     mainLayout->addWidget(shapeLabel, 2, 1, Qt::AlignRight);
     mainLayout->addWidget(shapeComboBox, 2, 2);
+    mainLayout->addWidget(infoLabel, 3, 1, Qt::AlignCenter);
 
     setLayout(mainLayout);
 

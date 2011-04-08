@@ -1,8 +1,10 @@
 #include "renderarea.h"
+#include <QMouseEvent>
 
-RenderArea::RenderArea(RoboImage r1, QWidget *parent)
+RenderArea::RenderArea(RoboImage r1, QLabel *inf, QWidget *parent)
     : QWidget(parent),
-      r(r1)
+      r(r1),
+      info(inf)
 {
     shape = Pixmap;
     antialiased = false;
@@ -10,7 +12,25 @@ RenderArea::RenderArea(RoboImage r1, QWidget *parent)
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
+    setMouseTracking(true);
     //r.read("/Users/ericchown/nbites/data/frames/graz/ballDist/1.NBFRM");
+}
+
+void RenderArea::mouseMoveEvent(QMouseEvent *event) {
+    int x = event->x() / 2;
+    int y = event->y() / 2;
+    QString xS;
+    xS.setNum(x);
+    QString yS;
+    yS.setNum(y);
+    QString yy;
+    yy.setNum(r.getY(x, y));
+    QString u;
+    u.setNum(r.getU(x, y));
+    QString v;
+    v.setNum(r.getV(x, y));
+    QString temp = "x, y: "+ xS+" "+yS+"\nYUV: "+yy+" "+u+" "+v;
+    info->setText(temp);
 }
 
 QSize RenderArea::minimumSizeHint() const
@@ -71,7 +91,8 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
 
     QTextStream out(stdout);
     QRect draw;
-    int red, green, blue;
+    int red, green, blue, edge;
+    bool found;
     for (int i = 0; i < r.getHeight(); i++)
     {
         for (int j = 0; j < r.getWidth(); j++)
@@ -109,6 +130,39 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                 break;
             case Z:
                 red = green = blue = r.getZ(j, i);
+                break;
+            case EDGE:
+                red = green = blue = r.getY(j, i);
+                found = false;
+                if (j > 0 && i > 1) {
+                    edge = abs(r.getY(j - 1, i) - r.getY(j, i));
+                    edge = max(abs(r.getY(j, i) - r.getY(j, i - 1)), edge);
+                    if (edge  > 10) {
+                        red = 255;
+                        green = 0;
+                        blue = 0;
+                        found = true;
+                    }
+                    edge = abs(r.getU(j - 1, i) - r.getU(j, i));
+                    edge = max(abs(r.getU(j, i) - r.getU(j, i - 1)), edge);
+                    if (edge > 10) {
+                        green = 255;
+                        blue = 0;
+                        if (!found) {
+                            red = 0;
+                        }
+                        found = true;
+                    }
+                    edge = abs(r.getV(j - 1, i) - r.getV(j, i));
+                    edge = max(abs(r.getV(j, i) - r.getV(j, i - 1)), edge);
+                    if (edge > 10) {
+                        blue = 255;
+                        if (!found) {
+                            red = 0;
+                            green = 0;
+                        }
+                    }
+                }
                 break;
             case WHEEL:
 
