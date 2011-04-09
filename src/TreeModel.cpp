@@ -17,15 +17,11 @@
 #include <QtGui>
 
 #include "TreeModel.h"
-#include <google/protobuf/descriptor.h>
 #include <iostream>
 
 namespace ProtoView {
 
-using namespace google::protobuf;
 using namespace std;
-
-const static uint32 NUM_DATA_COLS = 2;
 
 TreeModel::TreeModel(Node* _root, QObject *_parent) :
     QAbstractItemModel(_parent),
@@ -60,8 +56,17 @@ int TreeModel::rowCount(const QModelIndex &index) const {
     }
 }
 
-int TreeModel::columnCount(const QModelIndex &parent) const {
-    return NUM_DATA_COLS;
+int TreeModel::columnCount(const QModelIndex &index) const {
+
+    const Node* indexNode;
+
+    if (!index.isValid()) {
+        indexNode = root;
+    } else {
+        indexNode = static_cast<const Node*> (index.internalPointer());
+    }
+
+    return indexNode->getNumColumns();
 }
 
 QModelIndex TreeModel::index(int row, int column,
@@ -119,29 +124,9 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const {
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    return QVariant("blank");
+    const Node* childNode = static_cast<const Node*> (index.internalPointer());
 
-//    FieldDescriptor* thisField =
-//            static_cast<FieldDescriptor*> (index.internalPointer());
-//    FieldDescriptor* parentField =
-//            static_cast<FieldDescriptor*> (index.parent().internalPointer());
-//
-//    switch(index.column()) {
-//    case 0 :
-//        return QVariant(QString(thisField->name().data()));
-//    case 1 :
-////        if (parentField->type() == FieldDescriptor::TYPE_MESSAGE) {
-////            //Message* message = getMessageFromFieldDescriptor(parentField);
-////        } else {
-//            Message* message = this->message;
-////        }
-//
-////        if (thisField->is_repeated()) {
-////            return getSingularDataFromFieldDescriptor(message, thisField);
-//        } else {
-//
-//        }
-        return QVariant();
+    return childNode->getData(index.column());
 
 }
 
@@ -159,34 +144,5 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const {
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
-
-//QVariant TreeModel::getSingularDataFromFieldDescriptor(
-//        const google::protobuf::Message* message,
-//        const google::protobuf::FieldDescriptor* fieldDescriptor) const {
-//
-//    const Reflection* reflection = message->GetReflection();
-//    switch (fieldDescriptor->cpp_type()) {
-//    case FieldDescriptor::CPPTYPE_BOOL:
-//        return QVariant(reflection->GetBool(*message, fieldDescriptor));
-//    case FieldDescriptor::CPPTYPE_DOUBLE:
-//        return QVariant(reflection->GetDouble(*message, fieldDescriptor));
-//    case FieldDescriptor::CPPTYPE_FLOAT:
-//        return QVariant(reflection->GetFloat(*message, fieldDescriptor));
-//    case FieldDescriptor::CPPTYPE_INT32:
-//        return QVariant(reflection->GetInt32(*message, fieldDescriptor));
-//    case FieldDescriptor::CPPTYPE_INT64:
-//        return QVariant(reflection->GetInt64(*message, fieldDescriptor));
-//    case FieldDescriptor::CPPTYPE_MESSAGE:
-//        return QVariant();
-//    case FieldDescriptor::CPPTYPE_STRING:
-//        return QVariant(reflection->GetString(*message, fieldDescriptor).data());
-//    case FieldDescriptor::CPPTYPE_UINT32:
-//        return QVariant(reflection->GetUInt32(*message, fieldDescriptor));
-//    case FieldDescriptor::CPPTYPE_UINT64:
-//        return QVariant(reflection->GetUInt64(*message, fieldDescriptor));
-//    default:
-//        return QVariant();
-//    }
-//}
 
 }

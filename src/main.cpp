@@ -1,8 +1,12 @@
 #include <QtGui>
+#include <stdint.h>
+
 #include "mainwindow.h"
 #include "TreeModel.h"
 #include "ProtoNode.h"
 #include "/home/oneamtu/nbites/build/man/straight/memory/protos/Sensors.pb.h"
+
+
 
 int main(int argc, char *argv[])
 {

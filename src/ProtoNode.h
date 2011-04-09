@@ -9,6 +9,7 @@
 #define ProtoNode_H_
 
 #include <QList>
+#include <string>
 #include <google/protobuf/message.h>
 #include <google/protobuf/descriptor.h>
 
@@ -20,20 +21,27 @@ namespace proto = google::protobuf;
 
 class ProtoNode : public TreeModel::Node {
 
-
-
 public:
-    ProtoNode(Node* parent,
-              const proto::FieldDescriptor* fd,
-              const proto::Message* m = NULL);
+    ProtoNode(Node* _parent,
+              const proto::FieldDescriptor* _fieldDescriptor,
+              const proto::Message* _message = NULL);
     virtual ~ProtoNode();
 
     void constructTree();
+    QVariant getData(int column) const;
+    int getNumColumns() const;
+    QVariant getName() const;
+    QVariant getValue() const;
 
     const proto::FieldDescriptor *getFieldDescriptor() const;
     const proto::Message *getMessage() const;
 
 private:
+    QVariant getSingleValue() const;
+
+private:
+    const static int NUM_DATA_COLUMNS = 2;
+
     const proto::FieldDescriptor* fieldDescriptor;
     const proto::Message* message;
 };
