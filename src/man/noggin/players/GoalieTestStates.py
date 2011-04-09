@@ -121,7 +121,7 @@ def testDangerousBall(player):
 
 def testInBox(player):
     if player.counter % 100 == 0:
-        if goalTran.inBox(player):
+        if goalTran.goalieInBox(player):
             print "in"
         else:
             print "out"

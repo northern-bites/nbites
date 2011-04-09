@@ -61,7 +61,6 @@ def gameSet(player):
         player.brain.loc.resetBall()
         print player.brain.play.role
         if player.brain.play.isRole(GOALIE):
-            print "RESETTING GOALIE LOC"
             player.brain.resetGoalieLocalization()
 
         if player.brain.play.isRole(CHASER):

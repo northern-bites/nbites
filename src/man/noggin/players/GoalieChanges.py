@@ -36,7 +36,5 @@ def goalieStateChoice(player):
     #if player.isSaving:
        # return player.currentState
 
-#dangerous ball is dealt with by chase
-
     return player.currentState
 
