@@ -18,22 +18,19 @@ def goaliePosition(player):
         player.isPositioning = True
         player.isChasing = False
         player.isSaving = False
-        nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_LEFT_POST_X + 20,
-                               ((nogCon.LANDMARK_MY_GOAL_LEFT_POST_Y + 
-                                 nogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y)/2)))
-        #nav.positionPlaybook()
+        nav.positionPlaybook()
 
     if ball.dist >= goalCon.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLoc()
     else:
         player.brain.tracker.trackBall() 
 
-   # if player.brain.nav.isStopped():
-        #if goalTran.shouldPositionLeft(player):
-            #player.goNow('goaliePositionLeft')
+    if player.brain.nav.isStopped():
+        if goalTran.shouldPositionLeft(player):
+            player.goNow('goaliePositionLeft')
 
-        #elif goalTran.shouldPositionRight(player):
-            #player.goNow('goaliePositionRight')
+        elif goalTran.shouldPositionRight(player):
+            player.goNow('goaliePositionRight')
 
     return player.stay()
 
@@ -41,13 +38,10 @@ def goaliePositionRight(player):
 #move to the right position.
     if player.firstFrame():
         nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_LEFT_POST_X + 20,
-                               nogCon.LANDMARK_MY_GOAL_LEFT_POST_Y- 10, 0))
+                               nogCon.LANDMARK_MY_GOAL_LEFT_POST_Y- 20, 0))
 
-    elif player.shouldPositionCenter(player):
-        player.goNow('goaliePosition')
-
-    #for now dont try to get across the whole goal in one go
-    elif player.shouldPositionLeft(player):
+    elif (player.shouldPositionCenter(player) or 
+          player.shouldPositionLeft(player)):
         player.goNow('goaliePosition')
 
 
@@ -57,10 +51,7 @@ def goaliePositionLeft(player):
         nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_RIGHT_POST_X + 20,
                                nogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y + 10, 0))
 
-    elif player.shouldPositionCenter(player):
-        player.goNow('goaliePosition')
-
-    #for now dont try to get across the whole goal in one go
-    elif player.shouldPositionRight(player):
+    elif (player.shouldPositionCenter(player) or
+          player.shouldPositionRight(player)):
         player.goNow('goaliePosition')
 

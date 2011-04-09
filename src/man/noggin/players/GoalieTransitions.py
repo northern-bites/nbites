@@ -1,3 +1,4 @@
+from math import fabs
 from ..playbook import PBConstants as PBCon
 from .. import NogginConstants as NogCon
 import GoalieConstants as goalCon
@@ -26,7 +27,7 @@ def shouldPositionForSave(player):
     #add a counter  
     #player.shouldSaveCounter already exists
     #need to test velocity values
-    if (abs(ball.dx) > goalCon.VEL_THRES):
+    if (fabs(ball.dx) > goalCon.VEL_THRES):
         # if coming towards the goal
         #left front
         if (ball.relX > 0 and ball.relY > 0 and ball.dx > 0 and ball.dy > 0):
@@ -143,8 +144,6 @@ def shouldHoldSave(player):
 
 #POSITION TRANSITIONS
 
-#ask lizze about how to check this
-#i get the sense this was just to check on the right side of the field
 def outOfPosition(player):
     if player.penaltyKicking:
         return False
@@ -159,7 +158,7 @@ def outOfPosition(player):
 
 # player is inside the box with a small buffer
 #localization not good enough for this?
-def inBox(player):
+def goalieInBox(player):
     my = player.brain.my
 
     if  (my.x < (NogCon.MY_GOALBOX_RIGHT_X + 10)
@@ -256,6 +255,14 @@ def shouldChase(player):
     #can i use this?
     # elif not goTeam.goalieShouldChase(player):
         # return False
+    if not chaseTran.shouldChaseBall(player):
+        return False
+
+    if (ball.framesOff > 45):
+        print "no ball"
+        player.shouldChaseCounter = 0
+        player.shouldStopChaseCounter = 0
+        return False
 
     # close enough to chase
     elif (ball.x < goalCon.CHASE_RIGHT_X_LIMIT
@@ -277,13 +284,9 @@ def shouldChase(player):
 def shouldStopChase(player):
     ball= player.brain.ball
 
-   # if not player.isChasing:
-       # return False
-
-    #ask about this not working
-    #if(ball.framesOff > 5):
-        #print "1"
-        #player.shouldStopChaseCounter = 4
+    if(ball.framesOff > 45):
+        print "1"
+        player.shouldStopChaseCounter = 4
 
     if (ball.x > goalCon.CHASE_RIGHT_X_LIMIT
           or ball.x < goalCon.CHASE_LEFT_X_LIMIT
@@ -296,8 +299,6 @@ def shouldStopChase(player):
     #elif(chaseTran.shouldntStopChasing(player)):
         #print "3"
         #return False
-
-
     
     if player.shouldStopChaseCounter > 3:
         player.shouldStopChaseCounter = 0
