@@ -32,6 +32,38 @@ void VisualLine::findEndpoints(const HoughLine& a,
                                const HoughLine& b,
                                const Gradient& g)
 {
+    // Find the line (of the pair) which is above (in the image) the other one
+    const HoughLine& top = (a.getSinT() * a.getRadius() <
+                            b.getSinT() * b.getRadius()) ? a : b;
+    const HoughLine& bottom = (top == a) ? b : a;
+
+    findLineEdgeEnds(top, g, tr, tl);
+    findLineEdgeEnds(bottom, g, br, bl);
+}
+
+void VisualLine::findLineEdgeEnds(const HoughLine& line, const Gradient& g,
+                                 point<int>& r, point<int>& l)
+{
+    // Start in middle at closest point to center
+    int midX = line.getCosT() * line.getRadius() + IMAGE_WIDTH/2;
+    int midY = line.getSinT() * line.getRadius() + IMAGE_HEIGHT/2;
+
+    // Find coordinates of image edge intersections
+    // Find 0 end
+    float invSinT = 1/line.getSinT();
+    float invCosT = 1/line.getCosT();
+
+    float xStart = -midX * invSinT;
+    float yStart = -midY * invCosT;
+    float uStart = min(xStart, yStart);
+
+    // @TODO Is this right?!
+    float xEnd = IMAGE_WIDTH - midX * invSinT;
+    float yEnd = IMAGE_HEIGHT - midY * invCosT;
+    float uEnd = min(xEnd, yEnd);
+
+    // Search along line from one end to other keeping track of last
+    // runs of edge points. Look for start, then end runs.
 
 }
 

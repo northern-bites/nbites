@@ -571,28 +571,66 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
 {
 #ifdef OFFLINE
     if (thresh->debugHoughTransform){
-        list<HoughLine>::const_iterator line = lines.begin();
 
-        while (line != lines.end()){
+
+        // Static so they're only initialized once!
+        static double* u_intersections = new double[num_edges];
+
+        list<HoughLine>::const_iterator line;
+        for (line = lines.begin() ; line != lines.end(); line++){
             const double sn = line->getSinT();
-            const double cs = line->getCosT();
 
-            for (double u = -200.; u <= 200.; u+=1.){
+            // Flip cosine sign so it is correctly pointing the right
+            // way along the line. (@TODO, better explain)
+            const double cs = -line->getCosT();
 
-                double x0 = line->getRadius() * cs;
-                double y0 = line->getRadius() * sn;
+            const double x0 = -line->getRadius() * cs + IMAGE_WIDTH/2;
+            const double y0 = line->getRadius() * sn + IMAGE_HEIGHT/2;
 
-                int x = (int)round(x0 + u * sn) + IMAGE_WIDTH  / 2;
-                int y = (int)round(y0 - u * cs) + IMAGE_HEIGHT / 2;
+            u_intersections[top_edge] = -y0/cs;
+            u_intersections[bottom_edge] = (IMAGE_HEIGHT-1 - y0)/cs;
+            u_intersections[left_edge] = -x0/sn;
+            u_intersections[right_edge] = (IMAGE_WIDTH -1 - x0)/sn;
 
-                if (0 <= x && x < IMAGE_WIDTH &&
-                    0 <= y && y < IMAGE_HEIGHT){
+            double uStart = 0, uEnd = 0;
+            findLineEndOffsets(x0, y0,
+                               sn, cs,
+                               uStart, uEnd,
+                               u_intersections);
 
-                    drawDot(x,y, BLUE);
-                }
+            for (double u = min(uStart,uEnd); u <= max(uStart, uEnd); u+=1.){
+                int x = (int)round(x0 + u * sn);
+                int y = (int)round(y0 + u * cs);
+                drawDot(x,y, BLUE);
             }
-            line++;
         }
     }
 #endif
+}
+
+void Vision::findLineEndOffsets(double x0, double y0,
+                                double sn, double cs,
+                                double& u1, double& u2,
+                                double* intersects)
+{
+    static int bounds[num_edges] = {IMAGE_WIDTH,
+                                    IMAGE_WIDTH,
+                                    IMAGE_HEIGHT,
+                                    IMAGE_HEIGHT};
+
+    double angles[num_edges] = {sn,sn,cs,cs};
+    double offset[num_edges] = {x0,x0,y0,y0};
+
+    for (int i=0; i < num_edges; ++i){
+        if (offset[i] + intersects[i]*angles[i] >= 0 &&
+            offset[i] + intersects[i]*angles[i] < bounds[i]){
+            if (u1 == 0) {
+                u1 = intersects[i];
+            } else if( abs(u1 - intersects[i]) > 10){
+                // Prevent lines from being too short or the same
+                // point being used twice
+                u2 = intersects[i];
+            }
+        }
+    }
 }

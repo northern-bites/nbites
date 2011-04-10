@@ -41,7 +41,7 @@ bool HoughLine::intersect(int x0, int y0,
     return (abs(intX) <= x0 && abs(intY) <= y0);
 }
 
-bool HoughLine::operator==(const HoughLine &other)
+bool HoughLine::operator==(const HoughLine &other) const
 {
     // t,r follow from tIndex,rIndex; no need to compare
     return (other.getScore() == score &&
@@ -49,7 +49,7 @@ bool HoughLine::operator==(const HoughLine &other)
             other.getTIndex() == tIndex);
 }
 
-bool HoughLine::operator!=(const HoughLine &other)
+bool HoughLine::operator!=(const HoughLine &other) const
 {
     return !(*this == other);
 }
