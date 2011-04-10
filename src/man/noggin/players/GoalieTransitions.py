@@ -255,8 +255,10 @@ def shouldChase(player):
     #can i use this?
     # elif not goTeam.goalieShouldChase(player):
         # return False
-    if not chaseTran.shouldChaseBall(player):
-        return False
+
+    #test!
+    #if not chaseTran.shouldChaseBall(player):
+        #return False
 
     if (ball.framesOff > 45):
         print "no ball"
