@@ -573,34 +573,20 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
     if (thresh->debugHoughTransform){
 
 
-        // Static so they're only initialized once!
-        static double* u_intersections = new double[num_edges];
-
         list<HoughLine>::const_iterator line;
         for (line = lines.begin() ; line != lines.end(); line++){
             const double sn = line->getSinT();
+            const double cs = line->getCosT();
 
-            // Flip cosine sign so it is correctly pointing the right
-            // way along the line. (@TODO, better explain)
-            const double cs = -line->getCosT();
-
-            const double x0 = -line->getRadius() * cs + IMAGE_WIDTH/2;
+            const double x0 = line->getRadius() * cs + IMAGE_WIDTH/2;
             const double y0 = line->getRadius() * sn + IMAGE_HEIGHT/2;
 
-            u_intersections[top_edge] = -y0/cs;
-            u_intersections[bottom_edge] = (IMAGE_HEIGHT-1 - y0)/cs;
-            u_intersections[left_edge] = -x0/sn;
-            u_intersections[right_edge] = (IMAGE_WIDTH -1 - x0)/sn;
-
             double uStart = 0, uEnd = 0;
-            findLineEndOffsets(x0, y0,
-                               sn, cs,
-                               uStart, uEnd,
-                               u_intersections);
+            findLineEndOffsets(*line, x0, y0, uStart, uEnd);
 
             for (double u = min(uStart,uEnd); u <= max(uStart, uEnd); u+=1.){
                 int x = (int)round(x0 + u * sn);
-                int y = (int)round(y0 + u * cs);
+                int y = (int)round(y0 - u * cs); // cs goes opposite direction
                 drawDot(x,y, BLUE);
             }
         }
@@ -608,16 +594,32 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
 #endif
 }
 
-void Vision::findLineEndOffsets(double x0, double y0,
-                                double sn, double cs,
-                                double& u1, double& u2,
-                                double* intersects)
+void Vision::findLineEndOffsets(const HoughLine& line,
+                                const double x0, const double y0,
+                                double& u1, double& u2)
 {
+    // Static so they're only initialized once!
     static int bounds[num_edges] = {IMAGE_WIDTH,
                                     IMAGE_WIDTH,
                                     IMAGE_HEIGHT,
                                     IMAGE_HEIGHT};
+    static double intersects[num_edges];
 
+    // Flip cosine sign so it is correctly pointing the right
+    // way along the line. (@TODO, better explain)
+    const double cs = -line.getCosT();
+    const double sn = line.getSinT();
+
+    // Make sure we don't divide by zero!
+    double csInv = (cs == 0) ? (10000000) : (1/cs);
+    double snInv = (sn == 0) ? (10000000) : (1/sn);
+
+    intersects[top_edge] = -y0*csInv;
+    intersects[bottom_edge] = (IMAGE_HEIGHT-1 - y0)*csInv;
+    intersects[left_edge] = -x0*snInv;
+    intersects[right_edge] = (IMAGE_WIDTH -1 - x0)*snInv;
+
+    // Set up lists for each edge's attributes
     double angles[num_edges] = {sn,sn,cs,cs};
     double offset[num_edges] = {x0,x0,y0,y0};
 

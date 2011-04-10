@@ -100,10 +100,9 @@ public:
     virtual void drawEdges(Gradient& g);
     virtual void drawHoughLines(const std::list<HoughLine>& lines);
 
-    static void findLineEndOffsets(double x0, double y0,
-                                   double sn, double cs,
-                                   double& u1, double& u2,
-                                   double* u_intersections);
+    static void findLineEndOffsets(const HoughLine& line,
+                                   const double x0, const double y0,
+                                   double& u1, double& u2);
 
     //
     // SETTERS
