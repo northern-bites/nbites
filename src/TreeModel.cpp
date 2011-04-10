@@ -126,7 +126,7 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const {
 
     const Node* childNode = static_cast<const Node*> (index.internalPointer());
 
-    return childNode->getData(index.column());
+    return childNode->getData(index.row(), index.column());
 
 }
 

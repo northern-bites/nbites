@@ -20,12 +20,12 @@ public:
     virtual ~Node();
 
     virtual void constructTree() = 0;
-    virtual QVariant getData(int column) const = 0;
+    virtual QVariant getData(int row, int column) const = 0;
     virtual int getNumColumns() const = 0;
 
     void addChild(const Node* child);
     const Node* getChild(int index) const;
-    int childCount() const;
+    virtual int childCount() const;
 
     const Node *getParent() const;
 

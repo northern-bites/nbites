@@ -22,21 +22,30 @@ namespace proto = google::protobuf;
 class ProtoNode : public TreeModel::Node {
 
 public:
-    ProtoNode(Node* _parent,
+    ProtoNode(ProtoNode* _parent,
               const proto::FieldDescriptor* _fieldDescriptor,
               const proto::Message* _message = NULL);
     virtual ~ProtoNode();
 
     void constructTree();
-    QVariant getData(int column) const;
+
+    QVariant getData(int row, int column) const;
     int getNumColumns() const;
+    int childCount() const;
+    bool isRepeated() const;
+    bool isMessage() const;
+    int getSizeOfField() const;
     QVariant getName() const;
-    QVariant getValue() const;
+    QVariant getValue(int index) const;
 
     const proto::FieldDescriptor *getFieldDescriptor() const;
     const proto::Message *getMessage() const;
 
 private:
+    QList<ProtoNode*> constructMessageChildren(ProtoNode* parent);
+    QList<ProtoNode*> constructRepeatedChildren(ProtoNode* parent);
+    QVariant getRepeatedChildValue(int index) const;
+    QVariant getSingleValueAt(int index) const;
     QVariant getSingleValue() const;
 
 private:

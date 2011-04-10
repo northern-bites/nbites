@@ -17,6 +17,9 @@ int main(int argc, char *argv[])
     memory::proto::PMotionSensors* ms =
             new memory::proto::PMotionSensors();
     ms->set_timestamp(42);
+    ms->add_body_angles(23.2f);
+    ms->add_body_angles(23.2f);
+    ms->add_body_angles(23.2f);
     ProtoView::ProtoNode* root = new ProtoView::ProtoNode(NULL, NULL, ms);
     ProtoView::TreeModel messageModel(root);
 

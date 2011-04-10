@@ -12,7 +12,6 @@ namespace ProtoView {
 typedef TreeModel::Node Node;
 
 Node::Node(const Node* _parent) : parent(_parent){
-
 }
 
 Node::~Node() {
