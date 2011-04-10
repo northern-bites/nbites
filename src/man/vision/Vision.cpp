@@ -572,17 +572,16 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
 #ifdef OFFLINE
     if (thresh->debugHoughTransform){
 
-
         list<HoughLine>::const_iterator line;
         for (line = lines.begin() ; line != lines.end(); line++){
             const double sn = line->getSinT();
             const double cs = line->getCosT();
 
+            double uStart = 0, uEnd = 0;
+            HoughLine::findLineImageIntersects(*line, uStart, uEnd);
+
             const double x0 = line->getRadius() * cs + IMAGE_WIDTH/2;
             const double y0 = line->getRadius() * sn + IMAGE_HEIGHT/2;
-
-            double uStart = 0, uEnd = 0;
-            findLineEndOffsets(*line, x0, y0, uStart, uEnd);
 
             for (double u = min(uStart,uEnd); u <= max(uStart, uEnd); u+=1.){
                 int x = (int)round(x0 + u * sn);
@@ -594,45 +593,3 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
 #endif
 }
 
-void Vision::findLineEndOffsets(const HoughLine& line,
-                                const double x0, const double y0,
-                                double& u1, double& u2)
-{
-    // Static so they're only initialized once!
-    static int bounds[num_edges] = {IMAGE_WIDTH,
-                                    IMAGE_WIDTH,
-                                    IMAGE_HEIGHT,
-                                    IMAGE_HEIGHT};
-    static double intersects[num_edges];
-
-    // Flip cosine sign so it is correctly pointing the right
-    // way along the line. (@TODO, better explain)
-    const double cs = -line.getCosT();
-    const double sn = line.getSinT();
-
-    // Make sure we don't divide by zero!
-    double csInv = (cs == 0) ? (10000000) : (1/cs);
-    double snInv = (sn == 0) ? (10000000) : (1/sn);
-
-    intersects[top_edge] = -y0*csInv;
-    intersects[bottom_edge] = (IMAGE_HEIGHT-1 - y0)*csInv;
-    intersects[left_edge] = -x0*snInv;
-    intersects[right_edge] = (IMAGE_WIDTH -1 - x0)*snInv;
-
-    // Set up lists for each edge's attributes
-    double angles[num_edges] = {sn,sn,cs,cs};
-    double offset[num_edges] = {x0,x0,y0,y0};
-
-    for (int i=0; i < num_edges; ++i){
-        if (offset[i] + intersects[i]*angles[i] >= 0 &&
-            offset[i] + intersects[i]*angles[i] < bounds[i]){
-            if (u1 == 0) {
-                u1 = intersects[i];
-            } else if( abs(u1 - intersects[i]) > 10){
-                // Prevent lines from being too short or the same
-                // point being used twice
-                u2 = intersects[i];
-            }
-        }
-    }
-}

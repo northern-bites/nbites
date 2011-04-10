@@ -48,6 +48,9 @@ public:
             "\n\tr: " << l.r << " t:" << l.t << " score: " << l.score;
     }
 
+    static void findLineImageIntersects(const HoughLine& line,
+                                        double& u1, double& u2);
+
     bool operator==(const HoughLine &other) const;
     bool operator!=(const HoughLine &other) const;
 

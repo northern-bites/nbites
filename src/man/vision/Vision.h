@@ -100,10 +100,6 @@ public:
     virtual void drawEdges(Gradient& g);
     virtual void drawHoughLines(const std::list<HoughLine>& lines);
 
-    static void findLineEndOffsets(const HoughLine& line,
-                                   const double x0, const double y0,
-                                   double& u1, double& u2);
-
     //
     // SETTERS
     //
@@ -211,16 +207,6 @@ private:
     std::string name;
     int player;
     std::string colorTable;
-
-    enum {
-        top_edge = 0,
-        bottom_edge,
-        left_edge,
-        right_edge,
-        num_edges
-    };
-
-
 };
 
 #endif // _Vision_h_DEFINED
