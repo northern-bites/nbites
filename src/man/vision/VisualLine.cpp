@@ -60,14 +60,13 @@ void VisualLine::findLineEdgeEnds(const HoughLine& line, const Gradient& g,
 
     // Iterate across entire line
     double u;
+    int outX, outY;
     for(u=u1; u <= u2; u += 1.0){
         double x = x0 + u * sn;
         double y = y0 + u * cs;
 
         // Look for first edge points in direction of line
-        if (isLineEdge(line, g,
-                       static_cast<int>(x),
-                       static_cast<int>(y))){
+        if (isLineEdge(line, g, x, y, outX, outY)){
             edgeStreak = max(1, edgeStreak+1);
 
             // Mark first long streak
@@ -79,8 +78,8 @@ void VisualLine::findLineEdgeEnds(const HoughLine& line, const Gradient& g,
 
                     // Mark it (we'll correct ordering later)
                     // note: we want it to be the first point in the streak
-                    r.x = static_cast<int>((u-2.) * sn + x0);
-                    r.y = static_cast<int>((u-2.) * cs + y0);
+                    r.x = outX; //static_cast<int>((u-2.) * sn + x0);
+                    r.y = outY; //static_cast<int>((u-2.) * cs + y0);
                 }
             }
         } else {
@@ -93,16 +92,16 @@ void VisualLine::findLineEdgeEnds(const HoughLine& line, const Gradient& g,
                 foundEnd = true;
 
                 // Mark end of line segment
-                l.x = static_cast<int>((u-2.) * sn + x0);
-                l.y = static_cast<int>((u-2.) * cs + y0);
+                l.x = outX;//static_cast<int>((u-2.) * sn + x0);
+                l.y = outY;//static_cast<int>((u-2.) * cs + y0);
             }
         }
     }
 
     if (!foundEnd){
         // Mark end of line segment
-        l.x = static_cast<int>((u-2.) * sn + x0);
-        l.y = static_cast<int>((u-2.) * cs + y0);
+        l.x = outX; // static_cast<int>((u-2.) * sn + x0);
+        l.y = outY; static_cast<int>((u-2.) * cs + y0);
     }
 
     // Put points in the correct order
@@ -133,19 +132,28 @@ void VisualLine::find3DCoords()
 
 bool VisualLine::isLineEdge(const HoughLine& line,
                             const Gradient& g,
-                            int x0, int y0)
+                            double x0, double y0,
+                            int& _x, int& _y)
 {
     // Look 3 points on either side of line for an edge in the same
     // direction
-    for(int u = -edge_pt_buffer; u <= edge_pt_buffer; ++u){
-        int x = x0 + static_cast<int>(line.getCosT() *
-                                      static_cast<float>(u));
-        int y = y0  - static_cast<int>(line.getSinT() *
-                                       static_cast<float>(u));
-        if (g.peaks[y][x] != -1 &&
-            g.peaks[y][x] > line.getTIndex() - angle_epsilon &&
-            g.peaks[y][x] < line.getTIndex() + angle_epsilon){
-            return true;
+    for(double u = -edge_pt_buffer; u <= edge_pt_buffer; u += 1.0){
+
+        int x = static_cast<int>(line.getCosT() * u + x0);
+        int y = static_cast<int>(line.getSinT() * u + y0);
+
+        if (y < 0 || x < 0 || y > IMAGE_WIDTH || x > IMAGE_WIDTH){
+            continue;
+        }
+
+        if (g.peaks[y][x] != -1){
+            int tDiff = abs(((g.peaks[y][x] - line.getTIndex()) & 0xff)
+                            << 24 >> 24);
+            if(tDiff < angle_epsilon){
+                _x = x;
+                _y = y;
+                return true;
+            }
         }
     }
     return false;

@@ -84,9 +84,9 @@ class YOrder {
 class VisualLine : public VisualLandmark<lineID> {
     // Private constants
     enum {
-        edge_pts_for_line = 3,
-        edge_pt_buffer = 3,
-        angle_epsilon = 3
+        edge_pts_for_line = 6,
+        edge_pt_buffer = 4,
+        angle_epsilon = 5
     };
 
 
@@ -154,7 +154,10 @@ class VisualLine : public VisualLandmark<lineID> {
     void find3DCoords();
     void findLineEdgeEnds(const HoughLine& line, const Gradient& g,
                           point<int>& r, point<int>& l);
-    bool isLineEdge(const HoughLine& line, const Gradient& g, int x0, int y0);
+    bool isLineEdge(const HoughLine& line,
+                    const Gradient& g,
+                    double x0, double y0,
+                    int& _x, int& _y);
 
     void init();
     void calculateWidths();
