@@ -182,6 +182,7 @@ public:
     void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
     void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
     void setDebugHoughTransform(bool _bool) {debugHoughTransform = _bool;}
+    void setDebugVisualLines(bool _bool) {debugVisualLines = _bool;}
 #endif
 
     void initDebugImage();
@@ -288,12 +289,14 @@ private:
     bool debugOpenField;
     bool debugEdgeDetection;
     bool debugHoughTransform;
+    bool debugVisualLines;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;
     static const bool debugOpenField = false;
     static const bool debugEdgeDetection = false;
     static const bool debugHoughTransform = false;
+    static const bool debugVisualLines = false;
 #endif
 };
 

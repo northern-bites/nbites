@@ -44,27 +44,71 @@ void VisualLine::findEndpoints(const HoughLine& a,
 void VisualLine::findLineEdgeEnds(const HoughLine& line, const Gradient& g,
                                  point<int>& r, point<int>& l)
 {
-    // Start in middle at closest point to center
-    int midX = line.getCosT() * line.getRadius() + IMAGE_WIDTH/2;
-    int midY = line.getSinT() * line.getRadius() + IMAGE_HEIGHT/2;
-
-    // Find coordinates of image edge intersections
-    // Find 0 end
-    float invSinT = 1/line.getSinT();
-    float invCosT = 1/line.getCosT();
-
-    float xStart = -midX * invSinT;
-    float yStart = -midY * invCosT;
-    float uStart = min(xStart, yStart);
-
-    // @TODO Is this right?!
-    float xEnd = IMAGE_WIDTH - midX * invSinT;
-    float yEnd = IMAGE_HEIGHT - midY * invCosT;
-    float uEnd = min(xEnd, yEnd);
-
     // Search along line from one end to other keeping track of last
     // runs of edge points. Look for start, then end runs.
+    double u1 = 0, u2 = 0;
+    HoughLine::findLineImageIntersects(line, u1, u2);
 
+    const double x0 = line.getRadius() * line.getCosT() + IMAGE_WIDTH/2;
+    const double y0 = line.getRadius() * line.getSinT() + IMAGE_HEIGHT/2;
+
+    const double cs = -line.getCosT();
+    const double sn = line.getSinT();
+
+    int edgeStreak = 0;
+    bool foundStart = false, foundEnd = false;
+
+    // Iterate across entire line
+    double u;
+    for(u=u1; u <= u2; u += 1.0){
+        double x = x0 + u * sn;
+        double y = y0 + u * cs;
+
+        // Look for first edge points in direction of line
+        if (isLineEdge(line, g,
+                       static_cast<int>(x),
+                       static_cast<int>(y))){
+            edgeStreak = max(1, edgeStreak+1);
+
+            // Mark first long streak
+            if (edgeStreak >= edge_pts_for_line){
+                foundEnd = false;
+
+                if (!foundStart){
+                    foundStart = true;
+
+                    // Mark it (we'll correct ordering later)
+                    // note: we want it to be the first point in the streak
+                    r.x = static_cast<int>((u-2.) * sn + x0);
+                    r.y = static_cast<int>((u-2.) * cs + y0);
+                }
+            }
+        } else {
+            // Keep track of negative streaks too
+            edgeStreak = min(-1, edgeStreak-1);
+
+            // Look for last edge points in a row
+            if (foundStart && !foundEnd &&
+                edgeStreak <= -edge_pts_for_line){
+                foundEnd = true;
+
+                // Mark end of line segment
+                l.x = static_cast<int>((u-2.) * sn + x0);
+                l.y = static_cast<int>((u-2.) * cs + y0);
+            }
+        }
+    }
+
+    if (!foundEnd){
+        // Mark end of line segment
+        l.x = static_cast<int>((u-2.) * sn + x0);
+        l.y = static_cast<int>((u-2.) * cs + y0);
+    }
+
+    // Put points in the correct order
+    if (r.x < l.x){
+        swap(r,l);
+    }
 }
 
 /**
@@ -87,8 +131,25 @@ void VisualLine::find3DCoords()
 
 }
 
-
-
+bool VisualLine::isLineEdge(const HoughLine& line,
+                            const Gradient& g,
+                            int x0, int y0)
+{
+    // Look 3 points on either side of line for an edge in the same
+    // direction
+    for(int u = -edge_pt_buffer; u <= edge_pt_buffer; ++u){
+        int x = x0 + static_cast<int>(line.getCosT() *
+                                      static_cast<float>(u));
+        int y = y0  - static_cast<int>(line.getSinT() *
+                                       static_cast<float>(u));
+        if (g.peaks[y][x] != -1 &&
+            g.peaks[y][x] > line.getTIndex() - angle_epsilon &&
+            g.peaks[y][x] < line.getTIndex() + angle_epsilon){
+            return true;
+        }
+    }
+    return false;
+}
 
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
@@ -139,6 +200,7 @@ VisualLine::VisualLine(list<linePoint> &linePoints)
 
 VisualLine::VisualLine(const VisualLine& other)
     : VisualLandmark<lineID>(other),
+      tr(other.tr), tl(other.tl), br(other.br), bl(other.bl),
       start(other.start), end(other.end), leftBound(other.leftBound),
       rightBound(other.rightBound),
       bottomBound(other.bottomBound),

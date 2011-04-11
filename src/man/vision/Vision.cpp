@@ -137,6 +137,7 @@ void Vision::notifyImage() {
 
     drawEdges(*linesDetector.getEdges());
     drawHoughLines(linesDetector.getHoughLines());
+    drawVisualLines(*linesDetector.getLines());
     PROF_EXIT(profiler, P_VISION);
 }
 
@@ -583,7 +584,7 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
             const double x0 = line->getRadius() * cs + IMAGE_WIDTH/2;
             const double y0 = line->getRadius() * sn + IMAGE_HEIGHT/2;
 
-            for (double u = min(uStart,uEnd); u <= max(uStart, uEnd); u+=1.){
+            for (double u = uStart; u <= uEnd; u+=1.){
                 int x = (int)round(x0 + u * sn);
                 int y = (int)round(y0 - u * cs); // cs goes opposite direction
                 drawDot(x,y, BLUE);
@@ -593,3 +594,13 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
 #endif
 }
 
+void Vision::drawVisualLines(const vector<VisualLine>& lines)
+{
+    if (thresh->debugVisualLines){
+        vector<VisualLine>::const_iterator line;
+        for (line = lines.begin(); line != lines.end(); line++){
+            thresh->drawLine(line->tr, line->tl, MAROON);
+            thresh->drawLine(line->br, line->bl, MAROON);
+        }
+    }
+}

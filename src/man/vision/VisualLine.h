@@ -82,8 +82,18 @@ class YOrder {
 #include "Utility.h"
 
 class VisualLine : public VisualLandmark<lineID> {
+    // Private constants
+    enum {
+        edge_pts_for_line = 3,
+        edge_pt_buffer = 3,
+        angle_epsilon = 3
+    };
+
+
  public: // Constants
-    // number of points to be a valid line
+    // New HoughLine variables
+    point<int> tr, tl, br, bl;  // top right/left, bottom right/left
+
     static const unsigned int NUM_POINTS_TO_BE_VALID_LINE = 3;
 
  public:
@@ -91,13 +101,6 @@ class VisualLine : public VisualLandmark<lineID> {
     VisualLine(std::list<linePoint> &listOfPoints);
     VisualLine();
     VisualLine(const HoughLine& a, const HoughLine& b, const Gradient& g);
-
-    void findEndpoints(const HoughLine& a,
-                       const HoughLine& b,
-                       const Gradient& g);
-    void findDimensions();
-    void find3DCoords();
-
 
     VisualLine(float _dist, float _bearing);
     VisualLine(const VisualLine& other);
@@ -143,6 +146,16 @@ class VisualLine : public VisualLandmark<lineID> {
         }
 
  private: // Member functions
+
+    void findEndpoints(const HoughLine& a,
+                       const HoughLine& b,
+                       const Gradient& g);
+    void findDimensions();
+    void find3DCoords();
+    void findLineEdgeEnds(const HoughLine& line, const Gradient& g,
+                          point<int>& r, point<int>& l);
+    bool isLineEdge(const HoughLine& line, const Gradient& g, int x0, int y0);
+
     void init();
     void calculateWidths();
     const float calculateAngle() const;

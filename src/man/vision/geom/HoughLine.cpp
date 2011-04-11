@@ -55,6 +55,13 @@ bool HoughLine::operator!=(const HoughLine &other) const
     return !(*this == other);
 }
 
+/**
+ * Finds the distance from the perpendicular of a line to the origin
+ * to the edge of an image.
+ *
+ * u1 is the minimum distance value (signed)
+ * u2 is the maximum distance value (signed)
+ */
 void HoughLine::findLineImageIntersects(const HoughLine& line,
                                         double& u1, double& u2)
 {
@@ -98,5 +105,8 @@ void HoughLine::findLineImageIntersects(const HoughLine& line,
                 u2 = intersects[i];
             }
         }
+    }
+    if (u1 > u2){
+        swap(u1,u2);
     }
 }
