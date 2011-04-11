@@ -1,5 +1,13 @@
 /*
- * MessageNode.cpp
+ * ProtoNode.cpp
+ *
+ * @class ProtoNode
+ *
+ * A ProtoNode is either:
+ * * a repeated field node
+ * * a message node
+ * * a repeated field leaf
+ * * a singular field leaf
  *
  *  Created on: Apr 2, 2011
  *      Author: oneamtu
@@ -16,10 +24,10 @@ ProtoNode::ProtoNode(ProtoNode* _parent,
           const FieldDescriptor* _fieldDescriptor,
           const Message* _message) :
     Node(_parent), fieldDescriptor(_fieldDescriptor), message(_message) {
-    if (isMessage() && message == NULL) {
+    if (isMessage() && message == NULL && !isRepeated()) {
 
         const Message* parentM = _parent->getMessage();
-        message = &(parentM->GetReflection()-> GetMessage(*parentM, fieldDescriptor));
+        message = &(parentM->GetReflection()->GetMessage(*parentM, fieldDescriptor));
     }
 }
 
@@ -37,25 +45,25 @@ void ProtoNode::constructTree() {
         ProtoNode* parent = nodes.front();
         nodes.pop_front();
 
-        if (parent->isMessage()) {
-            nodes.append(constructMessageChildren(parent));
-        }
-
         if (parent->isRepeated()) {
-            nodes.append(constructRepeatedChildren(parent));
+            nodes.append(parent->constructRepeatedChildren());
+        } else {
+            if (parent->isMessage()) {
+                nodes.append(parent->constructMessageChildren());
+            }
         }
     }
 }
 
-QList<ProtoNode*> ProtoNode::constructMessageChildren(ProtoNode* parent) {
+QList<ProtoNode*> ProtoNode::constructMessageChildren() {
 
     QList<ProtoNode*> nodes;
-    const Descriptor* d = parent->getMessage()->GetDescriptor();
+    const Descriptor* d = this->getMessage()->GetDescriptor();
     for (int i = 0; i < d->field_count(); i++) {
 
         const FieldDescriptor* childFD = d->field(i);
-        ProtoNode* childNode = new ProtoNode(parent, childFD);
-        parent->addChild(childNode);
+        ProtoNode* childNode = new ProtoNode(this, childFD);
+        this->addChild(childNode);
 
         if (childNode->isMessage() || childNode->isRepeated()) {
             nodes.push_back(childNode);
@@ -64,17 +72,18 @@ QList<ProtoNode*> ProtoNode::constructMessageChildren(ProtoNode* parent) {
     return nodes;
 }
 
-QList<ProtoNode*> ProtoNode::constructRepeatedChildren(ProtoNode* parent) {
+QList<ProtoNode*> ProtoNode::constructRepeatedChildren() {
     QList<ProtoNode*> nodes;
-    for (int i = 0; i < parent->getSizeOfField(); i++) {
-
-        ProtoNode* childNode = new ProtoNode(parent, NULL);
-        parent->addChild(childNode);
-
-        //TODO: these are always false
-        if (childNode->isMessage() || childNode->isRepeated()) {
-            nodes.push_back(childNode);
+    for (int i = 0; i < this->getSizeOfField(); i++) {
+        ProtoNode* childNode;
+        if (this->isMessage()) {
+            const Message* message = this->getRepeatedMessageAt(i);
+            childNode = new ProtoNode(this, NULL, message);
+            nodes.append(childNode);
+        } else {
+            childNode = new ProtoNode(this, NULL);
         }
+        this->addChild(childNode);
     }
     return nodes;
 }
@@ -117,7 +126,7 @@ int ProtoNode::getSizeOfField() const {
 QVariant ProtoNode::getData(int row, int column) const {
     switch(column) {
     case 0 :
-        return getName();
+        return getName(row);
     case 1 :
         return getValue(row);
     default :
@@ -125,13 +134,11 @@ QVariant ProtoNode::getData(int row, int column) const {
     }
 }
 
-QVariant ProtoNode::getName() const {
+QVariant ProtoNode::getName(int index) const {
     if (fieldDescriptor != NULL) {
         return QVariant(fieldDescriptor->name().data());
     } else {
-        const ProtoNode* parent =
-                static_cast<const ProtoNode *>(this->getParent());
-        return parent->getName();
+        return index;
     }
 }
 
@@ -140,7 +147,7 @@ QVariant ProtoNode::getValue(int index) const {
     if (fieldDescriptor == NULL) {
         return getRepeatedChildValue(index);
     }
-    if (!fieldDescriptor->is_repeated()) {
+    if (!isRepeated()) {
         return getSingleValue();
     }
     return QVariant();
@@ -150,6 +157,22 @@ QVariant ProtoNode::getRepeatedChildValue(int index) const {
     const ProtoNode* parent =
                     static_cast<const ProtoNode *>(this->getParent());
             return parent->getSingleValueAt(index);
+}
+
+const Message* ProtoNode::getRepeatedMessageAt(int index) const {
+    if (!this->isRepeated()) {
+        return NULL;
+    }
+
+    const ProtoNode* parent =
+            static_cast<const ProtoNode *> (this->getParent());
+    const Message* parentM = parent->getMessage();
+    if (!parentM) {
+        return NULL;
+    }
+
+    const Reflection* reflection = parentM->GetReflection();
+    return &(reflection->GetRepeatedMessage(*parentM, fieldDescriptor, index));
 }
 
 QVariant ProtoNode::getSingleValueAt(int index) const {

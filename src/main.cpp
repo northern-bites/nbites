@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
     ms->add_body_angles(23.2f);
     ms->add_body_angles(23.2f);
     ms->add_body_angles(23.2f);
+    memory::proto::PSensors::PFSR* pfs = ms->add_fsrs();
+    pfs->set_front_left(23.2f);
     ProtoView::ProtoNode* root = new ProtoView::ProtoNode(NULL, NULL, ms);
     ProtoView::TreeModel messageModel(root);
 

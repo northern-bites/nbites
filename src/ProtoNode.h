@@ -35,16 +35,17 @@ public:
     bool isRepeated() const;
     bool isMessage() const;
     int getSizeOfField() const;
-    QVariant getName() const;
+    QVariant getName(int index) const;
     QVariant getValue(int index) const;
 
     const proto::FieldDescriptor *getFieldDescriptor() const;
     const proto::Message *getMessage() const;
 
 private:
-    QList<ProtoNode*> constructMessageChildren(ProtoNode* parent);
-    QList<ProtoNode*> constructRepeatedChildren(ProtoNode* parent);
+    QList<ProtoNode*> constructMessageChildren();
+    QList<ProtoNode*> constructRepeatedChildren();
     QVariant getRepeatedChildValue(int index) const;
+    const proto::Message* getRepeatedMessageAt(int index) const;
     QVariant getSingleValueAt(int index) const;
     QVariant getSingleValue() const;
 
