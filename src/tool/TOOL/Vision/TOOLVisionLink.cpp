@@ -536,17 +536,20 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 	(JNIEnv * env, jobject jobj, jboolean debugField){
 		vision.thresh->setDebugOpenField(debugField);
 	}
-
     JNIEXPORT void JNICALL
     Java_TOOL_Vision_TOOLVisionLink_cppSetEdgeDetectionDebug
     (JNIEnv * env, jobject jobj, jboolean debugEdgeDetection){
         vision.thresh->setDebugEdgeDetection(debugEdgeDetection);
     }
-
     JNIEXPORT void JNICALL
     Java_TOOL_Vision_TOOLVisionLink_cppSetHoughTransformDebug
     (JNIEnv * env, jobject jobj, jboolean debugHoughTransform){
         vision.thresh->setDebugHoughTransform(debugHoughTransform);
+    }
+    JNIEXPORT void JNICALL
+    Java_TOOL_Vision_TOOLVisionLink_cppSetVisualLinesDebug
+    (JNIEnv * env, jobject jobj, jboolean debugVisualLines){
+        vision.thresh->setDebugVisualLines(debugVisualLines);
     }
 
 #ifdef __cplusplus
