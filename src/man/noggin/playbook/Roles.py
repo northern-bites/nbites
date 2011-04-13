@@ -37,16 +37,15 @@ def rDefender(team, workingPlay):
     if not workingPlay.isRole(PBConstants.DEFENDER):
         team.subRoleSwitchTime = -1
     workingPlay.setRole(PBConstants.DEFENDER)
-    # If the ball is deep in our side, we become a sweeper
     if team.brain.ball.x < PBConstants.SWEEPER_X_THRESH:
         subRoleOnDeck = PBConstants.SWEEPER
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pSweeper(team, workingPlay)
-    elif team.brain.ball.x < PBConstants.STOPPER_X:
+    elif team.brain.ball.x < PBConstants.CENTER_BACK_X_THRESH:
         subRoleOnDeck = PBConstants.CENTER_BACK
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pCenterBack(team, workingPlay)
-    elif team.brain.ball.x < NogginConstants.CENTER_FIELD_X:
+    else:
         subRoleOnDeck = PBConstants.STOPPER
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pStopper(team, workingPlay)

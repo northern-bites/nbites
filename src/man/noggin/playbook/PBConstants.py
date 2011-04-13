@@ -205,22 +205,23 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 24
+NUM_SUB_ROLES = 25
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
 
-                                            #OFFENDER SUB ROLES 2-5
+                                            #OFFENDER SUB ROLES 2-6
                                             "LEFT_WING",
                                             "RIGHT_WING",
                                             "STRIKER",
                                             "FORWARD",
+                                            "PICKER",
 
-                                            # MIDDIE SUB ROLES 6-8
+                                            # MIDDIE SUB ROLES 7-9
                                             "DEFENSIVE_MIDDIE",
                                             "OFFENSIVE_MIDDIE",
                                             "DUB_D_MIDDIE",
 
-                                            # DEFENDER SUB ROLES 9-14
+                                            # DEFENDER SUB ROLES 10-15
                                             "STOPPER",
                                             "SWEEPER",
                                             "CENTER_BACK",
@@ -228,18 +229,18 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "LEFT_DEEP_BACK",
                                             "RIGHT_DEEP_BACK",
 
-                                            # CHASER SUB ROLES 15
+                                            # CHASER SUB ROLES 16
                                             "CHASE_NORMAL",
 
-                                            # GOALIE SUB ROLE 16-17
+                                            # GOALIE SUB ROLE 17-18
                                             "GOALIE_NORMAL",
                                             "GOALIE_CHASER",
 
-                                            # KICKOFF SUB ROLES 18-19
+                                            # KICKOFF SUB ROLES 19-20
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 20-23
+                                            # READY SUB ROLES 21-24
                                             "READY_GOALIE",
                                             "READY_CHASER",
                                             "READY_DEFENDER",
@@ -252,6 +253,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  RIGHT_WING,
  STRIKER,
  FORWARD,
+ PICKER,
 
  DEFENSIVE_MIDDIE,
  OFFENSIVE_MIDDIE,
@@ -385,15 +387,15 @@ SWEEPER_X_THRESH = NogginConstants.MY_GOALBOX_RIGHT_X + 90.
 SWEEPER_X = NogginConstants.MY_GOALBOX_RIGHT_X + 25.
 SWEEPER_Y = NogginConstants.CENTER_FIELD_Y
 SWEEPER_Y_OFFSET = 20.
-STOPPER_X = NogginConstants.CENTER_FIELD_X - NogginConstants.CENTER_CIRCLE_RADIUS - 90.
-STOPPER_Y_OFFSET = 90.0
+STOPPER_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[0]
+STOPPER_Y_OFFSET = 70.0
 MIN_STOPPER_Y = NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y + STOPPER_Y_OFFSET
 MAX_STOPPER_Y = NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y - STOPPER_Y_OFFSET
-CENTER_BACK_X_THRESH = NogginConstants.CENTER_FIELD_X - NogginConstants.CENTER_CIRCLE_RADIUS
+CENTER_BACK_X_THRESH = NogginConstants.CENTER_FIELD_X
 CENTER_BACK_MAX_X = STOPPER_X
 CENTER_BACK_MIN_X = SWEEPER_X
-MAX_CENTER_BACK_Y = NogginConstants.CENTER_FIELD_Y + 75.
-MIN_CENTER_BACK_Y = NogginConstants.CENTER_FIELD_Y - 75.
+MIN_CENTER_BACK_Y = NogginConstants.MY_GOALBOX_BOTTOM_Y
+MAX_CENTER_BACK_Y = NogginConstants.MY_GOALBOX_TOP_Y
 
 # Dub_d
 DEEP_BACK_X = SWEEPER_X
@@ -402,8 +404,9 @@ LEFT_DEEP_BACK_Y = NogginConstants.MY_GOALBOX_TOP_Y + 40.
 
 # Offender
 FORWARD_X = NogginConstants.CENTER_FIELD_X + NogginConstants.CENTER_CIRCLE_RADIUS + 90
-LEFT_FORWARD_Y = NogginConstants.OPP_GOALBOX_TOP_Y
-RIGHT_FORWARD_Y = NogginConstants.OPP_GOALBOX_BOTTOM_Y
+FORWARD_Y_OFFSET = 70.0
+LEFT_FORWARD_Y = NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y - FORWARD_Y_OFFSET
+RIGHT_FORWARD_Y = NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y + FORWARD_Y_OFFSET
 STRIKER_X_THRESH = NogginConstants.CENTER_FIELD_X - NogginConstants.CENTER_CIRCLE_RADIUS
 STRIKER_X = NogginConstants.OPP_GOALBOX_X - 25
 LEFT_STRIKER_Y = NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y
@@ -420,7 +423,7 @@ PICKER_Y = NogginConstants.CENTER_FIELD_Y
 
 # Middie Positions
 MIDDIE_X_OFFSET = 50.0
-MIDDIE_Y_OFFSET = 75.0
+MIDDIE_Y_OFFSET = 45.0
 MIN_MIDDIE_Y = NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y + MIDDIE_Y_OFFSET
 MAX_MIDDIE_Y = NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y - MIDDIE_Y_OFFSET
 DEFENSIVE_MIDDIE_X = NogginConstants.CENTER_FIELD_X - MIDDIE_X_OFFSET

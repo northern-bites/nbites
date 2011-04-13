@@ -204,19 +204,28 @@ def fReady(team, workingPlay):
     workingPlay.setFormation(PBConstants.READY_FORMATION)
     if team.me.isDefaultGoalie():
         Roles.rGoalie(team, workingPlay)
-    elif team.numActiveFieldPlayers >= 2:
-        if team.me.isDefaultDefender():
+    elif team.numActiveFieldPlayers == 1:
+        workingPlay.setRole(PBConstants.CHASER)
+        SubRoles.pReadyChaser(team, workingPlay)
+    elif team.numActiveFieldPlayers == 2:
+        highNumber = team.highestActivePlayerNumber()
+        if team.me.playerNumber == highNumber:
+            workingPlay.setRole(PBConstants.CHASER)
+            SubRoles.pReadyChaser(team, workingPlay)
+        else:
+            workingPlay.setRole(PBConstants.DEFENDER)
+            SubRoles.pReadyDefender(team, workingPlay)
+    else:
+        highNumber = team.highestActivePlayerNumber()
+        if team.me.playerNumber == highNumber:
+            workingPlay.setRole(PBConstants.CHASER)
+            SubRoles.pReadyChaser(team, workingPlay)
+        elif team.me.isDefaultDefender():
             workingPlay.setRole(PBConstants.DEFENDER)
             SubRoles.pReadyDefender(team, workingPlay)
         elif team.me.isDefaultOffender():
             workingPlay.setRole(PBConstants.OFFENDER)
             SubRoles.pReadyOffender(team, workingPlay)
-        elif team.me.isDefaultChaser():
-            workingPlay.setRole(PBConstants.CHASER)
-            SubRoles.pReadyChaser(team, workingPlay)
-    else:
-        workingPlay.setRole(PBConstants.CHASER)
-        SubRoles.pReadyChaser(team, workingPlay)
 
 
 #### Test Formations ####

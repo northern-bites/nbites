@@ -174,7 +174,7 @@ def pOffensiveMiddie(team, workingPlay):
                     PBConstants.MAX_MIDDIE_Y)
     h = team.brain.ball.heading
 
-    pos = (PBConstants.OFFENSIVE_MIDDIE_POS_X, y, h)
+    pos = (PBConstants.OFFENSIVE_MIDDIE_X, y, h)
     workingPlay.setPosition(pos)
 
 def pDubDMiddie(team, workingPlay):
@@ -183,8 +183,7 @@ def pDubDMiddie(team, workingPlay):
     y = MyMath.clip(team.brain.ball.y,
                     PBConstants.MIN_MIDDIE_Y,
                     PBConstants.MAX_MIDDIE_Y)
-    x = MyMath.clip(team.brain.ball.x + 150, NogginConstants.GREEN_PAD_X,
-                         NogginConstants.CENTER_FIELD_X)
+    x = PBConstants.OFFSENSIVE_MIDDIE_X
     h = team.brain.ball.heading
 
     pos = (x, y, h)
