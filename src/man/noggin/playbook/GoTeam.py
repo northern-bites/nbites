@@ -46,7 +46,7 @@ class GoTeam:
 
         if self.brain.gameController.currentState == 'gameReady':
             # Change which wing is forward based on the opponents score
-            self.kickoffFormation = (self.brain.gameController.theirTeam.teamScore)%2
+            self.kickoffFormation = (self.brain.gameController.gc.teams(self.brain.my.teamColor)[1])%2
 
         play.changed = False
         self.strategize(play)
@@ -435,53 +435,53 @@ class GoTeam:
     ############   Positioning Stuff     #################
     ######################################################
 
-def getPointBetweenBallAndGoal(self, ball, dist_from_ball):
-    """returns defensive position between ball (x,y) and goal (x,y)
-    at <dist_from_ball> centimeters away from ball"""
-    delta_y = ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
-    delta_x = ball.x - NogginConstants.MY_GOALBOX_LEFT_X
+    def getPointBetweenBallAndGoal(self, ball, dist_from_ball):
+        """returns defensive position between ball (x,y) and goal (x,y)
+        at <dist_from_ball> centimeters away from ball"""
+        delta_y = ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
+        delta_x = ball.x - NogginConstants.MY_GOALBOX_LEFT_X
 
-    # don't divide by 0
-    if delta_x == 0:
-        delta_x = 0.001
-    if delta_y == 0:
-        delta_y = 0.001
+        # don't divide by 0
+        if delta_x == 0:
+            delta_x = 0.001
+        if delta_y == 0:
+            delta_y = 0.001
 
-    pos_x = ball.x - ( dist_from_ball/
-                       hypot(delta_x,delta_y) )*delta_x
-    pos_y = ball.y - ( dist_from_ball/
-                       hypot(delta_x,delta_y) )*delta_y
+        pos_x = ball.x - ( dist_from_ball/
+                           hypot(delta_x,delta_y) )*delta_x
+        pos_y = ball.y - ( dist_from_ball/
+                           hypot(delta_x,delta_y) )*delta_y
 
-    return pos_x,pos_y
+        return pos_x,pos_y
 
-def fancyGoaliePosition(self):
-    """returns a goalie position using ellipse"""
+    def fancyGoaliePosition(self):
+        """returns a goalie position using ellipse"""
 
-    position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y)
+        position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y)
 
-    # lets try maintaining home position until the ball is closer in
-    # might help us stay localized better
-    ball = self.brain.ball
-    if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
-        # Use an ellipse just above the goalline to determine x and y position
-        # We get the angle from goal center to the ball to determine our X,Y
-        theta = atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
-                       ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
+        # lets try maintaining home position until the ball is closer in
+        # might help us stay localized better
+        ball = self.brain.ball
+        if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
+            # Use an ellipse just above the goalline to determine x and y position
+            # We get the angle from goal center to the ball to determine our X,Y
+            theta = atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
+                           ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
 
-        thetaDeg = PBConstants.RAD_TO_DEG * theta
+            thetaDeg = PBConstants.RAD_TO_DEG * theta
 
-        # Clip the angle so that the (x,y)-coordinate is not too close to the posts
-        if PBConstants.ELLIPSE_ANGLE_MIN > MyMath.sub180Angle(thetaDeg):
-            theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
-        elif PBConstants.ELLIPSE_ANGLE_MAX < MyMath.sub180Angle(thetaDeg):
-            theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
+            # Clip the angle so that the (x,y)-coordinate is not too close to the posts
+            if PBConstants.ELLIPSE_ANGLE_MIN > MyMath.sub180Angle(thetaDeg):
+                theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
+            elif PBConstants.ELLIPSE_ANGLE_MAX < MyMath.sub180Angle(thetaDeg):
+                theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
 
         # Determine X,Y of ellipse based on theta, set heading on the ball
         x, y = self.ellipse.getPositionFromTheta(theta)
         h = ball.heading
         position = (x,y,h)
 
-    return position
+        return position
 
 
 
@@ -493,19 +493,19 @@ def fancyGoaliePosition(self):
         """FSA print function that allows colors to be specified"""
         if printingColor == 'red':
             self.brain.out.printf(RED_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         elif printingColor == 'blue':
             self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         elif printingColor == 'yellow':
             self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         elif printingColor == 'cyan':
             self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         elif printingColor == 'purple':
             self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         else:
             self.brain.out.printf(str(outputString))
 

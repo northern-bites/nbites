@@ -108,9 +108,9 @@ def pPicker(team, workingPlay):
 def pLeftWing(team, workingPlay):
     """position left winger"""
     workingPlay.setSubRole(PBConstants.LEFT_WING)
-    midpoint = (PBConstants.WING_MAX_X - PBConstants.WING_MAX_Y)*.5
+    midpoint = (PBConstants.WING_MAX_X - PBConstants.WING_MAX_X)*.5
     scale = (PBConstants.WING_MAX_X - midpoint)/(PBConstants.PICKER_X_THRESH - midpoint)
-    x = -1*scale(team.brain.ball.x - midpoint)
+    x = -1*scale*(team.brain.ball.x - midpoint)
     y = PBConstants.LEFT_WING_Y
     h = team.brain.ball.heading
 
@@ -120,9 +120,9 @@ def pLeftWing(team, workingPlay):
 def pRightWing(team, workingPlay):
     """position right winger"""
     workingPlay.setSubRole(PBConstants.RIGHT_WING)
-    midpoint = (PBConstants.WING_MAX_X - PBConstants.WING_MAX_Y)*.5
+    midpoint = (PBConstants.WING_MAX_X - PBConstants.WING_MAX_X)*.5
     scale = (PBConstants.WING_MAX_X - midpoint)/(PBConstants.PICKER_X_THRESH - midpoint)
-    x = -1*scale(team.brain.ball.x - midpoint)
+    x = -1*scale*(team.brain.ball.x - midpoint)
     y = PBConstants.RIGHT_WING_Y
     h = team.brain.ball.heading
 
