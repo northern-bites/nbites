@@ -39,9 +39,10 @@
 #include "Sensors.h"
 #include "Vision.h"
 #include "Noggin.h"
-#include "Comm.h" 
+#include "Comm.h"
 #include "Motion.h"
 #include "NaoPose.h"
+#include "memory/Memory.hpp"
 #include "synchro.h"
 #include "RoboGuardian.h"
 #include "PyRoboGuardian.h"
@@ -115,6 +116,7 @@ public:
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
+    boost::shared_ptr<memory::Memory> memory;
 #ifdef USE_NOGGIN
     boost::shared_ptr<Noggin> noggin;
 #endif// USE_NOGGIN

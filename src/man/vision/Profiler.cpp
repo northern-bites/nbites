@@ -36,6 +36,10 @@ static const char *PCOMPONENT_NAMES[] = {
   "Fit Unused",
   "Intersect Lines",
 
+  "MemoryVision",
+  "MemoryVisionSensors",
+  "MemoryMotionSensors",
+
   "Python",
   "PyUpdate",
   "PyRun",
@@ -84,6 +88,10 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 	/*P_JOIN_LINES,				--> */ P_LINES,
 	/*P_FIT_UNUSED,				--> */ P_LINES,
 	/*P_INTERSECT_LINES,		--> */ P_LINES,
+
+	/*P_MEMORY_VISION,          --> */ P_FINAL,
+	/*P_MEMORY_VISION_SENSORS,  --> */ P_FINAL,
+	/*P_MEMORY_MOTION_SENSORS,  --> */ P_FINAL,
 
 	/*P_PYTHON					--> */ P_FINAL,
 	/*P_PYUPDATE				--> */ P_PYTHON,
