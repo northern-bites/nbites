@@ -340,13 +340,13 @@ smoothLoop:
 
         ## Add mm0= |00+10|01+11|02+12|03+13|
         ##     mm1= |01+11|02+12|03+13|04+14|
-        paddw   mm0, [esi + yPitch]
-        paddw   mm1, [esi + yPitch + 2]
+        paddusw   mm0, [esi + yPitch]
+        paddusw   mm1, [esi + yPitch + 2]
 
         ## Sum to get final values
         ## Add mm0= | 00+10+ | 01+11+ | 02+12+ | 03+13+ |
         ##          | 01+11  | 02+12  | 03+13  | 04+14  |
-        paddw   mm0, mm1
+        paddusw   mm0, mm1
 
         # subtract threshold (mm7), force to 0 if below threshold
         psubusw mm0, mm7
