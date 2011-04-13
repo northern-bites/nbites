@@ -6,7 +6,6 @@
 
 #include "MemoryMacros.hpp"
 #include "MVision.hpp"
-#include <list>
 
 namespace memory {
 

@@ -24,6 +24,7 @@ class Memory; //forward declaration
 #include "Vision.h"
 #include "MSensors.hpp"
 #include "Sensors.h"
+#include "Profiler.h"
 
 namespace memory {
 
@@ -32,8 +33,9 @@ using boost::shared_ptr;
 class Memory {
 
 public:
-    Memory(shared_ptr<Vision> vision_ptr,
-           shared_ptr<Sensors> sensors_ptr);
+    Memory( shared_ptr<Profiler> profiler_ptr,
+            shared_ptr<Vision> vision_ptr,
+            shared_ptr<Sensors> sensors_ptr);
     ~Memory();
     /**
      * calls the update function on @obj
@@ -57,7 +59,10 @@ public:
 public:
     MVision* mvision;
     MSensors* msensors;
-
+    //TODO: make this return a const poitner
     MSensors* getMSensors() const {return msensors;}
+
+private:
+    shared_ptr<Profiler> _profiler;
 };
 }

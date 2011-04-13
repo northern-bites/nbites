@@ -48,7 +48,7 @@ message PMotionSensors {
 	optional float chest_button = 9;
 
 	optional uint32 support_foot = 10;
-	optional uint32 unfiltered_inertial = 11;
+
 }
 
 message PVisionSensors {
