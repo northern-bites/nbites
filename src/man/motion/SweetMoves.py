@@ -8,6 +8,19 @@ SWEET_MOVE_LENGTH = 7
 CHAIN_MOVE_LENGTH = 5
 
 
+#==============================================================================
+#
+# Joint chains are in the following order:
+#
+# ((LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll),
+#  (LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll),
+#  (RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll),
+#  (RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll))
+#
+# Each SweetMove is a tuple of one of these ^ tuples.
+#
+#==============================================================================
+
 #===============================================================================
 #   CODE FROM BURST-ISRAEL ROBOCUP 2009
 #
