@@ -14,6 +14,7 @@
 #include "MObject.hpp"
 #include "MVisionSensors.hpp"
 #include "MMotionSensors.hpp"
+#include "MImage.hpp"
 
 #include "Sensors.h"
 #include "Profiler.h"
@@ -23,7 +24,7 @@
 
 namespace memory {
 class MSensors: public MMotionSensors, public MVisionSensors,
-    public Subscriber {
+    public MImage, public Subscriber {
 
 public:
     /**

@@ -39,6 +39,7 @@ static const char *PCOMPONENT_NAMES[] = {
   "MemoryVision",
   "MemoryVisionSensors",
   "MemoryMotionSensors",
+  "MemoryImage",
 
   "Python",
   "PyUpdate",
@@ -92,6 +93,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 	/*P_MEMORY_VISION,          --> */ P_FINAL,
 	/*P_MEMORY_VISION_SENSORS,  --> */ P_FINAL,
 	/*P_MEMORY_MOTION_SENSORS,  --> */ P_FINAL,
+	/*P_MEMORY_IMAGE,           --> */ P_FINAL,
 
 	/*P_PYTHON					--> */ P_FINAL,
 	/*P_PYUPDATE				--> */ P_PYTHON,

@@ -40,7 +40,8 @@ class Sensors;
 
 enum SENSORS_EVENT {
     NEW_MOTION_SENSORS = 1,
-    NEW_VISION_SENSORS
+    NEW_VISION_SENSORS,
+    NEW_IMAGE
 };
 
 struct FSR {

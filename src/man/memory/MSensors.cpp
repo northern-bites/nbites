@@ -14,7 +14,7 @@ using boost::shared_ptr;
 using namespace std;
 
 MSensors::MSensors(shared_ptr<Profiler> p, shared_ptr<Sensors> s) :
-        _profiler(p), MMotionSensors(s), MVisionSensors(s) {
+        MMotionSensors(s), MVisionSensors(s), MImage(s), _profiler(p) {
 }
 
 MSensors::~MSensors() {
@@ -34,6 +34,13 @@ void MSensors::update(const ProviderEvent e) {
         this->MVisionSensors::update();
         this->MVisionSensors::log();
         PROF_EXIT(_profiler.get(), P_MEMORY_VISION_SENSORS);
+    }
+
+    if (e.getType() == NEW_IMAGE) {
+        PROF_ENTER(_profiler.get(), P_MEMORY_IMAGE);
+        this->MVisionSensors::update();
+        this->MVisionSensors::log();
+        PROF_EXIT(_profiler.get(), P_MEMORY_IMAGE);
     }
 }
 }

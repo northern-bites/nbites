@@ -774,6 +774,7 @@ const uint8_t* Sensors::getColorImage() const
 void Sensors::setNaoImage(const uint8_t *img)
 {
     naoImage = img;
+    this->notify(ProviderEvent(this, NEW_IMAGE));
 }
 
 void Sensors::setImage (const uint16_t *img)

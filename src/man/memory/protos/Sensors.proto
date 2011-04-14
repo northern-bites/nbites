@@ -55,8 +55,6 @@ message PVisionSensors {
 
 	optional uint64 timestamp = 1;
 
-	optional bytes image = 2;
-
 	repeated float vision_body_angles = 3;
 	optional PSensors.PFootBumper left_foot_bumper = 4;
 	optional PSensors.PFootBumper right_foot_bumper = 5;
@@ -69,4 +67,11 @@ message PVisionSensors {
 	optional float battery_charge = 8;
 	optional float battery_current = 9;
 
+}
+
+message PImage {
+
+	optional uint64 timestamp = 1;
+
+	optional bytes image = 2;
 }

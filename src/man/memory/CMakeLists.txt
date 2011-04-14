@@ -48,6 +48,7 @@ set( MEMORY_SRCS Memory
                  MSensors
                  MVisionSensors
                  MMotionSensors
+                 MImage
                  )
 ############################ (SUB)DIRECTORY COMPILATION
 # add the protobuffer C++ source subdirectory
