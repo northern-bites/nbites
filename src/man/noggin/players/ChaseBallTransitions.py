@@ -43,6 +43,12 @@ def shouldPositionForKick(player):
             constants.BALL_PFK_MIN_X and \
             fabs(ball.bearing) < constants.BALL_PFK_BEARING_THRESH)
 
+def shouldSpinToBallClose(player):
+    ball = player.brain.ball
+    return ball.on and \
+        ball.dist < constants.SHOULD_STOP_DIST and \
+        ball.bearing > constants.SHOULD_STOP_BEARING
+
 def shouldStopAndKick(player):
     """
     Ball is in the correct position to kick but we aren't stopped

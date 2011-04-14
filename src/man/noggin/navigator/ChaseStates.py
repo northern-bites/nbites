@@ -66,14 +66,11 @@ def walkSpinToBall(nav):
     nav.dest.h = ball.heading
     nav.dest.relH = ball.bearing
 
-    if navTrans.atDestinationCloserAndFacing(nav.brain.my,
-                                             nav.dest,
-                                             ball.bearing):
-        return nav.goNow('stop')
-
     # Set our walk towards the ball
-    walkX, walkY, walkTheta = \
-           walker.getOmniWalkParam(nav.brain.my, nav.dest)
+    if (nav.dest.dist > constants.OMNI_WALK_DIST_THRESH):
+        walkX, walkY, walkTheta = walker.getWalkStraightParam(nav.brain.my, nav.dest)
+    else:
+        walkX, walkY, walkTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
 
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 

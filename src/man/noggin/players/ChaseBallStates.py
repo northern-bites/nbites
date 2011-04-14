@@ -2,6 +2,7 @@
 Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
+import ChaseBallConstants as constants
 import GoalieTransitions as goalTran
 from ..playbook.PBConstants import GOALIE
 from .. import NogginConstants as nogginConstants
@@ -37,6 +38,8 @@ def goalieChase(player):
     # Check in order of importance
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
+    elif transitions.shouldSpinToBallClose(player):
+        return player.goNow('spinToBallClose')
     elif transitions.shouldStopAndKick(player):
         return player.goNow('stopBeforeKick')
     elif transitions.shouldPositionForKick(player):
@@ -68,6 +71,9 @@ def approachBall(player):
     elif transitions.shouldDribble(player):
         return player.goNow('dribble')
 
+    elif transitions.shouldSpinToBallClose(player):
+        return player.goNow('spinToBallClose')
+
     elif transitions.shouldStopAndKick(player):
         return player.goNow('stopBeforeKick')
 
@@ -92,6 +98,22 @@ def stopBeforeKick(player):
         player.stopWalking()
 
     if player.brain.nav.isStopped():
+        return player.goNow('decideKick')
+
+    return player.stay()
+
+def spinToBallClose(player):
+    """
+    If the ball is really close to us, but we aren't facing it yet,
+    stop and spin toward it, then decide your kick.
+    """
+    player.brain.tracker.trackBall()
+
+    if player.brain.ball.bearing > constants.SHOULD_STOP_BEARING:
+        spinDir = player.brain.my.spinDirToPoint(player.brain.ball)
+        player.setWalk(0, 0, spinDir*constants.BALL_SPIN_SPEED)
+    else:
+        player.stopWalking()
         return player.goNow('decideKick')
 
     return player.stay()
