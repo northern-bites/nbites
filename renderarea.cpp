@@ -13,7 +13,6 @@ RenderArea::RenderArea(RoboImage r1, QLabel *inf, QWidget *parent)
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     setMouseTracking(true);
-    //r.read("/Users/ericchown/nbites/data/frames/graz/ballDist/1.NBFRM");
 }
 
 void RenderArea::mouseMoveEvent(QMouseEvent *event) {
@@ -189,7 +188,7 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
             }
             QColor col(red, green, blue);
             painter.setPen(col);
-            draw.setCoords(j * 2, i * 2, j* 2 + 1, i * 2 + 1);
+            draw.setCoords(j, i, j + 1, i + 1);
             painter.fillRect(draw, col);
         }
     }

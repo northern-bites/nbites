@@ -1,3 +1,13 @@
+/*  ColorTable class.  There are several things we need to do in this class.
+    1. Read the old color tables and convert them to the newest format.
+    Currently that means going from a number for each color to a bit for each
+    primary color.  That allows bit operations on the tables.
+    2. Write new color tables based upon the parameters set in the UI.
+
+    Our color table is currently a 128x128x128 table accessed by a pixel's
+    yuv value (in the order
+  */
+
 #include "colortable.h"
 
 ColorTable::ColorTable()
@@ -62,20 +72,127 @@ void ColorTable::read(QString filename)
             for (int z = 0; z < 128; z++)
             {
                 temp = file.read(1);
-                table[y][x][z] = temp[0];
+                switch(temp[0])
+                {
+                case 0:
+                    table[y][x][z] = UNDEFINED;
+                    break;
+                case 1:
+                    table[y][x][z] = WHITE;
+                    break;
+                case 2:
+                    table[y][x][z] = GREEN;
+                    break;
+                case 3:
+                    table[y][x][z] = BLUE;
+                    break;
+                case 4:
+                    table[y][x][z] = YELLOW;
+                    break;
+                case 5:
+                    table[y][x][z] = ORANGE;
+                    break;
+                case 6:
+                    table[y][x][z] = YELLOW & WHITE;
+                    break;
+                case 7:
+                    table[y][x][z] = BLUE & GREEN;
+                    break;
+                case 8:
+                    table[y][x][z] = ORANGE & PINK;
+                    break;
+                case 9:
+                    table[y][x][z] = ORANGE & YELLOW;
+                case 10:
+                    table[y][x][z] = PINK;
+                    break;
+                case 11:
+                    table[y][x][z] = NAVY;
+                    break;
+                default:
+                    table[y][x][z] = UNDEFINED;
+                    break;
+                }
             }
         }
     }
     file.close();
-    Stats** stats = colorStats();
+    /*Stats** stats = colorStats();
     for (int i = 0; i < mainColors; i++)
     {
         for (int j = 0; j < 3; j++)
         {
             stats[j][i].print(i, j);
         }
-    }
+    }*/
     enabled = true;
+    /*filename.chop(4);
+    writeNewFormat(filename);*/
+}
+
+void ColorTable::writeNewFormat(QString filename)
+{
+    QFile file(filename);
+    QTextStream out(stdout);
+    QByteArray temp;
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        out << "The file would not open properly" << "\n";
+        enabled = false;
+        return;
+    }
+    for (int y = 0; y < 128; ++y)
+    {
+        for (int x = 0; x < 128; x ++)
+        {
+            for (int z = 0; z < 128; z++)
+            {
+                switch(table[y][x][z])
+                {
+                case 0:
+                    temp[0] = UNDEFINED;
+                    break;
+                case 1:
+                    temp[0] = WHITE;
+                    break;
+                case 2:
+                    temp[0] = GREEN;
+                    break;
+                case 3:
+                    temp[0] = BLUE;
+                    break;
+                case 4:
+                    temp[0] = YELLOW;
+                    break;
+                case 5:
+                    temp[0] = ORANGE;
+                    break;
+                case 6:
+                    temp[0] = YELLOW & WHITE;
+                    break;
+                case 7:
+                    temp[0] = BLUE & GREEN;
+                    break;
+                case 8:
+                    temp[0] = ORANGE & PINK;
+                    break;
+                case 9:
+                    temp[0] = ORANGE & YELLOW;
+                case 10:
+                    temp[0] = PINK;
+                    break;
+                case 11:
+                    temp[0] = NAVY;
+                    break;
+                default:
+                    temp[0] = UNDEFINED;
+                    break;
+                }
+                file.write(temp);
+            }
+        }
+    }
+    file.close();
 }
 
 int ColorTable::tableIndex(int high7, int mid7, int low7)
@@ -91,13 +208,32 @@ unsigned ColorTable::index(int y, int u, int v)
 
 int ColorTable::getUpdatedColor(int y, int u, int v)
 {
-    int temp = index(y, u, v);
+    unsigned temp = index(y, u, v);
+    switch (temp)
+    {
+    case UNDEFINED:
+        return Black;
+    case WHITE:
+        return White;
+    case GREEN:
+        return Green;
+    case YELLOW:
+        return Yellow;
+    case BLUE:
+        return Blue;
+    case ORANGE:
+        return Orange;
+    default:
+        return Black;
+    }
+
+    /*int temp = index(y, u, v);
     while (temp < 0)
     {
         temp = 256 + temp;
     }
     temp = temp % 256;
-    return colormap[0][temp];
+    return colormap[0][temp];*/
 }
 
 Stats** ColorTable::colorStats()

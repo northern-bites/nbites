@@ -12,7 +12,7 @@
 
 ColorCreator::ColorCreator(QWidget *parent) :
     QWidget(parent),
-    roboimage(320, 240),
+    roboimage(WIDTH, HEIGHT),
     imageWindow(roboimage),
     ui(new Ui::ColorCreator)
 {
@@ -145,19 +145,19 @@ ColorCreator::~ColorCreator()
 
 void ColorCreator::updateDisplays()
 {
-    RoboImage::DisplayModes mode = RoboImage::Color;
+    /*RoboImage::DisplayModes mode = RoboImage::Color;
     QImage img = roboimage.fast();
     QPixmap display;
     display.convertFromImage(img);
-    ui->BaseImage->setPixmap(display);
+    //ui->BaseImage->setPixmap(display);*/
     imageWindow.show();
     imageWindow.repaint();
     QString next;
     next.setNum(currentFrameNumber+1, 10);
     QString prev;
     prev.setNum(currentFrameNumber-1, 10);
-    nextFrame = currentDirectory + "/" + next + ".NBFRM";
-    previousFrame = currentDirectory + "/" + prev + ".NBFRM";
+    nextFrame = currentDirectory + "/" + next + EXTENSION;
+    previousFrame = currentDirectory + "/" + prev + EXTENSION;
     haveFile = true;
     QTextStream out(stdout);
     updateThresh();
@@ -228,14 +228,14 @@ void ColorCreator::updateThresh()
     if (haveFile)
     {
         // we draw by using a QImage - turn it into a Pixmap, then put it on a label
-        QImage img(320, 240, QImage::Format_RGB32);
+        QImage img(WIDTH, HEIGHT, QImage::Format_RGB32);
         bool display;
         bool stats = false;
         QColor c;
         initStats();
-        for (int i = 0; i < 320; i++)
+        for (int i = 0; i < WIDTH; i++)
         {
-            for (int j = 0; j < 240; j++)
+            for (int j = 0; j < HEIGHT; j++)
             {
                 bool looping = true;
                 int start = Orange;
@@ -371,7 +371,7 @@ void ColorCreator::on_pushButton_clicked()
 {
     currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
                                             currentDirectory,
-                                            tr("Image Files (*.NBFRM)"));
+                                            tr("Image Files (*.frm)"));
     roboimage.read(currentDirectory);
     int last = currentDirectory.lastIndexOf("/");
     int period = currentDirectory.lastIndexOf(".") - last - 1;

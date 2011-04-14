@@ -7,7 +7,21 @@
 #include "window.h"
 #include "coloredit.h"
 #include "colortable.h"
+#define  NEWFRAMES
+#ifdef   NEWFRAMES
 #define  COLORS 8
+#define  WIDTH 640
+#define  HEIGHT 480
+#define  EXTENSION ".frm"
+#define  EXTENSIONLENGTH = 4
+#else
+#define  COLORS 8
+#define  WIDTH 320
+#define  HEIGHT 240
+#define  EXTENSION ".NBFRM"
+#define  EXTENSIONLENGTH = 6
+#endif
+
 
 namespace Ui {
     class ColorCreator;
