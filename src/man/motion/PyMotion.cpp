@@ -257,13 +257,13 @@ private:
 
 class PyCoordHeadCommand {
 public:
-  PyCoordHeadCommand( const float _x, const float _y, const float _z, NaoPose pose ) {
-    command = new CoordHeadCommand(_x,_y,_z,pose);
+  PyCoordHeadCommand( const float _x, const float _y, const float _z, const float relX, const float relY, const float relZ) {
+    command = new CoordHeadCommand(_x,_y,_z,relX,relY,relZ);
     }
-  PyCoordHeadCommand( const float _x, const float _y, const float _z, NaoPose pose,
+  PyCoordHeadCommand( const float _x, const float _y, const float _z, const float relX, const float relY, const float relZ,
                         const float maxYawSpeed,
                         const float maxPitchSpeed ) {
-    command = new CoordHeadCommand( _x, _y, _z, pose,
+    command = new CoordHeadCommand( _x, _y, _z, relX, relY, relZ,
 				    maxYawSpeed, maxPitchSpeed );
     }
 
@@ -406,11 +406,11 @@ BOOST_PYTHON_MODULE(_motion)
         ;
 
     class_<PyCoordHeadCommand>("CoordHeadCommand",
-			       init<float, float, float, NaoPose>
-			       (args("relX", "relY", "relZ", "pose"),
+			       init<float, float, float, float, float, float>
+			       (args("relX", "relY", "relZ", "poseX", "poseY", "poseZ"),
 								"A container for a coord head command."))
-      .def(init<float, float, float, NaoPose, float, float> (
-							     args( "relX", "relY", "relZ", "pose", "maxYawSpeed", "maxPitchSpeed")))
+      .def(init<float, float, float, float, float, float, float, float> (
+									 args( "relX", "relY", "relZ", "relX", "relY", "relZ", "maxYawSpeed", "maxPitchSpeed")))
 		;
 
     class_<PyWalkCommand>("WalkCommand",

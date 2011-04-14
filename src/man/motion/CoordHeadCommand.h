@@ -34,14 +34,18 @@ class CoordHeadCommand : public SetHeadCommand
 		  //_x, _y relative to robot center
 		  const float _z,
 		  //_z relative to ground
-		  NaoPose pose,
+		  //	  NaoPose pose,
+		  const float poseX, const float poseY, const float poseZ,
 		  const float _maxSpeedYaw =
 		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
 		  const float _maxSpeedPitch = 
 		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		  )
-   : SetHeadCommand(atan(_y/_x-pose.getFocalPointInWorldFrameX()),
-		    atan((pose.getFocalPointInWorldFrameZ()-_z)/sqrt(pow(_x-pose.getFocalPointInWorldFrameX(),2) + pow(_y-pose.getFocalPointInWorldFrameY(),2)))-((static_cast<float>(3.141592))*40.0/180.0f), //adjust by constant angle for lower camera
+   //  : SetHeadCommand(atan(_y/_x-pose.getFocalPointInWorldFrameX()),
+   //		    atan((pose.getFocalPointInWorldFrameZ()-_z)/sqrt(pow(_x-pose.getFocalPointInWorldFrameX(),2) + pow(_y-pose.getFocalPointInWorldFrameY(),2)))-((static_cast<float>(3.141592))*40.0/180.0f), //adjust by constant angle for lower camera
+   //		    _maxSpeedYaw, _maxSpeedPitch)
+   : SetHeadCommand(atan(_y/(_x-poseX)),
+		    atan((poseZ-_z)/sqrt(pow(_x-poseX,2)+pow(_y-poseY,2)))-((static_cast<float>(3.141592))*40.0/180.0f),
 		    _maxSpeedYaw, _maxSpeedPitch)
     {
       setChainList();
