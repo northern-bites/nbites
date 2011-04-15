@@ -34,3 +34,6 @@ HEADERS  += colorcreator.h \
     stats.h
 
 FORMS    += colorcreator.ui
+
+OTHER_FILES += \
+    README.txt
