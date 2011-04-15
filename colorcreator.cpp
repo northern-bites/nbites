@@ -25,6 +25,7 @@ ColorCreator::ColorCreator(QWidget *parent) :
     yMin = new int[COLORS];
     yMax = new int[COLORS];
     cols = new QColor[COLORS];
+    bitColor = new unsigned[COLORS];
 
     table = new ColorTable();
 
@@ -37,6 +38,16 @@ ColorCreator::ColorCreator(QWidget *parent) :
     cols[Pink] = QColor(255, 181, 197);
     cols[Navy] = QColor(0, 0, 128);
     cols[Black] = QColor(0, 0, 0);
+
+    // initialize bitColors for generating color tables
+    bitColor[Orange] = ORANGE;
+    bitColor[Blue] = BLUE;
+    bitColor[Yellow] = YELLOW;
+    bitColor[Green] = GREEN;
+    bitColor[White] = WHITE;
+    bitColor[Pink] = PINK;
+    bitColor[Navy] = NAVY;
+    bitColor[Black] = UNDEFINED;
 
     ui->setupUi(this);
     baseDirectory = "/Users/ericchown/nbites/data/frames";
@@ -495,4 +506,81 @@ void ColorCreator::on_getColorTable_clicked()
     table->read(currentColorDirectory);
     int last = currentColorDirectory.lastIndexOf("/");
     currentColorDirectory.chop(currentColorDirectory.size() - last);
+}
+
+void ColorCreator::writeNewFormat(QString filename)
+{
+    QFile file(filename);
+    QTextStream out(stdout);
+    QByteArray temp;
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        out << "The file would not open properly" << "\n";
+        return;
+    }
+    for (int y = 0; y < 128; ++y)
+    {
+        for (int x = 0; x < 128; x ++)
+        {
+            for (int z = 0; z < 128; z++)
+            {
+                temp[0] = UNDEFINED;
+                ColorSpace col;
+                col.setYuv(y * 2, x * 2, z * 2);
+                for (int c = 0; c < COLORS; c++)
+                {
+                    if (y * 2 >= yMin[c] && y * 2 <= yMax[c] && col.getHb() >= hMin[c] && col.getHb() <= hMax[c] &&
+                            col.getSb() >= sMin[c] && col.getSb() <= sMax[c] && col.getZb() >= zMin[c] &&
+                            col.getZb() <= zMax[c])
+                    {
+                        temp[0] = temp[0] | bitColor[c];
+                    }
+                }
+                file.write(temp);
+            }
+        }
+    }
+    file.close();
+}
+
+void ColorCreator::writeOldFormat(QString filename)
+{
+    QFile file(filename);
+    QTextStream out(stdout);
+    QByteArray temp;
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        out << "The file would not open properly" << "\n";
+        return;
+    }
+    for (int y = 0; y < 128; ++y)
+    {
+        for (int x = 0; x < 128; x ++)
+        {
+            for (int z = 0; z < 128; z++)
+            {
+                temp[0] = UNDEFINED;
+                ColorSpace col;
+                col.setYuv(y * 2, x * 2, z * 2);
+                for (int c = 0; c < COLORS; c++)
+                {
+                    if (y * 2 >= yMin[c] && y * 2 <= yMax[c] && col.getHb() >= hMin[c] && col.getHb() <= hMax[c] &&
+                            col.getSb() >= sMin[c] && col.getSb() <= sMax[c] && col.getZb() >= zMin[c] &&
+                            col.getZb() <= zMax[c])
+                    {
+                        temp[0] = temp[0] | bitColor[c];
+                    }
+                }
+                file.write(temp);
+            }
+        }
+    }
+    file.close();
+}
+
+
+void ColorCreator::on_writeNew_clicked()
+{
+    QString filename = baseColorTable + "new.mtb";
+    writeNewFormat(filename);
 }

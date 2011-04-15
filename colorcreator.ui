@@ -220,8 +220,8 @@
   <widget class="QComboBox" name="viewChoice">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>680</y>
+     <x>310</x>
+     <y>650</y>
      <width>111</width>
      <height>26</height>
     </rect>
@@ -376,8 +376,8 @@
   <widget class="QPushButton" name="getColorTable">
    <property name="geometry">
     <rect>
-     <x>530</x>
-     <y>660</y>
+     <x>810</x>
+     <y>590</y>
      <width>114</width>
      <height>32</height>
     </rect>
@@ -414,6 +414,19 @@
      <widget class="QLineEdit" name="lineEdit"/>
     </item>
    </layout>
+  </widget>
+  <widget class="QPushButton" name="writeNew">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>640</y>
+     <width>114</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Make New</string>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

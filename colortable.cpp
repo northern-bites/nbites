@@ -93,16 +93,16 @@ void ColorTable::read(QString filename)
                     table[y][x][z] = ORANGE;
                     break;
                 case 6:
-                    table[y][x][z] = YELLOW & WHITE;
+                    table[y][x][z] = YELLOW | WHITE;
                     break;
                 case 7:
                     table[y][x][z] = BLUE & GREEN;
                     break;
                 case 8:
-                    table[y][x][z] = ORANGE & PINK;
+                    table[y][x][z] = ORANGE | PINK;
                     break;
                 case 9:
-                    table[y][x][z] = ORANGE & YELLOW;
+                    table[y][x][z] = ORANGE | YELLOW;
                 case 10:
                     table[y][x][z] = PINK;
                     break;

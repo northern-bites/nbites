@@ -46,6 +46,8 @@ public:
     float max(float a, float b) {if (a > b) return a; return b;}
     int min(int a, int b) {if (a < b) return a; return b;}
     int max(int a, int b) {if (a > b) return a; return b;}
+    void writeNewFormat(QString filename);
+    void writeOldFormat(QString filename);
 
 private slots:
     void on_pushButton_clicked();
@@ -78,6 +80,8 @@ private slots:
 
     void on_getColorTable_clicked();
 
+    void on_writeNew_clicked();
+
 private:
     Ui::ColorCreator *ui;
     RoboImage roboimage;
@@ -106,6 +110,7 @@ private:
     int statsYMin, statsYMax, statsUMin, statsUMax, statsVMin, statsVMax;
     int currentColor;
     ColorEdit *green;
+    unsigned *bitColor;
     bool haveFile;
 };
 
