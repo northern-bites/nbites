@@ -32,7 +32,7 @@ SET( CMAKE_BUILD_TYPE CACHE FORCE "Release")
 
 # Default (no release specific) build flags
 SET( CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-write-strings -lrt")
+  "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-write-strings")
 SET( CMAKE_C_FLAGS
   "${CMAKE_CXX_FLAGS}" )
 # Release build flags
@@ -151,6 +151,10 @@ SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
 
 ########################### NB Common definitions
 include ( ${NBITES_DIR}/src/man/cmake/FindNBCOMMON.cmake )
+
+if (NOT (APPLE OR WIN32))
+  add_definitions( -lrt )
+endif()
 
 ########################## ADVANCED SETTINGS PREFERENCES
 # Set the cache variable that we would rather not appear on the normal
