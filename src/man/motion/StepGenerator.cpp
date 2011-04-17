@@ -113,7 +113,6 @@ void StepGenerator::resetHard(){
     //I don't think there is much else we need to do....
 }
 
-
 /**
  * Central method to get the previewed zmp_refernce values
  * In the process of getting these values, this method handles the following:
