@@ -14,7 +14,7 @@ def shouldChaseBall(player):
     We see the ball. So go get it.
     """
     ball = player.brain.ball
-    return (ball.on)
+    return (ball.framesOn > constants.BALL_ON_THRESH)
 
 def shouldApproachBall(player):
     """
@@ -136,7 +136,7 @@ def shouldScanFindBallActiveLoc(player):
 
 def shouldSpinFindBall(player):
     """
-    Should spin if we already tried searching
+    Should spin if we already tried scanning
     """
     return (player.stateTime >=
             SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL))
@@ -151,8 +151,7 @@ def shouldWalkFindBall(player):
     """
     If we've been spinFindBall-ing too long we should walk
     """
-    return player.counter > constants.WALK_FIND_BALL_FRAMES_THRESH and \
-        player.brain.ball.framesOff > constants.BALL_OFF_THRESH
+    return player.counter > constants.WALK_FIND_BALL_FRAMES_THRESH
 
 def shouldntStopChasing(player):
     """
