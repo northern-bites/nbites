@@ -4,19 +4,33 @@
 #
 
 import man.motion as motion
+import man.motion.HeadMoves as HeadMoves
 import man.motion.SweetMoves as SweetMoves
 
 def gameInitial(player):
-    player.gainsOn()
+    if player.firstFrame():
+        player.gainsOn()
+        player.brain.fallController.enableFallProtection(False)
     return player.stay()
 
 def gameReady(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
+
 def gameSet(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
+
 def gamePlaying(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
+
 def gamePenalized(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
 
 def standup(player):
