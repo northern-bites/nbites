@@ -89,18 +89,24 @@ SET( ROBOT_CONNECT_SRCS
   Lights
   PyLights
   ColorParams
-  ImageAcquisition.s
-  ImageAcquisitionFast.s
-  CopyImage.s
   )
 
-set_property(SOURCE
+# Add the assembly files if we're not on Mac OSX
+IF (UNIX AND NOT APPLE)
+  LIST( APPEND ROBOT_CONNECT_SRCS
+    ImageAcquisition.s
+    ImageAcquisitionFast.s
+    CopyImage.s
+    )
+
+SET_PROPERTY(SOURCE
   ImageAcquisition.s
   ImageAcquisitionFast.s
   CopyImage.s
  PROPERTY LANGUAGE C
  )
 
+ENDIF()
 
 IF(WEBOTS_BACKEND)
   LIST( APPEND ROBOT_CONNECT_SRCS

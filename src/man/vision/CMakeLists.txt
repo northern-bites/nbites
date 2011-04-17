@@ -90,14 +90,20 @@ SET( VISION_SRCS Ball
                  Gradient
                  HoughSpace
                  geom/HoughLine
-                 EdgeDetection.s
                  VisualDetector
                  FieldLinesDetector
                  )
 
-set_property(SOURCE
+# Add the assembly files if we're not on Mac OSX
+IF (UNIX AND NOT APPLE)
+  LIST( APPEND VISION_SRCS
+    EdgeDetection.s
+    )
+
+SET_PROPERTY(SOURCE
   EdgeDetection.s
  PROPERTY LANGUAGE C)
+ENDIF()
 
 SET( VISION_PYTHON_SRCS __init__.py )
 
