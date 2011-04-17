@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <time.h>
 #include "alvision/alimage.h"
 #include "alvision/alvisiondefinitions.h"
 #include "altools/alxplatform.h"
@@ -181,7 +182,7 @@ void ALImageTranscriber::run()
             // cout << "Sleeping for nano: " << nanoSleepTime
             //      << " and sec:" << secSleepTime << endl;
 
-            interval.tv_sec = static_cast<__time_t>(secSleepTime);
+            interval.tv_sec = static_cast<time_t>(secSleepTime);
             interval.tv_nsec = nanoSleepTime;
 
             nanosleep(&interval, &remainder);

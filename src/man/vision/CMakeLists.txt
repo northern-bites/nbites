@@ -171,7 +171,8 @@ IF( VISIONLINK )
   TARGET_LINK_LIBRARIES( ${VISIONLINK_TARGET} 
                         ${VISION_TARGET} 
                         ${SENSORS_TARGET}
-                        ${NBINCLUDE_TARGET} )
+                        ${NBINCLUDE_TARGET}
+			${ROBOT_CONNECT_TARGET})
 ENDIF( VISIONLINK )
 
 
