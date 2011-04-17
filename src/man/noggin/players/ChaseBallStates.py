@@ -155,20 +155,16 @@ def positionForKick(player):
     # Leave this state if necessary
     if transitions.shouldStopAndKick(player):
         return player.goLater('preKickStop')
-
     if player.brain.tracker.activeLocOn:
         if transitions.shouldScanFindBallActiveLoc(player):
             player.inKickingState = False
             return player.goLater('scanFindBall')
-
     elif transitions.shouldScanFindBall(player):
         player.inKickingState = False
         return player.goLater('scanFindBall')
-
     if transitions.shouldChaseFromPositionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
-
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldDribble(player):
             return player.goLater('dribble')
@@ -244,10 +240,8 @@ def orbitBall(player):
 
     if transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-
     if transitions.shouldChaseFromPositionForKick(player):
         return player.goLater('chase')
-
     elif player.brain.nav.isStopped():
         return player.goLater('chase')
     return player.stay()
