@@ -49,30 +49,42 @@ def shouldSpinToBallClose(player):
         ball.dist < constants.SHOULD_STOP_DIST and \
         fabs(ball.relY) > constants.SHOULD_STOP_Y
 
-def shouldStopAndKick(player):
+def shouldStopBeforeKick(player):
     """
-    Ball is in the correct position to kick but we aren't stopped
+    Ball is right in front of us but we aren't stopped
+    Used before we have a kick decided (more general)
     """
     ball = player.brain.ball
     return ball.on and \
         ball.relX > constants.SHOULD_KICK_CLOSE_X and \
         ball.relX < constants.SHOULD_KICK_FAR_X and \
         fabs(ball.relY) < constants.SHOULD_KICK_Y
-        # and player.counter < 1 ??
+
+def shouldStopAndKick(player):
+    """
+    Ball is in correct position to kick but we aren't stopped
+    Used after we have a kick decided (more specific)
+    """
+    ball = player.brain.ball
+    kick = player.brain.kickDecider.currentKick
+    (targetX, targetY, heading) = kick.getPosition()
+    return (ball.on and \
+                (fabs(ball.relX - targetX) <= constants.KICK_CLOSE_ENOUGH_X) and \
+                (fabs(ball.relY - targetY) <= constants.KICK_CLOSE_ENOUGH_Y))
 
 def shouldKickNow(player):
     """
     Ball is in the correct position to kick and we are stopped
+    Used after we have a kick decided (more specific)
     """
     ball = player.brain.ball
-    # Ensure we are stopped, we see the ball,
-    # and the ball is in the "kicking region"
-    return player.brain.nav.isStopped() and \
-        ball.on and \
-        ball.relX > constants.SHOULD_KICK_CLOSE_X and \
-        ball.relX < constants.SHOULD_KICK_FAR_X and \
-        fabs(ball.relY) < constants.SHOULD_KICK_Y
-        # and player.counter < 1 ??
+    kick = player.brain.kickDecider.currentKick
+    (targetX, targetY, heading) = kick.getPosition()
+    return (player.brain.nav.isStopped() and \
+                ball.on and \
+                (fabs(ball.relX - targetX) <= constants.KICK_CLOSE_ENOUGH_X) and \
+                (fabs(ball.relY - targetY) <= constants.KICK_CLOSE_ENOUGH_Y))
+                # and player.counter < 1 ??
 
 def shouldDribble(player):
     """

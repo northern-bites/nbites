@@ -40,7 +40,7 @@ def pfk_all(nav):
         nav.stopTheta = True
         nav.stopY = False
         nav.stopX = False
-        print "entered from: ", nav.lastDiffState
+        #print "entered from: ", nav.lastDiffState
 
     # get our ideal relative positionings from the kick
     (x_offset, y_offset, heading) = nav.kick.getPosition()

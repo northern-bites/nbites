@@ -22,7 +22,7 @@ def chase(player):
     # Check in order of importance
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
-    elif transitions.shouldStopAndKick(player):
+    elif transitions.shouldStopBeforeKick(player):
         return player.goNow('stopBeforeKick')
     elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
@@ -40,7 +40,7 @@ def goalieChase(player):
         return player.goNow('scanFindBall')
     elif transitions.shouldSpinToBallClose(player):
         return player.goNow('spinToBallClose')
-    elif transitions.shouldStopAndKick(player):
+    elif transitions.shouldStopBeforeKick(player):
         return player.goNow('stopBeforeKick')
     elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
@@ -57,26 +57,19 @@ def approachBall(player):
     if player.penaltyKicking and \
            player.brain.ball.inOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
-
     elif player.brain.tracker.activeLocOn:
         if transitions.shouldScanFindBallActiveLoc(player):
             return player.goLater('scanFindBall')
-
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-
     elif player.brain.play.isRole(GOALIE) and goalTran.dangerousBall(player):
         return player.goNow('approachDangerousBall')
-
     elif transitions.shouldDribble(player):
         return player.goNow('dribble')
-
     elif transitions.shouldSpinToBallClose(player):
         return player.goNow('spinToBallClose')
-
-    elif transitions.shouldStopAndKick(player):
+    elif transitions.shouldStopBeforeKick(player):
         return player.goNow('stopBeforeKick')
-
     elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
 
@@ -112,10 +105,6 @@ def spinToBallClose(player):
     if player.brain.ball.relY > constants.SHOULD_STOP_Y or \
             player.brain.ball.relY < -1*constants.SHOULD_STOP_Y:
         spinDir = player.brain.my.spinDirToPoint(player.brain.ball)
-        print spinDir
-        print player.brain.ball.relY
-        print player.brain.my.h
-        print player.brain.my.getRelativeBearing(player.brain.ball)
         player.setWalk(0, 0, spinDir*constants.BALL_SPIN_SPEED)
     else:
         player.stopWalking()
@@ -202,7 +191,7 @@ def dribble(player):
     # if we should stop dribbling, see what else we should do
     if transitions.shouldStopDribbling(player):
         # may not be appropriate due to turned out feet...
-        if transitions.shouldStopAndKick(player):
+        if transitions.shouldStopBeforeKick(player):
             return player.goLater('stopBeforeKick')
         if transitions.shouldPositionForKick(player):
             return player.goLater('decideKick')
