@@ -90,20 +90,14 @@ SET( VISION_SRCS Ball
                  Gradient
                  HoughSpace
                  geom/HoughLine
-                 ImageAcquisition.s
-                 ImageAcquisitionFast.s
                  EdgeDetection.s
-                 CopyImage.s
-                 ColorParams
                  VisualDetector
                  FieldLinesDetector
                  )
 
 set_property(SOURCE
-  ImageAcquisition.s
-  ImageAcquisitionFast.s
   EdgeDetection.s
-  CopyImage.s PROPERTY LANGUAGE C)
+ PROPERTY LANGUAGE C)
 
 SET( VISION_PYTHON_SRCS __init__.py )
 
@@ -198,15 +192,9 @@ add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp
   ${VISION_INCLUDE_DIR}/EdgeDetection.s
   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
-target_link_libraries( HoughSpaceTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
+target_link_libraries( HoughSpaceTest ${VISION_TARGET})
 
 
-
-add_executable( ImageAcquisitionTest ${VISION_TEST_DIR}/ImageAcquisitionTest.cpp
-  ${VISION_INCLUDE_DIR}/ImageAcquisition.s
-  ${VISION_INCLUDE_DIR}/ImageAcquisitionFast.s ${VISION_INCLUDE_DIR}/ColorParams.cpp )
-
-target_link_libraries( ImageAcquisitionTest ${NBCOMMON_LIBRARIES})
 
 add_executable( OfflineVision ${VISION_INCLUDE_DIR}/offline/OfflineVision.cpp )
 target_link_libraries( OfflineVision
