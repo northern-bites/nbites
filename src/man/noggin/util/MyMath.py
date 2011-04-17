@@ -39,9 +39,11 @@ def sign(x):
     return the sign of a number
     """
     if x == 0:
-        return 0.
+        return 0
+    elif x > 0:
+        return 1
     else:
-        return x/fabs(x)
+        return -1
 
 def clip(value,min,max):
     '''takes a value, plus a min and a max,

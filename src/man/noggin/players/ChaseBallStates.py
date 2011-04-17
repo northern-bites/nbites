@@ -109,8 +109,13 @@ def spinToBallClose(player):
     """
     player.brain.tracker.trackBall()
 
-    if player.brain.ball.bearing > constants.SHOULD_STOP_BEARING:
+    if player.brain.ball.relY > constants.SHOULD_STOP_Y or \
+            player.brain.ball.relY < -1*constants.SHOULD_STOP_Y:
         spinDir = player.brain.my.spinDirToPoint(player.brain.ball)
+        print spinDir
+        print player.brain.ball.relY
+        print player.brain.my.h
+        print player.brain.my.getRelativeBearing(player.brain.ball)
         player.setWalk(0, 0, spinDir*constants.BALL_SPIN_SPEED)
     else:
         player.stopWalking()

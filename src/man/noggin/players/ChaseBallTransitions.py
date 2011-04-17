@@ -47,7 +47,7 @@ def shouldSpinToBallClose(player):
     ball = player.brain.ball
     return ball.on and \
         ball.dist < constants.SHOULD_STOP_DIST and \
-        ball.bearing > constants.SHOULD_STOP_BEARING
+        fabs(ball.relY) > constants.SHOULD_STOP_Y
 
 def shouldStopAndKick(player):
     """
