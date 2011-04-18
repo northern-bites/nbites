@@ -78,9 +78,6 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
     QRect rect(10, 20, 80, 60);
 
     QPainterPath path;
-    /*path.moveTo(20, 80);
-    path.lineTo(20, 30);
-    path.cubicTo(80, 0, 50, 50, 80, 80);*/
 
     QPainter painter(this);
     painter.setPen(pen);
@@ -92,12 +89,13 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
     QRect draw;
     int red, green, blue, edge;
     bool found;
+    float radius = 120.0f * 120.0f;
+    float h, s, v;
+
     for (int i = 0; i < r.getHeight(); i++)
     {
         for (int j = 0; j < r.getWidth(); j++)
         {
-            float radius = 120.0f * 120.0f;
-            float h, s, v;
             float dist = (120 - i) * (120 - i) + (160 - j) * (160 - j);
             switch (shape) {
             case V:
