@@ -105,11 +105,11 @@ private:
         rightFootButton;
 
     Inertial lastInertial;
-    int fallingFrames,notFallingFrames,fallenCounter,groundCounter;
+    int fallingFrames,notFallingFrames,fallenCounter,groundOnCounter,groundOffCounter;
     bool registeredFalling;
-    int wifiReconnectTimeout;
-
     bool registeredShutdown;
+
+    int wifiReconnectTimeout;
 
     bool falling, fallen, feetOnGround;
     mutable bool useFallProtection;

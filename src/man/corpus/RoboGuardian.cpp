@@ -69,11 +69,13 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       //       lastButtonOnCounter(0),lastButtonOffCounter(0),
       //       buttonClicks(0),
       lastInertial(sensors->getInertial()), fallingFrames(0),
-      notFallingFrames(0),fallenCounter(0),groundCounter(0),
+      notFallingFrames(0),fallenCounter(0),
+	  groundOnCounter(0),groundOffCounter(0),
       registeredFalling(false),registeredShutdown(false),
-      falling(false),fallen(false),feetOnGround(true),
+	  wifiReconnectTimeout(0),
+	  falling(false),fallen(false),feetOnGround(true),
       useFallProtection(false),
-      wifiReconnectTimeout(0), lastHeatAudioWarning(0), lastHeatPrintWarning(0)
+      lastHeatAudioWarning(0), lastHeatPrintWarning(0)
 {
     pthread_mutex_init(&click_mutex,NULL);
     executeStartupAction();
@@ -201,16 +203,29 @@ void RoboGuardian::checkFeetOnGround() {
 
 	//printf("left: %f, right: %f, total: %f\n", leftSum, rightSum, (leftSum + rightSum));
 
-	if (leftSum + rightSum < onGroundFSRThresh) {
-		groundCounter += 1;
-	} else {
-		groundCounter = 0;
+	// buffer the transition in both directions
+	if (feetOnGround) {
+		if (leftSum + rightSum < onGroundFSRThresh) {
+			groundOffCounter++;
+		} else {
+			groundOffCounter = 0;
+		}
+	}
+	else {
+		if (leftSum + rightSum > onGroundFSRThresh) {
+			groundOnCounter++;
+		}
+		else {
+			groundOnCounter = 0;
+		}
 	}
 
-	if (groundCounter > GROUND_FRAMES_THRESH) {
+	if (groundOffCounter > GROUND_FRAMES_THRESH) {
 		feetOnGround = false;
-	} else {
+		groundOnCounter = groundOffCounter = 0;
+	} else if (groundOnCounter > GROUND_FRAMES_THRESH) {
 		feetOnGround = true;
+		groundOnCounter = groundOffCounter = 0;
 	}
 }
 

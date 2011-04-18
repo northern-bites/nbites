@@ -3,6 +3,7 @@ from man.motion import SweetMoves as SweetMoves
 
 """
 Fall Protection and Recovery States
+Also detects if the robot has been picked up & stops walk engine
 """
 def fallen(guard):
     """
@@ -84,12 +85,26 @@ def doneStanding(guard):
     guard.brain.player.switchTo(guard.brain.gameController.currentState)
     return guard.goLater('notFallen')
 
+def feetOffGround(guard):
+    """
+    Shuts off walk engine while the robot is off the ground
+    """
+    # back on the ground
+    if (guard.brain.roboguardian.isFeetOnGround()):
+        guard.brain.player.switchTo(guard.brain.gameController.currentState)
+        return guard.goNow('notFallen')
+
+    guard.brain.player.stopWalking()
+    guard.brain.nav.stop()
+
+    return guard.stay()
+
 def notFallen(guard):
     if guard.firstFrame():
         guard.standingUp = False
         guard.brain.roboguardian.enableFallProtection(True)
     """
-    Does nothing
+    Does nothing, also the target state for feet on ground
     """
     return guard.stay()
 
