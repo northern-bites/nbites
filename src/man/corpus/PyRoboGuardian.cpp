@@ -48,6 +48,7 @@ BOOST_PYTHON_MODULE(_roboguardian)
         .def("speakIPAddress", &RoboGuardian::speakIPAddress)
         .def("isRobotFalling", &RoboGuardian::isRobotFalling)
         .def("isRobotFallen", &RoboGuardian::isRobotFallen)
+        .def("isFeetOnGround", &RoboGuardian::isFeetOnGround)
         .def("enableFallProtection", &RoboGuardian::enableFallProtection)
         ;
 
