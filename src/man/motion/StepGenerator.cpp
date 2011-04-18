@@ -220,7 +220,6 @@ void StepGenerator::findSensorZMP(){
     const float joint_com_i_y = joints_com_i(1);
 
     ZmpTimeUpdate tUp = {controller_x->getZMP(), controller_y->getZMP()};
-    // TODO: fix joints_com_i_y and re-enable
     ZmpMeasurement pMeasure =
         {joint_com_i_x, (joint_com_i_y + COM_I_Y_OFFSET),
          accel_i(0), accel_i(1)};
