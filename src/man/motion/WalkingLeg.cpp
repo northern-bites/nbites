@@ -218,18 +218,18 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     // modulate our CoM height based on where we are in the step phase
 	// check bounds, so we don't do stupid things when the robot is stationary
 	if (percent_complete >= 0.0f && percent_complete <= 1.0f) {
-		const float com_height_adjustment_max = 2.0f;
-		// sin here maps [0, 1.0f] -> [-1, 1]
-		com_height_adjustment = sin((2*percent_complete - 0.5f)*M_PI_FLOAT)
+		const float com_height_adjustment_max = -1.5f;
+		// sin maps [0, 1.0f] -> [0, 1]
+		com_height_adjustment = sin(percent_complete*M_PI_FLOAT)
 			* com_height_adjustment_max;
 
 		//cout << "percent complete: " << percent_complete << endl;
-		//cout << "height adjustment " << com_height_adjustment << endl;
+//		cout << "height adjustment " << com_height_adjustment << endl;
 	}
 
     goal(0) = dest_x; //targetX for this leg
     goal(1) = dest_y;  //targetY
-    goal(2) = -gait->stance[WP::BODY_HEIGHT] + com_height_adjustment; //targetZ
+    goal(2) = -gait->stance[WP::BODY_HEIGHT] - com_height_adjustment; //targetZ
 
     vector<float> joint_result = finalizeJoints(goal);
     vector<float> stiff_result = getStiffnesses();

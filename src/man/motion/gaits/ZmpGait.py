@@ -6,7 +6,7 @@ ARM_CONFIG = constants.USE_ARMS
 WALKING = constants.WALKING
 NON_WALKING = constants.NON_WALKING
 
-MARVIN_STANCE_CONFIG = (32.0, # CoM height
+MARVIN_STANCE_CONFIG = (31.0, # CoM height
                         1.0,  # Forward displacement of CoM
                         11.5,  # Horizontal distance between feet
                         0.0,   # Body angle around y axis
