@@ -89,6 +89,7 @@ SET( ROBOT_CONNECT_SRCS
   Lights
   PyLights
   ColorParams
+  ImageAcquisition
   )
 
 # Add the assembly files if we're not on Mac OSX
@@ -280,7 +281,7 @@ add_executable( ImageAcquisitionTest ${CORPUS_TEST_DIR}/ImageAcquisitionTest.cpp
   )
 
 target_link_libraries( ImageAcquisitionTest
+  ${ROBOT_CONNECT_TARGET}
   rt
   )
-
 
