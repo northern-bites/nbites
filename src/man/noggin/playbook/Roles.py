@@ -19,9 +19,9 @@ def rGoalie(team, workingPlay):
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pReadyGoalie(team, workingPlay)
     else:
-        subRoleOnDeck = PBConstants.READY_NORMAL
+        subRoleOnDeck = PBConstants.GOALIE_NORMAL
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
-            SubRoles.pReadyNormal(team, workingPlay)
+            SubRoles.pGoalieNormal(team, workingPlay)
 
 def rChaser(team, workingPlay):
     '''sets current position for chaser since positioning is done by player'''
