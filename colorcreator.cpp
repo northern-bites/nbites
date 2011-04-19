@@ -504,6 +504,7 @@ void ColorCreator::on_colorSelect_currentIndexChanged(int index)
     ui->zMax->setValue(zMax[currentColor] * 100);
     ui->yMin->setValue(yMin[currentColor]);
     ui->yMax->setValue(yMax[currentColor]);
+    ui->zSlice->setValue((zMin[currentColor] + zMax[currentColor]) * 50);
 }
 
 void ColorCreator::on_viewChoice_currentIndexChanged(int index)
