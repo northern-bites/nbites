@@ -298,7 +298,6 @@ def stop(nav):
     return nav.stay()
 
 def stopped(nav):
-
     return nav.stay()
 
 def orbitPoint(nav):

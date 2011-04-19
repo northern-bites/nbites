@@ -89,13 +89,14 @@ def feetOffGround(guard):
     """
     Shuts off walk engine while the robot is off the ground
     """
+    if guard.firstFrame():
+        guard.brain.player.stopWalking()
+        guard.brain.nav.switchTo('stop')
+
     # back on the ground
     if (guard.brain.roboguardian.isFeetOnGround()):
         guard.brain.player.switchTo(guard.brain.gameController.currentState)
         return guard.goNow('notFallen')
-
-    guard.brain.player.stopWalking()
-    guard.brain.nav.stop()
 
     return guard.stay()
 
