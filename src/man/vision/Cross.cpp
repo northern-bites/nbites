@@ -35,6 +35,10 @@ Cross::Cross(Vision* vis, Threshold* thr, Field* fie, Context* con)
     const int MAX_CROSS_RUNS = 400;
 	blobs = new Blobs(MAX_CROSS_RUNS);
 	allocateColorRuns();
+
+#ifdef OFFLINE
+    CROSSDEBUG = false;
+#endif
 }
 
 
@@ -138,17 +142,17 @@ bool Cross::scanAroundPerimeter(Blob b) {
 	// first scan the sides
 	for (int i = max(0, y - 2); i < min(IMAGE_HEIGHT - 1, y + h + 2); i++) {
 		if (x > 3) {
-			if (thresh->thresholded[i][x - 4] == GREEN)
+			if (thresh->getThresholded(i,x - 4) == GREEN)
 				count++;
-			else if (thresh->thresholded[i][x - 4] == WHITE)
+			else if (thresh->getThresholded(i,x - 4) == WHITE)
 				count-=3;
 			counter++;
 		} else return false;
 
 		if (x + w + 4 < IMAGE_WIDTH) {
-			if (thresh->thresholded[i][x + w+ 4] == GREEN)
+			if (thresh->getThresholded(i,x + w+ 4) == GREEN)
 				count++;
-			else if (thresh->thresholded[i][x + w+ 4] == WHITE)
+			else if (thresh->getThresholded(i,x + w+ 4) == WHITE)
 				count-=3;
 			counter++;
 		} else return false;
@@ -157,19 +161,19 @@ bool Cross::scanAroundPerimeter(Blob b) {
 	// now scan above and below
 	for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
 		if (y > 1) {
-			if (thresh->thresholded[y - 2][i] == GREEN)
+			if (thresh->getThresholded(y - 2,i) == GREEN)
 				count++;
-		else if (thresh->thresholded[y - 2][i] == GREY)
+            else if (thresh->getThresholded(y - 2,i) == GREY)
 		  count--;
-			else if (thresh->thresholded[y - 2][i] == WHITE)
+			else if (thresh->getThresholded(y - 2,i) == WHITE)
 				count-=3;
 			counter++;
 		} else return false;
 
 		if (y + h + 2 < IMAGE_HEIGHT) {
-			if (thresh->thresholded[y+h+2][i] == GREEN)
+			if (thresh->getThresholded(y+h+2,i) == GREEN)
 				count++;
-			else if (thresh->thresholded[y+h+2][i] == WHITE)
+			else if (thresh->getThresholded(y+h+2,i) == WHITE)
 				count-=3;
 			counter++;
 		} else return false;
@@ -368,7 +372,7 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
 
 			if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
 				total++;
-				if (thresh->thresholded[ny][nx] == WHITE) {
+				if (thresh->getThresholded(ny,nx) == WHITE) {
 					good++;
 				}
 			}

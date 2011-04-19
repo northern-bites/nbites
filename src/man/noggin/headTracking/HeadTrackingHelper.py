@@ -54,8 +54,8 @@ class HeadTrackingHelper(object):
         safeChangeX = MyMath.clip(changeX, -maxChange, maxChange )
         safeChangeY = MyMath.clip(changeY, -maxChange, maxChange )
 
-        newYaw = curYaw + safeChangeX/3
-        newPitch = curPitch - safeChangeY/3
+        newYaw = curYaw + safeChangeX
+        newPitch = curPitch - safeChangeY
 
         newYaw = MyMath.clip(newYaw, -80., 80.)
 

@@ -49,7 +49,6 @@ import TOOL.Image.*;
 import TOOL.Net.NetworkModule;
 import TOOL.Net.RobotViewModule;
 import TOOL.PlayBookEditor.PlayBookEditorModule;
-import TOOL.SQL.SQLModule;
 import TOOL.WorldController.WorldControllerModule;
 
 import java.util.prefs.*;
@@ -192,8 +191,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         //    depends on NetworkModule
 		RobotViewModule robot_mod = new RobotViewModule(this, net_mod);
 		addModule(robot_mod);
-        // sql - load datasets from the MySQL HiveMind database
-        //addModule(new SQLModule(this));
+
         // wordcontroller - view and control robot udp broadcasts in realtime
 
         // Try to get the last directory we used for the world controller
@@ -298,7 +296,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
         quit.setActionCommand("quit");
         quit.addActionListener(this);
         quit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
-                                                   InputEvent.META_MASK ));
+                                                   InputEvent.CTRL_MASK ));
         fileMenu.add(quit);
 
         menuBar.add(fileMenu);

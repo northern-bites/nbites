@@ -18,6 +18,7 @@
   <property name="visionlink.def" value="-DVISIONLINK:BOOL=ON" />
   <property name="visionlink.header.def" value="-DVISIONLINK_HEADER_DIR:PATH=${visionlink.header.dir}"/>
   <property name="visionlink.file.def" value="-DVISIONLINK_FILE:FILEPATH=${visionlink.file}" />
+  <property name="use.mmx" value="-DUSE_MMX:BOOL=OFF"/>
   <!-- program definitions -->
   <property name="cmake" value="cmake"/>
 
@@ -55,6 +56,7 @@
       <arg value="${crossoff.def}"/>
       <arg value="${nbitesroot.def}"/>
       <arg value="${offline.def}"/>
+      <arg value="${use.mmx}"/>
       <arg value="${man.cmake.dir}" />
       <arg value="-G" />
       <arg value="${makefile.type}"/>

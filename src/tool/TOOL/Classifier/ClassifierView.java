@@ -115,7 +115,7 @@ public class ClassifierView extends DefaultDrawingPanel implements Observer,
         
         AffineTransform oldTransform = g2d.getTransform();
 
-        g2d.scale(xScale, yScale);
+        g2d.scale(xImageScale, yImageScale);
 
         if (model.hasClassifiedObjects()) {
             for (ClassifierObject e : model.getVisibleObjects()) {
@@ -189,7 +189,7 @@ public class ClassifierView extends DefaultDrawingPanel implements Observer,
 
     public void calculateScaling() {
         super.calculateScaling();
-        super.setLineWidth((float) xScale);
+        super.setLineWidth((float) xImageScale);
     }
     
 
@@ -241,7 +241,7 @@ public class ClassifierView extends DefaultDrawingPanel implements Observer,
             super.setMode(DrawingMode.RECTANGLE);
             break;
         }
-        super.setLineWidth((float) xScale);
+        super.setLineWidth((float) xImageScale);
     }
     
 
@@ -265,8 +265,8 @@ public class ClassifierView extends DefaultDrawingPanel implements Observer,
      * of ImagePanel,this does not give -1 if outside of the image.
      */
     public Point getImageCoordinate(Point screenCoordinate) {
-        return new Point((int) (screenCoordinate.getX() / xScale),
-                         (int) (screenCoordinate.getY() / yScale));
+        return new Point((int) (screenCoordinate.getX() / xImageScale),
+                         (int) (screenCoordinate.getY() / yImageScale));
     }
 
 
