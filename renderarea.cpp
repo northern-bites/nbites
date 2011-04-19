@@ -13,6 +13,7 @@ RenderArea::RenderArea(RoboImage r1, QLabel *inf, QWidget *parent)
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
     setMouseTracking(true);
+    edgediff = 10;
 }
 
 void RenderArea::mouseMoveEvent(QMouseEvent *event) {
@@ -136,7 +137,7 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                 if (j > 0 && i > 1) {
                     edge = abs(r.getY(j - 1, i) - r.getY(j, i));
                     edge = max(abs(r.getY(j, i) - r.getY(j, i - 1)), edge);
-                    if (edge  > 10) {
+                    if (edge  > edgediff) {
                         red = 255;
                         green = 0;
                         blue = 0;
@@ -144,7 +145,7 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                     }
                     edge = abs(r.getU(j - 1, i) - r.getU(j, i));
                     edge = max(abs(r.getU(j, i) - r.getU(j, i - 1)), edge);
-                    if (edge > 10) {
+                    if (edge > edgediff) {
                         green = 255;
                         blue = 0;
                         if (!found) {
@@ -154,7 +155,7 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                     }
                     edge = abs(r.getV(j - 1, i) - r.getV(j, i));
                     edge = max(abs(r.getV(j, i) - r.getV(j, i - 1)), edge);
-                    if (edge > 10) {
+                    if (edge > edgediff) {
                         blue = 255;
                         if (!found) {
                             red = 0;

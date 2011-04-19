@@ -215,6 +215,13 @@ void ColorCreator::updateColors()
                 {
                     display = false;
                 }
+                ColorSpace col;
+                col.setHsz(h, s, zSlice);
+                int y = col.getYb();
+                if (y < yMin[currentColor] || y > yMax[currentColor])
+                {
+                    display = false;
+                }
                 if (display)
                 {
                     c.setHsvF(h, s, zSlice);

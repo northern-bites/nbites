@@ -42,6 +42,7 @@ private:
     bool transformed;
     QPixmap pixmap;
     RoboImage r;
+    int edgediff;
 
 signals:
 
