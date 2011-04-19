@@ -90,25 +90,25 @@ SET( VISION_SRCS Ball
                  Gradient
                  HoughSpace
                  geom/HoughLine
-                 ColorParams
                  VisualDetector
                  FieldLinesDetector
-                 ImageAcquisition.s
-                 ImageAcquisitionFast.s
-                 EdgeDetection.s
-                 CopyImage.s
-		 Hough.s
-		 HoughAlt.s
                  )
 
-set_property(SOURCE
-  ImageAcquisition.s
-  ImageAcquisitionFast.s
-  EdgeDetection.s
-  CopyImage.s
-  Hough.s
-  HoughAlt.s
-  PROPERTY LANGUAGE C)
+# Add the assembly files if we're not on Mac OSX
+IF (UNIX AND NOT APPLE)
+  LIST( APPEND VISION_SRCS
+    EdgeDetection.s
+    Hough.s
+    HoughAlt.s
+    )
+
+  SET_PROPERTY(SOURCE
+    EdgeDetection.s
+    Hough.s
+    HoughAlt.s
+    PROPERTY LANGUAGE C
+    )
+ENDIF()
 
 SET( VISION_PYTHON_SRCS __init__.py )
 
@@ -176,7 +176,9 @@ IF( VISIONLINK )
   TARGET_LINK_LIBRARIES( ${VISIONLINK_TARGET}
                         ${VISION_TARGET}
                         ${SENSORS_TARGET}
-                        ${NBINCLUDE_TARGET} )
+                        ${NBINCLUDE_TARGET}
+			${ROBOT_CONNECT_TARGET}
+			)
 ENDIF( VISIONLINK )
 
 
@@ -188,6 +190,7 @@ ENDIF( VISIONLINK )
 #  )
 
 ########################### VISION TEST EXECUTABLES
+
 set( VISION_TEST_DIR ${VISION_INCLUDE_DIR}/test )
 
 add_executable( EdgeDetectorTest
@@ -215,16 +218,6 @@ target_link_libraries( HoughSpaceTest
   ${VISION_TARGET}
   )
 
-add_executable( ImageAcquisitionTest
-  ${VISION_TEST_DIR}/ImageAcquisitionTest
-  ${VISION_INCLUDE_DIR}/ImageAcquisition.s
-  ${VISION_INCLUDE_DIR}/ImageAcquisitionFast.s
-  ${VISION_INCLUDE_DIR}/ColorParams
-  )
-
-target_link_libraries( ImageAcquisitionTest
-  ${NBCOMMON_LIBRARIES}
-  )
 
 add_executable( OfflineVision
   ${VISION_INCLUDE_DIR}/offline/OfflineVision
@@ -233,6 +226,7 @@ add_executable( OfflineVision
 target_link_libraries( OfflineVision
                        ${VISION_TARGET}
 		       ${SENSORS_TARGET}
+		       ${ROBOT_CONNECT_TARGET}
 		       ${NBINCLUDE_TARGET}
 		       )
 
@@ -247,7 +241,6 @@ target_link_libraries( FLDTest
 
 add_test( NAME EdgeTest COMMAND EdgeDetectorTest )
 add_test( NAME HoughTest COMMAND HoughSpaceTest )
-add_test( NAME ImageAcquisitionTest COMMAND ImageAcquisitionTest )
 add_test( NAME FieldLinesTest COMMAND FLDTest )
 
 add_executable( ConvertFrame ${VISION_INCLUDE_DIR}/offline/ConvertFrames.cpp )

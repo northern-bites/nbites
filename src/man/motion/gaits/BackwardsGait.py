@@ -3,7 +3,7 @@ import man.motion as motion
 import GaitConstants as constants
 
 ODO_CONFIG = constants.ODO_CONFIG
-ARM_CONFIG = constants.ARM_CONFIG
+ARM_CONFIG = constants.USE_ARMS
 WALKING = constants.WALKING
 NON_WALKING = constants.NON_WALKING
 
@@ -48,8 +48,8 @@ MARVIN_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
 
 STIFFNESS_CONFIG = (0.85, #hipStiffness
                     0.3,  #kneeStiffness
-                    0.4,  #anklePitchStiffness
-                    0.3,  #ankleRollStiffness
+                    0.6,  #anklePitchStiffness
+                    0.5,  #ankleRollStiffness
                     0.1,  #armStiffness
                     0.1)  #arm pitch
 

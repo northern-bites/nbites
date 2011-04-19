@@ -15,4 +15,4 @@ if [ -n "${1:-""}" ]; then
   echo "Broadcasting to subnet ${1}"
 fi
 
-java -jar GameController.jar -spl -numplayers 3 ${broadcast} ${blue} ${red} 
+java -jar GameController.jar -spl ${broadcast} ${blue} ${red} 

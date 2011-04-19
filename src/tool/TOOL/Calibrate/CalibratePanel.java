@@ -49,7 +49,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
     private ColorSwatchPanel colorSwatches;
     private JCheckBox undefineSpecific, smallTableMode;
     private ThreshSlider thresh;
-    private JButton fillHoles, undo, redo, prevImage,
+    private JButton resetSet, undo, redo, prevImage,
         nextImage, jumpToButton, skipForward, skipBack;
     private JTextField jumpToFrame;
     private JTextPane feedback, XYPosition;
@@ -107,8 +107,8 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
 		skipBack = new JButton("Back " + (NUM_SKIP_FRAMES) + " (Alt + S)");
 		skipBack.setFocusable(false);
 
-        fillHoles = new JButton("Fill Holes (H)");
-        fillHoles.setFocusable(false);
+        resetSet = new JButton("Reset");
+        resetSet.setFocusable(false);
 
         smallTableMode = new JCheckBox("Small Table Mode");
 
@@ -219,7 +219,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         navigationButtons.add(redo);
         navigationButtons.add(jumpToFrame);
         navigationButtons.add(jumpToButton);
-        navigationButtons.add(fillHoles);
+        navigationButtons.add(resetSet);
         navigationButtons.add(smallTableMode);
         navigation.add(navigationButtons);
 
@@ -227,7 +227,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         Dimension navigationButtonsSize =
             new Dimension(2 * (int)
                     smallTableMode.getPreferredSize().getWidth(),
-                    4 * (int) fillHoles.getPreferredSize().getHeight());
+                    4 * (int) resetSet.getPreferredSize().getHeight());
         navigationButtons.setMinimumSize(navigationButtonsSize);
         navigationButtons.setPreferredSize(navigationButtonsSize);
         navigationButtons.setMaximumSize(navigationButtonsSize);
@@ -283,7 +283,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.ALT_MASK), "redo");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "undefineSpecific");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "edgeThresh");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "fillHoles");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0), "resetSet");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "nextImage");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "lastImage");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D,
@@ -328,9 +328,9 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
                 thresh.clickEnabled();
             }
         });
-        am.put("fillHoles", new AbstractAction("fillHoles") {
+        am.put("resetSet", new AbstractAction("resetSet") {
             public void actionPerformed(ActionEvent e) {
-                fillHoles.doClick();
+                resetSet.doClick();
             }
         });
         am.put("nextImage", new AbstractAction("nextImage") {
@@ -406,9 +406,9 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
             });
 
 
-        fillHoles.addActionListener(new ActionListener(){
+        resetSet.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e) {
-                    calibrate.fillHoles();
+                    calibrate.resetSet();
                 }
             });
 
@@ -545,7 +545,6 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         nextImage.setEnabled(calibrate.canGoForward());
         skipBack.setEnabled(calibrate.canGoBackward());
         skipForward.setEnabled(calibrate.canGoForward());
-        fillHoles.setEnabled(calibrate.hasImage());
         jumpToFrame.setEnabled(calibrate.hasImage());
         jumpToButton.setEnabled(calibrate.hasImage());
         smallTableMode.setSelected(calibrate.isSmallTableMode());

@@ -149,7 +149,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     long startTime = micro_time();
 
     // Shrink (by averaging) the image, and do color segmentation
-    _acquire_image_fast(table, &cp, img, newImg);
+    ImageAcquisition::acquire_image_fast(table, cp, img, newImg);
 
     //PROCESS VISION!!
     vision.notifyImage(newImg);
@@ -180,7 +180,6 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 
     delete[] newImg;
     newImg = NULL;
-
     env->ReleaseByteArrayElements( jtable, buf_table, 0);
 
     //get the id for the java class, so we can get method IDs
