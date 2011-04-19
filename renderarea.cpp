@@ -16,8 +16,8 @@ RenderArea::RenderArea(RoboImage r1, QLabel *inf, QWidget *parent)
 }
 
 void RenderArea::mouseMoveEvent(QMouseEvent *event) {
-    int x = event->x() / 2;
-    int y = event->y() / 2;
+    int x = event->x();
+    int y = event->y();
     QString xS;
     xS.setNum(x);
     QString yS;
@@ -28,7 +28,13 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event) {
     u.setNum(r.getU(x, y));
     QString v;
     v.setNum(r.getV(x, y));
-    QString temp = "x, y: "+ xS+" "+yS+"\nYUV: "+yy+" "+u+" "+v;
+    QString h;
+    h.setNum(r.getH(x, y));
+    QString s;
+    s.setNum(r.getS(x, y));
+    QString z;
+    z.setNum(r.getZ(x, y));
+    QString temp = "x, y: "+ xS+" "+yS+"\nYUV: "+yy+" "+u+" "+v+"\nHSV: "+h+" "+s+" "+z;
     info->setText(temp);
 }
 

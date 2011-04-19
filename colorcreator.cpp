@@ -88,24 +88,24 @@ ColorCreator::ColorCreator(QWidget *parent) :
             yMax[i] = 145;
             break;
         case Green:
-            hMin[i] = 0.45f;
-            hMax[i] = 0.60f;
-            sMin[i] = 0.3f;
-            sMax[i] = 0.6f;
-            zMin[i] = 0.0f;
-            zMax[i] = 1.0f;
-            yMin[i] = 41;
-            yMax[i] = 124;
+            hMin[i] = 0.42f;
+            hMax[i] = 0.58f;
+            sMin[i] = 0.35f;
+            sMax[i] = 0.62f;
+            zMin[i] = 0.22f;
+            zMax[i] = 0.73f;
+            yMin[i] = 47;
+            yMax[i] = 112;
             break;
         case Yellow:
-            hMin[i] = 0.13f;
-            hMax[i] = 0.36f;
-            sMin[i] = 0.08f;
-            sMax[i] = 0.70f;
-            zMin[i] = 0.17f;
-            zMax[i] = 1.0f;
-            yMin[i] = 62;
-            yMax[i] = 145;
+            hMin[i] = 0.10f;
+            hMax[i] = 0.30f;
+            sMin[i] = 0.11f;
+            sMax[i] = 0.74f;
+            zMin[i] = 0.26f;
+            zMax[i] = 0.70f;
+            yMin[i] = 54;
+            yMax[i] = 170;
             break;
         case Blue:
             hMin[i] = 0.58f;
@@ -118,19 +118,37 @@ ColorCreator::ColorCreator(QWidget *parent) :
             yMax[i] = 146;
             break;
         case White:
-            hMin[i] = 0.15f;
-            hMax[i] = 0.71f;
+            hMin[i] = 0.01f;
+            hMax[i] = 1.0f;
             sMin[i] = 0.0f;
             sMax[i] = 0.3f;
-            zMin[i] = 0.0f;
+            zMin[i] = 0.55f;
             zMax[i] = 1.0f;
             yMin[i] = 150;
             yMax[i] = 250;
             break;
+        case Pink:
+            hMin[i] = 0.73f;
+            hMax[i] = 0.98f;
+            sMin[i] = 0.17f;
+            sMax[i] = 0.4f;
+            zMin[i] = 0.14f;
+            zMax[i] = 0.31f;
+            yMin[i] = 38;
+            yMax[i] = 115;
+        case Navy:
+            hMin[i] = 0.64f;
+            hMax[i] = 0.68f;
+            sMin[i] = 0.38f;
+            sMax[i] = 0.62f;
+            zMin[i] = 0.29f;
+            zMax[i] = 0.36f;
+            yMin[i] = 35;
+            yMax[i] = 105;
         default:
             hMin[i] = 0.0f;
             hMax[i] = 0.01f;
-            sMin[i] = 0.0f;
+            sMin[i] = 0.99f;
             sMax[i] = 1.0f;
             zMin[i] = 0.0f;
             zMax[i] = 1.0f;
@@ -619,6 +637,7 @@ void ColorCreator::writeOldFormat(QString filename)
                             } else{
                                 temp[0] = GREEN_COL;
                             }
+                            break;
                         case White:
                             if (yellow)
                             {
@@ -642,7 +661,7 @@ void ColorCreator::writeOldFormat(QString filename)
                             break;
                         }
 
-                        temp[0] = temp[0] | bitColor[c];
+                        //temp[0] = temp[0] | bitColor[c];
                     }
                 }
                 file.write(temp);
