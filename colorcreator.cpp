@@ -12,9 +12,10 @@
 
 ColorCreator::ColorCreator(QWidget *parent) :
     QWidget(parent),
+    ui(new Ui::ColorCreator),
     roboimage(WIDTH, HEIGHT),
-    imageWindow(roboimage),
-    ui(new Ui::ColorCreator)
+    imageWindow(roboimage)
+
 {
     hMin = new float[COLORS];
     hMax = new float[COLORS];
@@ -136,6 +137,7 @@ ColorCreator::ColorCreator(QWidget *parent) :
             zMax[i] = 0.31f;
             yMin[i] = 38;
             yMax[i] = 115;
+            break;
         case Navy:
             hMin[i] = 0.64f;
             hMax[i] = 0.68f;
@@ -145,6 +147,7 @@ ColorCreator::ColorCreator(QWidget *parent) :
             zMax[i] = 0.36f;
             yMin[i] = 35;
             yMax[i] = 105;
+            break;
         default:
             hMin[i] = 0.0f;
             hMax[i] = 0.01f;
@@ -192,7 +195,6 @@ void ColorCreator::updateDisplays()
     tenthFrame = currentDirectory + "/" + plusTen + EXTENSION;
     minusTenthFrame = currentDirectory + "/" + plusTen + EXTENSION;
     haveFile = true;
-    QTextStream out(stdout);
     updateThresh();
 }
 
@@ -310,11 +312,11 @@ void ColorCreator::updateThresh()
                         {
                             display = false;
                         }
-                        if (z < zMin[start] || z > zMax[start])
+                        else if (z < zMin[start] || z > zMax[start])
                         {
                             display = false;
                         }
-                        if (y < yMin[start] || y > yMax[start])
+                        else if (y < yMin[start] || y > yMax[start])
                         {
                             display = false;
                         }

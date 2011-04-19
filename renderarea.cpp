@@ -80,29 +80,21 @@ void RenderArea::setTransformed(bool transformed)
 
 void RenderArea::paintEvent(QPaintEvent * /* event */)
 {
-
-    QRect rect(10, 20, 80, 60);
-
-    QPainterPath path;
-
     QPainter painter(this);
     painter.setPen(pen);
     painter.setBrush(brush);
-    if (antialiased)
-        painter.setRenderHint(QPainter::Antialiasing, true);
 
     QTextStream out(stdout);
     QRect draw;
     int red, green, blue, edge;
     bool found;
-    float radius = 120.0f * 120.0f;
-    float h, s, v;
+    red = green = blue = edge = 0;
 
     for (int i = 0; i < r.getHeight(); i++)
     {
         for (int j = 0; j < r.getWidth(); j++)
         {
-            float dist = (120 - i) * (120 - i) + (160 - j) * (160 - j);
+            //float dist = (120 - i) * (120 - i) + (160 - j) * (160 - j);
             switch (shape) {
             case V:
                 red = green = blue = r.getV(j, i);
@@ -165,23 +157,6 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                             green = 0;
                         }
                     }
-                }
-                break;
-            case WHEEL:
-
-                if (dist < radius)
-                {
-                    s = dist / radius;
-                    h = atan2(160 - j, 120 - i) / (2.0f * 3.14159f);
-                    v = 0.5;
-                    ColorSpace c;
-                    c.setHsz(h, s, v);
-                    red = c.getRb();
-                    green = c.getGb();
-                    blue = c.getBb();
-                } else
-                {
-                    red = green = blue = 0;
                 }
                 break;
             case Pixmap:

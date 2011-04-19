@@ -28,7 +28,7 @@ ColorTable::ColorTable()
     colormap = new int*[2];
     for (int i = 0; i < 2; i++)
     {
-        colormap[i] = new int[10];
+        colormap[i] = new int[12];
     }
     // map of our old "soft color" values to new colors
     colormap[0][0] = Black;
@@ -41,6 +41,8 @@ ColorTable::ColorTable()
     colormap[0][7] = Blue;
     colormap[0][8] = Orange;
     colormap[0][9] = Orange;
+    colormap[0][10] = Pink;
+    colormap[0][11] = Navy;
     colormap[1][0] = Black;
     colormap[1][1] = Black;
     colormap[1][2] = Black;
@@ -51,6 +53,8 @@ ColorTable::ColorTable()
     colormap[1][7] = Green;
     colormap[1][8] = Pink;
     colormap[1][9] = Yellow;
+    colormap[1][10] = Black;
+    colormap[1][11] = Black;
 }
 
 // Read table from a file and determine the format
@@ -265,7 +269,7 @@ Stats** ColorTable::colorStats()
                 }
                 // assumes old style table - convert values
                 // e.g. ORANGERED hits both ORANGE and RED
-                if (c < 10)
+                if (c < 12)
                     for (int q = 0; q < 2; ++q)
                     {
                         int ci = colormap[q][c];

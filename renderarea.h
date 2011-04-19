@@ -13,7 +13,7 @@ class RenderArea : public QWidget
 {
     Q_OBJECT
 public:
-    enum Shape { Y, U, V, Blue, Red, Green, H, S, Z, EDGE, WHEEL, Pixmap };
+    enum Shape { Y, U, V, Blue, Red, Green, H, S, Z, EDGE, Pixmap };
 
     RenderArea(RoboImage r1, QLabel *lab, QWidget *parent = 0);
 
@@ -34,6 +34,7 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
+    RoboImage r;
     Shape shape;
     QPen pen;
     QBrush brush;
@@ -41,7 +42,6 @@ private:
     bool antialiased;
     bool transformed;
     QPixmap pixmap;
-    RoboImage r;
 
 signals:
 

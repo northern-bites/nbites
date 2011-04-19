@@ -25,7 +25,6 @@ Window::Window(RoboImage r1, QWidget *parent) :
     shapeComboBox->addItem(tr("S"), RenderArea::S);
     shapeComboBox->addItem(tr("Z"), RenderArea::Z);
     shapeComboBox->addItem(tr("Edge"), RenderArea::EDGE);
-    shapeComboBox->addItem(tr("W"), RenderArea::WHEEL);
 
     shapeLabel = new QLabel(tr("&View:"));
     shapeLabel->setBuddy(shapeComboBox);
