@@ -131,7 +131,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 # Definitions for the type of robot (for compilation definitions), and
 # prefixes for library, executable, and path names
 IF( NOT DEFINED ROBOT_TYPE )
-  SET( ROBOT_TYPE NAO_RL )
+  SET( ROBOT_TYPE NAO_RL_33 )
 ENDIF( NOT DEFINED ROBOT_TYPE )
 SET( ROBOT_TYPE ${ROBOT_TYPE} CACHE STRING "Robot type" )
 SET( ROBOT_PREFIX nao )
