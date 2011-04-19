@@ -12,9 +12,10 @@
 
 ColorCreator::ColorCreator(QWidget *parent) :
     QWidget(parent),
+    ui(new Ui::ColorCreator),
     roboimage(WIDTH, HEIGHT),
-    imageWindow(roboimage),
-    ui(new Ui::ColorCreator)
+    imageWindow(roboimage)
+
 {
     hMin = new float[COLORS];
     hMax = new float[COLORS];
@@ -53,6 +54,7 @@ ColorCreator::ColorCreator(QWidget *parent) :
     baseDirectory = "/Users/ericchown/nbites/data/frames";
     baseColorTable = "/Users/ericchown/nbites/data/tables";
     haveFile = false;
+    viewerEnabled = false;
 
     ui->colorSelect->addItem(tr("Orange"), Orange);
     ui->colorSelect->addItem(tr("Blue"), Blue);
@@ -87,24 +89,24 @@ ColorCreator::ColorCreator(QWidget *parent) :
             yMax[i] = 145;
             break;
         case Green:
-            hMin[i] = 0.45f;
-            hMax[i] = 0.60f;
-            sMin[i] = 0.3f;
-            sMax[i] = 0.6f;
-            zMin[i] = 0.0f;
-            zMax[i] = 1.0f;
-            yMin[i] = 41;
-            yMax[i] = 124;
+            hMin[i] = 0.42f;
+            hMax[i] = 0.58f;
+            sMin[i] = 0.35f;
+            sMax[i] = 0.62f;
+            zMin[i] = 0.22f;
+            zMax[i] = 0.73f;
+            yMin[i] = 47;
+            yMax[i] = 112;
             break;
         case Yellow:
-            hMin[i] = 0.13f;
-            hMax[i] = 0.36f;
-            sMin[i] = 0.08f;
-            sMax[i] = 0.70f;
-            zMin[i] = 0.17f;
-            zMax[i] = 1.0f;
-            yMin[i] = 62;
-            yMax[i] = 145;
+            hMin[i] = 0.10f;
+            hMax[i] = 0.30f;
+            sMin[i] = 0.11f;
+            sMax[i] = 0.74f;
+            zMin[i] = 0.26f;
+            zMax[i] = 0.70f;
+            yMin[i] = 54;
+            yMax[i] = 170;
             break;
         case Blue:
             hMin[i] = 0.58f;
@@ -117,19 +119,39 @@ ColorCreator::ColorCreator(QWidget *parent) :
             yMax[i] = 146;
             break;
         case White:
-            hMin[i] = 0.15f;
-            hMax[i] = 0.71f;
+            hMin[i] = 0.01f;
+            hMax[i] = 1.0f;
             sMin[i] = 0.0f;
             sMax[i] = 0.3f;
-            zMin[i] = 0.0f;
+            zMin[i] = 0.55f;
             zMax[i] = 1.0f;
             yMin[i] = 150;
             yMax[i] = 250;
             break;
+        case Pink:
+            hMin[i] = 0.73f;
+            hMax[i] = 0.98f;
+            sMin[i] = 0.17f;
+            sMax[i] = 0.4f;
+            zMin[i] = 0.14f;
+            zMax[i] = 0.31f;
+            yMin[i] = 38;
+            yMax[i] = 115;
+            break;
+        case Navy:
+            hMin[i] = 0.64f;
+            hMax[i] = 0.68f;
+            sMin[i] = 0.38f;
+            sMax[i] = 0.62f;
+            zMin[i] = 0.29f;
+            zMax[i] = 0.36f;
+            yMin[i] = 35;
+            yMax[i] = 105;
+            break;
         default:
             hMin[i] = 0.0f;
             hMax[i] = 0.01f;
-            sMin[i] = 0.0f;
+            sMin[i] = 0.99f;
             sMax[i] = 1.0f;
             zMin[i] = 0.0f;
             zMax[i] = 1.0f;
@@ -156,21 +178,23 @@ ColorCreator::~ColorCreator()
 
 void ColorCreator::updateDisplays()
 {
-    /*RoboImage::DisplayModes mode = RoboImage::Color;
-    QImage img = roboimage.fast();
-    QPixmap display;
-    display.convertFromImage(img);
-    //ui->BaseImage->setPixmap(display);*/
-    imageWindow.show();
-    imageWindow.repaint();
+    if (viewerEnabled)
+    {
+        imageWindow.repaint();
+    }
     QString next;
     next.setNum(currentFrameNumber+1, 10);
     QString prev;
     prev.setNum(currentFrameNumber-1, 10);
+    QString plusTen;
+    plusTen.setNum(currentFrameNumber+10, 10);
+    QString minusTen;
+    minusTen.setNum(currentFrameNumber-10, 10);
     nextFrame = currentDirectory + "/" + next + EXTENSION;
     previousFrame = currentDirectory + "/" + prev + EXTENSION;
+    tenthFrame = currentDirectory + "/" + plusTen + EXTENSION;
+    minusTenthFrame = currentDirectory + "/" + plusTen + EXTENSION;
     haveFile = true;
-    QTextStream out(stdout);
     updateThresh();
 }
 
@@ -295,11 +319,11 @@ void ColorCreator::updateThresh()
                         {
                             display = false;
                         }
-                        if (z < zMin[start] || z > zMax[start])
+                        else if (z < zMin[start] || z > zMax[start])
                         {
                             display = false;
                         }
-                        if (y < yMin[start] || y > yMax[start])
+                        else if (y < yMin[start] || y > yMax[start])
                         {
                             display = false;
                         }
@@ -560,34 +584,126 @@ void ColorCreator::writeOldFormat(QString filename)
         out << "The file would not open properly" << "\n";
         return;
     }
-    for (int y = 0; y < 128; ++y)
+    // loop through all possible table values - our tables are v-u-y
+    int count = 0;
+    for (int z = 0; z < 128; ++z)
     {
         for (int x = 0; x < 128; x ++)
         {
-            for (int z = 0; z < 128; z++)
+            for (int y = 0; y < 128; y++)
             {
-                temp[0] = UNDEFINED;
+                temp[0] = GREY_COL;
                 ColorSpace col;
                 col.setYuv(y * 2, x * 2, z * 2);
-                for (int c = 0; c < COLORS; c++)
+                bool orange = false;
+                bool yellow = false;
+                bool blue = false;
+                for (int c = Orange; c < Black; c++)
                 {
-                    if (y * 2 >= yMin[c] && y * 2 <= yMax[c] && col.getHb() >= hMin[c] && col.getHb() <= hMax[c] &&
-                            col.getSb() >= sMin[c] && col.getSb() <= sMax[c] && col.getZb() >= zMin[c] &&
-                            col.getZb() <= zMax[c])
+                    bool ok = false;
+                    if (hMin[c] > hMax[c])
                     {
-                        temp[0] = temp[0] | bitColor[c];
+                        if (col.getH() >= hMin[c] || col.getH() <= hMax[c])
+                        {
+                            ok = true;
+                        }
+                    } else
+                    {
+                        if (col.getH() >= hMin[c] && col.getH() <= hMax[c])
+                        {
+                            ok = true;
+                        }
+                    }
+                    if (ok && y * 2 >= yMin[c] && y * 2 <= yMax[c] &&
+                            col.getS() >= sMin[c] && col.getS() <= sMax[c] && col.getZ() >= zMin[c] &&
+                            col.getZ() <= zMax[c])
+                    {
+                        switch (c)
+                        {
+                        case Orange:
+                            temp[0] = ORANGE_COL;
+                            orange = true;
+                            count++;
+                            break;
+                        case Blue:
+                            temp[0] = BLUE_COL;
+                            blue = true;
+                            break;
+                        case Yellow:
+                            if (orange)
+                            {
+                                temp[0] = ORANGEYELLOW_COL;
+                            } else
+                            {
+                                temp[0] = YELLOW_COL;
+                            }
+                            yellow = true;
+                            break;
+                        case Green:
+                            if (blue)
+                            {
+                                temp[0] = BLUEGREEN_COL;
+                            } else{
+                                temp[0] = GREEN_COL;
+                            }
+                            break;
+                        case White:
+                            if (yellow)
+                            {
+                                temp[0] = YELLOWWHITE_COL;
+                            } else
+                            {
+                                temp[0] = WHITE;
+                            }
+                            break;
+                        case Pink:
+                            if (orange)
+                            {
+                                temp[0] = ORANGERED_COL;
+                            } else
+                            {
+                                temp[0] = RED_COL;
+                            }
+                            break;
+                        case Navy:
+                            temp[0] = NAVY_COL;
+                            break;
+                        }
+
+                        //temp[0] = temp[0] | bitColor[c];
                     }
                 }
                 file.write(temp);
             }
         }
     }
+    out << "Count was " << count << "\n";
     file.close();
 }
 
 
 void ColorCreator::on_writeNew_clicked()
 {
-    QString filename = baseColorTable + "new.mtb";
-    writeNewFormat(filename);
+    QString filename = baseColorTable + "/new.mtb";
+    writeOldFormat(filename);
+}
+
+void ColorCreator::on_viewer_clicked()
+{
+    imageWindow.show();
+    viewerEnabled = true;
+}
+
+void ColorCreator::on_plusTen_clicked()
+{
+    roboimage.read(tenthFrame);
+    currentFrameNumber += 10;
+    updateDisplays();
+}
+
+void ColorCreator::on_minusTen_clicked()
+{
+    roboimage.read(minusTenthFrame);
+    currentFrameNumber -= 10;
+    updateDisplays();
 }

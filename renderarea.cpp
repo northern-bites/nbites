@@ -17,8 +17,8 @@ RenderArea::RenderArea(RoboImage r1, QLabel *inf, QWidget *parent)
 }
 
 void RenderArea::mouseMoveEvent(QMouseEvent *event) {
-    int x = event->x() / 2;
-    int y = event->y() / 2;
+    int x = event->x();
+    int y = event->y();
     QString xS;
     xS.setNum(x);
     QString yS;
@@ -29,7 +29,13 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event) {
     u.setNum(r.getU(x, y));
     QString v;
     v.setNum(r.getV(x, y));
-    QString temp = "x, y: "+ xS+" "+yS+"\nYUV: "+yy+" "+u+" "+v;
+    QString h;
+    h.setNum(r.getH(x, y));
+    QString s;
+    s.setNum(r.getS(x, y));
+    QString z;
+    z.setNum(r.getZ(x, y));
+    QString temp = "x, y: "+ xS+" "+yS+"\nYUV: "+yy+" "+u+" "+v+"\nHSV: "+h+" "+s+" "+z;
     info->setText(temp);
 }
 
@@ -75,31 +81,21 @@ void RenderArea::setTransformed(bool transformed)
 
 void RenderArea::paintEvent(QPaintEvent * /* event */)
 {
-
-    QRect rect(10, 20, 80, 60);
-
-    QPainterPath path;
-    /*path.moveTo(20, 80);
-    path.lineTo(20, 30);
-    path.cubicTo(80, 0, 50, 50, 80, 80);*/
-
     QPainter painter(this);
     painter.setPen(pen);
     painter.setBrush(brush);
-    if (antialiased)
-        painter.setRenderHint(QPainter::Antialiasing, true);
 
     QTextStream out(stdout);
     QRect draw;
     int red, green, blue, edge;
     bool found;
+    red = green = blue = edge = 0;
+
     for (int i = 0; i < r.getHeight(); i++)
     {
         for (int j = 0; j < r.getWidth(); j++)
         {
-            float radius = 120.0f * 120.0f;
-            float h, s, v;
-            float dist = (120 - i) * (120 - i) + (160 - j) * (160 - j);
+            //float dist = (120 - i) * (120 - i) + (160 - j) * (160 - j);
             switch (shape) {
             case V:
                 red = green = blue = r.getV(j, i);
@@ -162,23 +158,6 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                             green = 0;
                         }
                     }
-                }
-                break;
-            case WHEEL:
-
-                if (dist < radius)
-                {
-                    s = dist / radius;
-                    h = atan2(160 - j, 120 - i) / (2.0f * 3.14159f);
-                    v = 0.5;
-                    ColorSpace c;
-                    c.setHsz(h, s, v);
-                    red = c.getRb();
-                    green = c.getGb();
-                    blue = c.getBb();
-                } else
-                {
-                    red = green = blue = 0;
                 }
                 break;
             case Pixmap:

@@ -32,7 +32,7 @@
   <widget class="QPushButton" name="nextButton">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>160</x>
      <y>100</y>
      <width>114</width>
      <height>32</height>
@@ -426,6 +426,45 @@
    </property>
    <property name="text">
     <string>Make New</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="plusTen">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>100</y>
+     <width>114</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>+ 10</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="minusTen">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>100</y>
+     <width>114</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>- 10</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="viewer">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>50</y>
+     <width>114</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Viewer</string>
    </property>
   </widget>
  </widget>

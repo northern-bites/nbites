@@ -21,6 +21,19 @@
 #define  EXTENSION ".NBFRM"
 #define  EXTENSIONLENGTH = 6
 #endif
+#define GREY_COL 0x00
+#define WHITE_COL 0x01
+#define GREEN_COL 0x02
+#define BLUE_COL 0x03
+#define YELLOW_COL 0x04
+#define ORANGE_COL 0x05
+#define YELLOWWHITE_COL 0x06
+#define BLUEGREEN_COL 0x07
+#define ORANGERED_COL 0x08
+#define ORANGEYELLOW_COL 0x09
+#define RED_COL 0x0a
+#define NAVY_COL 0x0b
+
 
 
 namespace Ui {
@@ -82,6 +95,12 @@ private slots:
 
     void on_writeNew_clicked();
 
+    void on_viewer_clicked();
+
+    void on_plusTen_clicked();
+
+    void on_minusTen_clicked();
+
 private:
     Ui::ColorCreator *ui;
     RoboImage roboimage;
@@ -94,6 +113,8 @@ private:
     QString currentColorDirectory;
     QString nextFrame;
     QString previousFrame;
+    QString tenthFrame;
+    QString minusTenthFrame;
     int currentFrameNumber;
     int mode;
     QColor *cols;
@@ -112,6 +133,7 @@ private:
     ColorEdit *green;
     unsigned *bitColor;
     bool haveFile;
+    bool viewerEnabled;
 };
 
 #endif // COLORCREATOR_H
