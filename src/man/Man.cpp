@@ -73,8 +73,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
   // initialize core processing modules
 #ifdef USE_MOTION
-  motion = shared_ptr<Motion>(
-                              new Motion(synchro, enactor, sensors,profiler));
+  motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors,profiler,pose));
   guardian->setMotionInterface(motion->getInterface());
 #endif
   // initialize python roboguardian module.
