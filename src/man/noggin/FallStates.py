@@ -91,7 +91,7 @@ def feetOffGround(guard):
     """
     if guard.firstFrame():
         guard.brain.player.stopWalking()
-        guard.brain.nav.switchTo('stop')
+        guard.brain.nav.stop()
 
     # back on the ground
     if (guard.brain.roboguardian.isFeetOnGround()):
