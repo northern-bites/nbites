@@ -239,6 +239,7 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
                     (-90,0,90,0 ),0.3,0, stiff.STANDUP_STIFFNESSES ),
+                   #First motions: switched 0 and 8 to make it symmetrical
 
                    ((-50,0,-90,-35),
                     (5,8,-90,120,-65,0),
@@ -254,6 +255,7 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (-50,0,-90,70,-44,-39),
                     (-50,0,-90,70,-44,39),
                     (25,-20,60,88),1.0,0, stiff.STANDUP_STIFFNESSES),
+                   #Bring arms out to avoid stuck elbows
 
                    ((25,0,-90,-88),
                     (-50,0,-90,70,-44,-39),
@@ -274,6 +276,7 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (-50,5,-90,123,-5,-5),
                     (-50,-5,-90,123,-5,5),
                     (35,2,14,41),0.8, 0, stiff.STANDUP_STIFFNESSES),
+                   #Rock back onto heels, don't lean over so much
 
                    # ((64,7,-53,-74),
                    #  (-45,6,-61,124,-30,-6),
