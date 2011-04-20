@@ -268,10 +268,10 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (35,2,14,41),1.5, 0, stiff.STANDUP_STIFFNESSES),
                    #Rock back onto heels, don't lean over so much
 
-                   ((75,-7,-53,-74),
+                   ((75,10,-53,-74),
                     (-40,6,-61,124,-35,-6),
                     (-40,-6,-61,124,-35,6),
-                    (75,7,53,74),0.8, 0, stiff.STANDUP_STIFFNESSES),
+                    (75,-10,53,74),0.8, 0, stiff.STANDUP_STIFFNESSES),
 
                    ((93,10,-90,-80),
                     (0,0,-60,120,-60,0),
