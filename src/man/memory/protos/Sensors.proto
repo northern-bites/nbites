@@ -34,7 +34,7 @@ message PSensors {
 
 message PMotionSensors {
 
-    optional uint64 timestamp = 1;
+    optional int64 timestamp = 1;
 
 	repeated float body_angles = 2;
 	repeated float motion_body_angles = 3;
@@ -53,7 +53,7 @@ message PMotionSensors {
 
 message PVisionSensors {
 
-	optional uint64 timestamp = 1;
+	optional int64 timestamp = 1;
 
 	repeated float vision_body_angles = 3;
 	optional PSensors.PFootBumper left_foot_bumper = 4;
@@ -71,7 +71,7 @@ message PVisionSensors {
 
 message PImage {
 
-	optional uint64 timestamp = 1;
+	optional int64 timestamp = 1;
 
 	optional bytes image = 2;
 }
