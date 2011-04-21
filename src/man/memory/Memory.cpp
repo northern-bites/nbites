@@ -8,7 +8,7 @@
 
 #include "Memory.hpp"
 
-namespace memory{
+namespace memory {
 
 long long int birth_time; //the time we initialized memory
 //everything else is time stamped relative to this

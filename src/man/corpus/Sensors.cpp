@@ -61,7 +61,8 @@ Sensors::Sensors ()
       ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
       yImage(&global_image[0]), uvImage(&global_image[0]),
       colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
-      naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+      naoImage(NULL),
+      //naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
@@ -746,8 +747,9 @@ void Sensors::releaseVisionAngles() {
 }
 
 // Get a pointer to the full size Nao image
-const uint8_t* Sensors::getNaoImage () const
+uint8_t* Sensors::getNaoImage ()
 {
+    //cout << " get " << (long) naoImage << endl;
     return naoImage;
 }
 
@@ -771,9 +773,14 @@ const uint8_t* Sensors::getColorImage() const
     return colorImage;
 }
 
+void Sensors::setNaoImagePointer(char* _naoImage) {
+    cout << "I am being set!"<<endl;
+    naoImage = (uint8_t*) _naoImage;
+}
+
 void Sensors::setNaoImage(const uint8_t *img)
 {
-    naoImage = img;
+    //naoImage = img;
     this->notify(ProviderEvent(this, NEW_IMAGE));
 }
 

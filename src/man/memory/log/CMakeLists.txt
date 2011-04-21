@@ -9,11 +9,12 @@ cmake_minimum_required( VERSION 2.6.0 )
 # Libraries specifics.
 # cmake packages we use
 FIND_PACKAGE( Protobuf REQUIRED )
-
+FIND_PACKAGE( ZLIB )
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
-include_directories( ${PROTOBUF_INCLUDE_DIR}/
+include_directories( ${PROTOBUF_INCLUDE_DIRS}/
+                     ${ZLIB_INCLUDE_DIRS}
                      )
 
 ############################ PROJECT SOURCES FILES
@@ -30,5 +31,6 @@ add_library(
 
 target_link_libraries(
     ${LOGGER_TARGET}
-    ${PROTOBUF_LIBRARY}
+    ${PROTOBUF_LIBRARIES}
+    ${ZLIB_LIBRARIES}
     )

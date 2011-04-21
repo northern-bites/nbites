@@ -14,10 +14,10 @@
 
 #include <google/protobuf/message.h>
 
-typedef ::google::protobuf::Message ProtoMessage;
-
 namespace memory {
 namespace log {
+
+typedef ::google::protobuf::Message ProtoMessage;
 
 class Logger {
 

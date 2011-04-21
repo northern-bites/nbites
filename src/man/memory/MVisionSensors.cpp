@@ -7,6 +7,8 @@
 #include "Common.h" //for micro_time
 #include "MemoryMacros.hpp"
 #include "MVisionSensors.hpp"
+//TODO: remove this
+#include "NaoPaths.h"
 
 #include <vector>
 
@@ -17,7 +19,7 @@ using namespace proto;
 using namespace std;
 
 MVisionSensors::MVisionSensors(shared_ptr<Sensors> s) : sensors(s) {
-    fileLogger = new log::FileLogger("/home/nao/VisionSensors.log", MVISION_SENSORS_ID, this);
+    fileLogger = new log::FileLogger(NAO_LOG_DIR "/VisionSensors.log", MVISION_SENSORS_ID, this);
 }
 
 MVisionSensors::~MVisionSensors() {

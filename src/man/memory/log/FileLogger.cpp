@@ -16,6 +16,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <iostream>
+#include <zlib.h>
+
+#include <google/protobuf/io/gzip_stream.h>
 
 #include "FileLogger.hpp"
 
@@ -27,9 +30,9 @@ namespace log {
 
 using namespace std;
 
-FileLogger::FileLogger(char* fileName, int logTypeID, ProtoMessage* m) :
+FileLogger::FileLogger(string fileName, int logTypeID, ProtoMessage* m) :
         Logger(m) {
-    int file_descriptor = open(fileName,
+    int file_descriptor = open(fileName.data(),
                                O_WRONLY | O_CREAT,
                                S_IRWXU | S_IRWXG | S_IRWXO);
     if (file_descriptor == -1) {
@@ -37,6 +40,13 @@ FileLogger::FileLogger(char* fileName, int logTypeID, ProtoMessage* m) :
                 << " for logging" << endl;
     }
     raw_output = new FileOutputStream(file_descriptor);
+    //TODO: put the gzip code in a gzip file logger
+//    GzipOutputStream::Options opts;
+//    opts.format = GzipOutputStream::ZLIB;
+//    opts.compression_level = 1;
+//    opts.compression_strategy = Z_RLE;
+//    opts.buffer_size = 614400;
+//    GzipOutputStream* gzip_output = new GzipOutputStream(raw_output, opts);
     coded_output = new CodedOutputStream(raw_output);
     // this helps us ID the log
     coded_output->WriteLittleEndian32(logTypeID);

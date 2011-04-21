@@ -40,7 +40,7 @@ public:
      * @param m : the proto message we will log
      * @return
      */
-    FileLogger(char* fileName, int logTypeID, ProtoMessage* m);
+    FileLogger(std::string fileName, int logTypeID, ProtoMessage* m);
 
     /**
      * Closes the file, which will flush the output buffer

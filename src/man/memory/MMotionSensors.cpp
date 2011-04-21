@@ -4,11 +4,14 @@
  *      Author: oneamtu
  */
 
+#include <vector>
+
 #include "Common.h" //for micro_time
 #include "MemoryMacros.hpp"
 #include "MMotionSensors.hpp"
 
-#include <vector>
+//TODO: remove this
+#include "NaoPaths.h"
 
 namespace memory {
 
@@ -17,7 +20,7 @@ using namespace proto;
 using namespace std;
 
 MMotionSensors::MMotionSensors(shared_ptr<Sensors> s) : sensors(s) {
-    fileLogger = new log::FileLogger("/home/nao/MotionSensors.log", MMOTION_SENSORS_ID, this);
+    fileLogger = new log::FileLogger(NAO_LOG_DIR "/MotionSensors.log", MMOTION_SENSORS_ID, this);
 }
 
 MMotionSensors::~MMotionSensors() {

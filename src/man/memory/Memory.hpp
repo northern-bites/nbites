@@ -20,11 +20,14 @@ namespace memory {
 class Memory; //forward declaration
 }
 
+//TODO: make everything .h
 #include "MVision.hpp"
 #include "Vision.h"
 #include "MSensors.hpp"
 #include "Sensors.h"
 #include "Profiler.h"
+//TODO: remove this after making the logging board
+#include "NaoPaths.h"
 
 namespace memory {
 

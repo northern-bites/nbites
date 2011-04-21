@@ -49,7 +49,7 @@ private: // member variables
     // Keep a local copy of the image because accessing the one from
     // NaoQi is very slow.
     uint16_t *image;
-    uint8_t *naoImage;
+    //uint8_t *naoImage;
 
     unsigned char *table;
     ColorParams params;

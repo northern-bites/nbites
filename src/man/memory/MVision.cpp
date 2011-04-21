@@ -7,6 +7,9 @@
 #include "MemoryMacros.hpp"
 #include "MVision.hpp"
 
+//TODO: remove this
+#include "NaoPaths.h"
+
 namespace memory {
 
 using boost::shared_ptr;
@@ -14,7 +17,7 @@ using std::list;
 
 MVision::MVision(shared_ptr<Vision> v) :
     vision(v) {
-    fileLogger = new log::FileLogger("/home/nao/Vision.log", MVISION_ID, this);
+    fileLogger = new log::FileLogger(NAO_LOG_DIR "/Vision.log", MVISION_ID, this);
 }
 
 MVision::~MVision() {
