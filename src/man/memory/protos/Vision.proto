@@ -2,7 +2,7 @@ package memory.proto;
 
 message PVision {
 
-    optional uint64 timestamp = 1;
+    optional int64 timestamp = 1;
     optional PVisualBall visual_ball = 2;
     repeated PVisualCorner visual_corner = 3;
 
