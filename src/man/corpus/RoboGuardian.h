@@ -53,6 +53,7 @@ public:
     //getters
     bool isRobotFalling()const { return falling; }
     bool isRobotFallen()const { return fallen; }
+	bool isFeetOnGround()const { return feetOnGround; }
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
@@ -71,6 +72,7 @@ public:
 private:
     void checkFalling();
     void checkFallen();
+	void checkFeetOnGround();
     void checkBatteryLevels();
     void checkTemperatures();
     void checkConnection();
@@ -100,13 +102,13 @@ private:
         rightFootButton;
 
     Inertial lastInertial;
-    int fallingFrames,notFallingFrames,fallenCounter;
+    int fallingFrames,notFallingFrames,fallenCounter,groundOnCounter,groundOffCounter;
     bool registeredFalling;
-    int wifiReconnectTimeout;
-
     bool registeredShutdown;
 
-    bool falling, fallen;
+    int wifiReconnectTimeout;
+
+    bool falling, fallen, feetOnGround;
     mutable bool useFallProtection;
 
     mutable pthread_mutex_t click_mutex;

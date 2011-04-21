@@ -39,6 +39,11 @@ class FallController(FSA.FSA):
                 self.switchTo('fallen')
                 #         elif self.brain.guardian.falling:
                 #             self.switchTo('falling')
+
+            # if not falling, check if our feet are on the ground
+            if (not self.brain.roboguardian.isFeetOnGround()):
+                self.switchTo('feetOffGround')
+
         FSA.FSA.run(self)
 
     def isFallen(self):

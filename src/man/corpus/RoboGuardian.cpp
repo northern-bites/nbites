@@ -70,10 +70,12 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       //       buttonClicks(0),
       lastInertial(sensors->getInertial()), fallingFrames(0),
       notFallingFrames(0),fallenCounter(0),
+	  groundOnCounter(0),groundOffCounter(0),
       registeredFalling(false),registeredShutdown(false),
-      falling(false),fallen(false),
+	  wifiReconnectTimeout(0),
+	  falling(false),fallen(false),feetOnGround(true),
       useFallProtection(false),
-      wifiReconnectTimeout(0), lastHeatAudioWarning(0), lastHeatPrintWarning(0)
+      lastHeatAudioWarning(0), lastHeatPrintWarning(0)
 {
     pthread_mutex_init(&click_mutex,NULL);
     executeStartupAction();
@@ -97,6 +99,7 @@ void RoboGuardian::run(){
         countButtonPushes();
         checkFalling();
         checkFallen();
+		checkFeetOnGround();
         checkBatteryLevels();
         checkTemperatures();
         processFallingProtection();
@@ -174,6 +177,57 @@ void RoboGuardian::checkFallen(){
 
 }
 
+/**
+ * Method to check whether or not one of the robot's feet is on the
+ * ground. This is used to stop the motion engine (primarily) when we
+ * pick the robot up.
+ *
+ * We sum up the value of all the FSRs on both feet, and check the sum
+ * against a threshold. If the sum is under this threshold for more than
+ * GROUND_FRAMES_THRESH then we set feetOnGround=false
+ *
+ */
+void RoboGuardian::checkFeetOnGround() {
+//this can be higher than the falling thresholds since stopping the walk
+//engine is less critical
+	static const int GROUND_FRAMES_THRESH = 5;
+// lower than this, the robot is off the ground
+	static const float onGroundFSRThresh = 1.0f;
+
+	const FSR left = sensors->getLeftFootFSR();
+	const float leftSum = left.frontLeft + left.frontRight + left.rearLeft +
+		left.rearRight;
+	const FSR right = sensors->getRightFootFSR();
+	const float rightSum = right.frontLeft + right.frontRight + right.rearLeft +
+		right.rearRight;
+
+	//printf("left: %f, right: %f, total: %f\n", leftSum, rightSum, (leftSum + rightSum));
+
+	// buffer the transition in both directions
+	if (feetOnGround) {
+		if (leftSum + rightSum < onGroundFSRThresh) {
+			groundOffCounter++;
+		} else {
+			groundOffCounter = 0;
+		}
+	}
+	else {
+		if (leftSum + rightSum > onGroundFSRThresh) {
+			groundOnCounter++;
+		}
+		else {
+			groundOnCounter = 0;
+		}
+	}
+
+	if (groundOffCounter > GROUND_FRAMES_THRESH) {
+		feetOnGround = false;
+		groundOnCounter = groundOffCounter = 0;
+	} else if (groundOnCounter > GROUND_FRAMES_THRESH) {
+		feetOnGround = true;
+		groundOnCounter = groundOffCounter = 0;
+	}
+}
 
 /**
  * Method to watch the robots rotation and detect falls
