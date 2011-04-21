@@ -19,16 +19,11 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
-    if player.firstFrame():
-        player.setWalk(0,0, speeds.RIGHT_SPIN_MAX_SPEED)
-        player.brain.tracker.startScan(HeadMoves.SPIN_RIGHT_SCAN_BALL)
+    player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
 
     #if player.brain.ball.on:
-    player.brain.sensors.saveFrame()
-    player.numFramesSaved += 1
-
-    if player.numFramesSaved > 300:
-        return player.goLater('doneState')
+    # player.brain.sensors.saveFrame()
+    # player.numFramesSaved += 1
 
     return player.stay()
 
@@ -42,7 +37,6 @@ def doneState(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)
         player.brain.tracker.stopHeadMoves()
-        player.brain.sensors.resetSaveFrame()
 
 #     if player.stateTime > 8.0:
 #         shutoff = motion.StiffnessCommand(0.0)

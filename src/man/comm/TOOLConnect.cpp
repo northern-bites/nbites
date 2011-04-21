@@ -74,7 +74,6 @@ TOOLConnect::run ()
                 if (running) {
                     fprintf(stderr, "Caught error on socket.  TOOL connection reset.\n");
                     fprintf(stderr, "%s\n", e.what());
-                    reset();
                 }
             }
         }
