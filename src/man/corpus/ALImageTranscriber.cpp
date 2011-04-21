@@ -543,7 +543,6 @@ void ALImageTranscriber::waitForImage ()
             sensors->lockImage();
 #ifdef CAN_SAVE_FRAMES
 
-            cout << "grabbing a new frame";
             uint8_t* naoImage = sensors->getNaoImage();
             if (naoImage != NULL) {
                 _copy_image(ALimage->getData(), naoImage);
