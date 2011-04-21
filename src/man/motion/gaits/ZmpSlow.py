@@ -23,7 +23,7 @@ SLOWZMP_STEP_CONFIG = (0.375, # step duration
                        25.0, # max theta speed()
                        4.0,  # max x accel
                        4.0,  # max y accel
-                       20.0, # max theta speed()
+                       15.0, # max theta speed()
                        WALKING)  # walking gait = true
 
 SLOW_ZMP_CONFIG = (0.0,  # footCenterLocX

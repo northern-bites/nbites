@@ -20,7 +20,7 @@ STEP_CONFIG = (0.375, # step duration
                18.0,  # max x speed
                -9.0,  # max x speed (backwards)
                11.0,  # max y speed
-               25.0, # max theta speed()
+               30.0, # max theta speed()
                4.0,  # max x accel
                4.0,  # max y accel
                15.0, # max theta accel
