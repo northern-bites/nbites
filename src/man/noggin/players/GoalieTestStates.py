@@ -19,7 +19,7 @@ def gameInitial(player):
 def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
-        player.brain.fallController.disable()
+        player.brain.fallController.enableFallProtection(False)
         player.brain.tracker.trackBall()
         #player.brain.tracker.activeLoc()
         player.standup()

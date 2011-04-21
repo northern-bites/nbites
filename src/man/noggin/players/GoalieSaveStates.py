@@ -37,7 +37,7 @@ def goalieSave(player):
         # player.stopWalking()
 
 def goaliePickSave(player):   
-    player.brain.fallController.disable()
+    player.brain.fallController.enableFallProtection(False)
 
     if(TESTING):
         if helper.shouldSaveRight(player):
@@ -129,6 +129,6 @@ def postCenterSave(player):
     return player.stay()
 def postDiveSave(player):
     if player.brain.nav.isStopped():
-        player.brain.fallController.enable()
+        player.brain.fallController.enableFallProtection(True)
         player.isSaving = False
         return player.stay()

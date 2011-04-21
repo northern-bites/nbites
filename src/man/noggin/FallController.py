@@ -65,12 +65,6 @@ class FallController(FSA.FSA):
         else:
             return SweetMoves.getMoveTime(SweetMoves.STAND_UP_FRONT)
 
-    def enable(self):
-        self.switchTo('on')
-
-    def disable(self):
-        self.switchTo('off')
-
     def enableFallProtection(self, isTrue):
         self.printf("Fall Protection is " + str(isTrue))
         self.enabled = isTrue
