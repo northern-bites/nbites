@@ -125,7 +125,7 @@ public abstract class TOOLImage {
     }
 
     public int getComponent(int x, int y, int c) {
-        return pixels[y][x][c] & 0xff;
+        return pixels[y][x][c] & 0xff; // Convert the byte pixel value into an int.
     }
 
     /**

@@ -68,7 +68,7 @@ def step(nav, x, y, theta, numSteps):
 
     x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
 
-    createAndSendStepVector(nav, x_cms, y_cms, theta_degs)
+    createAndSendStepsVector(nav, x_cms, y_cms, theta_degs)
 
     nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
     nav.curSpinDir = MyMath.sign(theta)

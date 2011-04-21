@@ -18,6 +18,8 @@ class Threshold;  // forward reference
 #include "Context.h"
 #include "Profiler.h"
 #include "NaoPose.h"
+#include "Gradient.h"
+
 //
 // COLOR TABLE CONSTANTS
 // remember to change both values when chaning the color tables
@@ -89,6 +91,8 @@ class Threshold;  // forward reference
 // Constants pertaining to object detection and horizon detection
 static const int MIN_RUN_SIZE = 5;
 
+static const int DEFAULT_EDGE_VALUE = 30;
+
 /* The following two constants are used in the traversal of the image
    inside thresholdAndRuns. We start at the bottom left of the image which
    is (IMAGE_HEIGHT-1)*IMAGE_ROW_OFFSET. ADDRESS_JUMP means we want to move to
@@ -100,11 +104,6 @@ static const unsigned int ADDRESS_JUMP = (ADDRESS_START) + 1;
 static const int MIN_X_OPEN = 40;
 
 static const int VISUAL_HORIZON_COLOR = BROWN;
-
-static const int UOFFSET=3;
-static const int VOFFSET=1;
-static const int YOFFSET1=0;
-static const int YOFFSET2=2;
 
 static const int NUMBLOCKS = 3;
 
@@ -128,7 +127,8 @@ public:
 
     // main methods
     void visionLoop();
-    inline void threshold();
+    // inline void threshold();
+    void thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg);
     inline void runs();
     unsigned char getColor(int x, int y);
     unsigned char getExpandedColor(int x, int y, unsigned char col);
@@ -166,8 +166,8 @@ public:
     int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
     point <int> backStopCheck(bool which, int left, int right);
-    void setYUV(const uchar* newyuv);
-    const uchar* getYUV();
+    void setYUV(const uint16_t* newyuv);
+    const uint16_t* getYUV();
     static const char * getShortColor(int _id);
 
     int getPixelBoundaryLeft();
@@ -180,10 +180,13 @@ public:
     bool getHorizonDebug() { return visualHorizonDebug; }
     void setDebugShooting(bool _bool) {debugShot = _bool;}
     void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
+    void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
+    void setDebugHoughTransform(bool _bool) {debugHoughTransform = _bool;}
 #endif
 
     void initDebugImage();
     void transposeDebugImage();
+    void drawDetectedEdges(boost::shared_ptr<Gradient> g);
     void drawX(int x, int y, int c);
     void drawPoint(int x, int y, int c);
     void drawLine(const point<int> start, const point<int> end,
@@ -193,17 +196,14 @@ public:
     void drawBox(int left, int right, int bottom, int top, int c);
     void drawRect(int left, int top, int width, int height, int c);
 
+    void setEdgeThreshold(int _thresh);
+    int getEdgeThreshold();
+    void setHoughAcceptThreshold(int _thresh);
 
 #if ROBOT(NAO_RL)
-    inline uchar getY(int x, int y) {
-        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2)];
-    }
-    inline uchar getU(int x, int y) {
-        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + UOFFSET];
-    }
-    inline uchar getV(int x, int y) {
-        return yplane[y*IMAGE_ROW_OFFSET+4*(x/2) + VOFFSET];
-    }
+    int getY(int j, int i) const;
+    int getU(int x, int y) const;
+    int getV(int j, int i) const;
 #elif ROBOT(NAO_SIM)
 #  error NAO_SIM robot type not implemented
 #else
@@ -224,13 +224,20 @@ public:
     Ball* orange;
     Cross* cross;
     // main array
-    unsigned char thresholded[IMAGE_HEIGHT][IMAGE_WIDTH];
+    uint8_t* thresholded;
+    inline uint8_t getThresholded(int i, int j){
+        return thresholded[i * IMAGE_WIDTH + j];
+    }
+    inline void setThresholded(int i, int j, uint8_t value){
+        thresholded[i * IMAGE_WIDTH + j] = value;
+    }
+
 	Field* field;
     Context* context;
 
 #ifdef OFFLINE
     //write lines, points, boxes to this array to avoid changing the real image
-    unsigned char debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
+    uint8_t debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
 #endif
 
 private:
@@ -239,8 +246,8 @@ private:
     Vision* vision;
     boost::shared_ptr<NaoPose> pose;
 
-    const uchar* yuv;
-    const uchar* yplane, *uplane, *vplane;
+    const uint16_t* yuv;
+    const uint16_t* yplane;
 
     unsigned char bigTable[UMAX][VMAX][YMAX];
 
@@ -279,10 +286,14 @@ private:
     bool debugSelf;
     bool debugShot;
     bool debugOpenField;
+    bool debugEdgeDetection;
+    bool debugHoughTransform;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;
     static const bool debugOpenField = false;
+    static const bool debugEdgeDetection = false;
+    static const bool debugHoughTransform = false;
 #endif
 };
 

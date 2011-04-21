@@ -74,7 +74,6 @@ TOOLConnect::run ()
                 if (running) {
                     fprintf(stderr, "Caught error on socket.  TOOL connection reset.\n");
                     fprintf(stderr, "%s\n", e.what());
-                    reset();
                 }
             }
         }
@@ -176,14 +175,17 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Image data request
     if (r.image) {
         sensors->lockImage();
-		serial.write_bytes(sensors->getImage(), IMAGE_BYTE_SIZE);
-		sensors->releaseImage();
+        serial.write_bytes(
+            reinterpret_cast<const uint8_t*>(sensors->getNaoImage()),
+            NAO_IMAGE_BYTE_SIZE);
+        sensors->releaseImage();
     }
 
     if (r.thresh)
         // send thresholded image
-        serial.write_bytes(&vision->thresh->thresholded[0][0],
-                           IMAGE_WIDTH * IMAGE_HEIGHT);
+        serial.write_bytes(
+            reinterpret_cast<const uint8_t*>(sensors->getColorImage()),
+            COLOR_IMAGE_BYTE_SIZE);
 
 	if (r.objects) {
 		if (loc.get()) {

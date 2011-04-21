@@ -59,10 +59,7 @@ public:
     void setMotionInterface(MotionInterface * minterface)
         { motion_interface = minterface; }
 
-//private: // Since this feature is not really production ready
-// from George: I removed the private tag, so that Python can call this method
-    //setters
-    void enableFallProtection(bool _useFallProtection)const //off by default
+    void enableFallProtection(bool _useFallProtection) const
         { useFallProtection = _useFallProtection; };
 
 

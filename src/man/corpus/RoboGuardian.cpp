@@ -181,9 +181,9 @@ void RoboGuardian::checkFallen(){
  *
  * Also builds in the ability to shutoff gains when a fall is detected,
  * but this still has some problems. Mainly, it sometimes triggers a fall
- * when the robot is rotated back up again, but only when the robot is 
+ * when the robot is rotated back up again, but only when the robot is
  * 'over rotated' during the righting.  This feature can be enabled
- * by calling the currently private 'enableFallProtection'.
+ * by calling 'enableFallProtection'.
  * Also, currently the robot will print whenever it believes it is in
  * the process of falling. This will allow us to monitor how well this code
  * works.
@@ -210,7 +210,7 @@ void RoboGuardian::checkFalling(){
         notFallingFrames +=1;
     }
     //     cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
-    //          << "  fallingFrames is " << fallingFrames 
+    //          << "  fallingFrames is " << fallingFrames
     //          << " and critical angle is "<< falling_critical_angle<< endl;
 
     //If the robot has been falling for a while, and the robot is inclined
@@ -228,7 +228,7 @@ void RoboGuardian::checkFalling(){
 
 
 void RoboGuardian::processFallingProtection(){
-    if(falling && !registeredFalling){
+    if(useFallProtection && falling && !registeredFalling){
         registeredFalling = true;
         executeFallProtection();
     }else if(notFallingFrames > FALLING_RESET_FRAMES_THRESH){

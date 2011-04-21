@@ -50,3 +50,8 @@ OPTION(
     "Turn on/off saving every frame in-game."
     OFF
     )
+OPTION(
+  CAN_SAVE_FRAMES
+  "Enable the ability to save or stream frames. Slower performance."
+  ON
+  )

@@ -189,7 +189,6 @@ def pDubDMiddie(team, workingPlay):
     pos = (x, y, h)
     workingPlay.setPosition(pos)
 
-
 ##### Kickoff sub roles ####
 
 def pKickoffSweeper(team, workingPlay):
