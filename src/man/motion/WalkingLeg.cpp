@@ -217,7 +217,8 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
 
     // modulate our CoM height based on where we are in the step phase
 	// check bounds, so we don't do stupid things when the robot is stationary
-	if (percent_complete >= 0.0f && percent_complete <= 1.0f) {
+	// disabled for US Open 2011 until I can do more testing --Nathan @ 4/21/11
+	if (false && percent_complete >= 0.0f && percent_complete <= 1.0f) {
 		const float com_height_adjustment_max = -1.5f;
 		// sin maps [0, 1.0f] -> [0, 1]
 		com_height_adjustment = sin(percent_complete*M_PI_FLOAT)

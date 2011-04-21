@@ -452,11 +452,6 @@ void StepGenerator::swapSupportLegs(){
  *    - End, where the ZMP should move directly under the robot (origin of S)
  */
 void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
-
-	// HACK ALERT: the multiple ZMP queues in their current state are a hack
-	// Once we decouple ZMP generation from the step queues this won't be a problem
-	// GNM June 2010
-
     switch(newSupportStep->type){
     case REGULAR_STEP:
 		fillZMPRegular(newSupportStep);
