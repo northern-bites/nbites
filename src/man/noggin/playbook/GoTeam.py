@@ -46,7 +46,8 @@ class GoTeam:
 
         if self.brain.gameController.currentState == 'gameReady':
             # Change which wing is forward based on the opponents score
-            self.kickoffFormation = (self.brain.gameController.gc.teams(self.brain.my.teamColor)[1])%2
+            gc = self.brain.gameController.gc
+            self.kickoffFormation = (gc.teams(self.brain.my.teamColor)[1])%2
 
         play.changed = False
         self.strategize(play)
