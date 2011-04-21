@@ -82,7 +82,7 @@ class Navigator(FSA.FSA):
                 self.switchTo('walkStraightToPoint')
 
     def stop(self):
-        if self.currentState =='stop':
+        if (self.currentState =='stop' or self.currentState == 'stopped'):
             pass
         else:
             self.switchTo('stop')
