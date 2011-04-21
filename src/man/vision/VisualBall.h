@@ -28,10 +28,13 @@ public:
     void setDistanceWithSD(float _dist);
     void setBearingWithSD(float b);
     void findAngles() {
-        setAngleX((static_cast<float>(IMAGE_WIDTH)/2 -
-                static_cast<float>(centerX) ) / MAX_BEARING_RAD);
-        setAngleY((static_cast<float>(IMAGE_HEIGHT)/2 -
-                static_cast<float>(centerY) ) / MAX_ELEVATION_RAD);
+        setAngleX( static_cast<float>((IMAGE_WIDTH/2 - centerX)) /
+                   static_cast<float>(IMAGE_WIDTH/2) *
+                   MAX_BEARING_RAD);
+
+        setAngleY( static_cast<float>(IMAGE_HEIGHT/2 - centerY) /
+                   static_cast<float>(IMAGE_HEIGHT/2) *
+                   MAX_ELEVATION_RAD);
     }
 
     // calibration pre-huge chown changes

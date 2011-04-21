@@ -29,7 +29,8 @@ public class ProcessedImage extends ThresholdedImage {
     private TOOLVisionLink visionLink;//the link
 
     public ProcessedImage(Frame currentFrame, ColorTable cTable) {
-        super(currentFrame.image().getWidth(), currentFrame.image().getHeight());
+        super(currentFrame.robotDef().outputImageDimensions().width,
+              currentFrame.robotDef().outputImageDimensions().height);
 
         visionLink = new TOOLVisionLink();
     }
@@ -58,7 +59,7 @@ public class ProcessedImage extends ThresholdedImage {
         } else {
             //Get the joints from the frame if it exists
 
-            float[] joints = new float[RobotDef.NAO_DEF.numJoints()];
+            float[] joints = new float[RobotDef.NAO_DEF_VERSIONED.numJoints()];
             if(currentFrame != null && currentFrame.hasJoints()){
                 List<Float> list_joints = currentFrame.joints();
                 joints = new float[list_joints.size()];
@@ -69,10 +70,11 @@ public class ProcessedImage extends ThresholdedImage {
                 }
             }else{
                 //tool.CONSOLE.message("Warning: Processing image w/o " +
-				//                   "joint info");
+                //                   "joint info");
             }
 
-            float[] sensors = new float[RobotDef.NAO_DEF.numSensors()];
+            float[] sensors =
+                new float[RobotDef.NAO_DEF_VERSIONED.numSensors()];
             if (currentFrame != null && currentFrame.hasSensors()) {
                 List<Float> list_sensors = currentFrame.sensors();
                 sensors = new float[list_sensors.size()];
@@ -83,9 +85,9 @@ public class ProcessedImage extends ThresholdedImage {
             }
             else {
                 //tool.CONSOLE.message("Warning: Processing image w/o " +
-				//                   "sensor info");
+                //                   "sensor info");
             }
-            
+
             // Convert the TOOLImage to the one-dimensional format that the C++
             // side is used to.
             byte[] rawImage = new byte[baseImage.rawImageSize()];
@@ -100,12 +102,12 @@ public class ProcessedImage extends ThresholdedImage {
 
             // This variable is declared in the superclass and used by its
             // getters.
-			thresholded = visionLink.processImage(rawImage,
-						  image.getWidth(),
-						  image.getHeight(),
-						  joints, sensors,
-						  rawTable);
-	}
+            thresholded = visionLink.processImage(rawImage,
+                                                  getWidth(),
+                                                  getHeight(),
+                                                  joints, sensors,
+                                                  rawTable);
+        }
     }
 
     /**
@@ -133,7 +135,7 @@ public class ProcessedImage extends ThresholdedImage {
             //Get the joints from the frame if it exists
             Frame currentFrame = frame;
 
-            float[] joints = new float[RobotDef.NAO_DEF.numJoints()];
+            float[] joints = new float[RobotDef.NAO_DEF_VERSIONED.numJoints()];
             if(currentFrame.hasJoints()){
                 List<Float> list_joints = currentFrame.joints();
                 joints = new float[list_joints.size()];
@@ -147,7 +149,7 @@ public class ProcessedImage extends ThresholdedImage {
 				//                   "joint info");
             }
 
-            float[] sensors = new float[RobotDef.NAO_DEF.numSensors()];
+            float[] sensors = new float[RobotDef.NAO_DEF_VERSIONED.numSensors()];
             if (currentFrame.hasSensors()) {
                 List<Float> list_sensors = currentFrame.sensors();
                 sensors = new float[list_sensors.size()];
@@ -175,12 +177,12 @@ public class ProcessedImage extends ThresholdedImage {
 
             // This variable is declared in the superclass and used by its
             // getters.
-			thresholded = visionLink.processImage(rawImage,
-						  image.getWidth(),
-						  image.getHeight(),
-						  joints, sensors,
-						  rawTable);
-	}
+            thresholded = visionLink.processImage(rawImage,
+                                                  getWidth(),
+                                                  getHeight(),
+                                                  joints, sensors,
+                                                  rawTable);
+        }
     }
 
     /**

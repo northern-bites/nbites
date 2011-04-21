@@ -163,34 +163,30 @@ void Man::stopSubThreads() {
 void
 Man::processFrame ()
 {
+    PROF_ENTER(profiler.get(), P_FINAL);
+    PROF_EXIT(profiler.get(), P_GETIMAGE);
+
 #ifdef USE_VISION
-  //  This is called from Python right now
-  //if(camera_active)
-  //vision->copyImage(sensors->getImage());
+    // Need to lock image and vision angles for duration of
+    // vision processing to ensure consistency.
+    sensors->lockImage();
+
+    vision->notifyImage(sensors->getImage());
+
+    sensors->releaseImage();
 #endif
 
-
-  PROF_ENTER(profiler.get(), P_FINAL);
-  PROF_EXIT(profiler.get(), P_GETIMAGE);
-#ifdef USE_VISION
-  //if(camera_active)
-  PROF_ENTER(profiler, P_VISION);
-  vision->notifyImage(sensors->getImage());
-  PROF_EXIT(profiler, P_VISION);
-  //vision->notifyImage();
-#endif
-
-  // run Python behaviors
 #ifdef USE_NOGGIN
-  noggin->runStep();
+    noggin->runStep();
 #endif
-  PROF_ENTER(profiler.get(), P_LIGHTS);
-  lights->sendLights();
-  PROF_EXIT(profiler.get(), P_LIGHTS);
 
-  PROF_ENTER(profiler.get(), P_GETIMAGE);
-  PROF_EXIT(profiler.get(), P_FINAL);
-  PROF_NFRAME(profiler.get());
+    PROF_ENTER(profiler.get(), P_LIGHTS);
+    lights->sendLights();
+    PROF_EXIT(profiler.get(), P_LIGHTS);
+
+    PROF_ENTER(profiler.get(), P_GETIMAGE);
+    PROF_EXIT(profiler.get(), P_FINAL);
+    PROF_NFRAME(profiler.get());
 }
 
 

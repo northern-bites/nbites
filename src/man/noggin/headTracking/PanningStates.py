@@ -10,15 +10,11 @@ def scanBall(tracker):
         tracker.activeLocOn = False
         return tracker.goNow('ballTracking')
 
-
     if not tracker.brain.motion.isHeadActive():
-        ballDist = ball.dist
-
-        if ballDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
+        if ball.dist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.helper.executeHeadMove(HeadMoves.HIGH_SCAN_BALL)
-
-        elif ballDist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
-                ballDist < HeadMoves.MID_SCAN_FAR_BOUND:
+        elif ball.dist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
+                ball.dist < HeadMoves.MID_SCAN_FAR_BOUND:
             tracker.helper.executeHeadMove(HeadMoves.MID_DOWN_SCAN_BALL)
         else:
             tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)

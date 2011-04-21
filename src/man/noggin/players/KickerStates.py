@@ -4,19 +4,33 @@
 #
 
 import man.motion as motion
+import man.motion.HeadMoves as HeadMoves
 import man.motion.SweetMoves as SweetMoves
 
 def gameInitial(player):
-    player.gainsOn()
+    if player.firstFrame():
+        player.gainsOn()
+        player.brain.fallController.enableFallProtection(False)
     return player.stay()
 
 def gameReady(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
+
 def gameSet(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
+
 def gamePlaying(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
+
 def gamePenalized(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
 
 def standup(player):
@@ -32,7 +46,7 @@ def standup(player):
 def kickStraight(player):
     if player.firstFrame():
 
-        player.executeMove(SweetMoves.SHORT_QUICK_LEFT_KICK)
+        player.executeMove(SweetMoves.STAND_UP_FRONT)
 
     if player.counter == 50:
         return player.goLater('done')
@@ -40,6 +54,6 @@ def kickStraight(player):
 
 def done(player):
     if player.firstFrame():
-        player.walkPose()
+        #player.walkPose()
         return player.stay()
     return player.stay()

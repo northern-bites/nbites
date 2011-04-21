@@ -12,14 +12,18 @@ class FallController(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'blue'
         self.setPrintFunction(self.brain.out.printf)
+
         self.standingUp = False
         self.fallCount = 0
+        self.doneStandingCount = 0
+        self.standupMoveTime = 0
+
         self.FALLEN_THRESH = 72
         self.FALL_COUNT_THRESH = 15
-        self.doneStandingCount = 0
         self.DONE_STANDING_THRESH = 2
-        self.standupMoveTime = 0
+
         self.executeStandup = True
+        self.enabled = True
 
     def run(self):
         # Only try to stand up when playing or localizing in ready
@@ -38,6 +42,10 @@ class FallController(FSA.FSA):
         FSA.FSA.run(self)
 
     def isFallen(self):
+        # Make sure fall protection is enabled
+        if not self.enabled:
+            return False
+
         inertial = self.brain.sensors.inertial
         #self.printf("isFallen angleY is "+str(inertial.angleY))
         if ( abs(inertial.angleY) > self.FALLEN_THRESH ):
@@ -62,3 +70,9 @@ class FallController(FSA.FSA):
 
     def disable(self):
         self.switchTo('off')
+
+    def enableFallProtection(self, isTrue):
+        self.printf("Fall Protection is " + str(isTrue))
+        self.enabled = isTrue
+        self.brain.roboguardian.enableFallProtection(isTrue)
+

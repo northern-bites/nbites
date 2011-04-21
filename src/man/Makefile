@@ -42,7 +42,7 @@ CCMAKE_GUI=cmake-gui
 MKDIR=mkdir
 TOUCH=touch
 MAKE_OPTIONS=--no-print-directory
-
+MAN_TARGET=man
 
 .PHONY: default_target all straight cross cclean clean install noconfig
 .PHONY: clean_install
@@ -52,11 +52,11 @@ default_target: all
 
 all: $(CMAKE_STRAIGHT_DEPEND) $(CMAKE_WEBOTS_DEPEND) $(CMAKE_CROSS_DEPEND)
 	@if [ -e $(CROSS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR); \
+		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) ${MAN_TARGET}; \
 	elif [ -e $(STRAIGHT_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR); \
+		$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR) ${MAN_TARGET}; \
 	elif [ -e $(WEBOTS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR); \
+		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) ${MAN_TARGET}; \
 	fi
 
 $(CMAKE_WEBOTS_DEPEND):
@@ -75,8 +75,7 @@ $(CMAKE_CROSS_DEPEND):
 	fi
 
 build_straight:
-	$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR); \
-
+	$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR) ${MAN_TARGET}; \
 
 straight: $(STRAIGHT_FILE)
 	@set -e;
@@ -103,7 +102,7 @@ $(STRAIGHT_FILE):
 		$(CMAKE) $(CMAKE_STRAIGHT_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
 build_cross:
-	$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR); \
+	$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) ${MAN_TARGET}; \
 
 
 cross: $(CROSS_FILE)
@@ -131,7 +130,7 @@ $(CROSS_FILE):
 		$(CMAKE) $(CMAKE_CROSS_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
 build_webots:
-	$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR); \
+	$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) ${MAN_TARGET}; \
 
 webots: $(WEBOTS_FILE)
 	@set -e;

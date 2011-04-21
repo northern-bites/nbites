@@ -243,9 +243,9 @@ bool Robots::noWhite(Blob b) {
 	for (int i = 1; i < 10; i++) {
 		tops = 0; bottoms = 0;
 		for (int x = left; x <= right; x++) {
-			if (thresh->thresholded[top - i][x] == WHITE)
+			if (thresh->getThresholded(top - i,x) == WHITE)
 				tops++;
-			if (thresh->thresholded[bottom+i][x] == WHITE)
+			if (thresh->getThresholded(bottom+i,x) == WHITE)
 				bottoms++;
 			if (tops > width / 2 || tops == width) return false;
 			if (bottoms > width / 2 || tops == width) return false;
@@ -255,7 +255,7 @@ bool Robots::noWhite(Blob b) {
 	for (int i = top; i <= bottom; i++) {
 		tops = 0; bottoms = 0;
 		for (int x = left; x <= right; x++) {
-			if (thresh->thresholded[i][x] == WHITE)
+			if (thresh->getThresholded(i,x) == WHITE)
 				tops++;
 			if (tops > width / 4) return false;
 		}
@@ -313,7 +313,7 @@ void Robots::expandHorizontally(int which, int dir) {
 		opposites = 0;
 		green = 0;
         for (y = top; y < bottom && !good; y += 1) {
-			int pix = thresh->thresholded[y][x];
+			int pix = thresh->getThresholded(y,x);
             if (pix == color) {
                 gotCol++;
 			}
@@ -372,7 +372,7 @@ int Robots::expandVertically(int which, int dir) {
 		// check this row of pixels for white or same color (good),
 		// grey (pretty good), or for opposite color (bad)
         for (x = left; x < right && !good; x++) {
-            pix = thresh->thresholded[y][x];
+            pix = thresh->getThresholded(y,x);
             if (pix == color) {
                 col++;
             } else if (pix == WHITE) {
@@ -542,7 +542,7 @@ bool Robots::checkVertical(int left, int right, int top, int bottom) {
 	for (int y = top; y < bottom; y++) {
 		green = 0;
 		for (int x = left; x < right; x++) {
-			if (thresh->thresholded[y][x] == GREEN)
+			if (thresh->getThresholded(y,x) == GREEN)
 				green++;
 		}
 		if (green > width / 2)
@@ -562,7 +562,7 @@ bool Robots::checkHorizontal(int left, int right, int top, int bottom) {
 	for (int x = left; x < right; x++) {
 		green = 0;
 		for (int y = top; y < bottom; y++) {
-			if (thresh->thresholded[y][x] == GREEN)
+			if (thresh->getThresholded(y,x) == GREEN)
 				green++;
 		}
 		if (green > height / 2)
@@ -633,7 +633,7 @@ bool Robots::viableRobot(Blob a)
     int col = 0;
     for (int i = 0; i < a.width(); i+=2) {
         for (int j = 0; j < a.height(); j+=2) {
-            int newpix = thresh->thresholded[j+a.getLeftTopY()][i+a.getLeftTopX()];
+            int newpix = thresh->getThresholded(j+a.getLeftTopY(),i+a.getLeftTopX());
             if (newpix == WHITE) {
                 whites++;
             } else if (newpix == color) {
