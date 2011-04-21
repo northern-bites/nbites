@@ -122,13 +122,24 @@ public class FileSet extends AbstractDataSet {
 
         Frame frm = get(i);
 
+        store(i, frm, i, p);
+    }
+
+    // Store a frame with distinct file and frame index numbers.  This
+    // allows us to write a frame to different locations, or reuse an index
+    // in the frms vector for different frames
+    public void store(int fileNum,
+                      Frame frm,
+                      int frameIndex,
+                      String path) throws TOOLException {
+
         // need to create file name here, for access to path and basename
-        String baseName = i + frm.type().getExtension();
-        File f = new File(p, baseName);
+        String baseName = fileNum + frm.type().getExtension();
+        File f = new File(path, baseName);
 
         // store frame in specified file
         FrameLoader.storeFrame(f, frm);
         // mark that the frame is no longer modifed form the stored data
-        frameChanged.set(i, false);
+        frameChanged.set(frameIndex, false);
     }
 }
