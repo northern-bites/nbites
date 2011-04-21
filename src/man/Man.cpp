@@ -179,6 +179,8 @@ Man::processFrame ()
     sensors->releaseImage();
 #endif
 
+    memory->updateVision();
+
 #ifdef USE_NOGGIN
     noggin->runStep();
 #endif
