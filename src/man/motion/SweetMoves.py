@@ -554,6 +554,13 @@ GOALIE_DIVE_RIGHT = ( ((45.88,38.93,-122.88,-32.43),
                         (-36.38,0.17,-59.77,8.53),
                         0.1, 0, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
                       #makes robot lie flat
+
+                      ((-85.70,13.80,50.36,0.27),
+                        (-30.17,-19.16,16.53,22.32,23.03,24.42),
+                        (-30.17,11.16,-40.34,48.87,-10.46,24.52),
+                        (-36.38,0.17,-59.77,8.53),
+                        3.0, 0, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
+                      #stay on the ground for 3 seconds
                        )
 
 #same as GOALIE_DIVE_RIGHT except dives left when looking at robot

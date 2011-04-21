@@ -1,5 +1,5 @@
 # new file for goalie decisions
-# allows goalie to make decisions without having to 
+# allows goalie to make decisions without having to
 # go into each state the goalie could possibly end up
 #in and tell it how to do things
 
@@ -14,7 +14,7 @@ def goalieStateChoice(player):
 
     # for simplicity to start off with we just want the goalie to chase
     # the ball as long as it is close enough and it isnt dangerous
-    
+
     if player.isChasing:
         if goalTran.shouldStopChase(player):
             print "position"
@@ -24,14 +24,14 @@ def goalieStateChoice(player):
             return player.currentState
 
     if player.isPositioning:
-        if goalTran.outOfPosition(player):
+        if goalTran.shouldChase(player):
+            print "chase"
+            return 'goalieChase'
+        elif goalTran.outOfPosition(player):
             print "out"
             return player.currentState
         #elif goalTran.shouldSave(player):
             #return 'goalieSave'
-        elif goalTran.shouldChase(player):
-            print "chase"
-            return 'goalieChase'
 
     #if player.isSaving:
        # return player.currentState

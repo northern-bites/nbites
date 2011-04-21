@@ -24,7 +24,7 @@ def getTimeUntilSave(player):
 
 def shouldPositionForSave(player):
     ball = player.brain.ball
-    #add a counter  
+    #add a counter
     #player.shouldSaveCounter already exists
     #need to test velocity values
     if (fabs(ball.dx) > goalCon.VEL_THRES):
@@ -41,12 +41,12 @@ def shouldPositionForSave(player):
         #left back
         if (ball.relX < 0 and ball.relY > 0 and ball.dx < 0 and ball.dy > 0):
             return True
-        
+
         # this will have an issue with balls that cross close to the goalie
         #need to adjust for this...
-    
+
     return False
-    
+
 
 # not used right now
 #should move goalie but with dive right now shouldnt need
@@ -117,7 +117,7 @@ def shouldSaveCenter(player):
 
     elif( not shouldDiveRight and not shouldDiveLeft):
         player.countCenterSave += 1
-   
+
     if (player.countCenterSave > 3):
             player.counterCenterSave = 0
             player.counterLeftSave = 0
@@ -274,9 +274,9 @@ def shouldChase(player):
 def shouldStopChase(player):
     ball= player.brain.ball
 
-    if(ball.framesOff > 45):
-        print "1"
-        player.shouldStopChaseCounter = 4
+    #if(ball.framesOff > 45):
+       # print "1"
+       # player.shouldStopChaseCounter = 4
 
     if (ball.x > goalCon.CHASE_RIGHT_X_LIMIT
           or ball.x < goalCon.CHASE_LEFT_X_LIMIT
