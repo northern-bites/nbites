@@ -119,15 +119,14 @@ def decideKick(player):
     """
     if player.firstFrame():
         # Re-initialize to clear data from decideKick
-        player.brain.kickDecider.kickInfo = \
-            KickInformation.KickInformation(player)
+        player.brain.kickDecider.resetInfo()
 
         player.brain.tracker.kickDecideScan()
 
-    elif player.counter > 43:
+    elif player.counter > 43: #time required for scan
         return player.goNow('positionForKick')
 
-    player.brain.kickDecider.kickInfo.collectData(player.brain)
+    player.brain.kickDecider.collectInfo()
 
     return player.stay()
 
@@ -136,8 +135,7 @@ def positionForKick(player):
     State to align on the ball once we are near it
     """
     if player.firstFrame():
-        kick = player.brain.kickDecider.kickInfo.getKick()
-        player.brain.kickDecider.currentKick = kick
+        kick = player.brain.kickDecider.getKick()
 
         if kick is None:
             player.angleToOrbit = player.brain.kickDecider.kickInfo.orbitAngle
@@ -170,7 +168,7 @@ def positionForKick(player):
             return player.goLater('dribble')
 
     if player.brain.nav.isStopped():
-        kick = player.brain.kickDecider.kickInfo.getKick()
+        kick = player.brain.kickDecider.getKick()
         player.brain.nav.kickPosition(kick)
 
     return player.stay()
