@@ -124,7 +124,6 @@ def shouldSaveCenter(player):
             player.counterRightSave = 0
             return True
     return False
-            
 
 #need to figure out how this works
 def shouldHoldSave(player):
@@ -173,9 +172,6 @@ def goalieInBox(player):
 def shouldPositionCenter(player):
     ball = player.brain.ball
 
-    if player.isChasing or player.isSaving:
-        return False
-
     elif (ball.y > NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y + goalCon.BOX_BUFFER
         and ball.y < NogCon.LANDMARK_MY_GOAL_LEFT_POST_Y - goalCon.BOX_BUFFER):
         player.shouldPositionCenter += 1
@@ -190,9 +186,6 @@ def shouldPositionCenter(player):
 def shouldPositionRight(player):
     ball = player.brain.ball
 
-    if player.isChasing or player.isSaving:
-        return False
-
     elif (ball.y < NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y - goalCon.BOX_BUFFER
         and ball.x < NogCon.MY_GOALBOX_RIGHT_X + goalCon.BOX_BUFFER):
         player.shouldPositionRightCounter += 1
@@ -203,13 +196,10 @@ def shouldPositionRight(player):
             return True
 
     return False
-    
+
 
 def shouldPositionLeft(player):
     ball = player.brain.ball
-
-    if player. isChasing or player.isSaving:
-        return False
 
     if (ball.y > NogCon.LANDMARK_MY_GOAL_LEFT_POST_Y + goalCon.BOX_BUFFER
         and ball.x < NogCon.MY_GOALBOX_RIGHT_X + goalCon.BOX_BUFFER):
@@ -247,22 +237,22 @@ def shouldChase(player):
     ball = player.brain.ball
 
     #how does the penalty kicker work?
-    if player.isSaving or player.penaltyKicking:
+    if player.penaltyKicking:
         return False
-    
+
     # checks if others are chasing
     # what checks who is closest person to ball
     #can i use this?
     # elif not goTeam.goalieShouldChase(player):
         # return False
-    if not chaseTran.shouldChaseBall(player):
-        return False
+    #if not chaseTran.shouldChaseBall(player):
+        #return False
 
-    if (ball.framesOff > 45):
-        print "no ball"
-        player.shouldChaseCounter = 0
-        player.shouldStopChaseCounter = 0
-        return False
+    #if (ball.framesOff > 45):
+        #print "no ball"
+        #player.shouldChaseCounter = 0
+        #player.shouldStopChaseCounter = 0
+        #return False
 
     # close enough to chase
     elif (ball.x < goalCon.CHASE_RIGHT_X_LIMIT
@@ -275,7 +265,7 @@ def shouldChase(player):
         player.shouldChaseCounter = 0
         player.shouldStopChaseCounter = 0
         return True
-        
+
     return False
 
 #Should stop chasing if
@@ -299,7 +289,7 @@ def shouldStopChase(player):
     #elif(chaseTran.shouldntStopChasing(player)):
         #print "3"
         #return False
-    
+
     if player.shouldStopChaseCounter > 3:
         player.shouldStopChaseCounter = 0
         player.shouldChaseCounter = 0
