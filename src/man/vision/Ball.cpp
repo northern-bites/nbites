@@ -231,8 +231,8 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
         thisBall->init();
         return false;
     } else if (distanceDifference > DISTANCE_MISMATCH &&
-               (e.dist *2 <  thisBall->getDistance() ||
-                thisBall->getDistance() * 2 < e.dist)
+               (e.dist *2 <  focalDist.dist ||
+                focalDist.dist * 2 < e.dist)
                && e.dist < PIXACC && e.dist > 0) {
         if (BALLDEBUG) {
             cout << "Screening due to distance mismatch " << e.dist <<
@@ -1046,6 +1046,11 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 	}
 	thisBall->setConfidence(SURE);
 	thisBall->findAngles();
+	focalDist = vision->pose->sizeBasedEstimate(thisBall->getCenterX(),
+												thisBall->getCenterY(),
+												ORANGE_BALL_RADIUS,
+												thisBall->getRadius(),
+												ORANGE_BALL_RADIUS);
 	if (occlusion == NOOCCLUSION) {
 		thisBall->setFocalDistanceFromRadius();
 		//trust pixest to within 300 cm
@@ -1053,11 +1058,7 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 			thisBall->setDistanceEst(e);
 		}
 		else {
-			thisBall->setDistanceEst(vision->pose->sizeBasedEstimate(thisBall->getCenterX(),
-																	 thisBall->getCenterY(),
-																	 ORANGE_BALL_RADIUS,
-																	 thisBall->getRadius(),
-																	 ORANGE_BALL_RADIUS));
+			thisBall->setDistanceEst(focalDist);
 		}
 	} else {
 		// user our super swell updated pix estimate to do the distance
