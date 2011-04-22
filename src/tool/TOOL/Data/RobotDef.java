@@ -26,9 +26,14 @@ public class RobotDef {
     public static final String NAO_SIM_EXT = ".NSFRM";
     public static final String NAO_VERSIONED_EXT = ".FRM";
 
+    public static final int NAO_RL_NUM = 3;
+    public static final int NAO_SIM_NUM = 4;
+    public static final int NAO_NUM = 5;
+    public static final int NAO_RL_33_NUM = 6;
+
     public enum ImageType {
         NAO_RL("NAO_RL",
-               "A simulated Nao robot",
+               "A real Nao robot",
                NAO_DEF_VERSIONED,
                NAO_VERSIONED_EXT),
 
