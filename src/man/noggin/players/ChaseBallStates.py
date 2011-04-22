@@ -111,8 +111,12 @@ def spinToBallClose(player):
         spinDir = player.brain.my.spinDirToPoint(player.brain.ball)
         player.setWalk(0, 0, spinDir*constants.BALL_SPIN_SPEED)
     else:
-        player.stopWalking()
-        return player.goNow('decideKick')
+        if player.brain.ball.dist > constants.SHOULD_START_DIST:
+            player.brain.nav.chaseBall()
+            return player.goNow('decideKick')
+        else:
+            player.stopWalking()
+            return player.goNow('decideKick')
 
     return player.stay()
 
@@ -127,7 +131,7 @@ def decideKick(player):
 
         player.brain.tracker.kickDecideScan()
 
-    elif player.counter > 43: #time required for scan
+    elif player.counter > 50: #time required for scan
         return player.goNow('positionForKick')
 
     player.brain.kickDecider.collectInfo()
