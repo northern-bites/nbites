@@ -43,7 +43,7 @@ class KickDecider(object):
         if currentKick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
                 currentKick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
             ball = self.brain.ball
-            dist = self.destDist
+            dist = self.info.destDist
             return currentKick.sweetMove(ball.relY, dist)
         else:
             return currentKick.sweetMove
