@@ -92,6 +92,8 @@ def feetOffGround(guard):
         guard.brain.motion.resetWalk()
         guard.brain.motion.resetScripted()
         guard.brain.motion.stopHeadMoves()
+        guard.brain.player.stopWalking()
+        guard.brain.nav.stop()
 
     # back on the ground
     if (guard.brain.roboguardian.isFeetOnGround()):
