@@ -12,9 +12,9 @@ using namespace std;
 
 //#define DEBUG_GUARDIAN_CLICKS
 #define WIFI_CONNECTION NBITES
-#define WIFI_RECONNECTS_MAX 5
-//check for a connection once in 20 secs
-#define CONNECTION_CHECK_RATE 20*RoboGuardian::GUARDIAN_FRAME_RATE
+#define WIFI_RECONNECTS_MAX 3
+//check for a connection once in 30 secs
+#define CONNECTION_CHECK_RATE 30*RoboGuardian::GUARDIAN_FRAME_RATE
 
 const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
@@ -503,8 +503,8 @@ void RoboGuardian::speakIPAddress()const {
     const string host = getHostName();
 
     string speech_command = sout;
-    speech_command += " "+mynameis_wav;
-    speech_command += " "+nbsdir+host+wav;
+    //speech_command += " "+mynameis_wav;
+    //speech_command += " "+nbsdir+host+wav;
     speech_command += " "+my_address_is_wav;
 
     for (unsigned int i = 0; i < IP.size(); i++){
@@ -540,13 +540,16 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
 //TODO: comment
 void RoboGuardian::checkConnection(){
     const string IP = discoverIP();
+#ifdef DEBUG_CONNECTION
+    cout << "checking connection, got IP" << IP << endl;
+#endif DEBUG_CONNECTION
     if (IP.size() >= 7 && (IP[0] == '1' || IP[0] == '2')) {
         wifiReconnectTimeout = 0;
         return;
     } else {
         if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
             cout    << "No connection detected, trying to reconnect interfaces, attempt "
-                    << wifiReconnectTimeout << endl;
+                    <<  wifiReconnectTimeout << endl;
             reconnectWifiConnection();
             wifiReconnectTimeout++;
         }
@@ -581,13 +584,14 @@ bool RoboGuardian::checkWireless(){
 // we assume that autoconnect is on and that we already  have connected
 // to the network before
 void RoboGuardian::reconnectWifiConnection(){
-    // playFile(wifi_restart_wav);
+
     FILE * f3 = popen("connman services | awk '/ROBOTICS/ {print $4}'", "r");
     char service[100] = "";
     fscanf(f3,"%s\n", service);
     pclose(f3);
 
     if (service[0] != ' ') {
+        playFile(wifi_restart_wav);
         char command[100] = "";
         strcat(command, "su -c \" connman connect ");
         strcat(command, service);
