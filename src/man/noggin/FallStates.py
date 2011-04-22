@@ -46,13 +46,11 @@ def standup(guard):
         return guard.goLater('standing')
 
     # If on back, perform back stand up
-    if ( inertial.angleY < -guard.FALLEN_THRESH ):
+    if ( inertial.angleY < 0 ):
         return guard.goLater('standFromBack')
 
     # If on stomach, perform stand up from front
-    elif ( inertial.angleY > guard.FALLEN_THRESH ):
-        return guard.goLater('standFromFront')
-    return guard.stay()
+    return guard.goLater('standFromFront')
 
 def standFromBack(guard):
     if guard.firstFrame():
@@ -90,8 +88,10 @@ def feetOffGround(guard):
     Shuts off walk engine while the robot is off the ground
     """
     if guard.firstFrame():
-        guard.brain.player.stopWalking()
-        guard.brain.nav.stop()
+        guard.brain.tracker.stopHeadMoves()
+        guard.brain.motion.resetWalk()
+        guard.brain.motion.resetScripted()
+        guard.brain.motion.stopHeadMoves()
 
     # back on the ground
     if (guard.brain.roboguardian.isFeetOnGround()):

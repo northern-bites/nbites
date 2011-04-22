@@ -18,7 +18,7 @@ class FallController(FSA.FSA):
         self.doneStandingCount = 0
         self.standupMoveTime = 0
 
-        self.FALLEN_THRESH = 72
+        self.FALLEN_THRESH = 50
         self.FALL_COUNT_THRESH = 15
         self.DONE_STANDING_THRESH = 2
 
@@ -33,7 +33,7 @@ class FallController(FSA.FSA):
             inertial = self.brain.sensors.inertial
             #self.printf("run angleY is "+str(inertial.angleY))
 
-            if (not self.standingUp and self.isFallen() ):
+            if (not self.standingUp and self.brain.roboguardian.isRobotFallen() ):
                 self.standingUp = True
                 self.fallCount = 0
                 self.switchTo('fallen')
@@ -41,27 +41,11 @@ class FallController(FSA.FSA):
                 #             self.switchTo('falling')
 
             # if not falling, check if our feet are on the ground
-            if (not self.brain.roboguardian.isFeetOnGround()):
+            elif (not self.standingUp and
+                  not self.brain.roboguardian.isFeetOnGround()):
                 self.switchTo('feetOffGround')
 
         FSA.FSA.run(self)
-
-    def isFallen(self):
-        # Make sure fall protection is enabled
-        if not self.enabled:
-            return False
-
-        inertial = self.brain.sensors.inertial
-        #self.printf("isFallen angleY is "+str(inertial.angleY))
-        if ( abs(inertial.angleY) > self.FALLEN_THRESH ):
-            self.fallCount += 1
-            if self.fallCount > self.FALL_COUNT_THRESH:
-                return True
-        else:
-            self.fallCount = 0
-            return False
-
-        return False
 
     def getTimeRemainingEst(self):
         if (self.currentState == "notFallen" or

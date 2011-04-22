@@ -135,7 +135,7 @@ static const float NOFALL_SPEED_THRESH = 0.01f; //rads/20ms
 static const int FALLING_FRAMES_THRESH = 3;
 static const int FALLING_RESET_FRAMES_THRESH = 10;
 static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/6.0f; //30 degrees
-static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/2.5f; //72 degrees
+static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 
 
 //Check if the angle is unstable, (ie tending AWAY from zero)
@@ -153,7 +153,7 @@ bool isFalling(float angle_pos, float angle_vel){
 
 
 
-void RoboGuardian::checkFallen(){
+void RoboGuardian::checkFallen() {
     const Inertial inertial  = sensors->getInertial();
 
     /***** Determine if the robot has FALLEN OVER *****/
@@ -161,20 +161,21 @@ void RoboGuardian::checkFallen(){
         std::abs(inertial.angleX) > FALLEN_ANGLE_THRESH ||
         std::abs(inertial.angleY) > FALLEN_ANGLE_THRESH;
 
+	//cout << inertial.angleX << " " <<  inertial.angleY << endl;
+
     if(fallen_now)
         fallenCounter +=1;
     else
         fallenCounter = 0;
 
     static const int FALLEN_FRAMES_THRESH  = 2;
-    if(fallenCounter >= FALLEN_FRAMES_THRESH ){
-        fallen = true;
+
+	fallen = fallenCounter > FALLEN_FRAMES_THRESH;
+
 #ifdef DEBUG_GUARDIAN_FALLING
-        cout << "Robot has fallen" <<endl;
+		if (fallen)
+			cout << "Robot has fallen" <<endl;
 #endif
-    }
-
-
 }
 
 /**
@@ -190,7 +191,7 @@ void RoboGuardian::checkFallen(){
 void RoboGuardian::checkFeetOnGround() {
 //this can be higher than the falling thresholds since stopping the walk
 //engine is less critical
-	static const int GROUND_FRAMES_THRESH = 5;
+	static const int GROUND_FRAMES_THRESH = 10;
 // lower than this, the robot is off the ground
 	static const float onGroundFSRThresh = 1.0f;
 
