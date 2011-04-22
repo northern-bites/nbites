@@ -165,7 +165,7 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     //the progress towards the goal.
 
     //HORIZONTAL PROGRESS:
-    float percent_complete =
+	 const float percent_complete =
         ( static_cast<float>(frameCounter) /
           static_cast<float>(singleSupportFrames));
 
@@ -189,29 +189,48 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     goal(1) = target_c_y;
     goal(2) = -gait->stance[WP::BODY_HEIGHT] + heightOffGround;
 
-
     vector<float> joint_result = finalizeJoints(goal);
 
     vector<float> stiff_result = getStiffnesses();
     return LegJointStiffTuple(joint_result,stiff_result);
 }
 
+/**
+  this method calculates the angles for this leg when it is on the
+  ground (i.e. the leg on the ground in single support, or either
+  leg in double support).  We calculate the goal based on the
+  comx,comy from the controller, and the given parameters using
+  inverse kinematics.
+*/
 LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x, float dest_y) {
-    /**
-       this method calculates the angles for this leg when it is on the ground
-       (i.e. the leg on the ground in single support, or either leg in double
-       support).
-       We calculate the goal based on the comx,comy from the controller,
-       and the given parameters using inverse kinematics.
-     */
     ufvector3 dest_f = CoordFrame3D::vector3D(cur_dest->x,cur_dest->y);
     ufvector3 dest_c = prod(fc_Transform,dest_f);
     float dest_x = dest_c(0);
     float dest_y = dest_c(1);
 
+    //HORIZONTAL PROGRESS:
+    const float percent_complete =
+        ( static_cast<float>(frameCounter) /
+          static_cast<float>(singleSupportFrames));
+
+	float com_height_adjustment = 0.0f;
+
+    // modulate our CoM height based on where we are in the step phase
+	// check bounds, so we don't do stupid things when the robot is stationary
+	// disabled for US Open 2011 until I can do more testing --Nathan @ 4/21/11
+	if (false && percent_complete >= 0.0f && percent_complete <= 1.0f) {
+		const float com_height_adjustment_max = -1.5f;
+		// sin maps [0, 1.0f] -> [0, 1]
+		com_height_adjustment = sin(percent_complete*M_PI_FLOAT)
+			* com_height_adjustment_max;
+
+		//cout << "percent complete: " << percent_complete << endl;
+//		cout << "height adjustment " << com_height_adjustment << endl;
+	}
+
     goal(0) = dest_x; //targetX for this leg
     goal(1) = dest_y;  //targetY
-    goal(2) = -gait->stance[WP::BODY_HEIGHT];         //targetZ
+    goal(2) = -gait->stance[WP::BODY_HEIGHT] - com_height_adjustment; //targetZ
 
     vector<float> joint_result = finalizeJoints(goal);
     vector<float> stiff_result = getStiffnesses();
@@ -223,6 +242,8 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
     const float startStopSensorScale = getEndStepSensorScale();
 
     //Center of mass control
+	// We don't do this here anymore, instead getCOMc is integrated into
+	// the preview controller. Don't turn this back on!
 #ifdef USE_COM_CONTROL
     const float COM_SCALE = startStopSensorScale;
     const ufvector4 com_c = Kinematics::getCOMc(sensors->getMotionBodyAngles());

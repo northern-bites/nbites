@@ -113,7 +113,6 @@ void StepGenerator::resetHard(){
     //I don't think there is much else we need to do....
 }
 
-
 /**
  * Central method to get the previewed zmp_refernce values
  * In the process of getting these values, this method handles the following:
@@ -221,7 +220,6 @@ void StepGenerator::findSensorZMP(){
     const float joint_com_i_y = joints_com_i(1);
 
     ZmpTimeUpdate tUp = {controller_x->getZMP(), controller_y->getZMP()};
-    // TODO: fix joints_com_i_y and re-enable
     ZmpMeasurement pMeasure =
         {joint_com_i_x, (joint_com_i_y + COM_I_Y_OFFSET),
          accel_i(0), accel_i(1)};
@@ -454,11 +452,6 @@ void StepGenerator::swapSupportLegs(){
  *    - End, where the ZMP should move directly under the robot (origin of S)
  */
 void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
-
-	// HACK ALERT: the multiple ZMP queues in their current state are a hack
-	// Once we decouple ZMP generation from the step queues this won't be a problem
-	// GNM June 2010
-
     switch(newSupportStep->type){
     case REGULAR_STEP:
 		fillZMPRegular(newSupportStep);

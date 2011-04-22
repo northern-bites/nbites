@@ -5,8 +5,6 @@ import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import GoalieTransitions as goalTran
 from ..playbook.PBConstants import GOALIE
-from .. import NogginConstants as nogginConstants
-from man.noggin.typeDefs.Location import RobotLocation
 
 def chase(player):
     """
@@ -35,6 +33,13 @@ def goalieChase(player):
     TODO: make goalie more aggressive (different transitions?)
     """
     # Check in order of importance
+
+    #tells the goalie what state its in
+    if player.firstFrame():
+        player.isChasing = True
+        player.isPositioning = False
+        player.isSaving = False
+
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
     elif transitions.shouldSpinToBallClose(player):
@@ -193,37 +198,26 @@ def dribble(player):
 
     return player.stay()
 
-# TODO
+#adjusts position to be farther away from the ball
+#if the goalie is too close to the ball while in
+#the goal box
 def approachDangerousBall(player):
-    if player.firstFrame():
-        player.stopWalking()
-    #print "approach dangerous ball"
-    #single steps towards ball and goal with spin
-    #player.setSteps(0, 0, 0, 0)
     ball = player.brain.ball
     my = player.brain.my
+    if player.firstFrame():
+        player.stopWalking()
+
+    #move away from the ball so it is no longer dangerous
     if player.brain.nav.isStopped():
-        if ball.dist >= 10:
-            if ball.y > my.y + 7:
-                player.brain.nav.walk(0, 10, 0)
-            elif ball.y < my.y - 7:
-                player.brain.nav.walk(0, -10, 0)
+        if ball.relY > 0:
+            player.brain.nav.walk(0, -15, 0)
+        else:
+            player.brain.nav.walk(0, 15, 0)
 
     if not goalTran.dangerousBall(player):
         return player.goLater('chase')
     if transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-
-    return player.stay()
-
-def guardCorner(player):
-
-    ball = player.brain.ball
-    if player.brain.nav.isStopped():
-        if ball.y > nogginConstants.LANDMARK_LEFT_POST_Y:
-            player.brain.nav.goTo(RobotLocation(LANDMARK_LEFT_POST_X + 6, LANDMARK_LEFT_POST_Y, 0))
-        elif ball.y < nogginConstants.LANDMARK_RIGHT_POST_Y:
-            player.brain.nav.goTo(RobotLocation(LANDMARK_RIGHT_POST_X + 6, LANDMARK_RIGHT_POST_Y, 0))
 
     return player.stay()
 

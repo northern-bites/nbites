@@ -312,10 +312,13 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
                             if (isSavingStream){
                                 // Write image to a frame
-                                Frame newFrame = selectedRobot.get(numFramesStreamed);
+                                Frame newFrame = selectedRobot.get(0);
                                 selectedRobot.fillNewFrame(newFrame);
-                                selectedRobot.load(numFramesStreamed);
-                                selectedRobot.store(numFramesStreamed,saveFramePath);
+                                selectedRobot.load(0);
+                                selectedRobot.store(numFramesStreamed,
+                                                    selectedRobot.get(0),
+                                                    0,
+                                                    saveFramePath);
                                 numFramesStreamed++;
                             }
                             timeSpent = System.currentTimeMillis() - startTime;

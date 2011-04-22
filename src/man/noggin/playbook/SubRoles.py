@@ -154,6 +154,35 @@ def pGoalieChaser(team, workingPlay):
 
     workingPlay.setPosition(pos)
 
+def fancyGoaliePosition(team):
+    """returns a goalie position using ellipse"""
+
+    position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y)
+
+    # lets try maintaining home position until the ball is closer in
+    # might help us stay localized better
+    ball = team.brain.ball
+    if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
+        # Use an ellipse just above the goalline to determine x and y position
+        # We get the angle from goal center to the ball to determine our X,Y
+        theta = atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
+                       ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
+
+        thetaDeg = PBConstants.RAD_TO_DEG * theta
+
+        # Clip the angle so that the (x,y)-coordinate is not too close to the posts
+        if PBConstants.ELLIPSE_ANGLE_MIN > MyMath.sub180Angle(thetaDeg):
+            theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
+        elif PBConstants.ELLIPSE_ANGLE_MAX < MyMath.sub180Angle(thetaDeg):
+            theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
+
+        # Determine X,Y of ellipse based on theta, set heading on the ball
+        x, y = team.ellipse.getPositionFromTheta(theta)
+        h = ball.heading
+        position = (x,y,h)
+
+    return position
+
 # Kickoff sub roles
 def pKickoffSweeper(team, workingPlay):
     """position kickoff sweeper"""
@@ -249,7 +278,6 @@ def pGoalieReady(team, workingPlay):
                 team.brain.my.headingTo(PBConstants.CENTER_FIELD))
     workingPlay.setPosition(position)
 
-
 def getPointBetweenBallAndGoal(ball,dist_from_ball):
     """returns defensive position between ball (x,y) and goal (x,y)
     at <dist_from_ball> centimeters away from ball"""
@@ -268,32 +296,3 @@ def getPointBetweenBallAndGoal(ball,dist_from_ball):
                        hypot(delta_x,delta_y) )*delta_y
 
     return pos_x,pos_y
-
-def fancyGoaliePosition(team):
-    """returns a goalie position using ellipse"""
-
-    position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y)
-
-    # lets try maintaining home position until the ball is closer in
-    # might help us stay localized better
-    ball = team.brain.ball
-    if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
-        # Use an ellipse just above the goalline to determine x and y position
-        # We get the angle from goal center to the ball to determine our X,Y
-        theta = atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
-                       ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
-
-        thetaDeg = PBConstants.RAD_TO_DEG * theta
-
-        # Clip the angle so that the (x,y)-coordinate is not too close to the posts
-        if PBConstants.ELLIPSE_ANGLE_MIN > MyMath.sub180Angle(thetaDeg):
-            theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
-        elif PBConstants.ELLIPSE_ANGLE_MAX < MyMath.sub180Angle(thetaDeg):
-            theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
-
-        # Determine X,Y of ellipse based on theta, set heading on the ball
-        x, y = team.ellipse.getPositionFromTheta(theta)
-        h = ball.heading
-        position = (x,y,h)
-
-    return position

@@ -14,12 +14,14 @@ def playbookWalk(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
-        nav.playbookAtPositionCount += 1
-        if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
-            return nav.goNow('playbookAtPosition')
+    if (navTrans.atDestinationCloser(my, dest) and 
+        navTrans.atHeading(my, dest.h)):
+            nav.playbookAtPositionCount += 1
+            if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
+                return nav.goNow('playbookAtPosition')
     else:
-        nav.playbookAtPositionCount = 0
+        if not nav.playbookAtPositionCount == 0:
+            nav.playbookAtPositionCount -= 1
 
     dest.h = my.headingTo(dest)
 
@@ -46,7 +48,8 @@ def playbookOmni(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
+    if (navTrans.atDestinationCloser(my, dest) and 
+        navTrans.atHeading(my, dest.h)):
         nav.playbookAtPositionCount += 1
         if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
             return nav.goNow('playbookAtPosition')
@@ -76,7 +79,7 @@ def playbookAtPosition(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    if navTrans.atDestination(my, dest) and navTrans.atHeading(my, dest.h):
+    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
         nav.startOmniCount = 0
         return nav.stay()
 

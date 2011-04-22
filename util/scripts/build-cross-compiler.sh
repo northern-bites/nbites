@@ -28,7 +28,7 @@ SOURCES_PATH=https://robocup.bowdoin.edu/files/software/nao/cross_compiler_stuff
 SDK_FILE=linux-nao-SDK-1.10.tar.gz
 CTC_FILE=nao-cross-toolchain-1.10.10.tar.bz2
 BINUTILS_FILE=binutils-2.21.tar.bz2
-GCC_FILE=gcc-4.5.2.tar.bz2
+GCC_FILE=gcc-4.3.5.tar.bz2
 
 # stupid libraries that are needed by stupid GCC
 GMP_FILE=gmp-4.3.2.tar.bz2
@@ -71,7 +71,7 @@ fi
 echo "Unpacking binutils"
 rm -rf binutils-2.21 && tar -xjf $BINUTILS_FILE || exit 1
 echo "Unpacking gcc"
-rm -rf gcc-4.5.2 && tar -xjf $GCC_FILE || exit 1
+rm -rf gcc-4.3.5 && tar -xjf $GCC_FILE || exit 1
 echo "Unpacking GMP"
 rm -rf gmp-4.3.2 && tar -xjf $GMP_FILE || exit 1
 echo "Unpacking MPFR"
@@ -117,15 +117,17 @@ pushd build-mpc && ../mpc-0.9/configure --prefix=$PREFIX \
                          popd || exit 1
 
 echo "Building gcc"
+
+#                               --with-mpc-include=$PREFIX/include \
+#                               --with-mpc-lib=$PREFIX/lib \
+
 mkdir build-gcc
-pushd build-gcc && ../gcc-4.5.2/configure --prefix=$PREFIX \
+pushd build-gcc && ../gcc-4.3.5/configure --prefix=$PREFIX \
                                --target=$TARGET \
                                --with-gmp-include=$PREFIX/include \
                                --with-gmp-lib=$PREFIX/lib \
                                --with-mpfr-include=$PREFIX/include \
                                --with-mpfr-lib=$PREFIX/lib \
-                               --with-mpc-include=$PREFIX/include \
-                               --with-mpc-lib=$PREFIX/lib \
                                --with-gnu-as \
                                --with-gnu-ld \
                                --with-as=$PREFIX/bin/$TARGET-as \

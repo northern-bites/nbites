@@ -1,21 +1,22 @@
 from man.motion import SweetMoves
 from man.motion import StiffnessModes
 
-def gameInitial(player):
-    return player.goLater('standup')
 
-def standup(player):
+def gamePlaying(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.STAND_FOR_KICK_LEFT)
+        player.gainsOff()
 
-    if player.counter == 30:
-        return player.goLater('printKick')
-    return player.stay()
+    return player.goLater('printKick')
+
+
+def gamePenalized(player):
+
+    return player.goLater('printKick')
 
 
 def printKick(player):
     angles = player.brain.sensors.angles
-    if not player.counter%70:
+    if player.firstFrame():
         print "((%.2f,%.2f,%.2f,%.2f),"%(angles[2],angles[3],angles[4],angles[5])
         print "(%.2f,%.2f,%.2f,%.2f,%.2f,%.2f),"%(angles[6],angles[7],angles[8], \
                                                 angles[9],angles[10], \

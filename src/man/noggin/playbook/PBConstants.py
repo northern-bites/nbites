@@ -234,11 +234,11 @@ BALL_LOC_LIMIT = 220 # Dist at which we stop active localization and just track
 GOAL_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
 GOAL_CENTER_Y = NogginConstants.CENTER_FIELD_Y
 ELLIPSE_X_SHIFT = 5. # Increase this to account for the goalposts
-LARGE_ELLIPSE_HEIGHT = NogginConstants.GOALBOX_DEPTH * 0.65 #radius
+LARGE_ELLIPSE_HEIGHT = NogginConstants.GOALBOX_DEPTH * 0.65 #radius # lab field 60 regular 65
 LARGE_ELLIPSE_WIDTH = NogginConstants.CROSSBAR_CM_WIDTH / 2.0 #radius
 LARGE_ELLIPSE_CENTER_Y = NogginConstants.CENTER_FIELD_Y
 LARGE_ELLIPSE_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
-GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X + LARGE_ELLIPSE_HEIGHT
+GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X + 20 #LARGE_ELLIPSE_HEIGHT # unsure come back to
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
 ELLIPSE_POSITION_LIMIT = BALL_LOC_LIMIT
 # Angle limits for moving about ellipse

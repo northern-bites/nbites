@@ -14,6 +14,7 @@ def gameInitial(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.isSaving = False
         player.stopWalking()
         player.gainsOn()
         player.zeroHeads()
@@ -34,6 +35,7 @@ def gameReady(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.isSaving = False
         player.standup()
         player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
@@ -54,9 +56,10 @@ def gameSet(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.isSaving = False
         player.stopWalking()
         player.brain.loc.resetBall()
-
+        print player.brain.play.role
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
 
@@ -90,6 +93,7 @@ def gamePlaying(player):
 def gamePenalized(player):
     if player.firstFrame():
         player.isChasing = False
+        player.isSaving = False
         player.inKickingState = False
         player.justKicked = False
         player.stopWalking()
@@ -105,6 +109,7 @@ def fallen(player):
     player.isChasing = False
     player.inKickingState = False
     player.justKicked = False
+    #do I want isSaving here?
     return player.stay()
 
 def gameFinished(player):
@@ -117,6 +122,7 @@ def gameFinished(player):
         player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
+        player.isSaving = False
         player.stopWalking()
         player.zeroHeads()
         player.GAME_FINISHED_satDown = False

@@ -26,6 +26,16 @@ enum ProfiledComponent {
   P_RUNS,
   P_OBJECT,
 
+  P_EDGES,
+  P_SOBEL,
+  P_EDGE_PEAKS,
+
+  P_HOUGH,
+  P_MARK_EDGES,
+  P_SMOOTH,
+  P_HOUGH_PEAKS,
+  P_SUPPRESS,
+
   P_LINES,
 
   P_VERT_LINES,
@@ -66,6 +76,8 @@ class Profiler {
 
     void printCurrent();
     void printSummary();
+    void printCSVSummary();
+    void printIndentedSummary();
 
     bool nextFrame();
 
@@ -80,10 +92,18 @@ class Profiler {
       return profiling;
     }
 
+    inline bool shouldNotPrintLine(int i) {
+        // Don't print those times which are zero, i.e. they weren't run.
+        return (!printEmpty && sumTime[i] == 0);
+    }
+
   public:
-    bool profiling;
+    bool profiling, printEmpty;
+    int maxPrintDepth;
+    enum { PRINT_ALL_DEPTHS = -1 };
 
   private:
+
     long long (*timeFunction) ();
 
     bool start_next_frame;
@@ -91,6 +111,8 @@ class Profiler {
     int current_frame;
     long long enterTime[NUM_PCOMPONENTS];
     long long lastTime[NUM_PCOMPONENTS];
+
+public:
     long long minTime[NUM_PCOMPONENTS];
     long long maxTime[NUM_PCOMPONENTS];
     long long sumTime[NUM_PCOMPONENTS];

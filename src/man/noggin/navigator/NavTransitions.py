@@ -1,19 +1,21 @@
-from math import fabs
+from math import fabs, sqrt, pow
 from . import NavConstants as constants
 from man.noggin.util import MyMath
 from man.noggin import NogginConstants
 
-def atDestination(my, dest):
-    """
-    Returns true if we are at an (x, y) close enough to the one we want
-    """
-    return my.distTo(dest) < constants.CLOSE_ENOUGH_XY
-
 def atDestinationCloser(my, dest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
+
     """
-    return my.distTo(dest) < constants.CLOSER_XY
+    #diffX = fabs(dest.x - my.x)
+    #diffY = fabs(dest.y - my.y)
+
+    #return diffX < my.uncertX and diffY < my.uncertY
+
+    return my.distTo(dest) < (constants.CLOSER_XY +
+                              sqrt(pow(my.uncertX, 2) + 
+                                   pow(my.uncertY, 2)))
 
 def atDestinationCloserAndFacing(my, dest, bearing):
     return (atDestinationCloser(my, dest) and \
@@ -31,6 +33,7 @@ def atHeading(my, targetHeading):
     return hDiff < constants.CLOSE_ENOUGH_H and \
            my.uncertH < constants.LOC_IS_ACTIVE_H
 
+#not used
 def notAtHeading(my, targetHeading):
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
 
@@ -129,6 +132,7 @@ def shouldAvoidObstacle(nav):
     # don't dodge an object in front when we're not going forward
     if nav.walkX <= 0:
         return False
+
     return ((shouldAvoidObstacleLeft(nav) or
              shouldAvoidObstacleRight(nav)) and
             not nav.brain.player.penaltyKicking)
