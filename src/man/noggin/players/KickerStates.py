@@ -32,7 +32,7 @@ def standup(player):
 def kickStraight(player):
     if player.firstFrame():
 
-        player.executeMove(SweetMoves.SHORT_QUICK_LEFT_KICK)
+        player.executeMove(SweetMoves.LEFT_LONG_BACK_KICK)
 
     if player.counter == 50:
         return player.goLater('done')

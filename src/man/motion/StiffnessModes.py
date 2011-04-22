@@ -46,6 +46,30 @@ LOW_HEAD_STIFFNESSES = (LOWER_HEAD_VALUE, # Head
 
 
 
+BACK_KICK_STIFFNESSES =  (LOWER_HEAD_VALUE, # Head
+                        LOWER_HEAD_VALUE,
+                        GAINS_ON_VALUE, # larm
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE, # lleg
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE, # rleg
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE, # rarm
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,
+                        GAINS_ON_VALUE,)
+
+
 
 STANDUP_STIFFNESSES = (STANDUP_GAINS_VALUE, # Head
                        STANDUP_GAINS_VALUE,

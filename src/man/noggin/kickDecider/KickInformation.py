@@ -50,7 +50,7 @@ class KickInformation:
         self.kickObjective = self.getKickObjective()
         #if self.kickObjective == constants.OBJECTIVE_ORBIT:
          #   return None
-        return self.decideKick()
+        return kicks.LEFT_BACK_KICK
 
     def getKickObjective(self):
         """
