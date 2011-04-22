@@ -7,7 +7,6 @@ import GoalieTransitions as goalTran
 from ..playbook.PBConstants import GOALIE
 from .. import NogginConstants as nogginConstants
 from man.noggin.typeDefs.Location import RobotLocation
-from man.noggin.kickDecider import KickInformation
 
 def chase(player):
     """

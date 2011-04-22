@@ -49,7 +49,7 @@ RIGHT_KICKOFF_POINT = Location(NogginConstants.CENTER_FIELD_X +
                               NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
                               SIDELINE_KICKOFF_OFFSET)
 
-FORWARD_KICKOFF_POINT = Location(NogginConstants.CENTERFIELD_X +
+FORWARD_KICKOFF_POINT = Location(NogginConstants.CENTER_FIELD_X +
                                  NogginConstants.CENTER_CIRCLE_RADIUS + 15.,
                                  NogginConstants.CENTER_FIELD_Y)
 

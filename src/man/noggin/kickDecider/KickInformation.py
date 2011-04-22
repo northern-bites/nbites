@@ -38,8 +38,6 @@ class KickInformation:
 
         self.haveData = False
 
-        self.hasKickedOff = False
-
         self.kickObjective = None
         self.kick = None
         self.kickDest = None
@@ -53,14 +51,14 @@ class KickInformation:
         """
         self.calculateDataAverages()
 
-        if not self.hasKickedOff:
+        if not self.decider.hasKickedOff:
             self.kickObjective = constants.OBJECTIVE_KICKOFF
             return self.kickObjective
         elif self.sawOppGoal:
             self.kickObjective = constants.OBJECTIVE_SHOOT
             return self.kickObjective
         else:
-            self.kickObjective = self.OBJECTIVE_CLEAR
+            self.kickObjective = constants.OBJECTIVE_CLEAR
             return self.kickObjective
 
     def collectData(self):
@@ -69,29 +67,29 @@ class KickInformation:
         """
         self.haveData = True
 
-        if self.myGoalLeftPost.on:
-            if self.myGoalLeftPost.certainty == NogginConstants.SURE:
+        if self.brain.myGoalLeftPost.on:
+            if self.brain.myGoalLeftPost.certainty == NogginConstants.SURE:
                 self.sawOwnGoal = True
-                self.myGoalLeftPostBearings.append(self.myGoalLeftPost.visBearing)
-                self.myGoalLeftPostDists.append(self.myGoalLeftPost.visDist)
+                self.myGoalLeftPostBearings.append(self.brain.myGoalLeftPost.visBearing)
+                self.myGoalLeftPostDists.append(self.brain.myGoalLeftPost.visDist)
 
-        if self.myGoalRightPost.on:
-            if self.myGoalRightPost.certainty == NogginConstants.SURE:
+        if self.brain.myGoalRightPost.on:
+            if self.brain.myGoalRightPost.certainty == NogginConstants.SURE:
                 self.sawOwnGoal = True
-                self.myGoalRightPostBearings.append(self.myGoalRightPost.visBearing)
-                self.myGoalRightPostDists.append(self.myGoalRightPost.visDist)
+                self.myGoalRightPostBearings.append(self.brain.myGoalRightPost.visBearing)
+                self.myGoalRightPostDists.append(self.brain.myGoalRightPost.visDist)
 
-        if self.oppGoalLeftPost.on:
-            if self.oppGoalLeftPost.certainty == NogginConstants.SURE:
+        if self.brain.oppGoalLeftPost.on:
+            if self.brain.oppGoalLeftPost.certainty == NogginConstants.SURE:
                 self.sawOppGoal = True
-                self.oppGoalLeftPostBearings.append(self.oppGoalLeftPost.visBearing)
-                self.oppGoalLeftPostDists.append(self.oppGoalLeftPost.visDist)
+                self.oppGoalLeftPostBearings.append(self.brain.oppGoalLeftPost.visBearing)
+                self.oppGoalLeftPostDists.append(self.brain.oppGoalLeftPost.visDist)
 
-        if self.oppGoalRightPost.on:
-            if self.oppGoalRightPost.certainty == NogginConstants.SURE:
+        if self.brain.oppGoalRightPost.on:
+            if self.brain.oppGoalRightPost.certainty == NogginConstants.SURE:
                 self.sawOppGoal = True
-                self.oppGoalRightPostBearings.append(self.oppGoalRightPost.visBearing)
-                self.oppGoalRightPostDists.append(self.oppGoalRightPost.visDist)
+                self.oppGoalRightPostBearings.append(self.brain.oppGoalRightPost.visBearing)
+                self.oppGoalRightPostDists.append(self.brain.oppGoalRightPost.visDist)
 
     def calculateDataAverages(self):
         """
@@ -171,4 +169,8 @@ class KickInformation:
                   + " dist is: " + str(self.oppRightPostDist) +  "\n")
         if s == "":
             s = "No goal posts observed"
+        if self.kickObjective == constants.OBJECTIVE_SHOOT:
+            s += "\nObjective is: SHOOT"
+        if self.kickObjective == constants.OBJECTIVE_CLEAR:
+            s += "\nObjective is: CLEAR"
         return s

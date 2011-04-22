@@ -39,13 +39,14 @@ class KickDecider(object):
         """
         returns the sweet move required for motion to kick
         """
-        if self.currentKick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
-                self.currentKick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
+        currentKick = self.getKick()
+        if currentKick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
+                currentKick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
             ball = self.brain.ball
             dist = self.destDist
-            return self.currentKick.sweetMove(ball.relY, dist)
+            return currentKick.sweetMove(ball.relY, dist)
         else:
-            return self.currentKick.sweetMove
+            return currentKick.sweetMove
 
     def getKickObjective(self):
         self.info.getKickObjective()
