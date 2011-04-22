@@ -51,7 +51,7 @@ static const boost::shared_ptr<UnfreezeCommand> ENABLE_GAINS =
 
 //Non blocking!!
 void RoboGuardian::playFile(string str)const{
-    system((sout+str+" &").c_str()); // system returns an int. 
+    system((sout+str+" &").c_str()); // system returns an int.
 }
 
 
@@ -588,8 +588,10 @@ void RoboGuardian::reconnectWifiConnection(){
     pclose(f3);
 
     if (service[0] != ' ') {
-        char command[100] = "connman connect ";
+        char command[100] = "";
+        strcat(command, "su -c \" connman connect ");
         strcat(command, service);
+        strcat(command, " \"");
         system(command);
     } else {
         cout<<"couldn't find specified wifi network to reconnect to";
