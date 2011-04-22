@@ -668,7 +668,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
 }
 
-/*
+/**
  * Move the robot from it's current position to the destionation rel_x,
  * rel_y, rel_theta on the field. This method will move at the highest speed
  * possible, based on StepGenerator's current x,y,theta speeds.
@@ -767,7 +767,6 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
         generateStep(_x, _y, _theta);
 
         done = false;
-
     }
 
     for(int i =0; i < _numSteps; i++){

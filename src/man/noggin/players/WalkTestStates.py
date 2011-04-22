@@ -28,6 +28,9 @@ STRAIGHT_ONLY = ((WALK, (1.0, 0, 0), 150),
                  (WALK, (0, 1.0, 0), 150),
                  )
 
+DESTINATION_TEST = ((DEST, (5, 5, 0) 1000),
+                    )
+
 def gamePlaying(player):
     """
     This method must be overriden by interested SoccerPlayers
@@ -37,7 +40,7 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0
-        player.unitTest = STRAIGHT_ONLY
+        player.unitTest = DESTINATION_TEST
     return player.goLater('walkTest')
 
 
@@ -62,6 +65,10 @@ def walkTest(player):
                             currentVector[1],
                             currentVector[2],
                             currentVector[3],)
+        elif currentCommand[0] = DEST:
+            player.setDestination(currentVector[0],
+                                  currentVector[1],
+                                  currentVector[2],)
         else:
             player.printf("WARNING! Unrecognized command"
                           " type in WalkUnitTest")
@@ -72,6 +79,7 @@ def walkTest(player):
 
 def switchDirections(player):
     return player.goNow('walkTest')
+
 def sitdown(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)
