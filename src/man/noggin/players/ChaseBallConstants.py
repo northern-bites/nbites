@@ -26,8 +26,8 @@ BALL_PFK_MAX_X = 75
 BALL_PFK_MIN_X = 16
 
 # PFK (relates to navigator/PFKStates.py)
-KICK_CLOSE_ENOUGH_X = 3.0
-KICK_CLOSE_ENOUGH_Y = 3.0
+KICK_CLOSE_ENOUGH_X = 2.7
+KICK_CLOSE_ENOUGH_Y = 2.7
 
 # Should dribble should and should stop dribbling
 SHOULD_DRIBBLE_X = BALL_PFK_MAX_X
