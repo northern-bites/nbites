@@ -131,7 +131,7 @@ def decideKick(player):
 
         player.brain.tracker.kickDecideScan()
 
-    elif player.counter > 50: #time required for scan
+    elif player.counter > 43: #time required for scan
         return player.goNow('positionForKick')
 
     player.brain.kickDecider.collectInfo()
