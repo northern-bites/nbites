@@ -135,7 +135,7 @@ def testShouldPositionRight(player):
         if goalTran.shouldPositionRight(player):
             print "position right"
         elif goalTran.shouldPositionLeft(player):
-            print "position left"    
+            print "position left"
         elif goalTran.shouldPositionCenter(player):
             print "postion center"
 

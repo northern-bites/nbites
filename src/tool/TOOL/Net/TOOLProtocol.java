@@ -167,7 +167,7 @@ public class TOOLProtocol {
 
     public void processInfo() {
         gotInfo = true;
-        robotDef = RobotDef.ImageType.values()[robotType].getRobotDef();
+        robotDef = getRobotType().getRobotDef();
         if (robotDef == RobotDef.NAO_DEF_VERSIONED) {
             robotDef.setVersion(0);
         }
@@ -277,7 +277,16 @@ public class TOOLProtocol {
     }
 
     public RobotDef.ImageType getRobotType() {
-        return RobotDef.ImageType.values()[robotType];
+        switch(robotType){
+        case RobotDef.NAO_RL_NUM:                 // NAO_RL
+            return RobotDef.ImageType.NAO_RL;
+        case RobotDef.NAO_SIM_NUM:
+            return RobotDef.ImageType.NAO_SIM;
+        case RobotDef.NAO_NUM:
+        case RobotDef.NAO_RL_33_NUM:
+        default:
+            return RobotDef.ImageType.NAO_VER;
+        }
     }
 
     public RobotDef getRobotDef() {

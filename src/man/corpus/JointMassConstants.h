@@ -3,6 +3,8 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 
+#include "Common.h"
+
 using namespace boost::numeric;
 using namespace NBMath;
 
@@ -27,6 +29,7 @@ namespace Kinematics {
      * the I frame there is a 20mm offset in the y direction. If joint_com_y
      * looks broken in the debug graphs, tweak this (or find the real problem).
      */
+/** disable the offset on the old robots (@see Common.h) */
     static const float COM_I_Y_OFFSET = -20.0f;
 
 // All masses in grams

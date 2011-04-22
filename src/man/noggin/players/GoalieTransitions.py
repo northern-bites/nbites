@@ -212,8 +212,6 @@ def shouldPositionLeft(player):
 
     return False
 
-#CHASE CONSTANTS
-
 def dangerousBall(player):
     ball = player.brain.ball
 
@@ -229,9 +227,6 @@ def dangerousBall(player):
 #Decisions for when to chase.
 #Will chase when:
     # Inside the chasing box
-    # Not inside the goalie box
-    # Not saving
-    # Closest Player to the ball
 
 def shouldChase(player):
     ball = player.brain.ball
@@ -270,7 +265,6 @@ def shouldChase(player):
 
 #Should stop chasing if
     #Ball is outside of the chase range
-    #Ball is behind the goalie
 def shouldStopChase(player):
     ball= player.brain.ball
 
@@ -283,7 +277,6 @@ def shouldStopChase(player):
           or ball.y < goalCon.CHASE_LOWER_Y_LIMIT
           or ball.y > goalCon.CHASE_UPPER_Y_LIMIT):
         player.shouldStopChaseCounter += 1
-        print "2"
 
     #i dont think this works right now?
     #elif(chaseTran.shouldntStopChasing(player)):

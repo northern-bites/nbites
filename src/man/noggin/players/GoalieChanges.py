@@ -17,9 +17,7 @@ def goalieStateChoice(player):
 
     if player.isChasing:
         if goalTran.shouldStopChase(player):
-            print "position"
             return 'goaliePosition'
- #probably should return the state but need to fix
         else:
             return player.currentState
 
@@ -32,9 +30,6 @@ def goalieStateChoice(player):
             return player.currentState
         #elif goalTran.shouldSave(player):
             #return 'goalieSave'
-
-    #if player.isSaving:
-       # return player.currentState
 
     return player.currentState
 
