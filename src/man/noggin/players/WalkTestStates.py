@@ -24,7 +24,8 @@ UNIT_TEST1 = ((WALK, (.5, 0, 0), 100),
               (WALK, (.2, .2, .2), 50),
               )
 
-STRAIGHT_ONLY = ((WALK, (.75, 0, 0), 150),
+STRAIGHT_ONLY = ((WALK, (1.0, 0, 0), 150),
+                 (WALK, (0, 1.0, 0), 150),
                  )
 
 def gamePlaying(player):
@@ -36,7 +37,7 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0
-        player.unitTest = UNIT_TEST1
+        player.unitTest = STRAIGHT_ONLY
     return player.goLater('walkTest')
 
 
