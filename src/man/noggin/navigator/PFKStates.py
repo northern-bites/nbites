@@ -63,7 +63,7 @@ def pfk_all(nav):
     if not nav.stopX:
         sX = pfk_x(nav, ball, x_offset)
         if (sX < 0):
-            print "dangerous ball detected during PFK"
+            #print "dangerous ball detected during PFK"
             helper.setSlowSpeed(nav, sX, 0, 0)
             return nav.stay()
 

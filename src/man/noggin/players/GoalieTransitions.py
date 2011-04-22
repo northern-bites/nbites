@@ -172,7 +172,7 @@ def goalieInBox(player):
 def shouldPositionCenter(player):
     ball = player.brain.ball
 
-    elif (ball.y > NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y + goalCon.BOX_BUFFER
+    if (ball.y > NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y + goalCon.BOX_BUFFER
         and ball.y < NogCon.LANDMARK_MY_GOAL_LEFT_POST_Y - goalCon.BOX_BUFFER):
         player.shouldPositionCenter += 1
         if player.shouldPositionCenter > 3:
@@ -186,7 +186,7 @@ def shouldPositionCenter(player):
 def shouldPositionRight(player):
     ball = player.brain.ball
 
-    elif (ball.y < NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y - goalCon.BOX_BUFFER
+    if (ball.y < NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y - goalCon.BOX_BUFFER
         and ball.x < NogCon.MY_GOALBOX_RIGHT_X + goalCon.BOX_BUFFER):
         player.shouldPositionRightCounter += 1
         if player.shouldPositionRightCounter > 3:

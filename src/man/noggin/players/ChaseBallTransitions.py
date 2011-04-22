@@ -66,7 +66,7 @@ def shouldStopAndKick(player):
     Used after we have a kick decided (more specific)
     """
     ball = player.brain.ball
-    kick = player.brain.kickDecider.currentKick
+    kick = player.brain.kickDecider.getKick()
     (targetX, targetY, heading) = kick.getPosition()
     return (ball.on and \
                 (fabs(ball.relX - targetX) <= constants.KICK_CLOSE_ENOUGH_X) and \
@@ -78,7 +78,7 @@ def shouldKickNow(player):
     Used after we have a kick decided (more specific)
     """
     ball = player.brain.ball
-    kick = player.brain.kickDecider.currentKick
+    kick = player.brain.kickDecider.getKick()
     (targetX, targetY, heading) = kick.getPosition()
     return (player.brain.nav.isStopped() and \
                 ball.on and \
