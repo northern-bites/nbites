@@ -1,9 +1,9 @@
-from .. import NogginConstants as Constants
+from .. import NogginConstants as NogCon
 
 BALL_SAVE_LIMIT_TIME = 2.5
 MOVE_TO_SAVE_DIST_THRESH = 200.
-CENTER_SAVE_THRESH = 15.
-ORTHO_GOTO_THRESH = Constants.CENTER_FIELD_X * 0.5
+
+ORTHO_GOTO_THRESH = NogCon.CENTER_FIELD_X * 0.5
 STRAFE_ONLY = True
 STRAFE_SPEED = 0.3
 STRAFE_STEPS = 3
@@ -24,6 +24,8 @@ SAVE_OFFSET_X = 50
 GOALBOX_Y_REDUCTION = 20
 END_CLEAR_BUFFER = 10
 
+
+
 # Distance at which we use active localization
 ACTIVE_LOC_THRESH = 150.
 
@@ -36,3 +38,21 @@ CHASE_FROM_SQUAT_VEL = 4.0
 
 START_CHASE_BUFFER = 3
 STOP_CHASE_BUFFER = 3
+
+
+#Dani
+
+#Buffer for size of the goalie box so that the
+#Goalie will clear a ball in his box
+CENTER_SAVE_THRESH = 15
+BOX_BUFFER = 15
+SAVE_BUFFER = 10
+CHASE_RIGHT_X_LIMIT = NogCon.MY_GOALBOX_RIGHT_X + 70
+CHASE_LEFT_X_LIMIT = NogCon.MY_GOALBOX_LEFT_X - 7
+CHASE_UPPER_Y_LIMIT = NogCon.FIELD_HEIGHT + 10
+CHASE_LOWER_Y_LIMIT = 0 - 10
+
+CLOSE_BEHIND_GOALIE = -10
+
+VEL_THRES = 10
+#test these constanst soon!

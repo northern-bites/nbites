@@ -1,40 +1,57 @@
 
-import GoalieTransitions as helper
-import GoalieConstants as constants
+import GoalieTransitions as goalTran
+from ..import NogginConstants as nogCon
+import GoalieConstants as goalCon
+import ChaseBallStates as chaseBall
+from man.noggin.typeDefs.Location import RobotLocation
 
 def goaliePosition(player):
     """
     Have the robot navigate to the position reported to it from playbook
     """
-    brain = player.brain
-    nav = brain.nav
-    my = brain.my
+    nav = player.brain.nav
+    my = player.brain.my
+    ball = player.brain.ball
+    heading = None
 
     if player.firstFrame():
+        player.isPositioning = True
         player.isChasing = False
-        player.changeOmniGoToCounter = 0
+        player.isSaving = False
         nav.positionPlaybook()
 
-    if brain.ball.dist >= constants.ACTIVE_LOC_THRESH:
+    if ball.dist >= goalCon.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLoc()
     else:
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall() 
 
+    if player.brain.nav.isStopped():
+        if goalTran.shouldPositionLeft(player):
+            player.goNow('goaliePositionLeft')
 
-    heading = None
-    ball = brain.ball
+        elif goalTran.shouldPositionRight(player):
+            player.goNow('goaliePositionRight')
 
     return player.stay()
 
-def goaliePositionForSave(player):
+def goaliePositionRight(player):
+#move to the right position.
     if player.firstFrame():
-        player.stopWalking()
-        player.brain.tracker.trackBall()
+        nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_LEFT_POST_X + 20,
+                               nogCon.LANDMARK_MY_GOAL_LEFT_POST_Y- 20, 0))
 
-    strafeDir = helper.strafeDirForSave(player)
-    if fabs(strafeDir) > 0:
-        player.setWalk(0, constants.STRAFE_SPEED * MyMath.sign(strafeDir), 0)
-    else:
-        player.stopWalking()
+    elif (player.shouldPositionCenter(player) or 
+          player.shouldPositionLeft(player)):
+        player.goNow('goaliePosition')
 
-    return player.stay()
+
+def goaliePositionLeft(player):
+#move to the left position.
+    if player.firstFrame():
+        nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_RIGHT_POST_X + 20,
+                               nogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y + 10, 0))
+
+    elif (player.shouldPositionCenter(player) or
+          player.shouldPositionRight(player)):
+        player.goNow('goaliePosition')
+

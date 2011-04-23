@@ -8,7 +8,7 @@ from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieSaveStates
 from . import BrunswickStates
-
+from . import GoalieChanges
 from . import GoalieTransitions
 
 from .. import NogginConstants
@@ -35,14 +35,28 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.justKicked = False
         self.inKickingState = False
 
+        #GOALIE COUNTERS AND BOOLEANS
+        # Counters for goalie dive decision making
+        self.counterRightSave = 0
+        self.counterLeftSave = 0
+        self.counterCenterSave = 0
         self.shouldSaveCounter = 0
+
+        #Counters for goalie positioning
+        self.shouldPositionRightCounter = 0
+        self.shouldPositionLeftCounter = 0
+        self.shouldPositionCenterCounter = 0
+
+        #Goalie Chasing Counters
         self.shouldChaseCounter = 0
-        self.shouldStopCaseCounter = 0
-        self.posForSaveCounter = 0
-        self.framesFromCenter = 0
-        self.stepsOffCenter = 0
+        self.shouldStopChaseCounter = 0
+
+        #Boolean for Goalie Current State
         self.isChasing = False
-        self.saving = False
+        self.isSaving = False
+        self.isPositioning = False
+
+        #END GOALIE COUNTERS AND BOOLEANS
 
         self.frameCounter = 0
 
@@ -80,11 +94,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if self.brain.my.playerNumber == 1:
-            state = GoalieTransitions.goalieRunChecks(self)
-            return state
+        if self.play.isRole(PBConstants.GOALIE):
+            return GoalieChanges.goalieStateChoice(self)
 
-        elif self.brain.playbook.subRoleUnchanged():
+        if self.brain.playbook.subRoleUnchanged():
             return self.currentState
 
         elif self.inKickingState:

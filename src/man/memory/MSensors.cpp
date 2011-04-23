@@ -38,8 +38,8 @@ void MSensors::update(const ProviderEvent e) {
 
     if (e.getType() == NEW_IMAGE) {
         PROF_ENTER(_profiler.get(), P_MEMORY_IMAGE);
-        this->MImage::update();
-        this->MImage::log();
+//        this->MImage::update();
+//        this->MImage::log();
         PROF_EXIT(_profiler.get(), P_MEMORY_IMAGE);
     }
 }

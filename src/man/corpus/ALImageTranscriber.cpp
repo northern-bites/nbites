@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <time.h>
 #include "alvision/alimage.h"
 #include "alvision/alvisiondefinitions.h"
 #include "altools/alxplatform.h"
@@ -35,20 +36,20 @@ const int ALImageTranscriber::DEFAULT_CAMERA_BUFFERSIZE = 16;
 // Gain: 28 / Exp: 60
 // Gain: 35 / Exp: 40
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 30;
+const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 24;
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 127;
-const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 67;
+const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 94;
+const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 61;
 const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 154;
-const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 90;
-const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 152;
+const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 69;
+const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 107;
 const int ALImageTranscriber::DEFAULT_CAMERA_HUE = 0;
 // Lens correction
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSX = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSY = 0;
 // Exposure length
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 60;
+const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 72;
 // Image orientation
 const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
@@ -63,20 +64,20 @@ const int ALImageTranscriber::DEFAULT_CAMERA_BUFFERSIZE = 16;
 // Gain: 28 / Exp: 60
 // Gain: 35 / Exp: 40
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 30;
+const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 27;
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 127;
-const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 67;
-const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 154;
-const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 90;
-const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 152;
+const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 95;
+const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 74;
+const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 128;
+const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 69;
+const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 107;
 const int ALImageTranscriber::DEFAULT_CAMERA_HUE = 0;
 // Lens correction
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSX = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSY = 0;
 // Exposure length
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_EXPOSITION = 0; // AUTO EXPOSURE OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 60;
+const int ALImageTranscriber::DEFAULT_CAMERA_EXPOSURE = 105;
 // Image orientation
 const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
@@ -181,7 +182,7 @@ void ALImageTranscriber::run()
             // cout << "Sleeping for nano: " << nanoSleepTime
             //      << " and sec:" << secSleepTime << endl;
 
-            interval.tv_sec = static_cast<__time_t>(secSleepTime);
+            interval.tv_sec = static_cast<time_t>(secSleepTime);
             interval.tv_nsec = nanoSleepTime;
 
             nanosleep(&interval, &remainder);
@@ -541,15 +542,16 @@ void ALImageTranscriber::waitForImage ()
 
         if (ALimage != NULL){
             sensors->lockImage();
-#ifdef CAN_SAVE_FRAMES
 
+#ifdef CAN_SAVE_FRAMES
             uint8_t* naoImage = sensors->getNaoImage();
             if (naoImage != NULL) {
                 _copy_image(ALimage->getData(), naoImage);
                 _acquire_image_fast(table, &params, naoImage, image);
             }
 #else
-            _acquire_image_fast(table, &params, ALimage->getData(), image);
+            ImageAcquisition::acquire_image_fast(table, params,
+                                                 ALimage->getData(), image);
 #endif
             sensors->releaseImage();
 

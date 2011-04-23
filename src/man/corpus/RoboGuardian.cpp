@@ -12,9 +12,9 @@ using namespace std;
 
 //#define DEBUG_GUARDIAN_CLICKS
 #define WIFI_CONNECTION NBITES
-#define WIFI_RECONNECTS_MAX 5
-//check for a connection once in 20 secs
-#define CONNECTION_CHECK_RATE 20*RoboGuardian::GUARDIAN_FRAME_RATE
+#define WIFI_RECONNECTS_MAX 3
+//check for a connection once in 30 secs
+#define CONNECTION_CHECK_RATE 30*RoboGuardian::GUARDIAN_FRAME_RATE
 
 const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
@@ -51,7 +51,7 @@ static const boost::shared_ptr<UnfreezeCommand> ENABLE_GAINS =
 
 //Non blocking!!
 void RoboGuardian::playFile(string str)const{
-    system((sout+str+" &").c_str()); // system returns an int. 
+    system((sout+str+" &").c_str()); // system returns an int.
 }
 
 
@@ -70,10 +70,12 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       //       buttonClicks(0),
       lastInertial(sensors->getInertial()), fallingFrames(0),
       notFallingFrames(0),fallenCounter(0),
+	  groundOnCounter(0),groundOffCounter(0),
       registeredFalling(false),registeredShutdown(false),
-      falling(false),fallen(false),
+	  wifiReconnectTimeout(0),
+	  falling(false),fallen(false),feetOnGround(true),
       useFallProtection(false),
-      wifiReconnectTimeout(0), lastHeatAudioWarning(0), lastHeatPrintWarning(0)
+      lastHeatAudioWarning(0), lastHeatPrintWarning(0)
 {
     pthread_mutex_init(&click_mutex,NULL);
     executeStartupAction();
@@ -97,6 +99,7 @@ void RoboGuardian::run(){
         countButtonPushes();
         checkFalling();
         checkFallen();
+		checkFeetOnGround();
         checkBatteryLevels();
         checkTemperatures();
         processFallingProtection();
@@ -132,7 +135,7 @@ static const float NOFALL_SPEED_THRESH = 0.01f; //rads/20ms
 static const int FALLING_FRAMES_THRESH = 3;
 static const int FALLING_RESET_FRAMES_THRESH = 10;
 static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/6.0f; //30 degrees
-static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/2.5f; //72 degrees
+static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 
 
 //Check if the angle is unstable, (ie tending AWAY from zero)
@@ -150,7 +153,7 @@ bool isFalling(float angle_pos, float angle_vel){
 
 
 
-void RoboGuardian::checkFallen(){
+void RoboGuardian::checkFallen() {
     const Inertial inertial  = sensors->getInertial();
 
     /***** Determine if the robot has FALLEN OVER *****/
@@ -158,22 +161,74 @@ void RoboGuardian::checkFallen(){
         std::abs(inertial.angleX) > FALLEN_ANGLE_THRESH ||
         std::abs(inertial.angleY) > FALLEN_ANGLE_THRESH;
 
+	//cout << inertial.angleX << " " <<  inertial.angleY << endl;
+
     if(fallen_now)
         fallenCounter +=1;
     else
         fallenCounter = 0;
 
     static const int FALLEN_FRAMES_THRESH  = 2;
-    if(fallenCounter >= FALLEN_FRAMES_THRESH ){
-        fallen = true;
+
+	fallen = fallenCounter > FALLEN_FRAMES_THRESH;
+
 #ifdef DEBUG_GUARDIAN_FALLING
-        cout << "Robot has fallen" <<endl;
+		if (fallen)
+			cout << "Robot has fallen" <<endl;
 #endif
-    }
-
-
 }
 
+/**
+ * Method to check whether or not one of the robot's feet is on the
+ * ground. This is used to stop the motion engine (primarily) when we
+ * pick the robot up.
+ *
+ * We sum up the value of all the FSRs on both feet, and check the sum
+ * against a threshold. If the sum is under this threshold for more than
+ * GROUND_FRAMES_THRESH then we set feetOnGround=false
+ *
+ */
+void RoboGuardian::checkFeetOnGround() {
+//this can be higher than the falling thresholds since stopping the walk
+//engine is less critical
+	static const int GROUND_FRAMES_THRESH = 10;
+// lower than this, the robot is off the ground
+	static const float onGroundFSRThresh = 1.0f;
+
+	const FSR left = sensors->getLeftFootFSR();
+	const float leftSum = left.frontLeft + left.frontRight + left.rearLeft +
+		left.rearRight;
+	const FSR right = sensors->getRightFootFSR();
+	const float rightSum = right.frontLeft + right.frontRight + right.rearLeft +
+		right.rearRight;
+
+	//printf("left: %f, right: %f, total: %f\n", leftSum, rightSum, (leftSum + rightSum));
+
+	// buffer the transition in both directions
+	if (feetOnGround) {
+		if (leftSum + rightSum < onGroundFSRThresh) {
+			groundOffCounter++;
+		} else {
+			groundOffCounter = 0;
+		}
+	}
+	else {
+		if (leftSum + rightSum > onGroundFSRThresh) {
+			groundOnCounter++;
+		}
+		else {
+			groundOnCounter = 0;
+		}
+	}
+
+	if (groundOffCounter > GROUND_FRAMES_THRESH) {
+		feetOnGround = false;
+		groundOnCounter = groundOffCounter = 0;
+	} else if (groundOnCounter > GROUND_FRAMES_THRESH) {
+		feetOnGround = true;
+		groundOnCounter = groundOffCounter = 0;
+	}
+}
 
 /**
  * Method to watch the robots rotation and detect falls
@@ -181,9 +236,9 @@ void RoboGuardian::checkFallen(){
  *
  * Also builds in the ability to shutoff gains when a fall is detected,
  * but this still has some problems. Mainly, it sometimes triggers a fall
- * when the robot is rotated back up again, but only when the robot is 
+ * when the robot is rotated back up again, but only when the robot is
  * 'over rotated' during the righting.  This feature can be enabled
- * by calling the currently private 'enableFallProtection'.
+ * by calling 'enableFallProtection'.
  * Also, currently the robot will print whenever it believes it is in
  * the process of falling. This will allow us to monitor how well this code
  * works.
@@ -210,7 +265,7 @@ void RoboGuardian::checkFalling(){
         notFallingFrames +=1;
     }
     //     cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
-    //          << "  fallingFrames is " << fallingFrames 
+    //          << "  fallingFrames is " << fallingFrames
     //          << " and critical angle is "<< falling_critical_angle<< endl;
 
     //If the robot has been falling for a while, and the robot is inclined
@@ -228,7 +283,7 @@ void RoboGuardian::checkFalling(){
 
 
 void RoboGuardian::processFallingProtection(){
-    if(falling && !registeredFalling){
+    if(useFallProtection && falling && !registeredFalling){
         registeredFalling = true;
         executeFallProtection();
     }else if(notFallingFrames > FALLING_RESET_FRAMES_THRESH){
@@ -448,8 +503,8 @@ void RoboGuardian::speakIPAddress()const {
     const string host = getHostName();
 
     string speech_command = sout;
-    speech_command += " "+mynameis_wav;
-    speech_command += " "+nbsdir+host+wav;
+    //speech_command += " "+mynameis_wav;
+    //speech_command += " "+nbsdir+host+wav;
     speech_command += " "+my_address_is_wav;
 
     for (unsigned int i = 0; i < IP.size(); i++){
@@ -485,13 +540,16 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
 //TODO: comment
 void RoboGuardian::checkConnection(){
     const string IP = discoverIP();
+#ifdef DEBUG_CONNECTION
+    cout << "checking connection, got IP" << IP << endl;
+#endif DEBUG_CONNECTION
     if (IP.size() >= 7 && (IP[0] == '1' || IP[0] == '2')) {
         wifiReconnectTimeout = 0;
         return;
     } else {
         if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
             cout    << "No connection detected, trying to reconnect interfaces, attempt "
-                    << wifiReconnectTimeout << endl;
+                    <<  wifiReconnectTimeout << endl;
             reconnectWifiConnection();
             wifiReconnectTimeout++;
         }
@@ -526,15 +584,18 @@ bool RoboGuardian::checkWireless(){
 // we assume that autoconnect is on and that we already  have connected
 // to the network before
 void RoboGuardian::reconnectWifiConnection(){
-    // playFile(wifi_restart_wav);
+
     FILE * f3 = popen("connman services | awk '/ROBOTICS/ {print $4}'", "r");
     char service[100] = "";
     fscanf(f3,"%s\n", service);
     pclose(f3);
 
     if (service[0] != ' ') {
-        char command[100] = "connman connect ";
+        playFile(wifi_restart_wav);
+        char command[100] = "";
+        strcat(command, "su -c \" connman connect ");
         strcat(command, service);
+        strcat(command, " \"");
         system(command);
     } else {
         cout<<"couldn't find specified wifi network to reconnect to";

@@ -90,20 +90,20 @@ SET( VISION_SRCS Ball
                  Gradient
                  HoughSpace
                  geom/HoughLine
-                 ImageAcquisition.s
-                 ImageAcquisitionFast.s
-                 EdgeDetection.s
-                 CopyImage.s
-                 ColorParams
                  VisualDetector
                  FieldLinesDetector
                  )
 
-set_property(SOURCE
-  ImageAcquisition.s
-  ImageAcquisitionFast.s
+# Add the assembly files if we're not on Mac OSX
+IF (UNIX AND NOT APPLE)
+  LIST( APPEND VISION_SRCS
+    EdgeDetection.s
+    )
+
+SET_PROPERTY(SOURCE
   EdgeDetection.s
-  CopyImage.s PROPERTY LANGUAGE C)
+ PROPERTY LANGUAGE C)
+ENDIF()
 
 SET( VISION_PYTHON_SRCS __init__.py )
 
@@ -143,8 +143,8 @@ INSTALL(
   )
 
 ############################ SET LIBRARIES TO LINK WITH
-TARGET_LINK_LIBRARIES( 
-  ${VISION_TARGET} 
+TARGET_LINK_LIBRARIES(
+  ${VISION_TARGET}
   ${PYTHON_LIBRARY} )
 
 
@@ -153,25 +153,27 @@ IF( VISIONLINK )
 
   FIND_PACKAGE( JNI REQUIRED )
 
-  INCLUDE_DIRECTORIES( ${VISIONLINK_HEADER_DIR} 
+  INCLUDE_DIRECTORIES( ${VISIONLINK_HEADER_DIR}
                        ${JNI_INCLUDE_DIRS} )
-  
+
   SET( VISIONLINK_SRCS ${VISIONLINK_FILE})
   ADD_LIBRARY(
     ${VISIONLINK_TARGET}
     SHARED
     ${VISIONLINK_SRCS}
     )
-    
+
   IF( WIN32 )
     ADD_DEFINITIONS( -D_JNI_IMPLEMENTATION_ )
     SET_TARGET_PROPERTIES(${VISIONLINK_TARGET} PROPERTIES LINK_FLAGS -Wl,--kill-at)
   ENDIF( WIN32 )
-  
-  TARGET_LINK_LIBRARIES( ${VISIONLINK_TARGET} 
-                        ${VISION_TARGET} 
+
+  TARGET_LINK_LIBRARIES( ${VISIONLINK_TARGET}
+                        ${VISION_TARGET}
                         ${SENSORS_TARGET}
-                        ${NBINCLUDE_TARGET} )
+                        ${NBINCLUDE_TARGET}
+			${ROBOT_CONNECT_TARGET}
+			)
 ENDIF( VISIONLINK )
 
 
@@ -183,41 +185,36 @@ ENDIF( VISIONLINK )
 #  )
 
 ########################### VISION TEST EXECUTABLES
-set( VISION_TEST_DIR ${VISION_INCLUDE_DIR}/test)
-add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp
-  ${VISION_TEST_DIR}/EdgeDetectorTest.cpp
-  ${VISION_INCLUDE_DIR}/EdgeDetection.s
-  ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
-target_link_libraries( EdgeDetectorTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
+# set( VISION_TEST_DIR ${VISION_INCLUDE_DIR}/test)
+# add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp
+#   ${VISION_TEST_DIR}/EdgeDetectorTest.cpp
+#   ${VISION_INCLUDE_DIR}/EdgeDetection.s
+#   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
-
-add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp
-  ${VISION_TEST_DIR}/HoughSpaceTest.cpp
-  ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
-  ${VISION_INCLUDE_DIR}/EdgeDetection.s
-  ${VISION_INCLUDE_DIR}/Gradient.cpp )
-
-target_link_libraries( HoughSpaceTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
+# target_link_libraries( EdgeDetectorTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
 
 
+# add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp
+#   ${VISION_TEST_DIR}/HoughSpaceTest.cpp
+#   ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
+#   ${VISION_INCLUDE_DIR}/EdgeDetection.s
+#   ${VISION_INCLUDE_DIR}/Gradient.cpp )
 
-add_executable( ImageAcquisitionTest ${VISION_TEST_DIR}/ImageAcquisitionTest.cpp
-  ${VISION_INCLUDE_DIR}/ImageAcquisition.s
-  ${VISION_INCLUDE_DIR}/ImageAcquisitionFast.s ${VISION_INCLUDE_DIR}/ColorParams.cpp )
-
-target_link_libraries( ImageAcquisitionTest ${NBCOMMON_LIBRARIES})
-
-add_executable( OfflineVision ${VISION_INCLUDE_DIR}/offline/OfflineVision.cpp )
-target_link_libraries( OfflineVision
-  ${VISION_TARGET}
-  ${SENSORS_TARGET}
-  ${NBINCLUDE_TARGET}
-  )
-
-enable_testing()
-add_test( EdgeDetectorTest  EdgeDetectorTest )
-add_test( HoughSpaceTest  HoughSpaceTest )
+# target_link_libraries( HoughSpaceTest ${VISION_TARGET})
 
 
-add_executable( ConvertFrame ${VISION_INCLUDE_DIR}/offline/ConvertFrames.cpp )
+
+# add_executable( OfflineVision ${VISION_INCLUDE_DIR}/offline/OfflineVision.cpp )
+# target_link_libraries( OfflineVision
+#   ${VISION_TARGET}
+#   ${SENSORS_TARGET}
+#   ${NBINCLUDE_TARGET}
+#   )
+
+# enable_testing()
+# add_test( EdgeDetectorTest  EdgeDetectorTest )
+# add_test( HoughSpaceTest  HoughSpaceTest )
+
+
+# add_executable( ConvertFrame ${VISION_INCLUDE_DIR}/offline/ConvertFrames.cpp )

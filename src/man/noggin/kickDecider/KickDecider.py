@@ -1,145 +1,187 @@
+import kicks
+import KickInformation
+import KickingConstants as constants
 from .. import NogginConstants
-from . import kicks
-from . import KickingConstants as constants
-from . import KickInformation
-from math import fabs
-from ..util import MyMath
 
 class KickDecider(object):
     """
-    uses current information when called to determine what the best possible
-    kick is and where we need to be to execute it
+    Uses current info gathered by KickInformation to determine the
+    best possible kick and where we should position when called
     """
 
     def __init__(self, brain):
         self.brain = brain
         self.hasKickedOff = True
-        self.objDict = { constants.OBJECTIVE_CLEAR:self.clear,
-                         constants.OBJECTIVE_CENTER:self.center,
-                         constants.OBJECTIVE_SHOOT:self.shoot,
-                         constants.OBJECTIVE_KICKOFF:self.kickoff}
-        self.kickDest = None
-        self.destDist = 0.
-        self.currentObj = None
-        self.currentKick = None
 
-        self.kickInfo = KickInformation.KickInformation(brain.player)
+        self.info = KickInformation.KickInformation(self, brain)
+
+    def resetInfo(self):
+        """
+        resets kickInfo so we can decide on next kick
+        """
+        self.info = KickInformation.KickInformation(self, self.brain)
+
+    def collectInfo(self):
+        """
+        calls kickInfo to collect data
+        """
+        self.info.collectData()
+
+    def getKick(self):
+        """
+        returns the kick and decides on one if we haven't picked one yet
+        """
+        if self.info.kick is None:
+            self.info.kick = self.decideKick()
+        return self.info.kick
 
     def getSweetMove(self):
         """
-        returns the proper sweet move to execute to kick
+        returns the sweet move required for motion to kick
         """
-        if self.currentKick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
-               self.currentKick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
+        currentKick = self.getKick()
+        if currentKick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
+                currentKick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
             ball = self.brain.ball
-            dist = 500.
-            return self.currentKick.sweetMove(ball.relY, dist)
+            dist = self.info.destDist
+            return currentKick.sweetMove(ball.relY, dist)
         else:
-            return self.currentKick.sweetMove
+            return currentKick.sweetMove
+
+    def getKickObjective(self):
+        self.info.getKickObjective()
 
     def decideKick(self):
         """
-        using objective and localization determines best kick to make
+        using objective and heuristics and localization determines best kick
+        In April 2011, Localization is too unreliable. We use it as a last resort
         """
-        self.currentObj = self.kickInfo.getKickObjective()
+        self.getKickObjective()
 
-        if self.currentObj == constants.OBJECTIVE_UNCLEAR:
-             print "objective unclear"
-             return None
+        print self.info
 
-        # uses dictionary to retrieve and call proper method
-        self.kickDest = self.objDict[self.currentObj]()
-        # take my position and destination of kick to decide which kick
-        # need to consider: distance to kick, time needed to align for kick
-        # prioritize time to align
-        # calculate bearing to dest
-        bearing = MyMath.sub180Angle(self.brain.ball.headingTo(self.kickDest) -
-                                     self.brain.my.h)
-        print "bearing: %g" % bearing
-        if fabs(bearing) >= 75.:
-            print "kick sideways"
-            # kick sideways
-            # left or right?
-            # positive bearing means dest is to my left, so kick right
-            if bearing > 0:
-                kick = kicks.RIGHT_SIDE_KICK
-                kick.heading = MyMath.sub180Angle(
-                    self.brain.ball.headingTo(self.kickDest) - 90.)
-            else:
-                kick = kicks.LEFT_SIDE_KICK
-                kick.heading = MyMath.sub180Angle(
-                    self.brain.ball.headingTo(self.kickDest) + 90.)
-
+        if self.info.kickObjective == constants.OBJECTIVE_KICKOFF:
+            return self.kickOff() #should never happen
+        elif self.info.kickObjective == constants.OBJECTIVE_SHOOT:
+            return self.shoot()
+        #elif self.info.kickObjective == constants.OBJECTIVE_CLEAR:
         else:
-            print "kick straight"
-            #kick straight
-            # if my left foot is closer
-            #kick = kicks.LEFT_DYNAMIC_STRAIGHT_KICK
-            # if my right foot is closer
-            kick = kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
-            kick.heading = self.brain.ball.headingTo(self.kickDest)
+            return self.clear()
 
-        self.destDist = self.brain.ball.distTo(self.kickDest)
-        self.currentKick = kick
-        print "kickDest:", self.kickDest
-        print "my.x:%g my.y:%g my.h:%g" % (self.brain.my.x, self.brain.my.y, self.brain.my.h)
-
-        self.brain.out.printf(self.currentKick)
-        return self.currentKick
-
-    def getObjective(self):
+    def kickOff(self):
         """
-        determines what we want to do with the ball
+        returns the kick we should do in the kickOff situation
+        NOT TO BE USED!!! Handled elsewhere.
         """
-        ball = self.brain.ball
-
-        if self.brain.gameController.ownKickOff and \
-                self.brain.player.isChasing and \
-                not self.hasKickedOff:
-            return constants.OBJECTIVE_KICKOFF
-
-        # if ball on our side, get it out!
-        if ball.x < NogginConstants.CENTER_FIELD_X:
-            # clear (or maybe pass?)
-            return constants.OBJECTIVE_CLEAR
-
-        # if deep in opponent corner, center the ball
-        elif (ball.x > NogginConstants.OPP_GOALBOX_LEFT_X and
-              (ball.y > NogginConstants.OPP_GOALBOX_TOP_Y or
-               ball.y < NogginConstants.OPP_GOALBOX_BOTTOM_Y)):
-            return constants.OBJECTIVE_CENTER
-
-        return constants.OBJECTIVE_SHOOT
-
-    def kickoff(self):
-        """returns a destination for kickoff kick """
-        print "kickoff"
         self.hasKickedOff = True
-        return constants.LEFT_KICKOFF_POINT
-
-    def clear(self):
-        """chooses whether to use left or right clear destination """
-        ball = self.brain.ball
-        if ball.y < NogginConstants.CENTER_FIELD_Y:
-            print "clear left"
-            return constants.LEFT_CLEAR_POINT
+        if self.brain.playbook.pb.kickoffFormation == 0:
+            return kicks.RIGHT_SIDE_KICK
         else:
-            print "clear right"
-            return constants.RIGHT_CLEAR_POINT
-
-    def center(self):
-        """ returns point to center ball"""
-        print "center the ball"
-        return constants.CENTER_BALL_POINT
+            return kicks.LEFT_SIDE_KICK
 
     def shoot(self):
-        """ returns best location to shoot at"""
-        # TODO: use vision info to find and shoot at gaps
+        """
+        returns the kick we should do in a shooting situation
+        """
+        rightPostBearing = self.info.oppRightPostBearing
+        leftPostBearing = self.info.oppLeftPostBearing
 
-        ball = self.brain.ball
-        if ball.y < NogginConstants.CENTER_FIELD_Y:
-            print "shoot left"
-            return constants.SHOOT_AT_LEFT_AIM_POINT
+        # first determine if both opp goal posts were seen
+        if (rightPostBearing is not None and leftPostBearing is not None):
+            # if we are facing between the posts
+            if (leftPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
+                    rightPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0):
+                return self.chooseDynamicKick()
+            # if the goal is to our right, use our left foot
+            elif leftPostBearing < 0:
+                return kicks.LEFT_SIDE_KICK
+            # if the goal is to our left, use our right foot
+            elif rightPostBearing > 0:
+                return kicks.RIGHT_SIDE_KICK
+        # if only one was seen
+        elif (rightPostBearing is not None):
+            # if the right post is roughly to our right (but not too far), kick straight
+            if (rightPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0 and \
+                    rightPostBearing >= -1*constants.KICK_STRAIGHT_BEARING_THRESH):
+                return self.chooseDynamicKick()
+            # if the right post is roughly to our left, kick right
+            elif (rightPostBearing > 0):
+                return kicks.RIGHT_SIDE_KICK
+            # if the right post is way to our right, kick with the left foot
+            elif (rightPostBearing < -1*constants.KICK_STRAIGHT_BEARING_THRESH):
+                return kicks.LEFT_SIDE_KICK
+        elif (leftPostBearing is not None):
+            if (leftPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
+                    leftPostBearing <= constants.KICK_STRAIGHT_BEARING_THRESH):
+                return self.chooseDynamicKick()
+            elif (leftPostBearing < 0):
+                return kicks.LEFT_SIDE_KICK
+            elif (leftPostBearing > constants.KICK_STRAIGHT_BEARING_THRESH):
+                return kicks.RIGHT_SIDE_KICK
+        # if none were seen
+        return self.kickLoc()
+
+    def clear(self):
+        """
+        returns kick we should do in a clearing situation
+        """
+        rightPostBearing = self.info.myRightPostBearing
+        rightPostDist = self.info.myRightPostDist
+        leftPostBearing = self.info.myLeftPostBearing
+        leftPostDist = self.info.myLeftPostDist
+
+        # first determine if both my goal posts were seen
+        if (rightPostBearing is not None and leftPostBearing is not None):
+            distDiff = rightPostDist - leftPostDist
+            # if we are facing between our posts and difference between dists is small enough
+            if (rightPostBearing >= 0 and leftPostBearing <= 0 and \
+                    distDiff <= constants.CLEAR_POST_DIST_DIFF):
+                #return self.chooseBackKick()
+                pass
+            if (rightPostDist <= leftPostDist): #TODO elif when backKick is done
+                return kicks.LEFT_SIDE_KICK
+            elif (leftPostDist < rightPostDist):
+                return kicks.RIGHT_SIDE_KICK
+        # if only one was seen
+        elif (rightPostBearing is not None):
+            if (rightPostBearing > 0):
+                return kicks.LEFT_SIDE_KICK
+            else:
+                return kicks.RIGHT_SIDE_KICK
+        elif (leftPostBearing is not None):
+            if (leftPostBearing > 0):
+                return kicks.LEFT_SIDE_KICK
+            else:
+                return kicks.RIGHT_SIDE_KICK
+        return self.kickLoc()
+
+    def kickLoc(self):
+        """
+        returns kick using localization
+        """
+        my = self.brain.my
+        if (my.h <= 45. and my.h >= -45.):
+            return self.chooseDynamicKick()
+        elif (my.h <= 135. and my.h > 45.):
+            return kicks.LEFT_SIDE_KICK
+        elif (my.h >= -135. and my.h < -45.):
+            return kicks.RIGHT_SIDE_KICK
         else:
-            print "shoot right"
-            return constants.SHOOT_AT_RIGHT_AIM_POINT
+            #return self.chooseBackKick()
+            #TODO: Unneccessary when back kick is done
+            if my.y > NogginConstants.CENTER_FIELD_Y:
+                return kicks.LEFT_SIDE_KICK
+            else:
+                return kicks.RIGHT_SIDE_KICK
+
+    def chooseDynamicKick(self):
+        ball = self.brain.ball
+        if ball.relY > 0:
+            return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+        return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
+
+    def chooseBackKick(self):
+        ball = self.brain.ball
+        if ball.relY > 0:
+            return kicks.LEFT_BACK_KICK #TODO: make sure names are correct
+        return kicks.RIGHT_BACK_KICK

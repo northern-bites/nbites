@@ -48,7 +48,7 @@ FOV_Y_DEG = 34.8
 IMAGE_ANGLE_X = IMAGE_WIDTH / FOV_X_DEG
 IMAGE_ANGLE_Y = IMAGE_HEIGHT / FOV_Y_DEG
 
-NUM_TOTAL_BALL_VALUES = 30
+NUM_TOTAL_BALL_VALUES = 35
 NUM_VISION_BALL_VALUES = 9 #unused? 1/20/10
 NUM_VISION_FIELD_OBJECT_VALUES = 9
 
@@ -70,7 +70,7 @@ NUM_FIELD_OBJECT_DIST_CERTAINTIES = 4
 ##
 
 # Switch to tell us if we are using the lab field or not
-USING_LAB_FIELD = True
+USING_LAB_FIELD = False
 
 #---Landmark Constants------#
 # Notes:

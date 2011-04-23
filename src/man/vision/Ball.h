@@ -128,6 +128,7 @@ private:
     Blob *topBlob, zeroBlob;
     //Blob checker, obj, pole, leftBox, rightBox;
     Blobs *blobs;
+	estimate focalDist;
     int inferredConfidence;
     float slope;
     int occlusion;

@@ -160,10 +160,10 @@ $(WEBOTS_FILE):
 
 install: $(CMAKE_DEPEND)
 	@if [ -e $(CROSS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) ${MAN_TARGET} install; \
+		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) install; \
 		$(CROSS_DIR)/$(INSTALL_SCRIPT); \
 	elif [ -e $(WEBOTS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) ${MAN_TARGET} install; \
+		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) install; \
 		$(WEBOTS_DIR)/$(INSTALL_SCRIPT); \
 	else \
 		echo "Must have CROSS or WEBOTS build configured to 'make install'"; \
