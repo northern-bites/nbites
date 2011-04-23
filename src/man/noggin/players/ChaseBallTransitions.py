@@ -134,6 +134,12 @@ def shouldScanFindBallActiveLoc(player):
                 player.brain.tracker.activePanOut) and \
         (player.brain.ball.framesOff > constants.BALL_OFF_ACTIVE_LOC_THRESH)
 
+def shouldScanFindBallKick(player):
+    """
+    We lost the ball while in a kicking state, be more generous before looking
+    """
+    return (player.brain.ball.framesOff > constants.BALL_OFF_KICK_THRESH)
+
 def shouldSpinFindBall(player):
     """
     Should spin if we already tried scanning
