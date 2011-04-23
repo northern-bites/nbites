@@ -137,7 +137,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 			if (hasDestination) {
 				x = y = theta = 0; // stop the robot
 				hasDestination = false;
-				done = true;
 			}
 
 			// replenish with the current walk vector, when we don't have a destination
@@ -150,7 +149,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             fillZMP(nextStep);
             //transfer the nextStep element from future to current list
             currentZMPDSteps.push_back(nextStep);
-
         }
 #ifdef DEBUG_ZMP
         cout << "generate_zmp_ref()\n";
@@ -694,12 +692,15 @@ void StepGenerator::setDestination(const float rel_x, const float rel_y,
 		theta = gait->step[WP::MAX_VEL_THETA];
 	}
 
+	cout << "theta " << theta << " from gait " << gait->step[WP::MAX_VEL_THETA] << endl;
+
 	// find the limiting component of our speeds (x,y,theta)
+	// @TODO make this more accurate by taking acceleration into account
 	const float x_time = rel_x / x;
 	const float y_time = rel_y / y;
 	const float theta_time = rel_theta / theta;
 
-	printf("limiting time-- x: %f ye: %f theta: %f\n", x_time, y_time, theta_time);
+	printf("limiting time-- x: %f y: %f theta: %f\n", x_time, y_time, theta_time);
 
 	// figure out how long it will take at the limiting speeds
 	float timeToDest;
@@ -740,9 +741,6 @@ void StepGenerator::setDestination(const float rel_x, const float rel_y,
 
 	// use takeSteps to do the dirty work
 	takeSteps(x_vel, y_vel, thetaPerStep, numberSteps+1);
-
-	// make sure there's a stopping step to bring feet level
-	generateStep(0.0f, 0.0f, 0.0f);
 }
 
 /**
@@ -781,11 +779,9 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
         generateStep(_x, _y, _theta);
     }
 
-	// not true anymore? 
     //skip generating the end step, because it will be generated automatically:
     x = 0.0f; y =0.0f; theta = 0.0f;
 }
-
 
 /**
  *  Set up the walking engine for starting with a swinging step on the left,
@@ -934,7 +930,6 @@ void StepGenerator::generateStep( float _x,
 //                                  1:-1)*HIP_OFFSET_Y) != 0)
 //             type = REGULAR_STEP;
 //         else
-		cout << "end step here!" << endl;
 		type = END_STEP;
 
     }else{
@@ -970,9 +965,9 @@ void StepGenerator::generateStep( float _x,
                    lastQueuedStep->walkVector,
                                    type));
 
-#ifdef DEBUG_STEPGENERATOR
+//#ifdef DEBUG_STEPGENERATOR
     cout << "Generated a new step: "<<*step<<endl;
-#endif
+//#endif
     futureSteps.push_back(step);
     lastQueuedStep = step;
     //switch feet after each step is generated

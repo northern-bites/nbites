@@ -65,7 +65,7 @@ namespace WP {
         MAX_ACC_X,
         MAX_ACC_Y,
         MAX_ACC_THETA,
-	WALKING, //1.0 is walking, everything else is not walking.
+		WALKING, //1.0 is walking, everything else is not walking.
         LEN_STEP_CONFIG
     };
 
