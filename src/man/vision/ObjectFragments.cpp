@@ -1186,6 +1186,9 @@ int ObjectFragments::classifyByTCorner(Blob post) {
 					side = RIGHT;
 				}
 				if (!adjacent) {
+					if (diff < GOALBOX_OVERAGE * 3.0) {
+						return NOPOST;
+					}
 					if (POSTLOGIC) {
 						cout << "T is far from post " << diff << endl;
 					}
