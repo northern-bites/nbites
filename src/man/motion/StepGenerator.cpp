@@ -673,51 +673,52 @@ void StepGenerator::setSpeed(const float _x, const float _y,
  * maximum speeds (if setSpeed hasn't been called)
  */
 void StepGenerator::setDestination(const float rel_x, const float rel_y,
-								   const float rel_theta) {
-	hasDestination = true;
-	clearFutureSteps();
+								   const float rel_theta, float gain) {
 //#ifdef DEBUG_STEPGENERATOR
 	cout << "StepGenerator::setDestination() destination x=" << rel_x
 		 << " y=" << rel_y << " theta=" << rel_theta << endl;
 //#endif
-
-	// if setSpeed isn't explicity called, default to maximum allowed x,y,theta
-	if (x == 0 && y == 0 && theta == 0) {
-		if (rel_x > 0)
-			x = gait->step[WP::MAX_VEL_X];
-		else
-			x = gait->step[WP::MIN_VEL_X];
-
-		y = gait->step[WP::MAX_VEL_Y];
-		theta = gait->step[WP::MAX_VEL_THETA];
+	// sanity
+	if (gain <= 0.0f || gain > 1.0f) {
+		cout << "StepGenerator::setDestination() :: bad gain argument\n";
+		gain = 1.0f;
 	}
 
-	cout << "theta " << theta << " from gait " << gait->step[WP::MAX_VEL_THETA] << endl;
+	float step_x, step_y, step_theta;
+
+	// if setSpeed isn't explicity called, default to maximum allowed x,y,theta
+	if (rel_x > 0)
+		step_x = gain*gait->step[WP::MAX_VEL_X];
+	else
+		step_x = gain*gait->step[WP::MIN_VEL_X];
+
+	step_y = gain*gait->step[WP::MAX_VEL_Y];
+	step_theta = gain*gait->step[WP::MAX_VEL_THETA];
 
 	// find the limiting component of our speeds (x,y,theta)
 	// @TODO make this more accurate by taking acceleration into account
-	const float x_time = rel_x / x;
-	const float y_time = rel_y / y;
-	const float theta_time = rel_theta / theta;
+	const float x_time = std::abs(rel_x / step_x);
+	const float y_time = std::abs(rel_y / step_y);
+	const float theta_time = std::abs(rel_theta / step_theta);
 
-	printf("limiting time-- x: %f y: %f theta: %f\n", x_time, y_time, theta_time);
+	//printf("limiting time-- x: %f y: %f theta: %f\n", x_time, y_time, theta_time);
 
 	// figure out how long it will take at the limiting speeds
 	float timeToDest;
 
 	// x is limiting direction
 	if (x_time >=  y_time && x_time >= theta_time) {
-		cout << "x limiting" << endl;
+		//cout << "x limiting" << endl;
 		timeToDest = x_time;
 	}
 	// y limiting
 	else if (y_time >= x_time && y_time >= theta_time) {
-		cout << "y limiting" << endl;
+		//cout << "y limiting" << endl;
 		timeToDest = y_time;
 	}
 	// theta limiting
 	else {
-		cout << "theta limiting" << endl;
+		//cout << "theta limiting" << endl;
 		timeToDest = theta_time;
 	}
 
@@ -730,11 +731,17 @@ void StepGenerator::setDestination(const float rel_x, const float rel_y,
 	// slow down, run calculations again (since takeSteps sucks for <3 steps)
 	// @HACK :-)
 	if (numberSteps < 3) {
-		x *= .95f;
-		y *= .95f;
-		theta *= .95f;
-		return setDestination(rel_x, rel_y, rel_theta);
+		const float SCALE_DOWN = 0.95f;
+		return setDestination(rel_x, rel_y, rel_theta, gain*SCALE_DOWN);
 	}
+
+	// we've finished calculating, now deal with the motion queues
+	if (hasDestination || !done) {
+		clearFutureSteps();
+	} else {
+		resetQueues();
+	}
+	hasDestination = true;
 
 	// calculate size per step, sanity Check
 	printf("Making %d steps of (%f,%f,%f)\n", numberSteps+1, x_vel, y_vel, thetaPerStep);
