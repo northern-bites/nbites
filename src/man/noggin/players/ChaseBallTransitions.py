@@ -49,6 +49,11 @@ def shouldSpinToBallClose(player):
         ball.dist < constants.SHOULD_STOP_DIST and \
         fabs(ball.relY) > constants.SHOULD_STOP_Y
 
+def shouldSpinToKick(player):
+    ball = player.brain.ball
+    return (ball.relX < constants.SHOULD_SPIN_TO_KICK_X
+            and ball.relX > 0)
+
 def shouldStopBeforeKick(player):
     """
     Ball is right in front of us but we aren't stopped
@@ -133,6 +138,12 @@ def shouldScanFindBallActiveLoc(player):
     return not (player.brain.tracker.activePanUp or
                 player.brain.tracker.activePanOut) and \
         (player.brain.ball.framesOff > constants.BALL_OFF_ACTIVE_LOC_THRESH)
+
+def shouldScanFindBallKick(player):
+    """
+    We lost the ball while in a kicking state, be more generous before looking
+    """
+    return (player.brain.ball.framesOff > constants.BALL_OFF_KICK_THRESH)
 
 def shouldSpinFindBall(player):
     """

@@ -105,14 +105,48 @@ def spinToBallClose(player):
     stop and spin toward it, then decide your kick.
     """
     player.brain.tracker.trackBall()
+    ball = player.brain.ball
 
-    if player.brain.ball.relY > constants.SHOULD_STOP_Y or \
-            player.brain.ball.relY < -1*constants.SHOULD_STOP_Y:
-        spinDir = player.brain.my.spinDirToPoint(player.brain.ball)
+    if (ball.relY > constants.SHOULD_STOP_Y or
+        ball.relY < -1*constants.SHOULD_STOP_Y):
+        spinDir = player.brain.my.spinDirToPoint(ball)
         player.setWalk(0, 0, spinDir*constants.BALL_SPIN_SPEED)
     else:
-        player.stopWalking()
+        if ball.dist > constants.SHOULD_START_DIST:
+            player.brain.nav.chaseBall()
+        else:
+            player.stopWalking()
         return player.goNow('decideKick')
+    if player.brain.tracker.activeLocOn:
+        if transitions.shouldScanFindBallActiveLoc(player):
+            return player.goLater('scanFindBall')
+    elif transitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+
+    return player.stay()
+
+def spinToKick(player):
+    """
+    If the ball is behind the tip of our foot, but outside it, spin
+    """
+    player.brain.tracker.trackBall()
+    ball = player.brain.ball
+
+    if (ball.relY > constants.SHOULD_SPIN_TO_KICK_Y or
+        ball.relY < -1*constants.SHOULD_SPIN_TO_KICK_Y):
+        spinDir = player.brain.my.spinDirToPoint(ball)
+        player.setWalk(0,0,spinDir*constants.BALL_SPIN_SPEED)
+    else:
+        if ball.dist > constants.SHOULD_SPIN_TO_KICK_DIST:
+            player.brain.nav.chaseBall()
+        else:
+            player.stopWalking()
+        return player.goNow('decideKick')
+    if player.brain.tracker.activeLocOn:
+        if transitions.shouldScanFindBallActiveLoc(player):
+            return player.goLater('scanFindBall')
+    elif transitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
 
     return player.stay()
 
@@ -161,9 +195,11 @@ def positionForKick(player):
         if transitions.shouldScanFindBallActiveLoc(player):
             player.inKickingState = False
             return player.goLater('scanFindBall')
-    elif transitions.shouldScanFindBall(player):
+    elif transitions.shouldScanFindBallKick(player):
         player.inKickingState = False
         return player.goLater('scanFindBall')
+    elif transitions.shouldSpinToKick(player):
+        return player.goLater('spinToKick')
     if transitions.shouldChaseFromPositionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
@@ -184,7 +220,7 @@ def dribble(player):
     if player.firstFrame():
         player.brain.nav.dribble()
 
-    if transitions.shouldScanFindBall(player):
+    if transitions.shouldScanFindBallKick(player):
         return player.goLater('scanFindBall')
     # if we should stop dribbling, see what else we should do
     if transitions.shouldStopDribbling(player):

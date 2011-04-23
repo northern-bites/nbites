@@ -24,6 +24,7 @@ class Navigator(FSA.FSA):
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
+        self.justKicked = False
 
         # Goto controls
         self.dest = RobotLocation(0, 0, 0)
@@ -82,7 +83,8 @@ class Navigator(FSA.FSA):
                 self.switchTo('walkStraightToPoint')
 
     def stop(self):
-        if (self.currentState =='stop' or self.currentState == 'stopped'):
+        if ((self.currentState =='stop' or self.currentState == 'stopped')
+            and not self.justKicked):
             pass
         else:
             self.switchTo('stop')
