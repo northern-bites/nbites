@@ -642,11 +642,6 @@ GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0), #right arm
                   (-90., -38., -75., 90, 30, 20.),
                   (60., -35., 0., 0.),
                   .35, 0, stiff.LOW_HEAD_STIFFNESSES),
-                 ((60., 35., 0., 0.),
-                  (-90., 38., -75., 90, 30, -20.),
-                  (-90., -38., -75., 90, 30, 20.),
-                  (60., -35., 0., 0.),
-                  1., 0, stiff.LOW_LEG_STIFFNESSES)
                  )
 
 #Working goalie right dive.Needs to be faster but lies flat and dives
