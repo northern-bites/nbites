@@ -58,11 +58,11 @@ def rDefenderDubD(team, workingPlay):
     other_mates = None # put in scope
     myNumber = team.me.playerNumber
     if team.numActiveFieldPlayers == 2:
-        other_mates = team.getOtherActiveTeammates([myNumber])
+        other_mates = team.getOtherActiveFieldPlayers([myNumber])
     elif team.numActiveFieldPlayers == 3:
         # More forward robot is not a defender
         forwardNumber = team.getForward().playerNumber
-        other_mates = team.getOtherActiveTeammates([forwardNumber, myNumber])
+        other_mates = team.getOtherActiveFieldPlayers([forwardNumber, myNumber])
 
     rightPos = PBConstants.RIGHT_DEEP_BACK_POS
     leftPos = PBConstants.LEFT_DEEP_BACK_POS
