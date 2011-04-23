@@ -183,7 +183,7 @@ class KickDecider(object):
             return kicks.LEFT_LONG_BACK_KICK
         return kicks.RIGHT_LONG_BACK_KICK
 
-    def chosseShortBackKick(self):
+    def chooseShortBackKick(self):
         ball = self.brain.ball
         if ball.relY >0:
             return kicks.LEFT_SHORT_BACK_KICK
