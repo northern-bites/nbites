@@ -29,11 +29,20 @@ STRAIGHT_ONLY = ((WALK, (1.0, 0, 0), 150),
                  (WALK, (0, 1.0, 0), 150),
                  )
 
-#(WALK, (0, 0, 0), 30),
+CARDINAL_DEST_TEST = ((DEST, (15, 0, 0), 150),
+                      (DEST, (-15, 0, 0), 150),
+                      (DEST, (0, 10, 0), 150),
+                      (DEST, (0, -10, 0), 150),
+                      (DEST, (0, 0, 90), 150),
+                      (DEST, (0, 0, -90), 150),
+                      )
 
-DESTINATION_TEST = ((DEST, (15, 0, 0), 150),
-                    (DEST, (0, 0, 90), 150),
-                    )
+MIXED_DEST_TEST = ((DEST, (15, 15, 0), 200),
+                   (DEST, (15, -15, 0), 200),
+                   (DEST, (0, -15, -90), 200),
+                   (DEST, (50, 15, -90), 300),
+                   (DEST, (-30, -15, -90), 300),
+                   )
 
 def gamePlaying(player):
     """
@@ -44,9 +53,8 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0
-        player.unitTest = DESTINATION_TEST
+        player.unitTest = MIXED_DEST_TEST
     return player.goLater('walkTest')
-
 
 def walkTest(player):
     """
