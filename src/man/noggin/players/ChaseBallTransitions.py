@@ -49,6 +49,11 @@ def shouldSpinToBallClose(player):
         ball.dist < constants.SHOULD_STOP_DIST and \
         fabs(ball.relY) > constants.SHOULD_STOP_Y
 
+def shouldSpinToKick(player):
+    ball = player.brain.ball
+    return (ball.relX < constants.SHOULD_SPIN_TO_KICK_X
+            and ball.relX > 0)
+
 def shouldStopBeforeKick(player):
     """
     Ball is right in front of us but we aren't stopped
