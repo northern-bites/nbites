@@ -183,7 +183,7 @@ def pDubDMiddie(team, workingPlay):
     y = MyMath.clip(team.brain.ball.y,
                     PBConstants.MIN_MIDDIE_Y,
                     PBConstants.MAX_MIDDIE_Y)
-    x = PBConstants.OFFSENSIVE_MIDDIE_X
+    x = PBConstants.OFFENSIVE_MIDDIE_X
     h = team.brain.ball.heading
 
     pos = (x, y, h)

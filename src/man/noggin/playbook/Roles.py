@@ -72,7 +72,7 @@ def rDefenderDubD(team, workingPlay):
         subRoleOnDeck = PBConstants.RIGHT_DEEP_BACK
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pRightDeepBack(team, workingPlay)
-    else: #if pos == topPos
+    else: #if pos == leftPos
         subRoleOnDeck = PBConstants.LEFT_DEEP_BACK
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pLeftDeepBack(team, workingPlay)

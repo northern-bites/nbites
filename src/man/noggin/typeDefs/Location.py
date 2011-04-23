@@ -27,6 +27,9 @@ class Location (object):
     def __str__(self):
         return ("x: %g  y: %g z: %g" % (self.x, self.y, self.z))
 
+    def toTupleXY(self):
+        return (self.x, self.y)
+
     def distTo(self, other, forceCalc = False):
         """
         returns euclidian dist

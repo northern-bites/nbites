@@ -218,14 +218,14 @@ class GoTeam:
 
         # if we have two positions only two possibilites of positions
         elif len(positions) == 2:
-            myDist1 = hypot(positions[0][0] - self.brain.my.x,
-                            positions[0][1] - self.brain.my.y)
-            myDist2 = hypot(positions[1][0] - self.brain.my.x,
-                            positions[1][1] - self.brain.my.y)
-            mateDist1 = hypot(positions[0][0] - mates[0].x,
-                              positions[0][1] - mates[0].y)
-            mateDist2 = hypot(positions[1][0] - mates[0].x,
-                              positions[1][1] - mates[0].y)
+            myDist1 = hypot(positions[0].toTupleXY()[0] - self.brain.my.x,
+                            positions[0].toTupleXY()[1] - self.brain.my.y)
+            myDist2 = hypot(positions[1].toTupleXY()[0] - self.brain.my.x,
+                            positions[1].toTupleXY()[1] - self.brain.my.y)
+            mateDist1 = hypot(positions[0].toTupleXY()[0] - mates[0].x,
+                              positions[0].toTupleXY()[1] - mates[0].y)
+            mateDist2 = hypot(positions[1].toTupleXY()[0] - mates[0].x,
+                              positions[1].toTupleXY()[1] - mates[0].y)
 
             # Subrole hysteresis prevention does tie-breaking for us.
             # May need role hysteresis prevention.
@@ -263,7 +263,7 @@ class GoTeam:
             # bot1, bot2, bot3 are now 2D arrays of size 3x2.
             # the first arg corresponds to which position the bot is picking
             # and the second arg is the dist(0) which is calculated above
-            # or the actual position(1) which is also an [x,y] array.
+            # or the actual Location(1) which is also an [x,y] array.
 
             # 6 possible weights and positions
             distances = [ (bot2[0][0] + bot3[1][0] + bot4[2][0],  # dist sum,
@@ -288,6 +288,7 @@ class GoTeam:
                     chosenPositions = d
 
             # chosen Postitions is an array of size 4 where 1,2,3 are the positions
+            # returns a Location
             return chosenPositions[self.me.playerNumber -1]
 
 
