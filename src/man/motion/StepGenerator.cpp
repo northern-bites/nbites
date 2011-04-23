@@ -165,7 +165,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 /**
  * This method calculates the sensor ZMP. We build a body to world
  * transform using Aldebaran's filtered angleX/angleY. We then use
- * this to rotate the Aldebaran-filtered accX/Y/Z from the
+ * this to rotate the EKF-filtered accX/Y/Z from the
  * accelerometers. The transformed values are fed into an exponential
  * filter (acc_filter, to reduce jitter from the rotation), and the
  * filtered values are used in an EKF that maintains our sensor ZMP
@@ -184,8 +184,7 @@ void StepGenerator::findSensorZMP(){
         prod(CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, -inertial.angleX),
              CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -inertial.angleY));
 
-    // update the filter
-    // TODO: calibrate!!
+    // update the IIR filter
     acc_filter.update(inertial.accX,
                       inertial.accY,
                       inertial.accZ);
