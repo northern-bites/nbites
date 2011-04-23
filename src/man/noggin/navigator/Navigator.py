@@ -36,6 +36,8 @@ class Navigator(FSA.FSA):
         self.angleToOrbit = 0
         self.curSpinDir = 0
 
+        self.newDestination = False
+
         self.shouldAvoidObstacleLeftCounter = 0
         self.shouldAvoidObstacleRightCounter = 0
 
@@ -147,12 +149,11 @@ class Navigator(FSA.FSA):
         Sets a new destination
         Always does something, since destinations are relative and time sensitive
         """
-
         self.destX = x
         self.destY = y
         self.destTheta = theta
 
-        self.hasDestination = True
+        self.newDestination = True
         self.switchTo('destWalking')
 
     def takeSteps(self, x, y, theta, numSteps):
