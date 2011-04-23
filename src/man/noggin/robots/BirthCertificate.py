@@ -14,7 +14,7 @@ class BirthCertificate:
 	next_id = 0
 
 	def __init__(self, name, long_name, tts_name=None,
-				  doc='', gait=None, dribble_gait=None, backwards_gait=None, slow_gait=None):
+				  doc='', gait=None, dribble_gait=None, backwards_gait=None, slow_gait=None, spin_gait=None):
 		self.id = BirthCertificate.next_id
 		BirthCertificate.next_id += 1
 
@@ -28,6 +28,7 @@ class BirthCertificate:
 		self.dribble_gait = dribble_gait
 		self.backwards_gait = backwards_gait
 		self.slow_gait = slow_gait
+		self.spin_gait = spin_gait
 		self.current_gait = None
 
 	def setRobotGait(self, motion_interface):
@@ -49,6 +50,13 @@ class BirthCertificate:
 			print '\033[32m' + "BirthCertificates - Setting slow gait" + '\033[0m'
 			self.current_gait = self.slow_gait
 			motion_interface.setGait(self.slow_gait)
+
+	def setRobotSpinGait(self, motion_interface):
+		if self.spin_gait is not None and \
+				self.current_gait is not self.spin_gait:
+			print '\033[32m' + "BirthCertificates - Setting spin gait" + '\033[0m'
+			self.current_gait = self.spin_gait
+			motion_interface.setGait(self.spin_gait)
 
 	def setRobotBackwardsGait(self, motion_interface):
 		if self.backwards_gait is not None and \
