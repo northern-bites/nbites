@@ -17,9 +17,10 @@ def setSpeed(nav, x, y, theta):
     # use backwards gait if appropriate
     if x < BACKWARDS_GAIT_THRESH:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
-    elif fabs(theta) > SPIN_GAIT_THRESH and x < 0.1 and \
+    elif fabs(theta) > SPIN_GAIT_THRESH and \
+            fabs(x) < 0.1 and fabs(y) < 0.15 and \
             fabs(theta) > fabs(x) and \
-            (theta**2 + x**2 + y**2) > 0.2:
+            (theta**2 + x**2 + y**2) > 0.1:
         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
     else:
         nav.brain.CoA.setRobotGait(nav.brain.motion)
