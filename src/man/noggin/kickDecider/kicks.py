@@ -24,3 +24,6 @@ RIGHT_SIDE_KICK = Kick(x = 12, y = -5, move=SweetMoves.DREW_RIGHT_SIDE_KICK)
 
 RIGHT_DYNAMIC_STRAIGHT_KICK = Kick(y = -8, move=SweetMoves.DREW_KICK)
 LEFT_DYNAMIC_STRAIGHT_KICK = Kick(y = 8, move=SweetMoves.DREW_KICK)
+
+LEFT_BACK_KICK = Kick(x = 12, y = 8, move=SweetMoves.LEFT_LONG_BACK_KICK)
+RIGHT_BACK_KICK = Kick(x = 12, y = -8, move=SweetMoves.RIGHT_LONG_BACK_KICK)
