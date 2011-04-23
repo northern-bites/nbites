@@ -135,8 +135,11 @@ class KickDecider(object):
             distDiff = rightPostDist - leftPostDist
             # if we are facing between our posts and difference between dists is small enough
             if (rightPostBearing >= 0 and leftPostBearing <= 0 and \
-                    distDiff <= constants.CLEAR_POST_DIST_DIFF):
-                return self.chooseBackKick()
+                    distDiff <= constants.CENTERED_POST_DIST_DIFF):
+                return self.chooseLongBackKick()
+            elif(rightPostBearing >=0 and leftPostBearing <= 0 and \
+                     distDiff <= constants.CLEAR_POST_DIST_DIFF):
+                return self.chooseShortBackKick()
             elif (rightPostDist <= leftPostDist):
                 return kicks.LEFT_SIDE_KICK
             elif (leftPostDist < rightPostDist):
@@ -174,8 +177,14 @@ class KickDecider(object):
             return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
         return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
 
-    def chooseBackKick(self):
+    def chooseLongBackKick(self):
         ball = self.brain.ball
         if ball.relY > 0:
-            return kicks.LEFT_BACK_KICK
-        return kicks.RIGHT_BACK_KICK
+            return kicks.LEFT_LONG_BACK_KICK
+        return kicks.RIGHT_LONG_BACK_KICK
+
+    def chosseShortBackKick(self):
+        ball = self.brain.ball
+        if ball.relY >0:
+            return kicks.LEFT_SHORT_BACK_KICK
+        return kicks.RIGHT_SHORT_BACK_KICK
