@@ -35,6 +35,10 @@ class Navigator(FSA.FSA):
         self.orbitDir = 0
         self.angleToOrbit = 0
         self.curSpinDir = 0
+        self.destX = 0
+        self.destY = 0
+        self.destTheta = 0
+        self.destGain = 1
 
         self.newDestination = False
 

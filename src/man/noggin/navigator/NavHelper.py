@@ -7,11 +7,11 @@ import NavConstants as constants
 # forwards & backwards gaits (happens in spinFindBall sometimes, bad)
 BACKWARDS_GAIT_THRESH = -0.2
 
-def setDestination(nav, x, y, theta):
+def setDestination(nav, x, y, theta, gain):
     """
     Calls setDestination within the motion engine
     """
-    destination = motion.DestinationCommand(x=x, y=y, theta=theta)
+    destination = motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
     nav.brain.motion.sendDestCommand(destination)
 
 def setSpeed(nav, x, y, theta):

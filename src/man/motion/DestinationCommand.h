@@ -32,9 +32,9 @@
 class DestinationCommand : public MotionCommand
 {
 public:
-    DestinationCommand(float _x_mm, float _y_mm, float _theta_rads)
+    DestinationCommand(float _x_mm, float _y_mm, float _theta_rads, float _gain=1.0f)
 		: MotionCommand (MotionConstants::DESTINATION),
-          x_mm(_x_mm),y_mm(_y_mm),theta_rads(_theta_rads) {
+          x_mm(_x_mm),y_mm(_y_mm),theta_rads(_theta_rads), gain(_gain) {
 		setChainList();
 	}
 
@@ -44,6 +44,7 @@ public:
     const float x_mm;
     const float y_mm;
     const float theta_rads;
+	const float gain;
 protected:
 	virtual void setChainList() {
         chainList.assign(MotionConstants::WALK_CHAINS,
@@ -56,7 +57,7 @@ public:
         {
             return o << "DestinationCommand("
                      << w.x_mm << "," << w.y_mm << "," << w.theta_rads
-                     << ") ";
+                     << ") at: " << w.gain*100 << "%";
         }
 
 };

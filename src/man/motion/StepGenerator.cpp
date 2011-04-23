@@ -20,6 +20,7 @@
 #include <iostream>
 using namespace std;
 
+#include <math.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
@@ -671,29 +672,36 @@ void StepGenerator::setSpeed(const float _x, const float _y,
  * rel_y, rel_theta on the field. This method will move at the highest speed
  * possible, based on StepGenerator's current x,y,theta speeds or our gait's
  * maximum speeds (if setSpeed hasn't been called)
+ *
+ * Method will generate steps for an arbitrary relative destination, but NOTE
+ * that due to slipping, model imperfections etc. it is most accurate for distances
+ * of <30cm.
+ *
+ * @param gain optional speed modification parameter, range [0,1]
  */
 void StepGenerator::setDestination(const float rel_x, const float rel_y,
-								   const float rel_theta, float gain) {
-//#ifdef DEBUG_STEPGENERATOR
-	cout << "StepGenerator::setDestination() destination x=" << rel_x
-		 << " y=" << rel_y << " theta=" << rel_theta << endl;
-//#endif
-	// sanity
-	if (gain <= 0.0f || gain > 1.0f) {
-		cout << "StepGenerator::setDestination() :: bad gain argument\n";
-		gain = 1.0f;
-	}
+                                   const float rel_theta, float gain) {
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::setDestination() destination x=" << rel_x
+         << " y=" << rel_y << " theta=" << rel_theta << endl;
+#endif
 
-	float step_x, step_y, step_theta;
+    // sanity
+    if (gain <= 0.0f || gain > 1.0f) {
+        cout << "StepGenerator::setDestination() :: bad gain argument\n";
+        gain = 1.0f;
+    }
 
-	// if setSpeed isn't explicity called, default to maximum allowed x,y,theta
-	if (rel_x > 0)
-		step_x = gain*gait->step[WP::MAX_VEL_X];
-	else
-		step_x = gain*gait->step[WP::MIN_VEL_X];
+    float step_x, step_y, step_theta;
 
-	step_y = gain*gait->step[WP::MAX_VEL_Y];
-	step_theta = gain*gait->step[WP::MAX_VEL_THETA];
+    // if setSpeed isn't explicity called, default to maximum allowed x,y,theta
+    if (rel_x > 0)
+        step_x = gain*gait->step[WP::MAX_VEL_X];
+    else
+        step_x = gain*gait->step[WP::MIN_VEL_X];
+
+    step_y = gain*gait->step[WP::MAX_VEL_Y];
+    step_theta = gain*gait->step[WP::MAX_VEL_THETA];
 
 	// find the limiting component of our speeds (x,y,theta)
 	// @TODO make this more accurate by taking acceleration into account
@@ -726,7 +734,8 @@ void StepGenerator::setDestination(const float rel_x, const float rel_y,
 	const float y_vel = rel_y / timeToDest;
 	const float thetaPerStep = rel_theta / timeToDest;
 
-	const int numberSteps = timeToDest / gait->step[WP::DURATION];
+	const int numberSteps = static_cast<int>(
+		ceil(timeToDest / gait->step[WP::DURATION]));
 
 	// slow down, run calculations again (since takeSteps sucks for <3 steps)
 	// @HACK :-)
@@ -743,8 +752,9 @@ void StepGenerator::setDestination(const float rel_x, const float rel_y,
 	}
 	hasDestination = true;
 
-	// calculate size per step, sanity Check
+#ifdef DEBUG_STEPGENERATOR
 	printf("Making %d steps of (%f,%f,%f)\n", numberSteps+1, x_vel, y_vel, thetaPerStep);
+#endif
 
 	// use takeSteps to do the dirty work
 	takeSteps(x_vel, y_vel, thetaPerStep, numberSteps+1);
@@ -972,9 +982,9 @@ void StepGenerator::generateStep( float _x,
                    lastQueuedStep->walkVector,
                                    type));
 
-//#ifdef DEBUG_STEPGENERATOR
+#ifdef DEBUG_STEPGENERATOR
     cout << "Generated a new step: "<<*step<<endl;
-//#endif
+#endif
     futureSteps.push_back(step);
     lastQueuedStep = step;
     //switch feet after each step is generated

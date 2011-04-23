@@ -161,19 +161,20 @@ private:
 
 class PyDestinationCommand {
 public:
-    PyDestinationCommand(float x_cm, float m_cm, float theta_degs) {
+    PyDestinationCommand(float x_cm, float m_cm, float theta_degs, float gain=1.0f) {
         //All python units should be in CM and DEG
         //C++ is in mm and rads, so we need to convert
         command = boost::shared_ptr<DestinationCommand>
 			(new DestinationCommand(x_cm*CM_TO_MM,
 									m_cm*CM_TO_MM,
-									theta_degs*TO_RAD));
+									theta_degs*TO_RAD,
+                                    gain));
     }
 
-	boost::shared_ptr<DestinationCommand> getCommand() const { return command; }
+    boost::shared_ptr<DestinationCommand> getCommand() const { return command; }
 
 private:
-	boost::shared_ptr<DestinationCommand> command;
+    boost::shared_ptr<DestinationCommand> command;
 };
 
 class PyStepCommand {
@@ -328,9 +329,9 @@ public:
     void setNextWalkCommand(const PyWalkCommand *command) {
         motionInterface->setNextWalkCommand(command->getCommand());
     }
-	void sendDestCommand(const PyDestinationCommand *command) {
-		motionInterface->sendDestCommand(command->getCommand());
-	}
+    void sendDestCommand(const PyDestinationCommand *command) {
+        motionInterface->sendDestCommand(command->getCommand());
+    }
     void sendStepCommand(const PyStepCommand *command) {
         motionInterface->sendStepCommand(command->getCommand());
     }
@@ -438,15 +439,17 @@ BOOST_PYTHON_MODULE(_motion)
         ;
 
     class_<PyWalkCommand>("WalkCommand",
-                          init<float, float, float>(args("x","y","theta"),
- "A container for a walk command. Holds an x, y and theta which represents a"
- " walk vector"))
+                          init<float, float, float>
+						  (args("x","y","theta"),
+						   "A container for a walk command. Holds an x, y and theta which "
+						   "represents a walk vector"))
         ;
 
     class_<PyDestinationCommand>("DestinationCommand",
-                          init<float, float, float>(args("x","y","theta"),
- "A container for a destination command. Holds an x, y and theta which represent a"
- " destination relative to the origin of the robot"))
+                                 init<float, float, float, float>
+								 (args("x","y","theta","gain"),
+								  "A container for a destination command. Holds an x, y and theta which represent a"
+								  " destination relative to the origin of the robot, and a speed (gain)"))
         ;
 
     class_<PyStepCommand>("StepCommand",

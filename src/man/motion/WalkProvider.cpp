@@ -39,7 +39,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
       stepGenerator(sensors,&metaGait),
       pendingCommands(false),
       pendingStepCommands(false),
-	  pendingDestCommands(false),
+      pendingDestCommands(false),
       pendingGaitCommands(false),
       pendingStartGaitCommands(false),
       nextCommand(NULL)
@@ -100,10 +100,11 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     }
     pendingStepCommands=false;
 
-	if (pendingDestCommands) {
-		stepGenerator.setDestination(nextDestCommand->x_mm,
-									 nextDestCommand->y_mm,
-									 nextDestCommand->theta_rads);
+    if (pendingDestCommands) {
+        stepGenerator.setDestination(nextDestCommand->x_mm,
+                                     nextDestCommand->y_mm,
+                                     nextDestCommand->theta_rads,
+                                     nextDestCommand->gain);
 	}
 	pendingDestCommands = false;
 
