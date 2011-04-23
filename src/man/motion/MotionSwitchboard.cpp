@@ -19,14 +19,13 @@ const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
  1.57f,0.0f,1.13f,1.01f};
 
 
-MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
-									 shared_ptr<Profiler> p)
+MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,shared_ptr<Profiler> p,shared_ptr<NaoPose> pose)
     : sensors(s),
 	  profiler(p),
       walkProvider(sensors, p),
-      // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
 	  scriptedProvider(sensors, p),
 	  headProvider(sensors, p),
+      coordHeadProvider(sensors, p, pose),
       nullHeadProvider(sensors, p),
       nullBodyProvider(sensors, p),
 	  curProvider(&nullBodyProvider),
@@ -64,7 +63,6 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
     boost::shared_ptr<Gait> defaultGait(new Gait(DEFAULT_GAIT));
 
     sendMotionCommand(defaultGait);
-
 }
 
 MotionSwitchboard::~MotionSwitchboard() {
@@ -251,7 +249,7 @@ bool MotionSwitchboard::postProcess(){
 
     pthread_mutex_unlock(&next_provider_mutex);
 
-    //return if one of the enactors
+    //return if one of the enactors is active
     return curProvider->isActive() || curHeadProvider->isActive();
 }
 
@@ -352,6 +350,7 @@ void MotionSwitchboard::preProcessHead()
         nextProvider == &nullHeadProvider)
     {
         headProvider.hardReset();
+	/////////////coordHeadProvider.hardReset();
     }
 
 	if (curHeadProvider != nextHeadProvider)
@@ -746,10 +745,10 @@ void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
 
 }
 void MotionSwitchboard::sendMotionCommand(const CoordHeadCommand * command){
-    pthread_mutex_lock(&next_provider_mutex);
-    nextHeadProvider = &headProvider;
-    headProvider.setCommand(command);
-    pthread_mutex_unlock(&next_provider_mutex);
+  /*pthread_mutex_lock(&next_provider_mutex);
+    nextHeadProvider = &coordHeadProvider;
+    coordHeadProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);*/
 
 }
 void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){

@@ -33,6 +33,7 @@
 #include "Kinematics.h"
 
 #include "Profiler.h"
+#include "NaoPose.h"
 
 
 class CoordHeadProvider : public MotionProvider {
@@ -50,7 +51,11 @@ public:
   void setCommand(const CoordHeadCommand* command);
   
  private:
-
+    enum HeadMode {
+        SCRIPTED,
+        SET,
+	COORD
+    };
     void transitionTo(HeadMode newMode);
     void coordMode();
     void stopSet();

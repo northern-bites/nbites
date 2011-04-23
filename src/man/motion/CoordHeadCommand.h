@@ -27,29 +27,29 @@
 //#include "NBMath.h"
 //include math
 
-class CoordHeadCommand : public SetHeadCommand
+class CoordHeadCommand : public MotionCommand
 {
  public:
  CoordHeadCommand(const float _x, const float _y,
 		  //_x, _y relative to robot center
 		  const float _z,
 		  //_z relative to ground
-		  //	  NaoPose pose,
-		  const float poseX, const float poseY, const float poseZ,
 		  const float _maxSpeedYaw =
 		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
 		  const float _maxSpeedPitch = 
 		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		  )
-   //  : SetHeadCommand(atan(_y/_x-pose.getFocalPointInWorldFrameX()),
-   //		    atan((pose.getFocalPointInWorldFrameZ()-_z)/sqrt(pow(_x-pose.getFocalPointInWorldFrameX(),2) + pow(_y-pose.getFocalPointInWorldFrameY(),2)))-((static_cast<float>(3.141592))*40.0/180.0f), //adjust by constant angle for lower camera
-   //		    _maxSpeedYaw, _maxSpeedPitch)
-   : SetHeadCommand(atan(_y/(_x-poseX)),
-		    atan((poseZ-_z)/sqrt(pow(_x-poseX,2)+pow(_y-poseY,2)))-((static_cast<float>(3.141592))*40.0/180.0f),
-		    _maxSpeedYaw, _maxSpeedPitch)
+   : MotionCommand(MotionConstants::COORD_HEAD),
+    relX(_x), relY(_y), relZ(_z),
+    maxSpeedYaw(_maxSpeedYaw), maxSpeedPitch(_maxSpeedPitch)
     {
       setChainList();
     }
+  const float getRelX() const {return relX;}
+  const float getRelY() const {return relY;}
+  const float getRelZ() const {return relZ;}
+  const float getMaxSpeedYaw() const {return maxSpeedYaw;}
+  const float getMaxSpeedPitch() const {return maxSpeedPitch;}
  private:
   virtual void setChainList() {
     chainList.insert(chainList.end(),
@@ -57,7 +57,8 @@ class CoordHeadCommand : public SetHeadCommand
 		     MotionConstants::HEAD_JOINT_CHAINS
 		     + MotionConstants::HEAD_JOINT_NUM_CHAINS);
   }
-  //const float CAMERA_ANGLE = NBMath::TO_RAD*40.0; // from reddoc
+const float relX, relY, relZ;
+const float maxSpeedYaw,maxSpeedPitch;
 };
 
 #endif

@@ -22,6 +22,7 @@
 #define _SetHeadCommand_h_DEFINED
 
 #include "Kinematics.h"
+#include <iostream>
 
 class SetHeadCommand : public MotionCommand
 {
@@ -39,6 +40,7 @@ public:
            maxSpeedYaw(_maxSpeedYaw),
            maxSpeedPitch(_maxSpeedPitch)
 	   {
+	     std::cout << "Yaw:  " << _yaw << "  Pitch:  " << _pitch << std::endl;
 	     setChainList();
 	   }
        const float getYaw() const {return yaw;}
