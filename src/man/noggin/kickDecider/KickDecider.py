@@ -136,9 +136,8 @@ class KickDecider(object):
             # if we are facing between our posts and difference between dists is small enough
             if (rightPostBearing >= 0 and leftPostBearing <= 0 and \
                     distDiff <= constants.CLEAR_POST_DIST_DIFF):
-                #return self.chooseBackKick()
-                pass
-            if (rightPostDist <= leftPostDist): #TODO elif when backKick is done
+                return self.chooseBackKick()
+            elif (rightPostDist <= leftPostDist):
                 return kicks.LEFT_SIDE_KICK
             elif (leftPostDist < rightPostDist):
                 return kicks.RIGHT_SIDE_KICK
@@ -167,12 +166,7 @@ class KickDecider(object):
         elif (my.h >= -135. and my.h < -45.):
             return kicks.RIGHT_SIDE_KICK
         else:
-            #return self.chooseBackKick()
-            #TODO: Unneccessary when back kick is done
-            if my.y > NogginConstants.CENTER_FIELD_Y:
-                return kicks.LEFT_SIDE_KICK
-            else:
-                return kicks.RIGHT_SIDE_KICK
+            return self.chooseBackKick()
 
     def chooseDynamicKick(self):
         ball = self.brain.ball
@@ -183,5 +177,5 @@ class KickDecider(object):
     def chooseBackKick(self):
         ball = self.brain.ball
         if ball.relY > 0:
-            return kicks.LEFT_BACK_KICK #TODO: make sure names are correct
+            return kicks.LEFT_BACK_KICK
         return kicks.RIGHT_BACK_KICK
