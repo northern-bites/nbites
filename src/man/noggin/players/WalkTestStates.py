@@ -13,6 +13,7 @@ from ..WebotsConfig import WEBOTS_ACTIVE
 import man.motion.SweetMoves as SweetMoves
 
 #Types
+DEST = 2 
 STEP = 1 #currently broken in Nav.
 WALK = 0
 
@@ -28,7 +29,8 @@ STRAIGHT_ONLY = ((WALK, (1.0, 0, 0), 150),
                  (WALK, (0, 1.0, 0), 150),
                  )
 
-DESTINATION_TEST = ((DEST, (5, 5, 0) 1000),
+DESTINATION_TEST = ((DEST, (0, 0, 90), 150),
+                    (DEST, (30, 0, 0), 150),
                     )
 
 def gamePlaying(player):
@@ -65,7 +67,7 @@ def walkTest(player):
                             currentVector[1],
                             currentVector[2],
                             currentVector[3],)
-        elif currentCommand[0] = DEST:
+        elif currentCommand[0] == DEST:
             player.setDestination(currentVector[0],
                                   currentVector[1],
                                   currentVector[2],)

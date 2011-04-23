@@ -57,7 +57,7 @@ namespace WP {
         DURATION,
         DBL_SUPP_P,
         STEP_HEIGHT, //TODO move this to STANCE
-	FOOT_LIFT_ANGLE,
+		FOOT_LIFT_ANGLE,
         MAX_VEL_X,
         MIN_VEL_X,
         MAX_VEL_Y,

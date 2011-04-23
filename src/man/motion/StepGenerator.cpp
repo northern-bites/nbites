@@ -173,13 +173,13 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 /**
  * This method calculates the sensor ZMP. We build a body to world
  * transform using Aldebaran's filtered angleX/angleY. We then use
- * this to rotate the Aldebaran-filtered accX/Y/Z from the
- * accelerometers. The transformed values are fed into an exponential
- * filter (acc_filter, to reduce jitter from the rotation), and the
- * filtered values are used in an EKF that maintains our sensor ZMP
- * (zmp_filter). The ZMP EKF also takes in the CoM as calculated by
- * the joint angles of the robot (see JointMassConstants.h and
- * COKKinematics.cpp for implementation details of that)
+ * this to rotate EKF-filtered accX/Y/Z from the accelerometers. The
+ * transformed values are fed into an exponential filter (acc_filter,
+ * to reduce jitter from the rotation), and the filtered values are
+ * used in an EKF that maintains our sensor ZMP (zmp_filter). The ZMP
+ * EKF also takes in the CoM as calculated by the joint angles of the
+ * robot (see JointMassConstants.h and COKKinematics.cpp for
+ * implementation details of that)
  */
 void StepGenerator::findSensorZMP(){
     const Inertial inertial = sensors->getInertial();
@@ -671,70 +671,78 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 /**
  * Move the robot from it's current position to the destionation rel_x,
  * rel_y, rel_theta on the field. This method will move at the highest speed
- * possible, based on StepGenerator's current x,y,theta speeds.
- *
+ * possible, based on StepGenerator's current x,y,theta speeds or our gait's
+ * maximum speeds (if setSpeed hasn't been called)
  */
 void StepGenerator::setDestination(const float rel_x, const float rel_y,
 								   const float rel_theta) {
 	hasDestination = true;
 	clearFutureSteps();
-#ifdef DEBUG_STEPGENERATOR
-	cout << "StepGenerator::setDestination() new destination x=" << rel_x
-		 << " y=" << rel_y << " theta=" rel_theta << endl;
-#endif
+//#ifdef DEBUG_STEPGENERATOR
+	cout << "StepGenerator::setDestination() destination x=" << rel_x
+		 << " y=" << rel_y << " theta=" << rel_theta << endl;
+//#endif
 
+	// if setSpeed isn't explicity called, default to maximum allowed x,y,theta
 	if (x == 0 && y == 0 && theta == 0) {
-		cout << "Warning!! You must call setSpeed before setDestination!!" << endl;
-		// TODO: load these default values from somewhere smarter, the gait?
-		x = 150;
-		y = 100;
+		if (rel_x > 0)
+			x = gait->step[WP::MAX_VEL_X];
+		else
+			x = gait->step[WP::MIN_VEL_X];
+
+		y = gait->step[WP::MAX_VEL_Y];
+		theta = gait->step[WP::MAX_VEL_THETA];
 	}
 
-	int numberSteps = -1;
-	float x_vel, y_vel, thetaPerStep;
+	// find the limiting component of our speeds (x,y,theta)
+	const float x_time = rel_x / x;
+	const float y_time = rel_y / y;
+	const float theta_time = rel_theta / theta;
 
-	// find the limiting component of our speeds (x or y)
-	float x_time = rel_x / x;
-	float y_time = rel_y / y;
-
-	printf("x time: %f y time: %f\n", x_time, y_time);
+	printf("limiting time-- x: %f ye: %f theta: %f\n", x_time, y_time, theta_time);
 
 	// figure out how long it will take at the limiting speeds
 	float timeToDest;
 
 	// x is limiting direction
-	if (x_time > y_time) {
-		cout << "x limiting!" << endl;
+	if (x_time >=  y_time && x_time >= theta_time) {
+		cout << "x limiting" << endl;
 		timeToDest = x_time;
-		x_vel = x;
-		y_vel = x * rel_y/rel_x;   // (y/x) = (destY/destX)
 	}
-	else {
-		cout << "y limiting!" << endl;
+	// y limiting
+	else if (y_time >= x_time && y_time >= theta_time) {
+		cout << "y limiting" << endl;
 		timeToDest = y_time;
-		y_vel = y;
-		x_vel = y * rel_x/rel_y;
+	}
+	// theta limiting
+	else {
+		cout << "theta limiting" << endl;
+		timeToDest = theta_time;
 	}
 
-	// calculate number of steps
-	// TODO: pull duration from gait, or make it variable
-	float stepDuration = 0.4f;
-	numberSteps = timeToDest / stepDuration;
+	const float x_vel = rel_x / timeToDest;
+	const float y_vel = rel_y / timeToDest;
+	const float thetaPerStep = rel_theta / timeToDest;
+
+	const int numberSteps = timeToDest / gait->step[WP::DURATION];
 
 	// slow down, run calculations again (since takeSteps sucks for <3 steps)
+	// @HACK :-)
 	if (numberSteps < 3) {
 		x *= .95f;
 		y *= .95f;
+		theta *= .95f;
 		return setDestination(rel_x, rel_y, rel_theta);
 	}
-
-	thetaPerStep = rel_theta / numberSteps;
 
 	// calculate size per step, sanity Check
 	printf("Making %d steps of (%f,%f,%f)\n", numberSteps+1, x_vel, y_vel, thetaPerStep);
 
 	// use takeSteps to do the dirty work
 	takeSteps(x_vel, y_vel, thetaPerStep, numberSteps+1);
+
+	// make sure there's a stopping step to bring feet level
+	generateStep(0.0f, 0.0f, 0.0f);
 }
 
 /**
@@ -773,6 +781,7 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
         generateStep(_x, _y, _theta);
     }
 
+	// not true anymore? 
     //skip generating the end step, because it will be generated automatically:
     x = 0.0f; y =0.0f; theta = 0.0f;
 }
@@ -919,13 +928,14 @@ void StepGenerator::generateStep( float _x,
       _y = 0.0f;
       _theta = 0.0f;
 
-    }else if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
+    } else if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
 //         if(lastQueuedStep->x != 0 || lastQueuedStep->theta != 0 ||
 //            (lastQueuedStep->y - (lastQueuedStep->foot == LEFT_FOOT ?
 //                                  1:-1)*HIP_OFFSET_Y) != 0)
 //             type = REGULAR_STEP;
 //         else
-            type = END_STEP;
+		cout << "end step here!" << endl;
+		type = END_STEP;
 
     }else{
         //we are moving somewhere, and we must ensure that the last step
