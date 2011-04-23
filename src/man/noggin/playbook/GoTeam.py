@@ -339,7 +339,7 @@ class GoTeam:
     def getForward(self, mates):
         """Gets the robot that is in the most forward position"""
         maxX = 0.0
-        forward = self.teamMembers[0]
+        forward = self.brain.teamMembers[0]
         for mate in mates:
             mateX = mate.x
             if mateX > maxX:
@@ -350,7 +350,7 @@ class GoTeam:
     def getBack(self, mates):
         """Gets the robot that is in the farthest back position"""
         minX = NogginConstants.FIELD_WIDTH
-        back = self.teamMembers[0]
+        back = self.brain.teamMembers[0]
         for mate in mates:
             mateX = mate.x
             if mateX < minX:

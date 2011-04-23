@@ -122,7 +122,7 @@ def fNeutralOThreeField(team, workingPlay):
         if chaser_mate.playerNumber == team.brain.my.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
-            otherMates = team.getOtherActiveFieldPlayers(chaser_mate.playerNumber)
+            otherMates = team.getOtherActiveFieldPlayers([chaser_mate.playerNumber])
             forward = team.getForward(otherMates)
             if forward.playerNumber == team.brain.my.playerNumber:
                 Roles.rOffender(team, workingPlay)
@@ -139,7 +139,7 @@ def fNeutralDThreeField(team, workingPlay):
         if chaser_mate.playerNumber == team.brain.my.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
-            otherMates = team.getOtherActiveFieldPlayers(chaser_mate.playerNumber)
+            otherMates = team.getOtherActiveFieldPlayers([chaser_mate.playerNumber])
             forward = team.getForward(otherMates)
             if forward.playerNumber == team.brain.my.playerNumber:
                 Roles.rMiddie(team, workingPlay)
