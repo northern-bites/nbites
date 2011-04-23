@@ -142,6 +142,30 @@ def pGoalieNormal(team, workingPlay):
 
     workingPlay.setPosition(pos)
 
+def pGoaliePosRight(team, workingPlay):
+    """goalie position right side of goal"""
+
+    workingPlay.setSubRole(PBConstants.GOALIE_RIGHT)
+    h = team.brain.ball.heading
+    pos = (PBConstants.GOALIE_RIGHT_X, PBConstants.GOALIE_RIGHT_Y, h)
+
+    if PBConstants.USE_FANCY_GOALIE:
+        pos = fancyGoaliePosition(team)
+
+    workingPlay.setPosition(pos)
+
+def pGoaliePosLeft(team, workingPlay):
+    """goalie position left side of goal"""
+
+    workingPlay.setSubRole(PBConstants.GOALIE_LEFT)
+    h = team.brain.ball.heading
+    pos = (PBConstants.GOALIE_LEFT_X, PBConstants.GOALIE_LEFT_Y, h)
+
+    if PBConstants.USE_FANCY_GOALIE:
+        pos = fancyGoaliePosition(team)
+
+    workingPlay.setPosition(pos)
+
 def pGoalieChaser(team, workingPlay):
     """goalie is being a chaser, presumably in/near goalbox not intended for
         pulling the goalie situations"""

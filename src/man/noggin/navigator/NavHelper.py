@@ -105,6 +105,10 @@ def executeMove(motionInst, sweetMove):
         motionInst.enqueue(move)
 
 def convertWalkVector(brain, x_abs, y_abs, theta_abs):
+    """
+    NOTE: x_abs means that x is bound on [-1,1] (not an absolute value)
+    """
+
     checkWalkVector(x_abs, y_abs, theta_abs)
 
     gait = brain.CoA.current_gait
@@ -114,7 +118,7 @@ def convertWalkVector(brain, x_abs, y_abs, theta_abs):
     if x_abs > 0:
         x_mms = x_abs * gait.getStepValue(4) # max fwd X speed
     elif x_abs < 0:
-        x_mms = x_abs * gait.getStepValue(5) # max rev X speed
+        x_mms = x_abs * fabs(gait.getStepValue(5)) # max rev X speed
 
     # max Y speed (same in both directions)
     y_mms = y_abs * gait.getStepValue(6)

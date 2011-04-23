@@ -42,14 +42,14 @@ def goalieChase(player):
 
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
+    elif transitions.shouldApproachBall(player):
+        return player.goNow('approachBall')
     elif transitions.shouldSpinToBallClose(player):
         return player.goNow('spinToBallClose')
     elif transitions.shouldStopBeforeKick(player):
         return player.goNow('stopBeforeKick')
     elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
-    elif transitions.shouldApproachBall(player):
-        return player.goNow('approachBall')
     else:
         return player.goNow('scanFindBall')
 

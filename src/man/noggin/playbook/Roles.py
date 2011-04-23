@@ -48,6 +48,22 @@ def rGoalie(team, workingPlay):
         team.brain.gameController.currentState =='gameSet'):
         SubRoles.pGoalieReady(team, workingPlay)
 
+    #Goalie Positions in Center when ball within posts
+    elif ((team.brain.ball.x > NogginConstants.CENTER_FIELD_X) or
+          ((team.brain.ball.y > \
+            NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y) and
+          (team.brain.ball.y < NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y))):
+        SubRoles.pGoalieNormal(team, workingPlay)
+
+    #Right of post position right
+    elif (team.brain.ball.y <= NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y):
+        SubRoles.pGoaliePosRight(team, workingPlay)
+
+    #Left of post position left
+    elif (team.brain.ball.y >= NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y):
+        SubRoles.pGoaliePosLeft(team, workingPlay)
+
+    #sanity check
     else:
         SubRoles.pGoalieNormal(team, workingPlay)
 

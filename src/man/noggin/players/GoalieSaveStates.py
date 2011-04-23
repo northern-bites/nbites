@@ -36,7 +36,7 @@ def goalieSave(player):
     # else:
         # player.stopWalking()
 
-def goaliePickSave(player): 
+def goaliePickSave(player):
     player.brain.fallController.enableFallProtection(False)
 
     if helper.shouldSaveRight(player):
