@@ -1154,29 +1154,48 @@ int ObjectFragments::classifyByTCorner(Blob post) {
 			if (y < post.getLeftBottomY() + spany) {
 				closeEnough = true;
 			}
+			float diff = realDistance(x, y, post.getLeftBottomX(),
+									  post.getLeftBottomY());
+			bool adjacent = true;
+			if (diff > GOALBOX_OVERAGE * 2.0f) {
+				adjacent = false;
+			}
 			// if the T is higher in the visual field than the bottom of the post
 			// then we have an easy job - we can decide based on which side its on
 			if (closeEnough) {
 				if (POSTLOGIC) {
 					cout << "Got a T that was close enough " << endl;
 				}
+				int side;
                 if (k->doesItPointUp() && y < post.getLeftBottomY()) {
                     if (k->doesItPointLeft()) {
-                        return LEFT;
+                        side = LEFT;
                     } else {
-                        return RIGHT;
+                        side =  RIGHT;
                     }
                 } else if (k->doesItPointUp() && y > post.getLeftBottomY()) {
                     if (k->doesItPointLeft()) {
-                        return RIGHT;
+                        side = RIGHT;
                     } else {
-                        return LEFT;
+                        side = LEFT;
                     }
                 }
-				if (x <= post.getLeftBottomX()) {
-					return LEFT;
+				else if (x <= post.getLeftBottomX()) {
+					side = LEFT;
+				} else {
+					side = RIGHT;
 				}
-				return RIGHT;
+				if (!adjacent) {
+					if (POSTLOGIC) {
+						cout << "T is far from post " << diff << endl;
+					}
+					if (side == LEFT) {
+						return RIGHT;
+					} else {
+						return LEFT;
+					}
+				}
+				return side;
 			}
 		}
 	}
@@ -1356,8 +1375,9 @@ int ObjectFragments::classifyByCheckingLines(Blob post)
  */
 int ObjectFragments::classifyGoalBoxLineThatAbutsPost(int y, float diff, float dist,
                                                    int classification) {
+	return NOPOST;
     // can we see the bottom of the post?
-    if (y < IMAGE_HEIGHT - 1) {
+    /*if (y < IMAGE_HEIGHT - 1) {
         if (POSTLOGIC) {
             cout << "Perpindicular line detected, distance is " << diff << endl;
         }
@@ -1374,7 +1394,7 @@ int ObjectFragments::classifyGoalBoxLineThatAbutsPost(int y, float diff, float d
         } else {
             return NOPOST;
         }
-    }
+		}*/
 }
 
 /* Returns true if the given x value is within margin of either image edge.
