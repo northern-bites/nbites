@@ -6,14 +6,24 @@ import NavConstants as constants
 # this will prevent us from rapidly switching back and forth between
 # forwards & backwards gaits (happens in spinFindBall sometimes, bad)
 BACKWARDS_GAIT_THRESH = -0.2
+SPIN_GAIT_THRESH = 0.2
+
 
 def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
     """
+
+    #print (theta**2 + x**2 + y**2)
     # use backwards gait if appropriate
     if x < BACKWARDS_GAIT_THRESH:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
+    elif fabs(theta) > SPIN_GAIT_THRESH and \
+            fabs(x) < 0.1 and fabs(y) < 0.15 and \
+            fabs(theta) > fabs(x) and \
+            (theta**2 + x**2 + y**2) > 0.1:
+
+        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
     else:
         nav.brain.CoA.setRobotGait(nav.brain.motion)
 
@@ -45,17 +55,19 @@ def setSlowSpeed(nav, x, y, theta):
     Wrapper to set walk vector while using slow gait
     TODO: dynamic gait so this is unnecessary
     """
-    if x < BACKWARDS_GAIT_THRESH:
-        nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
-    else:
-        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
+    setSpeed(nav, x, y, theta)
 
-    x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
+#     if x < BACKWARDS_GAIT_THRESH:
+#         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
+#     else:
+#         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
 
-    createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
+#     x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
 
-    nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
-    nav.curSpinDir = MyMath.sign(theta)
+#     createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
+
+#     nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
+#    nav.curSpinDir = MyMath.sign(theta)
 
 def step(nav, x, y, theta, numSteps):
     """

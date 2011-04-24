@@ -1,8 +1,8 @@
-from math import (hypot, cos, sin, acos, asin)
-
-
+from math import (fabs, hypot, atan2, cos, sin, acos, asin)
+from ..util import MyMath
 from . import PBConstants
 from . import Strategies
+from .. import NogginConstants
 import time
 
 # ANSI terminal color codes
@@ -16,10 +16,8 @@ PURPLE_COLOR_CODE = '\033[35m'
 CYAN_COLOR_CODE = '\033[36m'
 
 class GoTeam:
-    """
-    This is the class which controls all of our coordinated behavior system.
-    Should act as a replacement to the old PlayBook monolith approach
-    """
+    """This is the class which controls all of our coordinated behavior system.
+       Should act as a replacement to the old PlayBook monolith approach"""
     def __init__(self, brain):
         self.brain = brain
         self.printStateChanges = True
@@ -35,17 +33,21 @@ class GoTeam:
         self.numActiveFieldPlayers = 0
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
+        self.subRoleSwitchTime = 0
         self.ellipse = Ellipse(PBConstants.LARGE_ELLIPSE_CENTER_X,
                                PBConstants.LARGE_ELLIPSE_CENTER_Y,
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
                                PBConstants.LARGE_ELLIPSE_WIDTH)
 
     def run(self, play):
-        """
-        We run this each frame to get the latest info
-        """
+        """We run this each frame to get the latest info"""
         if self.brain.gameController.currentState != 'gamePenalized':
             self.aPrioriTeammateUpdate()
+
+        if self.brain.gameController.currentState == 'gameReady':
+            # Change which wing is forward based on the opponents score
+            gc = self.brain.gameController.gc
+            self.kickoffFormation = (gc.teams(self.brain.my.teamColor)[1])%2
 
         play.changed = False
         self.strategize(play)
@@ -94,15 +96,16 @@ class GoTeam:
             Strategies.sNoFieldPlayers(self, play)
         elif self.numActiveFieldPlayers == 1:
             Strategies.sOneField(self, play)
-
-        # This is the important area, what is usually used during play
         elif self.numActiveFieldPlayers == 2:
+            Strategies.sTwoField(self, play)
+        elif self.numActiveFieldPlayers == 3:
             Strategies.sWin(self, play)
 
     def updateStateInfo(self, play):
         """
         Update information specific to the coordinated behaviors
         """
+        # Print changes
         if play.changed:
             if self.printStateChanges:
                 self.printf("Play switched to " + play.__str__())
@@ -110,16 +113,15 @@ class GoTeam:
     ######################################################
     ############       Role Switching Stuff     ##########
     ######################################################
-    def determineChaser(self):
-        """return the player number of the chaser"""
-
+    def determineChaser(self, play):
+        """return the team member who is the chaser"""
         chaser_mate = self.me
 
         if PBConstants.DEBUG_DET_CHASER:
             self.printf("chaser det: me == #%g"% self.brain.my.playerNumber)
 
         #save processing time and skip the rest if we have the ball
-        if self.me.hasBall(): #and self.me.isChaser()?
+        if self.me.hasBall() and play.isChaser():
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf("I have the ball")
             return chaser_mate
@@ -130,10 +132,10 @@ class GoTeam:
                 self.printf("\t mate #%g"% mate.playerNumber)
 
             # If the player number is me, or our ball models are super divergent ignore
-            if mate.playerNumber == self.me.playerNumber:
+            if (mate.playerNumber == self.me.playerNumber):# or
+                #fabs(mate.ballX - self.me.ballX) > 150.):
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("it's me")
-
                 continue
 
             elif mate.hasBall():
@@ -143,40 +145,32 @@ class GoTeam:
 
             else:
                 # Tie break stuff
-                if self.me.chaseTime < mate.chaseTime:
-                    chaseTimeScale = self.me.chaseTime
+                if chaser_mate.chaseTime < mate.chaseTime:
+                    chaseTimeScale = chaser_mate.chaseTime
                 else:
                     chaseTimeScale = mate.chaseTime
 
-                #TO-DO: break into a separate function call
-                if ((self.me.chaseTime - mate.chaseTime <
-                     PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
-                     (self.me.chaseTime - mate.chaseTime <
-                      PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
-                      self.me.isTeammateRole(PBConstants.CHASER))) and
-                    mate.playerNumber < self.me.playerNumber):
-
+                if self.shouldCallOff(mate, chaser_mate, chaseTimeScale):
                     if PBConstants.DEBUG_DET_CHASER:
-                        self.printf("\t #%d @ %g >= #%d @ %g" %
+                        self.printf("\t #%d @ %g >= #%d @ %g, shouldCallOff" %
                                (mate.playerNumber, mate.chaseTime,
                                 chaser_mate.playerNumber,
                                 chaser_mate.chaseTime))
-                        continue
 
-                #TO-DO: break into a separate function call
-                elif (mate.playerNumber > self.me.playerNumber and
-                      mate.chaseTime - self.me.chaseTime <
-                      PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
-                      mate.isTeammateRole(PBConstants.CHASER)):
+                elif self.shouldListen(mate, chaser_mate, chaseTimeScale):
+                    if PBConstants.DEBUG_DET_CHASER:
+                        self.printf(("\t #%d @ %g <= #%d @ %g, shouldListen" %
+                                      (mate.playerNumber, mate.chaseTime,
+                                       chaser_mate.playerNumber,
+                                       chaser_mate.chaseTime)))
                     chaser_mate = mate
 
                 # else pick the lowest chaseTime
                 else:
                     if mate.chaseTime < chaser_mate.chaseTime:
                         chaser_mate = mate
-
                     if PBConstants.DEBUG_DET_CHASER:
-                        self.printf (("\t #%d @ %g >= #%d @ %g" %
+                        self.printf (("\t #%d @ %g >= #%d @ %g, normal comparison" %
                                       (mate.playerNumber, mate.chaseTime,
                                        chaser_mate.playerNumber,
                                        chaser_mate.chaseTime)))
@@ -186,29 +180,57 @@ class GoTeam:
         # returns teammate instance (could be mine)
         return chaser_mate
 
-    def getLeastWeightPosition(self,positions, mates = None):
-        """
-        Gets the position for the robot such that the distance all robot have
-        to move is the least possible
-        """
+    def shouldCallOff(self, mate, chaser_mate, chaseTimeScale):
+        """Helper method for determineChaser"""
+        # chaser_mate = A, mate = B.
+        # A will still be chaser_mate if:
+        # [ (chaseTime(A) - minChaseTime(A,B) < e) or
+        #   (chaseTime(A) - minChaseTime(A,B) < d and already chasing)]
+        # and no higher robot calling off A.
+        return((chaser_mate.chaseTime - mate.chaseTime <
+                PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
+                (chaser_mate.chaseTime - mate.chaseTime <
+                 PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
+                 chaser_mate.isTeammateRole(PBConstants.CHASER))) and
+               mate.playerNumber < chaser_mate.playerNumber)
+
+    def shouldListen(self, mate, chaser_mate, chaseTimeScale):
+        """Helper method for determineChaser"""
+        # mate = A, chaser_mate = B.
+        # A will become chaser_mate if:
+        # chaseTime(A) < chaseTime(B) - m and
+        # A is higher robot that is already chaser.
+        return (mate.playerNumber > chaser_mate.playerNumber and
+                mate.chaseTime - chaser_mate.chaseTime <
+                PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
+                mate.isTeammateRole(PBConstants.CHASER))
+
+    def getLeastWeightPosition(self, positions, mates = None):
+        """Gets the position for the robot such that the distance
+           all robot have to move is the least possible"""
         # if there is only one position return the position
         if len(positions) == 1 or mates == None:
             return positions[0]
 
-        # if we have two positions only two possibilites of positions
-        #TODO: tie-breaking?
-        elif len(positions) == 2:
-            myDist1 = hypot(positions[0][0] - self.brain.my.x,
-                            positions[0][1] - self.brain.my.y)
-            myDist2 = hypot(positions[1][0] - self.brain.my.x,
-                            positions[1][1] - self.brain.my.y)
-            mateDist1 = hypot(positions[0][0] - mates.x,
-                              positions[0][1] - mates.y)
-            mateDist2 = hypot(positions[1][0] - mates.x,
-                              positions[1][1] - mates.y)
+        if len(positions) != len(mates)+1:
+            self.printf ("Error in getLeastWeightPosition. Not equal numbers of mates/positions")
+            return positions[0]
 
+        # if we have two positions only two possibilites of positions
+        elif len(positions) == 2:
+            myDist1 = hypot(positions[0].toTupleXY()[0] - self.brain.my.x,
+                            positions[0].toTupleXY()[1] - self.brain.my.y)
+            myDist2 = hypot(positions[1].toTupleXY()[0] - self.brain.my.x,
+                            positions[1].toTupleXY()[1] - self.brain.my.y)
+            mateDist1 = hypot(positions[0].toTupleXY()[0] - mates[0].x,
+                              positions[0].toTupleXY()[1] - mates[0].y)
+            mateDist2 = hypot(positions[1].toTupleXY()[0] - mates[0].x,
+                              positions[1].toTupleXY()[1] - mates[0].y)
+
+            # Subrole hysteresis prevention does tie-breaking for us.
+            # May need role hysteresis prevention.
             if myDist1 + mateDist2 == myDist2 + mateDist1:
-                if self.me.playerNumber > mates.playerNumber:
+                if self.me.playerNumber > mates[0].playerNumber:
                     return positions[0]
                 else:
                     return positions[1]
@@ -217,18 +239,66 @@ class GoTeam:
             else:
                 return positions[1]
 
+        # We have three positions
+        # Pseudo 2d array to hold the 3 bots dists to the 3 positions
+        elif len(positions) == 3:
+            bot2, bot3, bot4 = [], [], []
+            bot_distances = [bot2,bot3,bot4]
+
+            # get distances from every bot every possible position
+            for i,bot in enumerate(bot_distances):
+                bot_number = i+2
+                x, y = 0.0, 0.0
+                # use either my estimate or teammates'
+                if bot_number == self.me.playerNumber:
+                    x = self.brain.my.x
+                    y = self.brain.my.y
+                else:
+                    x = self.mates[bot_number-1].x
+                    y = self.mates[bot_number-1].y
+
+                for p in positions:
+                    bot.append([hypot(p[0] - x, p[1] - y), p])
+
+            # bot1, bot2, bot3 are now 2D arrays of size 3x2.
+            # the first arg corresponds to which position the bot is picking
+            # and the second arg is the dist(0) which is calculated above
+            # or the actual Location(1) which is also an [x,y] array.
+
+            # 6 possible weights and positions
+            distances = [ (bot2[0][0] + bot3[1][0] + bot4[2][0],  # dist sum,
+                           bot2[0][1],  bot3[1][1],  bot4[2][1]), # positions
+                          (bot2[1][0] + bot3[2][0] + bot4[0][0],  # dist sum,
+                           bot2[1][1],  bot3[2][1],  bot4[0][1]), # positions
+                          (bot2[2][0] + bot3[0][0] + bot4[1][0],  # .
+                           bot2[2][1],  bot3[0][1],  bot4[1][1]), # .
+                          (bot2[1][0] + bot3[0][0] + bot4[2][0],  # .
+                           bot2[1][1],  bot3[0][1],  bot4[2][1]), # .
+                          (bot2[2][0] + bot3[1][0] + bot4[0][0],  # .
+                           bot2[2][1],  bot3[1][1],  bot4[0][1]), # .
+                          (bot2[0][0] + bot3[2][0] + bot4[1][0],  # dist sum,
+                           bot2[0][1],  bot3[2][1],  bot4[1][1])] # positions
+
+            # We must find the least weight choice from the 6 possibilities
+            min_dist = NogginConstants.FIELD_WIDTH*3
+            chosenPositions = None
+            for i,d in enumerate(distances):
+                if d[0] < min_dist:
+                    min_dist = d[0]
+                    chosenPositions = d
+
+            # chosen Postitions is an array of size 4 where 1,2,3 are the positions
+            # returns a Location
+            return chosenPositions[self.me.playerNumber -1]
+
+
+
     ######################################################
     ############       Teammate Stuff     ################
     ######################################################
 
     def aPrioriTeammateUpdate(self):
-        """
-        Here we update information about teammates before running a new frame
-        """
-        # Change which wing is forward based on the opponents score
-        # self.kickoffFormation =
-        #(self.brain.gameController.theirTeam.teamScore) % 2
-
+        """Here we update information about teammates before running a new frame"""
         # update my own information for role switching
         self.time = time.time()
         self.me.updateMe()
@@ -240,30 +310,56 @@ class GoTeam:
         self.numActiveFieldPlayers = 0
         for mate in self.brain.teamMembers:
             if (mate.active and mate.isDead()): #no need to check inactive mates
-                #we set to True when we get a new packet from mate
-                mate.active = False
+                mate.active = False # we set active True when we get a new packet from mate
             elif (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
                 append(mate)
                 self.numActiveFieldPlayers += 1
 
     def highestActivePlayerNumber(self):
         """returns true if the player is the highest active player number"""
-        activeMate = self.getOtherActiveTeammate()
-        if activeMate.playerNumber > self.me.playerNumber:
-            return False
-        return True
-
-    def getOtherActiveTeammate(self):
-        """this returns the teammate instance of an active teammate that isn't
-        you."""
+        highNumber = 0
         for mate in self.activeFieldPlayers:
-            if self.me.playerNumber != mate.playerNumber:
-                return mate
+            if mate.playerNumber > highNumber:
+                highNumber = mate.playerNumber
+        return highNumber
+
+    def getOtherActiveFieldPlayers(self, exceptNumbers):
+        """returns the active teammates who don't have a number in exceptNumbers"""
+        mates = []
+        append = mates.append
+        for mate in self.activeFieldPlayers:
+            if mate.playerNumber not in exceptNumbers:
+                append(mate)
+        return mates
 
     def reset(self):
         """resets all information stored from teammates"""
         for mate in self.brain.teamMembers:
             mate.reset()
+
+    def getForward(self, mates):
+        """Gets the robot that is in the most forward position"""
+        maxX = 0.0
+        forward = self.brain.teamMembers[0]
+        for mate in mates:
+            mateX = mate.x
+            if mateX > maxX:
+                maxX = mateX
+                forward = mate
+        return forward
+
+    def getBack(self, mates):
+        """Gets the robot that is in the farthest back position"""
+        minX = NogginConstants.FIELD_WIDTH
+        back = self.brain.teamMembers[0]
+        for mate in mates:
+            mateX = mate.x
+            if mateX < minX:
+                minX = mateX
+                back = mate
+        return back
+
+
 
     ######################################################
     ############   Strategy Decision Stuff     ###########
@@ -273,9 +369,7 @@ class GoTeam:
         return self.noCalledChaser()
 
     def noCalledChaser(self):
-        """
-        Returns true if no one is chasing and they are not searching
-        """
+        """Returns true if no one is chasing and they are not searching"""
         # If everyone else is out, let's not go for the ball
         #if len(self.getActiveFieldPlayers()) == 0:
             #return False
@@ -291,6 +385,108 @@ class GoTeam:
 
         return True
 
+    def useKickoffFormation(self):
+        if (self.brain.gameController.timeSincePlay() < \
+            PBConstants.KICKOFF_FORMATION_TIME):
+            return True
+        else:
+            return False
+
+    def shouldUseDubD(self):
+        if not PBConstants.USE_DUB_D:
+            return False
+        ballY = self.brain.ball.y
+        ballX = self.brain.ball.x
+        goalie = self.brain.teamMembers[0]
+        return (
+            ( ballY > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+              ballY < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+              ballX < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
+            ( ballY > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
+              ballY < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
+              ballX < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
+              goalie.isTeammateRole(PBConstants.CHASER) )
+            )
+
+    def defenderShouldChase(self):
+        ballX = self.brain.ball.relX
+        goalie = self.brain.teamMembers[0]
+        return(ballX < PBConstants.CENTER_FIELD_DIST_THRESH and
+               not goalie.isTeammateRole(PBConstants.CHASER) )
+
+    def shouldSwitchSubRole(self, subRoleOnDeck, workingPlay):
+        """Returns true if switched into a new role (if time is -1) or
+        number of times is greater than threshold or
+        if current subrole is the same"""
+        if self.subRoleSwitchTime == -1:
+            self.subRoleSwitchTime = 0
+            return True
+        elif workingPlay.isSubRole(subRoleOnDeck):
+            self.subRoleSwitchTime = 0
+            return True
+        else:
+            self.subRoleSwitchTime += 1
+            if self.subRoleSwitchTime > PBConstants.SUB_ROLE_SWITCH_BUFFER:
+                self.subRoleSwitchTime = 0
+                return True
+        return False
+
+
+
+    ######################################################
+    ############   Positioning Stuff     #################
+    ######################################################
+
+    def getPointBetweenBallAndGoal(self, ball, dist_from_ball):
+        """returns defensive position between ball (x,y) and goal (x,y)
+        at <dist_from_ball> centimeters away from ball"""
+        delta_y = ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
+        delta_x = ball.x - NogginConstants.MY_GOALBOX_LEFT_X
+
+        # don't divide by 0
+        if delta_x == 0:
+            delta_x = 0.001
+        if delta_y == 0:
+            delta_y = 0.001
+
+        pos_x = ball.x - ( dist_from_ball/
+                           hypot(delta_x,delta_y) )*delta_x
+        pos_y = ball.y - ( dist_from_ball/
+                           hypot(delta_x,delta_y) )*delta_y
+
+        return pos_x,pos_y
+
+    def fancyGoaliePosition(self):
+        """returns a goalie position using ellipse"""
+
+        position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y)
+
+        # lets try maintaining home position until the ball is closer in
+        # might help us stay localized better
+        ball = self.brain.ball
+        if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
+            # Use an ellipse just above the goalline to determine x and y position
+            # We get the angle from goal center to the ball to determine our X,Y
+            theta = atan2( ball.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
+                           ball.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
+
+            thetaDeg = PBConstants.RAD_TO_DEG * theta
+
+            # Clip the angle so that the (x,y)-coordinate is not too close to the posts
+            if PBConstants.ELLIPSE_ANGLE_MIN > MyMath.sub180Angle(thetaDeg):
+                theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
+            elif PBConstants.ELLIPSE_ANGLE_MAX < MyMath.sub180Angle(thetaDeg):
+                theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
+
+        # Determine X,Y of ellipse based on theta, set heading on the ball
+        x, y = self.ellipse.getPositionFromTheta(theta)
+        h = ball.heading
+        position = (x,y,h)
+
+        return position
+
+
+
 ################################################################################
 #####################     Utility Functions      ###############################
 ################################################################################
@@ -299,19 +495,19 @@ class GoTeam:
         """FSA print function that allows colors to be specified"""
         if printingColor == 'red':
             self.brain.out.printf(RED_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         elif printingColor == 'blue':
             self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         elif printingColor == 'yellow':
             self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         elif printingColor == 'cyan':
             self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         elif printingColor == 'purple':
             self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) +\
-                RESET_COLORS_CODE)
+                                      RESET_COLORS_CODE)
         else:
             self.brain.out.printf(str(outputString))
 

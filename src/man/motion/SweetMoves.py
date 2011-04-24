@@ -398,7 +398,7 @@ DREW_LEFT_SIDE_KICK = (
      (0.,45.,-65.,55.,-20.,0.),
      (0.,10.,-38.,76.,-40.,-22.),
      (90.,-90.,50.,70.),
-     0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     .4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     # kick across body
     ((80.,0.,-50.,-70.),
@@ -501,11 +501,137 @@ RIGHT_SIDE_KICK = (
      (0.0 , 0.0 , -10.0 , 20.0 , -10.0 , -0.0),
      (80.0 , -90.0 , 50.0 , 70.0), 2.0 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES) )
 
+LEFT_LONG_BACK_KICK = (
+
+    # lean right 
+    ((80.,40.,-50.,-70.),
+     (0.,0.,-35.,65.,-28.,-14.),
+     (0.,2,-38.,76.,-40.,-14.),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.NORMAL_STIFFNESSES),
+
+    #lift left leg to side
+    ((80.,0.5,-50.,-70.),
+     (0.,45.,-35.,65.,-10.,-10.),
+     (0.,4.5,-38.,76.,-40.,-22.),
+     (80.,-40.,50.,70.),
+     0.5 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    #Swing around Leg
+    ((80.,22,-75.,-86.),
+     (0.,45.,-95.,25.,-10.,-10.),
+     (0.,4.5,-38.,76.,-40.,-16.5),
+     (80.,-40.,50.,70.),
+     0.7 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    #  #Set For Kick
+    ((80.,22,-75.,-86.),
+     (0.,14.,-95.,20.,-68.,-10.),
+     (0.,5.,-38.,76.,-40.,-16.5),
+     (80.,-40.,50.,70.),
+     0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+     # KICK!!!
+    ((80.,22,-75.,-86.),
+     (0.,13.,-50.,65.,-16.,-10.),
+     (0.,5.,-38.,76.,-40.,-16.5),
+     (80.,-40.,50.,70.),
+     .2 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+
+
+
+    # # #Lift left leg up a bit
+    # ((90.,50.,-50.,-40.),
+    #  (0.,42.,-55.,75.,-20.,5.),
+    #  (0.,8,-9.,16.,-10.,-20.),
+    #  (110.,-40.,60.,30.),
+    #  200.8,0, stiff.NORMAL_STIFFNESSES),
+
+    # # #Swing leg around (part uno)
+    # ((100.,60.,-50.,-30.),
+    #  (0.,29.,-72.,35.,-13.,23.),
+    #  (0.,9,-9.,20.,-10.,-20.),
+    #  (105.,-40.,60.,30.),
+    #  200.8,0, stiff.BACK_KICK_STIFFNESSES),
+
+    #  #Extend and lower the foot
+    # ((110.,70.,-50.,-20.),
+    #  (0.,15.,-85.,5.,-13.,-20.),
+    #  (0.,14.5,-20.,58.,-23.,-20.),
+    #  (80.,-45.,50.,70.),
+    #  5,0, stiff.BACK_KICK_STIFFNESSES),
+
+    #  #Kick!!!
+    # ((80.,56.,-50.,-70.),
+    #  (0.,12.,-62.,50.,-13.,-20.),
+    #  (0.,15,-30.,58.,-32.,-20.),
+    #  (80.,-45.,50.,70.),
+    #  .2,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
+    # recover
+    ((80.,40.,-50.,-70.),
+     (0.,0.,-35.,65.,-28.,-10.),
+     (0.,2,-38.,76.,-44.,-14.),
+     (90.,-40.,50.,70.),
+    .8,0, stiff.NORMAL_STIFFNESSES))
+
+
+RIGHT_LONG_BACK_KICK =  mirrorMove(LEFT_LONG_BACK_KICK)
+
+
+# Goalie saving stuff
+
+SAVE_LEFT_DEBUG = ( ((-90,0,0,0),
+                     (GOALIE_POS[0][1]),
+                     (GOALIE_POS[0][2]),
+                     (GOALIE_POS[0][3]), .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+
+SAVE_RIGHT_DEBUG = ( ((GOALIE_POS[0][0]),
+                      (GOALIE_POS[0][1]),
+                      (GOALIE_POS[0][2]),
+                      (-90,0,0,0), .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+
+SAVE_CENTER_DEBUG = ( ((-90,0,0,0),
+                       (GOALIE_POS[0][1]),
+                       (GOALIE_POS[0][2]),
+                       (-90,0,0,0), .5,0, stiff.NORMAL_STIFFNESSES), )
+
+SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0),
+                          (GOALIE_POS[0][1]),
+                          (GOALIE_POS[0][2]),
+                          (GOALIE_POS[0][3]), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+
+SAVE_RIGHT_HOLD_DEBUG = ( ((GOALIE_POS[0][0]),
+                           (GOALIE_POS[0][1]),
+                           (GOALIE_POS[0][2]),
+                           (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+
+SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0),
+                            (GOALIE_POS[0][1]),
+                            (GOALIE_POS[0][2]),
+                            (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+
 
 # GOALIE SAVING
 
+GOALIE_SAVE = (
+    #shoulder pitch, shoulder roll, elbow yaw, elbow roll
+    #hip yaw pitch, hip pitch, hip roll, knee pitch, ankle pitch, ankle roll
+    ((60.0, 35.0, 0.0, -0), #right arm
+     ( -76.0, 10.0, -50.0, 86.0, 0.0, -0),
+     ( -76.0, -10.0, -50.0, 86.0, 0.0, 0),
+     (60.0, -35.0, 0.0, 0), #left arm
+     1.5, 0, stiff.LOOSE_ARMS_STIFFNESSES),
+
+    ((40.0, 15.0, 0.0, -0), #right arm
+     ( -76.0, 20.0, -95.0, 65.0, 65.0, 0), #left leg
+     ( -76.0, -20.0, -95.0, 65.0, 65.0, 0), #right leg
+     (40.0, -15.0, 0.0, 0), #left arm
+     .5, 0, stiff.LOOSE_ARMS_STIFFNESSES) )
+
 #Squats with legs in M shape and arms at a 45 degree angle
-GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0), 
+GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0), #right arm
                   ( -76.0, 14.0, -54.0, 86.0, 0.0, -11),
                   ( -76.0, -14.0, -54.0, 86.0, 0.0, 11),
                   (60.0, -55.0, 0.0, 0), 
@@ -516,11 +642,6 @@ GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0),
                   (-90., -38., -75., 90, 30, 20.),
                   (60., -35., 0., 0.),
                   .35, 0, stiff.LOW_HEAD_STIFFNESSES),
-                 ((60., 35., 0., 0.),
-                  (-90., 38., -75., 90, 30, -20.),
-                  (-90., -38., -75., 90, 30, 20.),
-                  (60., -35., 0., 0.),
-                  1., 0, stiff.LOW_LEG_STIFFNESSES)
                  )
 
 #Working goalie right dive.Needs to be faster but lies flat and dives

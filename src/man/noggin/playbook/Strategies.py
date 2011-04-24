@@ -1,84 +1,115 @@
-from .. import NogginConstants
 from . import PBConstants
 from . import Formations
 
-def sReady(team, workingPlay):
-    workingPlay.setStrategy(PBConstants.S_READY)
 
-    Formations.fReady(team, workingPlay)
+#### No Field Players ####
 
 def sNoFieldPlayers(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_NO_FIELD_PLAYERS)
-
     Formations.fNoFieldPlayers(team, workingPlay)
+
+
+#### One Field Player ####
 
 def sOneField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_ONE_FIELD_PLAYER)
-    # no kickoff formation- would be identical to fOneField
-    # Formation for ball in our goal box
-    if shouldUseDubD(team):
-        Formations.fOneDubD(team, workingPlay)
-    else:
+    # no post-kickoff formation- would be identical to fOneField
+    # Defensive support for ball in our goalbox
+    if team.defenderShouldChase():
         Formations.fOneField(team, workingPlay)
+    else:
+        Formations.fOneFieldD(team, workingPlay)
+
+
+#### Two Field Players ####
 
 def sTwoField(team, workingPlay):
     '''
-    This is our standard strategy.  Based around the 2008.
+    More defensive minded two player strategy than zone
     '''
     workingPlay.setStrategy(PBConstants.S_TWO_FIELD_PLAYERS)
-    # Kickoff Formations
-    if useKickoffFormation(team):
+    # Post-Kickoff Formations
+    if team.useKickoffFormation():
         Formations.fKickoff(team, workingPlay)
-
-    # Formation for ball in our goal box
-    elif shouldUseDubD(team):
+    # Double defensive support for ball in our goalbox
+    elif team.shouldUseDubD():
         Formations.fTwoDubD(team, workingPlay)
-
+    # Agressive middie support for ball deep in opponents' territory.
+    elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+        Formations.fNeutralTwoField(team, workingPlay)
+    # Standard formation
     else:
-        # Keep a defender and a chaser
-        Formations.fDefensiveTwoField(team, workingPlay)
+        Formations.fTwoField(team, workingPlay)
 
-def sThreeField(team, workingPlay):
+def sTwoZone(team, workingPlay):
     '''
-    This is our pulled goalie strategy.
+    We attempt to keep one robot forward and one back
+    They become chaser if the ball is closer to them
     '''
-    workingPlay.setStrategy(PBConstants.S_THREE_FIELD_PLAYERS)
-    # Kickoff Formations
-    if useKickoffFormation(team):
+    workingPlay.setStrategy(PBConstants.S_TWO_ZONE)
+    # Post-Kickoff Formations
+    if team.useKickoffFormation():
         Formations.fKickoff(team, workingPlay)
+    # Ball on offensive side of the field, keep defender
+    # @TODO: this can cause chaser to ossilate back and forth. need tie-breaking
+    elif team.brain.ball.x > PBConstants.S_TWO_ZONE_DEFENDER_THRESH:
+        Formations.fTwoZoneD(team, workingPlay)
+    # Ball on defensive side of the field, keep offender
+    else:
+        Formations.fTwoZoneO(team, workingPlay)
 
-    # Formation for ball in our goal box
-    elif shouldUseDubD(team):
+
+#### Three Field Players ####
+
+def sWin(team, workingPlay):
+    '''
+    Main Strategy (2011)
+    '''
+    workingPlay.setStrategy(PBConstants.S_WIN)
+    # Post-Kickoff Formations
+    if team.useKickoffFormation():
+        Formations.fKickoff(team,workingPlay)
+    # Double defensive support for ball in our goalbox
+    elif team.shouldUseDubD():
         Formations.fThreeDubD(team, workingPlay)
-
-    # Standard spread formation
+    # Make the defender a middie if the ball is close enough to opp goal
+    elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+        Formations.fNeutralOThreeField(team, workingPlay)
+    # Make the offender a middie if the ball is close enough to our goal
+    elif team.brain.ball.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
+        Formations.fNeutralDThreeField(team, workingPlay)
+    # Standard Formation
     else:
         Formations.fThreeField(team, workingPlay)
 
-def sTwoZone(team, workingPlay):
-    """
-    We attempt to keep one robot forward and one back
-    They become chaser if the ball is closer to them
-    """
-    sTwoField(team, workingPlay)
 
-def sWin(team, workingPlay):
-    workingPlay.setStrategy(PBConstants.S_WIN)
+#### Four Field Players ####
 
+def sPullGoalie(team, workingPlay):
+    '''
+    Pull Goalie Strategy (2011)
+    '''
+    workingPlay.setStrategy(PBConstants.S_PULL_GOALIE)
     # Kickoff Formations
-    if useKickoffFormation(team):
-        Formations.fKickoff(team,workingPlay)
-
-    # Formation for ball in our goal box
-    elif shouldUseDubD(team):
-        Formations.fTwoDubD(team, workingPlay)
-    # Move the defender forward if the ball is close enough to opp goal, then become a middie
-    elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
-        Formations.fNeutralDefenseTwoField(team, workingPlay)
+    if team.useKickoffFormation():
+        Formations.fKickoff(team, workingPlay)
+    # Double defensive support for ball in our goalbox
+    elif team.shouldUseDubD():
+        Formations.fThreeDubD(team, workingPlay)
+    # Standard Formation
     else:
-        Formations.fDefensiveTwoField(team, workingPlay)
+        Formations.fFourField(team, workingPlay)
 
-# Add strategies for testing various roles
+
+#### Special Strategies ####
+
+def sReady(team, workingPlay):
+    workingPlay.setStrategy(PBConstants.S_READY)
+    Formations.fReady(team, workingPlay)
+
+
+#### Test Strategies ####
+
 def sTestDefender(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_TEST_DEFENDER)
     Formations.fTestDefender(team, workingPlay)
@@ -97,28 +128,4 @@ def sTestChaser(team, workingPlay):
         Formations.fReady(team, workingPlay)
     else:
         Formations.fTestChaser(team, workingPlay)
-
-#not sure this is the best place for these yet...
-def useKickoffFormation(team):
-    if (team.brain.gameController.timeSincePlay() <
-        PBConstants.KICKOFF_FORMATION_TIME):
-        return True
-    else:
-        return False
-
-def shouldUseDubD(team):
-    if not PBConstants.USE_DUB_D:
-        return False
-    ballY = team.brain.ball.y
-    ballX = team.brain.ball.x
-    goalie = team.teammates[0]
-    return (
-        ( ballY > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-          ballY < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-          ballX < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-        ( ballY > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-          ballY < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-          ballX < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-          goalie.isTeammateRole(PBConstants.CHASER) )
-        )
 
