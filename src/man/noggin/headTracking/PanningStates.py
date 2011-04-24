@@ -163,27 +163,52 @@ def scanQuickUp(tracker):
         tracker.activePanUp = True
         return tracker.goNow('panUpOnce')
 
+
+MOTION_START_BUFFER = 2
+
 def trianglePan(tracker):
+    motionAngles = tracker.brain.sensors.motionAngles
+    tracker.preTriPanHeads = (
+        motionAngles[MotionConstants.HeadYaw],
+        motionAngles[MotionConstants.HeadPitch]
+        )
+
+    if tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw] > 0:
+        return tracker.goNow('trianglePanLeft')
+    else :
+        return tracker.goNow('trianglePanRight')
+
+def trianglePanLeft(tracker):
     if tracker.firstFrame():
-        motionAngles = tracker.brain.sensors.motionAngles
-        prePanHeads = (
-            motionAngles[MotionConstants.HeadYaw],
-            motionAngles[MotionConstants.HeadPitch])
+        tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
 
-        if tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw] > 0:
-            tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
-            tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
-        else:
-            tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
-            tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
+    elif not tracker.brain.motion.isHeadActive() and \
+            tracker.counter > MOTION_START_BUFFER:
+        if tracker.lastDiffState == 'trianglePan':
+            return tracker.goLater('trianglePanRight')
+        else :
+            return tracker.goLater('trianglePanReturn')
 
-        if tracker.lastDiffState == 'activeTracking':
-            tracker.helper.panTo(prePanHeads)
-        else:
-            tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
+    return tracker.stay()
 
-    elif not tracker.brain.motion.isHeadActive() or \
-            tracker.counter > 40:
+def trianglePanRight(tracker):
+    if tracker.firstFrame():
+        tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
+
+    elif not tracker.brain.motion.isHeadActive() and \
+            tracker.counter > MOTION_START_BUFFER:
+        if tracker.lastDiffState == 'trianglePan':
+            return tracker.goLater('trianglePanLeft')
+        else :
+            return tracker.goLater('trianglePanReturn')
+    return tracker.stay()
+
+def trianglePanReturn(tracker):
+    if tracker.firstFrame():
+        tracker.helper.panTo(tracker.preTriPanHeads)
+    elif (not tracker.brain.motion.isHeadActive() and
+          tracker.counter > MOTION_START_BUFFER)  or \
+          tracker.target.on:
         return tracker.goLater('tracking')
     return tracker.stay()
 

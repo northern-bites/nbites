@@ -106,7 +106,7 @@ void RoboGuardian::run(){
         processChestButtonPushes();
         if (connectionCheckCount == CONNECTION_CHECK_RATE) {
             connectionCheckCount = 0;
-            checkConnection();
+        //    checkConnection();
         } else {
             connectionCheckCount++;
         }
@@ -595,7 +595,7 @@ void RoboGuardian::reconnectWifiConnection(){
         char command[100] = "";
         strcat(command, "su -c \" connman connect ");
         strcat(command, service);
-        strcat(command, " \"");
+        strcat(command, " \" & ");
         system(command);
     } else {
         cout<<"couldn't find specified wifi network to reconnect to";

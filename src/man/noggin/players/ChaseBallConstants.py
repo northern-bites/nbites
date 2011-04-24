@@ -12,6 +12,7 @@ USE_DRIBBLE = False
 # Ball on and off frame thresholds
 BALL_ON_THRESH = 2
 BALL_OFF_THRESH = 30
+BALL_OFF_KICK_THRESH = 80
 BALL_OFF_ACTIVE_LOC_THRESH = 200
 # Value to stop spinning to ball and approach
 BALL_APPROACH_BEARING_THRESH = 30
@@ -24,6 +25,11 @@ BALL_PFK_LEFT_Y = 16.0
 BALL_PFK_RIGHT_Y = -BALL_PFK_LEFT_Y
 BALL_PFK_MAX_X = 75
 BALL_PFK_MIN_X = 16
+
+# Should spin to kick
+SHOULD_SPIN_TO_KICK_X = 8
+SHOULD_SPIN_TO_KICK_Y = 7
+SHOULD_SPIN_TO_KICK_DIST = 40
 
 # PFK (relates to navigator/PFKStates.py)
 KICK_CLOSE_ENOUGH_X = 2.7

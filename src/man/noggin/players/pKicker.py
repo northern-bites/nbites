@@ -15,4 +15,3 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(KickerStates)
         self.setName('pKicker')
-

@@ -1186,6 +1186,9 @@ int ObjectFragments::classifyByTCorner(Blob post) {
 					side = RIGHT;
 				}
 				if (!adjacent) {
+					if (diff < GOALBOX_OVERAGE * 3.0) {
+						return NOPOST;
+					}
 					if (POSTLOGIC) {
 						cout << "T is far from post " << diff << endl;
 					}
@@ -1375,8 +1378,9 @@ int ObjectFragments::classifyByCheckingLines(Blob post)
  */
 int ObjectFragments::classifyGoalBoxLineThatAbutsPost(int y, float diff, float dist,
                                                    int classification) {
+	return NOPOST;
     // can we see the bottom of the post?
-    if (y < IMAGE_HEIGHT - 1) {
+    /*if (y < IMAGE_HEIGHT - 1) {
         if (POSTLOGIC) {
             cout << "Perpindicular line detected, distance is " << diff << endl;
         }
@@ -1393,7 +1397,7 @@ int ObjectFragments::classifyGoalBoxLineThatAbutsPost(int y, float diff, float d
         } else {
             return NOPOST;
         }
-    }
+		}*/
 }
 
 /* Returns true if the given x value is within margin of either image edge.
