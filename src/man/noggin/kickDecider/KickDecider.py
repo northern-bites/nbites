@@ -166,10 +166,12 @@ class KickDecider(object):
             return self.chooseDynamicKick()
         elif (my.h <= 135. and my.h > 45.):
             return kicks.LEFT_SIDE_KICK
-        elif (my.h >= -135. and my.h < -45.):
+        else (my.h >= -135. and my.h < -45.):
             return kicks.RIGHT_SIDE_KICK
-        else:
-            return self.chooseBackKick()
+        #Our localization is terrible so NEVER rely on it
+        #to do a backKick.  The kick is too powerful to use blindly
+        # else:
+        #     return self.chooseShortBackKick()
 
     def chooseDynamicKick(self):
         ball = self.brain.ball
