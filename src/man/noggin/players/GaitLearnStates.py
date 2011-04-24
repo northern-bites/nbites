@@ -1,3 +1,21 @@
+#
+# This is our walk-engine parameter optimizer. It uses a particle swarm (util/PSO.py)
+# to search a predefined gait space (motion/gaits/GaitLearnBoundaries.py) for an 
+# optimal set of parameters. 
+#
+# Things that need to happen before team-wide gait optimization can start:
+# (list current as of 4/23/11)
+#
+# @todo write PSO unit tests, verify that our implementation works as expected
+# @todo pickle file sync up/down script
+# @todo list of walk vectors to run on each particle (should last ~3 minutes)
+# @todo make sure this behavior still works
+# @todo collect stability variance data on several gaits, decide on heuristic
+# @todo (Motion) change engine to walk in place before beginning to move
+# @todo figure out a good way to get several "good" gaits out of a Swarm object
+#
+# @author Nathan Merritt
+
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import man.motion.RobotGaits as RobotGaits
