@@ -46,19 +46,6 @@ class Stability:
     def updatePosition(self, currentLocation):
         self.pastPositions.append(currentLocation)
 
-    def isWBFallen(self):
-        inertial = self.sensors.inertial
-
-        if fabs(inertial.accZ) < FALL_ACCZ_THRESHOLD:
-            self.fallCounter += 1
-        else:
-            self.fallCounter = 0
-
-        if self.fallCounter > FALL_FRAMES_THRESHOLD:
-            return True
-        else:
-            return False
-
     def getStability_X(self):
         return self.calculateStabilityVariance(self.accelX)
 
