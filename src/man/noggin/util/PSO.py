@@ -17,7 +17,6 @@
 # and the GNU Lesser Public License along with Man.  If not, see
 # <http:#www.gnu.org/licenses/>.
 
-
 # PSO.py: an implementation of a Particle-Swarm Optimizer
 #       will search through an N-dimensional space
 # @author Nathan Merritt
@@ -25,6 +24,11 @@
 import random
 from math import fabs
 from MyMath import clip
+
+try:
+   import cPickle as pickle
+except:
+   import pickle
 
 DEBUG = True
 DEBUG_POSITION = False
@@ -172,6 +176,10 @@ class Particle:
             print "Velocity: %s" % self.velocity
 
 class Swarm:
+    """
+    Manages a list of particles, ticks them and keeps track of the global
+    best solution found.
+    """
     def __init__(self, numParticles, nSpace, searchMins, searchMaxs):
         self.particles = []
         self.partIndex = 0
