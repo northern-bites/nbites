@@ -232,20 +232,41 @@ void HoughSpaceTest::test_pairing()
         int z = rand();
         HoughLine l(r, t, z);
 
-        hs.activeLines.add(l);
+        bool addIt = true;
+        for (int j=0; j < hs.activeLines.size(); ++j){
+            if (hs.activeLines[j] == l){
+                addIt = false;
+            }
+        }
+
+        if (addIt){
+            hs.activeLines.add(l);
+        }
     }
 
     // Run them through narrowing
     list<pair<HoughLine, HoughLine> > lines = hs.narrowHoughLines();
 
     // Ensure that the only lines which return are parallel
-    list<pair<HoughLine, HoughLine> >::iterator l;
+    list<pair<HoughLine, HoughLine> >::iterator l, l2;
 
     for(l = lines.begin(); l != lines.end(); ++l){
         TRUE(l->first != l->second &&
               isParallel(l->first, l->second));
     }
     PASSED(CORRECT_PAIRING);
+
+    // Ensure that every line is only in a pair once
+    for(l = lines.begin(); l != lines.end(); ++l){
+        for(l2 = l; ++l2 != lines.end(); ){
+
+            // Check all combos of lines between the pairs
+            NE(l->first, l2->first);
+            NE(l->first, l2->second);
+            NE(l->second, l2->first);
+            NE(l->second, l2->second);
+        }
+    }
 }
 
 bool HoughSpaceTest::isParallel(HoughLine& l, HoughLine& l2)
