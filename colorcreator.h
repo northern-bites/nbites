@@ -115,6 +115,8 @@ private:
     QString previousFrame;
     QString tenthFrame;
     QString minusTenthFrame;
+    QImage *img;
+    QImage *wheel;
     int currentFrameNumber;
     int mode;
     QColor *cols;

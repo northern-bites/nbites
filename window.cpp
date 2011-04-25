@@ -7,8 +7,8 @@ const int IdRole = Qt::UserRole;
 
 //! [1]
 Window::Window(RoboImage r1, QWidget *parent) :
-    r(r1),
-    QWidget(parent)
+    QWidget(parent),
+    r(r1)
 {
     infoLabel = new QLabel(tr("Information"));
     renderArea = new RenderArea(r, infoLabel);

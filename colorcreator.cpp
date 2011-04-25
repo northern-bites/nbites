@@ -17,6 +17,9 @@ ColorCreator::ColorCreator(QWidget *parent) :
     imageWindow(roboimage)
 
 {
+    img = new QImage(WIDTH, HEIGHT, QImage::Format_RGB32);
+    wheel = new QImage(200, 200, QImage::Format_RGB32);
+
     hMin = new float[COLORS];
     hMax = new float[COLORS];
     sMin = new float[COLORS];
@@ -74,6 +77,9 @@ ColorCreator::ColorCreator(QWidget *parent) :
     currentDirectory = baseDirectory;
     currentColorDirectory = baseColorTable;
     zSlice = 0.75f;
+
+    // initialize all of our values.  Ideally these will serve as a pretty good table
+    // for virtually any environment
     for (int i = 0; i < COLORS; i++)
     {
         switch(i)
@@ -201,7 +207,7 @@ void ColorCreator::updateDisplays()
 void ColorCreator::updateColors()
 {
     // we draw by using a QImage - turn it into a Pixmap, then put it on a label
-    QImage img(200, 200, QImage::Format_RGB32);
+    //QImage img(200, 200, QImage::Format_RGB32);
     bool display;
     QColor c;
     /* Our color wheel has a radius of 100.  Loop through the rectangle
@@ -255,11 +261,11 @@ void ColorCreator::updateColors()
             } else{
                 c.setHsvF(0.0, 0.0, 1.0f);
             }
-            img.setPixel(i, j, c.rgb());
+            wheel->setPixel(i, j, c.rgb());
         }
     }
     QPixmap pix;
-    pix.convertFromImage(img);
+    pix.convertFromImage(*wheel);
     ui->colorWheel->setPixmap(pix);
     ui->colorWheel->repaint();
     updateThresh();
@@ -269,8 +275,6 @@ void ColorCreator::updateThresh()
 {
     if (haveFile)
     {
-        // we draw by using a QImage - turn it into a Pixmap, then put it on a label
-        QImage img(WIDTH, HEIGHT, QImage::Format_RGB32);
         bool display;
         bool stats = false;
         QColor c;
@@ -339,7 +343,7 @@ void ColorCreator::updateThresh()
                     } else{
                         c.setRgb(y, y, y);
                     }
-                    img.setPixel(i, j, c.rgb());
+                    img->setPixel(i, j, c.rgb());
                     start++;
                     if (start == Black)
                     {
@@ -349,7 +353,7 @@ void ColorCreator::updateThresh()
             }
         }
         QPixmap pix;
-        pix.convertFromImage(img);
+        pix.convertFromImage(*img);
         ui->thresh->setPixmap(pix);
         ui->thresh->repaint();
         if (stats)
@@ -540,6 +544,7 @@ void ColorCreator::on_getColorTable_clicked()
     currentColorDirectory.chop(currentColorDirectory.size() - last);
 }
 
+// NOte: this won't work.  Its just a rough template
 void ColorCreator::writeNewFormat(QString filename)
 {
     QFile file(filename);
@@ -670,8 +675,6 @@ void ColorCreator::writeOldFormat(QString filename)
                             temp[0] = NAVY_COL;
                             break;
                         }
-
-                        //temp[0] = temp[0] | bitColor[c];
                     }
                 }
                 file.write(temp);

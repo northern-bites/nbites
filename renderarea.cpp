@@ -160,7 +160,7 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                     }
                 }
                 break;
-            case Pixmap:
+            case Pixmap:  // Note: not actually doing this as pixmap, perhaps it slows us down?
                 red = r.getRed(j, i);
                 green = r.getGreen(j, i);
                 blue = r.getBlue(j, i);
