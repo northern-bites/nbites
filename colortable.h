@@ -4,7 +4,6 @@
 #include <QFile>
 #include <QTextStream>
 #include "stats.h"
-#include "linefit.h"
 
 #define UNDEFINED 0x00
 #define WHITE     0x01
@@ -26,7 +25,6 @@ public:
     int tableIndex(int high7, int mid7, int low7);
     unsigned index(int y, int u, int v);
     Stats** colorStats();
-    LineFit*  colorZones();
     bool isEnabled() {return enabled;}
     int getUpdatedColor(int y, int u, int v);
 

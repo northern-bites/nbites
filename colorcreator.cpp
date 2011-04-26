@@ -13,11 +13,13 @@
 ColorCreator::ColorCreator(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ColorCreator),
-    roboimage(WIDTH, HEIGHT),
-    imageWindow(roboimage)
+    roboimage(WIDTH, HEIGHT)
 
 {
-    img = new QImage(WIDTH, HEIGHT, QImage::Format_RGB32);
+    img = new QImage(320, 240, QImage::Format_RGB32);
+    img2 = new QImage(320, 240, QImage::Format_RGB32);
+    img3 = new QImage(320, 240, QImage::Format_RGB32);
+    img4 = new QImage(320, 240, QImage::Format_RGB32);
     wheel = new QImage(200, 200, QImage::Format_RGB32);
 
     hMin = new float[COLORS];
@@ -70,13 +72,28 @@ ColorCreator::ColorCreator(QWidget *parent) :
 
     ui->viewChoice->addItem(tr("Single Color"), Single);
     ui->viewChoice->addItem(tr("All Colors"), Multiple);
-    ui->viewChoice->addItem(tr("Use Table"), Table);
+    ui->viewChoice->addItem(tr("Large View"), Big);
+
+
+    ui->channel->addItem(tr("Y"), Y);
+    ui->channel->addItem(tr("U"), U);
+    ui->channel->addItem(tr("V"), V);
+    ui->channel->addItem(tr("Blue"), Bluec);
+    ui->channel->addItem(tr("Red"), Redc);
+    ui->channel->addItem(tr("Green"), Greenc);
+    ui->channel->addItem(tr("H"), H);
+    ui->channel->addItem(tr("S"), S);
+    ui->channel->addItem(tr("Z"), Z);
+    ui->channel->addItem(tr("Edge"), EDGE);
     mode = Single;
+    shape = Y;
 
     currentColor = Orange;
     currentDirectory = baseDirectory;
     currentColorDirectory = baseColorTable;
     zSlice = 0.75f;
+
+    edgediff = 12;
 
     // initialize all of our values.  Ideally these will serve as a pretty good table
     // for virtually any environment
@@ -184,10 +201,6 @@ ColorCreator::~ColorCreator()
 
 void ColorCreator::updateDisplays()
 {
-    if (viewerEnabled)
-    {
-        imageWindow.repaint();
-    }
     QString next;
     next.setNum(currentFrameNumber+1, 10);
     QString prev;
@@ -271,17 +284,191 @@ void ColorCreator::updateColors()
     updateThresh();
 }
 
+QColor ColorCreator::getChannelView(int j, int i)
+{
+    bool found;
+    int red, green, blue, edge;
+    switch (shape) {
+    case V:
+        red = green = blue = roboimage.getV(j, i);
+        break;
+    case Bluec:
+        red = green = 0;
+        blue = roboimage.getBlue(j, i);
+        break;
+    case Y:
+        red = green = blue = roboimage.getY(j, i);
+        break;
+    case U:
+        red = green = blue = roboimage.getU(j, i);
+        break;
+    case Greenc:
+        red = blue = 0;
+        green = roboimage.getGreen(j, i);
+        break;
+    case Redc:
+        blue = green = 0;
+        red = roboimage.getRed(j, i);
+        break;
+    case H:
+        red = green = blue = roboimage.getH(j, i);
+        break;
+    case S:
+        red = green = blue = roboimage.getS(j, i);
+        break;
+    case Z:
+        red = green = blue = roboimage.getZ(j, i);
+        break;
+    case EDGE:
+        red = green = blue = 255; //roboimage.getY(j, i);
+        found = false;
+        if (j > 0 && i > 1) {
+            edge = abs(roboimage.getY(j - 1, i) - roboimage.getY(j, i));
+            edge = max(abs(roboimage.getY(j, i) - roboimage.getY(j, i - 1)), edge);
+            if (edge  > edgediff) {
+                red = 255;
+                green = 0;
+                blue = 0;
+                found = true;
+            }
+            edge = abs(roboimage.getU(j - 1, i) - roboimage.getU(j, i));
+            edge = max(abs(roboimage.getU(j, i) - roboimage.getU(j, i - 1)), edge);
+            if (edge > edgediff) {
+                green = 255;
+                blue = 0;
+                if (!found) {
+                    red = 0;
+                }
+                found = true;
+            }
+            edge = abs(roboimage.getV(j - 1, i) - roboimage.getV(j, i));
+            edge = max(abs(roboimage.getV(j, i) - roboimage.getV(j, i - 1)), edge);
+            if (edge > edgediff) {
+                blue = 255;
+                if (!found) {
+                    red = 0;
+                    green = 0;
+                }
+            }
+        }
+        break;
+    }
+    QColor col(red, green, blue);
+    return col;
+}
+
+void ColorCreator::largeDisplay()
+{
+    bool display;
+    QColor c;
+    for (int i = 0; i < WIDTH; i++)
+    {
+        for (int j = 0; j < HEIGHT; j++)
+        {
+            bool looping = true;
+            int start = Orange;
+            if (mode == Single) {
+                looping = false;
+                start = currentColor;
+            }
+            c.setRgb(255,255,255);
+            do {
+                display = true;
+                int y = roboimage.getY(i, j);
+                float s = (float)roboimage.getS(i, j) / 256.0f;
+                float h = (float)roboimage.getH(i, j) / 256.0f;
+                float z = (float)roboimage.getZ(i, j) / 256.0f;
+                // Since H is an angle the math is modulo.
+                if (hMax[start] > hMin[start])
+                {
+                    if (hMin[start] > h || hMax[start] < h)
+                    {
+                        display = false;
+                    }
+                } else if (hMin[start] > h && hMax[start] < h )
+                {
+                    display = false;
+                }
+                if (s < sMin[start] || s > sMax[start])
+                {
+                    display = false;
+                }
+                else if (z < zMin[start] || z > zMax[start])
+                {
+                    display = false;
+                }
+                else if (y < yMin[start] || y > yMax[start])
+                {
+                    display = false;
+                }
+                c = cols[start];
+
+                if (display)
+                {
+                    looping = false;
+                } else{
+                    c.setRgb(0, 0, 0);
+                }
+                if (i < WIDTH / 2)
+                {
+                    if (j < HEIGHT / 2)
+                    {
+                        img->setPixel(i, j, c.rgb());
+                    }
+                    else {
+                        img3->setPixel(i, j - HEIGHT / 2, c.rgb());
+                    }
+                } else {
+                    if (j < HEIGHT / 2)
+                    {
+                        img2->setPixel(i - WIDTH / 2, j, c.rgb());
+                    } else {
+                        img4->setPixel(i - WIDTH / 2, j - HEIGHT / 2, c.rgb());
+                    }
+                }
+                start++;
+                if (start == Black)
+                {
+                    looping = false;
+                }
+            } while (looping);
+        }
+    }
+    QPixmap pix;
+    pix.convertFromImage(*img);
+    ui->thresh->setPixmap(pix);
+    ui->thresh->repaint();
+    QPixmap pix2;
+    pix2.convertFromImage(*img2);
+    ui->view2->setPixmap(pix2);
+    ui->view2->repaint();
+    QPixmap pix3;
+    pix3.convertFromImage(*img3);
+    ui->view3->setPixmap(pix3);
+    ui->view3->repaint();
+    QPixmap pix4;
+    pix4.convertFromImage(*img4);
+    ui->view4->setPixmap(pix4);
+    ui->view4->repaint();
+
+}
+
 void ColorCreator::updateThresh()
 {
     if (haveFile)
     {
+        if (mode == Big) {
+            largeDisplay();
+            return;
+        }
         bool display;
         bool stats = false;
-        QColor c;
+        QColor c, c2;
+        int red, blue, green;
         initStats();
-        for (int i = 0; i < WIDTH; i++)
+        for (int i = 0; i < WIDTH; i+=2)
         {
-            for (int j = 0; j < HEIGHT; j++)
+            for (int j = 0; j < HEIGHT; j+=2)
             {
                 bool looping = true;
                 int start = Orange;
@@ -290,49 +477,59 @@ void ColorCreator::updateThresh()
                     stats = true;
                     start = currentColor;
                 }
+                red = roboimage.getRed(i, j);
+                green = roboimage.getGreen(i, j);
+                blue = roboimage.getBlue(i, j);
+                c.setRgb(red, green, blue);
+                img2->setPixel(i/2, j/2, c.rgb());
+                c = getChannelView(i, j);
+                img3->setPixel(i/2, j/2, c.rgb());
+                c.setRgb(0, 0, 0);
+                c.setRgb(255,255,255);
+                if (table->isEnabled())
+                {
+                    int y = roboimage.getY(i, j);
+                    int u = roboimage.getU(i, j);
+                    int v = roboimage.getV(i, j);
+                    int col = table->getUpdatedColor(y, u, v);
+                    if (col >= Black) {
+                        display = false;
+                    } else{
+                        c = cols[col];
+                    }
+                    img4->setPixel(i/2, j/2, c.rgb());
+                }
                 do {
                     display = true;
-
-                    int y = roboimage.getY(i, j);
-                    if (mode == Table && table->isEnabled())
+                    int y = roboimage.getY(i, j);      
+                    float s = (float)roboimage.getS(i, j) / 256.0f;
+                    float h = (float)roboimage.getH(i, j) / 256.0f;
+                    float z = (float)roboimage.getZ(i, j) / 256.0f;
+                    // Since H is an angle the math is modulo.
+                    if (hMax[start] > hMin[start])
                     {
-                        int u = roboimage.getU(i, j);
-                        int v = roboimage.getV(i, j);
-                        int col = table->getUpdatedColor(y, u, v);
-                        if (col >= Black) {
-                            display = false;
-                        } else{
-                            c = cols[col];
-                        }
-                    } else{
-                        float s = (float)roboimage.getS(i, j) / 256.0f;
-                        float h = (float)roboimage.getH(i, j) / 256.0f;
-                        float z = (float)roboimage.getZ(i, j) / 256.0f;
-                        // Since H is an angle the math is modulo.
-                        if (hMax[start] > hMin[start])
-                        {
-                            if (hMin[start] > h || hMax[start] < h)
-                            {
-                                display = false;
-                            }
-                        } else if (hMin[start] > h && hMax[start] < h )
+                        if (hMin[start] > h || hMax[start] < h)
                         {
                             display = false;
                         }
-                        if (s < sMin[start] || s > sMax[start])
-                        {
-                            display = false;
-                        }
-                        else if (z < zMin[start] || z > zMax[start])
-                        {
-                            display = false;
-                        }
-                        else if (y < yMin[start] || y > yMax[start])
-                        {
-                            display = false;
-                        }
-                        c = cols[start];
+                    } else if (hMin[start] > h && hMax[start] < h )
+                    {
+                        display = false;
                     }
+                    if (s < sMin[start] || s > sMax[start])
+                    {
+                        display = false;
+                    }
+                    else if (z < zMin[start] || z > zMax[start])
+                    {
+                        display = false;
+                    }
+                    else if (y < yMin[start] || y > yMax[start])
+                    {
+                        display = false;
+                    }
+                    c = cols[start];
+
                     if (display)
                     {
                         looping = false;
@@ -341,9 +538,9 @@ void ColorCreator::updateThresh()
                             collectStats(i, j);
                         }
                     } else{
-                        c.setRgb(y, y, y);
+                        c.setRgb(0, 0, 0);
                     }
-                    img->setPixel(i, j, c.rgb());
+                    img->setPixel(i/2, j/2, c.rgb());
                     start++;
                     if (start == Black)
                     {
@@ -356,6 +553,18 @@ void ColorCreator::updateThresh()
         pix.convertFromImage(*img);
         ui->thresh->setPixmap(pix);
         ui->thresh->repaint();
+        QPixmap pix2;
+        pix2.convertFromImage(*img2);
+        ui->view2->setPixmap(pix2);
+        ui->view2->repaint();
+        QPixmap pix3;
+        pix3.convertFromImage(*img3);
+        ui->view3->setPixmap(pix3);
+        ui->view3->repaint();
+        QPixmap pix4;
+        pix4.convertFromImage(*img4);
+        ui->view4->setPixmap(pix4);
+        ui->view4->repaint();
         if (stats)
         {
             outputStats();
@@ -692,11 +901,6 @@ void ColorCreator::on_writeNew_clicked()
     writeOldFormat(filename);
 }
 
-void ColorCreator::on_viewer_clicked()
-{
-    imageWindow.show();
-    viewerEnabled = true;
-}
 
 void ColorCreator::on_plusTen_clicked()
 {
@@ -710,4 +914,12 @@ void ColorCreator::on_minusTen_clicked()
     roboimage.read(minusTenthFrame);
     currentFrameNumber -= 10;
     updateDisplays();
+}
+
+
+
+void ColorCreator::on_channel_currentIndexChanged(int index)
+{
+    shape = index;
+    updateThresh();
 }

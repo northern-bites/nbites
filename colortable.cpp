@@ -285,26 +285,3 @@ Stats** ColorTable::colorStats()
     return colorStats;
 }
 
-LineFit* ColorTable::colorZones()
-{
-    LineFit* colorZones =  new LineFit[mainColors];
-
-    for (int c = 0; c < mainColors; ++c)
-        colorZones[c] = LineFit();
-
-    for (int y = 0; y < 256; y += 2)
-        for (int v = -128; v < 128; v += 2)
-            for (int u = -128; u < 128; u += 2)
-            {
-                int c = index(y, u, v);
-                if (c < mainColors)
-                    for (int q = 0; q < 2; ++q)
-                    {
-                        int ci = colormap[q][c];
-                        if (ci >= 0)
-                            colorZones[ci].add(u, v);
-                    }
-            }
-
-    return colorZones;
-}

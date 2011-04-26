@@ -209,8 +209,8 @@
     <rect>
      <x>40</x>
      <y>140</y>
-     <width>640</width>
-     <height>480</height>
+     <width>320</width>
+     <height>240</height>
     </rect>
    </property>
    <property name="text">
@@ -220,7 +220,7 @@
   <widget class="QComboBox" name="viewChoice">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>70</x>
      <y>650</y>
      <width>111</width>
      <height>26</height>
@@ -454,17 +454,53 @@
     <string>- 10</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="viewer">
+  <widget class="QLabel" name="view2">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>50</y>
-     <width>114</width>
-     <height>32</height>
+     <x>360</x>
+     <y>140</y>
+     <width>320</width>
+     <height>240</height>
     </rect>
    </property>
    <property name="text">
-    <string>Viewer</string>
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="view3">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>380</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="view4">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>380</y>
+     <width>320</width>
+     <height>240</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="channel">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>650</y>
+     <width>111</width>
+     <height>26</height>
+    </rect>
    </property>
   </widget>
  </widget>

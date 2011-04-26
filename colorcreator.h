@@ -3,8 +3,6 @@
 
 #include <QWidget>
 #include "roboimage.h"
-#include "renderarea.h"
-#include "window.h"
 #include "coloredit.h"
 #include "colortable.h"
 #define  NEWFRAMES
@@ -46,7 +44,8 @@ class ColorCreator : public QWidget
 
 public:
     enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black};
-    enum Choices {Single, Multiple, Table};
+    enum Choices {Single, Multiple, Big};
+    enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE};
     explicit ColorCreator(QWidget *parent = 0);
     ~ColorCreator();
     void updateDisplays();
@@ -61,6 +60,8 @@ public:
     int max(int a, int b) {if (a > b) return a; return b;}
     void writeNewFormat(QString filename);
     void writeOldFormat(QString filename);
+    QColor getChannelView(int i, int j);
+    void largeDisplay();
 
 private slots:
     void on_pushButton_clicked();
@@ -95,18 +96,16 @@ private slots:
 
     void on_writeNew_clicked();
 
-    void on_viewer_clicked();
-
     void on_plusTen_clicked();
 
     void on_minusTen_clicked();
+
+    void on_channel_currentIndexChanged(int index);
 
 private:
     Ui::ColorCreator *ui;
     RoboImage roboimage;
     ColorTable *table;
-    RenderArea *renderArea;
-    Window imageWindow;
     QString baseDirectory;
     QString currentDirectory;
     QString baseColorTable;
@@ -116,8 +115,13 @@ private:
     QString tenthFrame;
     QString minusTenthFrame;
     QImage *img;
+    QImage *img2;
+    QImage *img3;
+    QImage *img4;
     QImage *wheel;
+    int shape;
     int currentFrameNumber;
+    int edgediff;
     int mode;
     QColor *cols;
     float *hMin;
