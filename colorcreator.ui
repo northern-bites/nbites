@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>727</height>
+    <height>900</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -19,8 +19,8 @@
   <widget class="QPushButton" name="previousButton">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>100</y>
+     <x>210</x>
+     <y>20</y>
      <width>114</width>
      <height>32</height>
     </rect>
@@ -32,8 +32,8 @@
   <widget class="QPushButton" name="nextButton">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>100</y>
+     <x>320</x>
+     <y>20</y>
      <width>114</width>
      <height>32</height>
     </rect>
@@ -207,10 +207,10 @@
   <widget class="QLabel" name="thresh">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>140</y>
-     <width>320</width>
-     <height>240</height>
+     <x>50</x>
+     <y>60</y>
+     <width>640</width>
+     <height>480</height>
     </rect>
    </property>
    <property name="text">
@@ -220,8 +220,8 @@
   <widget class="QComboBox" name="viewChoice">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>650</y>
+     <x>120</x>
+     <y>830</y>
      <width>111</width>
      <height>26</height>
     </rect>
@@ -390,9 +390,9 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>50</y>
-     <width>284</width>
-     <height>34</height>
+     <y>20</y>
+     <width>161</width>
+     <height>31</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -400,13 +400,6 @@
      <widget class="QPushButton" name="pushButton">
       <property name="text">
        <string>Find</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Keyword</string>
       </property>
      </widget>
     </item>
@@ -431,8 +424,8 @@
   <widget class="QPushButton" name="plusTen">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>100</y>
+     <x>430</x>
+     <y>20</y>
      <width>114</width>
      <height>32</height>
     </rect>
@@ -444,8 +437,8 @@
   <widget class="QPushButton" name="minusTen">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>100</y>
+     <x>550</x>
+     <y>20</y>
      <width>114</width>
      <height>32</height>
     </rect>
@@ -457,8 +450,8 @@
   <widget class="QLabel" name="view2">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>140</y>
+     <x>50</x>
+     <y>570</y>
      <width>320</width>
      <height>240</height>
     </rect>
@@ -470,21 +463,8 @@
   <widget class="QLabel" name="view3">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>380</y>
-     <width>320</width>
-     <height>240</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>TextLabel</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="view4">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>380</y>
+     <x>380</x>
+     <y>570</y>
      <width>320</width>
      <height>240</height>
     </rect>
@@ -496,8 +476,8 @@
   <widget class="QComboBox" name="channel">
    <property name="geometry">
     <rect>
-     <x>250</x>
-     <y>650</y>
+     <x>510</x>
+     <y>830</y>
      <width>111</width>
      <height>26</height>
     </rect>

@@ -44,7 +44,7 @@ class ColorCreator : public QWidget
 
 public:
     enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black};
-    enum Choices {Single, Multiple, Big};
+    enum Choices {Single, Multiple};
     enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE};
     explicit ColorCreator(QWidget *parent = 0);
     ~ColorCreator();

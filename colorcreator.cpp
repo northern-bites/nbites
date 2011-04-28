@@ -16,7 +16,7 @@ ColorCreator::ColorCreator(QWidget *parent) :
     roboimage(WIDTH, HEIGHT)
 
 {
-    img = new QImage(320, 240, QImage::Format_RGB32);
+    img = new QImage(640, 480, QImage::Format_RGB32);
     img2 = new QImage(320, 240, QImage::Format_RGB32);
     img3 = new QImage(320, 240, QImage::Format_RGB32);
     img4 = new QImage(320, 240, QImage::Format_RGB32);
@@ -37,12 +37,12 @@ ColorCreator::ColorCreator(QWidget *parent) :
 
     // initialize colors for drawing thresholds
     cols[Orange] = QColor(255, 128, 0);
-    cols[Blue] = QColor(0, 0, 255);
-    cols[Green] = QColor(0, 201, 87);
+    cols[Blue] = QColor(100, 149, 237);
+    cols[Green] = QColor(0, 139, 0);
     cols[Yellow] = QColor(255, 255, 0);
     cols[White] = QColor(255, 255, 255);
     cols[Pink] = QColor(255, 181, 197);
-    cols[Navy] = QColor(0, 0, 128);
+    cols[Navy] = QColor(0, 0, 205);
     cols[Black] = QColor(0, 0, 0);
 
     // initialize bitColors for generating color tables
@@ -72,7 +72,6 @@ ColorCreator::ColorCreator(QWidget *parent) :
 
     ui->viewChoice->addItem(tr("Single Color"), Single);
     ui->viewChoice->addItem(tr("All Colors"), Multiple);
-    ui->viewChoice->addItem(tr("Large View"), Big);
 
 
     ui->channel->addItem(tr("Y"), Y);
@@ -112,34 +111,34 @@ ColorCreator::ColorCreator(QWidget *parent) :
             yMax[i] = 145;
             break;
         case Green:
-            hMin[i] = 0.42f;
-            hMax[i] = 0.58f;
-            sMin[i] = 0.35f;
-            sMax[i] = 0.62f;
+            hMin[i] = 0.37f;
+            hMax[i] = 0.45f;
+            sMin[i] = 0.28f;
+            sMax[i] = 0.46f;
             zMin[i] = 0.22f;
-            zMax[i] = 0.73f;
-            yMin[i] = 47;
-            yMax[i] = 112;
+            zMax[i] = 0.53f;
+            yMin[i] = 55;
+            yMax[i] = 105;
             break;
         case Yellow:
-            hMin[i] = 0.10f;
-            hMax[i] = 0.30f;
-            sMin[i] = 0.11f;
-            sMax[i] = 0.74f;
-            zMin[i] = 0.26f;
-            zMax[i] = 0.70f;
-            yMin[i] = 54;
-            yMax[i] = 170;
+            hMin[i] = 0.17f;
+            hMax[i] = 0.26f;
+            sMin[i] = 0.32f;
+            sMax[i] = 0.69f;
+            zMin[i] = 0.27f;
+            zMax[i] = 0.48f;
+            yMin[i] = 56;
+            yMax[i] = 105;
             break;
         case Blue:
-            hMin[i] = 0.58f;
-            hMax[i] = 0.69f;
-            sMin[i] = 0.42f;
+            hMin[i] = 0.54f;
+            hMax[i] = 0.67f;
+            sMin[i] = 0.30f;
             sMax[i] = 0.65f;
-            zMin[i] = 0.40f;
-            zMax[i] = 1.0f;
-            yMin[i] = 46;
-            yMax[i] = 146;
+            zMin[i] = 0.23f;
+            zMax[i] = 0.48f;
+            yMin[i] = 33;
+            yMax[i] = 105;
             break;
         case White:
             hMin[i] = 0.01f;
@@ -152,23 +151,23 @@ ColorCreator::ColorCreator(QWidget *parent) :
             yMax[i] = 250;
             break;
         case Pink:
-            hMin[i] = 0.73f;
-            hMax[i] = 0.98f;
-            sMin[i] = 0.17f;
-            sMax[i] = 0.4f;
-            zMin[i] = 0.14f;
-            zMax[i] = 0.31f;
-            yMin[i] = 38;
-            yMax[i] = 115;
+            hMin[i] = 0.75f;
+            hMax[i] = 0.19f;
+            sMin[i] = 0.0f;
+            sMax[i] = 0.29f;
+            zMin[i] = 0.21f;
+            zMax[i] = 0.54f;
+            yMin[i] = 58;
+            yMax[i] = 139;
             break;
         case Navy:
-            hMin[i] = 0.64f;
+            hMin[i] = 0.57f;
             hMax[i] = 0.68f;
-            sMin[i] = 0.38f;
-            sMax[i] = 0.62f;
-            zMin[i] = 0.29f;
-            zMax[i] = 0.36f;
-            yMin[i] = 35;
+            sMin[i] = 0.23f;
+            sMax[i] = 0.42f;
+            zMin[i] = 0.17f;
+            zMax[i] = 0.45f;
+            yMin[i] = 39;
             yMax[i] = 105;
             break;
         default:
@@ -409,23 +408,7 @@ void ColorCreator::largeDisplay()
                 } else{
                     c.setRgb(0, 0, 0);
                 }
-                if (i < WIDTH / 2)
-                {
-                    if (j < HEIGHT / 2)
-                    {
-                        img->setPixel(i, j, c.rgb());
-                    }
-                    else {
-                        img3->setPixel(i, j - HEIGHT / 2, c.rgb());
-                    }
-                } else {
-                    if (j < HEIGHT / 2)
-                    {
-                        img2->setPixel(i - WIDTH / 2, j, c.rgb());
-                    } else {
-                        img4->setPixel(i - WIDTH / 2, j - HEIGHT / 2, c.rgb());
-                    }
-                }
+                img->setPixel(i, j, c.rgb());
                 start++;
                 if (start == Black)
                 {
@@ -438,18 +421,6 @@ void ColorCreator::largeDisplay()
     pix.convertFromImage(*img);
     ui->thresh->setPixmap(pix);
     ui->thresh->repaint();
-    QPixmap pix2;
-    pix2.convertFromImage(*img2);
-    ui->view2->setPixmap(pix2);
-    ui->view2->repaint();
-    QPixmap pix3;
-    pix3.convertFromImage(*img3);
-    ui->view3->setPixmap(pix3);
-    ui->view3->repaint();
-    QPixmap pix4;
-    pix4.convertFromImage(*img4);
-    ui->view4->setPixmap(pix4);
-    ui->view4->repaint();
 
 }
 
@@ -457,15 +428,12 @@ void ColorCreator::updateThresh()
 {
     if (haveFile)
     {
-        if (mode == Big) {
-            largeDisplay();
-            return;
-        }
         bool display;
         bool stats = false;
         QColor c, c2;
         int red, blue, green;
         initStats();
+        largeDisplay();
         for (int i = 0; i < WIDTH; i+=2)
         {
             for (int j = 0; j < HEIGHT; j+=2)
@@ -486,73 +454,8 @@ void ColorCreator::updateThresh()
                 img3->setPixel(i/2, j/2, c.rgb());
                 c.setRgb(0, 0, 0);
                 c.setRgb(255,255,255);
-                if (table->isEnabled())
-                {
-                    int y = roboimage.getY(i, j);
-                    int u = roboimage.getU(i, j);
-                    int v = roboimage.getV(i, j);
-                    int col = table->getUpdatedColor(y, u, v);
-                    if (col >= Black) {
-                        display = false;
-                    } else{
-                        c = cols[col];
-                    }
-                    img4->setPixel(i/2, j/2, c.rgb());
-                }
-                do {
-                    display = true;
-                    int y = roboimage.getY(i, j);      
-                    float s = (float)roboimage.getS(i, j) / 256.0f;
-                    float h = (float)roboimage.getH(i, j) / 256.0f;
-                    float z = (float)roboimage.getZ(i, j) / 256.0f;
-                    // Since H is an angle the math is modulo.
-                    if (hMax[start] > hMin[start])
-                    {
-                        if (hMin[start] > h || hMax[start] < h)
-                        {
-                            display = false;
-                        }
-                    } else if (hMin[start] > h && hMax[start] < h )
-                    {
-                        display = false;
-                    }
-                    if (s < sMin[start] || s > sMax[start])
-                    {
-                        display = false;
-                    }
-                    else if (z < zMin[start] || z > zMax[start])
-                    {
-                        display = false;
-                    }
-                    else if (y < yMin[start] || y > yMax[start])
-                    {
-                        display = false;
-                    }
-                    c = cols[start];
-
-                    if (display)
-                    {
-                        looping = false;
-                        if (stats)
-                        {
-                            collectStats(i, j);
-                        }
-                    } else{
-                        c.setRgb(0, 0, 0);
-                    }
-                    img->setPixel(i/2, j/2, c.rgb());
-                    start++;
-                    if (start == Black)
-                    {
-                        looping = false;
-                    }
-                } while (looping);
             }
         }
-        QPixmap pix;
-        pix.convertFromImage(*img);
-        ui->thresh->setPixmap(pix);
-        ui->thresh->repaint();
         QPixmap pix2;
         pix2.convertFromImage(*img2);
         ui->view2->setPixmap(pix2);
@@ -561,10 +464,6 @@ void ColorCreator::updateThresh()
         pix3.convertFromImage(*img3);
         ui->view3->setPixmap(pix3);
         ui->view3->repaint();
-        QPixmap pix4;
-        pix4.convertFromImage(*img4);
-        ui->view4->setPixmap(pix4);
-        ui->view4->repaint();
         if (stats)
         {
             outputStats();
