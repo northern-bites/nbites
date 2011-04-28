@@ -463,6 +463,7 @@ void RoboGuardian::executeFallProtection(){
 
 void RoboGuardian::executeStartupAction() const{
     //Blank for now
+	playFile(nbsdir+"rick_roll.wav");
 
 }
 
