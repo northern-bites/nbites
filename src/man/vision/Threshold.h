@@ -20,6 +20,8 @@ class Threshold;  // forward reference
 #include "NaoPose.h"
 #include "Gradient.h"
 
+#define SOFTCOLORS
+
 //
 // COLOR TABLE CONSTANTS
 // remember to change both values when chaning the color tables
@@ -124,6 +126,85 @@ class Threshold
 public:
     Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr);
     virtual ~Threshold() {}
+
+    // Helper method that just returns whether the thresholded color is a
+    // green color
+    static inline const bool isGreen(unsigned char threshColor)
+        {
+#ifdef SOFTCOLORS
+			return threshColor == GREEN;
+#else
+			return threshColor & GREEN;
+#endif
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // blue color
+    static inline const bool isBlue(unsigned char threshColor)
+        {
+#ifdef SOFTCOLORS
+			return threshColor == BLUE || threshColor == BLUEGREEN;
+#else
+			return threshColor & BLUE;
+#endif
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // yellow color
+    static inline const bool isYellow(unsigned char threshColor)
+        {
+#ifdef SOFTCOLORS
+			return threshColor == YELLOW;
+#else
+			return threshColor & YELLOW;
+#endif
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // orange color
+    static inline const bool isOrange(unsigned char threshColor)
+        {
+#ifdef SOFTCOLORS
+			return threshColor == ORANGE || threshColor == ORANGERED;
+#else
+			return threshColor & ORANGE;
+#endif
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // navy color
+    static inline const bool isNavy(unsigned char threshColor)
+        {
+#ifdef SOFTCOLORS
+			return threshColor == NAVY;
+#else
+			return threshColor & NAVY;
+#endif
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // Red color
+    static inline const bool isRed(unsigned char threshColor)
+        {
+#ifdef SOFTCOLORS
+			return threshColor == RED;
+#else
+			return threshColor & RED;
+#endif
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // green color
+    static inline const bool isUndefined(unsigned char threshColor)
+        {
+#ifdef SOFTCOLORS
+			return threshColor == GREY;
+#else
+			return threshColor;
+#endif
+        }
+
+
 
     // main methods
     void visionLoop();

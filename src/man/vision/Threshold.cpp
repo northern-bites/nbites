@@ -260,13 +260,13 @@ unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
     if (yy < LOWGREENY) {
         return GREY;
     }
-    if (col == BLUE) {
+	if (isBlue(col)) {
         if (v > BLUEV - FUDGEV) {
             return BLUE;
         }
         return GREY;
     }
-    if (col == YELLOW) {
+    if (isYellow(col)) {
         if (v < YELLOWV + FUDGEV) {
             return YELLOW;
         }
@@ -332,6 +332,7 @@ void Threshold::findGoals(int column, int topEdge) {
         thresholded[j][column] = getColor(column, j);
 #endif
         unsigned char pixel = getThresholded(j,column);
+#ifdef SOFTCOLORS
         switch (pixel) {
         case BLUE:
             lastBlue = j;
@@ -352,11 +353,28 @@ void Threshold::findGoals(int column, int topEdge) {
             bad++;
         }
     }
+#else
+	if (isBlue(pixel)) {
+		lastBlue = j;
+		blues++;
+	}
+	if (isYellow(pixel)) {
+		lastYellow = j;
+		yellows++;
+	}
+	if (isNavy(pixel) || isRed(pixel)) {
+		robots++;
+	}
+	if (isOrange(pixel) || isUndefined(pixel)) {
+		bad++;
+	}
+#endif
     // now do the same going down from the horizon
     bad = 0;
     for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
         // note:  These were thresholded in the findBallsCrosses loop
         unsigned char pixel = getThresholded(j,column);
+#ifdef SOFTCOLORS
         switch (pixel) {
         case BLUE:
             firstBlue = j;
@@ -378,6 +396,22 @@ void Threshold::findGoals(int column, int topEdge) {
         default:
             bad++;
         }
+#else
+	if (isBlue(pixel)) {
+		firstBlue = j;
+		blues++;
+	}
+	if (isYellow(pixel)) {
+		firstYellow = j;
+		yellows++;
+	}
+	if (isNavy(pixel) || isRed(pixel)) {
+		robots++;
+	}
+	if (isOrange(pixel) || isUndefined(pixel)) {
+		bad++;
+	}
+#endif
     }
     if (blues > 10) {
         blue->newRun(column, lastBlue, firstBlue - lastBlue);
@@ -410,7 +444,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
     shoot[column] = true;
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
-        while (bound < IMAGE_HEIGHT && getColor(column, bound) == ORANGE) {
+        while (bound < IMAGE_HEIGHT && isOrange(getColor(column, bound))) {
             bound++;
         }
     }
@@ -423,10 +457,10 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         unsigned char pixel = getThresholded(j,column);
         // for simplicity treat ORANGERED as ORANGE - we'll look
         // more carefully when we check whether or not it is a ball
+#ifdef SOFTCOLORS
         if (pixel == ORANGERED) {
             pixel = ORANGE;
         }
-
         // check thresholded point with last thresholded point.
         // if the same, increment the current run
         if (lastPixel == pixel) {
@@ -492,8 +526,85 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             // since this loop runs when a run ends, restart # pixels in run counter
             currentRun = 1;
         }
+#else
+        // check thresholded point with last thresholded point.
+        // if the same, increment the current run
+        if (lastPixel == pixel) {
+            currentRun++;
+        }
+        // otherwise, do stuff according to color
+        if (lastPixel != pixel || j == topEdge) { // end of column
+            // Note: pixel can contain multiple colors, so we check all of them
+			if (isOrange(lastPixel)) {
+                // add to Ball data structure
+                if (j == topEdge) {
+                    while (j > 0 && isOrange(getThresholded(j,column))) {
+                        currentRun++;
+                        j--;
+                    }
+                }
+                if (currentRun > 2) {
+                    orange->newRun(column, j, currentRun);
+                }
+                greens += currentRun;
+			}
+			if (isWhite(lastPixel)) {
+                // add to the cross data structure
+                if (currentRun > 2) {
+                    cross->newRun(column, j, currentRun);
+                }
+			}
+			if (isUndefined(lastPixel)) {
+                if (currentRun > greys) {
+                    greys+= currentRun;
+                }
+                if (currentRun > 15 && shoot[column]) {
+                    evidence[column / divider]++;
+                    if (block[column / divider] < j + currentRun) {
+                        block[column / divider] = j + currentRun;
+                    }
+                    shoot[column] = false;
+                    if (debugShot) {
+                        drawPoint(column, j + currentRun, MAROON);
+                    }
+                }
+			}
+			if (isGreen(lastPixel)) {
+                greens+= currentRun;
+                lastGood = j;
+			}
+			if (isNavy(lastPixel)) {
+                robots+= currentRun;
+                if (robots > 5 && shoot[column]) {
+                    evidence[column / divider]++;
+                    if (block[column / divider] < j + currentRun) {
+                        block[column / divider] = j + currentRun;
+                    }
+                    shoot[column] = false;
+                    if (debugShot) {
+                        drawPoint(column, j + currentRun, MAROON);
+                    }
+                }
+			}
+			if (isRed(lastPixel)) {
+                robots+= currentRun;
+                if (robots > 5 && shoot[column]) {
+                    evidence[column / divider]++;
+                    if (block[column / divider] < j + currentRun) {
+                        block[column / divider] = j + currentRun;
+                    }
+                    shoot[column] = false;
+                    if (debugShot) {
+                        drawPoint(column, j + currentRun, MAROON);
+                    }
+                }
+			}
+            // since this loop runs when a run ends, restart # pixels in run counter
+            currentRun = 1;
+        }
+#endif
         lastPixel = pixel;
-        if (pixel == ORANGE) {
+        if (isOrange(pixel)) {
             int lastu = getU(column, j);
             int initu = lastu;
             while (j >= topEdge && abs(getU(column, j) - lastu) < 8 &&

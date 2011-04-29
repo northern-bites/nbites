@@ -66,6 +66,11 @@ public:
     void createBall(int c);
 
     // ball stuff
+	bool isOrange(unsigned char pix);
+	bool isRed(unsigned char pix);
+	bool isYellow(unsigned char pix);
+	bool isGreen(unsigned char pix);
+	bool isUndefined(unsigned char pix);
     float rightHalfColor(Blob obj);
     void setOcclusionInformation();
     bool ballIsReasonablySquare(int x, int y, int w, int h);
