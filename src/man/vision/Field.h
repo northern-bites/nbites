@@ -52,7 +52,7 @@ public:
 #ifdef SOFTCOLORS
 			return threshColor == GREEN || threshColor == BLUEGREEN;
 #else
-			return threshColor & GREEN;
+			return threshColor & GREEN_BIT;
 #endif
         }
 

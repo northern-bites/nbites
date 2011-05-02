@@ -20,7 +20,7 @@ class Threshold;  // forward reference
 #include "NaoPose.h"
 #include "Gradient.h"
 
-#define SOFTCOLORS
+//#define SOFTCOLORS
 
 //
 // COLOR TABLE CONSTANTS
@@ -134,7 +134,18 @@ public:
 #ifdef SOFTCOLORS
 			return threshColor == GREEN;
 #else
-			return threshColor & GREEN;
+			return threshColor & GREEN_BIT;
+#endif
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // white color
+    static inline const bool isWhite(unsigned char threshColor)
+        {
+#ifdef SOFTCOLORS
+			return threshColor == WHITE;
+#else
+			return threshColor & WHITE_BIT;
 #endif
         }
 
@@ -145,7 +156,7 @@ public:
 #ifdef SOFTCOLORS
 			return threshColor == BLUE || threshColor == BLUEGREEN;
 #else
-			return threshColor & BLUE;
+			return threshColor & BLUE_BIT;
 #endif
         }
 
@@ -156,7 +167,7 @@ public:
 #ifdef SOFTCOLORS
 			return threshColor == YELLOW;
 #else
-			return threshColor & YELLOW;
+			return threshColor & YELLOW_BIT;
 #endif
         }
 
@@ -167,7 +178,7 @@ public:
 #ifdef SOFTCOLORS
 			return threshColor == ORANGE || threshColor == ORANGERED;
 #else
-			return threshColor & ORANGE;
+			return threshColor & ORANGE_BIT;
 #endif
         }
 
@@ -178,7 +189,7 @@ public:
 #ifdef SOFTCOLORS
 			return threshColor == NAVY;
 #else
-			return threshColor & NAVY;
+			return threshColor & NAVY_BIT;
 #endif
         }
 
@@ -189,7 +200,7 @@ public:
 #ifdef SOFTCOLORS
 			return threshColor == RED;
 #else
-			return threshColor & RED;
+			return threshColor & RED_BIT;
 #endif
         }
 

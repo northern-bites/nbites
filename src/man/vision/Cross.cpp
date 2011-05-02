@@ -399,7 +399,7 @@ bool Cross::isWhite(unsigned char pix) {
 #ifdef SOFTCOLORS
 	return pix == WHITE;
 #else
-	return pix & GREEN;
+	return pix & WHITE_BIT;
 #endif
 }
 
@@ -412,7 +412,7 @@ bool Cross::isGreen(unsigned char pix) {
 #ifdef SOFTCOLORS
 	return pix == GREEN || pix == BLUEGREEN;
 #else
-	return pix & GREEN;
+	return pix & GREEN_BIT;
 #endif
 }
 

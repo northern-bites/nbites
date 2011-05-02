@@ -154,6 +154,16 @@ static const float MAX_ELEVATION_RAD = MAX_ELEVATION_DEG*TO_RAD;
 #define MAGENTA 26
 #define PURPLE 27
 
+#define GREY_BIT 0x00
+#define WHITE_BIT 0x01
+#define GREEN_BIT 0x02
+#define BLUE_BIT 0x04
+#define YELLOW_BIT 0x08
+#define ORANGE_BIT 0x10
+#define RED_BIT 0x20
+#define NAVY_BIT 0x40
+#define DRAWING_BIT 0x80
+
 // might be used for landmark recognition certainty - now used for ball certainty
 #define SURE       2
 #define MILDLYSURE 1

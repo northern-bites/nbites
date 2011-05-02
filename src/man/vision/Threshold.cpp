@@ -109,7 +109,6 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 /* Main vision loop, called by Vision.cc
  */
 void Threshold::visionLoop() {
-
     // threshold image and create runs
     thresholdAndRuns();
 
@@ -352,22 +351,22 @@ void Threshold::findGoals(int column, int topEdge) {
         default:
             bad++;
         }
-    }
 #else
-	if (isBlue(pixel)) {
-		lastBlue = j;
-		blues++;
-	}
-	if (isYellow(pixel)) {
-		lastYellow = j;
-		yellows++;
-	}
-	if (isNavy(pixel) || isRed(pixel)) {
-		robots++;
-	}
-	if (isOrange(pixel) || isUndefined(pixel)) {
-		bad++;
-	}
+        if (isBlue(pixel)) {
+            lastBlue = j;
+            blues++;
+        }
+        if (isYellow(pixel)) {
+            lastYellow = j;
+            yellows++;
+        }
+        if (isNavy(pixel) || isRed(pixel)) {
+            robots++;
+        }
+        if (isOrange(pixel) || isUndefined(pixel)) {
+            bad++;
+        }
+    }
 #endif
     // now do the same going down from the horizon
     bad = 0;
@@ -397,20 +396,24 @@ void Threshold::findGoals(int column, int topEdge) {
             bad++;
         }
 #else
-	if (isBlue(pixel)) {
-		firstBlue = j;
-		blues++;
-	}
-	if (isYellow(pixel)) {
-		firstYellow = j;
-		yellows++;
-	}
-	if (isNavy(pixel) || isRed(pixel)) {
-		robots++;
-	}
-	if (isOrange(pixel) || isUndefined(pixel)) {
-		bad++;
-	}
+        bool found = false;
+        if (isBlue(pixel)) {
+            firstBlue = j;
+            blues++;
+            found = true;
+        }
+        if (isYellow(pixel)) {
+            firstYellow = j;
+            yellows++;
+            found = true;
+        }
+        if (isNavy(pixel) || isRed(pixel)) {
+            robots++;
+            found = true;
+        }
+        if (!found) {
+            bad++;
+        }
 #endif
     }
     if (blues > 10) {
@@ -537,6 +540,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             // Note: pixel can contain multiple colors, so we check all of them
 			if (isOrange(lastPixel)) {
                 // add to Ball data structure
+                //drawPoint(column, j, MAROON);
                 if (j == topEdge) {
                     while (j > 0 && isOrange(getThresholded(j,column))) {
                         currentRun++;

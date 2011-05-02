@@ -274,7 +274,7 @@ private:
 #ifdef SOFTCOLORS
             return Utility::isElementInArray(color, LINE_COLORS, NUM_LINE_COLORS);
 #else
-			return color & WHITE;
+			return color & WHITE_BIT;
 #endif
         }
 
@@ -286,7 +286,7 @@ private:
             return Utility::isElementInArray(threshColor, FIELD_COLORS,
                                              NUM_GREEN_COLORS);
 #else
-			return threshColor & GREEN;
+			return threshColor & GREEN_BIT;
 #endif
         }
 

@@ -110,7 +110,7 @@ bool Ball::isOrange(unsigned char pix) {
 #ifdef SOFTCOLORS
 	return pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW;
 #else
-	return pix & ORANGE;
+	return pix & ORANGE_BIT;
 #endif
 }
 
@@ -123,7 +123,7 @@ bool Ball::isRed(unsigned char pix) {
 #ifdef SOFTCOLORS
 	return pix == RED || pix == ORANGERED;
 #else
-	return pix & RED;
+	return pix & RED_BIT;
 #endif
 }
 
@@ -136,7 +136,7 @@ bool Ball::isYellow(unsigned char pix) {
 #ifdef SOFTCOLORS
 	return pix == YELLOW || pix == ORANGEYELLOW;
 #else
-	return pix & YELLOW;
+	return pix & YELLOW_BIT;
 #endif
 }
 
@@ -149,7 +149,7 @@ bool Ball::isGreen(unsigned char pix) {
 #ifdef SOFTCOLORS
 	return pix == GREEN || pix == BLUEGREEN;
 #else
-	return pix & GREEN;
+	return pix & GREEN_BIT;
 #endif
 }
 
@@ -860,6 +860,7 @@ int	 Ball::roundness(Blob b)
 		if (BALLDEBUG) {
 			cout << "Roundness: Good " << goodPix << " " << badPix << endl;
         }
+        badPix = 0;
 		// if more than 20% or so of our pixels tested are bad, then we toss it out
 		if (goodPix < badPix * 5) {
 			return BAD_VALUE;

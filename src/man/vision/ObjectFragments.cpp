@@ -127,10 +127,10 @@ void ObjectFragments::createObject() {
     // these are in the relative order that they should be called
     switch (color) {
     case BLUE:
-        lookForFirstPost(vision->bglp, vision->bgrp, vision->bgCrossbar, BLUE);
+        lookForFirstPost(vision->bglp, vision->bgrp, vision->bgCrossbar, BLUE_BIT);
         break;
     case YELLOW:
-        lookForFirstPost(vision->yglp, vision->ygrp, vision->ygCrossbar, YELLOW);
+        lookForFirstPost(vision->yglp, vision->ygrp, vision->ygCrossbar, YELLOW_BIT);
         break;
     }
 }
