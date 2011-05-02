@@ -76,7 +76,7 @@ void ColorTable::read(QString filename)
             for (int z = 0; z < 128; z++)
             {
                 temp = file.read(1);
-                switch(temp[0])
+                /*switch(temp[0])
                 {
                 case 0:
                     table[y][x][z] = UNDEFINED;
@@ -116,7 +116,8 @@ void ColorTable::read(QString filename)
                 default:
                     table[y][x][z] = UNDEFINED;
                     break;
-                }
+                }*/
+                table[y][x][z] = temp[0];
             }
         }
     }

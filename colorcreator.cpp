@@ -30,7 +30,7 @@ ColorCreator::ColorCreator(QWidget *parent) :
     zMax = new float[COLORS];
     yMin = new int[COLORS];
     yMax = new int[COLORS];
-    cols = new QColor[COLORS];
+    cols = new QColor[COLORS+SOFT];
     bitColor = new unsigned[COLORS];
 
     table = new ColorTable();
@@ -43,17 +43,20 @@ ColorCreator::ColorCreator(QWidget *parent) :
     cols[White] = QColor(255, 255, 255);
     cols[Pink] = QColor(255, 181, 197);
     cols[Navy] = QColor(0, 0, 205);
-    cols[Black] = QColor(0, 0, 0);
+    cols[Black] = QColor(138, 43, 226);
+    cols[OrangeRed] = QColor(238, 64, 0);
+    cols[BlueGreen] = QColor(72, 209, 234);
+    cols[BlueNavy] =  QColor(105, 89, 205);
 
     // initialize bitColors for generating color tables
-    bitColor[Orange] = ORANGE;
-    bitColor[Blue] = BLUE;
-    bitColor[Yellow] = YELLOW;
-    bitColor[Green] = GREEN;
-    bitColor[White] = WHITE;
-    bitColor[Pink] = PINK;
-    bitColor[Navy] = NAVY;
-    bitColor[Black] = UNDEFINED;
+    bitColor[Orange] = ORANGE_COL;
+    bitColor[Blue] = BLUE_COL;
+    bitColor[Yellow] = YELLOW_COL;
+    bitColor[Green] = GREEN_COL;
+    bitColor[White] = WHITE_COL;
+    bitColor[Pink] = RED_COL;
+    bitColor[Navy] = NAVY_COL;
+    bitColor[Black] = GREY_COL;
 
     ui->setupUi(this);
     baseDirectory = "/Users/ericchown/nbites/data/frames";
@@ -84,6 +87,7 @@ ColorCreator::ColorCreator(QWidget *parent) :
     ui->channel->addItem(tr("S"), S);
     ui->channel->addItem(tr("Z"), Z);
     ui->channel->addItem(tr("Edge"), EDGE);
+    ui->channel->addItem(tr("Table"), Table);
     mode = Single;
     shape = Y;
 
@@ -318,6 +322,12 @@ QColor ColorCreator::getChannelView(int j, int i)
     case Z:
         red = green = blue = roboimage.getZ(j, i);
         break;
+    case Table:
+        if (table->isEnabled())
+        {
+            return displayColorTable(j, i);
+        }
+        break;
     case EDGE:
         red = green = blue = 255; //roboimage.getY(j, i);
         found = false;
@@ -354,6 +364,58 @@ QColor ColorCreator::getChannelView(int j, int i)
     }
     QColor col(red, green, blue);
     return col;
+}
+
+QColor ColorCreator::displayColorTable(int i, int j)
+{
+    QColor c;
+
+    int y = roboimage.getY(i, j);
+    int u = roboimage.getU(i, j);
+    int v = roboimage.getV(i, j);
+    unsigned col = table->index(y, u, v);
+    if ((col & ORANGE_COL) && (col & RED_COL))
+    {
+        c = cols[OrangeRed];
+    }
+    else if (col & ORANGE_COL) {
+        c = cols[Orange];
+    }
+    else if ((col & GREEN_COL) && (col & BLUE_COL))
+    {
+        c = cols[BlueGreen];
+    } else if ((col & GREEN_COL))
+    {
+        c = cols[Green];
+    }
+    else if ((col & WHITE_COL))
+    {
+        c = cols[White];
+    }
+    else if ((col & BLUE) && (col & NAVY))
+    {
+        c = cols[BlueNavy];
+    }
+    else if ((col & BLUE_COL))
+    {
+        c = cols[Blue];
+    }
+    else if ((col & NAVY_COL))
+    {
+        c = cols[Navy];
+    }
+    else if ((col & RED_COL))
+    {
+        c = cols[Pink];
+    }
+    else if ((col & YELLOW_COL))
+    {
+        c = cols[Yellow];
+    }
+    else {
+        c = cols[Black];
+    }
+    return c;
 }
 
 void ColorCreator::largeDisplay()
@@ -406,7 +468,7 @@ void ColorCreator::largeDisplay()
                 {
                     looping = false;
                 } else{
-                    c.setRgb(0, 0, 0);
+                    c = cols[Black];
                 }
                 img->setPixel(i, j, c.rgb());
                 start++;
@@ -652,7 +714,6 @@ void ColorCreator::on_getColorTable_clicked()
     currentColorDirectory.chop(currentColorDirectory.size() - last);
 }
 
-// NOte: this won't work.  Its just a rough template
 void ColorCreator::writeNewFormat(QString filename)
 {
     QFile file(filename);
@@ -663,20 +724,36 @@ void ColorCreator::writeNewFormat(QString filename)
         out << "The file would not open properly" << "\n";
         return;
     }
-    for (int y = 0; y < 128; ++y)
+    // loop through all possible table values - our tables are v-u-y
+    int count = 0;
+    for (int z = 0; z < 128; ++z)
     {
         for (int x = 0; x < 128; x ++)
         {
-            for (int z = 0; z < 128; z++)
+            for (int y = 0; y < 128; y++)
             {
-                temp[0] = UNDEFINED;
+                temp[0] = GREY_COL;
                 ColorSpace col;
                 col.setYuv(y * 2, x * 2, z * 2);
-                for (int c = 0; c < COLORS; c++)
+                for (int c = Orange; c < Black; c++)
                 {
-                    if (y * 2 >= yMin[c] && y * 2 <= yMax[c] && col.getHb() >= hMin[c] && col.getHb() <= hMax[c] &&
-                            col.getSb() >= sMin[c] && col.getSb() <= sMax[c] && col.getZb() >= zMin[c] &&
-                            col.getZb() <= zMax[c])
+                    bool ok = false;
+                    if (hMin[c] > hMax[c])
+                    {
+                        if (col.getH() >= hMin[c] || col.getH() <= hMax[c])
+                        {
+                            ok = true;
+                        }
+                    } else
+                    {
+                        if (col.getH() >= hMin[c] && col.getH() <= hMax[c])
+                        {
+                            ok = true;
+                        }
+                    }
+                    if (ok && y * 2 >= yMin[c] && y * 2 <= yMax[c] &&
+                            col.getS() >= sMin[c] && col.getS() <= sMax[c] && col.getZ() >= zMin[c] &&
+                            col.getZ() <= zMax[c])
                     {
                         temp[0] = temp[0] | bitColor[c];
                     }
@@ -797,7 +874,8 @@ void ColorCreator::writeOldFormat(QString filename)
 void ColorCreator::on_writeNew_clicked()
 {
     QString filename = baseColorTable + "/new.mtb";
-    writeOldFormat(filename);
+    //writeOldFormat(filename);
+    writeNewFormat(filename);
 }
 
 

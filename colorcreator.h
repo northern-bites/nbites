@@ -8,6 +8,7 @@
 #define  NEWFRAMES
 #ifdef   NEWFRAMES
 #define  COLORS 8
+#define  SOFT 3
 #define  WIDTH 640
 #define  HEIGHT 480
 #define  EXTENSION ".frm"
@@ -22,15 +23,15 @@
 #define GREY_COL 0x00
 #define WHITE_COL 0x01
 #define GREEN_COL 0x02
-#define BLUE_COL 0x03
-#define YELLOW_COL 0x04
-#define ORANGE_COL 0x05
-#define YELLOWWHITE_COL 0x06
-#define BLUEGREEN_COL 0x07
-#define ORANGERED_COL 0x08
-#define ORANGEYELLOW_COL 0x09
-#define RED_COL 0x0a
-#define NAVY_COL 0x0b
+#define BLUE_COL 0x04
+#define YELLOW_COL 0x08
+#define ORANGE_COL 0x10
+#define YELLOWWHITE_COL 0x09
+#define BLUEGREEN_COL 0x06
+#define ORANGERED_COL 0x30
+#define ORANGEYELLOW_COL 0x18
+#define RED_COL 0x20
+#define NAVY_COL 0x40
 
 
 
@@ -43,9 +44,9 @@ class ColorCreator : public QWidget
     Q_OBJECT
 
 public:
-    enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black};
+    enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black, BlueGreen, BlueNavy, OrangeRed};
     enum Choices {Single, Multiple};
-    enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE};
+    enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE, Table};
     explicit ColorCreator(QWidget *parent = 0);
     ~ColorCreator();
     void updateDisplays();
@@ -62,6 +63,7 @@ public:
     void writeOldFormat(QString filename);
     QColor getChannelView(int i, int j);
     void largeDisplay();
+    QColor displayColorTable(int i, int j);
 
 private slots:
     void on_pushButton_clicked();
