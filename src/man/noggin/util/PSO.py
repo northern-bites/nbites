@@ -30,17 +30,17 @@ try:
 except:
    import pickle
 
-DEBUG = True
+DEBUG = False
 DEBUG_POSITION = False
-DEBUG_PROGRESS = True
+DEBUG_PROGRESS = False
 
 # how much we trend towards pBest, gBest (cog/soc biases)
 # both set to <2 per the PSO wikipedia article
-COG = 0.3
+COG = 0.4
 SOC = 0.7
 MAX_INERTIAL = 0.75
 
-VELOCITY_MINIMUM_MAGNITUDE = 0.001
+VELOCITY_MINIMUM_MAGNITUDE = 0.0001
 
 INFINITY = float(1e3000)
 
@@ -52,7 +52,7 @@ class Particle:
         self.pBest_vars = [0]*nSpace
 
         self.gBest = -INFINITY
-        self.gBest_position = []
+        self.gBest_position = []*nSpace
 
         self.searchMins = searchMins
         self.searchMaxs = searchMaxs
@@ -60,8 +60,8 @@ class Particle:
         self.position = [0]*nSpace
         self.velocity = [0]*nSpace
 
-        # particles can cross the entire search space in one tick
-        self.velocityCap = [sMax - sMin for sMax, sMin in zip(searchMaxs, searchMins)]
+        # particles can cross 1/2 the entire search space in one tick
+        self.velocityCap = [.5*(sMax - sMin) for sMax, sMin in zip(searchMaxs, searchMins)]
 
         # initialized randomly per-particle as suggested by PSO wikipedia article
         self.INERTIAL = MAX_INERTIAL * random.random()
@@ -71,15 +71,15 @@ class Particle:
 
     def initializeParticle(self):
         for j in range(0, self.dimension):
-            # don't optimize any parameter where min == max
-            if self.searchMins[j] == self.searchMaxs[j]:
+           # don't optimize any parameter where min == max
+           if self.searchMins[j] == self.searchMaxs[j]:
                 self.position[j] = self.searchMins[j]
                 self.velocity[j] = 0
                 continue
 
-            self.position[j] = random.uniform(self.searchMins[j],
+           self.position[j] = random.uniform(self.searchMins[j],
                                               self.searchMaxs[j])
-            self.velocity[j] = random.uniform(-self.velocityCap[j],
+           self.velocity[j] = random.uniform(-self.velocityCap[j],
                                                self.velocityCap[j])
 
         self.gBest_position = self.position
@@ -116,13 +116,13 @@ class Particle:
             R1 = random.random()
             R2 = random.random()
 
-            self.velocity[i] = self.INERTIAL*self.velocity[i] \
+            newVelocity = self.INERTIAL*self.velocity[i] \
                 + COG * R1 * (self.pBest_vars[i] - self.position[i]) \
                 + SOC * R2 * (self.gBest_position[i] - self.position[i])
 
-            clip(self.velocity[i],
-                 -self.velocityCap[i],
-                 self.velocityCap[i])
+            self.velocity[i] = clip(newVelocity,
+                                    -self.velocityCap[i],
+                                    self.velocityCap[i])
 
             if fabs(self.velocity[i]) < VELOCITY_MINIMUM_MAGNITUDE:
                 self.velocity[i] = 0
@@ -130,11 +130,11 @@ class Particle:
 
     def updateParticlePosition(self):
         for i in range(0, self.dimension):
-            self.position[i] = self.position[i] + self.velocity[i]
+            newPosition = self.position[i] + self.velocity[i]
 
-            clip(self.position[i],
-                 self.searchMins[i],
-                 self.searchMaxs[i])
+            self.position[i] = clip(newPosition,
+                                    self.searchMins[i],
+                                    self.searchMaxs[i])
 
     # used to decide how stable our most recent set of parameters were
     def getHeuristic(self):
@@ -212,26 +212,22 @@ class Swarm:
     def getIterations(self):
         return self.iterations
 
-    def getCurrParticle(self):
+    def getCurrentParticle(self):
         return self.particles[self.partIndex]
-
-    def getNextParticle(self):
-        self.partIndex += 1
-
-        if self.partIndex < self.numParticles:
-            return self.particles[self.partIndex]
-        else:
-            self.iterations += 1
-            self.partIndex = 0
-            return self.particles[0]
 
     def getBestSolution(self):
         return (self.gBest_position, self.gBest)
 
-    def tickCurrParticle(self):
+    def tickCurrentParticle(self):
         (self.gBest, self.gBest_position) = \
                self.particles[self.partIndex].tick(self.gBest, self.gBest_position)
 
         if DEBUG:
             self.particles[self.partIndex].printState()
 
+        # increment the particle index after we tick it
+        self.partIndex += 1
+
+        if self.partIndex >= self.numParticles:
+            self.iterations += 1
+            self.partIndex = 0

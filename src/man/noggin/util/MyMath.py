@@ -7,7 +7,8 @@ from math import (atan2,
                   cos,
                   fabs,
                   radians,
-                  sin)
+                  sin,
+                  sqrt)
 
 
 def sub180Angle(angle):
@@ -70,6 +71,10 @@ def getRelativeVelocityX(robotH, velX, velY):
 def getRelativeVelocityY(robotH, velX, velY):
     '''Returns the y velocity of the ball relative to the self heading'''
     return velX * sin(radians(robotH)) + velY * cos(radians(robotH))
+
+def distance3d(a, b):
+    ''' Returns the euclidian distance between two 3d points'''
+    return sqrt((a[0] - b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2)
 
 def linesIntersect(x1,y1, x2, y2,
                      u1,v1, u2,v2):

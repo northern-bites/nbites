@@ -22,10 +22,45 @@
 # @author Nathan Merritt
 # @date April 2011
 
-import man.noggin.util.PSO as PSO
+import PSO as PSO
+from MyMath import distance3d
 
 #@todo set up ladder function test case as in:
 # http://users.softlab.ece.ntua.gr/~ttsiod/ladders.html
 
-#@todo set up a simple 3d geometric search example
+# a simple 3d geometric search example
+# the heuristic for each particle is the inverse of distance from DESTINATION
 
+DESTINATION = (4, 3, 4)
+geometric_mins = (0, 0, 0)
+geometric_maxs = (50, 50, 50)
+geometric_dimensions = 3
+geometric_particles = 20
+
+geometric_search = PSO.Swarm(geometric_particles, geometric_dimensions,
+                             geometric_mins, geometric_maxs)
+thisIteration = 0
+
+print "Looking for point (4, 3, 4)"
+
+while (geometric_search.getIterations() < 100):
+    currentParticle = geometric_search.getCurrentParticle()
+    particleLocation = currentParticle.getPosition()
+    distanceFromTarget = distance3d(DESTINATION, particleLocation)
+
+    currentParticle.setHeuristic(-distanceFromTarget) # since heuristic is maximized
+
+    #print "set heuristic "
+    #print -distanceFromTarget
+    #print "\n"
+
+    geometric_search.tickCurrentParticle()
+
+    if geometric_search.getIterations() > thisIteration:
+        thisIteration = geometric_search.getIterations()
+
+        # check the best found "solution" after each 10 iterations
+        if thisIteration % 10 == 0:
+            (best_loc, best_score) = geometric_search.getBestSolution()
+            print "Best solution after " + str(thisIteration) + " is: " \
+                + str(best_loc) + " with score " + str(best_score)
