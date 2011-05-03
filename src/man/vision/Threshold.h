@@ -193,7 +193,7 @@ public:
     //              const int color);
     void drawVisualHorizon();
     //void drawLine(int x, int y, int x1, int y1, int c);
-    void drawBox(int left, int right, int bottom, int top, int c);
+    //void drawBox(int left, int right, int bottom, int top, int c);
     void drawRect(int left, int top, int width, int height, int c);
 
     void setEdgeThreshold(int _thresh);

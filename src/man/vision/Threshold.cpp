@@ -1487,58 +1487,6 @@ void Threshold::transposeDebugImage(){
 #endif
 }
 
-/* Draw a box in the fake image.
- * @param left     x value of left edge
- * @param right    x value of right edge
- * @param bottom   y value of bottom
- * @param top      y value of top
- * @param c        the color we'd like to draw
- */
-void Threshold::drawBox(int left, int right, int bottom, int top, int c) {
-
-
-#ifdef OFFLINE
-    if (left < 0) {
-        left = 0;
-    }
-    if (top < 0) {
-        top = 0;
-    }
-    int width = right-left;
-    int height = bottom-top;
-
-    for (int i = left; i < left + width; i++) {
-        if (top >= 0 &&
-                top < IMAGE_HEIGHT &&
-                i >= 0 &&
-                i < IMAGE_WIDTH) {
-            debugImage[top][i] = static_cast<unsigned char>(c);
-        }
-        if ((top + height) >= 0 &&
-                (top + height) < IMAGE_HEIGHT &&
-                i >= 0 &&
-                i < IMAGE_WIDTH) {
-            debugImage[top + height][i] = static_cast<unsigned char>(c);
-        }
-    }
-    for (int i = top; i < top + height; i++) {
-        if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                left >= 0 &&
-                left < IMAGE_WIDTH) {
-            debugImage[i][left] = static_cast<unsigned char>(c);
-        }
-        if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                (left+width) >= 0 &&
-                (left+width) < IMAGE_WIDTH) {
-            debugImage[i][left + width] = static_cast<unsigned char>(c);
-        }
-    }
-#endif
-} // drawBox
-
-
 /* Draw a rectangle in the fake image.
  * @param left     x value of left edge
  * @param right    x value of right edge
