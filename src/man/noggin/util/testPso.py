@@ -31,17 +31,18 @@ from MyMath import distance3d
 # a simple 3d geometric search example
 # the heuristic for each particle is the inverse of distance from DESTINATION
 
-DESTINATION = (4, 3, 4)
+DESTINATION = (4, 4, 4)
 geometric_mins = (0, 0, 0)
-geometric_maxs = (50, 50, 50)
+geometric_maxs = (50, 50, 0)
 geometric_dimensions = 3
 geometric_particles = 20
 
 geometric_search = PSO.Swarm(geometric_particles, geometric_dimensions,
                              geometric_mins, geometric_maxs)
 thisIteration = 0
+bestFoundScore = -float(1e3000)
 
-print "Looking for point (4, 3, 4)"
+print "Looking for point 4,4,4 "
 
 while (geometric_search.getIterations() < 100):
     currentParticle = geometric_search.getCurrentParticle()
