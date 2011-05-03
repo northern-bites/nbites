@@ -104,6 +104,8 @@ private slots:
 
     void on_channel_currentIndexChanged(int index);
 
+    void on_getOldTable_clicked();
+
 private:
     Ui::ColorCreator *ui;
     RoboImage roboimage;

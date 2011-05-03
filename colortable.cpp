@@ -57,8 +57,7 @@ ColorTable::ColorTable()
     colormap[1][11] = Black;
 }
 
-// Read table from a file and determine the format
-void ColorTable::read(QString filename)
+void ColorTable::readOld(QString filename)
 {
     QFile file(filename);
     QTextStream out(stdout);
@@ -76,7 +75,7 @@ void ColorTable::read(QString filename)
             for (int z = 0; z < 128; z++)
             {
                 temp = file.read(1);
-                /*switch(temp[0])
+                switch(temp[0])
                 {
                 case 0:
                     table[y][x][z] = UNDEFINED;
@@ -116,7 +115,45 @@ void ColorTable::read(QString filename)
                 default:
                     table[y][x][z] = UNDEFINED;
                     break;
-                }*/
+                }
+            }
+        }
+    }
+    file.close();
+    /*Stats** stats = colorStats();
+    for (int i = 0; i < mainColors; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            stats[j][i].print(i, j);
+        }
+    }*/
+    enabled = true;
+    filename.chop(4);
+    QString newName = filename + "bit.mtb";
+    out << "Filename is :" << newName << "\n";
+    writeNewFormat(newName);
+}
+
+// Read table from a file and determine the format
+void ColorTable::read(QString filename)
+{
+    QFile file(filename);
+    QTextStream out(stdout);
+    QByteArray temp;
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        out << "The file would not open properly" << "\n";
+        enabled = false;
+        return;
+    }
+    for (int y = 0; y < 128; ++y)
+    {
+        for (int x = 0; x < 128; x ++)
+        {
+            for (int z = 0; z < 128; z++)
+            {
+                temp = file.read(1);
                 table[y][x][z] = temp[0];
             }
         }
@@ -135,6 +172,9 @@ void ColorTable::read(QString filename)
     writeNewFormat(filename);*/
 }
 
+/* WHen we read in a table of the old format we automatically convert
+  it to the new format.  Here we just write out the table directly.
+  */
 void ColorTable::writeNewFormat(QString filename)
 {
     QFile file(filename);
@@ -152,47 +192,7 @@ void ColorTable::writeNewFormat(QString filename)
         {
             for (int z = 0; z < 128; z++)
             {
-                switch(table[y][x][z])
-                {
-                case 0:
-                    temp[0] = UNDEFINED;
-                    break;
-                case 1:
-                    temp[0] = WHITE;
-                    break;
-                case 2:
-                    temp[0] = GREEN;
-                    break;
-                case 3:
-                    temp[0] = BLUE;
-                    break;
-                case 4:
-                    temp[0] = YELLOW;
-                    break;
-                case 5:
-                    temp[0] = ORANGE;
-                    break;
-                case 6:
-                    temp[0] = YELLOW & WHITE;
-                    break;
-                case 7:
-                    temp[0] = BLUE & GREEN;
-                    break;
-                case 8:
-                    temp[0] = ORANGE & PINK;
-                    break;
-                case 9:
-                    temp[0] = ORANGE & YELLOW;
-                case 10:
-                    temp[0] = PINK;
-                    break;
-                case 11:
-                    temp[0] = NAVY;
-                    break;
-                default:
-                    temp[0] = UNDEFINED;
-                    break;
-                }
+                temp[0] = table[y][x][z];
                 file.write(temp);
             }
         }

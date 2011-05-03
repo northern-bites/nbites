@@ -43,7 +43,7 @@ ColorCreator::ColorCreator(QWidget *parent) :
     cols[White] = QColor(255, 255, 255);
     cols[Pink] = QColor(255, 181, 197);
     cols[Navy] = QColor(0, 0, 205);
-    cols[Black] = QColor(138, 43, 226);
+    cols[Black] = QColor(100, 100, 100);
     cols[OrangeRed] = QColor(238, 64, 0);
     cols[BlueGreen] = QColor(72, 209, 234);
     cols[BlueNavy] =  QColor(105, 89, 205);
@@ -146,12 +146,12 @@ ColorCreator::ColorCreator(QWidget *parent) :
             break;
         case White:
             hMin[i] = 0.01f;
-            hMax[i] = 1.0f;
+            hMax[i] = 0.01f;
             sMin[i] = 0.0f;
-            sMax[i] = 0.3f;
-            zMin[i] = 0.55f;
+            sMax[i] = 0.38f;
+            zMin[i] = 0.39f;
             zMax[i] = 1.0f;
-            yMin[i] = 150;
+            yMin[i] = 102;
             yMax[i] = 250;
             break;
         case Pink:
@@ -755,6 +755,9 @@ void ColorCreator::writeNewFormat(QString filename)
                             col.getS() >= sMin[c] && col.getS() <= sMax[c] && col.getZ() >= zMin[c] &&
                             col.getZ() <= zMax[c])
                     {
+                        if (c == Orange) {
+                            count++;
+                        }
                         temp[0] = temp[0] | bitColor[c];
                     }
                 }
@@ -762,6 +765,7 @@ void ColorCreator::writeNewFormat(QString filename)
             }
         }
     }
+    out << "Count was " << count << "\n" << endl;
     file.close();
 }
 
@@ -899,4 +903,14 @@ void ColorCreator::on_channel_currentIndexChanged(int index)
 {
     shape = index;
     updateThresh();
+}
+
+void ColorCreator::on_getOldTable_clicked()
+{
+    currentColorDirectory = QFileDialog::getOpenFileName(this, tr("Open Old Color Table"),
+                                            currentColorDirectory,
+                                            tr("Table Files (*.mtb)"));
+    table->readOld(currentColorDirectory);
+    int last = currentColorDirectory.lastIndexOf("/");
+    currentColorDirectory.chop(currentColorDirectory.size() - last);
 }

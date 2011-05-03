@@ -21,6 +21,7 @@ public:
     ColorTable();
     unsigned*** getTable() {return table; }
     void read(QString filename);
+    void readOld(QString filename);
     void writeNewFormat(QString filename);
     int tableIndex(int high7, int mid7, int low7);
     unsigned index(int y, int u, int v);

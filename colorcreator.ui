@@ -221,7 +221,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>830</y>
+     <y>820</y>
      <width>111</width>
      <height>26</height>
     </rect>
@@ -392,7 +392,7 @@
      <x>40</x>
      <y>20</y>
      <width>161</width>
-     <height>31</height>
+     <height>34</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -477,10 +477,23 @@
    <property name="geometry">
     <rect>
      <x>510</x>
-     <y>830</y>
+     <y>820</y>
      <width>111</width>
      <height>26</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="getOldTable">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>690</y>
+     <width>114</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Old Table</string>
    </property>
   </widget>
  </widget>
