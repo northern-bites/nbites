@@ -153,6 +153,7 @@ void Threshold::visionLoop() {
  * image from bottom to top. Along the way we keep track of things like: where
  * we saw blue-yellow and yellow-blue transitions, where the green horizon
  * line is, etc.
+ * NOTE: The name is now a misnomer.  We no longer threshold here.
  */
 void Threshold::thresholdAndRuns() {
     PROF_ENTER(vision->profiler, P_THRESHRUNS); // profiling
@@ -221,31 +222,7 @@ void Threshold::thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg) {
 	value.
  */
 unsigned char Threshold::getColor(int x1, int y1) {
-#ifdef USE_EDGES
-    const unsigned char *yPtr = &yplane[0] +y1*IMAGE_ROW_OFFSET+2*x1;
-    int u = yPtr[UOFFSET + 2*(x1%2)];
-    if (u  > ORANGEU) {
-        return ORANGE;
-    }
-    int y = yPtr[0];
-    if (y > WHITEY) {
-        return WHITE;
-    } else if (y < LOWGREENY) {
-        return GREY;
-    }
-    int v = yPtr[VOFFSET+2*(x1%2)];
-    if (v > BLUEV) {
-        return BLUE;
-    } else if (v < YELLOWV) {
-        return YELLOW;
-    } else if (y > LOWGREENY && y < HIGHGREENY && u > LOWGREENU &&
-            u < HIGHGREENU && v > LOWGREENV && v < HIGHGREENV) {
-        return GREEN;
-    }
-    return GREY;
-#else
     return getThresholded(y1,x1);
-#endif
 }
 
 /*  When we have identified a possible post we open up the color spectrum a
@@ -253,28 +230,7 @@ unsigned char Threshold::getColor(int x1, int y1) {
  */
 
 unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
-#ifdef USE_EDGES
-    int v = getV(x, y);
-    int yy = getY(x, y);
-    if (yy < LOWGREENY) {
-        return GREY;
-    }
-	if (isBlue(col)) {
-        if (v > BLUEV - FUDGEV) {
-            return BLUE;
-        }
-        return GREY;
-    }
-    if (isYellow(col)) {
-        if (v < YELLOWV + FUDGEV) {
-            return YELLOW;
-        }
-    }
-    return GREY;
-#else
     return getColor(x, y);
-#endif
-
 }
 
 /* Image runs.  As explained in the comments for the threshold() method, I
@@ -327,31 +283,7 @@ void Threshold::findGoals(int column, int topEdge) {
     int robots = 0;
     for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
-#ifdef USE_EDGES
-        thresholded[j][column] = getColor(column, j);
-#endif
         unsigned char pixel = getThresholded(j,column);
-#ifdef SOFTCOLORS
-        switch (pixel) {
-        case BLUE:
-            lastBlue = j;
-            blues++;
-            break;
-        case YELLOW:
-            lastYellow = j;
-            yellows++;
-            break;
-        case BLUEGREEN:
-        case GREEN:
-            break;
-        case RED:
-        case NAVY:
-            robots++;
-            break;
-        default:
-            bad++;
-        }
-#else
         if (isBlue(pixel)) {
             lastBlue = j;
             blues++;
@@ -367,35 +299,11 @@ void Threshold::findGoals(int column, int topEdge) {
             bad++;
         }
     }
-#endif
     // now do the same going down from the horizon
     bad = 0;
     for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
         // note:  These were thresholded in the findBallsCrosses loop
         unsigned char pixel = getThresholded(j,column);
-#ifdef SOFTCOLORS
-        switch (pixel) {
-        case BLUE:
-            firstBlue = j;
-            blues++;
-            break;
-        case YELLOW:
-            firstYellow = j;
-            yellows++;
-            break;
-        case BLUEGREEN:
-            break;
-        case GREEN:
-            bad += 2;
-            break;
-        case RED:
-        case NAVY:
-            robots++;
-            break;
-        default:
-            bad++;
-        }
-#else
         bool found = false;
         if (isBlue(pixel)) {
             firstBlue = j;
@@ -414,7 +322,6 @@ void Threshold::findGoals(int column, int topEdge) {
         if (!found) {
             bad++;
         }
-#endif
     }
     if (blues > 10) {
         blue->newRun(column, lastBlue, firstBlue - lastBlue);
@@ -453,83 +360,10 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
     }
     // scan down the column looking for ORANGE and WHITE
     for (int j = bound; j >= topEdge; j--) {
-#ifdef USE_EDGES
-        thresholded[j][column] = getColor(column, j);
-#endif
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
         // for simplicity treat ORANGERED as ORANGE - we'll look
         // more carefully when we check whether or not it is a ball
-#ifdef SOFTCOLORS
-        if (pixel == ORANGERED) {
-            pixel = ORANGE;
-        }
-        // check thresholded point with last thresholded point.
-        // if the same, increment the current run
-        if (lastPixel == pixel) {
-            currentRun++;
-        }
-        // otherwise, do stuff according to color
-        if (lastPixel != pixel || j == topEdge) { // end of column
-            // switch for last thresholded pixel
-            switch (lastPixel) {
-            case ORANGE:
-                // add to Ball data structure
-                if (j == topEdge) {
-                    while (j > 0 && getThresholded(j,column) == ORANGE) {
-                        currentRun++;
-                        j--;
-                    }
-                }
-                if (currentRun > 2) {
-                    orange->newRun(column, j, currentRun);
-                }
-                greens += currentRun;
-                break;
-            case WHITE:
-                // add to the cross data structure
-                if (currentRun > 2) {
-                    cross->newRun(column, j, currentRun);
-                }
-                break;
-            case GREY:
-                if (currentRun > greys) {
-                    greys+= currentRun;
-                }
-                if (currentRun > 15 && shoot[column]) {
-                    evidence[column / divider]++;
-                    if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = j + currentRun;
-                    }
-                    shoot[column] = false;
-                    if (debugShot) {
-                        drawPoint(column, j + currentRun, MAROON);
-                    }
-                }
-                break;
-            case GREEN:
-                greens+= currentRun;
-                lastGood = j;
-                break;
-            case NAVY:
-            case RED:
-                robots+= currentRun;
-                if (robots > 5 && shoot[column]) {
-                    evidence[column / divider]++;
-                    if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = j + currentRun;
-                    }
-                    shoot[column] = false;
-                    if (debugShot) {
-                        drawPoint(column, j + currentRun, MAROON);
-                    }
-                }
-                break;
-            }
-            // since this loop runs when a run ends, restart # pixels in run counter
-            currentRun = 1;
-        }
-#else
         // check thresholded point with last thresholded point.
         // if the same, increment the current run
         if (lastPixel == pixel) {
@@ -606,18 +440,14 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             // since this loop runs when a run ends, restart # pixels in run counter
             currentRun = 1;
         }
-#endif
         lastPixel = pixel;
         if (isOrange(pixel)) {
-            int lastu = getU(column, j);
-            int initu = lastu;
-            while (j >= topEdge && abs(getU(column, j) - lastu) < 8 &&
-                   abs(initu - lastu) < 12) {
+            int lastv = getV(column, j);
+            int initv = lastv;
+            while (j >= topEdge && abs(getV(column, j) - lastv) < 8 &&
+                   abs(initv - lastv) < 12) {
                 currentRun++;
                 j--;
-#ifdef USE_EDGES
-                thresholded[j][column] = getColor(column, j);
-#endif
             }
 
             currentRun--;
@@ -1833,19 +1663,27 @@ const char* Threshold::getShortColor(int _id) {
     }
 }
 
+/* Get the Y channel for a given point.
+   @param   j    the y value
+   @param i      the x value
+   @return       the Y value at point j, i
+ */
 int Threshold::getY(int j, int i) const {
     return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
 }
 
 
-// These two are backwards, because our constants are backwards in
-// VisionDef.h. The real order is |U|V|U|V|, not |V|U|V|U|
-//
-// @TODO Fix these... (need to fix color tables first)
-int Threshold::getU(int x, int y) const {
+/* Get the V channel information for a given point in the image.
+   This is used to help identify the Ball which shows up well
+   in the V channel.
+ */
+int Threshold::getV(int x, int y) const {
     return static_cast<int>(vision->uvImg[y*IMAGE_WIDTH*2 + x*2 + 1]);
 }
 
-int Threshold::getV(int j, int i) const {
+/* Get the U channel information for a given point.  This has the
+   potential to help id post edges. We don't currently use it though.
+ */
+int Threshold::getU(int j, int i) const {
     return static_cast<int>(vision->uvImg[i*IMAGE_WIDTH*2 + j*2]);
 }

@@ -111,10 +111,8 @@ static const float RAD_TO_PIX_X = static_cast<float>(IMAGE_WIDTH) / static_cast<
  */
 
 // Image byte layout constants
-// @TODO: THESE ARE WRONG! The correct order is |Y|U|Y|V|,
-// color tables need fixing then, too
-#define UOFFSET  3
-#define VOFFSET  1
+#define UOFFSET  1
+#define VOFFSET  3
 #define YOFFSET1 0
 #define YOFFSET2 2
 

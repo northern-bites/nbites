@@ -405,15 +405,15 @@ void Ball::setOcclusionInformation() {
 
 /* From a given coordinate scan out in a given direction until the apparent
    edge of the ball is found.  We check for the edge using the difference
-   in the U dimension.
+   in the V dimension.
    @param x        x coord
    @param y        y coord
    @param dir      direction of scanning (1 or -1)
    @return         x value of the edge
  */
 int Ball::findBallEdgeX(int x, int y, int dir) {
-    int lastu = thresh->getU(x,y);
-    int midu = lastu;
+    int lastv = thresh->getV(x,y);
+    int midv = lastv;
     int newx = x;
     int changex = topBlob->getLeft();
     if (dir > 0) {
@@ -424,12 +424,12 @@ int Ball::findBallEdgeX(int x, int y, int dir) {
         if (y + i >= 0 && y + i < IMAGE_HEIGHT) {
             for (bool done = false; !done && newx >= 0 && newx < IMAGE_WIDTH;
                  newx+=dir) {
-                int newu = thresh->getU(newx, y + i);
-                if (abs(newu - lastu) > EDGEMISMATCH
-                    || abs(newu - midu) > EDGECENTERMISMATCH) {
+                int newv = thresh->getV(newx, y + i);
+                if (abs(newv - lastv) > EDGEMISMATCH
+                    || abs(newv - midv) > EDGECENTERMISMATCH) {
                     done = true;
                 }
-                lastu = newu;
+                lastv = newv;
             }
             if (dir < 0) {
                 if (newx + dir < changex) {
@@ -447,15 +447,15 @@ int Ball::findBallEdgeX(int x, int y, int dir) {
 
 /* From a given coordinate scan out in a given direction until the apparent
    edge of the ball is found.  We check for the edge using the difference
-   in the U dimension.
+   in the V dimension.
    @param x        x coord
    @param y        y coord
    @param dir      direction of scanning (1 or -1)
    @return         y value of the edge
  */
 int Ball::findBallEdgeY(int x, int y, int dir) {
-    int lastu = thresh->getU(x,y);
-    int midu = lastu;
+    int lastv = thresh->getV(x,y);
+    int midv = lastv;
     int newy = y;
     int changey = topBlob->getTop();
     if (dir > 0) {
@@ -466,12 +466,12 @@ int Ball::findBallEdgeY(int x, int y, int dir) {
         if (x + i >= 0 && x + i < IMAGE_WIDTH) {
             for (bool done = false; !done && newy >= 0 && newy < IMAGE_HEIGHT;
                  newy+=dir) {
-                int newu = thresh->getU(x + i,newy);
-                if (abs(newu - lastu) > EDGEMISMATCH
-                    || abs(newu - midu) > EDGECENTERMISMATCH) {
+                int newv = thresh->getV(x + i,newy);
+                if (abs(newv - lastv) > EDGEMISMATCH
+                    || abs(newv - midv) > EDGECENTERMISMATCH) {
                     done = true;
                 }
-                lastu = newu;
+                lastv = newv;
             }
             if (dir < 0) {
                 if (newy + dir < changey) {
