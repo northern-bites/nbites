@@ -308,6 +308,53 @@ void Vision::drawCenters() {
 
 } // drawCenters
 
+/**
+ * Draw a rectangle in the debugging image.
+ *
+ * @param left     x value of left edge
+ * @param right    x value of right edge
+ * @param bottom   y value of bottom
+ * @param top      y value of top
+ * @param c        the color we'd like to draw
+ */
+void Vision::drawRect(int left, int top, int width, int height, int c) {
+#ifdef OFFLINE
+    if (left < 0) {
+        width += left;
+        left = 0;
+    }
+    if (top < 0) {
+        height += top;
+        top = 0;
+    }
+
+    for (int i = left; i < left + width; i++) {
+        if (top >= 0 && top < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
+            debugImage[top][i] = static_cast<unsigned char>(c);
+        }
+        if ((top + height) >= 0 &&
+                (top + height) < IMAGE_HEIGHT &&
+                i >= 0 &&
+                i < IMAGE_WIDTH) {
+            debugImage[top + height][i] = static_cast<unsigned char>(c);
+        }
+    }
+    for (int i = top; i < top + height; i++) {
+        if (i >= 0 &&
+                i < IMAGE_HEIGHT &&
+                left >= 0 &&
+                left < IMAGE_WIDTH) {
+            debugImage[i][left] = static_cast<unsigned char>(c);
+        }
+        if (i >= 0 &&
+                i < IMAGE_HEIGHT &&
+                (left+width) >= 0 &&
+                (left+width) < IMAGE_WIDTH) {
+            debugImage[i][left + width] = static_cast<unsigned char>(c);
+        }
+    }
+#endif
+}
 
 /* drawRect()
    --helper method for drawing rectangles on the thresholded array
@@ -317,6 +364,7 @@ void Vision::drawCenters() {
    and lastly the color of the rectangle you want to use.
    --the rectangle drawn is a non-filled box.
 */
+/*
 void Vision::drawRect(int left, int top, int width, int height, int c) {
     if (left < 0) {
         width += left;
@@ -392,6 +440,7 @@ void Vision::drawRect(int left, int top, int width, int height, int c) {
     }
 #endif
 } // drawRect
+*/
 
 /**
  * Draw a line at the specified coordinates on the debugging
