@@ -551,8 +551,8 @@ void Threshold::setOpenFieldInformation() {
         int chunk = IMAGE_WIDTH / NUMBLOCKS, start = 0;
         for (int i = 0; i < NUMBLOCKS; i++) {
             if (block[i] > 0) {
-                drawLine(start, block[i], start + chunk, block[i], MAROON);
-                drawLine(start, block[i]+1, start + chunk, block[i]+1, MAROON);
+                vision->drawLine(start, block[i], start + chunk, block[i], MAROON);
+                vision->drawLine(start, block[i]+1, start + chunk, block[i]+1, MAROON);
             }
             start += chunk;
         }
@@ -600,8 +600,8 @@ void Threshold::setShot(VisualCrossbar* one) {
     } else {
         one->setShoot(true);
         if (debugShot) {
-            drawLine(r1, ly, r1, IMAGE_HEIGHT - 1, RED);
-            drawLine(r2, ly, r2, IMAGE_HEIGHT - 1, RED);
+            vision->drawLine(r1, ly, r1, IMAGE_HEIGHT - 1, RED);
+            vision->drawLine(r2, ly, r2, IMAGE_HEIGHT - 1, RED);
         }
     }
     one->setBackLeft(r1);
@@ -1585,65 +1585,9 @@ void Threshold::drawRect(int left, int top, int width, int height, int c) {
 #endif
 } // drawRect
 
-void Threshold::drawLine(const point<int> start, const point<int> end,
-                         const int color) {
-    drawLine(start.x, start.y, end.x, end.y, color);
-}
-
-/* Draw a line in the fake image.
- * @param x       start x
- * @param y       start y
- * @param x1      finish x
- * @param y1      finish y
- * @param c       color we'd like to draw
- */
-void Threshold::drawLine(int x, int y, int x1, int y1, int c) {
-
-#ifdef OFFLINE
-    float slope = static_cast<float>(y - y1) / static_cast<float>(x - x1);
-    int sign = 1;
-    if ((abs(y - y1)) > (abs(x - x1))) {
-        slope = 1.0f / slope;
-        if (y > y1)  {
-            sign = -1;
-        }
-        for (int i = y; i != y1; i += sign) {
-            int newx = x +
-                    static_cast<int>(slope * static_cast<float>(i - y) );
-
-            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT) {
-                debugImage[i][newx] = static_cast<unsigned char>(c);
-            }
-        }
-    } else if (slope != 0) {
-        //slope = 1.0 / slope;
-        if (x > x1) {
-            sign = -1;
-        }
-        for (int i = x; i != x1; i += sign) {
-            int newy = y +
-                    static_cast<int>(slope * static_cast<float>(i - x) );
-
-            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                debugImage[newy][i] = static_cast<unsigned char>(c);
-            }
-        }
-    }
-    else if (slope == 0) {
-        int startX = min(x, x1);
-        int endX = max(x, x1);
-        for (int i = startX; i <= endX; i++) {
-            if (y >= 0 && y < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                debugImage[y][i] = static_cast<unsigned char>(c);
-            }
-        }
-    }
-#endif
-}
-
 // Draws the visual horizon on the image
 void Threshold::drawVisualHorizon() {
-    drawLine(0, horizon, IMAGE_WIDTH, horizon, VISUAL_HORIZON_COLOR);
+    vision->drawLine(0, horizon, IMAGE_WIDTH, horizon, VISUAL_HORIZON_COLOR);
 }
 
 const char* Threshold::getShortColor(int _id) {

@@ -3533,9 +3533,9 @@ int FieldLines::numPixelsToHitColor(const int x, const int y, const int color,
 void FieldLines::drawBox(BoundingBox box, int color) const
 {
     for (int i = 0; i < 4; ++i) {
-        vision->thresh->drawLine(box.corners[i].x, box.corners[i].y,
-                                 box.corners[(i+1)%4].x, box.corners[(i+1)%4].y,
-                                 color);
+        vision->drawLine(box.corners[i].x, box.corners[i].y,
+			 box.corners[(i+1)%4].x, box.corners[(i+1)%4].y,
+			 color);
     }
 }
 
@@ -4467,10 +4467,10 @@ const float FieldLines::percentColor(const int x, const int y,
 void
 FieldLines::drawFieldLine(shared_ptr<VisualLine> toDraw, const int color) const
 {
-    vision->thresh->drawLine(toDraw->getStartpoint().x,
-							 toDraw->getStartpoint().y,
-                             toDraw->getEndpoint().x,
-							 toDraw->getEndpoint().y, color);
+    vision->drawLine(toDraw->getStartpoint().x,
+		     toDraw->getStartpoint().y,
+		     toDraw->getEndpoint().x,
+		     toDraw->getEndpoint().y, color);
 }
 
 void FieldLines::drawLinePoint(const linePoint &p, const int color) const

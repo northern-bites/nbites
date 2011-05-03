@@ -152,8 +152,8 @@ void Field::findTopEdges(int M) {
 			}
 		}
 		if (debugFieldEdge) {
-			thresh->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x,
-                             convex[i].y, ORANGE);
+			vision->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x,
+					 convex[i].y, ORANGE);
 		}
 	}
 	// calculate the distance to the edge of the field at three key points
@@ -369,7 +369,7 @@ int Field::getImprovedEstimate(int horizon) {
 					cout << "Found horizon " << k << " " << run << " "
 							<< greenPixels << endl;
 					vision->drawPoint(100, k + 1, BLACK);
-					thresh->drawLine(minpix, minpixrow, firstpix, k + 2, RED);
+					vision->drawLine(minpix, minpixrow, firstpix, k + 2, RED);
 				}
 				horizon = k + 2;
 				return horizon;
@@ -526,10 +526,10 @@ void Field::drawLess(int x, int y, int c)
 	const int lineBuff = 10;
 
 #ifdef OFFLINE
-	thresh->drawLine(x, y, x + lineBuff, y - lineBuff, c);
-	thresh->drawLine(x, y, x + lineBuff, y + lineBuff, c);
-	thresh->drawLine(x + 1, y, x + lineBuff + 1, y - lineBuff, c);
-	thresh->drawLine(x + 1, y, x + lineBuff + 1, y + lineBuff, c);
+	vision->drawLine(x, y, x + lineBuff, y - lineBuff, c);
+	vision->drawLine(x, y, x + lineBuff, y + lineBuff, c);
+	vision->drawLine(x + 1, y, x + lineBuff + 1, y - lineBuff, c);
+	vision->drawLine(x + 1, y, x + lineBuff + 1, y + lineBuff, c);
 #endif
 }
 
@@ -538,9 +538,9 @@ void Field::drawMore(int x, int y, int c)
 	const int lineBuff = 10;
 
 #ifdef OFFLINE
-	thresh->drawLine(x, y, x - lineBuff, y - lineBuff, c);
-	thresh->drawLine(x, y, x - lineBuff, y + lineBuff, c);
-	thresh->drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);
-    thresh->drawLine(x - 1, y, x - lineBuff - 1, y + lineBuff, c);
+	vision->drawLine(x, y, x - lineBuff, y - lineBuff, c);
+	vision->drawLine(x, y, x - lineBuff, y + lineBuff, c);
+	vision->drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);
+	vision->drawLine(x - 1, y, x - lineBuff - 1, y + lineBuff, c);
 #endif
 }

@@ -386,81 +386,64 @@ void Vision::drawRect(int left, int top, int width, int height, int c) {
 #endif
 } // drawRect
 
-/* drawLine()
-   --helper visualization method for drawing a line given two points and a color
-*/
+/* Draw a line in the fake image.
+ * @param x       start x
+ * @param y       start y
+ * @param x1      finish x
+ * @param y1      finish y
+ * @param c       color we'd like to draw
+ */
 void Vision::drawLine(int x, int y, int x1, int y1, int c) {
-    float slope = (float)(y - y1) / (float)(x - x1);
+
+#ifdef OFFLINE
+    float slope = static_cast<float>(y - y1) / static_cast<float>(x - x1);
     int sign = 1;
     if ((abs(y - y1)) > (abs(x - x1))) {
         slope = 1.0f / slope;
-        if (y > y1) sign = -1;
+        if (y > y1)  {
+            sign = -1;
+        }
         for (int i = y; i != y1; i += sign) {
-            int newx = x + static_cast<int>(slope * static_cast<float>(i - y) );
-            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT)
-                thresh->setThresholded(i,newx, static_cast<unsigned char>(c));
+            int newx = x +
+                    static_cast<int>(slope * static_cast<float>(i - y) );
+
+            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT) {
+                thresh->debugImage[i][newx] = static_cast<unsigned char>(c);
+            }
         }
     } else if (slope != 0) {
         //slope = 1.0 / slope;
-        if (x > x1) sign = -1;
-        for (int i = x; i != x1; i += sign) {
-            int newy = y + static_cast<int>(slope * static_cast<float>(i - x));
-            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH)
-                thresh->setThresholded(newy,i, static_cast<unsigned char>(c));
+        if (x > x1) {
+            sign = -1;
         }
-    }
-    else if (slope == 0) {
-        int startX = min(x, x1);
-        int endX = max(x, x1);
-        for (int i = startX; i <= endX; i++) {
-            if (y >= 0 && y < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                thresh->setThresholded(y,i, static_cast<unsigned char>(c));
+        for (int i = x; i != x1; i += sign) {
+            int newy = y +
+                    static_cast<int>(slope * static_cast<float>(i - x) );
+
+            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
+                thresh->debugImage[newy][i] = static_cast<unsigned char>(c);
             }
         }
     }
-/*
-    // This code is supposed to, I guess, make the line thicker since the Nao's
-    // image was 640x480 at some point and you couldn't see the drawing
-    // but it's not done well. if you look closely it looks like two blue
-    // lines are drawn next to each other but it's clearly not one solid line
-#if ROBOT(NAO)
-    y--;
-    y1--;
-    x--;
-    x1--;
-    if ((abs(y - y1)) > (abs(x - x1))) {
-        slope = 1.0 / slope;
-        if (y > y1) sign = -1;
-        for (int i = y; i != y1; i += sign) {
-            int newx = x + (int)(slope * (i - y));
-            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT)
-                thresh->thresholded[i][newx] = c;
-        }
-    } else if (slope != 0) {
-        //slope = 1.0 / slope;
-        if (x > x1) sign = -1;
-        for (int i = x; i != x1; i += sign) {
-            int newy = y + (int)(slope * (i - x));
-            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH)
-                thresh->thresholded[newy][i] = c;
-        }
-    }
     else if (slope == 0) {
         int startX = min(x, x1);
         int endX = max(x, x1);
         for (int i = startX; i <= endX; i++) {
             if (y >= 0 && y < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                thresh->thresholded[y][i] = c;
+                thresh->debugImage[y][i] = static_cast<unsigned char>(c);
             }
         }
     }
 #endif
-*/
 }
 
 // Convenience method to draw a VisualLine to the screen.
 void Vision::drawLine(boost::shared_ptr<VisualLine> line, const int color) {
     drawLine(line->getStartpoint().x, line->getStartpoint().y, line->getEndpoint().x, line->getEndpoint().y, color);
+}
+
+void Vision::drawLine(const point<int> start, const point<int> end, const int c) {
+    drawLine(start.x, start.y, end.x, end.y, c);
 }
 
 /* drawVerticalLine()

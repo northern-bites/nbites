@@ -91,6 +91,8 @@ public:
     void drawRect(int left, int top, int width, int height, int c);
     void drawLine(int x, int y, int x1, int y1, int c);
     void drawLine(boost::shared_ptr<VisualLine> line, const int color);
+    void drawLine(const point<int> start, const point<int> end,
+		  const int c);
     void drawVerticalLine(int x, int c);
     void drawHorizontalLine(int x, int c);
     void drawDot(int x, int y, int c);
