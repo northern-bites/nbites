@@ -547,7 +547,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
     int qy = yProject(left.x, right.y, qx);
     stop scan;
 
-    //thresh->drawPoint(left.x, left.y, BLUE);
+    //drawPoint(left.x, left.y, BLUE);
     // scan out a 1/4 of the way to the right the edge
     for (int i = 0; i < NUMSCANS; i++) {
         vertScan(qx, qy, dir, 4, c, c2, scan);
@@ -2460,7 +2460,7 @@ void ObjectFragments::drawRun(const run& run, int c) {
  */
 void ObjectFragments::drawPoint(int x, int y, int c) {
 #ifdef OFFLINE
-    thresh->drawPoint(x, y, c);
+    drawPoint(x, y, c);
 #endif
 }
 

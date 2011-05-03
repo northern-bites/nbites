@@ -97,6 +97,8 @@ public:
     virtual void drawDot(int x, int y, int c);
     virtual void drawCrossHairs(int x, int y, int c);
     virtual void drawFieldLines();
+    virtual void drawX(int x, int y, int c);
+    virtual void drawPoint(int x, int y, int c);
 
 
     //

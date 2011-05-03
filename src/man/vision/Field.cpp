@@ -145,9 +145,9 @@ void Field::findTopEdges(int M) {
 			topEdge[j] = (int)cur;
 			if (debugFieldEdge) {
 				if (j < convex[i].x - 2) {
-					thresh->drawPoint(j, (int)cur, BLACK);
+					vision->drawPoint(j, (int)cur, BLACK);
 				} else {
-					thresh->drawPoint(j, (int)cur, RED);
+					vision->drawPoint(j, (int)cur, RED);
 				}
 			}
 		}
@@ -317,7 +317,7 @@ int Field::getImprovedEstimate(int horizon) {
                  IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE &&
                  greenPixels < MIN_PIXELS_PRECISE; l+=3) {
 			if (debugHorizon) {
-				thresh->drawPoint(l, scanY, BLACK);
+				vision->drawPoint(l, scanY, BLACK);
 			}
 			int newPixel = thresh->getColor(l, scanY);
 			//int newPixel = thresh->thresholded[scanY][l];
@@ -353,7 +353,7 @@ int Field::getImprovedEstimate(int horizon) {
 					scanY = IMAGE_HEIGHT;
 				}
 				if (debugHorizon) {
-					thresh->drawPoint(j, scanY, BLACK);
+					vision->drawPoint(j, scanY, BLACK);
 				}
 				pixel = thresh->getColor(j, scanY);
 				if (pixel == GREEN) {
@@ -368,7 +368,7 @@ int Field::getImprovedEstimate(int horizon) {
 				if (debugHorizon) {
 					cout << "Found horizon " << k << " " << run << " "
 							<< greenPixels << endl;
-					thresh->drawPoint(100, k + 1, BLACK);
+					vision->drawPoint(100, k + 1, BLACK);
 					thresh->drawLine(minpix, minpixrow, firstpix, k + 2, RED);
 				}
 				horizon = k + 2;

@@ -207,7 +207,7 @@ void Vision::drawBoxes(void)
              BLUE);
 
     // vision horizon line
-    thresh->drawPoint(IMAGE_WIDTH/2, thresh->getVisionHorizon(), RED);
+    drawPoint(IMAGE_WIDTH/2, thresh->getVisionHorizon(), RED);
 
 } // drawBoxes
 
@@ -296,7 +296,7 @@ void Vision::drawCenters() {
     if (ball->getCenterX() >= 2 && ball->getCenterY() >= 2
         && ball->getCenterX() <= (IMAGE_WIDTH-2)
         && ball->getCenterY() <= (IMAGE_HEIGHT-2)) {
-        thresh->drawPoint(ball->getCenterX(), ball->getCenterY(), YELLOW);
+        drawPoint(ball->getCenterX(), ball->getCenterY(), YELLOW);
     }
 
 } // drawCenters
@@ -500,7 +500,7 @@ void Vision::drawCrossHairs(int x, int y, int c) {
 /* drawVerticalLine()
    --helper method to visualize a single point on the screen given a x-value
    --given a color as well
-   --use thresh->drawPoint() if you really want to see the point well.
+   --use drawPoint() if you really want to see the point well.
 */
 void Vision::drawDot(int x, int y, int c) {
     if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
@@ -521,11 +521,11 @@ void Vision::drawFieldLines() {
              j != points.end(); j++) {
             // Vertically found = black
             if (j->foundWithScan == VERTICAL) {
-                thresh->drawPoint(j->x, j->y, BLACK);
+                drawPoint(j->x, j->y, BLACK);
             }
             // Horizontally found = red
             else {
-                thresh->drawPoint(j->x, j->y, RED);
+                drawPoint(j->x, j->y, RED);
             }
         }
     }
@@ -535,17 +535,69 @@ void Vision::drawFieldLines() {
          i != unusedPoints->end(); i++) {
         // Unused vertical = PINK
         if (i->foundWithScan == VERTICAL) {
-            thresh->drawPoint(i->x, i->y, PINK);
+            drawPoint(i->x, i->y, PINK);
         }
         // Unused horizontal = Yellow
         else {
-            thresh->drawPoint(i->x, i->y, YELLOW);
+            drawPoint(i->x, i->y, YELLOW);
         }
     }
 
     const list <VisualCorner>* corners = fieldLines->getCorners();
     for (list <VisualCorner>::const_iterator i = corners->begin();
          i != corners->end(); i++) {
-        thresh->drawPoint(i->getX(), i->getY(), ORANGE);
+        drawPoint(i->getX(), i->getY(), ORANGE);
     }
+}
+
+// Prerequisite - point is within bounds of screen
+void Vision::drawX(int x, int y, int c) {
+
+#ifdef OFFLINE
+    // Mid point
+    thresh->debugImage[y-2][x-2] = static_cast<unsigned char>(c);
+    thresh->debugImage[y-1][x-1] = static_cast<unsigned char>(c);
+    thresh->debugImage[y][x] = static_cast<unsigned char>(c);
+    thresh->debugImage[y+1][x+1] = static_cast<unsigned char>(c);
+    thresh->debugImage[y+2][x+2] = static_cast<unsigned char>(c);
+
+    thresh->debugImage[y-2][x+2] = static_cast<unsigned char>(c);
+    thresh->debugImage[y-1][x+1] = static_cast<unsigned char>(c);
+
+    thresh->debugImage[y+1][x-1] = static_cast<unsigned char>(c);
+    thresh->debugImage[y+2][x-2] = static_cast<unsigned char>(c);
+#endif
+
+}
+
+/* drawPoint()
+ * Draws a crosshair or a 'point' on the fake image at some given x, y, and with
+ * a given color.
+ * @param x       center of the point
+ * @param y       center y value
+ * @param c       color to draw
+ */
+void Vision::drawPoint(int x, int y, int c) {
+
+#ifdef OFFLINE
+    if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x] = static_cast<unsigned char>(c);
+    }if (y+1 > 0 && x > 0 && y+1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y+1][x] = static_cast<unsigned char>(c);
+    }if (y+2 > 0 && x > 0 && y+2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y+2][x] = static_cast<unsigned char>(c);
+    }if (y-1 > 0 && x > 0 && y-1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y-1][x] = static_cast<unsigned char>(c);
+    }if (y-2 > 0 && x > 0 && y-2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y-2][x] = static_cast<unsigned char>(c);
+    }if (y > 0 && x+1 > 0 && y < (IMAGE_HEIGHT) && x+1 < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x+1] = static_cast<unsigned char>(c);
+    }if (y > 0 && x+2 > 0 && y < (IMAGE_HEIGHT) && x+2 < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x+2] = static_cast<unsigned char>(c);
+    }if (y > 0 && x-1 > 0 && y < (IMAGE_HEIGHT) && x-1 < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x-1] = static_cast<unsigned char>(c);
+    }if (y > 0 && x-2 > 0 && y < (IMAGE_HEIGHT) && x-2 < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x-2] = static_cast<unsigned char>(c);
+    }
+#endif
 }

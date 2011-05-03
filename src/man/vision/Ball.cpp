@@ -1153,7 +1153,7 @@ void Ball::drawRun(const run& run, int c) {
  */
 void Ball::drawPoint(int x, int y, int c) {
 #ifdef OFFLINE
-	thresh->drawPoint(x, y, c);
+	vision->drawPoint(x, y, c);
 #endif
 }
 
