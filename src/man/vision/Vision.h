@@ -93,10 +93,7 @@ public:
     void drawLine(boost::shared_ptr<VisualLine> line, const int color);
     void drawLine(const point<int> start, const point<int> end,
 		  const int c);
-    void drawVerticalLine(int x, int c);
-    void drawHorizontalLine(int x, int c);
     void drawDot(int x, int y, int c);
-    void drawCrossHairs(int x, int y, int c);
     void drawFieldLines();
     void drawX(int x, int y, int c);
     void drawPoint(int x, int y, int c);

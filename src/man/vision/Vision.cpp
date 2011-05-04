@@ -419,45 +419,6 @@ void Vision::drawLine(const point<int> start, const point<int> end, const int c)
     drawLine(start.x, start.y, end.x, end.y, c);
 }
 
-/* drawVerticalLine()
-   --helper method to visualize a vertical line on the screen given a x-value
-   --given a color as well
-*/
-void Vision::drawVerticalLine(int x, int c) {
-    if (x >= 0 && x < IMAGE_WIDTH) {
-        for (int i = 0; i < IMAGE_HEIGHT; i++) {
-            thresh->setThresholded(i,x, static_cast<unsigned char>(c));
-        }
-    }
-}
-
-/* drawHorizontalLine()
-   --helper method to visualize a vertical line on the screen given a x-value
-   --given a color as well
-*/
-void Vision::drawHorizontalLine(int y, int c) {
-    if (y >= 0 && y < IMAGE_HEIGHT) {
-        for (int i = 0; i < IMAGE_WIDTH; i++) {
-            thresh->setThresholded(y,i, static_cast<unsigned char>(c));
-            if (y + 1 < IMAGE_HEIGHT - 1) {
-                thresh->setThresholded(y+1,i, static_cast<unsigned char>(c));
-            }
-        }
-    }
-}
-
-// Draws gigantic lines across the screen centered on one x,y coordinate
-void Vision::drawCrossHairs(int x, int y, int c) {
-    drawHorizontalLine(y,c);
-    drawVerticalLine(x,c);
-}
-
-
-/* drawVerticalLine()
-   --helper method to visualize a single point on the screen given a x-value
-   --given a color as well
-   --use drawPoint() if you really want to see the point well.
-*/
 void Vision::drawDot(int x, int y, int c) {
     if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
         thresh->setThresholded(y,x, static_cast<unsigned char>(c));
