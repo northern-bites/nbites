@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # This file is part of Man, a robotic perception, locomotion, and
 # team strategy application created by the Northern Bites RoboCup
 # team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -43,7 +44,7 @@ geometric_search = PSO.Swarm(geometric_particles, geometric_dimensions,
 thisIteration = 0
 bestFoundScore = -float(1e3000)
 
-print "Looking for point 4,4,4 "
+print "Looking for point 25,25,25 "
 
 while (geometric_search.getIterations() < 100):
     currentParticle = geometric_search.getCurrentParticle()

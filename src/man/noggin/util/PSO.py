@@ -29,9 +29,10 @@ from math import (fabs,
 from MyMath import clip
 
 DEBUG = False # shuts on/off all debug statements
-DEBUG_POSITION = True
-DEBUG_PROGRESS = True
-DEBUG_REGROUPING = True
+DEBUG_POSITION = False
+DEBUG_PROGRESS = False
+DEBUG_REGROUPING = False
+DEBUG_REGROUPING_VERBOSE = False
 
 RANDOMIZE_LOST_PARTICLES = True
 
@@ -94,7 +95,7 @@ class Particle:
         #self.setHeuristic(-(x**2 - y**2))
         # parabaloid
         #self.setHeuristic(-(x**2 + y**2))
-        # rastigirin's non-continuous (run x,y on [-5,5]) << THIS ONE IS HARD
+        # rastigirin's non-continuous (run x,y on [-5,5]) << THIS ONE IS HARDo
         #
         #rastigirins = 20 + x**2 + y**2 - 10*(cos(2*pi*x)+ cos(2*pi*y))
         #self.setHeuristic(-rastigirins)
@@ -281,7 +282,7 @@ class Swarm:
 
     def regroupSwarm(self):
         '''
-        Saves our current gBest & gBest_position,  and then
+        Saves our current gBest & gBest_position, and then
         randomizes particles around it, to allow for search to
         continue after the swarm has converged
 
@@ -300,6 +301,18 @@ class Swarm:
         previous gBest, but this is fine.
 
         See (Evers, G. 2009) or look up RegPSO for more details
+
+        The algorithm is pulled into two helper methods to keep me sane
+        '''
+        # update various swarm parameters after they've been calculated
+        (self.currSearchMins, self.currSearchMaxs) = self.calculateRegroupedRange()
+
+        self.redistributeParticles()
+
+    def calculateRegroupedRange(self):
+        '''
+        Does the range calculations as described in regroupSwarm
+        @return (newMins, newMaxs) in a tuple
         '''
         newMins = [0]*self.nSpace
         newMaxs = [0]*self.nSpace
@@ -320,7 +333,7 @@ class Swarm:
             initial_range_i = self.initialSearchMaxs[i] - self.initialSearchMins[i]
             new_range_i = min(initial_range_i, uncertainty*REGROUP_FACTOR)
 
-            if DEBUG and DEBUG_REGROUPING:
+            if DEBUG and DEBUG_REGROUPING_VERBOSE:
                 print "old range %s" % initial_range_i
                 print "new_range_i %s" % new_range_i
                 print "uncertainty %s" % uncertainty
@@ -330,34 +343,37 @@ class Swarm:
             newMins[i] = self.gBest_position[i] - .5*new_range_i
             newMaxs[i] = self.gBest_position[i] + .5*new_range_i
 
-        # randomly spread particles within the new range
+        if DEBUG and DEBUG_REGROUPING:
+            print "range mins"
+            print self.initialSearchMins
+            print newMins
+            print "range maxs"
+            print self.initialSearchMaxs
+            print newMaxs
+
+        return (newMins, newMaxs)
+
+    def redistributeParticles(self):
+        '''
+        Randomly spreads particles around gBest and on the new ranges,
+        as described in regroupSwarm
+        '''
         for p in self.particles:
             newPosition = [0]*self.nSpace
 
             for i in range(0, self.nSpace):
                 R_i = random.random()
-                range_i = newMaxs[i] - newMins[i]
+                range_i = self.currSearchMaxs[i] - self.currSearchMins[i]
 
+                # randomly distributed around gBest, at radius of half the new range
                 newPosition[i] = self.gBest_position[i] \
                     + R_i*range_i \
                     - 0.5*range_i
 
+            # now tell the particle where to go, and zero its initial velocity
             p.setPosition(newPosition)
-            p.setBounds(newMins, newMaxs)
+            p.setBounds(self.currSearchMins, self.currSearchMaxs)
             p.zeroVelocity()
-
-        if DEBUG and DEBUG_REGROUPING:
-            print "range mins"
-            print self.initialSearchMins
-            print newMins
-
-            print "range maxs"
-            print self.initialSearchMaxs
-            print newMaxs
-
-        # update various swarm parameters
-        self.currSearchMins = newMins
-        self.currSearchMaxs = newMaxs
 
     def tickCurrentParticle(self):
         '''
