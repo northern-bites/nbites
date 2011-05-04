@@ -22,18 +22,19 @@
 # @author Nathan Merritt
 # @date April 2011
 
+# @see PSO::Particle::tick() for several benchmark functions
+
 import PSO as PSO
 from MyMath import distance3d
 
-#@todo set up ladder function test case as in:
-# http://users.softlab.ece.ntua.gr/~ttsiod/ladders.html
-
 # a simple 3d geometric search example
 # the heuristic for each particle is the inverse of distance from DESTINATION
+# verdict: works pretty well, runs into some trouble due to the distance function
+# did help me debug the PSO though
 
-DESTINATION = (4, 4, 4)
+DESTINATION = (25, 25, 25)
 geometric_mins = (0, 0, 0)
-geometric_maxs = (50, 50, 0)
+geometric_maxs = (50, 50, 50)
 geometric_dimensions = 3
 geometric_particles = 20
 
@@ -51,10 +52,6 @@ while (geometric_search.getIterations() < 100):
 
     currentParticle.setHeuristic(-distanceFromTarget) # since heuristic is maximized
 
-    #print "set heuristic "
-    #print -distanceFromTarget
-    #print "\n"
-
     geometric_search.tickCurrentParticle()
 
     if geometric_search.getIterations() > thisIteration:
@@ -65,3 +62,6 @@ while (geometric_search.getIterations() < 100):
             (best_loc, best_score) = geometric_search.getBestSolution()
             print "Best solution after " + str(thisIteration) + " is: " \
                 + str(best_loc) + " with score " + str(best_score)
+
+
+

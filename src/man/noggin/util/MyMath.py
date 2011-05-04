@@ -87,7 +87,7 @@ def distanceNd(ptA, ptB):
     differences = 0
 
     for i in range(0, dimensionality):
-        differences += (ptA[i] - ptB[i])**2
+        differences += pow((ptA[i] - ptB[i]), 2)
 
     return sqrt(differences)
 

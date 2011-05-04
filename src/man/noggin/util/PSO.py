@@ -23,30 +23,32 @@
 
 import random
 from math import (fabs,
-                  sqrt)
+                  sqrt,
+                  cos,
+                  pi)
 from MyMath import clip
 
-DEBUG = True # shuts off all debug statements
-DEBUG_POSITION = False
-DEBUG_PROGRESS = False
+DEBUG = False # shuts on/off all debug statements
+DEBUG_POSITION = True
+DEBUG_PROGRESS = True
 DEBUG_REGROUPING = True
 
 RANDOMIZE_LOST_PARTICLES = True
 
 REGROUPING = True
 # the % of the search space all particles must be within to regroup
-REGROUP_THRESH = 1.1*10**(-4)
-REGROUP_FACTOR = 6/(5*REGROUP_THRESH)
+REGROUP_THRESH = 1*10**(-3)
+REGROUP_FACTOR = 1/(10*REGROUP_THRESH)
 
 # how much we trend towards pBest, gBest (cog/soc biases)
 # both set to <2 per the PSO wikipedia article
-COG = 1.0
+COG = 0.4
 SOC = 0.7
 MAX_INERTIAL = 0.5
 
 MAX_VEL_PERCENT = 0.25 # particles can cover up to 1/4 the range in 1 tick
 
-VELOCITY_MINIMUM_MAGNITUDE = 0.0001
+VELOCITY_MINIMUM_MAGNITUDE = 0.00001
 
 INFINITY = float(1e3000)
 
@@ -84,6 +86,19 @@ class Particle:
         self.gBest_position = self.getPosition()
 
     def tick(self, gBest, gBest_position):
+        # several test cases using common PSO benchmark functions
+        # note that functions are put in negative since our PSO maximizes
+        #x = self.position[0]
+        #y = self.position[1]
+        # saddle
+        #self.setHeuristic(-(x**2 - y**2))
+        # parabaloid
+        #self.setHeuristic(-(x**2 + y**2))
+        # rastigirin's non-continuous (run x,y on [-5,5]) << THIS ONE IS HARD
+        #
+        #rastigirins = 20 + x**2 + y**2 - 10*(cos(2*pi*x)+ cos(2*pi*y))
+        #self.setHeuristic(-rastigirins)
+
         # Update local best and its fitness
         if self.heuristic > self.pBest:
             self.pBest = self.heuristic
@@ -143,12 +158,11 @@ class Particle:
 
     # used to decide how stable our most recent set of parameters were
     def getHeuristic(self):
-        return
+        return self.heuristic
 
     # when we set heuristic from outside the swarm, use this
     def setHeuristic(self, outside_heuristic):
         self.heuristic = outside_heuristic
-        return
 
     # DON'T CALL THIS PUBLICALLY
     def _setVelocityCap(self):
@@ -164,6 +178,10 @@ class Particle:
     # for use after REGROUPING
     def setPosition(self, position):
         self.position = position
+
+    # for use after REGROUPING
+    def zeroVelocity(self):
+        self.velocity = [0]*self.dimension
 
     def getPosition(self):
         return self.position
@@ -250,12 +268,7 @@ class Swarm:
     # probably not useful in actual RoboCup situations...
     def solve_swarm(self, iterations):
         for i in range(0, iterations):
-            for p in self.particles:
-                (self.gBest, self.gBest_position) = \
-                    p.tick(self.gBest, self.gBest_position)
-
-                if DEBUG:
-                    p.printState()
+            self.tickCurrentParticle()
 
     def getIterations(self):
         return self.iterations
@@ -288,24 +301,31 @@ class Swarm:
 
         See (Evers, G. 2009) or look up RegPSO for more details
         '''
-
         newMins = [0]*self.nSpace
         newMaxs = [0]*self.nSpace
 
         # calculate new range
         for i in range(0, self.nSpace):
-            maximum_distance = 0 # uncertainty
+            total_distance = 0
 
-            # which particle in this dimension is the furthest from gBest
+            # avg distance of all particles from gBest
             for p in self.particles:
                 particleLoc = p.getPosition()
                 distance = fabs(particleLoc[i] - self.gBest_position[i])
 
-                if distance > maximum_distance:
-                    maximum_distance = distance
+                total_distance += distance
+
+            uncertainty = total_distance / len(self.particles)
 
             initial_range_i = self.initialSearchMaxs[i] - self.initialSearchMins[i]
-            new_range_i = min(initial_range_i, maximum_distance*REGROUP_FACTOR)
+            new_range_i = min(initial_range_i, uncertainty*REGROUP_FACTOR)
+
+            if DEBUG and DEBUG_REGROUPING:
+                print "old range %s" % initial_range_i
+                print "new_range_i %s" % new_range_i
+                print "uncertainty %s" % uncertainty
+                print "regrouping factor %s" % REGROUP_FACTOR
+                print "other range option %s " % (uncertainty*REGROUP_FACTOR)
 
             newMins[i] = self.gBest_position[i] - .5*new_range_i
             newMaxs[i] = self.gBest_position[i] + .5*new_range_i
@@ -322,36 +342,30 @@ class Swarm:
                     + R_i*range_i \
                     - 0.5*range_i
 
-            if False:
-                print ""
-                print "old"
-                print p.getPosition()
-                print "new"
-                print newPosition
-                print ""
-
             p.setPosition(newPosition)
             p.setBounds(newMins, newMaxs)
+            p.zeroVelocity()
 
-        if True:
-            print "mins"
+        if DEBUG and DEBUG_REGROUPING:
+            print "range mins"
             print self.initialSearchMins
             print newMins
 
-            print "maxs"
+            print "range maxs"
             print self.initialSearchMaxs
             print newMaxs
 
         # update various swarm parameters
         self.currSearchMins = newMins
         self.currSearchMaxs = newMaxs
-        self.searchSpaceSize = self.calculateSearchSize()
 
     def tickCurrentParticle(self):
         '''
         Tells the current particle the gBest, ticks it, listens to see if
         it found a potential new gBest
         Each time we tick the last particle in this iteration, run iterationUpkeep()
+
+        IMPORTANT: Assumes that the current particle's heuristic has been set externally
         '''
         (this_gBest, this_gBest_position) = \
             self.particles[self.partIndex].tick(self.gBest, self.gBest_position)
