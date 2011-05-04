@@ -495,11 +495,11 @@ void ALImageTranscriber::initTable(string filename)
     }
 
     // actually read the table into memory
-    // Color table is in UVY ordering
+    // Color table is in VUY ordering
     int rval;
-    for(int u=0; u< uLimit; ++u){
-        for(int v=0; v < vLimit; ++v){
-            rval = fread(&table[u * vLimit * yLimit + v * yLimit],
+    for(int v=0; v < vLimit; ++v){
+        for(int u=0; u< uLimit; ++u){
+            rval = fread(&table[v * uLimit * yLimit + u * yLimit],
                          sizeof(unsigned char), yLimit, fp);
         }
     }

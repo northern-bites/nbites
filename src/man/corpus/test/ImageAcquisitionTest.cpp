@@ -185,10 +185,10 @@ int ImageAcquisitionTest::vIndex(int i, int j) const
  */
 int ImageAcquisitionTest::tableLookup(int y, int u, int v) const
 {
-    // Table is in UVY ordering
+    // Table is in VUY ordering
     int index = y +
-        v * static_cast<int>(c.uvDim & 0xFFFF) +
-        u * static_cast<int>( (c.uvDim >> 16) & 0xFFFF);
+        u * static_cast<int>(c.uvDim & 0xFFFF) +
+        v * static_cast<int>( (c.uvDim >> 16) & 0xFFFF);
     return table[index];
 }
 

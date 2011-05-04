@@ -191,7 +191,7 @@ void Threshold::thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg) {
     const uint8_t *oldEnd = oldImg + 320 * 240 * 2; // Size of old image
 
     // Loop optimizations thanks to Bill Silver. Uses constant offsets to
-    // speed up the table lookups. Operates on bigTable in UVY order for
+    // speed up the table lookups. Operates on bigTable in VUY order for
     // more optimizations.
     while (oldImg < oldEnd)
     {
@@ -1663,26 +1663,29 @@ const char* Threshold::getShortColor(int _id) {
     }
 }
 
-/* Get the Y channel for a given point.
-   @param   j    the y value
-   @param i      the x value
-   @return       the Y value at point j, i
+/**
+ *  Get the Y channel for a given point.
+ *  @param   j    the y value
+ *  @param i      the x value
+ *  @return       the Y value at point j, i
  */
 int Threshold::getY(int j, int i) const {
     return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
 }
 
 
-/* Get the V channel information for a given point in the image.
-   This is used to help identify the Ball which shows up well
-   in the V channel.
+/**
+ * Get the V channel information for a given point in the image.
+ * This is used to help identify the Ball which shows up well
+ * in the V channel.
  */
 int Threshold::getV(int x, int y) const {
     return static_cast<int>(vision->uvImg[y*IMAGE_WIDTH*2 + x*2 + 1]);
 }
 
-/* Get the U channel information for a given point.  This has the
-   potential to help id post edges. We don't currently use it though.
+/**
+ * Get the U channel information for a given point.  This has the
+ * potential to help id post edges. We don't currently use it though.
  */
 int Threshold::getU(int j, int i) const {
     return static_cast<int>(vision->uvImg[i*IMAGE_WIDTH*2 + j*2]);
