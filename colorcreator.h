@@ -64,6 +64,7 @@ public:
     QColor getChannelView(int i, int j);
     void largeDisplay();
     QColor displayColorTable(int i, int j);
+    bool testValue(float h, float s, float z, int y, int color);
 
 private slots:
     void on_pushButton_clicked();

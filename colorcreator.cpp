@@ -418,6 +418,33 @@ QColor ColorCreator::displayColorTable(int i, int j)
     return c;
 }
 
+bool ColorCreator::testValue(float h, float s, float z, int y, int color)
+{
+    if (hMax[color] > hMin[color])
+    {
+        if (hMin[color] > h || hMax[color] < h)
+        {
+            return false;
+        }
+    } else if (hMin[color] > h && hMax[color] < h )
+    {
+        return false;
+    }
+    if (s < sMin[color] || s > sMax[color])
+    {
+        return false;
+    }
+    else if (z < zMin[color] || z > zMax[color])
+    {
+        return false;
+    }
+    else if (y < yMin[color] || y > yMax[color])
+    {
+        return false;
+    }
+    return true;
+}
+
 void ColorCreator::largeDisplay()
 {
     bool display;
@@ -440,33 +467,32 @@ void ColorCreator::largeDisplay()
                 float h = (float)roboimage.getH(i, j) / 256.0f;
                 float z = (float)roboimage.getZ(i, j) / 256.0f;
                 // Since H is an angle the math is modulo.
-                if (hMax[start] > hMin[start])
-                {
-                    if (hMin[start] > h || hMax[start] < h)
-                    {
-                        display = false;
-                    }
-                } else if (hMin[start] > h && hMax[start] < h )
-                {
-                    display = false;
-                }
-                if (s < sMin[start] || s > sMax[start])
-                {
-                    display = false;
-                }
-                else if (z < zMin[start] || z > zMax[start])
-                {
-                    display = false;
-                }
-                else if (y < yMin[start] || y > yMax[start])
-                {
-                    display = false;
-                }
+                display = testValue(h, s, z, y, start);
                 c = cols[start];
-
                 if (display)
                 {
                     looping = false;
+                    // check for some common overlaps
+                    if (start == Orange)
+                    {
+                        if (testValue(h, s, z, y, Pink))
+                        {
+                            c = cols[OrangeRed];
+                        }
+                    } else if (start == Green)
+                    {
+                        if (testValue(h, s, z, y, Blue))
+                        {
+                            c = cols[BlueGreen];
+                        }
+                    }
+                    else if (start == Blue)
+                    {
+                        if (testValue(h, s, z, y, Navy))
+                        {
+                            c = cols[BlueNavy];
+                        }
+                    }
                 } else{
                     c = cols[Black];
                 }
@@ -738,7 +764,7 @@ void ColorCreator::writeNewFormat(QString filename)
                 for (int c = Orange; c < Black; c++)
                 {
                     bool ok = false;
-                    if (hMin[c] > hMax[c])
+                    if (hMin[c] >= hMax[c])
                     {
                         if (col.getH() >= hMin[c] || col.getH() <= hMax[c])
                         {

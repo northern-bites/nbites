@@ -129,10 +129,6 @@ void ColorTable::readOld(QString filename)
         }
     }*/
     enabled = true;
-    filename.chop(4);
-    QString newName = filename + "bit.mtb";
-    out << "Filename is :" << newName << "\n";
-    writeNewFormat(newName);
 }
 
 // Read table from a file and determine the format
@@ -168,8 +164,10 @@ void ColorTable::read(QString filename)
         }
     }*/
     enabled = true;
-    /*filename.chop(4);
-    writeNewFormat(filename);*/
+    filename.chop(4);
+    QString newName = filename + "uvy.mtb";
+    out << "Filename is :" << newName << "\n";
+    writeNewFormat(newName);
 }
 
 /* WHen we read in a table of the old format we automatically convert
