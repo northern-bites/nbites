@@ -1,13 +1,11 @@
 #
 # This is our walk-engine parameter optimizer. It uses a particle swarm (util/PSO.py)
 # to search a predefined gait space (motion/gaits/GaitLearnBoundaries.py) for an 
-# optimal set of parameters. 
+# optimal set of parameters.
 #
 # Things that need to happen before team-wide gait optimization can start:
-# (list current as of 4/23/11)
+# (list current as of 4/26/11)
 #
-# @todo write PSO unit tests, verify that our implementation works as expected
-# @todo pickle file sync up/down script
 # @todo list of walk vectors to run on each particle (should last ~3 minutes)
 # @todo make sure this behavior still works
 # @todo collect stability variance data on several gaits, decide on heuristic
@@ -15,6 +13,7 @@
 # @todo figure out a good way to get several "good" gaits out of a Swarm object
 #
 # @author Nathan Merritt
+# @date May 2011
 
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
@@ -25,10 +24,10 @@ import man.noggin.navigator.NavHelper as helper
 import man.noggin.navigator.WalkHelper as walkhelper
 
 import man.noggin.util.PSO as PSO
-from man.motion.gaits.GaitLearnBoundaries import \
-    gaitMins, gaitMaxs, \
-    gaitToArray, arrayToGaitTuple
-
+from man.motion.gaits.GaitLearnBoundaries import (gaitMins,
+                                                  gaitMaxs,
+                                                  gaitToArray,
+                                                  arrayToGaitTuple)
 from os.path import isfile, dirname, exists
 from os import makedirs
 from math import fabs
@@ -44,20 +43,18 @@ except:
    import pickle
 
 PSO_STATE_FILE = PICKLE_FILE_PREFIX + "PSO_pGaitLearner.pickle"
-BEST_GAIT_FILE = PICKLE_FILE_PREFIX + "PSO_endGait.pickle."
+BEST_GAIT_FILE = "" #@todo remove this
 
-SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge
+SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge?
 
 RANDOM_WALK_DURATION = 150
 
 POSITION_UPDATE_FRAMES = 15
-MINIMUM_REQUIRED_DISTANCE = 100
-DISTANCE_PENALTY = -400
 
 RUN_ONCE_STOP = True
 
 def gamePlaying(player):
-    player.print("In the pGaitLearner's version of game controller state (overridden)")
+    player.printf("In the pGaitLearner's version of game controller state (overridden)")
     if player.firstFrame():
         player.gainsOn()
         player.brain.tracker.trackBall()
@@ -170,12 +167,10 @@ def scoreGaitPerformance(player):
        + path_linearity \
        - stability_penalty
 
-   player.printf("total distance traveled with this gait is ",
-                 distancePenalty(player, distance_traveled))
    player.printf("stability penalty is %s" % stability_penalty)
    player.printf("robot stood for %s frames during random walk period" %
                  (frames_stood - player.straightWalkCounter))
-   player.printf(print "heuristic for this run is %s" % heuristic)
+   player.printf("heuristic for this run is %s" % heuristic)
 
    player.swarm.getCurrParticle().setHeuristic(heuristic)
    player.swarm.tickCurrParticle()
@@ -222,7 +217,7 @@ def reportBestGait(player):
       (bestGaitArray, gaitScore) = player.swarm.getBestSolution()
       bestGaitTuple = arrayToGaitTuple(bestGaitArray)
 
-      player.printf("best found gait's heuristic score was: ", gaitScore)
+      player.printf("best found gait's heuristic score was: %s" % gaitScore)
 
       try:
          gaitScore = int(gaitScore)
@@ -233,7 +228,7 @@ def reportBestGait(player):
             output = BEST_GAIT_FILE + str(gaitScore) + "." + str(i)
             i += 1
 
-      player.printf("best gait saved to file: ", output)
+         player.printf("best gait saved to file: %s" % output)
          f = open(output, 'w')
          pickle.dump(bestGaitTuple, f)
          f.close()
@@ -265,7 +260,7 @@ def startPSO(player):
         newPSO(player)
 
 def savePSO(player):
-    player.printf("Saving PSO state to: ", PSO_STATE_FILE)
+    player.printf("Saving PSO state to: %s" % PSO_STATE_FILE)
     ensure_dir(PSO_STATE_FILE)
     f = open(PSO_STATE_FILE, 'w')
     pickle.dump(player.swarm, f)
@@ -277,7 +272,7 @@ def newPSO(player):
                              44, gaitToArray(gaitMins), gaitToArray(gaitMaxs))
 
 def loadPSO(player):
-    player.printf("Loading PSO state from: ", PSO_STATE_FILE)
+    player.printf("Loading PSO state from: %s" % PSO_STATE_FILE)
     ensure_dir(PSO_STATE_FILE)
     f = open(PSO_STATE_FILE, 'r')
     player.swarm = pickle.load(f)
@@ -319,18 +314,6 @@ def getCurrentLocation(player):
                              player.brain.my.y,
                              player.brain.my.h)
 
-
-def distancePenalty(player, distance_traveled):
-    weight = 1 # @todo decide about this
-
-    weightedDistance = weight * distance_traveled
-
-    # prevents gaits that don't move at all
-    if weightedDistance < MINIMUM_REQUIRED_DISTANCE:
-        return DISTANCE_PENALTY
-
-    else:
-        return weightedDistance
 
 # makes any necessary directories so our file writes won't fail
 def ensure_dir(filename):

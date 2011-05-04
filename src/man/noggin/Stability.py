@@ -1,12 +1,13 @@
-from .. import NogginConstants as Constants
+from . import NogginConstants as Constants
 from math import fabs
-from . import Location
+from .typeDefs import Location
+
 try:
     from numpy import corrcoef
     haveNumpy = True
 except:
     haveNumpy = False
-    print "could not load numpy, please install it"
+    print "could not load numpy, please install it for advanced statistics"
 
 FALL_ACCZ_THRESHOLD = 5
 FALL_FRAMES_THRESHOLD = 15
