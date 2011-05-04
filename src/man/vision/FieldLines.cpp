@@ -270,7 +270,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points)
 
 
             const int current_y_value = vision->thresh->getY(x,y);
-            const int thresholdedColor = vision->thresh->getThresholded(y,x);
+            const unsigned char thresholdedColor = vision->thresh->getThresholded(y,x);
 
             const bool isAtAnUphillEdge = isUphillEdge(current_y_value, last_y_value,
                                                        VERTICAL);
@@ -475,7 +475,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
         // starting edge value
         for (int x = 1; x < IMAGE_WIDTH - 1; x++) {
             const int current_y_value = vision->thresh->getY(x,y);
-            const int thresholdedColor = vision->thresh->getThresholded(y,x);
+            const unsigned thresholdedColor = vision->thresh->getThresholded(y,x);
 
             const bool isAtAnUphillEdge = isUphillEdge(current_y_value,
                                                        last_y_value,
@@ -1843,7 +1843,7 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
         for (int j = y; j != stopValue; j += sign) {
             int newYChannel = vision->thresh->getY(x, j);
             if (isDownhillEdge(newYChannel, oldYChannel, VERTICAL) &&
-                percentColor(x, j, dir, FIELD_COLORS, NUM_GREEN_COLORS,
+                percentColor(x, j, dir, GREEN,
                              NUM_TEST_PIXELS) >= GREEN_PERCENT_CLEARANCE) {
                 // We found the edge we were looking for.
                 return j;
@@ -1878,13 +1878,13 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
         for (int i = x; i != stopValue; i += sign) {
             int newYChannel = vision->thresh->getY(i, y);
             if (isDownhillEdge(newYChannel, oldYChannel, HORIZONTAL) &&
-                percentColor(i, y, dir, FIELD_COLORS, NUM_GREEN_COLORS,
+                percentColor(i, y, dir, GREEN,
                              NUM_TEST_PIXELS) >= GREEN_PERCENT_CLEARANCE) {
                 // We found the edge we were looking for.
                 return i;
             }
             // We're in the field but we didn't see an edge.  No good.
-            else if (vision->thresh->getThresholded(y,i) == GREEN) {
+            else if (isGreenColor(vision->thresh->getThresholded(y,i))) {
                 return NO_EDGE;
             }
             oldYChannel = newYChannel;
@@ -2612,8 +2612,7 @@ const bool FieldLines::tooMuchGreenAtCorner(const point<int>& intersection,
 									  const int& numChecksPassed)
 {
 	float percentGreen = percentSurrounding(intersection,
-											FIELD_COLORS,
-											NUM_GREEN_COLORS,
+											GREEN,
 											CORNER_TEST_RADIUS);
 	if (percentGreen > MAX_GREEN_PERCENT_ALLOWED_AT_CORNER) {
 		if (debugIntersectLines)
@@ -2747,9 +2746,7 @@ const bool FieldLines::isItGreenAcrossFromLine(const VisualCorner& corner,
     }
 
     const float percentGreen =
-        percentSurrounding(checkPoint,
-                           FIELD_COLORS,
-                           NUM_GREEN_COLORS,
+        percentSurrounding(checkPoint, GREEN,
                            GREEN_AROUND_TEST_RADIUS);
 
     if (debugIntersectLines){
@@ -2836,13 +2833,11 @@ FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
 {
     const float percent1 = percentColorBetween(intersection.x, intersection.y,
                                                line1Closer.x, line1Closer.y,
-                                               FIELD_COLORS,
-                                               NUM_FIELD_COLORS);
+                                               GREEN);
 
     const float percent2 = percentColorBetween(intersection.x, intersection.y,
                                                line2Closer.x, line2Closer.y,
-                                               FIELD_COLORS,
-                                               NUM_FIELD_COLORS);
+                                               GREEN);
 
     if (debugIntersectLines)
         cout << "Percent green in between line 1 and corner: "
@@ -3368,8 +3363,8 @@ const bool FieldLines::isGreenWhiteEdge(int x, int y,
         (direction == HORIZONTAL ? TEST_LEFT : TEST_DOWN);
     const bool print =  (direction == VERTICAL && debugVertEdgeDetect) ||
         (direction == HORIZONTAL && debugHorEdgeDetect);
-    const float greenPercent = percentColor(x, y, searchDirection, FIELD_COLORS,
-                                      NUM_GREEN_COLORS, NUM_TEST_PIXELS);
+    const float greenPercent = percentColor(x, y, searchDirection, GREEN,
+                                      NUM_TEST_PIXELS);
     const bool enoughGreen = greenPercent >= GREEN_PERCENT_CLEARANCE;
 
     if (print && !enoughGreen)
@@ -3397,8 +3392,7 @@ const bool FieldLines::isWhiteGreenEdge(int x, int y,
 
     for (int numPixels = MIN_GREEN_PIXELS_TO_TEST;
          numPixels <= MAX_GREEN_PIXELS_TO_TEST; numPixels++) {
-        greenPercent = percentColor(x, y, searchDirection,
-                                    FIELD_COLORS, NUM_GREEN_COLORS,
+        greenPercent = percentColor(x, y, searchDirection, GREEN,
                                     numPixels);
         /*
           if (debugVertEdgeDetect)
@@ -4075,8 +4069,7 @@ const bool FieldLines::dupeFakeCorner(const list<point<int> > &corners,
 // pixel is at the edge of the screen and testing the entire square would
 // cause us to test outside of the image.
 const float FieldLines::percentSurrounding(const int x, const int y,
-                                           const int colors[],
-                                           const int numColors,
+                                           const unsigned char color,
                                            const int numPixels) const
 {
 
@@ -4097,11 +4090,9 @@ const float FieldLines::percentSurrounding(const int x, const int y,
         for (int j = startY; j <= endY; ++j) {
             // Search for the color at that pixel within the vector of
             // acceptable colors
-            for (int k = 0; k < numColors; ++k) {
-                if (colors[k] == vision->thresh->getThresholded(j,i)) {
-                    ++numFound;
-                    break;
-                }
+			if (colorsEqual(color, vision->thresh->getThresholded(j,i))) {
+				++numFound;
+				break;
             }
         }
     }
@@ -4112,28 +4103,10 @@ const float FieldLines::percentSurrounding(const int x, const int y,
 
 // Alternative form of percent surrounding that uses points.
 const float FieldLines::percentSurrounding(const point<int> &p,
-                                           const int colors[],
-                                           const int numColors,
+										   const unsigned char color,
                                            const int numPixels) const
 {
-    return percentSurrounding(p.x, p.y, colors, numColors, numPixels);
-}
-
-
-// Tests all the pixels in a square centered at (x,y) which extends numPixels
-// in all directions.  Counts how many of those pixels are the color passed in
-// and divides by the total number of pixels it was able to test in order to
-// determine the percent of the immediate area which match the colors array.
-// Note:  The percentage is converted from 0 <= x <= 1 into 0 <= x <= 100.
-// Additionally, the test area will not necessarily be a square if the test
-// pixel is at the edge of the screen and testing the entire square would
-// cause us to test outside of the image.
-const float FieldLines::percentSurrounding(const int x, const int y,
-                                           const int color,
-                                           const int numPixels) const
-{
-    const int colors[] = {color};
-    return percentSurrounding(x, y, colors, 1, numPixels);
+    return percentSurrounding(p.x, p.y, color, numPixels);
 }
 
 
@@ -4144,21 +4117,7 @@ const float FieldLines::percentSurrounding(const int x, const int y,
 // Preconditions:  (x1, y1) and (x2, y2) are valid coordinates in our image
 const float FieldLines::percentColorBetween(const int x1, const int y1,
                                             const int x2, const int y2,
-                                            const int color) const
-{
-    const int colors[] = {color};
-    return percentColorBetween(x1,y1,x2,y2,colors,1);
-}
-
-// Tests all pixels on the line between (x1, y1) and (x2, y2) for thresholded
-// values in the colors[] array.
-// Returns the percent of the pixels along the line that are found within
-// the colors array; always returns a number between 0 and 100.0.
-// Preconditions:  (x1, y1) and (x2, y2) are valid coordinates in our image
-const float FieldLines::percentColorBetween(const int x1, const int y1,
-                                            const int x2, const int y2,
-                                            const int colors[],
-                                            const int numColors) const
+                                            const unsigned char color) const
 {
     int totalPixels = 0;
     int numFound = 0;
@@ -4169,8 +4128,7 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
         if (y2 < y1)
             sign = -1;
         for (int j = y1; j != y2; j += sign, ++totalPixels) {
-            if (Utility::isElementInArray(vision->thresh->getThresholded(j,x2),
-                                          colors, numColors)) {
+			if (colorsEqual(vision->thresh->getThresholded(j,x2),color)) {
                 ++numFound;
             }
         }
@@ -4189,10 +4147,9 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
                 int newx = x1 +
 					static_cast<int>( (slope * static_cast<float>(i - y1)) );
 
-                if (Utility::isElementInArray(vision->thresh->
-                                              getThresholded(i,newx),
-                                              colors, numColors))
+				if (colorsEqual(vision->thresh->getThresholded(i,newx), color)) {
                     ++numFound;
+				}
             }
         }
 
@@ -4203,10 +4160,9 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
                 ++totalPixels;
                 int newy = y1 +
 					static_cast<int>( (slope * static_cast<float>(i - x1)) );
-                if (Utility::isElementInArray(vision->thresh->
-                                              getThresholded(newy,i),
-                                              colors, numColors))
+				if (colorsEqual(vision->thresh->getThresholded(newy,i), color)) {
                     ++numFound;
+				}
             }
         }
         // horizontal line, slope == 0
@@ -4215,10 +4171,9 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
             int endX = max(x1,x2);
             for (int i = startX; i <= endX; ++i) {
                 ++totalPixels;
-                if (Utility::isElementInArray(vision->thresh->
-                                              getThresholded(y2,i),
-                                              colors, numColors))
+				if (colorsEqual(vision->thresh->getThresholded(y2,i), color)) {
                     ++numFound;
+				}
             }
         }
     }
@@ -4230,17 +4185,7 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
 const float FieldLines::isColorBetween(const int x1, const int y1,
                                        const int x2, const int y2,
                                        const int longestHoleAllowed,
-                                       const int color) const
-{
-    const int colors[] = {color};
-    return isColorBetween(x1,y1,x2,y2,longestHoleAllowed,colors,1);
-}
-
-const bool FieldLines::isColorBetween(const int x1, const int y1,
-                                      const int x2, const int y2,
-                                      const int longestHoleAllowed,
-                                      const int colors[],
-                                      const int numColors) const
+                                       const unsigned char color) const
 {
     static const int SCAN_RADIUS = 1; // 3 pixels wide, thus
     int numHoles = 0;
@@ -4253,8 +4198,7 @@ const bool FieldLines::isColorBetween(const int x1, const int y1,
         for (int j = y1; j != y2; j += sign) {
             bool foundInLine = false;
             for (int testX = x2 - SCAN_RADIUS; testX <= x2 + SCAN_RADIUS; ++testX){
-                if (Utility::isElementInArray(vision->thresh->getThresholded(j,x2),
-                                              colors, numColors)) {
+				if (colorsEqual(vision->thresh->getThresholded(j,x2), color)) {
                     foundInLine = true;
                 }
             }
@@ -4290,9 +4234,7 @@ const bool FieldLines::isColorBetween(const int x1, const int y1,
 					static_cast<int>( (slope * static_cast<float>(i - y1)) );
                 for (int testX = newX - SCAN_RADIUS; testX <= newX + SCAN_RADIUS; ++testX){
 
-                    if (Utility::isElementInArray(vision->thresh->
-                                                  getThresholded(i,testX),
-                                                  colors, numColors)){
+					if (colorsEqual(vision->thresh->getThresholded(i,testX), color)) {
                         foundInLine = true;
                         break;
                     }
@@ -4317,9 +4259,7 @@ const bool FieldLines::isColorBetween(const int x1, const int y1,
                 int newY = y1 +
 					static_cast<int>( (slope * static_cast<float>(i - x1)) );
                 for (int testY = newY - SCAN_RADIUS; testY <= newY + SCAN_RADIUS; ++testY){
-                    if (Utility::isElementInArray(vision->thresh->
-                                                  getThresholded(testY,i),
-                                                  colors, numColors)){
+					if (colorsEqual(vision->thresh->getThresholded(testY,i), color)) {
                         foundInLine = true;
                         break;
                     }
@@ -4344,9 +4284,7 @@ const bool FieldLines::isColorBetween(const int x1, const int y1,
             for (int i = startX; i <= endX; ++i) {
                 bool foundInLine = false;
                 for (int testY = y2 - SCAN_RADIUS; testY <= y2 + SCAN_RADIUS; ++testY){
-                    if (Utility::isElementInArray(vision->thresh->
-                                                  getThresholded(testY,i),
-                                                  colors, numColors)){
+					if (colorsEqual(vision->thresh->getThresholded(testY,i), color)) {
                         foundInLine = true;
                         break;
                     }
@@ -4376,7 +4314,7 @@ const bool FieldLines::isColorBetween(const int x1, const int y1,
 
 const float FieldLines::percentColor(const int x, const int y,
                                      const TestDirection dir,
-                                     const int colors[], const int numColors,
+									 const unsigned char color,
                                      const int numPixels) const
 {
     int numFound = 0;
@@ -4393,11 +4331,9 @@ const float FieldLines::percentColor(const int x, const int y,
         // we've exhausted num or we've gone off screen
         for (int i = y + sign; numTotal < numPixels &&
                  i < IMAGE_HEIGHT && i >= 0; i += sign, ++numTotal) {
-            for (int j = 0; j < numColors; ++j) {
-                if (colors[j] == vision->thresh->getThresholded(i,x)) {
-                    ++numFound;
-                    break;
-                }
+			if (colorsEqual(color, vision->thresh->getThresholded(i,x))) {
+				++numFound;
+				break;
             }
         }
     }
@@ -4409,11 +4345,9 @@ const float FieldLines::percentColor(const int x, const int y,
         if (dir == TEST_RIGHT) sign = 1;
         for (int i = x + sign; numTotal < numPixels &&
                  i < IMAGE_WIDTH && i >= 0; i += sign, ++numTotal) {
-            for (int j = 0; j < numColors; ++j) {
-                if (colors[j] == vision->thresh->getThresholded(y,i)) {
-                    ++numFound;
-                    break;
-                }
+			if (colorsEqual(color, vision->thresh->getThresholded(y,i))) {
+				++numFound;
+				break;
             }
         }
     }
@@ -4447,20 +4381,6 @@ const bool FieldLines::linePointWidthsDifferent(const linePoint& last,
 			  lineWidthDifference < -MAX_WIDTH_DIFF)) );
 }
 
-/* Since this is a specific case where we're just testing for the percent
- * of a single color, we can apply the more general algorithm above to do
- * this for us.
- */
-const float FieldLines::percentColor(const int x, const int y,
-                                     const TestDirection dir,
-                                     const int color,
-                                     const int numPixels) const
-{
-    const int colors[] = {color};
-    return percentColor(x, y, dir, colors, 1, numPixels);
-}
-
-
 // Draws a line through the start and endpoint of the line, which were created
 // from the least squares approximation of the line rather than actual points
 // on the line.
@@ -4484,7 +4404,7 @@ void FieldLines::updateLineCounters(const int threshColor, int &numWhite,
     if (isLineColor(threshColor)) {
         ++numWhite;
     }
-    else if (threshColor == GREY) {
+    else if (isUndefined(threshColor)) {
         ++numUndefined;
     }
     else {

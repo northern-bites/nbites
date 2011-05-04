@@ -269,17 +269,47 @@ private:
 
     // Helper method that just returns whether the thresholded color is a
     // line color
-    static inline const bool isLineColor(const int color)
+    static inline const bool isLineColor(const unsigned char color)
         {
+#ifdef SOFTCOLORS
             return Utility::isElementInArray(color, LINE_COLORS, NUM_LINE_COLORS);
+#else
+			return color & WHITE_BIT;
+#endif
         }
 
     // Helper method that just returns whether the thresholded color is a
     // green color
-    static inline const bool isGreenColor(int threshColor)
+    static inline const bool isGreenColor(unsigned char threshColor)
         {
+#ifdef SOFTCOLORS
             return Utility::isElementInArray(threshColor, FIELD_COLORS,
                                              NUM_GREEN_COLORS);
+#else
+			return threshColor & GREEN_BIT;
+#endif
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // green color
+    static inline const bool isUndefined(unsigned char threshColor)
+        {
+#ifdef SOFTCOLORS
+			return threshColor == GREY;
+#else
+			return threshColor;
+#endif
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // equal to a fixed color
+    static inline const bool colorsEqual(unsigned char color, unsigned char col)
+        {
+#ifdef SOFTCOLORS
+			return color == col;
+#else
+			return color & col;
+#endif
         }
 
     // Given a line, attempts to extend it to both the left and right
@@ -473,38 +503,22 @@ private:
     const bool dupeFakeCorner(const std::list<point <int> > &corners,
                               const int x, const int y, const int testNumber) const;
     const float percentColor(const int x, const int y, const TestDirection dir,
-                             const int color, const int numPixels) const;
-    const float percentColor(const int x, const int y, const TestDirection dir,
-                             const int colors[], const int numColors,
-                             const int numPixels) const;
-    const float percentSurrounding(const int x, const int y,
-                                   const int colors[], const int numColors,
-                                   const int numPixels) const;
-    const float percentSurrounding(const int x, const int y, const int color,
+                             const unsigned char color, const int numPixels) const;
+    const float percentSurrounding(const int x, const int y, const unsigned char color,
                                    const int numPixels) const;
     // Alternative form of percent surrounding that uses points.
     const float percentSurrounding(const point<int> &p,
-                                   const int colors[], const int numColors,
+								   const unsigned char color,
                                    const int numPixels) const;
 
     const float percentColorBetween(const int x1, const int y1,
                                     const int x2, const int y2,
-                                    const int colors[],
-                                    const int numColors) const;
-    const float percentColorBetween(const int x1, const int y1,
-                                    const int x2, const int y2,
-                                    const int color) const;
+                                    const unsigned char color) const;
 
     const float isColorBetween(const int x1, const int y1,
                                const int x2, const int y2,
                                const int longestHoleAllowed,
-                               const int color) const;
-
-    const bool isColorBetween(const int x1, const int y1,
-                              const int x2, const int y2,
-                              const int longestHoleAllowed,
-                              const int colors[],
-                              const int numColors) const;
+                               const unsigned char color) const;
 
     const bool linePointWidthsDifferent(const linePoint& last,
                                         const linePoint& current) const;

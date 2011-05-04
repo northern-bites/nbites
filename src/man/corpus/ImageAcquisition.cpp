@@ -31,8 +31,8 @@ int ImageAcquisition::acquire_image_fast(uint8_t *table,
                                       static_cast<uint16_t>(*(yuv+YOFFSET2)));
 
             // See VisionDef.h, the defines there are wrong!
-            uint16_t uAvg = *(uvOut) = static_cast<uint16_t>(*(yuv+1));
-            uint16_t vAvg = *(uvOut+1) = static_cast<uint16_t>(*(yuv+3));
+            uint16_t uAvg = *(uvOut) = static_cast<uint16_t>(*(yuv+UOFFSET));
+            uint16_t vAvg = *(uvOut+1) = static_cast<uint16_t>(*(yuv+VOFFSET));
 
             // HACK. THIS ONLY WORKS FOR 0-256, 128 byte color tables.
             // I hope that we have moved to a more sensible
