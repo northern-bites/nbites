@@ -547,7 +547,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
     int qy = yProject(left.x, right.y, qx);
     stop scan;
 
-    //thresh->drawPoint(left.x, left.y, BLUE);
+    //drawPoint(left.x, left.y, BLUE);
     // scan out a 1/4 of the way to the right the edge
     for (int i = 0; i < NUMSCANS; i++) {
         vertScan(qx, qy, dir, 4, c, c2, scan);
@@ -2464,7 +2464,7 @@ void ObjectFragments::drawRun(const run& run, int c) {
  */
 void ObjectFragments::drawPoint(int x, int y, int c) {
 #ifdef OFFLINE
-    thresh->drawPoint(x, y, c);
+    drawPoint(x, y, c);
 #endif
 }
 
@@ -2474,7 +2474,7 @@ void ObjectFragments::drawPoint(int x, int y, int c) {
  */
 void ObjectFragments::drawRect(int x, int y, int w, int h, int c) {
 #ifdef OFFLINE
-    thresh->drawRect(x, y, w, h, c);
+    vision->drawRect(x, y, w, h, c);
 #endif
 }
 
@@ -2484,16 +2484,16 @@ void ObjectFragments::drawRect(int x, int y, int w, int h, int c) {
  */
 void ObjectFragments::drawBlob(Blob b, int c) {
 #ifdef OFFLINE
-    thresh->drawLine(b.getLeftTopX(), b.getLeftTopY(),
+    vision->drawLine(b.getLeftTopX(), b.getLeftTopY(),
                      b.getRightTopX(), b.getRightTopY(),
                      c);
-    thresh->drawLine(b.getLeftTopX(), b.getLeftTopY(),
+    vision->drawLine(b.getLeftTopX(), b.getLeftTopY(),
                      b.getLeftBottomX(), b.getLeftBottomY(),
                      c);
-    thresh->drawLine(b.getLeftBottomX(), b.getLeftBottomY(),
+    vision->drawLine(b.getLeftBottomX(), b.getLeftBottomY(),
                      b.getRightBottomX(), b.getRightBottomY(),
                      c);
-    thresh->drawLine(b.getRightTopX(), b.getRightTopY(),
+    vision->drawLine(b.getRightTopX(), b.getRightTopY(),
                      b.getRightBottomX(), b.getRightBottomY(),
                      c);
 #endif
@@ -2508,6 +2508,6 @@ void ObjectFragments::drawBlob(Blob b, int c) {
  */
 void ObjectFragments::drawLine(int x, int y, int x1, int y1, int c) {
 #ifdef OFFLINE
-    thresh->drawLine(x, y, x1, y1, c);
+    vision->drawLine(x, y, x1, y1, c);
 #endif
 }

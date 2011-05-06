@@ -187,15 +187,7 @@ public:
     void initDebugImage();
     void transposeDebugImage();
     void drawDetectedEdges(boost::shared_ptr<Gradient> g);
-    void drawX(int x, int y, int c);
-    void drawPoint(int x, int y, int c);
-    void drawLine(const point<int> start, const point<int> end,
-                  const int color);
     void drawVisualHorizon();
-    void drawLine(int x, int y, int x1, int y1, int c);
-    void drawBox(int left, int right, int bottom, int top, int c);
-    void drawRect(int left, int top, int width, int height, int c);
-
     void setEdgeThreshold(int _thresh);
     int getEdgeThreshold();
     void setHoughAcceptThreshold(int _thresh);

@@ -184,8 +184,8 @@ void Robots::robot(int bigGreen)
 		if (blobs->get(i).getBottom() < field->horizonAt(blobs->get(i).getLeft())) {
 			blobs->init(i);
 		} else if (noWhite(blobs->get(i))) {
-			thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
-							 blobs->get(i).width(), blobs->get(i).height(), WHITE);
+			vision->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
+					 blobs->get(i).width(), blobs->get(i).height(), WHITE);
 			blobs->init(i);
 		}
 		if (blobs->get(i).height() > blobHeightMin) {
@@ -198,8 +198,8 @@ void Robots::robot(int bigGreen)
     for (int i = 0; i < blobs->number(); i++) {
 		if (ROBOTSDEBUG) {
 			if (blobs->get(i).width() > 1) {
-				thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
-								 blobs->get(i).width(), blobs->get(i).height(), BLACK);
+				vision->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
+						 blobs->get(i).width(), blobs->get(i).height(), BLACK);
 			}
 		}
 	}

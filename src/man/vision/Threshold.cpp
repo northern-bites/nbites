@@ -466,7 +466,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                     shoot[column] = false;
                     if (debugShot) {
-                        drawPoint(column, j + currentRun, MAROON);
+                        vision->drawPoint(column, j + currentRun, MAROON);
                     }
                 }
                 break;
@@ -484,7 +484,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                     shoot[column] = false;
                     if (debugShot) {
-                        drawPoint(column, j + currentRun, MAROON);
+                        vision->drawPoint(column, j + currentRun, MAROON);
                     }
                 }
                 break;
@@ -523,7 +523,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         }
         shoot[column] = false;
         if (debugShot) {
-            drawPoint(column, IMAGE_HEIGHT - 4, RED);
+            vision->drawPoint(column, IMAGE_HEIGHT - 4, RED);
         }
     }
 }
@@ -542,7 +542,7 @@ void Threshold::setOpenFieldInformation() {
         vision->fieldOpenings[i].bearing = e.bearing;
         vision->fieldOpenings[i].elevation = e.elevation;
         if (debugOpenField) {
-            drawPoint(start, block[i], RED);
+            vision->drawPoint(start, block[i], RED);
         }
         start+= IMAGE_WIDTH / NUMBLOCKS;
     }
@@ -551,8 +551,8 @@ void Threshold::setOpenFieldInformation() {
         int chunk = IMAGE_WIDTH / NUMBLOCKS, start = 0;
         for (int i = 0; i < NUMBLOCKS; i++) {
             if (block[i] > 0) {
-                drawLine(start, block[i], start + chunk, block[i], MAROON);
-                drawLine(start, block[i]+1, start + chunk, block[i]+1, MAROON);
+                vision->drawLine(start, block[i], start + chunk, block[i], MAROON);
+                vision->drawLine(start, block[i]+1, start + chunk, block[i]+1, MAROON);
             }
             start += chunk;
         }
@@ -600,16 +600,16 @@ void Threshold::setShot(VisualCrossbar* one) {
     } else {
         one->setShoot(true);
         if (debugShot) {
-            drawLine(r1, ly, r1, IMAGE_HEIGHT - 1, RED);
-            drawLine(r2, ly, r2, IMAGE_HEIGHT - 1, RED);
+            vision->drawLine(r1, ly, r1, IMAGE_HEIGHT - 1, RED);
+            vision->drawLine(r2, ly, r2, IMAGE_HEIGHT - 1, RED);
         }
     }
     one->setBackLeft(r1);
     one->setBackRight(r2);
 
     if (debugShot) {
-        drawPoint(r1, ly, RED);
-        drawPoint(r2, ly, BLACK);
+        vision->drawPoint(r1, ly, RED);
+        vision->drawPoint(r2, ly, BLACK);
     }
     // now figure out the optimal direction
     int left = 0, right = 0;
@@ -655,7 +655,7 @@ void Threshold::setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3
             int temp = max(0, (int)start);
 #ifdef OFFLINE
             if (debugSelf) {
-                drawPoint(i, temp, BLACK);
+                vision->drawPoint(i, temp, BLACK);
             }
 #endif
             lowerBound[i] = temp;
@@ -670,7 +670,7 @@ void Threshold::setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3
             lowerBound[i] = temp;
 #ifdef OFFLINE
             if (debugSelf) {
-                drawPoint(i, temp, BLACK);
+                vision->drawPoint(i, temp, BLACK);
             }
 #endif
         }
@@ -1487,218 +1487,10 @@ void Threshold::transposeDebugImage(){
 #endif
 }
 
-/* Draw a box in the fake image.
- * @param left     x value of left edge
- * @param right    x value of right edge
- * @param bottom   y value of bottom
- * @param top      y value of top
- * @param c        the color we'd like to draw
- */
-void Threshold::drawBox(int left, int right, int bottom, int top, int c) {
-
-
-#ifdef OFFLINE
-    if (left < 0) {
-        left = 0;
-    }
-    if (top < 0) {
-        top = 0;
-    }
-    int width = right-left;
-    int height = bottom-top;
-
-    for (int i = left; i < left + width; i++) {
-        if (top >= 0 &&
-                top < IMAGE_HEIGHT &&
-                i >= 0 &&
-                i < IMAGE_WIDTH) {
-            debugImage[top][i] = static_cast<unsigned char>(c);
-        }
-        if ((top + height) >= 0 &&
-                (top + height) < IMAGE_HEIGHT &&
-                i >= 0 &&
-                i < IMAGE_WIDTH) {
-            debugImage[top + height][i] = static_cast<unsigned char>(c);
-        }
-    }
-    for (int i = top; i < top + height; i++) {
-        if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                left >= 0 &&
-                left < IMAGE_WIDTH) {
-            debugImage[i][left] = static_cast<unsigned char>(c);
-        }
-        if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                (left+width) >= 0 &&
-                (left+width) < IMAGE_WIDTH) {
-            debugImage[i][left + width] = static_cast<unsigned char>(c);
-        }
-    }
-#endif
-} // drawBox
-
-
-/* Draw a rectangle in the fake image.
- * @param left     x value of left edge
- * @param right    x value of right edge
- * @param bottom   y value of bottom
- * @param top      y value of top
- * @param c        the color we'd like to draw
- */
-void Threshold::drawRect(int left, int top, int width, int height, int c) {
-#ifdef OFFLINE
-    if (left < 0) {
-        width += left;
-        left = 0;
-    }
-    if (top < 0) {
-        height += top;
-        top = 0;
-    }
-
-    for (int i = left; i < left + width; i++) {
-        if (top >= 0 && top < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-            debugImage[top][i] = static_cast<unsigned char>(c);
-        }
-        if ((top + height) >= 0 &&
-                (top + height) < IMAGE_HEIGHT &&
-                i >= 0 &&
-                i < IMAGE_WIDTH) {
-            debugImage[top + height][i] = static_cast<unsigned char>(c);
-        }
-    }
-    for (int i = top; i < top + height; i++) {
-        if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                left >= 0 &&
-                left < IMAGE_WIDTH) {
-            debugImage[i][left] = static_cast<unsigned char>(c);
-        }
-        if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                (left+width) >= 0 &&
-                (left+width) < IMAGE_WIDTH) {
-            debugImage[i][left + width] = static_cast<unsigned char>(c);
-        }
-    }
-#endif
-} // drawRect
-
-void Threshold::drawLine(const point<int> start, const point<int> end,
-                         const int color) {
-    drawLine(start.x, start.y, end.x, end.y, color);
-}
-
-/* Draw a line in the fake image.
- * @param x       start x
- * @param y       start y
- * @param x1      finish x
- * @param y1      finish y
- * @param c       color we'd like to draw
- */
-void Threshold::drawLine(int x, int y, int x1, int y1, int c) {
-
-#ifdef OFFLINE
-    float slope = static_cast<float>(y - y1) / static_cast<float>(x - x1);
-    int sign = 1;
-    if ((abs(y - y1)) > (abs(x - x1))) {
-        slope = 1.0f / slope;
-        if (y > y1)  {
-            sign = -1;
-        }
-        for (int i = y; i != y1; i += sign) {
-            int newx = x +
-                    static_cast<int>(slope * static_cast<float>(i - y) );
-
-            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT) {
-                debugImage[i][newx] = static_cast<unsigned char>(c);
-            }
-        }
-    } else if (slope != 0) {
-        //slope = 1.0 / slope;
-        if (x > x1) {
-            sign = -1;
-        }
-        for (int i = x; i != x1; i += sign) {
-            int newy = y +
-                    static_cast<int>(slope * static_cast<float>(i - x) );
-
-            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                debugImage[newy][i] = static_cast<unsigned char>(c);
-            }
-        }
-    }
-    else if (slope == 0) {
-        int startX = min(x, x1);
-        int endX = max(x, x1);
-        for (int i = startX; i <= endX; i++) {
-            if (y >= 0 && y < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                debugImage[y][i] = static_cast<unsigned char>(c);
-            }
-        }
-    }
-#endif
-}
-
 // Draws the visual horizon on the image
 void Threshold::drawVisualHorizon() {
-    drawLine(0, horizon, IMAGE_WIDTH, horizon, VISUAL_HORIZON_COLOR);
+    vision->drawLine(0, horizon, IMAGE_WIDTH, horizon, VISUAL_HORIZON_COLOR);
 }
-
-/* drawPoint()
- * Draws a crosshair or a 'point' on the fake image at some given x, y, and with
- * a given color.
- * @param x       center of the point
- * @param y       center y value
- * @param c       color to draw
- */
-void Threshold::drawPoint(int x, int y, int c) {
-
-#ifdef OFFLINE
-    if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y][x] = static_cast<unsigned char>(c);
-    }if (y+1 > 0 && x > 0 && y+1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y+1][x] = static_cast<unsigned char>(c);
-    }if (y+2 > 0 && x > 0 && y+2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y+2][x] = static_cast<unsigned char>(c);
-    }if (y-1 > 0 && x > 0 && y-1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y-1][x] = static_cast<unsigned char>(c);
-    }if (y-2 > 0 && x > 0 && y-2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        debugImage[y-2][x] = static_cast<unsigned char>(c);
-    }if (y > 0 && x+1 > 0 && y < (IMAGE_HEIGHT) && x+1 < (IMAGE_WIDTH)) {
-        debugImage[y][x+1] = static_cast<unsigned char>(c);
-    }if (y > 0 && x+2 > 0 && y < (IMAGE_HEIGHT) && x+2 < (IMAGE_WIDTH)) {
-        debugImage[y][x+2] = static_cast<unsigned char>(c);
-    }if (y > 0 && x-1 > 0 && y < (IMAGE_HEIGHT) && x-1 < (IMAGE_WIDTH)) {
-        debugImage[y][x-1] = static_cast<unsigned char>(c);
-    }if (y > 0 && x-2 > 0 && y < (IMAGE_HEIGHT) && x-2 < (IMAGE_WIDTH)) {
-        debugImage[y][x-2] = static_cast<unsigned char>(c);
-    }
-#endif
-}
-
-// Prerequisite - point is within bounds of screen
-void Threshold::drawX(int x, int y, int c) {
-#ifdef OFFLINE
-    // Mid point
-    debugImage[y-2][x-2] = static_cast<unsigned char>(c);
-    debugImage[y-1][x-1] = static_cast<unsigned char>(c);
-    debugImage[y][x] = static_cast<unsigned char>(c);
-    debugImage[y+1][x+1] = static_cast<unsigned char>(c);
-    debugImage[y+2][x+2] = static_cast<unsigned char>(c);
-
-    debugImage[y-2][x+2] = static_cast<unsigned char>(c);
-    debugImage[y-1][x+1] = static_cast<unsigned char>(c);
-
-    debugImage[y+1][x-1] = static_cast<unsigned char>(c);
-    debugImage[y+2][x-2] = static_cast<unsigned char>(c);
-
-#endif
-
-}
-
-
 
 const char* Threshold::getShortColor(int _id) {
     switch (_id) {
@@ -1721,7 +1513,6 @@ const char* Threshold::getShortColor(int _id) {
 int Threshold::getY(int j, int i) const {
     return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
 }
-
 
 // These two are backwards, because our constants are backwards in
 // VisionDef.h. The real order is |U|V|U|V|, not |V|U|V|U|
