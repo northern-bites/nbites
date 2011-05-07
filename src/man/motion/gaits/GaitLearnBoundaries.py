@@ -3,29 +3,6 @@
 # is only a placeholder
 # parameters we're optimizing are marked with **
 
-def gaitToArray(gait):
-    list = []
-    for section in gait:
-        for value in section:
-            list.append(value)
-    return list
-
-# the opposite of gaitToArray
-# parses a list of the correct arity
-def arrayToGaitTuple(array):
-    assert len(array) == 44
-
-    stance = tuple(array[0:6])
-    step = tuple(array[6:18])
-    zmp = tuple(array[18:24])
-    hack = (array[25], array[25]) # joint hack is always the same L/R!
-    sensor = tuple(array[26:34])
-    stiffness = tuple(array[34:40])
-    odo = tuple(array[40:43])
-    arm = tuple(array[43:44])
-
-    return (stance, step, zmp, hack, sensor, stiffness, odo, arm)
-
 stanceMin = (31.00,  # CoM height
              0.0,    #** Forward displacement of CoM
              9.0,    #** Horizontal distance between feet
