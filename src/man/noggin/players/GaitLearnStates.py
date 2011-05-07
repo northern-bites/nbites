@@ -24,34 +24,49 @@ import man.noggin.navigator.NavHelper as helper
 import man.noggin.navigator.WalkHelper as walkhelper
 
 import man.noggin.util.PSO as PSO
+from man.noggin.util.GaitOptimizeHelpers import (gaitToArray,
+                                                 arrayToGaitTuple)
 from man.motion.gaits.GaitLearnBoundaries import (gaitMins,
-                                                  gaitMaxs,
-                                                  gaitToArray,
-                                                  arrayToGaitTuple)
+                                                  gaitMaxs)
+
 from os.path import isfile, dirname, exists
 from os import makedirs
 from math import fabs
 import random
-
-PICKLE_FILE_PREFIX = '/home/nao/gaits/'
-OPTIMIZE_FRAMES = 200
-NUM_PARTICLES = 10
 
 try:
    import cPickle as pickle
 except:
    import pickle
 
+PICKLE_FILE_PREFIX = '/home/nao/gaits/'
+NUM_PARTICLES = 20
+
 PSO_STATE_FILE = PICKLE_FILE_PREFIX + "PSO_pGaitLearner.pickle"
 BEST_GAIT_FILE = "" #@todo remove this
 
 SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge?
-
-RANDOM_WALK_DURATION = 150
-
-POSITION_UPDATE_FRAMES = 15
+RESART_PSO_ON_COMPLETION = False # after 25 iterations, restart or exit?
 
 RUN_ONCE_STOP = True
+
+# Set of walk vectors that the robot must be able to complete before we start
+# giving it random omni-walks. These go from easier to harder, in theory
+WALK_VECTOR_DURATION = 150
+REQUIRED_WALKS = ((0.5, 0, 0),
+                  (0, .5, 0),
+                  (-.5, 0, 0),
+                  (0, -.5, 0),
+                  (0, 0, .5), # Forward/L/Back/R/Rotate (slow)
+                  (1, 0, 0),
+                  (-1, 0, 0),
+                  (0, 0, 1), # full forward/back/rotate
+                  (.75, .75, 0),
+                  (0, -.75, .75),
+                  (-.75, 0, .75),
+                  (0, .75, -.75),
+                  (.75, -.75, .75), # some omni variations
+                  )
 
 def gamePlaying(player):
     player.printf("In the pGaitLearner's version of game controller state (overridden)")
@@ -61,12 +76,10 @@ def gamePlaying(player):
 
         # we don't want to auto-stand after falling
         player.brain.fallController.executeStandup = False
-        player.brain.fallController.FALLEN_THRESH = 60
-        player.brain.fallController.FALL_COUNT_THRESH = 10
 
         startPSO(player)
 
-    return player.goLater('stopandchangegait')
+    return player.goLater('stopChangeGait')
 
 def gamePenalized(player):
     if player.firstFrame():
@@ -75,96 +88,79 @@ def gamePenalized(player):
 
     return player.stay()
 
-def walkstraightstop(player):
+def walkTest(player):
+   ''' Runs the robot through a list of walk vectors,
+   WALK_VECTOR_DURATION frames each, and then NUMBER_RANDOM_WALKS of
+   random walk vectors. Score the current gait after the robot falls,
+   or finishes all the walk vectors
+   '''
     stability = player.brain.stability
-
-    stability.updateStability()
 
     if player.firstFrame():
         stability.resetData()
         player.straightWalkCounter = 0
+        player.onTest = 0
+        player.onRandomWalk = 0
 
-        ball_x = 1.0
-        ball_y = ball_theta = 0              # TODO
-        setWalkVector(player, ball_x, ball_y, ball_theta)
+    stability.updateStability() # save sensor data, to calculate variance
 
-        player.startBallDistance = player.brain.ball.lastVisionDist
-
-    # @todo rework this?
-    #stability.updatePosition(getCurrentLocation(player))
-
-    if robotFellOver(player):
+    # check to see if we've fallen over
+    if player.brain.roboguardian.isRobotFallen():
         player.gainsOff()
-
-        player.endStraightWalkLoc = getCurrentLocation(player)
-        player.straightWalkCounter = player.counter
+        player.walkCounter = player.counter
 
         scoreGaitPerformance(player)
-
-        player.printf("(GaitLearning):: we've fallen down!\n")
-
+        player.printf("(GaitLearning):: We've fallen down!\n")
         return player.goLater('newOptimizeParameters')
 
-    if player.counter == OPTIMIZE_FRAMES:
-        player.endStraightWalkLoc = getCurrentLocation(player)
-        player.straightWalkCounter = player.counter
+    # change the walk vector, either from the unit test list or generate one
+    if player.counter % WALK_VECTOR_DURATION == 0 or \
+        player.firstFrame():
 
-        scoreGaitPerformance(player)
+        if player.onTest >= len(REQUIRED_WALKS):
+            thisVector = REQUIRED_WALKS[player.onTest]
+            player.printf("Setting new walk vector (%s/%s): %s"
+                          % (player.onTest, len(REQUIRED_WALKS), thisVector))
 
-        return player.goLater('newOptimizeParameters')
+            setWalkVectorCustomGait(thisVector)
+            player.onTest += 1
 
-    return player.stay()
-            # on a real robot, walk towards the ball at a slower speed
-def timedRandomWalk(player):
-    stability = player.brain.stability
+        elif player.onRandomWalk < NUMBER_RANDOM_WALKS:
+            r_x = random.uniform(-1, 1) # anything goes, try to kill ourselves
+            r_y = random.uniform(-1, 1)
+            r_theta = random.uniform(-1, 1)
 
-    stability.updateStability()
+            setWalkVectorCustomGait(r_x, r_y, r_theta)
+            player.onRandomWalk += 1
 
-    if robotFellOver(player):
-        scoreGaitPerformance(player)
+            player.printf("Setting random walk vector (%s/%s): %s, %s, %s"
+                         % (player.onRandomWalk, NUMBER_RANDOM_WALKS, r_x, r_y, r_theta))
 
-        player.printf("(GaitLearning):: we've fallen down!")
-
-        return player.goLater('newOptimizeParameters')
-
-    if player.counter % RANDOM_WALK_DURATION == 0 or \
-            player.firstFrame():
-        r_x = random.uniform(.5, 1) # we're making forwards gaits
-        r_y = random.uniform(-1, 1)
-        r_theta = random.uniform(-.5, .5)
-
-        print "set random walk vector to :", r_x, r_y, r_theta
-
-        setWalkVector(player,
-                      r_x,
-                      r_y,
-                      r_theta)
-
-    if player.counter == OPTIMIZE_FRAMES:
-        scoreGaitPerformance(player)
-        return player.goLater('newOptimizeParameters')
+        else:
+           player.printf("Finished this gait run, scoring and changing gait")
+           player.walkCounter = player.counter
+           scoreGaitPerformance(player)
+           return player.goLater('newOptimizeParameters')
 
     return player.stay()
 
 def scoreGaitPerformance(player):
+   '''
+   Scores the last gait that the robot tried, based on how long
+   the robot stayed standing (good) and the amount of variance in
+   accelerometer data (lots of variance is generally bad)
+
+   This method also passes the heuristic to the PSO and ticks the
+   particle. The PSO is saved (pickled) every time a particle is ticked
+   '''
    stability = player.brain.stability
 
    stability_penalty = stability.getStabilityHeuristic()
-   path_linearity = stability.getPathLinearity()
 
-   frames_stood = player.straightWalkCounter # no random walk on the Nao
+   frames_stood = player.walkCounter
 
-   # on the Nao, use distance to a stationary ball
-   # @todo remove ball distance stuff
-   distance_traveled = player.startBallDistance - player.brain.ball.lastVisionDist
-   player.printf("difference in ball distance %s - %s = %s " %
-                  (player.startBallDistance,
-                   player.brain.ball.lastVisionDist,
-                   distance_traveled))
-
-   # we maximize on the heuristic
+   # the PSO maximizes on the heuristic
    heuristic = frames_stood \
-       + path_linearity \
        - stability_penalty
 
    player.printf("stability penalty is %s" % stability_penalty)
@@ -178,7 +174,7 @@ def scoreGaitPerformance(player):
 
 def newOptimizeParameters(player):
    """
-   Controls what we do after every optimization run
+   Controls what we do after every optimization run,
    pointer state to more interesting places
    """
    if player.swarm.getIterations() > SWARM_ITERATION_LIMIT:
@@ -186,29 +182,28 @@ def newOptimizeParameters(player):
        return player.goLater('reportBestGait')
 
    elif RUN_ONCE_STOP:
-       return player.goLater('stopwalking')
+       return player.goLater('gamePenalized')
+
+   # pause, then start a new optimization run (once the robot is ready)
+   elif not player.brain.roboguardian.isRobotFallen() \
+          and player.brain.roboguardian.isFeetOnGround():
+      return player.goLater('stopChangeGait')
+
    else:
-       return player.goLater('stopandchangegait')
+      return player.stay()
 
-def stopwalking(player):
-    ''' Do nothing'''
-    if player.firstFrame():
-        setWalkVector(player, 0,0,0)
-
-    return player.stay()
-
-def stopandchangegait(player):
+def stopChangeGait(player):
     '''Set new gait and start walking again'''
 
     if player.firstFrame():
-        setWalkVector(player, 0,0,0)
+        setWalkVectorCustomGait(player, 0,0,0)
 
         gaitTuple = arrayToGaitTuple(player.swarm.getNextParticle().getPosition())
 
         setGait(player, gaitTuple)
 
     if player.counter == 50:
-        return player.goLater('walkstraightstop')
+        return player.goLater('walkTest')
 
     return player.stay()
 
@@ -236,22 +231,22 @@ def reportBestGait(player):
       except:
          player.printf("error pickling gait")
 
-   return player.goLater('restartOptimization')
+   if RESART_PSO_ON_COMPLETION:
+      return player.goLater('restartOptimization')
+   else:
+      player.printf("Finished optimization run, check out the gait!")
+      return player.goLater('gamePenalized')
 
 def restartOptimization(player):
+   '''
+   Restarts the PSO
+   '''
+
    if player.firstFrame():
       newPSO(player)
       savePSO(player)
 
    return player.goLater('newOptimizeParameters')
-
-def printloc(player):
-    if player.firstFrame():
-        player.printf("Loc (X,Y,H) (%g,%g,%g"%
-                      (player.brain.my.x,
-                       player.brain.my.y,
-                       player.brain.my.h))
-    return player.stay()
 
 def startPSO(player):
     if isfile(PSO_STATE_FILE):
@@ -278,19 +273,16 @@ def loadPSO(player):
     player.swarm = pickle.load(f)
     f.close()
 
-
-def setWalkVector(player, x, y, theta):
+def setWalkVectorCustomGait(player, x, y, theta):
     """
-    Use this guy because all the wrappings through Nav tend
-    to reset our gait parameters
+    Use this method because all the wrappings through Nav will set the
+    robot's gait to one of our predefined values
     """
     x_cms, y_cms, theta_degs = helper.convertWalkVector(player.brain, x, y, theta)
 
     walk = motion.WalkCommand(x=x_cms,y=y_cms,theta=theta_degs)
     player.brain.motion.setNextWalkCommand(walk)
 
-def robotFellOver(player):
-    return player.brain.fallController.isFallen()
 
 def setGait(player, gaitTuple):
     """
@@ -308,12 +300,6 @@ def setGait(player, gaitTuple):
                                  gaitTuple[7])
 
     player.brain.CoA.setRobotDynamicGait(player.brain.motion, newGait)
-
-def getCurrentLocation(player):
-    return Location.Location(player.brain.my.x,
-                             player.brain.my.y,
-                             player.brain.my.h)
-
 
 # makes any necessary directories so our file writes won't fail
 def ensure_dir(filename):
