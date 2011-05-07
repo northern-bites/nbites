@@ -1,7 +1,7 @@
 /**
- * FileLogger.hpp
+ * CodedFileLogger.hpp
  *
- * @class FileLogger
+ * @class CodedFileLogger
  *
  * This class provides a way to serialize a proto message to a file
  * in a sequential manner.
@@ -29,7 +29,7 @@ namespace log {
 
 using namespace google::protobuf::io;
 
-class FileLogger : public Logger {
+class CodedFileLogger : public Logger {
 
 public:
     /**
@@ -40,14 +40,14 @@ public:
      * @param m : the proto message we will log
      * @return
      */
-    FileLogger(std::string fileName, int logTypeID, ProtoMessage* m);
+    CodedFileLogger(std::string fileName, int logTypeID, ProtoMessage* m);
 
     /**
      * Closes the file, which will flush the output buffer
      * to ensure that the file on disk is in sync with the buffer
      * @return
      */
-    ~FileLogger();
+    ~CodedFileLogger();
     void write();
 
 private:

@@ -12,7 +12,7 @@
 #include "protos/Vision.pb.h"
 #include "MObject.hpp"
 #include "Vision.h"
-#include "log/FileLogger.hpp"
+#include "log/CodedFileLogger.hpp"
 
 namespace memory {
 class MVision: public proto::PVision, public MObject {
@@ -39,7 +39,7 @@ private:
 
 private:
     boost::shared_ptr<Vision> vision;
-    log::FileLogger* fileLogger;
+    log::CodedFileLogger* fileLogger;
 
 };
 }

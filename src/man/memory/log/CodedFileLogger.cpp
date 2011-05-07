@@ -1,5 +1,5 @@
 /**
- * FileLogger.cpp
+ * CodedFileLogger.cpp
  *
  *  The structure for a log file:
  *  -- ID number for the type of object logged
@@ -20,7 +20,7 @@
 
 #include <google/protobuf/io/gzip_stream.h>
 
-#include "FileLogger.hpp"
+#include "CodedFileLogger.hpp"
 
 namespace memory {
 
@@ -30,7 +30,7 @@ namespace log {
 
 using namespace std;
 
-FileLogger::FileLogger(string fileName, int logTypeID, ProtoMessage* m) :
+CodedFileLogger::CodedFileLogger(string fileName, int logTypeID, ProtoMessage* m) :
         Logger(m) {
     int file_descriptor = open(fileName.data(),
                                O_WRONLY | O_CREAT,
@@ -54,14 +54,14 @@ FileLogger::FileLogger(string fileName, int logTypeID, ProtoMessage* m) :
     coded_output->WriteLittleEndian64(birth_time);
 }
 
-void FileLogger::write() {
+void CodedFileLogger::write() {
 
     //TODO: can we use cached size here?
     coded_output->WriteVarint32(message->ByteSize());
     message->SerializeToCodedStream(coded_output);
 }
 
-FileLogger::~FileLogger() {
+CodedFileLogger::~CodedFileLogger() {
     raw_output->Close();
     delete coded_output;
     delete raw_output;

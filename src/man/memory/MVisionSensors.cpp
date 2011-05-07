@@ -19,7 +19,7 @@ using namespace proto;
 using namespace std;
 
 MVisionSensors::MVisionSensors(shared_ptr<Sensors> s) : sensors(s) {
-    fileLogger = new log::FileLogger(NAO_LOG_DIR "/VisionSensors.log", MVISION_SENSORS_ID, this);
+    fileLogger = new log::CodedFileLogger(NAO_LOG_DIR "/VisionSensors.log", MVISION_SENSORS_ID, this);
 }
 
 MVisionSensors::~MVisionSensors() {

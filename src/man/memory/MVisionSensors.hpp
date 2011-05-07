@@ -12,7 +12,7 @@
 #include "protos/Sensors.pb.h"
 #include "MObject.hpp"
 #include "Sensors.h"
-#include "log/FileLogger.hpp"
+#include "log/CodedFileLogger.hpp"
 
 namespace memory {
 class MVisionSensors: public proto::PVisionSensors, public MObject {
@@ -34,7 +34,7 @@ public:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    log::FileLogger* fileLogger;
+    log::CodedFileLogger* fileLogger;
 
 };
 }
