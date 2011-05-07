@@ -18,8 +18,6 @@ class FallController(FSA.FSA):
         self.doneStandingCount = 0
         self.standupMoveTime = 0
 
-        self.FALLEN_THRESH = 50
-        self.FALL_COUNT_THRESH = 15
         self.DONE_STANDING_THRESH = 2
 
         self.executeStandup = True
