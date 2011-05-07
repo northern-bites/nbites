@@ -148,7 +148,8 @@ class Particle:
             if ((newPosition > self.searchMaxs[i]) or
                 (newPosition < self.searchMins[i]) and
                 RANDOMIZE_LOST_PARTICLES):
-                print "Randomized a lost particle!"
+                if DEBUG:
+                    print 'Randomized a lost particle (dimension {0})'.format(i)
                 self.position[i] = random.uniform(self.searchMins[i],
                                                   self.searchMaxs[i])
                 self.velocity[i] = 0

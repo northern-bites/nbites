@@ -6,9 +6,7 @@
 # Things that need to happen before team-wide gait optimization can start:
 # (list current as of 5/7/11)
 #
-# @todo collect stability variance data on several gaits, decide on heuristic
 # @todo (Motion) change engine to walk in place before beginning to move
-# @todo figure out a good way to get several "good" gaits out of a Swarm object
 #
 # @author Nathan Merritt
 # @date May 2011
@@ -70,17 +68,18 @@ REQUIRED_WALKS = ((0.5, 0, 0),
                   )
 
 def gamePlaying(player):
-    player.printf("In the pGaitLearner's version of game controller state (overridden)")
-    if player.firstFrame():
-        player.gainsOn()
-        player.brain.tracker.trackBall()
+   player.printf("In the pGaitLearner's version of game controller state (overridden)")
+   if player.firstFrame():
+      player.gainsOn()
+      player.brain.tracker.trackBall()
 
-        # we don't want to auto-stand after falling
-        player.brain.fallController.executeStandup = False
+      # we don't want to auto-stand after falling
+      player.brain.fallController.executeStandup = False
+      player.brain.fallController.enabled = False
 
-        startPSO(player)
+      startPSO(player)
 
-    return player.goLater('stopChangeGait')
+   return player.goLater('stopChangeGait')
 
 def gamePenalized(player):
     if player.firstFrame():
@@ -95,55 +94,55 @@ def walkTest(player):
    random walk vectors. Score the current gait after the robot falls,
    or finishes all the walk vectors
    '''
-    stability = player.brain.stability
+   stability = player.brain.stability
 
-    if player.firstFrame():
-        stability.resetData()
-        player.straightWalkCounter = 0
-        player.onTest = 0
-        player.onRandomWalk = 0
+   if player.firstFrame():
+      stability.resetData()
+      player.straightWalkCounter = 0
+      player.onTest = 0
+      player.onRandomWalk = 0
 
-    stability.updateStability() # save sensor data, to calculate variance
+   stability.updateStability() # save sensor data, to calculate variance
 
-    # check to see if we've fallen over
-    if player.brain.roboguardian.isRobotFallen():
-        player.gainsOff()
-        player.walkCounter = player.counter
+   # check to see if we've fallen over
+   if player.brain.roboguardian.isRobotFallen():
+      player.gainsOff()
+      player.walkCounter = player.counter
 
-        scoreGaitPerformance(player)
-        player.printf("(GaitLearning):: We've fallen down!\n")
-        return player.goLater('newOptimizeParameters')
+      scoreGaitPerformance(player)
+      player.printf("(GaitLearning):: We've fallen down!\n")
+      return player.goLater('newOptimizeParameters')
 
-    # change the walk vector, either from the unit test list or generate one
-    if player.counter % WALK_VECTOR_DURATION == 0 or \
-        player.firstFrame():
+   # change the walk vector, either from the unit test list or generate one
+   if player.counter % WALK_VECTOR_DURATION == 0 or \
+          player.firstFrame():
 
-        if player.onTest >= len(REQUIRED_WALKS):
-            thisVector = REQUIRED_WALKS[player.onTest]
-            player.printf("Setting new walk vector (%s/%s): %s"
-                          % (player.onTest, len(REQUIRED_WALKS), thisVector))
+      if player.onTest < len(REQUIRED_WALKS):
+         thisVector = REQUIRED_WALKS[player.onTest]
+         player.printf("Setting new walk vector (%s/%s): %s"
+                       % (player.onTest, len(REQUIRED_WALKS), thisVector))
 
-            setWalkVectorCustomGait(thisVector)
-            player.onTest += 1
+         setWalkVectorCustomGait(player, thisVector[0], thisVector[1], thisVector[2])
+         player.onTest += 1
 
-        elif player.onRandomWalk < NUMBER_RANDOM_WALKS:
-            r_x = random.uniform(-1, 1) # anything goes, try to kill ourselves
-            r_y = random.uniform(-1, 1)
-            r_theta = random.uniform(-1, 1)
+      elif player.onRandomWalk < NUMBER_RANDOM_WALKS:
+         r_x = random.uniform(-1, 1) # anything goes, try to kill ourselves
+         r_y = random.uniform(-1, 1)
+         r_theta = random.uniform(-1, 1)
 
-            setWalkVectorCustomGait(r_x, r_y, r_theta)
-            player.onRandomWalk += 1
+         setWalkVectorCustomGait(player, r_x, r_y, r_theta)
+         player.onRandomWalk += 1
 
-            player.printf("Setting random walk vector (%s/%s): %s, %s, %s"
-                         % (player.onRandomWalk, NUMBER_RANDOM_WALKS, r_x, r_y, r_theta))
+         player.printf("Setting random walk vector (%s/%s): %s, %s, %s"
+                       % (player.onRandomWalk, NUMBER_RANDOM_WALKS, r_x, r_y, r_theta))
 
-        else:
-           player.printf("Finished this gait run, scoring and changing gait")
-           player.walkCounter = player.counter
-           scoreGaitPerformance(player)
-           return player.goLater('newOptimizeParameters')
+      else:
+         player.printf("Finished this gait run, scoring and changing gait")
+         player.walkCounter = player.counter
+         scoreGaitPerformance(player)
+         return player.goLater('newOptimizeParameters')
 
-    return player.stay()
+   return player.stay()
 
 def scoreGaitPerformance(player):
    '''
@@ -161,16 +160,14 @@ def scoreGaitPerformance(player):
    frames_stood = player.walkCounter
 
    # the PSO maximizes on the heuristic
-   heuristic = frames_stood \
-       - stability_penalty
+   heuristic = frames_stood - stability_penalty
 
+   player.printf("robot stood for %s frames this run" % frames_stood)
    player.printf("stability penalty is %s" % stability_penalty)
-   player.printf("robot stood for %s frames during random walk period" %
-                 (frames_stood - player.straightWalkCounter))
    player.printf("heuristic for this run is %s" % heuristic)
 
-   player.swarm.getCurrParticle().setHeuristic(heuristic)
-   player.swarm.tickCurrParticle()
+   player.swarm.getCurrentParticle().setHeuristic(heuristic)
+   player.swarm.tickCurrentParticle()
    savePSO(player)
 
 def newOptimizeParameters(player):
@@ -197,14 +194,14 @@ def stopChangeGait(player):
     '''Set new gait and start walking again'''
 
     if player.firstFrame():
-        setWalkVectorCustomGait(player, 0,0,0)
+       setWalkVectorCustomGait(player, 0,0,0)
 
-        gaitTuple = arrayToGaitTuple(player.swarm.getNextParticle().getPosition())
+       gaitTuple = arrayToGaitTuple(player.swarm.getCurrentParticle().getPosition())
 
-        setGait(player, gaitTuple)
+       setGait(player, gaitTuple)
 
     if player.counter == 50:
-        return player.goLater('walkTest')
+       return player.goLater('walkTest')
 
     return player.stay()
 
@@ -242,12 +239,11 @@ def restartOptimization(player):
    '''
    Restarts the PSO
    '''
-
    if player.firstFrame():
       newPSO(player)
       savePSO(player)
 
-   return player.goLater('newOptimizeParameters')
+      return player.goLater('newOptimizeParameters')
 
 def startPSO(player):
     if isfile(PSO_STATE_FILE):
