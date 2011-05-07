@@ -4,10 +4,8 @@
 # optimal set of parameters.
 #
 # Things that need to happen before team-wide gait optimization can start:
-# (list current as of 4/26/11)
+# (list current as of 5/7/11)
 #
-# @todo list of walk vectors to run on each particle (should last ~3 minutes)
-# @todo make sure this behavior still works
 # @todo collect stability variance data on several gaits, decide on heuristic
 # @todo (Motion) change engine to walk in place before beginning to move
 # @todo figure out a good way to get several "good" gaits out of a Swarm object
@@ -25,7 +23,8 @@ import man.noggin.navigator.WalkHelper as walkhelper
 
 import man.noggin.util.PSO as PSO
 from man.noggin.util.GaitOptimizeHelpers import (gaitToArray,
-                                                 arrayToGaitTuple)
+                                                 arrayToGaitTuple,
+                                                 writeGaitToFile)
 from man.motion.gaits.GaitLearnBoundaries import (gaitMins,
                                                   gaitMaxs)
 
@@ -43,7 +42,7 @@ PICKLE_FILE_PREFIX = '/home/nao/gaits/'
 NUM_PARTICLES = 20
 
 PSO_STATE_FILE = PICKLE_FILE_PREFIX + "PSO_pGaitLearner.pickle"
-BEST_GAIT_FILE = "" #@todo remove this
+BEST_GAIT_FILE = PICKLE_FILE_PREFIX + "PSO_gait"
 
 SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge?
 RESART_PSO_ON_COMPLETION = False # after 25 iterations, restart or exit?
@@ -53,6 +52,7 @@ RUN_ONCE_STOP = True
 # Set of walk vectors that the robot must be able to complete before we start
 # giving it random omni-walks. These go from easier to harder, in theory
 WALK_VECTOR_DURATION = 150
+NUMBER_RANDOM_WALKS = 20
 REQUIRED_WALKS = ((0.5, 0, 0),
                   (0, .5, 0),
                   (-.5, 0, 0),
@@ -61,6 +61,7 @@ REQUIRED_WALKS = ((0.5, 0, 0),
                   (1, 0, 0),
                   (-1, 0, 0),
                   (0, 0, 1), # full forward/back/rotate
+                  (0, -1, 1),
                   (.75, .75, 0),
                   (0, -.75, .75),
                   (-.75, 0, .75),
@@ -209,33 +210,33 @@ def stopChangeGait(player):
 
 def reportBestGait(player):
    if player.firstFrame():
-      (bestGaitArray, gaitScore) = player.swarm.getBestSolution()
-      bestGaitTuple = arrayToGaitTuple(bestGaitArray)
+       (bestGaitArray, gaitScore) = player.swarm.getBestSolution()
+       bestGaitTuple = arrayToGaitTuple(bestGaitArray)
 
-      player.printf("best found gait's heuristic score was: %s" % gaitScore)
+       player.printf("best found gait's heuristic score was: %s" % gaitScore)
 
-      try:
-         gaitScore = int(gaitScore)
-         output = BEST_GAIT_FILE + str(gaitScore)
+       try:
+           gaitScore = int(gaitScore)
+           output = BEST_GAIT_FILE + str(gaitScore) + ".py"
 
-         i = 1
-         while isfile(output):
-            output = BEST_GAIT_FILE + str(gaitScore) + "." + str(i)
-            i += 1
+           i = 1
+           while isfile(output):
+               output = BEST_GAIT_FILE + str(gaitScore) + "." + str(i) + ".py"
+               i += 1
 
-         player.printf("best gait saved to file: %s" % output)
-         f = open(output, 'w')
-         pickle.dump(bestGaitTuple, f)
-         f.close()
+           player.printf("best gait saved to file: %s" % output)
+           f = open(output, 'w')
+           writeGaitToFile(f, bestGaitTuple, gaitScore)
+           f.close()
 
-      except:
-         player.printf("error pickling gait")
+       except:
+           player.printf("error writing out gait")
 
    if RESART_PSO_ON_COMPLETION:
-      return player.goLater('restartOptimization')
+       return player.goLater('restartOptimization')
    else:
-      player.printf("Finished optimization run, check out the gait!")
-      return player.goLater('gamePenalized')
+       player.printf("Finished optimization run, check out the gait!")
+       return player.goLater('gamePenalized')
 
 def restartOptimization(player):
    '''
