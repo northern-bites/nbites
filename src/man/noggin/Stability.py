@@ -9,9 +9,6 @@ except:
     haveNumpy = False
     print "could not load numpy, please install it for advanced statistics"
 
-FALL_ACCZ_THRESHOLD = 5
-FALL_FRAMES_THRESHOLD = 15
-
 # unstable walks that do not fall have accelerometer variance
 # on the order of 1.5-3, stable walks are < 1
 X_STABILITY_WEIGHT = 50
@@ -54,10 +51,22 @@ class Stability:
         return self.calculateStabilityVariance(self.accelY)
 
     def getStabilityHeuristic(self):
-        xStabilityHeuristic = X_STABILITY_WEIGHT * self.getStability_X()
-        yStabilityHeuristic = Y_STABILITY_WEIGHT * self.getStability_Y()
+        '''
+        Calculates the variance of the accelerometers in X & Y, multiplies them
+        by a constant weight to bring them above zero and then returns the sum
+        of the values squared.
+        '''
 
-        return xStabilityHeuristic + yStabilityHeuristic
+        xVariance = self.getStability_X()
+        yVariance = self.getStability_Y()
+
+        xStabilityHeuristic = X_STABILITY_WEIGHT * xVariance
+        yStabilityHeuristic = Y_STABILITY_WEIGHT * yVariance
+
+        # new style python print formatting - READ ABOUT IT (it's awesome)
+        print 'X/Y accelerometer variance: {0:.3f}/{1:.3f}'.format(xVariance, yVariance)
+
+        return xStabilityHeuristic**2 + yStabilityHeuristic**2
 
     def getPathLinearity(self):
         # sanity check so we don't crash when running on the Nao
