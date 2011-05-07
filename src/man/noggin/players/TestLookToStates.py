@@ -17,7 +17,8 @@ def gamePenalized(player):
 
 def standup(player):
     player.gainsOn()
-    player.standup()
+    if player.firstFrame():
+        player.standup()
     return player.goLater('lookRightClose')
 
 def lookRightClose(player):

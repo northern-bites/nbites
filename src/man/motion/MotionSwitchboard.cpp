@@ -346,14 +346,14 @@ void MotionSwitchboard::processBodyJoints()
 
 void MotionSwitchboard::preProcessHead()
 {
-    if (curProvider != &nullHeadProvider &&
-        nextProvider == &nullHeadProvider)
+    if (curHeadProvider != &nullHeadProvider &&
+        nextHeadProvider == &nullHeadProvider)
     {
         headProvider.hardReset();
-	/////////////coordHeadProvider.hardReset();
+	coordHeadProvider.hardReset();
     }
 
-	if (curHeadProvider != nextHeadProvider)
+    if (curHeadProvider != nextHeadProvider)
     {
         if (!curHeadProvider->isActive())
         {
@@ -367,7 +367,7 @@ void MotionSwitchboard::preProcessHead()
 #endif
             curHeadProvider->requestStop();
         }
-	}
+    }
 }
 
 void MotionSwitchboard::preProcessBody()
@@ -380,7 +380,7 @@ void MotionSwitchboard::preProcessBody()
     }
 
     //determine the curProvider, and do any necessary swapping
-	if (curProvider != nextProvider)
+    if (curProvider != nextProvider)
     {
         if (!curProvider->isActive())
         {
@@ -393,7 +393,7 @@ void MotionSwitchboard::preProcessBody()
 #endif
             curProvider->requestStop();
         }
-	}
+    }
 }
 
 void MotionSwitchboard::clipHeadJoints(vector<float>& joints)
@@ -745,10 +745,10 @@ void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
 
 }
 void MotionSwitchboard::sendMotionCommand(const CoordHeadCommand * command){
-  /*pthread_mutex_lock(&next_provider_mutex);
-    nextHeadProvider = &coordHeadProvider;
-    coordHeadProvider.setCommand(command);
-    pthread_mutex_unlock(&next_provider_mutex);*/
+  pthread_mutex_lock(&next_provider_mutex);
+  nextHeadProvider = &coordHeadProvider;
+  coordHeadProvider.setCommand(command);
+  pthread_mutex_unlock(&next_provider_mutex);
 
 }
 void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){

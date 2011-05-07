@@ -28,7 +28,6 @@
 #include "MotionProvider.h"
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
-#include "CoordHeadCommand.h"
 #include "Sensors.h"
 #include "ChopShop.h"
 #include "Kinematics.h"
@@ -71,13 +70,13 @@ private:
 
 
     boost::shared_ptr<ChoppedCommand> currCommand;
-	// Queue of all future commands
-	std::queue<const HeadJointCommand*> headCommandQueue;
+    // Queue of all future commands
+    std::queue<const HeadJointCommand*> headCommandQueue;
 
-	HeadMode curMode;
+    HeadMode curMode;
     float yawDest,pitchDest,lastYawDest,lastPitchDest;
-	float pitchMaxSpeed, yawMaxSpeed;
-	float headSetStiffness;
+    float pitchMaxSpeed, yawMaxSpeed;
+    float headSetStiffness;
 
     pthread_mutex_t head_provider_mutex;
 
