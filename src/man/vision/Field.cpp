@@ -98,9 +98,9 @@ void Field::initialScanForTopGreenPoints(int pH) {
 				x--;
 			pixel = thresh->getColor(x, top);
 			//pixel = thresh->thresholded[top][x];
-			if (pixel == GREEN) {
+			if (isGreen(pixel)) {
 				good++;
-			} else if (pixel == BLUEGREEN || pixel == GREY) {
+			} else if (isUndefined(pixel)) {
 				ok++;
 				if (ok > SCANNOISE) {
 					good = 0;
@@ -275,7 +275,7 @@ int Field::getInitialHorizonEstimate(int pH) {
 				 && greenPixels <= MIN_PIXELS_INITIAL; i+= SCAN_INTERVAL_X) {
 			//pixel = thresh->thresholded[scanY][i];
 			pixel = thresh->getColor(i, scanY);
-			if (pixel == GREEN) {
+			if (isGreen(pixel)) {
 				greenPixels++;
 			}
 			// project the line to get the next y value
@@ -321,7 +321,7 @@ int Field::getImprovedEstimate(int horizon) {
 			}
 			int newPixel = thresh->getColor(l, scanY);
 			//int newPixel = thresh->thresholded[scanY][l];
-			if (newPixel == GREEN) {
+			if (isGreen(newPixel)) {
 				// firstpix tracks where we saw the first green pixel
 				if (firstpix == -1) {
 					firstpix = l;
@@ -356,7 +356,7 @@ int Field::getImprovedEstimate(int horizon) {
 					thresh->drawPoint(j, scanY, BLACK);
 				}
 				pixel = thresh->getColor(j, scanY);
-				if (pixel == GREEN) {
+				if (isGreen(pixel)) {
 					run++;
 					greenPixels++;
 					firstpix = j;

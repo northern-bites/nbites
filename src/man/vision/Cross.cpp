@@ -142,18 +142,20 @@ bool Cross::scanAroundPerimeter(Blob b) {
 	// first scan the sides
 	for (int i = max(0, y - 2); i < min(IMAGE_HEIGHT - 1, y + h + 2); i++) {
 		if (x > 3) {
-			if (thresh->getThresholded(i,x - 4) == GREEN)
+			if (isGreen(thresh->getThresholded(i,x - 4))) {
 				count++;
-			else if (thresh->getThresholded(i,x - 4) == WHITE)
+			} else if (isWhite(thresh->getThresholded(i,x - 4))) {
 				count-=3;
+			}
 			counter++;
 		} else return false;
 
 		if (x + w + 4 < IMAGE_WIDTH) {
-			if (thresh->getThresholded(i,x + w+ 4) == GREEN)
+			if (isGreen(thresh->getThresholded(i,x + w+ 4))) {
 				count++;
-			else if (thresh->getThresholded(i,x + w+ 4) == WHITE)
+			} else if (isWhite(thresh->getThresholded(i,x + w+ 4))) {
 				count-=3;
+			}
 			counter++;
 		} else return false;
 	}
@@ -161,20 +163,22 @@ bool Cross::scanAroundPerimeter(Blob b) {
 	// now scan above and below
 	for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
 		if (y > 1) {
-			if (thresh->getThresholded(y - 2,i) == GREEN)
+			if (isGreen(thresh->getThresholded(y - 2,i))) {
 				count++;
-            else if (thresh->getThresholded(y - 2,i) == GREY)
-		  count--;
-			else if (thresh->getThresholded(y - 2,i) == WHITE)
+            } else if (isUndefined(thresh->getThresholded(y - 2,i))) {
+				count--;
+			} else if (isWhite(thresh->getThresholded(y - 2,i))) {
 				count-=3;
+			}
 			counter++;
 		} else return false;
 
 		if (y + h + 2 < IMAGE_HEIGHT) {
-			if (thresh->getThresholded(y+h+2,i) == GREEN)
+			if (isGreen(thresh->getThresholded(y+h+2,i))) {
 				count++;
-			else if (thresh->getThresholded(y+h+2,i) == WHITE)
+			} else if (isWhite(thresh->getThresholded(y+h+2,i))) {
 				count-=3;
+			}
 			counter++;
 		} else return false;
 	}
@@ -372,7 +376,7 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
 
 			if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
 				total++;
-				if (thresh->getThresholded(ny,nx) == WHITE) {
+				if (isWhite(thresh->getThresholded(ny,nx))) {
 					good++;
 				}
 			}
@@ -385,3 +389,44 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
 	}
 	return false;
 }
+
+/* Is the passed in pixel White?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is white or not
+ */
+bool Cross::isWhite(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == WHITE;
+#else
+	return pix & WHITE_BIT;
+#endif
+}
+
+/* Is the passed in pixel Green?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is green or not
+ */
+bool Cross::isGreen(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == GREEN || pix == BLUEGREEN;
+#else
+	return pix & GREEN_BIT;
+#endif
+}
+
+/* Is the passed in pixel Undefined?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is undefined or not
+ */
+bool Cross::isUndefined(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == GREY;
+#else
+	return pix;
+#endif
+}
+
+

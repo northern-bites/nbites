@@ -185,10 +185,10 @@ int ImageAcquisitionTest::vIndex(int i, int j) const
  */
 int ImageAcquisitionTest::tableLookup(int y, int u, int v) const
 {
-    // Table is in UVY ordering
+    // Table is in VUY ordering
     int index = y +
-        v * static_cast<int>(c.uvDim & 0xFFFF) +
-        u * static_cast<int>( (c.uvDim >> 16) & 0xFFFF);
+        u * static_cast<int>(c.uvDim & 0xFFFF) +
+        v * static_cast<int>( (c.uvDim >> 16) & 0xFFFF);
     return table[index];
 }
 
@@ -308,8 +308,8 @@ void ImageAcquisitionTest::run_average_test(){
 
             uint16_t u_output = uv_out[i*IMAGE_WIDTH*2 + j*2];
             uint16_t v_output = uv_out[i*IMAGE_WIDTH*2 + j*2 + 1];
-            EQ_INT ( (vAvgValue(i, j)), u_output);
-            EQ_INT ( (uAvgValue(i, j)), v_output);
+            EQ_INT ( (vAvgValue(i, j)), v_output);
+            EQ_INT ( (uAvgValue(i, j)), u_output);
             LT(u_output, 256);
             LT(v_output, 256);
         }

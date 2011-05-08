@@ -111,10 +111,8 @@ static const float RAD_TO_PIX_X = static_cast<float>(IMAGE_WIDTH) / static_cast<
  */
 
 // Image byte layout constants
-// @TODO: THESE ARE WRONG! The correct order is |Y|U|Y|V|,
-// color tables need fixing then, too
-#define UOFFSET  3
-#define VOFFSET  1
+#define UOFFSET  1
+#define VOFFSET  3
 #define YOFFSET1 0
 #define YOFFSET2 2
 
@@ -153,6 +151,16 @@ static const float MAX_ELEVATION_RAD = MAX_ELEVATION_DEG*TO_RAD;
 #define LIGHT_SKY_BLUE 25
 #define MAGENTA 26
 #define PURPLE 27
+
+#define GREY_BIT 0x00
+#define WHITE_BIT 0x01
+#define GREEN_BIT 0x02
+#define BLUE_BIT 0x04
+#define YELLOW_BIT 0x08
+#define ORANGE_BIT 0x10
+#define RED_BIT 0x20
+#define NAVY_BIT 0x40
+#define DRAWING_BIT 0x80
 
 // might be used for landmark recognition certainty - now used for ball certainty
 #define SURE       2
