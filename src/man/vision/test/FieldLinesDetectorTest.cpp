@@ -11,15 +11,20 @@ FieldLinesDetectorTest::FieldLinesDetectorTest() :
 
 }
 
+/**
+ * Test the attributes of the VisualLines found
+ */
 void FieldLinesDetectorTest::test_lines()
 {
     Gradient g;
+    g.reset();
+
     // Create fake image
     srand(time(NULL));
     for (int i=0; i < 50; ++i){
         uint8_t angle = static_cast<uint8_t>(rand());
         float radius = static_cast<float>(rand()%200);
-        Gradient::createLineAtPoint(g, angle, radius);
+        g.createLineAtPoint(angle, radius);
     }
 
     // Run it through field lines

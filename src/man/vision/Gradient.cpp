@@ -2,8 +2,10 @@
 #include <iostream>
 #include <mmintrin.h>
 #include <string.h>
+#include "Utility.h"
 
-using namespace std;
+using std::cout;
+using std::endl;
 
 const int Gradient::dxTab[DIRECTIONS] = { 1,  1,  0, -1, -1, -1,  0,  1};
 const int Gradient::dyTab[DIRECTIONS] = { 0,  1,  1,  1,  0, -1, -1, -1};
@@ -99,10 +101,9 @@ void Gradient::updatePeakGrid()
     }
 }
 
-void Gradient::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
+void Gradient::createLineAtPoint(uint8_t angle, float radius)
 {
     float radAngle = static_cast<float>(angle) * M_PI_FLOAT/128.f;
-
 
     double sn = sin(radAngle);
     double cs = cos(radAngle);
@@ -116,9 +117,38 @@ void Gradient::createLineAtPoint(Gradient& g, uint8_t angle, float radius)
 
         if ( abs(x) < IMAGE_WIDTH/2 &&
              abs(y) < IMAGE_HEIGHT/2){
-            g.addAngle(angle,
-                       static_cast<uint16_t>(x),
-                       static_cast<uint16_t>(y));
+            addAngle(angle,
+                     static_cast<int16_t>(x),
+                     static_cast<int16_t>(y));
+        }
+    }
+}
+
+void Gradient::createSegment(const point<int>& l,
+                             const point<int>& r)
+{
+    double radAngle = atan2((l.x - r.x), (r.y - l.y));
+
+    double sn = sin(radAngle);
+    double cs = cos(radAngle);
+
+    double x0 = l.x;
+    double y0 = l.y;
+
+    float length = Utility::getLength(l,r);
+
+    float xDiff = (r.x - l.x)/length;
+    float yDiff = (r.y - l.y)/length;
+
+    for (double u = 0; u <= length; u+=1.){
+        int x = (int)round(x0 + u * xDiff);
+        int y = (int)round(y0 + u * yDiff);
+
+        if ( abs(x) < IMAGE_WIDTH/2 &&
+             abs(y) < IMAGE_HEIGHT/2){
+            addAngle(static_cast<uint8_t>(radAngle/M_PI * 128),
+                     static_cast<int16_t>(x),
+                     static_cast<int16_t>(y));
         }
     }
 }
