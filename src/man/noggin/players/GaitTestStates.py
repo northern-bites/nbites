@@ -2,11 +2,14 @@
 Similar to WalkUnitTest, if a Gait makes it through all the Walk tests
 without falling then it is considered stable and passes
 
+DO NOT RUN THIS AS IT IS HORRIBLY BROKEN/OUTDATED
+
+--Nathan, April 2011
+
 """
 
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
-from ..WebotsConfig import WEBOTS_ACTIVE
 from .GaitLearnStates import setWalkVector, setGait, revertWebots
 import man.noggin.util.GaitTestData as data
 
@@ -65,6 +68,10 @@ def gamePlaying(player):
 
     if player.counter == 50:
        return player.goLater('gaitTest')
+
+    player.printf("****** ATTENTION **********")
+    player.printf("***DO NOT RUN THIS BECAUSE IT IS HORRIBLY BROKEN***")
+    player.printf("****** ATTENTION **********")
 
     return player.stay()
 
