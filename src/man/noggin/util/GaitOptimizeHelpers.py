@@ -19,6 +19,7 @@ def arrayToGaitTuple(array):
     stance = tuple(array[0:6])
     step = tuple(array[6:18])
     zmp = tuple(array[18:24])
+    zmp[3] = zmp[2] # zmp off same L/R
     hack = (array[25], array[25]) # joint hack is always the same L/R!
     sensor = tuple(array[26:34])
     stiffness = tuple(array[34:40])
