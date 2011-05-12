@@ -19,7 +19,8 @@ include_directories( ${PROTOBUF_INCLUDE_DIRS}/
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-set( LOGGER_SRCS CodedFileLogger.cpp )
+set( LOGGER_SRCS CodedFileLogger.cpp
+                 ZeroCopyFileLogger.cpp)
 
 ############################ Add sources
 # Add static library target
