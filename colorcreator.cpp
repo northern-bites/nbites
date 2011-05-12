@@ -30,6 +30,8 @@ ColorCreator::ColorCreator(QWidget *parent) :
     zMax = new float[COLORS];
     yMin = new int[COLORS];
     yMax = new int[COLORS];
+    vMin = new int[COLORS];
+    vMax = new int[COLORS];
     cols = new QColor[COLORS+SOFT];
     bitColor = new unsigned[COLORS];
 
@@ -106,13 +108,15 @@ ColorCreator::ColorCreator(QWidget *parent) :
         {
         case Orange:
             hMin[i] = 0.80f;
-            hMax[i] = 0.06f;
+            hMax[i] = 0.13f;
             sMin[i] = 0.25f;
             sMax[i] = 1.0f;
             zMin[i] = 0.12f;
             zMax[i] = 1.0f;
             yMin[i] = 34;
             yMax[i] = 145;
+            vMin[i] = 115;
+            vMax[i] = 171;
             break;
         case Green:
             hMin[i] = 0.37f;
@@ -123,6 +127,8 @@ ColorCreator::ColorCreator(QWidget *parent) :
             zMax[i] = 0.53f;
             yMin[i] = 55;
             yMax[i] = 105;
+            vMin[i] = 90;
+            vMax[i] = 131;
             break;
         case Yellow:
             hMin[i] = 0.17f;
@@ -133,6 +139,8 @@ ColorCreator::ColorCreator(QWidget *parent) :
             zMax[i] = 0.48f;
             yMin[i] = 56;
             yMax[i] = 105;
+            vMin[i] = 111;
+            vMax[i] = 128;
             break;
         case Blue:
             hMin[i] = 0.54f;
@@ -143,6 +151,8 @@ ColorCreator::ColorCreator(QWidget *parent) :
             zMax[i] = 0.48f;
             yMin[i] = 33;
             yMax[i] = 105;
+            vMin[i] = 109;
+            vMax[i] = 127;
             break;
         case White:
             hMin[i] = 0.01f;
@@ -153,16 +163,20 @@ ColorCreator::ColorCreator(QWidget *parent) :
             zMax[i] = 1.0f;
             yMin[i] = 102;
             yMax[i] = 250;
+            vMin[i] = 99;
+            vMax[i] = 128;
             break;
         case Pink:
             hMin[i] = 0.75f;
-            hMax[i] = 0.19f;
+            hMax[i] = 0.22f;
             sMin[i] = 0.0f;
             sMax[i] = 0.29f;
             zMin[i] = 0.21f;
             zMax[i] = 0.54f;
             yMin[i] = 58;
             yMax[i] = 139;
+            vMin[i] = 127;
+            vMax[i] = 143;
             break;
         case Navy:
             hMin[i] = 0.57f;
@@ -173,6 +187,8 @@ ColorCreator::ColorCreator(QWidget *parent) :
             zMax[i] = 0.45f;
             yMin[i] = 39;
             yMax[i] = 105;
+            vMin[i] = 106;
+            vMax[i] = 132;
             break;
         default:
             hMin[i] = 0.0f;
@@ -183,6 +199,8 @@ ColorCreator::ColorCreator(QWidget *parent) :
             zMax[i] = 1.0f;
             yMin[i] = 30;
             yMax[i] = 230;
+            vMin[i] = 40;
+            vMax[i] = 150;
             break;
         }
     }
@@ -194,6 +212,8 @@ ColorCreator::ColorCreator(QWidget *parent) :
     ui->zMax->setValue(zMax[currentColor] * 100);
     ui->yMin->setValue(yMin[currentColor]);
     ui->yMax->setValue(yMax[currentColor]);
+    ui->vMin->setValue(vMin[currentColor]);
+    ui->vMax->setValue(vMax[currentColor]);
     ui->zSlice->setValue(zSlice);
 }
 
@@ -264,7 +284,12 @@ void ColorCreator::updateColors()
                 ColorSpace col;
                 col.setHsz(h, s, zSlice);
                 int y = col.getYb();
+                int v = col.getVb();
                 if (y < yMin[currentColor] || y > yMax[currentColor])
+                {
+                    display = false;
+                }
+                if (v < vMin[currentColor] || v > vMax[currentColor])
                 {
                     display = false;
                 }
@@ -418,7 +443,7 @@ QColor ColorCreator::displayColorTable(int i, int j)
     return c;
 }
 
-bool ColorCreator::testValue(float h, float s, float z, int y, int color)
+bool ColorCreator::testValue(float h, float s, float z, int y, int v, int color)
 {
     if (hMax[color] > hMin[color])
     {
@@ -439,6 +464,9 @@ bool ColorCreator::testValue(float h, float s, float z, int y, int color)
         return false;
     }
     else if (y < yMin[color] || y > yMax[color])
+    {
+        return false;
+    } else if (v < vMin[color] || v > vMax[color])
     {
         return false;
     }
@@ -463,11 +491,12 @@ void ColorCreator::largeDisplay()
             do {
                 display = true;
                 int y = roboimage.getY(i, j);
+                int v = roboimage.getV(i, j);
                 float s = (float)roboimage.getS(i, j) / 256.0f;
                 float h = (float)roboimage.getH(i, j) / 256.0f;
                 float z = (float)roboimage.getZ(i, j) / 256.0f;
                 // Since H is an angle the math is modulo.
-                display = testValue(h, s, z, y, start);
+                display = testValue(h, s, z, y, v, start);
                 c = cols[start];
                 if (display)
                 {
@@ -475,20 +504,20 @@ void ColorCreator::largeDisplay()
                     // check for some common overlaps
                     if (start == Orange)
                     {
-                        if (testValue(h, s, z, y, Pink))
+                        if (testValue(h, s, z, y, v, Pink))
                         {
                             c = cols[OrangeRed];
                         }
                     } else if (start == Green)
                     {
-                        if (testValue(h, s, z, y, Blue))
+                        if (testValue(h, s, z, y, v, Blue))
                         {
                             c = cols[BlueGreen];
                         }
                     }
                     else if (start == Blue)
                     {
-                        if (testValue(h, s, z, y, Navy))
+                        if (testValue(h, s, z, y, v, Navy))
                         {
                             c = cols[BlueNavy];
                         }
@@ -704,6 +733,8 @@ void ColorCreator::on_colorSelect_currentIndexChanged(int index)
     ui->zMax->setValue(zMax[currentColor] * 100);
     ui->yMin->setValue(yMin[currentColor]);
     ui->yMax->setValue(yMax[currentColor]);
+    ui->vMin->setValue(vMin[currentColor]);
+    ui->vMax->setValue(vMax[currentColor]);
     ui->zSlice->setValue((zMin[currentColor] + zMax[currentColor]) * 50);
 }
 
@@ -939,4 +970,33 @@ void ColorCreator::on_getOldTable_clicked()
     table->readOld(currentColorDirectory);
     int last = currentColorDirectory.lastIndexOf("/");
     currentColorDirectory.chop(currentColorDirectory.size() - last);
+}
+
+void ColorCreator::on_edgeDiff_actionTriggered(int action)
+{
+
+}
+
+void ColorCreator::on_edgeDiff_valueChanged(int value)
+{
+    QTextStream out(stdout);
+    out << "Set threshold to " << value << "\n";
+    edgediff = value;
+    updateThresh();
+}
+
+void ColorCreator::on_vMin_valueChanged(int value)
+{
+    vMin[currentColor] = value;
+    updateColors();
+    QTextStream out(stdout);
+    out << "Set V Min value to " << value << "\n";
+}
+
+void ColorCreator::on_vMax_valueChanged(int value)
+{
+    vMax[currentColor] = value;
+    updateColors();
+    QTextStream out(stdout);
+    out << "Set V Max value to " << value << "\n";
 }

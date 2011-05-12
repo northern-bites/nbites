@@ -160,13 +160,13 @@
     </rect>
    </property>
    <property name="minimum">
-    <number>105</number>
+    <number>80</number>
    </property>
    <property name="maximum">
     <number>255</number>
    </property>
    <property name="singleStep">
-    <number>2</number>
+    <number>3</number>
    </property>
    <property name="value">
     <number>232</number>
@@ -197,8 +197,8 @@
   <widget class="QComboBox" name="colorSelect">
    <property name="geometry">
     <rect>
-     <x>810</x>
-     <y>540</y>
+     <x>800</x>
+     <y>630</y>
      <width>111</width>
      <height>26</height>
     </rect>
@@ -376,8 +376,8 @@
   <widget class="QPushButton" name="getColorTable">
    <property name="geometry">
     <rect>
-     <x>810</x>
-     <y>590</y>
+     <x>800</x>
+     <y>710</y>
      <width>114</width>
      <height>32</height>
     </rect>
@@ -411,8 +411,8 @@
   <widget class="QPushButton" name="writeNew">
    <property name="geometry">
     <rect>
-     <x>810</x>
-     <y>640</y>
+     <x>800</x>
+     <y>760</y>
      <width>114</width>
      <height>32</height>
     </rect>
@@ -476,7 +476,7 @@
   <widget class="QComboBox" name="channel">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>370</x>
      <y>820</y>
      <width>111</width>
      <height>26</height>
@@ -486,14 +486,115 @@
   <widget class="QPushButton" name="getOldTable">
    <property name="geometry">
     <rect>
-     <x>810</x>
-     <y>690</y>
+     <x>800</x>
+     <y>810</y>
      <width>114</width>
      <height>32</height>
     </rect>
    </property>
    <property name="text">
     <string>Old Table</string>
+   </property>
+  </widget>
+  <widget class="QSlider" name="edgeDiff">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>820</y>
+     <width>160</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>30</number>
+   </property>
+   <property name="sliderPosition">
+    <number>12</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QSlider" name="vMin">
+   <property name="geometry">
+    <rect>
+     <x>760</x>
+     <y>530</y>
+     <width>160</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>4</number>
+   </property>
+   <property name="maximum">
+    <number>150</number>
+   </property>
+   <property name="singleStep">
+    <number>2</number>
+   </property>
+   <property name="sliderPosition">
+    <number>100</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QSlider" name="vMax">
+   <property name="geometry">
+    <rect>
+     <x>760</x>
+     <y>570</y>
+     <width>160</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>80</number>
+   </property>
+   <property name="maximum">
+    <number>255</number>
+   </property>
+   <property name="singleStep">
+    <number>3</number>
+   </property>
+   <property name="pageStep">
+    <number>255</number>
+   </property>
+   <property name="value">
+    <number>80</number>
+   </property>
+   <property name="sliderPosition">
+    <number>80</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_11">
+   <property name="geometry">
+    <rect>
+     <x>940</x>
+     <y>530</y>
+     <width>62</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>V Min</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_12">
+   <property name="geometry">
+    <rect>
+     <x>940</x>
+     <y>570</y>
+     <width>62</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>V Max</string>
    </property>
   </widget>
  </widget>

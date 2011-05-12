@@ -64,7 +64,7 @@ public:
     QColor getChannelView(int i, int j);
     void largeDisplay();
     QColor displayColorTable(int i, int j);
-    bool testValue(float h, float s, float z, int y, int color);
+    bool testValue(float h, float s, float z, int y, int v, int color);
 
 private slots:
     void on_pushButton_clicked();
@@ -107,6 +107,14 @@ private slots:
 
     void on_getOldTable_clicked();
 
+    void on_edgeDiff_actionTriggered(int action);
+
+    void on_edgeDiff_valueChanged(int value);
+
+    void on_vMin_valueChanged(int value);
+
+    void on_vMax_valueChanged(int value);
+
 private:
     Ui::ColorCreator *ui;
     RoboImage roboimage;
@@ -138,6 +146,8 @@ private:
     float zSlice;
     int *yMin;
     int *yMax;
+    int *vMin;
+    int *vMax;
     float statsHMin, statsHMax, statsSMin, statsSMax, statsZMin, statsZMax;
     int statsYMin, statsYMax, statsUMin, statsUMax, statsVMin, statsVMax;
     int currentColor;
