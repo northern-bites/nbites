@@ -31,14 +31,14 @@ namespace log {
 using namespace std;
 
 CodedFileLogger::CodedFileLogger(string fileName, int logTypeID, ProtoMessage* m) :
-        Logger(m) {
-    int file_descriptor = open(fileName.data(),
-                               O_WRONLY | O_CREAT,
-                               S_IRWXU | S_IRWXG | S_IRWXO);
-    if (file_descriptor == -1) {
-        cout << "Warning: failed to open " << fileName
-                << " for logging" << endl;
-    }
+        FileLogger(fileName.data(), m) {
+//    int file_descriptor = open(fileName.data(),
+//                               O_WRONLY | O_CREAT,
+//                               S_IRWXU | S_IRWXG | S_IRWXO);
+//    if (file_descriptor == -1) {
+//        cout << "Warning: failed to open " << fileName
+//                << " for logging" << endl;
+//    }
     raw_output = new FileOutputStream(file_descriptor);
     //TODO: put the gzip code in a gzip file logger
 //    GzipOutputStream::Options opts;

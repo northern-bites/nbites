@@ -22,14 +22,14 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
-#include "Logger.hpp"
+#include "FileLogger.hpp"
 
 namespace memory {
 namespace log {
 
 using namespace google::protobuf::io;
 
-class CodedFileLogger : public Logger {
+class CodedFileLogger : public FileLogger {
 
 public:
     /**
