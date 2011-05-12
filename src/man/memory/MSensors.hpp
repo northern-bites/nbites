@@ -19,7 +19,7 @@
 #include "Sensors.h"
 #include "Profiler.h"
 
-#include "log/FileLogger.hpp"
+#include "log/CodedFileLogger.hpp"
 #include "Subscriber.h"
 
 namespace memory {
