@@ -31,7 +31,7 @@ namespace log {
 using namespace std;
 
 CodedFileLogger::CodedFileLogger(string fileName, int logTypeID, ProtoMessage* m) :
-        FileLogger(fileName.data(), m) {
+        FileLogger(fileName.data(), m), logID(logTypeID) {
 //    int file_descriptor = open(fileName.data(),
 //                               O_WRONLY | O_CREAT,
 //                               S_IRWXU | S_IRWXG | S_IRWXO);
@@ -39,6 +39,7 @@ CodedFileLogger::CodedFileLogger(string fileName, int logTypeID, ProtoMessage* m
 //        cout << "Warning: failed to open " << fileName
 //                << " for logging" << endl;
 //    }
+    cout << "File descriptor : " << file_descriptor << endl;
     raw_output = new FileOutputStream(file_descriptor);
     //TODO: put the gzip code in a gzip file logger
 //    GzipOutputStream::Options opts;
@@ -49,7 +50,11 @@ CodedFileLogger::CodedFileLogger(string fileName, int logTypeID, ProtoMessage* m
 //    GzipOutputStream* gzip_output = new GzipOutputStream(raw_output, opts);
     coded_output = new CodedOutputStream(raw_output);
     // this helps us ID the log
-    coded_output->WriteLittleEndian32(logTypeID);
+
+}
+
+void CodedFileLogger::writeHead() {
+    coded_output->WriteLittleEndian32(logID);
     // this time stamps the log
     coded_output->WriteLittleEndian64(birth_time);
 }
@@ -57,7 +62,7 @@ CodedFileLogger::CodedFileLogger(string fileName, int logTypeID, ProtoMessage* m
 void CodedFileLogger::write() {
 
     //TODO: can we use cached size here?
-    coded_output->WriteVarint32(message->ByteSize());
+    coded_output->WriteLittleEndian32(message->ByteSize());
     message->SerializeToCodedStream(coded_output);
 }
 

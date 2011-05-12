@@ -49,9 +49,10 @@ public:
      */
     ~CodedFileLogger();
     void write();
+    void writeHead();
 
 private:
-    int file_descriptor;
+    int logID;
 
    /**
     * @var raw_output : a ZeroCopyOutputStream, an abstract I/O interface
