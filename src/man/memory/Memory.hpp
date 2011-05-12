@@ -60,12 +60,13 @@ public:
     void updateVisionSensors();
 
 public:
-    MVision* mvision;
-    MSensors* msensors;
     //TODO: make this return a const poitner
     MSensors* getMSensors() const {return msensors;}
 
 private:
     shared_ptr<Profiler> _profiler;
+    MVision* mvision;
+    MSensors* msensors;
+
 };
 }
