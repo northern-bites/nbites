@@ -31,7 +31,7 @@ namespace log {
 using namespace std;
 
 CodedFileLogger::CodedFileLogger(string fileName, int logTypeID, ProtoMessage* m) :
-        FileLogger(fileName.data(), m), logID(logTypeID) {
+        FDLogger(fileName.data(), m), logID(logTypeID) {
 //    int file_descriptor = open(fileName.data(),
 //                               O_WRONLY | O_CREAT,
 //                               S_IRWXU | S_IRWXG | S_IRWXO);
@@ -62,6 +62,7 @@ void CodedFileLogger::writeHead() {
 void CodedFileLogger::write() {
 
     //TODO: can we use cached size here?
+    //cout << message->
     coded_output->WriteLittleEndian32(message->ByteSize());
     message->SerializeToCodedStream(coded_output);
 }

@@ -29,7 +29,7 @@ namespace log {
 
 using namespace google::protobuf::io;
 
-class CodedFileLogger : public FileLogger {
+class CodedFileLogger : public FDLogger {
 
 public:
     /**

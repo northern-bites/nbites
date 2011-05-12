@@ -23,14 +23,14 @@ namespace log {
 
 typedef ::google::protobuf::Message ProtoMessage;
 
-class FileLogger : public Logger {
+class FDLogger : public Logger {
 
 public:
     /**
      * @param m : the proto message to log
      * @return
      */
-    FileLogger(const char* output_file_descriptor, const ProtoMessage* m) :
+    FDLogger(const char* output_file_descriptor, const ProtoMessage* m) :
         Logger(m) {//file_descriptor(output_file_descriptor) {
         file_descriptor = open(output_file_descriptor,
                                        O_WRONLY | O_CREAT | O_TRUNC,
