@@ -7,7 +7,7 @@
 #include "CommDef.h"
 
 
-class CommTimer 
+class CommTimer
 {
   public:
     CommTimer(llong (*f)());
@@ -16,7 +16,7 @@ class CommTimer
     inline llong timestamp(void) {
       return time() - epoch;
     }
-    inline bool time_for_packet(void) {
+    inline bool time_to_send(void) {
       return timestamp() - packet_timer > MICROS_PER_PACKET;
     }
     inline void sent_packet(void) {

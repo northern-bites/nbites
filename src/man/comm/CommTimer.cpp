@@ -51,7 +51,6 @@ CommTimer::check_packet(const CommPacketHeader &p)
   }
 
   // Packet is good!
-  //
   team_times[p.player - 1] = p.timestamp;
   packets_checked++;
 
