@@ -16,9 +16,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <iostream>
-#include <zlib.h>
-
-#include <google/protobuf/io/gzip_stream.h>
 
 #include "Common.h"
 #include "ZeroCopyFileLogger.hpp"
@@ -33,42 +30,45 @@ using namespace std;
 
 ZeroCopyFileLogger::ZeroCopyFileLogger(string output_file_descriptor,
                                        int logTypeID, ProtoMessage* m) :
-        FDLogger(output_file_descriptor.data(), (m)), bytes_written(0),
-        logID(logTypeID),
-        raw_output (new FileOutputStream(file_descriptor, m->ByteSize() + 4)) {
-
+        FDLogger(output_file_descriptor.data(), (m)),
+        current_buffer(new (void*)),
+        current_buffer_size(1),
+        bytes_written(0),
+        logID(logTypeID)
+        {
+    raw_output = new FileOutputStream(file_descriptor, m->ByteSize() + 4);
+    cout << raw_output->GetErrno() << endl;
     this->getNextBuffer();
     writeHead();
 }
 
 void ZeroCopyFileLogger::writeHead() {
-    // this helps us ID the log
-    *((int*) (*current_buffer)) = logID;
-    // this time stamps the log
-    *((long long*) (*current_buffer) + sizeof(int)) = birth_time;
-
-    raw_output->BackUp(current_buffer_size - sizeof(int) - sizeof(long long));
+//    // this helps us ID the log
+//    *((int*) (*current_buffer)) = logID;
+//    // this time stamps the log
+//    *((long long*) (*current_buffer) + sizeof(int)) = birth_time;
+//
+//    raw_output->BackUp(current_buffer_size - sizeof(int) - sizeof(long long));
 }
 
 void ZeroCopyFileLogger::write() {
-
-    this->getNextBuffer();
-    *((int*) (*current_buffer)) = message->GetCachedSize();
-    message->SerializeToArray(current_buffer + sizeof(int), current_buffer_size - sizeof(int));
+//
+//    this->getNextBuffer();
+//    *((int*) (*current_buffer)) = message->GetCachedSize();
+//    message->SerializeToArray(current_buffer + sizeof(int), current_buffer_size - sizeof(int));
 
 }
 
 void ZeroCopyFileLogger::getNextBuffer() {
 
-    raw_output->Next((void**) current_buffer, &current_buffer_size);
+    raw_output->Next(current_buffer, &current_buffer_size);
     //we're not guaranteed a non-empty buffer
     //but we're guaranteed one eventually
     while (current_buffer_size == 0) {
-        raw_output->Next((void**) current_buffer, &current_buffer_size);
+        raw_output->Next(current_buffer, &current_buffer_size);
     }
 
 
-    //cout << current_buffer_size << endl;
 }
 
 ZeroCopyFileLogger::~ZeroCopyFileLogger() {

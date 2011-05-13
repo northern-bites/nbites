@@ -55,8 +55,7 @@ private:
     void writeHead();
 
 private:
-    int file_descriptor;
-    byte** current_buffer;
+    void** current_buffer;
     int current_buffer_size;
     unsigned long long bytes_written;
     int logID;
