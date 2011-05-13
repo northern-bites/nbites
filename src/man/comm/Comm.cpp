@@ -914,7 +914,7 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
 }
 
 // Takes info from packet and data and puts into a vector v.
-void Comm::parse_packet (const CommPacketHeader &packet, const char* data, int size)
+void Comm::parse_packet (const CommPacketHeader &packet, const char* msg, int size)
     throw()
 {
     int len = size / sizeof(float);
@@ -925,7 +925,7 @@ void Comm::parse_packet (const CommPacketHeader &packet, const char* data, int s
     v[1] = static_cast<float>(packet.player);
     v[2] = static_cast<float>(packet.color);
 	// copies actual message
-    memcpy(&v[3], data, size);
+    memcpy(&v[3], msg, size);
 
 	// push message onto queue
     if (latest->size() >= MAX_MESSAGE_MEMORY)
