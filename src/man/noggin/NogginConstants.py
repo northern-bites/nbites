@@ -5,6 +5,7 @@
 ##--------------------SWITCH BOARD ----------------#
 ##
 LOG_LOC = True
+LOG_COMM = True
 
 ##### MODULE SWITCHES ####
 USE_VISION = True # Disable for faster processing
