@@ -64,8 +64,8 @@ public:
         boost::shared_ptr<ImageTranscriber> _imageTranscriber,
         boost::shared_ptr<MotionEnactor> _enactor,
         boost::shared_ptr<Synchro> synchro,
-        boost::shared_ptr<Lights> _lights);
-
+        boost::shared_ptr<Lights> _lights,
+        boost::shared_ptr<Speech> _speech);
     // destructor
     virtual ~Man();
 
@@ -119,6 +119,7 @@ public:
     boost::shared_ptr<Noggin> noggin;
 #endif// USE_NOGGIN
     boost::shared_ptr<Lights> lights;
+    boost::shared_ptr<Speech> speech;
 
 };
 
