@@ -253,6 +253,25 @@ Blob* Blobs::getWidest()
 	return topBlob;
 }
 
+/*
+  Checks all of the blobs of this color and finds the biggest one.
+  returns its index.
+*/
+int Blobs::getBiggest()
+{
+	int index = 0;
+    int size = 0;
+    //check each blob in the array
+    for (int i = 0; i < numBlobs; i++) {
+		if (blobs[i].getArea() > size) {
+            size = blobs[i].getArea();
+			index = i;
+        }
+    }
+	return index;
+}
+
+
 /* Turn a blob back to zeros because of merging.
    @param which     The index of the blob to be zeroed
 */

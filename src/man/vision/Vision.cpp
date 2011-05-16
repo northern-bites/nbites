@@ -60,8 +60,10 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
     ball = new VisualBall();
     red1 = new VisualRobot();
     red2 = new VisualRobot();
+	red3 = new VisualRobot();
     navy1 = new VisualRobot();
     navy2 = new VisualRobot();
+	navy3 = new VisualRobot();
 	cross = new VisualCross();
 	fieldEdge = new VisualFieldEdge();
 

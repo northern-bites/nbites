@@ -977,7 +977,6 @@ bool ObjectFragments::checkSize(Blob b, int c)
  * We then call squareGoal to expand that into a post.	Later
  * we will check if it actually meets the criteria for a good post.
  * @param c		  current color
- * @param c2	  secondary color
  * @param left	  leftmost limit to look
  * @param right	  rightmost limit to look
  * @param		  indication of whether we found a decent candidate
