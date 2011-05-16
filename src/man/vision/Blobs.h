@@ -17,7 +17,7 @@ public:
 
 	void init();
 	void init(int which) {blobs[which].init();}
-	void blobIt(int x, int y, int h);
+	void blobIt(int x, int y, int h, bool merge);
 	void setLeft(int which, int a);
 	void setRight(int which, int a);
 	void setTop(int which, int a);
@@ -26,6 +26,8 @@ public:
 	Blob* getWidest();
 	void zeroTheBlob(int which);
 	void mergeBlobs(int first, int second);
+    void checkForMergers();
+    bool blobsOverlap(int first, int second);
 
 // getters
 	int number() const {return numBlobs;}

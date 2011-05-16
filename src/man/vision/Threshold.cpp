@@ -351,6 +351,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
     int bound = lowerBound[column];
     int robots = 0, greens = 0, greys = 0;
     int lastGood = IMAGE_HEIGHT - 1;
+    int maxWhite = 0;
     shoot[column] = true;
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
@@ -390,13 +391,16 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                 // add to the cross data structure
                 if (currentRun > 2) {
                     cross->newRun(column, j, currentRun);
+                    if (currentRun > maxWhite) {
+                        maxWhite = currentRun;
+                    }
                 }
 			}
 			if (isUndefined(lastPixel)) {
-                if (currentRun > greys) {
+                if (currentRun > 15) {
                     greys+= currentRun;
                 }
-                if (currentRun > 15 && shoot[column]) {
+                if (currentRun > 25 && shoot[column]) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
                         block[column / divider] = j + currentRun;
@@ -413,7 +417,10 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 			}
 			if (isNavy(lastPixel)) {
                 robots+= currentRun;
-                if (robots > 5 && shoot[column]) {
+                if (currentRun > 5) {
+                    navyblue->newRun(column, j, currentRun);
+                }
+                if (robots > 10 && shoot[column]) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
                         block[column / divider] = j + currentRun;
@@ -423,10 +430,13 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                         drawPoint(column, j + currentRun, MAROON);
                     }
                 }
-			}
+            }
 			if (isRed(lastPixel)) {
                 robots+= currentRun;
-                if (robots > 5 && shoot[column]) {
+                if (currentRun > 5) {
+                    red->newRun(column, j, currentRun);
+                }
+                if (robots > 10 && shoot[column]) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
                         block[column / divider] = j + currentRun;
@@ -725,12 +735,12 @@ void Threshold::objectRecognition() {
     // Chown-RLE
     initObjects();
     // now get the posts and goals
+    cross->createObject();
+    red->robot(cross);
+    navyblue->robot(cross);
     yellow->createObject();
     blue->createObject();
-    cross->createObject();
-    /* Shut off for now
-    red->robot(horizon);
-    navyblue->robot(horizon); */
+    cross->checkForCrosses();
 
     bool ylp = vision->yglp->getWidth() > 0;
     bool yrp = vision->ygrp->getWidth() > 0;

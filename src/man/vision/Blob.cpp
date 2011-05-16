@@ -75,6 +75,19 @@ void Blob::merge(Blob other) {
     rightBottom.y = value;
 }
 
+/* Test if two blobs are vertically aligned.  Potentially useful for
+   determining whether something is a robot
+ */
+bool Blob::isAligned(Blob other) {
+    if (getLeft() >= other.getLeft() && getLeft() <= other.getRight()) {
+        return true;
+    }
+    if (other.getLeft() >= getLeft() && other.getLeft() <= getRight()) {
+        return true;
+    }
+    return false;
+}
+
 /* Print debugging information for a blob.
  */
 void Blob::printBlob() const {
