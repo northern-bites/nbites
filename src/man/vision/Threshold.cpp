@@ -735,6 +735,7 @@ void Threshold::objectRecognition() {
     // Chown-RLE
     initObjects();
     // now get the posts and goals
+	// we need to make the white blobs before checking on robots
     cross->createObject();
     red->robot(cross);
     navyblue->robot(cross);
@@ -850,8 +851,10 @@ void Threshold::storeFieldObjects() {
 #if ROBOT(NAO)
     setVisualRobotInfo(vision->red1);
     setVisualRobotInfo(vision->red2);
+	setVisualRobotInfo(vision->red3);
     setVisualRobotInfo(vision->navy1);
     setVisualRobotInfo(vision->navy2);
+	setVisualRobotInfo(vision->navy3);
 #endif
 
 }
@@ -1218,8 +1221,10 @@ void Threshold::initObjects(void) {
     // robots
     vision->red1->init();
     vision->red2->init();
+	vision->red3->init();
     vision->navy1->init();
     vision->navy2->init();
+	vision->navy3->init();
     // balls
     vision->ball->init();
 

@@ -143,8 +143,8 @@ public:
     VisualFieldObject *bgrp, *bglp;
     VisualFieldObject *ygrp, *yglp;
     VisualCrossbar *ygCrossbar, *bgCrossbar;
-    VisualRobot *red1, *red2;
-    VisualRobot *navy1, *navy2;
+    VisualRobot *red1, *red2, *red3;
+    VisualRobot *navy1, *navy2, *navy3;
 	VisualCross *cross;
     VisualBall *ball;
 	VisualFieldEdge *fieldEdge;

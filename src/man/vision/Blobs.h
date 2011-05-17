@@ -24,6 +24,7 @@ public:
 	void setBottom(int which, int a);
 	Blob* getTopAndMerge(int maxY);
 	Blob* getWidest();
+	int getBiggest();
 	void zeroTheBlob(int which);
 	void mergeBlobs(int first, int second);
     void checkForMergers();

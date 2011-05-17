@@ -145,7 +145,7 @@ void Robots::robot(Cross* cross)
 	if (numberOfRuns < 1) return;
     const int lastRunXInit = -30;
     const int resConst = 10;
-    const int blobHeightMin = 5;
+    const int blobHeightMin = 10;
     const int robotBlobMin = 10;
 
     int lastrunx = lastRunXInit, lastruny = 0, lastrunh = 0;
@@ -164,11 +164,16 @@ void Robots::robot(Cross* cross)
     }
     // check each of the candidate blobs to see if it might reasonably be
     // called a piece of a robot
+	int viable = 0;
     for (int i = 0; i < blobs->number(); i++) {
 		if (blobs->get(i).getBottom() < field->horizonAt(blobs->get(i).getLeft())) {
 			blobs->init(i);
         } else if (!cross->checkForRobotBlobs(blobs->get(i))) {
             //} else if (noWhite(blobs->get(i))) {
+			thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
+							 blobs->get(i).width(), blobs->get(i).height(), WHITE);
+			blobs->init(i);
+		} else if (noWhite(blobs->get(i))) {
 			thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
 							 blobs->get(i).width(), blobs->get(i).height(), WHITE);
 			blobs->init(i);
@@ -180,11 +185,20 @@ void Robots::robot(Cross* cross)
 		if (blobs->get(i).height() > blobHeightMin) {
             thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
 							 blobs->get(i).width(), blobs->get(i).height(), MAROON);
+			viable++;
 		} else if (blobs->get(i).height() > 0) {
             thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
 							 blobs->get(i).width(), blobs->get(i).height(), WHITE);
+			blobs->init(i);
         }
     }
+	if (viable > 0) {
+		int robotnum;
+		for (int i = 1; i < viable && i < 4; i++) {
+			robotnum = blobs->getBiggest();
+			updateRobots(i, robotnum);
+		}
+	}
 }
 
 /* We have a swatch of color.  Let's make sure that there is some white
@@ -227,15 +241,19 @@ void Robots::updateRobots(int which, int index)
     if (color == RED) {
         if (which == 1) {
             vision->red1->updateRobot(blobs->get(index));
-        } else {
+        } else if (which == 2) {
             vision->red2->updateRobot(blobs->get(index));
-        }
+        } else {
+			vision->red3->updateRobot(blobs->get(index));
+		}
     } else {
         if (which == 1) {
             vision->navy1->updateRobot(blobs->get(index));
-        } else {
+        } else if (which == 2) {
             vision->navy2->updateRobot(blobs->get(index));
-        }
+        } else {
+			vision->navy3->updateRobot(blobs->get(index));
+		}
     }
 }
 
