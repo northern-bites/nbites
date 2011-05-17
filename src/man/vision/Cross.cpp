@@ -443,7 +443,7 @@ bool Cross::isUndefined(unsigned char pix) {
 #ifdef SOFTCOLORS
 	return pix == GREY;
 #else
-	return pix;
+	return pix == 0x00;
 #endif
 }
 

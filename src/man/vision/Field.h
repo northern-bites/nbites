@@ -57,6 +57,7 @@ public:
     static inline const bool isUndefined(unsigned char threshColor)
         {
 			return threshColor == 0x00;
+#endif
         }
 
 #ifdef OFFLINE

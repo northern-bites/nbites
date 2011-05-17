@@ -348,6 +348,7 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
             pixel = thresh->getExpandedColor(x, y, c);
         if (colorsEqual(pixel, c)) {
             good++;
+            bad--;
             run++;
             if (run > 1) {
                 scan.x = x;
@@ -407,6 +408,7 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
             // if it is either of the colors we're looking for - good
             good++;
             run++;
+            bad--;
             if (run > 1) {
                 scan.x = x;
                 scan.y = y;
@@ -1016,6 +1018,8 @@ int ObjectFragments::grabPost(int c, int leftx,
     // to try and start right in the middle
     int startX = maxX;
     int startY = maxY + maxRun / 2;
+    drawPoint(startX, maxY, MAROON);
+    drawPoint(startX, maxY + maxRun, MAROON);
     // starts a scan in the middle of the tallest run.
     squareGoal(startX, startY, runs[left+1].x, runs[right - 1].x,
                smallY, bigY, c, obj);
