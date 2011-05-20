@@ -225,6 +225,8 @@ public:
     int getRobotTop(int x, int c);
     int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
+    bool overlap(VisualRobot* robot, VisualFieldObject* post);
+    bool checkRobotAgainstBluePost(VisualRobot* robot, VisualFieldObject* post);
     point <int> backStopCheck(bool which, int left, int right);
     void setYUV(const uint16_t* newyuv);
     const uint16_t* getYUV();
@@ -242,6 +244,7 @@ public:
     void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
     void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
     void setDebugHoughTransform(bool _bool) {debugHoughTransform = _bool;}
+    void setDebugRobots(bool _bool);
 #endif
 
     void initDebugImage();
@@ -348,12 +351,14 @@ private:
     bool debugOpenField;
     bool debugEdgeDetection;
     bool debugHoughTransform;
+    bool debugRobots;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;
     static const bool debugOpenField = false;
     static const bool debugEdgeDetection = false;
     static const bool debugHoughTransform = false;
+    static const bool debugRobots = false;
 #endif
 };
 

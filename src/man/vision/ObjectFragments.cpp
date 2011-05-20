@@ -50,7 +50,7 @@ static const float BOX_FUDGE = 10.0f;          // allow for errors
 //here are defined the lower bounds on the sizes of goals, posts, and balls
 //IMPORTANT: they are only guesses right now.
 
-#define MIN_GOAL_HEIGHT	30
+#define MIN_GOAL_HEIGHT	40
 #define MIN_GOAL_WIDTH	4
 
 // ID information on goal post constant
@@ -893,8 +893,8 @@ distanceCertainty ObjectFragments::checkDist(Blob pole)
 int ObjectFragments::characterizeSize(Blob b) {
     int w = b.getRightTopX() - b.getLeftTopX() + 1;
     int h = b.getLeftBottomY() - b.getLeftTopY() + 1;
-    const int largePostHeight = 30;
-    const int smallPostHeight = 15;
+    const int largePostHeight = 100;
+    const int smallPostHeight = 50;
     const int smallPostWidth = 10;
     const int midPostHeight = 30;
     const int midPostWidth = 15;
@@ -2061,23 +2061,30 @@ bool ObjectFragments::postBigEnough(Blob b) {
  */
 
 bool ObjectFragments::badDistance(Blob b) {
-    int x = b.getLeftBottomX();
-    int y = b.getLeftBottomY();
-    int bottom = b.getBottom();
-    estimate e = vision->pose->pixEstimate(x, y, 0.0);
-    distanceCertainty dc = checkDist(b);
-    float disth = thresh->getGoalPostDistFromHeight(static_cast<float>
-                                                    (b.height()));
-    float distw = thresh->getGoalPostDistFromWidth(static_cast<float>
-                                                   (b.width()));
-    float diste = e.dist;
-    // this is essentially the code from Threshold.h
-    float choose = thresh->chooseGoalDistance(dc, disth, distw, diste,
-                                              bottom);
-    /*if (diste > 0.0f && choose > 2 * diste || choose * 2 < diste) {
-      cout << "Throwing out post.	 Distance estimate is " << e.dist << endl;
-      cout << "Dist from height width " << disth << " " << distw << endl;
-      }*/
+    if (b.height() < MIN_GOAL_HEIGHT + 25 && b.getTop() > 5) {
+        int x = b.getLeftBottomX();
+        int y = b.getLeftBottomY();
+        int bottom = b.getBottom();
+        estimate e = vision->pose->pixEstimate(x, y, 0.0);
+        distanceCertainty dc = checkDist(b);
+        float disth = thresh->getGoalPostDistFromHeight(static_cast<float>
+                                                        (b.height()));
+        float distw = thresh->getGoalPostDistFromWidth(static_cast<float>
+                                                       (b.width()));
+        float diste = e.dist;
+        // this is essentially the code from Threshold.h
+        float choose = thresh->chooseGoalDistance(dc, disth, distw, diste,
+                                                  bottom);
+
+        if (diste > 0.0f && choose > 2 * diste || choose * 2 < diste) {
+            if (POSTDEBUG) {
+                cout << "Throwing out post.	 Distance estimate is " << e.dist << endl;
+                cout << "Dist from height width " << disth << " " << distw << endl;
+                cout << "Post at " << x << " " << y << endl;
+            }
+            return true;
+        }
+    }
     return false;
 }
 
@@ -2110,6 +2117,13 @@ bool ObjectFragments::locationOk(Blob b)
     int spanX = b.width();
     int spanY = b.height();
     int mh = min(horizonLeft, horizonRight);
+    // file this one under "very specific sanity checks"
+    if (color == BLUE && spanY < TALL_POST && trueTop > IMAGE_HEIGHT / 2) {
+        if (SANITY) {
+            cout << "Screening blue post that is uniform-like" << endl;
+        }
+        return false;
+    }
     if (!horizonBottomOk(spanX, spanY, mh, trueLeft, trueRight, trueBottom,
                          trueTop)) {
         if (!greenCheck(b) || mh - trueBottom > spanY || spanX < MIN_WIDTH ||

@@ -133,10 +133,12 @@ void Robots::preprocess() {
 }
 
 
-/* Try and recognize robots.  Basically we're doing blobbing here, but with lots of extra
-   twists.  Mainly we're being extremely loose with the conditions under which we consider
-   blobs to be "connected."  We're trying to take advantage of the properties of the robots -
-   namely that they stand vertically normally.
+/* Try and recognize robots.  Basically we're doing blobbing here, but with lots
+   of extra twists.  Mainly we're being extremely loose with the conditions
+   under which we consider blobs to be "connected."  We're trying to take
+   advantage of the properties of the robots - namely that they stand vertically
+   normally.
+   @param cross     The Field cross data structure - contains white blob info
  */
 
 
@@ -145,7 +147,6 @@ void Robots::robot(Cross* cross)
 	if (numberOfRuns < 1) return;
     const int lastRunXInit = -30;
     const int resConst = 10;
-    const int blobHeightMin = 10;
     const int robotBlobMin = 10;
 
     int lastrunx = lastRunXInit, lastruny = 0, lastrunh = 0;
@@ -162,43 +163,275 @@ void Robots::robot(Cross* cross)
 		// set the current as the last
         lastrunx = runs[i].x; lastruny = runs[i].y; lastrunh = runs[i].h;
     }
+    mergeBigBlobs();
     // check each of the candidate blobs to see if it might reasonably be
     // called a piece of a robot
 	int viable = 0;
     for (int i = 0; i < blobs->number(); i++) {
-		if (blobs->get(i).getBottom() < field->horizonAt(blobs->get(i).getLeft())) {
-			blobs->init(i);
-        } else if (!cross->checkForRobotBlobs(blobs->get(i))) {
-            //} else if (noWhite(blobs->get(i))) {
-			thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
-							 blobs->get(i).width(), blobs->get(i).height(), WHITE);
-			blobs->init(i);
-		} else if (noWhite(blobs->get(i))) {
-			thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
-							 blobs->get(i).width(), blobs->get(i).height(), WHITE);
-			blobs->init(i);
-		} else if (blobs->get(i).height() > blobs->get(i).width()) {
-			thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
-							 blobs->get(i).width(), blobs->get(i).height(), YELLOW);
+        if (!sanityChecks(blobs->get(i), cross)) {
+            if (blobs->get(i).getRight() > 0) {
+                if (debugRobots) {
+                    thresh->drawRect(blobs->get(i).getLeft(),
+                                     blobs->get(i).getTop(),
+                                     blobs->get(i).width(),
+                                     blobs->get(i).height(),
+                                     WHITE);
+                }
+            }
             blobs->init(i);
-        }
-		if (blobs->get(i).height() > blobHeightMin) {
-            thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
-							 blobs->get(i).width(), blobs->get(i).height(), MAROON);
-			viable++;
-		} else if (blobs->get(i).height() > 0) {
-            thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
-							 blobs->get(i).width(), blobs->get(i).height(), WHITE);
-			blobs->init(i);
+        } else {
+            if (debugRobots) {
+                thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
+                                 blobs->get(i).width(), blobs->get(i).height(),
+                                 MAROON);
+            }
+            viable++;
         }
     }
+    // if we have some viable robots then let everyone know
 	if (viable > 0) {
 		int robotnum;
-		for (int i = 1; i < viable && i < 4; i++) {
+		for (int i = 1; i < viable + 1 && i < 4; i++) {
 			robotnum = blobs->getBiggest();
 			updateRobots(i, robotnum);
 		}
 	}
+}
+
+/* Robot sanity checks.  Takes a candidate blob and puts it through a
+   bunch of tests to make sure it is ok.
+   @param  candidate        the blob to check
+   @return                  whether we judge it to be reasonable
+ */
+
+bool Robots::sanityChecks(Blob candidate, Cross* cross) {
+    const int blobHeightMin = 10;
+    int height = candidate.height();
+    if (candidate.getRight() > 0) {
+        // the bottom of the uniform shouldn't be above field horizon
+        if (candidate.getBottom() < field->horizonAt(candidate.getLeft())) {
+            return false;
+        }
+        // blobs must be big enough
+        if (candidate.height() < blobHeightMin) {
+            return false;
+        }
+        // uniforms should be wider than they are tall
+        if (candidate.height() > candidate.width()) {
+            return false;
+        }
+        // there ought to be some white below the uniform
+        if (!cross->checkForRobotBlobs(candidate)) {
+            return false;
+        }
+        // the last check was pretty general, let's improve
+        if (candidate.getBottom() < IMAGE_HEIGHT - candidate.height() * 2
+            && !whiteBelow(candidate)) {
+            return false;
+        }
+        if (candidate.getTop() > candidate.height() * 2
+            && !whiteAbove(candidate)) {
+            return false;
+        }
+        // for some blobs we check even harder for white
+        if (height < 2 * blobHeightMin && noWhite(candidate)) {
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+/* Since the white blob check catches a lot of extra stuff like lines,
+   we need to check a bit more carefully.
+ */
+bool Robots::whiteBelow(Blob candidate) {
+    int bottom = candidate.getBottom();
+    int height = candidate.height();
+    int scanline = bottom + height;
+    for (int y = scanline; y < IMAGE_HEIGHT && y < scanline + height; y += 3) {
+        int white = 0;
+        int green = 0;
+        for (int x = candidate.getLeft(); x < candidate.getRight(); x++) {
+            if (isWhite(thresh->getThresholded(y, x))) {
+                white++;
+            } else if (isGreen(thresh->getThresholded(y, x))) {
+                green++;
+            }
+        }
+        if (green > candidate.width() / 2 && white == 0) {
+            return false;
+        }
+        if (white > candidate.width() / 4) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/* Since the white blob check catches a lot of extra stuff like lines,
+   we need to check a bit more carefully.
+ */
+bool Robots::whiteAbove(Blob candidate) {
+    int top = candidate.getTop();
+    int height = candidate.height();
+    int scanline = top - height;
+    for (int y = scanline; y > 0 && y > scanline - height; y -= 3) {
+        int white = 0;
+        int green = 0;
+        for (int x = candidate.getLeft(); x < candidate.getRight(); x++) {
+            if (isWhite(thresh->getThresholded(y, x))) {
+                white++;
+            } else if (isGreen(thresh->getThresholded(y, x))) {
+                green++;
+            }
+        }
+        if (green > candidate.width() / 2 && white == 0) {
+            return false;
+        }
+        if (white > candidate.width() / 4) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/* Since our uniforms often are wrinkled and whatnot, sometimes the blobs
+   are not continuous.  See if we can merge some.
+ */
+void Robots::mergeBigBlobs() {
+    for (int i = 0; i < blobs->number() - 1; i++) {
+        Blob merge = blobs->get(i);
+        if (merge.height() > 10) {
+            for (int j = i + 1; j < blobs->number(); j++) {
+                // check if the blobs are relatively near
+                if (blobs->get(j).height() > 10 && closeEnough(i, j)) {
+                    checkMerge(i, j);
+                } else {
+                }
+            }
+        }
+    }
+}
+
+/* Are two blobs close enough that they might actually be the same?
+   Note: if the area between is bigger than one of the blobs then can it?
+ */
+bool Robots::closeEnough(int i, int j) {
+    Blob a = blobs->get(i);
+    Blob b = blobs->get(j);
+    int width1 = a.width();
+    int width2 = b.width();
+    int height1 = a.height();
+    int height2 = b.height();
+    int bigWidth = max(width1, width2);
+    int bigHeight = max(height1, height2);
+    int dist1 = distance(a.getLeft(), a.getRight(), b.getLeft(), b.getRight());
+    int dist2 = distance(a.getTop(), a.getBottom(), b.getTop(), b.getBottom());
+    if (a.getRight() <= 0 || b.getRight() <= 0) {
+        return false;
+    }
+    if (dist1 > 5 && dist2 > 5) {
+        return false;
+    }
+    if (dist1 < bigHeight && dist2 < bigWidth) {
+        return true;
+    }
+    return false;
+}
+
+/* We have two blobs that are reasonably close.  See if they should be
+   merged.
+*/
+void Robots::checkMerge(int i, int j) {
+    Blob a = blobs->get(i);
+    Blob b = blobs->get(j);
+    if (debugRobots) {
+        cout << endl << endl << "Checking merge" << endl;
+        printBlob(a);
+        printBlob(b);
+    }
+    int dist1 = distance(a.getLeft(), a.getRight(), b.getLeft(), b.getRight());
+    int dist2 = distance(a.getTop(), a.getBottom(), b.getTop(), b.getBottom());
+    int green = 0;
+    int col = 0;
+    int miss = 0;
+    // top to bottom defines the y region between the two
+    int top = max(a.getTop(), b.getTop());
+    int bottom = min(a.getBottom(), b.getBottom());
+    int midx = (a.getLeft() + a.getRight()) / 2;
+    // left to right defines the x region between the two
+    int left = a.getRight();
+    int right = b.getLeft();
+    int midy = (a.getTop() + a.getBottom()) / 2;
+    int ii;
+    // check if they overlap in either dimension
+    if (left > right) {
+        // they overlap in x so we'll swap left and right
+        int temp = left;
+        left = right;
+        right = temp;
+    }
+    if (top > bottom) {
+        int temp = top;
+        top = bottom;
+        bottom = temp;
+    }
+    int width = right - left + 1;
+    int height = bottom - top + 1;
+    int area = max(10, width * height / 27);
+    int stripe = max(width, height);
+    for (int x = left; x < right; x+=3) {
+        for (int y = top; y < bottom; y+=3) {
+            if (debugRobots) {
+                thresh->drawPoint(x, y, MAROON);
+            }
+            if (isSameColor(thresh->getThresholded(y, x), color)) {
+                col++;
+                if (col > area || col > stripe) {
+                    blobs->mergeBlobs(i, j);
+                    if (debugRobots) {
+                        cout << "Merge" << endl;
+                    }
+                    return;
+                }
+            } else if (isGreen(thresh->getThresholded(y, x))) {
+                green++;
+                if (green > 5) {
+                    return;
+                }
+            } else if (isWhite(thresh->getThresholded(y, x))) {
+                miss++;
+                if (miss > area / 9 || miss > stripe) {
+                    return;
+                }
+            }
+        }
+    }
+    if (col > min(width, height) && green < 3) {
+        blobs->mergeBlobs(i, j);
+        if (debugRobots) {
+            cout << "Merge" << endl;
+        }
+    }
+}
+
+/* Calculate the horizontal distance between two objects
+ * (the end of one to the start of the other).
+ * @param x1	left x of one object
+ * @param x2	right x of the object
+ * @param x3	left x of the other
+ * @param x4	right x of the other
+ * @return		the distance between the objects in the x dimension
+ */
+int Robots::distance(int x1, int x2, int x3, int x4) {
+    if (x2 < x3) {
+        return x3 - x2;
+    }
+    if (x1 > x4) {
+        return x1 - x4;
+    }
+    return 0;
 }
 
 /* We have a swatch of color.  Let's make sure that there is some white
@@ -236,7 +469,9 @@ bool Robots::noWhite(Blob b) {
 
 void Robots::updateRobots(int which, int index)
 {
-    //cout << "Updating robot " << which << " " << color << endl;
+    if (debugRobots) {
+        cout << "Updating robot " << which << " " << color << endl;
+    }
     //printBlob(blobs[index]);
     if (color == RED) {
         if (which == 1) {
@@ -292,34 +527,16 @@ void Robots::newRun(int x, int y, int h)
     }
 }
 
-/* Calculate the horizontal distance between two objects
- * (the end of one to the start of the other).
- * @param x1    left x of one object
- * @param x2    right x of the object
- * @param x3    left x of the other
- * @param x4    right x of the other
- * @return      the distance between the objects in the x dimension
- */
-int Robots::distance(int x1, int x2, int x3, int x4) {
-    if (x2 < x3)
-        return x3 - x2;
-	if (x1 > x3 && x1 < x4)
-		return 0;
-    if (x1 > x4)
-        return x1 - x4;
-    return 0;
-}
-
 /* Print debugging information for a blob.
  * @param b    the blob
  */
 void Robots::printBlob(Blob b) {
 #if defined OFFLINE
-/*    cout << "Outputting blob" << endl;
+    cout << "Outputting blob" << endl;
     cout << b.getLeftTopX() << " " << b.getLeftTopY() << " " << b.getRightTopX() << " "
          << b.getRightTopY() << endl;
     cout << b.getLeftBottomX() << " " << b.getLeftBottomY() << " " << b.getRightBottomX()
-	<< " " << b.getRightBottomY() << endl;*/
+	<< " " << b.getRightBottomY() << endl;
 #endif
 }
 

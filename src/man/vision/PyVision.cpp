@@ -1033,8 +1033,10 @@ PyVision_new (Vision *v)
 
         self->red1 = PyVisualRobot_new(v->red1);
         self->red2 = PyVisualRobot_new(v->red2);
+        self->red3 = PyVisualRobot_new(v->red3);
         self->navy1 = PyVisualRobot_new(v->navy1);
         self->navy2 = PyVisualRobot_new(v->navy2);
+        self->navy3 = PyVisualRobot_new(v->navy3);
 
         self->ball = PyBall_new(v->ball);
 
@@ -1050,6 +1052,7 @@ PyVision_new (Vision *v)
 
             self->red1 == NULL       || self->red2 == NULL   ||
             self->navy1 == NULL      || self->navy2 == NULL  ||
+            self->navy3 == NULL      || self->red3 == NULL ||
             self->ball == NULL       || self->thresh == NULL ||
             self->fieldLines == NULL || self->pose == NULL   ) {
 
@@ -1080,8 +1083,10 @@ PyVision_update (PyVision *self)
 
     PyVisualRobot_update((PyVisualRobot *)self->red1);
     PyVisualRobot_update((PyVisualRobot *)self->red2);
+    PyVisualRobot_update((PyVisualRobot *)self->red3);
     PyVisualRobot_update((PyVisualRobot *)self->navy1);
     PyVisualRobot_update((PyVisualRobot *)self->navy2);
+    PyVisualRobot_update((PyVisualRobot *)self->navy3);
     PyBall_update((PyBall *)self->ball);
 
     PyThreshold_update((PyThreshold *)self->thresh);
@@ -1112,8 +1117,10 @@ PyVision_dealloc (PyVision* self)
     Py_XDECREF(self->yglp);
     Py_XDECREF(self->red1);
     Py_XDECREF(self->red2);
+    Py_XDECREF(self->red3);
     Py_XDECREF(self->navy1);
     Py_XDECREF(self->navy2);
+    Py_XDECREF(self->navy3);
     Py_XDECREF(self->ball);
 
     Py_XDECREF(self->thresh);

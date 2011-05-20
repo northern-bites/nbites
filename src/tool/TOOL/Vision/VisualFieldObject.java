@@ -24,6 +24,8 @@ public class VisualFieldObject {
         UNKNOWN_FIELD_OBJECT = 46,
         BLUE_GOAL_BACKSTOP = 47,
         YELLOW_GOAL_BACKSTOP = 48,
+        NAVY_ROBOT = 49,
+        RED_ROBOT = 50,
 		ABSTRACT_CROSS = 82,
 		BLUE_CROSS = 80,
 		YELLOW_CROSS = 81;

@@ -53,6 +53,9 @@ int Blob::getArea() const{
 }
 
 int Blob::width() const{
+    if (leftTop.x < 0) {
+        return 0;
+    }
     return rightTop.x - leftTop.x + 1;
 }
 

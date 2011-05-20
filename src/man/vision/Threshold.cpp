@@ -723,9 +723,51 @@ int Threshold::getRobotBottom(int x, int c) {
     return navyBottoms[x];
 }
 
+/* Check if a robot is close enough to a post that we need to worry about
+   recognizing one as the other
+   @param robot         a robot wearing a navy uniform - we think
+   @param post          a blue post - we think
+   @return              true when they are close
+ */
+bool Threshold::overlap(VisualRobot* robot, VisualFieldObject* post) {
+    int left = robot->getLeftTopX();
+    int right = robot->getRightTopX();
+    int left2 = post->getLeftTopX();
+    int right2 = post->getRightTopX();
+    if (distance(left, right, left2, right2) < 25) {
+        return true;
+    }
+    return false;
+}
 
-/*  Makes the calls to the vision system to recognize objects.  Then performs some extra
- * sanity checks to make sure we don't have weird cases like 2 beacons.
+
+/* A blue robot and a blue post appear to align vertically.  This will almost
+   never happen for real.  So get rid of one of them.
+   @param robot       a blue robot
+   @param post        a blue post
+   @return            the status of whether it is a post or not
+ */
+bool Threshold::checkRobotAgainstBluePost(VisualRobot* robot,
+                                          VisualFieldObject* post) {
+    if (overlap(robot, post)) {
+        int topRobot = robot->getLeftTopY();
+        int topPost = post->getLeftTopY();
+        // Essentially if the post extends above the uniform in the visual
+        // field then it is most likely a post.  If they are the same, then
+        // it is probably a post
+        // ToDo: Make this more robust
+        if (topRobot - topPost > 15) {
+            robot->init();
+        } else {
+            post->init();
+            return false;
+        }
+    }
+    return true;
+}
+
+/*  Makes the calls to the vision system to recognize objects.  Then performs
+ * some extra sanity checks to make sure we don't have weird cases.
  */
 
 void Threshold::objectRecognition() {
@@ -747,6 +789,34 @@ void Threshold::objectRecognition() {
     bool yrp = vision->ygrp->getWidth() > 0;
     bool blp = vision->bglp->getWidth() > 0;
     bool brp = vision->bgrp->getWidth() > 0;
+
+    // make sure we don't see a blue post in a Navy uniform
+    // or for that matter a navy uniform in a blue post
+    // Note: It may be that this sort of thing should be moved to Context
+    if (vision->navy1->getWidth() > 0) {
+        if (blp) {
+            blp = checkRobotAgainstBluePost(vision->navy1, vision->bglp);
+        }
+        if (brp) {
+            brp = checkRobotAgainstBluePost(vision->navy1, vision->bgrp);
+        }
+    }
+    if (vision->navy2->getWidth() > 0) {
+        if (blp) {
+            blp = checkRobotAgainstBluePost(vision->navy2, vision->bglp);
+        }
+        if (brp) {
+            brp = checkRobotAgainstBluePost(vision->navy2, vision->bgrp);
+        }
+    }
+    if (vision->navy3->getWidth() > 0) {
+        if (blp) {
+            blp = checkRobotAgainstBluePost(vision->navy3, vision->bglp);
+        }
+        if (brp) {
+            brp = checkRobotAgainstBluePost(vision->navy3, vision->bgrp);
+        }
+    }
 
     if ((ylp || yrp) && (blp || brp)) {
         // we see one of each, so pick the biggest one
@@ -1702,3 +1772,10 @@ int Threshold::getV(int x, int y) const {
 int Threshold::getU(int j, int i) const {
     return static_cast<int>(vision->uvImg[i*IMAGE_WIDTH*2 + j*2]);
 }
+
+#ifdef OFFLINE
+void Threshold::setDebugRobots(bool _bool) {
+        navyblue->setDebugRobots(_bool);
+        red->setDebugRobots(_bool);
+    }
+#endif

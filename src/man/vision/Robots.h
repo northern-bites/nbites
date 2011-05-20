@@ -57,9 +57,13 @@ public:
 	bool goodScan(int c, int w, int o, int g, int gr, int t);
 	void updateRobots(int w, int i);
 	void mergeBigBlobs();
-	bool closeEnough(Blob a, Blob b);
+    void checkMerge(int i, int j);
+	bool closeEnough(int i, int j);
+    bool sanityChecks(Blob candidate, Cross* cross);
 	bool bigEnough(Blob a, Blob b);
 	bool noGreen(Blob a, Blob b);
+    bool whiteBelow(Blob a);
+    bool whiteAbove(Blob b);
 	bool checkHorizontal(int l, int r, int t, int b);
 	bool checkVertical(int l, int r, int t, int b);
 	bool viableRobot(Blob a);
@@ -69,6 +73,25 @@ public:
 	void allocateColorRuns();
 	int distance(int x, int x1, int x2, int x3);
 	void printBlob(Blob a);
+
+    // Helper method that just returns whether the thresholded color is a
+    // green color
+    static inline const bool isGreen(unsigned char threshColor)
+        {
+			return threshColor & GREEN_BIT;
+        }
+    static inline const bool isSameColor(unsigned char threshColor, int col)
+        {
+            if (col == RED) {
+                return threshColor & RED_BIT;
+            } else {
+                return threshColor & NAVY_BIT;
+            }
+        }
+#ifdef OFFLINE
+    void setDebugRobots(bool debug) {debugRobots = debug;}
+#endif
+
 
 private:
     // class pointers
@@ -82,5 +105,10 @@ private:
 	int color;
 	Blob* topBlob;
 	run* runs;
+#ifdef OFFLINE
+    bool debugRobots;
+#else
+    static const bool debugRobots = false;
+#endif
 };
 #endif
