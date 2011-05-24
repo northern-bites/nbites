@@ -127,12 +127,10 @@ void ObjectFragments::createObject() {
     // these are in the relative order that they should be called
     switch (color) {
     case BLUE:
-        lookForFirstPost(vision->bglp, vision->bgrp, vision->bgCrossbar, BLUE,
-                         BLUEGREEN);
+        lookForFirstPost(vision->bglp, vision->bgrp, vision->bgCrossbar, BLUE_BIT);
         break;
     case YELLOW:
-        lookForFirstPost(vision->yglp, vision->ygrp, vision->ygCrossbar, YELLOW,
-                 ORANGEYELLOW);
+        lookForFirstPost(vision->yglp, vision->ygrp, vision->ygCrossbar, YELLOW_BIT);
         break;
     }
 }
@@ -239,6 +237,16 @@ int ObjectFragments::getBigRun(int left, int right) {
     return index;
 }
 
+/*
+ */
+bool ObjectFragments::colorsEqual(unsigned char c1, unsigned char c2) {
+#ifdef SOFTCOLORS
+	return c1 == c2;
+#else
+	return c1 & c2;
+#endif
+}
+
 
 /* The next group of methods has to do with scanning along axis parallel
  * dimensions in order to create objects without blobbing.
@@ -316,7 +324,7 @@ int ObjectFragments::yProject(point <int> point, int newx)
  * @param c2	   soft color that could also work
  */
 void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
-							   int c2, stop &scan)
+							   stop &scan)
 {
     scan.good = 0;
     scan.bad = 0;
@@ -334,11 +342,11 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
     for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
         //cout << "Vert scan " << x << " " << y << endl;
         // if it is the color we're looking for - good
-        if (c == GREEN)
+        if (colorsEqual(c, GREEN))
             pixel = thresh->getColor(x, y);
         else
             pixel = thresh->getExpandedColor(x, y, c);
-        if (pixel == c || pixel == c2) {
+        if (colorsEqual(pixel, c)) {
             good++;
             run++;
             if (run > 1) {
@@ -375,7 +383,7 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
  * @param rightBound further right we can go
  */
 void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
-									 int c2, int leftBound, int rightBound,
+									 int leftBound, int rightBound,
 					 stop & scan) {
     scan.good = 0;
     scan.bad = 0;
@@ -391,11 +399,11 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
     // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH
               && y < height && bad < stopper; ) {
-        if (c == GREEN)
+        if (colorsEqual(c, GREEN))
             pixel = thresh->getColor(x, y);
         else
             pixel = thresh->getExpandedColor(x, y, c);
-        if (pixel == c || pixel == c2) {
+        if (colorsEqual(pixel, c)) {
             // if it is either of the colors we're looking for - good
             good++;
             run++;
@@ -482,7 +490,7 @@ int ObjectFragments::pickNth(int values[], int n, int s) {
 
 void ObjectFragments::findVerticalEdge(point <int>& top,
 					   point <int>& bottom,
-					   int c, int c2, bool left)
+					   int c, bool left)
 {
     const int NUMSCANS = 5;
     const int WHICH = 3;
@@ -499,7 +507,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
 
     for (int i = 0; i < NUMSCANS; i++) {
         // scan out a 1/4 of the way down the edge
-        horizontalScan(qx, qy, dir, 4, c, c2, 0, IMAGE_WIDTH - 1, scan);
+        horizontalScan(qx, qy, dir, 4, c, 0, IMAGE_WIDTH - 1, scan);
         values[i] = abs(qx - scan.x);	// how far did we go?
         // set up the next scan
         qy += shortSpan;
@@ -532,7 +540,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
 
 void ObjectFragments::findHorizontalEdge(point <int>& left,
 					 point <int>& right, int c,
-					 int c2, bool up)
+					 bool up)
 {
     const int NUMSCANS = 4;
     const int WHICH = 2;
@@ -550,7 +558,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
     //thresh->drawPoint(left.x, left.y, BLUE);
     // scan out a 1/4 of the way to the right the edge
     for (int i = 0; i < NUMSCANS; i++) {
-        vertScan(qx, qy, dir, 4, c, c2, scan);
+        vertScan(qx, qy, dir, 4, c, scan);
         values[i] = abs(qy - scan.y);	// how far did we go?
         qx += shortSpan;
         qy = yProject(left.x, left.y, qx);
@@ -587,7 +595,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
 	@param c2	   secondary color
 */
 
-float ObjectFragments::correct(Blob & b, int color, int c2) {
+float ObjectFragments::correct(Blob & b, int color) {
     const float GOOD_SLOPE = 0.25f;
 
     int points[3];
@@ -619,13 +627,13 @@ float ObjectFragments::correct(Blob & b, int color, int c2) {
             while (col != color && midx < IMAGE_WIDTH && midx > -1) {
                 // normally we assume we are outside the real edge
                 midx+= k;
-                if (thresh->getExpandedColor(midx, midy, color) == color) {
+                if (colorsEqual(thresh->getExpandedColor(midx, midy, color),color)) {
                     col = color;
                     if (count == 0) {
                         // this is the case where the edge is outside our blob
                         while (midx >= 0 &&
-                               thresh->getExpandedColor(midx, midy, color)
-                               == color) {
+                               colorsEqual(thresh->getExpandedColor(midx, midy, color),
+										   color)) {
                             midx-= k;
                             count++;
                         }
@@ -710,7 +718,7 @@ float ObjectFragments::correct(Blob & b, int color, int c2) {
  * @param obj		blob to store the data in
  */
 void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
-				 int maxY, int c, int c2, Blob & obj)
+				 int maxY, int c, Blob & obj)
 {
     const int ERROR_TOLERANCE = 5;
 
@@ -728,17 +736,17 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
     point <int> leftBottom = point<int>(left, maxY);
     point <int> rightBottom = point<int>(right, topry + spanY);
     for (int i = 0; i < 2; i++) {
-        findVerticalEdge(leftTop, leftBottom, c, c2, true);
-        findVerticalEdge(rightTop, rightBottom, c, c2, false);
+        findVerticalEdge(leftTop, leftBottom, c, true);
+        findVerticalEdge(rightTop, rightBottom, c, false);
         // now expand the top and bottom
-        findHorizontalEdge(leftTop, rightTop, c, c2, true);
-        findHorizontalEdge(leftBottom, rightBottom, c, c2, false);
+        findHorizontalEdge(leftTop, rightTop, c, true);
+        findHorizontalEdge(leftBottom, rightBottom, c, false);
         // store the information into our blob
         obj.setBlob(leftTop, rightTop, leftBottom, rightBottom);
         // check if our estimated slope from pose is not right for this post
         float newSlope = 0.0f;
         if (i == 0) {
-            newSlope = correct(obj, c, c2);
+            newSlope = correct(obj, c);
             // if we detected that the post was leaning then redo
             leftTop = obj.getLeftTop();
             rightTop = obj.getRightTop();
@@ -768,10 +776,10 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
                 leftBottom = point<int>(newx, obj.getBottom());
                 rightBottom = point<int>(newx, obj.getBottom());
                 // repeat the process fresh
-                findVerticalEdge(leftTop, leftBottom, c, c2, true);
-                findVerticalEdge(rightTop, rightBottom, c, c2, false);
-                findHorizontalEdge(leftTop, rightTop, c, c2, true);
-                findHorizontalEdge(leftBottom, rightBottom, c, c2, false);
+                findVerticalEdge(leftTop, leftBottom, c, true);
+                findVerticalEdge(rightTop, rightBottom, c, false);
+                findHorizontalEdge(leftTop, rightTop, c, true);
+                findHorizontalEdge(leftBottom, rightBottom, c, false);
             }
         }
     }
@@ -859,7 +867,7 @@ distanceCertainty ObjectFragments::checkDist(Blob pole)
     nextY = pole.getLeftBottomY();
     stop scan;
     do {
-        vertScan(nextX, nextY, 1,  ERROR_TOLERANCE, GREEN, GREEN, scan);
+        vertScan(nextX, nextY, 1,  ERROR_TOLERANCE, GREEN, scan);
         nextX = nextX + 2;
         nextY = yProject(pole.getLeftBottom(), nextX);
     } while (nextX <= pole.getRightBottomX() && scan.good < 2);
@@ -918,7 +926,7 @@ bool ObjectFragments::qualityPost(Blob b, int c)
     //bool soFar;
     for (int i = b.getLeftTopX(); i < b.getRightTopX(); i++) {
         for (int j = b.getLeftTopY(); j < b.getLeftBottomY(); j++) {
-            if (thresh->getExpandedColor(i, j, c) == c) {
+            if (colorsEqual(thresh->getExpandedColor(i, j, c), c)) {
                 good++;
             }
         }
@@ -951,11 +959,11 @@ bool ObjectFragments::checkSize(Blob b, int c)
 
     int midY = b.getLeftTopY() + (b.getLeftBottomY() - b.getLeftTopY()) / 2;
     stop scan;
-    horizontalScan(b.getLeftTopX(), midY, -1,	 ERROR_TOLERANCE, c, c, 0,
+    horizontalScan(b.getLeftTopX(), midY, -1,	 ERROR_TOLERANCE, c, 0,
                    b.getLeftTopX() + 1, scan);
     //drawPoint(scan.x, scan.y, RED);
     int leftMid = scan.good;
-    horizontalScan(b.getRightTopX(), midY, 1, ERROR_TOLERANCE, c, c,
+    horizontalScan(b.getRightTopX(), midY, 1, ERROR_TOLERANCE, c,
                    b.getRightTopX() - 1, b.getRightTopX() + FAR_ENOUGH, scan);
     //drawPoint(scan.x, scan.y, RED);
     if (leftMid > PROBLEM_THRESHOLD && scan.good > PROBLEM_THRESHOLD) {
@@ -975,7 +983,7 @@ bool ObjectFragments::checkSize(Blob b, int c)
  * @param		  indication of whether we found a decent candidate
  */
 
-int ObjectFragments::grabPost(int c, int c2, int leftx,
+int ObjectFragments::grabPost(int c, int leftx,
 				  int rightx, Blob & obj) {
     int maxRun = 0, maxY = 0, maxX = 0, index = 0;
     // find the biggest Run
@@ -1010,7 +1018,7 @@ int ObjectFragments::grabPost(int c, int c2, int leftx,
     int startY = maxY + maxRun / 2;
     // starts a scan in the middle of the tallest run.
     squareGoal(startX, startY, runs[left+1].x, runs[right - 1].x,
-               smallY, bigY, c, c2, obj);
+               smallY, bigY, c, obj);
     // make sure we're looking at something big enough to be a post
     if (!postBigEnough(obj)) {
         if (POSTDEBUG) {
@@ -1067,7 +1075,7 @@ int ObjectFragments::classifyByCrossbar(Blob b)
     // scan the left side to see how far out we can go seeing post
     for (int i = 0; i < h / HEIGHT_DIVISOR && biggest < need; i+=1) {
         int tx = xProject(x, y, y + i);
-        horizontalScan(tx, y + i, -1, ERROR_TOLERANCE, color, color,
+        horizontalScan(tx, y + i, -1, ERROR_TOLERANCE, color,
                        max(0, x - 2 * w), IMAGE_WIDTH - 1, scan);
         if (scan.good > biggest) {
             biggest = scan.good;
@@ -1079,7 +1087,7 @@ int ObjectFragments::classifyByCrossbar(Blob b)
 
     for (int i = 0; i < h / HEIGHT_DIVISOR && biggest2 < need; i+=1) {
         int tx = xProject(x, y, y + i);
-        horizontalScan(tx, y + i, 1, ERROR_TOLERANCE, color, color,
+        horizontalScan(tx, y + i, 1, ERROR_TOLERANCE, color,
                        x - 1, IMAGE_WIDTH - 1, scan);
         if (scan.good > biggest2) {
             biggest2 = scan.good;
@@ -1103,7 +1111,7 @@ int ObjectFragments::classifyByCrossbar(Blob b)
         y = b.getLeftTopY();
         for (int i = h / 2; i <  h / 2 + h / HEIGHT_DIVISOR; i+=1) {
             int tx = xProject(x, y, y + i);
-            horizontalScan(tx, y + i, -1, ERROR_TOLERANCE, color, color,
+            horizontalScan(tx, y + i, -1, ERROR_TOLERANCE, color,
                            max(0, x - 2 * w), IMAGE_WIDTH - 1, scan);
             if (scan.good > biggest / 2) {
                 return NOPOST;
@@ -1114,7 +1122,7 @@ int ObjectFragments::classifyByCrossbar(Blob b)
     if (biggest2 > need && biggest2 > 2 * biggest) {
         for (int i = h / 2; i <  h / 2 + h / HEIGHT_DIVISOR; i+=1) {
             int tx = xProject(x, y, y + i);
-            horizontalScan(tx, y + i, 1, ERROR_TOLERANCE, color, color,
+            horizontalScan(tx, y + i, 1, ERROR_TOLERANCE, color,
                            max(0, x - 2 * w), IMAGE_WIDTH - 1, scan);
             if (scan.good > biggest2 / 2) {
                 return NOPOST;
@@ -1628,7 +1636,7 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
  * @return				 classification
  */
 
-int ObjectFragments::classifyFirstPost(int c,int c2, Blob pole)
+int ObjectFragments::classifyFirstPost(int c, Blob pole)
 {
     const int MIN_BLOB_SIZE = 10;
 
@@ -1779,7 +1787,7 @@ void ObjectFragments::updateRunsAfterFirstPost(Blob pole, int post) {
 // Look for posts and goals given the runs we've collected
 void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
 							   VisualFieldObject* right,
-							   VisualCrossbar* mid, int c, int c2)
+							   VisualCrossbar* mid, int c)
 {
     // if we don't have any runs there is nothing to do
     if (numberOfRuns <= 1) {
@@ -1787,7 +1795,7 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
     }
     distanceCertainty dc = BOTH_UNSURE;
     Blob pole;
-    int isItAPost = grabPost(c, c2, IMAGE_WIDTH - 3, 2, pole);
+    int isItAPost = grabPost(c, IMAGE_WIDTH - 3, 2, pole);
     // make sure we're looking at something big enough to be a post
     if (isItAPost == NOPOST) {
         return;
@@ -1800,7 +1808,7 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
     // first characterize the size of the possible post
     int howbig = characterizeSize(pole);
     // now see if we can figure out whether it is a right or left post
-    int post = classifyFirstPost(c, c2, pole);
+    int post = classifyFirstPost(c, pole);
     //setContext(post);
     // based on those results update the proper data structure
     if (post == LEFT) {
@@ -1818,7 +1826,7 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
         }
         return;
     }
-    lookForSecondPost(pole, post, left, right, mid, c, c2);
+    lookForSecondPost(pole, post, left, right, mid, c);
 }
 
 /* We have found one good post, here we look for a second.  The procedure
@@ -1836,7 +1844,7 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
 void ObjectFragments::lookForSecondPost(Blob pole, int post,
                                         VisualFieldObject* left,
                                         VisualFieldObject* right,
-                                        VisualCrossbar* mid, int c, int c2) {
+                                        VisualCrossbar* mid, int c) {
     const int POST_NEAR_DIST = 5;
     // at this point we have a post and it is normally classified
     // if we feel pretty good about this, then prepare for the next post
@@ -1848,7 +1856,7 @@ void ObjectFragments::lookForSecondPost(Blob pole, int post,
     bool questions = howbig == SMALL;
     Blob secondPost;
     // ready to grab the potential post
-    bool isItAPost = grabPost(c, c2, pole.getLeft() - POST_NEAR_DIST,
+    bool isItAPost = grabPost(c, pole.getLeft() - POST_NEAR_DIST,
                          pole.getRight() + POST_NEAR_DIST, secondPost);
     if (isItAPost == NOPOST || !isPostReasonableSizeShapeAndPlace(secondPost)) {
         // we didn't get one
@@ -1953,7 +1961,7 @@ bool ObjectFragments::greenCheck(Blob b)
     // do the actual scanning under the blob
     for (int i = 0; i < w; i+= 2) {
         y = yProject(x, b.getLeftBottomY(), x + i);
-        vertScan(x + i, y, 1, ERROR_TOLERANCE, GREEN, GREEN, scan);
+        vertScan(x + i, y, 1, ERROR_TOLERANCE, GREEN, scan);
         if (scan.good > 1) {
             return true;
         }
@@ -1964,10 +1972,10 @@ bool ObjectFragments::greenCheck(Blob b)
         x = max(0, xProject(x, b.getLeftBottomY(), b.getLeftBottomY() + i));
         int pix = thresh->getThresholded(min(IMAGE_HEIGHT - 1,
                                              b.getLeftBottomY() + i),x);
-        if (pix == GREEN) {
+        if (colorsEqual(pix, GREEN)) {
             return true;
         }
-        if (pix != WHITE) {
+        if (!colorsEqual(pix, WHITE)) {
             bad++;
         }
     }
@@ -2002,7 +2010,7 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
             ny = yProject(startx, starty, nx);
             if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
                 total++;
-                if (thresh->getExpandedColor(nx, ny, color) == color) {
+                if (colorsEqual(thresh->getExpandedColor(nx, ny, color), color)) {
                     good++;
                     if (good > goal) {
                         return true;
