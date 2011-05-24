@@ -3,6 +3,8 @@
 #include <sys/time.h>
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include <boost/python.hpp>
+using namespace boost::python;
 
 #include "PyVision.h"
 #if ROBOT(NAO)
@@ -254,7 +256,7 @@ PyVisualCorner_new (PyFieldLines *fl, int i, const VisualCorner &corner)
         self->fl = fl;
         self->i = i;
 
-        list<const ConcreteCorner*> possibilities = corner.getPossibleCorners();
+	std::list<const ConcreteCorner*> possibilities = corner.getPossibleCorners();
 
         self->dist = PyFloat_FromDouble(corner.getDistance());
         self->bearing = PyFloat_FromDouble(corner.getBearingDeg());
@@ -262,7 +264,7 @@ PyVisualCorner_new (PyFieldLines *fl, int i, const VisualCorner &corner)
         self->possibilities = PyList_New(possibilities.size());
         if (self->possibilities != NULL) {
             int c_i = 0;
-            for (list<const ConcreteCorner*>::const_iterator c =
+            for (std::list<const ConcreteCorner*>::const_iterator c =
                      possibilities.begin(); c != possibilities.end(); c_i++, c++) {
                 Py_INCREF(py_concrete_corners[*c]);
                 PyList_SetItem(self->possibilities, c_i, py_concrete_corners[*c]);
@@ -297,13 +299,13 @@ PyVisualCorner_update (PyVisualCorner *self, const VisualCorner &corner)
     Py_XDECREF(self->bearing);
     self->bearing = PyFloat_FromDouble(corner.getBearingDeg());
 
-    list<const ConcreteCorner*> possibilities = corner.getPossibleCorners();
+    std::list<const ConcreteCorner*> possibilities = corner.getPossibleCorners();
     if (self->possibilities == NULL)
         self->possibilities = PyList_New(possibilities.size());
 
     if (self->possibilities != NULL) {
         int c_i = 0;
-        for (list<const ConcreteCorner*>::const_iterator c =
+        for (std::list<const ConcreteCorner*>::const_iterator c =
                  possibilities.begin(); c != possibilities.end(); c_i++, c++) {
             Py_INCREF(py_concrete_corners[*c]);
             if (c_i < PyList_Size(self->possibilities))
@@ -528,13 +530,13 @@ PyFieldLines_new (shared_ptr<FieldLines> fl)
     if (self != NULL) {
         self->fl = fl;
 
-        const list<VisualCorner> *corners = fl->getCorners();
+        const std::list<VisualCorner> *corners = fl->getCorners();
 		const vector< shared_ptr<VisualLine> > *lines = fl->getLines();
 
         // Corners
         self->numCorners = PyInt_FromLong(corners->size());
         unsigned int i = 0;
-        for (list<VisualCorner>::const_iterator c = corners->begin();
+        for (std::list<VisualCorner>::const_iterator c = corners->begin();
              c != corners->end(); c++,i++) {
             PyObject *o = PyVisualCorner_new(self, i, *c);
             if (o != NULL)
@@ -584,8 +586,8 @@ PyFieldLines_new (shared_ptr<FieldLines> fl)
 extern void
 PyFieldLines_update (PyFieldLines *self)
 {
-    const list<VisualCorner> *corners = self->fl->getCorners();
-    const vector< shared_ptr<VisualLine> > *lines = self->fl->getLines();
+  const std::list<VisualCorner> *corners = self->fl->getCorners();
+  const std::vector< shared_ptr<VisualLine> > *lines = self->fl->getLines();
 
     Py_XDECREF(self->numCorners);
     self->numCorners = PyInt_FromLong(corners->size());
@@ -594,7 +596,7 @@ PyFieldLines_update (PyFieldLines *self)
 
     // Update all the corners, adding new ones if necessary
     unsigned int i = 0;
-    for (list<VisualCorner>::const_iterator c = corners->begin();
+    for (std::list<VisualCorner>::const_iterator c = corners->begin();
          c != corners->end(); i++, c++) {
         if (i >= self->raw_corners.size()) {
             // add a new VisualCorner
@@ -1255,14 +1257,14 @@ PyVision_update (PyObject *self, PyObject *args)
 // 'vision' module methods
 //
 
-static PyObject *module = NULL;
+static PyObject *mod = NULL;
 
 void
 vision_addToModule (PyObject *v, const char *name)
 {
-    if (module != NULL) {
+    if (mod != NULL) {
         Py_INCREF(v);
-        if (PyModule_AddObject(module, name, v) != 0) {
+        if (PyModule_AddObject(mod, name, v) != 0) {
             fprintf(stderr, "Could not add PyVision object to module\n");
             if (PyErr_Occurred())
                 PyErr_Print();
@@ -1314,44 +1316,44 @@ MODULE_INIT(vision) (void)
     // Initialize module
     //
 
-    module = Py_InitModule3(MODULE_HEAD "vision", vision_methods,
+    mod = Py_InitModule3(MODULE_HEAD "vision", vision_methods,
                             "Python-wrapped C++ robot vision library");
-    if (module == NULL)
+    if (mod == NULL)
         return;
 
     Py_INCREF(&PyVisualRobotType);
-    PyModule_AddObject(module, "VisualRobot", (PyObject *)&PyVisualRobotType);
+    PyModule_AddObject(mod, "VisualRobot", (PyObject *)&PyVisualRobotType);
 
     Py_INCREF(&PyVisualRobotType);
-    PyModule_AddObject(module, "VisualCrossbar", (PyObject *)&PyCrossbarType);
+    PyModule_AddObject(mod, "VisualCrossbar", (PyObject *)&PyCrossbarType);
 
     Py_INCREF(&PyPoseType);
-    PyModule_AddObject(module, "Pose", (PyObject *)&PyPoseType);
+    PyModule_AddObject(mod, "Pose", (PyObject *)&PyPoseType);
 
     Py_INCREF(&PyVisualCornerType);
-    PyModule_AddObject(module, "VisualCorner", (PyObject *)&PyVisualCornerType);
+    PyModule_AddObject(mod, "VisualCorner", (PyObject *)&PyVisualCornerType);
 
     Py_INCREF(&PyConcreteCornerType);
-    PyModule_AddObject(module, "ConcreteCorner",
+    PyModule_AddObject(mod, "ConcreteCorner",
                        (PyObject *)&PyConcreteCornerType);
 
     Py_INCREF(&PyVisualLineType);
-    PyModule_AddObject(module, "VisualLine", (PyObject *)&PyVisualLineType);
+    PyModule_AddObject(mod, "VisualLine", (PyObject *)&PyVisualLineType);
 
     Py_INCREF(&PyFieldLinesType);
-    PyModule_AddObject(module, "FieldLines", (PyObject *)&PyFieldLinesType);
+    PyModule_AddObject(mod, "FieldLines", (PyObject *)&PyFieldLinesType);
 
     Py_INCREF(&PyThresholdType);
-    PyModule_AddObject(module, "Threshold", (PyObject *)&PyThresholdType);
+    PyModule_AddObject(mod, "Threshold", (PyObject *)&PyThresholdType);
 
     Py_INCREF(&PyBallType);
-    PyModule_AddObject(module, "Ball", (PyObject *)&PyBallType);
+    PyModule_AddObject(mod, "Ball", (PyObject *)&PyBallType);
 
     Py_INCREF(&PyFieldObjectType);
-    PyModule_AddObject(module, "FieldObject", (PyObject *)&PyFieldObjectType);
+    PyModule_AddObject(mod, "FieldObject", (PyObject *)&PyFieldObjectType);
 
     Py_INCREF(&PyVisionType);
-    PyModule_AddObject(module, "Vision", (PyObject *)&PyVisionType);
+    PyModule_AddObject(mod, "Vision", (PyObject *)&PyVisionType);
 
     //
     // Fill py_concrete_corners array
