@@ -398,10 +398,10 @@ int Field::findGreenHorizon(int pH, float sl) {
         topEdge[i] = 0;
         shoot[i] = true;
 	}
-	if (pH < -100) {
+	/*if (pH < -100) {
         horizon = 0;
         return 0;
-	}
+        }*/
     /*estimate e = vision->pose->pixEstimate(IMAGE_WIDTH / 2, pH, 0.0f);
     cout << "Dist is " << e.dist << " " << pH << endl;
     if (e.dist > 1000.0) {

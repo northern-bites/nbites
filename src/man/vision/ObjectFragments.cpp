@@ -1191,7 +1191,7 @@ int ObjectFragments::classifyByTCorner(Blob post) {
                         side = LEFT;
                     }
                 }
-				else if (x <= post.getLeftBottomX()) {
+				else if (x <= post.getLeftBottomX() + spanx / 2) {
 					side = LEFT;
 				} else {
 					side = RIGHT;
@@ -1502,8 +1502,9 @@ int ObjectFragments::classifyByGoalline(const point<int> linel,
         return classifyGoalBoxLineThatAbutsPost(left.y, diffl,
                                              e3.dist, RIGHT);
     }
+    // too dangerous in practice
     // if either of the endpoints are far enough away we can classify the line
-    float linedist1 = realDistance(right.x, right.y, liner.x, liner.y);
+    /*float linedist1 = realDistance(right.x, right.y, liner.x, liner.y);
     float linedist2 = realDistance(left.x, left.y, linel.x, linel.y);
     if (linedist1 > linedist2) {
         if (linedist1 > GOALBOX_OVERAGE + 2 * BOX_FUDGE) {
@@ -1513,7 +1514,7 @@ int ObjectFragments::classifyByGoalline(const point<int> linel,
     } else if (linedist2 > GOALBOX_OVERAGE + 2 * BOX_FUDGE) {
         return classifyByLengthOfGoalline(linedist2, linel.x, linel.y,
                                           LEFT, RIGHT);
-    }
+                                          }*/
     return NOPOST;
 }
 
@@ -1694,14 +1695,14 @@ int ObjectFragments::classifyFirstPost(int c, Blob pole)
             return post;
         }
     }
-
+    /*
     post = classifyByCheckingLines(pole);
     if (post != NOPOST) {
         if (POSTLOGIC) {
             cout << "Found from lines" << endl;
         }
         return post;
-    }
+        }*/
 
     return post;
 }

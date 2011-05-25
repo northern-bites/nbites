@@ -218,6 +218,7 @@ public:
     float getGoalPostDistFromWidth(float width);
     float getBeaconDistFromHeight(float height);
     int distance(int x1, int x2, int x3, int x4);
+    float realDistance(int x, int y, int x1, int y1);
     float getEuclidianDist(point <int> coord1, point <int> coord2);
     void findGreenHorizon();
     point <int> findIntersection(int col, int dir, int c);
