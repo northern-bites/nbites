@@ -22,7 +22,6 @@ set( RoboImageViewer_srcs main.cpp
   colorcreator.cpp
   RoboImage.cpp
   colorspace.cpp
-  colorzone.cpp
   renderarea.cpp
   window.cpp
   coloredit.cpp
@@ -34,7 +33,6 @@ set( RoboImageViewer_srcs main.cpp
 set(RoboImageViewer_headers colorcreator.h
     RoboImage.h
     colorspace.h
-    colorzone.h
     renderarea.h
     window.h
     coloredit.h

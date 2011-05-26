@@ -12,7 +12,6 @@
 #include <QFile>
 #include <QPainter>
 #include "colorspace.h"
-#include "colorzone.h"
 
 class RoboImage
 {
