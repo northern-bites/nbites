@@ -5,7 +5,7 @@
 #include <QSlider>
 #include <QLabel>
 #include <QGridLayout>
-#include "roboimage.h"
+#include "RoboImage.h"
 
 class ColorEdit : public QWidget
 {

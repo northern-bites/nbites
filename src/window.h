@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QGridLayout>
-#include "roboimage.h"
+#include "RoboImage.h"
 
 
 class QCheckBox;

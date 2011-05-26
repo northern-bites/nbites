@@ -1,7 +1,7 @@
 
-############ ProtoViewer
+############ RoboImageViewer
 
-project( ColorTool )
+project( RoboImageViewer )
 cmake_minimum_required(VERSION 2.6.0)
 
 ########### Dependencies
@@ -18,9 +18,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 
 ########### Sources
 
-set( ProtoViewer_srcs main.cpp
+set( RoboImageViewer_srcs main.cpp
   colorcreator.cpp
-  roboimage.cpp
+  RoboImage.cpp
   colorspace.cpp
   colorzone.cpp
   renderarea.cpp
@@ -31,8 +31,8 @@ set( ProtoViewer_srcs main.cpp
   stats.cpp
   FileParser.cpp)
 
-set(ProtoViewer_headers colorcreator.h
-    roboimage.h
+set(RoboImageViewer_headers colorcreator.h
+    RoboImage.h
     colorspace.h
     colorzone.h
     renderarea.h
@@ -43,30 +43,29 @@ set(ProtoViewer_headers colorcreator.h
     stats.h
 )
 
-set(ProtoViewer_forms colorcreator.ui)
+set(RoboImageViewer_forms colorcreator.ui)
 
-#SET(ProtoViewer_resources images.qrc)
+#SET(RoboImageViewer_resources images.qrc)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
-  /usr/include/qt4
   /home/oneamtu/nbites/build/man/straight)
 
 ############ Qt4 goodness
 
-Qt4_wrap_cpp(ProtoViewer_headers_moc ${ProtoViewer_headers})
-Qt4_wrap_ui(ProtoViewer_forms_headers ${ProtoViewer_forms})
-#QT4_ADD_RESOURCES(ProtoViewer_RESOURCES_RCC ${Protoviewer_RESOURCES})
+Qt4_wrap_cpp(RoboImageViewer_headers_moc ${RoboImageViewer_headers})
+Qt4_wrap_ui(RoboImageViewer_forms_headers ${RoboImageViewer_forms})
+#QT4_ADD_RESOURCES(RoboImageViewer_RESOURCES_RCC ${Protoviewer_RESOURCES})
 
-add_executable(ColorTool ${ProtoViewer_srcs}
-  ${ProtoViewer_headers_moc}
-  ${ProtoViewer_forms_headers} )
+add_executable(RoboImageViewer ${RoboImageViewer_srcs}
+  ${RoboImageViewer_headers_moc}
+  ${RoboImageViewer_forms_headers} )
 #    ${helloworld_RESOURCES_RCC})
 
 link_directories( /home/oneamtu/nbites/build/man/straight/memory/protos )
 find_library(PROTOS protos /home/oneamtu/nbites/build/man/straight/memory/protos)
 
 target_link_libraries(
-  ColorTool
+  RoboImageViewer
   protobuf
   ${PROTOS}
   ${QT_LIBRARIES}

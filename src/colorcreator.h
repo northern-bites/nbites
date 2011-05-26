@@ -2,7 +2,7 @@
 #define COLORCREATOR_H
 
 #include <QWidget>
-#include "roboimage.h"
+#include "RoboImage.h"
 #include "renderarea.h"
 #include "window.h"
 #include "coloredit.h"

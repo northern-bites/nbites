@@ -6,7 +6,7 @@
 #include <QPen>
 #include <QPixmap>
 #include <QLabel>
-#include "roboimage.h"
+#include "RoboImage.h"
 #include "math.h"
 
 class RenderArea : public QWidget
