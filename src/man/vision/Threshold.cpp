@@ -325,6 +325,9 @@ void Threshold::findGoals(int column, int topEdge) {
             robots++;
             found = true;
         }
+        if (isGreen(pixel)) {
+            bad++;
+        }
         if (!found) {
             bad++;
         }
