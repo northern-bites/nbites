@@ -473,7 +473,7 @@ void Robots::updateRobots(int which, int index)
         cout << "Updating robot " << which << " " << color << endl;
     }
     //printBlob(blobs[index]);
-    if (color == RED) {
+    if (color == RED_BIT) {
         if (which == 1) {
             vision->red1->updateRobot(blobs->get(index));
         } else if (which == 2) {

@@ -93,13 +93,13 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     context = new Context(vision, this, field);
     blue = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                            field, context,
-                                                           BLUE));
+                                                           BLUE_BIT));
     yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                              field, context,
-                                                             YELLOW));
-    navyblue = new Robots(vision, this, field, context, NAVY);
-    red = new Robots(vision, this, field, context, RED);
-    orange = new Ball(vision, this, field, context, ORANGE);
+                                                             YELLOW_BIT));
+    navyblue = new Robots(vision, this, field, context, NAVY_BIT);
+    red = new Robots(vision, this, field, context, RED_BIT);
+    orange = new Ball(vision, this, field, context, ORANGE_BIT);
     cross = new Cross(vision, this, field, context);
     for (int i = 0; i < IMAGE_WIDTH; i++) {
         lowerBound[i] = IMAGE_HEIGHT - 1;
@@ -287,10 +287,16 @@ void Threshold::findGoals(int column, int topEdge) {
         if (isBlue(pixel)) {
             lastBlue = j;
             blues++;
+            if (firstBlue == topEdge) {
+                firstBlue = j;
+            }
         }
         if (isYellow(pixel)) {
             lastYellow = j;
             yellows++;
+            if (firstYellow == topEdge) {
+                firstYellow = j;
+            }
         }
         if (isNavy(pixel) || isRed(pixel)) {
             robots++;
@@ -771,10 +777,6 @@ bool Threshold::checkRobotAgainstBluePost(VisualRobot* robot,
  */
 
 void Threshold::objectRecognition() {
-#ifdef JOHO_DEBUG
-    print("   Theshold::objectRecognition");
-#endif
-    // Chown-RLE
     initObjects();
     // now get the posts and goals
 	// we need to make the white blobs before checking on robots
