@@ -738,6 +738,9 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
     point <int> leftBottom = point<int>(left, maxY);
     point <int> rightBottom = point<int>(right, topry + spanY);
     for (int i = 0; i < 2; i++) {
+        // now expand the top and bottom
+        findHorizontalEdge(leftTop, rightTop, c, true);
+        findHorizontalEdge(leftBottom, rightBottom, c, false);
         findVerticalEdge(leftTop, leftBottom, c, true);
         findVerticalEdge(rightTop, rightBottom, c, false);
         // now expand the top and bottom
