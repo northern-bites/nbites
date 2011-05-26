@@ -275,11 +275,14 @@ int Field::getInitialHorizonEstimate(int pH) {
 				 && greenPixels <= MIN_PIXELS_INITIAL; i+= SCAN_INTERVAL_X) {
 			//pixel = thresh->thresholded[scanY][i];
 			pixel = thresh->getColor(i, scanY);
-			if (isGreen(pixel)) {
-				greenPixels++;
-			}
 			// project the line to get the next y value
 			scanY = thresh->blue->yProject(0, j, i);
+			if (isGreen(pixel)) {
+				greenPixels++;
+                // since green pixels are likely to be next to other ones
+                i -= SCAN_INTERVAL_X;
+                i++;
+			}
 		}
 		// once we see enough green we're done
 		if (greenPixels > MIN_PIXELS_INITIAL) {
