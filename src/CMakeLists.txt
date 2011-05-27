@@ -26,7 +26,6 @@ set( RoboImageViewer_srcs main.cpp
   window.cpp
   coloredit.cpp
   linefit.cpp
-  stats.cpp
   FileParser.cpp)
 
 set(RoboImageViewer_headers colorcreator.h
@@ -36,7 +35,6 @@ set(RoboImageViewer_headers colorcreator.h
     window.h
     coloredit.h
     linefit.h
-    stats.h
 )
 
 set(RoboImageViewer_forms colorcreator.ui)
