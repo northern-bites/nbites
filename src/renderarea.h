@@ -7,7 +7,6 @@
 #include <QPixmap>
 #include <QLabel>
 #include "RoboImage.h"
-#include "math.h"
 
 class RenderArea : public QWidget
 {
