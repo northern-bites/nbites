@@ -1,8 +1,8 @@
-#include "RoboImage.h"
+#include "YUVImage.h"
 
 using namespace std;
 
-RoboImage::RoboImage(int wd, int ht) {
+YUVImage::YUVImage(int wd, int ht) {
 	width = wd;
 	height = ht;
 	yImg = new int*[wd];
@@ -15,7 +15,7 @@ RoboImage::RoboImage(int wd, int ht) {
 	}
 }
 
-void RoboImage::read(QString filename) {
+void YUVImage::read(QString filename) {
 	QFile file(filename);
 	QTextStream out(stdout);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -56,7 +56,7 @@ void RoboImage::read(QString filename) {
 	file.close();
 }
 
-void RoboImage::read(string s) {
+void YUVImage::read(string s) {
 
 	const char* data = s.data();
 	int i = 0;
@@ -91,47 +91,43 @@ void RoboImage::read(string s) {
 
 }
 
-QImage RoboImage::fast() {
-	return bmp();
-}
-
-int RoboImage::getRed(int x, int y) {
+int YUVImage::getRed(int x, int y) {
 	ColorSpace c;
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getRb();
 }
 
-int RoboImage::getGreen(int x, int y) {
+int YUVImage::getGreen(int x, int y) {
 	ColorSpace c;
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getGb();
 }
 
-int RoboImage::getBlue(int x, int y) {
+int YUVImage::getBlue(int x, int y) {
 	ColorSpace c;
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getBb();
 }
 
-int RoboImage::getH(int x, int y) {
+int YUVImage::getH(int x, int y) {
 	ColorSpace c;
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getHb();
 }
 
-int RoboImage::getS(int x, int y) {
+int YUVImage::getS(int x, int y) {
 	ColorSpace c;
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getSb();
 }
 
-int RoboImage::getZ(int x, int y) {
+int YUVImage::getZ(int x, int y) {
 	ColorSpace c;
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getZb();
 }
 
-QImage RoboImage::bmp() {
+QImage YUVImage::bmp() {
 	QImage img(width, height, QImage::Format_RGB32);
 	img.fill(0);
 	ColorSpace c;

@@ -6,17 +6,17 @@
 #include <QPen>
 #include <QPixmap>
 #include <QLabel>
-#include "RoboImage.h"
+#include "YUVImage.h"
 
-class RenderArea : public QWidget
+class RoboImageViewer: public QWidget
 {
     Q_OBJECT
 public:
     enum Shape { Y, U, V, Blue, Red, Green, H, S, Z, EDGE, WHEEL, Pixmap };
 
-    RenderArea(RoboImage r1, QLabel *lab, QWidget *parent = 0);
+    RoboImageViewer(YUVImage r1, QLabel *lab, QWidget *parent = 0);
 
-    void  setRoboImage(RoboImage img) { r = img;}
+    void  setYUVImage(YUVImage img) { r = img;}
     void mouseMoveEvent(QMouseEvent *event);
     int max(int a, int b) {if (a < b) return b; return a;}
     QSize minimumSizeHint() const;
@@ -40,7 +40,7 @@ private:
     bool antialiased;
     bool transformed;
     QPixmap pixmap;
-    RoboImage r;
+    YUVImage r;
 
 signals:
 

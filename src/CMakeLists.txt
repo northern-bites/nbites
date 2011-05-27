@@ -20,9 +20,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 
 set( RoboImageViewer_srcs main.cpp
   colorcreator.cpp
-  RoboImage.cpp
+  YUVImage.cpp
   colorspace.cpp
-  renderarea.cpp
+  RoboImageViewer.cpp
   window.cpp
   coloredit.cpp
   colortable.cpp
@@ -31,9 +31,9 @@ set( RoboImageViewer_srcs main.cpp
   FileParser.cpp)
 
 set(RoboImageViewer_headers colorcreator.h
-    RoboImage.h
+    YUVImage.h
     colorspace.h
-    renderarea.h
+    RoboImageViewer.h
     window.h
     coloredit.h
     colortable.h

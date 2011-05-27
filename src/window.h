@@ -7,8 +7,8 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QGridLayout>
-#include "RoboImage.h"
-
+#include "YUVImage.h"
+#include "RoboImageViewer.h"
 
 class QCheckBox;
 class QComboBox;
@@ -21,16 +21,16 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    explicit Window(RoboImage r1, QWidget *parent = 0);
+    explicit Window(YUVImage r1, QWidget *parent = 0);
 private slots:
     void shapeChanged();
 
 private:
-    RenderArea *renderArea;
+    RoboImageViewer *roboImageViewer;
     QLabel *shapeLabel;
     QLabel *infoLabel;
     QComboBox *shapeComboBox;
-    RoboImage r;
+    YUVImage r;
 
 
 };

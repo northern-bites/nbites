@@ -5,14 +5,14 @@
 #include <QSlider>
 #include <QLabel>
 #include <QGridLayout>
-#include "RoboImage.h"
+#include "YUVImage.h"
 
 class ColorEdit : public QWidget
 {
     Q_OBJECT
 public:
     enum Colors { Yellow, Blue, Orange, Green, White, Pink, Navy };
-    explicit ColorEdit(Colors c, RoboImage r1, QWidget *parent = 0);
+    explicit ColorEdit(Colors c, YUVImage r1, QWidget *parent = 0);
 
 signals:
 
@@ -32,7 +32,7 @@ private:
     QSlider *zMin;
     QSlider *zMax;
     int hLow, hHigh, sLow, sHigh, zLow, zHigh;
-    RoboImage r;
+    YUVImage r;
     Colors color;
 
 

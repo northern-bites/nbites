@@ -1,6 +1,5 @@
 #include "colorcreator.h"
 #include "ui_colorcreator.h"
-#include "math.h"
 
 #include <QTextStream>
 #include <QFileDialog>
@@ -261,33 +260,33 @@ void ColorCreator::updateThresh()
                             c = cols[col];
                         }
                     } else{
-                        float s = (float)roboimage.getS(i, j) / 256.0f;
-                        float h = (float)roboimage.getH(i, j) / 256.0f;
-                        float z = (float)roboimage.getZ(i, j) / 256.0f;
+//                        float s = (float)roboimage.getS(i, j) / 256.0f;
+//                        float h = (float)roboimage.getH(i, j) / 256.0f;
+//                        float z = (float)roboimage.getZ(i, j) / 256.0f;
                         // Since H is an angle the math is modulo.
-                        if (hMax[start] > hMin[start])
-                        {
-                            if (hMin[start] > h || hMax[start] < h)
-                            {
-                                display = false;
-                            }
-                        } else if (hMin[start] > h && hMax[start] < h )
-                        {
-                            display = false;
-                        }
-                        if (s < sMin[start] || s > sMax[start])
-                        {
-                            display = false;
-                        }
-                        if (z < zMin[start] || z > zMax[start])
-                        {
-                            display = false;
-                        }
-                        if (y < yMin[start] || y > yMax[start])
-                        {
-                            display = false;
-                        }
-                        c = cols[start];
+//                        if (hMax[start] > hMin[start])
+//                        {
+//                            if (hMin[start] > h || hMax[start] < h)
+//                            {
+//                                display = false;
+//                            }
+//                        } else if (hMin[start] > h && hMax[start] < h )
+//                        {
+//                            display = false;
+//                        }
+//                        if (s < sMin[start] || s > sMax[start])
+//                        {
+//                            display = false;
+//                        }
+//                        if (z < zMin[start] || z > zMax[start])
+//                        {
+//                            display = false;
+//                        }
+//                        if (y < yMin[start] || y > yMax[start])
+//                        {
+//                            display = false;
+//                        }
+//                        c = cols[start];
                     }
                     if (display)
                     {
@@ -337,24 +336,24 @@ void ColorCreator::initStats()
 
 void ColorCreator::collectStats(int x, int y)
 {
-    float s = (float)roboimage.getS(x, y) / 256.0f;
-    float h = (float)roboimage.getH(x, y) / 256.0f;
-    float z = (float)roboimage.getZ(x, y) / 256.0f;
-    int yy = roboimage.getY(x, y);
-    int u = roboimage.getU(x, y);
-    int v = roboimage.getV(x, y);
-    statsSMin = min(statsSMin, s);
-    statsSMax = max(statsSMax, s);
-    statsHMin = min(statsHMin, h);
-    statsHMax = max(statsHMax, h);
-    statsZMin = min(statsZMin, z);
-    statsZMax = max(statsZMax, z);
-    statsYMin = min(statsYMin, yy);
-    statsYMax = max(statsYMax, yy);
-    statsUMin = min(statsUMin, u);
-    statsUMax = max(statsUMax, u);
-    statsVMin = min(statsVMin, v);
-    statsVMax = max(statsVMax, v);
+//    float s = (float)roboimage.getS(x, y) / 256.0f;
+//    float h = (float)roboimage.getH(x, y) / 256.0f;
+//    float z = (float)roboimage.getZ(x, y) / 256.0f;
+//    int yy = roboimage.getY(x, y);
+//    int u = roboimage.getU(x, y);
+//    int v = roboimage.getV(x, y);
+//    statsSMin = min(statsSMin, s);
+//    statsSMax = max(statsSMax, s);
+//    statsHMin = min(statsHMin, h);
+//    statsHMax = max(statsHMax, h);
+//    statsZMin = min(statsZMin, z);
+//    statsZMax = max(statsZMax, z);
+//    statsYMin = min(statsYMin, yy);
+//    statsYMax = max(statsYMax, yy);
+//    statsUMin = min(statsUMin, u);
+//    statsUMax = max(statsUMax, u);
+//    statsVMin = min(statsVMin, v);
+//    statsVMax = max(statsVMax, v);
 }
 
 void ColorCreator::outputStats()

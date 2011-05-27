@@ -2,8 +2,8 @@
 #define COLORCREATOR_H
 
 #include <QWidget>
-#include "RoboImage.h"
-#include "renderarea.h"
+#include "YUVImage.h"
+#include "RoboImageViewer.h"
 #include "window.h"
 #include "coloredit.h"
 #include "colortable.h"
@@ -84,7 +84,7 @@ private slots:
 
 private:
     Ui::ColorCreator *ui;
-    RoboImage roboimage;
+    YUVImage roboimage;
     ColorTable *table;
     RenderArea *renderArea;
     Window imageWindow;

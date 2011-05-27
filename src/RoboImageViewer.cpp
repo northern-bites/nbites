@@ -1,7 +1,7 @@
-#include "renderarea.h"
+#include "RoboImageViewer.h"
 #include <QMouseEvent>
 
-RenderArea::RenderArea(RoboImage r1, QLabel *inf, QWidget *parent)
+RoboImageViewer::RoboImageViewer(YUVImage r1, QLabel *inf, QWidget *parent)
     : QWidget(parent),
       r(r1),
       info(inf)
@@ -15,7 +15,7 @@ RenderArea::RenderArea(RoboImage r1, QLabel *inf, QWidget *parent)
     setMouseTracking(true);
 }
 
-void RenderArea::mouseMoveEvent(QMouseEvent *event) {
+void RoboImageViewer::mouseMoveEvent(QMouseEvent *event) {
     int x = event->x() / 2;
     int y = event->y() / 2;
     QString xS;
@@ -32,47 +32,47 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event) {
     info->setText(temp);
 }
 
-QSize RenderArea::minimumSizeHint() const
+QSize RoboImageViewer::minimumSizeHint() const
 {
     return QSize(100, 100);
 }
 
-QSize RenderArea::sizeHint() const
+QSize RoboImageViewer::sizeHint() const
 {
     return QSize(640, 480);
 }
 
-void RenderArea::setShape(Shape shape)
+void RoboImageViewer::setShape(Shape shape)
 {
     this->shape = shape;
     update();
 }
 
-void RenderArea::setPen(const QPen &pen)
+void RoboImageViewer::setPen(const QPen &pen)
 {
     this->pen = pen;
     update();
 }
 
-void RenderArea::setBrush(const QBrush &brush)
+void RoboImageViewer::setBrush(const QBrush &brush)
 {
     this->brush = brush;
     update();
 }
 
-void RenderArea::setAntialiased(bool antialiased)
+void RoboImageViewer::setAntialiased(bool antialiased)
 {
     this->antialiased = antialiased;
     update();
 }
 
-void RenderArea::setTransformed(bool transformed)
+void RoboImageViewer::setTransformed(bool transformed)
 {
     this->transformed = transformed;
     update();
 }
 
-void RenderArea::paintEvent(QPaintEvent * /* event */)
+void RoboImageViewer::paintEvent(QPaintEvent * /* event */)
 {
 
     QRect rect(10, 20, 80, 60);

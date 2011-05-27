@@ -1,5 +1,5 @@
-#ifndef ROBOIMAGE_H
-#define ROBOIMAGE_H
+#ifndef YUVImage_H
+#define YUVImage_H
 
 #include <string>
 
@@ -13,7 +13,7 @@
 #include <QPainter>
 #include "colorspace.h"
 
-class RoboImage
+class YUVImage
 {
 public:
     enum DisplayModes
@@ -31,7 +31,7 @@ public:
     } display;
 
 public:
-    RoboImage(int wd, int ht);
+    YUVImage(int wd, int ht);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void read(QString filename);
@@ -50,11 +50,7 @@ public:
     int getH(int x, int y);
     int getS(int x, int y);
     int getZ(int x, int y);
-    int** monoChrome() { return yImg;}
-    QImage fast();
     QImage bmp();
-    void yuv(int i, int j, int y, int u, int v);
-    void rgb(int i, int j, int r, int g, int b);
 
 
 private:
@@ -65,4 +61,4 @@ private:
     int** vImg;
 };
 
-#endif // ROBOIMAGE_H
+#endif // YUVImage_H
