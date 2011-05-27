@@ -6,7 +6,6 @@
 #include "RoboImageViewer.h"
 #include "window.h"
 #include "coloredit.h"
-#include "colortable.h"
 
 #include "FileParser.h"
 #include "memory/protos/Sensors.pb.h"
@@ -42,10 +41,8 @@ public:
     ~ColorCreator();
     void updateDisplays();
     void updateColors();
-    void updateThresh();
     void initStats();
     void collectStats(int x, int y);
-    void outputStats();
     float min(float a, float b) {if (a < b) return a; return b;}
     float max(float a, float b) {if (a > b) return a; return b;}
     int min(int a, int b) {if (a < b) return a; return b;}
@@ -80,12 +77,9 @@ private slots:
 
     void on_zMax_valueChanged(int value);
 
-    void on_getColorTable_clicked();
-
 private:
     Ui::ColorCreator *ui;
     YUVImage roboimage;
-    ColorTable *table;
     RenderArea *renderArea;
     Window imageWindow;
     QString baseDirectory;

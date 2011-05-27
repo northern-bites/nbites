@@ -27,8 +27,6 @@ ColorCreator::ColorCreator(QWidget *parent) :
     yMax = new int[COLORS];
     cols = new QColor[COLORS];
 
-    table = new ColorTable();
-
     // initialize colors for drawing thresholds
     cols[Orange] = QColor(255, 128, 0);
     cols[Blue] = QColor(0, 0, 255);
@@ -161,7 +159,7 @@ void ColorCreator::updateDisplays()
     previousFrame = currentDirectory + "/" + prev + EXTENSION;
     haveFile = true;
     QTextStream out(stdout);
-    updateThresh();
+//    updateThresh();
 }
 
 void ColorCreator::updateColors()
@@ -221,151 +219,7 @@ void ColorCreator::updateColors()
     pix.convertFromImage(img);
     ui->colorWheel->setPixmap(pix);
     ui->colorWheel->repaint();
-    updateThresh();
-}
-
-void ColorCreator::updateThresh()
-{
-    if (haveFile)
-    {
-        // we draw by using a QImage - turn it into a Pixmap, then put it on a label
-        QImage img(WIDTH, HEIGHT, QImage::Format_RGB32);
-        bool display;
-        bool stats = false;
-        QColor c;
-        initStats();
-        for (int i = 0; i < WIDTH; i++)
-        {
-            for (int j = 0; j < HEIGHT; j++)
-            {
-                bool looping = true;
-                int start = Orange;
-                if (mode == Single) {
-                    looping = false;
-                    stats = true;
-                    start = currentColor;
-                }
-                do {
-                    display = true;
-
-                    int y = roboimage.getY(i, j);
-                    if (mode == Table && table->isEnabled())
-                    {
-                        int u = roboimage.getU(i, j);
-                        int v = roboimage.getV(i, j);
-                        int col = table->getUpdatedColor(y, u, v);
-                        if (col >= Black) {
-                            display = false;
-                        } else{
-                            c = cols[col];
-                        }
-                    } else{
-//                        float s = (float)roboimage.getS(i, j) / 256.0f;
-//                        float h = (float)roboimage.getH(i, j) / 256.0f;
-//                        float z = (float)roboimage.getZ(i, j) / 256.0f;
-                        // Since H is an angle the math is modulo.
-//                        if (hMax[start] > hMin[start])
-//                        {
-//                            if (hMin[start] > h || hMax[start] < h)
-//                            {
-//                                display = false;
-//                            }
-//                        } else if (hMin[start] > h && hMax[start] < h )
-//                        {
-//                            display = false;
-//                        }
-//                        if (s < sMin[start] || s > sMax[start])
-//                        {
-//                            display = false;
-//                        }
-//                        if (z < zMin[start] || z > zMax[start])
-//                        {
-//                            display = false;
-//                        }
-//                        if (y < yMin[start] || y > yMax[start])
-//                        {
-//                            display = false;
-//                        }
-//                        c = cols[start];
-                    }
-                    if (display)
-                    {
-                        looping = false;
-                        if (stats)
-                        {
-                            collectStats(i, j);
-                        }
-                    } else{
-                        c.setRgb(y, y, y);
-                    }
-                    img.setPixel(i, j, c.rgb());
-                    start++;
-                    if (start == Black)
-                    {
-                        looping = false;
-                    }
-                } while (looping);
-            }
-        }
-        QPixmap pix;
-        pix.convertFromImage(img);
-        ui->thresh->setPixmap(pix);
-        ui->thresh->repaint();
-        if (stats)
-        {
-            outputStats();
-        }
-    }
-}
-
-void ColorCreator::initStats()
-{
-    statsSMin = 1.0f;
-    statsSMax = 0.0f;
-    statsHMin = 1.0f;
-    statsHMax = 0.0f;
-    statsZMin = 1.0f;
-    statsZMax = 0.0f;
-    statsYMin = 255;
-    statsYMax = 0;
-    statsUMin = 255;
-    statsUMax = 0;
-    statsVMin = 255;
-    statsVMax = 0;
-}
-
-void ColorCreator::collectStats(int x, int y)
-{
-//    float s = (float)roboimage.getS(x, y) / 256.0f;
-//    float h = (float)roboimage.getH(x, y) / 256.0f;
-//    float z = (float)roboimage.getZ(x, y) / 256.0f;
-//    int yy = roboimage.getY(x, y);
-//    int u = roboimage.getU(x, y);
-//    int v = roboimage.getV(x, y);
-//    statsSMin = min(statsSMin, s);
-//    statsSMax = max(statsSMax, s);
-//    statsHMin = min(statsHMin, h);
-//    statsHMax = max(statsHMax, h);
-//    statsZMin = min(statsZMin, z);
-//    statsZMax = max(statsZMax, z);
-//    statsYMin = min(statsYMin, yy);
-//    statsYMax = max(statsYMax, yy);
-//    statsUMin = min(statsUMin, u);
-//    statsUMax = max(statsUMax, u);
-//    statsVMin = min(statsVMin, v);
-//    statsVMax = max(statsVMax, v);
-}
-
-void ColorCreator::outputStats()
-{
-    QTextStream out(stdout);
-    out << "Stats for current color\n";
-    out << "H: " << statsHMin << " " << statsHMax << "\n";
-    out << "S: " << statsSMin << " " << statsSMax << "\n";
-    out << "Z: " << statsZMin << " " << statsZMax << "\n";
-    out << "Y: " << statsYMin << " " << statsYMax << "\n";
-    out << "U: " << statsUMin << " " << statsUMax << "\n";
-    out << "V: " << statsVMin << " " << statsVMax << "\n";
+//    updateThresh();
 }
 
 void ColorCreator::on_pushButton_clicked()
@@ -481,7 +335,7 @@ void ColorCreator::on_colorSelect_currentIndexChanged(int index)
 void ColorCreator::on_viewChoice_currentIndexChanged(int index)
 {
     mode = index;
-    updateThresh();
+//    updateThresh();
 }
 
 void ColorCreator::on_zMin_valueChanged(int value)
@@ -498,15 +352,4 @@ void ColorCreator::on_zMax_valueChanged(int value)
     updateColors();
     QTextStream out(stdout);
     out << "Set Z Max value to " << value << "\n";
-}
-
-
-void ColorCreator::on_getColorTable_clicked()
-{
-    currentColorDirectory = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
-                                            currentColorDirectory,
-                                            tr("Table Files (*.mtb)"));
-    table->read(currentColorDirectory);
-    int last = currentColorDirectory.lastIndexOf("/");
-    currentColorDirectory.chop(currentColorDirectory.size() - last);
 }
