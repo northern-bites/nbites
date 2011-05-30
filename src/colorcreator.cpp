@@ -12,8 +12,9 @@
 
 ColorCreator::ColorCreator(QWidget *parent) :
     QWidget(parent),
-    roboimage(),
-    imageWindow(roboimage),
+    roboImage(new RoboImage(WIDTH, HEIGHT)),
+    yuvImage(new YUVImage(roboImage)),
+    imageWindow(),
     ui(new Ui::ColorCreator),
     pImage(new memory::proto::PImage())
 {
@@ -115,7 +116,8 @@ void ColorCreator::on_pushButton_clicked()
 
     fp = new memory::log::FileParser(pImage, currentDirectory.toStdString().data());
     fp->getNextMessage();
-    roboimage.read(pImage->image());
+    roboImage->updateImage(pImage->image().data());
+    yuvImage->updateFromRoboImage();
     int last = currentDirectory.lastIndexOf("/");
     int period = currentDirectory.lastIndexOf(".") - last - 1;
     QString temp = currentDirectory.mid(last+1, period);
@@ -125,15 +127,12 @@ void ColorCreator::on_pushButton_clicked()
     updateDisplays();
 }
 
-#include <iostream>
-
 void ColorCreator::on_previousButton_clicked()
 {
     //roboimage.read(previousFrame);
-    fp->getNextMessage();
-    std::cout << pImage->timestamp() << std::endl;
-    roboimage.read(pImage->image());
-    currentFrameNumber--;
+	roboImage->updateImage(pImage->image().data());
+	    yuvImage->updateFromRoboImage();
+	    currentFrameNumber--;
     updateDisplays();
 }
 
@@ -141,10 +140,9 @@ void ColorCreator::on_nextButton_clicked()
 {
   //  string s = SimpleParser::getNextImage();
   //  roboimage.read(s);
-    fp->getNextMessage();
-    std::cout << pImage->timestamp() << std::endl;
-    roboimage.read(pImage->image());
-    currentFrameNumber++;
+	roboImage->updateImage(pImage->image().data());
+	    yuvImage->updateFromRoboImage();
+	    currentFrameNumber++;
     updateDisplays();
 }
 

@@ -2,18 +2,39 @@
 
 using namespace std;
 
-YUVImage::YUVImage() {
-}
+YUVImage::YUVImage(const RoboImage* _roboImage) :
+		roboImage(_roboImage){
 
-YUVImage::YUVImage(RoboImage* roboImage) {
-
-	updateFrom(roboImage);
-}
-
-void YUVImage::updateFrom(RoboImage* roboImage) {
 	height = roboImage->getHeight();
 	width = roboImage->getWidth();
+
+	yImg = new int*[width];
+	uImg = new int*[width];
+	vImg = new int*[width];
+	for (int i = 0; i < width; i++) {
+		yImg[i] = new int[height];
+		vImg[i] = new int[height];
+		uImg[i] = new int[height];
+	}
+
+	updateFromRoboImage();
+}
+
+YUVImage::~YUVImage() {
+//	for (int i = 0; i < width; i++) {
+//		delete yImg[i];
+//		delete vImg[i];
+//		delete uImg[i];
+//	}
+//	delete yImg;
+//	delete uImg;
+//	delete vImg;
+}
+
+void YUVImage::updateFromRoboImage() {
 	const byte* data = roboImage->getImage();
+	if (data == NULL)
+		return ;
 	//copy the Y/U/V stuff
 	int i = 0;
 	for (int y = 0; y < height; ++y) {
@@ -121,40 +142,22 @@ void YUVImage::read(string s) {
 
 }
 
-int YUVImage::getRed(int x, int y) {
+int YUVImage::getRed(int x, int y) const {
 	ColorSpace c;
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getRb();
 }
 
-int YUVImage::getGreen(int x, int y) {
+int YUVImage::getGreen(int x, int y) const {
 	ColorSpace c;
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getGb();
 }
 
-int YUVImage::getBlue(int x, int y) {
+int YUVImage::getBlue(int x, int y) const {
 	ColorSpace c;
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getBb();
-}
-
-int YUVImage::getH(int x, int y) {
-	ColorSpace c;
-	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
-	return c.getHb();
-}
-
-int YUVImage::getS(int x, int y) {
-	ColorSpace c;
-	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
-	return c.getSb();
-}
-
-int YUVImage::getZ(int x, int y) {
-	ColorSpace c;
-	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
-	return c.getZb();
 }
 
 QImage YUVImage::bmp() {

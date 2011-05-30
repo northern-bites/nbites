@@ -6,12 +6,14 @@ const int IdRole = Qt::UserRole;
 //! [0]
 
 //! [1]
-Window::Window(YUVImage r1, QWidget *parent) :
-    r(r1),
-    QWidget(parent)
+Window::Window(QWidget *parent) :
+    QWidget(parent),
+    roboImage(new RoboImage(640, 480)),
+    yuvImage(new YUVImage(roboImage)),
+    pImage(new memory::proto::PImage())
 {
     infoLabel = new QLabel(tr("Information"));
-    roboImageViewer = new RoboImageViewer(r, infoLabel);
+    roboImageViewer = new RoboImageViewer(yuvImage, infoLabel);
 
     shapeComboBox = new QComboBox;
     shapeComboBox->addItem(tr("Pixmap"), RoboImageViewer::Pixmap);
@@ -42,5 +44,15 @@ Window::Window(YUVImage r1, QWidget *parent) :
     setLayout(mainLayout);
 
     setWindowTitle(tr("View Image"));
+
+    QString currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
+    		"/home",
+    		tr("Image Files (*.log)"));
+
+    fp = new memory::log::FileParser(pImage, currentDirectory.toStdString().data());
+    fp->getNextMessage();
+    roboImage->updateImage(pImage->image().data());
+    yuvImage->updateFromRoboImage();
+    this->repaint();
 }
 

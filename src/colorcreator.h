@@ -76,7 +76,8 @@ private slots:
 
 private:
     Ui::ColorCreator *ui;
-    YUVImage roboimage;
+    RoboImage* roboImage;
+    YUVImage* yuvImage;
     RenderArea *renderArea;
     Window imageWindow;
     QString baseDirectory;

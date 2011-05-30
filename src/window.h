@@ -7,8 +7,11 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QGridLayout>
+#include <QFileDialog>
 #include "YUVImage.h"
 #include "RoboImageViewer.h"
+#include "FileParser.h"
+#include "memory/protos/Sensors.pb.h"
 
 class QCheckBox;
 class QComboBox;
@@ -21,14 +24,17 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    explicit Window(YUVImage r1, QWidget *parent = 0);
+    explicit Window(QWidget *parent = 0);
 
 private:
     RoboImageViewer *roboImageViewer;
+    RoboImage *roboImage;
+    YUVImage *yuvImage;
     QLabel *shapeLabel;
     QLabel *infoLabel;
     QComboBox *shapeComboBox;
-    YUVImage r;
+    memory::log::FileParser* fp;
+    boost::shared_ptr<memory::proto::PImage> pImage;
 
 
 };
