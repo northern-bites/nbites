@@ -12,28 +12,16 @@
 #include <QFile>
 #include <QPainter>
 #include "colorspace.h"
+#include "RoboImage.h"
 
 class YUVImage
 {
-public:
-    enum DisplayModes
-    {
-        Color,
-        Y,
-        U,
-        V,
-        Red,
-        Green,
-        Blue,
-        Hue,
-        Saturation,
-        Value
-    } display;
 
 public:
-    YUVImage(int wd, int ht);
+	YUVImage();
+    YUVImage(RoboImage* roboImage);
     QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void updateFrom(RoboImage* roboImage);
     void read(QString filename);
     void read(std::string s);
     int getWidth() {return width;}
@@ -54,8 +42,9 @@ public:
 
 
 private:
-    int width;
-    int height;
+    unsigned int width;
+    unsigned int height;
+
     int** yImg;
     int** uImg;
     int** vImg;

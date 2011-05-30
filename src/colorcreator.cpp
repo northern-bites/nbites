@@ -12,129 +12,13 @@
 
 ColorCreator::ColorCreator(QWidget *parent) :
     QWidget(parent),
-    roboimage(WIDTH, HEIGHT),
+    roboimage(),
     imageWindow(roboimage),
     ui(new Ui::ColorCreator),
     pImage(new memory::proto::PImage())
 {
-    hMin = new float[COLORS];
-    hMax = new float[COLORS];
-    sMin = new float[COLORS];
-    sMax = new float[COLORS];
-    zMin = new float[COLORS];
-    zMax = new float[COLORS];
-    yMin = new int[COLORS];
-    yMax = new int[COLORS];
-    cols = new QColor[COLORS];
-
-    // initialize colors for drawing thresholds
-    cols[Orange] = QColor(255, 128, 0);
-    cols[Blue] = QColor(0, 0, 255);
-    cols[Green] = QColor(0, 201, 87);
-    cols[Yellow] = QColor(255, 255, 0);
-    cols[White] = QColor(255, 255, 255);
-    cols[Pink] = QColor(255, 181, 197);
-    cols[Navy] = QColor(0, 0, 128);
-    cols[Black] = QColor(0, 0, 0);
 
     ui->setupUi(this);
-    baseDirectory = "/Users/ericchown/nbites/data/frames";
-    baseColorTable = "/Users/ericchown/nbites/data/tables";
-    haveFile = false;
-
-    ui->colorSelect->addItem(tr("Orange"), Orange);
-    ui->colorSelect->addItem(tr("Blue"), Blue);
-    ui->colorSelect->addItem(tr("Yellow"), Yellow);
-    ui->colorSelect->addItem(tr("Green"), Green);
-    ui->colorSelect->addItem(tr("White"), White);
-    ui->colorSelect->addItem(tr("Pink"), Pink);
-    ui->colorSelect->addItem(tr("Navy"), Navy);
-    ui->colorSelect->addItem(tr("Black"), Black);
-
-    ui->viewChoice->addItem(tr("Single Color"), Single);
-    ui->viewChoice->addItem(tr("All Colors"), Multiple);
-    ui->viewChoice->addItem(tr("Use Table"), Table);
-    mode = Single;
-
-    currentColor = Orange;
-    currentDirectory = baseDirectory;
-    currentColorDirectory = baseColorTable;
-    zSlice = 0.75f;
-    for (int i = 0; i < COLORS; i++)
-    {
-        switch(i)
-        {
-        case Orange:
-            hMin[i] = 0.80f;
-            hMax[i] = 0.06f;
-            sMin[i] = 0.25f;
-            sMax[i] = 1.0f;
-            zMin[i] = 0.12f;
-            zMax[i] = 1.0f;
-            yMin[i] = 34;
-            yMax[i] = 145;
-            break;
-        case Green:
-            hMin[i] = 0.45f;
-            hMax[i] = 0.60f;
-            sMin[i] = 0.3f;
-            sMax[i] = 0.6f;
-            zMin[i] = 0.0f;
-            zMax[i] = 1.0f;
-            yMin[i] = 41;
-            yMax[i] = 124;
-            break;
-        case Yellow:
-            hMin[i] = 0.13f;
-            hMax[i] = 0.36f;
-            sMin[i] = 0.08f;
-            sMax[i] = 0.70f;
-            zMin[i] = 0.17f;
-            zMax[i] = 1.0f;
-            yMin[i] = 62;
-            yMax[i] = 145;
-            break;
-        case Blue:
-            hMin[i] = 0.58f;
-            hMax[i] = 0.69f;
-            sMin[i] = 0.42f;
-            sMax[i] = 0.65f;
-            zMin[i] = 0.40f;
-            zMax[i] = 1.0f;
-            yMin[i] = 46;
-            yMax[i] = 146;
-            break;
-        case White:
-            hMin[i] = 0.15f;
-            hMax[i] = 0.71f;
-            sMin[i] = 0.0f;
-            sMax[i] = 0.3f;
-            zMin[i] = 0.0f;
-            zMax[i] = 1.0f;
-            yMin[i] = 150;
-            yMax[i] = 250;
-            break;
-        default:
-            hMin[i] = 0.0f;
-            hMax[i] = 0.01f;
-            sMin[i] = 0.0f;
-            sMax[i] = 1.0f;
-            zMin[i] = 0.0f;
-            zMax[i] = 1.0f;
-            yMin[i] = 30;
-            yMax[i] = 230;
-            break;
-        }
-    }
-    ui->hMin->setValue(hMin[currentColor] * 100);
-    ui->hMax->setValue(hMax[currentColor] * 100);
-    ui->sMin->setValue(sMin[currentColor] * 100);
-    ui->sMax->setValue(sMax[currentColor] * 100);
-    ui->zMin->setValue(zMin[currentColor] * 100);
-    ui->zMax->setValue(zMax[currentColor] * 100);
-    ui->yMin->setValue(yMin[currentColor]);
-    ui->yMax->setValue(yMax[currentColor]);
-    ui->zSlice->setValue(zSlice);
 }
 
 ColorCreator::~ColorCreator()

@@ -24,16 +24,13 @@ set( RoboImageViewer_srcs main.cpp
   colorspace.cpp
   RoboImageViewer.cpp
   window.cpp
-  coloredit.cpp
   FileParser.cpp
   )
 
 set(RoboImageViewer_headers colorcreator.h
-    YUVImage.h
     colorspace.h
     RoboImageViewer.h
     window.h
-    coloredit.h
 )
 
 set(RoboImageViewer_forms colorcreator.ui)

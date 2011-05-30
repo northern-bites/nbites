@@ -22,8 +22,6 @@ class Window : public QWidget
 
 public:
     explicit Window(YUVImage r1, QWidget *parent = 0);
-private slots:
-    void shapeChanged();
 
 private:
     RoboImageViewer *roboImageViewer;

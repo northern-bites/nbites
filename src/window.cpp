@@ -30,10 +30,6 @@ Window::Window(YUVImage r1, QWidget *parent) :
     shapeLabel = new QLabel(tr("&View:"));
     shapeLabel->setBuddy(shapeComboBox);
 
-
-    connect(shapeComboBox, SIGNAL(activated(int)),
-            this, SLOT(shapeChanged()));
-
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->setColumnStretch(0, 1);
     mainLayout->setColumnStretch(3, 1);
@@ -45,15 +41,6 @@ Window::Window(YUVImage r1, QWidget *parent) :
 
     setLayout(mainLayout);
 
-    shapeChanged();
-
     setWindowTitle(tr("View Image"));
-}
-
-void Window::shapeChanged()
-{
-    RoboImageViewer::Shape shape = RoboImageViewer::Shape(shapeComboBox->itemData(
-            shapeComboBox->currentIndex(), IdRole).toInt());
-    roboImageViewer->setShape(shape);
 }
 

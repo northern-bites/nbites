@@ -2,16 +2,46 @@
 
 using namespace std;
 
-YUVImage::YUVImage(int wd, int ht) {
-	width = wd;
-	height = ht;
-	yImg = new int*[wd];
-	uImg = new int*[wd];
-	vImg = new int*[wd];
-	for (int i = 0; i < wd; i++) {
-		yImg[i] = new int[ht];
-		vImg[i] = new int[ht];
-		uImg[i] = new int[ht];
+YUVImage::YUVImage() {
+}
+
+YUVImage::YUVImage(RoboImage* roboImage) {
+
+	updateFrom(roboImage);
+}
+
+void YUVImage::updateFrom(RoboImage* roboImage) {
+	height = roboImage->getHeight();
+	width = roboImage->getWidth();
+	const byte* data = roboImage->getImage();
+	//copy the Y/U/V stuff
+	int i = 0;
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; x += 2) {
+
+			yImg[x][y] = data[i++];
+			while (yImg[x][y] < 0) {
+				yImg[x][y] = 256 + yImg[x][y];
+			}
+			yImg[x][y] = yImg[x][y] % 256;
+			uImg[x][y] = data[i++];
+			while (uImg[x][y] < 0) {
+				uImg[x][y] = 256 + uImg[x][y];
+			}
+			uImg[x][y] = uImg[x][y] % 256;
+			uImg[x + 1][y] = uImg[x][y];
+			yImg[x + 1][y] = data[i++];
+			while (yImg[x + 1][y] < 0) {
+				yImg[x + 1][y] = 256 + yImg[x + 1][y];
+			}
+			yImg[x + 1][y] = yImg[x + 1][y] % 256;
+			vImg[x][y] = data[i++];
+			while (vImg[x][y] < 0) {
+				vImg[x][y] = 256 + vImg[x][y];
+			}
+			vImg[x][y] = vImg[x][y] % 256;
+			vImg[x + 1][y] = vImg[x][y];
+		}
 	}
 }
 
@@ -131,68 +161,66 @@ QImage YUVImage::bmp() {
 	QImage img(width, height, QImage::Format_RGB32);
 	img.fill(0);
 	ColorSpace c;
-	DisplayModes dm = Color;
+//	DisplayModes dm = Color;
 	QTextStream out(stdout);
 
 	for (int j = 0; j < height; ++j)
 		for (int i = 0; i < width; ++i) {
 			c.setYuv(yImg[i][j], uImg[i][j], vImg[i][j]);
 			int r, g, b;
-			switch (dm) {
-			case Color:
+//			switch (dm) {
 				r = c.getRb();
 				g = c.getGb();
 				b = c.getBb();
-				//out << i << " " << j << " " << r << " " << g << " " << b << "\n";
-				break;
+//				break;
 
-			case Y:
-				r = g = b = yImg[i][j];
-				break;
+//			case Y:
+//				r = g = b = yImg[i][j];
+//				break;
+//
+//			case U:
+//				r = g = b = uImg[i][j];
+//				break;
+//
+//			case V:
+//				r = g = b = vImg[i][j];
+//				break;
+//
+//			case Red:
+//				r = g = b = c.getRb();
+//				break;
+//
+//			case Green:
+//				r = g = b = c.getGb();
+//				break;
+//
+//			case Blue:
+//				r = g = b = c.getBb();
+//				break;
+//
+//			case Hue:
+//				if (c.getS() >= 0.25f && c.getY() >= 0.2f) {
+//					ColorSpace h = ColorSpace();
+//					h.setHsz(c.getH(), c.getS(), 0.875f);
+//					r = h.getRb();
+//					g = h.getGb();
+//					b = h.getBb();
+//				} else
+//					r = g = b = 0;
+//				break;
+//
+//			case Saturation:
+//				r = g = b = c.getSb();
+//				break;
+//
+//			case Value:
+//				r = g = b = c.getZb();
+//				break;
 
-			case U:
-				r = g = b = uImg[i][j];
-				break;
-
-			case V:
-				r = g = b = vImg[i][j];
-				break;
-
-			case Red:
-				r = g = b = c.getRb();
-				break;
-
-			case Green:
-				r = g = b = c.getGb();
-				break;
-
-			case Blue:
-				r = g = b = c.getBb();
-				break;
-
-			case Hue:
-				if (c.getS() >= 0.25f && c.getY() >= 0.2f) {
-					ColorSpace h = ColorSpace();
-					h.setHsz(c.getH(), c.getS(), 0.875f);
-					r = h.getRb();
-					g = h.getGb();
-					b = h.getBb();
-				} else
-					r = g = b = 0;
-				break;
-
-			case Saturation:
-				r = g = b = c.getSb();
-				break;
-
-			case Value:
-				r = g = b = c.getZb();
-				break;
-
-			default:
-				r = g = b = 0;
-				break;
-			}
+//			default:
+//				r = g = b = 0;
+//				break;
+//			}
 			QRgb value = qRgb(r, g, b);
 			//value = Qt::cyan;
 			//out << " " << value.red() << " " << value.green() << " " << value.blue() << "\n";

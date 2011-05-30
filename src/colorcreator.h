@@ -5,7 +5,6 @@
 #include "YUVImage.h"
 #include "RoboImageViewer.h"
 #include "window.h"
-#include "coloredit.h"
 
 #include "FileParser.h"
 #include "memory/protos/Sensors.pb.h"
@@ -35,8 +34,6 @@ class ColorCreator : public QWidget
     Q_OBJECT
 
 public:
-    enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black};
-    enum Choices {Single, Multiple, Table};
     explicit ColorCreator(QWidget *parent = 0);
     ~ColorCreator();
     void updateDisplays();
@@ -103,7 +100,6 @@ private:
     float statsHMin, statsHMax, statsSMin, statsSMax, statsZMin, statsZMax;
     int statsYMin, statsYMax, statsUMin, statsUMax, statsVMin, statsVMax;
     int currentColor;
-    ColorEdit *green;
     bool haveFile;
     memory::log::FileParser* fp;
     boost::shared_ptr<memory::proto::PImage> pImage;
