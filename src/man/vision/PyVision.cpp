@@ -12,12 +12,12 @@ shared_ptr<Vision> vision_pointer;
 
 BOOST_PYTHON_MODULE(_vision)
 {
-  class_<Ball>("Ball", no_init)
-    //.def_readonly("width", &VisualBall::width)
-    //.def_readonly("height", &VisualBall::height)
-    //    .def_readonly("radius", &VisualBall::radius)    
+  class_<VisualBall>("Ball", no_init)
+    .def_readonly("width", &VisualBall::getWidth)
+    .def_readonly("height", &VisualBall::getHeight)
     ;
 
+  //noncopyable is required because vision has no public copy constructor
   class_<Vision, shared_ptr<Vision>, boost::noncopyable >("Vision", no_init)
     .add_property("ball", &Vision::ball)
     ;
