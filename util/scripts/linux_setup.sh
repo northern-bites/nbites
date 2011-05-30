@@ -8,11 +8,19 @@ fi
 echo "Downloading awesome free stuff! Also accept the Sun Java licence by \
 pressing TAB!"
 
+PACKAGES="build-essential cmake git-core sun-java6-jdk \
+python2.6-dev emacs cmake-curses-gui ccache curl aptitude"
+
+echo "Are you on 64-bit linux?(y/n)"
+read IS64BIT
+
+if [ $IS64BIT == 'y' ]; then
+  PACKAGES="$PACKAGES g++-4.4-multilib"
+fi
+
 sudo add-apt-repository ppa:sun-java-community-team/sun-java6
 sudo apt-get update
-sudo apt-get install build-essential cmake git-core sun-java6-jdk \
-python2.6-dev emacs cmake-curses-gui ccache curl aptitude \
-g++-4.4-multilib
+sudo apt-get install $PACKAGES
 sudo update-java-alternatives -s java-6-sun
 
 echo "Downloading and unpacking NBites files"
@@ -25,9 +33,6 @@ lib_dir=$nbites_dir/lib
 naoqi=naoqi-sdk-$naoqi_version-linux-nbites.tar.gz
 naoqi_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$naoqi
 naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux
-
-ctc=linux-x64-crosstoolchain.tar.gz
-ctc_robocup=$robocup/software/nao/cross_compiler_stuff/$ctc
 
 ext=ext-nbites-linux.tar.gz
 ext_robocup=$robocup/software/$ext
@@ -44,8 +49,13 @@ echo "Unpacking NaoQi"
 
 pushd $lib_dir
 tar -xvzf $naoqi
+rm $naoqi
 popd
 
+if [ $IS64BIT == 'y' ]; then
+
+ctc=linux-x64-crosstoolchain.tar.gz
+ctc_robocup=$robocup/software/nao/cross_compiler_stuff/$ctc
 
 echo "Downloading the CTC"
 rsync -v $USER@$ctc_robocup $naoqi_local/
@@ -54,15 +64,18 @@ echo "Unpacking the CTC"
 
 pushd $naoqi_local
 tar -xvzf $ctc
+rm $ctc
 popd
+fi
 
 echo "Downloading external components"
 
-rsync -v $USER@$ext_robocup $nbites_dir/
+rsync -v $USER_NAME@$ext_robocup $nbites_dir/
 
 echo "Unpacking ext"
 pushd $nbites_dir
 tar -xvzf $ext
+rm $ext
 popd
 
 echo "Setting up bash stuff ..."
@@ -70,6 +83,5 @@ echo "Setting up bash stuff ..."
 echo "source $PWD/nbites.bash" >> ~/.bashrc
 echo "export NBITES_DIR=$nbites_dir" >> ~/.bashrc
 echo "export AL_DIR=$naoqi_local" >> ~/.bashrc
-echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/$nbites_dir/ext/lib" >> ~/.bashrc
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$nbites_dir/ext/lib" >> ~/.bashrc
 echo "export PATH=$PATH:$nbites_dir/ext/bin" >> ~/.bashrc
-
