@@ -43,4 +43,6 @@ docs/*
 *.so
 src/remote/dist/javadoc/
 *.pdf
-*.o 
+*.o
+ext/*
+lib/*

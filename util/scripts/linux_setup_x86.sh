@@ -43,6 +43,7 @@ echo "Unpacking NaoQi"
 
 pushd $lib_dir
 tar -xvzf $naoqi
+rm $naoqi
 popd
 
 
@@ -57,11 +58,12 @@ popd
 
 echo "Downloading external components"
 
-rsync -v $USER@$ext_robocup $nbites_dir/
+rsync -v $USER_NAME@$ext_robocup $nbites_dir/
 
 echo "Unpacking ext"
 pushd $nbites_dir
 tar -xvzf $ext
+rm $ext
 popd
 
 echo "Setting up bash stuff ..."
