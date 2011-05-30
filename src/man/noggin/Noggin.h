@@ -70,7 +70,6 @@ private:
     boost::shared_ptr<ClickableButton> leftFootButton;
     boost::shared_ptr<ClickableButton> rightFootButton;
 
-    PyVision* pyvision;
     bool error_state;
     PyObject *module_helper;
     PyObject *brain_module;

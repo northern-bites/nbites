@@ -105,18 +105,7 @@ void Noggin::initializePython(shared_ptr<Vision> v)
     comm->add_to_module();
 
     // Initialize PyVision module
-    vision = v;
-    MODULE_INIT(vision) ();
-
-    // Initialize and insert the vision wrapper into the module
-    PyObject *result = PyVision_new(v.get());
-    if (result == NULL) {
-        cerr << "** Noggin extension could not initialize PyVision object **" <<
-            endl;
-        assert(false);
-    }
-    vision_addToModule(result, MODULE_HEAD);
-    pyvision = reinterpret_cast<PyVision*>(result);
+    c_init_vision();
 
     // Initialize localization stuff
     initializeLocalization();
@@ -263,11 +252,6 @@ void Noggin::runStep ()
     processGCButtonClicks();
 
     PROF_ENTER(profiler, P_PYTHON);
-
-    // Update vision information for Python
-    PROF_ENTER(profiler, P_PYUPDATE);
-    PyVision_update(pyvision);
-    PROF_EXIT(profiler, P_PYUPDATE);
 
 #   ifdef RUN_LOCALIZATION
     // Update localization information
