@@ -11,7 +11,7 @@ sys.stderr = sys.stdout
 # Packages and modules from super-directories
 from man import comm
 from man import motion
-from man import vision
+import vision
 #from man.corpus import leds
 import sensors
 
@@ -51,7 +51,7 @@ class Brain(object):
         self.out = NaoOutput.NaoOutput(self)
 
         # Setup nao modules inside brain for easy access
-        self.vision = vision.Vision()
+        self.vision = vision.vision
         self.sensors = sensors.sensors
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
@@ -88,9 +88,10 @@ class Brain(object):
         self.my.playerNumber = self.comm.gc.player
 
         # Information about the environment
-        self.initFieldObjects()
+        #self.initFieldObjects()
         self.initTeamMembers()
         self.ball = Ball.Ball(self.vision.ball)
+        print self.ball.width
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
 
@@ -222,7 +223,7 @@ class Brain(object):
 
         # order here is very important
         # Update Environment
-        self.updateVisualObjects()
+        #self.updateVisualObjects()
         self.sonar.updateSensors(self.sensors)
 
         # Communications update
