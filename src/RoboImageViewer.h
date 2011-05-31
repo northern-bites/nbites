@@ -6,25 +6,27 @@
 #include <QPen>
 #include <QPixmap>
 #include <QLabel>
-#include "YUVImage.h"
+#include "BMPYUVImage.h"
 
 class RoboImageViewer: public QWidget
 {
     Q_OBJECT
 public:
 
-    RoboImageViewer(const YUVImage* yuvImage, QLabel *lab, QWidget *parent = 0);
-    void  setYUVImage(YUVImage* img) { yuvImage = img;}
+    RoboImageViewer(const RoboImage* roboImage,
+    		QLabel *infoLabel = NULL,
+    		QWidget *parent = NULL);
+    virtual ~RoboImageViewer();
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
+    void updateBitmap();
 
 protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-    QLabel *info;
-    QPixmap pixmap;
-    const YUVImage *yuvImage;
+    BMPYUVImage *image;
+    QLabel* infoLabel;
 
 };
 

@@ -17,28 +17,9 @@
 #include <string>
 
 #include <QGraphicsItem>
-#include <QString>
-#include <QImage>
 #include <QColor>
-#include <QDataStream>
-#include <QTextStream>
-#include <QFile>
-#include <QPainter>
 #include "colorspace.h"
 #include "RoboImage.h"
-
-enum BitmapType {
-	YUV,
-	Y,
-	U,
-	V,
-	Red,
-	Green,
-	Blue,
-	Hue,
-	Saturation,
-	Value
-};
 
 class YUVImage
 {
@@ -46,7 +27,7 @@ class YUVImage
 public:
     YUVImage(const RoboImage* _roboImage);
     virtual ~YUVImage();
-    void updateFromRoboImage();
+    virtual void updateFromRoboImage();
     void read(QString filename);
     void read(std::string s);
     unsigned int getWidth() const { return width;}
@@ -60,10 +41,8 @@ public:
     int getRed(int x, int y) const;
     int getGreen(int x, int y) const;
     int getBlue(int x, int y) const;
-    QImage getBitmap(BitmapType type = YUV);
 
-
-private:
+protected:
     const RoboImage* roboImage;
 
     unsigned int width;

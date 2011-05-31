@@ -21,6 +21,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 set( RoboImageViewer_srcs main.cpp
   colorcreator.cpp
   YUVImage.cpp
+  BMPYUVImage.cpp
   colorspace.cpp
   RoboImageViewer.cpp
   window.cpp

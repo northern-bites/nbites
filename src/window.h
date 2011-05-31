@@ -29,7 +29,6 @@ public:
 private:
     RoboImageViewer *roboImageViewer;
     RoboImage *roboImage;
-    YUVImage *yuvImage;
     QLabel *shapeLabel;
     QLabel *infoLabel;
     QComboBox *shapeComboBox;
