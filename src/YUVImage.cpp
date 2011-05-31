@@ -21,14 +21,14 @@ YUVImage::YUVImage(const RoboImage* _roboImage) :
 }
 
 YUVImage::~YUVImage() {
-//	for (int i = 0; i < width; i++) {
-//		delete yImg[i];
-//		delete vImg[i];
-//		delete uImg[i];
-//	}
-//	delete yImg;
-//	delete uImg;
-//	delete vImg;
+	for (int i = 0; i < width; i++) {
+		delete yImg[i];
+		delete vImg[i];
+		delete uImg[i];
+	}
+	delete yImg;
+	delete uImg;
+	delete vImg;
 }
 
 void YUVImage::updateFromRoboImage() {
@@ -160,73 +160,70 @@ int YUVImage::getBlue(int x, int y) const {
 	return c.getBb();
 }
 
-QImage YUVImage::bmp() {
+QImage YUVImage::getBitmap(BitmapType type) {
 	QImage img(width, height, QImage::Format_RGB32);
 	img.fill(0);
 	ColorSpace c;
-//	DisplayModes dm = Color;
-	QTextStream out(stdout);
 
 	for (int j = 0; j < height; ++j)
 		for (int i = 0; i < width; ++i) {
 			c.setYuv(yImg[i][j], uImg[i][j], vImg[i][j]);
 			int r, g, b;
-//			switch (dm) {
+			switch (type) {
+			case YUV:
 				r = c.getRb();
 				g = c.getGb();
 				b = c.getBb();
-//				break;
+				break;
 
-//			case Y:
-//				r = g = b = yImg[i][j];
-//				break;
-//
-//			case U:
-//				r = g = b = uImg[i][j];
-//				break;
-//
-//			case V:
-//				r = g = b = vImg[i][j];
-//				break;
-//
-//			case Red:
-//				r = g = b = c.getRb();
-//				break;
-//
-//			case Green:
-//				r = g = b = c.getGb();
-//				break;
-//
-//			case Blue:
-//				r = g = b = c.getBb();
-//				break;
-//
-//			case Hue:
-//				if (c.getS() >= 0.25f && c.getY() >= 0.2f) {
-//					ColorSpace h = ColorSpace();
-//					h.setHsz(c.getH(), c.getS(), 0.875f);
-//					r = h.getRb();
-//					g = h.getGb();
-//					b = h.getBb();
-//				} else
-//					r = g = b = 0;
-//				break;
-//
-//			case Saturation:
-//				r = g = b = c.getSb();
-//				break;
-//
-//			case Value:
-//				r = g = b = c.getZb();
-//				break;
+			case Y:
+				r = g = b = yImg[i][j];
+				break;
 
-//			default:
-//				r = g = b = 0;
-//				break;
-//			}
+			case U:
+				r = g = b = uImg[i][j];
+				break;
+
+			case V:
+				r = g = b = vImg[i][j];
+				break;
+
+			case Red:
+				r = g = b = c.getRb();
+				break;
+
+			case Green:
+				r = g = b = c.getGb();
+				break;
+
+			case Blue:
+				r = g = b = c.getBb();
+				break;
+
+			case Hue:
+				if (c.getS() >= 0.25f && c.getY() >= 0.2f) {
+					ColorSpace h = ColorSpace();
+					h.setHsz(c.getH(), c.getS(), 0.875f);
+					r = h.getRb();
+					g = h.getGb();
+					b = h.getBb();
+				} else
+					r = g = b = 0;
+				break;
+
+			case Saturation:
+				r = g = b = c.getSb();
+				break;
+
+			case Value:
+				r = g = b = c.getZb();
+				break;
+
+			default:
+				r = g = b = 0;
+				break;
+			}
 			QRgb value = qRgb(r, g, b);
-			//value = Qt::cyan;
-			//out << " " << value.red() << " " << value.green() << " " << value.blue() << "\n";
 			img.setPixel(i, j, value);
 
 		}

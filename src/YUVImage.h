@@ -1,6 +1,19 @@
 #ifndef YUVImage_H
 #define YUVImage_H
 
+/**
+ * @class YUVImage
+ *
+ * Takes a robo image and splits it into 3 component images for each of the
+ * three channels.
+ * One instance of this class should rely on one instance of a roboImage.
+ * Once the pointer in the roboImage gets updated, make sure to update this
+ * class as well by using updateFromRoboImage().
+ *
+ * This could be extended by adding in a listener to some data manager that will
+ * push updates to the roboImage.
+ */
+
 #include <string>
 
 #include <QGraphicsItem>
@@ -14,18 +27,30 @@
 #include "colorspace.h"
 #include "RoboImage.h"
 
+enum BitmapType {
+	YUV,
+	Y,
+	U,
+	V,
+	Red,
+	Green,
+	Blue,
+	Hue,
+	Saturation,
+	Value
+};
+
 class YUVImage
 {
 
 public:
     YUVImage(const RoboImage* _roboImage);
     virtual ~YUVImage();
-    QRectF boundingRect() const;
     void updateFromRoboImage();
     void read(QString filename);
     void read(std::string s);
-    unsigned int getWidth() const {return width;}
-    unsigned int getHeight() const {return height;}
+    unsigned int getWidth() const { return width;}
+    unsigned int getHeight() const { return height;}
     int** getYImage() const { return yImg;}
     int** getUImage() const { return uImg;}
     int** getVImage() const { return vImg;}
@@ -35,7 +60,7 @@ public:
     int getRed(int x, int y) const;
     int getGreen(int x, int y) const;
     int getBlue(int x, int y) const;
-    QImage bmp();
+    QImage getBitmap(BitmapType type = YUV);
 
 
 private:
@@ -48,5 +73,4 @@ private:
     int** uImg;
     int** vImg;
 };
-
 #endif // YUVImage_H
