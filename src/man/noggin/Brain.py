@@ -91,7 +91,8 @@ class Brain(object):
         #self.initFieldObjects()
         self.initTeamMembers()
         self.ball = Ball.Ball(self.vision.ball)
-        print self.ball.width
+        print dir(self.vision.ball)
+        print dir(self.ball)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
 
