@@ -16,19 +16,6 @@ Window::Window(QWidget *parent) :
     roboImageViewer = new RoboImageViewer(yuvImage, infoLabel);
 
     shapeComboBox = new QComboBox;
-    shapeComboBox->addItem(tr("Pixmap"), RoboImageViewer::Pixmap);
-    shapeComboBox->addItem(tr("Blue"), RoboImageViewer::Blue);
-    shapeComboBox->addItem(tr("Red"), RoboImageViewer::Red);
-    shapeComboBox->addItem(tr("Green"), RoboImageViewer::Green);
-    shapeComboBox->addItem(tr("Y"), RoboImageViewer::Y);
-    shapeComboBox->addItem(tr("U"), RoboImageViewer::U);
-    shapeComboBox->addItem(tr("V"), RoboImageViewer::V);
-    shapeComboBox->addItem(tr("H"), RoboImageViewer::H);
-    shapeComboBox->addItem(tr("S"), RoboImageViewer::S);
-    shapeComboBox->addItem(tr("Z"), RoboImageViewer::Z);
-    shapeComboBox->addItem(tr("Edge"), RoboImageViewer::EDGE);
-    shapeComboBox->addItem(tr("W"), RoboImageViewer::WHEEL);
-
     shapeLabel = new QLabel(tr("&View:"));
     shapeLabel->setBuddy(shapeComboBox);
 

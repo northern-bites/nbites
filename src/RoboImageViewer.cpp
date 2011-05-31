@@ -8,24 +8,6 @@ RoboImageViewer::RoboImageViewer(const YUVImage* yuvImage, QLabel *inf, QWidget 
 {
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
-    setMouseTracking(true);
-}
-
-void RoboImageViewer::mouseMoveEvent(QMouseEvent *event) {
-//    int x = event->x() / 2;
-//    int y = event->y() / 2;
-//    QString xS;
-//    xS.setNum(x);
-//    QString yS;
-//    yS.setNum(y);
-//    QString yy;
-//    yy.setNum(r.getY(x, y));
-//    QString u;
-//    u.setNum(r.getU(x, y));
-//    QString v;
-//    v.setNum(r.getV(x, y));
-//    QString temp = "x, y: "+ xS+" "+yS+"\nYUV: "+yy+" "+u+" "+v;
-//    info->setText(temp);
 }
 
 QSize RoboImageViewer::minimumSizeHint() const
@@ -41,16 +23,8 @@ QSize RoboImageViewer::sizeHint() const
 void RoboImageViewer::paintEvent(QPaintEvent * /* event */)
 {
 
-    QRect rect(10, 20, 80, 60);
-
-    QPainterPath path;
-    /*path.moveTo(20, 80);
-    path.lineTo(20, 30);
-    path.cubicTo(80, 0, 50, 50, 80, 80);*/
-
     QPainter painter(this);
 
-    QTextStream out(stdout);
     QRect draw;
     int red, green, blue, edge;
     bool found;
