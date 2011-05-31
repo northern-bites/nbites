@@ -4,7 +4,7 @@ GAINS_ON_VALUE = 0.85
 GAINS_ARMS_VALUE = 0.2
 GAINS_OFF_VALUE = -1.0
 LOWER_HEAD_VALUE = 0.8
-DIVE_LEGS_VALUE = 0
+DIVE_VALUE = 0
 
 def flipStiffness( (headYaw, headPitch,
                     LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll,
@@ -312,26 +312,49 @@ LEFT_FARTHER_KICK_STIFFNESSES = (GAINS_ON_VALUE, # Head
 
 GOALIE_DIVE_RIGHT_STIFFNESSES=  (LOWER_HEAD_VALUE, # Head
                                  LOWER_HEAD_VALUE,
-                                 GAINS_ARMS_VALUE, # larm
-                                 GAINS_ARMS_VALUE,
-                                 GAINS_ARMS_VALUE,
-                                 GAINS_ARMS_VALUE,
-                                 DIVE_LEGS_VALUE, # lleg
-                                 DIVE_LEGS_VALUE,
-                                 DIVE_LEGS_VALUE,
-                                 DIVE_LEGS_VALUE,
-                                 DIVE_LEGS_VALUE,
-                                 DIVE_LEGS_VALUE,
-                                 DIVE_LEGS_VALUE, # rleg
-                                 DIVE_LEGS_VALUE,
-                                 DIVE_LEGS_VALUE,
-                                 DIVE_LEGS_VALUE,
-                                 DIVE_LEGS_VALUE,
-                                 DIVE_LEGS_VALUE,
-                                 GAINS_ARMS_VALUE, # rarm
-                                 GAINS_ARMS_VALUE,
-                                 GAINS_ARMS_VALUE,
-                                 GAINS_ARMS_VALUE,)
+                                 GAINS_ON_VALUE, # larm
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE, # lleg
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE, # rleg
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE, # rarm
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,
+                                 GAINS_ON_VALUE,)
+
+GOALIE_GROUND_STIFFNESSES = (LOWER_HEAD_VALUE, # Head
+                             LOWER_HEAD_VALUE,
+                             DIVE_VALUE, # larm
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE, # lleg
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE, # rleg
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE, # rarm
+                             DIVE_VALUE,
+                             DIVE_VALUE,
+                             DIVE_VALUE,)
 
 LEARN_MOTION_STIFFNESSES = (GAINS_OFF_VALUE, # Head
                             GAINS_OFF_VALUE,

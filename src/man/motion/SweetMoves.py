@@ -644,45 +644,52 @@ GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0), #right arm
                   .35, 0, stiff.LOW_HEAD_STIFFNESSES),
                  )
 
-#Working goalie right dive.Needs to be faster but lies flat and dives
-#straight right.
-GOALIE_DIVE_RIGHT = ( ((45.88,38.93,-122.88,-32.43),
+GOALIE_PRE_SAVE_POS = ( ((45.88,38.93,-122.88,-32.43),
                         (-59.06,21.54,-17.49,122.69,-69.70,-5.01),
                         (-59.06,-37.44,-16.00,123.84,-69.17,5.54),
                         (41.31,-38.85,120.23,41.93),
-                        1.0, 0, stiff.LOW_HEAD_STIFFNESSES),
+                        1.0, 0, stiff.LOW_HEAD_STIFFNESSES),)
                       #squats down with legs spread
                       #arms bent with hands above elbow
 
-                       ((53.44,66.62,-122.61,-42.98),
-                       (0,45.77,-87.00,122.78,-69.70,24.45),
-                       (0,12.92,29.70,38.85,9.41,22.15),
-                       (47.46,-30.33,120.06,41.93),
-                       1.0, 0, stiff.LOW_HEAD_STIFFNESSES),
-                      #turns his hips in while standing on his
-                      #left foot so that he is facing more left.
+#Working goalie right dive.Needs to be faster but lies flat and dives
+#straight right.
+GOALIE_DIVE_RIGHT = ( (INITIAL_POS[0][0],
+                       (-5.10,3,-55,115,-60,-3),
+                       (-5.10,-3,-55,115,-60,3),
+                       INITIAL_POS[0][3],
+                       0.3, 0, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
+                      #squats down
 
-                      ((-85.70,13.80,50.36,0.27),
-                       (-30.17,-19.16,16.53,22.32,23.03,24.42),
-                       (-30.17,11.16,-40.34,48.87,-10.46,24.52),
-                       (-36.38,0.17,-59.77,8.53),
-                       1.5, 0, stiff.LOW_HEAD_STIFFNESSES),
-                      #dives right
+                      ((0, 70, 0, 0),
+                       (-5.27,-2.63,-38.85,88.24,-45.88,-9.84),
+                       (-5.27,-16.43,-63.46,123.23,-59.76,-11.07),
+                       (0, -70, 0, 0),
+                       0.3, 1, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
+                      #arms out leans to one side
 
-                       ((-85.70,13.80,50.36,0.27),
-                        (-30.17,-19.16,16.53,22.32,23.03,24.42),
-                        (-30.17,11.16,-40.34,48.87,-10.46,24.52),
-                        (-36.38,0.17,-59.77,8.53),
-                        0.1, 0, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
-                      #makes robot lie flat
+                      ((0, 0, 0, 0),
+                       (-5.27,-2.63,-38.85,60.24,-45.88,-9.84),
+                       (-5.27,-16.43,-63.46,123.23,-59.76,-11.07),
+                       (-85.25,-60.65,-28.22,51.77),
+                       0.2, 1, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
+                      #falls over and puts arms in final position
 
-                      ((-85.70,13.80,50.36,0.27),
-                        (-30.17,-19.16,16.53,22.32,23.03,24.42),
-                        (-30.17,11.16,-40.34,48.87,-10.46,24.52),
-                        (-36.38,0.17,-59.77,8.53),
-                        3.0, 0, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
-                      #stay on the ground for 3 seconds
+                      ((0, 0, 0, 0),
+                       (-5.27,-2.63,-38.85,60.24,-45.88,-9.84),
+                       (-5.27,-16.43,-63.46,123.23,-59.76,-11.07),
+                       (-85.25,-60.65,-28.22,51.77),
+                       0.1, 1, stiff.GOALIE_GROUND_STIFFNESSES),
+                      #removes stiffnesses so lies flat
+
+                      ((28.30,-20.92,0.35,-1.58),
+                       (-10.58,-7.38,-22.41,16.52,50.01,-10.81),
+                       (-10.58,15.47,19.33,9.93,43.86,-10.54),
+                       (-58.53,-2.20,-52.74,5.01),
+                       0.3, 1, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
+                      #extend legs and arm
                        )
+
 
 #same as GOALIE_DIVE_RIGHT except dives left when looking at robot
 GOALIE_DIVE_LEFT = mirrorMove(GOALIE_DIVE_RIGHT)
