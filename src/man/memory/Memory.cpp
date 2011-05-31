@@ -6,7 +6,7 @@
 
 #include "Common.h"
 
-#include "Memory.hpp"
+#include "Memory.h"
 
 namespace memory {
 

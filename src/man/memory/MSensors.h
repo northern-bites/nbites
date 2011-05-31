@@ -11,15 +11,15 @@
 #include <boost/shared_ptr.hpp>
 
 #include "protos/Sensors.pb.h"
-#include "MObject.hpp"
-#include "MVisionSensors.hpp"
-#include "MMotionSensors.hpp"
-#include "MImage.hpp"
+#include "MObject.h"
+#include "MVisionSensors.h"
+#include "MMotionSensors.h"
+#include "MImage.h"
 
 #include "Sensors.h"
 #include "Profiler.h"
 
-#include "log/CodedFileLogger.hpp"
+#include "log/CodedFileLogger.h"
 #include "Subscriber.h"
 
 namespace memory {

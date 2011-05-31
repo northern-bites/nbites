@@ -21,9 +21,9 @@ class Memory; //forward declaration
 }
 
 //TODO: make everything .h
-#include "MVision.hpp"
+#include "MVision.h"
 #include "Vision.h"
-#include "MSensors.hpp"
+#include "MSensors.h"
 #include "Sensors.h"
 #include "Profiler.h"
 //TODO: remove this after making the logging board

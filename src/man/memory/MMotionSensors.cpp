@@ -7,8 +7,8 @@
 #include <vector>
 
 #include "Common.h" //for micro_time
-#include "MemoryMacros.hpp"
-#include "MMotionSensors.hpp"
+#include "MemoryMacros.h"
+#include "MMotionSensors.h"
 
 //TODO: remove this
 #include "NaoPaths.h"

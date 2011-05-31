@@ -16,11 +16,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <iostream>
-#include <zlib.h>
 
-#include <google/protobuf/io/gzip_stream.h>
-
-#include "CodedFileLogger.hpp"
+#include "CodedFileLogger.h"
 
 namespace memory {
 

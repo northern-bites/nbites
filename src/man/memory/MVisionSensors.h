@@ -10,9 +10,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include "protos/Sensors.pb.h"
-#include "MObject.hpp"
+#include "MObject.h"
 #include "Sensors.h"
-#include "log/CodedFileLogger.hpp"
+#include "log/CodedFileLogger.h"
 
 namespace memory {
 class MVisionSensors: public proto::PVisionSensors, public MObject {

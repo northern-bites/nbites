@@ -42,7 +42,7 @@
 #include "Comm.h"
 #include "Motion.h"
 #include "NaoPose.h"
-#include "memory/Memory.hpp"
+#include "memory/Memory.h"
 #include "synchro.h"
 #include "RoboGuardian.h"
 #include "PyRoboGuardian.h"

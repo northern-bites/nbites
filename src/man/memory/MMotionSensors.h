@@ -10,9 +10,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include "protos/Sensors.pb.h"
-#include "MObject.hpp"
+#include "MObject.h"
 #include "Sensors.h"
-#include "log/ZeroCopyFileLogger.hpp"
+#include "log/ZeroCopyFileLogger.h"
 
 namespace memory {
 class MMotionSensors: public proto::PMotionSensors, public MObject {

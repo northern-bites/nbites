@@ -8,8 +8,8 @@
 #include <string>
 
 #include "Common.h" //for micro_time
-#include "MemoryMacros.hpp"
-#include "MImage.hpp"
+#include "MemoryMacros.h"
+#include "MImage.h"
 
 //TODO: remove this
 #include "NaoPaths.h"

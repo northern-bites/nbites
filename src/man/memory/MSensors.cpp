@@ -4,8 +4,8 @@
  *      Author: oneamtu
  */
 
-#include "MemoryMacros.hpp"
-#include "MSensors.hpp"
+#include "MemoryMacros.h"
+#include "MSensors.h"
 #include <vector>
 
 namespace memory {

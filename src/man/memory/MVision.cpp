@@ -4,8 +4,8 @@
  *      Author: oneamtu
  */
 
-#include "MemoryMacros.hpp"
-#include "MVision.hpp"
+#include "MemoryMacros.h"
+#include "MVision.h"
 
 //TODO: remove this
 #include "NaoPaths.h"

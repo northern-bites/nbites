@@ -18,7 +18,7 @@
 #include <iostream>
 
 #include "Common.h"
-#include "ZeroCopyFileLogger.hpp"
+#include "ZeroCopyFileLogger.h"
 
 namespace memory {
 

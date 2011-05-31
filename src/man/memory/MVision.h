@@ -10,9 +10,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include "protos/Vision.pb.h"
-#include "MObject.hpp"
+#include "MObject.h"
 #include "Vision.h"
-#include "log/CodedFileLogger.hpp"
+#include "log/CodedFileLogger.h"
 
 namespace memory {
 class MVision: public proto::PVision, public MObject {

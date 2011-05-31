@@ -14,7 +14,7 @@
 
 #include <iostream>
 #include <google/protobuf/message.h>
-#include "Logger.hpp"
+#include "Logger.h"
 //TODO: remove this
 #include <fcntl.h>
 
