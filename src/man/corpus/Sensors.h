@@ -35,6 +35,32 @@ enum SupportFoot {
     RIGHT_SUPPORT
 };
 
+// naming convention: SENSOR_SIDEofBODY_POSTION
+enum SensorNames {
+	FSR_LEFT_F_L = 0,
+	FSR_LEFT_F_R,
+	FSR_LEFT_B_L,
+	FSR_LEFT_B_R,
+	FSR_RIGHT_F_L,
+	FSR_RIGHT_F_R,
+	FSR_RIGHT_B_L,
+	FSR_RIGHT_B_R,
+	BUMPER_LEFT_L,
+	BUMPER_LEFT_R,
+	BUMPER_RIGHT_L,
+	BUMPER_RIGHT_R,
+	ACC_X,
+	ACC_Y,
+	ACC_Z,
+	GYRO_X,
+	GYRO_Y,
+	ANGLE_X,
+	ANGLE_Y,
+	SONAR_LEFT,
+	SONAR_RIGHT,
+	SUPPORT_FOOT
+};
+
 class Sensors;
 
 

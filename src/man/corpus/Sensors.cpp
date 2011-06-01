@@ -697,23 +697,33 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
     // we have to be EXTRA careful about this order. If someone can think of
     // a better way to assign these so that it's checked at compile time
     // please do!
-    leftFootFSR = FSR(sensorValues[0], sensorValues[1],
-                      sensorValues[2], sensorValues[3]);
-    rightFootFSR = FSR(sensorValues[4], sensorValues[5],
-                       sensorValues[6], sensorValues[7]);
 
-    leftFootBumper = FootBumper(sensorValues[8], sensorValues[9]);
-    rightFootBumper = FootBumper(sensorValues[10], sensorValues[11]);
+	// foot force sensors
+    leftFootFSR = FSR(sensorValues[FSR_LEFT_F_L], sensorValues[FSR_LEFT_F_R],
+                      sensorValues[FSR_LEFT_B_L], sensorValues[FSR_LEFT_B_R]);
+    rightFootFSR = FSR(sensorValues[FSR_RIGHT_F_L], sensorValues[FSR_RIGHT_F_R],
+                       sensorValues[FSR_RIGHT_B_L], sensorValues[FSR_RIGHT_B_R]);
 
-    inertial = Inertial(sensorValues[12], sensorValues[13], sensorValues[14],
-                        sensorValues[15], sensorValues[16], // gyros
-                        sensorValues[17], sensorValues[18]); // angleX/angleY
+	// foot bumpers
+    leftFootBumper = FootBumper(sensorValues[BUMPER_LEFT_L],
+								sensorValues[BUMPER_LEFT_R]);
+    rightFootBumper = FootBumper(sensorValues[BUMPER_RIGHT_L],
+								 sensorValues[BUMPER_RIGHT_R]);
 
-    ultraSoundDistanceLeft = sensorValues[19];
-    ultraSoundDistanceRight = sensorValues[20];
+    inertial = Inertial(sensorValues[ACC_X], // accelerometers
+						sensorValues[ACC_Y],
+						sensorValues[ACC_Z],
+                        sensorValues[GYRO_X],  // gyros
+						sensorValues[GYRO_Y],
+                        sensorValues[ANGLE_X], // angleX/angleY
+						sensorValues[ANGLE_Y]);
 
-    supportFoot = static_cast<SupportFoot>(
-                                           static_cast<int>(sensorValues[21]));
+	// sonar
+    ultraSoundDistanceLeft = sensorValues[SONAR_LEFT];
+    ultraSoundDistanceRight = sensorValues[SONAR_RIGHT];
+
+    supportFoot =
+		static_cast<SupportFoot>(static_cast<int>(sensorValues[SUPPORT_FOOT]));
 
     pthread_mutex_unlock (&support_foot_mutex);
     pthread_mutex_unlock (&ultra_sound_mutex);
