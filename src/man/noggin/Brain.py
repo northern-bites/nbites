@@ -88,7 +88,7 @@ class Brain(object):
         self.my.playerNumber = self.comm.gc.player
 
         # Information about the environment
-        #self.initFieldObjects()
+        self.initFieldObjects()
         self.initTeamMembers()
         self.ball = Ball.Ball(self.vision.ball)
         self.play = Play.Play()
@@ -116,26 +116,26 @@ class Brain(object):
         # Yello goal left and right posts
         self.yglp = Landmarks.FieldObject(self.vision.yglp,
                                           Constants.VISION_YGLP)
-        self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
-                                          Constants.VISION_YGRP)
+        # self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
+        #                                   Constants.VISION_YGRP)
 
-        # Blue Goal left and right posts
-        self.bglp = Landmarks.FieldObject(self.vision.bglp,
-                                          Constants.VISION_BGLP)
-        self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
-                                          Constants.VISION_BGRP)
+        # # Blue Goal left and right posts
+        # self.bglp = Landmarks.FieldObject(self.vision.bglp,
+        #                                   Constants.VISION_BGLP)
+        # self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
+        #                                   Constants.VISION_BGRP)
 
-        self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
-                                             Constants.VISION_BG_CROSSBAR)
-        self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
-                                             Constants.VISION_YG_CROSSBAR)
+        # self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
+        #                                      Constants.VISION_BG_CROSSBAR)
+        # self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
+        #                                      Constants.VISION_YG_CROSSBAR)
 
-        # Now we setup the corners
-        self.corners = []
-        self.lines = []
+        # # Now we setup the corners
+        # self.corners = []
+        # self.lines = []
 
         # Now we build the field objects to be based on our team color
-        self.makeFieldObjectsRelative()
+        #self.makeFieldObjectsRelative()
 
     def makeFieldObjectsRelative(self):
         """
@@ -256,7 +256,7 @@ class Brain(object):
         """
         self.ball.updateVision(self.vision.ball)
 
-        # self.yglp.updateVision(self.vision.yglp)
+        self.yglp.updateVision(self.vision.yglp)
         # self.ygrp.updateVision(self.vision.ygrp)
         # self.bglp.updateVision(self.vision.bglp)
         # self.bgrp.updateVision(self.vision.bgrp)

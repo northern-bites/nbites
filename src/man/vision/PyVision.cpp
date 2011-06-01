@@ -30,10 +30,24 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("radius", &VisualBall::getRadius)
     ;
 
+  class_<VisualFieldObject>("FieldObject", no_init)
+    // From VisualDetection
+    .def_readonly("centerX", &VisualBall::getCenterX)
+    .def_readonly("centerY", &VisualBall::getCenterY)
+    .def_readonly("width", &VisualBall::getWidth)
+    .def_readonly("height", &VisualBall::getHeight)
+    .def_readonly("focDist", &VisualBall::getFocDist)
+    .def_readonly("dist", &VisualBall::getDistance)
+    .def_readonly("bearing", &VisualBall::getBearing)
+    .def_readonly("angleX", &VisualBall::getAngleXDeg)
+    .def_readonly("angleY", &VisualBall::getAngleYDeg)
+    ;
+
   //noncopyable is required because vision has no public copy constructor
   class_<Vision, shared_ptr<Vision>, boost::noncopyable >("Vision", no_init)
     //make_getter provides a getter for objects not pointers
     .add_property("ball", make_getter(&Vision::ball, return_value_policy<reference_existing_object>()))
+    .add_property("yglp", make_getter(&Vision::yglp, return_value_policy<reference_existing_object>()))
     ;
 
   scope().attr("vision") = vision_pointer;
