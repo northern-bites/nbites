@@ -65,9 +65,12 @@ class Sensors;
 
 
 struct FSR {
-FSR(const float fl, const float fr,
-    const float rl, const float rr)
-: frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
+	FSR()
+		: frontLeft(0), frontRight(0), rearLeft(0), rearRight(0) { }
+
+	FSR(const float fl, const float fr,
+		const float rl, const float rr)
+  : frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
 
     float frontLeft;
     float frontRight;
@@ -89,11 +92,15 @@ struct FootBumper {
 };
 
 struct Inertial {
-Inertial(const float _accX, const float _accY, const float _accZ,
-         const float _gyrX, const float _gyrY,
-         const float _angleX, const float _angleY)
-: accX(_accX), accY(_accY), accZ(_accZ),
-        gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
+	Inertial()
+		: accX(0), accY(0), accZ(0),
+		  gyrX(0), gyrY(0), angleX(0), angleY(0) { }
+
+	Inertial(const float _accX, const float _accY, const float _accZ,
+			 const float _gyrX, const float _gyrY,
+			 const float _angleX, const float _angleY)
+  : accX(_accX), accY(_accY), accZ(_accZ),
+	gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
 
     float accX;
     float accY;
