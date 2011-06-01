@@ -10,12 +10,13 @@
 #include <boost/shared_ptr.hpp>
 
 #include "protos/Sensors.pb.h"
+#include "RoboImage.h"
 #include "MObject.h"
 #include "Sensors.h"
-#include "log/CodedFileLogger.h"
+#include "log/ImageFDLogger.h"
 
 namespace memory {
-class MImage: public proto::PImage, public MObject {
+class MImage: public RoboImage, public MObject {
 
 public:
     /**
@@ -33,7 +34,7 @@ public:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    log::CodedFileLogger* fileLogger;
+    log::ImageFDLogger* fileLogger;
 
 };
 }

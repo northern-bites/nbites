@@ -20,13 +20,13 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-MImage::MImage(shared_ptr<Sensors> s) : sensors(s) {
-    fileLogger = new log::CodedFileLogger(NAO_LOG_DIR "/Image.log", MIMAGE_ID, this);
-    string* image_string = this->mutable_image();
-    image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
-    cout << " string capacity " << NAO_IMAGE_BYTE_SIZE << " "<<  image_string->capacity() << endl;
-    char* image_string_data = const_cast<char *>(image_string->data());
-    sensors->setNaoImagePointer(image_string_data);
+MImage::MImage(shared_ptr<Sensors> s) : RoboImage(), sensors(s) {
+    fileLogger = new log::ImageFDLogger(NAO_LOG_DIR "/Image.log", MIMAGE_ID, this);
+    //string* image_string = this->mutable_image();
+    //image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
+    //cout << " string capacity " << NAO_IMAGE_BYTE_SIZE << " "<<  image_string->capacity() << endl;
+    //char* image_string_data = const_cast<char *>(image_string->data());
+    //sensors->setNaoImagePointer(image_string_data);
 
 }
 
@@ -36,8 +36,9 @@ MImage::~MImage() {
 
 void MImage::update() {
 
-    ADD_PROTO_TIMESTAMP;
-    cout << "MImage_updata timestamp is " << (process_micro_time() - birth_time) << endl;
+    //ADD_PROTO_TIMESTAMP;
+    //cout << "MImage_updata timestamp is " << (process_micro_time() - birth_time) << endl;
+    this->updateImage(sensors->getRawNaoImage());
 
 //    string* image_string =  this->mutable_image();
 //    image_string->assign((char *) (sensors->getNaoImage()), 640*480*sizeof(char)*2);
@@ -52,5 +53,6 @@ void MImage::update() {
 
 void MImage::log() const {
     fileLogger->write();
+    sensors->setNaoImage(fileLogger->getCurrentImage());
 }
 }
