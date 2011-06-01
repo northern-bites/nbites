@@ -53,7 +53,7 @@ public:
 
 private:
     int logID;
-
+    const ProtoMessage* message;
    /**
     * @var raw_output : a ZeroCopyOutputStream, an abstract I/O interface
     * which will minimize the amount of copying to the buffer

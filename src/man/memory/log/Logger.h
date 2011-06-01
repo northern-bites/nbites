@@ -39,5 +39,6 @@ protected:
     const ProtoMessage *message;
 };
 
+
 }
 }

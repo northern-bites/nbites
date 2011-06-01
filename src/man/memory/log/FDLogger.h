@@ -23,23 +23,22 @@ namespace log {
 
 typedef ::google::protobuf::Message ProtoMessage;
 
-class FDLogger : public Logger {
+class FDLogger {
 
 public:
     /**
      * @param m : the proto message to log
      * @return
      */
-    FDLogger(const char* output_file_descriptor, const ProtoMessage* m) :
-        Logger(m) {//file_descriptor(output_file_descriptor) {
+    FDLogger(const char* output_file_descriptor)
+        {//file_descriptor(output_file_descriptor) {
         file_descriptor = open(output_file_descriptor,
                                        O_WRONLY | O_CREAT | O_TRUNC,
                                        S_IRWXU | S_IRWXG | S_IRWXO);
         if (file_descriptor < 0) {
             std::cout << "Invalid file descriptor passed for logging "
-                    << m->GetTypeName() << std::endl;
+                      << std::endl;
         }
-        std::cout << "File descriptor : " << file_descriptor << std::endl;
     }
     /**
      * The write() method should write the message to some

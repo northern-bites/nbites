@@ -28,15 +28,8 @@ namespace log {
 using namespace std;
 
 CodedFileLogger::CodedFileLogger(string fileName, int logTypeID, ProtoMessage* m) :
-        FDLogger(fileName.data(), m), logID(logTypeID) {
-//    int file_descriptor = open(fileName.data(),
-//                               O_WRONLY | O_CREAT,
-//                               S_IRWXU | S_IRWXG | S_IRWXO);
-//    if (file_descriptor == -1) {
-//        cout << "Warning: failed to open " << fileName
-//                << " for logging" << endl;
-//    }
-    cout << "File descriptor : " << file_descriptor << endl;
+        FDLogger(fileName.data()), logID(logTypeID), message(m) {
+
     raw_output = new FileOutputStream(file_descriptor);
     //TODO: put the gzip code in a gzip file logger
 //    GzipOutputStream::Options opts;
