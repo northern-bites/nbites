@@ -231,8 +231,8 @@ class Brain(object):
         self.updateComm()
 
         # Localization Update
-        self.updateLocalization()
-        self.ball.updateBestValues(self.my)
+        #self.updateLocalization()
+        #self.ball.updateBestValues(self.my)
 
         #Set LEDS
         self.leds.processLeds()
@@ -243,7 +243,7 @@ class Brain(object):
         self.fallController.run()
         self.updatePlaybook()
         self.player.run()
-        self.tracker.run()
+        #self.tracker.run()
         self.nav.run()
 
         # Broadcast Report for Teammates

@@ -57,7 +57,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
 #   endif
 
     // Initialize the interpreter and C python extensions
-    initializePython(v);
+    initializePython();
 
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
@@ -83,7 +83,7 @@ Noggin::~Noggin ()
 #   endif
 }
 
-void Noggin::initializePython(shared_ptr<Vision> v)
+void Noggin::initializePython()
 {
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Initializing interpreter and extension modules\n");
@@ -171,7 +171,7 @@ void Noggin::reload_hard ()
     // finalize and reinitialize the Python interpreter
     Py_Finalize();
     // load C extension modules
-    initializePython(vision);
+    initializePython();
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
     // Instantiate a Brain instance
@@ -293,6 +293,8 @@ void Noggin::updateLocalization()
     // Build the observations from vision data
     vector<Observation> observations;
     // FieldObjects
+    
+
     VisualFieldObject fo;
     fo = *vision->bgrp;
 
