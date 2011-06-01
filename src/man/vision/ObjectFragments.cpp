@@ -547,7 +547,6 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
     int qy = yProject(left.x, right.y, qx);
     stop scan;
 
-    //drawPoint(left.x, left.y, BLUE);
     // scan out a 1/4 of the way to the right the edge
     for (int i = 0; i < NUMSCANS; i++) {
         vertScan(qx, qy, dir, 4, c, c2, scan);
@@ -716,7 +715,6 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 
     // set bad values so we can check for failure
     obj.setLeftTopX(BADVALUE); obj.setLeftTopY(BADVALUE);
-    //drawPoint(x, y, RED);
     stop scan;
     int top = minY;
     int spanY = maxY - minY;
@@ -758,7 +756,7 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
                 int newx = xProject((midBottomx + midTopx) / 2, midY,
                                     obj.getTop());
                 if (CORRECT) {
-                    drawPoint(newx, midY, RED);
+                    vision->drawPoint(newx, midY, RED);
                     cout << "New start " << newx << " " << midY << endl;
                 }
                 leftTop = point<int>(newx, obj.getTop());
@@ -953,11 +951,9 @@ bool ObjectFragments::checkSize(Blob b, int c)
     stop scan;
     horizontalScan(b.getLeftTopX(), midY, -1,	 ERROR_TOLERANCE, c, c, 0,
                    b.getLeftTopX() + 1, scan);
-    //drawPoint(scan.x, scan.y, RED);
     int leftMid = scan.good;
     horizontalScan(b.getRightTopX(), midY, 1, ERROR_TOLERANCE, c, c,
                    b.getRightTopX() - 1, b.getRightTopX() + FAR_ENOUGH, scan);
-    //drawPoint(scan.x, scan.y, RED);
     if (leftMid > PROBLEM_THRESHOLD && scan.good > PROBLEM_THRESHOLD) {
         return false;
     }
@@ -2457,17 +2453,6 @@ void ObjectFragments::drawRun(const run& run, int c) {
     vision->drawLine(run.x,run.y+1,run.x,run.y+run.h+1,c);
 }
 
-/*	Draws a "+" on the screen at the specified location with the specified color.
- * @param x		x coord
- * @param y		y coord
- * @param c		the color to paint
- */
-void ObjectFragments::drawPoint(int x, int y, int c) {
-#ifdef OFFLINE
-    drawPoint(x, y, c);
-#endif
-}
-
 /*	Draws the outline of a rectangle in the specified color.
  * @param b	   the rectangle
  * @param c	   the color to paint
@@ -2496,18 +2481,5 @@ void ObjectFragments::drawBlob(Blob b, int c) {
     vision->drawLine(b.getRightTopX(), b.getRightTopY(),
                      b.getRightBottomX(), b.getRightBottomY(),
                      c);
-#endif
-}
-
-/* Draws a line on the screen of the specified color.
- * @param x	   x value of point 1
- * @param y	   y value of point 1
- * @param x1   x value of point 2
- * @param y1   y value of point 2
- * @param c	   the color to paint the line.
- */
-void ObjectFragments::drawLine(int x, int y, int x1, int y1, int c) {
-#ifdef OFFLINE
-    vision->drawLine(x, y, x1, y1, c);
 #endif
 }
