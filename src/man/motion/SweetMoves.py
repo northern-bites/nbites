@@ -16,6 +16,7 @@ CHAIN_MOVE_LENGTH = 5
 #    ------
 #    KICK_RIGHT = mirrorMove(KICK_LEFT)
 #    GOALIE_DIVE_LEFT = mirrorMove(GOALIE_DIVE_RIGHT)
+#    GOALIE_ROLL_OUT_LEFT = mirrorMove(GOALIE_ROLL_OUT_RIGHT)
 #===============================================================================
 
 def mirrorMove(positions):
@@ -327,14 +328,14 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-28,8,-49,126,-32,-22),
                   (-28,-31,-87,70,45,0),
                   (120,-33,-4,4),
-                  0.8,0, stiff.STANDUP_STIFFNESSES),
+                  0.6,0, stiff.STANDUP_STIFFNESSES),
                  # #turns to right a little and stands with one arm on ground
 
                  ((42,28,5,-47),
                   (-49,-16,22,101,-70,-5),
                   (-49,-32,-89,61,39,-7),
                   (101,-15,-4,3),
-                  0.9,0, stiff.STANDUP_STIFFNESSES),
+                  0.6,1, stiff.STANDUP_STIFFNESSES),
                  #gets hips up and over knees
 
                  ((59.76,29.35,4.39,-45.79),
@@ -342,8 +343,9 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-30.23,-26.72,-64.78,54.41,31.99,19.69),
                   (54.85,-45.62,-0.27,24.35),
                   1.0,0, stiff.STANDUP_STIFFNESSES),
-                 #pulls right leg in a little
+                 # #pulls right leg in a little
 
+                 ### need to fix this part *****
                  ((42,28,4,-46),
                   (-20.04,12.40,-56.95,122.78,-56.08,-6.94),
                   (-20.04,-0.96,-43.60,119.54,-62.93,2.64),
@@ -356,7 +358,7 @@ STAND_UP_BACK = (((100,0,0,0),
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  1.0,0, stiff.STANDUP_STIFFNESSES)
+                  0.4,0, stiff.STANDUP_STIFFNESSES)
                  )
 
 
