@@ -51,7 +51,7 @@ class Brain(object):
         self.out = NaoOutput.NaoOutput(self)
 
         # Setup nao modules inside brain for easy access
-        #self.vision = vision.vision
+        self.vision = vision.vision
         self.sensors = sensors.sensors
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
@@ -90,9 +90,7 @@ class Brain(object):
         # Information about the environment
         #self.initFieldObjects()
         self.initTeamMembers()
-        # self.ball = Ball.Ball(self.vision.ball)
-        # print dir(self.vision.ball)
-        # print dir(self.ball)
+        self.ball = Ball.Ball(self.vision.ball)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
 
@@ -224,7 +222,7 @@ class Brain(object):
 
         # order here is very important
         # Update Environment
-        #self.updateVisualObjects()
+        self.updateVisualObjects()
         self.sonar.updateSensors(self.sensors)
 
         # Communications update
@@ -232,44 +230,45 @@ class Brain(object):
 
         # Localization Update
         #self.updateLocalization()
-        #self.ball.updateBestValues(self.my)
+        self.ball.updateBestValues(self.my)
 
         #Set LEDS
-        self.leds.processLeds()
+        #self.leds.processLeds()
 
         # Behavior stuff
         self.time = time.time()
         self.gameController.run()
-        self.fallController.run()
-        self.updatePlaybook()
-        self.player.run()
+        #self.fallController.run()
+        #self.updatePlaybook()
+        #self.player.run()
         #self.tracker.run()
-        self.nav.run()
+        #self.nav.run()
 
         # Broadcast Report for Teammates
-        self.setPacketData()
+        #self.setPacketData()
 
         # Update any logs we have
-        self.out.updateLogs()
+        #self.out.updateLogs()
 
     def updateVisualObjects(self):
         """
         Update information about seen objects
         """
         self.ball.updateVision(self.vision.ball)
-        self.yglp.updateVision(self.vision.yglp)
-        self.ygrp.updateVision(self.vision.ygrp)
-        self.bglp.updateVision(self.vision.bglp)
-        self.bgrp.updateVision(self.vision.bgrp)
-        self.ygCrossbar.updateVision(self.vision.ygCrossbar)
-        self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
-        # Update the corner information
-        self.corners = []
+        # self.yglp.updateVision(self.vision.yglp)
+        # self.ygrp.updateVision(self.vision.ygrp)
+        # self.bglp.updateVision(self.vision.bglp)
+        # self.bgrp.updateVision(self.vision.bgrp)
+        # self.ygCrossbar.updateVision(self.vision.ygCrossbar)
+        # self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
-        self.time = time.time()
-        # Now we get the latest list of lines
-        self.lines = []
+        # # Update the corner information
+        # self.corners = []
+
+        # self.time = time.time()
+        # # Now we get the latest list of lines
+        # self.lines = []
 
     def updateComm(self):
         temp = self.comm.latestComm()
