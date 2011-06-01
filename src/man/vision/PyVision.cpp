@@ -51,10 +51,6 @@ void c_init_vision() {
 
 void set_vision_pointer (shared_ptr<Vision> visionptr) {
   vision_pointer = visionptr;
-  
-  if (vision_pointer == NULL) {
-    cout << "vision_pointer null";
-  }
 }
 
 

@@ -51,7 +51,7 @@ class Brain(object):
         self.out = NaoOutput.NaoOutput(self)
 
         # Setup nao modules inside brain for easy access
-        self.vision = vision.vision
+        #self.vision = vision.vision
         self.sensors = sensors.sensors
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
@@ -90,9 +90,9 @@ class Brain(object):
         # Information about the environment
         #self.initFieldObjects()
         self.initTeamMembers()
-        self.ball = Ball.Ball(self.vision.ball)
-        print dir(self.vision.ball)
-        print dir(self.ball)
+        # self.ball = Ball.Ball(self.vision.ball)
+        # print dir(self.vision.ball)
+        # print dir(self.ball)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
 
@@ -101,7 +101,7 @@ class Brain(object):
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
-        self.tracker = HeadTracking.HeadTracking(self)
+        #self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)
