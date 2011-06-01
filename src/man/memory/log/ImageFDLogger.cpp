@@ -1,5 +1,5 @@
 /**
- * ZeroCopyFileLogger.cpp
+ * ImageFDLogger.cpp
  *
  *  The structure for a log file:
  *  -- ID number for the type of object logged
@@ -18,7 +18,7 @@
 #include <iostream>
 
 #include "Common.h"
-#include "ZeroCopyFileLogger.h"
+#include "ImageFDLogger.h"
 
 namespace memory {
 
@@ -28,21 +28,22 @@ extern long long birth_time;
 
 using namespace std;
 
-ZeroCopyFileLogger::ZeroCopyFileLogger(string output_file_descriptor,
-                                       int logTypeID, ProtoMessage* m) :
-        FDLogger(output_file_descriptor.data(), (m)),
+ImageFDLogger::ImageFDLogger(string output_file_descriptor,
+                             int logTypeID,
+                             RoboImage* roboImage) :
+        FDLogger(output_file_descriptor.data()),
         current_buffer(new (void*)),
         current_buffer_size(1),
         bytes_written(0),
         logID(logTypeID)
         {
-    raw_output = new FileOutputStream(file_descriptor, m->ByteSize() + 4);
+    raw_output = new FileOutputStream(file_descriptor, NAO_IMAGE_BYTE_SIZE);
     cout << raw_output->GetErrno() << endl;
     this->getNextBuffer();
     writeHead();
 }
 
-void ZeroCopyFileLogger::writeHead() {
+void ImageFDLogger::writeHead() {
 //    // this helps us ID the log
 //    *((int*) (*current_buffer)) = logID;
 //    // this time stamps the log
@@ -51,7 +52,7 @@ void ZeroCopyFileLogger::writeHead() {
 //    raw_output->BackUp(current_buffer_size - sizeof(int) - sizeof(long long));
 }
 
-void ZeroCopyFileLogger::write() {
+void ImageFDLogger::write() {
 //
 //    this->getNextBuffer();
 //    *((int*) (*current_buffer)) = message->GetCachedSize();
@@ -59,7 +60,7 @@ void ZeroCopyFileLogger::write() {
 
 }
 
-void ZeroCopyFileLogger::getNextBuffer() {
+void ImageFDLogger::getNextBuffer() {
 
     raw_output->Next(current_buffer, &current_buffer_size);
     //we're not guaranteed a non-empty buffer
@@ -71,7 +72,7 @@ void ZeroCopyFileLogger::getNextBuffer() {
 
 }
 
-ZeroCopyFileLogger::~ZeroCopyFileLogger() {
+ImageFDLogger::~ImageFDLogger() {
 
     raw_output->Close();
     delete raw_output;

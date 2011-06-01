@@ -1,16 +1,18 @@
 /**
- * ZeroCopyFileLogger.hpp
+ * ImageFDLogger.hpp
  *
- * @class ZeroCopyFileLogger
+ * @class ImageFDLogger
  *
- * This class provides a way to serialize a proto message to a file
+ * This class provides a way to serialize a robo image to a file
  * in a sequential manner.
  * It uses the google/protobuf/io stuff.
+ *
+ * It provides an empty buffer of an appropriate size in which an image
+ * can be copied into for writing out.
  *
  * read more:
  * http://code.google.com/apis/protocolbuffers/docs/reference/cpp/google.protobuf.io.coded_stream.html
  *
- * some of the code is inspired from the example provided in the link
  *
  *      Author: Octavian Neamtu
  *      E-mail: oneamtu@bowdoin.edu
@@ -23,30 +25,31 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
 #include "FDLogger.h"
+#include "memory/RoboImage.h"
+#include "include/VisionDef.h"
 
 namespace memory {
 namespace log {
 
 using namespace google::protobuf::io;
 
-class ZeroCopyFileLogger : public FDLogger {
+class ImageFDLogger : public FDLogger {
 
 public:
     /**
      * Opens the file fileName and writes to its head
      *
      * @param logTypeID : an ID written to the head of the log identifying the log
-     * @return
      */
-    ZeroCopyFileLogger(std::string output_file_descriptor,
-                       int logTypeID, ProtoMessage* m);
+    ImageFDLogger(std::string output_file_descriptor,
+                  int logTypeID,
+                  RoboImage* roboImage);
 
     /**
      * Closes the file, which will flush the output buffer
      * to ensure that the file on disk is in sync with the buffer
-     * @return
      */
-    ~ZeroCopyFileLogger();
+    ~ImageFDLogger();
 
     void write();
 
@@ -59,6 +62,7 @@ private:
     int current_buffer_size;
     unsigned long long bytes_written;
     int logID;
+
 
    /**
     * @var raw_output : a ZeroCopyOutputStream, an abstract I/O interface
