@@ -350,7 +350,7 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-20.04,12.40,-56.95,122.78,-56.08,-6.94),
                   (-20.04,-0.96,-43.60,119.54,-62.93,2.64),
                   (51,-39,0,32), 
-                  1.0,0, stiff.STANDUP_STIFFNESSES),
+                  1.0,1, stiff.STANDUP_STIFFNESSES),
                  #pulls right leg in
 
                  #stands up
@@ -707,8 +707,8 @@ GOALIE_DIVE_RIGHT = ( (INITIAL_POS[0][0],
                       #removes stiffnesses so lies flat
 
                       ((28.30,-20.92,0.35,-1.58),
-                       (-10.58,-7.38,-22.41,16.52,50.01,-10.81),
-                       (-10.58,15.47,19.33,9.93,43.86,-10.54),
+                       (-10.58,0,0,16.52,50.01,-10.81),
+                       (-10.58,0,0,9.93,43.86,-10.54),
                        (-58.53,-2.20,-52.74,5.01),
                        0.3, 1, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
                       #extend legs and arm
@@ -719,10 +719,10 @@ GOALIE_DIVE_RIGHT = ( (INITIAL_POS[0][0],
 GOALIE_DIVE_LEFT = mirrorMove(GOALIE_DIVE_RIGHT)
 
 #Rolls goalie over onto back towards goal so she can get up
-GOALIE_ROLL_OUT_RIGHT = (((0,70,0,0),
-                         (-10.58,-7.38,-90.41,16.52,50.01,-10.81),
-                          (-10.58,-20,27,9.93,43.86,-10.54),
-                          (0,-70,0,0),
+GOALIE_ROLL_OUT_RIGHT = (((0,70.92,0,0),
+                          (-10.58,20.38,25.41,0,0,0),
+                          (-10.58,0.00 ,-90.00,0,0,0),
+                          (-58.53,-2.20,-52.74,5.01),
                           0.3, 1, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
                          )
 
