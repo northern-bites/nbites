@@ -45,6 +45,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
                 shared_ptr<Sensors> _sensors, MotionInterface * _minterface)
     : profiler(p), comm(c),gc(c->getGC()),
       sensors(_sensors),
+      vision(v),
       chestButton(rbg->getButton(CHEST_BUTTON)),
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
@@ -55,7 +56,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
 #   endif
-
+    
     // Initialize the interpreter and C python extensions
     initializePython();
 
@@ -293,7 +294,6 @@ void Noggin::updateLocalization()
     // Build the observations from vision data
     vector<Observation> observations;
     // FieldObjects
-    
 
     VisualFieldObject fo;
     fo = *vision->bgrp;
