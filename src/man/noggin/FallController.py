@@ -18,14 +18,15 @@ class FallController(FSA.FSA):
         self.doneStandingCount = 0
         self.standupMoveTime = 0
 
-        self.FALLEN_THRESH = 50
-        self.FALL_COUNT_THRESH = 15
         self.DONE_STANDING_THRESH = 2
 
         self.executeStandup = True
         self.enabled = True
 
     def run(self):
+        if not self.enabled:
+            return
+
         # Only try to stand up when playing or localizing in ready
         if (self.brain.gameController.currentState == 'gamePlaying' or
             self.brain.gameController.currentState == 'gameReady' ):
