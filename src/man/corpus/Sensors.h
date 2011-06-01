@@ -180,13 +180,15 @@ class Sensors : public Provider{
     //   its own, and there is no way, even with locking, to guarantee that the
     //   underlying data at the image pointer location is not modified while
     //   the image is locked in Sensors.
-    uint8_t* getNaoImage ();
+    uint8_t* getRawNaoImage();
+    uint8_t* getNaoImage();
     const uint16_t* getYImage() const;
     const uint16_t* getImage() const;
     const uint16_t* getUVImage() const;
     const uint8_t* getColorImage() const;
     void setNaoImagePointer(char* img);
-    void setNaoImage(const uint8_t *img);
+    void setNaoImage(uint8_t* img);
+    void setRawNaoImage(uint8_t *img);
     void setImage(const uint16_t* img);
     void lockImage() const;
     void releaseImage() const;
@@ -252,6 +254,7 @@ class Sensors : public Provider{
     const uint16_t *yImage, *uvImage;
     const uint8_t *colorImage;
     uint8_t *naoImage;
+    uint8_t *rawNaoImage;
 
     // Pose needs to know which foot is on the ground during a vision frame
     // If both are on the ground (DOUBLE_SUPPORT_MODE/not walking), we assume

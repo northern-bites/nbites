@@ -746,10 +746,17 @@ void Sensors::releaseVisionAngles() {
     pthread_mutex_unlock (&vision_angles_mutex);
 }
 
-// Get a pointer to the full size Nao image
-uint8_t* Sensors::getNaoImage ()
+//get a pointer to the full size Nao image
+//the pointer comes straight from the transcriber (no copying)
+uint8_t* Sensors::getRawNaoImage()
 {
-    //cout << " get " << (long) naoImage << endl;
+    return rawNaoImage;
+}
+
+//get a pointer to the full size Nao image
+//this image has been copied to some local buffer
+uint8_t* Sensors::getNaoImage()
+{
     return naoImage;
 }
 
@@ -778,10 +785,15 @@ void Sensors::setNaoImagePointer(char* _naoImage) {
     naoImage = (uint8_t*) _naoImage;
 }
 
-void Sensors::setNaoImage(const uint8_t *img)
+void Sensors::setRawNaoImage(uint8_t *img)
 {
-    //naoImage = img;
+    rawNaoImage = img;
     this->notify(ProviderEvent(this, NEW_IMAGE));
+}
+
+void Sensors::setNaoImage(uint8_t *img)
+{
+    naoImage = img;
 }
 
 void Sensors::setImage (const uint16_t *img)
