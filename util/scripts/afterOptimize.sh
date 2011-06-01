@@ -25,7 +25,7 @@ FETCH_GAIT="scp nao@$ROBOT_IP:/home/nao/gaits/$PICKLE /tmp/"
 
 echo "Fetching gait..."
 echo $FETCH_GAIT
-#$FETCH_GAIT
+$FETCH_GAIT
 
 echo "Type username for RoboCup server, followed by [ENTER]"
 read username
