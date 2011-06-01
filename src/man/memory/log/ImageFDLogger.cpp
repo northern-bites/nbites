@@ -19,6 +19,7 @@
 
 #include "Common.h"
 #include "ImageFDLogger.h"
+#include "ImageAcquisition.h"
 
 namespace memory {
 
@@ -35,15 +36,16 @@ ImageFDLogger::ImageFDLogger(string output_file_descriptor,
         current_buffer(new (void*)),
         current_buffer_size(1),
         bytes_written(0),
-        logID(logTypeID)
+        logID(logTypeID),
+        roboImage(roboImage)
         {
-    raw_output = new FileOutputStream(file_descriptor, NAO_IMAGE_BYTE_SIZE);
+    raw_output = new FileOutputStream(file_descriptor, roboImage->getByteSize());
     cout << raw_output->GetErrno() << endl;
-    this->getNextBuffer();
     writeHead();
 }
 
 void ImageFDLogger::writeHead() {
+//	this->getNextBuffer();
 //    // this helps us ID the log
 //    *((int*) (*current_buffer)) = logID;
 //    // this time stamps the log
@@ -53,14 +55,18 @@ void ImageFDLogger::writeHead() {
 }
 
 void ImageFDLogger::write() {
-//
-//    this->getNextBuffer();
-//    *((int*) (*current_buffer)) = message->GetCachedSize();
-//    message->SerializeToArray(current_buffer + sizeof(int), current_buffer_size - sizeof(int));
+
+    this->getNextBuffer();
+    _copy_image(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(roboImage->getImage())),
+    		reinterpret_cast<uint8_t*> (*current_buffer));
 
 }
 
-void ImageFDLogger::getNextBuffer() {
+uint8_t* ImageFDLogger::getCurrentImage() {
+	return reinterpret_cast<uint8_t*> (*current_buffer);
+}
+
+byte* ImageFDLogger::getNextBuffer() {
 
     raw_output->Next(current_buffer, &current_buffer_size);
     //we're not guaranteed a non-empty buffer
@@ -68,8 +74,6 @@ void ImageFDLogger::getNextBuffer() {
     while (current_buffer_size == 0) {
         raw_output->Next(current_buffer, &current_buffer_size);
     }
-
-
 }
 
 ImageFDLogger::~ImageFDLogger() {

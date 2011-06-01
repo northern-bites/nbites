@@ -52,9 +52,11 @@ public:
     ~ImageFDLogger();
 
     void write();
+    uint8_t* getCurrentImage();
+    byte* getNextBuffer();
 
 private:
-    void getNextBuffer();
+
     void writeHead();
 
 private:
@@ -62,7 +64,7 @@ private:
     int current_buffer_size;
     unsigned long long bytes_written;
     int logID;
-
+    RoboImage* roboImage;
 
    /**
     * @var raw_output : a ZeroCopyOutputStream, an abstract I/O interface
