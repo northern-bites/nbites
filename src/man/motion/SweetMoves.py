@@ -282,25 +282,31 @@ STAND_UP_BACK = (((100,0,0,0),
                   (100,0,0,0),0.8,0, stiff.STANDUP_STIFFNESSES),
                  #arms at sides
 
-                 ((121,15,6,-85),
-                  (0,0,27,105,-5,0),
-                  (0,0,27,105,-5,0),
-                  (121,-15,-6,85),0.8,0, stiff.STANDUP_STIFFNESSES),
+                 ((119,18,6,-88),
+                  (0,0,27,105,-15,0),
+                  (0,0,27,105,-15,0),
+                  (119,-18,-6,88),0.8,1, stiff.STANDUP_STIFFNESSES),
                  #hips arch and arms underneath
 
-                 ((121,15,6,-85),
+                 ((119,15,6,-85),
                   (-9.49,24.70,-40.25,115.22,22.41,7.74),
                   (-9.49,-36.12,-42.19,106.26,31.47,-19.51),
-                  (121,-15,-6,85),0.6,0, stiff.STANDUP_STIFFNESSES),
-                 #hips sit and upper body comes up with hands under
+                  (119,-15,-6,85),0.6,1, stiff.STANDUP_STIFFNESSES),
+                 # #hips sit and upper body comes up with hands under
 
-                 ((73.48,-3.17,68.55,-90.88),
+                 ((73.48,-16.17,81.55,-88.88),
+                  (-9.49,24.70,-40.25,115.22,22.41,7.74),
+                  (-9.49,-36.12,-42.19,106.26,31.47,-19.51),
+                  (72.78,16.70,-81.74,88.51),0.6,1, stiff.STANDUP_STIFFNESSES),
+
+                 ((72,-16, 81, -88),
+                  #(73.48,-3.17,68.55,-90.88),
                   (-9.49,24.70,-40.25,115.22,10,7.74),
                   (-9.49,-36.12,-42.19,106.26,10,-7.74),
                   (72.78,16.70,-81.74,88.51),0.6,0, stiff.STANDUP_STIFFNESSES),
                  #twists hands and pushes up
 
-                 ((120.23,-11.08,94.13,-1.93),
+                 ((119,-11.08,94.13,-1.93),
                   (-62.93,9.06,-84.64,116.72,21.88,23.73),
                   (-62.93,-29.44,-82.62,103.71,30.85,-10.11),
                   (115.93,17.58,-90.62,3.34),0.8,0, stiff.STANDUP_STIFFNESSES),
@@ -334,7 +340,8 @@ STAND_UP_BACK = (((100,0,0,0),
                  (INITIAL_POS[0][0],
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
-                  INITIAL_POS[0][3],1.0,0, stiff.STANDUP_STIFFNESSES))
+                  INITIAL_POS[0][3],1.0,0, stiff.STANDUP_STIFFNESSES)
+                 )
 
 
 RIGHT_FAR_KICK = (
@@ -652,8 +659,7 @@ GOALIE_PRE_SAVE_POS = ( ((45.88,38.93,-122.88,-32.43),
                       #squats down with legs spread
                       #arms bent with hands above elbow
 
-#Working goalie right dive.Needs to be faster but lies flat and dives
-#straight right.
+#Fast dive to the right when looking at the goalie
 GOALIE_DIVE_RIGHT = ( (INITIAL_POS[0][0],
                        (-5.10,3,-55,115,-60,-3),
                        (-5.10,-3,-55,115,-60,3),
@@ -693,6 +699,16 @@ GOALIE_DIVE_RIGHT = ( (INITIAL_POS[0][0],
 
 #same as GOALIE_DIVE_RIGHT except dives left when looking at robot
 GOALIE_DIVE_LEFT = mirrorMove(GOALIE_DIVE_RIGHT)
+
+#Rolls goalie over onto back towards goal so she can get up
+GOALIE_ROLL_OUT_RIGHT = (((0,70,0,0),
+                         (-10.58,-7.38,-90.41,16.52,50.01,-10.81),
+                          (-10.58,-20,27,9.93,43.86,-10.54),
+                          (0,-70,0,0),
+                          0.3, 1, stiff.GOALIE_DIVE_RIGHT_STIFFNESSES),
+                         )
+
+GOALIE_ROLL_OUT_LEFT = mirrorMove(GOALIE_ROLL_OUT_RIGHT)
 
 #Points left when would dive left
 GOALIE_TEST_DIVE_LEFT = ( ((0, 0, 0, 0),
