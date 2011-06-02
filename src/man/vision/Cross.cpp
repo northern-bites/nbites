@@ -101,7 +101,7 @@ void Cross::checkForCrosses() {
 		if (CROSSDEBUG) {
 			cout << "Blob " << candidate.width() << " " << candidate.height() << endl;
 			cout << "Coords " << candidate.getLeft() << " " << candidate.getTop() << endl;
-            thresh->drawRect(candidate.getLeft(), candidate.getTop(),
+            vision->drawRect(candidate.getLeft(), candidate.getTop(),
                              candidate.width(), candidate.height(), BLACK);
 		}
 		if (candidate.width() < maxWidth && candidate.height() < maxHeight &&

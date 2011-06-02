@@ -452,7 +452,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                     shoot[column] = false;
                     if (debugShot) {
-                        drawPoint(column, j + currentRun, MAROON);
+                        vision->drawPoint(column, j + currentRun, MAROON);
                     }
                 }
 			}

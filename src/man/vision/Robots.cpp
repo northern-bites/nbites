@@ -384,7 +384,7 @@ void Robots::checkMerge(int i, int j) {
     for (int x = left; x < right; x+=3) {
         for (int y = top; y < bottom; y+=3) {
             if (debugRobots) {
-                thresh->drawPoint(x, y, MAROON);
+                vision->drawPoint(x, y, MAROON);
             }
             if (isSameColor(thresh->getThresholded(y, x), color)) {
                 col++;
