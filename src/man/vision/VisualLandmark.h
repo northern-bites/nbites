@@ -56,9 +56,9 @@ protected:
 public:
     // Getters
     const idType getID() const { return id; }
-    const certainty getIDCertainty() const { return idCertainty; }
+    const certainty getIDCertainty() const { return int(idCertainty); }
     const distanceCertainty getDistanceCertainty() const {
-        return distanceCert;
+      return int(distanceCert);
     }
     const ConcreteLandmark * getConcreteLandmark() const {
         return concreteLandmark;
