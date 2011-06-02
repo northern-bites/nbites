@@ -249,7 +249,7 @@ int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {
    @return       a new estimate of the horizon line
  */
 int Field::getInitialHorizonEstimate(int pH) {
-	const int MIN_PIXELS_INITIAL = 4;
+	const int MIN_PIXELS_INITIAL = 8;
 	const int SCAN_INTERVAL_X = 10;
 	const int SCAN_INTERVAL_Y = 4;
 	//variable definitions

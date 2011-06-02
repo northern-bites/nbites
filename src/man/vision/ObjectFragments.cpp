@@ -188,7 +188,7 @@ void ObjectFragments::newRun(int x, int y, int h)
 {
     const int RUN_VALUES = 3;	   // x, y, and h of course
 
-    cout << "Run " << x << " " << y << " " << h << endl;
+    //cout << "Run " << x << " " << y << " " << h << endl;
     if (numberOfRuns < runsize) {
         int last = numberOfRuns - 1;
         // skip over noise --- jumps over two pixel noise currently.

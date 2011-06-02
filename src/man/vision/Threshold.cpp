@@ -444,7 +444,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             }
 			if (isRed(lastPixel)) {
                 robots+= currentRun;
-                if (currentRun > 5) {
+                if (currentRun > 3) {
                     red->newRun(column, j, currentRun);
                 }
                 if (robots > 10 && shoot[column]) {
@@ -462,11 +462,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             currentRun = 1;
         }
         lastPixel = pixel;
-        if (isOrange(pixel)) {
-            int lastv = getV(column, j);
-            int initv = lastv;
-            //while (j >= topEdge && abs(getV(column, j) - lastv) < 8 &&
-            //     abs(initv - lastv) < 12) {
+        /*if (isOrange(pixel)) {
             while (j >= topEdge && isOrange(getThresholded(j, column))) {
                 currentRun++;
                 j--;
@@ -481,7 +477,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 
             greens+= currentRun;
             lastPixel = ORANGE;
-        }
+			}*/
     }
     if (shoot[column] && greens < (bound - topEdge) / 2) {
         if (block[column / divider] == 0) {
