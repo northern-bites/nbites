@@ -51,6 +51,10 @@ BOOST_PYTHON_MODULE(vision)
     //make_getter provides a getter for objects not pointers
     .add_property("ball", make_getter(&Vision::ball, return_value_policy<reference_existing_object>()))
     .add_property("yglp", make_getter(&Vision::yglp, return_value_policy<reference_existing_object>()))
+    .add_property("ygrp", make_getter(&Vision::ygrp, return_value_policy<reference_existing_object>()))
+    .add_property("bglp", make_getter(&Vision::bglp, return_value_policy<reference_existing_object>()))
+    .add_property("bgrp", make_getter(&Vision::bgrp, return_value_policy<reference_existing_object>()))
+
     ;
 
   scope().attr("vision") = vision_pointer;

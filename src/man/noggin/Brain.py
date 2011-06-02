@@ -114,18 +114,18 @@ class Brain(object):
         """
 
         # Build instances of the vision based field objects
-        # Yello goal left and right posts
+        # Yellow goal left and right posts
         self.yglp = Landmarks.FieldObject(self.vision.yglp,
                                           Constants.VISION_YGLP)
 
-        # self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
-        #                                   Constants.VISION_YGRP)
+        self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
+                                          Constants.VISION_YGRP)
 
-        # # Blue Goal left and right posts
-        # self.bglp = Landmarks.FieldObject(self.vision.bglp,
-        #                                   Constants.VISION_BGLP)
-        # self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
-        #                                   Constants.VISION_BGRP)
+        # Blue Goal left and right posts
+        self.bglp = Landmarks.FieldObject(self.vision.bglp,
+                                          Constants.VISION_BGLP)
+        self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
+                                          Constants.VISION_BGRP)
 
         # self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
         #                                      Constants.VISION_BG_CROSSBAR)
@@ -257,17 +257,12 @@ class Brain(object):
         Update information about seen objects
         """
         self.ball.updateVision(self.vision.ball)
-        # if self.ball.on:
-        #     print "Vision: " + str(self.vision.ball.angleX)
-        #     print "Python: " + str(self.ball.angleX)
 
         self.yglp.updateVision(self.vision.yglp)
-        if self.yglp.on:
-            print "Vision: " + str(self.vision.yglp.angleX)
-            print "Python: " + str(self.yglp.angleX)
-        # self.ygrp.updateVision(self.vision.ygrp)
-        # self.bglp.updateVision(self.vision.bglp)
-        # self.bgrp.updateVision(self.vision.bgrp)
+        self.ygrp.updateVision(self.vision.ygrp)
+        self.bglp.updateVision(self.vision.bglp)
+        self.bgrp.updateVision(self.vision.bgrp)
+
         # self.ygCrossbar.updateVision(self.vision.ygCrossbar)
         # self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
