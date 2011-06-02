@@ -1,0 +1,68 @@
+Nathan's accelerometer variance notebook
+
+##
+Data taken on 5/7 on slarti, accelerometer filtering current as of then. The 
+heuristic is equal to the sum for X/Y of: (variance*WEIGHT), where the WEIGHT
+for these trials was set to 50 (the value used previously in our learning).
+##
+
+UNSTABLE - Walks the wrong way when given (0, 1, 0) vector, almost falls etc.
+
+  X/Y accelerometer variance: 0.083/0.425
+  Stability heuristic for this gait: 25.3544175266
+
+REALLY GOOD - highly stable, steady footsteps etc
+
+  X/Y accelerometer variance: 0.035/0.169
+  Stability heuristic for this gait: 10.1740243571
+
+To make this stand out more, we may want to square the terms. Data for this
+to follow. --> new heuristic = sum of X/Y (variance*WEIGHT)^2
+
+UNSTABLE, ran it a couple times. The robot performed about as badly as
+before. This time returning the square of the terms.
+
+  X/Y accelerometer variance: 0.045/0.244
+  Stability heuristic for this gait: 153.57502364
+
+  X/Y accelerometer variance: 0.118/0.347
+  Stability heuristic for this gait: 335.440689578
+
+  X/Y accelerometer variance: 0.128/0.861
+  Stability heuristic for this gait: 1894.44798416
+
+  X/Y accelerometer variance: 0.043/0.224
+  Stability heuristic for this gait: 130.059702832
+
+STABLE again, with the squaring of the variance terms
+
+  X/Y accelerometer variance: 0.058/0.079
+  Stability heuristic for this gait: 23.8473145554
+
+  X/Y accelerometer variance: 0.068/0.041
+  Stability heuristic for this gait: 15.7639944417
+
+  This trial was less stable than the first two, but still more stable
+  than the UNSTABLE category trials
+
+  X/Y accelerometer variance: 0.031/0.140
+  Stability heuristic for this gait: 51.2414201526
+
+Squaring the variance terms greatly helped differentiate the two gaits. I'm
+going to incorporate this into the walk learning heuristic. Especially once gaits
+get to the point that they all stand for an equal amount of time, this ought to
+help us tell which ones are the most stable.
+
+##
+Data taken 5/9, on slarti again for consistency's sake. Robot remained stationary
+for 30 seconds, and reported accelerometer variance afterwards.
+##
+
+X/Y accelerometer variance: 0.001/0.000
+Stability heuristic for this gait: 0.00275704520119
+
+X/Y accelerometer variance: 0.000/0.000
+Stability heuristic for this gait: 0.000197082665639
+
+X/Y accelerometer variance: 0.000/0.000
+Stability heuristic for this gait: 1.75638417627e-05

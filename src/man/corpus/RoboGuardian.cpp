@@ -106,7 +106,7 @@ void RoboGuardian::run(){
         processChestButtonPushes();
         if (connectionCheckCount == CONNECTION_CHECK_RATE) {
             connectionCheckCount = 0;
-            checkConnection();
+        //    checkConnection();
         } else {
             connectionCheckCount++;
         }
