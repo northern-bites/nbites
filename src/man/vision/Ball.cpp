@@ -179,7 +179,7 @@ void Ball::createBall(int h) {
 			int nextX = runs[i].x;
 			int nextY = runs[i].y;
 			int nextH = runs[i].h;
-			blobs->blobIt(nextX, nextY, nextH);
+			blobs->blobIt(nextX, nextY, nextH, true);
 		}
 	}
 	balls(h, vision->ball);
