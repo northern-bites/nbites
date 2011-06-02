@@ -182,6 +182,7 @@ std::string Vision::getRobotName() {
 */
 void Vision::drawBoxes(void)
 {
+#ifdef OFFLINE
 
     // draw field objects
     if(bglp->getDistance() > 0) drawFieldObject(bglp,RED);
@@ -210,11 +211,14 @@ void Vision::drawBoxes(void)
 
     // vision horizon line
     drawPoint(IMAGE_WIDTH/2, thresh->getVisionHorizon(), RED);
+#endif /* OFFLINE */
 
 } // drawBoxes
 
 // self-explanatory
-void Vision::drawFieldObject(VisualFieldObject* obj, int color) {
+void Vision::drawFieldObject(VisualFieldObject* obj, int color)
+{
+#ifdef OFFLINE
     drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
              obj->getRightTopX(), obj->getRightTopY(), color);
     drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
@@ -223,10 +227,13 @@ void Vision::drawFieldObject(VisualFieldObject* obj, int color) {
              obj->getRightTopX(), obj->getRightTopY(), color);
     drawLine(obj->getLeftBottomX(), obj->getLeftBottomY(),
              obj->getRightBottomX(), obj->getRightBottomY(), color);
+#endif /* OFFLINE */
 }
 
 // self-explanatory
-void Vision::drawCrossbar(VisualCrossbar* obj, int color) {
+void Vision::drawCrossbar(VisualCrossbar* obj, int color)
+{
+#ifdef OFFLINE
     drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
              obj->getRightTopX(), obj->getRightTopY(), color);
     drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
@@ -235,6 +242,7 @@ void Vision::drawCrossbar(VisualCrossbar* obj, int color) {
              obj->getRightTopX(), obj->getRightTopY(), color);
     drawLine(obj->getLeftBottomX(), obj->getLeftBottomY(),
              obj->getRightBottomX(), obj->getRightBottomY(), color);
+#endif /* OFFLINE */
 }
 
 /**
@@ -246,8 +254,8 @@ void Vision::drawCrossbar(VisualCrossbar* obj, int color) {
  * @param top     y value of the top vertices.
  * @param c       the color of the box.
  */
-void Vision::drawBox(int left, int right, int bottom, int top, int c) {
-    
+void Vision::drawBox(int left, int right, int bottom, int top, int c)
+{
 #ifdef OFFLINE
     if (left < 0) {
         left = 0;
@@ -286,8 +294,7 @@ void Vision::drawBox(int left, int right, int bottom, int top, int c) {
             thresh->debugImage[i][left + width] = static_cast<unsigned char>(c);
         }
     }
-#endif
-
+#endif /* OFFLINE */
 }
 
 
@@ -300,14 +307,17 @@ void Vision::drawBox(int left, int right, int bottom, int top, int c) {
    -goals
    -add more if you'd like
 */
-void Vision::drawCenters() {
+void Vision::drawCenters()
+{
+#ifdef OFFLINE
+
     // draws an X at the ball center X and Y.
     if (ball->getCenterX() >= 2 && ball->getCenterY() >= 2
         && ball->getCenterX() <= (IMAGE_WIDTH-2)
         && ball->getCenterY() <= (IMAGE_HEIGHT-2)) {
         drawPoint(ball->getCenterX(), ball->getCenterY(), YELLOW);
     }
-
+#endif /* OFFLINE */
 } // drawCenters
 
 /**
@@ -319,7 +329,8 @@ void Vision::drawCenters() {
  * @param top      y value of top
  * @param c        the color we'd like to draw
  */
-void Vision::drawRect(int left, int top, int width, int height, int c) {
+void Vision::drawRect(int left, int top, int width, int height, int c)
+{
 #ifdef OFFLINE
     if (left < 0) {
         width += left;
@@ -368,8 +379,8 @@ void Vision::drawRect(int left, int top, int width, int height, int c) {
  * @param y1      finish y
  * @param c       color we'd like to draw
  */
-void Vision::drawLine(int x, int y, int x1, int y1, int c) {
-
+void Vision::drawLine(int x, int y, int x1, int y1, int c)
+{
 #ifdef OFFLINE
     float slope = static_cast<float>(y - y1) / static_cast<float>(x - x1);
     int sign = 1;
@@ -409,25 +420,37 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c) {
             }
         }
     }
-#endif
+#endif /* OFFLINE */
 }
 
 // Convenience method to draw a VisualLine to the screen.
-void Vision::drawLine(boost::shared_ptr<VisualLine> line, const int color) {
-    drawLine(line->getStartpoint().x, line->getStartpoint().y, line->getEndpoint().x, line->getEndpoint().y, color);
+void Vision::drawLine(boost::shared_ptr<VisualLine> line, const int color)
+{
+#ifdef OFFLINE
+    drawLine(line->getStartpoint().x, line->getStartpoint().y,
+             line->getEndpoint().x, line->getEndpoint().y, color);
+#endif /* OFFLINE */
 }
 
-void Vision::drawLine(const point<int> start, const point<int> end, const int c) {
+void Vision::drawLine(const point<int> start,
+                      const point<int> end,
+                      const int c)
+{
     drawLine(start.x, start.y, end.x, end.y, c);
 }
 
-void Vision::drawDot(int x, int y, int c) {
+void Vision::drawDot(int x, int y, int c)
+{
+#ifdef OFFLINE
     if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        thresh->setThresholded(y,x, static_cast<unsigned char>(c));
+        thresh->debugImage[y][x] = static_cast<unsigned char>(c);
     }
+#endif /* OFFLINE */
 }
 
-void Vision::drawFieldLines() {
+void Vision::drawFieldLines()
+{
+#ifdef OFFLINE
     const vector< shared_ptr<VisualLine> >* lines = fieldLines->getLines();
 
     for (vector< shared_ptr<VisualLine> >::const_iterator i = lines->begin();
@@ -467,10 +490,12 @@ void Vision::drawFieldLines() {
          i != corners->end(); i++) {
         drawPoint(i->getX(), i->getY(), ORANGE);
     }
+#endif /* OFFLINE */
 }
 
 // Prerequisite - point is within bounds of screen
-void Vision::drawX(int x, int y, int c) {
+void Vision::drawX(int x, int y, int c)
+{
 
 #ifdef OFFLINE
     // Mid point
@@ -496,8 +521,8 @@ void Vision::drawX(int x, int y, int c) {
  * @param y       center y value
  * @param c       color to draw
  */
-void Vision::drawPoint(int x, int y, int c) {
-
+void Vision::drawPoint(int x, int y, int c)
+{
 #ifdef OFFLINE
     if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
         thresh->debugImage[y][x] = static_cast<unsigned char>(c);
