@@ -127,15 +127,11 @@ class Brain(object):
         self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
                                           Constants.VISION_BGRP)
 
-        self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
-                                             Constants.VISION_BG_CROSSBAR)
-        self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
-                                             Constants.VISION_YG_CROSSBAR)
-        print dir(self.bgCrossbar) 
-        print dir(self.vision.bgCrossbar)
-        print "*****"
-        print dir(self.ygCrossbar) 
-        print dir(self.vision.ygCrossbar)
+        #### Crossbars: uncomment here and PyVision.cpp to use
+        # self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
+        #                                      Constants.VISION_BG_CROSSBAR)
+        # self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
+        #                                      Constants.VISION_YG_CROSSBAR)
 
         # # Now we setup the corners
         # self.corners = []

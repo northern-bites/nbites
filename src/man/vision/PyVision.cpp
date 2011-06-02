@@ -46,6 +46,7 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("distCertainty", &VisualFieldObject::getDistanceCertaintyInt)
     ;
 
+  // Currently unused, but fully avaliable to python if uncommented
   class_<VisualCrossbar>("Crossbar", no_init)
 // From VisualDetection
     .def_readonly("centerX", &VisualCrossbar::getCenterX)
@@ -74,8 +75,10 @@ BOOST_PYTHON_MODULE(vision)
     .add_property("ygrp", make_getter(&Vision::ygrp, return_value_policy<reference_existing_object>()))
     .add_property("bglp", make_getter(&Vision::bglp, return_value_policy<reference_existing_object>()))
     .add_property("bgrp", make_getter(&Vision::bgrp, return_value_policy<reference_existing_object>()))
+    /* Crossbars: not used right now, uncomment here and Brain.py to use in python
     .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar, return_value_policy<reference_existing_object>()))
     .add_property("bgCrossbar", make_getter(&Vision::bgCrossbar, return_value_policy<reference_existing_object>()))
+    */
     ;
 
   scope().attr("vision") = vision_pointer;
