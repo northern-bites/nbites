@@ -24,7 +24,7 @@
 
 namespace memory {
 class MSensors: public MMotionSensors, public MVisionSensors,
-    public MImage, public Subscriber {
+				public MImage, public Subscriber {
 
 public:
     /**
