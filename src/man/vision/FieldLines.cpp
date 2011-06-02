@@ -319,8 +319,8 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points)
                             }
 
                             points.push_back(point);
-                            vision->thresh->drawPoint(point.x, point.y,
-                                                      UNUSED_VERT_POINT_COLOR);
+                            vision->drawPoint(point.x, point.y,
+					      UNUSED_VERT_POINT_COLOR);
                         }
 
                         resetLineCounters(numWhite, numUndefined, numNonWhite);
@@ -354,7 +354,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points)
                     else if (isSecondFarUphillEdge(x, greenWhiteY, x, y,
                                                    VERTICAL)) {
                         if (debugVertEdgeDetect) {
-                            vision->thresh->drawPoint(x, y, YELLOW);
+                            vision->drawPoint(x, y, YELLOW);
                         }
                         resetLineCounters(numWhite, numUndefined, numNonWhite);
                         greenWhiteY = y;
@@ -520,8 +520,8 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
                                         linePointX,y);
                             }
 
-                            vision->thresh->drawPoint(point.x, point.y,
-                                                      UNUSED_HOR_POINT_COLOR);
+                            vision->drawPoint(point.x, point.y,
+                                              UNUSED_HOR_POINT_COLOR);
                             points.push_back(point);
                         }
                         else {
@@ -567,7 +567,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
                     // We missed the last line. Start anew from this point
                     else if (isSecondFarUphillEdge(greenWhiteX, y, x, y,
                                                    HORIZONTAL)) {
-                        vision->thresh->drawPoint(x, y, YELLOW);
+                        vision->drawPoint(x, y, YELLOW);
                         resetLineCounters(numWhite, numUndefined, numNonWhite);
                         greenWhiteX = x;
                     }
@@ -1266,22 +1266,22 @@ void FieldLines::fitUnusedPoints(vector< shared_ptr<VisualLine> > &lines,
                     // Standard users do not care about how the point was fit to
                     // the line
                     if (standardView) {
-                        vision->thresh->drawPoint(j->x, j->y,
-                                                  USED_VERT_POINT_COLOR);
+                        vision->drawPoint(j->x, j->y,
+					  USED_VERT_POINT_COLOR);
                     }
                     else {
-                        vision->thresh->drawPoint(j->x, j->y,
-                                                  FIT_VERT_POINT_COLOR);
+                        vision->drawPoint(j->x, j->y,
+                                          FIT_VERT_POINT_COLOR);
                     }
                 }
                 else {
                     if (standardView) {
-                        vision->thresh->drawPoint(j->x, j->y,
-                                                  USED_HOR_POINT_COLOR);
+                        vision->drawPoint(j->x, j->y,
+                                          USED_HOR_POINT_COLOR);
                     }
                     else {
-                        vision->thresh->drawPoint(j->x, j->y,
-                                                  FIT_HOR_POINT_COLOR);
+                        vision->drawPoint(j->x, j->y,
+					  FIT_HOR_POINT_COLOR);
                     }
                 }
                 j = remainingPoints.erase(j);
@@ -1382,7 +1382,7 @@ void FieldLines::drawCorners(const list<VisualCorner> &toDraw, int color)
 {
     for (list<VisualCorner>::const_iterator i = toDraw.begin();
          i != toDraw.end(); ++i) {
-        vision->thresh->drawPoint(i->getX(), i->getY(), color);
+        vision->drawPoint(i->getX(), i->getY(), color);
     }
 }
 
@@ -1530,9 +1530,9 @@ void FieldLines::extendLineVertScan(ExtendDirection _testDir,
             }
 
             if (standardView) {
-                vision->thresh->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
+                vision->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
             } else {
-                vision->thresh->drawPoint(newPoint.x, newPoint.y, YELLOW);
+                vision->drawPoint(newPoint.x, newPoint.y, YELLOW);
             }
 
             foundLinePoints->push_back(newPoint);
@@ -1640,9 +1640,9 @@ void FieldLines::extendLineHorizScan(ExtendDirection _testDir,
             }
 
             if (standardView) {
-                vision->thresh->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
+                vision->drawPoint(newPoint.x, newPoint.y, USED_HOR_POINT_COLOR);
             } else {
-                vision->thresh->drawPoint(newPoint.x, newPoint.y, YELLOW);
+                vision->drawPoint(newPoint.x, newPoint.y, YELLOW);
             }
 
             foundLinePoints->push_back(newPoint);
@@ -2050,8 +2050,8 @@ list< VisualCorner > FieldLines::intersectLines()
                     vision->thresh->context->setGoalBoxLines();
                 }
             }
-            vision->thresh->drawPoint(intersection.x, intersection.y,
-                                      TENTATIVE_INTERSECTION_POINT_COLOR);
+            vision->drawPoint(intersection.x, intersection.y,
+                              TENTATIVE_INTERSECTION_POINT_COLOR);
 
             bool isCCIntersection = false, isDupe = false;;
 
@@ -2141,7 +2141,7 @@ list< VisualCorner > FieldLines::intersectLines()
                              << " duplicate intersections; max allowed is "
                              << MAX_NUM_DUPES << endl;
                     }
-                    vision->thresh->drawPoint(intersection.x, intersection.y,
+                    vision->drawPoint(intersection.x, intersection.y,
                                       INVALIDATED_INTERSECTION_POINT_COLOR);
                     // at this point, we are by a center and so we discard all
                     // corners after recoloring them so we can tell they are
@@ -2160,12 +2160,12 @@ list< VisualCorner > FieldLines::intersectLines()
             ++numChecksPassed;
 
             // Make sure the intersection point stands out, even against balls
-            vision->thresh->drawPoint(intersection.x - 1, intersection.y, BLACK);
-            vision->thresh->drawPoint(intersection.x + 1, intersection.y, BLACK);
-            vision->thresh->drawPoint(intersection.x, intersection.y + 1, BLACK);
-            vision->thresh->drawPoint(intersection.x, intersection.y - 1, BLACK);
-            vision->thresh->drawPoint(intersection.x, intersection.y,
-                                      LEGIT_INTERSECTION_POINT_COLOR);
+            vision->drawPoint(intersection.x - 1, intersection.y, BLACK);
+            vision->drawPoint(intersection.x + 1, intersection.y, BLACK);
+            vision->drawPoint(intersection.x, intersection.y + 1, BLACK);
+            vision->drawPoint(intersection.x, intersection.y - 1, BLACK);
+            vision->drawPoint(intersection.x, intersection.y,
+                              LEGIT_INTERSECTION_POINT_COLOR);
             // assign x, y, dist, bearing, line i, line j, t value for line i,
             // t value for line 2
             VisualCorner c(intersection.x, intersection.y, intersectDist, intersectBearing,
@@ -2531,7 +2531,7 @@ void FieldLines::couldNotFindCorrespondingBottom(const int imageColumn,
 {
     if (debugVertEdgeDetect) {
         cout <<"\t\tFailed checks." << endl;
-        vision->thresh->drawPoint(imageColumn,imageRow,CYAN);
+        vision->drawPoint(imageColumn,imageRow,CYAN);
     }
 }
 
@@ -3527,9 +3527,9 @@ int FieldLines::numPixelsToHitColor(const int x, const int y, const int color,
 void FieldLines::drawBox(BoundingBox box, int color) const
 {
     for (int i = 0; i < 4; ++i) {
-        vision->thresh->drawLine(box.corners[i].x, box.corners[i].y,
-                                 box.corners[(i+1)%4].x, box.corners[(i+1)%4].y,
-                                 color);
+        vision->drawLine(box.corners[i].x, box.corners[i].y,
+			 box.corners[(i+1)%4].x, box.corners[(i+1)%4].y,
+			 color);
     }
 }
 
@@ -4387,15 +4387,15 @@ const bool FieldLines::linePointWidthsDifferent(const linePoint& last,
 void
 FieldLines::drawFieldLine(shared_ptr<VisualLine> toDraw, const int color) const
 {
-    vision->thresh->drawLine(toDraw->getStartpoint().x,
-							 toDraw->getStartpoint().y,
-                             toDraw->getEndpoint().x,
-							 toDraw->getEndpoint().y, color);
+    vision->drawLine(toDraw->getStartpoint().x,
+		     toDraw->getStartpoint().y,
+		     toDraw->getEndpoint().x,
+		     toDraw->getEndpoint().y, color);
 }
 
 void FieldLines::drawLinePoint(const linePoint &p, const int color) const
 {
-    vision->thresh->drawPoint(p.x, p.y, color);
+    vision->drawPoint(p.x, p.y, color);
 }
 
 void FieldLines::updateLineCounters(const int threshColor, int &numWhite,
