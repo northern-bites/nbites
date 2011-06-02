@@ -656,17 +656,17 @@ GOALIE_SAVE = (
      .5, 0, stiff.LOOSE_ARMS_STIFFNESSES) )
 
 #Squats with legs in M shape and arms at a 45 degree angle
-GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0), #right arm
+GOALIE_SQUAT = ( ((60.0, 55.0, 0.0, -0),
                   ( -76.0, 14.0, -54.0, 86.0, 0.0, -11),
                   ( -76.0, -14.0, -54.0, 86.0, 0.0, 11),
                   (60.0, -55.0, 0.0, 0), 
-                  .75, 0, stiff.NORMAL_STIFFNESSES),
+                  0.3, 1, stiff.NORMAL_STIFFNESSES),
 
                  ((60., 35., 0., 0.),
                   (-90., 38., -75., 90, 30, -20.),
                   (-90., -38., -75., 90, 30, 20.),
                   (60., -35., 0., 0.),
-                  .35, 0, stiff.LOW_HEAD_STIFFNESSES),
+                  0.3, 0, stiff.LOW_HEAD_STIFFNESSES),
                  )
 
 GOALIE_PRE_SAVE_POS = ( ((45.88,38.93,-122.88,-32.43),
@@ -677,7 +677,7 @@ GOALIE_PRE_SAVE_POS = ( ((45.88,38.93,-122.88,-32.43),
                       #squats down with legs spread
                       #arms bent with hands above elbow
 
-#Fast dive to the right when looking at the goalie
+#Fast dive to the right 
 GOALIE_DIVE_RIGHT = ( (INITIAL_POS[0][0],
                        (-5.10,3,-55,115,-60,-3),
                        (-5.10,-3,-55,115,-60,3),
@@ -715,7 +715,7 @@ GOALIE_DIVE_RIGHT = ( (INITIAL_POS[0][0],
                        )
 
 
-#same as GOALIE_DIVE_RIGHT except dives left when looking at robot
+#same as GOALIE_DIVE_RIGHT except dives left 
 GOALIE_DIVE_LEFT = mirrorMove(GOALIE_DIVE_RIGHT)
 
 #Rolls goalie over onto back towards goal so she can get up
