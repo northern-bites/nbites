@@ -171,7 +171,7 @@ void Robots::robot(Cross* cross)
         if (!sanityChecks(blobs->get(i), cross)) {
             if (blobs->get(i).getRight() > 0) {
                 if (debugRobots) {
-                    thresh->drawRect(blobs->get(i).getLeft(),
+                    vision->drawRect(blobs->get(i).getLeft(),
                                      blobs->get(i).getTop(),
                                      blobs->get(i).width(),
                                      blobs->get(i).height(),
@@ -181,7 +181,7 @@ void Robots::robot(Cross* cross)
             blobs->init(i);
         } else {
             if (debugRobots) {
-                thresh->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
+                vision->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
                                  blobs->get(i).width(), blobs->get(i).height(),
                                  MAROON);
             }
