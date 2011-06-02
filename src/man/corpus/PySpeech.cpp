@@ -16,9 +16,8 @@ shared_ptr<Speech> speech_pointer;
 BOOST_PYTHON_MODULE(_speech)
 {
     class_<Speech, shared_ptr<Speech> >("Speech", no_init)
-        .def("say",       &Speech::say)
-        .def("setVolume", &Speech::setVolume)
-        .def("getVolume", &Speech::getVolume)
+        .def("say", &Speech::say)
+        .add_property("volume", &Speech::getVolume, &Speech::setVolume)
         .def("enable", &Speech::enable)
         .def("disable", &Speech::disable)
         ;

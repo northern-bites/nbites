@@ -3,7 +3,7 @@
 #include "alcore/alerror.h"
 #include <iostream>
 
-ALSpeech::ALSpeech(AL::ALPtr<AL::ALBroker> broker) : volume(0)
+ALSpeech::ALSpeech(AL::ALPtr<AL::ALBroker> broker) : Speech(), volume(0)
 {
     try {
         alProxy =
@@ -11,7 +11,8 @@ ALSpeech::ALSpeech(AL::ALPtr<AL::ALBroker> broker) : volume(0)
                 new AL::ALTextToSpeechProxy(broker));
 
     } catch(AL::ALError &e) {
-		std::cout << "Failed to initialize proxy to ALTextToSpeech" << std::endl;
+        std::cout << "Failed to initialize proxy to ALTextToSpeech"
+                  << std::endl;
     }
     volume = alProxy->getVolume();
 }

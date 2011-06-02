@@ -32,6 +32,10 @@ using namespace boost::assign;
 #include "corpus/synchro.h"
 #include "VisionDef.h"
 #include "Common.h"
+#include "PyRoboGuardian.h"
+#include "PySensors.h"
+#include "PyLights.h"
+#include "PySpeech.h"
 
 using namespace std;
 using boost::shared_ptr;

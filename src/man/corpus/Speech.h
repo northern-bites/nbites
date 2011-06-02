@@ -6,17 +6,19 @@
 class Speech
 {
 public:
-    Speech() : isEnabled(true){ };
     virtual ~Speech() { };
 
 public:
-    virtual void say(const std::string& text) = 0;
-    virtual void  setVolume(float v) = 0;
-    virtual float getVolume()      = 0;
-    virtual void enable()  { isEnabled = true;  }
-    virtual void disable() { isEnabled = false; }
+    virtual void say(const std::string& text) {  }
+
+    virtual void  setVolume(float v) {           }
+    virtual float getVolume()        { return 0; }
+
+    virtual void enable()  { isEnabled = true;   }
+    virtual void disable() { isEnabled = false;  }
 
 protected:
+    Speech() : isEnabled(true){ };
     bool isEnabled;
 };
 
