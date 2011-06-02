@@ -287,6 +287,7 @@ void Threshold::findGoals(int column, int topEdge) {
         if (isBlue(pixel)) {
             lastBlue = j;
             blues++;
+            bad--;
             if (firstBlue == topEdge) {
                 firstBlue = j;
             }
@@ -294,6 +295,7 @@ void Threshold::findGoals(int column, int topEdge) {
         if (isYellow(pixel)) {
             lastYellow = j;
             yellows++;
+            bad--;
             if (firstYellow == topEdge) {
                 firstYellow = j;
             }
@@ -463,8 +465,9 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         if (isOrange(pixel)) {
             int lastv = getV(column, j);
             int initv = lastv;
-            while (j >= topEdge && abs(getV(column, j) - lastv) < 8 &&
-                   abs(initv - lastv) < 12) {
+            //while (j >= topEdge && abs(getV(column, j) - lastv) < 8 &&
+            //     abs(initv - lastv) < 12) {
+            while (j >= topEdge && isOrange(getThresholded(j, column))) {
                 currentRun++;
                 j--;
             }

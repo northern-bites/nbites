@@ -188,6 +188,7 @@ void ObjectFragments::newRun(int x, int y, int h)
 {
     const int RUN_VALUES = 3;	   // x, y, and h of course
 
+    cout << "Run " << x << " " << y << " " << h << endl;
     if (numberOfRuns < runsize) {
         int last = numberOfRuns - 1;
         // skip over noise --- jumps over two pixel noise currently.
@@ -1166,6 +1167,8 @@ int ObjectFragments::classifyByTCorner(Blob post) {
 			int x = k->getX();
 			int y = k->getY();
 			bool closeEnough = false;
+            // Check the distance - if it is really far, then it is
+            // a side T
 			if (y < post.getLeftBottomY() + spany) {
 				closeEnough = true;
 			}
@@ -1246,6 +1249,16 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
                                           post.getLeftBottomY());
                 estimate e = vision->pose->pixEstimate(x, y, 0.0);
                 // if it is in the right position we can figure out which post
+                if (POSTLOGIC) {
+                    cout << "Checking a corner " << x << " " <<
+                        post.getLeftBottomX() << " corner points ";
+                    if (k->doesItPointRight()) {
+                        cout << "right" << endl;
+                    } else {
+                        cout << "left" << endl;
+                    }
+                    cout << "Distances: " << diff << " " << e.dist << endl;
+                }
                 if (x <= post.getLeftBottomX()) {
                     if (k->doesItPointRight()) {
                         return cornerClassifier(diff, e.dist,
@@ -1305,7 +1318,10 @@ int ObjectFragments::cornerClassifier(float diff, float dist, int x, int y,
         if (p.dist < 40.0f) {
             return class1;
         } else if (p.dist < 140.0f) {
-            return class2;
+            if (POSTLOGIC) {
+                cout << "Dangerous corner classification" << endl;
+            }
+            return NOPOST;
         } else {
             return class1;
         }

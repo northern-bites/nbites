@@ -229,7 +229,7 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
                     cout << "Screened one for horizon problems " << endl;
                     drawBlob(blobs->get(i), WHITE);
                 }
-            } else if (ar > MIN_AREA && perc > minpercent) {
+            } else if (ar > MIN_AREA && perc >= minpercent) {
                 if (BALLDEBUG) {
                     cout << "Candidate ball " << endl;
                     printBlob(blobs->get(i));
