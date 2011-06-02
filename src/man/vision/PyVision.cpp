@@ -42,8 +42,8 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("angleX", &VisualFieldObject::getAngleXDeg)
     .def_readonly("angleY", &VisualFieldObject::getAngleYDeg)
     // From VisualLandmark
-    .def_readonly("certainty", &VisualFieldObject::getIDCertainty)
-    .def_readonly("distCertainty", &VisualFieldObject::getDistanceCertainty)
+    .def_readonly("certainty", &VisualFieldObject::getIDCertaintyInt)
+    .def_readonly("distCertainty", &VisualFieldObject::getDistanceCertaintyInt)
     ;
 
   //noncopyable is required because vision has no public copy constructor
