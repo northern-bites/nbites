@@ -45,18 +45,22 @@ ImageFDLogger::ImageFDLogger(string output_file_descriptor,
 }
 
 void ImageFDLogger::writeHead() {
-//	this->getNextBuffer();
-//    // this helps us ID the log
-//    *((int*) (*current_buffer)) = logID;
-//    // this time stamps the log
-//    *((long long*) (*current_buffer) + sizeof(int)) = birth_time;
-//
-//    raw_output->BackUp(current_buffer_size - sizeof(int) - sizeof(long long));
+	this->getNextBuffer();
+	uint32_t bytes_written = 0;
+    // this helps us ID the log
+	this->writeValue<int32_t>(logID, &bytes_written);
+	// this time stamps the log
+    this->writeValue<int64_t>(birth_time, &bytes_written);
+    this->writeValue<uint32_t>(roboImage->getWidth(), &bytes_written);
+    this->writeValue<uint32_t>(roboImage->getHeight(), &bytes_written);
+    this->writeValue<uint32_t>(roboImage->getByteSize(), &bytes_written);
+    raw_output->BackUp(current_buffer_size - bytes_written);
 }
 
 void ImageFDLogger::write() {
 
     this->getNextBuffer();
+//    cout << "writing image to the buffer " << current_buffer_size << endl;
     _copy_image(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(roboImage->getImage())),
     		reinterpret_cast<uint8_t*> (*current_buffer));
 
@@ -66,7 +70,7 @@ uint8_t* ImageFDLogger::getCurrentImage() {
 	return reinterpret_cast<uint8_t*> (*current_buffer);
 }
 
-byte* ImageFDLogger::getNextBuffer() {
+void ImageFDLogger::getNextBuffer() {
 
     raw_output->Next(current_buffer, &current_buffer_size);
     //we're not guaranteed a non-empty buffer

@@ -21,12 +21,11 @@
 #pragma once
 
 #include <string>
-#include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <stdint.h>
 
 #include "FDLogger.h"
 #include "memory/RoboImage.h"
-#include "include/VisionDef.h"
 
 namespace memory {
 namespace log {
@@ -53,11 +52,23 @@ public:
 
     void write();
     uint8_t* getCurrentImage();
-    byte* getNextBuffer();
+
 
 private:
-
+    void getNextBuffer();
     void writeHead();
+    /*
+     * Writes a value of type T to the current buffer.
+     * It writes it at the specified offset and then
+     * increments the offset with the size of the value written.
+     */
+    template <class T>
+    void writeValue(T value, uint32_t* offset) {
+    	*((reinterpret_cast<T*> (*current_buffer)) + *offset) = value;
+    	*offset -= sizeof(T);
+    }
+
+
 
 private:
     void** current_buffer;
