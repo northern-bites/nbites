@@ -14,7 +14,6 @@ FIND_PACKAGE( ZLIB )
 ############################ INCLUDE DIRECTORY
 # Define include directories
 include_directories( ${PROTOBUF_INCLUDE_DIRS}/
-                     ${ZLIB_INCLUDE_DIRS}
                      )
 
 ############################ PROJECT SOURCES FILES
@@ -33,5 +32,5 @@ add_library(
 target_link_libraries(
     ${LOGGER_TARGET}
     ${PROTOBUF_LIBRARIES}
-    ${ZLIB_LIBRARIES}
+    ${ROBOT_CONNECT_TARGET}
     )
