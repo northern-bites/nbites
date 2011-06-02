@@ -100,7 +100,7 @@ class Brain(object):
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
-        #self.tracker = HeadTracking.HeadTracking(self)
+        self.tracker = HeadTracking.HeadTracking(self)
         self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)
@@ -127,7 +127,7 @@ class Brain(object):
         self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
                                           Constants.VISION_BGRP)
 
-        #### Crossbars: uncomment here and PyVision.cpp to use
+        #### Crossbars: uncomment here and PyVision.cpp to use #######
         # self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
         #                                      Constants.VISION_BG_CROSSBAR)
         # self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
@@ -138,7 +138,7 @@ class Brain(object):
         # self.lines = []
 
         # Now we build the field objects to be based on our team color
-        #self.makeFieldObjectsRelative()
+        self.makeFieldObjectsRelative()
 
     def makeFieldObjectsRelative(self):
         """
@@ -232,26 +232,26 @@ class Brain(object):
         self.updateComm()
 
         # Localization Update
-        #self.updateLocalization()
+        self.updateLocalization()
         self.ball.updateBestValues(self.my)
 
         #Set LEDS
-        #self.leds.processLeds()
+        self.leds.processLeds()
 
         # Behavior stuff
         self.time = time.time()
         self.gameController.run()
-        #self.fallController.run()
-        #self.updatePlaybook()
-        #self.player.run()
-        #self.tracker.run()
-        #self.nav.run()
+        self.fallController.run()
+        self.updatePlaybook()
+        self.player.run()
+        self.tracker.run()
+        self.nav.run()
 
         # Broadcast Report for Teammates
-        #self.setPacketData()
+        self.setPacketData()
 
         # Update any logs we have
-        #self.out.updateLogs()
+        self.out.updateLogs()
 
     def updateVisualObjects(self):
         """
@@ -270,7 +270,7 @@ class Brain(object):
         # # Update the corner information
         # self.corners = []
 
-        # self.time = time.time()
+        self.time = time.time()
         # # Now we get the latest list of lines
         # self.lines = []
 
