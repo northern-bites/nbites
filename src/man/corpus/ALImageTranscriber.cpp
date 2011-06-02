@@ -544,12 +544,12 @@ void ALImageTranscriber::waitForImage ()
             sensors->lockImage();
 
 #ifdef CAN_SAVE_FRAMES
-            uint8_t* naoImage = sensors->getNaoImage();
-            if (naoImage != NULL) {
+            //uint8_t* naoImage = sensors->getNaoImage();
+//            if (naoImage != NULL) {
                 //_copy_image(ALimage->getData(), naoImage);
             	sensors->setRawNaoImage(ALimage->getData());
                 _acquire_image_fast(table, &params, sensors->getNaoImage(), image);
-            }
+//            }
 #else
             ImageAcquisition::acquire_image_fast(table, params,
                                                  ALimage->getData(), image);
