@@ -18,6 +18,7 @@ import sensors
 # Modules from this directory
 from . import GameController
 from . import FallController
+from . import Stability
 from . import NogginConstants as Constants
 from . import Loc
 from . import TeamConfig
@@ -26,7 +27,7 @@ from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
 from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet,
-                       Play, TeamMember, Stability)
+                       Play, TeamMember)
 from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface

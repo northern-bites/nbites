@@ -40,6 +40,7 @@ public:
 
 	void init();
 	void createObject();
+    void checkForCrosses();
     bool checkSizeAgainstPixEstimate(Blob b);
     bool scanAroundPerimeter(Blob b);
     bool checkForLineIntersection(Blob b);
@@ -50,6 +51,7 @@ public:
 	bool isWhite(unsigned char pix);
 	bool isGreen(unsigned char pix);
 	bool isUndefined(unsigned char pix);
+    bool checkForRobotBlobs(Blob b);
 #ifdef OFFLINE
 	void setCrossDebug(bool debug) {CROSSDEBUG = debug;}
 #endif
