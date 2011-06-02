@@ -127,10 +127,15 @@ class Brain(object):
         self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
                                           Constants.VISION_BGRP)
 
-        # self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
-        #                                      Constants.VISION_BG_CROSSBAR)
-        # self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
-        #                                      Constants.VISION_YG_CROSSBAR)
+        self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
+                                             Constants.VISION_BG_CROSSBAR)
+        self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
+                                             Constants.VISION_YG_CROSSBAR)
+        print dir(self.bgCrossbar) 
+        print dir(self.vision.bgCrossbar)
+        print "*****"
+        print dir(self.ygCrossbar) 
+        print dir(self.vision.ygCrossbar)
 
         # # Now we setup the corners
         # self.corners = []
@@ -263,8 +268,8 @@ class Brain(object):
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
 
-        # self.ygCrossbar.updateVision(self.vision.ygCrossbar)
-        # self.bgCrossbar.updateVision(self.vision.bgCrossbar)
+        self.ygCrossbar.updateVision(self.vision.ygCrossbar)
+        self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
         # # Update the corner information
         # self.corners = []
