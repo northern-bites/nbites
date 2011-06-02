@@ -32,15 +32,18 @@ BOOST_PYTHON_MODULE(vision)
 
   class_<VisualFieldObject>("FieldObject", no_init)
     // From VisualDetection
-    .def_readonly("centerX", &VisualBall::getCenterX)
-    .def_readonly("centerY", &VisualBall::getCenterY)
-    .def_readonly("width", &VisualBall::getWidth)
-    .def_readonly("height", &VisualBall::getHeight)
-    .def_readonly("focDist", &VisualBall::getFocDist)
-    .def_readonly("dist", &VisualBall::getDistance)
-    .def_readonly("bearing", &VisualBall::getBearing)
-    .def_readonly("angleX", &VisualBall::getAngleXDeg)
-    .def_readonly("angleY", &VisualBall::getAngleYDeg)
+    .def_readonly("centerX", &VisualFieldObject::getCenterX)
+    .def_readonly("centerY", &VisualFieldObject::getCenterY)
+    .def_readonly("width", &VisualFieldObject::getWidth)
+    .def_readonly("height", &VisualFieldObject::getHeight)
+    .def_readonly("focDist", &VisualFieldObject::getFocDist)
+    .def_readonly("dist", &VisualFieldObject::getDistance)
+    .def_readonly("bearing", &VisualFieldObject::getBearing)
+    .def_readonly("angleX", &VisualFieldObject::getAngleXDeg)
+    .def_readonly("angleY", &VisualFieldObject::getAngleYDeg)
+    // From VisualLandmark
+    .def_readonly("certainty", &VisualFieldObject::getIDCertainty)
+    .def_readonly("distCertainty", &VisualFieldObject::getDistanceCertainty)
     ;
 
   //noncopyable is required because vision has no public copy constructor
