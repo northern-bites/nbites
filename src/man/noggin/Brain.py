@@ -151,24 +151,24 @@ class Brain(object):
             # Yellow goal
             self.oppGoalRightPost = self.yglp
             self.oppGoalLeftPost = self.ygrp
-            self.oppGoalCrossbar = self.ygCrossbar
+            #self.oppGoalCrossbar = self.ygCrossbar
 
             # Blue Goal
             self.myGoalLeftPost = self.bglp
             self.myGoalRightPost = self.bgrp
-            self.myGoalCrossbar = self.bgCrossbar
+            #self.myGoalCrossbar = self.bgCrossbar
 
         # Yellow team setup
         else:
             # Yellow goal
             self.myGoalLeftPost = self.yglp
             self.myGoalRightPost = self.ygrp
-            self.myGoalCrossbar = self.ygCrossbar
+            #self.myGoalCrossbar = self.ygCrossbar
 
             # Blue Goal
             self.oppGoalRightPost = self.bglp
             self.oppGoalLeftPost = self.bgrp
-            self.oppGoalCrossbar = self.bgCrossbar
+            #self.oppGoalCrossbar = self.bgCrossbar
 
         # Since, for ex.  bgrp points to the same thins as myGoalLeftPost,
         # we can set these regardless of our team color
@@ -264,8 +264,8 @@ class Brain(object):
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
 
-        self.ygCrossbar.updateVision(self.vision.ygCrossbar)
-        self.bgCrossbar.updateVision(self.vision.bgCrossbar)
+        #self.ygCrossbar.updateVision(self.vision.ygCrossbar)
+        #self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
         # # Update the corner information
         # self.corners = []
