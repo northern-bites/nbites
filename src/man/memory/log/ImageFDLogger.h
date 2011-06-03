@@ -40,7 +40,7 @@ public:
      *
      * @param logTypeID : an ID written to the head of the log identifying the log
      */
-    ImageFDLogger(std::string output_file_descriptor,
+    ImageFDLogger(const FDProvider* fdp,
                   int logTypeID,
                   RoboImage* roboImage);
 

@@ -13,30 +13,24 @@
 #pragma once
 
 #include <iostream>
-#include <google/protobuf/message.h>
-#include "Logger.h"
-//TODO: remove this
-#include <fcntl.h>
+#include "include/io/FileFDProvider.h"
 
 namespace memory {
 namespace log {
-
-typedef ::google::protobuf::Message ProtoMessage;
 
 class FDLogger {
 
 public:
     /**
-     * @param m : the proto message to log
-     * @return
+     * fdp : a FileFDProvider for the file descriptor where we want
+     * to log to
      */
-    FDLogger(const char* output_file_descriptor)
-        {//file_descriptor(output_file_descriptor) {
-        file_descriptor = open(output_file_descriptor,
-                                       O_WRONLY | O_CREAT | O_TRUNC,
-                                       S_IRWXU | S_IRWXG | S_IRWXO);
+    FDLogger(const FDProvider* fdp):
+    	file_descriptor_provider(fdp),
+    	file_descriptor(fdp->getFileDescriptor())
+        {
         if (file_descriptor < 0) {
-            std::cout << "Invalid file descriptor passed for logging "
+            std::cout << "Warning: invalid file descriptor passed for logging! "
                       << std::endl;
         }
     }
@@ -56,6 +50,7 @@ private:
 
 
 protected:
+    const FDProvider* file_descriptor_provider;
     int file_descriptor;
 };
 

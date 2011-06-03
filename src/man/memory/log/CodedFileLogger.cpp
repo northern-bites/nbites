@@ -27,8 +27,9 @@ namespace log {
 
 using namespace std;
 
-CodedFileLogger::CodedFileLogger(string fileName, int logTypeID, ProtoMessage* m) :
-        FDLogger(fileName.data()), logID(logTypeID), message(m) {
+CodedFileLogger::CodedFileLogger(const FDProvider* fdp,
+		int logTypeID, ProtoMessage* m) :
+        FDLogger(fdp), logID(logTypeID), message(m) {
 
     raw_output = new FileOutputStream(file_descriptor);
     //TODO: put the gzip code in a gzip file logger

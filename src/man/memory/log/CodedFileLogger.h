@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+#include <google/protobuf/message.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
@@ -27,7 +28,9 @@
 namespace memory {
 namespace log {
 
+//TODO: remove this
 using namespace google::protobuf::io;
+typedef ::google::protobuf::Message ProtoMessage;
 
 class CodedFileLogger : public FDLogger {
 
@@ -40,7 +43,7 @@ public:
      * @param m : the proto message we will log
      * @return
      */
-    CodedFileLogger(std::string fileName, int logTypeID, ProtoMessage* m);
+    CodedFileLogger(const FDProvider* fdp, int logTypeID, ProtoMessage* m);
 
     /**
      * Closes the file, which will flush the output buffer

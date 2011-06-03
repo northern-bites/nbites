@@ -29,10 +29,10 @@ extern long long birth_time;
 
 using namespace std;
 
-ImageFDLogger::ImageFDLogger(string output_file_descriptor,
+ImageFDLogger::ImageFDLogger(const FDProvider* fdp,
                              int logTypeID,
                              RoboImage* roboImage) :
-        FDLogger(output_file_descriptor.data()),
+        FDLogger(fdp),
         current_buffer(new (void*)),
         current_buffer_size(1),
         bytes_written(0),
@@ -50,7 +50,8 @@ void ImageFDLogger::writeHead() {
     // this helps us ID the log
 	this->writeValue<int32_t>(logID, &bytes_written);
 	// this time stamps the log
-    this->writeValue<int64_t>(birth_time, &bytes_written);
+	//extern int64_t birth_time;
+    //this->writeValue<int64_t>(birth_time, &bytes_written);
     this->writeValue<uint32_t>(roboImage->getWidth(), &bytes_written);
     this->writeValue<uint32_t>(roboImage->getHeight(), &bytes_written);
     this->writeValue<uint32_t>(roboImage->getByteSize(), &bytes_written);
@@ -60,7 +61,6 @@ void ImageFDLogger::writeHead() {
 void ImageFDLogger::write() {
 
     this->getNextBuffer();
-//    cout << "writing image to the buffer " << current_buffer_size << endl;
     _copy_image(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(roboImage->getImage())),
     		reinterpret_cast<uint8_t*> (*current_buffer));
 
