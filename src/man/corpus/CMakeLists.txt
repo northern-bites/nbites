@@ -134,7 +134,7 @@ ENDIF(WEBOTS_BACKEND)
 #                            )
 #ENDIF( PYTHON_SHARED_CORPUS )
 
-SET( CORPUS_PYTHON_SRCS __init__.py
+SET( CORPUS_PYTHON_SRCS
   leds.py
   sensors.py
   synchro.py
