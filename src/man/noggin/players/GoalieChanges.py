@@ -12,8 +12,13 @@ import GoalieTransitions as goalTran
 def goalieStateChoice(player):
     ball = player.brain.ball
 
-    # for simplicity to start off with we just want the goalie to chase
+    # for simplicity to start off with we just want
+    # the goalie to chase
     # the ball as long as it is close enough and it isnt dangerous
+
+    if player.penaltyKicking:
+        if goalTran.shouldSave(player):
+            return 'goalieSave'
 
     if player.isChasing:
         if goalTran.shouldStopChase(player):
