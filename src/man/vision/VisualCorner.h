@@ -144,6 +144,30 @@ private:
     float orientation;
     bool up;       // does the bisector point up?
     bool right;    // does the bisector point right?
+
+    // The orientation of the robot to the physical corner on the
+    // field, given in radians in terms of our rotation from the zero
+    // angle of that corner
+    //
+    // For L-Corners:
+    //             Zero angle is bisector of legs
+    //  ___________
+    // | .
+    // |   .
+    // |     .
+    // |       .  <-zero line
+    //
+    // For T-Corners:
+    //             Zero angle is aligned with the T-Stem
+    //
+    // |
+    // |
+    // |
+    // ------- <- zero line
+    // |
+    // |
+    // |
+    float physicalOrientation;
 };
 
 // functor that checks if the shape of one corner equals the given shape
