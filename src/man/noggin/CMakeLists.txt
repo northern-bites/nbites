@@ -91,6 +91,7 @@ SET( NOGGIN_PYTHON_SRCS __init__.py
                         GameController.py
                         GameStates.py
                         FallController.py
+			Stability.py
                         FallStates.py
                         NogginConstants.py
                         Leds.py

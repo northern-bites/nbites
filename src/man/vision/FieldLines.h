@@ -297,7 +297,7 @@ private:
 #ifdef SOFTCOLORS
 			return threshColor == GREY;
 #else
-			return threshColor;
+			return threshColor == 0x00;
 #endif
         }
 

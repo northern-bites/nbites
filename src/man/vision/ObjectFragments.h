@@ -164,7 +164,6 @@ public:
     void drawPoint(int x, int y, int c);
     void drawRect(int x, int y, int w, int h, int c);
     void drawBlob(Blob b, int c);
-    void drawLine(int x, int y, int x1, int y1, int c);
     void printBlob(Blob b);
     void printObject(VisualFieldObject * objs);
     void paintRun(int x,int y, int h, int c);

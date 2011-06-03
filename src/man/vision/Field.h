@@ -49,22 +49,14 @@ public:
     // green color
     static inline const bool isGreen(unsigned char threshColor)
         {
-#ifdef SOFTCOLORS
-			return threshColor == GREEN || threshColor == BLUEGREEN;
-#else
 			return threshColor & GREEN_BIT;
-#endif
         }
 
     // Helper method that just returns whether the thresholded color is a
     // undefined color
     static inline const bool isUndefined(unsigned char threshColor)
         {
-#ifdef SOFTCOLORS
-			return threshColor == GREY;
-#else
-			return threshColor;
-#endif
+			return threshColor == 0x00;
         }
 
 #ifdef OFFLINE

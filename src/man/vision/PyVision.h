@@ -933,7 +933,7 @@ typedef struct PyVision_t {
     PyObject *bgCrossbar, *ygCrossbar;
 
     // Robot recognition
-    PyObject *red1, *red2, *navy1, *navy2;
+    PyObject *red1, *red2, *red3, *navy1, *navy2, *navy3;
     // Orange ball
     PyObject *ball;
 

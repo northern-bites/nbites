@@ -28,12 +28,12 @@
 IF( WEBOTS_BACKEND )
   OPTION( USING_LAB_FIELD
     "Set field constants to use the lab field constants"
-    ON
+    OFF
     )
 ELSE( WEBOTS_BACKEND )
   OPTION( USING_LAB_FIELD
     "Set field constants to use the lab field constants"
-    ON
+    OFF
     )
 ENDIF( WEBOTS_BACKEND )
 

@@ -53,6 +53,9 @@ int Blob::getArea() const{
 }
 
 int Blob::width() const{
+    if (leftTop.x < 0) {
+        return 0;
+    }
     return rightTop.x - leftTop.x + 1;
 }
 
@@ -73,6 +76,19 @@ void Blob::merge(Blob other) {
     value = max(leftBottom.y, other.leftBottom.y);
     leftBottom.y = value;
     rightBottom.y = value;
+}
+
+/* Test if two blobs are vertically aligned.  Potentially useful for
+   determining whether something is a robot
+ */
+bool Blob::isAligned(Blob other) {
+    if (getLeft() >= other.getLeft() && getLeft() <= other.getRight()) {
+        return true;
+    }
+    if (other.getLeft() >= getLeft() && other.getLeft() <= getRight()) {
+        return true;
+    }
+    return false;
 }
 
 /* Print debugging information for a blob.
