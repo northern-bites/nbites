@@ -60,14 +60,18 @@ static shared_ptr<EnactorT> enactor;
 static shared_ptr<Lights> lights;
 
 void ALCreateMan( ALPtr<ALBroker> broker){
-    try{
-        ALSentinelProxy sentinel(broker);
-        sentinel.enableDefaultActionSimpleClick(false);
-        sentinel.enableDefaultActionDoubleClick(false);
-        sentinel.enableDefaultActionTripleClick(false);
-    }catch(ALError &e){
-        cout << "Failed to access the ALSentinel: "<<e.toString()<<endl;
-    }
+
+	// We don't load ALSentinel anymore
+	// we use our own version (RoboGuardian) to do stuff
+
+//    try{
+//        ALSentinelProxy sentinel(broker);
+//        sentinel.enableDefaultActionSimpleClick(false);
+//        sentinel.enableDefaultActionDoubleClick(false);
+//        sentinel.enableDefaultActionTripleClick(false);
+//    }catch(ALError &e){
+//        cout << "Failed to access the ALSentinel: "<<e.toString()<<endl;
+//    }
 
     synchro = shared_ptr<Synchro>(new Synchro());
     sensors = shared_ptr<Sensors>(new Sensors);
