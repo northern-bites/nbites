@@ -33,6 +33,8 @@ using namespace boost::assign;
 #include "VisionDef.h"
 #include "Common.h"
 
+//#include <valgrind/callgrind.h>
+
 using namespace std;
 using boost::shared_ptr;
 using memory::Memory;
@@ -60,7 +62,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
   profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
 #ifdef USE_TIME_PROFILING
   profiler->profiling = true;
-  profiler->profileFrames(700);
+  profiler->profileFrames(1400);
 #endif
   // give python a pointer to the sensors structure. Method defined in
   // Sensors.h
@@ -91,7 +93,6 @@ Man::Man (shared_ptr<Sensors> _sensors,
                                          sensors, motion->getInterface()));
 #endif// USE_NOGGIN
   memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
-  sensors->addSubscriber(memory->getMSensors());
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
@@ -131,6 +132,10 @@ void Man::startSubThreads() {
 #ifdef DEBUG_MAN_THREADING
   cout << "  run :: Signalling start" << endl;
 #endif
+
+//  printf("Start time: %lli \n", process_micro_time());
+//  CALLGRIND_START_INSTRUMENTATION;
+//  CALLGRIND_TOGGLE_COLLECT;
 }
 
 void Man::stopSubThreads() {

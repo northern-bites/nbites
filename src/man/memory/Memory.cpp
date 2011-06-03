@@ -16,10 +16,11 @@ long long int birth_time; //the time we initialized memory
 Memory::Memory(shared_ptr<Profiler> profiler_ptr,
         shared_ptr<Vision> vision_ptr,
         shared_ptr<Sensors> sensors_ptr) :
-        _profiler(profiler_ptr){
+        _profiler(profiler_ptr),
+        mvision(new MVision(vision_ptr)),
+        msensors(new MSensors(profiler_ptr, sensors_ptr)){
     birth_time = process_micro_time();
-    this->mvision = new MVision(vision_ptr);
-    this->msensors = new MSensors(profiler_ptr, sensors_ptr);
+    sensors_ptr->addSubscriber(msensors);
 }
 
 Memory::~Memory() {
