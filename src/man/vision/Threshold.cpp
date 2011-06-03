@@ -275,10 +275,11 @@ void Threshold::runs() {
 
 void Threshold::findGoals(int column, int topEdge) {
     const int BADSIZE = 5;
+	const int GAP = 15;
     // scan up for goals
-    int bad = 0, blues = 0, yellows = 0;
+    int bad = 0, blues = 0, yellows = 0, pinks = 0;
     int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge,
-        lastYellow = topEdge;
+        lastYellow = topEdge, firstPink = topEdge, lastPink = topEdge;
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
     for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
@@ -303,9 +304,19 @@ void Threshold::findGoals(int column, int topEdge) {
         if (isNavy(pixel) || isRed(pixel)) {
             robots++;
         }
-        if (isOrange(pixel) || isUndefined(pixel)) {
+		if (isRed(pixel)) {
+			lastPink = j;
+			pinks++;
+			if (firstPink == topEdge) {
+				firstPink = j;
+			}
+		}
+        if (isUndefined(pixel)) {
             bad++;
         }
+		if (lastYellow - j > GAP && lastBlue - j > GAP && lastPink - j > GAP) {
+			break;
+		}
     }
     // now do the same going down from the horizon
     bad = 0;
@@ -339,6 +350,9 @@ void Threshold::findGoals(int column, int topEdge) {
     } else if (yellows > 10) {
         yellow->newRun(column, lastYellow, firstYellow - lastYellow);
     }
+	if (pinks > 5) {
+		red->newRun(column, lastPink, firstPink - lastPink);
+	}
     if (shoot[column] && robots > 5) {
         shoot[column] = false;
     }

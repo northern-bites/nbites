@@ -1205,9 +1205,19 @@ int ObjectFragments::classifyByTCorner(Blob post) {
 						return NOPOST;
 					}
 					if (POSTLOGIC) {
-						cout << "T is far from post " << diff << endl;
+						float dis = context->realLineDistance(k->getTStem());
+						cout << "T is far from post " << diff << " " << dis
+							 << endl;
 					}
-					if (side == LEFT) {
+					// The T may actually be a center T - should be easy
+					if (context->realLineDistance(k->getTStem()) >
+						GOALBOX_DEPTH * 1.5f || diff > CROSSBAR_CM_WIDTH +
+						GOALBOX_OVERAGE * 2) {
+						if (POSTLOGIC) {
+							cout << "T is a side T" << endl;
+						}
+						return side;
+					} else if (side == LEFT) {
 						return RIGHT;
 					} else {
 						return LEFT;
@@ -2082,7 +2092,8 @@ bool ObjectFragments::postBigEnough(Blob b) {
  */
 
 bool ObjectFragments::badDistance(Blob b) {
-    if (b.height() < MIN_GOAL_HEIGHT + 25) {
+    if (b.height() < MIN_GOAL_HEIGHT + 25 ||
+		(vision->pose->getHorizonY(0) < 0 && color == BLUE_BIT)) {
         int x = b.getLeftBottomX();
         int y = b.getLeftBottomY();
         int bottom = b.getBottom();

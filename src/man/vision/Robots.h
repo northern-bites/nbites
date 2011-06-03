@@ -61,7 +61,7 @@ public:
 	bool closeEnough(int i, int j);
     bool sanityChecks(Blob candidate, Cross* cross);
 	bool bigEnough(Blob a, Blob b);
-	bool noGreen(Blob a, Blob b);
+	bool notGreen(Blob a);
     bool whiteBelow(Blob a);
     bool whiteAbove(Blob b);
 	bool checkHorizontal(int l, int r, int t, int b);

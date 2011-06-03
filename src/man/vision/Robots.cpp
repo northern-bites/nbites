@@ -207,11 +207,12 @@ void Robots::robot(Cross* cross)
 bool Robots::sanityChecks(Blob candidate, Cross* cross) {
     const int blobHeightMin = 10;
     int height = candidate.height();
+	int bottom = candidate.getBottom();
     if (candidate.getRight() > 0) {
         // the bottom of the uniform shouldn't be above field horizon
-        if (candidate.getBottom() < field->horizonAt(candidate.getLeft())) {
-            return false;
-        }
+        //if (bottom < field->horizonAt(candidate.getLeft())) {
+		//  return false;
+        //}
         // blobs must be big enough
         if (candidate.height() < blobHeightMin) {
             return false;
@@ -221,25 +222,66 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
             return false;
         }
         // there ought to be some white below the uniform
-        if (!cross->checkForRobotBlobs(candidate)) {
+        if (bottom < IMAGE_HEIGHT - 10 &&
+			!cross->checkForRobotBlobs(candidate)) {
+			if (debugRobots) {
+				cout << "Bad robot from cross check" << endl;
+			}
             return false;
         }
         // the last check was pretty general, let's improve
         if (candidate.getBottom() < IMAGE_HEIGHT - candidate.height() * 2
             && !whiteBelow(candidate)) {
+			if (debugRobots) {
+				cout << "Got rid for lack of white below" << endl;
+			}
             return false;
         }
         if (candidate.getTop() > candidate.height() * 2
             && !whiteAbove(candidate)) {
+			if (debugRobots) {
+				cout << "Got rid for lack of white above" << endl;
+			}
             return false;
         }
         // for some blobs we check even harder for white
         if (height < 2 * blobHeightMin && noWhite(candidate)) {
+			if (debugRobots) {
+				cout << "Got rid of small one for white" << endl;
+			}
             return false;
         }
+
+		if (color == NAVY_BIT && vision->pose->getHorizonY(0) < 0 &&
+			notGreen(candidate)) {
+			return false;
+		}
         return true;
     }
     return false;
+}
+
+/* When we are looking down, the shadowed carpet often has lots of Navy.
+   Make sure we aren't just looking at carpet
+ */
+bool Robots::notGreen(Blob candidate) {
+    int bottom = candidate.getBottom();
+    int top = candidate.getTop();
+	int left = candidate.getLeft();
+	int right = candidate.getRight();
+	int area = candidate.width() * candidate.height() / 5;
+	int greens = 0;
+	for (int i = left; i < right; i++) {
+		for (int j = top; j < bottom; j++) {
+			if (isGreen(thresh->getThresholded(j, i))) {
+				greens++;
+				if (greens > area) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 /* Since the white blob check catches a lot of extra stuff like lines,
