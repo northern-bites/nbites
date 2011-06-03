@@ -1,4 +1,4 @@
-/* 
+/*
 
 Vision Constants that span multiple classes and systems.
 -NOTE: please only put constants here that cannot be put in one class header.
@@ -15,7 +15,7 @@ Vision Constants that span multiple classes and systems.
 #define QVGA  1  // equivalent to kQVGA
 #define VGA   2  // equivalent to kVGA
 #ifndef NAO_IMAGE_SIZE
-#  define NAO_IMAGE_SIZE QVGA
+#  define NAO_IMAGE_SIZE VGA
 #endif
 
 #define YUV422INTER_CS  9 // equivalent to kYUV422InterlaceColorSpace
@@ -51,6 +51,14 @@ Vision Constants that span multiple classes and systems.
 #define NAO_IMAGE_ROW_OFFSET          (NAO_IMAGE_WIDTH * 2)
 #define NAO_SIM_IMAGE_ROW_OFFSET      (NAO_SIM_IMAGE_WIDTH * 3)
 
+#define AVERAGED_IMAGE_WIDTH  320
+#define AVERAGED_IMAGE_HEIGHT 240
+
+// Y Image and color image are EACH this size
+#define AVERAGED_IMAGE_SIZE AVERAGED_IMAGE_WIDTH * AVERAGED_IMAGE_HEIGHT
+
+// _Two_ bytes per pixel in EACH (y/color) image
+#define AVERAGED_Y_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE * 2
 
 #define VISION_FRAME_LENGTH_MS 34
 #define VISION_FRAME_LENGTH_uS 34000
@@ -59,22 +67,27 @@ Vision Constants that span multiple classes and systems.
 
 #if ROBOT(NAO_SIM)
 
-#  define IMAGE_WIDTH NAO_SIM_IMAGE_WIDTH
-#  define IMAGE_HEIGHT NAO_SIM_IMAGE_HEIGHT
+#  define IMAGE_WIDTH AVERAGED_IMAGE_WIDTH
+#  define IMAGE_HEIGHT AVERAGED_IMAGE_HEIGHT
 #  define FOV_X_DEG NAO_SIM_FOV_X_DEG
 #  define FOV_Y_DEG NAO_SIM_FOV_Y_DEG
-#  define IMAGE_BYTE_SIZE NAO_SIM_IMAGE_BYTE_SIZE
+#  define Y_IMAGE_BYTE_SIZE AVERAGED_Y_IMAGE_BYTE_SIZE
+#  define COLOR_IMAGE_BYTE_SIZE AVERAGED_Y_IMAGE_BYTE_SIZE
 
 #  define IMAGE_ROW_OFFSET NAO_SIM_IMAGE_ROW_OFFSET
 #  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
 
 #elif ROBOT(NAO_RL)
 
-#  define IMAGE_WIDTH NAO_IMAGE_WIDTH
-#  define IMAGE_HEIGHT NAO_IMAGE_HEIGHT
+#  define IMAGE_WIDTH AVERAGED_IMAGE_WIDTH
+#  define IMAGE_HEIGHT AVERAGED_IMAGE_HEIGHT
 #  define FOV_X_DEG NAO_FOV_X_DEG
 #  define FOV_Y_DEG NAO_FOV_Y_DEG
-#  define IMAGE_BYTE_SIZE NAO_IMAGE_BYTE_SIZE
+#  define Y_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE * 2 // uint16 values
+#  define UV_IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE * 2
+#  define COLOR_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE // Byte values
+#  define IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE \
+    + COLOR_IMAGE_BYTE_SIZE
 
 #  define IMAGE_ROW_OFFSET NAO_IMAGE_ROW_OFFSET
 #  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
@@ -93,7 +106,17 @@ static const float RAD_TO_PIX_X = static_cast<float>(IMAGE_WIDTH) / static_cast<
 #define HALF_IMAGE_WIDTH  (IMAGE_WIDTH / 2)
 #define HALF_IMAGE_HEIGHT (IMAGE_HEIGHT / 2)
 
-// Core Image Constants
+/**
+ * Core Image Constants
+ */
+
+// Image byte layout constants
+#define UOFFSET  1
+#define VOFFSET  3
+#define YOFFSET1 0
+#define YOFFSET2 2
+
+
 static const float MAX_BEARING_DEG = IMAGE_WIDTH / FOV_X_DEG; // relative to cam
 static const float MAX_ELEVATION_DEG = IMAGE_HEIGHT / FOV_Y_DEG; // ''
 static const float MAX_BEARING_RAD = MAX_BEARING_DEG*TO_RAD;
@@ -129,6 +152,16 @@ static const float MAX_ELEVATION_RAD = MAX_ELEVATION_DEG*TO_RAD;
 #define MAGENTA 26
 #define PURPLE 27
 
+#define GREY_BIT 0x00
+#define WHITE_BIT 0x01
+#define GREEN_BIT 0x02
+#define BLUE_BIT 0x04
+#define YELLOW_BIT 0x08
+#define ORANGE_BIT 0x10
+#define RED_BIT 0x20
+#define NAVY_BIT 0x40
+#define DRAWING_BIT 0x80
+
 // might be used for landmark recognition certainty - now used for ball certainty
 #define SURE       2
 #define MILDLYSURE 1
@@ -162,7 +195,6 @@ static const float MAX_ELEVATION_RAD = MAX_ELEVATION_DEG*TO_RAD;
 #define ALLBLOCKED         4
 #define EITHERWAY          5
 #define MINSHOTWIDTH       10
-
 
 // Math helper functions
 //

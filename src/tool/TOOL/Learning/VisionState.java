@@ -94,8 +94,9 @@ public class VisionState {
         //init the objects
         if (rawImage != null && colorTable != null)  {
             thresholdedImage = new ProcessedImage(frame, colorTable);
-            thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
-                                                             thresholdedImage.getHeight());
+            thresholdedOverlay =
+                new ThresholdedImageOverlay(thresholdedImage.getWidth(),
+                                            thresholdedImage.getHeight());
         }
 		seeBall = false;
 		seeBlue = GoalType.NO_POST;
@@ -620,6 +621,28 @@ public class VisionState {
 					thresholdedImage.getVisionLink().
 						setDebugShooting(shootingBox.isSelected());}
 			});
+		final JCheckBox edgeDetectionBox = new
+            JCheckBox(" Debug Edge Detection");
+		edgeDetectionBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					thresholdedImage.getVisionLink().
+						setDebugEdgeDetection(edgeDetectionBox.isSelected());}
+			});
+
+        final JCheckBox houghTransformBox = new
+            JCheckBox(" Debug Hough Transform");
+        houghTransformBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    thresholdedImage.getVisionLink().
+                        setDebugHoughTransform(houghTransformBox.isSelected());}
+            });
+        final JCheckBox robotBox = new
+            JCheckBox(" Debug Robots");
+        robotBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    thresholdedImage.getVisionLink().
+                        setDebugRobot(robotBox.isSelected());}
+            });
 
 		buttonPanel.add(new JLabel("\tField Line Flags"));
 		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
@@ -648,6 +671,9 @@ public class VisionState {
 		ballPanel.add(fieldEdgeBox);
         ballPanel.add(openFieldBox);
         ballPanel.add(shootingBox);
+        ballPanel.add(edgeDetectionBox);
+        ballPanel.add(houghTransformBox);
+        ballPanel.add(robotBox);
 		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
 		JPanel debugPanel = new JPanel();
@@ -695,5 +721,8 @@ public class VisionState {
 		thresholdedImage.getVisionLink().setDebugPostCorrect(false);
 		thresholdedImage.getVisionLink().setDebugFieldHorizon(false);
 		thresholdedImage.getVisionLink().setDebugFieldEdge(false);
+		thresholdedImage.getVisionLink().setDebugEdgeDetection(false);
+		thresholdedImage.getVisionLink().setDebugHoughTransform(false);
+		thresholdedImage.getVisionLink().setDebugRobot(false);
 	}
 }

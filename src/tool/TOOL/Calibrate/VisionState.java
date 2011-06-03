@@ -102,8 +102,9 @@ public class VisionState {
         //init the objects
         if (rawImage != null && colorTable != null)  {
             thresholdedImage = new ProcessedImage(f, colorTable);
-            thresholdedOverlay = new ThresholdedImageOverlay(thresholdedImage.getWidth(),
-                                                             thresholdedImage.getHeight());
+            thresholdedOverlay =
+                new ThresholdedImageOverlay(thresholdedImage.getWidth(),
+                                            thresholdedImage.getHeight());
         }
     }
 
@@ -112,14 +113,17 @@ public class VisionState {
     public void update() {
         //if the thresholdedImage is not null, process it again
         if (thresholdedImage != null)  {
-            //we process the image; the visionLink updates itself with the new data from the bot
+            //we process the image; the visionLink updates itself with
+            //the new data from the bot
             thresholdedImage.thresholdImage(f, colorTable);
             if (!drawThreshColors) thresholdedImage.clearColoring();
             //get the ball from the link
             ball = thresholdedImage.getVisionLink().getBall();
-            visualFieldObjects = thresholdedImage.getVisionLink().getVisualFieldObjects();
+            visualFieldObjects =
+                thresholdedImage.getVisionLink().getVisualFieldObjects();
             visualLines = thresholdedImage.getVisionLink().getVisualLines();
-            expectedVisualLines = thresholdedImage.getVisionLink().getExpectedVisualLines();
+            expectedVisualLines =
+                thresholdedImage.getVisionLink().getExpectedVisualLines();
             unusedPoints = thresholdedImage.getVisionLink().getUnusedPoints();
             visualCorners = thresholdedImage.getVisionLink().getVisualCorners();
             poseHorizon = thresholdedImage.getVisionLink().getPoseHorizon();
@@ -170,6 +174,12 @@ public class VisionState {
                     break;
                 case VisualFieldObject.BLUE_CROSS:
                     color = BLUE_CROSS_COLOR;
+                    break;
+                case VisualFieldObject.NAVY_ROBOT:
+                    color = Vision.YELLOW;
+                    break;
+                case VisualFieldObject.RED_ROBOT:
+                    color = Vision.BLUE;
                     break;
                 default: color = Vision.BLACK; break;
                 }
@@ -282,4 +292,10 @@ public class VisionState {
     public void setColorTable(ColorTable c) { colorTable = c; }
     public void setBall(Ball b) { ball = b;  }
     public void setDrawThreshColors(boolean dr){ drawThreshColors = dr;}
+    public void setEdgeThreshold(int thresh){
+        thresholdedImage.getVisionLink().setEdgeThreshold(thresh);
+    }
+    public void setHoughAcceptThresh(int thresh){
+        thresholdedImage.getVisionLink().setHoughAcceptThreshold(thresh);
+    }
 }

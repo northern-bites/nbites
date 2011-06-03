@@ -17,15 +17,19 @@ STEP = 1 #currently broken in Nav.
 WALK = 0
 
 # all walk vector values must be in the range [-1,1]
-UNIT_TEST1 = ((WALK, (.5, 0, 0), 100),
+UNIT_TEST1 = ((WALK, (1, 0, 0), 100),
               (WALK, (0, .5, 0), 100),
               (WALK, (.5, -.5, .75), 75),
               (WALK, (-.4, .5, .5), 50),
               (WALK, (.2, .2, .2), 50),
               )
 
-STRAIGHT_ONLY = ((WALK, (.75, 0, 0), 150),
+STRAIGHT_ONLY = ((WALK, (1.0, 0, 0), 150),
+                 (WALK, (0, 1.0, 0), 150),
                  )
+
+STAND_STILL = ((WALK, (0, 0, 0), 300),
+               )
 
 def gamePlaying(player):
     """
@@ -36,7 +40,9 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0
-        player.unitTest = UNIT_TEST1
+        player.unitTest = STRAIGHT_ONLY
+
+        player.brain.stability.resetData()
     return player.goLater('walkTest')
 
 
@@ -45,8 +51,12 @@ def walkTest(player):
     This method processes the list of commands until there are
     none left
     """
+    stability = player.brain.stability
+    stability.updateStability() # collect stability variance data
+
     if player.firstFrame():
         if player.testCounter >= len(player.unitTest):
+            player.printf('Stability heuristic for this gait: {0}'.format(stability.getStabilityHeuristic()))
             return player.goLater('sitdown')
         currentCommand  = player.unitTest[player.testCounter]
         player.testCounter += 1
@@ -54,8 +64,8 @@ def walkTest(player):
         currentVector = currentCommand[1]
         if currentCommand[0] == WALK:
             player.setWalk(currentVector[0],
-                            currentVector[1],
-                            currentVector[2],)
+                           currentVector[1],
+                           currentVector[2],)
         elif currentCommand[0] == STEP:
             player.setSteps(currentVector[0],
                             currentVector[1],

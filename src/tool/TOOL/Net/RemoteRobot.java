@@ -133,7 +133,7 @@ public class RemoteRobot extends FileSet {
 
         if (requestDetails.image())
             f.setImage(FrameLoader.loadBytes(proto.getRobotType(),
-                proto.getImage()));
+                                             proto.getImage()));
 
         // Mark as loaded
         frameLoaded.set(f.index(), true);
@@ -186,8 +186,10 @@ public class RemoteRobot extends FileSet {
                 connect();
             proto.request(DataRequest.THRESH_ONLY);
             return new ThresholdedImage(proto.getThresh(),
-										proto.getRobotDef().imageWidth(),
-										proto.getRobotDef().imageHeight());
+                                        proto.getRobotDef().
+                                        outputImageDimensions().width,
+                                        proto.getRobotDef().
+                                        outputImageDimensions().height);
         }catch (TOOLException e) {
             NetworkModule.logError("Attempt to retrieve direct image failed",
                                    e);

@@ -7,6 +7,7 @@ from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
+from ..playbook import PBConstants
 from man.noggin.typeDefs.Location import RobotLocation
 
 class Navigator(FSA.FSA):
@@ -24,6 +25,7 @@ class Navigator(FSA.FSA):
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
+        self.justKicked = False
 
         # Goto controls
         self.dest = RobotLocation(0, 0, 0)
@@ -68,6 +70,10 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
+        if(self.brain.play.isRole(PBConstants.GOALIE)):
+            if not self.brain.play.isSubRole(PBConstants.READY_GOALIE):
+               self.switchTo('playbookGoalieWalk')
+
         self.switchTo('playbookWalk')
 
     def goTo(self,dest):
@@ -82,7 +88,8 @@ class Navigator(FSA.FSA):
                 self.switchTo('walkStraightToPoint')
 
     def stop(self):
-        if self.currentState =='stop':
+        if ((self.currentState =='stop' or self.currentState == 'stopped')
+            and not self.justKicked):
             pass
         else:
             self.switchTo('stop')

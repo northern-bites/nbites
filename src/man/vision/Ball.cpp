@@ -79,6 +79,10 @@ Ball::Ball(Vision* vis, Threshold* thr, Field* fie, Context* con, int _color)
 	blobs = new Blobs(MAX_BALLS);
 	init(0.0);
 	allocateColorRuns();
+#ifdef OFFLINE
+    BALLDEBUG = false;
+    BALLDISTDEBUG = false;
+#endif
 }
 
 
@@ -97,6 +101,71 @@ void Ball::init(float s)
 	numPoints = 0;
 }
 
+/* Is the passed in pixel Orange?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is orange or not
+ */
+bool Ball::isOrange(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW;
+#else
+	return pix & ORANGE_BIT;
+#endif
+}
+
+/* Is the passed in pixel Red?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is orange or not
+ */
+bool Ball::isRed(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == RED || pix == ORANGERED;
+#else
+	return pix & RED_BIT;
+#endif
+}
+
+/* Is the passed in pixel Yellow?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is yellow or not
+ */
+bool Ball::isYellow(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == YELLOW || pix == ORANGEYELLOW;
+#else
+	return pix & YELLOW_BIT;
+#endif
+}
+
+/* Is the passed in pixel Green?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is green or not
+ */
+bool Ball::isGreen(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == GREEN || pix == BLUEGREEN;
+#else
+	return pix & GREEN_BIT;
+#endif
+}
+
+/* Is the passed in pixel Undefined?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is undefined or not
+ */
+bool Ball::isUndefined(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == GREY;
+#else
+	return pix;
+#endif
+}
+
 /* This is the entry  point ball recognition in Threshold.cc
  * @param  h			field horizon
  * @return				always 0
@@ -110,7 +179,7 @@ void Ball::createBall(int h) {
 			int nextX = runs[i].x;
 			int nextY = runs[i].y;
 			int nextH = runs[i].h;
-			blobs->blobIt(nextX, nextY, nextH);
+			blobs->blobIt(nextX, nextY, nextH, true);
 		}
 	}
 	balls(h, vision->ball);
@@ -227,8 +296,8 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
         thisBall->init();
         return false;
     } else if (distanceDifference > DISTANCE_MISMATCH &&
-               (e.dist *2 <  thisBall->getDistance() ||
-                thisBall->getDistance() * 2 < e.dist)
+               (e.dist *2 <  focalDist.dist ||
+                focalDist.dist * 2 < e.dist)
                && e.dist < PIXACC && e.dist > 0) {
         if (BALLDEBUG) {
             cout << "Screening due to distance mismatch " << e.dist <<
@@ -336,15 +405,15 @@ void Ball::setOcclusionInformation() {
 
 /* From a given coordinate scan out in a given direction until the apparent
    edge of the ball is found.  We check for the edge using the difference
-   in the U dimension.
+   in the V dimension.
    @param x        x coord
    @param y        y coord
    @param dir      direction of scanning (1 or -1)
    @return         x value of the edge
  */
 int Ball::findBallEdgeX(int x, int y, int dir) {
-    int lastu = thresh->getU(x, y);
-    int midu = lastu;
+    int lastv = thresh->getV(x,y);
+    int midv = lastv;
     int newx = x;
     int changex = topBlob->getLeft();
     if (dir > 0) {
@@ -355,12 +424,12 @@ int Ball::findBallEdgeX(int x, int y, int dir) {
         if (y + i >= 0 && y + i < IMAGE_HEIGHT) {
             for (bool done = false; !done && newx >= 0 && newx < IMAGE_WIDTH;
                  newx+=dir) {
-                int newu = thresh->getU(newx, y + i);
-                if (abs(newu - lastu) > EDGEMISMATCH
-                    || abs(newu - midu) > EDGECENTERMISMATCH) {
+                int newv = thresh->getV(newx, y + i);
+                if (abs(newv - lastv) > EDGEMISMATCH
+                    || abs(newv - midv) > EDGECENTERMISMATCH) {
                     done = true;
                 }
-                lastu = newu;
+                lastv = newv;
             }
             if (dir < 0) {
                 if (newx + dir < changex) {
@@ -378,15 +447,15 @@ int Ball::findBallEdgeX(int x, int y, int dir) {
 
 /* From a given coordinate scan out in a given direction until the apparent
    edge of the ball is found.  We check for the edge using the difference
-   in the U dimension.
+   in the V dimension.
    @param x        x coord
    @param y        y coord
    @param dir      direction of scanning (1 or -1)
    @return         y value of the edge
  */
 int Ball::findBallEdgeY(int x, int y, int dir) {
-    int lastu = thresh->getU(x, y);
-    int midu = lastu;
+    int lastv = thresh->getV(x,y);
+    int midv = lastv;
     int newy = y;
     int changey = topBlob->getTop();
     if (dir > 0) {
@@ -397,12 +466,12 @@ int Ball::findBallEdgeY(int x, int y, int dir) {
         if (x + i >= 0 && x + i < IMAGE_WIDTH) {
             for (bool done = false; !done && newy >= 0 && newy < IMAGE_HEIGHT;
                  newy+=dir) {
-                int newu = thresh->getU(x + i, newy);
-                if (abs(newu - lastu) > EDGEMISMATCH
-                    || abs(newu - midu) > EDGECENTERMISMATCH) {
+                int newv = thresh->getV(x + i,newy);
+                if (abs(newv - lastv) > EDGEMISMATCH
+                    || abs(newv - midv) > EDGECENTERMISMATCH) {
                     done = true;
                 }
-                lastu = newu;
+                lastv = newv;
             }
             if (dir < 0) {
                 if (newy + dir < changey) {
@@ -485,7 +554,7 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
                  i++) {
                 for (int j = topBlob->getLeftTopY();
                      j < topBlob->getLeftBottomY(); j++) {
-                    if (thresh->thresholded[j][i] == ORANGE) {
+                    if (isOrange(thresh->getThresholded(j,i))) {
                         topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;
                         i = IMAGE_WIDTH;
@@ -498,8 +567,8 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
             for (int i = topBlob->getLeftTopX() + h; i > -1; i--) {
                 for (int j = topBlob->getLeftTopY();
                      j < topBlob->getLeftBottomY(); j++) {
-                    if (thresh->thresholded[j][i] == ORANGE) {
-                        topBlob->setRightTopX(i);
+                    if (isOrange(thresh->getThresholded(j,i))) {
+						topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;
                         i = -1;
                     }
@@ -650,30 +719,27 @@ float Ball::rightHalfColor(Blob tempobj)
 	int pix;
 	for (int i = spanY / 2; i < spanY; i++) {
 		for (int j = 0; j < spanX; j++) {
-			pix = thresh->thresholded[y + i][x + j];
+			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
-					x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED ||
-							pix == ORANGEYELLOW)) {
+				x + j < IMAGE_WIDTH && isOrange(pix)) {
 				good++;
 			}
 		}
 	}
 	for (int i = 0; i < spanY; i++) {
 		for (int j = 0; j < spanX / 2; j++) {
-			pix = thresh->thresholded[y + i][x + j];
+			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
-					x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED ||
-							pix == ORANGEYELLOW)) {
+				x + j < IMAGE_WIDTH && isOrange(pix)) {
 				good1++;
 			}
 		}
 	}
 	for (int i = 0; i < spanY; i++) {
 		for (int j = spanX / 2; j < spanX; j++) {
-			pix = thresh->thresholded[y + i][x + j];
+			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
-					x + j < IMAGE_WIDTH && (pix == ORANGE || pix == ORANGERED ||
-							pix == ORANGEYELLOW)) {
+				x + j < IMAGE_WIDTH && isOrange(pix)) {
 				good2++;
 			}
 		}
@@ -794,6 +860,7 @@ int	 Ball::roundness(Blob b)
 		if (BALLDEBUG) {
 			cout << "Roundness: Good " << goodPix << " " << badPix << endl;
         }
+        badPix = 0;
 		// if more than 20% or so of our pixels tested are bad, then we toss it out
 		if (goodPix < badPix * 5) {
 			return BAD_VALUE;
@@ -815,17 +882,17 @@ pair<int, int> Ball::scanMidlinesForRoundnessInformation(Blob b) {
     int pix;
     int goodPix = 0, badPix = 0;
     for (int i = 0; i < h; i++) {
-        pix = thresh->thresholded[y+i][x + w/2];
-        if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
+        pix = thresh->getThresholded(y+i,x + w/2);
+		if (isOrange(pix)) {
             goodPix++;
-        } else if (pix != GREY)
+        } else if (!isUndefined(pix))
             badPix++;
     }
     for (int i = 0; i < w; i++) {
-        pix = thresh->thresholded[y+h/2][x + i];
-        if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
+        pix = thresh->getThresholded(y+h/2,x + i);
+		if (isOrange(pix)) {
             goodPix++;
-        } else if (pix != GREY) {
+        } else if (!isUndefined(pix)) {
             badPix++;
         }
     }
@@ -854,35 +921,31 @@ pair<int, int> Ball::scanDiagonalsForRoundnessInformation(Blob b) {
     int d3 = min(w, h);
     pair<int, int> info;
     for (int i = 0; i < d3; i++) {
-        pix = thresh->thresholded[y+i][x+i];
+        pix = thresh->getThresholded(y+i,x+i);
         if (i < d || (i > d3 - d)) {
-            if (pix == ORANGE || pix == ORANGERED) {
-                //drawPoint(x+i, y+i, BLACK);
+			if (isOrange(pix)) {
                 badPix++;
             } else {
                 goodPix++;
             }
         } else {
-            if (pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW) {
+			if (isOrange(pix)) {
                 goodPix++;
-            } else if (pix != GREY) {
+            } else if (!isUndefined(pix)) {
                 badPix++;
-                //drawPoint(x+i, y+i, PINK);
             }
         }
-        pix = thresh->thresholded[y+i][x+w-i];
+        pix = thresh->getThresholded(y+i,x+w-i);
         if (i < d || (i > d3 - d)) {
-            if (pix == ORANGE || pix == ORANGERED) {
-                //drawPoint(x+w-i, y+i, BLACK);
+			if (isOrange(pix)) {
                 badPix++;
             }
             else {
                 goodPix++;
             }
-        } else if (pix == ORANGE || pix == ORANGERED ||
-                   pix == ORANGEYELLOW) {
+        } else if (isOrange(pix)) {
             goodPix++;
-        } else if (pix != GREY) {
+        } else if (isUndefined(pix)) {
             badPix++;
         }
     }
@@ -922,20 +985,24 @@ bool Ball::badSurround(Blob b) {
 	h = h + surround * 2;
 	for (int i = 0; i < w && x + i < IMAGE_WIDTH; i++) {
 		for (int j = 0; j < h && y + j < IMAGE_HEIGHT; j++) {
-			pix = thresh->thresholded[y + j][x + i];
-			if (pix == ORANGE || pix == ORANGEYELLOW) {
+			pix = thresh->getThresholded(y + j,x + i);
+			if (isOrange(pix)) {
 				orange++;
                 if (x + i >= b.getLeft() && x + i <= b.getRight() &&
                     y + j >= b.getTop() && y + j <= b.getBottom()) {
                     borange++;
                 }
-			} else if (pix == RED) {
+			}
+			if (isRed(pix)) {
 				realred++;
-			} else if (pix == ORANGERED) {
+			}
+			if (isRed(pix) && isOrange(pix)) {
 				red++;
-			} else if (pix == GREEN) {
+			}
+			if (isGreen(pix)) {
 				greens++;
-			} else if (pix == YELLOW && j < surround) {
+			}
+			if (isYellow(pix) && j < surround) {
 				yellows++;
             }
 		}
@@ -1042,6 +1109,11 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 	}
 	thisBall->setConfidence(SURE);
 	thisBall->findAngles();
+	focalDist = vision->pose->sizeBasedEstimate(thisBall->getCenterX(),
+												thisBall->getCenterY(),
+												ORANGE_BALL_RADIUS,
+												thisBall->getRadius(),
+												ORANGE_BALL_RADIUS);
 	if (occlusion == NOOCCLUSION) {
 		thisBall->setFocalDistanceFromRadius();
 		//trust pixest to within 300 cm
@@ -1049,11 +1121,7 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 			thisBall->setDistanceEst(e);
 		}
 		else {
-			thisBall->setDistanceEst(vision->pose->sizeBasedEstimate(thisBall->getCenterX(),
-																	 thisBall->getCenterY(),
-																	 ORANGE_BALL_RADIUS,
-																	 thisBall->getRadius(),
-																	 ORANGE_BALL_RADIUS));
+			thisBall->setDistanceEst(focalDist);
 		}
 	} else {
 		// user our super swell updated pix estimate to do the distance
@@ -1148,7 +1216,7 @@ void Ball::drawRun(const run& run, int c) {
  */
 void Ball::drawPoint(int x, int y, int c) {
 #ifdef OFFLINE
-	thresh->drawPoint(x, y, c);
+	vision->drawPoint(x, y, c);
 #endif
 }
 
@@ -1158,7 +1226,7 @@ void Ball::drawPoint(int x, int y, int c) {
  */
 void Ball::drawRect(int x, int y, int w, int h, int c) {
 #ifdef OFFLINE
-	thresh->drawRect(x, y, w, h, c);
+	vision->drawRect(x, y, w, h, c);
 #endif
 }
 
@@ -1168,18 +1236,18 @@ void Ball::drawRect(int x, int y, int w, int h, int c) {
  */
 void Ball::drawBlob(Blob b, int c) {
 #ifdef OFFLINE
-	thresh->drawLine(b.getLeftTopX(), b.getLeftTopY(),
-					 b.getRightTopX(), b.getRightTopY(),
-					 c);
-	thresh->drawLine(b.getLeftTopX(), b.getLeftTopY(),
-					 b.getLeftBottomX(), b.getLeftBottomY(),
-					 c);
-	thresh->drawLine(b.getLeftBottomX(), b.getLeftBottomY(),
-					 b.getRightBottomX(), b.getRightBottomY(),
-					 c);
-    thresh->drawLine(b.getRightTopX(), b.getRightTopY(),
-					 b.getRightBottomX(), b.getRightBottomY(),
-					 c);
+	vision->drawLine(b.getLeftTopX(), b.getLeftTopY(),
+			 b.getRightTopX(), b.getRightTopY(),
+			 c);
+	vision->drawLine(b.getLeftTopX(), b.getLeftTopY(),
+			 b.getLeftBottomX(), b.getLeftBottomY(),
+			 c);
+	vision->drawLine(b.getLeftBottomX(), b.getLeftBottomY(),
+			 b.getRightBottomX(), b.getRightBottomY(),
+			 c);
+	vision->drawLine(b.getRightTopX(), b.getRightTopY(),
+			 b.getRightBottomX(), b.getRightBottomY(),
+			 c);
 #endif
 }
 
@@ -1192,7 +1260,7 @@ void Ball::drawBlob(Blob b, int c) {
  */
 void Ball::drawLine(int x, int y, int x1, int y1, int c) {
 #ifdef OFFLINE
-	thresh->drawLine(x, y, x1, y1, c);
+	vision->drawLine(x, y, x1, y1, c);
 #endif
 }
 

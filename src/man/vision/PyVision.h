@@ -691,6 +691,8 @@ typedef struct PyBall_t {
     PyObject *bearing;
     PyObject *elevation;
     PyObject *confidence;
+    PyObject *angleX;
+    PyObject *angleY;
 } PyBall;
 
 // C++ - accessible interface
@@ -734,6 +736,10 @@ static PyMemberDef PyBall_members[] = {
      "Ball elevation"},
     {"confidence", T_OBJECT_EX, offsetof(PyBall, confidence), READONLY,
      "Ball confidence (that it exists)"},
+    {"angleX", T_OBJECT_EX, offsetof(PyBall, angleX), READONLY,
+     "Ball angle X value"},
+    {"angleY", T_OBJECT_EX, offsetof(PyBall, angleY), READONLY,
+     "Ball angle Y value"},
 
     /* Sentinal */
     { NULL }
@@ -801,6 +807,8 @@ typedef struct PyFieldObject_t {
     PyObject *bearing;
     PyObject *certainty;
     PyObject *distCertainty;
+    PyObject *angleX;
+    PyObject *angleY;
 } PyFieldObject;
 
 // C++ - accessible inteface
@@ -846,6 +854,10 @@ static PyMemberDef PyFieldObject_members[] = {
      "Object certainty (that it exists)"},
     {"distCertainty", T_OBJECT_EX, offsetof(PyFieldObject, distCertainty),
      READONLY, "Object distance certainty"},
+    {"angleX", T_OBJECT_EX, offsetof(PyFieldObject, angleX), READONLY,
+     "FieldObject angle X value"},
+    {"angleY", T_OBJECT_EX, offsetof(PyFieldObject, angleY), READONLY,
+     "FieldObject angle Y value"},
 
     /* Sentinal */
     { NULL }
@@ -921,7 +933,7 @@ typedef struct PyVision_t {
     PyObject *bgCrossbar, *ygCrossbar;
 
     // Robot recognition
-    PyObject *red1, *red2, *navy1, *navy2;
+    PyObject *red1, *red2, *red3, *navy1, *navy2, *navy3;
     // Orange ball
     PyObject *ball;
 

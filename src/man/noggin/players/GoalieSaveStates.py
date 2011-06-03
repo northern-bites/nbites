@@ -1,6 +1,6 @@
 # These are the states for goalie saves.
-#They should be able to dive right and left 
-#and save center however right now they only 
+#They should be able to dive right and left
+#and save center however right now they only
 #allow you to saveCenter which is the goalie
 #squat.
 import man.motion.SweetMoves as SweetMoves
@@ -8,7 +8,7 @@ import GoalieTransitions as helper
 
 CENTER_SAVE_THRESH = 15
 
-TESTING = True
+TESTING = False
 
 def goalieSave(player):
 
@@ -36,23 +36,15 @@ def goalieSave(player):
     # else:
         # player.stopWalking()
 
-def goaliePickSave(player):   
-    player.brain.fallController.disable()
+def goaliePickSave(player):
+    player.brain.fallController.enableFallProtection(False)
 
-    if(TESTING):
-        if helper.shouldSaveRight(player):
-            return player.goNow('testSaveRight')
-        elif helper.shouldSaveLeft(player):
-            return player.goNow('testSaveLeft')
-        elif helper.shouldSaveCenter(player):
-            return player.goNow('testSaveCenter')
-    else:
-        if helper.shouldSaveRight(player):
-            return player.goNow('saveRight')
-        elif helper.shouldSaveLeft(player):
-            return player.goNow('saveLeft')
-        elif helper.shouldSaveCenter(player):
-            return player.goNow('saveCenter')
+    if helper.shouldSaveRight(player):
+        return player.goNow('saveRight')
+    elif helper.shouldSaveLeft(player):
+        return player.goNow('saveLeft')
+    elif helper.shouldSaveCenter(player):
+        return player.goNow('saveCenter')
 
     return player.stay()
 
@@ -129,6 +121,6 @@ def postCenterSave(player):
     return player.stay()
 def postDiveSave(player):
     if player.brain.nav.isStopped():
-        player.brain.fallController.enable()
+        player.brain.fallController.enableFallProtection(True)
         player.isSaving = False
         return player.stay()

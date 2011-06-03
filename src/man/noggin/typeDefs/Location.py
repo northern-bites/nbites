@@ -27,6 +27,9 @@ class Location (object):
     def __str__(self):
         return ("x: %g  y: %g z: %g" % (self.x, self.y, self.z))
 
+    def toTupleXY(self):
+        return (self.x, self.y)
+
     def distTo(self, other, forceCalc = False):
         """
         returns euclidian dist
@@ -98,36 +101,14 @@ class RobotLocation(Location):
 
     def spinDirToPoint(self, other):
         """
-        Advanced function to get the spin direction for a given point.
+        Simple function to get the spin direction for a given point.
         """
-        LEFT_SPIN = 1.
-        RIGHT_SPIN = -1.
-        spinDir = 0
-
         targetH = self.getRelativeBearing(other)
 
         if targetH == 0:
-            spinDir = -MyMath.sign(self.h)
-
-        elif targetH == (180 or -180):
-            spinDir = MyMath.sign(self.h)
-
-        elif MyMath.sign(targetH) == MyMath.sign(self.h):
-            spinDir = MyMath.sign(targetH - self.h)
-
-        elif self.h < 0:
-            if (self.h + 180) >= targetH:
-                spinDir = LEFT_SPIN
-            else: # h+180 < targetH
-                spinDir = RIGHT_SPIN
-
-        else: # h>0
-            if (self.h - 180) >= targetH:
-                spinDir = LEFT_SPIN
-            else:
-                spinDir = RIGHT_SPIN
-
-        return spinDir
+            return -MyMath.sign(self.h) # return 0???
+        else:
+            return MyMath.sign(targetH)
 
     def isFacingSideline(self):
 

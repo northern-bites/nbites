@@ -37,7 +37,7 @@
   <target name="compile"
           description="compile the source " >
     <mkdir dir="${build.dir}"/>
-    <javac srcdir="." destdir="${build.dir}">
+    <javac srcdir="." destdir="${build.dir}" debug="true">
       <classpath refid="tool.paths"/>
     </javac>
   </target>

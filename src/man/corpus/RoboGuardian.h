@@ -51,18 +51,16 @@ public:
     void speakIPAddress()const;
 
     //getters
-    bool isRobotFalling()const { return falling; }
-    bool isRobotFallen()const { return fallen; }
+    bool isRobotFalling()const { return useFallProtection && falling; }
+    bool isRobotFallen()const { return useFallProtection && fallen; }
+	bool isFeetOnGround()const { return useFallProtection && feetOnGround; }
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
     void setMotionInterface(MotionInterface * minterface)
         { motion_interface = minterface; }
 
-//private: // Since this feature is not really production ready
-// from George: I removed the private tag, so that Python can call this method
-    //setters
-    void enableFallProtection(bool _useFallProtection)const //off by default
+    void enableFallProtection(bool _useFallProtection) const
         { useFallProtection = _useFallProtection; };
 
 
@@ -74,6 +72,7 @@ public:
 private:
     void checkFalling();
     void checkFallen();
+	void checkFeetOnGround();
     void checkBatteryLevels();
     void checkTemperatures();
     void checkConnection();
@@ -103,13 +102,13 @@ private:
         rightFootButton;
 
     Inertial lastInertial;
-    int fallingFrames,notFallingFrames,fallenCounter;
+    int fallingFrames,notFallingFrames,fallenCounter,groundOnCounter,groundOffCounter;
     bool registeredFalling;
-    int wifiReconnectTimeout;
-
     bool registeredShutdown;
 
-    bool falling, fallen;
+    int wifiReconnectTimeout;
+
+    bool falling, fallen, feetOnGround;
     mutable bool useFallProtection;
 
     mutable pthread_mutex_t click_mutex;

@@ -19,7 +19,7 @@ def gameInitial(player):
 def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
-        player.brain.fallController.disable()
+        player.brain.fallController.enableFallProtection(False)
         player.brain.tracker.trackBall()
         #player.brain.tracker.activeLoc()
         player.standup()
@@ -135,7 +135,7 @@ def testShouldPositionRight(player):
         if goalTran.shouldPositionRight(player):
             print "position right"
         elif goalTran.shouldPositionLeft(player):
-            print "position left"    
+            print "position left"
         elif goalTran.shouldPositionCenter(player):
             print "postion center"
 

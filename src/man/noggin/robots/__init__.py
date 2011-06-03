@@ -33,6 +33,7 @@ and is thus responsible for saving the Universe.''',
 			dribble_gait = gaits.MARVIN_DRIBBLE_GAIT,
 			backwards_gait = gaits.MARVIN_BACKWARDS_GAIT,
 			slow_gait = gaits.MARVIN_SLOW_GAIT,
+			spin_gait = gaits.CUR_SPIN_GAIT,
 			)
 
 slarti = BirthCertificate.BirthCertificate(
@@ -48,6 +49,7 @@ pieces of the Wikkit Gate!''',
 			dribble_gait = gaits.SLARTI_DRIBBLE_GAIT,
 			backwards_gait = gaits.SLARTI_BACKWARDS_GAIT,
 			slow_gait = gaits.SLARTI_SLOW_GAIT,
+			spin_gait = gaits.CUR_SPIN_GAIT,
 			)
 
 trillian = BirthCertificate.BirthCertificate(
@@ -61,6 +63,7 @@ rebellion, I became a highly successful Sub Etha radio reporter.''',
 			dribble_gait = gaits.TRILLIAN_DRIBBLE_GAIT,
 			backwards_gait = gaits.TRILLIAN_BACKWARDS_GAIT,
 			slow_gait = gaits.TRILLIAN_SLOW_GAIT,
+			spin_gait = gaits.CUR_SPIN_GAIT,
 			)
 
 zaphod = BirthCertificate.BirthCertificate(
@@ -76,6 +79,7 @@ Krikkit robots.''',
 			dribble_gait = gaits.ZAPHOD_DRIBBLE_GAIT,
 			backwards_gait = gaits.ZAPHOD_BACKWARDS_GAIT,
 			slow_gait = gaits.ZAPHOD_SLOW_GAIT,
+			spin_gait = gaits.CUR_SPIN_GAIT,
 			)
 
 spock = BirthCertificate.BirthCertificate(
@@ -91,6 +95,7 @@ my father. I provide an emotionally detached, logical perspective to the crew.''
 		   dribble_gait = gaits.SPOCK_DRIBBLE_GAIT,
 		   backwards_gait = gaits.SPOCK_BACKWARDS_GAIT,
 		   slow_gait = gaits.SPOCK_SLOW_GAIT,
+		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
 scotty = BirthCertificate.BirthCertificate(
@@ -107,6 +112,7 @@ transporter to keep me suspended in transit for 75 years.''',
 		   dribble_gait = gaits.SCOTTY_DRIBBLE_GAIT,
 		   backwards_gait = gaits.SCOTTY_BACKWARDS_GAIT,
 		   slow_gait = gaits.SCOTTY_SLOW_GAIT,
+		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
 data = BirthCertificate.BirthCertificate(
@@ -123,6 +129,7 @@ despite Dr. Maddox's attempt to prove me non-sentient.''',
 		   dribble_gait = gaits.DATA_DRIBBLE_GAIT,
 		   backwards_gait = gaits.DATA_BACKWARDS_GAIT,
 		   slow_gait = gaits.DATA_SLOW_GAIT,
+		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
 dax = BirthCertificate.BirthCertificate(
@@ -138,6 +145,7 @@ Officer on the Deep Space Nine space station.''',
 		   dribble_gait = gaits.DAX_DRIBBLE_GAIT,
 		   backwards_gait = gaits.DAX_BACKWARDS_GAIT,
 		   slow_gait = gaits.DAX_SLOW_GAIT,
+		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
 annika = BirthCertificate.BirthCertificate(
@@ -154,6 +162,7 @@ know best, although the crew shortened it to Seven.''',
 		   dribble_gait = gaits.ANNIKA_DRIBBLE_GAIT,
 		   backwards_gait = gaits.ANNIKA_BACKWARDS_GAIT,
 		   slow_gait = gaits.ANNIKA_SLOW_GAIT,
+		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
 robot_map = { marvin.name	: marvin,
@@ -180,6 +189,7 @@ from its hostname (%s).	 The recognized robots are %s.''' %
 			dribble_gait = gaits.WEBOTS_GAIT,
 			backwards_gait = gaits.BACKWARDS_GAIT,
 			slow_gait = gaits.WEBOTS_GAIT,
+			spin_gait = gaits.CUR_SPIN_GAIT,
 			)
 
 

@@ -17,11 +17,11 @@ PFK_MIN_X_MAGNITUDE = speeds.MIN_OMNI_X_MAGNITUDE
 PFK_MIN_SPIN_MAGNITUDE = speeds.MIN_SPIN_WHILE_X_MAGNITUDE
 
 # Buffering values, insure that we eventually kick the ball
-PFK_CLOSE_ENOUGH_X = 2.0
-PFK_CLOSE_ENOUGH_Y = 5.0
+PFK_CLOSE_ENOUGH_X = 2.7
+PFK_CLOSE_ENOUGH_Y = 2.7
 PFK_CLOSE_ENOUGH_THETA = 11
-PFK_MAX_X_SPEED_DIST = 30
-PFK_MAX_Y_SPEED_DIST = 16
+PFK_MAX_X_SPEED_DIST = 80
+PFK_MAX_Y_SPEED_DIST = 20
 
 """
 Control State for PFK. Breaks up the problem into
@@ -40,7 +40,7 @@ def pfk_all(nav):
         nav.stopTheta = True
         nav.stopY = False
         nav.stopX = False
-        print "entered from: ", nav.lastDiffState
+        #print "entered from: ", nav.lastDiffState
 
     # get our ideal relative positionings from the kick
     (x_offset, y_offset, heading) = nav.kick.getPosition()
@@ -63,7 +63,7 @@ def pfk_all(nav):
     if not nav.stopX:
         sX = pfk_x(nav, ball, x_offset)
         if (sX < 0):
-            print "dangerous ball detected during PFK"
+            #print "dangerous ball detected during PFK"
             helper.setSlowSpeed(nav, sX, 0, 0)
             return nav.stay()
 
@@ -81,16 +81,16 @@ accurately on the ball and returns that value
 """
 #def pfk_theta(nav, ball, targetTheta)
 #
-# NOT IMPLEMENTED!!! Curently all theta positioning is done by approach ball.
+# NOT IMPLEMENTED!!! Curently all theta positioning is done by approachBall.
 #
 # Must use a global heading target based on a global robot heading.
-# Currently loc is unreliable so this cannot be done well.
-# Ideally, the kick would be determined at the time we decide to chase
-# the ball, maybe changed dynamically if we start recognizing other
-# robots, or if we have to avoid along the way. This would mean
-# positioning along a good theta direction. When motion has a good
-# OmniWalk, or walking along a path functionality, this would be more
-# achievable, maybe included in the motion system.
+# Currently loc is unreliable so this cannot be done well. Ideally,
+# the kick would be determined at the time we decide to chase the ball,
+# changed dynamically if we start recognizing other robots, or if the
+# ball moves along the way. This would mean positioning along a good
+# theta direction from the start to reach the ball effectively and then
+# fine turning for the kick. Once walking to a destination is implemented
+# this will be much more achievable. Work around for now.
 
 """
 Determines the speed in the y direction to position

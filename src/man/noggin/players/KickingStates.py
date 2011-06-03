@@ -1,3 +1,5 @@
+import ChaseBallTransitions as transitions
+
 """
 Here we house all of the state methods used for kicking the ball
 """
@@ -30,6 +32,7 @@ def kickBallExecute(player):
             player.penaltyMadeSecondKick = True
 
     if player.counter > 1 and player.brain.nav.isStopped():
+        player.brain.nav.justKicked = True
         return player.goLater('afterKick')
 
     return player.stay()
@@ -49,11 +52,15 @@ def afterKick(player):
 
         return player.stay()
 
+    player.brain.tracker.trackBall()
+
     if player.brain.ball.on:
-        player.brain.tracker.trackBall()
+        player.inKickingState = False
+        player.brain.nav.justKicked = False
         return player.goLater('chase')
 
-    if not player.brain.motion.isHeadActive():
+    if transitions.shouldScanFindBall(player):
         player.inKickingState = False
+        player.brain.nav.justKicked = False
         return player.goLater('scanFindBall')
     return player.stay()

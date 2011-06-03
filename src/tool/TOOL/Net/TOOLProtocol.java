@@ -24,6 +24,7 @@ import java.util.Vector;
 
 import TOOL.TOOL;
 import TOOL.Data.RobotDef;
+import TOOL.Data.DataTypes;
 import TOOL.WorldController.Observation;
 import TOOL.WorldController.LocalizationPacket;
 
@@ -166,39 +167,33 @@ public class TOOLProtocol {
 
     public void processInfo() {
         gotInfo = true;
-        switch (robotType) {
-		case RobotDef.AIBO:
-		case RobotDef.AIBO_ERS7:
-			robotDef = RobotDef.ERS7_DEF;
-			break;
-		case RobotDef.AIBO_220:
-			robotDef = RobotDef.ERS220_DEF;
-			break;
-		case RobotDef.NAO:
-		case RobotDef.NAO_RL:
-		case RobotDef.NAO_VER:
-			robotDef = RobotDef.NAO_DEF_VERSIONED;
-			robotDef.setVersion(0);
-			break;
-		case RobotDef.NAO_SIM:
-			robotDef = RobotDef.NAO_SIM_DEF;
-			break;
-		default:
-			robotDef = null;
-			gotInfo = false;
+        robotDef = getRobotType().getRobotDef();
+        if (robotDef == RobotDef.NAO_DEF_VERSIONED) {
+            robotDef.setVersion(0);
         }
 
         if (robotDef != null) {
             joints = new float[robotDef.numJoints()];
             sensors = new float[robotDef.numSensors()];
-            image = new byte[robotDef.rawImageSize()];
-            thresh = new byte[robotDef.imageWidth() * robotDef.imageHeight()];
+
+            image = new byte[robotDef.inputImageByteSize()];
+            thresh = new byte[robotDef.outputImageSize()];
         }
     }
 
     public void request(DataRequest r) {
         if (!connected)
             return;
+        byte[] data = r.getBytes();
+        for (int i=0; i < data.length; i++){
+            byte type = data[i];
+
+            if (type == 1 &&
+                !DataRequest.isImplemented(DataTypes.DataType.values()[i])){
+                System.out.println("Data Request is not implemented");
+                return;
+            }
+        }
 
         try {
 
@@ -208,9 +203,7 @@ public class TOOLProtocol {
 
             if (r.info()) {
                 robotType = serial.readByte();
-				if (robotType == RobotDef.NAO_RL || robotType == RobotDef.NAO){
-					robotType = RobotDef.NAO_VER;
-				}
+
                 byte buf[] = new byte[1024];
                 int length = serial.readBytes(buf, true);
                 robotName = new String(buf, 0, length, "US-ASCII");
@@ -283,8 +276,16 @@ public class TOOLProtocol {
         return null;
     }
 
-    public int getRobotType() {
-        return robotType;
+    public RobotDef.ImageType getRobotType() {
+        switch(robotType){
+        case RobotDef.NAO_SIM_NUM:
+            return RobotDef.ImageType.NAO_SIM;
+        case RobotDef.NAO_NUM:
+        case RobotDef.NAO_RL_33_NUM:
+        case RobotDef.NAO_RL_NUM:
+        default:
+            return RobotDef.ImageType.NAO_VER;
+        }
     }
 
     public RobotDef getRobotDef() {

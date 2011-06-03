@@ -35,6 +35,10 @@ Cross::Cross(Vision* vis, Threshold* thr, Field* fie, Context* con)
     const int MAX_CROSS_RUNS = 400;
 	blobs = new Blobs(MAX_CROSS_RUNS);
 	allocateColorRuns();
+
+#ifdef OFFLINE
+    CROSSDEBUG = false;
+#endif
 }
 
 
@@ -47,10 +51,41 @@ void Cross::init()
 	numberOfRuns = 0;
 }
 
-/* This is the entry  point for cross detection called in Threshold.cc
+/* This is the entry  point for cross detection called in Threshold.cpp.
+   Now only builds blobs for use here and in Robots.cpp.  The actual
+   checking occurs in the next method.
  */
 
 void Cross::createObject() {
+	// do basic run-length encoding
+	if (numberOfRuns > 1) {
+		for (int i = 0; i < numberOfRuns; i++) {
+			// search for contiguous blocks
+			int nextX = runs[i].x;
+			int nextY = runs[i].y;
+			int nextH = runs[i].h;
+			blobs->blobIt(nextX, nextY, nextH, false);
+		}
+	}
+
+	if (CROSSDEBUG){
+		cout << blobs->number() << " white blobs" << endl;
+	}
+}
+
+bool Cross::checkForRobotBlobs(Blob blob) {
+    for (int i = 0; i < blobs->number(); i++) {
+        if (blobs->get(i).isAligned(blob)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/* See if any of our candidate blobs are actually worthy crosses.
+ */
+
+void Cross::checkForCrosses() {
 	// TODO:  These were thrown together in an hour.  They should
 	// be more rigorously determined
 	const int maxWidth = 75;
@@ -59,21 +94,6 @@ void Cross::createObject() {
 	const int minHeight = 5;
 	const int maxRatio = 5;
 
-	// do basic run-length encoding
-	if (numberOfRuns > 1) {
-		for (int i = 0; i < numberOfRuns; i++) {
-			// search for contiguous blocks
-			int nextX = runs[i].x;
-			int nextY = runs[i].y;
-			int nextH = runs[i].h;
-			blobs->blobIt(nextX, nextY, nextH);
-		}
-	}
-
-	if (CROSSDEBUG){
-		cout << blobs->number() << " white blobs" << endl;
-	}
-
 	// loop through all the blobs and test the ones that are the right
 	// basic size
 	for (int i = 0; i < blobs->number(); i++) {
@@ -81,6 +101,8 @@ void Cross::createObject() {
 		if (CROSSDEBUG) {
 			cout << "Blob " << candidate.width() << " " << candidate.height() << endl;
 			cout << "Coords " << candidate.getLeft() << " " << candidate.getTop() << endl;
+            vision->drawRect(candidate.getLeft(), candidate.getTop(),
+                             candidate.width(), candidate.height(), BLACK);
 		}
 		if (candidate.width() < maxWidth && candidate.height() < maxHeight &&
 			candidate.width() > minWidth && candidate.height() > minHeight &&
@@ -138,18 +160,20 @@ bool Cross::scanAroundPerimeter(Blob b) {
 	// first scan the sides
 	for (int i = max(0, y - 2); i < min(IMAGE_HEIGHT - 1, y + h + 2); i++) {
 		if (x > 3) {
-			if (thresh->thresholded[i][x - 4] == GREEN)
+			if (isGreen(thresh->getThresholded(i,x - 4))) {
 				count++;
-			else if (thresh->thresholded[i][x - 4] == WHITE)
+			} else if (isWhite(thresh->getThresholded(i,x - 4))) {
 				count-=3;
+			}
 			counter++;
 		} else return false;
 
 		if (x + w + 4 < IMAGE_WIDTH) {
-			if (thresh->thresholded[i][x + w+ 4] == GREEN)
+			if (isGreen(thresh->getThresholded(i,x + w+ 4))) {
 				count++;
-			else if (thresh->thresholded[i][x + w+ 4] == WHITE)
+			} else if (isWhite(thresh->getThresholded(i,x + w+ 4))) {
 				count-=3;
+			}
 			counter++;
 		} else return false;
 	}
@@ -157,20 +181,22 @@ bool Cross::scanAroundPerimeter(Blob b) {
 	// now scan above and below
 	for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
 		if (y > 1) {
-			if (thresh->thresholded[y - 2][i] == GREEN)
+			if (isGreen(thresh->getThresholded(y - 2,i))) {
 				count++;
-		else if (thresh->thresholded[y - 2][i] == GREY)
-		  count--;
-			else if (thresh->thresholded[y - 2][i] == WHITE)
+            } else if (isUndefined(thresh->getThresholded(y - 2,i))) {
+				count--;
+			} else if (isWhite(thresh->getThresholded(y - 2,i))) {
 				count-=3;
+			}
 			counter++;
 		} else return false;
 
 		if (y + h + 2 < IMAGE_HEIGHT) {
-			if (thresh->thresholded[y+h+2][i] == GREEN)
+			if (isGreen(thresh->getThresholded(y+h+2,i))) {
 				count++;
-			else if (thresh->thresholded[y+h+2][i] == WHITE)
+			} else if (isWhite(thresh->getThresholded(y+h+2,i))) {
 				count-=3;
+			}
 			counter++;
 		} else return false;
 	}
@@ -368,7 +394,7 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
 
 			if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
 				total++;
-				if (thresh->thresholded[ny][nx] == WHITE) {
+				if (isWhite(thresh->getThresholded(ny,nx))) {
 					good++;
 				}
 			}
@@ -381,3 +407,44 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
 	}
 	return false;
 }
+
+/* Is the passed in pixel White?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is white or not
+ */
+bool Cross::isWhite(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == WHITE;
+#else
+	return pix & WHITE_BIT;
+#endif
+}
+
+/* Is the passed in pixel Green?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is green or not
+ */
+bool Cross::isGreen(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == GREEN || pix == BLUEGREEN;
+#else
+	return pix & GREEN_BIT;
+#endif
+}
+
+/* Is the passed in pixel Undefined?  Note: this is a transitional step towards
+   swapping our color tables to use bitwise operators.
+   @param pix    the pixel to test
+   @return       whether it is undefined or not
+ */
+bool Cross::isUndefined(unsigned char pix) {
+#ifdef SOFTCOLORS
+	return pix == GREY;
+#else
+	return pix == 0x00;
+#endif
+}
+
+

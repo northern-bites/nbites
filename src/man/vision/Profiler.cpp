@@ -6,6 +6,8 @@
 
 #include "Profiler.h"
 
+// #define PRINT_CSV
+
 static const char *PCOMPONENT_NAMES[] = {
   "GetImage",
   "Vision",
@@ -15,6 +17,16 @@ static const char *PCOMPONENT_NAMES[] = {
   "FGHorizon",
   "Runs",
   "Object",
+
+  "Edges",
+  "Sobel",
+  "Edge Peaks",
+
+  "Hough Transform",
+  "Mark Hough Edges",
+  "Smooth Hough Space",
+  "Hough Peaks",
+  "Suppress Hough Lines",
 
   "Lines",
   "Vert Lines",
@@ -54,6 +66,16 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 	/*P_FGHORIZON				--> */ P_THRESHRUNS,
 	/*P_RUNS					--> */ P_THRESHRUNS,
 	/*P_OBJECT					--> */ P_VISION,
+
+    /*P_EDGES,                  --> */ P_VISION,
+    /*P_SOBEL,                  --> */ P_EDGES,
+    /*P_EDGE_PEAKS,             --> */ P_EDGES,
+
+    /*P_HOUGH,                  --> */ P_VISION,
+    /*P_MARK_EDGES,             --> */ P_HOUGH,
+    /*P_SMOOTH,                 --> */ P_HOUGH,
+    /*P_HOUGH_PEAKS,            --> */ P_HOUGH,
+    /*P_SUPPRESS,               --> */ P_HOUGH,
 
 	/*P_LINES					--> */ P_VISION,
 	/*P_VERT_LINES,				--> */ P_LINES,
@@ -122,7 +144,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
  */
 
 Profiler::Profiler (long long (*f) ())
-  : timeFunction(f)
+    : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),timeFunction(f)
 {
   reset();
 }
@@ -200,6 +222,31 @@ Profiler::printCurrent ()
 void
 Profiler::printSummary ()
 {
+#ifdef PRINT_CSV
+    printCSVSummary();
+#else
+    printIndentedSummary();
+#endif /* PRINT_CSV */
+}
+
+void
+Profiler::printCSVSummary()
+{
+    printf("%s,%s,%s", "Component Name", "Sum Time", "Avg. Time\n");
+    for (int i = 0; i < NUM_PCOMPONENTS; ++i) {
+        if (shouldNotPrintLine(i))
+            continue;
+        printf("%s,%.10llu,%.6llu\n",
+               PCOMPONENT_NAMES[i],
+               sumTime[i],
+               (sumTime[i]/(current_frame+1) )
+            );
+    }
+}
+
+void
+Profiler::printIndentedSummary()
+{
   printf("Profiler Summary: %i Frames\n", (current_frame+1));
 
   // Calculate depths of sub-components, for indented display
@@ -225,6 +272,11 @@ Profiler::printSummary ()
   for (int i = 0; i < NUM_PCOMPONENTS; i++) {
     comp = PCOMPONENT_SUB_ORDER[i];
     parent_sum = (float)sumTime[comp];
+
+    if (shouldNotPrintLine(i) &&
+        (maxPrintDepth != PRINT_ALL_DEPTHS && depths[i] > maxPrintDepth))
+        continue;
+
     // depth-based indentation
     printf("%*s", depths[i]*2, "");
     if (sumTime[i] == 0)

@@ -21,7 +21,7 @@ TIME_PER_STEP = TIME_STEP/1000.
 ##
 ##--------------------TEAM STUFF-----------------------#
 ##
-NUM_PLAYERS_PER_TEAM = 3
+NUM_PLAYERS_PER_TEAM = 4
 LENGTH_OF_HALF = 600 #in seconds
 # Setup colors
 NUM_GAME_TEAM_COLORS = 2
@@ -32,7 +32,7 @@ teamColorDict = dict(zip(range(NUM_GAME_TEAM_COLORS),\
 ##
 ##--------------------VISION CONNECTION CONSTANTS------#
 ##
-IMAGE_SIZE = "QVGA"
+IMAGE_SIZE = "QVGA"             # 320x240 is what gets processed by vision
 CAMERA_FPS = 15
 # image constants, used for angle x,y setters
 if IMAGE_SIZE == "VGA":
@@ -70,7 +70,7 @@ NUM_FIELD_OBJECT_DIST_CERTAINTIES = 4
 ##
 
 # Switch to tell us if we are using the lab field or not
-USING_LAB_FIELD = True
+USING_LAB_FIELD = False
 
 #---Landmark Constants------#
 # Notes:
@@ -144,6 +144,9 @@ else:
 
 MIDFIELD_X = CENTER_FIELD_X
 MIDFIELD_Y = CENTER_FIELD_Y
+
+# y distance between sidelines and goalbox
+OUTSIDE_GOALBOX_Y = MIDFIELD_Y - GOALBOX_WIDTH*0.5
 
 # my goal box constants relative to (0,0) on my team
 MY_GOALBOX_LEFT_X = GREEN_PAD_X

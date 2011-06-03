@@ -1,6 +1,6 @@
 # .:: Basic Definitions ::::::::::::::::::::::::::::::::::::::::::::::::
 #
-# The basic diefinitions for the Northern Bites cmake packages, used
+# The basic definitions for the Northern Bites cmake packages, used
 # throughout different packages' configurations
 
 ############################ DISPLAY
@@ -30,6 +30,16 @@ SET( CMAKE_BUILD_TYPE CACHE FORCE "Release")
 # Note: We override the default CMAKE release and debug flags with our own
 # Note: We set the C flags to be the same as the CXX flags
 
+# NOTE: This is clearly a hack. Only Linux has librealtime, but I was
+#       having a hard time trying to figure out how to get every
+#       module to link against this library without adding it to every
+#       single library definition. This was the solution I came up with.
+#        -- Jack
+if (UNIX AND NOT APPLE)
+  SET( CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS} -lrt")
+endif()
+
 # Default (no release specific) build flags
 SET( CMAKE_CXX_FLAGS
   "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-write-strings")
@@ -45,7 +55,6 @@ SET( CMAKE_CXX_FLAGS_DEBUG
   "-g3" )
 SET( CMAKE_C_FLAGS_DEBUG
   "${CMAKE_CXX_FLAGS_DEBUG}" )
-
 
 ############################ TRUNK PATH
 # Ensure the TRUNK_PATH variable is set
@@ -75,7 +84,7 @@ SET( BUILD_DIR ${NBITES_DIR}/build/man )
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-  SET( AL_DIR "/usr/local/nao-1.10" )
+  SET( AL_DIR "/usr/local/nao-1.10.25" )
   SET( ENV{AL_DIR} ${AL_DIR} )
   MESSAGE( STATUS
     "reseting Environment variable AL_DIR to default ${AL_DIR}" )
@@ -131,7 +140,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 # Definitions for the type of robot (for compilation definitions), and
 # prefixes for library, executable, and path names
 IF( NOT DEFINED ROBOT_TYPE )
-  SET( ROBOT_TYPE NAO_RL )
+  SET( ROBOT_TYPE NAO_RL_33 )
 ENDIF( NOT DEFINED ROBOT_TYPE )
 SET( ROBOT_TYPE ${ROBOT_TYPE} CACHE STRING "Robot type" )
 SET( ROBOT_PREFIX nao )

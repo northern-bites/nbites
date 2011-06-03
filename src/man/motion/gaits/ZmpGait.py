@@ -17,13 +17,13 @@ STEP_CONFIG = (0.375, # step duration
                0.3,  # fraction in double support
                1.95,  # stepHeight
                -3.25,  # step lift
-               18.0,  # max x speed
+               15.0,  # max x speed
                -9.0,  # max x speed (backwards)
                11.0,  # max y speed
-               25.0, # max theta speed()
-               4.0,  # max x accel
-               4.0,  # max y accel
-               20.0, # max theta speed()
+               30.0, # max theta speed()
+               3.0,  # max x accel
+               3.0,  # max y accel
+               15.0, # max theta accel
                WALKING)  # walking gait = true
 
 ZMP_CONFIG = (0.0,  # footCenterLocX
@@ -42,7 +42,7 @@ MARVIN_SENSOR_CONFIG = (0.0,   # Feedback type (1.0 = spring, 0.0 = old)
                         0.00,  # spring constant k (kg/s^2)
                         0.00,  # spring constant k (kg/s^2)
                         7.0,   # max angle X (compensation)
-                        3.0,   # max angle Y
+                        4.0,   # max angle Y
                         45.0)   # max angle vel (change in compensation)
 
 STIFFNESS_CONFIG = (0.9, #hipStiffness

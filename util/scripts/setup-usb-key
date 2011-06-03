@@ -25,6 +25,7 @@ cp $CONFIG_DIR/naoqi.nbites $ROOT_PART/etc/init.d/naoqi
 LIB_DIR=../../lib
 # Add libboost_python-mt.so
 cp $LIB_DIR/nao/libboost_python-mt.so $ROOT_PART/usr/lib/
+cp $LIB_DIR/nao/libprotobuf.so $ROOT_PART/usr/lib/
 
 # Change hostname
 echo $HOSTNAME > $ROOT_PART/etc/hostname
