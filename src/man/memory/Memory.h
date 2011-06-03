@@ -61,7 +61,8 @@ public:
 
 public:
     //TODO: make this return a const poitner
-    MSensors* getMSensors() const {return msensors;}
+    const MSensors* getMSensors() const {return msensors;}
+    const MSensors* getMVision() const {return msensors;}
 
 private:
     shared_ptr<Profiler> _profiler;
