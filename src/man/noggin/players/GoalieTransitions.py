@@ -68,9 +68,9 @@ def shouldSave(player):
     #is prepared to save
     ball = player.brain.ball
 
-    if (shouldPrepareToSave):
+    if fabs(ball.dx) > 5: #goalCon.VEL_THRES:
         #inside goal box plus save buffer
-        if  (ball.x < (NogCon.MY_GOALBOX_RIGHT_X + goalCon.SAVE_BUFFER)
+        if (ball.x < (NogCon.MY_GOALBOX_RIGHT_X + goalCon.SAVE_BUFFER)
              and ball.y < (NogCon.MY_GOALBOX_TOP_Y + goalCon.SAVE_BUFFER)
              and ball.y > (NogCon.MY_GOALBOX_BOTTOM_Y - goalCon.SAVE_BUFFER)):
             return True
@@ -80,12 +80,9 @@ def shouldSave(player):
 def shouldSaveRight(player):
     ball= player.brain.ball
 
-    if ball.dx < goalCon.VEL_THRES and ball.dx > -goalCon.VEL_THRES:
-        return False
-
-    elif(ball.endY > goalCon.CENTER_SAVE_THRESH):
-        player.countRightSave += 1
-        if(player.countRightSave > 3):
+    if(ball.endY > goalCon.CENTER_SAVE_THRESH):
+        player.counterRightSave += 1
+        if(player.counterRightSave > 3):
             player.counterRightSave = 0
             player.counterLeftSave = 0
             player.counterCenterSave = 0
@@ -95,11 +92,8 @@ def shouldSaveRight(player):
 def shouldSaveLeft(player):
     ball= player.brain.ball
 
-    if ball.dx < goalCon.VEL_THRES and ball.dx > -goalCon.VEL_THRES:
-        return False
-
     if(ball.endY < -goalCon.CENTER_SAVE_THRESH):
-        player.countLeftSave += 1
+        player.counterLeftSave += 1
         if( player.counterLeftSave > 3) :
             player.counterLeftSave = 0
             player.counterRightSave = 0
@@ -111,21 +105,16 @@ def shouldSaveLeft(player):
 def shouldSaveCenter(player):
     ball= player.brain.ball
 
-    if(ball.dx < goalCon.VEL_THRES and ball.dx > -goalCon.VEL_THRES):
-        if ball.relX < 10:
-            player.countCenterSave += 1
-
-    elif( not shouldDiveRight and not shouldDiveLeft):
-        player.countCenterSave += 1
-
-    if (player.countCenterSave > 3):
+    if(not shouldSaveRight and not shouldSaveLeft):
+        player.counterCenterSave += 1
+        if (player.counterCenterSave > 3):
             player.counterCenterSave = 0
             player.counterLeftSave = 0
             player.counterRightSave = 0
             return True
     return False
 
-#need to figure out how this works
+# need to figure out how this works
 def shouldHoldSave(player):
     # same as shouldSave() except for the ball.framesOn check
     # try to come up with better conditions to test
@@ -147,8 +136,9 @@ def outOfPosition(player):
     if player.penaltyKicking:
         return False
 
-    #I need to figure out what this does
     my = player.brain.my
+    # checks if in front of box or a quarter of the way up the field
+    #check if this really should be MY_GOALBOX_RIGHT_X
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X and my.uncertX < 90)\
             or (my.x > NogCon.MIDFIELD_X * 0.5):
         #print "my.x ", my.x, " my.uncertX ", my.uncertX
@@ -212,14 +202,15 @@ def shouldPositionLeft(player):
 
     return False
 
+#CHASE TRANSITIONS
+
 def dangerousBall(player):
     ball = player.brain.ball
 
     # in box and behind me and close to me
     # if inBox(player):
-    if (ball.relX < 0 and ball.relX < 30
-        and ball.relY < 30
-        and ball.relY > -30):
+    if (ball.relX < 0):
+        #and ball.dist < 30):
         return True
 
     return False
@@ -248,6 +239,12 @@ def shouldChase(player):
         #player.shouldChaseCounter = 0
         #player.shouldStopChaseCounter = 0
         #return False
+
+
+    # checks if the ball is really far away
+    #  make sure we dont chase if really far
+    #if ball.relX > 300 :
+        #return false
 
     # close enough to chase
     elif (ball.x < goalCon.CHASE_RIGHT_X_LIMIT
