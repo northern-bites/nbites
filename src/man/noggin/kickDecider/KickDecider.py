@@ -100,7 +100,8 @@ class KickDecider(object):
                 return kicks.RIGHT_SIDE_KICK
         # if only one was seen
         elif (rightPostBearing is not None):
-            # if the right post is roughly to our right (but not too far), kick straight
+            # if the right post is roughly to our right
+            #(but not too far), kick straight
             if (rightPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0 and \
                     rightPostBearing >= -1*constants.KICK_STRAIGHT_BEARING_THRESH):
                 return self.chooseDynamicKick()
@@ -133,7 +134,8 @@ class KickDecider(object):
         # first determine if both my goal posts were seen
         if (rightPostBearing is not None and leftPostBearing is not None):
             distDiff = rightPostDist - leftPostDist
-            # if we are facing between our posts and difference between dists is small enough
+            # if we are facing between our posts and difference
+            #between dists is small enough
             if (rightPostBearing >= 0 and leftPostBearing <= 0 and \
                     distDiff <= constants.CENTERED_POST_DIST_DIFF):
                 return self.chooseLongBackKick()
@@ -168,7 +170,7 @@ class KickDecider(object):
             return kicks.LEFT_SIDE_KICK
         else:
             return kicks.RIGHT_SIDE_KICK
-        #Our localization is terrible so NEVER rely on it
+        #Our localization is unreliable so NEVER rely on it
         #to do a backKick.  The kick is too powerful to use blindly
         # else:
         #     return self.chooseShortBackKick()
