@@ -226,12 +226,6 @@ def shouldChase(player):
     if player.penaltyKicking:
         return False
 
-    # checks if others are chasing
-    # what checks who is closest person to ball
-    #can i use this?
-    # elif not goTeam.goalieShouldChase(player):
-        # return False
-
     #if not chaseTran.shouldChaseBall(player):
         #return False
 

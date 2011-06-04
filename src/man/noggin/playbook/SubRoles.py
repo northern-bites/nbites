@@ -5,6 +5,7 @@ from ..util import MyMath
 
 #### Goalie sub roles ####
 
+#should make this Center instead of normal
 def pGoalieNormal(team, workingPlay):
     """normal goalie position"""
     workingPlay.setSubRole(PBConstants.GOALIE_NORMAL)
@@ -37,6 +38,16 @@ def pGoaliePosLeft(team, workingPlay):
 
     if PBConstants.USE_FANCY_GOALIE:
         pos = fancyGoaliePosition(team)
+
+    workingPlay.setPosition(pos)
+
+def pGoalieSave(team, workingPlay):
+    workingPlay.setSubRole(PBConstants.GOALIE_SAVE)
+    h = team.brain.ball.heading
+    pos = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
+
+    if PBConstants.USE_FANCY_GOALIE:
+        pos = team.fancyGoaliePosition()
 
     workingPlay.setPosition(pos)
 
