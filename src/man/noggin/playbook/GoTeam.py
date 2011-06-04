@@ -365,9 +365,6 @@ class GoTeam:
     ############   Strategy Decision Stuff     ###########
     ######################################################
 
-    def goalieShouldChase(self):
-        return self.noCalledChaser()
-
     def noCalledChaser(self):
         """Returns true if no one is chasing and they are not searching"""
         # If everyone else is out, let's not go for the ball
