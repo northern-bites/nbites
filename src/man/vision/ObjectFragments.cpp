@@ -1216,7 +1216,9 @@ int ObjectFragments::classifyByTCorner(Blob post) {
 						if (POSTLOGIC) {
 							cout << "T is a side T" << endl;
 						}
-						return side;
+						// naturally it isn't always this simple - see
+						// watson_11/spock/pink_robot_far/8.NBFRM
+						return NOPOST;
 					} else if (side == LEFT) {
 						return RIGHT;
 					} else {

@@ -120,6 +120,14 @@ void Field::initialScanForTopGreenPoints(int pH) {
 			convex[i] = point<int>(i * SCANSIZE, IMAGE_HEIGHT);
 		}
 	}
+	for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
+	for (int i = good-1; i > -1; i--) {
+		convex[i].y = convex[i+1].y;
+	}
+	for (good = HULLS - 1; convex[good].y == IMAGE_HEIGHT && good > 0; good--) {}
+	for (int i = good + 1; i < HULLS; i++) {
+		convex[i].y = convex[i-1].y;
+	}
 }
 
 /* At this point we have found our convex hull as defined for the scanlines.

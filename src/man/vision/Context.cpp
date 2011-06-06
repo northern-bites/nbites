@@ -288,7 +288,7 @@ void Context::classifyT(VisualCorner & first) {
 				sideT = true;
 			} else if (rightx - leftx > IMAGE_WIDTH / 4) {
 				sideT = true;
-			} else if (first.getDistance() < 250.0f) {
+			} else if (first.getDistance() < FIELD_WHITE_WIDTH / 3) {
 				sideT = true;
 			}
 		}

@@ -377,6 +377,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
     int robots = 0, greens = 0, greys = 0;
     int lastGood = IMAGE_HEIGHT - 1;
     int maxWhite = 0;
+	bool faceDown = pose->getHorizonY(0) < 0;
+	bool faceDown2 = pose->getHorizonY(0) < -100;
     shoot[column] = true;
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
@@ -425,7 +427,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                 if (currentRun > 15) {
                     greys+= currentRun;
                 }
-                if (currentRun > 25 && shoot[column]) {
+                if (currentRun > 25 && shoot[column] && !faceDown2) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
                         block[column / divider] = j + currentRun;
@@ -439,16 +441,21 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 			if (isGreen(lastPixel)) {
                 greens+= currentRun;
                 lastGood = j;
+				// we often see navy in shadowed places
+				if (currentRun > 3) {
+					robots = 0;
+				}
 			}
 			if (isNavy(lastPixel)) {
                 robots+= currentRun;
                 if (currentRun > 5) {
                     navyblue->newRun(column, j, currentRun);
                 }
-                if (robots > 10 && shoot[column]) {
+                if (robots > 10 && column > 10 && column < IMAGE_WIDTH - 10
+					&& shoot[column] && !faceDown) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = j + currentRun;
+                        block[column / divider] = lastGood;//j + currentRun;
                     }
                     shoot[column] = false;
                     if (debugShot) {
@@ -464,7 +471,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                 if (robots > 10 && shoot[column]) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = j + currentRun;
+                        block[column / divider] = lastGood;//j + currentRun;
                     }
                     shoot[column] = false;
                     if (debugShot) {
