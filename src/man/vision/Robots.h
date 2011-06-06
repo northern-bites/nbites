@@ -39,14 +39,6 @@ public:
     Robots(Vision* vis, Threshold* thr, Field* fie, Context* con, int c);
     virtual ~Robots() {}
 
-    // Helper method that just returns whether the thresholded color is a
-    // white color
-    static inline const bool isWhite(unsigned char threshColor)
-        {
-			return threshColor & WHITE_BIT;
-        }
-
-
 	void init();
 	void preprocess();
 	void robot(Cross *cross);
@@ -74,20 +66,6 @@ public:
 	int distance(int x, int x1, int x2, int x3);
 	void printBlob(Blob a);
 
-    // Helper method that just returns whether the thresholded color is a
-    // green color
-    static inline const bool isGreen(unsigned char threshColor)
-        {
-			return threshColor & GREEN_BIT;
-        }
-    static inline const bool isSameColor(unsigned char threshColor, int col)
-        {
-            if (col == RED) {
-                return threshColor & RED_BIT;
-            } else {
-                return threshColor & NAVY_BIT;
-            }
-        }
 #ifdef OFFLINE
     void setDebugRobots(bool debug) {debugRobots = debug;}
 #endif

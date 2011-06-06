@@ -54,7 +54,6 @@ public:
     void init(float s);
 
     void newRun(int x, int endY, int height);
-	bool colorsEqual(unsigned char x, unsigned char y);
 
     // scan operations
     int yProject(int startx, int starty, int newy);

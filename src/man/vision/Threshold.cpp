@@ -285,7 +285,7 @@ void Threshold::findGoals(int column, int topEdge) {
     for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
-        if (isBlue(pixel)) {
+        if (Utility::isBlue(pixel)) {
             lastBlue = j;
             blues++;
             bad--;
@@ -293,7 +293,7 @@ void Threshold::findGoals(int column, int topEdge) {
                 firstBlue = j;
             }
         }
-        if (isYellow(pixel)) {
+        if (Utility::isYellow(pixel)) {
             lastYellow = j;
             yellows++;
             bad--;
@@ -301,17 +301,17 @@ void Threshold::findGoals(int column, int topEdge) {
                 firstYellow = j;
             }
         }
-        if (isNavy(pixel) || isRed(pixel)) {
+        if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
             robots++;
         }
-		if (isRed(pixel)) {
+		if (Utility::isRed(pixel)) {
 			lastPink = j;
 			pinks++;
 			if (firstPink == topEdge) {
 				firstPink = j;
 			}
 		}
-        if (isUndefined(pixel)) {
+        if (Utility::isUndefined(pixel)) {
             bad++;
         }
 		if (lastYellow - j > GAP && lastBlue - j > GAP && lastPink - j > GAP) {
@@ -324,21 +324,21 @@ void Threshold::findGoals(int column, int topEdge) {
         // note:  These were thresholded in the findBallsCrosses loop
         unsigned char pixel = getThresholded(j,column);
         bool found = false;
-        if (isBlue(pixel)) {
+        if (Utility::isBlue(pixel)) {
             firstBlue = j;
             blues++;
             found = true;
         }
-        if (isYellow(pixel)) {
+        if (Utility::isYellow(pixel)) {
             firstYellow = j;
             yellows++;
             found = true;
         }
-        if (isNavy(pixel) || isRed(pixel)) {
+        if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
             robots++;
             found = true;
         }
-        if (isGreen(pixel)) {
+        if (Utility::isGreen(pixel)) {
             bad++;
         }
         if (!found) {
@@ -382,7 +382,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
     shoot[column] = true;
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
-        while (bound < IMAGE_HEIGHT && isOrange(getColor(column, bound))) {
+        while (bound < IMAGE_HEIGHT &&
+			   Utility::isOrange(getColor(column, bound))) {
             bound++;
         }
     }
@@ -400,11 +401,12 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         // otherwise, do stuff according to color
         if (lastPixel != pixel || j == topEdge) { // end of column
             // Note: pixel can contain multiple colors, so we check all of them
-			if (isOrange(lastPixel)) {
+			if (Utility::isOrange(lastPixel)) {
                 // add to Ball data structure
                 //drawPoint(column, j, MAROON);
                 if (j == topEdge) {
-                    while (j > 0 && isOrange(getThresholded(j,column))) {
+                    while (j > 0 && Utility::isOrange(getThresholded(j,column)))
+					{
                         currentRun++;
                         j--;
                     }
@@ -414,7 +416,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                 }
                 greens += currentRun;
 			}
-			if (isWhite(lastPixel)) {
+			if (Utility::isWhite(lastPixel)) {
                 // add to the cross data structure
                 if (currentRun > 2) {
                     cross->newRun(column, j, currentRun);
@@ -423,7 +425,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                 }
 			}
-			if (isUndefined(lastPixel)) {
+			if (Utility::isUndefined(lastPixel)) {
                 if (currentRun > 15) {
                     greys+= currentRun;
                 }
@@ -438,7 +440,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                 }
 			}
-			if (isGreen(lastPixel)) {
+			if (Utility::isGreen(lastPixel)) {
                 greens+= currentRun;
                 lastGood = j;
 				// we often see navy in shadowed places
@@ -446,7 +448,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 					robots = 0;
 				}
 			}
-			if (isNavy(lastPixel)) {
+			if (Utility::isNavy(lastPixel)) {
                 robots+= currentRun;
                 if (currentRun > 5) {
                     navyblue->newRun(column, j, currentRun);
@@ -463,7 +465,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                 }
             }
-			if (isRed(lastPixel)) {
+			if (Utility::isRed(lastPixel)) {
                 robots+= currentRun;
                 if (currentRun > 3) {
                     red->newRun(column, j, currentRun);

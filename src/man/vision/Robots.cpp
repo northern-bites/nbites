@@ -273,7 +273,7 @@ bool Robots::notGreen(Blob candidate) {
 	int greens = 0;
 	for (int i = left; i < right; i++) {
 		for (int j = top; j < bottom; j++) {
-			if (isGreen(thresh->getThresholded(j, i))) {
+			if (Utility::isGreen(thresh->getThresholded(j, i))) {
 				greens++;
 				if (greens > area) {
 					return true;
@@ -295,9 +295,9 @@ bool Robots::whiteBelow(Blob candidate) {
         int white = 0;
         int green = 0;
         for (int x = candidate.getLeft(); x < candidate.getRight(); x++) {
-            if (isWhite(thresh->getThresholded(y, x))) {
+            if (Utility::isWhite(thresh->getThresholded(y, x))) {
                 white++;
-            } else if (isGreen(thresh->getThresholded(y, x))) {
+            } else if (Utility::isGreen(thresh->getThresholded(y, x))) {
                 green++;
             }
         }
@@ -322,9 +322,9 @@ bool Robots::whiteAbove(Blob candidate) {
         int white = 0;
         int green = 0;
         for (int x = candidate.getLeft(); x < candidate.getRight(); x++) {
-            if (isWhite(thresh->getThresholded(y, x))) {
+            if (Utility::isWhite(thresh->getThresholded(y, x))) {
                 white++;
-            } else if (isGreen(thresh->getThresholded(y, x))) {
+            } else if (Utility::isGreen(thresh->getThresholded(y, x))) {
                 green++;
             }
         }
@@ -428,7 +428,7 @@ void Robots::checkMerge(int i, int j) {
             if (debugRobots) {
                 vision->drawPoint(x, y, MAROON);
             }
-            if (isSameColor(thresh->getThresholded(y, x), color)) {
+            if (Utility::colorsEqual(thresh->getThresholded(y, x), color)) {
                 col++;
                 if (col > area || col > stripe) {
                     blobs->mergeBlobs(i, j);
@@ -437,12 +437,12 @@ void Robots::checkMerge(int i, int j) {
                     }
                     return;
                 }
-            } else if (isGreen(thresh->getThresholded(y, x))) {
+            } else if (Utility::isGreen(thresh->getThresholded(y, x))) {
                 green++;
                 if (green > 5) {
                     return;
                 }
-            } else if (isWhite(thresh->getThresholded(y, x))) {
+            } else if (Utility::isWhite(thresh->getThresholded(y, x))) {
                 miss++;
                 if (miss > area / 9 || miss > stripe) {
                     return;
@@ -490,9 +490,10 @@ bool Robots::noWhite(Blob b) {
 	for (int i = 1; i < b.height(); i++) {
 		tops = 0; bottoms = 0;
 		for (int x = left; x <= right; x++) {
-			if (top - i >= 0 && isWhite(thresh->getThresholded(top - i,x)))
+			if (top - i >= 0 && Utility::isWhite(thresh->getThresholded(top - i,x)))
 				tops++;
-			if (bottom + i < IMAGE_HEIGHT && isWhite(thresh->getThresholded(bottom+i,x)))
+			if (bottom + i < IMAGE_HEIGHT &&
+				Utility::isWhite(thresh->getThresholded(bottom+i,x)))
 				bottoms++;
 			if (tops > width / 2 || tops == width) return false;
 			if (bottoms > width / 2 || tops == width) return false;

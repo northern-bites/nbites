@@ -240,13 +240,6 @@ int ObjectFragments::getBigRun(int left, int right) {
     return index;
 }
 
-/*
- */
-bool ObjectFragments::colorsEqual(unsigned char c1, unsigned char c2) {
-	return !((c1 & c2) == 0x00);
-}
-
-
 /* The next group of methods has to do with scanning along axis parallel
  * dimensions in order to create objects without blobbing.
  */
@@ -341,11 +334,11 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
     for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
         //cout << "Vert scan " << x << " " << y << endl;
         // if it is the color we're looking for - good
-        if (colorsEqual(c, GREEN))
+        if (Utility::colorsEqual(c, GREEN))
             pixel = thresh->getColor(x, y);
         else
             pixel = thresh->getExpandedColor(x, y, c);
-        if (colorsEqual(pixel, c)) {
+        if (Utility::colorsEqual(pixel, c)) {
             good++;
             bad--;
             run++;
@@ -399,11 +392,11 @@ void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
     // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > leftBound && y > -1 && x < rightBound && x < IMAGE_WIDTH
               && y < height && bad < stopper; ) {
-        if (colorsEqual(c, GREEN))
+        if (Utility::colorsEqual(c, GREEN))
             pixel = thresh->getColor(x, y);
         else
             pixel = thresh->getExpandedColor(x, y, c);
-        if (colorsEqual(pixel, c)) {
+        if (Utility::colorsEqual(pixel, c)) {
             // if it is either of the colors we're looking for - good
             good++;
             run++;
@@ -628,12 +621,12 @@ float ObjectFragments::correct(Blob & b, int color) {
             while (col != color && midx < IMAGE_WIDTH && midx > -1) {
                 // normally we assume we are outside the real edge
                 midx+= k;
-                if (colorsEqual(thresh->getExpandedColor(midx, midy, color),color)) {
+                if (Utility::colorsEqual(thresh->getExpandedColor(midx, midy, color),color)) {
                     col = color;
                     if (count == 0) {
                         // this is the case where the edge is outside our blob
                         while (midx >= 0 &&
-                               colorsEqual(thresh->getExpandedColor(midx, midy, color),
+                               Utility::colorsEqual(thresh->getExpandedColor(midx, midy, color),
 										   color)) {
                             midx-= k;
                             count++;
@@ -929,7 +922,7 @@ bool ObjectFragments::qualityPost(Blob b, int c)
     //bool soFar;
     for (int i = b.getLeftTopX(); i < b.getRightTopX(); i++) {
         for (int j = b.getLeftTopY(); j < b.getLeftBottomY(); j++) {
-            if (colorsEqual(thresh->getExpandedColor(i, j, c), c)) {
+            if (Utility::colorsEqual(thresh->getExpandedColor(i, j, c), c)) {
                 good++;
             }
         }
@@ -2008,10 +2001,10 @@ bool ObjectFragments::greenCheck(Blob b)
         x = max(0, xProject(x, b.getLeftBottomY(), b.getLeftBottomY() + i));
         int pix = thresh->getThresholded(min(IMAGE_HEIGHT - 1,
                                              b.getLeftBottomY() + i),x);
-        if (colorsEqual(pix, GREEN)) {
+        if (Utility::colorsEqual(pix, GREEN)) {
             return true;
         }
-        if (!colorsEqual(pix, WHITE)) {
+        if (!Utility::colorsEqual(pix, WHITE)) {
             bad++;
         }
     }
@@ -2046,7 +2039,8 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
             ny = yProject(startx, starty, nx);
             if (ny > -1 && nx > -1 && ny < IMAGE_HEIGHT && nx < IMAGE_WIDTH) {
                 total++;
-                if (colorsEqual(thresh->getExpandedColor(nx, ny, color), color)) {
+                if (Utility::colorsEqual(thresh->getExpandedColor(nx, ny, color),
+										 color)) {
                     good++;
                     if (good > goal) {
                         return true;
