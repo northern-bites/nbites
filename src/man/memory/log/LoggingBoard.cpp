@@ -36,6 +36,12 @@ void LoggingBoard::initLoggingObjects() {
     objectFDProviderMap[mvisionSensors] = mvisionSensorsFDprovider;
     objectFDLoggerMap[mvisionSensors] = new CodedFileLogger(
             mvisionSensorsFDprovider, MVISION_SENSORS_ID, mvisionSensors);
+
+    const MImage* mimage = memory->getMImage();
+    FDProvider* mimageFDprovider = new FileFDProvider(MIMAGE_PATH);
+    objectFDProviderMap[mimage] = mimageFDprovider;
+    objectFDLoggerMap[mimage] = new ImageFDLogger(mimageFDprovider,
+            MIMAGE_ID, mimage);
 }
 
 void LoggingBoard::log(const MObject* mobject) {
@@ -48,6 +54,22 @@ void LoggingBoard::log(const MObject* mobject) {
         it->second->write();
     }
 }
+
+const ImageFDLogger* LoggingBoard::getImageLogger(const MImage* mimage) const {
+    return dynamic_cast<const ImageFDLogger*>(this->getLogger(mimage));
+}
+
+const FDLogger* LoggingBoard::getLogger(const MObject* mobject) const {
+    ObjectFDLoggerMap::const_iterator it = objectFDLoggerMap.find(mobject);
+    // if this is true, then we found a legitimate logger
+    // corresponding to our mobject in the map
+    if (it != objectFDLoggerMap.end()) {
+        return it->second;
+    } else {
+        return NULL;
+    }
+}
+
 
 }
 

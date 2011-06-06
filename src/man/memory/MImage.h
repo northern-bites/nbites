@@ -13,7 +13,6 @@
 #include "RoboImage.h"
 #include "MObject.h"
 #include "Sensors.h"
-#include "log/ImageFDLogger.h"
 
 namespace memory {
 class MImage: public RoboImage, public MObject {
@@ -34,7 +33,6 @@ public:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    log::ImageFDLogger* fileLogger;
 
 };
 }

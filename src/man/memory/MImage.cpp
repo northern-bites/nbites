@@ -4,15 +4,11 @@
  *      Author: oneamtu
  */
 
-#include <vector>
 #include <string>
 
 #include "Common.h" //for micro_time
 #include "MemoryMacros.h"
 #include "MImage.h"
-
-//TODO: remove this
-#include "NaoPaths.h"
 
 namespace memory {
 
@@ -21,7 +17,6 @@ using namespace proto;
 using namespace std;
 
 MImage::MImage(shared_ptr<Sensors> s) : RoboImage(), sensors(s) {
-    fileLogger = new log::ImageFDLogger(NAO_LOG_DIR "/Image.log", MIMAGE_ID, this);
     //string* image_string = this->mutable_image();
     //image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
     //cout << " string capacity " << NAO_IMAGE_BYTE_SIZE << " "<<  image_string->capacity() << endl;
@@ -31,13 +26,12 @@ MImage::MImage(shared_ptr<Sensors> s) : RoboImage(), sensors(s) {
 }
 
 MImage::~MImage() {
-    delete fileLogger;
 }
 
 void MImage::update() {
 
     //ADD_PROTO_TIMESTAMP;
-    //cout << "MImage_updata timestamp is " << (process_micro_time() - birth_time) << endl;
+//    cout << "MImage_updata timestamp is " << process_micro_time() << endl;
     this->updateImage(sensors->getRawNaoImage());
 
 //    string* image_string =  this->mutable_image();
@@ -49,10 +43,5 @@ void MImage::update() {
 //    printf("%p %p %p %p \n", &c[0], data, unsafe_data, s->data());
     //cout << unsafe_data << " " << sensors->getNaoImage() << endl;
 
-}
-
-void MImage::log() const {
-    fileLogger->write();
-    sensors->setNaoImage(fileLogger->getCurrentImage());
 }
 }

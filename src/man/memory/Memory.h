@@ -64,6 +64,7 @@ public:
 
 private:
     shared_ptr<Profiler> _profiler;
+    shared_ptr<Sensors> _sensors;
     MVision* mVision;
     MVisionSensors* mVisionSensors;
     MMotionSensors* mMotionSensors;

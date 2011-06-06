@@ -49,6 +49,9 @@ public:
 
     void log(const MObject* mobject);
 
+    const ImageFDLogger* getImageLogger(const MImage* mimage) const;
+    const FDLogger* getLogger(const MObject* mobject) const;
+
 private:
     void initLoggingObjects();
 

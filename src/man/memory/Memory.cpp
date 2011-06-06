@@ -19,6 +19,7 @@ Memory::Memory(shared_ptr<Profiler> profiler_ptr,
         shared_ptr<Vision> vision_ptr,
         shared_ptr<Sensors> sensors_ptr) :
         _profiler(profiler_ptr),
+        _sensors(sensors_ptr),
         mVision(new MVision(vision_ptr)),
         mVisionSensors(new MVisionSensors(sensors_ptr)),
         mMotionSensors(new MMotionSensors(sensors_ptr)),
@@ -65,7 +66,10 @@ void Memory::update(const ProviderEvent e) {
     if (e.getType() == NEW_IMAGE) {
         PROF_ENTER(_profiler.get(), P_MEMORY_IMAGE);
         mImage->update();
-        mImage->log();
+        loggingBoard->log(mImage);
+        //TODO: move this somewhere else
+        _sensors->setNaoImage(loggingBoard->getImageLogger(mImage)->
+                getCurrentImage());
         PROF_EXIT(_profiler.get(), P_MEMORY_IMAGE);
     }
 }
