@@ -59,6 +59,7 @@ void CodedFileLogger::write() {
 }
 
 CodedFileLogger::~CodedFileLogger() {
+    //TODO: this might not be flushing properly
     raw_output->Close();
     delete coded_output;
     delete raw_output;
