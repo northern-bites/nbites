@@ -39,5 +39,6 @@ public:
 protected:
     unsigned int width;
     unsigned int height;
+    //TODO: make byte into uint8_t
     const byte* image;
 };
