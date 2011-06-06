@@ -22,7 +22,9 @@ class Memory; //forward declaration
 
 #include "MVision.h"
 #include "Vision.h"
-#include "MSensors.h"
+#include "MVisionSensors.h"
+#include "MMotionSensors.h"
+#include "MImage.h"
 #include "Sensors.h"
 #include "Profiler.h"
 #include "log/LoggingBoard.h"
@@ -31,7 +33,7 @@ namespace memory {
 
 using boost::shared_ptr;
 
-class Memory {
+class Memory : public Subscriber {
 
 public:
     Memory( shared_ptr<Profiler> profiler_ptr,
@@ -44,27 +46,28 @@ public:
      * from its corresponding man object and maybe log it
      */
     void update(MObject* obj);
-    /**
-     * calls update(mvision)
-     */
     void updateVision();
+//    void updateMotionSensors();
+//    void updateVisionSensors();
+//    void updateImage();
     /**
-     * calls update((MMotionSensors) msensors)
+     * This function is called whenever one of the Providers we are subscribed
+     * to has something new/updated
      */
-    void updateMotionSensors();
-    /**
-     * calls update((MVisionSensors) msensors)
-     */
-    void updateVisionSensors();
+    void update(const ProviderEvent e);
 
 public:
-    const MSensors* getMSensors() const {return msensors;}
-    const MVision* getMVision() const {return mvision;}
+    const MVision* getMVision() const {return mVision;}
+    const MVisionSensors* getMVisionSensors() const {return mVisionSensors;}
+    const MMotionSensors* getMMotionSensors() const {return mMotionSensors;}
+    const MImage* getMImage() const {return mImage;}
 
 private:
     shared_ptr<Profiler> _profiler;
-    MVision* mvision;
-    MSensors* msensors;
+    MVision* mVision;
+    MVisionSensors* mVisionSensors;
+    MMotionSensors* mMotionSensors;
+    MImage* mImage;
 
     log::LoggingBoard* loggingBoard;
 };

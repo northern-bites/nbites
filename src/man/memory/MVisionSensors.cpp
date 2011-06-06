@@ -18,12 +18,9 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-MVisionSensors::MVisionSensors(shared_ptr<Sensors> s) : sensors(s) {
-    fileLogger = new log::CodedFileLogger(NAO_LOG_DIR "/VisionSensors.log", MVISION_SENSORS_ID, this);
-}
+MVisionSensors::MVisionSensors(shared_ptr<Sensors> s) : sensors(s) { }
 
 MVisionSensors::~MVisionSensors() {
-    delete fileLogger;
 }
 
 void MVisionSensors::update() {
@@ -52,9 +49,5 @@ void MVisionSensors::update() {
     this->set_battery_current(sensors->getBatteryCurrent());
 
     //std::cout << this->DebugString() << std::endl;
-}
-
-void MVisionSensors::log() const {
-    fileLogger->write();
 }
 }

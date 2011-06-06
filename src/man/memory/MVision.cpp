@@ -17,16 +17,15 @@ using std::list;
 
 MVision::MVision(shared_ptr<Vision> v) :
     vision(v) {
-    fileLogger = new log::CodedFileLogger(NAO_LOG_DIR "/Vision.log", MVISION_ID, this);
 }
 
 MVision::~MVision() {
-    delete fileLogger;
 }
 
 void MVision::update() {
 
     ADD_PROTO_TIMESTAMP;
+//    cout << "MVision_updata timestamp is " << process_micro_time() << endl;
 
     using namespace proto;
     //VisualBall
@@ -86,9 +85,5 @@ void MVision::update(PVision::PVisualDetection* visual_detection,
     visual_detection->set_elevation(visualDetection->getElevation());
     visual_detection->set_distance_sd(visualDetection->getDistanceSD());
     visual_detection->set_bearing_sd(visualDetection->getBearingSD());
-}
-
-void MVision::log() const {
-    fileLogger->write();
 }
 }

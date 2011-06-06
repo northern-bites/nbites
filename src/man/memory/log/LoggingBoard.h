@@ -19,8 +19,6 @@
 
 #include "CodedFileLogger.h"
 #include "ImageFDLogger.h"
-
-#include "NaoPaths.h"
 #include "memory/MObject.h"
 
 //forward declaration
@@ -46,12 +44,19 @@ class LoggingBoard {
 
 public:
     LoggingBoard(const Memory* _memory);
+    //TODO: make sure to delete all of the logger objects
     //~LoggingBoard();
 
     void log(const MObject* mobject);
 
 private:
     void initLoggingObjects();
+
+public:
+    static const char* MVISION_PATH;
+    static const char* MVISION_SENSORS_PATH;
+    static const char* MMOTION_SENSORS_PATH;
+    static const char* MIMAGE_PATH;
 
 private:
     const Memory* memory;

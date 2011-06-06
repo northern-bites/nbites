@@ -20,11 +20,9 @@ using namespace proto;
 using namespace std;
 
 MMotionSensors::MMotionSensors(shared_ptr<Sensors> s) : sensors(s) {
-    fileLogger = new log::CodedFileLogger(NAO_LOG_DIR "/MotionSensors.log", MMOTION_SENSORS_ID, this);
 }
 
 MMotionSensors::~MMotionSensors() {
-    delete fileLogger;
 }
 
 void MMotionSensors::update() {
@@ -70,6 +68,5 @@ void MMotionSensors::update() {
 }
 
 void MMotionSensors::log() const {
-    fileLogger->write();
 }
 }

@@ -19,16 +19,20 @@ Memory::Memory(shared_ptr<Profiler> profiler_ptr,
         shared_ptr<Vision> vision_ptr,
         shared_ptr<Sensors> sensors_ptr) :
         _profiler(profiler_ptr),
-        mvision(new MVision(vision_ptr)),
-        msensors(new MSensors(profiler_ptr, sensors_ptr)),
+        mVision(new MVision(vision_ptr)),
+        mVisionSensors(new MVisionSensors(sensors_ptr)),
+        mMotionSensors(new MMotionSensors(sensors_ptr)),
+        mImage(new MImage(sensors_ptr)),
         loggingBoard(new LoggingBoard(this)){
     birth_time = process_micro_time();
-    sensors_ptr->addSubscriber(msensors);
+    sensors_ptr->addSubscriber(this);
 }
 
 Memory::~Memory() {
-    delete mvision;
-    delete msensors;
+    delete mVision;
+    delete mVisionSensors;
+    delete mMotionSensors;
+    delete mImage;
 
     delete loggingBoard;
 }
@@ -38,16 +42,32 @@ void Memory::update(MObject* obj) {
 }
 
 void Memory::updateVision() {
-    update(mvision);
-    loggingBoard->log(mvision);
+    update(mVision);
+    loggingBoard->log(mVision);
 }
 
-void Memory::updateMotionSensors() {
-    update((MMotionSensors*) msensors);
-}
+void Memory::update(const ProviderEvent e) {
 
-void Memory::updateVisionSensors() {
-    update((MVisionSensors*) msensors);
+    if (e.getType() == NEW_MOTION_SENSORS) {
+        PROF_ENTER(_profiler.get(), P_MEMORY_MOTION_SENSORS);
+        mMotionSensors->update();
+        loggingBoard->log(mMotionSensors);
+        PROF_EXIT(_profiler.get(), P_MEMORY_MOTION_SENSORS);
+    }
+
+    if (e.getType() == NEW_VISION_SENSORS) {
+        PROF_ENTER(_profiler.get(), P_MEMORY_VISION_SENSORS);
+        mVisionSensors->update();
+        loggingBoard->log(mVisionSensors);
+        PROF_EXIT(_profiler.get(), P_MEMORY_VISION_SENSORS);
+    }
+
+    if (e.getType() == NEW_IMAGE) {
+        PROF_ENTER(_profiler.get(), P_MEMORY_IMAGE);
+        mImage->update();
+        mImage->log();
+        PROF_EXIT(_profiler.get(), P_MEMORY_IMAGE);
+    }
 }
 
 }
