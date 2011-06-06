@@ -66,18 +66,34 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("leftOpening", &VisualCrossbar::getLeftOpening)
     .def_readonly("rightOpening", &VisualCrossbar::getRightOpening)
     ;
+
+  class_<FieldLines>("FieldLines", no_init)
+    .def_readonly("numCorners", &FieldLines::getNumCorners)
+    ;
     
   //noncopyable is required because vision has no public copy constructor
   class_<Vision, shared_ptr<Vision>, boost::noncopyable >("Vision", no_init)
     //make_getter provides a getter for objects not pointers
-    .add_property("ball", make_getter(&Vision::ball, return_value_policy<reference_existing_object>()))
-    .add_property("yglp", make_getter(&Vision::yglp, return_value_policy<reference_existing_object>()))
-    .add_property("ygrp", make_getter(&Vision::ygrp, return_value_policy<reference_existing_object>()))
-    .add_property("bglp", make_getter(&Vision::bglp, return_value_policy<reference_existing_object>()))
-    .add_property("bgrp", make_getter(&Vision::bgrp, return_value_policy<reference_existing_object>()))
-    /* Crossbars: not used right now, uncomment here and Brain.py to use in python
-    .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar, return_value_policy<reference_existing_object>()))
-    .add_property("bgCrossbar", make_getter(&Vision::bgCrossbar, return_value_policy<reference_existing_object>()))
+    .add_property("ball", make_getter(&Vision::ball, return_value_policy
+				      <reference_existing_object>()))
+    .add_property("yglp", make_getter(&Vision::yglp, return_value_policy
+				      <reference_existing_object>()))
+    .add_property("ygrp", make_getter(&Vision::ygrp, return_value_policy
+				      <reference_existing_object>()))
+    .add_property("bglp", make_getter(&Vision::bglp, return_value_policy
+				      <reference_existing_object>()))
+    .add_property("bgrp", make_getter(&Vision::bgrp, return_value_policy
+				      <reference_existing_object>()))
+    .add_property("fieldLines", make_getter(&Vision::fieldLines, 
+					    return_value_policy
+					    <reference_existing_object>()))
+
+    /* Crossbars: not used right now, uncomment here and Brain.py to use
+       in python
+    .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar, 
+    return_value_policy<reference_existing_object>()))
+    .add_property("bgCrossbar", make_getter(&Vision::bgCrossbar, 
+    return_value_policy<reference_existing_object>()))
     */
     ;
 
