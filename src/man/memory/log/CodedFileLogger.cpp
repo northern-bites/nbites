@@ -28,7 +28,7 @@ namespace log {
 using namespace std;
 
 CodedFileLogger::CodedFileLogger(const FDProvider* fdp,
-		int logTypeID, ProtoMessage* m) :
+		int logTypeID, const ProtoMessage* m) :
         FDLogger(fdp), logID(logTypeID), message(m) {
 
     raw_output = new FileOutputStream(file_descriptor);

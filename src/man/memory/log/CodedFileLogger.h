@@ -43,7 +43,8 @@ public:
      * @param m : the proto message we will log
      * @return
      */
-    CodedFileLogger(const FDProvider* fdp, int logTypeID, ProtoMessage* m);
+    CodedFileLogger(const FDProvider* fdp,
+    		int logTypeID, const ProtoMessage* m);
 
     /**
      * Closes the file, which will flush the output buffer
