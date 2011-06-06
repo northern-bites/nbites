@@ -15,6 +15,7 @@ class VisualCorner;
 #include "VisualLine.h"
 #include <boost/shared_ptr.hpp>
 
+class NaoPose;
 
 class VisualCorner : public VisualDetection, public VisualLandmark<cornerID> {
 private: // Constants
@@ -26,11 +27,12 @@ private: // Constants
     static const point <int> naoLocation;
 
 public:
-    VisualCorner(const int _x, const int _y, const float _distance,
-                 const float _bearing,
+    VisualCorner(const int _x, const int _y,
+                 const float _distance, const float _bearing,
                  boost::shared_ptr<VisualLine> l1,
-                 boost::shared_ptr<VisualLine> l2, const float _t1,
-                 const float _t2);
+                 boost::shared_ptr<VisualLine> l2,
+                 const float _t1, const float _t2,
+                 boost::shared_ptr<NaoPose> _pose);
     // destructor
     virtual ~VisualCorner();
     // copy constructor
@@ -102,6 +104,7 @@ public:
 
 private: // private methods
     const shape getLClassification();
+    double getLPhysicalOrientation();
 
     void IDFromLine(const boost::shared_ptr<VisualLine> line);
 
@@ -118,6 +121,8 @@ private: // private methods
 
 
 private:
+    boost::shared_ptr<NaoPose> pose;
+
     // This list will hold all the possibilities for this corner's specific ID
     // It will get set from within FieldLines.cc.
     std::list <const ConcreteCorner *> possibleCorners;
@@ -151,11 +156,12 @@ private:
     //
     // For L-Corners:
     //             Zero angle is bisector of legs
-    //  ___________
-    // | .
-    // |   .
-    // |     .
-    // |       .  <-zero line
+    //
+    // ---------- <- zero line
+    // |
+    // |
+    // |
+    // |
     //
     // For T-Corners:
     //             Zero angle is aligned with the T-Stem

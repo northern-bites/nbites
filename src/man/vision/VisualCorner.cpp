@@ -1,5 +1,10 @@
 #include "VisualCorner.h"
+
 #include <math.h>
+
+#include "NaoPose.h"
+
+
 using namespace std;
 using namespace boost;
 
@@ -14,9 +19,11 @@ VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _distance,
                            const float _bearing,
                            shared_ptr<VisualLine> l1, shared_ptr<VisualLine> l2,
-                           const float _t1, const float _t2)
+                           const float _t1, const float _t2,
+                           shared_ptr<NaoPose> _pose)
     : VisualDetection(_x, _y, _distance, _bearing),
       VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
+      pose(_pose),
       possibleCorners(ConcreteCorner::concreteCorners().begin(),
                       ConcreteCorner::concreteCorners().end()),
       cornerType(UNKNOWN), secondaryShape(UNKNOWN), line1(l1), line2(l2),
@@ -26,7 +33,7 @@ VisualCorner::VisualCorner(const int _x, const int _y,
       // will get assigned in determineCornerShape which is right here in the
       // constructor.
       tBar(line1), tStem(line2),
-      angleBetweenLines(0), orientation(0)
+      angleBetweenLines(0), orientation(0), physicalOrientation(0)
 {
     lines.push_back(line1);
     lines.push_back(line2);
@@ -41,12 +48,15 @@ VisualCorner::~VisualCorner() {}
 
 VisualCorner::VisualCorner(const VisualCorner& other)
     : VisualDetection(other), VisualLandmark<cornerID>(other),
+      pose(other.pose),
       possibleCorners(other.possibleCorners),
       cornerType(other.cornerType), secondaryShape(other.secondaryShape),
       line1(other.line1), line2(other.line2), lines(other.lines),
       t1(other.t1), t2(other.t2),
       tBar(other.tBar), tStem(other.tStem),
-      angleBetweenLines(other.angleBetweenLines), orientation(other.orientation)
+      angleBetweenLines(other.angleBetweenLines),
+      orientation(other.orientation),
+      physicalOrientation(other.physicalOrientation)
 {
 }
 
@@ -74,6 +84,7 @@ void VisualCorner::determineCornerShape() {
     } else {
         // Temporary side effect - set angleBetweenLines
         cornerType = getLClassification();
+        physicalOrientation = getLPhysicalOrientation();
     }
 
     secondaryShape = UNKNOWN;
@@ -260,6 +271,44 @@ const shape VisualCorner::getLClassification() {
         return OUTER_L;
     }
 }
+
+/**
+ * See documentation for VisualCorner::physicalOrientation
+ * variable. Determines the value for L corners.
+ */
+double VisualCorner::getLPhysicalOrientation()
+{
+    // Get line endpoints
+    point<int> line1End = Utility::getPointFartherFromCorner(*line1, x, y);
+    point<int> line2End = Utility::getPointFartherFromCorner(*line2, x, y);
+
+    // Find which line is on the left:
+    // Is line2End to the left of the line intersect->line1End
+    point<int> leftEnd = Utility::left(point<int>(x,y),
+                                       line1End,
+                                       line2End) ? line2End : line1End;
+
+    estimate endPt = pose->pixEstimate(leftEnd.x, leftEnd.y, 0);
+
+    // Use angles to determine orientation
+    double i = distance * cos(bearing) - endPt.dist * cos(endPt.bearing);
+    double j = distance * sin(bearing) - endPt.dist * sin(endPt.bearing);
+
+    double legLength = hypot(i,j);
+
+    double cosBearing, sinBearing;
+    sincos(bearing, &sinBearing, &cosBearing);
+
+    // Dot product of us->intersect and leftEnd->intersect
+    double dot = distance * (cosBearing * i + sinBearing * j);
+
+    double orientationCos = dot/(distance * legLength);
+
+    // -sign(j) gives us the signed orientation depending on direction
+    // of vector
+    return -copysign(1,j) * acos(orientationCos);
+}
+
 
 /**
  * Use the ID and shape of the corner to help narrow down IDs for

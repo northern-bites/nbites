@@ -40,8 +40,8 @@ public:
     static const bool collinear(const point<int> &a, const point <int> &b,
                                 const point <int> &c);
 
-    // Returns true if the point is in the rectangle formed from the VisualLine's
-    // endpoints
+    // Returns true if the point is in the rectangle formed from the
+    // VisualLine's endpoints
     static const bool between(const VisualLine& line,
                               const point <int>& p);
 
@@ -55,13 +55,18 @@ public:
     static const bool intersectProp(const point<int> &a, const point<int> &b,
                                     const point<int> &c, const point<int> &d);
 
-    static const bool intersectProp(const VisualLine& line1, const VisualLine& line2);
+    static const bool intersectProp(const VisualLine& line1,
+                                    const VisualLine& line2);
 
-    static const point<int> getPointFartherFromCorner(const VisualLine &l, int cornerX, int cornerY);
+    static const point<int> getPointFartherFromCorner(const VisualLine &l,
+                                                      int cornerX,
+                                                      int cornerY);
 
 
-    static const point<int> getCloserEndpoint(const VisualLine& l, int x, int y);
-    static const point<int> getCloserEndpoint(const VisualLine& l, const point<int>& p);
+    static const point<int> getCloserEndpoint(const VisualLine& l,
+                                              int x, int y);
+    static const point<int> getCloserEndpoint(const VisualLine& l,
+                                              const point<int>& p);
 
     //static const float hypot(const float a, const float b);
 
