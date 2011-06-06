@@ -108,7 +108,6 @@ class GoTeam:
         # Print changes
         if play.changed:
             self.brain.speech.say(PBConstants.SUB_ROLES[play.subRole])
-            self.printf("Said Sub Role")
             if self.printStateChanges:
                 self.printf("Play switched to " + play.__str__())
 
