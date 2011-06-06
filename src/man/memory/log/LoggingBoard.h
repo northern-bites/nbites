@@ -11,40 +11,54 @@
  *
  */
 
-
 #pragma once
 
-#include <map.h>
-#include "CodedFileLogger.hpp"
-#include "memory/Memory.hpp"
-#include "memory/MObject.hpp
-#include "include/io/FDProvider.h"
+#include <map>
+
+#include "include/io/FileFDProvider.h"
+
+#include "CodedFileLogger.h"
+#include "ImageFDLogger.h"
 
 #include "NaoPaths.h"
-#include "FDLogger.h"
+#include "memory/MObject.h"
+
+//forward declaration
+namespace memory {
+namespace log {
+class LoggingBoard;
+}
+}
+
+#include "memory/Memory.h"
 
 namespace memory {
 
 namespace log {
 
-typedef pair< const MObject*, FDLogger*> objectFDLoggerPair;
-typedef pair< const MObject*, FDProvider*> objectFDProviderPair;
+typedef pair< const MObject*, FDLogger*> ObjectFDLoggerPair;
+typedef pair< const MObject*, FDProvider*> ObjectFDProviderPair;
+
+typedef map< const MObject*, FDLogger*> ObjectFDLoggerMap;
+typedef map< const MObject*, FDProvider*> ObjectFDProviderMap;
 
 class LoggingBoard {
 
 public:
     LoggingBoard(const Memory* _memory);
-    ~LoggingBoard();
+    //~LoggingBoard();
 
     void log(const MObject* mobject);
 
 private:
+    void initLoggingObjects();
+
+private:
     const Memory* memory;
-    map<const MObject*, FDLogger*> objectFDLoggerMap;
-    map<const MObject*, FDProvider*> objectFDProviderMap;
+    ObjectFDLoggerMap objectFDLoggerMap;
+    ObjectFDProviderMap objectFDProviderMap;
+
 
 };
-
 }
-
 }

@@ -20,14 +20,12 @@ namespace memory {
 class Memory; //forward declaration
 }
 
-//TODO: make everything .h
 #include "MVision.h"
 #include "Vision.h"
 #include "MSensors.h"
 #include "Sensors.h"
 #include "Profiler.h"
-//TODO: remove this after making the logging board
-#include "NaoPaths.h"
+#include "log/LoggingBoard.h"
 
 namespace memory {
 
@@ -60,14 +58,14 @@ public:
     void updateVisionSensors();
 
 public:
-    //TODO: make this return a const poitner
     const MSensors* getMSensors() const {return msensors;}
-    const MSensors* getMVision() const {return msensors;}
+    const MVision* getMVision() const {return mvision;}
 
 private:
     shared_ptr<Profiler> _profiler;
     MVision* mvision;
     MSensors* msensors;
 
+    log::LoggingBoard* loggingBoard;
 };
 }

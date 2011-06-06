@@ -12,7 +12,6 @@
 #include "protos/Vision.pb.h"
 #include "MObject.h"
 #include "Vision.h"
-#include "log/CodedFileLogger.h"
 
 namespace memory {
 class MVision: public proto::PVision, public MObject {
@@ -30,7 +29,6 @@ public:
      * from the Vision object
      */
     void update();
-    void log() const;
 
 private:
     //update helper methods
@@ -39,7 +37,6 @@ private:
 
 private:
     boost::shared_ptr<Vision> vision;
-    log::CodedFileLogger* fileLogger;
 
 };
 }

@@ -19,7 +19,8 @@ include_directories( ${PROTOBUF_INCLUDE_DIRS}/
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 set( LOGGER_SRCS CodedFileLogger.cpp
-                 ImageFDLogger.cpp)
+                 ImageFDLogger.cpp
+                 LoggingBoard.cpp)
 
 ############################ Add sources
 # Add static library target
@@ -33,4 +34,5 @@ target_link_libraries(
     ${LOGGER_TARGET}
     ${PROTOBUF_LIBRARIES}
     ${ROBOT_CONNECT_TARGET}
+    ${MEMORY_TARGET}
     )
