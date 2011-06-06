@@ -42,7 +42,7 @@ public:
      */
     ImageFDLogger(const FDProvider* fdp,
                   int logTypeID,
-                  RoboImage* roboImage);
+                  const RoboImage* roboImage);
 
     /**
      * Closes the file, which will flush the output buffer
@@ -51,7 +51,7 @@ public:
     ~ImageFDLogger();
 
     void write();
-    uint8_t* getCurrentImage();
+    const uint8_t* getCurrentImage() const;
 
 
 private:
@@ -75,7 +75,7 @@ private:
     int current_buffer_size;
     unsigned long long bytes_written;
     int logID;
-    RoboImage* roboImage;
+    const RoboImage* roboImage;
 
    /**
     * @var raw_output : a ZeroCopyOutputStream, an abstract I/O interface

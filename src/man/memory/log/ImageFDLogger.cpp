@@ -31,7 +31,7 @@ using namespace std;
 
 ImageFDLogger::ImageFDLogger(const FDProvider* fdp,
         int logTypeID,
-        RoboImage* roboImage) :
+        const RoboImage* roboImage) :
         FDLogger(fdp),
         current_buffer(new (void*)),
         current_buffer_size(1),
@@ -63,10 +63,10 @@ void ImageFDLogger::write() {
     this->getNextBuffer();
     _copy_image(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(roboImage->getImage())),
             reinterpret_cast<uint8_t*> (*current_buffer));
-
+    //roboImage->updateImage(getCurrentImage());
 }
 
-uint8_t* ImageFDLogger::getCurrentImage() {
+const uint8_t* ImageFDLogger::getCurrentImage() const {
     return reinterpret_cast<uint8_t*> (*current_buffer);
 }
 
