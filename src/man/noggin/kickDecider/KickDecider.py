@@ -100,7 +100,8 @@ class KickDecider(object):
                 return kicks.RIGHT_SIDE_KICK
         # if only one was seen
         elif (rightPostBearing is not None):
-            # if the right post is roughly to our right (but not too far), kick straight
+            # if the right post is roughly to our right
+            #(but not too far), kick straight
             if (rightPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0 and \
                     rightPostBearing >= -1*constants.KICK_STRAIGHT_BEARING_THRESH):
                 return self.chooseDynamicKick()
@@ -133,10 +134,14 @@ class KickDecider(object):
         # first determine if both my goal posts were seen
         if (rightPostBearing is not None and leftPostBearing is not None):
             distDiff = rightPostDist - leftPostDist
-            # if we are facing between our posts and difference between dists is small enough
+            # if we are facing between our posts and difference
+            #between dists is small enough
             if (rightPostBearing >= 0 and leftPostBearing <= 0 and \
-                    distDiff <= constants.CLEAR_POST_DIST_DIFF):
-                return self.chooseBackKick()
+                    distDiff <= constants.CENTERED_POST_DIST_DIFF):
+                return self.chooseLongBackKick()
+            elif(rightPostBearing >=0 and leftPostBearing <= 0 and \
+                     distDiff <= constants.CLEAR_POST_DIST_DIFF):
+                return self.chooseShortBackKick()
             elif (rightPostDist <= leftPostDist):
                 return kicks.LEFT_SIDE_KICK
             elif (leftPostDist < rightPostDist):
@@ -163,10 +168,12 @@ class KickDecider(object):
             return self.chooseDynamicKick()
         elif (my.h <= 135. and my.h > 45.):
             return kicks.LEFT_SIDE_KICK
-        elif (my.h >= -135. and my.h < -45.):
-            return kicks.RIGHT_SIDE_KICK
         else:
-            return self.chooseBackKick()
+            return kicks.RIGHT_SIDE_KICK
+        #Our localization is unreliable so NEVER rely on it
+        #to do a backKick.  The kick is too powerful to use blindly
+        # else:
+        #     return self.chooseShortBackKick()
 
     def chooseDynamicKick(self):
         ball = self.brain.ball
@@ -174,8 +181,14 @@ class KickDecider(object):
             return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
         return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
 
-    def chooseBackKick(self):
+    def chooseLongBackKick(self):
         ball = self.brain.ball
         if ball.relY > 0:
-            return kicks.LEFT_BACK_KICK
-        return kicks.RIGHT_BACK_KICK
+            return kicks.LEFT_LONG_BACK_KICK
+        return kicks.RIGHT_LONG_BACK_KICK
+
+    def chooseShortBackKick(self):
+        ball = self.brain.ball
+        if ball.relY >0:
+            return kicks.LEFT_SHORT_BACK_KICK
+        return kicks.RIGHT_SHORT_BACK_KICK
