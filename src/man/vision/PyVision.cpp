@@ -69,6 +69,7 @@ BOOST_PYTHON_MODULE(vision)
 
   class_<FieldLines>("FieldLines", no_init)
     .def_readonly("numCorners", &FieldLines::getNumCorners)
+    .def_readonly("numLines", &FieldLines::getNumLines)
     ;
     
   //noncopyable is required because vision has no public copy constructor
