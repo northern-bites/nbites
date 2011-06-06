@@ -755,7 +755,7 @@ uint8_t* Sensors::getRawNaoImage()
 
 //get a pointer to the full size Nao image
 //this image has been copied to some local buffer
-uint8_t* Sensors::getNaoImage()
+const uint8_t* Sensors::getNaoImage() const
 {
     return naoImage;
 }
@@ -791,7 +791,7 @@ void Sensors::setRawNaoImage(uint8_t *img)
     this->notify(ProviderEvent(this, NEW_IMAGE));
 }
 
-void Sensors::setNaoImage(uint8_t *img)
+void Sensors::setNaoImage(const uint8_t *img)
 {
     naoImage = img;
 }

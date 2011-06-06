@@ -548,7 +548,7 @@ void ALImageTranscriber::waitForImage ()
 //            if (naoImage != NULL) {
                 //_copy_image(ALimage->getData(), naoImage);
             	sensors->setRawNaoImage(ALimage->getData());
-                _acquire_image_fast(table, &params, sensors->getNaoImage(), image);
+                _acquire_image_fast(table, &params, const_cast<uint8_t*>(sensors->getNaoImage()), image);
 //            }
 #else
             ImageAcquisition::acquire_image_fast(table, params,
