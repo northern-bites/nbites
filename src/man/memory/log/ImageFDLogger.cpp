@@ -30,27 +30,27 @@ extern long long birth_time;
 using namespace std;
 
 ImageFDLogger::ImageFDLogger(const FDProvider* fdp,
-                             int logTypeID,
-                             RoboImage* roboImage) :
+        int logTypeID,
+        RoboImage* roboImage) :
         FDLogger(fdp),
         current_buffer(new (void*)),
         current_buffer_size(1),
         bytes_written(0),
         logID(logTypeID),
         roboImage(roboImage)
-        {
+{
     raw_output = new FileOutputStream(file_descriptor, roboImage->getByteSize());
     cout << raw_output->GetErrno() << endl;
     writeHead();
 }
 
 void ImageFDLogger::writeHead() {
-	this->getNextBuffer();
-	uint32_t bytes_written = 0;
+    this->getNextBuffer();
+    uint32_t bytes_written = 0;
     // this helps us ID the log
-	this->writeValue<int32_t>(logID, &bytes_written);
-	// this time stamps the log
-	//extern int64_t birth_time;
+    this->writeValue<int32_t>(logID, &bytes_written);
+    // this time stamps the log
+    //extern int64_t birth_time;
     //this->writeValue<int64_t>(birth_time, &bytes_written);
     this->writeValue<uint32_t>(roboImage->getWidth(), &bytes_written);
     this->writeValue<uint32_t>(roboImage->getHeight(), &bytes_written);
@@ -62,12 +62,12 @@ void ImageFDLogger::write() {
 
     this->getNextBuffer();
     _copy_image(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(roboImage->getImage())),
-    		reinterpret_cast<uint8_t*> (*current_buffer));
+            reinterpret_cast<uint8_t*> (*current_buffer));
 
 }
 
 uint8_t* ImageFDLogger::getCurrentImage() {
-	return reinterpret_cast<uint8_t*> (*current_buffer);
+    return reinterpret_cast<uint8_t*> (*current_buffer);
 }
 
 void ImageFDLogger::getNextBuffer() {

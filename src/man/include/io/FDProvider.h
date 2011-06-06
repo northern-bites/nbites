@@ -18,12 +18,12 @@
 class FDProvider {
 
 public:
-	FDProvider() {};
-	int getFileDescriptor() const { return file_descriptor; }
+    FDProvider() {};
+    int getFileDescriptor() const { return file_descriptor; }
 
-	virtual void openFileDescriptor() = 0;
+    virtual void openFileDescriptor() = 0;
 
 protected:
-	int file_descriptor;
+    int file_descriptor;
 
 };

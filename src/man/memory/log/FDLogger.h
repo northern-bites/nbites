@@ -26,12 +26,12 @@ public:
      * to log to
      */
     FDLogger(const FDProvider* fdp):
-    	file_descriptor_provider(fdp),
-    	file_descriptor(fdp->getFileDescriptor())
-        {
+        file_descriptor_provider(fdp),
+        file_descriptor(fdp->getFileDescriptor())
+    {
         if (file_descriptor < 0) {
             std::cout << "Warning: invalid file descriptor passed for logging! "
-                      << std::endl;
+                    << std::endl;
         }
     }
     /**
