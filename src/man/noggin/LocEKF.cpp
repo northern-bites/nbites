@@ -412,9 +412,7 @@ void LocEKF::incorporateMeasurement(Observation z,
         return;
     }
 
-    if ( z.isLine() ){
-        incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
-    } else if (z.getVisDistance() < USE_CARTESIAN_DIST) {
+    if (z.getVisDistance() < USE_CARTESIAN_DIST) {
         incorporateCartesianMeasurement( obsIndex, z, H_k, R_k, V_k);
     } else {
         incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
@@ -532,145 +530,72 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
     cout << "\t\t\tUsing polar " << endl;
 #endif
 
+    // Get the observed range and bearing
+    MeasurementVector z_x(2);
+    z_x(0) = z.getVisDistance();
+    z_x(1) = z.getVisBearing();
 
-    if ( z.isLine() ){
+    // Get expected values of the post
+    PointLandmark bestPossibility = z.getPointPossibilities()[obsIndex];
+    const float x_b = bestPossibility.x;
+    const float y_b = bestPossibility.y;
+    MeasurementVector d_x(2);
 
-        MeasurementVector z_x(2);
-        z_x(0) = z.getVisDistance();
-        z_x(1) = z.getVisBearing();
+    const float x = xhat_k_bar(0);
+    const float y = xhat_k_bar(1);
+    const float h = xhat_k_bar(2);
 
-        const LineLandmark l = z.getLinePossibilities()[obsIndex];
+    d_x(0) = static_cast<float>(hypot(x - x_b, y - y_b));
+    d_x(1) = safe_atan2(y_b - y,
+                        x_b - x) - h;
+    d_x(1) = NBMath::subPIAngle(d_x(1));
 
-        const float x_l = l.dx;
-        const float y_l = l.dy;
+    // Calculate invariance
+    V_k       = z_x - d_x;
+    V_k(1) = NBMath::subPIAngle(V_k(1));
 
-        const float x_b = l.x1;
-        const float y_b = l.y1;
+    // Calculate jacobians
+    H_k(0,0) = (x - x_b) / d_x(0);
+    H_k(0,1) = (y - y_b) / d_x(0);
+    H_k(0,2) = 0;
 
-        const float x_r = xhat_k_bar(0);
-        const float y_r = xhat_k_bar(1);
-        const float h_r = xhat_k_bar(2);
+    H_k(1,0) = (y_b - y) / (d_x(0)*d_x(0));
+    H_k(1,1) = (x - x_b) / (d_x(0)*d_x(0));
+    H_k(1,2) = -1;
 
-        const pair<float, float> closestLandmarkXY =
-            findClosestLinePointCartesian(l, x_r, y_r, h_r);
-
-        // Relativize the closest point
-        const float relX_p = closestLandmarkXY.first;
-        const float relY_p = closestLandmarkXY.second;
-
-        // If we're standing on top of the point (can happen in rare cases
-        // such as when loc is initialized), don't process it (leads to nan)
-        if (z.getVisDistance() < 0.001 ||
-            (relX_p < 0.001 && relY_p < 0.001)) {
-            R_k(0,0) = DONT_PROCESS_KEY;
-            return;
-        }
-
-        // Jacobians for line updates
-        H_k(0,0) = (2.0f*(-1.0f + pow(x_l,2.0f))*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2.0f*x_l*y_l*(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.0f*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f)));
-        H_k(0,1) = (2.0f*x_l*y_l*(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)) + 2.0f*(-1.0f + pow(y_l,2.0f))* (y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r)))/ (2.0f*sqrt(pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f)));
-        H_k(0,2) = 0.0f;
-
-        H_k(1,0) = -(((-1.0f + pow(x_l,2.0f) + pow(y_l,2.0f))*(y_b - y_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r), 2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f)));
-        H_k(1,1) = ((-1.0f + pow(x_l,2.0f) + pow(y_l,2.0f))*(x_b - x_r))/ (pow(x_b - x_r + x_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f) + pow(y_b - y_r + y_l*(-(x_b*x_l) - y_b*y_l + x_l*x_r + y_l*y_r),2.0f));
-        H_k(1,2) = -1.0f;
-
-        MeasurementVector d_x(2);
-        d_x(0) = static_cast<float>(hypot(relX_p, relY_p));
-        d_x(1) = safe_atan2(relY_p, relX_p) - h_r;
-        d_x(1) = subPIAngle(d_x(1));
-
+    // Update the measurement covariance matrix
+    R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
+    R_k(0,1) = 0.0;
+    R_k(1,0) = 0.0;
+    R_k(1,1) = z.getBearingSD() * z.getBearingSD();
 
 #ifdef USE_MM_LOC_EKF
-        // Set the uncertainty of the prediction
-        // @todo double check this. Almost certainly not right... @jgm
-        const double uncertX = getXUncert();
-        const double uncertY = getYUncert();
-        const double uncertH = getHUncert();
+    const double uncertX = getXUncert();
+    const double uncertY = getYUncert();
+    const double uncertH = getHUncert();
 
-        R_pred_k(0,0) = static_cast<float>(hypot(uncertX, uncertY));
-        R_pred_k(0,1) = 0;
-        R_pred_k(1,0) = 0;
-        R_pred_k(1,1) = .5 * uncertH;
-#endif
+    const float xInvariance = abs(x - x_b);
+    const float yInvariance = abs(y - y_b);
 
-        // Calculate invariance
-        V_k       = z_x - d_x;
-        V_k(1) = NBMath::subPIAngle(V_k(1));
-
-        R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
-        R_k(0,1) = 0;
-        R_k(1,0) = 0;
-        R_k(1,1) = z.getBearingSD() * z.getBearingSD();
-
-    } else{
-        // Get the observed range and bearing
-        MeasurementVector z_x(2);
-        z_x(0) = z.getVisDistance();
-        z_x(1) = z.getVisBearing();
-
-        // Get expected values of the post
-        PointLandmark bestPossibility = z.getPointPossibilities()[obsIndex];
-        const float x_b = bestPossibility.x;
-        const float y_b = bestPossibility.y;
-        MeasurementVector d_x(2);
-
-        const float x = xhat_k_bar(0);
-        const float y = xhat_k_bar(1);
-        const float h = xhat_k_bar(2);
-
-        d_x(0) = static_cast<float>(hypot(x - x_b, y - y_b));
-        d_x(1) = safe_atan2(y_b - y,
-                            x_b - x) - h;
-        d_x(1) = NBMath::subPIAngle(d_x(1));
-
-        // Calculate invariance
-        V_k       = z_x - d_x;
-        V_k(1) = NBMath::subPIAngle(V_k(1));
-
-        // Calculate jacobians
-        H_k(0,0) = (x - x_b) / d_x(0);
-        H_k(0,1) = (y - y_b) / d_x(0);
-        H_k(0,2) = 0;
-
-        H_k(1,0) = (y_b - y) / (d_x(0)*d_x(0));
-        H_k(1,1) = (x - x_b) / (d_x(0)*d_x(0));
-        H_k(1,2) = -1;
-
-        // Update the measurement covariance matrix
-        R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
-        R_k(0,1) = 0.0;
-        R_k(1,0) = 0.0;
-        R_k(1,1) = z.getBearingSD() * z.getBearingSD();
-
-#ifdef USE_MM_LOC_EKF
-        const double uncertX = getXUncert();
-        const double uncertY = getYUncert();
-        const double uncertH = getHUncert();
-
-        const float xInvariance = abs(x - x_b);
-        const float yInvariance = abs(y - y_b);
-
-        R_pred_k(0,0) = ((uncertX/xInvariance) + (uncertY/yInvariance) /
-                         (xInvariance*xInvariance + yInvariance*yInvariance));
-        R_pred_k(0,1) = 0;
-        R_pred_k(1,0) = 0;
-        R_pred_k(1,1) = (((uncertY / yInvariance) + (uncertX / xInvariance)) /
-                         (yInvariance / xInvariance) + uncertH);
+    R_pred_k(0,0) = ((uncertX/xInvariance) + (uncertY/yInvariance) /
+                     (xInvariance*xInvariance + yInvariance*yInvariance));
+    R_pred_k(0,1) = 0;
+    R_pred_k(1,0) = 0;
+    R_pred_k(1,1) = (((uncertY / yInvariance) + (uncertX / xInvariance)) /
+                     (yInvariance / xInvariance) + uncertH);
 #endif
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-        cout << "\t\t\tR vector is" << R_k << endl;
-        cout << "\t\t\tH vector is" << H_k << endl;
-        cout << "\t\t\tV vector is" << V_k << endl;
-        cout << "\t\t\t\td vector is" << d_x << endl;
-        cout << "\t\t\t\t\tx est is " << x << endl;
-        cout << "\t\t\t\t\ty est is " << y << endl;
-        cout << "\t\t\t\t\th est is " << h << endl;
-        cout << "\t\t\t\t\tx_b est is " << x_b << endl;
-        cout << "\t\t\t\t\ty_b est is " << y_b << endl;
+    cout << "\t\t\tR vector is" << R_k << endl;
+    cout << "\t\t\tH vector is" << H_k << endl;
+    cout << "\t\t\tV vector is" << V_k << endl;
+    cout << "\t\t\t\td vector is" << d_x << endl;
+    cout << "\t\t\t\t\tx est is " << x << endl;
+    cout << "\t\t\t\t\ty est is " << y << endl;
+    cout << "\t\t\t\t\th est is " << h << endl;
+    cout << "\t\t\t\t\tx_b est is " << x_b << endl;
+    cout << "\t\t\t\t\ty_b est is " << y_b << endl;
 #endif
-    }
 }
 
 /**
@@ -689,88 +614,10 @@ int LocEKF::findBestLandmark(const Observation& z)
         return -1;
     } else if (z.getNumPossibilities() == 1){
         return 0;
-    } else if (z.isLine()){
-        return findMostLikelyLine(z);
     } else {
         return findNearestNeighbor(z);
     }
 }
-
-/**
- * Uses the Mahalanobis distance to find the most likely line choice
- */
-int LocEKF::findMostLikelyLine(const Observation &z)
-{
-
-    vector<LineLandmark> possibleLines = z.getLinePossibilities();
-    int minIndex = -1;
-    float minDivergence = 800000.0f;
-    for (unsigned int i = 0; i < possibleLines.size(); ++i) {
-        float distance = getMahalanobisDistance(z, possibleLines[i]);
-
-        if (distance < minDivergence) {
-            minDivergence = distance;
-            minIndex = i;
-        }
-    }
-    return minIndex;
-}
-
-/**
- * Find the Mahalanobis distance from the observed line
- * to the potential concrete line. Uses Cartesian coordinates.
- *
- * @param The observed line
- * @param The ConcreteLine to compare against
- * @return The Mahalanobis distance between the lines
- */
-float LocEKF::getMahalanobisDistance(const Observation& z, const LineLandmark& l)
-{
-    // Robot's current estimated position
-    const float x_r = xhat_k_bar(0);
-    const float y_r = xhat_k_bar(1);
-    const float h_r = xhat_k_bar(2);
-
-    // x,y coordinates of observed line in the field frame of reference
-    MeasurementVector z_x(2);
-    z_x(0) = x_r + z.getVisDistance() * cos(z.getVisBearing() + h_r);
-    z_x(1) = y_r + z.getVisDistance() * sin(z.getVisBearing() + h_r);
-
-    const pair<float, float> line_xy =
-        findClosestLinePointCartesian(l, x_r, y_r, h_r);
-
-    MeasurementVector u(2);
-    u(0) = line_xy.first;
-    u(1) = line_xy.second;
-
-    const float dist_sd_2 = pow(z.getDistanceSD(), 2);
-
-    const float bsd = z.getVisBearing();
-
-    float cosb, sinb;
-    sincosf(bsd, &sinb, &cosb);
-
-    const float sinb_2 = sinb * sinb;
-    const float cosb_2 = cosb * cosb;
-
-    MeasurementMatrix s_inverse =
-        boost::numeric::ublas::scalar_matrix<float>(2,2,0.0f);
-    s_inverse(0,0) = ((0.0001f + dist_sd_2*sinb_2)/
-                      (1.e-8f + (dist_sd_2*cosb_2)/10000.f +
-                       (dist_sd_2*sinb_2)/10000.f));
-    s_inverse(0,1) = (-((dist_sd_2*cosb*sinb)/
-                        (1.e-8f + (dist_sd_2*cosb_2)/10000.f +
-                         (dist_sd_2*sinb_2)/10000.f)));
-    s_inverse(1,0) = -((dist_sd_2*cosb*sinb)/
-                       (1.e-8f + (dist_sd_2*cosb_2)/10000.f +
-                        (dist_sd_2*sinb_2)/10000.f));
-    s_inverse(1,1) = ((0.0001f + dist_sd_2*cosb_2)/
-                      (1.e-8f + (dist_sd_2*cosb_2)/10000.f +
-                       (dist_sd_2*sinb_2)/10000.f));
-
-    return sqrt(inner_prod(trans(z_x-u),prod(s_inverse,z_x-u)));
-}
-
 
 /**
  * Find the point closest to our observation.

@@ -176,8 +176,6 @@ private:
 
 
     int findBestLandmark(const Observation& z);
-	int findMostLikelyLine(const Observation& z);
-	float getMahalanobisDistance(const Observation& z, const LineLandmark& ll);
 	int findNearestNeighbor(const Observation& z);
     float getDivergence(const Observation& z, const PointLandmark& pt);
 
