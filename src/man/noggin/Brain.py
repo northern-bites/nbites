@@ -35,6 +35,7 @@ from .players import Switch
 from .kickDecider import KickDecider
 
 import _roboguardian
+import _speech
 
 class Brain(object):
     """
@@ -61,6 +62,7 @@ class Brain(object):
         #initalize the leds
         #print leds
         self.leds = Leds.Leds(self)
+        self.speech = _speech.speech
 
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()

@@ -163,6 +163,7 @@ def playbookGoalieWalk(nav):
 
 def playbookAtPosition(nav):
     if nav.firstFrame():
+        nav.brain.speech.say("At Position")
         helper.setSpeed(nav, 0, 0, 0)
         nav.startOmniCount = 0
 

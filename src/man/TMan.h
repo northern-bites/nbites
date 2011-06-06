@@ -19,7 +19,8 @@ public:
          boost::shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
          boost::shared_ptr<MotionEnactor> _enactor,
          boost::shared_ptr<Synchro> synchro,
-         boost::shared_ptr<Lights> _lights);
+         boost::shared_ptr<Lights> _lights,
+         boost::shared_ptr<Speech> _speech);
 
     virtual ~TMan();
 
