@@ -33,11 +33,6 @@ public:
      * the proto message fields with values from its respective man counterpart
      */
     virtual void update() = 0;
-    /**
-     * method log - this should be overwritten by a method that does some
-     * sort of logging, or does nothing
-     */
-    virtual void log() const = 0;
 
 };
 }
