@@ -67,9 +67,25 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("rightOpening", &VisualCrossbar::getRightOpening)
     ;
 
+  //FieldLines: holds corner and line information
   class_<FieldLines>("FieldLines", no_init)
     .def_readonly("numCorners", &FieldLines::getNumCorners)
     .def_readonly("numLines", &FieldLines::getNumLines)
+    .add_property("linesList", &FieldLines::getActualLines)
+    ;
+
+  //FieldLines helper classes:
+
+  // FieldLines holds a list of shared_ptrs to VisualLines (linesList) 
+  
+  class_<VisualLine>("VisualLine", no_init)
+    .def_readonly("angle", &VisualLine::getAngle)
+    .def_readonly("avgWidth", &VisualLine::getAvgWidth)
+    .def_readonly("bearing", &VisualLine::getBearing)
+    .def_readonly("dist", &VisualLine::getDistance)
+    .def_readonly("length", &VisualLine::getLength)
+    .def_readonly("slope", &VisualLine::getSlope)
+    .def_readonly("yInt", &VisualLine::getYIntercept)
     ;
     
   //noncopyable is required because vision has no public copy constructor

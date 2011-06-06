@@ -133,9 +133,9 @@ class Brain(object):
         # self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
         #                                      Constants.VISION_YG_CROSSBAR)
 
-        # # Now we setup the corners
+        # Now we setup the corners and lines
         # self.corners = []
-        # self.lines = []
+        # self.lines = self.vision.fieldLines.linesList
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
