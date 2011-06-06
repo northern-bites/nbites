@@ -2,6 +2,7 @@
 
 #include "alcore/alerror.h"
 #include <iostream>
+#include <algorithm>
 
 ALSpeech::ALSpeech(AL::ALPtr<AL::ALBroker> broker) : Speech(), volume(0)
 {
@@ -25,6 +26,7 @@ ALSpeech::~ALSpeech()
 void ALSpeech::say(const std::string& text)
 {
     if (isEnabled){
+        replaceSymbols(text);
         alProxy->say(text);
     }
 }
@@ -42,3 +44,11 @@ float ALSpeech::getVolume()
     return volume;
 }
 
+void ALSpeech::replaceSymbols(const std::string& text)
+{
+    replace(text.begin(), text.end(), '_', ' ');
+    replace(text.begin(), text.end(), ',', ' ');
+    replace(text.begin(), text.end(), ':', ' ');
+    replace(text.begin(), text.end(), '.', ' ');
+    replace(text.begin(), text.end(), '-', ' ');
+}

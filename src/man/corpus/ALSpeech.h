@@ -19,7 +19,8 @@ public:
 public:
     virtual void say(const std::string& text);
     virtual void setVolume(float v);
-    virtual float  getVolume();
+    virtual float getVolume();
+    void replaceSymbols(const std::string& text);
 
 private:
     AL::ALPtr<AL::ALTextToSpeechProxy> alProxy;
