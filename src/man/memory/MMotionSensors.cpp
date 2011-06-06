@@ -67,6 +67,4 @@ void MMotionSensors::update() {
     this->set_support_foot(sensors->getSupportFoot());
 }
 
-void MMotionSensors::log() const {
-}
 }
