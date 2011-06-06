@@ -17,10 +17,10 @@ public:
 
     // Speech class interface
 public:
-    virtual void say(const std::string& text);
+    virtual void say(std::string text);
     virtual void setVolume(float v);
     virtual float getVolume();
-    void replaceSymbols(const std::string& text);
+    void replaceSymbols(std::string& text);
 
 private:
     AL::ALPtr<AL::ALTextToSpeechProxy> alProxy;

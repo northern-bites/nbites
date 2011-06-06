@@ -23,7 +23,7 @@ ALSpeech::~ALSpeech()
 
 }
 
-void ALSpeech::say(const std::string& text)
+void ALSpeech::say(std::string text)
 {
     if (isEnabled){
         replaceSymbols(text);
@@ -44,11 +44,9 @@ float ALSpeech::getVolume()
     return volume;
 }
 
-void ALSpeech::replaceSymbols(const std::string& text)
+void ALSpeech::replaceSymbols(std::string& text)
 {
     replace(text.begin(), text.end(), '_', ' ');
-    replace(text.begin(), text.end(), ',', ' ');
     replace(text.begin(), text.end(), ':', ' ');
-    replace(text.begin(), text.end(), '.', ' ');
     replace(text.begin(), text.end(), '-', ' ');
 }

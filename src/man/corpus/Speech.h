@@ -9,7 +9,7 @@ public:
     virtual ~Speech() { };
 
 public:
-    virtual void say(const std::string& text) {  }
+    virtual void say(std::string text) {  }
 
     virtual void  setVolume(float v) {           }
     virtual float getVolume()        { return 0; }

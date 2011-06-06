@@ -48,7 +48,7 @@ def playbookOmni(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    if (navTrans.atDestinationCloser(my, dest) and 
+    if (navTrans.atDestinationCloser(my, dest) and
         navTrans.atHeading(my, dest.h)):
         nav.playbookAtPositionCount += 1
         if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
