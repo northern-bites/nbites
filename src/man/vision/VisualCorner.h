@@ -76,6 +76,7 @@ public:
     const float getAngleBetweenLines() const { return angleBetweenLines; }
 
     const float getOrientation() const { return orientation; }
+    const float getPhysicalOrientation() const { return physicalOrientation; }
 
     const point<int> getTStemEndpoint() const;
     const bool doesItPointDown();
@@ -226,6 +227,5 @@ public:
                         abs(edges.bottom - y) < minPixelSeparation));
     }
 };
-
 
 #endif
