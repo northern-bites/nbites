@@ -7,7 +7,6 @@
 #include "PyLoc.h"
 #include "EKFStructs.h"
 #include <cstdlib>
-#include "MMLocEKF.h"
 #include "LocEKF.h"
 
 #include "PySensors.h"
@@ -368,7 +367,7 @@ void Noggin::updateLocalization()
 #           endif
 #           ifdef DEBUG_CC_DETECTION_SAVE_FRAMES
             if (i->getShape() == CIRCLE) {
-	      cout<< "saw cc" <<endl;
+                cout<< "saw cc" <<endl;
                 sensors->saveFrame();
             }
 #           endif
