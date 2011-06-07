@@ -34,19 +34,17 @@
 #include "ImageTranscriber.h"
 #include "Transcriber.h"
 #include "Lights.h"
+#include "Speech.h"
 #include "Common.h"
 #include "Profiler.h"
 #include "Sensors.h"
 #include "Vision.h"
 #include "Noggin.h"
-#include "Comm.h" 
+#include "Comm.h"
 #include "Motion.h"
 #include "NaoPose.h"
 #include "synchro.h"
 #include "RoboGuardian.h"
-#include "PyRoboGuardian.h"
-#include "PySensors.h"
-#include "PyLights.h"
 
 /**
  * The Naoqi module to run our main Nao robot system.
@@ -64,8 +62,8 @@ public:
         boost::shared_ptr<ImageTranscriber> _imageTranscriber,
         boost::shared_ptr<MotionEnactor> _enactor,
         boost::shared_ptr<Synchro> synchro,
-        boost::shared_ptr<Lights> _lights);
-
+        boost::shared_ptr<Lights> _lights,
+        boost::shared_ptr<Speech> _speech);
     // destructor
     virtual ~Man();
 
@@ -119,6 +117,7 @@ public:
     boost::shared_ptr<Noggin> noggin;
 #endif// USE_NOGGIN
     boost::shared_ptr<Lights> lights;
+    boost::shared_ptr<Speech> speech;
 
 };
 
