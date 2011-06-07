@@ -164,6 +164,21 @@ double Butterworth::X(double x)
   return Y(y + k * (v - y));
 }
 
+// This is called a template specialization. It allows us to define a
+// specific implementation of a template member to be used when the
+// specific class HighPass<Boxcar> is being instantiated. This is
+// similar in purpose to overriding a base class member, but being a
+// template mechanism it is done at compile time, not run time, and so
+// it can be more efficient. For a Boxcar filter, we make a high-pass
+// version not by subtracting the output from the current input value
+// but from the mid-point input value.
+template <>
+double HighPass<Boxcar>::X(double x)
+{
+  Boxcar::X(x);
+  return y = Mid() - Boxcar::Y();
+}
+
 // ********************
 // *                  *
 // *  Signal Monitor  *
