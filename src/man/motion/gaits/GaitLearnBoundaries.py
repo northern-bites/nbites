@@ -49,7 +49,7 @@ stepMax = (0.5,   #** step duration
 
 zmpMin = (0.0,   # **footCenterLocX
           0.1,   # **zmp static percentage
-          -0.5,   # ** left zmp off ## same as hip hack, L/R locked
+          -0.5,   # **left zmp off ## like with hip hack, these are optimized in tandem
           0.4,   # right zmp off
           0.01,  # strafe zmp offse
           6.6)   # turn zmp offset

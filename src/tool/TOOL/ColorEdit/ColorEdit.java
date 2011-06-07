@@ -455,21 +455,21 @@ public class ColorEdit extends JPanel implements DataListener,
      */
 
     public void initStats() {
-	// init table
+        // init table
         for (int i = 0; i < NUM_COLORS+1; i++) {
             for (int j = 0; j < NUMSTATS - 1; j++) {
-		// 1, 3, 4, the maxes ones...
+                // 1, 3, 4, the maxes ones...
                 if (j % 2 == 1) {
-		    colorStats[i][j] = FAKE_MAX;
-		}
-		else {
+                    colorStats[i][j] = FAKE_MAX;
+                }
+                else {
                     // mins
-		    colorStats[i][j] = FAKE_MIN;
-		}
-	    } //end  numstats loop
-	    // Count is 0
-	    colorStats[i][NUMSTATS - 1] = 0;
-	}//end num colors loop
+                    colorStats[i][j] = FAKE_MIN;
+                }
+            } //end  numstats loop
+            // Count is 0
+            colorStats[i][NUMSTATS - 1] = 0;
+        }//end num colors loop
     }//end function
 
     /** Runs through the color table and counts up where the colors
@@ -477,7 +477,7 @@ public class ColorEdit extends JPanel implements DataListener,
      */
     public void collectStats() {
 		initStats();
-
+        
         for(int y=0; y<yMax; y++) {
             for(int u=0; u<uMax; u++) {
                 for(int v=0; v<vMax; v++){

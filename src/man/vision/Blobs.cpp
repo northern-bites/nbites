@@ -78,7 +78,7 @@ void Blobs::setBottom(int i, int y) {
  * @param y        y value of run
  * @param h        height of run
 */
-void Blobs::blobIt(int x, int y, int h)
+void Blobs::blobIt(int x, int y, int h, bool merge)
 {
     const int WHAT_IS_CONTIGUOUS = 4;  // fudge factor for juding contiguity
     const int MIN_BLOB_SIZE = 20;      // number of blobs before changing standard
@@ -147,6 +147,10 @@ void Blobs::blobIt(int x, int y, int h)
 
             // don't create a blob
             newBlob = false;
+            // sometimes blobs that weren't contiguous before may be now
+            if (merge) {
+                checkForMergers();
+            }
             break;
         }
         // no else
@@ -167,6 +171,46 @@ void Blobs::blobIt(int x, int y, int h)
         blobs[numBlobs].setArea(h);
         numBlobs++;
     }
+}
+
+/* Checks if any of our blobs are overlapping.  If so, then merge then and
+   eliminate one of them.
+ */
+void Blobs::checkForMergers()
+{
+    for (int i = 1; i < numBlobs; i++) {
+        for (int j = 0; j < i; j++) {
+            if (blobsOverlap(j, i)) {
+                mergeBlobs(i, j);
+            }
+        }
+    }
+}
+
+/* Do two blobs overlap?  Return true if they do.
+ */
+bool Blobs::blobsOverlap(int first, int second)
+{
+    const int SKIP = 4;
+    if (blobs[first].getLeft() < blobs[second].getLeft()) {
+        if (blobs[second].getLeft() > blobs[first].getRight() + SKIP) {
+            return false;
+        }
+    } else if (blobs[first].getLeft() > blobs[second].getRight() + SKIP) {
+        return false;
+    }
+    // at this point we know they overlap in the x direction
+    if (blobs[first].getTop() < blobs[second].getTop()) {
+        if (blobs[second].getTop() > blobs[first].getBottom() + SKIP) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    if (blobs[first].getTop() > blobs[second].getBottom() + SKIP) {
+        return false;
+    }
+    return true;
 }
 
 /*
@@ -208,6 +252,25 @@ Blob* Blobs::getWidest()
     }
 	return topBlob;
 }
+
+/*
+  Checks all of the blobs of this color and finds the biggest one.
+  returns its index.
+*/
+int Blobs::getBiggest()
+{
+	int index = 0;
+    int size = 0;
+    //check each blob in the array
+    for (int i = 0; i < numBlobs; i++) {
+		if (blobs[i].getArea() > size) {
+            size = blobs[i].getArea();
+			index = i;
+        }
+    }
+	return index;
+}
+
 
 /* Turn a blob back to zeros because of merging.
    @param which     The index of the blob to be zeroed

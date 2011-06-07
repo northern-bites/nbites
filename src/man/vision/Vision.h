@@ -59,7 +59,7 @@ class Vision
 
 public:
     Vision(boost::shared_ptr<NaoPose> _pose, boost::shared_ptr<Profiler> _prof);
-    virtual ~Vision();
+    ~Vision();
 
 private:
     // DO NOT ever copy or assign vision objects. Copying causes problems
@@ -72,31 +72,31 @@ private:
 
 public:
     // Main Vision methods
-    //   virtual, to allow overloading
     // copy the data from the given image into the static image pointer
-    virtual void copyImage(const byte *image);
+    void copyImage(const byte *image);
     // utilize the given image pointer for vision processing
     //   equivalent to setImage(image), followed by notifyImage()
-    virtual void notifyImage(const uint16_t *image);
+    void notifyImage(const uint16_t *image);
     // utilize the current image pointer for vision processing
-    virtual void notifyImage();
+    void notifyImage();
     // set the current image pointer to the given pointer
-    virtual void setImage(const uint16_t* image);
+    void setImage(const uint16_t* image);
 
     // visualization methods
-    virtual void drawBoxes(void);
-    virtual void drawFieldObject(VisualFieldObject* obj, int color);
-    virtual void drawCrossbar(VisualCrossbar* obj, int color);
-    virtual void drawBox(int left, int right, int bottom, int top, int c);
-    virtual void drawCenters(void);
-    virtual void drawRect(int left, int top, int width, int height, int c);
-    virtual void drawLine(int x, int y, int x1, int y1, int c);
-    virtual void drawLine(boost::shared_ptr<VisualLine> line, const int color);
-    virtual void drawVerticalLine(int x, int c);
-    virtual void drawHorizontalLine(int x, int c);
-    virtual void drawDot(int x, int y, int c);
-    virtual void drawCrossHairs(int x, int y, int c);
-    virtual void drawFieldLines();
+    void drawBoxes(void);
+    void drawFieldObject(VisualFieldObject* obj, int color);
+    void drawCrossbar(VisualCrossbar* obj, int color);
+    void drawBox(int left, int right, int bottom, int top, int c);
+    void drawCenters(void);
+    void drawRect(int left, int top, int width, int height, int c);
+    void drawLine(int x, int y, int x1, int y1, int c);
+    void drawLine(boost::shared_ptr<VisualLine> line, const int color);
+    void drawLine(const point<int> start, const point<int> end,
+		  const int c);
+    void drawDot(int x, int y, int c);
+    void drawFieldLines();
+    void drawX(int x, int y, int c);
+    void drawPoint(int x, int y, int c);
 
 
     //
@@ -143,8 +143,8 @@ public:
     VisualFieldObject *bgrp, *bglp;
     VisualFieldObject *ygrp, *yglp;
     VisualCrossbar *ygCrossbar, *bgCrossbar;
-    VisualRobot *red1, *red2;
-    VisualRobot *navy1, *navy2;
+    VisualRobot *red1, *red2, *red3;
+    VisualRobot *navy1, *navy2, *navy3;
 	VisualCross *cross;
     VisualBall *ball;
 	VisualFieldEdge *fieldEdge;

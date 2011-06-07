@@ -23,12 +23,12 @@ PICKLE="PSO_pGaitLearner.pickle"
 # fetch the gait file from the robot
 FETCH_GAIT="scp nao@$ROBOT_IP:/home/nao/gaits/$PICKLE /tmp/"
 
-echo "Fetching gait..."
-echo $FETCH_GAIT
-#$FETCH_GAIT
-
 echo "Type username for RoboCup server, followed by [ENTER]"
 read username
+
+echo "Fetching gait..."
+echo $FETCH_GAIT
+eval $FETCH_GAIT
 
 SERVER="$username@robocup.bowdoin.edu"
 
@@ -36,18 +36,18 @@ SERVER="$username@robocup.bowdoin.edu"
 NOW=`date "+%m_%d_%H_%M"`  # month_day_hour_minute
 
 PICKLE_PATH="$ROBOCUP_DIR/$PSO_DIR/$PICKLE"
-BACKUP="ssh $SERVER cp $PICKLE_PATH $PICKLE_PATH.$NOW"
+BACKUP="ssh $SERVER 'cp $PICKLE_PATH $PICKLE_PATH.$NOW'"
 
 echo "Backing up the old swarm pickle file"
 echo $BACKUP
-$BACKUP
+eval $BACKUP
 
 # and put the gait onto the server
 PUT_GAIT="scp /tmp/$PICKLE $SERVER:$ROBOCUP_DIR/$PSO_DIR/"
 
 echo "Putting gait pickle back onto our server"
 echo $PUT_GAIT
-$PUT_GAIT
+eval $PUT_GAIT
 
 echo "All done! Thanks for running the walk optimizer!"
 

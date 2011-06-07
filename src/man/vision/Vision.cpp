@@ -60,8 +60,10 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
     ball = new VisualBall();
     red1 = new VisualRobot();
     red2 = new VisualRobot();
+	red3 = new VisualRobot();
     navy1 = new VisualRobot();
     navy2 = new VisualRobot();
+	navy3 = new VisualRobot();
 	cross = new VisualCross();
 	fieldEdge = new VisualFieldEdge();
 
@@ -180,6 +182,7 @@ std::string Vision::getRobotName() {
 */
 void Vision::drawBoxes(void)
 {
+#ifdef OFFLINE
 
     // draw field objects
     if(bglp->getDistance() > 0) drawFieldObject(bglp,RED);
@@ -207,12 +210,15 @@ void Vision::drawBoxes(void)
              BLUE);
 
     // vision horizon line
-    thresh->drawPoint(IMAGE_WIDTH/2, thresh->getVisionHorizon(), RED);
+    drawPoint(IMAGE_WIDTH/2, thresh->getVisionHorizon(), RED);
+#endif /* OFFLINE */
 
 } // drawBoxes
 
 // self-explanatory
-void Vision::drawFieldObject(VisualFieldObject* obj, int color) {
+void Vision::drawFieldObject(VisualFieldObject* obj, int color)
+{
+#ifdef OFFLINE
     drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
              obj->getRightTopX(), obj->getRightTopY(), color);
     drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
@@ -221,10 +227,13 @@ void Vision::drawFieldObject(VisualFieldObject* obj, int color) {
              obj->getRightTopX(), obj->getRightTopY(), color);
     drawLine(obj->getLeftBottomX(), obj->getLeftBottomY(),
              obj->getRightBottomX(), obj->getRightBottomY(), color);
+#endif /* OFFLINE */
 }
 
 // self-explanatory
-void Vision::drawCrossbar(VisualCrossbar* obj, int color) {
+void Vision::drawCrossbar(VisualCrossbar* obj, int color)
+{
+#ifdef OFFLINE
     drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
              obj->getRightTopX(), obj->getRightTopY(), color);
     drawLine(obj->getLeftTopX(), obj->getLeftTopY(),
@@ -233,15 +242,21 @@ void Vision::drawCrossbar(VisualCrossbar* obj, int color) {
              obj->getRightTopX(), obj->getRightTopY(), color);
     drawLine(obj->getLeftBottomX(), obj->getLeftBottomY(),
              obj->getRightBottomX(), obj->getRightBottomY(), color);
+#endif /* OFFLINE */
 }
 
-/* drawBox()
-   --helper method for drawing rectangles on the thresholded array
-   for AiboConnect visualization.
-   --takes as input the left,right (x1,x2),bottom,top (y1,y2)
-   --the rectangle drawn is a non-filled box.
-*/
-void Vision::drawBox(int left, int right, int bottom, int top, int c) {
+/**
+ * Draws a rectangle to the debugging image in the Threshold class.
+ *
+ * @param left    x value of the left vertices.
+ * @param right   x value of the right vertices.
+ * @param bottom  y value of the bottom vertices.
+ * @param top     y value of the top vertices.
+ * @param c       the color of the box.
+ */
+void Vision::drawBox(int left, int right, int bottom, int top, int c)
+{
+#ifdef OFFLINE
     if (left < 0) {
         left = 0;
     }
@@ -253,33 +268,34 @@ void Vision::drawBox(int left, int right, int bottom, int top, int c) {
 
     for (int i = left; i < left + width; i++) {
         if (top >= 0 &&
-            top < IMAGE_HEIGHT &&
-            i >= 0 &&
-            i < IMAGE_WIDTH) {
-            thresh->setThresholded(top,i, static_cast<unsigned char>(c));
+                top < IMAGE_HEIGHT &&
+                i >= 0 &&
+                i < IMAGE_WIDTH) {
+            thresh->debugImage[top][i] = static_cast<unsigned char>(c);
         }
         if ((top + height) >= 0 &&
-            (top + height) < IMAGE_HEIGHT &&
-            i >= 0 &&
-            i < IMAGE_WIDTH) {
-            thresh->setThresholded(top + height,i, static_cast<unsigned char>(c));
+                (top + height) < IMAGE_HEIGHT &&
+                i >= 0 &&
+                i < IMAGE_WIDTH) {
+            thresh->debugImage[top + height][i] = static_cast<unsigned char>(c);
         }
     }
     for (int i = top; i < top + height; i++) {
         if (i >= 0 &&
-            i < IMAGE_HEIGHT &&
-            left >= 0 &&
-            left < IMAGE_WIDTH) {
-            thresh->setThresholded(i,left, static_cast<unsigned char>(c));
+                i < IMAGE_HEIGHT &&
+                left >= 0 &&
+                left < IMAGE_WIDTH) {
+            thresh->debugImage[i][left] = static_cast<unsigned char>(c);
         }
         if (i >= 0 &&
-            i < IMAGE_HEIGHT &&
-            (left+width) >= 0 &&
-            (left+width) < IMAGE_WIDTH) {
-            thresh->setThresholded(i,left + width, static_cast<unsigned char>(c));
+                i < IMAGE_HEIGHT &&
+                (left+width) >= 0 &&
+                (left+width) < IMAGE_WIDTH) {
+            thresh->debugImage[i][left + width] = static_cast<unsigned char>(c);
         }
     }
-} // drawBox
+#endif /* OFFLINE */
+}
 
 
 /* drawCenters()
@@ -291,26 +307,31 @@ void Vision::drawBox(int left, int right, int bottom, int top, int c) {
    -goals
    -add more if you'd like
 */
-void Vision::drawCenters() {
+void Vision::drawCenters()
+{
+#ifdef OFFLINE
+
     // draws an X at the ball center X and Y.
     if (ball->getCenterX() >= 2 && ball->getCenterY() >= 2
         && ball->getCenterX() <= (IMAGE_WIDTH-2)
         && ball->getCenterY() <= (IMAGE_HEIGHT-2)) {
-        thresh->drawPoint(ball->getCenterX(), ball->getCenterY(), YELLOW);
+        drawPoint(ball->getCenterX(), ball->getCenterY(), YELLOW);
     }
-
+#endif /* OFFLINE */
 } // drawCenters
 
-
-/* drawRect()
-   --helper method for drawing rectangles on the thresholded array
-   for AiboConnect visualization.
-   --takes as input the getX,getY (top left x,y coords),
-   the width and height of the object,
-   and lastly the color of the rectangle you want to use.
-   --the rectangle drawn is a non-filled box.
-*/
-void Vision::drawRect(int left, int top, int width, int height, int c) {
+/**
+ * Draw a rectangle in the debugging image.
+ *
+ * @param left     x value of left edge
+ * @param right    x value of right edge
+ * @param bottom   y value of bottom
+ * @param top      y value of top
+ * @param c        the color we'd like to draw
+ */
+void Vision::drawRect(int left, int top, int width, int height, int c)
+{
+#ifdef OFFLINE
     if (left < 0) {
         width += left;
         left = 0;
@@ -322,91 +343,72 @@ void Vision::drawRect(int left, int top, int width, int height, int c) {
 
     for (int i = left; i < left + width; i++) {
         if (top >= 0 && top < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-            thresh->setThresholded(top,i, static_cast<unsigned char>(c));
+            thresh->debugImage[top][i] = static_cast<unsigned char>(c);
         }
         if ((top + height) >= 0 &&
-            (top + height) < IMAGE_HEIGHT &&
-            i >= 0 &&
-            i < IMAGE_WIDTH) {
-            thresh->setThresholded(top + height,i, static_cast<unsigned char>(c));
+                (top + height) < IMAGE_HEIGHT &&
+                i >= 0 &&
+                i < IMAGE_WIDTH) {
+            thresh->debugImage[top + height][i] = static_cast<unsigned char>(c);
         }
     }
     for (int i = top; i < top + height; i++) {
         if (i >= 0 &&
-            i < IMAGE_HEIGHT &&
-            left >= 0 &&
-            left < IMAGE_WIDTH) {
-            thresh->setThresholded(i,left, static_cast<unsigned char>(c));
+                i < IMAGE_HEIGHT &&
+                left >= 0 &&
+                left < IMAGE_WIDTH) {
+            thresh->debugImage[i][left] = static_cast<unsigned char>(c);
         }
         if (i >= 0 &&
-            i < IMAGE_HEIGHT &&
-            (left+width) >= 0 &&
-            (left+width) < IMAGE_WIDTH) {
-            thresh->setThresholded(i,left + width, static_cast<unsigned char>(c));
-        }
-    }
-#if ROBOT(NAO)
-    left--;
-    width+=2;
-    height+=2;
-    top--;
-    if (left < 0) {
-        width += left;
-        left = 0;
-    }
-    if (top < 0) {
-        height += top;
-        top = 0;
-    }
-    for (int i = left; i < left + width; i++) {
-        if (top >= 0 && top < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-            thresh->setThresholded(top,i, static_cast<unsigned char>(c));
-        }
-        if ((top + height) >= 0 &&
-            (top + height) < IMAGE_HEIGHT &&
-            i >= 0 &&
-            i < IMAGE_WIDTH) {
-            thresh->setThresholded(top + height,i, static_cast<unsigned char>(c));
-        }
-    }
-    for (int i = top; i < top + height; i++) {
-        if (i >= 0 &&
-            i < IMAGE_HEIGHT &&
-            left >= 0 &&
-            left < IMAGE_WIDTH) {
-            thresh->setThresholded(i,left, static_cast<unsigned char>(c));
-        }
-        if (i >= 0 &&
-            i < IMAGE_HEIGHT &&
-            (left+width) >= 0 &&
-            (left+width) < IMAGE_WIDTH) {
-            thresh->setThresholded(i,left + width, static_cast<unsigned char>(c));
+                i < IMAGE_HEIGHT &&
+                (left+width) >= 0 &&
+                (left+width) < IMAGE_WIDTH) {
+            thresh->debugImage[i][left + width] = static_cast<unsigned char>(c);
         }
     }
 #endif
-} // drawRect
+}
 
-/* drawLine()
-   --helper visualization method for drawing a line given two points and a color
-*/
-void Vision::drawLine(int x, int y, int x1, int y1, int c) {
-    float slope = (float)(y - y1) / (float)(x - x1);
+/**
+ * Draw a line at the specified coordinates on the debugging
+ * image.
+ *
+ * @param x       start x
+ * @param y       start y
+ * @param x1      finish x
+ * @param y1      finish y
+ * @param c       color we'd like to draw
+ */
+void Vision::drawLine(int x, int y, int x1, int y1, int c)
+{
+#ifdef OFFLINE
+    float slope = static_cast<float>(y - y1) / static_cast<float>(x - x1);
     int sign = 1;
     if ((abs(y - y1)) > (abs(x - x1))) {
         slope = 1.0f / slope;
-        if (y > y1) sign = -1;
+        if (y > y1)  {
+            sign = -1;
+        }
         for (int i = y; i != y1; i += sign) {
-            int newx = x + static_cast<int>(slope * static_cast<float>(i - y) );
-            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT)
-                thresh->setThresholded(i,newx, static_cast<unsigned char>(c));
+            int newx = x +
+                    static_cast<int>(slope * static_cast<float>(i - y) );
+
+            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT) {
+                thresh->debugImage[i][newx] = static_cast<unsigned char>(c);
+            }
         }
     } else if (slope != 0) {
         //slope = 1.0 / slope;
-        if (x > x1) sign = -1;
+        if (x > x1) {
+            sign = -1;
+        }
         for (int i = x; i != x1; i += sign) {
-            int newy = y + static_cast<int>(slope * static_cast<float>(i - x));
-            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH)
-                thresh->setThresholded(newy,i, static_cast<unsigned char>(c));
+            int newy = y +
+                    static_cast<int>(slope * static_cast<float>(i - x) );
+
+            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
+                thresh->debugImage[newy][i] = static_cast<unsigned char>(c);
+            }
         }
     }
     else if (slope == 0) {
@@ -414,101 +416,41 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c) {
         int endX = max(x, x1);
         for (int i = startX; i <= endX; i++) {
             if (y >= 0 && y < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                thresh->setThresholded(y,i, static_cast<unsigned char>(c));
+                thresh->debugImage[y][i] = static_cast<unsigned char>(c);
             }
         }
     }
-/*
-    // This code is supposed to, I guess, make the line thicker since the Nao's
-    // image was 640x480 at some point and you couldn't see the drawing
-    // but it's not done well. if you look closely it looks like two blue
-    // lines are drawn next to each other but it's clearly not one solid line
-#if ROBOT(NAO)
-    y--;
-    y1--;
-    x--;
-    x1--;
-    if ((abs(y - y1)) > (abs(x - x1))) {
-        slope = 1.0 / slope;
-        if (y > y1) sign = -1;
-        for (int i = y; i != y1; i += sign) {
-            int newx = x + (int)(slope * (i - y));
-            if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT)
-                thresh->thresholded[i][newx] = c;
-        }
-    } else if (slope != 0) {
-        //slope = 1.0 / slope;
-        if (x > x1) sign = -1;
-        for (int i = x; i != x1; i += sign) {
-            int newy = y + (int)(slope * (i - x));
-            if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH)
-                thresh->thresholded[newy][i] = c;
-        }
-    }
-    else if (slope == 0) {
-        int startX = min(x, x1);
-        int endX = max(x, x1);
-        for (int i = startX; i <= endX; i++) {
-            if (y >= 0 && y < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
-                thresh->thresholded[y][i] = c;
-            }
-        }
-    }
-#endif
-*/
+#endif /* OFFLINE */
 }
 
 // Convenience method to draw a VisualLine to the screen.
-void Vision::drawLine(boost::shared_ptr<VisualLine> line, const int color) {
-    drawLine(line->getStartpoint().x, line->getStartpoint().y, line->getEndpoint().x, line->getEndpoint().y, color);
+void Vision::drawLine(boost::shared_ptr<VisualLine> line, const int color)
+{
+#ifdef OFFLINE
+    drawLine(line->getStartpoint().x, line->getStartpoint().y,
+             line->getEndpoint().x, line->getEndpoint().y, color);
+#endif /* OFFLINE */
 }
 
-/* drawVerticalLine()
-   --helper method to visualize a vertical line on the screen given a x-value
-   --given a color as well
-*/
-void Vision::drawVerticalLine(int x, int c) {
-    if (x >= 0 && x < IMAGE_WIDTH) {
-        for (int i = 0; i < IMAGE_HEIGHT; i++) {
-            thresh->setThresholded(i,x, static_cast<unsigned char>(c));
-        }
-    }
+void Vision::drawLine(const point<int> start,
+                      const point<int> end,
+                      const int c)
+{
+    drawLine(start.x, start.y, end.x, end.y, c);
 }
 
-/* drawHorizontalLine()
-   --helper method to visualize a vertical line on the screen given a x-value
-   --given a color as well
-*/
-void Vision::drawHorizontalLine(int y, int c) {
-    if (y >= 0 && y < IMAGE_HEIGHT) {
-        for (int i = 0; i < IMAGE_WIDTH; i++) {
-            thresh->setThresholded(y,i, static_cast<unsigned char>(c));
-            if (y + 1 < IMAGE_HEIGHT - 1) {
-                thresh->setThresholded(y+1,i, static_cast<unsigned char>(c));
-            }
-        }
-    }
-}
-
-// Draws gigantic lines across the screen centered on one x,y coordinate
-void Vision::drawCrossHairs(int x, int y, int c) {
-    drawHorizontalLine(y,c);
-    drawVerticalLine(x,c);
-}
-
-
-/* drawVerticalLine()
-   --helper method to visualize a single point on the screen given a x-value
-   --given a color as well
-   --use thresh->drawPoint() if you really want to see the point well.
-*/
-void Vision::drawDot(int x, int y, int c) {
+void Vision::drawDot(int x, int y, int c)
+{
+#ifdef OFFLINE
     if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
-        thresh->setThresholded(y,x, static_cast<unsigned char>(c));
+        thresh->debugImage[y][x] = static_cast<unsigned char>(c);
     }
+#endif /* OFFLINE */
 }
 
-void Vision::drawFieldLines() {
+void Vision::drawFieldLines()
+{
+#ifdef OFFLINE
     const vector< shared_ptr<VisualLine> >* lines = fieldLines->getLines();
 
     for (vector< shared_ptr<VisualLine> >::const_iterator i = lines->begin();
@@ -521,11 +463,11 @@ void Vision::drawFieldLines() {
              j != points.end(); j++) {
             // Vertically found = black
             if (j->foundWithScan == VERTICAL) {
-                thresh->drawPoint(j->x, j->y, BLACK);
+                drawPoint(j->x, j->y, BLACK);
             }
             // Horizontally found = red
             else {
-                thresh->drawPoint(j->x, j->y, RED);
+                drawPoint(j->x, j->y, RED);
             }
         }
     }
@@ -535,17 +477,71 @@ void Vision::drawFieldLines() {
          i != unusedPoints->end(); i++) {
         // Unused vertical = PINK
         if (i->foundWithScan == VERTICAL) {
-            thresh->drawPoint(i->x, i->y, PINK);
+            drawPoint(i->x, i->y, PINK);
         }
         // Unused horizontal = Yellow
         else {
-            thresh->drawPoint(i->x, i->y, YELLOW);
+            drawPoint(i->x, i->y, YELLOW);
         }
     }
 
     const list <VisualCorner>* corners = fieldLines->getCorners();
     for (list <VisualCorner>::const_iterator i = corners->begin();
          i != corners->end(); i++) {
-        thresh->drawPoint(i->getX(), i->getY(), ORANGE);
+        drawPoint(i->getX(), i->getY(), ORANGE);
     }
+#endif /* OFFLINE */
+}
+
+// Prerequisite - point is within bounds of screen
+void Vision::drawX(int x, int y, int c)
+{
+
+#ifdef OFFLINE
+    // Mid point
+    thresh->debugImage[y-2][x-2] = static_cast<unsigned char>(c);
+    thresh->debugImage[y-1][x-1] = static_cast<unsigned char>(c);
+    thresh->debugImage[y][x] = static_cast<unsigned char>(c);
+    thresh->debugImage[y+1][x+1] = static_cast<unsigned char>(c);
+    thresh->debugImage[y+2][x+2] = static_cast<unsigned char>(c);
+
+    thresh->debugImage[y-2][x+2] = static_cast<unsigned char>(c);
+    thresh->debugImage[y-1][x+1] = static_cast<unsigned char>(c);
+
+    thresh->debugImage[y+1][x-1] = static_cast<unsigned char>(c);
+    thresh->debugImage[y+2][x-2] = static_cast<unsigned char>(c);
+#endif
+
+}
+
+/* drawPoint()
+ * Draws a crosshair or a 'point' on the fake image at some given x, y, and with
+ * a given color.
+ * @param x       center of the point
+ * @param y       center y value
+ * @param c       color to draw
+ */
+void Vision::drawPoint(int x, int y, int c)
+{
+#ifdef OFFLINE
+    if (y > 0 && x > 0 && y < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x] = static_cast<unsigned char>(c);
+    }if (y+1 > 0 && x > 0 && y+1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y+1][x] = static_cast<unsigned char>(c);
+    }if (y+2 > 0 && x > 0 && y+2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y+2][x] = static_cast<unsigned char>(c);
+    }if (y-1 > 0 && x > 0 && y-1 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y-1][x] = static_cast<unsigned char>(c);
+    }if (y-2 > 0 && x > 0 && y-2 < (IMAGE_HEIGHT) && x < (IMAGE_WIDTH)) {
+        thresh->debugImage[y-2][x] = static_cast<unsigned char>(c);
+    }if (y > 0 && x+1 > 0 && y < (IMAGE_HEIGHT) && x+1 < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x+1] = static_cast<unsigned char>(c);
+    }if (y > 0 && x+2 > 0 && y < (IMAGE_HEIGHT) && x+2 < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x+2] = static_cast<unsigned char>(c);
+    }if (y > 0 && x-1 > 0 && y < (IMAGE_HEIGHT) && x-1 < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x-1] = static_cast<unsigned char>(c);
+    }if (y > 0 && x-2 > 0 && y < (IMAGE_HEIGHT) && x-2 < (IMAGE_WIDTH)) {
+        thresh->debugImage[y][x-2] = static_cast<unsigned char>(c);
+    }
+#endif
 }
