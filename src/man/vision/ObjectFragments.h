@@ -69,7 +69,7 @@ public:
     int findTrueLineHorizontal(point <int> left, point <int> right, int c,
                                bool up);
     void findVerticalEdge(point <int>& top, point <int>& bottom, int c,
-                                    bool left);
+						  bool left, bool correct);
     void findHorizontalEdge(point <int>& left, point <int>& right,
                                       int c, bool up);
     bool checkEdge(int x, int y, int x1, int y1);
@@ -112,9 +112,6 @@ public:
                                    pair<int, int> foo,
                                    int classification);
 
-
-
-
 	int classifyByCheckingLines(Blob post);
 
     int characterizeSize(Blob b);
@@ -125,8 +122,8 @@ public:
     void lookForFirstPost(VisualFieldObject *left, VisualFieldObject *right,
                   VisualCrossbar *mid, int c);
     void lookForSecondPost(Blob pole, int post,
-                                            VisualFieldObject* left,
-                                            VisualFieldObject* right,
+						   VisualFieldObject* left,
+						   VisualFieldObject* right,
                            VisualCrossbar* mid, int c);
 
     void updateRunsAfterFirstPost(Blob pole, int post);
@@ -160,13 +157,9 @@ public:
 
     // debugging methods
     void printObjs();
-    void drawPoint(int x, int y, int c);
-    void drawRect(int x, int y, int w, int h, int c);
     void drawBlob(Blob b, int c);
     void printBlob(Blob b);
     void printObject(VisualFieldObject * objs);
-    void paintRun(int x,int y, int h, int c);
-    void drawRun(const run& run, int c);
 #ifdef OFFLINE
 	void setPrintObjs(bool debug) {PRINTOBJS = debug;}
 	void setPostDebug(bool debug) {POSTDEBUG = debug;}

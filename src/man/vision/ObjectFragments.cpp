@@ -484,8 +484,8 @@ int ObjectFragments::pickNth(int values[], int n, int s) {
  */
 
 void ObjectFragments::findVerticalEdge(point <int>& top,
-					   point <int>& bottom,
-					   int c, bool left)
+									   point <int>& bottom,
+									   int c, bool left, bool correct)
 {
     const int NUMSCANS = 5;
     const int WHICH = 3;
@@ -510,6 +510,42 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
     }
 
   int qs = pickNth(values, WHICH, NUMSCANS);
+  if (qs == 0 && correct) {
+	  // reset in case our edge is too far out
+	  qy = top.y + shortSpan;
+	  qx = xProject(top.x, top.y, qy);
+	  for (int i = 0; i < NUMSCANS; i++) {
+		  bool found = false;
+		  values[i] = 0;
+		  int tempx = qx;
+		  int tempy = qy;
+		  while (!found) {
+			  if (Utility::colorsEqual(color,
+									   thresh->getThresholded(tempy, tempx))) {
+				  found = true;
+			  } else {
+				  values[i]++;
+			  }
+			  tempx -=dir;
+			  tempy = yProject(tempx - 1 * dir, tempy, tempx);
+			  if (tempx < 0 || tempx >= IMAGE_WIDTH || tempy < 0 ||
+															   tempy >= IMAGE_HEIGHT ||
+					  values[i] > 15) {
+				  found = true;
+			  }
+		  }
+		  // set up the next scan
+		  qy += shortSpan;
+		  qx = xProject(top.x, top.y, qy);
+	  }
+	  qs = pickNth(values, 2, NUMSCANS);
+	  if (qs > 0) {
+		  if (CORRECT) {
+			  cout << "Squeezing " << qs << " " << dir << endl;
+		  }
+	  }
+	  dir = -dir;
+  }
 
   // reset the edge
   int te = top.x;
@@ -594,6 +630,11 @@ float ObjectFragments::correct(Blob & b, int color) {
 
     int points[3];
     int corrections[3];
+	int directions[3];
+	for (int i = 0; i < 3; i++) {
+		corrections[i] = 0;
+		directions[i] = 0;
+	}
     int diffy = (b.getLeftBottomY() - b.getLeftTopY()) / 4;
     int midy = b.getLeftTopY();
     int midsy = 0, bottomy = 0, topy = 0;
@@ -621,22 +662,29 @@ float ObjectFragments::correct(Blob & b, int color) {
             while (col != color && midx < IMAGE_WIDTH && midx > -1) {
                 // normally we assume we are outside the real edge
                 midx+= k;
-                if (Utility::colorsEqual(thresh->getExpandedColor(midx, midy, color),color)) {
+                if (Utility::colorsEqual(thresh->getExpandedColor(midx, midy, color),
+										 color)) {
                     col = color;
                     if (count == 0) {
                         // this is the case where the edge is outside our blob
                         while (midx >= 0 &&
-                               Utility::colorsEqual(thresh->getExpandedColor(midx, midy, color),
-										   color)) {
+                               Utility::colorsEqual(thresh->getExpandedColor(midx,
+																			 midy,
+																			 color),
+													color)) {
                             midx-= k;
                             count++;
+							directions[i-1]--;
                         }
                     }
                 } else {
                     count++;
                     corrections[i-1]++;
+					directions[i-1]++;
                 }
-                if (count >	 2) correct = true;
+                if (count >	 2) {
+					correct = true;
+				}
             }
             points[i-1] = midx;
         }
@@ -690,6 +738,19 @@ float ObjectFragments::correct(Blob & b, int color) {
             b.getLeft() > 5 && b.getRight() < IMAGE_WIDTH - 4 &&
             abs(newSlope2 - newSlope3) < GOOD_SLOPE &&
             abs(newSlope3 - slope) > 0.1) {
+			// determine direction and magnitude of correction
+			/*int correctMagnitude = pickNth(corrections, 1, 3);
+			if (k == 1) {
+				if (directions[0] > 0 && directions[2] < 0) {
+					// correcting to right
+					int yChange = yProject(0, 0, correctMagnitude);
+					b.shift(correctMagnitude, yChange);
+				} else {
+					int yChange = yProject(0, 0, -correctMagnitude);
+					b.shift(-correctMagnitude, yChange);
+				}
+			}
+			drawBlob(b, GREEN);*/
             return newSlope3;
         }
         midy = b.getRightTopY();
@@ -721,6 +782,7 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
     stop scan;
     int top = minY;
     int spanY = maxY - minY;
+	int bottom = top + spanY;
     int topx = xProject(left, maxY, minY);
     int rightx = topx + (right - left);
     int topry = yProject(topx, top, rightx);
@@ -732,8 +794,8 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
         // now expand the top and bottom
         findHorizontalEdge(leftTop, rightTop, c, true);
         findHorizontalEdge(leftBottom, rightBottom, c, false);
-        findVerticalEdge(leftTop, leftBottom, c, true);
-        findVerticalEdge(rightTop, rightBottom, c, false);
+        findVerticalEdge(leftTop, leftBottom, c, true, false);
+        findVerticalEdge(rightTop, rightBottom, c, false, false);
         // now expand the top and bottom
         findHorizontalEdge(leftTop, rightTop, c, true);
         findHorizontalEdge(leftBottom, rightBottom, c, false);
@@ -753,7 +815,11 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
                     cout << "Old slope was " << slope << " " << newSlope <<
                         endl;
                 }
-                slope = newSlope;
+				bool right = false;
+				if (newSlope < slope) {
+					right = false;
+				}
+				slope = newSlope;
                 // we need to be very careful about placement here
                 // determine the center of the blob
                 int midTopx = (leftTop.x + rightTop.x) / 2;
@@ -765,15 +831,24 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
                     vision->drawPoint(newx, midY, RED);
                     cout << "New start " << newx << " " << midY << endl;
                 }
-                leftTop = point<int>(newx, obj.getTop());
-                rightTop = point<int>(newx, obj.getTop());
-                newx = xProject((midBottomx, +midTopx) / 2, midY,
-                                obj.getBottom());
-                leftBottom = point<int>(newx, obj.getBottom());
-                rightBottom = point<int>(newx, obj.getBottom());
+				// use the center to rotate all of the corners
+				int mag;
+				int projx = (xProject(newx, midY, top));
+				mag = projx - newx;
+				leftTop.x += mag;
+				rightTop.x += mag;
+				leftBottom.x -= mag;
+				rightBottom.x -= mag;
+
+                //leftTop = point<int>(newx, obj.getTop());
+                //rightTop = point<int>(newx, obj.getTop());
+                //newx = xProject((midBottomx, +midTopx) / 2, midY,
+				//              obj.getBottom());
+                //leftBottom = point<int>(newx, obj.getBottom());
+                //rightBottom = point<int>(newx, obj.getBottom());
                 // repeat the process fresh
-                findVerticalEdge(leftTop, leftBottom, c, true);
-                findVerticalEdge(rightTop, rightBottom, c, false);
+                findVerticalEdge(leftTop, leftBottom, c, true, true);
+                findVerticalEdge(rightTop, rightBottom, c, false, true);
                 findHorizontalEdge(leftTop, rightTop, c, true);
                 findHorizontalEdge(leftBottom, rightBottom, c, false);
             }
@@ -1095,11 +1170,11 @@ int ObjectFragments::classifyByCrossbar(Blob b)
     if (POSTLOGIC) {
         cout << "Cross check " << biggest << " " << biggest2 << endl;
         if (biggest > need) {
-            drawRect(b.getLeftTopX() - biggest, b.getLeftTopY(), biggest,
+            vision->drawRect(b.getLeftTopX() - biggest, b.getLeftTopY(), biggest,
                      DEBUG_DRAW_SIZE, ORANGE);
         }
         if (biggest2 > need) {
-            drawRect(x, y, biggest2, DEBUG_DRAW_SIZE, ORANGE);
+            vision->drawRect(x, y, biggest2, DEBUG_DRAW_SIZE, ORANGE);
         }
     }
 
@@ -2113,7 +2188,7 @@ bool ObjectFragments::badDistance(Blob b) {
         }
 
         float diste = e.dist;
-        if (diste > 0.0f && choose > 2 * diste || choose * 2 < diste) {
+        if (diste > 0.0f && choose * 2 < diste) {
             if (POSTDEBUG) {
                 cout << "Throwing out post.	 Distance estimate is " << e.dist
                      << endl;
@@ -2501,35 +2576,6 @@ void ObjectFragments::printBlob(Blob b) {
 #endif
 }
 
-/* Debugging method used to show where things were processed on the image.
- * Paints a verticle stripe corresponding to a "run" of color.
- *
- * @param x		x coord
- * @param y		y coord
- * @param h		height
- * @param c		the color to paint
- */
-void ObjectFragments::paintRun(int x, int y, int h, int c){
-    vision->drawLine(x,y+1,x,y+h+1,c);
-}
-
-/*	More or less the same as the previous method, but with different parameters.
- * @param run	  a run of color
- * @param c		  the color to paint
- */
-void ObjectFragments::drawRun(const run& run, int c) {
-    vision->drawLine(run.x,run.y+1,run.x,run.y+run.h+1,c);
-}
-
-/*	Draws the outline of a rectangle in the specified color.
- * @param b	   the rectangle
- * @param c	   the color to paint
- */
-void ObjectFragments::drawRect(int x, int y, int w, int h, int c) {
-#ifdef OFFLINE
-    vision->drawRect(x, y, w, h, c);
-#endif
-}
 
 /*	Draws the outline of a blob in the specified color.
  * @param b	   the blob

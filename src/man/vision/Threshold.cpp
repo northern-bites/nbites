@@ -685,8 +685,6 @@ void Threshold::detectSelf() {
     const int HIGHBOUND = -50;
     const int COMPENSATION = 20;
 
-    //cout << "Values " << pixInImageLeft << " " << pixInImageRight << " " << pixInImageUp << endl;
-
     for (int i = 0; i < IMAGE_WIDTH; i++) {
         lowerBound[i] = IMAGE_HEIGHT - 1;
     }
