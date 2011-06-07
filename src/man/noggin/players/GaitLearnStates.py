@@ -56,6 +56,7 @@ REQUIRED_WALKS = ((0.5, 0, 0),
                   (-.5, 0, 0),
                   (0, -.5, 0),
                   (0, 0, .5), # Forward/L/Back/R/Rotate (slow)
+                  (0, 0, 0), # pause to allow the robot to settle
                   (1, 0, 0),
                   (-1, 0, 0),
                   (0, 0, 1), # full forward/back/rotate
