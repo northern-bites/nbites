@@ -182,7 +182,7 @@ class Log:
         set it up
         """
         self.logType = logType
-        logTitle = LOG_DIR + logType + " " + count + ".txt"
+        logTitle = LOG_DIR + logType + " " + str(count) + ".txt"
         self.logFile = open(logTitle, 'w')
 
     def writeLine(self, line):
