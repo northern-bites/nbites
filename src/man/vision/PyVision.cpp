@@ -4,6 +4,7 @@
 using boost::shared_ptr;
 
 #include <boost/python.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 using namespace boost::python;
 using namespace std;
 
@@ -68,7 +69,7 @@ BOOST_PYTHON_MODULE(vision)
     ;
 
   //FieldLines: holds corner and line information
-  class_<FieldLines>("FieldLines", no_init)
+  class_<FieldLines, boost::shared_ptr<FieldLines> >("FieldLines", no_init)
     .def_readonly("numCorners", &FieldLines::getNumCorners)
     .def_readonly("numLines", &FieldLines::getNumLines)
     .add_property("linesList", &FieldLines::getActualLines)
@@ -77,8 +78,11 @@ BOOST_PYTHON_MODULE(vision)
   //FieldLines helper classes:
 
   // FieldLines holds a list of shared_ptrs to VisualLines (linesList) 
+  class_<std::vector<shared_ptr<VisualLine> > >("LineVec")
+    .def(vector_indexing_suite<std::vector<shared_ptr<VisualLine> >, true>())
+    ;
   
-  class_<VisualLine>("VisualLine", no_init)
+  class_<VisualLine, boost::shared_ptr<VisualLine> >("VisualLine", no_init)
     .def_readonly("angle", &VisualLine::getAngle)
     .def_readonly("avgWidth", &VisualLine::getAvgWidth)
     .def_readonly("bearing", &VisualLine::getBearing)
@@ -103,7 +107,7 @@ BOOST_PYTHON_MODULE(vision)
 				      <reference_existing_object>()))
     .add_property("fieldLines", make_getter(&Vision::fieldLines, 
 					    return_value_policy
-					    <reference_existing_object>()))
+					    <return_by_value>()))
 
     /* Crossbars: not used right now, uncomment here and Brain.py to use
        in python
