@@ -48,6 +48,7 @@ enum ProfiledComponent {
   P_PYTHON,
   P_PYUPDATE,
   P_PYRUN,
+  P_DCM,
   P_SWITCHBOARD,
   P_SCRIPTED,
   P_CHOPPED,
