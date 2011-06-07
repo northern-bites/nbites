@@ -1,0 +1,241 @@
+#include <stdio.h>
+
+#include <stdlib.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+#include "dsp.h"
+
+// ********************************
+// *                              *
+// *  Filter Abstract Base Class  *
+// *                              *
+// ********************************
+
+Filter::Filter()
+{
+  transientCount = 0;
+  Reset();
+}
+
+// Destructor is not inline
+Filter::~Filter()
+{
+}
+
+void Filter::Reset()
+{
+  y = 0;
+  sampleCount = 0;
+}
+
+
+// *******************
+// *                 *
+// *  Boxcar Filter  *
+// *                 *
+// *******************
+
+// The ratio of cutoff wavelength to filter width is nearly constant
+// over a wide range of wavelengths. This value was determined
+// emperically in Excel.
+const double Boxcar::cutRatio = 0.443;
+
+Boxcar::Boxcar(int width)
+{
+  fifo.NullValue(0);
+  Control(width);
+  Reset();
+}
+
+Boxcar::Boxcar(double cutoff)
+{
+  fifo.NullValue(0);
+  Cutoff(cutoff);
+  Reset();
+}
+
+void Boxcar::Control(int w)
+{
+  fifo.MaxCount(w);
+  TransientCount(w);
+  Reset();
+}
+
+void Boxcar::Reset()
+{
+  Filter::Reset();
+  fifo.Clear();
+  sum    = 0;
+  weight = 0;
+}
+
+double Boxcar::X(double x)
+{
+  if (fifo.Full())
+    sum += x - fifo.Read();
+  else
+  {
+    sum += x;
+    weight = 1.0 / (fifo.Count() + 1);
+  }
+  fifo.Write(x);
+  return Y(sum * weight);
+}
+
+double Boxcar::Mid() const
+{
+  // Client thinks Mid is const, but we need non-const access for peek, which
+  // can change Underflows.
+  FifoBuffer<double>& f = (FifoBuffer<double>&)fifo;
+  int i = fifo.Count() >> 1;
+  if ((fifo.MaxCount() & 1) == 0 && fifo.Count() > 1)
+    return 0.5 * (f.Peek(i - 1) + f.Peek(i));
+  else
+    return f.Peek(i);
+}
+
+// ******************************
+// *                            *
+// *  One-Pole Low Pass Filter  *
+// *                            *
+// ******************************
+
+// The formula for filter constant k as a function of the cutoff
+// wavelength wsa determined from the Z transform.
+void OnePoleLowPass::Control(double cutoff)
+{
+  wl = cutoff;
+  if (wl > 0)
+  {
+    double b = 1.0 - cos(2 * M_PI / wl);
+    k = sqrt(b * (b + 2.0)) - b;
+  }
+  else
+    k = 1.0;
+
+  TransientCount((int)wl);
+}
+
+double OnePoleLowPass::X(double x)
+{
+  double y = Filter::Y();
+  return Y(y + k * (x - y));
+}
+
+// *****************************************************
+// *                                                   *
+// *  Two-Pole Butterworth (Critically Damped) Filter  *
+// *                                                   *
+// *****************************************************
+
+Butterworth::Butterworth(double cutoff)
+{
+  Control(cutoff);
+  v = 0;
+}
+
+// The formula for filter constant k as a function of the cutoff
+// wavelength wsa determined from the Z transform.
+void Butterworth::Control(double cutoff)
+{
+  wl = cutoff;
+  if (wl > 0)
+  {
+    double b = 1.0 - cos(2 * M_PI / wl);
+    k = (sqrt(b * (b + 2.0 * (M_SQRT2 - 1.0))) - b) / (M_SQRT2 - 1.0);
+  }
+  else
+    k = 1.0;
+
+  TransientCount((int)wl);
+}
+
+void Butterworth::Reset()
+{
+  Filter::Reset();
+  v = 0;
+}
+
+double Butterworth::X(double x)
+{
+  double y = Filter::Y();
+  v += k * (x - v);
+  return Y(y + k * (v - y));
+}
+
+// ********************
+// *                  *
+// *  Signal Monitor  *
+// *                  *
+// ********************
+
+SignalMonitor::SignalMonitor(int numBins, double low, double high, bool log)
+{
+  bins = new int[numBins];
+  SignalMonitor::numBins = numBins;
+
+  if (log && low > 0 && high > 0)
+  {
+    // log histogram
+    SignalMonitor::low  = ::log(low);
+    SignalMonitor::high = ::log(high);
+    SignalMonitor::log  = true;
+  }
+  else
+  {
+    // linear histogram
+    SignalMonitor::low  = low;
+    SignalMonitor::high = high;
+    SignalMonitor::log  = false;
+  }
+
+  k = numBins / (SignalMonitor::high - SignalMonitor::low);
+  Reset();
+}
+
+SignalMonitor::~SignalMonitor()
+{
+  delete [] bins;
+}
+
+void SignalMonitor::Reset()
+{
+  for (int i = 0; i < numBins; ++i)
+    bins[i] = 0;
+}
+
+void SignalMonitor::X(double x)
+{
+  if (log)
+  {
+    if (x <= 0)
+      x = low;
+    else
+      x = ::log(x);
+  }
+
+  int index = (int)((x - low) * k);
+
+  if (index < 0)
+    index = 0;
+  else if (index >= numBins)
+    index = numBins - 1;
+
+  ++bins[index];
+}
+
+void SignalMonitor::Print(char* format)
+{
+  for (int i = 0; i < numBins; ++i)
+  {
+    double x = (i + 0.5) / k + low;
+    if (log)
+      x = exp(x);
+    printf(format, x);
+    if (bins[i] > 0)
+      printf("%10d\n", bins[i]);
+    else
+      printf("         .\n");
+  }
+}
