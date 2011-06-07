@@ -3,6 +3,7 @@
 #include "ZmpAccEKF.h"
 #include "BasicWorldConstants.h"
 using namespace boost::numeric;
+using namespace ekf;
 
 const int ZmpAccEKF::num_dimensions = ACC_NUM_DIMENSIONS;
 const float ZmpAccEKF::beta = 0.2f;

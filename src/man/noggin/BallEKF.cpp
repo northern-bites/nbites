@@ -4,6 +4,7 @@ using namespace boost::numeric;
 using namespace boost;
 using namespace NBMath;
 using namespace std;
+using namespace ekf;
 
 // Parameters
 const float BallEKF::ASSUMED_FPS = 30.0f;

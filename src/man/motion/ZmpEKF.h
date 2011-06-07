@@ -25,8 +25,8 @@
 #include "EKF.h"
 #include "EKFStructs.h"
 
-class ZmpEKF : public EKF<ZmpMeasurement, ZmpTimeUpdate, ZMP_NUM_DIMENSIONS,
-                          ZMP_NUM_MEASUREMENTS>
+class ZmpEKF : public ekf::EKF<ZmpMeasurement, ZmpTimeUpdate,
+                               ZMP_NUM_DIMENSIONS, ZMP_NUM_MEASUREMENTS>
 {
 public:
     ZmpEKF();

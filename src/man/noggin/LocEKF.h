@@ -20,9 +20,10 @@
  * @brief Class for tracking of loc position and velocity.  Extends the abstract
  * EKF class.
  */
-class LocEKF : public EKF<Observation,
-                          MotionModel, LOC_EKF_DIMENSION,
-                          LOC_MEASUREMENT_DIMENSION>,
+class LocEKF : public ekf::EKF<Observation,
+                               MotionModel,
+                               LOC_EKF_DIMENSION,
+                               LOC_MEASUREMENT_DIMENSION>,
                public LocSystem
 {
 public:

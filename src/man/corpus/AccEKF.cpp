@@ -3,6 +3,7 @@
 #include "AccEKF.h"
 #include "BasicWorldConstants.h"
 using namespace boost::numeric;
+using namespace ekf;
 
 const int AccEKF::num_dimensions = ACC_NUM_DIMENSIONS;
 const float AccEKF::beta = 0.2f;

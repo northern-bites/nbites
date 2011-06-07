@@ -46,6 +46,8 @@ const float LocEKF::Y_EST_MIN = 0.0f;
 const float LocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
 const float LocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
 
+using namespace ekf;
+
 /**
  * Initialize the localization EKF class
  *
@@ -62,7 +64,7 @@ LocEKF::LocEKF(float initX, float initY, float initH,
           LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), LocSystem(),
       lastOdo(0,0,0),
       lastObservations(0), useAmbiguous(true),
-      R_pred_k(measurementSize, measurementSize, 0.0f)
+      R_pred_k(LOC_MEASUREMENT_DIMENSION, LOC_MEASUREMENT_DIMENSION, 0.0f)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;

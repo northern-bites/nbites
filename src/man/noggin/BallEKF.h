@@ -18,8 +18,8 @@
  * @brief Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
  */
-class BallEKF : public EKF<RangeBearingMeasurement, MotionModel,
-                           BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION>
+class BallEKF : public ekf::EKF<RangeBearingMeasurement, MotionModel,
+                                BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION>
 {
 public:
     // Constructors & Destructors

@@ -3,6 +3,7 @@
 #include "BasicWorldConstants.h"
 #include "Kinematics.h"
 using namespace Kinematics;
+using namespace ekf;
 
 using namespace boost::numeric;
 
@@ -11,7 +12,8 @@ const float ZmpEKF::gamma = 0.5f;
 //const float ZmpEKF::variance  = 100.00f;
 
 ZmpEKF::ZmpEKF()
-    : EKF<ZmpMeasurement,ZmpTimeUpdate, ZMP_NUM_DIMENSIONS, ZMP_NUM_MEASUREMENTS>(beta, gamma)
+    : EKF<ZmpMeasurement,ZmpTimeUpdate,
+          ZMP_NUM_DIMENSIONS, ZMP_NUM_MEASUREMENTS>(beta, gamma)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -83,9 +85,9 @@ void ZmpEKF::incorporateMeasurement(ZmpMeasurement z,
     static const float com_height  = 310; //TODO: Move this
 	float zheight_div_G = com_height/GRAVITY_mss;
     static MeasurementVector last_measurement(
-        ublas::scalar_vector<float>(measurementSize, 0.0f));
+        ublas::scalar_vector<float>(ZMP_NUM_MEASUREMENTS, 0.0f));
 
-    MeasurementVector z_x(measurementSize);
+    MeasurementVector z_x(ZMP_NUM_MEASUREMENTS);
     z_x(0) = z.comX + zheight_div_G * z.accX;
     z_x(1) = z.comY + zheight_div_G * z.accY;
 
