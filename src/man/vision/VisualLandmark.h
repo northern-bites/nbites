@@ -60,9 +60,9 @@ public:
     const distanceCertainty getDistanceCertainty() const {
       return distanceCert;
     }
-    const int getIDCertaintyInt() const { return int(idCertainty); }
+    const int getIDCertaintyInt() const { return static_cast<int>(idCertainty); }
     const int getDistanceCertaintyInt() const {
-      return int(distanceCert);
+      return static_cast<int>(distanceCert);
     }
     const ConcreteLandmark * getConcreteLandmark() const {
         return concreteLandmark;

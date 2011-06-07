@@ -105,8 +105,7 @@ SET_PROPERTY(SOURCE
  PROPERTY LANGUAGE C)
 ENDIF()
 
-SET( VISION_PYTHON_SRCS __init__.py
-   vision.py
+SET( VISION_PYTHON_SRCS vision.py
    )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
