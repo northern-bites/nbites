@@ -175,6 +175,12 @@ public class VisionState {
                 case VisualFieldObject.BLUE_CROSS:
                     color = BLUE_CROSS_COLOR;
                     break;
+                case VisualFieldObject.NAVY_ROBOT:
+                    color = Vision.YELLOW;
+                    break;
+                case VisualFieldObject.RED_ROBOT:
+                    color = Vision.BLUE;
+                    break;
                 default: color = Vision.BLACK; break;
                 }
                 //draw the box

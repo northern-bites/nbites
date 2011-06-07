@@ -82,7 +82,7 @@ public class RobotDef {
      **/
     private static int [] sensorsForVersions = {22};
     public static final RobotDef NAO_DEF_VERSIONED =
-        new RobotDef(ImageType.NAO_RL,
+        new RobotDef(ImageType.NAO_VER,
                      640, 480,
                      320, 240, 22,
                      // sensor number version 1

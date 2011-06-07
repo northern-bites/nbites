@@ -51,10 +51,41 @@ void Cross::init()
 	numberOfRuns = 0;
 }
 
-/* This is the entry  point for cross detection called in Threshold.cc
+/* This is the entry  point for cross detection called in Threshold.cpp.
+   Now only builds blobs for use here and in Robots.cpp.  The actual
+   checking occurs in the next method.
  */
 
 void Cross::createObject() {
+	// do basic run-length encoding
+	if (numberOfRuns > 1) {
+		for (int i = 0; i < numberOfRuns; i++) {
+			// search for contiguous blocks
+			int nextX = runs[i].x;
+			int nextY = runs[i].y;
+			int nextH = runs[i].h;
+			blobs->blobIt(nextX, nextY, nextH, false);
+		}
+	}
+
+	if (CROSSDEBUG){
+		cout << blobs->number() << " white blobs" << endl;
+	}
+}
+
+bool Cross::checkForRobotBlobs(Blob blob) {
+    for (int i = 0; i < blobs->number(); i++) {
+        if (blobs->get(i).isAligned(blob)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/* See if any of our candidate blobs are actually worthy crosses.
+ */
+
+void Cross::checkForCrosses() {
 	// TODO:  These were thrown together in an hour.  They should
 	// be more rigorously determined
 	const int maxWidth = 75;
@@ -63,21 +94,6 @@ void Cross::createObject() {
 	const int minHeight = 5;
 	const int maxRatio = 5;
 
-	// do basic run-length encoding
-	if (numberOfRuns > 1) {
-		for (int i = 0; i < numberOfRuns; i++) {
-			// search for contiguous blocks
-			int nextX = runs[i].x;
-			int nextY = runs[i].y;
-			int nextH = runs[i].h;
-			blobs->blobIt(nextX, nextY, nextH);
-		}
-	}
-
-	if (CROSSDEBUG){
-		cout << blobs->number() << " white blobs" << endl;
-	}
-
 	// loop through all the blobs and test the ones that are the right
 	// basic size
 	for (int i = 0; i < blobs->number(); i++) {
@@ -85,6 +101,8 @@ void Cross::createObject() {
 		if (CROSSDEBUG) {
 			cout << "Blob " << candidate.width() << " " << candidate.height() << endl;
 			cout << "Coords " << candidate.getLeft() << " " << candidate.getTop() << endl;
+            vision->drawRect(candidate.getLeft(), candidate.getTop(),
+                             candidate.width(), candidate.height(), BLACK);
 		}
 		if (candidate.width() < maxWidth && candidate.height() < maxHeight &&
 			candidate.width() > minWidth && candidate.height() > minHeight &&
@@ -425,7 +443,7 @@ bool Cross::isUndefined(unsigned char pix) {
 #ifdef SOFTCOLORS
 	return pix == GREY;
 #else
-	return pix;
+	return pix == 0x00;
 #endif
 }
 
