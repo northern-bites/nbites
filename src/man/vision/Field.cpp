@@ -119,14 +119,19 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		} else {
 			convex[i] = point<int>(i * SCANSIZE, IMAGE_HEIGHT);
 		}
+		if (debugFieldEdge) {
+			vision->drawPoint(i * SCANSIZE, convex[i].y, MAROON);
+		}
 	}
 	for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
-	for (int i = good-1; i > -1; i--) {
-		convex[i].y = convex[i+1].y;
-	}
-	for (good = HULLS - 1; convex[good].y == IMAGE_HEIGHT && good > 0; good--) {}
-	for (int i = good + 1; i < HULLS; i++) {
-		convex[i].y = convex[i-1].y;
+	if (good < HULLS) {
+		for (int i = good-1; i > -1; i--) {
+			convex[i].y = convex[i+1].y;
+		}
+		for (good = HULLS - 1; convex[good].y == IMAGE_HEIGHT && good > 0; good--) {}
+		for (int i = good + 1; i < HULLS; i++) {
+			convex[i].y = convex[i-1].y;
+		}
 	}
 }
 
