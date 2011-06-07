@@ -14,6 +14,7 @@
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
 #include "PyLights.h"
+#include "PySpeech.h"
 
 //#define DEBUG_POST_OBSERVATIONS
 //#define DEBUG_CORNER_OBSERVATIONS
@@ -100,6 +101,7 @@ void Noggin::initializePython()
     c_init_sensors();
     //init_leds();
     c_init_lights();
+    c_init_speech();
     c_init_roboguardian();
     c_init_motion();
     c_init_comm();
