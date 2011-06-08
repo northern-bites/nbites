@@ -249,12 +249,21 @@ void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
 
     if (! useAmbiguous) {
         // Remove ambiguous observations
-        vector<PointObservation>::iterator iter = pt_z.begin();
-        while( iter != pt_z.end() ) {
-            if (iter->isAmbiguous() ) {
-                iter = pt_z.erase( iter );
+        vector<PointObservation>::iterator iter_p = pt_z.begin();
+        while( iter_p != pt_z.end() ) {
+            if (iter_p->isAmbiguous() ) {
+                iter_p = pt_z.erase( iter_p );
             } else {
-                ++iter;
+                ++iter_p;
+            }
+        }
+
+        vector<CornerObservation>::iterator iter_c = c_z.begin();
+        while( iter_c != c_z.end() ) {
+            if (iter_c->isAmbiguous() ) {
+                iter_c = c_z.erase( iter_c );
+            } else {
+                ++iter_c;
             }
         }
     }
@@ -291,7 +300,7 @@ bool MultiLocEKF::applyObservation(const ObservationT& Z)
 }
 
 #ifdef USE_MM_LOC_EKF
-bool MultiLocEKF::updateProabbility(const Observation& Z)
+bool MultiLocEKF::updateProbability(const Observation& Z)
 {
 
     if (R_k(0,0) == DONT_PROCESS_KEY)

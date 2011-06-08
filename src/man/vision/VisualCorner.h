@@ -17,7 +17,7 @@ class VisualCorner;
 
 class NaoPose;
 
-class VisualCorner : public VisualDetection, public VisualLandmark<cornerID> {
+class VisualCorner : public VisualDetection, public VisualLandmark {
 private: // Constants
     // Number of pixels that must extend beyond the intersection for a line to
     // be considered a T
@@ -57,8 +57,9 @@ public:
     ////////////////////////////////////////////////////////////
     // GETTERS
     ////////////////////////////////////////////////////////////
-    const std::list <const ConcreteCorner *> getPossibleCorners() const {
-        return possibleCorners; }
+    const std::list <const ConcreteCorner *>* getPossibilities() const {
+        return &possibleCorners;
+    }
     boost::shared_ptr<VisualLine> getLine1() const { return line1; }
     boost::shared_ptr<VisualLine> getLine2() const { return line2; }
 
@@ -66,23 +67,24 @@ public:
     boost::shared_ptr<VisualLine> getTStem() const { return tStem; }
 
     // See FieldLines.cc intersectLines to see how this is calculated and used
-    const float getT1() const { return t1; }
-    const float getT2() const { return t2; }
-    const shape getShape() const { return cornerType; }
-    const shape getSecondaryShape() const { return secondaryShape; }
+    float getT1() const { return t1; }
+    float getT2() const { return t2; }
+    shape getShape() const { return cornerType; }
+    shape getSecondaryShape() const { return secondaryShape; }
 
     // DO NOT USE THIS UNLESS getShape() returns inner or outer L; I have
     // not yet hooked up the angle thing for T corners
-    const float getAngleBetweenLines() const { return angleBetweenLines; }
+    float getAngleBetweenLines() const { return angleBetweenLines; }
 
-    const float getOrientation() const { return orientation; }
-    const float getPhysicalOrientation() const { return physicalOrientation; }
+    float getOrientation() const { return orientation; }
+    float getPhysicalOrientation() const { return physicalOrientation; }
+    float getPhysicalOrientationSD() const { return 0; }//return physicalOrientationSD; }
 
-    const point<int> getTStemEndpoint() const;
-    const bool doesItPointDown();
-    const bool doesItPointUp();
-    const bool doesItPointRight();
-    const bool doesItPointLeft();
+    point<int> getTStemEndpoint() const;
+    bool doesItPointDown();
+    bool doesItPointUp();
+    bool doesItPointRight();
+    bool doesItPointLeft();
 
     virtual const bool hasPositiveID();
 

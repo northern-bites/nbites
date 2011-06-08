@@ -57,7 +57,7 @@ void AccEKF::update(const float accX,
 EKF<AccelMeasurement, int, 3, 3>::StateVector
 AccEKF::associateTimeUpdate(int u_k)
 {
-    return ublas::zero_vector<float>(num_dimensions);
+    return ublas::zero_vector<float>(acc_num_dimensions);
 }
 
 const float AccEKF::scale(const float x) {
@@ -110,9 +110,9 @@ void AccEKF::incorporateMeasurement(const AccelMeasurement& z,
                                     MeasurementVector &V_k)
 {
     static MeasurementVector last_measurement(
-        ublas::scalar_vector<float>(num_dimensions, 0.0f));
+        ublas::scalar_vector<float>(acc_num_dimensions, 0.0f));
 
-    MeasurementVector z_x(num_dimensions);
+    MeasurementVector z_x(acc_num_dimensions);
     z_x(0) = z.x;
     z_x(1) = z.y;
     z_x(2) = z.z; // hahahha

@@ -22,7 +22,7 @@ VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _t1, const float _t2,
                            shared_ptr<NaoPose> _pose)
     : VisualDetection(_x, _y, _distance, _bearing),
-      VisualLandmark<cornerID>(CORNER_NO_IDEA_ID),
+      VisualLandmark(CORNER_NO_IDEA_ID),
       pose(_pose),
       possibleCorners(ConcreteCorner::concreteCorners().begin(),
                       ConcreteCorner::concreteCorners().end()),
@@ -47,7 +47,7 @@ VisualCorner::VisualCorner(const int _x, const int _y,
 VisualCorner::~VisualCorner() {}
 
 VisualCorner::VisualCorner(const VisualCorner& other)
-    : VisualDetection(other), VisualLandmark<cornerID>(other),
+    : VisualDetection(other), VisualLandmark(other),
       pose(other.pose),
       possibleCorners(other.possibleCorners),
       cornerType(other.cornerType), secondaryShape(other.secondaryShape),
@@ -534,7 +534,7 @@ setPossibleCorners( vector <const ConcreteCorner*> _possibleCorners)
  * Returns the endpoint of the TStem which is farther from
  * the corner. So the base of the stem, basically.
  */
-const point<int> VisualCorner::getTStemEndpoint() const
+point<int> VisualCorner::getTStemEndpoint() const
 {
     return Utility::getPointFartherFromCorner(*getTStem(), getX(), getY());
 }
@@ -542,12 +542,12 @@ const point<int> VisualCorner::getTStemEndpoint() const
 /**
  * Returns true when the endpoint is below the corner on the screen.
  */
-const bool VisualCorner::doesItPointDown()
+bool VisualCorner::doesItPointDown()
 {
     return abs(orientation) > 90.0;
 }
 
-const bool VisualCorner::doesItPointUp()
+bool VisualCorner::doesItPointUp()
 {
     return abs(orientation) < 90.0;
 }
@@ -555,7 +555,7 @@ const bool VisualCorner::doesItPointUp()
 /**
  * Returns true when the endpoint is below the corner on the screen.
  */
-const bool VisualCorner::doesItPointRight()
+bool VisualCorner::doesItPointRight()
 {
     return orientation >= 0.0;
 }
@@ -563,7 +563,7 @@ const bool VisualCorner::doesItPointRight()
 /**
  * Returns true when the endpoint is below the corner on the screen.
  */
-const bool VisualCorner::doesItPointLeft()
+bool VisualCorner::doesItPointLeft()
 {
     return orientation < 0.0;
 }

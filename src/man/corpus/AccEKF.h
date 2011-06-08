@@ -58,7 +58,6 @@ private:
     const float getVariance(float, float);
 
 private: // Constants
-    static const int num_dimensions;
     static const float beta;
     static const float gamma;
     static const float variance;

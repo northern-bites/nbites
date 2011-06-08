@@ -254,16 +254,17 @@ PyVisualCorner_new (PyFieldLines *fl, int i, const VisualCorner &corner)
         self->fl = fl;
         self->i = i;
 
-        list<const ConcreteCorner*> possibilities = corner.getPossibleCorners();
+        const list<const ConcreteCorner*> *possibilities =
+            corner.getPossibilities();
 
         self->dist = PyFloat_FromDouble(corner.getDistance());
         self->bearing = PyFloat_FromDouble(corner.getBearingDeg());
 
-        self->possibilities = PyList_New(possibilities.size());
+        self->possibilities = PyList_New(possibilities->size());
         if (self->possibilities != NULL) {
             int c_i = 0;
             for (list<const ConcreteCorner*>::const_iterator c =
-                     possibilities.begin(); c != possibilities.end(); c_i++, c++) {
+                     possibilities->begin(); c != possibilities->end(); c_i++, c++) {
                 Py_INCREF(py_concrete_corners[*c]);
                 PyList_SetItem(self->possibilities, c_i, py_concrete_corners[*c]);
             }
@@ -297,14 +298,15 @@ PyVisualCorner_update (PyVisualCorner *self, const VisualCorner &corner)
     Py_XDECREF(self->bearing);
     self->bearing = PyFloat_FromDouble(corner.getBearingDeg());
 
-    list<const ConcreteCorner*> possibilities = corner.getPossibleCorners();
+    const list<const ConcreteCorner*>* possibilities =
+        corner.getPossibilities();
     if (self->possibilities == NULL)
-        self->possibilities = PyList_New(possibilities.size());
+        self->possibilities = PyList_New(possibilities->size());
 
     if (self->possibilities != NULL) {
         int c_i = 0;
         for (list<const ConcreteCorner*>::const_iterator c =
-                 possibilities.begin(); c != possibilities.end(); c_i++, c++) {
+                 possibilities->begin(); c != possibilities->end(); c_i++, c++) {
             Py_INCREF(py_concrete_corners[*c]);
             if (c_i < PyList_Size(self->possibilities))
                 PyList_SetItem(self->possibilities, c_i, py_concrete_corners[*c]);

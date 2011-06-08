@@ -4,8 +4,7 @@
 #include <iomanip>
 #include <cstdlib>
 
-#include "VisualLandmark.h"
-#include "VisualDetection.h"
+#include "VisualObject.h"
 #include "ConcreteFieldObject.h"
 #include "Utility.h"
 #include "Structs.h"
@@ -16,7 +15,7 @@
 
 // Values for the Standard Deviation calculations
 
-class VisualCross : public VisualDetection, public VisualLandmark<crossID> {
+class VisualCross : public VisualObject {
 
 public:
     // Construcotrs

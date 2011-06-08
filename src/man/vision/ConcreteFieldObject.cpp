@@ -89,8 +89,8 @@ const string ConcreteFieldObject::toString() const {
 
 }
 
-const string ConcreteFieldObject::getStringFromID(const fieldObjectID
-                                                         testID) {
+const string ConcreteFieldObject::getStringFromID(const int testID)
+{
     switch (testID) {
     case BLUE_GOAL_LEFT_POST:
         return "Blue goal left post";
@@ -106,12 +106,12 @@ const string ConcreteFieldObject::getStringFromID(const fieldObjectID
 }
 
 
-const bool ConcreteFieldObject::isAbstract(const fieldObjectID testID)
+const bool ConcreteFieldObject::isAbstract(const int testID)
 {
     return (testID == BLUE_GOAL_POST || testID == YELLOW_GOAL_POST);
 }
 
-const bool ConcreteFieldObject::isGoal(const fieldObjectID testID) {
+const bool ConcreteFieldObject::isGoal(const int testID) {
     switch (testID) {
     case BLUE_GOAL_LEFT_POST: // Intentional fall throughs
     case BLUE_GOAL_RIGHT_POST:
@@ -125,7 +125,7 @@ const bool ConcreteFieldObject::isGoal(const fieldObjectID testID) {
     }
 }
 
-const float ConcreteFieldObject::getHeightFromGround(const fieldObjectID _id)
+const float ConcreteFieldObject::getHeightFromGround(const int _id)
 {
     return 0;
 }

@@ -79,7 +79,7 @@ class YOrder {
 #include "Structs.h"
 #include "Utility.h"
 
-class VisualLine : public VisualLandmark<lineID> {
+class VisualLine : public VisualLandmark {
  public: // Constants
     // number of points to be a valid line
     static const unsigned int NUM_POINTS_TO_BE_VALID_LINE = 3;

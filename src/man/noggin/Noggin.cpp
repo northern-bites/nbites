@@ -381,6 +381,7 @@ void Noggin::updateLocalization()
     } else {
         ++ballFramesOff;
     }
+
     RangeBearingMeasurement m;
     if( ballFramesOff < TEAMMATE_FRAMES_OFF_THRESH) {
         // If it's less than the threshold then we either see a ball or report
@@ -590,3 +591,4 @@ void Noggin::stopLocLog()
     loggingLoc = false;
 }
 #endif
+

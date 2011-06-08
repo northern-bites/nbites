@@ -6,7 +6,7 @@
 
 class VisualFieldObject;
 
-#include "VisualLandmark.h"
+#include "VisualObject.h"
 #include "VisualDetection.h"
 #include "ConcreteFieldObject.h"
 #include "Utility.h"
@@ -16,8 +16,7 @@ class VisualFieldObject;
 #include "Blob.h"
 #include "stdio.h"
 
-class VisualFieldObject : public VisualLandmark<fieldObjectID> ,
-                          public VisualDetection {
+class VisualFieldObject : public VisualObject {
 
 public:
     // Construcotrs
@@ -78,12 +77,10 @@ public:
     const point<float> getFieldLocation() const { return fieldLocation; }
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
-	const float getFieldX2() const { return fieldLocation2.x; }
-	const float getFieldY2() const { return fieldLocation2.y; }
-    const std::list <const ConcreteFieldObject *> * getPossibleFieldObjects()
-		const { return possibleFieldObjects; }
+    const float getFieldX2() const { return fieldLocation2.x; }
+    const float getFieldY2() const { return fieldLocation2.y; }
 
-	virtual const bool hasPositiveID();
+    virtual const bool hasPositiveID();
 
 private: // Class Variables
 
