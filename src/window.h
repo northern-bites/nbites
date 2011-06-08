@@ -8,9 +8,12 @@
 #include <QSpinBox>
 #include <QGridLayout>
 #include <QFileDialog>
+
+#include <boost/shared_ptr.hpp>
+
 #include "YUVImage.h"
 #include "RoboImageViewer.h"
-#include "MessageParser.h"
+#include "ImageParser.h"
 #include "memory/protos/Sensors.pb.h"
 
 class QCheckBox;
@@ -28,13 +31,11 @@ public:
 
 private:
     RoboImageViewer *roboImageViewer;
-    RoboImage *roboImage;
+    boost::shared_ptr<RoboImage> roboImage;
     QLabel *shapeLabel;
     QLabel *infoLabel;
     QComboBox *shapeComboBox;
-    memory::log::MessageParser* fp;
-    boost::shared_ptr<memory::proto::PImage> pImage;
-
+    memory::log::ImageParser* imageParser;
 
 };
 

@@ -1,14 +1,25 @@
-
+/**
+ *
+ * @class RoboImage
+ *
+ * stores a pointer to the byte array representing the robot image
+ * and other various useful information
+ *
+ * @author Octavian Neamtu
+ * @e-mail oneamtu89@gmail.com
+ *
+ */
 #pragma once
 
-//TODO: remove this typedef
-typedef char byte;
+#include "include/VisionDef.h"
 
 class RoboImage
 {
 
 public:
-    RoboImage(unsigned int wd = 0, unsigned int ht = 0, const byte* im = NULL) :
+    RoboImage(unsigned int wd = NAO_IMAGE_WIDTH,
+    		unsigned int ht = NAO_IMAGE_HEIGHT,
+    		const byte* im = NULL) :
     width(wd), height(ht), image(im) {}
 
     virtual void updateImage(const byte* _image) {
@@ -19,8 +30,8 @@ public:
 
     const unsigned int getWidth() const { return width; }
     const unsigned int getHeight() const { return height; }
-    //TODO: get this from a define from VisionDef
-    const unsigned int getByteSize() const { return width*height*2; }
+
+    const unsigned int getByteSize() const { return NAO_IMAGE_BYTE_SIZE; }
 
     void setWidth(const unsigned w) { width = w; }
     void setHeight(const unsigned h) { height = h; }
@@ -28,5 +39,6 @@ public:
 protected:
     unsigned int width;
     unsigned int height;
+    //TODO: make byte into uint8_t
     const byte* image;
 };

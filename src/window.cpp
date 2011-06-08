@@ -8,11 +8,10 @@ const int IdRole = Qt::UserRole;
 //! [1]
 Window::Window(QWidget *parent) :
     QWidget(parent),
-    roboImage(new RoboImage(640, 480)),
-    pImage(new memory::proto::PImage())
+    roboImage(new RoboImage())
 {
     infoLabel = new QLabel(tr("Information"));
-    roboImageViewer = new RoboImageViewer(roboImage, infoLabel);
+    roboImageViewer = new RoboImageViewer(roboImage.get(), infoLabel);
 
     shapeComboBox = new QComboBox;
     shapeLabel = new QLabel(tr("&View:"));
@@ -35,9 +34,8 @@ Window::Window(QWidget *parent) :
     		"/home",
     		tr("Image Files (*.log)"));
 
-    fp = new memory::log::MessageParser(pImage, currentDirectory.toStdString().data());
-    fp->getNextMessage();
-    roboImage->updateImage(pImage->image().data());
+    imageParser = new memory::log::ImageParser(roboImage, currentDirectory.toStdString().data());
+    imageParser->getNext();
     roboImageViewer->updateBitmap();
     this->repaint();
 }

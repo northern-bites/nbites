@@ -19,27 +19,26 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 ########### Sources
 
 set( RoboImageViewer_srcs main.cpp
-  colorcreator.cpp
   YUVImage.cpp
   BMPYUVImage.cpp
   colorspace.cpp
   RoboImageViewer.cpp
   window.cpp
-  MessageParser.cpp
+  ImageParser.cpp
   )
 
-set(RoboImageViewer_headers colorcreator.h
-    colorspace.h
+set(RoboImageViewer_headers colorspace.h
     RoboImageViewer.h
     window.h
 )
 
-set(RoboImageViewer_forms colorcreator.ui)
+#set(RoboImageViewer_forms colorcreator.ui)
 
 #SET(RoboImageViewer_resources images.qrc)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
-  /home/oneamtu/nbites/build/man/straight)
+  /home/oneamtu/nbites/build/man/straight
+  /home/oneamtu/nbites/src/man)
 
 ############ Qt4 goodness
 
