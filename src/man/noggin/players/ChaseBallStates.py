@@ -33,9 +33,6 @@ def goalieChase(player):
     """
     # Check in order of importance
 
-    #tells the goalie what state its in
-    if player.firstFrame():
-
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
     elif transitions.shouldApproachBall(player):

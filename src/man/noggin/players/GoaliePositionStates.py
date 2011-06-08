@@ -18,7 +18,7 @@ def goaliePosition(player):
         nav.positionPlaybook()
 
     if ball.dist >= goalCon.ACTIVE_LOC_THRESH:
-        player.brain.tracker.activeLoc()
+        player.brain.tracker.activeLocGoaliePos()
     else:
         player.brain.tracker.trackBall()
 

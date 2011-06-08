@@ -34,9 +34,11 @@ FIND_BALL_HEADS_LEFT = (((45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
 FIND_BALL_HEADS_RIGHT =  (((-45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
                           ((-45.,20.),0.3,1, stiff.LOW_HEAD_STIFFNESSES))
 
-OVER_RIGHT_SHOULDER = (((115.0,10.0),0.5,1,stiff.LOW_HEAD_STIFFNESSES),)
+# #OVER_RIGHT_SHOULDER = ((PAN_RIGHT_SHOULDER_HEADS,
+#                         0.5,1,stiff.LOW_HEAD_STIFFNESSES),)
 
-OVER_LEFT_SHOULDER = (((-115.0,10.0),0.5,1,stiff.LOW_HEAD_STIFFNESSES),)
+# OVER_LEFT_SHOULDER = ((PAN_LEFT_SHOULDER_HEADS,
+#                        0.5,1,stiff.LOW_HEAD_STIFFNESSES),)
 
 # Distance that can be seen at a certain head pitch
 # | degree | close | far |
@@ -272,6 +274,10 @@ PAN_LEFT_DOWN_HEADS = (60.0, 25.0)
 
 PAN_RIGHT_DOWN_HEADS = (-60.0, 25.0)
 
+PAN_RIGHT_SHOULDER_HEADS = (115.0,10.0)
+
+PAN_LEFT_SHOULDER_HEADS = (-115.0,10.0)
+
 LOOK_HEADS = {'left' : PAN_LEFT_HEADS,
               'right' : PAN_RIGHT_HEADS,
               'up' : PAN_UP_HEADS,
@@ -283,3 +289,4 @@ LOOK_HEADS = {'left' : PAN_LEFT_HEADS,
 DATA_PAN = (
     ((0.0,-45), 2.0, 0, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0, 15), 2.0, 0, stiff.LOW_HEAD_STIFFNESSES))
+

@@ -180,7 +180,10 @@ def trianglePan(tracker):
 
 def trianglePanLeft(tracker):
     if tracker.firstFrame():
-        tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
+        if tracker.goalieActiveLoc:
+            tracker.helper.panTo(HeadMoves.PAN_LEFT_SHOULDER_HEADS)
+        else:
+            tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
 
     elif not tracker.brain.motion.isHeadActive() and \
             tracker.counter > MOTION_START_BUFFER:
@@ -193,7 +196,10 @@ def trianglePanLeft(tracker):
 
 def trianglePanRight(tracker):
     if tracker.firstFrame():
-        tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
+        if tracker.goalieActiveLoc:
+            tracker.helper.panTo(HeadMoves.PAN_RIGHT_SHOULDER_HEADS)
+        else:
+            tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
 
     elif not tracker.brain.motion.isHeadActive() and \
             tracker.counter > MOTION_START_BUFFER:
@@ -205,6 +211,7 @@ def trianglePanRight(tracker):
 
 def trianglePanReturn(tracker):
     if tracker.firstFrame():
+        tracker.goalieActiveLoc = False
         tracker.helper.panTo(tracker.preTriPanHeads)
     elif (not tracker.brain.motion.isHeadActive() and
           tracker.counter > MOTION_START_BUFFER)  or \

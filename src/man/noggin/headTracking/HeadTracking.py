@@ -24,6 +24,8 @@ class HeadTracking(FSA.FSA):
         self.currentHeadScan = None
         self.headMove = None
 
+        self.goalieActiveLoc = False
+
         self.activePanDir = False
         self.activeLocOn = False
         self.activePanOut = False
@@ -73,6 +75,15 @@ class HeadTracking(FSA.FSA):
         """tracks the ball but periodically looks away"""
         self.target = self.brain.ball
         self.gain = 1.0
+        self.goalieActiveLoc = False
+        if (not self.activeLocOn):
+            self.switchTo('activeTracking')
+
+    def activeLocGoaliePos(self):
+        """tracks the ball but periodically looks away"""
+        self.target = self.brain.ball
+        self.gain = 1.0
+        self.goalieActiveLoc = True
         if (not self.activeLocOn):
             self.switchTo('activeTracking')
 
