@@ -8,8 +8,6 @@ from ..players import GoalieConstants as goalCon
 #********
 
 def shouldSave(team):
-    #Ball is within distance from the goalie and
-    #is prepared to save
     ball = team.brain.ball
 
     if fabs(ball.dx) > 5: #goalCon.VEL_THRES:
@@ -22,34 +20,22 @@ def shouldSave(team):
     return False
 
 def shouldPosition(team):
-    #if team.penaltyKicking:
-        #return False
-
     my = team.brain.my
     # checks if in front of box or a quarter of the way up the field
     #check if this really should be MY_GOALBOX_RIGHT_X
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X and my.uncertX < 90)\
             or (my.x > NogCon.MIDFIELD_X * 0.5):
-        #print "my.x ", my.x, " my.uncertX ", my.uncertX
         return True
     return False
 
 def shouldChase(team):
     ball = team.brain.ball
 
-    ## FIND OUT IF WE HAVE A SUBROLE FOR THIS!!!!!
-    #if team.penaltyKicking:
-        #return False
-
-    #if not chaseTran.shouldChaseBall(team):
-        #return False
-
     #if (ball.framesOff > 45):
         #print "no ball"
         #team.shouldChaseCounter = 0
         #team.shouldStopChaseCounter = 0
         #return False
-
 
     # checks if the ball is really far away
     #  make sure we dont chase if really far
@@ -74,7 +60,6 @@ def shouldStopChase(team):
     ball= team.brain.ball
 
     #if(ball.framesOff > 45):
-       # print "1"
        # team.shouldStopChaseCounter = 4
 
     if (ball.x > goalCon.CHASE_RIGHT_X_LIMIT
@@ -83,9 +68,8 @@ def shouldStopChase(team):
           or ball.y > goalCon.CHASE_UPPER_Y_LIMIT):
         team.shouldStopChaseCounter += 1
 
-    #i dont think this works right now?
+    #???? do we need this?
     #elif(chaseTran.shouldntStopChasing(player)):
-        #print "3"
         #return False
 
     if team.shouldStopChaseCounter > 3:
