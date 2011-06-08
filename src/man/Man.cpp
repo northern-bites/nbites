@@ -92,6 +92,9 @@ Man::Man (shared_ptr<Sensors> _sensors,
   set_speech_pointer(_speech);
 
   vision = shared_ptr<Vision>(new Vision(pose, profiler));
+
+  set_vision_pointer(vision);
+
   comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 #ifdef USE_NOGGIN
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,

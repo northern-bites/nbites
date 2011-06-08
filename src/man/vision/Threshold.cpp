@@ -946,11 +946,13 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
-                objPtr->getCenterX() ) /
-                MAX_BEARING_RAD );
+					      objPtr->getCenterX() ) /
+			   static_cast<float>(HALF_IMAGE_WIDTH) *
+			   MAX_BEARING_RAD );
         objPtr->setAngleY(static_cast<float>(HALF_IMAGE_HEIGHT -
-                objPtr->getCenterY() )/
-                MAX_ELEVATION_RAD);
+					     objPtr->getCenterY() )/
+			  static_cast<float>(HALF_IMAGE_HEIGHT) *
+			  MAX_ELEVATION_RAD);
 
         // if object is a goal post
         if (objPtr == vision->yglp ||
@@ -1081,11 +1083,13 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
-                objPtr->getCenterX() ) /
-                MAX_BEARING_RAD );
+					      objPtr->getCenterX() ) /
+			   static_cast<float>(HALF_IMAGE_WIDTH) *
+			   MAX_BEARING_RAD );
         objPtr->setAngleY( static_cast<float>(HALF_IMAGE_HEIGHT -
-                objPtr->getCenterY() ) /
-                MAX_ELEVATION_RAD );
+					      objPtr->getCenterY() ) /
+			   static_cast<float>(HALF_IMAGE_HEIGHT) *
+			   MAX_ELEVATION_RAD );
 
         // sets focal distance of the field object
         objPtr->setFocDist(objPtr->getDistance());
