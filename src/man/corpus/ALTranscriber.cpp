@@ -16,14 +16,16 @@ using namespace Kinematics;
 #include "ALNames.h"
 using namespace ALNames;
 
+static const int VARIANCE_FILTER_MIN = 0;
+
 ALTranscriber::ALTranscriber (AL::ALPtr<AL::ALBroker> _broker,
                               boost::shared_ptr<Sensors> _sensors)
     :Transcriber(_sensors),
      broker(_broker),
      accelerationFilter(),
-	 accX_m("accX", -100, 100),
-	 accY_m("accY", -100, 100),
-	 accZ_m("accZ", -100, 100),
+	 accX_m("accX", VARIANCE_FILTER_MIN, 5),
+	 accY_m("accY", VARIANCE_FILTER_MIN, 5),
+	 accZ_m("accZ", VARIANCE_FILTER_MIN, 5),
      lastAngleX(0.0f), lastAngleY(0.0f)
 {
     try{
@@ -148,8 +150,8 @@ void ALTranscriber::initSyncMotionWithALMemory(){
 
 }
 
-
 // for marvin!
+// TODO FIX THIS BECAUSE ITS PROBABLY TOTALLY WRONG
 static const float ACCEL_OFFSET_X = 3.5f;
 static const float ACCEL_OFFSET_Y = 0.5f;
 static const float ACCEL_OFFSET_Z = 4.0f;
@@ -163,7 +165,7 @@ const float ALTranscriber::calibrate_acc_x(const float x) {
 }
 
 const float ALTranscriber::calibrate_acc_y(const float y) {
-    return (y + ACCEL_OFFSET_Y) * ACCEL_CONVERSION_Y;
+	return (y + ACCEL_OFFSET_Y) * ACCEL_CONVERSION_Y;
 }
 
 const float ALTranscriber::calibrate_acc_z(const float z) {
@@ -199,6 +201,11 @@ void ALTranscriber::syncMotionWithALMemory() {
         gyrX = sensorValues[12], gyrY = sensorValues[13],
         angleX = sensorValues[14],//,-M_PI_FLOAT,M_PI_FLOAT),
         angleY = sensorValues[15];//,-M_PI_FLOAT,M_PI_FLOAT);
+
+	// update the variance filters
+	accX_m.X(accX);
+	//accY_m.X(accY);
+	//accZ_m.X(accZ);
 
     accelerationFilter.update(accX, accY, accZ);
     const float filteredX = accelerationFilter.getX();

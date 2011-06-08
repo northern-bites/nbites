@@ -2,7 +2,7 @@
 #include "SensorMonitor.h"
 
 SensorMonitor::SensorMonitor(std::string sensorName, double low, double high, bool log)
-	:  noise(),
+	:  noise(NoiseMeter<Boxcar>::ControlType(21, 21)),
 	   monitor(numberOfBins, low, high, log)
 {
 	SensorMonitor::sensorName = sensorName;
@@ -23,6 +23,9 @@ double SensorMonitor::X(double input) {
 			steadyAtFrame = SampleCount();
 		}
 	}
+
+	if (SampleCount() % 1000 == 0)
+		LogOutput();
 
 	return Y(input);
 }
