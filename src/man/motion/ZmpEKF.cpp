@@ -13,7 +13,7 @@ const float ZmpEKF::gamma = 0.5f;
 
 ZmpEKF::ZmpEKF()
     : EKF<ZmpMeasurement,ZmpTimeUpdate,
-          ZMP_NUM_DIMENSIONS, ZMP_NUM_MEASUREMENTS>(beta, gamma)
+          zmp_num_dimensions, ekf::zmp_num_measurements>(beta, gamma)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -47,12 +47,12 @@ void ZmpEKF::update(const ZmpTimeUpdate tUp,
     //noCorrectionStep();
 }
 
-EKF<ZmpMeasurement,ZmpTimeUpdate, ZMP_NUM_DIMENSIONS, ZMP_NUM_MEASUREMENTS>::StateVector
+EKF<ZmpMeasurement,ZmpTimeUpdate, zmp_num_dimensions, zmp_num_measurements>::StateVector
 ZmpEKF::associateTimeUpdate(ZmpTimeUpdate u_k)
 {
     static ZmpTimeUpdate lastUpdate = {0.0f, 0.0f};
 
-    StateVector delta(ZMP_NUM_DIMENSIONS);
+    StateVector delta(zmp_num_dimensions);
     delta(0) = u_k.cur_zmp_x - xhat_k(0);
     delta(1) = u_k.cur_zmp_y - xhat_k(1);
 
@@ -77,7 +77,7 @@ const float getVariance(const float divergence){
 }
 
 
-void ZmpEKF::incorporateMeasurement(ZmpMeasurement z,
+void ZmpEKF::incorporateMeasurement(const ZmpMeasurement& z,
                                     StateMeasurementMatrix &H_k,
                                     MeasurementMatrix &R_k,
                                     MeasurementVector &V_k)
@@ -85,9 +85,9 @@ void ZmpEKF::incorporateMeasurement(ZmpMeasurement z,
     static const float com_height  = 310; //TODO: Move this
 	float zheight_div_G = com_height/GRAVITY_mss;
     static MeasurementVector last_measurement(
-        ublas::scalar_vector<float>(ZMP_NUM_MEASUREMENTS, 0.0f));
+        ublas::scalar_vector<float>(zmp_num_measurements, 0.0f));
 
-    MeasurementVector z_x(ZMP_NUM_MEASUREMENTS);
+    MeasurementVector z_x(zmp_num_measurements);
     z_x(0) = z.comX + zheight_div_G * z.accX;
     z_x(1) = z.comY + zheight_div_G * z.accY;
 

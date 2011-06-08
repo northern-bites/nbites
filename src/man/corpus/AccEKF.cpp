@@ -5,14 +5,16 @@
 using namespace boost::numeric;
 using namespace ekf;
 
-const int AccEKF::num_dimensions = ACC_NUM_DIMENSIONS;
 const float AccEKF::beta = 0.2f;
 const float AccEKF::gamma = .2f;
 const float AccEKF::variance  = 0.22f;
 //const float AccEKF::variance  = 100.00f;
 
 AccEKF::AccEKF()
-    : EKF<AccelMeasurement,int, num_dimensions, num_dimensions>(beta, gamma)
+    : EKF<AccelMeasurement,
+          int,
+          acc_num_dimensions,
+          acc_num_dimensions>(beta, gamma)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -102,7 +104,7 @@ const float AccEKF::getVariance(float delta, float divergence) {
     return dont_trust;
 }
 
-void AccEKF::incorporateMeasurement(AccelMeasurement z,
+void AccEKF::incorporateMeasurement(const AccelMeasurement& z,
                                     StateMeasurementMatrix &H_k,
                                     MeasurementMatrix &R_k,
                                     MeasurementVector &V_k)

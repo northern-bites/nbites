@@ -28,8 +28,8 @@
 #include "EKFStructs.h"
 
 class ZmpAccEKF : public ekf::EKF<AccelMeasurement, int,
-                                  ACC_NUM_DIMENSIONS,
-                                  ACC_NUM_DIMENSIONS>
+                                  ekf::acc_num_dimensions,
+                                  ekf::acc_num_dimensions>
 {
 public:
     ZmpAccEKF();

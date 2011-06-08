@@ -19,20 +19,6 @@
 #define DEFAULT_BETA 3.0f
 #define DEFAULT_GAMMA 2.0f
 
-// Dimensions of implemented classes
-#define LOC_EKF_DIMENSION 3 // Number of states in Loc EKF
-#define LOC_MEASUREMENT_DIMENSION 2 // Number of dimensions in a measurement
-#define BALL_EKF_DIMENSION 4 // Number of states in Ball EKF
-#define BALL_MEASUREMENT_DIMENSION 2 // Number of dimensions in a measurement
-
-static const int ACC_NUM_DIMENSIONS = 3;
-static const int ACC_NUM_MEASUREMENTS = 3;
-
-static const int ANGLE_NUM_DIMENSIONS = 2;
-static const int ANGLE_NUM_MEASUREMENTS = 2;
-
-static const int ZMP_NUM_DIMENSIONS = 2;
-static const int ZMP_NUM_MEASUREMENTS = 2;
 static const float DONT_PROCESS_KEY = -1337.0f;
 /**
  * @brief An abstract class which implements the computational components of
@@ -42,6 +28,19 @@ static const float DONT_PROCESS_KEY = -1337.0f;
  * @author Tucker Hermans
  */
 namespace ekf {
+    enum {
+        dist_bearing_meas_dim = 2, // (Dist, Bearing) measurements
+        corner_measurement_dim = 3, // (Dist, Bearing, Orientation) meas.
+        loc_ekf_dimension = 3,  // # of states in Loc EKF
+        ball_ekf_dimension = 4, // # of states in Ball EKF
+        acc_num_dimensions = 3,
+        acc_num_measurements = 3,
+        angle_num_dimensions = 2,
+        angle_num_measurements = 2,
+        zmp_num_dimensions = 2,
+        zmp_num_measurements = 2
+    };
+
     template <class Measurement, class UpdateModel,
               unsigned int dimension, unsigned int measurementSize>
     class EKF
@@ -188,7 +187,7 @@ namespace ekf {
 #endif
         }
 
-        virtual void correctionStep(std::vector<Measurement> z_k) {
+        virtual void correctionStep(const std::vector<Measurement>& z_k) {
 
             // Incorporate all correction observations
             for(unsigned int i = 0; i < z_k.size(); ++i) {
@@ -203,7 +202,7 @@ namespace ekf {
             updateState();
         }
 
-        virtual void correctionStep(Measurement z_k){
+        virtual void correctionStep(const Measurement& z_k){
             incorporateMeasurement(z_k, H_k, R_k, v_k);
 
             if (R_k(0,0) == DONT_PROCESS_KEY) {
@@ -250,7 +249,7 @@ namespace ekf {
     protected:
         // Pure virtual methods to be specified by implementing class
         virtual StateVector associateTimeUpdate(UpdateModel u_k) = 0;
-        virtual void incorporateMeasurement(Measurement z,
+        virtual void incorporateMeasurement(const Measurement& z,
                                             StateMeasurementMatrix &H_k,
                                             MeasurementMatrix &R_k,
                                             MeasurementVector &V_k) = 0;

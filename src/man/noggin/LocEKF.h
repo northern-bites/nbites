@@ -38,10 +38,11 @@ public:
     virtual ~LocEKF() {}
 
     // Update functions
-    virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
-	void odometryUpdate(MotionModel u);
+    virtual void updateLocalization(const MotionModel& u,
+                                    const std::vector<Observation>& Z);
+	void odometryUpdate(const MotionModel& u);
 	void applyObservations(vector<Observation> Z);
-	bool applyObservation(Observation Z);
+	bool applyObservation(const Observation& Z);
 	void endFrame();
 
 	void copyEKF(const LocEKF& other);
@@ -160,20 +161,20 @@ public:
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
-    virtual void incorporateMeasurement(Observation z,
+    virtual void incorporateMeasurement(const Observation& z,
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
-	void incorporateCartesianMeasurement(int obsIndex,
-										   Observation z,
-										   StateMeasurementMatrix &H_k,
-										   MeasurementMatrix &R_k,
-										   MeasurementVector &V_k);
-	void incorporatePolarMeasurement(int obsIndex,
-									   Observation z,
-									   StateMeasurementMatrix &H_k,
-									   MeasurementMatrix &R_k,
-									   MeasurementVector &V_k);
+    void incorporateCartesianMeasurement(int obsIndex,
+                                         const Observation& z,
+                                         StateMeasurementMatrix &H_k,
+                                         MeasurementMatrix &R_k,
+                                         MeasurementVector &V_k);
+    void incorporatePolarMeasurement(int obsIndex,
+                                     const Observation& z,
+                                     StateMeasurementMatrix &H_k,
+                                     MeasurementMatrix &R_k,
+                                     MeasurementVector &V_k);
 
 
     int findBestLandmark(const Observation& z);

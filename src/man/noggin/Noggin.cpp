@@ -7,7 +7,7 @@
 #include "PyLoc.h"
 #include "EKFStructs.h"
 #include <cstdlib>
-#include "LocEKF.h"
+#include "MultiLocEKF.h"
 
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
@@ -128,12 +128,8 @@ void Noggin::initializeLocalization()
     printf("Initializing localization modules\n");
 #   endif
 
-    // Initialize the localization modules
-#ifdef USE_MM_LOC_EKF
-    loc = shared_ptr<LocSystem>(new MMLocEKF());
-#else
-    loc = shared_ptr<LocSystem>(new LocEKF());
-#endif
+    // Initialize the localization module
+    loc = shared_ptr<LocSystem>(new MultiLocEKF());
 
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
@@ -306,14 +302,16 @@ void Noggin::updateLocalization()
     MotionModel odometery = motion_interface->getOdometryUpdate();
 
     // Build the observations from vision data
-    vector<Observation> observations;
+    vector<PointObservation> pt_observations;
+    vector<CornerObservation> corner_observations;
+
     // FieldObjects
     VisualFieldObject fo;
     fo = *vision->bgrp;
 
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        Observation seen(fo);
-        observations.push_back(seen);
+        PointObservation seen(fo);
+        pt_observations.push_back(seen);
 #       ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw bgrp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
@@ -322,8 +320,8 @@ void Noggin::updateLocalization()
 
     fo = *vision->bglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        Observation seen(fo);
-        observations.push_back(seen);
+        PointObservation seen(fo);
+        pt_observations.push_back(seen);
 #       ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw bglp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
@@ -332,8 +330,8 @@ void Noggin::updateLocalization()
 
     fo = *vision->ygrp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        Observation seen(fo);
-        observations.push_back(seen);
+        PointObservation seen(fo);
+        pt_observations.push_back(seen);
 #       ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw ygrp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
@@ -342,8 +340,8 @@ void Noggin::updateLocalization()
 
     fo = *vision->yglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        Observation seen(fo);
-        observations.push_back(seen);
+        PointObservation seen(fo);
+        pt_observations.push_back(seen);
 #       ifdef DEBUG_POST_OBSERVATIONS
         cout << "Saw yglp at distance " << fo.getDistance()
              << " and bearing " << seen.getVisBearing() << endl;
@@ -356,8 +354,9 @@ void Noggin::updateLocalization()
     list <VisualCorner>::const_iterator i;
     for ( i = corners->begin(); i != corners->end(); ++i) {
         if (i->getDistance() < MAX_CORNER_DISTANCE) {
-            Observation seen(*i);
-            observations.push_back(seen);
+            CornerObservation seen(*i);
+            corner_observations.push_back(seen);
+
 #           ifdef DEBUG_CORNER_OBSERVATIONS
             cout << "Saw corner "
                  << ConcreteCorner::cornerIDToString(i->getID())
@@ -378,8 +377,8 @@ void Noggin::updateLocalization()
     // Field Cross
     if (vision->cross->getDistance() > 0 &&
         vision->cross->getDistance() < MAX_CROSS_DISTANCE) {
-        Observation seen(*vision->cross);
-        observations.push_back(seen);
+        PointObservation seen(*vision->cross);
+        pt_observations.push_back(seen);
 #       ifdef DEBUG_CROSS_OBSERVATIONS
         cout << "Saw cross "
              << vision->cross->getID()
@@ -402,7 +401,7 @@ void Noggin::updateLocalization()
 
     // Process the information
     PROF_ENTER(profiler, P_MCL);
-    loc->updateLocalization(odometery, observations);
+    loc->updateLocalization(odometery, pt_observations, corner_observations);
     PROF_EXIT(profiler, P_MCL);
 
     // Ball Tracking

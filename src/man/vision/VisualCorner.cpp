@@ -84,7 +84,7 @@ void VisualCorner::determineCornerShape() {
     } else {
         // Temporary side effect - set angleBetweenLines
         cornerType = getLClassification();
-        physicalOrientation = getLPhysicalOrientation();
+        physicalOrientation = static_cast<float>(getLPhysicalOrientation());
     }
 
     secondaryShape = UNKNOWN;

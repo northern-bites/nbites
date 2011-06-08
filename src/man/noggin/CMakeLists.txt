@@ -80,7 +80,9 @@ SET( NOGGIN_SRCS Noggin
                  # MCL
                  BallEKF
                  PyLoc
-                 LocEKF
+                 # LocEKF
+		 MultiMeasurementEKF
+		 MultiLocEKF
                  NogginStructs.h
                  )
 

@@ -1,4 +1,4 @@
-#include "LocEKF.h"
+#include "MultiLocEKF.h"
 #include <boost/numeric/ublas/io.hpp> // for cout
 #include "FieldConstants.h"
 //#define DEBUG_LOC_EKF_INPUTS
@@ -7,46 +7,45 @@ using namespace boost::numeric;
 using namespace boost;
 using namespace std;
 using namespace NBMath;
+using namespace ekf;
 
 // Parameters
 // Measurement conversion form
-const float LocEKF::USE_CARTESIAN_DIST = 50.0f;
+const float MultiLocEKF::USE_CARTESIAN_DIST = 50.0f;
 // Uncertainty
-const float LocEKF::BETA_LOC = 1.0f;
-const float LocEKF::GAMMA_LOC = 0.1f;
-const float LocEKF::BETA_ROT = M_PI_FLOAT/64.0f;
-const float LocEKF::GAMMA_ROT = 0.1f;
+const float MultiLocEKF::BETA_LOC = 1.0f;
+const float MultiLocEKF::GAMMA_LOC = 0.1f;
+const float MultiLocEKF::BETA_ROT = M_PI_FLOAT/64.0f;
+const float MultiLocEKF::GAMMA_ROT = 0.1f;
 
 // Default initialization values
-const float LocEKF::INIT_LOC_X = CENTER_FIELD_X;
-const float LocEKF::INIT_LOC_Y = CENTER_FIELD_Y;
-const float LocEKF::INIT_LOC_H = 0.0f;
-const float LocEKF::INIT_BLUE_GOALIE_LOC_X = (FIELD_WHITE_LEFT_SIDELINE_X +
+const float MultiLocEKF::INIT_LOC_X = CENTER_FIELD_X;
+const float MultiLocEKF::INIT_LOC_Y = CENTER_FIELD_Y;
+const float MultiLocEKF::INIT_LOC_H = 0.0f;
+const float MultiLocEKF::INIT_BLUE_GOALIE_LOC_X = (FIELD_WHITE_LEFT_SIDELINE_X +
                                               GOALBOX_DEPTH / 2.0f);
-const float LocEKF::INIT_BLUE_GOALIE_LOC_Y = CENTER_FIELD_Y;
-const float LocEKF::INIT_BLUE_GOALIE_LOC_H = 0.0f;
-const float LocEKF::INIT_RED_GOALIE_LOC_X = (FIELD_WHITE_RIGHT_SIDELINE_X -
+const float MultiLocEKF::INIT_BLUE_GOALIE_LOC_Y = CENTER_FIELD_Y;
+const float MultiLocEKF::INIT_BLUE_GOALIE_LOC_H = 0.0f;
+const float MultiLocEKF::INIT_RED_GOALIE_LOC_X = (FIELD_WHITE_RIGHT_SIDELINE_X -
                                              GOALBOX_DEPTH / 2.0f);
-const float LocEKF::INIT_RED_GOALIE_LOC_Y = CENTER_FIELD_Y;
-const float LocEKF::INIT_RED_GOALIE_LOC_H = M_PI_FLOAT;
+const float MultiLocEKF::INIT_RED_GOALIE_LOC_Y = CENTER_FIELD_Y;
+const float MultiLocEKF::INIT_RED_GOALIE_LOC_H = M_PI_FLOAT;
 // Uncertainty limits
-const float LocEKF::X_UNCERT_MAX = FIELD_WIDTH / 2.0f;
-const float LocEKF::Y_UNCERT_MAX = FIELD_HEIGHT / 2.0f;
-const float LocEKF::H_UNCERT_MAX = 4*M_PI_FLOAT;
-const float LocEKF::X_UNCERT_MIN = 1.0e-6f;
-const float LocEKF::Y_UNCERT_MIN = 1.0e-6f;
-const float LocEKF::H_UNCERT_MIN = 1.0e-6f;
+const float MultiLocEKF::X_UNCERT_MAX = FIELD_WIDTH / 2.0f;
+const float MultiLocEKF::Y_UNCERT_MAX = FIELD_HEIGHT / 2.0f;
+const float MultiLocEKF::H_UNCERT_MAX = 4*M_PI_FLOAT;
+const float MultiLocEKF::X_UNCERT_MIN = 1.0e-6f;
+const float MultiLocEKF::Y_UNCERT_MIN = 1.0e-6f;
+const float MultiLocEKF::H_UNCERT_MIN = 1.0e-6f;
 // Initial estimates
-const float LocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
-const float LocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
-const float LocEKF::INIT_H_UNCERT = M_PI_FLOAT * 2.0f;
+const float MultiLocEKF::INIT_X_UNCERT = X_UNCERT_MAX / 2.0f;
+const float MultiLocEKF::INIT_Y_UNCERT = Y_UNCERT_MAX / 2.0f;
+const float MultiLocEKF::INIT_H_UNCERT = M_PI_FLOAT * 2.0f;
 // Estimate limits
-const float LocEKF::X_EST_MIN = 0.0f;
-const float LocEKF::Y_EST_MIN = 0.0f;
-const float LocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
-const float LocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
-
-using namespace ekf;
+const float MultiLocEKF::X_EST_MIN = 0.0f;
+const float MultiLocEKF::Y_EST_MIN = 0.0f;
+const float MultiLocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
+const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
 
 /**
  * Initialize the localization EKF class
@@ -58,13 +57,18 @@ using namespace ekf;
  * @param initYUncert Initial y uncertainty
  * @param initHUncert Initial heading uncertainty
  */
-LocEKF::LocEKF(float initX, float initY, float initH,
+MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
                float initXUncert,float initYUncert, float initHUncert)
-    : EKF<Observation, MotionModel, LOC_EKF_DIMENSION,
-          LOC_MEASUREMENT_DIMENSION>(BETA_LOC,GAMMA_LOC), LocSystem(),
+    : TwoMeasurementEKF<PointObservation, dist_bearing_meas_dim,
+                        CornerObservation, corner_measurement_dim,
+                        MotionModel,
+                        loc_ekf_dimension>(BETA_LOC,GAMMA_LOC), LocSystem(),
       lastOdo(0,0,0),
-      lastObservations(0), useAmbiguous(true),
-      R_pred_k(LOC_MEASUREMENT_DIMENSION, LOC_MEASUREMENT_DIMENSION, 0.0f)
+      lastPointObservations(),
+      lastCornerObservations(),
+      useAmbiguous(true),
+      R_pred_k1(dist_bearing_meas_dim, dist_bearing_meas_dim, 0.0f),
+      R_pred_k2(corner_measurement_dim, corner_measurement_dim, 0.0f)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -83,7 +87,7 @@ LocEKF::LocEKF(float initX, float initY, float initH,
     gammas(2) = GAMMA_ROT;
 
 #ifdef DEBUG_LOC_EKF_INPUTS
-    cout << "Initializing LocEKF with: " << *this << endl;
+    cout << "Initializing MultiLocEKF with: " << *this << endl;
 #endif
 }
 
@@ -92,7 +96,7 @@ LocEKF::LocEKF(float initX, float initY, float initH,
  *
  * @param other EKF to be copied
  */
-void LocEKF::copyEKF(const LocEKF& other)
+void MultiLocEKF::copyEKF(const MultiLocEKF& other)
 {
     if(this != &other){
         xhat_k     = other.xhat_k;
@@ -115,13 +119,13 @@ void LocEKF::copyEKF(const LocEKF& other)
  *
  * @param other The EKF that this EKF will be merged with.
  */
-void LocEKF::mergeEKF(const LocEKF& other)
+void MultiLocEKF::mergeEKF(const MultiLocEKF& other)
 {
     // Make sure that the new probability is not 0 or rediculously close to it.
     const double newProbability = max(probability + other.getProbability(),
                                       0.000001);
 
-    StateVector new_xhat_k(LOC_EKF_DIMENSION);
+    StateVector new_xhat_k(ekf::loc_ekf_dimension);
 
     const int DRIFT_PROB_MAX_DIFF = 10;
     if ( other.getProbability() > probability * DRIFT_PROB_MAX_DIFF ){
@@ -161,7 +165,7 @@ void LocEKF::mergeEKF(const LocEKF& other)
 /**
  * Reset the EKF to a starting configuration
  */
-void LocEKF::reset()
+void MultiLocEKF::reset()
 {
     resetLocTo(INIT_LOC_X,
                INIT_LOC_Y,
@@ -171,7 +175,7 @@ void LocEKF::reset()
 /**
  * Reset the EKF to a blue goalie starting configuration
  */
-void LocEKF::blueGoalieReset()
+void MultiLocEKF::blueGoalieReset()
 {
     resetLocTo(INIT_BLUE_GOALIE_LOC_X,
                INIT_BLUE_GOALIE_LOC_Y,
@@ -182,7 +186,7 @@ void LocEKF::blueGoalieReset()
 /**
  * Reset the EKF to a red goalie starting configuration
  */
-void LocEKF::redGoalieReset()
+void MultiLocEKF::redGoalieReset()
 {
     resetLocTo(INIT_RED_GOALIE_LOC_X,
                INIT_RED_GOALIE_LOC_Y,
@@ -194,7 +198,7 @@ void LocEKF::redGoalieReset()
  *
  * @param x,y,h the position to set the EKF to.
  */
-void LocEKF::resetLocTo(float x, float y, float h)
+void MultiLocEKF::resetLocTo(float x, float y, float h)
 {
     setXEst(x);
     setYEst(y);
@@ -210,15 +214,16 @@ void LocEKF::resetLocTo(float x, float y, float h)
  * @param u The odometry since the last frame
  * @param Z The observations from the current frame
  */
-void LocEKF::updateLocalization(const MotionModel& u,
-                                const vector<Observation>& Z)
+void MultiLocEKF::updateLocalization(const MotionModel& u,
+                                     const std::vector<PointObservation>& pt_z,
+                                     const std::vector<CornerObservation>& c_z)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
     printBeforeUpdateInfo();
 #endif
 
     odometryUpdate(u);
-    applyObservations(Z);
+    applyObservations(pt_z, c_z);
     endFrame();
 
 #ifdef DEBUG_LOC_EKF_INPUTS
@@ -227,7 +232,7 @@ void LocEKF::updateLocalization(const MotionModel& u,
 }
 
 // Update expected position based on odometry
-void LocEKF::odometryUpdate(const MotionModel& u)
+void MultiLocEKF::odometryUpdate(const MotionModel& u)
 {
     timeUpdate(u);
     limitAPrioriUncert();
@@ -237,16 +242,17 @@ void LocEKF::odometryUpdate(const MotionModel& u)
 /**
  * Apply a whole set of observations from one time frame.
  */
-void LocEKF::applyObservations(vector<Observation> Z)
+void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
+                                    vector<CornerObservation> c_z)
 {
-    lastObservations = Z;
+    // lastObservations = Z;
 
     if (! useAmbiguous) {
         // Remove ambiguous observations
-        vector<Observation>::iterator iter = Z.begin();
-        while( iter != Z.end() ) {
-            if (iter->getNumPossibilities() > 1 ) {
-                iter = Z.erase( iter );
+        vector<PointObservation>::iterator iter = pt_z.begin();
+        while( iter != pt_z.end() ) {
+            if (iter->isAmbiguous() ) {
+                iter = pt_z.erase( iter );
             } else {
                 ++iter;
             }
@@ -254,8 +260,8 @@ void LocEKF::applyObservations(vector<Observation> Z)
     }
 
     // Correct step based on the observed stuff
-    if (Z.size() > 0) {
-        correctionStep(Z);
+    if (!pt_z.empty() && !c_z.empty()) {
+        correctionStep(pt_z, c_z);
     } else {
         noCorrectionStep();
     }
@@ -266,7 +272,8 @@ void LocEKF::applyObservations(vector<Observation> Z)
 /**
  * Apply an individual observation to the EKF.
  */
-bool LocEKF::applyObservation(const Observation& Z)
+template <class ObservationT>
+bool MultiLocEKF::applyObservation(const ObservationT& Z)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
     printBeforeUpdateInfo();
@@ -284,7 +291,7 @@ bool LocEKF::applyObservation(const Observation& Z)
 }
 
 #ifdef USE_MM_LOC_EKF
-bool LocEKF::updateProabbility(const Observation& Z)
+bool MultiLocEKF::updateProabbility(const Observation& Z)
 {
 
     if (R_k(0,0) == DONT_PROCESS_KEY)
@@ -342,13 +349,13 @@ bool LocEKF::updateProabbility(const Observation& Z)
  * Performs final cleanup at the end of a time step. Clips robot position
  * to be on the field and tests fof NaN values.
  */
-void LocEKF::endFrame()
+void MultiLocEKF::endFrame()
 {
 
     // Clip values if our estimate is off the field
     clipRobotPose();
     if (testForNaNReset()) {
-        cout << "LocEKF reset to: "<< *this << endl;
+        cout << "MultiLocEKF reset to: "<< *this << endl;
         cout << "\tLast odo is: " << lastOdo << endl;
         cout << endl;
     }
@@ -363,9 +370,13 @@ void LocEKF::endFrame()
  * @param u The motion model of the last frame.  Ignored for the loc.
  * @return The expected change in loc position (x,y, xVelocity, yVelocity)
  */
-EKF<Observation, MotionModel,
-    LOC_EKF_DIMENSION, LOC_MEASUREMENT_DIMENSION>::StateVector
-LocEKF::associateTimeUpdate(MotionModel u)
+TwoMeasurementEKF<PointObservation,
+                  dist_bearing_meas_dim,
+                  CornerObservation,
+                  corner_measurement_dim,
+                  MotionModel,
+                  loc_ekf_dimension>::StateVector
+MultiLocEKF::associateTimeUpdate(MotionModel u)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tUpdating Odometry of " << u << endl;
@@ -373,7 +384,7 @@ LocEKF::associateTimeUpdate(MotionModel u)
 
     // Calculate the assumed change in loc position
     // Assume no decrease in loc velocity
-    StateVector deltaLoc(LOC_EKF_DIMENSION);
+    StateVector deltaLoc(loc_ekf_dimension);
     const float h = getHEst();
     float sinh, cosh;
     sincosf(h, &sinh, &cosh);
@@ -398,10 +409,10 @@ LocEKF::associateTimeUpdate(MotionModel u)
  *
  * @return the measurement invariance
  */
-void LocEKF::incorporateMeasurement(const Observation& z,
-                                    StateMeasurementMatrix &H_k,
-                                    MeasurementMatrix &R_k,
-                                    MeasurementVector &V_k)
+void MultiLocEKF::incorporateMeasurement(const PointObservation& z,
+                                         StateMeasurementMatrix1 &H_k,
+                                         MeasurementMatrix1 &R_k,
+                                         MeasurementVector1 &V_k)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tIncorporating measurement " << z << endl;
@@ -422,8 +433,8 @@ void LocEKF::incorporateMeasurement(const Observation& z,
     }
 
     // Calculate the standard error of the measurement
-    const StateMeasurementMatrix newP = prod(P_k, trans(H_k));
-    MeasurementMatrix se = prod(H_k, newP) + R_k;
+    const StateMeasurementMatrix1 newP = prod(P_k, trans(H_k));
+    MeasurementMatrix1 se = prod(H_k, newP) + R_k;
     se(0,0) = sqrt(se(0,0));
     se(1,1) = sqrt(se(1,1));
 
@@ -439,24 +450,24 @@ void LocEKF::incorporateMeasurement(const Observation& z,
 
 }
 
-void LocEKF::incorporateCartesianMeasurement(int obsIndex,
-                                             const Observation& z,
-                                             StateMeasurementMatrix &H_k,
-                                             MeasurementMatrix &R_k,
-                                             MeasurementVector &V_k)
+void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
+                                                  const PointObservation& z,
+                                                  StateMeasurementMatrix1 &H_k,
+                                                  MeasurementMatrix1 &R_k,
+                                                  MeasurementVector1 &V_k)
 {
 
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tUsing cartesian " << endl;
 #endif
     // Convert our sighting to cartesian coordinates
-    MeasurementVector z_x(2);
+    MeasurementVector1 z_x(2);
     z_x(0) = z.getVisDistance() * cos(z.getVisBearing());
     z_x(1) = z.getVisDistance() * sin(z.getVisBearing());
 
     // Get expected values of the post
-    const float x_b = z.getPointPossibilities()[obsIndex].x;
-    const float y_b = z.getPointPossibilities()[obsIndex].y;
+    const float x_b = z.getPossibilities()[obsIndex].x;
+    const float y_b = z.getPossibilities()[obsIndex].y;
 
     const float x = xhat_k_bar(0);
     const float y = xhat_k_bar(1);
@@ -465,7 +476,7 @@ void LocEKF::incorporateCartesianMeasurement(int obsIndex,
     float sinh, cosh;
     sincosf(h, &sinh, &cosh);
 
-    MeasurementVector d_x(2);
+    MeasurementVector1 d_x(2);
     d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
     d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
 
@@ -523,26 +534,26 @@ void LocEKF::incorporateCartesianMeasurement(int obsIndex,
 #endif
 }
 
-void LocEKF::incorporatePolarMeasurement(int obsIndex,
-                                         const Observation& z,
-                                         StateMeasurementMatrix &H_k,
-                                         MeasurementMatrix &R_k,
-                                         MeasurementVector &V_k)
+void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
+                                         const PointObservation& z,
+                                         StateMeasurementMatrix1 &H_k,
+                                         MeasurementMatrix1 &R_k,
+                                         MeasurementVector1 &V_k)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tUsing polar " << endl;
 #endif
 
     // Get the observed range and bearing
-    MeasurementVector z_x(2);
+    MeasurementVector1 z_x(2);
     z_x(0) = z.getVisDistance();
     z_x(1) = z.getVisBearing();
 
     // Get expected values of the post
-    PointLandmark bestPossibility = z.getPointPossibilities()[obsIndex];
+    PointLandmark bestPossibility = z.getPossibilities()[obsIndex];
     const float x_b = bestPossibility.x;
     const float y_b = bestPossibility.y;
-    MeasurementVector d_x(2);
+    MeasurementVector1 d_x(2);
 
     const float x = xhat_k_bar(0);
     const float y = xhat_k_bar(1);
@@ -607,7 +618,7 @@ void LocEKF::incorporatePolarMeasurement(int obsIndex,
  *
  * @param z The observation to be fixed
  */
-int LocEKF::findBestLandmark(const Observation& z)
+int MultiLocEKF::findBestLandmark(const PointObservation& z)
 {
 
     // Hack in here for if the vision system cannot identify this observation
@@ -628,9 +639,9 @@ int LocEKF::findBestLandmark(const Observation& z)
  * @param The observed point
  * @return Index of the nearest neighbor
  */
-int LocEKF::findNearestNeighbor(const Observation& z)
+int MultiLocEKF::findNearestNeighbor(const PointObservation& z)
 {
-    vector<PointLandmark> possiblePoints = z.getPointPossibilities();
+    vector<PointLandmark> possiblePoints = z.getPossibilities();
     float minDivergence = 250.0f;
     int minIndex = -1;
     for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
@@ -652,7 +663,7 @@ int LocEKF::findNearestNeighbor(const Observation& z)
  *
  * @return The divergence value
  */
-float LocEKF::getDivergence(const Observation& z, const PointLandmark& pt)
+float MultiLocEKF::getDivergence(const PointObservation& z, const PointLandmark& pt)
 {
     const float x = xhat_k_bar(0);
     const float y = xhat_k_bar(1);
@@ -672,7 +683,7 @@ float LocEKF::getDivergence(const Observation& z, const PointLandmark& pt)
 /**
  * Method to ensure that uncertainty does not grow without bound
  */
-void LocEKF::limitAPrioriUncert()
+void MultiLocEKF::limitAPrioriUncert()
 {
     // Check x uncertainty
     if(P_k_bar(0,0) > X_UNCERT_MAX) {
@@ -701,7 +712,7 @@ void LocEKF::limitAPrioriUncert()
 /**
  * Method to ensure that uncertainty does not grow or shrink without bound
  */
-void LocEKF::limitPosteriorUncert()
+void MultiLocEKF::limitPosteriorUncert()
 {
     // Check x uncertainty
     if(P_k(0,0) < X_UNCERT_MIN) {
@@ -741,7 +752,7 @@ void LocEKF::limitPosteriorUncert()
  * Method to use the estimate ellipse to intelligently clip the pose estimate
  * of the robot using the information of the uncertainty ellipse.
  */
-void LocEKF::clipRobotPose()
+void MultiLocEKF::clipRobotPose()
 {
     // Limit our X estimate
     if (xhat_k(0) > X_EST_MAX) {
@@ -786,7 +797,7 @@ void LocEKF::clipRobotPose()
  * @param CPC Predicted measurement variance
  * @param EPS Size of the deadzone
  */
-void LocEKF::deadzone(float &R, float &innovation,
+void MultiLocEKF::deadzone(float &R, float &innovation,
                       float CPC, float eps)
 {
     float invR = 0.0;
@@ -818,7 +829,7 @@ void LocEKF::deadzone(float &R, float &innovation,
 // Returns relative coordinates of the point, in the frame of
 // reference of the field's coordinate system.
 std::pair<float,float>
-LocEKF::findClosestLinePointCartesian(LineLandmark l, float x_r,
+MultiLocEKF::findClosestLinePointCartesian(LineLandmark l, float x_r,
                                       float y_r, float h_r)
 {
     const float x_l = l.dx;
@@ -837,18 +848,18 @@ LocEKF::findClosestLinePointCartesian(LineLandmark l, float x_r,
     return std::pair<float,float>(relX_p, relY_p);
 }
 
-void LocEKF::printBeforeUpdateInfo()
+void MultiLocEKF::printBeforeUpdateInfo()
 {
     cout << "Loc update: " << endl;
     cout << "Before updates: " << *this << endl;
     cout << "\tOdometery is " << lastOdo <<endl;
     cout << "\tObservations are: " << endl;
-    for(unsigned int i = 0; i < lastObservations.size(); ++i) {
-        cout << "\t\t" << lastObservations[i] <<endl;
-    }
+    // for(unsigned int i = 0; i < lastObservations.size(); ++i) {
+    //     cout << "\t\t" << lastObservations[i] <<endl;
+    // }
 }
 
-void LocEKF::printAfterUpdateInfo()
+void MultiLocEKF::printAfterUpdateInfo()
 {
     cout << "After updates: " << *this << endl;
     cout << endl;
