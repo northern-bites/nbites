@@ -124,10 +124,10 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
   transitionTo(COORD);
   float relY = command->getRelY()-pose->getFocalPointInWorldFrameY()/10;//adjust from mm to cm
   float relX = command->getRelX()-pose->getFocalPointInWorldFrameX()/10;
-  float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()/10-30;//adjust for robot center's distance above ground
+  float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()/10-300;//adjust for robot center's distance above ground
   yawDest = atan(relY/relX);
   float hypoDist = sqrt(pow(relY,2)+pow(relX,2));
-  pitchDest = atan(relZ/hypoDist)-CAMERA_ANGLE;//constant for lower camera
+  pitchDest = -1*atan(relZ/hypoDist)-CAMERA_ANGLE;//adjust for atan sign
   yawMaxSpeed = command->getMaxSpeedYaw();
   pitchMaxSpeed = command->getMaxSpeedPitch();
 
@@ -139,8 +139,9 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
   pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.35);
 
   setActive();
-  /* ** */cout <<"looking at yaw:  "<<yawDest<<"  and pitch: "<<pitchDest<<endl;
-  /* ** */cout <<"currently at:   "<<lastYawDest<<"   "<<lastPitchDest<<endl;
+  /* ** *///cout <<"looking towards:  "<<yawDest<<"   "<<pitchDest<<endl;
+  /* ** *///cout <<"currently at:     "<<lastYawDest<<"   "<<lastPitchDest<<endl;
+  /* ** *///cout <<"debug:  "<<relZ<<"  "<<hypoDist<<"  "<<(relZ/hypoDist)<<"  "<<atan(relZ/hypoDist)<<endl;
   /* ** *///cout <<"relative position: "<<command->getRelX()<<"  "<<command->getRelY()<<"  "<<command->getRelZ()<<endl;
   /* ** *///cout <<"adjusted position: "<<relX<<"  "<<relY<<"  "<<relZ<<endl;
   pthread_mutex_unlock(&coord_head_provider_mutex);

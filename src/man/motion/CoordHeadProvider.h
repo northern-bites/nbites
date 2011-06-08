@@ -84,7 +84,7 @@ public:
     void setNextHeadCommand();
 
     //constant for lower camera
-    static const float CAMERA_ANGLE = .7;
+    static const float CAMERA_ANGLE = .6981;
 };
 
 #endif
