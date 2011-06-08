@@ -50,6 +50,8 @@ import TOOL.Vision.LinePoint;
 import TOOL.Vision.VisualCorner;
 import TOOL.Vision.Horizon;
 
+import TOOL.Vision.Vision;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -62,6 +64,31 @@ public class TOOLVisionLink {
     //These are defined here for ease, but need to get read from somewhere else
     public static final  int DFLT_IMAGE_WIDTH = 640;
     public static final  int DFLT_IMAGE_HEIGHT = 480;
+
+    public static final byte GREEN = Vision.GREEN;
+    public static final byte BLUE = Vision.BLUE;
+    public static final byte YELLOW = Vision.YELLOW;
+    public static final byte ORANGE = Vision.ORANGE;
+    public static final byte YELLOWWHITE = Vision.YELLOWWHITE;
+    public static final byte BLUEGREEN = Vision.BLUEGREEN;
+    public static final byte ORANGERED = Vision.ORANGERED;
+    public static final byte ORANGEYELLOW = Vision.ORANGEYELLOW;
+    public static final byte RED = Vision.RED;
+    public static final byte WHITE = Vision.WHITE;
+	public static final byte GREY = Vision.GREY;
+    public static final byte NAVY = Vision.NAVY;
+
+    public static final byte BIT_GREY = 0x00;
+    public static final byte BIT_WHITE = 0x01;
+    public static final byte BIT_GREEN = 0x02;
+    public static final byte BIT_BLUE = 0x04;
+    public static final byte BIT_YELLOW = 0x08;
+    public static final byte BIT_ORANGE = 0x10;
+    public static final byte BIT_RED = 0x20;
+    public static final byte BIT_NAVY = 0x40;
+    public static final int BIT_DRAWING = 0x80;
+    public static final byte BIT_MASK = 0x7e;
+
     //image dimensions
     private int width;
     private int height;
@@ -135,6 +162,49 @@ public class TOOLVisionLink {
                 cppProcessImage(img_data,joint_data,
                                 sensor_data,ct_data,
                                 threshResult);
+                // update the thresholded array for display
+                for (int i = 0; i < imageWidth; i++) {
+                    for (int j = 0; j < imageHeight; j++) {
+                        byte col = threshResult[j][i];
+                        if (col == Vision.MAROON) {
+                        } else if ((col & BIT_ORANGE) > 0) {
+                            if ((col & BIT_RED) > 0) {
+                                col = ORANGERED;
+                            }
+                            else if ((col & BIT_YELLOW) > 0) {
+                                col = ORANGEYELLOW;
+                            } else {
+                                col = ORANGE;
+                            }
+                        }
+                        else if ((col & BIT_GREEN) > 0) {
+                            if ((col & BIT_BLUE) > 0) {
+                                col = BLUEGREEN;
+                            } else {
+                                col = GREEN;
+                            }
+                        }
+                        else if ((col & BIT_BLUE) > 0) {
+                            col = BLUE;
+                        } else if ((col & BIT_NAVY) > 0) {
+                            col = NAVY;
+                        }
+                        else if ((col & BIT_YELLOW) > 0) {
+                            if ((col & BIT_WHITE) > 0) {
+                                col = YELLOWWHITE;
+                            } else {
+                                col = YELLOW;
+                            }
+                        }
+                        else if ((col & BIT_WHITE) > 0) {
+                            col = WHITE;
+                        }
+                        else if ((col & BIT_RED) > 0) {
+                            col = RED;
+                        }
+                        threshResult[j][i] = col;
+                    }
+                }
             }catch(Throwable e){
                 System.err.println("Error in c++ side of the vision link. \n");
                 e.printStackTrace();
@@ -215,6 +285,7 @@ public class TOOLVisionLink {
     native private void cppSetOpenFieldDebug(boolean _bool);
     native private void cppSetEdgeDetectionDebug(boolean _bool);
     native private void cppSetHoughTransformDebug(boolean _bool);
+    native private void cppSetRobotDebug(boolean _bool);
 
 
     // Set edge detection threshold
@@ -687,6 +758,17 @@ public class TOOLVisionLink {
         if (visionLinkSuccessful) {
             try {
                 cppSetHoughTransformDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugRobot(boolean _bool) {
+        if (visionLinkSuccessful) {
+            try {
+                cppSetRobotDebug(_bool);
             } catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n");
             }

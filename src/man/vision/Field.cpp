@@ -98,9 +98,9 @@ void Field::initialScanForTopGreenPoints(int pH) {
 				x--;
 			pixel = thresh->getColor(x, top);
 			//pixel = thresh->thresholded[top][x];
-			if (pixel == GREEN) {
+			if (isGreen(pixel)) {
 				good++;
-			} else if (pixel == BLUEGREEN || pixel == GREY) {
+			} else if (isUndefined(pixel)) {
 				ok++;
 				if (ok > SCANNOISE) {
 					good = 0;
@@ -145,15 +145,15 @@ void Field::findTopEdges(int M) {
 			topEdge[j] = (int)cur;
 			if (debugFieldEdge) {
 				if (j < convex[i].x - 2) {
-					thresh->drawPoint(j, (int)cur, BLACK);
+					vision->drawPoint(j, (int)cur, BLACK);
 				} else {
-					thresh->drawPoint(j, (int)cur, RED);
+					vision->drawPoint(j, (int)cur, RED);
 				}
 			}
 		}
 		if (debugFieldEdge) {
-			thresh->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x,
-                             convex[i].y, ORANGE);
+			vision->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x,
+					 convex[i].y, ORANGE);
 		}
 	}
 	// calculate the distance to the edge of the field at three key points
@@ -275,11 +275,14 @@ int Field::getInitialHorizonEstimate(int pH) {
 				 && greenPixels <= MIN_PIXELS_INITIAL; i+= SCAN_INTERVAL_X) {
 			//pixel = thresh->thresholded[scanY][i];
 			pixel = thresh->getColor(i, scanY);
-			if (pixel == GREEN) {
-				greenPixels++;
-			}
 			// project the line to get the next y value
 			scanY = thresh->blue->yProject(0, j, i);
+			if (isGreen(pixel)) {
+				greenPixels++;
+                // since green pixels are likely to be next to other ones
+                i -= SCAN_INTERVAL_X;
+                i++;
+			}
 		}
 		// once we see enough green we're done
 		if (greenPixels > MIN_PIXELS_INITIAL) {
@@ -317,11 +320,11 @@ int Field::getImprovedEstimate(int horizon) {
                  IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE &&
                  greenPixels < MIN_PIXELS_PRECISE; l+=3) {
 			if (debugHorizon) {
-				thresh->drawPoint(l, scanY, BLACK);
+				vision->drawPoint(l, scanY, BLACK);
 			}
 			int newPixel = thresh->getColor(l, scanY);
 			//int newPixel = thresh->thresholded[scanY][l];
-			if (newPixel == GREEN) {
+			if (isGreen(newPixel)) {
 				// firstpix tracks where we saw the first green pixel
 				if (firstpix == -1) {
 					firstpix = l;
@@ -353,10 +356,10 @@ int Field::getImprovedEstimate(int horizon) {
 					scanY = IMAGE_HEIGHT;
 				}
 				if (debugHorizon) {
-					thresh->drawPoint(j, scanY, BLACK);
+					vision->drawPoint(j, scanY, BLACK);
 				}
 				pixel = thresh->getColor(j, scanY);
-				if (pixel == GREEN) {
+				if (isGreen(pixel)) {
 					run++;
 					greenPixels++;
 					firstpix = j;
@@ -368,8 +371,8 @@ int Field::getImprovedEstimate(int horizon) {
 				if (debugHorizon) {
 					cout << "Found horizon " << k << " " << run << " "
 							<< greenPixels << endl;
-					thresh->drawPoint(100, k + 1, BLACK);
-					thresh->drawLine(minpix, minpixrow, firstpix, k + 2, RED);
+					vision->drawPoint(100, k + 1, BLACK);
+					vision->drawLine(minpix, minpixrow, firstpix, k + 2, RED);
 				}
 				horizon = k + 2;
 				return horizon;
@@ -398,10 +401,10 @@ int Field::findGreenHorizon(int pH, float sl) {
         topEdge[i] = 0;
         shoot[i] = true;
 	}
-	if (pH < -100) {
+	/*if (pH < -100) {
         horizon = 0;
         return 0;
-	}
+        }*/
     /*estimate e = vision->pose->pixEstimate(IMAGE_WIDTH / 2, pH, 0.0f);
     cout << "Dist is " << e.dist << " " << pH << endl;
     if (e.dist > 1000.0) {
@@ -526,10 +529,10 @@ void Field::drawLess(int x, int y, int c)
 	const int lineBuff = 10;
 
 #ifdef OFFLINE
-	thresh->drawLine(x, y, x + lineBuff, y - lineBuff, c);
-	thresh->drawLine(x, y, x + lineBuff, y + lineBuff, c);
-	thresh->drawLine(x + 1, y, x + lineBuff + 1, y - lineBuff, c);
-	thresh->drawLine(x + 1, y, x + lineBuff + 1, y + lineBuff, c);
+	vision->drawLine(x, y, x + lineBuff, y - lineBuff, c);
+	vision->drawLine(x, y, x + lineBuff, y + lineBuff, c);
+	vision->drawLine(x + 1, y, x + lineBuff + 1, y - lineBuff, c);
+	vision->drawLine(x + 1, y, x + lineBuff + 1, y + lineBuff, c);
 #endif
 }
 
@@ -538,9 +541,9 @@ void Field::drawMore(int x, int y, int c)
 	const int lineBuff = 10;
 
 #ifdef OFFLINE
-	thresh->drawLine(x, y, x - lineBuff, y - lineBuff, c);
-	thresh->drawLine(x, y, x - lineBuff, y + lineBuff, c);
-	thresh->drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);
-    thresh->drawLine(x - 1, y, x - lineBuff - 1, y + lineBuff, c);
+	vision->drawLine(x, y, x - lineBuff, y - lineBuff, c);
+	vision->drawLine(x, y, x - lineBuff, y + lineBuff, c);
+	vision->drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);
+	vision->drawLine(x - 1, y, x - lineBuff - 1, y + lineBuff, c);
 #endif
 }
