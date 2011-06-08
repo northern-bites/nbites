@@ -232,7 +232,8 @@ int ObjectFragments::getBigRun(int left, int right) {
         nextH = runs[i].h;
         nextX = runs[i].x;
         nextY = runs[i].y;
-        if (nextH > maxRun && (nextX < left || nextX > right)) {
+        if (nextH > maxRun && (nextX < left || nextX > right) &&
+			nextX > 5 && nextX < IMAGE_WIDTH - 5) {
             maxRun = nextH;
             index = i;
         }
@@ -1896,7 +1897,10 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
     }
     distanceCertainty dc = BOTH_UNSURE;
     Blob pole;
+	float saveSlope = slope;
     int isItAPost = grabPost(c, IMAGE_WIDTH - 3, 2, pole);
+	// restore slope for 2d post
+	slope = saveSlope;
     // make sure we're looking at something big enough to be a post
     if (isItAPost == NOPOST) {
         return;
@@ -2188,7 +2192,8 @@ bool ObjectFragments::badDistance(Blob b) {
         }
 
         float diste = e.dist;
-        if (diste > 0.0f && choose * 2 < diste) {
+        if (diste > 0.0f && (choose * 2 < diste || diste * 2 < choose) &&
+			choose > 150.0f) {
             if (POSTDEBUG) {
                 cout << "Throwing out post.	 Distance estimate is " << e.dist
                      << endl;
@@ -2198,6 +2203,16 @@ bool ObjectFragments::badDistance(Blob b) {
             }
             return true;
         }
+		if (vision->pose->getHorizonY(0) < -100 && color == BLUE_BIT &&
+			choose > 200.0f) {
+			if (POSTDEBUG) {
+				cout << "Throwing away questionable blue post" <<
+					choose << " " << diste << " " <<
+					vision->pose->getHorizonY(0) << endl;
+			}
+			return true;
+		}
+
     }
     return false;
 }
@@ -2388,7 +2403,7 @@ bool ObjectFragments::withinMarginInt(int n, int n2, int margin) {
  */
 
 bool ObjectFragments::relativeSizesOk(Blob post1, Blob post2) {
-    const float fudge = 20.0f;
+    const float fudge = 40.0f;
     int x1 = post1.getMidBottomX();
     int y1 = post1.getMidBottomY();
     int x2 = post2.getMidBottomX();
@@ -2414,6 +2429,10 @@ bool ObjectFragments::relativeSizesOk(Blob post1, Blob post2) {
                 return true;
             }
         }
+		if (abs(e.dist - e1.dist) < 100.0f && abs(x1 -x2) > IMAGE_WIDTH / 4 &&
+			dist < CROSSBAR_CM_WIDTH + fudge * 3) {
+			return true;
+		}
         if (SANITY) {
             cout << "Failed relative size check 1 dist was " << dist <<
                 " " << x1 << " " << y1 << " " << x2 << " " << y2 <<
