@@ -1,3 +1,4 @@
+
 # Makefile for using cmake to generate a project Makefile
 # @author Octavian Neamtu
 
@@ -8,9 +9,9 @@ CCMAKE=ccmake
 MKDIR=mkdir
 CD=cd
 
-PROJECT_DIR=..
-BIN_DIR=$(PROJECT_DIR)/build
-SRC_DIR=$(PROJECT_DIR)/src
+PROJECT_DIR=$(PWD)/../..
+BIN_DIR=$(PROJECT_DIR)/build/QTool
+SRC_DIR=$(PWD)
 GEN_MAKEFILE=$(BIN_DIR)/Makefile
 
 ECLIPSE_PROJECT_FILE=$(BIN_DIR)/.project
