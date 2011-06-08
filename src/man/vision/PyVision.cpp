@@ -75,10 +75,11 @@ BOOST_PYTHON_MODULE(vision)
     .add_property("linesList", &FieldLines::getActualLines)
     ;
 
-  //FieldLines helper classes:
+  //FieldLines helper classes:/
 
   // FieldLines holds a list of shared_ptrs to VisualLines (linesList) 
   class_<std::vector<shared_ptr<VisualLine> > >("LineVec")
+    // True is for NoProxy, since shared_ptrs don't need one
     .def(vector_indexing_suite<std::vector<shared_ptr<VisualLine> >, true>())
     ;
   
