@@ -45,6 +45,7 @@ typedef TTMan ALMan;
 #include "ALImageTranscriber.h"
 
 #include "NaoLights.h"
+#include "ALSpeech.h"
 
 using namespace std;
 using namespace AL;
@@ -58,6 +59,7 @@ static shared_ptr<ALTranscriber> transcriber;
 static shared_ptr<ALImageTranscriber> imageTranscriber;
 static shared_ptr<EnactorT> enactor;
 static shared_ptr<Lights> lights;
+static shared_ptr<Speech> speech;
 
 void ALCreateMan( ALPtr<ALBroker> broker){
     try{
@@ -85,14 +87,17 @@ void ALCreateMan( ALPtr<ALBroker> broker){
 #endif
     lights = shared_ptr<Lights>(new NaoLights(broker));
 
+    speech = shared_ptr<Speech>(new ALSpeech(broker));
+
     //setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
     man = boost::shared_ptr<ALMan> (new ALMan(sensors,
-                                          transcriber,
-                                          imageTranscriber,
-                                          enactor,
+                                              transcriber,
+                                              imageTranscriber,
+                                              enactor,
                                               synchro,
-                                              lights));
+                                              lights,
+                                              speech));
     man->startSubThreads();
 }
 
