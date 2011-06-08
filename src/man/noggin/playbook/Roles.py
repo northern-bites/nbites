@@ -26,8 +26,9 @@ def rGoalie(team, workingPlay):
 def rChaser(team, workingPlay):
     '''sets current position for chaser since positioning is done by player'''
     if not workingPlay.isRole(PBConstants.CHASER):
-        team.subRoleSwitchTime = -1
+        team.subRoleSwitchTime = 0
     workingPlay.setRole(PBConstants.CHASER)
+    # Note: Don't use shouldSwitchSubRole here. Go for the ball immediately.
     workingPlay.setSubRole(PBConstants.CHASE_NORMAL)
     pos = (team.brain.my.x,team.brain.my.y, team.brain.ball.heading)
     workingPlay.setPosition(pos)

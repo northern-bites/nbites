@@ -75,8 +75,10 @@ class KickDecider(object):
         """
         self.hasKickedOff = True
         if self.brain.playbook.pb.kickoffFormation == 0:
+            print "RIGHT_SIDE"
             return kicks.RIGHT_SIDE_KICK
         else:
+            print "LEFT_SIDE"
             return kicks.LEFT_SIDE_KICK
 
     def shoot(self):
@@ -94,9 +96,11 @@ class KickDecider(object):
                 return self.chooseDynamicKick()
             # if the goal is to our right, use our left foot
             elif leftPostBearing < 0:
+                print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
             # if the goal is to our left, use our right foot
             elif rightPostBearing > 0:
+                print "RIGHT_SIDE"
                 return kicks.RIGHT_SIDE_KICK
         # if only one was seen
         elif (rightPostBearing is not None):
@@ -106,17 +110,21 @@ class KickDecider(object):
                 return self.chooseDynamicKick()
             # if the right post is roughly to our left, kick right
             elif (rightPostBearing > 0):
+                print "RIGHT_SIDE"
                 return kicks.RIGHT_SIDE_KICK
             # if the right post is way to our right, kick with the left foot
             elif (rightPostBearing < -1*constants.KICK_STRAIGHT_BEARING_THRESH):
+                print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
         elif (leftPostBearing is not None):
             if (leftPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
                     leftPostBearing <= constants.KICK_STRAIGHT_BEARING_THRESH):
                 return self.chooseDynamicKick()
             elif (leftPostBearing < 0):
+                print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
             elif (leftPostBearing > constants.KICK_STRAIGHT_BEARING_THRESH):
+                print "RIGHT_SIDE"
                 return kicks.RIGHT_SIDE_KICK
         # if none were seen
         return self.kickLoc()
@@ -138,19 +146,25 @@ class KickDecider(object):
                     distDiff <= constants.CLEAR_POST_DIST_DIFF):
                 return self.chooseBackKick()
             elif (rightPostDist <= leftPostDist):
+                print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
             elif (leftPostDist < rightPostDist):
+                print "RIGHT_SIDE"
                 return kicks.RIGHT_SIDE_KICK
         # if only one was seen
         elif (rightPostBearing is not None):
             if (rightPostBearing > 0):
+                print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
             else:
+                print "RIGHT_SIDE"
                 return kicks.RIGHT_SIDE_KICK
         elif (leftPostBearing is not None):
             if (leftPostBearing > 0):
+                print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
             else:
+                print "RIGHT_SIDE"
                 return kicks.RIGHT_SIDE_KICK
         return self.kickLoc()
 
@@ -162,8 +176,10 @@ class KickDecider(object):
         if (my.h <= 45. and my.h >= -45.):
             return self.chooseDynamicKick()
         elif (my.h <= 135. and my.h > 45.):
+            print "LEFT_SIDE"
             return kicks.LEFT_SIDE_KICK
         elif (my.h >= -135. and my.h < -45.):
+            print "RIGHT_SIDE"
             return kicks.RIGHT_SIDE_KICK
         else:
             return self.chooseBackKick()
@@ -171,11 +187,15 @@ class KickDecider(object):
     def chooseDynamicKick(self):
         ball = self.brain.ball
         if ball.relY > 0:
+            print "LEFT_DYNAMIC_STRAIGHT"
             return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+        print "RIGHT_DYNAMIC_STRAIGHT"
         return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
 
     def chooseBackKick(self):
         ball = self.brain.ball
         if ball.relY > 0:
+            print "LEFT_BACK"
             return kicks.LEFT_BACK_KICK
+        print "RIGHT_BACK"
         return kicks.RIGHT_BACK_KICK
