@@ -22,7 +22,6 @@
 #define USE_TEAMMATE_BALL_REPORTS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
-//#define DEBUG_CC_DETECTION_SAVE_FRAMES
 static const float MAX_CORNER_DISTANCE = 150.0f;
 static const float MAX_CROSS_DISTANCE = 150.0f;
 using namespace std;
@@ -31,10 +30,6 @@ using namespace boost;
 #ifdef LOG_LOCALIZATION
 fstream outputFile;
 #include <ctime>
-#endif
-
-#ifdef DEBUG_CC_DETECTION_SAVE_FRAMES
-#include "ConcreteCorner.h"
 #endif
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
@@ -312,39 +307,42 @@ void Noggin::updateLocalization()
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         PointObservation seen(fo);
         pt_observations.push_back(seen);
-#       ifdef DEBUG_POST_OBSERVATIONS
-        cout << "Saw bgrp at distance " << fo.getDistance()
-             << " and bearing " << seen.getVisBearing() << endl;
-#       endif
     }
 
     fo = *vision->bglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         PointObservation seen(fo);
         pt_observations.push_back(seen);
-#       ifdef DEBUG_POST_OBSERVATIONS
-        cout << "Saw bglp at distance " << fo.getDistance()
-             << " and bearing " << seen.getVisBearing() << endl;
-#       endif
     }
 
     fo = *vision->ygrp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         PointObservation seen(fo);
         pt_observations.push_back(seen);
-#       ifdef DEBUG_POST_OBSERVATIONS
-        cout << "Saw ygrp at distance " << fo.getDistance()
-             << " and bearing " << seen.getVisBearing() << endl;
-#       endif
     }
 
     fo = *vision->yglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
         PointObservation seen(fo);
         pt_observations.push_back(seen);
+    }
+
 #       ifdef DEBUG_POST_OBSERVATIONS
-        cout << "Saw yglp at distance " << fo.getDistance()
-             << " and bearing " << seen.getVisBearing() << endl;
+    vector<PointObservation>::iterator i;
+    for(i = pt_observations.begin(); i != pt_observations.end(); ++i){
+        cout << "Spotted post: " << *i << endl;
+    }
+#       endif
+
+
+    // Field Cross
+    if (vision->cross->getDistance() > 0 &&
+        vision->cross->getDistance() < MAX_CROSS_DISTANCE) {
+
+        PointObservation seen(*vision->cross);
+        pt_observations.push_back(seen);
+#       ifdef DEBUG_CROSS_OBSERVATIONS
+        cout << "Saw cross " << pt_observations.back() << endl;
 #       endif
     }
 
@@ -364,40 +362,9 @@ void Noggin::updateLocalization()
                  << seen.getVisDistance() << " and bearing "
                  << seen.getVisBearing() << endl;
 #           endif
-#           ifdef DEBUG_CC_DETECTION_SAVE_FRAMES
-            if (i->getShape() == CIRCLE) {
-                cout<< "saw cc" <<endl;
-                sensors->saveFrame();
-            }
-#           endif
         }
     }
 #   endif
-
-    // Field Cross
-    if (vision->cross->getDistance() > 0 &&
-        vision->cross->getDistance() < MAX_CROSS_DISTANCE) {
-        PointObservation seen(*vision->cross);
-        pt_observations.push_back(seen);
-#       ifdef DEBUG_CROSS_OBSERVATIONS
-        cout << "Saw cross "
-             << vision->cross->getID()
-             << " at distance " << vision->cross->getDistance()
-             << " and bearing " << vision->cross->getBearing() << endl;
-        //sensors->saveFrame();
-#       endif
-    }
-
-    // Lines
-	// const vector< shared_ptr<VisualLine> > * lines = vision->fieldLines->getLines();
-    // vector <shared_ptr<VisualLine> >::const_iterator j;
-    // for ( j = lines->begin(); j != lines->end(); ++j) {
-	// 	if ( !(*j)->getCCLine() &&
-	// 		 (*j)->getPossibleLines().size() < ConcreteLine::NUM_LINES) {
-	// 		Observation seen(**j);
-	// 		observations.push_back(seen);
-	// 	}
-    // }
 
     // Process the information
     PROF_ENTER(profiler, P_MCL);
@@ -410,7 +377,6 @@ void Noggin::updateLocalization()
 #   ifdef DEBUG_BALL_OBSERVATIONS
         cout << "Ball seen at distance " << vision->ball->getDistance()
              << " and bearing " << vision->ball->getBearing() << endl;
-        //sensors->saveFrame();
 #   endif
     } else {
         ++ballFramesOff;
