@@ -25,7 +25,7 @@ DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
 
 # Length of time to spend in the kickoff play
-KICKOFF_FORMATION_TIME = 0
+KICKOFF_FORMATION_TIME = 10
 
 NUM_TEAM_PLAYERS = NogginConstants.NUM_PLAYERS_PER_TEAM
 PACKET_DEAD_PERIOD = 2 # TO-DO: look at shortening so it replaces penalized
@@ -291,7 +291,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 # |  |            /  |
 # |G |      +    |  C+
 # |  |            \__|
-# 0  |    D          |
+# 0  |  D            |
 # |__|               |
 # |__________________|
 #
@@ -303,7 +303,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 
 CENTER_FIELD = Location(NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y)
 """DEFENDER"""
-READY_KICKOFF_DEFENDER_X = NogginConstants.CENTER_FIELD_X * 0.5
+READY_KICKOFF_DEFENDER_X = NogginConstants.CENTER_FIELD_X * 0.3
 READY_KICKOFF_DEFENDER_0_Y = NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y
 READY_KICKOFF_DEFENDER_1_Y = NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y
 """OFFENDER"""
@@ -323,7 +323,7 @@ READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 # 0  |             __|
 # |  |      C     /  |
 # |G |      +    |   +
-# |  |   D        \__|
+# |  | D          \__|
 # 0  |               |
 # |__|     O         |
 # |__________________|
@@ -334,10 +334,10 @@ READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 # Defender: Blocking opponent chaser's view of other goalpost. Furthest back for defense.
 # Goalie: At home.
 
-READY_NON_KICKOFF_MAX_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[1] - 12 # 12 is roughly dist from Nao's center to feet.
+READY_NON_KICKOFF_MAX_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[1] - 15 # 12 is roughly dist from Nao's center to feet.
 """DEFENDER"""
-READY_NON_KICKOFF_DEFENDER_X = 180. # Adjacent of defender-goalpost-blocking-triangle
-READY_NON_KICKOFF_DEFENDER_OFFSET = 42. # Opposite of defender-goalpost-blocking-triangle
+READY_NON_KICKOFF_DEFENDER_X = 80. # Adjacent of defender-goalpost-blocking-triangle
+READY_NON_KICKOFF_DEFENDER_OFFSET = 51.3 # Opposite of defender-goalpost-blocking-triangle
 READY_NON_KICKOFF_DEFENDER_0_Y = NogginConstants.CENTER_FIELD_Y - READY_NON_KICKOFF_DEFENDER_OFFSET
 READY_NON_KICKOFF_DEFENDER_1_Y = NogginConstants.CENTER_FIELD_Y + READY_NON_KICKOFF_DEFENDER_OFFSET
 """OFFENDER"""
@@ -351,15 +351,10 @@ READY_NON_KICKOFF_CHASER_OFFSET = 28. # Opposite of chaser-goalpost-blocking-tri
 READY_NON_KICKOFF_CHASER_0_Y = NogginConstants.CENTER_FIELD_Y + READY_NON_KICKOFF_CHASER_OFFSET
 READY_NON_KICKOFF_CHASER_1_Y = NogginConstants.CENTER_FIELD_Y - READY_NON_KICKOFF_CHASER_OFFSET
 
-#TODO: reconsider where players should move after kickoff
 ### KICK OFF POSITIONS (right after kickoff, rather)
-KICKOFF_OFFENDER_X = NogginConstants.CENTER_FIELD_X * 1./2.
-KICKOFF_OFFENDER_0_Y = NogginConstants.FIELD_HEIGHT * 1./4.
-KICKOFF_OFFENDER_1_Y = NogginConstants.FIELD_HEIGHT * 3./4.
-
-KICKOFF_DEFENDER_X = NogginConstants.CENTER_FIELD_X * 1./2.
-KICKOFF_DEFENDER_0_Y = NogginConstants.FIELD_HEIGHT * 1./4.
-KICKOFF_DEFENDER_1_Y = NogginConstants.FIELD_HEIGHT * 3./4.
+KICKOFF_OFFENDER_X = NogginConstants.CENTER_FIELD_X
+KICKOFF_OFFENDER_0_Y = READY_KICKOFF_OFFENDER_0_Y
+KICKOFF_OFFENDER_1_Y = READY_KICKOFF_OFFENDER_1_Y
 
 #GOALIE
 BALL_LOC_LIMIT = 220. # Dist at which we stop active localization and just track
