@@ -6,7 +6,7 @@
 
 namespace memory {
 
-namespace log {
+namespace parse {
 
 using namespace std;
 using namespace google::protobuf::io;
@@ -63,12 +63,12 @@ shared_ptr<const proto::Message> MessageParser::getNext() {
     //current_size = size;
 
     CodedInputStream::Limit l = coded_input->PushLimit(size);
-    finished = current_message->ParseFromCodedStream(coded_input);
+    finished = container->ParseFromCodedStream(coded_input);
     coded_input->PopLimit(l);
 
-    current_size = raw_input->ByteCount() - byte_count;
+    //current_size = raw_input->ByteCount() - byte_count;
 
-    return current_message;
+    return container;
 }
 
 shared_ptr<const proto::Message> MessageParser::getPrev() {
@@ -80,9 +80,8 @@ shared_ptr<const proto::Message> MessageParser::getPrev() {
     coded_input->ReadVarint32(&size);
 
     CodedInputStream::Limit l = coded_input->PushLimit(size);
-    finished = current_message->ParseFromCodedStream(coded_input);
+    finished = container->ParseFromCodedStream(coded_input);
     coded_input->PopLimit(l);
-
 }
 
 

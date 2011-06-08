@@ -6,7 +6,7 @@
 
 namespace memory {
 
-namespace log {
+namespace parse {
 
 using namespace std;
 using namespace google::protobuf::io;
@@ -53,7 +53,13 @@ void ImageParser::readHeader() {
     cout << "Birth time: " << log_header.birth_time << endl;
 
     container->setWidth(this->readValue<uint32_t>(&bytes_read));
-    cout << "Width: " << container->getWidth() << endl;
+    container->setHeight(this->readValue<uint32_t>(&bytes_read));
+    container->setByteSize(this->readValue<uint32_t>(&bytes_read));
+    //the buffer isn't full yet - back up will make sure only the used part
+    //is read
+    //TODO: bug - the next call to Next() will return @bytes_read less bytes in the buffer
+    //find a way around it (using Skip or some other stuff)
+    raw_input->BackUp(current_buffer_size - bytes_read);
 }
 
 const LogHeader ImageParser::getHeader() {
@@ -62,16 +68,13 @@ const LogHeader ImageParser::getHeader() {
 
 shared_ptr<const RoboImage> ImageParser::getNext() {
 
-//    proto::uint32 size;
-//    uint64_t byte_count = raw_input->ByteCount();
-//    coded_input->ReadVarint32(&size);
-//
-//    CodedInputStream::Limit l = coded_input->PushLimit(size);
-//    finished = current_message->ParseFromCodedStream(coded_input);
-//    coded_input->PopLimit(l);
-//
-//    current_size = raw_input->ByteCount() - byte_count;
-
+    uint32_t bytes_read = 0;
+    this->getNextBuffer();
+    if (!finished) {
+        container->setTimestamp(this->readValue<int64_t>(&bytes_read));
+        container->updateImage(
+                reinterpret_cast<const uint8_t*>(*current_buffer) + bytes_read);
+    }
     return container;
 }
 
@@ -91,17 +94,19 @@ shared_ptr<const RoboImage> ImageParser::getPrev() {
 
 void ImageParser::getNextBuffer() {
 
-    raw_input->Next(current_buffer, &current_buffer_size);
+    bool notEnd = raw_input->Next(current_buffer, &current_buffer_size);
+    finished = !notEnd;
     //we're not guaranteed a non-empty buffer
     //but we're guaranteed one eventually
-    while (current_buffer_size == 0) {
+    while (current_buffer_size == 0 && !finished) {
         raw_input->Next(current_buffer, &current_buffer_size);
     }
 }
 
 void ImageParser::initStreams() {
 
-    raw_input = new FileInputStream(file_descriptor);
+    raw_input = new FileInputStream(file_descriptor,
+            container->getByteSize() + sizeof(container->getTimestamp()));
 }
 
 }

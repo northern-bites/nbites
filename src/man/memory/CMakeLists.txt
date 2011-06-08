@@ -55,9 +55,11 @@ set( MEMORY_SRCS Memory
 
 set( PROTOS_TARGET protos )
 set( LOGGER_TARGET log )
+set( PARSER_TARGET parse )
 
 add_subdirectory( protos )
 add_subdirectory( log )
+add_subdirectory( parse )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output executable or shared library, and the install

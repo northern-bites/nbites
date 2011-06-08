@@ -16,7 +16,7 @@
 
 namespace memory {
 
-namespace log {
+namespace parse {
 
 namespace proto_io = google::protobuf::io;
 namespace proto = google::protobuf;

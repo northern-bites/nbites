@@ -15,11 +15,11 @@
 #include <stdint.h>
 
 #include "Parser.h"
-#include "RoboImage.h"
+#include "memory/RoboImage.h"
 
 namespace memory {
 
-namespace log {
+namespace parse {
 
 namespace proto_io = google::protobuf::io;
 

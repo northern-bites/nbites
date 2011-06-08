@@ -9,11 +9,9 @@
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
 
-#include "ProtoDefs.h"
-
 namespace memory {
 
-namespace log {
+namespace parse {
 
 struct LogHeader {
 
