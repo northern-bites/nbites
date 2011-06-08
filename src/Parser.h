@@ -6,7 +6,7 @@
 #pragma once
 
 #include <string>
-#include <google/protobuf/message.h>
+#include <stdint.h>
 #include <boost/shared_ptr.hpp>
 
 #include "ProtoDefs.h"
@@ -15,32 +15,31 @@ namespace memory {
 
 namespace log {
 
-namespace proto = google::protobuf;
-
 struct LogHeader {
 
-    proto::uint32 log_id;
-    proto::uint64 birth_time;
+    uint32_t log_id;
+    uint64_t birth_time;
 
 };
 
+template <class T>
 class Parser {
 
 public:
-    Parser(boost::shared_ptr<proto::Message> message) {
+    Parser(boost::shared_ptr<T> message) {
         current_message = message;
     }
 
     virtual ~Parser() {}
 
     virtual const LogHeader getHeader() = 0;
-    virtual boost::shared_ptr<const proto::Message> getNextMessage() = 0;
-    virtual boost::shared_ptr<const proto::Message> getPrevMessage() = 0;
+    virtual boost::shared_ptr<const T> getNextMessage() = 0;
+    virtual boost::shared_ptr<const T> getPrevMessage() = 0;
 
 
 protected:
     LogHeader log_header;
-    boost::shared_ptr<proto::Message> current_message;
+    boost::shared_ptr<T> current_message;
 
 };
 

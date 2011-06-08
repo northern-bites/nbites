@@ -19,8 +19,9 @@ namespace memory {
 namespace log {
 
 namespace proto_io = google::protobuf::io;
+namespace proto = google::protobuf;
 
-class FileParser : Parser{
+class FileParser : Parser <proto::Message>{
 
 public:
     FileParser(boost::shared_ptr<proto::Message> message,

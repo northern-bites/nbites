@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "colorspace.h"
-
 //TODO: remove this typedef
 typedef char byte;
 
@@ -21,6 +19,8 @@ public:
 
     const unsigned int getWidth() const { return width; }
     const unsigned int getHeight() const { return height; }
+    //TODO: get this from a define from VisionDef
+    const unsigned int getByteSize() const { return width*height*2; }
 
     void setWidth(const unsigned w) { width = w; }
     void setHeight(const unsigned h) { height = h; }

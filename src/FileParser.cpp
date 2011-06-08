@@ -12,9 +12,10 @@ using namespace std;
 using namespace google::protobuf::io;
 using boost::shared_ptr;
 
+//TODO: use file descriptor providers
 FileParser::FileParser(boost::shared_ptr<proto::Message> message,
                        int _file_descriptor) :
-        Parser(message),
+        Parser<proto::Message>(message),
         file_descriptor(_file_descriptor)
 {
 
@@ -25,7 +26,7 @@ FileParser::FileParser(boost::shared_ptr<proto::Message> message,
 
 FileParser::FileParser(boost::shared_ptr<proto::Message> message,
                        const char* _file_name) :
-        Parser(message) {
+       Parser<proto::Message>(message) {
 
     file_descriptor = open(_file_name, O_RDONLY);
 
