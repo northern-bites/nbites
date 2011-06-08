@@ -4,7 +4,7 @@
 # Ensure the AL_DIR variable is set
 
 IF( "x$ENV{AL_DIR}x" STREQUAL "xx")
-    SET( AL_DIR "/usr/local/nao-1.10.25" )
+    SET( AL_DIR "/usr/local/nao-1.10.37" )
   SET( ENV{AL_DIR} ${AL_DIR} )
 ELSE( "x$ENV{AL_DIR}x" STREQUAL "xx")
   SET( AL_DIR $ENV{AL_DIR} )
