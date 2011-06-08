@@ -34,8 +34,9 @@ public:
     void initStreams();
 
     const LogHeader getHeader();
-    boost::shared_ptr<const proto::Message> getNextMessage();
-    boost::shared_ptr<const proto::Message> getPrevMessage();
+    boost::shared_ptr<const proto::Message> getNext();
+    boost::shared_ptr<const proto::Message> getPrev();
+    boost::shared_ptr<const proto::Message> getCurrent();
 
 private:
     void readHeader();

@@ -43,7 +43,7 @@ MessageParser::~MessageParser() {
 
 void MessageParser::readHeader() {
 
-    coded_input->ReadLittleEndian32(&(log_header.log_id));
+
     cout << "Log ID: " << log_header.log_id << endl;
 
     coded_input->ReadLittleEndian64(&(log_header.birth_time));
@@ -54,7 +54,7 @@ const LogHeader MessageParser::getHeader() {
     return log_header;
 }
 
-shared_ptr<const proto::Message> MessageParser::getNextMessage() {
+shared_ptr<const proto::Message> MessageParser::getNext() {
 
     proto::uint32 size;
     uint64_t byte_count = raw_input->ByteCount();
@@ -71,7 +71,7 @@ shared_ptr<const proto::Message> MessageParser::getNextMessage() {
     return current_message;
 }
 
-shared_ptr<const proto::Message> MessageParser::getPrevMessage() {
+shared_ptr<const proto::Message> MessageParser::getPrev() {
 
 
     raw_input->BackUp(current_size);

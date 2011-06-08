@@ -26,20 +26,19 @@ template <class T>
 class Parser {
 
 public:
-    Parser(boost::shared_ptr<T> message) {
-        current_message = message;
+    Parser(boost::shared_ptr<T> container) : container(container) {
     }
 
     virtual ~Parser() {}
 
     virtual const LogHeader getHeader() = 0;
-    virtual boost::shared_ptr<const T> getNextMessage() = 0;
-    virtual boost::shared_ptr<const T> getPrevMessage() = 0;
+    virtual boost::shared_ptr<const T> getNext() = 0;
+    virtual boost::shared_ptr<const T> getPrev() = 0;
 
 
 protected:
     LogHeader log_header;
-    boost::shared_ptr<T> current_message;
+    boost::shared_ptr<T> container;
 
 };
 
