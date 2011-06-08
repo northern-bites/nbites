@@ -64,10 +64,11 @@ private:
      */
     template <class T>
     void writeValue(T value, uint32_t* offset) {
-    	*((reinterpret_cast<T*> (*current_buffer)) + *offset) = value;
+        uint8_t* byte_ptr_to_write_to =
+                reinterpret_cast<uint8_t*> (*current_buffer) + *offset;
+    	*(reinterpret_cast<T*>(byte_ptr_to_write_to)) = value;
     	*offset += sizeof(T);
     }
-
 
 
 private:

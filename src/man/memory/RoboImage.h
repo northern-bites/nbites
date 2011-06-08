@@ -11,6 +11,8 @@
  */
 #pragma once
 
+#include <stdint.h>
+
 #include "include/VisionDef.h"
 
 class RoboImage
@@ -19,8 +21,9 @@ class RoboImage
 public:
     RoboImage(unsigned int wd = NAO_IMAGE_WIDTH,
     		unsigned int ht = NAO_IMAGE_HEIGHT,
-    		const byte* im = NULL) :
-    width(wd), height(ht), image(im) {}
+    		const byte* im = NULL,
+    		int32_t byte_size = NAO_IMAGE_BYTE_SIZE) :
+    width(wd), height(ht), image(im), byte_size(byte_size), timestamp(0) {}
 
     virtual void updateImage(const byte* _image) {
     	image = _image;
@@ -28,17 +31,22 @@ public:
 
     const byte* getImage() const { return image; }
 
-    const unsigned int getWidth() const { return width; }
-    const unsigned int getHeight() const { return height; }
+    unsigned int getWidth() const { return width; }
+    unsigned int getHeight() const { return height; }
 
-    const unsigned int getByteSize() const { return NAO_IMAGE_BYTE_SIZE; }
+    unsigned int getByteSize() const { return byte_size; }
+    int64_t getTimestamp() const { return timestamp; }
 
     void setWidth(const unsigned w) { width = w; }
     void setHeight(const unsigned h) { height = h; }
+    void setByteSize(uint32_t bs) { byte_size = bs; }
+    void setTimestamp(int64_t ts) { timestamp = ts; }
 
 protected:
     unsigned int width;
     unsigned int height;
     //TODO: make byte into uint8_t
-    const byte* image;
+    const uint8_t* image;
+    int32_t byte_size;
+    int64_t timestamp;
 };
