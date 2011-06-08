@@ -21,6 +21,9 @@ ALTranscriber::ALTranscriber (AL::ALPtr<AL::ALBroker> _broker,
     :Transcriber(_sensors),
      broker(_broker),
      accelerationFilter(),
+	 accX_m("accX", -100, 100),
+	 accY_m("accY", -100, 100),
+	 accZ_m("accZ", -100, 100),
      lastAngleX(0.0f), lastAngleY(0.0f)
 {
     try{

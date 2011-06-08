@@ -31,6 +31,7 @@
 #include "Transcriber.h"
 #include "Sensors.h"
 #include "AccEKF.h"
+#include "SensorMonitor.h"
 /**
  *  This class servers to connect our Sensors class with AlMemory.
  *  It has different mechanisims which can be called
@@ -62,6 +63,8 @@ private: //Members
     std::vector<float> jointValues;
 
     AccEKF accelerationFilter;
+
+	SensorMonitor accX_m, accY_m, accZ_m;
 
     float lastAngleX, lastAngleY;
     float lastReadAngleX, lastReadAngleY;
