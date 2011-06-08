@@ -14,15 +14,11 @@ def goalieSave(player):
 
     brain = player.brain
     if player.firstFrame():
-        player.isSaving = True
-        player.isChasing = False
-        player.isPositioning = False
         brain.motion.stopHeadMoves()
         player.stopWalking()
         brain.tracker.trackBall()
         #does tracker work after  you stopHeadMoves?
         brain.fallController.enableFallProtection(False)
-        player.brain.speech.say("Saving")
 
     if helper.shouldSaveRight(player):
         return player.goNow('saveRight')
@@ -144,8 +140,6 @@ def postDiveSave(player):
 
 def doneSaving(player):
     if player.firstFrame():
-        player.isSaving = False
-        player.isPositioning = True
-        player.isChasing = False
+        nav.positionPlaybook()
 
     return player.stay()

@@ -15,9 +15,6 @@ def goaliePosition(player):
     heading = None
 
     if player.firstFrame():
-        player.isPositioning = True
-        player.isChasing = False
-        player.isSaving = False
         nav.positionPlaybook()
 
     if ball.dist >= goalCon.ACTIVE_LOC_THRESH:

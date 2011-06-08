@@ -1,6 +1,7 @@
 from .. import NogginConstants
 from . import PBConstants
 from . import SubRoles
+from . import RoleTransitions as RoleTran
 
 #######################################
 # In each role, we check to see if we should switch into a particular subRole
@@ -9,41 +10,56 @@ from . import SubRoles
 
 def rGoalie(team, workingPlay):
     '''The Goalie'''
+    ''' We don't use shouldSwitchSubRole because of need to switch at
+    different points for different actions with the goalies. Use
+    counters instead to keep track of when to change.  Counters are done
+    through RoleTransitions. '''
     if not workingPlay.isRole(PBConstants.GOALIE):
-        team.subRoleSwitchTime = -1
-    workingPlay.setRole(PBConstants.GOALIE)
+        workingPlay.setRole(PBConstants.GOALIE)
     if (team.brain.gameController.currentState == 'gameReady' or
         team.brain.gameController.currentState =='gameSet'):
         # Special case for ready goalie.
-        subRoleOnDeck = PBConstants.READY_GOALIE
-        if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
-            SubRoles.pReadyGoalie(team, workingPlay)
+        SubRoles.pReadyGoalie(team, workingPlay)
 
-    elif ((team.brain.ball.x > NogginConstants.CENTER_FIELD_X) or
-          ((team.brain.ball.y > \
-            NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y) and
-          (team.brain.ball.y < NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y))):
-        subRoleOnDeck = PBConstants.GOALIE_NORMAL
-        if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
+    elif workingPlay.isSubRole(PBConstants.READY_GOALIE):
+        SubRoles.pGoalieNormal(team, workingPlay)
+
+    elif workingPlay.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
+        SubRoles.pGoaliePenaltySaver(team, workingPlay)
+
+    elif workingPlay.isSubRole(PBConstants.GOALIE_CHASER):
+        if RoleTran.shouldStopChase(team):
+            SubRoles.pGoalieNormal(team, workingPlay)
+        else:
+            SubRoles.pGoalieChaser(team, workingPlay)
+
+    elif (workingPlay.isSubRole(PBConstants.GOALIE_NORMAL) or
+          workingPlay.isSubRole(PBConstants.GOALIE_RIGHT) or
+          workingPlay.isSubRole(PBConstants.GOALIE_LEFT)):
+        if RoleTran.shouldChase(team):
+            SubRoles.pGoalieChaser(team, workingPlay)
+
+        elif RoleTran.shouldPosition(team):
             SubRoles.pGoalieNormal(team, workingPlay)
 
-    #Right of post position right
-    elif (team.brain.ball.y <= NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y):
-        subRoleOnDeck = PBConstants.GOALIE_RIGHT
-        if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
+        elif RoleTran.shouldPositionRight(team):
             SubRoles.pGoaliePosRight(team, workingPlay)
 
-    #Left of post position left
-    elif (team.brain.ball.y >= NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y):
-        subRoleOnDeck = PBConstants.GOALIE_LEFT
-        if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
+        elif RoleTran.shouldPositionLeft(team):
             SubRoles.pGoaliePosLeft(team, workingPlay)
 
-    # Sanity Check
-    else:
-        subRoleOnDeck = PBConstants.GOALIE_NORMAL
-        if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
+        elif RoleTran.shouldPositionCenter(team):
             SubRoles.pGoalieNormal(team, workingPlay)
+
+        elif workingPlay.isSubRole(PBConstants.GOALIE_NORMAL):
+            SubRoles.pGoalieNormal(team, workingPlay)
+
+        elif workingPlay.isSubRole(PBConstants.GOALIE_RIGHT):
+            SubRoles.pGoaliePosRight(team, workingPlay)
+
+        elif workingPlay.isSubRole(PBConstants.GOALIE_LEFT):
+            SubRoles.pGoaliePosLeft(team, workingPlay)
+
 
 def rChaser(team, workingPlay):
     '''sets current position for chaser since positioning is done by player'''

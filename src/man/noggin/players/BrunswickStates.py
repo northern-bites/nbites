@@ -11,10 +11,8 @@ def gameInitial(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
-        player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        player.isSaving = False
         player.stopWalking()
         player.gainsOn()
         player.zeroHeads()
@@ -32,10 +30,8 @@ def gameReady(player):
     Stand up, and pan for localization
     """
     if player.firstFrame():
-        player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        player.isSaving = False
         player.standup()
         player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
@@ -53,10 +49,8 @@ def gameSet(player):
     Fixate on the ball, or scan to look for it
     """
     if player.firstFrame():
-        player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        player.isSaving = False
         player.stopWalking()
         player.brain.loc.resetBall()
         print player.brain.play.role
@@ -92,8 +86,6 @@ def gamePlaying(player):
 
 def gamePenalized(player):
     if player.firstFrame():
-        player.isChasing = False
-        player.isSaving = False
         player.inKickingState = False
         player.justKicked = False
         player.stopWalking()
@@ -106,10 +98,8 @@ def fallen(player):
     """
     Stops the player when the robot has fallen
     """
-    player.isChasing = False
     player.inKickingState = False
     player.justKicked = False
-    #do I want isSaving here?
     return player.stay()
 
 def gameFinished(player):
@@ -119,10 +109,8 @@ def gameFinished(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
-        player.isChasing = False
         player.inKickingState = False
         player.justKicked = False
-        player.isSaving = False
         player.stopWalking()
         player.zeroHeads()
         player.GAME_FINISHED_satDown = False
@@ -174,6 +162,7 @@ def penaltyShotsGamePlaying(player):
             player.firstFrame():
         player.brain.resetLocalization()
     if player.brain.play.isRole(GOALIE):
+        player.brain.play.setSubRole(GOALIE_PENALTY_SAVER)
         return player.goNow('penaltyGoalie')
     return player.goNow('penaltyKick')
 

@@ -10,7 +10,6 @@ def chase(player):
     """
     Super State to determine what to do from various situations
     """
-    player.isChasing = True
     player.hasAlignedOnce = False
 
     if player.brain.play.isRole(GOALIE):
@@ -36,9 +35,6 @@ def goalieChase(player):
 
     #tells the goalie what state its in
     if player.firstFrame():
-        player.isChasing = True
-        player.isPositioning = False
-        player.isSaving = False
 
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')

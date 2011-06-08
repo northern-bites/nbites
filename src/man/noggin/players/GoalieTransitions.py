@@ -3,8 +3,7 @@ from ..playbook import PBConstants as PBCon
 from .. import NogginConstants as NogCon
 import GoalieConstants as goalCon
 import ChaseBallTransitions as chaseTran
-#am I suposed to do this?
-from ..playbook import GoTeam as GoTeam
+
 
 DEBUG = False
 
@@ -158,12 +157,11 @@ def goalieInBox(player):
 
     return False
 
-# add a counter to this
+# NOT USED
 def shouldPositionCenter(player):
     ball = player.brain.ball
 
-    if (ball.y > NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y + goalCon.BOX_BUFFER
-        and ball.y < NogCon.LANDMARK_MY_GOAL_LEFT_POST_Y - goalCon.BOX_BUFFER):
+    if (not shouldPositionRight(player) and not shouldPositionLeft(player)):
         player.shouldPositionCenter += 1
         if player.shouldPositionCenter > 3:
             player.shouldPositionCenterCounter = 0
