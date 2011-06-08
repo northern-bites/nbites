@@ -36,77 +36,77 @@ template <class T>
 class FifoBuffer
 {
 public:
-  // effect   Construct FIFO with specified maximum number of items.
-  FifoBuffer(int maxCount = 0);
- ~FifoBuffer();
+    // effect   Construct FIFO with specified maximum number of items.
+    FifoBuffer(int maxCount = 0);
+    ~FifoBuffer();
 
-  // effect   Get/set maximum number of items. Setting clears the FIFO.
-  // notes    Setting zero items makes this a null FIFO.
-  int  MaxCount() const { return ringSize;}
-  void MaxCount(int n);
+    // effect   Get/set maximum number of items. Setting clears the FIFO.
+    // notes    Setting zero items makes this a null FIFO.
+    int  MaxCount() const { return ringSize;}
+    void MaxCount(int n);
 
-  // effect   Get/set the value to be returned when reading an empty
-  //           FIFO or when calling Peek with an index that does not
-  //           exist.
-  // note     The value is undefined until set by the client, because
-  //           since we don't know type T we can't pick a value.
-  T    NullValue()    const { return nullValue;}
-  void NullValue(T x)       { nullValue = x;   }
+    // effect   Get/set the value to be returned when reading an empty
+    //           FIFO or when calling Peek with an index that does not
+    //           exist.
+    // note     The value is undefined until set by the client, because
+    //           since we don't know type T we can't pick a value.
+    T    NullValue()    const { return nullValue;}
+    void NullValue(T x)       { nullValue = x;   }
 
-  // effect   Remove all items from the FIFO
-  void Clear();
+    // effect   Remove all items from the FIFO
+    void Clear();
 
-  // returns  True if the FIFO is empty/full.
-  bool Empty() const { return count == 0;       }
-  bool Full () const { return count == ringSize;}
+    // returns  True if the FIFO is empty/full.
+    bool Empty() const { return count == 0;       }
+    bool Full () const { return count == ringSize;}
 
-  // returns  Number of items in the FIFO
-  int Count() const { return count;}
+    // returns  Number of items in the FIFO
+    int Count() const { return count;}
 
-  // returns  If the index is valid (0 <= index < Count()), the item at
-  //           the specified index, numbered starting with 0 for the
-  //           oldest item and up to Count()-1 for the newest.  If the
-  //           index is invalid, NullValue()
-  // effect   If the index is invalid, increment Underflows. This is why
-  //           Peek is non-const.
-  T Peek(int index);
+    // returns  If the index is valid (0 <= index < Count()), the item at
+    //           the specified index, numbered starting with 0 for the
+    //           oldest item and up to Count()-1 for the newest.  If the
+    //           index is invalid, NullValue()
+    // effect   If the index is invalid, increment Underflows. This is why
+    //           Peek is non-const.
+    T Peek(int index);
 
-  // returns  If the FIFO is not empty, the oldest element, otherwise NullValue
-  // effect   If the FIFO is not empty remove the oldest element,
-  //           otherwise increment Underflows
-  T Read();
+    // returns  If the FIFO is not empty, the oldest element, otherwise NullValue
+    // effect   If the FIFO is not empty remove the oldest element,
+    //           otherwise increment Underflows
+    T Read();
 
-  // effect   If the FIFO is not full add the specified element,
-  //           otherwise increment Overflows
-  void Write(T);
+    // effect   If the FIFO is not full add the specified element,
+    //           otherwise increment Overflows
+    void Write(T);
 
-  // returns  This FIFO
-  // effect   Read or write using alternate syntax
-  FifoBuffer& operator<< (T  x) { Write(x)  ; return *this;}
-  FifoBuffer& operator>> (T& x) { x = Read(); return *this;}
+    // returns  This FIFO
+    // effect   Read or write using alternate syntax
+    FifoBuffer& operator<< (T  x) { Write(x)  ; return *this;}
+    FifoBuffer& operator>> (T& x) { x = Read(); return *this;}
 
-  // returns  True if there have been any errors since construction
-  bool Error() const { return overflows > 0 | underflows > 0;}
+    // returns  True if there have been any errors since construction
+    bool Error() const { return overflows > 0 | underflows > 0;}
 
-  // returns  Number of underflows/overflows since construction
-  int Overflows () const { return overflows; }
-  int Underflows() const { return underflows;}
+    // returns  Number of underflows/overflows since construction
+    int Overflows () const { return overflows; }
+    int Underflows() const { return underflows;}
 
 private:
-  // FIFO is implemented as a ring buffer
-  T*  ring;
-  int ringSize;       // number of items allocated
-  int readIndex;
-  int writeIndex;
-  int count;
-  T   nullValue;
+    // FIFO is implemented as a ring buffer
+    T*  ring;
+    int ringSize;       // number of items allocated
+    int readIndex;
+    int writeIndex;
+    int count;
+    T   nullValue;
 
-  int overflows;
-  int underflows;
+    int overflows;
+    int underflows;
 
-  // Disallow use of default copy constructor, assignment operator
-  FifoBuffer(const FifoBuffer&);
-  FifoBuffer& operator= (const FifoBuffer&);
+    // Disallow use of default copy constructor, assignment operator
+    FifoBuffer(const FifoBuffer&);
+    FifoBuffer& operator= (const FifoBuffer&);
 };
 
 // FIFO template class implementation. Template class inplementations
@@ -117,81 +117,81 @@ private:
 template <class T>
 FifoBuffer<T>::FifoBuffer(int maxCount)
 {
-  ring = 0;
-  overflows = underflows = 0;
-  MaxCount(maxCount);
+    ring = 0;
+    overflows = underflows = 0;
+    MaxCount(maxCount);
 }
 
 template <class T>
 FifoBuffer<T>::~FifoBuffer()
 {
-  delete [] ring;
+    delete [] ring;
 }
 
 template <class T>
 void FifoBuffer<T>::MaxCount(int n)
 {
-  delete [] ring;
-  if (n > 0)
-    ring = new T[n];
-  else
-    ring = 0;
-  ringSize = n;
-  Clear();
+    delete [] ring;
+    if (n > 0)
+        ring = new T[n];
+    else
+        ring = 0;
+    ringSize = n;
+    Clear();
 }
 
 template <class T>
 void FifoBuffer<T>::Clear()
 {
-  readIndex = writeIndex = 0;
-  count = 0;
+    readIndex = writeIndex = 0;
+    count = 0;
 }
 
 template <class T>
 T FifoBuffer<T>::Peek(int index)
 {
-  // This is equivalent to index < 0 || index >= count, but
-  // faster. Conditional branches are slow.
-  if ((unsigned int)index >= (unsigned int)count)
-  {
-    ++underflows;
-    return nullValue;
-  }
+    // This is equivalent to index < 0 || index >= count, but
+    // faster. Conditional branches are slow.
+    if ((unsigned int)index >= (unsigned int)count)
+    {
+        ++underflows;
+        return nullValue;
+    }
 
-  int i = readIndex + index;
-  if (i >= ringSize)    // don't use % operator, divide is slow
-    i -= ringSize;
-  return  ring[i];
+    int i = readIndex + index;
+    if (i >= ringSize)    // don't use % operator, divide is slow
+        i -= ringSize;
+    return  ring[i];
 }
 
 template <class T>
 T FifoBuffer<T>::Read()
 {
-  if (Empty())
-  {
-    ++underflows;
-    return nullValue;
-  }
+    if (Empty())
+    {
+        ++underflows;
+        return nullValue;
+    }
 
-  T x = ring[readIndex++];
-  if (readIndex == ringSize)
-    readIndex = 0;
-  --count;
-  return x;
+    T x = ring[readIndex++];
+    if (readIndex == ringSize)
+        readIndex = 0;
+    --count;
+    return x;
 }
 
 template <class T>
 void FifoBuffer<T>::Write(T x)
 {
-  if (Full())
-    ++overflows;
-  else
-  {
-    ring[writeIndex++] = x;
-    if (writeIndex == ringSize)
-      writeIndex = 0;
-    ++count;
-  }
+    if (Full())
+        ++overflows;
+    else
+    {
+        ring[writeIndex++] = x;
+        if (writeIndex == ringSize)
+            writeIndex = 0;
+        ++count;
+    }
 }
 
 // ********************************
@@ -235,52 +235,52 @@ void FifoBuffer<T>::Write(T x)
 class Filter
 {
 public:
-  // effect   Construct in reset state
-  Filter();
+    // effect   Construct in reset state
+    Filter();
 
-  // A polymorphic base class should have a virtual destructor.
-  virtual ~Filter();
+    // A polymorphic base class should have a virtual destructor.
+    virtual ~Filter();
 
-  // effect   Restore state to the initial value (i.e. erase all history).
-  // note     Derived classes will often override this, but should call it
-  //           in the overriding member
-  virtual void Reset();
+    // effect   Restore state to the initial value (i.e. erase all history).
+    // note     Derived classes will often override this, but should call it
+    //           in the overriding member
+    virtual void Reset();
 
-  // returns  The next output value
-  // effect   Specify next input value, update filter state.
-  // note     Derived classes must call the protected Y(double) member to
-  //           generate the output, e.g. "return Y(someValue)"
-  virtual double X(double) = 0;
+    // returns  The next output value
+    // effect   Specify next input value, update filter state.
+    // note     Derived classes must call the protected Y(double) member to
+    //           generate the output, e.g. "return Y(someValue)"
+    virtual double X(double) = 0;
 
-  // returns  The current output value
-  // note     This is the same value returned by the most recent call to
-  //           X(). Typically derived classes don't need to override
-  //           this, but see HighPass for an example of doing so.
-  virtual double Y() const { return y;}
+    // returns  The current output value
+    // note     This is the same value returned by the most recent call to
+    //           X(). Typically derived classes don't need to override
+    //           this, but see HighPass for an example of doing so.
+    virtual double Y() const { return y;}
 
-  // returns  Number of inputs after Reset for filter to be beyond
-  //           transient startup phase.
-  int TransientCount() const { return transientCount;}
+    // returns  Number of inputs after Reset for filter to be beyond
+    //           transient startup phase.
+    int TransientCount() const { return transientCount;}
 
-  // returns  True if filter is in steady state, i.e. sufficient inputs
-  //           have been received
-  bool Steady() const { return sampleCount >= transientCount;}
+    // returns  True if filter is in steady state, i.e. sufficient inputs
+    //           have been received
+    bool Steady() const { return sampleCount >= transientCount;}
 
-  // returns  Number of inputs since Reset
-  int SampleCount() const { return sampleCount;}
+    // returns  Number of inputs since Reset
+    int SampleCount() const { return sampleCount;}
 
 protected:
-  // effect   Set transient count. Derived classes must call this in the
-  //           constructor and when it changes
-  void TransientCount(int tc) { transientCount = tc;}
+    // effect   Set transient count. Derived classes must call this in the
+    //           constructor and when it changes
+    void TransientCount(int tc) { transientCount = tc;}
 
-  // effect   Set current output value. Derived classes call this in the X() member.
-  double Y(double y) {  ++sampleCount; return Filter::y = y;}
+    // effect   Set current output value. Derived classes call this in the X() member.
+    double Y(double y) {  ++sampleCount; return Filter::y = y;}
 
 private:
-  double y;                 // current output
-  int    transientCount;
-  int    sampleCount;       // number of samples since Reset
+    double y;                 // current output
+    int    transientCount;
+    int    sampleCount;       // number of samples since Reset
 };
 
 // *******************
@@ -302,50 +302,50 @@ private:
 class Boxcar : public Filter
 {
 public:
-  // Filter width
-  typedef int ControlType;
+    // Filter width
+    typedef int ControlType;
 
-  // Default and ControlType constructor
-  Boxcar(int width = 0);
+    // Default and ControlType constructor
+    Boxcar(int width = 0);
 
-  // effect   Construct with specified cutoff wavelength
-  Boxcar(double cutoff);
+    // effect   Construct with specified cutoff wavelength
+    Boxcar(double cutoff);
 
-  // effect   Get/set cutoff wavelength
-  // note     Setting the value resets the filter
-  double Cutoff(         ) const { return Control() / cutRatio;}
-  void   Cutoff(double wl)       { Control((int)(wl * cutRatio + 0.5)); }
+    // effect   Get/set cutoff wavelength
+    // note     Setting the value resets the filter
+    double Cutoff(         ) const { return Control() / cutRatio;}
+    void   Cutoff(double wl)       { Control((int)(wl * cutRatio + 0.5)); }
 
-  // effect   Get/set control value (width of filter)
-  // note     Setting the control value resets the filter
-  int  Control(     ) const { return fifo.MaxCount(); }
-  void Control(int w);
+    // effect   Get/set control value (width of filter)
+    // note     Setting the control value resets the filter
+    int  Control(     ) const { return fifo.MaxCount(); }
+    void Control(int w);
 
-  virtual void Reset();
+    virtual void Reset();
 
-  virtual double X(double);
+    virtual double X(double);
 
-  // returns  The input value (x) at the mid-point of the most recent Width values.
+    // returns  The input value (x) at the mid-point of the most recent Width values.
 
-  // note     If Width is odd, the returned value is the single value at
-  //          the exact mid-point. If Width is even, the returned
-  //          value is the average of the two values surrounding the
-  //          exact mid-point, so the Mid value is somewhat
-  //          smoothed. If Width is even but there have only been an
-  //          odd number of x values, the returned value is still the
-  //          average of two values, the exact mid-point and one
-  //          neighbor, to keep the same smoothing, unless there has
-  //          been only one x value so far, in which case it is
-  //          returned.
-  double Mid() const;
+    // note     If Width is odd, the returned value is the single value at
+    //          the exact mid-point. If Width is even, the returned
+    //          value is the average of the two values surrounding the
+    //          exact mid-point, so the Mid value is somewhat
+    //          smoothed. If Width is even but there have only been an
+    //          odd number of x values, the returned value is still the
+    //          average of two values, the exact mid-point and one
+    //          neighbor, to keep the same smoothing, unless there has
+    //          been only one x value so far, in which case it is
+    //          returned.
+    double Mid() const;
 
 private:
-  FifoBuffer<double> fifo;
+    FifoBuffer<double> fifo;
 
-  double sum;       // sum of values currently in the FIFO
-  double weight;    // reciprocal of number of samples currently in the FIFO
+    double sum;       // sum of values currently in the FIFO
+    double weight;    // reciprocal of number of samples currently in the FIFO
 
-  static const double cutRatio;
+    static const double cutRatio;
 };
 
 // ******************************
@@ -363,20 +363,20 @@ private:
 class OnePoleLowPass : public Filter
 {
 public:
-  typedef double ControlType;
+    typedef double ControlType;
 
-  // Default and ControlType constructor
-  OnePoleLowPass(double cutoff = 0) { Control(cutoff); }
+    // Default and ControlType constructor
+    OnePoleLowPass(double cutoff = 0) { Control(cutoff); }
 
-  // effect   Get/set cutoff wavelength
-  double Control(      ) const { return wl;}
-  void   Control(double);
+    // effect   Get/set cutoff wavelength
+    double Control(      ) const { return wl;}
+    void   Control(double);
 
-  virtual double X(double x);
+    virtual double X(double x);
 
 private:
-  double wl;  // control value (cutoff wavelength in samples)
-  double k;   // filter constant
+    double wl;  // control value (cutoff wavelength in samples)
+    double k;   // filter constant
 };
 
 // *****************************************************
@@ -394,23 +394,23 @@ private:
 class Butterworth : public Filter
 {
 public:
-  typedef double ControlType;
+    typedef double ControlType;
 
-  // Default and ControlType constructor
-  Butterworth(double cutoff = 0);
+    // Default and ControlType constructor
+    Butterworth(double cutoff = 0);
 
-  // effect   Get/set cutoff wavelength
-  double Control(      ) const { return wl; }
-  void   Control(double);
+    // effect   Get/set cutoff wavelength
+    double Control(      ) const { return wl; }
+    void   Control(double);
 
-  virtual void Reset();
+    virtual void Reset();
 
-  virtual double X(double x);
+    virtual double X(double x);
 
 private:
-  double wl;      // control value (cutoff wavelength in samples)
-  double k;       // filter constant
-  double v;       // intermediate filter output
+    double wl;      // control value (cutoff wavelength in samples)
+    double k;       // filter constant
+    double v;       // intermediate filter output
 };
 
 // **********************
@@ -452,44 +452,44 @@ template <class F>
 class HighPass : public F
 {
 public:
-  // ControlType is inherited from F
+    // ControlType is inherited from F
 
-  // Default and ControlType constructor
-  HighPass();
-  HighPass(typename F::ControlType);
+    // Default and ControlType constructor
+    HighPass();
+    HighPass(typename F::ControlType);
 
-  virtual void Reset();
+    virtual void Reset();
 
-  // Here is where the high-pass is done
-  virtual double X(double x) { return y = x - F::X(x); }
+    // Here is where the high-pass is done
+    virtual double X(double x) { return y = x - F::X(x); }
 
-  // Need to override Y() to return HighPass::y rather than base Filter::y
-  virtual double Y() const { return y;}
+    // Need to override Y() to return HighPass::y rather than base Filter::y
+    virtual double Y() const { return y;}
 
 private:
-  double y;   // need my own output, hides base class y
+    double y;   // need my own output, hides base class y
 };
 
 // To construct me, just construct the base class and clear y.
 template <class F>
 HighPass<F>::HighPass()
 {
-  y = 0;
+    y = 0;
 }
 
 template <class F>
 HighPass<F>::HighPass(typename F::ControlType c)
-  : F(c)
+    : F(c)
 {
-  y = 0;
+    y = 0;
 }
 
 // My reset is just the base class reset, and clear y
 template <class F>
 void HighPass<F>::Reset()
 {
-  F::Reset();
-  y = 0;
+    F::Reset();
+    y = 0;
 }
 
 // *********************
@@ -510,27 +510,27 @@ template <class F>
 class VarianceFilter : public Filter
 {
 public:
-  // ControlType is not inherited, so it has to be defined
-  typedef typename F::ControlType ControlType;
+    // ControlType is not inherited, so it has to be defined
+    typedef typename F::ControlType ControlType;
 
-  // Default and ControlType constructor
-  VarianceFilter();
-  VarianceFilter(ControlType);
+    // Default and ControlType constructor
+    VarianceFilter();
+    VarianceFilter(ControlType);
 
-  virtual void Reset();
+    virtual void Reset();
 
-  // effect   Get/set control value
-  ControlType Control(           ) const { return sig.Control();}
-  void        Control(ControlType);
+    // effect   Get/set control value
+    ControlType Control(           ) const { return sig.Control();}
+    void        Control(ControlType);
 
-  virtual double X(double);
+    virtual double X(double);
 
-  // returns  Standard deviation of signal
-  double SD() const { return sqrt(Y());}
+    // returns  Standard deviation of signal
+    double SD() const { return sqrt(Y());}
 
 private:
-  F sig;
-  F sigSquared;
+    F sig;
+    F sigSquared;
 };
 
 template <class F>
@@ -540,32 +540,32 @@ VarianceFilter<F>::VarianceFilter()
 
 template <class F>
 VarianceFilter<F>::VarianceFilter(ControlType c)
-  : sig(c), sigSquared(c)
+    : sig(c), sigSquared(c)
 {
-  TransientCount(sig.TransientCount());
+    TransientCount(sig.TransientCount());
 }
 
 template <class F>
 void VarianceFilter<F>::Reset()
 {
-  Filter::   Reset();
-  sig       .Reset();
-  sigSquared.Reset();
+    Filter::   Reset();
+    sig       .Reset();
+    sigSquared.Reset();
 }
 
 template <class F>
 void VarianceFilter<F>::Control(ControlType c)
 {
-  sig       .Control(c);
-  sigSquared.Control(c);
-  TransientCount(sig.TransientCount());
+    sig       .Control(c);
+    sigSquared.Control(c);
+    TransientCount(sig.TransientCount());
 }
 
 template <class F>
 double VarianceFilter<F>::X(double x)
 {
-  double s = sig.X(x);
-  return Y(sigSquared.X(x * x) - s * s);
+    double s = sig.X(x);
+    return Y(sigSquared.X(x * x) - s * s);
 }
 
 // ************************
@@ -591,37 +591,37 @@ template <class F1, class F2>
 class ComposedFilter: public Filter
 {
 public:
-  // The ControlType is a struct with data members for the two control values
-  struct ControlType
-  {
-    typename F1::ControlType C1;
-    typename F2::ControlType C2;
+    // The ControlType is a struct with data members for the two control values
+    struct ControlType
+    {
+        typename F1::ControlType C1;
+        typename F2::ControlType C2;
 
-    // A syntactically convenient way to specify a control value
-    ControlType(typename F1::ControlType c1, typename F2::ControlType c2)
-		  { C1 = c1; C2 = c2; }
-  };
+        // A syntactically convenient way to specify a control value
+        ControlType(typename F1::ControlType c1, typename F2::ControlType c2)
+            { C1 = c1; C2 = c2; }
+    };
 
-  // Default and ControlType constructor
-  ComposedFilter();
-  ComposedFilter(ControlType);
+    // Default and ControlType constructor
+    ComposedFilter();
+    ComposedFilter(ControlType);
 
-  virtual void Reset();
+    virtual void Reset();
 
-  // effect   Get/set control value
-  ControlType Control(           ) const { return ControlType(f1.Control(), f2.Control()); }
-  void        Control(ControlType);
+    // effect   Get/set control value
+    ControlType Control(           ) const { return ControlType(f1.Control(), f2.Control()); }
+    void        Control(ControlType);
 
-  virtual double X(double x) { return Y(f2.X(f1.X(x))); }
+    virtual double X(double x) { return Y(f2.X(f1.X(x))); }
 
-  // returns Const references to each component Filter, which can be
-  // use to read their states.
-  const F1& A() const { return f1;}
-  const F2& B() const { return f2;}
+    // returns Const references to each component Filter, which can be
+    // use to read their states.
+    const F1& A() const { return f1;}
+    const F2& B() const { return f2;}
 
 private:
-  F1 f1;
-  F2 f2;
+    F1 f1;
+    F2 f2;
 };
 
 template <class F1, class F2>
@@ -632,23 +632,23 @@ ComposedFilter<F1, F2>::ComposedFilter()
 template <class F1, class F2>
 ComposedFilter<F1, F2>::ComposedFilter(ControlType c)
 {
-  Control(c);
+    Control(c);
 }
 
 template <class F1, class F2>
 void ComposedFilter<F1, F2>::Control(ControlType c)
 {
-  f1.Control(c.C1);
-  f2.Control(c.C2);
-  TransientCount(f1.TransientCount() + f2.TransientCount());
+    f1.Control(c.C1);
+    f2.Control(c.C2);
+    TransientCount(f1.TransientCount() + f2.TransientCount());
 }
 
 template <class F1, class F2>
 void ComposedFilter<F1, F2>::Reset()
 {
-  Filter::Reset();
-  f1     .Reset();
-  f2     .Reset();
+    Filter::Reset();
+    f1     .Reset();
+    f2     .Reset();
 }
 
 
@@ -665,12 +665,12 @@ template <class F>
 class NoiseMeter : public ComposedFilter<HighPass<Boxcar>, VarianceFilter<F> >
 {
 public:
-  // A shortcut name for the inherited ControlType
-  typedef typename ComposedFilter<HighPass<Boxcar>, VarianceFilter<F> >::ControlType ControlType;
+    // A shortcut name for the inherited ControlType
+    typedef typename ComposedFilter<HighPass<Boxcar>, VarianceFilter<F> >::ControlType ControlType;
 
-  // Default and ControlType constructor
-  NoiseMeter();
-  NoiseMeter(ControlType);
+    // Default and ControlType constructor
+    NoiseMeter();
+    NoiseMeter(ControlType);
 };
 
 template <class F>
@@ -680,7 +680,7 @@ NoiseMeter<F>::NoiseMeter()
 
 template <class F>
 NoiseMeter<F>::NoiseMeter(ControlType c)
-  : ComposedFilter<HighPass<Boxcar>, VarianceFilter<F> >(c)
+    : ComposedFilter<HighPass<Boxcar>, VarianceFilter<F> >(c)
 {
 }
 
@@ -695,35 +695,36 @@ NoiseMeter<F>::NoiseMeter(ControlType c)
 class SignalMonitor
 {
 public:
-  // effect   Construct as specified
-  // args     numBins   Number of bins in the histogram
-  //          low       The signal value corresponding to the low value of
-  //                     the first histogram bin
-  //          high      The signal value corresponding to the high value of
-  //                     the last histogram bin
-  //          log       The histogram is log (true) or linear (false)
-  // note     Signal values than are below "low" are counted in the first
-  //           bin; those above "high" are counted in the last bin
+    // effect   Construct as specified
+    // args     numBins   Number of bins in the histogram
+    //          low       The signal value corresponding to the low value of
+    //                     the first histogram bin
+    //          high      The signal value corresponding to the high value of
+    //                     the last histogram bin
+    //          log       The histogram is log (true) or linear (false)
+    // note     Signal values than are below "low" are counted in the first
+    //           bin; those above "high" are counted in the last bin
 
-  SignalMonitor(int numBins, double low, double high, bool log);
- ~SignalMonitor();
+    SignalMonitor(int numBins, double low, double high, bool log);
+    ~SignalMonitor();
 
-  // effect   Increment the histogram bin corresponding to the specified signal value
-  void X(double);
+    // effect   Increment the histogram bin corresponding to the specified signal value
+    void X(double);
 
-  // effect   Clear the histogram
-  void Reset();
+    // effect   Clear the histogram
+    void Reset();
 
-  // effect   Print the histogram, using the specified format string for
-  //           printing signal values
-  void Print(char* format);
+    // effect   Print the histogram, using the specified format string for
+    //           printing signal values
+    void Print(char* format);
+    std::string toString();
 
 private:
-  int*    bins;       // the histogram
-  int     numBins;
-  double  low, high;
-  bool    log;
-  double  k;          // Convert from signal value to bin index with just a multiply
+    int*    bins;       // the histogram
+    int     numBins;
+    double  low, high;
+    bool    log;
+    double  k;          // Convert from signal value to bin index with just a multiply
 };
 
 
