@@ -10,14 +10,13 @@ class VisualCorner;
 
 #include "ConcreteCorner.h"
 #include "Utility.h"
-#include "VisualDetection.h"
-#include "VisualLandmark.h"
+#include "VisualObject.h"
 #include "VisualLine.h"
 #include <boost/shared_ptr.hpp>
 
 class NaoPose;
 
-class VisualCorner : public VisualDetection, public VisualLandmark {
+class VisualCorner : public VisualObject {
 private: // Constants
     // Number of pixels that must extend beyond the intersection for a line to
     // be considered a T

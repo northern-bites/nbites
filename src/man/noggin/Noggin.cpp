@@ -352,8 +352,8 @@ void Noggin::updateLocalization()
     list <VisualCorner>::const_iterator i;
     for ( i = corners->begin(); i != corners->end(); ++i) {
         if (i->getDistance() < MAX_CORNER_DISTANCE) {
-            CornerObservation seen(*i);
-            corner_observations.push_back(seen);
+            PointObservation seen(*i);
+            pt_observations.push_back(seen);
 
 #           ifdef DEBUG_CORNER_OBSERVATIONS
             cout << "Saw corner "

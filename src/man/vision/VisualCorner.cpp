@@ -21,8 +21,7 @@ VisualCorner::VisualCorner(const int _x, const int _y,
                            shared_ptr<VisualLine> l1, shared_ptr<VisualLine> l2,
                            const float _t1, const float _t2,
                            shared_ptr<NaoPose> _pose)
-    : VisualDetection(_x, _y, _distance, _bearing),
-      VisualLandmark(CORNER_NO_IDEA_ID),
+    : VisualObject(CORNER_NO_IDEA_ID,_x, _y, _distance, _bearing),
       pose(_pose),
       possibleCorners(ConcreteCorner::concreteCorners().begin(),
                       ConcreteCorner::concreteCorners().end()),
@@ -47,7 +46,7 @@ VisualCorner::VisualCorner(const int _x, const int _y,
 VisualCorner::~VisualCorner() {}
 
 VisualCorner::VisualCorner(const VisualCorner& other)
-    : VisualDetection(other), VisualLandmark(other),
+    : VisualObject(other),
       pose(other.pose),
       possibleCorners(other.possibleCorners),
       cornerType(other.cornerType), secondaryShape(other.secondaryShape),
