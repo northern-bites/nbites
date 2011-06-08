@@ -77,7 +77,7 @@ class KickDecider(object):
         """
         # if there are too few players on the field to do a side kick pass.
         if smallTeam:
-            if self.brain.ball.relY <= 0:
+            if self.brain.ball.relY >= 0:
                 self.setKick(kicks.LEFT_DYNAMIC_STRAIGHT_KICK)
             else:
                 self.setKick(kicks.RIGHT_DYNAMIC_STRAIGHT_KICK)
@@ -196,7 +196,7 @@ class KickDecider(object):
 
     def chooseDynamicKick(self):
         ball = self.brain.ball
-        if ball.relY > 0:
+        if ball.relY >= 0:
             print "LEFT_DYNAMIC_STRAIGHT"
             return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
         print "RIGHT_DYNAMIC_STRAIGHT"
