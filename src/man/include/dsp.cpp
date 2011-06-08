@@ -4,6 +4,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 #include "dsp.h"
 
 // ********************************
@@ -240,22 +244,27 @@ void SignalMonitor::X(double x)
     ++bins[index];
 }
 
-void SignalMonitor::Print(char* format)
+void SignalMonitor::Print()
 {
+	std::cout << toString();
+}
+
+std::string SignalMonitor::toString()
+{
+	std::stringstream data;
+
     for (int i = 0; i < numBins; ++i)
     {
         double x = (i + 0.5) / k + low;
         if (log)
             x = exp(x);
-        printf(format, x);
+		data << x;
         if (bins[i] > 0)
-            printf("%10d\n", bins[i]);
+			data << "\t" << bins[i];
         else
-            printf("         .\n");
+			data << "\t" << 0;
+		data << std::endl;
     }
-}
 
-std::string SignalMonitor::toString()
-{
-	return "";
+	return data.str();
 }

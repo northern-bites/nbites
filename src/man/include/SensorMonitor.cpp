@@ -1,6 +1,10 @@
 
 #include "SensorMonitor.h"
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 SensorMonitor::SensorMonitor(std::string sensorName, double low, double high, bool log)
 	:  noise(NoiseMeter<Boxcar>::ControlType(21, 21)),
 	   monitor(numberOfBins, low, high, log)
@@ -10,6 +14,7 @@ SensorMonitor::SensorMonitor(std::string sensorName, double low, double high, bo
 }
 
 SensorMonitor::~SensorMonitor() {
+	printf("SensorMonitor (%s) destructor\n", sensorName.c_str());
 	LogOutput();
 }
 
@@ -24,9 +29,6 @@ double SensorMonitor::X(double input) {
 		}
 	}
 
-	if (SampleCount() % 1000 == 0)
-		LogOutput();
-
 	return Y(input);
 }
 
@@ -39,6 +41,18 @@ void SensorMonitor::Reset() {
 }
 
 void SensorMonitor::LogOutput() {
-	// todo: log output to /tmp/sensorName.sensor
-	monitor.Print("%5.2f");
+	using namespace std;
+
+	stringstream filename;
+
+	filename << "/tmp/" << sensorName << ".sensor.xls";
+
+	ofstream outFile;
+
+	outFile.open(filename.str().c_str(), ifstream::out);
+
+	outFile << "Report for sensor: " << sensorName << endl;
+	outFile << monitor.toString() << endl;
+
+	outFile.close();
 }

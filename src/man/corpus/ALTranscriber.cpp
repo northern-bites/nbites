@@ -26,6 +26,10 @@ ALTranscriber::ALTranscriber (AL::ALPtr<AL::ALBroker> _broker,
 	 accX_m("accX", VARIANCE_FILTER_MIN, 5),
 	 accY_m("accY", VARIANCE_FILTER_MIN, 5),
 	 accZ_m("accZ", VARIANCE_FILTER_MIN, 5),
+	 gyrX_m("gyroX", VARIANCE_FILTER_MIN, 5),
+	 gyrY_m("gyroY", VARIANCE_FILTER_MIN, 5),
+	 angleX_m("angleX", VARIANCE_FILTER_MIN, 5),
+	 angleY_m("angleY", VARIANCE_FILTER_MIN, 5),
      lastAngleX(0.0f), lastAngleY(0.0f)
 {
     try{
@@ -204,8 +208,12 @@ void ALTranscriber::syncMotionWithALMemory() {
 
 	// update the variance filters
 	accX_m.X(accX);
-	//accY_m.X(accY);
-	//accZ_m.X(accZ);
+	accY_m.X(accY);
+	accZ_m.X(accZ);
+	gyrX_m.X(gyrX);
+	gyrY_m.X(gyrY);
+	angleX_m.X(angleX);
+	angleY_m.X(angleY);
 
     accelerationFilter.update(accX, accY, accZ);
     const float filteredX = accelerationFilter.getX();

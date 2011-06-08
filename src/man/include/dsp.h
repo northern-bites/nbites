@@ -8,6 +8,9 @@
 #ifndef _dsp_
 #define _dsp_
 
+#include <string>
+
+
 // The purpose of this code is to provide a simple, reasonably
 // efficient discrete signal processing library, as well as a variety
 // of C++ coding examples covering templates and polymorphic classes.
@@ -716,7 +719,7 @@ public:
 
     // effect   Print the histogram, using the specified format string for
     //           printing signal values
-    void Print(char* format);
+    void Print();
     std::string toString();
 
 private:

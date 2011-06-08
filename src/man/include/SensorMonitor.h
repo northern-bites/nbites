@@ -21,7 +21,8 @@
  * This class links a NoiseMeter and SignalMonitor together to provide
  * a first-warning system for failed sensors. Also, it provides a way
  * to quantify the amount of noise present in our data under game
- * circumstances.
+ * circumstances. At destruction, this class will log the data it has
+ * collected to /tmp/sensorName.xls
  *
  * Currently this class doesn't do any filtering of the data, but that
  * would be trivial to template and add (currently using a width 1 Boxcar).
