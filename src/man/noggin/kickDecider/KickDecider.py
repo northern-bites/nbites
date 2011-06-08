@@ -79,15 +79,18 @@ class KickDecider(object):
         if smallTeam:
             if self.brain.ball.relY >= 0:
                 self.setKick(kicks.LEFT_DYNAMIC_STRAIGHT_KICK)
+                print "Kickoff STRAIGHT_LEFT_KICK"
             else:
                 self.setKick(kicks.RIGHT_DYNAMIC_STRAIGHT_KICK)
+                print "Kickoff STRAIGHT_RIGHT_KICK"
             self.info.destDist = 100.
-
         # do a side kick pass depending on where the offender is.
         elif self.brain.playbook.pb.kickoffFormation == 0:
             self.setKick(kicks.RIGHT_SIDE_KICK)
+            print "Kickoff RIGHT_SIDE_KICK"
         else:
             self.setKick(kicks.LEFT_SIDE_KICK)
+            print "Kickoff LEFT_SIDE_KICK"
 
         self.info.kickObjective = constants.OBJECTIVE_KICKOFF
 
