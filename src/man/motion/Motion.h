@@ -51,7 +51,6 @@ class Motion : public Thread
 {
 public:
     Motion(boost::shared_ptr<Synchro> synchro,
-           //boost::shared_ptr<MotionEnactor> _enactor,
            boost::shared_ptr<MotionEnactor> _enactor,
            boost::shared_ptr<Sensors> s,
 	   boost::shared_ptr<Profiler>p,

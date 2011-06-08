@@ -82,6 +82,9 @@ public:
 
     std::vector<float> getCurrentHeads();
     void setNextHeadCommand();
+
+    //constant for lower camera
+    static const float CAMERA_ANGLE = .7;
 };
 
 #endif

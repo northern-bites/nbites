@@ -92,7 +92,7 @@ class HeadTrackingHelper(object):
    #     self.tracker.brain.motion.setHead(headMove)
 
     def lookToPoint(self, target):
-        headMove = motion.CoordHeadCommand(target.x, target.y, float(0.0))
+        headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
         self.tracker.brain.motion.coordHead(headMove)
 
     def calcBearing(self, target):

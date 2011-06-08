@@ -25,7 +25,7 @@ def lookRightClose(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(my.x, my.y - 10, 0)
+    brain.tracker.lookToPoint(20,-10, 0)
 
     if player.counter == 50:
         player.brain.tracker.stopHeadMoves()
@@ -36,7 +36,7 @@ def lookRightFar(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(my.x, my.y - 200, 0)
+    brain.tracker.lookToPoint(20,-200, 0)
 
     if player.counter == 50:
         player.brain.tracker.stopHeadMoves()
@@ -47,7 +47,7 @@ def lookStraightClose(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(my.x + 10, my.y, 0)
+    brain.tracker.lookToPoint(10, 0, 0)
 
     if player.counter == 50:
         player.brain.tracker.stopHeadMoves()
@@ -58,7 +58,7 @@ def lookStraightFar(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(my.x + 200, my.y, 0)
+    brain.tracker.lookToPoint(200, 0, 0)
 
     if player.counter == 50:
         player.brain.tracker.stopHeadMoves()
@@ -69,7 +69,7 @@ def lookLeftClose(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(my.x, my.y + 10, 0)
+    brain.tracker.lookToPoint(20, 10, 0)
 
     if player.counter == 50:
         player.brain.tracker.stopHeadMoves()
@@ -80,7 +80,7 @@ def lookLeftFar(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(my.x, my.y + 200, 0)
+    brain.tracker.lookToPoint(20, 200, 0)
 
     if player.counter == 50:
         player.brain.tracker.stopHeadMoves()
