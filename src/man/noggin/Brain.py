@@ -11,13 +11,14 @@ sys.stderr = sys.stdout
 # Packages and modules from super-directories
 from man import comm
 from man import motion
-from man import vision
+import vision
 #from man.corpus import leds
 import sensors
 
 # Modules from this directory
 from . import GameController
 from . import FallController
+from . import Stability
 from . import NogginConstants as Constants
 from . import Loc
 from . import TeamConfig
@@ -26,7 +27,7 @@ from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
 from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet,
-                       Play, TeamMember, Stability)
+                       Play, TeamMember)
 from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
@@ -34,6 +35,7 @@ from .players import Switch
 from .kickDecider import KickDecider
 
 import _roboguardian
+import _speech
 
 class Brain(object):
     """
@@ -51,7 +53,7 @@ class Brain(object):
         self.out = NaoOutput.NaoOutput(self)
 
         # Setup nao modules inside brain for easy access
-        self.vision = vision.Vision()
+        self.vision = vision.vision
         self.sensors = sensors.sensors
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
@@ -60,6 +62,7 @@ class Brain(object):
         #initalize the leds
         #print leds
         self.leds = Leds.Leds(self)
+        self.speech = _speech.speech
 
         # Initialize motion interface and module references
         self.motion = motion.MotionInterface()
@@ -113,9 +116,10 @@ class Brain(object):
         """
 
         # Build instances of the vision based field objects
-        # Yello goal left and right posts
+        # Yellow goal left and right posts
         self.yglp = Landmarks.FieldObject(self.vision.yglp,
                                           Constants.VISION_YGLP)
+
         self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
                                           Constants.VISION_YGRP)
 
@@ -125,14 +129,15 @@ class Brain(object):
         self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
                                           Constants.VISION_BGRP)
 
-        self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
-                                             Constants.VISION_BG_CROSSBAR)
-        self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
-                                             Constants.VISION_YG_CROSSBAR)
+        #### Crossbars: uncomment here and PyVision.cpp to use #######
+        # self.bgCrossbar = Landmarks.Crossbar(self.vision.bgCrossbar,
+        #                                      Constants.VISION_BG_CROSSBAR)
+        # self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
+        #                                      Constants.VISION_YG_CROSSBAR)
 
-        # Now we setup the corners
-        self.corners = []
-        self.lines = []
+        # # Now we setup the corners
+        # self.corners = []
+        # self.lines = []
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
@@ -148,24 +153,24 @@ class Brain(object):
             # Yellow goal
             self.oppGoalRightPost = self.yglp
             self.oppGoalLeftPost = self.ygrp
-            self.oppGoalCrossbar = self.ygCrossbar
+            #self.oppGoalCrossbar = self.ygCrossbar
 
             # Blue Goal
             self.myGoalLeftPost = self.bglp
             self.myGoalRightPost = self.bgrp
-            self.myGoalCrossbar = self.bgCrossbar
+            #self.myGoalCrossbar = self.bgCrossbar
 
         # Yellow team setup
         else:
             # Yellow goal
             self.myGoalLeftPost = self.yglp
             self.myGoalRightPost = self.ygrp
-            self.myGoalCrossbar = self.ygCrossbar
+            #self.myGoalCrossbar = self.ygCrossbar
 
             # Blue Goal
             self.oppGoalRightPost = self.bglp
             self.oppGoalLeftPost = self.bgrp
-            self.oppGoalCrossbar = self.bgCrossbar
+            #self.oppGoalCrossbar = self.bgCrossbar
 
         # Since, for ex.  bgrp points to the same thins as myGoalLeftPost,
         # we can set these regardless of our team color
@@ -255,19 +260,21 @@ class Brain(object):
         Update information about seen objects
         """
         self.ball.updateVision(self.vision.ball)
+
         self.yglp.updateVision(self.vision.yglp)
         self.ygrp.updateVision(self.vision.ygrp)
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
-        self.ygCrossbar.updateVision(self.vision.ygCrossbar)
-        self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
-        # Update the corner information
-        self.corners = []
+        #self.ygCrossbar.updateVision(self.vision.ygCrossbar)
+        #self.bgCrossbar.updateVision(self.vision.bgCrossbar)
+
+        # # Update the corner information
+        # self.corners = []
 
         self.time = time.time()
-        # Now we get the latest list of lines
-        self.lines = []
+        # # Now we get the latest list of lines
+        # self.lines = []
 
     def updateComm(self):
         temp = self.comm.latestComm()

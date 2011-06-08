@@ -278,12 +278,11 @@ public class TOOLProtocol {
 
     public RobotDef.ImageType getRobotType() {
         switch(robotType){
-        case RobotDef.NAO_RL_NUM:                 // NAO_RL
-            return RobotDef.ImageType.NAO_RL;
         case RobotDef.NAO_SIM_NUM:
             return RobotDef.ImageType.NAO_SIM;
         case RobotDef.NAO_NUM:
         case RobotDef.NAO_RL_33_NUM:
+        case RobotDef.NAO_RL_NUM:
         default:
             return RobotDef.ImageType.NAO_VER;
         }

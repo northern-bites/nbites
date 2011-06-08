@@ -20,6 +20,8 @@ class Threshold;  // forward reference
 #include "NaoPose.h"
 #include "Gradient.h"
 
+//#define SOFTCOLORS
+
 //
 // COLOR TABLE CONSTANTS
 // remember to change both values when chaning the color tables
@@ -125,6 +127,64 @@ public:
     Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr);
     virtual ~Threshold() {}
 
+    // Helper method that just returns whether the thresholded color is a
+    // green color
+    static inline const bool isGreen(unsigned char threshColor)
+        {
+			return threshColor & GREEN_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // white color
+    static inline const bool isWhite(unsigned char threshColor)
+        {
+			return threshColor & WHITE_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // blue color
+    static inline const bool isBlue(unsigned char threshColor)
+        {
+			return threshColor & BLUE_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // yellow color
+    static inline const bool isYellow(unsigned char threshColor)
+        {
+			return threshColor & YELLOW_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // orange color
+    static inline const bool isOrange(unsigned char threshColor)
+        {
+			return threshColor & ORANGE_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // navy color
+    static inline const bool isNavy(unsigned char threshColor)
+        {
+			return threshColor & NAVY_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // Red color
+    static inline const bool isRed(unsigned char threshColor)
+        {
+			return threshColor & RED_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is
+    // undefined
+    static inline const bool isUndefined(unsigned char threshColor)
+        {
+			return threshColor == 0x00;
+        }
+
+
+
     // main methods
     void visionLoop();
     // inline void threshold();
@@ -158,6 +218,7 @@ public:
     float getGoalPostDistFromWidth(float width);
     float getBeaconDistFromHeight(float height);
     int distance(int x1, int x2, int x3, int x4);
+    float realDistance(int x, int y, int x1, int y1);
     float getEuclidianDist(point <int> coord1, point <int> coord2);
     void findGreenHorizon();
     point <int> findIntersection(int col, int dir, int c);
@@ -165,6 +226,8 @@ public:
     int getRobotTop(int x, int c);
     int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
+    bool overlap(VisualRobot* robot, VisualFieldObject* post);
+    bool checkRobotAgainstBluePost(VisualRobot* robot, VisualFieldObject* post);
     point <int> backStopCheck(bool which, int left, int right);
     void setYUV(const uint16_t* newyuv);
     const uint16_t* getYUV();
@@ -182,20 +245,13 @@ public:
     void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
     void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
     void setDebugHoughTransform(bool _bool) {debugHoughTransform = _bool;}
+    void setDebugRobots(bool _bool);
 #endif
 
     void initDebugImage();
     void transposeDebugImage();
     void drawDetectedEdges(boost::shared_ptr<Gradient> g);
-    void drawX(int x, int y, int c);
-    void drawPoint(int x, int y, int c);
-    void drawLine(const point<int> start, const point<int> end,
-                  const int color);
     void drawVisualHorizon();
-    void drawLine(int x, int y, int x1, int y1, int c);
-    void drawBox(int left, int right, int bottom, int top, int c);
-    void drawRect(int left, int top, int width, int height, int c);
-
     void setEdgeThreshold(int _thresh);
     int getEdgeThreshold();
     void setHoughAcceptThreshold(int _thresh);
@@ -288,12 +344,14 @@ private:
     bool debugOpenField;
     bool debugEdgeDetection;
     bool debugHoughTransform;
+    bool debugRobots;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;
     static const bool debugOpenField = false;
     static const bool debugEdgeDetection = false;
     static const bool debugHoughTransform = false;
+    static const bool debugRobots = false;
 #endif
 };
 

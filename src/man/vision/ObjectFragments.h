@@ -54,30 +54,32 @@ public:
     void init(float s);
 
     void newRun(int x, int endY, int height);
+	bool colorsEqual(unsigned char x, unsigned char y);
 
     // scan operations
     int yProject(int startx, int starty, int newy);
     int yProject(point <int> point, int newy);
     int xProject(int startx, int starty, int newx);
     int xProject(point <int> point, int newx);
-    void vertScan(int x, int y, int dir, int stopper, int c, int c2, stop & scan);
+    void vertScan(int x, int y, int dir, int stopper, int c, stop & scan);
 	int pickNth(int val[], int n, int s);
-    void horizontalScan(int x, int y, int dir, int stopper, int c, int c2, int l,
+    void horizontalScan(int x, int y, int dir, int stopper, int c, int l,
                         int r, stop & scan);
-    int findTrueLineVertical(point <int> top, point <int> bottom, int c, int c2,
+    int findTrueLineVertical(point <int> top, point <int> bottom, int c,
                              bool left);
-    int findTrueLineHorizontal(point <int> left, point <int> right, int c, int c2,
+    int findTrueLineHorizontal(point <int> left, point <int> right, int c,
                                bool up);
     void findVerticalEdge(point <int>& top, point <int>& bottom, int c,
-                                    int c2, bool left);
+                                    bool left);
     void findHorizontalEdge(point <int>& left, point <int>& right,
-                                      int c, int c2, bool up);
+                                      int c, bool up);
     bool checkEdge(int x, int y, int x1, int y1);
     int horizonAt(int x);
 
     // finding square objects
-    void squareGoal(int x, int y, int left, int right, int top, int bottom, int c, int c2, Blob & pole);
-    float correct(Blob & b, int c, int c2);
+    void squareGoal(int x, int y, int left, int right, int top, int bottom,
+					int c, Blob & pole);
+    float correct(Blob & b, int c);
 
     // main method
     void createObject();
@@ -118,18 +120,18 @@ public:
 
     int characterizeSize(Blob b);
 
-    int classifyFirstPost(int c, int c2, Blob pole);
+    int classifyFirstPost(int c, Blob pole);
 
     // the big kahuna
     void lookForFirstPost(VisualFieldObject *left, VisualFieldObject *right,
-                  VisualCrossbar *mid, int c, int c2);
+                  VisualCrossbar *mid, int c);
     void lookForSecondPost(Blob pole, int post,
                                             VisualFieldObject* left,
                                             VisualFieldObject* right,
-                           VisualCrossbar* mid, int c, int c2);
+                           VisualCrossbar* mid, int c);
 
     void updateRunsAfterFirstPost(Blob pole, int post);
-    int grabPost(int c, int c2, int left, int right, Blob & pole);
+    int grabPost(int c, int left, int right, Blob & pole);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
     void transferTopBlob(VisualFieldObject * one, certainty cert,
                          distanceCertainty dc);
@@ -162,7 +164,6 @@ public:
     void drawPoint(int x, int y, int c);
     void drawRect(int x, int y, int w, int h, int c);
     void drawBlob(Blob b, int c);
-    void drawLine(int x, int y, int x1, int y1, int c);
     void printBlob(Blob b);
     void printObject(VisualFieldObject * objs);
     void paintRun(int x,int y, int h, int c);

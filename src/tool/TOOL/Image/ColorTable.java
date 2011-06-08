@@ -66,6 +66,16 @@ public class ColorTable {
     public static final byte RED = Vision.RED;
     public static final byte WHITE = Vision.WHITE;
 	public static final byte GREY = Vision.GREY;
+    public static final byte NAVY = Vision.NAVY;
+
+    public static final byte BIT_GREY = 0x00;
+    public static final byte BIT_WHITE = 0x01;
+    public static final byte BIT_GREEN = 0x02;
+    public static final byte BIT_BLUE = 0x04;
+    public static final byte BIT_YELLOW = 0x08;
+    public static final byte BIT_ORANGE = 0x10;
+    public static final byte BIT_RED = 0x20;
+    public static final byte BIT_NAVY = 0x40;
 
 
     public static final int FAIL = 1;
@@ -288,8 +298,7 @@ public class ColorTable {
                          (color == ORANGE && oldColor == ORANGEYELLOW) ||
                          (color == YELLOW && oldColor == ORANGEYELLOW)) {
                     newColor = ORANGEYELLOW;
-                }
-
+                    }
                 setColor(thisPixel, newColor);
             }
         }
@@ -561,29 +570,85 @@ public class ColorTable {
     }
 
 
+    // April 2011 - with the switch to bits, rather than just rewrite the whole
+    // tool (which would take forever) we're just going to have the table class
+    // wrap all of the changes and hope the other classes don't manipulate the
+    // table directly themselves
+
+    public byte convertColorFromBits(byte col) {
+        if ((col & BIT_ORANGE) > 0) {
+            if ((col & BIT_RED) > 0) {
+                return ORANGERED;
+            }
+            if ((col & BIT_YELLOW) > 0) {
+                return ORANGEYELLOW;
+            }
+            return ORANGE;
+        }
+        if ((col & BIT_GREEN) > 0) {
+            if ((col & BIT_BLUE) > 0) {
+                return BLUEGREEN;
+            }
+            return GREEN;
+        }
+        if ((col & BIT_BLUE) > 0) {
+            return BLUE;
+        }
+        if ((col & BIT_YELLOW) > 0) {
+            if ((col & BIT_WHITE) > 0) {
+                return YELLOWWHITE;
+            }
+            return YELLOW;
+        }
+        if ((col & BIT_WHITE) > 0) {
+            return WHITE;
+        }
+        if ((col & BIT_RED) > 0) {
+            return RED;
+        }
+        return GREY;
+    }
+
+    public byte convertFromOldColor(byte color) {
+        switch (color) {
+        case GREY: return BIT_GREY;
+        case GREEN: return BIT_GREEN;
+        case WHITE: return BIT_WHITE;
+        case YELLOW: return BIT_YELLOW;
+        case BLUE: return BIT_BLUE;
+        case ORANGE: return BIT_ORANGE;
+        case NAVY: return BIT_NAVY;
+        case RED: return BIT_RED;
+        case ORANGERED: return BIT_ORANGE | BIT_RED;
+        case ORANGEYELLOW: return BIT_ORANGE | BIT_YELLOW;
+        case YELLOWWHITE: return BIT_YELLOW | BIT_WHITE;
+        case BLUEGREEN: return BIT_BLUE | BIT_GREEN;
+        default: return BIT_GREY;
+        }
+    }
 
     //returns the color at a given pixel combination, specified by array
     public byte getColor(int[] pixel) {
-        return colorTable[pixel[Y ]>>uShift]
-            [pixel[Cb]>>vShift]
-            [pixel[Cr]>>yShift];
+        return convertColorFromBits(colorTable[pixel[Y ]>>uShift]
+                                    [pixel[Cb]>>vShift]
+                                    [pixel[Cr]>>yShift]);
     }
 
     public byte getColor(int _y, int _u, int _v) {
-        return colorTable[_u >> uShift]
-            [_v >> vShift]
-            [_y >> yShift];
+        return convertColorFromBits(colorTable[_u >> uShift]
+                                    [_v >> vShift]
+                                    [_y >> yShift]);
     }
 
     /** Gets color for given y,u,v, value without bitshifting */
     public byte getRawColor(int[] pixel) {
-        return colorTable[pixel[Cb ]]
-            [pixel[Cr]]
-            [pixel[Y]];
+        return convertColorFromBits(colorTable[pixel[Cb ]]
+                                    [pixel[Cr]]
+                                    [pixel[Y]]);
     }
 
     public byte getRawColor(int _y, int _u, int _v) {
-        return colorTable[_u][_v][_y];
+        return convertColorFromBits(colorTable[_u][_v][_y]);
     }
 
     public boolean isModified(){
@@ -591,12 +656,14 @@ public class ColorTable {
     }
 
     public void setColor(int[] pixel, byte color) {
+        color = convertFromOldColor(color);
         colorTable[pixel[Cb ] >> uShift]
             [pixel[Cr] >> vShift]
             [pixel[Y] >> yShift] = color;
     }
 
     public void setRawColor(int[] pixel, byte color) {
+        color = convertFromOldColor(color);
         colorTable[pixel[Cb ]]
             [pixel[Cr]]
             [pixel[Y]] = color;

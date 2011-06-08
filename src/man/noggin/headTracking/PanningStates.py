@@ -168,7 +168,7 @@ def scanQuickUp(tracker):
         return tracker.goNow('panUpOnce')
 
 
-MOTION_START_BUFFER = 5
+MOTION_START_BUFFER = 2
 
 def trianglePan(tracker):
     motionAngles = tracker.brain.sensors.motionAngles
@@ -210,9 +210,10 @@ def trianglePanRight(tracker):
 def trianglePanReturn(tracker):
     if tracker.firstFrame():
         tracker.helper.panTo(tracker.preTriPanHeads)
-    elif not tracker.brain.motion.isHeadActive() and \
-            tracker.counter > MOTION_START_BUFFER:
-        return tracker.goLater('stop')
+    elif (not tracker.brain.motion.isHeadActive() and
+          tracker.counter > MOTION_START_BUFFER)  or \
+          tracker.target.on:
+        return tracker.goLater('tracking')
     return tracker.stay()
 
 def bounceUp(tracker):

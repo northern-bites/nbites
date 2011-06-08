@@ -32,6 +32,10 @@ using namespace boost::assign;
 #include "corpus/synchro.h"
 #include "VisionDef.h"
 #include "Common.h"
+#include "PyRoboGuardian.h"
+#include "PySensors.h"
+#include "PyLights.h"
+#include "PySpeech.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -48,12 +52,15 @@ Man::Man (shared_ptr<Sensors> _sensors,
           shared_ptr<ImageTranscriber> _imageTranscriber,
           shared_ptr<MotionEnactor> _enactor,
           shared_ptr<Synchro> synchro,
-          shared_ptr<Lights> _lights)
+          shared_ptr<Lights> _lights,
+          shared_ptr<Speech> _speech)
+
   : sensors(_sensors),
     transcriber(_transcriber),
     imageTranscriber(_imageTranscriber),
     enactor(_enactor),
-    lights(_lights)
+    lights(_lights),
+    speech(_speech)
 {
   // initialize system helper modules
   profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
@@ -81,8 +88,12 @@ Man::Man (shared_ptr<Sensors> _sensors,
   set_guardian_pointer(guardian);
 
   set_lights_pointer(_lights);
+  set_speech_pointer(_speech);
 
   vision = shared_ptr<Vision>(new Vision(pose, profiler));
+
+  set_vision_pointer(vision);
+
   comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 #ifdef USE_NOGGIN
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
