@@ -82,15 +82,6 @@ class HeadTrackingHelper(object):
         self.executeHeadMove( ((heads, panTime, 0,
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
-   # def lookToPoint(self, target):
-   #     """look to an absolute position on the field"""
-   #     bearing = self.calcBearing(target)
-   #     headPitch = self.calcHeadPitch(target)
-
-   #     #makes and calls motion command
-   #     headMove = motion.SetHeadCommand( bearing, headPitch )
-   #     self.tracker.brain.motion.setHead(headMove)
-
     def lookToPoint(self, target):
         headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
         self.tracker.brain.motion.coordHead(headMove)

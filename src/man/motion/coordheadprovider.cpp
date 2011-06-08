@@ -126,6 +126,14 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
   float relX = command->getRelX()-pose->getFocalPointInWorldFrameX()/10;
   float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()/10-300;//adjust for robot center's distance above ground
   yawDest = atan(relY/relX);
+  //adjust yaw for atan range limits
+  if (relX<0) {
+    if (relY<0) {
+      yawDest = (-1*yawDest)-1.57;
+    } else {
+      yawDest = (-1*yawDest)+1.57;
+    }
+  }
   float hypoDist = sqrt(pow(relY,2)+pow(relX,2));
   pitchDest = -1*atan(relZ/hypoDist)-CAMERA_ANGLE;//adjust for atan sign
   yawMaxSpeed = command->getMaxSpeedYaw();
@@ -135,15 +143,10 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
   //these limits are currently pretty arbitrary
   yawDest = clip(yawDest, 1.5);
   pitchDest = clip(pitchDest, -6.5, .5);
-  yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*.5);
-  pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.35);
+  yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*.3);
+  pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.3);
 
   setActive();
-  /* ** *///cout <<"looking towards:  "<<yawDest<<"   "<<pitchDest<<endl;
-  /* ** *///cout <<"currently at:     "<<lastYawDest<<"   "<<lastPitchDest<<endl;
-  /* ** *///cout <<"debug:  "<<relZ<<"  "<<hypoDist<<"  "<<(relZ/hypoDist)<<"  "<<atan(relZ/hypoDist)<<endl;
-  /* ** *///cout <<"relative position: "<<command->getRelX()<<"  "<<command->getRelY()<<"  "<<command->getRelZ()<<endl;
-  /* ** *///cout <<"adjusted position: "<<relX<<"  "<<relY<<"  "<<relZ<<endl;
   pthread_mutex_unlock(&coord_head_provider_mutex);
 }
 
