@@ -35,7 +35,7 @@ Window::Window(QWidget *parent) :
     		"/home",
     		tr("Image Files (*.log)"));
 
-    fp = new memory::log::FileParser(pImage, currentDirectory.toStdString().data());
+    fp = new memory::log::MessageParser(pImage, currentDirectory.toStdString().data());
     fp->getNextMessage();
     roboImage->updateImage(pImage->image().data());
     roboImageViewer->updateBitmap();

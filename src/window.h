@@ -10,7 +10,7 @@
 #include <QFileDialog>
 #include "YUVImage.h"
 #include "RoboImageViewer.h"
-#include "FileParser.h"
+#include "MessageParser.h"
 #include "memory/protos/Sensors.pb.h"
 
 class QCheckBox;
@@ -32,7 +32,7 @@ private:
     QLabel *shapeLabel;
     QLabel *infoLabel;
     QComboBox *shapeComboBox;
-    memory::log::FileParser* fp;
+    memory::log::MessageParser* fp;
     boost::shared_ptr<memory::proto::PImage> pImage;
 
 

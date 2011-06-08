@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fcntl.h>
 
-#include "FileParser.h"
+#include "MessageParser.h"
 
 namespace memory {
 
@@ -13,7 +13,7 @@ using namespace google::protobuf::io;
 using boost::shared_ptr;
 
 //TODO: use file descriptor providers
-FileParser::FileParser(boost::shared_ptr<proto::Message> message,
+MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
                        int _file_descriptor) :
         Parser<proto::Message>(message),
         file_descriptor(_file_descriptor)
@@ -24,7 +24,7 @@ FileParser::FileParser(boost::shared_ptr<proto::Message> message,
 
 }
 
-FileParser::FileParser(boost::shared_ptr<proto::Message> message,
+MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
                        const char* _file_name) :
        Parser<proto::Message>(message) {
 
@@ -34,14 +34,14 @@ FileParser::FileParser(boost::shared_ptr<proto::Message> message,
     readHeader();
 }
 
-FileParser::~FileParser() {
+MessageParser::~MessageParser() {
 
     delete coded_input;
     delete raw_input;
     close(file_descriptor);
 }
 
-void FileParser::readHeader() {
+void MessageParser::readHeader() {
 
     coded_input->ReadLittleEndian32(&(log_header.log_id));
     cout << "Log ID: " << log_header.log_id << endl;
@@ -50,11 +50,11 @@ void FileParser::readHeader() {
     cout << "Birth time: " << log_header.birth_time << endl;
 }
 
-const LogHeader FileParser::getHeader() {
+const LogHeader MessageParser::getHeader() {
     return log_header;
 }
 
-shared_ptr<const proto::Message> FileParser::getNextMessage() {
+shared_ptr<const proto::Message> MessageParser::getNextMessage() {
 
     proto::uint32 size;
     uint64_t byte_count = raw_input->ByteCount();
@@ -71,7 +71,7 @@ shared_ptr<const proto::Message> FileParser::getNextMessage() {
     return current_message;
 }
 
-shared_ptr<const proto::Message> FileParser::getPrevMessage() {
+shared_ptr<const proto::Message> MessageParser::getPrevMessage() {
 
 
     raw_input->BackUp(current_size);
@@ -86,7 +86,7 @@ shared_ptr<const proto::Message> FileParser::getPrevMessage() {
 }
 
 
-void FileParser::initStreams() {
+void MessageParser::initStreams() {
 
     raw_input = new FileInputStream(file_descriptor);
     coded_input = new CodedInputStream(raw_input);

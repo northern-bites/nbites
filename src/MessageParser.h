@@ -21,15 +21,15 @@ namespace log {
 namespace proto_io = google::protobuf::io;
 namespace proto = google::protobuf;
 
-class FileParser : Parser <proto::Message>{
+class MessageParser : Parser <proto::Message>{
 
 public:
-    FileParser(boost::shared_ptr<proto::Message> message,
+    MessageParser(boost::shared_ptr<proto::Message> message,
                const char* _file_name);
-    FileParser(boost::shared_ptr<proto::Message> message,
+    MessageParser(boost::shared_ptr<proto::Message> message,
                int _file_descriptor);
 
-    ~FileParser();
+    ~MessageParser();
 
     void initStreams();
 

@@ -25,7 +25,7 @@ set( RoboImageViewer_srcs main.cpp
   colorspace.cpp
   RoboImageViewer.cpp
   window.cpp
-  FileParser.cpp
+  MessageParser.cpp
   )
 
 set(RoboImageViewer_headers colorcreator.h

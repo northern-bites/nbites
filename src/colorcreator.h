@@ -6,7 +6,7 @@
 #include "RoboImageViewer.h"
 #include "window.h"
 
-#include "FileParser.h"
+#include "MessageParser.h"
 #include "memory/protos/Sensors.pb.h"
 
 #define  NEWFRAMES
@@ -102,7 +102,7 @@ private:
     int statsYMin, statsYMax, statsUMin, statsUMax, statsVMin, statsVMax;
     int currentColor;
     bool haveFile;
-    memory::log::FileParser* fp;
+    memory::log::MessageParser* fp;
     boost::shared_ptr<memory::proto::PImage> pImage;
 };
 
