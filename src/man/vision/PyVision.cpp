@@ -3,9 +3,6 @@
 #include <boost/shared_ptr.hpp>
 using boost::shared_ptr;
 
-#include <boost/python.hpp>
-using namespace boost::python;
-using namespace std;
 
 #include "PyVision.h"
 

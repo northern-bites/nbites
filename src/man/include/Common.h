@@ -7,6 +7,8 @@
 
 #include <math.h> // for PI
 #include "NBMath.h"
+//TODO: (Octavian) THIS IS A REALLY SHITTY WAY TO ENSURE THAT THE CONFIG DEFINES
+// ARE DEFINED EVERYWHERE. BEWARE!
 #include "manconfig.h"
 #include "nameconfig.h"
 #include "visionconfig.h"
@@ -96,4 +98,21 @@ static long long micro_time (void)
 #endif
 }
 
+static long long process_micro_time(void)
+{
+    // Needed for microseconds which we convert to milliseconds
+    struct timespec tv;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tv);
+
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_nsec / 1000;
+}
+
+static long long monotonic_micro_time(void)
+{
+    // Needed for microseconds which we convert to milliseconds
+    struct timespec tv;
+    clock_gettime(CLOCK_MONOTONIC, &tv);
+
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_nsec / 1000;
+}
 #endif // Common_h_DEFINED

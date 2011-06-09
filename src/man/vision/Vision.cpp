@@ -45,8 +45,7 @@ static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
     : pose(_pose), profiler(_prof),
       yImg(&global_16_image[0]), linesDetector(profiler),
-      frameNumber(0), id(-1), name(), player(1),
-      colorTable("table.mtb")
+      frameNumber(0), colorTable("table.mtb")
 {
     // variable initialization
 
@@ -161,11 +160,6 @@ std::string Vision::getThreshColor(int _id) {
     default: return "No idea what thresh color you have, mate";
     }
 }
-
-std::string Vision::getRobotName() {
-    return name;
-}
-
 
 
 /*******************************|

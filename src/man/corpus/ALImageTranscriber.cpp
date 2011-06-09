@@ -89,7 +89,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
     : ThreadedImageTranscriber(s,synchro,"ALImageTranscriber"),
       log(), camera(), lem_name(""), camera_active(false),
       image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
-      naoImage(new uint8_t[NAO_IMAGE_BYTE_SIZE]),
+      //naoImage(new uint8_t[NAO_IMAGE_BYTE_SIZE]),
       table(new unsigned char[yLimit * uLimit * vLimit]),
       params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
 {
@@ -544,9 +544,12 @@ void ALImageTranscriber::waitForImage ()
             sensors->lockImage();
 
 #ifdef CAN_SAVE_FRAMES
-            _copy_image(ALimage->getData(), naoImage);
-            ImageAcquisition::acquire_image_fast(table, params,
-                                                 naoImage, image);
+            //uint8_t* naoImage = sensors->getNaoImage();
+//            if (naoImage != NULL) {
+                //_copy_image(ALimage->getData(), naoImage);
+            	sensors->setRawNaoImage(ALimage->getData());
+                _acquire_image_fast(table, &params, const_cast<uint8_t*>(sensors->getNaoImage()), image);
+//            }
 #else
             ImageAcquisition::acquire_image_fast(table, params,
                                                  ALimage->getData(), image);
@@ -610,7 +613,7 @@ void ALImageTranscriber::waitForImage ()
             sensors->lockImage();
             sensors->setImage(image);
 #ifdef CAN_SAVE_FRAMES
-            sensors->setNaoImage(naoImage);
+            //sensors->setNaoImage(NULL);
 #endif
             sensors->releaseImage();
         }

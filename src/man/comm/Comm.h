@@ -1,10 +1,6 @@
 #ifndef Comm_H
 #define Comm_H
 
-#if ROBOT(NAO)
-// Comment out the ENTIRE FILE if we are compiling for the Aibo
-
-
 #include <vector>
 #include <string>
 #include <pthread.h>
@@ -104,7 +100,5 @@ private:
 };
 
 bool c_init_comm(void);
-
-#endif // ROBOT(NAO) - commenting out the entire file
 
 #endif /* Comm_H */
