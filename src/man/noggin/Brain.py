@@ -272,11 +272,6 @@ class Brain(object):
         # # Update the corner information
         self.corners = self.vision.fieldLines.cornersList
 
-        for corner in self.corners:
-            print "Dist: " + str(corner.focDist) + " Bear: " + str(corner.bearing)
-
-        print "**********"
-
         self.time = time.time()
         # # Now we get the latest list of lines
         self.lines = self.vision.fieldLines.linesList
