@@ -127,63 +127,6 @@ public:
     Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr);
     virtual ~Threshold() {}
 
-    // Helper method that just returns whether the thresholded color is a
-    // green color
-    static inline const bool isGreen(unsigned char threshColor)
-        {
-			return threshColor & GREEN_BIT;
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // white color
-    static inline const bool isWhite(unsigned char threshColor)
-        {
-			return threshColor & WHITE_BIT;
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // blue color
-    static inline const bool isBlue(unsigned char threshColor)
-        {
-			return threshColor & BLUE_BIT;
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // yellow color
-    static inline const bool isYellow(unsigned char threshColor)
-        {
-			return threshColor & YELLOW_BIT;
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // orange color
-    static inline const bool isOrange(unsigned char threshColor)
-        {
-			return threshColor & ORANGE_BIT;
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // navy color
-    static inline const bool isNavy(unsigned char threshColor)
-        {
-			return threshColor & NAVY_BIT;
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // Red color
-    static inline const bool isRed(unsigned char threshColor)
-        {
-			return threshColor & RED_BIT;
-        }
-
-    // Helper method that just returns whether the thresholded color is
-    // undefined
-    static inline const bool isUndefined(unsigned char threshColor)
-        {
-			return threshColor == 0x00;
-        }
-
-
 
     // main methods
     void visionLoop();

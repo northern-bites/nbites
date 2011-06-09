@@ -39,6 +39,7 @@ public:
     void setBottom(int y) {setLeftBottomY(y); setRightBottomY(y);}
 	void setArea(int a) {area = a;}
 	void setPixels(int p) {pixels = p;}
+	void shift(int deltax, int deltay);
 
 	// GETTERS
 	point<int> getLeftTop() const {return leftTop;}

@@ -89,6 +89,7 @@ void Context::init() {
     sameHalf = false;
     face = FACING_UNKNOWN;
     objectRightX = -1;
+	objectDistance = 0.0f;
 }
 
 /**
@@ -269,8 +270,31 @@ void Context::checkForConnectedCorners(list<VisualCorner> &corners) {
 void Context::classifyT(VisualCorner & first) {
     float l1 = realLineDistance(first.getTStem());
     float l2 = realLineDistance(first.getTBar());
-    if (l1 > 2 * GOALBOX_DEPTH &&
-        (face == FACING_UNKNOWN || !sameHalf || l1 > 3 * GOALBOX_DEPTH)) {
+	if (debugIdentifyCorners) {
+		cout << "Checking T " << l1 << " " << l2 << " " <<
+			first.getDistance() << endl;
+	}
+	bool sideT = false;
+	if (!sameHalf && face != FACING_UNKNOWN) {
+		// if we are far away and the T stem is long
+		if (l1 > 2 * GOALBOX_DEPTH) {
+			sideT = true;
+		} else {
+			// if we are far away then if the T is near the goal
+			// it should be pointing relatively straight at us
+			int leftx = first.getTStem()->getLeftEndpoint().x;
+			int rightx = first.getTStem()->getRightEndpoint().x;
+			if (leftx < objectRightX && rightx > objectRightX) {
+				sideT = true;
+			} else if (rightx - leftx > IMAGE_WIDTH / 4) {
+				sideT = true;
+			} else if (first.getDistance() < FIELD_WHITE_WIDTH / 3) {
+				sideT = true;
+			}
+		}
+	}
+	if (sideT || l1 > 3 * GOALBOX_DEPTH || (face == FACING_UNKNOWN &&
+				  l1 > 2 * GOALBOX_DEPTH)) {
         if (face == FACING_BLUE_GOAL) {
             if (first.doesItPointRight()) {
                 first.setSecondaryShape(CENTER_T_BOTTOM);
@@ -705,7 +729,7 @@ void Context::classifyInnerL(VisualCorner & corner) {
     // Watch out for seeing a corner, but a part of goalbox too, but
     // the T of the goalbox is too close to edge to recognize
     // replace 70 with GREEN_PAD_X
-    if (dist < 70.0 * 2.0 && corner.getDistance() > 175) {
+    if (dist < GREEN_PAD_X * 2.0 && corner.getDistance() > 175) {
         // could indicate this is actually a corner
         // we can do this if we see a post
         // punt for now
@@ -1635,7 +1659,13 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
             // We don't want to identify corners based on posts that aren't sure
             allFieldObjects[i]->getIDCertainty() == _SURE) {
             // set field half information
-            if (allFieldObjects[i]->getDistance() < MIDFIELD_X) {
+			if (debugIdentifyCorners) {
+				cout << "checking distance to field object " <<
+					allFieldObjects[i]->getDistance() << " " <<
+					MIDFIELD_X << endl;
+			}
+			objectDistance = allFieldObjects[i]->getDistance();
+            if (objectDistance < MIDFIELD_X) {
                 sameHalf = true;
             }
             objectRightX = allFieldObjects[i]->getRightBottomX();
@@ -1655,6 +1685,7 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
             // a good distance (occluded on two sides)
             // we may not want to use the object too much, but it can help
             sameHalf = true;
+			objectDistance = 0;
             objectRightX = allFieldObjects[i]->getRightBottomX();
             objectRightY = allFieldObjects[i]->getRightBottomY();
         }
