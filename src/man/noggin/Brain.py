@@ -136,7 +136,7 @@ class Brain(object):
         #                                      Constants.VISION_YG_CROSSBAR)
 
         # Now we setup the corners and lines
-        # self.corners = []
+        self.corners = self.vision.fieldLines.cornersList
         self.lines = self.vision.fieldLines.linesList
 
         # Now we build the field objects to be based on our team color
@@ -270,7 +270,12 @@ class Brain(object):
         #self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
         # # Update the corner information
-        # self.corners = []
+        self.corners = self.vision.fieldLines.cornersList
+
+        for corner in self.corners:
+            print "Dist: " + str(corner.focDist) + " Bear: " + str(corner.bearing)
+
+        print "**********"
 
         self.time = time.time()
         # # Now we get the latest list of lines

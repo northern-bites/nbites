@@ -49,7 +49,7 @@ BOOST_PYTHON_MODULE(vision)
 
   // Currently unused, but fully avaliable to python if uncommented
   class_<VisualCrossbar>("Crossbar", no_init)
-// From VisualDetection
+    // From VisualDetection
     .def_readonly("centerX", &VisualCrossbar::getCenterX)
     .def_readonly("centerY", &VisualCrossbar::getCenterY)
     .def_readonly("width", &VisualCrossbar::getWidth)
@@ -73,6 +73,7 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("numCorners", &FieldLines::getNumCorners)
     .def_readonly("numLines", &FieldLines::getNumLines)
     .add_property("linesList", &FieldLines::getActualLines)
+    .add_property("cornersList", &FieldLines::getActualCorners)
     ;
 
   //FieldLines helper classes:/
@@ -82,7 +83,7 @@ BOOST_PYTHON_MODULE(vision)
     // True is for NoProxy, since shared_ptrs don't need one
     .def(vector_indexing_suite<std::vector<shared_ptr<VisualLine> >, true>())
     ;
-  
+
   class_<VisualLine, boost::shared_ptr<VisualLine> >("VisualLine", no_init)
     .def_readonly("angle", &VisualLine::getAngle)
     .def_readonly("avgWidth", &VisualLine::getAvgWidth)
@@ -92,7 +93,29 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("slope", &VisualLine::getSlope)
     .def_readonly("yInt", &VisualLine::getYIntercept)
     ;
-    
+
+  // FieldLines holds a list of VisualCorners (not pointers) (cornersList) 
+  class_<std::list<VisualCorner> >("CornerList")
+    .def("__iter__", boost::python::iterator<std::list<VisualCorner> >())
+    ;
+
+  class_<VisualCorner>("VisualCorner", no_init)
+    // From VisualDetection
+    .def_readonly("centerX", &VisualCorner::getCenterX)
+    .def_readonly("centerY", &VisualCorner::getCenterY)
+    .def_readonly("width", &VisualCorner::getWidth)
+    .def_readonly("height", &VisualCorner::getHeight)
+    .def_readonly("focDist", &VisualCorner::getFocDist)
+    .def_readonly("dist", &VisualCorner::getDistance)
+    .def_readonly("bearing", &VisualCorner::getBearingDeg)
+    .def_readonly("angleX", &VisualCorner::getAngleXDeg)
+    .def_readonly("angleY", &VisualCorner::getAngleYDeg)
+    .def_readonly("x", &VisualCorner::getX)
+    .def_readonly("y", &VisualCorner::getY)
+    .def_readonly("elevation", &VisualCorner::getElevationDeg)
+    ;
+
+  ///////MAIN VISION CLASS/////////  
   //noncopyable is required because vision has no public copy constructor
   class_<Vision, shared_ptr<Vision>, boost::noncopyable >("Vision", no_init)
     //make_getter provides a getter for objects not pointers
