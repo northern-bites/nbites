@@ -115,10 +115,11 @@ public:
  */
 struct PointLandmark
 {
-    PointLandmark(float _x, float _y) : x(_x), y(_y) {}
+    PointLandmark(float _x, float _y, float _angle) : x(_x), y(_y), angle(_angle) {}
     PointLandmark() {}
     float x;
     float y;
+    float angle;
     friend std::ostream& operator<< (std::ostream &o, const PointLandmark &c)
         {
             return o << c.x << " " << c.y;
@@ -131,13 +132,13 @@ struct PointLandmark
  */
 struct CornerLandmark
 {
-    CornerLandmark(float _x, float _y) : x(_x), y(_y) {}
+    CornerLandmark(float _x, float _y, float _a) : x(_x), y(_y), angle(_a) {}
     CornerLandmark() {}
     float x;
     float y;
     float angle;
     friend std::ostream& operator<< (std::ostream &o, const CornerLandmark &c) {
-        return o << c.x << " " << c.y;
+        return o << c.x << " " << c.y << " " << c.angle;
     }
 
 };
