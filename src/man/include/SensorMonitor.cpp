@@ -6,7 +6,7 @@
 #include <sstream>
 
 SensorMonitor::SensorMonitor(std::string sensorName, double low, double high, bool log)
-	:  noise(NoiseMeter<Boxcar>::ControlType(21, 21)),
+	:  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
 	   monitor(numberOfBins, low, high, log)
 {
 	SensorMonitor::sensorName = sensorName;
@@ -14,7 +14,6 @@ SensorMonitor::SensorMonitor(std::string sensorName, double low, double high, bo
 }
 
 SensorMonitor::~SensorMonitor() {
-	printf("SensorMonitor (%s) destructor\n", sensorName.c_str());
 	LogOutput();
 }
 
@@ -24,6 +23,7 @@ double SensorMonitor::X(double input) {
 	if (noise.Steady()) {
 		monitor.X(noise.Y());
 
+		// for making sure filter output is reasonable (test)
 		if (steadyAtFrame == NOT_STEADY) {
 			steadyAtFrame = SampleCount();
 		}

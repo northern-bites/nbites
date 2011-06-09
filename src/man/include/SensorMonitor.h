@@ -56,7 +56,7 @@ public:
 
 private:
 	std::string sensorName;
-	NoiseMeter<Boxcar> noise;
+	NoiseMeter<Butterworth> noise;
 	SignalMonitor monitor;
 	int steadyAtFrame;
 };

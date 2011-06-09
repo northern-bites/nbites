@@ -63,7 +63,14 @@ Sensors::Sensors ()
       colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
-      unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+	  accX_m("accX", 0, 5),
+	  accY_m("accY", 0, 5),
+	  accZ_m("accZ", 0, 5),
+	  gyrX_m("gyroX", 0, 5),
+	  gyrY_m("gyroY", 0, 5),
+	  angleX_m("angleX", 0, 5),
+	  angleY_m("angleY", 0, 5),
+	  unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
       FRM_FOLDER("/home/nao/naoqi/frames"),
 	  saving_frames_on(false)
@@ -83,6 +90,7 @@ Sensors::Sensors ()
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
 #endif
+	pthread_mutex_init(&variance_mutex, NULL);
 
     // THIS IS AN OCTAL NUMBER, must start with 0
     mkdir(FRM_FOLDER.c_str(), 0755); // permissions: u+rwx, og+rx
@@ -105,6 +113,7 @@ Sensors::~Sensors ()
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_destroy(&image_mutex);
 #endif
+    pthread_mutex_destroy(&variance_mutex);
 }
 
 const vector<float> Sensors::getBodyAngles () const
@@ -626,6 +635,7 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
     pthread_mutex_lock(&fsr_mutex);
     pthread_mutex_lock(&inertial_mutex);
     pthread_mutex_lock(&unfiltered_inertial_mutex);
+	pthread_mutex_lock(&variance_mutex);
 
     leftFootFSR = _leftFoot;
     rightFootFSR = _rightFoot;
@@ -633,6 +643,16 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
     inertial = _inertial;
     unfilteredInertial = _unfilteredInertial;
 
+	// update the variance filters
+	accX_m.X(unfilteredInertial.accX);
+	accY_m.X(unfilteredInertial.accY);
+	accZ_m.X(unfilteredInertial.accZ);
+	gyrX_m.X(unfilteredInertial.gyrX);
+	gyrY_m.X(unfilteredInertial.gyrY);
+	angleX_m.X(unfilteredInertial.angleX);
+	angleY_m.X(unfilteredInertial.angleY);
+
+	pthread_mutex_unlock(&variance_mutex);
     pthread_mutex_unlock(&unfiltered_inertial_mutex);
     pthread_mutex_unlock(&inertial_mutex);
     pthread_mutex_unlock(&fsr_mutex);
@@ -815,6 +835,22 @@ void Sensors::stopSavingFrames()
 bool Sensors::isSavingFrames() const
 {
     return saving_frames_on;
+}
+
+// tells our sensor monitors to dump their data to /tmp/
+void Sensors::writeVarianceData() {
+	pthread_mutex_lock(&variance_mutex);
+
+	cout << "Logging variance data to /tmp/" << endl;
+	accX_m.LogOutput();
+	accY_m.LogOutput();
+	accZ_m.LogOutput();
+	gyrX_m.LogOutput();
+	gyrY_m.LogOutput();
+	angleX_m.LogOutput();
+	angleY_m.LogOutput();
+
+	pthread_mutex_unlock(&variance_mutex);
 }
 
 // @TODO move this to Transcriber to write out from full size image...

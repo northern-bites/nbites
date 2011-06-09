@@ -25,10 +25,10 @@
 #include <pthread.h>
 #include <stdint.h>
 
-
 #include "SensorDef.h"
 #include "NaoDef.h"
 #include "VisionDef.h"
+#include "SensorMonitor.h"
 
 enum SupportFoot {
     LEFT_SUPPORT = 0,
@@ -192,12 +192,15 @@ class Sensors {
     void releaseVisionAngles();
 
     // Save a vision frame with associated sensor data
-    void saveFrame(void);
+    void saveFrame();
     void loadFrame(std::string path);
-    void resetSaveFrame(void);
-	void startSavingFrames(void);
-	void stopSavingFrames(void);
+    void resetSaveFrame();
+	void startSavingFrames();
+	void stopSavingFrames();
 	bool isSavingFrames() const;
+
+	// writes data collected by SensorMonitors to /tmp/
+	void writeVarianceData();
 
  private:
 
@@ -217,6 +220,7 @@ class Sensors {
     mutable pthread_mutex_t support_foot_mutex;
     mutable pthread_mutex_t battery_mutex;
     mutable pthread_mutex_t image_mutex;
+    mutable pthread_mutex_t variance_mutex;
 
     // Joint angles and sensors
     // Make the following distinction: bodyAngles is a vector of the most current
@@ -253,6 +257,9 @@ class Sensors {
      * Stuff below is not logged to vision frames or sent over the network to
      * TOOL.
      */
+
+	// Sensor variance/health monitors
+	SensorMonitor accX_m, accY_m, accZ_m, gyrX_m, gyrY_m, angleX_m, angleY_m;
 
     Inertial unfilteredInertial;
     //ChestButton

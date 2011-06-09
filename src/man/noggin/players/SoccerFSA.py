@@ -22,7 +22,17 @@ class SoccerFSA(FSA.FSA):
         self.stateChangeColor = 'red'
         self.setPrintFunction(self.brain.out.printf)
 
+        # for writing variance data every time we enter gamePenalized
+        self.wroteVarianceData = false
+
     def run(self):
+        if self.currentState == 'gamePenalized':
+            if not self.wroteVarianceData:
+                self.brain.sensors.writeVarianceData
+            self.wroteVarianceData = true
+        else:
+            self.wroteVarianceData = false
+
         FSA.FSA.run(self)
 
     def executeMove(self,sweetMove):
