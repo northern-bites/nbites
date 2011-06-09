@@ -1,6 +1,6 @@
 #include "coloredit.h"
 
-ColorEdit::ColorEdit(Colors c1, RoboImage r1, QWidget *parent) :
+ColorEdit::ColorEdit(Colors c1, YUVImage r1, QWidget *parent) :
     color(c1),
     r(r1),
     QWidget(parent)

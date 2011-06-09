@@ -1,5 +1,5 @@
-#ifndef ROBOIMAGE_H
-#define ROBOIMAGE_H
+#ifndef OldRoboImage_H
+#define OldRoboImage_H
 
 #include <QGraphicsItem>
 #include <QString>
@@ -9,10 +9,10 @@
 #include <QTextStream>
 #include <QFile>
 #include <QPainter>
-#include "colorspace.h"
+#include "Image/ColorSpace.h"
 #include "colorzone.h"
 
-class RoboImage
+class OldRoboImage
 {
 public:
     enum DisplayModes
@@ -30,7 +30,7 @@ public:
     } display;
 
 public:
-    RoboImage(int wd, int ht);
+    OldRoboImage(int wd, int ht);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void read(QString filename);
@@ -63,4 +63,4 @@ private:
     int** vImg;
 };
 
-#endif // ROBOIMAGE_H
+#endif // OldRoboImage_H

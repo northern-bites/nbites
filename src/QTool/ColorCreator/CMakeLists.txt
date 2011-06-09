@@ -20,16 +20,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 
 set( ColorCreator_srcs
   colorcreator.cpp
-  roboimage.cpp
-  colorspace.cpp
   colorzone.cpp
   coloredit.cpp
   colortable.cpp
   stats.cpp )
 
 set(ColorCreator_headers colorcreator.h
-    roboimage.h
-    colorspace.h
     colorzone.h
     coloredit.h
     colortable.h
@@ -56,6 +52,6 @@ add_library(ColorCreator ${ColorCreator_srcs}
 #    ${helloworld_RESOURCES_RCC})
 
 target_link_libraries(
-  ColorTool
+  ColorCreator
   ${QT_LIBRARIES}
   )

@@ -1,5 +1,5 @@
 #include <QtGui/QApplication>
-#include "colorcreator.h"
+#include "ColorCreator/colorcreator.h"
 
 int main(int argc, char *argv[])
 {

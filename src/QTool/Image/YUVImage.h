@@ -41,6 +41,10 @@ public:
     int getRed(int x, int y) const;
     int getGreen(int x, int y) const;
     int getBlue(int x, int y) const;
+    int getH(int x, int y) const;
+    int getS(int x, int y) const;
+    int getZ(int x, int y) const;
+
 
 protected:
     const RoboImage* roboImage;

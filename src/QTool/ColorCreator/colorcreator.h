@@ -2,7 +2,9 @@
 #define COLORCREATOR_H
 
 #include <QWidget>
-#include "roboimage.h"
+#include "Image/YUVImage.h"
+#include "man/memory/RoboImage.h"
+#include "man/memory/parse/ImageParser.h"
 #include "coloredit.h"
 #include "colortable.h"
 #define  NEWFRAMES
@@ -117,7 +119,10 @@ private slots:
 
 private:
     Ui::ColorCreator *ui;
-    RoboImage roboimage;
+    //TODO: fix the namings here ASAP! - Octavian
+    RoboImage* image;
+    YUVImage roboimage;
+    memory::parse::ImageParser* imageParser;
     ColorTable *table;
     QString baseDirectory;
     QString currentDirectory;

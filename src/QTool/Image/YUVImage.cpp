@@ -118,3 +118,21 @@ int YUVImage::getBlue(int x, int y) const {
 	c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
 	return c.getBb();
 }
+
+int YUVImage::getH(int x, int y) const {
+    ColorSpace c;
+    c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
+    return c.getHb();
+}
+
+int YUVImage::getS(int x, int y) const {
+    ColorSpace c;
+    c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
+    return c.getSb();
+}
+
+int YUVImage::getZ(int x, int y) const {
+    ColorSpace c;
+    c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
+    return c.getZb();
+}

@@ -1,6 +1,6 @@
-#include "roboimage.h"
+#include "OldRoboImage.h"
 
-RoboImage::RoboImage(int wd, int ht)
+OldRoboImage::OldRoboImage(int wd, int ht)
 {
     width = wd;
     height = ht;
@@ -14,7 +14,7 @@ RoboImage::RoboImage(int wd, int ht)
     }
 }
 
-void RoboImage::read(QString filename)
+void OldRoboImage::read(QString filename)
 {
     QFile file(filename);
     QTextStream out(stdout);
@@ -62,55 +62,55 @@ void RoboImage::read(QString filename)
     }
     file.close();
 }
-QImage RoboImage::fast()
+QImage OldRoboImage::fast()
 {
     ColorZone cz();
     return bmp();
 }
 
-int RoboImage::getRed(int x, int y)
+int OldRoboImage::getRed(int x, int y)
 {
     ColorSpace c;
     c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
     return c.getRb();
 }
 
-int RoboImage::getGreen(int x, int y)
+int OldRoboImage::getGreen(int x, int y)
 {
     ColorSpace c;
     c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
     return c.getGb();
 }
 
-int RoboImage::getBlue(int x, int y)
+int OldRoboImage::getBlue(int x, int y)
 {
     ColorSpace c;
     c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
     return c.getBb();
 }
 
-int RoboImage::getH(int x, int y)
+int OldRoboImage::getH(int x, int y)
 {
     ColorSpace c;
     c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
     return c.getHb();
 }
 
-int RoboImage::getS(int x, int y)
+int OldRoboImage::getS(int x, int y)
 {
     ColorSpace c;
     c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
     return c.getSb();
 }
 
-int RoboImage::getZ(int x, int y)
+int OldRoboImage::getZ(int x, int y)
 {
     ColorSpace c;
     c.setYuv(yImg[x][y], uImg[x][y], vImg[x][y]);
     return c.getZb();
 }
 
-QImage RoboImage::bmp()
+QImage OldRoboImage::bmp()
 {
     QImage img(width, height, QImage::Format_RGB32);
     img.fill(0);

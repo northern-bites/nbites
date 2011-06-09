@@ -32,7 +32,8 @@ set(QTool_headers
 #SET(QTool_resources images.qrc)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
-                    ${PROTOBUF_INCLUDE_DIRS})
+                    ${PROTOBUF_INCLUDE_DIRS}
+                    .)
 
 ############ Qt4 goodness
 
@@ -51,6 +52,7 @@ find_library(PARSE_LIB parse ${MAN_STRAIGHT_BUILD}/memory/parse)
 
 ######### Subdirectory compilation
 add_subdirectory( Image )
+add_subdirectory( ColorCreator )
 
 ######### The executable
 

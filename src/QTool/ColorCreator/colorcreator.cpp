@@ -9,12 +9,13 @@
 #include <QRgb>
 #include <QImage>
 #include <QPixmap>
+#include <boost/shared_ptr.hpp>
 
 ColorCreator::ColorCreator(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ColorCreator),
-    roboimage(WIDTH, HEIGHT)
-
+    image(new RoboImage()),
+    roboimage(image)
 {
     img = new QImage(640, 480, QImage::Format_RGB32);
     img2 = new QImage(320, 240, QImage::Format_RGB32);
@@ -642,27 +643,27 @@ void ColorCreator::on_pushButton_clicked()
 {
     currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
                                             currentDirectory,
-                                            tr("Image Files (*.frm)"));
-    roboimage.read(currentDirectory);
-    int last = currentDirectory.lastIndexOf("/");
-    int period = currentDirectory.lastIndexOf(".") - last - 1;
-    QString temp = currentDirectory.mid(last+1, period);
-    bool ok;
-    currentFrameNumber = temp.toInt(&ok, 10);
-    currentDirectory.chop(currentDirectory.size() - last);
+                                            tr("Image Files (*.log)"));
+    imageParser= new memory::parse::ImageParser(
+            boost::shared_ptr<RoboImage> (image),
+            currentDirectory.toStdString().data());
+    imageParser->getNext();
+    roboimage.updateFromRoboImage();
     updateDisplays();
 }
 
 void ColorCreator::on_previousButton_clicked()
 {
-    roboimage.read(previousFrame);
+    //roboimage.read(previousFrame);
     currentFrameNumber--;
     updateDisplays();
 }
 
 void ColorCreator::on_nextButton_clicked()
 {
-    roboimage.read(nextFrame);
+    //roboimage.read(nextFrame);
+    imageParser->getNext();
+    roboimage.updateFromRoboImage();
     currentFrameNumber++;
     updateDisplays();
 }
@@ -942,14 +943,14 @@ void ColorCreator::on_writeNew_clicked()
 
 void ColorCreator::on_plusTen_clicked()
 {
-    roboimage.read(tenthFrame);
+    //roboimage.read(tenthFrame);
     currentFrameNumber += 10;
     updateDisplays();
 }
 
 void ColorCreator::on_minusTen_clicked()
 {
-    roboimage.read(minusTenthFrame);
+    //roboimage.read(minusTenthFrame);
     currentFrameNumber -= 10;
     updateDisplays();
 }
