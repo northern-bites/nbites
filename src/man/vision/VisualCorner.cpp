@@ -72,6 +72,7 @@ void VisualCorner::determineCornerShape() {
         tStem = line2;
         setID(T_CORNER);
         setTOrientation();
+        physicalOrientation = getTPhysicalOrientation();
     } else if(Utility::tValueInMiddleOfLine(t2, line2->getLength(),
                                             max(line1->getAvgWidth(),
                                                 MIN_EXTEND_DIST))) {
@@ -80,6 +81,7 @@ void VisualCorner::determineCornerShape() {
         tStem = line1;
         setID(T_CORNER);
         setTOrientation();
+        physicalOrientation = getTPhysicalOrientation();
     } else {
         // Temporary side effect - set angleBetweenLines
         cornerType = getLClassification();
@@ -275,7 +277,7 @@ const shape VisualCorner::getLClassification() {
  * See documentation for VisualCorner::physicalOrientation
  * variable. Determines the value for L corners.
  */
-double VisualCorner::getLPhysicalOrientation()
+float VisualCorner::getLPhysicalOrientation()
 {
     // Get line endpoints
     point<int> line1End = Utility::getPointFartherFromCorner(*line1, x, y);
@@ -287,27 +289,41 @@ double VisualCorner::getLPhysicalOrientation()
                                        line1End,
                                        line2End) ? line2End : line1End;
 
-    estimate endPt = pose->pixEstimate(leftEnd.x, leftEnd.y, 0);
+    return getLinePhysicalOrientation(leftEnd);
+}
+
+float VisualCorner::getTPhysicalOrientation()
+{
+    point<int> stemEnd = getTStemEndpoint();
+    return getLinePhysicalOrientation(stemEnd);
+}
+
+/**
+ * @return Orientation of line on the ground from 0-2pi radians (right
+ *         hand rule)
+ */
+float VisualCorner::getLinePhysicalOrientation(point<int> end)
+{
+    estimate endPt = pose->pixEstimate(end.x, end.y, 0);
 
     // Use angles to determine orientation
-    double i = distance * cos(bearing) - endPt.dist * cos(endPt.bearing);
-    double j = distance * sin(bearing) - endPt.dist * sin(endPt.bearing);
+    //
+    // Make the coordinate frame point at the corner by subtracting
+    // the bearings. This makes the operation independent of the
+    // robot's direction.
+    float x = distance - endPt.dist * cosf(endPt.bearing - bearing);
+    float y = - endPt.dist * sinf(endPt.bearing - bearing);
 
-    double legLength = hypot(i,j);
+    float legLength = hypotf(x,y);
 
-    double cosBearing, sinBearing;
-    sincos(bearing, &sinBearing, &cosBearing);
-
-    // Dot product of us->intersect and leftEnd->intersect
-    double dot = distance * (cosBearing * i + sinBearing * j);
-
-    double orientationCos = dot/(distance * legLength);
+    // Adjacent over hypotenuse
+    // "That's just the definition of cosine" - Yoni
+    float orientationCos = x/legLength;
 
     // -sign(j) gives us the signed orientation depending on direction
     // of vector
-    return -copysign(1,j) * acos(orientationCos);
+    return -copysign(1,y) * acos(orientationCos);
 }
-
 
 /**
  * Use the ID and shape of the corner to help narrow down IDs for

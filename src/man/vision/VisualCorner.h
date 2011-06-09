@@ -106,7 +106,9 @@ public:
 
 private: // private methods
     const shape getLClassification();
-    double getLPhysicalOrientation();
+    float getLPhysicalOrientation();
+    float getTPhysicalOrientation();
+    float getLinePhysicalOrientation(point<int> end);
 
     void IDFromLine(const boost::shared_ptr<VisualLine> line);
 
