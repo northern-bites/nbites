@@ -84,6 +84,7 @@ BOOST_PYTHON_MODULE(vision)
   class_<VisualLine, boost::shared_ptr<VisualLine> >("VisualLine", no_init)
     .def_readonly("angle", &VisualLine::getAngle)
     .def_readonly("avgWidth", &VisualLine::getAvgWidth)
+    // Fix that this is in rads!
     .def_readonly("bearing", &VisualLine::getBearing)
     .def_readonly("dist", &VisualLine::getDistance)
     .def_readonly("length", &VisualLine::getLength)
@@ -98,10 +99,6 @@ BOOST_PYTHON_MODULE(vision)
 
   class_<VisualCorner>("VisualCorner", no_init)
     // From VisualDetection
-    .def_readonly("centerX", &VisualCorner::getCenterX)
-    .def_readonly("centerY", &VisualCorner::getCenterY)
-    .def_readonly("width", &VisualCorner::getWidth)
-    .def_readonly("height", &VisualCorner::getHeight)
     .def_readonly("dist", &VisualCorner::getDistance)
     .def_readonly("bearing", &VisualCorner::getBearingDeg)
     .def_readonly("angleX", &VisualCorner::getAngleXDeg)

@@ -13,29 +13,45 @@ class FieldLines:
 
     def updateLines(self, visionInfos):
         self.numLines = visionInfos.numLines
-        self.lines = visionInfos.linesList
+        # Lists are wiped every time vision loop executes
+        self.lines = []
+        for line in visionInfos.linesList:
+            self.lines.append(Line(line))
 
     def updateCorners(self, visionInfos):
         self.numCorners = visionInfos.numCorners
-        self.corners = visionInfos.cornersList
+        # Lists are wiped every time vision loop executes
+        self.corners = []
+        for corner in visionInfos.cornersList:
+            self.corners.append(Corner(corner))
+
+#Lines and corners are only created, not updated
 
 class Line:
 
     def __init__(self, visionLine):
-        self.dist = 0
-        
-        self.updateVision
-
-    def updateVision(self, visionLine):
+        self.angle = visionLine.angle
+        self.width = visionLine.avgWidth
+        self.bearing = visionLine.bearing
         self.dist = visionLine.dist
+        self.length = visionLine.length
+        self.slope = visionLine.slope
+        self.yInt = visionLine.yInt
 
+    def __str__(self):
+        return "Line with angle " + str(self.angle) + " width " + str(self.width) + " bearing " + str(self.bearing) + " dist " + str(self.dist) + " length " + str(self.length) + " slope " + str(self.slope) + " yInt " + str(self.yInt) + "."
+        
 class Corner:
 
     def __init__(self, visionCorner):
-        self.dist = 0
-        
-        self.updateVision
-
-    def updateVision(self, visionCorner):
         self.dist = visionCorner.dist
+        self.bearing = visionCorner.bearing
+        self.angleX = visionCorner.angleX
+        self.angleY = visionCorner.angleY
+        self.x = visionCorner.x
+        self.y = visionCorner.y
+        self.elevation = visionCorner.elevation
+        
+    def __str__(self):
+        return "Corner with dist " + str(self.dist) + " bearing " + str(self.bearing) + " angleX " + str(self.angleX) + " angleY " + str(self.angleY) + " x " + str(self.x) + " y " + str(self.y) + " elevation " + str(self.elevation) + "."
         
