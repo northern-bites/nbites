@@ -27,14 +27,15 @@ void staticSendCommands(NaoEnactor * n) {
     n->sendCommands();
 }
 
-NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
+NaoEnactor::NaoEnactor(boost::shared_ptr<Profiler> p,
+                       boost::shared_ptr<Sensors> s,
                        boost::shared_ptr<Transcriber> t,
                        AL::ALPtr<AL::ALBroker> _pbroker)
     : MotionEnactor(), broker(_pbroker), sensors(s),
       transcriber(t),
       motionValues(Kinematics::NUM_JOINTS,0.0f),  // commands sent to joints
-      lastMotionHardness(Kinematics::NUM_JOINTS,0.0f)
-
+      lastMotionHardness(Kinematics::NUM_JOINTS,0.0f),
+      profiler(p)
 {
     try {
         dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
@@ -57,6 +58,7 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
 
 void NaoEnactor::sendCommands(){
 
+    PROF_ENTER(profiler.get(), P_DCM);
     if(!switchboard){
         if(switchboardSet)
             cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
@@ -150,6 +152,7 @@ void NaoEnactor::postSensors(){
     //We only want the switchboard to start calculating new joints once we've
     //updated the latest sensor information into Sensors
     switchboard->signalNextFrame();
+    PROF_EXIT(profiler.get(), P_DCM);
 }
 
 /**

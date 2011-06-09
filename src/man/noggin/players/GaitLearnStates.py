@@ -77,6 +77,9 @@ def gamePlaying(player):
       player.brain.fallController.executeStandup = False
       player.brain.fallController.enabled = False
 
+      # robots that talk are annoying
+      player.brain.speech.disable()
+
       startPSO(player)
 
    return player.goLater('stopChangeGait')
