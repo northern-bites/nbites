@@ -274,7 +274,7 @@ void Threshold::runs() {
  */
 
 void Threshold::findGoals(int column, int topEdge) {
-    const int BADSIZE = 5;
+    const int BADSIZE = 10;
 	const int GAP = 25;
     // scan up for goals
     int bad = 0, blues = 0, yellows = 0, pinks = 0;

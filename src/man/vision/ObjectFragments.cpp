@@ -596,6 +596,42 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
     }
 
     int qs = pickNth(values, WHICH, NUMSCANS);
+  if (qs == 0) {
+	  // reset in case our edge is too far out
+	  int qx = left.x + shortSpan;
+	  int qy = yProject(left.x, right.y, qx);
+	  for (int i = 0; i < NUMSCANS; i++) {
+		  bool found = false;
+		  values[i] = 0;
+		  int tempx = qx;
+		  int tempy = qy;
+		  while (!found) {
+			  if (Utility::colorsEqual(color,
+									   thresh->getThresholded(tempy, tempx))) {
+				  found = true;
+			  } else {
+				  values[i]++;
+			  }
+			  tempy -=dir;
+			  tempx = xProject(tempx, tempy - dir, tempy);
+			  if (tempx < 0 || tempx >= IMAGE_WIDTH || tempy < 0 ||
+															   tempy >= IMAGE_HEIGHT ||
+					  values[i] > 15) {
+				  found = true;
+			  }
+		  }
+		  // set up the next scan
+		  qx += shortSpan;
+		  qy = yProject(left.x, left.y, qx);
+	  }
+	  qs = pickNth(values, 2, NUMSCANS);
+	  if (qs > 0) {
+		  if (CORRECT) {
+			  cout << "Squeezing horizontally" << qs << " " << dir << endl;
+		  }
+	  }
+	  dir = -dir;
+  }
     // reset the edge
     int te = left.y;
     left.y = left.y + dir * qs;
@@ -1685,6 +1721,8 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 
     int largel = 0;
     int larger = 0;
+	int indexr = 0;
+	int indexl = 0;
     int mind = min(100, height / 2 + (right - left) / 2);
     for (int i = 0; i < numberOfRuns; i++) {
         int nextX = runs[i].x;
@@ -1698,25 +1736,50 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
             if (nextX < left - mind) {
                 if (nextH > largel) {
                     largel = nextH;
+					indexl = i;
                 }
             } else if (nextX > right + mind) {
                 if (nextH > larger) {
                     larger = nextH;
+					indexr = i;
                 }
             }
         }
     }
     if ((larger > height / 2 || larger > MIN_OTHER_THRESHOLD) && larger >
         largel) {
-        if (POSTLOGIC) {
-            cout << "Larger " << left << " " << right << " " << larger << endl;
-        }
-        return LEFT;
+		// watch out for tiny swatches
+		int count = 0;
+		for (int i = indexr + 1; i < numberOfRuns && runs[i].x - runs[i-1].x < 3;
+			 i++) {
+			count++;
+		}
+		for (int i = indexr - 1; i >= 0 && runs[i+1].x - runs[i].x < 3; i++) {
+			count++;
+		}
+		if (count > 4) {
+			if (POSTLOGIC) {
+				cout << "Larger " << left << " " << right << " " << larger <<
+					" " << count << endl;
+			}
+			return LEFT;
+		}
     } else if (largel > MIN_OTHER_THRESHOLD || largel > height / 2) {
-        if (POSTLOGIC) {
-            cout << "Largel " << left << " " << right << " " << largel << endl;
-        }
-        return RIGHT;
+		int count = 0;
+		for (int i = indexl + 1; i < numberOfRuns && runs[i].x - runs[i-1].x < 3;
+			 i++) {
+			count++;
+		}
+		for (int i = indexl - 1; i >= 0 && runs[i+1].x - runs[i].x < 3; i++) {
+			count++;
+		}
+		if (count > 4) {
+			if (POSTLOGIC) {
+				cout << "Largel " << left << " " << right << " " << largel <<
+					" " << count << endl;
+			}
+			return RIGHT;
+		}
     }
     if (POSTLOGIC) {
         cout << "Large R " << larger << " " << largel << " " << endl;
@@ -1816,7 +1879,7 @@ bool ObjectFragments::isPostReasonableSizeShapeAndPlace(Blob post) {
     int fakeBottom = max(post.getBottom(), horizonLeft);
     // do some sanity checking - this one makes sure the blob is ok
     if (!locationOk(post)) {
-        if (POSTLOGIC)
+        if (POSTDEBUG)
             cout << "Bad location on post" << endl;
         return false;
     }
@@ -2151,6 +2214,11 @@ bool ObjectFragments::postBigEnough(Blob b) {
         return false;
     }
     if (b.height() < MIN_GOAL_HEIGHT) {
+		// before tossing it, check for occlusion
+		int gap = horizonAt(b.getLeft()) - b.getBottom();
+		if (b.height() + gap > MIN_GOAL_HEIGHT) {
+			return true;
+		}
         if (b.getTop() > 5) {
             return false;
         }
@@ -2204,13 +2272,23 @@ bool ObjectFragments::badDistance(Blob b) {
             return true;
         }
 		if (vision->pose->getHorizonY(0) < -100 && color == BLUE_BIT &&
-			choose > 200.0f) {
+			(choose > 200.0f || choose > 2 * diste)) {
 			if (POSTDEBUG) {
 				cout << "Throwing away questionable blue post" <<
 					choose << " " << diste << " " <<
 					vision->pose->getHorizonY(0) << endl;
 			}
 			return true;
+		}
+		if (b.getTop() > IMAGE_HEIGHT / 3 && diste < 100.0f) {
+			if (POSTDEBUG) {
+				cout << "Close post, but in bottom of image " << diste << endl;
+			}
+			return true;
+		}
+		if (POSTDEBUG) {
+			cout << "Distance estimates pix first: " << diste << " " <<
+				choose << endl;
 		}
 
     }
@@ -2253,6 +2331,12 @@ bool ObjectFragments::locationOk(Blob b)
         }
         return false;
     }
+	if (trueTop > mh) {
+		if (SANITY) {
+			cout << "Top was less than horizon " << trueTop << " " << mh << endl;
+		}
+		return false;
+	}
     if (!horizonBottomOk(spanX, spanY, mh, trueLeft, trueRight, trueBottom,
                          trueTop)) {
         if (!greenCheck(b) || mh - trueBottom > spanY || spanX < MIN_WIDTH ||
@@ -2263,6 +2347,7 @@ bool ObjectFragments::locationOk(Blob b)
                 if (SANITY) {
                     cout << "Screening blob for bottom reasons" << endl;
                     printBlob(b);
+					drawBlob(b, RED);
                 }
                 return false;
             }
@@ -2309,10 +2394,10 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight,
             return false;
         }
     }
-    if (bottom + BOTTOM_FUDGE_FACTOR + min(spanX, ALLOWANCE_DUE_TO_WIDTH) <
-        minHeight) {
+    if (bottom + BOTTOM_FUDGE_FACTOR + 5 * spanX < minHeight) {
         if (SANITY) {
-            cout << "Bad height" << endl;
+            cout << "Bad height " << bottom << " " << spanX <<
+				" " << minHeight << endl;
         }
         return false;
     }
