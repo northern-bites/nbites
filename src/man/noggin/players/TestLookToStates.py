@@ -19,78 +19,78 @@ def standup(player):
     player.gainsOn()
     if player.firstFrame():
         player.standup()
-    return player.goLater('lookRightClose')
+    return player.goLater('lookRightBackNear')
 
 # alternate testing path
 
-def lookRight2(player):
+def lookRightBackNear(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(1000,-500,0)
+    brain.tracker.lookToPoint(-200,-200,0)
 
     if player.counter == 30:
         player.brain.tracker.stopHeadMoves()
-        return player.goLater('lookRight1')
+        return player.goLater('lookRightBackFar')
     return player.stay()
 
-def lookRight1(player):
+def lookRightBackFar(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(1000,-250,0)
+    brain.tracker.lookToPoint(-200,-2000,0)
 
     if player.counter == 30:
         player.brain.tracker.stopHeadMoves()
-        return player.goLater('lookCenterLong1')
+        return player.goLater('lookCenter')
     return player.stay()
 
-def lookCenterLong1(player):
+def lookCenterRight(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(1000,0,0)
+    brain.tracker.lookToPoint(2000,-800,0)
 
     if player.counter == 30:
         player.brain.tracker.stopHeadMoves()
-        return player.goLater('lookCenterShort')
+        return player.goLater('lookCenter')
     return player.stay()
 
-def lookCenterShort(player):
+def lookCenter(player):
     brain = player.brain
-    brain.tracker.lookToPoint(200,0,0)
+    brain.tracker.lookToPoint(5000,0,0)
     if player.counter == 30:
         player.brain.tracker.stopHeadMoves()
-        return player.goLater('lookCenterLong2')
+        return player.goLater('done')
     return player.stay()
 
-def lookCenterLong2(player):
-    brain = player.brain
-    my = brain.my
-
-    brain.tracker.lookToPoint(1000,0,0)
-
-    if player.counter == 30:
-        player.brain.tracker.stopHeadMoves()
-        return player.goLater('lookLeft1')
-    return player.stay()
-
-def lookLeft1(player):
+def lookCenterLeft(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(1000,250,0)
+    brain.tracker.lookToPoint(2000,800,0)
 
     if player.counter == 30:
         player.brain.tracker.stopHeadMoves()
-        return player.goLater('lookLeft2')
+        return player.goLater('lookLeftBackFar')
     return player.stay()
 
-def lookLeft2(player):
+def lookLeftBackFar(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(1000,500,0)
+    brain.tracker.lookToPoint(-200,600,0)
+
+    if player.counter == 30:
+        player.brain.tracker.stopHeadMoves()
+        return player.goLater('lookLeftBackNear')
+    return player.stay()
+
+def lookLeftBackNear(player):
+    brain = player.brain
+    my = brain.my
+
+    brain.tracker.lookToPoint(-200,200,0)
 
     if player.counter == 30:
         player.brain.tracker.stopHeadMoves()

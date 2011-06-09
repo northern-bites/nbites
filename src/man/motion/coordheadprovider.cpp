@@ -95,6 +95,12 @@ void CoordHeadProvider::coordMode(){
     const float pitchChangeTarget = NBMath::clip(pitchDest - lastPitchDest,
                                                  -pitchMaxSpeed,
                                                  pitchMaxSpeed);
+
+    //avoid colliding with shoulder pads at very negative pitch values
+    if (lastYawDest < -3.5 || lastYawDest > 3.5) {
+      pitchChangeTarget = clip(pitchChangeTarget, -4.5-lastPitchDest, pitchChangeTarget);
+    }
+
 #ifdef DEBUG_HEADPROVIDER
      cout << "Last values "<<endl
           <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
@@ -142,9 +148,9 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
   //clip dest and maxVel values to safe limits
   //these limits are currently pretty arbitrary
   yawDest = clip(yawDest, 1.5);
-  pitchDest = clip(pitchDest, -6.5, .5);
-  yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*.3);
-  pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.3);
+  pitchDest = clip(pitchDest, -6, .5);
+  yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*.35);
+  pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.35);
 
   setActive();
   pthread_mutex_unlock(&coord_head_provider_mutex);
