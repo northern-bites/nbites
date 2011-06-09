@@ -122,9 +122,9 @@ void CoordHeadProvider::coordMode(){
 void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
   pthread_mutex_lock(&coord_head_provider_mutex);
   transitionTo(COORD);
-  float relY = command->getRelY()-pose->getFocalPointInWorldFrameY()/10;//adjust from mm to cm
-  float relX = command->getRelX()-pose->getFocalPointInWorldFrameX()/10;
-  float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()/10-30;//adjust for robot center's distance above ground
+  float relY = command->getRelY()-pose->getFocalPointInWorldFrameY();//adjust from mm to cm
+  float relX = command->getRelX()-pose->getFocalPointInWorldFrameX();
+  float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()-300;//adjust for robot center's distance above ground
   yawDest = atan(relY/relX);
   float hypoDist = sqrt(pow(relY,2)+pow(relX,2));
   pitchDest = atan(relZ/hypoDist)-CAMERA_ANGLE;//constant for lower camera
@@ -134,13 +134,13 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
   //clip dest and maxVel values to safe limits
   //these limits are currently pretty arbitrary
   yawDest = clip(yawDest, 1.5);
-  pitchDest = clip(pitchDest, -6.5, .5);
+  pitchDest = clip(pitchDest, -.65, .5);
   yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*.35);
   pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.35);
 
   setActive();
-  /* ** */cout <<"looking at yaw:  "<<yawDest<<"  and pitch: "<<pitchDest<<endl;
-  /* ** */cout <<"currently at:   "<<lastYawDest<<"   "<<lastPitchDest<<endl;
+  /* ** *///cout <<"looking at yaw:  "<<yawDest<<"  and pitch: "<<pitchDest<<endl;
+  /* ** *///cout <<"currently at:   "<<lastYawDest<<"   "<<lastPitchDest<<endl;
   /* ** *///cout <<"relative position: "<<command->getRelX()<<"  "<<command->getRelY()<<"  "<<command->getRelZ()<<endl;
   /* ** *///cout <<"adjusted position: "<<relX<<"  "<<relY<<"  "<<relZ<<endl;
   pthread_mutex_unlock(&coord_head_provider_mutex);
