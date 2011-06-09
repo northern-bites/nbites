@@ -114,7 +114,7 @@ void MotionSwitchboard::stop() {
  * takes too long, the enactor will send old joints.
  */
 void MotionSwitchboard::run() {
-    static int fcount = 0;
+    frameCount = 0;
 
     //IMPORTANT Before anything else happens we need to put the correct
     //angles into sensors->motionBodyAngles:
@@ -145,7 +145,7 @@ void MotionSwitchboard::run() {
         pthread_mutex_lock(&calc_new_joints_mutex);
         pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
         pthread_mutex_unlock(&calc_new_joints_mutex);
-        fcount++;
+        frameCount++;
     }
     cout << "Switchboard run has exited" <<endl;
 }

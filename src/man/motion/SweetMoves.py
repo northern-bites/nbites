@@ -85,9 +85,9 @@ GOALIE_POS = ((INITIAL_POS[0][0],
 
 #KICKS
 def DREW_KICK(y,dist):
-    if y<=0:
+    if y<0:
         return mirrorMove(LEFT_D_KICK(-1*y,dist))
-    elif y>0:
+    elif y>=0:
         return LEFT_D_KICK(y,dist)
 
 
