@@ -7,6 +7,8 @@
 
 #include <math.h> // for PI
 #include "NBMath.h"
+//TODO: (Octavian) THIS IS A REALLY SHITTY WAY TO ENSURE THAT THE CONFIG DEFINES
+// ARE DEFINED EVERYWHERE. BEWARE!
 #include "manconfig.h"
 #include "nameconfig.h"
 #include "visionconfig.h"
