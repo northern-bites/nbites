@@ -19,6 +19,8 @@ def chase(player):
     # Check in order of importance
     if transitions.shouldScanFindBall(player):
         return player.goNow('scanFindBall')
+    elif transitions.shouldKickOff(player):
+        return player.goNow('kickOff')
     elif transitions.shouldStopBeforeKick(player):
         return player.goNow('stopBeforeKick')
     elif transitions.shouldPositionForKick(player):
@@ -212,6 +214,17 @@ def positionForKick(player):
         player.brain.nav.kickPosition(kick)
 
     return player.stay()
+
+def kickOff(player):
+    """
+    Perform special behavior when we are kicking off
+    """
+    # Hard coded constant (3) since when we switch to 4 field players,
+    # this won't be the case anymore.
+    smallTeam = player.brain.playbook.pb.numActiveFieldPlayers < 3
+    player.brain.kickDecider.setKickOff(smallTeam)
+
+    return player.goNow('positionForKick')
 
 def dribble(player):
     """
