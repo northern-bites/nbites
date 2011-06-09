@@ -11,9 +11,9 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "YUVImage.h"
-#include "RoboImageViewer.h"
-#include "ImageParser.h"
+#include "man/memory/RoboImage.h"
+#include "Image/RoboImageViewer.h"
+#include "man/memory/parse/ImageParser.h"
 #include "memory/protos/Sensors.pb.h"
 
 class QCheckBox;
@@ -35,7 +35,7 @@ private:
     QLabel *shapeLabel;
     QLabel *infoLabel;
     QComboBox *shapeComboBox;
-    memory::log::ImageParser* imageParser;
+    memory::parse::ImageParser* imageParser;
 
 };
 

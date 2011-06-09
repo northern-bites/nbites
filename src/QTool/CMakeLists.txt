@@ -1,12 +1,13 @@
 
-############ RoboImageViewer
+############ QTool
 
-project( RoboImageViewer )
+project( QTool )
 cmake_minimum_required(VERSION 2.6.0)
 
 ########### Dependencies
 
 find_package(Qt4 REQUIRED)
+find_package(Protobuf REQUIRED)
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
@@ -18,45 +19,50 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 
 ########### Sources
 
-set( RoboImageViewer_srcs main.cpp
-  YUVImage.cpp
-  BMPYUVImage.cpp
-  colorspace.cpp
-  RoboImageViewer.cpp
+set( QTool_srcs main.cpp
   window.cpp
-  ImageParser.cpp
   )
 
-set(RoboImageViewer_headers colorspace.h
-    RoboImageViewer.h
+set(QTool_headers
     window.h
 )
 
-#set(RoboImageViewer_forms colorcreator.ui)
+#set(QTool_forms colorcreator.ui)
 
-#SET(RoboImageViewer_resources images.qrc)
+#SET(QTool_resources images.qrc)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
-  /home/oneamtu/nbites/build/man/straight
-  /home/oneamtu/nbites/src/man)
+                    ${PROTOBUF_INCLUDE_DIRS})
 
 ############ Qt4 goodness
 
-Qt4_wrap_cpp(RoboImageViewer_headers_moc ${RoboImageViewer_headers})
-Qt4_wrap_ui(RoboImageViewer_forms_headers ${RoboImageViewer_forms})
-#QT4_ADD_RESOURCES(RoboImageViewer_RESOURCES_RCC ${Protoviewer_RESOURCES})
+Qt4_wrap_cpp(QTool_headers_moc ${QTool_headers})
+Qt4_wrap_ui(QTool_forms_headers ${QTool_forms})
+#QT4_ADD_RESOURCES(QTool_RESOURCES_RCC ${Protoviewer_RESOURCES})
 
-add_executable(RoboImageViewer ${RoboImageViewer_srcs}
-  ${RoboImageViewer_headers_moc}
-  ${RoboImageViewer_forms_headers} )
 #    ${helloworld_RESOURCES_RCC})
 
-link_directories( /home/oneamtu/nbites/build/man/straight/memory/protos )
-find_library(PROTOS protos /home/oneamtu/nbites/build/man/straight/memory/protos)
+########## MAN LINK
+set( MAN_STRAIGHT_BUILD ../../build/man/straight )
+
+include_directories( ../ ../man ${MAN_STRAIGHT_BUILD}/cfg ${MAN_STRAIGHT_BUILD})
+find_library(MEMORY_LIB memory ${MAN_STRAIGHT_BUILD}/memory)
+find_library(PARSE_LIB parse ${MAN_STRAIGHT_BUILD}/memory/parse)
+
+######### Subdirectory compilation
+add_subdirectory( Image )
+
+######### The executable
+
+add_executable(QTool ${QTool_srcs}
+  ${QTool_headers_moc}
+  ${QTool_forms_headers} )
 
 target_link_libraries(
-  RoboImageViewer
-  protobuf
-  ${PROTOS}
+  QTool
+  Image
+  ${MEMORY_LIB}
+  ${PARSE_LIB}
+  ${PROTOBUF_LIBRARIES}
   ${QT_LIBRARIES}
   )

@@ -11,7 +11,7 @@
 #include <QImage>
 #include <QColor>
 #include <QPainter>
-#include "colorspace.h"
+#include "ColorSpace.h"
 #include "YUVImage.h"
 
 enum BitmapType {

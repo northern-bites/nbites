@@ -18,8 +18,8 @@
 
 #include <QGraphicsItem>
 #include <QColor>
-#include "colorspace.h"
-#include "RoboImage.h"
+#include "ColorSpace.h"
+#include "man/memory/RoboImage.h"
 
 class YUVImage
 {

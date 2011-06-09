@@ -1,4 +1,4 @@
-#include "RoboImageViewer.h"
+
 #include "window.h"
 
 //! [0]
@@ -34,7 +34,7 @@ Window::Window(QWidget *parent) :
     		"/home",
     		tr("Image Files (*.log)"));
 
-    imageParser = new memory::log::ImageParser(roboImage, currentDirectory.toStdString().data());
+    imageParser = new memory::parse::ImageParser(roboImage, currentDirectory.toStdString().data());
     imageParser->getNext();
     roboImageViewer->updateBitmap();
     this->repaint();
