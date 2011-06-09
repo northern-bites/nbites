@@ -218,7 +218,6 @@ void ObjectFragments::newRun(int x, int y, int h)
  *
  * @param left	  the left boundary of legal runs to consider
  * @param right	  the right boundary of legal runs to consider
- * @param hor	  a horizon boundary that we do not currently use
  * @return index  the index of the largest run that meets the criteria
  */
 int ObjectFragments::getBigRun(int left, int right) {
@@ -234,6 +233,36 @@ int ObjectFragments::getBigRun(int left, int right) {
         nextY = runs[i].y;
         if (nextH > maxRun && (nextX < left || nextX > right) &&
 			nextX > 5 && nextX < IMAGE_WIDTH - 5) {
+            maxRun = nextH;
+            index = i;
+        }
+    }
+    return index;
+}
+
+/* Identical to the last method except it allows a wider latitude
+   of runs to consider.  Basically when our first attempt failed
+   we expand our search parameters to include more runs (at the
+   edges).  Also, will exclude the failed area
+ *
+ * @param left	  the left boundary of legal runs to consider
+ * @param right	  the right boundary of legal runs to consider
+ * @param prev    the run returned by getBigRun that didn't work
+ * @return index  the x value of the largest run that meets the criteria
+ */
+int ObjectFragments::getBigRunExpanded(int left, int right, int prev) {
+    int maxRun = -100;
+    int nextH = 0;
+    int nextX = 0;
+    int nextY = 0;
+    int index = BADVALUE;
+    // find the biggest Run
+    for (int i = 0; i < numberOfRuns; i++) {
+        nextH = runs[i].h;
+        nextX = runs[i].x;
+        nextY = runs[i].y;
+        if (nextH > maxRun && (nextX < left || nextX > right) &&
+			(abs (nextX - prev) > 3)) {
             maxRun = nextH;
             index = i;
         }
@@ -1078,25 +1107,10 @@ bool ObjectFragments::checkSize(Blob b, int c)
     return true;
 }
 
-/* Try and find the biggest post left on the screen.  We start by looking for
- * our longest "run" of the current color.
- * We then call squareGoal to expand that into a post.	Later
- * we will check if it actually meets the criteria for a good post.
- * @param c		  current color
- * @param left	  leftmost limit to look
- * @param right	  rightmost limit to look
- * @param		  indication of whether we found a decent candidate
+/*
  */
-
-int ObjectFragments::grabPost(int c, int leftx,
-				  int rightx, Blob & obj) {
-    int maxRun = 0, maxY = 0, maxX = 0, index = 0;
-    // find the biggest Run
-    index = getBigRun(leftx, rightx);
-    if (index == BADVALUE) {
-        return NOPOST;
-    }
-    maxRun = runs[index].h;  maxY = runs[index].y;  maxX = runs[index].x;
+void ObjectFragments::lookForPost(int index, Blob & obj) {
+    int maxRun = runs[index].h,  maxY = runs[index].y,  maxX = runs[index].x;
 
     int need = max(10, min(30, maxRun / 3));
     int left, right, smallY = maxY + maxRun / 2, bigY = smallY;
@@ -1123,15 +1137,59 @@ int ObjectFragments::grabPost(int c, int leftx,
     int startY = maxY + maxRun / 2;
     // starts a scan in the middle of the tallest run.
     squareGoal(startX, startY, runs[left+1].x, runs[right - 1].x,
-               smallY, bigY, c, obj);
+               smallY, bigY, color, obj);
+}
+
+/* Try and find the biggest post left on the screen.  We start by looking for
+ * our longest "run" of the current color.
+ * We then call squareGoal to expand that into a post.	Later
+ * we will check if it actually meets the criteria for a good post.
+ * @param c		  current color
+ * @param left	  leftmost limit to look
+ * @param right	  rightmost limit to look
+ * @param		  indication of whether we found a decent candidate
+ */
+
+int ObjectFragments::grabPost(int c, int leftx,
+				  int rightx, Blob & obj) {
+    int index = 0;
+    // find the biggest Run
+    index = getBigRun(leftx, rightx);
+    if (index == BADVALUE) {
+		// try again
+		index = getBigRunExpanded(leftx, rightx, -100);
+		if (index == BADVALUE) {
+			return NOPOST;
+		} else if (POSTDEBUG) {
+			cout << "Expanded big run used to generate post" << endl;
+		}
+    }
+	lookForPost(index, obj);
     // make sure we're looking at something big enough to be a post
     if (!postBigEnough(obj)) {
-        if (POSTDEBUG) {
-            cout << "Post was too small" << endl;
-            printBlob(obj);
-            drawBlob(obj, ORANGE);
-        }
-        return NOPOST;
+		// try again
+		index = getBigRunExpanded(leftx, rightx, runs[index].x);
+		if (index != BADVALUE) {
+			if (POSTDEBUG) {
+				cout << "First post was too small, trying again" << endl;
+				drawBlob(obj, ORANGE);
+			}
+			lookForPost(index, obj);
+			if (!postBigEnough(obj)) {
+				if (POSTDEBUG) {
+					cout << "Post was too small" << endl;
+					printBlob(obj);
+					drawBlob(obj, ORANGE);
+				}
+				return NOPOST;
+			}
+		} else {
+			if (POSTDEBUG) {
+				cout << "Post was too small first" << endl;
+				drawBlob(obj, ORANGE);
+			}
+			return NOPOST;
+		}
     }
     // check how big it is versus how big we think it should be
     if (badDistance(obj)) {
