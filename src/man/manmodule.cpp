@@ -62,15 +62,6 @@ static shared_ptr<Lights> lights;
 static shared_ptr<Speech> speech;
 
 void ALCreateMan( ALPtr<ALBroker> broker){
-    try{
-        ALSentinelProxy sentinel(broker);
-        sentinel.enableDefaultActionSimpleClick(false);
-        sentinel.enableDefaultActionDoubleClick(false);
-        sentinel.enableDefaultActionTripleClick(false);
-    }catch(ALError &e){
-        cout << "Failed to access the ALSentinel: "<<e.toString()<<endl;
-    }
-
     synchro = shared_ptr<Synchro>(new Synchro());
     sensors = shared_ptr<Sensors>(new Sensors);
     transcriber = shared_ptr<ALTranscriber>(new ALTranscriber(broker,sensors));
