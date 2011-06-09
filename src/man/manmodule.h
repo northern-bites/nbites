@@ -24,6 +24,7 @@
 #include "altools/alxplatform.h"
 
 #include "manconfig.h"
+#include "vision/Profiler.h"
 
 // ..::: Version Information ::
 /** Major release version */

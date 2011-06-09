@@ -98,9 +98,9 @@ void Field::initialScanForTopGreenPoints(int pH) {
 				x--;
 			pixel = thresh->getColor(x, top);
 			//pixel = thresh->thresholded[top][x];
-			if (isGreen(pixel)) {
+			if (Utility::isGreen(pixel)) {
 				good++;
-			} else if (isUndefined(pixel)) {
+			} else if (Utility::isUndefined(pixel)) {
 				ok++;
 				if (ok > SCANNOISE) {
 					good = 0;
@@ -118,6 +118,19 @@ void Field::initialScanForTopGreenPoints(int pH) {
             }
 		} else {
 			convex[i] = point<int>(i * SCANSIZE, IMAGE_HEIGHT);
+		}
+		if (debugFieldEdge) {
+			vision->drawPoint(i * SCANSIZE, convex[i].y, MAROON);
+		}
+	}
+	for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
+	if (good < HULLS) {
+		for (int i = good-1; i > -1; i--) {
+			convex[i].y = convex[i+1].y;
+		}
+		for (good = HULLS - 1; convex[good].y == IMAGE_HEIGHT && good > 0; good--) {}
+		for (int i = good + 1; i < HULLS; i++) {
+			convex[i].y = convex[i-1].y;
 		}
 	}
 }
@@ -249,7 +262,7 @@ int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {
    @return       a new estimate of the horizon line
  */
 int Field::getInitialHorizonEstimate(int pH) {
-	const int MIN_PIXELS_INITIAL = 4;
+	const int MIN_PIXELS_INITIAL = 8;
 	const int SCAN_INTERVAL_X = 10;
 	const int SCAN_INTERVAL_Y = 4;
 	//variable definitions
@@ -277,7 +290,7 @@ int Field::getInitialHorizonEstimate(int pH) {
 			pixel = thresh->getColor(i, scanY);
 			// project the line to get the next y value
 			scanY = thresh->blue->yProject(0, j, i);
-			if (isGreen(pixel)) {
+			if (Utility::isGreen(pixel)) {
 				greenPixels++;
                 // since green pixels are likely to be next to other ones
                 i -= SCAN_INTERVAL_X;
@@ -324,7 +337,7 @@ int Field::getImprovedEstimate(int horizon) {
 			}
 			int newPixel = thresh->getColor(l, scanY);
 			//int newPixel = thresh->thresholded[scanY][l];
-			if (isGreen(newPixel)) {
+			if (Utility::isGreen(newPixel)) {
 				// firstpix tracks where we saw the first green pixel
 				if (firstpix == -1) {
 					firstpix = l;
@@ -359,7 +372,7 @@ int Field::getImprovedEstimate(int horizon) {
 					vision->drawPoint(j, scanY, BLACK);
 				}
 				pixel = thresh->getColor(j, scanY);
-				if (isGreen(pixel)) {
+				if (Utility::isGreen(pixel)) {
 					run++;
 					greenPixels++;
 					firstpix = j;

@@ -64,6 +64,7 @@ def gameSet(player):
             player.brain.resetGoalieLocalization()
 
         if player.brain.play.isRole(CHASER):
+            player.hasKickedOffKick = False
             player.brain.tracker.trackBall()
 
         if player.lastDiffState == 'gamePenalized':
