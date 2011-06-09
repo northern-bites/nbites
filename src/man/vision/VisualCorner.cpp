@@ -64,28 +64,30 @@ VisualCorner::VisualCorner(const VisualCorner& other)
  * constructed in FieldLines::interesctLines()
  */
 void VisualCorner::determineCornerShape() {
+
+    // Decide the T stem and bar lines
     if (Utility::tValueInMiddleOfLine(t1, line1->getLength(),
                                       max(line2->getAvgWidth(),
                                           MIN_EXTEND_DIST))) {
         cornerType = T;
         tBar = line1;
         tStem = line2;
-        setID(T_CORNER);
-        setTOrientation();
-        physicalOrientation = getTPhysicalOrientation();
     } else if(Utility::tValueInMiddleOfLine(t2, line2->getLength(),
                                             max(line1->getAvgWidth(),
                                                 MIN_EXTEND_DIST))) {
         cornerType = T;
         tBar = line2;
         tStem = line1;
-        setID(T_CORNER);
-        setTOrientation();
-        physicalOrientation = getTPhysicalOrientation();
-    } else {
+    } else {          // It's a L Corner
         // Temporary side effect - set angleBetweenLines
         cornerType = getLClassification();
-        physicalOrientation = static_cast<float>(getLPhysicalOrientation());
+        physicalOrientation = getLPhysicalOrientation();
+    }
+
+    // Set T Attributes
+    if (cornerType == T){
+        setTOrientation();
+        physicalOrientation = getTPhysicalOrientation();
     }
 
     secondaryShape = UNKNOWN;
@@ -474,8 +476,9 @@ void VisualCorner::setSecondaryShape(const shape s) {
     }
 }
 
-/* Once we have identified a corner as a T we can set its orientation
-   according to the line that forms the stem.
+/*
+ * Once we have identified a corner as a T we can set its orientation
+ * according to the line that forms the stem.
  */
 void VisualCorner::setTOrientation() {
     point<int> end = getTStemEndpoint();
