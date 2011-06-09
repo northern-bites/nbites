@@ -9,7 +9,7 @@ cmake_minimum_required( VERSION 2.6.0 )
 # Libraries specifics.
 # cmake packages we use
 FIND_PACKAGE( Protobuf REQUIRED )
-FIND_PACKAGE( ZLIB )
+#FIND_PACKAGE( ZLIB )
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
@@ -18,20 +18,20 @@ include_directories( ${PROTOBUF_INCLUDE_DIRS}/
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-set( LOGGER_SRCS CodedFileLogger.cpp
+set( LOG_SRCS CodedFileLogger.cpp
                  ImageFDLogger.cpp
                  LoggingBoard.cpp)
 
 ############################ Add sources
 # Add static library target
 add_library(
-  ${LOGGER_TARGET}
+  ${LOG_TARGET}
   STATIC
-  ${LOGGER_SRCS}
+  ${LOG_SRCS}
   )
 
 target_link_libraries(
-    ${LOGGER_TARGET}
+    ${LOG_TARGET}
     ${PROTOBUF_LIBRARIES}
     ${ROBOT_CONNECT_TARGET}
     ${MEMORY_TARGET}

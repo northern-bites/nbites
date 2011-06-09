@@ -18,19 +18,19 @@ include_directories( ${PROTOBUF_INCLUDE_DIRS}/
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-set( PARSER_SRCS MessageParser.cpp
+set( PARSE_SRCS MessageParser.cpp
                  ImageParser.cpp
                  )
 
 ############################ Add sources
 # Add static library target
 add_library(
-  ${PARSER_TARGET}
+  ${PARSE_TARGET}
   STATIC
-  ${PARSER_SRCS}
+  ${PARSE_SRCS}
   )
 
 target_link_libraries(
-    ${PARSER_TARGET}
+    ${PARSE_TARGET}
     ${PROTOBUF_LIBRARIES}
     )

@@ -54,8 +54,8 @@ set( MEMORY_SRCS Memory
 # it's where we house all our generated protobuggers
 
 set( PROTOS_TARGET protos )
-set( LOGGER_TARGET log )
-set( PARSER_TARGET parse )
+set( LOG_TARGET log )
+set( PARSE_TARGET parse )
 
 add_subdirectory( protos )
 add_subdirectory( log )
@@ -76,7 +76,8 @@ add_library(
 target_link_libraries(
   ${MEMORY_TARGET}
   ${PROTOS_TARGET}
-  ${LOGGER_TARGET}
+  ${PARSE_TARGET}
+  ${LOG_TARGET}
   )
 
 
