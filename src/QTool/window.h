@@ -1,6 +1,8 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+//TODO: Octavian - this file is useless, remove it soon
+
 #include <QWidget>
 #include <QComboBox>
 #include <QCheckBox>
