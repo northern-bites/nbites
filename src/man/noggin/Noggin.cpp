@@ -14,6 +14,7 @@
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
 #include "PyLights.h"
+#include "PySpeech.h"
 
 //#define DEBUG_POST_OBSERVATIONS
 //#define DEBUG_CORNER_OBSERVATIONS
@@ -45,6 +46,7 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
                 shared_ptr<Sensors> _sensors, MotionInterface * _minterface)
     : profiler(p), comm(c),gc(c->getGC()),
       sensors(_sensors),
+      vision(v),
       chestButton(rbg->getButton(CHEST_BUTTON)),
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
@@ -55,9 +57,9 @@ Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
 #   endif
-
+    
     // Initialize the interpreter and C python extensions
-    initializePython(v);
+    initializePython();
 
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
@@ -83,7 +85,7 @@ Noggin::~Noggin ()
 #   endif
 }
 
-void Noggin::initializePython(shared_ptr<Vision> v)
+void Noggin::initializePython()
 {
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Initializing interpreter and extension modules\n");
@@ -99,24 +101,14 @@ void Noggin::initializePython(shared_ptr<Vision> v)
     c_init_sensors();
     //init_leds();
     c_init_lights();
+    c_init_speech();
     c_init_roboguardian();
     c_init_motion();
     c_init_comm();
     comm->add_to_module();
 
     // Initialize PyVision module
-    vision = v;
-    MODULE_INIT(vision) ();
-
-    // Initialize and insert the vision wrapper into the module
-    PyObject *result = PyVision_new(v.get());
-    if (result == NULL) {
-        cerr << "** Noggin extension could not initialize PyVision object **" <<
-            endl;
-        assert(false);
-    }
-    vision_addToModule(result, MODULE_HEAD);
-    pyvision = reinterpret_cast<PyVision*>(result);
+    c_init_vision();
 
     // Initialize localization stuff
     initializeLocalization();
@@ -182,7 +174,7 @@ void Noggin::reload_hard ()
     // finalize and reinitialize the Python interpreter
     Py_Finalize();
     // load C extension modules
-    initializePython(vision);
+    initializePython();
     // import noggin.Brain and instantiate a Brain reference
     import_modules();
     // Instantiate a Brain instance
@@ -264,11 +256,6 @@ void Noggin::runStep ()
 
     PROF_ENTER(profiler, P_PYTHON);
 
-    // Update vision information for Python
-    PROF_ENTER(profiler, P_PYUPDATE);
-    PyVision_update(pyvision);
-    PROF_EXIT(profiler, P_PYUPDATE);
-
 #   ifdef RUN_LOCALIZATION
     // Update localization information
     PROF_ENTER(profiler, P_LOC);
@@ -309,6 +296,7 @@ void Noggin::updateLocalization()
     // Build the observations from vision data
     vector<Observation> observations;
     // FieldObjects
+
     VisualFieldObject fo;
     fo = *vision->bgrp;
 

@@ -45,28 +45,6 @@ public:
     void drawLess(int x, int y, int c);
     void drawMore(int x, int y, int c);
 
-    // Helper method that just returns whether the thresholded color is a
-    // green color
-    static inline const bool isGreen(unsigned char threshColor)
-        {
-#ifdef SOFTCOLORS
-			return threshColor == GREEN || threshColor == BLUEGREEN;
-#else
-			return threshColor & GREEN_BIT;
-#endif
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // undefined color
-    static inline const bool isUndefined(unsigned char threshColor)
-        {
-#ifdef SOFTCOLORS
-			return threshColor == GREY;
-#else
-			return threshColor;
-#endif
-        }
-
 #ifdef OFFLINE
 	void setDebugHorizon(bool debug) {debugHorizon = debug;}
 	void setDebugFieldEdge(bool debug) {debugFieldEdge = debug;}

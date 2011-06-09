@@ -88,6 +88,8 @@ SET( ROBOT_CONNECT_SRCS
   PyRoboGuardian
   Lights
   PyLights
+  Speech
+  PySpeech
   ColorParams
   ImageAcquisition
   )
@@ -124,6 +126,7 @@ ELSE(WEBOTS_BACKEND)
     ALImageTranscriber
     NaoLights
     NaoRGBLight
+    ALSpeech
     )
 ENDIF(WEBOTS_BACKEND)
 
@@ -134,7 +137,7 @@ ENDIF(WEBOTS_BACKEND)
 #                            )
 #ENDIF( PYTHON_SHARED_CORPUS )
 
-SET( CORPUS_PYTHON_SRCS __init__.py
+SET( CORPUS_PYTHON_SRCS
   leds.py
   sensors.py
   synchro.py

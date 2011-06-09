@@ -179,7 +179,7 @@ void Ball::createBall(int h) {
 			int nextX = runs[i].x;
 			int nextY = runs[i].y;
 			int nextH = runs[i].h;
-			blobs->blobIt(nextX, nextY, nextH);
+			blobs->blobIt(nextX, nextY, nextH, true);
 		}
 	}
 	balls(h, vision->ball);
@@ -229,7 +229,7 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
                     cout << "Screened one for horizon problems " << endl;
                     drawBlob(blobs->get(i), WHITE);
                 }
-            } else if (ar > MIN_AREA && perc > minpercent) {
+            } else if (ar > MIN_AREA && perc >= minpercent) {
                 if (BALLDEBUG) {
                     cout << "Candidate ball " << endl;
                     printBlob(blobs->get(i));
@@ -267,7 +267,7 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
 	const float PIXACC = 300;
 	const int HORIZON_THRESHOLD = 30;
 
-    float distanceDifference = fabs(e.dist - thisBall->getDistance());
+    float distanceDifference = fabs(e.dist - focalDist.dist);
     int horb = horizonAt(topBlob->getLeftBottomX());
 
     if (!ballIsReasonablySquare(topBlob->getLeftTopX(), topBlob->getLeftTopY(),
@@ -1216,7 +1216,7 @@ void Ball::drawRun(const run& run, int c) {
  */
 void Ball::drawPoint(int x, int y, int c) {
 #ifdef OFFLINE
-	thresh->drawPoint(x, y, c);
+	vision->drawPoint(x, y, c);
 #endif
 }
 
@@ -1226,7 +1226,7 @@ void Ball::drawPoint(int x, int y, int c) {
  */
 void Ball::drawRect(int x, int y, int w, int h, int c) {
 #ifdef OFFLINE
-	thresh->drawRect(x, y, w, h, c);
+	vision->drawRect(x, y, w, h, c);
 #endif
 }
 
@@ -1236,18 +1236,18 @@ void Ball::drawRect(int x, int y, int w, int h, int c) {
  */
 void Ball::drawBlob(Blob b, int c) {
 #ifdef OFFLINE
-	thresh->drawLine(b.getLeftTopX(), b.getLeftTopY(),
-					 b.getRightTopX(), b.getRightTopY(),
-					 c);
-	thresh->drawLine(b.getLeftTopX(), b.getLeftTopY(),
-					 b.getLeftBottomX(), b.getLeftBottomY(),
-					 c);
-	thresh->drawLine(b.getLeftBottomX(), b.getLeftBottomY(),
-					 b.getRightBottomX(), b.getRightBottomY(),
-					 c);
-    thresh->drawLine(b.getRightTopX(), b.getRightTopY(),
-					 b.getRightBottomX(), b.getRightBottomY(),
-					 c);
+	vision->drawLine(b.getLeftTopX(), b.getLeftTopY(),
+			 b.getRightTopX(), b.getRightTopY(),
+			 c);
+	vision->drawLine(b.getLeftTopX(), b.getLeftTopY(),
+			 b.getLeftBottomX(), b.getLeftBottomY(),
+			 c);
+	vision->drawLine(b.getLeftBottomX(), b.getLeftBottomY(),
+			 b.getRightBottomX(), b.getRightBottomY(),
+			 c);
+	vision->drawLine(b.getRightTopX(), b.getRightTopY(),
+			 b.getRightBottomX(), b.getRightBottomY(),
+			 c);
 #endif
 }
 
@@ -1260,7 +1260,7 @@ void Ball::drawBlob(Blob b, int c) {
  */
 void Ball::drawLine(int x, int y, int x1, int y1, int c) {
 #ifdef OFFLINE
-	thresh->drawLine(x, y, x1, y1, c);
+	vision->drawLine(x, y, x1, y1, c);
 #endif
 }
 

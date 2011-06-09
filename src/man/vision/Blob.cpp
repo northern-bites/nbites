@@ -53,6 +53,9 @@ int Blob::getArea() const{
 }
 
 int Blob::width() const{
+    if (leftTop.x < 0) {
+        return 0;
+    }
     return rightTop.x - leftTop.x + 1;
 }
 
@@ -73,6 +76,36 @@ void Blob::merge(Blob other) {
     value = max(leftBottom.y, other.leftBottom.y);
     leftBottom.y = value;
     rightBottom.y = value;
+}
+
+/* Test if two blobs are vertically aligned.  Potentially useful for
+   determining whether something is a robot
+ */
+bool Blob::isAligned(Blob other) {
+    if (getLeft() >= other.getLeft() && getLeft() <= other.getRight()) {
+        return true;
+    }
+    if (other.getLeft() >= getLeft() && other.getLeft() <= getRight()) {
+        return true;
+    }
+    return false;
+}
+
+/* Shift the blob in the directions indicated by the deltas.
+   Note: not a pure shift - the bottom and top shift in opposite
+   directions.
+   @param deltax       the amount of change in the x direction
+   @param deltay       the amount of change in the y direction
+ */
+void Blob::shift(int deltax, int deltay) {
+	leftTop.x += deltax;
+	rightTop.x += deltax;
+	leftBottom.x -= deltax;
+	rightBottom.x -= deltax;
+	leftTop.y += deltay;
+	rightTop.y += deltay;
+	leftBottom.y += deltay;
+	rightBottom.y += deltay;
 }
 
 /* Print debugging information for a blob.

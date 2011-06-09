@@ -169,6 +169,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         for(int j = 0; j < IMAGE_WIDTH; j++) {
             row[j]= vision.thresh->getThresholded(i,j);
 #ifdef OFFLINE
+			// problem: the thresh image has non-bitwise colors
             if (vision.thresh->debugImage[i][j] != GREY) {
                 row[j]= vision.thresh->debugImage[i][j];
             }
@@ -204,21 +205,29 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     VisualFieldObject *obj;
     VisualCrossbar * cb;
     VisualCross *cross = NULL;
+    VisualRobot *robot = NULL;
     int k = 0;
     while(k != -1) {
         //loop through all the objects we want to pass
+        int id = 0;
         switch(k) {
-            case 0: obj = vision.bgrp; k++; cb = NULL; cross = NULL; break;
-            case 1: obj = vision.bglp; k++; cb = NULL; cross = NULL; break;
-            case 2: obj = vision.ygrp; k++; cb = NULL; cross = NULL; break;
-            case 3: obj = vision.yglp; k++; cb = NULL; cross = NULL; break;
-            case 4: cb = vision.ygCrossbar; k++; obj = NULL; cross = NULL; break;
-            case 5: cb = vision.bgCrossbar; k++; obj = NULL; cross = NULL; break;
-            case 6: cross = vision.cross; k++; cb = NULL; obj = NULL; break;
-            default: k = -1; obj = NULL; cb = NULL; break;
+        case 0: obj = vision.bgrp; k++; cb = NULL; cross = NULL; robot = NULL; break;
+        case 1: obj = vision.bglp; k++; cb = NULL; cross = NULL; robot = NULL; break;
+        case 2: obj = vision.ygrp; k++; cb = NULL; cross = NULL; robot = NULL; break;
+        case 3: obj = vision.yglp; k++; cb = NULL; cross = NULL; robot = NULL; break;
+        case 4: cb = vision.ygCrossbar; k++; obj = NULL; cross = NULL; robot = NULL; break;
+        case 5: cb = vision.bgCrossbar; k++; obj = NULL; cross = NULL; robot = NULL; break;
+        case 6: cross = vision.cross; k++; cb = NULL; obj = NULL; robot = NULL; break;
+        case 7: robot = vision.navy1; k++; id = 49; obj = NULL; cb = NULL; cross = NULL; break;
+        case 8: robot = vision.navy2; k++; id = 49; obj = NULL; cb = NULL; cross = NULL; break;
+        case 9: robot = vision.navy3; k++; id = 49; obj = NULL; cb = NULL; cross = NULL; break;
+        case 10: robot = vision.red1; k++; id = 50; obj = NULL; cb = NULL; cross = NULL; break;
+        case 11: robot = vision.red2; k++; id = 50; obj = NULL; cb = NULL; cross = NULL; break;
+        case 12: robot = vision.red3; k++; id = 50; obj = NULL; cb = NULL; cross = NULL; break;
+        default: k = -1; obj = NULL; cb = NULL; break;
         }
         if (obj != NULL) {
-            int id = (int) obj->getID();
+            id = (int) obj->getID();
             if (obj->getPossibleFieldObjects()->size() > 1) {
                 if (id == BLUE_GOAL_LEFT_POST ||
                         id == BLUE_GOAL_RIGHT_POST ||
@@ -245,6 +254,14 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
                     cb->getRightTopX(), cb->getRightTopY(),
                     cb->getLeftBottomX(), cb->getLeftBottomY(),
                     cb->getRightBottomX(), cb->getRightBottomY());
+        } else if (robot != NULL) {
+            env->CallVoidMethod(jobj, setFieldObjectInfo,
+                    id,
+                    robot->getWidth(), robot->getHeight(),
+                    robot->getLeftTopX(), robot->getLeftTopY(),
+                    robot->getRightTopX(), robot->getRightTopY(),
+                    robot->getLeftBottomX(), robot->getLeftBottomY(),
+                    robot->getRightBottomX(), robot->getRightBottomY());
         } else if (cross != NULL) {
             env->CallVoidMethod(jobj, setFieldObjectInfo,
                     (int)cross->getID(),
@@ -545,6 +562,11 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     Java_TOOL_Vision_TOOLVisionLink_cppSetHoughTransformDebug
     (JNIEnv * env, jobject jobj, jboolean debugHoughTransform){
         vision.thresh->setDebugHoughTransform(debugHoughTransform);
+    }
+    JNIEXPORT void JNICALL
+    Java_TOOL_Vision_TOOLVisionLink_cppSetRobotDebug
+    (JNIEnv * env, jobject jobj, jboolean debugRobot) {
+        vision.thresh->setDebugRobots(debugRobot);
     }
 
 #ifdef __cplusplus
