@@ -101,6 +101,8 @@ public:
         return walkProvider.getOdometryUpdate();
     }
 
+    int getFrameCount() const { return frameCount; }
+
 private:
     void preProcess();
     void processJoints();
@@ -142,6 +144,7 @@ private:
     std::vector <float> nextStiffnesses;
     std::vector <float> lastJoints;
 
+    int frameCount;
     bool running;
 	mutable bool newJoints; //Way to track if we ever use the same joints twice
 

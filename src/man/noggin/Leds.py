@@ -61,11 +61,10 @@ BALL_OFF_LEDS = ((LEFT_EYE_LED, BLUE, NOW),)
 #### Chaser #######
 CHASER_ON_LEDS = ((RIGHT_EYE_LED, GREEN, NOW),)
 LOC_CHASER_ON_LEDS = ((RIGHT_EYE_LED, WHITE, NOW),)
-#### Defender ####
-SWEEPER_ON_LEDS = ((RIGHT_EYE_LED, PURPLE, NOW),)
-STOPPER_ON_LEDS = ((RIGHT_EYE_LED, CYAN, NOW),)
-MIDDIE_ON_LEDS =  ((RIGHT_EYE_LED, YELLOW, NOW),)
 #### Other ####
+MIDDIE_ON_LEDS = ((RIGHT_EYE_LED, PURPLE, NOW),)
+DEFENDER_ON_LEDS = ((RIGHT_EYE_LED, CYAN, NOW),)
+OFFENDER_ON_LEDS =  ((RIGHT_EYE_LED, YELLOW, NOW),)
 CHASER_OFF_LEDS = ((RIGHT_EYE_LED, BLUE, NOW),)
 
 #### GOAL ######
@@ -126,14 +125,11 @@ class Leds():
                 else:
                     self.executeLeds(CHASER_ON_LEDS)
             elif self.brain.play.isRole(PBConstants.DEFENDER):
-                if self.brain.play.isSubRole(PBConstants.STOPPER):
-                    self.executeLeds(STOPPER_ON_LEDS)
-                elif self.brain.play.isSubRole(PBConstants.SWEEPER):
-                    self.executeLeds(SWEEPER_ON_LEDS)
-                elif self.brain.play.isSubRole(PBConstants.DEFENSIVE_MIDDIE):
-                    self.executeLeds(MIDDIE_ON_LEDS)
-                else:
-                    self.executeLeds(CHASER_OFF_LEDS)
+                self.executeLeds(DEFENDER_ON_LEDS)
+            elif self.brain.play.isRole(PBConstants.OFFENDER):
+                self.executeLeds(OFFENDER_ON_LEDS)
+            elif self.brain.play.isRole(PBConstants.MIDDIE):
+                self.executeLeds(MIDDIE_ON_LEDS)
             else:
                 self.executeLeds(CHASER_OFF_LEDS)
 
