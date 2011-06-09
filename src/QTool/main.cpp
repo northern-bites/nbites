@@ -1,10 +1,10 @@
 #include <QtGui/QApplication>
-#include "window.h"
+#include "colorcreator.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Window w;
+    ColorCreator w;
     w.show();
 
     return a.exec();

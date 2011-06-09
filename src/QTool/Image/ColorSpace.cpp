@@ -1,4 +1,4 @@
-#include "ColorSpace.h"
+#include "colorspace.h"
 
 ColorSpace::ColorSpace()
 {

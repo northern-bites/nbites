@@ -1,7 +1,7 @@
 
-############ ProtoViewer
+############ ColorCreator
 
-project( ColorTool )
+project( ColorCreator )
 cmake_minimum_required(VERSION 2.6.0)
 
 ########### Dependencies
@@ -18,7 +18,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 
 ########### Sources
 
-set( ProtoViewer_srcs main.cpp
+set( ColorCreator_srcs
   colorcreator.cpp
   roboimage.cpp
   colorspace.cpp
@@ -27,7 +27,7 @@ set( ProtoViewer_srcs main.cpp
   colortable.cpp
   stats.cpp )
 
-set(ProtoViewer_headers colorcreator.h
+set(ColorCreator_headers colorcreator.h
     roboimage.h
     colorspace.h
     colorzone.h
@@ -36,9 +36,9 @@ set(ProtoViewer_headers colorcreator.h
     stats.h
 )
 
-set(ProtoViewer_forms colorcreator.ui)
+set(ColorCreator_forms colorcreator.ui)
 
-#SET(ProtoViewer_resources images.qrc)
+#SET(ColorCreator_resources images.qrc)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
   /usr/include/qt4
@@ -46,21 +46,16 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
 
 ############ Qt4 goodness
 
-Qt4_wrap_cpp(ProtoViewer_headers_moc ${ProtoViewer_headers})
-Qt4_wrap_ui(ProtoViewer_forms_headers ${ProtoViewer_forms})
-#QT4_ADD_RESOURCES(ProtoViewer_RESOURCES_RCC ${Protoviewer_RESOURCES})
+Qt4_wrap_cpp(ColorCreator_headers_moc ${ColorCreator_headers})
+Qt4_wrap_ui(ColorCreator_forms_headers ${ColorCreator_forms})
+#QT4_ADD_RESOURCES(ColorCreator_RESOURCES_RCC ${ColorCreator_RESOURCES})
 
-add_executable(ColorTool ${ProtoViewer_srcs}
-  ${ProtoViewer_headers_moc}
-  ${ProtoViewer_forms_headers} )
+add_library(ColorCreator ${ColorCreator_srcs}
+  ${ColorCreator_headers_moc}
+  ${ColorCreator_forms_headers} )
 #    ${helloworld_RESOURCES_RCC})
-
-link_directories( /home/oneamtu/nbites/build/man/straight/memory/protos )
-find_library(PROTOS protos /home/oneamtu/nbites/build/man/straight/memory/protos)
 
 target_link_libraries(
   ColorTool
-  protobuf
-  ${PROTOS}
   ${QT_LIBRARIES}
   )
