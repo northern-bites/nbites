@@ -15,6 +15,8 @@
 
 #include "include/VisionDef.h"
 
+//TODO: add to namespace memory
+
 class RoboImage
 {
 
