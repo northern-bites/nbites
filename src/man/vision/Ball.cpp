@@ -229,7 +229,7 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
                     cout << "Screened one for horizon problems " << endl;
                     drawBlob(blobs->get(i), WHITE);
                 }
-            } else if (ar > MIN_AREA && perc > minpercent) {
+            } else if (ar > MIN_AREA && perc >= minpercent) {
                 if (BALLDEBUG) {
                     cout << "Candidate ball " << endl;
                     printBlob(blobs->get(i));
@@ -267,7 +267,7 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
 	const float PIXACC = 300;
 	const int HORIZON_THRESHOLD = 30;
 
-    float distanceDifference = fabs(e.dist - thisBall->getDistance());
+    float distanceDifference = fabs(e.dist - focalDist.dist);
     int horb = horizonAt(topBlob->getLeftBottomX());
 
     if (!ballIsReasonablySquare(topBlob->getLeftTopX(), topBlob->getLeftTopY(),

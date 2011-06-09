@@ -19,7 +19,8 @@
 class NaoEnactor : public MotionEnactor {
 
 public:
-	NaoEnactor(boost::shared_ptr<Sensors> s,
+	NaoEnactor(boost::shared_ptr<Profiler> p,
+	           boost::shared_ptr<Sensors> s,
                boost::shared_ptr<Transcriber> transcriber,
                AL::ALPtr<AL::ALBroker> broker);
     virtual ~NaoEnactor() { };
@@ -40,6 +41,7 @@ private: // Members
     AL::ALValue joint_command;
     AL::ALValue us_command;
 
+    boost::shared_ptr<Profiler> profiler;
 
 
 private: // Helper methods

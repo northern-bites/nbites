@@ -229,6 +229,7 @@ private:
     bool seeCenterCircle;
     int objectRightX;
     int objectRightY;
+	float objectDistance;
 #ifdef OFFLINE
     bool debugIdentifyCorners;
 #else

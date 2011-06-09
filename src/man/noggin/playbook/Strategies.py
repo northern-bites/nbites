@@ -13,6 +13,7 @@ def sNoFieldPlayers(team, workingPlay):
 
 def sOneField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_ONE_FIELD_PLAYER)
+    # No Kickoff play because it would be identical
     Formations.fOneField(team, workingPlay)
 
 #### Two Field Players ####
