@@ -76,6 +76,14 @@ private:
     bool validate_packet(const char* msg, int len, CommPacketHeader& packet)
         throw();
 
+    // Comm monitoring methods.
+
+    // Calculates the running average delay between received
+    // transmissions. Called each time a new packet is received.
+    // Note that it only calculates those packets received from
+    // other robots, not from the TOOL or GameController.
+    void updateAverageDelay();
+
 private:
     // mutex lock for threaded data access
     pthread_mutex_t comm_mutex;
@@ -101,6 +109,11 @@ private:
     struct sockaddr_in gc_broadcast_addr;
     char buf[UDP_BUF_SIZE];
 
+    // Data monitoring information.
+    llong averagePacketDelay;                 // Stores the running average delay between
+                                              // received packets.
+    int totalPacketsReceived;                 // Running total packets received.
+    int ourPacketsReceived;                   // Running count of "our" packets received.
 };
 
 bool c_init_comm(void);

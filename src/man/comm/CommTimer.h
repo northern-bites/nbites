@@ -13,9 +13,8 @@ class CommTimer
     CommTimer(llong (*f)());
     virtual ~CommTimer() { }
 
-    inline llong timestamp(void) {
-      return time() - epoch;
-    }
+    inline llong timestamp(void) { return time() - epoch; }
+
     inline bool time_to_send(void) {
 	return timestamp() - packet_timer > MICROS_PER_PACKET;
     }
@@ -31,25 +30,27 @@ class CommTimer
     inline llong elapsed_seconds(void) {
       return timestamp() - mark_time;
     }
-    inline llong lastPacketSentAt() const { return packet_timer; }
+
+    llong lastPacketSentAt() const { return packet_timer; }
+
+    void packetReceived() { lastPacketReceived = timestamp(); }
+
+    llong lastPacketReceivedAt() const { return lastPacketReceived; }
 
     bool check_packet(const CommPacketHeader &packet);
     void get_time_from_others();
     void reset();
 
   private:
-    llong (*time)();
+    llong (*time)();                 // Pointer to function that returns current
+                                     // time.
     llong epoch;
-
-    llong packet_timer;
+    llong lastPacketReceived;        // Time last packet was received.
+    llong packet_timer;              // Time last packet was sent. 
     llong mark_time;
     std::vector<llong> team_times;
     unsigned int packets_checked;
     bool need_to_update;
-    //float point_fps;
-    //float fps;
-    //std::vector<float> fps_list;
-
 };
 
 #endif // _CommTimer_h_DEFINED

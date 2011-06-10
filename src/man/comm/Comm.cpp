@@ -474,6 +474,8 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
     gc_broadcast_addr.sin_family = AF_INET;
     gc_broadcast_addr.sin_port = htons(GAMECONTROLLER_PORT);
     gc_broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+
+    averagePacketDelay = 0;
 }
 
 // Deconstructor
@@ -792,6 +794,11 @@ void Comm::receive () throw(socket_error)
     // While no error, handle the packet and continue to receive new ones.
     while (result > 0) {
 	//cout << "Comm::receive() : result == " << result << endl;
+	// Received a packet! Update the average delay.
+	if(timer.lastPacketReceivedAt() != 0) {
+	    updateAverageDelay();
+	}
+	timer.packetReceived();
         // handle the message
         handle_comm(recv_addr, &buf[0], result);
         // check for another one
@@ -1024,4 +1031,26 @@ std::string Comm::getRobotName ()
 #endif
 
     return name;
+}
+
+// Updates the average delay between received transmissions. Uses a simple
+// running average method. (Time measured in microseconds?)
+void Comm::updateAverageDelay() 
+{
+    // The delay is the difference between the current time and 
+    // the last received packet recorded by the CommTimer.
+    llong newAverage = 0;
+    llong delay      = 0;
+    delay = timer.timestamp() - timer.lastPacketReceivedAt();
+    if(averagePacketDelay == 0) {
+	// First data sample acquired; average is just delay.
+        newAverage = delay;
+    } else {
+	newAverage = (llong)(0.5 * (averagePacketDelay + delay));
+    }
+
+    // Log data?
+    cout << "Comm::updateAverageDelay() : average delay == " << newAverage << endl;
+
+    averagePacketDelay = newAverage;
 }
