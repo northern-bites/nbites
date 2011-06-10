@@ -17,7 +17,7 @@ class CommTimer
       return time() - epoch;
     }
     inline bool time_to_send(void) {
-      return timestamp() - packet_timer > MICROS_PER_PACKET;
+	return timestamp() - packet_timer > MICROS_PER_PACKET;
     }
     inline void sent_packet(void) {
       packet_timer = timestamp();
@@ -31,11 +31,11 @@ class CommTimer
     inline llong elapsed_seconds(void) {
       return timestamp() - mark_time;
     }
+    inline llong lastPacketSentAt() const { return packet_timer; }
 
     bool check_packet(const CommPacketHeader &packet);
     void get_time_from_others();
     void reset();
-
 
   private:
     llong (*time)();
