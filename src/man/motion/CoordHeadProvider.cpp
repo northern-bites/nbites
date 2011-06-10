@@ -115,9 +115,9 @@ void CoordHeadProvider::coordMode(){
 
 
     //update the chain angles
-    float newHeads[Kinematics::HEAD_JOINTS] = {lastYawDest,lastPitchDest};
-    vector<float> newChainAngles  =
-        vector<float>(newHeads,newHeads + Kinematics::HEAD_JOINTS);
+    vector<float> newChainAngles;
+	newChainAngles.push_back(lastYawDest);
+	newChainAngles.push_back(lastPitchDest);
     setNextChainJoints(HEAD_CHAIN,newChainAngles);
 
     vector<float> head_gains(HEAD_JOINTS, headSetStiffness);
@@ -133,7 +133,7 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
     float relX = command->getRelX()-pose->getFocalPointInWorldFrameX();
     float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()-300;//adjust for robot center's distance above ground
     yawDest = atan(relY/relX);
-    float hypoDist = sqrt(pow(relY,2)+pow(relX,2));
+    float hypoDist = sqrt((relY*relY)+(relX*relX));
     pitchDest = atan(relZ/hypoDist)-CAMERA_ANGLE;//constant for lower camera
     yawMaxSpeed = command->getMaxSpeedYaw();
     pitchMaxSpeed = command->getMaxSpeedPitch();
@@ -182,14 +182,12 @@ void CoordHeadProvider::stopSet(){
 void CoordHeadProvider::transitionTo(HeadMode newMode){
     //Method to handle special cases when the state changes
     if(newMode != curMode){
-        switch(newMode){
-        case COORD:
-            //If we need to switch modes, then we may not know what the latest
-            //angles are, so lets get them again from sensors
-            vector<float> mAngles = sensors->getMotionBodyAngles();
-            lastYawDest =mAngles[0];
-            lastPitchDest =mAngles[1];
-            break;
+		//If we need to switch modes, then we may not know what the latest
+		//angles are, so lets get them again from sensors
+		vector<float> mAngles = sensors->getMotionBodyAngles();
+		lastYawDest =mAngles[0];
+		lastPitchDest =mAngles[1];
+		break;
         }
         curMode = newMode;
 #ifdef DEBUG_HEADPROVIDER
