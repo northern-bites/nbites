@@ -17,6 +17,7 @@ ColorCreator::ColorCreator(QWidget *parent) :
     image(new RoboImage()),
     roboimage(image)
 {
+
     img = new QImage(640, 480, QImage::Format_RGB32);
     img2 = new QImage(320, 240, QImage::Format_RGB32);
     img3 = new QImage(320, 240, QImage::Format_RGB32);

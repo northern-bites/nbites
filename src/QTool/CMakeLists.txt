@@ -20,11 +20,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 ########### Sources
 
 set( QTool_srcs main.cpp
-  window.cpp
+  QTool.cpp
   )
 
 set(QTool_headers
-    window.h
+    QTool.h
 )
 
 #set(QTool_forms colorcreator.ui)
@@ -62,8 +62,8 @@ add_executable(QTool ${QTool_srcs}
 
 target_link_libraries(
   QTool
-  Image
   ColorCreator
+  Image
   ${MEMORY_LIB}
   ${PARSE_LIB}
   ${PROTOBUF_LIBRARIES}
