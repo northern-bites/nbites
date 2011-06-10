@@ -9,6 +9,7 @@ CommTimer::CommTimer(llong (*f)())
     team_times(NUM_PLAYERS_PER_TEAM, 0), packets_checked(0),
     need_to_update(false)
 {
+    cout << "epoch == " << epoch << endl;
 }
 
 void
@@ -28,18 +29,18 @@ CommTimer::check_packet(const CommPacketHeader &p)
 
   // INVALID TIMESTAMP
   if (p.timestamp == GAME_INITIAL_TIMESTAMP){
-	  //cout << "game init timestamp" << endl;
+	  cout << "game init timestamp" << endl;
 	  return false;
   }
   // TOO OLD CHECK
   if (p.timestamp + PACKET_GRACE_PERIOD < ts){
-	  //std::cout << "too old to check. pt" << p.timestamp/1000 <<" ts: " << ts/1000 << std::endl;
+	  std::cout << "too old to check. pt" << p.timestamp/1000 <<" ts: " << ts/1000 << std::endl;
 	  return false;
   }
 
   // OUT OF ORDER CHECK
   if (p.timestamp < team_times[p.player - 1]){
-	  //std::cout << "out of order" << std::endl;
+	  std::cout << "out of order" << std::endl;
 	  return false;
   }
   // JUST RESET CHECK

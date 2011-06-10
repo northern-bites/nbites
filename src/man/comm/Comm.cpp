@@ -435,7 +435,7 @@ bool c_init_comm (void)
     shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());
     shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
 
-    shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_time));
+    shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_mono_time));
     shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
     shared_ptr<Vision> vision = shared_ptr<Vision>(new Vision(pose, prof));
 
@@ -462,7 +462,7 @@ PyMODINIT_FUNC init_comm (void)
 Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
     : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
-	  latest(new list<vector<float> >), sensors(s), timer(&micro_time),
+	  latest(new list<vector<float> >), sensors(s), timer(&micro_mono_time),
 	  gc(new GameController()), tool(_synchro, s, v, gc)
 {
     pthread_mutex_init(&comm_mutex,NULL);
@@ -509,6 +509,7 @@ void Comm::run ()
         //discover_broadcast();
 
         while (running) {
+	    //cout << "Sending!" << timer.timestamp() << endl;
             send();
 
 			// recieve until it's time to send again.
@@ -749,9 +750,11 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 		// send the udp message
         result = ::sendto(sockn, msg, len, 0, (struct sockaddr*)&addr,
                           sizeof(broadcast_addr));
+	//cout << "Comm::send() : result == " << result << endl;
         // except if error is blocking error
         if (result == -1 && errno == EAGAIN) {
             result = -2;
+	    cout << "Comm::send() : EAGAIN error!" << endl;
             nanosleep(&interval, &remainder);
         }
     }
@@ -770,6 +773,7 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 
     // record last time we sent a message
     timer.sent_packet();
+    //cout << "Comm::send() : last packet sent at " << timer.last_packet_sent_at() << endl;
 }
 
 // Recieves packets from various sources
@@ -781,9 +785,13 @@ void Comm::receive () throw(socket_error)
     socklen_t addr_len = sizeof(sockaddr_in);
 
     // receive a UDP message
+    // recvfrom() returns the number of bytes actually recieved,
+    // or -1 if error.
     int result = ::recvfrom(sockn, &buf, UDP_BUF_SIZE, 0,
                             (struct sockaddr*)&recv_addr, &addr_len);
+    // While no error, handle the packet and continue to receive new ones.
     while (result > 0) {
+	//cout << "Comm::receive() : result == " << result << endl;
         // handle the message
         handle_comm(recv_addr, &buf[0], result);
         // check for another one
@@ -840,6 +848,8 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
     if (len == static_cast<int>(strlen(TOOL_REQUEST_MSG)) &&
         memcmp(msg, TOOL_REQUEST_MSG, TOOL_REQUEST_LEN) == 0) {
 
+	//cout << "Comm::handle_comm() : handling packet from TOOL..." << endl;
+
         std::string robotName = getRobotName();
         const char *name = robotName.c_str();
 
@@ -859,10 +869,18 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
         free(response);
 
     } else {
+	//cout << "Comm::handle_comm() : handling packet..." << endl;
         // validate packet format, check packet timestamp, and parse data
         CommPacketHeader packet;
-        if (validate_packet(msg, len, packet))
+        if (validate_packet(msg, len, packet)) {
+	    // Log that a packet has been received.
+	    //cout << "Comm::handle_comm() : packet received at "
+	    //<< packet.timestamp << endl;
+	    //cout << " header == " << packet.header << endl;
+	    //cout << " team == " << packet.team << endl;
+	    //cout << " player == " << packet.player << endl;
             parse_packet(packet, msg + sizeof(packet), len - sizeof(packet));
+	}
     }
 }
 
@@ -880,7 +898,7 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     throw() {
     // check packet length
 	if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader)){
-		std::cout << "bad length" << std::endl;
+	    //std::cout << "bad length (" << len << ")" << std::endl;
 		return false;
 	}
 
@@ -889,19 +907,19 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
 
     // check packet header
     if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0){
-        //std::cout << "bad header" << std::endl;
+        //std::cout << "bad header (" << packet.header << ")" << std::endl;
         return false;
     }
     // check team number
     if (packet.team != gc->team()){
-        //std::cout << "bad team number" << std::endl;
+        //std::cout << "bad team number (" << packet.team << ")" << std::endl;
         return false;
     }
 
     // check player number
     if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM ||
         packet.player == gc->player()){
-        //std::cout << "bad player number" << std::endl;
+        //std::cout << "bad player number (" << packet.player << ")" << std::endl;
         return false;
     }
 
