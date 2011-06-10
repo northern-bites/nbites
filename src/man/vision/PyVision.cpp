@@ -106,8 +106,15 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("x", &VisualCorner::getX)
     .def_readonly("y", &VisualCorner::getY)
     .def_readonly("elevation", &VisualCorner::getElevationDeg)
+    .def_readonly("possibilities", &VisualCorner::getIDs)
     ;
 
+  // VisualCorner can return a vector of IDs from ConcretCorner
+  class_<std::vector<cornerID> >("IDVec")
+    .def(vector_indexing_suite<std::vector<cornerID> >())
+    ;
+
+  // From ConcreteCorner.h, gives the ID of a ConcreteCorner
   enum_<cornerID>("cornerID")
     .value("L_INNER_CORNER", L_INNER_CORNER)
     .value("L_OUTER_CORNER", L_OUTER_CORNER)
