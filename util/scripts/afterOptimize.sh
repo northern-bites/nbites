@@ -28,7 +28,7 @@ read username
 
 echo "Fetching gait..."
 echo $FETCH_GAIT
-eval $FETCH_GAIT
+eval $FETCH_GAIT || exit 1
 
 SERVER="$username@robocup.bowdoin.edu"
 
@@ -40,14 +40,14 @@ BACKUP="ssh $SERVER 'cp $PICKLE_PATH $PICKLE_PATH.$NOW'"
 
 echo "Backing up the old swarm pickle file"
 echo $BACKUP
-eval $BACKUP
+eval $BACKUP || exit 1
 
 # and put the gait onto the server
 PUT_GAIT="scp /tmp/$PICKLE $SERVER:$ROBOCUP_DIR/$PSO_DIR/"
 
 echo "Putting gait pickle back onto our server"
 echo $PUT_GAIT
-eval $PUT_GAIT
+eval $PUT_GAIT || exit 1
 
 echo "All done! Thanks for running the walk optimizer!"
 

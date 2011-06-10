@@ -135,7 +135,7 @@ public:
     void classifyOuterL(VisualCorner &first);
     void classifyT(VisualCorner &first);
 
-    const list<const ConcreteCorner*> classifyCornerWithObjects(
+    const std::list<const ConcreteCorner*> classifyCornerWithObjects(
         const VisualCorner &corner,
         const std::vector <const VisualFieldObject*> &visibleObjects) const;
 
@@ -229,6 +229,7 @@ private:
     bool seeCenterCircle;
     int objectRightX;
     int objectRightY;
+	float objectDistance;
 #ifdef OFFLINE
     bool debugIdentifyCorners;
 #else

@@ -47,15 +47,16 @@ using boost::shared_ptr;
 //                                     //
 /////////////////////////////////////////
 
-Man::Man (shared_ptr<Sensors> _sensors,
+Man::Man (shared_ptr<Profiler> _profiler,
+          shared_ptr<Sensors> _sensors,
           shared_ptr<Transcriber> _transcriber,
           shared_ptr<ImageTranscriber> _imageTranscriber,
           shared_ptr<MotionEnactor> _enactor,
           shared_ptr<Synchro> synchro,
           shared_ptr<Lights> _lights,
           shared_ptr<Speech> _speech)
-
-  : sensors(_sensors),
+  : profiler(_profiler),
+    sensors(_sensors),
     transcriber(_transcriber),
     imageTranscriber(_imageTranscriber),
     enactor(_enactor),
@@ -63,7 +64,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
     speech(_speech)
 {
   // initialize system helper modules
-  profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
+
 #ifdef USE_TIME_PROFILING
   profiler->profiling = true;
   profiler->profileFrames(700);
@@ -92,6 +93,9 @@ Man::Man (shared_ptr<Sensors> _sensors,
   set_speech_pointer(_speech);
 
   vision = shared_ptr<Vision>(new Vision(pose, profiler));
+
+  set_vision_pointer(vision);
+
   comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 #ifdef USE_NOGGIN
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,

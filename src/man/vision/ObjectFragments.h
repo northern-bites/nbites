@@ -54,7 +54,6 @@ public:
     void init(float s);
 
     void newRun(int x, int endY, int height);
-	bool colorsEqual(unsigned char x, unsigned char y);
 
     // scan operations
     int yProject(int startx, int starty, int newy);
@@ -70,7 +69,7 @@ public:
     int findTrueLineHorizontal(point <int> left, point <int> right, int c,
                                bool up);
     void findVerticalEdge(point <int>& top, point <int>& bottom, int c,
-                                    bool left);
+						  bool left, bool correct);
     void findHorizontalEdge(point <int>& left, point <int>& right,
                                       int c, bool up);
     bool checkEdge(int x, int y, int x1, int y1);
@@ -88,6 +87,7 @@ public:
     bool qualityPost(Blob b, int c);
     bool checkSize(Blob b, int c);
     int getBigRun(int left, int right);
+	int getBigRunExpanded(int left, int right, int prevx);
     bool updateObject(VisualFieldObject* a, Blob b, certainty _certainty,
                       distanceCertainty _distCertainty);
     distanceCertainty checkDist(Blob pole);
@@ -113,9 +113,6 @@ public:
                                    pair<int, int> foo,
                                    int classification);
 
-
-
-
 	int classifyByCheckingLines(Blob post);
 
     int characterizeSize(Blob b);
@@ -126,11 +123,12 @@ public:
     void lookForFirstPost(VisualFieldObject *left, VisualFieldObject *right,
                   VisualCrossbar *mid, int c);
     void lookForSecondPost(Blob pole, int post,
-                                            VisualFieldObject* left,
-                                            VisualFieldObject* right,
+						   VisualFieldObject* left,
+						   VisualFieldObject* right,
                            VisualCrossbar* mid, int c);
 
     void updateRunsAfterFirstPost(Blob pole, int post);
+	void lookForPost(int index, Blob & obj);
     int grabPost(int c, int left, int right, Blob & pole);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
     void transferTopBlob(VisualFieldObject * one, certainty cert,
@@ -161,13 +159,9 @@ public:
 
     // debugging methods
     void printObjs();
-    void drawPoint(int x, int y, int c);
-    void drawRect(int x, int y, int w, int h, int c);
     void drawBlob(Blob b, int c);
     void printBlob(Blob b);
     void printObject(VisualFieldObject * objs);
-    void paintRun(int x,int y, int h, int c);
-    void drawRun(const run& run, int c);
 #ifdef OFFLINE
 	void setPrintObjs(bool debug) {PRINTOBJS = debug;}
 	void setPostDebug(bool debug) {POSTDEBUG = debug;}
