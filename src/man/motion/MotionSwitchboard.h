@@ -64,7 +64,9 @@
 
 class MotionSwitchboard {
 public:
-  MotionSwitchboard(boost::shared_ptr<Sensors> s,boost::shared_ptr<Profiler> p,boost::shared_ptr<NaoPose> pose);
+  MotionSwitchboard(boost::shared_ptr<Sensors> s,
+					boost::shared_ptr<Profiler> p,
+					boost::shared_ptr<NaoPose> pose);
     ~MotionSwitchboard();
 
     void start();

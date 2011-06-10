@@ -29,14 +29,10 @@ def spinScanBall(tracker):
         tracker.activeLocOn = False
         return tracker.goNow('ballSpinTracking')
 
-   # if nav.walkTheta > 0:
-   #     tracker.headMove = HeadMoves.SPIN_LEFT_SCAN_BALL
-   # else:
-   #     tracker.headMove = HeadMoves.SPIN_RIGHT_SCAN_BALL
-    if tracker.brain.ball.relY > 0:
-        tracker.headMove = HeadMoves.LOOK_UP
+    if nav.walkTheta > 0:
+        tracker.headMove = HeadMoves.SPIN_LEFT_SCAN_BALL
     else:
-        tracker.headMove = HeadMoves.LOOK_DOWN
+        tracker.headMove = HeadMoves.SPIN_RIGHT_SCAN_BALL
 
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(tracker.headMove)
