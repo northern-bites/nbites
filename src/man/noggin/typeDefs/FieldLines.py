@@ -51,6 +51,7 @@ class Corner:
         self.x = visionCorner.x
         self.y = visionCorner.y
         self.elevation = visionCorner.elevation
+        self.possibilities = visionCorner.possibilities
         
     def __str__(self):
         return "Corner with dist " + str(self.dist) + " bearing " + str(self.bearing) + " angleX " + str(self.angleX) + " angleY " + str(self.angleY) + " x " + str(self.x) + " y " + str(self.y) + " elevation " + str(self.elevation) + "."
