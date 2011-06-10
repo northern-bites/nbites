@@ -274,7 +274,6 @@ class Brain(object):
         # # Update the corner information
         self.fieldLines.updateCorners(self.vision.fieldLines)
         self.corners = self.fieldLines.corners
-        for corner in self.corners:
 
         self.time = time.time()
 
