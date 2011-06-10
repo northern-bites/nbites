@@ -92,7 +92,7 @@ private:
     // Gives an estimate for the latency in communications (i.e., the 
     // difference between the timestamp of time sent contained in the 
     // packet data and the current time.)
-    llong estimatePacketLatency();
+    //llong estimatePacketLatency();
 
 private:
     // mutex lock for threaded data access
