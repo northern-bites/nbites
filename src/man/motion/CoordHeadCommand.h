@@ -29,9 +29,9 @@ class CoordHeadCommand : public MotionCommand
 {
 public:
     CoordHeadCommand(const float _x, const float _y,
-                     //_x, _y relative to robot center
+                     //_x, _y relative to robot center in mm
                      const float _z,
-                     //_z relative to ground
+                     //_z relative to ground in mm
                      const float _maxSpeedYaw =
                      Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
                      const float _maxSpeedPitch =

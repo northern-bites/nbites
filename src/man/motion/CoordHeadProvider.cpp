@@ -170,6 +170,8 @@ void CoordHeadProvider::setActive(){
 
 
 bool CoordHeadProvider::isDone(){
+	//returns true when robot's current yaw and pitch match destination's
+	//yaw and pitch
     return ((yawDest == lastYawDest) && (pitchDest == lastPitchDest));
 }
 
