@@ -39,23 +39,23 @@
 
 class CoordHeadProvider : public MotionProvider {
 public:
-  CoordHeadProvider(boost::shared_ptr<Sensors> s,
-		    boost::shared_ptr<Profiler> p,
-		    boost::shared_ptr<NaoPose> _pose);
-  virtual ~CoordHeadProvider();
+    CoordHeadProvider(boost::shared_ptr<Sensors> s,
+                      boost::shared_ptr<Profiler> p,
+                      boost::shared_ptr<NaoPose> _pose);
+    virtual ~CoordHeadProvider();
 
-  void requestStopFirstInstance();
-  void calculateNextJointsAndStiffnesses();
+    void requestStopFirstInstance();
+    void calculateNextJointsAndStiffnesses();
 
-  void hardReset();
+    void hardReset();
 
-  void setCommand(const CoordHeadCommand* command);
-  
- private:
+    void setCommand(const CoordHeadCommand* command);
+
+private:
     enum HeadMode {
         SCRIPTED,
         SET,
-	COORD
+        COORD
     };
     void transitionTo(HeadMode newMode);
     void coordMode();

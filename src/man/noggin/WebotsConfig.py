@@ -1,4 +1,4 @@
-WEBOTS_ACTIVE = ""
+WEBOTS_ACTIVE = False
 
 if WEBOTS_ACTIVE == "ON":
     WEBOTS_ACTIVE = True

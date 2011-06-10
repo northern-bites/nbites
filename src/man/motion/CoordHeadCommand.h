@@ -29,36 +29,36 @@
 
 class CoordHeadCommand : public MotionCommand
 {
- public:
- CoordHeadCommand(const float _x, const float _y,
-		  //_x, _y relative to robot center
-		  const float _z,
-		  //_z relative to ground
-		  const float _maxSpeedYaw =
-		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
-		  const float _maxSpeedPitch = 
-		  Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
-		  )
-   : MotionCommand(MotionConstants::COORD_HEAD),
-    relX(_x), relY(_y), relZ(_z),
-    maxSpeedYaw(_maxSpeedYaw), maxSpeedPitch(_maxSpeedPitch)
-    {
-      setChainList();
+public:
+    CoordHeadCommand(const float _x, const float _y,
+                     //_x, _y relative to robot center
+                     const float _z,
+                     //_z relative to ground
+                     const float _maxSpeedYaw =
+                     Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
+                     const float _maxSpeedPitch =
+                     Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
+        )
+        : MotionCommand(MotionConstants::COORD_HEAD),
+          relX(_x), relY(_y), relZ(_z),
+          maxSpeedYaw(_maxSpeedYaw), maxSpeedPitch(_maxSpeedPitch)
+        {
+            setChainList();
+        }
+    const float getRelX() const {return relX;}
+    const float getRelY() const {return relY;}
+    const float getRelZ() const {return relZ;}
+    const float getMaxSpeedYaw() const {return maxSpeedYaw;}
+    const float getMaxSpeedPitch() const {return maxSpeedPitch;}
+private:
+    virtual void setChainList() {
+        chainList.insert(chainList.end(),
+                         MotionConstants::HEAD_JOINT_CHAINS,
+                         MotionConstants::HEAD_JOINT_CHAINS
+                         + MotionConstants::HEAD_JOINT_NUM_CHAINS);
     }
-  const float getRelX() const {return relX;}
-  const float getRelY() const {return relY;}
-  const float getRelZ() const {return relZ;}
-  const float getMaxSpeedYaw() const {return maxSpeedYaw;}
-  const float getMaxSpeedPitch() const {return maxSpeedPitch;}
- private:
-  virtual void setChainList() {
-    chainList.insert(chainList.end(),
-		     MotionConstants::HEAD_JOINT_CHAINS,
-		     MotionConstants::HEAD_JOINT_CHAINS
-		     + MotionConstants::HEAD_JOINT_NUM_CHAINS);
-  }
-const float relX, relY, relZ;
-const float maxSpeedYaw,maxSpeedPitch;
+    const float relX, relY, relZ;
+    const float maxSpeedYaw,maxSpeedPitch;
 };
 
 #endif

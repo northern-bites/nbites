@@ -30,17 +30,17 @@ using boost::shared_ptr;
 //#define DEBUG_HEADPROVIDER
 
 CoordHeadProvider::CoordHeadProvider(shared_ptr<Sensors> s,shared_ptr<Profiler> p,shared_ptr<NaoPose> _pose)
-	: MotionProvider(HEAD_PROVIDER, p),
-	  sensors(s),
-	  pose(_pose),
-	  chopper(sensors),
-	  nextJoints(),
-	  currCommand(new ChoppedCommand() ),
-	  curMode(SCRIPTED),
-	  yawDest(0.0f), pitchDest(0.0f),
-	  lastYawDest(0.0f), lastPitchDest(0.0f),
-	  pitchMaxSpeed(0.0f), yawMaxSpeed(0.0f),
-	  headSetStiffness(0.6f)
+    : MotionProvider(HEAD_PROVIDER, p),
+      sensors(s),
+      pose(_pose),
+      chopper(sensors),
+      nextJoints(),
+      currCommand(new ChoppedCommand() ),
+      curMode(SCRIPTED),
+      yawDest(0.0f), pitchDest(0.0f),
+      lastYawDest(0.0f), lastPitchDest(0.0f),
+      pitchMaxSpeed(0.0f), yawMaxSpeed(0.0f),
+      headSetStiffness(0.6f)
 {
     pthread_mutex_init (&coord_head_provider_mutex, NULL);
 }
@@ -72,15 +72,15 @@ void CoordHeadProvider::hardReset(){
 
 //Method called from MotionSwitchboard
 void CoordHeadProvider::calculateNextJointsAndStiffnesses() {
-	PROF_ENTER(profiler,P_HEAD);
-	pthread_mutex_lock(&coord_head_provider_mutex);
+    PROF_ENTER(profiler,P_HEAD);
+    pthread_mutex_lock(&coord_head_provider_mutex);
     switch(curMode){
     case COORD:
         coordMode();
     }
     setActive();
-	pthread_mutex_unlock(&coord_head_provider_mutex);
-	PROF_EXIT(profiler,P_HEAD);
+    pthread_mutex_unlock(&coord_head_provider_mutex);
+    PROF_EXIT(profiler,P_HEAD);
 }
 
 //Method called during the 'SET' Mode
@@ -98,21 +98,21 @@ void CoordHeadProvider::coordMode(){
 
     //avoid potential head collisions with shoulder pads
     if (lastPitchDest < 0) {
-      if (lastYawDest < -.35 || lastYawDest > .35) {
-	pitchChangeTarget = clip(pitchChangeTarget,-lastPitchDest,pitchChangeTarget);
-      }
+        if (lastYawDest < -.35 || lastYawDest > .35) {
+            pitchChangeTarget = clip(pitchChangeTarget,-lastPitchDest,pitchChangeTarget);
+        }
     }
 
 #ifdef DEBUG_HEADPROVIDER
-     cout << "Last values "<<endl
-          <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
-          <<"   added      ("<<yawChangeTarget<<","<<pitchChangeTarget<<")"<<endl
-          <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
+    cout << "Last values "<<endl
+         <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
+         <<"   added      ("<<yawChangeTarget<<","<<pitchChangeTarget<<")"<<endl
+         <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
 #endif
 
     //update memory for next  run
-     lastYawDest = lastYawDest+yawChangeTarget;
-     lastPitchDest = lastPitchDest+pitchChangeTarget;
+    lastYawDest = lastYawDest+yawChangeTarget;
+    lastPitchDest = lastPitchDest+pitchChangeTarget;
 
 
     //update the chain angles
@@ -128,30 +128,30 @@ void CoordHeadProvider::coordMode(){
 
 
 void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
-  pthread_mutex_lock(&coord_head_provider_mutex);
-  transitionTo(COORD);
-  float relY = command->getRelY()-pose->getFocalPointInWorldFrameY();//adjust from mm to cm
-  float relX = command->getRelX()-pose->getFocalPointInWorldFrameX();
-  float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()-300;//adjust for robot center's distance above ground
-  yawDest = atan(relY/relX);
-  float hypoDist = sqrt(pow(relY,2)+pow(relX,2));
-  pitchDest = atan(relZ/hypoDist)-CAMERA_ANGLE;//constant for lower camera
-  yawMaxSpeed = command->getMaxSpeedYaw();
-  pitchMaxSpeed = command->getMaxSpeedPitch();
+    pthread_mutex_lock(&coord_head_provider_mutex);
+    transitionTo(COORD);
+    float relY = command->getRelY()-pose->getFocalPointInWorldFrameY();//adjust from mm to cm
+    float relX = command->getRelX()-pose->getFocalPointInWorldFrameX();
+    float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()-300;//adjust for robot center's distance above ground
+    yawDest = atan(relY/relX);
+    float hypoDist = sqrt(pow(relY,2)+pow(relX,2));
+    pitchDest = atan(relZ/hypoDist)-CAMERA_ANGLE;//constant for lower camera
+    yawMaxSpeed = command->getMaxSpeedYaw();
+    pitchMaxSpeed = command->getMaxSpeedPitch();
 
-  //clip dest and maxVel values to safe limits
-  //these limits are currently pretty arbitrary
-  yawDest = clip(yawDest, 1.5);
-  pitchDest = clip(pitchDest, -.65, .5);
-  yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*.35);
-  pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.35);
+    //clip dest and maxVel values to safe limits
+    //these limits are currently pretty arbitrary
+    yawDest = clip(yawDest, 1.5);
+    pitchDest = clip(pitchDest, -.65, .5);
+    yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*.35);
+    pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.35);
 
-  setActive();
-  /* ** *///cout <<"looking at yaw:  "<<yawDest<<"  and pitch: "<<pitchDest<<endl;
-  /* ** *///cout <<"currently at:   "<<lastYawDest<<"   "<<lastPitchDest<<endl;
-  /* ** *///cout <<"relative position: "<<command->getRelX()<<"  "<<command->getRelY()<<"  "<<command->getRelZ()<<endl;
-  /* ** *///cout <<"adjusted position: "<<relX<<"  "<<relY<<"  "<<relZ<<endl;
-  pthread_mutex_unlock(&coord_head_provider_mutex);
+    setActive();
+    /* ** *///cout <<"looking at yaw:  "<<yawDest<<"  and pitch: "<<pitchDest<<endl;
+    /* ** *///cout <<"currently at:   "<<lastYawDest<<"   "<<lastPitchDest<<endl;
+    /* ** *///cout <<"relative position: "<<command->getRelX()<<"  "<<command->getRelY()<<"  "<<command->getRelZ()<<endl;
+    /* ** *///cout <<"adjusted position: "<<relX<<"  "<<relY<<"  "<<relZ<<endl;
+    pthread_mutex_unlock(&coord_head_provider_mutex);
 }
 
 vector<float> CoordHeadProvider::getCurrentHeads() {
@@ -181,7 +181,7 @@ void CoordHeadProvider::stopSet(){
 }
 
 void CoordHeadProvider::transitionTo(HeadMode newMode){
-//Method to handle special cases when the state changes
+    //Method to handle special cases when the state changes
     if(newMode != curMode){
         switch(newMode){
         case COORD:
@@ -194,11 +194,11 @@ void CoordHeadProvider::transitionTo(HeadMode newMode){
         }
         curMode = newMode;
 #ifdef DEBUG_HEADPROVIDER
-    cout << "Transitioned to mode :"<<curMode<<endl;
+        cout << "Transitioned to mode :"<<curMode<<endl;
 #endif
     }else{
 #ifdef DEBUG_HEADPROVIDER
-    cout << "No transition need to get to :"<<curMode<<endl;
+        cout << "No transition need to get to :"<<curMode<<endl;
 #endif
     }
 
