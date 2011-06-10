@@ -62,8 +62,8 @@ add_executable(QTool ${QTool_srcs}
 
 target_link_libraries(
   QTool
-  Image
   ColorCreator
+  Image
   ${MEMORY_LIB}
   ${PARSE_LIB}
   ${PROTOBUF_LIBRARIES}

@@ -11,6 +11,8 @@
 #include <qmainwindow.h>
 #include <qtabwidget.h>
 
+#include "ColorCreator/colorcreator.h"
+
 namespace QTool {
 
 class QTool : public QMainWindow {
@@ -22,7 +24,9 @@ public:
     ~QTool();
 
 private:
-    QTabWidget toolTabs;
+    QTabWidget* toolTabs;
+
+    ColorCreator* colorCreator;
 
 };
 
