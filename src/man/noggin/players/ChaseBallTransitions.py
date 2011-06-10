@@ -123,6 +123,13 @@ def shouldStopDribbling(player):
             player.brain.my.x < ( NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
                                   NogginConstants.GREEN_PAD_X))
 
+def shouldKickOff(player):
+    """
+    Determines whether we should do our KickOff play as chaser
+    """
+    return (player.brain.gameController.ownKickOff and
+            not player.hasKickedOffKick)
+
 ####### FIND BALL STUFF ##############
 
 def shouldScanFindBall(player):

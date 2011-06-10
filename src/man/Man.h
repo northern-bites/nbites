@@ -57,7 +57,8 @@ class Man : public ImageSubscriber
 public:
 
     // contructors
-    Man(boost::shared_ptr<Sensors> _sensors,
+    Man(boost::shared_ptr<Profiler> _profiler,
+        boost::shared_ptr<Sensors> _sensors,
         boost::shared_ptr<Transcriber> _transcriber,
         boost::shared_ptr<ImageTranscriber> _imageTranscriber,
         boost::shared_ptr<MotionEnactor> _enactor,

@@ -169,6 +169,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         for(int j = 0; j < IMAGE_WIDTH; j++) {
             row[j]= vision.thresh->getThresholded(i,j);
 #ifdef OFFLINE
+			// problem: the thresh image has non-bitwise colors
             if (vision.thresh->debugImage[i][j] != GREY) {
                 row[j]= vision.thresh->debugImage[i][j];
             }

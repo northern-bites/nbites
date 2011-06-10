@@ -542,7 +542,7 @@ void RoboGuardian::checkConnection(){
     const string IP = discoverIP();
 #ifdef DEBUG_CONNECTION
     cout << "checking connection, got IP" << IP << endl;
-#endif DEBUG_CONNECTION
+#endif
     if (IP.size() >= 7 && (IP[0] == '1' || IP[0] == '2')) {
         wifiReconnectTimeout = 0;
         return;
