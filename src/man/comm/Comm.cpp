@@ -33,9 +33,9 @@ using namespace boost;
 
 static PyObject *comm_module = NULL;
 
-//
-// Python Comm class definitions
-//
+/************************************/
+/****** Python Comm class defs ******/
+/************************************/
 
 typedef struct PyComm_t {
     PyObject_HEAD
@@ -45,6 +45,7 @@ typedef struct PyComm_t {
 #endif
 } PyComm;
 
+// Dummy Method for making new PyComm Objects which we can't do.
 static PyObject * PyComm_new (PyTypeObject *type, PyObject *args,
 							  PyObject *kwds)
 {
@@ -53,42 +54,52 @@ static PyObject * PyComm_new (PyTypeObject *type, PyObject *args,
     return NULL;
 }
 
+// Deconstructor for PyComm objects
 static void PyComm_dealloc (PyComm *self)
 {
     self->ob_type->tp_free((PyObject *)self);
 }
 
+// Retrieve a list of the latest recieved communication data
 static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
 {
     list<vector<float> >* latest;
     Py_BEGIN_ALLOW_THREADS
 
+		//grabs latestComm from C++
         latest = reinterpret_cast<PyComm*>(self)->comm->latestComm();
 
     Py_END_ALLOW_THREADS
 
-        // Build tuple of tuples of joint values
-        PyObject *outer = PyList_New(latest->size()), *inner, *f;
+        // Build tuple of tuples of floats, ie:
+		// packets is a tuple of packets where each packet is a tuple of
+		// fields which is a tuple of fields where each field is a float
+        PyObject *packets = PyList_New(latest->size()), *fields, *f;
     bool success = true;
     int i, j;
-    if (outer != NULL) {
+    if (packets != NULL) {
         i = 0;
         while (!latest->empty()) {
+			// v is a vector of fields. Each v represents a packet.
             vector<float> &v = latest->front();
-            inner = PyList_New(v.size());
-            if (inner != NULL) {
+            fields = PyList_New(v.size());
+            if (fields != NULL) {
                 for (unsigned int j = 0; j < v.size(); j++) {
+					// get float from vector of fields
                     f = PyFloat_FromDouble(v[j]);
                     if (f != NULL)
-                        PyList_SET_ITEM(inner, j, f);
+						// put each field, f, in fields at position j
+                        PyList_SET_ITEM(fields, j, f);
                     else {
                         success = false;
                         break;
                     }
                 }
-                PyList_SET_ITEM(outer, i, inner);
+				// put each tuple of fields (representing a packet) into packets
+                PyList_SET_ITEM(packets, i, fields);
                 if (!success)
                     break;
+				// get next packet from latest
                 latest->pop_front();
                 i++;
             }else {
@@ -100,13 +111,14 @@ static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
 
     // failed building tuples, recover memory
     if (!success) {
-        Py_DECREF(outer);
+        Py_DECREF(packets);
         return NULL;
     }
 
-    return outer;
+    return packets;
 }
 
+// Sets Comm Data from Python
 static PyObject * PyComm_setData (PyObject *self, PyObject *args)
 {
     PyObject *current;
@@ -140,6 +152,7 @@ static PyObject * PyComm_setData (PyObject *self, PyObject *args)
     return Py_None;
 }
 
+// starts Comm Thread from Python
 static PyObject * PyComm_start (PyObject *self, PyObject *)
 {
     int result;
@@ -164,6 +177,7 @@ static PyObject * PyComm_start (PyObject *self, PyObject *)
         }
 }
 
+// stops Comm Thread from Python
 static PyObject * PyComm_stop (PyObject *self, PyObject *)
 {
     Py_BEGIN_ALLOW_THREADS
@@ -176,6 +190,7 @@ static PyObject * PyComm_stop (PyObject *self, PyObject *)
     return Py_None;
 }
 
+// starts ToolConnect from Python
 static PyObject * PyComm_startTOOL (PyObject *self, PyObject *)
 {
     int result;
@@ -200,6 +215,7 @@ static PyObject * PyComm_startTOOL (PyObject *self, PyObject *)
         }
 }
 
+// stops ToolConnect from Python
 static PyObject * PyComm_stopTOOL (PyObject *self, PyObject *)
 {
     Py_BEGIN_ALLOW_THREADS
@@ -212,12 +228,14 @@ static PyObject * PyComm_stopTOOL (PyObject *self, PyObject *)
     return Py_None;
 }
 
+// sets Localization Access for Tool from Python
 void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
                                  shared_ptr<BallEKF> _ballEKF)
 {
     tool.setLocalizationAccess(_loc, _ballEKF);
 }
 
+// gets Robot's name from Python
 static PyObject * PyComm_getRobotName (PyObject *self, PyObject *)
 {
     std::string name = ((PyComm*)self)->comm->getRobotName();
@@ -234,6 +252,7 @@ static PyMemberDef PyComm_members[] = {
     {NULL}
 };
 
+/** Description of PyMethods **/
 static PyMethodDef PyComm_methods[] = {
 
     {"latestComm", (PyCFunction)PyComm_latestComm, METH_NOARGS,
@@ -302,6 +321,7 @@ static PyTypeObject PyCommType = {
     PyComm_new,                /* tp_new */
 };
 
+// makes new reference to comm in Python
 static PyObject * PyComm_new (Comm *comm)
 {
     PyComm *self;
@@ -329,6 +349,7 @@ static PyObject * PyComm_new (Comm *comm)
 
 static PyMethodDef module_methods[] = { {NULL} };
 
+// initializes Comm Module from Python
 bool c_init_comm (void)
 {
     if (!Py_IsInitialized())
@@ -414,7 +435,7 @@ bool c_init_comm (void)
     shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());
     shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
 
-    shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_time));
+    shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_mono_time));
     shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
     shared_ptr<Vision> vision = shared_ptr<Vision>(new Vision(pose, prof));
 
@@ -425,6 +446,7 @@ bool c_init_comm (void)
     return true;
 }
 
+// Initializes Comm module from python
 PyMODINIT_FUNC init_comm (void)
 {
     c_init_comm();
@@ -432,14 +454,15 @@ PyMODINIT_FUNC init_comm (void)
 
 
 
-//
-// C++ Comm class methods
-//
+/************************/
+/* C++ Comm class methods
+/************************/
 
+// Constructor
 Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
     : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
-	  latest(new list<vector<float> >), sensors(s), timer(&micro_time),
+	  latest(new list<vector<float> >), sensors(s), timer(&micro_mono_time),
 	  gc(new GameController()), tool(_synchro, s, v, gc)
 {
     pthread_mutex_init(&comm_mutex,NULL);
@@ -453,11 +476,13 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
     gc_broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 }
 
+// Deconstructor
 Comm::~Comm ()
 {
     pthread_mutex_destroy(&comm_mutex);
 }
 
+// starts ToolConnect thread and starts Comm thread
 int Comm::start ()
 {
     // Run the TOOLConnect thread
@@ -467,6 +492,7 @@ int Comm::start ()
     return Thread::start();
 }
 
+// Main control loop for Comm
 void Comm::run ()
 {
     // Signal thread start
@@ -483,9 +509,11 @@ void Comm::run ()
         //discover_broadcast();
 
         while (running) {
+	    //cout << "Sending!" << timer.timestamp() << endl;
             send();
 
-            while (running && !timer.time_for_packet()) {
+			// recieve until it's time to send again.
+            while (running && !timer.time_to_send()) {
                 receive();
                 nanosleep(&interval, &remainder);
             }
@@ -503,13 +531,14 @@ void Comm::run ()
     //trigger->off();
 }
 
+// Stops ToolConnect thread and Comm thread
 void Comm::stop ()
 {
     tool.stop();
 
     Thread::stop();
 }
-
+// Starts ToolConnect thread
 int Comm::startTOOL ()
 {
     const int result = tool.start();
@@ -520,12 +549,13 @@ int Comm::startTOOL ()
     return result;
 }
 
+// Stops ToolConnect thread
 void Comm::stopTOOL ()
 {
     tool.stop();
 }
 
-
+// Prints an error
 void Comm::error(socket_error err) throw()
 {
     running = false;
@@ -536,6 +566,7 @@ void Comm::error(socket_error err) throw()
     fprintf(stderr, "%s\n", err.what());
 }
 
+// Attempts to discover broadcast address
 void Comm::discover_broadcast ()
 {
     // run ifconfig command to discover broadcast address
@@ -570,9 +601,9 @@ void Comm::discover_broadcast ()
     } else if (len <= 0) {
         //cout<<"Failed to discover broadcast address -- find broadcast returned no output";
     }
-
 }
 
+// Binds all required sockets
 void Comm::bind () throw(socket_error)
 {
     int one = 1;
@@ -610,12 +641,12 @@ void Comm::bind () throw(socket_error)
 
 
     // Bind GameController socket
-    //
 #ifdef USE_GAMECONTROLLER
     bind_gc();
 #endif
 }
 
+// Binds GameController Socket
 void Comm::bind_gc () throw(socket_error)
 {
     int one = 1;
@@ -655,6 +686,7 @@ void Comm::bind_gc () throw(socket_error)
 //#endif
 }
 
+// Sends all relevant data to correct sources
 void Comm::send () throw(socket_error)
 {
     pthread_mutex_lock (&comm_mutex);
@@ -686,7 +718,7 @@ void Comm::send () throw(socket_error)
         pthread_mutex_unlock (&comm_mutex);
 
         send(&buf[0], sizeof(returnPacket), gc_broadcast_addr);
-    } else {
+    } else { // Don't bother to send packet to teammates if we are penalized
 
         // C++ header data
         const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
@@ -704,10 +736,10 @@ void Comm::send () throw(socket_error)
 
 }
 
+// Actually does the sending of the data
 void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error)
 {
 #ifdef COMM_SEND
-    // send the udp message
     int result = -2;
 
 	struct timespec interval, remainder;
@@ -715,11 +747,14 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 	interval.tv_nsec = 100000;
 
     while (result == -2) {
+		// send the udp message
         result = ::sendto(sockn, msg, len, 0, (struct sockaddr*)&addr,
                           sizeof(broadcast_addr));
+	//cout << "Comm::send() : result == " << result << endl;
         // except if error is blocking error
         if (result == -1 && errno == EAGAIN) {
             result = -2;
+	    cout << "Comm::send() : EAGAIN error!" << endl;
             nanosleep(&interval, &remainder);
         }
     }
@@ -738,8 +773,10 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 
     // record last time we sent a message
     timer.sent_packet();
+    //cout << "Comm::send() : last packet sent at " << timer.last_packet_sent_at() << endl;
 }
 
+// Recieves packets from various sources
 void Comm::receive () throw(socket_error)
 {
 #ifdef COMM_LISTEN
@@ -748,9 +785,13 @@ void Comm::receive () throw(socket_error)
     socklen_t addr_len = sizeof(sockaddr_in);
 
     // receive a UDP message
+    // recvfrom() returns the number of bytes actually recieved,
+    // or -1 if error.
     int result = ::recvfrom(sockn, &buf, UDP_BUF_SIZE, 0,
                             (struct sockaddr*)&recv_addr, &addr_len);
+    // While no error, handle the packet and continue to receive new ones.
     while (result > 0) {
+	//cout << "Comm::receive() : result == " << result << endl;
         // handle the message
         handle_comm(recv_addr, &buf[0], result);
         // check for another one
@@ -765,7 +806,6 @@ void Comm::receive () throw(socket_error)
     }
 
     // Receive GameController packets
-    //
 #ifdef USE_GAMECONTROLLER
     receive_gc();
 #endif
@@ -773,6 +813,7 @@ void Comm::receive () throw(socket_error)
 #endif
 }
 
+// Recieves packets from GameController
 void Comm::receive_gc () throw(socket_error)
 {
 #ifdef COMM_LISTEN
@@ -799,11 +840,15 @@ void Comm::receive_gc () throw(socket_error)
 #endif
 }
 
+// Handles incomming packet from teammates (or Tool)
 void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
     throw()
 {
+	// Checks for Tool message
     if (len == static_cast<int>(strlen(TOOL_REQUEST_MSG)) &&
         memcmp(msg, TOOL_REQUEST_MSG, TOOL_REQUEST_LEN) == 0) {
+
+	//cout << "Comm::handle_comm() : handling packet from TOOL..." << endl;
 
         std::string robotName = getRobotName();
         const char *name = robotName.c_str();
@@ -824,16 +869,22 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
         free(response);
 
     } else {
-
+	//cout << "Comm::handle_comm() : handling packet..." << endl;
         // validate packet format, check packet timestamp, and parse data
         CommPacketHeader packet;
-        if (validate_packet(msg, len, packet))
+        if (validate_packet(msg, len, packet)) {
+	    // Log that a packet has been received.
+	    //cout << "Comm::handle_comm() : packet received at "
+	    //<< packet.timestamp << endl;
+	    //cout << " header == " << packet.header << endl;
+	    //cout << " team == " << packet.team << endl;
+	    //cout << " player == " << packet.player << endl;
             parse_packet(packet, msg + sizeof(packet), len - sizeof(packet));
-
+	}
     }
-
 }
 
+// Handles packet from GameController
 void Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw()
 {
 	gc->handle_packet(msg, len);
@@ -842,11 +893,12 @@ void Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw(
 	}
 }
 
+// Ensure packet is one of ours
 bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     throw() {
     // check packet length
 	if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader)){
-		std::cout << "bad length" << std::endl;
+	    //std::cout << "bad length (" << len << ")" << std::endl;
 		return false;
 	}
 
@@ -855,19 +907,19 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
 
     // check packet header
     if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0){
-        //std::cout << "bad header" << std::endl;
+        //std::cout << "bad header (" << packet.header << ")" << std::endl;
         return false;
     }
     // check team number
     if (packet.team != gc->team()){
-        //std::cout << "bad team number" << std::endl;
+        //std::cout << "bad team number (" << packet.team << ")" << std::endl;
         return false;
     }
 
     // check player number
     if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM ||
         packet.player == gc->player()){
-        //std::cout << "bad player number" << std::endl;
+        //std::cout << "bad player number (" << packet.player << ")" << std::endl;
         return false;
     }
 
@@ -879,22 +931,27 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     return true;
 }
 
-void Comm::parse_packet (const CommPacketHeader &packet, const char* data, int size)
+// Takes info from packet and data and puts into a vector v.
+void Comm::parse_packet (const CommPacketHeader &packet, const char* msg, int size)
     throw()
 {
     int len = size / sizeof(float);
 
+	// parses header info out.
     vector<float> v(len + 3);
     v[0] = static_cast<float>(packet.team);
     v[1] = static_cast<float>(packet.player);
     v[2] = static_cast<float>(packet.color);
-    memcpy(&v[3], data, len * sizeof(float));
+	// copies actual message
+    memcpy(&v[3], msg, size);
 
+	// push message onto queue
     if (latest->size() >= MAX_MESSAGE_MEMORY)
         latest->pop_front();
     latest->push_back(v);
 }
 
+// Adds Comm to Python Module
 void Comm::add_to_module ()
 {
     if (comm_module == NULL) {
@@ -910,6 +967,7 @@ void Comm::add_to_module ()
     }
 }
 
+// Generates new list for latest and returns the old one.
 list<vector<float> >* Comm::latestComm()
 {
     list<vector<float> >* old = latest;
@@ -938,6 +996,7 @@ TeammateBallMeasurement Comm::getTeammateBallReport()
     return m;
 }
 
+// Sets data
 void Comm::setData (std::vector<float> &newData)
 {
     pthread_mutex_lock (&comm_mutex);
@@ -947,6 +1006,7 @@ void Comm::setData (std::vector<float> &newData)
     pthread_mutex_unlock (&comm_mutex);
 }
 
+// Returns name of robot
 std::string Comm::getRobotName ()
 {
     struct utsname name_str;
