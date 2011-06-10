@@ -108,6 +108,49 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("elevation", &VisualCorner::getElevationDeg)
     ;
 
+  enum_<cornerID>("cornerID")
+    .value("L_INNER_CORNER", L_INNER_CORNER)
+    .value("L_OUTER_CORNER", L_OUTER_CORNER)
+    .value("T_CORNER", T_CORNER)
+    .value("CENTER_CIRCLE", CENTER_CIRCLE)
+    
+    //FUZZY/CLEAR IDS start at 4
+    .value("BLUE_GOAL_T", BLUE_GOAL_T)
+    .value("YELLOW_GOAL_T", YELLOW_GOAL_T) //5
+    .value("BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L", 
+	   BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L)
+    .value("BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L",
+	   BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L)
+    .value("BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L",
+	   BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L)
+    .value("BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L",
+	   BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L)
+    .value("CORNER_INNER_L", CORNER_INNER_L) //10
+    .value("GOAL_BOX_INNER_L", GOAL_BOX_INNER_L)
+    .value("BLUE_GOAL_OUTER_L", BLUE_GOAL_OUTER_L)
+    .value("YELLOW_GOAL_OUTER_L", YELLOW_GOAL_OUTER_L)
+    .value("CENTER_T", CENTER_T)
+    
+    //SPECIFIC CORNER IDS start at 15
+    .value("BLUE_CORNER_TOP_L", BLUE_CORNER_TOP_L) //15
+    .value("BLUE_CORNER_BOTTOM_L", BLUE_CORNER_BOTTOM_L)
+    .value("BLUE_GOAL_LEFT_T", BLUE_GOAL_LEFT_T)
+    .value("BLUE_GOAL_RIGHT_T", BLUE_GOAL_RIGHT_T)
+    .value("BLUE_GOAL_LEFT_L", BLUE_GOAL_LEFT_L)
+    .value("BLUE_GOAL_RIGHT_L", BLUE_GOAL_RIGHT_L) //20
+    .value("CENTER_BOTTOM_T", CENTER_BOTTOM_T)
+    .value("CENTER_TOP_T", CENTER_TOP_T)
+    .value("YELLOW_CORNER_BOTTOM_L", YELLOW_CORNER_BOTTOM_L)
+    .value("YELLOW_CORNER_TOP_L", YELLOW_CORNER_TOP_L)
+    .value("YELLOW_GOAL_LEFT_T", YELLOW_GOAL_LEFT_T) //25
+    .value("YELLOW_GOAL_RIGHT_T", YELLOW_GOAL_RIGHT_T)
+    .value("YELLOW_GOAL_LEFT_L", YELLOW_GOAL_LEFT_L)
+    .value("YELLOW_GOAL_RIGHT_L", YELLOW_GOAL_RIGHT_L)
+    .value("CORNER_NO_IDEA_ID", CORNER_NO_IDEA_ID)
+    .value("TOP_CC", TOP_CC) // 30
+    .value("BOTTOM_CC", BOTTOM_CC)
+    ;
+
   ///////MAIN VISION CLASS/////////  
   //noncopyable is required because vision has no public copy constructor
   class_<Vision, shared_ptr<Vision>, boost::noncopyable >("Vision", no_init)
