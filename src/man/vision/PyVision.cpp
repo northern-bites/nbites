@@ -90,6 +90,39 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("length", &VisualLine::getLength)
     .def_readonly("slope", &VisualLine::getSlope)
     .def_readonly("yInt", &VisualLine::getYIntercept)
+    .def_readonly("possibilities", &VisualLine::getIDs)
+    ;
+
+  //VisualLine can return a vector of IDs from ConcreteLine
+  class_<std::vector<lineID> >("LineIDVec")
+    .def(vector_indexing_suite<std::vector<cornerID> >())
+    ;
+
+  // From ConcreteLine.h, gives the ID of a line
+  enum_<lineID>("lineID")
+    // Ambiguous lines
+    .value("UNKNOWN_LINE", UNKNOWN_LINE) //50
+    .value("SIDE_OR_ENDLINE", SIDE_OR_ENDLINE)
+    .value("SIDELINE_LINE", SIDELINE_LINE)
+    .value("ENDLINE_LINE", ENDLINE_LINE)
+    .value("GOALBOX_LINE", GOALBOX_LINE)
+    .value("GOALBOX_SIDE_LINE", GOALBOX_SIDE_LINE) //55
+    .value("GOALBOX_TOP_LINE", GOALBOX_TOP_LINE)
+    // Distinct lines
+    // Named by looking from center field out, left end is at blue goal
+    .value("BLUE_GOAL_ENDLINE", BLUE_GOAL_ENDLINE)
+    .value("YELLOW_GOAL_ENDLINE", YELLOW_GOAL_ENDLINE)
+    .value("TOP_SIDELINE", TOP_SIDELINE)
+    .value("BOTTOM_SIDELINE", BOTTOM_SIDELINE) //60
+    .value("MIDLINE", MIDLINE)
+    //Goalbox lines
+    // Named as if you were the goalie, top of box = TOP_LINE
+    .value("BLUE_GOALBOX_TOP_LINE", BLUE_GOALBOX_TOP_LINE)
+    .value("BLUE_GOALBOX_LEFT_LINE", BLUE_GOALBOX_LEFT_LINE)
+    .value("BLUE_GOALBOX_RIGHT_LINE", BLUE_GOALBOX_RIGHT_LINE)
+    .value("YELLOW_GOALBOX_TOP_LINE", YELLOW_GOALBOX_TOP_LINE) //65
+    .value("YELLOW_GOALBOX_LEFT_LINE", YELLOW_GOALBOX_LEFT_LINE)
+    .value("YELLOW_GOALBOX_RIGHT_LINE", YELLOW_GOALBOX_RIGHT_LINE)
     ;
 
   // FieldLines holds a list of VisualCorners (not pointers) (cornersList) 
@@ -109,12 +142,12 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("possibilities", &VisualCorner::getIDs)
     ;
 
-  // VisualCorner can return a vector of IDs from ConcretCorner
-  class_<std::vector<cornerID> >("IDVec")
+  // VisualCorner can return a vector of IDs from ConcreteCorner
+  class_<std::vector<cornerID> >("CornerIDVec")
     .def(vector_indexing_suite<std::vector<cornerID> >())
     ;
 
-  // From ConcreteCorner.h, gives the ID of a ConcreteCorner
+  // From ConcreteCorner.h, gives the ID of a corner
   enum_<cornerID>("cornerID")
     .value("L_INNER_CORNER", L_INNER_CORNER)
     .value("L_OUTER_CORNER", L_OUTER_CORNER)

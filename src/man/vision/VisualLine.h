@@ -216,6 +216,7 @@ class VisualLine : public VisualLandmark<lineID> {
 
     inline const std::string getColorString() const;
     inline const std::list <const ConcreteLine *> getPossibleLines() const;
+    const std::vector<lineID> getIDs();
     inline const std::vector<linePoint> getPoints() const;
 
     virtual const bool hasPositiveID();
