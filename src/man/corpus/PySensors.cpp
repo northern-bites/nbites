@@ -69,7 +69,6 @@ BOOST_PYTHON_MODULE(sensors)
         .def(vector_indexing_suite< std::vector<float> >())
         ;
 
-	// noncopyable used b/c SensorMonitor has no copy constructor or operator=
     class_<Sensors, shared_ptr<Sensors> >("Sensors", no_init)
         //All the properties lack a setter. The values should be read-only
         //NOTE: all sensor values in Python should be in degrees and centimeters

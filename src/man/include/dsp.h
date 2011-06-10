@@ -43,6 +43,12 @@ public:
     FifoBuffer(int maxCount = 0);
     ~FifoBuffer();
 
+	// we have to define our own copy and assignment to make sure the ring gets copied
+	// effect Construct a FIFO that is identical to other
+    FifoBuffer(const FifoBuffer& other);
+	// effect make this FIFO a copy of other
+    FifoBuffer& operator= (const FifoBuffer& other);
+
     // effect   Get/set maximum number of items. Setting clears the FIFO.
     // notes    Setting zero items makes this a null FIFO.
     int  MaxCount() const { return ringSize;}
@@ -106,10 +112,6 @@ private:
 
     int overflows;
     int underflows;
-
-    // Disallow use of default copy constructor, assignment operator
-    FifoBuffer(const FifoBuffer&);
-    FifoBuffer& operator= (const FifoBuffer&);
 };
 
 // FIFO template class implementation. Template class inplementations
@@ -129,6 +131,40 @@ template <class T>
 FifoBuffer<T>::~FifoBuffer()
 {
     delete [] ring;
+}
+
+// NOTE: accessing private members is allowed in this case because the copy
+//       constructor is a class member function (access is by class, not by obj)
+template <class T>
+FifoBuffer<T>::FifoBuffer(const FifoBuffer& other) :
+	ringSize(other.ringSize),
+	readIndex(other.readIndex),
+	writeIndex(other.writeIndex),
+	count(other.count),
+	nullValue(other.nullValue),
+	overflows(other.overflows),
+	underflows(other.underflows)
+{
+	ring = new T[ringSize];
+	for (int i = 0; i < ringSize; ++i)
+		ring[i] = other.ring[i];
+}
+
+template <class T>
+FifoBuffer<T>& FifoBuffer<T>::operator= (const FifoBuffer& other)
+{
+	ringSize = other.ringSize;
+	readIndex = other.readIndex;
+	writeIndex = other.writeIndex;
+	count = other.count;
+	nullValue = other.nullValue;
+	overflows = other.overflows;
+	underflows = other.underflows;
+
+	delete [] ring;
+	ring = new T[ringSize];
+	for (int i = 0; i < ringSize; ++i)
+		ring[i] = other.ring[i];
 }
 
 template <class T>

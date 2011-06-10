@@ -23,15 +23,16 @@ class SoccerFSA(FSA.FSA):
         self.setPrintFunction(self.brain.out.printf)
 
         # for writing variance data every time we enter gamePenalized
-        self.wroteVarianceData = false
+        self.wroteVarianceData = False
 
     def run(self):
+        # gamePenalized is a good time for a lot of i/o, since we won't be moving
         if self.currentState == 'gamePenalized':
             if not self.wroteVarianceData:
-                self.brain.sensors.writeVarianceData
-            self.wroteVarianceData = true
+                self.brain.sensors.writeVarianceData()
+                self.wroteVarianceData = True
         else:
-            self.wroteVarianceData = false
+            self.wroteVarianceData = False
 
         FSA.FSA.run(self)
 
