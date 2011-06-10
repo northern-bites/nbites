@@ -463,7 +463,8 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
     : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
 	  latest(new list<vector<float> >), sensors(s), timer(&micro_mono_time),
-	  gc(new GameController()), tool(_synchro, s, v, gc)
+      gc(new GameController()), tool(_synchro, s, v, gc), averagePacketDelay(0),
+      totalPacketsReceived(0), ourPacketsReceived(0)
 {
     pthread_mutex_init(&comm_mutex,NULL);
     // initialize broadcast address structure
@@ -474,8 +475,6 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
     gc_broadcast_addr.sin_family = AF_INET;
     gc_broadcast_addr.sin_port = htons(GAMECONTROLLER_PORT);
     gc_broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-
-    averagePacketDelay = 0;
 }
 
 // Deconstructor
@@ -515,11 +514,11 @@ void Comm::run()
 	    // If time to send, send packet.
 	    if(timer.timeToSend()) {
 		send();
-	    } else {
-		// Otherwise, receive.
-		receive();
-		nanosleep(&interval, &remainder);
-	    }
+	    } 
+
+	    // Otherwise, receive.
+	    receive();
+	    nanosleep(&interval, &remainder);
 	}
     } catch (socket_error &e) {
         fprintf(stderr, "Error occurred in Comm, thread has paused.\n");
@@ -800,9 +799,11 @@ void Comm::receive() throw(socket_error)
 	    updateAverageDelay();
 	}
 	timer.packetReceived();
-        // handle the message
+	totalPacketsReceived++;
+	updatePercentReceived();
+        // Handle messages from not for GameController.
         handle_comm(recv_addr, &buf[0], result);
-        // check for another one
+        // Continue checking for new messages...
         result = ::recvfrom(sockn, &buf, UDP_BUF_SIZE, 0,
                             (struct sockaddr*)&recv_addr, &addr_len);
     }
@@ -858,6 +859,8 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 
 	//cout << "Comm::handle_comm() : handling packet from TOOL..." << endl;
 
+	ourPacketsReceived++;
+
         std::string robotName = getRobotName();
         const char *name = robotName.c_str();
 
@@ -881,6 +884,7 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
         // validate packet format, check packet timestamp, and parse data
         CommPacketHeader packet;
         if (validate_packet(msg, len, packet)) {
+	    ourPacketsReceived++;
 	    // Log that a packet has been received.
 	    //cout << "Comm::handle_comm() : packet received at "
 	    //<< packet.timestamp << endl;
@@ -896,6 +900,7 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 void Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw()
 {
 	gc->handle_packet(msg, len);
+	ourPacketsReceived++;
 	if (gc->shouldResetTimer()){
 		timer.reset();
 	}
@@ -1058,5 +1063,16 @@ void Comm::updateAverageDelay()
 
 void Comm::updatePercentReceived()
 {
-    // TODO.
+    cout << "Comm::updatePercentReceived() : total packets == " << totalPacketsReceived
+	 << " our packets == " << ourPacketsReceived << endl;
+    double percentage = 0.0f;
+    if(totalPacketsReceived != 0) {
+	percentage = ourPacketsReceived/(double)totalPacketsReceived;
+	cout << "Comm::updatePercentReceived() : " << percentage*100 << "%" << endl;
+    } else {
+	cout << "Comm::updatePercentReceived() : divide by zero error!" << endl;
+    }
 }
+
+//llong Comm::estimatePacketLatency()
+//{ }

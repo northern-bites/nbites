@@ -89,6 +89,11 @@ private:
     // that have our header.
     void updatePercentReceived();
 
+    // Gives an estimate for the latency in communications (i.e., the 
+    // difference between the timestamp of time sent contained in the 
+    // packet data and the current time.)
+    llong estimatePacketLatency();
+
 private:
     // mutex lock for threaded data access
     pthread_mutex_t comm_mutex;
@@ -107,8 +112,8 @@ private:
     int toolCommandState;
 
     // Socket information
-    int sockn;
-    int gc_sockn;
+    int sockn;                               // Socket file descriptor. 
+    int gc_sockn;                            // GameController socket file descriptor.
     struct sockaddr_in bind_addr;
     struct sockaddr_in broadcast_addr;
     struct sockaddr_in gc_broadcast_addr;
