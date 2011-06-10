@@ -84,6 +84,11 @@ private:
     // other robots, not from the TOOL or GameController.
     void updateAverageDelay();
 
+    // Calculates the running percentage of packets received that are
+    // "ours" by recording the total packets received and the percent
+    // that have our header.
+    void updatePercentReceived();
+
 private:
     // mutex lock for threaded data access
     pthread_mutex_t comm_mutex;

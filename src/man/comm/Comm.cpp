@@ -495,7 +495,7 @@ int Comm::start ()
 }
 
 // Main control loop for Comm
-void Comm::run ()
+void Comm::run()
 {
     // Signal thread start
     running = true;
@@ -510,16 +510,17 @@ void Comm::run ()
 
         //discover_broadcast();
 
-        while (running) {
-	    //cout << "Sending!" << timer.timestamp() << endl;
-            send();
-
-			// recieve until it's time to send again.
-            while (running && !timer.time_to_send()) {
-                receive();
-                nanosleep(&interval, &remainder);
-            }
-        }
+	// The main packet send/receive loop.
+	while(running) {
+	    // If time to send, send packet.
+	    if(timer.timeToSend()) {
+		send();
+	    } else {
+		// Otherwise, receive.
+		receive();
+		nanosleep(&interval, &remainder);
+	    }
+	}
     } catch (socket_error &e) {
         fprintf(stderr, "Error occurred in Comm, thread has paused.\n");
         fprintf(stderr, "%s\n", e.what());
@@ -779,7 +780,7 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 }
 
 // Recieves packets from various sources
-void Comm::receive () throw(socket_error)
+void Comm::receive() throw(socket_error)
 {
 #ifdef COMM_LISTEN
 
@@ -1053,4 +1054,9 @@ void Comm::updateAverageDelay()
     cout << "Comm::updateAverageDelay() : average delay == " << newAverage << endl;
 
     averagePacketDelay = newAverage;
+}
+
+void Comm::updatePercentReceived()
+{
+    // TODO.
 }

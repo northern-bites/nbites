@@ -15,9 +15,8 @@ class CommTimer
 
     inline llong timestamp(void) { return time() - epoch; }
 
-    inline bool time_to_send(void) {
-	return timestamp() - packet_timer > MICROS_PER_PACKET;
-    }
+    inline bool timeToSend(void) { return timestamp() - packet_timer > MICROS_PER_PACKET; }
+
     inline void sent_packet(void) {
       packet_timer = timestamp();
     }
