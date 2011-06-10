@@ -74,25 +74,24 @@ void CoordHeadProvider::hardReset(){
 void CoordHeadProvider::calculateNextJointsAndStiffnesses() {
     PROF_ENTER(profiler,P_HEAD);
     pthread_mutex_lock(&coord_head_provider_mutex);
-    switch(curMode){
-    case COORD:
-        coordMode();
-    }
+
+	coordMode();
+
     setActive();
     pthread_mutex_unlock(&coord_head_provider_mutex);
     PROF_EXIT(profiler,P_HEAD);
 }
 
-//Method called during the 'SET' Mode
+//Method called during the 'COORD' Mode
 void CoordHeadProvider::coordMode(){
     //Maximum head movement is Rad/motion frame (6 deg/20ms from AL docs)
     const float MAX_HEAD_VEL = 6.0f*TO_RAD;
 
     //Calculate how much we can move toward the goal
-    const float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
+    float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
                                                - yawMaxSpeed,
                                                yawMaxSpeed);
-    const float pitchChangeTarget = NBMath::clip(pitchDest - lastPitchDest,
+    float pitchChangeTarget = NBMath::clip(pitchDest - lastPitchDest,
                                                  -pitchMaxSpeed,
                                                  pitchMaxSpeed);
 
@@ -141,10 +140,10 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
 
     //clip dest and maxVel values to safe limits
     //these limits are currently pretty arbitrary
-    yawDest = clip(yawDest, 1.5);
-    pitchDest = clip(pitchDest, -.65, .5);
-    yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*.35);
-    pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.35);
+    yawDest = clip(yawDest,YAW_CLIP);
+    pitchDest = clip(pitchDest,PITCH_MIN_CLIP,PITCH_MAX_CLIP);
+    yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*SPEED_CLIP_FACTOR);
+    pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*SPEED_CLIP_FACTOR);
 
     setActive();
     /* ** *///cout <<"looking at yaw:  "<<yawDest<<"  and pitch: "<<pitchDest<<endl;

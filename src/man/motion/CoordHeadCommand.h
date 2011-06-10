@@ -24,8 +24,6 @@
 #include "Kinematics.h"
 #include "NaoPose.h"
 #include <cmath>
-//#include "NBMath.h"
-//include math
 
 class CoordHeadCommand : public MotionCommand
 {
