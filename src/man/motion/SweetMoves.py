@@ -340,7 +340,7 @@ STAND_UP_BACK = (((100,0,0,0),
 RIGHT_FAR_KICK = (
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),
-     (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),
+     (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),   
      (80.0 , -40.0 , 50.0 , 70.0), 0.8 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
@@ -546,8 +546,6 @@ LEFT_LONG_BACK_KICK = (
     .8,0, stiff.NORMAL_STIFFNESSES))
 
 
-RIGHT_LONG_BACK_KICK =  mirrorMove(LEFT_LONG_BACK_KICK)
-
 LEFT_SHORT_BACK_KICK =  (
 
     # lean right 
@@ -593,7 +591,7 @@ LEFT_SHORT_BACK_KICK =  (
     .8,0, stiff.NORMAL_STIFFNESSES))
 
 RIGHT_LONG_BACK_KICK =  mirrorMove(LEFT_LONG_BACK_KICK)
-RIGHT_SHORT_BACK_KICK = mirrorMove(LEFT_LONG_BACK_KICK)
+RIGHT_SHORT_BACK_KICK = mirrorMove(LEFT_SHORT_BACK_KICK)
 
 
 
