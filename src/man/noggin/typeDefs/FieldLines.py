@@ -37,6 +37,7 @@ class Line:
         self.length = visionLine.length
         self.slope = visionLine.slope
         self.yInt = visionLine.yInt
+        self.possibilities = visionLine.possibilities
 
     def __str__(self):
         return "Line with angle " + str(self.angle) + " width " + str(self.width) + " bearing " + str(self.bearing) + " dist " + str(self.dist) + " length " + str(self.length) + " slope " + str(self.slope) + " yInt " + str(self.yInt) + "."

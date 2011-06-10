@@ -95,7 +95,7 @@ BOOST_PYTHON_MODULE(vision)
 
   //VisualLine can return a vector of IDs from ConcreteLine
   class_<std::vector<lineID> >("LineIDVec")
-    .def(vector_indexing_suite<std::vector<cornerID> >())
+    .def(vector_indexing_suite<std::vector<lineID> >())
     ;
 
   // From ConcreteLine.h, gives the ID of a line
