@@ -56,3 +56,4 @@ def writeGaitToFile(file, gait, gaitNumber):
         file.write(declaration)
 
     file.write(")\n\n")
+
