@@ -189,16 +189,13 @@ void CoordHeadProvider::transitionTo(HeadMode newMode){
 		vector<float> mAngles = sensors->getMotionBodyAngles();
 		lastYawDest =mAngles[0];
 		lastPitchDest =mAngles[1];
-		break;
-        }
-        curMode = newMode;
+	curMode = newMode;
 #ifdef DEBUG_HEADPROVIDER
-        cout << "Transitioned to mode :"<<curMode<<endl;
+	cout << "Transitioned to mode :"<<curMode<<endl;
 #endif
-    }else{
+	}else{
 #ifdef DEBUG_HEADPROVIDER
         cout << "No transition need to get to :"<<curMode<<endl;
 #endif
-    }
-
+	}
 }
