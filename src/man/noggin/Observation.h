@@ -132,6 +132,9 @@ public:
         sigma_o(_c.getPhysicalOrientationSD()) { }
     virtual ~CornerObservation() { }
 
+    float getVisOrientation() const { return visOrientation; };
+    float getOrientationSD()  const { return sigma_o;        };
+
 private:
     float visOrientation;
     float sigma_o;

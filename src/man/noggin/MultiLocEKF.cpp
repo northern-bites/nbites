@@ -427,7 +427,7 @@ void MultiLocEKF::incorporateMeasurement(const PointObservation& z,
     cout << "\t\t\tIncorporating measurement " << z << endl;
 #endif
 
-    const int obsIndex = findBestLandmark(z);
+    const int obsIndex = findBestLandmark<PointObservation, PointLandmark>(z);
 
     // No landmark is close enough, don't attempt to use one
     if (obsIndex < 0) {
@@ -621,48 +621,30 @@ void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
 #endif
 }
 
-/**
- * Given an observation with multiple possibilities, we return the observation
- * with the best possibility as the first element of the vector
- *
- * @param z The observation to be fixed
- */
-int MultiLocEKF::findBestLandmark(const PointObservation& z)
-{
-
-    // Hack in here for if the vision system cannot identify this observation
-    // (no possible identities)
-    // @TODO this should never happen, so fix vision system to stop it from happening.
-    if (z.getNumPossibilities() == 0){
-        return -1;
-    } else if (z.getNumPossibilities() == 1){
-        return 0;
-    } else {
-        return findNearestNeighbor(z);
-    }
-}
-
-/**
- * Find the point closest to our observation.
- *
- * @param The observed point
- * @return Index of the nearest neighbor
- */
-int MultiLocEKF::findNearestNeighbor(const PointObservation& z)
-{
-    vector<PointLandmark> possiblePoints = z.getPossibilities();
-    float minDivergence = 250.0f;
-    int minIndex = -1;
-    for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
-        float divergence = getDivergence(z, possiblePoints[i]);
-
-        if (divergence < minDivergence) {
-            minDivergence = divergence;
-            minIndex = i;
-        }
-    }
-    return minIndex;
-}
+#define CALCULATE_PT_OBS_ERRORS(obs, pt)                                \
+    const float x = xhat_k_bar(0);                                      \
+    const float y = xhat_k_bar(1);                                      \
+    const float h = xhat_k_bar(2);                                      \
+                                                                        \
+                                                                        \
+    float pt_rel_x = (pt.x - x);                                        \
+    float pt_rel_y = (pt.y - y);                                        \
+                                                                        \
+    float pt_dist = hypotf(pt_rel_x, pt_rel_y);                         \
+                                                                        \
+    /* Heading from me to landmark */                                   \
+    float heading_mag = acosf(pt_rel_x / pt_dist);                      \
+                                                                        \
+    /* Sign the heading and subtract our heading to get bearing */      \
+    float pt_bearing = subPIAngle(copysignf(1.0f, pt_rel_y) *           \
+                                  heading_mag - h);                     \
+                                                                        \
+    /* Normalized errors */                                             \
+    float dist_error_norm = (pt_dist - z.getVisDistance()) /            \
+                                              z.getDistanceSD();        \
+    float bearing_error_norm = (subPIAngle(pt_bearing -                 \
+                                           z.getVisBearing()) /         \
+                                z.getBearingSD());
 
 /**
  * Get the divergence between an observation and a possible point landmark
@@ -672,21 +654,34 @@ int MultiLocEKF::findNearestNeighbor(const PointObservation& z)
  *
  * @return The divergence value
  */
-float MultiLocEKF::getDivergence(const PointObservation& z, const PointLandmark& pt)
+float MultiLocEKF::getDivergence(const PointObservation& z,
+                                 const PointLandmark& pt)
 {
-    const float x = xhat_k_bar(0);
-    const float y = xhat_k_bar(1);
-    const float h = xhat_k_bar(2);
-    float x_b_r = z.getVisDistance() * cos(z.getVisBearing());
-    float y_b_r = z.getVisDistance() * sin(z.getVisBearing());
+    CALCULATE_PT_OBS_ERRORS(z,pt);
+    // Euclidean distance
+    return (dist_error_norm * dist_error_norm +
+            bearing_error_norm * bearing_error_norm);
+}
 
-    float sinh, cosh;
-    sincosf(h, &sinh, &cosh);
+float MultiLocEKF::getDivergence(const CornerObservation& z,
+                                 const CornerLandmark& pt)
+{
+    CALCULATE_PT_OBS_ERRORS(z,pt);
 
-    float x_b  = (pt.x - x) * cosh + (pt.y - y) * sinh;
-    float y_b = -(pt.x - x) * sinh + (pt.y - y) * cosh;
+    // Calculate the heading from the corner to us
+    float heading_from_corner = 180 - heading_mag;
 
-    return static_cast<float>(hypot(x_b_r - x_b, y_b_r - y_b));
+    float pt_orientation = (heading_from_corner * copysignf(1.0f,
+                                                            -pt_rel_y) -
+                            pt.angle);
+
+    float orientation_error_norm = (pt_orientation -
+                                    z.getVisOrientation()) /
+        z.getOrientationSD();
+
+    return (dist_error_norm * dist_error_norm +
+            bearing_error_norm * bearing_error_norm +
+            orientation_error_norm * orientation_error_norm);
 }
 
 /**

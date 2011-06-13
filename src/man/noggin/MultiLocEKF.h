@@ -159,9 +159,56 @@ private:
                                      MeasurementVector1 &V_k);
 
 
-    int findBestLandmark(const PointObservation& z);
-    int findNearestNeighbor(const PointObservation& z);
+
+    /**
+     * Given an observation with multiple possibilities, we return the
+     * observation with the best possibility as the first element of
+     * the vector
+     *
+     * @param z The observation to be fixed
+     */
+    template <class ObsT, class LandmarkT>
+    int findBestLandmark(const ObsT& z) {
+
+        // Hack in here for if the vision system cannot identify this
+        // observation (no possible identities)
+        //
+        // @TODO this should never happen, so fix vision system to stop it from happening.
+        if (z.getNumPossibilities() == 0){
+            return -1;
+        } else if (z.getNumPossibilities() == 1){
+            return 0;
+        } else {
+            return findNearestNeighbor<ObsT, LandmarkT>(z);
+        }
+    }
+
+
+    /**
+     * Find the point closest to our observation.
+     *
+     * @param The observed point
+     * @return Index of the nearest neighbor
+     */
+    template <class ObsT, class LandmarkT>
+    int findNearestNeighbor(const ObsT& z){
+        std::vector<LandmarkT> possiblePoints = z.getPossibilities();
+        float minDivergence = 250.0f;
+        int minIndex = -1;
+        for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
+            float divergence = getDivergence(z, possiblePoints[i]);
+
+            if (divergence < minDivergence) {
+                minDivergence = divergence;
+                minIndex = i;
+            }
+        }
+        return minIndex;
+    }
+
+
     float getDivergence(const PointObservation& z, const PointLandmark& pt);
+    float getDivergence(const CornerObservation& z, const CornerLandmark& pt);
 
 #ifdef USE_MM_LOC_EKF
     bool updateProbability(const Observation& Z);
