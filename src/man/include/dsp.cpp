@@ -255,16 +255,27 @@ std::string SignalMonitor::toString()
 
     for (int i = 0; i < numBins; ++i)
     {
-        double x = (i + 0.5) / k + low;
-        if (log)
-            x = exp(x);
-		data << x;
-        if (bins[i] > 0)
-			data << "\t" << bins[i];
-        else
-			data << "\t" << 0;
+		data << binMidPoint(i);
+		data << "\t" << binCount(i);
 		data << std::endl;
     }
 
 	return data.str();
+}
+
+const int SignalMonitor::binCount(int index) const {
+	if (index < 0 || index > numBins)
+		return 0;
+
+	if (bins[index] > 0)
+		return bins[index];
+	else
+		return 0;
+}
+
+const double SignalMonitor::binMidPoint(int index) const {
+	double x = (index + 0.5) / k + low;
+	if (log)
+		x = exp(x);
+	return x;
 }

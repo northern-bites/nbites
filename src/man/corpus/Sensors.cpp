@@ -53,24 +53,18 @@ Sensors::Sensors ()
       motionBodyAngles(NUM_ACTUATORS),
       bodyAnglesError(NUM_ACTUATORS),
       bodyTemperatures(NUM_ACTUATORS,0.0f),
-      leftFootFSR(0.0f, 0.0f, 0.0f, 0.0f),
+      leftFootFSR(),
       rightFootFSR(leftFootFSR),
       leftFootBumper(0.0f, 0.0f),
       rightFootBumper(0.0f, 0.0f),
-      inertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+      inertial(),
       ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
       yImage(&global_image[0]), uvImage(&global_image[0]),
       colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
-	  accX_m("accX", 0, 5),
-	  accY_m("accY", 0, 5),
-	  accZ_m("accZ", 0, 5),
-	  gyrX_m("gyroX", 0, 5),
-	  gyrY_m("gyroY", 0, 5),
-	  angleX_m("angleX", 0, 5),
-	  angleY_m("angleY", 0, 5),
-	  unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
+	  varianceMonitor(7, "SensorVariance", sensorNames),
+	  unfilteredInertial(),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
       FRM_FOLDER("/home/nao/naoqi/frames"),
 	  saving_frames_on(false)
@@ -644,13 +638,14 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
     unfilteredInertial = _unfilteredInertial;
 
 	// update the variance filters
-	accX_m.X(unfilteredInertial.accX);
-	accY_m.X(unfilteredInertial.accY);
-	accZ_m.X(unfilteredInertial.accZ);
-	gyrX_m.X(unfilteredInertial.gyrX);
-	gyrY_m.X(unfilteredInertial.gyrY);
-	angleX_m.X(unfilteredInertial.angleX);
-	angleY_m.X(unfilteredInertial.angleY);
+	// TODO: clean this line up (ellipsis arguments?)
+	varianceMonitor.update(0, unfilteredInertial.accX);
+	varianceMonitor.update(1, unfilteredInertial.accY);
+	varianceMonitor.update(2, unfilteredInertial.accZ);
+	varianceMonitor.update(3, unfilteredInertial.gyrX);
+	varianceMonitor.update(4, unfilteredInertial.gyrY);
+	varianceMonitor.update(5, unfilteredInertial.angleX);
+	varianceMonitor.update(6, unfilteredInertial.angleY);
 
 	pthread_mutex_unlock(&variance_mutex);
     pthread_mutex_unlock(&unfiltered_inertial_mutex);
@@ -852,13 +847,7 @@ void Sensors::writeVarianceData() {
 	pthread_mutex_lock(&variance_mutex);
 
 	cout << "Logging variance data to /tmp/" << endl;
-	accX_m.LogOutput();
-	accY_m.LogOutput();
-	accZ_m.LogOutput();
-	gyrX_m.LogOutput();
-	gyrY_m.LogOutput();
-	angleX_m.LogOutput();
-	angleY_m.LogOutput();
+	varianceMonitor.LogOutput();
 
 	pthread_mutex_unlock(&variance_mutex);
 }

@@ -24,9 +24,6 @@
  * circumstances. At destruction, this class will log the data it has
  * collected to /tmp/sensorName.xls
  *
- * Currently this class doesn't do any filtering of the data, but that
- * would be trivial to template and add (currently using a width 1 Boxcar).
- *
  * @see dsp.h
  * @author Nathan Merritt
  * @date June 2011
@@ -47,12 +44,20 @@ static const int numberOfBins = 25;
 class SensorMonitor : public Filter
 {
 public:
-	SensorMonitor(std::string sensorName, double low, double high, bool log=false);
+	SensorMonitor();
+	SensorMonitor(std::string sensorName);
 	~SensorMonitor();
 
 	double X(double);
 	void Reset();
 	void LogOutput(); 	// prints histograms to /tmp/{sensorName}.sensor
+
+	const int numberOfBins() const { return monitor.NumberOfBins(); }
+	const double binMidPoint(int index) const;
+	const int binCountAt(int index) const;
+
+	std::string const SensorName() { return sensorName; }
+	void SensorName(std::string name) { sensorName = name; }
 
 private:
 	std::string sensorName;

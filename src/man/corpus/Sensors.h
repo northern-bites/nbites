@@ -28,7 +28,7 @@
 #include "SensorDef.h"
 #include "NaoDef.h"
 #include "VisionDef.h"
-#include "SensorMonitor.h"
+#include "BulkMonitor.h"
 
 enum SupportFoot {
     LEFT_SUPPORT = 0,
@@ -58,7 +58,13 @@ enum SensorNames {
 	ANGLE_Y,
 	SONAR_LEFT,
 	SONAR_RIGHT,
-	SUPPORT_FOOT
+	SUPPORT_FOOT,
+	SENSOR_COUNT,
+};
+
+// names of different sensors in the order we grab them
+const string sensorNames[] = {
+	"accX", "accY", "accZ", "gyroX", "gyroY", "angleX", "angleY"
 };
 
 class Sensors;
@@ -292,7 +298,7 @@ class Sensors {
      */
 
 	// Sensor variance/health monitors
-	SensorMonitor accX_m, accY_m, accZ_m, gyrX_m, gyrY_m, angleX_m, angleY_m;
+	BulkMonitor varianceMonitor;
 
     Inertial unfilteredInertial;
     //ChestButton

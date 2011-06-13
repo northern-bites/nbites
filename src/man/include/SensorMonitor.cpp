@@ -5,16 +5,29 @@
 #include <fstream>
 #include <sstream>
 
-SensorMonitor::SensorMonitor(std::string sensorName, double low, double high, bool log)
+// parameters for the SignalMonitor
+static const bool LOG_DEFAULT = true;
+static const int NUMBER_BINS = 25;
+static const float LOW_BIN = 0.001f;
+static const float HIGH_BIN = 3.0f;
+
+SensorMonitor::SensorMonitor()
 	:  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
-	   monitor(numberOfBins, low, high, log)
+	   monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT)
+{
+	Reset();
+}
+
+SensorMonitor::SensorMonitor(std::string sensorName)
+	:  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
+	   monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT)
 {
 	SensorMonitor::sensorName = sensorName;
 	Reset();
 }
 
 SensorMonitor::~SensorMonitor() {
-	LogOutput();
+	// nothing to do here!
 }
 
 double SensorMonitor::X(double input) {
@@ -55,4 +68,12 @@ void SensorMonitor::LogOutput() {
 	outFile << monitor.toString() << endl;
 
 	outFile.close();
+}
+
+const int SensorMonitor::binCountAt(int index) const {
+	return monitor.binCount(index);
+}
+
+const double SensorMonitor::binMidPoint(int index) const {
+	return monitor.binMidPoint(index);
 }

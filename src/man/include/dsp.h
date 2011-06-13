@@ -753,6 +753,10 @@ public:
     // effect   Clear the histogram
     void Reset();
 
+	const int NumberOfBins() const { return numBins; }
+	const int binCount(int index) const;
+	const double binMidPoint(int index) const;
+
     // effect   Print the histogram, using the specified format string for
     //           printing signal values
     void Print();
