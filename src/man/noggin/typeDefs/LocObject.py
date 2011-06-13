@@ -8,7 +8,9 @@ class LocObject(Location):
         Location.__init__(self, 0,0,0)
         self.locDist = 0
         self.locBearing = 0
-        self.trackingFitness = 0
+        self.relX = 0
+        self.relY = 0
+        self.trackingFitness = 0   # Used in ActiveLoc
 
     def __lt__(self, other):
         return (self.trackingFitness < other.trackingFitness)

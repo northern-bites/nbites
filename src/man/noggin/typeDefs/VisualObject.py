@@ -1,13 +1,9 @@
-from .. import NogginConstants as Constants
-from .Location import Location
-
-class VisualObject(Location):
+class VisualObject():
     """VisualObject is a class for all objects that need general vision information
     in python. the fields common to all are centerX, centerY, width, height, focDist,
     dist, bearing
     """
     def __init__(self):
-        Location.__init__(self, 0,0,0)
         self.centerX = 0
         self.centerY = 0
         self.width = 0
@@ -15,6 +11,8 @@ class VisualObject(Location):
         self.focDist = 0
         self.visDist = 0
         self.visBearing = 0
+        self.angleX = 0
+        self.angleY = 0
         self.framesOn = 0
         self.framesOff = 0
         self.on = False
