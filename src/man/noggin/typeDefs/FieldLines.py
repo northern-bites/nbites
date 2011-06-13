@@ -47,11 +47,8 @@ class Corner:
     def __init__(self, visionCorner):
         self.dist = visionCorner.dist
         self.bearing = visionCorner.bearing
-        self.angleX = visionCorner.angleX
-        self.angleY = visionCorner.angleY
         self.x = visionCorner.x
         self.y = visionCorner.y
-        self.elevation = visionCorner.elevation
         self.possibilities = visionCorner.possibilities
         
     def __str__(self):

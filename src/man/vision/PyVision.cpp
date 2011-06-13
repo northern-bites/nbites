@@ -41,8 +41,22 @@ BOOST_PYTHON_MODULE(vision)
     .def_readonly("angleX", &VisualFieldObject::getAngleXDeg)
     .def_readonly("angleY", &VisualFieldObject::getAngleYDeg)
     // From VisualLandmark
-    .def_readonly("certainty", &VisualFieldObject::getIDCertaintyInt)
-    .def_readonly("distCertainty", &VisualFieldObject::getDistanceCertaintyInt)
+    .def_readonly("certainty", &VisualFieldObject::getIDCertainty)
+    .def_readonly("distCertainty", &VisualFieldObject::getDistanceCertainty)
+    ;
+
+  // From VisualLandmark.h, ID certainty possibilities
+  enum_<certainty>("certainty")
+    .value("NOT_SURE", NOT_SURE)
+    .value("MILDLY_SURE", MILDLY_SURE)
+    .value("_SURE", _SURE)
+    ;
+
+  enum_<distanceCertainty>("distanceCertainty")
+    .value("BOTH_UNSURE", BOTH_UNSURE)
+    .value("WIDTH_UNSURE", WIDTH_UNSURE)
+    .value("HEIGHT_UNSURE", HEIGHT_UNSURE)
+    .value("BOTH_SURE", BOTH_SURE)
     ;
 
   // Currently unused, but fully avaliable to python if uncommented
@@ -133,11 +147,8 @@ BOOST_PYTHON_MODULE(vision)
     // From VisualDetection
     .def_readonly("dist", &VisualCorner::getDistance)
     .def_readonly("bearing", &VisualCorner::getBearingDeg)
-    .def_readonly("angleX", &VisualCorner::getAngleXDeg)
-    .def_readonly("angleY", &VisualCorner::getAngleYDeg)
     .def_readonly("x", &VisualCorner::getX)
     .def_readonly("y", &VisualCorner::getY)
-    .def_readonly("elevation", &VisualCorner::getElevationDeg)
     .def_readonly("possibilities", &VisualCorner::getIDs)
     ;
 
