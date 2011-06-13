@@ -1127,14 +1127,11 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
         objPtr->setFocDist(objPtr->getDistance());
 		estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
 											  objPtr->getCenterY(),
-											  30.0f);
+											  265.0f);
+		cout << "est is " << pose_est.dist << endl;
 		// convert dist + angle estimates to body center
 		estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
 											  objPtr->getCenterY(),
-											  // ahem: Hack! But it works
-											  // if and when we fix pix est.
-											  // then we'll need to change
-											  // this back.
 											  pose_est.dist / 2.0f);
 		objPtr->setDistanceWithSD(obj_est.dist);
 		objPtr->setBearingWithSD(obj_est.bearing);
