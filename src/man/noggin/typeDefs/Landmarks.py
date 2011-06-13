@@ -1,7 +1,8 @@
 from .. import NogginConstants as Constants
 from .VisualObject import VisualObject
+from .LocObject import LocObject
 
-class FieldObject(VisualObject):
+class FieldObject(VisualObject, LocObject):
     """
     FieldObject is a class for field landmarks, storing visual information
     -landmarks:
@@ -24,9 +25,8 @@ class FieldObject(VisualObject):
         """initialization all values for FieldObject() class"""
         # Things to be filled out later
         VisualObject.__init__(self)
+        LocObject.__init__(self)
         self.localId = 0 # name based around team color
-        self.locDist = 0
-        self.locBearing = 0
         self.angleX = 0
         self.angleY = 0
 
