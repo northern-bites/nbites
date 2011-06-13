@@ -37,13 +37,13 @@ void ALEnactor::run() {
     long long currentTime;
 	struct timespec interval, remainder;
     while (running) {
-        currentTime = micro_time();
+        currentTime = process_micro_time();
             sendCommands();
             //Once we've sent the most calculated joints
             postSensors();
 
         const long long zero = 0;
-        const long long processTime = micro_time() - currentTime;
+        const long long processTime = process_micro_time() - currentTime;
 
 #if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
         if (processTime > MOTION_FRAME_LENGTH_uS){

@@ -80,7 +80,7 @@ const static float MOTION_FRAME_LENGTH_S = 0.01f;
 const float MOTION_FRAME_LENGTH_uS = 1000.0f * 1000.0f * MOTION_FRAME_LENGTH_S;
 const float MOTION_FRAME_RATE = 1.0f / MOTION_FRAME_LENGTH_S;
 
-static long long micro_time (void)
+static long long thread_micro_time (void)
 {
 #ifdef OFFLINE
 
