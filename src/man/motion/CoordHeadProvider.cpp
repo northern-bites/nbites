@@ -49,7 +49,6 @@ CoordHeadProvider::CoordHeadProvider(shared_ptr<Sensors> s,shared_ptr<Profiler> 
 // Motion Provider Methods
 CoordHeadProvider::~CoordHeadProvider() {
     pthread_mutex_destroy(&coord_head_provider_mutex);
-    // remove all remaining values from chain queues
 }
 
 void CoordHeadProvider::requestStopFirstInstance() {
