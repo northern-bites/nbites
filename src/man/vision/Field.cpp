@@ -103,7 +103,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 			}
 			pixel = thresh->getColor(x, top);
 			//pixel = thresh->thresholded[top][x];
-			if (Utility::isGreen(pixel)) {
+			if (Utility::isGreen(pixel) || Utility::isOrange(pixel)) {
 				good++;
 				greenRun++;
 				if (greenRun > 3 && topGreen == IMAGE_HEIGHT - 1) {
@@ -288,6 +288,7 @@ int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {
  */
 int Field::getInitialHorizonEstimate(int pH) {
 	const int MIN_PIXELS_INITIAL = 8;
+	const int MIN_PIXELS_HARDER = 20;
 	const int SCAN_INTERVAL_X = 10;
 	const int SCAN_INTERVAL_Y = 4;
 	//variable definitions
@@ -295,6 +296,10 @@ int Field::getInitialHorizonEstimate(int pH) {
 	register int i, j;
 	unsigned char pixel; //, lastPixel;
 
+	int pixelsNeeded = MIN_PIXELS_HARDER;
+	if (pH < -100) {
+		pixelsNeeded = MIN_PIXELS_INITIAL;
+	}
 	horizon = -1;			 // our calculated horizon
 	run = 0;				 // how many consecutive green pixels have I seen?
 	greenPixels = 0;		 // count for any given line
@@ -310,7 +315,7 @@ int Field::getInitialHorizonEstimate(int pH) {
 		// we do a scan based on the slope provided by pose
 		// and we only look at every 10th pixel
 		for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1
-				 && greenPixels <= MIN_PIXELS_INITIAL; i+= SCAN_INTERVAL_X) {
+				 && greenPixels <= pixelsNeeded; i+= SCAN_INTERVAL_X) {
 			//pixel = thresh->thresholded[scanY][i];
 			pixel = thresh->getColor(i, scanY);
 			// project the line to get the next y value
@@ -323,7 +328,7 @@ int Field::getInitialHorizonEstimate(int pH) {
 			}
 		}
 		// once we see enough green we're done
-		if (greenPixels > MIN_PIXELS_INITIAL) {
+		if (greenPixels > pixelsNeeded) {
 			return j;
 		}
 	}
