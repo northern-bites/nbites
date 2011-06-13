@@ -80,8 +80,10 @@ popd
 
 echo "Setting up bash stuff ..."
 
-echo "source $PWD/nbites.bash" >> ~/.bashrc
-echo "export NBITES_DIR=$nbites_dir" >> ~/.bashrc
-echo "export AL_DIR=$naoqi_local" >> ~/.bashrc
-echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$nbites_dir/ext/lib" >> ~/.bashrc
-echo "export PATH=$PATH:$nbites_dir/ext/bin" >> ~/.bashrc
+echo "export NBITES_DIR=$nbites_dir" >> nbites.bash
+echo "export AL_DIR=$naoqi_local" >> nbites.bash
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$nbites_dir/ext/lib" >> ~/nbites.bash
+echo "export PATH=$PATH:$nbites_dir/ext/bin" >> ~/nbites.bash
+echo "Done! The last step is just to add the following line"
+echo "source $PWD/nbites.bash"
+echo "to your .bashrc (which is in your home directory)"
