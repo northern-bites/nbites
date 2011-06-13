@@ -684,6 +684,22 @@ float MultiLocEKF::getDivergence(const CornerObservation& z,
             orientation_error_norm * orientation_error_norm);
 }
 
+
+/*
+ * Specialized acceptable divergence functions
+ */
+template<>
+float MultiLocEKF::getAcceptableDivergence<CornerLandmark>() {
+    // (3 sd's outside)^2 * 3
+    return ekf::corner_measurement_dim  * ekf::corner_measurement_dim *3;
+}
+
+template<>
+float MultiLocEKF::getAcceptableDivergence<PointLandmark>() {
+    // (3 sd's outside)^2 * 2
+    return ekf::dist_bearing_meas_dim * ekf::dist_bearing_meas_dim * 3;
+}
+
 /**
  * Method to ensure that uncertainty does not grow without bound
  */

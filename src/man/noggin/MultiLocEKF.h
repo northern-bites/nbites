@@ -193,7 +193,7 @@ private:
     template <class ObsT, class LandmarkT>
     int findNearestNeighbor(const ObsT& z){
         std::vector<LandmarkT> possiblePoints = z.getPossibilities();
-        float minDivergence = 250.0f;
+        float minDivergence = getAcceptableDivergence<LandmarkT>();
         int minIndex = -1;
         for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
             float divergence = getDivergence(z, possiblePoints[i]);
@@ -206,9 +206,12 @@ private:
         return minIndex;
     }
 
-
     float getDivergence(const PointObservation& z, const PointLandmark& pt);
     float getDivergence(const CornerObservation& z, const CornerLandmark& pt);
+
+    // Generic template
+    template<class LandmarkT>
+    inline float getAcceptableDivergence() { return 100; } // arbitrary
 
 #ifdef USE_MM_LOC_EKF
     bool updateProbability(const Observation& Z);

@@ -77,7 +77,7 @@ public:
 
     float getOrientation() const { return orientation; }
     float getPhysicalOrientation() const { return physicalOrientation; }
-    float getPhysicalOrientationSD() const { return 0; }//return physicalOrientationSD; }
+    float getPhysicalOrientationSD() const { return M_PI/6; } //return physicalOrientationSD; }
 
     point<int> getTStemEndpoint() const;
     bool doesItPointDown();
