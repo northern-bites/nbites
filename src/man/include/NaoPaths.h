@@ -7,7 +7,8 @@
  *
  */
 
-#pragma once
+#ifndef _NAOPATHS_H_
+#define _NAOPATHS_H_
 
 #ifdef OFFLINE
 
@@ -20,5 +21,7 @@
 #define NAO_HOME_DIR "/home/nao"
 #define NAO_NAOQI_DIR NAO_HOME_DIR "/naoqi"
 #define NAO_LOG_DIR NAO_NAOQI_DIR "/log"
+
+#endif
 
 #endif
