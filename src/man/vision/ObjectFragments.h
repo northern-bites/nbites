@@ -87,6 +87,7 @@ public:
     bool qualityPost(Blob b, int c);
     bool checkSize(Blob b, int c);
     int getBigRun(int left, int right);
+	int getBigRunExpanded(int left, int right, int prevx);
     bool updateObject(VisualFieldObject* a, Blob b, certainty _certainty,
                       distanceCertainty _distCertainty);
     distanceCertainty checkDist(Blob pole);
@@ -127,6 +128,7 @@ public:
                            VisualCrossbar* mid, int c);
 
     void updateRunsAfterFirstPost(Blob pole, int post);
+	void lookForPost(int index, Blob & obj);
     int grabPost(int c, int left, int right, Blob & pole);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
     void transferTopBlob(VisualFieldObject * one, certainty cert,
