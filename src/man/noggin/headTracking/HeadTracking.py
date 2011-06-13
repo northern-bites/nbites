@@ -32,7 +32,8 @@ class HeadTracking(FSA.FSA):
         self.isPreKickScanning = False
         self.preActivePanHeads = None
         self.currentLocObject = None
-        self.locObjectList = []# ** # needs to be initialized
+        self.locObjectList = []
+        self.locObjectList.extend(self.brain.myFieldObjects)
         self.helper = helper.HeadTrackingHelper(self)
 
         self.lookDirection = None
@@ -164,10 +165,9 @@ class HeadTracking(FSA.FSA):
         """
         Looks at currentLocObject.
         """
-        relX = MyMath.getRelativeX(self.currentLocObject.locDist,self.currentLocObject.locBearing)
-        relY = MyMath.getRelativeY(self.currentLocObject.locDist,self.currentLocObjext.locBearing)
-
-        self.lookToPoint(relX,relY,currentLocObjext.height)
+        self.lookToPoint(self.currentLocObject.relX, \
+                             self.currentLocObject.relY, \
+                             self.currentLocObject.height)
 
 # ** # old method
     def bounceHead(self):

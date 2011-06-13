@@ -45,8 +45,9 @@ def relocalize(player):
     else:
         player.shouldRelocalizeCounter = 0
 
-    if not player.brain.motion.isHeadActive():
-        player.brain.tracker.locPans()
+    # ** #removed for test of HeadTracking.readyLoc()
+    # ** #if not player.brain.motion.isHeadActive():
+        # ** #player.brain.tracker.locPans()
 
     if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
         direction = MyMath.sign(player.getWalk()[2])

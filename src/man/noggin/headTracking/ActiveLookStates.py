@@ -87,7 +87,7 @@ def readyLoc(tracker):
     """
     #update tracking fitness of locObjects
     for obj in tracker.locObjectList[:]:
-        obj.trackingFitness = obj.locDist
+        tracker.helpter.updateTrackingFitness(obj)
     #sort list of locObjects
     newlist = tracker.locObjectList.sorted()
 

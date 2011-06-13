@@ -85,6 +85,13 @@ class HeadTrackingHelper(object):
         self.executeHeadMove( ((heads, panTime, 0,
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
+# ** # new method
+    def updateTrackingFitness(self, locObj):
+        locObj.trackingFitness = locObj.dist
+        #if bearing is unusable, set fitness to auto fail
+        if fabs(locObj.bearing) > constants.BEARING_THRESHOLD:
+            locObj.trackingFitness = constants.FITNESS_THRESHOLD+1
+
 # ** # old method
     def lookToPoint(self, target):
         headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
