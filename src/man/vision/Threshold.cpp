@@ -1125,13 +1125,17 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 
         // sets focal distance of the field object
         objPtr->setFocDist(objPtr->getDistance());
-        // convert dist + angle estimates to body center
-        estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
-                                              objPtr->getDistance());
-        objPtr->setDistanceWithSD(obj_est.dist);
-        objPtr->setBearingWithSD(obj_est.bearing);
-        objPtr->setElevation(obj_est.elevation);
+		estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
+											  objPtr->getCenterY(),
+											  265.0f);
+		cout << "est is " << pose_est.dist << endl;
+		// convert dist + angle estimates to body center
+		estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
+											  objPtr->getCenterY(),
+											  pose_est.dist / 2.0f);
+		objPtr->setDistanceWithSD(obj_est.dist);
+		objPtr->setBearingWithSD(obj_est.bearing);
+		objPtr->setElevation(obj_est.elevation);
     } else {
         objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);

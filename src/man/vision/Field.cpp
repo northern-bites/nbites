@@ -354,9 +354,10 @@ int Field::getImprovedEstimate(int horizon) {
 		greenPixels = 0;
 		run = 0;
 		scanY = 0;
+		int maxRun = 0;
 		for (l = max(0, firstpix - 5), firstpix = -1; l < IMAGE_WIDTH && scanY <
                  IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE &&
-                 greenPixels < MIN_PIXELS_PRECISE; l+=3) {
+                 (greenPixels < MIN_PIXELS_PRECISE || maxRun < 5); l+=3) {
 			if (debugHorizon) {
 				vision->drawPoint(l, scanY, BLACK);
 			}
@@ -373,6 +374,9 @@ int Field::getImprovedEstimate(int horizon) {
 					}
 				}
 				run++;
+				if (run > maxRun) {
+					maxRun = run;
+				}
 				greenPixels++;
 			} else {
 				run = 0;
@@ -382,7 +386,8 @@ int Field::getImprovedEstimate(int horizon) {
 		}
 		// now check how we did in this scanline - remember now we are
 		// looking for the first line where we DON'T have lots of green
-		if (run < MIN_GREEN_SIZE && greenPixels < MIN_PIXELS_PRECISE) {
+		if (run < MIN_GREEN_SIZE && (greenPixels < MIN_PIXELS_PRECISE ||
+									 maxRun < 5)) {
 			// first make sure we didn't get fooled by firstpix
 			run = 0;
 			scanY = firstpix;
