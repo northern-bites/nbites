@@ -235,7 +235,9 @@ class Brain(object):
 
         # Localization Update
         self.updateLocalization()
-        self.ball.updateBestValues(self.my)
+
+        # Choose whether we use Vision or Localization
+        self.updateBestValues()
 
         #Set LEDS
         self.leds.processLeds()
@@ -288,10 +290,22 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-
-        # Update global information to current estimates
         self.my.updateLoc(self.loc)
         self.ball.updateLoc(self.loc, self.my)
+        self.yglp.updateLoc(self.loc, self.my)
+        self.ygrp.updateLoc(self.loc, self.my)
+        self.bglp.updateLoc(self.loc, self.my)
+        self.bgrp.updateLoc(self.loc, self.my)
+
+    def updateBestValues(self):
+        """
+        Update estimates about objects using best information available
+        """
+        self.ball.updateBestValues(self.my)
+        self.yglp.updateBestValues()
+        self.ygrp.updateBestValues()
+        self.bglp.updateBestValues()
+        self.bgrp.updateBestValues()
 
     def updatePlaybook(self):
         """
