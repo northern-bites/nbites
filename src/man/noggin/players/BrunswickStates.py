@@ -37,7 +37,8 @@ def gameReady(player):
         player.justKicked = False
         player.isSaving = False
         player.standup()
-        player.brain.tracker.locPans()
+        # ** #player.brain.tracker.locPans()
+        player.brain.tracker.readyLoc()# ** #new tracking behavior
         player.brain.sensors.startSavingFrames()
 
         if player.lastDiffState == 'gameInitial':
