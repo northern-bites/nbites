@@ -159,9 +159,11 @@ class KickDecider(object):
             #between dists is small enough
             if (rightPostBearing >= 0 and leftPostBearing <= 0 and \
                     distDiff <= constants.CENTERED_POST_DIST_DIFF):
+                print "LONG_BACK"
                 return self.chooseLongBackKick()
             elif(rightPostBearing >=0 and leftPostBearing <= 0 and \
                      distDiff <= constants.CLEAR_POST_DIST_DIFF):
+                print "SHORT_BACK"
                 return self.chooseShortBackKick()
             elif (rightPostDist <= leftPostDist):
                 print "LEFT_SIDE"
@@ -194,8 +196,10 @@ class KickDecider(object):
         if (my.h <= 45. and my.h >= -45.):
             return self.chooseDynamicKick()
         elif (my.h <= 135. and my.h > 45.):
+            print "LEFT_SIDE"
             return kicks.LEFT_SIDE_KICK
         else:
+            print "RIGHT_SIDE"
             return kicks.RIGHT_SIDE_KICK
 
         #Our localization is unreliable so NEVER rely on it
@@ -214,7 +218,6 @@ class KickDecider(object):
     def chooseLongBackKick(self):
         ball = self.brain.ball
         if ball.relY > 0:
-<<<<<<< HEAD
             return kicks.LEFT_LONG_BACK_KICK
         return kicks.RIGHT_LONG_BACK_KICK
 
@@ -223,9 +226,3 @@ class KickDecider(object):
         if ball.relY >0:
             return kicks.LEFT_SHORT_BACK_KICK
         return kicks.RIGHT_SHORT_BACK_KICK
-=======
-            print "LEFT_BACK"
-            return kicks.LEFT_BACK_KICK
-        print "RIGHT_BACK"
-        return kicks.RIGHT_BACK_KICK
->>>>>>> nbites/master
