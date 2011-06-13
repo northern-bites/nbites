@@ -11,6 +11,8 @@ class VisualObject():
         self.focDist = 0
         self.visDist = 0
         self.visBearing = 0
+        self.angleX = 0
+        self.angleY = 0
         self.framesOn = 0
         self.framesOff = 0
         self.on = False

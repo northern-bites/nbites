@@ -1,6 +1,11 @@
 from .. import NogginConstants as Constants
 from .VisualObject import VisualObject
 from .LocObject import LocObject
+from ..util.MyMath import (getRelativeX,
+                           getRelativeY,
+                           sub180Angle)
+
+LOST_OBJECT_FRAMES_THRESH = 7
 
 class FieldObject(VisualObject, LocObject):
     """
@@ -27,8 +32,9 @@ class FieldObject(VisualObject, LocObject):
         VisualObject.__init__(self)
         LocObject.__init__(self)
         self.localId = 0 # name based around team color
-        self.angleX = 0
-        self.angleY = 0
+        self.dist = 0
+        self.bearing = 0
+        self.elevation = 0
 
         # Setup the data from vision
         self.visionId = visionName
@@ -47,6 +53,27 @@ class FieldObject(VisualObject, LocObject):
         VisualObject.updateVision(self, visionInfos)
         self.certainty = visionInfos.certainty
         self.distCertainty = visionInfos.distCertainty
+
+    def updateLoc(self, loc, my):
+        """updates class variables with localization information"""
+        # Don't need to update x, y here because they stay the same.
+        self.locDist = my.distTo(self, forceCalc=True)
+        self.locBearing = my.getRelativeBearing(self, forceCalc=True)
+
+    def updateBestValues(self):
+        if self.on:
+            self.bearing = self.visBearing
+            self.dist = self.visDist
+
+        elif self.framesOff < LOST_OBJECT_FRAMES_THRESH:
+            pass
+
+        else:
+            self.bearing = self.locBearing
+            self.dist = self.locDist
+
+        self.relX = getRelativeX(self.dist, self.bearing)
+        self.relY = getRelativeY(self.dist, self.bearing)
 
     def __str__(self):
         """returns string with all class variables"""
