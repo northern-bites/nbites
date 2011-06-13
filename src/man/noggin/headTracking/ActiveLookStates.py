@@ -3,10 +3,12 @@ import man.motion.HeadMoves as HeadMoves
 
 TIME_TO_LOOK_TO_TARGET = 1.0
 
+# ** # old method
 def lookToPoint(tracker):
     tracker.helper.lookToPoint(tracker.target)
     return tracker.stay()
 
+# ** # old method
 def lookToTarget(tracker):
     """looks to best guess of where target is"""
 
@@ -27,6 +29,7 @@ def lookToTarget(tracker):
 
     return tracker.stay()
 
+# ** # old method
 def scanForTarget(tracker):
     """performs naive scan for target"""
     if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
@@ -54,6 +57,7 @@ def scanForTarget(tracker):
 
     return tracker.stay()
 
+# ** # old method
 def targetTracking(tracker):
     """
     state askes it's parent (the tracker) for an object or angles to track

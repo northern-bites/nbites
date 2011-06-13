@@ -9,6 +9,7 @@ class HeadTrackingHelper(object):
     def __init__(self, tracker):
         self.tracker = tracker
 
+# ** # old method
     def executeHeadMove(self, headMove):
         """performs a sweetmove"""
         for position in headMove:
@@ -24,6 +25,7 @@ class HeadTrackingHelper(object):
             self.tracker.brain.motion.enqueue(move)
 
 
+# ** # old method
     def trackObject(self):
         """
         Method to actually perform the tracking.
@@ -64,6 +66,7 @@ class HeadTrackingHelper(object):
                                          maxSpeed, maxSpeed)
         self.tracker.brain.motion.setHead(headMove)
 
+# ** # old method
     def panTo(self, heads):
         """
         Pan heads at appropriate speed to given heads
@@ -82,16 +85,19 @@ class HeadTrackingHelper(object):
         self.executeHeadMove( ((heads, panTime, 0,
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
+# ** # old method
     def lookToPoint(self, target):
         headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
         self.tracker.brain.motion.coordHead(headMove)
 
+# ** # old method
     def calcBearing(self, target):
         """returns the bearing to target in degrees. usable as headYaw"""
         my = self.tracker.brain.my
 
         return my.getRelativeBearing(target)
 
+# ** # old method
     def calcHeadPitch(self, target):
         """returns the pitch to target in degrees"""
         my = self.tracker.brain.my
@@ -107,6 +113,7 @@ class HeadTrackingHelper(object):
         headPitch = atan(relHeight/dist) - CAMERA_ANGLE
         return headPitch
 
+# ** # old method
     def getCameraHeight(self):
         """gets the height of the lower camera in cm"""
         pose = self.tracker.brain.vision.pose

@@ -3,6 +3,7 @@ from . import TrackingConstants as constants
 
 DEBUG = False
 
+# ** # old method
 def ballTracking(tracker):
     '''Super state which handles following/refinding the ball'''
     if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -10,6 +11,7 @@ def ballTracking(tracker):
     else:
         return tracker.goNow('scanBall')
 
+# ** # old method
 def tracking(tracker):
     """
     state askes it's parent (the tracker) for an object or angles to track
@@ -32,6 +34,7 @@ def tracking(tracker):
 
     return tracker.stay()
 
+# ** # old method
 def ballSpinTracking(tracker):
     '''Super state which handles following/refinding the ball'''
     if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -40,6 +43,7 @@ def ballSpinTracking(tracker):
         return tracker.goNow('spinScanBall')
 
 
+# ** # old method
 def activeTracking(tracker):
     """
     Method to perform tracking

@@ -35,19 +35,23 @@ class HeadTracking(FSA.FSA):
         self.lookDirection = None
         self.target = self.brain.ball #default
 
+# ** # old method
     def stopHeadMoves(self):
         """stop all head moves. In TrackingStates.py"""
         self.switchTo('stop')
 
+# ** # old method
     def setNeutralHead(self):
         """executes sweet move to move head to neutral position.
         Does not call stop head moves. In TrackingStates.py"""
         self.switchTo('neutralHead')
 
+# ** # old method
     def performHeadMove(self, headMove):
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
+# ** # old method
     def trackBall(self):
         """automatically tracks the ball. scans for the ball if not in view"""
         self.target = self.brain.ball
@@ -56,6 +60,7 @@ class HeadTracking(FSA.FSA):
             and (not self.currentState == 'scanBall') ):
             self.switchTo('ballTracking')
 
+# ** # old method
     def trackBallSpin(self):
         """automatically tracks the ball. spins if not in view"""
         self.target = self.brain.ball
@@ -64,11 +69,13 @@ class HeadTracking(FSA.FSA):
             and (not self.currentState == 'spinScanBall') ):
             self.switchTo('ballSpinTracking')
 
+# ** # old method
     def locPans(self):
         """repeatedly performs quick pan"""
         self.activeLocOn = False
         self.switchTo('locPans')
 
+# ** # old method
     def activeLoc(self):
         """tracks the ball but periodically looks away"""
         self.target = self.brain.ball
@@ -76,23 +83,27 @@ class HeadTracking(FSA.FSA):
         if (not self.activeLocOn):
             self.switchTo('activeTracking')
 
+# ** # old method
     def preKickScan(self):
         """Scans up very quickly to see  """
         if not self.isPreKickScanning:
             self.isPreKickScanning = True
             self.switchTo('scanQuickUp')
 
+# ** # old method
     def kickDecideScan(self):
         self.lastDiffState = 'stop'
         if self.currentState != 'trianglePan':
             self.switchTo('trianglePan')
 
+# ** # old method
     def startScan(self,  newScan):
         """repeatedly performs passed in scan"""
         if newScan != self.currentHeadScan:
             self.currentHeadScan = newScan
             self.switchTo('scanning')
 
+# ** # old method
     def lookToDir(self,  direction):
         """performs scripted look: down, up, right, or left"""
         if self.currentState is not 'look' or \
@@ -100,6 +111,7 @@ class HeadTracking(FSA.FSA):
             self.lookDirection = direction
             self.switchTo('look')
 
+# ** # old method
     def trackTarget(self, target):
         """automatically tracks landmark, scans for landmark if not in view
         only works if target has attribute locDist, framesOn, framesOff,x,y"""
@@ -111,11 +123,13 @@ class HeadTracking(FSA.FSA):
             not self.currentState == 'scanForTarget' ):
             self.switchTo('targetTracking')
 
+# ** # old method
     def lookToTarget(self, target):
         """looks toward our best guess of landmark position based on loc"""
         self.target.height = 0
         self.switchTo('lookToPoint')
 
+# ** # old method
     def lookToPoint(self, goalX=0, goalY=0, goalHeight=0):
         """continuously looks toward our best guess of goal based on loc"""
         self.target.x = goalX
@@ -125,5 +139,7 @@ class HeadTracking(FSA.FSA):
         if not self.currentState == 'lookToPoint':
             self.switchTo('lookToPoint')
 
+# ** # old method
     def bounceHead(self):
         self.switchTo('bounceUp')
+
