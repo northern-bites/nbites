@@ -8,7 +8,7 @@ QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
         colorCreator(new ColorCreator()){
 
-    this->setWindowTitle(tr("QTool - the only tool you need!"));
+    this->setWindowTitle(tr("HackTool"));
 
     this->setCentralWidget(toolTabs);
 
