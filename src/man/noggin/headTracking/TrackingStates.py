@@ -91,11 +91,13 @@ def trackLoc(tracker):
 
     # safety check that currentLocObject was set
     if tracker.currentLocObject is None:
+        print "currentLocObject is None"
         return tracker.goLater(tracker.lastDiffState())
 
     tracker.lookToLocObject()
 
-    if not tracker.brain.motion.isHeadActive()# ** # might never be true... test
-        return tracker.goLater(tracker.lastDiffState())
+    if not tracker.brain.motion.isHeadActive():
+        print "head is not active"
+        return tracker.goLater(tracker.lastDiffState)
 
     return tracker.stay()

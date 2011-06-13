@@ -87,17 +87,16 @@ def readyLoc(tracker):
     """
     #update tracking fitness of locObjects
     for obj in tracker.locObjectList[:]:
-        tracker.helpter.updateTrackingFitness(obj)
+        tracker.helper.updateTrackingFitness(obj)
     #sort list of locObjects
-    newlist = tracker.locObjectList.sorted()
+    newlist = sorted(tracker.locObjectList)
 
     if not newlist == tracker.locObjectList:
         #landmarks have changed fitness ranking. Track most fit.
         tracker.currentLocObject = tracker.locObjectList[0]
-        return tracker.goLater('trackloc')
-    else:
-        #no change in list order
-        pass
+        return tracker.goLater('trackLoc')
+
+    #Assert: no change in list order
 
     #check for no currentLocObject (first pass in readyLoc state)
     if tracker.currentLocObject is None:

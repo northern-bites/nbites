@@ -18,7 +18,7 @@ class HeadTracking(FSA.FSA):
 
         self.currentState = 'stopped'
         self.setPrintFunction(self.brain.out.printf)
-        self.setPrintStateChanges(False)
+        self.setPrintStateChanges(True)
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
 
@@ -158,7 +158,7 @@ class HeadTracking(FSA.FSA):
         self.target.x = goalX
         self.target.y = goalY
         self.target.height = goalZ
-        helper.lookToPoint(target)
+        self.helper.lookToPoint(self.target)
 
 # ** # new method
     def lookToLocObject(self):
