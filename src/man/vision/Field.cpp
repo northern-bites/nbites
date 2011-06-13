@@ -82,6 +82,8 @@ Field::Field(Vision* vis, Threshold * thr)
 void Field::initialScanForTopGreenPoints(int pH) {
 	int good, ok, top;
 	unsigned char pixel;
+	int topGreen = 0;
+	int greenRun = 0;
 	// we need a better criteria for what the top is
 	for (int i = 0; i < HULLS; i++) {
 		good = 0;
@@ -90,30 +92,42 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		if (poseProject <= 0) {
 			poseProject = 0;
 		}
+		topGreen = IMAGE_HEIGHT - 1;
+		greenRun = 0;
 		for (top = max(poseProject, 0);
 				good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
 			// scan until we find a run of green pixels
 			int x = i * SCANSIZE;
-			if (i == HULLS - 1)
+			if (i == HULLS - 1) {
 				x--;
+			}
 			pixel = thresh->getColor(x, top);
 			//pixel = thresh->thresholded[top][x];
 			if (Utility::isGreen(pixel)) {
 				good++;
+				greenRun++;
+				if (greenRun > 3 && topGreen == IMAGE_HEIGHT - 1) {
+					topGreen = top - greenRun;
+				}
+			} else if (Utility::isOrange(pixel) || Utility::isWhite(pixel)) {
+				//good++;
+				greenRun = 0;
 			} else if (Utility::isUndefined(pixel)) {
 				ok++;
 				if (ok > SCANNOISE) {
 					good = 0;
 					ok = 0;
 				}
+				greenRun = 0;
 			} else {
 				good = 0;
 				ok = 0;
+				greenRun = 0;
 			}
 		}
 		if (good == RUNSIZE) {
-			convex[i] = point<int>(i * SCANSIZE, top - good);
-			if (poseProject < 0 && top - good < 10) {
+			convex[i] = point<int>(i * SCANSIZE, topGreen);
+			if (poseProject < 0 && topGreen < 10) {
 				convex[i] = point<int>(i * SCANSIZE, 0);
             }
 		} else {
@@ -121,6 +135,17 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		}
 		if (debugFieldEdge) {
 			vision->drawPoint(i * SCANSIZE, convex[i].y, MAROON);
+		}
+	}
+	// look for odd spikes and quell them
+	for (good = 1; good < HULLS - 1; good++) {
+		if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
+			convex[good].y > 15) {
+			if (debugFieldEdge) {
+				cout << "Spike at " << convex[good].x << " " << convex[good].y <<
+					endl;
+			}
+			convex[good].y = convex[good-1].y;
 		}
 	}
 	for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
