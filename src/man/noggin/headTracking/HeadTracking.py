@@ -4,6 +4,7 @@ from . import ActiveLookStates
 from . import BasicStates
 from . import HeadTrackingHelper as helper
 from ..util import FSA
+from ..util import MyMath
 
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""
@@ -30,6 +31,8 @@ class HeadTracking(FSA.FSA):
         self.activePanUp = False
         self.isPreKickScanning = False
         self.preActivePanHeads = None
+        self.currentLocObject = None
+        self.locObjectList = []# ** # needs to be initialized
         self.helper = helper.HeadTrackingHelper(self)
 
         self.lookDirection = None
@@ -46,7 +49,7 @@ class HeadTracking(FSA.FSA):
         Does not call stop head moves. In TrackingStates.py"""
         self.switchTo('neutralHead')
 
-# ** # old method
+# ** # old method - kept unchanged
     def performHeadMove(self, headMove):
         self.headMove = headMove
         self.switchTo('doHeadMove')
@@ -68,6 +71,13 @@ class HeadTracking(FSA.FSA):
         if ( (not self.currentState == 'tracking')
             and (not self.currentState == 'spinScanBall') ):
             self.switchTo('ballSpinTracking')
+
+# ** # new method
+    def spinFindBall(self):
+        """Assumes robot is spinning and looking for ball."""
+        """Scans along side robot is spinning to."""
+        self.activeLocOn = False
+        self.switchTo('spinningPan')
 
 # ** # old method
     def locPans(self):
@@ -130,16 +140,40 @@ class HeadTracking(FSA.FSA):
         self.switchTo('lookToPoint')
 
 # ** # old method
-    def lookToPoint(self, goalX=0, goalY=0, goalHeight=0):
-        """continuously looks toward our best guess of goal based on loc"""
+#    def lookToPoint(self, goalX=0, goalY=0, goalHeight=0):
+#        """continuously looks toward our best guess of goal based on loc"""
+#        self.target.x = goalX
+#        self.target.y = goalY
+#        self.target.height = goalHeight
+#        #allows us to update target values but not confuse FSA
+#        if not self.currentState == 'lookToPoint':
+#            self.switchTo('lookToPoint')
+
+# ** # new method - now a helper method
+    def lookToPoint(self, goalX=0, goalY=0, goalZ=0):
+        """
+        Look at given relative coordinates.
+        """
         self.target.x = goalX
         self.target.y = goalY
-        self.target.height = goalHeight
-        #allows us to update target values but not confuse FSA
-        if not self.currentState == 'lookToPoint':
-            self.switchTo('lookToPoint')
+        self.target.height = goalZ
+        helper.lookToPoint(target)
+
+# ** # new method
+    def lookToLocObject(self):
+        """
+        Looks at currentLocObject.
+        """
+        relX = MyMath.getRelativeX(self.currentLocObject.locDist,self.currentLocObject.locBearing)
+        relY = MyMath.getRelativeY(self.currentLocObject.locDist,self.currentLocObjext.locBearing)
+
+        self.lookToPoint(relX,relY,currentLocObjext.height)
 
 # ** # old method
     def bounceHead(self):
         self.switchTo('bounceUp')
 
+# ** # new method
+    def readyLoc(self):
+        currentLocObject = None
+        self.switchTo('readyLoc')

@@ -79,3 +79,23 @@ def activeTracking(tracker):
         return tracker.goLater('trianglePan')
 
     return tracker.stay()
+
+# ** # new method
+def trackLoc(tracker):
+    """
+    Look at the current LocObject, then go to lastDiffState
+    """
+    # make sure head is inactive first
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+
+    # safety check that currentLocObject was set
+    if tracker.currentLocObject is None:
+        return tracker.goLater(tracker.lastDiffState())
+
+    tracker.lookToLocObject()
+
+    if not tracker.brain.motion.isHeadActive()# ** # might never be true... test
+        return tracker.goLater(tracker.lastDiffState())
+
+    return tracker.stay()

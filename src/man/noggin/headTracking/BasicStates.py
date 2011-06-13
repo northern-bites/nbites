@@ -1,12 +1,12 @@
 from man.motion import HeadMoves
 
-# ** # old method
+# ** # old method - kept unchanged
 def stopped(tracker):
     '''default state where the tracker does nothing'''
     tracker.activeLocOn = False
     return tracker.stay()
 
-# ** # old method
+# ** # old method - kept unchanged
 def stop(tracker):
     ''' stop all head moves '''
     if tracker.firstFrame():
@@ -31,7 +31,7 @@ def neutralHead(tracker):
 
     return tracker.stay()
 
-# ** # old method
+# ** # old method - kept unchanged
 def doHeadMove(tracker):
     '''executes the currently set headMove'''
     if tracker.firstFrame():

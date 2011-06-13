@@ -78,3 +78,24 @@ def targetTracking(tracker):
     tracker.helper.trackObject()
 
     return tracker.stay()
+
+# ** # new method
+def readyLoc(tracker):
+    """
+    Assumes the robot is in the "ready" state.
+    Looks at nearby landmarks for localization.
+    """
+    #update tracking fitness of locObjects
+    for obj in tracker.locObjectList[:]:
+        obj.trackingFitness = obj.locDist
+    #sort list of locObjects
+    tracker.locObjectList.sort()
+
+    # if there is a new best fit locObject, track it
+    if not tracker.currentLocObject == tracker.locObjectList[0]:
+        tracker.currentLocObject = tracker.locObjectList[0]
+        return tracker.goLater('trackLoc')
+
+    # last track object is best fit: track second best now
+    tracker.currentLocObject = tracker.locObjectList[1]
+    return tracker.goLater('trackLock')

@@ -41,6 +41,20 @@ def spinScanBall(tracker):
 
     return tracker.stay()
 
+# ** # new method
+def spinningPan(tracker):
+    nav = tracker.brain.nav
+
+    if nav.walkTheta > 0:
+        tracker.headMove = HeadMoves.SPIN_LEFT_SCAN_BALL
+    else:
+        tracker.headMove = HeadMoves.SPIN_RIGHT_SCAN_BALL
+
+    if not tracker.brain.motion.isHeadActive():
+        tracker.helper.executeHeadMove(tracker.headMove)
+
+    return tracker.stay()
+
 # ** # old method
 def scanning(tracker):
     if tracker.firstFrame():
