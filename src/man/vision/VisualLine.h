@@ -189,6 +189,7 @@ class VisualLine : public VisualLandmark<lineID> {
     inline const float getAvgVerticalWidth() const;
     inline const float getAvgWidth() const; // Returns width based on orientation
     inline const float getBearing() const;
+    inline const float getBearingDeg() const;
     inline const float getBearingSD() const;
     inline const float getDistance() const;
     inline const float getDistanceSD() const;
@@ -253,6 +254,10 @@ inline const float VisualLine::getDistance() const
 inline const float VisualLine::getBearing() const
 {
     return bearing;
+}
+inline const float VisualLine::getBearingDeg() const
+{
+  return bearing*TO_DEG;
 }
 inline const float VisualLine::getDistanceSD() const
 {
