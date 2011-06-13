@@ -89,13 +89,22 @@ def readyLoc(tracker):
     for obj in tracker.locObjectList[:]:
         obj.trackingFitness = obj.locDist
     #sort list of locObjects
-    tracker.locObjectList.sort()
+    newlist = tracker.locObjectList.sorted()
 
-    # if there is a new best fit locObject, track it
-    if not tracker.currentLocObject == tracker.locObjectList[0]:
+    if not newlist == tracker.locObjectList:
+        #landmarks have changed fitness ranking
         tracker.currentLocObject = tracker.locObjectList[0]
-        return tracker.goLater('trackLoc')
+        return tracker.goLater('trackloc')
+    else:
+        #no change in list order
+        pass
 
-    # last track object is best fit: track second best now
-    tracker.currentLocObject = tracker.locObjectList[1]
-    return tracker.goLater('trackLock')
+    #check for No currentLocObject
+    if tracker.currentLocObject is None:
+        tracker.currentLocObject = tracker.locObjectList[0]
+
+    #track next most fit locObject
+    tracker.currentLocObject = tracker.locObjectList[1]# ** #not done yet
+
+    #track currentLocObject
+    return tracker.goLater('trackLoc')
