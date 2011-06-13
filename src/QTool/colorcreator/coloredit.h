@@ -5,7 +5,7 @@
 #include <QSlider>
 #include <QLabel>
 #include <QGridLayout>
-#include "Image/YUVImage.h"
+#include "image/YUVImage.h"
 
 class ColorEdit : public QWidget
 {

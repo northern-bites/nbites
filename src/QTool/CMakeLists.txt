@@ -51,8 +51,8 @@ find_library(MEMORY_LIB memory ${MAN_STRAIGHT_BUILD}/memory)
 find_library(PARSE_LIB parse ${MAN_STRAIGHT_BUILD}/memory/parse)
 
 ######### Subdirectory compilation
-add_subdirectory( Image )
-add_subdirectory( ColorCreator )
+add_subdirectory( image )
+add_subdirectory( colorcreator )
 
 ######### The executable
 
@@ -62,8 +62,8 @@ add_executable(QTool ${QTool_srcs}
 
 target_link_libraries(
   QTool
-  ColorCreator
-  Image
+  colorcreator
+  image
   ${MEMORY_LIB}
   ${PARSE_LIB}
   ${PROTOBUF_LIBRARIES}

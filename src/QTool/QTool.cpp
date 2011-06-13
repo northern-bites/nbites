@@ -2,7 +2,7 @@
 #include "QTool.h"
 #include <iostream>
 
-namespace QTool {
+namespace qtool {
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),

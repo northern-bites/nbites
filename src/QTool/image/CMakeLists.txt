@@ -1,7 +1,7 @@
 
 ############ QTool/Image
 
-project( Image )
+project( image )
 cmake_minimum_required(VERSION 2.6.0)
 
 ########### Dependencies
@@ -41,7 +41,7 @@ find_library(MEMORY_LIB memory ${MAN_STRAIGHT_BUILD}/memory)
 
 ######### The Library
 
-add_library(Image
+add_library(image
     STATIC
     ${Image_srcs}
     ${Image_headers_moc}
@@ -49,7 +49,7 @@ add_library(Image
 
 
 target_link_libraries(
-  Image
+  image
   ${MEMORY_LIB}
   ${QT_LIBRARIES}
   )

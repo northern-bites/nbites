@@ -1,7 +1,7 @@
 
 ############ ColorCreator
 
-project( ColorCreator )
+project( colorcreator )
 cmake_minimum_required(VERSION 2.6.0)
 
 ########### Dependencies
@@ -46,12 +46,12 @@ Qt4_wrap_cpp(ColorCreator_headers_moc ${ColorCreator_headers})
 Qt4_wrap_ui(ColorCreator_forms_headers ${ColorCreator_forms})
 #QT4_ADD_RESOURCES(ColorCreator_RESOURCES_RCC ${ColorCreator_RESOURCES})
 
-add_library(ColorCreator ${ColorCreator_srcs}
+add_library(colorcreator ${ColorCreator_srcs}
   ${ColorCreator_headers_moc}
   ${ColorCreator_forms_headers} )
 #    ${helloworld_RESOURCES_RCC})
 
 target_link_libraries(
-  ColorCreator
+  colorcreator
   ${QT_LIBRARIES}
   )

@@ -1,7 +1,7 @@
 #ifndef COLORZONE_H
 #define COLORZONE_H
 
-#include "Image/ColorSpace.h"
+#include "image/ColorSpace.h"
 class ColorZone
 {
 public:

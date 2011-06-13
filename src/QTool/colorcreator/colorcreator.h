@@ -2,7 +2,7 @@
 #define COLORCREATOR_H
 
 #include <QWidget>
-#include "Image/YUVImage.h"
+#include "image/YUVImage.h"
 #include "man/memory/RoboImage.h"
 #include "man/memory/parse/ImageParser.h"
 #include "coloredit.h"

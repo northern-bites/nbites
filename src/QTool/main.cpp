@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QTool::QTool qTool;
+    qtool::QTool qTool;
     qTool.show();
     return a.exec();
 }
