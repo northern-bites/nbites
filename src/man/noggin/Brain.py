@@ -264,8 +264,6 @@ class Brain(object):
         self.ball.updateVision(self.vision.ball)
 
         self.yglp.updateVision(self.vision.yglp)
-        print self.yglp.certainty
-        print self.yglp.distCertainty
         self.ygrp.updateVision(self.vision.ygrp)
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
