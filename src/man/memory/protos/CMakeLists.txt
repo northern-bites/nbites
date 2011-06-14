@@ -24,7 +24,6 @@ file(GLOB PROTO_INPUT
   "*.proto")
 
 #protobuf compiler
-find_program(PROTOC protoc)
 set(PROTOC_C_OUT_FLAG --cpp_out)
 
 #protobuf output
@@ -41,8 +40,9 @@ endforeach(PROTO_FILE ${PROTO_INPUT})
 # add the custom command that will generate all the files
 add_custom_command(
   OUTPUT ${PROTO_GEN}
-  COMMAND ${PROTOC} ${PROTO_INPUT} ${PROTOC_C_OUT_FLAG} ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS ${PROTOC} ${PROTO_INPUT}
+  COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTO_INPUT}
+  ${PROTOC_C_OUT_FLAG} ${CMAKE_CURRENT_BINARY_DIR}
+  DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTO_INPUT}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
