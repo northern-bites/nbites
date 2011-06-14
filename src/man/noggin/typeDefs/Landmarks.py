@@ -55,29 +55,7 @@ class FieldObject(VisualObject):
                  Constants.landmarkTuple[self.localId],
                  self.visDist, self.visBearing))
 
-
-class Line:
-    """
-    class for one single line, contains:
-    -x1,y1 -- left coordinate on image screen
-    -x2,y2 -- right coordinate on image screen
-    -slope -- slope of line. remember that (0,0) is top-left corner of image
-    -length -- length of the line
-    """
-    def __init__(self, visionLine):
-        """init method"""
-        self.x1 = visionLine.x1
-        self.y1 = visionLine.y1
-        self.x2 = visionLine.x2
-        self.y2 = visionLine.y2
-        self.slope = visionLine.slope
-        self.length = visionLine.length
-
-    def __str__(self):
-        return ("p1: (%g,%g) p2: (%g,%g) slope: %g length: %g" %
-                (self.x1,self.y1,self.x2,self.y1,self.slope,self.length))
-
-
+#### Crossbars currently unused!
 class Crossbar(VisualObject):
     """
     Crossbar class, what used to be the backstop class
