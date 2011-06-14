@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 1 ]; then
-	echo "usage: ./linux_setup_x64.sh [ naoqi-version ]"
+	echo "usage: ./linux_setup.sh [ naoqi-version ]"
 	exit 1
 fi
 
