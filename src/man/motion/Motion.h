@@ -61,12 +61,13 @@ public:
     void stop();
     void run();
     MotionInterface * getInterface(){return &interface;}
-    boost::shared_ptr<NaoPose> pose;
 private:
     MotionSwitchboard switchboard;
-    boost::shared_ptr<MotionEnactor> enactor;
     MotionInterface interface;
+
+    boost::shared_ptr<MotionEnactor> enactor;
     boost::shared_ptr<Profiler> profiler;
+    boost::shared_ptr<NaoPose> pose;
 };
 
 #endif
