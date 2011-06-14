@@ -23,10 +23,9 @@ struct LogHeader {
 class Parser {
 
 public:
-    Parser() {};
-    virtual ~Parser();
+    Parser() {}
 
-    virtual const LogHeader getHeader() = 0;
+    virtual const LogHeader getHeader() {return log_header;}
     virtual bool getNext() = 0;
 
 protected:
@@ -39,8 +38,6 @@ class TemplatedParser : public Parser {
 public:
     TemplatedParser(boost::shared_ptr<T> container) : container(container) {
     }
-
-    virtual ~TemplatedParser() {}
 
 
     //TODO: change these to void/bool move them to the generic parser
