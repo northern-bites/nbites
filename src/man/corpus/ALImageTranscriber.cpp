@@ -89,7 +89,6 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
     : ThreadedImageTranscriber(s,synchro,"ALImageTranscriber"),
       log(), camera(), lem_name(""), camera_active(false),
       image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
-      naoImage(new uint8_t[NAO_IMAGE_BYTE_SIZE]),
       table(new unsigned char[yLimit * uLimit * vLimit]),
       params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
 {
@@ -143,7 +142,7 @@ void ALImageTranscriber::run()
     struct timespec interval, remainder;
     while (Thread::running) {
         //start timer
-        const long long startTime = micro_time();
+        const long long startTime = process_micro_time();
 
         if (camera_active)
             waitForImage();
@@ -157,7 +156,7 @@ void ALImageTranscriber::run()
 #endif
 
         //stop timer
-        const long long processTime = micro_time() - startTime;
+        const long long processTime = process_micro_time() - startTime;
         //sleep until next frame
 
         lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
@@ -544,9 +543,8 @@ void ALImageTranscriber::waitForImage ()
             sensors->lockImage();
 
 #ifdef CAN_SAVE_FRAMES
-            _copy_image(ALimage->getData(), naoImage);
-            ImageAcquisition::acquire_image_fast(table, params,
-                                                 naoImage, image);
+            	sensors->setRawNaoImage(ALimage->getData());
+                _acquire_image_fast(table, &params, const_cast<uint8_t*>(sensors->getNaoImage()), image);
 #else
             ImageAcquisition::acquire_image_fast(table, params,
                                                  ALimage->getData(), image);
@@ -609,9 +607,6 @@ void ALImageTranscriber::waitForImage ()
             // Update Sensors image pointer
             sensors->lockImage();
             sensors->setImage(image);
-#ifdef CAN_SAVE_FRAMES
-            sensors->setNaoImage(naoImage);
-#endif
             sensors->releaseImage();
         }
 
