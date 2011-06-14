@@ -57,7 +57,15 @@ def activeTracking(tracker):
         return tracker.goLater('activeLocScan')
 
     elif not tracker.activePanOut and \
-            tracker.counter <= constants.ACTIVE_LOC_STARE_THRESH:
+            tracker.counter <= constants.ACTIVE_LOC_STARE_THRESH \
+            and not tracker.goalieActiveLoc:
+        tracker.helper.trackObject()
+        tracker.activePanOut = False
+        return tracker.stay()
+
+    elif not tracker.activePanOut and \
+            tracker.counter <= constants.ACTIVE_LOC_STARE_GOALIE_THRESH \
+            and tracker.goalieActiveLoc:
         tracker.helper.trackObject()
         tracker.activePanOut = False
         return tracker.stay()
@@ -75,3 +83,4 @@ def activeTracking(tracker):
         return tracker.goLater('trianglePan')
 
     return tracker.stay()
+

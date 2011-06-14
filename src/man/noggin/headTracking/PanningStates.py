@@ -211,7 +211,6 @@ def trianglePanRight(tracker):
 
 def trianglePanReturn(tracker):
     if tracker.firstFrame():
-        tracker.goalieActiveLoc = False
         tracker.helper.panTo(tracker.preTriPanHeads)
     elif (not tracker.brain.motion.isHeadActive() and
           tracker.counter > MOTION_START_BUFFER)  or \
