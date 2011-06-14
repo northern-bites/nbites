@@ -62,9 +62,10 @@ enum SensorNames {
 	SENSOR_COUNT,
 };
 
-// names of different sensors in the order we grab them
+// names of different sensors (for variance monitoring)
 const string sensorNames[] = {
-	"accX", "accY", "accZ", "gyroX", "gyroY", "angleX", "angleY"
+	"accX", "accY", "accZ", "gyroX", "gyroY", "angleX", "angleY",
+	"sonarLeft", "sonarRight"
 };
 
 class Sensors;
@@ -238,12 +239,15 @@ class Sensors {
 	void stopSavingFrames();
 	bool isSavingFrames() const;
 
-	// writes data collected by SensorMonitors to /tmp/
+	// writes data collected the variance monitor to /tmp/
 	void writeVarianceData();
 
  private:
-
     void add_to_module();
+
+	// put the sensor data values into the variance tracker, at the correct hz
+	void updateMotionDataVariance();
+	void updateVisionDataVariance();
 
     // Locking mutexes
     mutable pthread_mutex_t angles_mutex;

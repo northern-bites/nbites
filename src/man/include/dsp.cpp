@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 
@@ -194,15 +195,12 @@ SignalMonitor::SignalMonitor(int numBins, double low, double high, bool log)
     bins = new int[numBins];
     SignalMonitor::numBins = numBins;
 
-    if (log && low > 0 && high > 0)
-    {
+    if (log && low > 0 && high > 0) {
         // log histogram
         SignalMonitor::low  = ::log(low);
         SignalMonitor::high = ::log(high);
         SignalMonitor::log  = true;
-    }
-    else
-    {
+    } else {
         // linear histogram
         SignalMonitor::low  = low;
         SignalMonitor::high = high;
@@ -226,8 +224,7 @@ void SignalMonitor::Reset()
 
 void SignalMonitor::X(double x)
 {
-    if (log)
-    {
+    if (log) {
         if (x <= 0)
             x = low;
         else
@@ -249,20 +246,20 @@ void SignalMonitor::Print()
 	std::cout << toString();
 }
 
+/// @return a two-column string with bin midpoints (low to high) and counts
 std::string SignalMonitor::toString()
 {
-	std::stringstream data;
+	using namespace std;
+	stringstream data;
+	const int width = 8;
 
-    for (int i = 0; i < numBins; ++i)
-    {
-		data << binMidPoint(i);
-		data << "\t" << binCount(i);
-		data << std::endl;
-    }
-
+    for (int i = 0; i < numBins; ++i) {
+		data << setw(width) << binMidPoint(i)  << binCount(i) << endl;
+	}
 	return data.str();
 }
 
+/// @return the number of samples that have been in this bin
 const int SignalMonitor::binCount(int index) const {
 	if (index < 0 || index > numBins)
 		return 0;
@@ -273,6 +270,7 @@ const int SignalMonitor::binCount(int index) const {
 		return 0;
 }
 
+/// @return the mid point of the bin at index
 const double SignalMonitor::binMidPoint(int index) const {
 	double x = (index + 0.5) / k + low;
 	if (log)

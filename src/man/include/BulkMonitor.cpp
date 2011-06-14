@@ -56,7 +56,7 @@ void BulkMonitor::Reset() {
 
 void BulkMonitor::LogOutput() {
 	using namespace std;
-	const int width = 8;
+	const int width = 12;
 
 	stringstream filename;
 	ofstream outFile;

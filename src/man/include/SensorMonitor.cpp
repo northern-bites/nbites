@@ -7,9 +7,9 @@
 
 // parameters for the SignalMonitor
 static const bool LOG_DEFAULT = true;
-static const int NUMBER_BINS = 25;
-static const float LOW_BIN = 0.001f;
-static const float HIGH_BIN = 3.0f;
+static const int NUMBER_BINS = 30;
+static const float LOW_BIN = 0.0001f;
+static const float HIGH_BIN = 30.0f;
 
 SensorMonitor::SensorMonitor()
 	:  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
@@ -41,7 +41,6 @@ double SensorMonitor::X(double input) {
 			steadyAtFrame = SampleCount();
 		}
 	}
-
 	return Y(input);
 }
 
@@ -49,19 +48,16 @@ void SensorMonitor::Reset() {
 	Filter::Reset();
 	noise.Reset();
 	monitor.Reset();
-
 	steadyAtFrame = NOT_STEADY;
 }
 
 void SensorMonitor::LogOutput() {
 	using namespace std;
-
 	stringstream filename;
 
 	filename << "/tmp/" << sensorName << ".sensor.xls";
 
 	ofstream outFile;
-
 	outFile.open(filename.str().c_str(), ifstream::out);
 
 	outFile << "Report for sensor: " << sensorName << endl;

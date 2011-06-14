@@ -22,7 +22,7 @@ class SoccerFSA(FSA.FSA):
         self.stateChangeColor = 'red'
         self.setPrintFunction(self.brain.out.printf)
 
-        # for writing variance data every time we enter gamePenalized
+        # for writing variance data only once per appropriate state
         self.wroteVarianceData = False
 
     def run(self):
