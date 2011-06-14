@@ -44,6 +44,7 @@ public:
     //~ParsingBoard();
 
     void parse(const MObject* mobject);
+    void parseAll();
 
     //const ImageParser* getImageParser(const MImage* mimage) const;
 //    const Parser* getParser(const MObject* mobject) const;

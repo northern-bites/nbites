@@ -54,6 +54,15 @@ void ParsingBoard::parse(const MObject* mobject) {
     }
 }
 
+void ParsingBoard::parseAll() {
+
+    for (ObjectParserMap::iterator it = objectParserMap.begin();
+            it != objectParserMap.end(); it++ ) {
+        it->second->getNext();
+    }
+
+}
+
 //const ImageParser* ParsingBoard::getImageLogger(const MImage* mimage) const {
 //    return dynamic_cast<const ImageParser*>(this->getLogger(mimage));
 //}
