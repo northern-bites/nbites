@@ -1,74 +1,73 @@
-#include "LoggingBoard.h"
-#include "NaoPaths.h"
+#include "ParsingBoard.h"
 
 namespace memory {
 
-namespace log {
+namespace parse {
 
-const char* LoggingBoard::MVISION_PATH = NAO_LOG_DIR "/Vision.log";
-const char* LoggingBoard::MMOTION_SENSORS_PATH = NAO_LOG_DIR "/MotionSensors.log";
-const char* LoggingBoard::MVISION_SENSORS_PATH = NAO_LOG_DIR "/VisionSensors.log";
-const char* LoggingBoard::MIMAGE_PATH = NAO_LOG_DIR "/Image.log";
+//const char* ParsingBoard::MVISION_PATH = NAO_LOG_DIR "/Vision.log";
+//const char* ParsingBoard::MMOTION_SENSORS_PATH = NAO_LOG_DIR "/MotionSensors.log";
+//const char* ParsingBoard::MVISION_SENSORS_PATH = NAO_LOG_DIR "/VisionSensors.log";
+//const char* ParsingBoard::MIMAGE_PATH = NAO_LOG_DIR "/Image.log";
 
-LoggingBoard::LoggingBoard(const Memory* _memory) :
-    memory(_memory) {
-    initLoggingObjects();
+ParsingBoard::ParsingBoard(Memory* memory) :
+    memory(memory) {
+    initParsingObjects();
 }
 
-void LoggingBoard::initLoggingObjects() {
+void ParsingBoard::initParsingObjects() {
 
-    const MVision* mvision = memory->getMVision();
-    FDProvider* mvisionFDprovider = new FileFDProvider(MVISION_PATH);
-    objectFDProviderMap[mvision] = mvisionFDprovider;
-    objectFDLoggerMap[mvision] = new CodedFileLogger(mvisionFDprovider,
-            MVISION_ID, mvision);
+//    const MVision* mvision = memory->getMVision();
+//    FDProvider* mvisionFDprovider = new FileFDProvider(MVISION_PATH);
+//    objectFDProviderMap[mvision] = mvisionFDprovider;
+//    objectFDLoggerMap[mvision] = new CodedFileLogger(mvisionFDprovider,
+//            MVISION_ID, mvision);
+//
+//    const MMotionSensors* mmotionSensors = memory->getMMotionSensors();
+//    FDProvider* mmotionSensorsFDprovider = new FileFDProvider(
+//            MMOTION_SENSORS_PATH);
+//    objectFDProviderMap[mmotionSensors] = mmotionSensorsFDprovider;
+//    objectFDLoggerMap[mmotionSensors] = new CodedFileLogger(
+//            mmotionSensorsFDprovider, MMOTION_SENSORS_ID, mmotionSensors);
+//
+//    const MVisionSensors* mvisionSensors = memory->getMVisionSensors();
+//    FDProvider* mvisionSensorsFDprovider = new FileFDProvider(
+//            MVISION_SENSORS_PATH);
+//    objectFDProviderMap[mvisionSensors] = mvisionSensorsFDprovider;
+//    objectFDLoggerMap[mvisionSensors] = new CodedFileLogger(
+//            mvisionSensorsFDprovider, MVISION_SENSORS_ID, mvisionSensors);
 
-    const MMotionSensors* mmotionSensors = memory->getMMotionSensors();
-    FDProvider* mmotionSensorsFDprovider = new FileFDProvider(
-            MMOTION_SENSORS_PATH);
-    objectFDProviderMap[mmotionSensors] = mmotionSensorsFDprovider;
-    objectFDLoggerMap[mmotionSensors] = new CodedFileLogger(
-            mmotionSensorsFDprovider, MMOTION_SENSORS_ID, mmotionSensors);
-
-    const MVisionSensors* mvisionSensors = memory->getMVisionSensors();
-    FDProvider* mvisionSensorsFDprovider = new FileFDProvider(
-            MVISION_SENSORS_PATH);
-    objectFDProviderMap[mvisionSensors] = mvisionSensorsFDprovider;
-    objectFDLoggerMap[mvisionSensors] = new CodedFileLogger(
-            mvisionSensorsFDprovider, MVISION_SENSORS_ID, mvisionSensors);
-
-    const MImage* mimage = memory->getMImage();
-    FDProvider* mimageFDprovider = new FileFDProvider(MIMAGE_PATH);
+    MImage* mimage = memory->getMutableMImage();
+    FDProvider* mimageFDprovider = new FileFDProvider("/home/oneamtu/log/trillian/Image.log");
     objectFDProviderMap[mimage] = mimageFDprovider;
-    objectFDLoggerMap[mimage] = new ImageFDLogger(mimageFDprovider,
-            MIMAGE_ID, mimage);
+    objectParserMap[mimage] = new ImageParser("/home/oneamtu/log/trillian/Image.log",
+            shared_ptr<MImage>(mimage));
 }
 
-void LoggingBoard::log(const MObject* mobject) {
+void ParsingBoard::parse(const MObject* mobject) {
 
-    ObjectFDLoggerMap::iterator it = objectFDLoggerMap.find(mobject);
+    ObjectParserMap::iterator it = objectParserMap.find(mobject);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
-    if (it != objectFDLoggerMap.end()) {
+    if (it != objectParserMap.end()) {
         //it->second is the logger associated with the specified mobject
-        it->second->write();
+        it->second->getNext();
     }
 }
 
-const ImageFDLogger* LoggingBoard::getImageLogger(const MImage* mimage) const {
-    return dynamic_cast<const ImageFDLogger*>(this->getLogger(mimage));
-}
+//const ImageParser* ParsingBoard::getImageLogger(const MImage* mimage) const {
+//    return dynamic_cast<const ImageParser*>(this->getLogger(mimage));
+//}
 
-const FDLogger* LoggingBoard::getLogger(const MObject* mobject) const {
-    ObjectFDLoggerMap::const_iterator it = objectFDLoggerMap.find(mobject);
-    // if this is true, then we found a legitimate logger
-    // corresponding to our mobject in the map
-    if (it != objectFDLoggerMap.end()) {
-        return it->second;
-    } else {
-        return NULL;
-    }
-}
+//const Parser* ParsingBoard::getLogger(const MObject* mobject) const {
+//    ObjectFDLoggerMap::const_iterator it = objectFDLoggerMap.find(mobject);
+//    // if this is true, then we found a legitimate logger
+//    // corresponding to our mobject in the map
+//    if (it != objectFDLoggerMap.end()) {
+//        return it->second;
+//    } else {
+//        return NULL;
+//    }
+//}
 
 
 }

@@ -23,8 +23,8 @@ using boost::shared_ptr;
 //
 //}
 
-ImageParser::ImageParser(boost::shared_ptr<RoboImage> image,
-                       const char* _file_name) :
+ImageParser::ImageParser(const char* _file_name,
+        boost::shared_ptr<RoboImage> image) :
        TemplatedParser<RoboImage>(image),
        current_buffer(new const void*),
        current_buffer_size(1) {
@@ -66,7 +66,7 @@ const LogHeader ImageParser::getHeader() {
     return log_header;
 }
 
-shared_ptr<const RoboImage> ImageParser::getNext() {
+bool ImageParser::getNext() {
 
     uint32_t bytes_read = 0;
     this->getNextBuffer();

@@ -36,23 +36,23 @@ typedef pair< const MObject*, FDProvider*> ObjectFDProviderPair;
 typedef map< const MObject*, Parser*> ObjectParserMap;
 typedef map< const MObject*, FDProvider*> ObjectFDProviderMap;
 
-class LoggingBoard {
+class ParsingBoard {
 
 public:
-    LoggingBoard(const Memory* _memory);
+    ParsingBoard(Memory* _memory);
     //TODO: make sure to delete all of the Parser objects
-    //~LoggingBoard();
+    //~ParsingBoard();
 
     void parse(const MObject* mobject);
 
     //const ImageParser* getImageParser(const MImage* mimage) const;
-    const Parser* getParser(const MObject* mobject) const;
+//    const Parser* getParser(const MObject* mobject) const;
 
 private:
     void initParsingObjects();
 
 private:
-    const Memory* memory;
+    Memory* memory;
     ObjectParserMap objectParserMap;
     ObjectFDProviderMap objectFDProviderMap;
 

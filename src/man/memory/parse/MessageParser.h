@@ -21,7 +21,7 @@ namespace parse {
 namespace proto_io = google::protobuf::io;
 namespace proto = google::protobuf;
 
-class MessageParser : TemplatedParser <proto::Message>{
+class MessageParser : public TemplatedParser <proto::Message>{
 
 public:
     MessageParser(boost::shared_ptr<proto::Message> message,
@@ -34,7 +34,7 @@ public:
     void initStreams();
 
     const LogHeader getHeader();
-    boost::shared_ptr<const proto::Message> getNext();
+    bool getNext();
     boost::shared_ptr<const proto::Message> getPrev();
     boost::shared_ptr<const proto::Message> getCurrent();
 

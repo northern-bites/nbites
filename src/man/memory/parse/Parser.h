@@ -27,13 +27,14 @@ public:
     virtual ~Parser();
 
     virtual const LogHeader getHeader() = 0;
+    virtual bool getNext() = 0;
 
 protected:
     LogHeader log_header;
 };
 
 template <class T>
-class TemplatedParser : Parser {
+class TemplatedParser : public Parser {
 
 public:
     TemplatedParser(boost::shared_ptr<T> container) : container(container) {
@@ -43,7 +44,7 @@ public:
 
 
     //TODO: change these to void/bool move them to the generic parser
-    virtual boost::shared_ptr<const T> getNext() = 0;
+    virtual bool getNext() = 0;
     virtual boost::shared_ptr<const T> getPrev() = 0;
 
 

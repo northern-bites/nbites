@@ -26,7 +26,7 @@ MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
 
 MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
                        const char* _file_name) :
-       Parser<proto::Message>(message) {
+       TemplatedParser<proto::Message>(message) {
 
     file_descriptor = open(_file_name, O_RDONLY);
 
@@ -54,7 +54,7 @@ const LogHeader MessageParser::getHeader() {
     return log_header;
 }
 
-shared_ptr<const proto::Message> MessageParser::getNext() {
+bool MessageParser::getNext() {
 
     proto::uint32 size;
     uint64_t byte_count = raw_input->ByteCount();
