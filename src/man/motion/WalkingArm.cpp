@@ -150,9 +150,9 @@ const float WalkingArm::getArmScaleFromStep(boost::shared_ptr<Step> step) {
     if (std::abs(scale) > 1)
         scale = NBMath::sign(scale) * 1;
 
-    cout << "x/y/t scale: " << std::setw(10) << std::setprecision(2)
-         << step->walkVector.x << step->walkVector.y << step->walkVector.theta
-         << scale << endl;
+    //cout << "x/y/t scale: " << std::setw(10) << std::setprecision(2)
+    //     << step->walkVector.x << step->walkVector.y << step->walkVector.theta
+	//<< scale << endl;
 
     return sign * scale;;
 }
