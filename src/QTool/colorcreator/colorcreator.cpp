@@ -645,9 +645,8 @@ void ColorCreator::on_pushButton_clicked()
     currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
                                             currentDirectory,
                                             tr("Image Files (*.log)"));
-    imageParser= new memory::parse::ImageParser(
-            boost::shared_ptr<RoboImage> (image),
-            currentDirectory.toStdString().data());
+    imageParser= new memory::parse::ImageParser(currentDirectory.toStdString().data(),
+            boost::shared_ptr<RoboImage> (image));
     imageParser->getNext();
     roboimage.updateFromRoboImage();
     updateDisplays();
