@@ -168,8 +168,8 @@ FULL_SCAN_BALL = (
     (( -65.0, -25.0),0.4,  1, stiff.LOW_HEAD_STIFFNESSES),
     (( 0.0, -35.0),0.5,  1, stiff.LOW_HEAD_STIFFNESSES),
     (( 65.0, -25.0),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((118.,-5.),0.2,  1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-65.,-5.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),)
+    ((118.,-5.),0.3,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.,-5.),.5, 1, stiff.LOW_HEAD_STIFFNESSES),)
 
 
 HIGH_SCAN_CLOSE_BOUND = 104
