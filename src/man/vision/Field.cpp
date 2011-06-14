@@ -88,8 +88,10 @@ void Field::initialScanForTopGreenPoints(int pH) {
 	for (int i = 0; i < HULLS; i++) {
 		good = 0;
 		ok = 0;
-		int poseProject = yProject(0, pH, i * SCANSIZE);
+		int poseProject = thresh->blue->yProject(0, pH, i * SCANSIZE);
 		if (poseProject <= 0) {
+			poseProject = 0;
+		} else if (pH == 0) {
 			poseProject = 0;
 		}
 		topGreen = IMAGE_HEIGHT - 1;
