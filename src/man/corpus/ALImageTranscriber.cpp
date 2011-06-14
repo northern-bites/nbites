@@ -505,7 +505,7 @@ void ALImageTranscriber::initTable(string filename)
     }
 
 #ifndef OFFLINE
-    printf("Loaded colortable %s",filename.c_str());
+    printf("Loaded colortable %s\n",filename.c_str());
 #endif
 
     fclose(fp);
