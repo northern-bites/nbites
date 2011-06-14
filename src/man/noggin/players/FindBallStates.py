@@ -8,20 +8,26 @@ def scanFindBall(player):
     State to move the head to find the ball. If we find the ball, we
     move to align on it. If we don't find it, we spin to keep looking
     """
+
+    print "I don't know where the ball is!"
+    print "Imma look"
     player.stopWalking()
     player.brain.tracker.trackBall()
 
     if transitions.shouldChaseBall(player):
         return player.goNow('chase')
 
-    # a time based check. may be a problem for goalie. if it's not good for him to
-    # spin, he should prbly not be chaser anymore, so this wouldn't get reached
+    # a time based check. may be a problem for goalie. if it's not
+    # good for him to spin, he should prbly not be chaser anymore, so
+    # this wouldn't get reached
     if transitions.shouldSpinFindBall(player):
         return player.goLater('spinFindBall')
 
 #    ball = player.brain.ball
 #    if fabs(ball.bearing) < constants.SCAN_FIND_BEARING_THRESH:
 #        return player.stay()
+
+
 #
 #    else:
 #        return player.goLater('spinFindBall')

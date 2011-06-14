@@ -22,6 +22,7 @@ def scanBall(tracker):
     # Instead because our ball unformatino is poor, lets just do one
     # scan and make sure we don't miss it.  If our ball EKF is better
     # and trustworthy than we can put the above code back in
+    print "Perform Full Scan Ball"
     tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
     return tracker.stay()
 
