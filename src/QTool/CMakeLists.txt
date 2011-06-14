@@ -46,9 +46,13 @@ Qt4_wrap_ui(QTool_forms_headers ${QTool_forms})
 ########## MAN LINK
 set( MAN_STRAIGHT_BUILD ../../build/man/straight )
 
-include_directories( ../ ../man ${MAN_STRAIGHT_BUILD}/cfg ${MAN_STRAIGHT_BUILD})
+include_directories( ../ ../man ${MAN_STRAIGHT_BUILD}/cfg ${MAN_STRAIGHT_BUILD}
+    ../man/vision ../man/include ../man/sensors ../man/corpus)
 find_library(MEMORY_LIB memory ${MAN_STRAIGHT_BUILD}/memory)
 find_library(PARSE_LIB parse ${MAN_STRAIGHT_BUILD}/memory/parse)
+find_library(VISION_LIB vision ${MAN_STRAIGHT_BUILD}/vision)
+find_library(SENSORS_LIB _sensors ${MAN_STRAIGHT_BUILD}/corpus)
+find_library(NB_INCLUDE _nb_include ${MAN_STRAIGHT_BUILD}/corpus)
 
 ######### Subdirectory compilation
 add_subdirectory( image )
@@ -66,6 +70,8 @@ target_link_libraries(
   image
   ${MEMORY_LIB}
   ${PARSE_LIB}
+  ${SENSORS_LIB}
+  ${NB_INCLUDE}
   ${PROTOBUF_LIBRARIES}
   ${QT_LIBRARIES}
   )
