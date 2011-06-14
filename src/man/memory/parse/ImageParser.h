@@ -23,7 +23,7 @@ namespace parse {
 
 namespace proto_io = google::protobuf::io;
 
-class ImageParser : Parser <RoboImage>{
+class ImageParser : TemplatedParser <RoboImage>{
 
 public:
     ImageParser(boost::shared_ptr<RoboImage> image,

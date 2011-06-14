@@ -9,6 +9,7 @@
  * provider) to provide the file descriptor necessary. Some stuff
  * might go to a file, some might go to wifi, etc.
  *
+ * @author Octavian Neamtu
  */
 
 #pragma once

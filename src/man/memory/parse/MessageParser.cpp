@@ -15,7 +15,7 @@ using boost::shared_ptr;
 //TODO: use file descriptor providers
 MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
                        int _file_descriptor) :
-        Parser<proto::Message>(message),
+        TemplatedParser<proto::Message>(message),
         file_descriptor(_file_descriptor)
 {
 

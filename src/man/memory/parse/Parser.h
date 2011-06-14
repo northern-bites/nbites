@@ -20,22 +20,33 @@ struct LogHeader {
 
 };
 
-template <class T>
 class Parser {
 
 public:
-    Parser(boost::shared_ptr<T> container) : container(container) {
-    }
-
-    virtual ~Parser() {}
+    Parser() {};
+    virtual ~Parser();
 
     virtual const LogHeader getHeader() = 0;
+
+protected:
+    LogHeader log_header;
+};
+
+template <class T>
+class TemplatedParser : Parser {
+
+public:
+    TemplatedParser(boost::shared_ptr<T> container) : container(container) {
+    }
+
+    virtual ~TemplatedParser() {}
+
+
     virtual boost::shared_ptr<const T> getNext() = 0;
     virtual boost::shared_ptr<const T> getPrev() = 0;
 
 
 protected:
-    LogHeader log_header;
     boost::shared_ptr<T> container;
 
 };

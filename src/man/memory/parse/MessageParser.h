@@ -21,7 +21,7 @@ namespace parse {
 namespace proto_io = google::protobuf::io;
 namespace proto = google::protobuf;
 
-class MessageParser : Parser <proto::Message>{
+class MessageParser : TemplatedParser <proto::Message>{
 
 public:
     MessageParser(boost::shared_ptr<proto::Message> message,

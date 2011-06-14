@@ -25,7 +25,7 @@ using boost::shared_ptr;
 
 ImageParser::ImageParser(boost::shared_ptr<RoboImage> image,
                        const char* _file_name) :
-       Parser<RoboImage>(image),
+       TemplatedParser<RoboImage>(image),
        current_buffer(new const void*),
        current_buffer_size(1) {
 
