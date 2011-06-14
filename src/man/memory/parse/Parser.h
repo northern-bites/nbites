@@ -42,6 +42,7 @@ public:
     virtual ~TemplatedParser() {}
 
 
+    //TODO: change these to void/bool move them to the generic parser
     virtual boost::shared_ptr<const T> getNext() = 0;
     virtual boost::shared_ptr<const T> getPrev() = 0;
 
