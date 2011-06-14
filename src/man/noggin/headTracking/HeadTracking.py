@@ -17,7 +17,7 @@ class HeadTracking(FSA.FSA):
 
         self.currentState = 'stopped'
         self.setPrintFunction(self.brain.out.printf)
-        self.setPrintStateChanges(False)
+        self.setPrintStateChanges(True)
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
 
@@ -38,6 +38,10 @@ class HeadTracking(FSA.FSA):
     def stopHeadMoves(self):
         """stop all head moves. In TrackingStates.py"""
         self.switchTo('stop')
+
+    def isStopped(self):
+        """Checks that all head moves have stopped"""
+        return self.currentState == 'stopped'
 
     def setNeutralHead(self):
         """executes sweet move to move head to neutral position.
