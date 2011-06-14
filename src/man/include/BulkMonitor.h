@@ -40,19 +40,19 @@ using std::string;
 class BulkMonitor
 {
 public:
-	BulkMonitor(int _numberMonitors, string _bulkName, const string _sensorNames[]);
-	~BulkMonitor();
+    BulkMonitor(int _numberMonitors, string _bulkName, const string _sensorNames[]);
+    ~BulkMonitor();
 
-	// this method
-	double update(int sensor, double input);
+    // this method
+    double update(int sensor, double input);
 
-	void Reset();
-	void LogOutput();
+    void Reset();
+    void LogOutput();
 
 private:
-	SensorMonitor* monitors;
-	int numberMonitors;
-	string bulkName; // output file we log to in /tmp/
+    SensorMonitor* monitors;
+    int numberMonitors;
+    string bulkName; // output file we log to in /tmp/
 };
 
 #endif

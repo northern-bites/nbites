@@ -26,6 +26,7 @@
 #include <stdint.h>
 
 #include "SensorDef.h"
+#include "SensorConfigs.h"
 #include "NaoDef.h"
 #include "VisionDef.h"
 #include "BulkMonitor.h"
@@ -35,49 +36,13 @@ enum SupportFoot {
     RIGHT_SUPPORT
 };
 
-// naming convention: SENSOR_SIDEofBODY_POSTION
-enum SensorNames {
-	FSR_LEFT_F_L = 0,
-	FSR_LEFT_F_R,
-	FSR_LEFT_B_L,
-	FSR_LEFT_B_R,
-	FSR_RIGHT_F_L,
-	FSR_RIGHT_F_R,
-	FSR_RIGHT_B_L,
-	FSR_RIGHT_B_R,
-	BUMPER_LEFT_L,
-	BUMPER_LEFT_R,
-	BUMPER_RIGHT_L,
-	BUMPER_RIGHT_R,
-	ACC_X,
-	ACC_Y,
-	ACC_Z,
-	GYRO_X,
-	GYRO_Y,
-	ANGLE_X,
-	ANGLE_Y,
-	SONAR_LEFT,
-	SONAR_RIGHT,
-	SUPPORT_FOOT,
-	SENSOR_COUNT,
-};
-
-// names of different sensors (for variance monitoring)
-const string sensorNames[] = {
-	"accX", "accY", "accZ", "gyroX", "gyroY", "angleX", "angleY",
-	"sonarLeft", "sonarRight"
-};
-
-class Sensors;
-
-
 struct FSR {
-	FSR()
-		: frontLeft(0), frontRight(0), rearLeft(0), rearRight(0) { }
+    FSR()
+        : frontLeft(0), frontRight(0), rearLeft(0), rearRight(0) { }
 
-	FSR(const float fl, const float fr,
-		const float rl, const float rr)
-  : frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
+    FSR(const float fl, const float fr,
+        const float rl, const float rr)
+        : frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
 
     float frontLeft;
     float frontRight;
@@ -99,15 +64,15 @@ struct FootBumper {
 };
 
 struct Inertial {
-	Inertial()
-		: accX(0), accY(0), accZ(0),
-		  gyrX(0), gyrY(0), angleX(0), angleY(0) { }
+    Inertial()
+        : accX(0), accY(0), accZ(0),
+          gyrX(0), gyrY(0), angleX(0), angleY(0) { }
 
-	Inertial(const float _accX, const float _accY, const float _accZ,
-			 const float _gyrX, const float _gyrY,
-			 const float _angleX, const float _angleY)
-  : accX(_accX), accY(_accY), accZ(_accZ),
-	gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
+    Inertial(const float _accX, const float _accY, const float _accZ,
+             const float _gyrX, const float _gyrY,
+             const float _angleX, const float _angleY)
+        : accX(_accX), accY(_accY), accZ(_accZ),
+          gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
 
     float accX;
     float accY;
@@ -121,7 +86,7 @@ struct Inertial {
 
 class Sensors {
     //friend class Man;
- public:
+public:
     Sensors();
     ~Sensors();
 
@@ -235,19 +200,19 @@ class Sensors {
     void saveFrame();
     void loadFrame(std::string path);
     void resetSaveFrame();
-	void startSavingFrames();
-	void stopSavingFrames();
-	bool isSavingFrames() const;
+    void startSavingFrames();
+    void stopSavingFrames();
+    bool isSavingFrames() const;
 
-	// writes data collected the variance monitor to /tmp/
-	void writeVarianceData();
+    // writes data collected the variance monitor to /tmp/
+    void writeVarianceData();
 
- private:
+private:
     void add_to_module();
 
-	// put the sensor data values into the variance tracker, at the correct hz
-	void updateMotionDataVariance();
-	void updateVisionDataVariance();
+    // put the sensor data values into the variance tracker, at the correct hz
+    void updateMotionDataVariance();
+    void updateVisionDataVariance();
 
     // Locking mutexes
     mutable pthread_mutex_t angles_mutex;
@@ -301,8 +266,8 @@ class Sensors {
      * TOOL.
      */
 
-	// Sensor variance/health monitors
-	BulkMonitor varianceMonitor;
+    // Sensor variance/health monitor
+    BulkMonitor varianceMonitor;
 
     Inertial unfilteredInertial;
     //ChestButton
@@ -313,7 +278,7 @@ class Sensors {
 
     static int saved_frames;
     std::string FRM_FOLDER;
-	bool saving_frames_on;
+    bool saving_frames_on;
 };
 
 

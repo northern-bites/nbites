@@ -21,8 +21,7 @@
  * This class links a NoiseMeter and SignalMonitor together to provide
  * a first-warning system for failed sensors. Also, it provides a way
  * to quantify the amount of noise present in our data under game
- * circumstances. At destruction, this class will log the data it has
- * collected to /tmp/sensorName.xls
+ * circumstances.
  *
  * @see dsp.h
  * @author Nathan Merritt
@@ -56,7 +55,7 @@ public:
 	const double binMidPoint(int index) const;
 	const int binCountAt(int index) const;
 
-	std::string const SensorName() { return sensorName; }
+	const std::string SensorName() const { return sensorName; }
 	void SensorName(std::string name) { sensorName = name; }
 
 private:
