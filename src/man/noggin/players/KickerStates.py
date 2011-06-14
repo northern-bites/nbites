@@ -45,7 +45,6 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-
         tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
 
     if player.counter == 50:

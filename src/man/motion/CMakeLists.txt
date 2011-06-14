@@ -70,6 +70,7 @@ SET( MOTION_SRCS
 		     ChopShop
 		     NullProvider
 		     WalkProvider
+		     CoordHeadProvider
 		     Step
 		     Gait
 		     AbstractGait
