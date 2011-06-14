@@ -13,7 +13,6 @@
 namespace memory {
 
 using boost::shared_ptr;
-using namespace proto;
 using namespace std;
 
 MImage::MImage(shared_ptr<Sensors> s) : RoboImage(), sensors(s) {
