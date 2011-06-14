@@ -11,6 +11,7 @@
 #include <qmainwindow.h>
 #include <qtabwidget.h>
 
+#include "data/DataManager.h"
 #include "colorcreator/colorcreator.h"
 
 namespace qtool {
