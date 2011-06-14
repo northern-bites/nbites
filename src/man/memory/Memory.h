@@ -62,6 +62,8 @@ public:
     const MMotionSensors* getMMotionSensors() const {return mMotionSensors;}
     const MImage* getMImage() const {return mImage;}
 
+    MImage* getMutableMImage() {return mImage;}
+
 private:
     shared_ptr<Profiler> _profiler;
     shared_ptr<Sensors> _sensors;
