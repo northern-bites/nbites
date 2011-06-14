@@ -21,6 +21,6 @@ def goaliePosition(player):
         player.brain.tracker.activeLocGoaliePos()
     else:
         player.brain.tracker.trackBall()
-
+ 
     return player.stay()
 

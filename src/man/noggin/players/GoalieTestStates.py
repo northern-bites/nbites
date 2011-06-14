@@ -137,34 +137,3 @@ def testInBox(player):
             print "out"
 
     return player.stay()
-
-
-
-def testShouldPositionRight(player):
-    if player.counter % 100 == 0:
-        if goalTran.shouldPositionRight(player):
-            print "position right"
-        elif goalTran.shouldPositionLeft(player):
-            print "position left"
-        elif goalTran.shouldPositionCenter(player):
-            print "postion center"
-
-    return player.stay()
-
-def testChase(player):
-
-    if goalTran.shouldChase(player):
-        print "chase"
-    else:
-        print "staying"
-
-    return player.stay()
-
-def testStopChase(player):
-
-    if goalTran.shouldStopChase(player):
-        print "stop"
-    else:
-        print "not stopping"
-
-    return player.stay()
