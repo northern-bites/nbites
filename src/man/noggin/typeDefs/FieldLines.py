@@ -1,13 +1,13 @@
 ## All line and corner information for Python
 
 class FieldLines:
-    
+
     def __init__(self, visionInfos):
         self.numCorners = 0
         self.numLines = 0
         self.lines = []
         self.corners = []
-        
+
         self.updateLines(visionInfos)
         self.updateCorners(visionInfos)
 
@@ -40,8 +40,11 @@ class Line:
         self.possibilities = visionLine.possibilities
 
     def __str__(self):
-        return "Line with angle " + str(self.angle) + " width " + str(self.width) + " bearing " + str(self.bearing) + " dist " + str(self.dist) + " length " + str(self.length) + " slope " + str(self.slope) + " yInt " + str(self.yInt) + "."
-        
+        return "Line with angle " + str(self.angle) + " width " + \
+            str(self.width) + " bearing " + str(self.bearing) + " dist " + \
+            str(self.dist) + " length " + str(self.length) + " slope " + \
+            str(self.slope) + " yInt " + str(self.yInt) + "."
+
 class Corner:
 
     def __init__(self, visionCorner):
@@ -50,7 +53,8 @@ class Corner:
         self.x = visionCorner.x
         self.y = visionCorner.y
         self.possibilities = visionCorner.possibilities
-        
+
     def __str__(self):
-        return "Corner with dist " + str(self.dist) + " bearing " + str(self.bearing) + " angleX " + str(self.angleX) + " angleY " + str(self.angleY) + " x " + str(self.x) + " y " + str(self.y) + " elevation " + str(self.elevation) + "."
-        
+        return "Corner with dist " + str(self.dist) + " bearing " + \
+            str(self.bearing) + " x " + str(self.x) + " y " + str(self.y) + "."
+
