@@ -101,71 +101,6 @@ void Ball::init(float s)
 	numPoints = 0;
 }
 
-/* Is the passed in pixel Orange?  Note: this is a transitional step towards
-   swapping our color tables to use bitwise operators.
-   @param pix    the pixel to test
-   @return       whether it is orange or not
- */
-bool Ball::isOrange(unsigned char pix) {
-#ifdef SOFTCOLORS
-	return pix == ORANGE || pix == ORANGERED || pix == ORANGEYELLOW;
-#else
-	return pix & ORANGE_BIT;
-#endif
-}
-
-/* Is the passed in pixel Red?  Note: this is a transitional step towards
-   swapping our color tables to use bitwise operators.
-   @param pix    the pixel to test
-   @return       whether it is orange or not
- */
-bool Ball::isRed(unsigned char pix) {
-#ifdef SOFTCOLORS
-	return pix == RED || pix == ORANGERED;
-#else
-	return pix & RED_BIT;
-#endif
-}
-
-/* Is the passed in pixel Yellow?  Note: this is a transitional step towards
-   swapping our color tables to use bitwise operators.
-   @param pix    the pixel to test
-   @return       whether it is yellow or not
- */
-bool Ball::isYellow(unsigned char pix) {
-#ifdef SOFTCOLORS
-	return pix == YELLOW || pix == ORANGEYELLOW;
-#else
-	return pix & YELLOW_BIT;
-#endif
-}
-
-/* Is the passed in pixel Green?  Note: this is a transitional step towards
-   swapping our color tables to use bitwise operators.
-   @param pix    the pixel to test
-   @return       whether it is green or not
- */
-bool Ball::isGreen(unsigned char pix) {
-#ifdef SOFTCOLORS
-	return pix == GREEN || pix == BLUEGREEN;
-#else
-	return pix & GREEN_BIT;
-#endif
-}
-
-/* Is the passed in pixel Undefined?  Note: this is a transitional step towards
-   swapping our color tables to use bitwise operators.
-   @param pix    the pixel to test
-   @return       whether it is undefined or not
- */
-bool Ball::isUndefined(unsigned char pix) {
-#ifdef SOFTCOLORS
-	return pix == GREY;
-#else
-	return pix;
-#endif
-}
-
 /* This is the entry  point ball recognition in Threshold.cc
  * @param  h			field horizon
  * @return				always 0
@@ -301,7 +236,8 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
                && e.dist < PIXACC && e.dist > 0) {
         if (BALLDEBUG) {
             cout << "Screening due to distance mismatch " << e.dist <<
-                " " << thisBall->getDistance() << endl;
+                " " << focalDist.dist << endl;
+			drawBlob(*topBlob, BLACK);
         }
         thisBall->init();
         topBlob->init();
@@ -349,7 +285,8 @@ int Ball::balls(int horizon, VisualBall *thisBall)
         }
         w = topBlob->width();
         h = topBlob->height();
-        if (abs(w - h) > DIAMETERMISMATCH && !nearEdge(*topBlob)) {
+        //if (abs(w - h) > DIAMETERMISMATCH && !nearEdge(*topBlob)) {
+		if (!nearEdge(*topBlob)) {
             adjustBallDimensions();
             w = topBlob->width();
             h = topBlob->height();
@@ -554,7 +491,7 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
                  i++) {
                 for (int j = topBlob->getLeftTopY();
                      j < topBlob->getLeftBottomY(); j++) {
-                    if (isOrange(thresh->getThresholded(j,i))) {
+                    if (Utility::isOrange(thresh->getThresholded(j,i))) {
                         topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;
                         i = IMAGE_WIDTH;
@@ -567,7 +504,7 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
             for (int i = topBlob->getLeftTopX() + h; i > -1; i--) {
                 for (int j = topBlob->getLeftTopY();
                      j < topBlob->getLeftBottomY(); j++) {
-                    if (isOrange(thresh->getThresholded(j,i))) {
+                    if (Utility::isOrange(thresh->getThresholded(j,i))) {
 						topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;
                         i = -1;
@@ -721,7 +658,7 @@ float Ball::rightHalfColor(Blob tempobj)
 		for (int j = 0; j < spanX; j++) {
 			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
-				x + j < IMAGE_WIDTH && isOrange(pix)) {
+				x + j < IMAGE_WIDTH && Utility::isOrange(pix)) {
 				good++;
 			}
 		}
@@ -730,7 +667,7 @@ float Ball::rightHalfColor(Blob tempobj)
 		for (int j = 0; j < spanX / 2; j++) {
 			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
-				x + j < IMAGE_WIDTH && isOrange(pix)) {
+				x + j < IMAGE_WIDTH && Utility::isOrange(pix)) {
 				good1++;
 			}
 		}
@@ -739,7 +676,7 @@ float Ball::rightHalfColor(Blob tempobj)
 		for (int j = spanX / 2; j < spanX; j++) {
 			pix = thresh->getThresholded(y + i,x + j);
 			if (y + i > -1 && x + j > -1 && (y + i) < IMAGE_HEIGHT &&
-				x + j < IMAGE_WIDTH && isOrange(pix)) {
+				x + j < IMAGE_WIDTH && Utility::isOrange(pix)) {
 				good2++;
 			}
 		}
@@ -883,16 +820,16 @@ pair<int, int> Ball::scanMidlinesForRoundnessInformation(Blob b) {
     int goodPix = 0, badPix = 0;
     for (int i = 0; i < h; i++) {
         pix = thresh->getThresholded(y+i,x + w/2);
-		if (isOrange(pix)) {
+		if (Utility::isOrange(pix)) {
             goodPix++;
-        } else if (!isUndefined(pix))
+        } else if (!Utility::isUndefined(pix))
             badPix++;
     }
     for (int i = 0; i < w; i++) {
         pix = thresh->getThresholded(y+h/2,x + i);
-		if (isOrange(pix)) {
+		if (Utility::isOrange(pix)) {
             goodPix++;
-        } else if (!isUndefined(pix)) {
+        } else if (!Utility::isUndefined(pix)) {
             badPix++;
         }
     }
@@ -923,29 +860,29 @@ pair<int, int> Ball::scanDiagonalsForRoundnessInformation(Blob b) {
     for (int i = 0; i < d3; i++) {
         pix = thresh->getThresholded(y+i,x+i);
         if (i < d || (i > d3 - d)) {
-			if (isOrange(pix)) {
+			if (Utility::isOrange(pix)) {
                 badPix++;
             } else {
                 goodPix++;
             }
         } else {
-			if (isOrange(pix)) {
+			if (Utility::isOrange(pix)) {
                 goodPix++;
-            } else if (!isUndefined(pix)) {
+            } else if (!Utility::isUndefined(pix)) {
                 badPix++;
             }
         }
         pix = thresh->getThresholded(y+i,x+w-i);
         if (i < d || (i > d3 - d)) {
-			if (isOrange(pix)) {
+			if (Utility::isOrange(pix)) {
                 badPix++;
             }
             else {
                 goodPix++;
             }
-        } else if (isOrange(pix)) {
+        } else if (Utility::isOrange(pix)) {
             goodPix++;
-        } else if (isUndefined(pix)) {
+        } else if (Utility::isUndefined(pix)) {
             badPix++;
         }
     }
@@ -986,23 +923,23 @@ bool Ball::badSurround(Blob b) {
 	for (int i = 0; i < w && x + i < IMAGE_WIDTH; i++) {
 		for (int j = 0; j < h && y + j < IMAGE_HEIGHT; j++) {
 			pix = thresh->getThresholded(y + j,x + i);
-			if (isOrange(pix)) {
+			if (Utility::isOrange(pix)) {
 				orange++;
                 if (x + i >= b.getLeft() && x + i <= b.getRight() &&
                     y + j >= b.getTop() && y + j <= b.getBottom()) {
                     borange++;
                 }
 			}
-			if (isRed(pix)) {
+			else if (Utility::isRed(pix)) {
 				realred++;
 			}
-			if (isRed(pix) && isOrange(pix)) {
+			if (Utility::isRed(pix) && Utility::isOrange(pix)) {
 				red++;
 			}
-			if (isGreen(pix)) {
+			if (Utility::isGreen(pix)) {
 				greens++;
 			}
-			if (isYellow(pix) && j < surround) {
+			if (Utility::isYellow(pix) && j < surround) {
 				yellows++;
             }
 		}
@@ -1018,7 +955,7 @@ bool Ball::badSurround(Blob b) {
 		}
 		return true;
 	}
-	if (realred > greens && w * h < 2000) {
+	if (realred > greens * 2 && w * h < 2000 && b.getBottom() < IMAGE_HEIGHT - 5) {
 		if (BALLDEBUG) {
 			cout << "Too much real red versus green" << endl;
 		}
