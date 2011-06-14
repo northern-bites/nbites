@@ -145,7 +145,7 @@ private:
     virtual void incorporateMeasurement(const CornerObservation& z,
                                         StateMeasurementMatrix2 &H_k,
                                         MeasurementMatrix2 &R_k,
-                                        MeasurementVector2 &V_k) { };
+                                        MeasurementVector2 &V_k);
 
     void incorporateCartesianMeasurement(int obsIndex,
                                          const PointObservation& z,
@@ -159,6 +159,11 @@ private:
                                      MeasurementVector1 &V_k);
 
 
+    void calculateMatrices(int index,
+                           const CornerObservation& z,
+                           StateMeasurementMatrix2 &H_k,
+                           MeasurementMatrix2 &R_k,
+                           MeasurementVector2 &V_k);
 
     /**
      * Given an observation with multiple possibilities, we return the

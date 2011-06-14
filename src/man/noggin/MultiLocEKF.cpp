@@ -47,6 +47,52 @@ const float MultiLocEKF::Y_EST_MIN = 0.0f;
 const float MultiLocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
 const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
 
+
+/**
+ * Calculate the distance and bearing error between an observation
+ * (obs) and a landmark (pt).
+ *
+ * Stores them in pt_dist and pt_bearing
+ */
+#define CALCULATE_PT_OBS_ERRORS(obs, pt)                                \
+    const float x = xhat_k_bar(0);                                      \
+    const float y = xhat_k_bar(1);                                      \
+    const float h = xhat_k_bar(2);                                      \
+                                                                        \
+    /* Relative (x,y) from landmark to our position */                  \
+    float pt_rel_x = (x - pt.x);                                        \
+    float pt_rel_y = (y - pt.y);                                        \
+                                                                        \
+    float pt_dist = hypotf(pt_rel_x, pt_rel_y);                         \
+                                                                        \
+    /* Heading from me to landmark */                                   \
+    /* Opposite of pt_rel_x needed to get vector direction right  */    \
+    float heading_mag = acosf(-pt_rel_x / pt_dist);                     \
+                                                                        \
+    /* Sign the heading and subtract our heading to get bearing */      \
+    float pt_bearing = subPIAngle(copysignf(1.0f, -pt_rel_y) *          \
+                                  heading_mag - h);                     \
+                                                                        \
+    float dist_error = pt_dist - z.getVisDistance();                    \
+    float bearing_error =  subPIAngle(pt_bearing -                      \
+                                      z.getVisBearing()) /              \
+        z.getBearingSD();                                               \
+
+
+
+#define CALCULATE_CORNER_OBS_ERRORS(obs, pt)                            \
+    CALCULATE_PT_OBS_ERRORS(obs, pt);                                   \
+                                                                        \
+    /* Calculate the heading from the corner to us */                   \
+    float heading_from_corner = 180 - heading_mag;                      \
+                                                                        \
+    float pt_orientation = (heading_from_corner *                       \
+                            copysignf(1.0f, pt_rel_y) - pt.angle);      \
+                                                                        \
+    float orientation_error = pt_orientation - z.getVisOrientation();
+
+
+
 /**
  * Initialize the localization EKF class
  *
@@ -470,7 +516,7 @@ void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
     cout << "\t\t\tUsing cartesian " << endl;
 #endif
     // Convert our sighting to cartesian coordinates
-    MeasurementVector1 z_x(2);
+    MeasurementVector1 z_x(dist_bearing_meas_dim);
     z_x(0) = z.getVisDistance() * cos(z.getVisBearing());
     z_x(1) = z.getVisDistance() * sin(z.getVisBearing());
 
@@ -485,7 +531,7 @@ void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
     float sinh, cosh;
     sincosf(h, &sinh, &cosh);
 
-    MeasurementVector1 d_x(2);
+    MeasurementVector1 d_x(dist_bearing_meas_dim);
     d_x(0) = (x_b - x) * cosh + (y_b - y) * sinh;
     d_x(1) = -(x_b - x) * sinh + (y_b - y) * cosh;
 
@@ -544,17 +590,17 @@ void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
 }
 
 void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
-                                         const PointObservation& z,
-                                         StateMeasurementMatrix1 &H_k,
-                                         MeasurementMatrix1 &R_k,
-                                         MeasurementVector1 &V_k)
+                                              const PointObservation& z,
+                                              StateMeasurementMatrix1 &H_k,
+                                              MeasurementMatrix1 &R_k,
+                                              MeasurementVector1 &V_k)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tUsing polar " << endl;
 #endif
 
     // Get the observed range and bearing
-    MeasurementVector1 z_x(2);
+    MeasurementVector1 z_x(dist_bearing_meas_dim);
     z_x(0) = z.getVisDistance();
     z_x(1) = z.getVisBearing();
 
@@ -562,7 +608,7 @@ void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
     PointLandmark bestPossibility = z.getPossibilities()[obsIndex];
     const float x_b = bestPossibility.x;
     const float y_b = bestPossibility.y;
-    MeasurementVector1 d_x(2);
+    MeasurementVector1 d_x(dist_bearing_meas_dim);
 
     const float x = xhat_k_bar(0);
     const float y = xhat_k_bar(1);
@@ -621,30 +667,99 @@ void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
 #endif
 }
 
-#define CALCULATE_PT_OBS_ERRORS(obs, pt)                                \
-    const float x = xhat_k_bar(0);                                      \
-    const float y = xhat_k_bar(1);                                      \
-    const float h = xhat_k_bar(2);                                      \
-                                                                        \
-                                                                        \
-    float pt_rel_x = (pt.x - x);                                        \
-    float pt_rel_y = (pt.y - y);                                        \
-                                                                        \
-    float pt_dist = hypotf(pt_rel_x, pt_rel_y);                         \
-                                                                        \
-    /* Heading from me to landmark */                                   \
-    float heading_mag = acosf(pt_rel_x / pt_dist);                      \
-                                                                        \
-    /* Sign the heading and subtract our heading to get bearing */      \
-    float pt_bearing = subPIAngle(copysignf(1.0f, pt_rel_y) *           \
-                                  heading_mag - h);                     \
-                                                                        \
-    /* Normalized errors */                                             \
-    float dist_error_norm = (pt_dist - z.getVisDistance()) /            \
-                                              z.getDistanceSD();        \
-    float bearing_error_norm = (subPIAngle(pt_bearing -                 \
-                                           z.getVisBearing()) /         \
-                                z.getBearingSD());
+
+void MultiLocEKF::incorporateMeasurement(const CornerObservation& z,
+                                         StateMeasurementMatrix2 &H_k,
+                                         MeasurementMatrix2 &R_k,
+                                         MeasurementVector2 &V_k)
+{
+#ifdef DEBUG_LOC_EKF_INPUTS
+    cout << "\t\t\tIncorporating measurement " << z << endl;
+#endif
+
+    const int obsIndex = findBestLandmark<CornerObservation, CornerLandmark>(z);
+
+    // No landmark is close enough, don't attempt to use one
+    if (obsIndex < 0) {
+        R_k(0,0) = DONT_PROCESS_KEY;
+        return;
+    }
+
+    calculateMatrices(obsIndex, z, H_k, R_k, V_k);
+
+    // Calculate the standard error of the measurement
+    const StateMeasurementMatrix1 newP = prod(P_k, trans(H_k));
+    MeasurementMatrix1 se = prod(H_k, newP) + R_k;
+    se(0,0) = sqrt(se(0,0));
+    se(1,1) = sqrt(se(1,1));
+
+    // Ignore observations based on standard error
+    if ( se(0,0)*6.0f < abs(V_k(0))) {
+#ifdef DEBUG_STANDARD_ERROR
+        cout << "\t Ignoring measurement " << endl;
+        cout << "\t Standard error is " << se << endl;
+        cout << "\t Invariance is " << abs(V_k(0))*5 << endl;
+#endif
+        R_k(0,0) = DONT_PROCESS_KEY;
+    }
+}
+
+void MultiLocEKF::calculateMatrices(int index,
+                                    const CornerObservation& z,
+                                    StateMeasurementMatrix2 &H_k,
+                                    MeasurementMatrix2 &R_k,
+                                    MeasurementVector2 &V_k)
+{
+
+    // Get the observed range, bearing, and orientation
+    // Pack into measurement vector
+
+    // Get expected values of the corner
+    CornerLandmark bestPossibility = z.getPossibilities()[index];
+
+    // Calculate the errors
+    CALCULATE_CORNER_OBS_ERRORS(z, bestPossibility);
+
+    // Calculate invariance
+    V_k(0) = dist_error;
+    V_k(1) = bearing_error;
+    V_k(2) = orientation_error;
+
+    /*
+     * Calculate jacobians.
+     *
+     * See CALCULATE_PT_OBS_ERRORS macro for variable derivations.
+     */
+
+    // Derivatives of distance with respect to x,y,h
+    H_k(0,0) = pt_rel_x / pt_dist;
+    H_k(0,1) = pt_rel_y / pt_dist;
+    H_k(0,2) = 0;
+
+    // Derivatives of bearing with respect to x,y,h
+    H_k(1,0) = -pt_rel_y / (pt_dist * pt_dist);
+    H_k(1,1) =  pt_rel_x / (pt_dist * pt_dist);
+    H_k(1,2) = -1;
+
+    // Derivatives of orientation with respect to x,y,h
+    H_k(2,0) =  pt_rel_y / (pt_dist * pt_dist);
+    H_k(2,1) = -pt_rel_x / (pt_dist * pt_dist);
+    H_k(2,2) = 0;
+
+    // Update the measurement covariance matrix
+    // Indices: (Dist, bearing, orientation)
+    R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
+    R_k(0,1) = 0.0f;
+    R_k(0,2) = 0.0f;
+
+    R_k(1,0) = 0.0f;
+    R_k(1,1) = z.getBearingSD() * z.getBearingSD();
+    R_k(1,2) = 0.0f;
+
+    R_k(2,0) = 0.0f;
+    R_k(2,1) = 0.0f;
+    R_k(2,2) = z.getOrientationSD() * z.getOrientationSD();
+}
 
 /**
  * Get the divergence between an observation and a possible point landmark
@@ -658,6 +773,12 @@ float MultiLocEKF::getDivergence(const PointObservation& z,
                                  const PointLandmark& pt)
 {
     CALCULATE_PT_OBS_ERRORS(z,pt);
+
+
+    // Normalized errors
+    float dist_error_norm    = dist_error    / z.getDistanceSD();
+    float bearing_error_norm = bearing_error / z.getBearingSD();
+
     // Euclidean distance
     return (dist_error_norm * dist_error_norm +
             bearing_error_norm * bearing_error_norm);
@@ -666,18 +787,12 @@ float MultiLocEKF::getDivergence(const PointObservation& z,
 float MultiLocEKF::getDivergence(const CornerObservation& z,
                                  const CornerLandmark& pt)
 {
-    CALCULATE_PT_OBS_ERRORS(z,pt);
+    CALCULATE_CORNER_OBS_ERRORS(z, pt);
 
-    // Calculate the heading from the corner to us
-    float heading_from_corner = 180 - heading_mag;
-
-    float pt_orientation = (heading_from_corner * copysignf(1.0f,
-                                                            -pt_rel_y) -
-                            pt.angle);
-
-    float orientation_error_norm = (pt_orientation -
-                                    z.getVisOrientation()) /
-        z.getOrientationSD();
+    // Normalized errors
+    float dist_error_norm        = dist_error        / z.getDistanceSD();
+    float bearing_error_norm     = bearing_error     / z.getBearingSD();
+    float orientation_error_norm = orientation_error / z.getOrientationSD();
 
     return (dist_error_norm * dist_error_norm +
             bearing_error_norm * bearing_error_norm +
