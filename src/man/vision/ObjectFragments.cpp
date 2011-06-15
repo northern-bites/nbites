@@ -2389,7 +2389,7 @@ bool ObjectFragments::locationOk(Blob b)
         }
         return false;
     }
-	if (trueTop > mh) {
+	if (trueTop > mh && trueTop > 3) {
 		if (SANITY) {
 			cout << "Top was less than horizon " << trueTop << " " << mh << endl;
 		}
