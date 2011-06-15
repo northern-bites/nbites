@@ -62,5 +62,5 @@ def afterKick(player):
     if transitions.shouldFindBall(player):
         player.inKickingState = False
         player.brain.nav.justKicked = False
-        return player.goLater('fxoindBall')
+        return player.goLater('findBall')
     return player.stay()
