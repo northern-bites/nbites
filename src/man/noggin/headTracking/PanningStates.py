@@ -3,8 +3,6 @@ from . import TrackingConstants as constants
 from man.motion import MotionConstants
 
 def scanBall(tracker):
-    print "Panning scan ball"
-
     ball = tracker.brain.ball
 
     if tracker.target == ball and \
@@ -29,8 +27,6 @@ def scanBall(tracker):
     return tracker.stay()
 
 def spinScanBall(tracker):
-    print "Panning spin scan ball"
-
     ball = tracker.brain.ball
     nav = tracker.brain.nav
 
