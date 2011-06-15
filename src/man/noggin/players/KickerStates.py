@@ -45,7 +45,8 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-         player.noggin.tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
+
+        player.executeMove(SweetMoves.STAND_UP_BACK)
 
     if player.counter == 50:
         return player.goLater('done')
