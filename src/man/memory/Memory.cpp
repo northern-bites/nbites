@@ -5,7 +5,6 @@
  */
 
 #include "Common.h"
-
 #include "Memory.h"
 
 namespace memory {
@@ -14,6 +13,13 @@ long long int birth_time; //the time we initialized memory
 //everything else is time stamped relative to this
 
 using log::LoggingBoard;
+
+Memory::Memory() : mVision(new MVision(shared_ptr<Vision>())),
+        mVisionSensors(new MVisionSensors(shared_ptr<Sensors>())),
+        mMotionSensors(new MMotionSensors(shared_ptr<Sensors>())),
+        mImage(new MImage(shared_ptr<Sensors>()))
+{
+}
 
 Memory::Memory(shared_ptr<Profiler> profiler_ptr,
         shared_ptr<Vision> vision_ptr,

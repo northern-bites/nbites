@@ -36,6 +36,8 @@ using boost::shared_ptr;
 class Memory : public Subscriber {
 
 public:
+    Memory();
+
     Memory( shared_ptr<Profiler> profiler_ptr,
             shared_ptr<Vision> vision_ptr,
             shared_ptr<Sensors> sensors_ptr);
