@@ -228,6 +228,15 @@ class Brain(object):
         # order here is very important
         # Update Environment
         self.updateVisualObjects()
+
+
+        # ** # debugging
+        #print "visual update:"
+        #print "yglp:",self.yglp.visDist,self.yglp.visBearing
+        #print "ygrp:",self.ygrp.visDist,self.ygrp.visBearing
+        # ** #
+
+
         self.sonar.updateSensors(self.sensors)
 
         # Communications update
@@ -236,8 +245,23 @@ class Brain(object):
         # Localization Update
         self.updateLocalization()
 
+        # ** # debugging
+        #print "loc update:"
+        #print "yglp:",self.yglp.locDist,self.yglp.locBearing
+        #print "ygrp:",self.ygrp.locDist,self.ygrp.locBearing
+        # ** #
+
         # Choose whether we use Vision or Localization
         self.updateBestValues()
+
+        # ** # debugging
+        #print "best values:"
+        #print "yglp:",self.yglp.dist,self.yglp.bearing
+        #print "ygrp:",self.ygrp.dist,self.ygrp.bearing
+        #print "rel values:"
+        #print "yglp:",self.yglp.relX,self.yglp.relY
+        #print "ygrp:",self.ygrp.relX,self.ygrp.relY
+        # ** #
 
         #Set LEDS
         self.leds.processLeds()

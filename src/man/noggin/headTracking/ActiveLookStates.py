@@ -86,13 +86,14 @@ def readyLoc(tracker):
     Looks at nearby landmarks for localization.
     """
     #update tracking fitness of locObjects
-    for obj in tracker.locObjectList[:]:
+    for obj in tracker.locObjectList:
         tracker.helper.updateTrackingFitness(obj)
     #sort list of locObjects
     newlist = sorted(tracker.locObjectList)
 
     if not newlist == tracker.locObjectList:
-        #landmarks have changed fitness ranking. Track most fit.
+        #landmarks have changed fitness ranking. Track most fit
+        tracker.locObjectList = newlist
         tracker.currentLocObject = tracker.locObjectList[0]
         return tracker.goLater('trackLoc')
 

@@ -38,6 +38,7 @@ class HeadTracking(FSA.FSA):
 
         self.lookDirection = None
         self.target = self.brain.ball #default
+        self.nudged = False# ** # debugging field
 
 # ** # old method
     def stopHeadMoves(self):
@@ -150,7 +151,7 @@ class HeadTracking(FSA.FSA):
 #        if not self.currentState == 'lookToPoint':
 #            self.switchTo('lookToPoint')
 
-# ** # new method - now a helper method
+    # ** # new method - now a helper method
     def lookToPoint(self, goalX=0, goalY=0, goalZ=0):
         """
         Look at given relative coordinates.
@@ -160,14 +161,29 @@ class HeadTracking(FSA.FSA):
         self.target.height = goalZ
         self.helper.lookToPoint(self.target)
 
-# ** # new method
+    # ** # new method
     def lookToLocObject(self):
         """
         Looks at currentLocObject.
         """
+
+        # ** # debugging print lines
+        #print "my location:", self.brain.my.x, self.brain.my.y, self.brain.my.h
+        #print "object list:"
+        #for obj in self.locObjectList:
+        #    print obj.visionId, obj.dist, obj.bearing, obj.on
+        #print "target rel coords:", self.currentLocObject.relX, self.currentLocObject.relY
+        #print "target dist/bearing:",self.currentLocObject.dist,self.currentLocObject.bearing
+        #print "target fitness:",self.currentLocObject.trackingFitness
+        print self.currentLocObject.visionId
+
         self.lookToPoint(self.currentLocObject.relX, \
                              self.currentLocObject.relY, \
-                             self.currentLocObject.height)
+                             0.0)
+
+# ** # debugging method
+    def nudge(self):
+        self.nudged = True
 
 # ** # old method
     def bounceHead(self):

@@ -85,6 +85,7 @@ def trackLoc(tracker):
     """
     Look at the current LocObject, then go to lastDiffState
     """
+
     # make sure head is inactive first
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
@@ -92,12 +93,20 @@ def trackLoc(tracker):
     # safety check that currentLocObject was set
     if tracker.currentLocObject is None:
         print "currentLocObject is None"
-        return tracker.goLater(tracker.lastDiffState())
+        # ** # nudge debugging
+        if tracker.nudged:
+            tracker.nudged = False
+            return tracker.goLater(tracker.lastDiffState())
+        return tracker.stay()
 
     tracker.lookToLocObject()
 
-    if not tracker.brain.motion.isHeadActive():
-        print "head is not active"
-        return tracker.goLater(tracker.lastDiffState)
+    if tracker.counter > 3 and not tracker.brain.motion.isHeadActive():
+        print "inactive and ready to switch landmarks after",tracker.counter
+        # ** # nudge debugging
+        if tracker.nudged:
+            tracker.nudged = False
+            return tracker.goLater(tracker.lastDiffState)
+        return tracker.stay()
 
     return tracker.stay()

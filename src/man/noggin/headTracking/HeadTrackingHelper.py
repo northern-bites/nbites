@@ -94,7 +94,8 @@ class HeadTrackingHelper(object):
 
 # ** # old method
     def lookToPoint(self, target):
-        headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
+        #convert from cm to mm for c++ code
+        headMove = motion.CoordHeadCommand(10*target.x, 10*target.y, 10*target.height,.1065*.1,.1227*.1)
         self.tracker.brain.motion.coordHead(headMove)
 
 # ** # old method
