@@ -204,7 +204,7 @@ def trianglePanReturn(tracker):
     elif (not tracker.brain.motion.isHeadActive() and
           tracker.counter > MOTION_START_BUFFER)  or \
           tracker.target.on:
-        return tracker.goLater('tracking')
+        return tracker.goLater('ballTracking')
     return tracker.stay()
 
 def bounceUp(tracker):
