@@ -65,7 +65,7 @@ extern "C" {
 //Instantiate the vision stuff
 static shared_ptr<Sensors> sensors(new Sensors());
 static shared_ptr<NaoPose> pose(new NaoPose(sensors));
-static shared_ptr<Profiler> profiler(new Profiler(micro_time));
+static shared_ptr<Profiler> profiler(new Profiler(thread_micro_time));
 static Vision vision(pose, profiler);
 
 JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
@@ -146,7 +146,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     ColorParams  cp(0,0,0,256,256,256,128,128,128);
 
     //timing the vision process
-    long startTime = micro_time();
+    long startTime = thread_micro_time();
 
     // Shrink (by averaging) the image, and do color segmentation
     ImageAcquisition::acquire_image_fast(table, cp, img, newImg);
@@ -154,7 +154,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     //PROCESS VISION!!
     vision.notifyImage(newImg);
 
-    long processTime = micro_time() - startTime;
+    long processTime = thread_micro_time() - startTime;
     vision.drawBoxes();
     env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
