@@ -130,7 +130,7 @@ private slots:
 private:
     Ui::ColorCreator *ui;
     //TODO: fix the namings here ASAP! - Octavian
-    RoboImage* image;
+    const RoboImage* image;
     YUVImage roboimage;
     memory::parse::ImageParser* imageParser;
     const qtool::data::DataManager* dataManager;

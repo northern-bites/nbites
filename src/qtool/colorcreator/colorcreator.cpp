@@ -17,7 +17,7 @@ ColorCreator::ColorCreator(const DataManager* dataManager, QWidget *parent) :
     QWidget(parent),
     dataManager(dataManager),
     ui(new Ui::ColorCreator),
-    image(new RoboImage()),
+    image(dataManager->getMemory()->getMImage()),
     roboimage(image)
 {
 
@@ -648,8 +648,8 @@ void ColorCreator::on_pushButton_clicked()
     currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
                                             currentDirectory,
                                             tr("Image Files (*.log)"));
-    imageParser= new memory::parse::ImageParser(currentDirectory.toStdString().data(),
-            boost::shared_ptr<RoboImage> (image));
+//    imageParser= new memory::parse::ImageParser(currentDirectory.toStdString().data(),
+//            boost::shared_ptr<const RoboImage> (image));
     imageParser->getNext();
     roboimage.updateFromRoboImage();
     updateDisplays();
