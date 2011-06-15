@@ -98,20 +98,16 @@ def spinToBall(player):
     If the ball is close to us, but we aren't facing it yet,
     stop and spin toward it, then decide your kick.
     """
-
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
+    # in case we lose the ball in our shoulder, always trackBall.
+    player.brain.tracker.trackBall()
     ball = player.brain.ball
+    spinDir = player.brain.my.spinDirToPoint(ball)
+    player.setWalk(0, 0, spinDir*constants.BALL_SPIN_SPEED)
 
-    if (ball.relY > constants.SHOULD_STOP_Y or
-        ball.relY < -1*constants.SHOULD_STOP_Y):
-        spinDir = player.brain.my.spinDirToPoint(ball)
-        player.setWalk(0, 0, spinDir*constants.BALL_SPIN_SPEED)
-    else:
-        player.stopWalking()
-        return player.goNow('chase')
     if transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
+    elif not transitions.shouldSpinToBall(player):
+        return player.goNow('chase')
 
     return player.stay()
 
@@ -149,9 +145,7 @@ def positionForKick(player):
         player.brain.tracker.trackBall()
         player.brain.nav.kickPosition(kick)
 
-
-    # TODO remove transition in favor of nav.isStopped()
-    if transitions.shouldStopAndKick(player):
+    if transitions.shouldKick(player):
         return player.goLater('kickBallExecute')
     elif transitions.shouldScanFindBallKick(player):
         player.inKickingState = False
@@ -189,13 +183,12 @@ def approachDangerousBall(player):
     """adjusts position to be farther away from the ball
     if the goalie is too close to the ball while in
     the goal box"""
-    ball = player.brain.ball
     if player.firstFrame():
         player.stopWalking()
 
     #move away from the ball so it is no longer dangerous
     if player.brain.nav.isStopped():
-        if ball.relY > 0:
+        if player.brain.ball.relY > 0:
             player.brain.nav.walk(0, -15, 0)
         else:
             player.brain.nav.walk(0, 15, 0)

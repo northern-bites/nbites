@@ -20,40 +20,38 @@ def shouldChaseFromPositionForKick(player):
     ball = player.brain.ball
     return shouldChaseBall(player) and \
         not shouldPositionForKick(player) and \
-        ball.dist > constants.BALL_PFK_MAX_X+10
+        ball.dist > constants.BALL_PFK_DIST+10
 
 def shouldPositionForKick(player):
     """
     Should begin aligning on the ball for a kick when close
     """
     ball = player.brain.ball
-    return (constants.BALL_PFK_LEFT_Y > ball.relY > \
-            constants.BALL_PFK_RIGHT_Y and \
-            constants.BALL_PFK_MAX_X > ball.relX > \
-            constants.BALL_PFK_MIN_X and \
-            fabs(ball.bearing) < constants.BALL_PFK_BEARING_THRESH)
-
-def shouldSpinToBall(player):
-    ball = player.brain.ball
-    return ((ball.on and ball.dist < constants.SHOULD_STOP_DIST and
-             fabs(ball.relY) > constants.SHOULD_STOP_Y) or
-            (ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
+    return (ball.on and ball.dist < constants.BALL_PFK_DIST and
+            (constants.BALL_PFK_LEFT_Y > ball.relY >
+             constants.BALL_PFK_RIGHT_Y))
 
 def shouldStopBeforeKick(player):
     """
     Ball is right in front of us but we aren't stopped
-    Used before we have a kick decided (more general)
+    Used before we have a kick decided
     """
     ball = player.brain.ball
-    return ball.on and \
-        ball.relX > constants.SHOULD_KICK_CLOSE_X and \
-        ball.relX < constants.SHOULD_KICK_FAR_X and \
-        fabs(ball.relY) < constants.SHOULD_KICK_Y
+    return (shouldPositionForKick(player) and
+            ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST)
 
-def shouldStopAndKick(player):
+def shouldSpinToBall(player):
     """
-    Ball is in correct position to kick but we aren't stopped
-    Used after we have a kick decided (more specific)
+    Ball is close and we should spin before we decide our kick
+    """
+    ball = player.brain.ball
+    return ((ball.on and not shouldPositionForKick(player) and
+             ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST) or
+            (ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
+
+def shouldKick(player):
+    """
+    Ball is in correct position to kick
     """
     return player.brain.nav.isStopped() and player.counter > 1
 
