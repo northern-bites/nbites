@@ -45,11 +45,10 @@ def spinFindBall(player):
     """
     print "SPIN FIND BALL"
 
-    # if transitions.shouldChaseBall(player):
-    #     player.stopWalking()
-    #     player.brain.tracker.trackBall()
-    #     return player.
-goNow('chase')
+    if transitions.shouldChaseBall(player):
+        player.stopWalking()
+        player.brain.tracker.trackBall()
+        return player.goNow('chase')
 
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()
