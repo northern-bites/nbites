@@ -65,9 +65,6 @@ void MVision::update() {
         visual_corner->set_secondary_shape(i->getSecondaryShape());
         visual_corner->set_angle_between_lines(i->getAngleBetweenLines());
         visual_corner->set_orientation(i->getOrientation());
-        visual_corner->set_up(i->doesItPointUp());
-        visual_corner->set_right(i->doesItPointDown());
-
     }
 
 }
