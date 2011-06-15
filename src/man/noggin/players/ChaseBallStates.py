@@ -153,7 +153,7 @@ def positionForKick(player):
 
     # TODO remove transition in favor of nav.isStopped()
     if transitions.shouldStopAndKick(player):
-        return player.goLater('preKickStop')
+        return player.goLater('kickBallExecute')
     elif transitions.shouldScanFindBallKick(player):
         player.inKickingState = False
         return player.goLater('scanFindBall')
