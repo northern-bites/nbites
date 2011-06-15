@@ -70,9 +70,6 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
-        if(self.brain.play.isRole(PBConstants.GOALIE)):
-            if not self.brain.play.isSubRole(PBConstants.READY_GOALIE):
-               self.switchTo('playbookGoalieWalk')
 
         self.switchTo('playbookWalk')
 
