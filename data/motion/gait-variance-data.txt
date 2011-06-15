@@ -1,4 +1,4 @@
-Nathan's accelerometer variance notebook
+	Nathan's accelerometer variance notebook
 
 ##
 Data taken on 5/7 on slarti, accelerometer filtering current as of then. The 

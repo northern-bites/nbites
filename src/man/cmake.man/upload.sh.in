@@ -29,14 +29,14 @@ else
 fi
 
 COLOR_TABLE_PATH=${COLOR_TABLE}
-COLOR_TABLE_DIR=${MAN_INSTALL_PREFIX}/lib
+COLOR_TABLE_DIR=${MAN_INSTALL_PREFIX}/lib/naoqi/
 TABLE_STD_NAME=table.mtb
 
 if [ $REMOTE = "ON" ] && [  $WEBOTS = "OFF" ] ; then
 
   echo "Installing remotely"
-  SRC=${MAN_INSTALL_PREFIX}/lib/*
-  DEST=/home/nao/naoqi/lib/naoqi
+  SRC=${MAN_INSTALL_PREFIX}/*
+  DEST=/home/nao/naoqi/
 
   if [ ! -n "$ROBOT" ]; then
     echo "[upload.sh] Error - no remote address specified" >&2

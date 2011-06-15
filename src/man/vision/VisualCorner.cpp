@@ -518,3 +518,15 @@ const bool VisualCorner::doesItPointLeft()
 {
     return orientation < 0.0;
 }
+
+const std::vector<cornerID> VisualCorner::getIDs() {
+  std::vector<cornerID> poss;
+
+  for (list<const ConcreteCorner*>::const_iterator
+	 currCorner = possibleCorners.begin();
+       currCorner != possibleCorners.end(); currCorner++) {
+    poss.push_back((**currCorner).getID());
+  }
+
+  return poss;
+}
