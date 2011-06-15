@@ -6,9 +6,15 @@ from math import fabs
 def scanFindBall(player):
     """
     State to move the head to find the ball. If we find the ball, we
-    move to align on it. If we don't find it, we spin to keep looking
+    mppove to align on it. If we don't find it, we spin to keep looking
     """
+
+    print "Scan to find the ball state"
+
     player.stopWalking()
+
+    print "I stopped walking!!"
+
     player.brain.tracker.trackBall()
 
     if transitions.shouldChaseBall(player):
@@ -36,6 +42,8 @@ def spinFindBall(player):
     State to spin to find the ball. If we find the ball, we
     move to align on it. If we don't find it, we walk to look for it
     """
+    print "Spin to find the ball state"
+
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
@@ -62,6 +70,9 @@ def walkFindBall(player):
     """
     State to walk to find the ball. If we find the ball we chase it.
     """
+
+    print "Walk to find the ball state"
+
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()

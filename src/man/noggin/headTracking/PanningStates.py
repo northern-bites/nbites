@@ -2,9 +2,9 @@ import man.motion.HeadMoves as HeadMoves
 from . import TrackingConstants as constants
 from man.motion import MotionConstants
 
-TypeScan = ""
-
 def scanBall(tracker):
+    print "Panning scan ball"
+
     ball = tracker.brain.ball
 
     if tracker.target == ball and \
@@ -29,6 +29,8 @@ def scanBall(tracker):
     return tracker.stay()
 
 def spinScanBall(tracker):
+    print "Panning spin scan ball"
+
     ball = tracker.brain.ball
     nav = tracker.brain.nav
 
