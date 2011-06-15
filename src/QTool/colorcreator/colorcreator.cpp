@@ -665,10 +665,11 @@ void ColorCreator::on_previousButton_clicked()
 void ColorCreator::on_nextButton_clicked()
 {
     //roboimage.read(nextFrame);
-    imageParser->getNext();
-    roboimage.updateFromRoboImage();
+    //imageParser->getNext();
+    //roboimage.updateFromRoboImage();
+    dataManager->getNext();
     currentFrameNumber++;
-    updateDisplays();
+    //updateDisplays();
 }
 
 

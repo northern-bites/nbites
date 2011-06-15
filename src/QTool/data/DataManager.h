@@ -24,7 +24,7 @@ class DataManager : public Provider {
 public:
     DataManager();
 
-    void getNext() {
+    void getNext() const {
         dataHandler->readNext();
         this->notify(0);
     }
