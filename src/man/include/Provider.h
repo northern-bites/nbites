@@ -14,7 +14,6 @@
 class Provider;
 
 #include "Subscriber.h"
-#include "ProviderEvent.h"
 
 class Provider {
 
@@ -26,10 +25,10 @@ public:
     Provider(){};
 
     void addSubscriber(Subscriber* s) { subscribers.push_back(s); }
-    void notify(const ProviderEvent e) const {
+    void notify(int eventID) const {
         for (std::list<Subscriber*>::const_iterator i = subscribers.begin();
                 i != subscribers.end(); i++) {
-            (*i)->update(e);
+            (*i)->update(eventID);
         }
     }
 

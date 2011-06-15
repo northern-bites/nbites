@@ -12,12 +12,10 @@
 
 #pragma once
 
-#include "ProviderEvent.h"
-
 class Subscriber {
 
 public:
     Subscriber(){};
 
-    virtual void update(const ProviderEvent ProviderEvent) = 0;
+    virtual void update(int eventID) = 0;
 };
