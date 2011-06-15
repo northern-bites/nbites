@@ -1325,7 +1325,7 @@ void Threshold::initTable(std::string filename) {
         }
 
 #ifndef OFFLINE
-    print("Loaded colortable %s",filename.c_str());
+    print("Loaded colortable %s\n",filename.c_str());
 #endif
 
     fclose(fp);
