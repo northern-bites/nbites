@@ -1,5 +1,3 @@
-import ChaseBallTransitions as transitions
-
 """
 Here we house all of the state methods used for kicking the ball
 """
@@ -31,7 +29,6 @@ def afterKick(player):
     """
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
-        player.hasAlignedOnce = False
         player.standup()
         player.brain.tracker.trackBall()
 
@@ -40,14 +37,12 @@ def afterKick(player):
 
         return player.stay()
 
-    if player.brain.ball.on and player.brain.nav.isStopped():
-        player.inKickingState = False
-        player.brain.nav.justKicked = False
-        return player.goLater('chase')
+    # TODO: if we wiffed, try again without resetting hasKickedOff
 
-    if transitions.shouldScanFindBall(player) and player.brain.nav.isStopped():
+    if player.brain.nav.isStopped():
         player.inKickingState = False
+        player.hasKickedOff = True
         player.brain.nav.justKicked = False
-        return player.goLater('scanFindBall')
+        return player.goNow('chase')
 
     return player.stay()

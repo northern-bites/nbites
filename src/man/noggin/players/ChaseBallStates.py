@@ -11,7 +11,6 @@ def chase(player):
     Super State to determine what to do from various situations
     """
     player.isChasing = True
-    player.hasAlignedOnce = False
 
     if player.brain.play.isRole(GOALIE):
         return player.goNow('goalieChase')

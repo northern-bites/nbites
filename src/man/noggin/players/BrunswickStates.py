@@ -13,7 +13,6 @@ def gameInitial(player):
     if player.firstFrame():
         player.isChasing = False
         player.inKickingState = False
-        player.justKicked = False
         player.isSaving = False
         player.stopWalking()
         player.gainsOn()
@@ -34,7 +33,6 @@ def gameReady(player):
     if player.firstFrame():
         player.isChasing = False
         player.inKickingState = False
-        player.justKicked = False
         player.isSaving = False
         player.standup()
         player.brain.tracker.locPans()
@@ -55,17 +53,17 @@ def gameSet(player):
     if player.firstFrame():
         player.isChasing = False
         player.inKickingState = False
-        player.justKicked = False
         player.isSaving = False
         player.stopWalking()
         player.brain.loc.resetBall()
-        print player.brain.play.role
+        player.brain.tracker.trackBall()
+
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
 
-        if player.brain.play.isRole(CHASER):
+        if (player.brain.play.isRole(CHASER) and
+            player.brain.gameController.ownKickOff):
             player.hasKickedOffKick = False
-            player.brain.tracker.trackBall()
 
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
@@ -96,7 +94,6 @@ def gamePenalized(player):
         player.isChasing = False
         player.isSaving = False
         player.inKickingState = False
-        player.justKicked = False
         player.stopWalking()
         player.penalizeHeads()
         player.brain.sensors.stopSavingFrames()
@@ -109,7 +106,6 @@ def fallen(player):
     """
     player.isChasing = False
     player.inKickingState = False
-    player.justKicked = False
     #do I want isSaving here?
     return player.stay()
 
@@ -122,7 +118,6 @@ def gameFinished(player):
     if player.firstFrame():
         player.isChasing = False
         player.inKickingState = False
-        player.justKicked = False
         player.isSaving = False
         player.stopWalking()
         player.zeroHeads()

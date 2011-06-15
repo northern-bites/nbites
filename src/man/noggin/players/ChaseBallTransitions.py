@@ -1,7 +1,6 @@
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
-import KickingHelpers as helpers
 from .. import NogginConstants
 from math import fabs
 
@@ -64,6 +63,7 @@ def shouldDribble(player):
     """
     if constants.USE_DRIBBLE:
         my = player.brain.my
+        # helpers is no longer used. Find a different way.
         dribbleAimPoint = helpers.getShotCloseAimPoint(player)
         goalBearing = my.getRelativeBearing(dribbleAimPoint)
         return  (not player.penaltyKicking and
@@ -80,6 +80,7 @@ def shouldStopDribbling(player):
     While dribbling we should stop
     """
     my = player.brain.my
+    # helpers is no longer used. Find a different way.
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
     goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (player.penaltyKicking or
@@ -94,8 +95,7 @@ def shouldKickOff(player):
     """
     Determines whether we should do our KickOff play as chaser
     """
-    return (player.brain.gameController.ownKickOff and
-            not player.hasKickedOffKick)
+    return (not player.hasKickedOffKick)
 
 ####### PENALTY KICK STUFF ###########
 
@@ -104,6 +104,7 @@ def shouldStopPenaltyKickDribbling(player):
     While dribbling we should stop
     """
     my = player.brain.my
+    # helpers is no longer used. Find a different way.
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
     goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (inPenaltyKickStrikezone(player) or

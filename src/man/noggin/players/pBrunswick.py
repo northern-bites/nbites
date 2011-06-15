@@ -32,7 +32,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.setName('pBrunswick')
 
-        self.justKicked = False
         self.inKickingState = False
 
         #GOALIE COUNTERS AND BOOLEANS
@@ -68,21 +67,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyMadeSecondKick = False
 
         # Kickoff kick
-        self.hasKickedOffKick = True
+        self.hasKickedOff = True
 
-        self.lastKickScanCounter = 0
-        self.hasAlignedOnce = True
+        # Orbiting
         self.angleToOrbit = 0.0
 
     def run(self):
         self.play = self.brain.play
-        if self.currentState == 'afterKick' or \
-               self.lastDiffState == 'afterKick':
-            self.hasKickedOffKick = True
-            self.justKicked = True
-        else:
-            self.justKicked = False
-
         gcState = self.brain.gameController.currentState
         if not self.firstFrame() and (gcState == 'gamePlaying' or\
                (gcState == 'penaltyShotsGamePlaying'
