@@ -56,7 +56,7 @@ public:
      * This function is called whenever one of the Providers we are subscribed
      * to has something new/updated
      */
-    void update(const ProviderEvent e);
+    void update(int eventID);
 
 public:
     const MVision* getMVision() const {return mVision;}
