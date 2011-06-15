@@ -23,8 +23,6 @@ def scanFindBall(player):
     State to move the head to find the ball. If we find the ball, we
     mppove to align on it. If we don't find it, we spin to keep looking
     """
-    print "SCAN FIND BALL"
-
     player.brain.tracker.trackBall()
 
     if transitions.shouldChaseBall(player):
@@ -43,7 +41,6 @@ def spinFindBall(player):
     State to spin to find the ball. If we find the ball, we
     move to align on it. If we don't find it, we walk to look for it
     """
-    print "SPIN FIND BALL"
 
     if transitions.shouldChaseBall(player):
         player.stopWalking()
