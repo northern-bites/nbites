@@ -137,22 +137,24 @@ const float WalkingArm::getShoulderPitchAddition(shared_ptr<Step> supportStep){
  */
 const float WalkingArm::getArmScaleFromStep(boost::shared_ptr<Step> step) {
     float sign = 1.0f;
-    if (step->walkVector.x < 0) {
+    // reverse arm swinging when walking backwards
+    if (step->walkVector.x < 0)
         sign = -1.0f;
-    }
 
+    float scale = 1.0f;
     float turn = std::abs(step->walkVector.y) + std::abs(step->walkVector.theta);
-    float scale = 1;
 
+    // because we could be going forward at full speed, don't want to div by 0
     if (turn > 0)
+        // inversely proportional to how much we're turning
         scale = std::abs(step->walkVector.x) / turn;
 
     if (std::abs(scale) > 1)
-        scale = NBMath::sign(scale) * 1;
+        scale = NBMath::sign(scale) * 1.0f;
 
-    //cout << "x/y/t scale: " << std::setw(10) << std::setprecision(2)
-    //     << step->walkVector.x << step->walkVector.y << step->walkVector.theta
-	//<< scale << endl;
+    //cout << "x/y/t scale: " << std::setprecision(2) << std::setw(10)
+    //<< step->walkVector.x << step->walkVector.y << step->walkVector.theta
+    //     << scale << endl;
 
     return sign * scale;;
 }
