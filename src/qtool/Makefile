@@ -10,7 +10,7 @@ MKDIR=mkdir
 CD=cd
 
 PROJECT_DIR=$(PWD)/../..
-BIN_DIR=$(PROJECT_DIR)/build/QTool
+BIN_DIR=$(PROJECT_DIR)/build/qtool
 SRC_DIR=$(PWD)
 GEN_MAKEFILE=$(BIN_DIR)/Makefile
 
