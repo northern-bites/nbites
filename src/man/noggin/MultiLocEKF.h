@@ -214,7 +214,7 @@ private:
 
 #ifdef DEBUG_DIVERGENCE_CALCULATIONS
             std::cout << "Divergence: " << divergence << std::endl;
-            std::cout << "\tto " << possiblePoints[i] << std::endl;
+            std::cout << "\tto Landmark " << possiblePoints[i] << std::endl;
 #endif // DEBUG_DIVERGENCE_CALCULATIONS
 
             if (divergence < minDivergence) {
