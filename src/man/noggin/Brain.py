@@ -27,7 +27,7 @@ from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
 from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet,
-                       Play, TeamMember, FieldLines)
+                       Play, TeamMember, FieldLines, FieldEdge)
 from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
@@ -94,6 +94,7 @@ class Brain(object):
         self.initFieldObjects()
         self.initTeamMembers()
         self.ball = Ball.Ball(self.vision.ball)
+        self.fieldEdge = FieldEdge.FieldEdge(self.vision.fieldEdge)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
 
@@ -262,6 +263,7 @@ class Brain(object):
         Update information about seen objects
         """
         self.ball.updateVision(self.vision.ball)
+        self.fieldEdge.updateVision(self.vision.fieldEdge)
 
         self.yglp.updateVision(self.vision.yglp)
         self.ygrp.updateVision(self.vision.ygrp)

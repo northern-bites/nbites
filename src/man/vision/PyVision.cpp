@@ -52,12 +52,29 @@ BOOST_PYTHON_MODULE(vision)
     .value("_SURE", _SURE)
     ;
 
+  // From VisualLandmark.h, distance certainty possibilities
   enum_<distanceCertainty>("distanceCertainty")
     .value("BOTH_UNSURE", BOTH_UNSURE)
     .value("WIDTH_UNSURE", WIDTH_UNSURE)
     .value("HEIGHT_UNSURE", HEIGHT_UNSURE)
     .value("BOTH_SURE", BOTH_SURE)
     ;
+
+  class_<VisualFieldEdge>("VisualFieldEdge", no_init)
+      .def_readonly("maxDist", &VisualFieldEdge::getMaxDistance)
+      .def_readonly("leftDist", &VisualFieldEdge::getDistanceLeft)
+      .def_readonly("rightDist", &VisualFieldEdge::getDistanceRight)
+      .def_readonly("centerDist", &VisualFieldEdge::getDistanceCenter)
+      .def_readonly("shape", &VisualFieldEdge::getShape)
+      ;
+
+  // From VisualFieldEdge.h, describes shape of field edge
+  enum_<Basic_Shape>("basicShape")
+      .value("RISING_RIGHT", RISING_RIGHT)
+      .value("RISING_LEFT", RISING_LEFT)
+      .value("FLAT", FLAT)
+      .value("WEDGE", WEDGE)
+      ;
 
   // Currently unused, but fully avaliable to python if uncommented
   class_<VisualCrossbar>("Crossbar", no_init)
@@ -89,7 +106,7 @@ BOOST_PYTHON_MODULE(vision)
 
   //FieldLines helper classes:/
 
-  // FieldLines holds a list of shared_ptrs to VisualLines (linesList) 
+  // FieldLines holds a list of shared_ptrs to VisualLines (linesList)
   class_<std::vector<shared_ptr<VisualLine> > >("LineVec")
     // True is for NoProxy, since shared_ptrs don't need one
     .def(vector_indexing_suite<std::vector<shared_ptr<VisualLine> >, true>())
@@ -138,7 +155,7 @@ BOOST_PYTHON_MODULE(vision)
     .value("YELLOW_GOALBOX_RIGHT_LINE", YELLOW_GOALBOX_RIGHT_LINE)
     ;
 
-  // FieldLines holds a list of VisualCorners (not pointers) (cornersList) 
+  // FieldLines holds a list of VisualCorners (not pointers) (cornersList)
   class_<std::list<VisualCorner> >("CornerList")
     .def("__iter__", boost::python::iterator<std::list<VisualCorner> >())
     ;
@@ -163,11 +180,11 @@ BOOST_PYTHON_MODULE(vision)
     .value("L_OUTER_CORNER", L_OUTER_CORNER)
     .value("T_CORNER", T_CORNER)
     .value("CENTER_CIRCLE", CENTER_CIRCLE)
-    
+
     //FUZZY/CLEAR IDS start at 4
     .value("BLUE_GOAL_T", BLUE_GOAL_T)
     .value("YELLOW_GOAL_T", YELLOW_GOAL_T) //5
-    .value("BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L", 
+    .value("BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L",
 	   BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L)
     .value("BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L",
 	   BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L)
@@ -180,7 +197,7 @@ BOOST_PYTHON_MODULE(vision)
     .value("BLUE_GOAL_OUTER_L", BLUE_GOAL_OUTER_L)
     .value("YELLOW_GOAL_OUTER_L", YELLOW_GOAL_OUTER_L)
     .value("CENTER_T", CENTER_T)
-    
+
     //SPECIFIC CORNER IDS start at 15
     .value("BLUE_CORNER_TOP_L", BLUE_CORNER_TOP_L) //15
     .value("BLUE_CORNER_BOTTOM_L", BLUE_CORNER_BOTTOM_L)
@@ -201,29 +218,32 @@ BOOST_PYTHON_MODULE(vision)
     .value("BOTTOM_CC", BOTTOM_CC)
     ;
 
-  ///////MAIN VISION CLASS/////////  
+  ///////MAIN VISION CLASS/////////
   //noncopyable is required because vision has no public copy constructor
   class_<Vision, shared_ptr<Vision>, boost::noncopyable >("Vision", no_init)
     //make_getter provides a getter for objects not pointers
-    .add_property("ball", make_getter(&Vision::ball, return_value_policy
-				      <reference_existing_object>()))
-    .add_property("yglp", make_getter(&Vision::yglp, return_value_policy
-				      <reference_existing_object>()))
-    .add_property("ygrp", make_getter(&Vision::ygrp, return_value_policy
-				      <reference_existing_object>()))
-    .add_property("bglp", make_getter(&Vision::bglp, return_value_policy
-				      <reference_existing_object>()))
-    .add_property("bgrp", make_getter(&Vision::bgrp, return_value_policy
-				      <reference_existing_object>()))
-    .add_property("fieldLines", make_getter(&Vision::fieldLines, 
-					    return_value_policy
-					    <return_by_value>()))
+      .add_property("ball", make_getter(&Vision::ball, return_value_policy
+                                        <reference_existing_object>()))
+      .add_property("yglp", make_getter(&Vision::yglp, return_value_policy
+                                        <reference_existing_object>()))
+      .add_property("ygrp", make_getter(&Vision::ygrp, return_value_policy
+                                        <reference_existing_object>()))
+      .add_property("bglp", make_getter(&Vision::bglp, return_value_policy
+                                        <reference_existing_object>()))
+      .add_property("bgrp", make_getter(&Vision::bgrp, return_value_policy
+                                        <reference_existing_object>()))
+      .add_property("fieldLines", make_getter(&Vision::fieldLines,
+                                              return_value_policy
+                                              <return_by_value>()))
+      .add_property("fieldEdge", make_getter(&Vision::fieldEdge,
+                                             return_value_policy
+                                             <reference_existing_object>()))
 
     /* Crossbars: not used right now, uncomment here and Brain.py to use
        in python
-    .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar, 
+    .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar,
     return_value_policy<reference_existing_object>()))
-    .add_property("bgCrossbar", make_getter(&Vision::bgCrossbar, 
+    .add_property("bgCrossbar", make_getter(&Vision::bgCrossbar,
     return_value_policy<reference_existing_object>()))
     */
     ;
