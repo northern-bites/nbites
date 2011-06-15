@@ -21,7 +21,7 @@ public:
     DataHandler(memory::Memory* memory) : memory(memory) {}
     ~DataHandler();
 
-    //virtual void updateMemory() {parsingBoard->parseAll();}
+    virtual void readNext() {parsingBoard->parseAll();}
 
 private:
     memory::Memory* memory;
