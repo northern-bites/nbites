@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "man/memory/Memory.h"
 #include "man/memory/parse/ParsingBoard.h"
 
 namespace qtool {
@@ -18,7 +19,7 @@ namespace data {
 class DataHandler {
 
 public:
-    DataHandler(memory::Memory* memory) : memory(memory) {}
+    DataHandler(memory::Memory* memory);
     ~DataHandler();
 
     virtual void readNext() {parsingBoard->parseAll();}

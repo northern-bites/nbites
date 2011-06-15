@@ -30,11 +30,10 @@ public:
     }
 
     boost::shared_ptr<const memory::Memory> getMemory() const {
-        return boost::shared_ptr<const memory::Memory>(memory);}
+        return memory;}
 
 private:
-    //TODO: make this a shared ptr
-    memory::Memory* memory;
+    boost::shared_ptr<memory::Memory> memory;
     DataHandler* dataHandler;
 
 };
