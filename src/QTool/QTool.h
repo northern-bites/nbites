@@ -27,8 +27,8 @@ public:
 private:
     QTabWidget* toolTabs;
 
+    data::DataManager* dataManager;
     ColorCreator* colorCreator;
-
 };
 
 }

@@ -4,21 +4,27 @@
 
 namespace qtool {
 
+using data::DataManager;
+
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
-        colorCreator(new ColorCreator()){
+        dataManager(new DataManager()),
+        colorCreator(new ColorCreator(dataManager)){
 
     this->setWindowTitle(tr("HackTool"));
 
     this->setCentralWidget(toolTabs);
 
     toolTabs->addTab(colorCreator, tr("Color Creator"));
+
+    dataManager->addSubscriber(colorCreator);
 }
 
 QTool::~QTool() {
     delete toolTabs;
 
     delete colorCreator;
+    delete dataManager;
 }
 
 }

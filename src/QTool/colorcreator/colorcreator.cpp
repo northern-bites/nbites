@@ -11,8 +11,11 @@
 #include <QPixmap>
 #include <boost/shared_ptr.hpp>
 
-ColorCreator::ColorCreator(QWidget *parent) :
+using qtool::data::DataManager;
+
+ColorCreator::ColorCreator(const DataManager* dataManager, QWidget *parent) :
     QWidget(parent),
+    dataManager(dataManager),
     ui(new Ui::ColorCreator),
     image(new RoboImage()),
     roboimage(image)

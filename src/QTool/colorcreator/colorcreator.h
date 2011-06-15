@@ -2,11 +2,16 @@
 #define COLORCREATOR_H
 
 #include <QWidget>
-#include "image/YUVImage.h"
+//man
 #include "man/memory/RoboImage.h"
 #include "man/memory/parse/ImageParser.h"
+#include "man/include/Subscriber.h"
+//qtool
+#include "image/YUVImage.h"
 #include "coloredit.h"
 #include "colortable.h"
+#include "data/DataManager.h"
+
 #define  NEWFRAMES
 #ifdef   NEWFRAMES
 #define  COLORS 8
@@ -41,7 +46,7 @@ namespace Ui {
     class ColorCreator;
 }
 
-class ColorCreator : public QWidget
+class ColorCreator : public QWidget, public Subscriber
 {
     Q_OBJECT
 
@@ -49,11 +54,16 @@ public:
     enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black, BlueGreen, BlueNavy, OrangeRed};
     enum Choices {Single, Multiple};
     enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE, Table};
-    explicit ColorCreator(QWidget *parent = 0);
+    ColorCreator(const qtool::data::DataManager* dataManager,
+            QWidget *parent = 0);
     ~ColorCreator();
     void updateDisplays();
     void updateColors();
     void updateThresh();
+    void update(int eventID) {
+        roboimage.updateFromRoboImage();
+            updateDisplays();
+    }
     void initStats();
     void collectStats(int x, int y);
     void outputStats();
@@ -123,6 +133,7 @@ private:
     RoboImage* image;
     YUVImage roboimage;
     memory::parse::ImageParser* imageParser;
+    const qtool::data::DataManager* dataManager;
     ColorTable *table;
     QString baseDirectory;
     QString currentDirectory;

@@ -34,8 +34,6 @@ set(ColorCreator_headers colorcreator.h
 
 set(ColorCreator_forms colorcreator.ui)
 
-#SET(ColorCreator_resources images.qrc)
-
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
   /usr/include/qt4
   /home/oneamtu/nbites/build/man/straight)
@@ -44,12 +42,13 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
 
 Qt4_wrap_cpp(ColorCreator_headers_moc ${ColorCreator_headers})
 Qt4_wrap_ui(ColorCreator_forms_headers ${ColorCreator_forms})
-#QT4_ADD_RESOURCES(ColorCreator_RESOURCES_RCC ${ColorCreator_RESOURCES})
 
-add_library(colorcreator ${ColorCreator_srcs}
-  ${ColorCreator_headers_moc}
-  ${ColorCreator_forms_headers} )
-#    ${helloworld_RESOURCES_RCC})
+add_library(
+    colorcreator
+    STATIC
+    ${ColorCreator_srcs}
+    ${ColorCreator_headers_moc}
+    ${ColorCreator_forms_headers} )
 
 target_link_libraries(
   colorcreator
