@@ -22,6 +22,7 @@
 using boost::shared_ptr;
 
 #include "Sensors.h"
+#include "NaoPose.h"
 #include "WalkProvider.h"
 using namespace std;
 
@@ -30,13 +31,15 @@ using namespace Kinematics;
 //#define DEBUG_WALKPROVIDER
 
 WalkProvider::WalkProvider(shared_ptr<Sensors> s,
+                           shared_ptr<NaoPose> _pose,
                            shared_ptr<Profiler> p)
     : MotionProvider(WALK_PROVIDER, p),
       sensors(s),
+      pose(_pose),
       metaGait(),
       nextGait(DEFAULT_GAIT),
       startGait(DEFAULT_GAIT),
-      stepGenerator(sensors,&metaGait),
+      stepGenerator(sensors, pose, &metaGait),
       pendingCommands(false),
       pendingStepCommands(false),
       pendingGaitCommands(false),

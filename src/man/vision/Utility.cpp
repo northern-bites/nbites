@@ -878,7 +878,7 @@ point<int> Utility::getClosestLinePoint(const VisualLine& line,
     vector<linePoint>::const_iterator i;
 
     // No point is this far away...@TODO make it nicer
-    float minDist = 99999999;
+    float minDist = 99999999.0f;
     point<int> closest;
     for (i = points.begin(); i != points.end(); ++i){
         const float length = getLength(i->x, i->y, pt.x, pt.y);

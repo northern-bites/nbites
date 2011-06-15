@@ -55,13 +55,13 @@ Man::Man (shared_ptr<Profiler> _profiler,
           shared_ptr<Synchro> synchro,
           shared_ptr<Lights> _lights,
           shared_ptr<Speech> _speech)
-  : profiler(_profiler),
-    sensors(_sensors),
-    transcriber(_transcriber),
-    imageTranscriber(_imageTranscriber),
-    enactor(_enactor),
-    lights(_lights),
-    speech(_speech)
+    :     sensors(_sensors),
+          transcriber(_transcriber),
+          imageTranscriber(_imageTranscriber),
+          enactor(_enactor),
+          profiler(_profiler),
+          lights(_lights),
+          speech(_speech)
 {
   // initialize system helper modules
 

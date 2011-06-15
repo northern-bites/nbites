@@ -93,7 +93,7 @@ static const int DIST_POINT_FUDGE = 5;
 
 
 ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie,
-                                 Context* con, int _color)
+                                 Context* con, unsigned char _color)
     : vision(vis), thresh(thr), field(fie), context(con), color(_color),
       runsize(1)
 {
@@ -144,7 +144,7 @@ void ObjectFragments::createObject() {
 /* Set the primary color.  Depending on the color, we have different space needs
  * @param c		   the color
  */
-void ObjectFragments::setColor(int c)
+void ObjectFragments::setColor(unsigned char c)
 {
     const int RUN_VALUES = 3;			  // x, y, and h
     const int RUNS_PER_LINE = 5;
@@ -345,7 +345,8 @@ int ObjectFragments::yProject(point <int> point, int newx)
  * @param c		   color we are most interested in
  * @param c2	   soft color that could also work
  */
-void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
+void ObjectFragments::vertScan(int x, int y, int dir, int stopper,
+							   unsigned char c,
 							   stop &scan)
 {
     scan.good = 0;
@@ -405,7 +406,8 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper, int c,
  * @param leftBound	 furthest left we can go
  * @param rightBound further right we can go
  */
-void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper, int c,
+void ObjectFragments::horizontalScan(int x, int y, int dir, int stopper,
+									 unsigned char c,
 									 int leftBound, int rightBound,
 					 stop & scan) {
     scan.good = 0;
@@ -515,7 +517,7 @@ int ObjectFragments::pickNth(int values[], int n, int s) {
 
 void ObjectFragments::findVerticalEdge(point <int>& top,
 									   point <int>& bottom,
-									   int c, bool left, bool correct)
+									   unsigned char c, bool left, bool correct)
 {
     const int NUMSCANS = 5;
     const int WHICH = 3;
@@ -600,7 +602,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
  */
 
 void ObjectFragments::findHorizontalEdge(point <int>& left,
-					 point <int>& right, int c,
+					 point <int>& right, unsigned char c,
 					 bool up)
 {
     const int NUMSCANS = 4;
@@ -691,7 +693,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
 	@param c2	   secondary color
 */
 
-float ObjectFragments::correct(Blob & b, int color) {
+float ObjectFragments::correct(Blob & b, unsigned char color) {
     const float GOOD_SLOPE = 0.25f;
 
     int points[3];
@@ -705,7 +707,8 @@ float ObjectFragments::correct(Blob & b, int color) {
     int midy = b.getLeftTopY();
     int midsy = 0, bottomy = 0, topy = 0;
     bool correct = false;
-    int midx, col, count;
+    int midx, count;
+	unsigned char col;
     // loop to the right and to the left
     for (int k = 1; k > -2; k = k - 2) {
         // loop at 1/4 2/4 and 3/4
@@ -722,7 +725,7 @@ float ObjectFragments::correct(Blob & b, int color) {
             } else if (i == 2) {
                 midsy = midy;
             } else bottomy = midy;
-            col = BLACK;
+            col = GREY_BIT;
             count = 0;
             // we should be at the current edge - loop until we find real thing
             while (col != color && midx < IMAGE_WIDTH && midx > -1) {
@@ -839,7 +842,7 @@ float ObjectFragments::correct(Blob & b, int color) {
  * @param obj		blob to store the data in
  */
 void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
-				 int maxY, int c, Blob & obj)
+				 int maxY, unsigned char c, Blob & obj)
 {
     const int ERROR_TOLERANCE = 5;
 
@@ -1055,7 +1058,7 @@ int ObjectFragments::characterizeSize(Blob b) {
  * @return	  a constant indicating size - SMALL, MEDIUM, or LARGE
  */
 
-bool ObjectFragments::qualityPost(Blob b, int c)
+bool ObjectFragments::qualityPost(Blob b, unsigned char c)
 {
     const float PERCENT_NEEDED = 0.6f;  // percent of pixels that must be right
 
@@ -1088,7 +1091,7 @@ bool ObjectFragments::qualityPost(Blob b, int c)
  * @return	  a constant indicating size - SMALL, MEDIUM, or LARGE
  */
 
-bool ObjectFragments::checkSize(Blob b, int c)
+bool ObjectFragments::checkSize(Blob b, unsigned char c)
 {
     const int ERROR_TOLERANCE = 6;	 // how many bad pixels to scan over
     const int FAR_ENOUGH = 10;		 // how far to scan to be sure
@@ -1150,7 +1153,7 @@ void ObjectFragments::lookForPost(int index, Blob & obj) {
  * @param		  indication of whether we found a decent candidate
  */
 
-int ObjectFragments::grabPost(int c, int leftx,
+int ObjectFragments::grabPost(unsigned char c, int leftx,
 				  int rightx, Blob & obj) {
     int index = 0;
     // find the biggest Run
@@ -1859,7 +1862,7 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
  * @return				 classification
  */
 
-int ObjectFragments::classifyFirstPost(int c, Blob pole)
+int ObjectFragments::classifyFirstPost(unsigned char c, Blob pole)
 {
     const int MIN_BLOB_SIZE = 10;
 
@@ -2010,7 +2013,7 @@ void ObjectFragments::updateRunsAfterFirstPost(Blob pole, int post) {
 // Look for posts and goals given the runs we've collected
 void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
 							   VisualFieldObject* right,
-							   VisualCrossbar* mid, int c)
+							   VisualCrossbar* mid, unsigned char c)
 {
     // if we don't have any runs there is nothing to do
     if (numberOfRuns <= 1) {
@@ -2073,7 +2076,7 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
 void ObjectFragments::lookForSecondPost(Blob pole, int post,
                                         VisualFieldObject* left,
                                         VisualFieldObject* right,
-                                        VisualCrossbar* mid, int c) {
+                                        VisualCrossbar* mid, unsigned char c) {
     const int POST_NEAR_DIST = 5;
     // at this point we have a post and it is normally classified
     // if we feel pretty good about this, then prepare for the next post
@@ -2199,7 +2202,7 @@ bool ObjectFragments::greenCheck(Blob b)
     int bad = 0;
     for (int i = 0; i < EXTRA_LINES && bad < MAX_BAD_PIXELS; i++) {
         x = max(0, xProject(x, b.getLeftBottomY(), b.getLeftBottomY() + i));
-        int pix = thresh->getThresholded(min(IMAGE_HEIGHT - 1,
+        unsigned char pix = thresh->getThresholded(min(IMAGE_HEIGHT - 1,
                                              b.getLeftBottomY() + i),x);
         if (Utility::colorsEqual(pix, GREEN)) {
             return true;
@@ -2222,7 +2225,7 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
     int y = tempobj.getLeftTopY();
     int spanX = tempobj.width();
     int spanY = tempobj.height();
-    int goal = (int)((spanX * spanY) * minpercent);
+    int goal = static_cast<int>(static_cast<float>(spanX * spanY) * minpercent);
     if (spanX < 1 || spanY < 1) {
         if (POSTDEBUG) {
             cout << "Invalid size in color check" << endl;
@@ -2389,7 +2392,7 @@ bool ObjectFragments::locationOk(Blob b)
         }
         return false;
     }
-	if (trueTop > mh) {
+	if (trueTop > mh && trueTop > 3) {
 		if (SANITY) {
 			cout << "Top was less than horizon " << trueTop << " " << mh << endl;
 		}
