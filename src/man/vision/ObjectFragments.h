@@ -43,7 +43,7 @@ static const int MAX_POINTS = 100;
 class ObjectFragments {
 public:
     ObjectFragments(Vision* vis, Threshold* thr, Field* fie, Context* con,
-                    int _color);
+                    unsigned char _color);
     virtual ~ObjectFragments() {}
 
     // SETTERS

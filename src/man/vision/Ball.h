@@ -49,11 +49,12 @@ static const float ORANGE_BALL_RADIUS = 32.5; //mm
 
 class Ball {
 public:
-    Ball(Vision* vis, Threshold* thr, Field* fie, Context* con, int _color);
+    Ball(Vision* vis, Threshold* thr, Field* fie, Context* con,
+		 unsigned char _color);
     virtual ~Ball() {}
 
     // SETTERS
-    void setColor(int c);
+    void setColor(unsigned char c);
     void allocateColorRuns();
 	void newRun(int x, int y, int h);
 
@@ -121,7 +122,7 @@ private:
     Context* context;
 
     int topSpot; //keeps track of best blob -> global var for debugging purposes
-    int color;
+    unsigned char color;
     int runsize;
     int biggestRun;
     int maxHeight;

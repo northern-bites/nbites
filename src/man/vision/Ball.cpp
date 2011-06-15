@@ -72,7 +72,8 @@ static const int DIST_POINT_FUDGE = 5;
 //previous constants inserted from .h class
 
 
-Ball::Ball(Vision* vis, Threshold* thr, Field* fie, Context* con, int _color)
+Ball::Ball(Vision* vis, Threshold* thr, Field* fie, Context* con,
+		   unsigned char _color)
     : vision(vis), thresh(thr), field(fie), context(con), color(_color),
       runsize(1)
 {
@@ -546,7 +547,7 @@ bool Ball::ballIsNotSquare(int h, int w) {
 /* Set the primary color.  Depending on the color, we have different space needs
  * @param c		   the color
  */
-void Ball::setColor(int c)
+void Ball::setColor(unsigned char c)
 {
 	const int RUN_VALUES = 3;			// x, y, and h
 	const int RUNS_PER_LINE = 5;

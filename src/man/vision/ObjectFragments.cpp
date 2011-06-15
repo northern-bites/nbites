@@ -93,7 +93,7 @@ static const int DIST_POINT_FUDGE = 5;
 
 
 ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie,
-                                 Context* con, int _color)
+                                 Context* con, unsigned char _color)
     : vision(vis), thresh(thr), field(fie), context(con), color(_color),
       runsize(1)
 {
@@ -2225,7 +2225,7 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
     int y = tempobj.getLeftTopY();
     int spanX = tempobj.width();
     int spanY = tempobj.height();
-    int goal = (int)((spanX * spanY) * minpercent);
+    int goal = static_cast<int>((spanX * spanY) * minpercent);
     if (spanX < 1 || spanY < 1) {
         if (POSTDEBUG) {
             cout << "Invalid size in color check" << endl;
