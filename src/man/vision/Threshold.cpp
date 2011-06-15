@@ -1131,10 +1131,14 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 		// convert dist + angle estimates to body center
 		estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
 											  objPtr->getCenterY(),
-											  pose_est.dist / 2.0f);
+											  pose_est.dist);
 		objPtr->setDistanceWithSD(obj_est.dist);
 		objPtr->setBearingWithSD(obj_est.bearing);
 		objPtr->setElevation(obj_est.elevation);
+		// now that we have the robot information check if it might kick
+		if (vision->ball->getWidth() > 0) {
+			context->checkForKickDanger(objPtr);
+		}
     } else {
         objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);

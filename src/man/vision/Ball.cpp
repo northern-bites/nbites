@@ -314,7 +314,8 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 		estimate es;
 		es = vision->pose->pixEstimate(topBlob->getLeftTopX() + topBlob->width() /
 									   2, topBlob->getLeftTopY() + 2
-									   * topBlob->height() / PIX_EST_DIV, ORANGE_BALL_RADIUS);
+									   * topBlob->height() / PIX_EST_DIV,
+									   ORANGE_BALL_RADIUS);
 		cout << "Distance is " << thisBall->getDistance() << " " <<
 				thisBall->getFocDist() << " " << es.dist << endl;
 		cout<< "Radius"<<thisBall->getRadius()<<endl;
@@ -653,7 +654,7 @@ float Ball::rightHalfColor(Blob tempobj)
 	int spanY = tempobj.height();
 	int spanX = tempobj.width();
 	int good = 0, good1 = 0, good2 = 0;
-	int pix;
+	unsigned char pix;
 	for (int i = spanY / 2; i < spanY; i++) {
 		for (int j = 0; j < spanX; j++) {
 			pix = thresh->getThresholded(y + i,x + j);
@@ -816,7 +817,7 @@ pair<int, int> Ball::scanMidlinesForRoundnessInformation(Blob b) {
 	int h = b.height();
 	int x = b.getLeftTopX();
 	int y = b.getLeftTopY();
-    int pix;
+    unsigned char pix;
     int goodPix = 0, badPix = 0;
     for (int i = 0; i < h; i++) {
         pix = thresh->getThresholded(y+i,x + w/2);
@@ -851,7 +852,7 @@ pair<int, int> Ball::scanDiagonalsForRoundnessInformation(Blob b) {
 	int h = b.height();
 	int x = b.getLeftTopX();
 	int y = b.getLeftTopY();
-    int pix;
+    unsigned char pix;
     int goodPix = 0, badPix = 0;
     int d = ROUND2(static_cast<float>(std::max(w, h)) /
                    CORNER_CHUNK_DIV);
@@ -912,8 +913,9 @@ bool Ball::badSurround(Blob b) {
 	int w = b.width();
 	int h = b.height();
 	int surround = min(SURROUND, w/2);
-	int greens = 0, orange = 0, red = 0, borange = 0, pix, realred = 0,
+	int greens = 0, orange = 0, red = 0, borange = 0, realred = 0,
 			yellows = 0;
+	unsigned char pix;
 
 	// now collect information on the area surrounding the ball and the ball
 	x = max(0, x - surround);
