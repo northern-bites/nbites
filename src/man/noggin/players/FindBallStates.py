@@ -8,7 +8,6 @@ def findBall(player):
     """
     State to stop all activity and begin finding the ball
     """
-    print "FIND BALL!!"
 
     player.stopWalking()
     player.brain.tracker.stopHeadMoves()
