@@ -368,7 +368,7 @@ int Field::getImprovedEstimate(int horizon) {
 			if (debugHorizon) {
 				vision->drawPoint(l, scanY, BLACK);
 			}
-			int newPixel = thresh->getColor(l, scanY);
+			unsigned char newPixel = thresh->getColor(l, scanY);
 			//int newPixel = thresh->thresholded[scanY][l];
 			if (Utility::isGreen(newPixel)) {
 				// firstpix tracks where we saw the first green pixel
