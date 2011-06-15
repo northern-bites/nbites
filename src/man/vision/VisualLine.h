@@ -215,7 +215,7 @@ class VisualLine : public VisualLandmark {
     inline const bool isParallel() const;
 
     inline const std::string getColorString() const;
-    inline const std::list <const ConcreteLine *> getPossibleLines() const;
+    inline const std::list <const ConcreteLine *> getPossibilities() const;
     inline const std::vector<linePoint> getPoints() const;
 
     virtual const bool hasPositiveID();
@@ -376,7 +376,7 @@ inline const std::string VisualLine::getColorString() const
 }
 
 inline
-const std::list <const ConcreteLine *> VisualLine::getPossibleLines() const
+const std::list <const ConcreteLine *> VisualLine::getPossibilities() const
 {
     return possibleLines;
 }

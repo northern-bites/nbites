@@ -18,6 +18,9 @@
 class VisualCross : public VisualObject {
 
 public:
+    // ConcreteType provided by this VisualObject
+    typedef ConcreteCross ConcreteType;
+
     // Construcotrs
     VisualCross();
 	VisualCross(const crossID id);
@@ -67,7 +70,7 @@ public:
     const int getLeftBottomY() const{ return leftBottom.y; }
     const int getRightBottomX() const{ return rightBottom.x; }
     const int getRightBottomY() const{ return rightBottom.y; }
-    const std::list <const ConcreteCross *> * getPossibleCrosses() const {
+    const std::list <const ConcreteCross *> * getPossibilities() const {
         return possibleCrosses;
     }
 	virtual const bool hasPositiveID();

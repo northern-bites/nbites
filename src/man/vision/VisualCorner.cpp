@@ -324,7 +324,7 @@ float VisualCorner::getLinePhysicalOrientation(point<int> end)
 
     // -sign(j) gives us the signed orientation depending on direction
     // of vector
-    return -copysign(1,y) * acos(orientationCos);
+    return -copysignf(1,y) * acosf(orientationCos);
 }
 
 /**
@@ -393,7 +393,7 @@ void VisualCorner::IDFromLine(const shared_ptr<VisualLine> line)
     // change the ID an a corner that has already been identified
     if (!line->hasPositiveID() || hasPositiveID())
         return;
-    const ConcreteLine* concreteLine = line->getPossibleLines().front();
+    const ConcreteLine* concreteLine = line->getPossibilities().front();
 
     const vector <const ConcreteCorner*> concretes =
         ConcreteCorner::concreteCorners();
@@ -482,7 +482,8 @@ void VisualCorner::setSecondaryShape(const shape s) {
  */
 void VisualCorner::setTOrientation() {
     point<int> end = getTStemEndpoint();
-    orientation = TO_DEG * atan2(end.x - getX(), getY() - end.y);
+    orientation = TO_DEG * static_cast<float>(atan2(end.x - getX(),
+                                                    getY() - end.y));
 }
 
 void VisualCorner::setPossibleCorners(

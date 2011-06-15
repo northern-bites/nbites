@@ -115,11 +115,10 @@ public:
  */
 struct PointLandmark
 {
-    PointLandmark(float _x, float _y, float _angle) : x(_x), y(_y), angle(_angle) {}
+    PointLandmark(float _x, float _y) : x(_x), y(_y) {}
     PointLandmark() {}
     float x;
     float y;
-    float angle;
     friend std::ostream& operator<< (std::ostream &o, const PointLandmark &c)
         {
             return o << c.x << " " << c.y;

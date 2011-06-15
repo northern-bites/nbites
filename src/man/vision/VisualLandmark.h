@@ -72,10 +72,6 @@ public:
         return concreteLandmark;
     }
 
-    const std::list<const ConcreteLandmark*> *getPossibilities() const {
-        return &possibilities;
-    }
-
     // Setters
     virtual void setIDCertainty(certainty c) { idCertainty = c; }
     void setDistanceCertainty(distanceCertainty c) { distanceCert = c; }

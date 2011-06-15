@@ -1209,7 +1209,7 @@ list <const ConcreteCorner*> Context::compareObjsOuterL(
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
 			// and add all the possibilities up.
-			list<const ConcreteLandmark*>::const_iterator i =
+			list<const ConcreteFieldObject*>::const_iterator i =
 				(*k)->getPossibilities()->begin();
 
 			bool close = false;
@@ -1345,7 +1345,7 @@ list <const ConcreteCorner*> Context::compareObjsT(
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
 			// and add all the possibilities up.
-			list<const ConcreteLandmark*>::const_iterator i =
+			list<const ConcreteFieldObject*>::const_iterator i =
 				(*k)->getPossibilities()->begin();
 
 			bool close = false;
@@ -1412,7 +1412,7 @@ list <const ConcreteCorner*> Context::compareObjsInnerL(
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
 			// and add all the possibilities up.
-			list<const ConcreteLandmark*>::const_iterator i =
+			list<const ConcreteFieldObject*>::const_iterator i =
 				(*k)->getPossibilities()->begin();
 
 			bool close = false;
@@ -1478,7 +1478,7 @@ list <const ConcreteCorner*> Context::compareObjsCenterCorners(
 			// The visual object might be abstract, so we should check
 			// all of its possible objects to see if we're close enough to one
 			// and add all the possibilities up.
-			list<const ConcreteLandmark*>::const_iterator i =
+			list<const ConcreteFieldObject*>::const_iterator i =
 				(*k)->getPossibilities()->begin();
 
 			bool close = false;

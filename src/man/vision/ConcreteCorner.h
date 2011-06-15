@@ -149,6 +149,8 @@ public:
     ////////////////////////////////////////////////////////////
     const cornerID getID() const { return id; }
 
+    float getFieldAngle() const { return fieldAngle; }
+
     virtual const std::string toString() const;
 
     static const std::vector <const ConcreteCorner*>&
@@ -232,6 +234,7 @@ public:
 private: // Instance variables recording location on field and identifier
     cornerID id;
     shape cornerType;
+    float fieldAngle;
 
     const ConcreteLine * line1;
     const ConcreteLine * line2;

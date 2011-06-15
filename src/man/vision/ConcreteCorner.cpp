@@ -3,7 +3,7 @@ using namespace std;
 
 ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
                                const cornerID _id)
-    : ConcreteLandmark(_fieldX, _fieldY), id(_id) {
+    : ConcreteLandmark(_fieldX, _fieldY), fieldAngle(0), id(_id) {
     cornerType = inferCornerType(_id);
 	if (cornerType == T){
 		assignTCornerLines();
@@ -12,7 +12,7 @@ ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
 ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
                                const ConcreteLine& _l1, const ConcreteLine& _l2,
                                const cornerID _id)
-    : ConcreteLandmark(_fieldX, _fieldY), id(_id) ,
+    : ConcreteLandmark(_fieldX, _fieldY), fieldAngle(0), id(_id) ,
 	  line1(&_l1), line2(&_l2), lines()
 {
     cornerType = inferCornerType(_id);

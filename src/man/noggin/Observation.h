@@ -16,7 +16,9 @@
 #include "NBMath.h"
 #include "NogginStructs.h"
 #include "VisualObject.h"
+#include "VisualFieldObject.h"
 #include "VisualCorner.h"
+#include "VisualCross.h"
 
 /**
  * @brief Class to hold the informations associated with the
@@ -26,29 +28,73 @@ template<class LandmarkT>
 class Observation
 {
 public:
-
-   /**
-    * Observation generic template constructor
-    */
-    Observation(const VisualObject &_object)
+    Observation(const VisualFieldObject &_object)
         : visDist(_object.getDistance()), visBearing(_object.getBearing()),
           sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
-          id(_object.getID()) {
+          id(_object.getID())
+        {
             initPossibilities(_object);
         }
 
-    template <class CornerLandmark>
-    void initPossibilities(const VisualObject& _object);
+    Observation(const VisualCorner &_object)
+        : visDist(_object.getDistance()), visBearing(_object.getBearing()),
+          sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
+          id(_object.getID())
+        {
+        }
+
+    Observation(const VisualCross &_object)
+        : visDist(_object.getDistance()), visBearing(_object.getBearing()),
+          sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
+          id(_object.getID())
+        {
+        }
+
+    Observation() { }
+public:
 
     virtual ~Observation() { }
 
+protected:
     // Core Functions
+    void initPossibilities(const VisualFieldObject& _object) {
+        typedef typename VisualFieldObject::ConcreteType ConcT;
 
-    void initPossibilities(const VisualObject& _object) {
-        std::list<const ConcreteLandmark *>::const_iterator i;
+        typename std::list<const ConcT *>::const_iterator i;
 
-        const std::list <const ConcreteLandmark *> * objList =
+        const std::list <const ConcT *> * objList =
             _object.getPossibilities();
+
+        for( i = objList->begin(); i != objList->end(); ++i) {
+            LandmarkT objectLandmark((**i).getFieldX(),
+                                     (**i).getFieldY());
+            possibilities.push_back(objectLandmark);
+        }
+    }
+
+    void initPossibilities(const VisualCross& _object) {
+        typedef typename VisualCross::ConcreteType ConcT;
+
+        typename std::list<const ConcT *>::const_iterator i;
+
+        const std::list <const ConcT *> * objList =
+            _object.getPossibilities();
+
+        for( i = objList->begin(); i != objList->end(); ++i) {
+            LandmarkT objectLandmark((**i).getFieldX(),
+                                     (**i).getFieldY());
+            possibilities.push_back(objectLandmark);
+        }
+    }
+
+    void initPossibilities(const VisualCorner& _object) {
+        typedef typename VisualCorner::ConcreteType ConcT;
+
+        typename std::list<const ConcT *>::const_iterator i;
+
+        const std::list <const ConcT *> * objList =
+            _object.getPossibilities();
+
         for( i = objList->begin(); i != objList->end(); ++i) {
             LandmarkT objectLandmark((**i).getFieldX(),
                                      (**i).getFieldY(),
@@ -56,6 +102,8 @@ public:
             possibilities.push_back(objectLandmark);
         }
     }
+
+public:
 
     /**
      *

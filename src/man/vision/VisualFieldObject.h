@@ -19,6 +19,9 @@ class VisualFieldObject;
 class VisualFieldObject : public VisualObject {
 
 public:
+    // ConcreteType provided by this VisualObject
+    typedef ConcreteFieldObject ConcreteType;
+
     // Construcotrs
     VisualFieldObject(const int _x, const int _y, const float _distance,
                       const float _bearing);
@@ -79,6 +82,9 @@ public:
     const float getFieldY() const { return fieldLocation.y; }
     const float getFieldX2() const { return fieldLocation2.x; }
     const float getFieldY2() const { return fieldLocation2.y; }
+    const std::list<const ConcreteFieldObject*> * getPossibilities() const {
+        return possibleFieldObjects;
+    }
 
     virtual const bool hasPositiveID();
 

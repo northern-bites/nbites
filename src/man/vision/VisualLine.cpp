@@ -80,7 +80,7 @@ VisualLine::VisualLine(const VisualLine& other)
       distance(other.getDistance()), bearing(other.getBearing()),
       distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
       ccLine(other.getCCLine()),
-      possibleLines(other.getPossibleLines())
+      possibleLines(other.getPossibilities())
 {
 }
 

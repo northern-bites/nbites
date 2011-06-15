@@ -26,6 +26,9 @@ private: // Constants
     static const point <int> naoLocation;
 
 public:
+    // ConcreteType provided by this VisualObject
+    typedef ConcreteCorner ConcreteType;
+
     VisualCorner(const int _x, const int _y,
                  const float _distance, const float _bearing,
                  boost::shared_ptr<VisualLine> l1,
@@ -77,7 +80,7 @@ public:
 
     float getOrientation() const { return orientation; }
     float getPhysicalOrientation() const { return physicalOrientation; }
-    float getPhysicalOrientationSD() const { return M_PI/6; } //return physicalOrientationSD; }
+    float getPhysicalOrientationSD() const { return M_PI_FLOAT/6; } //return physicalOrientationSD; }
 
     point<int> getTStemEndpoint() const;
     bool doesItPointDown();
