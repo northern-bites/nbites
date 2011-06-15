@@ -119,13 +119,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
 
     ###### HELPER METHODS ######
-    def inFrontOfBall(self):
-        ball = self.brain.ball
-        my = self.brain.my
-        return my.x > ball.x and \
-            my.y < ChaseConstants.IN_FRONT_SLOPE*(my.x - ball.x) + ball.y and \
-            my.y > -ChaseConstants.IN_FRONT_SLOPE*(my.x-ball.x) + ball.y
-
     def getPenaltyKickingBallDest(self):
         if not self.penaltyMadeFirstKick:
             return Location(NogginConstants.FIELD_WIDTH * 3./4.,
