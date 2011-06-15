@@ -18,11 +18,7 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.brain.tracker.readyLoc()
-    #if player.counter > 30:
-    #    player.brain.tracker.nudge()
     return player.stay()
 
 def gamePenalized(player):
-    if player.firstFrame():
-        player.brain.tracker.nudge()
-    return player.goLater('gamePlaying')
+    return player.goLater('stay')

@@ -7,6 +7,7 @@ from math import (atan2,
                   cos,
                   fabs,
                   radians,
+                  degrees,
                   sin,
                   sqrt)
 

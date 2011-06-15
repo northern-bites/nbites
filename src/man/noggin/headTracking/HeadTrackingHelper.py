@@ -98,6 +98,11 @@ class HeadTrackingHelper(object):
         headMove = motion.CoordHeadCommand(10*target.x, 10*target.y, 10*target.height,.1065*.1,.1227*.1)
         self.tracker.brain.motion.coordHead(headMove)
 
+# ** # debugging method
+    def lookToAngles(self, yaw=0, pitch=0):
+        headMove = motion.SetHeadCommand(MyMath.degrees(yaw),MyMath.degrees(pitch))
+        self.tracker.brain.motion.setHead(headMove)
+
 # ** # old method
     def calcBearing(self, target):
         """returns the bearing to target in degrees. usable as headYaw"""

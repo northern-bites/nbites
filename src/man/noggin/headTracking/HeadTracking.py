@@ -5,6 +5,7 @@ from . import BasicStates
 from . import HeadTrackingHelper as helper
 from ..util import FSA
 from ..util import MyMath
+from man.motion import MotionConstants# ** # debugging code
 
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""
@@ -184,6 +185,15 @@ class HeadTracking(FSA.FSA):
 # ** # debugging method
     def nudge(self):
         self.nudged = True
+
+# ** # debugging method
+    def lookToAngles(self,pitch,yaw):
+        self.helper.lookToAngles(yaw,pitch)
+
+# ** # debugging method
+    def printAngles(self):
+        motionAngles = self.brain.sensors.motionAngles
+        print MyMath.radians(motionAngles[MotionConstants.HeadYaw]),MyMath.radians(motionAngles[MotionConstants.HeadPitch])
 
 # ** # old method
     def bounceHead(self):

@@ -95,13 +95,6 @@ void CoordHeadProvider::coordMode(){
                                                  -pitchMaxSpeed,
                                                  pitchMaxSpeed);
 
-    //avoid potential head collisions with shoulder pads
-    if (lastPitchDest < 0) {
-        if (lastYawDest < -.35 || lastYawDest > .35) {
-            pitchChangeTarget = clip(pitchChangeTarget,-lastPitchDest,pitchChangeTarget);
-        }
-    }
-
 #ifdef DEBUG_HEADPROVIDER
     cout << "Last values "<<endl
          <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
