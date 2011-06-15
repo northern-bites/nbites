@@ -1,18 +1,29 @@
 #include "ConcreteCorner.h"
 using namespace std;
 
-ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
+// Directions which a corner can point
+static const float NORTH = 0;
+static const float WEST = M_PI_FLOAT/2;
+static const float SOUTH = M_PI_FLOAT;
+static const float EAST = -M_PI_FLOAT/2;
+
+ConcreteCorner::ConcreteCorner(const float _fieldX,
+                               const float _fieldY,
+                               const float _fieldAngle,
                                const cornerID _id)
-    : ConcreteLandmark(_fieldX, _fieldY), fieldAngle(0), id(_id) {
+    : ConcreteLandmark(_fieldX, _fieldY), fieldAngle(_fieldAngle), id(_id) {
     cornerType = inferCornerType(_id);
     if (cornerType == T){
         assignTCornerLines();
     }
 }
-ConcreteCorner::ConcreteCorner(const float _fieldX, const float _fieldY,
-                               const ConcreteLine& _l1, const ConcreteLine& _l2,
+ConcreteCorner::ConcreteCorner(const float _fieldX,
+                               const float _fieldY,
+                               const float _fieldAngle,
+                               const ConcreteLine& _l1,
+                               const ConcreteLine& _l2,
                                const cornerID _id)
-    : ConcreteLandmark(_fieldX, _fieldY), fieldAngle(0), id(_id) ,
+    : ConcreteLandmark(_fieldX, _fieldY), fieldAngle(_fieldAngle), id(_id) ,
       line1(&_l1), line2(&_l2), lines()
 {
     cornerType = inferCornerType(_id);
@@ -35,10 +46,13 @@ ConcreteCorner::~ConcreteCorner() {}
 // Constants for absolute coordinates on the field of the specific corners.
 // (0,0) is the lower left corner of the field when BLUE goal is at the
 // bottom
+//
+// Angle of zero is pointed in the Y-direction
 ///////////////////////////////////////////////////////////////////////////////
 const ConcreteCorner& ConcreteCorner::blue_corner_top_l(){
     static const ConcreteCorner corner(FIELD_WHITE_LEFT_SIDELINE_X,
                                        FIELD_WHITE_TOP_SIDELINE_Y,
+                                       NORTH,
                                        ConcreteLine::blue_goal_endline(),
                                        ConcreteLine::top_sideline(),
                                        BLUE_CORNER_TOP_L);
@@ -48,6 +62,7 @@ const ConcreteCorner& ConcreteCorner::blue_corner_top_l(){
 const ConcreteCorner& ConcreteCorner::blue_corner_bottom_l(){
     static const ConcreteCorner corner(FIELD_WHITE_LEFT_SIDELINE_X,
                                        FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                       WEST,
                                        ConcreteLine::blue_goal_endline(),
                                        ConcreteLine::bottom_sideline(),
                                        BLUE_CORNER_BOTTOM_L);
@@ -57,6 +72,7 @@ const ConcreteCorner& ConcreteCorner::blue_corner_bottom_l(){
 const ConcreteCorner& ConcreteCorner::blue_goal_left_t(){
     static const ConcreteCorner corner(BLUE_GOALBOX_LEFT_X,
                                        BLUE_GOALBOX_TOP_Y,
+                                       NORTH,
                                        ConcreteLine::blue_goal_endline(),
                                        ConcreteLine::blue_goalbox_left_line(),
                                        BLUE_GOAL_LEFT_T);
@@ -67,6 +83,7 @@ const ConcreteCorner& ConcreteCorner::blue_goal_right_t()
 {
     static const ConcreteCorner corner(BLUE_GOALBOX_LEFT_X,
                                        BLUE_GOALBOX_BOTTOM_Y,
+                                       NORTH,
                                        ConcreteLine::blue_goal_endline(),
                                        ConcreteLine::blue_goalbox_right_line(),
                                        BLUE_GOAL_RIGHT_T);
@@ -76,6 +93,7 @@ const ConcreteCorner& ConcreteCorner::blue_goal_right_t()
 const ConcreteCorner& ConcreteCorner::blue_goal_left_l(){
     static const ConcreteCorner corner(BLUE_GOALBOX_RIGHT_X,
                                        BLUE_GOALBOX_TOP_Y,
+                                       EAST,
                                        ConcreteLine::blue_goalbox_left_line(),
                                        ConcreteLine::blue_goalbox_top_line(),
                                        BLUE_GOAL_LEFT_L);
@@ -85,6 +103,7 @@ const ConcreteCorner& ConcreteCorner::blue_goal_left_l(){
 const ConcreteCorner& ConcreteCorner::blue_goal_right_l(){
     static const ConcreteCorner corner(BLUE_GOALBOX_RIGHT_X,
                                        BLUE_GOALBOX_BOTTOM_Y,
+                                       SOUTH,
                                        ConcreteLine::blue_goalbox_right_line(),
                                        ConcreteLine::blue_goalbox_top_line(),
                                        BLUE_GOAL_RIGHT_L);
@@ -94,6 +113,7 @@ const ConcreteCorner& ConcreteCorner::blue_goal_right_l(){
 const ConcreteCorner& ConcreteCorner::yellow_corner_bottom_l(){
     static const ConcreteCorner corner(FIELD_WHITE_RIGHT_SIDELINE_X,
                                        FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                       SOUTH,
                                        ConcreteLine::yellow_goal_endline(),
                                        ConcreteLine::bottom_sideline(),
                                        YELLOW_CORNER_BOTTOM_L);
@@ -103,6 +123,7 @@ const ConcreteCorner& ConcreteCorner::yellow_corner_bottom_l(){
 const ConcreteCorner& ConcreteCorner::yellow_corner_top_l(){
     static const ConcreteCorner corner(FIELD_WHITE_RIGHT_SIDELINE_X,
                                        FIELD_WHITE_TOP_SIDELINE_Y,
+                                       EAST,
                                        ConcreteLine::yellow_goal_endline(),
                                        ConcreteLine::top_sideline(),
                                        YELLOW_CORNER_TOP_L);
@@ -112,6 +133,7 @@ const ConcreteCorner& ConcreteCorner::yellow_corner_top_l(){
 const ConcreteCorner& ConcreteCorner::yellow_goal_left_t(){
     static const ConcreteCorner corner(YELLOW_GOALBOX_RIGHT_X,
                                        YELLOW_GOALBOX_BOTTOM_Y,
+                                       SOUTH,
                                        ConcreteLine::yellow_goal_endline(),
                                        ConcreteLine::yellow_goalbox_left_line(),
                                        YELLOW_GOAL_LEFT_T);
@@ -121,6 +143,7 @@ const ConcreteCorner& ConcreteCorner::yellow_goal_left_t(){
 const ConcreteCorner& ConcreteCorner::yellow_goal_right_t(){
     static const ConcreteCorner corner(YELLOW_GOALBOX_RIGHT_X,
                                        YELLOW_GOALBOX_TOP_Y,
+                                       SOUTH,
                                        ConcreteLine::yellow_goal_endline(),
                                        ConcreteLine::yellow_goalbox_right_line(),
                                        YELLOW_GOAL_RIGHT_T);
@@ -130,6 +153,7 @@ const ConcreteCorner& ConcreteCorner::yellow_goal_right_t(){
 const ConcreteCorner& ConcreteCorner::yellow_goal_left_l(){
     static const ConcreteCorner corner(YELLOW_GOALBOX_LEFT_X,
                                        YELLOW_GOALBOX_BOTTOM_Y,
+                                       WEST,
                                        ConcreteLine::yellow_goalbox_left_line(),
                                        ConcreteLine::yellow_goalbox_top_line(),
                                        YELLOW_GOAL_LEFT_L);
@@ -139,19 +163,27 @@ const ConcreteCorner& ConcreteCorner::yellow_goal_left_l(){
 const ConcreteCorner& ConcreteCorner::yellow_goal_right_l(){
     static const ConcreteCorner corner(YELLOW_GOALBOX_LEFT_X,
                                        YELLOW_GOALBOX_TOP_Y,
+                                       NORTH,
                                        ConcreteLine::yellow_goalbox_right_line(),
                                        ConcreteLine::yellow_goalbox_top_line(),
                                        YELLOW_GOAL_RIGHT_L);
     return corner;
 }
 
+/**
+ * Center circles
+ *
+ * They are given an arbitrary angle (for now)
+ */
 const ConcreteCorner& ConcreteCorner::top_cc(){
-    static const ConcreteCorner corner(TOP_CC_X, TOP_CC_Y, TOP_CC);
+    static const ConcreteCorner corner(TOP_CC_X, TOP_CC_Y,
+                                       NORTH, TOP_CC);
     return corner;
 }
 
 const ConcreteCorner& ConcreteCorner::bottom_cc(){
-    static const ConcreteCorner corner(BOTTOM_CC_X, BOTTOM_CC_Y, BOTTOM_CC);
+    static const ConcreteCorner corner(BOTTOM_CC_X, BOTTOM_CC_Y,
+                                       NORTH, BOTTOM_CC);
     return corner;
 }
 
@@ -159,13 +191,14 @@ const ConcreteCorner& ConcreteCorner::bottom_cc(){
 // Exists because of a sanity check in FieldLines
 const ConcreteCorner& ConcreteCorner::fake_cc()
 {
-    static const ConcreteCorner corner(CENTER_FIELD_X, CENTER_FIELD_Y, CENTER_CIRCLE);
+    static const ConcreteCorner corner(CENTER_FIELD_X, CENTER_FIELD_Y, NORTH, CENTER_CIRCLE);
     return corner;
 }
 
 const ConcreteCorner& ConcreteCorner::center_bottom_t(){
     static const ConcreteCorner corner(MIDFIELD_X,
                                        FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                       WEST,
                                        ConcreteLine::bottom_sideline(),
                                        ConcreteLine::midline(),
                                        CENTER_BOTTOM_T);
@@ -175,6 +208,7 @@ const ConcreteCorner& ConcreteCorner::center_bottom_t(){
 const ConcreteCorner& ConcreteCorner::center_top_t(){
     static const ConcreteCorner corner(MIDFIELD_X,
                                        FIELD_WHITE_TOP_SIDELINE_Y,
+                                       EAST,
                                        ConcreteLine::top_sideline(),
                                        ConcreteLine::midline(),
                                        CENTER_TOP_T);

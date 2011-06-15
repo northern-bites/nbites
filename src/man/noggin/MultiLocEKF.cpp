@@ -1,5 +1,7 @@
 #include "MultiLocEKF.h"
 #include <boost/numeric/ublas/io.hpp> // for cout
+#include <iostream>
+
 #include "FieldConstants.h"
 //#define DEBUG_LOC_EKF_INPUTS
 //#define DEBUG_STANDARD_ERROR
@@ -89,7 +91,8 @@ const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
     float pt_orientation = (heading_from_corner *                       \
                             copysignf(1.0f, pt_rel_y) - pt.angle);      \
                                                                         \
-    float orientation_error = pt_orientation - z.getVisOrientation();
+    float orientation_error = subPIAngle(pt_orientation -               \
+                                         z.getVisOrientation());
 
 
 
@@ -315,7 +318,7 @@ void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
     }
 
     // Correct step based on the observed stuff
-    if (!pt_z.empty() && !c_z.empty()) {
+    if (!pt_z.empty() || !c_z.empty()) {
         correctionStep(pt_z, c_z);
     } else {
         noCorrectionStep();
@@ -620,7 +623,7 @@ void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
     d_x(1) = NBMath::subPIAngle(d_x(1));
 
     // Calculate invariance
-    V_k       = z_x - d_x;
+    V_k    = z_x - d_x;
     V_k(1) = NBMath::subPIAngle(V_k(1));
 
     // Calculate jacobians
@@ -676,7 +679,6 @@ void MultiLocEKF::incorporateMeasurement(const CornerObservation& z,
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tIncorporating measurement " << z << endl;
 #endif
-
     const int obsIndex = findBestLandmark<CornerObservation, CornerLandmark>(z);
 
     // No landmark is close enough, don't attempt to use one
@@ -710,7 +712,6 @@ void MultiLocEKF::calculateMatrices(int index,
                                     MeasurementMatrix2 &R_k,
                                     MeasurementVector2 &V_k)
 {
-
     // Get the observed range, bearing, and orientation
     // Pack into measurement vector
 
@@ -774,10 +775,14 @@ float MultiLocEKF::getDivergence(const PointObservation& z,
 {
     CALCULATE_PT_OBS_ERRORS(z,pt);
 
-
     // Normalized errors
     float dist_error_norm    = dist_error    / z.getDistanceSD();
     float bearing_error_norm = bearing_error / z.getBearingSD();
+
+#ifdef DEBUG_DIVERGENCE_CALCULATIONS
+    cout << "Normalized distance error: " << dist_error_norm << endl;
+    cout << "Normalized bearing error: " << bearing_error_norm << endl;
+#endif //DEBUG_DIVERGENCE_CALCULATIONS
 
     // Euclidean distance
     return (dist_error_norm * dist_error_norm +
@@ -793,6 +798,13 @@ float MultiLocEKF::getDivergence(const CornerObservation& z,
     float dist_error_norm        = dist_error        / z.getDistanceSD();
     float bearing_error_norm     = bearing_error     / z.getBearingSD();
     float orientation_error_norm = orientation_error / z.getOrientationSD();
+
+#ifdef DEBUG_DIVERGENCE_CALCULATIONS
+    cout << "Normalized distance error: " << dist_error_norm << endl;
+    cout << "Normalized bearing error: " << bearing_error_norm << endl;
+    cout << "Normalized orientation error: " << orientation_error_norm << endl;
+#endif //DEBUG_DIVERGENCE_CALCULATIONS
+
 
     return (dist_error_norm * dist_error_norm +
             bearing_error_norm * bearing_error_norm +
@@ -834,8 +846,8 @@ void MultiLocEKF::limitAPrioriUncert()
     }
 
     // We don't want any covariance values getting too large
-    for (unsigned int i = 0; i < numStates; ++i) {
-        for (unsigned int j = 0; j < numStates; ++j) {
+    for (unsigned int i = 0; i < loc_ekf_dimension; ++i) {
+        for (unsigned int j = 0; j < loc_ekf_dimension; ++j) {
             if(P_k(i,j) > X_UNCERT_MAX) {
                 P_k(i,j) = X_UNCERT_MAX;
             }
@@ -891,13 +903,13 @@ void MultiLocEKF::clipRobotPose()
 {
     // Limit our X estimate
     if (xhat_k(0) > X_EST_MAX) {
-        StateVector v(numStates);
+        StateVector v(loc_ekf_dimension);
         v(0) = 1.0f;
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - X_EST_MAX) /
             inner_prod(v, prod(P_k,v));
     }
     else if (xhat_k(0) < X_EST_MIN) {
-        StateVector v(numStates);
+        StateVector v(loc_ekf_dimension);
         v(0) = 1.0f;
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
             inner_prod(v, prod(P_k,v));
@@ -905,13 +917,13 @@ void MultiLocEKF::clipRobotPose()
 
     // Limit our Y estimate
     if (xhat_k(1) < Y_EST_MIN) {
-        StateVector v(numStates);
+        StateVector v(loc_ekf_dimension);
         v(1) = 1.0f;
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
             inner_prod(v, prod(P_k,v));
     }
     else if (xhat_k(1) > Y_EST_MAX) {
-        StateVector v(numStates);
+        StateVector v(loc_ekf_dimension);
         v(1) = 1.0f;
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - Y_EST_MAX) /
             inner_prod(v, prod(P_k,v));

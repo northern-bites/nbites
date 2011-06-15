@@ -13,6 +13,7 @@ class ConcreteCorner;
 #include "FieldConstants.h"
 #include "ConcreteLine.h"
 #include "ConcreteLandmark.h"
+#include "NBMath.h"
 
 enum cornerID {
     L_INNER_CORNER = 0,
@@ -98,9 +99,13 @@ class ConcreteCorner : public ConcreteLandmark {
      * this class.
      */
 private:
-    ConcreteCorner(const float fieldX, const float fieldY, const cornerID _id);
-    ConcreteCorner(const float _fieldX, const float _fieldY,
-                   const ConcreteLine& _l1, const ConcreteLine& _l2,
+    ConcreteCorner(const float fieldX, const float fieldY,
+                   const float fieldAngle, const cornerID _id);
+    ConcreteCorner(const float _fieldX,
+                   const float _fieldY,
+                   const float fieldAngle,
+                   const ConcreteLine& _l1,
+                   const ConcreteLine& _l2,
                    const cornerID _id);
 
     // copy constructor
@@ -234,6 +239,9 @@ public:
 private: // Instance variables recording location on field and identifier
     cornerID id;
     shape cornerType;
+
+    // Angle which the left leg (L Corner) or T-Stem (T Corner) mkaes
+    // with the Y-Axis ("north")
     float fieldAngle;
 
     const ConcreteLine * line1;

@@ -41,6 +41,7 @@ public:
           sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
           id(_object.getID())
         {
+            initPossibilities(_object);
         }
 
     Observation(const VisualCross &_object)
@@ -48,6 +49,7 @@ public:
           sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
           id(_object.getID())
         {
+            initPossibilities(_object);
         }
 
     Observation() { }
@@ -137,14 +139,6 @@ public:
     void setBearingSD(float _sdB)  { sigma_b = _sdB;  }
     void setID(int _id)            { id = _id;        }
 
-    // void addPossibility(LandmarkT p){
-    //     possibilities.push_back(p);
-    // }
-    void setPossibility(LandmarkT p){
-        possibilities.clear();
-        possibilities.push_back(p);
-    }
-
     /*
      * Helper functions
      */
@@ -153,7 +147,7 @@ public:
                  << ", " << c.sigma_d << ", " << c.sigma_b << ")";
     }
 
-private:
+protected:
     // Vision information
     float visDist, visBearing;
     float sigma_d, sigma_b;
@@ -183,6 +177,12 @@ public:
     float getVisOrientation() const { return visOrientation; };
     float getOrientationSD()  const { return sigma_o;        };
 
+    friend std::ostream& operator<< (std::ostream &o, const CornerObservation &c) {
+        return o << "Obs " << c.id << ": (" << c.visDist << ", " << c.visBearing
+                 << ", " << c.visOrientation << ", "
+                 << c.sigma_d << ", " << c.sigma_b
+                 << ", " << c.sigma_o <<  ")";
+    }
 private:
     float visOrientation;
     float sigma_o;

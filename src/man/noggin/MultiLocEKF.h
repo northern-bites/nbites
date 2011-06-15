@@ -16,6 +16,9 @@
 #include "Observation.h"
 #include "LocSystem.h"
 
+//#define DEBUG_DIVERGENCE_CALCULATIONS
+
+
 /**
  * @brief Class for tracking of loc position and velocity.  Extends the abstract
  * EKF class.
@@ -178,7 +181,8 @@ private:
         // Hack in here for if the vision system cannot identify this
         // observation (no possible identities)
         //
-        // @TODO this should never happen, so fix vision system to stop it from happening.
+        // @TODO this should never happen, so fix vision system to
+        // stop it from happening.
         if (z.getNumPossibilities() == 0){
             return -1;
         } else if (z.getNumPossibilities() == 1){
@@ -198,10 +202,20 @@ private:
     template <class ObsT, class LandmarkT>
     int findNearestNeighbor(const ObsT& z){
         std::vector<LandmarkT> possiblePoints = z.getPossibilities();
-        float minDivergence = getAcceptableDivergence<LandmarkT>();
+        float minDivergence = 500;//getAcceptableDivergence<LandmarkT>();
         int minIndex = -1;
+
+#ifdef DEBUG_DIVERGENCE_CALCULATIONS
+        std::cout << "Calculating Divergence from " << z << std::endl;
+#endif // DEBUG_DIVERGENCE_CALCULATIONS
+
         for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
             float divergence = getDivergence(z, possiblePoints[i]);
+
+#ifdef DEBUG_DIVERGENCE_CALCULATIONS
+            std::cout << "Divergence: " << divergence << std::endl;
+            std::cout << "\tto " << possiblePoints[i] << std::endl;
+#endif // DEBUG_DIVERGENCE_CALCULATIONS
 
             if (divergence < minDivergence) {
                 minDivergence = divergence;

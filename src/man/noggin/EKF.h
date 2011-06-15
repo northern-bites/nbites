@@ -209,7 +209,8 @@ namespace ekf {
                 return;
             }
             // Calculate the Kalman gain matrix
-            const StateMeasurementMatrix pTimesHTrans = prod(P_k_bar, trans(H_k));
+            const StateMeasurementMatrix pTimesHTrans =
+                prod(P_k_bar, trans(H_k));
 
             if(measurementSize == 2){
                 K_k = prod(pTimesHTrans,

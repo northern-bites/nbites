@@ -11,7 +11,7 @@ namespace ekf {
               class Measurement2,
               unsigned int mSize2,
               class UpdateModel,
-              unsigned int dimension>
+              unsigned int numStates>
     class TwoMeasurementEKF
     {
     public:
@@ -20,7 +20,7 @@ namespace ekf {
 
         // A vector with the number of state dimensions
         typedef boost::numeric::ublas::vector<float, boost::numeric::ublas::
-                                              bounded_array<float,dimension> >
+                                              bounded_array<float,numStates> >
         StateVector;
 
 
@@ -28,8 +28,8 @@ namespace ekf {
         typedef boost::numeric::ublas::matrix<float,
                                               boost::numeric::ublas::row_major,
                                               boost::numeric::ublas::
-                                              bounded_array<float, dimension*
-                                                            dimension> >
+                                              bounded_array<float, numStates*
+                                                            numStates> >
         StateMatrix;
 
 
@@ -53,7 +53,7 @@ namespace ekf {
                                               boost::numeric::ublas::row_major,
                                               boost::numeric::ublas::
                                               bounded_array<float, mSize1*
-                                                            dimension> >
+                                                            numStates> >
         StateMeasurementMatrix1;
 
         // A vector with the length of the measurement dimensions
@@ -74,7 +74,7 @@ namespace ekf {
                                               boost::numeric::ublas::row_major,
                                               boost::numeric::ublas::
                                               bounded_array<float, mSize2*
-                                                            dimension> >
+                                                            numStates> >
         StateMeasurementMatrix2;
         ////////////////////////////////////////////////////////////
 
@@ -99,16 +99,15 @@ namespace ekf {
 
         const boost::numeric::ublas::identity_matrix<float> dimensionIdentity;
 
-        const unsigned int numStates; // number of states in the kalman filter
         int frameCounter;
 
     public:
         // Constructors & Destructors
         TwoMeasurementEKF(float _beta, float _gamma)
-            : xhat_k(dimension), xhat_k_bar(dimension),
-              Q_k(dimension,dimension), A_k(dimension,dimension),
-              P_k(dimension,dimension), P_k_bar(dimension,dimension),
-              betas(dimension), gammas(dimension),
+            : xhat_k(numStates), xhat_k_bar(numStates),
+              Q_k(numStates,numStates), A_k(numStates,numStates),
+              P_k(numStates,numStates), P_k_bar(numStates,numStates),
+              betas(numStates), gammas(numStates),
 
               // Measurement type 1
               K_k1(numStates, mSize1, 0.0f),
@@ -122,15 +121,12 @@ namespace ekf {
               R_k2(mSize2, mSize2, 0.0f),
               v_k2(mSize2),
 
-              dimensionIdentity(dimension),
-
-              numStates(dimension), frameCounter(0)
-
+              dimensionIdentity(numStates), frameCounter(0)
             {
 
             // Initialize all matrix values to 0
-            for(unsigned i = 0; i < dimension; ++i) {
-                for(unsigned j = 0; j < dimension; ++j) {
+            for(unsigned i = 0; i < numStates; ++i) {
+                for(unsigned j = 0; j < numStates; ++j) {
                     Q_k(i,j) = 0.0f;
                     A_k(i,j) = 0.0f;
                     P_k(i,j) = 0.0f;
@@ -222,7 +218,6 @@ namespace ekf {
                 correctionStep(*m2);
             }
 
-
             // Allow implementing classes to do things before copying
             // the vectors. For most implementations this should be
             // ignored
@@ -245,7 +240,8 @@ namespace ekf {
 
             if(mSize1 == 2){
                 K_k1 = prod(pTimesHTrans,
-                           NBMath::invert2by2(prod(H_k1, pTimesHTrans) + R_k1));
+                            NBMath::invert2by2(prod(H_k1,
+                                                    pTimesHTrans) + R_k1));
             } else {
                 const MeasurementMatrix1 inv =
                     NBMath::solve(prod(H_k1, pTimesHTrans) + R_k1,
@@ -274,7 +270,8 @@ namespace ekf {
 
             if(mSize2 == 2){
                 K_k2 = prod(pTimesHTrans,
-                            NBMath::invert2by2(prod(H_k2, pTimesHTrans) + R_k2));
+                            NBMath::invert2by2(prod(H_k2,
+                                                    pTimesHTrans) + R_k2));
             } else {
                 const MeasurementMatrix2 inv =
                     NBMath::solve(prod(H_k2, pTimesHTrans) + R_k2,
