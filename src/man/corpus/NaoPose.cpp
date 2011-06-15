@@ -48,7 +48,7 @@ const float NaoPose::PIX_TO_RAD_X =
 const float NaoPose::PIX_TO_RAD_Y = static_cast<float> (FOV_Y_DEG
         / IMAGE_HEIGHT) * TO_RAD;
 
-const estimate NaoPose::NULL_ESTIMATE = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+const estimate NaoPose::NULL_ESTIMATE;
 
 const float NaoPose::INFTY = 1E+37f;
 
@@ -481,7 +481,7 @@ const float NaoPose::correctDistance(const float uncorrectedDist) {
  *
  */
 estimate NaoPose::getEstimate(ublas::vector<float> objInWorldFrame) {
-    estimate pix_est = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+    estimate pix_est;
 
     //distance as projected onto XY plane - ie bird's eye view
 

@@ -91,6 +91,7 @@
 #include "Kinematics.h"
 #include "CoordFrame.h"
 #include "Sensors.h"
+#include "NaoPose.h"
 #include "NBMatrixMath.h"
 #include "ZmpEKF.h"
 #include "ZmpAccExp.h"
@@ -116,7 +117,9 @@ static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at 
 
 class StepGenerator {
 public:
-    StepGenerator(boost::shared_ptr<Sensors> s, const MetaGait * _gait);
+    StepGenerator(boost::shared_ptr<Sensors> s,
+                  boost::shared_ptr<NaoPose> p,
+                  const MetaGait * _gait);
     ~StepGenerator();
 
     void tick_controller();
@@ -222,6 +225,7 @@ private:
     NBMath::ufmatrix3 cc_Transform; //odometry
 
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<NaoPose> pose;
     const MetaGait *gait;
     bool nextStepIsLeft;
 
