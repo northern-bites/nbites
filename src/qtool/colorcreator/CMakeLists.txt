@@ -21,13 +21,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 set( ColorCreator_srcs
   ColorCreator.cpp
   colorzone.cpp
-  coloredit.cpp
+  ColorEdit.cpp
   colortable.cpp
   stats.cpp )
 
 set(ColorCreator_headers ColorCreator.h
     colorzone.h
-    coloredit.h
+    ColorEdit.h
     colortable.h
     stats.h
 )

@@ -8,7 +8,7 @@
 #include "man/include/Subscriber.h"
 //qtool
 #include "image/YUVImage.h"
-#include "coloredit.h"
+#include "ColorEdit.h"
 #include "colortable.h"
 #include "data/DataManager.h"
 

@@ -1,4 +1,4 @@
-#include "coloredit.h"
+#include "ColorEdit.h"
 
 namespace qtool {
 namespace colorcreator {
