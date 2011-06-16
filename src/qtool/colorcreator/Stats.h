@@ -1,6 +1,7 @@
 #ifndef STATS_H
 #define STATS_H
 #include <QTextStream>
+#include <cmath>
 
 namespace qtool {
 namespace colorcreator {
