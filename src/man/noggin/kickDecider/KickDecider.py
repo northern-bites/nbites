@@ -154,10 +154,12 @@ class KickDecider(object):
         # first determine if both my goal posts were seen
         if (rightPostBearing is not None and leftPostBearing is not None):
             distDiff = rightPostDist - leftPostDist
-            # if we are facing between our posts and difference between dists is small enough
+            # if we are facing between our posts and the distances are
+            # roughly equal and the abs value of the post bearings are
+            # equal, back kick!
             if (rightPostBearing >= 0 and leftPostBearing <= 0 and \
                     distDiff <= constants.CLEAR_POST_DIST_DIFF):
-                return self.chooseBackKick()
+                return self.chooseShortBackKick()
             elif (rightPostDist <= leftPostDist):
                 print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
@@ -205,10 +207,18 @@ class KickDecider(object):
         print "RIGHT_DYNAMIC_STRAIGHT"
         return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
 
-    def chooseBackKick(self):
+    def chooseLongBackKick(self):
         ball = self.brain.ball
         if ball.relY > 0:
-            print "LEFT_BACK"
-            return kicks.LEFT_BACK_KICK
-        print "RIGHT_BACK"
-        return kicks.RIGHT_BACK_KICK
+            print "LEFT_LONG_BACK"
+            return kicks.LEFT_LONG_BACK_KICK
+        print "RIGHT_LONG_BACK"
+        return kicks.RIGHT_LONG_BACK_KICK
+
+    def chooseShortBackKick(self):
+        ball = self.brain.ball
+        if ball.relY > 0:
+            print "LEFT_SHORT_BACK"
+            return kicks.LEFT_SHORT_BACK_KICK
+        print "RIGHT_SHORT_BACK"
+        return kicks.RIGHT_SHORT_BACK_KICK
