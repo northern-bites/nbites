@@ -61,10 +61,10 @@ def shouldSpinToBall(player):
     Ball is close and we should spin before we decide our kick
     """
     ball = player.brain.ball
-    return ((shouldChaseBall(player) and
-             not shouldPositionForKick(player) and
+    return (shouldChaseBall(player) and
+            ((not shouldPositionForKick(player) and
              ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST) or
-            (ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
+            ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
 
 def shouldKick(player):
     """
