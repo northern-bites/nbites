@@ -93,20 +93,12 @@ def trackLoc(tracker):
     # safety check that currentLocObject was set
     if tracker.currentLocObject is None:
         print "currentLocObject is None"
-        # ** # nudge debugging
-        if tracker.nudged:
-            tracker.nudged = False
-            return tracker.goLater(tracker.lastDiffState())
-        return tracker.stay()
+        return tracker.goLater(tracker.lastDiffState())
 
     tracker.lookToLocObject()
 
     if tracker.counter > 3 and not tracker.brain.motion.isHeadActive():
         print "inactive and ready to switch landmarks after",tracker.counter
-        # ** # nudge debugging
-        if tracker.nudged:
-            tracker.nudged = False
-            return tracker.goLater(tracker.lastDiffState)
-        return tracker.stay()
+        return tracker.goLater(tracker.lastDiffState)
 
     return tracker.stay()

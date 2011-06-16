@@ -65,8 +65,9 @@ class FieldObject(VisualObject, LocObject):
             self.bearing = self.visBearing
             self.dist = self.visDist
 
-        elif self.framesOff < LOST_OBJECT_FRAMES_THRESH:
-            pass
+        # ** #caused errors: when !self.on, self.bearing != self.locBearing
+        #elif self.framesOff < LOST_OBJECT_FRAMES_THRESH:
+        #    pass
 
         else:
             self.bearing = self.locBearing

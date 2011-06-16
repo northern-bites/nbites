@@ -21,4 +21,6 @@ def gamePlaying(player):
     return player.stay()
 
 def gamePenalized(player):
-    return player.goLater('stay')
+    if player.firstFrame():
+        player.brain.tracker.stopHeadMoves()
+    return player.stay()

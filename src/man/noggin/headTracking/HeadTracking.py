@@ -169,12 +169,16 @@ class HeadTracking(FSA.FSA):
         """
 
         # ** # debugging print lines
-        #print "my location:", self.brain.my.x, self.brain.my.y, self.brain.my.h
+        print "my location:", self.brain.my.x, self.brain.my.y
         #print "object list:"
         #for obj in self.locObjectList:
         #    print obj.visionId, obj.dist, obj.bearing, obj.on
-        #print "target rel coords:", self.currentLocObject.relX, self.currentLocObject.relY
-        #print "target dist/bearing:",self.currentLocObject.dist,self.currentLocObject.bearing
+        print "target on?:",self.currentLocObject.on
+        print "target rel coords:", self.currentLocObject.relX, self.currentLocObject.relY
+        print "target dist/bearing:",self.currentLocObject.dist,self.currentLocObject.bearing
+        print "target location:",self.currentLocObject.x,self.currentLocObject.y
+        print "target visLoc:",self.currentLocObject.visDist,self.currentLocObject.visBearing
+        print "target locLoc:",self.currentLocObject.locDist,self.currentLocObject.locBearing
         #print "target fitness:",self.currentLocObject.trackingFitness
         print self.currentLocObject.visionId
 

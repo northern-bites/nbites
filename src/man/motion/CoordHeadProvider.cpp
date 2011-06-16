@@ -133,15 +133,15 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
 
     //clip dest and maxVel values to safe limits
     //these limits are currently pretty arbitrary
-    yawDest = clip(yawDest,YAW_CLIP);
     pitchDest = clip(pitchDest,PITCH_MIN_CLIP,PITCH_MAX_CLIP);
+    yawDest = Kinematics::boundHeadYaw(yawDest,pitchDest);
     yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*SPEED_CLIP_FACTOR);
     pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*SPEED_CLIP_FACTOR);
 
     setActive();
-    /* ** */cout <<"looking towards:  "<<yawDest<<"   "<<pitchDest<<endl;
-    /* ** */cout <<"currently at:   "<<lastYawDest<<"   "<<lastPitchDest<<endl;
-    /* ** */cout <<"relative position: "<<command->getRelX()/10<<"  "<<command->getRelY()/10<<"  "<<command->getRelZ()/10<<"  hypo:  "<<(sqrt(command->getRelX()*command->getRelX()+command->getRelY()*command->getRelY()))/10<<endl;
+    /* ** *///cout <<"looking towards:  "<<yawDest<<"   "<<pitchDest<<endl;
+    /* ** *///cout <<"currently at:   "<<lastYawDest<<"   "<<lastPitchDest<<endl;
+    /* ** *///cout <<"relative position: "<<command->getRelX()/10<<"  "<<command->getRelY()/10<<"  "<<command->getRelZ()/10<<"  hypo:  "<<(sqrt(command->getRelX()*command->getRelX()+command->getRelY()*command->getRelY()))/10<<endl;
     /* ** *///cout <<"adjusted position: "<<relX/10<<"  "<<relY/10<<"  "<<relZ/10<<"  hypo:  "<<hypoDist/10<<endl;
     pthread_mutex_unlock(&coord_head_provider_mutex);
 }
