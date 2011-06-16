@@ -33,8 +33,8 @@ Motion::Motion (shared_ptr<Synchro> _synchro,
                 shared_ptr<NaoPose> _pose)
   : Thread(_synchro, "Motion"),
     switchboard(s,p,_pose),
-    enactor(_enactor),
     interface(&switchboard),
+    enactor(_enactor),
     profiler(p),
     pose(_pose)
 {

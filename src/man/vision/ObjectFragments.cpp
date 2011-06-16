@@ -2225,7 +2225,7 @@ bool ObjectFragments::rightBlobColor(Blob tempobj, float minpercent) {
     int y = tempobj.getLeftTopY();
     int spanX = tempobj.width();
     int spanY = tempobj.height();
-    int goal = static_cast<int>((spanX * spanY) * minpercent);
+    int goal = static_cast<int>(static_cast<float>(spanX * spanY) * minpercent);
     if (spanX < 1 || spanY < 1) {
         if (POSTDEBUG) {
             cout << "Invalid size in color check" << endl;

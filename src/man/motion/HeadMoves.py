@@ -160,6 +160,18 @@ FORWARD_COMB_PAN = (
 
 ########################SCANS###########################
 
+FULL_SCAN_BALL = (
+    ((-65.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.,20.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, -5.0) ,0.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    (( -118.0, -5.0),1.5,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( -65.0, -25.0),0.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 0.0, -35.0),0.5,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 65.0, -25.0),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((118.,-5.),0.3,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.,-5.),.5, 1, stiff.LOW_HEAD_STIFFNESSES),)
+
+
 HIGH_SCAN_CLOSE_BOUND = 104
 HIGH_SCAN_BALL = (
     (( -65.0, -25.0),0.6,  1, stiff.LOW_HEAD_STIFFNESSES),
@@ -215,8 +227,8 @@ SPIN_RIGHT_SCAN_BALL = (
     ((-60.,-25.),0.8,1, stiff.LOW_HEAD_STIFFNESSES))
 
 RIGHT_EDGE_SCAN_BALL = (
-    ((-55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-60.,-25.),0.6,1, stiff.LOW_HEAD_STIFFNESSES))
+    ((-55.,20.),0.71,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-60.,-32),0.71,1, stiff.LOW_HEAD_STIFFNESSES))
 
 SPIN_LEFT_SCAN_BALL = (
     ((55.,20.),0.4,1, stiff.LOW_HEAD_STIFFNESSES),
@@ -224,8 +236,8 @@ SPIN_LEFT_SCAN_BALL = (
     ((60.,-25.),0.8,1, stiff.LOW_HEAD_STIFFNESSES))
 
 LEFT_EDGE_SCAN_BALL = (
-    ((55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
-    ((60.,-25.),0.6,1, stiff.LOW_HEAD_STIFFNESSES))
+    ((55.,20.),0.71,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((60.,-32.),0.71,1, stiff.LOW_HEAD_STIFFNESSES))
 
 SQUAT_LOW_SCAN_BALL = (
     ((-65.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),

@@ -39,12 +39,12 @@ ENDIF( APPLE )
 ########################## FIND PATH
 # we should look in the naoqi sdk folder for the libraries we need first
 # so we use the same version as on the robot
-# SET( CMAKE_FIND_ROOT_PATH  ${AL_DIR} )
+SET( CMAKE_FIND_ROOT_PATH  $ENV{NBITES_DIR}/ext/ )
 
 # search for programs in the system root
-# SET( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER )
+SET( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH )
 # for libraries and headers in the nao sdk preferably, if not defaults to
 # system root
-# SET( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH )
-# SET( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH )
-# SET( CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH )
+SET( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH )
+SET( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH )
+SET( CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH )
