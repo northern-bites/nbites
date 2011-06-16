@@ -15,7 +15,9 @@
 
 #include "Node.h"
 
-namespace ProtoView {
+namespace qtool {
+namespace data {
+namespace treemodel {
 
 namespace proto = google::protobuf;
 
@@ -56,5 +58,7 @@ private:
     const proto::Message* message;
 };
 
+}
+}
 }
 #endif /* ProtoNode_H_ */

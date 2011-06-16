@@ -22,7 +22,9 @@
 #include <QModelIndex>
 #include <QVariant>
 
-namespace ProtoView {
+namespace qtool {
+namespace data {
+namespace treemodel {
 
 class TreeModel : public QAbstractItemModel
 {
@@ -54,7 +56,8 @@ private:
 
 };
 }
-
+}
+}
 #include "Node.h"
 
 #endif // TreeModel_H

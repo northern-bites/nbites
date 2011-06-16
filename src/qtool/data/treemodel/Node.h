@@ -12,7 +12,9 @@
 
 #include "TreeModel.h"
 
-namespace ProtoView {
+namespace qtool {
+namespace data {
+namespace treemodel {
 
 class TreeModel::Node {
 public:
@@ -37,5 +39,7 @@ private:
     const Node* parent;
 };
 
+}
+}
 }
 #endif /* Node_H_ */

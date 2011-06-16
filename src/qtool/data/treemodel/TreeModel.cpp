@@ -19,7 +19,9 @@
 #include "TreeModel.h"
 #include <iostream>
 
-namespace ProtoView {
+namespace qtool {
+namespace data {
+namespace treemodel {
 
 using namespace std;
 
@@ -145,4 +147,6 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
+}
+}
 }

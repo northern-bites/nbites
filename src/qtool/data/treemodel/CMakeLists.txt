@@ -1,7 +1,7 @@
 
-############ ProtoViewer
+############ treemodel
 
-project( ProtoViewer )
+project( treemodel )
 cmake_minimum_required(VERSION 2.6.0)
 
 ########### Dependencies
@@ -13,38 +13,35 @@ add_definitions(${QT_DEFINITIONS})
 
 ########### Sources
 
-set( ProtoViewer_srcs main.cpp
-  mainwindow.cpp
+set( treemodel_srcs
   TreeModel.cpp
   Node.cpp
   ProtoNode.cpp )
 
-set(ProtoViewer_headers mainwindow.h
+set(treemodel_headers
   TreeModel.h )
 
-set(ProtoViewer_forms mainwindow.ui)
-
-#SET(ProtoViewer_resources images.qrc)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
   /usr/include/qt4)
 
 ############ Qt4 goodness
 
-Qt4_wrap_cpp(ProtoViewer_headers_moc ${ProtoViewer_headers})
-Qt4_wrap_ui(ProtoViewer_forms_headers ${ProtoViewer_forms})
-#QT4_ADD_RESOURCES(ProtoViewer_RESOURCES_RCC ${Protoviewer_RESOURCES})
+Qt4_wrap_cpp(treemodel_headers_moc ${treemodel_headers})
+Qt4_wrap_ui(treemodel_forms_headers ${treemodel_forms})
 
-add_executable(ProtoViewer ${ProtoViewer_srcs}
-  ${ProtoViewer_headers_moc}
-  ${ProtoViewer_forms_headers} )
-#    ${helloworld_RESOURCES_RCC})
+
+add_library(treemodel
+  STATIC
+  ${treemodel_srcs}
+  ${treemodel_headers_moc}
+  ${treemodel_forms_headers} )
 
 link_directories( /home/oneamtu/nbites/build/man/straight/memory/protos )
 find_library(PROTOS protos /home/oneamtu/nbites/build/man/straight/memory/protos)
 
 target_link_libraries(
-  ProtoViewer
+  treemodel
   protobuf
   ${PROTOS}
   ${QT_LIBRARIES}

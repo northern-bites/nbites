@@ -7,7 +7,9 @@
 
 #include "Node.h"
 
-namespace ProtoView {
+namespace qtool {
+namespace data {
+namespace treemodel {
 
 typedef TreeModel::Node Node;
 
@@ -46,4 +48,6 @@ int Node::indexOfChild(const Node* child) const {
     return children.indexOf(child);
 }
 
+}
+}
 }

@@ -27,6 +27,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
 Qt4_wrap_cpp(data_headers_moc ${data_headers})
 Qt4_wrap_ui(data_forms_headers ${data_forms})
 
+add_subdirectory(treemodel)
+
 add_library(data
     STATIC
     ${data_srcs}
@@ -38,6 +40,7 @@ find_library(PROTOS protos /home/oneamtu/nbites/build/man/straight/memory/protos
 
 target_link_libraries(
   data
+  treemodel
   protobuf
   ${PROTOS}
   ${QT_LIBRARIES}
