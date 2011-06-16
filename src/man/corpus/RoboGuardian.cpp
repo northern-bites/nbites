@@ -141,16 +141,10 @@ static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 //Check if the angle is unstable, (ie tending AWAY from zero)
 bool isFalling(float angle_pos, float angle_vel){
     if (angle_pos >= FALLING_ANGLE_THRESH){
-        //then we only care if the velocity is negative
-<<<<<<< HEAD
-        if(angle_vel < -FALL_SPEED_THRESH)
-=======
 	cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos 
 	     << ", angle_vel == " << angle_vel << endl;
-        //if(angle_vel < -FALL_SPEED_THRESH)
->>>>>>> changed fall procedure so that when the magnitude of the angle beyond the 0 point goes beyond the threshold, gains are shut off; these changes do not make use of angular velocity/speed of the robot falling.
             return true;
-    }else{
+    } else {
         if(angle_vel > FALL_SPEED_THRESH)
             return true;
     }
