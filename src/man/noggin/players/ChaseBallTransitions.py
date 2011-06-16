@@ -25,6 +25,18 @@ def shouldChaseFromPositionForKick(player):
             (constants.BALL_PFK_LEFT_Y+5 < ball.relY <
              constants.BALL_PFK_RIGHT_Y-5))
 
+def shouldChaseFromSpinToBall(player):
+    """
+    Exit spinToBall if the ball is now in front of us or suddenly
+    far away. This should be like shouldSpinToBall but with
+    slightly larger range to avoid oscillations between chase and
+    spinToBall
+    """
+    ball = player.brain.ball
+    return (shouldChaseBall(player) and
+            (shouldPositionForKick(player) or
+             ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST+5))
+
 def shouldPositionForKick(player):
     """
     Should begin aligning on the ball for a kick when close

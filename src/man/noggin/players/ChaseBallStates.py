@@ -108,7 +108,7 @@ def spinToBall(player):
 
     if transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
-    elif not transitions.shouldSpinToBall(player):
+    elif transitions.shouldChaseFromSpinToBall(player):
         return player.goNow('chase')
 
     return player.stay()
