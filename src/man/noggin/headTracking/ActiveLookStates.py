@@ -94,22 +94,22 @@ def readyLoc(tracker):
     if not newlist == tracker.locObjectList:
         #landmarks have changed fitness ranking. Track most fit
         tracker.locObjectList = newlist
-        tracker.currentLocObject = tracker.locObjectList[0]
+        tracker.target = tracker.locObjectList[0]
         return tracker.goLater('trackLoc')
 
     #Assert: no change in list order
 
-    #check for no currentLocObject (first pass in readyLoc state)
-    if tracker.currentLocObject is None:
-        tracker.currentLocObject = tracker.locObjectList[0]
+    #check for no target (first pass in readyLoc state)
+    if tracker.target is None:
+        tracker.target = tracker.locObjectList[0]
 
     #track next most fit locObject
-    oldIndex = tracker.locObjectList.index(tracker.currentLocObject)
-    tracker.currentLocObject = tracker.locObjectList[oldIndex+1]
+    oldIndex = tracker.locObjectList.index(tracker.target)
+    tracker.target = tracker.locObjectList[oldIndex+1]
     #check for unfit trackingFitness
-    if tracker.currentLocObject.trackingFitness > constants.FITNESS_THRESHOLD:
+    if tracker.target.trackingFitness > constants.FITNESS_THRESHOLD:
         #cycle to most fit locObject
-        tracker.currentLocObject = tracker.locObjectList[0]
+        tracker.target = tracker.locObjectList[0]
 
-    #track currentLocObject
+    #track target
     return tracker.goLater('trackLoc')

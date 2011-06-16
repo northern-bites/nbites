@@ -66,6 +66,49 @@ class HeadTrackingHelper(object):
                                          maxSpeed, maxSpeed)
         self.tracker.brain.motion.setHead(headMove)
 
+# ** # new method
+    def lookToTargetAngles(self):
+        """
+        If headTracking has a target which is on frame,
+        uses setHeadCommands to bring target to center of frame.
+        """
+        (yaw,pitch) = (0.,0.)
+        # Find the target's angular distance from the center of vision
+        if not self.tracker.target is None and self.tracker.target.on:
+            yaw = self.tracker.target.angleX
+            pitch = self.tracker.target.angleY
+        else:
+            # by default, do nothing
+            return
+
+        headMove = motion.SetHeadCommand(yaw,pitch)
+        self.tracker.brain.motion.setHead(headMove)
+
+    # ** # new method
+    def lookToLocObject(self):
+        """
+        Looks at target's relative coordinates
+        """
+        target = self.tracker.target
+
+        # ** # debugging print lines
+        print "my location:", self.brain.my.x, self.brain.my.y
+        #print "object list:"
+        #for obj in self.locObjectList:
+        #    print obj.visionId, obj.dist, obj.bearing, obj.on
+        print "target on?:",self.target.on
+        print "target rel coords:", self.target.relX, self.target.relY
+        print "target dist/bearing:",self.target.dist,self.target.bearing
+        print "target location:",self.target.x,self.target.y
+        print "target visLoc:",self.target.visDist,self.target.visBearing
+        print "target locLoc:",self.target.locDist,self.target.locBearing
+        #print "target fitness:",self.target.trackingFitness
+        print self.target.visionId
+
+        self.lookToPoint(self.target.relX, \
+                             self.target.relY, \
+                             0.0)
+
 # ** # old method
     def panTo(self, heads):
         """
@@ -87,12 +130,15 @@ class HeadTrackingHelper(object):
 
 # ** # new method
     def updateTrackingFitness(self, locObj):
+        """
+        Updates the fitness value for each given landmark.
+        """
         locObj.trackingFitness = locObj.dist
         #if bearing is unusable, set fitness to auto fail
         if fabs(locObj.bearing) > constants.BEARING_THRESHOLD:
             locObj.trackingFitness = constants.FITNESS_THRESHOLD+1
 
-# ** # old method
+# ** # old method - replaced?
     def lookToPoint(self, target):
         #convert from cm to mm for c++ code
         headMove = motion.CoordHeadCommand(10*target.x, 10*target.y, 10*target.height,.1065*.1,.1227*.1)

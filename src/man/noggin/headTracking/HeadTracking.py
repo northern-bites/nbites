@@ -32,13 +32,13 @@ class HeadTracking(FSA.FSA):
         self.activePanUp = False
         self.isPreKickScanning = False
         self.preActivePanHeads = None
-        self.currentLocObject = None
         self.locObjectList = []
         self.locObjectList.extend(self.brain.myFieldObjects)
         self.helper = helper.HeadTrackingHelper(self)
 
         self.lookDirection = None
         self.target = self.brain.ball #default
+        # target should either be ball or instance of FieldObject
         self.nudged = False# ** # debugging field
 
 # ** # old method
@@ -57,7 +57,7 @@ class HeadTracking(FSA.FSA):
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
-# ** # old method
+# ** # old method (main input method)
     def trackBall(self):
         """automatically tracks the ball. scans for the ball if not in view"""
         self.target = self.brain.ball
@@ -66,7 +66,7 @@ class HeadTracking(FSA.FSA):
             and (not self.currentState == 'scanBall') ):
             self.switchTo('ballTracking')
 
-# ** # old method
+# ** # old method (main input method)
     def trackBallSpin(self):
         """automatically tracks the ball. spins if not in view"""
         self.target = self.brain.ball
@@ -75,7 +75,7 @@ class HeadTracking(FSA.FSA):
             and (not self.currentState == 'spinScanBall') ):
             self.switchTo('ballSpinTracking')
 
-# ** # new method
+# ** # new method (main input method)
     def spinFindBall(self):
         """Assumes robot is spinning and looking for ball."""
         """Scans along side robot is spinning to."""
@@ -88,7 +88,7 @@ class HeadTracking(FSA.FSA):
         self.activeLocOn = False
         self.switchTo('locPans')
 
-# ** # old method
+# ** # old method (main input method)
     def activeLoc(self):
         """tracks the ball but periodically looks away"""
         self.target = self.brain.ball
@@ -124,7 +124,7 @@ class HeadTracking(FSA.FSA):
             self.lookDirection = direction
             self.switchTo('look')
 
-# ** # old method
+# ** # old method (main input method)
     def trackTarget(self, target):
         """automatically tracks landmark, scans for landmark if not in view
         only works if target has attribute locDist, framesOn, framesOff,x,y"""
@@ -152,7 +152,7 @@ class HeadTracking(FSA.FSA):
 #        if not self.currentState == 'lookToPoint':
 #            self.switchTo('lookToPoint')
 
-    # ** # new method - now a helper method
+    # ** # new method - helper method
     def lookToPoint(self, goalX=0, goalY=0, goalZ=0):
         """
         Look at given relative coordinates.
@@ -161,30 +161,6 @@ class HeadTracking(FSA.FSA):
         self.target.y = goalY
         self.target.height = goalZ
         self.helper.lookToPoint(self.target)
-
-    # ** # new method
-    def lookToLocObject(self):
-        """
-        Looks at currentLocObject.
-        """
-
-        # ** # debugging print lines
-        print "my location:", self.brain.my.x, self.brain.my.y
-        #print "object list:"
-        #for obj in self.locObjectList:
-        #    print obj.visionId, obj.dist, obj.bearing, obj.on
-        print "target on?:",self.currentLocObject.on
-        print "target rel coords:", self.currentLocObject.relX, self.currentLocObject.relY
-        print "target dist/bearing:",self.currentLocObject.dist,self.currentLocObject.bearing
-        print "target location:",self.currentLocObject.x,self.currentLocObject.y
-        print "target visLoc:",self.currentLocObject.visDist,self.currentLocObject.visBearing
-        print "target locLoc:",self.currentLocObject.locDist,self.currentLocObject.locBearing
-        #print "target fitness:",self.currentLocObject.trackingFitness
-        print self.currentLocObject.visionId
-
-        self.lookToPoint(self.currentLocObject.relX, \
-                             self.currentLocObject.relY, \
-                             0.0)
 
 # ** # debugging method
     def nudge(self):
@@ -205,5 +181,5 @@ class HeadTracking(FSA.FSA):
 
 # ** # new method
     def readyLoc(self):
-        currentLocObject = None
+        self.target = None
         self.switchTo('readyLoc')

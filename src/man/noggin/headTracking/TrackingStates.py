@@ -91,11 +91,16 @@ def trackLoc(tracker):
         tracker.brain.motion.stopHeadMoves()
 
     # safety check that currentLocObject was set
-    if tracker.currentLocObject is None:
-        print "currentLocObject is None"
+    if tracker.target is None:
+        print "target is None"
         return tracker.goLater(tracker.lastDiffState())
 
-    tracker.lookToLocObject()
+    # if target is on frame already, track via angles
+    if tracker.target.framesOn > TRACKER_FRAMES_ON_TRACK_THRESH:
+        tracker.helper.lookToTargetAngles()
+    # if target is off frame, track via relative coordinates
+    else:
+        tracker.helper.lookToTargetCoords()
 
     if tracker.counter > 3 and not tracker.brain.motion.isHeadActive():
         print "inactive and ready to switch landmarks after",tracker.counter
