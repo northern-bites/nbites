@@ -24,7 +24,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
                                      shared_ptr<NaoPose> pose)
     : sensors(s),
       profiler(p),
-      walkProvider(sensors, p),
+      walkProvider(sensors, pose, p),
       scriptedProvider(sensors, p),
       headProvider(sensors, p),
       coordHeadProvider(sensors, p, pose),

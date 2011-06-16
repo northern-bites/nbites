@@ -149,12 +149,14 @@ INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_PATH}
   ${ALCOMMON_INCLUDE_DIR}
   ${MINGW_INCLUDE_DIR}
+  ${MAN_INCLUDE_DIR}
   ${COMM_INCLUDE_DIR}
   ${CORPUS_INCLUDE_DIR}
   ${MOTION_INCLUDE_DIR}
   ${NOGGIN_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${WEBOTS_INCLUDE_DIR}
+  ${MEMORY_INCLUDE_DIR}
   ${CFG_DIR}
   )
 
@@ -222,16 +224,16 @@ TARGET_LINK_LIBRARIES(
   ${VISION_TARGET}
   ${MOTION_TARGET}
   ${NOGGIN_TARGET}
+  ${MEMORY_TARGET}
   ${WEBOTS_LIBRARIES}
   )
 
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories to
 # include in this package
-SUBDIRS(
-  comm
-  corpus
-  vision
-  motion
-  noggin
-  )
+add_subdirectory( memory )
+add_subdirectory( comm )
+add_subdirectory( corpus )
+add_subdirectory( vision )
+add_subdirectory( motion )
+add_subdirectory( noggin )

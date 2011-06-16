@@ -45,3 +45,5 @@ docs/*
 src/remote/dist/javadoc/
 *.pdf
 *.o 
+ext/*
+lib/*

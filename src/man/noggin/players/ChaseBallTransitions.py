@@ -159,13 +159,13 @@ def inPenaltyKickStrikezone(player):
 
 ####### FIND BALL STUFF ##############
 
-def shouldScanFindBall(player):
+def shouldFindBall(player):
     """
     We lost the ball, scan to find it
     """
     return (player.brain.ball.framesOff > constants.BALL_OFF_THRESH)
 
-def shouldScanFindBallKick(player):
+def shouldFindBallKick(player):
     """
     We lost the ball while in a kicking state, be more generous before looking
     """
