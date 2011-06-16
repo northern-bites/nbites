@@ -3,6 +3,9 @@
 #include "math.h"
 #include <QTextStream>
 
+namespace qtool {
+namespace colorcreator {
+
 class Stats
 {
 public:
@@ -27,5 +30,8 @@ private:
     double minimum;
     double maximum;
 };
+
+}
+}
 
 #endif // STATS_H

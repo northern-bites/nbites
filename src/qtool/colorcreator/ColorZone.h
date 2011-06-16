@@ -2,6 +2,10 @@
 #define COLORZONE_H
 
 #include "image/ColorSpace.h"
+
+namespace qtool {
+namespace colorcreator {
+
 class ColorZone
 {
 public:
@@ -13,5 +17,8 @@ public:
     float SLo, SHi;
     float Hlo, HHi;
 };
+
+}
+}
 
 #endif // COLORZONE_H

@@ -3,7 +3,8 @@
 #include <QString>
 #include <QFile>
 #include <QTextStream>
-#include "stats.h"
+
+#include "Stats.h"
 
 #define UNDEFINED 0x00
 #define WHITE     0x01
@@ -13,6 +14,9 @@
 #define ORANGE    0x10
 #define PINK      0x20
 #define NAVY      0x40
+
+namespace qtool {
+namespace colorcreator {
 
 class ColorTable
 {
@@ -35,5 +39,8 @@ private:
     unsigned*** table;
     bool enabled;
 };
+
+}
+}
 
 #endif // COLORTABLE_H

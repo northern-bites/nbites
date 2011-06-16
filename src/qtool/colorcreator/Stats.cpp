@@ -1,4 +1,7 @@
-#include "stats.h"
+#include "Stats.h"
+
+namespace qtool {
+namespace colorcreator {
 
 Stats::Stats()
 {
@@ -55,4 +58,7 @@ void Stats::print(int x, int y)
     out << "Stats for color " << x << " index " << y << " " << n << " entries.\n";
     out << "Min " << getMin() << " Max " << getMax() << " mean " << mean() << "\n";
     out << "StdDev " << stDev() << " " << rms() << "\n";
+}
+
+}
 }

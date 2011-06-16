@@ -8,9 +8,10 @@
 #include "man/include/Subscriber.h"
 //qtool
 #include "image/YUVImage.h"
-#include "ColorEdit.h"
-#include "colortable.h"
 #include "data/DataManager.h"
+//colorcreator
+#include "ColorEdit.h"
+#include "ColorTable.h"
 
 #define  NEWFRAMES
 #ifdef   NEWFRAMES
@@ -43,7 +44,6 @@
 namespace Ui {
     class ColorCreator;
 }
-
 
 namespace qtool {
 namespace colorcreator {

@@ -1,4 +1,7 @@
-#include "colorzone.h"
+#include "ColorZone.h"
+
+namespace qtool {
+namespace colorcreator {
 
 ColorZone::ColorZone()
 {
@@ -24,4 +27,7 @@ bool ColorZone::within(ColorSpace c)
       if (h1 < 1)
         h1 -= (float)floor(h1);
       return c.valid() && YLo <= c.getY() && c.getY() <= YHi && SLo <= c.getS() && c.getS() <= SHi && h0 <= h1;
+}
+
+}
 }

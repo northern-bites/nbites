@@ -8,7 +8,10 @@
     yuv value (in the order
   */
 
-#include "colortable.h"
+#include "ColorTable.h"
+
+namespace qtool {
+namespace colorcreator {
 
 ColorTable::ColorTable()
 {
@@ -284,3 +287,5 @@ Stats** ColorTable::colorStats()
     return colorStats;
 }
 
+}
+}
