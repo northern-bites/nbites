@@ -64,7 +64,7 @@ public:
     void updateThresh();
     void update(int eventID) {
         yuvImage.updateFromRoboImage();
-            updateDisplays();
+        updateDisplays();
     }
     void initStats();
     void collectStats(int x, int y);
