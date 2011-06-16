@@ -140,9 +140,15 @@ static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 
 //Check if the angle is unstable, (ie tending AWAY from zero)
 bool isFalling(float angle_pos, float angle_vel){
-    if (angle_pos < 0){
+    if (angle_pos >= FALLING_ANGLE_THRESH){
         //then we only care if the velocity is negative
+<<<<<<< HEAD
         if(angle_vel < -FALL_SPEED_THRESH)
+=======
+	cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos 
+	     << ", angle_vel == " << angle_vel << endl;
+        //if(angle_vel < -FALL_SPEED_THRESH)
+>>>>>>> changed fall procedure so that when the magnitude of the angle beyond the 0 point goes beyond the threshold, gains are shut off; these changes do not make use of angular velocity/speed of the robot falling.
             return true;
     }else{
         if(angle_vel > FALL_SPEED_THRESH)
@@ -257,27 +263,35 @@ void RoboGuardian::checkFalling(){
     const float angleSpeed = angleMag - lastAngleMag;
     const bool falling_critical_angle = angleMag > FALLING_ANGLE_THRESH;
 
-    if(isFalling(angleMag,angleSpeed)){
+    if(isFalling(angleMag, angleSpeed)) {
+	// If falling, increment falling frames counter.
         fallingFrames += 1;
         notFallingFrames = 0;
-    }else if( angleSpeed < NOFALL_SPEED_THRESH){
-        fallingFrames = 0;
-        notFallingFrames +=1;
+    } else if(!falling_critical_angle) {
+	// Otherwise, not falling.
+	fallingFrames = 0;
+	notFallingFrames += 1;
     }
-    //     cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
-    //          << "  fallingFrames is " << fallingFrames
-    //          << " and critical angle is "<< falling_critical_angle<< endl;
+
+    if(angleMag >= FALLING_ANGLE_THRESH) {
+         cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
+              << "  fallingFrames is " << fallingFrames
+	      << " notFallingFrames is " << notFallingFrames
+              << " and critical angle is "<< falling_critical_angle<< endl;
+    }
 
     //If the robot has been falling for a while, and the robot is inclined
     //already at a 45 degree angle, than we know we are falling
-    if (fallingFrames > FALLING_FRAMES_THRESH && falling_critical_angle){
-        //Execute protection? Just print for now and we'll see how this works
+    if (fallingFrames > FALLING_FRAMES_THRESH){
+        // When falling, execute the fall protection method.
+	cout << "RoboGuardian::checkFalling() : FALLING!" << endl;
         falling = true;
+	processFallingProtection();
     }else if(notFallingFrames > FALLING_FRAMES_THRESH){
         falling = false;
     }
 
-
+    // To calculate the angular speed of the fall next time.
     lastInertial  = inertial;
 }
 

@@ -853,7 +853,6 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     // cast packet data into CommPacketHeader struct
     packet = *reinterpret_cast<const CommPacketHeader*>(msg);
 
-    // check packet header
     if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0){
         //std::cout << "bad header" << std::endl;
         return false;
@@ -875,6 +874,7 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
         //std::cout << "bad timer" << std::endl;
         return false;
     }
+
     // passed all checks, packet is valid
     return true;
 }
