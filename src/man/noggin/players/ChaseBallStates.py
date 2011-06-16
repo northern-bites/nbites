@@ -64,6 +64,8 @@ def approachBall(player):
         return player.goNow('penaltyBallInOppGoalbox')
     elif transitions.shouldScanFindBall(player):
         return player.goLater('scanFindBall')
+    elif transitions.shouldKickOff(player):
+        return player.goNow('kickOff')
     elif transitions.shouldSpinToBall(player):
         return player.goNow('spinToBall')
     elif transitions.shouldStopBeforeKick(player):
