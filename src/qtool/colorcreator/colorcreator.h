@@ -40,11 +40,13 @@
 #define RED_COL 0x20
 #define NAVY_COL 0x40
 
-
-
 namespace Ui {
     class ColorCreator;
 }
+
+
+namespace qtool {
+namespace colorcreator {
 
 class ColorCreator : public QWidget, public Subscriber
 {
@@ -171,5 +173,8 @@ private:
     bool haveFile;
     bool viewerEnabled;
 };
+
+}
+}
 
 #endif // COLORCREATOR_H

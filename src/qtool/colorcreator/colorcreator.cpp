@@ -11,7 +11,10 @@
 #include <QPixmap>
 #include <boost/shared_ptr.hpp>
 
-using qtool::data::DataManager;
+namespace qtool {
+namespace colorcreator {
+
+using data::DataManager;
 
 ColorCreator::ColorCreator(const DataManager* dataManager, QWidget *parent) :
     QWidget(parent),
@@ -1004,4 +1007,7 @@ void ColorCreator::on_vMax_valueChanged(int value)
     updateColors();
     QTextStream out(stdout);
     out << "Set V Max value to " << value << "\n";
+}
+
+}
 }

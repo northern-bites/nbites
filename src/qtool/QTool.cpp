@@ -5,6 +5,8 @@
 namespace qtool {
 
 using data::DataManager;
+using colorcreator::ColorCreator;
+
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
