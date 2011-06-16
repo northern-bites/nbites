@@ -293,6 +293,7 @@ public class TOOLVisionLink {
     native private void cppSetEdgeDetectionDebug(boolean _bool);
     native private void cppSetHoughTransformDebug(boolean _bool);
     native private void cppSetRobotDebug(boolean _bool);
+    native private void cppSetDebugDangerousBall(boolean _bool);
 
 
     // Set edge detection threshold
@@ -776,6 +777,17 @@ public class TOOLVisionLink {
         if (visionLinkSuccessful) {
             try {
                 cppSetRobotDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugDangerousBall(boolean _bool) {
+        if (visionLinkSuccessful) {
+            try {
+                cppSetDebugDangerousBall(_bool);
             } catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n");
             }

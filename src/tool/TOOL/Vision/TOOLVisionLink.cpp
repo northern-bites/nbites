@@ -467,6 +467,11 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 		vision.fieldLines->setDebugIdentifyCorners(debugIdentifyCorners);
 	}
 	JNIEXPORT void JNICALL
+	Java_TOOL_Vision_TOOLVisionLink_cppSetDebugDangerousBall
+	(JNIEnv * env, jobject jobj, jboolean debugDangerousBall){
+		vision.thresh->context->setDebugDangerousBall(debugDangerousBall);
+	}
+	JNIEXPORT void JNICALL
 	Java_TOOL_Vision_TOOLVisionLink_cppSetFieldLinesDebugCcScan
 	(JNIEnv * env, jobject jobj, jboolean debugCcScan){
 		vision.fieldLines->setDebugCcScan(debugCcScan);

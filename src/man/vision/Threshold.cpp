@@ -247,6 +247,9 @@ void Threshold::runs() {
     // back when the robots had colored shoulder pads we worried about seeing them
     detectSelf();
 #endif
+	for (int i = IMAGE_HEIGHT - 1; i >= 0; i--) {
+		pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+	}
     for (int i = 0; i < NUMBLOCKS; i++) {
         block[i] = 0;
         evidence[i] = 0;
@@ -934,6 +937,10 @@ void Threshold::objectRecognition() {
     }
 
     storeFieldObjects();
+	if (vision->ball->getWidth() > 0 && vision->ball->getDistance() > 15.0f &&
+		vision->ball->getHeat() < 1.0f) {
+		context->checkForKickDangerNoRobots();
+	}
 
 }
 

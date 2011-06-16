@@ -179,6 +179,7 @@ public:
     int getPixelBoundaryLeft();
     int getPixelBoundaryRight();
     int getPixelBoundaryUp();
+	float getPixDistance(int y) {return pixDistance[y];}
 
 #ifdef OFFLINE
     void setConstant(int c);
@@ -271,6 +272,8 @@ private:
     int lowerBound[IMAGE_WIDTH];
     int block[NUMBLOCKS];
     int evidence[NUMBLOCKS];
+
+	float pixDistance[IMAGE_HEIGHT];
 
     // thresholding variables
     int horizon;

@@ -643,6 +643,13 @@ public class VisionState {
                     thresholdedImage.getVisionLink().
                         setDebugRobot(robotBox.isSelected());}
             });
+        final JCheckBox dangerBox = new
+            JCheckBox(" Debug Dangerous Ball");
+        dangerBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    thresholdedImage.getVisionLink().
+                        setDebugDangerousBall(dangerBox.isSelected());}
+            });
 
 		buttonPanel.add(new JLabel("\tField Line Flags"));
 		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
@@ -674,6 +681,7 @@ public class VisionState {
         ballPanel.add(edgeDetectionBox);
         ballPanel.add(houghTransformBox);
         ballPanel.add(robotBox);
+		ballPanel.add(dangerBox);
 		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
 		JPanel debugPanel = new JPanel();
@@ -724,5 +732,6 @@ public class VisionState {
 		thresholdedImage.getVisionLink().setDebugEdgeDetection(false);
 		thresholdedImage.getVisionLink().setDebugHoughTransform(false);
 		thresholdedImage.getVisionLink().setDebugRobot(false);
+		thresholdedImage.getVisionLink().setDebugDangerousBall(false);
 	}
 }

@@ -27,6 +27,7 @@ void VisualBall::init() {
     distance = 0;
     bearing = 0;
     elevation = 0;
+	heat = 0.0f;
 }
 
 void VisualBall::setDistanceEst(estimate ball_est)
