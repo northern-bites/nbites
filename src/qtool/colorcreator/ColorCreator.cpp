@@ -1,5 +1,5 @@
 #include "ColorCreator.h"
-#include "ui_colorcreator.h"
+#include "ui_ColorCreator.h"
 #include "math.h"
 
 #include <QTextStream>

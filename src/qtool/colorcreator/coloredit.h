@@ -7,6 +7,9 @@
 #include <QGridLayout>
 #include "image/YUVImage.h"
 
+namespace qtool {
+namespace colorcreator {
+
 class ColorEdit : public QWidget
 {
     Q_OBJECT
@@ -37,5 +40,8 @@ private:
 
 
 };
+
+}
+}
 
 #endif // COLOREDIT_H
