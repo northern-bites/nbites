@@ -941,7 +941,7 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
     one->updateObject(&two, _certainty, _distCertainty);
     // update the context variables too
     if (!_certainty) {
-        if (color == BLUE) {
+        if (color == BLUE_BIT) {
             context->setUnknownBluePost();
         } else {
             context->setUnknownYellowPost();

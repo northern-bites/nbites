@@ -514,10 +514,14 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
                                       bool l1IsLeft) {
     shape leftColor = LEFT_GOAL_YELLOW_L;
     shape rightColor = RIGHT_GOAL_YELLOW_L;
+	shape leftCorner = YELLOW_GOAL_BOTTOM;
+	shape rightCorner = YELLOW_GOAL_TOP;
     if ((face == FACING_BLUE_GOAL && sameHalf) ||
         (face == FACING_YELLOW_GOAL && !sameHalf)) {
         leftColor = LEFT_GOAL_BLUE_L;
         rightColor = RIGHT_GOAL_BLUE_L;
+		leftCorner = BLUE_GOAL_TOP;
+		rightCorner = BLUE_GOAL_BOTTOM;
     }
     // sometime to be super-safe we should check where the line intersects
     // the goal post
@@ -530,13 +534,13 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
                 corner.setSecondaryShape(leftColor);
             } else {
                 // we must have missed the other L corner for some reason
-                corner.setSecondaryShape(RIGHT_GOAL_CORNER);
+                corner.setSecondaryShape(leftCorner);
             }
         } else {
             if (l2y < objectRightY) {
                 corner.setSecondaryShape(leftColor);
             } else {
-                corner.setSecondaryShape(RIGHT_GOAL_CORNER);
+                corner.setSecondaryShape(leftCorner);
             }
         }
     } else {
@@ -545,13 +549,13 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
             if (l2y < objectRightY) {
                 corner.setSecondaryShape(rightColor);
             } else {
-                corner.setSecondaryShape(LEFT_GOAL_CORNER);
+                corner.setSecondaryShape(rightCorner);
             }
         } else {
             if (l1y < objectRightY) {
                 corner.setSecondaryShape(rightColor);
             } else {
-                corner.setSecondaryShape(LEFT_GOAL_CORNER);
+                corner.setSecondaryShape(rightCorner);
             }
         }
     }
@@ -733,7 +737,10 @@ void Context::classifyInnerL(VisualCorner & corner) {
         // could indicate this is actually a corner
         // we can do this if we see a post
         // punt for now
-        return;
+		if (debugIdentifyCorners) {
+			cout << "Punting on inner L " << dist << endl;
+		}
+        //return;
     }
     // l1 and l2 hold information on points away from the corner
     if (l1IsLeft) {
@@ -1665,7 +1672,8 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
 					MIDFIELD_X << endl;
 			}
 			objectDistance = allFieldObjects[i]->getDistance();
-            if (objectDistance < MIDFIELD_X) {
+            if (objectDistance < MIDFIELD_X ||
+				allFieldObjects[i]->getWidth() > 25) {
                 sameHalf = true;
             }
             objectRightX = allFieldObjects[i]->getRightBottomX();
@@ -1688,7 +1696,9 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
 			objectDistance = 0;
             objectRightX = allFieldObjects[i]->getRightBottomX();
             objectRightY = allFieldObjects[i]->getRightBottomY();
-        }
+        } else {
+			sameHalf = true;
+		}
     }
     return visibleObjects;
 }
@@ -1860,6 +1870,17 @@ float Context::realLineDistance(boost::shared_ptr<VisualLine> line) {
     const point<int> end2 = line->getStartpoint();
     return realDistance(end1.x, end1.y, end2.x, end2.y);
 }
+
+/*
+ */
+/*bool Context::onGoalSide() {
+	if (face == FACING_BLUE_GOAL && fieldHalf == HALF_BLUE) {
+		return true;
+	}
+	if (face == FACING_YELLOW_GOAL && fieldHalf == HALF_YELLOW) {
+		return true;
+	}
+	}*/
 
 
 /* Set facing information.  Initially this is based on whether we see a goal
