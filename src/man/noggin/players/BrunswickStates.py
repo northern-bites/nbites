@@ -61,7 +61,7 @@ def gameSet(player):
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
 
-        if (player.brain.play.isRole(READY_CHASER) and
+        if (player.brain.play.isRole(CHASER) and
             player.brain.gameController.ownKickOff):
             player.hasKickedOff = False
 
