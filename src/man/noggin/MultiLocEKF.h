@@ -16,7 +16,7 @@
 #include "Observation.h"
 #include "LocSystem.h"
 
-//#define DEBUG_DIVERGENCE_CALCULATIONS
+// #define DEBUG_DIVERGENCE_CALCULATIONS
 
 
 /**
@@ -206,15 +206,16 @@ private:
         int minIndex = -1;
 
 #ifdef DEBUG_DIVERGENCE_CALCULATIONS
-        std::cout << "Calculating Divergence from " << z << std::endl;
+        std::cout << std::endl
+                  << "Calculating Divergence from " << z << std::endl;
 #endif // DEBUG_DIVERGENCE_CALCULATIONS
 
         for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
             float divergence = getDivergence(z, possiblePoints[i]);
 
 #ifdef DEBUG_DIVERGENCE_CALCULATIONS
-            std::cout << "Divergence: " << divergence << std::endl;
-            std::cout << "\tto Landmark " << possiblePoints[i] << std::endl;
+            std::cout << "\tTo Landmark " << possiblePoints[i] << std::endl;
+            std::cout << "\t\tdivergence =  " << divergence << std::endl;
 #endif // DEBUG_DIVERGENCE_CALCULATIONS
 
             if (divergence < minDivergence) {

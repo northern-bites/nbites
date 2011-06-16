@@ -75,10 +75,10 @@ const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
     float pt_bearing = subPIAngle(copysignf(1.0f, -pt_rel_y) *          \
                                   heading_mag - h);                     \
                                                                         \
-    float dist_error = pt_dist - z.getVisDistance();                    \
-    float bearing_error =  subPIAngle(pt_bearing -                      \
-                                      z.getVisBearing()) /              \
-        z.getBearingSD();                                               \
+    float dist_error = z.getVisDistance() - pt_dist;                    \
+    float bearing_error = (subPIAngle(z.getVisBearing() - pt_bearing) / \
+                           z.getBearingSD());
+
 
 
 
@@ -91,8 +91,8 @@ const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
     float pt_orientation = (heading_from_corner *                       \
                             copysignf(1.0f, pt_rel_y) - pt.angle);      \
                                                                         \
-    float orientation_error = subPIAngle(pt_orientation -               \
-                                         z.getVisOrientation());
+    float orientation_error = subPIAngle(z.getVisOrientation() -        \
+                                         pt_orientation);
 
 
 
@@ -745,7 +745,7 @@ void MultiLocEKF::calculateMatrices(int index,
     H_k(1,2) = -1;
 
     // Derivatives of orientation with respect to x,y,h
-    H_k(2,0) =  pt_rel_y / (pt_dist * pt_dist);
+    H_k(2,0) = pt_rel_y / (pt_dist * pt_dist);
     H_k(2,1) = -pt_rel_x / (pt_dist * pt_dist);
     H_k(2,2) = 0;
 
