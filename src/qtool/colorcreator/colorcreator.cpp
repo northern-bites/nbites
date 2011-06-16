@@ -17,8 +17,8 @@ ColorCreator::ColorCreator(const DataManager* dataManager, QWidget *parent) :
     QWidget(parent),
     dataManager(dataManager),
     ui(new Ui::ColorCreator),
-    image(dataManager->getMemory()->getMImage()),
-    roboimage(image)
+    roboImage(dataManager->getMemory()->getMImage()),
+    yuvImage(roboImage)
 {
 
     img = new QImage(640, 480, QImage::Format_RGB32);
@@ -323,34 +323,34 @@ QColor ColorCreator::getChannelView(int j, int i)
     int red, green, blue, edge;
     switch (shape) {
     case V:
-        red = green = blue = roboimage.getV(j, i);
+        red = green = blue = yuvImage.getV(j, i);
         break;
     case Bluec:
         red = green = 0;
-        blue = roboimage.getBlue(j, i);
+        blue = yuvImage.getBlue(j, i);
         break;
     case Y:
-        red = green = blue = roboimage.getY(j, i);
+        red = green = blue = yuvImage.getY(j, i);
         break;
     case U:
-        red = green = blue = roboimage.getU(j, i);
+        red = green = blue = yuvImage.getU(j, i);
         break;
     case Greenc:
         red = blue = 0;
-        green = roboimage.getGreen(j, i);
+        green = yuvImage.getGreen(j, i);
         break;
     case Redc:
         blue = green = 0;
-        red = roboimage.getRed(j, i);
+        red = yuvImage.getRed(j, i);
         break;
     case H:
-        red = green = blue = roboimage.getH(j, i);
+        red = green = blue = yuvImage.getH(j, i);
         break;
     case S:
-        red = green = blue = roboimage.getS(j, i);
+        red = green = blue = yuvImage.getS(j, i);
         break;
     case Z:
-        red = green = blue = roboimage.getZ(j, i);
+        red = green = blue = yuvImage.getZ(j, i);
         break;
     case Table:
         if (table->isEnabled())
@@ -359,19 +359,19 @@ QColor ColorCreator::getChannelView(int j, int i)
         }
         break;
     case EDGE:
-        red = green = blue = 255; //roboimage.getY(j, i);
+        red = green = blue = 255; //yuvImage.getY(j, i);
         found = false;
         if (j > 0 && i > 1) {
-            edge = abs(roboimage.getY(j - 1, i) - roboimage.getY(j, i));
-            edge = max(abs(roboimage.getY(j, i) - roboimage.getY(j, i - 1)), edge);
+            edge = abs(yuvImage.getY(j - 1, i) - yuvImage.getY(j, i));
+            edge = max(abs(yuvImage.getY(j, i) - yuvImage.getY(j, i - 1)), edge);
             if (edge  > edgediff) {
                 red = 255;
                 green = 0;
                 blue = 0;
                 found = true;
             }
-            edge = abs(roboimage.getU(j - 1, i) - roboimage.getU(j, i));
-            edge = max(abs(roboimage.getU(j, i) - roboimage.getU(j, i - 1)), edge);
+            edge = abs(yuvImage.getU(j - 1, i) - yuvImage.getU(j, i));
+            edge = max(abs(yuvImage.getU(j, i) - yuvImage.getU(j, i - 1)), edge);
             if (edge > edgediff) {
                 green = 255;
                 blue = 0;
@@ -380,8 +380,8 @@ QColor ColorCreator::getChannelView(int j, int i)
                 }
                 found = true;
             }
-            edge = abs(roboimage.getV(j - 1, i) - roboimage.getV(j, i));
-            edge = max(abs(roboimage.getV(j, i) - roboimage.getV(j, i - 1)), edge);
+            edge = abs(yuvImage.getV(j - 1, i) - yuvImage.getV(j, i));
+            edge = max(abs(yuvImage.getV(j, i) - yuvImage.getV(j, i - 1)), edge);
             if (edge > edgediff) {
                 blue = 255;
                 if (!found) {
@@ -400,9 +400,9 @@ QColor ColorCreator::displayColorTable(int i, int j)
 {
     QColor c;
 
-    int y = roboimage.getY(i, j);
-    int u = roboimage.getU(i, j);
-    int v = roboimage.getV(i, j);
+    int y = yuvImage.getY(i, j);
+    int u = yuvImage.getU(i, j);
+    int v = yuvImage.getV(i, j);
     unsigned col = table->index(y, u, v);
     if ((col & ORANGE_COL) && (col & RED_COL))
     {
@@ -495,11 +495,11 @@ void ColorCreator::largeDisplay()
             c.setRgb(255,255,255);
             do {
                 display = true;
-                int y = roboimage.getY(i, j);
-                int v = roboimage.getV(i, j);
-                float s = (float)roboimage.getS(i, j) / 256.0f;
-                float h = (float)roboimage.getH(i, j) / 256.0f;
-                float z = (float)roboimage.getZ(i, j) / 256.0f;
+                int y = yuvImage.getY(i, j);
+                int v = yuvImage.getV(i, j);
+                float s = (float)yuvImage.getS(i, j) / 256.0f;
+                float h = (float)yuvImage.getH(i, j) / 256.0f;
+                float z = (float)yuvImage.getZ(i, j) / 256.0f;
                 // Since H is an angle the math is modulo.
                 display = testValue(h, s, z, y, v, start);
                 c = cols[start];
@@ -567,9 +567,9 @@ void ColorCreator::updateThresh()
                     stats = true;
                     start = currentColor;
                 }
-                red = roboimage.getRed(i, j);
-                green = roboimage.getGreen(i, j);
-                blue = roboimage.getBlue(i, j);
+                red = yuvImage.getRed(i, j);
+                green = yuvImage.getGreen(i, j);
+                blue = yuvImage.getBlue(i, j);
                 c.setRgb(red, green, blue);
                 img2->setPixel(i/2, j/2, c.rgb());
                 c = getChannelView(i, j);
@@ -611,12 +611,12 @@ void ColorCreator::initStats()
 
 void ColorCreator::collectStats(int x, int y)
 {
-    float s = (float)roboimage.getS(x, y) / 256.0f;
-    float h = (float)roboimage.getH(x, y) / 256.0f;
-    float z = (float)roboimage.getZ(x, y) / 256.0f;
-    int yy = roboimage.getY(x, y);
-    int u = roboimage.getU(x, y);
-    int v = roboimage.getV(x, y);
+    float s = (float)yuvImage.getS(x, y) / 256.0f;
+    float h = (float)yuvImage.getH(x, y) / 256.0f;
+    float z = (float)yuvImage.getZ(x, y) / 256.0f;
+    int yy = yuvImage.getY(x, y);
+    int u = yuvImage.getU(x, y);
+    int v = yuvImage.getV(x, y);
     statsSMin = min(statsSMin, s);
     statsSMax = max(statsSMax, s);
     statsHMin = min(statsHMin, h);
@@ -649,24 +649,24 @@ void ColorCreator::on_pushButton_clicked()
                                             currentDirectory,
                                             tr("Image Files (*.log)"));
 //    imageParser= new memory::parse::ImageParser(currentDirectory.toStdString().data(),
-//            boost::shared_ptr<const RoboImage> (image));
+//            boost::shared_ptr<const yuvImage> (image));
     imageParser->getNext();
-    roboimage.updateFromRoboImage();
+    yuvImage.updateFromRoboImage();
     updateDisplays();
 }
 
 void ColorCreator::on_previousButton_clicked()
 {
-    //roboimage.read(previousFrame);
+    //yuvImage.read(previousFrame);
     currentFrameNumber--;
     updateDisplays();
 }
 
 void ColorCreator::on_nextButton_clicked()
 {
-    //roboimage.read(nextFrame);
+    //yuvImage.read(nextFrame);
     //imageParser->getNext();
-    //roboimage.updateFromRoboImage();
+    //yuvImage.updateFromRoboImage();
     dataManager->getNext();
     currentFrameNumber++;
     //updateDisplays();
@@ -947,14 +947,14 @@ void ColorCreator::on_writeNew_clicked()
 
 void ColorCreator::on_plusTen_clicked()
 {
-    //roboimage.read(tenthFrame);
+    //yuvImage.read(tenthFrame);
     currentFrameNumber += 10;
     updateDisplays();
 }
 
 void ColorCreator::on_minusTen_clicked()
 {
-    //roboimage.read(minusTenthFrame);
+    //yuvImage.read(minusTenthFrame);
     currentFrameNumber -= 10;
     updateDisplays();
 }

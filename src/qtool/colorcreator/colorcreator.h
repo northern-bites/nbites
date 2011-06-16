@@ -61,7 +61,7 @@ public:
     void updateColors();
     void updateThresh();
     void update(int eventID) {
-        roboimage.updateFromRoboImage();
+        yuvImage.updateFromRoboImage();
             updateDisplays();
     }
     void initStats();
@@ -129,9 +129,8 @@ private slots:
 
 private:
     Ui::ColorCreator *ui;
-    //TODO: fix the namings here ASAP! - Octavian
-    const RoboImage* image;
-    YUVImage roboimage;
+    const RoboImage* roboImage;
+    YUVImage yuvImage;
     memory::parse::ImageParser* imageParser;
     const qtool::data::DataManager* dataManager;
     ColorTable *table;
