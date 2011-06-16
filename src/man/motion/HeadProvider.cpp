@@ -82,6 +82,9 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
     case SET:
         setMode();
         break;
+	case COORD:
+		//dummy case to remove unnecessary cmake warning
+		break;
     }
     setActive();
 	pthread_mutex_unlock(&head_provider_mutex);
@@ -106,6 +109,7 @@ void HeadProvider::setMode(){
           <<"   added      ("<<yawChangeTarget<<","<<pitchChangeTarget<<")"<<endl
           <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
 #endif
+
 
     //update memory for next  run
     lastYawDest = lastYawDest+yawChangeTarget;
@@ -149,8 +153,8 @@ void HeadProvider::setCommand(const SetHeadCommand *command) {
     transitionTo(SET);
     yawDest = command->getYaw();
     pitchDest = command->getPitch();
-	yawMaxSpeed = command->getMaxSpeedYaw();
-	pitchMaxSpeed = command->getMaxSpeedPitch();
+	yawMaxSpeed = command->getMaxSpeedYaw()*.1;/* ** *///debugging speed
+	pitchMaxSpeed = command->getMaxSpeedPitch()*.1;/* ** *///debugging speed
     setActive();
     pthread_mutex_unlock(&head_provider_mutex);
 }
@@ -243,6 +247,9 @@ void HeadProvider::transitionTo(HeadMode newMode){
             lastYawDest =mAngles[0];
             lastPitchDest =mAngles[1];
             break;
+		case COORD:
+			//dummy case to remove unnecessary cmake warning
+			break;
         }
         curMode = newMode;
 #ifdef DEBUG_HEADPROVIDER

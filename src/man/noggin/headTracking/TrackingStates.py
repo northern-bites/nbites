@@ -83,8 +83,10 @@ def activeTracking(tracker):
 # ** # new method
 def trackLoc(tracker):
     """
-    Look at the current LocObject, then go to lastDiffState
+    Look at the current target, then go to lastDiffState
     """
+
+    print "-------------------------------------"
 
     # make sure head is inactive first
     if tracker.firstFrame():
@@ -96,13 +98,15 @@ def trackLoc(tracker):
         return tracker.goLater(tracker.lastDiffState())
 
     # if target is on frame already, track via angles
-    if tracker.target.framesOn > TRACKER_FRAMES_ON_TRACK_THRESH:
+    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        print "tracking via angles"
         tracker.helper.lookToTargetAngles()
     # if target is off frame, track via relative coordinates
     else:
+        print "tracking via coords"
         tracker.helper.lookToTargetCoords()
 
-    if tracker.counter > 3 and not tracker.brain.motion.isHeadActive():
+    if tracker.counter > 100 and not tracker.brain.motion.isHeadActive():
         print "inactive and ready to switch landmarks after",tracker.counter
         return tracker.goLater(tracker.lastDiffState)
 

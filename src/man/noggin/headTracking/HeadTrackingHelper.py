@@ -72,42 +72,47 @@ class HeadTrackingHelper(object):
         If headTracking has a target which is on frame,
         uses setHeadCommands to bring target to center of frame.
         """
-        (yaw,pitch) = (0.,0.)
+        # Get current head angles
+        motionAngles = self.tracker.brain.sensors.motionAngles
+        curPitch = motionAngles[MotionConstants.HeadPitch]
+        curYaw = motionAngles[MotionConstants.HeadYaw]
+
         # Find the target's angular distance from the center of vision
         if not self.tracker.target is None and self.tracker.target.on:
-            yaw = self.tracker.target.angleX
-            pitch = self.tracker.target.angleY
+            curYaw += self.tracker.target.angleX
+            curPitch -= self.tracker.target.angleY
+            #note: angleY is positive up from center of vision frame
         else:
             # by default, do nothing
             return
 
-        headMove = motion.SetHeadCommand(yaw,pitch)
+        headMove = motion.SetHeadCommand(curYaw,curPitch)
         self.tracker.brain.motion.setHead(headMove)
 
     # ** # new method
-    def lookToLocObject(self):
+    def lookToTargetCoords(self):
         """
         Looks at target's relative coordinates
         """
         target = self.tracker.target
 
         # ** # debugging print lines
-        print "my location:", self.brain.my.x, self.brain.my.y
+        #print "my location:", self.tracker.brain.my.x, self.tracker.brain.my.y
         #print "object list:"
-        #for obj in self.locObjectList:
+        #for obj in self.tracker.locObjectList:
         #    print obj.visionId, obj.dist, obj.bearing, obj.on
-        print "target on?:",self.target.on
-        print "target rel coords:", self.target.relX, self.target.relY
-        print "target dist/bearing:",self.target.dist,self.target.bearing
-        print "target location:",self.target.x,self.target.y
-        print "target visLoc:",self.target.visDist,self.target.visBearing
-        print "target locLoc:",self.target.locDist,self.target.locBearing
-        #print "target fitness:",self.target.trackingFitness
-        print self.target.visionId
+        #print "target ID is:",target.visionId
+        #print "target on?:",target.on
+        print "target rel coords:", target.relX, target.relY
+        #print "target location:",target.x,target.y
+        #print "target dist/bearing:",target.dist,target.bearing
+        #print "target visLoc:",target.visDist,target.visBearing
+        #print "target locLoc:",target.locDist,target.locBearing
+        #print "target fitness:",target.trackingFitness
 
-        self.lookToPoint(self.target.relX, \
-                             self.target.relY, \
-                             0.0)
+        #convert from cm to mm for c++ code
+        headMove = motion.CoordHeadCommand(10*target.relX, 10*target.relY, 10*target.height,.1065*.1,.1227*.1)# arbitrary slow down for debugging
+        self.tracker.brain.motion.coordHead(headMove)
 
 # ** # old method
     def panTo(self, heads):

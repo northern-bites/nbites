@@ -231,9 +231,9 @@ class Brain(object):
 
 
         # ** # debugging
-        print "visual update:"
-        print "yglp:",self.yglp.visDist,self.yglp.visBearing
-        print "ygrp:",self.ygrp.visDist,self.ygrp.visBearing
+        #print "visual update:"
+        #print "yglp:",self.yglp.visDist,self.yglp.visBearing
+        #print "ygrp:",self.ygrp.visDist,self.ygrp.visBearing
         # ** #
 
 
@@ -246,21 +246,21 @@ class Brain(object):
         self.updateLocalization()
 
         # ** # debugging
-        print "loc update:"
-        print "yglp:",self.yglp.locDist,self.yglp.locBearing
-        print "ygrp:",self.ygrp.locDist,self.ygrp.locBearing
+        #print "loc update:"
+        #print "yglp:",self.yglp.locDist,self.yglp.locBearing
+        #print "ygrp:",self.ygrp.locDist,self.ygrp.locBearing
         # ** #
 
         # Choose whether we use Vision or Localization
         self.updateBestValues()
 
         # ** # debugging
-        print "best values:"
-        print "yglp:",self.yglp.dist,self.yglp.bearing
-        print "ygrp:",self.ygrp.dist,self.ygrp.bearing
-        print "rel values:"
-        print "yglp:",self.yglp.relX,self.yglp.relY
-        print "ygrp:",self.ygrp.relX,self.ygrp.relY
+        #print "best values:"
+        #print "yglp:",self.yglp.dist,self.yglp.bearing
+        #print "ygrp:",self.ygrp.dist,self.ygrp.bearing
+        #print "rel values:"
+        #print "yglp:",self.yglp.relX,self.yglp.relY
+        #print "ygrp:",self.ygrp.relX,self.ygrp.relY
         # ** #
 
         #Set LEDS
