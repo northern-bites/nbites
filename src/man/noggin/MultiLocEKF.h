@@ -31,6 +31,11 @@ class MultiLocEKF : public ekf::TwoMeasurementEKF<PointObservation,
                                                   ekf::loc_ekf_dimension>,
                     public LocSystem
 {
+    enum {
+        max_pt_divergence = 10,
+        max_corner_divergence = 20
+    };
+
 public:
 
     // Constructors & Destructors
@@ -202,7 +207,7 @@ private:
     template <class ObsT, class LandmarkT>
     int findNearestNeighbor(const ObsT& z){
         std::vector<LandmarkT> possiblePoints = z.getPossibilities();
-        float minDivergence = 500;//getAcceptableDivergence<LandmarkT>();
+        float minDivergence = getAcceptableDivergence<LandmarkT>();
         int minIndex = -1;
 
 #ifdef DEBUG_DIVERGENCE_CALCULATIONS

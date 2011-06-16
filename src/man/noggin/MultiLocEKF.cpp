@@ -820,13 +820,13 @@ float MultiLocEKF::getDivergence(const CornerObservation& z,
 template<>
 float MultiLocEKF::getAcceptableDivergence<CornerLandmark>() {
     // (3 sd's outside)^2 * 3
-    return ekf::corner_measurement_dim  * ekf::corner_measurement_dim *3;
+    return max_corner_divergence;
 }
 
 template<>
 float MultiLocEKF::getAcceptableDivergence<PointLandmark>() {
     // (3 sd's outside)^2 * 2
-    return ekf::dist_bearing_meas_dim * ekf::dist_bearing_meas_dim * 3;
+    return max_pt_divergence;
 }
 
 /**
