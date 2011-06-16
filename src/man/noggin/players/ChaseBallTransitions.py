@@ -15,19 +15,23 @@ def shouldChaseBall(player):
 
 def shouldChaseFromPositionForKick(player):
     """
-    Exit PFK if the ball is too far away.
+    Exit PFK if the ball is too far away. This should be
+    like shouldPFK but with a slightly larger range to avoid
+    oscillations between chase and PFK.
     """
     ball = player.brain.ball
-    return shouldChaseBall(player) and \
-        not shouldPositionForKick(player) and \
-        ball.dist > constants.BALL_PFK_DIST+10
+    return (shouldChaseBall(player) and
+            ball.dist > constants.BALL_PFK_DIST+5 and
+            (constants.BALL_PFK_LEFT_Y+5 < ball.relY <
+             constants.BALL_PFK_RIGHT_Y-5))
 
 def shouldPositionForKick(player):
     """
     Should begin aligning on the ball for a kick when close
     """
     ball = player.brain.ball
-    return (ball.on and ball.dist < constants.BALL_PFK_DIST and
+    return (shouldChaseBall(player) and
+            ball.dist < constants.BALL_PFK_DIST and
             (constants.BALL_PFK_LEFT_Y > ball.relY >
              constants.BALL_PFK_RIGHT_Y))
 
@@ -45,7 +49,8 @@ def shouldSpinToBall(player):
     Ball is close and we should spin before we decide our kick
     """
     ball = player.brain.ball
-    return ((ball.on and not shouldPositionForKick(player) and
+    return ((shouldChaseBall(player) and
+             not shouldPositionForKick(player) and
              ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST) or
             (ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
 
@@ -93,7 +98,7 @@ def shouldKickOff(player):
     """
     Determines whether we should do our KickOff play as chaser
     """
-    return (not player.hasKickedOffKick)
+    return (not player.hasKickedOff)
 
 ####### PENALTY KICK STUFF ###########
 
