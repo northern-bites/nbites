@@ -26,10 +26,7 @@ set( ColorCreator_srcs
   Stats.cpp )
 
 set(ColorCreator_headers ColorCreator.h
-    ColorZone.h
     ColorEdit.h
-    ColorTable.h
-    Stats.h
 )
 
 set(ColorCreator_forms ColorCreator.ui)
