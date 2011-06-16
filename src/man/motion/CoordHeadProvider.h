@@ -18,69 +18,79 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef _HeadProvider_h_DEFINED
-#define _HeadProvider_h_DEFINED
+#ifndef _CoordHeadProvider_h_DEFINED
+#define _ScriptedProvider_h_DEFINED
 
 #include <vector>
 #include <queue>
 #include <boost/shared_ptr.hpp>
 
 #include "MotionProvider.h"
-#include "HeadJointCommand.h"
-#include "SetHeadCommand.h"
+#include "BodyJointCommand.h"
+#include "CoordHeadCommand.h"
 #include "Sensors.h"
 #include "ChopShop.h"
+#include "ChoppedCommand.h"
 #include "Kinematics.h"
 
-class HeadProvider : public MotionProvider {
+#include "Profiler.h"
+#include "NaoPose.h"
+
+
+class CoordHeadProvider : public MotionProvider {
 public:
-    HeadProvider(boost::shared_ptr<Sensors> s,
-				 boost::shared_ptr<Profiler> p);
-    virtual ~HeadProvider();
+    CoordHeadProvider(boost::shared_ptr<Sensors> s,
+                      boost::shared_ptr<Profiler> p,
+                      boost::shared_ptr<NaoPose> _pose);
+    virtual ~CoordHeadProvider();
 
     void requestStopFirstInstance();
     void calculateNextJointsAndStiffnesses();
 
     void hardReset();
 
-	void enqueueSequence(std::vector<HeadJointCommand*> &seq);
-	void setCommand(const SetHeadCommand* command);
-	void setCommand(const HeadJointCommand* command);
+    void setCommand(const CoordHeadCommand* command);
 
 private:
     enum HeadMode {
         SCRIPTED,
         SET,
-	COORD
+        COORD
     };
-
     void transitionTo(HeadMode newMode);
-    void setMode();
-    void scriptedMode();
-    void stopScripted();
+    void coordMode();
     void stopSet();
 
     void setActive();
     bool isDone();
 
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<NaoPose> pose;
     ChopShop chopper;
     std::vector< std::vector<float> > nextJoints;
 
 
     boost::shared_ptr<ChoppedCommand> currCommand;
     // Queue of all future commands
-    std::queue<const HeadJointCommand*> headCommandQueue;
 
     HeadMode curMode;
     float yawDest,pitchDest,lastYawDest,lastPitchDest;
     float pitchMaxSpeed, yawMaxSpeed;
     float headSetStiffness;
 
-    pthread_mutex_t head_provider_mutex;
+    pthread_mutex_t coord_head_provider_mutex;
 
     std::vector<float> getCurrentHeads();
     void setNextHeadCommand();
+
+	//constants
+    //lower camera
+    static const float CAMERA_ANGLE = 0.6981f;
+	//clip constants for setCommand()
+	static const float YAW_CLIP = 1.9f;
+	static const float PITCH_MIN_CLIP = -0.65f;
+	static const float PITCH_MAX_CLIP = 0.5f;
+	static const float SPEED_CLIP_FACTOR = 0.35f;
 };
 
 #endif

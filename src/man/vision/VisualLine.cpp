@@ -460,3 +460,16 @@ const bool VisualLine::hasPositiveID()
 {
     return possibleLines.size() == 1;
 }
+
+const std::vector<lineID> VisualLine::getIDs() {
+  std::vector<lineID> poss;
+
+  for (list<const ConcreteLine*>::const_iterator 
+	 currLine = possibleLines.begin();
+       currLine != possibleLines.end(); currLine++) {
+    poss.push_back((**currLine).getID());
+  }
+
+  return poss;
+}
+

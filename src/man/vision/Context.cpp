@@ -1707,6 +1707,15 @@ vector<const VisualFieldObject*> Context::getAllVisibleFieldObjects() const
     return visibleObjects;
 }
 
+/* This is called when we have identified a robot and a ball. We'll
+   check how likely it is that the robot might kick the ball and try
+   and determine a level of danger and a possible direction.
+ */
+void Context::checkForKickDanger(VisualRobot *robot) {
+	//cout << "Checking for kick danger " << robot->getDistance() <<
+	//	" " << vision->ball->getDistance() << endl;
+}
+
 /* In some Nao frames, robots obscure part of the goal and the bottom is not
    visible.  We can only use pix estimates of goals whose bottoms are visible
    @param goal       a goal we'd like to check distances to

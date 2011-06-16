@@ -27,7 +27,7 @@ from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
 from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet,
-                       Play, TeamMember)
+                       Play, TeamMember, FieldLines, FieldEdge)
 from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
@@ -94,6 +94,7 @@ class Brain(object):
         self.initFieldObjects()
         self.initTeamMembers()
         self.ball = Ball.Ball(self.vision.ball)
+        self.fieldEdge = FieldEdge.FieldEdge(self.vision.fieldEdge)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
 
@@ -135,9 +136,11 @@ class Brain(object):
         # self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
         #                                      Constants.VISION_YG_CROSSBAR)
 
-        # # Now we setup the corners
-        # self.corners = []
-        # self.lines = []
+        # Now we setup the corners and lines
+        self.fieldLines = FieldLines.FieldLines(self.vision.fieldLines)
+
+        self.corners = self.fieldLines.corners
+        self.lines = self.fieldLines.lines
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
@@ -260,6 +263,7 @@ class Brain(object):
         Update information about seen objects
         """
         self.ball.updateVision(self.vision.ball)
+        self.fieldEdge.updateVision(self.vision.fieldEdge)
 
         self.yglp.updateVision(self.vision.yglp)
         self.ygrp.updateVision(self.vision.ygrp)
@@ -270,11 +274,14 @@ class Brain(object):
         #self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
         # # Update the corner information
-        # self.corners = []
+        self.fieldLines.updateCorners(self.vision.fieldLines)
+        self.corners = self.fieldLines.corners
 
         self.time = time.time()
+
         # # Now we get the latest list of lines
-        # self.lines = []
+        self.fieldLines.updateLines(self.vision.fieldLines)
+        self.lines = self.fieldLines.lines
 
     def updateComm(self):
         temp = self.comm.latestComm()

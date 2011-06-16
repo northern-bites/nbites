@@ -46,6 +46,7 @@ SWARM_ITERATION_LIMIT = 25 # wikipedia says this should be enough to converge?
 RESART_PSO_ON_COMPLETION = False # after 25 iterations, restart or exit?
 
 RUN_ONCE_STOP = True
+REPORT_AFTER_RUN = True # saves the best gait after each run (may save duplicates)
 
 # Set of walk vectors that the robot must be able to complete before we start
 # giving it random omni-walks. These go from easier to harder, in theory
@@ -178,9 +179,13 @@ def newOptimizeParameters(player):
    Controls what we do after every optimization run,
    pointer state to more interesting places
    """
+   if REPORT_AFTER_RUN:
+      reportBestGait(player)
+
    if player.swarm.getIterations() > SWARM_ITERATION_LIMIT:
        print "Swarm is done optimizing!"
-       return player.goLater('reportBestGait')
+       reportBestGait(player)
+       return player.goLater('gamePenalized')
 
    elif RUN_ONCE_STOP:
        return player.goLater('gamePenalized')
@@ -209,34 +214,22 @@ def stopChangeGait(player):
     return player.stay()
 
 def reportBestGait(player):
-   if player.firstFrame():
-       (bestGaitArray, gaitScore) = player.swarm.getBestSolution()
-       bestGaitTuple = arrayToGaitTuple(bestGaitArray)
+   (bestGaitArray, gaitScore) = player.swarm.getBestSolution()
+   bestGaitTuple = arrayToGaitTuple(bestGaitArray)
 
-       player.printf("best found gait's heuristic score was: %s" % gaitScore)
+   player.printf("best found gait's heuristic score was: %s" % gaitScore)
 
-       try:
-           gaitScore = int(gaitScore)
-           output = BEST_GAIT_FILE + str(gaitScore) + ".py"
+   try:
+      gaitScore = int(gaitScore)
+      output = BEST_GAIT_FILE + str(gaitScore) + ".py"
 
-           i = 1
-           while isfile(output):
-               output = BEST_GAIT_FILE + str(gaitScore) + "." + str(i) + ".py"
-               i += 1
+      player.printf("best gait saved to file: %s" % output)
+      f = open(output, 'w')
+      writeGaitToFile(f, bestGaitTuple, gaitScore)
+      f.close()
 
-           player.printf("best gait saved to file: %s" % output)
-           f = open(output, 'w')
-           writeGaitToFile(f, bestGaitTuple, gaitScore)
-           f.close()
-
-       except:
-           player.printf("error writing out gait")
-
-   if RESART_PSO_ON_COMPLETION:
-       return player.goLater('restartOptimization')
-   else:
-       player.printf("Finished optimization run, check out the gait!")
-       return player.goLater('gamePenalized')
+   except:
+      player.printf("error writing out gait")
 
 def restartOptimization(player):
    '''

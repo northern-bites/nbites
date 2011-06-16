@@ -119,6 +119,20 @@ CONFIGURE_FILE(
   ESCAPE_QUOTES
   )
 
+IF ( NOT USE_TTS )
+  SET( USE_TTS_POUND "#" )
+ELSE()
+  SET( USE_TTS_POUND "" )
+ENDIF()
+
+SET( AUTOLOAD_INI ${CFG_DIR}/autoload.ini )
+
+CONFIGURE_FILE(
+  ${MAN_CMAKE_DIR}/autoload.ini.in
+  ${CFG_DIR}/autoload.ini
+  ESCAPE_QUOTES
+  )
+
 ############################ DEFINITIONS
 # Add here definition needed.
 ADD_DEFINITIONS(
@@ -191,6 +205,11 @@ INSTALL(
 INSTALL(
   FILES ${MAN_PYTHON_SRCS}
   DESTINATION ${MAN_PYTHON_TARGET_DIR}
+  CONFIGURATIONS "" Debug Release
+  )
+INSTALL(
+  FILES ${AUTOLOAD_INI}
+  DESTINATION ${OUTPUT_ROOT_DIR_PREF}
   CONFIGURATIONS "" Debug Release
   )
 

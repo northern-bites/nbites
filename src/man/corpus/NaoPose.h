@@ -209,6 +209,8 @@ class NaoPose {
     }
     const float getBodyCenterHeight() const { return comHeight; }
     const float getFocalPointInWorldFrameZ() const { return focalPointInWorldFrame.z;}
+    const float getFocalPointInWorldFrameX() const { return focalPointInWorldFrame.x;}
+    const float getFocalPointInWorldFrameY() const { return focalPointInWorldFrame.y;}
 
  protected: // helper methods
     static const boost::numeric::ublas::matrix <float>

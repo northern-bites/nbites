@@ -188,10 +188,10 @@ void Vision::drawBoxes(void)
 
     // balls
     // orange
-    if(ball->getWidth() > 0)
+    /*if(ball->getWidth() > 0)
         drawRect(ball->getX(), ball->getY(),
                  NBMath::ROUND(ball->getWidth()),
-                 NBMath::ROUND(ball->getHeight()), PINK);
+                 NBMath::ROUND(ball->getHeight()), PINK);*/
 
     // lines
     drawFieldLines();
@@ -201,7 +201,7 @@ void Vision::drawBoxes(void)
              pose->getLeftHorizon().y,
              pose->getRightHorizon().x,
              pose->getRightHorizon().y,
-             BLUE);
+             MAROON);
 
     // vision horizon line
     drawPoint(IMAGE_WIDTH/2, thresh->getVisionHorizon(), RED);

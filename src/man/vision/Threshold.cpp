@@ -274,24 +274,27 @@ void Threshold::runs() {
  */
 
 void Threshold::findGoals(int column, int topEdge) {
-    const int BADSIZE = 5;
-	const int GAP = 25;
+    const int BADSIZE = 10;
+	const int GAP = 15;
     // scan up for goals
     int bad = 0, blues = 0, yellows = 0, pinks = 0;
     int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge,
         lastYellow = topEdge, firstPink = topEdge, lastPink = topEdge;
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
+	int blueRun = 0;
     for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
         if (Utility::isBlue(pixel)) {
-            lastBlue = j;
-            blues++;
-            bad--;
-            if (firstBlue == topEdge) {
-                firstBlue = j;
-            }
+			if (j - lastBlue < 4) {
+				lastBlue = j;
+				blues++;
+				bad--;
+				if (firstBlue == topEdge) {
+					firstBlue = j;
+				}
+			}
         }
         if (Utility::isYellow(pixel)) {
             lastYellow = j;
@@ -320,18 +323,24 @@ void Threshold::findGoals(int column, int topEdge) {
     }
     // now do the same going down from the horizon
     bad = 0;
+	blueRun = 0;
+	int greens = 0;
     for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
         // note:  These were thresholded in the findBallsCrosses loop
         unsigned char pixel = getThresholded(j,column);
         bool found = false;
-        if (Utility::isBlue(pixel)) {
-            firstBlue = j;
-            blues++;
+        if (Utility::isBlue(pixel) && !Utility::isGreen(pixel)) {
+            //blues++;
+			//blueRun++;
+			if (blueRun > 3 && greens < 4) {
+				firstBlue = j;
+			}
             found = true;
         }
         if (Utility::isYellow(pixel)) {
             firstYellow = j;
             yellows++;
+			blueRun = 0;
             found = true;
         }
         if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
@@ -340,9 +349,12 @@ void Threshold::findGoals(int column, int topEdge) {
         }
         if (Utility::isGreen(pixel)) {
             bad++;
+			blueRun = 0;
+			greens++;
         }
         if (!found) {
             bad++;
+			blueRun = 0;
         }
     }
     if (blues > 10) {
@@ -1113,13 +1125,20 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 
         // sets focal distance of the field object
         objPtr->setFocDist(objPtr->getDistance());
-        // convert dist + angle estimates to body center
-        estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
-                                              objPtr->getDistance());
-        objPtr->setDistanceWithSD(obj_est.dist);
-        objPtr->setBearingWithSD(obj_est.bearing);
-        objPtr->setElevation(obj_est.elevation);
+		estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
+											  objPtr->getCenterY(),
+											  265.0f);
+		// convert dist + angle estimates to body center
+		estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
+											  objPtr->getCenterY(),
+											  pose_est.dist);
+		objPtr->setDistanceWithSD(obj_est.dist);
+		objPtr->setBearingWithSD(obj_est.bearing);
+		objPtr->setElevation(obj_est.elevation);
+		// now that we have the robot information check if it might kick
+		if (vision->ball->getWidth() > 0) {
+			context->checkForKickDanger(objPtr);
+		}
     } else {
         objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
@@ -1310,7 +1329,7 @@ void Threshold::initTable(std::string filename) {
         }
 
 #ifndef OFFLINE
-    print("Loaded colortable %s",filename.c_str());
+    print("Loaded colortable %s\n",filename.c_str());
 #endif
 
     fclose(fp);

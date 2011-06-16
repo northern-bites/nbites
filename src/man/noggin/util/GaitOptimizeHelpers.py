@@ -4,6 +4,8 @@
 # @author Nathan Merritt
 # @date May 2011
 
+import time
+
 def gaitToArray(gait):
     list = []
     for section in gait:
@@ -36,16 +38,18 @@ def writeGaitToFile(file, gait, gaitNumber):
     The file will need indentation tuneups, but otherwise it's good to go
     '''
 
+    file.write("import man.motion as motion\n\n")
+
     for i in range (0, len(GAIT_SECTION_NAMES)):
         declaration =  GAIT_SECTION_NAMES[i] + "_" + str(gaitNumber) + " = ("
         file.write(declaration)
 
-        for value in gait:
+        for value in gait[i]:
             file.write(str(value))
             file.write(",\n")
-        file.write(")\n")
+        file.write(")\n\n")
 
-    file.write("\n\n")
+    file.write("\n")
 
     gait_declaration = "gait_" + str(gaitNumber) + " = motion.GaitCommand(\n"
     file.write(gait_declaration)
@@ -56,3 +60,4 @@ def writeGaitToFile(file, gait, gaitNumber):
         file.write(declaration)
 
     file.write(")\n\n")
+

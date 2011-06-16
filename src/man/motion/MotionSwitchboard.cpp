@@ -20,24 +20,25 @@ const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 
 
 MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
-									 shared_ptr<Profiler> p)
+                                     shared_ptr<Profiler> p,
+                                     shared_ptr<NaoPose> pose)
     : sensors(s),
-	  profiler(p),
-      walkProvider(sensors, p),
-      // HOW SHOULD WE PASS FRAME_LENGTH??? HACK!
-	  scriptedProvider(sensors, p),
-	  headProvider(sensors, p),
+      profiler(p),
+      walkProvider(sensors, pose, p),
+      scriptedProvider(sensors, p),
+      headProvider(sensors, p),
+      coordHeadProvider(sensors, p, pose),
       nullHeadProvider(sensors, p),
       nullBodyProvider(sensors, p),
-	  curProvider(&nullBodyProvider),
-	  nextProvider(&nullBodyProvider),
+      curProvider(&nullBodyProvider),
+      nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
       nextHeadProvider(&nullHeadProvider),
       sensorAngles(s->getBodyAngles()),
       nextJoints(sensorAngles),
       nextStiffnesses(vector<float>(NUM_JOINTS,0.0f)),
       lastJoints(sensorAngles),
-	  running(false),
+      running(false),
       newJoints(false),
       readyToSend(false),
       noWalkTransitionCommand(true)
@@ -64,7 +65,6 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
     boost::shared_ptr<Gait> defaultGait(new Gait(DEFAULT_GAIT));
 
     sendMotionCommand(defaultGait);
-
 }
 
 MotionSwitchboard::~MotionSwitchboard() {
@@ -125,14 +125,14 @@ void MotionSwitchboard::run() {
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
     while(running) {
-		PROF_ENTER(profiler, P_SWITCHBOARD);
+        PROF_ENTER(profiler, P_SWITCHBOARD);
         realityCheckJoints();
 
         preProcess();
         processJoints();
         processStiffness();
         bool active  = postProcess();
-		PROF_EXIT(profiler, P_SWITCHBOARD);
+        PROF_EXIT(profiler, P_SWITCHBOARD);
 
         if(active)
         {
@@ -232,15 +232,15 @@ bool MotionSwitchboard::postProcess(){
     //and we have the next provider ready, then we want to swap to ensure
     //that we never have an inactive provider when an active one is potentially
     //ready to take over:
-	if (curProvider != nextProvider && !curProvider->isActive())
+    if (curProvider != nextProvider && !curProvider->isActive())
     {
         swapBodyProvider();
-	}
+    }
 
     if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
     {
         swapHeadProvider();
-	}
+    }
 
     // Update sensors with the correct support foot because it may have
     // changed this frame.
@@ -251,7 +251,7 @@ bool MotionSwitchboard::postProcess(){
 
     pthread_mutex_unlock(&next_provider_mutex);
 
-    //return if one of the enactors
+    //return if one of the enactors is active
     return curProvider->isActive() || curHeadProvider->isActive();
 }
 
@@ -264,11 +264,11 @@ void MotionSwitchboard::processHeadJoints()
 
     if (curHeadProvider->isActive())
     {
-		// Calculate the next joints and get them
-		curHeadProvider->calculateNextJointsAndStiffnesses();
+        // Calculate the next joints and get them
+        curHeadProvider->calculateNextJointsAndStiffnesses();
 
-		// get headJoints from headProvider
-		vector <float > headJoints = curHeadProvider->getChainJoints(HEAD_CHAIN);
+        // get headJoints from headProvider
+        vector <float > headJoints = curHeadProvider->getChainJoints(HEAD_CHAIN);
 
         clipHeadJoints(headJoints);
 
@@ -303,16 +303,16 @@ void MotionSwitchboard::processBodyJoints()
 #endif
     if (curProvider->isActive())
     {
-		//Request new joints
-		curProvider->calculateNextJointsAndStiffnesses();
-		const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
-		const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
-		const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
+        //Request new joints
+        curProvider->calculateNextJointsAndStiffnesses();
+        const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
+        const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
+        const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
 
-		const vector <float > larmJoints = curProvider->getChainJoints(LARM_CHAIN);
+        const vector <float > larmJoints = curProvider->getChainJoints(LARM_CHAIN);
 
-		//Copy the new values into place, and wait to be signaled.
-		pthread_mutex_lock(&next_joints_mutex);
+        //Copy the new values into place, and wait to be signaled.
+        pthread_mutex_lock(&next_joints_mutex);
 
         for(unsigned int i = 0; i < LEG_JOINTS; i ++)
         {
@@ -348,13 +348,14 @@ void MotionSwitchboard::processBodyJoints()
 
 void MotionSwitchboard::preProcessHead()
 {
-    if (curProvider != &nullHeadProvider &&
-        nextProvider == &nullHeadProvider)
+    if (curHeadProvider != &nullHeadProvider &&
+        nextHeadProvider == &nullHeadProvider)
     {
         headProvider.hardReset();
+        coordHeadProvider.hardReset();
     }
 
-	if (curHeadProvider != nextHeadProvider)
+    if (curHeadProvider != nextHeadProvider)
     {
         if (!curHeadProvider->isActive())
         {
@@ -368,7 +369,7 @@ void MotionSwitchboard::preProcessHead()
 #endif
             curHeadProvider->requestStop();
         }
-	}
+    }
 }
 
 void MotionSwitchboard::preProcessBody()
@@ -381,7 +382,7 @@ void MotionSwitchboard::preProcessBody()
     }
 
     //determine the curProvider, and do any necessary swapping
-	if (curProvider != nextProvider)
+    if (curProvider != nextProvider)
     {
         if (!curProvider->isActive())
         {
@@ -394,7 +395,7 @@ void MotionSwitchboard::preProcessBody()
 #endif
             curProvider->requestStop();
         }
-	}
+    }
 }
 
 void MotionSwitchboard::clipHeadJoints(vector<float>& joints)
@@ -732,7 +733,7 @@ void MotionSwitchboard::sendMotionCommand(const WalkCommand *command){
 }
 void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
     pthread_mutex_lock(&next_provider_mutex);
-	noWalkTransitionCommand = true;
+    noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
     scriptedProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
@@ -747,8 +748,8 @@ void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
 }
 void MotionSwitchboard::sendMotionCommand(const CoordHeadCommand * command){
     pthread_mutex_lock(&next_provider_mutex);
-    nextHeadProvider = &headProvider;
-    headProvider.setCommand(command);
+    nextHeadProvider = &coordHeadProvider;
+    coordHeadProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
 
 }

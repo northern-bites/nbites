@@ -82,38 +82,54 @@ Field::Field(Vision* vis, Threshold * thr)
 void Field::initialScanForTopGreenPoints(int pH) {
 	int good, ok, top;
 	unsigned char pixel;
+	int topGreen = 0;
+	int greenRun = 0;
 	// we need a better criteria for what the top is
 	for (int i = 0; i < HULLS; i++) {
 		good = 0;
 		ok = 0;
-		int poseProject = yProject(0, pH, i * SCANSIZE);
+		int poseProject = thresh->blue->yProject(0, pH, i * SCANSIZE);
 		if (poseProject <= 0) {
 			poseProject = 0;
+		} else if (pH == 0) {
+			poseProject = 0;
 		}
+		topGreen = IMAGE_HEIGHT - 1;
+		greenRun = 0;
 		for (top = max(poseProject, 0);
 				good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
 			// scan until we find a run of green pixels
 			int x = i * SCANSIZE;
-			if (i == HULLS - 1)
+			if (i == HULLS - 1) {
 				x--;
+			}
 			pixel = thresh->getColor(x, top);
 			//pixel = thresh->thresholded[top][x];
-			if (Utility::isGreen(pixel)) {
+			if (Utility::isGreen(pixel) || Utility::isOrange(pixel)) {
 				good++;
+				greenRun++;
+				if (greenRun > 3 && topGreen == IMAGE_HEIGHT - 1) {
+					topGreen = top - greenRun;
+				}
+			} else if (Utility::isOrange(pixel) || Utility::isWhite(pixel)) {
+				//good++;
+				greenRun = 0;
 			} else if (Utility::isUndefined(pixel)) {
 				ok++;
 				if (ok > SCANNOISE) {
 					good = 0;
 					ok = 0;
 				}
+				greenRun = 0;
 			} else {
 				good = 0;
 				ok = 0;
+				greenRun = 0;
 			}
 		}
 		if (good == RUNSIZE) {
-			convex[i] = point<int>(i * SCANSIZE, top - good);
-			if (poseProject < 0 && top - good < 10) {
+			convex[i] = point<int>(i * SCANSIZE, topGreen);
+			if (poseProject < 0 && topGreen < 10) {
 				convex[i] = point<int>(i * SCANSIZE, 0);
             }
 		} else {
@@ -121,6 +137,17 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		}
 		if (debugFieldEdge) {
 			vision->drawPoint(i * SCANSIZE, convex[i].y, MAROON);
+		}
+	}
+	// look for odd spikes and quell them
+	for (good = 1; good < HULLS - 1; good++) {
+		if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
+			convex[good].y > 15) {
+			if (debugFieldEdge) {
+				cout << "Spike at " << convex[good].x << " " << convex[good].y <<
+					endl;
+			}
+			convex[good].y = convex[good-1].y;
 		}
 	}
 	for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
@@ -263,6 +290,7 @@ int Field::ccw(point<int> p1, point<int> p2, point<int> p3) {
  */
 int Field::getInitialHorizonEstimate(int pH) {
 	const int MIN_PIXELS_INITIAL = 8;
+	const int MIN_PIXELS_HARDER = 20;
 	const int SCAN_INTERVAL_X = 10;
 	const int SCAN_INTERVAL_Y = 4;
 	//variable definitions
@@ -270,6 +298,10 @@ int Field::getInitialHorizonEstimate(int pH) {
 	register int i, j;
 	unsigned char pixel; //, lastPixel;
 
+	int pixelsNeeded = MIN_PIXELS_HARDER;
+	if (pH < -100) {
+		pixelsNeeded = MIN_PIXELS_INITIAL;
+	}
 	horizon = -1;			 // our calculated horizon
 	run = 0;				 // how many consecutive green pixels have I seen?
 	greenPixels = 0;		 // count for any given line
@@ -285,7 +317,7 @@ int Field::getInitialHorizonEstimate(int pH) {
 		// we do a scan based on the slope provided by pose
 		// and we only look at every 10th pixel
 		for (i = 0; i < IMAGE_WIDTH && scanY < IMAGE_HEIGHT && scanY > -1
-				 && greenPixels <= MIN_PIXELS_INITIAL; i+= SCAN_INTERVAL_X) {
+				 && greenPixels <= pixelsNeeded; i+= SCAN_INTERVAL_X) {
 			//pixel = thresh->thresholded[scanY][i];
 			pixel = thresh->getColor(i, scanY);
 			// project the line to get the next y value
@@ -298,7 +330,7 @@ int Field::getInitialHorizonEstimate(int pH) {
 			}
 		}
 		// once we see enough green we're done
-		if (greenPixels > MIN_PIXELS_INITIAL) {
+		if (greenPixels > pixelsNeeded) {
 			return j;
 		}
 	}
@@ -329,13 +361,14 @@ int Field::getImprovedEstimate(int horizon) {
 		greenPixels = 0;
 		run = 0;
 		scanY = 0;
+		int maxRun = 0;
 		for (l = max(0, firstpix - 5), firstpix = -1; l < IMAGE_WIDTH && scanY <
                  IMAGE_HEIGHT && scanY > -1 && run < MIN_GREEN_SIZE &&
-                 greenPixels < MIN_PIXELS_PRECISE; l+=3) {
+                 (greenPixels < MIN_PIXELS_PRECISE || maxRun < 5); l+=3) {
 			if (debugHorizon) {
 				vision->drawPoint(l, scanY, BLACK);
 			}
-			int newPixel = thresh->getColor(l, scanY);
+			unsigned char newPixel = thresh->getColor(l, scanY);
 			//int newPixel = thresh->thresholded[scanY][l];
 			if (Utility::isGreen(newPixel)) {
 				// firstpix tracks where we saw the first green pixel
@@ -348,6 +381,9 @@ int Field::getImprovedEstimate(int horizon) {
 					}
 				}
 				run++;
+				if (run > maxRun) {
+					maxRun = run;
+				}
 				greenPixels++;
 			} else {
 				run = 0;
@@ -357,7 +393,8 @@ int Field::getImprovedEstimate(int horizon) {
 		}
 		// now check how we did in this scanline - remember now we are
 		// looking for the first line where we DON'T have lots of green
-		if (run < MIN_GREEN_SIZE && greenPixels < MIN_PIXELS_PRECISE) {
+		if (run < MIN_GREEN_SIZE && (greenPixels < MIN_PIXELS_PRECISE ||
+									 maxRun < 5)) {
 			// first make sure we didn't get fooled by firstpix
 			run = 0;
 			scanY = firstpix;

@@ -117,6 +117,13 @@
 #  undef  USING_LAB_FIELD
 #endif
 
+#define USING_TTS_${USE_TTS}
+#ifdef USING_TTS_ON
+#  define USING_TTS
+#else
+#  undef USING_TTS
+#endif
+
 #endif // !_manconfig_h
 
 

@@ -28,12 +28,11 @@ using boost::shared_ptr;
 
 //#define DEBUG_HEADPROVIDER
 
-HeadProvider::HeadProvider(shared_ptr<Sensors> s,
-						   shared_ptr<Profiler> p)
+HeadProvider::HeadProvider(shared_ptr<Sensors> s,shared_ptr<Profiler> p)
 	: MotionProvider(HEAD_PROVIDER, p),
 	  sensors(s),
 	  chopper(sensors),
-      nextJoints(),
+	  nextJoints(),
 	  currCommand(new ChoppedCommand() ),
 	  headCommandQueue(),
 	  curMode(SCRIPTED),
@@ -49,7 +48,6 @@ HeadProvider::HeadProvider(shared_ptr<Sensors> s,
 // Motion Provider Methods
 HeadProvider::~HeadProvider() {
     pthread_mutex_destroy(&head_provider_mutex);
-    // remove all remaining values from chain queues
 }
 
 void HeadProvider::requestStopFirstInstance() {
@@ -80,7 +78,6 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
     case SCRIPTED:
         scriptedMode();
         break;
-	case COORD:
     case SET:
         setMode();
         break;
@@ -145,20 +142,7 @@ void HeadProvider::scriptedMode(){
 
 
 }
-void HeadProvider::setCommand(const CoordHeadCommand *command) {
-    pthread_mutex_lock(&head_provider_mutex);
-    transitionTo(COORD);
 
-	yawDest = command->getYaw();
-	pitchDest = command->getPitch();
-
-	yawMaxSpeed = command->getMaxSpeedYaw();
-	pitchMaxSpeed = command->getMaxSpeedPitch();
-
-    setActive();
-    pthread_mutex_unlock(&head_provider_mutex);
-
-}
 void HeadProvider::setCommand(const SetHeadCommand *command) {
     pthread_mutex_lock(&head_provider_mutex);
     transitionTo(SET);
@@ -214,12 +198,9 @@ void HeadProvider::setActive(){
 
 
 bool HeadProvider::isDone(){
-    const bool setDone = ((yawDest == lastYawDest) &&
-						  (pitchDest == lastPitchDest));
-    const bool scriptedDone = (currCommand->isDone()  &&
-							   headCommandQueue.empty());
+    const bool setDone = ((yawDest == lastYawDest) && (pitchDest == lastPitchDest));
+    const bool scriptedDone = (currCommand->isDone()  && headCommandQueue.empty());
     switch(curMode){
-    case COORD:
     case SET:
         return setDone;
         break;
@@ -254,7 +235,6 @@ void HeadProvider::transitionTo(HeadMode newMode){
         case SCRIPTED:
             stopScripted();
             break;
-		case COORD:
         case SET:
             //If we need to switch modes, then we may not know what the latest
             //angles are, so lets get them again from sensors
