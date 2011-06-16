@@ -19,20 +19,20 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 ########### Sources
 
 set( ColorCreator_srcs
-  colorcreator.cpp
+  ColorCreator.cpp
   colorzone.cpp
   coloredit.cpp
   colortable.cpp
   stats.cpp )
 
-set(ColorCreator_headers colorcreator.h
+set(ColorCreator_headers ColorCreator.h
     colorzone.h
     coloredit.h
     colortable.h
     stats.h
 )
 
-set(ColorCreator_forms colorcreator.ui)
+set(ColorCreator_forms ColorCreator.ui)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
   /usr/include/qt4

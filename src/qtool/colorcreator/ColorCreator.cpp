@@ -1,4 +1,4 @@
-#include "colorcreator.h"
+#include "ColorCreator.h"
 #include "ui_colorcreator.h"
 #include "math.h"
 

@@ -12,7 +12,7 @@
 #include <qtabwidget.h>
 
 #include "data/DataManager.h"
-#include "colorcreator/colorcreator.h"
+#include "colorcreator/ColorCreator.h"
 
 namespace qtool {
 
