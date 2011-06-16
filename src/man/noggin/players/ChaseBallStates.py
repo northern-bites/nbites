@@ -22,8 +22,8 @@ def chase(player):
         return player.goNow('kickOff')
     elif transitions.shouldSpinToBall(player):
         return player.goNow('spinToBall')
-    elif transitions.shouldStopBeforeKick(player):
-        return player.goNow('stopBeforeKick')
+    elif transitions.shouldClaimBall(player):
+        return player.goNow('claimBall')
     elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
     else:
@@ -48,8 +48,8 @@ def goalieChase(player):
         return player.goNow('approachDangerousBall')
     elif transitions.shouldSpinToBall(player):
         return player.goNow('spinToBall')
-    elif transitions.shouldStopBeforeKick(player):
-        return player.goNow('stopBeforeKick')
+    elif transitions.shouldClaimBall(player):
+        return player.goNow('claimBall')
     elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
     else:
@@ -66,8 +66,8 @@ def approachBall(player):
         return player.goLater('scanFindBall')
     elif transitions.shouldSpinToBall(player):
         return player.goNow('spinToBall')
-    elif transitions.shouldStopBeforeKick(player):
-        return player.goNow('stopBeforeKick')
+    elif transitions.shouldClaimBall(player):
+        return player.goNow('claimBall')
     elif transitions.shouldPositionForKick(player):
         return player.goNow('decideKick')
 

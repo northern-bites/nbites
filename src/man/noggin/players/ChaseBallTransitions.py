@@ -47,10 +47,10 @@ def shouldPositionForKick(player):
             (constants.BALL_PFK_LEFT_Y > ball.relY >
              constants.BALL_PFK_RIGHT_Y))
 
-def shouldStopBeforeKick(player):
+def shouldClaimBall(player):
     """
-    Ball is right in front of us but we aren't stopped
-    Used before we have a kick decided
+    Ball is right in front of us but we would kick it away if we tried
+    to decide the kick on the move. So go claim it first.
     """
     ball = player.brain.ball
     return (shouldPositionForKick(player) and

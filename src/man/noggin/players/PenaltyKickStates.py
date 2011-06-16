@@ -53,8 +53,7 @@ def penaltyKickShortDribble(player):
     if player.firstFrame():
         player.penaltyMadeFirstKick = True
     if transitions.shouldStopPenaltyKickDribbling(player):
-
-        if transitions.shouldStopBeforeKick(player):
+        if transitions.shouldClaimBall(player):
             return player.goLater('chase')
         elif transitions.shouldPositionForKick(player):
             return player.goLater('positionForKick')
