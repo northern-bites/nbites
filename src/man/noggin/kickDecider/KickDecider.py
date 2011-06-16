@@ -193,11 +193,10 @@ class KickDecider(object):
         elif (my.h <= 135. and my.h > 45.):
             print "LEFT_SIDE"
             return kicks.LEFT_SIDE_KICK
-        elif (my.h >= -135. and my.h < -45.):
+       # elif (my.h >= -135. and my.h < -45.):
+        else:
             print "RIGHT_SIDE"
             return kicks.RIGHT_SIDE_KICK
-        else:
-            return self.chooseBackKick()
 
     def chooseDynamicKick(self):
         ball = self.brain.ball
