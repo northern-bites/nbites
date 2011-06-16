@@ -142,6 +142,7 @@ static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 bool isFalling(float angle_pos, float angle_vel){
     if (angle_pos < 0){
         //then we only care if the velocity is negative
+	cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos << endl;
         if(angle_vel < -FALL_SPEED_THRESH)
             return true;
     }else{

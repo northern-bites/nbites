@@ -749,7 +749,7 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 	interval.tv_nsec = 100000;
 
     while (result == -2) {
-		// send the udp message
+	// send the udp message
         result = ::sendto(sockn, msg, len, 0, (struct sockaddr*)&addr,
                           sizeof(broadcast_addr));
 	//cout << "Comm::send() : result == " << result << endl;
@@ -775,7 +775,7 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 
     // record last time we sent a message
     timer.sent_packet();
-    //cout << "Comm::send() : last packet sent at " << timer.last_packet_sent_at() << endl;
+    cout << "Comm::send() : last packet sent at " << timer.lastPacketSentAt() << endl;
 }
 
 // Recieves packets from various sources
@@ -793,12 +793,11 @@ void Comm::receive() throw(socket_error)
                             (struct sockaddr*)&recv_addr, &addr_len);
     // While no error, handle the packet and continue to receive new ones.
     while (result > 0) {
-	//cout << "Comm::receive() : result == " << result << endl;
+	cout << "Comm::receive() : result == " << result << endl;
 	// Received a packet! Update the average delay.
 	if(timer.lastPacketReceivedAt() != 0) {
 	    updateAverageDelay();
 	}
-	timer.packetReceived();
 	totalPacketsReceived++;
 	updatePercentReceived();
         // Handle messages from not for GameController.
@@ -853,13 +852,11 @@ void Comm::receive_gc () throw(socket_error)
 void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
     throw()
 {
-	// Checks for Tool message
+// Checks for Tool message
     if (len == static_cast<int>(strlen(TOOL_REQUEST_MSG)) &&
         memcmp(msg, TOOL_REQUEST_MSG, TOOL_REQUEST_LEN) == 0) {
 
-	//cout << "Comm::handle_comm() : handling packet from TOOL..." << endl;
-
-	ourPacketsReceived++;
+        //cout << "Comm::handle_comm() : handling packet from TOOL..." << endl;
 
         std::string robotName = getRobotName();
         const char *name = robotName.c_str();
@@ -875,24 +872,23 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 
         struct sockaddr_in r_addr = addr;
         r_addr.sin_port = htons(TOOL_PORT);
-
         send(&response[0], len, r_addr);
         free(response);
 
     } else {
-	//cout << "Comm::handle_comm() : handling packet..." << endl;
+        cout << "Comm::handle_comm() : handling packet..." << endl;
         // validate packet format, check packet timestamp, and parse data
         CommPacketHeader packet;
         if (validate_packet(msg, len, packet)) {
-	    ourPacketsReceived++;
-	    // Log that a packet has been received.
-	    //cout << "Comm::handle_comm() : packet received at "
-	    //<< packet.timestamp << endl;
-	    //cout << " header == " << packet.header << endl;
-	    //cout << " team == " << packet.team << endl;
-	    //cout << " player == " << packet.player << endl;
+            ourPacketsReceived++;
+            // Log that a packet has been received.
+            //cout << "Comm::handle_comm() : packet received at "
+            //<< packet.timestamp << endl;
+            //cout << " header == " << packet.header << endl;
+            //cout << " team == " << packet.team << endl;
+            //cout << " player == " << packet.player << endl;
             parse_packet(packet, msg + sizeof(packet), len - sizeof(packet));
-	}
+        }
     }
 }
 
@@ -900,7 +896,6 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 void Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw()
 {
 	gc->handle_packet(msg, len);
-	ourPacketsReceived++;
 	if (gc->shouldResetTimer()){
 		timer.reset();
 	}
@@ -910,37 +905,58 @@ void Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw(
 bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     throw() {
     // check packet length
-	if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader)){
-	    //std::cout << "bad length (" << len << ")" << std::endl;
-		return false;
-	}
+    if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader)) {
+	cout << "bad length (" << len << ")" << endl;
+	return false;
+    }
 
     // cast packet data into CommPacketHeader struct
     packet = *reinterpret_cast<const CommPacketHeader*>(msg);
 
     // check packet header
-    if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0){
-        //std::cout << "bad header (" << packet.header << ")" << std::endl;
+    if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0) {
+        cout << "bad header (" << packet.header << ")" << endl;
         return false;
     }
     // check team number
-    if (packet.team != gc->team()){
-        //std::cout << "bad team number (" << packet.team << ")" << std::endl;
+    if (packet.team != gc->team()) {
+        cout << "bad team number (" << packet.team << ")" << endl;
         return false;
     }
-
     // check player number
     if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM ||
-        packet.player == gc->player()){
-        //std::cout << "bad player number (" << packet.player << ")" << std::endl;
+        packet.player == gc->player()) {
+        cout << "bad player number (" << packet.player << ")" << endl;
+        return false;
+    }
+    if (!timer.check_packet(packet)) {
+        cout << "bad timer" << endl;
         return false;
     }
 
-    if (!timer.check_packet(packet)){
-        //std::cout << "bad timer" << std::endl;
-        return false;
+    llong currTime = timer.timestamp();
+
+    // Now attempt to syncronize the clocks of this robot and 
+    // the robot from which this packet was received. Eventually the 
+    // two clocks to reach an equilibrium point, within a reasonable
+    // margin of error.
+    if(packet.timestamp + MIN_PACKET_DELAY > currTime) {
+        timer.setOffset(packet.timestamp + MIN_PACKET_DELAY - currTime);
     }
-    // passed all checks, packet is valid
+
+    // Get fixed packet received at time if necessary.
+    timer.packetReceived();
+
+
+    // Log latency/timer offset data?
+    cout << "original current time == " << currTime
+	 << " packet sent at (timestamp) == " << packet.timestamp
+	 << " packet received at == " <<  timer.lastPacketReceivedAt()
+	 << " offset == " << timer.getOffset()
+	 << " latency == " << estimatePacketLatency(packet)
+	 << endl;
+
+    // Packet is valid!
     return true;
 }
 
@@ -950,15 +966,16 @@ void Comm::parse_packet (const CommPacketHeader &packet, const char* msg, int si
 {
     int len = size / sizeof(float);
 
-	// parses header info out.
+    // parses header info out.
     vector<float> v(len + 3);
     v[0] = static_cast<float>(packet.team);
     v[1] = static_cast<float>(packet.player);
     v[2] = static_cast<float>(packet.color);
-	// copies actual message
+
+    // copies actual message
     memcpy(&v[3], msg, size);
 
-	// push message onto queue
+    // push message onto queue
     if (latest->size() >= MAX_MESSAGE_MEMORY)
         latest->pop_front();
     latest->push_back(v);
@@ -1020,7 +1037,7 @@ void Comm::setData (std::vector<float> &newData)
 }
 
 // Returns name of robot
-std::string Comm::getRobotName ()
+std::string Comm::getRobotName()
 {
     struct utsname name_str;
     uname(&name_str);
@@ -1040,7 +1057,7 @@ std::string Comm::getRobotName ()
 }
 
 // Updates the average delay between received transmissions. Uses a simple
-// running average method. (Time measured in microseconds?)
+// running average method.
 void Comm::updateAverageDelay() 
 {
     // The delay is the difference between the current time and 
@@ -1074,5 +1091,10 @@ void Comm::updatePercentReceived()
     }
 }
 
-//llong Comm::estimatePacketLatency()
-//{ }
+llong Comm::estimatePacketLatency(const CommPacketHeader &latestPacket) 
+{
+    // Find the difference between the recorded time the packet was 
+    // received and the timestamp inside the packet of when it was 
+    // sent.
+    return timer.lastPacketReceivedAt() - latestPacket.timestamp;
+}

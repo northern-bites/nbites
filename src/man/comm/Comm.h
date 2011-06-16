@@ -81,18 +81,19 @@ private:
     // Calculates the running average delay between received
     // transmissions. Called each time a new packet is received.
     // Note that it only calculates those packets received from
-    // other robots, not from the TOOL or GameController.
+    // other robots, not from the TOOL, GameController, or itself.
     void updateAverageDelay();
 
     // Calculates the running percentage of packets received that are
     // "ours" by recording the total packets received and the percent
-    // that have our header.
+    // that have our header (but not packets from the TOOL, GameController,
+    // or from itself.
     void updatePercentReceived();
 
     // Gives an estimate for the latency in communications (i.e., the 
     // difference between the timestamp of time sent contained in the 
     // packet data and the current time.)
-    //llong estimatePacketLatency();
+    llong estimatePacketLatency(const CommPacketHeader &latestPacket);
 
 private:
     // mutex lock for threaded data access

@@ -5,11 +5,11 @@ using namespace std;
 
 
 CommTimer::CommTimer(llong (*f)())
-  : time(f), epoch(time()), packet_timer(0), mark_time(epoch),
+  : time(f), epoch(time()), lastPacketSent(0), mark_time(epoch),
     team_times(NUM_PLAYERS_PER_TEAM, 0), packets_checked(0),
-    need_to_update(false), lastPacketReceived(0)
+    need_to_update(false), lastPacketReceived(0), offsetMicros(0)
 {
-    cout << "epoch == " << epoch << endl;
+
 }
 
 void
@@ -17,7 +17,7 @@ CommTimer::reset()
 {
   epoch = time();
   team_times = vector<llong>(NUM_PLAYERS_PER_TEAM, 0);
-  packet_timer = 0;
+  lastPacketSent = 0;
   mark_time = 0;
   packets_checked = 0;
   lastPacketReceived = 0;
@@ -90,4 +90,3 @@ CommTimer::get_time_from_others()
     need_to_update = false;
   }
 }
-
