@@ -294,7 +294,9 @@ void MultiLocEKF::odometryUpdate(const MotionModel& u)
 void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
                                     vector<CornerObservation> c_z)
 {
-    // lastObservations = Z;
+    // Update recently seen observations of both types
+    lastCornerObservations = c_z;
+    lastPointObservations = pt_z;
 
     if (! useAmbiguous) {
         // Remove ambiguous observations
