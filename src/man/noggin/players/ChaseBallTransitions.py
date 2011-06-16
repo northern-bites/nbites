@@ -37,6 +37,18 @@ def shouldChaseFromSpinToBall(player):
             (shouldPositionForKick(player) or
              ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST+5))
 
+def shouldChaseFromClaimBall(player):
+    """
+    Exit claimBall if the ball is no longer too close to us. This
+    should be like shouldClaimBall but with slightly larger range to
+    avoid oscillations between chase and claimBall
+    """
+    ball = player.brain.ball
+    return (shouldChaseBall(player) and
+            (shouldChaseFromPositionForKick(player) or
+             ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST or
+             ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
+
 def shouldPositionForKick(player):
     """
     Should begin aligning on the ball for a kick when close
@@ -71,6 +83,16 @@ def shouldKick(player):
     Ball is in correct position to kick
     """
     return player.brain.nav.isStopped() and player.counter > 1
+
+def shouldKickAgain(player):
+    """
+    Ball hasn't changed enough to warrant new kick decision.
+    """
+    ball = player.brain.ball
+    return (shouldKick(player) and
+            (constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.relX <
+             constants.SHOULD_KICK_AGAIN_FAR_X) and
+            fabs(ball.relY) < constants.SHOULD_KICK_AGAIN_Y)
 
 def shouldDribble(player):
     """

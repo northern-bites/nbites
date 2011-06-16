@@ -1,3 +1,4 @@
+from . import ChaseBallTransitions as transitions
 """
 Here we house all of the state methods used for kicking the ball
 """
@@ -37,7 +38,9 @@ def afterKick(player):
 
         return player.stay()
 
-    # TODO: if we wiffed, try again without resetting hasKickedOff
+    if transitions.shouldKickAgain(player):
+        player.brain.nav.justKicked = False
+        return player.goNow('positionForKick')
 
     if player.brain.nav.isStopped():
         player.inKickingState = False

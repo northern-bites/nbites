@@ -77,19 +77,23 @@ def approachBall(player):
 
     return player.stay()
 
-def stopBeforeKick(player):
+def claimBall(player):
     """
-    If we haven't decided which kick to do, but we should stop
-    so we don't kick the ball away, stop
+    If we haven't decided which kick to do, but we would kick
+    the ball away if we decided our kick on the move, go claim
+    it and then decide.
     """
     if player.firstFrame():
-        player.stopWalking()
+        kick = player.brain.kickDecider.getCenterKickPosition()
         player.brain.tracker.trackBall()
+        player.brain.nav.kickPosition(kick)
 
-    if transitions.shouldScanFindBall(player):
-        return player.goLater('scanFindBall')
-    if player.brain.nav.isStopped():
+    if transitions.shouldKick(player):
         return player.goNow('decideKick')
+    elif transitions.shouldScanFindBall(player):
+        return player.goLater('scanFindBall')
+    elif transitions.shouldChaseFromClaimBall(player):
+        return player.goNow('chase')
 
     return player.stay()
 
