@@ -139,10 +139,12 @@ static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 
 
 //Check if the angle is unstable, (ie tending AWAY from zero)
-bool isFalling(float angle_pos, float angle_vel){
-    if (angle_pos >= FALLING_ANGLE_THRESH){
-	cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos 
-	     << ", angle_vel == " << angle_vel << endl;
+bool isFalling(float angle_pos, float angle_vel) {
+    // Test falling based on angle (note that angle_pos is assumed to be
+    // the mag. of the angle).
+    if (angle_pos >= FALLING_ANGLE_THRESH) {
+	//cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos 
+	//     << ", angle_vel == " << angle_vel << endl;
             return true;
     } else {
         if(angle_vel > FALL_SPEED_THRESH)
@@ -267,18 +269,20 @@ void RoboGuardian::checkFalling(){
 	notFallingFrames += 1;
     }
 
+    /*
     if(angleMag >= FALLING_ANGLE_THRESH) {
          cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
               << "  fallingFrames is " << fallingFrames
 	      << " notFallingFrames is " << notFallingFrames
               << " and critical angle is "<< falling_critical_angle<< endl;
     }
+    */
 
     //If the robot has been falling for a while, and the robot is inclined
     //already at a 45 degree angle, than we know we are falling
     if (fallingFrames > FALLING_FRAMES_THRESH){
         // When falling, execute the fall protection method.
-	cout << "RoboGuardian::checkFalling() : FALLING!" << endl;
+	//cout << "RoboGuardian::checkFalling() : FALLING!" << endl;
         falling = true;
 	processFallingProtection();
     }else if(notFallingFrames > FALLING_FRAMES_THRESH){
