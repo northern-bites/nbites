@@ -1,6 +1,7 @@
 build/*
 install/*
 data/*
+ext/*
 *.pyc
 *.ekf
 *.mcl
