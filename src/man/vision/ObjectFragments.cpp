@@ -2386,7 +2386,7 @@ bool ObjectFragments::locationOk(Blob b)
     int spanY = b.height();
     int mh = min(horizonLeft, horizonRight);
     // file this one under "very specific sanity checks"
-    if (color == BLUE && spanY < TALL_POST && trueTop > IMAGE_HEIGHT / 2) {
+    if (color == BLUE_BIT && spanY < TALL_POST && trueTop > IMAGE_HEIGHT / 2) {
         if (SANITY) {
             cout << "Screening blue post that is uniform-like" << endl;
         }
@@ -2448,7 +2448,7 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight,
     if (spanY > TALL_POST) {
         return true;
     }
-    if (color == BLUE) {
+    if (color == BLUE_BIT) {
         if (bottom + BOTTOM_FUDGE_FACTOR < minHeight) {
             if (SANITY)
                 cout << "Removed risky blue post" << endl;
