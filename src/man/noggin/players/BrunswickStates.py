@@ -1,4 +1,4 @@
-from ..playbook.PBConstants import (GOALIE, CHASER)
+from ..playbook.PBConstants import (GOALIE, CHASER, READY_CHASER)
 import man.motion.SweetMoves as SweetMoves
 ###
 # Reimplementation of Game Controller States for pBrunswick
@@ -61,6 +61,10 @@ def gameSet(player):
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
 
+        if (player.brain.play.isRole(READY_CHASER) and
+            player.brain.gameController.ownKickOff):
+            player.hasKickedOff = False
+
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
 
@@ -68,11 +72,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
-        if (player.brain.play.isRole(CHASER) and
-            player.brain.gameController.ownKickOff):
-            player.hasKickedOffKick = False
-
-        if player.lastDiffState == 'gamePenalized' and player.firstFrame():
+        if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
 
             if player.lastStateTime > 25:
