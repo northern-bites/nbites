@@ -354,8 +354,8 @@ void RoboGuardian::checkTemperatures(){
     for(unsigned int joint = 0; joint < Kinematics::NUM_JOINTS; joint++){
         const float tempDiff = newTemps[joint] - lastTemps[joint];
         if(newTemps[joint] >= HIGH_TEMP && tempDiff >= TEMP_THRESHOLD &&
-           micro_time() - lastHeatPrintWarning > TIME_BETWEEN_HEAT_WARNINGS){
-            lastHeatPrintWarning = micro_time();
+           process_micro_time() - lastHeatPrintWarning > TIME_BETWEEN_HEAT_WARNINGS){
+            lastHeatPrintWarning = process_micro_time();
             cout << Thread::name << "::" << "TEMP-WARNING: "
                  << Kinematics::JOINT_STRINGS[joint]
                  << " is at " << setprecision(1)
@@ -366,9 +366,9 @@ void RoboGuardian::checkTemperatures(){
         }
     }
     if(sayWarning &&
-       micro_time() - lastHeatAudioWarning > TIME_BETWEEN_HEAT_WARNINGS){
+       process_micro_time() - lastHeatAudioWarning > TIME_BETWEEN_HEAT_WARNINGS){
         playFile(heat_wav);
-        lastHeatAudioWarning = micro_time();
+        lastHeatAudioWarning = process_micro_time();
     }
     lastTemps = newTemps;
 }
@@ -541,9 +541,11 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
 //TODO: comment
 void RoboGuardian::checkConnection(){
     const string IP = discoverIP();
+
 #ifdef DEBUG_CONNECTION
     cout << "checking connection, got IP" << IP << endl;
 #endif /* DEBUG_CONNECTION */
+
     if (IP.size() >= 7 && (IP[0] == '1' || IP[0] == '2')) {
         wifiReconnectTimeout = 0;
         return;

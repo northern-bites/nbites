@@ -39,6 +39,10 @@ class HeadTracking(FSA.FSA):
         """stop all head moves. In TrackingStates.py"""
         self.switchTo('stop')
 
+    def isStopped(self):
+        """Checks that all head moves have stopped"""
+        return self.currentState == 'stopped'
+
     def setNeutralHead(self):
         """executes sweet move to move head to neutral position.
         Does not call stop head moves. In TrackingStates.py"""

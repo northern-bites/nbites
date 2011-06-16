@@ -13,13 +13,8 @@ def sNoFieldPlayers(team, workingPlay):
 
 def sOneField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_ONE_FIELD_PLAYER)
-    # no post-kickoff formation- would be identical to fOneField
-    # Defensive support for ball in our goalbox
-    if team.defenderShouldChase():
-        Formations.fOneField(team, workingPlay)
-    else:
-        Formations.fOneFieldD(team, workingPlay)
-
+    # No Kickoff play because it would be identical
+    Formations.fOneField(team, workingPlay)
 
 #### Two Field Players ####
 

@@ -286,7 +286,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points)
                     // We're beyond the point where we could possibly find
                     // another legitimate top to the line, go ahead and add the
                     // line point
-                    if (isGreenColor(thresholdedColor) || isAtAnUphillEdge ||
+                    if (Utility::isGreen(thresholdedColor) || isAtAnUphillEdge ||
                         !isWaitingForAnotherTopEdge(whiteGreenY, y)
                         // About to exit this iteration of loop due to y
                         // position
@@ -491,7 +491,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
                     // We're beyond the point where we could possibly find
                     // another legitimate right to the line, go ahead and add
                     // the line point
-                    if (isGreenColor(thresholdedColor) || isAtAnUphillEdge ||
+                    if (Utility::isGreen(thresholdedColor) || isAtAnUphillEdge ||
                         !isWaitingForAnotherRightEdge(whiteGreenX, x)
                         // About to exit this iteration due to x position
                         || isAtRightOfImage(x, IMAGE_WIDTH - 1)) {
@@ -1505,7 +1505,7 @@ void FieldLines::extendLineVertScan(ExtendDirection _testDir,
         // lastX, lastY, curX, curY
         if (shouldStopExtendingLine(lastPoint.x, lastPoint.y, curX, curY)) {
             break;
-        } else if (!isLineColor(vision->thresh->getThresholded(curY,curX))) {
+        } else if (!Utility::isWhite(vision->thresh->getThresholded(curY,curX))) {
             continue;
         }
         // Since we are scanning top to bottom, we are looking for HORIZONTAL
@@ -1615,7 +1615,7 @@ void FieldLines::extendLineHorizScan(ExtendDirection _testDir,
         // lastX, lastY, curX, curY
         if (shouldStopExtendingLine(lastX, lastY, curX, curY)) {
             break;
-        } else if (!isLineColor(vision->thresh->getThresholded(curY,curX))) {
+        } else if (!Utility::isWhite(vision->thresh->getThresholded(curY,curX))) {
             continue;
         }
         // Since we are scanning top to bottom, we are looking for VERTICAL
@@ -1849,7 +1849,7 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
                 return j;
             }
             // We're in the field but we didn't see an edge.  No good.
-            else if (!isLineColor(vision->thresh->getThresholded(j,x))) {
+            else if (!Utility::isWhite(vision->thresh->getThresholded(j,x))) {
                 //      else if (vision->thresh->thresholded[j][x] == GREEN) {
                 return NO_EDGE;
             }
@@ -1884,7 +1884,7 @@ const int FieldLines::findEdgeFromMiddleOfLine(int x, int y,
                 return i;
             }
             // We're in the field but we didn't see an edge.  No good.
-            else if (isGreenColor(vision->thresh->getThresholded(y,i))) {
+            else if (Utility::isGreen(vision->thresh->getThresholded(y,i))) {
                 return NO_EDGE;
             }
             oldYChannel = newYChannel;
@@ -4090,7 +4090,7 @@ const float FieldLines::percentSurrounding(const int x, const int y,
         for (int j = startY; j <= endY; ++j) {
             // Search for the color at that pixel within the vector of
             // acceptable colors
-			if (colorsEqual(color, vision->thresh->getThresholded(j,i))) {
+			if (Utility::colorsEqual(color, vision->thresh->getThresholded(j,i))) {
 				++numFound;
 				break;
             }
@@ -4128,7 +4128,7 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
         if (y2 < y1)
             sign = -1;
         for (int j = y1; j != y2; j += sign, ++totalPixels) {
-			if (colorsEqual(vision->thresh->getThresholded(j,x2),color)) {
+			if (Utility::colorsEqual(vision->thresh->getThresholded(j,x2),color)) {
                 ++numFound;
             }
         }
@@ -4147,7 +4147,7 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
                 int newx = x1 +
 					static_cast<int>( (slope * static_cast<float>(i - y1)) );
 
-				if (colorsEqual(vision->thresh->getThresholded(i,newx), color)) {
+				if (Utility::colorsEqual(vision->thresh->getThresholded(i,newx), color)) {
                     ++numFound;
 				}
             }
@@ -4160,7 +4160,7 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
                 ++totalPixels;
                 int newy = y1 +
 					static_cast<int>( (slope * static_cast<float>(i - x1)) );
-				if (colorsEqual(vision->thresh->getThresholded(newy,i), color)) {
+				if (Utility::colorsEqual(vision->thresh->getThresholded(newy,i), color)) {
                     ++numFound;
 				}
             }
@@ -4171,7 +4171,7 @@ const float FieldLines::percentColorBetween(const int x1, const int y1,
             int endX = max(x1,x2);
             for (int i = startX; i <= endX; ++i) {
                 ++totalPixels;
-				if (colorsEqual(vision->thresh->getThresholded(y2,i), color)) {
+				if (Utility::colorsEqual(vision->thresh->getThresholded(y2,i), color)) {
                     ++numFound;
 				}
             }
@@ -4198,7 +4198,7 @@ const float FieldLines::isColorBetween(const int x1, const int y1,
         for (int j = y1; j != y2; j += sign) {
             bool foundInLine = false;
             for (int testX = x2 - SCAN_RADIUS; testX <= x2 + SCAN_RADIUS; ++testX){
-				if (colorsEqual(vision->thresh->getThresholded(j,x2), color)) {
+				if (Utility::colorsEqual(vision->thresh->getThresholded(j,x2), color)) {
                     foundInLine = true;
                 }
             }
@@ -4234,7 +4234,7 @@ const float FieldLines::isColorBetween(const int x1, const int y1,
 					static_cast<int>( (slope * static_cast<float>(i - y1)) );
                 for (int testX = newX - SCAN_RADIUS; testX <= newX + SCAN_RADIUS; ++testX){
 
-					if (colorsEqual(vision->thresh->getThresholded(i,testX), color)) {
+					if (Utility::colorsEqual(vision->thresh->getThresholded(i,testX), color)) {
                         foundInLine = true;
                         break;
                     }
@@ -4259,7 +4259,7 @@ const float FieldLines::isColorBetween(const int x1, const int y1,
                 int newY = y1 +
 					static_cast<int>( (slope * static_cast<float>(i - x1)) );
                 for (int testY = newY - SCAN_RADIUS; testY <= newY + SCAN_RADIUS; ++testY){
-					if (colorsEqual(vision->thresh->getThresholded(testY,i), color)) {
+					if (Utility::colorsEqual(vision->thresh->getThresholded(testY,i), color)) {
                         foundInLine = true;
                         break;
                     }
@@ -4284,7 +4284,7 @@ const float FieldLines::isColorBetween(const int x1, const int y1,
             for (int i = startX; i <= endX; ++i) {
                 bool foundInLine = false;
                 for (int testY = y2 - SCAN_RADIUS; testY <= y2 + SCAN_RADIUS; ++testY){
-					if (colorsEqual(vision->thresh->getThresholded(testY,i), color)) {
+					if (Utility::colorsEqual(vision->thresh->getThresholded(testY,i), color)) {
                         foundInLine = true;
                         break;
                     }
@@ -4331,7 +4331,7 @@ const float FieldLines::percentColor(const int x, const int y,
         // we've exhausted num or we've gone off screen
         for (int i = y + sign; numTotal < numPixels &&
                  i < IMAGE_HEIGHT && i >= 0; i += sign, ++numTotal) {
-			if (colorsEqual(color, vision->thresh->getThresholded(i,x))) {
+			if (Utility::colorsEqual(color, vision->thresh->getThresholded(i,x))) {
 				++numFound;
 				break;
             }
@@ -4345,7 +4345,7 @@ const float FieldLines::percentColor(const int x, const int y,
         if (dir == TEST_RIGHT) sign = 1;
         for (int i = x + sign; numTotal < numPixels &&
                  i < IMAGE_WIDTH && i >= 0; i += sign, ++numTotal) {
-			if (colorsEqual(color, vision->thresh->getThresholded(y,i))) {
+			if (Utility::colorsEqual(color, vision->thresh->getThresholded(y,i))) {
 				++numFound;
 				break;
             }
@@ -4401,10 +4401,10 @@ void FieldLines::drawLinePoint(const linePoint &p, const int color) const
 void FieldLines::updateLineCounters(const int threshColor, int &numWhite,
                                     int &numUndefined, int &numNonWhite)
 {
-    if (isLineColor(threshColor)) {
+    if (Utility::isWhite(threshColor)) {
         ++numWhite;
     }
-    else if (isUndefined(threshColor)) {
+    else if (Utility::isUndefined(threshColor)) {
         ++numUndefined;
     }
     else {

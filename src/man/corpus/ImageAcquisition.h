@@ -1,3 +1,6 @@
+#ifndef _IMAGE_ACQUISITION_H_
+#define _IMAGE_ACQUISITION_H_
+
 #include <stdint.h>
 
 class ColorParams;
@@ -14,3 +17,5 @@ namespace ImageAcquisition {
                            uint8_t *yuv, uint16_t *out );
 
 };
+
+#endif

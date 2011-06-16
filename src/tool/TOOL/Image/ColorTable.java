@@ -294,9 +294,10 @@ public class ColorTable {
                 }
 
                 else if ((color == ORANGE && oldColor == YELLOW) ||
-                         (color == YELLOW && oldColor == ORANGE) ||
+						 // (color == YELLOW && oldColor == ORANGE) ||
                          (color == ORANGE && oldColor == ORANGEYELLOW) ||
                          (color == YELLOW && oldColor == ORANGEYELLOW)) {
+					//System.out.println(color+" "+oldColor);
                     newColor = ORANGEYELLOW;
                     }
                 setColor(thisPixel, newColor);

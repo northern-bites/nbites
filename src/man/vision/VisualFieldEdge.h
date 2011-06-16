@@ -32,7 +32,7 @@ class VisualFieldEdge  {
 
 public:
     VisualFieldEdge();
-    ~VisualFieldEdge();
+    ~VisualFieldEdge(){}
 
 private: // Private member variables
 	fieldEdgeDistances distances;

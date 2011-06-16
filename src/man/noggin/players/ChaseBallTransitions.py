@@ -123,15 +123,22 @@ def shouldStopDribbling(player):
             player.brain.my.x < ( NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
                                   NogginConstants.GREEN_PAD_X))
 
+def shouldKickOff(player):
+    """
+    Determines whether we should do our KickOff play as chaser
+    """
+    return (player.brain.gameController.ownKickOff and
+            not player.hasKickedOffKick)
+
 ####### FIND BALL STUFF ##############
 
-def shouldScanFindBall(player):
+def shouldFindBall(player):
     """
     We lost the ball, scan to find it
     """
     return (player.brain.ball.framesOff > constants.BALL_OFF_THRESH)
 
-def shouldScanFindBallActiveLoc(player):
+def shouldFindBallActiveLoc(player):
     """
     We lost the ball, scan to find it
     """
@@ -139,7 +146,7 @@ def shouldScanFindBallActiveLoc(player):
                 player.brain.tracker.activePanOut) and \
         (player.brain.ball.framesOff > constants.BALL_OFF_ACTIVE_LOC_THRESH)
 
-def shouldScanFindBallKick(player):
+def shouldFindBallKick(player):
     """
     We lost the ball while in a kicking state, be more generous before looking
     """

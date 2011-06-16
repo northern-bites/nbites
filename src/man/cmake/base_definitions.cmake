@@ -154,9 +154,10 @@ SET(
   CACHE INTERNAL "Install prefix"
   )
 
-SET( OUTPUT_ROOT_DIR_BIN "${CMAKE_INSTALL_PREFIX}/bin" )
-SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc" )
-SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
+SET( OUTPUT_ROOT_DIR_BIN "${CMAKE_INSTALL_PREFIX}/bin"		  )
+SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc"		  )
+SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib/naoqi/"     )
+SET( OUTPUT_ROOT_DIR_PREF "${CMAKE_INSTALL_PREFIX}/preferences/"  )
 
 ########################### NB Common definitions
 include ( ${NBITES_DIR}/src/man/cmake/FindNBCOMMON.cmake )

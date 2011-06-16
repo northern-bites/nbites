@@ -51,10 +51,7 @@ class KickInformation:
         """
         self.calculateDataAverages()
 
-        if not self.decider.hasKickedOff:
-            self.kickObjective = constants.OBJECTIVE_KICKOFF
-            return self.kickObjective
-        elif self.sawOppGoal:
+        if self.sawOppGoal:
             self.kickObjective = constants.OBJECTIVE_SHOOT
             return self.kickObjective
         else:
@@ -168,9 +165,9 @@ class KickInformation:
             s += ("Opp right post bearing is: " + str(self.oppRightPostBearing)
                   + " dist is: " + str(self.oppRightPostDist) +  "\n")
         if s == "":
-            s = "No goal posts observed"
+            s = "No goal posts observed\n"
         if self.kickObjective == constants.OBJECTIVE_SHOOT:
-            s += "\nObjective is: SHOOT"
+            s += "Objective is: SHOOT\n"
         if self.kickObjective == constants.OBJECTIVE_CLEAR:
-            s += "\nObjective is: CLEAR"
+            s += "Objective is: CLEAR\n"
         return s

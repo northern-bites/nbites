@@ -166,7 +166,14 @@ public class TOOLVisionLink {
                 for (int i = 0; i < imageWidth; i++) {
                     for (int j = 0; j < imageHeight; j++) {
                         byte col = threshResult[j][i];
-                        if (col == Vision.MAROON) {
+                        if (col == Vision.MAROON ||
+							col == Vision.PINK ||
+							col == Vision.CYAN ||
+							col == Vision.MAGENTA ||
+							col == Vision.PURPLE ||
+							col == Vision.BLACK ||
+							col == Vision.RED ||
+							col == Vision.ORANGE) {
                         } else if ((col & BIT_ORANGE) > 0) {
                             if ((col & BIT_RED) > 0) {
                                 col = ORANGERED;

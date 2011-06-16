@@ -42,6 +42,7 @@
 #include "WalkingConstants.h"
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
+#include "CoordHeadProvider.h"
 #include "NullHeadProvider.h"
 #include "NullBodyProvider.h"
 #include "Sensors.h"
@@ -62,8 +63,9 @@
 
 class MotionSwitchboard {
 public:
-    MotionSwitchboard(boost::shared_ptr<Sensors> s,
-					  boost::shared_ptr<Profiler> p);
+  MotionSwitchboard(boost::shared_ptr<Sensors> s,
+					boost::shared_ptr<Profiler> p,
+					boost::shared_ptr<NaoPose> pose);
     ~MotionSwitchboard();
 
     void start();
@@ -100,6 +102,8 @@ public:
         return walkProvider.getOdometryUpdate();
     }
 
+    int getFrameCount() const { return frameCount; }
+
 private:
     void preProcess();
     void processJoints();
@@ -127,6 +131,7 @@ private:
     WalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
+    CoordHeadProvider coordHeadProvider;
     NullHeadProvider nullHeadProvider;
     NullBodyProvider nullBodyProvider;
 
@@ -141,6 +146,7 @@ private:
     std::vector <float> nextStiffnesses;
     std::vector <float> lastJoints;
 
+    int frameCount;
     bool running;
 	mutable bool newJoints; //Way to track if we ever use the same joints twice
 

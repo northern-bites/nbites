@@ -55,6 +55,7 @@
 class WalkProvider : public MotionProvider {
 public:
     WalkProvider(boost::shared_ptr<Sensors> s,
+                 boost::shared_ptr<NaoPose> pose,
 				 boost::shared_ptr<Profiler> p);
     virtual ~WalkProvider();
 
@@ -87,6 +88,7 @@ private:
     virtual void setActive();
 
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<NaoPose> pose;
 
     MetaGait metaGait;
     Gait nextGait;

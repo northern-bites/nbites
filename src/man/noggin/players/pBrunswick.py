@@ -78,6 +78,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.play = self.brain.play
         if self.currentState == 'afterKick' or \
                self.lastDiffState == 'afterKick':
+            self.hasKickedOffKick = True
             self.justKicked = True
         else:
             self.justKicked = False

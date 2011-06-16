@@ -6,6 +6,8 @@
 #include "Sensors.h"
 #include "ImageSubscriber.h"
 
+//TODO: @oneamtu make this a subclass of Provider and ImageSubscriber a
+// subclass of Subscriber
 class ImageTranscriber {
  public:
  ImageTranscriber(boost::shared_ptr<Sensors> s)

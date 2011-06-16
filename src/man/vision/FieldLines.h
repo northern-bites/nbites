@@ -267,51 +267,6 @@ private:
     // top and bottom, and the more horizontal ones to the left and right
     void extendLines(std::vector< boost::shared_ptr<VisualLine> > &lines);
 
-    // Helper method that just returns whether the thresholded color is a
-    // line color
-    static inline const bool isLineColor(const unsigned char color)
-        {
-#ifdef SOFTCOLORS
-            return Utility::isElementInArray(color, LINE_COLORS, NUM_LINE_COLORS);
-#else
-			return color & WHITE_BIT;
-#endif
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // green color
-    static inline const bool isGreenColor(unsigned char threshColor)
-        {
-#ifdef SOFTCOLORS
-            return Utility::isElementInArray(threshColor, FIELD_COLORS,
-                                             NUM_GREEN_COLORS);
-#else
-			return threshColor & GREEN_BIT;
-#endif
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // green color
-    static inline const bool isUndefined(unsigned char threshColor)
-        {
-#ifdef SOFTCOLORS
-			return threshColor == GREY;
-#else
-			return threshColor == 0x00;
-#endif
-        }
-
-    // Helper method that just returns whether the thresholded color is a
-    // equal to a fixed color
-    static inline const bool colorsEqual(unsigned char color, unsigned char col)
-        {
-#ifdef SOFTCOLORS
-			return color == col;
-#else
-			return color & col;
-#endif
-        }
-
     // Given a line, attempts to extend it to both the left and right
     void extendLineHorizontally(boost::shared_ptr<VisualLine> line);
 
@@ -594,8 +549,15 @@ public:
     const bool getStandardView() { return standardView; }
 #endif
 
-    const std::vector < boost::shared_ptr<VisualLine> >* getLines() const { return &linesList; }
+    const std::vector < boost::shared_ptr<VisualLine> >* getLines() 
+      const { return &linesList; }
+    //ONLY used for PyVision!
+    const std::vector <boost::shared_ptr<VisualLine> > getActualLines() 
+      const { return linesList; }
+    const int getNumLines() { return linesList.size(); }
     std::list <VisualCorner>* getCorners() {return &cornersList; }
+    //ONLY used for PyVision!
+    std::list<VisualCorner> getActualCorners() { return cornersList; }
     const int getNumCorners() { return cornersList.size(); }
     const std::list<linePoint>* getUnusedPoints() const {
         return &unusedPointsList;

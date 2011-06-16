@@ -59,8 +59,8 @@ const bool Utility::between(const VisualLine& line,
     return
         // Point is between the endpoints in x direction
         (p.x >= line.getLeftEndpoint().x && p.x <= line.getRightEndpoint().x) &&
-        // Point is between the endpoints in y direction (note that the the higher
-        // in the image it is, the lower the y coordinate)
+        // Point is between the endpoints in y direction (note that the the
+        // higher in the image it is, the lower the y coordinate)
         (p.y >= line.getTopEndpoint().y && p.y <= line.getBottomEndpoint().y);
 }
 
@@ -112,7 +112,8 @@ const point<int> Utility::getCloserEndpoint(const VisualLine& l, int x, int y) {
     }
 
 }
-const point<int> Utility::getCloserEndpoint(const VisualLine& l, const point<int>& p) {
+const point<int> Utility::getCloserEndpoint(const VisualLine& l,
+											const point<int>& p) {
     return getCloserEndpoint(l, p.x, p.y);
 }
 
@@ -139,7 +140,8 @@ const bool Utility::intersectProp(const point<int> &a, const point<int> &b,
         && (left(c,d,a) ^ left(c,d,b));
 }
 
-const bool Utility::intersectProp(const VisualLine& line1, const VisualLine& line2)
+const bool Utility::intersectProp(const VisualLine& line1,
+								  const VisualLine& line2)
 {
     return intersectProp(line1.getStartpoint(), line1.getEndpoint(),
                          line2.getStartpoint(), line2.getEndpoint());
@@ -148,7 +150,8 @@ const bool Utility::intersectProp(const VisualLine& line1, const VisualLine& lin
 
 // get slope given x1,y1 and x2,y2
 float Utility::getSlope(int x1, int y1, int x2, int y2) {
-    return static_cast<float> (static_cast<float>(y2-y1)/static_cast<float>(x2-x1));
+    return static_cast<float> (static_cast<float>(y2-y1)/
+							   static_cast<float>(x2-x1));
 }
 
 float Utility::getSlope(const VisualLine& line) {
@@ -160,9 +163,11 @@ float Utility::getSlope(const VisualLine& line) {
 // See http://mathworld.wolfram.com/LeastSquaresFitting.html for illustration;
 // we calculate vertical (or horizontal) offsets from the line rather than
 // perpendicular offsets
-float Utility::getPointDeviation(const VisualLine &aLine, const int x, const int y) {
+float Utility::getPointDeviation(const VisualLine &aLine, const int x,
+								 const int y) {
     // Bigger change in x than in y, nearer to horizontal than vertical
-    if ( abs(aLine.getEndpoint().x - aLine.getStartpoint().x) > abs(aLine.getEndpoint().y - aLine.getStartpoint().y) ) {
+    if ( abs(aLine.getEndpoint().x - aLine.getStartpoint().x) >
+		 abs(aLine.getEndpoint().y - aLine.getStartpoint().y) ) {
         float lineY = static_cast<float>(getLineY(x, aLine));
         return fabs(static_cast<float>(y) - lineY);
     }
@@ -182,7 +187,8 @@ float Utility::getPointDeviation(const VisualLine &aLine, const int x, const int
 // Calculate how well the point fits to the line.
 // Return distance between point and line evaluated at same x or y (depending
 // on orientation of the line)
-float Utility::getPointDeviation(const VisualLine &aLine, const linePoint &point) {
+float Utility::getPointDeviation(const VisualLine &aLine,
+								 const linePoint &point) {
     return getPointDeviation(aLine, point.x, point.y);
 }
 
@@ -278,7 +284,8 @@ float Utility::getAngle(int x1, int y1, int x2, int y2) {
         else         return 90.0;
     }
     // y1-y2 due to flipped coordinate system
-    return TO_DEG * atan( static_cast<float>(y1-y2) / static_cast<float>(x2-x1) );
+    return TO_DEG * atan( static_cast<float>(y1-y2) /
+						  static_cast<float>(x2-x1) );
 }
 
 
@@ -311,7 +318,8 @@ float Utility::getInterceptY(int x1, int y1, float slope){
     return ( -slope*static_cast<float>(x1) + static_cast<float>(y1) );
 }
 
-// Returns the (x, y) coordinate where the two lines intersect, or (NO_INTERSECTION, NO_INTERSECTION)
+// Returns the (x, y) coordinate where the two lines intersect,
+// or (NO_INTERSECTION, NO_INTERSECTION)
 // if they do not intersect.  (since we are only concerned  about
 // intersections that appear on the screen, this will not be a problem)
 const point<int> Utility::getIntersection(const VisualLine& line1,
@@ -333,14 +341,13 @@ const point <int> Utility::getIntersection(const point<int> line1Start,
     int I_C2 = I_A2*line2Start.x+I_B2*line2Start.y;
 
 
-    int I_det = I_A1*I_B2 - I_A2*I_B1;/*
-                                        cout << line1Start << "\t" <<  line1End << endl;
-                                        cout << line2Start << "\t" << line2End << endl;
-
-                                        cout << "I_A1 I_B1 I_C1 I_A2 I_B2 I_C2 I_DET" << endl;
-                                        cout << I_A1 << " " <<  I_B1 << " " << I_C1 << " " << I_A2
-                                        << " " << I_B2 << " " << I_C2 << " " << I_det << endl;
-                                      */
+    int I_det = I_A1*I_B2 - I_A2*I_B1;
+	/* cout << line1Start << "\t" <<  line1End << endl;
+	   cout << line2Start << "\t" << line2End << endl;
+	   cout << "I_A1 I_B1 I_C1 I_A2 I_B2 I_C2 I_DET" << endl;
+	   cout << I_A1 << " " <<  I_B1 << " " << I_C1 << " " << I_A2
+	   << " " << I_B2 << " " << I_C2 << " " << I_det << endl;
+	*/
 
     point <int> intersection;
     if (I_det != 0) {
@@ -362,7 +369,8 @@ const point <int> Utility::getIntersection(const point<int> line1Start,
 
 
 template <typename T>
-bool Utility::isElementInArray(const T elem, const T list[], const int numElems) {
+bool Utility::isElementInArray(const T elem, const T list[],
+							   const int numElems) {
     for (int i = 0; i < numElems; i++) {
         if (elem == list[i])
             return true;
@@ -370,7 +378,8 @@ bool Utility::isElementInArray(const T elem, const T list[], const int numElems)
     return false;
 }
 
-bool Utility::isElementInArray(const int elem, const int list[], const int numElems) {
+bool Utility::isElementInArray(const int elem, const int list[],
+							   const int numElems) {
     for (int i = 0; i < numElems; i++) {
         if (elem == list[i])
             return true;
@@ -870,7 +879,7 @@ point<int> Utility::getClosestLinePoint(const VisualLine& line,
     vector<linePoint>::const_iterator i;
 
     // No point is this far away...@TODO make it nicer
-    float minDist = 99999999;
+    float minDist = 99999999.0f;
     point<int> closest;
     for (i = points.begin(); i != points.end(); ++i){
         const float length = getLength(i->x, i->y, pt.x, pt.y);
