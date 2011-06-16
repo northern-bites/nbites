@@ -130,12 +130,22 @@ typedef struct CommPacketHeader_t
     memcpy(&header[0], &h[0], sizeof(header));
   }
 */
-  char header[sizeof(PACKET_HEADER)];
-  llong timestamp;
-  int team;
-  int player;
-  int color;
+    char header[sizeof(PACKET_HEADER)];
+    llong timestamp;
+    int number;
+    int team;
+    int player;
+    int color;
 } CommPacketHeader;
 
+typedef struct CommTeammatePacketInfo_t 
+{
+    CommTeammatePacketInfo_t()
+    : timestamp(0), lastNumber(0)
+	{ }
+
+    llong timestamp;      // Timestamp of last received packet.
+    int lastNumber;        // (Unique) number of last packet received.
+} CommTeammatePacketInfo;
 
 #endif /* CommDef.h */

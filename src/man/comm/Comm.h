@@ -102,6 +102,8 @@ private:
     std::vector<float> data;
     // Received data
     std::list<std::vector<float> >* latest;
+    int lastPacketNumber;                    // Stores the number of the last packet
+                                             // sent. Should be unique.
 
     // References to global data structures
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors

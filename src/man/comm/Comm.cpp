@@ -464,7 +464,7 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
     : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
 	  latest(new list<vector<float> >), sensors(s), timer(&micro_mono_time),
       gc(new GameController()), tool(_synchro, s, v, gc), averagePacketDelay(0),
-      totalPacketsReceived(0), ourPacketsReceived(0)
+      totalPacketsReceived(0), ourPacketsReceived(0), lastPacketNumber(0)
 {
     pthread_mutex_init(&comm_mutex,NULL);
     // initialize broadcast address structure
@@ -723,8 +723,7 @@ void Comm::send () throw(socket_error)
     } else { // Don't bother to send packet to teammates if we are penalized
 
         // C++ header data
-        const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
-                                         gc->team(), gc->player(), gc->color()};
+        const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(), lastPacketNumber++, gc->team(), gc->player(), gc->color()};
         memcpy(&buf[0], &header, sizeof(header));
         // variable Python extra data
         memcpy(&buf[sizeof(header)], &data[0], sizeof(float) * data.size());
@@ -882,11 +881,11 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
         if (validate_packet(msg, len, packet)) {
             ourPacketsReceived++;
             // Log that a packet has been received.
-            //cout << "Comm::handle_comm() : packet received at "
-            //<< packet.timestamp << endl;
-            //cout << " header == " << packet.header << endl;
-            //cout << " team == " << packet.team << endl;
-            //cout << " player == " << packet.player << endl;
+            cout << "Comm::handle_comm() : packet received at "
+            << packet.timestamp
+	    << " from player " << packet.player
+	    << " with packet number " << packet.number
+	    << endl;
             parse_packet(packet, msg + sizeof(packet), len - sizeof(packet));
         }
     }

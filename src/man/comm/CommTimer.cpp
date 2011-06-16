@@ -6,8 +6,8 @@ using namespace std;
 
 CommTimer::CommTimer(llong (*f)())
   : time(f), epoch(time()), lastPacketSent(0), mark_time(epoch),
-    team_times(NUM_PLAYERS_PER_TEAM, 0), packets_checked(0),
-    need_to_update(false), lastPacketReceived(0), offsetMicros(0)
+    teamPackets(NUM_PLAYERS_PER_TEAM), packets_checked(0), need_to_update(false), 
+    lastPacketReceived(0), offsetMicros(0)
 {
 
 }
@@ -16,7 +16,7 @@ void
 CommTimer::reset()
 {
   epoch = time();
-  team_times = vector<llong>(NUM_PLAYERS_PER_TEAM, 0);
+  teamPackets = vector<CommTeammatePacketInfo>(NUM_PLAYERS_PER_TEAM);
   lastPacketSent = 0;
   mark_time = 0;
   packets_checked = 0;
@@ -40,10 +40,19 @@ CommTimer::check_packet(const CommPacketHeader &p)
   }
 
   // OUT OF ORDER CHECK
+  /*
   if (p.timestamp < team_times[p.player - 1]){
 	  std::cout << "out of order" << std::endl;
 	  return false;
   }
+  */
+  // Check whether the packet number is greater than the last 
+  // packet number received for that particular teammate.
+  if(p.number < teamPackets[p.player-1].lastNumber) {
+      cout << "CommTimer::check_packet() packet received out of order!" << endl;
+      return false;
+  }
+
   // JUST RESET CHECK
   if (!need_to_update && ts < PACKET_GRACE_PERIOD &&
       ts + PACKET_GRACE_PERIOD < p.timestamp){
@@ -53,7 +62,7 @@ CommTimer::check_packet(const CommPacketHeader &p)
   }
 
   // Packet is good!
-  team_times[p.player - 1] = p.timestamp;
+  teamPackets[p.player - 1].timestamp = p.timestamp;
   packets_checked++;
 
   if (need_to_update)
@@ -76,17 +85,17 @@ CommTimer::get_time_from_others()
   llong tstamp = timestamp();
 
   // average the times of those ahead of us
-  for (vector<llong>::iterator ts = team_times.begin(); ts != team_times.end();
-       ts++) {
-    if (tstamp + PACKET_TIME_DISRUPTED < *ts) {
-      tsum += *ts;
-      num++;
-    }
+  for (vector<CommTeammatePacketInfo>::iterator tp = teamPackets.begin(); tp != teamPackets.end();
+       tp++) {
+      if (tstamp + PACKET_TIME_DISRUPTED < tp->timestamp) {
+	  tsum += tp->timestamp;
+	  num++;
+      }
   }
 
   if (num > 0) {
-    tsum /= num;
-    epoch -= tsum - tstamp;
-    need_to_update = false;
+      tsum /= num;
+      epoch -= tsum - tstamp;
+      need_to_update = false;
   }
 }
