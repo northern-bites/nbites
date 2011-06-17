@@ -19,8 +19,7 @@ QTool::QTool() : QMainWindow(),
 
     toolTabs->addTab(colorCreator, tr("Color Creator"));
 
-    //TODO: tomorrow
-    dataManager->addSubscriber(colorCreator);
+    dataManager->addSubscriber(colorCreator, data::NEW_IMAGE);
 }
 
 QTool::~QTool() {

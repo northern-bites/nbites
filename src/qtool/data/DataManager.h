@@ -19,14 +19,21 @@
 namespace qtool {
 namespace data {
 
-class DataManager : public MultiProvider<int> {
+enum DataEvent {
+    NEW_IMAGE = 17,
+    NEW_VISION_SENSORS,
+    NEW_MOTION_SENSORS,
+    NEW_VISION_INFO
+};
+
+class DataManager : public MultiProvider<DataEvent> {
 
 public:
     DataManager();
 
     void getNext() const {
         dataHandler->readNext();
-        this->notifySubscribers(0);
+        this->notifySubscribers(NEW_IMAGE);
     }
 
     boost::shared_ptr<const memory::Memory> getMemory() const {

@@ -48,7 +48,7 @@ namespace Ui {
 namespace qtool {
 namespace colorcreator {
 
-class ColorCreator : public QWidget, public Subscriber<int>
+class ColorCreator : public QWidget, public Subscriber<data::DataEvent>
 {
     Q_OBJECT
 
@@ -62,7 +62,7 @@ public:
     void updateDisplays();
     void updateColors();
     void updateThresh();
-    void update(int eventID) {
+    void update(data::DataEvent event) {
         yuvImage.updateFromRoboImage();
         updateDisplays();
     }
