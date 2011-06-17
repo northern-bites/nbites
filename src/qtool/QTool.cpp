@@ -24,9 +24,9 @@ QTool::QTool() : QMainWindow(),
 }
 
 QTool::~QTool() {
+    delete colorCreator;
     delete toolTabs;
 
-    delete colorCreator;
     delete dataManager;
 }
 
