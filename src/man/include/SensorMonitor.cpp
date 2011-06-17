@@ -50,7 +50,7 @@ double SensorMonitor::X(double input) {
     //<< " hpf " << noise.A().Y()
     //<< " var " << noise.Y() << std::endl;
 
-    if (reportErrors) {
+    if (reportErrors && noise.Steady()) {
         if ((lowVariance != DONT_CHECK && variance < lowVariance) ||
             (highVariance != DONT_CHECK && variance > highVariance)) {
             reportSensorError();
@@ -90,8 +90,9 @@ void SensorMonitor::setVarianceBounds(float low, float high) {
 
 void SensorMonitor::reportSensorError() {
     std::cout << "Potential sensor problem with " << sensorName
-              << ", saw " << Y() << " not between " << lowVariance
-              << "-" << highVariance << std::endl;
+              << ", saw a variance of " << Y()
+              << " (feel free to ignore this if the robot is stationary)"
+              << std::endl;
 }
 
 const int SensorMonitor::binCountAt(int index) const {

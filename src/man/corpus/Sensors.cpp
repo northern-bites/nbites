@@ -63,11 +63,12 @@ Sensors::Sensors ()
       colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
-	  varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
-	  unfilteredInertial(),
+      varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
+      fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
+      unfilteredInertial(),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
       FRM_FOLDER("/home/nao/naoqi/frames"),
-	  saving_frames_on(false)
+      saving_frames_on(false)
 {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
@@ -84,7 +85,7 @@ Sensors::Sensors ()
 #ifdef USE_SENSORS_IMAGE_LOCKING
     pthread_mutex_init(&image_mutex, NULL);
 #endif
-	pthread_mutex_init(&variance_mutex, NULL);
+    pthread_mutex_init(&variance_mutex, NULL);
 
     // set up the sensor monitoring
     varianceMonitor.Sensor(ACCX).setVarianceBounds(SensorMonitor::DONT_CHECK,
@@ -98,9 +99,9 @@ Sensors::Sensors ()
     varianceMonitor.Sensor(GYROY).setVarianceBounds(GYRO_LOW,
                                                     SensorMonitor::DONT_CHECK);
     varianceMonitor.Sensor(ANGLEX).setVarianceBounds(SensorMonitor::DONT_CHECK,
-                                                      ANGLE_XY_HIGH);
+                                                     ANGLE_XY_HIGH);
     varianceMonitor.Sensor(ANGLEY).setVarianceBounds(SensorMonitor::DONT_CHECK,
-                                                      ANGLE_XY_HIGH);
+                                                     ANGLE_XY_HIGH);
     varianceMonitor.Sensor(SONARL).setVarianceBounds(SensorMonitor::DONT_CHECK,
                                                      SONAR_HIGH);
     varianceMonitor.Sensor(SONARR).setVarianceBounds(SensorMonitor::DONT_CHECK,
@@ -604,7 +605,7 @@ void Sensors::setUnfilteredInertial(const float accX, const float accY, const fl
 
     unfilteredInertial = Inertial(accX, accY, accZ, gyrX, gyrY, angleX, angleY);
 
-	updateMotionDataVariance();
+    updateMotionDataVariance();
 
     pthread_mutex_unlock (&unfiltered_inertial_mutex);
 }
@@ -615,7 +616,7 @@ void Sensors::setUnfilteredInertial (const Inertial &v)
 
     unfilteredInertial = v;
 
-	updateMotionDataVariance();
+    updateMotionDataVariance();
 
     pthread_mutex_unlock (&unfiltered_inertial_mutex);
 }
@@ -628,7 +629,7 @@ void Sensors::setUltraSound (const float distLeft,
     ultraSoundDistanceLeft = distLeft;
     ultraSoundDistanceRight = distRight;
 
-	updateVisionDataVariance();
+    updateVisionDataVariance();
 
     pthread_mutex_unlock (&ultra_sound_mutex);
 }
@@ -662,7 +663,7 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
     inertial = _inertial;
     unfilteredInertial = _unfilteredInertial;
 
-	updateMotionDataVariance();
+    updateMotionDataVariance();
 
     pthread_mutex_unlock(&unfiltered_inertial_mutex);
     pthread_mutex_unlock(&inertial_mutex);
@@ -690,7 +691,7 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
     batteryCharge = bCharge;
     batteryCurrent = bCurrent;
 
-	updateVisionDataVariance();
+    updateVisionDataVariance();
 
     pthread_mutex_unlock(&ultra_sound_mutex);
     pthread_mutex_unlock (&button_mutex);
@@ -711,35 +712,35 @@ void Sensors::setAllSensors (vector<float> sensorValues) {
     // a better way to assign these so that it's checked at compile time
     // please do!
 
-	// foot force sensors
+    // foot force sensors
     leftFootFSR = FSR(sensorValues[FSR_LEFT_F_L], sensorValues[FSR_LEFT_F_R],
                       sensorValues[FSR_LEFT_B_L], sensorValues[FSR_LEFT_B_R]);
     rightFootFSR = FSR(sensorValues[FSR_RIGHT_F_L], sensorValues[FSR_RIGHT_F_R],
                        sensorValues[FSR_RIGHT_B_L], sensorValues[FSR_RIGHT_B_R]);
 
-	// foot bumpers
+    // foot bumpers
     leftFootBumper = FootBumper(sensorValues[BUMPER_LEFT_L],
-								sensorValues[BUMPER_LEFT_R]);
+                                sensorValues[BUMPER_LEFT_R]);
     rightFootBumper = FootBumper(sensorValues[BUMPER_RIGHT_L],
-								 sensorValues[BUMPER_RIGHT_R]);
+                                 sensorValues[BUMPER_RIGHT_R]);
 
     inertial = Inertial(sensorValues[ACC_X], // accelerometers
-						sensorValues[ACC_Y],
-						sensorValues[ACC_Z],
+                        sensorValues[ACC_Y],
+                        sensorValues[ACC_Z],
                         sensorValues[GYRO_X],  // gyros
-						sensorValues[GYRO_Y],
+                        sensorValues[GYRO_Y],
                         sensorValues[ANGLE_X], // angleX/angleY
-						sensorValues[ANGLE_Y]);
+                        sensorValues[ANGLE_Y]);
 
-	// sonar
+    // sonar
     ultraSoundDistanceLeft = sensorValues[SONAR_LEFT];
     ultraSoundDistanceRight = sensorValues[SONAR_RIGHT];
 
     supportFoot =
-		static_cast<SupportFoot>(static_cast<int>(sensorValues[SUPPORT_FOOT]));
+        static_cast<SupportFoot>(static_cast<int>(sensorValues[SUPPORT_FOOT]));
 
-	updateMotionDataVariance();
-	updateVisionDataVariance();
+    updateMotionDataVariance();
+    updateVisionDataVariance();
 
     pthread_mutex_unlock (&support_foot_mutex);
     pthread_mutex_unlock (&ultra_sound_mutex);
@@ -864,11 +865,11 @@ bool Sensors::isSavingFrames() const
 }
 
 void Sensors::updateMotionDataVariance() {
-	pthread_mutex_lock(&variance_mutex);
+    pthread_mutex_lock(&variance_mutex);
 
     int i = 0; // so re-ordering of sensors is easy
 
-    // TODO: clean this up (ellipsis arguments?)
+    // Inertial stuff
     varianceMonitor.update(i,   unfilteredInertial.accX);
     varianceMonitor.update(++i, unfilteredInertial.accY);
     varianceMonitor.update(++i, unfilteredInertial.accZ);
@@ -877,30 +878,41 @@ void Sensors::updateMotionDataVariance() {
     varianceMonitor.update(++i, unfilteredInertial.angleX);
     varianceMonitor.update(++i, unfilteredInertial.angleY);
 
-    // TODO: add FSRs? (maybe when we actuallly use them?)
+    // FSRs (in their own monitor)
+    i = 0;
 
-	pthread_mutex_unlock(&variance_mutex);
+    fsrMonitor.update(i,   leftFootFSR.frontLeft);
+    fsrMonitor.update(++i, leftFootFSR.frontRight);
+    fsrMonitor.update(++i, leftFootFSR.rearLeft);
+    fsrMonitor.update(++i, leftFootFSR.rearRight);
+    fsrMonitor.update(++i, rightFootFSR.frontLeft);
+    fsrMonitor.update(++i, rightFootFSR.frontRight);
+    fsrMonitor.update(++i, rightFootFSR.rearLeft);
+    fsrMonitor.update(++i, rightFootFSR.rearRight);
+
+    pthread_mutex_unlock(&variance_mutex);
 }
 
 void Sensors::updateVisionDataVariance() {
-	pthread_mutex_lock(&variance_mutex);
+    pthread_mutex_lock(&variance_mutex);
 
-	int i = 7; /// @see updateMotionDataVariance()
+    int i = 7; /// @see updateMotionDataVariance()
 
-	varianceMonitor.update( i, ultraSoundDistanceLeft);
-	varianceMonitor.update(++i, ultraSoundDistanceRight);
+    varianceMonitor.update( i, ultraSoundDistanceLeft);
+    varianceMonitor.update(++i, ultraSoundDistanceRight);
 
-	pthread_mutex_unlock(&variance_mutex);
+    pthread_mutex_unlock(&variance_mutex);
 }
 
 // tells our sensor monitors to dump their data to /tmp/
 void Sensors::writeVarianceData() {
-	pthread_mutex_lock(&variance_mutex);
+    pthread_mutex_lock(&variance_mutex);
 
-	cout << "Logging variance data to /tmp/" << endl;
-	varianceMonitor.LogOutput();
+    cout << "Logging variance data to /tmp/" << endl;
+    varianceMonitor.LogOutput();
+    fsrMonitor.LogOutput();
 
-	pthread_mutex_unlock(&variance_mutex);
+    pthread_mutex_unlock(&variance_mutex);
 }
 
 // @TODO move this to Transcriber to write out from full size image...

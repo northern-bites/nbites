@@ -51,7 +51,12 @@ enum SensorMonitorOrder {
     ANGLEY,
     SONARL,
     SONARR,
-    MONITOR_COUNT
+    MONITOR_COUNT,
+};
+
+const std::string fsrNames[] = {
+    "left_f_L", "left_f_r", "left_b_l", "left_b_r",
+    "right_f_L", "right_f_r", "right_b_l", "right_b_r"
 };
 
 // names of different sensors (for variance monitoring)

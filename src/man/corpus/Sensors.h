@@ -267,7 +267,7 @@ private:
      */
 
     // Sensor variance/health monitor
-    BulkMonitor varianceMonitor;
+    BulkMonitor varianceMonitor, fsrMonitor;
 
     Inertial unfilteredInertial;
     //ChestButton
