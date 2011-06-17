@@ -14,10 +14,9 @@ def goalieSave(player):
 
     brain = player.brain
     if player.firstFrame():
-        brain.motion.stopHeadMoves()
+        brain.tracker.stopHeadMoves()
         player.stopWalking()
         brain.tracker.trackBall()
-        #does tracker work after  you stopHeadMoves?
         brain.fallController.enableFallProtection(False)
 
     if helper.shouldSaveRight(player):
