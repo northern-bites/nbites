@@ -39,7 +39,7 @@ void ParsingBoard::initParsingObjects() {
     MImage* mimage = memory->getMutableMImage();
     FDProvider* mimageFDprovider = new FileFDProvider("/home/oneamtu/log/trillian/Image.log");
     objectFDProviderMap[mimage] = mimageFDprovider;
-    objectParserMap[mimage] = new ImageParser("/home/oneamtu/log/trillian/Image.log",
+    objectParserMap[mimage] = new ImageParser("/home/oneamtu/log/spock/Image.log",
             shared_ptr<MImage>(mimage));
 }
 
