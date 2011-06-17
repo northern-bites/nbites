@@ -61,7 +61,9 @@ KICK_STRAIGHT_POST_BEARING = 20
 KICK_STRAIGHT_BEARING_THRESH = 70
 KICK_SIDE_DIST_THRESH = .75*NogginConstants.GOAL_WIDTH
 
+#Constants to help decide back kick
 CLEAR_POST_DIST_DIFF = .25*NogginConstants.GOAL_WIDTH
+CENTERED_POST_DIST_DIFF = .1 * NogginConstants.GOAL_WIDTH
 
 ## KickInformation constants
 GPOST_NEAR_THRESHOLD = 200
