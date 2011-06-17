@@ -41,6 +41,9 @@ static const string wifi_restart_wav = nbsdir +"wifi_restart"+wav;
 static const string dot = ".";
 
 
+//TODO: remove
+using namespace man::corpus::guardian;
+
 static const boost::shared_ptr<FreezeCommand> REMOVE_GAINS =
     boost::shared_ptr<FreezeCommand>
     (new FreezeCommand());
@@ -75,13 +78,15 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
 	  wifiReconnectTimeout(0),
 	  falling(false),fallen(false),feetOnGround(true),
       useFallProtection(false),
-      lastHeatAudioWarning(0), lastHeatPrintWarning(0)
+      lastHeatAudioWarning(0), lastHeatPrintWarning(0),
+      connectionAngel(new ConnectionAngel())
 {
     pthread_mutex_init(&click_mutex,NULL);
     executeStartupAction();
 }
 RoboGuardian::~RoboGuardian(){
     pthread_mutex_destroy(&click_mutex);
+    delete connectionAngel;
 }
 
 
@@ -143,7 +148,7 @@ bool isFalling(float angle_pos, float angle_vel) {
     // Test falling based on angle (note that angle_pos is assumed to be
     // the mag. of the angle).
     if (angle_pos >= FALLING_ANGLE_THRESH) {
-	//cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos 
+	//cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos
 	//     << ", angle_vel == " << angle_vel << endl;
             return true;
     } else {
@@ -498,18 +503,19 @@ string RoboGuardian::getHostName()const {
 }
 
 const string RoboGuardian::discoverIP() const{
-    // try ...|awk '{print $1 " " $2}' and grep -v inet6
-    system("ifconfig|grep 'inet'|cut -d':' -f2|awk '{print $1}'|grep -v 127.0.0.1 > /tmp/ip.txt");
-    char ip[100];
-    FILE * ipf = fopen("/tmp/ip.txt","r");
-    if(ipf != NULL){
-        fscanf(ipf,"%s\n",ip);
-        return ip;
-        fclose(ipf);
-    }else{
-        cout << "Unable to read IP from this platform"<<endl;
-        return "0";
-    }
+    return string(connectionAngel->get_ip_string());
+//    // try ...|awk '{print $1 " " $2}' and grep -v inet6
+//    system("ifconfig|grep 'inet'|cut -d':' -f2|awk '{print $1}'|grep -v 127.0.0.1 > /tmp/ip.txt");
+//    char ip[100];
+//    FILE * ipf = fopen("/tmp/ip.txt","r");
+//    if(ipf != NULL){
+//        fscanf(ipf,"%s\n",ip);
+//        return ip;
+//        fclose(ipf);
+//    }else{
+//        cout << "Unable to read IP from this platform"<<endl;
+//        return "0";
+//    }
 
 }
 
