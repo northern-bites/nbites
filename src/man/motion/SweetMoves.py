@@ -643,7 +643,7 @@ LEFT_SHORT_BACK_KICK = (
      (0.,13.,-50.,65.,-16.,-10.),
      (0.,5.,-38.,76.,-40.,-16.5),
      (80.,-40.,50.,70.),
-     .3 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     .4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     # recover
     ((80.,40.,-50.,-70.),

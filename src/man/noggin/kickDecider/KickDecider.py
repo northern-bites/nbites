@@ -65,6 +65,8 @@ class KickDecider(object):
 
         print self.info
 
+        return self.chooseShortBackKick()
+
         if self.info.kickObjective == constants.OBJECTIVE_SHOOT:
             return self.shoot()
         #elif self.info.kickObjective == constants.OBJECTIVE_CLEAR:
