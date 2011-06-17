@@ -205,7 +205,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 25
+NUM_SUB_ROLES = 29
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
 
@@ -232,15 +232,19 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             # CHASER SUB ROLES 16
                                             "CHASE_NORMAL",
 
-                                            # GOALIE SUB ROLE 17-18
+                                            # GOALIE SUB ROLE 17-22
                                             "GOALIE_NORMAL",
+                                            "GOALIE_RIGHT",
+                                            "GOALIE_LEFT",
+                                            "GOALIE_SAVE",
                                             "GOALIE_CHASER",
+                                            "GOALIE_PENALTY_SAVER",
 
-                                            # KICKOFF SUB ROLES 19-20
+                                            # KICKOFF SUB ROLES 23-24
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 21-24
+                                            # READY SUB ROLES 25-28
                                             "READY_GOALIE",
                                             "READY_CHASER",
                                             "READY_DEFENDER",
@@ -269,7 +273,11 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  CHASE_NORMAL,
 
  GOALIE_NORMAL,
+ GOALIE_RIGHT,
+ GOALIE_LEFT,
+ GOALIE_SAVE,
  GOALIE_CHASER,
+ GOALIE_PENALTY_SAVER,
 
  KICKOFF_SWEEPER,
  KICKOFF_STRIKER,
@@ -366,8 +374,14 @@ LARGE_ELLIPSE_HEIGHT = NogginConstants.GOALBOX_DEPTH * 0.65 #radius # lab field 
 LARGE_ELLIPSE_WIDTH = NogginConstants.CROSSBAR_CM_WIDTH / 2.0 #radius
 LARGE_ELLIPSE_CENTER_Y = NogginConstants.CENTER_FIELD_Y
 LARGE_ELLIPSE_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
+
 GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X + 20 #LARGE_ELLIPSE_HEIGHT # unsure come back to
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
+GOALIE_RIGHT_X = NogginConstants.MY_GOALBOX_LEFT_X + 20
+GOALIE_RIGHT_Y = NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y + 10
+GOALIE_LEFT_X = NogginConstants.MY_GOALBOX_LEFT_X + 20
+GOALIE_LEFT_Y = NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y - 10
+
 ELLIPSE_POSITION_LIMIT = BALL_LOC_LIMIT
 # Angle limits for moving about ellipse
 ELLIPSE_ANGLE_MAX = 80

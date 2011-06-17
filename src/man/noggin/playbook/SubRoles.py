@@ -5,6 +5,7 @@ from ..util import MyMath
 
 #### Goalie sub roles ####
 
+#should make this Center instead of normal
 def pGoalieNormal(team, workingPlay):
     """normal goalie position"""
     workingPlay.setSubRole(PBConstants.GOALIE_NORMAL)
@@ -16,10 +17,54 @@ def pGoalieNormal(team, workingPlay):
 
     workingPlay.setPosition(pos)
 
+def pGoaliePosRight(team, workingPlay):
+    """goalie position right side of goal"""
+
+    workingPlay.setSubRole(PBConstants.GOALIE_RIGHT)
+    h = team.brain.ball.heading
+    pos = (PBConstants.GOALIE_RIGHT_X, PBConstants.GOALIE_RIGHT_Y, h)
+
+    if PBConstants.USE_FANCY_GOALIE:
+        pos = team.fancyGoaliePosition()
+
+    workingPlay.setPosition(pos)
+
+def pGoaliePosLeft(team, workingPlay):
+    """goalie position left side of goal"""
+
+    workingPlay.setSubRole(PBConstants.GOALIE_LEFT)
+    h = team.brain.ball.heading
+    pos = (PBConstants.GOALIE_LEFT_X, PBConstants.GOALIE_LEFT_Y, h)
+
+    if PBConstants.USE_FANCY_GOALIE:
+        pos = team.fancyGoaliePosition()
+
+    workingPlay.setPosition(pos)
+
+def pGoalieSave(team, workingPlay):
+    workingPlay.setSubRole(PBConstants.GOALIE_SAVE)
+    h = team.brain.ball.heading
+    pos = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
+
+    if PBConstants.USE_FANCY_GOALIE:
+        pos = team.fancyGoaliePosition()
+
+    workingPlay.setPosition(pos)
+
 def pGoalieChaser(team, workingPlay):
     """goalie is being a chaser, presumably in/near goalbox not intended for
         pulling the goalie situations"""
     workingPlay.setSubRole(PBConstants.GOALIE_CHASER)
+    h = team.brain.ball.heading
+    pos = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
+
+    if PBConstants.USE_FANCY_GOALIE:
+       pos = team.fancyGoaliePosition()
+
+    workingPlay.setPosition(pos)
+
+def pGoaliePenaltySaver(team, workingPlay):
+    workingPlay.setSubRole(PBConstants.GOALIE_PENALTY_SAVER)
     h = team.brain.ball.heading
     pos = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
 

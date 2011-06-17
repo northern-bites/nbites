@@ -39,6 +39,13 @@ class GoTeam:
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
                                PBConstants.LARGE_ELLIPSE_WIDTH)
 
+        self.shouldPositionLeftCounter = 0
+        self.shouldPositionRightCounter = 0
+        self.shouldPositionCenterCounter = 0
+        self.shouldSaveCounter = 0
+        self.shouldChaseCounter = 0
+        self.shouldStopChaseCounter = 0
+
     def run(self, play):
         """We run this each frame to get the latest info"""
         if self.brain.gameController.currentState != 'gamePenalized':
@@ -366,9 +373,6 @@ class GoTeam:
     ############   Strategy Decision Stuff     ###########
     ######################################################
 
-    def goalieShouldChase(self):
-        return self.noCalledChaser()
-
     def noCalledChaser(self):
         """Returns true if no one is chasing and they are not searching"""
         # If everyone else is out, let's not go for the ball
@@ -460,11 +464,12 @@ class GoTeam:
     def fancyGoaliePosition(self):
         """returns a goalie position using ellipse"""
 
-        position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y)
-
         # lets try maintaining home position until the ball is closer in
         # might help us stay localized better
         ball = self.brain.ball
+        h = ball.heading
+        position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
+
         if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
             # Use an ellipse just above the goalline to determine x and y position
             # We get the angle from goal center to the ball to determine our X,Y
@@ -480,9 +485,8 @@ class GoTeam:
                 theta = PBConstants.ELLIPSE_ANGLE_MAX * PBConstants.DEG_TO_RAD
 
         # Determine X,Y of ellipse based on theta, set heading on the ball
-        x, y = self.ellipse.getPositionFromTheta(theta)
-        h = ball.heading
-        position = (x,y,h)
+            x, y = self.ellipse.getPositionFromTheta(theta)
+            position = (x,y,h)
 
         return position
 

@@ -10,8 +10,6 @@ def chase(player):
     """
     Super State to determine what to do from various situations
     """
-    player.isChasing = True
-
     if player.brain.play.isRole(GOALIE):
         return player.goNow('goalieChase')
 
@@ -35,12 +33,6 @@ def goalieChase(player):
     TODO: dangerousBall??
     """
     # Check in order of importance
-
-    #tells the goalie what state its in
-    if player.firstFrame():
-        player.isChasing = True
-        player.isPositioning = False
-        player.isSaving = False
 
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')

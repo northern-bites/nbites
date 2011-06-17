@@ -3,8 +3,7 @@ from ..playbook import PBConstants as PBCon
 from .. import NogginConstants as NogCon
 import GoalieConstants as goalCon
 import ChaseBallTransitions as chaseTran
-#am I suposed to do this?
-from ..playbook import GoTeam as GoTeam
+
 
 DEBUG = False
 
@@ -24,7 +23,7 @@ def getTimeUntilSave(player):
 
 def shouldPositionForSave(player):
     ball = player.brain.ball
-    #add a counter 
+    #add a counter
     #player.shouldSaveCounter already exists
     #need to test velocity values
     if (fabs(ball.dx) > goalCon.VEL_THRES):
@@ -68,9 +67,9 @@ def shouldSave(player):
     #is prepared to save
     ball = player.brain.ball
 
-    if (shouldPrepareToSave):
+    if fabs(ball.dx) > 5: #goalCon.VEL_THRES:
         #inside goal box plus save buffer
-        if  (ball.x < (NogCon.MY_GOALBOX_RIGHT_X + goalCon.SAVE_BUFFER)
+        if (ball.x < (NogCon.MY_GOALBOX_RIGHT_X + goalCon.SAVE_BUFFER)
              and ball.y < (NogCon.MY_GOALBOX_TOP_Y + goalCon.SAVE_BUFFER)
              and ball.y > (NogCon.MY_GOALBOX_BOTTOM_Y - goalCon.SAVE_BUFFER)):
             return True
@@ -80,12 +79,9 @@ def shouldSave(player):
 def shouldSaveRight(player):
     ball= player.brain.ball
 
-    if ball.dx < goalCon.VEL_THRES and ball.dx > -goalCon.VEL_THRES:
-        return False
-
-    elif(ball.endY > goalCon.CENTER_SAVE_THRESH):
-        player.countRightSave += 1
-        if(player.countRightSave > 3):
+    if(ball.endY > goalCon.CENTER_SAVE_THRESH):
+        player.counterRightSave += 1
+        if(player.counterRightSave > 3):
             player.counterRightSave = 0
             player.counterLeftSave = 0
             player.counterCenterSave = 0
@@ -95,11 +91,8 @@ def shouldSaveRight(player):
 def shouldSaveLeft(player):
     ball= player.brain.ball
 
-    if ball.dx < goalCon.VEL_THRES and ball.dx > -goalCon.VEL_THRES:
-        return False
-
     if(ball.endY < -goalCon.CENTER_SAVE_THRESH):
-        player.countLeftSave += 1
+        player.counterLeftSave += 1
         if( player.counterLeftSave > 3) :
             player.counterLeftSave = 0
             player.counterRightSave = 0
@@ -111,21 +104,16 @@ def shouldSaveLeft(player):
 def shouldSaveCenter(player):
     ball= player.brain.ball
 
-    if(ball.dx < goalCon.VEL_THRES and ball.dx > -goalCon.VEL_THRES):
-        if ball.relX < 10:
-            player.countCenterSave += 1
-
-    elif( not shouldDiveRight and not shouldDiveLeft):
-        player.countCenterSave += 1
-
-    if (player.countCenterSave > 3):
+    if(not shouldSaveRight and not shouldSaveLeft):
+        player.counterCenterSave += 1
+        if (player.counterCenterSave > 3):
             player.counterCenterSave = 0
             player.counterLeftSave = 0
             player.counterRightSave = 0
             return True
     return False
 
-#need to figure out how this works
+# need to figure out how this works
 def shouldHoldSave(player):
     # same as shouldSave() except for the ball.framesOn check
     # try to come up with better conditions to test
@@ -143,18 +131,6 @@ def shouldHoldSave(player):
 
 #POSITION TRANSITIONS
 
-def outOfPosition(player):
-    if player.penaltyKicking:
-        return False
-
-    #I need to figure out what this does
-    my = player.brain.my
-    if (my.x > NogCon.MY_GOALBOX_RIGHT_X and my.uncertX < 90)\
-            or (my.x > NogCon.MIDFIELD_X * 0.5):
-        #print "my.x ", my.x, " my.uncertX ", my.uncertX
-        return True
-    return False
-
 # player is inside the box with a small buffer
 #localization not good enough for this?
 def goalieInBox(player):
@@ -168,103 +144,17 @@ def goalieInBox(player):
 
     return False
 
-# add a counter to this
-def shouldPositionCenter(player):
-    ball = player.brain.ball
 
-    if (ball.y > NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y + goalCon.BOX_BUFFER
-        and ball.y < NogCon.LANDMARK_MY_GOAL_LEFT_POST_Y - goalCon.BOX_BUFFER):
-        player.shouldPositionCenter += 1
-        if player.shouldPositionCenter > 3:
-            player.shouldPositionCenterCounter = 0
-            player.shouldPositionLeftCounter = 0
-            player.shouldPositionRightCounter = 0
-            return True
-
-    return False
-
-def shouldPositionRight(player):
-    ball = player.brain.ball
-
-    if (ball.y < NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y - goalCon.BOX_BUFFER
-        and ball.x < NogCon.MY_GOALBOX_RIGHT_X + goalCon.BOX_BUFFER):
-        player.shouldPositionRightCounter += 1
-        if player.shouldPositionRightCounter > 3:
-            player.shouldPositionRightCounter = 0
-            player.shouldPositionLeftCounter = 0
-            player.shouldPositionCenterCounter = 0
-            return True
-
-    return False
-
-
-def shouldPositionLeft(player):
-    ball = player.brain.ball
-
-    if (ball.y > NogCon.LANDMARK_MY_GOAL_LEFT_POST_Y + goalCon.BOX_BUFFER
-        and ball.x < NogCon.MY_GOALBOX_RIGHT_X + goalCon.BOX_BUFFER):
-        player.shouldPositionLeftCounter += 1
-        if player.shouldPositionLeftCounter > 3:
-            player.shouldPositionRightCounter = 0
-            player.shouldPositionLeftCounter = 0
-            player.shouldPositionCenterCounter = 0
-            return True
-
-    return False
+#CHASE TRANSITIONS
 
 def dangerousBall(player):
     ball = player.brain.ball
 
     # in box and behind me and close to me
     # if inBox(player):
-    if (ball.relX < 0 and ball.relX < 30
-        and ball.relY < 30
-        and ball.relY > -30):
+    if (ball.relX < 0):
+        #and ball.dist < 30):
         return True
 
     return False
 
-#Decisions for when to chase.
-#Will chase when:
-    # Inside the chasing box
-
-def shouldChase(player):
-    ball = player.brain.ball
-
-    if player.penaltyKicking:
-        return False
-
-    # close enough to chase
-    elif (ball.x < goalCon.CHASE_RIGHT_X_LIMIT
-          and ball.x > goalCon.CHASE_LEFT_X_LIMIT
-          and ball.y > goalCon.CHASE_LOWER_Y_LIMIT
-          and ball.y < goalCon.CHASE_UPPER_Y_LIMIT):
-        player.shouldChaseCounter += 1
-
-    if player.shouldChaseCounter > 3:
-        player.shouldChaseCounter = 0
-        player.shouldStopChaseCounter = 0
-        return True
-
-    return False
-
-#Should stop chasing if
-    #Ball is outside of the chase range
-def shouldStopChase(player):
-    ball= player.brain.ball
-
-    #if(ball.framesOff > 45):
-        #player.shouldStopChaseCounter = 4
-
-    if (ball.x > goalCon.CHASE_RIGHT_X_LIMIT
-          or ball.x < goalCon.CHASE_LEFT_X_LIMIT
-          or ball.y < goalCon.CHASE_LOWER_Y_LIMIT
-          or ball.y > goalCon.CHASE_UPPER_Y_LIMIT):
-        player.shouldStopChaseCounter += 1
-
-    if player.shouldStopChaseCounter > 3:
-        player.shouldStopChaseCounter = 0
-        player.shouldChaseCounter = 0
-        return True
-
-    return False
