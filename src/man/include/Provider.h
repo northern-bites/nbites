@@ -30,7 +30,7 @@ public:
     Provider(){
     }
 
-    void addSubscriber(Subscriber<event_type>* s) {
+    virtual void addSubscriber(Subscriber<event_type>* s) {
         subscribers.push_back(s);
     }
 

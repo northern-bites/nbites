@@ -30,7 +30,11 @@ public:
     MultiProvider(){
     }
 
-    void addSubscriber(Subscriber<event_type>* s,
+    virtual void addSubscriber(Subscriber<event_type>* s) {
+        Provider<event_type>::addSubscriber(s);
+    }
+
+    virtual void addSubscriber(Subscriber<event_type>* s,
             event_type event_to_subscribe_to) {
         eventSubscriberMap.insert(
                 EventSubscriberPair(event_to_subscribe_to, s));

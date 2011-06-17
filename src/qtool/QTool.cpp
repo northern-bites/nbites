@@ -20,7 +20,7 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(colorCreator, tr("Color Creator"));
 
     //TODO: tomorrow
-    dataManager->Provider<int>::addSubscriber(colorCreator);
+    dataManager->addSubscriber(colorCreator);
 }
 
 QTool::~QTool() {
