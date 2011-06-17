@@ -12,48 +12,49 @@ static const float LOW_BIN = 0.0001f;
 static const float HIGH_BIN = 100.0f;
 
 SensorMonitor::SensorMonitor()
-	:  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
-	   monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
+    :  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
+       monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
        reportErrors(false),
        lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
 {
-	Reset();
+    Reset();
 }
 
 SensorMonitor::SensorMonitor(std::string sensorName)
-	:  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
-	   monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
+    :  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
+       monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
        reportErrors(false),
        lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
 {
-	SensorMonitor::sensorName = sensorName;
-	Reset();
+    SensorMonitor::sensorName = sensorName;
+    Reset();
 }
 
 SensorMonitor::~SensorMonitor() {
-	// nothing to do here!
+    // nothing to do here!
 }
 
 double SensorMonitor::X(double input) {
     double variance = Y(noise.X(input));
 
- 	if (noise.Steady()) {
-		monitor.X(variance);
+    if (noise.Steady()) {
+	monitor.X(variance);
 
-		// for making sure filter output is reasonable (test)
-		if (steadyAtFrame == NOT_STEADY) {
-			steadyAtFrame = SampleCount();
-		}
+	// for making sure filter output is reasonable (test)
+	if (steadyAtFrame == NOT_STEADY) {
+	    steadyAtFrame = SampleCount();
 	}
+    }
 
     //std::cout << sensorName << " input: " << input
     //<< " hpf " << noise.A().Y()
     //<< " var " << noise.Y() << std::endl;
 
+    // error if variance is out of bounds or exactly zero (implies a dead sensor)
     if (reportErrors && noise.Steady()) {
         if ((lowVariance != DONT_CHECK && variance < lowVariance) ||
             (highVariance != DONT_CHECK && variance > highVariance) ||
-	    variance == 0.0) {
+            variance == 0.0) {
             reportSensorError();
         }
     }
@@ -61,25 +62,25 @@ double SensorMonitor::X(double input) {
 }
 
 void SensorMonitor::Reset() {
-	Filter::Reset();
-	noise.Reset();
-	monitor.Reset();
-	steadyAtFrame = NOT_STEADY;
+    Filter::Reset();
+    noise.Reset();
+    monitor.Reset();
+    steadyAtFrame = NOT_STEADY;
 }
 
 void SensorMonitor::LogOutput() {
-	using namespace std;
-	stringstream filename;
+    using namespace std;
+    stringstream filename;
 
-	filename << "/tmp/" << sensorName << ".sensor.xls";
+    filename << "/tmp/" << sensorName << ".sensor.xls";
 
-	ofstream outFile;
-	outFile.open(filename.str().c_str(), ifstream::out);
+    ofstream outFile;
+    outFile.open(filename.str().c_str(), ifstream::out);
 
-	outFile << "Report for sensor: " << sensorName << endl;
-	outFile << monitor.toString() << endl;
+    outFile << "Report for sensor: " << sensorName << endl;
+    outFile << monitor.toString() << endl;
 
-	outFile.close();
+    outFile.close();
 }
 
 void SensorMonitor::setVarianceBounds(float low, float high) {
@@ -97,9 +98,9 @@ void SensorMonitor::reportSensorError() {
 }
 
 const int SensorMonitor::binCountAt(int index) const {
-	return monitor.binCount(index);
+    return monitor.binCount(index);
 }
 
 const double SensorMonitor::binMidPoint(int index) const {
-	return monitor.binMidPoint(index);
+    return monitor.binMidPoint(index);
 }
