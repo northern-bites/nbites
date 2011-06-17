@@ -17,9 +17,9 @@
 #include <unistd.h>
 #include <iostream>
 
-#include "Common.h"
+#include "include/Common.h"
 #include "ImageFDLogger.h"
-#include "ImageAcquisition.h"
+#include "corpus/ImageAcquisition.h"
 
 namespace memory {
 
@@ -41,7 +41,7 @@ ImageFDLogger::ImageFDLogger(const FDProvider* fdp,
 {
     raw_output = new FileOutputStream(file_descriptor,
             roboImage->getByteSize() + sizeof(roboImage->getTimestamp()));
-    cout << raw_output->GetErrno() << endl;
+    //cout << raw_output->GetErrno() << endl;
     writeHead();
 }
 
