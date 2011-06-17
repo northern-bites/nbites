@@ -35,8 +35,8 @@ def goalieChase(player):
     """
     # Check in order of importance
 
-    if transitions.shouldScanFindBall(player):
-        return player.goNow('scanFindBall')
+    if transitions.shouldFindBall(player):
+        return player.goNow('findBall')
     elif transitions.shouldApproachBall(player):
         return player.goNow('approachBall')
     elif transitions.shouldSpinToBallClose(player):

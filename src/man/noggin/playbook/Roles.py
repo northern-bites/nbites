@@ -30,6 +30,10 @@ def rGoalie(team, workingPlay):
     elif workingPlay.isSubRole(PBConstants.GOALIE_CHASER):
         if RoleTran.shouldStopChase(team):
             SubRoles.pGoalieNormal(team, workingPlay)
+
+        elif RoleTran.shouldPosition(team):
+            SubRoles.pGoalieNormal(team, workingPlay)
+
         else:
             SubRoles.pGoalieChaser(team, workingPlay)
 
@@ -39,14 +43,11 @@ def rGoalie(team, workingPlay):
         if RoleTran.shouldChase(team):
             SubRoles.pGoalieChaser(team, workingPlay)
 
-        elif RoleTran.shouldPosition(team):
-            SubRoles.pGoalieNormal(team, workingPlay)
+        # elif RoleTran.shouldPositionRight(team):
+        #     SubRoles.pGoaliePosRight(team, workingPlay)
 
-        elif RoleTran.shouldPositionRight(team):
-            SubRoles.pGoaliePosRight(team, workingPlay)
-
-        elif RoleTran.shouldPositionLeft(team):
-            SubRoles.pGoaliePosLeft(team, workingPlay)
+        # elif RoleTran.shouldPositionLeft(team):
+        #     SubRoles.pGoaliePosLeft(team, workingPlay)
 
         elif RoleTran.shouldPositionCenter(team):
             SubRoles.pGoalieNormal(team, workingPlay)
@@ -54,11 +55,12 @@ def rGoalie(team, workingPlay):
         elif workingPlay.isSubRole(PBConstants.GOALIE_NORMAL):
             SubRoles.pGoalieNormal(team, workingPlay)
 
-        elif workingPlay.isSubRole(PBConstants.GOALIE_RIGHT):
-            SubRoles.pGoaliePosRight(team, workingPlay)
+        # elif workingPlay.isSubRole(PBConstants.GOALIE_RIGHT):
+        #     SubRoles.pGoaliePosRight(team, workingPlay)
 
-        elif workingPlay.isSubRole(PBConstants.GOALIE_LEFT):
-            SubRoles.pGoaliePosLeft(team, workingPlay)
+        # elif workingPlay.isSubRole(PBConstants.GOALIE_LEFT):
+
+        #     SubRoles.pGoaliePosLeft(team, workingPlay)
 
 
 def rChaser(team, workingPlay):
