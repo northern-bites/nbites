@@ -313,7 +313,6 @@ class Brain(object):
         Update information about seen objects
         """
         self.ball.updateVision(self.vision.ball)
-        print "Ball heat: " + str(self.ball.heat)
         self.fieldEdge.updateVision(self.vision.fieldEdge)
 
         self.yglp.updateVision(self.vision.yglp)
