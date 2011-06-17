@@ -10,25 +10,36 @@
 #pragma once
 
 #include <list>
-
-class Provider;
-
 #include "Subscriber.h"
 
+template <class T>
 class Provider {
 
+    typedef T event_type;
+    // typename here "convinces" the compiler that Subscriber<T> is actually
+    // a type and then we typedef that to a new type
+    typedef
+            typename std::list<Subscriber<event_type> * >::const_iterator
+            subscriber_iter;
+
 private:
-    std::list <Subscriber*> subscribers;
+    std::list <Subscriber<event_type>*> subscribers;
 
 public:
 
-    Provider(){};
+    Provider(){
+    }
 
-    void addSubscriber(Subscriber* s) { subscribers.push_back(s); }
-    void notify(int eventID) const {
-        for (std::list<Subscriber*>::const_iterator i = subscribers.begin();
+    void addSubscriber(Subscriber<event_type>* s) {
+        subscribers.push_back(s);
+    }
+
+protected:
+
+    void notify(event_type event) const {
+        for (subscriber_iter i = subscribers.begin();
                 i != subscribers.end(); i++) {
-            (*i)->update(eventID);
+            (*i)->update(event);
         }
     }
 

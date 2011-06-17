@@ -86,7 +86,7 @@ Inertial(const float _accX, const float _accY, const float _accZ,
 };
 
 
-class Sensors : public Provider{
+class Sensors : public Provider<int>{
     //friend class Man;
  public:
     Sensors();

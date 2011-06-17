@@ -33,7 +33,7 @@ namespace memory {
 
 using boost::shared_ptr;
 
-class Memory : public Subscriber {
+class Memory : public Subscriber<int> {
 
 public:
     Memory();

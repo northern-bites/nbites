@@ -12,10 +12,13 @@
 
 #pragma once
 
+template <class T>
 class Subscriber {
+
+    typedef T event_type;
 
 public:
     Subscriber(){};
 
-    virtual void update(int eventID) = 0;
+    virtual void update(event_type event) = 0;
 };

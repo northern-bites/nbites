@@ -19,7 +19,7 @@
 namespace qtool {
 namespace data {
 
-class DataManager : public Provider {
+class DataManager : public Provider<int> {
 
 public:
     DataManager();

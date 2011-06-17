@@ -48,7 +48,7 @@ namespace Ui {
 namespace qtool {
 namespace colorcreator {
 
-class ColorCreator : public QWidget, public Subscriber
+class ColorCreator : public QWidget, public Subscriber<int>
 {
     Q_OBJECT
 
