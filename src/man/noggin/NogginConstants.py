@@ -236,6 +236,15 @@ visionObjectTuple = ("YGLP",
                      "BGLP",
                      "BGRP")
 
+#Vision IDS for robots
+NUM_POSSIBLE_ROBOTS = 6
+(RED_1,
+RED_2,
+RED_3,
+BLUE_1,
+BLUE_2,
+BLUE_3) = range(NUM_POSSIBLE_ROBOTS)
+
 if USING_LAB_FIELD:
     LINE_CROSS_OFFSET = 130
 else :
