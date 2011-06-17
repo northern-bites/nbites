@@ -47,9 +47,9 @@ public:
     SensorMonitor(std::string sensorName);
     ~SensorMonitor();
 
-    double X(double);
-    void Reset();
-    void LogOutput();   // prints histograms to /tmp/{sensorName}.sensor
+	double X(double);
+	void Reset();
+	void LogOutput(); // prints histograms to /home/nao/naoqi/log/{sensorName}.sensor
 
     // values outside will cause a print statement
     void setVarianceBounds(float low, float high);

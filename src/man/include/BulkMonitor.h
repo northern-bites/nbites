@@ -53,7 +53,7 @@ public:
 private:
     SensorMonitor* monitors;
     int numberMonitors;
-    string bulkName; // output file we log to in /tmp/
+    string bulkName; // output file we log to in /home/nao/naoqi/log/
 };
 
 #endif

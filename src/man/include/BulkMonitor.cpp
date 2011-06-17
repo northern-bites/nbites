@@ -65,10 +65,10 @@ void BulkMonitor::LogOutput() {
     using namespace std;
     const int width = 12;
 
-    stringstream filename;
-    ofstream outFile;
-    filename << "/tmp/" << bulkName << ".monitor.xls";
-    outFile.open(filename.str().c_str(), ifstream::out);
+	stringstream filename;
+	ofstream outFile;
+	filename << "/home/nao/naoqi/log/" << bulkName << ".monitor.xls";
+	outFile.open(filename.str().c_str(), ifstream::out);
 
     // header line with sensor names
     outFile << setw(width) << "bin";
