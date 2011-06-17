@@ -20,6 +20,7 @@ class Navigator(FSA.FSA):
         self.addStates(ChaseStates)
         self.addStates(PFKStates)
         self.currentState = 'stopped'
+        self.doingSweetMove = False
         self.setName('Navigator')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)

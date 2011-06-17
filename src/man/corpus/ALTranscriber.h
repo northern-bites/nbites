@@ -42,12 +42,15 @@
  *  code out of Man
  */
 
+
 class ALTranscriber : public Transcriber
 {
 public:
     ALTranscriber(AL::ALPtr<AL::ALBroker> _broker,
                   boost::shared_ptr<Sensors> sensors);
-    virtual ~ALTranscriber(){};
+    virtual ~ALTranscriber() {
+		printf("ALTranscriber destructor\n");
+	};
 
     virtual void postMotionSensors(){ syncMotionWithALMemory(); }
     virtual void postVisionSensors(){ syncVisionWithALMemory(); }
