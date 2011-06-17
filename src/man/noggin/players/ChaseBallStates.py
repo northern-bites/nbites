@@ -113,7 +113,7 @@ def spinToBall(player):
     if transitions.shouldFindBall(player):
         return player.goLater('findBall')
     elif transitions.shouldChaseFromSpinToBall(player):
-        return player.goLater('chase')
+        return player.goNow('chase')
 
     return player.stay()
 
@@ -152,13 +152,13 @@ def positionForKick(player):
         player.brain.nav.kickPosition(kick)
 
     if transitions.shouldKick(player):
-        return player.goLater('kickBallExecute')
+        return player.goNow('kickBallExecute')
     elif transitions.shouldFindBallKick(player):
         player.inKickingState = False
         return player.goLater('findBall')
     elif transitions.shouldChaseFromPositionForKick(player):
         player.inKickingState = False
-        return player.goLater('chase')
+        return player.goNow('chase')
 
     return player.stay()
 
