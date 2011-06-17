@@ -186,36 +186,31 @@ def trianglePan(tracker):
 
 def trianglePanLeft(tracker):
     if tracker.firstFrame():
-        tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
+        tracker.helper.executeHeadMove(HeadMoves.POST_LEFT_SCAN)
 
     elif not tracker.brain.motion.isHeadActive() and \
             tracker.counter > MOTION_START_BUFFER:
-        if tracker.lastDiffState == 'trianglePan':
-            return tracker.goLater('trianglePanRight')
-        else :
-            return tracker.goLater('trianglePanReturn')
+        return tracker.goLater('trianglePanReturn')
 
     return tracker.stay()
 
 def trianglePanRight(tracker):
     if tracker.firstFrame():
-        tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
+        tracker.helper.executeHeadMove(HeadMoves.POST_RIGHT_SCAN)
 
     elif not tracker.brain.motion.isHeadActive() and \
             tracker.counter > MOTION_START_BUFFER:
-        if tracker.lastDiffState == 'trianglePan':
-            return tracker.goLater('trianglePanLeft')
-        else :
-            return tracker.goLater('trianglePanReturn')
+        return tracker.goLater('trianglePanReturn')
     return tracker.stay()
 
 def trianglePanReturn(tracker):
     if tracker.firstFrame():
+        # TODO! Should be look to ball.
         tracker.helper.panTo(tracker.preTriPanHeads)
     elif (not tracker.brain.motion.isHeadActive() and
           tracker.counter > MOTION_START_BUFFER)  or \
           tracker.target.on:
-        return tracker.goLater('tracking')
+        return tracker.goLater('ballTracking')
     return tracker.stay()
 
 def bounceUp(tracker):
