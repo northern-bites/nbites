@@ -70,6 +70,7 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
+
         self.switchTo('playbookWalk')
 
     def goTo(self,dest):
