@@ -333,15 +333,11 @@ class Brain(object):
 
         #Update corner info
         self.corners = self.vision.fieldLines.corners
-        for corner in self.corners:
-            print corner.dist
 
         self.time = time.time()
 
         #Update line info
         self.lines = self.vision.fieldLines.lines
-        for line in self.lines:
-            print line.dist
 
     def updateComm(self):
         temp = self.comm.latestComm()

@@ -150,7 +150,7 @@ class Ball(VisualObject):
 
         self.dx = self.lastRelX - self.relX
         self.dy = self.lastRelY - self.relY
-        
+
         # calculation for the goalie to figure out
         # what the y value of the ball will be when it
         # gets to the goalie
