@@ -94,6 +94,7 @@ void ALCreateMan( ALPtr<ALBroker> broker){
     man->startSubThreads();
 }
 
+// it appears that Aldebaran doesn't actually call this method for us
 void ALDestroyMan(){
     man->stopSubThreads();
 }
