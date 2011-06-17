@@ -45,7 +45,6 @@ class LoggingBoard {
 
 public:
     LoggingBoard(const Memory* _memory);
-    //TODO: make sure to delete all of the logger objects
     ~LoggingBoard();
 
     static LoggingBoard* NullLoggingBoard();
