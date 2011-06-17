@@ -11,7 +11,7 @@ CD=cd
 
 PROJECT_DIR=$(PWD)/../..
 BIN_DIR=$(PROJECT_DIR)/build/qtool
-SRC_DIR=$(PWD)
+SRC_DIR=$(PROJECT_DIR)/src
 GEN_MAKEFILE=$(BIN_DIR)/Makefile
 
 TOOLCHAIN_FILE=$(PROJECT_DIR)/src/man/cmake/generic.cmake
@@ -20,7 +20,7 @@ TOOLCHAIN_FLAG=-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE)
 ECLIPSE_PROJECT_FILE=$(BIN_DIR)/.project
 ECLIPSE_FLAGS=-G "Eclipse CDT4 - Unix Makefiles"
 
-MAKE_FLAGS=--no-print-directory
+MAKE_FLAGS=--no-print-directory qtool
 
 .phony: build clean cfg eclipse
 
@@ -46,3 +46,6 @@ cfg: $(GEN_MAKEFILE)
 
 clean:
 	rm -rf $(BIN_DIR)
+
+run:
+	$(BIN_DIR)/qtool/qtool
