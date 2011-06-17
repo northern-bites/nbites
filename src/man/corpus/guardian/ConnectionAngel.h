@@ -1,10 +1,10 @@
-#ifndef _WIFI_ANGEL_
-#define _WIFI_ANGEL_
+#ifndef _CONNECTION_ANGEL_
+#define _CONNECTION_ANGEL_
 
 /**
- * @class WifiAngel
+ * @class ConnectionAngel
  *
- * Guards against mishaps with wifi.
+ * Handles IP discovery
  *
  * @author Octavian Neamtu <oneamtu89@gmail.com>
  *
@@ -55,4 +55,4 @@ private:
 }
 }
 
-#endif //_WIFI_ANGEL_
+#endif //_CONNECTION_ANGEL_

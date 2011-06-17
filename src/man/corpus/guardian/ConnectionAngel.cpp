@@ -36,7 +36,7 @@ ConnectionAngel::~ConnectionAngel() {
 }
 
 /**
- * this is the fastest way to do it - Octavian
+ * this is the fastest way to do it at around 144 us - Octavian
  */
 unsigned long ConnectionAngel::get_ip() const {
 
@@ -64,7 +64,6 @@ unsigned long ConnectionAngel::get_ip() const {
             if (is_wired_if(current_if->ifa_name) && if_address != 0) {
                 is_wired_connected = true;
             }
-            printf("%s IP Address %s\n", current_if->ifa_name, address_buffer);
         }
     }
 
