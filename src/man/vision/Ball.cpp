@@ -1033,8 +1033,9 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 	thisBall->setRadius( std::max(static_cast<float>(w)/radDiv,
 								  static_cast<float>(h)/radDiv ) );
 	int amount = h / 2;
-	if (w > h)
+	if (w > h) {
 		amount = w / 2;
+	}
 
 	if (occlusion == LEFTOCCLUSION) {
 		thisBall->setCenterX(topBlob->getRightTopX() - amount);
@@ -1054,7 +1055,7 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 												ORANGE_BALL_RADIUS,
 												thisBall->getRadius(),
 												ORANGE_BALL_RADIUS);
-	if (occlusion == NOOCCLUSION) {
+	if (occlusion == NOOCCLUSION || e.dist > 600) {
 		thisBall->setFocalDistanceFromRadius();
 		//trust pixest to within 300 cm
 		if (e.dist <= 300) {
@@ -1064,17 +1065,18 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 			thisBall->setDistanceEst(focalDist);
 		}
 	} else {
-		// user our super swell updated pix estimate to do the distance
+		// use our super swell updated pix estimate to do the distance
 		thisBall->setDistanceEst(e);
 		if (BALLDISTDEBUG) {
 			thisBall->setFocalDistanceFromRadius();
 		}
 	}
-	/*cout<<"pixest "<<e.dist<<"size "<<vision->pose->sizeBasedEstimate(thisBall->getCenterX(),
-																	  thisBall->getCenterY(),
-																	  ORANGE_BALL_RADIUS,
-																	  thisBall->getRadius(),
-																	  ORANGE_BALL_RADIUS).dist<<endl;*/
+	/*cout<<"pixest "<<e.dist<<"size "<<vision->pose->sizeBasedEstimate(
+	  thisBall->getCenterX(),
+	  thisBall->getCenterY(),
+	  ORANGE_BALL_RADIUS,
+	  thisBall->getRadius(),
+	  ORANGE_BALL_RADIUS).dist<<endl;*/
 }
 
 /* Misc. routines

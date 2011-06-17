@@ -206,7 +206,7 @@ void Robots::robot(Cross* cross)
  */
 
 bool Robots::sanityChecks(Blob candidate, Cross* cross) {
-    const int blobHeightMin = 10;
+    const int blobHeightMin = 8;
     int height = candidate.height();
 	int bottom = candidate.getBottom();
     if (candidate.getRight() > 0) {
