@@ -35,10 +35,10 @@ namespace memory {
 
 namespace log {
 
-typedef pair< const MObject*, FDLogger*> ObjectFDLoggerPair;
+typedef pair< const MObject*, FDLogger*> ObjectLoggerPair;
 typedef pair< const MObject*, FDProvider*> ObjectFDProviderPair;
 
-typedef map< const MObject*, FDLogger*> ObjectFDLoggerMap;
+typedef map< const MObject*, FDLogger*> ObjectLoggerMap;
 typedef map< const MObject*, FDProvider*> ObjectFDProviderMap;
 
 class LoggingBoard {
@@ -46,12 +46,17 @@ class LoggingBoard {
 public:
     LoggingBoard(const Memory* _memory);
     //TODO: make sure to delete all of the logger objects
-    //~LoggingBoard();
+    ~LoggingBoard();
+
+    static LoggingBoard* NullLoggingBoard();
 
     void log(const MObject* mobject);
 
     const ImageFDLogger* getImageLogger(const MImage* mimage) const;
     const FDLogger* getLogger(const MObject* mobject) const;
+
+protected:
+    LoggingBoard();
 
 private:
     void initLoggingObjects();
@@ -64,9 +69,8 @@ public:
 
 private:
     const Memory* memory;
-    ObjectFDLoggerMap objectFDLoggerMap;
+    ObjectLoggerMap objectLoggerMap;
     ObjectFDProviderMap objectFDProviderMap;
-
 
 };
 }

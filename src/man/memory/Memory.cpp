@@ -17,7 +17,8 @@ using log::LoggingBoard;
 Memory::Memory() : mVision(new MVision(shared_ptr<Vision>())),
         mVisionSensors(new MVisionSensors(shared_ptr<Sensors>())),
         mMotionSensors(new MMotionSensors(shared_ptr<Sensors>())),
-        mImage(new MImage(shared_ptr<Sensors>()))
+        mImage(new MImage(shared_ptr<Sensors>())),
+        loggingBoard(LoggingBoard::NullLoggingBoard())
 {
 }
 
