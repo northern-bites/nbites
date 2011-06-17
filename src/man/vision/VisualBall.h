@@ -36,6 +36,7 @@ public:
                    static_cast<float>(IMAGE_HEIGHT/2) *
                    MAX_ELEVATION_RAD);
     }
+	void setHeat(float value) {heat = value;}
 
     // calibration pre-huge chown changes
     //void setFocalDistance() {focDist = 2250*pow((getRadius()*2),-1.0917);}
@@ -58,6 +59,7 @@ public:
     // Getters
     const float getRadius() const { return radius; }
     const int getConfidence() const { return confidence;}
+	const float getHeat() const { return heat;}
 
     // Member functions
     const float ballDistanceToSD(float _distance) const {
@@ -70,6 +72,7 @@ public:
 private:
     float radius;
     int confidence;
+	float heat;
 
 };
 
