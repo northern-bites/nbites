@@ -9,7 +9,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "memory/protos/Vision.pb.h"
+#include "protos/Vision.pb.h"
 #include "MObject.h"
 #include "vision/Vision.h"
 

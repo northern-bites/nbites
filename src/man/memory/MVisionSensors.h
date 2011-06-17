@@ -9,7 +9,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "memory/protos/Sensors.pb.h"
+#include "protos/Sensors.pb.h"
 #include "MObject.h"
 #include "Sensors.h"
 
