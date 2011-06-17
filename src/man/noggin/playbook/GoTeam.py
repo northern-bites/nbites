@@ -139,7 +139,7 @@ class GoTeam:
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf("\t mate #%g"% mate.playerNumber)
 
-            # If the player number is me, or our ball models are super divergent ignore
+            # If the player number is me, or ball models are super divergent, ignore
             if (mate.playerNumber == self.me.playerNumber):# or
                 #fabs(mate.ballX - self.me.ballX) > 150.):
                 if PBConstants.DEBUG_DET_CHASER:
@@ -164,6 +164,7 @@ class GoTeam:
                                (mate.playerNumber, mate.chaseTime,
                                 chaser_mate.playerNumber,
                                 chaser_mate.chaseTime))
+                    continue
 
                 elif self.shouldListen(mate, chaser_mate, chaseTimeScale):
                     if PBConstants.DEBUG_DET_CHASER:
@@ -194,7 +195,7 @@ class GoTeam:
         # A will still be chaser_mate if:
         # [ (chaseTime(A) - minChaseTime(A,B) < e) or
         #   (chaseTime(A) - minChaseTime(A,B) < d and already chasing)]
-        # and no higher robot calling off A.
+        # and no higher robot calling off A. # @TODO!!!! this is built into the for loop pattern. we don't need this check. It's only if a higher robot is calling off A.
         return((chaser_mate.chaseTime - mate.chaseTime <
                 PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
                 (chaser_mate.chaseTime - mate.chaseTime <
@@ -206,7 +207,7 @@ class GoTeam:
         """Helper method for determineChaser"""
         # mate = A, chaser_mate = B.
         # A will become chaser_mate if:
-        # chaseTime(A) < chaseTime(B) - m and
+        # chaseTime(A) < chaseTime(B) - m and # @TODO!!!! this isn't what's in the code. Reconsider the order of the should____ checks. Figure this out.
         # A is higher robot that is already chaser.
         return (mate.playerNumber > chaser_mate.playerNumber and
                 mate.chaseTime - chaser_mate.chaseTime <
@@ -316,7 +317,7 @@ class GoTeam:
         append = self.activeFieldPlayers.append
 
         self.numActiveFieldPlayers = 0
-        for mate in self.brain.teamMembers:
+        for mate in self.brain.teamMembers: ## @TODO!!!! figure out what happened here. We thought we were with another bot when it was in penalty.
             if (mate.active and mate.isDead()): #no need to check inactive mates
                 mate.active = False # we set active True when we get a new packet from mate
             elif (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
