@@ -139,12 +139,14 @@ static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 
 
 //Check if the angle is unstable, (ie tending AWAY from zero)
-bool isFalling(float angle_pos, float angle_vel){
-    if (angle_pos < 0){
-        //then we only care if the velocity is negative
-        if(angle_vel < -FALL_SPEED_THRESH)
+bool isFalling(float angle_pos, float angle_vel) {
+    // Test falling based on angle (note that angle_pos is assumed to be
+    // the mag. of the angle).
+    if (angle_pos >= FALLING_ANGLE_THRESH) {
+	//cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos 
+	//     << ", angle_vel == " << angle_vel << endl;
             return true;
-    }else{
+    } else {
         if(angle_vel > FALL_SPEED_THRESH)
             return true;
     }
@@ -257,27 +259,37 @@ void RoboGuardian::checkFalling(){
     const float angleSpeed = angleMag - lastAngleMag;
     const bool falling_critical_angle = angleMag > FALLING_ANGLE_THRESH;
 
-    if(isFalling(angleMag,angleSpeed)){
+    if(isFalling(angleMag, angleSpeed)) {
+	// If falling, increment falling frames counter.
         fallingFrames += 1;
         notFallingFrames = 0;
-    }else if( angleSpeed < NOFALL_SPEED_THRESH){
-        fallingFrames = 0;
-        notFallingFrames +=1;
+    } else if(!falling_critical_angle) {
+	// Otherwise, not falling.
+	fallingFrames = 0;
+	notFallingFrames += 1;
     }
-    //     cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
-    //          << "  fallingFrames is " << fallingFrames
-    //          << " and critical angle is "<< falling_critical_angle<< endl;
+
+    /*
+    if(angleMag >= FALLING_ANGLE_THRESH) {
+         cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
+              << "  fallingFrames is " << fallingFrames
+	      << " notFallingFrames is " << notFallingFrames
+              << " and critical angle is "<< falling_critical_angle<< endl;
+    }
+    */
 
     //If the robot has been falling for a while, and the robot is inclined
     //already at a 45 degree angle, than we know we are falling
-    if (fallingFrames > FALLING_FRAMES_THRESH && falling_critical_angle){
-        //Execute protection? Just print for now and we'll see how this works
+    if (fallingFrames > FALLING_FRAMES_THRESH){
+        // When falling, execute the fall protection method.
+	//cout << "RoboGuardian::checkFalling() : FALLING!" << endl;
         falling = true;
+	processFallingProtection();
     }else if(notFallingFrames > FALLING_FRAMES_THRESH){
         falling = false;
     }
 
-
+    // To calculate the angular speed of the fall next time.
     lastInertial  = inertial;
 }
 
@@ -353,8 +365,8 @@ void RoboGuardian::checkTemperatures(){
     for(unsigned int joint = 0; joint < Kinematics::NUM_JOINTS; joint++){
         const float tempDiff = newTemps[joint] - lastTemps[joint];
         if(newTemps[joint] >= HIGH_TEMP && tempDiff >= TEMP_THRESHOLD &&
-           micro_time() - lastHeatPrintWarning > TIME_BETWEEN_HEAT_WARNINGS){
-            lastHeatPrintWarning = micro_time();
+           process_micro_time() - lastHeatPrintWarning > TIME_BETWEEN_HEAT_WARNINGS){
+            lastHeatPrintWarning = process_micro_time();
             cout << Thread::name << "::" << "TEMP-WARNING: "
                  << Kinematics::JOINT_STRINGS[joint]
                  << " is at " << setprecision(1)
@@ -365,9 +377,9 @@ void RoboGuardian::checkTemperatures(){
         }
     }
     if(sayWarning &&
-       micro_time() - lastHeatAudioWarning > TIME_BETWEEN_HEAT_WARNINGS){
+       process_micro_time() - lastHeatAudioWarning > TIME_BETWEEN_HEAT_WARNINGS){
         playFile(heat_wav);
-        lastHeatAudioWarning = micro_time();
+        lastHeatAudioWarning = process_micro_time();
     }
     lastTemps = newTemps;
 }

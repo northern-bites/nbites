@@ -37,9 +37,11 @@ using namespace boost::assign;
 #include "PyLights.h"
 #include "PySpeech.h"
 
+//#include <valgrind/callgrind.h>
+
 using namespace std;
 using boost::shared_ptr;
-
+using memory::Memory;
 
 /////////////////////////////////////////
 //                                     //
@@ -63,11 +65,12 @@ Man::Man (shared_ptr<Profiler> _profiler,
           lights(_lights),
           speech(_speech)
 {
+
   // initialize system helper modules
 
 #ifdef USE_TIME_PROFILING
   profiler->profiling = true;
-  profiler->profileFrames(700);
+  profiler->profileFrames(1400);
 #endif
   // give python a pointer to the sensors structure. Method defined in
   // Sensors.h
@@ -100,6 +103,9 @@ Man::Man (shared_ptr<Profiler> _profiler,
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
                                          sensors, motion->getInterface()));
 #endif// USE_NOGGIN
+#ifdef USE_MEMORY
+  memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
+#endif USE_MEMORY
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
@@ -139,6 +145,10 @@ void Man::startSubThreads() {
 #ifdef DEBUG_MAN_THREADING
   cout << "  run :: Signalling start" << endl;
 #endif
+
+//  printf("Start time: %lli \n", process_micro_time());
+//  CALLGRIND_START_INSTRUMENTATION;
+//  CALLGRIND_TOGGLE_COLLECT;
 }
 
 void Man::stopSubThreads() {
@@ -186,7 +196,9 @@ Man::processFrame ()
 
     sensors->releaseImage();
 #endif
-
+#ifdef USE_MEMORY
+    memory->updateVision();
+#endif USE_MEMORY
 #ifdef USE_NOGGIN
     noggin->runStep();
 #endif
@@ -204,7 +216,7 @@ Man::processFrame ()
 void Man::notifyNextVisionImage() {
   // Synchronize noggin's information about joint angles with the motion
   // thread's information
-
+  //TODO: Octavian: move this to before we copy the image! (it will improve the pose I think)
   sensors->updateVisionAngles();
 
   transcriber->postVisionSensors();

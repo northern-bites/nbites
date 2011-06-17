@@ -56,6 +56,9 @@ class KickDecider(object):
     def getKickObjective(self):
         self.info.getKickObjective()
 
+    def getCenterKickPosition(self):
+        return kicks.CENTER_KICK_POSITION
+
     def decideKick(self):
         """
         using objective and heuristics and localization determines best kick

@@ -941,7 +941,7 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
     one->updateObject(&two, _certainty, _distCertainty);
     // update the context variables too
     if (!_certainty) {
-        if (color == BLUE) {
+        if (color == BLUE_BIT) {
             context->setUnknownBluePost();
         } else {
             context->setUnknownYellowPost();
@@ -2386,7 +2386,7 @@ bool ObjectFragments::locationOk(Blob b)
     int spanY = b.height();
     int mh = min(horizonLeft, horizonRight);
     // file this one under "very specific sanity checks"
-    if (color == BLUE && spanY < TALL_POST && trueTop > IMAGE_HEIGHT / 2) {
+    if (color == BLUE_BIT && spanY < TALL_POST && trueTop > IMAGE_HEIGHT / 2) {
         if (SANITY) {
             cout << "Screening blue post that is uniform-like" << endl;
         }
@@ -2448,7 +2448,7 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight,
     if (spanY > TALL_POST) {
         return true;
     }
-    if (color == BLUE) {
+    if (color == BLUE_BIT) {
         if (bottom + BOTTOM_FUDGE_FACTOR < minHeight) {
             if (SANITY)
                 cout << "Removed risky blue post" << endl;

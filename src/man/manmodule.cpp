@@ -69,7 +69,7 @@ void ALCreateMan( ALPtr<ALBroker> broker){
         shared_ptr<ALImageTranscriber>
         (new ALImageTranscriber(synchro, sensors, broker));
 
-    boost::shared_ptr<Profiler> profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
+    boost::shared_ptr<Profiler> profiler = shared_ptr<Profiler>(new Profiler(&thread_micro_time));
 #ifdef USE_DCM
     enactor = shared_ptr<EnactorT>(new EnactorT(profiler, sensors,
                                                 transcriber,broker));

@@ -27,3 +27,5 @@ LEFT_DYNAMIC_STRAIGHT_KICK = Kick(y = 8, move=SweetMoves.DREW_KICK)
 
 LEFT_BACK_KICK = Kick(x = 12, y = 7, move=SweetMoves.LEFT_LONG_BACK_KICK)
 RIGHT_BACK_KICK = Kick(x = 12, y = -7, move=SweetMoves.RIGHT_LONG_BACK_KICK)
+
+CENTER_KICK_POSITION = Kick(x = DEFAULT_KICK_X_OFFSET + 5, y = 0)

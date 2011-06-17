@@ -152,7 +152,8 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Robot information request
     if (r.info) {
         serial.write_byte(ROBOT_TYPE);
-        std::string name = vision->getRobotName();
+        //TODO: this is dumb, remove it
+        std::string name = "";
         serial.write_bytes((const byte*)name.c_str(), name.size());
         // TODO - get calibration file name access
         serial.write_bytes((byte*)"table.mtb", strlen("table.mtb"));

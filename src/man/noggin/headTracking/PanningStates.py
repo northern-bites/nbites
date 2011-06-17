@@ -9,15 +9,21 @@ def scanBall(tracker):
             tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.activeLocOn = False
         return tracker.goNow('ballTracking')
+    # #Here we choose where to look for the ball first
+    # if not tracker.brain.motion.isHeadActive():
+    #     if ball.dist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
+    #         tracker.helper.executeHeadMove(HeadMoves.HIGH_SCAN_BALL)
+    #     elif ball.dist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
+    #             ball.dist < HeadMoves.MID_SCAN_FAR_BOUND:
+    #         tracker.helper.executeHeadMove(HeadMoves.MID_DOWN_SCAN_BALL)
+    #     else:
+    #         tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)
 
+    # Instead because our ball unformatino is poor, lets just do one
+    # scan and make sure we don't miss it.  If our ball EKF is better
+    # and trustworthy than we can put the above code back in
     if not tracker.brain.motion.isHeadActive():
-        if ball.dist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
-            tracker.helper.executeHeadMove(HeadMoves.HIGH_SCAN_BALL)
-        elif ball.dist > HeadMoves.MID_SCAN_CLOSE_BOUND and \
-                ball.dist < HeadMoves.MID_SCAN_FAR_BOUND:
-            tracker.helper.executeHeadMove(HeadMoves.MID_DOWN_SCAN_BALL)
-        else:
-            tracker.helper.executeHeadMove(HeadMoves.LOW_SCAN_BALL)
+        tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
     return tracker.stay()
 
 def spinScanBall(tracker):
@@ -30,9 +36,9 @@ def spinScanBall(tracker):
         return tracker.goNow('ballSpinTracking')
 
     if nav.walkTheta > 0:
-        tracker.headMove = HeadMoves.SPIN_LEFT_SCAN_BALL
+        tracker.headMove = HeadMoves.LEFT_EDGE_SCAN_BALL
     else:
-        tracker.headMove = HeadMoves.SPIN_RIGHT_SCAN_BALL
+        tracker.headMove = HeadMoves.RIGHT_EDGE_SCAN_BALL
 
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(tracker.headMove)
@@ -180,36 +186,31 @@ def trianglePan(tracker):
 
 def trianglePanLeft(tracker):
     if tracker.firstFrame():
-        tracker.helper.panTo(HeadMoves.PAN_LEFT_HEADS)
+        tracker.helper.executeHeadMove(HeadMoves.POST_LEFT_SCAN)
 
     elif not tracker.brain.motion.isHeadActive() and \
             tracker.counter > MOTION_START_BUFFER:
-        if tracker.lastDiffState == 'trianglePan':
-            return tracker.goLater('trianglePanRight')
-        else :
-            return tracker.goLater('trianglePanReturn')
+        return tracker.goLater('trianglePanReturn')
 
     return tracker.stay()
 
 def trianglePanRight(tracker):
     if tracker.firstFrame():
-        tracker.helper.panTo(HeadMoves.PAN_RIGHT_HEADS)
+        tracker.helper.executeHeadMove(HeadMoves.POST_RIGHT_SCAN)
 
     elif not tracker.brain.motion.isHeadActive() and \
             tracker.counter > MOTION_START_BUFFER:
-        if tracker.lastDiffState == 'trianglePan':
-            return tracker.goLater('trianglePanLeft')
-        else :
-            return tracker.goLater('trianglePanReturn')
+        return tracker.goLater('trianglePanReturn')
     return tracker.stay()
 
 def trianglePanReturn(tracker):
     if tracker.firstFrame():
+        # TODO! Should be look to ball.
         tracker.helper.panTo(tracker.preTriPanHeads)
     elif (not tracker.brain.motion.isHeadActive() and
           tracker.counter > MOTION_START_BUFFER)  or \
           tracker.target.on:
-        return tracker.goLater('tracking')
+        return tracker.goLater('ballTracking')
     return tracker.stay()
 
 def bounceUp(tracker):

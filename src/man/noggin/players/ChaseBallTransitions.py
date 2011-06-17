@@ -1,10 +1,7 @@
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
-import KickingHelpers as helpers
 from .. import NogginConstants
-from ..playbook.PBConstants import GOALIE
-
 from math import fabs
 
 ####### CHASING STUFF ##############
@@ -16,80 +13,86 @@ def shouldChaseBall(player):
     ball = player.brain.ball
     return (ball.framesOn > constants.BALL_ON_THRESH)
 
-def shouldApproachBall(player):
-    """
-    Approach the ball if it is far away.
-    """
-    ball = player.brain.ball
-    return (ball.on and not shouldPositionForKick(player))
-
 def shouldChaseFromPositionForKick(player):
     """
-    Exit PFK if the ball is too far away.
+    Exit PFK if the ball is too far away. This should be
+    like shouldPFK but with a slightly larger range to avoid
+    oscillations between chase and PFK.
     """
     ball = player.brain.ball
-    return shouldChaseBall(player) and \
-        not shouldPositionForKick(player) and \
-        ball.dist > constants.BALL_PFK_MAX_X+10
+    return (shouldChaseBall(player) and
+            (ball.dist > constants.BALL_PFK_DIST+5 or
+             (ball.relY > constants.BALL_PFK_LEFT_Y+5 or
+              ball.relY < constants.BALL_PFK_RIGHT_Y-5)))
+
+def shouldChaseFromSpinToBall(player):
+    """
+    Exit spinToBall if the ball is now in front of us or suddenly
+    far away. This should be like shouldSpinToBall but with
+    slightly larger range to avoid oscillations between chase and
+    spinToBall
+    """
+    ball = player.brain.ball
+    return (shouldChaseBall(player) and
+            (shouldPositionForKick(player) or
+             ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST+5))
+
+def shouldChaseFromClaimBall(player):
+    """
+    Exit claimBall if the ball is no longer too close to us. This
+    should be like shouldClaimBall but with slightly larger range to
+    avoid oscillations between chase and claimBall
+    """
+    ball = player.brain.ball
+    return (shouldChaseBall(player) and
+            (shouldChaseFromPositionForKick(player) or
+             ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST or
+             ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
 
 def shouldPositionForKick(player):
     """
     Should begin aligning on the ball for a kick when close
     """
     ball = player.brain.ball
-    return (constants.BALL_PFK_LEFT_Y > ball.relY > \
-            constants.BALL_PFK_RIGHT_Y and \
-            constants.BALL_PFK_MAX_X > ball.relX > \
-            constants.BALL_PFK_MIN_X and \
-            fabs(ball.bearing) < constants.BALL_PFK_BEARING_THRESH)
+    return (shouldChaseBall(player) and
+            ball.dist < constants.BALL_PFK_DIST and
+            (constants.BALL_PFK_LEFT_Y > ball.relY >
+             constants.BALL_PFK_RIGHT_Y))
 
-def shouldSpinToBallClose(player):
-    ball = player.brain.ball
-    return ball.on and \
-        ball.dist < constants.SHOULD_STOP_DIST and \
-        fabs(ball.relY) > constants.SHOULD_STOP_Y
-
-def shouldSpinToKick(player):
-    ball = player.brain.ball
-    return (ball.relX < constants.SHOULD_SPIN_TO_KICK_X
-            and ball.relX > 0)
-
-def shouldStopBeforeKick(player):
+def shouldClaimBall(player):
     """
-    Ball is right in front of us but we aren't stopped
-    Used before we have a kick decided (more general)
+    Ball is right in front of us but we would kick it away if we tried
+    to decide the kick on the move. So go claim it first.
     """
     ball = player.brain.ball
-    return ball.on and \
-        ball.relX > constants.SHOULD_KICK_CLOSE_X and \
-        ball.relX < constants.SHOULD_KICK_FAR_X and \
-        fabs(ball.relY) < constants.SHOULD_KICK_Y
+    return (shouldPositionForKick(player) and
+            ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST)
 
-def shouldStopAndKick(player):
+def shouldSpinToBall(player):
     """
-    Ball is in correct position to kick but we aren't stopped
-    Used after we have a kick decided (more specific)
+    Ball is close and we should spin before we decide our kick
     """
     ball = player.brain.ball
-    kick = player.brain.kickDecider.getKick()
-    (targetX, targetY, heading) = kick.getPosition()
-    return (ball.on and \
-                (fabs(ball.relX - targetX) <= constants.KICK_CLOSE_ENOUGH_X) and \
-                (fabs(ball.relY - targetY) <= constants.KICK_CLOSE_ENOUGH_Y))
+    return (shouldChaseBall(player) and
+            ((not shouldPositionForKick(player) and
+             ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST) or
+            ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
 
-def shouldKickNow(player):
+def shouldKick(player):
     """
-    Ball is in the correct position to kick and we are stopped
-    Used after we have a kick decided (more specific)
+    Ball is in correct position to kick
+    """
+    return player.brain.nav.isStopped() and player.counter > 1
+
+def shouldKickAgain(player):
+    """
+    Ball hasn't changed enough to warrant new kick decision.
     """
     ball = player.brain.ball
-    kick = player.brain.kickDecider.getKick()
-    (targetX, targetY, heading) = kick.getPosition()
-    return (player.brain.nav.isStopped() and \
-                ball.on and \
-                (fabs(ball.relX - targetX) <= constants.KICK_CLOSE_ENOUGH_X) and \
-                (fabs(ball.relY - targetY) <= constants.KICK_CLOSE_ENOUGH_Y))
-                # and player.counter < 1 ??
+    return (shouldKick(player) and
+            (constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.relX <
+             constants.SHOULD_KICK_AGAIN_FAR_X) and
+            fabs(ball.relY) < constants.SHOULD_KICK_AGAIN_Y)
 
 def shouldDribble(player):
     """
@@ -97,6 +100,7 @@ def shouldDribble(player):
     """
     if constants.USE_DRIBBLE:
         my = player.brain.my
+        # helpers is no longer used. Find a different way.
         dribbleAimPoint = helpers.getShotCloseAimPoint(player)
         goalBearing = my.getRelativeBearing(dribbleAimPoint)
         return  (not player.penaltyKicking and
@@ -113,6 +117,7 @@ def shouldStopDribbling(player):
     While dribbling we should stop
     """
     my = player.brain.my
+    # helpers is no longer used. Find a different way.
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
     goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (player.penaltyKicking or
@@ -127,26 +132,40 @@ def shouldKickOff(player):
     """
     Determines whether we should do our KickOff play as chaser
     """
-    return (player.brain.gameController.ownKickOff and
-            not player.hasKickedOffKick)
+    return (not player.hasKickedOff)
+
+####### PENALTY KICK STUFF ###########
+
+def shouldStopPenaltyKickDribbling(player):
+    """
+    While dribbling we should stop
+    """
+    my = player.brain.my
+    # helpers is no longer used. Find a different way.
+    dribbleAimPoint = helpers.getShotCloseAimPoint(player)
+    goalBearing = my.getRelativeBearing(dribbleAimPoint)
+    return (inPenaltyKickStrikezone(player) or
+            player.brain.ball.relX > constants.STOP_DRIBBLE_X or
+            fabs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
+            fabs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
+            player.counter > constants.STOP_PENALTY_DRIBBLE_COUNT)
+
+def inPenaltyKickStrikezone(player):
+    """
+    If we are in a good place to kick
+    """
+    return (NogginConstants.OPP_GOALBOX_LEFT_X + 75. < player.brain.my.x)
+
 
 ####### FIND BALL STUFF ##############
 
-def shouldScanFindBall(player):
+def shouldFindBall(player):
     """
     We lost the ball, scan to find it
     """
     return (player.brain.ball.framesOff > constants.BALL_OFF_THRESH)
 
-def shouldScanFindBallActiveLoc(player):
-    """
-    We lost the ball, scan to find it
-    """
-    return not (player.brain.tracker.activePanUp or
-                player.brain.tracker.activePanOut) and \
-        (player.brain.ball.framesOff > constants.BALL_OFF_ACTIVE_LOC_THRESH)
-
-def shouldScanFindBallKick(player):
+def shouldFindBallKick(player):
     """
     We lost the ball while in a kicking state, be more generous before looking
     """
@@ -170,45 +189,3 @@ def shouldWalkFindBall(player):
     If we've been spinFindBall-ing too long we should walk
     """
     return player.counter > constants.WALK_FIND_BALL_FRAMES_THRESH
-
-def shouldntStopChasing(player):
-    """
-    Dont switch out of chaser in certain circumstances
-    """
-    return player.inKickingState
-
-def shouldPreKickScan(player):
-    if player.brain.ball.on:
-        return (constants.PRE_KICK_SCAN_MIN_DIST < player.brain.ball.dist
-                < constants.PRE_KICK_SCAN_MAX_DIST and
-                abs(player.brain.ball.bearing) <
-                constants.APPROACH_ACTIVE_LOC_BEARING)
-    return False
-
-def shouldActiveLoc(player):
-    if player.brain.ball.on:
-        return (player.brain.ball.dist > constants.APPROACH_ACTIVE_LOC_DIST
-                and fabs(player.brain.ball.bearing) <
-                constants.APPROACH_ACTIVE_LOC_BEARING)
-
-    else:
-        return player.brain.ball.dist > constants.APPROACH_ACTIVE_LOC_DIST
-
-def shouldStopPenaltyKickDribbling(player):
-    """
-    While dribbling we should stop
-    """
-    my = player.brain.my
-    dribbleAimPoint = helpers.getShotCloseAimPoint(player)
-    goalBearing = my.getRelativeBearing(dribbleAimPoint)
-    return (inPenaltyKickStrikezone(player) or
-            player.brain.ball.relX > constants.STOP_DRIBBLE_X or
-            fabs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
-            fabs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
-            player.counter > constants.STOP_PENALTY_DRIBBLE_COUNT)
-
-def inPenaltyKickStrikezone(player):
-    """
-    If we are in a good place to kick
-    """
-    return (NogginConstants.OPP_GOALBOX_LEFT_X + 75. < player.brain.my.x)

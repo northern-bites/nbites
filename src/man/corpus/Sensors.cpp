@@ -61,7 +61,8 @@ Sensors::Sensors ()
       ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
       yImage(&global_image[0]), uvImage(&global_image[0]),
       colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
-      naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+      naoImage(NULL),
+      //naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
       unfilteredInertial(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
@@ -637,6 +638,8 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
     pthread_mutex_unlock(&inertial_mutex);
     pthread_mutex_unlock(&fsr_mutex);
     pthread_mutex_unlock(&button_mutex);
+
+    this->notify(ProviderEvent(this, NEW_MOTION_SENSORS));
 }
 
 /**
@@ -662,7 +665,7 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
     pthread_mutex_unlock(&ultra_sound_mutex);
     pthread_mutex_unlock (&button_mutex);
     pthread_mutex_unlock (&battery_mutex);
-
+    this->notify(ProviderEvent(this, NEW_VISION_SENSORS));
 }
 
 void Sensors::setAllSensors (vector<float> sensorValues) {
@@ -743,8 +746,16 @@ void Sensors::releaseVisionAngles() {
     pthread_mutex_unlock (&vision_angles_mutex);
 }
 
-// Get a pointer to the full size Nao image
-const uint8_t* Sensors::getNaoImage () const
+//get a pointer to the full size Nao image
+//the pointer comes straight from the transcriber (no copying)
+uint8_t* Sensors::getRawNaoImage()
+{
+    return rawNaoImage;
+}
+
+//get a pointer to the full size Nao image
+//this image has been copied to some local buffer
+const uint8_t* Sensors::getNaoImage() const
 {
     return naoImage;
 }
@@ -767,6 +778,17 @@ const uint16_t* Sensors::getUVImage() const
 const uint8_t* Sensors::getColorImage() const
 {
     return colorImage;
+}
+
+void Sensors::setNaoImagePointer(char* _naoImage) {
+    cout << "I am being set!"<<endl;
+    naoImage = (uint8_t*) _naoImage;
+}
+
+void Sensors::setRawNaoImage(uint8_t *img)
+{
+    rawNaoImage = img;
+    this->notify(ProviderEvent(this, NEW_IMAGE));
 }
 
 void Sensors::setNaoImage(const uint8_t *img)
