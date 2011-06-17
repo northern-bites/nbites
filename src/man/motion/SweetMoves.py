@@ -159,6 +159,7 @@ STAND_FOR_KICK_LEFT = (
      (0.,23.,-13.,20.,-10.,-20.),
      (80.,-40.,50.,70.),2.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES) )
 
+
 # NEEDS 0.4 value for right leg
 LEFT_FAR_KICK = (
     #swing to the right
