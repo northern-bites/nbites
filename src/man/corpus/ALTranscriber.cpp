@@ -145,8 +145,8 @@ void ALTranscriber::initSyncMotionWithALMemory(){
 
 }
 
-
 // for marvin!
+// TODO FIX THIS BECAUSE ITS PROBABLY TOTALLY WRONG
 static const float ACCEL_OFFSET_X = 3.5f;
 static const float ACCEL_OFFSET_Y = 0.5f;
 static const float ACCEL_OFFSET_Z = 4.0f;
@@ -160,7 +160,7 @@ const float ALTranscriber::calibrate_acc_x(const float x) {
 }
 
 const float ALTranscriber::calibrate_acc_y(const float y) {
-    return (y + ACCEL_OFFSET_Y) * ACCEL_CONVERSION_Y;
+	return (y + ACCEL_OFFSET_Y) * ACCEL_CONVERSION_Y;
 }
 
 const float ALTranscriber::calibrate_acc_z(const float z) {
@@ -206,7 +206,7 @@ void ALTranscriber::syncMotionWithALMemory() {
     float filteredAngleX = lastAngleX;
     float filteredAngleY = lastAngleY;
     if(std::abs(lastReadAngleX -angleX) < 0.10 &&
-       std::abs(lastReadAngleY -angleY) < 0.10){ //0.15 is experimental
+       std::abs(lastReadAngleY -angleY) < 0.10){ // experimental
         const float newWeight = 0.75f;
         filteredAngleX = newWeight*angleX + (1-newWeight)*lastAngleX ;
         filteredAngleY = newWeight*angleY + (1-newWeight)*lastAngleY ;
@@ -220,15 +220,42 @@ void ALTranscriber::syncMotionWithALMemory() {
     lastReadAngleX = angleX;
     lastReadAngleY = angleY;
 
-    //TODO: don't allocate these FSR, etc objects each time
+	// so the FSRs etc. aren't allocated each time
+	static FSR leftFSR, rightFSR;
+
+	leftFSR.frontLeft = LfrontLeft;
+	leftFSR.frontRight = LfrontRight;
+	leftFSR.rearLeft = LrearLeft;
+	leftFSR.rearRight = LrearRight;
+
+	rightFSR.frontLeft = RfrontLeft;
+	rightFSR.frontRight = RfrontRight;
+	rightFSR.rearLeft = RrearLeft;
+	rightFSR.rearRight = RrearRight;
+
+	static Inertial filtered, unfiltered;
+
+	filtered.accX = filteredX;
+	filtered.accY = filteredY;
+	filtered.accZ = filteredZ;
+	filtered.gyrX = gyrX;
+	filtered.gyrY = gyrY;
+	filtered.angleX = filteredAngleX;
+	filtered.angleY = filteredAngleY;
+
+	unfiltered.accX = accX;
+	unfiltered.accY = accY;
+	unfiltered.accZ = accZ;
+	unfiltered.gyrX = gyrX;
+	unfiltered.gyrY = gyrY;
+	unfiltered.angleX = angleX;
+	unfiltered.angleY = angleY;
+
     sensors->
-        setMotionSensors(FSR(LfrontLeft, LfrontRight, LrearLeft, LrearRight),
-                         FSR(RfrontLeft, RfrontRight, RrearLeft, RrearRight),
+        setMotionSensors(leftFSR, rightFSR,
                          chestButton,
-                         Inertial(filteredX, filteredY, filteredZ,
-                                  gyrX, gyrY, filteredAngleX, filteredAngleY),
-                         Inertial(accX, accY, accZ,
-                                  gyrX, gyrY, angleX, angleY));
+						 filtered,
+						 unfiltered);
 }
 
 
