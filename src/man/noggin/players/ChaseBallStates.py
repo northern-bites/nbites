@@ -10,8 +10,6 @@ def chase(player):
     """
     Super State to determine what to do from various situations
     """
-    player.isChasing = True
-
     if player.brain.play.isRole(GOALIE):
         return player.goNow('goalieChase')
 
@@ -35,12 +33,6 @@ def goalieChase(player):
     TODO: dangerousBall??
     """
     # Check in order of importance
-
-    #tells the goalie what state its in
-    if player.firstFrame():
-        player.isChasing = True
-        player.isPositioning = False
-        player.isSaving = False
 
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
@@ -113,7 +105,7 @@ def spinToBall(player):
     if transitions.shouldFindBall(player):
         return player.goLater('findBall')
     elif transitions.shouldChaseFromSpinToBall(player):
-        return player.goLater('chase')
+        return player.goNow('chase')
 
     return player.stay()
 
@@ -152,7 +144,7 @@ def positionForKick(player):
         player.brain.nav.kickPosition(kick)
 
     if transitions.shouldKick(player):
-        return player.goLater('kickBallExecute')
+        return player.goNow('kickBallExecute')
     elif transitions.shouldFindBallKick(player):
         player.inKickingState = False
         return player.goLater('findBall')

@@ -51,9 +51,9 @@ public:
     void speakIPAddress()const;
 
     //getters
-    bool isRobotFalling()const { return falling; }
-    bool isRobotFallen()const { return fallen; }
-	bool isFeetOnGround()const { return feetOnGround; }
+    bool isRobotFalling()const { return useFallProtection && falling; }
+    bool isRobotFallen()const { return useFallProtection && fallen; }
+	bool isFeetOnGround()const { return useFallProtection && feetOnGround; }
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 

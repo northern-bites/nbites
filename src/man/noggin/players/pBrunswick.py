@@ -39,21 +39,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.counterRightSave = 0
         self.counterLeftSave = 0
         self.counterCenterSave = 0
-        self.shouldSaveCounter = 0
-
-        #Counters for goalie positioning
-        self.shouldPositionRightCounter = 0
-        self.shouldPositionLeftCounter = 0
-        self.shouldPositionCenterCounter = 0
-
-        #Goalie Chasing Counters
-        self.shouldChaseCounter = 0
-        self.shouldStopChaseCounter = 0
-
-        #Boolean for Goalie Current State
-        self.isChasing = False
-        self.isSaving = False
-        self.isPositioning = False
 
         #END GOALIE COUNTERS AND BOOLEANS
 
@@ -86,9 +71,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if self.play.isRole(PBConstants.GOALIE):
-            return GoalieChanges.goalieStateChoice(self)
-
         if self.brain.playbook.subRoleUnchanged():
             return self.currentState
 
@@ -103,11 +85,20 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'chase'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
-        if self.brain.my.playerNumber == 1:
-            return 'goaliePosition'
+        if self.play.isRole(PBConstants.GOALIE):
+            return self.getRoleStateGoalie()
         else:
             return 'playbookPosition'
 
+    def getRoleStateGoalie(self):
+        if self.play.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
+            return 'penaltyGoalie'
+        if self.play.isSubRole(PBConstants.GOALIE_CHASER):
+            return 'goalieChase'
+        elif self.play.isSubRole(PBConstants.GOALIE_SAVE):
+            return 'goalieSave'
+        else:
+            return 'goaliePosition'
 
     ###### HELPER METHODS ######
     def getPenaltyKickingBallDest(self):

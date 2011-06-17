@@ -30,23 +30,23 @@
 #include "BulkMonitor.h"
 
 BulkMonitor::BulkMonitor(int _numberMonitors, std:: string _bulkName,
-						 const std::string sensorNames[])
-	: numberMonitors(_numberMonitors),
-	  bulkName(_bulkName)
+                         const std::string sensorNames[])
+    : numberMonitors(_numberMonitors),
+      bulkName(_bulkName)
 {
-	monitors = new SensorMonitor[numberMonitors];
-	for (int i = 0; i < numberMonitors; ++i)
-		monitors[i].SensorName(sensorNames[i]);
+    monitors = new SensorMonitor[numberMonitors];
+    for (int i = 0; i < numberMonitors; ++i)
+        monitors[i].SensorName(sensorNames[i]);
 }
 
 BulkMonitor::~BulkMonitor() {
-	delete [] monitors;
+    delete [] monitors;
 }
 
 double BulkMonitor::update(int sensor, double input) {
-	if (sensor < 0 || sensor > numberMonitors)
-		return 0;
-	return monitors[sensor].X(input);
+    if (sensor < 0 || sensor > numberMonitors)
+        return 0;
+    return monitors[sensor].X(input);
 }
 
 SensorMonitor& BulkMonitor::Sensor(int sensor) {
@@ -57,33 +57,33 @@ SensorMonitor& BulkMonitor::Sensor(int sensor) {
 }
 
 void BulkMonitor::Reset() {
-	for (int i = 0; i < numberMonitors; ++i)
-		monitors[i].Reset();
+    for (int i = 0; i < numberMonitors; ++i)
+        monitors[i].Reset();
 }
 
 void BulkMonitor::LogOutput() {
-	using namespace std;
-	const int width = 12;
+    using namespace std;
+    const int width = 12;
 
 	stringstream filename;
 	ofstream outFile;
-	filename << "/tmp/" << bulkName << ".monitor.xls";
+	filename << "/home/nao/naoqi/log/" << bulkName << ".monitor.xls";
 	outFile.open(filename.str().c_str(), ifstream::out);
 
-	// header line with sensor names
-	outFile << setw(width) << "bin";
-	for (int i = 0; i < numberMonitors; ++i)
-		outFile << setw(width) << monitors[i].SensorName();
-	outFile << endl;
+    // header line with sensor names
+    outFile << setw(width) << "bin";
+    for (int i = 0; i < numberMonitors; ++i)
+        outFile << setw(width) << monitors[i].SensorName();
+    outFile << endl;
 
-	// histogram loop (data, line by line)
-	const int numBins = monitors[0].numberOfBins();
-	for (int bin = 0; bin < numBins; ++bin) {
-		outFile << setw(width) << setprecision(4) << monitors[0].binMidPoint(bin);
+    // histogram loop (data, line by line)
+    const int numBins = monitors[0].numberOfBins();
+    for (int bin = 0; bin < numBins; ++bin) {
+        outFile << setw(width) << setprecision(4) << monitors[0].binMidPoint(bin);
 
-		for (int i = 0; i < numberMonitors; ++i)
-			outFile << setw(width) << monitors[i].binCountAt(bin);
-		outFile << endl;
-	}
-	outFile.close();
+        for (int i = 0; i < numberMonitors; ++i)
+            outFile << setw(width) << monitors[i].binCountAt(bin);
+        outFile << endl;
+    }
+    outFile.close();
 }
