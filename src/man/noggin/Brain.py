@@ -137,10 +137,22 @@ class Brain(object):
         #                                      Constants.VISION_YG_CROSSBAR)
 
         # Now we setup the corners and lines
-        self.fieldLines = FieldLines.FieldLines(self.vision.fieldLines)
+        ##########################################################
+        # Notes about corners and lines:
+        # fieldLines contains numLines, lines, numCorners, and corners.
+        # numLines, numCorners = number of lines and corners seen
+        # lines = a list of lines seen (indexing ok)
+        # corners = a list of corners seen. DOES NOT SUPPORT INDEXING.
+        #
+        # Each line has: angle, avgWidth, bearing, dist, length, slope, yInt,
+        #     and possibilities (a list of possible IDs, NO INDEXING)
+        # Each corner has: dist, bearing, x, y, and possibilities (same as
+        #     for lines, NO INDEXING)
+        # The corners/possibilities lists do support iteration.
+        ###########################################################
 
-        self.corners = self.fieldLines.corners
-        self.lines = self.fieldLines.lines
+        self.lines = self.vision.fieldLines.lines
+        self.corners = self.vision.fieldLines.corners
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
@@ -273,15 +285,17 @@ class Brain(object):
         #self.ygCrossbar.updateVision(self.vision.ygCrossbar)
         #self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
-        # # Update the corner information
-        self.fieldLines.updateCorners(self.vision.fieldLines)
-        self.corners = self.fieldLines.corners
+        #Update corner info
+        self.corners = self.vision.fieldLines.corners
+        for corner in self.corners:
+            print corner.dist
 
         self.time = time.time()
 
-        # # Now we get the latest list of lines
-        self.fieldLines.updateLines(self.vision.fieldLines)
-        self.lines = self.fieldLines.lines
+        #Update line info
+        self.lines = self.vision.fieldLines.lines
+        for line in self.lines:
+            print line.dist
 
     def updateComm(self):
         temp = self.comm.latestComm()

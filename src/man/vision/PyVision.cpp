@@ -115,8 +115,8 @@ BOOST_PYTHON_MODULE(vision)
     class_<FieldLines, boost::shared_ptr<FieldLines> >("FieldLines", no_init)
         .def_readonly("numCorners", &FieldLines::getNumCorners)
         .def_readonly("numLines", &FieldLines::getNumLines)
-        .add_property("linesList", &FieldLines::getActualLines)
-        .add_property("cornersList", &FieldLines::getActualCorners)
+        .add_property("lines", &FieldLines::getActualLines)
+        .add_property("corners", &FieldLines::getActualCorners)
         ;
 
     //FieldLines helper classes:/
