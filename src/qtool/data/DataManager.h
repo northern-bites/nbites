@@ -13,20 +13,20 @@
 
 #include "DataHandler.h"
 #include "memory/Memory.h"
-#include "include/Provider.h"
+#include "include/MultiProvider.h"
 #include "boost/shared_ptr.hpp"
 
 namespace qtool {
 namespace data {
 
-class DataManager : public Provider<int> {
+class DataManager : public MultiProvider<int> {
 
 public:
     DataManager();
 
     void getNext() const {
         dataHandler->readNext();
-        this->notify(0);
+        this->notifySubscribers(0);
     }
 
     boost::shared_ptr<const memory::Memory> getMemory() const {
