@@ -514,10 +514,14 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
                                       bool l1IsLeft) {
     shape leftColor = LEFT_GOAL_YELLOW_L;
     shape rightColor = RIGHT_GOAL_YELLOW_L;
+	shape leftCorner = YELLOW_GOAL_BOTTOM;
+	shape rightCorner = YELLOW_GOAL_TOP;
     if ((face == FACING_BLUE_GOAL && sameHalf) ||
         (face == FACING_YELLOW_GOAL && !sameHalf)) {
         leftColor = LEFT_GOAL_BLUE_L;
         rightColor = RIGHT_GOAL_BLUE_L;
+		leftCorner = BLUE_GOAL_TOP;
+		rightCorner = BLUE_GOAL_BOTTOM;
     }
     // sometime to be super-safe we should check where the line intersects
     // the goal post
@@ -530,13 +534,13 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
                 corner.setSecondaryShape(leftColor);
             } else {
                 // we must have missed the other L corner for some reason
-                corner.setSecondaryShape(RIGHT_GOAL_CORNER);
+                corner.setSecondaryShape(leftCorner);
             }
         } else {
             if (l2y < objectRightY) {
                 corner.setSecondaryShape(leftColor);
             } else {
-                corner.setSecondaryShape(RIGHT_GOAL_CORNER);
+                corner.setSecondaryShape(leftCorner);
             }
         }
     } else {
@@ -545,13 +549,13 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
             if (l2y < objectRightY) {
                 corner.setSecondaryShape(rightColor);
             } else {
-                corner.setSecondaryShape(LEFT_GOAL_CORNER);
+                corner.setSecondaryShape(rightCorner);
             }
         } else {
             if (l1y < objectRightY) {
                 corner.setSecondaryShape(rightColor);
             } else {
-                corner.setSecondaryShape(LEFT_GOAL_CORNER);
+                corner.setSecondaryShape(rightCorner);
             }
         }
     }
@@ -733,7 +737,10 @@ void Context::classifyInnerL(VisualCorner & corner) {
         // could indicate this is actually a corner
         // we can do this if we see a post
         // punt for now
-        return;
+		if (debugIdentifyCorners) {
+			cout << "Punting on inner L " << dist << endl;
+		}
+        //return;
     }
     // l1 and l2 hold information on points away from the corner
     if (l1IsLeft) {
@@ -1665,7 +1672,8 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
 					MIDFIELD_X << endl;
 			}
 			objectDistance = allFieldObjects[i]->getDistance();
-            if (objectDistance < MIDFIELD_X) {
+            if (objectDistance < MIDFIELD_X ||
+				allFieldObjects[i]->getWidth() > 25) {
                 sameHalf = true;
             }
             objectRightX = allFieldObjects[i]->getRightBottomX();
@@ -1688,7 +1696,9 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
 			objectDistance = 0;
             objectRightX = allFieldObjects[i]->getRightBottomX();
             objectRightY = allFieldObjects[i]->getRightBottomY();
-        }
+        } else {
+			sameHalf = true;
+		}
     }
     return visibleObjects;
 }
@@ -1712,8 +1722,108 @@ vector<const VisualFieldObject*> Context::getAllVisibleFieldObjects() const
    and determine a level of danger and a possible direction.
  */
 void Context::checkForKickDanger(VisualRobot *robot) {
-	//cout << "Checking for kick danger " << robot->getDistance() <<
-	//	" " << vision->ball->getDistance() << endl;
+	const float ROBOT_TO_BALL = 30.0f;
+	const int ROBOT_OFFSET = IMAGE_WIDTH / 4;
+	int robotX = robot->getCenterX();
+	int robotY = robot->getCenterY();
+	int ballX = vision->ball->getCenterX();
+	int ballY = vision->ball->getCenterY();
+	float heat = 0.0f;
+	float distance = abs(robot->getDistance() - vision->ball->getDistance());
+	float dist = realDistance(robotX, ballY, ballX, ballY);
+	if (dist < 13.0f) {
+		heat += 10.0f;
+	} else if (dist < 16.0f) {
+		heat += 7.5f;
+	} else if (dist < 21.0f) {
+		heat += 2.5f;
+	}
+	if (distance < 20.0f) {
+		heat += 10.0f;
+	} else if (distance < 30.0f) {
+		heat += 7.5f;
+	} else if (distance < 40.0f) {
+		heat += 2.5f;
+	}
+	if (debugDangerousBall) {
+		cout << "Dangerous ball check: " << heat << endl;
+	}
+	float currentHeat = vision->ball->getHeat();
+	if (heat > currentHeat) {
+		vision->ball->setHeat(heat);
+	}
+}
+
+/* Much like the last method we are checking if a robot might kick
+   the ball.  The need for this method is that sometimes we don't
+   id a robot when it is in the frame (and near the ball). So try a
+   little harder if we haven't id'd any.
+ */
+void Context::checkForKickDangerNoRobots() {
+	int ballX = vision->ball->getX();
+	int ballY = vision->ball->getY();
+	int width = static_cast<int>(vision->ball->getWidth());
+	int height = static_cast<int>(vision->ball->getHeight());
+	float topDist = thresh->getPixDistance(ballY) + 30.0f;
+	int count = 0, total = 0;
+	float heat = 0.0f;
+	// zone 1 - right above the ball
+	for (int i = ballY - 1; i >= 0 && thresh->getPixDistance(i) < topDist; i--) {
+		for (int j = ballX; j < ballX + width; j++) {
+			unsigned char pixel = thresh->getThresholded(i, j);
+			if (Utility::isWhite(pixel)) {
+				count++;
+			}
+			total++;
+		}
+	}
+	if (count * 2 > total) {
+		heat += 5.0f;
+	} else if (count * 3 > total) {
+		heat += 2.5f;
+	}
+	// zone 2 to the left and above the ball
+	count = 0;
+	total = 0;
+	for (int i = ballY + height / 2; i >= 0 && thresh->getPixDistance(i) <
+			 topDist; i--) {
+		for (int j = max(0, ballX - width); j < ballX; j++) {
+			unsigned char pixel = thresh->getThresholded(i, j);
+			if (Utility::isWhite(pixel)) {
+				count++;
+			}
+			total++;
+		}
+	}
+	if (count * 2 > total) {
+		heat += 5.0f;
+	} else if (count * 3 > total) {
+		heat += 2.5f;
+	}
+	// zone 3 to the left and above the ball
+	count = 0;
+	total = 0;
+	for (int i = ballY + height / 2; i >= 0 && thresh->getPixDistance(i) <
+			 topDist; i--) {
+		for (int j = ballX + width; j < ballX + 2 * width && j < IMAGE_WIDTH;
+			 j++) {
+			unsigned char pixel = thresh->getThresholded(i, j);
+			if (Utility::isWhite(pixel)) {
+				count++;
+			}
+			total++;
+		}
+	}
+	if (count * 2 > total) {
+		heat += 5.0f;
+	} else if (count * 3 > total) {
+		heat += 2.5f;
+	}
+	vision->ball->setHeat(heat);
+	if (debugDangerousBall) {
+		cout << "Dangerous Ball no robot check: " << heat << " " <<
+			count << " " << total << endl;
+	}
 }
 
 /* In some Nao frames, robots obscure part of the goal and the bottom is not
@@ -1760,6 +1870,17 @@ float Context::realLineDistance(boost::shared_ptr<VisualLine> line) {
     const point<int> end2 = line->getStartpoint();
     return realDistance(end1.x, end1.y, end2.x, end2.y);
 }
+
+/*
+ */
+/*bool Context::onGoalSide() {
+	if (face == FACING_BLUE_GOAL && fieldHalf == HALF_BLUE) {
+		return true;
+	}
+	if (face == FACING_YELLOW_GOAL && fieldHalf == HALF_YELLOW) {
+		return true;
+	}
+	}*/
 
 
 /* Set facing information.  Initially this is based on whether we see a goal

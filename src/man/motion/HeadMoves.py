@@ -256,6 +256,15 @@ POST_SCAN = (
     ((65.,-25.),2.0,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-25.),2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+POST_LEFT_SCAN = ((( 65.,-25.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+                  (( 35.,-35.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+                  ((-35.,-35.), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES),
+                  ((-65.,-25.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+POST_RIGHT_SCAN = (((-65.,-25.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+                   ((-35.,-35.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+                   (( 35.,-35.), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES),
+                   (( 65.,-25.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 KICK_SCAN = (
     ((0.0,-45),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
