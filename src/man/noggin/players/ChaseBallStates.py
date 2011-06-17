@@ -150,7 +150,7 @@ def positionForKick(player):
         return player.goLater('findBall')
     elif transitions.shouldChaseFromPositionForKick(player):
         player.inKickingState = False
-        return player.goNow('chase')
+        return player.goLater('chase')
 
     return player.stay()
 

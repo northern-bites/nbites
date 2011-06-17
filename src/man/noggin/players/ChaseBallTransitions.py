@@ -22,8 +22,7 @@ def shouldChaseFromPositionForKick(player):
     ball = player.brain.ball
     return (shouldChaseBall(player) and
             (ball.dist > constants.BALL_PFK_DIST+5 or
-             (ball.relY > constants.BALL_PFK_LEFT_Y+5 or
-              ball.relY < constants.BALL_PFK_RIGHT_Y-5)))
+             fabs(ball.relY) > constants.BALL_PFK_LEFT_Y))
 
 def shouldChaseFromSpinToBall(player):
     """
