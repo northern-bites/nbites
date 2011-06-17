@@ -108,6 +108,11 @@ Sensors::Sensors ()
     varianceMonitor.Sensor(SONARR).setVarianceBounds(SensorMonitor::DONT_CHECK,
                                                      SONAR_HIGH);
 
+    // all FSRs have the same variance range
+    for (int i = 0; i <= FSR_RIGHT_B_R; ++i)
+	fsrMonitor.Sensor(i).setVarianceBounds(SensorMonitor::DONT_CHECK,
+					       FSR_HIGH);
+
     // THIS IS AN OCTAL NUMBER, must start with 0
     mkdir(FRM_FOLDER.c_str(), 0755); // permissions: u+rwx, og+rx
 }

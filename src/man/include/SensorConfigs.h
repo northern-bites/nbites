@@ -81,4 +81,6 @@ const float SONAR_HIGH = 2.0f;
 
 const float ANGLE_XY_HIGH = 5.0f;
 
+const float FSR_HIGH = 5.0f;
+
 #endif
