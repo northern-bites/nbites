@@ -21,23 +21,29 @@ def rGoalie(team, workingPlay):
         # Special case for ready goalie.
         SubRoles.pReadyGoalie(team, workingPlay)
 
+    # Get out of ready
     elif workingPlay.isSubRole(PBConstants.READY_GOALIE):
-        SubRoles.pGoalieNormal(team, workingPlay)
+        SubRoles.pGoalieCenter(team, workingPlay)
 
+    # Penalty Kick
     elif workingPlay.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
         SubRoles.pGoaliePenaltySaver(team, workingPlay)
 
+    # Saving will go here
+
+    # Chase
     elif workingPlay.isSubRole(PBConstants.GOALIE_CHASER):
         if RoleTran.shouldStopChase(team):
-            SubRoles.pGoalieNormal(team, workingPlay)
+            SubRoles.pGoalieCenter(team, workingPlay)
 
         elif RoleTran.shouldPosition(team):
-            SubRoles.pGoalieNormal(team, workingPlay)
+            SubRoles.pGoalieCenter(team, workingPlay)
 
         else:
             SubRoles.pGoalieChaser(team, workingPlay)
 
-    elif (workingPlay.isSubRole(PBConstants.GOALIE_NORMAL) or
+    # Position
+    elif (workingPlay.isSubRole(PBConstants.GOALIE_CENTER) or
           workingPlay.isSubRole(PBConstants.GOALIE_RIGHT) or
           workingPlay.isSubRole(PBConstants.GOALIE_LEFT)):
         if RoleTran.shouldChase(team):
@@ -50,10 +56,10 @@ def rGoalie(team, workingPlay):
         #     SubRoles.pGoaliePosLeft(team, workingPlay)
 
         elif RoleTran.shouldPositionCenter(team):
-            SubRoles.pGoalieNormal(team, workingPlay)
+            SubRoles.pGoalieCenter(team, workingPlay)
 
-        elif workingPlay.isSubRole(PBConstants.GOALIE_NORMAL):
-            SubRoles.pGoalieNormal(team, workingPlay)
+        elif workingPlay.isSubRole(PBConstants.GOALIE_CENTER):
+            SubRoles.pGoalieCenter(team, workingPlay)
 
         # elif workingPlay.isSubRole(PBConstants.GOALIE_RIGHT):
         #     SubRoles.pGoaliePosRight(team, workingPlay)

@@ -1,3 +1,8 @@
+#
+# The transitions for the goalie for the goalie states.
+# Covers chase, position and save.
+#
+
 from math import fabs
 from ..playbook import PBConstants as PBCon
 from .. import NogginConstants as NogCon

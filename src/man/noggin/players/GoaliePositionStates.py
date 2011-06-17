@@ -17,10 +17,12 @@ def goaliePosition(player):
     if player.firstFrame():
         nav.positionPlaybook()
 
+    # When the ball is far away we want to make sure we
+    # are in position
     if ball.dist >= goalCon.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLocGoaliePos()
     else:
         player.brain.tracker.trackBall()
- 
+
     return player.stay()
 
