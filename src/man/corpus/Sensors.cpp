@@ -63,7 +63,7 @@ Sensors::Sensors ()
       colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
-	  varianceMonitor(9, "SensorVariance", sensorNames),
+	  varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
 	  unfilteredInertial(),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
       FRM_FOLDER("/home/nao/naoqi/frames"),
@@ -85,6 +85,26 @@ Sensors::Sensors ()
     pthread_mutex_init(&image_mutex, NULL);
 #endif
 	pthread_mutex_init(&variance_mutex, NULL);
+
+    // set up the sensor monitoring
+    varianceMonitor.Sensor(ACCX).setVarianceBounds(SensorMonitor::DONT_CHECK,
+                                                   ACCELEROMETER_HIGH_XY);
+    varianceMonitor.Sensor(ACCY).setVarianceBounds(SensorMonitor::DONT_CHECK,
+                                                   ACCELEROMETER_HIGH_XY);
+    varianceMonitor.Sensor(ACCZ).setVarianceBounds(SensorMonitor::DONT_CHECK,
+                                                   ACCELEROMETER_HIGH_Z);
+    varianceMonitor.Sensor(GYROX).setVarianceBounds(GYRO_LOW,
+                                                    SensorMonitor::DONT_CHECK);
+    varianceMonitor.Sensor(GYROY).setVarianceBounds(GYRO_LOW,
+                                                    SensorMonitor::DONT_CHECK);
+    varianceMonitor.Sensor(ANGLEX).setVarianceBounds(SensorMonitor::DONT_CHECK,
+                                                      ANGLE_XY_HIGH);
+    varianceMonitor.Sensor(ANGLEY).setVarianceBounds(SensorMonitor::DONT_CHECK,
+                                                      ANGLE_XY_HIGH);
+    varianceMonitor.Sensor(SONARL).setVarianceBounds(SensorMonitor::DONT_CHECK,
+                                                     SONAR_HIGH);
+    varianceMonitor.Sensor(SONARR).setVarianceBounds(SensorMonitor::DONT_CHECK,
+                                                     SONAR_HIGH);
 
     // THIS IS AN OCTAL NUMBER, must start with 0
     mkdir(FRM_FOLDER.c_str(), 0755); // permissions: u+rwx, og+rx
@@ -846,18 +866,18 @@ bool Sensors::isSavingFrames() const
 void Sensors::updateMotionDataVariance() {
 	pthread_mutex_lock(&variance_mutex);
 
-	int i = 0; // so re-ordering of sensors is easy
+    int i = 0; // so re-ordering of sensors is easy
 
-	// TODO: clean this up (ellipsis arguments?)
-	varianceMonitor.update(i, unfilteredInertial.accX);
-	varianceMonitor.update(++i, unfilteredInertial.accY);
-	varianceMonitor.update(++i, unfilteredInertial.accZ);
-	varianceMonitor.update(++i, unfilteredInertial.gyrX);
-	varianceMonitor.update(++i, unfilteredInertial.gyrY);
-	varianceMonitor.update(++i, unfilteredInertial.angleX);
-	varianceMonitor.update(++i, unfilteredInertial.angleY);
+    // TODO: clean this up (ellipsis arguments?)
+    varianceMonitor.update(i,   unfilteredInertial.accX);
+    varianceMonitor.update(++i, unfilteredInertial.accY);
+    varianceMonitor.update(++i, unfilteredInertial.accZ);
+    varianceMonitor.update(++i, unfilteredInertial.gyrX);
+    varianceMonitor.update(++i, unfilteredInertial.gyrY);
+    varianceMonitor.update(++i, unfilteredInertial.angleX);
+    varianceMonitor.update(++i, unfilteredInertial.angleY);
 
-	// TODO: add FSRs? (maybe when we actuallly use them?)
+    // TODO: add FSRs? (maybe when we actuallly use them?)
 
 	pthread_mutex_unlock(&variance_mutex);
 }

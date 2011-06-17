@@ -51,6 +51,12 @@ public:
 	void Reset();
 	void LogOutput(); 	// prints histograms to /tmp/{sensorName}.sensor
 
+    // values outside will cause a print statement
+    void setVarianceBounds(float low, float high);
+    void disableErrors() { reportErrors = false; }
+
+    static const int DONT_CHECK = -1;
+
 	const int numberOfBins() const { return monitor.NumberOfBins(); }
 	const double binMidPoint(int index) const;
 	const int binCountAt(int index) const;
@@ -59,10 +65,14 @@ public:
 	void SensorName(std::string name) { sensorName = name; }
 
 private:
+    void reportSensorError();
+
 	std::string sensorName;
 	NoiseMeter<Butterworth> noise;
 	SignalMonitor monitor;
 	int steadyAtFrame;
+    bool reportErrors; // warn if sensor variances exceed thresholds
+    float lowVariance, highVariance;
 };
 
 

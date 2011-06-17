@@ -41,12 +41,39 @@ enum SensorNames {
     SENSOR_COUNT,
 };
 
+enum SensorMonitorOrder {
+    ACCX = 0,
+    ACCY,
+    ACCZ,
+    GYROX,
+    GYROY,
+    ANGLEX,
+    ANGLEY,
+    SONARL,
+    SONARR,
+    MONITOR_COUNT
+};
+
 // names of different sensors (for variance monitoring)
 const std::string sensorNames[] = {
     "accX", "accY", "accZ", "gyroX", "gyroY", "angleX", "angleY",
     "sonarLeft", "sonarRight"
 };
 
+/*
+ * Limits for sensor variance - if a specific sensor reports a rolling variance
+ * outside these boundaries then that might be an early warning that the sensor
+ * is malfunctioning. Data to determine these boundaries was collected from
+ * several robots as they ran pBrunswick.
+ */
 
+const float GYRO_LOW = 0.0005f;
+
+const float ACCELEROMETER_HIGH_XY = 75.0f;
+const float ACCELEROMETER_HIGH_Z = 100.0f; // Z is generally noiser
+
+const float SONAR_HIGH = 2.0f;
+
+const float ANGLE_XY_HIGH = 5.0f;
 
 #endif

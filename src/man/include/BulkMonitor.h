@@ -43,8 +43,9 @@ public:
     BulkMonitor(int _numberMonitors, string _bulkName, const string _sensorNames[]);
     ~BulkMonitor();
 
-    // this method
     double update(int sensor, double input);
+
+    SensorMonitor& Sensor(int sensor);
 
     void Reset();
     void LogOutput();

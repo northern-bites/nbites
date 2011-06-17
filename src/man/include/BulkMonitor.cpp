@@ -49,6 +49,13 @@ double BulkMonitor::update(int sensor, double input) {
 	return monitors[sensor].X(input);
 }
 
+SensorMonitor& BulkMonitor::Sensor(int sensor) {
+    if (sensor < 0 || sensor > numberMonitors)
+        printf("You requested a sensor I don't have! This is bad!\n");
+
+    return monitors[sensor];
+}
+
 void BulkMonitor::Reset() {
 	for (int i = 0; i < numberMonitors; ++i)
 		monitors[i].Reset();

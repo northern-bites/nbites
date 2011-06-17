@@ -9,18 +9,22 @@
 static const bool LOG_DEFAULT = true;
 static const int NUMBER_BINS = 30;
 static const float LOW_BIN = 0.0001f;
-static const float HIGH_BIN = 30.0f;
+static const float HIGH_BIN = 100.0f;
 
 SensorMonitor::SensorMonitor()
 	:  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
-	   monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT)
+	   monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
+       reportErrors(false),
+       lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
 {
 	Reset();
 }
 
 SensorMonitor::SensorMonitor(std::string sensorName)
 	:  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
-	   monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT)
+	   monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
+       reportErrors(false),
+       lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
 {
 	SensorMonitor::sensorName = sensorName;
 	Reset();
@@ -31,17 +35,28 @@ SensorMonitor::~SensorMonitor() {
 }
 
 double SensorMonitor::X(double input) {
-	noise.X(input);
+    float variance = Y(noise.X(input));
 
-	if (noise.Steady()) {
-		monitor.X(noise.Y());
+ 	if (noise.Steady()) {
+		monitor.X(variance);
 
 		// for making sure filter output is reasonable (test)
 		if (steadyAtFrame == NOT_STEADY) {
 			steadyAtFrame = SampleCount();
 		}
 	}
-	return Y(input);
+
+    //std::cout << sensorName << " input: " << input
+    //<< " hpf " << noise.A().Y()
+    //<< " var " << noise.Y() << std::endl;
+
+    if (reportErrors) {
+        if ((lowVariance != DONT_CHECK && variance < lowVariance) ||
+            (highVariance != DONT_CHECK && variance > highVariance)) {
+            reportSensorError();
+        }
+    }
+    return Y();
 }
 
 void SensorMonitor::Reset() {
@@ -64,6 +79,19 @@ void SensorMonitor::LogOutput() {
 	outFile << monitor.toString() << endl;
 
 	outFile.close();
+}
+
+void SensorMonitor::setVarianceBounds(float low, float high) {
+    lowVariance = low;
+    highVariance = high;
+
+    reportErrors = true;
+}
+
+void SensorMonitor::reportSensorError() {
+    std::cout << "Potential sensor problem with " << sensorName
+              << ", saw " << Y() << " not between " << lowVariance
+              << "-" << highVariance << std::endl;
 }
 
 const int SensorMonitor::binCountAt(int index) const {
