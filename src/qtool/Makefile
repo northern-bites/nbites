@@ -6,6 +6,8 @@ MAKE=make
 CMAKE=cmake
 CCMAKE=ccmake
 
+GDB=gdb
+
 MKDIR=mkdir
 CD=cd
 
@@ -19,6 +21,10 @@ TOOLCHAIN_FLAG=-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE)
 
 ECLIPSE_PROJECT_FILE=$(BIN_DIR)/.project
 ECLIPSE_FLAGS=-G "Eclipse CDT4 - Unix Makefiles"
+
+EXECUTABLE=$(BIN_DIR)/qtool/qtool
+
+CMAKE_DEBUG_CONFIG=-DCMAKE_BUILD_TYPE=debug
 
 MAKE_FLAGS=--no-print-directory qtool
 
@@ -47,5 +53,16 @@ cfg: $(GEN_MAKEFILE)
 clean:
 	rm -rf $(BIN_DIR)
 
-run:
-	$(BIN_DIR)/qtool/qtool
+$(EXECUTABLE): build
+
+run: $(EXECUTABLE)
+	$(EXECUTABLE)
+
+config_debug: $(GEN_MAKEFILE)
+	$(CD) $(BIN_DIR); \
+	$(CMAKE) $(CMAKE_DEBUG_CONFIG) .
+
+debug: config_debug build
+
+run_gdb: debug
+	$(GDB) $(EXECUTABLE)
