@@ -2,7 +2,6 @@
  * MultiLocEKF.h - Header file for the MultiLocEKF class
  * We use an Extended Kalman Filter for figuring out where we are on the field
  *
- * @author Tucker Hermans
  */
 
 #ifndef MultiLocEKF_h_DEFINED
@@ -177,7 +176,7 @@ private:
                                      MeasurementVector1 &V_k);
 
 
-    void calculateMatrices(int index,
+    void incorporateCorner(int index,
                            const CornerObservation& z,
                            StateMeasurementMatrix2 &H_k,
                            MeasurementMatrix2 &R_k,
@@ -188,6 +187,43 @@ private:
         typename vector<T>::iterator i = z.begin();
         while( i != z.end() ) {
             i->isAmbiguous() ? i = z.erase(i) : ++i;
+        }
+    }
+
+    /**
+     * Check the standard error of a measurement update and signal to
+     * the system to not process it the standard error is too large.
+     */
+    template<typename StateMeasMT , typename MeasVT, typename MeasMT >
+    void checkStandardError(const StateMatrix& P_k, const StateMeasMT& H_k,
+                            const MeasVT& V_k, MeasMT * R_k){
+
+        // Calculate the standard error of the measurement
+        const StateMeasMT newP = prod(P_k, trans(H_k));
+
+        // Really this is the square of standard error
+        MeasMT se = prod(H_k, newP) + (*R_k);
+
+        // Since we are only comparing to V_k, we square V_k instead
+        // of square rooting se(). This is considerably faster. Also
+        // means we use the square of our fraction to compare
+
+        // Ignore observations based on standard error
+        // we avoid sqrt of
+        if ( se(0,0) *
+             STANDARD_ERROR_THRESH *
+             STANDARD_ERROR_THRESH < V_k(0) * V_k(0) ) {
+
+#ifdef DEBUG_STANDARD_ERROR
+            cout << "\t Ignoring measurement " << endl;
+            cout << "\t Standard error is " << se << endl;
+            cout << "\t Invariance is " << abs(V_k(0))*5 << endl;
+#endif
+
+            // Signal system to not use this observation and that
+            // there was an observed error during this frame
+            (*R_k)(0,0) = DONT_PROCESS_KEY;
+            observationError = true;
         }
     }
 
@@ -272,8 +308,6 @@ private:
     std::vector<PointObservation> lastPointObservations;
     std::vector<CornerObservation> lastCornerObservations;
     bool useAmbiguous;
-    MeasurementMatrix1 R_pred_k1;
-    MeasurementMatrix2 R_pred_k2;
 
     /**
      * Members responsible for keeping running totals of recent
@@ -288,6 +322,7 @@ private:
 
     // Fraction of frames with an erroneous observation
     const static float ERROR_RESET_THRESH;
+    const static float STANDARD_ERROR_THRESH;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;

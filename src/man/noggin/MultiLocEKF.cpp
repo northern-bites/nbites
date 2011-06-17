@@ -3,8 +3,8 @@
 #include <iostream>
 
 #include "FieldConstants.h"
-//#define DEBUG_LOC_EKF_INPUTS
-//#define DEBUG_STANDARD_ERROR
+// #define DEBUG_LOC_EKF_INPUTS
+// #define DEBUG_STANDARD_ERROR
 using namespace boost::numeric;
 using namespace boost;
 using namespace std;
@@ -50,6 +50,7 @@ const float MultiLocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
 const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
 
 const float MultiLocEKF::ERROR_RESET_THRESH = 0.2f;
+const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
 
 
 /**
@@ -82,8 +83,12 @@ const float MultiLocEKF::ERROR_RESET_THRESH = 0.2f;
                            z.getBearingSD());
 
 
-
-
+/**
+ * Calculate the expected distance, bearing, and orientation to a
+ * landmark and its errors with an observation.
+ *
+ * Stores orientation in pt_orientation
+ */
 #define CALCULATE_CORNER_OBS_ERRORS(obs, pt)                            \
     CALCULATE_PT_OBS_ERRORS(obs, pt);                                   \
                                                                         \
@@ -97,6 +102,50 @@ const float MultiLocEKF::ERROR_RESET_THRESH = 0.2f;
                                          pt_orientation);
 
 
+/**
+ * Fills the invariance, Jacobian, and covariance matrix for a point.
+ *
+ * Must be called after CALCULATE_PT_OBS_ERRORS
+ */
+#define INCORPORATE_POINT_POLAR(H_k, R_k, V_k){                         \
+        V_k(0) = dist_error;                                            \
+        V_k(1) = bearing_error;                                         \
+                                                                        \
+        /* Calculate jacobians. */                                      \
+        /* See CALCULATE_PT_OBS_ERRORS macro for variable */            \
+        /* derivations.*/                                               \
+                                                                        \
+        /* Derivatives of distance with respect to x,y,h */             \
+        H_k(0,0) = pt_rel_x / pt_dist;                                  \
+        H_k(0,1) = pt_rel_y / pt_dist;                                  \
+        H_k(0,2) = 0;                                                   \
+                                                                        \
+        /* Derivatives of bearing with respect to x,y,h */              \
+        H_k(1,0) = -pt_rel_y / (pt_dist * pt_dist);                     \
+        H_k(1,1) =  pt_rel_x / (pt_dist * pt_dist);                     \
+        H_k(1,2) = -1;                                                  \
+                                                                        \
+        /* Update the measurement covariance matrix */                  \
+        /* Indices: (Dist, bearing, orientation) */                     \
+        R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();               \
+        R_k(0,1) = 0.0f;                                                \
+        R_k(0,2) = 0.0f;                                                \
+                                                                        \
+        R_k(1,0) = 0.0f;                                                \
+        R_k(1,1) = z.getBearingSD() * z.getBearingSD();                 \
+        R_k(1,2) = 0.0f;                                                \
+    }
+
+#ifdef DEBUG_LOC_EKF_INPUTS
+#define PRINT_LOC_EKF_INPUTS()                          \
+    cout << "\t\t\tR vector is" << R_k << endl;         \
+    cout << "\t\t\tH vector is" << H_k << endl;         \
+    cout << "\t\t\tV vector is" << V_k << endl;         \
+    cout << "\t\t\t\t\t(x,y,h) est is (" << x << ", "   \
+         << y << ", " << h << ")" << endl;
+#else
+#define PRINT_LOC_EKF_INPUTS()
+#endif
 
 /**
  * Initialize the localization EKF class
@@ -114,13 +163,9 @@ MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
                         CornerObservation, corner_measurement_dim,
                         MotionModel,
                         loc_ekf_dimension>(BETA_LOC,GAMMA_LOC), LocSystem(),
-      lastOdo(0,0,0),
-      lastPointObservations(),
-      lastCornerObservations(),
-      useAmbiguous(true),
-      R_pred_k1(dist_bearing_meas_dim, dist_bearing_meas_dim, 0.0f),
-      R_pred_k2(corner_measurement_dim, corner_measurement_dim, 0.0f),
-      errorLog(error_log_width), observationError(false), resetFlag(false)
+      lastOdo(0,0,0), lastPointObservations(), lastCornerObservations(),
+      useAmbiguous(true), errorLog(error_log_width),
+      observationError(false), resetFlag(false)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -345,24 +390,33 @@ void MultiLocEKF::incorporateMeasurement(const PointObservation& z,
         incorporatePolarMeasurement( obsIndex, z, H_k, R_k, V_k);
     }
 
-    // Calculate the standard error of the measurement
-    const StateMeasurementMatrix1 newP = prod(P_k, trans(H_k));
-    MeasurementMatrix1 se = prod(H_k, newP) + R_k;
-    se(0,0) = sqrt(se(0,0));
-    se(1,1) = sqrt(se(1,1));
+    checkStandardError<StateMeasurementMatrix1, MeasurementVector1,
+                       MeasurementMatrix1>(P_k, H_k, V_k, &R_k);
+}
 
-    // Ignore observations based on standard error
-    if ( se(0,0)*6.0f < abs(V_k(0))) {
-#ifdef DEBUG_STANDARD_ERROR
-        cout << "\t Ignoring measurement " << endl;
-        cout << "\t Standard error is " << se << endl;
-        cout << "\t Invariance is " << abs(V_k(0))*5 << endl;
+void MultiLocEKF::incorporateMeasurement(const CornerObservation& z,
+                                         StateMeasurementMatrix2 &H_k,
+                                         MeasurementMatrix2 &R_k,
+                                         MeasurementVector2 &V_k)
+{
+#ifdef DEBUG_LOC_EKF_INPUTS
+    cout << "\t\t\tIncorporating measurement " << z << endl;
 #endif
+    const int obsIndex = findBestLandmark<CornerObservation, CornerLandmark>(z);
+
+    // No landmark is close enough, don't attempt to use one
+    if (obsIndex < 0) {
         R_k(0,0) = DONT_PROCESS_KEY;
+        return;
     }
 
-    observationError = (observationError || (R_k(0,0) == DONT_PROCESS_KEY));
+    incorporateCorner(obsIndex, z, H_k, R_k, V_k);
+
+    checkStandardError<StateMeasurementMatrix2,
+                       MeasurementVector2,
+                       MeasurementMatrix2>(P_k, H_k, V_k, &R_k);
 }
+
 
 void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
                                                   const PointObservation& z,
@@ -425,17 +479,8 @@ void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
     const float xInvariance = abs(x_b -x);
     const float yInvariance = abs(y_b -y);
 
-#ifdef DEBUG_LOC_EKF_INPUTS
-    cout << "\t\t\tR vector is" << R_k << endl;
-    cout << "\t\t\tH vector is" << H_k << endl;
-    cout << "\t\t\tV vector is" << V_k << endl;
-    cout << "\t\t\t\td vector is" << d_x << endl;
-    cout << "\t\t\t\t\tx est is " << x << endl;
-    cout << "\t\t\t\t\ty est is " << y << endl;
-    cout << "\t\t\t\t\th est is " << h << endl;
-    cout << "\t\t\t\t\tx_b est is " << x_b << endl;
-    cout << "\t\t\t\t\ty_b est is " << y_b << endl;
-#endif
+    PRINT_LOC_EKF_INPUTS();
+
 }
 
 void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
@@ -448,96 +493,19 @@ void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
     cout << "\t\t\tUsing polar " << endl;
 #endif
 
-    // Get the observed range and bearing
-    MeasurementVector1 z_x(dist_bearing_meas_dim);
-    z_x(0) = z.getVisDistance();
-    z_x(1) = z.getVisBearing();
-
     // Get expected values of the post
     PointLandmark bestPossibility = z.getPossibilities()[obsIndex];
-    const float x_b = bestPossibility.x;
-    const float y_b = bestPossibility.y;
-    MeasurementVector1 d_x(dist_bearing_meas_dim);
 
-    const float x = xhat_k_bar(0);
-    const float y = xhat_k_bar(1);
-    const float h = xhat_k_bar(2);
+    // Calculate the errors
+    CALCULATE_PT_OBS_ERRORS(z, bestPossibility);
 
-    d_x(0) = static_cast<float>(hypot(x - x_b, y - y_b));
-    d_x(1) = safe_atan2(y_b - y,
-                        x_b - x) - h;
-    d_x(1) = NBMath::subPIAngle(d_x(1));
+    INCORPORATE_POINT_POLAR(H_k, R_k, V_k);
 
-    // Calculate invariance
-    V_k    = z_x - d_x;
-    V_k(1) = NBMath::subPIAngle(V_k(1));
-
-    // Calculate jacobians
-    H_k(0,0) = (x - x_b) / d_x(0);
-    H_k(0,1) = (y - y_b) / d_x(0);
-    H_k(0,2) = 0;
-
-    H_k(1,0) = (y_b - y) / (d_x(0)*d_x(0));
-    H_k(1,1) = (x - x_b) / (d_x(0)*d_x(0));
-    H_k(1,2) = -1;
-
-    // Update the measurement covariance matrix
-    R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
-    R_k(0,1) = 0.0;
-    R_k(1,0) = 0.0;
-    R_k(1,1) = z.getBearingSD() * z.getBearingSD();
-
-#ifdef DEBUG_LOC_EKF_INPUTS
-    cout << "\t\t\tR vector is" << R_k << endl;
-    cout << "\t\t\tH vector is" << H_k << endl;
-    cout << "\t\t\tV vector is" << V_k << endl;
-    cout << "\t\t\t\td vector is" << d_x << endl;
-    cout << "\t\t\t\t\tx est is " << x << endl;
-    cout << "\t\t\t\t\ty est is " << y << endl;
-    cout << "\t\t\t\t\th est is " << h << endl;
-    cout << "\t\t\t\t\tx_b est is " << x_b << endl;
-    cout << "\t\t\t\t\ty_b est is " << y_b << endl;
-#endif
+    PRINT_LOC_EKF_INPUTS();
 }
 
 
-void MultiLocEKF::incorporateMeasurement(const CornerObservation& z,
-                                         StateMeasurementMatrix2 &H_k,
-                                         MeasurementMatrix2 &R_k,
-                                         MeasurementVector2 &V_k)
-{
-#ifdef DEBUG_LOC_EKF_INPUTS
-    cout << "\t\t\tIncorporating measurement " << z << endl;
-#endif
-    const int obsIndex = findBestLandmark<CornerObservation, CornerLandmark>(z);
-
-    // No landmark is close enough, don't attempt to use one
-    if (obsIndex < 0) {
-        R_k(0,0) = DONT_PROCESS_KEY;
-        return;
-    }
-
-    calculateMatrices(obsIndex, z, H_k, R_k, V_k);
-
-    // Calculate the standard error of the measurement
-    const StateMeasurementMatrix1 newP = prod(P_k, trans(H_k));
-    MeasurementMatrix1 se = prod(H_k, newP) + R_k;
-    se(0,0) = sqrt(se(0,0));
-    se(1,1) = sqrt(se(1,1));
-
-    // Ignore observations based on standard error
-    if ( se(0,0)*6.0f < abs(V_k(0))) {
-#ifdef DEBUG_STANDARD_ERROR
-        cout << "\t Ignoring measurement " << endl;
-        cout << "\t Standard error is " << se << endl;
-        cout << "\t Invariance is " << abs(V_k(0))*5 << endl;
-#endif
-        R_k(0,0) = DONT_PROCESS_KEY;
-    }
-    observationError = (observationError || (R_k(0,0) == DONT_PROCESS_KEY));
-}
-
-void MultiLocEKF::calculateMatrices(int index,
+void MultiLocEKF::incorporateCorner(int index,
                                     const CornerObservation& z,
                                     StateMeasurementMatrix2 &H_k,
                                     MeasurementMatrix2 &R_k,
@@ -552,45 +520,23 @@ void MultiLocEKF::calculateMatrices(int index,
     // Calculate the errors
     CALCULATE_CORNER_OBS_ERRORS(z, bestPossibility);
 
-    // Calculate invariance
-    V_k(0) = dist_error;
-    V_k(1) = bearing_error;
+    // Uses the same values as a point landmark (dist, bearing)
+    INCORPORATE_POINT_POLAR(H_k, R_k, V_k);
+
+    // Has additional dimensions for orientation
     V_k(2) = orientation_error;
-
-    /*
-     * Calculate jacobians.
-     *
-     * See CALCULATE_PT_OBS_ERRORS macro for variable derivations.
-     */
-
-    // Derivatives of distance with respect to x,y,h
-    H_k(0,0) = pt_rel_x / pt_dist;
-    H_k(0,1) = pt_rel_y / pt_dist;
-    H_k(0,2) = 0;
-
-    // Derivatives of bearing with respect to x,y,h
-    H_k(1,0) = -pt_rel_y / (pt_dist * pt_dist);
-    H_k(1,1) =  pt_rel_x / (pt_dist * pt_dist);
-    H_k(1,2) = -1;
 
     // Derivatives of orientation with respect to x,y,h
     H_k(2,0) = pt_rel_y / (pt_dist * pt_dist);
     H_k(2,1) = -pt_rel_x / (pt_dist * pt_dist);
     H_k(2,2) = 0;
 
-    // Update the measurement covariance matrix
-    // Indices: (Dist, bearing, orientation)
-    R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();
-    R_k(0,1) = 0.0f;
-    R_k(0,2) = 0.0f;
-
-    R_k(1,0) = 0.0f;
-    R_k(1,1) = z.getBearingSD() * z.getBearingSD();
-    R_k(1,2) = 0.0f;
-
+    // Orientation covariences
     R_k(2,0) = 0.0f;
     R_k(2,1) = 0.0f;
     R_k(2,2) = z.getOrientationSD() * z.getOrientationSD();
+
+    PRINT_LOC_EKF_INPUTS();
 }
 
 /**

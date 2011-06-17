@@ -211,11 +211,17 @@ namespace ekf {
             typename std::vector<Measurement2>::const_iterator m2;
 
             for(m1 = z_k1.begin(); m1 != z_k1.end(); ++m1) {
-                correctionStep(*m1);
+                correctionStep<mSize1, Measurement1,
+                               StateMeasurementMatrix1,
+                               MeasurementMatrix1,
+                               MeasurementVector1>(*m1, H_k1, K_k1, R_k1, v_k1);
             }
 
             for(m2 = z_k2.begin(); m2 != z_k2.end(); ++m2) {
-                correctionStep(*m2);
+                correctionStep<mSize2, Measurement2,
+                               StateMeasurementMatrix2,
+                               MeasurementMatrix2,
+                               MeasurementVector2>(*m2, H_k2, K_k2, R_k2, v_k2);
             }
 
             // Allow implementing classes to do things before copying
@@ -227,64 +233,40 @@ namespace ekf {
             updateState();
         }
 
-        virtual void correctionStep(const Measurement1& z_k1){
-            incorporateMeasurement(z_k1, H_k1, R_k1, v_k1);
+        template<int mSize, typename MeasT,
+                 typename StateMeasMT, typename MeasMT, typename MeasVT>
+        void correctionStep(const MeasT& z_k,
+                            StateMeasMT& H_k,
+                            StateMeasMT& K_k,
+                            MeasMT& R_k,
+                            MeasVT& V_k) {
+            incorporateMeasurement(z_k, H_k, R_k, V_k);
 
-            if (R_k1(0,0) == DONT_PROCESS_KEY) {
+            if (R_k(0,0) == DONT_PROCESS_KEY) {
                 return;
             }
 
             // Calculate the Kalman gain matrix
-            const StateMeasurementMatrix1 pTimesHTrans =
-                prod(P_k_bar, trans(H_k1));
+            const StateMeasMT pTimesHTrans =
+                prod(P_k_bar, trans(H_k));
 
-            if(mSize1 == 2){
-                K_k1 = prod(pTimesHTrans,
-                            NBMath::invert2by2(prod(H_k1,
-                                                    pTimesHTrans) + R_k1));
+            if(mSize == 2){
+                K_k = prod(pTimesHTrans,
+                           NBMath::invert2by2(prod(H_k,
+                                                   pTimesHTrans) + R_k));
             } else {
-                const MeasurementMatrix1 inv =
-                    NBMath::solve(prod(H_k1, pTimesHTrans) + R_k1,
+                const MeasMT inv =
+                    NBMath::solve(prod(H_k, pTimesHTrans) + R_k,
                                   boost::numeric::ublas::identity_matrix<float>(
-                                      mSize1));
-                K_k1 = prod(pTimesHTrans, inv);
+                                      mSize));
+                K_k = prod(pTimesHTrans, inv);
             }
 
             // Use the Kalman gain matrix to determine the next estimate
-            xhat_k_bar = xhat_k_bar + prod(K_k1, v_k1);
+            xhat_k_bar = xhat_k_bar + prod(K_k, V_k);
 
             // Update associate uncertainty
-            P_k_bar = prod(dimensionIdentity - prod(K_k1,H_k1), P_k_bar);
-        }
-
-        virtual void correctionStep(const Measurement2& z_k2){
-            incorporateMeasurement(z_k2, H_k2, R_k2, v_k2);
-
-            if (R_k2(0,0) == DONT_PROCESS_KEY) {
-                return;
-            }
-
-            // Calculate the Kalman gain matrix
-            const StateMeasurementMatrix2 pTimesHTrans =
-                prod(P_k_bar, trans(H_k2));
-
-            if(mSize2 == 2){
-                K_k2 = prod(pTimesHTrans,
-                            NBMath::invert2by2(prod(H_k2,
-                                                    pTimesHTrans) + R_k2));
-            } else {
-                const MeasurementMatrix2 inv =
-                    NBMath::solve(prod(H_k2, pTimesHTrans) + R_k2,
-                                  boost::numeric::ublas::identity_matrix<float>(
-                                      mSize2));
-                K_k2 = prod(pTimesHTrans, inv);
-            }
-
-            // Use the Kalman gain matrix to determine the next estimate
-            xhat_k_bar = xhat_k_bar + prod(K_k2, v_k2);
-
-            // Update associate uncertainty
-            P_k_bar = prod(dimensionIdentity - prod(K_k2,H_k2), P_k_bar);
+            P_k_bar = prod(dimensionIdentity - prod(K_k,H_k), P_k_bar);
         }
 
         virtual void noCorrectionStep(void) {
