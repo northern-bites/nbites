@@ -1,4 +1,4 @@
-from ..playbook.PBConstants import (GOALIE, CHASER, READY_CHASER)
+from ..playbook.PBConstants import (GOALIE, CHASER)
 import man.motion.SweetMoves as SweetMoves
 ###
 # Reimplementation of Game Controller States for pBrunswick

@@ -28,20 +28,18 @@ def shouldChaseFromPositionForKick(player):
 def shouldChaseFromSpinToBall(player):
     """
     Exit spinToBall if the ball is now in front of us or suddenly
-    far away. This should be like shouldSpinToBall but with
-    slightly larger range to avoid oscillations between chase and
-    spinToBall
+    far away.
     """
     ball = player.brain.ball
     return (shouldChaseBall(player) and
-            (shouldPositionForKick(player) or
-             ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST+5))
+            (ball.relX > constants.SHOULD_SPIN_TO_KICK_X and
+             (shouldPositionForKick(player) or
+              (fabs(ball.relY) > constants.BALL_PFK_LEFT_Y and
+               ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST + 5))))
 
 def shouldChaseFromClaimBall(player):
     """
-    Exit claimBall if the ball is no longer too close to us. This
-    should be like shouldClaimBall but with slightly larger range to
-    avoid oscillations between chase and claimBall
+    Exit claimBall if the ball is no longer too close to us.
     """
     ball = player.brain.ball
     return (shouldChaseBall(player) and
@@ -74,9 +72,9 @@ def shouldSpinToBall(player):
     """
     ball = player.brain.ball
     return (shouldChaseBall(player) and
-            ((not shouldPositionForKick(player) and
+            ((fabs(ball.relY) > constants.BALL_PFK_LEFT_Y and
              ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST) or
-            ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
+             ball.relX <= 9.5))
 
 def shouldKick(player):
     """
