@@ -80,6 +80,7 @@ SET( BUILD_DIR ${NBITES_DIR}/build/man )
 ############################ TRUNK REVISION
 # Record the current revision number of the repository
 #SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
+
 ############################ ALDEBARAN DIRECTORY
 # Ensure the AL_DIR variable is set
 
@@ -98,6 +99,23 @@ IF( NOT EXISTS ${AL_DIR} )
     )
 ENDIF( NOT EXISTS ${AL_DIR} )
 
+############################ NBITES DIRECTORY
+# Ensure the NBITES_DIR variable is set
+
+IF( "x$ENV{NBITES_DIR}x" STREQUAL "xx")
+  SET( NBITES_DIR "${NBITES_DIR}" )
+  SET( ENV{NBITES_DIR} ${NBITES_DIR} )
+  MESSAGE( STATUS
+    "reseting Environment variable NBITES_DIR to default ${NBITES_DIR}" )
+ELSE( "x$ENV{NBITES_DIR}x" STREQUAL "xx")
+  SET( NBITES_DIR $ENV{NBITES_DIR} )
+ENDIF( "x$ENV{NBITES_DIR}x" STREQUAL "xx")
+
+IF( NOT EXISTS ${NBITES_DIR} )
+  MESSAGE( FATAL_ERROR
+    "Path to the nbites directory does not exist!"
+    )
+ENDIF( NOT EXISTS ${NBITES_DIR} )
 
 ############################ MAN INSTALL PREFIX
 # Ensure the MAN_INSTALL_PREFIX variable is set
