@@ -28,6 +28,7 @@ BOOST_PYTHON_MODULE(vision)
         // From VisualBall itself
         .def_readonly("confidence", &VisualBall::getConfidence)
         .def_readonly("radius", &VisualBall::getRadius)
+        .def_readonly("heat", &VisualBall::getHeat)
         ;
 
     class_<VisualFieldObject>("FieldObject", no_init)
