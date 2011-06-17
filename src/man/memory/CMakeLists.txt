@@ -79,6 +79,7 @@ target_link_libraries(
   ${PARSE_TARGET}
   ${LOG_TARGET}
   ${VISION_TARGET}
+  ${SENSORS_TARGET}
   )
 
 

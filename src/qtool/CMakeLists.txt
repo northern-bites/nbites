@@ -1,8 +1,12 @@
 
-############ QTool
+############ qtool
 
-project( QTool )
-cmake_minimum_required(VERSION 2.6.0)
+project( qtool )
+cmake_minimum_required(VERSION 2.8.0)
+
+message(STATUS "")
+message(STATUS "...::: Configuring the qtool project :::... ")
+message(STATUS "")
 
 ########### Dependencies
 
@@ -19,42 +23,30 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 
 ########### Sources
 
-set( QTool_srcs main.cpp
+set( qtool_srcs main.cpp
   QTool.cpp
   )
 
-set(QTool_headers
+set(qtool_headers
     QTool.h
 )
 
-#set(QTool_forms colorcreator.ui)
+#set(qtool_forms qtool.ui)
 
-#SET(QTool_resources images.qrc)
+#set(qtool_resources qtool.res)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}
+include_directories(.
+                    ${CMAKE_CURRENT_BINARY_DIR}
                     ${PROTOBUF_INCLUDE_DIRS}
-                    .)
+                    )
 
 ############ Qt4 goodness
 
-Qt4_wrap_cpp(QTool_headers_moc ${QTool_headers})
-Qt4_wrap_ui(QTool_forms_headers ${QTool_forms})
-#QT4_ADD_RESOURCES(QTool_RESOURCES_RCC ${Protoviewer_RESOURCES})
+Qt4_wrap_cpp(qtool_headers_moc ${qtool_headers})
+Qt4_wrap_ui(qtool_forms_headers ${qtool_forms})
+#### resources example
+#Qr4_add_resources(qtool_resources_rcc ${qtool_resources})
 
-#    ${helloworld_RESOURCES_RCC})
-
-########## MAN LINK
-set( MAN_STRAIGHT_BUILD ../../build/man/straight )
-
-include_directories( ../ ../man ${MAN_STRAIGHT_BUILD}/cfg ${MAN_STRAIGHT_BUILD}
-    ../man/vision ../man/include ../man/sensors ../man/corpus)
-find_library(MEMORY_LIB memory ${MAN_STRAIGHT_BUILD}/memory)
-find_library(PARSE_LIB parse ${MAN_STRAIGHT_BUILD}/memory/parse)
-find_library(LOG_LIB log ${MAN_STRAIGHT_BUILD}/memory/log)
-find_library(VISION_LIB vision ${MAN_STRAIGHT_BUILD}/vision)
-find_library(SENSORS_LIB _sensors ${MAN_STRAIGHT_BUILD}/corpus)
-find_library(NB_INCLUDE _nb_include ${MAN_STRAIGHT_BUILD}/corpus)
-find_library(ROBOT_CONNECT _robot_connect ${MAN_STRAIGHT_BUILD}/corpus)
 
 ######### Subdirectory compilation
 add_subdirectory( image )
@@ -63,21 +55,16 @@ add_subdirectory( data )
 
 ######### The executable
 
-add_executable(QTool ${QTool_srcs}
-  ${QTool_headers_moc}
-  ${QTool_forms_headers} )
+add_executable(qtool
+  ${qtool_srcs}
+  ${qtool_headers_moc}
+  ${qtool_forms_headers} )
 
 target_link_libraries(
-  QTool
+  qtool
   colorcreator
   image
   data
-  ${MEMORY_LIB}
-  ${PARSE_LIB}
-  ${LOG_LIB}
-  ${ROBOT_CONNECT}
-  ${SENSORS_LIB}
-  ${NB_INCLUDE}
   ${PROTOBUF_LIBRARIES}
   ${QT_LIBRARIES}
   )

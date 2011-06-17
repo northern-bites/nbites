@@ -35,13 +35,10 @@ add_library(data
     ${data_headers_moc}
     ${data_forms_headers} )
 
-link_directories( /home/oneamtu/nbites/build/man/straight/memory/protos )
-find_library(PROTOS protos /home/oneamtu/nbites/build/man/straight/memory/protos)
-
 target_link_libraries(
   data
   treemodel
   protobuf
-  ${PROTOS}
+  memory
   ${QT_LIBRARIES}
   )

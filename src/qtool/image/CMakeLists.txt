@@ -50,6 +50,5 @@ add_library(image
 
 target_link_libraries(
   image
-  ${MEMORY_LIB}
   ${QT_LIBRARIES}
   )
