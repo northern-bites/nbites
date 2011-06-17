@@ -35,7 +35,7 @@ SensorMonitor::~SensorMonitor() {
 }
 
 double SensorMonitor::X(double input) {
-    float variance = Y(noise.X(input));
+    double variance = Y(noise.X(input));
 
  	if (noise.Steady()) {
 		monitor.X(variance);
@@ -52,7 +52,8 @@ double SensorMonitor::X(double input) {
 
     if (reportErrors && noise.Steady()) {
         if ((lowVariance != DONT_CHECK && variance < lowVariance) ||
-            (highVariance != DONT_CHECK && variance > highVariance)) {
+            (highVariance != DONT_CHECK && variance > highVariance) ||
+	    variance == 0.0) {
             reportSensorError();
         }
     }
