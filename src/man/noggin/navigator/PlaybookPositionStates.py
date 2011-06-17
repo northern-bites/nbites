@@ -2,7 +2,6 @@ from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
-from ..playbook import PBConstants
 from man.noggin.util import MyMath
 
 DEBUG = False

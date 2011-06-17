@@ -7,7 +7,6 @@ from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from ..playbook import PBConstants
 from man.noggin.typeDefs.Location import RobotLocation
 
 class Navigator(FSA.FSA):
