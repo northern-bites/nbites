@@ -39,7 +39,7 @@ enum SupportFoot {
 
 class Sensors;
 
-enum SENSORS_EVENT {
+enum SensorsEvent {
     NEW_MOTION_SENSORS = 1,
     NEW_VISION_SENSORS,
     NEW_IMAGE
@@ -86,7 +86,7 @@ Inertial(const float _accX, const float _accY, const float _accZ,
 };
 
 
-class Sensors : public Provider<int>{
+class Sensors : public Provider<SensorsEvent>{
     //friend class Man;
  public:
     Sensors();

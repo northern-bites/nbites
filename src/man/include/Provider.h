@@ -36,7 +36,7 @@ public:
 
 protected:
 
-    void notify(event_type event) const {
+    virtual void notifySubscribers(event_type event) const {
         for (subscriber_iter i = subscribers.begin();
                 i != subscribers.end(); i++) {
             (*i)->update(event);

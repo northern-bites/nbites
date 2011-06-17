@@ -639,7 +639,7 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
     pthread_mutex_unlock(&fsr_mutex);
     pthread_mutex_unlock(&button_mutex);
 
-    this->notify(NEW_MOTION_SENSORS);
+    this->notifySubscribers(NEW_MOTION_SENSORS);
 }
 
 /**
@@ -665,7 +665,7 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
     pthread_mutex_unlock(&ultra_sound_mutex);
     pthread_mutex_unlock (&button_mutex);
     pthread_mutex_unlock (&battery_mutex);
-    this->notify(NEW_VISION_SENSORS);
+    this->notifySubscribers(NEW_VISION_SENSORS);
 }
 
 void Sensors::setAllSensors (vector<float> sensorValues) {
@@ -788,7 +788,7 @@ void Sensors::setNaoImagePointer(char* _naoImage) {
 void Sensors::setRawNaoImage(uint8_t *img)
 {
     rawNaoImage = img;
-    this->notify(NEW_IMAGE);
+    this->notifySubscribers(NEW_IMAGE);
 }
 
 void Sensors::setNaoImage(const uint8_t *img)

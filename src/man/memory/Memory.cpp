@@ -53,23 +53,23 @@ void Memory::updateVision() {
     loggingBoard->log(mVision);
 }
 
-void Memory::update(int eventID) {
+void Memory::update(SensorsEvent event) {
 
-    if (eventID == NEW_MOTION_SENSORS) {
+    if (event== NEW_MOTION_SENSORS) {
         PROF_ENTER(_profiler.get(), P_MEMORY_MOTION_SENSORS);
         mMotionSensors->update();
         loggingBoard->log(mMotionSensors);
         PROF_EXIT(_profiler.get(), P_MEMORY_MOTION_SENSORS);
     }
 
-    if (eventID == NEW_VISION_SENSORS) {
+    if (event== NEW_VISION_SENSORS) {
         PROF_ENTER(_profiler.get(), P_MEMORY_VISION_SENSORS);
         mVisionSensors->update();
         loggingBoard->log(mVisionSensors);
         PROF_EXIT(_profiler.get(), P_MEMORY_VISION_SENSORS);
     }
 
-    if (eventID == NEW_IMAGE) {
+    if (event== NEW_IMAGE) {
         PROF_ENTER(_profiler.get(), P_MEMORY_IMAGE);
         mImage->update();
         loggingBoard->log(mImage);

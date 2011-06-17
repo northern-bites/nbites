@@ -33,7 +33,7 @@ namespace memory {
 
 using boost::shared_ptr;
 
-class Memory : public Subscriber<int> {
+class Memory : public Subscriber<SensorsEvent> {
 
 public:
     Memory();
@@ -56,7 +56,7 @@ public:
      * This function is called whenever one of the Providers we are subscribed
      * to has something new/updated
      */
-    void update(int eventID);
+    void update(SensorsEvent eventID);
 
 public:
     const MVision* getMVision() const {return mVision;}
