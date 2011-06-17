@@ -49,6 +49,8 @@ const float MultiLocEKF::Y_EST_MIN = 0.0f;
 const float MultiLocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
 const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
 
+const float MultiLocEKF::ERROR_RESET_THRESH = 0.2f;
+
 
 /**
  * Calculate the distance and bearing error between an observation
@@ -117,7 +119,8 @@ MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
       lastCornerObservations(),
       useAmbiguous(true),
       R_pred_k1(dist_bearing_meas_dim, dist_bearing_meas_dim, 0.0f),
-      R_pred_k2(corner_measurement_dim, corner_measurement_dim, 0.0f)
+      R_pred_k2(corner_measurement_dim, corner_measurement_dim, 0.0f),
+      errorLog(error_log_width), observationError(false), resetFlag(false)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -271,6 +274,9 @@ void MultiLocEKF::updateLocalization(const MotionModel& u,
     printBeforeUpdateInfo();
 #endif
 
+    // Reset error check
+    observationError = false;
+
     odometryUpdate(u);
     applyObservations(pt_z, c_z);
     endFrame();
@@ -299,32 +305,26 @@ void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
     lastPointObservations = pt_z;
 
     if (! useAmbiguous) {
-        // Remove ambiguous observations
-        vector<PointObservation>::iterator iter_p = pt_z.begin();
-        while( iter_p != pt_z.end() ) {
-            if (iter_p->isAmbiguous() ) {
-                iter_p = pt_z.erase( iter_p );
-            } else {
-                ++iter_p;
-            }
-        }
+        removeAmbiguous<PointObservation>(pt_z);
+       removeAmbiguous<CornerObservation>(c_z);
+    }
 
-        vector<CornerObservation>::iterator iter_c = c_z.begin();
-        while( iter_c != c_z.end() ) {
-            if (iter_c->isAmbiguous() ) {
-                iter_c = c_z.erase( iter_c );
-            } else {
-                ++iter_c;
-            }
-        }
+    bool shouldCorrect = !pt_z.empty() || !c_z.empty();
+
+    // Our localization needs to be reset
+    if (resetFlag){
+
+        // resetFlag = false if we reset loc, still true otherwise
+        resetFlag = !resetLoc(pt_z, c_z);
+
+        // We should only run a correction step if we've seen
+        // observations, and we are still waiting to correct our Loc
+        shouldCorrect = shouldCorrect && resetFlag;
     }
 
     // Correct step based on the observed stuff
-    if (!pt_z.empty() || !c_z.empty()) {
-        correctionStep(pt_z, c_z);
-    } else {
-        noCorrectionStep();
-    }
+    shouldCorrect ? correctionStep(pt_z, c_z) : noCorrectionStep();
+
     //limitPosteriorUncert();
 }
 
@@ -508,6 +508,7 @@ void MultiLocEKF::incorporateMeasurement(const PointObservation& z,
         R_k(0,0) = DONT_PROCESS_KEY;
     }
 
+    observationError = (observationError || (R_k(0,0) == DONT_PROCESS_KEY));
 }
 
 void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
@@ -706,6 +707,7 @@ void MultiLocEKF::incorporateMeasurement(const CornerObservation& z,
 #endif
         R_k(0,0) = DONT_PROCESS_KEY;
     }
+    observationError = (observationError || (R_k(0,0) == DONT_PROCESS_KEY));
 }
 
 void MultiLocEKF::calculateMatrices(int index,
@@ -1014,4 +1016,105 @@ void MultiLocEKF::printAfterUpdateInfo()
     cout << endl;
     cout << endl;
     cout << endl;
+}
+
+/**
+ * Checks after correction steps and before the state is updated.
+ */
+void MultiLocEKF::beforeCorrectionFinish()
+{
+    double pushValue(0.0f);
+    if (observationError){
+        pushValue = 1.0f;
+    }
+
+    // If we've seen to many erroneous frames, let's reset to be safe
+    if (errorLog.X(pushValue) > ERROR_RESET_THRESH){
+        resetFlag = true;
+    }
+}
+
+
+/**
+ * Uses unambiguous observations to reset localization to a new
+ * position. Used when our localization begins to diverge
+ * significantly.
+ *
+ * @return true if the system was reset from definite observations,
+ *         false otherwise
+ */
+bool MultiLocEKF::resetLoc(const vector<PointObservation> pt_z,
+                           const vector<CornerObservation>& c_z)
+{
+    return (resetLoc(pt_z) || resetLoc(c_z));
+}
+
+/**
+ * Look for two unambiguous point observations (whatever they are) in
+ * order to triangulate our new position
+ *
+ * @return true if we reset our loc
+ */
+bool MultiLocEKF::resetLoc(const vector<PointObservation>& z)
+{
+    vector<PointObservation>::const_iterator i;
+    const PointObservation * def_1 = NULL, * def_2 = NULL;
+    for (i = z.begin() ; i != z.end(); ++i){
+
+        if (!i->isAmbiguous()){
+
+            // Set the two pointers to definite pt observations
+            if (def_1 == NULL){
+                def_1 = &(*i);
+            } else if (def_2 == NULL){
+                def_2 = &(*i);
+                break;
+            }
+        }
+    }
+
+    if (def_2 != NULL){
+        resetLoc(def_1, def_2);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Look for an unambiguous corner observation to use to reset our
+ * localization.
+ *
+ * @return true if we reset our loc
+ */
+bool MultiLocEKF::resetLoc(const vector<CornerObservation>& z)
+{
+    // Search corners for one definite observation
+    vector<CornerObservation>::const_iterator i;
+
+    for(i = z.begin(); i != z.end(); ++i){
+
+        // Once we find a definite corner, reset to it
+        if (!i->isAmbiguous()){
+            resetLoc(&(*i));
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Triangulate and reset our position with two definite
+ * PointObservations.
+ */
+void MultiLocEKF::resetLoc(const PointObservation* pt1,
+                           const PointObservation* pt2)
+{
+    assert(!pt1->isAmbiguous() && !pt2->isAmbiguous());
+
+}
+
+void MultiLocEKF::resetLoc(const CornerObservation* c)
+{
+    assert(!c->isAmbiguous());
+
 }

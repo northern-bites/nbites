@@ -15,6 +15,7 @@
 #include "NogginStructs.h"
 #include "Observation.h"
 #include "LocSystem.h"
+#include "dsp.h"
 
 // #define DEBUG_DIVERGENCE_CALCULATIONS
 
@@ -70,6 +71,16 @@ public:
     virtual void redGoalieReset();
     virtual void blueGoalieReset();
     virtual inline void resetLocTo(float x, float y, float h);
+
+    bool resetLoc(const vector<PointObservation> pt_z,
+                  const vector<CornerObservation>& c_z);
+
+    bool resetLoc(const vector<PointObservation>& z);
+    bool resetLoc(const vector<CornerObservation>& z);
+
+    void resetLoc(const PointObservation* pt1,
+                  const PointObservation* pt2);
+    void resetLoc(const CornerObservation* c);
 
     // Getters
     // Get location informations
@@ -173,6 +184,14 @@ private:
                            MeasurementMatrix2 &R_k,
                            MeasurementVector2 &V_k);
 
+    template <class T>
+    void removeAmbiguous(vector<T>& z){
+        typename vector<T>::iterator i = z.begin();
+        while( i != z.end() ) {
+            i->isAmbiguous() ? i = z.erase(i) : ++i;
+        }
+    }
+
     /**
      * Given an observation with multiple possibilities, we return the
      * observation with the best possibility as the first element of
@@ -238,6 +257,8 @@ private:
     template<class LandmarkT>
     inline float getAcceptableDivergence() { return 100; } // arbitrary
 
+    virtual void beforeCorrectionFinish();
+
 #ifdef USE_MM_LOC_EKF
     bool updateProbability(const Observation& Z);
 #endif
@@ -256,8 +277,22 @@ private:
     std::vector<PointObservation> lastPointObservations;
     std::vector<CornerObservation> lastCornerObservations;
     bool useAmbiguous;
-	MeasurementMatrix1 R_pred_k1;
-	MeasurementMatrix2 R_pred_k2;
+    MeasurementMatrix1 R_pred_k1;
+    MeasurementMatrix2 R_pred_k2;
+
+    /**
+     * Members responsible for keeping running totals of recent
+     * erroneous (too divergent) observations.
+     */
+    Boxcar errorLog;
+    bool observationError, resetFlag;
+
+    enum {
+        error_log_width = 50
+    };
+
+    // Fraction of frames with an erroneous observation
+    const static float ERROR_RESET_THRESH;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;

@@ -31,7 +31,7 @@ public:
     Observation(const VisualFieldObject &_object)
         : visDist(_object.getDistance()), visBearing(_object.getBearing()),
           sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
-          id(_object.getID())
+          id(_object.getID()), possibilities()
         {
             initPossibilities(_object);
         }
@@ -39,7 +39,7 @@ public:
     Observation(const VisualCorner &_object)
         : visDist(_object.getDistance()), visBearing(_object.getBearing()),
           sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
-          id(_object.getID())
+          id(_object.getID()), possibilities()
         {
             initPossibilities(_object);
         }
@@ -47,7 +47,7 @@ public:
     Observation(const VisualCross &_object)
         : visDist(_object.getDistance()), visBearing(_object.getBearing()),
           sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
-          id(_object.getID())
+          id(_object.getID()), possibilities()
         {
             initPossibilities(_object);
         }
