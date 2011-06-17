@@ -15,43 +15,14 @@ def goaliePosition(player):
     heading = None
 
     if player.firstFrame():
-        player.isPositioning = True
-        player.isChasing = False
-        player.isSaving = False
         nav.positionPlaybook()
 
+    # When the ball is far away we want to make sure we
+    # are in position
     if ball.dist >= goalCon.ACTIVE_LOC_THRESH:
-        player.brain.tracker.activeLoc()
+        player.brain.tracker.activeLocGoaliePos()
     else:
-        player.brain.tracker.trackBall() 
-
-    if player.brain.nav.isStopped():
-        if goalTran.shouldPositionLeft(player):
-            player.goNow('goaliePositionLeft')
-
-        elif goalTran.shouldPositionRight(player):
-            player.goNow('goaliePositionRight')
+        player.brain.tracker.trackBall()
 
     return player.stay()
-
-def goaliePositionRight(player):
-#move to the right position.
-    if player.firstFrame():
-        nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_LEFT_POST_X + 20,
-                               nogCon.LANDMARK_MY_GOAL_LEFT_POST_Y- 20, 0))
-
-    elif (player.shouldPositionCenter(player) or 
-          player.shouldPositionLeft(player)):
-        player.goNow('goaliePosition')
-
-
-def goaliePositionLeft(player):
-#move to the left position.
-    if player.firstFrame():
-        nav.goTo(RobotLocation(nogCon.LANDMARK_MY_GOAL_RIGHT_POST_X + 20,
-                               nogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y + 10, 0))
-
-    elif (player.shouldPositionCenter(player) or
-          player.shouldPositionRight(player)):
-        player.goNow('goaliePosition')
 

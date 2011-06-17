@@ -12,32 +12,12 @@ TESTING = False
 
 def goalieSave(player):
 
-#going to want it to get in a squat to prepare at somepoint in here
-
     brain = player.brain
     if player.firstFrame():
-        player.isSaving = True
-        player.isChasing = False
-        brain.motion.stopHeadMoves()
+        brain.tracker.stopHeadMoves()
         player.stopWalking()
         brain.tracker.trackBall()
-
-    if helper.shouldSave(player):
-        return player.goNow('goaliePickSave')
-
-    return player.stay()
-
-    #need to check if havent saved and need to move
-
-    #Right now do not need to move side to side for saving
-    #strafeDir = helper.strafeDirForSave(player)
-    # if fabs(strafeDir) > 0:
-        #player.setWalk(0, constants.STRAFE_SPEED * MyMath.sign(strafeDir), 0)
-    # else:
-        # player.stopWalking()
-
-def goaliePickSave(player): 
-    player.brain.fallController.enableFallProtection(False)
+        brain.fallController.enableFallProtection(False)
 
     if helper.shouldSaveRight(player):
         return player.goNow('saveRight')
@@ -45,20 +25,34 @@ def goaliePickSave(player):
         return player.goNow('saveLeft')
     elif helper.shouldSaveCenter(player):
         return player.goNow('saveCenter')
+    #add check for strafe in future
 
-    return player.stay()
+    #return player.stay()
+
+#moves left or right
+#NEEDS WORK
+#NOT USED RIGHT NOW
+def saveStrafe(player):
+    strafeDir = helper.strafeDirForSave(player)
+    if fabs(strafeDir) > 0:
+        player.setWalk(0, constants.STRAFE_SPEED * MyMath.sign(strafeDir), 0)
+    else:
+        player.stopWalking()
+
+
+# REAL SAVES
 
 def saveRight(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.SAVE_RIGHT_DEBUG)
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.SAVE_RIGHT_DEBUG):
+        player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.GOALIE_DIVE_RIGHT):
         return player.goLater('holdRightSave')
     return player.stay()
 
 def saveLeft(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.SAVE_LEFT_DEBUG)
-    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.SAVE_LEFT_DEBUG):
+        player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
+    if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.GOALIE_DIVE_LEFT):
         return player.goLater('holdLeftSave')
     return player.stay()
 
@@ -68,6 +62,8 @@ def saveCenter(player):
     if player.stateTime >= SweetMoves.getMoveTime(SweetMoves.GOALIE_SQUAT):
         return player.goLater('holdCenterSave')
     return player.stay()
+
+# TEST SAVES (JUST MOVE ARMS)
 
 def testSaveRight(player):
     if player.firstFrame():
@@ -93,34 +89,56 @@ def testSaveCenter(player):
         return player.goNow('goalieSave')
     return player.stay()
 
-#not sure how to decide this yet
+# HOLD SAVE
+
 def holdRightSave(player):
-    #if helper.shouldHoldSave(player):
-    #else:
-        return player.goLater('postDiveSave')
-    #return player.stay()
-
-def holdLeftSave(player):
-    #if helper.shouldHoldSave(player):
-    #else:
-        return player.goLater('postDiveSave')
-    #return player.stay()
-
-def holdCenterSave(player):
-    #if helper.shouldHoldSave(player):
-    #else:
-        return player.goLater('postCenterSave')
-    #return player.stay()
-
-def postCenterSave(player):
-    if player.brain.nav.isStopped():
-        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-        player.isSaving = False
+    if helper.shouldHoldSave(player):
         return player.stay()
+    else:
+        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
+        return player.goLater('postDiveSave')
 
     return player.stay()
-def postDiveSave(player):
-    if player.brain.nav.isStopped():
-        player.brain.fallController.enableFallProtection(True)
-        player.isSaving = False
+
+def holdLeftSave(player):
+    if helper.shouldHoldSave(player):
         return player.stay()
+    else:
+        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
+        return player.goLater('postDiveSave')
+
+    return player.stay()
+
+def holdCenterSave(player):
+    if helper.shouldHoldSave(player):
+        return player.stay()
+    else:
+        return player.goLater('postCenterSave')
+
+    return player.stay()
+
+# POST SAVE
+
+def postCenterSave(player):
+    if player.firstFrame():
+        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+
+    if player.counter == 10:
+        return player.goLater('doneSaving')
+
+    return player.stay()
+
+def postDiveSave(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(True)
+
+    if player.counter == 10:
+        return player.goLater('doneSaving')
+
+    return player.stay()
+
+def doneSaving(player):
+    if player.firstFrame():
+        nav.positionPlaybook()
+
+    return player.stay()

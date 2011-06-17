@@ -95,7 +95,7 @@ void RoboGuardian::run(){
     interval.tv_nsec = static_cast<long long int> (GUARDIAN_FRAME_LENGTH_uS * 1000);
     int connectionCheckCount = 0;
     while(Thread::running){
-
+        // @TODO: Thread safe?
         countButtonPushes();
         checkFalling();
         checkFallen();
@@ -156,6 +156,9 @@ bool isFalling(float angle_pos, float angle_vel) {
 
 
 void RoboGuardian::checkFallen() {
+    if (!useFallProtection){
+        return;
+    }
     const Inertial inertial  = sensors->getInertial();
 
     /***** Determine if the robot has FALLEN OVER *****/
@@ -247,6 +250,9 @@ void RoboGuardian::checkFeetOnGround() {
  *
  */
 void RoboGuardian::checkFalling(){
+    if (!useFallProtection){
+        return;
+    }
     const Inertial inertial  = sensors->getInertial();
 
     /***** Determine if the robot is in the process of FALLING ****/
