@@ -40,12 +40,13 @@ class MultiLocEKF : public ekf::TwoMeasurementEKF<PointObservation,
 public:
 
     // Constructors & Destructors
-    MultiLocEKF(float initX = INIT_LOC_X,
-           float initY = INIT_LOC_Y,
-           float initH = INIT_LOC_H,
-           float initXUncert = INIT_X_UNCERT,
-           float initYUncert = INIT_Y_UNCERT,
-           float initHUncert = INIT_H_UNCERT);
+    explicit MultiLocEKF(float initX = INIT_LOC_X,
+                         float initY = INIT_LOC_Y,
+                         float initH = INIT_LOC_H,
+                         float initXUncert = INIT_X_UNCERT,
+                         float initYUncert = INIT_Y_UNCERT,
+                         float initHUncert = INIT_H_UNCERT);
+
     virtual ~MultiLocEKF() {}
 
     // Update functions
@@ -57,12 +58,7 @@ public:
     void applyObservations(std::vector<PointObservation> pt_z,
                            std::vector<CornerObservation> c_z);
 
-    template <class T>
-    bool applyObservation(const T& Z);
     void endFrame();
-
-    void copyEKF(const MultiLocEKF& other);
-    void mergeEKF(const MultiLocEKF& other);
 
     void printAfterUpdateInfo();
     void printBeforeUpdateInfo();
@@ -153,6 +149,9 @@ public:
     void setUseAmbiguous(bool _use) { useAmbiguous = _use; }
 
 private:
+    MultiLocEKF(const MultiLocEKF& other);
+    MultiLocEKF operator=(const MultiLocEKF& other);
+
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
 
@@ -258,10 +257,6 @@ private:
     inline float getAcceptableDivergence() { return 100; } // arbitrary
 
     virtual void beforeCorrectionFinish();
-
-#ifdef USE_MM_LOC_EKF
-    bool updateProbability(const Observation& Z);
-#endif
 
     void limitAPrioriUncert();
     void limitPosteriorUncert();

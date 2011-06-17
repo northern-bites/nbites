@@ -144,77 +144,6 @@ MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
 }
 
 /**
- * Set the EKF to be identical to the given EKF
- *
- * @param other EKF to be copied
- */
-void MultiLocEKF::copyEKF(const MultiLocEKF& other)
-{
-    if(this != &other){
-        xhat_k     = other.xhat_k;
-        xhat_k_bar = other.xhat_k_bar;
-        Q_k        = other.Q_k;
-        A_k        = other.A_k;
-        P_k        = other.P_k;
-        P_k_bar    = other.P_k_bar;
-        betas      = other.betas;
-        gammas     = other.gammas;
-        setProbability(other.getProbability());
-    }
-
-}
-
-
-/**
- * Merges the current EKF with the given EKF in such a way as to preserve the
- * the probability distribution.
- *
- * @param other The EKF that this EKF will be merged with.
- */
-void MultiLocEKF::mergeEKF(const MultiLocEKF& other)
-{
-    // Make sure that the new probability is not 0 or rediculously close to it.
-    const double newProbability = max(probability + other.getProbability(),
-                                      0.000001);
-
-    StateVector new_xhat_k(ekf::loc_ekf_dimension);
-
-    const int DRIFT_PROB_MAX_DIFF = 10;
-    if ( other.getProbability() > probability * DRIFT_PROB_MAX_DIFF ){
-        xhat_k = other.getState();
-        P_k = other.getStateUncertainty();
-    } else if ( probability > other.getProbability() * DRIFT_PROB_MAX_DIFF) {
-        new_xhat_k = xhat_k;
-    } else {
-        new_xhat_k(0) = static_cast<float>( (1/newProbability)*
-                                            (probability * getXEst() +
-                                             other.getProbability() * other.getXEst()) );
-        new_xhat_k(1) = static_cast<float>( (1/newProbability)*
-                                            (probability * getYEst() +
-                                             other.getProbability() * other.getYEst()) );
-        new_xhat_k(2) = static_cast<float>( (1/newProbability)*
-                                            (probability * getHEst() +
-                                             other.getProbability() * other.getHEst()) );
-
-        const StateVector diffA = (xhat_k - new_xhat_k);
-        const StateMatrix a = P_k + outer_prod(diffA,
-                                               trans(diffA));
-
-        const StateVector diffB = (other.getState() - new_xhat_k);
-        const StateMatrix b = (other.getStateUncertainty() +
-                               outer_prod(diffB, trans(diffB)));
-
-        P_k = (((probability * a) + (other.getProbability() * b))
-               /
-               newProbability);
-
-        xhat_k = new_xhat_k;
-    }
-
-    setProbability(newProbability);
-}
-
-/**
  * Reset the EKF to a starting configuration
  */
 void MultiLocEKF::reset()
@@ -306,7 +235,7 @@ void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
 
     if (! useAmbiguous) {
         removeAmbiguous<PointObservation>(pt_z);
-       removeAmbiguous<CornerObservation>(c_z);
+        removeAmbiguous<CornerObservation>(c_z);
     }
 
     bool shouldCorrect = !pt_z.empty() || !c_z.empty();
@@ -327,82 +256,6 @@ void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
 
     //limitPosteriorUncert();
 }
-
-
-/**
- * Apply an individual observation to the EKF.
- */
-template <class ObservationT>
-bool MultiLocEKF::applyObservation(const ObservationT& Z)
-{
-#ifdef DEBUG_LOC_EKF_INPUTS
-    printBeforeUpdateInfo();
-#endif
-
-    correctionStep(Z);
-    updateState();
-
-#ifdef USE_MM_LOC_EKF
-    return updateProbability(Z);
-#else
-    return true;
-#endif
-
-}
-
-#ifdef USE_MM_LOC_EKF
-bool MultiLocEKF::updateProbability(const Observation& Z)
-{
-
-    if (R_k(0,0) == DONT_PROCESS_KEY)
-        return true;
-
-    const MeasurementMatrix measurementVar = R_k + R_pred_k;
-
-    MeasurementMatrix measurementVarInv = measurementVar;
-    const double denom = (-measurementVar(0,1) * measurementVar(1,0) +
-                          measurementVar(0,0) * measurementVar(1,1));
-
-    if (denom < 0.0001){
-        probability *= 0.0001;
-        return true;
-    }
-
-    measurementVarInv(0,0) = measurementVar(1,1)/denom;
-    measurementVarInv(0,1) = -measurementVar(0,1)/denom;
-    measurementVarInv(1,0) = -measurementVar(1,0)/denom;
-    measurementVarInv(1,1) = measurementVar(0,0)/denom;
-
-    v_k(0) = abs(v_k(0));
-    v_k(1) = abs(v_k(1));
-    v_k(2) = abs(v_k(2));
-
-    // We need the measurement innovation or invariance, aka v_k
-    const double exponent = -0.5 * inner_prod(trans(v_k),
-                                              prod(measurementVarInv, v_k));
-
-    if (abs(exponent) > 2.25)
-        return true;
-
-    double detMeasVar = (-measurementVar(0,1) * measurementVar(1,0) +
-                         measurementVar(0,0) * measurementVar(1,1));
-    if (detMeasVar < 0.0001)
-        detMeasVar = 1e-08;
-    const double coefficient = 1 / sqrt( //pow(2 * PI, LOC_MEASUREMENT_DIMENSION) *
-        detMeasVar );
-
-    const double outlierProb = 0.08;
-    const double probCo = (1-outlierProb)*(pow(M_E, exponent)) + outlierProb;
-
-    // cout << "probCo= " << probCo << "\tprob:" << probability << endl;
-
-    probability *= probCo;
-    return false;
-}
-
-#endif
-
-
 
 
 /**
@@ -572,16 +425,6 @@ void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
     const float xInvariance = abs(x_b -x);
     const float yInvariance = abs(y_b -y);
 
-#ifdef USE_MM_LOC_EKF
-    R_pred_k(0,0) = ((uncertX / xInvariance + coshUncert / cosh) +
-                     (uncertY / yInvariance + sinhUncert / sinh));
-    R_pred_k(0,1) = 0;
-    R_pred_k(1,0) = 0;
-    R_pred_k(1,1) = ((uncertX / xInvariance + sinhUncert / sinh) +
-                     (uncertY / yInvariance + coshUncert / cosh));
-#endif
-
-
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tR vector is" << R_k << endl;
     cout << "\t\t\tH vector is" << H_k << endl;
@@ -643,22 +486,6 @@ void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
     R_k(0,1) = 0.0;
     R_k(1,0) = 0.0;
     R_k(1,1) = z.getBearingSD() * z.getBearingSD();
-
-#ifdef USE_MM_LOC_EKF
-    const double uncertX = getXUncert();
-    const double uncertY = getYUncert();
-    const double uncertH = getHUncert();
-
-    const float xInvariance = abs(x - x_b);
-    const float yInvariance = abs(y - y_b);
-
-    R_pred_k(0,0) = ((uncertX/xInvariance) + (uncertY/yInvariance) /
-                     (xInvariance*xInvariance + yInvariance*yInvariance));
-    R_pred_k(0,1) = 0;
-    R_pred_k(1,0) = 0;
-    R_pred_k(1,1) = (((uncertY / yInvariance) + (uncertX / xInvariance)) /
-                     (yInvariance / xInvariance) + uncertH);
-#endif
 
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tR vector is" << R_k << endl;
