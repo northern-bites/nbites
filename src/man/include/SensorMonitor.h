@@ -73,6 +73,7 @@ private:
     int steadyAtFrame;
     bool reportErrors; // warn if sensor variances exceed thresholds
     float lowVariance, highVariance;
+    int seenErrors;
 };
 
 

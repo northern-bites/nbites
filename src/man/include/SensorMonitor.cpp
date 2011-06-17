@@ -66,18 +66,19 @@ void SensorMonitor::Reset() {
     noise.Reset();
     monitor.Reset();
     steadyAtFrame = NOT_STEADY;
+    seenErrors = 0;
 }
 
 void SensorMonitor::LogOutput() {
     using namespace std;
     stringstream filename;
 
-	filename << "/home/nao/naoqi/log/" << sensorName << ".sensor.xls";
-
+    filename << "/home/nao/naoqi/log/" << sensorName << ".sensor.xls";
     ofstream outFile;
     outFile.open(filename.str().c_str(), ifstream::out);
 
     outFile << "Report for sensor: " << sensorName << endl;
+    outFile << "Showed unusual variance " << seenErrors << " times" << endl;
     outFile << monitor.toString() << endl;
 
     outFile.close();
@@ -91,10 +92,12 @@ void SensorMonitor::setVarianceBounds(float low, float high) {
 }
 
 void SensorMonitor::reportSensorError() {
-    std::cout << "Potential sensor problem with " << sensorName
-              << ", saw a variance of " << Y()
-              << " (feel free to ignore this if the robot is stationary)"
-              << std::endl;
+    ++seenErrors;
+    if (seenErrors == 10)
+	std::cout << "*** Potential sensor problem with " << sensorName
+		  << ", saw a variance of " << Y()
+		  << " (feel free to ignore this if the robot is stationary)"
+		  << std::endl;
 }
 
 const int SensorMonitor::binCountAt(int index) const {
