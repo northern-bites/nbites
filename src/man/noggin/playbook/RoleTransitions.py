@@ -23,9 +23,19 @@ def shouldPosition(team):
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X  and my.uncertX < 90):
         if(ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER 
            or ball.relX > 200):
+            team.shouldChaseCounter = 0
+            team.shouldStopChaseCounter = 0
+            team.shouldPositionCenterCounter = 0
+            team.shouldPositionLeftCounter = 0
+            team.shouldPositionRightCounter = 0
             return True
     elif my.x > NogCon.MIDFIELD_X * 0.5:
         print "1/4"
+        team.shouldChaseCounter = 0
+        team.shouldStopChaseCounter = 0
+        team.shouldPositionCenterCounter = 0
+        team.shouldPositionLeftCounter = 0
+        team.shouldPositionRightCounter = 0
         return True
 
     return False
@@ -33,11 +43,9 @@ def shouldPosition(team):
 def shouldChase(team):
     ball = team.brain.ball
 
-    #if (ball.framesOff > 30):
-        #print "no ball"
-        #team.shouldChaseCounter = 0
-        #team.shouldStopChaseCounter = 0
-        #return False
+    if (ball.framesOff > 30):
+        print "no ball"
+        return False
 
     # close enough to chase
     if (ball.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.BOX_BUFFER
@@ -60,8 +68,13 @@ def shouldChase(team):
 def shouldStopChase(team):
     ball= team.brain.ball
 
-    #if(ball.framesOff > 30):
-        #team.shouldStopChaseCounter = 4
+    if(ball.framesOff > 30):
+        team.shouldStopChaseCounter = 0
+        team.shouldChaseCounter = 0
+        team.shouldPositionCenterCounter = 0
+        team.shouldPositionLeftCounter = 0
+        team.shouldPositionRightCounter = 0
+        return True
 
     if (ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER
         or ball.relX > goalCon.STOP_CHASE_RELX_BUFFER
@@ -86,6 +99,11 @@ def shouldPositionCenter(team):
     ball = team.brain.ball
 
     if ball.framesOff > 30:
+        team.shouldStopChaseCounter = 0
+        team.shouldChaseCounter = 0
+        team.shouldPositionCenterCounter = 0
+        team.shouldPositionLeftCounter = 0
+        team.shouldPositionRightCounter = 0
         return True
 
     if ball.x > goalCon.CHASE_RIGHT_X_LIMIT:
