@@ -5,6 +5,8 @@
 #include "FieldConstants.h"
 // #define DEBUG_LOC_EKF_INPUTS
 // #define DEBUG_STANDARD_ERROR
+// #define DEBUG_DIVERGENCE_CALCULATIONS
+// #define DEBUG_ERROR_LOG
 using namespace boost::numeric;
 using namespace boost;
 using namespace std;
@@ -129,11 +131,9 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
         /* Indices: (Dist, bearing, orientation) */                     \
         R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();               \
         R_k(0,1) = 0.0f;                                                \
-        R_k(0,2) = 0.0f;                                                \
                                                                         \
         R_k(1,0) = 0.0f;                                                \
         R_k(1,1) = z.getBearingSD() * z.getBearingSD();                 \
-        R_k(1,2) = 0.0f;                                                \
     }
 
 #ifdef DEBUG_LOC_EKF_INPUTS
@@ -287,7 +287,6 @@ void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
 
     // Our localization needs to be reset
     if (resetFlag){
-
         // resetFlag = false if we reset loc, still true otherwise
         resetFlag = !resetLoc(pt_z, c_z);
 
@@ -523,6 +522,7 @@ void MultiLocEKF::incorporateCorner(int index,
     // Uses the same values as a point landmark (dist, bearing)
     INCORPORATE_POINT_POLAR(H_k, R_k, V_k);
 
+
     // Has additional dimensions for orientation
     V_k(2) = orientation_error;
 
@@ -532,6 +532,10 @@ void MultiLocEKF::incorporateCorner(int index,
     H_k(2,2) = 0;
 
     // Orientation covariences
+    // last column and last row indices
+    R_k(0,2) = 0.0f;
+    R_k(1,2) = 0.0f;
+
     R_k(2,0) = 0.0f;
     R_k(2,1) = 0.0f;
     R_k(2,2) = z.getOrientationSD() * z.getOrientationSD();
@@ -801,8 +805,13 @@ void MultiLocEKF::beforeCorrectionFinish()
         pushValue = 1.0f;
     }
 
+#ifdef DEBUG_ERROR_LOG
+    cout << "Error log has value of " << errorLog.Y() << endl;
+#endif /* DEBUG_ERROR_LOG */
+
     // If we've seen to many erroneous frames, let's reset to be safe
-    if (errorLog.X(pushValue) > ERROR_RESET_THRESH){
+    if (errorLog.X(pushValue) > ERROR_RESET_THRESH &&
+        errorLog.Steady()){
         resetFlag = true;
     }
 }
@@ -846,6 +855,11 @@ bool MultiLocEKF::resetLoc(const vector<PointObservation>& z)
         }
     }
 
+#ifdef DEBUG_ERROR_LOG
+        cout << "Resetting localization with points: "
+             << *def_1 << " and " << *def_2 << endl;
+#endif
+
     if (def_2 != NULL){
         resetLoc(def_1, def_2);
         return true;
@@ -869,6 +883,11 @@ bool MultiLocEKF::resetLoc(const vector<CornerObservation>& z)
         // Once we find a definite corner, reset to it
         if (!i->isAmbiguous()){
             resetLoc(&(*i));
+
+#ifdef DEBUG_ERROR_LOG
+        cout << "Resetting localization with corner: "
+             << *i << endl;
+#endif
             return true;
         }
     }
