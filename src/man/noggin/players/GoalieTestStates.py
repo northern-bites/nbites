@@ -14,12 +14,13 @@ import GoalieConstants as goalCon
 def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
+        player.standup()
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
-        player.brain.fallController.enableFallProtection(False)
+        #player.brain.fallController.enableFallProtection(False)
         player.brain.tracker.trackBall()
         #player.brain.tracker.activeLoc()
         player.standup()
@@ -31,7 +32,8 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
-    return player.goNow('testChase')
+    player.walkPose()
+    return player.goNow('testDX')
 
 def gamePenalized(player):
     angles = player.brain.sensors.angles
@@ -57,7 +59,7 @@ def testDive(player):
 
 def testDX(player):
     ball=player.brain.ball
-    if ball.framesOn > 0:
+    if player.counter % 3 == 1:
         print "relX"
         print ball.relX
         print "relY"
@@ -71,42 +73,50 @@ def testDX(player):
 
 def testSaveDecision(player):
     ball = player.brain.ball
- 
-    if ball.framesOn > 0 :
-        if(ball.dx > 11 or ball.dx < -11):
-            print "moving"
-            if ball.relY > goalCon.CENTER_SAVE_THRESH:
-                print "save right + 1"
-                player.counterRightSave +=1
-                if player.counterRightSave > 3:
-                    print "save right"
-                    player.counterRightSave = 0
-                    player.counterLeftSave = 0
-                    player.counterCenterSave = 0
-            elif ball.relY < -goalCon.CENTER_SAVE_THRESH:
-                print "save left + 1"
-                player.counterLeftSave +=1
-                if player.counterLeftSave > 3:
-                    print "save left"
-                    player.counterRightSave = 0
-                    player.counterLeftSave = 0
-                    player.counterCenterSave = 0
-            elif( ball.relY > -goalCon.CENTER_SAVE_THRESH and
-                  ball.relY < goalCon.CENTER_SAVE_THRESH):
-                print "save center + 1"
-                player.counterCenterSave +=1
-                if player.counterCenterSave > 3:
-                    print "save center"
-                    player.counterRightSave = 0
-                    player.counterLeftSave = 0
-                    player.counterCenterSave = 0
 
-       # if ball.relX < 85:
-            #print "save now"
-       # else:
-           # print "save later"
-    
+    if goalTran.shouldSave(player):
+        return player.goNow('goalieSave')
+
     return player.stay()
+
+    # if ball.framesOn > 0 :
+    #     if(ball.dx > 11 or ball.dx < -11):
+    #         print "moving"
+    #         if ball.relY > goalCon.CENTER_SAVE_THRESH:
+    #             print "save right + 1"
+    #             player.counterRightSave +=1
+    #             if player.counterRightSave > 3:
+    #                 player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
+    #                 print "save right"
+    #                 player.counterRightSave = 0
+    #                 player.counterLeftSave = 0
+    #                 player.counterCenterSave = 0
+    #         elif ball.relY < -goalCon.CENTER_SAVE_THRESH:
+    #             print "save left + 1"
+    #             player.counterLeftSave +=1
+    #             if player.counterLeftSave > 3:
+    #                 player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
+    #                 print "save left"
+    #                 player.counterRightSave = 0
+    #                 player.counterLeftSave = 0
+    #                 player.counterCenterSave = 0
+    #         elif( ball.relY > -goalCon.CENTER_SAVE_THRESH and
+    #               ball.relY < goalCon.CENTER_SAVE_THRESH):
+    #             print "save center + 1"
+    #             player.counterCenterSave +=1
+    #             if player.counterCenterSave > 3:
+    #                 player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+    #                 print "save center"
+    #                 player.counterRightSave = 0
+    #                 player.counterLeftSave = 0
+    #                 player.counterCenterSave = 0
+
+    #    # if ball.relX < 85:
+    #         #print "save now"
+    #    # else:
+    #        # print "save later"
+
+    # return player.stay()
 
 
 # not using below here for now
@@ -125,39 +135,5 @@ def testInBox(player):
             print "in"
         else:
             print "out"
-
-    return player.stay()
-
-
-
-def testShouldPositionRight(player):
-    if player.counter % 100 == 0:
-        if goalTran.shouldPositionRight(player):
-            print "position right"
-        elif goalTran.shouldPositionLeft(player):
-            print "position left"
-        elif goalTran.shouldPositionCenter(player):
-            print "postion center"
-
-    return player.stay()
-
-def testChase(player):
-    player.isSaving = False
-    player.penaltyKicking = False
-
-    if goalTran.shouldChase(player):
-        print "chase"
-    else:
-        print "staying"
-
-    return player.stay()
-
-def testStopChase(player):
-    player.isChasing = True
-
-    if goalTran.shouldStopChase(player):
-        print "stop"
-    else:
-        print "not stopping"
 
     return player.stay()
