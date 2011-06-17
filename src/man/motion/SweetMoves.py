@@ -243,7 +243,7 @@ STAND_UP_BACK = (((100,0,0,0),
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  0.4,0, stiff.STANDUP_STIFFNESSES)
+                  0.6,0, stiff.STANDUP_STIFFNESSES)
                  )
 
 #**********************
