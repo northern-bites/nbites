@@ -85,6 +85,7 @@ SET( ROBOT_CONNECT_SRCS
   AccEKF
   RoboGuardian
   guardian/ConnectionAngel.cpp
+  guardian/WifiAngel.cpp
   ClickableButton
   PyRoboGuardian
   Lights

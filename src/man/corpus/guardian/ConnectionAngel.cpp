@@ -6,28 +6,18 @@
 #include <ifaddrs.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <cstring>
 
-#include "RoboGuardian.h"
+#include "ConnectionConstants.h"
 
 namespace man {
 namespace corpus {
 namespace guardian {
 
 using std::string;
+using namespace connection_constants;
 
-const char* ConnectionAngel::CONNECTION_NAME_DEFAULT = "ROBOTICS";
-const int ConnectionAngel::WIFI_RECONNECTS_MAX_DEFAULT = 3;
-const int ConnectionAngel::CONNECTION_CHECK_RATE_DEFAULT =
-        30*RoboGuardian::GUARDIAN_FRAME_RATE;
-
-const char* ConnectionAngel::LOOPBACK_IF_NAME = "lo";
-const char* ConnectionAngel::WIRED_IF_NAME = "eth0";
-
-ConnectionAngel::ConnectionAngel(const char* connection_name,
-        int wifi_reconnects_max, int connection_check_rate) :
-        connection_name(connection_name),
-        wifi_reconnects_max(wifi_reconnects_max),
-        connection_check_rate(connection_check_rate),
+ConnectionAngel::ConnectionAngel() :
         address_buffer(new char[INET_ADDRSTRLEN]){
 }
 

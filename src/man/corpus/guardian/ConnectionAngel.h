@@ -1,6 +1,3 @@
-#ifndef _CONNECTION_ANGEL_
-#define _CONNECTION_ANGEL_
-
 /**
  * @class ConnectionAngel
  *
@@ -9,6 +6,9 @@
  * @author Octavian Neamtu <oneamtu89@gmail.com>
  *
  */
+#ifndef _CONNECTION_ANGEL_
+#define _CONNECTION_ANGEL_
+
 
 #include <string>
 #include <stdint.h>
@@ -21,33 +21,20 @@ class ConnectionAngel {
 
 
 public:
-    ConnectionAngel(const char* connection_name = CONNECTION_NAME_DEFAULT,
-            int wifi_reconnects_max = WIFI_RECONNECTS_MAX_DEFAULT,
-            int connection_check_rate = CONNECTION_CHECK_RATE_DEFAULT);
-
-    ~ConnectionAngel();
+    ConnectionAngel();
+    virtual ~ConnectionAngel();
 
     unsigned long get_ip() const;
     const char* get_ip_string() const;
-
-public:
-    static const char* CONNECTION_NAME_DEFAULT;
-    static const int WIFI_RECONNECTS_MAX_DEFAULT;
-    static const int CONNECTION_CHECK_RATE_DEFAULT;
-
-    static const char* LOOPBACK_IF_NAME;
-    static const char* WIRED_IF_NAME;
+    bool connected() const {return get_ip();}
 
 private:
     inline bool is_loopback_if(const char* if_name) const;
     inline bool is_wired_if(const char* if_name) const;
 
 private:
-    const char* connection_name;
-    int wifi_reconnects_max;
     int connection_check_rate;
-
-    //and the last address polled for
+    //address_buffer - contains the last address returned by get_ip
     char* address_buffer;
 };
 

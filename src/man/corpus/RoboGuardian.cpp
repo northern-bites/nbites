@@ -11,10 +11,10 @@ using namespace std;
 #include "UnfreezeCommand.h"
 
 //#define DEBUG_GUARDIAN_CLICKS
-#define WIFI_CONNECTION NBITES
-#define WIFI_RECONNECTS_MAX 3
-//check for a connection once in 30 secs
-#define CONNECTION_CHECK_RATE 30*RoboGuardian::GUARDIAN_FRAME_RATE
+//check for a connection once in 20 secs
+//the connection checking takes ~ 200 us if a connection is present
+//TODO: make this a static variable
+#define CONNECTION_CHECK_RATE 20*RoboGuardian::GUARDIAN_FRAME_RATE
 
 const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
@@ -79,14 +79,14 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
 	  falling(false),fallen(false),feetOnGround(true),
       useFallProtection(false),
       lastHeatAudioWarning(0), lastHeatPrintWarning(0),
-      connectionAngel(new ConnectionAngel())
+      wifiAngel(new WifiAngel())
 {
     pthread_mutex_init(&click_mutex,NULL);
     executeStartupAction();
 }
 RoboGuardian::~RoboGuardian(){
     pthread_mutex_destroy(&click_mutex);
-    delete connectionAngel;
+    delete wifiAngel;
 }
 
 
@@ -111,7 +111,7 @@ void RoboGuardian::run(){
         processChestButtonPushes();
         if (connectionCheckCount == CONNECTION_CHECK_RATE) {
             connectionCheckCount = 0;
-        //    checkConnection();
+            wifiAngel->check_on_wifi();
         } else {
             connectionCheckCount++;
         }
@@ -495,6 +495,7 @@ void RoboGuardian::executeShutdownAction()const {
     system("shutdown -h now &");
 }
 
+//TODO: cache this - it's unlikely to change while we're running the code
 string RoboGuardian::getHostName()const {
     char name[40];
     name[0] ='\0';
@@ -502,27 +503,11 @@ string RoboGuardian::getHostName()const {
     return string(name);
 }
 
-const string RoboGuardian::discoverIP() const{
-    return string(connectionAngel->get_ip_string());
-//    // try ...|awk '{print $1 " " $2}' and grep -v inet6
-//    system("ifconfig|grep 'inet'|cut -d':' -f2|awk '{print $1}'|grep -v 127.0.0.1 > /tmp/ip.txt");
-//    char ip[100];
-//    FILE * ipf = fopen("/tmp/ip.txt","r");
-//    if(ipf != NULL){
-//        fscanf(ipf,"%s\n",ip);
-//        return ip;
-//        fclose(ipf);
-//    }else{
-//        cout << "Unable to read IP from this platform"<<endl;
-//        return "0";
-//    }
-
+const string RoboGuardian::discoverIP() const {
+    return string(wifiAngel->get_ip_string());
 }
 
 void RoboGuardian::speakIPAddress()const {
-    //Currently we poll the broker. If this breaks in the future
-    //you can try to call /opt/naoqi/bin/ip.sh or
-    //parse the output of if config yourself
     const string IP = discoverIP();//broker->getIP();
     const string host = getHostName();
 
@@ -571,12 +556,12 @@ void RoboGuardian::checkConnection(){
         wifiReconnectTimeout = 0;
         return;
     } else {
-        if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
-            cout    << "No connection detected, trying to reconnect interfaces, attempt "
-                    <<  wifiReconnectTimeout << endl;
-            reconnectWifiConnection();
-            wifiReconnectTimeout++;
-        }
+//        if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
+//            cout    << "No connection detected, trying to reconnect interfaces, attempt "
+//                    <<  wifiReconnectTimeout << endl;
+//            reconnectWifiConnection();
+//            wifiReconnectTimeout++;
+//        }
     }
 }
 

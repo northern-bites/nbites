@@ -31,7 +31,7 @@
 #include "MotionInterface.h"
 #include "ClickableButton.h"
 
-#include "guardian/ConnectionAngel.h"
+#include "guardian/WifiAngel.h"
 
 enum  ButtonID {
     CHEST_BUTTON = 0,
@@ -121,7 +121,7 @@ private:
 
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
 
-    man::corpus::guardian::ConnectionAngel* connectionAngel;
+    man::corpus::guardian::WifiAngel* wifiAngel;
 
     mutable pthread_mutex_t click_mutex;
 };
