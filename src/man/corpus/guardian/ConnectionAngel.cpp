@@ -63,10 +63,14 @@ unsigned long ConnectionAngel::get_ip() const {
     return ip_address;
 }
 
-const char* ConnectionAngel::get_ip_string() const {
+const char* ConnectionAngel::get_ip_cstring() const {
     unsigned long int_address = this->get_ip();
     inet_ntop(AF_INET, &int_address, address_buffer, INET_ADDRSTRLEN);
     return address_buffer;
+}
+
+std::string ConnectionAngel::get_ip_string() const {
+    return std::string(address_buffer);
 }
 
 inline bool ConnectionAngel::is_loopback_if(const char* if_name) const {

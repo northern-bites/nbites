@@ -38,6 +38,7 @@ bool WifiAngel::check_on_wifi() {
 //TODO: #FunProject not essential, but it could be a fun little project to
 //use the dbus to communicate with connman
 //that will make it faster, and also give us more control over our connection
+//TODO: make a more hardcore version that kills wpa_supplicant and maybe even connman
 //Octavian
 bool WifiAngel::try_to_reconnect() {
 

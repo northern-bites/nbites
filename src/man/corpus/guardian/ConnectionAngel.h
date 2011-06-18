@@ -25,7 +25,8 @@ public:
     virtual ~ConnectionAngel();
 
     unsigned long get_ip() const;
-    const char* get_ip_string() const;
+    const char* get_ip_cstring() const;
+    std::string get_ip_string() const;
     bool connected() const {return get_ip();}
 
 private:

@@ -42,8 +42,6 @@ public:
      * @return true if wifi was up, false if it was down
      */
     bool check_on_wifi();
-
-protected:
     bool try_to_reconnect();
 
 private:

@@ -53,6 +53,7 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       chestButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
       leftFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
       rightFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
+      frameCount(0),
       // buttonOnCounter(0),buttonOffCounter(0),
       //       lastButtonOnCounter(0),lastButtonOffCounter(0),
       //       buttonClicks(0),
@@ -94,12 +95,10 @@ void RoboGuardian::run(){
         checkTemperatures();
         processFallingProtection();
         processChestButtonPushes();
-        if (connectionCheckCount == CONNECTION_CHECK_RATE) {
-            connectionCheckCount = 0;
+        if (frameCount % CONNECTION_CHECK_RATE == 0) {
             wifiAngel->check_on_wifi();
-        } else {
-            connectionCheckCount++;
         }
+        frameCount++;
         nanosleep(&interval, &remainder);
     }
 
@@ -430,7 +429,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         enableGains();
         break;
     case 7:
-		checkConnection();
+        wifiAngel->try_to_reconnect();
         break;
     case 9:
         //Easter EGG!
@@ -470,8 +469,6 @@ void RoboGuardian::executeFallProtection(){
 
 
 void RoboGuardian::executeStartupAction() const{
-    //Blank for now
-
 }
 
 void RoboGuardian::executeShutdownAction()const {
@@ -489,7 +486,7 @@ string RoboGuardian::getHostName()const {
 }
 
 const string RoboGuardian::discoverIP() const {
-    return string(wifiAngel->get_ip_string());
+    return wifiAngel->get_ip_string();
 }
 
 void RoboGuardian::speakIPAddress()const {
@@ -531,69 +528,9 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
         return chestButton;
     }
 }
-//TODO: comment
-void RoboGuardian::checkConnection(){
-    const string IP = discoverIP();
-#ifdef DEBUG_CONNECTION
-    cout << "checking connection, got IP" << IP << endl;
-#endif
-    if (IP.size() >= 7 && (IP[0] == '1' || IP[0] == '2')) {
-        wifiReconnectTimeout = 0;
-        return;
-    } else {
-//        if (wifiReconnectTimeout < WIFI_RECONNECTS_MAX) {
-//            cout    << "No connection detected, trying to reconnect interfaces, attempt "
-//                    <<  wifiReconnectTimeout << endl;
-//            reconnectWifiConnection();
-//            wifiReconnectTimeout++;
-//        }
-    }
-}
 
-bool RoboGuardian::checkWired(){
-    FILE * f1 = popen("connman services | awk '/Wired/ {print $1}'", "r");
-    char status[3] = "";
-    fscanf(f1,"%s\n",status);
-    pclose(f1);
-    if(status[0] == '*') {
-        cout<<"wired "<<status<<endl;
-        return true;
-    }
-    return false;
-}
-
-bool RoboGuardian::checkWireless(){
-
-    FILE * f2 = popen("connman services | awk '/ROBOTICS/ {print $1}'", "r");
-    char status[3] = "";
-    fscanf(f2,"%s\n",status);
-    pclose(f2);
-    if (status[0] == '*') {
-        cout<<"wireless"<<endl;
-        return true;
-    }
-    return false;
-}
-
-// we assume that autoconnect is on and that we already  have connected
-// to the network before
-void RoboGuardian::reconnectWifiConnection(){
-
-    FILE * f3 = popen("connman services | awk '/ROBOTICS/ {print $4}'", "r");
-    char service[100] = "";
-    fscanf(f3,"%s\n", service);
-    pclose(f3);
-
-    if (service[0] != ' ') {
-        playFile(wifi_restart_wav);
-        char command[100] = "";
-        strcat(command, "su -c \" connman connect ");
-        strcat(command, service);
-        strcat(command, " \" & ");
-        system(command);
-    } else {
-        cout<<"couldn't find specified wifi network to reconnect to";
-    }
+bool RoboGuardian::checkConnection(){
+    return wifiAngel->connected();
 }
 
 void RoboGuardian::ifUpDown(){

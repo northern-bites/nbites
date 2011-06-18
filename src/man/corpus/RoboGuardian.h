@@ -78,9 +78,7 @@ private:
 	void checkFeetOnGround();
     void checkBatteryLevels();
     void checkTemperatures();
-    void checkConnection();
-    bool checkWired();
-    bool checkWireless();
+    bool checkConnection();
     void countButtonPushes();
     void processFallingProtection();
     void processChestButtonPushes();
@@ -88,7 +86,6 @@ private:
     void executeFallProtection();
     void shutoffGains();
     void enableGains();
-    void reconnectWifiConnection();
     void ifUpDown();
     //helpers
     std::string getHostName()const;
@@ -110,6 +107,8 @@ private:
     boost::shared_ptr<ClickableButton> chestButton,
         leftFootButton,
         rightFootButton;
+
+    unsigned int frameCount;
 
     Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter,groundOnCounter,groundOffCounter;
