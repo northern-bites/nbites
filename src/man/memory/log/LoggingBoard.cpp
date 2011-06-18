@@ -1,8 +1,8 @@
 #include "LoggingBoard.h"
 #include "NaoPaths.h"
 
+namespace man {
 namespace memory {
-
 namespace log {
 
 using namespace man::include::paths;
@@ -74,5 +74,5 @@ const FDLogger* LoggingBoard::getLogger(const MObject* mobject) const {
 
 
 }
-
+}
 }

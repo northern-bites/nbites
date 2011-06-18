@@ -10,6 +10,7 @@
 
 #pragma once
 
+namespace man {
 namespace memory {
 
 /**
@@ -35,4 +36,5 @@ public:
     virtual void update() = 0;
 
 };
+}
 }

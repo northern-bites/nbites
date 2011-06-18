@@ -41,7 +41,7 @@ using namespace boost::assign;
 
 using namespace std;
 using boost::shared_ptr;
-using memory::Memory;
+using man::memory::Memory;
 
 /////////////////////////////////////////
 //                                     //

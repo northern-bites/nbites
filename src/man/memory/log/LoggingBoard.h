@@ -23,16 +23,18 @@
 #include "memory/MObject.h"
 
 //forward declaration
+namespace man {
 namespace memory {
 namespace log {
 class LoggingBoard;
 }
 }
+}
 
 #include "memory/Memory.h"
 
+namespace man {
 namespace memory {
-
 namespace log {
 
 typedef pair< const MObject*, FDLogger*> ObjectFDLoggerPair;
@@ -69,5 +71,6 @@ private:
 
 
 };
+}
 }
 }

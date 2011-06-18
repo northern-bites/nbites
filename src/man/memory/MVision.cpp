@@ -7,6 +7,7 @@
 #include "MemoryMacros.h"
 #include "MVision.h"
 
+namespace man {
 namespace memory {
 
 using boost::shared_ptr;
@@ -82,5 +83,6 @@ void MVision::update(PVision::PVisualDetection* visual_detection,
     visual_detection->set_elevation(visualDetection->getElevation());
     visual_detection->set_distance_sd(visualDetection->getDistanceSD());
     visual_detection->set_bearing_sd(visualDetection->getBearingSD());
+}
 }
 }

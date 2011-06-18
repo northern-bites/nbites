@@ -25,6 +25,7 @@
 
 #include "FDLogger.h"
 
+namespace man {
 namespace memory {
 namespace log {
 
@@ -70,5 +71,6 @@ private:
     CodedOutputStream* coded_output;
 
 };
+}
 }
 }
