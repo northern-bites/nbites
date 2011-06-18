@@ -31,6 +31,9 @@
 #include "MotionInterface.h"
 #include "ClickableButton.h"
 
+#include "guardian/WifiAngel.h"
+
+//TODO: move this to the guardian folder
 
 enum  ButtonID {
     CHEST_BUTTON = 0,
@@ -90,6 +93,13 @@ private:
     //helpers
     std::string getHostName()const;
     void playFile(std::string filePath)const; //non-blocking
+
+public:
+    static const int GUARDIAN_FRAME_RATE;
+    static const int GUARDIAN_FRAME_LENGTH_uS;
+    static const unsigned long long int TIME_BETWEEN_HEAT_WARNINGS =
+        MICROS_PER_SECOND * 60;
+
 private:
 
     boost::shared_ptr<Sensors> sensors;
@@ -111,14 +121,11 @@ private:
     bool falling, fallen, feetOnGround;
     mutable bool useFallProtection;
 
-    mutable pthread_mutex_t click_mutex;
-    static const int GUARDIAN_FRAME_RATE;
-    static const int GUARDIAN_FRAME_LENGTH_uS;
-
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
-    static const unsigned long long int TIME_BETWEEN_HEAT_WARNINGS =
-        MICROS_PER_SECOND * 60;
 
+    man::corpus::guardian::WifiAngel* wifiAngel;
+
+    mutable pthread_mutex_t click_mutex;
 };
 
 #endif

@@ -84,6 +84,8 @@ SET( SYNCHRO_SRCS synchro
 SET( ROBOT_CONNECT_SRCS
   AccEKF
   RoboGuardian
+  guardian/ConnectionAngel.cpp
+  guardian/WifiAngel.cpp
   ClickableButton
   PyRoboGuardian
   Lights
@@ -275,9 +277,6 @@ TARGET_LINK_LIBRARIES( ${NBINCLUDE_TARGET}
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories (some may not actually be subdirectories) to
 # include in this package
-#SUBDIRS(
-#  )
-
 
 ############################ TESTS!
 

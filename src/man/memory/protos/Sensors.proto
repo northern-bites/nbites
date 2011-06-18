@@ -1,4 +1,4 @@
-package memory.proto;
+package man.memory.proto;
 
 message PSensors {
 
