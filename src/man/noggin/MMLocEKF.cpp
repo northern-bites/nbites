@@ -1,5 +1,8 @@
 #include "MMLocEKF.h"
 
+using namespace std;
+
+//TODO: fix tabs to spaces!
 // @todo implement mostLikelyModel tracking
 MMLocEKF::MMLocEKF() :
 	LocSystem(),mostLikelyModel(0), numActive(0),

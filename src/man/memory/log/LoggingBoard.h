@@ -37,11 +37,11 @@ namespace man {
 namespace memory {
 namespace log {
 
-typedef pair< const MObject*, FDLogger*> ObjectFDLoggerPair;
-typedef pair< const MObject*, FDProvider*> ObjectFDProviderPair;
+typedef std::pair< const MObject*, FDLogger*> ObjectFDLoggerPair;
+typedef std::pair< const MObject*, FDProvider*> ObjectFDProviderPair;
 
-typedef map< const MObject*, FDLogger*> ObjectFDLoggerMap;
-typedef map< const MObject*, FDProvider*> ObjectFDProviderMap;
+typedef std::map< const MObject*, FDLogger*> ObjectFDLoggerMap;
+typedef std::map< const MObject*, FDProvider*> ObjectFDProviderMap;
 
 class LoggingBoard {
 

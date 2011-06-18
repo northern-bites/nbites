@@ -6,8 +6,6 @@
 #include "VisionHelpers.h"
 #include <stdlib.h>
 
-using namespace std;
-
 class Blob {
 public:
     Blob();
@@ -54,10 +52,10 @@ public:
 	point<int> getRightBottom() const {return rightBottom;}
 	int getRightBottomX() const {return rightBottom.x;}
 	int getRightBottomY() const {return rightBottom.y;}
-	int getLeft() const {return min(leftTop.x, leftBottom.x);}
-	int getRight() const {return max(rightTop.x, rightBottom.x);}
-	int getTop() const {return min(leftTop.y, rightTop.y);}
-	int getBottom() const {return max(leftBottom.y, rightBottom.y);}
+	int getLeft() const {return std::min(leftTop.x, leftBottom.x);}
+	int getRight() const {return std::max(rightTop.x, rightBottom.x);}
+	int getTop() const {return std::min(leftTop.y, rightTop.y);}
+	int getBottom() const {return std::max(leftBottom.y, rightBottom.y);}
     int getMidBottomX() const {return (leftBottom.x + rightBottom.x) / 2;}
     int getMidBottomY() const {return (leftBottom.y + rightBottom.y) / 2;}
 	int width() const;
