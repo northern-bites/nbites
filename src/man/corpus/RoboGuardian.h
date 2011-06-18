@@ -33,6 +33,8 @@
 
 #include "guardian/WifiAngel.h"
 
+//TODO: move this to the guardian folder
+
 enum  ButtonID {
     CHEST_BUTTON = 0,
     LEFT_FOOT_BUTTON,

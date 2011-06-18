@@ -10,6 +10,8 @@ using namespace std;
 #include "FreezeCommand.h"
 #include "UnfreezeCommand.h"
 
+#include "guardian/SoundPaths.h"
+
 //#define DEBUG_GUARDIAN_CLICKS
 //check for a connection once in 20 secs
 //the connection checking takes ~ 200 us if a connection is present
@@ -23,26 +25,9 @@ const int RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1 * 1000 * 1000 /
 
 const int RoboGuardian::NO_CLICKS = -1;
 
-static const string quiet = " -q ";
-static const string sout = "aplay"+quiet;
-static const string sdir = "/opt/naoqi/share/naoqi/wav/";
-static const string nbsdir = "/home/nao/naoqi/etc/audio/";
-static const string wav = ".wav";
-static const string shutdown_wav = sdir + "shutdown" + wav;
-static const string heat_wav = sdir + "heat" + wav;
-static const string energy_wav = sdir + "energy" + wav;
-static const string mynameis_wav = nbsdir + "mynameis" + wav;
-static const string my_address_is_wav = sdir + "my_internet_address_is" + wav;
-static const string stiffness_removed_wav = sdir + "emergency_stiffness"+wav;
-static const string stiffness_enabled_wav = nbsdir + "stiffness_enabled"+wav;
-static const string warning_wav = sdir + "warning"+wav;
-static const string falling_wav = nbsdir +"falling"+wav;
-static const string wifi_restart_wav = nbsdir +"wifi_restart"+wav;
-static const string dot = ".";
-
-
 //TODO: remove
 using namespace man::corpus::guardian;
+using namespace man::corpus::guardian::sound_paths;
 
 static const boost::shared_ptr<FreezeCommand> REMOVE_GAINS =
     boost::shared_ptr<FreezeCommand>

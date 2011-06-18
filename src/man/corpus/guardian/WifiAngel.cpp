@@ -5,11 +5,14 @@
 #include <cstdlib> //system()
 #include <cstring> //strcat()
 
+#include "SoundPaths.h"
+
 namespace man {
 namespace corpus {
 namespace guardian {
 
 using std::string;
+using namespace sound_paths;
 
 WifiAngel::WifiAngel(string connection_name,
         int wifi_reconnects_max) :
@@ -32,6 +35,9 @@ bool WifiAngel::check_on_wifi() {
 }
 
 //TODO: this returns false always - is there a way to check if we're successful?
+//TODO: #FunProject not essential, but it could be a fun little project to
+//use the dbus to communicate with connman
+//that will make it faster, and also give us more control over our connection
 //Octavian
 bool WifiAngel::try_to_reconnect() {
 
@@ -45,7 +51,7 @@ bool WifiAngel::try_to_reconnect() {
 
     if (service[0] != ' ') {
         //TODO: make this a call to roboguardian
-        //system((sout+str+" &").c_str());
+        system((sout+wifi_restart_wav+" &").c_str());
         char command[100] = "";
         strcat(command, "su -c \" connman connect ");
         strcat(command, service);
