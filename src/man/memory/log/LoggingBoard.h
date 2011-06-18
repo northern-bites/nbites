@@ -14,6 +14,7 @@
 #pragma once
 
 #include <map>
+#include <string>
 
 #include "include/io/FileFDProvider.h"
 
@@ -56,10 +57,10 @@ private:
     void initLoggingObjects();
 
 public:
-    static const char* MVISION_PATH;
-    static const char* MVISION_SENSORS_PATH;
-    static const char* MMOTION_SENSORS_PATH;
-    static const char* MIMAGE_PATH;
+    static const std::string MVISION_PATH;
+    static const std::string MVISION_SENSORS_PATH;
+    static const std::string MMOTION_SENSORS_PATH;
+    static const std::string MIMAGE_PATH;
 
 private:
     const Memory* memory;

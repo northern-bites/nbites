@@ -7,9 +7,6 @@
 #include "MemoryMacros.h"
 #include "MVision.h"
 
-//TODO: remove this
-#include "NaoPaths.h"
-
 namespace memory {
 
 using boost::shared_ptr;
