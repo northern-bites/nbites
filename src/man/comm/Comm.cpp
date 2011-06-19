@@ -141,11 +141,9 @@ static PyObject * PyComm_start (PyObject *self, PyObject *)
     Py_END_ALLOW_THREADS;
 
 	if (result == -1)
-		PyErr_SetString(PyExc_RuntimeError,
-						"Comm threads have already started");
+		PyErr_SetString(PyExc_RuntimeError,"Comm threads have already started");
 	else if (result > 0)
-		PyErr_Format(PyExc_RuntimeError,
-					 "pthreads return error code %i", result);
+		PyErr_Format(PyExc_RuntimeError,"pthreads return error code %i", result);
 	else
 	{
 		Py_INCREF(Py_None);
@@ -176,20 +174,18 @@ static PyObject * PyComm_startTOOL (PyObject *self, PyObject *)
 
         result = ((PyComm*)self)->comm->startTOOL();
 
-    Py_END_ALLOW_THREADS
+    Py_END_ALLOW_THREADS;
 
-        if (result == -1) {
-            PyErr_SetString(PyExc_RuntimeError,
-                            "TOOL thread has already started");
-            return NULL;
-        }else if (result > 0) {
-            PyErr_Format(PyExc_RuntimeError,
-                         "pthreads return error code %i", result);
-            return NULL;
-        }else {
-            Py_INCREF(Py_None);
-            return Py_None;
-        }
+	if (result == -1)
+		PyErr_SetString(PyExc_RuntimeError,"TOOL thread has already started");
+	else if (result > 0)
+		PyErr_Format(PyExc_RuntimeError,"pthreads return error code %i", result);
+	else
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	return NULL;
 }
 
 // stops ToolConnect from Python
@@ -199,9 +195,9 @@ static PyObject * PyComm_stopTOOL (PyObject *self, PyObject *)
 
         ((PyComm*)self)->comm->stopTOOL();
 
-    Py_END_ALLOW_THREADS
+    Py_END_ALLOW_THREADS;
 
-        Py_INCREF(Py_None);
+	Py_INCREF(Py_None);
     return Py_None;
 }
 
