@@ -95,7 +95,8 @@ void Vision::copyImage(const byte* image) {
 
 void Vision::notifyImage(const uint16_t* y) {
     yImg = y;
-    uvImg = y + AVERAGED_IMAGE_SIZE;
+    uImg = y + AVERAGED_IMAGE_SIZE;
+    vImg = uImg + AVERAGED_IMAGE_SIZE;
 
     // Set the current image pointer in Threshold
     thresh->setYUV(y);

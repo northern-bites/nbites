@@ -1432,8 +1432,7 @@ void Threshold::setYUV(const uint16_t* newyuv) {
     yuv = newyuv;
     thresholded = const_cast<uint8_t*>(
         reinterpret_cast<const uint8_t*>(yuv) +
-        Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE);
-    yplane = yuv;
+        Y_IMAGE_BYTE_SIZE + U_IMAGE_BYTE_SIZE + V_IMAGE_BYTE_SIZE);
 }
 
 /* Calculate the distance between two objects (x distance only).
@@ -1558,21 +1557,23 @@ int Threshold::getY(int j, int i) const {
     return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
 }
 
-/**
- * Get the V channel information for a given point in the image.
- * This is used to help identify the Ball which shows up well
- * in the V channel.
- */
-int Threshold::getV(int x, int y) const {
-    return static_cast<int>(vision->uvImg[y*IMAGE_WIDTH*2 + x*2 + 1]);
-}
+
 
 /**
  * Get the U channel information for a given point.  This has the
  * potential to help id post edges. We don't currently use it though.
  */
 int Threshold::getU(int j, int i) const {
-    return static_cast<int>(vision->uvImg[i*IMAGE_WIDTH*2 + j*2]);
+    return static_cast<int>(vision->uImg[i*IMAGE_WIDTH + j]);
+}
+
+/**
+ * Get the V channel information for a given point in the image.
+ * This is used to help identify the Ball which shows up well
+ * in the V channel.
+ */
+int Threshold::getV(int j, int i) const {
+    return static_cast<int>(vision->vImg[i*IMAGE_WIDTH + j]);
 }
 
 #ifdef OFFLINE

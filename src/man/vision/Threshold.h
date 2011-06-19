@@ -247,7 +247,6 @@ private:
     boost::shared_ptr<NaoPose> pose;
 
     const uint16_t* yuv;
-    const uint16_t* yplane;
 
     unsigned char bigTable[UMAX][VMAX][YMAX];
 

@@ -58,14 +58,14 @@
 .equiv INIT_LOOP_COUNT, -320
 .equiv OUT_IMG_WIDTH, 320
 .equiv OUT_IMG_HEIGHT, 240
-.equiv Y_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2
-.equiv UV_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 4
+.equiv CHANNEL_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2
 
 
         ## Output image layout
         .struct 0
 yImg:   .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2 # 16 bit Y values
-uvImg:  .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 4 # 16 bit U and V values
+uImg:  .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2 # 16 bit U values
+vImg:  .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2 # 16 bit V values
 colorImg:
 
 ## STACK STRUCTURE, esp offsets
@@ -73,7 +73,6 @@ colorImg:
 row_count:      .skip 4
 rdtsc_output:   .skip 4
 y_out_img:      .skip 4
-uv_out_img:     .skip 4
 color_out_img:  .skip 1280
                 .skip 4         # make color_out_row qword aligned
 color_stack_row_end:
@@ -112,8 +111,15 @@ uvDim:   .skip 8
 .macro LOOP phase
         ## Prefetch the next 32 bytes of image (only useful when image is cacheable)
         ## Each "phase" loads 8 bytes, so we only need to prefetch once every 4 phases
+
         .ifeq (\phase)
-        prefetch [esi+ecx*4+64]
+        ## NOT USEFUL WHEN USING UNCACHEABLE CAMERA BUFFER
+        ## prefetch [esi+ecx*4+64]
+
+        ## Prefetch writes to the output images
+        prefetchw [edi+ ecx*2 + 8 *((\phase-1)/2)]
+        prefetchw [edi+ ecx*2 + 8 *((\phase-1)/2) + uImg]
+        prefetchw [edi+ ecx*2 + 8 *((\phase-1)/2) + vImg]
         .endif
 
         # Fetch next 8 pixels from upper (0) source row, split into y and uv words
@@ -139,38 +145,58 @@ uvDim:   .skip 8
         ## mm0: | 0000 | sum1 | 0000 | sum0 |
         pand    mm0, mm6
 
-########################## PHASE 0 (FIRST)
-        .if (\phase == 0 || \phase == 2)
-        ## Copy the y values for later packing
-        movq    mm3, mm0
+        .ifeq (\phase)
         .endif
 
-########################## PHASE 1
-        .if (\phase == 1 || \phase == 3)
+########################## FIRST PHASES (0,2)
+        .if (\phase == 0 || \phase == 2)
+        ## Copy the Y values for later packing
+        movq    mm3, mm0
 
-	# Replace y image ptr
-        mov     edi, [esp + y_out_img]
+        ## Store U values
+        ## Zero out the top half of each doubleword, so
+        ## mm4:  | 0000 | u20 | 0000 | u00 |
+        movq    mm4, mm1
+        pand    mm4, mm6
+
+        ## Store V Values
+        ## Move V values to bottom of each doubleword
+        ## mm4:  | 0000 | v20 | 0000 | v00 |
+        movq    mm5, mm1
+        psrld   mm5, 16
+        .endif
+
+########################## SECOND PHASES (1,3)
+        .if (\phase == 1 || \phase == 3)
 
         ## Pack values from first two phases together as 4 words in mm3
         ## mm3 after pack: | y3 | y2 | y1 | y0 |
         packssdw mm3, mm0
 
         ## First write out goes at the pointer, next goes 8 bytes later
-        movntq [edi+ ecx*2 + 8 *((\phase-1)/2)], mm3
+        movntq [edi+ ecx*2 + 8 *((\phase-1)/2) + yImg], mm3
+
+        ## Extract U values and write
+        movq    mm2, mm1
+        pand    mm2, mm6
+        packssdw mm4, mm2
+
+        ## ## mm2: |v20 | v20 | v00 | v00 |
+        movq    mm2, mm1
+        psrld   mm2, 16
+        packssdw mm5, mm2
+
+        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + uImg], mm4
+        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + vImg], mm5
+
         .endif
 
 
    #######
  #########
-########## UV-COLOR SECTION
+########## COLOR SECTION
  #########
    #######
-
-        ## Load uv img ptr
-        mov     edi, [esp + uv_out_img]
-
-        # Write out uv values, 8 bytes each phase
-        movntq [edi+ecx*4 + \phase * 8], mm1
 
         # Convert two y sums in words 0 and 2 to two table indicies
         psubusw mm0, [edx + yZero]      # zero point
@@ -228,13 +254,9 @@ _acquire_image_fast:
         ## Put end of row pointers on stack
         mov     [esp + y_out_img], edi
 
-        ## Put uv image pointer on stack
-        add     edi, Y_IMG_BYTE_SIZE + OUT_IMG_WIDTH * 2
-        mov     [esp + uv_out_img], edi
-
         ## Set color image pointer forward entire y image, and uv image, then back half a y-image row
         mov     edi, [esp + y_out_img]
-        add     edi, Y_IMG_BYTE_SIZE + UV_IMG_BYTE_SIZE - 320
+        add     edi, colorImg - OUT_IMG_WIDTH
         mov     [esp + color_out_img], edi
 
         # set mm7 to 0x00FF00FF00FF00FF for y pixel mask
@@ -248,7 +270,7 @@ _acquire_image_fast:
 # Start of outer (y) loop
 yLoop:
         mov     ecx, INIT_LOOP_COUNT                       # x loop count
-        mov     edi, [esp + uv_out_img]
+        mov     edi, [esp + y_out_img]
 
 # Start of inner (x) loop
 #
@@ -296,7 +318,6 @@ colorLoop:
 
         ## Move pointers to end of next output image rows
         add     dword ptr[esp + y_out_img], OUT_IMG_WIDTH * 2
-        add     dword ptr[esp + uv_out_img], OUT_IMG_WIDTH * 2 * 2
         add     dword ptr[esp + color_out_img], OUT_IMG_WIDTH
 
         dec     dword ptr[esp + row_count]
