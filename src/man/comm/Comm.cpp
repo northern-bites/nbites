@@ -77,7 +77,7 @@ static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
 
 	PyObject *packets = PyList_New(latest->size()), *fields, *f;
     if (packets == NULL)
-		goto abort;
+		goto abort;     // used goto statements because it's clearer and Bill said so.
 	for (int i = 0; !latest->empty(); latest->pop_front(), i++)
 	{
 		vector<float> &v = latest->front();
