@@ -249,7 +249,6 @@ public class TOOLVisionLink {
     public Vector<VisualFieldObject> getVisualFieldObjects() { return visualFieldObjects;}
     public Vector<VisualLine> getVisualLines() { return visualLines;}
     public Vector<VisualLine> getExpectedVisualLines() { return expectedVisualLines;}
-    public Vector<LinePoint> getUnusedPoints() { return unusedPoints;}
     public Vector<VisualCorner> getVisualCorners() { return visualCorners;}
     public Horizon getPoseHorizon(){ return poseHorizon;}
     public int getVisionHorizon(){ return visionHorizon;}

@@ -84,7 +84,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         cout << "Error: the image had the wrong byte size" << endl;
         cout << "Image byte size should be " << IMAGE_BYTE_SIZE << endl;
         cout << "Detected byte size of " << env->GetArrayLength(jimg)
-        << endl;
+             << endl;
         return;
     }
     if (env->GetArrayLength(jjoints) != Kinematics::NUM_JOINTS) {
@@ -328,15 +328,6 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
                         (*i)->getEndpoint().x, (*i)->getEndpoint().y);
             }
 
-            //push data from unusedPoints
-            const list <linePoint> *unusedPoints = vision.fieldLines->getUnusedPoints();
-            env->CallVoidMethod(jobj, prepPointBuffers, unusedPoints->size());
-            for (list <linePoint>::const_iterator i = unusedPoints->begin();
-                    i != unusedPoints->end(); i++)
-            env->CallVoidMethod(jobj, setPointInfo,
-                    i->x, i->y,
-                    i->lineWidth, i->foundWithScan);
-            env->CallVoidMethod(jobj, setUnusedPointsInfo);
             //push data from visualCorners
             const list <VisualCorner>* corners = vision.fieldLines->getCorners();
             for (list <VisualCorner>::const_iterator i = corners->begin();
