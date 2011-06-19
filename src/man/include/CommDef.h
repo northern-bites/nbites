@@ -107,6 +107,8 @@ static const long long GAME_INITIAL_TIMESTAMP = -1;
 static const long long PENALIZED_TIMESTAMP = -2;
 static const long long SOS_TIMESTAMP = -666;
 static const long long USE_TEAMMATE_BALL_REPORT_FRAMES_OFF = 2;
+// The minimum delay between sending and receiving a packet (packet "travel time").
+static const long long MIN_PACKET_DELAY = 0;
 
 static const unsigned int MAX_MESSAGE_MEMORY = 20;
 
@@ -128,12 +130,22 @@ typedef struct CommPacketHeader_t
     memcpy(&header[0], &h[0], sizeof(header));
   }
 */
-  char header[sizeof(PACKET_HEADER)];
-  llong timestamp;
-  int team;
-  int player;
-  int color;
+    char header[sizeof(PACKET_HEADER)];
+    llong timestamp;
+    int number;
+    int team;
+    int player;
+    int color;
 } CommPacketHeader;
 
+typedef struct CommTeammatePacketInfo_t 
+{
+    CommTeammatePacketInfo_t()
+    : timestamp(0), lastNumber(0)
+	{ }
+
+    llong timestamp;      // Timestamp of last received packet.
+    int lastNumber;        // (Unique) number of last packet received.
+} CommTeammatePacketInfo;
 
 #endif /* CommDef.h */

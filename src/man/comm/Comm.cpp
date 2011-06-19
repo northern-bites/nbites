@@ -390,7 +390,7 @@ bool c_init_comm (void)
 #ifdef USE_PYCOMM_FAKE_BACKEND
     shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());
     shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
-    shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_time));
+	shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&monotonic_micro_time));
     shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
     shared_ptr<Vision> vision = shared_ptr<Vision>(new Vision(pose, prof));
     PyObject *pcomm = PyComm_new(new Comm(synchro, sensors, vision));
@@ -415,7 +415,8 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
     : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
 	  latest(new list<vector<float> >), sensors(s), timer(&monotonic_micro_time),
-	  gc(new GameController()), tool(_synchro, s, v, gc)
+      gc(new GameController()), tool(_synchro, s, v, gc), averagePacketDelay(0),
+      totalPacketsReceived(0), ourPacketsReceived(0), lastPacketNumber(0)
 {
     pthread_mutex_init(&comm_mutex,NULL);
     // initialize broadcast address structure
@@ -445,7 +446,7 @@ int Comm::start ()
 }
 
 // Main control loop for Comm
-void Comm::run ()
+void Comm::run()
 {
     // Signal thread start
     running = true;
@@ -460,15 +461,17 @@ void Comm::run ()
 
         //discover_broadcast();
 
-        while (running) {
-            send();
+	// The main packet send/receive loop.
+	while(running) {
+	    // If time to send, send packet.
+	    if(timer.timeToSend()) {
+		send();
+	    }
 
-			// recieve until it's time to send again.
-            while (running && !timer.time_to_send()) {
-                receive();
-                nanosleep(&interval, &remainder);
-            }
-        }
+	    // Otherwise, receive.
+	    receive();
+	    nanosleep(&interval, &remainder);
+	}
     } catch (socket_error &e) {
         fprintf(stderr, "Error occurred in Comm, thread has paused.\n");
         fprintf(stderr, "%s\n", e.what());
@@ -672,8 +675,7 @@ void Comm::send () throw(socket_error)
     } else { // Don't bother to send packet to teammates if we are penalized
 
         // C++ header data
-        const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
-                                         gc->team(), gc->player(), gc->color()};
+        const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(), lastPacketNumber++, gc->team(), gc->player(), gc->color()};
         memcpy(&buf[0], &header, sizeof(header));
         // variable Python extra data
         memcpy(&buf[sizeof(header)], &data[0], sizeof(float) * data.size());
@@ -698,12 +700,14 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 	interval.tv_nsec = 100000;
 
     while (result == -2) {
-		// send the udp message
+	// send the udp message
         result = ::sendto(sockn, msg, len, 0, (struct sockaddr*)&addr,
                           sizeof(broadcast_addr));
+	//cout << "Comm::send() : result == " << result << endl;
         // except if error is blocking error
         if (result == -1 && errno == EAGAIN) {
             result = -2;
+	    cout << "Comm::send() : EAGAIN error!" << endl;
             nanosleep(&interval, &remainder);
         }
     }
@@ -722,10 +726,11 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 
     // record last time we sent a message
     timer.sent_packet();
+    cout << "Comm::send() : last packet sent at " << timer.lastPacketSentAt() << endl;
 }
 
 // Recieves packets from various sources
-void Comm::receive () throw(socket_error)
+void Comm::receive() throw(socket_error)
 {
 #ifdef COMM_LISTEN
 
@@ -733,12 +738,22 @@ void Comm::receive () throw(socket_error)
     socklen_t addr_len = sizeof(sockaddr_in);
 
     // receive a UDP message
+    // recvfrom() returns the number of bytes actually recieved,
+    // or -1 if error.
     int result = ::recvfrom(sockn, &buf, UDP_BUF_SIZE, 0,
                             (struct sockaddr*)&recv_addr, &addr_len);
+    // While no error, handle the packet and continue to receive new ones.
     while (result > 0) {
-        // handle the message
+	cout << "Comm::receive() : result == " << result << endl;
+	// Received a packet! Update the average delay.
+	if(timer.lastPacketReceivedAt() != 0) {
+	    updateAverageDelay();
+	}
+	totalPacketsReceived++;
+	updatePercentReceived();
+        // Handle messages from not for GameController.
         handle_comm(recv_addr, &buf[0], result);
-        // check for another one
+        // Continue checking for new messages...
         result = ::recvfrom(sockn, &buf, UDP_BUF_SIZE, 0,
                             (struct sockaddr*)&recv_addr, &addr_len);
     }
@@ -788,9 +803,11 @@ void Comm::receive_gc () throw(socket_error)
 void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
     throw()
 {
-	// Checks for Tool message
+// Checks for Tool message
     if (len == static_cast<int>(strlen(TOOL_REQUEST_MSG)) &&
         memcmp(msg, TOOL_REQUEST_MSG, TOOL_REQUEST_LEN) == 0) {
+
+        //cout << "Comm::handle_comm() : handling packet from TOOL..." << endl;
 
         std::string robotName = getRobotName();
         const char *name = robotName.c_str();
@@ -806,15 +823,23 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 
         struct sockaddr_in r_addr = addr;
         r_addr.sin_port = htons(TOOL_PORT);
-
         send(&response[0], len, r_addr);
         free(response);
 
     } else {
+        cout << "Comm::handle_comm() : handling packet..." << endl;
         // validate packet format, check packet timestamp, and parse data
         CommPacketHeader packet;
-        if (validate_packet(msg, len, packet))
+        if (validate_packet(msg, len, packet)) {
+            ourPacketsReceived++;
+            // Log that a packet has been received.
+            cout << "Comm::handle_comm() : packet received at "
+            << packet.timestamp
+	    << " from player " << packet.player
+	    << " with packet number " << packet.number
+	    << endl;
             parse_packet(packet, msg + sizeof(packet), len - sizeof(packet));
+        }
     }
 }
 
@@ -831,37 +856,58 @@ void Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw(
 bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     throw() {
     // check packet length
-	if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader)){
-		std::cout << "bad length" << std::endl;
-		return false;
-	}
+    if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader)) {
+	cout << "bad length (" << len << ")" << endl;
+	return false;
+    }
 
     // cast packet data into CommPacketHeader struct
     packet = *reinterpret_cast<const CommPacketHeader*>(msg);
 
-    if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0){
-        //std::cout << "bad header" << std::endl;
+    // check packet header
+    if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0) {
+        cout << "bad header (" << packet.header << ")" << endl;
         return false;
     }
     // check team number
-    if (packet.team != gc->team()){
-        //std::cout << "bad team number" << std::endl;
+    if (packet.team != gc->team()) {
+        cout << "bad team number (" << packet.team << ")" << endl;
         return false;
     }
-
     // check player number
     if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM ||
-        packet.player == gc->player()){
-        //std::cout << "bad player number" << std::endl;
+        packet.player == gc->player()) {
+        cout << "bad player number (" << packet.player << ")" << endl;
+        return false;
+    }
+    if (!timer.check_packet(packet)) {
+        cout << "bad timer" << endl;
         return false;
     }
 
-    if (!timer.check_packet(packet)){
-        //std::cout << "bad timer" << std::endl;
-        return false;
+    llong currTime = timer.timestamp();
+
+    // Now attempt to syncronize the clocks of this robot and
+    // the robot from which this packet was received. Eventually the
+    // two clocks to reach an equilibrium point, within a reasonable
+    // margin of error.
+    if(packet.timestamp + MIN_PACKET_DELAY > currTime) {
+        timer.setOffset(packet.timestamp + MIN_PACKET_DELAY - currTime);
     }
 
-    // passed all checks, packet is valid
+    // Get fixed packet received at time if necessary.
+    timer.packetReceived();
+
+
+    // Log latency/timer offset data?
+    cout << "original current time == " << currTime
+	 << " packet sent at (timestamp) == " << packet.timestamp
+	 << " packet received at == " <<  timer.lastPacketReceivedAt()
+	 << " offset == " << timer.getOffset()
+	 << " latency == " << estimatePacketLatency(packet)
+	 << endl;
+
+    // Packet is valid!
     return true;
 }
 
@@ -871,15 +917,16 @@ void Comm::parse_packet (const CommPacketHeader &packet, const char* msg, int si
 {
     int len = size / sizeof(float);
 
-	// parses header info out.
+    // parses header info out.
     vector<float> v(len + 3);
     v[0] = static_cast<float>(packet.team);
     v[1] = static_cast<float>(packet.player);
     v[2] = static_cast<float>(packet.color);
-	// copies actual message
+
+    // copies actual message
     memcpy(&v[3], msg, size);
 
-	// push message onto queue
+    // push message onto queue
     if (latest->size() >= MAX_MESSAGE_MEMORY)
         latest->pop_front();
     latest->push_back(v);
@@ -941,7 +988,7 @@ void Comm::setData (std::vector<float> &newData)
 }
 
 // Returns name of robot
-std::string Comm::getRobotName ()
+std::string Comm::getRobotName()
 {
     struct utsname name_str;
     uname(&name_str);
@@ -964,4 +1011,47 @@ void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
                                  shared_ptr<BallEKF> _ballEKF)
 {
     tool.setLocalizationAccess(_loc, _ballEKF);
+}
+
+// Updates the average delay between received transmissions. Uses a simple
+// running average method.
+void Comm::updateAverageDelay()
+{
+    // The delay is the difference between the current time and \
+    // the last received packet recorded by the CommTimer.
+    llong newAverage = 0;
+    llong delay      = 0;
+    delay = timer.timestamp() - timer.lastPacketReceivedAt();
+    if(averagePacketDelay == 0) {
+	// First data sample acquired; average is just delay.
+        newAverage = delay;
+    } else {
+	newAverage = (llong)(0.5 * (averagePacketDelay + delay));
+    }
+
+    // Log data?
+    cout << "Comm::updateAverageDelay() : average delay == " << newAverage << endl;
+
+    averagePacketDelay = newAverage;
+}
+
+void Comm::updatePercentReceived()
+{
+    cout << "Comm::updatePercentReceived() : total packets == " << totalPacketsReceived
+	 << " our packets == " << ourPacketsReceived << endl;
+    double percentage = 0.0f;
+    if(totalPacketsReceived != 0) {
+	percentage = ourPacketsReceived/(double)totalPacketsReceived;
+	cout << "Comm::updatePercentReceived() : " << percentage*100 << "%" << endl;
+    } else {
+	cout << "Comm::updatePercentReceived() : divide by zero error!" << endl;
+    }
+}
+
+llong Comm::estimatePacketLatency(const CommPacketHeader &latestPacket)
+{
+    // Find the difference between the recorded time the packet was
+    // received and the timestamp inside the packet of when it was
+    // sent.
+    return timer.lastPacketReceivedAt() - latestPacket.timestamp;
 }

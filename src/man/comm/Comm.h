@@ -72,6 +72,25 @@ private:
     bool validate_packet(const char* msg, int len, CommPacketHeader& packet)
         throw();
 
+    // Comm monitoring methods.
+
+    // Calculates the running average delay between received
+    // transmissions. Called each time a new packet is received.
+    // Note that it only calculates those packets received from
+    // other robots, not from the TOOL, GameController, or itself.
+    void updateAverageDelay();
+
+    // Calculates the running percentage of packets received that are
+    // "ours" by recording the total packets received and the percent
+    // that have our header (but not packets from the TOOL, GameController,
+    // or from itself.
+    void updatePercentReceived();
+
+    // Gives an estimate for the latency in communications (i.e., the 
+    // difference between the timestamp of time sent contained in the 
+    // packet data and the current time.)
+    llong estimatePacketLatency(const CommPacketHeader &latestPacket);
+
 private:
     // mutex lock for threaded data access
     pthread_mutex_t comm_mutex;
@@ -79,6 +98,8 @@ private:
     std::vector<float> data;
     // Received data
     std::list<std::vector<float> >* latest;
+    int lastPacketNumber;                    // Stores the number of the last packet
+                                             // sent. Should be unique.
 
     // References to global data structures
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
@@ -90,13 +111,18 @@ private:
     int toolCommandState;
 
     // Socket information
-    int sockn;
-    int gc_sockn;
+    int sockn;                               // Socket file descriptor. 
+    int gc_sockn;                            // GameController socket file descriptor.
     struct sockaddr_in bind_addr;
     struct sockaddr_in broadcast_addr;
     struct sockaddr_in gc_broadcast_addr;
     char buf[UDP_BUF_SIZE];
 
+    // Data monitoring information.
+    llong averagePacketDelay;                 // Stores the running average delay between
+                                              // received packets.
+    int totalPacketsReceived;                 // Running total packets received.
+    int ourPacketsReceived;                   // Running count of "our" packets received.
 };
 
 bool c_init_comm(void);

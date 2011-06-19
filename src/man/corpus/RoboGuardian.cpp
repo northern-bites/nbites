@@ -142,23 +142,24 @@ static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 bool isFalling(float angle_pos, float angle_vel) {
     // Test falling based on angle (note that angle_pos is assumed to be
     // the mag. of the angle).
-    if (angle_pos >= FALLING_ANGLE_THRESH) {
-	//cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos 
+    if (angle_pos >= FALLING_ANGLE_THRESH)
+	{
+	//cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos
 	//     << ", angle_vel == " << angle_vel << endl;
-            return true;
-    } else {
-        if(angle_vel > FALL_SPEED_THRESH)
-            return true;
+		return true;
     }
+	else
+		if(angle_vel > FALL_SPEED_THRESH)
+            return true;
     return false;
 }
 
 
 
 void RoboGuardian::checkFallen() {
-    if (!useFallProtection){
+    if (!useFallProtection)
         return;
-    }
+
     const Inertial inertial  = sensors->getInertial();
 
     /***** Determine if the robot has FALLEN OVER *****/
