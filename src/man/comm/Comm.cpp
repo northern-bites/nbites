@@ -61,6 +61,10 @@ static void PyComm_dealloc (PyComm *self)
 }
 
 // Retrieve a list of the latest recieved communication data
+// Note: This function, on failure, may throw away zero or more packets.
+//       Not sure if this behavior is good or not, but I'm keeping it
+//       because i'd rather not change the behavior without more research.
+//       June 18, 2011 :: Wils Dawson
 static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
 {
     list<vector<float> >* latest;
@@ -69,53 +73,32 @@ static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
 		//grabs latestComm from C++
         latest = reinterpret_cast<PyComm*>(self)->comm->latestComm();
 
-    Py_END_ALLOW_THREADS
+    Py_END_ALLOW_THREADS;
 
-        // Build tuple of tuples of floats, ie:
-		// packets is a tuple of packets where each packet is a tuple of
-		// fields which is a tuple of fields where each field is a float
-        PyObject *packets = PyList_New(latest->size()), *fields, *f;
-    bool success = true;
-    int i, j;
-    if (packets != NULL) {
-        i = 0;
-        while (!latest->empty()) {
-			// v is a vector of fields. Each v represents a packet.
-            vector<float> &v = latest->front();
-            fields = PyList_New(v.size());
-            if (fields != NULL) {
-                for (unsigned int j = 0; j < v.size(); j++) {
-					// get float from vector of fields
-                    f = PyFloat_FromDouble(v[j]);
-                    if (f != NULL)
-						// put each field, f, in fields at position j
-                        PyList_SET_ITEM(fields, j, f);
-                    else {
-                        success = false;
-                        break;
-                    }
-                }
-				// put each tuple of fields (representing a packet) into packets
-                PyList_SET_ITEM(packets, i, fields);
-                if (!success)
-                    break;
-				// get next packet from latest
-                latest->pop_front();
-                i++;
-            }else {
-                success = false;
-                break;
-            }
-        }
-    }
-
-    // failed building tuples, recover memory
-    if (!success) {
-        Py_DECREF(packets);
-        return NULL;
-    }
+	PyObject *packets = PyList_New(latest->size()), *fields, *f;
+    if (packets == NULL)
+		goto abort;
+	for (int i = 0; !latest->empty(); latest->pop_front(), i++)
+	{
+		vector<float> &v = latest->front();
+		fields = PyList_New(v.size());
+		if (fields == NULL)
+			goto abort;
+		for (int j = 0; j < v.size(); j++)
+		{
+			f = PyFloat_FromDouble(v[j]);
+			if (f == NULL)
+				goto abort;
+			PyList_SET_ITEM(fields, j, f);
+		}
+		PyList_SET_ITEM(packets, i, fields);
+	}
 
     return packets;
+
+abort:
+	Py_XDECREF(packets);
+	return NULL;
 }
 
 // Sets Comm Data from Python
