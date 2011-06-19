@@ -15,10 +15,11 @@ DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
 DEBUG_DETERMINE_CHASE_TIME = False
-BALL_ON_BONUS = 1000.
-CHASE_SPEED = 15.00 #cm/sec
-BALL_GOAL_LINE_BONUS = CHASE_SPEED*10 #takes a little less than 10 secs to orbit 180
 SEC_TO_MILLIS = 1000.0
+CHASE_SPEED = 15.00 #cm/sec
+BALL_ON_BONUS = 10.
+BALL_GOAL_LINE_BONUS = 10.
+FALLEN_ROBOT_PENALTY = 10.
 # penalty is: (ball_dist*heading)/scale
 PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
 # penalty is: (ball_dist*ball_bearing)/scale
@@ -147,7 +148,7 @@ class TeamMember(RobotLocation):
         ## if DEBUG_DETERMINE_CHASE_TIME:
         ##     self.printf("DETERMINE CHASE TIME DEBUG")
 
-        time += (self.ballDist / CHASE_SPEED)*SEC_TO_MILLIS
+        time += (self.ballDist / CHASE_SPEED)
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time base is " + str(time))
@@ -162,20 +163,22 @@ class TeamMember(RobotLocation):
         # Give a bonus for lining up along the ball-goal line
         lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
         rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
-        if (lpb < self.ballBearing < rpb):
+        if (lpb > self.ballBearing > rpb):
             time -= BALL_GOAL_LINE_BONUS
+            if (lpb > 0 > rpb):
+                time -= BALL_GOAL_LINE_BONUS
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after ball-goal-line bonus " +str(time))
 
         # Add a penalty for being fallen over
-        time += (self.brain.fallController.getTimeRemainingEst()*SEC_TO_MILLIS)
+        time += FALLEN_ROBOT_PENALTY#(self.brain.fallController.getTimeRemainingEst())
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after fallen over penalty " + str(time))
             self.brain.out.printf("")
 
-        return time
+        return time*SEC_TO_MILLIS
 
     def hasBall(self):
         return self.grabbing
