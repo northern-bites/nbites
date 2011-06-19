@@ -26,13 +26,13 @@ using namespace Kinematics;
 using boost::shared_ptr;
 
 ScriptedProvider::ScriptedProvider(shared_ptr<Sensors> s,
-								   shared_ptr<Profiler> p)
-	: MotionProvider(SCRIPTED_PROVIDER, p),
-	  sensors(s),
-	  chopper(sensors),
-	  // INITIALIZE WITH NULL/FINISHED CHOPPED COMMAND
-	currCommand(new ChoppedCommand()),
-    bodyCommandQueue()
+				   shared_ptr<Profiler> p)
+    : MotionProvider(SCRIPTED_PROVIDER, p),
+      sensors(s),
+      chopper(sensors),
+      // INITIALIZE WITH NULL/FINISHED CHOPPED COMMAND
+      currCommand(new ChoppedCommand()),
+      bodyCommandQueue()
 
 {
     // Create mutexes
@@ -83,7 +83,7 @@ bool ScriptedProvider::isDone() {
 
 // Are we finished with our current motion command?
 bool ScriptedProvider::currCommandEmpty() {
-	return currCommand->isDone();
+    return currCommand->isDone();
 }
 
 // Do we have any BodyCommands left to run through?
@@ -92,34 +92,34 @@ bool ScriptedProvider::commandQueueEmpty(){
 }
 
 void ScriptedProvider::calculateNextJointsAndStiffnesses() {
-	PROF_ENTER(profiler,P_SCRIPTED);
-	pthread_mutex_lock(&scripted_mutex);
-	if (currCommandEmpty())
-		setNextBodyCommand();
+    PROF_ENTER(profiler,P_SCRIPTED);
+    pthread_mutex_lock(&scripted_mutex);
+    if (currCommandEmpty())
+	setNextBodyCommand();
 
 
-	// Go through the chains and enqueue the next
-	// joints from the ChoppedCommand.
-	shared_ptr<vector <vector <float> > > currentChains(getCurrentChains());
+    // Go through the chains and enqueue the next
+    // joints from the ChoppedCommand.
+    shared_ptr<vector <vector <float> > > currentChains(getCurrentChains());
 
-	for (unsigned int id=0; id< Kinematics::NUM_CHAINS; ++id ) {
-		Kinematics::ChainID cid = static_cast<Kinematics::ChainID>(id);
-		if ( currCommand->isDone() ){
-			setNextChainJoints( cid,
-								currentChains->at(cid) );
-		}else{
-			setNextChainJoints( cid,
-								currCommand->getNextJoints(cid) );
-		}
-		// Curr command will allways provide the current stiffnesses
-		// even if it is finished providing new joint angles.
-		setNextChainStiffnesses( cid,
-								 currCommand->getStiffness(cid) );
+    for (unsigned int id=0; id< Kinematics::NUM_CHAINS; ++id ) {
+	Kinematics::ChainID cid = static_cast<Kinematics::ChainID>(id);
+	if ( currCommand->isDone() ){
+	    setNextChainJoints( cid,
+				currentChains->at(cid) );
+	}else{
+	    setNextChainJoints( cid,
+				currCommand->getNextJoints(cid) );
 	}
+	// Curr command will allways provide the current stiffnesses
+	// even if it is finished providing new joint angles.
+	setNextChainStiffnesses( cid,
+				 currCommand->getStiffness(cid) );
+    }
 
     setActive();
-	pthread_mutex_unlock(&scripted_mutex);
-	PROF_EXIT(profiler,P_SCRIPTED);
+    pthread_mutex_unlock(&scripted_mutex);
+    PROF_EXIT(profiler,P_SCRIPTED);
 }
 
 /*
@@ -132,7 +132,7 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
  * a time, even if they deal with different joints or chains.
  */
 void ScriptedProvider::setCommand(const BodyJointCommand *command) {
-	pthread_mutex_lock(&scripted_mutex);
+    pthread_mutex_lock(&scripted_mutex);
     bodyCommandQueue.push(command);
     setActive();
     pthread_mutex_unlock(&scripted_mutex);
@@ -140,25 +140,25 @@ void ScriptedProvider::setCommand(const BodyJointCommand *command) {
 
 
 void ScriptedProvider::enqueueSequence(std::vector<const BodyJointCommand*> &seq) {
-	// Take in vec of commands and enqueue them all
-	for (vector<const BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
-		setCommand(*i);
+    // Take in vec of commands and enqueue them all
+    for (vector<const BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
+	setCommand(*i);
 }
 
 void ScriptedProvider::setNextBodyCommand() {
 
-	// If there are no more commands, don't try to enqueue one
-	if ( !bodyCommandQueue.empty() ) {
+    // If there are no more commands, don't try to enqueue one
+    if ( !bodyCommandQueue.empty() ) {
 
-		const BodyJointCommand *nextCommand = bodyCommandQueue.front();
-		bodyCommandQueue.pop();
+	const BodyJointCommand *nextCommand = bodyCommandQueue.front();
+	bodyCommandQueue.pop();
 
-		// Replace the current command and delete the
-		// next command object
-		PROF_ENTER(profiler, P_CHOPPED);
-		currCommand = chopper.chopCommand(nextCommand);
-		PROF_EXIT(profiler, P_CHOPPED);
-	}
+	// Replace the current command and delete the
+	// next command object
+	PROF_ENTER(profiler, P_CHOPPED);
+	currCommand = chopper.chopCommand(nextCommand);
+	PROF_EXIT(profiler, P_CHOPPED);
+    }
 }
 
 // Get the chain's current positions. Gives a shared pointer to
@@ -166,26 +166,26 @@ void ScriptedProvider::setNextBodyCommand() {
 // each chain very simple.
 shared_ptr<vector<vector<float> > > ScriptedProvider::getCurrentChains() {
     shared_ptr<vector<vector<float> > >currentChains(
-		new vector<vector<float> >(Kinematics::NUM_CHAINS) );
+	new vector<vector<float> >(Kinematics::NUM_CHAINS) );
 
     vector<float> currentJoints = sensors->getBodyAngles();
 
     unsigned int lastChainJoint,joint,chain;
-	lastChainJoint= 0;
-	joint = 0;
-	chain = 0;
+    lastChainJoint= 0;
+    joint = 0;
+    chain = 0;
 
-	vector<vector<float> >::iterator i = currentChains->begin();
+    vector<vector<float> >::iterator i = currentChains->begin();
 
-	while (i != currentChains->end() ) {
+    while (i != currentChains->end() ) {
         lastChainJoint += chain_lengths[chain];
 
         for ( ; joint < lastChainJoint ; joint++) {
             i->push_back(currentJoints.at(joint));
         }
 
-		++i;
-		++chain;
+	++i;
+	++chain;
     }
     return currentChains;
 }

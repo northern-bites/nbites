@@ -33,7 +33,7 @@
 #include "MotionConstants.h"
 
 class BodyJointCommand : public JointCommand {
- public:
+public:
     BodyJointCommand(const float time,
                      const std::vector<float> *body_joints,
                      const std::vector<float> *body_stiffness,
@@ -64,7 +64,7 @@ class BodyJointCommand : public JointCommand {
     const bool conflicts(const BodyJointCommand &other) const;
     const bool conflicts(const float chainTimeRemaining[Kinematics::NUM_CHAINS]) const;
 
- private:
+private:
     virtual void setChainList();
     const std::vector<float> *larm_joints;
     const std::vector<float> *lleg_joints;

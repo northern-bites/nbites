@@ -46,28 +46,28 @@ public:
 
     void hardReset();
 
-	void enqueueSequence(std::vector<const BodyJointCommand*> &seq);
-	void setCommand(const BodyJointCommand * command);
+    void enqueueSequence(std::vector<const BodyJointCommand*> &seq);
+    void setCommand(const BodyJointCommand * command);
 
 private:
     boost::shared_ptr<Sensors> sensors;
-	ChopShop chopper;
-	std::vector<std::vector<float> > nextJoints;
+    ChopShop chopper;
+    std::vector<std::vector<float> > nextJoints;
 
-	// The current chopped command which is being enacted
-	boost::shared_ptr<ChoppedCommand> currCommand;
+    // The current chopped command which is being enacted
+    boost::shared_ptr<ChoppedCommand> currCommand;
 
-	// Queue to hold the next body commands
-	std::queue<const BodyJointCommand*> bodyCommandQueue;
+    // Queue to hold the next body commands
+    std::queue<const BodyJointCommand*> bodyCommandQueue;
 
-	pthread_mutex_t scripted_mutex;
+    pthread_mutex_t scripted_mutex;
 
-	boost::shared_ptr<std::vector <std::vector <float> > > getCurrentChains();
+    boost::shared_ptr<std::vector <std::vector <float> > > getCurrentChains();
 
-	void setNextBodyCommand();
+    void setNextBodyCommand();
     void setActive();
-	bool isDone();
-	bool currCommandEmpty();
+    bool isDone();
+    bool currCommandEmpty();
     bool commandQueueEmpty();
 
 };

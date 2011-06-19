@@ -28,7 +28,7 @@ using namespace boost;
 using namespace Kinematics;
 
 ChopShop::ChopShop (shared_ptr<Sensors> s)
-	: sensors(s)
+    : sensors(s)
 {
 
 }
@@ -40,40 +40,40 @@ ChopShop::ChopShop (shared_ptr<Sensors> s)
 /*************************************************************************/
 shared_ptr<ChoppedCommand>
 ChopShop::chopCommand(const JointCommand *command) {
-	shared_ptr<ChoppedCommand> chopped;
-	int numChops = 1;
-	if (command->getDuration() > MOTION_FRAME_LENGTH_S) {
-		numChops = static_cast<int>(command->getDuration() / MOTION_FRAME_LENGTH_S);
-	}
+    shared_ptr<ChoppedCommand> chopped;
+    int numChops = 1;
+    if (command->getDuration() > MOTION_FRAME_LENGTH_S) {
+	numChops = static_cast<int>(command->getDuration() / MOTION_FRAME_LENGTH_S);
+    }
 
-	vector<float> currentJoints = getCurrentJoints();
+    vector<float> currentJoints = getCurrentJoints();
 
-	if (command->getInterpolation() == INTERPOLATION_LINEAR) {
-		chopped = chopLinear(command, currentJoints, numChops);
-	}
+    if (command->getInterpolation() == INTERPOLATION_LINEAR) {
+	chopped = chopLinear(command, currentJoints, numChops);
+    }
 
- 	else if (command->getInterpolation() == INTERPOLATION_SMOOTH) {
- 		chopped =  chopSmooth(command, currentJoints, numChops);
- 	}
+    else if (command->getInterpolation() == INTERPOLATION_SMOOTH) {
+	chopped =  chopSmooth(command, currentJoints, numChops);
+    }
 
-	else {
-		cout << "ILLEGAL INTERPOLATION VALUE. CHOPPING SMOOTHLY" << endl;
-		chopped = chopSmooth(command, currentJoints, numChops) ;
-	}
+    else {
+	cout << "ILLEGAL INTERPOLATION VALUE. CHOPPING SMOOTHLY" << endl;
+	chopped = chopSmooth(command, currentJoints, numChops) ;
+    }
 
-	// Deleting command!
-	delete command;
-	return chopped;
+    // Deleting command!
+    delete command;
+    return chopped;
 }
 
 //Smooth interpolation motion
 shared_ptr<ChoppedCommand>
 ChopShop::chopSmooth(const JointCommand *command,
-					 vector<float> currentJoints, int numChops) {
-	return shared_ptr<ChoppedCommand> ( new SmoothChoppedCommand(
-											command,
-											currentJoints,
-											numChops ) );
+		     vector<float> currentJoints, int numChops) {
+    return shared_ptr<ChoppedCommand> ( new SmoothChoppedCommand(
+					    command,
+					    currentJoints,
+					    numChops ) );
 }
 
 /*
@@ -83,13 +83,13 @@ ChopShop::chopSmooth(const JointCommand *command,
  */
 shared_ptr<ChoppedCommand>
 ChopShop::chopLinear(const JointCommand *command,
-					 vector<float> currentJoints,
-					 int numChops) {
+		     vector<float> currentJoints,
+		     int numChops) {
 
-	return shared_ptr<ChoppedCommand> ( new LinearChoppedCommand(
-											command,
-											currentJoints,
-											numChops ) );
+    return shared_ptr<ChoppedCommand> ( new LinearChoppedCommand(
+					    command,
+					    currentJoints,
+					    numChops ) );
 }
 
 vector<float> ChopShop::getCurrentJoints() {
