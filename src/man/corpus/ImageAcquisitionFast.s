@@ -140,56 +140,34 @@ uvDim:   .skip 8
         pand    mm0, mm6
 
 ########################## PHASE 0 (FIRST)
-        .ifeq (\phase)
-        ## Prefetch the UV segment
-        prefetchw [edi+ecx*4]
-
+        .if (\phase == 0 || \phase == 2)
         ## Copy the y values for later packing
-        movq    mm4, mm0
+        movq    mm3, mm0
         .endif
-
 
 ########################## PHASE 1
-        .ifeq (\phase - 1)
-        mov     edi, [esp + y_out_img] # Replace y image ptr
+        .if (\phase == 1 || \phase == 3)
 
-        ## Prefetch the next Y out segment
-        prefetchw [edi+ecx*2 + 32]
+	# Replace y image ptr
+        mov     edi, [esp + y_out_img]
 
-        ## Pack values from first two phases together as 4 words in mm4
-        ## mm4 after pack: | y3 | y2 | y1 | y0 |
-        packssdw mm4, mm0
-        movntq [edi+ecx*2], mm4
+        ## Pack values from first two phases together as 4 words in mm3
+        ## mm3 after pack: | y3 | y2 | y1 | y0 |
+        packssdw mm3, mm0
 
-        ## Load uv img ptr back
-        mov     edi, [esp + uv_out_img]
+        ## First write out goes at the pointer, next goes 8 bytes later
+        movntq [edi+ ecx*2 + 8 *((\phase-1)/2)], mm3
         .endif
 
-########################## PHASE 2
-        .ifeq (\phase - 2)
-        movq    mm4, mm0
-        .endif
-
-########################## PHASE 3
-        ## Last phase, pack phase 2 & 3 into an array, then pack all 8
-        ## bytes together and write them out
-        .ifeq (\phase - 3)
-        mov     edi, [esp + y_out_img] # Replace y image ptr
-
-        ## mm0 before: | 0 | y7 | 0 | y6|
-        ## mm4 after:  | y7 | y6 | y5 | y4 | all 16 bit words
-        packssdw mm4, mm0
-        movntq [edi+ecx*2+8], mm4
-
-        ## Load uv img ptr
-        mov     edi, [esp + uv_out_img]
-        .endif
 
    #######
  #########
 ########## UV-COLOR SECTION
  #########
    #######
+
+        ## Load uv img ptr
+        mov     edi, [esp + uv_out_img]
 
         # Write out uv values, 8 bytes each phase
         movntq [edi+ecx*4 + \phase * 8], mm1
