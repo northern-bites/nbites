@@ -166,7 +166,14 @@ public class TOOLVisionLink {
                 for (int i = 0; i < imageWidth; i++) {
                     for (int j = 0; j < imageHeight; j++) {
                         byte col = threshResult[j][i];
-                        if (col == Vision.MAROON) {
+                        if (col == Vision.MAROON ||
+							col == Vision.PINK ||
+							col == Vision.CYAN ||
+							col == Vision.MAGENTA ||
+							col == Vision.PURPLE ||
+							col == Vision.BLACK ||
+							col == Vision.RED ||
+							col == Vision.ORANGE) {
                         } else if ((col & BIT_ORANGE) > 0) {
                             if ((col & BIT_RED) > 0) {
                                 col = ORANGERED;
@@ -286,6 +293,7 @@ public class TOOLVisionLink {
     native private void cppSetEdgeDetectionDebug(boolean _bool);
     native private void cppSetHoughTransformDebug(boolean _bool);
     native private void cppSetRobotDebug(boolean _bool);
+    native private void cppSetDebugDangerousBall(boolean _bool);
 
 
     // Set edge detection threshold
@@ -769,6 +777,17 @@ public class TOOLVisionLink {
         if (visionLinkSuccessful) {
             try {
                 cppSetRobotDebug(_bool);
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugDangerousBall(boolean _bool) {
+        if (visionLinkSuccessful) {
+            try {
+                cppSetDebugDangerousBall(_bool);
             } catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n");
             }

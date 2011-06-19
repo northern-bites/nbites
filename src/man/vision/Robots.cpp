@@ -35,7 +35,8 @@ static const bool ROBOTSDEBUG = false;
 static const bool ROBOTSDEBUG = false;
 #endif
 
-Robots::Robots(Vision* vis, Threshold* thr, Field* fie, Context* con, int col)
+Robots::Robots(Vision* vis, Threshold* thr, Field* fie, Context* con,
+			   unsigned char col)
     : vision(vis), thresh(thr), field(fie), context(con), color(col)
 {
 	const int MAX_ROBOT_RUNS = 400;
@@ -56,7 +57,7 @@ void Robots::init()
 /* Set the primary color.  Depending on the color, we have different space needs
  * @param c        the color
  */
-void Robots::setColor(int c)
+void Robots::setColor(unsigned char c)
 {
     const int RUN_VALUES = 3;           // x, y, and h
     const int RUNS_PER_LINE = 5;
@@ -205,13 +206,14 @@ void Robots::robot(Cross* cross)
  */
 
 bool Robots::sanityChecks(Blob candidate, Cross* cross) {
-    const int blobHeightMin = 10;
+    const int blobHeightMin = 8;
     int height = candidate.height();
+	int bottom = candidate.getBottom();
     if (candidate.getRight() > 0) {
         // the bottom of the uniform shouldn't be above field horizon
-        if (candidate.getBottom() < field->horizonAt(candidate.getLeft())) {
-            return false;
-        }
+        //if (bottom < field->horizonAt(candidate.getLeft())) {
+		//  return false;
+        //}
         // blobs must be big enough
         if (candidate.height() < blobHeightMin) {
             return false;
@@ -221,25 +223,66 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
             return false;
         }
         // there ought to be some white below the uniform
-        if (!cross->checkForRobotBlobs(candidate)) {
+        if (bottom < IMAGE_HEIGHT - 10 &&
+			!cross->checkForRobotBlobs(candidate)) {
+			if (debugRobots) {
+				cout << "Bad robot from cross check" << endl;
+			}
             return false;
         }
         // the last check was pretty general, let's improve
         if (candidate.getBottom() < IMAGE_HEIGHT - candidate.height() * 2
             && !whiteBelow(candidate)) {
+			if (debugRobots) {
+				cout << "Got rid for lack of white below" << endl;
+			}
             return false;
         }
         if (candidate.getTop() > candidate.height() * 2
             && !whiteAbove(candidate)) {
+			if (debugRobots) {
+				cout << "Got rid for lack of white above" << endl;
+			}
             return false;
         }
         // for some blobs we check even harder for white
         if (height < 2 * blobHeightMin && noWhite(candidate)) {
+			if (debugRobots) {
+				cout << "Got rid of small one for white" << endl;
+			}
             return false;
         }
+
+		if (color == NAVY_BIT && vision->pose->getHorizonY(0) < 0 &&
+			notGreen(candidate)) {
+			return false;
+		}
         return true;
     }
     return false;
+}
+
+/* When we are looking down, the shadowed carpet often has lots of Navy.
+   Make sure we aren't just looking at carpet
+ */
+bool Robots::notGreen(Blob candidate) {
+    int bottom = candidate.getBottom();
+    int top = candidate.getTop();
+	int left = candidate.getLeft();
+	int right = candidate.getRight();
+	int area = candidate.width() * candidate.height() / 5;
+	int greens = 0;
+	for (int i = left; i < right; i++) {
+		for (int j = top; j < bottom; j++) {
+			if (Utility::isGreen(thresh->getThresholded(j, i))) {
+				greens++;
+				if (greens > area) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 /* Since the white blob check catches a lot of extra stuff like lines,
@@ -253,9 +296,9 @@ bool Robots::whiteBelow(Blob candidate) {
         int white = 0;
         int green = 0;
         for (int x = candidate.getLeft(); x < candidate.getRight(); x++) {
-            if (isWhite(thresh->getThresholded(y, x))) {
+            if (Utility::isWhite(thresh->getThresholded(y, x))) {
                 white++;
-            } else if (isGreen(thresh->getThresholded(y, x))) {
+            } else if (Utility::isGreen(thresh->getThresholded(y, x))) {
                 green++;
             }
         }
@@ -280,9 +323,9 @@ bool Robots::whiteAbove(Blob candidate) {
         int white = 0;
         int green = 0;
         for (int x = candidate.getLeft(); x < candidate.getRight(); x++) {
-            if (isWhite(thresh->getThresholded(y, x))) {
+            if (Utility::isWhite(thresh->getThresholded(y, x))) {
                 white++;
-            } else if (isGreen(thresh->getThresholded(y, x))) {
+            } else if (Utility::isGreen(thresh->getThresholded(y, x))) {
                 green++;
             }
         }
@@ -386,7 +429,7 @@ void Robots::checkMerge(int i, int j) {
             if (debugRobots) {
                 vision->drawPoint(x, y, MAROON);
             }
-            if (isSameColor(thresh->getThresholded(y, x), color)) {
+            if (Utility::colorsEqual(thresh->getThresholded(y, x), color)) {
                 col++;
                 if (col > area || col > stripe) {
                     blobs->mergeBlobs(i, j);
@@ -395,12 +438,12 @@ void Robots::checkMerge(int i, int j) {
                     }
                     return;
                 }
-            } else if (isGreen(thresh->getThresholded(y, x))) {
+            } else if (Utility::isGreen(thresh->getThresholded(y, x))) {
                 green++;
                 if (green > 5) {
                     return;
                 }
-            } else if (isWhite(thresh->getThresholded(y, x))) {
+            } else if (Utility::isWhite(thresh->getThresholded(y, x))) {
                 miss++;
                 if (miss > area / 9 || miss > stripe) {
                     return;
@@ -448,9 +491,10 @@ bool Robots::noWhite(Blob b) {
 	for (int i = 1; i < b.height(); i++) {
 		tops = 0; bottoms = 0;
 		for (int x = left; x <= right; x++) {
-			if (top - i >= 0 && isWhite(thresh->getThresholded(top - i,x)))
+			if (top - i >= 0 && Utility::isWhite(thresh->getThresholded(top - i,x)))
 				tops++;
-			if (bottom + i < IMAGE_HEIGHT && isWhite(thresh->getThresholded(bottom+i,x)))
+			if (bottom + i < IMAGE_HEIGHT &&
+				Utility::isWhite(thresh->getThresholded(bottom+i,x)))
 				bottoms++;
 			if (tops > width / 2 || tops == width) return false;
 			if (bottoms > width / 2 || tops == width) return false;

@@ -119,6 +119,20 @@ CONFIGURE_FILE(
   ESCAPE_QUOTES
   )
 
+IF ( NOT USE_TTS )
+  SET( USE_TTS_POUND "#" )
+ELSE()
+  SET( USE_TTS_POUND "" )
+ENDIF()
+
+SET( AUTOLOAD_INI ${CFG_DIR}/autoload.ini )
+
+CONFIGURE_FILE(
+  ${MAN_CMAKE_DIR}/autoload.ini.in
+  ${CFG_DIR}/autoload.ini
+  ESCAPE_QUOTES
+  )
+
 ############################ DEFINITIONS
 # Add here definition needed.
 ADD_DEFINITIONS(
@@ -135,12 +149,14 @@ INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_PATH}
   ${ALCOMMON_INCLUDE_DIR}
   ${MINGW_INCLUDE_DIR}
+  ${MAN_INCLUDE_DIR}
   ${COMM_INCLUDE_DIR}
   ${CORPUS_INCLUDE_DIR}
   ${MOTION_INCLUDE_DIR}
   ${NOGGIN_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${WEBOTS_INCLUDE_DIR}
+  ${MEMORY_INCLUDE_DIR}
   ${CFG_DIR}
   )
 
@@ -190,6 +206,11 @@ INSTALL(
   DESTINATION ${MAN_PYTHON_TARGET_DIR}
   CONFIGURATIONS "" Debug Release
   )
+INSTALL(
+  FILES ${AUTOLOAD_INI}
+  DESTINATION ${OUTPUT_ROOT_DIR_PREF}
+  CONFIGURATIONS "" Debug Release
+  )
 
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES(
@@ -203,16 +224,16 @@ TARGET_LINK_LIBRARIES(
   ${VISION_TARGET}
   ${MOTION_TARGET}
   ${NOGGIN_TARGET}
+  ${MEMORY_TARGET}
   ${WEBOTS_LIBRARIES}
   )
 
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories to
 # include in this package
-SUBDIRS(
-  comm
-  corpus
-  vision
-  motion
-  noggin
-  )
+add_subdirectory( memory )
+add_subdirectory( comm )
+add_subdirectory( corpus )
+add_subdirectory( vision )
+add_subdirectory( motion )
+add_subdirectory( noggin )

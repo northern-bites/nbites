@@ -247,6 +247,9 @@ void Threshold::runs() {
     // back when the robots had colored shoulder pads we worried about seeing them
     detectSelf();
 #endif
+	for (int i = IMAGE_HEIGHT - 1; i >= 0; i--) {
+		pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+	}
     for (int i = 0; i < NUMBLOCKS; i++) {
         block[i] = 0;
         evidence[i] = 0;
@@ -274,62 +277,87 @@ void Threshold::runs() {
  */
 
 void Threshold::findGoals(int column, int topEdge) {
-    const int BADSIZE = 5;
+    const int BADSIZE = 10;
+	const int GAP = 15;
     // scan up for goals
-    int bad = 0, blues = 0, yellows = 0;
+    int bad = 0, blues = 0, yellows = 0, pinks = 0;
     int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge,
-        lastYellow = topEdge;
+        lastYellow = topEdge, firstPink = topEdge, lastPink = topEdge;
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
+	int blueRun = 0;
     for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
-        if (isBlue(pixel)) {
-            lastBlue = j;
-            blues++;
-            if (firstBlue == topEdge) {
-                firstBlue = j;
-            }
+        if (Utility::isBlue(pixel)) {
+			if (j - lastBlue < 4) {
+				lastBlue = j;
+				blues++;
+				bad--;
+				if (firstBlue == topEdge) {
+					firstBlue = j;
+				}
+			}
         }
-        if (isYellow(pixel)) {
+        if (Utility::isYellow(pixel)) {
             lastYellow = j;
             yellows++;
+            bad--;
             if (firstYellow == topEdge) {
                 firstYellow = j;
             }
         }
-        if (isNavy(pixel) || isRed(pixel)) {
+        if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
             robots++;
         }
-        if (isOrange(pixel) || isUndefined(pixel)) {
+		if (Utility::isRed(pixel)) {
+			lastPink = j;
+			pinks++;
+			if (firstPink == topEdge) {
+				firstPink = j;
+			}
+		}
+        if (Utility::isUndefined(pixel)) {
             bad++;
         }
+		if (lastYellow - j > GAP && lastBlue - j > GAP && lastPink - j > GAP) {
+			break;
+		}
     }
     // now do the same going down from the horizon
     bad = 0;
+	blueRun = 0;
+	int greens = 0;
     for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
         // note:  These were thresholded in the findBallsCrosses loop
         unsigned char pixel = getThresholded(j,column);
         bool found = false;
-        if (isBlue(pixel)) {
-            firstBlue = j;
-            blues++;
+        if (Utility::isBlue(pixel) && !Utility::isGreen(pixel)) {
+            //blues++;
+			//blueRun++;
+			if (blueRun > 3 && greens < 4) {
+				firstBlue = j;
+			}
             found = true;
         }
-        if (isYellow(pixel)) {
+        if (Utility::isYellow(pixel)) {
             firstYellow = j;
             yellows++;
+			blueRun = 0;
             found = true;
         }
-        if (isNavy(pixel) || isRed(pixel)) {
+        if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
             robots++;
             found = true;
         }
-        if (isGreen(pixel)) {
+        if (Utility::isGreen(pixel)) {
             bad++;
+			blueRun = 0;
+			greens++;
         }
         if (!found) {
             bad++;
+			blueRun = 0;
         }
     }
     if (blues > 10) {
@@ -337,6 +365,9 @@ void Threshold::findGoals(int column, int topEdge) {
     } else if (yellows > 10) {
         yellow->newRun(column, lastYellow, firstYellow - lastYellow);
     }
+	if (pinks > 5) {
+		red->newRun(column, lastPink, firstPink - lastPink);
+	}
     if (shoot[column] && robots > 5) {
         shoot[column] = false;
     }
@@ -361,10 +392,13 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
     int robots = 0, greens = 0, greys = 0;
     int lastGood = IMAGE_HEIGHT - 1;
     int maxWhite = 0;
+	bool faceDown = pose->getHorizonY(0) < 0;
+	bool faceDown2 = pose->getHorizonY(0) < -100;
     shoot[column] = true;
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
-        while (bound < IMAGE_HEIGHT && isOrange(getColor(column, bound))) {
+        while (bound < IMAGE_HEIGHT &&
+			   Utility::isOrange(getColor(column, bound))) {
             bound++;
         }
     }
@@ -382,11 +416,12 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         // otherwise, do stuff according to color
         if (lastPixel != pixel || j == topEdge) { // end of column
             // Note: pixel can contain multiple colors, so we check all of them
-			if (isOrange(lastPixel)) {
+			if (Utility::isOrange(lastPixel)) {
                 // add to Ball data structure
                 //drawPoint(column, j, MAROON);
                 if (j == topEdge) {
-                    while (j > 0 && isOrange(getThresholded(j,column))) {
+                    while (j > 0 && Utility::isOrange(getThresholded(j,column)))
+					{
                         currentRun++;
                         j--;
                     }
@@ -396,7 +431,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                 }
                 greens += currentRun;
 			}
-			if (isWhite(lastPixel)) {
+			if (Utility::isWhite(lastPixel)) {
                 // add to the cross data structure
                 if (currentRun > 2) {
                     cross->newRun(column, j, currentRun);
@@ -405,11 +440,11 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                 }
 			}
-			if (isUndefined(lastPixel)) {
+			if (Utility::isUndefined(lastPixel)) {
                 if (currentRun > 15) {
                     greys+= currentRun;
                 }
-                if (currentRun > 25 && shoot[column]) {
+                if (currentRun > 25 && shoot[column] && !faceDown2) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
                         block[column / divider] = j + currentRun;
@@ -420,19 +455,24 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                 }
 			}
-			if (isGreen(lastPixel)) {
+			if (Utility::isGreen(lastPixel)) {
                 greens+= currentRun;
                 lastGood = j;
+				// we often see navy in shadowed places
+				if (currentRun > 3) {
+					robots = 0;
+				}
 			}
-			if (isNavy(lastPixel)) {
+			if (Utility::isNavy(lastPixel)) {
                 robots+= currentRun;
                 if (currentRun > 5) {
                     navyblue->newRun(column, j, currentRun);
                 }
-                if (robots > 10 && shoot[column]) {
+                if (robots > 10 && column > 10 && column < IMAGE_WIDTH - 10
+					&& shoot[column] && !faceDown) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = j + currentRun;
+                        block[column / divider] = lastGood;//j + currentRun;
                     }
                     shoot[column] = false;
                     if (debugShot) {
@@ -440,15 +480,15 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                 }
             }
-			if (isRed(lastPixel)) {
+			if (Utility::isRed(lastPixel)) {
                 robots+= currentRun;
-                if (currentRun > 5) {
+                if (currentRun > 3) {
                     red->newRun(column, j, currentRun);
                 }
                 if (robots > 10 && shoot[column]) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = j + currentRun;
+                        block[column / divider] = lastGood;//j + currentRun;
                     }
                     shoot[column] = false;
                     if (debugShot) {
@@ -460,11 +500,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             currentRun = 1;
         }
         lastPixel = pixel;
-        if (isOrange(pixel)) {
-            int lastv = getV(column, j);
-            int initv = lastv;
-            while (j >= topEdge && abs(getV(column, j) - lastv) < 8 &&
-                   abs(initv - lastv) < 12) {
+        /*if (isOrange(pixel)) {
+            while (j >= topEdge && isOrange(getThresholded(j, column))) {
                 currentRun++;
                 j--;
             }
@@ -478,7 +515,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 
             greens+= currentRun;
             lastPixel = ORANGE;
-        }
+			}*/
     }
     if (shoot[column] && greens < (bound - topEdge) / 2) {
         if (block[column / divider] == 0) {
@@ -662,8 +699,6 @@ void Threshold::detectSelf() {
     const int TOPRIGHT = 250;
     const int HIGHBOUND = -50;
     const int COMPENSATION = 20;
-
-    //cout << "Values " << pixInImageLeft << " " << pixInImageRight << " " << pixInImageUp << endl;
 
     for (int i = 0; i < IMAGE_WIDTH; i++) {
         lowerBound[i] = IMAGE_HEIGHT - 1;
@@ -902,6 +937,10 @@ void Threshold::objectRecognition() {
     }
 
     storeFieldObjects();
+	if (vision->ball->getWidth() > 0 && vision->ball->getDistance() > 15.0f &&
+		vision->ball->getHeat() < 1.0f) {
+		context->checkForKickDangerNoRobots();
+	}
 
 }
 
@@ -1093,13 +1132,20 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 
         // sets focal distance of the field object
         objPtr->setFocDist(objPtr->getDistance());
-        // convert dist + angle estimates to body center
-        estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
-                                              objPtr->getDistance());
-        objPtr->setDistanceWithSD(obj_est.dist);
-        objPtr->setBearingWithSD(obj_est.bearing);
-        objPtr->setElevation(obj_est.elevation);
+		estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
+											  objPtr->getCenterY(),
+											  265.0f);
+		// convert dist + angle estimates to body center
+		estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
+											  objPtr->getCenterY(),
+											  pose_est.dist);
+		objPtr->setDistanceWithSD(obj_est.dist);
+		objPtr->setBearingWithSD(obj_est.bearing);
+		objPtr->setElevation(obj_est.elevation);
+		// now that we have the robot information check if it might kick
+		if (vision->ball->getWidth() > 0) {
+			context->checkForKickDanger(objPtr);
+		}
     } else {
         objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
@@ -1290,7 +1336,7 @@ void Threshold::initTable(std::string filename) {
         }
 
 #ifndef OFFLINE
-    print("Loaded colortable %s",filename.c_str());
+    print("Loaded colortable %s\n",filename.c_str());
 #endif
 
     fclose(fp);

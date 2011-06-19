@@ -160,6 +160,9 @@ public:
                        const std::vector<const VisualFieldObject*>& visibleObjects)
         const;
 
+	void checkForKickDanger(VisualRobot *robot);
+	void checkForKickDangerNoRobots();
+
     const bool arePointsCloseEnough(const float estimatedDistance,
                                     const ConcreteCorner* j,
                                     const VisualFieldObject* k,
@@ -192,6 +195,8 @@ public:
 #ifdef OFFLINE
     void setDebugIdentifyCorners(bool _bool) {debugIdentifyCorners = _bool;}
     const bool getDebugIdentifyCorners() const { return debugIdentifyCorners;}
+	void setDebugDangerousBall(bool _bool) {debugDangerousBall = _bool;}
+	const bool setDebugDangerousBall() const {return debugDangerousBall;}
 #endif
 
 
@@ -229,10 +234,13 @@ private:
     bool seeCenterCircle;
     int objectRightX;
     int objectRightY;
+	float objectDistance;
 #ifdef OFFLINE
     bool debugIdentifyCorners;
+	bool debugDangerousBall;
 #else
     static const bool debugIdentifyCorners = false;
+	static const bool debugDangerousBall = false;
 #endif
 };
 

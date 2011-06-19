@@ -43,51 +43,53 @@ static const int MAX_POINTS = 100;
 class ObjectFragments {
 public:
     ObjectFragments(Vision* vis, Threshold* thr, Field* fie, Context* con,
-                    int _color);
+                    unsigned char _color);
     virtual ~ObjectFragments() {}
 
     // SETTERS
-    void setColor(int c);
+    void setColor(unsigned char c);
     void allocateColorRuns();
 
     // Making object
     void init(float s);
 
     void newRun(int x, int endY, int height);
-	bool colorsEqual(unsigned char x, unsigned char y);
 
     // scan operations
     int yProject(int startx, int starty, int newy);
     int yProject(point <int> point, int newy);
     int xProject(int startx, int starty, int newx);
     int xProject(point <int> point, int newx);
-    void vertScan(int x, int y, int dir, int stopper, int c, stop & scan);
+    void vertScan(int x, int y, int dir, int stopper, unsigned char c,
+				  stop & scan);
 	int pickNth(int val[], int n, int s);
-    void horizontalScan(int x, int y, int dir, int stopper, int c, int l,
+    void horizontalScan(int x, int y, int dir, int stopper, unsigned char c,
+						int l,
                         int r, stop & scan);
-    int findTrueLineVertical(point <int> top, point <int> bottom, int c,
+    int findTrueLineVertical(point <int> top, point <int> bottom, unsigned char c,
                              bool left);
-    int findTrueLineHorizontal(point <int> left, point <int> right, int c,
+    int findTrueLineHorizontal(point <int> left, point <int> right, unsigned char c,
                                bool up);
-    void findVerticalEdge(point <int>& top, point <int>& bottom, int c,
-                                    bool left);
+    void findVerticalEdge(point <int>& top, point <int>& bottom, unsigned char c,
+						  bool left, bool correct);
     void findHorizontalEdge(point <int>& left, point <int>& right,
-                                      int c, bool up);
+                                      unsigned char c, bool up);
     bool checkEdge(int x, int y, int x1, int y1);
     int horizonAt(int x);
 
     // finding square objects
     void squareGoal(int x, int y, int left, int right, int top, int bottom,
-					int c, Blob & pole);
-    float correct(Blob & b, int c);
+					unsigned char c, Blob & pole);
+    float correct(Blob & b, unsigned char c);
 
     // main method
     void createObject();
 
     // miscelaneous goal processing  methods
-    bool qualityPost(Blob b, int c);
-    bool checkSize(Blob b, int c);
+    bool qualityPost(Blob b, unsigned char c);
+    bool checkSize(Blob b, unsigned char c);
     int getBigRun(int left, int right);
+	int getBigRunExpanded(int left, int right, int prevx);
     bool updateObject(VisualFieldObject* a, Blob b, certainty _certainty,
                       distanceCertainty _distCertainty);
     distanceCertainty checkDist(Blob pole);
@@ -113,25 +115,23 @@ public:
                                    pair<int, int> foo,
                                    int classification);
 
-
-
-
 	int classifyByCheckingLines(Blob post);
 
     int characterizeSize(Blob b);
 
-    int classifyFirstPost(int c, Blob pole);
+    int classifyFirstPost(unsigned char c, Blob pole);
 
     // the big kahuna
     void lookForFirstPost(VisualFieldObject *left, VisualFieldObject *right,
-                  VisualCrossbar *mid, int c);
+                  VisualCrossbar *mid, unsigned char c);
     void lookForSecondPost(Blob pole, int post,
-                                            VisualFieldObject* left,
-                                            VisualFieldObject* right,
-                           VisualCrossbar* mid, int c);
+						   VisualFieldObject* left,
+						   VisualFieldObject* right,
+                           VisualCrossbar* mid, unsigned char c);
 
     void updateRunsAfterFirstPost(Blob pole, int post);
-    int grabPost(int c, int left, int right, Blob & pole);
+	void lookForPost(int index, Blob & obj);
+    int grabPost(unsigned char c, int left, int right, Blob & pole);
     void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
     void transferTopBlob(VisualFieldObject * one, certainty cert,
                          distanceCertainty dc);
@@ -161,13 +161,9 @@ public:
 
     // debugging methods
     void printObjs();
-    void drawPoint(int x, int y, int c);
-    void drawRect(int x, int y, int w, int h, int c);
     void drawBlob(Blob b, int c);
     void printBlob(Blob b);
     void printObject(VisualFieldObject * objs);
-    void paintRun(int x,int y, int h, int c);
-    void drawRun(const run& run, int c);
 #ifdef OFFLINE
 	void setPrintObjs(bool debug) {PRINTOBJS = debug;}
 	void setPostDebug(bool debug) {POSTDEBUG = debug;}
@@ -184,7 +180,7 @@ private:
 	Field* field;
     Context* context;
 
-    int color;
+    unsigned char color;
     int runsize;
     int biggestRun;
     int numberOfRuns;

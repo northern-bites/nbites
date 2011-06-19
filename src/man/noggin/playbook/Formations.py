@@ -192,12 +192,22 @@ def fKickoff(team, workingPlay):
     workingPlay.setFormation(PBConstants.KICKOFF_FORMATION)
     if team.me.isDefaultGoalie():
         Roles.rGoalie(team, workingPlay)
-    elif team.me.isDefaultDefender():
-        Roles.rDefender(team, workingPlay)
-    elif team.me.isDefaultOffender():
-        Roles.rOffender(team, workingPlay)
-    elif team.me.isDefaultChaser():
+    elif team.numActiveFieldPlayers == 1:
         Roles.rChaser(team, workingPlay)
+    elif team.numActiveFieldPlayers == 2:
+        highNumber = team.highestActivePlayerNumber()
+        if team.me.playerNumber == highNumber:
+            Roles.rChaser(team, workingPlay)
+        else:
+            Roles.rDefender(team, workingPlay)
+    else:
+        if team.me.isDefaultChaser():
+            Roles.rChaser(team, workingPlay)
+        elif team.me.isDefaultDefender():
+            Roles.rDefender(team, workingPlay)
+        elif team.me.isDefaultOffender():
+            workingPlay.setRole(PBConstants.OFFENDER)
+            SubRoles.pKickoffStriker(team, workingPlay)
 
 def fReady(team, workingPlay):
     '''pre-kickoff positions'''
@@ -216,8 +226,7 @@ def fReady(team, workingPlay):
             workingPlay.setRole(PBConstants.DEFENDER)
             SubRoles.pReadyDefender(team, workingPlay)
     else:
-        highNumber = team.highestActivePlayerNumber()
-        if team.me.playerNumber == highNumber:
+        if team.me.isDefaultChaser():
             workingPlay.setRole(PBConstants.CHASER)
             SubRoles.pReadyChaser(team, workingPlay)
         elif team.me.isDefaultDefender():

@@ -36,32 +36,22 @@ class Robots; // forward reference
 
 class Robots {
 public:
-    Robots(Vision* vis, Threshold* thr, Field* fie, Context* con, int c);
+    Robots(Vision* vis, Threshold* thr, Field* fie, Context* con,
+		   unsigned char c);
     virtual ~Robots() {}
-
-    // Helper method that just returns whether the thresholded color is a
-    // white color
-    static inline const bool isWhite(unsigned char threshColor)
-        {
-			return threshColor & WHITE_BIT;
-        }
-
 
 	void init();
 	void preprocess();
 	void robot(Cross *cross);
 	void expandRobotBlob(int which);
 	bool noWhite(Blob b);
-	void expandHorizontally(int which, int dir);
-	int expandVertically(int which, int dir);
-	bool goodScan(int c, int w, int o, int g, int gr, int t);
 	void updateRobots(int w, int i);
 	void mergeBigBlobs();
     void checkMerge(int i, int j);
 	bool closeEnough(int i, int j);
     bool sanityChecks(Blob candidate, Cross* cross);
 	bool bigEnough(Blob a, Blob b);
-	bool noGreen(Blob a, Blob b);
+	bool notGreen(Blob a);
     bool whiteBelow(Blob a);
     bool whiteAbove(Blob b);
 	bool checkHorizontal(int l, int r, int t, int b);
@@ -69,25 +59,11 @@ public:
 	bool viableRobot(Blob a);
 	void createObject();
 	void newRun(int x, int y, int h);
-	void setColor(int c);
+	void setColor(unsigned char c);
 	void allocateColorRuns();
 	int distance(int x, int x1, int x2, int x3);
 	void printBlob(Blob a);
 
-    // Helper method that just returns whether the thresholded color is a
-    // green color
-    static inline const bool isGreen(unsigned char threshColor)
-        {
-			return threshColor & GREEN_BIT;
-        }
-    static inline const bool isSameColor(unsigned char threshColor, int col)
-        {
-            if (col == RED) {
-                return threshColor & RED_BIT;
-            } else {
-                return threshColor & NAVY_BIT;
-            }
-        }
 #ifdef OFFLINE
     void setDebugRobots(bool debug) {debugRobots = debug;}
 #endif
@@ -102,7 +78,7 @@ private:
 
 	Blobs* blobs;
 	int numberOfRuns, runsize;
-	int color;
+	unsigned char color;
 	Blob* topBlob;
 	run* runs;
 #ifdef OFFLINE

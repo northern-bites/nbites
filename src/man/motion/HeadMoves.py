@@ -34,6 +34,12 @@ FIND_BALL_HEADS_LEFT = (((45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
 FIND_BALL_HEADS_RIGHT =  (((-45.,-10.),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
                           ((-45.,20.),0.3,1, stiff.LOW_HEAD_STIFFNESSES))
 
+# #OVER_RIGHT_SHOULDER = ((PAN_RIGHT_SHOULDER_HEADS,
+#                         0.5,1,stiff.LOW_HEAD_STIFFNESSES),)
+
+# OVER_LEFT_SHOULDER = ((PAN_LEFT_SHOULDER_HEADS,
+#                        0.5,1,stiff.LOW_HEAD_STIFFNESSES),)
+
 # Distance that can be seen at a certain head pitch
 # | degree | close | far |
 # |     20 |    15 |  53 |
@@ -160,6 +166,18 @@ FORWARD_COMB_PAN = (
 
 ########################SCANS###########################
 
+FULL_SCAN_BALL = (
+    ((-65.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.,20.),1.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.0, -5.0) ,0.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    (( -118.0, -5.0),1.5,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( -65.0, -25.0),0.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 0.0, -35.0),0.5,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 65.0, -25.0),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((118.,-5.),0.3,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((65.,-5.),.5, 1, stiff.LOW_HEAD_STIFFNESSES),)
+
+
 HIGH_SCAN_CLOSE_BOUND = 104
 HIGH_SCAN_BALL = (
     (( -65.0, -25.0),0.6,  1, stiff.LOW_HEAD_STIFFNESSES),
@@ -215,8 +233,8 @@ SPIN_RIGHT_SCAN_BALL = (
     ((-60.,-25.),0.8,1, stiff.LOW_HEAD_STIFFNESSES))
 
 RIGHT_EDGE_SCAN_BALL = (
-    ((-55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-60.,-25.),0.6,1, stiff.LOW_HEAD_STIFFNESSES))
+    ((-55.,20.),0.71,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-60.,-32),0.71,1, stiff.LOW_HEAD_STIFFNESSES))
 
 SPIN_LEFT_SCAN_BALL = (
     ((55.,20.),0.4,1, stiff.LOW_HEAD_STIFFNESSES),
@@ -224,8 +242,8 @@ SPIN_LEFT_SCAN_BALL = (
     ((60.,-25.),0.8,1, stiff.LOW_HEAD_STIFFNESSES))
 
 LEFT_EDGE_SCAN_BALL = (
-    ((55.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
-    ((60.,-25.),0.6,1, stiff.LOW_HEAD_STIFFNESSES))
+    ((55.,20.),0.71,1, stiff.LOW_HEAD_STIFFNESSES),
+    ((60.,-32.),0.71,1, stiff.LOW_HEAD_STIFFNESSES))
 
 SQUAT_LOW_SCAN_BALL = (
     ((-65.,20.),0.6,1, stiff.LOW_HEAD_STIFFNESSES),
@@ -244,6 +262,15 @@ POST_SCAN = (
     ((65.,-25.),2.0,  1, stiff.LOW_HEAD_STIFFNESSES),
     ((-65.,-25.),2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+POST_LEFT_SCAN = ((( 65.,-25.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+                  (( 35.,-35.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+                  ((-35.,-35.), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES),
+                  ((-65.,-25.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+POST_RIGHT_SCAN = (((-65.,-25.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+                   ((-35.,-35.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+                   (( 35.,-35.), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES),
+                   (( 65.,-25.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 KICK_SCAN = (
     ((0.0,-45),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
@@ -268,6 +295,10 @@ PAN_LEFT_DOWN_HEADS = (60.0, 25.0)
 
 PAN_RIGHT_DOWN_HEADS = (-60.0, 25.0)
 
+PAN_RIGHT_SHOULDER_HEADS = (115.0,10.0)
+
+PAN_LEFT_SHOULDER_HEADS = (-115.0,10.0)
+
 LOOK_HEADS = {'left' : PAN_LEFT_HEADS,
               'right' : PAN_RIGHT_HEADS,
               'up' : PAN_UP_HEADS,
@@ -279,3 +310,4 @@ LOOK_HEADS = {'left' : PAN_LEFT_HEADS,
 DATA_PAN = (
     ((0.0,-45), 2.0, 0, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0, 15), 2.0, 0, stiff.LOW_HEAD_STIFFNESSES))
+

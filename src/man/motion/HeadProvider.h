@@ -28,7 +28,6 @@
 #include "MotionProvider.h"
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
-#include "CoordHeadCommand.h"
 #include "Sensors.h"
 #include "ChopShop.h"
 #include "Kinematics.h"
@@ -47,13 +46,12 @@ public:
 	void enqueueSequence(std::vector<HeadJointCommand*> &seq);
 	void setCommand(const SetHeadCommand* command);
 	void setCommand(const HeadJointCommand* command);
-	void setCommand(const CoordHeadCommand* command);
 
 private:
     enum HeadMode {
         SCRIPTED,
         SET,
-		COORD
+	COORD
     };
 
     void transitionTo(HeadMode newMode);
@@ -71,13 +69,13 @@ private:
 
 
     boost::shared_ptr<ChoppedCommand> currCommand;
-	// Queue of all future commands
-	std::queue<const HeadJointCommand*> headCommandQueue;
+    // Queue of all future commands
+    std::queue<const HeadJointCommand*> headCommandQueue;
 
-	HeadMode curMode;
+    HeadMode curMode;
     float yawDest,pitchDest,lastYawDest,lastPitchDest;
-	float pitchMaxSpeed, yawMaxSpeed;
-	float headSetStiffness;
+    float pitchMaxSpeed, yawMaxSpeed;
+    float headSetStiffness;
 
     pthread_mutex_t head_provider_mutex;
 

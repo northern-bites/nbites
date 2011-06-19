@@ -20,6 +20,7 @@ class Navigator(FSA.FSA):
         self.addStates(ChaseStates)
         self.addStates(PFKStates)
         self.currentState = 'stopped'
+        self.doingSweetMove = False
         self.setName('Navigator')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)
@@ -69,6 +70,7 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
+
         self.switchTo('playbookWalk')
 
     def goTo(self,dest):

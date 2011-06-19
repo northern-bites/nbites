@@ -91,6 +91,23 @@ bool Blob::isAligned(Blob other) {
     return false;
 }
 
+/* Shift the blob in the directions indicated by the deltas.
+   Note: not a pure shift - the bottom and top shift in opposite
+   directions.
+   @param deltax       the amount of change in the x direction
+   @param deltay       the amount of change in the y direction
+ */
+void Blob::shift(int deltax, int deltay) {
+	leftTop.x += deltax;
+	rightTop.x += deltax;
+	leftBottom.x -= deltax;
+	rightBottom.x -= deltax;
+	leftTop.y += deltay;
+	rightTop.y += deltay;
+	leftBottom.y += deltay;
+	rightBottom.y += deltay;
+}
+
 /* Print debugging information for a blob.
  */
 void Blob::printBlob() const {

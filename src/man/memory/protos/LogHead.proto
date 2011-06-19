@@ -1,0 +1,8 @@
+package memory.proto;
+
+message LogHead {
+
+	required int32 logID = 1;
+	required int64 birth_time = 2;
+
+}

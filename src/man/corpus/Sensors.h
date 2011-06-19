@@ -20,28 +20,37 @@
 
 #ifndef Sensors_H
 #define Sensors_H
+#include <string>
 #include <vector>
 #include <list>
 #include <pthread.h>
 #include <stdint.h>
 
-
 #include "SensorDef.h"
+#include "SensorConfigs.h"
 #include "NaoDef.h"
 #include "VisionDef.h"
+#include "Provider.h"
+#include "BulkMonitor.h"
 
 enum SupportFoot {
     LEFT_SUPPORT = 0,
     RIGHT_SUPPORT
 };
 
-class Sensors;
-
+enum SENSORS_EVENT {
+    NEW_MOTION_SENSORS = 1,
+    NEW_VISION_SENSORS,
+    NEW_IMAGE
+};
 
 struct FSR {
-FSR(const float fl, const float fr,
-    const float rl, const float rr)
-: frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
+    FSR()
+        : frontLeft(0), frontRight(0), rearLeft(0), rearRight(0) { }
+
+    FSR(const float fl, const float fr,
+        const float rl, const float rr)
+        : frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
 
     float frontLeft;
     float frontRight;
@@ -63,11 +72,15 @@ struct FootBumper {
 };
 
 struct Inertial {
-Inertial(const float _accX, const float _accY, const float _accZ,
-         const float _gyrX, const float _gyrY,
-         const float _angleX, const float _angleY)
-: accX(_accX), accY(_accY), accZ(_accZ),
-        gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
+    Inertial()
+        : accX(0), accY(0), accZ(0),
+          gyrX(0), gyrY(0), angleX(0), angleY(0) { }
+
+    Inertial(const float _accX, const float _accY, const float _accZ,
+             const float _gyrX, const float _gyrY,
+             const float _angleX, const float _angleY)
+        : accX(_accX), accY(_accY), accZ(_accZ),
+          gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
 
     float accX;
     float accY;
@@ -79,9 +92,9 @@ Inertial(const float _accX, const float _accY, const float _accZ,
 };
 
 
-class Sensors {
+class Sensors : public Provider{
     //friend class Man;
- public:
+public:
     Sensors();
     ~Sensors();
 
@@ -173,12 +186,15 @@ class Sensors {
     //   its own, and there is no way, even with locking, to guarantee that the
     //   underlying data at the image pointer location is not modified while
     //   the image is locked in Sensors.
-    const uint8_t* getNaoImage () const;
+    uint8_t* getRawNaoImage();
+    const uint8_t* getNaoImage() const;
     const uint16_t* getYImage() const;
     const uint16_t* getImage() const;
     const uint16_t* getUVImage() const;
     const uint8_t* getColorImage() const;
-    void setNaoImage(const uint8_t *img);
+    void setNaoImagePointer(char* img);
+    void setNaoImage(const uint8_t* img);
+    void setRawNaoImage(uint8_t *img);
     void setImage(const uint16_t* img);
     void lockImage() const;
     void releaseImage() const;
@@ -192,16 +208,22 @@ class Sensors {
     void releaseVisionAngles();
 
     // Save a vision frame with associated sensor data
-    void saveFrame(void);
+    void saveFrame();
     void loadFrame(std::string path);
-    void resetSaveFrame(void);
-	void startSavingFrames(void);
-	void stopSavingFrames(void);
-	bool isSavingFrames() const;
+    void resetSaveFrame();
+    void startSavingFrames();
+    void stopSavingFrames();
+    bool isSavingFrames() const;
 
- private:
+    // writes data collected the variance monitor to /tmp/
+    void writeVarianceData();
 
+private:
     void add_to_module();
+
+    // put the sensor data values into the variance tracker, at the correct hz
+    void updateMotionDataVariance();
+    void updateVisionDataVariance();
 
     // Locking mutexes
     mutable pthread_mutex_t angles_mutex;
@@ -217,6 +239,7 @@ class Sensors {
     mutable pthread_mutex_t support_foot_mutex;
     mutable pthread_mutex_t battery_mutex;
     mutable pthread_mutex_t image_mutex;
+    mutable pthread_mutex_t variance_mutex;
 
     // Joint angles and sensors
     // Make the following distinction: bodyAngles is a vector of the most current
@@ -242,7 +265,9 @@ class Sensors {
     float ultraSoundDistanceRight;
 
     const uint16_t *yImage, *uvImage;
-    const uint8_t *colorImage, *naoImage;
+    const uint8_t *colorImage;
+    const uint8_t *naoImage;
+    uint8_t *rawNaoImage;
 
     // Pose needs to know which foot is on the ground during a vision frame
     // If both are on the ground (DOUBLE_SUPPORT_MODE/not walking), we assume
@@ -254,6 +279,9 @@ class Sensors {
      * TOOL.
      */
 
+    // Sensor variance/health monitor
+    BulkMonitor varianceMonitor, fsrMonitor;
+
     Inertial unfilteredInertial;
     //ChestButton
     float chestButton;
@@ -263,7 +291,7 @@ class Sensors {
 
     static int saved_frames;
     std::string FRM_FOLDER;
-	bool saving_frames_on;
+    bool saving_frames_on;
 };
 
 

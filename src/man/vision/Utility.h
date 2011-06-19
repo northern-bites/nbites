@@ -40,8 +40,8 @@ public:
     static const bool collinear(const point<int> &a, const point <int> &b,
                                 const point <int> &c);
 
-    // Returns true if the point is in the rectangle formed from the VisualLine's
-    // endpoints
+    // Returns true if the point is in the rectangle formed from the
+	// VisualLine's endpoints
     static const bool between(const VisualLine& line,
                               const point <int>& p);
 
@@ -55,13 +55,17 @@ public:
     static const bool intersectProp(const point<int> &a, const point<int> &b,
                                     const point<int> &c, const point<int> &d);
 
-    static const bool intersectProp(const VisualLine& line1, const VisualLine& line2);
+    static const bool intersectProp(const VisualLine& line1,
+									const VisualLine& line2);
 
-    static const point<int> getPointFartherFromCorner(const VisualLine &l, int cornerX, int cornerY);
+    static const point<int> getPointFartherFromCorner(const VisualLine &l,
+													  int cornerX, int cornerY);
 
 
-    static const point<int> getCloserEndpoint(const VisualLine& l, int x, int y);
-    static const point<int> getCloserEndpoint(const VisualLine& l, const point<int>& p);
+    static const point<int> getCloserEndpoint(const VisualLine& l,
+											  int x, int y);
+    static const point<int> getCloserEndpoint(const VisualLine& l,
+											  const point<int>& p);
 
     //static const float hypot(const float a, const float b);
 
@@ -143,7 +147,7 @@ public:
     //                   Must be positive
     //
     // Return:
-    // thePoints        4 point <int> structs (having x and y values) representing
+    // thePoints      4 point <int> structs (having x and y values) representing
     //                  the location of the corners of the bounding box.
     //                  NOTE:  The method is set up in such a way that
     //                  connecting thePoints[0] to [1], [1] to [2], [2] to [3],
@@ -151,9 +155,9 @@ public:
     //                  This allows the drawing to be easily done using a for
     //                  loop and modular arithmetic, e.g.
     //                  for (int i = 0; i < 4; i ++) {
-    //                           vision -> drawLine(thePoints[i].x, thePoints[i].y
-    //                           thePoints[(i + 1) % 4].x, thePoints[(i + 1) % 4].y
-    //                           COLOR)
+    //                       vision -> drawLine(thePoints[i].x, thePoints[i].y
+    //                       thePoints[(i + 1) % 4].x, thePoints[(i + 1) % 4].y
+    //                       COLOR)
     //                  }
 
     static BoundingBox getBoundingBox(int x1, int y1, int x2, int y2,
@@ -171,7 +175,7 @@ public:
     // plumbTop           the (x,y) coordinate of the top of the plumb line
     // plumbBottom        the (x,y) coordinate of the bottom of the plumb line;
     //                    for our purposes this will always be IMAGE_HEIGHT
-    // line1start         the (x,y) coordinate of one of the endpoints of the line
+    // line1start         the (x,y) coordinate of one of the endpoints
     // line1end           the (x,y) coordinate of the second of the endpoints of
     //                    the line.
     // Returns (NO_INTERSECTION, NO_INTERSECTION)
@@ -209,13 +213,15 @@ public:
                                            const float minExtendDistance);
 
     // Calculate how well the point fits to the line.
-    // Return distance between point and line evaluated at same x or y (depending
-    // on orientation of the line)
-    static float getPointDeviation(const VisualLine &aLine, const linePoint &point);
-    static float getPointDeviation(const VisualLine &aLine, const int x, const int y);
+    // Return distance between point and line evaluated at same x or y
+    // (depending on orientation of the line)
+    static float getPointDeviation(const VisualLine &aLine,
+								   const linePoint &point);
+    static float getPointDeviation(const VisualLine &aLine, const int x,
+								   const int y);
 
 
-    // A closed polygon contains a point if and only if a plumb line (vertical line)
+    // A closed polygon contains a point if and only if a plumb line
     // dropped down from the point passes through (intersects) an odd number of
     // sides.  See http://www.fandm.edu/x7736.xml
     // We check for intersection at all 4 sides of the box; if an odd number is
@@ -258,6 +264,70 @@ public:
                                             const point<int>& pt);
     static point<int> getClosestLinePoint(const VisualLine& line,
                                           const point<int>& pt);
+
+    // Helper method that just returns whether the thresholded color is a
+    // green color
+    static inline const bool isGreen(unsigned char threshColor)
+        {
+			return threshColor & GREEN_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // white color
+    static inline const bool isWhite(unsigned char threshColor)
+        {
+			return threshColor & WHITE_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // blue color
+    static inline const bool isBlue(unsigned char threshColor)
+        {
+			return threshColor & BLUE_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // yellow color
+    static inline const bool isYellow(unsigned char threshColor)
+        {
+			return threshColor & YELLOW_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // orange color
+    static inline const bool isOrange(unsigned char threshColor)
+        {
+			return threshColor & ORANGE_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // navy color
+    static inline const bool isNavy(unsigned char threshColor)
+        {
+			return threshColor & NAVY_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is a
+    // Red color
+    static inline const bool isRed(unsigned char threshColor)
+        {
+			return threshColor & RED_BIT;
+        }
+
+    // Helper method that just returns whether the thresholded color is
+    // undefined
+    static inline const bool isUndefined(unsigned char threshColor)
+        {
+			return threshColor == 0x00;
+        }
+
+	// are two colors equal?
+	static inline const bool colorsEqual(unsigned char x, unsigned char y) {
+		return !((x & y) == 0x00);
+	}
+
+
+
 
 };
 

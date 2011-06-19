@@ -51,10 +51,7 @@ class KickInformation:
         """
         self.calculateDataAverages()
 
-        if not self.decider.hasKickedOff:
-            self.kickObjective = constants.OBJECTIVE_KICKOFF
-            return self.kickObjective
-        elif self.sawOppGoal:
+        if self.sawOppGoal:
             self.kickObjective = constants.OBJECTIVE_SHOOT
             return self.kickObjective
         else:

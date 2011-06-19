@@ -62,15 +62,6 @@ static shared_ptr<Lights> lights;
 static shared_ptr<Speech> speech;
 
 void ALCreateMan( ALPtr<ALBroker> broker){
-    try{
-        ALSentinelProxy sentinel(broker);
-        sentinel.enableDefaultActionSimpleClick(false);
-        sentinel.enableDefaultActionDoubleClick(false);
-        sentinel.enableDefaultActionTripleClick(false);
-    }catch(ALError &e){
-        cout << "Failed to access the ALSentinel: "<<e.toString()<<endl;
-    }
-
     synchro = shared_ptr<Synchro>(new Synchro());
     sensors = shared_ptr<Sensors>(new Sensors);
     transcriber = shared_ptr<ALTranscriber>(new ALTranscriber(broker,sensors));
@@ -78,8 +69,9 @@ void ALCreateMan( ALPtr<ALBroker> broker){
         shared_ptr<ALImageTranscriber>
         (new ALImageTranscriber(synchro, sensors, broker));
 
+    boost::shared_ptr<Profiler> profiler = shared_ptr<Profiler>(new Profiler(&thread_micro_time));
 #ifdef USE_DCM
-    enactor = shared_ptr<EnactorT>(new EnactorT(sensors,
+    enactor = shared_ptr<EnactorT>(new EnactorT(profiler, sensors,
                                                 transcriber,broker));
 #else
     enactor = shared_ptr<EnactorT>(new EnactorT(sensors,synchro,
@@ -91,7 +83,8 @@ void ALCreateMan( ALPtr<ALBroker> broker){
 
     //setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
-    man = boost::shared_ptr<ALMan> (new ALMan(sensors,
+    man = boost::shared_ptr<ALMan> (new ALMan(profiler,
+                                              sensors,
                                               transcriber,
                                               imageTranscriber,
                                               enactor,
@@ -101,6 +94,7 @@ void ALCreateMan( ALPtr<ALBroker> broker){
     man->startSubThreads();
 }
 
+// it appears that Aldebaran doesn't actually call this method for us
 void ALDestroyMan(){
     man->stopSubThreads();
 }

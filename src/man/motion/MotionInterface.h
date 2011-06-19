@@ -98,6 +98,8 @@ class MotionInterface
     void setBalanceMode( int pBalanceMode ) const ;
     int getBalanceMode() const;
 
+    int getFrameCount() const { return switchboard->getFrameCount(); }
+
   private:
     MotionSwitchboard *switchboard;
 };

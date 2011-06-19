@@ -11,7 +11,6 @@ class KickDecider(object):
 
     def __init__(self, brain):
         self.brain = brain
-        self.hasKickedOff = True
 
         self.info = KickInformation.KickInformation(self, brain)
 
@@ -35,6 +34,12 @@ class KickDecider(object):
             self.info.kick = self.decideKick()
         return self.info.kick
 
+    def setKick(self, k):
+        """
+        sets a particular kick
+        """
+        self.info.kick = k
+
     def getSweetMove(self):
         """
         returns the sweet move required for motion to kick
@@ -51,6 +56,9 @@ class KickDecider(object):
     def getKickObjective(self):
         self.info.getKickObjective()
 
+    def getCenterKickPosition(self):
+        return kicks.CENTER_KICK_POSITION
+
     def decideKick(self):
         """
         using objective and heuristics and localization determines best kick
@@ -60,26 +68,34 @@ class KickDecider(object):
 
         print self.info
 
-        if self.info.kickObjective == constants.OBJECTIVE_KICKOFF:
-            return self.kickOff() #should never happen
-        elif self.info.kickObjective == constants.OBJECTIVE_SHOOT:
+        if self.info.kickObjective == constants.OBJECTIVE_SHOOT:
             return self.shoot()
         #elif self.info.kickObjective == constants.OBJECTIVE_CLEAR:
         else:
             return self.clear()
 
-    def kickOff(self):
+    def setKickOff(self, smallTeam):
         """
-        returns the kick we should do in the kickOff situation
-        NOT TO BE USED!!! Handled elsewhere.
+        sets the kick we should do in the kickOff situation
         """
-        self.hasKickedOff = True
-        if self.brain.playbook.pb.kickoffFormation == 0:
-            print "RIGHT_SIDE"
-            return kicks.RIGHT_SIDE_KICK
+        # if there are too few players on the field to do a side kick pass.
+        if smallTeam:
+            if self.brain.ball.relY >= 0:
+                self.setKick(kicks.LEFT_DYNAMIC_STRAIGHT_KICK)
+                print "Kickoff STRAIGHT_LEFT_KICK"
+            else:
+                self.setKick(kicks.RIGHT_DYNAMIC_STRAIGHT_KICK)
+                print "Kickoff STRAIGHT_RIGHT_KICK"
+            self.info.destDist = 100.
+        # do a side kick pass depending on where the offender is.
+        elif self.brain.playbook.pb.kickoffFormation == 0:
+            self.setKick(kicks.RIGHT_SIDE_KICK)
+            print "Kickoff RIGHT_SIDE_KICK"
         else:
-            print "LEFT_SIDE"
-            return kicks.LEFT_SIDE_KICK
+            self.setKick(kicks.LEFT_SIDE_KICK)
+            print "Kickoff LEFT_SIDE_KICK"
+
+        self.info.kickObjective = constants.OBJECTIVE_KICKOFF
 
     def shoot(self):
         """
@@ -186,7 +202,7 @@ class KickDecider(object):
 
     def chooseDynamicKick(self):
         ball = self.brain.ball
-        if ball.relY > 0:
+        if ball.relY >= 0:
             print "LEFT_DYNAMIC_STRAIGHT"
             return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
         print "RIGHT_DYNAMIC_STRAIGHT"

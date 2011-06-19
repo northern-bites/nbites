@@ -32,7 +32,7 @@ FETCH_GAIT="scp ${SERVER}:$ROBOCUP_DIR/$PSO_DIR/$PICKLE /tmp/"
 
 echo "Fetching gait..."
 echo $FETCH_GAIT
-eval $FETCH_GAIT
+eval $FETCH_GAIT || exit 1
 
 # make /home/nao/gaits folder on the robot
 MAKE_DIR="ssh nao@$ROBOT_IP 'mkdir /home/nao/gaits'"
@@ -45,7 +45,7 @@ PUT_GAIT="scp /tmp/$PICKLE nao@$ROBOT_IP:/home/nao/gaits/"
 
 echo "Putting gait pickle onto robot"
 echo $PUT_GAIT
-eval $PUT_GAIT
+eval $PUT_GAIT || exit 1
 
 echo "All done! Go ahead and 'make install' now and run the optimizer"
 echo "Remember to run afterOptimize.sh when you're finished"

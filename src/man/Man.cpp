@@ -37,9 +37,11 @@ using namespace boost::assign;
 #include "PyLights.h"
 #include "PySpeech.h"
 
+//#include <valgrind/callgrind.h>
+
 using namespace std;
 using boost::shared_ptr;
-
+using memory::Memory;
 
 /////////////////////////////////////////
 //                                     //
@@ -47,26 +49,28 @@ using boost::shared_ptr;
 //                                     //
 /////////////////////////////////////////
 
-Man::Man (shared_ptr<Sensors> _sensors,
+Man::Man (shared_ptr<Profiler> _profiler,
+          shared_ptr<Sensors> _sensors,
           shared_ptr<Transcriber> _transcriber,
           shared_ptr<ImageTranscriber> _imageTranscriber,
           shared_ptr<MotionEnactor> _enactor,
           shared_ptr<Synchro> synchro,
           shared_ptr<Lights> _lights,
           shared_ptr<Speech> _speech)
-
-  : sensors(_sensors),
-    transcriber(_transcriber),
-    imageTranscriber(_imageTranscriber),
-    enactor(_enactor),
-    lights(_lights),
-    speech(_speech)
+    :     sensors(_sensors),
+          transcriber(_transcriber),
+          imageTranscriber(_imageTranscriber),
+          enactor(_enactor),
+          profiler(_profiler),
+          lights(_lights),
+          speech(_speech)
 {
+
   // initialize system helper modules
-  profiler = shared_ptr<Profiler>(new Profiler(&micro_time));
+
 #ifdef USE_TIME_PROFILING
   profiler->profiling = true;
-  profiler->profileFrames(700);
+  profiler->profileFrames(1400);
 #endif
   // give python a pointer to the sensors structure. Method defined in
   // Sensors.h
@@ -80,8 +84,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
   // initialize core processing modules
 #ifdef USE_MOTION
-  motion = shared_ptr<Motion>(
-                              new Motion(synchro, enactor, sensors,profiler));
+  motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors,profiler,pose));
   guardian->setMotionInterface(motion->getInterface());
 #endif
   // initialize python roboguardian module.
@@ -100,6 +103,9 @@ Man::Man (shared_ptr<Sensors> _sensors,
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
                                          sensors, motion->getInterface()));
 #endif// USE_NOGGIN
+#ifdef USE_MEMORY
+  memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
+#endif USE_MEMORY
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
@@ -139,6 +145,10 @@ void Man::startSubThreads() {
 #ifdef DEBUG_MAN_THREADING
   cout << "  run :: Signalling start" << endl;
 #endif
+
+//  printf("Start time: %lli \n", process_micro_time());
+//  CALLGRIND_START_INSTRUMENTATION;
+//  CALLGRIND_TOGGLE_COLLECT;
 }
 
 void Man::stopSubThreads() {
@@ -186,7 +196,9 @@ Man::processFrame ()
 
     sensors->releaseImage();
 #endif
-
+#ifdef USE_MEMORY
+    memory->updateVision();
+#endif USE_MEMORY
 #ifdef USE_NOGGIN
     noggin->runStep();
 #endif
@@ -204,7 +216,7 @@ Man::processFrame ()
 void Man::notifyNextVisionImage() {
   // Synchronize noggin's information about joint angles with the motion
   // thread's information
-
+  //TODO: Octavian: move this to before we copy the image! (it will improve the pose I think)
   sensors->updateVisionAngles();
 
   transcriber->postVisionSensors();
