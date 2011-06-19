@@ -140,7 +140,7 @@ class GoTeam:
                 self.printf("\t mate #%g"% mate.playerNumber)
 
             # If the player number is me, or ball models are super divergent, ignore
-            if (mate.playerNumber == self.me.playerNumber):# or
+            if (mate == self.me):# or
                 #fabs(mate.ballX - self.me.ballX) > 150.):
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("it's me")
