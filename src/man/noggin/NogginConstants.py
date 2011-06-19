@@ -1,37 +1,61 @@
 # Constants.py
 # This file holds all Constants which span multiple files
 
-##
-##--------------------SWITCH BOARD ----------------#
-##
+# ****************
+# *              *
+# * SWITCH BOARD *
+# *              *
+# ****************
+
 LOG_LOC = True
 
-##### MODULE SWITCHES ####
+# *******************
+# *                 *
+# * MODULE SWITCHES *
+# *                 *
+# *******************
+
 USE_VISION = True # Disable for faster processing
 
-##--------------------COM HEADER -------------#
+# *******************
+# *                 *
+# *   COM HEADER    *
+# *                 *
+# *******************
+
 PACKET_HEADER = "ilikeyoulots"
 NUM_PACKET_ELEMENTS = 20
-##
-##--------------------WALK TIME CONSTANTS -------------#
-##
+
+# ***********************
+# *                     *
+# * WALK TIME CONSTANTS *
+# *                     *
+# ***********************
+
 TIME_STEP = 40
 TIME_PER_STEP = TIME_STEP/1000.
 
-##
-##--------------------TEAM STUFF-----------------------#
-##
+# ***********************
+# *                     *
+# *      TEAM STUFF     *
+# *                     *
+# ***********************
+
 NUM_PLAYERS_PER_TEAM = 4
 LENGTH_OF_HALF = 600 #in seconds
+
 # Setup colors
 NUM_GAME_TEAM_COLORS = 2
 teamColorDict = dict(zip(range(NUM_GAME_TEAM_COLORS),\
                       ("TEAM_BLUE","TEAM_RED")))
 (TEAM_BLUE,TEAM_RED) = range(NUM_GAME_TEAM_COLORS)
 
-##
-##--------------------VISION CONNECTION CONSTANTS------#
-##
+# *********************************
+# *                               *
+# * VISION CONNECTION CONSTANTS   *
+# *                               *
+# *********************************
+
 IMAGE_SIZE = "QVGA"             # 320x240 is what gets processed by vision
 CAMERA_FPS = 15
 # image constants, used for angle x,y setters
@@ -65,9 +89,11 @@ NUM_FIELD_OBJECT_DIST_CERTAINTIES = 4
  HEIGHT_UNSURE,
  BOTH_SURE) = range(NUM_FIELD_OBJECT_DIST_CERTAINTIES)
 
-##
-##--------------------LOCALIZATION CONSTANTS-----------#
-##
+# *********************************
+# *                               *
+# *    LOCALIZATION CONSTANTS     *
+# *                               *
+# *********************************
 
 # Switch to tell us if we are using the lab field or not
 USING_LAB_FIELD = False
@@ -84,10 +110,10 @@ if USING_LAB_FIELD:
     GREEN_PAD_X = 20.
     GREEN_PAD_Y = 15.
 else:
-    FIELD_WHITE_WIDTH = 605.
-    FIELD_WHITE_HEIGHT = 405.
-    GREEN_PAD_X = 67.5
-    GREEN_PAD_Y = 67.5
+    FIELD_WHITE_WIDTH = 600.0
+    FIELD_WHITE_HEIGHT = 400.0
+    GREEN_PAD_X = 70.0
+    GREEN_PAD_Y = 70.0
 
 FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + GREEN_PAD_X * 2.0
 FIELD_GREEN_HEIGHT = FIELD_WHITE_HEIGHT + GREEN_PAD_Y * 2.0
@@ -133,14 +159,14 @@ LANDMARK_OPP_GOAL_LEFT_POST_Y = CENTER_FIELD_Y + CROSSBAR_CM_WIDTH / 2.0
 GOAL_WIDTH = LANDMARK_MY_GOAL_LEFT_POST_Y - \
     LANDMARK_MY_GOAL_RIGHT_POST_Y
 
-CENTER_CIRCLE_RADIUS = 62.5 # not scaled
+CENTER_CIRCLE_RADIUS = 60.0 # not scaled
 
 if USING_LAB_FIELD:
-    GOALBOX_DEPTH = 60.
-    GOALBOX_WIDTH = 200.
+    GOALBOX_DEPTH = 60.0
+    GOALBOX_WIDTH = 200.0
 else:
-    GOALBOX_DEPTH = 65.
-    GOALBOX_WIDTH = 230.
+    GOALBOX_DEPTH = 60.0
+    GOALBOX_WIDTH = 220.0
 
 MIDFIELD_X = CENTER_FIELD_X
 MIDFIELD_Y = CENTER_FIELD_Y
