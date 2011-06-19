@@ -1028,39 +1028,40 @@ void Comm::updateAverageDelay()
 {
     // The delay is the difference between the current time and \
     // the last received packet recorded by the CommTimer.
+	// Note: First data sample acquired; average is just delay.
     llong newAverage = 0;
     llong delay      = 0;
     delay = timer.timestamp() - timer.lastPacketReceivedAt();
-    if(averagePacketDelay == 0) {
-	// First data sample acquired; average is just delay.
+    if(averagePacketDelay == 0)
         newAverage = delay;
-    } else {
-	newAverage = (llong)(0.5 * (averagePacketDelay + delay));
-    }
+	else
+		newAverage = (llong)(0.5 * (averagePacketDelay + delay));
 
     // Log data?
-    cout << "Comm::updateAverageDelay() : average delay == " << newAverage << endl;
+    cout << "Comm::updateAverageDelay() : average delay == "
+		 << newAverage << endl;
 
     averagePacketDelay = newAverage;
 }
 
 void Comm::updatePercentReceived()
 {
-    cout << "Comm::updatePercentReceived() : total packets == " << totalPacketsReceived
-	 << " our packets == " << ourPacketsReceived << endl;
+    cout << "Comm::updatePercentReceived() : total packets == "
+		 << totalPacketsReceived
+		 << " our packets == " << ourPacketsReceived << endl;
     double percentage = 0.0f;
-    if(totalPacketsReceived != 0) {
-	percentage = ourPacketsReceived/(double)totalPacketsReceived;
-	cout << "Comm::updatePercentReceived() : " << percentage*100 << "%" << endl;
-    } else {
-	cout << "Comm::updatePercentReceived() : divide by zero error!" << endl;
+    if(totalPacketsReceived != 0)
+	{
+		percentage = ourPacketsReceived/(double)totalPacketsReceived;
+		cout << "Comm::updatePercentReceived() : " << percentage*100 << "%" << endl;
     }
+	else
+		cout << "Comm::updatePercentReceived() : divide by zero error!" << endl;
 }
 
 llong Comm::estimatePacketLatency(const CommPacketHeader &latestPacket)
 {
     // Find the difference between the recorded time the packet was
-    // received and the timestamp inside the packet of when it was
-    // sent.
+    // received and the timestamp inside the packet of when it was sent.
     return timer.lastPacketReceivedAt() - latestPacket.timestamp;
 }
