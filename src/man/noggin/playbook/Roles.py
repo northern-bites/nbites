@@ -33,13 +33,20 @@ def rGoalie(team, workingPlay):
 
     # Chase
     elif workingPlay.isSubRole(PBConstants.GOALIE_CHASER):
-        if RoleTran.shouldStopChase(team):
+        if team.brain.player.inKickingState:
+            print "1"
+            SubRoles.pGoalieChaser(team, workingPlay)
+
+        elif RoleTran.shouldStopChase(team):
+            print "2"
             SubRoles.pGoalieCenter(team, workingPlay)
 
-        elif RoleTran.shouldPosition(team):
-            SubRoles.pGoalieCenter(team, workingPlay)
+        # elif RoleTran.shouldPosition(team):
+        #     print "3"
+        #     SubRoles.pGoalieCenter(team, workingPlay)
 
         else:
+            print "4"
             SubRoles.pGoalieChaser(team, workingPlay)
 
     # Position
@@ -47,6 +54,7 @@ def rGoalie(team, workingPlay):
           workingPlay.isSubRole(PBConstants.GOALIE_RIGHT) or
           workingPlay.isSubRole(PBConstants.GOALIE_LEFT)):
         if RoleTran.shouldChase(team):
+            print "5"
             SubRoles.pGoalieChaser(team, workingPlay)
 
         # elif RoleTran.shouldPositionRight(team):
@@ -56,9 +64,11 @@ def rGoalie(team, workingPlay):
         #     SubRoles.pGoaliePosLeft(team, workingPlay)
 
         elif RoleTran.shouldPositionCenter(team):
+            print "6"
             SubRoles.pGoalieCenter(team, workingPlay)
 
         elif workingPlay.isSubRole(PBConstants.GOALIE_CENTER):
+            print "7"
             SubRoles.pGoalieCenter(team, workingPlay)
 
         # elif workingPlay.isSubRole(PBConstants.GOALIE_RIGHT):
