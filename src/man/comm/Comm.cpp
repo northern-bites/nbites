@@ -406,10 +406,9 @@ PyMODINIT_FUNC init_comm (void)
 }
 
 
-
-/************************/
-/* C++ Comm class methods
-/************************/
+/**************************/
+/* C++ Comm class methods */
+/**************************/
 
 // Constructor
 Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
