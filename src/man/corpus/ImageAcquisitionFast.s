@@ -80,6 +80,17 @@ color_stack_row_end:
 
 .equiv end_of_stack, color_stack_row_end
 
+        ## ColorParam structure
+        .struct 0
+yZero:   .skip 8
+ySlope:  .skip 8
+yLimit:  .skip 8
+
+uvZero:  .skip 8
+uvSlope: .skip 8
+uvLimit: .skip 8
+uvDim:   .skip 8
+
 .section .text
 
 ## Inner loop of the color processing
@@ -114,11 +125,11 @@ color_stack_row_end:
         pand    mm0, mm7
         psrlw   mm1, 8
 
-        ##
-        ##
-        ## Y AVERAGING SECTION
-        ##
-        ##
+   #######
+ #########
+########## Y AVERAGING SECTION
+ #########
+   #######
 
         # Sum 2 y values (words, 9 bits used)
         # mm0: | xxx | y20 + y30 | xxx | y00 + y10 |
@@ -128,6 +139,7 @@ color_stack_row_end:
         ## mm0: | 0000 | sum1 | 0000 | sum0 |
         pand    mm0, mm6
 
+########################## PHASE 0 (FIRST)
         .ifeq (\phase)
         ## Prefetch the UV segment
         prefetchw [edi+ecx*4]
@@ -137,66 +149,66 @@ color_stack_row_end:
         .endif
 
 
+########################## PHASE 1
         .ifeq (\phase - 1)
         mov     edi, [esp + y_out_img] # Replace y image ptr
 
         ## Prefetch the next Y out segment
         prefetchw [edi+ecx*2 + 32]
 
-        movq    mm2, mm0
-
         ## Pack values from first two phases together as 4 words in mm4
         ## mm4 after pack: | y3 | y2 | y1 | y0 |
-        packssdw mm4, mm2
+        packssdw mm4, mm0
         movntq [edi+ecx*2], mm4
 
         ## Load uv img ptr back
         mov     edi, [esp + uv_out_img]
         .endif
 
+########################## PHASE 2
         .ifeq (\phase - 2)
-        movq    mm5, mm0
+        movq    mm4, mm0
         .endif
 
+########################## PHASE 3
         ## Last phase, pack phase 2 & 3 into an array, then pack all 8
         ## bytes together and write them out
         .ifeq (\phase - 3)
         mov     edi, [esp + y_out_img] # Replace y image ptr
-        movq     mm2, mm0
 
-        ## mm2 before: | 0 | y7 | 0 | y6|
-        ## mm5 after:  | y7 | y6 | y5 | y4 | all 16 bit words
-        packssdw mm5, mm2
-        movntq [edi+ecx*2+8], mm5
+        ## mm0 before: | 0 | y7 | 0 | y6|
+        ## mm4 after:  | y7 | y6 | y5 | y4 | all 16 bit words
+        packssdw mm4, mm0
+        movntq [edi+ecx*2+8], mm4
 
         ## Load uv img ptr
         mov     edi, [esp + uv_out_img]
         .endif
 
-        ##
-        ##
-        ## UV-COLOR SECTION
-        ##
-        ##
+   #######
+ #########
+########## UV-COLOR SECTION
+ #########
+   #######
 
         # Write out uv values, 8 bytes each phase
         movntq [edi+ecx*4 + \phase * 8], mm1
 
         # Convert two y sums in words 0 and 2 to two table indicies
-        psubusw mm0, [edx]                      # zero point
-        pmulhw mm0, [edx+8]                    # slope
-        pminsw  mm0, [edx+16]                   # limit to maximum value
+        psubusw mm0, [edx + yZero]      # zero point
+        pmulhw mm0, [edx + ySlope]                  # slope
+        pminsw  mm0, [edx + yLimit]                 # limit to maximum value
 
         # Convert four u,v sums to four table indicies
-        psubusw mm1, [edx+24]                   # zero point
-        pmulhw mm1, [edx+32]                   # slope
+        psubusw mm1, [edx + uvZero]                 # zero point
+        pmulhw mm1, [edx + uvSlope]                 # slope
         psllw   mm1, 1
-        pminsw  mm1, [edx+40]                   # limit to maximum value
+        pminsw  mm1, [edx + uvLimit]                # limit to maximum value
 
         # Calculate two table offsets from y, u, and v table indicies (dwords)
         # mm0: | table offset 1 | table offset 0 |
-        pmaddwd mm1, [edx+48]                   # combine u and v indicies
-        paddd   mm0, mm1                        # add y index
+        pmaddwd mm1, [edx + uvDim]                  # combine u and v indicies
+        paddd   mm0, mm1                            # add y index
 
         ## Write color address for 2 pixels to the stack, we'll look
         ## it up in the table later
