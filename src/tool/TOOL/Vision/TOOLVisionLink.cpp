@@ -143,7 +143,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 
     uint16_t *newImg = reinterpret_cast<uint16_t*>(new uint8_t[320*240*7]);
 
-    ColorParams  cp(0,0,0,256,256,256,128,128,128);
+    ColorParams cp(0,0,0,256,256,256,128,128,128);
 
     //timing the vision process
     long startTime = thread_micro_time();
@@ -155,7 +155,6 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     vision.notifyImage(newImg);
 
     long processTime = thread_micro_time() - startTime;
-    vision.drawBoxes();
     env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
     //copy results from vision thresholded to the array passed in from java
@@ -179,7 +178,8 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         env->ReleaseByteArrayElements(row_target, row, 0);
     }
 
-    delete newImg;
+    delete[] newImg;
+    newImg = NULL;
     env->ReleaseByteArrayElements( jtable, buf_table, 0);
 
     //get the id for the java class, so we can get method IDs
@@ -556,13 +556,11 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 	(JNIEnv * env, jobject jobj, jboolean debugField){
 		vision.thresh->setDebugOpenField(debugField);
 	}
-
     JNIEXPORT void JNICALL
     Java_TOOL_Vision_TOOLVisionLink_cppSetEdgeDetectionDebug
     (JNIEnv * env, jobject jobj, jboolean debugEdgeDetection){
         vision.thresh->setDebugEdgeDetection(debugEdgeDetection);
     }
-
     JNIEXPORT void JNICALL
     Java_TOOL_Vision_TOOLVisionLink_cppSetHoughTransformDebug
     (JNIEnv * env, jobject jobj, jboolean debugHoughTransform){
@@ -572,6 +570,11 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     Java_TOOL_Vision_TOOLVisionLink_cppSetRobotDebug
     (JNIEnv * env, jobject jobj, jboolean debugRobot) {
         vision.thresh->setDebugRobots(debugRobot);
+    }
+    JNIEXPORT void JNICALL
+    Java_TOOL_Vision_TOOLVisionLink_cppSetVisualLinesDebug
+    (JNIEnv * env, jobject jobj, jboolean debugVisualLines){
+        vision.thresh->setDebugVisualLines(debugVisualLines);
     }
 
 #ifdef __cplusplus

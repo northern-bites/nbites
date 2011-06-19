@@ -35,6 +35,7 @@ enum ProfiledComponent {
   P_SMOOTH,
   P_HOUGH_PEAKS,
   P_SUPPRESS,
+  P_PAIR_LINES,
 
   P_LINES,
 

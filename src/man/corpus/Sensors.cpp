@@ -1003,22 +1003,10 @@ void Sensors::loadFrame(string path)
     // Load the image from the file, puts it straight into Sensors'
     // image buffer so it doesn't have to allocate its own buffer and
     // worry about deleting it
-    uint16_t * img = const_cast<uint16_t*>(getImage());
-    uint8_t * byte_img = new uint8_t[320 * 240 * 2];
-    fin.read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
+    uint8_t * img = const_cast<uint8_t*>(getNaoImage());
+    fin.read(reinterpret_cast<char *>(img), 640 * 480 * 2);
     releaseImage();
 
-    lockImage();
-
-    // Translate the loaded image into the proper format.
-    // @TODO: Convert images to new format.
-    for (int i=0; i < 320*240; ++i){
-        img[i] = 0;
-        img[i] = static_cast<uint16_t>(byte_img[i<<1]);
-    }
-    delete byte_img;
-
-    releaseImage();
     float v;
     int version;
     string space;

@@ -1,10 +1,11 @@
 #include "FieldLinesDetector.h"
+#include <stdio.h>
 
 using namespace std;
 using boost::shared_ptr;
 
 FieldLinesDetector::FieldLinesDetector(shared_ptr<Profiler> p) :
-    VisualDetector(), edges(p), hough(p), gradient(new Gradient()),
+    VisualDetector(), edges(p), hough(p), gradient(),
     houghLines()
 {
 
@@ -13,9 +14,16 @@ FieldLinesDetector::FieldLinesDetector(shared_ptr<Profiler> p) :
 /**
  * Detect field lines and their intersections (aka corners) in the given image
  */
-void FieldLinesDetector::detect(const uint16_t *img)
+void FieldLinesDetector::detect(int upperBound, const uint16_t *img)
 {
-    findHoughLines(img);
+    // For safety (in case horizon is too low), scan from above the
+    // given upperbound
+    upperBound -= 10;
+
+    // Only use values within the image
+    upperBound = min(max(0, upperBound), IMAGE_HEIGHT-3);
+
+    findHoughLines(upperBound, img);
     findFieldLines();
 }
 
@@ -27,11 +35,11 @@ void FieldLinesDetector::detect(const uint16_t *img)
  * Side effects: Updates gradient with current image's gradient values,
  *               updates list of hough space lines
  */
-void FieldLinesDetector::findHoughLines(const uint16_t *img)
+void FieldLinesDetector::findHoughLines(int upperBound, const uint16_t *img)
 {
-    gradient->reset();
-    edges.detectEdges(img, gradient);
-    // houghLines = hough.findLines(gradient);
+    gradient.reset();
+    edges.detectEdges(upperBound, img, gradient);
+    houghLines = hough.findLines(gradient);
 }
 
 /**
@@ -40,7 +48,13 @@ void FieldLinesDetector::findHoughLines(const uint16_t *img)
  */
 void FieldLinesDetector::findFieldLines()
 {
-
+    lines.clear();
+    list<pair<HoughLine, HoughLine> >::const_iterator hl;
+    for(hl = houghLines.begin(); hl != houghLines.end(); ++hl){
+        lines.push_back(VisualLine(hl->first,
+                                   hl->second,
+                                   gradient));
+    }
 }
 
 void FieldLinesDetector::setEdgeThreshold(int thresh)
@@ -51,4 +65,15 @@ void FieldLinesDetector::setEdgeThreshold(int thresh)
 void FieldLinesDetector::setHoughAcceptThreshold(int thresh)
 {
     hough.setAcceptThreshold(thresh);
+}
+
+list<HoughLine> FieldLinesDetector::getHoughLines() const
+{
+    list<HoughLine> lines;
+    list<pair<HoughLine, HoughLine> >::const_iterator i;
+    for(i = houghLines.begin(); i != houghLines.end(); ++i){
+        lines.push_back(i->first);
+        lines.push_back(i->second);
+    }
+    return lines;
 }

@@ -190,6 +190,7 @@ public:
     void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
     void setDebugHoughTransform(bool _bool) {debugHoughTransform = _bool;}
     void setDebugRobots(bool _bool);
+    void setDebugVisualLines(bool _bool) {debugVisualLines = _bool;}
 #endif
 
     void initDebugImage();
@@ -290,6 +291,7 @@ private:
     bool debugEdgeDetection;
     bool debugHoughTransform;
     bool debugRobots;
+    bool debugVisualLines;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;
@@ -297,6 +299,7 @@ private:
     static const bool debugEdgeDetection = false;
     static const bool debugHoughTransform = false;
     static const bool debugRobots = false;
+    static const bool debugVisualLines = false;
 #endif
 };
 

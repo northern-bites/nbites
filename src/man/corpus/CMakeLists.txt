@@ -281,13 +281,15 @@ TARGET_LINK_LIBRARIES( ${NBINCLUDE_TARGET}
 
 ############################ TESTS!
 
-# add_executable( ImageAcquisitionTest ${CORPUS_TEST_DIR}/ImageAcquisitionTest.cpp
-#   ${CORPUS_INCLUDE_DIR}/ImageAcquisition.s
-#   ${CORPUS_INCLUDE_DIR}/ImageAcquisitionFast.s ${CORPUS_INCLUDE_DIR}/ColorParams.cpp
-#   )
+add_executable( ImageAcquisitionTest
+  ${CORPUS_TEST_DIR}/ImageAcquisitionTest
+  ${CORPUS_INCLUDE_DIR}/ImageAcquisition.s
+  ${CORPUS_INCLUDE_DIR}/ImageAcquisitionFast.s
+  ${CORPUS_INCLUDE_DIR}/ColorParams
+  )
 
-# target_link_libraries( ImageAcquisitionTest
-#   ${ROBOT_CONNECT_TARGET}
-#   rt
-#   )
+target_link_libraries( ImageAcquisitionTest
+  ${NBCOMMON_LIBRARIES}
+  )
 
+add_test( NAME ImageAcquisitionTest COMMAND ImageAcquisitionTest )

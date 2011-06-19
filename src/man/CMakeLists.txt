@@ -22,6 +22,7 @@
 PROJECT( MAN )
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
+ENABLE_TESTING()
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects

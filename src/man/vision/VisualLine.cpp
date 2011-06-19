@@ -14,6 +14,151 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 }
 
 
+VisualLine::VisualLine(const HoughLine& a,
+                       const HoughLine& b,
+                       const Gradient& g) :
+    VisualLandmark<lineID>(UNKNOWN_LINE)
+{
+    findEndpoints(a,b,g);
+    findDimensions();
+    find3DCoords();
+}
+
+/**
+ * Find the endpoints of the line from the given HoughLines.
+ *
+ */
+void VisualLine::findEndpoints(const HoughLine& a,
+                               const HoughLine& b,
+                               const Gradient& g)
+{
+    // Find the line (of the pair) which is above (in the image) the other one
+    const HoughLine& top = (a.getSinT() * a.getRadius() <
+                            b.getSinT() * b.getRadius()) ? a : b;
+    const HoughLine& bottom = (top == a) ? b : a;
+
+    findLineEdgeEnds(top, g, tr, tl);
+    findLineEdgeEnds(bottom, g, br, bl);
+}
+
+void VisualLine::findLineEdgeEnds(const HoughLine& line, const Gradient& g,
+                                 point<int>& r, point<int>& l)
+{
+    // Search along line from one end to other keeping track of last
+    // runs of edge points. Look for start, then end runs.
+    double u1 = 0, u2 = 0;
+    HoughLine::findLineImageIntersects(line, u1, u2);
+
+    const double x0 = line.getRadius() * line.getCosT() + IMAGE_WIDTH/2;
+    const double y0 = line.getRadius() * line.getSinT() + IMAGE_HEIGHT/2;
+
+    const double cs = -line.getCosT();
+    const double sn = line.getSinT();
+
+    int edgeStreak = 0;
+    bool foundStart = false, foundEnd = false;
+
+    // Iterate across entire line
+    double u;
+    int outX, outY;
+    for(u=u1; u <= u2; u += 1.0){
+        double x = x0 + u * sn;
+        double y = y0 + u * cs;
+
+        // Look for first edge points in direction of line
+        if (isLineEdge(line, g, x, y, outX, outY)){
+            edgeStreak = max(1, edgeStreak+1);
+
+            // Mark first long streak
+            if (edgeStreak >= edge_pts_for_line){
+                foundEnd = false;
+
+                if (!foundStart){
+                    foundStart = true;
+
+                    // Mark it (we'll correct ordering later)
+                    // note: we want it to be the first point in the streak
+                    r.x = outX; //static_cast<int>((u-2.) * sn + x0);
+                    r.y = outY; //static_cast<int>((u-2.) * cs + y0);
+                }
+            }
+        } else {
+            // Keep track of negative streaks too
+            edgeStreak = min(-1, edgeStreak-1);
+
+            // Look for last edge points in a row
+            if (foundStart && !foundEnd &&
+                edgeStreak <= -edge_pts_for_line){
+                foundEnd = true;
+
+                // Mark end of line segment
+                l.x = outX;//static_cast<int>((u-2.) * sn + x0);
+                l.y = outY;//static_cast<int>((u-2.) * cs + y0);
+            }
+        }
+    }
+
+    if (!foundEnd){
+        // Mark end of line segment
+        l.x = outX; // static_cast<int>((u-2.) * sn + x0);
+        l.y = outY; static_cast<int>((u-2.) * cs + y0);
+    }
+
+    // Put points in the correct order
+    if (r.x < l.x){
+        swap(r,l);
+    }
+}
+
+/**
+ * Find various line dimensions:
+ *                            - Height
+ *                            - Width
+ *                            - Length
+ */
+void VisualLine::findDimensions()
+{
+
+}
+
+/**
+ * Calculate the position of the line relative to the robot rather
+ * than just in the image frame
+ */
+void VisualLine::find3DCoords()
+{
+
+}
+
+bool VisualLine::isLineEdge(const HoughLine& line,
+                            const Gradient& g,
+                            double x0, double y0,
+                            int& _x, int& _y)
+{
+    // Look 3 points on either side of line for an edge in the same
+    // direction
+    for(double u = -edge_pt_buffer; u <= edge_pt_buffer; u += 1.0){
+
+        int x = static_cast<int>(line.getCosT() * u + x0);
+        int y = static_cast<int>(line.getSinT() * u + y0);
+
+        if (y < 0 || x < 0 || y > IMAGE_WIDTH || x > IMAGE_WIDTH){
+            continue;
+        }
+
+        if (g.peaks[y][x] != -1){
+            int tDiff = abs(((g.peaks[y][x] - line.getTIndex()) & 0xff)
+                            << 24 >> 24);
+            if(tDiff < angle_epsilon){
+                _x = x;
+                _y = y;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
@@ -63,6 +208,7 @@ VisualLine::VisualLine(list<linePoint> &linePoints)
 
 VisualLine::VisualLine(const VisualLine& other)
     : VisualLandmark<lineID>(other),
+      tr(other.tr), tl(other.tl), br(other.br), bl(other.bl),
       start(other.start), end(other.end), leftBound(other.leftBound),
       rightBound(other.rightBound),
       bottomBound(other.bottomBound),

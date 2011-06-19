@@ -5,11 +5,13 @@
 #include <iostream>
 #include <stdio.h>
 
-extern "C" void _sobel_operator(const uint8_t thresh,
+extern "C" void _sobel_operator(int bound,
+                                const uint8_t thresh,
                                 const uint16_t *input,
                                 uint16_t *out);
-extern "C" void _find_edge_peaks(const uint16_t *gradients,
-                                 uint16_t *angles);
+extern "C" int _find_edge_peaks(int bound,
+                                const uint16_t *gradients,
+                                Gradient::AnglePeak *angles);
 using boost::shared_ptr;
 using namespace std;
 
@@ -24,12 +26,13 @@ EdgeDetector::EdgeDetector(boost::shared_ptr<Profiler> p, uint8_t thresh):
  *
  * @param channel      The entire channel (one of Y, U, or V)
  */
-void EdgeDetector::detectEdges(const uint16_t* channel,
-                               shared_ptr<Gradient> gradient)
+void EdgeDetector::detectEdges(int upperBound,
+                               const uint16_t* channel,
+                               Gradient& gradient)
 {
     PROF_ENTER(profiler, P_EDGES);
-    sobelOperator(channel, gradient);
-    findPeaks(gradient);
+    sobelOperator(upperBound, channel, gradient);
+    findPeaks(upperBound, gradient);
     PROF_EXIT(profiler,P_EDGES);
 }
 
@@ -44,14 +47,16 @@ void EdgeDetector::detectEdges(const uint16_t* channel,
  * @param channel     The channel with edges to be detected.
  * @param gradient    Gradient struct to be populated.
  */
-void EdgeDetector::sobelOperator(const uint16_t* channel,
-                                 shared_ptr<Gradient> gradient)
+void EdgeDetector::sobelOperator(int upperBound,
+                                 const uint16_t* channel,
+                                 Gradient& gradient)
 {
     PROF_ENTER(profiler, P_SOBEL);
 #ifdef USE_MMX
-    _sobel_operator(threshold, &channel[0], gradient->values);
+    _sobel_operator(upperBound, threshold,
+                    &channel[0], &gradient.values[0][0]);
 #else
-    for (int i=1; i < Gradient::rows-1; ++i){
+    for (int i=1+upperBound; i < Gradient::rows-1; ++i){
         for (int j=1; j < Gradient::cols-1; ++j) {
 
             int xGrad = (
@@ -78,8 +83,8 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
             xGrad = -xGrad;
             yGrad = -yGrad;
 
-            gradient->setX(static_cast<int16_t>(xGrad), i, j);
-            gradient->setY(static_cast<int16_t>(yGrad), i, j);
+            gradient.setX(static_cast<int16_t>(xGrad), i, j);
+            gradient.setY(static_cast<int16_t>(yGrad), i, j);
 
             xGrad = xGrad << 3;
             yGrad = yGrad << 3;
@@ -94,8 +99,7 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
 
             // All non above threshold points are zero
             mag = max(0, mag-((threshold*threshold) >> 10));
-
-            gradient->setMagnitude(static_cast<uint16_t>(mag), i, j);
+            gradient.setMagnitude(static_cast<uint16_t>(mag), i, j);
         }
     }
 #endif /* USE_MMX */
@@ -119,11 +123,13 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
  *
  * @param gradient Gradient to check for points.
  */
-void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
+void EdgeDetector::findPeaks(int upperBound, Gradient& gradient)
 {
     PROF_ENTER(profiler, P_EDGE_PEAKS);
 #ifdef USE_MMX
-    _find_edge_peaks(gradient->values, gradient->angles);
+    gradient.numPeaks = _find_edge_peaks(upperBound,
+                                         &gradient.values[0][0],
+                                         gradient.angles);
 #else
     /**************** IMPORTANT NOTE: **********************
      *
@@ -135,33 +141,31 @@ void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
      * This has the effect of shrinking the image in by 4 rows and
      * columns, but oh well.
      */
-    for (int i=2; i < Gradient::rows-2; ++i) {
-        for (int j=2; j < Gradient::cols-2; ++j){
+    for (int16_t i=2+upperBound; i < Gradient::rows-2; ++i) {
+        for (int16_t j=2; j < Gradient::cols-2; ++j){
 
-            gradient->peaks[i][j] = false; // Not a peak yet
-            const int z = gradient->getMagnitude(i,j);
+            const int z = gradient.getMagnitude(i,j);
             if (z > 0){
-                const int y = gradient->getY(i,j);
-                const int x = gradient->getX(i,j);
+                const int y = gradient.getY(i,j);
+                const int x = gradient.getX(i,j);
 
                 // Get the highest 3 bits of the direction
-                const int a = (gradient->dir3(y,x));;
+                const int a = (Gradient::dir3(y,x));;
 
-                if (z > gradient->getMagnitude(i + Gradient::dyTab[a],
+                if (z > gradient.getMagnitude(i + Gradient::dyTab[a],
                                                j + Gradient::dxTab[a]) &&
-                    z >= gradient->getMagnitude(i - Gradient::dyTab[a],
-                                                j - Gradient::dxTab[a])){
-                    gradient->peaks[i][j] = true;
+                    z >= gradient.getMagnitude(i - Gradient::dyTab[a],
+                                               j - Gradient::dxTab[a])){
+                    gradient.addAngle(Gradient::dir(y,x),
+                                      static_cast<int16_t>(j - IMAGE_WIDTH/2),
+                                      static_cast<int16_t>(i - IMAGE_HEIGHT/2));
                 }
-            }
-            if (!gradient->peaks[i][j]){
-                gradient->setX(0,i,j);
-                gradient->setY(0,i,j);
-                gradient->setMagnitude(0,i,j);
             }
         }
     }
 #endif
+
+    gradient.updatePeakGrid();
     PROF_EXIT(profiler, P_EDGE_PEAKS);
 }
 

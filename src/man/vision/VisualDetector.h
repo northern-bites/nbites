@@ -22,7 +22,7 @@ public:
     VisualDetector() { };
     virtual ~VisualDetector() { };
 
-    virtual void detect(const uint16_t * image) = 0;
+    virtual void detect(int upperBound, const uint16_t * image) = 0;
 
     // @TODO: Implement!
     // virtual void identify(Context *context) = 0;

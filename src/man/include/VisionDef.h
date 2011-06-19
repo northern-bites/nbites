@@ -222,6 +222,16 @@ inline static double MICRO2DEG(const long x) {
   return RAD2DEG(MICRO2RAD(x));
 }
 
+namespace VisionDef {
+
+    enum {
+        top_edge = 0,
+        bottom_edge,
+        left_edge,
+        right_edge,
+        num_edges
+    };
+};
 
 #endif // VisionDef_h_DEFINED
 

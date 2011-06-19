@@ -83,21 +83,23 @@ public:
     void setImage(const uint16_t* image);
 
     // visualization methods
-    void drawBoxes(void);
-    void drawFieldObject(VisualFieldObject* obj, int color);
-    void drawCrossbar(VisualCrossbar* obj, int color);
     void drawBox(int left, int right, int bottom, int top, int c);
+    void drawBoxes(void);
     void drawCenters(void);
-    void drawRect(int left, int top, int width, int height, int c);
-    void drawLine(int x, int y, int x1, int y1, int c);
+    void drawCrossbar(VisualCrossbar* obj, int color);
+    void drawDot(int x, int y, int c);
+    void drawEdges(Gradient& g);
+    void drawFieldLines();
+    void drawFieldObject(VisualFieldObject* obj, int color);
+    void drawHoughLines(const std::list<HoughLine>& lines);
     void drawLine(boost::shared_ptr<VisualLine> line, const int color);
     void drawLine(const point<int> start, const point<int> end,
-		  const int c);
-    void drawDot(int x, int y, int c);
-    void drawFieldLines();
-    void drawX(int x, int y, int c);
+                  const int c);
+    void drawLine(int x, int y, int x1, int y1, int c);
     void drawPoint(int x, int y, int c);
-
+    void drawRect(int left, int top, int width, int height, int c);
+    void drawVisualLines(const vector<VisualLine>& lines);
+    void drawX(int x, int y, int c);
 
     //
     // SETTERS
@@ -197,8 +199,6 @@ private:
 
     // information
     std::string colorTable;
-
-
 };
 
 #endif // _Vision_h_DEFINED

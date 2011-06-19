@@ -21,6 +21,7 @@
 .equiv  yGrad, imgHt * yPitch * 2
 
         .struct 8
+bound_sobel_param:  .skip 4
 thresh: .skip 4
 inImg:  .skip 4
 outImg:
@@ -28,14 +29,17 @@ outImg:
 # Tables and structs for Edge Peak Loop
 #
         ## Parameter struct
-                .struct 8
-gradients_param:      .skip 4
-angles_param:
+                        .struct 8
+bound_peak_param:       .skip 4
+gradients_param:        .skip 4
+angles_param:           .skip 4
 
         ## Stack layout
                 .struct 0
 row_count:      .skip 4
 angles_ptr:     .skip 4
+num_peaks:      .skip 4
+bound_val:         .skip 4
 end_of_peak_stack:
 
         .equiv neighborOffset, 12*4
@@ -155,8 +159,7 @@ atanTable:
 
 .section .text
 
-        ## _sobel_operator(uint8_t thresh, uint16_t *yimg, int16_t  *outX,
-        ##                 int16_t *outY, uint16_t *mag)
+        ## _sobel_operator(int bound, uint8_t thresh, uint16_t *in, int16_t* out);
 _sobel_operator:
         push    ebp
         mov     ebp, esp
@@ -169,6 +172,9 @@ _sobel_operator:
 
         ## Load arguments into registers
 
+        ## Load bound on starting row
+        mov     eax, [ebp + bound_sobel_param]
+
         ## We have to move destination registers to the ends of the next row
         ##
         ## | o | o | o | <- source comes from this row
@@ -180,16 +186,23 @@ _sobel_operator:
         pmullw  mm6, mm6
         psrlw   mm6, 10
 
+
+        imul    eax, yPitch
         mov     esi, [ebp + inImg]
+        add     esi, eax        # Move forward to bound-th row
 
         pcmpeqb mm7, mm7
         pandn   mm7, mm7
 
         mov     edi, [ebp + outImg]
-        add     edi, yPitch # Adjust destination pointer to second row
+        add     edi, yPitch     # Adjust destination pointer to second row
+        add     edi, eax        # Move dest pointer forward by 'bound' rows
 
         # Actually only does from top row through third to bottom
         mov     ebx, 238
+        # We start at the "bound" row, so do fewer
+        sub     ebx, dword ptr[ebp+bound_sobel_param]
+
 sobel_yLoop:
         ## 4 pixels processed each iteration (320 per row / 4 = 80 iterations)
         mov     ecx, 80
@@ -278,7 +291,7 @@ sobel_xLoop:
 
 .section        .text
 
-        ## _find_edge_peaks(int16_t *gradients, uint16_t *output)
+        ## _find_edge_peaks(int bound, int16_t *gradients, uint16_t *output)
         ##
         ## General Registers:
         ##      eax     y gradient, then max(xGrad, yGrad), then binary angle
@@ -290,7 +303,9 @@ sobel_xLoop:
         ##      ebp     offset to gradient direction neighbors for peak test
         ##
         ## Stack:
-        ##      [esp]       y index counter
+        ##      [esp + row_count]       y index counter
+        ##      [esp + angles_ptr]      pointer to output (angles) array
+        ##      [esp + num_peaks]       number of peaks found
 
 _find_edge_peaks:
         ## Load output address
@@ -300,7 +315,11 @@ _find_edge_peaks:
         push    edi
         push    ebx
 
+        mov     ecx, dword ptr[esp + bound_peak_param + 12]
+        imul    ebx, ecx, yPitch # move forward by 'bound' rows
+
         mov     edi, dword ptr[esp + gradients_param + 12]
+        add     edi, ebx
 
         ## Move foward to first usable gradient point
         ## This is 2 rows down (since row 0 has no gradient values and
@@ -314,10 +333,15 @@ _find_edge_peaks:
         mov     eax, dword ptr[esp + angles_param + 12]
 
         sub     esp, end_of_peak_stack
+        mov     dword ptr[esp + bound_val], ecx
         mov     dword ptr[esp + angles_ptr], eax
 
+        mov     dword ptr[esp + num_peaks], 0
+
         ## 240 rows, 238 gradient magnitudes, 236 possible peak rows
-        mov     dword ptr[esp + row_count], 237
+        mov     ebx, 237
+        sub     ebx, dword ptr[esp + bound_val]
+        mov     dword ptr[esp + row_count], ebx
 
         cld                             # search increasing addresses
 
@@ -331,19 +355,31 @@ peaks_xLoop:
                                         # or until end of row
         jz      peaks_xLoop_end         # end of row or non-zero value found?
 
+############################################
+### Functionally equivalent, but slower loop, here for explanation of
+###      what is going on in 'repe scasw'
+############################################
+## above:  add     edi, 2
+##         dec     ecx
+##         jz      peaks_xLoop_end
+
+##         cmp     eax, [edi-2]
+##         je      above
+
         # Found next magnitude above noise threshold. Here
         #       edi     -> one word past the non-zero
         #                  (i.e. >= noise threshold) squared magnitude.
         #       ecx     count remaining in current row
         #               (x coordinate is offset from this value)
+        prefetch [edi - xPitch]
+        prefetch [edi - xPitch - yPitch]
+        prefetch [edi - xPitch + yPitch]
 
         # Fetch y gradient, compute absolute value, save sign bit in edx
-        prefetch [edi - xPitch]
         movsx   eax, word ptr [edi - xPitch + yGrad]
         cdq
         xor     eax, edx
         sub     eax, edx
-        prefetch [edi - xPitch + yPitch]
 
         # Fetch x gradient, compute absolute value, shift sign bit into edx
         movsx   ebx, word ptr [edi - xPitch + xGrad]
@@ -373,7 +409,12 @@ peaks_xLoop:
 
         # Peak?
         movzx   esi, word ptr[edi + ebp - xPitch]
-        neg     ebp             # Find opposite of gradient
+
+        # It's an asymmetric peak test
+        # (neighbor-1 < peak < otherNeighbor) equiv (neighbor <= peak < otherNeighbor)
+        # since we're using integers
+        dec     esi
+        neg     ebp             # Find opposite neighbor offset
 
         ## INTERLACED instructions (watch out, could get confusing,
         ##                                      don't hurt yourself)
@@ -389,7 +430,7 @@ peaks_xLoop:
         cmp     si, word ptr[edi + ebp - xPitch]
         cmovb   si, word ptr[edi + ebp - xPitch]
         cmp     si, word ptr[edi - xPitch]
-        jb      peaks_xLoop
+        ja      peaks_xLoop     # If curpix.mag > max(neighbor1.mag, neighbor2.mag)
 
         # lookup reciprocal, U16.16
         movzx   eax, word ptr [recipTable + eax*2]
@@ -423,12 +464,15 @@ peaks_xLoop:
         ## for instance, on first pixel in image,
         ## ecx will be at 315 (not 316 still, since it gets decremented once
         ## in the 'repe scasw' instruction)
-        mov     edx, 317
+
+        ## Calculate the coordinate relative to the image center, also
+        mov     edx, 317 - imgWd/2
         sub     edx, ecx
         mov     word ptr[esi + 2], dx
 
         ## Load y coordinate and write it out
-        mov     edx, 238
+        ## Calculate the coordinate relative to the image center
+        mov     edx, 238 - imgHt/2
         sub     edx, dword ptr[esp + row_count]
 
         ## 236 >= row_count >= 0, must write out starting from 2 --> 238
@@ -436,6 +480,8 @@ peaks_xLoop:
 
         ## Move angles ptr forward to the next location in the array
         add     dword ptr[esp + angles_ptr], 6
+
+        inc     dword ptr[esp + num_peaks]
 
         jmp     peaks_xLoop
 
@@ -450,8 +496,10 @@ peaks_xLoop_end:
         ## Put zeros in the x,y, angle spots for the element after the
         ## last in the list of edge peaks. Signals end of list to user.
         mov     word ptr[esi], 0
-        mov     word ptr[esi+2], 0
-        mov     word ptr[esi+4], 0
+        mov     word ptr[esi+2], 0 - imgWd/2 # Relative to image center
+        mov     word ptr[esi+4], 0 - imgHt/2
+
+        mov     eax, [esp + num_peaks]
 
         ## Clean up and return
         add     esp, end_of_peak_stack

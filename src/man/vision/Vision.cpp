@@ -134,7 +134,12 @@ void Vision::notifyImage() {
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
-    // linesDetector.detect(yImg);
+
+    linesDetector.detect(thresh->getVisionHorizon(), yImg);
+
+    drawEdges(*linesDetector.getEdges());
+    drawHoughLines(linesDetector.getHoughLines());
+    drawVisualLines(*linesDetector.getLines());
     PROF_EXIT(profiler, P_VISION);
 }
 
@@ -539,4 +544,54 @@ void Vision::drawPoint(int x, int y, int c)
         thresh->debugImage[y][x-2] = static_cast<unsigned char>(c);
     }
 #endif
+}
+
+void Vision::drawEdges(Gradient& g)
+{
+#ifdef OFFLINE
+    if (thresh->debugEdgeDetection){
+        for (int i=0; g.isPeak(i); ++i) {
+            drawDot(g.getAnglesXCoord(i) + IMAGE_WIDTH/2,
+                    g.getAnglesYCoord(i) + IMAGE_HEIGHT/2,
+                    PINK);
+        }
+    }
+#endif
+}
+
+void Vision::drawHoughLines(const list<HoughLine>& lines)
+{
+#ifdef OFFLINE
+    if (thresh->debugHoughTransform){
+
+        list<HoughLine>::const_iterator line;
+        for (line = lines.begin() ; line != lines.end(); line++){
+            const double sn = line->getSinT();
+            const double cs = line->getCosT();
+
+            double uStart = 0, uEnd = 0;
+            HoughLine::findLineImageIntersects(*line, uStart, uEnd);
+
+            const double x0 = line->getRadius() * cs + IMAGE_WIDTH/2;
+            const double y0 = line->getRadius() * sn + IMAGE_HEIGHT/2;
+
+            for (double u = uStart; u <= uEnd; u+=1.){
+                int x = (int)round(x0 + u * sn);
+                int y = (int)round(y0 - u * cs); // cs goes opposite direction
+                drawDot(x,y, BLUE);
+            }
+        }
+    }
+#endif
+}
+
+void Vision::drawVisualLines(const vector<VisualLine>& lines)
+{
+    if (thresh->debugVisualLines){
+        vector<VisualLine>::const_iterator line;
+        for (line = lines.begin(); line != lines.end(); line++){
+            drawLine(line->tr, line->tl, MAROON);
+            drawLine(line->br, line->bl, MAROON);
+        }
+    }
 }

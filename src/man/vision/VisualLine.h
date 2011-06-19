@@ -8,6 +8,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "ConcreteLine.h"
+#include "geom/HoughLine.h"
+#include "Gradient.h"
 #include "VisualLandmark.h"
 
 class VisualLine;
@@ -80,14 +82,26 @@ class YOrder {
 #include "Utility.h"
 
 class VisualLine : public VisualLandmark<lineID> {
+    // Private constants
+    enum {
+        edge_pts_for_line = 6,
+        edge_pt_buffer = 4,
+        angle_epsilon = 5
+    };
+
+
  public: // Constants
-    // number of points to be a valid line
+    // New HoughLine variables
+    point<int> tr, tl, br, bl;  // top right/left, bottom right/left
+
     static const unsigned int NUM_POINTS_TO_BE_VALID_LINE = 3;
 
  public:
     VisualLine(std::list<std::list<linePoint>::iterator> &listOfIterators);
     VisualLine(std::list<linePoint> &listOfPoints);
     VisualLine();
+    VisualLine(const HoughLine& a, const HoughLine& b, const Gradient& g);
+
     VisualLine(float _dist, float _bearing);
     VisualLine(const VisualLine& other);
     ~VisualLine();
@@ -132,6 +146,19 @@ class VisualLine : public VisualLandmark<lineID> {
         }
 
  private: // Member functions
+
+    void findEndpoints(const HoughLine& a,
+                       const HoughLine& b,
+                       const Gradient& g);
+    void findDimensions();
+    void find3DCoords();
+    void findLineEdgeEnds(const HoughLine& line, const Gradient& g,
+                          point<int>& r, point<int>& l);
+    bool isLineEdge(const HoughLine& line,
+                    const Gradient& g,
+                    double x0, double y0,
+                    int& _x, int& _y);
+
     void init();
     void calculateWidths();
     const float calculateAngle() const;

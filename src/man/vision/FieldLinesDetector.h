@@ -2,13 +2,15 @@
 #define _FieldLinesDetector_h_DEFINED
 
 #include <list>
+#include <vector>
 
-#include "VisualDetector.h"
-#include "VisualCorner.h"
-#include "VisualLine.h"
 #include "EdgeDetector.h"
+#include "geom/HoughLine.h"
 #include "HoughSpace.h"
 #include "Profiler.h"
+#include "VisualCorner.h"
+#include "VisualDetector.h"
+#include "VisualLine.h"
 
 class FieldLinesDetector : VisualDetector
 {
@@ -17,25 +19,34 @@ public:
     virtual ~FieldLinesDetector() { };
 
     // VisualDetector interface
-    virtual void detect(const uint16_t *img);
-
-    // FieldLines interface
-    std::list<VisualLine> getLines(){ return std::list<VisualLine>(); }
-    std::list<VisualCorner> getCorners(){ return std::list<VisualCorner>(); }
+    virtual void detect(int upperBound, const uint16_t *img);
 
     // Parameter Interface
     void setEdgeThreshold(int thresh);
     void setHoughAcceptThreshold(int thresh);
 
+    Gradient* getEdges() { return &gradient; }
+    std::list<HoughLine> getHoughLines() const;
+
+    // FieldLines interface
+    std::vector<VisualLine>* getLines() {
+        return &lines;
+    };
+    std::list<VisualCorner>* getCorners() {
+        return &corners;
+    }
+
 private:
-    void findHoughLines(const uint16_t *img);
+    void findHoughLines(int upperBound, const uint16_t *img);
     void findFieldLines();
 
 private:
     EdgeDetector edges;
     HoughSpace hough;
-    boost::shared_ptr<Gradient> gradient;
-    std::list<HoughLine> houghLines;
+    Gradient gradient;
+    std::list<std::pair<HoughLine, HoughLine> > houghLines;
+    std::vector<VisualLine> lines;
+    std::list<VisualCorner> corners;
 };
 
 #endif /* _FieldLinesDetector_h_DEFINED */

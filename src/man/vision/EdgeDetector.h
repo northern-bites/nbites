@@ -1,6 +1,7 @@
 #ifndef EdgeDetector_h_DEFINED
 #define EdgeDetector_h_DEFINED
 
+#include "visionconfig.h"
 #include "VisionDef.h"
 #include "Gradient.h"
 #include "Profiler.h"
@@ -23,22 +24,25 @@ public:
  * Public interface
  */
 public:
-    void detectEdges(const uint16_t* channel,
-                     boost::shared_ptr<Gradient> gradient);
+    void detectEdges(int upperBound,
+                     const uint16_t* channel,
+                     Gradient& gradient);
 
-    uint8_t  getThreshold()           { return threshold; }
-    void setThreshold(uint8_t thresh) { threshold = thresh; }
+    void    setThreshold(uint8_t thresh) { threshold = thresh; }
+    uint8_t getThreshold() { return threshold; }
 
 private:
-    void sobelOperator(const uint16_t* channel,
-                       boost::shared_ptr<Gradient> gradient);
-    void findPeaks(boost::shared_ptr<Gradient> gradient);
+    void sobelOperator(int upperBound,
+                       const uint16_t* channel,
+                       Gradient& gradient);
 
+    void findPeaks(int upperBound, Gradient& gradient);
+
+private:
     enum {
-        default_edge_value = 30
+        default_edge_value = 75
     };
 
-private:
     boost::shared_ptr<Profiler> profiler;
     uint8_t threshold;
 };

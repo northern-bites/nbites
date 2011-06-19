@@ -7,6 +7,7 @@
 #include <iostream>
 #include "VisionDef.h"
 #include "Common.h"
+#include "Structs.h"
 
 
 /**
@@ -14,123 +15,176 @@
  */
 class Gradient
 {
+    // Structures and constants
+public:
+    // x, y coords are stored relative to image center (origin)
+    struct AnglePeak {
+        uint16_t angle;
+        int16_t x;
+        int16_t y;
+    };
+
+    enum {
+        // Row Offsets in value array
+        magnitudes = 0,
+        x_grads = IMAGE_HEIGHT,
+        y_grads = IMAGE_HEIGHT * 2,
+
+        num_angles_limit = IMAGE_WIDTH * IMAGE_HEIGHT /2,
+    };
+
     // Public member functions
 public:
-    Gradient();
+    explicit Gradient();
     virtual ~Gradient() { };
 
-    static inline int dir(int y, int x) {
-        return static_cast<int>(atan2(y, x) / M_PI * 128.0) & 0xff;
+    // MUST BE CALLED EVERY FRAME BEFORE REUSING A GRADIENT OBJECT
+    void reset();
+
+    void clear();
+    void clearPeakGrid();
+    int peaks_list_contains(int i, int j);
+    void printAnglesList();
+    void updatePeakGrid();
+    void createLineAtPoint(uint8_t angle, float radius);
+
+    void createSegment(const point<int>& l,
+                       const point<int>& r);
+
+
+    inline void addAngle(uint8_t angle, int16_t x, int16_t y){
+        angles[numPeaks].angle = angle;
+        angles[numPeaks].x     = x;
+        angles[numPeaks].y     = y;
+        numPeaks++;
     }
 
-    void reset();
+    inline bool isPeak(int n){
+        return (n < numPeaks);
+    }
+
+    static inline uint8_t dir(int y, int x) {
+        return static_cast<uint8_t>(atan2(y, x) / M_PI * 128.0) & 0xff;
+    }
 
     /**
      * Calculate the highest three bits of an angle for the given y and x
      */
-    static inline int dir3(int y, int x) {
-        unsigned int d = 0x0;
-        //http://www-graphics.stanford.edu/~seander/bithacks.html#ConditionalSetOrClearBitsWithoutBranching
-        // w = (w & ~m) | (-f & m);
+    static inline uint8_t dir3(int y, int x) {
+        uint8_t d = 0x0;
+        if (y <0){
+            d |= 0x4;
+        }
 
-        // if (y <0){
-        //     d |= 0x4;
-        // }
-        d = ( d & ~0x4) | ( -(y<0) & 0x4);
-
-        // if ((x^y) < 0){
-        //     d |= 0x2;
-        // }
-        d = (d & ~0x2) | ( -((x^y) < 0) & 0x2);
+        if ((x^y) < 0){
+            d |= 0x2;
+        }
 
 
-        // if (d & 0x2) {
-        //     if (abs(x) > abs(y)){
-        //         d |= 0x1;
-        //     }
-        // } else if (abs(x) < abs(y)){
-        //     d |= 0x1;
-        // }
-        d = (d & 0x2) ? ((d & 0x1) | (- (abs(x) > abs(y)) & 0x1)) :
-                         (d & 0x1) | (- (abs(x) < abs(y)) & 0x1);
+        if (d & 0x2) {
+            if (abs(x) > abs(y)){
+                d |= 0x1;
+            }
+        } else if (abs(x) < abs(y)){
+            d |= 0x1;
+        }
 
-        return (d);
+        return d;
     }
+
+// **********************************************
+//                    Getters
+// **********************************************
 
     // Values are all offset by one (see EdgeDetection.s)
-    uint16_t getMagnitude(int i, int j){
-        return values[i * IMAGE_WIDTH + j + magnitudes + 1];
+    inline uint16_t getMagnitude(int i, int j){
+#ifdef USE_MMX
+        return (values[i + magnitudes][j+1]);
+#else
+        return (values[i + magnitudes][j]);
+#endif
     }
 
-    int16_t getX(int i, int j){
-        return values[i * IMAGE_WIDTH + j + x_grads + 1];
+    inline int16_t getX(int i, int j){
+#ifdef USE_MMX
+        return values[i + x_grads][j+1];
+#else
+        return values[i + x_grads][j];
+#endif
     }
 
-    int16_t getY(int i, int j){
-        return values[i * IMAGE_WIDTH + j + y_grads + 1];
-    }
-
-    void setMagnitude(uint16_t v, int i, int j){
-        values[i * IMAGE_WIDTH + j + magnitudes + 1] = v;
-    }
-
-    void setX(int16_t v, int i, int j){
-        values[i * IMAGE_WIDTH + j + x_grads + 1] = v;
-    }
-
-    void setY(int16_t v, int i, int j){
-        values[i * IMAGE_WIDTH + j + y_grads + 1] = v;
+    inline int16_t getY(int i, int j){
+#ifdef USE_MMX
+        return values[i + y_grads][j + 1];
+#else
+        return values[i + y_grads][j];
+#endif
     }
 
     // Return the nth angle in the angles array
-    uint8_t getAngle(int n){
-        return static_cast<uint8_t>(angles[n*3 + angles_offset]);
+    inline uint8_t getAngle(int n){
+        return static_cast<uint8_t>(angles[n].angle);
     }
 
     // Return the nth x coordinate in the angles array
-    uint16_t getAnglesXCoord(int n){
-        return angles[n*3 + angles_x_offset];
+    inline int16_t getAnglesXCoord(int n){
+        return angles[n].x;
     }
 
     // Return the nth y coordinate in the angles array
-    uint16_t getAnglesYCoord(int n){
-        return angles[n*3 + angles_y_offset];
+    inline int16_t getAnglesYCoord(int n){
+        return angles[n].y;
     }
 
-    int peaks_list_contains(int i, int j);
+// **********************************************
+//                    Setters
+// **********************************************
+
+    void setMagnitude(uint16_t v, int i, int j){
+#ifdef USE_MMX
+        values[i + magnitudes][j + 1] = v;
+#else
+        values[i + magnitudes][j] = v;
+#endif
+    }
+
+    void setX(int16_t v, int i, int j){
+#ifdef USE_MMX
+        values[i + x_grads][j + 1] = v;
+#else
+        values[i + x_grads][j] = v;
+#endif
+    }
+
+    void setY(int16_t v, int i, int j){
+#ifdef USE_MMX
+        values[i + y_grads][j + 1] = v;
+#else
+        values[i + y_grads][j] = v;
+#endif
+    }
+
 
     // Public member variables
-
-    // Values is all the arrays in one, the others get pointers within
-    // 'values'
-    uint16_t *values;
+public:
+    int numPeaks;
     enum {
-        magnitudes = 0,
-        x_grads = IMAGE_WIDTH * IMAGE_HEIGHT,
-        y_grads = IMAGE_WIDTH * IMAGE_HEIGHT * 2
+        rows = IMAGE_HEIGHT,
+        cols = IMAGE_WIDTH
     };
 
-    // Each angle has 3 values: angle, x coordinate, and y coordinate
-    uint16_t *angles;
+    // Values is the 3 magnitude, x, & y gradient value arrays in one
+    uint16_t  values[rows*3][cols];
+    int16_t  peaks [rows][cols];
+    AnglePeak angles[num_angles_limit];
 
-    enum {
-        num_angles_limit = IMAGE_WIDTH * IMAGE_HEIGHT /2,
-        angles_size = num_angles_limit * 3,
-        angles_offset = 0,
-        angles_x_offset = 1,
-        angles_y_offset = 2,
-    };
-
-    bool peaks[IMAGE_HEIGHT][IMAGE_WIDTH];
-
-    const static int rows = IMAGE_HEIGHT;
-    const static int cols = IMAGE_WIDTH;
     // Tables that specify the + neighbor of a pixel indexed by
     // gradient direction octant (the high 3 bits of direction).
     const static int DIRECTIONS = 8;
     const static int dxTab[DIRECTIONS];
     const static int dyTab[DIRECTIONS];
-
+private:
+    Gradient(const Gradient& other);
 };
 
 #endif /* _Gradient_h_DEFINED */
