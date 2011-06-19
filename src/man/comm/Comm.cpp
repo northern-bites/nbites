@@ -138,20 +138,20 @@ static PyObject * PyComm_start (PyObject *self, PyObject *)
 
         result = ((PyComm*)self)->comm->start();
 
-    Py_END_ALLOW_THREADS
+    Py_END_ALLOW_THREADS;
 
-        if (result == -1) {
-            PyErr_SetString(PyExc_RuntimeError,
-                            "Comm threads have already started");
-            return NULL;
-        }else if (result > 0) {
-            PyErr_Format(PyExc_RuntimeError,
-                         "pthreads return error code %i", result);
-            return NULL;
-        }else {
-            Py_INCREF(Py_None);
-            return Py_None;
-        }
+	if (result == -1)
+		PyErr_SetString(PyExc_RuntimeError,
+						"Comm threads have already started");
+	else if (result > 0)
+		PyErr_Format(PyExc_RuntimeError,
+					 "pthreads return error code %i", result);
+	else
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	return NULL;
 }
 
 // stops Comm Thread from Python
@@ -161,9 +161,9 @@ static PyObject * PyComm_stop (PyObject *self, PyObject *)
 
         ((PyComm*)self)->comm->stop();
 
-    Py_END_ALLOW_THREADS
+    Py_END_ALLOW_THREADS;
 
-        Py_INCREF(Py_None);
+	Py_INCREF(Py_None);
     return Py_None;
 }
 
