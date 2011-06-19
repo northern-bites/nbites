@@ -123,15 +123,15 @@ class GoTeam:
     ######################################################
     def determineChaser(self, play):
         """return the team member who is the chaser"""
-        chaser_mate = self.me
+        chaser_mate = self.activeFieldPlayers[0]
 
         if PBConstants.DEBUG_DET_CHASER:
             self.printf("chaser det: me == #%g"% self.brain.my.playerNumber)
 
         #save processing time and skip the rest if we have the ball
-        if self.me.hasBall() and play.isChaser():
+        if self.brain.player.inKickingState and play.isChaser():
             if PBConstants.DEBUG_DET_CHASER:
-                self.printf("I have the ball")
+                self.printf("It's me")
             return chaser_mate
 
         # scroll through the teammates
@@ -139,13 +139,10 @@ class GoTeam:
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf("\t mate #%g"% mate.playerNumber)
 
-            # If the player number is me, or ball models are super divergent, ignore
-            if (mate == self.me):# or
-                #fabs(mate.ballX - self.me.ballX) > 150.):
+            # We can skip computation if the mate we are now considering is the chaser_mate.
+            if (mate == chaser_mate):
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf("it's me")
-                if (self.brain.player.inKickingState):
-                    return self.me
+                    self.printf("mate %g is chaser_mate already." % mate.playerNumber)
                 continue
 
             elif mate.hasBall():
@@ -160,20 +157,20 @@ class GoTeam:
                 else:
                     chaseTimeScale = mate.chaseTime
 
-                if self.shouldCallOff(mate, chaser_mate, chaseTimeScale):
+                if self.shouldCallOff(chaser_mate, mate, chaseTimeScale):
                     if PBConstants.DEBUG_DET_CHASER:
                         self.printf("\t #%d @ %g >= #%d @ %g, shouldCallOff" %
                                (mate.playerNumber, mate.chaseTime,
                                 chaser_mate.playerNumber,
                                 chaser_mate.chaseTime))
-                    continue
+                    if self.shouldListen(chaser_mate, mate, chaseTimeScale):
+                        if PBConstants.DEBUG_DET_CHASER:
+                            self.printf(("\t #%d @ %g <= #%d @ %g, shouldListen" %
+                                         (mate.playerNumber, mate.chaseTime,
+                                          chaser_mate.playerNumber,
+                                          chaser_mate.chaseTime)))
+                        continue
 
-                elif self.shouldListen(mate, chaser_mate, chaseTimeScale):
-                    if PBConstants.DEBUG_DET_CHASER:
-                        self.printf(("\t #%d @ %g <= #%d @ %g, shouldListen" %
-                                      (mate.playerNumber, mate.chaseTime,
-                                       chaser_mate.playerNumber,
-                                       chaser_mate.chaseTime)))
                     chaser_mate = mate
 
                 # else pick the lowest chaseTime
@@ -191,30 +188,26 @@ class GoTeam:
         # returns teammate instance (could be mine)
         return chaser_mate
 
-    def shouldCallOff(self, mate, chaser_mate, chaseTimeScale):
-        """Helper method for determineChaser"""
-        # chaser_mate = A, mate = B.
-        # A will still be chaser_mate if:
-        # [ (chaseTime(A) - chaseTime(B) < e) or
-        #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
-        # and no higher robot calling off A. # @TODO!!!! this is built into the for loop pattern. we don't need this check. It's only if a higher robot is calling off A.
-        return((chaser_mate.chaseTime - mate.chaseTime <
-                PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
-                (chaser_mate.chaseTime - mate.chaseTime <
-                 PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
-                 chaser_mate.isTeammateRole(PBConstants.CHASER))) and
-               mate.playerNumber < chaser_mate.playerNumber)
-
-    def shouldListen(self, mate, chaser_mate, chaseTimeScale):
-        """Helper method for determineChaser"""
+    def shouldCallOff(self, chaser_mate, mate, chaseTimeScale):
+        """Decides if mate shouldCallOff the chaser_mate"""
         # mate = A, chaser_mate = B.
         # A will become chaser_mate if:
-        # chaseTime(A) < chaseTime(B) - m and # @TODO!!!! this isn't what's in the code. Reconsider the order of the should____ checks. Figure this out.
+        # [ (chaseTime(A) - chaseTime(B) < e) or
+        #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
+        return(((mate.chaseTime - chaser_mate.chaseTime) <
+                (PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale)) or
+               ((mate.chaseTime - chaser_mate.chaseTime) <
+                (PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale) and
+                chaser_mate.isTeammateRole(PBConstants.CHASER)))
+
+    def shouldListen(self, mate, chaser_mate, chaseTimeScale):
+        """Decides if mate should listen to the chaser_mate after calling off"""
+        # mate = A, chaser_mate = B.
+        # A will relinquish chaser to chaser_mate if:
+        # chaseTime(B) < chaseTime(A) - m
         # A is higher robot that is already chaser.
-        return (mate.playerNumber > chaser_mate.playerNumber and
-                mate.chaseTime - chaser_mate.chaseTime <
-                PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
-                mate.isTeammateRole(PBConstants.CHASER))
+        return (chaser_mate.chaseTime < mate.chaseTime -
+                (PBConstants.LISTEN_THRESH + .45 * chaseTimeScale))
 
     def getLeastWeightPosition(self, positions, mates = None):
         """Gets the position for the robot such that the distance
