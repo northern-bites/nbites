@@ -144,6 +144,8 @@ class GoTeam:
                 #fabs(mate.ballX - self.me.ballX) > 150.):
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("it's me")
+                if (self.brain.player.inKickingState):
+                    return self.me
                 continue
 
             elif mate.hasBall():
@@ -193,8 +195,8 @@ class GoTeam:
         """Helper method for determineChaser"""
         # chaser_mate = A, mate = B.
         # A will still be chaser_mate if:
-        # [ (chaseTime(A) - minChaseTime(A,B) < e) or
-        #   (chaseTime(A) - minChaseTime(A,B) < d and already chasing)]
+        # [ (chaseTime(A) - chaseTime(B) < e) or
+        #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
         # and no higher robot calling off A. # @TODO!!!! this is built into the for loop pattern. we don't need this check. It's only if a higher robot is calling off A.
         return((chaser_mate.chaseTime - mate.chaseTime <
                 PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
