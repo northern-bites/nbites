@@ -133,7 +133,7 @@ uvDim:   .skip 8
 
    #######
  #########
-########## Y AVERAGING SECTION
+########## YUV SPLITTING SECTION
  #########
    #######
 
@@ -164,12 +164,12 @@ uvDim:   .skip 8
         ## mm3 after pack: | y3 | y2 | y1 | y0 |
         packssdw mm3, mm0
 
-        ## First write out goes at the pointer, next goes 8 bytes later
-        movntq [edi+ ecx*2 + 8 *((\phase-1)/2) + yImg], mm3
-
         ## Copy old and new values to temp registers
         movq    mm5, mm4
         movq    mm2, mm1
+
+        ## First write out goes at the pointer, next goes 8 bytes later
+        movntq [edi+ ecx*2 + 8 *((\phase-1)/2) + yImg], mm3
 
         ## Zero out V values
         pand    mm5, mm6
@@ -201,14 +201,21 @@ uvDim:   .skip 8
  #########
    #######
 
-        # Convert two y sums in words 0 and 2 to two table indicies
+        ##
+        ## Instructions here are interspersed to reduce dependencies
+        ##
+
+        # Convert two y sums (in mm0) in words 0 and 2 to two table indicies
         psubusw mm0, [edx + yZero]      # zero point
+
+        # Convert four u,v sums (in mm1) to four table indicies
+        psubusw mm1, [edx + uvZero]                 # zero point
+
         pmulhw mm0, [edx + ySlope]                  # slope
+
+        pmulhw mm1, [edx + uvSlope]                 # slope
         pminsw  mm0, [edx + yLimit]                 # limit to maximum value
 
-        # Convert four u,v sums to four table indicies
-        psubusw mm1, [edx + uvZero]                 # zero point
-        pmulhw mm1, [edx + uvSlope]                 # slope
         psllw   mm1, 1
         pminsw  mm1, [edx + uvLimit]                # limit to maximum value
 
