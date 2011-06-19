@@ -109,18 +109,12 @@ static PyObject * PyComm_setData (PyObject *self, PyObject *args)
     std::vector<float> values;
 
     int size = PyTuple_Size(args);
-    for (int i = 0; i < size; i++) {
-        // retrive i'th object
+    for (int i = 0; i < size; i++)
+	{
         current = PyTuple_GET_ITEM(args, i);
+        if (!PyNumber_Check(current))
+            PyErr_BadArgument()
 
-        // check type
-        if (!PyNumber_Check(current)) {
-            PyErr_SetString(PyExc_TypeError,
-                            "setData() expects all float or integer arguments");
-            return NULL;
-        }
-
-        // add it to the list
         values.push_back(static_cast<float>(PyFloat_AsDouble(current)));
     }
 
@@ -129,9 +123,9 @@ static PyObject * PyComm_setData (PyObject *self, PyObject *args)
         // set comm data
         ((PyComm*)self)->comm->setData(values);
 
-    Py_END_ALLOW_THREADS
+    Py_END_ALLOW_THREADS;
 
-        Py_INCREF(Py_None);
+	Py_INCREF(Py_None);
     return Py_None;
 }
 
