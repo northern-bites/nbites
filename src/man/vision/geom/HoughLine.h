@@ -24,7 +24,7 @@ public:
     inline int getTIndex()   const { return tIndex; }
     inline int getScore()    const { return score;  }
 
-    inline float getSinT()  const {
+    inline float getSinT() const {
         if (!didSin){
             didSin = true;
             sinT = sinf(t);
@@ -32,7 +32,7 @@ public:
         return sinT;
     }
 
-    inline float getCosT()   const {
+    inline float getCosT() const {
         if (!didCos){
             didCos = true;
             cosT = cosf(t);
@@ -43,13 +43,16 @@ public:
     static bool intersect(int x0, int y0,
                           const HoughLine& a, const HoughLine& b);
     friend std::ostream& operator<< (std::ostream &o,
-                                     const HoughLine &l){
+                                     const HoughLine &l) {
         return o << "Line: rIndex: " << l.rIndex << " tIndex: " << l.tIndex <<
             "\n\tr: " << l.r << " t:" << l.t << " score: " << l.score;
     }
 
-    bool operator==(const HoughLine &other);
-    bool operator!=(const HoughLine &other);
+    static void findLineImageIntersects(const HoughLine& line,
+                                        double& u1, double& u2);
+
+    bool operator==(const HoughLine &other) const;
+    bool operator!=(const HoughLine &other) const;
 
 private:
     int rIndex, tIndex;    // Radius, angle indices in HoughSpace table

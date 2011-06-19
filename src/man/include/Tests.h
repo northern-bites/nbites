@@ -10,6 +10,7 @@
 // #define EQ_INT(x,y) if (x !=y ){ printf("%d != %d\n\t", x, y); fflush(stdout); assert(false);}
 
 #define NE_INT(x,y) assert(x != y)
+#define NE(x,y) assert(x != y)
 
 #define LT(x,y) assert(x < y)
 #define LTE(x,y) assert(x <= y)

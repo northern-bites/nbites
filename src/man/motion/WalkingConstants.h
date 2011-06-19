@@ -41,11 +41,11 @@ enum SupportMode{
     PERSISTENT_DOUBLE_SUPPORT
 };
 
+// Shoulder pitch, Shoulder roll, Elbow yaw, Elbow roll
 static const float LARM_WALK_ANGLES[Kinematics::ARM_JOINTS] =
-{M_PI_FLOAT/2.0f ,.26f,0.0f,0.0f};
+{M_PI_FLOAT/2.0f, 0.15f, -M_PI_FLOAT/2.0f, -M_PI_FLOAT/3.0f};
 static const float RARM_WALK_ANGLES[Kinematics::ARM_JOINTS] =
-{M_PI_FLOAT/2.0f,-.26f,0.0f,0.0f};
-
+{M_PI_FLOAT/2.0f, -0.15f, M_PI_FLOAT/2.0f, M_PI_FLOAT/3.0f};
 
 //Sensitivity to new walk vectors -- currently 0, giving maximum sensitivity
 //when a new vector differs by more than these constants, the internal

@@ -8,6 +8,7 @@
 #include <math.h> // for PI
 #include "NBMath.h"
 #include "manconfig.h"
+#include "visionconfig.h"
 #include <time.h>
 
 // ROBOT TYPES
@@ -60,11 +61,20 @@ const float MOTION_FRAME_RATE = 1.0f / MOTION_FRAME_LENGTH_S;
 
 static long long micro_time (void)
 {
+#ifdef OFFLINE
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
+
+#else
+
     // Needed for microseconds which we convert to milliseconds
     struct timespec tv;
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &tv);
-
     return tv.tv_sec * MICROS_PER_SECOND + tv.tv_nsec / 1000;
+
+#endif
 }
 
 #endif // Common_h_DEFINED

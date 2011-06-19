@@ -99,6 +99,7 @@ public:
     virtual void drawFieldLines();
     virtual void drawEdges(Gradient& g);
     virtual void drawHoughLines(const std::list<HoughLine>& lines);
+    virtual void drawVisualLines(const vector<VisualLine>& lines);
 
     //
     // SETTERS
@@ -207,8 +208,6 @@ private:
     std::string name;
     int player;
     std::string colorTable;
-
-
 };
 
 #endif // _Vision_h_DEFINED

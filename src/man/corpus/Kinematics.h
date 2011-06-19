@@ -100,6 +100,8 @@ namespace Kinematics {
 
     static const unsigned int NUM_JOINTS = HEAD_JOINTS + ARM_JOINTS*2 +
         LEG_JOINTS*2;
+    // includes arm pieces, which don't have a motor
+	static const unsigned int NUM_MASS_PIECES = NUM_JOINTS + 2;
     static const unsigned int NUM_BODY_JOINTS = ARM_JOINTS*2 + LEG_JOINTS*2;
     static const unsigned int chain_lengths[NUM_CHAINS] = {2, 4, 6, 6, 4};
 	static const unsigned int chain_first_joint[NUM_CHAINS] = {0,2,6,12,18};
@@ -142,15 +144,17 @@ namespace Kinematics {
     /**********    Bodily dimensions     ***********/
 
     static const float SHOULDER_OFFSET_Y = 98.0f;
-    static const float UPPER_ARM_LENGTH = 90.0f;
-    static const float LOWER_ARM_LENGTH = 55.55f;
+    static const float UPPER_ARM_LENGTH = 105.0f;
+    static const float LOWER_ARM_LENGTH = 55.95f;
     static const float SHOULDER_OFFSET_Z = 100.0f;
+	static const float HAND_OFFSET_X = 57.75f;
+	static const float HAND_OFFSET_Z = 12.31f;
     static const float THIGH_LENGTH = 100.0f;
-    static const float TIBIA_LENGTH = 102.75f;
+    static const float TIBIA_LENGTH = 102.90f;
     static const float NECK_OFFSET_Z = 126.5f;
     static const float HIP_OFFSET_Y = 50.0f;
     static const float HIP_OFFSET_Z = 85.0f;
-    static const float FOOT_HEIGHT = 45.11f;
+    static const float FOOT_HEIGHT = 45.19f;
 
     // Camera
     static const float CAMERA_OFF_X = 48.80f; // in millimeters

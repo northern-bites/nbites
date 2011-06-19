@@ -226,17 +226,18 @@ void ImageAcquisitionTest::test_color_segmentation()
  */
 void ImageAcquisitionTest::test_avg()
 {
-
+#ifndef __APPLE__
     clock_gettime(CLOCK_MONOTONIC, &startT_mono);
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startT_process);
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &startT_thread);
+#endif
 
     unsigned int clockTicks = _acquire_image_fast(table, &c, yuv, out);
 
+#ifndef __APPLE__
     clock_gettime(CLOCK_MONOTONIC, &finishT_mono);
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &finishT_process);
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &finishT_thread);
-
 
     sum_clocks += clockTicks;
     min_clocks = min(min_clocks, clockTicks);
@@ -275,6 +276,8 @@ void ImageAcquisitionTest::test_avg()
             sum_clocks = 0;
         min_clocks = 0xFFFFFFF;
     }
+#endif
+
 #ifndef PROFILE_ACQUIRE
     run_average_test();
 #endif

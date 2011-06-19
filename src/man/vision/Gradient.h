@@ -7,6 +7,7 @@
 #include <iostream>
 #include "VisionDef.h"
 #include "Common.h"
+#include "Structs.h"
 
 
 /**
@@ -16,6 +17,7 @@ class Gradient
 {
     // Structures and constants
 public:
+    // x, y coords are stored relative to image center (origin)
     struct AnglePeak {
         uint16_t angle;
         int16_t x;
@@ -44,7 +46,10 @@ public:
     int peaks_list_contains(int i, int j);
     void printAnglesList();
     void updatePeakGrid();
-    static void createLineAtPoint(Gradient& g, uint8_t angle, float radius);
+    void createLineAtPoint(uint8_t angle, float radius);
+
+    void createSegment(const point<int>& l,
+                       const point<int>& r);
 
 
     inline void addAngle(uint8_t angle, int16_t x, int16_t y){

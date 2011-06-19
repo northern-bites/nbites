@@ -6,7 +6,7 @@ using namespace boost;
 //-------------------------------
 // Static VisualCorner variables:
 const point <int> VisualCorner::
-dogLocation(IMAGE_WIDTH/2, IMAGE_HEIGHT - 1);
+naoLocation(IMAGE_WIDTH/2, IMAGE_HEIGHT - 1);
 
 const float VisualCorner::MIN_EXTEND_DIST = 12.0f;
 
@@ -188,7 +188,7 @@ const shape VisualCorner::getLClassification() {
     const point<int> intersection = Utility::
         getIntersection(line1End, line2End,
                         cornerLocation,
-                        dogLocation);
+                        naoLocation);
     // Lines are parallel..
     if ((intersection.x == Utility::NO_INTERSECTION) &&
         (intersection.y == Utility::NO_INTERSECTION))
@@ -199,28 +199,33 @@ const shape VisualCorner::getLClassification() {
     int otherLineMaxX = max(line1End.x, line2End.x);
     int otherLineMaxY = max(line1End.y, line2End.y);
 
-    int dogCornerLineMinX = min(getX(), dogLocation.x);
-    int dogCornerLineMinY = min(getY(), dogLocation.y);
-    int dogCornerLineMaxX = max(getX(), dogLocation.x);
-    int dogCornerLineMaxY = max(getY(), dogLocation.y);
+    int naoCornerLineMinX = min(getX(), naoLocation.x);
+    int naoCornerLineMinY = min(getY(), naoLocation.y);
+    int naoCornerLineMaxX = max(getX(), naoLocation.x);
+    int naoCornerLineMaxY = max(getY(), naoLocation.y);
+    /*cout << "Inters " << intersection.x << " " << intersection.y << " " <<
+        otherLineMinX << " " << naoCornerLineMinX << " " <<
+        otherLineMaxX << " " << naoCornerLineMaxX << " " <<
+        otherLineMinY << " " << naoCornerLineMinY << " " <<
+        otherLineMaxY << " " << naoCornerLineMaxY << endl; */
 
 
-    bool onBothLines = (intersection.x >= max(otherLineMinX, dogCornerLineMinX)
+    bool onBothLines = (intersection.x >= max(otherLineMinX, naoCornerLineMinX)
                         &&
-                        intersection.x <= min(otherLineMaxX, dogCornerLineMaxX)
+                        intersection.x <= min(otherLineMaxX, naoCornerLineMaxX)
                         &&
-                        intersection.y >= max(otherLineMinY, dogCornerLineMinY)
+                        intersection.y >= max(otherLineMinY, naoCornerLineMinY)
                         &&
-                        intersection.y <= min(otherLineMaxY, dogCornerLineMaxY)
+                        intersection.y <= min(otherLineMaxY, naoCornerLineMaxY)
         );
     /*
     // We know we have a crossing somewhere.
-    const float cornerToDogLineLength = Utility::getLength(dogLocation, cornerLocation);
-    const float tOnCornerToDogLine =
+    const float cornerToNaoLineLength = Utility::getLength(naoLocation, cornerLocation);
+    const float tOnCornerToNaoLine =
     Utility::findLinePointDistanceFromStart(intersection,
-    dogLocation,
+    naoLocation,
     cornerLocation,
-    cornerToDogLineLength);
+    cornerToNaoLineLength);
 
     const float otherLineLength = Utility::getLength(line1End, line2End);
 
@@ -230,25 +235,25 @@ const shape VisualCorner::getLClassification() {
     line2End,
     otherLineLength);
 
-    const bool intersectionLiesOnCornerToDogLine =
-    tOnCornerToDogLine > 0 && tOnCornerToDogLine < cornerToDogLineLength;
+    const bool intersectionLiesOnCornerToNaoLine =
+    tOnCornerToNaoLine > 0 && tOnCornerToNaoLine < cornerToNaoLineLength;
     const bool intersectionLiesOnOtherLine =
     tOnOtherLine > 0 && tOnOtherLine < otherLineLength;
 
-    // See 115.FRM.  Add uncertainty if angle between cornerToDog and
+    // See 115.FRM.  Add uncertainty if angle between cornerToNao and
     // one of corner.line1 or corner.line2 is very small
 
 
 
-    if (onBothLines != (intersectionLiesOnCornerToDogLine &&
+    if (onBothLines != (intersectionLiesOnCornerToNaoLine &&
     intersectionLiesOnOtherLine)) {
-    cout << onBothLines << intersectionLiesOnCornerToDogLine
+    cout << onBothLines << intersectionLiesOnCornerToNaoLine
     << intersectionLiesOnOtherLine << endl;
     cout << "You screwed up nick." << endl;
     }
 
     */
-    //if (intersectionLiesOnCornerToDogLine && intersectionLiesOnOtherLine) {
+    //if (intersectionLiesOnCornerToNaoLine && intersectionLiesOnOtherLine) {
     if (onBothLines) {
         return INNER_L;
     } else {

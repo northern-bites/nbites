@@ -1,6 +1,5 @@
 #include "WalkingArm.h"
 
-
 using namespace Kinematics;
 using boost::shared_ptr;
 using namespace std;
@@ -15,8 +14,6 @@ WalkingArm::WalkingArm(const MetaGait * _gait,ChainID id)
 {}
 
 WalkingArm::~WalkingArm(){}
-
-
 
 
 ArmJointStiffTuple WalkingArm::tick(shared_ptr<Step> supportStep){
@@ -34,7 +31,7 @@ ArmJointStiffTuple WalkingArm::tick(shared_ptr<Step> supportStep){
 	armStiffnesses[0] = gait->stiffness[WP::ARM_PITCH];
 
     frameCounter++;
-    for(unsigned int  i = 0; shouldSwitchStates() && i < 2; i++){
+    for(unsigned int i = 0; shouldSwitchStates() && i < 2; i++){
         switchToNextState();
         lastStepType = supportStep->type;
     };

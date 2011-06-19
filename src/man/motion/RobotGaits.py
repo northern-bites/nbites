@@ -13,7 +13,7 @@ from .gaits.ZaphodSlowGait import ZAPHOD_SLOW_GAIT
 from .gaits.WebotsGait import WEBOTS_GAIT, WEBOTS_GAIT2
 from .gaits.BackwardsGait import BACKWARDS_GAIT
 from .gaits.ZmpGait import ZMP_GAIT
-
+ 
 # disabled / unused gaits
 #from .gaits.ComGait import COM_GAIT
 #from .gaits.MedGait import MEDIUM_GAIT, MARVIN_MEDIUM_GATE

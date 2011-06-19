@@ -914,6 +914,28 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
     }
 }
 
+/** We have what has been classified as an innerl connected to an outerl.
+    Since this is not normally possible we should check it out.  Generally
+    it probably means that a T corner has been miscast as an L.  This can
+    occur when looking at a goal from the far goalbox corner when the goal
+    is edged out over the goal line.
+    @param inner         an innerl corner
+    @param outer         an outerl corner connected to the innerl
+ */
+void Context::checkInnerToOuter(VisualCorner & inner, VisualCorner & outer) {
+    // if it is the T, then we should be able to see the nearby goal post
+    if (face == FACING_BLUE_GOAL || face == FACING_YELLOW_GOAL) {
+    }
+}
+
+/** We have two connected outerls.  This is theoretically possible, but
+    somewhat unlikely.  There are two major possibilities.  First, we
+    are seeing both goalbox corners at once.  Second, we are misclassifying
+    one or both of these (e.g. a T as an L, an innerl as an outerl).
+ */
+void Context::checkOuterToOuter(VisualCorner & first, VisualCorner & second) {
+}
+
 /** We have a T and (apparently) a field corner. The T could be
     a side or a goal, so try and use length, # of corners and
     other things to narrow it down.
@@ -1051,6 +1073,11 @@ void Context::findCornerRelationship(VisualCorner & first,
         if (debugIdentifyCorners) {
             cout << "Two non T corners with common length " <<
                 realLineDistance(common) << endl;
+        }
+        if (first.getShape() == INNER_L && second.getShape() == OUTER_L) {
+            checkInnerToOuter(first, second);
+        } else if (first.getShape() == OUTER_L && second.getShape() == INNER_L) {
+            checkInnerToOuter(second, first);
         }
         // it is likely that one of the corners is actually a T
         // it is possible (never seen it) that it could be the two goal corners

@@ -45,7 +45,7 @@ ADD_DEFINITIONS(
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
-INCLUDE_DIRECTORIES( 
+INCLUDE_DIRECTORIES(
   ${NBCOMMON_INCLUDE_DIR}
   ${PYTHON_INCLUDE_PATH}
   ${VISION_INCLUDE_DIR}
@@ -81,26 +81,50 @@ SET( SYNCHRO_SRCS synchro
   )
 
 ########### ROBOT CONNECT #########
-SET( ROBOT_CONNECT_SRCS AccEKF
+SET( ROBOT_CONNECT_SRCS
+  AccEKF
   RoboGuardian
   ClickableButton
   PyRoboGuardian
   Lights
-  PyLights)
+  PyLights
+  ColorParams
+  ImageAcquisition
+  )
+
+# Add the assembly files if we're not on Mac OSX
+IF (UNIX AND NOT APPLE)
+  LIST( APPEND ROBOT_CONNECT_SRCS
+    ImageAcquisition.s
+    ImageAcquisitionFast.s
+    CopyImage.s
+    )
+
+SET_PROPERTY(SOURCE
+  ImageAcquisition.s
+  ImageAcquisitionFast.s
+  CopyImage.s
+ PROPERTY LANGUAGE C
+ )
+
+ENDIF()
 
 IF(WEBOTS_BACKEND)
-  LIST( APPEND ROBOT_CONNECT_SRCS WBEnactor
+  LIST( APPEND ROBOT_CONNECT_SRCS
+    WBEnactor
     AngleEKF
     WBTranscriber
     WBImageTranscriber
     )
 ELSE(WEBOTS_BACKEND)
-  LIST( APPEND ROBOT_CONNECT_SRCS ALEnactor
+  LIST( APPEND ROBOT_CONNECT_SRCS
+    ALEnactor
     NaoEnactor
     ALTranscriber
     ALImageTranscriber
     NaoLights
-    NaoRGBLight)
+    NaoRGBLight
+    )
 ENDIF(WEBOTS_BACKEND)
 
 
@@ -239,7 +263,7 @@ TARGET_LINK_LIBRARIES( ${ROBOT_CONNECT_TARGET}
   ${PYTHON_LIBRARIES}
   ${Boost_PYTHON_LIBRARY}
   )
-TARGET_LINK_LIBRARIES( ${NBINCLUDE_TARGET} 
+TARGET_LINK_LIBRARIES( ${NBINCLUDE_TARGET}
   )
 
 ############################ (SUB)DIRECTORY COMPILATION
@@ -247,3 +271,19 @@ TARGET_LINK_LIBRARIES( ${NBINCLUDE_TARGET}
 # include in this package
 #SUBDIRS(
 #  )
+
+
+############################ TESTS!
+
+add_executable( ImageAcquisitionTest
+  ${CORPUS_TEST_DIR}/ImageAcquisitionTest
+  ${CORPUS_INCLUDE_DIR}/ImageAcquisition.s
+  ${CORPUS_INCLUDE_DIR}/ImageAcquisitionFast.s
+  ${CORPUS_INCLUDE_DIR}/ColorParams
+  )
+
+target_link_libraries( ImageAcquisitionTest
+  ${NBCOMMON_LIBRARIES}
+  )
+
+add_test( NAME ImageAcquisitionTest COMMAND ImageAcquisitionTest )

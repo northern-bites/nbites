@@ -280,18 +280,36 @@ void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
     PROF_EXIT(profiler, P_SUPPRESS);
 }
 
+/**
+ * Put the Hough lines into pairs of lines with opposite
+ * angles. Opposite angles mean that the gradients on the lines are
+ * headed into each other, as in the two edges of a field line.
+ *
+ * Each line should be paired with only one other line, that line
+ * being the closest other parallel line to it. That way two parallel field
+ * lines will not produce very strange results. If a line has no
+ * parallel counterpart, it is discarded.
+ *
+ * @TODO Make sure lines are headed into or out of the line only. This
+ *       would prevent inner parts of two lines from being paired.
+ */
 list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
 {
     PROF_ENTER(profiler, P_PAIR_LINES);
     list<pair<int, int> > pairs;
     const int size = lines.size();
 
+    // The array which holds the partner line for each HoughLine
     int pair_array[size];
+
+    // The minimum r distance found for a partner line for each HoughLine
     int min_pair_r[size];
+
+    const static int NO_PARTNER = -1;
 
     // Init arrays
     for(int i=0; i < size; ++i){
-        pair_array[i] = -1;
+        pair_array[i] = NO_PARTNER;
         min_pair_r[i] = INT_MAX;
     }
 
@@ -322,6 +340,15 @@ list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
             if (rSum < min_pair_r[i] &&
                 rSum < min_pair_r[j]){
 
+                // Unset previous line pairs
+                if (pair_array[i] != NO_PARTNER){
+                    pair_array[pair_array[i]] = NO_PARTNER;
+                }
+
+                if (pair_array[j] != NO_PARTNER){
+                    pair_array[pair_array[j]] = NO_PARTNER;
+                }
+
                 pair_array[i] = j;
                 pair_array[j] = i;
 
@@ -333,7 +360,7 @@ list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
     for(int i=0; i < size; ++i){
         // If this line hasn't been paired up with a line after it,
         // this keeps us from duplicating line pairs.
-        if (pair_array[i] < i){
+        if (pair_array[i] < i){ // pair_array == -1 when no partner was found
             continue;
         }
 

@@ -1,14 +1,5 @@
-
-import math
-
-import man.motion as motion
-import man.motion.SweetMoves as SweetMoves
-import man.motion.MotionConstants as MotionConstants
-
-
 def gameInitial(player):
     return player.stay()
-
 def gameReady(player):
     return player.stay()
 def gameSet(player):

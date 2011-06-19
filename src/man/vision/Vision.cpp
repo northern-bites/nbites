@@ -137,6 +137,7 @@ void Vision::notifyImage() {
 
     drawEdges(*linesDetector.getEdges());
     drawHoughLines(linesDetector.getHoughLines());
+    drawVisualLines(*linesDetector.getLines());
     PROF_EXIT(profiler, P_VISION);
 }
 
@@ -571,28 +572,35 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
 {
 #ifdef OFFLINE
     if (thresh->debugHoughTransform){
-        list<HoughLine>::const_iterator line = lines.begin();
 
-        while (line != lines.end()){
+        list<HoughLine>::const_iterator line;
+        for (line = lines.begin() ; line != lines.end(); line++){
             const double sn = line->getSinT();
             const double cs = line->getCosT();
 
-            for (double u = -200.; u <= 200.; u+=1.){
+            double uStart = 0, uEnd = 0;
+            HoughLine::findLineImageIntersects(*line, uStart, uEnd);
 
-                double x0 = line->getRadius() * cs;
-                double y0 = line->getRadius() * sn;
+            const double x0 = line->getRadius() * cs + IMAGE_WIDTH/2;
+            const double y0 = line->getRadius() * sn + IMAGE_HEIGHT/2;
 
-                int x = (int)round(x0 + u * sn) + IMAGE_WIDTH  / 2;
-                int y = (int)round(y0 - u * cs) + IMAGE_HEIGHT / 2;
-
-                if (0 <= x && x < IMAGE_WIDTH &&
-                    0 <= y && y < IMAGE_HEIGHT){
-
-                    drawDot(x,y, BLUE);
-                }
+            for (double u = uStart; u <= uEnd; u+=1.){
+                int x = (int)round(x0 + u * sn);
+                int y = (int)round(y0 - u * cs); // cs goes opposite direction
+                drawDot(x,y, BLUE);
             }
-            line++;
         }
     }
 #endif
+}
+
+void Vision::drawVisualLines(const vector<VisualLine>& lines)
+{
+    if (thresh->debugVisualLines){
+        vector<VisualLine>::const_iterator line;
+        for (line = lines.begin(); line != lines.end(); line++){
+            thresh->drawLine(line->tr, line->tl, MAROON);
+            thresh->drawLine(line->br, line->bl, MAROON);
+        }
+    }
 }

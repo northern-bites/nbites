@@ -44,11 +44,11 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     done(true),
     sensorAngles(s,_gait),
     com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
-	joints_com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+    joints_com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
     est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
     zmp_ref_x(list<float>()),zmp_ref_y(list<float>()),
-	futureSteps(),
+    futureSteps(),
     currentZMPDSteps(),
     si_Transform(CoordFrame3D::identity3D()),
     last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
@@ -73,8 +73,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     com_log = fopen("/tmp/com_log.xls","w");
     fprintf(com_log,"time\tcom_x\tcom_y\tpre_x\tpre_y\tzmp_x\tzmp_y\t"
             "sensor_zmp_x\tsensor_zmp_y\tekf_zmp_x\tekf_zmp_y\t"
-			"real_com_x\treal_com_y\tjoints_com_x\tjoints_com_y\t"
-			"angleX\tangleY\taccX\taccY\taccZ\t"
+            "real_com_x\treal_com_y\tjoints_com_x\tjoints_com_y\t"
+            "angleX\tangleY\taccX\taccY\taccZ\t"
             "lfl\tlfr\tlrl\tlrr\trfl\trfr\trrl\trrr\t"
             "state\n");
 #endif
@@ -82,11 +82,11 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     zmp_log = fopen("/tmp/zmp_log.xls","w");
     fprintf(zmp_log,"time\tpre_x\tpre_y\tcom_x\tcom_y\tcom_px\tcom_py"
             "\taccX\taccY\taccZ\t"
-			"ekf_zmp_x\tekf_zmp_y\t"
-			"angleX\tangleY\n");
+            "ekf_zmp_x\tekf_zmp_y\t"
+            "angleX\tangleY\n");
 #endif
 #ifdef DEBUG_ZMP_REF
-	zmp_ref_log = fopen("/tmp/zmp_ref_log.xls","w");
+    zmp_ref_log = fopen("/tmp/zmp_ref_log.xls","w");
 #endif
 
 }
@@ -100,7 +100,7 @@ StepGenerator::~StepGenerator()
     fclose(zmp_log);
 #endif
 #ifdef DEBUG_ZMP_REF
-	fclose(zmp_ref_log);
+    fclose(zmp_ref_log);
 #endif
     delete controller_x; delete controller_y;
 }
@@ -146,17 +146,17 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 
         }
 #ifdef DEBUG_ZMP
-		cout << "generate_zmp_ref()\n";
-		list<float>::iterator it;
-		cout << "zmp_ref_x: " << zmp_ref_x.size();
-		for (it=zmp_ref_x.begin(); it!=zmp_ref_x.end(); ++it)
-			cout << " " << *it;
-		cout << "\n";
+        cout << "generate_zmp_ref()\n";
+        list<float>::iterator it;
+        cout << "zmp_ref_x: " << zmp_ref_x.size();
+        for (it=zmp_ref_x.begin(); it!=zmp_ref_x.end(); ++it)
+            cout << " " << *it;
+        cout << "\n";
 
-		cout << " zmp_ref_y: " << zmp_ref_y.size();
-		for (it=zmp_ref_y.begin(); it!=zmp_ref_y.end(); ++it)
-			cout << " " << *it;
-		cout << "\n";
+        cout << " zmp_ref_y: " << zmp_ref_y.size();
+        for (it=zmp_ref_y.begin(); it!=zmp_ref_y.end(); ++it)
+            cout << " " << *it;
+        cout << "\n";
 #endif
     }
 
@@ -164,66 +164,66 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
 }
 
 /**
- * This method calculates the sensor ZMP. We build a body to world transform using
- * Aldebaran's filtered angleX/angleY. We then use this to rotate the unfiltered
- * accX/Y/Z from the accelerometers. The transformed values are fed into an
- * exponential filter (acc_filter), and the filtered values are used in an EKF
- * that maintains our sensor ZMP (zmp_filter). The ZMP EKF also takes in the CoM
- * as calculated by the joint angles of the robot (see JointMassConstants.h and
- * COKKinematics.cpp for implementation details)
+ * This method calculates the sensor ZMP. We build a body to world
+ * transform using Aldebaran's filtered angleX/angleY. We then use
+ * this to rotate the Aldebaran-filtered accX/Y/Z from the
+ * accelerometers. The transformed values are fed into an exponential
+ * filter (acc_filter, to reduce jitter from the rotation), and the
+ * filtered values are used in an EKF that maintains our sensor ZMP
+ * (zmp_filter). The ZMP EKF also takes in the CoM as calculated by
+ * the joint angles of the robot (see JointMassConstants.h and
+ * COKKinematics.cpp for implementation details of that)
  */
 void StepGenerator::findSensorZMP(){
     const Inertial inertial = sensors->getInertial();
-    const Inertial unfiltered = sensors->getUnfilteredInertial();
 
     //The robot may or may not be tilted with respect to vertical,
     //so, since walking is conducted from a bird's eye perspective
     //we would like to rotate the sensor measurements appropriately.
     //We will use angleX, and angleY:
-
     const ufmatrix4 bodyToWorldTransform =
         prod(CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, -inertial.angleX),
              CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -inertial.angleY));
 
-	// update the filter
-	// TODO: calibrate!!
-    acc_filter.update(unfiltered.accX,
-					  unfiltered.accY,
-					  unfiltered.accZ);
+    // update the filter
+    // TODO: calibrate!!
+    acc_filter.update(inertial.accX,
+                      inertial.accY,
+                      inertial.accZ);
 
     const ufvector4 accInBodyFrame = CoordFrame4D::vector4D(acc_filter.getX(),
-															acc_filter.getY(),
-															acc_filter.getZ());
-	// and rotate the filtered acceleration
-	accInWorldFrame = prod(bodyToWorldTransform,
-						   accInBodyFrame);
+                                                            acc_filter.getY(),
+                                                            acc_filter.getZ());
+    // and rotate the filtered acceleration
+    accInWorldFrame = prod(bodyToWorldTransform,
+                           accInBodyFrame);
 
      //cout << endl<< "########################"<<endl;
-	 //cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
+     //cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
      //cout << "Accel in world frame: "<< accInWorldFrame <<endl;
      //cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
 
     //Rotate from the local C to the global I frame
-	const ufvector3 accel_c = CoordFrame3D::vector3D(accInWorldFrame(0),
-													 accInWorldFrame(1));
-	const float angle_fc = safe_asin(fc_Transform(1,0));
+    const ufvector3 accel_c = CoordFrame3D::vector3D(accInWorldFrame(0),
+                                                     accInWorldFrame(1));
+    const float angle_fc = safe_asin(fc_Transform(1,0));
     const float angle_if = safe_asin(if_Transform(1,0));
     const float tot_angle = -(angle_fc+angle_if);
     const ufvector3 accel_i = prod(CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,
-															tot_angle),
-								   accel_c);
+                                                            tot_angle),
+                                   accel_c);
     // translate com_c (from joint angles) to I frame
     const ufvector4 com_c_xyz = getCOMc(sensors->getMotionBodyAngles());
     const ufvector3 joints_com_c = CoordFrame3D::vector3D(com_c_xyz(0), com_c_xyz(1));
     const ufvector3 joints_com_f = prod(cf_Transform, joints_com_c);
-	joints_com_i = prod(fi_Transform, joints_com_f);
-	const float joint_com_i_x = joints_com_i(0);
-	const float joint_com_i_y = joints_com_i(1);
+    joints_com_i = prod(fi_Transform, joints_com_f);
+    const float joint_com_i_x = joints_com_i(0);
+    const float joint_com_i_y = joints_com_i(1);
 
     ZmpTimeUpdate tUp = {controller_x->getZMP(), controller_y->getZMP()};
-	// TODO: fix joints_com_i in x !!
+    // TODO: fix joints_com_i_y and re-enable
     ZmpMeasurement pMeasure =
-        {controller_x->getPosition(), joint_com_i_y,
+        {joint_com_i_x, (joint_com_i_y + COM_I_Y_OFFSET),
          accel_i(0), accel_i(1)};
     zmp_filter.update(tUp,pMeasure);
 
@@ -231,7 +231,7 @@ void StepGenerator::findSensorZMP(){
 	cout << "controller_x com: " << controller_x->getPosition();
 	cout << "com_c -> com_i (x): " << joint_com_i_x << endl;
 	cout << " controller_y com: " << controller_y->getPosition();
-	cout << "com_c -> com_i (y): " << joint_com_i_y << endl;
+	cout << "com_c -> com_i (y): " << joint_com_i_y + COM_I_Y_OFFSET << endl;
 #endif
 }
 
@@ -1174,7 +1174,7 @@ void StepGenerator::debugLogging(){
     float real_com_x = leg_dest_i(0);
     float real_com_y = leg_dest_i(1);// + 2*HIP_OFFSET_Y;
 	float joint_com_i_x = joints_com_i(0);
-	float joint_com_i_y = joints_com_i(1);
+	float joint_com_i_y = joints_com_i(1) + COM_I_Y_OFFSET;
 
     Inertial inertial = sensors->getInertial();
     FSR leftFoot = sensors->getLeftFootFSR();
