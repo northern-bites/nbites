@@ -456,22 +456,18 @@ void Comm::run()
 	interval.tv_sec = 0;
 	interval.tv_nsec = SLEEP_MILLIS * 1000;
 
-    try {
+    try{
         bind();
-
         //discover_broadcast();
 
-	// The main packet send/receive loop.
-	while(running) {
-	    // If time to send, send packet.
-	    if(timer.timeToSend()) {
-		send();
-	    }
+		while(running)
+		{
+			if(timer.timeToSend())
+				send();
 
-	    // Otherwise, receive.
-	    receive();
-	    nanosleep(&interval, &remainder);
-	}
+			receive();
+			nanosleep(&interval, &remainder);
+		}
     } catch (socket_error &e) {
         fprintf(stderr, "Error occurred in Comm, thread has paused.\n");
         fprintf(stderr, "%s\n", e.what());
@@ -489,7 +485,6 @@ void Comm::run()
 void Comm::stop ()
 {
     tool.stop();
-
     Thread::stop();
 }
 // Starts ToolConnect thread
@@ -525,50 +520,48 @@ void Comm::discover_broadcast ()
 {
     // run ifconfig command to discover broadcast address
     FILE *f = popen(
-        "ifconfig | grep 'Bcast' | sed -e 's/.* Bcast:\\([^ ]*\\) .*/\\1/'",
+		"ifconfig | grep 'Bcast' | sed -e 's/.* Bcast:\\([^ ]*\\) .*/\\1/'",
         "r");
-    if (f == NULL) {
-        error(SOCKET_ERROR(errno));
-        return;
-    }
+    if (f == NULL)
+        return error(SOCKET_ERROR(errno));
 
     // read output and result (error status)
     char buf[1024];
     int len = fread(&buf[0], 1, 1024, f);
     int result = pclose(f);
 
-    if (result == 0 && len > 0) {
+    if (result == 0 && len > 0)
+	{
         // add null character to enable processing as a normal string
         buf[len] = '\0';
         // convert address to in_addr struct
         struct in_addr addr;
-        if (inet_aton(&buf[0], &addr)) {
+        if (inet_aton(&buf[0], &addr))
+		{
             broadcast_addr.sin_addr = addr;
             cout << "Using broadcast address " << buf << endl;
-
-        } else {
-            error(SOCKET_ERROR(errno));
         }
-    } else if (result != 0) {
+		else
+			error(SOCKET_ERROR(errno));
+	}
+	else if (result != 0)
         //cout<<"Failed to discover broadcast address -- command returned error";
-
-    } else if (len <= 0) {
+	else if (len <= 0)
         //cout<<"Failed to discover broadcast address -- find broadcast returned no output";
-    }
 }
 
 // Binds all required sockets
 void Comm::bind () throw(socket_error)
 {
-    int one = 1;
-
     // create socket
     sockn = ::socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockn == -1) {
+    if (sockn == -1)
+	{
         stop();
         throw SOCKET_ERROR(errno);
     }
 
+	int one = 1;
 #ifdef COMM_LISTEN
     // set bind address parameters
     bind_addr.sin_family = AF_INET;
@@ -580,7 +573,8 @@ void Comm::bind () throw(socket_error)
 
     // bind socket to address
     if (::bind(sockn, reinterpret_cast<const struct sockaddr*>(&bind_addr),
-               sizeof(bind_addr)) == -1) {
+               sizeof(bind_addr)) == -1)
+	{
         stop();
         throw SOCKET_ERROR(errno);
     }
@@ -593,8 +587,6 @@ void Comm::bind () throw(socket_error)
     int flags = fcntl(sockn, F_GETFL);
     fcntl(sockn, F_SETFL, flags | O_NONBLOCK);
 
-
-    // Bind GameController socket
 #ifdef USE_GAMECONTROLLER
     bind_gc();
 #endif
@@ -603,15 +595,15 @@ void Comm::bind () throw(socket_error)
 // Binds GameController Socket
 void Comm::bind_gc () throw(socket_error)
 {
-    int one = 1;
-
     // create socket
     gc_sockn = ::socket(AF_INET, SOCK_DGRAM, 0);
-    if (gc_sockn == -1) {
+    if (gc_sockn == -1)
+	{
         stop();
         throw SOCKET_ERROR(errno);
     }
 
+	int one = 1;
 #ifdef COMM_LISTEN
     // set bind address parameters
     struct sockaddr_in bind_addr;
@@ -624,7 +616,8 @@ void Comm::bind_gc () throw(socket_error)
 
     // bind socket to address
     if (::bind(gc_sockn, (const struct sockaddr*)&bind_addr,
-               sizeof(bind_addr)) == -1) {
+               sizeof(bind_addr)) == -1)
+	{
         stop();
         throw SOCKET_ERROR(errno);
     }
@@ -646,16 +639,16 @@ void Comm::send () throw(socket_error)
     pthread_mutex_lock (&comm_mutex);
 
     // Let game controller know that we have been manually penalized
-    if (gc->shouldSendManualPenalty()) {
+    if (gc->shouldSendManualPenalty())
+	{
         gc->sentManualPenalty();
 
         RoboCupGameControlReturnData returnPacket;
 
-        if (gc->isManuallyPenalized()) {
+        if (gc->isManuallyPenalized())
             returnPacket.message = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
-        } else {
+		else
             returnPacket.message = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
-        }
 
         memcpy(returnPacket.header,
                GAMECONTROLLER_RETURN_STRUCT_HEADER,
@@ -672,10 +665,13 @@ void Comm::send () throw(socket_error)
         pthread_mutex_unlock (&comm_mutex);
 
         send(&buf[0], sizeof(returnPacket), gc_broadcast_addr);
-    } else { // Don't bother to send packet to teammates if we are penalized
-
+    }
+	else
+	{
         // C++ header data
-        const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(), lastPacketNumber++, gc->team(), gc->player(), gc->color()};
+        const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
+										 lastPacketNumber++, gc->team(), gc->player(),
+										 gc->color()};
         memcpy(&buf[0], &header, sizeof(header));
         // variable Python extra data
         memcpy(&buf[sizeof(header)], &data[0], sizeof(float) * data.size());
@@ -686,7 +682,6 @@ void Comm::send () throw(socket_error)
         send(&buf[0], sizeof(header) + sizeof(float) * data.size(),
              broadcast_addr);
     }
-
 }
 
 // Actually does the sending of the data
@@ -699,21 +694,23 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 	interval.tv_sec = 0;
 	interval.tv_nsec = 100000;
 
-    while (result == -2) {
-	// send the udp message
+    while (result == -2)
+	{
+		// send the udp message
         result = ::sendto(sockn, msg, len, 0, (struct sockaddr*)&addr,
                           sizeof(broadcast_addr));
-	//cout << "Comm::send() : result == " << result << endl;
+		//cout << "Comm::send() : result == " << result << endl;
         // except if error is blocking error
-        if (result == -1 && errno == EAGAIN) {
+        if (result == -1 && errno == EAGAIN)
+		{
             result = -2;
-	    cout << "Comm::send() : EAGAIN error!" << endl;
+			cout << "Comm::send() : EAGAIN error!" << endl;
             nanosleep(&interval, &remainder);
         }
     }
-
     // error
-    if (result == -1) {
+    if (result == -1)
+	{
         if (errno == ENETUNREACH &&
             broadcast_addr.sin_addr.s_addr == htonl(INADDR_BROADCAST))
             // attempt to discover our specific broadcast address
@@ -733,24 +730,23 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 void Comm::receive() throw(socket_error)
 {
 #ifdef COMM_LISTEN
-
     struct sockaddr_in recv_addr;
     socklen_t addr_len = sizeof(sockaddr_in);
 
     // receive a UDP message
-    // recvfrom() returns the number of bytes actually recieved,
-    // or -1 if error.
+    // recvfrom() returns the number of bytes actually recieved, or -1 if error.
     int result = ::recvfrom(sockn, &buf, UDP_BUF_SIZE, 0,
                             (struct sockaddr*)&recv_addr, &addr_len);
+
     // While no error, handle the packet and continue to receive new ones.
-    while (result > 0) {
-	cout << "Comm::receive() : result == " << result << endl;
-	// Received a packet! Update the average delay.
-	if(timer.lastPacketReceivedAt() != 0) {
-	    updateAverageDelay();
-	}
-	totalPacketsReceived++;
-	updatePercentReceived();
+    while (result > 0)
+	{
+		cout << "Comm::receive() : result == " << result << endl;
+		// Received a packet! Update the average delay.
+		if(timer.lastPacketReceivedAt() != 0)
+			updateAverageDelay();
+		totalPacketsReceived++;
+		updatePercentReceived();
         // Handle messages from not for GameController.
         handle_comm(recv_addr, &buf[0], result);
         // Continue checking for new messages...
@@ -759,7 +755,8 @@ void Comm::receive() throw(socket_error)
     }
 
     // if an error occured (other than nonblocking EAGAIN error)
-    if (running && result == -1 && errno != EAGAIN) {
+    if (running && result == -1 && errno != EAGAIN)
+	{
         stop();
         throw SOCKET_ERROR(errno);
     }
@@ -767,9 +764,9 @@ void Comm::receive() throw(socket_error)
     // Receive GameController packets
 #ifdef USE_GAMECONTROLLER
     receive_gc();
-#endif
+#endif /*USE_GAMECONTROLLER*/
 
-#endif
+#endif /*COMM_LISTEN*/
 }
 
 // Recieves packets from GameController
@@ -783,7 +780,8 @@ void Comm::receive_gc () throw(socket_error)
     // receive a UDP message
     int result = ::recvfrom(gc_sockn, &buf, UDP_BUF_SIZE, 0,
                             (struct sockaddr*)&recv_addr, &addr_len);
-    while (result > 0) {
+    while (result > 0)
+	{
         // handle the message
         handle_gc(recv_addr, &buf[0], result);
         // check for another one
@@ -792,7 +790,8 @@ void Comm::receive_gc () throw(socket_error)
     }
 
     // if an error occured (other than nonblocking EAGAIN error)
-    if (running && result == -1 && errno != EAGAIN) {
+    if (running && result == -1 && errno != EAGAIN)
+	{
         stop();
         throw SOCKET_ERROR(errno);
     }
@@ -805,8 +804,8 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 {
 // Checks for Tool message
     if (len == static_cast<int>(strlen(TOOL_REQUEST_MSG)) &&
-        memcmp(msg, TOOL_REQUEST_MSG, TOOL_REQUEST_LEN) == 0) {
-
+        memcmp(msg, TOOL_REQUEST_MSG, TOOL_REQUEST_LEN) == 0)
+	{
         //cout << "Comm::handle_comm() : handling packet from TOOL..." << endl;
 
         std::string robotName = getRobotName();
@@ -825,62 +824,73 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
         r_addr.sin_port = htons(TOOL_PORT);
         send(&response[0], len, r_addr);
         free(response);
-
-    } else {
+    }
+	else
+	{
         cout << "Comm::handle_comm() : handling packet..." << endl;
         // validate packet format, check packet timestamp, and parse data
         CommPacketHeader packet;
-        if (validate_packet(msg, len, packet)) {
+        if (validate_packet(msg, len, packet))
+		{
             ourPacketsReceived++;
             // Log that a packet has been received.
             cout << "Comm::handle_comm() : packet received at "
-            << packet.timestamp
-	    << " from player " << packet.player
-	    << " with packet number " << packet.number
-	    << endl;
+				 << packet.timestamp
+				 << " from player " << packet.player
+				 << " with packet number " << packet.number
+				 << endl;
             parse_packet(packet, msg + sizeof(packet), len - sizeof(packet));
         }
     }
 }
 
 // Handles packet from GameController
-void Comm::handle_gc (struct sockaddr_in &addr, const char *msg, int len) throw()
+void Comm::handle_gc (struct sockaddr_in &addr,
+					  const char *msg, int len) throw()
 {
 	gc->handle_packet(msg, len);
-	if (gc->shouldResetTimer()){
+	if (gc->shouldResetTimer())
 		timer.reset();
-	}
 }
 
 // Ensure packet is one of ours
-bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
-    throw() {
+bool Comm::validate_packet (const char* msg, int len,
+							CommPacketHeader& packet)throw()
+{
     // check packet length
-    if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader)) {
-	cout << "bad length (" << len << ")" << endl;
-	return false;
+    if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader))
+	{
+		cout << "bad length (" << len << ")" << endl;
+		return false;
     }
 
     // cast packet data into CommPacketHeader struct
     packet = *reinterpret_cast<const CommPacketHeader*>(msg);
 
     // check packet header
-    if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0) {
+    if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0)
+	{
         cout << "bad header (" << packet.header << ")" << endl;
         return false;
     }
+
     // check team number
-    if (packet.team != gc->team()) {
+    if (packet.team != gc->team())
+	{
         cout << "bad team number (" << packet.team << ")" << endl;
         return false;
     }
+
     // check player number
     if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM ||
-        packet.player == gc->player()) {
+        packet.player == gc->player())
+	{
         cout << "bad player number (" << packet.player << ")" << endl;
         return false;
     }
-    if (!timer.check_packet(packet)) {
+
+    if (!timer.check_packet(packet))
+	{
         cout << "bad timer" << endl;
         return false;
     }
@@ -891,29 +901,29 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     // the robot from which this packet was received. Eventually the
     // two clocks to reach an equilibrium point, within a reasonable
     // margin of error.
-    if(packet.timestamp + MIN_PACKET_DELAY > currTime) {
+    if(packet.timestamp + MIN_PACKET_DELAY > currTime)
+	{
         timer.setOffset(packet.timestamp + MIN_PACKET_DELAY - currTime);
     }
 
     // Get fixed packet received at time if necessary.
     timer.packetReceived();
 
-
     // Log latency/timer offset data?
     cout << "original current time == " << currTime
-	 << " packet sent at (timestamp) == " << packet.timestamp
-	 << " packet received at == " <<  timer.lastPacketReceivedAt()
-	 << " offset == " << timer.getOffset()
-	 << " latency == " << estimatePacketLatency(packet)
-	 << endl;
+		 << " packet sent at (timestamp) == " << packet.timestamp
+		 << " packet received at == " <<  timer.lastPacketReceivedAt()
+		 << " offset == " << timer.getOffset()
+		 << " latency == " << estimatePacketLatency(packet)
+		 << endl;
 
     // Packet is valid!
     return true;
 }
 
 // Takes info from packet and data and puts into a vector v.
-void Comm::parse_packet (const CommPacketHeader &packet, const char* msg, int size)
-    throw()
+void Comm::parse_packet (const CommPacketHeader &packet,
+						 const char* msg, int size)throw()
 {
     int len = size / sizeof(float);
 
@@ -926,7 +936,7 @@ void Comm::parse_packet (const CommPacketHeader &packet, const char* msg, int si
     // copies actual message
     memcpy(&v[3], msg, size);
 
-    // push message onto queue
+    // push message onto queue and pops off the front if we have too many.
     if (latest->size() >= MAX_MESSAGE_MEMORY)
         latest->pop_front();
     latest->push_back(v);
@@ -935,14 +945,15 @@ void Comm::parse_packet (const CommPacketHeader &packet, const char* msg, int si
 // Adds Comm to Python Module
 void Comm::add_to_module ()
 {
-    if (comm_module == NULL) {
-        if (!c_init_comm()) {
+    if (comm_module == NULL)
+        if (!c_init_comm())
+		{
             cerr << "Comm module failed to initialize the backend" << endl;
             PyErr_Print();
         }
-    }
 
-    if (comm_module != NULL) {
+    if (comm_module != NULL)
+	{
         PyObject *comm = PyComm_new(this);
         PyModule_AddObject(comm_module, "inst", comm);
     }
@@ -963,12 +974,14 @@ TeammateBallMeasurement Comm::getTeammateBallReport()
     list<vector<float> >::iterator i;
     TeammateBallMeasurement m;
     float minUncert = 10000.0f;
-    for (i = latest->begin(); i != latest->end(); ++i) {
+    for (i = latest->begin(); i != latest->end(); ++i)
+	{
         // Get the combined uncert x and y
         float curUncert = static_cast<float>( hypot((*i)[6],(*i)[7]) );
         // If the teammate sees the ball and its uncertainty is less than the
         // Current minimum, then we
-        if ((*i)[13] > 0.0 && curUncert < minUncert) {
+        if ((*i)[13] > 0.0 && curUncert < minUncert)
+		{
             minUncert = curUncert;
             m.ballX = (*i)[9];
             m.ballY = (*i)[10];
@@ -981,9 +994,7 @@ TeammateBallMeasurement Comm::getTeammateBallReport()
 void Comm::setData (std::vector<float> &newData)
 {
     pthread_mutex_lock (&comm_mutex);
-
     data = newData;
-
     pthread_mutex_unlock (&comm_mutex);
 }
 
@@ -999,11 +1010,9 @@ std::string Comm::getRobotName()
     name.append("- ");
     name.append(robot_get_name());
 #elif ROBOT(NAO)
-#elif ROBOT(AIBO)
 #else
 #  error "Undefined robot type"
 #endif
-
     return name;
 }
 
