@@ -134,7 +134,7 @@ static const float FALL_SPEED_THRESH = 0.03f; //rads/20ms
 static const float NOFALL_SPEED_THRESH = 0.01f; //rads/20ms
 static const int FALLING_FRAMES_THRESH = 3;
 static const int FALLING_RESET_FRAMES_THRESH = 10;
-static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/6.0f; //30 degrees
+static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/4.0f; //45 degrees
 static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 
 
