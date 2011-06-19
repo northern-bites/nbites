@@ -201,13 +201,6 @@ static PyObject * PyComm_stopTOOL (PyObject *self, PyObject *)
     return Py_None;
 }
 
-// sets Localization Access for Tool from Python
-void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
-                                 shared_ptr<BallEKF> _ballEKF)
-{
-    tool.setLocalizationAccess(_loc, _ballEKF);
-}
-
 // gets Robot's name from Python
 static PyObject * PyComm_getRobotName (PyObject *self, PyObject *)
 {
@@ -215,6 +208,7 @@ static PyObject * PyComm_getRobotName (PyObject *self, PyObject *)
     return PyString_FromStringAndSize(name.c_str(), name.size());
 }
 
+// static array of PyComm's members
 static PyMemberDef PyComm_members[] = {
 #ifdef USE_PYTHON_GC
     {"gc", T_OBJECT, offsetof(PyComm, gc), READONLY,
@@ -298,20 +292,20 @@ static PyTypeObject PyCommType = {
 static PyObject * PyComm_new (Comm *comm)
 {
     PyComm *self;
-
     self = (PyComm *)PyCommType.tp_alloc(&PyCommType, 0);
-    if (self != NULL) {
+    if (self != NULL)
+	{
         self->comm = comm;
 #ifdef USE_PYTHON_GC
         self->gc =
             reinterpret_cast<PyGameController*>(PyGameController_new(comm->getGC()));
-        if (self->gc == NULL) {
+        if (self->gc == NULL)
+		{
             PyComm_dealloc(self);
             self = NULL;
         }
 #endif
     }
-
     return (PyObject *)self;
 }
 
@@ -332,7 +326,8 @@ bool c_init_comm (void)
 #ifdef USE_PYTHON_GC
         || PyType_Ready(&PyGameControllerType) < 0
 #endif
-        ) {
+		)
+	{
         fprintf(stderr, "Error creating Comm Python class type\n");
         if (PyErr_Occurred())
             PyErr_Print();
@@ -343,7 +338,6 @@ bool c_init_comm (void)
 
     comm_module = Py_InitModule3("_comm", module_methods,
                                  "Container module for Comm proxy class to C++");
-
     if (comm_module == NULL) {
         fprintf(stderr, "Error initializing Comm Python module\n");
         return false;
@@ -372,50 +366,36 @@ bool c_init_comm (void)
                        PyInt_FromLong(STATE2_NORMAL));
     PyModule_AddObject(comm_module, "STATE2_PENALTYSHOOT",
                        PyInt_FromLong(STATE2_PENALTYSHOOT));
-
     PyModule_AddObject(comm_module, "PENALTY_NONE",
                        PyInt_FromLong(PENALTY_NONE));
-
     PyModule_AddObject(comm_module, "PENALTY_BALL_HOLDING",
                        PyInt_FromLong(PENALTY_SPL_BALL_HOLDING));
-
     PyModule_AddObject(comm_module, "PENALTY_PLAYER_PUSHING",
                        PyInt_FromLong(PENALTY_SPL_PLAYER_PUSHING));
-
     PyModule_AddObject(comm_module, "PENALTY_OBSTRUCTION",
                        PyInt_FromLong(PENALTY_SPL_OBSTRUCTION));
-
     PyModule_AddObject(comm_module, "PENALTY_INACTIVE_PLAYER",
                        PyInt_FromLong(PENALTY_SPL_INACTIVE_PLAYER));
-
     PyModule_AddObject(comm_module, "PENALTY_ILLEGAL_DEFENDER",
                        PyInt_FromLong(PENALTY_SPL_ILLEGAL_DEFENDER));
-
     PyModule_AddObject(comm_module, "PENALTY_LEAVING",
                        PyInt_FromLong(PENALTY_SPL_LEAVING_THE_FIELD));
-
     PyModule_AddObject(comm_module, "PENALTY_PLAYING_WITH_HANDS",
                        PyInt_FromLong(PENALTY_SPL_PLAYING_WITH_HANDS));
-
     PyModule_AddObject(comm_module, "PENALTY_REQUEST_FOR_PICKUP",
                        PyInt_FromLong(PENALTY_SPL_REQUEST_FOR_PICKUP));
-
     PyModule_AddObject(comm_module, "PENALTY_MANUAL",
                        PyInt_FromLong(PENALTY_MANUAL));
-
 
 #ifdef USE_PYCOMM_FAKE_BACKEND
     shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());
     shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
-
     shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_time));
     shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
     shared_ptr<Vision> vision = shared_ptr<Vision>(new Vision(pose, prof));
-
     PyObject *pcomm = PyComm_new(new Comm(synchro, sensors, vision));
     PyModule_AddObject(comm_module, "inst", pcomm);
 #endif
-
     return true;
 }
 
@@ -979,4 +959,10 @@ std::string Comm::getRobotName ()
 #endif
 
     return name;
+}
+
+void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
+                                 shared_ptr<BallEKF> _ballEKF)
+{
+    tool.setLocalizationAccess(_loc, _ballEKF);
 }
