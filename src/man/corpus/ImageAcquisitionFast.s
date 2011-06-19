@@ -153,17 +153,8 @@ uvDim:   .skip 8
         ## Copy the Y values for later packing
         movq    mm3, mm0
 
-        ## Store U values
-        ## Zero out the top half of each doubleword, so
-        ## mm4:  | 0000 | u20 | 0000 | u00 |
+        ## Store UV values for later
         movq    mm4, mm1
-        pand    mm4, mm6
-
-        ## Store V Values
-        ## Move V values to bottom of each doubleword
-        ## mm4:  | 0000 | v20 | 0000 | v00 |
-        movq    mm5, mm1
-        psrld   mm5, 16
         .endif
 
 ########################## SECOND PHASES (1,3)
@@ -176,18 +167,30 @@ uvDim:   .skip 8
         ## First write out goes at the pointer, next goes 8 bytes later
         movntq [edi+ ecx*2 + 8 *((\phase-1)/2) + yImg], mm3
 
-        ## Extract U values and write
+        ## Copy old and new values to temp registers
+        movq    mm5, mm4
         movq    mm2, mm1
-        pand    mm2, mm6
-        packssdw mm4, mm2
 
-        ## ## mm2: |v20 | v20 | v00 | v00 |
-        movq    mm2, mm1
-        psrld   mm2, 16
+        ## Zero out V values
+        pand    mm5, mm6
+        pand    mm2, mm6
+
+        ## Pack values together
         packssdw mm5, mm2
 
-        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + uImg], mm4
-        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + vImg], mm5
+        ## Copy new values into temp register
+        movq    mm2, mm1
+
+        ## Shift old and new to zero out U values
+        psrld   mm4, 16
+        psrld   mm2, 16
+
+        ## Pack values
+        packssdw mm4, mm2
+
+        ## Write out both U and V values
+        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + uImg], mm5
+        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + vImg], mm4
 
         .endif
 
