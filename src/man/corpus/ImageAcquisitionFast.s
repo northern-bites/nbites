@@ -128,7 +128,10 @@ uvDim:   .skip 8
         movq    mm0, [esi+ecx*4 + (\phase * 8)]
         movq    mm1, mm0
 
+        ## Zero out upper half of each word (the UV values)
         pand    mm0, mm7
+
+        ## Same here, but replace the bottom half with the UV component
         psrlw   mm1, 8
 
    #######
@@ -145,16 +148,15 @@ uvDim:   .skip 8
         ## mm0: | 0000 | sum1 | 0000 | sum0 |
         pand    mm0, mm6
 
-        .ifeq (\phase)
-        .endif
-
 ########################## FIRST PHASES (0,2)
         .if (\phase == 0 || \phase == 2)
         ## Copy the Y values for later packing
         movq    mm3, mm0
 
-        ## Store UV values for later
-        movq    mm4, mm1
+        ## Put U values in lower doubleword
+        ## Vs in upper
+        ## | V1 | V0 | U1 | U0 |
+        pshufw  mm4, mm1, 0b11011000
         .endif
 
 ########################## SECOND PHASES (1,3)
@@ -164,33 +166,26 @@ uvDim:   .skip 8
         ## mm3 after pack: | y3 | y2 | y1 | y0 |
         packssdw mm3, mm0
 
-        ## Copy old and new values to temp registers
-        movq    mm5, mm4
-        movq    mm2, mm1
+        ## Shuffle U values around
+        ## | V3 | V2 | U3 | U2 |
+        pshufw  mm2, mm1, 0b11011000
 
         ## First write out goes at the pointer, next goes 8 bytes later
         movntq [edi+ ecx*2 + 8 *((\phase-1)/2) + yImg], mm3
 
-        ## Zero out V values
-        pand    mm5, mm6
-        pand    mm2, mm6
+        ## Copy old UV values to mm5
+        movq    mm5, mm4
 
-        ## Pack values together
-        packssdw mm5, mm2
+        ## Unpack U values
+        ## mm4: | U3 | U2 | U1 | U0 |
+	punpckldq mm4, mm2
 
-        ## Copy new values into temp register
-        movq    mm2, mm1
-
-        ## Shift old and new to zero out U values
-        psrld   mm4, 16
-        psrld   mm2, 16
-
-        ## Pack values
-        packssdw mm4, mm2
+        ## mm5: | V3 | V2 | V1 | V0 |
+	punpckhdq mm5, mm2
 
         ## Write out both U and V values
-        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + uImg], mm5
-        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + vImg], mm4
+        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + uImg], mm4
+        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + vImg], mm5
 
         .endif
 
