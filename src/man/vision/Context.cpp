@@ -826,6 +826,26 @@ void Context::classifyInnerL(VisualCorner & corner) {
     // there are two ways the two lines can be connected
     bool l1IsLeft = l1x1 < l2x1;
 
+	// check if this corner is at the edge
+	float distant = 0.0f;
+	const vector < boost::shared_ptr<VisualLine> > * lines =
+		vision->fieldLines->getLines();
+    for (vector < boost::shared_ptr<VisualLine> >::const_iterator i =
+			 lines->begin();
+		 i != lines->end(); ++i) {
+		distant = max((*i)->getDistance(), distant);
+	}
+	bool isInner = false;
+
+	if (distant > corner.getLine1()->getDistance() &&
+		distant > corner.getLine2()->getDistance()) {
+		isInner = true;
+	}
+
+	if (face == FACING_UNKNOWN && !isInner && dist < 2.0f * 70.0f) {
+		lookForFieldCorner(corner, l1, l2);
+	}
+
 	// if we're a long way away and we don't see a goal post
 	// it is highly likely that we see a field corner
 	if (face == FACING_UNKNOWN && cornerDist > 150.0f) {
@@ -839,13 +859,13 @@ void Context::classifyInnerL(VisualCorner & corner) {
 	if (face != FACING_UNKNOWN && cornerDist > 150 && objectDistance > 150 &&
 		realDistance(corner.getX(), corner.getY(), objectRightX, objectRightY) >
 		GOALBOX_DEPTH + 20) {
-		lookForFieldCorner(corner, l1, l2);
+		setFieldCorner(corner);
 		return;
 	}
 
 	// 223-11/annika/center_circle+varous/NBFRM.43
 	if (face != FACING_UNKNOWN && cornerDist > 300) {
-		lookForFieldCorner(corner, l1, l2);
+		setFieldCorner(corner);
 		return;
 	}
 
