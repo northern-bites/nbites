@@ -65,6 +65,7 @@ SET( MOTION_SRCS
 		     ChoppedCommand
 		     LinearChoppedCommand
 		     SmoothChoppedCommand
+		     PreviewChoppedCommand
 		     BaseFreezeCommand
 		     HeadProvider
 		     ChopShop

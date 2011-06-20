@@ -60,18 +60,21 @@ ChoppedCommand::ptr ChopShop::chopCommand(const JointCommand *command) {
 	chopped = chopSmooth(command, currentJoints, numChops) ;
     }
 
+    // for CoM preview estimates
+    ChoppedCommand::ptr preview ( new PreviewChoppedCommand(chopped) );
+
     // Deleting command!
     delete command;
-    return chopped;
+    return preview;
 }
 
 //Smooth interpolation motion
 ChoppedCommand::ptr ChopShop::chopSmooth(const JointCommand *command,
 					 vector<float> currentJoints, int numChops) {
-    return ChoppedCommand::ptr ( new SmoothChoppedCommand(
-				     command,
-				     currentJoints,
-				     numChops ) );
+    return ChoppedCommand::ptr  ( new SmoothChoppedCommand(
+				      command,
+				      currentJoints,
+				      numChops ) );
 }
 
 /*

@@ -31,6 +31,7 @@
 #include "ChoppedCommand.h"
 #include "LinearChoppedCommand.h"
 #include "SmoothChoppedCommand.h"
+#include "PreviewChoppedCommand.h"
 #include "Common.h"
 
 class ChopShop

@@ -32,19 +32,27 @@
 
 #include "Kinematics.h"
 #include "ChoppedCommand.h"
+#include "NBMath.h"
 #include "dsp.h" // for preview filter
+
+using NBMath::ufvector4;
 
 class PreviewChoppedCommand : public ChoppedCommand {
 public:
     PreviewChoppedCommand( ChoppedCommand::ptr choppedCommand );
     ~PreviewChoppedCommand();
 
-    std::vector<float> getNextJoints(int id);
+    // these methods are called on our stored pointer
+    bool isDone();
+    virtual std::vector<float> getNextJoints(int id);
+    const std::vector<float> getStiffness ( Kinematics::ChainID id ) const;
+
+    const ufvector4 getFutureComPosition();
+    const ufvector4 getComDerivative();
 
 private:
-    Boxcar<double> com_x, com_y;
+    Boxcar com_x, com_y, com_dx, com_dy;
     ChoppedCommand::ptr alreadyChoppedCommand;
-
 };
 
 

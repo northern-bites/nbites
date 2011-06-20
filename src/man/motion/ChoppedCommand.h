@@ -50,7 +50,6 @@ private:
     bool finished;
 
  private:
-    // filter for upcoming CoM changes goes here
     std::vector<float> head_stiff, larm_stiff, rarm_stiff;
     std::vector<float> lleg_stiff, rleg_stiff;
 

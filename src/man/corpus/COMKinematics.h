@@ -4,8 +4,7 @@
 #include "Kinematics.h"
 
 namespace Kinematics{
-    const NBMath::ufvector4
-    getCOMc(const std::vector<float> bodyAngles);
+    const NBMath::ufvector4 getCOMc(const std::vector<float> bodyAngles);
 
     void buildJointTransforms(const float angles[]);
 

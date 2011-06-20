@@ -8,7 +8,6 @@
 #include "JointCommand.h"
 #include "ChoppedCommand.h"
 
-
 // At the moment, this only works for Linear Interpolation.
 // Will later extended to apply to Smooth Interpolation
 class LinearChoppedCommand : public ChoppedCommand
