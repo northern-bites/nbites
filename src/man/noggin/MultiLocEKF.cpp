@@ -898,11 +898,41 @@ bool MultiLocEKF::resetLoc(const vector<CornerObservation>& z)
  * Triangulate and reset our position with two definite
  * PointObservations.
  */
-void MultiLocEKF::resetLoc(const PointObservation* pt1,
-                           const PointObservation* pt2)
+void MultiLocEKF::resetLoc(const PointObservation* obs1,
+                           const PointObservation* obs2)
 {
     assert(!pt1->isAmbiguous() && !pt2->isAmbiguous());
 
+    PointLandmark pt1 = obs1.getPossibilities().front();
+    PointLandmark pt2 = obs2.getPossibilities().front();
+
+    float i = pt2.x - pt1.x;
+    float j = pt2.y - pt1.y;
+
+    float sideA = obs1.getDistance();
+    float sideB = obs2.getDistance();
+
+    float sideC = hypotf(i,j);
+    float ptVecHeading = acosf(i/sideC);
+
+    float angleC = abs(subPIAngle(obs1.getBearing() - obs2.getBearing()));
+
+    float angleB = asinf(sideC / (sideB * sin(angleC)));
+
+    if (NBMath::subPIAngle(obs1.getBearing() - obs2.getBearing()) > 0){
+        angleB = -angleB;
+    }
+
+    float x_hat = sideA * cos(angleB) + pt1.x;
+    float y_hat = sideA * sin(angleB) + pt1.y;
+
+    float newX = x_hat * cos(ptVecHeading) - y_hat * sin(ptVecHeading);
+    float newY = x_hat * sin(ptVecHeading) + y_hat * cos(ptVecHeading);
+
+    float headingPt2 = acosf((pt2.x - newX)/sin(sideB));
+    float signedHeadingPt2 = copysignf(1.0f, pt2.y - newY) * headingPt2;
+
+    float newH = NBMath::subPIAngle(signedHeadingPt2 - obs2.getBearing());
 }
 
 void MultiLocEKF::resetLoc(const CornerObservation* c)
