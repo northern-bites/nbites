@@ -221,24 +221,27 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-30.23,-10.19,-35.86,122.78,-67.68,8.44),
                   (-30.23,-26.72,-70.78,54.41,34.99,19.69),
                   (54.85,-45.62,-0.27,24.35),
-                  1.0,0, stiff.STANDUP_STIFFNESSES),
+                  0.4,1, stiff.STANDUP_STIFFNESSES),
                  #pulls right leg in a little
 
                  ((35,2,-14,-41),
                   (-50,5,-90,123,-13,-5),
                   (-50,-5,-90,123,-13,5),
-                  (35,2,14,41),1.5, 0, stiff.STANDUP_STIFFNESSES),
+                  (35,2,14,41),
+                  0.6, 1, stiff.STANDUP_STIFFNESSES),
                    #Rock back to squatting upright
 
                  ((75,10,-53,-74),
                   (-40,6,-61,124,-35,-6),
                   (-40,-6,-61,124,-35,6),
-                  (75,-10,53,74),0.8, 0, stiff.STANDUP_STIFFNESSES),
+                  (75,-10,53,74),
+                  0.4, 1, stiff.STANDUP_STIFFNESSES),
 
                  ((93,10,-90,-80),
                   (0,0,-60,120,-60,0),
                   (0,0,-60,120,-60,0),
-                  (93,-10,90,80),0.8,0, stiff.STANDUP_STIFFNESSES),
+                  (93,-10,90,80),
+                  0.4,1, stiff.STANDUP_STIFFNESSES),
                  #Pull knees together
 
                  #stands up
