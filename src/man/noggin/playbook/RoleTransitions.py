@@ -51,6 +51,7 @@ def shouldChase(team):
     # close enough to chase
     if (ball.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.BOX_BUFFER
         and ball.relX < goalCon.CHASE_RELX_BUFFER
+        and ball.on
           #and ball.y > goalCon.CHASE_LOWER_Y_LIMIT
           #and ball.y < goalCon.CHASE_UPPER_Y_LIMIT
         ):
@@ -71,6 +72,7 @@ def shouldStopChase(team):
     my = team.brain.my
 
     if(ball.framesOff > 30):
+        print "ball off"
         team.shouldStopChaseCounter = 0
         team.shouldChaseCounter = 0
         team.shouldPositionCenterCounter = 0
@@ -89,7 +91,7 @@ def shouldStopChase(team):
         return True
 
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X  and my.uncertX < 90):
-        if(ball.x > goalCon.CHASE_RIGHT_X_LIMIT):
+        if(ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER):
             print "ball not chaseable"
             team.shouldChaseCounter = 0
             team.shouldStopChaseCounter = 0
@@ -106,6 +108,7 @@ def shouldStopChase(team):
         team.shouldStopChaseCounter += 1
 
     if team.shouldStopChaseCounter > 3:
+        print "out of chase range"
         team.shouldStopChaseCounter = 0
         team.shouldChaseCounter = 0
         team.shouldPositionCenterCounter = 0
