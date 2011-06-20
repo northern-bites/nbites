@@ -90,7 +90,7 @@ namespace MotionConstants {
         Kinematics::RARM_CHAIN };
 
     static const float DEFAULT_ON_STIFFNESS = 0.85f;
-    static const float DEFAULT_OFF_STIFFNESS = 0.0f;
+    static const float DEFAULT_OFF_STIFFNESS = -1.0f;
 
     static const bool null_head_mask[Kinematics::NUM_CHAINS] =
     {true, false, false, false, false};
