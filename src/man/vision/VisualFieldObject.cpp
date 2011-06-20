@@ -43,6 +43,7 @@ void VisualFieldObject::init(){
     setBearing(0);
     elevation = 0;
     idCertainty = NOT_SURE;
+    on = false;
 
     switch (id) {
     case BLUE_GOAL_LEFT_POST:

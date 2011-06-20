@@ -21,6 +21,7 @@ void VisualRobot::init()
     setDistance(0);
     setBearing(0);
     elevation = 0;
+    on = false;
 }
 
 /**

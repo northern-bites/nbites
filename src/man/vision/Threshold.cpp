@@ -983,6 +983,9 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
         objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
 
+        // set obj to on screen
+        objPtr->setOn(true);
+
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
 					      objPtr->getCenterX() ) /
@@ -1119,6 +1122,9 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
         // set center x,y
         objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
+
+        // set the robot to on screen for this frame
+        objPtr->setOn(true);
 
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
