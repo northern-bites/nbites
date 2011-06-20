@@ -315,9 +315,8 @@ class GoTeam:
 
         self.numActiveFieldPlayers = 0
         for mate in self.brain.teamMembers: ## @TODO!!!! figure out what happened here. We thought we were with another bot when it was in penalty.
-            if (mate.active and mate.isDead()): #no need to check inactive mates
-                mate.active = False # we set active True when we get a new packet from mate
-            elif (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
+            # don't check inactive mates or the goalie.
+            if (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
                 append(mate)
                 self.numActiveFieldPlayers += 1
 

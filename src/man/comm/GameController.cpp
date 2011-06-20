@@ -372,6 +372,11 @@ const bool GameController::isManuallyPenalized(void) const
     return manuallyPenalized;
 }
 
+const bool GameController::isPenalized(void) const
+{
+	return penalized() != PENALTY_NONE;
+}
+
 //
 // Python GameController interface
 //

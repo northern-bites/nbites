@@ -219,8 +219,9 @@ class TeamMember(RobotLocation):
         returns True if teammates last timestamp is sufficiently behind ours.
         however, the bot could still be on but sending really laggy packets.
         """
-        return (PACKET_DEAD_PERIOD <
-                (self.brain.time - self.lastPacketTime))
+        if ((self.brain.time + PACKET_DEAD_PERIOD) < self.lastPacketTime):
+            print "\nTIME GOT RESET! AH!!!!!!!!!!!!!!!!!!!\n"
+        return (PACKET_DEAD_PERIOD < (self.brain.time - self.lastPacketTime))
 
     def __str__(self):
         return "I am player number " + self.playerNumber
