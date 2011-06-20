@@ -1417,6 +1417,24 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
         if (k->getShape() == INNER_L) {
             int x = k->getX();
             int y = k->getY();
+			float distant = 0;
+			// check if this corner is at the edge
+			const vector < boost::shared_ptr<VisualLine> > * lines =
+				vision->fieldLines->getLines();
+			for (vector < boost::shared_ptr<VisualLine> >::const_iterator i =
+					 lines->begin();
+				 i != lines->end(); ++i) {
+				distant = max((*i)->getDistance(), distant);
+			}
+			if (distant > k->getLine1()->getDistance() &&
+				distant > k->getLine2()->getDistance()) {
+				if (x > post.getLeft()) {
+					return LEFT;
+				} else {
+					return RIGHT;
+				}
+			}
+
             // if we can't see the bottom of the post it is too dangerous
             if (y < post.getBottom() && post.getBottom() < IMAGE_HEIGHT - 2) {
                 // roughly how far away is it?

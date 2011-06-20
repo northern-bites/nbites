@@ -1006,10 +1006,6 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             distanceCertainty cert = objPtr->getDistanceCertainty();
             float distw = getGoalPostDistFromWidth(width);
             float disth = getGoalPostDistFromHeight(height);
-            /*objPtr->getCenterX(),
-                                                     objPtr->getCenterY(),
-                                                     GOAL_POST_CM_HEIGHT * 10/2,
-                                                     */
 
             const int bottomLeftX = objPtr->getLeftBottomX();
             const int bottomRightX = objPtr->getRightBottomX();
@@ -1052,15 +1048,18 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             // sanity check: throw ridiculous distance estimates out
             // constants in Threshold.h
             if (dist < POST_MIN_FOC_DIST ||
-                    dist > POST_MAX_FOC_DIST) {
+				dist > POST_MAX_FOC_DIST) {
                 dist = 0.0;
             }
             objPtr->setDistance(dist);
-        } else { // don't know what object it is
+			if (dist < MIDFIELD_X) {
+				context->setSameHalf();
+			}
+		} else { // don't know what object it is
             //print("setFieldObjectInfo: unrecognized FieldObject");
+			//cout << "What the heck!" << endl;
             return;
         }
-
         // sets focal distance of the field object
         objPtr->setFocDist(objPtr->getDistance());
         // convert dist + angle estimates to body center
@@ -1086,6 +1085,9 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
                                     float distw, float poseDist, int bottom) {
     float dist = 0.0f;
+	if (poseDist < 200.0f) {
+		return poseDist;
+	}
     switch (cert) {
     case HEIGHT_UNSURE:
         dist = distw;
@@ -1194,34 +1196,44 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
             bool blp = vision->bglp->getDistance() > 0.0f;
             bool brp = vision->bgrp->getDistance() > 0.0f;
             float dist = 0.0f;
-            const float CLOSECROSS = 300.0f;
+			float postDist = 0.0f;
+            const float CLOSECROSS = 250.0f;
             const float FARCROSS = 405.0f;
+			const float LONGPOST = 500.0f;
             int postX = 0, postY = 0;
             if (ylp || yrp) {
                 // get the relevant distances
                 if (ylp) {
                     postX = vision->yglp->getLeftBottomX();
                     postY = vision->yglp->getLeftBottomY();
+					postDist = vision->yglp->getDistance();
                 } else {
                     postX = vision->ygrp->getLeftBottomX();
                     postY = vision->ygrp->getLeftBottomY();
+					postDist = vision->ygrp->getDistance();
                 }
                 dist = realDistance(crossX, crossY, postX, postY);
-                if (dist < CLOSECROSS) {
+				if (postDist > LONGPOST) {
+					objPtr->setID(BLUE_GOAL_CROSS);
+				} else if (dist < CLOSECROSS) {
                     objPtr->setID(YELLOW_GOAL_CROSS);
-                } else {
+				} else {
                     objPtr->setID(ABSTRACT_CROSS);
                 }
             } else if (blp || brp) {
                 if (blp) {
                     postX = vision->bglp->getLeftBottomX();
                     postY = vision->bglp->getLeftBottomY();
+					postDist = vision->bglp->getDistance();
                 } else {
                     postX = vision->bgrp->getLeftBottomX();
                     postY = vision->bgrp->getLeftBottomY();
+					postDist = vision->bgrp->getDistance();
                 }
                 dist = realDistance(crossX, crossY, postX, postY);
-                if (dist < CLOSECROSS) {
+				if (postDist > LONGPOST) {
+					objPtr->setID(YELLOW_GOAL_CROSS);
+				} else if (dist < CLOSECROSS) {
                     objPtr->setID(BLUE_GOAL_CROSS);
                 } else {
                     objPtr->setID(ABSTRACT_CROSS);
