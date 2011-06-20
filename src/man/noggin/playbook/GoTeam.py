@@ -131,7 +131,7 @@ class GoTeam:
         #save processing time and skip the rest if we have the ball
         if self.brain.player.inKickingState and play.isChaser():
             if PBConstants.DEBUG_DET_CHASER:
-                self.printf("It's me")
+                self.printf("I should Chase")
             return chaser_mate
 
         # scroll through the teammates
@@ -139,10 +139,12 @@ class GoTeam:
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf("\t mate #%g"% mate.playerNumber)
 
-            # We can skip computation if the mate we are now considering is the chaser_mate.
+            # We can skip computation if the mate we are now considering
+            # is the chaser_mate.
             if (mate == chaser_mate):
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf("mate %g is chaser_mate already." % mate.playerNumber)
+                    self.printf("mate %g is chaser_mate already."
+                                % mate.playerNumber)
                 continue
 
             elif mate.hasBall():
@@ -372,16 +374,16 @@ class GoTeam:
     def noCalledChaser(self):
         """Returns true if no one is chasing and they are not searching"""
         # If everyone else is out, let's not go for the ball
-        #if len(self.getActiveFieldPlayers()) == 0:
+        #if self.numActiveFieldPlayers == 0:
             #return False
 
         if self.brain.gameController.currentState == 'gameReady' or\
                 self.brain.gameController.currentState =='gameSet':
             return False
 
-        # TO-DO: switch this to activeFieldPlayers
-        for mate in self.activeFieldPlayers:
-            if mate.isTeammateRole(PBConstants.CHASER):
+        for mate in self.brain.teamMembers:
+            if (mate.isTeammateRole(PBConstants.CHASER) or
+                mate.isTeammateSubRole(PBConstants.GOALIE_CHASER)):
                 return False
 
         return True
@@ -396,18 +398,9 @@ class GoTeam:
     def shouldUseDubD(self):
         if not PBConstants.USE_DUB_D:
             return False
-        ballY = self.brain.ball.y
-        ballX = self.brain.ball.x
         goalie = self.brain.teamMembers[0]
-        return (
-            ( ballY > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-              ballY < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-              ballX < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-            ( ballY > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-              ballY < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-              ballX < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-              goalie.isTeammateRole(PBConstants.CHASER) )
-            )
+        return (goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER) and
+                not self.brain.player.inKickingState)
 
     def defenderShouldChase(self):
         ballX = self.brain.ball.relX

@@ -1,7 +1,6 @@
 from .Location import (RobotLocation, Location)
 from .. import NogginConstants
 from math import fabs
-import time
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
                     NogginConstants.OPP_GOALBOX_MIDDLE_Y)
@@ -41,7 +40,7 @@ class TeamMember(RobotLocation):
         self.role = None
         self.subRole = None
         self.chaseTime = 0
-        self.lastPacketTime = time.time()
+        self.lastPacketTime = 0.0
 
         #other info we want stored
         self.brain = tbrain # brain instance
@@ -143,48 +142,51 @@ class TeamMember(RobotLocation):
         Attempt to define a time to get to the ball.
         Can give bonuses or penalties in certain situations.
         """
-        time = 0.0
+        t = 0.0
 
         ## if DEBUG_DETERMINE_CHASE_TIME:
         ##     self.printf("DETERMINE CHASE TIME DEBUG")
 
-        time += (self.ballDist / CHASE_SPEED)
+        t += (self.ballDist / CHASE_SPEED)
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time base is " + str(time))
+            self.brain.out.printf("\tChase time base is " + str(t))
 
         # Give a bonus for seeing the ball
         if self.brain.ball.on:
-            time -= BALL_ON_BONUS
+            t -= BALL_ON_BONUS
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after ball on bonus " + str(time))
+            self.brain.out.printf("\tChase time after ball on bonus " + str(t))
 
         # Give a bonus for lining up along the ball-goal line
         lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
         rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
         if (lpb > self.ballBearing > rpb):
-            time -= BALL_GOAL_LINE_BONUS
+            t -= BALL_GOAL_LINE_BONUS
             if (lpb > 0 > rpb):
-                time -= BALL_GOAL_LINE_BONUS
+                t -= BALL_GOAL_LINE_BONUS
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after ball-goal-line bonus " +str(time))
+            self.brain.out.printf("\tChase time after ball-goal-line bonus " +str(t))
 
         # Add a penalty for being fallen over
-        time += FALLEN_ROBOT_PENALTY#(self.brain.fallController.getTimeRemainingEst())
+        t += FALLEN_ROBOT_PENALTY#(self.brain.fallController.getTimeRemainingEst())
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after fallen over penalty " + str(time))
+            self.brain.out.printf("\tChase time after fallen over penalty " + str(t))
             self.brain.out.printf("")
 
-        return time*SEC_TO_MILLIS
+        return t*SEC_TO_MILLIS
 
     def hasBall(self):
         return self.grabbing
 
     def isTeammateRole(self, roleToTest):
         return (self.role == roleToTest)
+
+    def isTeammateSubRole(self, subRoleToTest):
+        return (self.subRole == subRoleToTest)
 
     def isDefaultGoalie(self):
         return (self.playerNumber == DEFAULT_GOALIE_NUMBER)
@@ -214,7 +216,7 @@ class TeamMember(RobotLocation):
     def isDead(self):
         """
         returns True if teammates last timestamp is sufficiently behind ours.
-        however, the dog could still be on but sending really laggy packets.
+        however, the bot could still be on but sending really laggy packets.
         """
         return (PACKET_DEAD_PERIOD <
                 (self.brain.time - self.lastPacketTime))
