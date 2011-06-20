@@ -164,10 +164,10 @@ class Brain(object):
         """
         self.red1 = Robot.Robot(self.vision.red1, Constants.RED_1)
         self.red2 = Robot.Robot(self.vision.red2, Constants.RED_2)
-        self.red3 = Robot.Robot(self.vision.red1, Constants.RED_3)
+        self.red3 = Robot.Robot(self.vision.red3, Constants.RED_3)
         self.blue1 = Robot.Robot(self.vision.navy1, Constants.BLUE_1)
         self.blue2 = Robot.Robot(self.vision.navy2, Constants.BLUE_2)
-        self.blue3 = Robot.Robot(self.vision.navy1, Constants.BLUE_3)
+        self.blue3 = Robot.Robot(self.vision.navy3, Constants.BLUE_3)
 
         self.makeRobotsRelative()
 

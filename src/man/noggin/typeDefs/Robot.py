@@ -19,3 +19,17 @@ class Robot(VisualObject):
         self.topCornerX = visionInfos.x
         self.topCornerY = visionInfos.y
         self.elevation = visionInfos.elevation
+
+    def __str__(self):
+        """ ToString """
+        return ("dist: %g bearing: %g center: (%d, %d) w/h: %g/%g aX/aY: %g/%g framesOn: %d framesOff %d on: %s topCornerX/Y %g/%g elev: %g type: %s" %
+                (self.visDist, self.visBearing,
+                 self.centerX, self.centerY,
+                 self.width, self.height,
+                 self.angleX, self.angleY,
+                 self.framesOn, self.framesOff,
+                 self.on, self.topCornerX, self.topCornerY,
+                 self.elevation, self.type)) 
+
+
+
