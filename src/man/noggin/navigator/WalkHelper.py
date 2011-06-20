@@ -132,6 +132,34 @@ def getWalkStraightParam(my, dest):
 
     return (sX, 0, 0)
 
+def getWalkBackParam(my, dest):
+    relX, relH = 0, 0
+    if hasattr(dest, "relX") and \
+            hasattr(dest, "relH"):
+        relX = dest.relX
+        relH = dest.relH
+    else:
+        bearingDeg = my.getRelativeBearing(dest)
+        distToDest = my.distTo(dest)
+        relX = MyMath.getRelativeX(distToDest, bearingDeg)
+        relH = MyMath.sub180Angle(dest.h - my.h)
+
+    if not fabs(relH) > 150 :
+        spinGain = 1./constants.APPROACH_THETA_WITH_GAIN_DIST
+        sTheta = (180-relH) * spinGain
+        sTheta = MyMath.clip(sTheta,
+                             constants.OMNI_MAX_RIGHT_SPIN_SPEED,
+                             constants.OMNI_MAX_LEFT_SPIN_SPEED)
+        return ( 0, 0, sTheta)
+
+    forwardGain = 1./constants.APPROACH_X_WITH_GAIN_DIST
+    sX = relX * forwardGain
+    sX = MyMath.clip(sX,
+                     constants.GOTO_BACKWARD_SPEED,
+                     constants.GOTO_FORWARD_SPEED)
+
+    return (sX, 0, 0)
+
 def getSpinOnlyParam(my, dest):
     # Determine the speed to turn
     # see if getRotScale can go faster
