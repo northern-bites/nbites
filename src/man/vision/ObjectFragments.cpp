@@ -50,7 +50,7 @@ static const float BOX_FUDGE = 10.0f;          // allow for errors
 //here are defined the lower bounds on the sizes of goals, posts, and balls
 //IMPORTANT: they are only guesses right now.
 
-#define MIN_GOAL_HEIGHT	40
+#define MIN_GOAL_HEIGHT	35
 #define MIN_GOAL_WIDTH	4
 
 // ID information on goal post constant
@@ -1426,6 +1426,7 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
 				 i != lines->end(); ++i) {
 				distant = max((*i)->getDistance(), distant);
 			}
+			// check that the post isn't too far away
 			if (distant > k->getLine1()->getDistance() &&
 				distant > k->getLine2()->getDistance()) {
 				if (x > post.getLeft()) {
@@ -2521,6 +2522,10 @@ bool ObjectFragments::secondPostFarEnough(Blob post1, Blob post2, int post) {
         }
         return false;
     }
+	if ((right2.x >= left1.x - 2 && right2.x <= right1.x + 2) ||
+		(right1.x >= left2.x - 2 && right1.x <= right2.x + 2)) {
+		return false;
+	}
     if (dist(left1.x, left1.y, right2.x, right2.y) > MIN_POST_SEPARATION &&
         dist(left2.x, left2.y, right1.x, right1.y) > MIN_POST_SEPARATION) {
         if (dist(left1.x, left1.y, left2.x, left2.y) > MIN_POST_SEPARATION &&

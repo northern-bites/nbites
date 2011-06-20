@@ -1087,7 +1087,33 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
                 t.setSecondaryShape(RIGHT_GOAL_T);
             }
         }
-    }
+    } else if (l1.getShape() == INNER_L) {
+		if (face == FACING_BLUE_GOAL) {
+			if (l1.doesItPointLeft()) {
+				l1.setSecondaryShape(LEFT_GOAL_BLUE_L);
+				t.setSecondaryShape(LEFT_GOAL_BLUE_T);
+			} else {
+				l1.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+				t.setSecondaryShape(RIGHT_GOAL_BLUE_T);
+			}
+		} else if (face == FACING_YELLOW_GOAL) {
+			if (l1.doesItPointLeft()) {
+				l1.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+				t.setSecondaryShape(LEFT_GOAL_YELLOW_T);
+			} else {
+				l1.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+				t.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
+			}
+		} else {
+			if (l1.doesItPointLeft()) {
+				l1.setSecondaryShape(LEFT_GOAL_L);
+				t.setSecondaryShape(LEFT_GOAL_T);
+			} else {
+				l1.setSecondaryShape(RIGHT_GOAL_L);
+				t.setSecondaryShape(RIGHT_GOAL_T);
+			}
+		}
+	}
 }
 
 /** We have what has been classified as an innerl connected to an outerl.

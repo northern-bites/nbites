@@ -286,14 +286,17 @@ void Threshold::findGoals(int column, int topEdge) {
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
 	int blueRun = 0;
+	bool faceDown2 = pose->getHorizonY(0) < -100;
     for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
         if (Utility::isBlue(pixel)) {
 			if (j - lastBlue < 4) {
 				lastBlue = j;
-				blues++;
-				bad--;
+				if (!faceDown2) {
+					blues++;
+					bad--;
+				}
 				if (firstBlue == topEdge) {
 					firstBlue = j;
 				}
@@ -333,8 +336,8 @@ void Threshold::findGoals(int column, int topEdge) {
         unsigned char pixel = getThresholded(j,column);
         bool found = false;
         if (Utility::isBlue(pixel) && !Utility::isGreen(pixel)) {
-            //blues++;
-			//blueRun++;
+            blues++;
+			blueRun++;
 			if (blueRun > 3 && greens < 4) {
 				firstBlue = j;
 			}
@@ -1199,7 +1202,7 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 			float postDist = 0.0f;
             const float CLOSECROSS = 250.0f;
             const float FARCROSS = 405.0f;
-			const float LONGPOST = 500.0f;
+			const float LONGPOST = 450.0f;
             int postX = 0, postY = 0;
             if (ylp || yrp) {
                 // get the relevant distances
