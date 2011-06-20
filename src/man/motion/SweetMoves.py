@@ -91,74 +91,87 @@ GOALIE_POS = ((INITIAL_POS[0][0],
 STAND_UP_FRONT = ( ((90,50,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (90,-50,0,0 ),0.5,0, stiff.STANDUP_STIFFNESSES ),
+                    (90,-50,0,0 ),
+                    0.5,0, stiff.STANDUP_STIFFNESSES ),
 
                    ((90,90,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (90,-90,0,0 ),0.5,0, stiff.STANDUP_STIFFNESSES ),
+                    (90,-90,0,0 ),
+                    0.5,0, stiff.STANDUP_STIFFNESSES ),
 
                    ((-90,90,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (-90,-90,0,0 ),0.5,0, stiff.STANDUP_STIFFNESSES ),
+                    (-90,-90,0,0 ),
+                    0.5,0, stiff.STANDUP_STIFFNESSES ),
 
                    ((-90,0,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (-90,0,0,0 ),0.7,0, stiff.STANDUP_STIFFNESSES ),
+                    (-90,0,0,0 ),
+                    0.7,0, stiff.STANDUP_STIFFNESSES ),
 
                    ((-90,0,-90,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (-90,0,90,0 ),0.3,0, stiff.STANDUP_STIFFNESSES ),
+                    (-90,0,90,0 ),
+                    0.3,0, stiff.STANDUP_STIFFNESSES ),
                    #All of the above basically position the arms
 
                    ((-50,0,-90,-35),
                     (5,8,-90,120,-65,0),
                     (5,0,-90,120,-65,4),
-                    (-50,0,90,35),1.3,0, stiff.STANDUP_STIFFNESSES),
+                    (-50,0,90,35),
+                    1.3,0, stiff.STANDUP_STIFFNESSES),
 
                    ((25,20,-60,-88),
                     (-50,0,-90,70,-44,-39),
                     (-50,0,-90,70,-44,39),
-                    (25,-20,60,88),0.7,0, stiff.STANDUP_STIFFNESSES),
+                    (25,-20,60,88),
+                    0.7,0, stiff.STANDUP_STIFFNESSES),
                    #Bring arms out to avoid stuck elbows
 
                    ((25,0,-90,-88),
                     (-50,0,-90,70,-44,-39),
                     (-50,0,-90,70,-44,39),
-                    (25,0,90,88),0.5,0, stiff.STANDUP_STIFFNESSES),
+                    (25,0,90,88),
+                    0.5,0, stiff.STANDUP_STIFFNESSES),
                    #Squatting, supported by hands
 
                    ((0,0,-90,-8),
                     (-50,8,-90,58,5,-31),
                     (-50,0,-90,58,5,31),
-                    (0,0,90,8),1.1,0, stiff.STANDUP_STIFFNESSES),
+                    (0,0,90,8),
+                    1.1,0, stiff.STANDUP_STIFFNESSES),
                    #Push back onto feet
 
                    ((35,2,-14,-41),
                     (-50,5,-90,123,-13,-5),
                     (-50,-5,-90,123,-13,5),
-                    (35,2,14,41),1.5, 0, stiff.STANDUP_STIFFNESSES),
+                    (35,2,14,41),
+                    1.5, 0, stiff.STANDUP_STIFFNESSES),
                    #Rock back to squatting upright
 
                    ((75,10,-53,-74),
                     (-40,6,-61,124,-35,-6),
                     (-40,-6,-61,124,-35,6),
-                    (75,-10,53,74),0.8, 0, stiff.STANDUP_STIFFNESSES),
+                    (75,-10,53,74),
+                    0.8, 0, stiff.STANDUP_STIFFNESSES),
 
                    ((93,10,-90,-80),
                     (0,0,-60,120,-60,0),
                     (0,0,-60,120,-60,0),
-                    (93,-10,90,80),0.8,0, stiff.STANDUP_STIFFNESSES),
+                    (93,-10,90,80),
+                    0.8,0, stiff.STANDUP_STIFFNESSES),
                    #Pull knees together
 
                    #Stands up:
                    ( INITIAL_POS[0][0],
                      INITIAL_POS[0][1],
                      INITIAL_POS[0][2],
-                     INITIAL_POS[0][3],1.0,0, stiff.STANDUP_STIFFNESSES))
+                     INITIAL_POS[0][3],
+                     1.0,0, stiff.STANDUP_STIFFNESSES))
 
 
 STAND_UP_BACK = (((100,0,0,0),
