@@ -171,7 +171,7 @@ const WalkVector Step::elipseClipVelocities(const WalkVector & source){
 									 + std::pow(
 										 stepConfig[WP::MAX_VEL_X]
 										 *std::cos(theta),2));
-  const float rad_to_mm = max_xy_mag / stepConfig[WP::MAX_VEL_THETA];
+  const float rad_to_mm = (max_xy_mag / stepConfig[WP::MAX_VEL_THETA]);
   // cout << "xy_mag = " << xy_mag << " converted theta = " << source.theta*rad_to_mm<<endl;
   const float phi = NBMath::safe_atan2(xy_mag,source.theta*rad_to_mm);
 
