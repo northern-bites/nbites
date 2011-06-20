@@ -578,7 +578,7 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
             for (double u = uStart; u <= uEnd; u+=1.){
                 int x = (int)round(x0 + u * sn);
                 int y = (int)round(y0 - u * cs); // cs goes opposite direction
-                drawDot(x,y, BLUE);
+                drawDot(x,y, MAROON);
             }
         }
     }
@@ -587,6 +587,7 @@ void Vision::drawHoughLines(const list<HoughLine>& lines)
 
 void Vision::drawVisualLines(const vector<VisualLine>& lines)
 {
+#ifdef OFFLINE
     if (thresh->debugVisualLines){
         vector<VisualLine>::const_iterator line;
         for (line = lines.begin(); line != lines.end(); line++){
@@ -594,4 +595,5 @@ void Vision::drawVisualLines(const vector<VisualLine>& lines)
             drawLine(line->br, line->bl, MAROON);
         }
     }
+#endif
 }

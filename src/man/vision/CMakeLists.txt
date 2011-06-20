@@ -151,7 +151,8 @@ INSTALL(
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES(
   ${VISION_TARGET}
-  ${PYTHON_LIBRARY} )
+  ${PYTHON_LIBRARY}
+  )
 
 
 ############################ VISIONLINK
