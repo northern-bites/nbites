@@ -27,7 +27,7 @@ from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
 from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet,
-                       Play, TeamMember, FieldLines, FieldEdge, Robot)
+                       Play, TeamMember)
 from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
@@ -92,10 +92,8 @@ class Brain(object):
 
         # Information about the environment
         self.initFieldObjects()
-        self.initVisualRobots()
         self.initTeamMembers()
         self.ball = Ball.Ball(self.vision.ball)
-        self.fieldEdge = FieldEdge.FieldEdge(self.vision.fieldEdge)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
 
@@ -137,63 +135,8 @@ class Brain(object):
         # self.ygCrossbar = Landmarks.Crossbar(self.vision.ygCrossbar,
         #                                      Constants.VISION_YG_CROSSBAR)
 
-        # Now we setup the corners and lines
-        ##########################################################
-        # Notes about corners and lines:
-        # fieldLines contains numLines, lines, numCorners, and corners.
-        # numLines, numCorners = number of lines and corners seen
-        # lines = a list of lines seen (indexing ok)
-        # corners = a list of corners seen. DOES NOT SUPPORT INDEXING.
-        #
-        # Each line has: angle, avgWidth, bearing, dist, length, slope, yInt,
-        #     and possibilities (a list of possible IDs, NO INDEXING)
-        # Each corner has: dist, bearing, x, y, and possibilities (same as
-        #     for lines, NO INDEXING)
-        # The corners/possibilities lists do support iteration.
-        ###########################################################
-
-        self.lines = self.vision.fieldLines.lines
-        self.corners = self.vision.fieldLines.corners
-
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
-
-    def initVisualRobots(self):
-        """
-        Builds all of the robot objects to hold vision information.
-        """
-        self.red1 = Robot.Robot(self.vision.red1, Constants.RED_1)
-        self.red2 = Robot.Robot(self.vision.red2, Constants.RED_2)
-        self.red3 = Robot.Robot(self.vision.red3, Constants.RED_3)
-        self.blue1 = Robot.Robot(self.vision.navy1, Constants.BLUE_1)
-        self.blue2 = Robot.Robot(self.vision.navy2, Constants.BLUE_2)
-        self.blue3 = Robot.Robot(self.vision.navy3, Constants.BLUE_3)
-
-        self.makeRobotsRelative()
-
-    def makeRobotsRelative(self):
-        """
-        Gives robots relative names based on team colors
-        """
-        if self.my.teamColor == Constants.TEAM_BLUE:
-        # Make blue robots my teammates and red ones opponents
-            self.teammate1 = self.blue1
-            self.teammate2 = self.blue2
-            self.teammate3 = self.blue3
-
-            self.opponent1 = self.red1
-            self.opponent2 = self.red2
-            self.opponent3 = self.red3
-
-        else:
-            #Make red robots my teammmates and blue ones opponents
-            self.teammate1 = self.red1
-            self.teammate2 = self.red2
-            self.teammate3 = self.red3
-
-            self.opponent1 = self.blue1
-            self.opponent2 = self.blue2
-            self.opponent3 = self.blue3
 
     def makeFieldObjectsRelative(self):
         """
@@ -313,30 +256,17 @@ class Brain(object):
         Update information about seen objects
         """
         self.ball.updateVision(self.vision.ball)
-        self.fieldEdge.updateVision(self.vision.fieldEdge)
+        #self.fieldEdge.updateVision(self.vision.fieldEdge)
 
         self.yglp.updateVision(self.vision.yglp)
         self.ygrp.updateVision(self.vision.ygrp)
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
 
-        self.red1.updateVision(self.vision.red1)
-        self.red2.updateVision(self.vision.red2)
-        self.red3.updateVision(self.vision.red3)
-        self.blue1.updateVision(self.vision.navy1)
-        self.blue2.updateVision(self.vision.navy2)
-        self.blue3.updateVision(self.vision.navy3)
-
         #self.ygCrossbar.updateVision(self.vision.ygCrossbar)
         #self.bgCrossbar.updateVision(self.vision.bgCrossbar)
 
-        #Update corner info
-        self.corners = self.vision.fieldLines.corners
-
         self.time = time.time()
-
-        #Update line info
-        self.lines = self.vision.fieldLines.lines
 
     def updateComm(self):
         temp = self.comm.latestComm()
