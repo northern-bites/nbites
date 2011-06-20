@@ -372,9 +372,10 @@ const bool GameController::isManuallyPenalized(void) const
     return manuallyPenalized;
 }
 
-const bool GameController::isPenalized(void) const
+const bool GameController::isPenalized(void)
 {
-	return penalized() != PENALTY_NONE;
+	const uint16 currentPenalty = penalty();
+	return currentPenalty != PENALTY_NONE;
 }
 
 //

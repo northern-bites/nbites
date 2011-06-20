@@ -688,7 +688,7 @@ void Comm::send () throw(socket_error)
         send(&buf[0], sizeof(returnPacket), gc_broadcast_addr);
     }
 	// don't send packets if we are penalized.
-	else if (!gc->isPenalized)
+	else if (!(gc->isPenalized()))
 	{
         // C++ header data
         const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
