@@ -4,15 +4,16 @@
 #define __ChoppedCommand_h
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
+
 #include "JointCommand.h"
 #include "Kinematics.h"
-#include "dsp.h" // for preview filter
 
-// At the moment, this only works for Linear Interpolation.
-// Will later extended to apply to Smooth Interpolation
 class ChoppedCommand
 {
  public:
+    typedef boost::shared_ptr<ChoppedCommand> ptr;
+
     // HACK: Empty constructor. Will initialize a finished
     // body joint command with no values. Don't use!
     // ***SHOULD NOT BE USED***
@@ -21,6 +22,7 @@ class ChoppedCommand
     ChoppedCommand ( const JointCommand *command, int chops );
     virtual ~ChoppedCommand(void) { }
 
+    // must define in child classes
     virtual std::vector<float> getNextJoints(int id) {
         return std::vector<float>(0);
     }

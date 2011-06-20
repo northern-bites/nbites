@@ -35,7 +35,7 @@
 class HeadProvider : public MotionProvider {
 public:
     HeadProvider(boost::shared_ptr<Sensors> s,
-				 boost::shared_ptr<Profiler> p);
+		 boost::shared_ptr<Profiler> p);
     virtual ~HeadProvider();
 
     void requestStopFirstInstance();
@@ -43,9 +43,9 @@ public:
 
     void hardReset();
 
-	void enqueueSequence(std::vector<HeadJointCommand*> &seq);
-	void setCommand(const SetHeadCommand* command);
-	void setCommand(const HeadJointCommand* command);
+    void enqueueSequence(std::vector<HeadJointCommand*> &seq);
+    void setCommand(const SetHeadCommand* command);
+    void setCommand(const HeadJointCommand* command);
 
 private:
     enum HeadMode {
@@ -68,7 +68,7 @@ private:
     std::vector< std::vector<float> > nextJoints;
 
 
-    boost::shared_ptr<ChoppedCommand> currCommand;
+    ChoppedCommand::ptr currCommand;
     // Queue of all future commands
     std::queue<const HeadJointCommand*> headCommandQueue;
 

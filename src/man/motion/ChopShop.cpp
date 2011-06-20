@@ -38,9 +38,8 @@ ChopShop::ChopShop (shared_ptr<Sensors> s)
 /*************************************************************************/
 /*******  THIS WILL DELETE THE JOINT COMMAND PASSED TO IT!   *************/
 /*************************************************************************/
-shared_ptr<ChoppedCommand>
-ChopShop::chopCommand(const JointCommand *command) {
-    shared_ptr<ChoppedCommand> chopped;
+ChoppedCommand::ptr ChopShop::chopCommand(const JointCommand *command) {
+    ChoppedCommand::ptr chopped;
     int numChops = 1;
     if (command->getDuration() > MOTION_FRAME_LENGTH_S) {
 	numChops = static_cast<int>(command->getDuration() / MOTION_FRAME_LENGTH_S);
@@ -67,13 +66,12 @@ ChopShop::chopCommand(const JointCommand *command) {
 }
 
 //Smooth interpolation motion
-shared_ptr<ChoppedCommand>
-ChopShop::chopSmooth(const JointCommand *command,
-		     vector<float> currentJoints, int numChops) {
-    return shared_ptr<ChoppedCommand> ( new SmoothChoppedCommand(
-					    command,
-					    currentJoints,
-					    numChops ) );
+ChoppedCommand::ptr ChopShop::chopSmooth(const JointCommand *command,
+					 vector<float> currentJoints, int numChops) {
+    return ChoppedCommand::ptr ( new SmoothChoppedCommand(
+				     command,
+				     currentJoints,
+				     numChops ) );
 }
 
 /*
@@ -81,15 +79,13 @@ ChopShop::chopSmooth(const JointCommand *command,
  * Retrieves current joint angels and acquiries the differences
  * between the current and the intended final. Send them to
  */
-shared_ptr<ChoppedCommand>
-ChopShop::chopLinear(const JointCommand *command,
-		     vector<float> currentJoints,
-		     int numChops) {
-
-    return shared_ptr<ChoppedCommand> ( new LinearChoppedCommand(
-					    command,
-					    currentJoints,
-					    numChops ) );
+ChoppedCommand::ptr ChopShop::chopLinear(const JointCommand *command,
+					 vector<float> currentJoints,
+					 int numChops) {
+    return ChoppedCommand::ptr ( new LinearChoppedCommand(
+				     command,
+				     currentJoints,
+				     numChops ) );
 }
 
 vector<float> ChopShop::getCurrentJoints() {

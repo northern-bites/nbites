@@ -37,16 +37,14 @@ ChoppedCommand::ChoppedCommand(const JointCommand *command, int chops )
     constructStiffness(command);
 }
 
-void
-ChoppedCommand::constructStiffness(const JointCommand *command) {
+void ChoppedCommand::constructStiffness(const JointCommand *command) {
     for (unsigned int i=0; i < NUM_CHAINS; i++)
         constructChainStiffness(static_cast<ChainID>(i),
                                 command);
 }
 
-void
-ChoppedCommand::constructChainStiffness(ChainID id,
-                                        const JointCommand* command) {
+void ChoppedCommand::constructChainStiffness(ChainID id,
+					     const JointCommand* command) {
     const vector<float> *body_stiff = command->getStiffness();
     vector<float>::const_iterator bodyStart = body_stiff->begin();
 
@@ -130,9 +128,8 @@ ChoppedCommand::getStiffness( ChainID chainID ) const
     case LANKLE_CHAIN:
         break;
     }
-    cout << "Should not have reached this point! ERROR!" << endl;
+    cout << "ChoppedCommand-Should not have reached this point! ERROR!" << endl;
     return larm_stiff;
-
 }
 
 vector<float>*
@@ -153,7 +150,6 @@ ChoppedCommand::getStiffnessRef( ChainID chainID )
     case LANKLE_CHAIN:
         break;
     }
-    cout << "Should not have reached this point! ERROR!" << endl;
+    cout << "ChoppedCommand-Should not have reached this point! ERROR!" << endl;
     return &larm_stiff;
-
 }

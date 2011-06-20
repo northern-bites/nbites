@@ -62,7 +62,7 @@ void ScriptedProvider::hardReset(){
         delete cmd;
         bodyCommandQueue.pop();
     }
-    currCommand = shared_ptr<ChoppedCommand>(new ChoppedCommand());
+    currCommand = ChoppedCommand::ptr(new ChoppedCommand());
     setActive();
     pthread_mutex_unlock(&scripted_mutex);
 }

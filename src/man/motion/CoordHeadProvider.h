@@ -70,7 +70,7 @@ private:
     std::vector< std::vector<float> > nextJoints;
 
 
-    boost::shared_ptr<ChoppedCommand> currCommand;
+    ChoppedCommand::ptr currCommand;
     // Queue of all future commands
 
     HeadMode curMode;

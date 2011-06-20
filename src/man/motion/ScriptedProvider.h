@@ -55,7 +55,7 @@ private:
     std::vector<std::vector<float> > nextJoints;
 
     // The current chopped command which is being enacted
-    boost::shared_ptr<ChoppedCommand> currCommand;
+    ChoppedCommand::ptr currCommand;
 
     // Queue to hold the next body commands
     std::queue<const BodyJointCommand*> bodyCommandQueue;

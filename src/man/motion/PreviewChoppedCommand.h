@@ -18,43 +18,34 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef _ChopShop_h_DEFINED
-#define _ChopShop_h_DEFINED
+/**
+ * Provides a wrapper around a ChoppedCommand that generates future
+ * joint angles and CoM positions, to allow for dynamic stabilization.
+ *
+ * @author Nathan Merritt
+ * @date June 2011
+ */
 
-#include <vector>
-#include <boost/shared_ptr.hpp>
+#pragma once
+#ifndef PREVIEW_CHOPPED_H
+#define PREVIEW_CHOPPED_H
 
-#include "Sensors.h"
-#include "BodyJointCommand.h"
-
-#include "JointCommand.h"
+#include "Kinematics.h"
 #include "ChoppedCommand.h"
-#include "LinearChoppedCommand.h"
-#include "SmoothChoppedCommand.h"
-#include "Common.h"
+#include "dsp.h" // for preview filter
 
-class ChopShop
-{
+class PreviewChoppedCommand : public ChoppedCommand {
 public:
-    ChopShop(boost::shared_ptr<Sensors> s);
+    PreviewChoppedCommand( ChoppedCommand::ptr choppedCommand );
+    ~PreviewChoppedCommand();
 
-    ChoppedCommand::ptr chopCommand(const JointCommand *command);
+    std::vector<float> getNextJoints(int id);
 
 private:
-    boost::shared_ptr<Sensors> sensors;
-    float FRAME_LENGTH_S;
-
-    ChoppedCommand::ptr chopLinear(const JointCommand *command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-    ChoppedCommand::ptr chopSmooth(const JointCommand *command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-
-    std::vector<float> getCurrentJoints();
+    Boxcar<double> com_x, com_y;
+    ChoppedCommand::ptr alreadyChoppedCommand;
 
 };
+
 
 #endif

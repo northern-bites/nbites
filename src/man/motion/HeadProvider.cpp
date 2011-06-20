@@ -218,7 +218,7 @@ void HeadProvider::stopScripted(){
         delete cmd;
         headCommandQueue.pop();
     }
-    currCommand = shared_ptr<ChoppedCommand>(new ChoppedCommand());
+    currCommand = ChoppedCommand::ptr(new ChoppedCommand());
 
 }
 
