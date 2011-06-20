@@ -953,6 +953,14 @@ void Threshold::objectRecognition() {
 void Threshold::storeFieldObjects() {
 
     setFieldObjectInfo(vision->yglp);
+    if (vision->yglp->isOn()) {
+        vision->yglp->setFramesOn(vision->yglp->getFramesOn()+1);
+        vision->yglp->setFramesOff(0);
+    }
+    else {
+        vision->yglp->setFramesOff(vision->yglp->getFramesOff()+1);
+        vision->yglp->setFramesOn(0);
+    }
     setFieldObjectInfo(vision->ygrp);
     setFieldObjectInfo(vision->bglp);
     setFieldObjectInfo(vision->bgrp);

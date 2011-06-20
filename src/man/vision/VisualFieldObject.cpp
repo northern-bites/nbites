@@ -7,6 +7,8 @@ VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
     : VisualLandmark<fieldObjectID>(_id), VisualDetection()
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 
@@ -14,6 +16,8 @@ VisualFieldObject::VisualFieldObject()
     : VisualLandmark<fieldObjectID>(UNKNOWN_FIELD_OBJECT), VisualDetection()
  {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 VisualFieldObject::VisualFieldObject(const int _x, const int _y,
