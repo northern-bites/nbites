@@ -44,6 +44,10 @@ BOOST_PYTHON_MODULE(vision)
         // From VisualLandmark
         .def_readonly("certainty", &VisualFieldObject::getIDCertainty)
         .def_readonly("distCertainty", &VisualFieldObject::getDistanceCertainty)
+        // From VisualFieldObject
+        .def_readonly("on", &VisualFieldObject::isOn)
+        .def_readonly("framesOn", &VisualFieldObject::getFramesOn)
+        .def_readonly("framesOff", &VisualFieldObject::getFramesOff)
         ;
 
     // From VisualLandmark.h, ID certainty possibilities

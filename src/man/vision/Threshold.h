@@ -150,6 +150,7 @@ public:
     void initCompressedTable(std::string filename);
 
     void storeFieldObjects();
+    void setFramesOnAndOff(VisualFieldObject *objPtr);
     void setFieldObjectInfo(VisualFieldObject *objPtr);
     void setVisualRobotInfo(VisualRobot *objPtr);
     void setVisualCrossInfo(VisualCross *objPtr);

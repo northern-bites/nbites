@@ -953,17 +953,17 @@ void Threshold::objectRecognition() {
 void Threshold::storeFieldObjects() {
 
     setFieldObjectInfo(vision->yglp);
-    if (vision->yglp->isOn()) {
-        vision->yglp->setFramesOn(vision->yglp->getFramesOn()+1);
-        vision->yglp->setFramesOff(0);
-    }
-    else {
-        vision->yglp->setFramesOff(vision->yglp->getFramesOff()+1);
-        vision->yglp->setFramesOn(0);
-    }
+    setFramesOnAndOff(vision->yglp);
+
     setFieldObjectInfo(vision->ygrp);
+    setFramesOnAndOff(vision->ygrp);
+
     setFieldObjectInfo(vision->bglp);
+    setFramesOnAndOff(vision->bglp);
+
     setFieldObjectInfo(vision->bgrp);
+    setFramesOnAndOff(vision->bgrp);
+
     setVisualCrossInfo(vision->cross);
     vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
@@ -980,6 +980,21 @@ void Threshold::storeFieldObjects() {
 #endif
 
 }
+
+/*
+ * Sets frames on/off to the correct number for a VisualFieldObject
+ */
+void Threshold::setFramesOnAndOff(VisualFieldObject *objPtr) {
+   if (objPtr->isOn()) {
+        objPtr->setFramesOn(objPtr->getFramesOn()+1);
+        objPtr->setFramesOff(0);
+    }
+    else {
+        objPtr->setFramesOff(objPtr->getFramesOff()+1);
+        objPtr->setFramesOn(0);
+    }
+ }
+
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
  * @param objPtr    the field object to study
