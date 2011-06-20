@@ -1,6 +1,7 @@
 from .Location import (RobotLocation, Location)
 from .. import NogginConstants
 from math import fabs
+import time
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
                     NogginConstants.OPP_GOALBOX_MIDDLE_Y)
@@ -40,7 +41,7 @@ class TeamMember(RobotLocation):
         self.role = None
         self.subRole = None
         self.chaseTime = 0
-        self.lastPacketTime = 0.0
+        self.lastPacketTime = time.time()
 
         #other info we want stored
         self.brain = tbrain # brain instance
@@ -82,7 +83,7 @@ class TeamMember(RobotLocation):
         self.dribbling = self.ballDist <= \
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING
 
-        self.lastPacketTime = time.time()
+        self.lastPacketTime = self.time.time()
 
 
     def updateMe(self):
@@ -117,7 +118,7 @@ class TeamMember(RobotLocation):
                          (fabs(self.ballBearing) <
                           NogginConstants.BALL_TEAMMATE_BEARING_GRABBING)
 
-        self.lastPacketTime = self.brain.time
+        self.lastPacketTime = self.time.time()
 
     def reset(self):
         '''Reset all important Teammate variables'''

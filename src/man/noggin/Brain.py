@@ -230,6 +230,7 @@ class Brain(object):
 
         # order here is very important
         # Update Environment
+        self.time = time.time()
         self.updateVisualObjects()
         self.sonar.updateSensors(self.sensors)
 
@@ -244,7 +245,6 @@ class Brain(object):
         self.leds.processLeds()
 
         # Behavior stuff
-        self.time = time.time()
         self.gameController.run()
         self.fallController.run()
         self.updatePlaybook()
@@ -276,8 +276,6 @@ class Brain(object):
         # # Update the corner information
         self.fieldLines.updateCorners(self.vision.fieldLines)
         self.corners = self.fieldLines.corners
-
-        self.time = time.time()
 
         # # Now we get the latest list of lines
         self.fieldLines.updateLines(self.vision.fieldLines)
