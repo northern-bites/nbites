@@ -974,8 +974,10 @@ void Context::findUnconnectedCornerRelationship(VisualCorner & first,
         inner->setSecondaryShape(RIGHT_GOAL_CORNER);
         if (face == FACING_BLUE_GOAL) {
             outer->setSecondaryShape(RIGHT_GOAL_BLUE_L);
+			inner->setSecondaryShape(BLUE_GOAL_BOTTOM);
         } else if (face == FACING_YELLOW_GOAL) {
             outer->setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+			inner->setSecondaryShape(YELLOW_GOAL_TOP);
         } else {
             outer->setSecondaryShape(RIGHT_GOAL_L);
         }
@@ -984,8 +986,10 @@ void Context::findUnconnectedCornerRelationship(VisualCorner & first,
         inner->setSecondaryShape(LEFT_GOAL_CORNER);
         if (face == FACING_BLUE_GOAL) {
             outer->setSecondaryShape(LEFT_GOAL_BLUE_L);
+			inner->setSecondaryShape(BLUE_GOAL_TOP);
         } else if (face == FACING_YELLOW_GOAL) {
             outer->setSecondaryShape(LEFT_GOAL_YELLOW_L);
+			inner->setSecondaryShape(YELLOW_GOAL_BOTTOM);
         } else {
             outer->setSecondaryShape(LEFT_GOAL_L);
         }
