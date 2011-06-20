@@ -89,11 +89,11 @@ void CoordHeadProvider::coordMode(){
 
     //Calculate how much we can move toward the goal
     float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
-                                               - yawMaxSpeed,
-                                               yawMaxSpeed);
+										 - yawMaxSpeed,
+										 yawMaxSpeed);
     float pitchChangeTarget = NBMath::clip(pitchDest - lastPitchDest,
-                                                 -pitchMaxSpeed,
-                                                 pitchMaxSpeed);
+										   -pitchMaxSpeed,
+										   pitchMaxSpeed);
 
 #ifdef DEBUG_HEADPROVIDER
     cout << "Last values "<<endl
@@ -120,9 +120,10 @@ void CoordHeadProvider::coordMode(){
 
 
 void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
+	// All distances are expected to be in mm
     pthread_mutex_lock(&coord_head_provider_mutex);
     transitionTo(COORD);
-    float relY = command->getRelY()-pose->getFocalPointInWorldFrameY();//adjust from mm to cm
+    float relY = command->getRelY()-pose->getFocalPointInWorldFrameY();
     float relX = command->getRelX()-pose->getFocalPointInWorldFrameX();
     float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()-300;//adjust for robot center's distance above ground
     yawDest = atan(relY/relX);
@@ -159,6 +160,7 @@ vector<float> CoordHeadProvider::getCurrentHeads() {
 
 void CoordHeadProvider::setActive(){
     isDone() ? inactive() : active();
+	/* ** *///cout<<"Coord head active?: "<<isDone()<<endl;
 }
 
 

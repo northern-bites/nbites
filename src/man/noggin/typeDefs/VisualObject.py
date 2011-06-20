@@ -10,9 +10,13 @@ class VisualObject():
         self.height = 0
         self.focDist = 0
         self.visDist = 0
+        # relative distance according to the vision system
         self.visBearing = 0
+        # relative bearing according to the vision system
         self.angleX = 0
+        # positive is left from center of vision frame
         self.angleY = 0
+        # positive is up from center of vision frame
         self.framesOn = 0
         self.framesOff = 0
         self.on = False

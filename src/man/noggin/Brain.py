@@ -116,10 +116,10 @@ class Brain(object):
         """
 
         # Build instances of the vision based field objects
+        # Left post is on that goalie's left
         # Yellow goal left and right posts
         self.yglp = Landmarks.FieldObject(self.vision.yglp,
                                           Constants.VISION_YGLP)
-
         self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
                                           Constants.VISION_YGRP)
 

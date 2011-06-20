@@ -85,11 +85,11 @@ private:
 
 	//constants
     //lower camera
-    static const float CAMERA_ANGLE = .6981;
+    static const float CAMERA_ANGLE = 0.6981f;
 	//clip constants for setCommand()
-	static const float PITCH_MIN_CLIP = -.65;
-	static const float PITCH_MAX_CLIP = .5;
-	static const float SPEED_CLIP_FACTOR = .2;
+	static const float PITCH_MIN_CLIP = -0.65f;
+	static const float PITCH_MAX_CLIP = 0.5f;
+	static const float SPEED_CLIP_FACTOR = 0.1f;
 };
 
 #endif
