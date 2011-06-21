@@ -18,7 +18,9 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-MVisionSensors::MVisionSensors(shared_ptr<Sensors> s) : sensors(s) { }
+MVisionSensors::MVisionSensors(shared_ptr<Sensors> s) : sensors(s) {
+    REGISTER_MOBJECT("VisionSensors");
+}
 
 MVisionSensors::~MVisionSensors() {
 }

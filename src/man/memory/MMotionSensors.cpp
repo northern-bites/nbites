@@ -20,6 +20,7 @@ using namespace proto;
 using namespace std;
 
 MMotionSensors::MMotionSensors(shared_ptr<Sensors> s) : sensors(s) {
+    REGISTER_MOBJECT("MotionSensors");
 }
 
 MMotionSensors::~MMotionSensors() {

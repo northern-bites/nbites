@@ -17,6 +17,7 @@ using std::list;
 
 MVision::MVision(shared_ptr<Vision> v) :
     vision(v) {
+    REGISTER_MOBJECT("Vision");
 }
 
 MVision::~MVision() {

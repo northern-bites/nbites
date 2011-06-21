@@ -5,34 +5,34 @@
  * to the generic wrapper class to the protobuffer subsystem we employ to
  * manage important data
  *
+ * N.B. All derived classes should call setName or REGISTER_MOBJECT in their constructor
+ *
  *      Author: Octavian Neamtu
  */
 
 #pragma once
 
-namespace memory {
+#define REGISTER_MOBJECT(x) {this->setName(x);}
 
-/**
- * @enum MObject_ID
- *
- * This enum is written as an int in the log head in order to identify it
- *
- */
-enum MObject_ID {
-    MVISION_ID = 1,//!< MVISION_ID
-    MMOTION_SENSORS_ID = 2,//!< MMOTION_SENSORS_ID
-    MVISION_SENSORS_ID = 3,//!< MVISION_SENSORS_ID
-    MIMAGE_ID = 5,//!< MIMAGE_ID
-};
+namespace memory {
 
 class MObject {
 
 public:
+    MObject() : name("unknown"){
+    }
     /**
      * method update - this should be overwritten by a method that sets all of
      * the proto message fields with values from its respective man counterpart
      */
     virtual void update() = 0;
 
+protected:
+    void setName(std::string new_name) { name = new_name; }
+
+private:
+    std::string name;
+
 };
+
 }

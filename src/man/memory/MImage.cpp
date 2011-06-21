@@ -5,6 +5,7 @@
  */
 
 #include <string>
+#include <typeinfo>
 
 #include "Common.h" //for micro_time
 #include "MemoryMacros.h"
@@ -21,7 +22,7 @@ MImage::MImage(shared_ptr<Sensors> s) : RoboImage(), sensors(s) {
     //cout << " string capacity " << NAO_IMAGE_BYTE_SIZE << " "<<  image_string->capacity() << endl;
     //char* image_string_data = const_cast<char *>(image_string->data());
     //sensors->setNaoImagePointer(image_string_data);
-
+    REGISTER_MOBJECT("Image");
 }
 
 MImage::~MImage() {
