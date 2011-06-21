@@ -48,7 +48,7 @@ FOV_Y_DEG = 34.8
 IMAGE_ANGLE_X = IMAGE_WIDTH / FOV_X_DEG
 IMAGE_ANGLE_Y = IMAGE_HEIGHT / FOV_Y_DEG
 
-NUM_TOTAL_BALL_VALUES = 35
+NUM_TOTAL_BALL_VALUES = 36
 NUM_VISION_BALL_VALUES = 9 #unused? 1/20/10
 NUM_VISION_FIELD_OBJECT_VALUES = 9
 
@@ -235,6 +235,15 @@ visionObjectTuple = ("YGLP",
                      "YGRP",
                      "BGLP",
                      "BGRP")
+
+#Vision IDS for robots
+NUM_POSSIBLE_ROBOTS = 6
+(RED_1,
+RED_2,
+RED_3,
+BLUE_1,
+BLUE_2,
+BLUE_3) = range(NUM_POSSIBLE_ROBOTS)
 
 if USING_LAB_FIELD:
     LINE_CROSS_OFFSET = 130
