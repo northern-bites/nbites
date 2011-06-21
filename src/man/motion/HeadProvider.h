@@ -67,7 +67,6 @@ private:
     ChopShop chopper;
     std::vector< std::vector<float> > nextJoints;
 
-
     ChoppedCommand::ptr currCommand;
     // Queue of all future commands
     std::queue<const HeadJointCommand*> headCommandQueue;

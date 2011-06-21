@@ -38,7 +38,8 @@ ChopShop::ChopShop (shared_ptr<Sensors> s)
 /*************************************************************************/
 /*******  THIS WILL DELETE THE JOINT COMMAND PASSED TO IT!   *************/
 /*************************************************************************/
-ChoppedCommand::ptr ChopShop::chopCommand(const JointCommand *command) {
+ChoppedCommand::ptr ChopShop::chopCommand(const JointCommand *command,
+					  bool comPreview) {
     ChoppedCommand::ptr chopped;
     int numChops = 1;
     if (command->getDuration() > MOTION_FRAME_LENGTH_S) {
@@ -60,12 +61,14 @@ ChoppedCommand::ptr ChopShop::chopCommand(const JointCommand *command) {
 	chopped = chopSmooth(command, currentJoints, numChops) ;
     }
 
-    // for CoM preview estimates
-    ChoppedCommand::ptr preview ( new PreviewChoppedCommand(chopped) );
-
-    // Deleting command!
+    // Deleting JointCommand!
     delete command;
-    return preview;
+
+    // for CoM preview estimates
+    if (comPreview) {
+	return ChoppedCommand::ptr ( new PreviewChoppedCommand(chopped) );
+    }
+    return chopped;
 }
 
 //Smooth interpolation motion

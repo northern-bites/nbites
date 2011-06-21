@@ -39,7 +39,8 @@ class ChopShop
 public:
     ChopShop(boost::shared_ptr<Sensors> s);
 
-    ChoppedCommand::ptr chopCommand(const JointCommand *command);
+    ChoppedCommand::ptr chopCommand(const JointCommand *command,
+				    bool comPreview=false);
 
 private:
     boost::shared_ptr<Sensors> sensors;

@@ -26,7 +26,7 @@ class ChoppedCommand
         return std::vector<float>(0);
     }
     virtual const std::vector<float> getStiffness( Kinematics::ChainID chaindID) const;
-    bool isDone() const { return finished; }
+    virtual bool isDone() const { return finished; }
 
  protected:
     void checkDone();

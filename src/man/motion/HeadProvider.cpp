@@ -170,15 +170,11 @@ void HeadProvider::enqueueSequence(std::vector<HeadJointCommand*> &seq) {
 }
 
 void HeadProvider::setNextHeadCommand() {
-
-
 	if ( !headCommandQueue.empty() ) {
 		const HeadJointCommand *command = headCommandQueue.front();
 		currCommand = chopper.chopCommand(command);
 		headCommandQueue.pop();
-
 	}
-
 }
 
 vector<float> HeadProvider::getCurrentHeads() {

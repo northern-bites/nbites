@@ -30,10 +30,10 @@
 #ifndef PREVIEW_CHOPPED_H
 #define PREVIEW_CHOPPED_H
 
-#include "Kinematics.h"
+#include "COMKinematics.h"
 #include "ChoppedCommand.h"
 #include "NBMath.h"
-#include "dsp.h" // for preview filter
+#include "dsp.h" // for FifoBuffer
 
 using NBMath::ufvector4;
 
@@ -42,15 +42,20 @@ public:
     PreviewChoppedCommand( ChoppedCommand::ptr choppedCommand );
     ~PreviewChoppedCommand();
 
-    // these methods are called on our stored pointer
-    std::vector<float> getNextJoints(int id);
-    const std::vector<float> getStiffness ( Kinematics::ChainID id ) const;
+    virtual std::vector<float> getNextJoints(int id);
+    virtual const std::vector<float> getStiffness(Kinematics::ChainID id) const;
+    virtual bool isDone() const;
 
     const ufvector4 getFutureComPosition();
     const ufvector4 getComDerivative();
 
 private:
-    void checkDone();
+    void bufferNextAngles(int chainID);
+
+    typedef FifoBuffer<std::vector<float> > VectorFifo;
+    std::vector<VectorFifo> jointAngles;
+
+    std::vector<float> thisFramesAngles;
 
     Boxcar com_x, com_y, com_dx, com_dy;
     ChoppedCommand::ptr alreadyChoppedCommand;

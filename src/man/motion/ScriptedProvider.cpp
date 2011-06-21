@@ -156,7 +156,8 @@ void ScriptedProvider::setNextBodyCommand() {
 	// Replace the current command and delete the
 	// next command object
 	PROF_ENTER(profiler, P_CHOPPED);
-	currCommand = chopper.chopCommand(nextCommand);
+	const bool useComPreviews = true;
+	currCommand = chopper.chopCommand(nextCommand, useComPreviews);
 	PROF_EXIT(profiler, P_CHOPPED);
     }
 }
