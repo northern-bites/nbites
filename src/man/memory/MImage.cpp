@@ -10,6 +10,7 @@
 #include "MemoryMacros.h"
 #include "MImage.h"
 
+namespace man {
 namespace memory {
 
 using boost::shared_ptr;
@@ -43,5 +44,6 @@ void MImage::update() {
 //    printf("%p %p %p %p \n", &c[0], data, unsafe_data, s->data());
     //cout << unsafe_data << " " << sensors->getNaoImage() << endl;
 
+}
 }
 }

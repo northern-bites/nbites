@@ -14,6 +14,7 @@
 #include "MObject.h"
 #include "Sensors.h"
 
+namespace man {
 namespace memory {
 class MImage: public RoboImage, public MObject {
 
@@ -35,4 +36,5 @@ private:
     boost::shared_ptr<Sensors> sensors;
 
 };
+}
 }

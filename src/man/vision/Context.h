@@ -180,10 +180,10 @@ public:
     // prints their string representations
     void printPossibilities(const std::list <const ConcreteCorner*> &list)const;
     // Determines which field objects are visible on the screen and returns
-    // a vector of the pointers of the objects that are visible.
+    // a std::vector of the pointers of the objects that are visible.
     std::vector<const VisualFieldObject*> getVisibleFieldObjects();
 
-    vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
+    std::vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
 
     const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
 
