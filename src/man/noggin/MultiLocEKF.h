@@ -16,7 +16,10 @@
 #include "LocSystem.h"
 #include "dsp.h"
 
+// #define DEBUG_LOC_EKF_INPUTS
+// #define DEBUG_STANDARD_ERROR
 // #define DEBUG_DIVERGENCE_CALCULATIONS
+// #define DEBUG_ERROR_LOG
 
 
 /**
@@ -229,8 +232,19 @@ private:
             // Signal system to not use this observation and that
             // there was an observed error during this frame
             (*R_k)(0,0) = DONT_PROCESS_KEY;
-            observationError = true;
         }
+
+        double pushValue =  ((*R_k)(0,0) == DONT_PROCESS_KEY) ? 1.0f : 0.0f;
+
+        // If we've seen to many erroneous frames, let's reset to be safe
+        if (errorLog.X(pushValue) > ERROR_RESET_THRESH &&
+            errorLog.Steady()){
+            resetFlag = true;
+        }
+
+#ifdef DEBUG_ERROR_LOG
+        cout << "Error log has value of " << errorLog.Y() << endl;
+#endif /* DEBUG_ERROR_LOG */
     }
 
     /**
@@ -320,10 +334,10 @@ private:
      * erroneous (too divergent) observations.
      */
     Boxcar errorLog;
-    bool observationError, resetFlag;
+    bool resetFlag;
 
     enum {
-        error_log_width = 50
+        error_log_width = 20
     };
 
     // Fraction of frames with an erroneous observation

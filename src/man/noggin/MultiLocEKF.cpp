@@ -3,10 +3,7 @@
 #include <iostream>
 
 #include "FieldConstants.h"
-// #define DEBUG_LOC_EKF_INPUTS
-// #define DEBUG_STANDARD_ERROR
-// #define DEBUG_DIVERGENCE_CALCULATIONS
-// #define DEBUG_ERROR_LOG
+
 using namespace boost::numeric;
 using namespace boost;
 using namespace std;
@@ -51,7 +48,7 @@ const float MultiLocEKF::Y_EST_MIN = 0.0f;
 const float MultiLocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
 const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
 
-const float MultiLocEKF::ERROR_RESET_THRESH = 0.2f;
+const float MultiLocEKF::ERROR_RESET_THRESH = 0.6f;
 const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
 
 
@@ -165,7 +162,7 @@ MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
                         loc_ekf_dimension>(BETA_LOC,GAMMA_LOC), LocSystem(),
       lastOdo(0,0,0), lastPointObservations(), lastCornerObservations(),
       useAmbiguous(true), errorLog(error_log_width),
-      observationError(false), resetFlag(false)
+      resetFlag(false)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -248,9 +245,6 @@ void MultiLocEKF::updateLocalization(const MotionModel& u,
     printBeforeUpdateInfo();
 #endif
 
-    // Reset error check
-    observationError = false;
-
     odometryUpdate(u);
     applyObservations(pt_z, c_z);
     endFrame();
@@ -290,12 +284,16 @@ void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
         // resetFlag = false if we reset loc, still true otherwise
         resetFlag = !resetLoc(pt_z, c_z);
 
+        if (!resetFlag){
+            errorLog.Reset();
+        }
+
         // We should only run a correction step if we've seen
         // observations, and we are still waiting to correct our Loc
         shouldCorrect = shouldCorrect && resetFlag;
     }
 
-    // Correct step based on the observed stuff
+    // Correct step based on the observations
     shouldCorrect ? correctionStep(pt_z, c_z) : noCorrectionStep();
 
     //limitPosteriorUncert();
@@ -643,37 +641,13 @@ void MultiLocEKF::limitAPrioriUncert()
 void MultiLocEKF::limitPosteriorUncert()
 {
     // Check x uncertainty
-    if(P_k(0,0) < X_UNCERT_MIN) {
-        P_k(0,0) = X_UNCERT_MIN;
-        P_k_bar(0,0) = X_UNCERT_MIN;
-    }
-    // Check y uncertainty
-    if(P_k(1,1) < Y_UNCERT_MIN) {
-        P_k(1,1) = Y_UNCERT_MIN;
-        P_k_bar(1,1) = Y_UNCERT_MIN;
+    P_k(0,0) = P_k_bar(0,0) = clip(P_k(0,0), X_UNCERT_MIN, X_UNCERT_MAX);
 
-    }
-    // Check h uncertainty
-    if(P_k(2,2) < H_UNCERT_MIN) {
-        P_k(2,2) = H_UNCERT_MIN;
-        P_k_bar(2,2) = H_UNCERT_MIN;
-
-    }
-    // Check x uncertainty
-    if(P_k(0,0) > X_UNCERT_MAX) {
-        P_k(0,0) = X_UNCERT_MAX;
-        P_k_bar(0,0) = X_UNCERT_MAX;
-    }
     // Check y uncertainty
-    if(P_k(1,1) > Y_UNCERT_MAX) {
-        P_k(1,1) = Y_UNCERT_MAX;
-        P_k_bar(1,1) = Y_UNCERT_MAX;
-    }
+    P_k(1,1) = P_k_bar(1,1) = clip(P_k(1,1), Y_UNCERT_MIN, Y_UNCERT_MAX);
+
     // Check h uncertainty
-    if(P_k(2,2) > H_UNCERT_MAX) {
-        P_k(2,2) = H_UNCERT_MAX;
-        P_k_bar(2,2) = H_UNCERT_MAX;
-    }
+    P_k(2,2) = P_k_bar(2,2) = clip(P_k(2,2), H_UNCERT_MIN, H_UNCERT_MAX);
 }
 
 /**
@@ -800,20 +774,7 @@ void MultiLocEKF::printAfterUpdateInfo()
  */
 void MultiLocEKF::beforeCorrectionFinish()
 {
-    double pushValue(0.0f);
-    if (observationError){
-        pushValue = 1.0f;
-    }
 
-#ifdef DEBUG_ERROR_LOG
-    cout << "Error log has value of " << errorLog.Y() << endl;
-#endif /* DEBUG_ERROR_LOG */
-
-    // If we've seen to many erroneous frames, let's reset to be safe
-    if (errorLog.X(pushValue) > ERROR_RESET_THRESH &&
-        errorLog.Steady()){
-        resetFlag = true;
-    }
 }
 
 
@@ -828,7 +789,7 @@ void MultiLocEKF::beforeCorrectionFinish()
 bool MultiLocEKF::resetLoc(const vector<PointObservation> pt_z,
                            const vector<CornerObservation>& c_z)
 {
-    return (resetLoc(pt_z) || resetLoc(c_z));
+    return (resetLoc(pt_z));// || resetLoc(c_z));
 }
 
 /**
@@ -856,8 +817,8 @@ bool MultiLocEKF::resetLoc(const vector<PointObservation>& z)
     }
 
 #ifdef DEBUG_ERROR_LOG
-        cout << "Resetting localization with points: "
-             << *def_1 << " and " << *def_2 << endl;
+    cout << "Resetting localization with points: "
+         << *def_1 << " and " << *def_2 << endl;
 #endif
 
     if (def_2 != NULL){
@@ -888,7 +849,7 @@ bool MultiLocEKF::resetLoc(const vector<CornerObservation>& z)
         cout << "Resetting localization with corner: "
              << *i << endl;
 #endif
-            return true;
+        return true;
         }
     }
     return false;
@@ -917,19 +878,19 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
      *    sin(C)    sin(B)    sin(A)
      *
      *     self   b
-     *        +---------+ pt2  _
+     *        +---------+ pt2  ^
      *        |C      A/       |
      *        |       /        |
      *        |      /         |
      *      a |     / c        |
-     *        |    /        i  |   (x goes up, like on the field. Heading of zero is up)
-     *        |   /            |
+     *        |    /        i  |   (x goes up, like on the field.
+     *        |   /            |            Heading of zero is up)
      *        |B /             |
      *        | /              |
      *        +/               _
      *      pt1
      *            j
-     *       |-----------|
+     *       |----------->
      */
 
     float sideA = obs1->getVisDistance();
@@ -937,10 +898,16 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
     float sideC = hypotf(i,j);
 
     // Calculate angle between vector (pt1,pt2) and north (zero heading)
-    float ptVecHeading = acosf(i/sideC);
+    float ptVecHeading = copysign(1.0f, j) * acosf(i/sideC);
 
-    float angleC = abs(subPIAngle(obs1->getVisBearing() - obs2->getVisBearing()));
-    float angleB = asinf(sideC / (sideB * sin(angleC)));
+    float angleC = abs(subPIAngle(obs1->getVisBearing() -
+                                  obs2->getVisBearing()));
+
+    // Clamp the input to asin to within (-1 , 1) due to measurement
+    // inaccuracies. This prevents a nan return from asin.
+    float angleB = asinf( max( min( (sideB * sin(angleC)) /sideC,
+                                    1.0f),
+                               -1.0f));
 
      // Swap sign of angle B to place us on the correct side of the
     // line (pt1 -> pt2)
@@ -949,16 +916,17 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
     }
 
     // x_hat, y_hat are x and y in coord frame with x axis pointed
-    // from (pt1 -> pt2) and y perpindicular
-    float x_hat = sideA * cos(angleB) + pt1.x;
-    float y_hat = sideA * sin(angleB) + pt1.y;
+    // from (pt1 -> pt2) and y perpendicular
+    float x_hat = sideA * cos(angleB);
+    float y_hat = sideA * sin(angleB);
 
-    // Transform to global x and y coords
-    float newX = x_hat * cos(ptVecHeading) - y_hat * sin(ptVecHeading);
-    float newY = x_hat * sin(ptVecHeading) + y_hat * cos(ptVecHeading);
+    // Transform to global x and y coordinates
+    float newX = x_hat * cos(ptVecHeading) - y_hat * sin(ptVecHeading) + pt1.x;
+    float newY = x_hat * sin(ptVecHeading) + y_hat * cos(ptVecHeading) + pt1.y;
 
     // Heading of line (self -> pt2)
-    float headingPt2 = acosf((pt2.x - newX)/sin(sideB));
+    // Clamp the input to (-1,1) to prevent illegal trig call and a nan return
+    float headingPt2 = acosf( min(max( (pt2.x - newX)/sideB, -1.0f), 1.0f) );
 
     // Sign based on y direction of vector (self -> pt2)
     float signedHeadingPt2 = copysignf(1.0f, pt2.y - newY) * headingPt2;
@@ -969,6 +937,18 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
     xhat_k_bar(x_index) = newX;
     xhat_k_bar(y_index) = newY;
     xhat_k_bar(h_index) = newH;
+
+    P_k_bar(0,0) = obs1->getDistanceSD() * obs1->getDistanceSD();
+    P_k_bar(0,1) = 0.0f;
+    P_k_bar(0,2) = 0.0f;
+
+    P_k_bar(1,0) = 0.0f;
+    P_k_bar(1,1) = obs1->getDistanceSD() * obs1->getDistanceSD();
+    P_k_bar(1,2) = 0.0f;
+
+    P_k_bar(2,0) = 0.0f;
+    P_k_bar(2,1) = 0.0f;
+    P_k_bar(2,2) = obs1->getBearingSD() * obs1->getBearingSD();
 }
 
 void MultiLocEKF::resetLoc(const CornerObservation* c)
@@ -978,7 +958,7 @@ void MultiLocEKF::resetLoc(const CornerObservation* c)
     CornerLandmark pt = c->getPossibilities().front();
 
     // Orientation around north vector
-    float theta = NBMath::subPIAngle(pt.angle + c->getVisOrientation());
+    float theta = NBMath::subPIAngle(pt.angle - c->getVisOrientation());
 
     xhat_k_bar(x_index) = pt.x + c->getVisDistance() * cos(theta);
     xhat_k_bar(y_index) = pt.y + c->getVisDistance() * sin(theta);
@@ -986,4 +966,29 @@ void MultiLocEKF::resetLoc(const CornerObservation* c)
                                              - M_PI_FLOAT
                                              + c->getVisOrientation()
                                              - c->getVisBearing());
+
+
+    float distVariance = c->getDistanceSD() * c->getDistanceSD();
+    float bearingVariance = c->getBearingSD() * c->getBearingSD();
+    float orientationVariance = c->getOrientationSD() * c->getOrientationSD();
+
+    float xVariance = c->getVisDistance() * orientationVariance * sin(theta) +
+        cos(theta) * distVariance + orientationVariance * distVariance;
+
+    float yVariance = c->getVisDistance() * orientationVariance * cos(theta) +
+        sin(theta) * distVariance + orientationVariance * distVariance;
+
+    float hVariance = orientationVariance + bearingVariance;
+
+    P_k_bar(0,0) = xVariance;
+    P_k_bar(0,1) = 0.0f;
+    P_k_bar(0,2) = 0.0f;
+
+    P_k_bar(1,0) = 0.0f;
+    P_k_bar(1,1) = yVariance;
+    P_k_bar(1,2) = 0.0f;
+
+    P_k_bar(2,0) = 0.0f;
+    P_k_bar(2,1) = 0.0f;
+    P_k_bar(2,2) = hVariance;
 }
