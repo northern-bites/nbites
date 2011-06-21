@@ -50,6 +50,15 @@ SET( CMAKE_SYSTEM_PROCESSOR geode )
 
 INCLUDE("${AL_DIR}/crosstoolchain/toolchain-geode.cmake")
 
+################# CCache
+
+if (CCACHE)
+  SET( CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
+  SET( CMAKE_CXX_COMPILER ${CCACHE})
+  SET( CMAKE_C_COMPILER_ARG1 ${CMAKE_C_COMPILER})
+  SET( CMAKE_C_COMPILER ${CCACHE})
+endif()
+
 # where should we look for libraries we need
 SET(CMAKE_FIND_ROOT_PATH  ${OE_SYSROOT} $ENV{NBITES_DIR}/ext/)
 
