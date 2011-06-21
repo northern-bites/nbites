@@ -956,9 +956,17 @@ void Threshold::objectRecognition() {
 void Threshold::storeFieldObjects() {
 
     setFieldObjectInfo(vision->yglp);
+    setFramesOnAndOff(vision->yglp);
+
     setFieldObjectInfo(vision->ygrp);
+    setFramesOnAndOff(vision->ygrp);
+
     setFieldObjectInfo(vision->bglp);
+    setFramesOnAndOff(vision->bglp);
+
     setFieldObjectInfo(vision->bgrp);
+    setFramesOnAndOff(vision->bgrp);
+
     setVisualCrossInfo(vision->cross);
     vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
@@ -967,14 +975,40 @@ void Threshold::storeFieldObjects() {
 
 #if ROBOT(NAO)
     setVisualRobotInfo(vision->red1);
+    setFramesOnAndOff(vision->red1);
+
     setVisualRobotInfo(vision->red2);
+    setFramesOnAndOff(vision->red2);
+
 	setVisualRobotInfo(vision->red3);
+    setFramesOnAndOff(vision->red3);
+
     setVisualRobotInfo(vision->navy1);
+    setFramesOnAndOff(vision->navy1);
+
     setVisualRobotInfo(vision->navy2);
+    setFramesOnAndOff(vision->navy2);
+
 	setVisualRobotInfo(vision->navy3);
+    setFramesOnAndOff(vision->navy3);
 #endif
 
 }
+
+/*
+ * Sets frames on/off to the correct number for a VisualFieldObject
+ */
+void Threshold::setFramesOnAndOff(VisualFieldObject *objPtr) {
+   if (objPtr->isOn()) {
+        objPtr->setFramesOn(objPtr->getFramesOn()+1);
+        objPtr->setFramesOff(0);
+    }
+    else {
+        objPtr->setFramesOff(objPtr->getFramesOff()+1);
+        objPtr->setFramesOn(0);
+    }
+ }
+
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
  * @param objPtr    the field object to study
@@ -985,6 +1019,9 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
         // set center x,y
         objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
+
+        // set obj to on screen
+        objPtr->setOn(true);
 
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
@@ -1125,6 +1162,9 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
         objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
 
+        // set the robot to on screen for this frame
+        objPtr->setOn(true);
+
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
 					      objPtr->getCenterX() ) /
@@ -1158,6 +1198,19 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
         objPtr->setElevation(0.0);
     }
 }
+
+// Keeps track of frames on/off for VisualRobots
+void Threshold::setFramesOnAndOff(VisualRobot *objPtr) {
+   if (objPtr->isOn()) {
+        objPtr->setFramesOn(objPtr->getFramesOn()+1);
+        objPtr->setFramesOff(0);
+    }
+    else {
+        objPtr->setFramesOff(objPtr->getFramesOff()+1);
+        objPtr->setFramesOn(0);
+    }
+ }
+
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
  * @param objPtr    the field object to study
