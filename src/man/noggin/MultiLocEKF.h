@@ -36,6 +36,12 @@ class MultiLocEKF : public ekf::TwoMeasurementEKF<PointObservation,
         max_corner_divergence = 8
     };
 
+    enum {
+        x_index = 0,
+        y_index,
+        h_index
+    };
+
 public:
 
     // Constructors & Destructors

@@ -901,42 +901,89 @@ bool MultiLocEKF::resetLoc(const vector<CornerObservation>& z)
 void MultiLocEKF::resetLoc(const PointObservation* obs1,
                            const PointObservation* obs2)
 {
-    assert(!pt1->isAmbiguous() && !pt2->isAmbiguous());
+    assert(!obs1->isAmbiguous() && !obs2->isAmbiguous());
 
-    PointLandmark pt1 = obs1.getPossibilities().front();
-    PointLandmark pt2 = obs2.getPossibilities().front();
+    PointLandmark pt1 = obs1->getPossibilities().front();
+    PointLandmark pt2 = obs2->getPossibilities().front();
 
+    // Components of vector from (pt1 -> pt2)
     float i = pt2.x - pt1.x;
     float j = pt2.y - pt1.y;
 
-    float sideA = obs1.getDistance();
-    float sideB = obs2.getDistance();
+    /**
+     * Using Law of Sines
+     *      c         b         a
+     *   ------- = ------- = -------
+     *    sin(C)    sin(B)    sin(A)
+     *
+     *     self   b
+     *        +---------+ pt2  _
+     *        |C      A/       |
+     *        |       /        |
+     *        |      /         |
+     *      a |     / c        |
+     *        |    /        i  |   (x goes up, like on the field. Heading of zero is up)
+     *        |   /            |
+     *        |B /             |
+     *        | /              |
+     *        +/               _
+     *      pt1
+     *            j
+     *       |-----------|
+     */
 
+    float sideA = obs1->getVisDistance();
+    float sideB = obs2->getVisDistance();
     float sideC = hypotf(i,j);
+
+    // Calculate angle between vector (pt1,pt2) and north (zero heading)
     float ptVecHeading = acosf(i/sideC);
 
-    float angleC = abs(subPIAngle(obs1.getBearing() - obs2.getBearing()));
-
+    float angleC = abs(subPIAngle(obs1->getVisBearing() - obs2->getVisBearing()));
     float angleB = asinf(sideC / (sideB * sin(angleC)));
 
-    if (NBMath::subPIAngle(obs1.getBearing() - obs2.getBearing()) > 0){
+     // Swap sign of angle B to place us on the correct side of the
+    // line (pt1 -> pt2)
+    if (NBMath::subPIAngle(obs1->getVisBearing() - obs2->getVisBearing()) > 0){
         angleB = -angleB;
     }
 
+    // x_hat, y_hat are x and y in coord frame with x axis pointed
+    // from (pt1 -> pt2) and y perpindicular
     float x_hat = sideA * cos(angleB) + pt1.x;
     float y_hat = sideA * sin(angleB) + pt1.y;
 
+    // Transform to global x and y coords
     float newX = x_hat * cos(ptVecHeading) - y_hat * sin(ptVecHeading);
     float newY = x_hat * sin(ptVecHeading) + y_hat * cos(ptVecHeading);
 
+    // Heading of line (self -> pt2)
     float headingPt2 = acosf((pt2.x - newX)/sin(sideB));
+
+    // Sign based on y direction of vector (self -> pt2)
     float signedHeadingPt2 = copysignf(1.0f, pt2.y - newY) * headingPt2;
 
-    float newH = NBMath::subPIAngle(signedHeadingPt2 - obs2.getBearing());
+    // New global heading
+    float newH = NBMath::subPIAngle(signedHeadingPt2 - obs2->getVisBearing());
+
+    xhat_k_bar(x_index) = newX;
+    xhat_k_bar(y_index) = newY;
+    xhat_k_bar(h_index) = newH;
 }
 
 void MultiLocEKF::resetLoc(const CornerObservation* c)
 {
     assert(!c->isAmbiguous());
 
+    CornerLandmark pt = c->getPossibilities().front();
+
+    // Orientation around north vector
+    float theta = NBMath::subPIAngle(pt.angle + c->getVisOrientation());
+
+    xhat_k_bar(x_index) = pt.x + c->getVisDistance() * cos(theta);
+    xhat_k_bar(y_index) = pt.y + c->getVisDistance() * sin(theta);
+    xhat_k_bar(h_index) = NBMath::subPIAngle(pt.angle
+                                             - M_PI_FLOAT
+                                             + c->getVisOrientation()
+                                             - c->getVisBearing());
 }
