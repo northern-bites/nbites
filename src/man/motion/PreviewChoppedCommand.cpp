@@ -10,6 +10,8 @@ PreviewChoppedCommand::PreviewChoppedCommand ( ChoppedCommand::ptr choppedComman
       com_dy(COM_PREVIEW_FRAMES),
       alreadyChoppedCommand(choppedCommand)
 {
+    checkDone();
+
     // on construction, fill the Boxcars with our future CoM estimates
 }
 
@@ -17,12 +19,15 @@ PreviewChoppedCommand::~PreviewChoppedCommand() {
     // nothing to do here, no dynamically allocated storage
 }
 
-bool PreviewChoppedCommand::isDone() {
-    return alreadyChoppedCommand->isDone();
+void PreviewChoppedCommand::checkDone() {
+    finished = alreadyChoppedCommand->isDone();
 }
 
 std::vector<float> PreviewChoppedCommand::getNextJoints( int id ) {
-    return alreadyChoppedCommand->getNextJoints(id);
+    std::vector<float> next = alreadyChoppedCommand->getNextJoints(id);
+    checkDone();
+
+    return next;
 }
 
 const std::vector<float>

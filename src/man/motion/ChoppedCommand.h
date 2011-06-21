@@ -22,12 +22,10 @@ class ChoppedCommand
     ChoppedCommand ( const JointCommand *command, int chops );
     virtual ~ChoppedCommand(void) { }
 
-    // must define in child classes
     virtual std::vector<float> getNextJoints(int id) {
         return std::vector<float>(0);
     }
-
-    const std::vector<float> getStiffness( Kinematics::ChainID chaindID) const;
+    virtual const std::vector<float> getStiffness( Kinematics::ChainID chaindID) const;
     bool isDone() const { return finished; }
 
  protected:

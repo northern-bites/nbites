@@ -43,14 +43,15 @@ public:
     ~PreviewChoppedCommand();
 
     // these methods are called on our stored pointer
-    bool isDone();
-    virtual std::vector<float> getNextJoints(int id);
+    std::vector<float> getNextJoints(int id);
     const std::vector<float> getStiffness ( Kinematics::ChainID id ) const;
 
     const ufvector4 getFutureComPosition();
     const ufvector4 getComDerivative();
 
 private:
+    void checkDone();
+
     Boxcar com_x, com_y, com_dx, com_dy;
     ChoppedCommand::ptr alreadyChoppedCommand;
 };
