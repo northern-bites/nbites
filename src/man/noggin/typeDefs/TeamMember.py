@@ -14,12 +14,11 @@ DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
-DEBUG_DETERMINE_CHASE_TIME = False
+DEBUG_DETERMINE_CHASE_TIME = True
 SEC_TO_MILLIS = 1000.0
 CHASE_SPEED = 15.00 #cm/sec
-BALL_ON_BONUS = 10.
-BALL_GOAL_LINE_BONUS = 10.
-FALLEN_ROBOT_PENALTY = 10.
+BALL_OFF_PENALTY = 10.
+BALL_GOAL_LINE_PENALTY = 10.
 # penalty is: (ball_dist*heading)/scale
 PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
 # penalty is: (ball_dist*ball_bearing)/scale
@@ -83,7 +82,7 @@ class TeamMember(RobotLocation):
         self.dribbling = self.ballDist <= \
                           NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING
 
-        self.lastPacketTime = self.time.time()
+        self.lastPacketTime = time.time()
 
 
     def updateMe(self):
@@ -94,7 +93,6 @@ class TeamMember(RobotLocation):
 
         my = self.brain.my
         ball = self.brain.ball
-        pb = self.brain.playbook
 
         self.x = my.x
         self.y = my.y
@@ -118,7 +116,7 @@ class TeamMember(RobotLocation):
                          (fabs(self.ballBearing) <
                           NogginConstants.BALL_TEAMMATE_BEARING_GRABBING)
 
-        self.lastPacketTime = self.time.time()
+        self.lastPacketTime = time.time()
 
     def reset(self):
         '''Reset all important Teammate variables'''
@@ -154,8 +152,8 @@ class TeamMember(RobotLocation):
             self.brain.out.printf("\tChase time base is " + str(t))
 
         # Give a bonus for seeing the ball
-        if self.brain.ball.on:
-            t -= BALL_ON_BONUS
+        if not self.brain.ball.on:
+            t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after ball on bonus " + str(t))
@@ -163,16 +161,18 @@ class TeamMember(RobotLocation):
         # Give a bonus for lining up along the ball-goal line
         lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
         rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
-        if (lpb > self.ballBearing > rpb):
-            t -= BALL_GOAL_LINE_BONUS
-            if (lpb > 0 > rpb):
-                t -= BALL_GOAL_LINE_BONUS
+        # ball is lined up
+        if (self.ballBearing > lpb or rpb > self.ballBearing):
+            t += BALL_GOAL_LINE_PENALTY
+            # we are lined up on that.
+            if (lpb < 0 or rpb > 0):
+                t += BALL_GOAL_LINE_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after ball-goal-line bonus " +str(t))
 
         # Add a penalty for being fallen over
-        t += FALLEN_ROBOT_PENALTY#(self.brain.fallController.getTimeRemainingEst())
+        t += self.brain.fallController.getTimeRemainingEst()
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after fallen over penalty " + str(t))
