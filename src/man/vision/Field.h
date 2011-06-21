@@ -58,6 +58,7 @@ private:
 
 	// the field horizon
 	int horizon;
+	int poseHorizon;
 	float slope;
 
     bool shoot[IMAGE_WIDTH];
