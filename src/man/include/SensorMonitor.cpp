@@ -11,6 +11,8 @@ static const int NUMBER_BINS = 30;
 static const float LOW_BIN = 0.0001f;
 static const float HIGH_BIN = 100.0f;
 
+static const int ERRORS_BEFORE_REPORT = 15;
+
 SensorMonitor::SensorMonitor()
     :  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
        monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
@@ -94,7 +96,7 @@ void SensorMonitor::setVarianceBounds(float low, float high) {
 
 void SensorMonitor::reportSensorError() {
     ++seenErrors;
-    if (seenErrors == 10) {
+    if (seenErrors == ERRORS_BEFORE_REPORT) {
 	std::cout << "*** Potential sensor problem with " << sensorName
 		  << ", saw a variance of " << Y()
 		  << " (feel free to ignore this if the robot is stationary)"
