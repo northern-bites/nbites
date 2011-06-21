@@ -146,14 +146,26 @@ class HeadTrackingHelper(object):
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
 # ** # new method
-    def updateTrackingFitness(self, locObj):
+    def updateGeneralTrackingFitness(self, locObj):
         """
-        Updates the fitness value for each given landmark.
+        Updates the fitness value for each given landmark,
+        based on distance.
         """
         locObj.trackingFitness = locObj.dist
         #if bearing is unusable, set fitness to auto fail
         if fabs(locObj.bearing) > constants.BEARING_THRESHOLD:
             locObj.trackingFitness = constants.FITNESS_THRESHOLD+1
+
+# ** # new method
+    def updateAngularTrackingFitness(self, locObj, target):
+        """
+        Updates the fitness value for each given landmark,
+        based on angular distance from target.
+        """
+        locObj.trackingFitness = target.bearing - locObj.bearing
+        #if bearing is unusable, set fitness to auto fail
+        if (fabs(locObj.bearing) > constants.BEARING_THRESHOLD:
+                locObj.trackingFitness = constants.FITNESS_THRESHOLD+1
 
 # ** # new method
     def findPostInVision(self, post, brain):

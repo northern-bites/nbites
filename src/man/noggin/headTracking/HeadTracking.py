@@ -180,7 +180,14 @@ class HeadTracking(FSA.FSA):
     def bounceHead(self):
         self.switchTo('bounceUp')
 
+    # PRIMARY INPUT METHODS FOR TRACKING FSA:
+
 # ** # new method
     def readyLoc(self):
         self.target = None
         self.switchTo('readyLoc')
+
+# ** # new method
+    def trackBall(self):
+        self.target = self.brain.ball
+        self.switchTo('trackingBall')

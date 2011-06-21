@@ -88,7 +88,7 @@ def readyLoc(tracker):
     tracker.decisionState = 'readyLoc'
     #update tracking fitness of locObjects
     for obj in tracker.locObjectList:
-        tracker.helper.updateTrackingFitness(obj)
+        tracker.helper.updateGeneralTrackingFitness(obj)
     #sort list of locObjects
     newlist = sorted(tracker.locObjectList)
 
@@ -96,6 +96,7 @@ def readyLoc(tracker):
         #landmarks have changed fitness ranking. Track most fit
         tracker.locObjectList = newlist
         tracker.target = tracker.locObjectList[0]
+        print "target Id:",tracker.target.visionId# ** #debugging
         return tracker.goLater('trackLoc')
 
     #Assert: no change in list order
@@ -112,5 +113,40 @@ def readyLoc(tracker):
         #cycle to most fit locObject
         tracker.target = tracker.locObjectList[0]
 
+    print "target Id:",tracker.target.visionId# ** #debugging
+
     #track target
+    return tracker.goLater('trackLoc')
+
+# ** # new method
+def trackingBallLoc(tracker):
+    """
+    Periodically looks directly at ball.
+    Otherwise, looks for nearest landmark, without losing sight
+    of the ball.
+    """
+    # Make sure that head is inactive
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+
+    # When finished, states called by trackingBallLoc will return to
+    # trackingBall state, which will then return here.
+    tracker.decisionState = 'trackingBall'
+
+    # Update landmark fitness by angular distance from ball
+    for obj in tracker.locObjectList:
+        tracker.helper.updateAngularTrackingFitness(obj,tracker.target)
+    # Sort list of locObjects, set target to most fit
+    tracker.locObjectList = sorted(tracker.locObjectList)
+    tracker.target = tracker.locObjectList[0]
+
+    # Sanity check most fit locObject
+    if fabs(tracker.brain.ball.elevation - tracker.target.elevation) > \
+            constants.ELEVATION_OFFSET_LIMIT or \
+            fabs(tracker.brain.ball.bearing - tracker.target.bearing) > \
+            constants.BEARING_OFFSET_LIMIT:
+        print "No viable landmark to check."
+        return tracker.goLater('trackingBall')
+
+    # Track target
     return tracker.goLater('trackLoc')

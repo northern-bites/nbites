@@ -96,10 +96,10 @@ def trackLoc(tracker):
         print "target is None, or the ball"
         return tracker.goLater(tracker.decisionState)
 
-    tracker.helper.lookToTargetCoords(target)
+    tracker.helper.lookToTargetCoords(tracker.target)
 
     # if close enough to target, switch to stareLoc
-    if tracker.target.framesOn > TRACKER_FRAMES_ON_TRACK_THRESH:
+    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         print "found target on frame, now staring"
         return tracker.goLater('stareLoc')
 
@@ -108,7 +108,7 @@ def trackLoc(tracker):
     #print "target on?:",target.on
 
 
-    if tracker.counter > constants.TRACKER_SEARCH_THRESH:
+    if tracker.counter > constants.TRACKER_FRAMES_SEARCH_THRESH:
         print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
         print "Past search thresh, switching to new target"
         return tracker.goLater(tracker.decisionState)
@@ -140,3 +140,28 @@ def stareLoc(tracker):
         return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()
+
+# ** # new state
+def trackingBall(tracker):
+    """
+    Look directly at ball for a short time.
+    Then, check for nearby landmarks without losing sight of the ball.
+    """
+    # make sure head is inactive first, and that ball is the target
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        if tracker.target != tracker.brain.ball:
+            print "Target was not ball."
+            tracker.target = tracker.brain.ball
+
+    # assert: tracker.target is the ball
+
+    # look to the ball for TRACKER_BALL_STARE_THRESH frames
+    tracker.helper.lookToTargetAngles(tracker.target)
+
+    if tracker.counter > constants.TRACKER_BALL_STARE_THRESH:
+        print "Past stare thresh for ball, looking for landmarks"
+        return tracker.goLater('trackingBallLoc')
+
+    return tracker.stay()
+

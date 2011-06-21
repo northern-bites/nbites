@@ -22,8 +22,8 @@ def gamePlaying(player):
     player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
 
     #if player.brain.ball.on:
-    # player.brain.sensors.saveFrame()
-    # player.numFramesSaved += 1
+    #player.brain.sensors.saveFrame()
+    #player.numFramesSaved += 1
 
     return player.stay()
 
