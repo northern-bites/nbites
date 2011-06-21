@@ -541,8 +541,13 @@ void ALImageTranscriber::waitForImage ()
 
 
         if (ALimage != NULL){
-            sensors->lockImage();
+            // Synchronize noggin's information about joint angles with the motion
+            // thread's information
+            //we need to update the joint values before we copy the image
+            //since it takes a long time to copy it
+            sensors->updateVisionAngles();
 
+            sensors->lockImage();
 #ifdef CAN_SAVE_FRAMES
 #ifdef USE_MEMORY
             sensors->setRawNaoImage(ALimage->getData());
@@ -557,6 +562,8 @@ void ALImageTranscriber::waitForImage ()
                                                  ALimage->getData(), image);
 #endif
             sensors->releaseImage();
+            //we're done with the aldebaran buffer
+            this->releaseImage();
 
         } else {
             cout << "\tALImage from camera was null!!" << endl;

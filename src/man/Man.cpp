@@ -214,19 +214,11 @@ Man::processFrame ()
 
 
 void Man::notifyNextVisionImage() {
-  // Synchronize noggin's information about joint angles with the motion
-  // thread's information
-  //TODO: Octavian: move this to before we copy the image! (it will improve the pose I think)
-  sensors->updateVisionAngles();
 
   transcriber->postVisionSensors();
 
   // Process current frame
   processFrame();
-
-  //Release the camera image
-  //if(camera_active)
-  imageTranscriber->releaseImage();
 
   // Make sure messages are printed
   fflush(stdout);
