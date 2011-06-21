@@ -74,15 +74,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getNextState(self):
         if self.brain.playbook.subRoleUnchanged():
-            print "sub role unchanged"
             return self.currentState
 
         elif self.inKickingState:
-            print "in kicking state"
             return self.currentState
 
         else:
-            print "switching role"
             return self.getRoleState()
 
     def getRoleState(self):
