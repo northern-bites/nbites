@@ -534,6 +534,8 @@ void Robots::updateRobots(int which, int index)
 			vision->navy3->updateRobot(blobs->get(index));
 		}
     }
+
+    blobs->zeroTheBlob(index);
 }
 
 /* Adds a new run to the basic data structure.

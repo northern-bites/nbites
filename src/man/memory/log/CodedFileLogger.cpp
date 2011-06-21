@@ -19,6 +19,7 @@
 
 #include "CodedFileLogger.h"
 
+namespace man {
 namespace memory {
 
 extern long long birth_time;
@@ -64,6 +65,7 @@ CodedFileLogger::~CodedFileLogger() {
     delete coded_output;
     delete raw_output;
     close(file_descriptor);
+}
 }
 }
 }
