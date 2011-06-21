@@ -83,7 +83,7 @@ def activeTracking(tracker):
 # ** # new method
 def trackLoc(tracker):
     """
-    Look at the current target, then go to lastDiffState after
+    Look towards the current target, then stare at it for
     TRACKER_FRAMES_STARE_THRESH frames.
     """
 
@@ -91,33 +91,52 @@ def trackLoc(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
-    # safety check that currentLocObject was set
-    if tracker.target is None:
-        print "target is None"
-        return tracker.goLater(tracker.lastDiffState())
+    # safety check that currentLocObject was set to a post
+    if tracker.target is None or tracker.target == tracker.brain.ball:
+        print "target is None, or the ball"
+        return tracker.goLater(tracker.decisionState)
+
+    tracker.helper.lookToTargetCoords(target)
+
+    # if close enough to target, switch to stareLoc
+    if tracker.target.framesOn > TRACKER_FRAMES_ON_TRACK_THRESH:
+        print "found target on frame, now staring"
+        return tracker.goLater('stareLoc')
+
+    # debugging
+    #print "bglp on?:",tracker.target.on
+    #print "target on?:",target.on
+
+
+    if tracker.counter > constants.TRACKER_SEARCH_THRESH:
+        print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+        print "Past search thresh, switching to new target"
+        return tracker.goLater(tracker.decisionState)
+
+    return tracker.stay()
+
+# ** # new state
+def stareLoc(tracker):
+    """
+    Dynamically stare at the target, then return to decisionState.
+    """
+    # make sure head is inactive first
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
 
     # find the real post in vision frame
-    if tracker.target != tracker.brain.ball:
-        post = tracker.helper.findPostInVision(tracker.target, tracker.brain)
+    target = tracker.helper.findPostInVision(tracker.target, tracker.brain)
 
-    # if target is on frame already, track via angles
-    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
-        print "tracking via angles"
-        tracker.helper.lookToTargetAngles()
-    # if target lost only briefly, keep looking at same area
-    elif tracker.target.framesOff < constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-        print "target lost on frame"
-        tracker.brain.motion.stopHeadMoves()
-    # if target is off frame, track via relative coordinates
-    else:
-        print "tracking via coords"
-        tracker.helper.lookToTargetCoords()
+    # second safety check that any post is on the frame
+    if target is None:
+        print "no post of correct color on frame"
+        return tracker.stay()
+
+    tracker.helper.lookToTargetAngles(target)
 
     if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
-        print "old target"
-        print "ID:",tracker.target.visionId
         print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
         print "Past stare thresh, switching to new target"
-        return tracker.goLater(tracker.lastDiffState)
+        return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()

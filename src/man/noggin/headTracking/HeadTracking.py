@@ -22,6 +22,7 @@ class HeadTracking(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
+        self.decisionState = 'stopped'
 
         self.currentHeadScan = None
         self.headMove = None

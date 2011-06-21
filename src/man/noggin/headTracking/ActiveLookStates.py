@@ -85,6 +85,7 @@ def readyLoc(tracker):
     Assumes the robot is in the "ready" state.
     Looks at nearby landmarks for localization.
     """
+    tracker.decisionState = 'readyLoc'
     #update tracking fitness of locObjects
     for obj in tracker.locObjectList:
         tracker.helper.updateTrackingFitness(obj)
