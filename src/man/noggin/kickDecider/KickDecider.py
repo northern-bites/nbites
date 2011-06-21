@@ -68,6 +68,8 @@ class KickDecider(object):
 
         print self.info
 
+        return self.chooseShortBackKick()
+
         if self.info.kickObjective == constants.OBJECTIVE_SHOOT:
             return self.shoot()
         #elif self.info.kickObjective == constants.OBJECTIVE_CLEAR:
@@ -166,7 +168,7 @@ class KickDecider(object):
             # difference between dists is small enough
             if (rightPostBearing >= 0 and leftPostBearing <= 0 and
                 distDiff <= constants.CLEAR_POST_DIST_DIFF):
-                return self.chooseBackKick()
+                return self.chooseLongBackKick()
             elif (rightPostDist <= leftPostDist):
                 print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
@@ -205,7 +207,7 @@ class KickDecider(object):
             return self.chooseDynamicKick()
         elif (my.headingTo(oppLeftPost, forceCalc = True) > -1*my.h >
               my.headingTo(oppRightPost, forceCalc = True)):
-            return self.chooseBackKick()
+            return self.chooseShortBackKick()
         elif (my.h > 0):
             print "LEFT_SIDE"
             return kicks.LEFT_SIDE_KICK
@@ -223,8 +225,7 @@ class KickDecider(object):
             print "RIGHT_SIDE"
             return kicks.RIGHT_SIDE_KICK
         else:
-            # short back kick goes here.
-            return self.chooseBackKick()
+            return self.chooseShortBackKick()
 
     def chooseDynamicKick(self):
         ball = self.brain.ball
@@ -234,10 +235,18 @@ class KickDecider(object):
         print "RIGHT_DYNAMIC_STRAIGHT"
         return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
 
-    def chooseBackKick(self):
+    def chooseLongBackKick(self):
         ball = self.brain.ball
         if ball.relY > 0:
-            print "LEFT_BACK"
-            return kicks.LEFT_BACK_KICK
-        print "RIGHT_BACK"
-        return kicks.RIGHT_BACK_KICK
+            print "LEFT_LONG_BACK"
+            return kicks.LEFT_LONG_BACK_KICK
+        print "RIGHT_LONG_BACK"
+        return kicks.RIGHT_LONG_BACK_KICK
+
+    def chooseShortBackKick(self):
+        ball = self.brain.ball
+        if ball.relY > 0:
+            print "LEFT_SHORT_BACK"
+            return kicks.LEFT_SHORT_BACK_KICK
+        print "RIGHT_SHORT_BACK"
+        return kicks.RIGHT_SHORT_BACK_KICK
