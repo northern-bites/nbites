@@ -64,6 +64,10 @@ public:
     void setBearingWithSD(float _bearing);
     virtual void setIDCertainty(certainty c);
 
+    void setOn(bool _on){ on = _on; }
+    void setFramesOn(int numOn){ framesOn = numOn; }
+    void setFramesOff(int numOff){ framesOff = numOff; }
+
     // GETTERS
     const int getLeftTopX() const{ return leftTop.x; }
     const int getLeftTopY() const{ return leftTop.y; }
@@ -84,6 +88,9 @@ public:
 		const { return possibleFieldObjects; }
 
 	virtual const bool hasPositiveID();
+    const bool isOn() const{ return on; }
+    int getFramesOn() { return framesOn; }
+    int getFramesOff(){ return framesOff; }
 
 private: // Class Variables
 
@@ -95,6 +102,8 @@ private: // Class Variables
 	point <float> fieldLocation2; // for abstract field objects
     // This list will hold all the possibilities for this objects's specific ID
     const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
+    bool on;
+    int framesOn, framesOff;
 
     // Helper Methods
     inline static float postDistanceToSD(float _distance) {

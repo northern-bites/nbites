@@ -94,6 +94,8 @@ public:
     int findBallEdgeY(int x, int y, int dir);
     int findBallEdgeX(int x, int y, int dir);
 
+    void setFramesOnAndOff(VisualBall *objPtr);
+
     // sanity checks
     void preScreenBlobsBasedOnSizeAndColor();
     bool sanityChecks(int w, int h, estimate e, VisualBall * thisBall);
