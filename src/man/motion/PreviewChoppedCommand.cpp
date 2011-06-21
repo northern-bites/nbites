@@ -45,8 +45,8 @@ PreviewChoppedCommand::~PreviewChoppedCommand() {
 void PreviewChoppedCommand::bufferNextAngles(int chainID) {
     vector<float> chainAngles = alreadyChoppedCommand->getNextJoints(chainID);
 
-    //copy(chainAngles.begin(), chainAngles.end(),
-    //thisFramesAngles.begin() + thisFramesAngles.size());
+    thisFramesAngles.insert(thisFramesAngles.end(),
+			    chainAngles.begin(), chainAngles.end());
 
     jointAngles[chainID].Write(chainAngles);
 
@@ -56,8 +56,28 @@ void PreviewChoppedCommand::bufferNextAngles(int chainID) {
 
     // updates CoM estimates
     if (chainID == Kinematics::NUM_CHAINS - 1) {
-	std::cout << "Saw last chain, updating CoM...angles vector size: "
-		  << thisFramesAngles.size() << std::endl;
+	ufvector4 com_c = Kinematics::getCOMc(thisFramesAngles);
+
+	double lastX = com_x.Y();
+	double lastY = com_y.Y();
+
+	// put the CoM into the filters
+	com_x.X(com_c(0));
+	com_y.X(com_c(1));
+
+	// update the dx filters
+	com_dx.X(lastX - com_x.Y());
+	com_dy.X(lastY - com_y.Y());
+
+	std::cout //<< "Saw last chain, updating CoM...angles vector size: "
+	    //<< thisFramesAngles.size()
+		  << " CoM this frame: " << com_c
+		  << " CoM_X filter: " << com_x.Y()
+		  << " d/dt CoM_X: " << com_dx.Y()
+		  << " CoM_Y filter: " << com_y.Y()
+		  << " d/dt CoM_Y: " << com_dy.Y()
+		  << std::endl;
+
 	thisFramesAngles.clear();
     }
 }
@@ -108,8 +128,8 @@ const ufvector4 PreviewChoppedCommand::getFutureComPosition() {
 }
 
 const ufvector4 PreviewChoppedCommand::getComDerivative() {
-    ufvector4 comDerivative = CoordFrame4D::vector4D(static_cast<float>(com_x.Y()),
-						     static_cast<float>(com_y.Y()),
+    ufvector4 comDerivative = CoordFrame4D::vector4D(static_cast<float>(com_dx.Y()),
+						     static_cast<float>(com_dy.Y()),
 						     0.0f);
     return comDerivative;
 }
