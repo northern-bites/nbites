@@ -545,9 +545,13 @@ void Comm::discover_broadcast ()
 			error(SOCKET_ERROR(errno));
 	}
 	else if (result != 0)
+	{
         //cout<<"Failed to discover broadcast address -- command returned error";
-	else if (len <= 0)
+	}
+	else if(len <= 0)
+	{ 
         //cout<<"Failed to discover broadcast address -- find broadcast returned no output";
+	}
 }
 
 // Binds all required sockets
@@ -695,27 +699,26 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 	interval.tv_nsec = 100000;
 
     while (result == -2)
-	{
-		// send the udp message
+    {
+	// send the udp message
         result = ::sendto(sockn, msg, len, 0, (struct sockaddr*)&addr,
                           sizeof(broadcast_addr));
-		//cout << "Comm::send() : result == " << result << endl;
         // except if error is blocking error
         if (result == -1 && errno == EAGAIN)
-		{
+	{
             result = -2;
-			cout << "Comm::send() : EAGAIN error!" << endl;
+	    cerr << "Comm::send() : EAGAIN error!" << endl;
             nanosleep(&interval, &remainder);
         }
     }
     // error
     if (result == -1)
-	{
+    {
         if (errno == ENETUNREACH &&
             broadcast_addr.sin_addr.s_addr == htonl(INADDR_BROADCAST))
             // attempt to discover our specific broadcast address
             discover_broadcast();
-
+	
         else if (errno != EAGAIN)
             error(SOCKET_ERROR(errno));
     }
@@ -723,7 +726,7 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 
     // record last time we sent a message
     timer.sent_packet();
-    cout << "Comm::send() : last packet sent at " << timer.lastPacketSentAt() << endl;
+    //cout << "Comm::send() : last packet sent at " << timer.lastPacketSentAt() << endl;
 }
 
 // Recieves packets from various sources
@@ -740,13 +743,13 @@ void Comm::receive() throw(socket_error)
 
     // While no error, handle the packet and continue to receive new ones.
     while (result > 0)
-	{
-		cout << "Comm::receive() : result == " << result << endl;
-		// Received a packet! Update the average delay.
-		if(timer.lastPacketReceivedAt() != 0)
-			updateAverageDelay();
-		totalPacketsReceived++;
-		updatePercentReceived();
+    {
+	// Received a packet! Update the average delay.
+	if(timer.lastPacketReceivedAt() != 0)
+	    updateAverageDelay();
+	
+	totalPacketsReceived++;
+	updatePercentReceived();
         // Handle messages from not for GameController.
         handle_comm(recv_addr, &buf[0], result);
         // Continue checking for new messages...
@@ -756,7 +759,7 @@ void Comm::receive() throw(socket_error)
 
     // if an error occured (other than nonblocking EAGAIN error)
     if (running && result == -1 && errno != EAGAIN)
-	{
+    {
         stop();
         throw SOCKET_ERROR(errno);
     }
@@ -773,7 +776,6 @@ void Comm::receive() throw(socket_error)
 void Comm::receive_gc () throw(socket_error)
 {
 #ifdef COMM_LISTEN
-
     struct sockaddr_in recv_addr;
     socklen_t addr_len = sizeof(sockaddr_in);
 
@@ -781,7 +783,7 @@ void Comm::receive_gc () throw(socket_error)
     int result = ::recvfrom(gc_sockn, &buf, UDP_BUF_SIZE, 0,
                             (struct sockaddr*)&recv_addr, &addr_len);
     while (result > 0)
-	{
+    {
         // handle the message
         handle_gc(recv_addr, &buf[0], result);
         // check for another one
@@ -791,7 +793,7 @@ void Comm::receive_gc () throw(socket_error)
 
     // if an error occured (other than nonblocking EAGAIN error)
     if (running && result == -1 && errno != EAGAIN)
-	{
+    {
         stop();
         throw SOCKET_ERROR(errno);
     }
@@ -805,9 +807,7 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 // Checks for Tool message
     if (len == static_cast<int>(strlen(TOOL_REQUEST_MSG)) &&
         memcmp(msg, TOOL_REQUEST_MSG, TOOL_REQUEST_LEN) == 0)
-	{
-        //cout << "Comm::handle_comm() : handling packet from TOOL..." << endl;
-
+    {
         std::string robotName = getRobotName();
         const char *name = robotName.c_str();
 
@@ -825,20 +825,21 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
         send(&response[0], len, r_addr);
         free(response);
     }
-	else
-	{
-        cout << "Comm::handle_comm() : handling packet..." << endl;
+    else
+    {
         // validate packet format, check packet timestamp, and parse data
         CommPacketHeader packet;
         if (validate_packet(msg, len, packet))
-		{
+	{
             ourPacketsReceived++;
+#ifdef COMM_DEBUG
             // Log that a packet has been received.
             cout << "Comm::handle_comm() : packet received at "
 				 << packet.timestamp
 				 << " from player " << packet.player
 				 << " with packet number " << packet.number
 				 << endl;
+#endif
             parse_packet(packet, msg + sizeof(packet), len - sizeof(packet));
         }
     }
@@ -859,9 +860,11 @@ bool Comm::validate_packet (const char* msg, int len,
 {
     // check packet length
     if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader))
-	{
-		cout << "bad length (" << len << ")" << endl;
-		return false;
+    {
+#ifdef COMM_DEBUG
+	cout << Thread::name << ": Received packet header has bad length (" << len << ")." << endl;
+#endif
+	return false;
     }
 
     // cast packet data into CommPacketHeader struct
@@ -869,31 +872,34 @@ bool Comm::validate_packet (const char* msg, int len,
 
     // check packet header
     if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0)
-	{
-        cout << "bad header (" << packet.header << ")" << endl;
+    {
+#ifdef COMM_DEBUG
+        cout << Thread::name << ": Received packet with bad header (" << packet.header << ")." << endl;
+#endif
         return false;
     }
 
     // check team number
     if (packet.team != gc->team())
-	{
-        cout << "bad team number (" << packet.team << ")" << endl;
+    {
+#ifdef COMM_DEBUG
+        cout << Thread::name << ": Packet has a bad team number (" << packet.team << ")." << endl;
+#endif
         return false;
     }
 
     // check player number
     if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM ||
         packet.player == gc->player())
-	{
-        cout << "bad player number (" << packet.player << ")" << endl;
+    {
+#ifdef COMM_DEBUG
+        cout << Thread::name << ": Packet has a bad player number (" << packet.player << ")." << endl;
+#endif
         return false;
     }
 
     if (!timer.check_packet(packet))
-	{
-        cout << "bad timer" << endl;
         return false;
-    }
 
     llong currTime = timer.timestamp();
 
@@ -902,28 +908,29 @@ bool Comm::validate_packet (const char* msg, int len,
     // two clocks to reach an equilibrium point, within a reasonable
     // margin of error.
     if(packet.timestamp + MIN_PACKET_DELAY > currTime)
-	{
         timer.setOffset(packet.timestamp + MIN_PACKET_DELAY - currTime);
-    }
 
     // Get fixed packet received at time if necessary.
     timer.packetReceived();
 
+#ifdef COMM_DEBUG
     // Log latency/timer offset data?
     cout << "original current time == " << currTime
-		 << " packet sent at (timestamp) == " << packet.timestamp
-		 << " packet received at == " <<  timer.lastPacketReceivedAt()
-		 << " offset == " << timer.getOffset()
-		 << " latency == " << estimatePacketLatency(packet)
-		 << endl;
+	 << " packet sent at (timestamp) == " << packet.timestamp
+	 << " packet received at == " <<  timer.lastPacketReceivedAt()
+	 << " offset == " << timer.getOffset()
+	 << " latency == " << estimatePacketLatency(packet)
+	 << endl;
+#endif
 
     // Packet is valid!
     return true;
 }
 
 // Takes info from packet and data and puts into a vector v.
-void Comm::parse_packet (const CommPacketHeader &packet,
-						 const char* msg, int size)throw()
+void Comm::parse_packet(const CommPacketHeader &packet,
+			const char* msg, int size)
+    throw()
 {
     int len = size / sizeof(float);
 
@@ -943,17 +950,18 @@ void Comm::parse_packet (const CommPacketHeader &packet,
 }
 
 // Adds Comm to Python Module
-void Comm::add_to_module ()
+void Comm::add_to_module()
 {
     if (comm_module == NULL)
+    {
         if (!c_init_comm())
-		{
+	{
             cerr << "Comm module failed to initialize the backend" << endl;
             PyErr_Print();
         }
-
+    }
     if (comm_module != NULL)
-	{
+    {
         PyObject *comm = PyComm_new(this);
         PyModule_AddObject(comm_module, "inst", comm);
     }
@@ -975,13 +983,13 @@ TeammateBallMeasurement Comm::getTeammateBallReport()
     TeammateBallMeasurement m;
     float minUncert = 10000.0f;
     for (i = latest->begin(); i != latest->end(); ++i)
-	{
+    {
         // Get the combined uncert x and y
         float curUncert = static_cast<float>( hypot((*i)[6],(*i)[7]) );
         // If the teammate sees the ball and its uncertainty is less than the
         // Current minimum, then we
         if ((*i)[13] > 0.0 && curUncert < minUncert)
-		{
+	{
             minUncert = curUncert;
             m.ballX = (*i)[9];
             m.ballY = (*i)[10];
@@ -1026,37 +1034,48 @@ void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
 // running average method.
 void Comm::updateAverageDelay()
 {
-    // The delay is the difference between the current time and \
+    // The delay is the difference between the current time and
     // the last received packet recorded by the CommTimer.
-	// Note: First data sample acquired; average is just delay.
+    // Note: First data sample acquired; average is just delay.
     llong newAverage = 0;
     llong delay      = 0;
     delay = timer.timestamp() - timer.lastPacketReceivedAt();
     if(averagePacketDelay == 0)
         newAverage = delay;
-	else
-		newAverage = (llong)(0.5 * (averagePacketDelay + delay));
+    else
+	newAverage = (llong)(0.5 * (averagePacketDelay + delay));
 
+#ifdef COMM_DEBUG
     // Log data?
-    cout << "Comm::updateAverageDelay() : average delay == "
-		 << newAverage << endl;
+    cout << Thread::name << ": updateAverageDelay() : average delay == "
+	 << newAverage << endl;
+#endif
 
     averagePacketDelay = newAverage;
 }
 
 void Comm::updatePercentReceived()
 {
-    cout << "Comm::updatePercentReceived() : total packets == "
-		 << totalPacketsReceived
-		 << " our packets == " << ourPacketsReceived << endl;
+#ifdef COMM_DEBUG
+    cout << Thread::name << ": updatePercentReceived() : total packets == "
+	 << totalPacketsReceived
+	 << " our packets == " << ourPacketsReceived << endl;
+#endif
+
     double percentage = 0.0f;
     if(totalPacketsReceived != 0)
-	{
+    {
 		percentage = ourPacketsReceived/(double)totalPacketsReceived;
-		cout << "Comm::updatePercentReceived() : " << percentage*100 << "%" << endl;
+#ifdef COMM_DEBUG
+		cout << Thread::name << ": updatePercentReceived() : " << percentage*100 << "%" << endl;
+#endif
     }
-	else
-		cout << "Comm::updatePercentReceived() : divide by zero error!" << endl;
+    else
+    {
+#ifdef COMM_DEBUG
+	cout << Thread::name << ": updatePercentReceived() : divide by zero error!" << endl;
+#endif
+    }
 }
 
 llong Comm::estimatePacketLatency(const CommPacketHeader &latestPacket)

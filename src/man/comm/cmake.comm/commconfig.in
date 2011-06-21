@@ -27,5 +27,13 @@
 #  undef  USE_PYTHON_GC
 #endif
 
+// Set/unset a COMM_DEBUG flag.
+#define COMM_DEBUG_${COMM_DEBUG}
+#ifdef  COMM_DEBUG_ON
+#   define COMM_DEBUG
+#else
+#   undef COMM_DEBUG
+#endif
+
 #endif // !_commconfig_h
 

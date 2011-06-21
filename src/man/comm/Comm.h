@@ -17,6 +17,7 @@
 #include "Vision.h"
 #include "CommTimer.h"
 #include "NogginStructs.h"
+#include "commconfig.h"
 
 class Comm
     : public Thread
