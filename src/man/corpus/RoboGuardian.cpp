@@ -65,14 +65,13 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
 	  falling(false),fallen(false),feetOnGround(true),
       useFallProtection(false),
       lastHeatAudioWarning(0), lastHeatPrintWarning(0),
-      wifiAngel(new WifiAngel())
+      wifiAngel()
 {
     pthread_mutex_init(&click_mutex,NULL);
     executeStartupAction();
 }
 RoboGuardian::~RoboGuardian(){
     pthread_mutex_destroy(&click_mutex);
-    delete wifiAngel;
 }
 
 
@@ -96,7 +95,7 @@ void RoboGuardian::run(){
         processFallingProtection();
         processChestButtonPushes();
         if (frameCount % CONNECTION_CHECK_RATE == 0) {
-            wifiAngel->check_on_wifi();
+            wifiAngel.check_on_wifi();
         }
         frameCount++;
         nanosleep(&interval, &remainder);
@@ -429,7 +428,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         enableGains();
         break;
     case 7:
-        wifiAngel->try_to_reconnect();
+        wifiAngel.try_to_reconnect();
         break;
     case 9:
         //Easter EGG!
@@ -486,7 +485,7 @@ string RoboGuardian::getHostName()const {
 }
 
 const string RoboGuardian::discoverIP() const {
-    return wifiAngel->get_ip_string();
+    return wifiAngel.get_ip_string();
 }
 
 void RoboGuardian::speakIPAddress()const {
@@ -530,7 +529,7 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
 }
 
 bool RoboGuardian::checkConnection(){
-    return wifiAngel->connected();
+    return wifiAngel.connected();
 }
 
 void RoboGuardian::ifUpDown(){

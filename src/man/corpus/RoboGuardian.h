@@ -122,7 +122,7 @@ private:
 
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
 
-    man::corpus::guardian::WifiAngel* wifiAngel;
+    man::corpus::guardian::WifiAngel wifiAngel;
 
     mutable pthread_mutex_t click_mutex;
 };
