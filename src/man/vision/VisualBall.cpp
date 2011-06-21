@@ -8,6 +8,8 @@
 VisualBall::VisualBall()
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 /* Initializes Variables every frame. Make sure before using any of these
@@ -28,6 +30,7 @@ void VisualBall::init() {
     bearing = 0;
     elevation = 0;
 	heat = 0.0f;
+    on = false;
 }
 
 void VisualBall::setDistanceEst(estimate ball_est)

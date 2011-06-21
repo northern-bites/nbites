@@ -29,6 +29,9 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("confidence", &VisualBall::getConfidence)
         .def_readonly("radius", &VisualBall::getRadius)
         .def_readonly("heat", &VisualBall::getHeat)
+        .def_readonly("on", &VisualBall::isOn)
+        .def_readonly("framesOn", &VisualBall::getFramesOn)
+        .def_readonly("framesOff", &VisualBall::getFramesOff)
         ;
 
     class_<VisualFieldObject>("FieldObject", no_init)

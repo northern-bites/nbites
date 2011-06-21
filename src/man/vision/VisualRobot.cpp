@@ -2,6 +2,8 @@
 VisualRobot::VisualRobot() : VisualDetection()
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 VisualRobot::VisualRobot(const VisualRobot& o) : VisualDetection(o) {}
