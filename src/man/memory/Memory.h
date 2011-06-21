@@ -31,16 +31,21 @@ class Memory; //forward declaration
 
 namespace memory {
 
-using boost::shared_ptr;
+enum MObject_ID {
+    MVISION_ID = 1,
+    MMOTION_SENSORS_ID,
+    MVISION_SENSORS_ID,
+    MIMAGE_ID
+};
 
 class Memory : public Subscriber<SensorsEvent> {
 
 public:
     Memory();
 
-    Memory( shared_ptr<Profiler> profiler_ptr,
-            shared_ptr<Vision> vision_ptr,
-            shared_ptr<Sensors> sensors_ptr);
+    Memory( boost::shared_ptr<Profiler> profiler_ptr,
+            boost::shared_ptr<Vision> vision_ptr,
+            boost::shared_ptr<Sensors> sensors_ptr);
     ~Memory();
     /**
      * calls the update function on @obj
@@ -49,9 +54,7 @@ public:
      */
     void update(MObject* obj);
     void updateVision();
-//    void updateMotionSensors();
-//    void updateVisionSensors();
-//    void updateImage();
+
     /**
      * This function is called whenever one of the Providers we are subscribed
      * to has something new/updated
@@ -67,8 +70,8 @@ public:
     MImage* getMutableMImage() {return mImage;}
 
 private:
-    shared_ptr<Profiler> _profiler;
-    shared_ptr<Sensors> _sensors;
+    boost::shared_ptr<Profiler> _profiler;
+    boost::shared_ptr<Sensors> _sensors;
     MVision* mVision;
     MVisionSensors* mVisionSensors;
     MMotionSensors* mMotionSensors;

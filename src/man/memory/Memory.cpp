@@ -13,6 +13,7 @@ long long int birth_time; //the time we initialized memory
 //everything else is time stamped relative to this
 
 using log::LoggingBoard;
+using boost::shared_ptr;
 
 Memory::Memory() : mVision(new MVision(shared_ptr<Vision>())),
         mVisionSensors(new MVisionSensors(shared_ptr<Sensors>())),

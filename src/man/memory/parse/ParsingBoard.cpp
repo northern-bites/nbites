@@ -9,6 +9,8 @@ namespace parse {
 //const char* ParsingBoard::MVISION_SENSORS_PATH = NAO_LOG_DIR "/VisionSensors.log";
 //const char* ParsingBoard::MIMAGE_PATH = NAO_LOG_DIR "/Image.log";
 
+using boost::shared_ptr;
+
 ParsingBoard::ParsingBoard(Memory* memory) :
     memory(memory) {
     initParsingObjects();
