@@ -77,7 +77,7 @@ static const float GOALBOX_WIDTH = 200.f;
 static const float GOALBOX_DEPTH = 60.f;
 static const float GOALBOX_WIDTH = 230.f;
 #endif // USING_LAB_FIELD
-#endif
+
 
 // These are used by the vision system
 // The distance the goalie box extends out past each goal post
