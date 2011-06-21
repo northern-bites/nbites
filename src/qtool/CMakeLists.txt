@@ -11,7 +11,6 @@ message(STATUS "")
 ########### Dependencies
 
 find_package(Qt4 REQUIRED)
-find_package(Protobuf REQUIRED)
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
@@ -65,6 +64,5 @@ target_link_libraries(
   colorcreator
   image
   data
-  ${PROTOBUF_LIBRARIES}
   ${QT_LIBRARIES}
   )

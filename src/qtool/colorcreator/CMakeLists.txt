@@ -11,11 +11,6 @@ find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
-######### FLAGS
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-
 ########### Sources
 
 set( ColorCreator_srcs
@@ -31,9 +26,7 @@ set(ColorCreator_headers ColorCreator.h
 
 set(ColorCreator_forms ColorCreator.ui)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}
-  /usr/include/qt4
-  /home/oneamtu/nbites/build/man/straight)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ############ Qt4 goodness
 

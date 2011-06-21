@@ -19,8 +19,7 @@ set( data_srcs DataHandler.cpp
 
 set(data_headers  )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}
-  /usr/include/qt4)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ############ Qt4 goodness
 
@@ -38,7 +37,7 @@ add_library(data
 target_link_libraries(
   data
   treemodel
-  protobuf
   memory
+  parse
   ${QT_LIBRARIES}
   )

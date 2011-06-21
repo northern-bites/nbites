@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 2.6.0)
 ########### Dependencies
 
 find_package(Qt4 REQUIRED)
+find_package(Protobuf REQUIRED)
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
@@ -23,7 +24,7 @@ set(treemodel_headers
 
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
-  /usr/include/qt4)
+                    ${PROTOBUF_INCLUDE_DIR})
 
 ############ Qt4 goodness
 
@@ -37,12 +38,8 @@ add_library(treemodel
   ${treemodel_headers_moc}
   ${treemodel_forms_headers} )
 
-link_directories( /home/oneamtu/nbites/build/man/straight/memory/protos )
-find_library(PROTOS protos /home/oneamtu/nbites/build/man/straight/memory/protos)
-
 target_link_libraries(
   treemodel
-  protobuf
-  ${PROTOS}
+  ${PROTOBUF_LIBRARY}
   ${QT_LIBRARIES}
   )
