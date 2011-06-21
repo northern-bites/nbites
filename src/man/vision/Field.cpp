@@ -140,14 +140,16 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		}
 	}
 	// look for odd spikes and quell them
-	for (good = 1; good < HULLS - 1; good++) {
-		if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
-			convex[good].y > 15) {
-			if (debugFieldEdge) {
-				cout << "Spike at " << convex[good].x << " " << convex[good].y <<
-					endl;
+	if (poseHorizon > -100) {
+		for (good = 1; good < HULLS - 1; good++) {
+			if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
+				convex[good].y > 15) {
+				if (debugFieldEdge) {
+					cout << "Spike at " << convex[good].x << " " << convex[good].y <<
+						endl;
+				}
+				convex[good].y = convex[good-1].y;
 			}
-			convex[good].y = convex[good-1].y;
 		}
 	}
 	for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
@@ -451,6 +453,8 @@ int Field::findGreenHorizon(int pH, float sl) {
         topEdge[i] = 0;
         shoot[i] = true;
 	}
+	// store field pose
+	poseHorizon = pH;
 	/*if (pH < -100) {
         horizon = 0;
         return 0;
