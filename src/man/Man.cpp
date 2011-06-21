@@ -41,7 +41,7 @@ using namespace boost::assign;
 
 using namespace std;
 using boost::shared_ptr;
-using memory::Memory;
+using man::memory::Memory;
 
 /////////////////////////////////////////
 //                                     //
@@ -105,7 +105,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 #endif// USE_NOGGIN
 #ifdef USE_MEMORY
   memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
-#endif USE_MEMORY
+#endif
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
@@ -198,7 +198,7 @@ Man::processFrame ()
 #endif
 #ifdef USE_MEMORY
     memory->updateVision();
-#endif USE_MEMORY
+#endif
 #ifdef USE_NOGGIN
     noggin->runStep();
 #endif

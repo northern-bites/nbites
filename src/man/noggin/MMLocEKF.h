@@ -14,64 +14,64 @@ class MMLocEKF : public LocSystem
 {
 
 
-public:							// Public interface
-	MMLocEKF();
-	virtual ~MMLocEKF();
+public:                         // Public interface
+    MMLocEKF();
+    virtual ~MMLocEKF();
 
-	virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
+    virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
 
-private:						// Private methods
-	void initModels();
-	void destroyModels();
+private:                        // Private methods
+    void initModels();
+    void destroyModels();
 
-	void timeUpdate(MotionModel u);
-	bool correctionStep(std::vector<Observation>& Z);
+    void timeUpdate(MotionModel u);
+    bool correctionStep(std::vector<Observation>& Z);
 
-	bool applyUnambiguousObservations(std::vector<Observation>& Z);
-	bool applyAmbiguousObservations(const std::vector<Observation>& Z);
-	void applyObsToActiveModels(const Observation& Z);
-	void applyNoCorrectionStep();
+    bool applyUnambiguousObservations(std::vector<Observation>& Z);
+    bool applyAmbiguousObservations(const std::vector<Observation>& Z);
+    void applyObsToActiveModels(const Observation& Z);
+    void applyNoCorrectionStep();
 
-	void splitObservation(const Observation& obs, LocEKF * model);
-	void consolidateModels(int maxAfterMerge);
+    void splitObservation(const Observation& obs, LocEKF * model);
+    void consolidateModels(int maxAfterMerge);
 
-	void mergeModels(double mergeThreshold);
+    void mergeModels(double mergeThreshold);
 
-	void endFrame();
-	void normalizeProbabilities(const list<LocEKF*>& unnormalized,
-								double totalProb);
+    void endFrame();
+    void normalizeProbabilities(const std::list<LocEKF*>& unnormalized,
+                                double totalProb);
 
-	void setAllModelsInactive();
-	void equalizeProbabilities();
-	bool mergeable(double mergeThreshold, LocEKF* one, LocEKF* two);
+    void setAllModelsInactive();
+    void equalizeProbabilities();
+    bool mergeable(double mergeThreshold, LocEKF* one, LocEKF* two);
 
 
-private:						// Private variables
+private:                        // Private variables
 
-	const static int MAX_MODELS = 30;
+    const static int MAX_MODELS = 30;
 
-	LocEKF* models[MAX_MODELS];
-	list<LocEKF*> modelList;
+    LocEKF* models[MAX_MODELS];
+    std::list<LocEKF*> modelList;
 
-	int mostLikelyModel;
-	int numActive, numFree;
+    int mostLikelyModel;
+    int numActive, numFree;
 
-	inline const int getMostLikelyModel() const;
-	inline LocEKF * getInactiveModel() const;
-	inline void deactivateModel(LocEKF * model);
-	inline void activateModel(LocEKF * model);
+    inline const int getMostLikelyModel() const;
+    inline LocEKF * getInactiveModel() const;
+    inline void deactivateModel(LocEKF * model);
+    inline void activateModel(LocEKF * model);
 
-	MotionModel lastOdo;
-	vector<Observation> lastObservations;
+    MotionModel lastOdo;
+    std::vector<Observation> lastObservations;
 
-	const static double PROB_SUM = 1.0;
-	const static double MERGE_THRESH_INIT = 0.01f;
-	const static double MERGE_THRESH_STEP = 0.05f;
-	const static int MAX_ACTIVE_MODELS = 6;
-	const static double OUTLIER_PROB_LIMIT = 0.005;
+    const static double PROB_SUM = 1.0;
+    const static double MERGE_THRESH_INIT = 0.01f;
+    const static double MERGE_THRESH_STEP = 0.05f;
+    const static int MAX_ACTIVE_MODELS = 6;
+    const static double OUTLIER_PROB_LIMIT = 0.005;
 
 public:
-	// LocSystem virtual getters
+    // LocSystem virtual getters
     virtual const PoseEst getCurrentEstimate() const;
     virtual const PoseEst getCurrentUncertainty() const;
     virtual const float getXEst() const;
@@ -87,17 +87,17 @@ public:
         return lastOdo;
     }
 
-	const list<LocEKF*>  getModels() const;
+    const std::list<LocEKF*>  getModels() const;
 
-	virtual const vector<Observation> getLastObservations() const {
-		return lastObservations;
-	}
+    virtual const std::vector<Observation> getLastObservations() const {
+        return lastObservations;
+    }
 
     virtual void blueGoalieReset();
     virtual void redGoalieReset();
     virtual void reset();
 
-	// LocSystem virtual setters
+    // LocSystem virtual setters
     virtual void setXEst(float xEst){}
     virtual void setYEst(float yEst){}
     virtual void setHEst(float hEst){}
