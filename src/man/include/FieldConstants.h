@@ -68,7 +68,7 @@ static const float LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y =
 static const float LANDMARK_YELLOW_GOAL_TOP_POST_Y =
     CENTER_FIELD_Y + CROSSBAR_CM_WIDTH / 2.0f;
 
-static const float CENTER_CIRCLE_RADIUS = 62.5f; // Not scaled
+static const float CENTER_CIRCLE_RADIUS = 60.0f; // Not scaled
 
 #ifdef USING_LAB_FIELD
 static const float GOALBOX_DEPTH = 60.f;
