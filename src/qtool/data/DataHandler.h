@@ -22,11 +22,11 @@ public:
     DataHandler(memory::Memory* memory);
     ~DataHandler();
 
-    virtual void readNext() {parsingBoard->parseAll();}
+    virtual void readNext() {parsingBoard.parseAll();}
 
 private:
     memory::Memory* memory;
-    memory::parse::ParsingBoard* parsingBoard;
+    memory::parse::ParsingBoard parsingBoard;
 
 };
 
