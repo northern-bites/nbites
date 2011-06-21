@@ -205,7 +205,8 @@ QVariant ProtoNode::getSingleValueAt(int index) const {
                 reflection->GetRepeatedInt32(*parentM, fieldDescriptor, index));
     case FieldDescriptor::CPPTYPE_INT64:
         return QVariant(
-                reflection->GetRepeatedInt64(*parentM, fieldDescriptor, index));
+                static_cast<qint64>(
+                reflection->GetRepeatedInt64(*parentM, fieldDescriptor, index)));
     case FieldDescriptor::CPPTYPE_MESSAGE:
         return QVariant();
     case FieldDescriptor::CPPTYPE_STRING:
@@ -218,7 +219,8 @@ QVariant ProtoNode::getSingleValueAt(int index) const {
                 reflection->GetRepeatedUInt32(*parentM, fieldDescriptor, index));
     case FieldDescriptor::CPPTYPE_UINT64:
         return QVariant(
-                reflection->GetRepeatedUInt64(*parentM, fieldDescriptor, index));
+                static_cast<quint64>(
+                reflection->GetRepeatedUInt64(*parentM, fieldDescriptor, index)));
     default:
         return QVariant();
     }
@@ -243,7 +245,8 @@ QVariant ProtoNode::getSingleValue() const {
     case FieldDescriptor::CPPTYPE_INT32:
         return QVariant(reflection->GetInt32(*parentM, fieldDescriptor));
     case FieldDescriptor::CPPTYPE_INT64:
-        return QVariant(reflection->GetInt64(*parentM, fieldDescriptor));
+        return QVariant(static_cast<qint64>(
+                reflection->GetInt64(*parentM, fieldDescriptor)));
     case FieldDescriptor::CPPTYPE_MESSAGE:
         return QVariant();
     case FieldDescriptor::CPPTYPE_STRING:
@@ -252,7 +255,8 @@ QVariant ProtoNode::getSingleValue() const {
     case FieldDescriptor::CPPTYPE_UINT32:
         return QVariant(reflection->GetUInt32(*parentM, fieldDescriptor));
     case FieldDescriptor::CPPTYPE_UINT64:
-        return QVariant(reflection->GetUInt64(*parentM, fieldDescriptor));
+        return QVariant(static_cast<qint64>(
+                reflection->GetUInt64(*parentM, fieldDescriptor)));
     default:
         return QVariant();
     }
