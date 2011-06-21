@@ -113,7 +113,8 @@ static PyObject * PyComm_setData (PyObject *self, PyObject *args)
 	{
         current = PyTuple_GET_ITEM(args, i);
         if (!PyNumber_Check(current))
-            return PyErr_BadArgument();
+            //return PyErr_BadArgument();
+	    return NULL;
 
         values.push_back(static_cast<float>(PyFloat_AsDouble(current)));
     }
