@@ -1305,6 +1305,120 @@ int ObjectFragments::classifyByCrossbar(Blob b)
     return NOPOST;
 }
 
+/*
+ */
+int ObjectFragments::classifyByInnerL(Blob post, int x, int y, bool right,
+									  boost::shared_ptr<VisualLine> line1,
+									  boost::shared_ptr<VisualLine> line2) {
+	//int x = corner->getX();
+	//int y = corner->getY();
+	float distant = 0;
+	// check if this corner is at the edge
+	const vector < boost::shared_ptr<VisualLine> > * lines =
+		vision->fieldLines->getLines();
+	for (vector < boost::shared_ptr<VisualLine> >::const_iterator i =
+			 lines->begin();
+		 i != lines->end(); ++i) {
+		distant = max((*i)->getDistance(), distant);
+	}
+	// check that the post isn't too far away
+	if (distant > line1->getDistance() &&
+		distant > line2->getDistance()) {
+		if (x > post.getLeft()) {
+			return LEFT;
+		} else {
+			return RIGHT;
+		}
+	}
+
+	// if we can't see the bottom of the post it is too dangerous
+	if (y < post.getBottom() && post.getBottom() < IMAGE_HEIGHT - 2) {
+		// roughly how far away is it?
+		float diff = realDistance(x, y, post.getLeftBottomX(),
+								  post.getLeftBottomY());
+		estimate e = vision->pose->pixEstimate(x, y, 0.0);
+		// if it is in the right position we can figure out which post
+		if (POSTLOGIC) {
+			cout << "Checking a corner " << x << " " <<
+				post.getLeftBottomX() << " corner points ";
+			if (right) {
+				cout << "right" << endl;
+			} else {
+				cout << "left" << endl;
+			}
+			cout << "Distances: " << diff << " " << e.dist << endl;
+		}
+		if (x <= post.getLeftBottomX()) {
+			if (right) {
+				return cornerClassifier(diff, e.dist,
+										post.getLeftBottomX(),
+										post.getLeftBottomX(),
+										LEFT, RIGHT, true);
+			} else {
+				return cornerClassifier(diff, e.dist,
+										post.getLeftBottomX(),
+										post.getLeftBottomX(),
+										LEFT, RIGHT, false);
+			}
+		} else {
+			if (right) {
+				return cornerClassifier(diff, e.dist,
+										post.getRightBottomX(),
+										post.getRightBottomY(), RIGHT,
+										LEFT, false);
+			} else {
+				return cornerClassifier(diff, e.dist,
+										post.getRightBottomX(),
+										post.getRightBottomY(), RIGHT,
+										LEFT, true);
+			}
+		}
+	}
+	return NOPOST;
+}
+
+/* Try to use Outer L corners to decide which post we're looking at.
+ */
+
+int ObjectFragments::classifyByOuterL(Blob post,
+									  boost::shared_ptr<VisualLine> line1,
+									  boost::shared_ptr<VisualLine> line2) {
+	// Determine which line of the corner is the shortest
+	const point<int> end1 = line1->getEndpoint();
+	const point<int> end2 = line1->getStartpoint();
+	float l1 = realDistance(end1.x, end1.y, end2.x, end2.y);
+	const point<int> endl1 = line2->getEndpoint();
+	const point<int> endl2 = line2->getStartpoint();
+	float l2 = realDistance(endl1.x, endl1.y, endl2.x, endl2.y);
+	// if one line is long enough we can determine its relationship
+	if (l1 > l2 && l1 > GOALBOX_DEPTH + 20.0f) {
+		if (end1.y < end2.y) {
+			if (end1.x > post.getRight()) {
+				return RIGHT;
+			} else {
+				return LEFT;
+			}
+		} else if (end2.x > post.getRight()) {
+			return RIGHT;
+		} else {
+			return LEFT;
+		}
+	} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 20.0f) {
+		if (endl1.y < endl2.y) {
+			if (endl1.x > post.getRight()) {
+				return RIGHT;
+			} else {
+				return LEFT;
+			}
+		} else if (endl2.x > post.getRight()) {
+			return RIGHT;
+		} else {
+			return LEFT;
+		}
+	}
+	return NOPOST;
+}
+
 
 /* Try to use T Corners to decide which post we're looking at.
    This is actually considerably easier with the large goal boxes as the only
@@ -1411,75 +1525,23 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
     int spanx = post.width();
     int spany = post.height();
     // iterate through all of the corners, skipping all of the T Corners
+	int classification;
     for (list <VisualCorner>::iterator k = corners->begin();
          k != corners->end(); k++) {
         // we already processed T Corners so skip them, skip others too
         if (k->getShape() == INNER_L) {
-            int x = k->getX();
-            int y = k->getY();
-			float distant = 0;
-			// check if this corner is at the edge
-			const vector < boost::shared_ptr<VisualLine> > * lines =
-				vision->fieldLines->getLines();
-			for (vector < boost::shared_ptr<VisualLine> >::const_iterator i =
-					 lines->begin();
-				 i != lines->end(); ++i) {
-				distant = max((*i)->getDistance(), distant);
+            classification = classifyByInnerL(post, k->getX(), k->getY(),
+											  k->doesItPointRight(),
+											  k->getLine1(), k->getLine2());
+			if (classification != NOPOST) {
+				return classification;
 			}
-			// check that the post isn't too far away
-			if (distant > k->getLine1()->getDistance() &&
-				distant > k->getLine2()->getDistance()) {
-				if (x > post.getLeft()) {
-					return LEFT;
-				} else {
-					return RIGHT;
-				}
+        } else if (k->getShape() == OUTER_L) {
+			classification = classifyByOuterL(post, k->getLine1(), k->getLine2());
+			if (classification != NOPOST) {
+				return classification;
 			}
-
-            // if we can't see the bottom of the post it is too dangerous
-            if (y < post.getBottom() && post.getBottom() < IMAGE_HEIGHT - 2) {
-                // roughly how far away is it?
-                float diff = realDistance(x, y, post.getLeftBottomX(),
-                                          post.getLeftBottomY());
-                estimate e = vision->pose->pixEstimate(x, y, 0.0);
-                // if it is in the right position we can figure out which post
-                if (POSTLOGIC) {
-                    cout << "Checking a corner " << x << " " <<
-                        post.getLeftBottomX() << " corner points ";
-                    if (k->doesItPointRight()) {
-                        cout << "right" << endl;
-                    } else {
-                        cout << "left" << endl;
-                    }
-                    cout << "Distances: " << diff << " " << e.dist << endl;
-                }
-                if (x <= post.getLeftBottomX()) {
-                    if (k->doesItPointRight()) {
-                        return cornerClassifier(diff, e.dist,
-                                                post.getLeftBottomX(),
-                                                post.getLeftBottomX(),
-                                                LEFT, RIGHT, true);
-                    } else {
-                        return cornerClassifier(diff, e.dist,
-                                                post.getLeftBottomX(),
-                                                post.getLeftBottomX(),
-                                                LEFT, RIGHT, false);
-                    }
-                } else {
-                    if (k->doesItPointRight()) {
-                        return cornerClassifier(diff, e.dist,
-                                                post.getRightBottomX(),
-                                                post.getRightBottomY(), RIGHT,
-                                                LEFT, false);
-                    } else {
-                        return cornerClassifier(diff, e.dist,
-                                                post.getRightBottomX(),
-                                                post.getRightBottomY(), RIGHT,
-                                                LEFT, true);
-                    }
-                }
-            }
-        }
+		}
     }
     return NOPOST;
 }
