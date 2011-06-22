@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -18,44 +17,32 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef _ChopShop_h_DEFINED
-#define _ChopShop_h_DEFINED
+/**
+ * This class extends PreviewChoppedCommand to control two BalancingArms
+ * which use the CoM preview calculations. All this should be transparent
+ * to ScriptedProvider
+ *
+ * @author Nathan Merritt
+ * @date June 2011
+ */
 
-#include <vector>
-#include <boost/shared_ptr.hpp>
+#pragma once
+#ifndef BALANCING_CHOPPED_COMMAND
+#define BALANCING_CHOPPED_COMMAND
 
-#include "Sensors.h"
-#include "BodyJointCommand.h"
+#include "PreviewChoppedCommand.h"
+#include "BalancingArm.h"
 
-#include "JointCommand.h"
-#include "ChoppedCommand.h"
-#include "LinearChoppedCommand.h"
-#include "SmoothChoppedCommand.h"
-#include "BalancingChoppedCommand.h"
-#include "Common.h"
-
-class ChopShop
-{
+class BalancingChoppedCommand : public PreviewChoppedCommand {
 public:
-    ChopShop(boost::shared_ptr<Sensors> s);
+    BalancingChoppedCommand( ChoppedCommand::ptr choppedCommand );
+    ~BalancingChoppedCommand();
 
-    ChoppedCommand::ptr chopCommand(const JointCommand *command,
-				    bool comPreview=false);
+    virtual std::vector<float> getNextJoints(int id);
+    virtual const std::vector<float> getStiffness(Kinematics::ChainID id) const;
 
 private:
-    boost::shared_ptr<Sensors> sensors;
-    float FRAME_LENGTH_S;
-
-    ChoppedCommand::ptr chopLinear(const JointCommand *command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-    ChoppedCommand::ptr chopSmooth(const JointCommand *command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-
-    std::vector<float> getCurrentJoints();
+    BalancingArm::ptr leftArm, rightArm;
 
 };
 

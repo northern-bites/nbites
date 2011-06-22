@@ -11,13 +11,14 @@ static const int COM_PREVIEW_FRAMES = 20;
 //#define DEBUG_SCRIPTED_COM
 
 PreviewChoppedCommand::PreviewChoppedCommand ( ChoppedCommand::ptr choppedCommand )
-    : thisFramesAngles(vector<float>()),
+    : previewStruct(COMPreview()),
+      alreadyChoppedCommand(choppedCommand),
+      jointAngles(vector<VectorFifo>()),
+      thisFramesAngles(vector<float>()),
       com_x(COM_PREVIEW_FRAMES),
       com_y(COM_PREVIEW_FRAMES),
       com_dx(COM_PREVIEW_FRAMES),
-      com_dy(COM_PREVIEW_FRAMES),
-      previewStruct(COMPreview()),
-      alreadyChoppedCommand(choppedCommand)
+      com_dy(COM_PREVIEW_FRAMES)
 {
 #ifdef DEBUG_SCRIPTED_COM
     std::cout << "Starting new PreviewChoppedCommand" << std::endl;

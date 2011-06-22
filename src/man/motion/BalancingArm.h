@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -18,45 +17,35 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef _ChopShop_h_DEFINED
-#define _ChopShop_h_DEFINED
 
-#include <vector>
+/**
+ * This class moves an arm to automatically balance based on a CoM preview
+ * calculated somewhere else.
+ *
+ * @author Nathan Merritt
+ * @date June 2011
+ * @see WalkingArm, PreviewChoppedCommand
+ */
+
+#pragma once
+#ifndef BALANCING_ARM_H
+#define BALANCING_ARM_H
+
 #include <boost/shared_ptr.hpp>
 
-#include "Sensors.h"
-#include "BodyJointCommand.h"
+#include "Kinematics.h"
+#include "COMPreview.h"
 
-#include "JointCommand.h"
-#include "ChoppedCommand.h"
-#include "LinearChoppedCommand.h"
-#include "SmoothChoppedCommand.h"
-#include "BalancingChoppedCommand.h"
-#include "Common.h"
-
-class ChopShop
-{
+class BalancingArm {
 public:
-    ChopShop(boost::shared_ptr<Sensors> s);
+    typedef boost::shared_ptr<BalancingArm> ptr;
 
-    ChoppedCommand::ptr chopCommand(const JointCommand *command,
-				    bool comPreview=false);
+    BalancingArm( Kinematics::ChainID id );
+    ~BalancingArm();
 
 private:
-    boost::shared_ptr<Sensors> sensors;
-    float FRAME_LENGTH_S;
-
-    ChoppedCommand::ptr chopLinear(const JointCommand *command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-    ChoppedCommand::ptr chopSmooth(const JointCommand *command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-
-    std::vector<float> getCurrentJoints();
-
+    COMPreview::ptr comPreview;
 };
+
 
 #endif

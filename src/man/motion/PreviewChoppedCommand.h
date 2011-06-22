@@ -55,6 +55,10 @@ public:
 
     COMPreview::ptr getComPreview();
 
+protected:
+    COMPreview previewStruct;
+    ChoppedCommand::ptr alreadyChoppedCommand;
+
 private:
     void bufferNextAngles(int chainID);
     void updateComEstimates();
@@ -65,8 +69,6 @@ private:
     std::vector<float> thisFramesAngles;
 
     Boxcar com_x, com_y, com_dx, com_dy;
-    COMPreview previewStruct;
-    ChoppedCommand::ptr alreadyChoppedCommand;
 };
 
 

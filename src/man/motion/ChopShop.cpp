@@ -66,7 +66,7 @@ ChoppedCommand::ptr ChopShop::chopCommand(const JointCommand *command,
 
     // for CoM preview estimates
     if (comPreview) {
-	return ChoppedCommand::ptr ( new PreviewChoppedCommand(chopped) );
+	return ChoppedCommand::ptr ( new BalancingChoppedCommand(chopped) );
     }
     return chopped;
 }
