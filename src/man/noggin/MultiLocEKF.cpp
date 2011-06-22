@@ -91,11 +91,18 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
 #define CALCULATE_CORNER_OBS_ERRORS(obs, pt)                            \
     CALCULATE_PT_OBS_ERRORS(obs, pt);                                   \
                                                                         \
-    /* Calculate the heading from the corner to us */                   \
-    float heading_from_corner = 180 - heading_mag;                      \
+    /* Calculate dot product of distance vector to corner's zero  */    \
+    float dot_prod = (pt_rel_x * cos(pt.angle) +                        \
+                      pt_rel_y * sin(pt.angle) );                       \
                                                                         \
-    float pt_orientation = (heading_from_corner *                       \
-                            copysignf(1.0f, pt_rel_y) - pt.angle);      \
+    /* Calculate sign based on corner's listed angle */                 \
+    float dot_sign = (-pt_rel_x * sin(pt.angle) +                       \
+                      pt_rel_y * cos(pt.angle) );                       \
+                                                                        \
+    /* Acos always returns positive, so we have the magnitude of our */ \
+    /* orientation to the corner */                                     \
+    float mag_orientation = acosf(dot_prod/pt_dist);                    \
+    float pt_orientation = copysignf(1.0f,dot_sign) * mag_orientation;  \
                                                                         \
     float orientation_error = subPIAngle(z.getVisOrientation() -        \
                                          pt_orientation);
@@ -512,21 +519,29 @@ void MultiLocEKF::incorporateCorner(int index,
     // Pack into measurement vector
 
     // Get expected values of the corner
-    CornerLandmark bestPossibility = z.getPossibilities()[index];
+    CornerLandmark c = z.getPossibilities()[index];
 
     // Calculate the errors
-    CALCULATE_CORNER_OBS_ERRORS(z, bestPossibility);
+    CALCULATE_CORNER_OBS_ERRORS(z, c);
 
     // Uses the same values as a point landmark (dist, bearing)
     INCORPORATE_POINT_POLAR(H_k, R_k, V_k);
 
-
     // Has additional dimensions for orientation
     V_k(2) = orientation_error;
 
+    float denom = sqrt( 1 - ((dot_prod * dot_prod) /
+                             (pt_dist*pt_dist)));
+    float sign = copysignf(1.0f, dot_sign);
+
     // Derivatives of orientation with respect to x,y,h
-    H_k(2,0) = pt_rel_y / (pt_dist * pt_dist);
-    H_k(2,1) = -pt_rel_x / (pt_dist * pt_dist);
+    H_k(2,0) = sign * (dot_prod * pt_rel_x/
+                       pow(pt_dist,3) -
+                       cos(c.angle)/pt_dist) / denom;
+
+    H_k(2,1) = sign * (dot_prod*pt_rel_y/
+                       pow(pt_dist,3) -
+                       sin(c.angle)/pt_dist) / denom;
     H_k(2,2) = 0;
 
     // Orientation covariences
@@ -898,7 +913,7 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
     float sideC = hypotf(i,j);
 
     // Calculate angle between vector (pt1,pt2) and north (zero heading)
-    float ptVecHeading = copysign(1.0f, j) * acosf(i/sideC);
+    float ptVecHeading = copysignf(1.0f, j) * acosf(i/sideC);
 
     float angleC = abs(subPIAngle(obs1->getVisBearing() -
                                   obs2->getVisBearing()));
@@ -958,7 +973,7 @@ void MultiLocEKF::resetLoc(const CornerObservation* c)
     CornerLandmark pt = c->getPossibilities().front();
 
     // Orientation around north vector
-    float theta = NBMath::subPIAngle(pt.angle - c->getVisOrientation());
+    float theta = NBMath::subPIAngle(pt.angle + c->getVisOrientation());
 
     xhat_k_bar(x_index) = pt.x + c->getVisDistance() * cos(theta);
     xhat_k_bar(y_index) = pt.y + c->getVisDistance() * sin(theta);
@@ -980,15 +995,15 @@ void MultiLocEKF::resetLoc(const CornerObservation* c)
 
     float hVariance = orientationVariance + bearingVariance;
 
-    P_k_bar(0,0) = xVariance;
+    P_k_bar(0,0) = distVariance * 2;
     P_k_bar(0,1) = 0.0f;
     P_k_bar(0,2) = 0.0f;
 
     P_k_bar(1,0) = 0.0f;
-    P_k_bar(1,1) = yVariance;
+    P_k_bar(1,1) = distVariance * 2;
     P_k_bar(1,2) = 0.0f;
 
     P_k_bar(2,0) = 0.0f;
     P_k_bar(2,1) = 0.0f;
-    P_k_bar(2,2) = hVariance;
+    P_k_bar(2,2) = bearingVariance * 2;
 }
