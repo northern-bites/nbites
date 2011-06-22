@@ -41,12 +41,12 @@ class HeadTracking(FSA.FSA):
         self.target = self.brain.ball #default
         # target should either be ball or instance of FieldObject
 
-# ** # old method
+# ** # old method - should keep
     def stopHeadMoves(self):
         """stop all head moves. In TrackingStates.py"""
         self.switchTo('stop')
 
-# ** # old method
+# ** # old method - should keep
     def setNeutralHead(self):
         """executes sweet move to move head to neutral position.
         Does not call stop head moves. In TrackingStates.py"""

@@ -140,10 +140,6 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
     pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*SPEED_CLIP_FACTOR);
 
     setActive();
-    /* ** *///cout <<"looking towards:  "<<yawDest<<"   "<<pitchDest<<endl;
-    /* ** *///cout <<"currently at:   "<<lastYawDest<<"   "<<lastPitchDest<<endl;
-    /* ** *///cout <<"relative position: "<<command->getRelX()/10<<"  "<<command->getRelY()/10<<"  "<<command->getRelZ()/10<<"  hypo:  "<<(sqrt(command->getRelX()*command->getRelX()+command->getRelY()*command->getRelY()))/10<<endl;
-    /* ** *///cout <<"adjusted position: "<<relX/10<<"  "<<relY/10<<"  "<<relZ/10<<"  hypo:  "<<hypoDist/10<<endl;
     pthread_mutex_unlock(&coord_head_provider_mutex);
 }
 
@@ -160,7 +156,6 @@ vector<float> CoordHeadProvider::getCurrentHeads() {
 
 void CoordHeadProvider::setActive(){
     isDone() ? inactive() : active();
-	/* ** *///cout<<"Coord head active?: "<<isDone()<<endl;
 }
 
 

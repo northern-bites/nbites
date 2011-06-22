@@ -204,7 +204,6 @@ vector<float> HeadProvider::getCurrentHeads() {
 
 void HeadProvider::setActive(){
     isDone() ? inactive() : active();
-	/* ** *///cout<<"Head active?: "<<isDone()<<endl;
 }
 
 
