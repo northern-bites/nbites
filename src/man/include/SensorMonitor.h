@@ -35,7 +35,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "ALSpeech.h"
+#include "Speech.h"
 #include "dsp.h"
 
 #define NOT_STEADY -1
