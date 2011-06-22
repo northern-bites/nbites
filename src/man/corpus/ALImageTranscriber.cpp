@@ -551,7 +551,8 @@ void ALImageTranscriber::waitForImage ()
 #ifdef CAN_SAVE_FRAMES
 #ifdef USE_MEMORY
             sensors->setRawNaoImage(ALimage->getData());
-            ImageAcquisition::_acquire_image_fast(table, &params, const_cast<uint8_t*>(sensors->getNaoImage()), image);
+            ImageAcquisition::acquire_image_fast(table, params,
+                        const_cast<uint8_t*>(sensors->getNaoImage()), image);
 #else
             _copy_image(ALimage->getData(), naoImage);
             ImageAcquisition::acquire_image_fast(table, params,
