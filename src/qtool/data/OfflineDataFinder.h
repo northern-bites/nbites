@@ -28,6 +28,10 @@ public:
 private:
     void setupFSModel();
     void setupFSBrowser();
+    void scanFolderForLogs(QString path);
+
+private slots:
+    void folderChanged(const QModelIndex& index);
 
 private:
     QFileSystemModel* fsModel;

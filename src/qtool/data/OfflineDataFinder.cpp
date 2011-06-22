@@ -1,5 +1,6 @@
 #include "OfflineDataFinder.h"
 
+#include <iostream>
 #include <QCoreApplication>
 
 namespace qtool {
@@ -14,8 +15,6 @@ OfflineDataFinder::OfflineDataFinder(QWidget* parent) :
 
     setupFSModel();
     setupFSBrowser();
-
-
     layout->addWidget(fsBrowser);
 
     this->setLayout(layout);
@@ -30,6 +29,7 @@ void OfflineDataFinder::setupFSModel() {
 
     fsModel = new QFileSystemModel();
     fsModel->setRootPath(QDir::homePath());
+    fsModel->setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 }
 
 void OfflineDataFinder::setupFSBrowser() {
@@ -37,12 +37,31 @@ void OfflineDataFinder::setupFSBrowser() {
     fsBrowser = new QTreeView();
     fsBrowser->setModel(fsModel);
     fsBrowser->setRootIndex(fsModel->index(QDir::homePath()));
-    fsBrowser->setExpanded(fsModel->index(QDir::currentPath()), true);
+    fsBrowser->expand(fsModel->index(QDir::currentPath()));
 
     fsBrowser->setColumnWidth(0, DEFAULT_NAME_COLUMN_WIDTH);
     fsBrowser->setColumnHidden(1, true);
     fsBrowser->setColumnHidden(2, true);
     fsBrowser->setColumnHidden(3, true);
+
+    connect(fsBrowser, SIGNAL(doubleClicked(const QModelIndex&)),
+            this, SLOT(folderChanged(const QModelIndex&)));
+}
+
+void OfflineDataFinder::folderChanged(const QModelIndex& index) {
+    this->scanFolderForLogs(fsModel->filePath(index));
+}
+
+void OfflineDataFinder::scanFolderForLogs(QString path) {
+    QDir dir(path, "*.log");
+    QFileInfoList list = dir.entryInfoList();
+     std::cout << "     Bytes Filename" << std::endl;
+     for (int i = 0; i < list.size(); ++i) {
+         QFileInfo fileInfo = list.at(i);
+         std::cout << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10)
+                                                 .arg(fileInfo.fileName()));
+         std::cout << std::endl;
+     }
 }
 
 }
