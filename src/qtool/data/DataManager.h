@@ -11,10 +11,10 @@
 
 #pragma once
 
-#include "DataHandler.h"
-#include "memory/Memory.h"
+#include "DataSource.h"
+#include "man/memory/Memory.h"
+#include "man/memory/parse/ParsingBoard.h"
 #include "include/MultiProvider.h"
-#include "boost/shared_ptr.hpp"
 
 namespace qtool {
 namespace data {
@@ -31,17 +31,20 @@ class DataManager : public MultiProvider<DataEvent> {
 public:
     DataManager();
 
-    void getNext() const {
-        dataHandler->readNext();
+    void getNext() {
+        parsingBoard.parseAll();
         this->notifySubscribers(NEW_IMAGE);
     }
 
     boost::shared_ptr<const man::memory::Memory> getMemory() const {
         return memory;}
 
+    void newDataSource(DataSource::ptr dataSource);
+
 private:
     boost::shared_ptr<man::memory::Memory> memory;
-    DataHandler* dataHandler;
+    man::memory::parse::ParsingBoard parsingBoard;
+    DataSource::ptr dataSource;
 
 };
 

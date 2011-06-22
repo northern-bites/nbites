@@ -8,27 +8,27 @@
  *
  */
 
-#pragma once
-
-#include "man/memory/Memory.h"
-#include "man/memory/parse/ParsingBoard.h"
-
-namespace qtool {
-namespace data {
-
-class DataHandler {
-
-public:
-    DataHandler(man::memory::Memory* memory);
-    ~DataHandler();
-
-    virtual void readNext() {parsingBoard.parseAll();}
-
-private:
-    man::memory::Memory* memory;
-    man::memory::parse::ParsingBoard parsingBoard;
-
-};
-
-}
-}
+//#pragma once
+//
+//#include "man/memory/Memory.h"
+//#include "man/memory/parse/ParsingBoard.h"
+//
+//namespace qtool {
+//namespace data {
+//
+//class DataHandler {
+//
+//public:
+//    DataHandler(man::memory::Memory* memory);
+//    ~DataHandler();
+//
+//    virtual void readNext() {parsingBoard.parseAll();}
+//
+//private:
+//    man::memory::Memory* memory;
+//    man::memory::parse::ParsingBoard parsingBoard;
+//
+//};
+//
+//}
+//}

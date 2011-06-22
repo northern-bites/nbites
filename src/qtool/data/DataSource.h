@@ -13,45 +13,34 @@
 
 #include <boost/shared_ptr.hpp>
 #include <man/memory/Memory.h>
+#include <vector>
 
 namespace qtool {
 namespace data{
 
-typedef man::memory::MObject_ID Data_ID;
-
 class DataSource {
 
-    typedef std::pair< Data_ID, FDProvider* > DataFDProviderPair;
-    typedef std::map< Data_ID, FDProvider* > DataFDProviderMap;
+    typedef std::pair< int, man::include::io::FDProvider::ptr > FDProviderPair;
+    typedef std::map< int, man::include::io::FDProvider::ptr > FDProviderMap;
 
 public:
     typedef boost::shared_ptr<DataSource> ptr;
-    struct Type {
-        enum {
-            offline = 1,
-            online,
-            old
-        };
+    enum Type {
+        offline = 1,
+        online,
+        old
     };
 
 public:
-    DataSource(Type type) : type(type){}
+    DataSource(Type type);
 
-    int getFileDescriptor(Data_ID data_ID) {
-
-        DataFDProviderMap::iterator it = dataFDProviderMap.find(data_ID);
-
-        if (it != dataFDProviderMap.end()) {
-            //we found a legitimate object
-            return it->second->getFileDescriptor();
-        }
-        return 0;
-    }
+    std::vector<int> getFileDescriptors();
+    void addProvider(man::include::io::FDProvider::ptr fdprovider);
 
     Type getType() { return type; }
 
 private:
-    DataFDProviderMap dataFDProviderMap;
+    FDProviderMap fdProviderMap;
     Type type;
 };
 

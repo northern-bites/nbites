@@ -13,10 +13,10 @@ add_definitions(${QT_DEFINITIONS})
 
 ########### Sources
 
-set( data_srcs DataHandler.cpp
-               DataManager.cpp
+set( data_srcs DataManager.cpp
                DataLoader.cpp
                OfflineDataFinder.cpp
+               DataSource.cpp
                )
 
 set( data_headers DataLoader.h

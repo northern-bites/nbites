@@ -12,6 +12,7 @@
 #include <QtGui>
 
 #include "OfflineDataFinder.h"
+#include "DataManager.h"
 #include "DataSource.h"
 
 namespace qtool {
@@ -22,13 +23,17 @@ class DataLoader : public QWidget
     Q_OBJECT
 
 public:
-    DataLoader(QWidget *parent = 0);
+    DataLoader(DataManager* dataManager ,QWidget *parent = 0);
     ~DataLoader();
 
 private:
     QComboBox* setupDataSelectorBox();
 
+private slots:
+    void newDataSource(DataSource::ptr dataSource);
+
 private:
+    DataManager* dataManager;
     DataFinder* dataFinder;
 };
 

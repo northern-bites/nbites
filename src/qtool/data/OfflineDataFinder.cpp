@@ -3,8 +3,14 @@
 #include <iostream>
 #include <QCoreApplication>
 
+#include "NaoPaths.h"
+
 namespace qtool {
 namespace data {
+
+using man::include::io::FDProvider;
+using man::include::io::FileFDProvider;
+using namespace man::include::paths;
 
 static const int DEFAULT_NAME_COLUMN_WIDTH = 300;
 
@@ -44,7 +50,7 @@ void OfflineDataFinder::setupFSBrowser() {
     fsBrowser->setColumnHidden(2, true);
     fsBrowser->setColumnHidden(3, true);
 
-    connect(fsBrowser, SIGNAL(doubleClicked(const QModelIndex&)),
+    connect(fsBrowser, SIGNAL(expanded(const QModelIndex&)),
             this, SLOT(folderChanged(const QModelIndex&)));
 }
 
@@ -53,16 +59,25 @@ void OfflineDataFinder::folderChanged(const QModelIndex& index) {
 }
 
 void OfflineDataFinder::scanFolderForLogs(QString path) {
-    QDir dir(path, "*.log");
+    QString filter = QString(("*" + NAO_LOG_EXTENSION).data());
+    QDir dir(path, filter);
     QFileInfoList list = dir.entryInfoList();
-     std::cout << "     Bytes Filename" << std::endl;
-     for (int i = 0; i < list.size(); ++i) {
-         QFileInfo fileInfo = list.at(i);
-         std::cout << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10)
-                                                 .arg(fileInfo.fileName()));
-         std::cout << std::endl;
-     }
-}
 
+    DataSource::ptr dataSource;
+    if (list.size() == 0) {
+        return;
+    }
+
+    dataSource = DataSource::ptr(new DataSource(DataSource::offline));
+    for (int i = 0; i < list.size(); i++) {
+        QFileInfo fileInfo = list.at(i);
+        if (fileInfo.size() != 0) {
+            std::string path = fileInfo.absoluteFilePath().toStdString();
+            dataSource->addProvider(
+                    FDProvider::ptr(new FileFDProvider(path, O_RDONLY)));
+        }
+    }
+    emit signalNewDataSource(dataSource);
+}
 }
 }

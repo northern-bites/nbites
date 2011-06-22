@@ -15,7 +15,7 @@
 #include "DataSource.h"
 
 namespace qtool {
-namespace data{
+namespace data {
 
 class DataFinder : public QWidget {
     Q_OBJECT
@@ -24,10 +24,7 @@ public:
     DataFinder(QWidget *parent = 0) : QWidget(parent) {}
 
 signals:
-    void newDataSource(DataSource::ptr dataSource);
-
-protected:
-    DataSource::ptr dataSource;
+    void signalNewDataSource(DataSource::ptr dataSource);
 
 };
 

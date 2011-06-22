@@ -12,7 +12,7 @@ using colorcreator::ColorCreator;
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
         dataManager(new DataManager()),
-        dataLoader(new DataLoader()),
+        dataLoader(new DataLoader(dataManager)),
         colorCreator(new ColorCreator(dataManager)){
 
     this->setWindowTitle(tr("HackTool"));
