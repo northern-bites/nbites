@@ -1,7 +1,8 @@
 #include "RoboImageViewer.h"
 #include <QMouseEvent>
 
-RoboImageViewer::RoboImageViewer(const RoboImage* roboImage, QLabel *infoLabel, QWidget *parent)
+RoboImageViewer::RoboImageViewer(const man::memory::RoboImage* roboImage,
+                                 QLabel *infoLabel, QWidget *parent)
     : QWidget(parent),
       image(new BMPYUVImage(roboImage)),
       infoLabel(infoLabel)

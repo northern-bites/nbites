@@ -131,9 +131,8 @@ private slots:
 
 private:
     Ui::ColorCreator *ui;
-    const RoboImage* roboImage;
+    const man::memory::RoboImage* roboImage;
     YUVImage yuvImage;
-    memory::parse::ImageParser* imageParser;
     const qtool::data::DataManager* dataManager;
     ColorTable *table;
     QString baseDirectory;

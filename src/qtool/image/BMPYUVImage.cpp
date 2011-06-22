@@ -1,7 +1,7 @@
 
 #include "BMPYUVImage.h"
 
-BMPYUVImage::BMPYUVImage(const RoboImage *_roboImage) :
+BMPYUVImage::BMPYUVImage(const man::memory::RoboImage *_roboImage) :
 	YUVImage(_roboImage),
 	bitmap(width, height, QImage::Format_RGB32)
 { }

@@ -13,7 +13,7 @@ class RoboImageViewer: public QWidget
     Q_OBJECT
 public:
 
-    RoboImageViewer(const RoboImage* roboImage,
+    RoboImageViewer(const man::memory::RoboImage* roboImage,
     		QLabel *infoLabel = NULL,
     		QWidget *parent = NULL);
     virtual ~RoboImageViewer();

@@ -31,7 +31,7 @@ class BMPYUVImage : public YUVImage
 {
 
 public:
-    BMPYUVImage(const RoboImage* _roboImage);
+    BMPYUVImage(const man::memory::RoboImage* _roboImage);
     virtual ~BMPYUVImage() {};
     virtual void updateFromRoboImage();
     void updateBitmap();

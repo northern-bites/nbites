@@ -3,7 +3,7 @@
 namespace qtool {
 namespace data {
 
-using memory::Memory;
+using man::memory::Memory;
 using boost::shared_ptr;
 
 DataManager::DataManager() :

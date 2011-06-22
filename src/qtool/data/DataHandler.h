@@ -19,14 +19,14 @@ namespace data {
 class DataHandler {
 
 public:
-    DataHandler(memory::Memory* memory);
+    DataHandler(man::memory::Memory* memory);
     ~DataHandler();
 
     virtual void readNext() {parsingBoard.parseAll();}
 
 private:
-    memory::Memory* memory;
-    memory::parse::ParsingBoard parsingBoard;
+    man::memory::Memory* memory;
+    man::memory::parse::ParsingBoard parsingBoard;
 
 };
 

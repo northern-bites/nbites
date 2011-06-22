@@ -36,11 +36,11 @@ public:
         this->notifySubscribers(NEW_IMAGE);
     }
 
-    boost::shared_ptr<const memory::Memory> getMemory() const {
+    boost::shared_ptr<const man::memory::Memory> getMemory() const {
         return memory;}
 
 private:
-    boost::shared_ptr<memory::Memory> memory;
+    boost::shared_ptr<man::memory::Memory> memory;
     DataHandler* dataHandler;
 
 };

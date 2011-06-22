@@ -2,6 +2,8 @@
 
 using namespace std;
 
+using man::memory::RoboImage;
+
 YUVImage::YUVImage(const RoboImage* _roboImage) :
 		roboImage(_roboImage) {
 

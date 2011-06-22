@@ -3,7 +3,7 @@
 namespace qtool {
 namespace data {
 
-using memory::Memory;
+using man::memory::Memory;
 
 DataHandler::DataHandler(Memory* memory) :
     memory(memory),

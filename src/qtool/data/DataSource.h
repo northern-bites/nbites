@@ -17,12 +17,12 @@
 namespace qtool {
 namespace data{
 
-typedef memory::MObject_ID Data_ID;
+typedef man::memory::MObject_ID Data_ID;
 
 class DataSource {
 
-    typedef pair< Data_ID, FDProvider* > DataFDProviderPair;
-    typedef map< Data_ID, FDProvider* > DataFDProviderMap;
+    typedef std::pair< Data_ID, FDProvider* > DataFDProviderPair;
+    typedef std::map< Data_ID, FDProvider* > DataFDProviderMap;
 
 public:
     typedef boost::shared_ptr<DataSource> ptr;

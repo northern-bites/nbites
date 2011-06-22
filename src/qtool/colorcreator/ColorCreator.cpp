@@ -15,6 +15,7 @@ namespace qtool {
 namespace colorcreator {
 
 using data::DataManager;
+using man::memory::RoboImage;
 
 ColorCreator::ColorCreator(const DataManager* dataManager, QWidget *parent) :
     QWidget(parent),
@@ -651,9 +652,6 @@ void ColorCreator::on_pushButton_clicked()
     currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
                                             currentDirectory,
                                             tr("Image Files (*.log)"));
-//    imageParser= new memory::parse::ImageParser(currentDirectory.toStdString().data(),
-//            boost::shared_ptr<const yuvImage> (image));
-    imageParser->getNext();
     yuvImage.updateFromRoboImage();
     updateDisplays();
 }
