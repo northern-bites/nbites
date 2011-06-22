@@ -1092,7 +1092,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 dist = 0.0;
             }
             objPtr->setDistance(dist);
-			if (dist < MIDFIELD_X) {
+			if (dist < MIDFIELD_X + 150) {
 				context->setSameHalf();
 			}
 		} else { // don't know what object it is

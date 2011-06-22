@@ -421,10 +421,8 @@ void Context::checkLowOuterL(VisualCorner & corner, bool line1IsLonger) {
     }
     if (face == FACING_BLUE_GOAL) {
         if (left) {
-			cout << "Setting shape " << LEFT_GOAL_BLUE_L << endl;
             corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
         } else {
-			cout << "Also set " << endl;
             corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
         }
     } else if (face == FACING_YELLOW_GOAL) {
@@ -434,7 +432,6 @@ void Context::checkLowOuterL(VisualCorner & corner, bool line1IsLonger) {
             corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
         }
     }
-	cout << "Shape is " << corner.getSecondaryShape() << endl;
 }
 
 /** If we have a single OUTER_L corner we can often glean a lot of information
@@ -783,19 +780,19 @@ void Context::lookForFieldCorner(VisualCorner & corner, float l1, float l2) {
         l2 > GOALBOX_DEPTH * GOALBOX_FUDGE) {
         setFieldCorner(corner);
 		return;
-	} else if (l1 > 150 && dist < 2 * 70 && face == FACING_UNKNOWN) {
+	} else if (l1 > 150 && dist < 2 * GREEN_PAD_X && face == FACING_UNKNOWN) {
 		if (l1IsLeft) {
 			corner.setSecondaryShape(RIGHT_GOAL_CORNER);
 		} else {
 			corner.setSecondaryShape(LEFT_GOAL_CORNER);
 		}
-	} else if (l2 > 150 && dist < 2 * 70 && face == FACING_UNKNOWN) {
+	} else if (l2 > 150 && dist < 2 * GREEN_PAD_X && face == FACING_UNKNOWN) {
 		if (l1IsLeft) {
 			corner.setSecondaryShape(LEFT_GOAL_CORNER);
 		} else {
 			corner.setSecondaryShape(RIGHT_GOAL_CORNER);
 		}
-	} else if (dist < 2 * 70.0) {
+	} else if (dist < 2 * GREEN_PAD_X) {
         // if we have a long line and it isn't far from edge -> field corner
         int otherX, otherY;
         if (l1 > GOALBOX_DEPTH * GOALBOX_FUDGE) {
@@ -808,7 +805,7 @@ void Context::lookForFieldCorner(VisualCorner & corner, float l1, float l2) {
             }
             int horizon2 = field->horizonAt(otherX);
             float dist2 = realDistance(otherX, otherY, otherX, horizon);
-            if (dist2 < 2 * 70.0) {
+            if (dist2 < 2 * GREEN_PAD_X) {
                 setFieldCorner(corner);
                 return;
             }
@@ -822,7 +819,7 @@ void Context::lookForFieldCorner(VisualCorner & corner, float l1, float l2) {
             }
             int horizon2 = field->horizonAt(otherX);
             float dist2 = realDistance(otherX, otherY, otherX, horizon);
-            if (dist2 < 2 * 70.0) {
+            if (dist2 < 2 * GREEN_PAD_X) {
                 setFieldCorner(corner);
                 return;
             }
@@ -842,7 +839,7 @@ void Context::lookForFieldCorner(VisualCorner & corner, float l1, float l2) {
             int h2 = field->horizonAt(x2);
             float d1 = realDistance(x1, y1, x1, h1);
             float d2 = realDistance(x2, y2, x2, h2);
-            if (d1 < 70.0 * 2 && d2 < 70.0 * 2) {
+            if (d1 < GREEN_PAD_X * 2 && d2 < GREEN_PAD_X * 2) {
                 setFieldCorner(corner);
                 return;
             }
@@ -902,7 +899,7 @@ void Context::classifyInnerL(VisualCorner & corner) {
 		isInner = true;
 	}
 
-	if (face == FACING_UNKNOWN && !isInner && dist < 2.0f * 70.0f) {
+	if (face == FACING_UNKNOWN && !isInner && dist < 2.0f * GREEN_PAD_X) {
 		lookForFieldCorner(corner, l1, l2);
 	}
 
@@ -919,14 +916,25 @@ void Context::classifyInnerL(VisualCorner & corner) {
 	if (face != FACING_UNKNOWN && cornerDist > 150 && objectDistance > 150 &&
 		realDistance(corner.getX(), corner.getY(), objectRightX, objectRightY) >
 		GOALBOX_DEPTH + 20) {
-		setFieldCorner(corner);
-		return;
+		if (objectRightX > corner.getX() && corner.doesItPointLeft()) {
+			setFieldCorner(corner);
+			return;
+		} else if (objectRightX < corner.getX() && corner.doesItPointRight()) {
+			setFieldCorner(corner);
+			return;
+		}
 	}
 
 	// 223-11/annika/center_circle+varous/NBFRM.43
+	// but 223-11/field_pictures-dax/NBFRM.195
 	if (face != FACING_UNKNOWN && cornerDist > 300) {
-		setFieldCorner(corner);
-		return;
+		if (objectRightX > corner.getX() && corner.doesItPointLeft()) {
+			setFieldCorner(corner);
+			return;
+		} else if (objectRightX < corner.getX() && corner.doesItPointRight()) {
+			setFieldCorner(corner);
+			return;
+		}
 	}
 
     // Watch out for seeing a corner, but a part of goalbox too, but
@@ -1219,8 +1227,29 @@ void Context::checkInnerToOuter(VisualCorner & inner, VisualCorner & outer) {
 				outer.changeToT(common);
 				checkTToFieldCorner(outer, inner);
 			}
+		} else if (commonDist < GOALBOX_WIDTH * 2) {
+			// probably the two ends of the goal box - should be an easy case
+			if (inner.getY() < outer.getY()) {
+				if (inner.doesItPointRight()) {
+					if (face == FACING_YELLOW_GOAL) {
+						inner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+						outer.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+					} else if (face == FACING_BLUE_GOAL) {
+						inner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+						outer.setSecondaryShape(LEFT_GOAL_BLUE_L);
+					}
+				} else {
+					if (face == FACING_YELLOW_GOAL) {
+						inner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+						outer.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+					} else if (face == FACING_BLUE_GOAL) {
+						inner.setSecondaryShape(LEFT_GOAL_BLUE_L);
+						outer.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+					}
+				}
+			}
 		}
-    }
+	}
 }
 
 /** We have two connected outerls.  This is theoretically possible, but
