@@ -18,7 +18,8 @@ set( data_srcs DataHandler.cpp
                DataLoader.cpp
                )
 
-set( data_headers DataFinder.h )
+set( data_headers DataLoader.h
+                  DataFinder.h )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

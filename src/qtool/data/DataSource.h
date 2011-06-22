@@ -26,8 +26,17 @@ class DataSource {
 
 public:
     typedef boost::shared_ptr<DataSource> ptr;
+    struct Type {
+        enum {
+            offline = 1,
+            online,
+            old
+        };
+    };
 
-    DataSource() {}
+public:
+    DataSource(Type type) : type(type){}
+
     int getFileDescriptor(Data_ID data_ID) {
 
         DataFDProviderMap::iterator it = dataFDProviderMap.find(data_ID);
@@ -39,8 +48,11 @@ public:
         return 0;
     }
 
+    Type getType() { return type; }
+
 private:
     DataFDProviderMap dataFDProviderMap;
+    Type type;
 };
 
 }

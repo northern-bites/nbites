@@ -11,6 +11,7 @@
 #include <qmainwindow.h>
 #include <qtabwidget.h>
 
+#include "data/DataLoader.h"
 #include "data/DataManager.h"
 #include "colorcreator/ColorCreator.h"
 
@@ -28,6 +29,7 @@ private:
     QTabWidget* toolTabs;
 
     data::DataManager* dataManager;
+    data::DataLoader* dataLoader;
     colorcreator::ColorCreator* colorCreator;
 };
 

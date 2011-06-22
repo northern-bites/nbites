@@ -9,6 +9,13 @@
 #pragma once
 
 #include <QWidget>
+#include <QtGui>
+
+#include "DataFinder.h"
+#include "DataSource.h"
+
+namespace qtool {
+namespace data {
 
 class DataLoader : public QWidget
 {
@@ -18,4 +25,12 @@ public:
     DataLoader(QWidget *parent = 0);
     ~DataLoader();
 
+private:
+    QComboBox* setupDataSelectorBox();
+
+private:
+    DataFinder* dataFinder;
 };
+
+}
+}
