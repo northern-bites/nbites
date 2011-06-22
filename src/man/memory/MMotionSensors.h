@@ -13,6 +13,7 @@
 #include "MObject.h"
 #include "Sensors.h"
 
+namespace man {
 namespace memory {
 class MMotionSensors: public proto::PMotionSensors, public MObject {
 
@@ -34,4 +35,5 @@ private:
     boost::shared_ptr<Sensors> sensors;
 
 };
+}
 }

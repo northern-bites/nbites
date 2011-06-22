@@ -6,8 +6,6 @@
 #include "VisionHelpers.h"
 #include "Blob.h"
 
-using namespace std;
-
 static const int BADONE = -10000;
 
 class Blobs {

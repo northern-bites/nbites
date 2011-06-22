@@ -119,6 +119,7 @@ void Ball::createBall(int h) {
 		}
 	}
 	balls(h, vision->ball);
+    setFramesOnAndOff(vision->ball);
 }
 
 /* Are the dimensions of a candidate blob worthy of further study?
@@ -299,6 +300,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
         // SORT OUT BALL INFORMATION
         setOcclusionInformation();
         setBallInfo(w, h, thisBall, e);
+        if (thisBall->getHeight() > 0) thisBall->setOn(true);
     } while (!sanityChecks(w, h, e, thisBall));
 
     // last second adjustment for non-square balls
@@ -1078,6 +1080,21 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 	  thisBall->getRadius(),
 	  ORANGE_BALL_RADIUS).dist<<endl;*/
 }
+
+/*
+ * Sets frames on/off to the correct number.
+ */
+void Ball::setFramesOnAndOff(VisualBall *objPtr) {
+   if (objPtr->isOn()) {
+        objPtr->setFramesOn(objPtr->getFramesOn()+1);
+        objPtr->setFramesOff(0);
+    }
+    else {
+        objPtr->setFramesOff(objPtr->getFramesOff()+1);
+        objPtr->setFramesOn(0);
+    }
+ }
+
 
 /* Misc. routines
  */

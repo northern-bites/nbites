@@ -59,6 +59,20 @@ VisualCorner::VisualCorner(const VisualCorner& other)
 {
 }
 
+/*
+ */
+void VisualCorner::changeToT(boost::shared_ptr<VisualLine> stem) {
+	cornerType = T;
+	tStem = stem;
+	if (line1 == stem) {
+		tBar = line2;
+	} else {
+		tBar = line1;
+	}
+	setID(T_CORNER);
+	setTOrientation();
+}
+
 /* This method will assign a value to the variable cornerType. It assumes
  * that the corner is not a cross corner. If it were it wouldn't have been
  * constructed in FieldLines::interesctLines()

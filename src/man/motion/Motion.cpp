@@ -27,9 +27,9 @@ using namespace boost;
 //#include "NaoEnactor.h"
 
 Motion::Motion (shared_ptr<Synchro> _synchro,
-		shared_ptr<MotionEnactor> _enactor,
-		shared_ptr<Sensors> s,
-		shared_ptr<Profiler> p,
+                shared_ptr<MotionEnactor> _enactor,
+                shared_ptr<Sensors> s,
+                shared_ptr<Profiler> p,
                 shared_ptr<NaoPose> _pose)
   : Thread(_synchro, "Motion"),
     switchboard(s,p,_pose),

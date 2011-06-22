@@ -5,8 +5,6 @@
 #include <math.h>
 #include <boost/shared_ptr.hpp>
 
-using namespace std;
-
 #define UNKNOWN_DISTANCE  -1.0f
 
 class VisualFieldEdge;
@@ -43,10 +41,12 @@ public:
 	const float getDistanceLeft() const { return distances.left; }
 	const float getDistanceCenter() const { return distances.center; }
 	const float getDistanceRight() const { return distances.right; }
-	float getMinimumDistance() { return min(distances.right, min(distances.center,
-															   distances.left)); }
-	float getMaxDistance() {return max(distances.right, max(distances.center,
-															   distances.left)); }
+	float getMinimumDistance() { return std::min(distances.right,
+	                                             std::min(distances.center,
+	                                                      distances.left)); }
+	float getMaxDistance() {return std::max(distances.right,
+	                                        std::max(distances.center,
+	                                                 distances.left)); }
 
 	Basic_Shape getShape();
 

@@ -27,6 +27,7 @@ using namespace AL;
 
 #include "Kinematics.h"
 using namespace Kinematics;
+using namespace std;
 
 //#define SPEEDY_ENACTOR
 
@@ -35,7 +36,7 @@ void ALEnactor::run() {
     Thread::trigger->on();
 
     long long currentTime;
-	struct timespec interval, remainder;
+    struct timespec interval, remainder;
     while (running) {
         currentTime = process_micro_time();
             sendCommands();
@@ -51,11 +52,11 @@ void ALEnactor::run() {
                       << processTime << std::endl;
             //Don't sleep at all
         } else{
-			interval.tv_sec = 0;
-			interval.tv_nsec = static_cast<long int>(
+            interval.tv_sec = 0;
+            interval.tv_nsec = static_cast<long int>(
                 static_cast<long long int>(MOTION_FRAME_LENGTH_uS)
                 - processTime);
-			nanosleep(&interval,&remainder);
+            nanosleep(&interval,&remainder);
         }
 #endif
 

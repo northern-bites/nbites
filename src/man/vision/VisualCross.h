@@ -86,10 +86,10 @@ private: // Class Variables
 
     // Member functions
     inline static float robotDistanceToSD(float _distance) {
-        return sqrt(0.00000004f * std::pow(_distance,4.079f));
+        return sqrtf(0.00000004f * std::pow(_distance,4.079f));
     }
     inline static float robotBearingToSD(float _bearing) {
-        return sqrt(static_cast<float>(M_PI_FLOAT) / 8.0f);
+        return sqrtf(M_PI_FLOAT / 8.0f);
     }
 
 };

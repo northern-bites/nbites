@@ -14,7 +14,7 @@
 class LocSystem
 {
 public:
-	LocSystem() : active(false), probability(0.0) {};
+    LocSystem() : active(false), probability(0.0) {};
     virtual ~LocSystem() {};
     // Core Functions
     virtual void updateLocalization(const MotionModel& u_t,
@@ -24,7 +24,7 @@ public:
 
     virtual void blueGoalieReset() = 0;
     virtual void redGoalieReset() = 0;
-	virtual void resetLocTo(float x, float y, float h) = 0;
+    virtual void resetLocTo(float x, float y, float h) = 0;
 
     // Getters
     virtual PoseEst getCurrentEstimate() const    = 0;
@@ -66,15 +66,15 @@ public:
                  << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert()
                  << ", "
                  << c.getHUncert() << ")\t"
-				 << "Prob: " << c.getProbability();
+                 << "Prob: " << c.getProbability();
 
     }
 
 private:
-	bool active;
+    bool active;
 
 protected:
-	double probability;
+    double probability;
 };
 
 #endif // LocSystem_h_DEFINED

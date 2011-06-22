@@ -7,6 +7,8 @@ VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
     : VisualObject(_id)
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 
@@ -14,6 +16,8 @@ VisualFieldObject::VisualFieldObject()
     : VisualObject(UNKNOWN_FIELD_OBJECT)
  {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 VisualFieldObject::VisualFieldObject(const int _x, const int _y,
@@ -43,6 +47,7 @@ void VisualFieldObject::init(){
     setBearing(0);
     elevation = 0;
     idCertainty = NOT_SURE;
+    on = false;
 
     switch (id) {
     case BLUE_GOAL_LEFT_POST:
