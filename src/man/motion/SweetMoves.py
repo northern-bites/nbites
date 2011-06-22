@@ -150,7 +150,7 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (-50,8,-90,58,5,-31),
                     (-50,0,-90,58,5,31),
                     (0,0,90,8),
-                    0.9,1, stiff.STANDUP_STIFFNESSES),
+                    0.7,1, stiff.STANDUP_STIFFNESSES),
                    #Push back onto feet
 
                    ((35,2,-14,-41),
@@ -164,13 +164,13 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (-40,6,-61,124,-35,-6),
                     (-40,-6,-61,124,-35,6),
                     (75,-10,53,74),
-                    0.7, 1, stiff.STANDUP_STIFFNESSES),
+                    0.4, 1, stiff.STANDUP_STIFFNESSES),
 
                    ((93,10,-90,-80),
                     (0,0,-60,120,-60,0),
                     (0,0,-60,120,-60,0),
                     (93,-10,90,80),
-                    0.6,1, stiff.STANDUP_STIFFNESSES),
+                    0.4,1, stiff.STANDUP_STIFFNESSES),
                    #Pull knees together
 
                    #Stands up:
@@ -178,7 +178,7 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                      INITIAL_POS[0][1],
                      INITIAL_POS[0][2],
                      INITIAL_POS[0][3],
-                     1.0,1, stiff.STANDUP_STIFFNESSES))
+                     0.7,1, stiff.STANDUP_STIFFNESSES))
 
 
 STAND_UP_BACK = (((100,0,0,0),
