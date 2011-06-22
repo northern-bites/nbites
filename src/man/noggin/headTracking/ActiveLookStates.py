@@ -1,6 +1,7 @@
 from . import TrackingConstants as constants
 from .. import NogginConstants
 import man.motion.HeadMoves as HeadMoves
+from math import (fabs)
 
 TIME_TO_LOOK_TO_TARGET = 1.0
 
@@ -86,36 +87,36 @@ def trackLandmarks(tracker):
     Assumes the robot is in the "ready" state.
     Looks at nearby landmarks for localization.
     """
-    #update tracking fitness of locObjects
+    # Update tracking fitness of locObjects
     for obj in tracker.locObjectList:
         tracker.helper.updateGeneralTrackingFitness(obj)
-    #sort list of locObjects
+    # Sort list of locObjects
     newlist = sorted(tracker.locObjectList)
 
     if not newlist == tracker.locObjectList:
-        #landmarks have changed fitness ranking. Track most fit
+        #Landmarks have changed fitness ranking. Track most fit.
         tracker.locObjectList = newlist
         tracker.target = tracker.locObjectList[0]
         print "target Id:",tracker.target.visionId# ** #debugging
         return tracker.goLater('trackLoc')
 
-    #Assert: no change in list order
+    # Assert: no change in list order
 
-    #check for no target (first pass in trackLandmarks state)
+    # Check for no target (first pass in trackLandmarks state)
     if tracker.target is None:
         tracker.target = tracker.locObjectList[0]
 
-    #track next most fit locObject
+    # Track next most fit locObject
     oldIndex = tracker.locObjectList.index(tracker.target)
     tracker.target = tracker.locObjectList[oldIndex+1]
-    #check for unfit trackingFitness
+    # Check for unfit trackingFitness
     if tracker.target.trackingFitness > constants.FITNESS_THRESHOLD:
-        #cycle to most fit locObject
+        # Cycle to most fit locObject
         tracker.target = tracker.locObjectList[0]
 
     print "target Id:",tracker.target.visionId# ** #debugging
 
-    #track target
+    # Track target
     return tracker.goLater('trackLoc')
 
 # ** # new method
@@ -136,17 +137,37 @@ def trackingBallLoc(tracker):
     # Update landmark fitness by angular distance from ball
     for obj in tracker.locObjectList:
         tracker.helper.updateAngularTrackingFitness(obj,tracker.target)
-    # Sort list of locObjects, set target to most fit
-    tracker.locObjectList = sorted(tracker.locObjectList)
-    tracker.target = tracker.locObjectList[0]
+    # Sort list of locObjects
+    newlist = sorted(tracker.locObjectList)
 
-    # Sanity check most fit locObject
-    if fabs(tracker.brain.ball.elevation - tracker.target.elevation) > \
-            constants.ELEVATION_OFFSET_LIMIT or \
-            fabs(tracker.brain.ball.bearing - tracker.target.bearing) > \
-            constants.BEARING_OFFSET_LIMIT:
-        print "No viable landmark to check."
-        return tracker.goLater('trackingBall')
+    if not newlist == tracker.locObjectList:
+        # Landmarks have changed fitness ranking. Track most fit.
+        tracker.locObjectList = newlist
+        tracker.target = tracker.locObjectList[0]
+        return tracker.goLater('trackLoc')
+
+    # Assert: no change in list order
+
+    # Check for no target (first pass in method)
+    if tracker.target is None:
+        tracker.target = tracker.locObjectList[0]
+
+    # Track next most fit locObject
+    oldIndex = tracker.locObjectList.index(tracker.target)
+    tracker.target = tracker.locObjectList[oldIndex+1]
+
+    # Sanity check on target
+    while fabs(tracker.brain.ball.elevation - tracker.target.elevation) > \
+                constants.ELEVATION_OFFSET_LIMIT or \
+                fabs(tracker.brain.ball.bearing - tracker.target.bearing) > \
+                constants.BEARING_OFFSET_LIMIT:
+            # If this is most fit target, there are no viable landmarks
+            if tracker.target == tracker.locObjectList[0]:
+                print "No viable landmark to check."
+                return tracker.goLater('trackingBall')
+            else:
+                # Cycle to most fit landmark, then sanity check it.
+                tracker.target = tracker.locObjectList[0]
 
     # Track target
     return tracker.goLater('trackLoc')

@@ -40,7 +40,6 @@ class HeadTracking(FSA.FSA):
         self.lookDirection = None
         self.target = self.brain.ball #default
         # target should either be ball or instance of FieldObject
-        self.nudged = False# ** # debugging field
 
 # ** # old method
     def stopHeadMoves(self):

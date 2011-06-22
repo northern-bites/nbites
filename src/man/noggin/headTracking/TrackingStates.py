@@ -147,19 +147,14 @@ def trackingBall(tracker):
     Look directly at ball for a short time.
     Then, check for nearby landmarks without losing sight of the ball.
     """
-    # make sure head is inactive first, and that ball is the target
+    # make sure head is inactive first
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        if tracker.target != tracker.brain.ball:
-            print "Target was not ball."
-            tracker.target = tracker.brain.ball
-
-    # assert: tracker.target is the ball
 
     # Look to the ball for TRACKER_BALL_STARE_THRESH frames
     # If ball is lost on frame, do nothing.
-    if tracker.target.on:
-        tracker.helper.lookToTargetAngles(tracker.target)
+    if tracker.brain.ball.on:
+        tracker.helper.lookToTargetAngles(tracker.brain.ball)
 
     if tracker.counter > constants.TRACKER_BALL_STARE_THRESH:
         print "Past stare thresh for ball, looking for landmarks"
