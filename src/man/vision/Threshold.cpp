@@ -429,7 +429,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                         j--;
                     }
                 }
-                if (currentRun > 2) {
+                if (currentRun > 1) {
                     orange->newRun(column, j, currentRun);
                 }
                 greens += currentRun;
