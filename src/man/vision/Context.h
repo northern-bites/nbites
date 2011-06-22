@@ -80,6 +80,7 @@ public:
     void setBall() {ball = true;}
     void setGoalBoxLines() {seeGoalBoxLines = true;}
     void setSeeCenterCircle(){seeCenterCircle = true;}
+	void setSameHalf() {sameHalf = true;}
 
     // getters
     int  getTCorner() {return tCorner;}
@@ -128,7 +129,7 @@ public:
     void checkUnknownGoalCorner(VisualCorner & corner, float l1, float l2,
                                 bool l1IsLeft);
     void checkGoalCornerWithPost(VisualCorner & corner, int y1, int y2,
-                                 bool l1IsLeft);
+                                 bool l1IsLeft, float dist);
     void checkLowOuterL(VisualCorner & corner, bool line1IsLonger);
     void lookForFieldCorner(VisualCorner & first, float l1, float l2);
     void classifyInnerL(VisualCorner & first);
@@ -161,6 +162,7 @@ public:
         const;
 
 	void checkForKickDanger(VisualRobot *robot);
+	void checkForKickDangerNoRobots();
 
     const bool arePointsCloseEnough(const float estimatedDistance,
                                     const ConcreteCorner* j,
@@ -178,10 +180,10 @@ public:
     // prints their string representations
     void printPossibilities(const std::list <const ConcreteCorner*> &list)const;
     // Determines which field objects are visible on the screen and returns
-    // a vector of the pointers of the objects that are visible.
+    // a std::vector of the pointers of the objects that are visible.
     std::vector<const VisualFieldObject*> getVisibleFieldObjects();
 
-    vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
+    std::vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
 
     const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
 
@@ -194,6 +196,8 @@ public:
 #ifdef OFFLINE
     void setDebugIdentifyCorners(bool _bool) {debugIdentifyCorners = _bool;}
     const bool getDebugIdentifyCorners() const { return debugIdentifyCorners;}
+	void setDebugDangerousBall(bool _bool) {debugDangerousBall = _bool;}
+	const bool setDebugDangerousBall() const {return debugDangerousBall;}
 #endif
 
 
@@ -234,8 +238,10 @@ private:
 	float objectDistance;
 #ifdef OFFLINE
     bool debugIdentifyCorners;
+	bool debugDangerousBall;
 #else
     static const bool debugIdentifyCorners = false;
+	static const bool debugDangerousBall = false;
 #endif
 };
 

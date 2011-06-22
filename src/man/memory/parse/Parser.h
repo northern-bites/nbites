@@ -9,8 +9,8 @@
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
 
+namespace man {
 namespace memory {
-
 namespace parse {
 
 struct LogHeader {
@@ -50,5 +50,6 @@ protected:
 
 };
 
+}
 }
 }

@@ -150,8 +150,10 @@ public:
     void initCompressedTable(std::string filename);
 
     void storeFieldObjects();
+    void setFramesOnAndOff(VisualFieldObject *objPtr);
     void setFieldObjectInfo(VisualFieldObject *objPtr);
     void setVisualRobotInfo(VisualRobot *objPtr);
+    void setFramesOnAndOff(VisualRobot *objPtr);
     void setVisualCrossInfo(VisualCross *objPtr);
     void setShot(VisualCrossbar * one);
     void setOpenFieldInformation();
@@ -179,6 +181,7 @@ public:
     int getPixelBoundaryLeft();
     int getPixelBoundaryRight();
     int getPixelBoundaryUp();
+	float getPixDistance(int y) {return pixDistance[y];}
 
 #ifdef OFFLINE
     void setConstant(int c);
@@ -271,6 +274,8 @@ private:
     int lowerBound[IMAGE_WIDTH];
     int block[NUMBLOCKS];
     int evidence[NUMBLOCKS];
+
+	float pixDistance[IMAGE_HEIGHT];
 
     // thresholding variables
     int horizon;

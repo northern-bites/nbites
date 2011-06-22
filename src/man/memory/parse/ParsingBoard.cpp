@@ -1,7 +1,7 @@
 #include "ParsingBoard.h"
 
+namespace man {
 namespace memory {
-
 namespace parse {
 
 //const char* ParsingBoard::MVISION_PATH = NAO_LOG_DIR "/Vision.log";
@@ -82,5 +82,5 @@ void ParsingBoard::parseAll() {
 
 
 }
-
+}
 }

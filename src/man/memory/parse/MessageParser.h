@@ -14,6 +14,7 @@
 
 #include "Parser.h"
 
+namespace man {
 namespace memory {
 
 namespace parse {
@@ -52,5 +53,6 @@ private:
 
 };
 
+}
 }
 }

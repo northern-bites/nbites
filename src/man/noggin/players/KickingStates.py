@@ -1,21 +1,7 @@
-import ChaseBallTransitions as transitions
-
+from . import ChaseBallTransitions as transitions
 """
 Here we house all of the state methods used for kicking the ball
 """
-def preKickStop(player):
-    """
-    If we have already decided the kick but need to stop before
-    we make the kick, stop
-    """
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        player.stopWalking()
-
-    if player.brain.nav.isStopped():
-        return player.goLater('kickBallExecute')
-
-    return player.stay()
 
 def kickBallExecute(player):
     """
@@ -44,23 +30,26 @@ def afterKick(player):
     """
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
-        player.hasAlignedOnce = False
         player.standup()
+        player.brain.tracker.trackBall()
 
         if player.penaltyKicking:
             return player.goLater('penaltyKickRelocalize')
 
         return player.stay()
 
-    player.brain.tracker.trackBall()
-
-    if player.brain.ball.on:
-        player.inKickingState = False
+    if transitions.shouldKickAgain(player):
         player.brain.nav.justKicked = False
-        return player.goLater('chase')
-
+        return player.goNow('positionForKick')
     if transitions.shouldFindBall(player):
         player.inKickingState = False
+        player.hasKickedOff = True
         player.brain.nav.justKicked = False
         return player.goLater('findBall')
+    if player.brain.nav.isStopped():
+        player.inKickingState = False
+        player.hasKickedOff = True
+        player.brain.nav.justKicked = False
+        return player.goNow('chase')
+
     return player.stay()

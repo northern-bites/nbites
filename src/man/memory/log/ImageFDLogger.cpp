@@ -21,6 +21,7 @@
 #include "ImageFDLogger.h"
 #include "corpus/ImageAcquisition.h"
 
+namespace man {
 namespace memory {
 
 extern long long birth_time;
@@ -87,6 +88,7 @@ ImageFDLogger::~ImageFDLogger() {
     raw_output->Close();
     delete raw_output;
     close(file_descriptor);
+}
 }
 }
 }

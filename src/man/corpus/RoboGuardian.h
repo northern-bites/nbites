@@ -31,6 +31,9 @@
 #include "MotionInterface.h"
 #include "ClickableButton.h"
 
+#include "guardian/WifiAngel.h"
+
+//TODO: move this to the guardian folder
 
 enum  ButtonID {
     CHEST_BUTTON = 0,
@@ -51,9 +54,9 @@ public:
     void speakIPAddress()const;
 
     //getters
-    bool isRobotFalling()const { return falling; }
-    bool isRobotFallen()const { return fallen; }
-	bool isFeetOnGround()const { return feetOnGround; }
+    bool isRobotFalling()const { return useFallProtection && falling; }
+    bool isRobotFallen()const { return useFallProtection && fallen; }
+	bool isFeetOnGround()const { return useFallProtection && feetOnGround; }
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
@@ -75,9 +78,7 @@ private:
 	void checkFeetOnGround();
     void checkBatteryLevels();
     void checkTemperatures();
-    void checkConnection();
-    bool checkWired();
-    bool checkWireless();
+    bool checkConnection();
     void countButtonPushes();
     void processFallingProtection();
     void processChestButtonPushes();
@@ -85,11 +86,17 @@ private:
     void executeFallProtection();
     void shutoffGains();
     void enableGains();
-    void reconnectWifiConnection();
     void ifUpDown();
     //helpers
     std::string getHostName()const;
     void playFile(std::string filePath)const; //non-blocking
+
+public:
+    static const int GUARDIAN_FRAME_RATE;
+    static const int GUARDIAN_FRAME_LENGTH_uS;
+    static const unsigned long long int TIME_BETWEEN_HEAT_WARNINGS =
+        MICROS_PER_SECOND * 60;
+
 private:
 
     boost::shared_ptr<Sensors> sensors;
@@ -101,6 +108,8 @@ private:
         leftFootButton,
         rightFootButton;
 
+    unsigned int frameCount;
+
     Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter,groundOnCounter,groundOffCounter;
     bool registeredFalling;
@@ -111,14 +120,11 @@ private:
     bool falling, fallen, feetOnGround;
     mutable bool useFallProtection;
 
-    mutable pthread_mutex_t click_mutex;
-    static const int GUARDIAN_FRAME_RATE;
-    static const int GUARDIAN_FRAME_LENGTH_uS;
-
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
-    static const unsigned long long int TIME_BETWEEN_HEAT_WARNINGS =
-        MICROS_PER_SECOND * 60;
 
+    man::corpus::guardian::WifiAngel wifiAngel;
+
+    mutable pthread_mutex_t click_mutex;
 };
 
 #endif

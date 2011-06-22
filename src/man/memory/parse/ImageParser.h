@@ -17,8 +17,8 @@
 #include "Parser.h"
 #include "memory/RoboImage.h"
 
+namespace man {
 namespace memory {
-
 namespace parse {
 
 namespace proto_io = google::protobuf::io;
@@ -67,5 +67,6 @@ private:
 
 };
 
+}
 }
 }

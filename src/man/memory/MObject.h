@@ -12,8 +12,10 @@
 
 #pragma once
 
+
 #define REGISTER_MOBJECT(x) {this->setName(x);}
 
+namespace man {
 namespace memory {
 
 class MObject {
@@ -35,4 +37,5 @@ private:
 
 };
 
+}
 }

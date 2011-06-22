@@ -13,6 +13,7 @@
 #include "MObject.h"
 #include "vision/Vision.h"
 
+namespace man {
 namespace memory {
 class MVision: public proto::PVision, public MObject {
 
@@ -39,4 +40,5 @@ private:
     boost::shared_ptr<Vision> vision;
 
 };
+}
 }

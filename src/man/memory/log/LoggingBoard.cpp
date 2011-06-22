@@ -1,14 +1,16 @@
 #include "LoggingBoard.h"
 #include "NaoPaths.h"
 
+namespace man {
 namespace memory {
-
 namespace log {
 
-const char* LoggingBoard::MVISION_PATH = NAO_LOG_DIR "/Vision.log";
-const char* LoggingBoard::MMOTION_SENSORS_PATH = NAO_LOG_DIR "/MotionSensors.log";
-const char* LoggingBoard::MVISION_SENSORS_PATH = NAO_LOG_DIR "/VisionSensors.log";
-const char* LoggingBoard::MIMAGE_PATH = NAO_LOG_DIR "/Image.log";
+using namespace man::include::paths;
+
+const string LoggingBoard::MVISION_PATH = NAO_LOG_DIR + "/Vision.log";
+const string LoggingBoard::MMOTION_SENSORS_PATH = NAO_LOG_DIR + "/MotionSensors.log";
+const string LoggingBoard::MVISION_SENSORS_PATH = NAO_LOG_DIR + "/VisionSensors.log";
+const string LoggingBoard::MIMAGE_PATH = NAO_LOG_DIR + "/Image.log";
 
 LoggingBoard::LoggingBoard() {
 }
@@ -94,5 +96,5 @@ const FDLogger* LoggingBoard::getLogger(const MObject* mobject) const {
 
 
 }
-
+}
 }

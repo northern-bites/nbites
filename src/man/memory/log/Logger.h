@@ -14,6 +14,7 @@
 
 #include <google/protobuf/message.h>
 
+namespace man {
 namespace memory {
 namespace log {
 
@@ -40,5 +41,6 @@ protected:
 };
 
 
+}
 }
 }

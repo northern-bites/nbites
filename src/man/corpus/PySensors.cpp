@@ -89,6 +89,7 @@ BOOST_PYTHON_MODULE(sensors)
         .def("resetSaveFrame", &Sensors::resetSaveFrame)
 		.def("startSavingFrames", &Sensors::startSavingFrames)
 		.def("stopSavingFrames", &Sensors::stopSavingFrames)
+		.def("writeVarianceData", &Sensors::writeVarianceData)
         ;
 
     scope().attr("sensors") = sensors_pointer;

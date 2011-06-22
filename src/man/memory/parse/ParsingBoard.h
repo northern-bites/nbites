@@ -19,22 +19,25 @@
 #include "memory/MObject.h"
 
 //forward declaration
+namespace man {
 namespace memory {
 namespace parse {
 class ParsingBoard;
 }
 }
+}
 
 #include "memory/Memory.h"
 
+namespace man {
 namespace memory {
 namespace parse {
 
-typedef pair< const MObject*, Parser*> ObjectParserPair;
-typedef pair< const MObject*, FDProvider*> ObjectFDProviderPair;
+typedef std::pair< const MObject*, Parser*> ObjectParserPair;
+typedef std::pair< const MObject*, FDProvider*> ObjectFDProviderPair;
 
-typedef map< const MObject*, Parser*> ObjectParserMap;
-typedef map< const MObject*, FDProvider*> ObjectFDProviderMap;
+typedef std::map< const MObject*, Parser*> ObjectParserMap;
+typedef std::map< const MObject*, FDProvider*> ObjectFDProviderMap;
 
 class ParsingBoard {
 
@@ -59,5 +62,6 @@ private:
 
 
 };
+}
 }
 }

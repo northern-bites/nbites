@@ -19,6 +19,15 @@ IF( APPLE )
   SET( TARGET_HOST "TARGET_HOST_MACOSX")
 ENDIF( APPLE )
 
+######## CCache
+
+if (CCACHE)
+  SET( CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
+  SET( CMAKE_CXX_COMPILER ${CCACHE})
+  SET( CMAKE_C_COMPILER_ARG1 ${CMAKE_C_COMPILER})
+  SET( CMAKE_C_COMPILER ${CCACHE})
+endif()
+
 ########################## FIND PATH
 # we should look in the naoqi sdk folder for the libraries we need first
 # so we use the same version as on the robot

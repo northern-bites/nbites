@@ -4,8 +4,8 @@
 
 #include "ImageParser.h"
 
+namespace man {
 namespace memory {
-
 namespace parse {
 
 using namespace std;
@@ -109,5 +109,6 @@ void ImageParser::initStreams() {
             container->getByteSize() + sizeof(container->getTimestamp()));
 }
 
+}
 }
 }

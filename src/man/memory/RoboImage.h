@@ -15,7 +15,8 @@
 
 #include "include/VisionDef.h"
 
-//TODO: add to namespace memory
+namespace man {
+namespace memory {
 
 class RoboImage
 {
@@ -52,3 +53,6 @@ protected:
     int32_t byte_size;
     int64_t timestamp;
 };
+
+}
+}

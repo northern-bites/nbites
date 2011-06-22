@@ -12,9 +12,11 @@ DEBUG = False
 def doingSweetMove(nav):
     '''State that we stay in while doing sweet moves'''
     if nav.firstFrame():
+        nav.doingSweetMove = True
         return nav.stay()
 
     if not nav.brain.motion.isBodyActive():
+        nav.doingSweetMove = False
         return nav.goNow('stopped')
 
     return nav.stay()

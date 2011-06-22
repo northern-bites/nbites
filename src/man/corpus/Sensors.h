@@ -25,12 +25,15 @@
 #include <list>
 #include <pthread.h>
 #include <stdint.h>
-
+#include <boost/shared_ptr.hpp>
 
 #include "SensorDef.h"
+#include "SensorConfigs.h"
 #include "NaoDef.h"
 #include "VisionDef.h"
 #include "Provider.h"
+#include "Speech.h"
+#include "BulkMonitor.h"
 
 enum SupportFoot {
     LEFT_SUPPORT = 0,
@@ -46,9 +49,12 @@ enum SensorsEvent {
 };
 
 struct FSR {
-FSR(const float fl, const float fr,
-    const float rl, const float rr)
-: frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
+    FSR()
+        : frontLeft(0), frontRight(0), rearLeft(0), rearRight(0) { }
+
+    FSR(const float fl, const float fr,
+        const float rl, const float rr)
+        : frontLeft(fl), frontRight(fr), rearLeft(rl), rearRight(rr) { }
 
     float frontLeft;
     float frontRight;
@@ -70,11 +76,15 @@ struct FootBumper {
 };
 
 struct Inertial {
-Inertial(const float _accX, const float _accY, const float _accZ,
-         const float _gyrX, const float _gyrY,
-         const float _angleX, const float _angleY)
-: accX(_accX), accY(_accY), accZ(_accZ),
-        gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
+    Inertial()
+        : accX(0), accY(0), accZ(0),
+          gyrX(0), gyrY(0), angleX(0), angleY(0) { }
+
+    Inertial(const float _accX, const float _accY, const float _accZ,
+             const float _gyrX, const float _gyrY,
+             const float _angleX, const float _angleY)
+        : accX(_accX), accY(_accY), accZ(_accZ),
+          gyrX(_gyrX), gyrY(_gyrY), angleX(_angleX), angleY(_angleY) { }
 
     float accX;
     float accY;
@@ -88,8 +98,8 @@ Inertial(const float _accX, const float _accY, const float _accZ,
 
 class Sensors : public Provider<SensorsEvent>{
     //friend class Man;
- public:
-    Sensors();
+public:
+    Sensors(boost::shared_ptr<Speech> s);
     ~Sensors();
 
     // Locking data retrieval methods
@@ -202,16 +212,25 @@ class Sensors : public Provider<SensorsEvent>{
     void releaseVisionAngles();
 
     // Save a vision frame with associated sensor data
-    void saveFrame(void);
+    void saveFrame();
     void loadFrame(std::string path);
-    void resetSaveFrame(void);
-	void startSavingFrames(void);
-	void stopSavingFrames(void);
-	bool isSavingFrames() const;
+    void resetSaveFrame();
+    void startSavingFrames();
+    void stopSavingFrames();
+    bool isSavingFrames() const;
 
- private:
+    // writes data collected the variance monitor to ~/naoqi/log/
+    void writeVarianceData();
 
+private:
     void add_to_module();
+
+    // put the sensor data values into the variance tracker, at the correct hz
+    void updateMotionDataVariance();
+    void updateVisionDataVariance();
+
+    // Pointer to speech, for Sensor warnings
+    boost::shared_ptr<Speech> speech;
 
     // Locking mutexes
     mutable pthread_mutex_t angles_mutex;
@@ -227,6 +246,7 @@ class Sensors : public Provider<SensorsEvent>{
     mutable pthread_mutex_t support_foot_mutex;
     mutable pthread_mutex_t battery_mutex;
     mutable pthread_mutex_t image_mutex;
+    mutable pthread_mutex_t variance_mutex;
 
     // Joint angles and sensors
     // Make the following distinction: bodyAngles is a vector of the most current
@@ -266,6 +286,9 @@ class Sensors : public Provider<SensorsEvent>{
      * TOOL.
      */
 
+    // Sensor variance/health monitor
+    BulkMonitor varianceMonitor, fsrMonitor;
+
     Inertial unfilteredInertial;
     //ChestButton
     float chestButton;
@@ -275,7 +298,7 @@ class Sensors : public Provider<SensorsEvent>{
 
     static int saved_frames;
     std::string FRM_FOLDER;
-	bool saving_frames_on;
+    bool saving_frames_on;
 };
 
 

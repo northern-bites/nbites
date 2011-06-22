@@ -15,6 +15,7 @@
 #pragma once
 
 #include <map>
+#include <string>
 
 #include "include/io/FileFDProvider.h"
 
@@ -23,23 +24,25 @@
 #include "memory/MObject.h"
 
 //forward declaration
+namespace man {
 namespace memory {
 namespace log {
 class LoggingBoard;
 }
 }
+}
 
 #include "memory/Memory.h"
 
+namespace man {
 namespace memory {
-
 namespace log {
 
-typedef pair< const MObject*, FDLogger*> ObjectLoggerPair;
-typedef pair< const MObject*, FDProvider*> ObjectFDProviderPair;
+typedef std::pair< const MObject*, FDLogger*> ObjectLoggerPair;
+typedef std::pair< const MObject*, FDProvider*> ObjectFDProviderPair;
 
-typedef map< const MObject*, FDLogger*> ObjectLoggerMap;
-typedef map< const MObject*, FDProvider*> ObjectFDProviderMap;
+typedef std::map< const MObject*, FDLogger*> ObjectLoggerMap;
+typedef std::map< const MObject*, FDProvider*> ObjectFDProviderMap;
 
 class LoggingBoard {
 
@@ -61,10 +64,10 @@ private:
     void initLoggingObjects();
 
 public:
-    static const char* MVISION_PATH;
-    static const char* MVISION_SENSORS_PATH;
-    static const char* MMOTION_SENSORS_PATH;
-    static const char* MIMAGE_PATH;
+    static const std::string MVISION_PATH;
+    static const std::string MVISION_SENSORS_PATH;
+    static const std::string MMOTION_SENSORS_PATH;
+    static const std::string MIMAGE_PATH;
 
 private:
     const Memory* memory;
@@ -72,5 +75,6 @@ private:
     ObjectFDProviderMap objectFDProviderMap;
 
 };
+}
 }
 }

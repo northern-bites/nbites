@@ -7,6 +7,7 @@
 #include "Common.h"
 #include "Memory.h"
 
+namespace man {
 namespace memory {
 
 long long int birth_time; //the time we initialized memory
@@ -82,4 +83,5 @@ void Memory::update(SensorsEvent event) {
     }
 }
 
+}
 }

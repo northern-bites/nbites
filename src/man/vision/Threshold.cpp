@@ -247,6 +247,9 @@ void Threshold::runs() {
     // back when the robots had colored shoulder pads we worried about seeing them
     detectSelf();
 #endif
+	for (int i = IMAGE_HEIGHT - 1; i >= 0; i--) {
+		pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+	}
     for (int i = 0; i < NUMBLOCKS; i++) {
         block[i] = 0;
         evidence[i] = 0;
@@ -283,14 +286,17 @@ void Threshold::findGoals(int column, int topEdge) {
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
 	int blueRun = 0;
+	bool faceDown2 = pose->getHorizonY(0) < -100;
     for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
         if (Utility::isBlue(pixel)) {
 			if (j - lastBlue < 4) {
 				lastBlue = j;
-				blues++;
-				bad--;
+				if (!faceDown2) {
+					blues++;
+					bad--;
+				}
 				if (firstBlue == topEdge) {
 					firstBlue = j;
 				}
@@ -330,8 +336,8 @@ void Threshold::findGoals(int column, int topEdge) {
         unsigned char pixel = getThresholded(j,column);
         bool found = false;
         if (Utility::isBlue(pixel) && !Utility::isGreen(pixel)) {
-            //blues++;
-			//blueRun++;
+            blues++;
+			blueRun++;
 			if (blueRun > 3 && greens < 4) {
 				firstBlue = j;
 			}
@@ -934,6 +940,10 @@ void Threshold::objectRecognition() {
     }
 
     storeFieldObjects();
+	if (vision->ball->getWidth() > 0 && vision->ball->getDistance() > 15.0f &&
+		vision->ball->getHeat() < 1.0f) {
+		context->checkForKickDangerNoRobots();
+	}
 
 }
 
@@ -946,9 +956,17 @@ void Threshold::objectRecognition() {
 void Threshold::storeFieldObjects() {
 
     setFieldObjectInfo(vision->yglp);
+    setFramesOnAndOff(vision->yglp);
+
     setFieldObjectInfo(vision->ygrp);
+    setFramesOnAndOff(vision->ygrp);
+
     setFieldObjectInfo(vision->bglp);
+    setFramesOnAndOff(vision->bglp);
+
     setFieldObjectInfo(vision->bgrp);
+    setFramesOnAndOff(vision->bgrp);
+
     setVisualCrossInfo(vision->cross);
     vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
@@ -957,14 +975,40 @@ void Threshold::storeFieldObjects() {
 
 #if ROBOT(NAO)
     setVisualRobotInfo(vision->red1);
+    setFramesOnAndOff(vision->red1);
+
     setVisualRobotInfo(vision->red2);
+    setFramesOnAndOff(vision->red2);
+
 	setVisualRobotInfo(vision->red3);
+    setFramesOnAndOff(vision->red3);
+
     setVisualRobotInfo(vision->navy1);
+    setFramesOnAndOff(vision->navy1);
+
     setVisualRobotInfo(vision->navy2);
+    setFramesOnAndOff(vision->navy2);
+
 	setVisualRobotInfo(vision->navy3);
+    setFramesOnAndOff(vision->navy3);
 #endif
 
 }
+
+/*
+ * Sets frames on/off to the correct number for a VisualFieldObject
+ */
+void Threshold::setFramesOnAndOff(VisualFieldObject *objPtr) {
+   if (objPtr->isOn()) {
+        objPtr->setFramesOn(objPtr->getFramesOn()+1);
+        objPtr->setFramesOff(0);
+    }
+    else {
+        objPtr->setFramesOff(objPtr->getFramesOff()+1);
+        objPtr->setFramesOn(0);
+    }
+ }
+
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
  * @param objPtr    the field object to study
@@ -975,6 +1019,9 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
         // set center x,y
         objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
+
+        // set obj to on screen
+        objPtr->setOn(true);
 
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
@@ -999,10 +1046,6 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             distanceCertainty cert = objPtr->getDistanceCertainty();
             float distw = getGoalPostDistFromWidth(width);
             float disth = getGoalPostDistFromHeight(height);
-            /*objPtr->getCenterX(),
-                                                     objPtr->getCenterY(),
-                                                     GOAL_POST_CM_HEIGHT * 10/2,
-                                                     */
 
             const int bottomLeftX = objPtr->getLeftBottomX();
             const int bottomRightX = objPtr->getRightBottomX();
@@ -1045,15 +1088,18 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             // sanity check: throw ridiculous distance estimates out
             // constants in Threshold.h
             if (dist < POST_MIN_FOC_DIST ||
-                    dist > POST_MAX_FOC_DIST) {
+				dist > POST_MAX_FOC_DIST) {
                 dist = 0.0;
             }
             objPtr->setDistance(dist);
-        } else { // don't know what object it is
+			if (dist < MIDFIELD_X) {
+				context->setSameHalf();
+			}
+		} else { // don't know what object it is
             //print("setFieldObjectInfo: unrecognized FieldObject");
+			//cout << "What the heck!" << endl;
             return;
         }
-
         // sets focal distance of the field object
         objPtr->setFocDist(objPtr->getDistance());
         // convert dist + angle estimates to body center
@@ -1079,6 +1125,9 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
                                     float distw, float poseDist, int bottom) {
     float dist = 0.0f;
+	if (poseDist < 200.0f) {
+		return poseDist;
+	}
     switch (cert) {
     case HEIGHT_UNSURE:
         dist = distw;
@@ -1113,6 +1162,9 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
         objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
 
+        // set the robot to on screen for this frame
+        objPtr->setOn(true);
+
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
 					      objPtr->getCenterX() ) /
@@ -1146,6 +1198,19 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
         objPtr->setElevation(0.0);
     }
 }
+
+// Keeps track of frames on/off for VisualRobots
+void Threshold::setFramesOnAndOff(VisualRobot *objPtr) {
+   if (objPtr->isOn()) {
+        objPtr->setFramesOn(objPtr->getFramesOn()+1);
+        objPtr->setFramesOff(0);
+    }
+    else {
+        objPtr->setFramesOff(objPtr->getFramesOff()+1);
+        objPtr->setFramesOn(0);
+    }
+ }
+
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
  * @param objPtr    the field object to study
@@ -1187,34 +1252,44 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
             bool blp = vision->bglp->getDistance() > 0.0f;
             bool brp = vision->bgrp->getDistance() > 0.0f;
             float dist = 0.0f;
-            const float CLOSECROSS = 300.0f;
+			float postDist = 0.0f;
+            const float CLOSECROSS = 250.0f;
             const float FARCROSS = 405.0f;
+			const float LONGPOST = 450.0f;
             int postX = 0, postY = 0;
             if (ylp || yrp) {
                 // get the relevant distances
                 if (ylp) {
                     postX = vision->yglp->getLeftBottomX();
                     postY = vision->yglp->getLeftBottomY();
+					postDist = vision->yglp->getDistance();
                 } else {
                     postX = vision->ygrp->getLeftBottomX();
                     postY = vision->ygrp->getLeftBottomY();
+					postDist = vision->ygrp->getDistance();
                 }
                 dist = realDistance(crossX, crossY, postX, postY);
-                if (dist < CLOSECROSS) {
+				if (postDist > LONGPOST) {
+					objPtr->setID(BLUE_GOAL_CROSS);
+				} else if (dist < CLOSECROSS) {
                     objPtr->setID(YELLOW_GOAL_CROSS);
-                } else {
+				} else {
                     objPtr->setID(ABSTRACT_CROSS);
                 }
             } else if (blp || brp) {
                 if (blp) {
                     postX = vision->bglp->getLeftBottomX();
                     postY = vision->bglp->getLeftBottomY();
+					postDist = vision->bglp->getDistance();
                 } else {
                     postX = vision->bgrp->getLeftBottomX();
                     postY = vision->bgrp->getLeftBottomY();
+					postDist = vision->bgrp->getDistance();
                 }
                 dist = realDistance(crossX, crossY, postX, postY);
-                if (dist < CLOSECROSS) {
+				if (postDist > LONGPOST) {
+					objPtr->setID(YELLOW_GOAL_CROSS);
+				} else if (dist < CLOSECROSS) {
                     objPtr->setID(BLUE_GOAL_CROSS);
                 } else {
                     objPtr->setID(ABSTRACT_CROSS);
