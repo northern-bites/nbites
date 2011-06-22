@@ -124,6 +124,13 @@
 #  undef USING_TTS
 #endif
 
+#define USE_ALSPEECH_${USE_ALSPEECH}
+#ifdef USE_ALSPEECH_ON
+#   define USE_ALSPEECH
+#else
+#   undef USE_ALSPEECH
+#endif
+
 #endif // !_manconfig_h
 
 

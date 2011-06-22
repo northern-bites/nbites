@@ -39,15 +39,27 @@ ENDIF( WEBOTS_BACKEND )
 
 IF( OE_CROSS_BUILD )
   OPTION( OFFLINE
-    "turn offline vision debugging on for compatability with tool"
+    "turn offline vision debugging on for compatibility with tool"
     OFF
     )
 ELSE( OE_CROSS_BUILD )
   OPTION( OFFLINE
-    "turn offline vision debugging on for compatability with tool"
+    "turn offline vision debugging on for compatibility with tool"
     ON
     )
 ENDIF( OE_CROSS_BUILD )
+
+IF( OE_CROSS_BUILD )
+  OPTION( USE_ALSPEECH
+    "turn Aldebaran speech on for debugging"
+    ON
+    )
+ELSE()
+  OPTION( USE_ALSPEECH
+    "turn Aldebaran speech on for debugging"
+    OFF
+    )
+ENDIF()
 
 OPTION(
     MAN_IS_REMOTE_
