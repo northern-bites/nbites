@@ -4,8 +4,8 @@
 
 #include "MessageParser.h"
 
+namespace man {
 namespace memory {
-
 namespace parse {
 
 using namespace std;
@@ -94,5 +94,6 @@ void MessageParser::initStreams() {
 
 }
 
+}
 }
 }

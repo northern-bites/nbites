@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <fcntl.h>
+#include <string>
 #include "FDProvider.h"
 
 class FileFDProvider : public FDProvider {
@@ -20,6 +21,15 @@ public:
             int permissions = S_IRWXU | S_IRWXG | S_IRWXO) :
                 FDProvider(),
                 fileName(fileName),
+                flags(flags), permissions(permissions){
+        openFileDescriptor();
+    }
+
+    FileFDProvider(std::string fileName,
+            int flags = O_WRONLY | O_CREAT | O_TRUNC,
+            int permissions = S_IRWXU | S_IRWXG | S_IRWXO) :
+                FDProvider(),
+                fileName(fileName.c_str()),
                 flags(flags), permissions(permissions){
         openFileDescriptor();
     }

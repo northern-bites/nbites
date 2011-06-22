@@ -16,8 +16,10 @@
 
 #include <boost/shared_ptr.hpp>
 
+namespace man {
 namespace memory {
 class Memory; //forward declaration
+}
 }
 
 #include "MVision.h"
@@ -29,6 +31,7 @@ class Memory; //forward declaration
 #include "Profiler.h"
 #include "log/LoggingBoard.h"
 
+namespace man {
 namespace memory {
 
 using boost::shared_ptr;
@@ -72,4 +75,5 @@ private:
 
     log::LoggingBoard* loggingBoard;
 };
+}
 }

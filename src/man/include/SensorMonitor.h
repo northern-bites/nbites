@@ -32,9 +32,11 @@
 #ifndef SENSOR_MONITOR_H
 #define SENSOR_MONITOR_H
 
-#include "dsp.h"
-
 #include <string>
+#include <boost/shared_ptr.hpp>
+
+#include "ALSpeech.h"
+#include "dsp.h"
 
 #define NOT_STEADY -1
 
@@ -44,7 +46,7 @@ class SensorMonitor : public Filter
 {
 public:
     SensorMonitor();
-    SensorMonitor(std::string sensorName);
+    SensorMonitor(boost::shared_ptr<Speech> s, std::string sensorName);
     ~SensorMonitor();
 
 	double X(double);
@@ -64,9 +66,12 @@ public:
     const std::string SensorName() const { return sensorName; }
     void SensorName(std::string name) { sensorName = name; }
 
+    void SpeechPtr(boost::shared_ptr<Speech> s) { speech = s; }
+
 private:
     void reportSensorError();
 
+    boost::shared_ptr<Speech> speech;
     std::string sensorName;
     NoiseMeter<Butterworth> noise;
     SignalMonitor monitor;

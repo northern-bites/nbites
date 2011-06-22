@@ -1,0 +1,49 @@
+#!/bin/sh
+
+#Script to sync frames between robot and your computer
+ROBOT=$1
+LOCAL_DEST=$2
+LOG_NAME=$3
+
+DATE="$(date +%d%m%y)"
+LOG_EXT=nbl
+
+REMOTE_FILES=naoqi/log/*.log
+
+LOG_NAME=$LOCAL_DEST/$LOG_NAME-$ROBOT-$DATE.$LOG_EXT
+
+USAGE="./grab <robot-address> <folder-destination> <log-name> \nExample: $> ./grab zaphod.local graz falseBalls"
+
+if [ "$1" = "" ]; then
+    echo "No robot specified"
+    echo $USAGE
+    exit 1
+fi
+
+if [ "$2" = "" ]; then
+    echo "No local destination specified"
+    echo $USAGE
+    exit 1
+fi
+
+if [ "$3" = "" ]; then
+    echo "No log name specified"
+    echo $USAGE
+    exit 1
+fi
+
+echo "mkdir -p $LOCAL_DEST"
+mkdir -p $LOCAL_DEST
+
+# set directory to be world-writable so we can add learning files etc.
+
+chmod a+w $LOCAL_DEST
+
+echo "scp -r nao@$ROBOT:$REMOTE_FILES ."
+scp nao@$ROBOT:$REMOTE_FILES .
+
+echo "tar -cvf $LOG_NAME *.log"
+tar -cvf $LOG_NAME *.log
+
+echo "rm *.log"
+rm *.log

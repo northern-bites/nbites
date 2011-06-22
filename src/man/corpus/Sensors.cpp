@@ -48,8 +48,9 @@ static uint16_t global_image[NAO_IMAGE_BYTE_SIZE];
 //
 int Sensors::saved_frames = 0;
 
-Sensors::Sensors ()
-    : bodyAngles(NUM_ACTUATORS), visionBodyAngles(NUM_ACTUATORS),
+Sensors::Sensors (boost::shared_ptr<Speech> s)
+    : speech(s),
+      bodyAngles(NUM_ACTUATORS), visionBodyAngles(NUM_ACTUATORS),
       motionBodyAngles(NUM_ACTUATORS),
       bodyAnglesError(NUM_ACTUATORS),
       bodyTemperatures(NUM_ACTUATORS,0.0f),
@@ -64,8 +65,8 @@ Sensors::Sensors ()
       naoImage(NULL),
       //naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
-      varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
-      fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
+      varianceMonitor(speech, MONITOR_COUNT, "SensorVariance", sensorNames),
+      fsrMonitor(speech, BUMPER_LEFT_L, "FSR_Variance", fsrNames),
       unfilteredInertial(),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
       FRM_FOLDER("/home/nao/naoqi/frames"),

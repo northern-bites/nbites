@@ -55,30 +55,3 @@ class FieldObject(VisualObject):
                  Constants.landmarkTuple[self.localId],
                  self.visDist, self.visBearing))
 
-#### Crossbars currently unused!
-class Crossbar(VisualObject):
-    """
-    Crossbar class, what used to be the backstop class
-    """
-    def __init__(self, visionInfos, visionName):
-        """initialization of all values for Crossbar() class"""
-        VisualObject.__init__(self)
-        # Setup the data from vision
-        self.visionId = visionName
-        self.updateVision(visionInfos)
-
-    def updateVision(self, visionInfos):
-        """updates class variables with new vision information"""
-        VisualObject.updateVision(self, visionInfos)
-
-        self.x = visionInfos.x
-        self.y = visionInfos.y
-        self.angleX = visionInfos.angleX
-        self.angleY = visionInfos.angleY
-        self.elevation = visionInfos.elevation
-        self.leftOpening = visionInfos.leftOpening
-        self.rightOpening = visionInfos.rightOpening
-        self.shoot = visionInfos.shoot
-
-    def __str__(self):
-        return VisualObject.__str__(self)
