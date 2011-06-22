@@ -31,6 +31,8 @@ using boost::shared_ptr;
 #include "Observer.h"
 #include "BasicWorldConstants.h"
 #include "COMKinematics.h"
+#include "JointMassConstants.h"
+
 using namespace boost::numeric;
 using namespace Kinematics;
 using namespace NBMath;
@@ -43,33 +45,33 @@ using namespace NBMath;
 StepGenerator::StepGenerator(shared_ptr<Sensors> s,
                              shared_ptr<NaoPose> p,
                              const MetaGait * _gait)
-  : x(0.0f), y(0.0f), theta(0.0f),
-    done(true),
-    sensorAngles(s,_gait),
-    com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
-    joints_com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
-    com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
-    est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
-    zmp_ref_x(list<float>()),zmp_ref_y(list<float>()),
-    futureSteps(),
-    currentZMPDSteps(),
-    si_Transform(CoordFrame3D::identity3D()),
-    last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
-    if_Transform(CoordFrame3D::identity3D()),
-    fi_Transform(CoordFrame3D::identity3D()),
-    fc_Transform(CoordFrame3D::identity3D()),
-    cf_Transform(CoordFrame3D::identity3D()),
-    cc_Transform(CoordFrame3D::identity3D()),
-    sensors(s), pose(p), gait(_gait), nextStepIsLeft(true),
-    leftLeg(s,gait,&sensorAngles,LLEG_CHAIN),
-    rightLeg(s,gait,&sensorAngles,RLEG_CHAIN),
-    leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),
-    supportFoot(LEFT_SUPPORT),
-    controller_x(new Observer()),
-    controller_y(new Observer()),
-    zmp_filter(),
-    acc_filter(),
-    accInWorldFrame(CoordFrame4D::vector4D(0.0f,0.0f,0.0f))
+    : x(0.0f), y(0.0f), theta(0.0f),
+      done(true),
+      sensorAngles(s,_gait),
+      com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+      joints_com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+      com_f(CoordFrame3D::vector3D(0.0f,0.0f)),
+      est_zmp_i(CoordFrame3D::vector3D(0.0f,0.0f)),
+      zmp_ref_x(list<float>()),zmp_ref_y(list<float>()),
+      futureSteps(),
+      currentZMPDSteps(),
+      si_Transform(CoordFrame3D::identity3D()),
+      last_zmp_end_s(CoordFrame3D::vector3D(0.0f,0.0f)),
+      if_Transform(CoordFrame3D::identity3D()),
+      fi_Transform(CoordFrame3D::identity3D()),
+      fc_Transform(CoordFrame3D::identity3D()),
+      cf_Transform(CoordFrame3D::identity3D()),
+      cc_Transform(CoordFrame3D::identity3D()),
+      sensors(s), pose(p), gait(_gait), nextStepIsLeft(true),
+      leftLeg(s,gait,&sensorAngles,LLEG_CHAIN),
+      rightLeg(s,gait,&sensorAngles,RLEG_CHAIN),
+      leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),
+      supportFoot(LEFT_SUPPORT),
+      controller_x(new Observer()),
+      controller_y(new Observer()),
+      zmp_filter(),
+      acc_filter(),
+      accInWorldFrame(CoordFrame4D::vector4D(0.0f,0.0f,0.0f))
 {
     //COM logging
 #ifdef DEBUG_CONTROLLER_COM
@@ -199,10 +201,10 @@ void StepGenerator::findSensorZMP(){
     accInWorldFrame = prod(bodyToWorldTransform,
                            accInBodyFrame);
 
-     //cout << endl<< "########################"<<endl;
-     //cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
-     //cout << "Accel in world frame: "<< accInWorldFrame <<endl;
-     //cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
+    //cout << endl<< "########################"<<endl;
+    //cout << "Accel in body  frame: "<< accInBodyFrame <<endl;
+    //cout << "Accel in world frame: "<< accInWorldFrame <<endl;
+    //cout << "Angle X is "<< inertial.angleX << " Y is" <<inertial.angleY<<endl;
 
     //Rotate from the local C to the global I frame
     const ufvector3 accel_c = CoordFrame3D::vector3D(accInWorldFrame(0),
@@ -223,16 +225,18 @@ void StepGenerator::findSensorZMP(){
 
     ZmpTimeUpdate tUp = {controller_x->getZMP(), controller_y->getZMP()};
     ZmpMeasurement pMeasure =
-        //{joint_com_i_x, (joint_com_i_y + COM_I_Y_OFFSET),
-		{controller_x->getPosition(), controller_y->getPosition(),
-		 accel_i(0), accel_i(1)};
+    //{joint_com_i_x, (joint_com_i_y + COM_I_Y_OFFSET),
+	{controller_x->getPosition(), controller_y->getPosition(),
+	 accel_i(0), accel_i(1)};
     zmp_filter.update(tUp,pMeasure);
 
 #ifdef DEBUG_COM_TRANSFORMS
-    cout << "controller_x com: " << controller_x->getPosition();
-    cout << "com_c -> com_i (x): " << joint_com_i_x << endl;
-    cout << " controller_y com: " << controller_y->getPosition();
-    cout << "com_c -> com_i (y): " << joint_com_i_y + COM_I_Y_OFFSET << endl;
+    cout << "raw " << com_c_xyz
+	 << " controller_x com: " << controller_x->getPosition()
+	 << " com_c -> com_i (x): " << joint_com_i_x
+	 << " controller_y com: " << controller_y->getPosition()
+	 << " com_c -> com_i (y): " << joint_com_i_y + COM_I_Y_OFFSET
+	 << endl;
 #endif
 }
 
@@ -347,9 +351,9 @@ WalkLegsTuple StepGenerator::tick_legs(){
     //Since we'd like to ignore the state information of the WalkinLeg as much
     //as possible, we send in the source of the swinging leg to both, regardless
     LegJointStiffTuple left  = leftLeg.tick(leftStep_f,swingingStepSource_f,
-                                       swingingStep_f,fc_Transform);
+					    swingingStep_f,fc_Transform);
     LegJointStiffTuple right = rightLeg.tick(rightStep_f,swingingStepSource_f,
-                                        swingingStep_f,fc_Transform);
+					     swingingStep_f,fc_Transform);
 
     if(supportStep_f->foot == LEFT_FOOT){
         updateOdometry(leftLeg.getOdoUpdate());
@@ -379,69 +383,69 @@ WalkLegsTuple StepGenerator::tick_legs(){
  * when the support feet change
  */
 void StepGenerator::swapSupportLegs(){
-        if (currentZMPDSteps.size() +  futureSteps.size() <
-            MIN_NUM_ENQUEUED_STEPS)
-            throw "Insufficient steps";
+    if (currentZMPDSteps.size() +  futureSteps.size() <
+	MIN_NUM_ENQUEUED_STEPS)
+	throw "Insufficient steps";
 
-        //there are at least three elements in the list, pop the obsolete one
-        //(currently use last step to determine when to stop, hackish-ish)
-        //and the first step is the support one now, the second the swing
-        lastStep_s = *currentZMPDSteps.begin();
-        currentZMPDSteps.pop_front();
-        swingingStep_s  = *(++currentZMPDSteps.begin());
-        supportStep_s   =  *currentZMPDSteps.begin();
+    //there are at least three elements in the list, pop the obsolete one
+    //(currently use last step to determine when to stop, hackish-ish)
+    //and the first step is the support one now, the second the swing
+    lastStep_s = *currentZMPDSteps.begin();
+    currentZMPDSteps.pop_front();
+    swingingStep_s  = *(++currentZMPDSteps.begin());
+    supportStep_s   =  *currentZMPDSteps.begin();
 
-        supportFoot = (supportStep_s->foot == LEFT_FOOT ?
-                       LEFT_SUPPORT : RIGHT_SUPPORT);
+    supportFoot = (supportStep_s->foot == LEFT_FOOT ?
+		   LEFT_SUPPORT : RIGHT_SUPPORT);
 
-        //update the translation matrix between i and f coord. frames
-        ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
-        if_Transform = prod(stepTransform,if_Transform);
-        update_FtoI_transform();
+    //update the translation matrix between i and f coord. frames
+    ufmatrix3 stepTransform = get_fprime_f(supportStep_s);
+    if_Transform = prod(stepTransform,if_Transform);
+    update_FtoI_transform();
 
-        //Express the  destination  and source for the supporting foot and
-        //swinging foots locations in f coord. Since the supporting foot doesn't
-        //move, we ignore its source.
+    //Express the  destination  and source for the supporting foot and
+    //swinging foots locations in f coord. Since the supporting foot doesn't
+    //move, we ignore its source.
 
-        //First, do the support foot, which is always at the origin
-        const ufvector3 origin = CoordFrame3D::vector3D(0,0);
-        const ufvector3 supp_pos_f = origin;
+    //First, do the support foot, which is always at the origin
+    const ufvector3 origin = CoordFrame3D::vector3D(0,0);
+    const ufvector3 supp_pos_f = origin;
 
-        //Second, do the source of the swinging leg, which can be calculated
-        //using the stepTransform matrix from above
-        ufvector3 swing_src_f = prod(stepTransform,origin);
+    //Second, do the source of the swinging leg, which can be calculated
+    //using the stepTransform matrix from above
+    ufvector3 swing_src_f = prod(stepTransform,origin);
 
-        //Third, do the dest. of the swinging leg, which is more complicated
-        //We get the translation matrix that takes points in next f-type
-        //coordinate frame, namely the one that will be centered at the swinging
-        //foot's destination, and puts them into the current f coord. frame
-        const ufmatrix3 swing_reverse_trans =
-            get_f_fprime(swingingStep_s);
-        //This gives us the position of the swinging foot's destination
-        //in the current f frame
-        const ufvector3 swing_pos_f = prod(swing_reverse_trans,
-                                           origin);
+    //Third, do the dest. of the swinging leg, which is more complicated
+    //We get the translation matrix that takes points in next f-type
+    //coordinate frame, namely the one that will be centered at the swinging
+    //foot's destination, and puts them into the current f coord. frame
+    const ufmatrix3 swing_reverse_trans =
+	get_f_fprime(swingingStep_s);
+    //This gives us the position of the swinging foot's destination
+    //in the current f frame
+    const ufvector3 swing_pos_f = prod(swing_reverse_trans,
+				       origin);
 
-        //finally, we need to know how much turning there will be. Turns out,
-        //we can simply read this out of the aforementioned translation matr.
-        //this only works because its a 3D homog. coord matr - 4D would break
-        float swing_dest_angle = -safe_asin(swing_reverse_trans(1,0));
+    //finally, we need to know how much turning there will be. Turns out,
+    //we can simply read this out of the aforementioned translation matr.
+    //this only works because its a 3D homog. coord matr - 4D would break
+    float swing_dest_angle = -safe_asin(swing_reverse_trans(1,0));
 
-        //we use the swinging source to calc. a path for the swinging foot
-        //it is not clear now if we will need to angle offset or what
-        float swing_src_angle = -safe_asin(stepTransform(1,0));
+    //we use the swinging source to calc. a path for the swinging foot
+    //it is not clear now if we will need to angle offset or what
+    float swing_src_angle = -safe_asin(stepTransform(1,0));
 
-        //in the F coordinate frames, we express Steps representing
-        // the three footholds from above
-        supportStep_f =
-            shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
-                                      0.0f,*supportStep_s));
-        swingingStep_f =
-            shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
-                                      swing_dest_angle,*swingingStep_s));
-        swingingStepSource_f  =
-            shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
-                                      swing_src_angle,*lastStep_s));
+    //in the F coordinate frames, we express Steps representing
+    // the three footholds from above
+    supportStep_f =
+	shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
+				  0.0f,*supportStep_s));
+    swingingStep_f =
+	shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
+				  swing_dest_angle,*swingingStep_s));
+    swingingStepSource_f  =
+	shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
+				  swing_src_angle,*lastStep_s));
 
 }
 
@@ -464,7 +468,7 @@ void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
         break;
     default:
         throw "Unsupported Step type";
-        }
+    }
 
     newSupportStep->zmpd = true;
 }
@@ -551,8 +555,8 @@ void StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
 
     //First, split up the frames:
     const int halfNumDSChops = //DS - DoubleStaticChops
-       static_cast<int>(static_cast<float>(newSupportStep->doubleSupportFrames)*
-                        newSupportStep->zmpConfig[WP::DBL_SUP_STATIC_P]/2.0f);
+	static_cast<int>(static_cast<float>(newSupportStep->doubleSupportFrames)*
+			 newSupportStep->zmpConfig[WP::DBL_SUP_STATIC_P]/2.0f);
     const int numDMChops = //DM - DoubleMovingChops
         newSupportStep->doubleSupportFrames - halfNumDSChops*2;
 
@@ -628,7 +632,7 @@ void StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep) {
  * Set the speed of the walk eninge in mm/s and rad/s
  */
 void StepGenerator::setSpeed(const float _x, const float _y,
-                                  const float _theta)  {
+			     const float _theta)  {
 
     //Regardless, we are changing the walk vector, so we need to scrap any future plans
     clearFutureSteps();
@@ -694,7 +698,7 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
             <<") and with "<<_numSteps<<" Steps were APPENDED because"
             "StepGenerator is already active!!" <<endl;
     }else{
-       //we are starting fresh from a stopped state, so we need to clear all remaining
+	//we are starting fresh from a stopped state, so we need to clear all remaining
         //steps and zmp values.
         resetQueues();
 
@@ -747,9 +751,9 @@ void StepGenerator::resetSteps(const bool startLeft){
     Foot firstSupportFoot = RIGHT_FOOT;
     float supportSign = 1.0f;
     if(startLeft){
-        #ifdef DEBUG_STEPGENERATOR
+#ifdef DEBUG_STEPGENERATOR
         cout << "StepGenerator::startLeft"<<endl;
-        #endif
+#endif
 
         //start off in a double support phase where the right leg swings first
         //HOWEVER, since the first support step is END, there will be no
@@ -767,9 +771,9 @@ void StepGenerator::resetSteps(const bool startLeft){
         nextStepIsLeft = false;
 
     }else{ //startRight
-        #ifdef DEBUG_STEPGENERATOR
+#ifdef DEBUG_STEPGENERATOR
         cout << "StepGenerator::startRight"<<endl;
-        #endif
+#endif
 
         //start off in a double support phase where the left leg swings first
         //HOWEVER, since the first support step is END, there will be no
@@ -806,7 +810,7 @@ void StepGenerator::resetSteps(const bool startLeft){
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is REGULAR type.
     shared_ptr<Step> firstSupportStep =
-      shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
+	shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
                                   *gait,
                                   firstSupportFoot,ZERO_WALKVECTOR,END_STEP));
     shared_ptr<Step> dummyStep =
@@ -856,10 +860,10 @@ void StepGenerator::generateStep( float _x,
     StepType type;
 
     if(gait->step[WP::WALKING] == WP::NON_WALKING_GAIT){
-      type = END_STEP;
-      _x = 0.0f;
-      _y = 0.0f;
-      _theta = 0.0f;
+	type = END_STEP;
+	_x = 0.0f;
+	_y = 0.0f;
+	_theta = 0.0f;
 
     }else if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
 //         if(lastQueuedStep->x != 0 || lastQueuedStep->theta != 0 ||
@@ -867,7 +871,7 @@ void StepGenerator::generateStep( float _x,
 //                                  1:-1)*HIP_OFFSET_Y) != 0)
 //             type = REGULAR_STEP;
 //         else
-            type = END_STEP;
+	type = END_STEP;
 
     }else{
         //we are moving somewhere, and we must ensure that the last step
@@ -877,7 +881,7 @@ void StepGenerator::generateStep( float _x,
                 type = REGULAR_STEP;
                 _x = 0.0f;
                 _y = 0.0f;
-                 _theta = 0.0f;
+		_theta = 0.0f;
             }else{
                 type = REGULAR_STEP;
                 lastQueuedStep->type = REGULAR_STEP;
@@ -900,7 +904,7 @@ void StepGenerator::generateStep( float _x,
                                    *gait,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
-                   lastQueuedStep->walkVector,
+				   lastQueuedStep->walkVector,
                                    type));
 
 #ifdef DEBUG_STEPGENERATOR
@@ -1096,7 +1100,7 @@ void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
  * Method to figure out when to start swinging with the left vs. right left
  */
 const bool StepGenerator::decideStartLeft(const float lateralVelocity,
-                                       const float radialVelocity){
+					  const float radialVelocity){
     //Currently, the logic is very simple: if the strafe direction
     //or the turn direction go left, then start that way
     //Strafing takes precedence over turning.
@@ -1161,9 +1165,9 @@ void StepGenerator::debugLogging(){
     //also, beware of the time delay between sent commands and the robot
     ufvector3 leg_dest_c =
         -Kinematics::forwardKinematics((leftLeg.isSupporting()?
-                                       LLEG_CHAIN: RLEG_CHAIN),//LLEG_CHAIN,
-                                      (leftLeg.isSupporting()?
-                                       lleg_angles: rleg_angles));
+					LLEG_CHAIN: RLEG_CHAIN),//LLEG_CHAIN,
+				       (leftLeg.isSupporting()?
+					lleg_angles: rleg_angles));
     leg_dest_c(2) = 1.0f;
 
     ufvector3 leg_dest_i = prod(fi_Transform,leg_dest_c);
@@ -1204,7 +1208,7 @@ void StepGenerator::debugLogging(){
     const float comPX = controller_x->getZMP();
     const float comPY = controller_y->getZMP();
 
-	Inertial acc = sensors->getUnfilteredInertial();
+    Inertial acc = sensors->getUnfilteredInertial();
     const float accX = accInWorldFrame(0);
     const float accY = accInWorldFrame(1);
     const float accZ = accInWorldFrame(2);
@@ -1212,7 +1216,7 @@ void StepGenerator::debugLogging(){
 
     fprintf(zmp_log,"%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
             stime,preX,preY,comX,comY,comPX,comPY,accX,accY,accZ,
-			zmp_filter.get_zmp_x(),zmp_filter.get_zmp_y(),
+	    zmp_filter.get_zmp_x(),zmp_filter.get_zmp_y(),
             acc.angleX,acc.angleY);
     stime+= MOTION_FRAME_LENGTH_S;
 #endif

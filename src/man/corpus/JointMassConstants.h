@@ -24,12 +24,6 @@ public:
 
 namespace Kinematics {
 
-    /* Not sure why we need this, CoM transformations seemed to be working
-     * before the 3.3 upgrade. In any case, when moving from the C frame to
-     * the I frame there is a 20mm offset in the y direction. If joint_com_y
-     * looks broken in the debug graphs, tweak this (or find the real problem).
-     */
-/** disable the offset on the old robots (@see Common.h) */
     static const float COM_I_Y_OFFSET = -20.0f;
 
 // All masses in grams
@@ -69,11 +63,6 @@ namespace Kinematics {
     static const float ELBOW_MASS_Y = 0.01f;
     static const float ELBOW_MASS_Z = -0.19f;
 
-    static const float FOREARM_MASS_g = 77.24f;
-    static const float FOREARM_MASS_X = 25.56f;
-    static const float FOREARM_MASS_Y = -2.73f;
-    static const float FOREARM_MASS_Z = 0.96f;
-
     static const float HAND_MASS_g = 185.00f;
     static const float HAND_MASS_X = 65.36f;
     static const float HAND_MASS_Y = -0.34f;
@@ -111,8 +100,8 @@ namespace Kinematics {
 
     static const float TOTAL_MASS  =  // ~4879g
 	CHEST_MASS_g + HEAD_MASS_g + NECK_MASS_g +
-	2.0f*(SHOULDER_MASS_g + BICEP_MASS_g + ELBOW_MASS_g + FOREARM_MASS_g +
-	      HAND_MASS_g + PELVIS_MASS_g + HIP_MASS_g + THIGH_MASS_g + TIBIA_MASS_g +
+	2.0f*(SHOULDER_MASS_g + BICEP_MASS_g + ELBOW_MASS_g + HAND_MASS_g
+	      + PELVIS_MASS_g + HIP_MASS_g + THIGH_MASS_g + TIBIA_MASS_g +
 	      ANKLE_MASS_g + FOOT_MASS_g);
 
 // put the constants and offsets together into Joint objects
@@ -128,7 +117,6 @@ namespace Kinematics {
 	Joint(SHOULDER_MASS_g, SHOULDER_MASS_X, -SHOULDER_MASS_Y, SHOULDER_MASS_Z),
 	Joint(BICEP_MASS_g, BICEP_MASS_X, -BICEP_MASS_Y, BICEP_MASS_Z),
 	Joint(ELBOW_MASS_g, ELBOW_MASS_X, -ELBOW_MASS_Y, ELBOW_MASS_Z),
-	Joint(FOREARM_MASS_g, FOREARM_MASS_X, -FOREARM_MASS_Y, FOREARM_MASS_Z),
 	Joint(HAND_MASS_g, HAND_MASS_X, -HAND_MASS_Y, HAND_MASS_Z),
 	// LLEG
 	Joint(PELVIS_MASS_g, PELVIS_MASS_X, -PELVIS_MASS_Y, PELVIS_MASS_Z),
@@ -148,7 +136,6 @@ namespace Kinematics {
 	Joint(SHOULDER_MASS_g, SHOULDER_MASS_X, SHOULDER_MASS_Y, SHOULDER_MASS_Z),
 	Joint(BICEP_MASS_g, BICEP_MASS_X, BICEP_MASS_Y, BICEP_MASS_Z),
 	Joint(ELBOW_MASS_g, ELBOW_MASS_X, ELBOW_MASS_Y, ELBOW_MASS_Z),
-	Joint(FOREARM_MASS_g, FOREARM_MASS_X, FOREARM_MASS_Y, FOREARM_MASS_Z),
 	Joint(HAND_MASS_g, HAND_MASS_X, HAND_MASS_Y, HAND_MASS_Z),
     };
 

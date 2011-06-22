@@ -25,7 +25,6 @@
 #include "NBMath.h"
 #include "NBMatrixMath.h"
 #include "CoordFrame.h"
-#include "JointMassConstants.h"
 
 namespace Kinematics {
 
@@ -76,22 +75,6 @@ namespace Kinematics {
     };
     static const unsigned int FIRST_HEAD_JOINT = HEAD_YAW;
 
-    /**
-     * (Deprecated)
-     enum Motion_IntFlag {
-     UNINT_INTR_CMD, // Un-interruptable interrupter command
-     INT_INTR_CMD,   // Interruptable interupter command
-     UNINT_CMD,      // Un-interruptable command
-     INT_CMD         // Interruptable command
-     };
-
-     enum SupportLeg{
-     BOTH_LEGS = 0,
-     RIGHT_LEG,
-     LEFT_LEG
-     };
-    **/
-
     static const unsigned int HEAD_JOINTS = 2;
     static const unsigned int ARM_JOINTS = 4;
     static const unsigned int LEG_JOINTS = 6;
@@ -100,8 +83,6 @@ namespace Kinematics {
 
     static const unsigned int NUM_JOINTS = HEAD_JOINTS + ARM_JOINTS*2 +
         LEG_JOINTS*2;
-    // includes arm pieces, which don't have a motor
-    static const unsigned int NUM_MASS_PIECES = NUM_JOINTS + 2;
     static const unsigned int NUM_BODY_JOINTS = ARM_JOINTS*2 + LEG_JOINTS*2;
     static const unsigned int chain_lengths[NUM_CHAINS] = {2, 4, 6, 6, 4};
     static const unsigned int chain_first_joint[NUM_CHAINS] = {0,2,6,12,18};

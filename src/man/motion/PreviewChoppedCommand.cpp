@@ -8,6 +8,8 @@ using std::vector;
 
 static const int COM_PREVIEW_FRAMES = 20;
 
+//#define DEBUG_SCRIPTED_COM
+
 PreviewChoppedCommand::PreviewChoppedCommand ( ChoppedCommand::ptr choppedCommand )
     : thisFramesAngles(vector<float>()),
       com_x(COM_PREVIEW_FRAMES),
@@ -89,12 +91,14 @@ void PreviewChoppedCommand::updateComEstimates() {
     com_dx.X(lastX - com_x.Y());
     com_dy.X(lastY - com_y.Y());
 
+#ifdef DEBUG_SCRIPTED_COM
     std::cout //<< "Saw last chain, updating CoM...angles vector size: "
 	//<< thisFramesAngles.size()
-	//<< " raw CoM this frame: " << com_c
+	<< " raw CoM this frame: " << com_c
 	<< " CoM pos: " << getFutureComPosition()
 	<< " (d/dt CoM pos): " << getComDerivative()
 	<< std::endl;
+#endif
 
     thisFramesAngles.clear();
 }

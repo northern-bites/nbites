@@ -2,6 +2,7 @@
 #define COMKinematics_h_DEFINED
 
 #include "Kinematics.h"
+#include "JointMassConstants.h"
 
 namespace Kinematics{
     const NBMath::ufvector4 getCOMc(const std::vector<float> bodyAngles);
