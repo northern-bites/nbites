@@ -11,7 +11,7 @@
 #include <QWidget>
 #include <QtGui>
 
-#include "DataFinder.h"
+#include "OfflineDataFinder.h"
 #include "DataSource.h"
 
 namespace qtool {

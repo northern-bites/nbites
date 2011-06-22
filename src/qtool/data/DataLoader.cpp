@@ -6,7 +6,7 @@ namespace data {
 
 DataLoader::DataLoader(QWidget *parent) :
     QWidget(parent),
-    dataFinder(new DataFinder())
+    dataFinder(new OfflineDataFinder())
 {
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setAlignment(Qt::AlignTop);

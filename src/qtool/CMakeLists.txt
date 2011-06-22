@@ -66,3 +66,7 @@ target_link_libraries(
   data
   ${QT_LIBRARIES}
   )
+
+set_property(
+  TARGET qtool
+  APPEND PROPERTY COMPILE_DEFINITIONS NBITES_DIR=${NBITES_DIR} )
