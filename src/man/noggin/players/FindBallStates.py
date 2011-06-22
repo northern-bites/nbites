@@ -50,12 +50,12 @@ def spinFindBall(player):
         player.brain.tracker.stopHeadMoves()
 
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
-        player.brain.tracker.trackBallSpin()
         my = player.brain.my
         ball = player.brain.ball
         spinDir = my.spinDirToPoint(ball)
-
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
+
+        player.brain.tracker.trackBallSpin()
 
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldWalkFindBall(player):
