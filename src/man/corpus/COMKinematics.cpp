@@ -95,58 +95,50 @@ void Kinematics::buildJointTransforms(const float angles[]) {
 
 void Kinematics::buildHeadNeck(const int start, const float angles[]) {
     // neck (head yaw)
-    limbs[start] = prod(translation4D(0, 0, NECK_OFFSET_Z),
-			rotation4D(Z_AXIS, angles[HEAD_YAW]));
+    limbs[start] = get6DTransform(0.0f, 0.0f, NECK_OFFSET_Z,
+				  0.0f, 0.0f, angles[HEAD_YAW]);
     // head (head pitch)
-    limbs[start + 1] = prod(rotation4D(Y_AXIS, -angles[HEAD_PITCH]),
+    limbs[start + 1] = prod(rotation4D(Y_AXIS, angles[HEAD_PITCH]),
 			    limbs[start]);
 }
 
 void Kinematics::buildArmChain(const int start, const float side, const float angles[]) {
-    ufmatrix4 temp; // for multiple transformations, ublas hates nested prod calls
-
     // shoulder pitch (shoulder)
-    limbs[start] = prod(translation4D(0, SHOULDER_OFFSET_Y*side, SHOULDER_OFFSET_Z),
-			rotation4D(Y_AXIS, -angles[start]));
+    limbs[start] = get6DTransform(0.0f, SHOULDER_OFFSET_Y*side, SHOULDER_OFFSET_Z,
+				  0.0f, -angles[start], 0.0f);
     // shoulder roll (bicep)
-    limbs[start + 1] = prod(rotation4D(Z_AXIS, angles[start + 1]*side),
+    limbs[start + 1] = prod(rotation4D(Z_AXIS, angles[start + 1]),
 			    limbs[start]);
     // elbow yaw (elbow)
-    temp = prod(translation4D(UPPER_ARM_LENGTH, 0.0f, 0.0f),
-		limbs[start + 1]);
-    limbs[start + 2] = prod(rotation4D(X_AXIS, angles[start + 2]*side),
-                            temp);
+    limbs[start + 2] = prod(get6DTransform(UPPER_ARM_LENGTH, 0.0f, 0.0f,
+					   angles[start + 2], 0.0f, 0.0f),
+			    limbs[start + 1]);
     // elbow roll (hand/forearm together)
-    limbs[start + 3] = prod(rotation4D(Z_AXIS, angles[start + 3]*side),
+    limbs[start + 3] = prod(rotation4D(Z_AXIS, angles[start + 3]),
                             limbs[start + 2]);
 }
 
 // See: buildArmChain
 void Kinematics::buildLegChain(const int start, const float side, const float angles[]) {
-    ufmatrix4 temp; // for multiple transformations, ublas hates nested prod calls
-
-    // hip yaw pitch
-    temp = prod(translation4D(0.0f, HIP_OFFSET_Y*side, -HIP_OFFSET_Z),
-		rotation4D(X_AXIS, M_PI_FLOAT/4*side));
-    limbs[start] = prod(rotation4D(Z_AXIS, angles[start]*-side),
-                        temp);
-    // hip roll
-    limbs[start + 1] = prod(rotation4D(X_AXIS, (angles[start + 1] + M_PI_FLOAT/4)*-side),
+    // hip yaw pitch (pelvis)
+    limbs[start] = get6DTransform(0.0f, HIP_OFFSET_Y*side, -HIP_OFFSET_Z,
+				  M_PI_FLOAT/4*side, 0.0f, angles[start]);
+    // hip roll (hip)
+    limbs[start + 1] = prod(rotation4D(X_AXIS,
+				       (angles[start + 1] + M_PI_FLOAT/4*side)),
                             limbs[start]);
-    // hip pitch
+    // hip pitch (thigh)
     limbs[start + 2] = prod(rotation4D(Y_AXIS, angles[start + 2]),
                             limbs[start + 1]);
-    // knee pitch
-    temp = prod(translation4D(0.0f, 0.0f, -THIGH_LENGTH),
-		limbs[start + 2]);
-    limbs[start + 3] = prod(rotation4D(Y_AXIS, angles[start + 3]),
-			    temp);
-    // ankle pitch
-    temp = prod(translation4D(0.0f, 0.0f, -TIBIA_LENGTH),
-                limbs[start + 3]);
-    limbs[start + 4] = prod(rotation4D(Y_AXIS, angles[start + 4]),
-                            temp);
-    // ankle roll
-    limbs[start + 5] = prod(rotation4D(X_AXIS, angles[start + 5] * -side),
+    // knee pitch (tibia)
+    limbs[start + 3] = prod(get6DTransform(0.0f, 0.0f, -THIGH_LENGTH,
+					   0.0f, angles[start + 3], 0.0f),
+			    limbs[start + 2]);
+    // ankle pitch (ankle)
+    limbs[start + 4] = prod(get6DTransform(0.0f, 0.0f, -TIBIA_LENGTH,
+					   0.0f, angles[start + 4], 0.0f),
+			    limbs[start + 3]);
+    // ankle roll (foot)
+    limbs[start + 5] = prod(rotation4D(X_AXIS, angles[start + 5]),
 			    limbs[start + 4]);
 }
