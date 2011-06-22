@@ -153,7 +153,7 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
 		int x = blobs->get(i).getLeft();
 		int y = blobs->get(i).getTop();
         int diam = max(w, h);
-		if (w < 10) {
+		if (w < 10 || (w < 20 && perc > 0.25)) {
 			int count = 0;
 			for (int j = x; j < x + w; j++) {
 				for (int k = y; k < y + h; k++) {
@@ -732,7 +732,13 @@ bool Ball::ballIsReasonablySquare(int x, int y, int w, int h) {
         return true;
 	} else if (ratio > THINBALL && ratio < FATBALL) {
         return true;
-    } else if (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin) ||
+	} else if (ratio < BALLTOOFAT && ratio > OCCLUDEDTHIN) {
+		// check for robot occlusion
+		if (robotOccludesIt(x, y, w, h)) {
+			return true;
+		}
+	}
+	if (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin) ||
                nearImageEdgeY(y, margin) || nearImageEdgeY(y+h, margin)) {
         bool nearX = nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin);
         bool nearY = nearImageEdgeY(y, margin) || nearImageEdgeY(y+h, margin);
@@ -761,6 +767,41 @@ bool Ball::ballIsReasonablySquare(int x, int y, int w, int h) {
 		return false;
 	}
     return true;
+}
+
+/*
+ */
+bool Ball::robotOccludesIt(int x, int y, int w, int h) {
+	if (BALLDEBUG) {
+		cout << "Checking for occluded ball" << endl;
+	}
+	int count = 0;
+	if (x > 2) {
+		for (int i = y; i < y + h; i++) {
+			for (int j = x - 2; j < x; j++) {
+				if (Utility::isWhite(thresh->getThresholded(i, j))) {
+					count++;
+				}
+			}
+		}
+	}
+	if (count > h) {
+		return true;
+	}
+	count = 0;
+	if (x < IMAGE_WIDTH - 2) {
+		for (int i = y; i < y + h; i++) {
+			for (int j = x + w + 1; j < x + w + 3; j++) {
+				if (Utility::isWhite(thresh->getThresholded(i, j))) {
+					count++;
+				}
+			}
+		}
+	}
+	if (count > h) {
+		return true;
+	}
+	return false;
 }
 
 /* Returns true is the blob abuts any image edge
