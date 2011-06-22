@@ -164,13 +164,13 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (-40,6,-61,124,-35,-6),
                     (-40,-6,-61,124,-35,6),
                     (75,-10,53,74),
-                    0.8, 1, stiff.STANDUP_STIFFNESSES),
+                    0.7, 1, stiff.STANDUP_STIFFNESSES),
 
                    ((93,10,-90,-80),
                     (0,0,-60,120,-60,0),
                     (0,0,-60,120,-60,0),
                     (93,-10,90,80),
-                    0.8,1, stiff.STANDUP_STIFFNESSES),
+                    0.6,1, stiff.STANDUP_STIFFNESSES),
                    #Pull knees together
 
                    #Stands up:
