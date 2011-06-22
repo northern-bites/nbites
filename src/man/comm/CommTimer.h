@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "CommDef.h"
-
+#include "commconfig.h"
 
 class CommTimer
 {
@@ -51,7 +51,6 @@ class CommTimer
                                      // timer must be offset to be synced with the 
                                      // other robots' clocks.
     llong mark_time;
-    //std::vector<llong> team_times;
     std::vector<CommTeammatePacketInfo> teamPackets;
     unsigned int packets_checked;
     bool need_to_update;

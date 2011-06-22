@@ -29,36 +29,40 @@ CommTimer::check_packet(const CommPacketHeader &p)
   llong ts = timestamp();
 
   // INVALID TIMESTAMP
-  if (p.timestamp == GAME_INITIAL_TIMESTAMP){
-	  cout << "game init timestamp" << endl;
-	  return false;
-  }
-  // TOO OLD CHECK
-  if (p.timestamp + PACKET_GRACE_PERIOD < ts){
-	  std::cout << "too old to check. pt" << p.timestamp/1000 <<" ts: " << ts/1000 << std::endl;
-	  return false;
-  }
-
-  // OUT OF ORDER CHECK
-  /*
-  if (p.timestamp < team_times[p.player - 1]){
-	  std::cout << "out of order" << std::endl;
-	  return false;
-  }
-  */
-  // Check whether the packet number is greater than the last 
-  // packet number received for that particular teammate.
-  if(p.number < teamPackets[p.player-1].lastNumber) {
-      cout << "CommTimer::check_packet() packet received out of order!" << endl;
+  if (p.timestamp == GAME_INITIAL_TIMESTAMP)
+  {
+#ifdef COMM_DEBUG
+      cout << "CommTimer::check_packet() : Invalid timestamp, game init timestamp." << endl;
+#endif
       return false;
   }
-
+  // TOO OLD CHECK
+  if (p.timestamp + PACKET_GRACE_PERIOD < ts)
+  {
+#ifdef COMM_DEBUG
+      cout << "CommTimer::check_packet() : Packet is too old to check (pt: " << p.timestamp/1000 <<" ts: " << ts/1000 
+	   << ")." << endl;
+#endif      
+      return false;
+  }
+  // Check whether the packet number is greater than the last 
+  // packet number received for that particular teammate.
+  if(p.number < teamPackets[p.player-1].lastNumber) 
+  {
+#ifdef COMM_DEBUG  
+      cout << "CommTimer::check_packet() : Packet received out of order!" << endl;
+#endif
+      return false;
+  }
   // JUST RESET CHECK
   if (!need_to_update && ts < PACKET_GRACE_PERIOD &&
-      ts + PACKET_GRACE_PERIOD < p.timestamp){
-	  std::cout << "just reset" << std::endl;
-	  need_to_update = true;
-	  return false;
+      ts + PACKET_GRACE_PERIOD < p.timestamp)
+  {
+#ifdef COMM_DEBUG
+      cout << "CommTimer::check_packet() : Just reset." << endl;
+#endif
+      need_to_update = true;
+      return false;
   }
 
   // Packet is good!
