@@ -27,6 +27,8 @@ class HeadTracking(FSA.FSA):
         self.currentHeadScan = None
         self.headMove = None
 
+        self.goalieActiveLoc = False
+
         self.activePanDir = False
         self.activeLocOn = False
         self.activePanOut = False
@@ -45,6 +47,11 @@ class HeadTracking(FSA.FSA):
     def stopHeadMoves(self):
         """stop all head moves. In TrackingStates.py"""
         self.switchTo('stop')
+
+# ** # new method
+    def isStopped(self):
+        """Checks that all head moves have stopped"""
+        return self.currentState == 'stopped'
 
 # ** # old method - should keep
     def setNeutralHead(self):
@@ -87,13 +94,27 @@ class HeadTracking(FSA.FSA):
         self.activeLocOn = False
         self.switchTo('locPans')
 
-# ** # old method (main input method)
-    #def activeLoc(self):
-        #"""tracks the ball but periodically looks away"""
-        #self.target = self.brain.ball
-        #self.gain = 1.0
-        #if (not self.activeLocOn):
-        #    self.switchTo('activeTracking')
+# ** # old method (main input method) MODIFIED BY NBITES MASTER
+#    def activeLoc(self):
+#        """tracks the ball but periodically looks away"""
+#        self.target = self.brain.ball
+#        self.gain = 1.0
+#        self.goalieActiveLoc = False
+#        if (not self.activeLocOn):
+#            self.switchTo('activeTracking')
+#
+#    # only need to set goalieActiveLoc in this
+#    # and activeLoc because they are the only states
+#    # that directly initially call activeTracking
+
+# ** # new method MODIFIED BY NBITES MASTER
+    def activeLocGoaliePos(self):
+        """looks at the ball for shorter amount of time that activeLoc"""
+        self.target = self.brain.ball
+        self.gain = 1.0
+        self.goalieActiveLoc = True
+        if (not self.activeLocOn):
+            self.switchTo('activeTracking')
 
 # ** # old method
     def preKickScan(self):

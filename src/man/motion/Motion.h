@@ -53,20 +53,21 @@ public:
     Motion(boost::shared_ptr<Synchro> synchro,
            boost::shared_ptr<MotionEnactor> _enactor,
            boost::shared_ptr<Sensors> s,
-	   boost::shared_ptr<Profiler>p,
-	   boost::shared_ptr<NaoPose> _pose);
+           boost::shared_ptr<Profiler>p,
+           boost::shared_ptr<NaoPose> _pose);
     ~Motion();
 
     int start();
     void stop();
     void run();
     MotionInterface * getInterface(){return &interface;}
-    boost::shared_ptr<NaoPose> pose;
 private:
     MotionSwitchboard switchboard;
-    boost::shared_ptr<MotionEnactor> enactor;
     MotionInterface interface;
-	boost::shared_ptr<Profiler> profiler;
+
+    boost::shared_ptr<MotionEnactor> enactor;
+    boost::shared_ptr<Profiler> profiler;
+    boost::shared_ptr<NaoPose> pose;
 };
 
 #endif

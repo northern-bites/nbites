@@ -18,6 +18,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <iostream>
+#include <iomanip>
 using namespace std;
 
 #include <boost/shared_ptr.hpp>
@@ -39,7 +40,9 @@ using namespace NBMath;
 //#define DEBUG_ZMP_REF
 //#define DEBUG_COM_TRANSFORMS
 
-StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
+StepGenerator::StepGenerator(shared_ptr<Sensors> s,
+                             shared_ptr<NaoPose> p,
+                             const MetaGait * _gait)
   : x(0.0f), y(0.0f), theta(0.0f),
     done(true),
     sensorAngles(s,_gait),
@@ -57,7 +60,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s, const MetaGait * _gait)
     fc_Transform(CoordFrame3D::identity3D()),
     cf_Transform(CoordFrame3D::identity3D()),
     cc_Transform(CoordFrame3D::identity3D()),
-    sensors(s),gait(_gait),nextStepIsLeft(true),
+    sensors(s), pose(p), gait(_gait), nextStepIsLeft(true),
     leftLeg(s,gait,&sensorAngles,LLEG_CHAIN),
     rightLeg(s,gait,&sensorAngles,RLEG_CHAIN),
     leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),

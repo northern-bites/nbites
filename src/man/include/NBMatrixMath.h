@@ -6,6 +6,7 @@
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/lu.hpp>              // for lu_factorize
+#include "NBVector.h"
 
 namespace NBMath {
 
@@ -23,21 +24,13 @@ namespace NBMath {
         float,
         boost::numeric::ublas::row_major,
         boost::numeric::ublas::bounded_array<float,9> > ufmatrix3;
-    typedef boost::numeric::ublas::vector<
-        float, boost::numeric::ublas::bounded_array<float,3> > ufvector3;
-    typedef boost::numeric::ublas::matrix<
-        float,
-        boost::numeric::ublas::row_major,
-        boost::numeric::ublas::bounded_array<float,3> > ufrowVector3;
 
     typedef boost::numeric::ublas::matrix<
         float,
         boost::numeric::ublas::row_major,
         boost::numeric::ublas::bounded_array<float,16> > ufmatrix4;
-    typedef boost::numeric::ublas::vector<
-        float, boost::numeric::ublas::bounded_array<float,4> > ufvector4;
 
-
+    typedef boost::numeric::ublas::matrix <float> ufmatrix;
 
     const boost::numeric::ublas::matrix<float>
     invert2by2(boost::numeric::ublas::matrix<float> m);

@@ -164,6 +164,22 @@ class NaoPose {
     /********** Core Methods **********/
     void transform ();
 
+    /**
+     * Takes a pixel and the height orthogonal from the ground
+     * of the point that the pixel represents in real world
+     *
+     * @params
+     * pixelX, pixelY - the coordinates of the pixel, where 0,0
+     * is the top left corner of the image (the standard way images are
+     * mapped)
+     *
+     * objectHeight - the height of the point represented by the pixel
+     * in !!MM!!
+     *
+     * @returns
+     * an estimate of the distance to the point (and the bearing)
+     * all estimates are in CM
+     */
     const estimate pixEstimate(const int pixelX, const int pixelY,
                                const float objectHeight);
     const estimate sizeBasedEstimate(const int pixelX, const int pixelY, const float objectHeight,

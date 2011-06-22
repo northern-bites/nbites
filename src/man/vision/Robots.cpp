@@ -35,7 +35,8 @@ static const bool ROBOTSDEBUG = false;
 static const bool ROBOTSDEBUG = false;
 #endif
 
-Robots::Robots(Vision* vis, Threshold* thr, Field* fie, Context* con, int col)
+Robots::Robots(Vision* vis, Threshold* thr, Field* fie, Context* con,
+			   unsigned char col)
     : vision(vis), thresh(thr), field(fie), context(con), color(col)
 {
 	const int MAX_ROBOT_RUNS = 400;
@@ -56,7 +57,7 @@ void Robots::init()
 /* Set the primary color.  Depending on the color, we have different space needs
  * @param c        the color
  */
-void Robots::setColor(int c)
+void Robots::setColor(unsigned char c)
 {
     const int RUN_VALUES = 3;           // x, y, and h
     const int RUNS_PER_LINE = 5;
@@ -205,7 +206,7 @@ void Robots::robot(Cross* cross)
  */
 
 bool Robots::sanityChecks(Blob candidate, Cross* cross) {
-    const int blobHeightMin = 10;
+    const int blobHeightMin = 8;
     int height = candidate.height();
 	int bottom = candidate.getBottom();
     if (candidate.getRight() > 0) {
@@ -533,6 +534,8 @@ void Robots::updateRobots(int which, int index)
 			vision->navy3->updateRobot(blobs->get(index));
 		}
     }
+
+    blobs->zeroTheBlob(index);
 }
 
 /* Adds a new run to the basic data structure.

@@ -7,6 +7,8 @@
 
 #include <math.h> // for PI
 #include "NBMath.h"
+//TODO: (Octavian) THIS IS A REALLY SHITTY WAY TO ENSURE THAT THE CONFIG DEFINES
+// ARE DEFINED EVERYWHERE. BEWARE!
 #include "manconfig.h"
 #include "nameconfig.h"
 #include "visionconfig.h"
@@ -78,7 +80,8 @@ const static float MOTION_FRAME_LENGTH_S = 0.01f;
 const float MOTION_FRAME_LENGTH_uS = 1000.0f * 1000.0f * MOTION_FRAME_LENGTH_S;
 const float MOTION_FRAME_RATE = 1.0f / MOTION_FRAME_LENGTH_S;
 
-static long long micro_time (void)
+//TODO: if we ever want to time stuff offline proper, then fix the ifdefs
+static long long thread_micro_time (void)
 {
 #ifdef OFFLINE
 
@@ -96,4 +99,38 @@ static long long micro_time (void)
 #endif
 }
 
+static long long process_micro_time(void)
+{
+#ifdef OFFLINE
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
+
+#else
+
+    // Needed for microseconds which we convert to milliseconds
+    struct timespec tv;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tv);
+
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_nsec / 1000;
+#endif
+}
+
+static long long monotonic_micro_time(void)
+{
+#ifdef OFFLINE
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
+
+#else
+    // Needed for microseconds which we convert to milliseconds
+    struct timespec tv;
+    clock_gettime(CLOCK_MONOTONIC, &tv);
+
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_nsec / 1000;
+#endif
+}
 #endif // Common_h_DEFINED

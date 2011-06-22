@@ -22,7 +22,7 @@ def penaltyKickRelocalize(player):
     if my.locScore == NogginConstants.BAD_LOC and \
             player.counter < PENALTY_RELOCALIZE_FRAMES:
         return player.stay()
-    return player.goLater('scanFindBall')
+    return player.goLater('findBall')
 
 def penaltyGoalie(player):
     """
@@ -53,8 +53,7 @@ def penaltyKickShortDribble(player):
     if player.firstFrame():
         player.penaltyMadeFirstKick = True
     if transitions.shouldStopPenaltyKickDribbling(player):
-
-        if transitions.shouldStopBeforeKick(player):
+        if transitions.shouldClaimBall(player):
             return player.goLater('chase')
         elif transitions.shouldPositionForKick(player):
             return player.goLater('positionForKick')

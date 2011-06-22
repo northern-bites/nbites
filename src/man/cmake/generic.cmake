@@ -36,15 +36,24 @@ IF( APPLE )
   SET( TARGET_HOST "TARGET_HOST_MACOSX")
 ENDIF( APPLE )
 
+######## CCache
+
+if (CCACHE)
+  SET( CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
+  SET( CMAKE_CXX_COMPILER ${CCACHE})
+  SET( CMAKE_C_COMPILER_ARG1 ${CMAKE_C_COMPILER})
+  SET( CMAKE_C_COMPILER ${CCACHE})
+endif()
+
 ########################## FIND PATH
 # we should look in the naoqi sdk folder for the libraries we need first
 # so we use the same version as on the robot
-# SET( CMAKE_FIND_ROOT_PATH  ${AL_DIR} )
+SET( CMAKE_FIND_ROOT_PATH  $ENV{NBITES_DIR}/ext/ )
 
 # search for programs in the system root
-# SET( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER )
+SET( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH )
 # for libraries and headers in the nao sdk preferably, if not defaults to
 # system root
-# SET( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH )
-# SET( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH )
-# SET( CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH )
+SET( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH )
+SET( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH )
+SET( CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH )

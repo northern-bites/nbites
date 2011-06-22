@@ -30,6 +30,7 @@ private:
     void setState(SupportMode newState);
 
     const float getShoulderPitchAddition(boost::shared_ptr<Step> supportStep);
+    const float getArmScaleFromStep(boost::shared_ptr<Step> supportStep);
 
 private:
     SupportMode state;

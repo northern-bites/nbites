@@ -66,7 +66,8 @@ class Ball(VisualObject):
          self.dy,
          self.endY,
          self.lastSeenDist,
-         self.lastSeenBearing) = [0]*Constants.NUM_TOTAL_BALL_VALUES
+         self.lastSeenBearing,
+         self.heat) = [0]*Constants.NUM_TOTAL_BALL_VALUES
 
         self.updateVision(visionBall)
 
@@ -95,6 +96,7 @@ class Ball(VisualObject):
         VisualObject.updateVision(self, visionBall)
         self.elevation = visionBall.elevation
         self.confidence = visionBall.confidence
+        self.heat = visionBall.heat
 
     def updateLoc(self, loc, my):
         """
@@ -146,8 +148,9 @@ class Ball(VisualObject):
         self.relX = getRelativeX(self.dist, self.bearing)
         self.relY = getRelativeY(self.dist, self.bearing)
 
-        self.dx = self.lastRelX - self.relX
-        self.dy = self.lastRelY - self.relY
+        if not self.on:
+            self.dx = self.lastRelX - self.relX
+            self.dy = self.lastRelY - self.relY
 
         # calculation for the goalie to figure out
         # what the y value of the ball will be when it

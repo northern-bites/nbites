@@ -48,7 +48,6 @@ HeadProvider::HeadProvider(shared_ptr<Sensors> s,shared_ptr<Profiler> p)
 // Motion Provider Methods
 HeadProvider::~HeadProvider() {
     pthread_mutex_destroy(&head_provider_mutex);
-    // remove all remaining values from chain queues
 }
 
 void HeadProvider::requestStopFirstInstance() {

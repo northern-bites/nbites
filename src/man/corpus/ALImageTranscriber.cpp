@@ -143,7 +143,7 @@ void ALImageTranscriber::run()
     struct timespec interval, remainder;
     while (Thread::running) {
         //start timer
-        const long long startTime = micro_time();
+        const long long startTime = process_micro_time();
 
         if (camera_active)
             waitForImage();
@@ -157,7 +157,7 @@ void ALImageTranscriber::run()
 #endif
 
         //stop timer
-        const long long processTime = micro_time() - startTime;
+        const long long processTime = process_micro_time() - startTime;
         //sleep until next frame
 
         lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
@@ -505,7 +505,7 @@ void ALImageTranscriber::initTable(string filename)
     }
 
 #ifndef OFFLINE
-    printf("Loaded colortable %s",filename.c_str());
+    printf("Loaded colortable %s\n",filename.c_str());
 #endif
 
     fclose(fp);
@@ -541,17 +541,29 @@ void ALImageTranscriber::waitForImage ()
 
 
         if (ALimage != NULL){
-            sensors->lockImage();
+            // Synchronize noggin's information about joint angles with the motion
+            // thread's information
+            //we need to update the joint values before we copy the image
+            //since it takes a long time to copy it
+            sensors->updateVisionAngles();
 
+            sensors->lockImage();
 #ifdef CAN_SAVE_FRAMES
+#ifdef USE_MEMORY
+            sensors->setRawNaoImage(ALimage->getData());
+            ImageAcquisition::_acquire_image_fast(table, &params, const_cast<uint8_t*>(sensors->getNaoImage()), image);
+#else
             _copy_image(ALimage->getData(), naoImage);
             ImageAcquisition::acquire_image_fast(table, params,
-                                                 naoImage, image);
+                    	naoImage, image);
+#endif
 #else
             ImageAcquisition::acquire_image_fast(table, params,
                                                  ALimage->getData(), image);
 #endif
             sensors->releaseImage();
+            //we're done with the aldebaran buffer
+            this->releaseImage();
 
         } else {
             cout << "\tALImage from camera was null!!" << endl;
