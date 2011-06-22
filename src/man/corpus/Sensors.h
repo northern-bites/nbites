@@ -25,12 +25,14 @@
 #include <list>
 #include <pthread.h>
 #include <stdint.h>
+#include <boost/shared_ptr.hpp>
 
 #include "SensorDef.h"
 #include "SensorConfigs.h"
 #include "NaoDef.h"
 #include "VisionDef.h"
 #include "Provider.h"
+#include "Speech.h"
 #include "BulkMonitor.h"
 
 enum SupportFoot {
@@ -95,7 +97,7 @@ struct Inertial {
 class Sensors : public Provider{
     //friend class Man;
 public:
-    Sensors();
+    Sensors(boost::shared_ptr<Speech> s);
     ~Sensors();
 
     // Locking data retrieval methods
@@ -215,7 +217,7 @@ public:
     void stopSavingFrames();
     bool isSavingFrames() const;
 
-    // writes data collected the variance monitor to /tmp/
+    // writes data collected the variance monitor to ~/naoqi/log/
     void writeVarianceData();
 
 private:
@@ -224,6 +226,9 @@ private:
     // put the sensor data values into the variance tracker, at the correct hz
     void updateMotionDataVariance();
     void updateVisionDataVariance();
+
+    // Pointer to speech, for Sensor warnings
+    boost::shared_ptr<Speech> speech;
 
     // Locking mutexes
     mutable pthread_mutex_t angles_mutex;

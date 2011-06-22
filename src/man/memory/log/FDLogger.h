@@ -15,6 +15,7 @@
 #include <iostream>
 #include "include/io/FileFDProvider.h"
 
+namespace man {
 namespace memory {
 namespace log {
 
@@ -54,5 +55,6 @@ protected:
     int file_descriptor;
 };
 
+}
 }
 }

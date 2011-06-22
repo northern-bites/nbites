@@ -51,9 +51,9 @@ public:
             almotion = broker->getMotionProxy();
             almotion_link = true;
         } catch(AL::ALError &e){
-            cout << "Failed to initialize proxy to ALMotion!!!" << endl;
-            cout << "Please turn on 'motion' in autoload.ini and restart naoqi"
-                 << endl;
+            std::cout << "Failed to initialize proxy to ALMotion!!!" << std::endl;
+            std::cout << "Please turn on 'motion' in autoload.ini and restart naoqi"
+                 << std::endl;
             almotion_link = false;
         }
 

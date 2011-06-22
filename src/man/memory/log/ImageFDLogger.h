@@ -27,6 +27,7 @@
 #include "FDLogger.h"
 #include "memory/RoboImage.h"
 
+namespace man {
 namespace memory {
 namespace log {
 
@@ -85,5 +86,6 @@ private:
     FileOutputStream* raw_output;
 
 };
+}
 }
 }

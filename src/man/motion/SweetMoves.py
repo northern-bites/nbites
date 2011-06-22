@@ -48,28 +48,35 @@ OFF = None #OFF means the joint chain doesnt get enqueued during this motion
 INITIAL_POS = (((60.0, 35.0, 0.0, 0.0),
                 (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
                 (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
-                (60.0,-35.0, 0.0, 0.0),3.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+                (60.0,-35.0, 0.0, 0.0),
+                3.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
 NO_HEAD_INITIAL_POS = (((60.0, 35.0, 0.0, 0.0),
-                (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
-                (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
-                (60.0,-35.0, 0.0, 0.0),3.0,0,stiff.NO_HEAD_STIFFNESSES),)
+                        (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
+                        (0.0,  0.0,  -21.6, 52.13, -30.3, 0.0),
+                        (60.0,-35.0, 0.0, 0.0),
+                        3.0,0,stiff.NO_HEAD_STIFFNESSES),)
 
 #Angles measured pretty exactly from the robot w/gains off.
 #might want to make them even different if we suspect the motors are weakening
 SIT_POS = (((0.,90.,0.,0.),
             (0.,0.,-55.,125.7,-75.7,0.),
             (0.,0.,-55.,125.7,-75.7,0.),
-            (0.,-90.,0.,0.),3.0,0,stiff.LOW_HEAD_STIFFNESSES),
+            (0.,-90.,0.,0.),
+            3.0,0,stiff.LOW_HEAD_STIFFNESSES),
+
            ((90.,0.,-65.,-57.),
             (0.,0.,-55.,125.7,-75.7,0.),
             (0.,0.,-55.,125.7,-75.7,0.),
-            (90.,0.,65.,57.),1.5,0,stiff.LOW_LEG_STIFFNESSES))
+            (90.,0.,65.,57.),
+            1.5,0,stiff.LOW_LEG_STIFFNESSES))
 
 ZERO_POS = (((0.,0.,0.,0.),
              (0.,0.,0.,0.,0.),
              (0.,0.,0.,0.,0.,0.),
-             (0.,0.,0.,0.),4.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+             (0.,0.,0.,0.),
+             4.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+
 PENALIZED_POS = INITIAL_POS
 
 SET_POS = INITIAL_POS
@@ -91,74 +98,87 @@ GOALIE_POS = ((INITIAL_POS[0][0],
 STAND_UP_FRONT = ( ((90,50,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (90,-50,0,0 ),0.5,0, stiff.STANDUP_STIFFNESSES ),
+                    (90,-50,0,0 ),
+                    0.5,0, stiff.STANDUP_STIFFNESSES ),
 
                    ((90,90,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (90,-90,0,0 ),0.5,0, stiff.STANDUP_STIFFNESSES ),
+                    (90,-90,0,0 ),
+                    0.5,0, stiff.STANDUP_STIFFNESSES ),
 
                    ((-90,90,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (-90,-90,0,0 ),0.5,0, stiff.STANDUP_STIFFNESSES ),
+                    (-90,-90,0,0 ),
+                    0.5,0, stiff.STANDUP_STIFFNESSES ),
 
                    ((-90,0,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (-90,0,0,0 ),0.7,0, stiff.STANDUP_STIFFNESSES ),
+                    (-90,0,0,0 ),
+                    0.7,0, stiff.STANDUP_STIFFNESSES ),
 
                    ((-90,0,-90,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
-                    (-90,0,90,0 ),0.3,0, stiff.STANDUP_STIFFNESSES ),
+                    (-90,0,90,0 ),
+                    0.3,0, stiff.STANDUP_STIFFNESSES ),
                    #All of the above basically position the arms
 
                    ((-50,0,-90,-35),
                     (5,8,-90,120,-65,0),
                     (5,0,-90,120,-65,4),
-                    (-50,0,90,35),1.3,0, stiff.STANDUP_STIFFNESSES),
+                    (-50,0,90,35),
+                    1.3,0, stiff.STANDUP_STIFFNESSES),
 
                    ((25,20,-60,-88),
                     (-50,0,-90,70,-44,-39),
                     (-50,0,-90,70,-44,39),
-                    (25,-20,60,88),0.7,0, stiff.STANDUP_STIFFNESSES),
+                    (25,-20,60,88),
+                    0.7,0, stiff.STANDUP_STIFFNESSES),
                    #Bring arms out to avoid stuck elbows
 
                    ((25,0,-90,-88),
                     (-50,0,-90,70,-44,-39),
                     (-50,0,-90,70,-44,39),
-                    (25,0,90,88),0.5,0, stiff.STANDUP_STIFFNESSES),
+                    (25,0,90,88),
+                    0.5,0, stiff.STANDUP_STIFFNESSES),
                    #Squatting, supported by hands
 
                    ((0,0,-90,-8),
                     (-50,8,-90,58,5,-31),
                     (-50,0,-90,58,5,31),
-                    (0,0,90,8),1.1,0, stiff.STANDUP_STIFFNESSES),
+                    (0,0,90,8),
+                    1.1,0, stiff.STANDUP_STIFFNESSES),
                    #Push back onto feet
 
                    ((35,2,-14,-41),
                     (-50,5,-90,123,-13,-5),
                     (-50,-5,-90,123,-13,5),
-                    (35,2,14,41),1.5, 0, stiff.STANDUP_STIFFNESSES),
+                    (35,2,14,41),
+                    1.5, 0, stiff.STANDUP_STIFFNESSES),
                    #Rock back to squatting upright
 
                    ((75,10,-53,-74),
                     (-40,6,-61,124,-35,-6),
                     (-40,-6,-61,124,-35,6),
-                    (75,-10,53,74),0.8, 0, stiff.STANDUP_STIFFNESSES),
+                    (75,-10,53,74),
+                    0.8, 0, stiff.STANDUP_STIFFNESSES),
 
                    ((93,10,-90,-80),
                     (0,0,-60,120,-60,0),
                     (0,0,-60,120,-60,0),
-                    (93,-10,90,80),0.8,0, stiff.STANDUP_STIFFNESSES),
+                    (93,-10,90,80),
+                    0.8,0, stiff.STANDUP_STIFFNESSES),
                    #Pull knees together
 
                    #Stands up:
                    ( INITIAL_POS[0][0],
                      INITIAL_POS[0][1],
                      INITIAL_POS[0][2],
-                     INITIAL_POS[0][3],1.0,0, stiff.STANDUP_STIFFNESSES))
+                     INITIAL_POS[0][3],
+                     1.0,0, stiff.STANDUP_STIFFNESSES))
 
 
 STAND_UP_BACK = (((100,0,0,0),
@@ -221,21 +241,27 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-30.23,-10.19,-35.86,122.78,-67.68,8.44),
                   (-30.23,-26.72,-70.78,54.41,34.99,19.69),
                   (54.85,-45.62,-0.27,24.35),
-                  1.0,0, stiff.STANDUP_STIFFNESSES),
+                  0.4,1, stiff.STANDUP_STIFFNESSES),
                  #pulls right leg in a little
 
-                 ((42,28,4,-46),
-                  (-20.04,12.40,-56.95,122.78,-56.08,-6.94),
-                  (-20.04,-0.96,-43.60,121,-62.93,2.64),
-                  (51,-39,0,32),
-                  1.0,1, stiff.STANDUP_STIFFNESSES),
-                 #pulls right leg in
+                 ((35,2,-14,-41),
+                  (-50,5,-90,123,-13,-5),
+                  (-50,-5,-90,123,-13,5),
+                  (35,2,14,41),
+                  0.6, 1, stiff.STANDUP_STIFFNESSES),
+                   #Rock back to squatting upright
+
+                 ((75,10,-53,-74),
+                  (-40,6,-61,124,-35,-6),
+                  (-40,-6,-61,124,-35,6),
+                  (75,-10,53,74),
+                  0.4, 1, stiff.STANDUP_STIFFNESSES),
 
                  ((93,10,-90,-80),
                   (0,0,-60,120,-60,0),
                   (0,0,-60,120,-60,0),
                   (93,-10,90,80),
-                  0.8,0, stiff.STANDUP_STIFFNESSES),
+                  0.4,1, stiff.STANDUP_STIFFNESSES),
                  #Pull knees together
 
                  #stands up
@@ -243,7 +269,7 @@ STAND_UP_BACK = (((100,0,0,0),
                   INITIAL_POS[0][1],
                   INITIAL_POS[0][2],
                   INITIAL_POS[0][3],
-                  0.4,0, stiff.STANDUP_STIFFNESSES)
+                  0.6,0, stiff.STANDUP_STIFFNESSES)
                  )
 
 #**********************
@@ -255,32 +281,38 @@ STAND_UP_BACK = (((100,0,0,0),
 SAVE_LEFT_DEBUG = ( ((-90,0,0,0),
                      (GOALIE_POS[0][1]),
                      (GOALIE_POS[0][2]),
-                     (GOALIE_POS[0][3]), .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+                     (GOALIE_POS[0][3]), 
+                     .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_RIGHT_DEBUG = ( ((GOALIE_POS[0][0]),
                       (GOALIE_POS[0][1]),
                       (GOALIE_POS[0][2]),
-                      (-90,0,0,0), .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+                      (-90,0,0,0), 
+                      .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_CENTER_DEBUG = ( ((-90,0,0,0),
                        (GOALIE_POS[0][1]),
                        (GOALIE_POS[0][2]),
-                       (-90,0,0,0), .5,0, stiff.NORMAL_STIFFNESSES), )
+                       (-90,0,0,0), 
+                       .5,0, stiff.NORMAL_STIFFNESSES), )
 
 SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0),
                           (GOALIE_POS[0][1]),
                           (GOALIE_POS[0][2]),
-                          (GOALIE_POS[0][3]), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+                          (GOALIE_POS[0][3]), 
+                          0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_RIGHT_HOLD_DEBUG = ( ((GOALIE_POS[0][0]),
                            (GOALIE_POS[0][1]),
                            (GOALIE_POS[0][2]),
-                           (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+                           (-90,0,0,0), 
+                           0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0),
                             (GOALIE_POS[0][1]),
                             (GOALIE_POS[0][2]),
-                            (-90,0,0,0), 0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
+                            (-90,0,0,0), 
+                            0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 GOALIE_SAVE = (
     #shoulder pitch, shoulder roll, elbow yaw, elbow roll
@@ -415,6 +447,7 @@ GOALIE_SQUAT_STRAFE_RIGHT = ( ((-90., 90., 0., 0.),
                                (-90., -50., -75., 90, 30, 20.),
                                (-90., -90., 0., 0.),
                                1.5, 0, stiff.LOW_HEAD_STIFFNESSES),
+
                               ((-90., 90., 0., 0.),
                                (-90., 50., -75., 125.7, -10., -20.),
                                (-90., -50., -75., 40, 40, 20.),
@@ -425,22 +458,26 @@ GOALIE_STAND_UP = (
     ((35,2,-14,-41),
      (-55,5,-90,123,-17,-17),
      (-55,-5,-90,123,-17,17),
-     (35,2,14,41),0.8, 0, stiff.STANDUP_STIFFNESSES),
+     (35,2,14,41),
+     0.8, 0, stiff.STANDUP_STIFFNESSES),
 
     ((75,10,-53,-74),
      (-40,6,-61,124,-35,-6),
      (-40,-6,-61,124,-35,6),
-     (75,-10,53,74),1.2, 0, stiff.STANDUP_STIFFNESSES),
+     (75,-10,53,74),
+     1.2, 0, stiff.STANDUP_STIFFNESSES),
 
     ((93,10,-90,-80),
      (0,0,-60,120,-60,0),
      (0,0,-60,120,-60,0),
-     (93,-10,90,80),1.0,0, stiff.STANDUP_STIFFNESSES),
+     (93,-10,90,80),
+     1.0,0, stiff.STANDUP_STIFFNESSES),
 
     ( INITIAL_POS[0][0],
       INITIAL_POS[0][1],
       INITIAL_POS[0][2],
-      INITIAL_POS[0][3],1.0,0, stiff.STANDUP_STIFFNESSES))
+      INITIAL_POS[0][3],
+      1.0,0, stiff.STANDUP_STIFFNESSES))
 
 
 #**********************
@@ -520,12 +557,14 @@ STAND_FOR_KICK_LEFT = (
     ((80.,90.,-50.,-70.),
      (0.,0.,-10.,20.,-10.,0.),
      (0.,0.,-10.,20.,-10.,0.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     2.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
     #swing to the right
     ((80.,40.,-50.,-70.),
      (0.,20.,-10.,20.,-10.,-20.),
      (0.,23.,-13.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES) )
+     (80.,-40.,50.,70.),
+     2.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES) )
 
 # NEEDS 0.4 value for right leg
 LEFT_FAR_KICK = (
@@ -533,36 +572,49 @@ LEFT_FAR_KICK = (
     ((80.,40.,-50.,-70.),
      (0.,0.,-15.,20.,-10.,0.),
      (0.,0.,-15.,20.,-10.,0.),
-     (80.,-40.,50.,70.),0.8,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     ((80.,40.,-50.,-70.),
      (0.,15.,-10.,20.,-10.,-20.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),0.8,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     # Lift leg leg
     ((80.,40.,-50.,-70.),
      (0.,15.,-45.,85.,-40.,-20.),
      (0.,15.,-12.,16.,-10.,-20.),
-     (80.,-40.,50.,70.),0.8,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     # kick left leg
     ((80.,40.,-50.,-70.),
      (0.,15.,-60.,41.,-8.,-20.),
      (0.,15.,-10.,30.,-10.,-20.),
-     (80.,-40.,50.,70.),0.11,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.11,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
     # unkick foot
     ((80.,40.,-50.,-70.),
      (0.,15.,-45.,85.,-40.,-10.),
      (0.,15.,-12.,16.,-10.,-20.),
-     (80.,-40.,50.,70.),0.2,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.2,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     # put foot down
     ((80.,40.,-50.,-70.),
      (0.,15.,-22,42.,-20,-10.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),1.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     1.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     #swing to normal
     ((80.,40.,-50.,-70.),
      (0.,15.,-12.5,25.,-12.5,-20.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),0.7,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.7,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     ((80.,40.,-50.,-70.),
      (0.,0.,-15.,20.,-10.,0.),
      (0.,0.,-15.,20.,-10.,0.),
@@ -574,42 +626,50 @@ RIGHT_FAR_KICK = (
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),
      (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),
-     (80.0 , -40.0 , 50.0 , 70.0), 0.8 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
+     (80.0 , -40.0 , 50.0 , 70.0),
+     0.8 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -15.0 , -10.0 , 20.0 , -10.0 , 20.0),
      (0.0 , -15.0 , -10.0 , 20.0 , -10.0 , 20.0),
-     (80.0 , -40.0 , 50.0 , 70.0), 0.8 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES ),
+     (80.0 , -40.0 , 50.0 , 70.0),
+     0.8 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES ),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -15.0 , -12.0 , 16.0 , -10.0 , 20.0),
      (0.0 , -15.0 , -45.0 , 85.0 , -40.0 , 20.0),
-     (80.0 , -40.0 , 50.0 , 70.0), 0.8 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
+     (80.0 , -40.0 , 50.0 , 70.0),
+     0.8 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -15.0 , -10.0 , 30.0 , -10.0 , 20.0),
      (0.0 , -15.0 , -60.0 , 41.0 , -8.0 , 20.0),
-     (80.0 , -40.0 , 50.0 , 70.0), 0.11 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
+     (80.0 , -40.0 , 50.0 , 70.0),
+     0.11 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -15.0 , -12.0 , 16.0 , -10.0 , 20.0),
      (0.0 , -15.0 , -45.0 , 85.0 , -40.0 , 10.0),
-     (80.0 , -40.0 , 50.0 , 70.0), 0.2 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
+     (80.0 , -40.0 , 50.0 , 70.0),
+     0.2 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -15.0 , -10.0 , 20.0 , -10.0 , 20.0),
      (0.0 , -15.0 , -22.0 , 42.0 , -20.0 , 10.0),
-     (80.0 , -40.0 , 50.0 , 70.0), 1.0 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
+     (80.0 , -40.0 , 50.0 , 70.0),
+     1.0 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -15.0 , -10.0 , 20.0 , -10.0 , 20.0),
      (0.0 , -15.0 , -12.5 , 25.0 , -12.5 , 20.0),
-     (80.0 , -40.0 , 50.0 , 70.0), 0.7 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
+     (80.0 , -40.0 , 50.0 , 70.0),
+     0.7 , 0, stiff.RIGHT_FAR_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),
      (0.0 , -0.0 , -15.0 , 20.0 , -10.0 , -0.0),
-     (80.0 , -40.0 , 50.0 , 70.0), 1.0 , 0, stiff.LOW_HEAD_STIFFNESSES) )
+     (80.0 , -40.0 , 50.0 , 70.0),
+     1.0 , 0, stiff.LOW_HEAD_STIFFNESSES) )
 
 DREW_LEFT_SIDE_KICK = (
     # lean right
@@ -683,56 +743,66 @@ LEFT_SIDE_KICK = (
     ((80.,40.,-50.,-70.),
      (0.,20.,-10.,20.,-10.,-20.),
      (0.,16.,-13.,20.,-10.,-22.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
-    (2, (0.,40.,-30.,70.,-32.,-20.), 0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
-    (2, (0.,40.,-50.,30.,20.,0.), 0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+    (2, (0.,40.,-30.,70.,-32.,-20.),0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    (2, (0.,40.,-50.,30.,20.,0.),0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     ((80.,70.,-10.,-10.),
      (0.,9.,-60.,30.,23.,0.),
      (0.,23.,-13.,20.,-10.,-25.),
-     (80.,-40.,50.,70.),0.2,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.2,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     ((80.,70.,-10.,-10.),
      (0.,23.,-13.,20.,-10.,-25.),
      (0.,20.,-13.,20.,-10.,-25.),
-     (80.,-40.,50.,70.),0.8,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     ((80.,90.,-50.,-70.),
      (0.,0.,-10.,20.,-10.,0.),
      (0.,0.,-10.,20.,-10.,0.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES) )
+     (80.,-40.,50.,70.),
+     2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES) )
 
 
 RIGHT_SIDE_KICK = (
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -0.0 , -10.0 , 20.0 , -10.0 , -0.0),
      (0.0 , -0.0 , -10.0 , 20.0 , -10.0 , -0.0),
-     (80.0 , -90.0 , 50.0 , 70.0), 2.0 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
+     (80.0 , -90.0 , 50.0 , 70.0),
+     2.0 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -16.0 , -13.0 , 20.0 , -10.0 , 22.0),
      (0.0 , -20.0 , -10.0 , 20.0 , -10.0 , 20.0),
-     (80.0 , -40.0 , 50.0 , 70.0), 2.0 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
+     (80.0 , -40.0 , 50.0 , 70.0),
+     2.0 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
 
-    (3, (0.,-40.,-30.,70.,-32.,20.), 0.4 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
-    (3, (0.,-40.,-50.,30.,20.,0.), 0.4 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
+    (3, (0.,-40.,-30.,70.,-32.,20.),0.4 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
+    (3, (0.,-40.,-50.,30.,20.,0.),0.4 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
 
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -23.0 , -13.0 , 20.0 , -10.0 , 25.0),
      (0.0 , -9.0 , -60.0 , 30.0 , 23.0 , -0.0),
-     (80.0 , -70.0 , 10.0 , 10.0), 0.2 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
+     (80.0 , -70.0 , 10.0 , 10.0),
+     0.2 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , -20.0 , -13.0 , 20.0 , -10.0 , 25.0),
      (0.0 , -23.0 , -13.0 , 20.0 , -10.0 , 25.0),
-     (80.0 , -70.0 , 10.0 , 10.0), 0.8 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
+     (80.0 , -70.0 , 10.0 , 10.0),
+     0.8 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
 
     ((80.0 , 40.0 , -50.0 , -70.0),
      (0.0 , 0.0 , -10.0 , 20.0 , -10.0 , -0.0),
      (0.0 , 0.0 , -10.0 , 20.0 , -10.0 , -0.0),
-     (80.0 , -90.0 , 50.0 , 70.0), 2.0 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES) )
+     (80.0 , -90.0 , 50.0 , 70.0),
+     2.0 , 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES) )
 
 LEFT_LONG_BACK_KICK = (
 
@@ -770,9 +840,6 @@ LEFT_LONG_BACK_KICK = (
      (0.,5.,-38.,76.,-40.,-16.5),
      (80.,-40.,50.,70.),
      .2 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
-
-
-
 
     # # #Lift left leg up a bit
     # ((90.,50.,-50.,-40.),
@@ -817,45 +884,62 @@ LEFT_BIG_KICK = (
     ((80.,40.,-50.,-70.),
      (0.,0.,-15.,20.,-10.,0.),
      (0.,0.,-15.,20.,-10.,0.),
-     (80.,-40.,50.,70.),0.8,0, stiff.NORMAL_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.NORMAL_STIFFNESSES),
+
     ((80.,40.,-50.,-70.),
      (0.,15.,-10.,20.,-10.,-20.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),0.8,0, stiff.NORMAL_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.NORMAL_STIFFNESSES),
+
     # Lift leg leg
     ((80.,40.,-50.,-70.),
      (0.,15.,-45.,85.,-40.,-20.),
      (0.,15.,-12.,16.,-10.,-20.),
-     (80.,-40.,50.,70.),0.8,0, stiff.NORMAL_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.NORMAL_STIFFNESSES),
+
     #cock left leg
     ((20.,40.,0.,0.),
      (0.,15.,-22.,120.,0.,-20.),
      (0.,15.,-12.,16.,-10.,-20.),
-     (100.,-40.,0.,0.),0.8,0, stiff.NORMAL_STIFFNESSES),
+     (100.,-40.,0.,0.),
+     0.8,0, stiff.NORMAL_STIFFNESSES),
+
     # kick left leg
     ((50.,40.,0.,0.),
      (0.,15.,-80.,60.,-20.,-20.),
      (0.,15.,-22.,30.,-10.,-20.),
-     (20.,-40.,0.,0.),0.18,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (20.,-40.,0.,0.),
+     0.18,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     # unkick foot
     ((80.,40.,-50.,-70.),
      (0.,15.,-45.,85.,-40.,-10.),
      (0.,15.,-12.,16.,-10.,-20.),
-     (80.,-40.,50.,70.),1.5,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     1.5,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     # put foot down
     ((80.,40.,-50.,-70.),
      (0.,15.,-22,42.,-20,-10.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),1.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     1.0,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     #swing to normal
     ((80.,40.,-50.,-70.),
      (0.,15.,-12.5,25.,-12.5,-20.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),0.7,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.7,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     ((80.,40.,-50.,-70.),
      (0.,0.,-15.,20.,-10.,0.),
      (0.,0.,-15.,20.,-10.,0.),
-     (80.,-40.,50.,70.),1.0,0, stiff.LOW_HEAD_STIFFNESSES)
+     (80.,-40.,50.,70.),
+     1.0,0, stiff.LOW_HEAD_STIFFNESSES)
     )
 
 RIGHT_BIG_KICK = mirrorMove(LEFT_BIG_KICK)
@@ -864,19 +948,27 @@ SHORT_QUICK_LEFT_KICK = (
     ((90,15,0,0),
      (0.,0.,-15.,20.,-10.,0.),
      (0.,0.,-15.,20.,-10.,0.),
-     (90,-15,0,0),0.4,0, stiff.LOW_HEAD_STIFFNESSES),
+     (90,-15,0,0),
+     0.4,0, stiff.LOW_HEAD_STIFFNESSES),
+
     ((90,15,0,0),
      (0.,15.,-25.,50.,-20.,-20.),
      (0.,17.,-15.,20.,-10.,-20.),
-     (90,-15,0,0),0.8,0, stiff.LOW_HEAD_STIFFNESSES),
+     (90,-15,0,0),
+     0.8,0, stiff.LOW_HEAD_STIFFNESSES),
+
     ((90,15,0,0),
      (0.,15.,-45.,20.,-20.,-20.),
      (0.,16.,-15.,20.,-8.,-20.),
-     (90,-15,0,0),0.08,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     (90,-15,0,0),
+     0.08,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+
     ((90,15,0,0),
      (0.,15.,-25.,50.,-25.,-20.),
      (0.,15.,-10.,20.,-10.,-20.),
-     (90,-15,0,0),0.3,0, stiff.LOW_HEAD_STIFFNESSES),
+     (90,-15,0,0),
+     0.3,0, stiff.LOW_HEAD_STIFFNESSES),
+
     ((90,15,0,0),
      (0.,0.,-15.,20.,-10.,0.),
      (0.,0.,-15.,20.,-10.,0.),
@@ -889,12 +981,14 @@ SHORT_LEFT_SIDE_KICK = (
     ((80.,90.,-50.,-70.),
      (0.,0.,-10.,20.,-10.,0.),
      (0.,0.,-10.,20.,-10.,0.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     ((80.,40.,-50.,-70.),
      (0.,20.,-10.,20.,-10.,-20.),
      (0.,16.,-13.,20.,-10.,-22.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     (2, (0.,40.,-30.,70.,-32.,-20.), 0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
     (2, (0.,40.,-50.,30.,20.,0.), 0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
@@ -902,27 +996,33 @@ SHORT_LEFT_SIDE_KICK = (
     ((80.,70.,-10.,-10.),
      (0.,26.,-60.,30.,23.,0.),
      (0.,23.,-13.,20.,-10.,-25.),
-     (80.,-40.,50.,70.),0.2,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.2,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     ((80.,70.,-10.,-10.),
      (0.,23.,-13.,20.,-10.,-25.),
      (0.,20.,-13.,20.,-10.,-25.),
-     (80.,-40.,50.,70.),0.8,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     ((80.,90.,-50.,-70.),
      (0.,0.,-10.,20.,-10.,0.),
      (0.,0.,-10.,20.,-10.,0.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES) )
+     (80.,-40.,50.,70.),
+     2.0,0, stiff.LEFT_SIDE_KICK_STIFFNESSES) )
 
 SHORT_RIGHT_SIDE_KICK = (
     ((80.0, 40.0, -50.0, -70.0),
      (0.0, -0.0, -10.0, 20.0, -10.0, -0.0),
      (0.0, -0.0, -10.0, 20.0, -10.0, -0.0),
-     (80.0, -90.0, 50.0, 70.0), 2.0, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES ),
+     (80.0, -90.0, 50.0, 70.0),
+     2.0, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES ),
+
     ((80.0, 40.0, -50.0, -70.0),
      (0.0, -16.0, -13.0, 20.0, -10.0, 22.0),
      (0.0, -20.0, -10.0, 20.0, -10.0, 20.0),
-     (80.0, -40.0, 50.0, 70.0), 2.0, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES ),
+     (80.0, -40.0, 50.0, 70.0),
+     2.0, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES ),
 
     (3, (0.,-40.,-30.,70.,-32.,20.), 0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
     (3, (0.,-40.,-50.,30.,20.,0.), 0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
@@ -930,23 +1030,30 @@ SHORT_RIGHT_SIDE_KICK = (
     ((80.0, 40.0, -50.0, -70.0),
      (0.0, -23.0, -13.0, 20.0, -10.0, 25.0),
      (0.0, -26.0, -60.0, 30.0, 23.0, -0.0),
-     (80.0, -70.0, 10.0, 10.0), 0.2, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
+     (80.0, -70.0, 10.0, 10.0),
+     0.2, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES),
+
     ((80.0, 40.0, -50.0, -70.0),
      (0.0, -20.0, -13.0, 20.0, -10.0, 25.0),
      (0.0, -23.0, -13.0, 20.0, -10.0, 25.0),
-     (80.0, -70.0, 10.0, 10.0), 0.8, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES ),
+     (80.0, -70.0, 10.0, 10.0),
+     0.8, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES ),
+
     ((80.0, 40.0, -50.0, -70.0),
      (0.0, -0.0, -10.0, 20.0, -10.0, -0.0),
      (0.0, -0.0, -10.0, 20.0, -10.0, -0.0),
-     (80.0, -90.0, 50.0, 70.0), 2.0, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES))
+     (80.0, -90.0, 50.0, 70.0),
+     2.0, 0, stiff.RIGHT_SIDE_KICK_STIFFNESSES))
 
 LEARN_KICK_LEFT = (
     ((80.,90.,-50.,-70.),
      (0.,0.,-10.,20.,-10.,0.),
      (0.,0.,-10.,20.,-10.,0.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEARN_MOTION_STIFFNESSES),
+     (80.,-40.,50.,70.),
+     2.0,0, stiff.LEARN_MOTION_STIFFNESSES),
     #swing to the right
     ((80.,40.,-50.,-70.),
      (0.,20.,-10.,20.,-10.,-20.),
      (0.,23.,-13.,20.,-10.,-20.),
-     (80.,-40.,50.,70.),2.0,0, stiff.LEARN_MOTION_STIFFNESSES) )
+     (80.,-40.,50.,70.),
+     2.0,0, stiff.LEARN_MOTION_STIFFNESSES) )
