@@ -1,7 +1,4 @@
 
-########################## DEFINES & DEFINITIONS
-SET( STRAIGHT_BUILD ON )
-
 ########################## PLATFORM
 IF( WIN32 )
   SET( TARGET_ARCH "windows" )
