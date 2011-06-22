@@ -80,7 +80,6 @@ class HeadTracking(FSA.FSA):
     def spinFindBall(self):
         """Assumes robot is spinning and looking for ball."""
         """Scans along side robot is spinning to."""
-        self.activeLocOn = False
         self.switchTo('spinningPan')
 
 # ** # old method
@@ -90,12 +89,12 @@ class HeadTracking(FSA.FSA):
         self.switchTo('locPans')
 
 # ** # old method (main input method)
-    def activeLoc(self):
-        """tracks the ball but periodically looks away"""
-        self.target = self.brain.ball
-        self.gain = 1.0
-        if (not self.activeLocOn):
-            self.switchTo('activeTracking')
+    #def activeLoc(self):
+        #"""tracks the ball but periodically looks away"""
+        #self.target = self.brain.ball
+        #self.gain = 1.0
+        #if (not self.activeLocOn):
+        #    self.switchTo('activeTracking')
 
 # ** # old method
     def preKickScan(self):
@@ -185,9 +184,22 @@ class HeadTracking(FSA.FSA):
 # ** # new method
     def readyLoc(self):
         self.target = None
-        self.switchTo('readyLoc')
+        self.decisionState = 'trackLandmarks'
+        self.switchTo('trackLandmarks')
 
 # ** # new method
     def trackBall(self):
         self.target = self.brain.ball
         self.switchTo('trackingBall')
+
+# ** # new method
+    def passiveLoc(self):
+        self.target = None
+        self.decisionState = 'passiveLoc'
+        self.switchTo('passiveLoc')
+
+# ** # new method
+    def activeLoc(self):
+        self.target = None
+        self.decisionState = 'activeLoc'
+        self.switchTo('activeLoc')

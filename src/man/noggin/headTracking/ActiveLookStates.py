@@ -1,4 +1,5 @@
 from . import TrackingConstants as constants
+from .. import NogginConstants
 import man.motion.HeadMoves as HeadMoves
 
 TIME_TO_LOOK_TO_TARGET = 1.0
@@ -80,12 +81,11 @@ def targetTracking(tracker):
     return tracker.stay()
 
 # ** # new method
-def readyLoc(tracker):
+def trackLandmarks(tracker):
     """
     Assumes the robot is in the "ready" state.
     Looks at nearby landmarks for localization.
     """
-    tracker.decisionState = 'readyLoc'
     #update tracking fitness of locObjects
     for obj in tracker.locObjectList:
         tracker.helper.updateGeneralTrackingFitness(obj)
@@ -101,7 +101,7 @@ def readyLoc(tracker):
 
     #Assert: no change in list order
 
-    #check for no target (first pass in readyLoc state)
+    #check for no target (first pass in trackLandmarks state)
     if tracker.target is None:
         tracker.target = tracker.locObjectList[0]
 
@@ -150,3 +150,47 @@ def trackingBallLoc(tracker):
 
     # Track target
     return tracker.goLater('trackLoc')
+
+# ** # new method
+def passiveLoc(tracker):
+    """
+    Assumes robot is in 'set'.
+    Looks at nearby landmarks until sufficiently localized,
+    Then looks to center of field for ball.
+    """
+    my = tracker.brain.my
+    if my.locScoreXY == NogginConstants.GOOD_LOC and \
+            my.locScoreTheta == NogginConstants.GOOD_LOC:
+        print "I am sure about my position. Now looking to the ball."
+        # Set ball position to center of field.
+        tracker.target = tracker.brain.ball
+        tracker.target.x = 370
+        tracker.target.y = 270
+        tracker.helper.lookToTargetCoords(tracker.target)
+        return tracker.goLater('neutralHead')# ** # debugging
+        #return tracker.stay()
+
+    # Not confident enough about position:
+    # check next landmark.
+    return tracker.goLater('trackLandmarks')
+
+# ** # new method
+def activeLoc(tracker):
+    """
+    Intended for field players who are not chaser.
+    Check nearby landmarks until localization is good enough,
+    then look at the ball while localization remains good.
+    """
+    # Make sure head is stopped
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+
+    my = tracker.brain.my
+    if my.locScoreXY == NogginConstants.GOOD_LOC and \
+            my.locScoreTheta == NogginConstants.GOOD_LOC:
+        # If localization is good, look to the ball
+        print "I am sure about my position. Now checking ball."
+        return tracker.goLater('checkBall')
+
+    # If localization not good enough, check landmarks
+    return tracker.goLater('trackLandmarks')

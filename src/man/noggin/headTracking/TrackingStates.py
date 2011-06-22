@@ -156,8 +156,10 @@ def trackingBall(tracker):
 
     # assert: tracker.target is the ball
 
-    # look to the ball for TRACKER_BALL_STARE_THRESH frames
-    tracker.helper.lookToTargetAngles(tracker.target)
+    # Look to the ball for TRACKER_BALL_STARE_THRESH frames
+    # If ball is lost on frame, do nothing.
+    if tracker.target.on:
+        tracker.helper.lookToTargetAngles(tracker.target)
 
     if tracker.counter > constants.TRACKER_BALL_STARE_THRESH:
         print "Past stare thresh for ball, looking for landmarks"

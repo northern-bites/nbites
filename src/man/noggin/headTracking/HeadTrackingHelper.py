@@ -164,7 +164,7 @@ class HeadTrackingHelper(object):
         """
         locObj.trackingFitness = target.bearing - locObj.bearing
         #if bearing is unusable, set fitness to auto fail
-        if (fabs(locObj.bearing) > constants.BEARING_THRESHOLD:
+        if fabs(locObj.bearing) > constants.BEARING_THRESHOLD:
                 locObj.trackingFitness = constants.FITNESS_THRESHOLD+1
 
 # ** # new method

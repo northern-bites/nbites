@@ -79,6 +79,22 @@ def locPans(tracker):
 
     return tracker.stay()
 
+# ** # new method
+def checkBall(tracker):
+    """
+    If ball not on frame, look to current ball coordinates.
+    If ball is on frame, track it via angles.
+    """
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.target = tracker.brain.ball
+
+    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        tracker.helper.lookToTargetAngles()
+    elif tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+        tracker.helper.lookToTargetCoords()
+    return tracker.stay()
+
 # ** # old method
 def panLeftOnce(tracker):
     if tracker.firstFrame():
