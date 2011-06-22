@@ -10,9 +10,7 @@
 #include "MemoryMacros.h"
 #include "MMotionSensors.h"
 
-//TODO: remove this
-#include "NaoPaths.h"
-
+namespace man {
 namespace memory {
 
 using boost::shared_ptr;
@@ -67,4 +65,5 @@ void MMotionSensors::update() {
     this->set_support_foot(sensors->getSupportFoot());
 }
 
+}
 }

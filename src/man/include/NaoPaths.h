@@ -10,18 +10,27 @@
 #ifndef _NAOPATHS_H_
 #define _NAOPATHS_H_
 
+#include <string>
+
+namespace man {
+namespace include {
+namespace paths {
+
 #ifdef OFFLINE
 
-#define NAO_HOME_DIR "~/"
-#define NAO_NAOQI_DIR NAO_HOME_DIR "/naoqi"
-#define NAO_LOG_DIR NAO_NAOQI_DIR "/log"
+static const std::string NAO_HOME_DIR = "~/";
 
 #else
 
-#define NAO_HOME_DIR "/home/nao"
-#define NAO_NAOQI_DIR NAO_HOME_DIR "/naoqi"
-#define NAO_LOG_DIR NAO_NAOQI_DIR "/log"
+static const std::string NAO_HOME_DIR = "/home/nao";
 
 #endif
 
+static const std::string NAO_NAOQI_DIR = NAO_HOME_DIR + "/naoqi";
+static const std::string NAO_LOG_DIR = NAO_NAOQI_DIR + "/log";
+
 #endif
+
+}
+}
+}

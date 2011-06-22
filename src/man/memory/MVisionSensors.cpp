@@ -7,11 +7,10 @@
 #include "Common.h" //for micro_time
 #include "MemoryMacros.h"
 #include "MVisionSensors.h"
-//TODO: remove this
-#include "NaoPaths.h"
 
 #include <vector>
 
+namespace man {
 namespace memory {
 
 using boost::shared_ptr;
@@ -49,5 +48,6 @@ void MVisionSensors::update() {
     this->set_battery_current(sensors->getBatteryCurrent());
 
     //std::cout << this->DebugString() << std::endl;
+}
 }
 }

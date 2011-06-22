@@ -61,8 +61,8 @@ const std::string fsrNames[] = {
 
 // names of different sensors (for variance monitoring)
 const std::string sensorNames[] = {
-    "accX", "accY", "accZ", "gyroX", "gyroY", "angleX", "angleY",
-    "sonarLeft", "sonarRight"
+    "acc_X", "acc_Y", "acc_Z", "gyro_X", "gyro_Y", "angle_X", "angle_Y",
+    "sonar_Left", "sonar_Right"
 };
 
 /*
