@@ -789,7 +789,7 @@ void MultiLocEKF::beforeCorrectionFinish()
 bool MultiLocEKF::resetLoc(const vector<PointObservation> pt_z,
                            const vector<CornerObservation>& c_z)
 {
-    return (resetLoc(pt_z));// || resetLoc(c_z));
+    return (resetLoc(pt_z)|| resetLoc(c_z));
 }
 
 /**

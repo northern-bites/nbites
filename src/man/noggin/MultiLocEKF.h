@@ -76,11 +76,11 @@ public:
     virtual void blueGoalieReset();
     virtual inline void resetLocTo(float x, float y, float h);
 
-    bool resetLoc(const vector<PointObservation> pt_z,
-                  const vector<CornerObservation>& c_z);
+    bool resetLoc(const std::vector<PointObservation> pt_z,
+                  const std::vector<CornerObservation>& c_z);
 
-    bool resetLoc(const vector<PointObservation>& z);
-    bool resetLoc(const vector<CornerObservation>& z);
+    bool resetLoc(const std::vector<PointObservation>& z);
+    bool resetLoc(const std::vector<CornerObservation>& z);
 
     void resetLoc(const PointObservation* pt1,
                   const PointObservation* pt2);
@@ -192,8 +192,8 @@ private:
                            MeasurementVector2 &V_k);
 
     template <class T>
-    void removeAmbiguous(vector<T>& z){
-        typename vector<T>::iterator i = z.begin();
+    void removeAmbiguous(std::vector<T>& z){
+        typename std::vector<T>::iterator i = z.begin();
         while( i != z.end() ) {
             i->isAmbiguous() ? i = z.erase(i) : ++i;
         }
