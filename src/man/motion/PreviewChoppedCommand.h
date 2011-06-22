@@ -35,8 +35,9 @@
 
 #include "COMKinematics.h"
 #include "ChoppedCommand.h"
-#include "NBMath.h"
+#include "NBMatrixMath.h"
 #include "dsp.h" // for FifoBuffer
+#include "COMPreview.h"
 
 using NBMath::ufvector3;
 
@@ -52,6 +53,8 @@ public:
     const ufvector3 getFutureComPosition();
     const ufvector3 getComDerivative();
 
+    COMPreview::ptr getComPreview();
+
 private:
     void bufferNextAngles(int chainID);
     void updateComEstimates();
@@ -62,6 +65,7 @@ private:
     std::vector<float> thisFramesAngles;
 
     Boxcar com_x, com_y, com_dx, com_dy;
+    COMPreview previewStruct;
     ChoppedCommand::ptr alreadyChoppedCommand;
 };
 

@@ -16,9 +16,13 @@ PreviewChoppedCommand::PreviewChoppedCommand ( ChoppedCommand::ptr choppedComman
       com_y(COM_PREVIEW_FRAMES),
       com_dx(COM_PREVIEW_FRAMES),
       com_dy(COM_PREVIEW_FRAMES),
+      previewStruct(COMPreview()),
       alreadyChoppedCommand(choppedCommand)
 {
+#ifdef DEBUG_SCRIPTED_COM
     std::cout << "Starting new PreviewChoppedCommand" << std::endl;
+#endif
+
     for (unsigned int i = 0; i < Kinematics::NUM_CHAINS; ++i)
 	jointAngles.push_back( VectorFifo(COM_PREVIEW_FRAMES) );
 
@@ -26,10 +30,8 @@ PreviewChoppedCommand::PreviewChoppedCommand ( ChoppedCommand::ptr choppedComman
 
     // Fill the FIFOs with joint angles & the Boxcars with future CoM estimates
     for (int frame = 0; frame < COM_PREVIEW_FRAMES; ++frame) {
-	if (alreadyChoppedCommand->isDone()) {
-	    printf("command is done, breaking\n");
+	if (alreadyChoppedCommand->isDone())
 	    break;
-	}
 
 	for (unsigned int chain = 0; chain < Kinematics::NUM_CHAINS; ++chain)
 	    bufferNextAngles(chain);
@@ -91,6 +93,8 @@ void PreviewChoppedCommand::updateComEstimates() {
     com_dx.X(lastX - com_x.Y());
     com_dy.X(lastY - com_y.Y());
 
+    previewStruct.update( com_x.Y(), com_y.Y(), com_dx.Y(), com_dy.Y() );
+
 #ifdef DEBUG_SCRIPTED_COM
     std::cout //<< "Saw last chain, updating CoM...angles vector size: "
 	//<< thisFramesAngles.size()
@@ -151,4 +155,8 @@ const ufvector3 PreviewChoppedCommand::getComDerivative() {
     ufvector3 comDerivative = CoordFrame3D::vector3D(static_cast<float>(com_dx.Y()),
 						     static_cast<float>(com_dy.Y()));
     return comDerivative;
+}
+
+COMPreview::ptr PreviewChoppedCommand::getComPreview() {
+    return COMPreview::ptr ( &previewStruct );
 }
