@@ -13,7 +13,7 @@ ufmatrix4 limbs[Kinematics::NUM_MASS_PIECES]; // transform to the origin of each
 const ufvector4
 Kinematics::getCOMc(const vector<float> bodyAngles) {
     if (bodyAngles.size() != Kinematics::NUM_JOINTS)
-	cout << "bodyAngles vector input to Kinematics::getCOMc\n";
+	cout << "bad bodyAngles vector input to Kinematics::getCOMc\n";
 
     // copy the body angles to an array
     float angles[NUM_MASS_PIECES];

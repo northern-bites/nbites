@@ -21,6 +21,9 @@
 /**
  * Provides a wrapper around a ChoppedCommand that generates future
  * joint angles and CoM positions, to allow for dynamic stabilization.
+ * This extra computation is fine because the motion engine isn't running
+ * when we're executing SweetMoves. ScriptedProvider is the only provider
+ * that uses this class, so far.
  *
  * @author Nathan Merritt
  * @date June 2011
@@ -35,7 +38,7 @@
 #include "NBMath.h"
 #include "dsp.h" // for FifoBuffer
 
-using NBMath::ufvector4;
+using NBMath::ufvector3;
 
 class PreviewChoppedCommand : public ChoppedCommand {
 public:
@@ -46,11 +49,12 @@ public:
     virtual const std::vector<float> getStiffness(Kinematics::ChainID id) const;
     virtual bool isDone() const;
 
-    const ufvector4 getFutureComPosition();
-    const ufvector4 getComDerivative();
+    const ufvector3 getFutureComPosition();
+    const ufvector3 getComDerivative();
 
 private:
     void bufferNextAngles(int chainID);
+    void updateComEstimates();
 
     typedef FifoBuffer<std::vector<float> > VectorFifo;
     std::vector<VectorFifo> jointAngles;
