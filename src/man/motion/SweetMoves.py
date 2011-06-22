@@ -150,14 +150,14 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (-50,8,-90,58,5,-31),
                     (-50,0,-90,58,5,31),
                     (0,0,90,8),
-                    1.1,1, stiff.STANDUP_STIFFNESSES),
+                    0.9,1, stiff.STANDUP_STIFFNESSES),
                    #Push back onto feet
 
                    ((35,2,-14,-41),
                     (-50,5,-90,123,-13,-5),
                     (-50,-5,-90,123,-13,5),
                     (35,2,14,41),
-                    1.5, 1, stiff.STANDUP_STIFFNESSES),
+                    1.0, 1, stiff.STANDUP_STIFFNESSES),
                    #Rock back to squatting upright
 
                    ((75,10,-53,-74),
