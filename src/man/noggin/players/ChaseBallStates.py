@@ -158,8 +158,7 @@ def kickOff(player):
     """
     Perform special behavior when we are kicking off
     """
-    smallTeam = player.brain.playbook.pb.numActiveFieldPlayers < 3
-    player.brain.kickDecider.setKickOff(smallTeam)
+    player.brain.kickDecider.setKickOff()
 
     return player.goNow('positionForKick')
 

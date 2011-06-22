@@ -68,8 +68,6 @@ class KickDecider(object):
 
         print self.info
 
-        return self.chooseShortBackKick()
-
         if self.info.kickObjective == constants.OBJECTIVE_SHOOT:
             return self.shoot()
         #elif self.info.kickObjective == constants.OBJECTIVE_CLEAR:
@@ -80,6 +78,8 @@ class KickDecider(object):
         """
         sets the kick we should do in the kickOff situation
         """
+        smallTeam = self.brain.playbook.pb.numActiveFieldPlayers < 3
+
         # if there are too few players on the field to do a side kick pass.
         if smallTeam:
             if self.brain.ball.relY >= 0:
