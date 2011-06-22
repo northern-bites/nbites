@@ -131,6 +131,13 @@
 #   undef USE_ALSPEECH
 #endif
 
+#define USE_MEMORY_${USE_MEMORY}
+#ifdef USE_MEMORY_ON
+#   define USE_MEMORY
+#else
+#   undef USE_MEMORY
+#endif
+
 #endif // !_manconfig_h
 
 

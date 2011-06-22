@@ -119,7 +119,7 @@ OPTION(
   ON
   )
 OPTION(
-  USE_TTS
-  "Use the Text-To-Speech system"
-  ON
+  USE_MEMORY
+  "Use memory and logging"
+  OFF
   )
