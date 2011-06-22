@@ -53,7 +53,8 @@ using boost::shared_ptr;
 
 void ALCreateMan( ALPtr<ALBroker> broker){
     static shared_ptr<Synchro> synchro(new Synchro());
-    static shared_ptr<Sensors> sensors(new Sensors());
+    static shared_ptr<Speech> speech(new ALSpeech(broker));
+    static shared_ptr<Sensors> sensors(new Sensors(speech));
     static shared_ptr<ALTranscriber> transcriber(new ALTranscriber(broker,sensors));
     static shared_ptr<ALImageTranscriber> imageTranscriber(
             new ALImageTranscriber(synchro, sensors, broker));
@@ -66,7 +67,6 @@ void ALCreateMan( ALPtr<ALBroker> broker){
                                                 transcriber,broker));
 #endif
     static shared_ptr<Lights> lights(new NaoLights(broker));
-    static shared_ptr<Speech> speech(new ALSpeech(broker));
 
     //setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
