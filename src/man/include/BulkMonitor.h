@@ -40,7 +40,8 @@ using std::string;
 class BulkMonitor
 {
 public:
-    BulkMonitor(int _numberMonitors, string _bulkName, const string _sensorNames[]);
+    BulkMonitor(boost::shared_ptr<Speech> s,
+		int _numberMonitors, string _bulkName, const string _sensorNames[]);
     ~BulkMonitor();
 
     double update(int sensor, double input);
@@ -51,6 +52,7 @@ public:
     void LogOutput();
 
 private:
+    boost::shared_ptr<Speech> speech;
     SensorMonitor* monitors;
     int numberMonitors;
     string bulkName; // output file we log to in /home/nao/naoqi/log/
