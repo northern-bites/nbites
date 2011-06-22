@@ -30,6 +30,7 @@
 #include "Common.h"
 #include "ImageAcquisition.h"
 #include "ColorParams.h"
+#include "Speech.h"
 
 using namespace std;
 using namespace boost;
@@ -63,7 +64,8 @@ extern "C" {
 #endif
 
 //Instantiate the vision stuff
-static shared_ptr<Sensors> sensors(new Sensors());
+static shared_ptr<Sensors> sensors(new Sensors(
+                                       shared_ptr<Speech>(new Speech())));
 static shared_ptr<NaoPose> pose(new NaoPose(sensors));
 static shared_ptr<Profiler> profiler(new Profiler(thread_micro_time));
 static Vision vision(pose, profiler);
