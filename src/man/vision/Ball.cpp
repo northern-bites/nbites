@@ -144,10 +144,26 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
 	// pre-screen blobs that don't meet our criteria
 	for (int i = 0; i < blobs->number(); i++) {
         int ar = blobs->get(i).getArea();
-        float perc = static_cast<float>(blobs->get(i).getPixels()) / static_cast<float>(ar);
+        float perc = static_cast<float>(blobs->get(i).getPixels()) /
+			static_cast<float>(ar);
+		// the getPixels approach doesn't work well for small balls
         int w = blobs->get(i).width();
         int h = blobs->get(i).height();
+		int x = blobs->get(i).getLeft();
+		int y = blobs->get(i).getTop();
         int diam = max(w, h);
+		if (w < 10) {
+			int count = 0;
+			for (int j = x; j < x + w; j++) {
+				for (int k = y; k < y + h; k++) {
+					if (Utility::isOrange(thresh->getThresholded(k, j)) &&
+						!Utility::isRed(thresh->getThresholded(k, j))) {
+						count++;
+					}
+				}
+			}
+			perc = static_cast<float>(count) / static_cast<float>(ar);
+		}
         // For now we are going to allow very small balls to be a bit less orange
         // obviously this is dangerous, so we'll have to keep an eye on it.
         if (ar < MIN_AREA * 3) {
