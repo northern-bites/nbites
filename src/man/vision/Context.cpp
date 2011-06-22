@@ -421,8 +421,10 @@ void Context::checkLowOuterL(VisualCorner & corner, bool line1IsLonger) {
     }
     if (face == FACING_BLUE_GOAL) {
         if (left) {
+			cout << "Setting shape " << LEFT_GOAL_BLUE_L << endl;
             corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
         } else {
+			cout << "Also set " << endl;
             corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
         }
     } else if (face == FACING_YELLOW_GOAL) {
@@ -432,6 +434,7 @@ void Context::checkLowOuterL(VisualCorner & corner, bool line1IsLonger) {
             corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
         }
     }
+	cout << "Shape is " << corner.getSecondaryShape() << endl;
 }
 
 /** If we have a single OUTER_L corner we can often glean a lot of information
@@ -474,6 +477,13 @@ void Context::classifyOuterL(VisualCorner & corner) {
 			}
 		}
 	}
+    bool line1IsLonger = l1 > l2;
+    bool pointsMostlyUp = abs(corner.getOrientation()) < 45.0;
+    if (!pointsMostlyUp) {
+        checkLowOuterL(corner, line1IsLonger);
+		return;
+    } // for now we let compareObjsOuterL handle the else
+
 	// if we can definitively determine the correct short line
 	if (l1 < GOALBOX_FUDGE * GOALBOX_DEPTH &&
         l2 > GOALBOX_FUDGE * GOALBOX_DEPTH) {
@@ -544,11 +554,6 @@ void Context::classifyOuterL(VisualCorner & corner) {
         corner.setSecondaryShape(SIDE_T);
         return;
     }
-    bool line1IsLonger = l1 > l2;
-    bool pointsMostlyUp = abs(corner.getOrientation()) < 45.0;
-    if (!pointsMostlyUp) {
-        checkLowOuterL(corner, line1IsLonger);
-    } // for now we let compareObjsOuterL handle the else
 }
 
 /** We have identified an innerl as a field corner.  Set it accordingly
