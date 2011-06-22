@@ -161,7 +161,7 @@ void Context::identifyCorners(list <VisualCorner> &corners)
         // For localization we want the positively identified corners to come
         // first so  that  they can inform the localization system and help
         // identify abstract corners that might be in the frame
-        if (possibleClassifications.size() == 1) {
+		if (possibleClassifications.size() == 1) {
             VisualCorner copy = *i;
             copy.setPossibleCorners(possibleClassifications);
             // This has the effect of incrementing our iterator and deleting the
@@ -274,7 +274,16 @@ void Context::classifyT(VisualCorner & first) {
 		cout << "Checking T " << l1 << " " << l2 << " " <<
 			first.getDistance() << endl;
 	}
+	// check if this is actually a center circle corner
+    int horizon = field->horizonAt(first.getX());
+	float dist = realDistance(first.getX(), first.getY(),
+                              first.getX(), horizon);
 	bool sideT = false;
+	// we are generous normally on same half we can be more precise
+	// for Ts
+	if (objectDistance > MIDFIELD_X) {
+		sameHalf = false;
+	}
 	if (!sameHalf && face != FACING_UNKNOWN) {
 		// if we are far away and the T stem is long
 		if (l1 > 2 * GOALBOX_DEPTH) {
@@ -547,6 +556,8 @@ void Context::classifyOuterL(VisualCorner & corner) {
                l2 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
                !sameHalf) {
         // our "L" is actually a T unfortunately it isn't set up right
+		// To Do: use the chageTo method in VisualCorner to get the the
+		// set up properly
         corner.setShape(T);
         corner.setSecondaryShape(SIDE_T);
         return;
@@ -910,6 +921,15 @@ void Context::classifyInnerL(VisualCorner & corner) {
 			lookForFieldCorner(corner, l1, l2);
 			return;
 		}
+	}
+
+	//223-11/scotty/dark_corner_far_ball/NBFRM.32
+	if (face != FACING_UNKNOWN && !sameHalf && cornerDist > 300 &&
+		objectDistance - cornerDist > 200) {
+		// this isn't a corner at all it is part of the center circle
+		corner.setShape(CIRCLE);
+		corner.setSecondaryShape(CIRCLE);
+		return;
 	}
 
 	// 223-11/annika/center_circle+varous/NBFRM.49
