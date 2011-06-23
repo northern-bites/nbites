@@ -56,7 +56,7 @@ void Motion::stop() {
 }
 
 void Motion::run(){
-    std::cout <<"Motion::run"<<std::endl;
+    std::cout <<"Motion::run"<< std::endl;
     Thread::trigger->on();
 
     //Setup the callback  in the enactor so it knows to call the switchboard

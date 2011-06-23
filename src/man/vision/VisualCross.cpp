@@ -1,19 +1,19 @@
 #include "VisualCross.h"
 VisualCross::VisualCross() :
-    VisualDetection(), VisualLandmark<crossID>(ABSTRACT_CROSS)
+    VisualObject(ABSTRACT_CROSS)
 {
     init();
 }
 
 VisualCross::VisualCross(const crossID _id) :
-    VisualDetection(), VisualLandmark<crossID>(_id)
+    VisualObject(_id)
 {
     init();
 }
 
 
 VisualCross::VisualCross(const VisualCross& o) :
-    VisualDetection(o), VisualLandmark<crossID>(o.id){}
+    VisualObject(o){}
 
 // Initialization, happens every frame.
 void VisualCross::init()
