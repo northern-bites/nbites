@@ -8,6 +8,9 @@
  */
 
 #include "ConcreteLandmark.h"
+
+#include <list>
+
 #include "Structs.h"
 
 // What is the certainty associated with the identification of the object
@@ -27,11 +30,11 @@ enum distanceCertainty {
 
 
 
-template <class idType> class VisualLandmark {
-
+class VisualLandmark
+{
 public:
     // Constructor
-    VisualLandmark(idType _id ,certainty _idCertainty = NOT_SURE,
+    VisualLandmark(int _id ,certainty _idCertainty = NOT_SURE,
                    distanceCertainty _distanceCertainty = BOTH_UNSURE,
                    ConcreteLandmark* _concreteLandmark = 0)
         : id(_id), idCertainty(_idCertainty), distanceCert(_distanceCertainty),
@@ -48,14 +51,15 @@ public:
 protected:
     // How sure are we that we identified the correct object
     // (for example, blue goal left post versus blue goal right post)
-    idType id;
+    int id;
     certainty idCertainty;
     distanceCertainty distanceCert;
     ConcreteLandmark * concreteLandmark;
+    std::list<const ConcreteLandmark*> possibilities;
 
 public:
     // Getters
-    const idType getID() const { return id; }
+    const int getID() const { return id; }
     const certainty getIDCertainty() const { return idCertainty; }
     const distanceCertainty getDistanceCertainty() const {
       return distanceCert;
@@ -64,12 +68,11 @@ public:
         return concreteLandmark;
     }
 
-
     // Setters
     virtual void setIDCertainty(certainty c) { idCertainty = c; }
     void setDistanceCertainty(distanceCertainty c) { distanceCert = c; }
     void setConcreteLandmark(ConcreteLandmark * c) { concreteLandmark = c; }
-    void setID(idType _id) { id = _id; }
+    void setID(int _id) { id = _id; }
     // Calculate and set the standard deviation of the measurement while
     // setting the distance; should be used whenever a legitimate distance
     // measurement is set

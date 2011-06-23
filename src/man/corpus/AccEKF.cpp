@@ -3,15 +3,18 @@
 #include "AccEKF.h"
 #include "BasicWorldConstants.h"
 using namespace boost::numeric;
+using namespace ekf;
 
-const int AccEKF::num_dimensions = ACC_NUM_DIMENSIONS;
 const float AccEKF::beta = 0.2f;
 const float AccEKF::gamma = .2f;
 const float AccEKF::variance  = 0.22f;
 //const float AccEKF::variance  = 100.00f;
 
 AccEKF::AccEKF()
-    : EKF<AccelMeasurement,int, num_dimensions, num_dimensions>(beta, gamma)
+    : EKF<AccelMeasurement,
+          int,
+          acc_num_dimensions,
+          acc_num_dimensions>(beta, gamma)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -54,7 +57,7 @@ void AccEKF::update(const float accX,
 EKF<AccelMeasurement, int, 3, 3>::StateVector
 AccEKF::associateTimeUpdate(int u_k)
 {
-    return ublas::zero_vector<float>(num_dimensions);
+    return ublas::zero_vector<float>(acc_num_dimensions);
 }
 
 const float AccEKF::scale(const float x) {
@@ -101,15 +104,15 @@ const float AccEKF::getVariance(float delta, float divergence) {
     return dont_trust;
 }
 
-void AccEKF::incorporateMeasurement(AccelMeasurement z,
+void AccEKF::incorporateMeasurement(const AccelMeasurement& z,
                                     StateMeasurementMatrix &H_k,
                                     MeasurementMatrix &R_k,
                                     MeasurementVector &V_k)
 {
     static MeasurementVector last_measurement(
-        ublas::scalar_vector<float>(num_dimensions, 0.0f));
+        ublas::scalar_vector<float>(acc_num_dimensions, 0.0f));
 
-    MeasurementVector z_x(num_dimensions);
+    MeasurementVector z_x(acc_num_dimensions);
     z_x(0) = z.x;
     z_x(1) = z.y;
     z_x(2) = z.z; // hahahha
