@@ -49,21 +49,6 @@ def strafeDirForSave(player):
     else:
         return 0
 
-
-def shouldSave(player):
-    #Ball is within distance from the goalie and
-    #is prepared to save
-    ball = player.brain.ball
-
-    if fabs(ball.dx) > 5: #goalCon.VEL_THRES:
-        #inside goal box plus save buffer
-        if (ball.x < (NogCon.MY_GOALBOX_RIGHT_X + goalCon.SAVE_BUFFER)
-             and ball.y < (NogCon.MY_GOALBOX_TOP_Y + goalCon.SAVE_BUFFER)
-             and ball.y > (NogCon.MY_GOALBOX_BOTTOM_Y - goalCon.SAVE_BUFFER)):
-            return True
-
-    return False
-
 def shouldSaveRight(player):
     ball= player.brain.ball
 

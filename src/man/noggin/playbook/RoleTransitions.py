@@ -8,14 +8,19 @@ from ..players import ChaseBallTransitions as chaseTran
 # GOALIE*
 #********
 
-def shouldSave(team):
+
+def shouldPositionForSave(team):
     ball = team.brain.ball
 
-     ## NEED TO FIGURE THIS OUT ###
+    if ball.heat > 18 :
+        return True
+
     return False
+
 
 def shouldChase(team):
     ball = team.brain.ball
+    print ball.heat
 
     if (ball.framesOff > 30):
         return False

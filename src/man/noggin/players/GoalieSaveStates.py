@@ -17,17 +17,20 @@ def goalieSave(player):
         brain.tracker.stopHeadMoves()
         player.stopWalking()
         brain.tracker.trackBall()
-        brain.fallController.enableFallProtection(False)
+        player.isSaving = True
 
-    if helper.shouldSaveRight(player):
-        return player.goNow('saveRight')
-    elif helper.shouldSaveLeft(player):
-        return player.goNow('saveLeft')
-    elif helper.shouldSaveCenter(player):
-        return player.goNow('saveCenter')
+
+    if helper.shouldSave(player):
+        brain.fallController.enableFallProtection(False)
+        if helper.shouldSaveRight(player):
+            return player.goNow('testSaveRight')
+        elif helper.shouldSaveLeft(player):
+            return player.goNow('testSaveLeft')
+        else:
+            return player.goNow('testSaveCenter')
     #add check for strafe in future
 
-    #return player.stay()
+    return player.stay()
 
 #moves left or right
 #NEEDS WORK
@@ -70,7 +73,7 @@ def testSaveRight(player):
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
     if player.counter > 50:
         player.executeMove(SweetMoves.INITIAL_POS)
-        return player.goNow('goalieSave')
+        return player.goNow('holdRightSave')
     return player.stay()
 
 def testSaveLeft(player):
@@ -78,7 +81,7 @@ def testSaveLeft(player):
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
     if player.counter > 50:
         player.executeMove(SweetMoves.INITIAL_POS)
-        return player.goNow('goalieSave')
+        return player.goNow('holdLeftSave')
     return player.stay()
 
 def testSaveCenter(player):
@@ -86,7 +89,7 @@ def testSaveCenter(player):
         player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
     if player.counter > 50:
         player.executeMove(SweetMoves.INITIAL_POS)
-        return player.goNow('goalieSave')
+        return player.goNow('holdCenterSave')
     return player.stay()
 
 # HOLD SAVE
@@ -139,6 +142,6 @@ def postDiveSave(player):
 
 def doneSaving(player):
     if player.firstFrame():
-        nav.positionPlaybook()
+        player.isSaving = False
 
     return player.stay()
