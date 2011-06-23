@@ -1,3 +1,8 @@
+#
+# The transitions for the goalie for the goalie states.
+# Covers chase, position and save.
+#
+
 from math import fabs
 from ..playbook import PBConstants as PBCon
 from .. import NogginConstants as NogCon
@@ -131,19 +136,6 @@ def shouldHoldSave(player):
 
 #POSITION TRANSITIONS
 
-def outOfPosition(player):
-    if player.penaltyKicking:
-        return False
-
-    my = player.brain.my
-    # checks if in front of box or a quarter of the way up the field
-    #check if this really should be MY_GOALBOX_RIGHT_X
-    if (my.x > NogCon.MY_GOALBOX_RIGHT_X and my.uncertX < 90)\
-            or (my.x > NogCon.MIDFIELD_X * 0.5):
-        #print "my.x ", my.x, " my.uncertX ", my.uncertX
-        return True
-    return False
-
 # player is inside the box with a small buffer
 #localization not good enough for this?
 def goalieInBox(player):
@@ -157,48 +149,6 @@ def goalieInBox(player):
 
     return False
 
-# NOT USED
-def shouldPositionCenter(player):
-    ball = player.brain.ball
-
-    if (not shouldPositionRight(player) and not shouldPositionLeft(player)):
-        player.shouldPositionCenter += 1
-        if player.shouldPositionCenter > 3:
-            player.shouldPositionCenterCounter = 0
-            player.shouldPositionLeftCounter = 0
-            player.shouldPositionRightCounter = 0
-            return True
-
-    return False
-
-def shouldPositionRight(player):
-    ball = player.brain.ball
-
-    if (ball.y < NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y - goalCon.BOX_BUFFER
-        and ball.x < NogCon.MY_GOALBOX_RIGHT_X + goalCon.BOX_BUFFER):
-        player.shouldPositionRightCounter += 1
-        if player.shouldPositionRightCounter > 3:
-            player.shouldPositionRightCounter = 0
-            player.shouldPositionLeftCounter = 0
-            player.shouldPositionCenterCounter = 0
-            return True
-
-    return False
-
-
-def shouldPositionLeft(player):
-    ball = player.brain.ball
-
-    if (ball.y > NogCon.LANDMARK_MY_GOAL_LEFT_POST_Y + goalCon.BOX_BUFFER
-        and ball.x < NogCon.MY_GOALBOX_RIGHT_X + goalCon.BOX_BUFFER):
-        player.shouldPositionLeftCounter += 1
-        if player.shouldPositionLeftCounter > 3:
-            player.shouldPositionRightCounter = 0
-            player.shouldPositionLeftCounter = 0
-            player.shouldPositionCenterCounter = 0
-            return True
-
-    return False
 
 #CHASE TRANSITIONS
 
@@ -213,69 +163,3 @@ def dangerousBall(player):
 
     return False
 
-#Decisions for when to chase.
-#Will chase when:
-    # Inside the chasing box
-
-def shouldChase(player):
-    ball = player.brain.ball
-
-    #how does the penalty kicker work?
-    if player.penaltyKicking:
-        return False
-
-    #if not chaseTran.shouldChaseBall(player):
-        #return False
-
-    #if (ball.framesOff > 45):
-        #print "no ball"
-        #player.shouldChaseCounter = 0
-        #player.shouldStopChaseCounter = 0
-        #return False
-
-
-    # checks if the ball is really far away
-    #  make sure we dont chase if really far
-    #if ball.relX > 300 :
-        #return false
-
-    # close enough to chase
-    elif (ball.x < goalCon.CHASE_RIGHT_X_LIMIT
-          and ball.x > goalCon.CHASE_LEFT_X_LIMIT
-          and ball.y > goalCon.CHASE_LOWER_Y_LIMIT
-          and ball.y < goalCon.CHASE_UPPER_Y_LIMIT):
-        player.shouldChaseCounter += 1
-
-    if player.shouldChaseCounter > 3:
-        player.shouldChaseCounter = 0
-        player.shouldStopChaseCounter = 0
-        return True
-
-    return False
-
-#Should stop chasing if
-    #Ball is outside of the chase range
-def shouldStopChase(player):
-    ball= player.brain.ball
-
-    #if(ball.framesOff > 45):
-       # print "1"
-       # player.shouldStopChaseCounter = 4
-
-    if (ball.x > goalCon.CHASE_RIGHT_X_LIMIT
-          or ball.x < goalCon.CHASE_LEFT_X_LIMIT
-          or ball.y < goalCon.CHASE_LOWER_Y_LIMIT
-          or ball.y > goalCon.CHASE_UPPER_Y_LIMIT):
-        player.shouldStopChaseCounter += 1
-
-    #i dont think this works right now?
-    #elif(chaseTran.shouldntStopChasing(player)):
-        #print "3"
-        #return False
-
-    if player.shouldStopChaseCounter > 3:
-        player.shouldStopChaseCounter = 0
-        player.shouldChaseCounter = 0
-        return True
-
-    return False

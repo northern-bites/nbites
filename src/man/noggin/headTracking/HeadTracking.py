@@ -41,6 +41,10 @@ class HeadTracking(FSA.FSA):
         """stop all head moves. In TrackingStates.py"""
         self.switchTo('stop')
 
+    def isStopped(self):
+        """Checks that all head moves have stopped"""
+        return self.currentState == 'stopped'
+
     def setNeutralHead(self):
         """executes sweet move to move head to neutral position.
         Does not call stop head moves. In TrackingStates.py"""
@@ -79,8 +83,11 @@ class HeadTracking(FSA.FSA):
         if (not self.activeLocOn):
             self.switchTo('activeTracking')
 
+    # only need to set goalieActiveLoc in this
+    # and activeLoc because they are the only states
+    # that directly initially call activeTracking
     def activeLocGoaliePos(self):
-        """tracks the ball but periodically looks away"""
+        """looks at the ball for shorter amount of time that activeLoc"""
         self.target = self.brain.ball
         self.gain = 1.0
         self.goalieActiveLoc = True

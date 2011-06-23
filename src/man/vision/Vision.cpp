@@ -45,8 +45,7 @@ static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
     : pose(_pose), profiler(_prof),
       yImg(&global_16_image[0]), linesDetector(profiler),
-      frameNumber(0), id(-1), name(), player(1),
-      colorTable("table.mtb")
+      frameNumber(0), colorTable("table.mtb")
 {
     // variable initialization
 
@@ -134,6 +133,7 @@ void Vision::notifyImage() {
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
+
     // linesDetector.detect(yImg);
     PROF_EXIT(profiler, P_VISION);
 }
@@ -162,11 +162,6 @@ std::string Vision::getThreshColor(int _id) {
     }
 }
 
-std::string Vision::getRobotName() {
-    return name;
-}
-
-
 
 /*******************************|
 | Vision visualization methods. |
@@ -194,10 +189,10 @@ void Vision::drawBoxes(void)
 
     // balls
     // orange
-    if(ball->getWidth() > 0)
+    /*if(ball->getWidth() > 0)
         drawRect(ball->getX(), ball->getY(),
                  NBMath::ROUND(ball->getWidth()),
-                 NBMath::ROUND(ball->getHeight()), PINK);
+                 NBMath::ROUND(ball->getHeight()), PINK);*/
 
     // lines
     drawFieldLines();
@@ -207,7 +202,7 @@ void Vision::drawBoxes(void)
              pose->getLeftHorizon().y,
              pose->getRightHorizon().x,
              pose->getRightHorizon().y,
-             BLUE);
+             MAROON);
 
     // vision horizon line
     drawPoint(IMAGE_WIDTH/2, thresh->getVisionHorizon(), RED);

@@ -83,22 +83,17 @@ class HeadTrackingHelper(object):
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
     def lookToPoint(self, target):
-        """look to an absolute position on the field"""
-        bearing = self.calcBearing(target)
-        headPitch = self.calcHeadPitch(target)
-
-        #makes and calls motion command
-        headMove = motion.CoordHeadCommand( bearing, headPitch )
+        headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
         self.tracker.brain.motion.coordHead(headMove)
 
     def calcBearing(self, target):
-        """returns the bearing to target in radians. usable as headYaw"""
+        """returns the bearing to target in degrees. usable as headYaw"""
         my = self.tracker.brain.my
 
-        return radians(my.getRelativeBearing(target))
+        return my.getRelativeBearing(target)
 
     def calcHeadPitch(self, target):
-        """returns the pitch to target in radians"""
+        """returns the pitch to target in degrees"""
         my = self.tracker.brain.my
 
         relX = target.x - my.x
@@ -124,4 +119,4 @@ class HeadTrackingHelper(object):
         return lensHeightInCM
     """ already had to calculate bearing and groundDist to get xRelMe, yRelMe. those were stupid in the first place because they were used in CoordHeadCommand to calculate bearing again (doh!) with groundDist already calculated all that was needed was a single call to atan. """
 
-CAMERA_ANGLE = radians(40.0) # from reddoc
+CAMERA_ANGLE = 40.0 # from reddoc

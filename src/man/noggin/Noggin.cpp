@@ -44,9 +44,11 @@ const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
                 shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
                 shared_ptr<Sensors> _sensors, MotionInterface * _minterface)
-    : profiler(p), comm(c),gc(c->getGC()),
-      sensors(_sensors),
+    : profiler(p),
       vision(v),
+      comm(c),
+      gc(c->getGC()),
+      sensors(_sensors),
       chestButton(rbg->getButton(CHEST_BUTTON)),
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),

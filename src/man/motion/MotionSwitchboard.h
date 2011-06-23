@@ -43,6 +43,7 @@
 #include "WalkingConstants.h"
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
+#include "CoordHeadProvider.h"
 #include "NullHeadProvider.h"
 #include "NullBodyProvider.h"
 #include "Sensors.h"
@@ -63,8 +64,9 @@
 
 class MotionSwitchboard {
 public:
-    MotionSwitchboard(boost::shared_ptr<Sensors> s,
-					  boost::shared_ptr<Profiler> p);
+  MotionSwitchboard(boost::shared_ptr<Sensors> s,
+					boost::shared_ptr<Profiler> p,
+					boost::shared_ptr<NaoPose> pose);
     ~MotionSwitchboard();
 
     void start();
@@ -112,7 +114,7 @@ private:
     void preProcessBody();
     void processHeadJoints();
     void processBodyJoints();
-    void clipHeadJoints(vector<float>& joints);
+    void clipHeadJoints(std::vector<float>& joints);
     void safetyCheckJoints();
     void swapBodyProvider();
     void swapHeadProvider();
@@ -130,6 +132,7 @@ private:
     WalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
+    CoordHeadProvider coordHeadProvider;
     NullHeadProvider nullHeadProvider;
     NullBodyProvider nullBodyProvider;
 

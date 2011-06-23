@@ -2,7 +2,6 @@ from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
-from ..playbook import PBConstants
 from man.noggin.util import MyMath
 
 DEBUG = False
@@ -16,19 +15,10 @@ def playbookWalk(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    relX = 0
-    if hasattr(dest, "relX"):
-        relX = dest.relX
-    else:
-        bearingDeg = my.getRelativeBearing(dest)
-        distToDest = my.distTo(dest)
-        relX = MyMath.getRelativeX(distToDest, bearingDeg)
-
-    if (navTrans.atDestinationCloser(my, dest) and
+    if (navTrans.atDestinationCloser(my, dest) and 
         navTrans.atHeading(my, dest.h)):
             nav.playbookAtPositionCount += 1
-            if nav.playbookAtPositionCount > \
-                    constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
+            if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
                 return nav.goNow('playbookAtPosition')
     else:
         if not nav.playbookAtPositionCount == 0:
@@ -36,17 +26,8 @@ def playbookWalk(nav):
 
     dest.h = my.headingTo(dest)
 
-    if (nav.brain.play.isRole(PBConstants.GOALIE) and
-        not nav.brain.play.isSubRole(PBConstants.READY_GOALIE)):
-        if (relX < 0):
-            return nav.goNow('playbookGoalieWalk')
-        else:
-            walkX, walkY, walkTheta = walker.getWalkSpinParam(my, dest)
-            helper.setSpeed(nav, walkX, walkY, walkTheta)
-
-    else:
-        walkX, walkY, walkTheta = walker.getWalkSpinParam(my, dest)
-        helper.setSpeed(nav, walkX, walkY, walkTheta)
+    walkX, walkY, walkTheta = walker.getWalkSpinParam(my, dest)
+    helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     if navTrans.useFinalHeading(nav.brain, dest):
         nav.omniWalkToCount += 1
@@ -68,93 +49,23 @@ def playbookOmni(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    relX = 0
-    if hasattr(dest, "relX"):
-        relX = dest.relX
-    else:
-        bearingDeg = my.getRelativeBearing(dest)
-        distToDest = my.distTo(dest)
-        relX = MyMath.getRelativeX(distToDest, bearingDeg)
-
     if (navTrans.atDestinationCloser(my, dest) and
         navTrans.atHeading(my, dest.h)):
         nav.playbookAtPositionCount += 1
-        if nav.playbookAtPositionCount > \
-                constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
+        if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
             return nav.goNow('playbookAtPosition')
     else:
-        if not nav.playbookAtPositionCount == 0:
-            nav.playbookAtPositionCount -= 1
+        nav.playbookAtPositionCount = 0
 
     walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     if not navTrans.useFinalHeading(nav.brain, dest):
         nav.stopOmniCount += 1
-
-    if (nav.stopOmniCount > \
-            constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK):
-        if (nav.brain.play.isRole(PBConstants.GOALIE) and
-            not nav.brain.play.isSubRole(PBConstants.READY_GOALIE)):
-            if (relX < 0):
-                return nav.goLater('playbookGoalieWalk')
-            else:
-                print relX
-                return nav.goLater('playbookWalk')
-        else:
+        if nav.stopOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
             return nav.goLater('playbookWalk')
     else:
         nav.stopOmniCount = 0
-
-    if navTrans.shouldAvoidObstacle(nav):
-        return nav.goLater('avoidObstacle')
-
-    return nav.stay()
-
-def playbookGoalieWalk(nav):
-    if nav.firstFrame():
-        nav.stopOmniCount = 0
-        nav.playbookAtPositionCount = 0
-
-    my = nav.brain.my
-    dest = nav.brain.play.getPosition()
-
-    relX = 0
-    if hasattr(dest, "relX"):
-        relX = dest.relX
-    else:
-        bearingDeg = my.getRelativeBearing(dest)
-        distToDest = my.distTo(dest)
-        relX = MyMath.getRelativeX(distToDest, bearingDeg)
-
-    if (navTrans.atDestinationCloser(my, dest) and
-        navTrans.atHeading(my, dest.h)):
-        nav.playbookAtPositionCount += 1
-        if nav.playbookAtPositionCount > \
-                constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
-            return nav.goNow('playbookAtPosition')
-    else:
-        if not nav.playbookAtPositionCount == 0:
-            nav.playbookAtPositionCount -= 1
-
-    dest.h = my.headingTo(dest)
-
-    if (nav.brain.play.isRole(PBConstants.GOALIE) and
-        not nav.brain.play.isSubRole(PBConstants.READY_GOALIE)):
-        if (relX > 0):
-            return nav.goNow('playbookWalk')
-        else:
-            walkX, walkY, walkTheta = walker.getWalkBackParam(my, dest)
-            helper.setSpeed(nav, walkX, walkY, walkTheta)
-    else:
-        return nav.goNow('playbookWalk')
-
-    if navTrans.useFinalHeading(nav.brain, dest):
-        nav.omniWalkToCount += 1
-        if nav.omniWalkToCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
-            return nav.goLater('playbookOmni')
-    else:
-        nav.omniWalkToCount = 0
 
     if navTrans.shouldAvoidObstacle(nav):
         return nav.goLater('avoidObstacle')
@@ -170,8 +81,7 @@ def playbookAtPosition(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    if (navTrans.atDestinationCloser(my, dest) and
-        navTrans.atHeading(my, dest.h)):
+    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
         nav.startOmniCount = 0
         return nav.stay()
 

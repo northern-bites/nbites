@@ -37,9 +37,11 @@ using namespace boost::assign;
 #include "PyLights.h"
 #include "PySpeech.h"
 
+//#include <valgrind/callgrind.h>
+
 using namespace std;
 using boost::shared_ptr;
-
+using man::memory::Memory;
 
 /////////////////////////////////////////
 //                                     //
@@ -55,19 +57,20 @@ Man::Man (shared_ptr<Profiler> _profiler,
           shared_ptr<Synchro> synchro,
           shared_ptr<Lights> _lights,
           shared_ptr<Speech> _speech)
-  : profiler(_profiler),
-    sensors(_sensors),
-    transcriber(_transcriber),
-    imageTranscriber(_imageTranscriber),
-    enactor(_enactor),
-    lights(_lights),
-    speech(_speech)
+    :     sensors(_sensors),
+          transcriber(_transcriber),
+          imageTranscriber(_imageTranscriber),
+          enactor(_enactor),
+          profiler(_profiler),
+          lights(_lights),
+          speech(_speech)
 {
+
   // initialize system helper modules
 
 #ifdef USE_TIME_PROFILING
   profiler->profiling = true;
-  profiler->profileFrames(700);
+  profiler->profileFrames(1400);
 #endif
   // give python a pointer to the sensors structure. Method defined in
   // Sensors.h
@@ -81,8 +84,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 
   // initialize core processing modules
 #ifdef USE_MOTION
-  motion = shared_ptr<Motion>(
-                              new Motion(synchro, enactor, sensors,profiler));
+  motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors,profiler,pose));
   guardian->setMotionInterface(motion->getInterface());
 #endif
   // initialize python roboguardian module.
@@ -101,6 +103,9 @@ Man::Man (shared_ptr<Profiler> _profiler,
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
                                          sensors, motion->getInterface()));
 #endif// USE_NOGGIN
+#ifdef USE_MEMORY
+  memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
+#endif
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
@@ -140,6 +145,10 @@ void Man::startSubThreads() {
 #ifdef DEBUG_MAN_THREADING
   cout << "  run :: Signalling start" << endl;
 #endif
+
+//  printf("Start time: %lli \n", process_micro_time());
+//  CALLGRIND_START_INSTRUMENTATION;
+//  CALLGRIND_TOGGLE_COLLECT;
 }
 
 void Man::stopSubThreads() {
@@ -187,7 +196,9 @@ Man::processFrame ()
 
     sensors->releaseImage();
 #endif
-
+#ifdef USE_MEMORY
+    memory->updateVision();
+#endif
 #ifdef USE_NOGGIN
     noggin->runStep();
 #endif
@@ -203,19 +214,11 @@ Man::processFrame ()
 
 
 void Man::notifyNextVisionImage() {
-  // Synchronize noggin's information about joint angles with the motion
-  // thread's information
-
-  sensors->updateVisionAngles();
 
   transcriber->postVisionSensors();
 
   // Process current frame
   processFrame();
-
-  //Release the camera image
-  //if(camera_active)
-  imageTranscriber->releaseImage();
 
   // Make sure messages are printed
   fflush(stdout);

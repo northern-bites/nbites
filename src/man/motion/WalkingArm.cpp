@@ -1,5 +1,7 @@
 #include "WalkingArm.h"
 
+#include <iomanip>
+
 using namespace Kinematics;
 using boost::shared_ptr;
 using namespace std;
@@ -35,7 +37,7 @@ ArmJointStiffTuple WalkingArm::tick(shared_ptr<Step> supportStep){
 
     armJoints[0] += getShoulderPitchAddition(supportStep);
     vector<float> armStiffnesses(ARM_JOINTS,gait->stiffness[WP::ARM]);
-	armStiffnesses[0] = gait->stiffness[WP::ARM_PITCH];
+    armStiffnesses[0] = gait->stiffness[WP::ARM_PITCH];
 
     frameCounter++;
     for(unsigned int i = 0; shouldSwitchStates() && i < 2; i++){
@@ -57,6 +59,7 @@ ArmJointStiffTuple WalkingArm::tick(shared_ptr<Step> supportStep){
 const float WalkingArm::getShoulderPitchAddition(shared_ptr<Step> supportStep){
     float direction = 1.0f; //forward = negative
     float percentComplete = 0.0f;
+
     switch(state){
     case SUPPORTING:
         //When the leg on this side is supporting (i.e. swinging back)
@@ -88,8 +91,10 @@ const float WalkingArm::getShoulderPitchAddition(shared_ptr<Step> supportStep){
         break;
     }
 
-    float start = -direction*gait->arm[WP::AMPLITUDE];
-    float end = direction*gait->arm[WP::AMPLITUDE];
+    float scale = getArmScaleFromStep(supportStep);
+
+    float start = -direction * scale * gait->arm[WP::AMPLITUDE];
+    float end = direction * scale * gait->arm[WP::AMPLITUDE];
 
     //We need to intelligently deal with non-regular steps
     //Since end steps are employed in both the starting and stopping contexts
@@ -121,7 +126,37 @@ const float WalkingArm::getShoulderPitchAddition(shared_ptr<Step> supportStep){
     const float percentToDest = NBMath::cycloidx(theta)/(2.0f*M_PI_FLOAT);
 
     return start + percentToDest*(end - start);
+}
 
+/**
+ * Scales arm swing based on the current walk vector. This will lower the distance
+ * that the arm swings when the robot is strafing or sidestepping, and cause the
+ * arms to swing correctly when the robot is walking backwards.
+ *
+ * @return a float [-1,1] to scale the arm motion by
+ */
+const float WalkingArm::getArmScaleFromStep(boost::shared_ptr<Step> step) {
+    float sign = 1.0f;
+    // reverse arm swinging when walking backwards
+    if (step->walkVector.x < 0)
+        sign = -1.0f;
+
+    float scale = 1.0f;
+    float turn = std::abs(step->walkVector.y) + std::abs(step->walkVector.theta);
+
+    // because we could be going forward at full speed, don't want to div by 0
+    if (turn > 0)
+        // inversely proportional to how much we're turning
+        scale = std::abs(step->walkVector.x) / turn;
+
+    if (std::abs(scale) > 1)
+        scale = NBMath::sign(scale) * 1.0f;
+
+    //cout << "x/y/t scale: " << std::setprecision(2) << std::setw(10)
+    //<< step->walkVector.x << step->walkVector.y << step->walkVector.theta
+    //     << scale << endl;
+
+    return sign * scale;;
 }
 
 void WalkingArm::startRight(){

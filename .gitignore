@@ -1,6 +1,7 @@
 build/*
 install/*
 data/*
+ext/*
 *.pyc
 *.ekf
 *.mcl
@@ -37,6 +38,7 @@ noggin/util/fakeData/*
 /noggin/offline/c++filt
 /noggin/offline/faker
 /noggin/offline/fakerData/*
+/util/GameController/GameController.log
 *~
 docs/*
 *.wav
@@ -44,3 +46,5 @@ docs/*
 src/remote/dist/javadoc/
 *.pdf
 *.o 
+ext/*
+lib/*

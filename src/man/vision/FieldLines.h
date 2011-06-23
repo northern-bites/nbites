@@ -549,8 +549,15 @@ public:
     const bool getStandardView() { return standardView; }
 #endif
 
-    const std::vector < boost::shared_ptr<VisualLine> >* getLines() const { return &linesList; }
+    const std::vector < boost::shared_ptr<VisualLine> >* getLines() 
+      const { return &linesList; }
+    //ONLY used for PyVision!
+    const std::vector <boost::shared_ptr<VisualLine> > getActualLines() 
+      const { return linesList; }
+    const int getNumLines() { return linesList.size(); }
     std::list <VisualCorner>* getCorners() {return &cornersList; }
+    //ONLY used for PyVision!
+    std::list<VisualCorner> getActualCorners() { return cornersList; }
     const int getNumCorners() { return cornersList.size(); }
     const std::list<linePoint>* getUnusedPoints() const {
         return &unusedPointsList;

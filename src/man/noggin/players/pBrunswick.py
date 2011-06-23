@@ -32,7 +32,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.setName('pBrunswick')
 
-        self.justKicked = False
         self.inKickingState = False
 
         #GOALIE COUNTERS AND BOOLEANS
@@ -53,25 +52,19 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyMadeSecondKick = False
 
         # Kickoff kick
-        self.hasKickedOffKick = True
+        self.hasKickedOff = True
 
-        self.lastKickScanCounter = 0
-        self.hasAlignedOnce = True
+        # Orbiting
         self.angleToOrbit = 0.0
 
     def run(self):
         self.play = self.brain.play
-        if self.currentState == 'afterKick' or \
-               self.lastDiffState == 'afterKick':
-            self.hasKickedOffKick = True
-            self.justKicked = True
-        else:
-            self.justKicked = False
-
         gcState = self.brain.gameController.currentState
-        if not self.firstFrame() and (gcState == 'gamePlaying' or\
-               (gcState == 'penaltyShotsGamePlaying'
-                and self.play.isRole(PBConstants.GOALIE))):
+
+        # WHY: do we not change on the first frame???
+        if (gcState == 'gamePlaying' or\
+                (gcState == 'penaltyShotsGamePlaying'
+                 and self.play.isRole(PBConstants.GOALIE))):
             roleState = self.getNextState()
 
             if roleState != self.currentState:
@@ -110,13 +103,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'goaliePosition'
 
     ###### HELPER METHODS ######
-    def inFrontOfBall(self):
-        ball = self.brain.ball
-        my = self.brain.my
-        return my.x > ball.x and \
-            my.y < ChaseConstants.IN_FRONT_SLOPE*(my.x - ball.x) + ball.y and \
-            my.y > -ChaseConstants.IN_FRONT_SLOPE*(my.x-ball.x) + ball.y
-
     def getPenaltyKickingBallDest(self):
         if not self.penaltyMadeFirstKick:
             return Location(NogginConstants.FIELD_WIDTH * 3./4.,

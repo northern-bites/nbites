@@ -36,7 +36,8 @@ class Robots; // forward reference
 
 class Robots {
 public:
-    Robots(Vision* vis, Threshold* thr, Field* fie, Context* con, int c);
+    Robots(Vision* vis, Threshold* thr, Field* fie, Context* con,
+		   unsigned char c);
     virtual ~Robots() {}
 
 	void init();
@@ -44,9 +45,6 @@ public:
 	void robot(Cross *cross);
 	void expandRobotBlob(int which);
 	bool noWhite(Blob b);
-	void expandHorizontally(int which, int dir);
-	int expandVertically(int which, int dir);
-	bool goodScan(int c, int w, int o, int g, int gr, int t);
 	void updateRobots(int w, int i);
 	void mergeBigBlobs();
     void checkMerge(int i, int j);
@@ -61,7 +59,7 @@ public:
 	bool viableRobot(Blob a);
 	void createObject();
 	void newRun(int x, int y, int h);
-	void setColor(int c);
+	void setColor(unsigned char c);
 	void allocateColorRuns();
 	int distance(int x, int x1, int x2, int x3);
 	void printBlob(Blob a);
@@ -80,7 +78,7 @@ private:
 
 	Blobs* blobs;
 	int numberOfRuns, runsize;
-	int color;
+	unsigned char color;
 	Blob* topBlob;
 	run* runs;
 #ifdef OFFLINE

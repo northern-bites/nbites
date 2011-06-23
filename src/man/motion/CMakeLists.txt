@@ -70,6 +70,7 @@ SET( MOTION_SRCS
 		     ChopShop
 		     NullProvider
 		     WalkProvider
+		     CoordHeadProvider
 		     Step
 		     Gait
 		     AbstractGait
@@ -147,7 +148,7 @@ INSTALL(
   DIRECTORY ${MOTION_PYTHON_SUBDIRS}
   DESTINATION ${MOTION_PYTHON_TARGET_DIR}/
   CONFIGURATIONS "" Debug Release
-  FILES_MATCHING PATTERN "*.py"
+  PATTERN "*.py"
   )
 
 ############################ LINKER LANGUAGE

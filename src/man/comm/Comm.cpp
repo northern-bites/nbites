@@ -439,7 +439,7 @@ PyMODINIT_FUNC init_comm (void)
 Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
     : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
-	  latest(new list<vector<float> >), sensors(s), timer(&micro_time),
+	  latest(new list<vector<float> >), sensors(s), timer(&monotonic_micro_time),
 	  gc(new GameController()), tool(_synchro, s, v, gc)
 {
     pthread_mutex_init(&comm_mutex,NULL);
@@ -853,7 +853,6 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
     // cast packet data into CommPacketHeader struct
     packet = *reinterpret_cast<const CommPacketHeader*>(msg);
 
-    // check packet header
     if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0){
         //std::cout << "bad header" << std::endl;
         return false;
@@ -875,6 +874,7 @@ bool Comm::validate_packet (const char* msg, int len, CommPacketHeader& packet)
         //std::cout << "bad timer" << std::endl;
         return false;
     }
+
     // passed all checks, packet is valid
     return true;
 }

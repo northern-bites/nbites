@@ -7,7 +7,6 @@ from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from ..playbook import PBConstants
 from man.noggin.typeDefs.Location import RobotLocation
 
 class Navigator(FSA.FSA):
@@ -21,6 +20,7 @@ class Navigator(FSA.FSA):
         self.addStates(ChaseStates)
         self.addStates(PFKStates)
         self.currentState = 'stopped'
+        self.doingSweetMove = False
         self.setName('Navigator')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)
@@ -70,9 +70,6 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
-        if(self.brain.play.isRole(PBConstants.GOALIE)):
-            if not self.brain.play.isSubRole(PBConstants.READY_GOALIE):
-               self.switchTo('playbookGoalieWalk')
 
         self.switchTo('playbookWalk')
 

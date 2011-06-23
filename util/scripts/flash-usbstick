@@ -231,7 +231,7 @@ destroyhome(){
   # I choose to use a strange block size 15*1025
   echo "${image}"
   echo "/dev/${dev}"
-  dd if=/dev/zero of="/dev/${dev}" bs=1M seek=475 2>/dev/null >/dev/null
+  #dd if=/dev/zero of="/dev/${dev}" bs=1M seek=475 2>/dev/null >/dev/null
 
 }
 

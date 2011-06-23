@@ -1,21 +1,10 @@
-import ChaseBallTransitions as transitions
+from . import ChaseBallTransitions as transitions
+from . import ChaseBallConstants as constants
+from ..kickDecider import kicks
 
 """
 Here we house all of the state methods used for kicking the ball
 """
-def preKickStop(player):
-    """
-    If we have already decided the kick but need to stop before
-    we make the kick, stop
-    """
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        player.stopWalking()
-
-    if player.brain.nav.isStopped():
-        return player.goLater('kickBallExecute')
-
-    return player.stay()
 
 def kickBallExecute(player):
     """
@@ -44,23 +33,65 @@ def afterKick(player):
     """
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
-        player.hasAlignedOnce = False
         player.standup()
+        player.brain.tracker.trackBall()
+
+        kick = player.brain.kickDecider.getKick()
+
+        # We need to find it!
+        if not player.brain.ball.on:
+            if kick is kicks.LEFT_SIDE_KICK:
+                player.brain.tracker.lookToDir("right")
+            elif kick is kicks.RIGHT_SIDE_KICK:
+                player.brain.tracker.lookToDir("left")
+            elif (kick is kicks.RIGHT_DYNAMIC_STRAIGHT_KICK or
+                  kick is kicks.LEFT_DYNAMIC_STRAIGHT_KICK):
+                player.brain.tracker.kickDecideScan() # should scan upper reaches.
+            else:
+                return player.goLater('spinAfterBackKick')
 
         if player.penaltyKicking:
             return player.goLater('penaltyKickRelocalize')
 
         return player.stay()
 
-    player.brain.tracker.trackBall()
-
-    if player.brain.ball.on:
-        player.inKickingState = False
+    if transitions.shouldKickAgain(player):
         player.brain.nav.justKicked = False
-        return player.goLater('chase')
-
-    if transitions.shouldScanFindBall(player):
+        return player.goNow('positionForKick')
+    if transitions.shouldFindBallKick(player):
         player.inKickingState = False
+        player.hasKickedOff = True
         player.brain.nav.justKicked = False
-        return player.goLater('scanFindBall')
+        return player.goLater('findBall')
+    if ((player.counter > 1 and player.brain.nav.isStopped()) or
+        transitions.shouldChaseBall(player)):
+        player.inKickingState = False
+        player.hasKickedOff = True
+        player.brain.nav.justKicked = False
+        return player.goNow('chase')
+
+    return player.stay()
+
+def spinAfterBackKick(player):
+    """
+    State to spin to the ball after we kick it behind us.
+    """
+    if transitions.shouldChaseBall(player):
+        player.stopWalking()
+        player.brain.tracker.trackBall()
+        return player.goNow('chase')
+
+    if player.firstFrame():
+        player.brain.tracker.stopHeadMoves()
+        player.stopWalking()
+
+    if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
+        kick = player.brain.kickDecider.getKick()
+        if kick is kicks.LEFT_LONG_BACK_KICK or kick is kicks.LEFT_SHORT_BACK_KICK:
+            player.setWalk(0, 0, constants.FIND_BALL_SPIN_SPEED)
+        else:
+            player.setWalk(0, 0, -1*constants.FIND_BALL_SPIN_SPEED)
+
+        player.brain.tracker.trackBallSpin()
+
     return player.stay()

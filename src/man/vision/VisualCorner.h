@@ -83,9 +83,12 @@ public:
 
     virtual const bool hasPositiveID();
 
+    const std::vector<cornerID> getIDs();
+
     ////////////////////////////////////////////////////////////
     // SETTERS
     ////////////////////////////////////////////////////////////
+	void changeToT(boost::shared_ptr<VisualLine> stem);
     void setPossibleCorners(std::list <const ConcreteCorner *>
                             _possibleCorners);
     void setPossibleCorners(std::vector <const ConcreteCorner *>

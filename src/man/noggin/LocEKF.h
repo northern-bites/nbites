@@ -21,9 +21,9 @@
  * EKF class.
  */
 class LocEKF : public EKF<Observation,
-                          MotionModel, LOC_EKF_DIMENSION,
-                          LOC_MEASUREMENT_DIMENSION>,
-               public LocSystem
+MotionModel, LOC_EKF_DIMENSION,
+LOC_MEASUREMENT_DIMENSION>,
+public LocSystem
 {
 public:
 
@@ -38,21 +38,21 @@ public:
 
     // Update functions
     virtual void updateLocalization(MotionModel u, std::vector<Observation> Z);
-	void odometryUpdate(MotionModel u);
-	void applyObservations(vector<Observation> Z);
-	bool applyObservation(Observation Z);
-	void endFrame();
+    void odometryUpdate(MotionModel u);
+    void applyObservations(std::vector<Observation> Z);
+    bool applyObservation(Observation Z);
+    void endFrame();
 
-	void copyEKF(const LocEKF& other);
-	void mergeEKF(const LocEKF& other);
+    void copyEKF(const LocEKF& other);
+    void mergeEKF(const LocEKF& other);
 
-	void printAfterUpdateInfo();
-	void printBeforeUpdateInfo();
+    void printAfterUpdateInfo();
+    void printBeforeUpdateInfo();
 
     virtual void reset();
     virtual void redGoalieReset();
     virtual void blueGoalieReset();
-	virtual inline void resetLocTo(float x, float y, float h);
+    virtual inline void resetLocTo(float x, float y, float h);
 
     // Getters
     /**
@@ -75,15 +75,15 @@ public:
      */
     virtual const float getHEstDeg() const {
         return subPIAngle(xhat_k(2)) * TO_DEG;
-	}
+    }
 
 
     /**
      * @return The current pose estimate of the robot
      */
     virtual const PoseEst getCurrentEstimate() const { return PoseEst(xhat_k(0),
-                                                              xhat_k(1),
-                                                              xhat_k(2)); }
+                                                                      xhat_k(1),
+                                                                      xhat_k(2)); }
 
     /**
      * @return The current uncertainty for loc x position
@@ -116,9 +116,9 @@ public:
         return lastOdo;
     }
 
-	virtual const vector<Observation> getLastObservations() const {
-		return lastObservations;
-	}
+    virtual const std::vector<Observation> getLastObservations() const {
+        return lastObservations;
+    }
 
     // Setters
     /**
@@ -163,42 +163,42 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
-	void incorporateCartesianMeasurement(int obsIndex,
-										   Observation z,
-										   StateMeasurementMatrix &H_k,
-										   MeasurementMatrix &R_k,
-										   MeasurementVector &V_k);
-	void incorporatePolarMeasurement(int obsIndex,
-									   Observation z,
-									   StateMeasurementMatrix &H_k,
-									   MeasurementMatrix &R_k,
-									   MeasurementVector &V_k);
+    void incorporateCartesianMeasurement(int obsIndex,
+                                         Observation z,
+                                         StateMeasurementMatrix &H_k,
+                                         MeasurementMatrix &R_k,
+                                         MeasurementVector &V_k);
+    void incorporatePolarMeasurement(int obsIndex,
+                                     Observation z,
+                                     StateMeasurementMatrix &H_k,
+                                     MeasurementMatrix &R_k,
+                                     MeasurementVector &V_k);
 
 
     int findBestLandmark(const Observation& z);
-	int findMostLikelyLine(const Observation& z);
-	float getMahalanobisDistance(const Observation& z, const LineLandmark& ll);
-	int findNearestNeighbor(const Observation& z);
+    int findMostLikelyLine(const Observation& z);
+    float getMahalanobisDistance(const Observation& z, const LineLandmark& ll);
+    int findNearestNeighbor(const Observation& z);
     float getDivergence(const Observation& z, const PointLandmark& pt);
 
 #ifdef USE_MM_LOC_EKF
-	bool updateProbability(const Observation& Z);
+    bool updateProbability(const Observation& Z);
 #endif
 
     void limitAPrioriUncert();
     void limitPosteriorUncert();
     void clipRobotPose();
     void deadzone(float &R, float &innovation, float CPC, float EPS);
-	std::pair<float, float> findClosestLinePointCartesian(LineLandmark l,
-														  float x_r,
-														  float y_r,
-														  float h_r);
+    std::pair<float, float> findClosestLinePointCartesian(LineLandmark l,
+                                                          float x_r,
+                                                          float y_r,
+                                                          float h_r);
 
     // Last odometry update
     MotionModel lastOdo;
-	vector<Observation> lastObservations;
+    std::vector<Observation> lastObservations;
     bool useAmbiguous;
-	MeasurementMatrix R_pred_k;
+    MeasurementMatrix R_pred_k;
 
     // Parameters
     const static float USE_CARTESIAN_DIST;

@@ -106,3 +106,8 @@ OPTION(
   "Redirect the standard error to standard out in C++"
   ON
   )
+OPTION(
+  USE_TTS
+  "Use the Text-To-Speech system"
+  ON
+  )

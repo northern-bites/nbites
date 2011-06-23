@@ -27,13 +27,16 @@ using namespace boost;
 //#include "NaoEnactor.h"
 
 Motion::Motion (shared_ptr<Synchro> _synchro,
-				shared_ptr<MotionEnactor> _enactor,
-				shared_ptr<Sensors> s, shared_ptr<Profiler> p)
+                shared_ptr<MotionEnactor> _enactor,
+                shared_ptr<Sensors> s,
+                shared_ptr<Profiler> p,
+                shared_ptr<NaoPose> _pose)
   : Thread(_synchro, "Motion"),
-    switchboard(s,p),
-    enactor(_enactor),
+    switchboard(s,p,_pose),
     interface(&switchboard),
-	profiler(p)
+    enactor(_enactor),
+    profiler(p),
+    pose(_pose)
 {
     set_motion_interface(&interface);
 }
@@ -53,7 +56,7 @@ void Motion::stop() {
 }
 
 void Motion::run(){
-    cout <<"Motion::run"<<endl;
+    std::cout <<"Motion::run"<<std::endl;
     Thread::trigger->on();
 
     //Setup the callback  in the enactor so it knows to call the switchboard
