@@ -2169,7 +2169,7 @@ list< VisualCorner > FieldLines::intersectLines()
             // assign x, y, dist, bearing, line i, line j, t value for line i,
             // t value for line 2
             VisualCorner c(intersection.x, intersection.y, intersectDist, intersectBearing,
-                           *i, *j, t_I, t_J);
+                           *i, *j, t_I, t_J, pose);
 
             if (!isThereGreenAroundCorner(c, **i, **j)){
                 continue;

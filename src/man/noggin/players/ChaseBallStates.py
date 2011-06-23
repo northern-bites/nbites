@@ -159,10 +159,16 @@ def kickOff(player):
     """
     Perform special behavior when we are kicking off
     """
-    smallTeam = player.brain.playbook.pb.numActiveFieldPlayers < 3
-    player.brain.kickDecider.setKickOff(smallTeam)
+    player.brain.kickDecider.setKickOff()
 
-    return player.goNow('positionForKick')
+    if transitions.shouldPositionForKick(player):
+        return player.goNow('positionForKick')
+
+    if player.firstFrame():
+        player.brain.nav.chaseBall()
+        player.brain.tracker.trackBall()
+
+    return player.stay()
 
 def dribble(player):
     """

@@ -10,13 +10,13 @@ class VisualCorner;
 
 #include "ConcreteCorner.h"
 #include "Utility.h"
-#include "VisualDetection.h"
-#include "VisualLandmark.h"
+#include "VisualObject.h"
 #include "VisualLine.h"
 #include <boost/shared_ptr.hpp>
 
+class NaoPose;
 
-class VisualCorner : public VisualDetection, public VisualLandmark<cornerID> {
+class VisualCorner : public VisualObject {
 private: // Constants
     // Number of pixels that must extend beyond the intersection for a line to
     // be considered a T
@@ -26,11 +26,15 @@ private: // Constants
     static const point <int> naoLocation;
 
 public:
-    VisualCorner(const int _x, const int _y, const float _distance,
-                 const float _bearing,
+    // ConcreteType provided by this VisualObject
+    typedef ConcreteCorner ConcreteType;
+
+    VisualCorner(const int _x, const int _y,
+                 const float _distance, const float _bearing,
                  boost::shared_ptr<VisualLine> l1,
-                 boost::shared_ptr<VisualLine> l2, const float _t1,
-                 const float _t2);
+                 boost::shared_ptr<VisualLine> l2,
+                 const float _t1, const float _t2,
+                 boost::shared_ptr<NaoPose> _pose);
     // destructor
     virtual ~VisualCorner();
     // copy constructor
@@ -55,8 +59,9 @@ public:
     ////////////////////////////////////////////////////////////
     // GETTERS
     ////////////////////////////////////////////////////////////
-    const std::list <const ConcreteCorner *> getPossibleCorners() const {
-        return possibleCorners; }
+    const std::list <const ConcreteCorner *>* getPossibilities() const {
+        return &possibleCorners;
+    }
     boost::shared_ptr<VisualLine> getLine1() const { return line1; }
     boost::shared_ptr<VisualLine> getLine2() const { return line2; }
 
@@ -64,22 +69,25 @@ public:
     boost::shared_ptr<VisualLine> getTStem() const { return tStem; }
 
     // See FieldLines.cc intersectLines to see how this is calculated and used
-    const float getT1() const { return t1; }
-    const float getT2() const { return t2; }
-    const shape getShape() const { return cornerType; }
-    const shape getSecondaryShape() const { return secondaryShape; }
+    float getT1() const { return t1; }
+    float getT2() const { return t2; }
+    shape getShape() const { return cornerType; }
+    shape getSecondaryShape() const { return secondaryShape; }
 
     // DO NOT USE THIS UNLESS getShape() returns inner or outer L; I have
     // not yet hooked up the angle thing for T corners
-    const float getAngleBetweenLines() const { return angleBetweenLines; }
+    float getAngleBetweenLines() const { return angleBetweenLines; }
 
-    const float getOrientation() const { return orientation; }
+    float getOrientation() const { return orientation; }
+    float getPhysicalOrientation() const { return physicalOrientation; }
+    float getPhysicalOrientationSD() const { return M_PI_FLOAT/20; }
+    //return physicalOrientationSD; }
 
-    const point<int> getTStemEndpoint() const;
-    const bool doesItPointDown();
-    const bool doesItPointUp();
-    const bool doesItPointRight();
-    const bool doesItPointLeft();
+    point<int> getTStemEndpoint() const;
+    bool doesItPointDown();
+    bool doesItPointUp();
+    bool doesItPointRight();
+    bool doesItPointLeft();
 
     virtual const bool hasPositiveID();
 
@@ -88,6 +96,7 @@ public:
     ////////////////////////////////////////////////////////////
     // SETTERS
     ////////////////////////////////////////////////////////////
+	void changeToT(boost::shared_ptr<VisualLine> stem);
     void setPossibleCorners(std::list <const ConcreteCorner *>
                             _possibleCorners);
     void setPossibleCorners(std::vector <const ConcreteCorner *>
@@ -104,6 +113,9 @@ public:
 
 private: // private methods
     const shape getLClassification();
+    float getLPhysicalOrientation();
+    float getTPhysicalOrientation();
+    float getLinePhysicalOrientation(point<int> end);
 
     void IDFromLine(const boost::shared_ptr<VisualLine> line);
 
@@ -120,6 +132,8 @@ private: // private methods
 
 
 private:
+    boost::shared_ptr<NaoPose> pose;
+
     // This list will hold all the possibilities for this corner's specific ID
     // It will get set from within FieldLines.cc.
     std::list <const ConcreteCorner *> possibleCorners;
@@ -146,6 +160,32 @@ private:
     float orientation;
     bool up;       // does the bisector point up?
     bool right;    // does the bisector point right?
+
+    // The physical orientation of the robot to the physical corner on the
+    // field, given in radians in terms of our rotation from the zero
+    // angle of that corner
+    //
+    // For L-Corners:
+    //         Zero angle is the left leg if you are standing
+    //             at the intersection
+    //
+    // ---------- <- zero line
+    // |
+    // |
+    // |
+    // |
+    //
+    // For T-Corners:
+    //             Zero angle is aligned with the T-Stem
+    //
+    // |
+    // |
+    // |
+    // ------- <- zero line
+    // |
+    // |
+    // |
+    float physicalOrientation;
 };
 
 // functor that checks if the shape of one corner equals the given shape
@@ -198,6 +238,5 @@ public:
                         abs(edges.bottom - y) < minPixelSeparation));
     }
 };
-
 
 #endif

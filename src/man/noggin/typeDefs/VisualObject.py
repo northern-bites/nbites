@@ -14,9 +14,9 @@ class VisualObject(Location):
         self.height = 0
         self.visDist = 0
         self.visBearing = 0
+        self.on = 0
         self.framesOn = 0
         self.framesOff = 0
-        self.on = False
 
     def updateVision(self, visionInfos):
         self.centerX = visionInfos.centerX
@@ -27,17 +27,9 @@ class VisualObject(Location):
         self.visBearing = visionInfos.bearing
         self.angleX = visionInfos.angleX
         self.angleY = visionInfos.angleY
-
-        # obj is in this frame
-        if self.visDist > 0:
-            self.on = True
-            self.framesOn += 1
-            self.framesOff = 0
-        # obj not in this frame
-        else:
-            self.on = False
-            self.framesOff += 1
-            self.framesOn = 0
+        self.on = visionInfos.on
+        self.framesOn = visionInfos.framesOn
+        self.framesOff = visionInfos.framesOff
 
     def __str__(self):
         """returns string with all class variables"""

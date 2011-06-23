@@ -132,6 +132,7 @@ def returnHeadsPan(tracker):
 def look(tracker):
     """down, right, up, left"""
     if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
         heads = HeadMoves.LOOK_HEADS[tracker.lookDirection]
         tracker.helper.panTo(heads)
         return tracker.stay()

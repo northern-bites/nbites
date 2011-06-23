@@ -27,8 +27,8 @@
 #include "EKF.h"
 #include "EKFStructs.h"
 
-class AccEKF : public EKF<AccelMeasurement, int, ACC_NUM_DIMENSIONS,
-                          ACC_NUM_DIMENSIONS>
+class AccEKF : public ekf::EKF<AccelMeasurement, int, ekf::acc_num_dimensions,
+                               ekf::acc_num_dimensions>
 {
 public:
     AccEKF();
@@ -50,7 +50,7 @@ public:
 private:
     // Core functions
     virtual StateVector associateTimeUpdate(int u_k);
-    virtual void incorporateMeasurement(AccelMeasurement z,
+    virtual void incorporateMeasurement(const AccelMeasurement& z,
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
@@ -58,7 +58,6 @@ private:
     const float getVariance(float, float);
 
 private: // Constants
-    static const int num_dimensions;
     static const float beta;
     static const float gamma;
     static const float variance;
