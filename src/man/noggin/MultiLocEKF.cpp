@@ -59,9 +59,9 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
  * Stores them in pt_dist and pt_bearing
  */
 #define CALCULATE_PT_OBS_ERRORS(obs, pt)                                \
-    const float x = xhat_k_bar(0);                                      \
-    const float y = xhat_k_bar(1);                                      \
-    const float h = xhat_k_bar(2);                                      \
+    const float x = xhat_k_bar(x_index);                                \
+    const float y = xhat_k_bar(y_index);                                \
+    const float h = xhat_k_bar(h_index);                                \
                                                                         \
     /* Relative (x,y) from landmark to our position */                  \
     float pt_rel_x = (x - pt.x);                                        \
@@ -140,6 +140,7 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
         R_k(1,1) = z.getBearingSD() * z.getBearingSD();                 \
     }
 
+// Print the vectors and matrices used in the correction steps
 #ifdef DEBUG_LOC_EKF_INPUTS
 #define PRINT_LOC_EKF_INPUTS()                          \
     cout << "\t\t\tR vector is" << R_k << endl;         \
@@ -286,8 +287,8 @@ void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
 
     bool shouldCorrect = !pt_z.empty() || !c_z.empty();
 
-    // Our localization needs to be reset
     if (resetFlag){
+
         // resetFlag = false if we reset loc, still true otherwise
         resetFlag = !resetLoc(pt_z, c_z);
 
@@ -303,7 +304,7 @@ void MultiLocEKF::applyObservations(vector<PointObservation> pt_z,
     // Correct step based on the observations
     shouldCorrect ? correctionStep(pt_z, c_z) : noCorrectionStep();
 
-    //limitPosteriorUncert();
+    limitPosteriorUncert();
 }
 
 
@@ -362,14 +363,13 @@ MultiLocEKF::associateTimeUpdate(MotionModel u)
 }
 
 /**
- * Method to deal with incorporating a loc measurement into the EKF
+ * Method to deal with incorporating a PointObservation into the EKF
  *
  * @param z the measurement to be incorporated
- * @param H_k the jacobian associated with the measurement, to be filled out
- * @param R_k the covariance matrix of the measurement, to be filled out
- * @param V_k the measurement invariance
+ * @param H_k the jacobian associated with the measurement, to be filled
+ * @param R_k the covariance matrix of the measurement, to be filled
+ * @param V_k the measurement invariance, to be filled
  *
- * @return the measurement invariance
  */
 void MultiLocEKF::incorporateMeasurement(const PointObservation& z,
                                          StateMeasurementMatrix1 &H_k,
@@ -388,6 +388,8 @@ void MultiLocEKF::incorporateMeasurement(const PointObservation& z,
         return;
     }
 
+    // If the observation is close, we use a more stable technique for
+    // incorporating it
     if (z.getVisDistance() < USE_CARTESIAN_DIST) {
         incorporateCartesianMeasurement( obsIndex, z, H_k, R_k, V_k);
     } else {
@@ -398,6 +400,16 @@ void MultiLocEKF::incorporateMeasurement(const PointObservation& z,
                        MeasurementMatrix1>(P_k, H_k, V_k, &R_k);
 }
 
+
+/**
+ * Method to deal with incorporating a Corner Observation into the EKF
+ *
+ * @param z the measurement to be incorporated
+ * @param H_k the jacobian associated with the measurement, to be filled
+ * @param R_k the covariance matrix of the measurement, to be filled
+ * @param V_k the measurement invariance, to be filled
+ *
+ */
 void MultiLocEKF::incorporateMeasurement(const CornerObservation& z,
                                          StateMeasurementMatrix2 &H_k,
                                          MeasurementMatrix2 &R_k,
@@ -422,6 +434,10 @@ void MultiLocEKF::incorporateMeasurement(const CornerObservation& z,
 }
 
 
+/**
+ * Convert the (normall polar) measurement to cartesian for a more
+ * stable jacobian and small distances
+ */
 void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
                                                   const PointObservation& z,
                                                   StateMeasurementMatrix1 &H_k,
@@ -487,6 +503,9 @@ void MultiLocEKF::incorporateCartesianMeasurement(int obsIndex,
 
 }
 
+/**
+ * Incorporate the Point Observation in its native polar form
+ */
 void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
                                               const PointObservation& z,
                                               StateMeasurementMatrix1 &H_k,
@@ -502,23 +521,22 @@ void MultiLocEKF::incorporatePolarMeasurement(int obsIndex,
 
     // Calculate the errors
     CALCULATE_PT_OBS_ERRORS(z, bestPossibility);
-
     INCORPORATE_POINT_POLAR(H_k, R_k, V_k);
-
     PRINT_LOC_EKF_INPUTS();
 }
 
-
+/**
+ * Incorporate a corner into the EKF.
+ *
+ *     Corners have distance, bearing *and* orientation!
+ */
 void MultiLocEKF::incorporateCorner(int index,
                                     const CornerObservation& z,
                                     StateMeasurementMatrix2 &H_k,
                                     MeasurementMatrix2 &R_k,
                                     MeasurementVector2 &V_k)
 {
-    // Get the observed range, bearing, and orientation
-    // Pack into measurement vector
-
-    // Get expected values of the corner
+    // The corner which fits the data best
     CornerLandmark c = z.getPossibilities()[index];
 
     // Calculate the errors
@@ -530,11 +548,15 @@ void MultiLocEKF::incorporateCorner(int index,
     // Has additional dimensions for orientation
     V_k(2) = orientation_error;
 
+    // The jacobian's denomitator
     float denom = sqrt( 1 - ((dot_prod * dot_prod) /
                              (pt_dist*pt_dist)));
     float sign = copysignf(1.0f, dot_sign);
 
     // Derivatives of orientation with respect to x,y,h
+    //
+    // Derived using SAGE math software (Linux), from
+    // the equations used to find the orientation
     H_k(2,0) = sign * (dot_prod * pt_rel_x/
                        pow(pt_dist,3) -
                        cos(c.angle)/pt_dist) / denom;
@@ -583,6 +605,10 @@ float MultiLocEKF::getDivergence(const PointObservation& z,
             bearing_error_norm * bearing_error_norm);
 }
 
+/**
+ * Returns the normalized Euclidean error between the given
+ * observation and landmark
+ */
 float MultiLocEKF::getDivergence(const CornerObservation& z,
                                  const CornerLandmark& pt)
 {
@@ -607,16 +633,18 @@ float MultiLocEKF::getDivergence(const CornerObservation& z,
 
 
 /*
- * Specialized acceptable divergence functions
+ * Specialized acceptable divergence functions. Templated to allow for
+ * a different "acceptable divergence" for different landmark types,
+ * since they have different dimensions.
  */
 template<>
-float MultiLocEKF::getAcceptableDivergence<CornerLandmark>() {
+inline float MultiLocEKF::getAcceptableDivergence<CornerLandmark>() {
     // (3 sd's outside)^2 * 3
     return max_corner_divergence;
 }
 
 template<>
-float MultiLocEKF::getAcceptableDivergence<PointLandmark>() {
+inline float MultiLocEKF::getAcceptableDivergence<PointLandmark>() {
     // (3 sd's outside)^2 * 2
     return max_pt_divergence;
 }
@@ -701,70 +729,6 @@ void MultiLocEKF::clipRobotPose()
     }
 }
 
-
-
-// THIS METHOD IS NOT CURRENTLY BEING USED NOR HAS IT BEEN ADEQUATELY TESTED
-// CONSULT NUbots Team Report 2006 FOR MORE INFORMATION
-/**
- * Detect if we are in a deadzone and apply the correct changes to keep the pose
- * estimate from drifting
- *
- * @param R The measurement noise covariance matrix
- * @param innovation The measurement divergence
- * @param CPC Predicted measurement variance
- * @param EPS Size of the deadzone
- */
-void MultiLocEKF::deadzone(float &R, float &innovation,
-                      float CPC, float eps)
-{
-    float invR = 0.0;
-    // Not in a deadzone
-    if ((eps < 1.0e-08) || (CPC < 1.0e-08) || (R < 1e-08)) {
-        return;
-    }
-
-    if ( abs(innovation) > eps) {
-        // Decrease the covariance, so that it effects the estimate more
-        invR=( abs(innovation) / eps-1) / CPC;
-    } else {
-        // Decrease the innovations, so that it doesn't effect the estimate
-        innovation=0.0;
-        invR = 0.25f / (eps*eps) - 1.0f/ CPC;
-    }
-
-    // Limit the min Covariance value
-    if (invR<1.0e-08) {
-        invR=1e-08f;
-    }
-    // Set the covariance to be the adjusted value
-    if ( R < 1.0/invR ) {
-        R=1.0f/invR;
-    }
-}
-
-// Finds the closest point on a line to the robot's position.
-// Returns relative coordinates of the point, in the frame of
-// reference of the field's coordinate system.
-std::pair<float,float>
-MultiLocEKF::findClosestLinePointCartesian(LineLandmark l, float x_r,
-                                      float y_r, float h_r)
-{
-    const float x_l = l.dx;
-    const float y_l = l.dy;
-
-    const float x_b = l.x1;
-    const float y_b = l.y1;
-
-    // Find closest point on the line to the robot (global frame)
-    const float x_p = ((x_r - x_b)*x_l + (y_r - y_b)*y_l)*x_l + x_b;
-    const float y_p = ((x_r - x_b)*x_l + (y_r - y_b)*y_l)*y_l + y_b;
-
-    // Relativize the closest point
-    const float relX_p = x_p - x_r;
-    const float relY_p = y_p - y_r;
-    return std::pair<float,float>(relX_p, relY_p);
-}
-
 void MultiLocEKF::printBeforeUpdateInfo()
 {
     cout << "Loc update: " << endl;
@@ -783,15 +747,6 @@ void MultiLocEKF::printAfterUpdateInfo()
     cout << endl;
     cout << endl;
 }
-
-/**
- * Checks after correction steps and before the state is updated.
- */
-void MultiLocEKF::beforeCorrectionFinish()
-{
-
-}
-
 
 /**
  * Uses unambiguous observations to reset localization to a new
@@ -986,14 +941,6 @@ void MultiLocEKF::resetLoc(const CornerObservation* c)
     float distVariance = c->getDistanceSD() * c->getDistanceSD();
     float bearingVariance = c->getBearingSD() * c->getBearingSD();
     float orientationVariance = c->getOrientationSD() * c->getOrientationSD();
-
-    float xVariance = c->getVisDistance() * orientationVariance * sin(theta) +
-        cos(theta) * distVariance + orientationVariance * distVariance;
-
-    float yVariance = c->getVisDistance() * orientationVariance * cos(theta) +
-        sin(theta) * distVariance + orientationVariance * distVariance;
-
-    float hVariance = orientationVariance + bearingVariance;
 
     P_k_bar(0,0) = distVariance * 2;
     P_k_bar(0,1) = 0.0f;

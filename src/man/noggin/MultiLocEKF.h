@@ -45,6 +45,10 @@ class MultiLocEKF : public ekf::TwoMeasurementEKF<PointObservation,
         h_index
     };
 
+    enum {
+        error_log_width = 20
+    };
+
 public:
 
     // Constructors & Destructors
@@ -253,6 +257,9 @@ private:
      * the vector
      *
      * @param z The observation to be fixed
+     *
+     * @return The index of the landmark which fits best, or -1 if no
+     *         acceptable landmarks are found
      */
     template <class ObsT, class LandmarkT>
     int findBestLandmark(const ObsT& z) {
@@ -276,10 +283,13 @@ private:
      * Find the point closest to our observation.
      *
      * @param The observed point
-     * @return Index of the nearest neighbor
+     *
+     * @return Index of the nearest neighbor or -1 if none are
+     *         acceptably close to the observation
      */
     template <class ObsT, class LandmarkT>
     int findNearestNeighbor(const ObsT& z){
+
         std::vector<LandmarkT> possiblePoints = z.getPossibilities();
         float minDivergence = getAcceptableDivergence<LandmarkT>();
         int minIndex = -1;
@@ -287,20 +297,20 @@ private:
 #ifdef DEBUG_DIVERGENCE_CALCULATIONS
         std::cout << std::endl
                   << "Calculating Divergence from " << z << std::endl;
-#endif // DEBUG_DIVERGENCE_CALCULATIONS
+#endif
 
         for (unsigned int i = 0; i < possiblePoints.size(); ++i) {
             float divergence = getDivergence(z, possiblePoints[i]);
-
-#ifdef DEBUG_DIVERGENCE_CALCULATIONS
-            std::cout << "\tTo Landmark " << possiblePoints[i] << std::endl;
-            std::cout << "\t\tdivergence =  " << divergence << std::endl;
-#endif // DEBUG_DIVERGENCE_CALCULATIONS
 
             if (divergence < minDivergence) {
                 minDivergence = divergence;
                 minIndex = i;
             }
+
+#ifdef DEBUG_DIVERGENCE_CALCULATIONS
+            std::cout << "\tTo Landmark " << possiblePoints[i] << std::endl;
+            std::cout << "\t\tdivergence =  " << divergence << std::endl;
+#endif
         }
         return minIndex;
     }
@@ -310,18 +320,13 @@ private:
 
     // Generic template
     template<class LandmarkT>
-    inline float getAcceptableDivergence() { return 100; } // arbitrary
+    static inline float getAcceptableDivergence() { return 100; } // arbitrary
 
-    virtual void beforeCorrectionFinish();
+    virtual void beforeCorrectionFinish(){ }
 
     void limitAPrioriUncert();
     void limitPosteriorUncert();
     void clipRobotPose();
-    void deadzone(float &R, float &innovation, float CPC, float EPS);
-    std::pair<float, float> findClosestLinePointCartesian(LineLandmark l,
-                                                          float x_r,
-                                                          float y_r,
-                                                          float h_r);
 
     // Last odometry update
     MotionModel lastOdo;
@@ -335,10 +340,6 @@ private:
      */
     Boxcar errorLog;
     bool resetFlag;
-
-    enum {
-        error_log_width = 20
-    };
 
     // Fraction of frames with an erroneous observation
     const static float ERROR_RESET_THRESH;

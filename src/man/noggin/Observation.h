@@ -21,89 +21,61 @@
 #include "VisualCross.h"
 
 /**
+ * The constructors for all point observations are identical based on
+ * their types, but can't be templated because we don't want
+ * Observation to have multiple different types.
+ */
+#define POINT_OBSERVATION_CONSTRUCTOR(VisT, ConcT)                      \
+    Observation(const VisT &_object)                                    \
+        : visDist(_object.getDistance()), visBearing(_object.getBearing()), \
+          sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()), \
+          id(_object.getID()), possibilities()                          \
+    {                                                                   \
+        const std::list <const ConcT *> * objList =                     \
+            _object.getPossibilities();                                 \
+        std::list<const ConcT*>::const_iterator i;                      \
+        for( i = objList->begin(); i != objList->end(); ++i) {          \
+            LandmarkT objectLandmark((**i).getFieldX(),                 \
+                                     (**i).getFieldY());                \
+            possibilities.push_back(objectLandmark);                    \
+        }                                                               \
+    }
+
+
+
+/**
  * @brief Class to hold the informations associated with the
- *        observation of a landmark
+ *        observation of a landmark.
+ *
+ *        Template argument defines the type of landmark which this
+ *        Observation corresponds to.
  */
 template<class LandmarkT>
 class Observation
 {
 public:
-    Observation(const VisualFieldObject &_object)
-        : visDist(_object.getDistance()), visBearing(_object.getBearing()),
-          sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
-          id(_object.getID()), possibilities()
-        {
-            initPossibilities(_object);
-        }
+    POINT_OBSERVATION_CONSTRUCTOR(VisualFieldObject, ConcreteFieldObject)
+    POINT_OBSERVATION_CONSTRUCTOR(VisualCross, ConcreteCross)
 
+    // We need a special constructor for corners since they have 3
+    // arguments for their landmarks (rather than the two for points)
     Observation(const VisualCorner &_object)
-        : visDist(_object.getDistance()), visBearing(_object.getBearing()),
-          sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
-          id(_object.getID()), possibilities()
+    : visDist(_object.getDistance()), visBearing(_object.getBearing()),
+        sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
+        id(_object.getID()), possibilities()
         {
-            initPossibilities(_object);
+            const std::list <const ConcreteCorner *> * objList =
+                _object.getPossibilities();
+            std::list<const ConcreteCorner*>::const_iterator i;
+            for( i = objList->begin(); i != objList->end(); ++i) {
+                LandmarkT objectLandmark((**i).getFieldX(),
+                                         (**i).getFieldY(),
+                                         (**i).getFieldAngle());
+                possibilities.push_back(objectLandmark);
+            }
         }
-
-    Observation(const VisualCross &_object)
-        : visDist(_object.getDistance()), visBearing(_object.getBearing()),
-          sigma_d(_object.getDistanceSD()), sigma_b(_object.getBearingSD()),
-          id(_object.getID()), possibilities()
-        {
-            initPossibilities(_object);
-        }
-
-    Observation() { }
-public:
 
     virtual ~Observation() { }
-
-protected:
-    // Core Functions
-    void initPossibilities(const VisualFieldObject& _object) {
-        typedef typename VisualFieldObject::ConcreteType ConcT;
-
-        typename std::list<const ConcT *>::const_iterator i;
-
-        const std::list <const ConcT *> * objList =
-            _object.getPossibilities();
-
-        for( i = objList->begin(); i != objList->end(); ++i) {
-            LandmarkT objectLandmark((**i).getFieldX(),
-                                     (**i).getFieldY());
-            possibilities.push_back(objectLandmark);
-        }
-    }
-
-    void initPossibilities(const VisualCross& _object) {
-        typedef typename VisualCross::ConcreteType ConcT;
-
-        typename std::list<const ConcT *>::const_iterator i;
-
-        const std::list <const ConcT *> * objList =
-            _object.getPossibilities();
-
-        for( i = objList->begin(); i != objList->end(); ++i) {
-            LandmarkT objectLandmark((**i).getFieldX(),
-                                     (**i).getFieldY());
-            possibilities.push_back(objectLandmark);
-        }
-    }
-
-    void initPossibilities(const VisualCorner& _object) {
-        typedef typename VisualCorner::ConcreteType ConcT;
-
-        typename std::list<const ConcT *>::const_iterator i;
-
-        const std::list <const ConcT *> * objList =
-            _object.getPossibilities();
-
-        for( i = objList->begin(); i != objList->end(); ++i) {
-            LandmarkT objectLandmark((**i).getFieldX(),
-                                     (**i).getFieldY(),
-                                     (**i).getFieldAngle());
-            possibilities.push_back(objectLandmark);
-        }
-    }
 
 public:
 
@@ -157,13 +129,13 @@ protected:
     std::vector<LandmarkT> possibilities;
 };
 
+// Shorthand for use elsewhere
 typedef Observation<PointLandmark> PointObservation;
-
 
 /**
  * Derived Corner Observation
  *
- * Gives corner orientation plus basic range,bearing info
+ * Gives corner orientation plus basic point Observation information
  */
 class CornerObservation : public Observation<CornerLandmark>
 {
@@ -172,17 +144,20 @@ public:
         Observation<CornerLandmark>(_c),
         visOrientation(_c.getPhysicalOrientation()),
         sigma_o(_c.getPhysicalOrientationSD()) { }
+
     virtual ~CornerObservation() { }
 
     float getVisOrientation() const { return visOrientation; };
     float getOrientationSD()  const { return sigma_o;        };
 
-    friend std::ostream& operator<< (std::ostream &o, const CornerObservation &c) {
+    friend std::ostream& operator<< (std::ostream &o,
+                                     const CornerObservation &c) {
         return o << "Obs " << c.id << ": (" << c.visDist << ", " << c.visBearing
                  << ", " << c.visOrientation << ", "
                  << c.sigma_d << ", " << c.sigma_b
                  << ", " << c.sigma_o <<  ")";
     }
+
 private:
     float visOrientation;
     float sigma_o;

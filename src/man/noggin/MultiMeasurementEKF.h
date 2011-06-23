@@ -6,6 +6,60 @@
 
 namespace ekf {
 
+/**
+ * Declare the measurment types for a given measurement number
+ */
+#define MEASUREMENT_MATRIX_TYPES(n)                                          \
+    /* A vector with the length of the measurement dimensions */             \
+    typedef boost::numeric::ublas::vector<float, boost::numeric::ublas::     \
+                                          bounded_array<float,mSize##n> >    \
+    MeasurementVector##n;                                                    \
+                                                                             \
+    /* A square matrix with measurement dimension number of rows and cols */ \
+    typedef boost::numeric::ublas::matrix<float,                             \
+                                          boost::numeric::ublas::row_major,  \
+                                          boost::numeric::ublas::            \
+                                          bounded_array<float, mSize##n*     \
+                                                        mSize##n> >          \
+    MeasurementMatrix##n;                                                    \
+                                                                             \
+    /* A matrix that is of size measurement * states */                      \
+    typedef boost::numeric::ublas::matrix<float,                             \
+                                          boost::numeric::ublas::row_major,  \
+                                          boost::numeric::ublas::            \
+                                          bounded_array<float, mSize##n*     \
+                                                        numStates> >         \
+    StateMeasurementMatrix##n;
+
+
+/**
+ * Declare the measurement matrices associated with an observation
+ * parameter
+ */
+#define MEASUREMENT_MATRICES(n)                 \
+    StateMeasurementMatrix##n K_k##n, H_k##n;   \
+    MeasurementMatrix##n R_k##n;                \
+    MeasurementVector##n v_k##n;
+
+/**
+ * For use in the constructor list, it initializes the measurement
+ * matrices in the same order as they are declared in the
+ * MEASUREMENT_MATRICES macro.
+ */
+#define INIT_MEASUREMENT_MATRICES(n)            \
+        K_k##n(numStates, mSize##n, 0.0f),      \
+        H_k##n(mSize##n, numStates, 0.0f),      \
+        R_k##n(mSize##n, mSize##n, 0.0f),       \
+        v_k##n(mSize##n)
+
+
+
+/**
+ *
+ * An EKF which can take in two observation types and fuse their
+ * information to get a single consistent update.
+ *
+ */
 template <class Measurement1,
           unsigned int mSize1,
           class Measurement2,
@@ -33,50 +87,9 @@ public:
    StateMatrix;
 
 
-////////////////////////////////////////////////////////////
    // MEASUREMENT SIZE DEPENDANT VECTORS AND MATRICES
-   // A vector with the length of the measurement dimensions
-   typedef boost::numeric::ublas::vector<float, boost::numeric::ublas::
-                                         bounded_array<float,mSize1> >
-   MeasurementVector1;
-
-   // A square matrix with measurement dimension number of rows and cols
-   typedef boost::numeric::ublas::matrix<float,
-                                         boost::numeric::ublas::row_major,
-                                         boost::numeric::ublas::
-                                         bounded_array<float, mSize1*
-                                                       mSize1> >
-   MeasurementMatrix1;
-
-   // A matrix that is of size measurement * states
-   typedef boost::numeric::ublas::matrix<float,
-                                         boost::numeric::ublas::row_major,
-                                         boost::numeric::ublas::
-                                         bounded_array<float, mSize1*
-                                                       numStates> >
-   StateMeasurementMatrix1;
-
-   // A vector with the length of the measurement dimensions
-   typedef boost::numeric::ublas::vector<float, boost::numeric::ublas::
-                                         bounded_array<float,mSize2> >
-   MeasurementVector2;
-
-   // A square matrix with measurement dimension number of rows and cols
-   typedef boost::numeric::ublas::matrix<float,
-                                         boost::numeric::ublas::row_major,
-                                         boost::numeric::ublas::
-                                         bounded_array<float, mSize2*
-                                                       mSize2> >
-   MeasurementMatrix2;
-
-   // A matrix that is of size measurement * states
-   typedef boost::numeric::ublas::matrix<float,
-                                         boost::numeric::ublas::row_major,
-                                         boost::numeric::ublas::
-                                         bounded_array<float, mSize2*
-                                                       numStates> >
-   StateMeasurementMatrix2;
-   ////////////////////////////////////////////////////////////
+    MEASUREMENT_MATRIX_TYPES(1);
+    MEASUREMENT_MATRIX_TYPES(2);
 
 protected:
    StateVector xhat_k; // Estimate Vector
@@ -89,13 +102,8 @@ protected:
    StateVector gammas; // scaled uncertainty increase
 
    // Necessary computational matrices for correction step
-   StateMeasurementMatrix1 K_k1, H_k1;
-   MeasurementMatrix1 R_k1;
-   MeasurementVector1 v_k1;
-
-   StateMeasurementMatrix2 K_k2, H_k2;
-   MeasurementMatrix2 R_k2;
-   MeasurementVector2 v_k2;
+    MEASUREMENT_MATRICES(1);
+    MEASUREMENT_MATRICES(2);
 
    const boost::numeric::ublas::identity_matrix<float> dimensionIdentity;
 
@@ -108,19 +116,8 @@ public:
          Q_k(numStates,numStates), A_k(numStates,numStates),
          P_k(numStates,numStates), P_k_bar(numStates,numStates),
          betas(numStates), gammas(numStates),
-
-         // Measurement type 1
-         K_k1(numStates, mSize1, 0.0f),
-         H_k1(mSize1, numStates, 0.0f),
-         R_k1(mSize1, mSize1, 0.0f),
-         v_k1(mSize1),
-
-         // Measurement type 2
-         K_k2(numStates, mSize2, 0.0f),
-         H_k2(mSize2, numStates, 0.0f),
-         R_k2(mSize2, mSize2, 0.0f),
-         v_k2(mSize2),
-
+         INIT_MEASUREMENT_MATRICES(1),
+         INIT_MEASUREMENT_MATRICES(2),
          dimensionIdentity(numStates), frameCounter(0)
       {
 
