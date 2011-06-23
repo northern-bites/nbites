@@ -148,7 +148,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     ColorParams  cp(0,0,0,256,256,256,128,128,128);
 
     //timing the vision process
-    long startTime = thread_micro_time();
+    long long startTime = thread_micro_time();
 
     // Shrink (by averaging) the image, and do color segmentation
     ImageAcquisition::acquire_image_fast(table, cp, img, newImg);
@@ -156,7 +156,8 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     //PROCESS VISION!!
     vision.notifyImage(newImg);
 
-    long processTime = thread_micro_time() - startTime;
+    long long processTime = thread_micro_time() - startTime;
+
     vision.drawBoxes();
     env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
@@ -230,7 +231,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         }
         if (obj != NULL) {
             id = (int) obj->getID();
-            if (obj->getPossibleFieldObjects()->size() > 1) {
+            if (obj->getPossibilities()->size() > 1) {
                 if (id == BLUE_GOAL_LEFT_POST ||
                         id == BLUE_GOAL_RIGHT_POST ||
                         id == BLUE_GOAL_POST) {

@@ -25,8 +25,10 @@
 #include "EKF.h"
 #include "EKFStructs.h"
 
-class ZmpEKF : public EKF<ZmpMeasurement, ZmpTimeUpdate, ZMP_NUM_DIMENSIONS,
-                          ZMP_NUM_MEASUREMENTS>
+class ZmpEKF : public ekf::EKF<ZmpMeasurement,
+                               ZmpTimeUpdate,
+                               ekf::zmp_num_dimensions,
+                               ekf::zmp_num_measurements>
 {
 public:
     ZmpEKF();
@@ -45,7 +47,7 @@ public:
 private:
     // Core functions
     virtual StateVector associateTimeUpdate(ZmpTimeUpdate u_k);
-    virtual void incorporateMeasurement(ZmpMeasurement z,
+    virtual void incorporateMeasurement(const ZmpMeasurement& z,
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);

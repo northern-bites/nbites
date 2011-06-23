@@ -48,8 +48,8 @@ void ALEnactor::run() {
 
 #if ! defined OFFLINE || ! defined SPEEDY_ENACTOR
         if (processTime > MOTION_FRAME_LENGTH_uS){
-            cout << "Time spent in ALEnactor longer than frame length: "
-                 << processTime <<endl;
+            std::cout << "Time spent in ALEnactor longer than frame length: "
+                      << processTime << std::endl;
             //Don't sleep at all
         } else{
             interval.tv_sec = 0;
@@ -98,9 +98,8 @@ void ALEnactor::sendHardness(){
     //      probably quite slow
     for(unsigned int joint = 0; joint < NUM_JOINTS; joint ++){
 
-        const float chainStiffness
-            = motionCommandStiffness[joint];
-        const string name = JOINT_STRINGS[joint];
+        const float chainStiffness = motionCommandStiffness[joint];
+        const std::string name = JOINT_STRINGS[joint];
 #ifndef NO_ACTUAL_MOTION
         //almotion->setStiffness(name ,chainStiffness);
 #endif

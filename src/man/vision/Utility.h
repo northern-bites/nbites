@@ -41,7 +41,7 @@ public:
                                 const point <int> &c);
 
     // Returns true if the point is in the rectangle formed from the
-	// VisualLine's endpoints
+    // VisualLine's endpoints
     static const bool between(const VisualLine& line,
                               const point <int>& p);
 
@@ -56,16 +56,17 @@ public:
                                     const point<int> &c, const point<int> &d);
 
     static const bool intersectProp(const VisualLine& line1,
-									const VisualLine& line2);
+                                    const VisualLine& line2);
 
     static const point<int> getPointFartherFromCorner(const VisualLine &l,
-													  int cornerX, int cornerY);
+                                                      int cornerX,
+                                                      int cornerY);
 
 
     static const point<int> getCloserEndpoint(const VisualLine& l,
-											  int x, int y);
+                                              int x, int y);
     static const point<int> getCloserEndpoint(const VisualLine& l,
-											  const point<int>& p);
+                                              const point<int>& p);
 
     //static const float hypot(const float a, const float b);
 
