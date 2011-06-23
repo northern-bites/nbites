@@ -145,10 +145,26 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
 	// pre-screen blobs that don't meet our criteria
 	for (int i = 0; i < blobs->number(); i++) {
         int ar = blobs->get(i).getArea();
-        float perc = static_cast<float>(blobs->get(i).getPixels()) / static_cast<float>(ar);
+        float perc = static_cast<float>(blobs->get(i).getPixels()) /
+			static_cast<float>(ar);
+		// the getPixels approach doesn't work well for small balls
         int w = blobs->get(i).width();
         int h = blobs->get(i).height();
+		int x = blobs->get(i).getLeft();
+		int y = blobs->get(i).getTop();
         int diam = max(w, h);
+		if (w < 10 || (w < 20 && perc > 0.25)) {
+			int count = 0;
+			for (int j = x; j < x + w; j++) {
+				for (int k = y; k < y + h; k++) {
+					if (Utility::isOrange(thresh->getThresholded(k, j)) &&
+						!Utility::isRed(thresh->getThresholded(k, j))) {
+						count++;
+					}
+				}
+			}
+			perc = static_cast<float>(count) / static_cast<float>(ar);
+		}
         // For now we are going to allow very small balls to be a bit less orange
         // obviously this is dangerous, so we'll have to keep an eye on it.
         if (ar < MIN_AREA * 3) {
@@ -716,7 +732,13 @@ bool Ball::ballIsReasonablySquare(int x, int y, int w, int h) {
         return true;
 	} else if (ratio > THINBALL && ratio < FATBALL) {
         return true;
-    } else if (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin) ||
+	} else if (ratio < BALLTOOFAT && ratio > OCCLUDEDTHIN) {
+		// check for robot occlusion
+		if (robotOccludesIt(x, y, w, h)) {
+			return true;
+		}
+	}
+	if (nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin) ||
                nearImageEdgeY(y, margin) || nearImageEdgeY(y+h, margin)) {
         bool nearX = nearImageEdgeX(x, margin) || nearImageEdgeX(x+w, margin);
         bool nearY = nearImageEdgeY(y, margin) || nearImageEdgeY(y+h, margin);
@@ -745,6 +767,41 @@ bool Ball::ballIsReasonablySquare(int x, int y, int w, int h) {
 		return false;
 	}
     return true;
+}
+
+/*
+ */
+bool Ball::robotOccludesIt(int x, int y, int w, int h) {
+	if (BALLDEBUG) {
+		cout << "Checking for occluded ball" << endl;
+	}
+	int count = 0;
+	if (x > 2) {
+		for (int i = y; i < y + h; i++) {
+			for (int j = x - 2; j < x; j++) {
+				if (Utility::isWhite(thresh->getThresholded(i, j))) {
+					count++;
+				}
+			}
+		}
+	}
+	if (count > h) {
+		return true;
+	}
+	count = 0;
+	if (x < IMAGE_WIDTH - 2) {
+		for (int i = y; i < y + h; i++) {
+			for (int j = x + w + 1; j < x + w + 3; j++) {
+				if (Utility::isWhite(thresh->getThresholded(i, j))) {
+					count++;
+				}
+			}
+		}
+	}
+	if (count > h) {
+		return true;
+	}
+	return false;
 }
 
 /* Returns true is the blob abuts any image edge

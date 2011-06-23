@@ -75,6 +75,7 @@ public:
     float rightHalfColor(Blob obj);
     void setOcclusionInformation();
     bool ballIsReasonablySquare(int x, int y, int w, int h);
+	bool robotOccludesIt(int x, int y, int w, int h);
     bool nearImageEdgeX(int x, int margin);
     bool nearImageEdgeY(int y, int margin);
     bool nearEdge(Blob b);
