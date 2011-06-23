@@ -33,6 +33,8 @@ class HeadTracking(FSA.FSA):
         self.activeLocOn = False
         self.activePanOut = False
         self.activePanUp = False
+        # Enable safeBallTracking to always keep ball in frame while tracking
+        self.safeBallTracking = False
         self.isPreKickScanning = False
         self.preActivePanHeads = None
         self.locObjectList = []
@@ -223,3 +225,9 @@ class HeadTracking(FSA.FSA):
         self.target = None
         self.decisionState = 'activeLoc'
         self.switchTo('activeLoc')
+
+# ** # new method
+    def stareBall(self):
+        self.target = self.brain.ball
+        self.decisionState = 'trackingBall'
+        self.switchTo('trackingBall')

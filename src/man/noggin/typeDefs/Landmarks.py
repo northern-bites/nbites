@@ -82,3 +82,41 @@ class FieldObject(VisualObject, LocObject):
                 (Constants.visionObjectTuple[self.visionId],
                  Constants.landmarkTuple[self.localId],
                  self.visDist, self.visBearing))
+
+class FieldCorner(LocObject):
+    """
+    FieldCorner is a class for corners, storing localization information.
+    """
+    def __init__(self, _Id):
+        LocObject.__init__(self)
+        self.Id = _Id
+        self.framesOn = 0
+        self.height = 0
+        self.locDist = 0
+        self.locBearing = 0
+        self.x = 0
+        self.y = 0
+
+    def associateWithRelativeLandmark(self, relativeLandmark):
+        """
+        Method to set the properties of the object relative to the team color
+        """
+        self.x = relativeLandmark[0]
+        self.y = relativeLandmark[1]
+
+    def updateVision(self, possibleCorners, visionCorners):
+        if possibleCorners.count(self.Id) > 0:
+            # This corner has a definite match in the vision frame
+            self.framesOn += 1
+        else:
+            self.framesOn = 0
+
+    def updateLoc(self, loc, my):
+        """
+        Updates class variables with localization information.
+        """
+        self.locDist = my.distTo(self, forceCalc=True)
+        self.locBearing = my.getRelativeBearing(self, forceCalc=True)
+
+    def updateBestValues(self):
+        pass

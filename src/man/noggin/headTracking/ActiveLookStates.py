@@ -84,7 +84,6 @@ def targetTracking(tracker):
 # ** # new method
 def trackLandmarks(tracker):
     """
-    Assumes the robot is in the "ready" state.
     Looks at nearby landmarks for localization.
     """
     # Update tracking fitness of locObjects
@@ -130,9 +129,11 @@ def trackingBallLoc(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
-    # When finished, states called by trackingBallLoc will return to
-    # trackingBall state, which will then return here.
-    tracker.decisionState = 'trackingBall'
+    tracker.decisionState = 'trackingBallLoc'
+
+    # If we didn't arrive here from trackingBall, go there now.
+    if tracker.lastDiffState != 'trackingBall':
+        return tracker.goLater('trackingBall')
 
     # Update landmark fitness by angular distance from ball
     for obj in tracker.locObjectList:
@@ -156,18 +157,29 @@ def trackingBallLoc(tracker):
     oldIndex = tracker.locObjectList.index(tracker.target)
     tracker.target = tracker.locObjectList[oldIndex+1]
 
+    # Set values for sanity check.
+    if (tracker.safeBallTracking):
+        elevationCheck = fabs(tracker.brain.ball.elevation - \
+                                  tracker.target.elevation) < \
+                                  constants.ELEVATION_OFFSET_LIMIT
+        bearingCheck = fabs(tracker.brain.ball.bearing - \
+                                tracker.target.bearing) < \
+                                constant.BEARING_OFFSET_LIMIT
+    else:
+        # Elevation rarly inhibits looking towards an object
+        elevationCheck = True
+        bearingCheck = fabs(tracker.target.bearing) < \
+            constants.BEARING_THRESHOLD
+
     # Sanity check on target
-    while fabs(tracker.brain.ball.elevation - tracker.target.elevation) > \
-                constants.ELEVATION_OFFSET_LIMIT or \
-                fabs(tracker.brain.ball.bearing - tracker.target.bearing) > \
-                constants.BEARING_OFFSET_LIMIT:
-            # If this is most fit target, there are no viable landmarks
-            if tracker.target == tracker.locObjectList[0]:
-                print "No viable landmark to check."
-                return tracker.goLater('trackingBall')
-            else:
-                # Cycle to most fit landmark, then sanity check it.
-                tracker.target = tracker.locObjectList[0]
+    while not elevationCheck or not bearingCheck:
+        # If this is most fit target, there are no viable landmarks
+        if tracker.target == tracker.locObjectList[0]:
+            print "No viable landmark to check."
+            return tracker.goLater('trackingBall')
+        else:
+            # Cycle to most fit landmark, then sanity check it.
+            tracker.target = tracker.locObjectList[0]
 
     # Track target
     return tracker.goLater('trackLoc')

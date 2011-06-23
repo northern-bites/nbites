@@ -99,7 +99,7 @@ def trackLoc(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
-    # safety check that currentLocObject was set to a post
+    # safety check that target was not set to a ball
     if tracker.target is None or tracker.target == tracker.brain.ball:
         print "target is None, or the ball"
         return tracker.goLater(tracker.decisionState)
@@ -107,7 +107,7 @@ def trackLoc(tracker):
     tracker.helper.lookToTargetCoords(tracker.target)
 
     # if close enough to target, switch to stareLoc
-    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+    if tracker.helper.inView(target):
         print "found target on frame, now staring"
         return tracker.goLater('stareLoc')
 
@@ -127,20 +127,24 @@ def trackLoc(tracker):
 def stareLoc(tracker):
     """
     Dynamically stare at the target, then return to decisionState.
+    Note: Does not alter tracker.target
     """
-    # make sure head is inactive first
+    # Make sure head is inactive first
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
-    # find the real post in vision frame
-    target = tracker.helper.findPostInVision(tracker.target, tracker.brain)
+    # Find the real post in vision frame
+    if tracker.target is FieldObject:
+        stareTarget = tracker.helper.findPostInVision(tracker.target, tracker.brain)
+    else: # Target is a corner.
+        stareTarget = tracker.helper.findCornerInVision(tracker.target, tracker.brain)
 
-    # second safety check that any post is on the frame
+    # Second safety check that something was on frame
     if target is None:
-        print "no post of correct color on frame"
+        print "no possible target currently visible"
         return tracker.stay()
 
-    tracker.helper.lookToTargetAngles(target)
+    tracker.helper.lookToTargetAngles(stareTarget)
 
     if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
         print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
@@ -153,7 +157,6 @@ def stareLoc(tracker):
 def trackingBall(tracker):
     """
     Look directly at ball for a short time.
-    Then, check for nearby landmarks without losing sight of the ball.
     """
     # make sure head is inactive first
     if tracker.firstFrame():
@@ -166,6 +169,6 @@ def trackingBall(tracker):
 
     if tracker.counter > constants.TRACKER_BALL_STARE_THRESH:
         print "Past stare thresh for ball, looking for landmarks"
-        return tracker.goLater('trackingBallLoc')
+        return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()

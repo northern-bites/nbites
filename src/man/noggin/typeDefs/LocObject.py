@@ -1,8 +1,8 @@
 from .Location import Location
 
 class LocObject(Location):
-    """LocObject is a class for objects that need location information when vision
-    information is lacking."""
+    """LocObject is a class for objects that need location information
+    when vision information is lacking."""
 
     def __init__(self):
         Location.__init__(self, 0,0,0)

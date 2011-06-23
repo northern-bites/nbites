@@ -191,6 +191,26 @@ class HeadTrackingHelper(object):
 
         return None
 
+# ** # new method
+    def findCornerInVision(self, corner, brain):
+        """
+        Finds the given corner in the vision frame.
+        """
+        if corner.on:
+            return corner
+        else:
+            return None
+
+# ** # new method
+    def inView(self, target):
+        """
+        Returns confidence that target is in the vision frame.
+        """
+        if target is FieldObject:
+            return target.framesOn() > constants.TRACKER_FRAMES_ON_TRACK_THRESH
+        else: # Target is a corner.
+            return target.framesOn() > constants.TRACKER_FRAMES_ON_TRACK_THRESH
+
 # ** # old method - replaced?
     def lookToPoint(self, target):
         #convert from cm to mm for c++ code

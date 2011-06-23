@@ -129,6 +129,11 @@ class Brain(object):
         self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
                                           Constants.VISION_BGRP)
 
+        # Add field corners
+        self.corners = []
+        for i in range(16): # See PyVision.cpp for index meanings, 15-31
+            corners.append(Landmarks.FieldCorner(i))
+
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
 
@@ -143,22 +148,54 @@ class Brain(object):
             # Yellow goal
             self.oppGoalRightPost = self.yglp
             self.oppGoalLeftPost = self.ygrp
-
             # Blue Goal
             self.myGoalLeftPost = self.bglp
             self.myGoalRightPost = self.bgrp
+            # Corners
+            self.myHalfLeftCorner = self.corners[0]
+            self.myHalfRightCorner = self.corners[1]
+            self.myBoxLeftT = self.corners[2]
+            self.myBoxRightT = self.corners[3]
+            self.myBoxLeftL = self.corners[4]
+            self.myBoxRightL = self.corners[5]
+            self.centerLeftT = self.corners[7]
+            self.centerRightT = self.corners[8]
+            self.centerLeftCross = self.corners[15]
+            self.centerRightCross = self.corners[16]
+            self.oppHalfLeftCorner = self.corners[9]
+            self.oppHalfRightCorner = self.corners[8]
+            self.oppBoxLeftT = self.corners[11]
+            self.oppBoxRightT = self.corners[10]
+            self.oppBoxLeftL = self.corners[13]
+            self.oppBoxRightL = self.corners[12]
 
         # Yellow team setup
         else:
             # Yellow goal
             self.myGoalLeftPost = self.yglp
             self.myGoalRightPost = self.ygrp
-
             # Blue Goal
             self.oppGoalRightPost = self.bglp
             self.oppGoalLeftPost = self.bgrp
+            # Corners
+            self.myHalfLeftCorner = self.corners[8]
+            self.myHalfRightCorner = self.corners[9]
+            self.myBoxLeftT = self.corners[10]
+            self.myBoxRightT = self.corners[11]
+            self.myBoxLeftL = self.corners[12]
+            self.myBoxRightL = self.corners[13]
+            self.centerLeftT = self.corners[8]
+            self.centerRightT = self.corners[7]
+            self.centerLeftCross = self.corners[16]
+            self.centerRightCross = self.corners[15]
+            self.oppHalfLeftCorner = self.corners[1]
+            self.oppHalfRightCorner = self.corners[0]
+            self.oppBoxLeftT = self.corners[3]
+            self.oppBoxRightT = self.corners[2]
+            self.oppBoxLeftL = self.corners[5]
+            self.oppBoxRightL = self.corners[4]
 
-        # Since, for ex.  bgrp points to the same thins as myGoalLeftPost,
+        # Since, for ex.  bgrp points to the same things as myGoalLeftPost,
         # we can set these regardless of our team color
         self.myGoalLeftPost.associateWithRelativeLandmark(
                 Constants.LANDMARK_MY_GOAL_LEFT_POST)
@@ -278,6 +315,12 @@ class Brain(object):
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
 
+        possibleCorners = []
+        for i in range(len(self.vision.fieldlines.corners)):
+            possibleCorners.extend(self.vision.fieldlines.corners[i].possibilities)
+        for i in range(len(corners)):
+            corners[i].updateVision(possibleCorners,self.vision.fieldlines)
+
         self.time = time.time()
 
     def updateComm(self):
@@ -299,6 +342,9 @@ class Brain(object):
         self.bglp.updateLoc(self.loc, self.my)
         self.bgrp.updateLoc(self.loc, self.my)
 
+        for i in range(len(corners)):
+            corners[i].updateLoc(self.loc, self.my)
+
     def updateBestValues(self):
         """
         Update estimates about objects using best information available
@@ -308,6 +354,9 @@ class Brain(object):
         self.ygrp.updateBestValues()
         self.bglp.updateBestValues()
         self.bgrp.updateBestValues()
+
+        for i in range(len(corners)):
+            corners[i].updateBestValues()
 
     def updatePlaybook(self):
         """
