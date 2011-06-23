@@ -1,7 +1,6 @@
 import kicks
 import KickInformation
 import KickingConstants as constants
-from .. import NogginConstants
 
 class KickDecider(object):
     """
