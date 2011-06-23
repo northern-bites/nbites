@@ -74,7 +74,7 @@ class KickDecider(object):
         else:
             return self.clear()
 
-    def setKickOff(self, smallTeam):
+    def setKickOff(self):
         """
         sets the kick we should do in the kickOff situation
         """
