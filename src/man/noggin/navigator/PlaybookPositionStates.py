@@ -51,7 +51,8 @@ def playbookOmni(nav):
     if (navTrans.atDestinationCloser(my, dest) and
         navTrans.atHeading(my, dest.h)):
         nav.playbookAtPositionCount += 1
-        if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:
+        if (nav.playbookAtPositionCount >
+            constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK):
             return nav.goNow('playbookAtPosition')
     else:
         nav.playbookAtPositionCount = 0

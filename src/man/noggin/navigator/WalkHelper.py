@@ -1,5 +1,5 @@
 from . import NavConstants as constants
-from math import fabs
+from math import fabs, sqrt
 from man.noggin.util import MyMath
 
 def getOmniWalkParam(my, dest):
@@ -49,15 +49,13 @@ def getOmniWalkParam(my, dest):
                              constants.OMNI_MAX_RIGHT_SPIN_SPEED,
                              constants.OMNI_MAX_LEFT_SPIN_SPEED)
 
-    # refine x and y speeds
-    if (fabs(relH) > 50.):
-        sX = 0
-        sY = 0
+    denom = sqrt(sX*sX + sY*sY + sTheta*sTheta)
+    if denom != 0:
+        sX     /= denom
+        sY     /= denom
+        sTheta /= denom
 
-    elif (fabs(relH) > 25.):
-        sY = 0
-        sX = sX*.5
-
+    print (sX, sY, sTheta)
     return (sX, sY, sTheta)
 
 def getWalkSpinParam(my, dest):
