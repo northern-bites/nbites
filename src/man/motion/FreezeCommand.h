@@ -1,8 +1,6 @@
 #ifndef FreezeCommand_h
 #define FreezeCommand_h
 
-#include <boost/shared_ptr.hpp>
-
 #include "BaseFreezeCommand.h"
 
 class FreezeCommand : public BaseFreezeCommand {

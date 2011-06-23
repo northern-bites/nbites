@@ -26,68 +26,68 @@
 
 namespace MotionConstants {
 
-	enum MotionType {
-		WALK = 0,
+    enum MotionType {
+	WALK = 0,
         STEP,
-		BODY_JOINT,
-		HEAD_JOINT,
+	BODY_JOINT,
+	HEAD_JOINT,
         GAIT,
         SET_HEAD,
-		COORD_HEAD,
+	COORD_HEAD,
         STIFFNESS,
         FREEZE,
         UNFREEZE
-	};
+    };
 
-	const static unsigned int WALK_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
-	const static unsigned int STEP_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
-	const static unsigned int BODY_JOINT_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
-	const static unsigned int HEAD_JOINT_NUM_CHAINS = 1;
+    const static unsigned int WALK_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
+    const static unsigned int STEP_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
+    const static unsigned int BODY_JOINT_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
+    const static unsigned int HEAD_JOINT_NUM_CHAINS = 1;
     const static unsigned int GAIT_NUM_CHAINS = Kinematics::NUM_BODY_CHAINS;
     const static unsigned int STIFFNESS_NUM_CHAINS = Kinematics::NUM_CHAINS;
     const static unsigned int FREEZE_NUM_CHAINS = Kinematics::NUM_CHAINS;
 
 
-	const static int WALK_CHAINS[WALK_NUM_CHAINS] =
-      {Kinematics::LARM_CHAIN,
-       Kinematics::LLEG_CHAIN,
-       Kinematics::RLEG_CHAIN,
-       Kinematics::RARM_CHAIN };
+    const static int WALK_CHAINS[WALK_NUM_CHAINS] =
+    {Kinematics::LARM_CHAIN,
+     Kinematics::LLEG_CHAIN,
+     Kinematics::RLEG_CHAIN,
+     Kinematics::RARM_CHAIN };
 
-	const static int STEP_CHAINS[STEP_NUM_CHAINS] =
-      {Kinematics::LARM_CHAIN,
-       Kinematics::LLEG_CHAIN,
-       Kinematics::RLEG_CHAIN,
-       Kinematics::RARM_CHAIN };
+    const static int STEP_CHAINS[STEP_NUM_CHAINS] =
+    {Kinematics::LARM_CHAIN,
+     Kinematics::LLEG_CHAIN,
+     Kinematics::RLEG_CHAIN,
+     Kinematics::RARM_CHAIN };
 
     const static int GAIT_CHAINS[GAIT_NUM_CHAINS] =
-      { Kinematics::LARM_CHAIN,
-        Kinematics::LLEG_CHAIN,
-        Kinematics::RLEG_CHAIN,
-        Kinematics::RARM_CHAIN };
-
-	const static int BODY_JOINT_CHAINS[BODY_JOINT_NUM_CHAINS] =
     { Kinematics::LARM_CHAIN,
       Kinematics::LLEG_CHAIN,
       Kinematics::RLEG_CHAIN,
       Kinematics::RARM_CHAIN };
 
-	const static int HEAD_JOINT_CHAINS[HEAD_JOINT_NUM_CHAINS] =
-      { Kinematics::HEAD_CHAIN };
+    const static int BODY_JOINT_CHAINS[BODY_JOINT_NUM_CHAINS] =
+    { Kinematics::LARM_CHAIN,
+      Kinematics::LLEG_CHAIN,
+      Kinematics::RLEG_CHAIN,
+      Kinematics::RARM_CHAIN };
+
+    const static int HEAD_JOINT_CHAINS[HEAD_JOINT_NUM_CHAINS] =
+    { Kinematics::HEAD_CHAIN };
 
     const static int STIFFNESS_CHAINS[STIFFNESS_NUM_CHAINS] =
-      { Kinematics::HEAD_CHAIN,
-        Kinematics::LARM_CHAIN,
-        Kinematics::LLEG_CHAIN,
-        Kinematics::RLEG_CHAIN,
-        Kinematics::RARM_CHAIN };
+    { Kinematics::HEAD_CHAIN,
+      Kinematics::LARM_CHAIN,
+      Kinematics::LLEG_CHAIN,
+      Kinematics::RLEG_CHAIN,
+      Kinematics::RARM_CHAIN };
 
     const static int FREEZE_CHAINS[FREEZE_NUM_CHAINS] =
-      { Kinematics::HEAD_CHAIN,
-        Kinematics::LARM_CHAIN,
-        Kinematics::LLEG_CHAIN,
-        Kinematics::RLEG_CHAIN,
-        Kinematics::RARM_CHAIN };
+    { Kinematics::HEAD_CHAIN,
+      Kinematics::LARM_CHAIN,
+      Kinematics::LLEG_CHAIN,
+      Kinematics::RLEG_CHAIN,
+      Kinematics::RARM_CHAIN };
 
     static const float DEFAULT_ON_STIFFNESS = 0.85f;
     static const float DEFAULT_OFF_STIFFNESS = -1.0f;

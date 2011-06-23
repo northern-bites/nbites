@@ -17,7 +17,6 @@
 // You should have received a copy of the GNU General Public License
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
-//For gaitcommands
 
 #define BOOST_PYTHON_MAX_ARITY 28
 
@@ -30,6 +29,7 @@
 using namespace std;
 using namespace boost::python;
 
+#include "PyMotionCommand.h"
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
@@ -43,10 +43,8 @@ using namespace Kinematics;
 
 static MotionInterface* interface_reference = 0;
 
-class PyHeadJointCommand {
+class PyHeadJointCommand : public PyMotionCommand<HeadJointCommand> {
 public:
-    typedef boost::shared_ptr<PyHeadJointCommand> ptr;
-
     PyHeadJointCommand(float time, tuple joints,
 		       tuple stiffness, int interpolationType) {
 
@@ -66,14 +64,9 @@ public:
 				     static_cast<InterpolationType>(interpolationType)) 
 		);
     }
-
-    HeadJointCommand::ptr getCommand() const { return command; }
-
-private:
-    HeadJointCommand::ptr command;
 };
 
-class PyGaitCommand {
+class PyGaitCommand : public PyMotionCommand<Gait> {
 public:
     PyGaitCommand(const tuple &_stance_config,
                   const tuple &_step_config,
@@ -125,8 +118,6 @@ public:
 		     arm));
     }
 
-    Gait::ptr getCommand() const { return command; }
-
     template <class T, const unsigned int size> void
     fillArray( T target[size], tuple t, const T convert_units[size]){
         for(unsigned int i = 0; i < size; i++){
@@ -142,11 +133,10 @@ public:
     }
 
 private:
-    Gait::ptr command;
     float step[WP::LEN_STEP_CONFIG];
 };
 
-class PyWalkCommand {
+class PyWalkCommand : public PyMotionCommand<WalkCommand> {
 public:
     PyWalkCommand(float x_cms, float m_cms, float theta_degs) {
         //All python units should be in CM and DEG per second
@@ -157,14 +147,9 @@ public:
 			    theta_degs*TO_RAD)
 	    );
     }
-
-    WalkCommand::ptr getCommand() const { return command; }
-
-private:
-    WalkCommand::ptr command;
 };
 
-class PyStepCommand {
+class PyStepCommand : public PyMotionCommand<StepCommand> {
 public:
     PyStepCommand(float x_cms, float m_cms, float theta_degs, int numStep) {
         //All python units should be in CM and DEG per second
@@ -175,17 +160,10 @@ public:
 					     theta_degs*TO_RAD,
 					     numStep));
     }
-
-    StepCommand::ptr getCommand() const { return command; }
-
-private:
-    StepCommand::ptr command;
 };
 
-class PyBodyJointCommand {
+class PyBodyJointCommand : public PyMotionCommand<BodyJointCommand> {
 public:
-    typedef boost::shared_ptr<PyBodyJointCommand> ptr;
-
     PyBodyJointCommand(float time,
                        tuple larmJoints, tuple llegJoints,
                        tuple rlegJoints, tuple rarmJoints,
@@ -241,14 +219,9 @@ public:
 				 static_cast<InterpolationType>(interpolationType))
 	    );
     }
-
-    BodyJointCommand::ptr getCommand() const { return command; }
-
-private:
-    BodyJointCommand::ptr command;
 };
 
-class PySetHeadCommand {
+class PySetHeadCommand : public PyMotionCommand<SetHeadCommand> {
 public:
     PySetHeadCommand(const float yaw, const float pitch) {
         command = SetHeadCommand::ptr (
@@ -263,13 +236,9 @@ public:
 			       maxYawSpeed * TO_RAD, maxPitchSpeed * TO_RAD)
 	    );
     }
-
-    SetHeadCommand::ptr getCommand() const { return command; }
-private:
-    SetHeadCommand::ptr command;
 };
 
-class PyCoordHeadCommand {
+class PyCoordHeadCommand : public PyMotionCommand<CoordHeadCommand> {
 public:
     PyCoordHeadCommand( const float _x, const float _y, const float _z) {
 	command = CoordHeadCommand::ptr (
@@ -284,30 +253,22 @@ public:
 				  maxYawSpeed, maxPitchSpeed )
 	    );
     }
-
-    CoordHeadCommand::ptr getCommand() const { return command; }
-private:
-    CoordHeadCommand::ptr command;
 };
 
-class PyFreezeCommand{
+class PyFreezeCommand : public PyMotionCommand<FreezeCommand> {
 public:
     //Later, one could add more specific stiffness options
-    PyFreezeCommand()
-        :command(FreezeCommand::ptr(new FreezeCommand())){}
-    const FreezeCommand::ptr getCommand() const{return command;}
-private:
-    FreezeCommand::ptr command;
+    PyFreezeCommand() {
+	command = FreezeCommand::ptr( new FreezeCommand() );
+    }
 };
 
-class PyUnfreezeCommand{
+class PyUnfreezeCommand : public PyMotionCommand<UnfreezeCommand> {
 public:
     //Later, one could add more specific stiffness options
-    PyUnfreezeCommand(float stiffness)
-        :command(UnfreezeCommand::ptr(new UnfreezeCommand())){}
-    const UnfreezeCommand::ptr getCommand()const{return command;}
-private:
-    UnfreezeCommand::ptr command;
+    PyUnfreezeCommand(float stiffness) {
+	command = UnfreezeCommand::ptr( new UnfreezeCommand() );
+    }
 };
 
 /* All the Py<>Command pointers are ref-counted by Python so they don't need to

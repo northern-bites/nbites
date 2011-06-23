@@ -13,17 +13,16 @@ public:
     Gait(const Gait & other);
     Gait(const AbstractGait & other);
     Gait(const float _stance_config[WP::LEN_STANCE_CONFIG],
-		 const float _step_config[WP::LEN_STEP_CONFIG],
-		 const float _zmp_config[WP::LEN_ZMP_CONFIG],
-		 const float _joint_hack_config[WP::LEN_HACK_CONFIG],
-		 const float _sensor_config[WP::LEN_SENSOR_CONFIG],
-		 const float _stiffness_config[WP::LEN_STIFF_CONFIG],
-		 const float _odo_config[WP::LEN_ODO_CONFIG],
-		 const float _arm_config[WP::LEN_ARM_CONFIG]);
+	 const float _step_config[WP::LEN_STEP_CONFIG],
+	 const float _zmp_config[WP::LEN_ZMP_CONFIG],
+	 const float _joint_hack_config[WP::LEN_HACK_CONFIG],
+	 const float _sensor_config[WP::LEN_SENSOR_CONFIG],
+	 const float _stiffness_config[WP::LEN_STIFF_CONFIG],
+	 const float _odo_config[WP::LEN_ODO_CONFIG],
+	 const float _arm_config[WP::LEN_ARM_CONFIG]); 
 
 protected:
     Gait();
-
 };
 
 

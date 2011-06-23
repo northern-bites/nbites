@@ -24,33 +24,37 @@
 /**
  * Overarching MotionCommand class for motion.
  *
- * It's only ability is to keep track of what kind of motion
- * it implements.
+ * Keeps track of what kind of motion it implements, and provides
+ * a standardized command progress interface to Python.
  *
  */
 #include <list>
 
-#include <boost/shared_ptr.hpp>
-
+#include "Common.h"
 #include "MotionConstants.h"
+#include "AbstractCommand.h"
 
-class MotionCommand
-{
+class MotionCommand : public AbstractCommand {
 public:
     typedef boost::shared_ptr<MotionCommand> ptr;
 
     MotionCommand(MotionConstants::MotionType type)
-	: chainList(), commandFinished(false), motionType(type) { }
+	: chainList(), motionType(type) { }
     virtual ~MotionCommand() { }
     const MotionConstants::MotionType getType() const { return motionType; }
     const std::list<int>* getChainList() const { return &chainList; }
 
-    bool isDoneExecuting() { return commandFinished; };
-    void finishedExecuting() { commandFinished = true; };
+    // TODO: override framesRemaining()
+
+    virtual float timeRemaining_s() {
+	if (isDoneExecuting())
+	    return 0.0f;
+	return static_cast<float>(framesRemaining()) * MOTION_FRAME_LENGTH_S;
+    }
 
 protected:
     std::list<int> chainList;
-    bool commandFinished;
+
 private:
     virtual void setChainList() = 0;
     const MotionConstants::MotionType motionType;

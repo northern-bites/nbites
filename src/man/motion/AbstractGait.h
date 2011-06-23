@@ -2,11 +2,11 @@
 #define AbstractGait_h_DEFINED
 
 #include <string>
-#include <boost/shared_ptr.hpp>
 
+#include "AbstractCommand.h"
 #include "GaitConstants.h"
 
-class AbstractGait {
+class AbstractGait : public AbstractCommand {
  public:
     typedef boost::shared_ptr<AbstractGait> ptr;
 
