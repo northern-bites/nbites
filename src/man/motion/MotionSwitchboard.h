@@ -37,7 +37,6 @@
 
 #include "motionconfig.h" // for cmake set debugging flags like MOTION_DEBUG
 
-#include "MCL.h"
 #include "Kinematics.h"
 #include "WalkProvider.h"
 #include "WalkingConstants.h"

@@ -4,6 +4,7 @@ using namespace boost::numeric;
 using namespace boost;
 using namespace NBMath;
 using namespace std;
+using namespace ekf;
 
 // Parameters
 const float BallEKF::ASSUMED_FPS = 30.0f;
@@ -46,8 +47,8 @@ const float BallEKF::BALL_JUMP_VEL_THRESH = 250.0f;
 static const bool USE_BALL_JUMP_RESET = true;
 
 BallEKF::BallEKF()
-    : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
-          BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL)
+    : EKF<RangeBearingMeasurement, MotionModel, ball_ekf_dimension,
+          dist_bearing_meas_dim>(BETA_BALL,GAMMA_BALL)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -94,8 +95,8 @@ BallEKF::BallEKF(float initX, float initY,
                  float initVelX, float initVelY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
-    : EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
-          BALL_MEASUREMENT_DIMENSION>(BETA_BALL,GAMMA_BALL)
+    : EKF<RangeBearingMeasurement, MotionModel, ball_ekf_dimension,
+          dist_bearing_meas_dim>(BETA_BALL,GAMMA_BALL)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -181,11 +182,11 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
  * @param u The motion model of the last frame.  Ignored for the ball.
  * @return The expected change in ball position (x,y, xVelocity, yVelocity)
  */
-EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
-    BALL_MEASUREMENT_DIMENSION>::StateVector BallEKF::associateTimeUpdate(
+EKF<RangeBearingMeasurement, MotionModel, ball_ekf_dimension,
+    dist_bearing_meas_dim>::StateVector BallEKF::associateTimeUpdate(
         MotionModel u)
 {
-    StateVector deltaBall(BALL_EKF_DIMENSION);
+    StateVector deltaBall(ball_ekf_dimension);
 
     float dt = 1.0f / ASSUMED_FPS;
     // Calculate the assumed change in ball position
@@ -211,7 +212,7 @@ EKF<RangeBearingMeasurement, MotionModel, BALL_EKF_DIMENSION,
  *
  * @return the measurement invariance
  */
-void BallEKF::incorporateMeasurement(RangeBearingMeasurement z,
+void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
                                      StateMeasurementMatrix &H_k,
                                      MeasurementMatrix &R_k,
                                      MeasurementVector &V_k)

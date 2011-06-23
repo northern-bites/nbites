@@ -4,7 +4,7 @@ using namespace std;
 const float VisualFieldObject::BOTH_UNSURE_DISTANCE_SD = 2500;
 
 VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
-    : VisualLandmark<fieldObjectID>(_id), VisualDetection()
+    : VisualObject(_id)
 {
     init();
     framesOn = 0;
@@ -13,7 +13,7 @@ VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
 
 
 VisualFieldObject::VisualFieldObject()
-    : VisualLandmark<fieldObjectID>(UNKNOWN_FIELD_OBJECT), VisualDetection()
+    : VisualObject(UNKNOWN_FIELD_OBJECT)
  {
     init();
     framesOn = 0;
@@ -23,12 +23,12 @@ VisualFieldObject::VisualFieldObject()
 VisualFieldObject::VisualFieldObject(const int _x, const int _y,
                                      const float _distance,
                                      const float _bearing)
-    : VisualLandmark<fieldObjectID>(UNKNOWN_FIELD_OBJECT),
-      VisualDetection(_x, _y, _distance, _bearing)
+    : VisualObject(UNKNOWN_FIELD_OBJECT,
+                                  _x, _y, _distance, _bearing)
 {
 }
 VisualFieldObject::VisualFieldObject(const VisualFieldObject& other) :
-    VisualLandmark<fieldObjectID>(other), VisualDetection(other)
+    VisualObject(other)
 {
 }
 

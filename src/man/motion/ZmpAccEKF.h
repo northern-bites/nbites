@@ -27,8 +27,9 @@
 #include "EKF.h"
 #include "EKFStructs.h"
 
-class ZmpAccEKF : public EKF<AccelMeasurement, int, ACC_NUM_DIMENSIONS,
-                          ACC_NUM_DIMENSIONS>
+class ZmpAccEKF : public ekf::EKF<AccelMeasurement, int,
+                                  ekf::acc_num_dimensions,
+                                  ekf::acc_num_dimensions>
 {
 public:
     ZmpAccEKF();
