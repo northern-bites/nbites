@@ -148,7 +148,7 @@ class Ball(VisualObject):
         self.relX = getRelativeX(self.dist, self.bearing)
         self.relY = getRelativeY(self.dist, self.bearing)
 
-        if not self.on:
+        if self.on:
             self.dx = self.lastRelX - self.relX
             self.dy = self.lastRelY - self.relY
 

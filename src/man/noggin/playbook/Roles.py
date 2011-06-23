@@ -30,6 +30,13 @@ def rGoalie(team, workingPlay):
         SubRoles.pGoaliePenaltySaver(team, workingPlay)
 
     # Saving will go here
+    elif workingPlay.isSubRole(PBConstants.GOALIE_SAVE):
+        if (team.brain.player.isSaving):
+            SubRoles.pGoalieSave(team, workingPlay)
+        elif RoleTran.shouldChase(team):
+            SubRoles.pGoalieChaser(team, workingPlay)
+        else:
+            SubRoles.pGoalieCenter(team, workingPlay)
 
     # Chase
     elif workingPlay.isSubRole(PBConstants.GOALIE_CHASER):
@@ -46,7 +53,10 @@ def rGoalie(team, workingPlay):
     elif (workingPlay.isSubRole(PBConstants.GOALIE_CENTER) or
           workingPlay.isSubRole(PBConstants.GOALIE_RIGHT) or
           workingPlay.isSubRole(PBConstants.GOALIE_LEFT)):
-        if RoleTran.shouldChase(team):
+        if RoleTran.shouldPositionForSave(team):
+            SubRoles.pGoalieSave(team, workingPlay)
+
+        elif RoleTran.shouldChase(team):
             SubRoles.pGoalieChaser(team, workingPlay)
 
         # elif RoleTran.shouldPositionRight(team):

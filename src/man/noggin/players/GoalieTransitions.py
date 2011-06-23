@@ -28,26 +28,9 @@ def getTimeUntilSave(player):
 
 def shouldPositionForSave(player):
     ball = player.brain.ball
-    #add a counter
-    #player.shouldSaveCounter already exists
-    #need to test velocity values
-    if (fabs(ball.dx) > goalCon.VEL_THRES):
-        # if coming towards the goal
-        #left front
-        if (ball.relX > 0 and ball.relY > 0 and ball.dx > 0 and ball.dy > 0):
-            return True
-        #right front
-        if (ball.relX > 0 and ball.relY < 0 and ball.dx > 0 and ball.dy < 0):
-            return True
-        #right back
-        if (ball.relX < 0 and ball.relY < 0 and ball.dx < 0 and ball.dy < 0):
-            return True
-        #left back
-        if (ball.relX < 0 and ball.relY > 0 and ball.dx < 0 and ball.dy > 0):
-            return True
 
-        # this will have an issue with balls that cross close to the goalie
-        #need to adjust for this...
+    if ball.heat > 18 :
+        return True
 
     return False
 
@@ -66,25 +49,10 @@ def strafeDirForSave(player):
     else:
         return 0
 
-
-def shouldSave(player):
-    #Ball is within distance from the goalie and
-    #is prepared to save
-    ball = player.brain.ball
-
-    if fabs(ball.dx) > 5: #goalCon.VEL_THRES:
-        #inside goal box plus save buffer
-        if (ball.x < (NogCon.MY_GOALBOX_RIGHT_X + goalCon.SAVE_BUFFER)
-             and ball.y < (NogCon.MY_GOALBOX_TOP_Y + goalCon.SAVE_BUFFER)
-             and ball.y > (NogCon.MY_GOALBOX_BOTTOM_Y - goalCon.SAVE_BUFFER)):
-            return True
-
-    return False
-
 def shouldSaveRight(player):
     ball= player.brain.ball
 
-    if(ball.endY > goalCon.CENTER_SAVE_THRESH):
+    if(ball.endY > goalCon.CENTER_SAVE_THRESH and goalieInBox()):
         player.counterRightSave += 1
         if(player.counterRightSave > 3):
             player.counterRightSave = 0
@@ -96,7 +64,7 @@ def shouldSaveRight(player):
 def shouldSaveLeft(player):
     ball= player.brain.ball
 
-    if(ball.endY < -goalCon.CENTER_SAVE_THRESH):
+    if(ball.endY < -goalCon.CENTER_SAVE_THRESH and goalieInBox()):
         player.counterLeftSave += 1
         if( player.counterLeftSave > 3) :
             player.counterLeftSave = 0
@@ -106,6 +74,7 @@ def shouldSaveLeft(player):
 
     return False
 
+# Not used
 def shouldSaveCenter(player):
     ball= player.brain.ball
 
