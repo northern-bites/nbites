@@ -28,11 +28,11 @@
 #endif
 
 // Set/unset a COMM_DEBUG flag.
-#define COMM_DEBUG_${COMM_DEBUG}
-#ifdef  COMM_DEBUG_ON
-#   define COMM_DEBUG
+#define DEBUG_COMM_${DEBUG_COMM}
+#ifdef  DEBUG_COMM_ON
+#   define DEBUG_COMM
 #else
-#   undef COMM_DEBUG
+#   undef DEBUG_COMM
 #endif
 
 #endif // !_commconfig_h

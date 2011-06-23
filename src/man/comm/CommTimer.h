@@ -13,19 +13,15 @@ class CommTimer
     CommTimer(llong (*f)());
     virtual ~CommTimer() { }
 
-    inline llong timestamp(void) { return time() - epoch + offsetMicros; }
+    llong timestamp() { return time() - epoch + offsetMicros; }
 
-    inline bool timeToSend(void) { return timestamp() - lastPacketSentAt() > MICROS_PER_PACKET; }
+    bool timeToSend() { return timestamp() - lastPacketSentAt() > nextSendDelay; }
 
-    inline void sent_packet(void) {
-      lastPacketSent = timestamp();
-    }
-    inline void mark(void) {
-      mark_time = timestamp();
-    }
-    inline llong elapsed(void) {
-      return timestamp() - mark_time;
-    }
+    void packetSent();
+
+    void mark() { mark_time = timestamp(); }
+
+    llong elapsed() { return timestamp() - mark_time; }
 
     llong lastPacketSentAt() const { return lastPacketSent; }
 
@@ -37,7 +33,9 @@ class CommTimer
 
     llong getOffset() const { return offsetMicros; }
 
-    bool check_packet(const CommPacketHeader &packet);
+    int packetsDropped(const CommPacketHeader& packet);
+
+    bool check_packet(const CommPacketHeader& packet);
     void get_time_from_others();
     void reset();
 
@@ -50,6 +48,7 @@ class CommTimer
     llong offsetMicros;              // The number of microseconds by which the 
                                      // timer must be offset to be synced with the 
                                      // other robots' clocks.
+    llong nextSendDelay;             // The timestamp when the next packet must be sent.
     llong mark_time;
     std::vector<CommTeammatePacketInfo> teamPackets;
     unsigned int packets_checked;

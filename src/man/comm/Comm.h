@@ -18,9 +18,9 @@
 #include "CommTimer.h"
 #include "NogginStructs.h"
 #include "commconfig.h"
+#include "NetworkMonitor.h"
 
-class Comm
-    : public Thread
+class Comm : public Thread
 {
 public:
     Comm(boost::shared_ptr<Synchro> _synchro, boost::shared_ptr<Sensors> s,
@@ -124,6 +124,8 @@ private:
                                               // received packets.
     int totalPacketsReceived;                 // Running total packets received.
     int ourPacketsReceived;                   // Running count of "our" packets received.
+
+    NetworkMonitor monitor;
 };
 
 bool c_init_comm(void);

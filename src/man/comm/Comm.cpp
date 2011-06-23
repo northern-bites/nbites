@@ -453,22 +453,36 @@ void Comm::run()
     running = true;
     trigger->on();
 
-	struct timespec interval, remainder;
-	interval.tv_sec = 0;
-	interval.tv_nsec = SLEEP_MILLIS * 1000;
+    struct timespec interval, remainder;
+    interval.tv_sec = 0;
+    interval.tv_nsec = SLEEP_MILLIS * 1000;
 
-    try{
+#ifdef DEBUG_COMM
+    llong lastMonitorOutput = timer.timestamp();
+#endif
+
+    try
+    {
         bind();
         //discover_broadcast();
 
-		while(running)
-		{
-			if(timer.timeToSend())
-				send();
+	while(running)
+	{
+	    if(timer.timeToSend())
+		send();
 
-			receive();
-			nanosleep(&interval, &remainder);
-		}
+#ifdef DEBUG_COMM
+	    // Update the monitor output logs every half minute.
+	    if(timer.timestamp() - lastMonitorOutput > 30 * MICROS_PER_SECOND)
+	    {
+		monitor.logOutput();
+		lastMonitorOutput = timer.timestamp();
+	    }
+#endif
+
+	    receive();
+	    nanosleep(&interval, &remainder);
+	}
     } catch (socket_error &e) {
         fprintf(stderr, "Error occurred in Comm, thread has paused.\n");
         fprintf(stderr, "%s\n", e.what());
@@ -645,14 +659,14 @@ void Comm::send () throw(socket_error)
 
     // Let game controller know that we have been manually penalized
     if (gc->shouldSendManualPenalty())
-	{
+    {
         gc->sentManualPenalty();
 
         RoboCupGameControlReturnData returnPacket;
 
         if (gc->isManuallyPenalized())
             returnPacket.message = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
-		else
+	else
             returnPacket.message = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
 
         memcpy(returnPacket.header,
@@ -671,12 +685,13 @@ void Comm::send () throw(socket_error)
 
         send(&buf[0], sizeof(returnPacket), gc_broadcast_addr);
     }
-	else
-	{
+    else
+    {
         // C++ header data
         const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
-										 lastPacketNumber++, gc->team(), gc->player(),
-										 gc->color()};
+					 lastPacketNumber++, gc->team(), gc->player(),
+					 gc->color()};
+
         memcpy(&buf[0], &header, sizeof(header));
         // variable Python extra data
         memcpy(&buf[sizeof(header)], &data[0], sizeof(float) * data.size());
@@ -695,9 +710,9 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 #ifdef COMM_SEND
     int result = -2;
 
-	struct timespec interval, remainder;
-	interval.tv_sec = 0;
-	interval.tv_nsec = 100000;
+    struct timespec interval, remainder;
+    interval.tv_sec = 0;
+    interval.tv_nsec = 100000;
 
     while (result == -2)
     {
@@ -726,8 +741,11 @@ void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error
 #endif
 
     // record last time we sent a message
-    timer.sent_packet();
-    //cout << "Comm::send() : last packet sent at " << timer.lastPacketSentAt() << endl;
+    timer.packetSent();
+#ifdef DEBUG_COMM  
+    cout << Thread::name << ": Last packet sent at " << timer.lastPacketSentAt() 
+	 << "." << endl;
+#endif
 }
 
 // Recieves packets from various sources
@@ -833,7 +851,7 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
         if (validate_packet(msg, len, packet))
 	{
             ourPacketsReceived++;
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
             // Log that a packet has been received.
             cout << "Comm::handle_comm() : packet received at "
 				 << packet.timestamp
@@ -856,13 +874,14 @@ void Comm::handle_gc (struct sockaddr_in &addr,
 }
 
 // Ensure packet is one of ours
-bool Comm::validate_packet (const char* msg, int len,
-							CommPacketHeader& packet)throw()
+bool Comm::validate_packet(const char* msg, int len,
+			   CommPacketHeader& packet)
+    throw()
 {
     // check packet length
     if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader))
     {
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
 	cout << Thread::name << ": Received packet header has bad length (" << len << ")." << endl;
 #endif
 	return false;
@@ -874,7 +893,7 @@ bool Comm::validate_packet (const char* msg, int len,
     // check packet header
     if (memcmp(packet.header, PACKET_HEADER, sizeof(PACKET_HEADER)) != 0)
     {
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
         cout << Thread::name << ": Received packet with bad header (" << packet.header << ")." << endl;
 #endif
         return false;
@@ -883,7 +902,7 @@ bool Comm::validate_packet (const char* msg, int len,
     // check team number
     if (packet.team != gc->team())
     {
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
         cout << Thread::name << ": Packet has a bad team number (" << packet.team << ")." << endl;
 #endif
         return false;
@@ -893,12 +912,17 @@ bool Comm::validate_packet (const char* msg, int len,
     if (packet.player < 0 || packet.player > NUM_PLAYERS_PER_TEAM ||
         packet.player == gc->player())
     {
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
         cout << Thread::name << ": Packet has a bad player number (" << packet.player << ")." << endl;
 #endif
         return false;
     }
 
+    // Before calling timer.check_packet(), check for dropped packets.
+    int dropped = timer.packetsDropped(packet);
+    if(dropped > 0)
+	monitor.packetsDropped(dropped);
+    
     if (!timer.check_packet(packet))
         return false;
 
@@ -913,8 +937,10 @@ bool Comm::validate_packet (const char* msg, int len,
 
     // Get fixed packet received at time if necessary.
     timer.packetReceived();
+    // Update network monitor.
+    monitor.packetReceived(packet.timestamp, timer.lastPacketReceivedAt());
 
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
     // Log latency/timer offset data?
     cout << "original current time == " << currTime
 	 << " packet sent at (timestamp) == " << packet.timestamp
@@ -1000,7 +1026,7 @@ TeammateBallMeasurement Comm::getTeammateBallReport()
 }
 
 // Sets data
-void Comm::setData (std::vector<float> &newData)
+void Comm::setData(std::vector<float> &newData)
 {
     pthread_mutex_lock (&comm_mutex);
     data = newData;
@@ -1046,7 +1072,7 @@ void Comm::updateAverageDelay()
     else
 	newAverage = (llong)(0.5 * (averagePacketDelay + delay));
 
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
     // Log data?
     cout << Thread::name << ": updateAverageDelay() : average delay == "
 	 << newAverage << endl;
@@ -1057,7 +1083,7 @@ void Comm::updateAverageDelay()
 
 void Comm::updatePercentReceived()
 {
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
     cout << Thread::name << ": updatePercentReceived() : total packets == "
 	 << totalPacketsReceived
 	 << " our packets == " << ourPacketsReceived << endl;
@@ -1067,13 +1093,13 @@ void Comm::updatePercentReceived()
     if(totalPacketsReceived != 0)
     {
 		percentage = ourPacketsReceived/(double)totalPacketsReceived;
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
 		cout << Thread::name << ": updatePercentReceived() : " << percentage*100 << "%" << endl;
 #endif
     }
     else
     {
-#ifdef COMM_DEBUG
+#ifdef DEBUG_COMM
 	cout << Thread::name << ": updatePercentReceived() : divide by zero error!" << endl;
 #endif
     }

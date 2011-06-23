@@ -1,30 +1,52 @@
 #include <iostream>
+#include <cstdlib>
 #include "CommTimer.h"
 
 using namespace std;
 
 
 CommTimer::CommTimer(llong (*f)())
-  : time(f), epoch(time()), lastPacketSent(0), mark_time(epoch),
-    teamPackets(NUM_PLAYERS_PER_TEAM), packets_checked(0), need_to_update(false), 
-    lastPacketReceived(0), offsetMicros(0)
+    : time(f), epoch(time()), lastPacketReceived(0), lastPacketSent(0),
+      offsetMicros(0), nextSendDelay(0), mark_time(epoch), 
+      teamPackets(NUM_PLAYERS_PER_TEAM), packets_checked(0), 
+      need_to_update(false)
 {
-
+    // Default is six packets/second, but should vary randomly.
+    nextSendDelay = MICROS_PER_SECOND / 6;
+    srand(time());
 }
 
-void
-CommTimer::reset()
+void CommTimer::reset()
 {
-  epoch = time();
-  teamPackets = vector<CommTeammatePacketInfo>(NUM_PLAYERS_PER_TEAM);
-  lastPacketSent = 0;
-  mark_time = 0;
-  packets_checked = 0;
-  lastPacketReceived = 0;
+    epoch = time();
+    teamPackets = vector<CommTeammatePacketInfo>(NUM_PLAYERS_PER_TEAM);
+    lastPacketSent = 0;
+    mark_time = 0;
+    packets_checked = 0;
+    lastPacketReceived = 0;
 }
 
-bool
-CommTimer::check_packet(const CommPacketHeader &p)
+void CommTimer::packetSent() 
+{
+    lastPacketSent = timestamp();
+    // Calculate the next time a packet needs to be sent by randomly
+    // choosing a value for the time between packets sent within
+    // acceptable bounds.
+    // int randPacketsPerSecond = rand() % (MAX_PACKETS_PER_SECOND + 1)
+    // 	+ MIN_PACKETS_PER_SECOND;
+    // nextSendDelay = MICROS_PER_SECOND / randPacketsPerSecond;
+}
+
+int CommTimer::packetsDropped(const CommPacketHeader& packet)
+{
+    int dropped = packet.number - teamPackets[packet.player-1].lastNumber;
+    if(dropped <= 1)
+	return 0;
+    else
+	return dropped - 1;
+}
+
+bool CommTimer::check_packet(const CommPacketHeader &p)
 {
   llong ts = timestamp();
 
@@ -75,8 +97,7 @@ CommTimer::check_packet(const CommPacketHeader &p)
   return true;
 }
 
-void
-CommTimer::get_time_from_others()
+void CommTimer::get_time_from_others()
 {
   if (packets_checked < 2) {
     // not enought data yet, get time when we can later

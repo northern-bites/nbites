@@ -109,27 +109,14 @@ static const long long SOS_TIMESTAMP = -666;
 static const long long USE_TEAMMATE_BALL_REPORT_FRAMES_OFF = 2;
 // The minimum delay between sending and receiving a packet (packet "travel time").
 static const long long MIN_PACKET_DELAY = 0;
+// The minimum and maximum number of packets we can send per second.
+static const long long MAX_PACKETS_PER_SECOND = 10;  // 10 packets per second.
+static const long long MIN_PACKETS_PER_SECOND = 4;   // 4 packets pers second.
 
 static const unsigned int MAX_MESSAGE_MEMORY = 20;
 
 typedef struct CommPacketHeader_t
 {
-/*
-  CommPacketHeader_t(): timestamp(0), team(-1), player(-1) { }
-  CommPacketHeader_t(const char* msg) {
-    memcpy(&header[0], msg, sizeof(header));
-    timestamp = static_cast<llong>(msg[sizeof(PACKET_HEADER)   ]);
-    team      = static_cast<int>  (msg[sizeof(PACKET_HEADER) +
-                                       sizeof(timestamp)       ]);
-    player    = static_cast<int>  (msg[sizeof(PACKET_HEADER) +
-                                       sizeof(timestamp)     +
-                                       sizeof(team)            ]);
-  }
-  CommPacketHeader_t(const char *h, const llong ts, const int t, const int p)
-    : timestamp(ts), team(t), player(p) {
-    memcpy(&header[0], &h[0], sizeof(header));
-  }
-*/
     char header[sizeof(PACKET_HEADER)];
     llong timestamp;
     int number;
@@ -144,7 +131,7 @@ typedef struct CommTeammatePacketInfo_t
     : timestamp(0), lastNumber(0)
 	{ }
 
-    llong timestamp;      // Timestamp of last received packet.
+    llong timestamp;       // Timestamp of last received packet.
     int lastNumber;        // (Unique) number of last packet received.
 } CommTeammatePacketInfo;
 
