@@ -43,7 +43,7 @@ class PyMotionCommand {
 public:
     typedef typename T::ptr ptr;
 
-    PyMotionCommand();
+    virtual ~PyMotionCommand() {}
 
     // Generic, exposed to Python for all commands
     int framesRemaining() const { return command->framesRemaining(); }
@@ -54,10 +54,8 @@ public:
     ptr getCommand() const { return command; }
 
 protected:
+    PyMotionCommand() {} // only derived classes can be instantiated
     ptr command; // will be some sort of boost::shared_ptr
-
-private:
-
 };
 
 
