@@ -17,3 +17,5 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.counterRightSave = 0
         self.counterLeftSave = 0
         self.counterCenterSave = 0
+
+        self.inKickingState = False

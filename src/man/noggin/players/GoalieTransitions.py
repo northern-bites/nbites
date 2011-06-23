@@ -28,26 +28,9 @@ def getTimeUntilSave(player):
 
 def shouldPositionForSave(player):
     ball = player.brain.ball
-    #add a counter
-    #player.shouldSaveCounter already exists
-    #need to test velocity values
-    if (fabs(ball.dx) > goalCon.VEL_THRES):
-        # if coming towards the goal
-        #left front
-        if (ball.relX > 0 and ball.relY > 0 and ball.dx > 0 and ball.dy > 0):
-            return True
-        #right front
-        if (ball.relX > 0 and ball.relY < 0 and ball.dx > 0 and ball.dy < 0):
-            return True
-        #right back
-        if (ball.relX < 0 and ball.relY < 0 and ball.dx < 0 and ball.dy < 0):
-            return True
-        #left back
-        if (ball.relX < 0 and ball.relY > 0 and ball.dx < 0 and ball.dy > 0):
-            return True
 
-        # this will have an issue with balls that cross close to the goalie
-        #need to adjust for this...
+    if ball.heat > 18 :
+        return True
 
     return False
 

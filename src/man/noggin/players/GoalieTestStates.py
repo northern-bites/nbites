@@ -33,7 +33,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     player.walkPose()
-    return player.goNow('testDX')
+    return player.goNow('testHeat')
 
 def gamePenalized(player):
     angles = player.brain.sensors.angles
@@ -48,6 +48,14 @@ def gamePenalized(player):
         print "(%.2f,%.2f,%.2f,%.2f), ),"%(angles[18],angles[19],angles[20],angles[21])
         print " "
         print " "
+
+    return player.stay()
+
+def testHeat(player):
+    ball = player.brain.ball
+
+    if ball.heat > 18:
+        player.brain.speech.say("Save")
 
     return player.stay()
 
