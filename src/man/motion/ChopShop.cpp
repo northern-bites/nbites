@@ -64,7 +64,7 @@ ChoppedCommand::ptr ChopShop::chopCommand(const JointCommand *command,
     // Deleting JointCommand!
     delete command;
 
-    // for CoM preview estimates
+    // for CoM preview estimates and dynamic balancing
     if (comPreview) {
 	return ChoppedCommand::ptr ( new BalancingChoppedCommand(chopped) );
     }

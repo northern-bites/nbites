@@ -40,10 +40,13 @@ class BalancingArm {
 public:
     typedef boost::shared_ptr<BalancingArm> ptr;
 
-    BalancingArm( Kinematics::ChainID id );
+    BalancingArm( Kinematics::ChainID id, COMPreview::ptr com );
     ~BalancingArm();
 
+    std::vector<float> getNextJoints();
+
 private:
+    Kinematics::ChainID chain;
     COMPreview::ptr comPreview;
 };
 

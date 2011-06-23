@@ -31,7 +31,7 @@ namespace Kinematics {
 // and the GLOBAL coordinate frame)
 // current as of 3/22/11 from
 // http://robocup.aldebaran-robotics.com/docs/site_en/reddoc/hardware
-// ** all values for the RIGHT side of the robot **
+// ** All values for the RIGHT side of the robot **
 
     static const float CHEST_MASS_g = 1039.48f;
     static const float CHEST_MASS_X = -4.15f;

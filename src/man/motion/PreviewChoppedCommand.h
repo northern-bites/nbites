@@ -53,10 +53,10 @@ public:
     const ufvector3 getFutureComPosition();
     const ufvector3 getComDerivative();
 
-    COMPreview::ptr getComPreview();
+    COMPreview::ptr ComPreview();
 
 protected:
-    COMPreview previewStruct;
+    COMPreview::ptr previewStruct;
     ChoppedCommand::ptr alreadyChoppedCommand;
 
 private:

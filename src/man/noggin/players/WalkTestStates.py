@@ -25,7 +25,6 @@ UNIT_TEST1 = ((WALK, (1, 0, 0), 100),
               )
 
 STRAIGHT_ONLY = ((WALK, (1.0, 0, 0), 150),
-                 (WALK, (0, 1.0, 0), 150),
                  )
 
 STAND_STILL = ((WALK, (0, 0, 0), 300),

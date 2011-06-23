@@ -11,7 +11,7 @@ static const int COM_PREVIEW_FRAMES = 20;
 //#define DEBUG_SCRIPTED_COM
 
 PreviewChoppedCommand::PreviewChoppedCommand ( ChoppedCommand::ptr choppedCommand )
-    : previewStruct(COMPreview()),
+    : previewStruct( new COMPreview() ),
       alreadyChoppedCommand(choppedCommand),
       jointAngles(vector<VectorFifo>()),
       thisFramesAngles(vector<float>()),
@@ -94,7 +94,7 @@ void PreviewChoppedCommand::updateComEstimates() {
     com_dx.X(lastX - com_x.Y());
     com_dy.X(lastY - com_y.Y());
 
-    previewStruct.update( com_x.Y(), com_y.Y(), com_dx.Y(), com_dy.Y() );
+    previewStruct->update( com_x.Y(), com_y.Y(), com_dx.Y(), com_dy.Y() );
 
 #ifdef DEBUG_SCRIPTED_COM
     std::cout //<< "Saw last chain, updating CoM...angles vector size: "
@@ -158,6 +158,6 @@ const ufvector3 PreviewChoppedCommand::getComDerivative() {
     return comDerivative;
 }
 
-COMPreview::ptr PreviewChoppedCommand::getComPreview() {
-    return COMPreview::ptr ( &previewStruct );
+COMPreview::ptr PreviewChoppedCommand::ComPreview() {
+    return previewStruct;
 }
