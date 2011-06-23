@@ -33,6 +33,9 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "NBMath.h"
+#include "NBMatrixMath.h"
+
 #include "Kinematics.h"
 #include "COMPreview.h"
 
@@ -40,12 +43,27 @@ class BalancingArm {
 public:
     typedef boost::shared_ptr<BalancingArm> ptr;
 
+    enum ArmJoint {
+	SHOULDER_PITCH = 0,
+	SHOULDER_ROLL,
+	ELBOW_YAW,
+	ELBOW_ROLL,
+    };
+
     BalancingArm( Kinematics::ChainID id, COMPreview::ptr com );
     ~BalancingArm();
 
     std::vector<float> getNextJoints();
 
 private:
+    float getJoint(int id);
+
+    float shoulderPitch();
+    float shoulderRoll();
+    float elbowYaw();
+    float elbowRoll();
+
+    bool leftArm;
     Kinematics::ChainID chain;
     COMPreview::ptr comPreview;
 };
