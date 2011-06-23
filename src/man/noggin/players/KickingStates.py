@@ -1,4 +1,7 @@
 from . import ChaseBallTransitions as transitions
+from ..kickDecider import kicks
+from man.motion import HeadMoves
+
 """
 Here we house all of the state methods used for kicking the ball
 """
@@ -31,7 +34,25 @@ def afterKick(player):
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
         player.standup()
-        player.brain.tracker.trackBall()
+
+        kick = player.brain.kickDecider.getKick()
+
+        # We need to find it!
+        if not player.brain.ball.on:
+            # We kicked the ball left
+            if kick is kicks.LEFT_SIDE_KICK:
+                player.brain.tracker.lookToDir("right")
+            elif kick is kicks.RIGHT_SIDE_KICK:
+                player.brain.tracker.lookToDir("left")
+            elif kick is kicks.RIGHT_DYNAMIC_STRAIGHT_KICK or \
+                    kick is kicks.LEFT_DYNAMIC_STRAIGHT_KICK:
+                player.brain.tracker.lookToDir("up")
+
+            # @TODO So we must have back kicked, we should go straight to a
+            # spin find ball state
+            else:
+                player.brain.tracker.trackBall()
+
 
         if player.penaltyKicking:
             return player.goLater('penaltyKickRelocalize')
