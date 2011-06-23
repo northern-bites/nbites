@@ -34,22 +34,18 @@ def afterKick(player):
     # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
         player.standup()
+        player.brain.tracker.trackBall()
 
         kick = player.brain.kickDecider.getKick()
 
         # We need to find it!
         if not player.brain.ball.on:
-            print "I DIDN'T SEE IT!!!!"
             if kick is kicks.LEFT_SIDE_KICK:
-                print "LOOKING RIGHT"
                 player.brain.tracker.lookToDir("right")
             elif kick is kicks.RIGHT_SIDE_KICK:
-                print "LOOKING LEFT"
                 player.brain.tracker.lookToDir("left")
             elif (kick is kicks.RIGHT_DYNAMIC_STRAIGHT_KICK or
                   kick is kicks.LEFT_DYNAMIC_STRAIGHT_KICK):
-                print "LOOKING UP"
-                # TODO: didn't always trigger even though line was executed. maybe counter check below fixed it???
                 player.brain.tracker.kickDecideScan() # should scan upper reaches.
             else:
                 return player.goLater('spinAfterBackKick')
@@ -82,7 +78,7 @@ def spinAfterBackKick(player):
     """
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        player.tracker.trackBall()
+        player.brain.tracker.trackBall()
         return player.goNow('chase')
 
     if player.firstFrame():
@@ -92,10 +88,8 @@ def spinAfterBackKick(player):
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
         kick = player.brain.kickDecider.getKick()
         if kick is kicks.LEFT_LONG_BACK_KICK or kick is kicks.LEFT_SHORT_BACK_KICK:
-            print "SPINNING LEFT"
             player.setWalk(0, 0, constants.FIND_BALL_SPIN_SPEED)
         else:
-            print "SPINNING RIGHT"
             player.setWalk(0, 0, -1*constants.FIND_BALL_SPIN_SPEED)
 
         player.brain.tracker.trackBallSpin()
