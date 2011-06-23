@@ -184,7 +184,7 @@ void WalkProvider::setActive(){
     }
 }
 
-std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
+std::vector<BodyJointCommand::ptr> WalkProvider::getGaitTransitionCommand(){
     pthread_mutex_lock(&walk_provider_mutex);
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
@@ -203,7 +203,7 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     const float  MAX_RAD_PER_SEC =  M_PI_FLOAT*0.3f;
     float time = max_change/MAX_RAD_PER_SEC;
 
-    vector<BodyJointCommand *> commands;
+    vector<BodyJointCommand::ptr> commands;
 
     if(time <= MOTION_FRAME_LENGTH_S){
         return commands;
@@ -225,13 +225,17 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     vector<float> * stiffness2 = new vector<float>(Kinematics::NUM_JOINTS,
                                                    0.85f);
 
-    commands.push_back(new BodyJointCommand(0.5f,safe_larm,NULL,NULL,safe_rarm,
-                                            stiffness,
-                                            Kinematics::INTERPOLATION_SMOOTH));
+    commands.push_back(BodyJointCommand::ptr (
+			   new BodyJointCommand(0.5f,safe_larm,NULL,NULL,safe_rarm,
+						stiffness,
+						Kinematics::INTERPOLATION_SMOOTH)
+			   ) );
 
-    commands.push_back(new BodyJointCommand(time,gaitJoints,
-                                            stiffness2,
-                                            Kinematics::INTERPOLATION_SMOOTH));
+    commands.push_back(BodyJointCommand::ptr (
+			   new BodyJointCommand(time,gaitJoints,
+						stiffness2,
+						Kinematics::INTERPOLATION_SMOOTH)
+			   )  );
     pthread_mutex_unlock(&walk_provider_mutex);
     return commands;
 }

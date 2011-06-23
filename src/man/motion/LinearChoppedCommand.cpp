@@ -21,12 +21,10 @@
 #include "LinearChoppedCommand.h"
 #include "MotionConstants.h"
 
-
 using namespace std;
-
 using namespace Kinematics;
 
-LinearChoppedCommand::LinearChoppedCommand(const JointCommand *command,
+LinearChoppedCommand::LinearChoppedCommand(const JointCommand::ptr command,
 					   vector<float> currentJoints,
 					   int chops )
     : ChoppedCommand(command, chops)

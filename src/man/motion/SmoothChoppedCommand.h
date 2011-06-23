@@ -13,7 +13,7 @@
 class SmoothChoppedCommand : public ChoppedCommand
 {
 public:
-    SmoothChoppedCommand( const JointCommand *command,
+    SmoothChoppedCommand( const JointCommand::ptr command,
 			  std::vector<float> startJoints,
 			  int chops );
 

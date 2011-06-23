@@ -23,10 +23,9 @@
 #include <cmath>
 
 using namespace std;
-
 using namespace Kinematics;
 
-SmoothChoppedCommand::SmoothChoppedCommand(const JointCommand *command,
+SmoothChoppedCommand::SmoothChoppedCommand(const JointCommand::ptr command,
 					   vector<float> startJoints,
 					   int chops )
     : ChoppedCommand(command, chops)

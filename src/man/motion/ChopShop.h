@@ -39,24 +39,23 @@ class ChopShop
 public:
     ChopShop(boost::shared_ptr<Sensors> s);
 
-    ChoppedCommand::ptr chopCommand(const JointCommand *command,
+    ChoppedCommand::ptr chopCommand(const JointCommand::ptr command,
 				    bool comPreview=false);
 
 private:
     boost::shared_ptr<Sensors> sensors;
     float FRAME_LENGTH_S;
 
-    ChoppedCommand::ptr chopLinear(const JointCommand *command,
+    ChoppedCommand::ptr chopLinear(const JointCommand::ptr command,
 				   std::vector<float> currentJoints,
 				   int numChops);
 
-    ChoppedCommand::ptr chopSmooth(const JointCommand *command,
+    ChoppedCommand::ptr chopSmooth(const JointCommand::ptr command,
 				   std::vector<float> currentJoints,
 				   int numChops);
 
 
     std::vector<float> getCurrentJoints();
-
 };
 
 #endif

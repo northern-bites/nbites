@@ -19,7 +19,7 @@ class ChoppedCommand
     // ***SHOULD NOT BE USED***
     ChoppedCommand() : finished(true) { }
 
-    ChoppedCommand ( const JointCommand *command, int chops );
+    ChoppedCommand ( const JointCommand::ptr command, int chops );
     virtual ~ChoppedCommand(void) { }
 
     virtual std::vector<float> getNextJoints(int id) {
@@ -31,13 +31,13 @@ class ChoppedCommand
  protected:
     void checkDone();
 
-    std::vector<float> getFinalJoints(const JointCommand *command,
+    std::vector<float> getFinalJoints(const JointCommand::ptr command,
                                       std::vector<float> currentJoints);
 
 private:
-    void constructStiffness( const JointCommand *command);
+    void constructStiffness( const JointCommand::ptr command);
     void constructChainStiffness(Kinematics::ChainID id,
-                                 const JointCommand *command);
+                                 const JointCommand::ptr command);
     std::vector<float>* getStiffnessRef( Kinematics::ChainID chainID);
 
  protected:

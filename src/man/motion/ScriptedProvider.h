@@ -46,8 +46,8 @@ public:
 
     void hardReset();
 
-    void enqueueSequence(std::vector<const BodyJointCommand*> &seq);
-    void setCommand(const BodyJointCommand * command);
+    void enqueueSequence(std::vector<BodyJointCommand::ptr> &seq);
+    void setCommand(const BodyJointCommand::ptr command);
 
 private:
     boost::shared_ptr<Sensors> sensors;
@@ -58,7 +58,7 @@ private:
     ChoppedCommand::ptr currCommand;
 
     // Queue to hold the next body commands
-    std::queue<const BodyJointCommand*> bodyCommandQueue;
+    std::queue<BodyJointCommand::ptr> bodyCommandQueue;
 
     pthread_mutex_t scripted_mutex;
 

@@ -28,12 +28,17 @@
  */
 
 #include <vector>
+
+#include <boost/shared_ptr.hpp>
+
 #include "Kinematics.h"
 #include "JointCommand.h"
 #include "MotionConstants.h"
 
 class BodyJointCommand : public JointCommand {
 public:
+    typedef boost::shared_ptr<BodyJointCommand> ptr;
+
     BodyJointCommand(const float time,
                      const std::vector<float> *body_joints,
                      const std::vector<float> *body_stiffness,

@@ -74,7 +74,7 @@ public:
 	void setCommand(const boost::shared_ptr<Gait> command);
 	void setCommand(const boost::shared_ptr<StepCommand> command);
 
-    std::vector<BodyJointCommand *> getGaitTransitionCommand();
+    std::vector<BodyJointCommand::ptr> getGaitTransitionCommand();
     MotionModel getOdometryUpdate(){
         const std::vector<float> odo = stepGenerator.getOdometryUpdate();
         return MotionModel(odo[0]*MM_TO_CM,odo[1]*MM_TO_CM,odo[2]);
@@ -102,7 +102,7 @@ private:
 
     mutable pthread_mutex_t walk_provider_mutex;
     const WalkCommand * nextCommand;
-     boost::shared_ptr<StepCommand> nextStepCommand;
+    boost::shared_ptr<StepCommand> nextStepCommand;
 
 };
 

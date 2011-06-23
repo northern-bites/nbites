@@ -27,15 +27,15 @@ void
 MotionInterface::sendStepCommand(const boost::shared_ptr<StepCommand> command){
     switchboard->sendMotionCommand(command);
 }
-void MotionInterface::enqueue(const BodyJointCommand *command){
+void MotionInterface::enqueue(const BodyJointCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 
-void MotionInterface::enqueue(const HeadJointCommand *command){
+void MotionInterface::enqueue(const HeadJointCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 
-void MotionInterface::setHead(const SetHeadCommand *command){
+void MotionInterface::setHead(const SetHeadCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 
@@ -43,10 +43,10 @@ void MotionInterface::coordHead(const CoordHeadCommand *command){
     switchboard->sendMotionCommand(command);
 }
 
-void MotionInterface::sendFreezeCommand(const boost::shared_ptr<FreezeCommand> command){
+void MotionInterface::sendFreezeCommand(const FreezeCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
-void MotionInterface::sendFreezeCommand(const boost::shared_ptr<UnfreezeCommand> command){
+void MotionInterface::sendFreezeCommand(const UnfreezeCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 
@@ -88,7 +88,7 @@ void MotionInterface::setWalkExtraConfig( float pLHipRollBacklashCompensator,
 					  float pTorsoYOrientation) const {
 }
 
-void MotionInterface::setGait(const boost::shared_ptr<Gait> command){
+void MotionInterface::setGait(const Gait::ptr command){
     switchboard->sendMotionCommand(command);
 }
 

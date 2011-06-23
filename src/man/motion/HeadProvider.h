@@ -43,9 +43,9 @@ public:
 
     void hardReset();
 
-    void enqueueSequence(std::vector<HeadJointCommand*> &seq);
-    void setCommand(const SetHeadCommand* command);
-    void setCommand(const HeadJointCommand* command);
+    void enqueueSequence(std::vector<HeadJointCommand::ptr> &seq);
+    void setCommand(const HeadJointCommand::ptr command);
+    void setCommand(const SetHeadCommand::ptr command);
 
 private:
     enum HeadMode {
@@ -69,7 +69,7 @@ private:
 
     ChoppedCommand::ptr currCommand;
     // Queue of all future commands
-    std::queue<const HeadJointCommand*> headCommandQueue;
+    std::queue<HeadJointCommand::ptr> headCommandQueue;
 
     HeadMode curMode;
     float yawDest,pitchDest,lastYawDest,lastPitchDest;

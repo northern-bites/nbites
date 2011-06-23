@@ -58,8 +58,6 @@ void ScriptedProvider::requestStopFirstInstance() { }
 void ScriptedProvider::hardReset(){
     pthread_mutex_lock(&scripted_mutex);
     while(!bodyCommandQueue.empty()){
-        const BodyJointCommand * cmd = bodyCommandQueue.front();
-        delete cmd;
         bodyCommandQueue.pop();
     }
     currCommand = ChoppedCommand::ptr(new ChoppedCommand());
@@ -131,7 +129,7 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
  * Only one BodyJointCommand can be enqueued at
  * a time, even if they deal with different joints or chains.
  */
-void ScriptedProvider::setCommand(const BodyJointCommand *command) {
+void ScriptedProvider::setCommand(const BodyJointCommand::ptr command) {
     pthread_mutex_lock(&scripted_mutex);
     bodyCommandQueue.push(command);
     setActive();
@@ -139,9 +137,10 @@ void ScriptedProvider::setCommand(const BodyJointCommand *command) {
 }
 
 
-void ScriptedProvider::enqueueSequence(std::vector<const BodyJointCommand*> &seq) {
+void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand::ptr> &seq) {
     // Take in vec of commands and enqueue them all
-    for (vector<const BodyJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
+    vector<BodyJointCommand::ptr>::iterator i;
+    for (i = seq.begin(); i != seq.end(); ++i)
 	setCommand(*i);
 }
 
@@ -150,11 +149,10 @@ void ScriptedProvider::setNextBodyCommand() {
     // If there are no more commands, don't try to enqueue one
     if ( !bodyCommandQueue.empty() ) {
 
-	const BodyJointCommand *nextCommand = bodyCommandQueue.front();
+	const BodyJointCommand::ptr nextCommand = bodyCommandQueue.front();
 	bodyCommandQueue.pop();
 
-	// Replace the current command and delete the
-	// next command object
+	// Replace the current command
 	PROF_ENTER(profiler, P_CHOPPED);
 	const bool useComPreviews = true;
 	currCommand = chopper.chopCommand(nextCommand, useComPreviews);

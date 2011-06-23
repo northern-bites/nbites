@@ -27,25 +27,28 @@
  * It's only ability is to keep track of what kind of motion
  * it implements.
  *
- * Must be DELETED when passed to a provider!!!
  */
 #include <list>
+
 #include "MotionConstants.h"
 
 class MotionCommand
 {
 public:
-	MotionCommand(MotionConstants::MotionType type)
-		: chainList(), motionType(type) { }
-	virtual ~MotionCommand() { }
-	const MotionConstants::MotionType getType() const { return motionType; }
-	const std::list<int>* getChainList() const { return &chainList; }
+    MotionCommand(MotionConstants::MotionType type)
+	: chainList(), commandFinished(false), motionType(type) { }
+    virtual ~MotionCommand() { }
+    const MotionConstants::MotionType getType() const { return motionType; }
+    const std::list<int>* getChainList() const { return &chainList; }
+
+    bool isDoneExecuting() { return commandFinished; };
 
 protected:
-	std::list<int> chainList;
+    std::list<int> chainList;
+    bool commandFinished;
 private:
-	virtual void setChainList() = 0;
-	const MotionConstants::MotionType motionType;
+    virtual void setChainList() = 0;
+    const MotionConstants::MotionType motionType;
 };
 
 #endif

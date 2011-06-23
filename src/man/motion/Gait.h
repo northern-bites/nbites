@@ -8,6 +8,8 @@
 
 class Gait : public AbstractGait {
 public:
+    typedef boost::shared_ptr<Gait> ptr;
+
     Gait(const Gait & other);
     Gait(const AbstractGait & other);
     Gait(const float _stance_config[WP::LEN_STANCE_CONFIG],
