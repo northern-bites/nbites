@@ -273,6 +273,10 @@ void Context::classifyT(VisualCorner & first) {
 	if (debugIdentifyCorners) {
 		cout << "Checking T " << l1 << " " << l2 << " " <<
 			first.getDistance() << endl;
+		if (objectRightX >= 0) {
+			cout << "Object is at " << objectRightX << " " <<
+				objectRightY << " " << objectDistance << endl;
+		}
 	}
 	// check if this is actually a center circle corner
     int horizon = field->horizonAt(first.getX());
@@ -285,8 +289,8 @@ void Context::classifyT(VisualCorner & first) {
 		sameHalf = false;
 	}
 	if (!sameHalf && face != FACING_UNKNOWN) {
-		// if we are far away and the T stem is long
-		if (l1 > 2 * GOALBOX_DEPTH) {
+		// if we are far away and the T stem is long and the T isn't near goal
+		if (l1 > 2 * GOALBOX_DEPTH && objectDistance - first.getDistance() > 200) {
 			sideT = true;
 		} else {
 			// if we are far away then if the T is near the goal
@@ -353,9 +357,9 @@ void Context::classifyT(VisualCorner & first) {
                     }
                 } else {
                     if (first.doesItPointLeft()) {
-                        first.setSecondaryShape(RIGHT_GOAL_BLUE_T);
+                        first.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
                     } else {
-                        first.setSecondaryShape(LEFT_GOAL_BLUE_T);
+                        first.setSecondaryShape(LEFT_GOAL_YELLOW_T);
                     }
                 }
             } else if (first.getX() > objectRightX) {
@@ -2021,7 +2025,14 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
 					allFieldObjects[i]->getDistance() << " " <<
 					MIDFIELD_X << endl;
 			}
-			objectDistance = allFieldObjects[i]->getDistance();
+			if (allFieldObjects[i]->getDistance() > 0) {
+				if (objectDistance > 0) {
+					objectDistance = min(allFieldObjects[i]->getDistance(),
+										 objectDistance);
+				} else {
+					objectDistance = allFieldObjects[i]->getDistance();
+				}
+			}
             objectRightX = allFieldObjects[i]->getRightBottomX();
             objectRightY = allFieldObjects[i]->getRightBottomY();
             // With the Nao we need to make sure that the goal posts are near
@@ -2038,13 +2049,23 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
             // we see a post, but it is probably too close to get
             // a good distance (occluded on two sides)
             // we may not want to use the object too much, but it can help
-			objectDistance = 0;
-            objectRightX = allFieldObjects[i]->getRightBottomX();
-            objectRightY = allFieldObjects[i]->getRightBottomY();
-        } else if (allFieldObjects[i]->getDistance() > 0) {
-			objectDistance = allFieldObjects[i]->getDistance();
-            objectRightX = allFieldObjects[i]->getRightBottomX();
-            objectRightY = allFieldObjects[i]->getRightBottomY();
+			if (objectRightX > 0) {
+				objectRightX = allFieldObjects[i]->getRightBottomX();
+				objectRightY = allFieldObjects[i]->getRightBottomY();
+			}
+		} else {
+			if (allFieldObjects[i]->getDistance() > 0) {
+				if (objectDistance > 0) {
+					objectDistance = min(allFieldObjects[i]->getDistance(),
+										 objectDistance);
+				} else {
+					objectDistance = allFieldObjects[i]->getDistance();
+				}
+			}
+			if (allFieldObjects[i]->getRightBottomX() > 0) {
+				objectRightX = allFieldObjects[i]->getRightBottomX();
+				objectRightY = allFieldObjects[i]->getRightBottomY();
+			}
 		}
     }
     return visibleObjects;
