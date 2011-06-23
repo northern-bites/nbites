@@ -28,6 +28,8 @@
 class CoordHeadCommand : public MotionCommand
 {
 public:
+    typedef boost::shared_ptr<CoordHeadCommand> ptr;
+
     CoordHeadCommand(const float _x, const float _y,
                      //_x, _y relative to robot center in mm
                      const float _z,

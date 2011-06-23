@@ -8,7 +8,7 @@ using std::vector;
 
 static const int COM_PREVIEW_FRAMES = 20;
 
-//#define DEBUG_SCRIPTED_COM
+#define DEBUG_SCRIPTED_COM
 
 PreviewChoppedCommand::PreviewChoppedCommand ( ChoppedCommand::ptr choppedCommand )
     : previewStruct( new COMPreview() ),

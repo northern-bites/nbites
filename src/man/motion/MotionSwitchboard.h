@@ -78,13 +78,13 @@ public:
     void signalNextFrame();
     void sendMotionCommand(const HeadJointCommand::ptr command);
     void sendMotionCommand(const BodyJointCommand::ptr command);
-    void sendMotionCommand(const WalkCommand* command);
-    void sendMotionCommand(const boost::shared_ptr<Gait> command);
+    void sendMotionCommand(const WalkCommand::ptr command);
+    void sendMotionCommand(const Gait::ptr command);
     void sendMotionCommand(const SetHeadCommand::ptr command);
-    void sendMotionCommand(const CoordHeadCommand* command);
-    void sendMotionCommand(const boost::shared_ptr<FreezeCommand> command);
-    void sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command);
-    void sendMotionCommand(const boost::shared_ptr<StepCommand> command);
+    void sendMotionCommand(const CoordHeadCommand::ptr command);
+    void sendMotionCommand(const FreezeCommand::ptr command);
+    void sendMotionCommand(const UnfreezeCommand::ptr command);
+    void sendMotionCommand(const StepCommand::ptr command);
 
 public:
     void stopHeadMoves(){headProvider.requestStop();}

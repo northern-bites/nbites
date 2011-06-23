@@ -38,9 +38,11 @@ static const WalkVector ZERO_WALKVECTOR = {0.0f,0.0f,0.0f};
  */
 class Step{
 public:
+    typedef boost::shared_ptr<Step> ptr;
+
     Step(const Step & other);
     Step(const WalkVector &target,
-         const AbstractGait & gait,	 
+         const AbstractGait & gait,
 	 const Foot _foot,
 	 const WalkVector &last = ZERO_WALKVECTOR,
          const StepType _type = REGULAR_STEP);

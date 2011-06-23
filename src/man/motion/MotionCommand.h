@@ -30,11 +30,15 @@
  */
 #include <list>
 
+#include <boost/shared_ptr.hpp>
+
 #include "MotionConstants.h"
 
 class MotionCommand
 {
 public:
+    typedef boost::shared_ptr<MotionCommand> ptr;
+
     MotionCommand(MotionConstants::MotionType type)
 	: chainList(), commandFinished(false), motionType(type) { }
     virtual ~MotionCommand() { }
@@ -42,6 +46,7 @@ public:
     const std::list<int>* getChainList() const { return &chainList; }
 
     bool isDoneExecuting() { return commandFinished; };
+    void finishedExecuting() { commandFinished = true; };
 
 protected:
     std::list<int> chainList;

@@ -20,11 +20,10 @@
 
 #include "MotionInterface.h"
 
-void MotionInterface::setNextWalkCommand(const WalkCommand *command){
+void MotionInterface::setNextWalkCommand(const WalkCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
-void
-MotionInterface::sendStepCommand(const boost::shared_ptr<StepCommand> command){
+void MotionInterface::sendStepCommand(const StepCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 void MotionInterface::enqueue(const BodyJointCommand::ptr command){
@@ -39,7 +38,7 @@ void MotionInterface::setHead(const SetHeadCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 
-void MotionInterface::coordHead(const CoordHeadCommand *command){
+void MotionInterface::coordHead(const CoordHeadCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 

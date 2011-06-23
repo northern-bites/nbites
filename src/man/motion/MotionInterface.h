@@ -48,8 +48,8 @@ class MotionInterface
         : switchboard(_switchboard) {}
     virtual ~MotionInterface() {}
 
-    void setNextWalkCommand(const WalkCommand *command);
-    void sendStepCommand(const boost::shared_ptr<StepCommand> command);
+    void setNextWalkCommand(const WalkCommand::ptr command);
+    void sendStepCommand(const StepCommand::ptr command);
     void enqueue(const BodyJointCommand::ptr command);
     void enqueue(const HeadJointCommand::ptr command);
     inline bool isWalkActive() {return switchboard->isWalkActive();}
@@ -57,7 +57,7 @@ class MotionInterface
     inline bool isBodyActive(){return switchboard->isBodyActive();}
     void setGait(const boost::shared_ptr<Gait> command);
     void setHead(const SetHeadCommand::ptr command);
-    void coordHead(const CoordHeadCommand * command);
+    void coordHead(const CoordHeadCommand::ptr command);
     void stopBodyMoves();
     void stopHeadMoves();
     void resetWalkProvider();

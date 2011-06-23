@@ -56,7 +56,7 @@ class WalkProvider : public MotionProvider {
 public:
     WalkProvider(boost::shared_ptr<Sensors> s,
                  boost::shared_ptr<NaoPose> pose,
-				 boost::shared_ptr<Profiler> p);
+		 boost::shared_ptr<Profiler> p);
     virtual ~WalkProvider();
 
     void requestStopFirstInstance();
@@ -64,15 +64,15 @@ public:
 
     void hardReset();
 
-	void setCommand(const MotionCommand* command)
+    void setCommand(const MotionCommand::ptr command)
         {
             pthread_mutex_lock(&walk_provider_mutex);
-            setCommand(reinterpret_cast<const WalkCommand*>(command));
+            setCommand(boost::dynamic_pointer_cast<WalkCommand>(command));
             pthread_mutex_unlock(&walk_provider_mutex);
         }
-	void setCommand(const WalkCommand * command);
-	void setCommand(const boost::shared_ptr<Gait> command);
-	void setCommand(const boost::shared_ptr<StepCommand> command);
+    void setCommand(const WalkCommand::ptr command);
+    void setCommand(const Gait::ptr command);
+    void setCommand(const StepCommand::ptr command);
 
     std::vector<BodyJointCommand::ptr> getGaitTransitionCommand();
     MotionModel getOdometryUpdate(){
@@ -101,8 +101,8 @@ private:
     bool pendingStartGaitCommands;
 
     mutable pthread_mutex_t walk_provider_mutex;
-    const WalkCommand * nextCommand;
-    boost::shared_ptr<StepCommand> nextStepCommand;
+    WalkCommand::ptr nextCommand;
+    StepCommand::ptr nextStepCommand;
 
 };
 

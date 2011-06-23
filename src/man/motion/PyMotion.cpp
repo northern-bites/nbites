@@ -73,7 +73,7 @@ private:
     HeadJointCommand::ptr command;
 };
 
-class PyGaitCommand{
+class PyGaitCommand {
 public:
     PyGaitCommand(const tuple &_stance_config,
                   const tuple &_step_config,
@@ -82,7 +82,7 @@ public:
                   const tuple &_sensor_config,
                   const tuple &_stiffness_config,
                   const tuple &_odo_config,
-                  const tuple &_arm_config){
+                  const tuple &_arm_config) {
 
         float stance[WP::LEN_STANCE_CONFIG];
         fillArray<float,WP::LEN_STANCE_CONFIG>
@@ -115,18 +115,17 @@ public:
         fillArray<float,WP::LEN_ARM_CONFIG>
             (arm,_arm_config,WP::ARM_CONVERSION);
 
-        command = boost::shared_ptr<Gait>(new Gait(
-                                              stance,step,
-                                              zmp,
-                                              hack,
-                                              sensor,
-                                              stiffness,
-                                              odo,
-                                              arm));
-
-
+        command = Gait::ptr (
+	    new Gait(stance,step,
+		     zmp,
+		     hack,
+		     sensor,
+		     stiffness,
+		     odo,
+		     arm));
     }
-    boost::shared_ptr<Gait> getCommand()const{return command;}
+
+    Gait::ptr getCommand() const { return command; }
 
     template <class T, const unsigned int size> void
     fillArray( T target[size], tuple t, const T convert_units[size]){
@@ -143,7 +142,7 @@ public:
     }
 
 private:
-    boost::shared_ptr<Gait> command;
+    Gait::ptr command;
     float step[WP::LEN_STEP_CONFIG];
 };
 
@@ -152,15 +151,17 @@ public:
     PyWalkCommand(float x_cms, float m_cms, float theta_degs) {
         //All python units should be in CM and DEG per second
         //C++ is in mm and rads, so we need to convert
-        command = new WalkCommand(x_cms*CM_TO_MM,
-                                  m_cms*CM_TO_MM,
-                                  theta_degs*TO_RAD);
+        command = WalkCommand::ptr(
+	    new WalkCommand(x_cms*CM_TO_MM,
+			    m_cms*CM_TO_MM,
+			    theta_degs*TO_RAD)
+	    );
     }
 
-    WalkCommand* getCommand() const { return command; }
+    WalkCommand::ptr getCommand() const { return command; }
 
 private:
-    WalkCommand *command;
+    WalkCommand::ptr command;
 };
 
 class PyStepCommand {
@@ -169,16 +170,16 @@ public:
         //All python units should be in CM and DEG per second
         //C++ is in mm and rads, so we need to convert
         command =
-            boost::shared_ptr<StepCommand>(new StepCommand(x_cms*CM_TO_MM,
-                                                           m_cms*CM_TO_MM,
-                                                           theta_degs*TO_RAD,
-                                                           numStep));
+            StepCommand::ptr(new StepCommand(x_cms*CM_TO_MM,
+					     m_cms*CM_TO_MM,
+					     theta_degs*TO_RAD,
+					     numStep));
     }
 
-    boost::shared_ptr<StepCommand> getCommand() const { return command; }
+    StepCommand::ptr getCommand() const { return command; }
 
 private:
-    boost::shared_ptr<StepCommand> command;
+    StepCommand::ptr command;
 };
 
 class PyBodyJointCommand {
@@ -271,40 +272,46 @@ private:
 class PyCoordHeadCommand {
 public:
     PyCoordHeadCommand( const float _x, const float _y, const float _z) {
-	command = new CoordHeadCommand(_x,_y,_z);
+	command = CoordHeadCommand::ptr (
+	    new CoordHeadCommand(_x,_y,_z)
+	    );
     }
     PyCoordHeadCommand( const float _x, const float _y, const float _z,
                         const float maxYawSpeed,
                         const float maxPitchSpeed ) {
-	command = new CoordHeadCommand( _x, _y, _z,
-					maxYawSpeed, maxPitchSpeed );
+	command = CoordHeadCommand::ptr(
+	    new CoordHeadCommand( _x, _y, _z,
+				  maxYawSpeed, maxPitchSpeed )
+	    );
     }
 
-    CoordHeadCommand* getCommand() const { return command; }
+    CoordHeadCommand::ptr getCommand() const { return command; }
 private:
-    CoordHeadCommand *command;
+    CoordHeadCommand::ptr command;
 };
 
 class PyFreezeCommand{
 public:
     //Later, one could add more specific stiffness options
     PyFreezeCommand()
-        :command(boost::shared_ptr<FreezeCommand>(new FreezeCommand())){}
-    const boost::shared_ptr<FreezeCommand> getCommand() const{return command;}
+        :command(FreezeCommand::ptr(new FreezeCommand())){}
+    const FreezeCommand::ptr getCommand() const{return command;}
 private:
-    boost::shared_ptr<FreezeCommand> command;
+    FreezeCommand::ptr command;
 };
 
 class PyUnfreezeCommand{
 public:
     //Later, one could add more specific stiffness options
     PyUnfreezeCommand(float stiffness)
-        :command(boost::shared_ptr<UnfreezeCommand>(new UnfreezeCommand())){}
-    const boost::shared_ptr<UnfreezeCommand> getCommand()const{return command;}
+        :command(UnfreezeCommand::ptr(new UnfreezeCommand())){}
+    const UnfreezeCommand::ptr getCommand()const{return command;}
 private:
-    boost::shared_ptr<UnfreezeCommand> command;
+    UnfreezeCommand::ptr command;
 };
 
+/* All the Py<>Command pointers are ref-counted by Python so they don't need to
+   to be shared_ptrs here */
 class PyMotionInterface {
 public:
     PyMotionInterface() {

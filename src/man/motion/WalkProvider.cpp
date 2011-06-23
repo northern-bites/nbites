@@ -44,9 +44,9 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
       pendingStepCommands(false),
       pendingGaitCommands(false),
       pendingStartGaitCommands(false),
-      nextCommand(NULL)
+      nextCommand()
 {
-    pthread_mutex_init(&walk_provider_mutex,NULL);
+    pthread_mutex_init(&walk_provider_mutex, NULL);
 
     setActive();
 }
@@ -56,7 +56,7 @@ WalkProvider::~WalkProvider() {
 }
 
 void WalkProvider::requestStopFirstInstance() {
-    setCommand(new WalkCommand(0.0f, 0.0f, 0.0f));
+    setCommand(WalkCommand::ptr( new WalkCommand(0.0f, 0.0f, 0.0f) ));
 }
 
 void WalkProvider::hardReset(){
@@ -92,7 +92,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
                                nextCommand->theta_rads);
     }
     pendingCommands = false;
-    nextCommand = NULL;
+    nextCommand = WalkCommand::ptr();
 
     if(pendingStepCommands){
         stepGenerator.takeSteps(nextStepCommand->x_mms,
@@ -150,25 +150,25 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     PROF_EXIT(profiler,P_WALK);
 }
 
-void WalkProvider::setCommand(const WalkCommand * command){
+void WalkProvider::setCommand(const WalkCommand::ptr command){
     //grab the velocities in mm/second rad/second from WalkCommand
     pthread_mutex_lock(&walk_provider_mutex);
-    delete nextCommand;
+
     nextCommand = command;
     pendingCommands = true;
-
     setActive();
+
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 
 
-void WalkProvider::setCommand(const boost::shared_ptr<Gait> command){
+void WalkProvider::setCommand(const Gait::ptr command){
     pthread_mutex_lock(&walk_provider_mutex);
     nextGait = Gait(*command);
     pendingGaitCommands = true;
     pthread_mutex_unlock(&walk_provider_mutex);
 }
-void WalkProvider::setCommand(const boost::shared_ptr<StepCommand> command){
+void WalkProvider::setCommand(const StepCommand::ptr command){
     pthread_mutex_lock(&walk_provider_mutex);
     nextStepCommand = command;
     pendingStepCommands = true;

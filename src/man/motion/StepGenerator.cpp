@@ -141,7 +141,7 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             generateStep(x, y, theta); // replenish with the current walk vector
         }
         else {
-            shared_ptr<Step> nextStep = futureSteps.front();
+            Step::ptr nextStep = futureSteps.front();
             futureSteps.pop_front();
 
             fillZMP(nextStep);
@@ -337,7 +337,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
                                                  -body_rot_angle_fc));
 
     //Now we need to determine which leg to send the coorect footholds/Steps to
-    shared_ptr<Step> leftStep_f,rightStep_f;
+    Step::ptr leftStep_f,rightStep_f;
     //First, the support leg.
     if (supportStep_f->foot == LEFT_FOOT){
         leftStep_f = supportStep_f;
@@ -438,13 +438,13 @@ void StepGenerator::swapSupportLegs(){
     //in the F coordinate frames, we express Steps representing
     // the three footholds from above
     supportStep_f =
-	shared_ptr<Step>(new Step(supp_pos_f(0),supp_pos_f(1),
+	Step::ptr(new Step(supp_pos_f(0),supp_pos_f(1),
 				  0.0f,*supportStep_s));
     swingingStep_f =
-	shared_ptr<Step>(new Step(swing_pos_f(0),swing_pos_f(1),
+	Step::ptr(new Step(swing_pos_f(0),swing_pos_f(1),
 				  swing_dest_angle,*swingingStep_s));
     swingingStepSource_f  =
-	shared_ptr<Step>(new Step(swing_src_f(0),swing_src_f(1),
+	Step::ptr(new Step(swing_src_f(0),swing_src_f(1),
 				  swing_src_angle,*lastStep_s));
 
 }
@@ -458,7 +458,7 @@ void StepGenerator::swapSupportLegs(){
  *    - Regular, where there is another step coming after
  *    - End, where the ZMP should move directly under the robot (origin of S)
  */
-void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
+void StepGenerator::fillZMP(const Step::ptr newSupportStep ){
     switch(newSupportStep->type){
     case REGULAR_STEP:
         fillZMPRegular(newSupportStep);
@@ -476,7 +476,7 @@ void StepGenerator::fillZMP(const shared_ptr<Step> newSupportStep ){
 /**
  * Generates the ZMP reference pattern for a normal step
  */
-void StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
+void StepGenerator::fillZMPRegular(const Step::ptr newSupportStep ){
     //update the lastZMPD Step
     const float sign = (newSupportStep->foot == LEFT_FOOT ? 1.0f : -1.0f);
     const float last_sign = -sign;
@@ -609,7 +609,7 @@ void StepGenerator::fillZMPRegular(const shared_ptr<Step> newSupportStep ){
  * Generates the ZMP reference pattern for a step when it is the support step
  * such that it will be the last step before stopping
  */
-void StepGenerator::fillZMPEnd(const shared_ptr<Step> newSupportStep) {
+void StepGenerator::fillZMPEnd(const Step::ptr newSupportStep) {
     const ufvector3 end_s =
         CoordFrame3D::vector3D(gait->stance[WP::BODY_OFF_X],
                                0.0f);
@@ -809,12 +809,12 @@ void StepGenerator::resetSteps(const bool startLeft){
 
     //Support step is END Type, but the first swing step, generated
     //in generateStep, is REGULAR type.
-    shared_ptr<Step> firstSupportStep =
-	shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
+    Step::ptr firstSupportStep =
+	Step::ptr(new Step(ZERO_WALKVECTOR,
                                   *gait,
                                   firstSupportFoot,ZERO_WALKVECTOR,END_STEP));
-    shared_ptr<Step> dummyStep =
-        shared_ptr<Step>(new Step(ZERO_WALKVECTOR,
+    Step::ptr dummyStep =
+        Step::ptr(new Step(ZERO_WALKVECTOR,
                                   *gait,
                                   dummyFoot));
     //need to indicate what the current support foot is:
@@ -900,7 +900,7 @@ void StepGenerator::generateStep( float _x,
 
     const WalkVector new_walk = {_x,_y,_theta};
 
-    shared_ptr<Step> step(new Step(new_walk,
+    Step::ptr step(new Step(new_walk,
                                    *gait,
                                    (nextStepIsLeft ?
                                     LEFT_FOOT : RIGHT_FOOT),
@@ -955,7 +955,7 @@ StepGenerator::getDefaultStance(const Gait& wp){
  * Method returns the transformation matrix that goes between the previous
  * foot ('f') coordinate frame and the next f coordinate frame rooted at 'step'
  */
-const ufmatrix3 StepGenerator::get_fprime_f(const shared_ptr<Step> step){
+const ufmatrix3 StepGenerator::get_fprime_f(const Step::ptr step){
     const float leg_sign = (step->foot == LEFT_FOOT ? 1.0f : -1.0f);
 
     const float x = step->x;
@@ -977,7 +977,7 @@ const ufmatrix3 StepGenerator::get_fprime_f(const shared_ptr<Step> step){
  * frame rooted at the last step.  Really just the inverse of the matrix
  * returned by the 'get_fprime_f'
  */
-const ufmatrix3 StepGenerator::get_f_fprime(const shared_ptr<Step> step){
+const ufmatrix3 StepGenerator::get_f_fprime(const Step::ptr step){
     const float leg_sign = (step->foot == LEFT_FOOT ? 1.0f : -1.0f);
 
     const float x = step->x;
@@ -997,7 +997,7 @@ const ufmatrix3 StepGenerator::get_f_fprime(const shared_ptr<Step> step){
  * Translates points in the sprime frame into the s frame, where
  * the difference between sprime and s is based on 'step'
  */
-const ufmatrix3 StepGenerator::get_sprime_s(const shared_ptr<Step> step){
+const ufmatrix3 StepGenerator::get_sprime_s(const Step::ptr step){
     const float leg_sign = (step->foot == LEFT_FOOT ? 1.0f : -1.0f);
 
     const float x = step->x;
@@ -1018,7 +1018,7 @@ const ufmatrix3 StepGenerator::get_sprime_s(const shared_ptr<Step> step){
  * in the next s frame back to the previous one, based on the intervening
  * Step (s' being the last s frame).
  */
-const ufmatrix3 StepGenerator::get_s_sprime(const shared_ptr<Step> step){
+const ufmatrix3 StepGenerator::get_s_sprime(const Step::ptr step){
     const float leg_sign = (step->foot == LEFT_FOOT ? 1.0f : -1.0f);
 
     const float x = step->x;
