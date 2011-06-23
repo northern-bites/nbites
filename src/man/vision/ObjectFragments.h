@@ -97,6 +97,11 @@ public:
     // post recognition routines
     int classifyByCrossbar(Blob b);
     int classifyByOtherRuns(int left, int right, int height);
+	int classifyByOuterL(Blob post, boost::shared_ptr<VisualLine> line1,
+						 boost::shared_ptr<VisualLine> line2);
+	int classifyByInnerL(Blob post, int x, int y, bool right,
+						 boost::shared_ptr<VisualLine> line1,
+						 boost::shared_ptr<VisualLine> line2);
     int classifyByTCorner(Blob b);
     int classifyByCheckingCorners(Blob b);
     int cornerClassifier(float diff, float dist, int x, int y,int class1,
@@ -109,10 +114,10 @@ public:
                                    int class1, int class2);
     int classifyByGoalline(const point<int> linel, const point<int> liner,
                            point<int> left, point<int> right);
-    int classifyByGoalBoxFrontline(pair<int, int> foo,
+    int classifyByGoalBoxFrontline(std::pair<int, int> foo,
                                    point<int> left, point<int> right);
     int getFrontlineClassification(point<int> post,
-                                   pair<int, int> foo,
+                                   std::pair<int, int> foo,
                                    int classification);
 
 	int classifyByCheckingLines(Blob post);
@@ -125,8 +130,8 @@ public:
     void lookForFirstPost(VisualFieldObject *left, VisualFieldObject *right,
                   VisualCrossbar *mid, unsigned char c);
     void lookForSecondPost(Blob pole, int post,
-						   VisualFieldObject* left,
-						   VisualFieldObject* right,
+                           VisualFieldObject* left,
+                           VisualFieldObject* right,
                            VisualCrossbar* mid, unsigned char c);
 
     void updateRunsAfterFirstPost(Blob pole, int post);

@@ -2,6 +2,8 @@
 VisualRobot::VisualRobot() : VisualDetection()
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 VisualRobot::VisualRobot(const VisualRobot& o) : VisualDetection(o) {}
@@ -21,6 +23,7 @@ void VisualRobot::init()
     setDistance(0);
     setBearing(0);
     elevation = 0;
+    on = false;
 }
 
 /**

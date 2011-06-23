@@ -14,38 +14,10 @@ def shouldSave(team):
      ## NEED TO FIGURE THIS OUT ###
     return False
 
-# def shouldPosition(team):
-#     my = team.brain.my
-#     ball = team.brain.ball
-
-#     # checks if in front of box or a quarter of the way up the field
-#     #check if this really should be MY_GOALBOX_RIGHT_X
-#     if (my.x > NogCon.MY_GOALBOX_RIGHT_X  and my.uncertX < 90):
-#         if(ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER
-#            or ball.relX > CHASE_RELX_BUFFER):
-#             print "ball not chaseable"
-#             team.shouldChaseCounter = 0
-#             team.shouldStopChaseCounter = 0
-#             team.shouldPositionCenterCounter = 0
-#             team.shouldPositionLeftCounter = 0
-#             team.shouldPositionRightCounter = 0
-#             return True
-#     elif my.x > NogCon.MIDFIELD_X * 0.5:
-#         print "1/4"
-#         team.shouldChaseCounter = 0
-#         team.shouldStopChaseCounter = 0
-#         team.shouldPositionCenterCounter = 0
-#         team.shouldPositionLeftCounter = 0
-#         team.shouldPositionRightCounter = 0
-#         return True
-
-#     return False
-
 def shouldChase(team):
     ball = team.brain.ball
 
     if (ball.framesOff > 30):
-        print "no ball"
         return False
 
     # close enough to chase
@@ -72,7 +44,6 @@ def shouldStopChase(team):
     my = team.brain.my
 
     if(ball.framesOff > 30):
-        print "ball off"
         team.shouldStopChaseCounter = 0
         team.shouldChaseCounter = 0
         team.shouldPositionCenterCounter = 0
@@ -82,7 +53,6 @@ def shouldStopChase(team):
 
     # I'm 1/4 of the way up the field
     if my.x > NogCon.MIDFIELD_X * 0.5:
-        print "1/4"
         team.shouldChaseCounter = 0
         team.shouldStopChaseCounter = 0
         team.shouldPositionCenterCounter = 0
@@ -92,7 +62,6 @@ def shouldStopChase(team):
 
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X  and my.uncertX < 90):
         if(ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER):
-            print "ball not chaseable"
             team.shouldChaseCounter = 0
             team.shouldStopChaseCounter = 0
             team.shouldPositionCenterCounter = 0
@@ -108,7 +77,6 @@ def shouldStopChase(team):
         team.shouldStopChaseCounter += 1
 
     if team.shouldStopChaseCounter > 3:
-        print "out of chase range"
         team.shouldStopChaseCounter = 0
         team.shouldChaseCounter = 0
         team.shouldPositionCenterCounter = 0

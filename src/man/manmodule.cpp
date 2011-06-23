@@ -51,39 +51,26 @@ using namespace std;
 using namespace AL;
 using boost::shared_ptr;
 
-
-static shared_ptr<ALMan> man;
-static shared_ptr<Sensors> sensors;
-static shared_ptr<Synchro> synchro;
-static shared_ptr<ALTranscriber> transcriber;
-static shared_ptr<ALImageTranscriber> imageTranscriber;
-static shared_ptr<EnactorT> enactor;
-static shared_ptr<Lights> lights;
-static shared_ptr<Speech> speech;
-
 void ALCreateMan( ALPtr<ALBroker> broker){
-    synchro = shared_ptr<Synchro>(new Synchro());
-    sensors = shared_ptr<Sensors>(new Sensors);
-    transcriber = shared_ptr<ALTranscriber>(new ALTranscriber(broker,sensors));
-    imageTranscriber =
-        shared_ptr<ALImageTranscriber>
-        (new ALImageTranscriber(synchro, sensors, broker));
-
-    boost::shared_ptr<Profiler> profiler = shared_ptr<Profiler>(new Profiler(&thread_micro_time));
+    static shared_ptr<Synchro> synchro(new Synchro());
+    static shared_ptr<Speech> speech(new ALSpeech(broker));
+    static shared_ptr<Sensors> sensors(new Sensors(speech));
+    static shared_ptr<ALTranscriber> transcriber(new ALTranscriber(broker,sensors));
+    static shared_ptr<ALImageTranscriber> imageTranscriber(
+            new ALImageTranscriber(synchro, sensors, broker));
+    static shared_ptr<Profiler> profiler(new Profiler(&thread_micro_time));
 #ifdef USE_DCM
-    enactor = shared_ptr<EnactorT>(new EnactorT(profiler, sensors,
+    static shared_ptr<EnactorT> enactor(new EnactorT(profiler, sensors,
                                                 transcriber,broker));
 #else
-    enactor = shared_ptr<EnactorT>(new EnactorT(sensors,synchro,
+    static shared_ptr<EnactorT> enactor(new EnactorT(sensors,synchro,
                                                 transcriber,broker));
 #endif
-    lights = shared_ptr<Lights>(new NaoLights(broker));
-
-    speech = shared_ptr<Speech>(new ALSpeech(broker));
+    static shared_ptr<Lights> lights(new NaoLights(broker));
 
     //setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
-    man = boost::shared_ptr<ALMan> (new ALMan(profiler,
+    static shared_ptr<ALMan> man = boost::shared_ptr<ALMan> (new ALMan(profiler,
                                               sensors,
                                               transcriber,
                                               imageTranscriber,
@@ -96,7 +83,7 @@ void ALCreateMan( ALPtr<ALBroker> broker){
 
 // it appears that Aldebaran doesn't actually call this method for us
 void ALDestroyMan(){
-    man->stopSubThreads();
+//    man->stopSubThreads();
 }
 
 
