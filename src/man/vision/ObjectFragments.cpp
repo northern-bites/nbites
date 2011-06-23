@@ -2156,6 +2156,9 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
         }
         return;
     }
+	if (PRINTOBJS) {
+		printBlob(pole);
+	}
     lookForSecondPost(pole, post, left, right, mid, c);
 }
 
