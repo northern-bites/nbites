@@ -161,12 +161,13 @@ private:
     bool up;       // does the bisector point up?
     bool right;    // does the bisector point right?
 
-    // The orientation of the robot to the physical corner on the
+    // The physical orientation of the robot to the physical corner on the
     // field, given in radians in terms of our rotation from the zero
     // angle of that corner
     //
     // For L-Corners:
-    //             Zero angle is bisector of legs
+    //         Zero angle is the left leg if you are standing
+    //             at the intersection
     //
     // ---------- <- zero line
     // |

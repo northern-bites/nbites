@@ -77,8 +77,6 @@ public:
 
     virtual ~Observation() { }
 
-public:
-
     /**
      *
      * Visual information Getters
