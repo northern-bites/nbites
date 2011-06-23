@@ -1,16 +1,15 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 from ..playbook.PBConstants import GOALIE
-from math import fabs
 
 
 def findBall(player):
     """
     State to stop all activity and begin finding the ball
     """
-
     player.stopWalking()
     player.brain.tracker.stopHeadMoves()
+
     if player.brain.nav.isStopped():
         return player.goLater('scanFindBall')
 
@@ -40,7 +39,6 @@ def spinFindBall(player):
     State to spin to find the ball. If we find the ball, we
     move to align on it. If we don't find it, we walk to look for it
     """
-
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
@@ -50,12 +48,12 @@ def spinFindBall(player):
         player.brain.tracker.stopHeadMoves()
 
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
-        player.brain.tracker.trackBallSpin()
         my = player.brain.my
         ball = player.brain.ball
         spinDir = my.spinDirToPoint(ball)
-
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
+
+        player.brain.tracker.trackBallSpin()
 
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldWalkFindBall(player):

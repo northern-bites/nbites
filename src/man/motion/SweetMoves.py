@@ -95,6 +95,7 @@ GOALIE_POS = ((INITIAL_POS[0][0],
 #     STAND  UPS      *
 #                     *
 #**********************
+
 STAND_UP_FRONT = ( ((90,50,0,0),
                     (0,0,8,120,-65,0),
                     (0,0,8,120,-65,4),
@@ -281,37 +282,37 @@ STAND_UP_BACK = (((100,0,0,0),
 SAVE_LEFT_DEBUG = ( ((-90,0,0,0),
                      (GOALIE_POS[0][1]),
                      (GOALIE_POS[0][2]),
-                     (GOALIE_POS[0][3]), 
+                     (GOALIE_POS[0][3]),
                      .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_RIGHT_DEBUG = ( ((GOALIE_POS[0][0]),
                       (GOALIE_POS[0][1]),
                       (GOALIE_POS[0][2]),
-                      (-90,0,0,0), 
+                      (-90,0,0,0),
                       .5, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_CENTER_DEBUG = ( ((-90,0,0,0),
                        (GOALIE_POS[0][1]),
                        (GOALIE_POS[0][2]),
-                       (-90,0,0,0), 
+                       (-90,0,0,0),
                        .5,0, stiff.NORMAL_STIFFNESSES), )
 
 SAVE_LEFT_HOLD_DEBUG = ( ((-90,0,0,0),
                           (GOALIE_POS[0][1]),
                           (GOALIE_POS[0][2]),
-                          (GOALIE_POS[0][3]), 
+                          (GOALIE_POS[0][3]),
                           0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_RIGHT_HOLD_DEBUG = ( ((GOALIE_POS[0][0]),
                            (GOALIE_POS[0][1]),
                            (GOALIE_POS[0][2]),
-                           (-90,0,0,0), 
+                           (-90,0,0,0),
                            0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 SAVE_CENTER_HOLD_DEBUG = ( ((-90,0,0,0),
                             (GOALIE_POS[0][1]),
                             (GOALIE_POS[0][2]),
-                            (-90,0,0,0), 
+                            (-90,0,0,0),
                             0.1, 0, stiff.LOOSE_ARMS_STIFFNESSES), )
 
 GOALIE_SAVE = (
@@ -878,6 +879,53 @@ LEFT_LONG_BACK_KICK = (
 
 
 RIGHT_LONG_BACK_KICK =  mirrorMove(LEFT_LONG_BACK_KICK)
+
+LEFT_SHORT_BACK_KICK = (
+
+    # lean right
+    ((80.,40.,-50.,-70.),
+     (0.,0.,-35.,65.,-28.,-14.),
+     (0.,2,-38.,76.,-40.,-14.),
+     (80.,-40.,50.,70.),
+     0.8,0, stiff.NORMAL_STIFFNESSES),
+
+    #lift left leg to side
+    ((80.,0.5,-50.,-70.),
+     (0.,45.,-35.,65.,-10.,-10.),
+     (0.,4.5,-38.,76.,-40.,-22.),
+     (80.,-40.,50.,70.),
+     0.5 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    #Swing around Leg
+    ((80.,22,-75.,-86.),
+     (0.,45.,-95.,25.,-10.,-10.),
+     (0.,4.5,-38.,76.,-40.,-16.5),
+     (80.,-40.,50.,70.),
+     0.7 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    #  #Set For Kick
+    ((80.,22,-75.,-86.),
+     (0.,14.,-95.,20.,-68.,-10.),
+     (0.,5.,-38.,76.,-40.,-16.5),
+     (80.,-40.,50.,70.),
+     0.4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+     # KICK!!!
+    ((80.,22,-75.,-86.),
+     (0.,13.,-50.,65.,-16.,-10.),
+     (0.,5.,-38.,76.,-40.,-16.5),
+     (80.,-40.,50.,70.),
+     .4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+
+    # recover
+    ((80.,40.,-50.,-70.),
+     (0.,0.,-35.,65.,-28.,-10.),
+     (0.,2,-38.,76.,-44.,-14.),
+     (90.,-40.,50.,70.),
+    .8,0, stiff.NORMAL_STIFFNESSES))
+
+
+RIGHT_SHORT_BACK_KICK =  mirrorMove(LEFT_SHORT_BACK_KICK)
 
 LEFT_BIG_KICK = (
     #swing to the right

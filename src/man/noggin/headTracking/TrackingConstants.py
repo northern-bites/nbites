@@ -1,10 +1,5 @@
-TRACKING = 'tracking'
 
-LOC_PANS = 'locPans'
-
-PAN_LEFT_ONCE = 'panLeftOnce'
-
-MAX_PAN_SPEED = 240.0              # deg/sec
+MAX_PAN_SPEED = 200.0              # deg/sec
 
 TRACKER_FRAMES_ON_TRACK_THRESH = 1
 TRACKER_FRAMES_OFF_REFIND_THRESH = 5
