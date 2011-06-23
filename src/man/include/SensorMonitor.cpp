@@ -17,17 +17,18 @@ SensorMonitor::SensorMonitor()
     :  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
        monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
        reportErrors(false),
-       lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
+       lowVariance(DONT_CHECK), highVariance(DONT_CHECK),
+       validSpeechPointer(false)
 {
     Reset();
 }
 
-SensorMonitor::SensorMonitor(boost::shared_ptr<Speech> s, std::string sensorName)
-    :  speech(s),
-       noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
+SensorMonitor::SensorMonitor(std::string sensorName)
+    :  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
        monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
        reportErrors(false),
-       lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
+       lowVariance(DONT_CHECK), highVariance(DONT_CHECK),
+       validSpeechPointer(false)
 {
     SensorMonitor::sensorName = sensorName;
     Reset();
@@ -101,7 +102,8 @@ void SensorMonitor::reportSensorError() {
 		  << ", saw a variance of " << Y()
 		  << " (feel free to ignore this if the robot is stationary)"
 		  << std::endl;
-	speech->say("Problem with " + sensorName);
+	if (validSpeechPointer)
+	    speech->say("Problem with " + sensorName);
     }
 }
 
