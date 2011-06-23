@@ -306,8 +306,12 @@ void Context::classifyT(VisualCorner & first) {
 			}
 		}
 	}
-	if (sideT || l1 > 3 * GOALBOX_DEPTH || (face == FACING_UNKNOWN &&
-				  l1 > 2 * GOALBOX_DEPTH)) {
+	if (debugIdentifyCorners && sideT) {
+		cout << "Side T is true" << endl;
+	}
+	if (sideT || (l1 > 3 * GOALBOX_DEPTH && objectDistance > 250) ||
+		(face == FACING_UNKNOWN &&
+		 l1 > 2 * GOALBOX_DEPTH)) {
         if (face == FACING_BLUE_GOAL) {
             if (first.doesItPointRight()) {
                 first.setSecondaryShape(CENTER_T_BOTTOM);
@@ -468,6 +472,7 @@ void Context::classifyOuterL(VisualCorner & corner) {
 	// check if it is an obvious field corner
 	if (corner.getY() < objectRightY - 20) {
 		if (face == FACING_BLUE_GOAL) {
+			// 223-11/slarti/lookingin-bg/NBFRM.0
 			if (corner.getX() < objectRightX && corner.doesItPointLeft()) {
 				corner.setSecondaryShape(BLUE_GOAL_BOTTOM);
 				return;
@@ -488,7 +493,7 @@ void Context::classifyOuterL(VisualCorner & corner) {
 		}
 	}
     bool line1IsLonger = l1 > l2;
-    bool pointsMostlyUp = abs(corner.getOrientation()) < 45.0;
+    bool pointsMostlyUp = abs(corner.getOrientation()) < 135.0;
     if (!pointsMostlyUp) {
         checkLowOuterL(corner, line1IsLonger);
 		return;
@@ -517,6 +522,8 @@ void Context::classifyOuterL(VisualCorner & corner) {
 	} else if (l1 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
         l2 < GOALBOX_FUDGE * GOALBOX_DEPTH) {
 		const point<int> top = corner.getLine2()->getTopEndpoint();
+		// bug:  223-11/slarti/leftbluecorner/NBFRM.12
+		// basically on the side of the goal this idea doesn't work
 		if (objectRightX > -1) {
 			if (top.x > objectRightX) {
 				if (face == FACING_YELLOW_GOAL) {
@@ -1050,15 +1057,33 @@ void Context::findUnconnectedCornerRelationship(VisualCorner & first,
                 unconnectedInnerLs(first, second);
             }
             return;
-        }
+        } else {
+			classifyInnerL(first);
+			if (second.getShape() == T) {
+				classifyT(second);
+			}
+			return;
+		}
     } else if (second.getShape() == INNER_L) {
         if (first.getShape() == OUTER_L) {
             inner = &second;
             outer = &first;
         } else {
+			classifyInnerL(second);
+			if (first.getShape() == T) {
+				classifyT(first);
+			}
             return;
         }
     } else {
+		if (first.getShape() == T) {
+			classifyT(first);
+		}
+		if (second.getShape() == T) {
+			classifyT(second);
+		} else if (second.getShape() == OUTER_L) {
+			classifyOuterL(second);
+		}
         return;
     }
     // check the orientation of the outer-l
@@ -2024,6 +2049,8 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
 				cout << "checking distance to field object " <<
 					allFieldObjects[i]->getDistance() << " " <<
 					MIDFIELD_X << endl;
+				cout << "Object is at " << allFieldObjects[i]->getRightBottomX()
+					 << " " << allFieldObjects[i]->getRightBottomY() << endl;
 			}
 			if (allFieldObjects[i]->getDistance() > 0) {
 				if (objectDistance > 0) {
@@ -2049,7 +2076,8 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
             // we see a post, but it is probably too close to get
             // a good distance (occluded on two sides)
             // we may not want to use the object too much, but it can help
-			if (objectRightX > 0) {
+			if (objectRightX < 1 && allFieldObjects[i]->getRightBottomX() >
+				0) {
 				objectRightX = allFieldObjects[i]->getRightBottomX();
 				objectRightY = allFieldObjects[i]->getRightBottomY();
 			}
@@ -2063,8 +2091,19 @@ vector <const VisualFieldObject*> Context::getVisibleFieldObjects()
 				}
 			}
 			if (allFieldObjects[i]->getRightBottomX() > 0) {
-				objectRightX = allFieldObjects[i]->getRightBottomX();
-				objectRightY = allFieldObjects[i]->getRightBottomY();
+				if (objectRightX < 1) {
+					if (debugIdentifyCorners) {
+						cout << "checking distance to weird field object " <<
+							allFieldObjects[i]->getDistance() << " " <<
+							MIDFIELD_X << endl;
+						cout << "Object is at " <<
+							allFieldObjects[i]->getRightBottomX()
+							 << " " << allFieldObjects[i]->getRightBottomY() <<
+							endl;
+					}
+					objectRightX = allFieldObjects[i]->getRightBottomX();
+					objectRightY = allFieldObjects[i]->getRightBottomY();
+				}
 			}
 		}
     }
