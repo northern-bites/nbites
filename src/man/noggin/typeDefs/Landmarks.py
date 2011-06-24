@@ -90,6 +90,7 @@ class FieldCorner(LocObject):
     def __init__(self, _Id):
         LocObject.__init__(self)
         self.Id = _Id
+        self.elevation = 0
         self.framesOn = 0
         self.height = 0
         self.dist = 0

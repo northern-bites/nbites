@@ -101,8 +101,9 @@ def trackLandmarks(tracker):
 
     # Assert: no change in list order
 
-    # Check for no target (first pass in trackLandmarks state)
-    if tracker.target is None:
+    # Check for no target (or ball target)
+    # Always occurs in the first pass in trackLandmarks state
+    if tracker.target is None or tracker.target == tracker.brain.ball:
         print "ALS: target is None"# ** #debugging
         tracker.target = tracker.locObjectList[0]
 
@@ -142,21 +143,18 @@ def trackingBallLoc(tracker):
     # Sort list of locObjects
     newlist = sorted(tracker.locObjectList)
 
-    if not newlist == tracker.locObjectList:
+    # Check for no target (first pass in method)
+    if tracker.target is None:
+        tracker.target = tracker.locObjectList[0]
+    elif not newlist == tracker.locObjectList:
         # Landmarks have changed fitness ranking. Track most fit.
         tracker.locObjectList = newlist
         tracker.target = tracker.locObjectList[0]
         return tracker.goLater('trackLoc')
-
-    # Assert: no change in list order
-
-    # Check for no target (first pass in method)
-    if tracker.target is None:
-        tracker.target = tracker.locObjectList[0]
-
-    # Track next most fit locObject
-    oldIndex = tracker.locObjectList.index(tracker.target)
-    tracker.target = tracker.locObjectList[oldIndex+1]
+    else:
+        # Track next most fit locObject
+        oldIndex = tracker.locObjectList.index(tracker.target)
+        tracker.target = tracker.locObjectList[oldIndex+1]
 
     # Set values for sanity check.
     if (tracker.safeBallTracking):
@@ -201,8 +199,7 @@ def passiveLoc(tracker):
         tracker.target.x = 370
         tracker.target.y = 270
         tracker.helper.lookToTargetCoords(tracker.target)
-        return tracker.goLater('neutralHead')# ** # debugging
-        #return tracker.stay()
+        return tracker.stay()
 
     # Not confident enough about position:
     # check next landmark.

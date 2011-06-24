@@ -175,7 +175,7 @@ class HeadTracking(FSA.FSA):
 #        if not self.currentState == 'lookToPoint':
 #            self.switchTo('lookToPoint')
 
-    # ** # new method - helper method
+# ** # new method - helper method
     def lookToPoint(self, goalX=0, goalY=0, goalZ=0):
         """
         Look at given relative coordinates.
@@ -213,6 +213,7 @@ class HeadTracking(FSA.FSA):
 # ** # new method
     def trackBall(self):
         self.target = self.brain.ball
+        self.decisionState = 'trackingBallLoc'
         self.switchTo('trackingBall')
 
 # ** # new method

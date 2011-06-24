@@ -101,6 +101,37 @@ def checkBall(tracker):
         tracker.helper.lookToTargetCoords()
     return tracker.stay()
 
+def kickWhiffCheck(tracker):
+    """
+    After a kick was executed and the ball was lost,
+    look down and check for a whiff.
+    """
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.helper.executeHeadMove(HeadMoves.LOOK_DOWN)
+        tracker.target = tracker.brain.ball
+        return tracker.stay()
+
+    if tracker.target.framesOn() > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        # Ball located, stare at it.
+        tracker.stareBall()
+        return tracker.stay()
+
+    if not tracker.brain.motion.isHeadActive():
+        # Ball was not whiffed. Pan in kick direction.
+        return tracker.goLater(followKickPan)# ** # NOT WRITTEN YET # ** #
+
+def followKickPan(tracker):
+    """
+    Pan in direction of kick. For side kicks, start at feet and pan out
+    from there. For straight kicks, ball was probably lost because it was
+    moving too fast, so start far out and pan back. For back kicks, don't
+    enter this state at all.
+    """
+    # ** # Switch on kicks (noggin.kickDecider.kicks)
+    # ** # Execute appropriate pan.
+    pass
+
 # ** # old method
 def panLeftOnce(tracker):
     if tracker.firstFrame():

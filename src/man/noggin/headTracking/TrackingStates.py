@@ -174,12 +174,14 @@ def trackingBall(tracker):
         tracker.brain.motion.stopHeadMoves()
 
     # Look to the ball for TRACKER_BALL_STARE_THRESH frames
-    # If ball is lost on frame, do nothing.
+    # If ball is lost on frame, look towards coordinates.
     if tracker.brain.ball.on:
         tracker.helper.lookToTargetAngles(tracker.brain.ball)
+    else:
+        tracker.helper.lookToTargetCoords(tracker.brain.ball)
 
     if tracker.counter > constants.TRACKER_BALL_STARE_THRESH:
-        print "Past stare thresh for ball, looking for landmarks"
+        print "Past stare thresh for ball, going to:",tracker.decisionState
         return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()
