@@ -8,8 +8,6 @@ using namespace std;
 using namespace boost::python;
 using namespace boost;
 
-// #include "MCL.h"
-// #include "LocEKF.h"
 #include "LocSystem.h"
 #include "BallEKF.h"
 

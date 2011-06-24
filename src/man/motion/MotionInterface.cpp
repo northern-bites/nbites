@@ -26,6 +26,9 @@ void MotionInterface::setNextWalkCommand(const WalkCommand::ptr command){
 void MotionInterface::sendStepCommand(const StepCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
+void MotionInterface::sendDestCommand(const DestinationCommand::ptr command){
+    switchboard->sendMotionCommand(command);
+}
 void MotionInterface::enqueue(const BodyJointCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }

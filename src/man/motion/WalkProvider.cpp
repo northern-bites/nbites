@@ -42,6 +42,7 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
       stepGenerator(sensors, pose, &metaGait),
       pendingCommands(false),
       pendingStepCommands(false),
+      pendingDestCommands(false),
       pendingGaitCommands(false),
       pendingStartGaitCommands(false),
       nextCommand()
@@ -62,7 +63,7 @@ void WalkProvider::requestStopFirstInstance() {
 void WalkProvider::hardReset(){
     pthread_mutex_lock(&walk_provider_mutex);
     stepGenerator.resetHard();
-    pendingCommands = pendingStepCommands =false;
+    pendingCommands = pendingStepCommands = pendingDestCommands = false;
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);
 }
@@ -101,6 +102,14 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
                                 nextStepCommand->numSteps);
     }
     pendingStepCommands=false;
+
+    if (pendingDestCommands) {
+        stepGenerator.setDestination(nextDestCommand->x_mm,
+                                     nextDestCommand->y_mm,
+                                     nextDestCommand->theta_rads,
+                                     nextDestCommand->gain);
+	}
+	pendingDestCommands = false;
 
     //Also need to process stepCommands here
 
@@ -161,6 +170,13 @@ void WalkProvider::setCommand(const WalkCommand::ptr command){
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 
+void WalkProvider::setCommand(const boost::shared_ptr<DestinationCommand> command){
+    pthread_mutex_lock(&walk_provider_mutex);
+	nextDestCommand = command;
+	pendingDestCommands = true;
+	setActive();
+    pthread_mutex_unlock(&walk_provider_mutex);
+}
 
 void WalkProvider::setCommand(const Gait::ptr command){
     pthread_mutex_lock(&walk_provider_mutex);
@@ -177,7 +193,8 @@ void WalkProvider::setCommand(const StepCommand::ptr command){
 }
 void WalkProvider::setActive(){
     //check to see if the walk engine is active
-    if(stepGenerator.isDone() && !pendingCommands && !pendingStepCommands){
+    if(stepGenerator.isDone() && !pendingCommands && !pendingStepCommands
+	   && !pendingDestCommands){
         inactive();
     }else{
         active();

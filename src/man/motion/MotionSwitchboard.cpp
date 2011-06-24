@@ -790,3 +790,10 @@ void MotionSwitchboard::sendMotionCommand(const StepCommand::ptr command){
     pthread_mutex_unlock(&next_provider_mutex);
 }
 
+void MotionSwitchboard::sendMotionCommand(const DestinationCommand::ptr command){
+    pthread_mutex_lock(&next_provider_mutex);
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
+}
+

@@ -64,6 +64,12 @@ class SoccerFSA(FSA.FSA):
         nav = self.brain.nav
         return (nav.walkX, nav.walkY, nav.walkTheta)
 
+    def setDestination(self, x, y, theta):
+        """
+        Wrapper method to set the robot's destination
+        """
+        self.brain.nav.setDest(x, y, theta)
+
     def setSteps(self, x, y, theta, numSteps=1):
         """
         Have the robot walk a specified number of steps

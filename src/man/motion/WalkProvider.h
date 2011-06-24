@@ -46,9 +46,9 @@
 #include "MetaGait.h"
 #include "BodyJointCommand.h"
 #include "StepCommand.h"
+#include "DestinationCommand.h"
 
 #include "Profiler.h"
-
 
 //NOTE: we need to get passed a reference to the switchboard so we can
 //know the length of a motion frame!!
@@ -73,6 +73,7 @@ public:
     void setCommand(const WalkCommand::ptr command);
     void setCommand(const Gait::ptr command);
     void setCommand(const StepCommand::ptr command);
+    void setCommand(const DestinationCommand::ptr command);
 
     std::vector<BodyJointCommand::ptr> getGaitTransitionCommand();
     MotionModel getOdometryUpdate(){
@@ -97,13 +98,14 @@ private:
     StepGenerator stepGenerator;
     bool pendingCommands;
     bool pendingStepCommands;
+    bool pendingDestCommands;
     bool pendingGaitCommands;
     bool pendingStartGaitCommands;
 
     mutable pthread_mutex_t walk_provider_mutex;
     WalkCommand::ptr nextCommand;
     StepCommand::ptr nextStepCommand;
-
+    DestinationCommand::ptr nextDestCommand;
 };
 
 #endif

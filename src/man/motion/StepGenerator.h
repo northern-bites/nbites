@@ -108,12 +108,12 @@
 typedef boost::tuple<const std::list<float>*,
                      const std::list<float>*> zmp_xy_tuple;
 typedef boost::tuple<LegJointStiffTuple,
-		     LegJointStiffTuple> WalkLegsTuple;
+                      LegJointStiffTuple> WalkLegsTuple;
 typedef boost::tuple<ArmJointStiffTuple,
                      ArmJointStiffTuple> WalkArmsTuple;
 
 static unsigned int MIN_NUM_ENQUEUED_STEPS = 3; //At any given time, we need at least 3
-//steps stored in future, current lists
+                                     //steps stored in future, current lists
 
 class StepGenerator {
 public:
@@ -129,7 +129,8 @@ public:
     bool isDone() const { return done; }
 
     void setSpeed(const float _x, const float _y, const float _theta);
-    void setDestination(const float rel_x, const float rel_y, const float rel_theta);
+	void setDestination(const float rel_x, const float rel_y, const float rel_theta,
+						float gain = 1.0f);
     void takeSteps(const float _x, const float _y, const float _theta,
                    const int _numSteps);
 
@@ -185,6 +186,8 @@ private:
     float theta;
 
     bool done;
+
+	bool hasDestination;
 
     SensorAngles sensorAngles;
 

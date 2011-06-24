@@ -13,6 +13,7 @@ from ..WebotsConfig import WEBOTS_ACTIVE
 import man.motion.SweetMoves as SweetMoves
 
 #Types
+DEST = 2
 STEP = 1 #currently broken in Nav.
 WALK = 0
 
@@ -25,10 +26,23 @@ UNIT_TEST1 = ((WALK, (1, 0, 0), 100),
               )
 
 STRAIGHT_ONLY = ((WALK, (1.0, 0, 0), 150),
+                 (WALK, (0, 1.0, 0), 150),
                  )
 
-STAND_STILL = ((WALK, (0, 0, 0), 300),
-               )
+CARDINAL_DEST_TEST = ((DEST, (15, 0, 0), 150),
+                      (DEST, (-15, 0, 0), 150),
+                      (DEST, (0, 10, 0), 150),
+                      (DEST, (0, -10, 0), 150),
+                      (DEST, (0, 0, 90), 150),
+                      (DEST, (0, 0, -90), 150),
+                      )
+
+MIXED_DEST_TEST = ((DEST, (15, 15, 0), 200),
+                   (DEST, (15, -15, 0), 200),
+                   (DEST, (0, -15, -90), 200),
+                   (DEST, (50, 15, -90), 300),
+                   (DEST, (-30, -15, -90), 300),
+                   )
 
 def gamePlaying(player):
     """
@@ -39,11 +53,8 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0
-        player.unitTest = STRAIGHT_ONLY
-
-        player.brain.stability.resetData()
+        player.unitTest = MIXED_DEST_TEST
     return player.goLater('walkTest')
-
 
 def walkTest(player):
     """
@@ -70,6 +81,10 @@ def walkTest(player):
                             currentVector[1],
                             currentVector[2],
                             currentVector[3],)
+        elif currentCommand[0] == DEST:
+            player.setDestination(currentVector[0],
+                                  currentVector[1],
+                                  currentVector[2],)
         else:
             player.printf("WARNING! Unrecognized command"
                           " type in WalkUnitTest")
@@ -79,7 +94,8 @@ def walkTest(player):
     return player.stay()
 
 def switchDirections(player):
-    return player.goNow('walkTest')
+    return player.goLater('walkTest')
+
 def sitdown(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)

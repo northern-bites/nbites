@@ -172,6 +172,25 @@ public:
     }
 };
 
+class PyDestinationCommand : public PyMotionCommand {
+public:
+    PyDestinationCommand(float x_cm, float m_cm, float theta_degs, float gain=1.0f) {
+        //All python units should be in CM and DEG
+        //C++ is in mm and rads, so we need to convert
+        command = DestinationCommand::ptr(
+	    new DestinationCommand(x_cm*CM_TO_MM,
+				   m_cm*CM_TO_MM,
+				   theta_degs*TO_RAD,
+				   gain)
+	    );
+    }
+
+    DestinationCommand::ptr getCommand() const {
+	return dynamic_pointer_cast<DestinationCommand>(command);
+    }
+};
+
+
 class PyStepCommand : public PyMotionCommand {
 public:
     PyStepCommand(float x_cms, float m_cms, float theta_degs, int numStep) {
@@ -338,6 +357,9 @@ public:
     }
     void sendStepCommand(const PyStepCommand *command) {
         motionInterface->sendStepCommand(command->getCommand());
+    }
+    void sendDestCommand(const PyDestinationCommand *command) {
+        motionInterface->sendDestCommand(command->getCommand());
     }
     void setGait(const PyGaitCommand *command) {
         motionInterface->setGait(command->getCommand());

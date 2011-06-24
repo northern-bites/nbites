@@ -108,6 +108,14 @@ BOOST_PYTHON_MODULE(_motion)
 									     "A container for a walk command. Holds an x, y and theta which represents a"
 									     " walk vector"))
         ;
+
+    class_<PyDestinationCommand, bases<PyMotionCommand> >("DestinationCommand",
+							  init<float, float, float, float>
+							  (args("x","y","theta","gain"),
+							   "A container for a destination command. Holds an x, y and theta which represent a"
+							   " destination relative to the origin of the robot, and a speed (gain)"))
+        ;
+
     class_<PyStepCommand, bases<PyMotionCommand> >("StepCommand",
 						   init<float, float, float, int>(args("x","y","theta",
 										       "numSteps"),
@@ -131,14 +139,15 @@ BOOST_PYTHON_MODULE(_motion)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("sendStepCommand", &PyMotionInterface::sendStepCommand)
+	.def("sendDestCommand", &PyMotionInterface::sendDestCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead", &PyMotionInterface::setHead)
-	.def("coordHead", &PyMotionInterface::coordHead)
+        .def("coordHead", &PyMotionInterface::coordHead)
         .def("sendFreezeCommand",frz1)
         .def("sendFreezeCommand",frz2)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
         .def("isHeadActive", &PyMotionInterface::isHeadActive)
-	.def("isBodyActive", &PyMotionInterface::isBodyActive)
+        .def("isBodyActive", &PyMotionInterface::isBodyActive)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
         .def("resetWalk", &PyMotionInterface::resetWalkProvider)

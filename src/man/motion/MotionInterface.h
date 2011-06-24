@@ -24,7 +24,6 @@
 #include <queue>
 #include <vector>
 
-#include "MCL.h"
 #include "Kinematics.h"
 #include "WalkCommand.h"
 #include "BodyJointCommand.h"
@@ -50,6 +49,7 @@ class MotionInterface
 
     void setNextWalkCommand(const WalkCommand::ptr command);
     void sendStepCommand(const StepCommand::ptr command);
+    void sendDestCommand(const DestinationCommand::ptr command);
     void enqueue(const BodyJointCommand::ptr command);
     void enqueue(const HeadJointCommand::ptr command);
     inline bool isWalkActive() {return switchboard->isWalkActive();}

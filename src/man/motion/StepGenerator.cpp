@@ -21,6 +21,7 @@
 #include <iomanip>
 using namespace std;
 
+#include <math.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/assign/std/vector.hpp>
 using namespace boost::assign;
@@ -137,8 +138,14 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
     while (zmp_ref_y.size() <= Observer::NUM_PREVIEW_FRAMES ||
            // VERY IMPORTANT: make sure we have enough ZMPed steps
            currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS) {
-        if (futureSteps.size() == 0){
-            generateStep(x, y, theta); // replenish with the current walk vector
+        if (futureSteps.size() == 0) {
+			if (hasDestination) {
+				x = y = theta = 0; // stop the robot
+				hasDestination = false;
+			}
+
+			// replenish with the current walk vector, when we don't have a destination
+            generateStep(x, y, theta);
         }
         else {
             Step::ptr nextStep = futureSteps.front();
@@ -147,7 +154,6 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
             fillZMP(nextStep);
             //transfer the nextStep element from future to current list
             currentZMPDSteps.push_back(nextStep);
-
         }
 #ifdef DEBUG_ZMP
         cout << "generate_zmp_ref()\n";
@@ -555,8 +561,8 @@ void StepGenerator::fillZMPRegular(const Step::ptr newSupportStep ){
 
     //First, split up the frames:
     const int halfNumDSChops = //DS - DoubleStaticChops
-	static_cast<int>(static_cast<float>(newSupportStep->doubleSupportFrames)*
-			 newSupportStep->zmpConfig[WP::DBL_SUP_STATIC_P]/2.0f);
+       static_cast<int>(static_cast<float>(newSupportStep->doubleSupportFrames)*
+                        newSupportStep->zmpConfig[WP::DBL_SUP_STATIC_P]/2.0f);
     const int numDMChops = //DM - DoubleMovingChops
         newSupportStep->doubleSupportFrames - halfNumDSChops*2;
 
@@ -632,7 +638,7 @@ void StepGenerator::fillZMPEnd(const Step::ptr newSupportStep) {
  * Set the speed of the walk eninge in mm/s and rad/s
  */
 void StepGenerator::setSpeed(const float _x, const float _y,
-			     const float _theta)  {
+							 const float _theta)  {
 
     //Regardless, we are changing the walk vector, so we need to scrap any future plans
     clearFutureSteps();
@@ -666,18 +672,97 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
 }
 
-/*
+/**
  * Move the robot from it's current position to the destionation rel_x,
- * rel_y, rel_theta on the field. This method will move at the maximum speed
- * allowed by the gait parameters
+ * rel_y, rel_theta on the field. This method will move at the highest speed
+ * possible, based on StepGenerator's current x,y,theta speeds or our gait's
+ * maximum speeds (if setSpeed hasn't been called)
  *
- * Note: this method works by calling takeSteps several times with appropriate values
+ * Method will generate steps for an arbitrary relative destination, but NOTE
+ * that due to slipping, model imperfections etc. it is most accurate for distances
+ * of <30cm.
+ *
+ * @param gain optional speed modification parameter, range [0,1]
  */
 void StepGenerator::setDestination(const float rel_x, const float rel_y,
-                                   const float rel_theta) {
-    clearFutureSteps();
+                                   const float rel_theta, float gain) {
+#ifdef DEBUG_STEPGENERATOR
+    cout << "StepGenerator::setDestination() destination x=" << rel_x
+         << " y=" << rel_y << " theta=" << rel_theta << endl;
+#endif
 
+    // sanity
+    if (gain <= 0.0f || gain > 1.0f) {
+        cout << "StepGenerator::setDestination() :: bad gain argument\n";
+        gain = 1.0f;
+    }
 
+    float step_x, step_y, step_theta;
+
+    // if setSpeed isn't explicity called, default to maximum allowed x,y,theta
+    if (rel_x > 0)
+        step_x = gain*gait->step[WP::MAX_VEL_X];
+    else
+        step_x = gain*gait->step[WP::MIN_VEL_X];
+
+    step_y = gain*gait->step[WP::MAX_VEL_Y];
+    step_theta = gain*gait->step[WP::MAX_VEL_THETA];
+
+	// find the limiting component of our speeds (x,y,theta)
+	// @TODO make this more accurate by taking acceleration into account
+	const float x_time = std::abs(rel_x / step_x);
+	const float y_time = std::abs(rel_y / step_y);
+	const float theta_time = std::abs(rel_theta / step_theta);
+
+	//printf("limiting time-- x: %f y: %f theta: %f\n", x_time, y_time, theta_time);
+
+	// figure out how long it will take at the limiting speeds
+	float timeToDest;
+
+	// x is limiting direction
+	if (x_time >=  y_time && x_time >= theta_time) {
+		//cout << "x limiting" << endl;
+		timeToDest = x_time;
+	}
+	// y limiting
+	else if (y_time >= x_time && y_time >= theta_time) {
+		//cout << "y limiting" << endl;
+		timeToDest = y_time;
+	}
+	// theta limiting
+	else {
+		//cout << "theta limiting" << endl;
+		timeToDest = theta_time;
+	}
+
+	const float x_vel = rel_x / timeToDest;
+	const float y_vel = rel_y / timeToDest;
+	const float thetaPerStep = rel_theta / timeToDest;
+
+	const int numberSteps = static_cast<int>(
+		ceil(timeToDest / gait->step[WP::DURATION]));
+
+	// slow down, run calculations again (since takeSteps sucks for <3 steps)
+	// @HACK :-)
+	if (numberSteps < 3) {
+		const float SCALE_DOWN = 0.95f;
+		return setDestination(rel_x, rel_y, rel_theta, gain*SCALE_DOWN);
+	}
+
+	// we've finished calculating, now deal with the motion queues
+	if (hasDestination || !done) {
+		clearFutureSteps();
+	} else {
+		resetQueues();
+	}
+	hasDestination = true;
+
+#ifdef DEBUG_STEPGENERATOR
+	printf("Making %d steps of (%f,%f,%f)\n", numberSteps+1, x_vel, y_vel, thetaPerStep);
+#endif
+
+	// use takeSteps to do the dirty work
+	takeSteps(x_vel, y_vel, thetaPerStep, numberSteps+1);
 }
 
 /**
@@ -698,7 +783,7 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
             <<") and with "<<_numSteps<<" Steps were APPENDED because"
             "StepGenerator is already active!!" <<endl;
     }else{
-	//we are starting fresh from a stopped state, so we need to clear all remaining
+       //we are starting fresh from a stopped state, so we need to clear all remaining
         //steps and zmp values.
         resetQueues();
 
@@ -710,19 +795,15 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
         generateStep(_x, _y, _theta);
 
         done = false;
-
     }
-
 
     for(int i =0; i < _numSteps; i++){
         generateStep(_x, _y, _theta);
     }
 
-
     //skip generating the end step, because it will be generated automatically:
     x = 0.0f; y =0.0f; theta = 0.0f;
 }
-
 
 /**
  *  Set up the walking engine for starting with a swinging step on the left,
@@ -865,7 +946,7 @@ void StepGenerator::generateStep( float _x,
 	_y = 0.0f;
 	_theta = 0.0f;
 
-    }else if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
+    } else if (_x ==0 && _y == 0 && _theta == 0){//stopping, or stopped
 //         if(lastQueuedStep->x != 0 || lastQueuedStep->theta != 0 ||
 //            (lastQueuedStep->y - (lastQueuedStep->foot == LEFT_FOOT ?
 //                                  1:-1)*HIP_OFFSET_Y) != 0)
@@ -881,7 +962,7 @@ void StepGenerator::generateStep( float _x,
                 type = REGULAR_STEP;
                 _x = 0.0f;
                 _y = 0.0f;
-		_theta = 0.0f;
+                 _theta = 0.0f;
             }else{
                 type = REGULAR_STEP;
                 lastQueuedStep->type = REGULAR_STEP;
@@ -896,7 +977,6 @@ void StepGenerator::generateStep( float _x,
 
     //The input here is in velocities. We need to convert it to distances perstep
     //Also, we need to scale for the fact that we can only turn or strafe every other step
-
 
     const WalkVector new_walk = {_x,_y,_theta};
 
@@ -1100,7 +1180,7 @@ void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
  * Method to figure out when to start swinging with the left vs. right left
  */
 const bool StepGenerator::decideStartLeft(const float lateralVelocity,
-					  const float radialVelocity){
+                                       const float radialVelocity){
     //Currently, the logic is very simple: if the strafe direction
     //or the turn direction go left, then start that way
     //Strafing takes precedence over turning.
