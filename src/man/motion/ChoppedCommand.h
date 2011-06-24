@@ -4,43 +4,43 @@
 #define __ChoppedCommand_h
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
+
 #include "JointCommand.h"
 #include "Kinematics.h"
 
-// At the moment, this only works for Linear Interpolation.
-// Will later extended to apply to Smooth Interpolation
 class ChoppedCommand
 {
  public:
+    typedef boost::shared_ptr<ChoppedCommand> ptr;
 
     // HACK: Empty constructor. Will initialize a finished
     // body joint command with no values. Don't use!
     // ***SHOULD NOT BE USED***
- ChoppedCommand() : finished(true) { }
+    ChoppedCommand() : finished(true) { }
 
+    ChoppedCommand ( const JointCommand::ptr command, int chops );
     virtual ~ChoppedCommand(void) { }
-
-    ChoppedCommand ( const JointCommand *command, int chops );
 
     virtual std::vector<float> getNextJoints(int id) {
         return std::vector<float>(0);
     }
+    virtual const std::vector<float> getStiffness( Kinematics::ChainID chaindID) const;
+    virtual bool isDone() const { return finished; }
 
-    const std::vector<float> getStiffness( Kinematics::ChainID chaindID) const;
-    bool isDone() const { return finished; }
+    int NumChops() const { return numChops; }
 
  protected:
     void checkDone();
 
-    std::vector<float> getFinalJoints(const JointCommand *command,
+    std::vector<float> getFinalJoints(const JointCommand::ptr command,
                                       std::vector<float> currentJoints);
 
- private:
-    void constructStiffness( const JointCommand *command);
+private:
+    void constructStiffness( const JointCommand::ptr command);
     void constructChainStiffness(Kinematics::ChainID id,
-                                 const JointCommand *command);
+                                 const JointCommand::ptr command);
     std::vector<float>* getStiffnessRef( Kinematics::ChainID chainID);
-
 
  protected:
     int numChops;

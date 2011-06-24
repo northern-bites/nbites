@@ -1314,11 +1314,10 @@ int ObjectFragments::classifyByCrossbar(Blob b)
 
 /*
  */
-int ObjectFragments::classifyByInnerL(Blob post, int x, int y, bool right,
-									  boost::shared_ptr<VisualLine> line1,
-									  boost::shared_ptr<VisualLine> line2) {
-	//int x = corner->getX();
-	//int y = corner->getY();
+int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
+	int x = corner.getX();
+	int y = corner.getY();
+	bool right = corner.doesItPointRight();
 	float distant = 0;
 	// check if this corner is at the edge
 	const vector < boost::shared_ptr<VisualLine> > * lines =
@@ -1329,8 +1328,8 @@ int ObjectFragments::classifyByInnerL(Blob post, int x, int y, bool right,
 		distant = max((*i)->getDistance(), distant);
 	}
 	// check that the post isn't too far away
-	if (distant > line1->getDistance() &&
-		distant > line2->getDistance()) {
+	if (distant > corner.getLine1()->getDistance() &&
+		distant > corner.getLine2()->getDistance()) {
 		if (x > post.getLeft()) {
 			return LEFT;
 		} else {
@@ -1394,45 +1393,68 @@ int ObjectFragments::classifyByInnerL(Blob post, int x, int y, bool right,
 /* Try to use Outer L corners to decide which post we're looking at.
  */
 
-int ObjectFragments::classifyByOuterL(Blob post,
-									  boost::shared_ptr<VisualLine> line1,
-									  boost::shared_ptr<VisualLine> line2) {
+int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 	// Determine which line of the corner is the shortest
-	const point<int> end1 = line1->getEndpoint();
-	const point<int> end2 = line1->getStartpoint();
+	const point<int> end1 = corner.getLine1()->getEndpoint();
+	const point<int> end2 = corner.getLine1()->getStartpoint();
 	float l1 = realDistance(end1.x, end1.y, end2.x, end2.y);
-	const point<int> endl1 = line2->getEndpoint();
-	const point<int> endl2 = line2->getStartpoint();
+	const point<int> endl1 = corner.getLine2()->getEndpoint();
+	const point<int> endl2 = corner.getLine2()->getStartpoint();
 	float l2 = realDistance(endl1.x, endl1.y, endl2.x, endl2.y);
+	int x = corner.getX();
+	float dist = realDistance(post.getLeft(), post.getBottom(),
+							  corner.getX(), corner.getY());
+	// sometimes side Ts turn up as Ls
+	// annika/yellowgoal/63.FRM
+	if (dist > 250 || (l1 > 150 && l2 > 150)) {
+		return NOPOST;
+	}
 	// if one line is long enough we can determine its relationship
 	if (POSTLOGIC) {
 		cout << "Checking outer L corner " << l1 << " " << l2 << endl;
 	}
-	if (l1 > l2 && l1 > GOALBOX_DEPTH + 20.0f) {
-		if (endl1.y < end2.y) {
-			if (endl1.x > post.getRight()) {
+	if (abs(corner.getOrientation()) < 90) {
+		if (l1 > l2 && l1 > GOALBOX_DEPTH + 20.0f) {
+			if (endl1.y < end2.y) {
+				if (endl1.x > post.getRight()) {
+					return RIGHT;
+				} else {
+					return LEFT;
+				}
+			} else if (endl2.x > post.getRight()) {
 				return RIGHT;
 			} else {
 				return LEFT;
 			}
-		} else if (endl2.x > post.getRight()) {
-			return RIGHT;
-		} else {
-			return LEFT;
+		} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 20.0f) {
+			if (end1.y < end2.y) {
+				if (end1.x > post.getRight()) {
+					return RIGHT;
+				} else {
+					return LEFT;
+				}
+			} else if (end2.x > post.getRight()) {
+				return RIGHT;
+			} else {
+				return LEFT;
+			}
 		}
-	} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 20.0f) {
-		if (end1.y < end2.y) {
-			if (end1.x > post.getRight()) {
+	}
+	// perhaps it is a field corner
+	if (post.getBottom() - corner.getY() > 20 &&
+		corner.getDistance() < MIDFIELD_X) {
+		if (POSTLOGIC) {
+			cout << "Checking for field corner" << endl;
+		}
+		if (x > post.getLeft() + post.width() / 2) {
+			if (corner.doesItPointRight()) {
 				return RIGHT;
-			} else {
-				return LEFT;
 			}
-		} else if (end2.x > post.getRight()) {
-			return RIGHT;
-		} else {
+		} else if (corner.doesItPointLeft()) {
 			return LEFT;
 		}
 	}
+
 	return NOPOST;
 }
 
@@ -1547,14 +1569,12 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
          k != corners->end(); k++) {
         // we already processed T Corners so skip them, skip others too
         if (k->getShape() == INNER_L) {
-            classification = classifyByInnerL(post, k->getX(), k->getY(),
-											  k->doesItPointRight(),
-											  k->getLine1(), k->getLine2());
+            classification = classifyByInnerL(post, *k);
 			if (classification != NOPOST) {
 				return classification;
 			}
-        } else if (k->getShape() == OUTER_L && abs(k->getOrientation() < 60)) {
-			classification = classifyByOuterL(post, k->getLine1(), k->getLine2());
+        } else if (k->getShape() == OUTER_L) {
+			classification = classifyByOuterL(post, *k);
 			if (classification != NOPOST) {
 				return classification;
 			}
@@ -2156,6 +2176,9 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
         }
         return;
     }
+	if (PRINTOBJS) {
+		printBlob(pole);
+	}
     lookForSecondPost(pole, post, left, right, mid, c);
 }
 

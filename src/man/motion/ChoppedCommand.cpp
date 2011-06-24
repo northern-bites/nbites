@@ -22,12 +22,11 @@
 #include "MotionConstants.h"
 #include "JointCommand.h"
 
-
 using namespace std;
 
 using namespace Kinematics;
 
-ChoppedCommand::ChoppedCommand(const JointCommand *command, int chops )
+ChoppedCommand::ChoppedCommand(const JointCommand::ptr command, int chops )
     : numChops(chops),
       numChopped(NUM_CHAINS,0),
       motionType( command->getType() ),
@@ -37,16 +36,14 @@ ChoppedCommand::ChoppedCommand(const JointCommand *command, int chops )
     constructStiffness(command);
 }
 
-void
-ChoppedCommand::constructStiffness(const JointCommand *command) {
+void ChoppedCommand::constructStiffness(const JointCommand::ptr command) {
     for (unsigned int i=0; i < NUM_CHAINS; i++)
         constructChainStiffness(static_cast<ChainID>(i),
                                 command);
 }
 
-void
-ChoppedCommand::constructChainStiffness(ChainID id,
-                                        const JointCommand* command) {
+void ChoppedCommand::constructChainStiffness(ChainID id,
+					     const JointCommand::ptr command) {
     const vector<float> *body_stiff = command->getStiffness();
     vector<float>::const_iterator bodyStart = body_stiff->begin();
 
@@ -80,7 +77,7 @@ void ChoppedCommand::checkDone() {
     finished = allDone;
 }
 
-vector<float> ChoppedCommand::getFinalJoints(const JointCommand *command,
+vector<float> ChoppedCommand::getFinalJoints(const JointCommand::ptr command,
                                              vector<float> currentJoints) {
     vector<float> finalJoints(0);
     vector<float>::iterator currentStart = currentJoints.begin();
@@ -130,9 +127,8 @@ ChoppedCommand::getStiffness( ChainID chainID ) const
     case LANKLE_CHAIN:
         break;
     }
-    cout << "Should not have reached this point! ERROR!" << endl;
+    cout << "ChoppedCommand-Should not have reached this point! ERROR!" << endl;
     return larm_stiff;
-
 }
 
 vector<float>*
@@ -153,7 +149,6 @@ ChoppedCommand::getStiffnessRef( ChainID chainID )
     case LANKLE_CHAIN:
         break;
     }
-    cout << "Should not have reached this point! ERROR!" << endl;
+    cout << "ChoppedCommand-Should not have reached this point! ERROR!" << endl;
     return &larm_stiff;
-
 }

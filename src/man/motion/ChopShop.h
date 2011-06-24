@@ -31,30 +31,31 @@
 #include "ChoppedCommand.h"
 #include "LinearChoppedCommand.h"
 #include "SmoothChoppedCommand.h"
+#include "BalancingChoppedCommand.h"
 #include "Common.h"
 
 class ChopShop
 {
 public:
-	ChopShop(boost::shared_ptr<Sensors> s);
+    ChopShop(boost::shared_ptr<Sensors> s);
 
-    boost::shared_ptr<ChoppedCommand> chopCommand(const JointCommand *command);
+    ChoppedCommand::ptr chopCommand(const JointCommand::ptr command,
+				    bool comPreview=false);
 
 private:
     boost::shared_ptr<Sensors> sensors;
-	float FRAME_LENGTH_S;
+    float FRAME_LENGTH_S;
 
-    boost::shared_ptr<ChoppedCommand> chopLinear(const JointCommand *command,
-												 std::vector<float> currentJoints,
-												 int numChops);
+    ChoppedCommand::ptr chopLinear(const JointCommand::ptr command,
+				   std::vector<float> currentJoints,
+				   int numChops);
 
-    boost::shared_ptr<ChoppedCommand> chopSmooth(const JointCommand *command,
-												 std::vector<float> currentJoints,
-												 int numChops);
+    ChoppedCommand::ptr chopSmooth(const JointCommand::ptr command,
+				   std::vector<float> currentJoints,
+				   int numChops);
 
 
-	std::vector<float> getCurrentJoints();
-
+    std::vector<float> getCurrentJoints();
 };
 
 #endif

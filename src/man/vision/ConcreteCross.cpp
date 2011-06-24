@@ -67,7 +67,7 @@ const string ConcreteCross::toString() const {
 
 }
 
-const string ConcreteCross::getStringFromID(const crossID testID) {
+const string ConcreteCross::getStringFromID(const int testID) {
     switch (testID) {
     case BLUE_GOAL_CROSS:
         return "Blue goal field cross";
@@ -80,7 +80,7 @@ const string ConcreteCross::getStringFromID(const crossID testID) {
     }
 }
 
-const float ConcreteCross::getHeightFromGround(const crossID _id)
+const float ConcreteCross::getHeightFromGround(const int _id)
 {
     return 0;
 }

@@ -20,10 +20,11 @@
  * @brief Class for tracking of loc position and velocity.  Extends the abstract
  * EKF class.
  */
-class LocEKF : public EKF<Observation,
-MotionModel, LOC_EKF_DIMENSION,
-LOC_MEASUREMENT_DIMENSION>,
-public LocSystem
+class LocEKF : public ekf::EKF<Observation,
+                               MotionModel,
+                               LOC_EKF_DIMENSION,
+                               LOC_MEASUREMENT_DIMENSION>,
+               public LocSystem
 {
 public:
 
@@ -159,25 +160,23 @@ public:
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
-    virtual void incorporateMeasurement(Observation z,
+    virtual void incorporateMeasurement(const Observation& z,
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
     void incorporateCartesianMeasurement(int obsIndex,
-                                         Observation z,
+                                         const Observation& z,
                                          StateMeasurementMatrix &H_k,
                                          MeasurementMatrix &R_k,
                                          MeasurementVector &V_k);
     void incorporatePolarMeasurement(int obsIndex,
-                                     Observation z,
+                                     const Observation& z,
                                      StateMeasurementMatrix &H_k,
                                      MeasurementMatrix &R_k,
                                      MeasurementVector &V_k);
 
 
     int findBestLandmark(const Observation& z);
-    int findMostLikelyLine(const Observation& z);
-    float getMahalanobisDistance(const Observation& z, const LineLandmark& ll);
     int findNearestNeighbor(const Observation& z);
     float getDivergence(const Observation& z, const PointLandmark& pt);
 

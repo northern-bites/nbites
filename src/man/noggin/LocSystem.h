@@ -17,8 +17,9 @@ public:
     LocSystem() : active(false), probability(0.0) {};
     virtual ~LocSystem() {};
     // Core Functions
-    virtual void updateLocalization(MotionModel u_t,
-                                    std::vector<Observation> z_t) = 0;
+    virtual void updateLocalization(const MotionModel& u_t,
+                                    const std::vector<PointObservation>& pt_z,
+                                    const std::vector<CornerObservation>& c_z) = 0;
     virtual void reset() = 0;
 
     virtual void blueGoalieReset() = 0;
@@ -26,20 +27,25 @@ public:
     virtual void resetLocTo(float x, float y, float h) = 0;
 
     // Getters
-    virtual const PoseEst getCurrentEstimate() const = 0;
-    virtual const PoseEst getCurrentUncertainty() const = 0;
-    virtual const float getXEst() const = 0;
-    virtual const float getYEst() const = 0;
-    virtual const float getHEst() const = 0;
-    virtual const float getHEstDeg() const = 0;
-    virtual const float getXUncert() const = 0;
-    virtual const float getYUncert() const = 0;
-    virtual const float getHUncert() const = 0;
-    virtual const float getHUncertDeg() const = 0;
-    virtual const MotionModel getLastOdo() const = 0;
-    virtual const std::vector<Observation> getLastObservations() const = 0;
-    virtual const bool isActive() const { return active;}
-    const double getProbability() const { return probability; }
+    virtual PoseEst getCurrentEstimate() const    = 0;
+    virtual PoseEst getCurrentUncertainty() const = 0;
+    virtual float getXEst() const                 = 0;
+    virtual float getYEst() const                 = 0;
+    virtual float getHEst() const                 = 0;
+    virtual float getHEstDeg() const              = 0;
+    virtual float getXUncert() const              = 0;
+    virtual float getYUncert() const              = 0;
+    virtual float getHUncert() const              = 0;
+    virtual float getHUncertDeg() const           = 0;
+    virtual MotionModel getLastOdo() const        = 0;
+
+    virtual std::vector<PointObservation> getLastPointObservations() const = 0;
+
+    virtual
+    std::vector<CornerObservation> getLastCornerObservations() const = 0;
+
+    virtual bool isActive() const { return active;}
+    double getProbability() const { return probability; }
 
     // Setters
     virtual void setXEst(float xEst) = 0;

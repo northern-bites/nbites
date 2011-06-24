@@ -40,8 +40,7 @@ using std::string;
 class BulkMonitor
 {
 public:
-    BulkMonitor(boost::shared_ptr<Speech> s,
-		int _numberMonitors, string _bulkName, const string _sensorNames[]);
+    BulkMonitor(int _numberMonitors, string _bulkName, const string _sensorNames[]);
     ~BulkMonitor();
 
     double update(int sensor, double input);
@@ -50,6 +49,10 @@ public:
 
     void Reset();
     void LogOutput();
+
+    int NumberMonitors() const { return numberMonitors; }
+
+    void SpeechPointer(boost::shared_ptr<Speech> s);
 
 private:
     boost::shared_ptr<Speech> speech;

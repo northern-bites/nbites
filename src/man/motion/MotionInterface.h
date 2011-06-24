@@ -24,10 +24,10 @@
 #include <queue>
 #include <vector>
 
-#include "MCL.h"
 #include "Kinematics.h"
 #include "WalkCommand.h"
 #include "BodyJointCommand.h"
+#include "HeadJointCommand.h"
 #include "MotionSwitchboard.h"
 #include "WalkingConstants.h"
 #include "StepCommand.h"
@@ -47,22 +47,23 @@ class MotionInterface
         : switchboard(_switchboard) {}
     virtual ~MotionInterface() {}
 
-    void setNextWalkCommand(const WalkCommand *command);
-    void sendStepCommand(const boost::shared_ptr<StepCommand> command);
-    void enqueue(const BodyJointCommand *command);
-    void enqueue(const HeadJointCommand *command);
+    void setNextWalkCommand(const WalkCommand::ptr command);
+    void sendStepCommand(const StepCommand::ptr command);
+    void sendDestCommand(const DestinationCommand::ptr command);
+    void enqueue(const BodyJointCommand::ptr command);
+    void enqueue(const HeadJointCommand::ptr command);
     inline bool isWalkActive() {return switchboard->isWalkActive();}
     inline bool isHeadActive(){return switchboard->isHeadActive();}
     inline bool isBodyActive(){return switchboard->isBodyActive();}
-    void setGait(const boost::shared_ptr<Gait> command);
-    void setHead(const SetHeadCommand * command);
-    void coordHead(const CoordHeadCommand * command);
+    void setGait(const Gait::ptr command);
+    void setHead(const SetHeadCommand::ptr command);
+    void coordHead(const CoordHeadCommand::ptr command);
     void stopBodyMoves();
     void stopHeadMoves();
     void resetWalkProvider();
     void resetScriptedProvider();
-    void sendFreezeCommand(const boost::shared_ptr<FreezeCommand> command);
-    void sendFreezeCommand(const boost::shared_ptr<UnfreezeCommand> command);
+    void sendFreezeCommand(const FreezeCommand::ptr command);
+    void sendFreezeCommand(const UnfreezeCommand::ptr command);
 
     //For noggin
     MotionModel getOdometryUpdate(){
