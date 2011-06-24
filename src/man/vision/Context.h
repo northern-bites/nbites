@@ -120,6 +120,8 @@ public:
     void checkConnectedTs(VisualCorner & first, VisualCorner & second);
     void checkInnerToOuter(VisualCorner & inner, VisualCorner & outer);
     void checkOuterToOuter(VisualCorner & inner, VisualCorner & outer);
+	void checkForBadTID(VisualCorner & first, VisualCorner & second,
+						boost::shared_ptr<VisualLine> common);
     void checkTToCenter(VisualCorner & first, VisualCorner & second);
     void checkTToGoal(VisualCorner & t, VisualCorner & l1,
                       boost::shared_ptr<VisualLine> common);

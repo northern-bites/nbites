@@ -1342,6 +1342,26 @@ void Context::checkOuterToOuter(VisualCorner & first, VisualCorner & second) {
 	}
 }
 
+/* We have a corner connected to another - but one of them is a CC or
+   something.  We have reason to believe that maybe it is a T and and
+   field corner.
+ */
+void Context::checkForBadTID(VisualCorner & first, VisualCorner & second,
+							 boost::shared_ptr<VisualLine> common) {
+	if (face != FACING_UNKNOWN) {
+		// good chance that first is a T
+		if (abs(first.getDistance() - objectDistance) < GOALBOX_OVERAGE * 2){
+			// we need to figure out which line is the stem
+			if (first.getLine1() == common) {
+				first.changeToT(first.getLine2());
+			} else {
+				first.changeToT(first.getLine1());
+			}
+			checkTToFieldCorner(first, second);
+		}
+	}
+}
+
 /** We have a T and (apparently) a field corner. The T could be
     a side or a goal, so try and use length, # of corners and
     other things to narrow it down.
@@ -1490,6 +1510,14 @@ void Context::findCornerRelationship(VisualCorner & first,
         // it is possible (never seen it) that it could be the two goal corners
 		if (first.getShape() == OUTER_L && second.getShape() == OUTER_L) {
 			checkOuterToOuter(first, second);
+		}
+		// sometimes we see a goal T as a CC
+		if (commonDist < BLUE_GOALBOX_BOTTOM_Y + 20) {
+			if (first.getDistance() < second.getDistance()) {
+				checkForBadTID(first, second, common);
+			} else {
+				checkForBadTID(second, first, common);
+			}
 		}
     }
 }
