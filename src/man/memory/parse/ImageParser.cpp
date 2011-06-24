@@ -11,25 +11,13 @@ namespace parse {
 using namespace std;
 using namespace google::protobuf::io;
 using boost::shared_ptr;
+using namespace include::io;
 
-//TODO: use file descriptor providers
-//ImageParser::ImageParser(boost::shared_ptr<ProtoImage> image,
-//                       int _file_descriptor) :
-//        Parser<ProtoImage>(image),
-//        file_descriptor(_file_descriptor)
-//{
-//    initStreams();
-//    readHeader();
-//
-//}
-
-ImageParser::ImageParser(const char* _file_name,
+ImageParser::ImageParser(include::io::FDProvider::ptr fdProvider,
         boost::shared_ptr<RoboImage> image) :
-       TemplatedParser<RoboImage>(image),
+        TemplatedParser<RoboImage>(fdProvider, image),
        current_buffer(new const void*),
        current_buffer_size(1) {
-
-    file_descriptor = open(_file_name, O_RDONLY);
 
     initStreams();
     readHeader();
@@ -105,7 +93,7 @@ void ImageParser::getNextBuffer() {
 
 void ImageParser::initStreams() {
 
-    raw_input = new FileInputStream(file_descriptor,
+    raw_input = new FileInputStream(fdProvider->getFileDescriptor(),
             container->getByteSize() + sizeof(container->getTimestamp()));
 }
 

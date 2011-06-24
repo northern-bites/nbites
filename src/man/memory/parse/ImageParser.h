@@ -26,12 +26,9 @@ namespace proto_io = google::protobuf::io;
 class ImageParser : public TemplatedParser <RoboImage>{
 
 public:
-    ImageParser(const char* _file_name,
+    ImageParser(include::io::FDProvider::ptr fdProvider,
             boost::shared_ptr<RoboImage> image);
-//    ImageParser(boost::shared_ptr<const RoboImage> image,
-//               int _file_descriptor);
-
-    ~ImageParser();
+    virtual ~ImageParser();
 
     void initStreams();
 

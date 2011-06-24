@@ -1,53 +1,72 @@
 #include "ParsingBoard.h"
 
+#include <vector>
+#include <iostream>
+
 namespace man {
 namespace memory {
 namespace parse {
 
-//const char* ParsingBoard::MVISION_PATH = NAO_LOG_DIR "/Vision.log";
-//const char* ParsingBoard::MMOTION_SENSORS_PATH = NAO_LOG_DIR "/MotionSensors.log";
-//const char* ParsingBoard::MVISION_SENSORS_PATH = NAO_LOG_DIR "/VisionSensors.log";
-//const char* ParsingBoard::MIMAGE_PATH = NAO_LOG_DIR "/Image.log";
-
 using boost::shared_ptr;
+using namespace std;
 
-ParsingBoard::ParsingBoard(Memory* memory) :
+ParsingBoard::ParsingBoard(Memory::ptr memory,
+        IOProvider::const_ptr ioProvider) :
     memory(memory) {
-    initParsingObjects();
+    this->newIOProvider(ioProvider);
 }
 
-void ParsingBoard::initParsingObjects() {
+ParsingBoard::~ParsingBoard(){}
 
-//    const MVision* mvision = memory->getMVision();
-//    FDProvider* mvisionFDprovider = new FileFDProvider(MVISION_PATH);
-//    objectFDProviderMap[mvision] = mvisionFDprovider;
-//    objectFDLoggerMap[mvision] = new CodedFileLogger(mvisionFDprovider,
-//            MVISION_ID, mvision);
-//
-//    const MMotionSensors* mmotionSensors = memory->getMMotionSensors();
-//    FDProvider* mmotionSensorsFDprovider = new FileFDProvider(
-//            MMOTION_SENSORS_PATH);
-//    objectFDProviderMap[mmotionSensors] = mmotionSensorsFDprovider;
-//    objectFDLoggerMap[mmotionSensors] = new CodedFileLogger(
-//            mmotionSensorsFDprovider, MMOTION_SENSORS_ID, mmotionSensors);
-//
-//    const MVisionSensors* mvisionSensors = memory->getMVisionSensors();
-//    FDProvider* mvisionSensorsFDprovider = new FileFDProvider(
-//            MVISION_SENSORS_PATH);
-//    objectFDProviderMap[mvisionSensors] = mvisionSensorsFDprovider;
-//    objectFDLoggerMap[mvisionSensors] = new CodedFileLogger(
-//            mvisionSensorsFDprovider, MVISION_SENSORS_ID, mvisionSensors);
+void ParsingBoard::initParsingObjects(const IOProvider::FDProviderMap* fdmap) {
 
-    MImage* mimage = memory->getMutableMImage();
-    FDProvider* mimageFDprovider = new FileFDProvider("/home/oneamtu/log/trillian/Image.log");
-    objectFDProviderMap[mimage] = mimageFDprovider;
-    objectParserMap[mimage] = new ImageParser("/home/oneamtu/log/spock/Image.log",
-            shared_ptr<MImage>(mimage));
+//
+//        MObject_ID logID = static_cast<MObject_ID>(Parser::peekAtLogID(*i));
+//        std::cout<< logID << std::endl;
+//        if (logID == MIMAGE_ID) {
+//            shared_ptr<RoboImage> roboImage = memory->getMutableRoboImage();
+//            objectParserMap[MIMAGE_ID] = new ImageParser(roboImage, *i);
+//        } else {
+//            shared_ptr<ProtoMessage> mobject =
+//                    memory->getMutableProtoMessage(logID);
+//            if (mobject != NULL) {
+//                objectParserMap[logID] = new MessageParser(mobject, *i);
+//            } else {
+//                std::cout<<"Could not read valid log ID from file descriptor :"
+//                        << *i << std::endl;
+//            }
+//        }
+//    }
 }
 
-void ParsingBoard::parse(const MObject* mobject) {
+void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
+    objectParserMap.clear();
 
-    ObjectParserMap::iterator it = objectParserMap.find(mobject);
+    const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
+    for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
+            i!= fdmap->end(); i++) {
+
+        if (i->first == MIMAGE_ID) {
+            shared_ptr<RoboImage> roboImage = memory->getMutableRoboImage();
+            objectParserMap[MIMAGE_ID] = Parser::ptr(new ImageParser(i->second,
+                    roboImage));
+        } else {
+            shared_ptr<ProtoMessage> mobject =
+                    memory->getMutableProtoMessage(i->first);
+            if (mobject != NULL) {
+                objectParserMap[i->first] = Parser::ptr(new MessageParser(i->second,
+                        mobject));
+            } else {
+                std::cout<<"Could not read valid log ID from file descriptor :"
+                        << i->first << i->second->info() << std::endl;
+            }
+        }
+    }
+}
+
+void ParsingBoard::parse(MObject_ID id) {
+
+    ObjectParserMap::iterator it = objectParserMap.find(id);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
     if (it != objectParserMap.end()) {
@@ -57,7 +76,6 @@ void ParsingBoard::parse(const MObject* mobject) {
 }
 
 void ParsingBoard::parseAll() {
-
     for (ObjectParserMap::iterator it = objectParserMap.begin();
             it != objectParserMap.end(); it++ ) {
         it->second->getNext();

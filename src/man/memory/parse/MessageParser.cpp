@@ -11,25 +11,13 @@ namespace parse {
 using namespace std;
 using namespace google::protobuf::io;
 using boost::shared_ptr;
+using namespace include::io;
 
 //TODO: use file descriptor providers
-MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
-                       int _file_descriptor) :
-        TemplatedParser<proto::Message>(message),
-        file_descriptor(_file_descriptor)
+MessageParser::MessageParser(FDProvider::ptr fdProvider,
+        boost::shared_ptr<proto::Message> message) :
+        TemplatedParser<proto::Message>(fdProvider, message)
 {
-
-    initStreams();
-    readHeader();
-
-}
-
-MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
-                       const char* _file_name) :
-       TemplatedParser<proto::Message>(message) {
-
-    file_descriptor = open(_file_name, O_RDONLY);
-
     initStreams();
     readHeader();
 }
@@ -38,7 +26,6 @@ MessageParser::~MessageParser() {
 
     delete coded_input;
     delete raw_input;
-    close(file_descriptor);
 }
 
 void MessageParser::readHeader() {
@@ -87,7 +74,7 @@ shared_ptr<const proto::Message> MessageParser::getPrev() {
 
 void MessageParser::initStreams() {
 
-    raw_input = new FileInputStream(file_descriptor);
+    raw_input = new FileInputStream(fdProvider->getFileDescriptor());
     coded_input = new CodedInputStream(raw_input);
     coded_input->SetTotalBytesLimit(2000000000, 2000000000);
 

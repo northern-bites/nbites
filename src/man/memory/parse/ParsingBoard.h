@@ -12,8 +12,7 @@
 
 #include <map>
 
-#include "include/io/FileFDProvider.h"
-
+#include "include/io/BulkIO.h"
 #include "MessageParser.h"
 #include "ImageParser.h"
 #include "memory/MObject.h"
@@ -33,33 +32,30 @@ namespace man {
 namespace memory {
 namespace parse {
 
-typedef std::pair< const MObject*, Parser*> ObjectParserPair;
-typedef std::pair< const MObject*, FDProvider*> ObjectFDProviderPair;
-
-typedef std::map< const MObject*, Parser*> ObjectParserMap;
-typedef std::map< const MObject*, FDProvider*> ObjectFDProviderMap;
+typedef std::pair< MObject_ID, Parser::ptr> ObjectParserPair;
+typedef std::map< MObject_ID, Parser::ptr> ObjectParserMap;
 
 class ParsingBoard {
 
-public:
-    ParsingBoard(Memory* _memory);
-    //TODO: make sure to delete all of the Parser objects
-    //~ParsingBoard();
+private:
+    typedef include::io::BulkIO<MObject_ID> IOProvider;
 
-    void parse(const MObject* mobject);
+public:
+    ParsingBoard(Memory::ptr memory,
+            IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
+    virtual ~ParsingBoard();
+
+    void newIOProvider(IOProvider::const_ptr ioProvider);
+
+    void parse(MObject_ID);
     void parseAll();
 
-    //const ImageParser* getImageParser(const MImage* mimage) const;
-//    const Parser* getParser(const MObject* mobject) const;
+protected:
+    void initParsingObjects(const IOProvider::FDProviderMap* fdmap);
 
 private:
-    void initParsingObjects();
-
-private:
-    Memory* memory;
+    Memory::ptr memory;
     ObjectParserMap objectParserMap;
-    ObjectFDProviderMap objectFDProviderMap;
-
 
 };
 }
