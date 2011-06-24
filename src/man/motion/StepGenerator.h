@@ -149,7 +149,9 @@ private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
 
     void findSensorZMP();
-    float scaleSensors(const float sensorZMP, const float perfectZMP) const;
+
+    // checks reliability of Sensor measurements, scales sensorZMP
+    float scaleSensors(const float sensorZMP, const float perfectZMP);
 
     void swapSupportLegs();
 
@@ -187,7 +189,8 @@ private:
 
     bool done;
 
-	bool hasDestination;
+    bool hasDestination;
+    bool brokenSensorWarning;
 
     SensorAngles sensorAngles;
 

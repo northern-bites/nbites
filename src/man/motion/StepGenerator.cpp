@@ -48,6 +48,8 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s,
                              const MetaGait * _gait)
     : x(0.0f), y(0.0f), theta(0.0f),
       done(true),
+      hasDestination(false),
+      brokenSensorWarning(false),
       sensorAngles(s,_gait),
       com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
       joints_com_i(CoordFrame3D::vector3D(0.0f,0.0f)),
@@ -247,21 +249,22 @@ void StepGenerator::findSensorZMP(){
 }
 
 float StepGenerator::scaleSensors(const float sensorZMP,
-                                  const float perfectZMP) const {
+                                  const float perfectZMP) {
     // TODO: find a better value for this!
-    static float sensorWeight;
+    float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
 
     // If our motion sensors are broken, we don't want to use the observer
-    // (second conditional insures that this only prints once)
-    if (sensors->angleXYBroken() && sensorWeight > 0) {
+    if (brokenSensorWarning || sensors->angleXYBroken()) {
 	sensorWeight = 0.0f;
+
 	// TODO: signal Python, so the robot can fall back to a slower gait
 
-	cout << "*********** WARNING WARNING **********************" << endl
-	     << "Too many motion sensors are broken, disabling the observer" << endl
-	     << "*********** WARNING WARNING **********************" << endl;
-    } else {
-	sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
+	if (!brokenSensorWarning) {
+	    brokenSensorWarning = true;
+	    cout << "*********** WARNING WARNING **********************" << endl
+		 << "Too many motion sensors are broken, disabling the observer" << endl
+		 << "*********** WARNING WARNING **********************" << endl;
+	}
     }
 
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
