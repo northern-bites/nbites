@@ -31,18 +31,20 @@ class DataManager : public MultiProvider<DataEvent> {
 public:
     DataManager();
 
+    virtual ~DataManager();
+
     void getNext() {
-        parsingBoard.parseAll();
+        parsingBoard.parse(man::memory::MIMAGE_ID);
         this->notifySubscribers(NEW_IMAGE);
     }
 
-    boost::shared_ptr<const man::memory::Memory> getMemory() const {
+    man::memory::Memory::ptr getMemory() const {
         return memory;}
 
     void newDataSource(DataSource::ptr dataSource);
 
 private:
-    boost::shared_ptr<man::memory::Memory> memory;
+    man::memory::Memory::ptr memory;
     man::memory::parse::ParsingBoard parsingBoard;
     DataSource::ptr dataSource;
 

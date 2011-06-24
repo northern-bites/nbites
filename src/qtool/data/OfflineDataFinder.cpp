@@ -4,12 +4,15 @@
 #include <QCoreApplication>
 
 #include "NaoPaths.h"
+#include "man/memory/parse/Parser.h"
+#include "man/include/io/FileFDProvider.h"
 
 namespace qtool {
 namespace data {
 
 using man::include::io::FDProvider;
 using man::include::io::FileFDProvider;
+using man::memory::parse::Parser;
 using namespace man::include::paths;
 
 static const int DEFAULT_NAME_COLUMN_WIDTH = 300;
@@ -73,8 +76,10 @@ void OfflineDataFinder::scanFolderForLogs(QString path) {
         QFileInfo fileInfo = list.at(i);
         if (fileInfo.size() != 0) {
             std::string path = fileInfo.absoluteFilePath().toStdString();
-            dataSource->addProvider(
-                    FDProvider::ptr(new FileFDProvider(path, O_RDONLY)));
+            FDProvider::ptr fdprovider = FDProvider::ptr(new FileFDProvider(path, O_RDONLY));
+            MObject_ID logID = static_cast<MObject_ID>(Parser::peekAtLogID(
+                    fdprovider->getFileDescriptor()));
+            dataSource->addFDProvider(logID, fdprovider);
         }
     }
     emit signalNewDataSource(dataSource);

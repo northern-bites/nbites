@@ -5,17 +5,20 @@
 namespace qtool {
 namespace data {
 
-using man::memory::Memory;
+using namespace man::memory;
 using boost::shared_ptr;
 
 DataManager::DataManager() :
-    memory(shared_ptr<Memory>(new Memory())),
-    parsingBoard(memory.get()) {
+    memory(Memory::ptr(new Memory())),
+    parsingBoard(memory) {
 
 }
 
+DataManager::~DataManager() {
+}
+
 void DataManager::newDataSource(DataSource::ptr dataSource) {
-    std::cout << "yup" << std::endl;
+    parsingBoard.newIOProvider(dataSource);
 }
 
 }

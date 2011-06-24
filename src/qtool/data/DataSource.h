@@ -12,35 +12,34 @@
 #pragma once
 
 #include <boost/shared_ptr.hpp>
-#include <man/memory/Memory.h>
-#include <vector>
+
+#include "man/memory/Memory.h"
+#include "man/include/io/BulkIO.h"
 
 namespace qtool {
 namespace data{
 
-class DataSource {
+typedef man::memory::MObject_ID MObject_ID;
 
-    typedef std::pair< int, man::include::io::FDProvider::ptr > FDProviderPair;
-    typedef std::map< int, man::include::io::FDProvider::ptr > FDProviderMap;
+class DataSource : public man::include::io::BulkIO<MObject_ID> {
 
 public:
     typedef boost::shared_ptr<DataSource> ptr;
+
     enum Type {
         offline = 1,
         online,
-        old
+        old,
+        null
     };
 
 public:
-    DataSource(Type type);
-
-    std::vector<int> getFileDescriptors();
-    void addProvider(man::include::io::FDProvider::ptr fdprovider);
+    DataSource(Type type) : type(type) {}
+    virtual ~DataSource() {}
 
     Type getType() { return type; }
 
 private:
-    FDProviderMap fdProviderMap;
     Type type;
 };
 
