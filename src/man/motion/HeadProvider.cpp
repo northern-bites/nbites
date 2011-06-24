@@ -158,10 +158,11 @@ void HeadProvider::setCommand(const SetHeadCommand::ptr command) {
 
 void HeadProvider::setCommand(const HeadJointCommand::ptr command) {
     pthread_mutex_lock(&head_provider_mutex);
-    transitionTo(SCRIPTED);
 
+    transitionTo(SCRIPTED);
     headCommandQueue.push(command); //HACK this should probably be mutexed
     setActive();
+
     pthread_mutex_unlock(&head_provider_mutex);
 }
 
@@ -174,6 +175,7 @@ void HeadProvider::enqueueSequence(std::vector<HeadJointCommand::ptr> &seq) {
 
 void HeadProvider::setNextHeadCommand() {
     if ( !headCommandQueue.empty() ) {
+	currCommand = chopper.chopCommand(headCommandQueue.front());
 	headCommandQueue.pop();
     }
 }

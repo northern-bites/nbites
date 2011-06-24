@@ -14,6 +14,11 @@ class ChoppedCommand
  public:
     typedef boost::shared_ptr<ChoppedCommand> ptr;
 
+    // HACK: Empty constructor. Will initialize a finished
+    // body joint command with no values. Don't use!
+    // ***SHOULD NOT BE USED***
+    ChoppedCommand() : finished(true) { }
+
     ChoppedCommand ( const JointCommand::ptr command, int chops );
     virtual ~ChoppedCommand(void) { }
 

@@ -12,7 +12,7 @@ static const int COM_PREVIEW_FRAMES = 20;
 
 PreviewChoppedCommand::PreviewChoppedCommand ( ChoppedCommand::ptr choppedCommand )
     : previewStruct( new COMPreview() ),
-      alreadyChoppedCommand(choppedCommand),
+      //alreadyChoppedCommand(choppedCommand),
       jointAngles(vector<VectorFifo>()),
       thisFramesAngles(vector<float>()),
       com_x(COM_PREVIEW_FRAMES),
@@ -31,7 +31,7 @@ PreviewChoppedCommand::PreviewChoppedCommand ( ChoppedCommand::ptr choppedComman
 
     // Fill the FIFOs with joint angles & the Boxcars with future CoM estimates
     for (int frame = 0; frame < COM_PREVIEW_FRAMES; ++frame) {
-	if (alreadyChoppedCommand->isDone())
+	if (this->ChoppedCommand::isDone())
 	    break;
 
 	for (unsigned int chain = 0; chain < Kinematics::NUM_CHAINS; ++chain)
