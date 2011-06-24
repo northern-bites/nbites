@@ -13,6 +13,12 @@
 #include <string>
 #include "FDProvider.h"
 
+namespace man {
+namespace include {
+namespace io {
+
+//TODO: create a separate C++ class
+
 class FileFDProvider : public FDProvider {
 
 public:
@@ -34,6 +40,15 @@ public:
         openFileDescriptor();
     }
 
+    ~FileFDProvider() {
+        close(file_descriptor);
+    }
+
+    std::string info() {
+        return std::string(fileName);
+    }
+
+protected:
     void openFileDescriptor() {
 
         file_descriptor = open(fileName,
@@ -50,3 +65,10 @@ private:
     int flags, permissions;
 
 };
+
+}
+}
+}
+//TODO: remove!!
+using man::include::io::FDProvider;
+using man::include::io::FileFDProvider;
