@@ -60,7 +60,7 @@ public:
     BodyJointCommand(const BodyJointCommand &other);
     virtual ~BodyJointCommand(void);
 
-    virtual const  std::vector<float>* getJoints(Kinematics::ChainID chainID) const;
+    virtual const std::vector<float>* getJoints(Kinematics::ChainID chainID) const;
     const std::vector<float>* getLArmJoints(void) const { return larm_joints; }
     const std::vector<float>* getLLegJoints(void) const { return lleg_joints; }
     const std::vector<float>* getRLegJoints(void) const { return rleg_joints; }

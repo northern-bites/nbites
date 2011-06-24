@@ -30,19 +30,10 @@
 #ifndef PY_MOTION_COMMAND_H
 #define PY_MOTION_COMMAND_H
 
-#include <boost/static_assert.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include "AbstractCommand.h"
 
-#include "AbstractCommand.h" // for template parameter checking
-
-template <class T>
 class PyMotionCommand {
-    // only derived classes of AbstractCommand can be used as template parameters
-    BOOST_STATIC_ASSERT((boost::is_base_of<AbstractCommand,T>::value));
-
 public:
-    typedef typename T::ptr ptr;
-
     virtual ~PyMotionCommand() {}
 
     // Generic, exposed to Python for all commands
@@ -50,12 +41,9 @@ public:
     bool isDoneExecuting() const { return command->isDoneExecuting(); }
     float timeRemaining() const { return command->timeRemaining(); }
 
-    // used by all the derived classes
-    ptr getCommand() const { return command; }
-
 protected:
     PyMotionCommand() {} // only derived classes can be instantiated
-    ptr command; // will be some sort of boost::shared_ptr
+    AbstractCommand::ptr command;
 };
 
 

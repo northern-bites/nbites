@@ -32,27 +32,35 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "Common.h"
+
 class AbstractCommand {
 public:
     // all derived classes need at least this, many will override
     typedef boost::shared_ptr<AbstractCommand> ptr;
 
     AbstractCommand()
-	: commandFinished(false)
+	: commandFinished(false), framesLeft(-1)
 	{}
     virtual ~AbstractCommand() {}
 
     // Sent through to Python (override them for nicer behavior)
-    virtual int framesRemaining() { return -1; }
-    virtual bool isDoneExecuting() { return commandFinished; }
-    virtual float timeRemaining_s() { return -1.0f; }
+    virtual int framesRemaining() { return framesLeft; }
+    virtual bool isDoneExecuting() { return commandFinished || framesLeft <= 0; }
+    virtual float timeRemaining() {
+	if (isDoneExecuting())
+	    return 0.0f;
+	return static_cast<float>(framesRemaining()) * MOTION_FRAME_RATE;
+    }
 
-    // ONLY CALL THIS FROM PROVIDERS (isn't exposed to Python)
-    void finishedExecuting() { commandFinished = true; };
+    // ONLY CALL THESE FROM PROVIDERS (aren't exposed to Python)
+    void finishedExecuting() { commandFinished = true; }
+    void framesRemaining(int _frames) { framesLeft = _frames; }
+    void tick() { --framesLeft; }
 
 private:
     bool commandFinished;
-
+    int framesLeft;
 };
 
 

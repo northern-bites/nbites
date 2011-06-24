@@ -30,8 +30,8 @@ ScriptedProvider::ScriptedProvider(shared_ptr<Sensors> s,
     : MotionProvider(SCRIPTED_PROVIDER, p),
       sensors(s),
       chopper(sensors),
-      // INITIALIZE WITH NULL/FINISHED CHOPPED COMMAND
-      currCommand(new ChoppedCommand()),
+      currCommand(),
+      currCommand_unchopped(),
       bodyCommandQueue()
 
 {
@@ -60,7 +60,14 @@ void ScriptedProvider::hardReset(){
     while(!bodyCommandQueue.empty()){
         bodyCommandQueue.pop();
     }
-    currCommand = ChoppedCommand::ptr(new ChoppedCommand());
+    if (currCommand_unchopped) {
+	currCommand_unchopped->finishedExecuting();
+	currCommand_unchopped = BodyJointCommand::ptr();
+    }
+
+    if (currCommand)
+	currCommand = ChoppedCommand::ptr();
+
     setActive();
     pthread_mutex_unlock(&scripted_mutex);
 }
@@ -81,7 +88,10 @@ bool ScriptedProvider::isDone() {
 
 // Are we finished with our current motion command?
 bool ScriptedProvider::currCommandEmpty() {
-    return currCommand->isDone();
+    if (currCommand)
+	return currCommand->isDone();
+    else
+	return true;
 }
 
 // Do we have any BodyCommands left to run through?
@@ -99,6 +109,8 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
     // Go through the chains and enqueue the next
     // joints from the ChoppedCommand.
     shared_ptr<vector <vector <float> > > currentChains(getCurrentChains());
+
+    currCommand_unchopped->tick();
 
     for (unsigned int id=0; id< Kinematics::NUM_CHAINS; ++id ) {
 	Kinematics::ChainID cid = static_cast<Kinematics::ChainID>(id);
@@ -145,18 +157,23 @@ void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand::ptr> &seq) 
 }
 
 void ScriptedProvider::setNextBodyCommand() {
-
     // If there are no more commands, don't try to enqueue one
     if ( !bodyCommandQueue.empty() ) {
+	// tell the last command its finished
+	if (currCommand_unchopped)
+	    currCommand_unchopped->finishedExecuting();
 
-	const BodyJointCommand::ptr nextCommand = bodyCommandQueue.front();
+	currCommand_unchopped = bodyCommandQueue.front();
 	bodyCommandQueue.pop();
 
 	// Replace the current command
 	PROF_ENTER(profiler, P_CHOPPED);
 	const bool useComPreviews = true;
-	currCommand = chopper.chopCommand(nextCommand, useComPreviews);
+	currCommand = chopper.chopCommand(currCommand_unchopped,
+					  useComPreviews);
 	PROF_EXIT(profiler, P_CHOPPED);
+
+	currCommand_unchopped->framesRemaining(currCommand->NumChops());
     }
 }
 

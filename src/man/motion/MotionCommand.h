@@ -44,14 +44,6 @@ public:
     const MotionConstants::MotionType getType() const { return motionType; }
     const std::list<int>* getChainList() const { return &chainList; }
 
-    // TODO: override framesRemaining()
-
-    virtual float timeRemaining_s() {
-	if (isDoneExecuting())
-	    return 0.0f;
-	return static_cast<float>(framesRemaining()) * MOTION_FRAME_LENGTH_S;
-    }
-
 protected:
     std::list<int> chainList;
 

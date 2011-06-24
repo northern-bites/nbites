@@ -54,7 +54,6 @@ public:
     const std::vector<float>* getStiffness() const{ return stiffness; }
     virtual const std::vector<float>* getJoints(Kinematics::ChainID chain) const = 0;
 
-
 protected:
     const float duration;
     const Kinematics::InterpolationType type;

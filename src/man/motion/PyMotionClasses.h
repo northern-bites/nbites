@@ -36,7 +36,10 @@
 #ifndef PY_MOTION_CLASSES_H
 #define PY_MOTION_CLASSES_H
 
-#include "PyMotionCommand.h" // templated base class
+#include <boost/shared_ptr.hpp>
+using boost::dynamic_pointer_cast;
+
+#include "PyMotionCommand.h" // base class
 
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
@@ -51,7 +54,7 @@ using namespace Kinematics;
 
 static MotionInterface* interface_reference = 0;
 
-class PyHeadJointCommand : public PyMotionCommand<HeadJointCommand> {
+class PyHeadJointCommand : public PyMotionCommand {
 public:
     PyHeadJointCommand(float time, tuple joints,
 		       tuple stiffness, int interpolationType) {
@@ -72,9 +75,13 @@ public:
 				     static_cast<InterpolationType>(interpolationType)) 
 		);
     }
+
+    HeadJointCommand::ptr getCommand() const {
+	return dynamic_pointer_cast<HeadJointCommand>(command);
+    }
 };
 
-class PyGaitCommand : public PyMotionCommand<Gait> {
+class PyGaitCommand : public PyMotionCommand {
 public:
     PyGaitCommand(const tuple &_stance_config,
                   const tuple &_step_config,
@@ -140,11 +147,15 @@ public:
 	return 0;
     }
 
+    Gait::ptr getCommand() const {
+	return dynamic_pointer_cast<Gait>(command);
+    }
+
 private:
     float step[WP::LEN_STEP_CONFIG];
 };
 
-class PyWalkCommand : public PyMotionCommand<WalkCommand> {
+class PyWalkCommand : public PyMotionCommand {
 public:
     PyWalkCommand(float x_cms, float m_cms, float theta_degs) {
         //All python units should be in CM and DEG per second
@@ -155,9 +166,13 @@ public:
 			    theta_degs*TO_RAD)
 	    );
     }
+
+    WalkCommand::ptr getCommand() const {
+	return dynamic_pointer_cast<WalkCommand>(command);
+    }
 };
 
-class PyStepCommand : public PyMotionCommand<StepCommand> {
+class PyStepCommand : public PyMotionCommand {
 public:
     PyStepCommand(float x_cms, float m_cms, float theta_degs, int numStep) {
         //All python units should be in CM and DEG per second
@@ -168,9 +183,13 @@ public:
 					     theta_degs*TO_RAD,
 					     numStep));
     }
+
+    StepCommand::ptr getCommand() const {
+	return dynamic_pointer_cast<StepCommand> (command);
+    }
 };
 
-class PyBodyJointCommand : public PyMotionCommand<BodyJointCommand> {
+class PyBodyJointCommand : public PyMotionCommand {
 public:
     PyBodyJointCommand(float time,
                        tuple larmJoints, tuple llegJoints,
@@ -227,9 +246,13 @@ public:
 				 static_cast<InterpolationType>(interpolationType))
 	    );
     }
+
+    BodyJointCommand::ptr getCommand() const {
+	return dynamic_pointer_cast<BodyJointCommand>(command);
+    }
 };
 
-class PySetHeadCommand : public PyMotionCommand<SetHeadCommand> {
+class PySetHeadCommand : public PyMotionCommand {
 public:
     PySetHeadCommand(const float yaw, const float pitch) {
         command = SetHeadCommand::ptr (
@@ -244,9 +267,13 @@ public:
 			       maxYawSpeed * TO_RAD, maxPitchSpeed * TO_RAD)
 	    );
     }
+
+    SetHeadCommand::ptr getCommand() const {
+	return dynamic_pointer_cast<SetHeadCommand>(command);
+    }
 };
 
-class PyCoordHeadCommand : public PyMotionCommand<CoordHeadCommand> {
+class PyCoordHeadCommand : public PyMotionCommand {
 public:
     PyCoordHeadCommand( const float _x, const float _y, const float _z) {
 	command = CoordHeadCommand::ptr (
@@ -261,21 +288,33 @@ public:
 				  maxYawSpeed, maxPitchSpeed )
 	    );
     }
+
+    CoordHeadCommand::ptr getCommand() const {
+	return dynamic_pointer_cast<CoordHeadCommand>(command);
+    }
 };
 
-class PyFreezeCommand : public PyMotionCommand<FreezeCommand> {
+class PyFreezeCommand : public PyMotionCommand {
 public:
     //Later, one could add more specific stiffness options
     PyFreezeCommand() {
 	command = FreezeCommand::ptr( new FreezeCommand() );
     }
+
+    FreezeCommand::ptr getCommand() const {
+	return dynamic_pointer_cast<FreezeCommand> (command);
+    }
 };
 
-class PyUnfreezeCommand : public PyMotionCommand<UnfreezeCommand> {
+class PyUnfreezeCommand : public PyMotionCommand {
 public:
     //Later, one could add more specific stiffness options
     PyUnfreezeCommand(float stiffness) {
 	command = UnfreezeCommand::ptr( new UnfreezeCommand() );
+    }
+
+    UnfreezeCommand::ptr getCommand() const {
+	return dynamic_pointer_cast<UnfreezeCommand> (command);
     }
 };
 
