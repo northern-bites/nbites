@@ -11,12 +11,14 @@ static const int NUMBER_BINS = 30;
 static const float LOW_BIN = 0.0001f;
 static const float HIGH_BIN = 100.0f;
 
-static const int ERRORS_BEFORE_REPORT = 15;
+/* this should stay pretty high, once a sensor reports itself as dead we stop
+   using it in motion/behaviors/etc so we don't want to do that lightly */
+static const int ERRORS_BEFORE_REPORT = 50;
 
 SensorMonitor::SensorMonitor()
     :  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
        monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
-       reportErrors(false),
+       reportErrors(false), sensorTrustworthy(true),
        lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
 {
     Reset();
@@ -102,6 +104,7 @@ void SensorMonitor::reportSensorError() {
 		  << " (feel free to ignore this if the robot is stationary)"
 		  << std::endl;
 	speech->say("Problem with " + sensorName);
+	sensorTrustworthy = false;
     }
 }
 

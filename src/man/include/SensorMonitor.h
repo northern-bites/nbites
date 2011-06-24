@@ -57,6 +57,8 @@ public:
     void setVarianceBounds(float low, float high);
     void disableErrors() { reportErrors = false; }
 
+    bool isTrustworthy() { return sensorTrustworthy; }
+
     static const int DONT_CHECK = -1;
 
     const int numberOfBins() const { return monitor.NumberOfBins(); }
@@ -77,6 +79,7 @@ private:
     SignalMonitor monitor;
     int steadyAtFrame;
     bool reportErrors; // warn if sensor variances exceed thresholds
+    bool sensorTrustworthy;
     float lowVariance, highVariance;
     int seenErrors;
 };

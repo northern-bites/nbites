@@ -51,6 +51,8 @@ public:
     void Reset();
     void LogOutput();
 
+    int NumberMonitors() const { return numberMonitors; }
+
 private:
     boost::shared_ptr<Speech> speech;
     SensorMonitor* monitors;

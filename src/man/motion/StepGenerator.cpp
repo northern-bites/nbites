@@ -249,7 +249,21 @@ void StepGenerator::findSensorZMP(){
 float StepGenerator::scaleSensors(const float sensorZMP,
                                   const float perfectZMP) const {
     // TODO: find a better value for this!
-    const float sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
+    static float sensorWeight;
+
+    // If our motion sensors are broken, we don't want to use the observer
+    // (second conditional insures that this only prints once)
+    if (sensors->angleXYBroken() && sensorWeight > 0) {
+	sensorWeight = 0.0f;
+	// TODO: signal Python, so the robot can fall back to a slower gait
+
+	cout << "*********** WARNING WARNING **********************" << endl
+	     << "Too many motion sensors are broken, disabling the observer" << endl
+	     << "*********** WARNING WARNING **********************" << endl;
+    } else {
+	sensorWeight = 0.4f; //gait->sensor[WP::OBSERVER_SCALE];
+    }
+
     return sensorZMP*sensorWeight + (1.0f - sensorWeight)*perfectZMP;
 }
 
