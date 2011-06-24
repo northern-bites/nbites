@@ -36,10 +36,10 @@ PACKET_DEAD_PERIOD = 2 # TO-DO: look at shortening so it replaces penalized
 TEAMMATE_CHASING_PENALTY = 3 # adds standard penalty for teammates (buffer)
 TEAMMATE_CHASER_USE_NUMBERS_BUFFER = 20.0 # cm
 TEAMMATE_POSITIONING_USE_NUMBERS_BUFFER = 25.0 # cm
-# role switching constants
-CALL_OFF_THRESH = 125.
-LISTEN_THRESH = 250.
-STOP_CALLING_THRESH = 275.
+# role switching constants in milliseconds
+CALL_OFF_THRESH = 1250.             # how likely it is to be chaser
+LISTEN_THRESH = 2500.               # how likely it is to stop being chaser
+STOP_CALLING_THRESH = 2750.         # how likely you are to ignore teammates ideas.
 BEARING_BONUS = 300.
 BALL_NOT_SUPER_OFF_BONUS = 300.
 BALL_CAPTURE_BONUS = 1000.

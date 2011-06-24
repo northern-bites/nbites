@@ -153,19 +153,24 @@ class GoTeam:
                 chaser_mate = mate
 
             else:
-                # Tie break stuff
+                # Tie breaking. Method described in Robust Team Play, by Henry Work
+                """
+                ## NOTE: Took out chaseTimeScale because it wansn't guaranteeing that
+                ##       the thresholds would be appropriately tiered. A good idea,
+                ##       but bad implementation. May work with some futsing around.
+                ##       -- Wils (06/24/11)
                 if chaser_mate.chaseTime < mate.chaseTime:
                     chaseTimeScale = chaser_mate.chaseTime
                 else:
                     chaseTimeScale = mate.chaseTime
-
-                if self.shouldCallOff(chaser_mate, mate, chaseTimeScale):
+                """
+                if self.shouldCallOff(chaser_mate, mate): #, chaseTimeScale):
                     if PBConstants.DEBUG_DET_CHASER:
                         self.printf("\t #%d @ %g >= #%d @ %g, shouldCallOff" %
                                (mate.playerNumber, mate.chaseTime,
                                 chaser_mate.playerNumber,
                                 chaser_mate.chaseTime))
-                    if self.shouldListen(chaser_mate, mate, chaseTimeScale):
+                    if self.shouldListen(chaser_mate, mate): #, chaseTimeScale):
                         if PBConstants.DEBUG_DET_CHASER:
                             self.printf(("\t #%d @ %g <= #%d @ %g, shouldListen" %
                                          (mate.playerNumber, mate.chaseTime,
@@ -190,26 +195,26 @@ class GoTeam:
         # returns teammate instance (could be mine)
         return chaser_mate
 
-    def shouldCallOff(self, chaser_mate, mate, chaseTimeScale):
+    def shouldCallOff(self, chaser_mate, mate): #, chaseTimeScale):
         """Decides if mate shouldCallOff the chaser_mate"""
         # mate = A, chaser_mate = B.
         # A will become chaser_mate if:
         # [ (chaseTime(A) - chaseTime(B) < e) or
         #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
         return(((mate.chaseTime - chaser_mate.chaseTime) <
-                (PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale)) or
+                (PBConstants.CALL_OFF_THRESH)) or # + .15 *chaseTimeScale)) or
                ((mate.chaseTime - chaser_mate.chaseTime) <
-                (PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale) and
-                chaser_mate.isTeammateRole(PBConstants.CHASER)))
+                (PBConstants.STOP_CALLING_THRESH) and # + .35 * chaseTimeScale) and
+                mate.isTeammateRole(PBConstants.CHASER)))
 
-    def shouldListen(self, mate, chaser_mate, chaseTimeScale):
+    def shouldListen(self, mate, chaser_mate): #, chaseTimeScale):
         """Decides if mate should listen to the chaser_mate after calling off"""
         # mate = A, chaser_mate = B.
         # A will relinquish chaser to chaser_mate if:
         # chaseTime(B) < chaseTime(A) - m
         # A is higher robot that is already chaser.
         return (chaser_mate.chaseTime < mate.chaseTime -
-                (PBConstants.LISTEN_THRESH + .45 * chaseTimeScale))
+                (PBConstants.LISTEN_THRESH)) # + .45 * chaseTimeScale))
 
     def getLeastWeightPosition(self, positions, mates = None):
         """Gets the position for the robot such that the distance
