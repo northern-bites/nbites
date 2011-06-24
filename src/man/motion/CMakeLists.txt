@@ -65,6 +65,9 @@ SET( MOTION_SRCS
 		     ChoppedCommand
 		     LinearChoppedCommand
 		     SmoothChoppedCommand
+		     PreviewChoppedCommand
+		     COMPreview
+		     BalancingChoppedCommand
 		     BaseFreezeCommand
 		     HeadProvider
 		     ChopShop
@@ -79,6 +82,7 @@ SET( MOTION_SRCS
 		     SpringSensor
 		     WalkingLeg
 		     WalkingArm
+		     BalancingArm
 		     PreviewController
 		     Observer
 		     ZmpExp

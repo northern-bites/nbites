@@ -270,6 +270,21 @@ def walking(nav):
 
     return nav.stay()
 
+def destWalking(nav):
+    """
+    State to be used when we are walking to a destination
+    """
+    if nav.firstFrame() or nav.newDestination:
+        if (nav.destGain < 0):
+            nav.destGain = 1;
+            # @todo Leaving the actual interface of the destGain parameter unimplemented
+            # Wils, figure out how you want to set it up --Nathan
+
+        helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta, nav.destGain)
+        nav.newDestination = False
+
+    return nav.stay()
+
 # State to use with the setSteps method
 def stepping(nav):
     """

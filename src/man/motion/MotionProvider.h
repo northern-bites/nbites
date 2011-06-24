@@ -123,7 +123,7 @@ protected:
     }
 
     void setNextChainStiffnesses(const Kinematics::ChainID id,
-                            const std::vector <float> &chainJoints) {
+				 const std::vector <float> &chainJoints) {
         nextStiffnesses[id] = chainJoints;
     }
 

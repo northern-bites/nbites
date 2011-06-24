@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -18,44 +17,56 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef _ChopShop_h_DEFINED
-#define _ChopShop_h_DEFINED
 
-#include <vector>
+/**
+ * This class moves an arm to automatically balance based on a CoM preview
+ * calculated somewhere else.
+ *
+ * @author Nathan Merritt
+ * @date June 2011
+ * @see WalkingArm, PreviewChoppedCommand
+ */
+
+#pragma once
+#ifndef BALANCING_ARM_H
+#define BALANCING_ARM_H
+
 #include <boost/shared_ptr.hpp>
 
-#include "Sensors.h"
-#include "BodyJointCommand.h"
+#include "NBMath.h"
+#include "NBMatrixMath.h"
 
-#include "JointCommand.h"
-#include "ChoppedCommand.h"
-#include "LinearChoppedCommand.h"
-#include "SmoothChoppedCommand.h"
-#include "BalancingChoppedCommand.h"
-#include "Common.h"
+#include "Kinematics.h"
+#include "COMPreview.h"
 
-class ChopShop
-{
+class BalancingArm {
 public:
-    ChopShop(boost::shared_ptr<Sensors> s);
+    typedef boost::shared_ptr<BalancingArm> ptr;
 
-    ChoppedCommand::ptr chopCommand(const JointCommand::ptr command,
-				    bool comPreview=false);
+    enum ArmJoint {
+	SHOULDER_PITCH = 0,
+	SHOULDER_ROLL,
+	ELBOW_YAW,
+	ELBOW_ROLL,
+    };
+
+    BalancingArm( Kinematics::ChainID id, COMPreview::ptr com );
+    ~BalancingArm();
+
+    std::vector<float> getNextJoints();
 
 private:
-    boost::shared_ptr<Sensors> sensors;
-    float FRAME_LENGTH_S;
+    float getJoint(int id);
 
-    ChoppedCommand::ptr chopLinear(const JointCommand::ptr command,
-				   std::vector<float> currentJoints,
-				   int numChops);
+    float shoulderPitch();
+    float shoulderRoll();
+    float elbowYaw();
+    float elbowRoll();
 
-    ChoppedCommand::ptr chopSmooth(const JointCommand::ptr command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-
-    std::vector<float> getCurrentJoints();
+    bool leftArm;
+    Kinematics::ChainID chain;
+    COMPreview::ptr comPreview;
 };
+
 
 #endif

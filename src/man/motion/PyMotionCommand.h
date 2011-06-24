@@ -18,44 +18,33 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef _ChopShop_h_DEFINED
-#define _ChopShop_h_DEFINED
+/**
+ * All PyMotion commands inherit from here, so we can define a unified
+ * callback interface from the motion engine.
+ *
+ * @author Nathan Merritt
+ * @date June 2011
+ */
 
-#include <vector>
-#include <boost/shared_ptr.hpp>
+#pragma once
+#ifndef PY_MOTION_COMMAND_H
+#define PY_MOTION_COMMAND_H
 
-#include "Sensors.h"
-#include "BodyJointCommand.h"
+#include "AbstractCommand.h"
 
-#include "JointCommand.h"
-#include "ChoppedCommand.h"
-#include "LinearChoppedCommand.h"
-#include "SmoothChoppedCommand.h"
-#include "BalancingChoppedCommand.h"
-#include "Common.h"
-
-class ChopShop
-{
+class PyMotionCommand {
 public:
-    ChopShop(boost::shared_ptr<Sensors> s);
+    virtual ~PyMotionCommand() {}
 
-    ChoppedCommand::ptr chopCommand(const JointCommand::ptr command,
-				    bool comPreview=false);
+    // Generic, exposed to Python for all commands
+    int framesRemaining() const { return command->framesRemaining(); }
+    bool isDoneExecuting() const { return command->isDoneExecuting(); }
+    float timeRemaining() const { return command->timeRemaining(); }
 
-private:
-    boost::shared_ptr<Sensors> sensors;
-    float FRAME_LENGTH_S;
-
-    ChoppedCommand::ptr chopLinear(const JointCommand::ptr command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-    ChoppedCommand::ptr chopSmooth(const JointCommand::ptr command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-
-    std::vector<float> getCurrentJoints();
+protected:
+    PyMotionCommand() {} // only derived classes can be instantiated
+    AbstractCommand::ptr command;
 };
+
 
 #endif

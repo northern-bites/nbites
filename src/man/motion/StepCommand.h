@@ -2,7 +2,11 @@
 #define StepCommand_h
 
 class StepCommand : public MotionCommand {
+
+
 public:
+    typedef boost::shared_ptr<StepCommand> ptr;
+
     StepCommand(float _x_mms, float _y_mms, float _theta_rads, int nSteps = 1)
   : MotionCommand(MotionConstants::WALK),
     x_mms(_x_mms),y_mms(_y_mms),theta_rads(_theta_rads), numSteps(nSteps)

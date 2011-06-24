@@ -74,7 +74,7 @@ void CoordHeadProvider::calculateNextJointsAndStiffnesses() {
     PROF_ENTER(profiler,P_HEAD);
     pthread_mutex_lock(&coord_head_provider_mutex);
 
-	coordMode();
+    coordMode();
 
     setActive();
     pthread_mutex_unlock(&coord_head_provider_mutex);
@@ -88,11 +88,11 @@ void CoordHeadProvider::coordMode(){
 
     //Calculate how much we can move toward the goal
     float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
-                                               - yawMaxSpeed,
-                                               yawMaxSpeed);
+					 - yawMaxSpeed,
+					 yawMaxSpeed);
     float pitchChangeTarget = NBMath::clip(pitchDest - lastPitchDest,
-                                                 -pitchMaxSpeed,
-                                                 pitchMaxSpeed);
+					   -pitchMaxSpeed,
+					   pitchMaxSpeed);
 
     //avoid potential head collisions with shoulder pads
     if (lastPitchDest < 0) {
@@ -115,8 +115,8 @@ void CoordHeadProvider::coordMode(){
 
     //update the chain angles
     vector<float> newChainAngles;
-	newChainAngles.push_back(lastYawDest);
-	newChainAngles.push_back(lastPitchDest);
+    newChainAngles.push_back(lastYawDest);
+    newChainAngles.push_back(lastPitchDest);
     setNextChainJoints(HEAD_CHAIN,newChainAngles);
 
     vector<float> head_gains(HEAD_JOINTS, headSetStiffness);
@@ -125,7 +125,7 @@ void CoordHeadProvider::coordMode(){
 }
 
 
-void CoordHeadProvider::setCommand(const CoordHeadCommand *command) {
+void CoordHeadProvider::setCommand(const CoordHeadCommand::ptr command) {
     pthread_mutex_lock(&coord_head_provider_mutex);
     transitionTo(COORD);
     float relY = command->getRelY()-pose->getFocalPointInWorldFrameY();//adjust from mm to cm
@@ -169,8 +169,8 @@ void CoordHeadProvider::setActive(){
 
 
 bool CoordHeadProvider::isDone(){
-	//returns true when robot's current yaw and pitch match destination's
-	//yaw and pitch
+    //returns true when robot's current yaw and pitch match destination's
+    //yaw and pitch
     return ((yawDest == lastYawDest) && (pitchDest == lastPitchDest));
 }
 
@@ -183,18 +183,18 @@ void CoordHeadProvider::stopSet(){
 void CoordHeadProvider::transitionTo(HeadMode newMode){
     //Method to handle special cases when the state changes
     if(newMode != curMode){
-		//If we need to switch modes, then we may not know what the latest
-		//angles are, so lets get them again from sensors
-		vector<float> mAngles = sensors->getMotionBodyAngles();
-		lastYawDest =mAngles[0];
-		lastPitchDest =mAngles[1];
+	//If we need to switch modes, then we may not know what the latest
+	//angles are, so lets get them again from sensors
+	vector<float> mAngles = sensors->getMotionBodyAngles();
+	lastYawDest =mAngles[0];
+	lastPitchDest =mAngles[1];
 	curMode = newMode;
 #ifdef DEBUG_HEADPROVIDER
 	cout << "Transitioned to mode :"<<curMode<<endl;
 #endif
-	}else{
+    }else{
 #ifdef DEBUG_HEADPROVIDER
         cout << "No transition need to get to :"<<curMode<<endl;
 #endif
-	}
+    }
 }
