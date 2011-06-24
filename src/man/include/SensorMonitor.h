@@ -46,12 +46,13 @@ class SensorMonitor : public Filter
 {
 public:
     SensorMonitor();
-    SensorMonitor(boost::shared_ptr<Speech> s, std::string sensorName);
+    SensorMonitor(std::string sensorName);
+    SensorMonitor(int _bins, float _lowBin, float _highBin, bool isLog);
     ~SensorMonitor();
 
-	double X(double);
-	void Reset();
-	void LogOutput(); // prints histograms to /home/nao/naoqi/log/{sensorName}.sensor
+    double X(double);
+    void Reset();
+    void LogOutput(); // prints histograms to /home/nao/naoqi/log/{sensorName}.sensor
 
     // values outside will cause a print statement
     void setVarianceBounds(float low, float high);
@@ -68,7 +69,7 @@ public:
     const std::string SensorName() const { return sensorName; }
     void SensorName(std::string name) { sensorName = name; }
 
-    void SpeechPtr(boost::shared_ptr<Speech> s) { speech = s; }
+    void SpeechPointer(boost::shared_ptr<Speech> s) { speech = s; }
 
 private:
     void reportSensorError();

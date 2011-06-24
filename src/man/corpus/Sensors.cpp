@@ -65,8 +65,8 @@ Sensors::Sensors (boost::shared_ptr<Speech> s)
       naoImage(NULL),
       //naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
-      varianceMonitor(speech, MONITOR_COUNT, "SensorVariance", sensorNames),
-      fsrMonitor(speech, BUMPER_LEFT_L, "FSR_Variance", fsrNames),
+      varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
+      fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
       unfilteredInertial(),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
       FRM_FOLDER("/home/nao/naoqi/frames"),
@@ -113,6 +113,10 @@ Sensors::Sensors (boost::shared_ptr<Speech> s)
     for (int i = 0; i <= FSR_RIGHT_B_R; ++i)
 	fsrMonitor.Sensor(i).setVarianceBounds(SensorMonitor::DONT_CHECK,
 					       FSR_HIGH);
+
+    // give the variance monitors access to speech
+    varianceMonitor.SpeechPointer(speech);
+    fsrMonitor.SpeechPointer(speech);
 
     // THIS IS AN OCTAL NUMBER, must start with 0
     mkdir(FRM_FOLDER.c_str(), 0755); // permissions: u+rwx, og+rx
