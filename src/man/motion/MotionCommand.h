@@ -24,28 +24,32 @@
 /**
  * Overarching MotionCommand class for motion.
  *
- * It's only ability is to keep track of what kind of motion
- * it implements.
+ * Keeps track of what kind of motion it implements, and provides
+ * a standardized command progress interface to Python.
  *
- * Must be DELETED when passed to a provider!!!
  */
 #include <list>
-#include "MotionConstants.h"
 
-class MotionCommand
-{
+#include "Common.h"
+#include "MotionConstants.h"
+#include "AbstractCommand.h"
+
+class MotionCommand : public AbstractCommand {
 public:
-	MotionCommand(MotionConstants::MotionType type)
-		: chainList(), motionType(type) { }
-	virtual ~MotionCommand() { }
-	const MotionConstants::MotionType getType() const { return motionType; }
-	const std::list<int>* getChainList() const { return &chainList; }
+    typedef boost::shared_ptr<MotionCommand> ptr;
+
+    MotionCommand(MotionConstants::MotionType type)
+	: chainList(), motionType(type) { }
+    virtual ~MotionCommand() { }
+    const MotionConstants::MotionType getType() const { return motionType; }
+    const std::list<int>* getChainList() const { return &chainList; }
 
 protected:
-	std::list<int> chainList;
+    std::list<int> chainList;
+
 private:
-	virtual void setChainList() = 0;
-	const MotionConstants::MotionType motionType;
+    virtual void setChainList() = 0;
+    const MotionConstants::MotionType motionType;
 };
 
 #endif

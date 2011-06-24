@@ -65,8 +65,8 @@ Sensors::Sensors (boost::shared_ptr<Speech> s)
       naoImage(NULL),
       //naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
       supportFoot(LEFT_SUPPORT),
-      varianceMonitor(speech, MONITOR_COUNT, "SensorVariance", sensorNames),
-      fsrMonitor(speech, BUMPER_LEFT_L, "FSR_Variance", fsrNames),
+      varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
+      fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
       unfilteredInertial(),
       chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
       FRM_FOLDER("/home/nao/naoqi/frames"),
@@ -113,6 +113,10 @@ Sensors::Sensors (boost::shared_ptr<Speech> s)
     for (int i = 0; i <= FSR_RIGHT_B_R; ++i)
 	fsrMonitor.Sensor(i).setVarianceBounds(SensorMonitor::DONT_CHECK,
 					       FSR_HIGH);
+
+    // give the variance monitors access to speech
+    varianceMonitor.SpeechPointer(speech);
+    fsrMonitor.SpeechPointer(speech);
 
     // THIS IS AN OCTAL NUMBER, must start with 0
     mkdir(FRM_FOLDER.c_str(), 0755); // permissions: u+rwx, og+rx
@@ -941,6 +945,56 @@ void Sensors::writeVarianceData() {
     fsrMonitor.LogOutput();
 
     pthread_mutex_unlock(&variance_mutex);
+}
+
+/**
+ * These methods provide access to a percentage of each sensor type
+ * that is broken, so we can decide in behaviors whether or not to
+ * use that sensor.
+ *
+ * @return count of number of sensors that have reported an error
+ */
+
+float Sensors::percentBrokenFSR() {
+    int brokenFSRs = 0;
+    int numberFSRs = fsrMonitor.NumberMonitors();
+
+    for (int i = 0; i < numberFSRs; ++i)
+	if (!fsrMonitor.Sensor(i).isTrustworthy())
+	    ++brokenFSRs;
+
+    return static_cast<float> (brokenFSRs) /
+	static_cast<float> (numberFSRs);
+}
+
+float Sensors::percentBrokenMotionSensors() {
+    int brokenMotion = 0;
+    // sonar is checked elsewhere, so don't double count
+    int motionSensors = varianceMonitor.NumberMonitors() - 2;
+
+    for (int i = 0; i < motionSensors; ++i)
+	if (!varianceMonitor.Sensor(i).isTrustworthy())
+	    ++brokenMotion;
+
+    return static_cast<float> (brokenMotion) /
+    static_cast<float> (motionSensors);
+}
+
+bool Sensors::angleXYBroken() {
+    return !(varianceMonitor.Sensor(ANGLEX).isTrustworthy() &&
+	     varianceMonitor.Sensor(ANGLEY).isTrustworthy());
+}
+
+float Sensors::percentBrokenSonar() {
+    int brokenSonars = 0;
+
+    if (!varianceMonitor.Sensor(SONARL).isTrustworthy())
+	++brokenSonars;
+
+    if (!varianceMonitor.Sensor(SONARR).isTrustworthy())
+	++brokenSonars;
+
+    return static_cast<float>(brokenSonars) * 0.5f;// only two Sonar sensors
 }
 
 // @TODO move this to Transcriber to write out from full size image...

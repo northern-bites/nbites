@@ -52,6 +52,7 @@
 #include "BodyJointCommand.h"
 #include "HeadJointCommand.h"
 #include "WalkCommand.h"
+#include "DestinationCommand.h"
 #include "Gait.h"
 #include "SetHeadCommand.h"
 #include "CoordHeadCommand.h"
@@ -60,36 +61,36 @@
 #  define DEBUG_JOINTS_OUTPUT
 #endif
 
-
 class MotionSwitchboard {
 public:
-  MotionSwitchboard(boost::shared_ptr<Sensors> s,
-					boost::shared_ptr<Profiler> p,
-					boost::shared_ptr<NaoPose> pose);
+    MotionSwitchboard(boost::shared_ptr<Sensors> s,
+		      boost::shared_ptr<Profiler> p,
+		      boost::shared_ptr<NaoPose> pose);
     ~MotionSwitchboard();
 
     void start();
     void stop();
     void run();
 
-	const std::vector <float> getNextJoints() const;
-	const std::vector<float> getNextStiffness() const;
+    const std::vector <float> getNextJoints() const;
+    const std::vector<float> getNextStiffness() const;
     void signalNextFrame();
-	void sendMotionCommand(const BodyJointCommand* command);
-	void sendMotionCommand(const HeadJointCommand* command);
-	void sendMotionCommand(const WalkCommand* command);
-	void sendMotionCommand(const boost::shared_ptr<Gait> command);
-	void sendMotionCommand(const SetHeadCommand* command);
-	void sendMotionCommand(const CoordHeadCommand* command);
-	void sendMotionCommand(const boost::shared_ptr<FreezeCommand> command);
-	void sendMotionCommand(const boost::shared_ptr<UnfreezeCommand> command);
-	void sendMotionCommand(const boost::shared_ptr<StepCommand> command);
+    void sendMotionCommand(const HeadJointCommand::ptr command);
+    void sendMotionCommand(const BodyJointCommand::ptr command);
+    void sendMotionCommand(const WalkCommand::ptr command);
+    void sendMotionCommand(const Gait::ptr command);
+    void sendMotionCommand(const SetHeadCommand::ptr command);
+    void sendMotionCommand(const CoordHeadCommand::ptr command);
+    void sendMotionCommand(const FreezeCommand::ptr command);
+    void sendMotionCommand(const UnfreezeCommand::ptr command);
+    void sendMotionCommand(const StepCommand::ptr command);
+    void sendMotionCommand(const DestinationCommand::ptr command);
 
 public:
     void stopHeadMoves(){headProvider.requestStop();}
-	void stopBodyMoves(){
-		curProvider->requestStop();
-	}
+    void stopBodyMoves(){
+	curProvider->requestStop();
+    }
 
     bool isWalkActive(){return walkProvider.isActive();}
     bool isHeadActive(){return headProvider.isActive();}
@@ -127,7 +128,7 @@ private:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-	boost::shared_ptr<Profiler> profiler;
+    boost::shared_ptr<Profiler> profiler;
     WalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
@@ -135,11 +136,11 @@ private:
     NullHeadProvider nullHeadProvider;
     NullBodyProvider nullBodyProvider;
 
-	MotionProvider * curProvider;
-	MotionProvider * nextProvider;
+    MotionProvider * curProvider;
+    MotionProvider * nextProvider;
 
-	MotionProvider * curHeadProvider;
-	MotionProvider * nextHeadProvider;
+    MotionProvider * curHeadProvider;
+    MotionProvider * nextHeadProvider;
 
     std::vector <float> sensorAngles;
     std::vector <float> nextJoints;
@@ -148,7 +149,7 @@ private:
 
     int frameCount;
     bool running;
-	mutable bool newJoints; //Way to track if we ever use the same joints twice
+    mutable bool newJoints; //Way to track if we ever use the same joints twice
 
     bool readyToSend;
 

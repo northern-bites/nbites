@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -18,44 +17,35 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef _ChopShop_h_DEFINED
-#define _ChopShop_h_DEFINED
+#pragma once
+#ifndef COM_PREVIEW_H
+#define COM_PREVIEW_H
 
-#include <vector>
+#include <pthread.h>
 #include <boost/shared_ptr.hpp>
 
-#include "Sensors.h"
-#include "BodyJointCommand.h"
-
-#include "JointCommand.h"
-#include "ChoppedCommand.h"
-#include "LinearChoppedCommand.h"
-#include "SmoothChoppedCommand.h"
-#include "BalancingChoppedCommand.h"
-#include "Common.h"
-
-class ChopShop
-{
+class COMPreview {
 public:
-    ChopShop(boost::shared_ptr<Sensors> s);
+    typedef boost::shared_ptr<COMPreview> ptr;
 
-    ChoppedCommand::ptr chopCommand(const JointCommand::ptr command,
-				    bool comPreview=false);
+    COMPreview();
+    ~COMPreview();
+
+    void update(double _x, double _y, double _dx, double _dy);
+
+    double X() { return x; }
+    double Y() { return y; }
+    double DX() { return dx; }
+    double DY() { return dy; }
 
 private:
-    boost::shared_ptr<Sensors> sensors;
-    float FRAME_LENGTH_S;
+    mutable pthread_mutex_t mutex;
 
-    ChoppedCommand::ptr chopLinear(const JointCommand::ptr command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-    ChoppedCommand::ptr chopSmooth(const JointCommand::ptr command,
-				   std::vector<float> currentJoints,
-				   int numChops);
-
-
-    std::vector<float> getCurrentJoints();
+    double x; //mm
+    double y;
+    double dx; // mm/tick
+    double dy;
 };
+
 
 #endif

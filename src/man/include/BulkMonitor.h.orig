@@ -50,9 +50,11 @@ public:
     void Reset();
     void LogOutput();
 
+<<<<<<< HEAD
     int NumberMonitors() const { return numberMonitors; }
-
+=======
     void SpeechPointer(boost::shared_ptr<Speech> s);
+>>>>>>> master
 
 private:
     boost::shared_ptr<Speech> speech;

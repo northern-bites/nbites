@@ -29,17 +29,17 @@ using boost::shared_ptr;
 //#define DEBUG_HEADPROVIDER
 
 HeadProvider::HeadProvider(shared_ptr<Sensors> s,shared_ptr<Profiler> p)
-	: MotionProvider(HEAD_PROVIDER, p),
-	  sensors(s),
-	  chopper(sensors),
-	  nextJoints(),
-	  currCommand(new ChoppedCommand() ),
-	  headCommandQueue(),
-	  curMode(SCRIPTED),
-	  yawDest(0.0f), pitchDest(0.0f),
-	  lastYawDest(0.0f), lastPitchDest(0.0f),
-	  pitchMaxSpeed(0.0f), yawMaxSpeed(0.0f),
-	  headSetStiffness(0.6f)
+    : MotionProvider(HEAD_PROVIDER, p),
+      sensors(s),
+      chopper(sensors),
+      nextJoints(),
+      currCommand(new ChoppedCommand() ),
+      headCommandQueue(),
+      curMode(SCRIPTED),
+      yawDest(0.0f), pitchDest(0.0f),
+      lastYawDest(0.0f), lastPitchDest(0.0f),
+      pitchMaxSpeed(0.0f), yawMaxSpeed(0.0f),
+      headSetStiffness(0.6f)
 {
     pthread_mutex_init (&head_provider_mutex, NULL);
 }
@@ -72,8 +72,8 @@ void HeadProvider::hardReset(){
 
 //Method called from MotionSwitchboard
 void HeadProvider::calculateNextJointsAndStiffnesses() {
-	PROF_ENTER(profiler,P_HEAD);
-	pthread_mutex_lock(&head_provider_mutex);
+    PROF_ENTER(profiler,P_HEAD);
+    pthread_mutex_lock(&head_provider_mutex);
     switch(curMode){
     case SCRIPTED:
         scriptedMode();
@@ -83,8 +83,8 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
         break;
     }
     setActive();
-	pthread_mutex_unlock(&head_provider_mutex);
-	PROF_EXIT(profiler,P_HEAD);
+    pthread_mutex_unlock(&head_provider_mutex);
+    PROF_EXIT(profiler,P_HEAD);
 }
 
 //Method called during the 'SET' Mode
@@ -100,10 +100,10 @@ void HeadProvider::setMode(){
                                                  -pitchMaxSpeed,
                                                  pitchMaxSpeed);
 #ifdef DEBUG_HEADPROVIDER
-     cout << "Last values "<<endl
-          <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
-          <<"   added      ("<<yawChangeTarget<<","<<pitchChangeTarget<<")"<<endl
-          <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
+    cout << "Last values "<<endl
+	 <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
+	 <<"   added      ("<<yawChangeTarget<<","<<pitchChangeTarget<<")"<<endl
+	 <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
 #endif
 
     //update memory for next  run
@@ -128,57 +128,56 @@ void HeadProvider::scriptedMode(){
 
     if (!currCommand->isDone() ) {
         setNextChainJoints( HEAD_CHAIN,
-							currCommand->getNextJoints(HEAD_CHAIN) );
-		setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
-								 currCommand->getStiffness(
-									 Kinematics::HEAD_CHAIN) );
+			    currCommand->getNextJoints(HEAD_CHAIN) );
+	setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
+				 currCommand->getStiffness(
+				     Kinematics::HEAD_CHAIN) );
 
     }
     else {
         setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
-		setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
-								 vector<float>(HEAD_JOINTS, 0.0f) );
+	setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
+				 vector<float>(HEAD_JOINTS, 0.0f) );
     }
 
 
 }
 
-void HeadProvider::setCommand(const SetHeadCommand *command) {
+void HeadProvider::setCommand(const SetHeadCommand::ptr command) {
     pthread_mutex_lock(&head_provider_mutex);
+
     transitionTo(SET);
     yawDest = command->getYaw();
     pitchDest = command->getPitch();
-	yawMaxSpeed = command->getMaxSpeedYaw();
-	pitchMaxSpeed = command->getMaxSpeedPitch();
+    yawMaxSpeed = command->getMaxSpeedYaw();
+    pitchMaxSpeed = command->getMaxSpeedPitch();
     setActive();
+
     pthread_mutex_unlock(&head_provider_mutex);
 }
 
-void HeadProvider::setCommand(const HeadJointCommand *command) {
-	pthread_mutex_lock(&head_provider_mutex);
-    transitionTo(SCRIPTED);
+void HeadProvider::setCommand(const HeadJointCommand::ptr command) {
+    pthread_mutex_lock(&head_provider_mutex);
 
+    transitionTo(SCRIPTED);
     headCommandQueue.push(command); //HACK this should probably be mutexed
     setActive();
+
     pthread_mutex_unlock(&head_provider_mutex);
 }
 
-void HeadProvider::enqueueSequence(std::vector<HeadJointCommand*> &seq) {
-	// Take in vec of commands and enqueue them all
-	for (vector<HeadJointCommand*>::iterator i= seq.begin(); i != seq.end(); i++)
-		setCommand(*i);
+void HeadProvider::enqueueSequence(std::vector<HeadJointCommand::ptr> &seq) {
+    // Take in vec of commands and enqueue them all
+    vector<HeadJointCommand::ptr>::iterator i;
+    for (i = seq.begin(); i != seq.end(); ++i)
+	setCommand(*i);
 }
 
 void HeadProvider::setNextHeadCommand() {
-
-
-	if ( !headCommandQueue.empty() ) {
-		const HeadJointCommand *command = headCommandQueue.front();
-		currCommand = chopper.chopCommand(command);
-		headCommandQueue.pop();
-
-	}
-
+    if ( !headCommandQueue.empty() ) {
+	currCommand = chopper.chopCommand(headCommandQueue.front());
+	headCommandQueue.pop();
+    }
 }
 
 vector<float> HeadProvider::getCurrentHeads() {
@@ -212,14 +211,10 @@ bool HeadProvider::isDone(){
     }
 }
 void HeadProvider::stopScripted(){
-
-    while(!headCommandQueue.empty()){
-        const HeadJointCommand * cmd = headCommandQueue.front();
-        delete cmd;
+    while(!headCommandQueue.empty())
         headCommandQueue.pop();
-    }
-    currCommand = shared_ptr<ChoppedCommand>(new ChoppedCommand());
 
+    currCommand = ChoppedCommand::ptr(new ChoppedCommand());
 }
 
 void HeadProvider::stopSet(){
@@ -245,11 +240,11 @@ void HeadProvider::transitionTo(HeadMode newMode){
         }
         curMode = newMode;
 #ifdef DEBUG_HEADPROVIDER
-    cout << "Transitioned to mode :"<<curMode<<endl;
+	cout << "Transitioned to mode :"<<curMode<<endl;
 #endif
     }else{
 #ifdef DEBUG_HEADPROVIDER
-    cout << "No transition need to get to :"<<curMode<<endl;
+	cout << "No transition need to get to :"<<curMode<<endl;
 #endif
     }
 
