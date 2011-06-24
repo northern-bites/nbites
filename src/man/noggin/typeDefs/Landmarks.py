@@ -92,8 +92,8 @@ class FieldCorner(LocObject):
         self.Id = _Id
         self.framesOn = 0
         self.height = 0
-        self.locDist = 0
-        self.locBearing = 0
+        self.dist = 0
+        self.bearing = 0
         self.visDist = 0
         self.visBearing = 0
         self.x = 0
@@ -111,7 +111,7 @@ class FieldCorner(LocObject):
         self.x = relativeLandmark[0]
         self.y = relativeLandmark[1]
 
-    def updateVision(self, possibleCorners, visionCorners):
+    def updateVision(self):
         if not certainOnFrame:
             # Was not on frame; reset vision values
             self.framesOn = 0
@@ -120,8 +120,11 @@ class FieldCorner(LocObject):
             self.visDist = 0
             self.visBearing = 0
 
+        certainOnFrame = False
+
     def setVisualCorner(self, corner):
         self.framesOn += 1
+        self.certainOnFrame = True
 
         # Update visual angle values.
         self.angleX = corner.angleX
@@ -137,5 +140,12 @@ class FieldCorner(LocObject):
         self.locBearing = my.getRelativeBearing(self, forceCalc=True)
 
     def updateBestValues(self):
+        if self.framesOn > 0: # Effectively, if self.on
+            self.bearing = self.visBearing
+            self.dist = self.visDist
+        else:
+            self.bearing = self.locBearing
+            self.dist = self.locDist
+
         self.relX = getRelativeX(self.locDist, self.locBearing)
         self.relY = getRelativeY(self.locDist, self.locBearing)

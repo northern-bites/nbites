@@ -131,7 +131,7 @@ class Brain(object):
 
         # Add field corners
         self.corners = []
-        for i in range(16): # See PyVision.cpp for index meanings, 15-31
+        for i in range(17): # See PyVision.cpp for index meanings, 15-31
             self.corners.append(Landmarks.FieldCorner(i))
 
         # Now we build the field objects to be based on our team color
@@ -160,8 +160,8 @@ class Brain(object):
             self.myBoxRightL = self.corners[5]
             self.centerLeftT = self.corners[7]
             self.centerRightT = self.corners[8]
-            self.centerLeftCross = self.corners[14]
-            self.centerRightCross = self.corners[15]
+            self.centerLeftCross = self.corners[15]
+            self.centerRightCross = self.corners[16]
             self.oppHalfLeftCorner = self.corners[9]
             self.oppHalfRightCorner = self.corners[8]
             self.oppBoxLeftT = self.corners[11]
@@ -315,9 +315,13 @@ class Brain(object):
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
 
-        possibleCorners = []
+        # If a possible visualCorner is definite, set it's visual values
+        # to the correct FieldCorner object.
         for c in self.vision.fieldLines.corners:
-            possibleCorners.extend(c.possibilities)
+            for p in c.possibilities:
+                if p > 14:
+                    self.corners[p-15].setVisualCorner(p)
+        # Check all FieldCorners and reset values if not in this frame.
         for i in range(len(self.corners)):
             self.corners[i].updateVision(possibleCorners,self.vision.fieldLines.corners)
 
