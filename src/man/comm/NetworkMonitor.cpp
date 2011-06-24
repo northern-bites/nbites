@@ -1,6 +1,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 #include "NetworkMonitor.h"
 
@@ -45,7 +46,7 @@ void NetworkMonitor::packetReceived(long long timeSent, long long timeReceived)
     else
     {
 	// Calculate the latency. Add to latency monitor.
-	droppedPackets.X(timeReceived - timeSent);
+	latency.X(timeReceived - timeSent);
     }
 }
 
@@ -58,12 +59,13 @@ void NetworkMonitor::packetsDropped(int numDropped)
 
 const int NetworkMonitor::totalPacketsReceived() const
 {
-    // 0 indicates that a packet has been received; 1 indicates a dropped packet.
+    // 0 indicates that a packet has been received.
     return droppedPackets.binCount(0);
 }
 
 const int NetworkMonitor::totalPacketsDropped() const
 {
+    // 1 indicates a dropped packet.
     return droppedPackets.binCount(1);
 }
 
@@ -73,16 +75,29 @@ void NetworkMonitor::logOutput()
     using namespace std;
 
     ofstream logFile;
-    logFile.open("/home/nao/naoqi/log/networkdata.txt", ios::out | ios::trunc);
+    logFile.open("/home/nao/naoqi/log/network.xls", ios::out);
 
     if(logFile.is_open())
     {
+	using namespace std;
+	const int width = 12;
+
 	logFile << "Network Monitor Report" << endl;
 	logFile << "Latency: " << endl;
-	logFile << latency.toString() << endl;
-	logFile << "Dropped Packets: " << endl;
-	logFile << droppedPackets.toString() << endl;
+	for(int i = 0; i < NUM_BINS_LATENCY; ++i)
+	{
+	    logFile << setw(width) << setprecision(4) << latency.binMidPoint(i);
+	    logFile << setw(width) << latency.binCount(i);
+	    logFile << endl;
+	}
+	logFile << "Dropped packets: " << endl;
+	for(int i = 0; i < NUM_BINS_DROPPED; ++i)
+	{
+	    logFile << setw(width) << setprecision(4) << droppedPackets.binMidPoint(i);
+	    logFile << setw(width) << droppedPackets.binCount(i);
+	    logFile << endl;
+	}
     }
     else
-	cerr << "NetworkMonitor::saveLog() : error opening log file!" << endl;
+	cerr << "NetworkMonitor::logOutput() : error opening log file!" << endl;
 }

@@ -123,7 +123,7 @@ private:
     llong averagePacketDelay;                 // Stores the running average delay between
                                               // received packets.
     int totalPacketsReceived;                 // Running total packets received.
-    int ourPacketsReceived;                   // Running count of "our" packets received.
+    int ourPacketsReceived;                   // Running count of "our" packets received (excludes robot's own.)
 
     NetworkMonitor monitor;
 };

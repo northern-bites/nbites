@@ -497,7 +497,7 @@ void Comm::run()
 }
 
 // Stops ToolConnect thread and Comm thread
-void Comm::stop ()
+void Comm::stop()
 {
     tool.stop();
     Thread::stop();
@@ -514,7 +514,7 @@ int Comm::startTOOL ()
 }
 
 // Stops ToolConnect thread
-void Comm::stopTOOL ()
+void Comm::stopTOOL()
 {
     tool.stop();
 }
@@ -531,7 +531,7 @@ void Comm::error(socket_error err) throw()
 }
 
 // Attempts to discover broadcast address
-void Comm::discover_broadcast ()
+void Comm::discover_broadcast()
 {
     // run ifconfig command to discover broadcast address
     FILE *f = popen(
@@ -570,7 +570,7 @@ void Comm::discover_broadcast ()
 }
 
 // Binds all required sockets
-void Comm::bind () throw(socket_error)
+void Comm::bind() throw(socket_error)
 {
     // create socket
     sockn = ::socket(AF_INET, SOCK_DGRAM, 0);
@@ -687,10 +687,10 @@ void Comm::send () throw(socket_error)
     }
     else
     {
-        // C++ header data
-        const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
-					 lastPacketNumber++, gc->team(), gc->player(),
-					 gc->color()};
+        // Set the header.
+        const CommPacketHeader header = { PACKET_HEADER, timer.timestamp(),
+					  lastPacketNumber++, gc->team(), gc->player(),
+					  gc->color() };
 
         memcpy(&buf[0], &header, sizeof(header));
         // variable Python extra data
@@ -705,7 +705,7 @@ void Comm::send () throw(socket_error)
 }
 
 // Actually does the sending of the data
-void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error)
+void Comm::send(const char *msg, int len, sockaddr_in &addr) throw(socket_error)
 {
 #ifdef COMM_SEND
     int result = -2;
@@ -873,12 +873,14 @@ void Comm::handle_gc (struct sockaddr_in &addr,
 		timer.reset();
 }
 
-// Ensure packet is one of ours
+// Ensure packet is one of ours, that it is not the robot's own packet, and that it's not a
+// packet from another team. Also calls the timer method to validate the packet to make sure 
+// that it is not too old, etc.
 bool Comm::validate_packet(const char* msg, int len,
 			   CommPacketHeader& packet)
     throw()
 {
-    // check packet length
+    // Packet header must match the correct packet header.
     if (static_cast<unsigned int>(len) < sizeof(CommPacketHeader))
     {
 #ifdef DEBUG_COMM
@@ -917,14 +919,18 @@ bool Comm::validate_packet(const char* msg, int len,
 #endif
         return false;
     }
-
-    // Before calling timer.check_packet(), check for dropped packets.
-    int dropped = timer.packetsDropped(packet);
-    if(dropped > 0)
-	monitor.packetsDropped(dropped);
     
     if (!timer.check_packet(packet))
         return false;
+
+    // Check for dropped packets, then let the timer update teammate packet info.
+    int dropped = timer.packetsDropped(packet);
+    if(dropped > 0)
+	monitor.packetsDropped(dropped);
+
+    // Now allow the timer to make sure all teammate times have been updated according
+    // to the received packet.
+    timer.updateTeamPackets(packet);
 
     llong currTime = timer.timestamp();
 
@@ -1073,7 +1079,6 @@ void Comm::updateAverageDelay()
 	newAverage = (llong)(0.5 * (averagePacketDelay + delay));
 
 #ifdef DEBUG_COMM
-    // Log data?
     cout << Thread::name << ": updateAverageDelay() : average delay == "
 	 << newAverage << endl;
 #endif

@@ -36,6 +36,7 @@ class CommTimer
     int packetsDropped(const CommPacketHeader& packet);
 
     bool check_packet(const CommPacketHeader& packet);
+    void updateTeamPackets(const CommPacketHeader& packet);
     void get_time_from_others();
     void reset();
 

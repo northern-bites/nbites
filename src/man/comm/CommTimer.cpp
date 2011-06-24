@@ -86,17 +86,23 @@ bool CommTimer::check_packet(const CommPacketHeader &p)
       need_to_update = true;
       return false;
   }
-
-  // Packet is good!
-  teamPackets[p.player - 1].timestamp = p.timestamp;
-  packets_checked++;
-
-  if (need_to_update)
-    get_time_from_others();
-
+  
+  // All tests passed, packet must be valid.
   return true;
 }
 
+// This should be called if the packet is found to be valid.
+void CommTimer::updateTeamPackets(const CommPacketHeader& packet)
+{  
+    // Packet is good!
+    teamPackets[packet.player - 1].timestamp = packet.timestamp;
+    packets_checked++;
+
+    if (need_to_update)
+	get_time_from_others(); 
+}
+
+// Not sure yet what this does...may be redundant.
 void CommTimer::get_time_from_others()
 {
   if (packets_checked < 2) {
