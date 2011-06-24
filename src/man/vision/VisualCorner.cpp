@@ -41,6 +41,12 @@ VisualCorner::VisualCorner(const int _x, const int _y,
     // Calculate and set the standard deviation of the measurements
     setDistanceSD(cornerDistanceToSD(_distance));
     setBearingSD(cornerBearingToSD(_bearing));
+	setAngleX( static_cast<float>(HALF_IMAGE_WIDTH - _x) /
+			   static_cast<float>(HALF_IMAGE_WIDTH) *
+			   MAX_BEARING_RAD);
+	setAngleY(static_cast<float>(HALF_IMAGE_HEIGHT - _y) /
+			  static_cast<float>(HALF_IMAGE_HEIGHT) *
+			  MAX_ELEVATION_RAD);
 }
 
 VisualCorner::~VisualCorner() {}

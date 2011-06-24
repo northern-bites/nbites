@@ -1402,6 +1402,13 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 	const point<int> endl2 = corner.getLine2()->getStartpoint();
 	float l2 = realDistance(endl1.x, endl1.y, endl2.x, endl2.y);
 	int x = corner.getX();
+	float dist = realDistance(post.getLeft(), post.getBottom(),
+							  corner.getX(), corner.getY());
+	// sometimes side Ts turn up as Ls
+	// annika/yellowgoal/63.FRM
+	if (dist > 250 || (l1 > 150 && l2 > 150)) {
+		return NOPOST;
+	}
 	// if one line is long enough we can determine its relationship
 	if (POSTLOGIC) {
 		cout << "Checking outer L corner " << l1 << " " << l2 << endl;

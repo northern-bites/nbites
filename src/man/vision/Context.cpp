@@ -467,6 +467,9 @@ void Context::classifyOuterL(VisualCorner & corner) {
     float l2 = realLineDistance(corner.getLine2());
     if (debugIdentifyCorners) {
         cout << "Lines " << l1 << " " << l2 << endl;
+		if (objectDistance > 0) {
+			cout << "Object is " << objectDistance << endl;
+		}
     }
 
 	// check if it is an obvious field corner
@@ -565,7 +568,7 @@ void Context::classifyOuterL(VisualCorner & corner) {
         return;
     } else if (l1 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
                l2 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
-               !sameHalf) {
+               objectDistance > 300) {
         // our "L" is actually a T unfortunately it isn't set up right
 		// To Do: use the chageTo method in VisualCorner to get the the
 		// set up properly
