@@ -132,7 +132,7 @@ class Brain(object):
         # Add field corners
         self.corners = []
         for i in range(16): # See PyVision.cpp for index meanings, 15-31
-            corners.append(Landmarks.FieldCorner(i))
+            self.corners.append(Landmarks.FieldCorner(i))
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
@@ -160,8 +160,8 @@ class Brain(object):
             self.myBoxRightL = self.corners[5]
             self.centerLeftT = self.corners[7]
             self.centerRightT = self.corners[8]
-            self.centerLeftCross = self.corners[15]
-            self.centerRightCross = self.corners[16]
+            self.centerLeftCross = self.corners[14]
+            self.centerRightCross = self.corners[15]
             self.oppHalfLeftCorner = self.corners[9]
             self.oppHalfRightCorner = self.corners[8]
             self.oppBoxLeftT = self.corners[11]
@@ -316,10 +316,10 @@ class Brain(object):
         self.bgrp.updateVision(self.vision.bgrp)
 
         possibleCorners = []
-        for i in range(len(self.vision.fieldlines.corners)):
-            possibleCorners.extend(self.vision.fieldlines.corners[i].possibilities)
-        for i in range(len(corners)):
-            corners[i].updateVision(possibleCorners,self.vision.fieldlines)
+        for c in self.vision.fieldLines.corners:
+            possibleCorners.extend(c.possibilities)
+        for i in range(len(self.corners)):
+            self.corners[i].updateVision(possibleCorners,self.vision.fieldLines.corners)
 
         self.time = time.time()
 
@@ -342,8 +342,8 @@ class Brain(object):
         self.bglp.updateLoc(self.loc, self.my)
         self.bgrp.updateLoc(self.loc, self.my)
 
-        for i in range(len(corners)):
-            corners[i].updateLoc(self.loc, self.my)
+        for i in range(len(self.corners)):
+            self.corners[i].updateLoc(self.loc, self.my)
 
     def updateBestValues(self):
         """
@@ -355,8 +355,8 @@ class Brain(object):
         self.bglp.updateBestValues()
         self.bgrp.updateBestValues()
 
-        for i in range(len(corners)):
-            corners[i].updateBestValues()
+        for i in range(len(self.corners)):
+            self.corners[i].updateBestValues()
 
     def updatePlaybook(self):
         """

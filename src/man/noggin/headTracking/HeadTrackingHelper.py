@@ -4,6 +4,7 @@ from man.motion import MotionConstants
 from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
 from math import (fabs, atan, radians, hypot)
+from ..typeDefs.Landmarks import FieldObject
 
 class HeadTrackingHelper(object):
     def __init__(self, tracker):
@@ -207,9 +208,9 @@ class HeadTrackingHelper(object):
         Returns confidence that target is in the vision frame.
         """
         if target is FieldObject:
-            return target.framesOn() > constants.TRACKER_FRAMES_ON_TRACK_THRESH
+            return target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH
         else: # Target is a corner.
-            return target.framesOn() > constants.TRACKER_FRAMES_ON_TRACK_THRESH
+            return target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH
 
 # ** # old method - replaced?
     def lookToPoint(self, target):

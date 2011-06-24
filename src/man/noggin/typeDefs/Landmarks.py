@@ -94,8 +94,15 @@ class FieldCorner(LocObject):
         self.height = 0
         self.locDist = 0
         self.locBearing = 0
+        self.visDist = 0
+        self.visBearing = 0
         self.x = 0
         self.y = 0
+        self.angleX = 0
+        self.angleY = 0
+        self.certainOnFrame = False
+        # Marked true when corner was seen with high confidence.
+        # Reset every frame in updateVision
 
     def associateWithRelativeLandmark(self, relativeLandmark):
         """
@@ -105,11 +112,22 @@ class FieldCorner(LocObject):
         self.y = relativeLandmark[1]
 
     def updateVision(self, possibleCorners, visionCorners):
-        if possibleCorners.count(self.Id) > 0:
-            # This corner has a definite match in the vision frame
-            self.framesOn += 1
-        else:
+        if not certainOnFrame:
+            # Was not on frame; reset vision values
             self.framesOn = 0
+            self.angleX = 0
+            self.angleY = 0
+            self.visDist = 0
+            self.visBearing = 0
+
+    def setVisualCorner(self, corner):
+        self.framesOn += 1
+
+        # Update visual angle values.
+        self.angleX = corner.angleX
+        self.angleY = corner.angleY
+        self.visDist = corner.dist
+        self.visBearing = corner.bearing
 
     def updateLoc(self, loc, my):
         """
@@ -119,4 +137,5 @@ class FieldCorner(LocObject):
         self.locBearing = my.getRelativeBearing(self, forceCalc=True)
 
     def updateBestValues(self):
-        pass
+        self.relX = getRelativeX(self.locDist, self.locBearing)
+        self.relY = getRelativeY(self.locDist, self.locBearing)

@@ -96,13 +96,14 @@ def trackLandmarks(tracker):
         #Landmarks have changed fitness ranking. Track most fit.
         tracker.locObjectList = newlist
         tracker.target = tracker.locObjectList[0]
-        print "target Id:",tracker.target.visionId# ** #debugging
+        print "fitness list changed"# ** #debugging
         return tracker.goLater('trackLoc')
 
     # Assert: no change in list order
 
     # Check for no target (first pass in trackLandmarks state)
     if tracker.target is None:
+        print "ALS: target is None"# ** #debugging
         tracker.target = tracker.locObjectList[0]
 
     # Track next most fit locObject
@@ -113,7 +114,7 @@ def trackLandmarks(tracker):
         # Cycle to most fit locObject
         tracker.target = tracker.locObjectList[0]
 
-    print "target Id:",tracker.target.visionId# ** #debugging
+    print "going to: track target"# ** #debugging
 
     # Track target
     return tracker.goLater('trackLoc')

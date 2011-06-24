@@ -1,5 +1,6 @@
 from man.motion import MotionConstants
 from . import TrackingConstants as constants
+from ..typeDefs.Landmarks import FieldObject
 
 DEBUG = False
 
@@ -94,6 +95,16 @@ def trackLoc(tracker):
     Look towards the current target, then stare at it for
     TRACKER_FRAMES_STARE_THRESH frames.
     """
+    # ** # more debugging code
+    for obj in tracker.locObjectList:
+        if obj is FieldCorner and obj.Id == 3:
+            tracker.target = obj
+
+    # ** # debugging code
+    if tracker.target is FieldObject:
+        print "target is corner:",tracker.target.Id
+    else:
+        print "target is post:",tracker.target.visionId
 
     # make sure head is inactive first
     if tracker.firstFrame():
@@ -107,7 +118,7 @@ def trackLoc(tracker):
     tracker.helper.lookToTargetCoords(tracker.target)
 
     # if close enough to target, switch to stareLoc
-    if tracker.helper.inView(target):
+    if tracker.helper.inView(tracker.target):
         print "found target on frame, now staring"
         return tracker.goLater('stareLoc')
 
@@ -117,7 +128,7 @@ def trackLoc(tracker):
 
 
     if tracker.counter > constants.TRACKER_FRAMES_SEARCH_THRESH:
-        print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+        #print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
         print "Past search thresh, switching to new target"
         return tracker.goLater(tracker.decisionState)
 
@@ -133,6 +144,11 @@ def stareLoc(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
+    if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
+        ###print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+        print "Past stare thresh, switching to new target"
+        return tracker.goLater(tracker.decisionState)
+
     # Find the real post in vision frame
     if tracker.target is FieldObject:
         stareTarget = tracker.helper.findPostInVision(tracker.target, tracker.brain)
@@ -140,16 +156,11 @@ def stareLoc(tracker):
         stareTarget = tracker.helper.findCornerInVision(tracker.target, tracker.brain)
 
     # Second safety check that something was on frame
-    if target is None:
+    if stareTarget is None:
         print "no possible target currently visible"
         return tracker.stay()
 
     tracker.helper.lookToTargetAngles(stareTarget)
-
-    if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
-        print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-        print "Past stare thresh, switching to new target"
-        return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()
 
