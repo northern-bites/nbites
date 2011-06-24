@@ -14,16 +14,16 @@ import GoalieConstants as goalCon
 def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
-        player.standup()
+        player.excuteMove(SweetMoves.INITIAL_POS)
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
+        player.excuteMove(SweetMoves.INITIAL_POS)
         #player.brain.fallController.enableFallProtection(False)
         player.brain.tracker.trackBall()
         #player.brain.tracker.activeLoc()
-        player.standup()
 
     return player.stay()
 
@@ -32,7 +32,8 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
-    player.walkPose()
+    if player.firstFrame():
+        player.executeMove(SweetMoves.INITIAL_POS)
     return player.goNow('testHeat')
 
 def gamePenalized(player):
@@ -53,9 +54,10 @@ def gamePenalized(player):
 
 def testHeat(player):
     ball = player.brain.ball
+    player.brain.tracker.trackBall()
 
-    if ball.heat > 18:
-        player.brain.speech.say("Save")
+    if player.counter % 10 == 0:
+        print ball.heat
 
     return player.stay()
 
