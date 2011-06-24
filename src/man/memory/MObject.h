@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <boost/shared_ptr.hpp>
 
 #define REGISTER_MOBJECT(x) {this->setName(x);}
 
@@ -21,6 +22,9 @@ namespace memory {
 class MObject {
 
 public:
+    typedef boost::shared_ptr<MObject> ptr;
+    typedef boost::shared_ptr<const MObject> const_ptr;
+
     MObject() : name("unknown"){
     }
     /**
