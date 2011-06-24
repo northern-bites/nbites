@@ -54,10 +54,14 @@ def gamePenalized(player):
 
 def testHeat(player):
     ball = player.brain.ball
-    player.brain.tracker.trackBall()
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
 
     if player.counter % 10 == 0:
         print ball.heat
+
+    if ball.heat >= 10:
+        player.brain.speech.sat("Save")
 
     return player.stay()
 
