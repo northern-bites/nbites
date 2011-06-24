@@ -1269,7 +1269,6 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 					postDist = vision->ygrp->getDistance();
                 }
                 dist = realDistance(crossX, crossY, postX, postY);
-				cout << "Dist is " << dist << " " << postDist << endl;
 				if (postDist > LONGPOST) {
 					objPtr->setID(BLUE_GOAL_CROSS);
 				} else if (dist < CLOSECROSS) {
@@ -1288,7 +1287,6 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 					postDist = vision->bgrp->getDistance();
                 }
                 dist = realDistance(crossX, crossY, postX, postY);
-				cout << "Dist is " << dist << " " << postDist << endl;
 				if (postDist > LONGPOST) {
 					objPtr->setID(YELLOW_GOAL_CROSS);
 				} else if (dist < CLOSECROSS) {
