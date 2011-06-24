@@ -55,14 +55,14 @@ public:
     ////////////////////////////////////////////////////////////
     // GETTERS
     ////////////////////////////////////////////////////////////
-    const fieldObjectID getID() const { return id; }
+    const int getID() const { return id; }
 
     virtual const std::string toString() const;
-    static const std::string getStringFromID(const fieldObjectID testID);
-    static const float getHeightFromGround(const fieldObjectID id);
+    static const std::string getStringFromID(const int testID);
+    static const float getHeightFromGround(const int id);
 
-    static const bool isAbstract(const fieldObjectID testID);
-    static const bool isGoal(const fieldObjectID testID);
+    static const bool isAbstract(const int testID);
+    static const bool isGoal(const int testID);
 
 // Static member variables
 public:
@@ -89,7 +89,7 @@ public:
     static const std::list <const ConcreteFieldObject*> yellowGoalRightPostList;
 
 private: // Instance variables recording location on field and identifier
-    fieldObjectID id;
+    int id;
 
 }; // class ConcreteFieldObject
 
