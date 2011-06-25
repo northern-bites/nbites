@@ -69,6 +69,3 @@ private:
 }
 }
 }
-//TODO: remove!!
-using man::include::io::FDProvider;
-using man::include::io::FileFDProvider;

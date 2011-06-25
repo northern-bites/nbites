@@ -42,7 +42,7 @@ CodedFileLogger::CodedFileLogger(const FDProvider* fdp,
 //    GzipOutputStream* gzip_output = new GzipOutputStream(raw_output, opts);
     coded_output = new CodedOutputStream(raw_output);
     // this helps us ID the log
-
+    this->writeHead();
 }
 
 void CodedFileLogger::writeHead() {
@@ -64,7 +64,6 @@ CodedFileLogger::~CodedFileLogger() {
     raw_output->Close();
     delete coded_output;
     delete raw_output;
-    close(file_descriptor);
 }
 }
 }

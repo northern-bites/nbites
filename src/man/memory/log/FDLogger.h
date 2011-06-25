@@ -21,6 +21,9 @@ namespace log {
 
 class FDLogger {
 
+protected:
+    typedef include::io::FDProvider FDProvider;
+
 public:
     /**
      * fdp : a FileFDProvider for the file descriptor where we want
