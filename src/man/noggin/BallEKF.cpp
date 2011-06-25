@@ -518,21 +518,29 @@ void BallEKF::clipBallEstimate()
 
 }
 
+
+/**
+ * Transform relative positions and velocities to global
+ */
 const float BallEKF::getGlobalX() const
 {
-
+    return xhat_k(x_index) * cos(robotPose.h) +
+        xhat_k(y_index) * sin(robotPose.h) + robotPose.x;
 }
 const float BallEKF::getGlobalY() const
 {
-
+    return -xhat_k(x_index) * sin(robotPose.h) +
+        xhat_k(y_index) * cos(robotPose.h) + robotPose.y;
 }
 const float BallEKF::getGlobalXVelocity() const
 {
-
+    return xhat_k(vel_x_index) * cos(robotPose.h) +
+        xhat_k(vel_y_index) * sin(robotPose.h);
 }
 const float BallEKF::getGlobalYVelocity() const
 {
-
+    return -xhat_k(vel_x_index) * sin(robotPose.h) +
+        xhat_k(vel_y_index) * cos(robotPose.h);
 }
 
 /**
@@ -540,17 +548,21 @@ const float BallEKF::getGlobalYVelocity() const
  */
 const float BallEKF::getGlobalXUncert() const
 {
-
+    return P_k(x_index,x_index) * cos(robotPose.h) +
+        P_k(y_index,y_index) * sin(robotPose.h);
 }
 const float BallEKF::getGlobalYUncert() const
 {
-
+    return -P_k(x_index,x_index) * sin(robotPose.h) +
+        P_k(y_index,y_index) * cos(robotPose.h);
 }
 const float BallEKF::getGlobalXVelocityUncert() const
 {
-
+    return P_k(vel_x_index,vel_x_index) * cos(robotPose.h) +
+        P_k(vel_y_index,vel_y_index) * sin(robotPose.h);
 }
 const float BallEKF::getGlobalYVelocityUncert() const
 {
-
+    return -P_k(vel_x_index,vel_x_index) * sin(robotPose.h) +
+        P_k(vel_y_index,vel_y_index) * cos(robotPose.h);
 }
