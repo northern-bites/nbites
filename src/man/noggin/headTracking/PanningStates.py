@@ -23,6 +23,7 @@ def scanBall(tracker):
     # # and trustworthy than we can put the above code back in
     # if not tracker.brain.motion.isHeadActive():
     #     tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
+    return tracker.stay()
 
 def spinScanBall(tracker):
     ball = tracker.brain.ball
