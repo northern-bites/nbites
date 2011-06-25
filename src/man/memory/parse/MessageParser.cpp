@@ -13,7 +13,7 @@ using namespace google::protobuf::io;
 using boost::shared_ptr;
 using namespace include::io;
 
-MessageParser::MessageParser(FDProvider::ptr fdProvider,
+MessageParser::MessageParser(FDProvider::const_ptr fdProvider,
         boost::shared_ptr<proto::Message> message) :
         TemplatedParser<proto::Message>(fdProvider, message)
 {

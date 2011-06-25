@@ -13,7 +13,7 @@ using namespace google::protobuf::io;
 using boost::shared_ptr;
 using namespace include::io;
 
-ImageParser::ImageParser(include::io::FDProvider::ptr fdProvider,
+ImageParser::ImageParser(include::io::FDProvider::const_ptr fdProvider,
         boost::shared_ptr<RoboImage> image) :
         TemplatedParser<RoboImage>(fdProvider, image),
        current_buffer(new const void*),

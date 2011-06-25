@@ -52,7 +52,7 @@ template <class T>
 class TemplatedParser : public Parser {
 
 public:
-    TemplatedParser(include::io::FDProvider::ptr fdProvider,
+    TemplatedParser(include::io::FDProvider::const_ptr fdProvider,
             boost::shared_ptr<T> container) :
                 fdProvider(fdProvider), container(container) {
     }
@@ -63,7 +63,7 @@ public:
 
 
 protected:
-    include::io::FDProvider::ptr fdProvider;
+    include::io::FDProvider::const_ptr fdProvider;
     boost::shared_ptr<T> container;
 
 };

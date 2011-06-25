@@ -25,7 +25,7 @@ namespace proto = google::protobuf;
 class MessageParser : public TemplatedParser <proto::Message>{
 
 public:
-    MessageParser(include::io::FDProvider::ptr fdProvider,
+    MessageParser(include::io::FDProvider::const_ptr fdProvider,
             boost::shared_ptr<proto::Message> message);
 
     virtual ~MessageParser();
