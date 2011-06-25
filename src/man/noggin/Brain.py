@@ -320,10 +320,10 @@ class Brain(object):
         for c in self.vision.fieldLines.corners:
             for p in c.possibilities:
                 if p > 14:
-                    self.corners[p-15].setVisualCorner(p)
+                    self.corners[p-15].setVisualCorner(c)
         # Check all FieldCorners and reset values if not in this frame.
         for i in range(len(self.corners)):
-            self.corners[i].updateVision(possibleCorners,self.vision.fieldLines.corners)
+            self.corners[i].updateVision()
 
         self.time = time.time()
 

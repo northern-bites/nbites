@@ -102,6 +102,7 @@ class FieldCorner(LocObject):
         self.angleX = 0
         self.angleY = 0
         self.certainOnFrame = False
+        self.on = False # ** # replace certainOnFrame with this
         # Marked true when corner was seen with high confidence.
         # Reset every frame in updateVision
 
@@ -113,7 +114,7 @@ class FieldCorner(LocObject):
         self.y = relativeLandmark[1]
 
     def updateVision(self):
-        if not certainOnFrame:
+        if not self.certainOnFrame:
             # Was not on frame; reset vision values
             self.framesOn = 0
             self.angleX = 0
@@ -121,11 +122,13 @@ class FieldCorner(LocObject):
             self.visDist = 0
             self.visBearing = 0
 
-        certainOnFrame = False
+        self.certainOnFrame = False
+        self.on = False
 
     def setVisualCorner(self, corner):
         self.framesOn += 1
         self.certainOnFrame = True
+        self.on = True
 
         # Update visual angle values.
         self.angleX = corner.angleX

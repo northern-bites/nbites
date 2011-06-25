@@ -125,7 +125,7 @@ def trackingBallLoc(tracker):
     """
     Periodically looks directly at ball.
     Otherwise, looks for nearest landmark, without losing sight
-    of the ball.
+    of the ball if boolean is set in headTracking.
     """
     # Make sure that head is inactive
     if tracker.firstFrame():
@@ -186,7 +186,6 @@ def trackingBallLoc(tracker):
 # ** # new method
 def passiveLoc(tracker):
     """
-    Assumes robot is in 'set'.
     Looks at nearby landmarks until sufficiently localized,
     Then looks to center of field for ball.
     """

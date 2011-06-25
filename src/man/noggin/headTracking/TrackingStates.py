@@ -1,6 +1,7 @@
 from man.motion import MotionConstants
 from . import TrackingConstants as constants
 from ..typeDefs.Landmarks import FieldObject
+from ..typeDefs.Landmarks import FieldCorner
 
 DEBUG = False
 
@@ -96,15 +97,23 @@ def trackLoc(tracker):
     TRACKER_FRAMES_STARE_THRESH frames.
     """
     # ** # more debugging code
+    print "locObjectList size:",len(tracker.locObjectList)
     for obj in tracker.locObjectList:
-        if obj is FieldCorner and obj.Id == 3:
-            tracker.target = obj
+        if obj isinstance FieldCorner:
+            print "FieldCorner:",obj.Id
+            if obj.Id == 3:
+                tracker.target = obj
+                print "Target set as corner for debugging"
+        elif obj isinstance FieldObject:
+            print "FieldObject:",obj.visionId
 
     # ** # debugging code
-    if tracker.target is FieldObject:
+    if tracker.target isinstance FieldCorner:
         print "target is corner:",tracker.target.Id
-    else:
+    elif tracker.target isinstance FieldObject:
         print "target is post:",tracker.target.visionId
+    else:
+        print "target is neither a post nor a corner... wtf??"
 
     # make sure head is inactive first
     if tracker.firstFrame():
@@ -185,3 +194,4 @@ def trackingBall(tracker):
         return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()
+

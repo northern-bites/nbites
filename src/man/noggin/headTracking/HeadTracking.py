@@ -24,50 +24,51 @@ class HeadTracking(FSA.FSA):
         self.setName('headTracking')
         self.decisionState = 'stopped'
 
-        self.currentHeadScan = None
+        self.currentHeadScan = None # ** # deprecated?
         self.headMove = None
 
         self.goalieActiveLoc = False
 
-        self.activePanDir = False
-        self.activeLocOn = False
-        self.activePanOut = False
-        self.activePanUp = False
+        self.activePanDir = False # ** # deprecated?
+        self.activeLocOn = False # ** # deprecated?
+        self.activePanOut = False # ** # deprecated?
+        self.activePanUp = False # ** # deprecated?
         # Enable safeBallTracking to always keep ball in frame while tracking
         self.safeBallTracking = False
-        self.isPreKickScanning = False
-        self.preActivePanHeads = None
+        self.isPreKickScanning = False # ** # deprecated?
+        self.preActivePanHeads = None # ** # deprecated? should probably stay
         self.locObjectList = []
         self.locObjectList.extend(self.brain.myFieldObjects)
-        self.locObjectList.extend.(self.brain.corners)
+        self.locObjectList.extend(self.brain.corners)
         self.helper = helper.HeadTrackingHelper(self)
 
-        self.lookDirection = None
+        self.lookDirection = None # ** # deprecated?
+        self.kickDirection = None
         self.target = self.brain.ball #default
         # target should either be ball or instance of FieldObject
 
 # ** # old method - should keep
     def stopHeadMoves(self):
-        """stop all head moves. In TrackingStates.py"""
+        """Stop all head moves."""
         self.switchTo('stop')
 
-# ** # new method
+# ** # new method - Used in player FSA
     def isStopped(self):
-        """Checks that all head moves have stopped"""
+        """Checks that all head moves have stopped."""
         return self.currentState == 'stopped'
 
 # ** # old method - should keep
     def setNeutralHead(self):
-        """executes sweet move to move head to neutral position.
-        Does not call stop head moves. In TrackingStates.py"""
+        """Executes sweet move to move head to neutral position."""
         self.switchTo('neutralHead')
 
 # ** # old method - kept unchanged
     def performHeadMove(self, headMove):
+        """Executes the given headMove, then stops."""
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
-# ** # old method (main input method)
+# ** # old method (main input method) - deprecated
     def trackBall(self):
         """automatically tracks the ball. scans for the ball if not in view"""
         self.target = self.brain.ball
@@ -76,7 +77,7 @@ class HeadTracking(FSA.FSA):
             and (not self.currentState == 'scanBall') ):
             self.switchTo('ballTracking')
 
-# ** # old method (main input method)
+# ** # old method (main input method) - deprecated
     def trackBallSpin(self):
         """automatically tracks the ball. spins if not in view"""
         self.target = self.brain.ball
@@ -147,7 +148,7 @@ class HeadTracking(FSA.FSA):
             self.lookDirection = direction
             self.switchTo('look')
 
-# ** # old method (main input method)
+# ** # old method (main input method) - deprecated
     def trackTarget(self, target):
         """automatically tracks landmark, scans for landmark if not in view
         only works if target has attribute locDist, framesOn, framesOff,x,y"""
@@ -159,13 +160,13 @@ class HeadTracking(FSA.FSA):
             not self.currentState == 'scanForTarget' ):
             self.switchTo('targetTracking')
 
-# ** # old method
+# ** # old method - deprecated (replaced by helper.lookToTargetCoords)
     def lookToTarget(self, target):
         """looks toward our best guess of landmark position based on loc"""
         self.target.height = 0
         self.switchTo('lookToPoint')
 
-# ** # old method
+# ** # old method - deprecated (replaced)
 #    def lookToPoint(self, goalX=0, goalY=0, goalHeight=0):
 #        """continuously looks toward our best guess of goal based on loc"""
 #        self.target.x = goalX
@@ -206,30 +207,67 @@ class HeadTracking(FSA.FSA):
 
 # ** # new method
     def readyLoc(self):
+        """
+        Should be called by all robots in 'ready' state.
+        The robot will cycle through nearby landmarks, looking at each
+        for a short time before moving on to the next. Will function
+        properly if the robot is in motion.
+        """
         self.target = None
         self.decisionState = 'trackLandmarks'
         self.switchTo('trackLandmarks')
 
 # ** # new method
     def trackBall(self):
+        """
+        Should be called by chaser.
+        The robot will switch between looking at the ball and
+        periodically looking at nearby landmarks. Landmark fitness
+        is determined by angular change from the ball to minimize
+        time between targets.
+        If safeBallTracking is True, robot will not lose sight of
+        ball while checking landmarks.
+        """
         self.target = self.brain.ball
         self.decisionState = 'trackingBallLoc'
         self.switchTo('trackingBall')
 
 # ** # new method
     def passiveLoc(self):
+        """
+        Should be called by all robots in 'set' state.
+        The robot will cycle through nearby landmarks, looking at each
+        for a short time before moving on to the next. Once localization
+        is good, the robot will look towards the center of the field.
+        NOTE: Should work if robot is moving, provided they stop before
+        becoming well localized. Should use 'readyLoc' state instead.
+        """
         self.target = None
         self.decisionState = 'passiveLoc'
         self.switchTo('passiveLoc')
 
 # ** # new method
     def activeLoc(self):
+        """
+        Should be called by all field players (offender, defender).
+        While localization is poor, the robot will cycle through nearby
+        landmarks, looking at each for a short time. When localization is
+        good enough, the robot will look to the ball for a short time.
+        NOTE: If localization stays good, the robot will stare at the ball.
+        """
         self.target = None
         self.decisionState = 'activeLoc'
         self.switchTo('activeLoc')
 
 # ** # new method
     def stareBall(self):
+        """
+        Should be called by chaser pre-kick.
+        The robot will track the ball and stare at it constantly.
+        NOTE: Currently, if ball is not visible at it's estimated
+        coordinates, robot will continue to stare there, and will not
+        begin scripted pans.
+        """
         self.target = self.brain.ball
         self.decisionState = 'trackingBall'
         self.switchTo('trackingBall')

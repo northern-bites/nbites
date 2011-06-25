@@ -91,10 +91,16 @@ def checkBall(tracker):
     If ball not on frame, look to current ball coordinates.
     If ball is on frame, track it via angles.
     """
+    # Stop head moves and set target.
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
         tracker.target = tracker.brain.ball
 
+    # Check for time in state.
+    if tracker.counter > TRACKER_BALL_STARE_THRESH:
+        return tracker.goLater(tracker.decisionState)
+
+    # Look to ball.
     if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.helper.lookToTargetAngles()
     elif tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -119,7 +125,7 @@ def kickWhiffCheck(tracker):
 
     if not tracker.brain.motion.isHeadActive():
         # Ball was not whiffed. Pan in kick direction.
-        return tracker.goLater(followKickPan)# ** # NOT WRITTEN YET # ** #
+        return tracker.goLater(followKickPan)
 
 def followKickPan(tracker):
     """
@@ -127,10 +133,24 @@ def followKickPan(tracker):
     from there. For straight kicks, ball was probably lost because it was
     moving too fast, so start far out and pan back. For back kicks, don't
     enter this state at all.
+    If ball is located, stare at it.
+    NOTE: Set tracker.kickDirection to constants.LOOK_UP, etc.
     """
-    # ** # Switch on kicks (noggin.kickDecider.kicks)
-    # ** # Execute appropriate pan.
-    pass
+    if tracker.firstFrame():
+        tracker.target = tracker.brain.ball
+        tracker.brain.motion.stopHeadMoves()
+        if tracker.kickDirection == constants.LOOK_LEFT:
+            pass # ** # Do left pan # ** #
+        elif tracker.kickDirection == constants.LOOK_RIGHT:
+            pass # ** # Do right pan # ** #
+        elif tracker.kickDirection == constants.LOOK_UP:
+            pass # ** # Do forward pan # ** #
+
+    # Check if ball was seen.
+    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        tracker.stareBall()
+
+    return tracker.stay()
 
 # ** # old method
 def panLeftOnce(tracker):
