@@ -13,6 +13,8 @@ TESTING = False
 def goalieSave(player):
 
     brain = player.brain
+    ball = brain.ball
+
     if player.firstFrame():
         brain.tracker.stopHeadMoves()
         player.stopWalking()
@@ -22,9 +24,10 @@ def goalieSave(player):
 
     if helper.shouldSave(player):
         brain.fallController.enableFallProtection(False)
+        print ball.endY
         if helper.shouldSaveRight(player):
             return player.goNow('saveRight')
-        elif helper.shouldSaveLeft(player):
+        if helper.shouldSaveLeft(player):
             return player.goNow('saveLeft')
         else:
             return player.goNow('saveCenter')
@@ -99,7 +102,7 @@ def holdRightSave(player):
         return player.stay()
     else:
         player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
-        return player.goLater('postDiveSave')
+        return player.goLater('rollOutRight')
 
     return player.stay()
 
@@ -107,8 +110,7 @@ def holdLeftSave(player):
     if helper.shouldHoldSave(player):
         return player.stay()
     else:
-        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
-        return player.goLater('postDiveSave')
+        return player.goLater('rollOutLeft')
 
     return player.stay()
 
@@ -122,26 +124,41 @@ def holdCenterSave(player):
 
 # POST SAVE
 
+def rollOutRight(player):
+    if player.counter == 5:
+        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
+        return player.goLater('postDiveSave')
+
+    return player.stay()
+
+def rollOutLeft(player):
+    if player.counter == 5:
+        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
+        return player.goLater('postDiveSave')
+
+    return player.stay()
+
 def postCenterSave(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
 
-    if player.counter == 10:
+    if player.counter == 25:
         return player.goLater('doneSaving')
 
     return player.stay()
 
 def postDiveSave(player):
     if player.firstFrame():
-        player.brain.fallController.enableFallProtection(True)
+        player.executeMove(SweetMoves.STAND_UP_BACK)
 
-    if player.counter == 10:
+    if player.counter == 50:
         return player.goLater('doneSaving')
 
     return player.stay()
 
 def doneSaving(player):
     if player.firstFrame():
+        player.brain.fallController.enableFallProtection(True)
         player.isSaving = False
 
     return player.stay()
