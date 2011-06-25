@@ -13,9 +13,9 @@ namespace memory {
 using boost::shared_ptr;
 using std::list;
 
-MVision::MVision(shared_ptr<Vision> v) :
-    vision(v) {
-    REGISTER_MOBJECT("Vision");
+MVision::MVision(MObject_ID id, std::string name, shared_ptr<Vision> v) :
+        MObject(id, name),
+        vision(v) {
 }
 
 MVision::~MVision() {

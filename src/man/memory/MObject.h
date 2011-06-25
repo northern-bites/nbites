@@ -13,11 +13,26 @@
 #pragma once
 
 #include <boost/shared_ptr.hpp>
-
-#define REGISTER_MOBJECT(x) {this->setName(x);}
+#include <string>
 
 namespace man {
 namespace memory {
+
+//IDs and names are tightly linked, be sure to modify both when needed!
+enum MObject_ID {
+    MVISION_ID = 1,
+    MMOTION_SENSORS_ID,
+    MVISION_SENSORS_ID,
+    MIMAGE_ID
+};
+
+static const std::string MObject_names[] = {
+            "unknown",
+            "Vision",
+            "MotionSensors",
+            "VisionSensors",
+            "Image"
+};
 
 class MObject {
 
@@ -25,18 +40,19 @@ public:
     typedef boost::shared_ptr<MObject> ptr;
     typedef boost::shared_ptr<const MObject> const_ptr;
 
-    MObject() : name("unknown"){
+    MObject(MObject_ID id, std::string name) : id(id), name(name) {
     }
     /**
      * method update - this should be overwritten by a method that sets all of
      * the proto message fields with values from its respective man counterpart
      */
     virtual void update() = 0;
-
-protected:
-    void setName(std::string new_name) { name = new_name; }
+    static const std::string* NameFromID(MObject_ID id) {
+        return &MObject_names[static_cast<int>(id)];
+    }
 
 private:
+    MObject_ID id;
     std::string name;
 
 };

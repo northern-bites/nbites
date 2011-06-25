@@ -23,8 +23,8 @@ public:
      * links to
      * @return
      */
-    MMotionSensors(boost::shared_ptr<Sensors> s);
-    ~MMotionSensors();
+    MMotionSensors(MObject_ID id, std::string name, boost::shared_ptr<Sensors> s);
+    virtual ~MMotionSensors();
     /**
      * Updates all the fields of the underlying proto::PSensors with values
      * from the Sensors object
