@@ -190,6 +190,8 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("x", &VisualCorner::getX)
         .def_readonly("y", &VisualCorner::getY)
         .def_readonly("possibilities", &VisualCorner::getIDs)
+        .def_readonly("angleX", &VisualCorner::getAngleXDeg)
+        .def_readonly("angleY", &VisualCorner::getAngleYDeg)
         ;
 
     // VisualCorner can return a vector of IDs from ConcreteCorner
