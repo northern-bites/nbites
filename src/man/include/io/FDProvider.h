@@ -31,7 +31,7 @@ public:
     virtual ~FDProvider() {};
     int getFileDescriptor() const { return file_descriptor; }
 
-    virtual std::string info() = 0;
+    virtual std::string debugInfo() = 0;
 
 protected:
     virtual void openFileDescriptor() = 0;

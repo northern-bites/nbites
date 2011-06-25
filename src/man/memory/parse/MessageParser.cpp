@@ -13,7 +13,6 @@ using namespace google::protobuf::io;
 using boost::shared_ptr;
 using namespace include::io;
 
-//TODO: use file descriptor providers
 MessageParser::MessageParser(FDProvider::ptr fdProvider,
         boost::shared_ptr<proto::Message> message) :
         TemplatedParser<proto::Message>(fdProvider, message)
@@ -30,7 +29,7 @@ MessageParser::~MessageParser() {
 
 void MessageParser::readHeader() {
 
-
+    coded_input->ReadLittleEndian32(&(log_header.log_id));
     cout << "Log ID: " << log_header.log_id << endl;
 
     coded_input->ReadLittleEndian64(&(log_header.birth_time));

@@ -53,12 +53,13 @@ void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
         } else {
             shared_ptr<ProtoMessage> mobject =
                     memory->getMutableProtoMessage(i->first);
-            if (mobject != NULL) {
+            if (mobject != shared_ptr<ProtoMessage>()) {
                 objectParserMap[i->first] = Parser::ptr(new MessageParser(i->second,
                         mobject));
             } else {
-                std::cout<<"Could not read valid log ID from file descriptor :"
-                        << i->first << i->second->info() << std::endl;
+                std::cout<<"Could not read valid log ID from file descriptor: "
+                        << "log ID: " << i->first << " "
+                        << i->second->debugInfo() << std::endl;
             }
         }
     }
