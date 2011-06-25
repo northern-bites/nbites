@@ -29,7 +29,6 @@ def shouldPositionForSave(team):
 
 def shouldChase(team):
     ball = team.brain.ball
-    print ball.heat
 
     if (ball.framesOff > 30):
         return False

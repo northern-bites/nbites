@@ -250,7 +250,7 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-50,-5,-90,123,-13,5),
                   (35,2,14,41),
                   0.6, 1, stiff.STANDUP_STIFFNESSES),
-                   #Rock back to squatting upright
+                  #squatting upright
 
                  ((75,10,-53,-74),
                   (-40,6,-61,124,-35,-6),
@@ -428,19 +428,27 @@ GOALIE_SQUAT_STAND_UP = ( ((0.0, 55.0, 0.0, -0),
                            ( -76.0, 10.0, -75.0, 125.0,  -10.7, -0),
                            ( -76.0, -10.0, -75.0, 125.0, -10.7, 0),
                            (0.0, -55.0, 0.0, 0),
-                           .5, 0, stiff.STANDUP_STIFFNESSES) ,
+                           .6, 0, stiff.STANDUP_STIFFNESSES) ,
 
                           ((0.0, 45.0, 0.0, -0),
                            ( -46.0, 4.0, -50.0, 125.0,  -45., -5),
                            ( -46.0, -4.0, -50.0, 125.0, -45., 5),
                            (0.0, -45.0, 0.0, 0),
-                           .5, 0, stiff.STANDUP_STIFFNESSES) ,
+                           .6, 0, stiff.STANDUP_STIFFNESSES) ,
 
+                          ((93,10,-90,-80),
+                           (0,0,-60,120,-60,0),
+                           (0,0,-60,120,-60,0),
+                           (93,-10,90,80),
+                           0.4,1, stiff.STANDUP_STIFFNESSES),
+                          #Pull knees together
+
+                          #stands up
                           (INITIAL_POS[0][0],
-                           (0.0,  5.0, -28., 52.13, -30.3, 0.0),
-                           (0.0,  -5.0, -28., 52.13, -30.3, 0.0),
+                           INITIAL_POS[0][1],
+                           INITIAL_POS[0][2],
                            INITIAL_POS[0][3],
-                           .75,0,stiff.STANDUP_STIFFNESSES),
+                           0.6,0, stiff.STANDUP_STIFFNESSES)
                           )
 
 GOALIE_SQUAT_STRAFE_RIGHT = ( ((-90., 90., 0., 0.),

@@ -41,6 +41,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.counterCenterSave = 0
 
         self.isSaving = False
+        self.shouldSaveCounter = 0
 
         #END GOALIE COUNTERS AND BOOLEANS
 

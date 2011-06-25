@@ -18,8 +18,11 @@ def shouldSave(player):
     ball = player.brain.ball
 
     if ball.dx > 2 :
+        player.shouldSaveCounter += 1
         print ball.dx
-        return True
+        if player.shouldSaveCounter > 1:
+            player.shouldSaveCounter = 0
+            return True
 
     return False
 
