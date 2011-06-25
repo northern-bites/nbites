@@ -25,6 +25,7 @@ class FDProvider {
 
 public:
     typedef boost::shared_ptr<FDProvider> ptr;
+    typedef boost::shared_ptr<const FDProvider> const_ptr;
 
 public:
     FDProvider() : file_descriptor(0) {}
