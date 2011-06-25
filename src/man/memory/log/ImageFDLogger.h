@@ -49,7 +49,7 @@ public:
      * Closes the file, which will flush the output buffer
      * to ensure that the file on disk is in sync with the buffer
      */
-    ~ImageFDLogger();
+    virtual ~ImageFDLogger();
 
     void write();
     const uint8_t* getCurrentImage() const;

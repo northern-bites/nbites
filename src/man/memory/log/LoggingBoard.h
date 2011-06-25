@@ -33,46 +33,27 @@ class LoggingBoard;
 }
 
 #include "memory/Memory.h"
+#include "memory/MemoryIOBoard.h"
 
 namespace man {
 namespace memory {
 namespace log {
 
-typedef std::pair< const MObject*, FDLogger*> ObjectLoggerPair;
-typedef std::pair< const MObject*, FDProvider*> ObjectFDProviderPair;
-
-typedef std::map< const MObject*, FDLogger*> ObjectLoggerMap;
-typedef std::map< const MObject*, FDProvider*> ObjectFDProviderMap;
-
-class LoggingBoard {
+class LoggingBoard : MemoryIOBoard<FDLogger> {
 
 public:
-    LoggingBoard(const Memory* _memory);
-    ~LoggingBoard();
-
-    static LoggingBoard* NullLoggingBoard();
+    LoggingBoard(const Memory* memory,
+                IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
+    virtual ~LoggingBoard() {};
 
     void log(const MObject* mobject);
 
-    const ImageFDLogger* getImageLogger(const MImage* mimage) const;
-    const FDLogger* getLogger(const MObject* mobject) const;
-
-protected:
-    LoggingBoard();
-
-private:
-    void initLoggingObjects();
-
-public:
-    static const std::string MVISION_PATH;
-    static const std::string MVISION_SENSORS_PATH;
-    static const std::string MMOTION_SENSORS_PATH;
-    static const std::string MIMAGE_PATH;
+    void newIOProvider(IOProvider::const_ptr ioProvider);
+//    const ImageFDLogger* getImageLogger(const MImage* mimage) const;
+//    const FDLogger* getLogger(const MObject* mobject) const;
 
 private:
     const Memory* memory;
-    ObjectLoggerMap objectLoggerMap;
-    ObjectFDProviderMap objectFDProviderMap;
 
 };
 }

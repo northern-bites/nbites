@@ -52,7 +52,7 @@ public:
      * to ensure that the file on disk is in sync with the buffer
      * @return
      */
-    ~CodedFileLogger();
+    virtual ~CodedFileLogger();
     void write();
     void writeHead();
 
