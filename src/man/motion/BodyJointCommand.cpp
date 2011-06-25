@@ -71,7 +71,6 @@ BodyJointCommand::BodyJointCommand
         }
     }
     delete bodyJoints;
-
 }
 
 BodyJointCommand::BodyJointCommand(const float time,

@@ -48,8 +48,8 @@ public:
     const crossID getID() const { return id; }
 
     virtual const std::string toString() const;
-    static const std::string getStringFromID(const crossID testID);
-    static const float getHeightFromGround(const crossID id);
+    static const std::string getStringFromID(const int testID);
+    static const float getHeightFromGround(const int id);
 
 // Static member variables
 public:

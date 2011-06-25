@@ -6,7 +6,7 @@
 
 class VisualFieldObject;
 
-#include "VisualLandmark.h"
+#include "VisualObject.h"
 #include "VisualDetection.h"
 #include "ConcreteFieldObject.h"
 #include "Utility.h"
@@ -16,10 +16,12 @@ class VisualFieldObject;
 #include "Blob.h"
 #include "stdio.h"
 
-class VisualFieldObject : public VisualLandmark<fieldObjectID> ,
-                          public VisualDetection {
+class VisualFieldObject : public VisualObject {
 
 public:
+    // ConcreteType provided by this VisualObject
+    typedef ConcreteFieldObject ConcreteType;
+
     // Construcotrs
     VisualFieldObject(const int _x, const int _y, const float _distance,
                       const float _bearing);
@@ -82,12 +84,13 @@ public:
     const point<float> getFieldLocation() const { return fieldLocation; }
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
-	const float getFieldX2() const { return fieldLocation2.x; }
-	const float getFieldY2() const { return fieldLocation2.y; }
-    const std::list <const ConcreteFieldObject *> * getPossibleFieldObjects()
-		const { return possibleFieldObjects; }
+    const float getFieldX2() const { return fieldLocation2.x; }
+    const float getFieldY2() const { return fieldLocation2.y; }
+    const std::list<const ConcreteFieldObject*> * getPossibilities() const {
+        return possibleFieldObjects;
+    }
 
-	virtual const bool hasPositiveID();
+    virtual const bool hasPositiveID();
     const bool isOn() const{ return on; }
     int getFramesOn() { return framesOn; }
     int getFramesOff(){ return framesOff; }

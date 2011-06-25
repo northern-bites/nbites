@@ -97,11 +97,8 @@ public:
     // post recognition routines
     int classifyByCrossbar(Blob b);
     int classifyByOtherRuns(int left, int right, int height);
-	int classifyByOuterL(Blob post, boost::shared_ptr<VisualLine> line1,
-						 boost::shared_ptr<VisualLine> line2);
-	int classifyByInnerL(Blob post, int x, int y, bool right,
-						 boost::shared_ptr<VisualLine> line1,
-						 boost::shared_ptr<VisualLine> line2);
+	int classifyByOuterL(Blob post, VisualCorner & corner);
+	int classifyByInnerL(Blob post, VisualCorner  & corner);
     int classifyByTCorner(Blob b);
     int classifyByCheckingCorners(Blob b);
     int cornerClassifier(float diff, float dist, int x, int y,int class1,

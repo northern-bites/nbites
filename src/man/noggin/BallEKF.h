@@ -18,8 +18,10 @@
  * @brief Class for tracking of ball position and velocity.  Extends the abstract
  * EKF class.
  */
-class BallEKF : public EKF<RangeBearingMeasurement, MotionModel,
-                           BALL_EKF_DIMENSION, BALL_MEASUREMENT_DIMENSION>
+class BallEKF : public ekf::EKF<RangeBearingMeasurement,
+                                MotionModel,
+                                ekf::ball_ekf_dimension,
+                                ekf::dist_bearing_meas_dim>
 {
 public:
     // Constructors & Destructors
@@ -127,7 +129,7 @@ public:
 private:
     // Core Functions
     virtual StateVector associateTimeUpdate(MotionModel u_k);
-    virtual void incorporateMeasurement(RangeBearingMeasurement z,
+    virtual void incorporateMeasurement(const RangeBearingMeasurement& z,
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);

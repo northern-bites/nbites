@@ -283,9 +283,9 @@ PAN_UP = (
     ((0.,-40.),0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.,-40.),0.3, 1, stiff.LOW_HEAD_STIFFNESSES))
 
-PAN_LEFT_HEADS = ( 65.0, -20.0)
+PAN_LEFT_HEADS = ( 65.0, -30.0)
 
-PAN_RIGHT_HEADS = ( -65.0, -20.0)
+PAN_RIGHT_HEADS = ( -65.0, -30.0)
 
 PAN_UP_HEADS = ( 0.0, -30.0)
 

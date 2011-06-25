@@ -5,14 +5,14 @@
 
 class ConcreteLandmark {
 public:
-    ConcreteLandmark(const float _fieldX, const float _fieldY);
+    ConcreteLandmark(const float& _fieldX, const float& _fieldY);
     ConcreteLandmark(const ConcreteLandmark& other);
     virtual ~ConcreteLandmark();
 
     virtual const std::string toString() const = 0;
 
-    const float getFieldX() const { return fieldX; }
-    const float getFieldY() const { return fieldY; }
+    float getFieldX()     const { return fieldX;     }
+    float getFieldY()     const { return fieldY;     }
 
 private:
     //  point <const float> fieldLocation;

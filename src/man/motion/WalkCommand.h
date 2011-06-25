@@ -25,6 +25,8 @@
 #ifndef _WalkCommand_h_DEFINED
 #define _WalkCommand_h_DEFINED
 
+#include <boost/shared_ptr.hpp>
+
 // Ours
 #include "MotionConstants.h"
 #include "MotionCommand.h"
@@ -32,6 +34,8 @@
 class WalkCommand : public MotionCommand
 {
 public:
+    typedef boost::shared_ptr<WalkCommand> ptr;
+
     WalkCommand(float _x_mms, float _y_mms, float _theta_rads)
         : MotionCommand(MotionConstants::WALK),
           x_mms(_x_mms),y_mms(_y_mms),theta_rads(_theta_rads)

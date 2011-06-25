@@ -76,6 +76,7 @@ void Blob::merge(Blob other) {
     value = max(leftBottom.y, other.leftBottom.y);
     leftBottom.y = value;
     rightBottom.y = value;
+	pixels += other.pixels;
 }
 
 /* Test if two blobs are vertically aligned.  Potentially useful for

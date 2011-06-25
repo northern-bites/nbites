@@ -1,11 +1,15 @@
 #ifndef AbstractGait_h_DEFINED
 #define AbstractGait_h_DEFINED
+
 #include <string>
 
+#include "AbstractCommand.h"
 #include "GaitConstants.h"
 
-class AbstractGait {
+class AbstractGait : public AbstractCommand {
  public:
+    typedef boost::shared_ptr<AbstractGait> ptr;
+
     AbstractGait();
     virtual ~AbstractGait();
     std::string toString() const ;

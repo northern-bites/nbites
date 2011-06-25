@@ -429,7 +429,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                         j--;
                     }
                 }
-                if (currentRun > 2) {
+                if (currentRun > 1) {
                     orange->newRun(column, j, currentRun);
                 }
                 greens += currentRun;
@@ -1092,7 +1092,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 dist = 0.0;
             }
             objPtr->setDistance(dist);
-			if (dist < MIDFIELD_X) {
+			if (dist < MIDFIELD_X + 150) {
 				context->setSameHalf();
 			}
 		} else { // don't know what object it is
@@ -1125,7 +1125,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
                                     float distw, float poseDist, int bottom) {
     float dist = 0.0f;
-	if (poseDist < 200.0f) {
+	if (poseDist < 200.0f && poseDist > 0 && bottom <= IMAGE_HEIGHT - 5) {
 		return poseDist;
 	}
     switch (cert) {

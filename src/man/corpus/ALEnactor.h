@@ -22,6 +22,7 @@
 #define _ALEnactor_h_DEFINED
 
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 #include "alcommon/albroker.h"
 #include "alcore/alerror.h"
 #include "alcore/alptr.h"
@@ -37,6 +38,8 @@
 #include "MotionSwitchboard.h"
 #include "Transcriber.h"
 
+using namespace std;
+
 class ALEnactor : public ThreadedMotionEnactor {
 public:
     ALEnactor(boost::shared_ptr<Sensors> s,
@@ -51,9 +54,10 @@ public:
             almotion = broker->getMotionProxy();
             almotion_link = true;
         } catch(AL::ALError &e){
-            std::cout << "Failed to initialize proxy to ALMotion!!!" << std::endl;
-            std::cout << "Please turn on 'motion' in autoload.ini and restart naoqi"
-                 << std::endl;
+            std::cout << "Failed to initialize "
+                      << "proxy to ALMotion!!!" << std::endl;
+            std::cout << "Please turn on 'motion'"
+                      <<" in autoload.ini and restart naoqi" << std::endl;
             almotion_link = false;
         }
 

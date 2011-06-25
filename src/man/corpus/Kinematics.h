@@ -25,7 +25,6 @@
 #include "NBMath.h"
 #include "NBMatrixMath.h"
 #include "CoordFrame.h"
-#include "JointMassConstants.h"
 
 namespace Kinematics {
 
@@ -39,11 +38,11 @@ namespace Kinematics {
         RANKLE_CHAIN  // (same)
     };
 
-	// Interpolation types
-	enum InterpolationType {
-		INTERPOLATION_SMOOTH = 0,
-		INTERPOLATION_LINEAR
-	};
+    // Interpolation types
+    enum InterpolationType {
+	INTERPOLATION_SMOOTH = 0,
+	INTERPOLATION_LINEAR
+    };
 
     /// Joint Name constants ///
     enum JointNames {
@@ -76,36 +75,18 @@ namespace Kinematics {
     };
     static const unsigned int FIRST_HEAD_JOINT = HEAD_YAW;
 
-    /**
-     * (Deprecated)
-    enum Motion_IntFlag {
-        UNINT_INTR_CMD, // Un-interruptable interrupter command
-        INT_INTR_CMD,   // Interruptable interupter command
-        UNINT_CMD,      // Un-interruptable command
-        INT_CMD         // Interruptable command
-    };
-
-    enum SupportLeg{
-        BOTH_LEGS = 0,
-        RIGHT_LEG,
-        LEFT_LEG
-    };
-    **/
-
     static const unsigned int HEAD_JOINTS = 2;
     static const unsigned int ARM_JOINTS = 4;
     static const unsigned int LEG_JOINTS = 6;
     static const unsigned int NUM_CHAINS = 5;
-	static const unsigned int NUM_BODY_CHAINS = 4;
+    static const unsigned int NUM_BODY_CHAINS = 4;
 
     static const unsigned int NUM_JOINTS = HEAD_JOINTS + ARM_JOINTS*2 +
         LEG_JOINTS*2;
-    // includes arm pieces, which don't have a motor
-	static const unsigned int NUM_MASS_PIECES = NUM_JOINTS + 2;
     static const unsigned int NUM_BODY_JOINTS = ARM_JOINTS*2 + LEG_JOINTS*2;
     static const unsigned int chain_lengths[NUM_CHAINS] = {2, 4, 6, 6, 4};
-	static const unsigned int chain_first_joint[NUM_CHAINS] = {0,2,6,12,18};
-	static const unsigned int chain_last_joint[NUM_CHAINS] = {1,5,11,17,21};
+    static const unsigned int chain_first_joint[NUM_CHAINS] = {0,2,6,12,18};
+    static const unsigned int chain_last_joint[NUM_CHAINS] = {1,5,11,17,21};
 
     static const std::string CHAIN_STRINGS[NUM_CHAINS] =
     { "Head",
@@ -147,8 +128,8 @@ namespace Kinematics {
     static const float UPPER_ARM_LENGTH = 105.0f;
     static const float LOWER_ARM_LENGTH = 55.95f;
     static const float SHOULDER_OFFSET_Z = 100.0f;
-	static const float HAND_OFFSET_X = 57.75f;
-	static const float HAND_OFFSET_Z = 12.31f;
+    static const float HAND_OFFSET_X = 57.75f;
+    static const float HAND_OFFSET_Z = 12.31f;
     static const float THIGH_LENGTH = 100.0f;
     static const float TIBIA_LENGTH = 102.90f;
     static const float NECK_OFFSET_Z = 126.5f;
@@ -321,28 +302,28 @@ namespace Kinematics {
     //Base transforms to get from body center to beg. of chain
     static const boost::numeric::ublas::matrix <float> HEAD_BASE_TRANSFORMS[1]
     = { CoordFrame4D::translation4D( 0.0f,
-                       0.0f,
-                       NECK_OFFSET_Z ) };
+				     0.0f,
+				     NECK_OFFSET_Z ) };
 
     static const boost::numeric::ublas::matrix <float> LEFT_ARM_BASE_TRANSFORMS[1]
     = { CoordFrame4D::translation4D( 0.0f,
-                       SHOULDER_OFFSET_Y,
-                       SHOULDER_OFFSET_Z ) };
+				     SHOULDER_OFFSET_Y,
+				     SHOULDER_OFFSET_Z ) };
 
     static const boost::numeric::ublas::matrix <float> LEFT_LEG_BASE_TRANSFORMS[1]
     ={ CoordFrame4D::translation4D( 0.0f,
-                      HIP_OFFSET_Y,
-                      -HIP_OFFSET_Z ) };
+				    HIP_OFFSET_Y,
+				    -HIP_OFFSET_Z ) };
 
     static const boost::numeric::ublas::matrix <float> RIGHT_LEG_BASE_TRANSFORMS[1]
     ={ CoordFrame4D::translation4D( 0.0f,
-                      -HIP_OFFSET_Y,
-                      -HIP_OFFSET_Z ) };
+				    -HIP_OFFSET_Y,
+				    -HIP_OFFSET_Z ) };
 
     static const boost::numeric::ublas::matrix <float> RIGHT_ARM_BASE_TRANSFORMS[1]
     ={ CoordFrame4D::translation4D( 0.0f,
-                      -SHOULDER_OFFSET_Y,
-                      SHOULDER_OFFSET_Z ) };
+				    -SHOULDER_OFFSET_Y,
+				    SHOULDER_OFFSET_Z ) };
 
     static const boost::numeric::ublas::matrix <float> * BASE_TRANSFORMS[NUM_CHAINS] =
     { &HEAD_BASE_TRANSFORMS[0],
@@ -365,19 +346,19 @@ namespace Kinematics {
     = { CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS, M_PI_FLOAT),
         CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -M_PI_FLOAT/2),
         CoordFrame4D::translation4D(0.0f,
-                      0.0f,
-                      -FOOT_HEIGHT) };
+				    0.0f,
+				    -FOOT_HEIGHT) };
 
     static const boost::numeric::ublas::matrix <float> RIGHT_LEG_END_TRANSFORMS[3] =
-        { CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS, M_PI_FLOAT),
-        CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -M_PI_FLOAT/2),
-        CoordFrame4D::translation4D(0.0f,
-                      0.0f,
-                      -FOOT_HEIGHT) };
+    { CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS, M_PI_FLOAT),
+      CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, -M_PI_FLOAT/2),
+      CoordFrame4D::translation4D(0.0f,
+				  0.0f,
+				  -FOOT_HEIGHT) };
 
     static const boost::numeric::ublas::matrix <float> RIGHT_ARM_END_TRANSFORMS[2] =
-        { CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS, -M_PI_FLOAT/2),
-        CoordFrame4D::translation4D(UPPER_ARM_LENGTH + LOWER_ARM_LENGTH,0.0f,0.0f) };
+    { CoordFrame4D::rotation4D(CoordFrame4D::Z_AXIS, -M_PI_FLOAT/2),
+      CoordFrame4D::translation4D(UPPER_ARM_LENGTH + LOWER_ARM_LENGTH,0.0f,0.0f) };
 
 
     static const boost::numeric::ublas::matrix <float> * END_TRANSFORMS[NUM_CHAINS] =

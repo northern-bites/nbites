@@ -3,15 +3,18 @@
 #include "ZmpAccEKF.h"
 #include "BasicWorldConstants.h"
 using namespace boost::numeric;
+using namespace ekf;
 
-const int ZmpAccEKF::num_dimensions = ACC_NUM_DIMENSIONS;
 const float ZmpAccEKF::beta = 0.2f;
 const float ZmpAccEKF::gamma = .2f;
 const float ZmpAccEKF::variance  = 0.22f;
 //const float ZmpAccEKF::variance  = 100.00f;
 
 ZmpAccEKF::ZmpAccEKF()
-    : EKF<AccelMeasurement,int, num_dimensions, num_dimensions>(beta, gamma)
+    : EKF<AccelMeasurement,
+          int,
+          acc_num_dimensions,
+          acc_num_dimensions>(beta, gamma)
 {
     // ones on the diagonal
     A_k(0,0) = 1.0;
@@ -27,8 +30,6 @@ ZmpAccEKF::ZmpAccEKF()
     P_k(0,0) = -GRAVITY_mss;
     P_k(1,1) = -GRAVITY_mss;
     P_k(2,2) = -GRAVITY_mss;
-
-
 }
 
 ZmpAccEKF::~ZmpAccEKF()

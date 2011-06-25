@@ -361,6 +361,7 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper,
     int width = IMAGE_WIDTH;
     int height = IMAGE_HEIGHT;
     unsigned char pixel;
+	int hor = horizonAt(x);
     // go until we hit enough bad pixels or are at a screen edge
     for ( ; x > -1 && y > -1 && x < width && y < height && bad < stopper; ) {
         //cout << "Vert scan " << x << " " << y << endl;
@@ -370,12 +371,18 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper,
         else
             pixel = thresh->getExpandedColor(x, y, c);
         if (Utility::colorsEqual(pixel, c)) {
-            good++;
-            bad--;
-            run++;
-            if (run > 1) {
-                scan.x = x;
-                scan.y = y;
+			// when we're below the horizon ignore bluegreen
+			if (c == BLUE_BIT && dir == 1 && y > hor && Utility::isGreen(pixel)) {
+				bad++;
+				run = 0;
+			} else {
+				good++;
+				bad--;
+				run++;
+				if (run > 1) {
+					scan.x = x;
+					scan.y = y;
+				}
             }
         } else {
             bad++;
@@ -627,42 +634,42 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
     }
 
     int qs = pickNth(values, WHICH, NUMSCANS);
-  if (qs == 0) {
-	  // reset in case our edge is too far out
-	  int qx = left.x + shortSpan;
-	  int qy = yProject(left.x, right.y, qx);
-	  for (int i = 0; i < NUMSCANS; i++) {
-		  bool found = false;
-		  values[i] = 0;
-		  int tempx = qx;
-		  int tempy = qy;
-		  while (!found) {
-			  if (Utility::colorsEqual(color,
-									   thresh->getThresholded(tempy, tempx))) {
-				  found = true;
-			  } else {
-				  values[i]++;
-			  }
-			  tempy -=dir;
-			  tempx = xProject(tempx, tempy - dir, tempy);
-			  if (tempx < 0 || tempx >= IMAGE_WIDTH || tempy < 0 ||
-															   tempy >= IMAGE_HEIGHT ||
-					  values[i] > 15) {
-				  found = true;
-			  }
-		  }
-		  // set up the next scan
-		  qx += shortSpan;
-		  qy = yProject(left.x, left.y, qx);
-	  }
-	  qs = pickNth(values, 2, NUMSCANS);
-	  if (qs > 0) {
-		  if (CORRECT) {
-			  cout << "Squeezing horizontally" << qs << " " << dir << endl;
-		  }
-	  }
-	  dir = -dir;
-  }
+	if (qs == 0) {
+		// reset in case our edge is too far out
+		int qx = left.x + shortSpan;
+		int qy = yProject(left.x, right.y, qx);
+		for (int i = 0; i < NUMSCANS; i++) {
+			bool found = false;
+			values[i] = 0;
+			int tempx = qx;
+			int tempy = qy;
+			while (!found) {
+				if (Utility::colorsEqual(color,
+										 thresh->getThresholded(tempy, tempx))) {
+					found = true;
+				} else {
+					values[i]++;
+				}
+				tempy -=dir;
+				tempx = xProject(tempx, tempy - dir, tempy);
+				if (tempx < 0 || tempx >= IMAGE_WIDTH || tempy < 0 ||
+																 tempy >= IMAGE_HEIGHT ||
+						values[i] > 15) {
+					found = true;
+				}
+			}
+			// set up the next scan
+			qx += shortSpan;
+			qy = yProject(left.x, left.y, qx);
+		}
+		qs = pickNth(values, 2, NUMSCANS);
+		if (qs > 0) {
+			if (CORRECT) {
+				cout << "Squeezing horizontally" << qs << " " << dir << endl;
+			}
+		}
+		dir = -dir;
+	}
     // reset the edge
     int te = left.y;
     left.y = left.y + dir * qs;
@@ -1307,11 +1314,10 @@ int ObjectFragments::classifyByCrossbar(Blob b)
 
 /*
  */
-int ObjectFragments::classifyByInnerL(Blob post, int x, int y, bool right,
-									  boost::shared_ptr<VisualLine> line1,
-									  boost::shared_ptr<VisualLine> line2) {
-	//int x = corner->getX();
-	//int y = corner->getY();
+int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
+	int x = corner.getX();
+	int y = corner.getY();
+	bool right = corner.doesItPointRight();
 	float distant = 0;
 	// check if this corner is at the edge
 	const vector < boost::shared_ptr<VisualLine> > * lines =
@@ -1322,12 +1328,20 @@ int ObjectFragments::classifyByInnerL(Blob post, int x, int y, bool right,
 		distant = max((*i)->getDistance(), distant);
 	}
 	// check that the post isn't too far away
-	if (distant > line1->getDistance() &&
-		distant > line2->getDistance()) {
+	if (distant > corner.getLine1()->getDistance() &&
+		distant > corner.getLine2()->getDistance()) {
 		if (x > post.getLeft()) {
 			return LEFT;
 		} else {
 			return RIGHT;
+		}
+	}
+	estimate e = vision->pose->pixEstimate(x, y, 0.0);
+	if (e.dist < FIELD_WHITE_HEIGHT / 2) {
+		if (x > post.getLeft()) {
+			return RIGHT;
+		} else {
+			return LEFT;
 		}
 	}
 
@@ -1336,7 +1350,6 @@ int ObjectFragments::classifyByInnerL(Blob post, int x, int y, bool right,
 		// roughly how far away is it?
 		float diff = realDistance(x, y, post.getLeftBottomX(),
 								  post.getLeftBottomY());
-		estimate e = vision->pose->pixEstimate(x, y, 0.0);
 		// if it is in the right position we can figure out which post
 		if (POSTLOGIC) {
 			cout << "Checking a corner " << x << " " <<
@@ -1380,42 +1393,68 @@ int ObjectFragments::classifyByInnerL(Blob post, int x, int y, bool right,
 /* Try to use Outer L corners to decide which post we're looking at.
  */
 
-int ObjectFragments::classifyByOuterL(Blob post,
-									  boost::shared_ptr<VisualLine> line1,
-									  boost::shared_ptr<VisualLine> line2) {
+int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 	// Determine which line of the corner is the shortest
-	const point<int> end1 = line1->getEndpoint();
-	const point<int> end2 = line1->getStartpoint();
+	const point<int> end1 = corner.getLine1()->getEndpoint();
+	const point<int> end2 = corner.getLine1()->getStartpoint();
 	float l1 = realDistance(end1.x, end1.y, end2.x, end2.y);
-	const point<int> endl1 = line2->getEndpoint();
-	const point<int> endl2 = line2->getStartpoint();
+	const point<int> endl1 = corner.getLine2()->getEndpoint();
+	const point<int> endl2 = corner.getLine2()->getStartpoint();
 	float l2 = realDistance(endl1.x, endl1.y, endl2.x, endl2.y);
+	int x = corner.getX();
+	float dist = realDistance(post.getLeft(), post.getBottom(),
+							  corner.getX(), corner.getY());
+	// sometimes side Ts turn up as Ls
+	// annika/yellowgoal/63.FRM
+	if (dist > 250 || (l1 > 150 && l2 > 150)) {
+		return NOPOST;
+	}
 	// if one line is long enough we can determine its relationship
-	if (l1 > l2 && l1 > GOALBOX_DEPTH + 20.0f) {
-		if (end1.y < end2.y) {
-			if (end1.x > post.getRight()) {
+	if (POSTLOGIC) {
+		cout << "Checking outer L corner " << l1 << " " << l2 << endl;
+	}
+	if (abs(corner.getOrientation()) < 90) {
+		if (l1 > l2 && l1 > GOALBOX_DEPTH + 20.0f) {
+			if (endl1.y < end2.y) {
+				if (endl1.x > post.getRight()) {
+					return RIGHT;
+				} else {
+					return LEFT;
+				}
+			} else if (endl2.x > post.getRight()) {
 				return RIGHT;
 			} else {
 				return LEFT;
 			}
-		} else if (end2.x > post.getRight()) {
-			return RIGHT;
-		} else {
-			return LEFT;
+		} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 20.0f) {
+			if (end1.y < end2.y) {
+				if (end1.x > post.getRight()) {
+					return RIGHT;
+				} else {
+					return LEFT;
+				}
+			} else if (end2.x > post.getRight()) {
+				return RIGHT;
+			} else {
+				return LEFT;
+			}
 		}
-	} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 20.0f) {
-		if (endl1.y < endl2.y) {
-			if (endl1.x > post.getRight()) {
+	}
+	// perhaps it is a field corner
+	if (post.getBottom() - corner.getY() > 20 &&
+		corner.getDistance() < MIDFIELD_X) {
+		if (POSTLOGIC) {
+			cout << "Checking for field corner" << endl;
+		}
+		if (x > post.getLeft() + post.width() / 2) {
+			if (corner.doesItPointRight()) {
 				return RIGHT;
-			} else {
-				return LEFT;
 			}
-		} else if (endl2.x > post.getRight()) {
-			return RIGHT;
-		} else {
+		} else if (corner.doesItPointLeft()) {
 			return LEFT;
 		}
 	}
+
 	return NOPOST;
 }
 
@@ -1530,14 +1569,12 @@ int ObjectFragments::classifyByCheckingCorners(Blob post)
          k != corners->end(); k++) {
         // we already processed T Corners so skip them, skip others too
         if (k->getShape() == INNER_L) {
-            classification = classifyByInnerL(post, k->getX(), k->getY(),
-											  k->doesItPointRight(),
-											  k->getLine1(), k->getLine2());
+            classification = classifyByInnerL(post, *k);
 			if (classification != NOPOST) {
 				return classification;
 			}
         } else if (k->getShape() == OUTER_L) {
-			classification = classifyByOuterL(post, k->getLine1(), k->getLine2());
+			classification = classifyByOuterL(post, *k);
 			if (classification != NOPOST) {
 				return classification;
 			}
@@ -2139,6 +2176,9 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
         }
         return;
     }
+	if (PRINTOBJS) {
+		printBlob(pole);
+	}
     lookForSecondPost(pole, post, left, right, mid, c);
 }
 
@@ -2364,9 +2404,12 @@ bool ObjectFragments::postBigEnough(Blob b) {
         if (b.getTop() > 5) {
             return false;
         }
-        /*if (b.width() < 20) {
+        if (color == BLUE_BIT && b.width() < 20) {
             return false;
-            }*/
+		}
+		if (b.height() < MIN_GOAL_HEIGHT / 2) {
+			return false;
+		}
     }
     return true;
 }
