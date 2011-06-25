@@ -17,8 +17,9 @@ DEBUG = False
 def shouldSave(player):
     ball = player.brain.ball
 
-    if ball.dx > 2 and ball.heat < 10:
+    if (ball.dx > 2 and ball.heat == 0):
         player.shouldSaveCounter += 1
+        print ball.heat
         print ball.dx
         if player.shouldSaveCounter > 1:
             player.shouldSaveCounter = 0

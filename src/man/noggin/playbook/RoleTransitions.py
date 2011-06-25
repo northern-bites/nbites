@@ -16,6 +16,7 @@ def shouldPositionForSave(team):
         team.shouldSaveCounter += 1
         if team.shouldSaveCounter > 1:
             team.brain.speech.say("Save")
+            print ball.heat
             team.shouldChaseCounter = 0
             team.shouldStopChaseCounter = 0
             team.shouldPositionCenterCounter = 0
