@@ -128,11 +128,11 @@ class GoTeam:
         if PBConstants.DEBUG_DET_CHASER:
             self.printf("chaser det: me == #%g"% self.brain.my.playerNumber)
 
-        #save processing time and skip the rest if we have the ball
+        # save processing time and skip the rest if we have the ball
         if self.brain.player.inKickingState and play.isChaser():
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf("I should Chase")
-            return chaser_mate
+            return self.me
 
         # scroll through the teammates
         for mate in self.activeFieldPlayers:
@@ -207,14 +207,14 @@ class GoTeam:
                 (PBConstants.STOP_CALLING_THRESH) and # + .35 * chaseTimeScale) and
                 mate.isTeammateRole(PBConstants.CHASER)))
 
-    def shouldListen(self, mate, chaser_mate): #, chaseTimeScale):
+    def shouldListen(self, chaser_mate, mate): #, chaseTimeScale):
         """Decides if mate should listen to the chaser_mate after calling off"""
         # mate = A, chaser_mate = B.
         # A will relinquish chaser to chaser_mate if:
         # chaseTime(B) < chaseTime(A) - m
-        # A is higher robot that is already chaser.
-        return (chaser_mate.chaseTime < mate.chaseTime -
-                (PBConstants.LISTEN_THRESH)) # + .45 * chaseTimeScale))
+        # A is higher robot that has decided to be chaser.
+        return (chaser_mate.chaseTime < (mate.chaseTime -
+                (PBConstants.LISTEN_THRESH))) # + .45 * chaseTimeScale))
 
     def getLeastWeightPosition(self, positions, mates = None):
         """Gets the position for the robot such that the distance

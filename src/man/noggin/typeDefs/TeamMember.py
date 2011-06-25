@@ -14,10 +14,10 @@ DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
-DEBUG_DETERMINE_CHASE_TIME = True
+DEBUG_DETERMINE_CHASE_TIME = False
 SEC_TO_MILLIS = 1000.0
 CHASE_SPEED = 15.00 #cm/sec
-BALL_OFF_PENALTY = 10.
+BALL_OFF_PENALTY = 1000.             # Big penalty for not seeing the ball.
 BALL_GOAL_LINE_PENALTY = 10.
 # penalty is: (ball_dist*heading)/scale
 PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
@@ -137,9 +137,11 @@ class TeamMember(RobotLocation):
 
     def determineChaseTime(self):
         """
-        Metric for deciding chaser.
-        Attempt to define a time to get to the ball.
-        Can give bonuses or penalties in certain situations.
+        Attempt to define a time in seconds to get to the ball.
+        Can give penalties in certain situations.
+        @ return: returns a time in milliseconds with penalties.
+        Note: Don't give bonuses. It can result in negative chase times
+              which can screw up the math later on. --Wils (06/25/11)
         """
         t = 0.0
 
@@ -151,22 +153,23 @@ class TeamMember(RobotLocation):
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time base is " + str(t))
 
-        # Give a bonus for seeing the ball
+        # Give a penalty for not seeing the ball
         if not self.brain.ball.on:
             t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after ball on bonus " + str(t))
 
-        # Give a bonus for lining up along the ball-goal line
+        # Give penalties for not lining up along the ball-goal line
         lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
         rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
-        # ball is lined up
+        # TODO: scale these by how far off we are??
+        # ball is not lined up
         if (self.ballBearing > lpb or rpb > self.ballBearing):
             t += BALL_GOAL_LINE_PENALTY
-            # we are lined up on that.
-            if (lpb < 0 or rpb > 0):
-                t += BALL_GOAL_LINE_PENALTY
+        # we are not lined up
+        if (lpb < 0 or rpb > 0):
+            t += BALL_GOAL_LINE_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after ball-goal-line bonus " +str(t))
