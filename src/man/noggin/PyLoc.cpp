@@ -65,20 +65,24 @@ public:
 
     // Ball localization
     // Global Coordinates
-    const float getBallXEst() const { return ballEKF->getXEst(); }
-    const float getBallYEst() const { return ballEKF->getYEst(); }
-    const float getXVelocityEst() const { return ballEKF->getXVelocityEst(); }
-    const float getYVelocityEst() const { return ballEKF->getYVelocityEst(); }
+    const float getBallXEst() const { return ballEKF->getGlobalX(); }
+    const float getBallYEst() const { return ballEKF->getGlobalY(); }
+    const float getXVelocityEst() const {
+        return ballEKF->getGlobalXVelocity();
+    }
+    const float getYVelocityEst() const {
+        return ballEKF->getGlobalYVelocity();
+    }
 
     // Ball Uncertainty
     // Global Coordinates
-    const float getBallXUncert() const { return ballEKF->getXUncert(); }
-    const float getBallYUncert() const { return ballEKF->getYUncert(); }
+    const float getBallXUncert() const { return ballEKF->getGlobalXUncert(); }
+    const float getBallYUncert() const { return ballEKF->getGlobalYUncert(); }
     const float getXVelocityUncert() const {
-        return ballEKF->getXVelocityUncert();
+        return ballEKF->getGlobalXVelocityUncert();
     }
     const float getYVelocityUncert() const {
-        return ballEKF->getYVelocityUncert();
+        return ballEKF->getGlobalYVelocityUncert();
     }
 
     // Odometry

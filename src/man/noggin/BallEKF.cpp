@@ -48,17 +48,18 @@ static const bool USE_BALL_JUMP_RESET = true;
 
 BallEKF::BallEKF()
     : EKF<RangeBearingMeasurement, MotionModel, ball_ekf_dimension,
-          dist_bearing_meas_dim>(BETA_BALL,GAMMA_BALL)
+          dist_bearing_meas_dim>(BETA_BALL,GAMMA_BALL), robotPose(),
+      lastUpdateTime(0), frameLength(0.0f)
 {
     // ones on the diagonal
-    A_k(0,0) = 1.0;
-    A_k(1,1) = 1.0;
+    A_k(x_index,x_index) = 1.0;
+    A_k(y_index,y_index) = 1.0;
     A_k(2,2) = 1.0;
     A_k(3,3) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    A_k(0,2) = 1.0f / ASSUMED_FPS;
-    A_k(1,3) = 1.0f / ASSUMED_FPS;
+    A_k(0,vel_x_index) = 1.0f / ASSUMED_FPS;
+    A_k(1,vel_y_index) = 1.0f / ASSUMED_FPS;
 
     // Set velocity uncertainty parameters
     // betas(2) = BETA_BALL_VEL;
@@ -67,14 +68,14 @@ BallEKF::BallEKF()
     // gammas(3) = GAMMA_BALL_VEL;
 
     // Setup initial values
-    setXEst(INIT_BALL_X);
-    setYEst(INIT_BALL_Y);
-    setXVelocityEst(INIT_BALL_X_VEL);
-    setYVelocityEst(INIT_BALL_Y_VEL);
-    setXUncert(INIT_X_UNCERT);
-    setYUncert(INIT_Y_UNCERT);
-    setXVelocityUncert(INIT_X_VEL_UNCERT);
-    setYVelocityUncert(INIT_Y_VEL_UNCERT);
+    setGlobalXEst(INIT_BALL_X);
+    setGlobalYEst(INIT_BALL_Y);
+    setGlobalXVelocityEst(INIT_BALL_X_VEL);
+    setGlobalYVelocityEst(INIT_BALL_Y_VEL);
+    setGlobalXUncert(INIT_X_UNCERT);
+    setGlobalYUncert(INIT_Y_UNCERT);
+    setGlobalXVelocityUncert(INIT_X_VEL_UNCERT);
+    setGlobalYVelocityUncert(INIT_Y_VEL_UNCERT);
 }
 
 
@@ -99,24 +100,24 @@ BallEKF::BallEKF(float initX, float initY,
           dist_bearing_meas_dim>(BETA_BALL,GAMMA_BALL)
 {
     // ones on the diagonal
-    A_k(0,0) = 1.0;
-    A_k(1,1) = 1.0;
-    A_k(2,2) = 1.0;
-    A_k(3,3) = 1.0;
+    A_k(x_index,x_index) = 1.0;
+    A_k(y_index,y_index) = 1.0;
+    A_k(vel_x_index,vel_x_index) = 1.0;
+    A_k(vel_y_index,vel_y_index) = 1.0;
 
     // Assummed change in position necessary for velocity to work correctly
-    A_k(0,2) = 1.0f / ASSUMED_FPS;
-    A_k(1,3) = 1.0f / ASSUMED_FPS;
+    A_k(0,vel_x_index) = 1.0f / ASSUMED_FPS;
+    A_k(1,vel_y_index) = 1.0f / ASSUMED_FPS;
 
     // Setup initial values
-    setXEst(initX);
-    setYEst(initY);
-    setXVelocityEst(initVelX);
-    setYVelocityEst(initVelY);
-    setXUncert(initXUncert);
-    setYUncert(initYUncert);
-    setXVelocityUncert(initVelXUncert);
-    setYVelocityUncert(initVelYUncert);
+    setGlobalXEst(initX);
+    setGlobalYEst(initY);
+    setGlobalXVelocityEst(initVelX);
+    setGlobalYVelocityEst(initVelY);
+    setGlobalXUncert(initXUncert);
+    setGlobalYUncert(initYUncert);
+    setGlobalXVelocityUncert(initVelXUncert);
+    setGlobalYVelocityUncert(initVelYUncert);
 }
 
 
@@ -131,18 +132,18 @@ void BallEKF::reset()
         }
     }
     // Set the initial values
-    setXEst(INIT_BALL_X);
-    setYEst(INIT_BALL_Y);
-    setXVelocityEst(INIT_BALL_X_VEL);
-    setYVelocityEst(INIT_BALL_Y_VEL);
-    setXUncert(INIT_X_UNCERT);
-    P_k_bar(0,0) = INIT_X_UNCERT;
-    setYUncert(INIT_Y_UNCERT);
-    P_k_bar(1,1) = INIT_Y_UNCERT;
-    setXVelocityUncert(INIT_X_VEL_UNCERT);
-    P_k_bar(2,2) = INIT_X_VEL_UNCERT;
-    setYVelocityUncert(INIT_X_VEL_UNCERT);
-    P_k_bar(3,3) = INIT_Y_VEL_UNCERT;
+    setGlobalXEst(INIT_BALL_X);
+    setGlobalYEst(INIT_BALL_Y);
+    setGlobalXVelocityEst(INIT_BALL_X_VEL);
+    setGlobalYVelocityEst(INIT_BALL_Y_VEL);
+    setGlobalXUncert(INIT_X_UNCERT);
+    P_k_bar(x_index,x_index) = INIT_X_UNCERT;
+    setGlobalYUncert(INIT_Y_UNCERT);
+    P_k_bar(y_index,y_index) = INIT_Y_UNCERT;
+    setGlobalXVelocityUncert(INIT_X_VEL_UNCERT);
+    P_k_bar(vel_x_index,vel_x_index) = INIT_X_VEL_UNCERT;
+    setGlobalYVelocityUncert(INIT_X_VEL_UNCERT);
+    P_k_bar(vel_y_index,vel_y_index) = INIT_Y_VEL_UNCERT;
 }
 
 /**
@@ -150,11 +151,20 @@ void BallEKF::reset()
  *
  * @param ball the ball seen this frame.
  */
-void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
+void BallEKF::updateModel(const MotionModel& odo,
+                          const RangeBearingMeasurement& ball,
+                          const PoseEst& p)
 {
     robotPose = p;
+
+    // if (ball.distance > 0.0 &&
+    //     resetFlag){
+    //     resetState();
+    //     resetFlag = false;
+    // }
+
     // Update expected ball movement
-    timeUpdate(MotionModel());
+    timeUpdate(odo);
     limitAPrioriUncert();
 
     // We've seen a ball
@@ -166,8 +176,10 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
     } else { // No ball seen
         noCorrectionStep();
     }
-    limitPosteriorUncert();
+
+    // limitPosteriorUncert();
     limitPosteriorEst();
+
     if (testForNaNReset()) {
         cout << "\tBallEKF reset to " << *this << endl;
         cout << "\tObservation was: " << ball << endl;
@@ -179,25 +191,53 @@ void BallEKF::updateModel(RangeBearingMeasurement  ball, PoseEst p)
  * frame.  Updates the values of the covariance matrix Q_k and the jacobian
  * A_k.
  *
- * @param u The motion model of the last frame.  Ignored for the ball.
+ * @param u The motion model of the last frame.
  * @return The expected change in ball position (x,y, xVelocity, yVelocity)
  */
-EKF<RangeBearingMeasurement, MotionModel, ball_ekf_dimension,
-    dist_bearing_meas_dim>::StateVector BallEKF::associateTimeUpdate(
-        MotionModel u)
+EKF<RangeBearingMeasurement,
+    MotionModel, ball_ekf_dimension,
+    dist_bearing_meas_dim>::StateVector
+BallEKF::associateTimeUpdate(MotionModel odo)
 {
+    // Get time since last update
+    long long int time = monotonic_micro_time();
+    frameLength = static_cast<float>(time - lastUpdateTime)/
+        1000000; // u_s to sec
+    lastUpdateTime = time;
+
+
     StateVector deltaBall(ball_ekf_dimension);
 
-    float dt = 1.0f / ASSUMED_FPS;
-    // Calculate the assumed change in ball position
-    deltaBall(0) = getXVelocityEst() * dt;
-    deltaBall(1) = getYVelocityEst() * dt;
-    // Decrease in velocity with respect to velocity and friction
-    deltaBall(2) = CARPET_FRICTION * getXVelocityEst() *dt;
-    deltaBall(3) = CARPET_FRICTION * getYVelocityEst() *dt;
+    // Changes to ball position from odometry
+    deltaBall(x_index) = sin(odo.deltaR) * odo.deltaL -
+        cos(odo.deltaR) * odo.deltaF;
 
-    A_k(0,2) = dt;
-    A_k(1,3) = dt;
+    deltaBall(y_index) = -sin(odo.deltaR) * odo.deltaF -
+        cos(odo.deltaR) * odo.deltaL;
+
+    const float velX = getRelativeXVelocity();
+    const float velY = getRelativeYVelocity();
+
+    // Rotate the velocity components into the new coordinate frame
+    float newVelX = cos(odo.deltaR) * velX - sin(odo.deltaR) * velY;
+    float newVelY = cos(odo.deltaR) * velY + sin(odo.deltaR) * velX;
+
+    // Add position changes from velocity
+    deltaBall(x_index) += newVelX * frameLength;
+    deltaBall(y_index) += newVelY * frameLength;
+
+    // Change in velocity direction from odometry
+    deltaBall(vel_x_index) = newVelX - getRelativeXVelocity();
+    deltaBall(vel_y_index) = newVelY - getRelativeYVelocity();
+
+    // Deceleration of ball due to friction (physics!)
+    deltaBall(vel_x_index) -= (copysignf(1.0f, newVelX) *
+                               CARPET_FRICTION * newVelX * frameLength);
+    deltaBall(vel_y_index) -= (copysignf(1.0f, newVelY) *
+                               CARPET_FRICTION * newVelY * frameLength);
+
+    A_k(0,vel_x_index) = frameLength;
+    A_k(1,vel_y_index) = frameLength;
 
     return deltaBall;
 }
@@ -217,106 +257,57 @@ void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
                                      MeasurementMatrix &R_k,
                                      MeasurementVector &V_k)
 {
-    // Currently we always use Cartesian measurements
-    // We originally only used this for ball's closer than 50cm,
-    // However it was found to make velocity estimates much less noisy to
-    // always use Cartesian coordinates
-    if (z.distance < USE_CARTESIAN_BALL_DIST) {
-        // Convert our sighting to cartesian coordinates
-        const float x_b_r = z.distance * cos(z.bearing);
-        const float y_b_r = z.distance * sin(z.bearing);
-        MeasurementVector z_x(2);
 
-        z_x(0) = x_b_r;
-        z_x(1) = y_b_r;
+    // Convert our sighting to cartesian coordinates
+    const float x_b_r = z.distance * cos(z.bearing);
+    const float y_b_r = z.distance * sin(z.bearing);
 
-        // Get expected values of ball
-        const float x_b = getXEst();
-        const float y_b = getYEst();
-        float sinh, cosh;
-        sincosf(robotPose.h, &sinh, &cosh);
+    // Measured values
+    MeasurementVector z_x(2);
+    z_x(x_index) = x_b_r;
+    z_x(y_index) = y_b_r;
 
-        MeasurementVector d_x(2);
+    z_x(vel_x_index) = (x_b_r - xhat_k_bar(x_index)) / frameLength;
+    z_x(vel_y_index) = (y_b_r - xhat_k_bar(y_index)) / frameLength;
 
-        d_x(0) = (x_b - robotPose.x) * cosh + (y_b - robotPose.y) * sinh;
-        d_x(1) = -(x_b - robotPose.x) * sinh + (y_b - robotPose.y) * cosh;
+    // Calculate invariance
+    V_k = z_x - xhat_k_bar;
 
-        // Calculate invariance
-        V_k = z_x - d_x;
+    // Calculate jacobians
+    float sinB = sin(z.bearing);
+    float cosB = cos(z.bearing);
 
-        // Calculate jacobians
-        H_k(0,0) = cosh;
-        H_k(0,1) = sinh;
-        H_k(1,0) = -sinh;
-        H_k(1,1) = cosh;
+    // Derivatives with respect to distance
+    H_k(0,x_index)     = cosB;
+    H_k(0,y_index)     = sinB;
+    H_k(0,vel_x_index) = cosB/frameLength;
+    H_k(0,vel_y_index) = sinB/frameLength;
 
-        // Update the measurement covariance matrix
+    // Derivatives with respect to bearing
+    H_k(1,x_index)     = -sinB             * z.distance;
+    H_k(1,y_index)     =  cosB             * z.distance;
+    H_k(1,vel_x_index) = -sinB/frameLength * z.distance;
+    H_k(1,vel_y_index) =  cosB/frameLength * z.distance;
 
-        // This could be done better to create an ellipse that more accurately
-        // measures uncertainty. Currently uncertainty is over-sized as a circle
-        // about the ball estimate.  The more correct implementation is the
-        // commented out code bellow the next 2 lines of code.  It should be
-        // tested and the beta and gamma parameters possibly tuned before being
-        // used.
-		const float sd_dist_sq = pow(z.distanceSD, 2);
-		const float var = sd_dist_sq * sin(z.bearing) * cos(z.bearing);
-        R_k(0,0) = sd_dist_sq * pow(cos(z.bearing), 2);
-		R_k(0,1) = var;
-		R_k(1,0) = var;
-        R_k(1,1) = sd_dist_sq * pow(sin(z.bearing), 2);
+    // Update the measurement covariance matrix
 
-    } else {
-        // Convert our sighting to cartesian coordinates
-        MeasurementVector z_x(2);
-        z_x(0) = z.distance;
-        z_x(1) = z.bearing;
+    const float sd_dist_sq = z.distanceSD * z.distanceSD;
+    const float var = sd_dist_sq * sin(z.bearing) * cos(z.bearing);
 
-        // Get expected values of ball
-        const float x_b = getXEst();
-        const float y_b = getYEst();
+    R_k(0,x_index) = sd_dist_sq * cosB;
+    R_k(0,y_index) = sd_dist_sq * sinB;
+    R_k(0,vel_x_index) = sd_dist_sq * cosB / frameLength;
+    R_k(0,vel_y_index) = sd_dist_sq * sinB / frameLength;
 
-        MeasurementVector d_x(2);
-
-        d_x(0) = static_cast<float>(hypot(x_b - robotPose.x,
-                                          y_b - robotPose.y));
-        d_x(1) = subPIAngle(safe_atan2(y_b - robotPose.y,
-                                       x_b - robotPose.x) - robotPose.h);
-
-        // Calculate invariance
-        V_k = z_x - d_x;
-        // cout << "\tExpected was: " << d_x << endl;
-        // cout << "\tObserved was: " << z_x << endl;
-
-        // Calculate jacobians
-        H_k(0,0) = (x_b - robotPose.x) / d_x(0);
-        H_k(0,1) = (y_b - robotPose.y) / d_x(0);
-        H_k(1,0) = (robotPose.y - y_b) / (d_x(0)*d_x(0));
-        H_k(1,1) = (x_b - robotPose.x) / (d_x(0)*d_x(0));
-
-        // Update the measurement covariance matrix
-        R_k(0,0) = z.distanceSD * z.distanceSD;
-        R_k(1,1) = z.bearingSD * z.bearingSD;
-    }
-
+    R_k(1,x_index) = z.bearingSD * z.bearingSD;
+    R_k(1,y_index) = z.bearingSD * z.bearingSD;
+    R_k(1,vel_x_index) = z.bearingSD * z.bearingSD / frameLength;
+    R_k(1,vel_y_index) = z.bearingSD * z.bearingSD / frameLength;
 }
 
 void BallEKF::beforeCorrectionFinish(void)
 {
-    // We set velocity to 0, if the ball jumps too much
-    // The ball was likely moved by a referee or hasn't been seen in a while
-    // If the ball IS moving, then we'll pick it up in the next frame
-    if (USE_BALL_JUMP_RESET &&
-        (abs(xhat_k(2) - xhat_k_bar(2)) > BALL_JUMP_VEL_THRESH ||
-         abs(xhat_k(3) - xhat_k_bar(3)) > BALL_JUMP_VEL_THRESH) ) {
-        xhat_k_bar(2) = 0.0f;
-        xhat_k(2) = 0.0f;
-        xhat_k_bar(3) = 0.0f;
-        xhat_k(3) = 0.0f;
-        P_k(2,2) = VELOCITY_UNCERT_MAX;
-        P_k_bar(2,2) = VELOCITY_UNCERT_MAX;
-        P_k(3,3) = VELOCITY_UNCERT_MAX;
-        P_k_bar(3,3) = VELOCITY_UNCERT_MAX;
-    }
+
 }
 
 /**
@@ -324,18 +315,10 @@ void BallEKF::beforeCorrectionFinish(void)
  */
 void BallEKF::limitAPrioriEst()
 {
-    if(xhat_k_bar(2) > VELOCITY_EST_MAX) {
-        xhat_k_bar(2) = VELOCITY_EST_MAX;
-    }
-    if(xhat_k_bar(2) < VELOCITY_EST_MIN) {
-        xhat_k_bar(2) = VELOCITY_EST_MIN;
-    }
-    if(xhat_k_bar(3) > VELOCITY_EST_MAX) {
-        xhat_k_bar(3) = VELOCITY_EST_MAX;
-    }
-    if(xhat_k_bar(3) < VELOCITY_EST_MIN) {
-        xhat_k_bar(3) = VELOCITY_EST_MIN;
-    }
+    xhat_k_bar(vel_x_index) =
+        NBMath::clip(xhat_k_bar(vel_x_index), VELOCITY_EST_MIN, VELOCITY_EST_MAX);
+    xhat_k_bar(vel_y_index) =
+        NBMath::clip(xhat_k_bar(vel_y_index), VELOCITY_EST_MIN, VELOCITY_EST_MAX);
 }
 
 /**
@@ -345,64 +328,64 @@ void BallEKF::limitPosteriorEst()
 {
     // Clip the ball position estimate if it goes off of the field
     // Reset the velocity to zero if we do this
-    if(xhat_k(0) > X_EST_MAX) {
-        xhat_k_bar(0) = X_EST_MAX;
-        xhat_k(0) = X_EST_MAX;
-        xhat_k_bar(2) = 0.0f;
-        xhat_k(2) = 0.0f;
-        xhat_k_bar(3) = 0.0f;
-        xhat_k(3) = 0.0f;
+    if(xhat_k(x_index) > X_EST_MAX) {
+        xhat_k_bar(x_index) = X_EST_MAX;
+        xhat_k(x_index) = X_EST_MAX;
+        xhat_k_bar(vel_x_index) = 0.0f;
+        xhat_k(vel_x_index) = 0.0f;
+        xhat_k_bar(vel_y_index) = 0.0f;
+        xhat_k(vel_y_index) = 0.0f;
 
     }
-    if(xhat_k(0) < X_EST_MIN) {
-        xhat_k_bar(0) = X_EST_MIN;
-        xhat_k(0) = X_EST_MIN;
-        xhat_k_bar(2) = 0.0f;
-        xhat_k(2) = 0.0f;
-        xhat_k_bar(3) = 0.0f;
-        xhat_k(3) = 0.0f;
+    if(xhat_k(x_index) < X_EST_MIN) {
+        xhat_k_bar(x_index) = X_EST_MIN;
+        xhat_k(x_index) = X_EST_MIN;
+        xhat_k_bar(vel_x_index) = 0.0f;
+        xhat_k(vel_x_index) = 0.0f;
+        xhat_k_bar(vel_y_index) = 0.0f;
+        xhat_k(vel_y_index) = 0.0f;
 
     }
-    if(xhat_k(1) > Y_EST_MAX) {
-        xhat_k_bar(1) = Y_EST_MAX;
-        xhat_k(1) = Y_EST_MAX;
-        xhat_k_bar(2) = 0.0f;
-        xhat_k(2) = 0.0f;
-        xhat_k_bar(3) = 0.0f;
-        xhat_k(3) = 0.0f;
+    if(xhat_k(y_index) > Y_EST_MAX) {
+        xhat_k_bar(y_index) = Y_EST_MAX;
+        xhat_k(y_index) = Y_EST_MAX;
+        xhat_k_bar(vel_x_index) = 0.0f;
+        xhat_k(vel_x_index) = 0.0f;
+        xhat_k_bar(vel_y_index) = 0.0f;
+        xhat_k(vel_y_index) = 0.0f;
     }
-    if(xhat_k(1) < Y_EST_MIN) {
-        xhat_k_bar(1) = Y_EST_MIN;
-        xhat_k(1) = Y_EST_MIN;
-        xhat_k_bar(2) = 0.0f;
-        xhat_k(2) = 0.0f;
-        xhat_k_bar(3) = 0.0f;
-        xhat_k(3) = 0.0f;
+    if(xhat_k(y_index) < Y_EST_MIN) {
+        xhat_k_bar(y_index) = Y_EST_MIN;
+        xhat_k(y_index) = Y_EST_MIN;
+        xhat_k_bar(vel_x_index) = 0.0f;
+        xhat_k(vel_x_index) = 0.0f;
+        xhat_k_bar(vel_y_index) = 0.0f;
+        xhat_k(vel_y_index) = 0.0f;
     }
-    if(xhat_k(2) > VELOCITY_EST_MAX) {
-        xhat_k_bar(2) = VELOCITY_EST_MAX;
-        xhat_k(2) = VELOCITY_EST_MAX;
+    if(xhat_k(vel_x_index) > VELOCITY_EST_MAX) {
+        xhat_k_bar(vel_x_index) = VELOCITY_EST_MAX;
+        xhat_k(vel_x_index) = VELOCITY_EST_MAX;
     }
-    if(xhat_k(2) < VELOCITY_EST_MIN) {
-        xhat_k_bar(2) = VELOCITY_EST_MIN;
-        xhat_k(2) = VELOCITY_EST_MIN;
+    if(xhat_k(vel_x_index) < VELOCITY_EST_MIN) {
+        xhat_k_bar(vel_x_index) = VELOCITY_EST_MIN;
+        xhat_k(vel_x_index) = VELOCITY_EST_MIN;
     }
-    if(xhat_k(3) > VELOCITY_EST_MAX) {
-        xhat_k_bar(3) = VELOCITY_EST_MAX;
-        xhat_k(3) = VELOCITY_EST_MAX;
+    if(xhat_k(vel_y_index) > VELOCITY_EST_MAX) {
+        xhat_k_bar(vel_y_index) = VELOCITY_EST_MAX;
+        xhat_k(vel_y_index) = VELOCITY_EST_MAX;
     }
-    if(xhat_k(3) < VELOCITY_EST_MIN) {
-        xhat_k_bar(3) = VELOCITY_EST_MIN;
-        xhat_k(3) = VELOCITY_EST_MIN;
+    if(xhat_k(vel_y_index) < VELOCITY_EST_MIN) {
+        xhat_k_bar(vel_y_index) = VELOCITY_EST_MIN;
+        xhat_k(vel_y_index) = VELOCITY_EST_MIN;
     }
 
-    if(std::abs(xhat_k(2)) < VELOCITY_EST_MIN_SPEED) {
-        xhat_k_bar(2) = 0.0f;
-        xhat_k(2) = 0.0f;
+    if(std::abs(xhat_k(vel_x_index)) < VELOCITY_EST_MIN_SPEED) {
+        xhat_k_bar(vel_x_index) = 0.0f;
+        xhat_k(vel_x_index) = 0.0f;
     }
-    if(std::abs(xhat_k(3)) < VELOCITY_EST_MIN_SPEED) {
-        xhat_k_bar(3) = 0.0f;
-        xhat_k(3) = 0.0f;
+    if(std::abs(xhat_k(vel_y_index)) < VELOCITY_EST_MIN_SPEED) {
+        xhat_k_bar(vel_y_index) = 0.0f;
+        xhat_k(vel_y_index) = 0.0f;
     }
 }
 
@@ -413,36 +396,36 @@ void BallEKF::limitAPrioriUncert()
 {
 
     // Check x uncertainty
-    if(P_k_bar(0,0) > X_UNCERT_MAX) {
-        P_k_bar(0,0) = X_UNCERT_MAX;
+    if(P_k_bar(x_index,x_index) > X_UNCERT_MAX) {
+        P_k_bar(x_index,x_index) = X_UNCERT_MAX;
     }
     // Check y uncertainty
-    if(P_k_bar(1,1) > Y_UNCERT_MAX) {
-        P_k_bar(1,1) = Y_UNCERT_MAX;
+    if(P_k_bar(y_index,y_index) > Y_UNCERT_MAX) {
+        P_k_bar(y_index,y_index) = Y_UNCERT_MAX;
     }
     // Check x veolcity uncertainty
-    if(P_k_bar(2,2) > VELOCITY_UNCERT_MAX) {
-        P_k_bar(2,2) = VELOCITY_UNCERT_MAX;
+    if(P_k_bar(vel_x_index,vel_x_index) > VELOCITY_UNCERT_MAX) {
+        P_k_bar(vel_x_index,vel_x_index) = VELOCITY_UNCERT_MAX;
     }
     // Check y veolcity uncertainty
-    if(P_k_bar(3,3) > VELOCITY_UNCERT_MAX) {
-        P_k_bar(3,3) = VELOCITY_UNCERT_MAX;
+    if(P_k_bar(vel_y_index,vel_y_index) > VELOCITY_UNCERT_MAX) {
+        P_k_bar(vel_y_index,vel_y_index) = VELOCITY_UNCERT_MAX;
     }
     // Check x uncertainty
-    if(P_k_bar(0,0) < X_UNCERT_MIN) {
-        P_k_bar(0,0) = X_UNCERT_MIN;
+    if(P_k_bar(x_index,x_index) < X_UNCERT_MIN) {
+        P_k_bar(x_index,x_index) = X_UNCERT_MIN;
     }
     // Check y uncertainty
-    if(P_k_bar(1,1) < Y_UNCERT_MIN) {
-        P_k_bar(1,1) = Y_UNCERT_MIN;
+    if(P_k_bar(y_index,y_index) < Y_UNCERT_MIN) {
+        P_k_bar(y_index,y_index) = Y_UNCERT_MIN;
     }
     // Check x veolcity uncertainty
-    if(P_k_bar(2,2) < VELOCITY_UNCERT_MIN) {
-        P_k_bar(2,2) = VELOCITY_UNCERT_MIN;
+    if(P_k_bar(vel_x_index,vel_x_index) < VELOCITY_UNCERT_MIN) {
+        P_k_bar(vel_x_index,vel_x_index) = VELOCITY_UNCERT_MIN;
     }
     // Check y veolcity uncertainty
-    if(P_k_bar(3,3) < VELOCITY_UNCERT_MIN) {
-        P_k_bar(3,3) = VELOCITY_UNCERT_MIN;
+    if(P_k_bar(vel_y_index,vel_y_index) < VELOCITY_UNCERT_MIN) {
+        P_k_bar(vel_y_index,vel_y_index) = VELOCITY_UNCERT_MIN;
     }
 }
 
@@ -451,26 +434,18 @@ void BallEKF::limitAPrioriUncert()
  */
 void BallEKF::limitPosteriorUncert()
 {
-    // Check x uncertainty
-    if(P_k(0,0) < X_UNCERT_MIN) {
-        P_k(0,0) = X_UNCERT_MIN;
-        P_k_bar(0,0) = X_UNCERT_MIN;
-    }
-    // Check y uncertainty
-    if(P_k(1,1) < Y_UNCERT_MIN) {
-        P_k(1,1) = Y_UNCERT_MIN;
-        P_k_bar(1,1) = Y_UNCERT_MIN;
-    }
-    // Check x veolcity uncertainty
-    if(P_k(2,2) < VELOCITY_UNCERT_MIN) {
-        P_k(2,2) = VELOCITY_UNCERT_MIN;
-        P_k_bar(2,2) = VELOCITY_UNCERT_MIN;
-    }
-    // Check y veolcity uncertainty
-    if(P_k(3,3) < VELOCITY_UNCERT_MIN) {
-        P_k(3,3) = VELOCITY_UNCERT_MIN;
-        P_k_bar(3,3) = VELOCITY_UNCERT_MIN;
-    }
+    P_k(x_index,x_index) = P_k_bar(x_index,x_index) =
+        NBMath::clip(P_k(x_index,x_index), X_UNCERT_MIN, X_UNCERT_MAX);
+    P_k(y_index,y_index) = P_k_bar(y_index,y_index) =
+        NBMath::clip(P_k(y_index,y_index), Y_UNCERT_MIN, Y_UNCERT_MAX);
+    P_k(vel_x_index,vel_x_index) = P_k_bar(vel_x_index,vel_x_index) =
+        NBMath::clip(P_k(vel_x_index,vel_x_index),
+                     VELOCITY_UNCERT_MIN,
+                     VELOCITY_UNCERT_MAX);
+    P_k(vel_y_index,vel_y_index) = P_k_bar(vel_y_index,vel_y_index) =
+        NBMath::clip(P_k(vel_y_index,vel_y_index),
+                     VELOCITY_UNCERT_MIN,
+                     VELOCITY_UNCERT_MAX);
 
     // We don't want any covariance values getting too large
     for (unsigned int i = 0; i < numStates; ++i) {
@@ -481,27 +456,6 @@ void BallEKF::limitPosteriorUncert()
             }
         }
     }
-
-    // Check x uncertainty
-    if(P_k(0,0) > X_UNCERT_MAX) {
-        P_k(0,0) = X_UNCERT_MAX;
-        P_k_bar(0,0) = X_UNCERT_MAX;
-    }
-    // Check y uncertainty
-    if(P_k(1,1) > Y_UNCERT_MAX) {
-        P_k(1,1) = Y_UNCERT_MAX;
-        P_k_bar(1,1) = Y_UNCERT_MAX;
-    }
-    // Check x veolcity uncertainty
-    if(P_k(2,2) > VELOCITY_UNCERT_MAX) {
-        P_k(2,2) = VELOCITY_UNCERT_MAX;
-        P_k_bar(2,2) = VELOCITY_UNCERT_MAX;
-    }
-    // Check y veolcity uncertainty
-    if(P_k(3,3) > VELOCITY_UNCERT_MAX) {
-        P_k(3,3) = VELOCITY_UNCERT_MAX;
-        P_k_bar(3,3) = VELOCITY_UNCERT_MAX;
-    }
 }
 
 /**
@@ -510,56 +464,93 @@ void BallEKF::limitPosteriorUncert()
 void BallEKF::clipBallEstimate()
 {
     // Limit our X estimate
-    if (xhat_k(0) > X_EST_MAX) {
+    if (xhat_k(x_index) > X_EST_MAX) {
         StateVector v(numStates);
-        v(0) = 1.0f;
+        v(x_index) = 1.0f;
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - X_EST_MAX) /
             inner_prod(v, prod(P_k,v));
     }
-    else if (xhat_k(0) < X_EST_MIN) {
+    else if (xhat_k(x_index) < X_EST_MIN) {
         StateVector v(numStates);
-        v(0) = 1.0f;
+        v(x_index) = 1.0f;
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
             inner_prod(v, prod(P_k,v));
     }
 
     // Limit our Y estimate
-    if (xhat_k(1) < Y_EST_MIN) {
+    if (xhat_k(y_index) < Y_EST_MIN) {
         StateVector v(numStates);
-        v(1) = 1.0f;
+        v(y_index) = 1.0f;
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
             inner_prod(v, prod(P_k,v));
     }
-    else if (xhat_k(1) > Y_EST_MAX) {
+    else if (xhat_k(y_index) > Y_EST_MAX) {
         StateVector v(numStates);
-        v(1) = 1.0f;
+        v(y_index) = 1.0f;
         xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - Y_EST_MAX) /
             inner_prod(v, prod(P_k,v));
 
     }
 
-    if(xhat_k(2) > VELOCITY_EST_MAX) {
-        xhat_k_bar(2) = VELOCITY_EST_MAX;
-        xhat_k(2) = VELOCITY_EST_MAX;
+    if(xhat_k(vel_x_index) > VELOCITY_EST_MAX) {
+        xhat_k_bar(vel_x_index) = VELOCITY_EST_MAX;
+        xhat_k(vel_x_index) = VELOCITY_EST_MAX;
     }
-    if(xhat_k(2) < VELOCITY_EST_MIN) {
-        xhat_k_bar(2) = VELOCITY_EST_MIN;
-        xhat_k(2) = VELOCITY_EST_MIN;
+    if(xhat_k(vel_x_index) < VELOCITY_EST_MIN) {
+        xhat_k_bar(vel_x_index) = VELOCITY_EST_MIN;
+        xhat_k(vel_x_index) = VELOCITY_EST_MIN;
     }
-    if(xhat_k(3) > VELOCITY_EST_MAX) {
-        xhat_k_bar(3) = VELOCITY_EST_MAX;
-        xhat_k(3) = VELOCITY_EST_MAX;
+    if(xhat_k(vel_y_index) > VELOCITY_EST_MAX) {
+        xhat_k_bar(vel_y_index) = VELOCITY_EST_MAX;
+        xhat_k(vel_y_index) = VELOCITY_EST_MAX;
     }
-    if(xhat_k(3) < VELOCITY_EST_MIN) {
-        xhat_k_bar(3) = VELOCITY_EST_MIN;
-        xhat_k(3) = VELOCITY_EST_MIN;
+    if(xhat_k(vel_y_index) < VELOCITY_EST_MIN) {
+        xhat_k_bar(vel_y_index) = VELOCITY_EST_MIN;
+        xhat_k(vel_y_index) = VELOCITY_EST_MIN;
     }
 
-    if (std::abs(xhat_k(2)) < VELOCITY_EST_MIN_SPEED) {
-        xhat_k(2) = 0.0f;
+    if (std::abs(xhat_k(vel_x_index)) < VELOCITY_EST_MIN_SPEED) {
+        xhat_k(vel_x_index) = 0.0f;
     }
-    if (std::abs(xhat_k(3)) < VELOCITY_EST_MIN_SPEED) {
-        xhat_k(3) = 0.0f;
+    if (std::abs(xhat_k(vel_y_index)) < VELOCITY_EST_MIN_SPEED) {
+        xhat_k(vel_y_index) = 0.0f;
     }
+
+}
+
+const float BallEKF::getGlobalX() const
+{
+
+}
+const float BallEKF::getGlobalY() const
+{
+
+}
+const float BallEKF::getGlobalXVelocity() const
+{
+
+}
+const float BallEKF::getGlobalYVelocity() const
+{
+
+}
+
+/**
+ * Global uncertainties
+ */
+const float BallEKF::getGlobalXUncert() const
+{
+
+}
+const float BallEKF::getGlobalYUncert() const
+{
+
+}
+const float BallEKF::getGlobalXVelocityUncert() const
+{
+
+}
+const float BallEKF::getGlobalYVelocityUncert() const
+{
 
 }
