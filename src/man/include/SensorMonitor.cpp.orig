@@ -16,31 +16,26 @@ static const float HIGH_BIN = 100.0f;
 static const int ERRORS_BEFORE_REPORT = 50;
 
 SensorMonitor::SensorMonitor()
-    :  speech(),
-       noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
+    :  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
        monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
-       reportErrors(true),
+<<<<<<< HEAD
+       reportErrors(false), sensorTrustworthy(true),
        lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
-{
-    Reset();
-}
-
-SensorMonitor::SensorMonitor(int _bins, float _lowBin, float _highBin, bool isLog)
-    : speech(),
-      noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
-      monitor(_bins, _lowBin, _highBin, isLog),
-      reportErrors(true),
-      lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
+=======
+       reportErrors(false),
+       lowVariance(DONT_CHECK), highVariance(DONT_CHECK),
+       validSpeechPointer(false)
+>>>>>>> master
 {
     Reset();
 }
 
 SensorMonitor::SensorMonitor(std::string sensorName)
-    :  speech(),
-       noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
+    :  noise(NoiseMeter<Butterworth>::ControlType(21, 60)),
        monitor(NUMBER_BINS, LOW_BIN, HIGH_BIN, LOG_DEFAULT),
-       reportErrors(true),
-       lowVariance(DONT_CHECK), highVariance(DONT_CHECK)
+       reportErrors(false),
+       lowVariance(DONT_CHECK), highVariance(DONT_CHECK),
+       validSpeechPointer(false)
 {
     SensorMonitor::sensorName = sensorName;
     Reset();
@@ -83,7 +78,6 @@ void SensorMonitor::Reset() {
     monitor.Reset();
     steadyAtFrame = NOT_STEADY;
     seenErrors = 0;
-    sensorTrustworthy = true;
 }
 
 void SensorMonitor::LogOutput() {
@@ -104,6 +98,8 @@ void SensorMonitor::LogOutput() {
 void SensorMonitor::setVarianceBounds(float low, float high) {
     lowVariance = low;
     highVariance = high;
+
+    reportErrors = true;
 }
 
 void SensorMonitor::reportSensorError() {
@@ -113,11 +109,13 @@ void SensorMonitor::reportSensorError() {
 		  << ", saw a variance of " << Y()
 		  << " (feel free to ignore this if the robot is stationary)"
 		  << std::endl;
-
-	if (speech)
-	    speech->say("Problem with " + sensorName);
-
+<<<<<<< HEAD
+	speech->say("Problem with " + sensorName);
 	sensorTrustworthy = false;
+=======
+	if (validSpeechPointer)
+	    speech->say("Problem with " + sensorName);
+>>>>>>> master
     }
 }
 

@@ -1,3 +1,4 @@
+
 #ifndef _Noggin_h_DEFINED
 #define _Noggin_h_DEFINED
 
