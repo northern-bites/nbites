@@ -9,7 +9,7 @@
 
 class CommTimer
 {
-  public:
+public:
     CommTimer(llong (*f)());
     virtual ~CommTimer() { }
 
@@ -40,7 +40,7 @@ class CommTimer
     void get_time_from_others();
     void reset();
 
-  private:
+private:
     llong (*time)();                 // Pointer to function that returns current
                                      // time.
     llong epoch;
@@ -52,7 +52,7 @@ class CommTimer
     llong nextSendDelay;             // The timestamp when the next packet must be sent.
     llong mark_time;
     std::vector<CommTeammatePacketInfo> teamPackets;
-    unsigned int packets_checked;
+    unsigned int numPacketsChecked;
     bool need_to_update;
 };
 

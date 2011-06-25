@@ -4,13 +4,14 @@
 
 #include "dsp.h"
 
-class NetworkMonitor
+class NetworkMonitor : public Boxcar
 {
 public:
     NetworkMonitor();
     ~NetworkMonitor();
 
-    void reset();
+    void Reset();
+    double X(double);
 
     void packetReceived(long long timeSent, long long timeReceived);
     void packetsDropped(int numDropped);
@@ -19,6 +20,9 @@ public:
     const int totalPacketsDropped() const;
     const int totalPackets() const { return totalPacketsReceived() + totalPacketsDropped(); }
 
+    int findPeakLatency();
+    void performHealthCheck();
+
     void logOutput();
 
 private:
@@ -26,6 +30,7 @@ private:
     SignalMonitor droppedPackets;
 
     long long lastPacketReceivedAt;
+    int initialLatencyPeak;
 };
 
 #endif // NETWORK_MONITOR_H

@@ -471,6 +471,8 @@ void Comm::run()
 	    if(timer.timeToSend())
 		send();
 
+	    monitor.performHealthCheck();
+
 #ifdef DEBUG_COMM
 	    // Update the monitor output logs every half minute.
 	    if(timer.timestamp() - lastMonitorOutput > 30 * MICROS_PER_SECOND)
@@ -865,8 +867,9 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 }
 
 // Handles packet from GameController
-void Comm::handle_gc (struct sockaddr_in &addr,
-					  const char *msg, int len) throw()
+void Comm::handle_gc(struct sockaddr_in &addr,
+		     const char *msg, int len) 
+    throw()
 {
 	gc->handle_packet(msg, len);
 	if (gc->shouldResetTimer())
