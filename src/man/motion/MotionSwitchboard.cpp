@@ -484,7 +484,7 @@ void MotionSwitchboard::safetyCheckJoints()
  * required when switching between providers
  */
 void MotionSwitchboard::swapBodyProvider(){
-    std::vector<BodyJointCommand *> gaitSwitches;
+    std::vector<BodyJointCommand::ptr> gaitSwitches;
     std::string old_provider = curProvider->getName();
 
     switch(nextProvider->getType())
@@ -718,20 +718,18 @@ void MotionSwitchboard::updateDebugLogs(){
 }
 #endif
 
-void MotionSwitchboard::sendMotionCommand(const boost::shared_ptr<Gait> command){
+void MotionSwitchboard::sendMotionCommand(const Gait::ptr command){
     //Don't request to switch providers when we get a gait command
-    //nextProvider = &walkProvider;
-
     walkProvider.setCommand(command);
 }
-void MotionSwitchboard::sendMotionCommand(const WalkCommand *command){
+void MotionSwitchboard::sendMotionCommand(const WalkCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
 
 }
-void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
+void MotionSwitchboard::sendMotionCommand(const BodyJointCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
     noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
@@ -739,29 +737,28 @@ void MotionSwitchboard::sendMotionCommand(const BodyJointCommand *command){
     pthread_mutex_unlock(&next_provider_mutex);
 
 }
-void MotionSwitchboard::sendMotionCommand(const SetHeadCommand * command){
+void MotionSwitchboard::sendMotionCommand(const SetHeadCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
 
 }
-void MotionSwitchboard::sendMotionCommand(const CoordHeadCommand * command){
+void MotionSwitchboard::sendMotionCommand(const CoordHeadCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
     nextHeadProvider = &coordHeadProvider;
     coordHeadProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
 
 }
-void MotionSwitchboard::sendMotionCommand(const HeadJointCommand *command){
+void MotionSwitchboard::sendMotionCommand(const HeadJointCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
 
 }
-void
-MotionSwitchboard::sendMotionCommand(const shared_ptr<FreezeCommand> command){
+void MotionSwitchboard::sendMotionCommand(const FreezeCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
     nextProvider = &nullBodyProvider;
     nextHeadProvider = &nullHeadProvider;
@@ -775,8 +772,7 @@ MotionSwitchboard::sendMotionCommand(const shared_ptr<FreezeCommand> command){
 #endif
 
 }
-void
-MotionSwitchboard::sendMotionCommand(const shared_ptr<UnfreezeCommand> command){
+void MotionSwitchboard::sendMotionCommand(const UnfreezeCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
     if(curHeadProvider == &nullHeadProvider){
         nullHeadProvider.setCommand(command);
@@ -787,8 +783,14 @@ MotionSwitchboard::sendMotionCommand(const shared_ptr<UnfreezeCommand> command){
     pthread_mutex_unlock(&next_provider_mutex);
 }
 
-void
-MotionSwitchboard::sendMotionCommand(const shared_ptr<StepCommand> command){
+void MotionSwitchboard::sendMotionCommand(const StepCommand::ptr command){
+    pthread_mutex_lock(&next_provider_mutex);
+    nextProvider = &walkProvider;
+    walkProvider.setCommand(command);
+    pthread_mutex_unlock(&next_provider_mutex);
+}
+
+void MotionSwitchboard::sendMotionCommand(const DestinationCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);

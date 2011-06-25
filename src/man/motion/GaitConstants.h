@@ -57,7 +57,7 @@ namespace WP {
         DURATION,
         DBL_SUPP_P,
         STEP_HEIGHT, //TODO move this to STANCE
-	FOOT_LIFT_ANGLE,
+		FOOT_LIFT_ANGLE,
         MAX_VEL_X,
         MIN_VEL_X,
         MAX_VEL_Y,
@@ -65,7 +65,7 @@ namespace WP {
         MAX_ACC_X,
         MAX_ACC_Y,
         MAX_ACC_THETA,
-	WALKING, //1.0 is walking, everything else is not walking.
+		WALKING, //1.0 is walking, everything else is not walking.
         LEN_STEP_CONFIG
     };
 

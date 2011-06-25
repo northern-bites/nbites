@@ -28,12 +28,17 @@
  */
 
 #include <vector>
+
+#include <boost/shared_ptr.hpp>
+
 #include "Kinematics.h"
 #include "JointCommand.h"
 #include "MotionConstants.h"
 
 class BodyJointCommand : public JointCommand {
- public:
+public:
+    typedef boost::shared_ptr<BodyJointCommand> ptr;
+
     BodyJointCommand(const float time,
                      const std::vector<float> *body_joints,
                      const std::vector<float> *body_stiffness,
@@ -55,7 +60,7 @@ class BodyJointCommand : public JointCommand {
     BodyJointCommand(const BodyJointCommand &other);
     virtual ~BodyJointCommand(void);
 
-    virtual const  std::vector<float>* getJoints(Kinematics::ChainID chainID) const;
+    virtual const std::vector<float>* getJoints(Kinematics::ChainID chainID) const;
     const std::vector<float>* getLArmJoints(void) const { return larm_joints; }
     const std::vector<float>* getLLegJoints(void) const { return lleg_joints; }
     const std::vector<float>* getRLegJoints(void) const { return rleg_joints; }
@@ -64,7 +69,7 @@ class BodyJointCommand : public JointCommand {
     const bool conflicts(const BodyJointCommand &other) const;
     const bool conflicts(const float chainTimeRemaining[Kinematics::NUM_CHAINS]) const;
 
- private:
+private:
     virtual void setChainList();
     const std::vector<float> *larm_joints;
     const std::vector<float> *lleg_joints;
