@@ -24,6 +24,7 @@ class FDLogger {
 
 public:
     typedef boost::shared_ptr<FDLogger> ptr;
+    typedef boost::shared_ptr<FDLogger> const_ptr;
 
 protected:
     typedef include::io::FDProvider FDProvider;

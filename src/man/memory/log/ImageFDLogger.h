@@ -36,6 +36,10 @@ using namespace google::protobuf::io;
 class ImageFDLogger : public FDLogger {
 
 public:
+    typedef boost::shared_ptr<ImageFDLogger> ptr;
+    typedef boost::shared_ptr<ImageFDLogger> const_ptr;
+
+public:
     /**
      * Opens the file fileName and writes to its head
      *
