@@ -21,7 +21,7 @@ def rGoalie(team, workingPlay):
         # Special case for ready goalie.
         SubRoles.pReadyGoalie(team, workingPlay)
 
-    # Get out of ready
+    # Get out of ready -> Just after kick off
     elif workingPlay.isSubRole(PBConstants.READY_GOALIE):
         SubRoles.pGoalieKickOff(team, workingPlay)
 
@@ -38,7 +38,7 @@ def rGoalie(team, workingPlay):
     elif workingPlay.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
         SubRoles.pGoaliePenaltySaver(team, workingPlay)
 
-    # Saving will go here
+    # Saving
     elif workingPlay.isSubRole(PBConstants.GOALIE_SAVE):
         if (team.brain.player.isSaving):
             SubRoles.pGoalieSave(team, workingPlay)

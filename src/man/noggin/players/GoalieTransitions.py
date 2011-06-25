@@ -18,6 +18,7 @@ def shouldSave(player):
     ball = player.brain.ball
 
     if ball.dx > 2 :
+        print ball.dx
         return True
 
     return False

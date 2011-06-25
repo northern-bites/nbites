@@ -12,9 +12,17 @@ from ..players import ChaseBallTransitions as chaseTran
 def shouldPositionForSave(team):
     ball = team.brain.ball
 
-    if ball.heat >= 10 :
-        team.brain.speech.say("Save")
-        return True
+    if ball.heat > 10 :
+        team.shouldSaveCounter += 1
+        if team.shouldSaveCounter > 1:
+            team.brain.speech.say("Save")
+            team.shouldChaseCounter = 0
+            team.shouldStopChaseCounter = 0
+            team.shouldPositionCenterCounter = 0
+            team.shouldPositionLeftCounter = 0
+            team.shouldPositionRightCounter = 0
+            team.shouldSaveCounter = 0
+            return True
 
     return False
 
@@ -41,6 +49,7 @@ def shouldChase(team):
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
     return False
@@ -55,6 +64,7 @@ def shouldStopChase(team):
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
     # I'm 1/4 of the way up the field
@@ -64,6 +74,7 @@ def shouldStopChase(team):
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X  and my.uncertX < 90):
@@ -73,6 +84,7 @@ def shouldStopChase(team):
             team.shouldPositionCenterCounter = 0
             team.shouldPositionLeftCounter = 0
             team.shouldPositionRightCounter = 0
+            team.shouldSaveCounter = 0
             return True
 
     elif (ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER
@@ -88,6 +100,7 @@ def shouldStopChase(team):
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
     return False
@@ -103,6 +116,7 @@ def shouldPositionCenter(team):
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
     if ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER:
@@ -113,6 +127,7 @@ def shouldPositionCenter(team):
             team.shouldPositionCenterCounter = 0
             team.shouldPositionLeftCounter = 0
             team.shouldPositionRightCounter = 0
+            team.shouldSaveCounter = 0
         return True
 
     return False
@@ -133,6 +148,7 @@ def shouldPositionRight(team):
             team.shouldPositionRightCounter = 0
             team.shouldPositionLeftCounter = 0
             team.shouldPositionCenterCounter = 0
+            team.shouldSaveCounter = 0
         return True
 
     return False
@@ -154,6 +170,7 @@ def shouldPositionLeft(team):
             team.shouldPositionRightCounter = 0
             team.shouldPositionLeftCounter = 0
             team.shouldPositionCenterCounter = 0
+            team.shouldSaveCounter = 0
         return True
 
     return False

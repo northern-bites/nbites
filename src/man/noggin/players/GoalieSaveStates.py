@@ -23,11 +23,11 @@ def goalieSave(player):
     if helper.shouldSave(player):
         brain.fallController.enableFallProtection(False)
         if helper.shouldSaveRight(player):
-            return player.goNow('testSaveRight')
+            return player.goNow('saveRight')
         elif helper.shouldSaveLeft(player):
-            return player.goNow('testSaveLeft')
+            return player.goNow('saveLeft')
         else:
-            return player.goNow('testSaveCenter')
+            return player.goNow('saveCenter')
     #add check for strafe in future
 
     return player.stay()
