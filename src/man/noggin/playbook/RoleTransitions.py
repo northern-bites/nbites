@@ -12,7 +12,8 @@ from ..players import ChaseBallTransitions as chaseTran
 def shouldPositionForSave(team):
     ball = team.brain.ball
 
-    if ball.heat > 18 :
+    if ball.heat >= 10 :
+        team.brain.speech.say("Save")
         return True
 
     return False
@@ -104,7 +105,7 @@ def shouldPositionCenter(team):
         team.shouldPositionRightCounter = 0
         return True
 
-    if ball.x > goalCon.CHASE_RIGHT_X_LIMIT:
+    if ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER:
         team.shouldPositionCenterCounter += 1
         if team.shouldPositionCenterCounter > 3:
             team.shouldStopChaseCounter = 0
@@ -122,7 +123,7 @@ def shouldPositionRight(team):
     if ball.framesOff > 30:
         return False
 
-    if (ball.y < goalCon.CHASE_LOWER_Y_LIMIT
+    if (ball.y < goalCon.CHASE_LOWER_Y_LIMIT + goalCon.CHASE_BUFFER
         and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.on):
         team.shouldPositionRightCounter += 1
@@ -143,7 +144,7 @@ def shouldPositionLeft(team):
     if ball.framesOff > 30:
         return False
 
-    if (ball.y > goalCon.CHASE_UPPER_Y_LIMIT
+    if (ball.y > goalCon.CHASE_UPPER_Y_LIMIT + goalCon.CHASE_BUFFER
         and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.on):
         team.shouldPositionLeftCounter += 1

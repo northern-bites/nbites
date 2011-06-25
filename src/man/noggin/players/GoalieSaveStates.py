@@ -73,7 +73,7 @@ def testSaveRight(player):
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
     if player.counter > 50:
         player.executeMove(SweetMoves.INITIAL_POS)
-        return player.goNow('holdRightSave')
+        return player.goNow('doneSaving')
     return player.stay()
 
 def testSaveLeft(player):
@@ -81,7 +81,7 @@ def testSaveLeft(player):
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
     if player.counter > 50:
         player.executeMove(SweetMoves.INITIAL_POS)
-        return player.goNow('holdLeftSave')
+        return player.goNow('doneSaving')
     return player.stay()
 
 def testSaveCenter(player):
@@ -89,7 +89,7 @@ def testSaveCenter(player):
         player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
     if player.counter > 50:
         player.executeMove(SweetMoves.INITIAL_POS)
-        return player.goNow('holdCenterSave')
+        return player.goNow('doneSaving')
     return player.stay()
 
 # HOLD SAVE

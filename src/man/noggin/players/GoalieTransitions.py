@@ -14,6 +14,15 @@ DEBUG = False
 
 #SAVING TRANSITIONS
 
+def shouldSave(player):
+    ball = player.brain.ball
+
+    if ball.dx > 2 :
+        return True
+
+    return False
+
+
 #not using right now
 #uses ball velocity information which
 #im not sure I want to use
@@ -25,15 +34,6 @@ def getTimeUntilSave(player):
     else:
         time = -1
     return time
-
-def shouldPositionForSave(player):
-    ball = player.brain.ball
-
-    if ball.heat > 18 :
-        return True
-
-    return False
-
 
 # not used right now
 #should move goalie but with dive right now shouldnt need
@@ -52,7 +52,7 @@ def strafeDirForSave(player):
 def shouldSaveRight(player):
     ball= player.brain.ball
 
-    if(ball.endY > goalCon.CENTER_SAVE_THRESH and goalieInBox()):
+    if(ball.endY > goalCon.CENTER_SAVE_THRESH and goalieInBox(player)):
         player.counterRightSave += 1
         if(player.counterRightSave > 3):
             player.counterRightSave = 0
@@ -64,7 +64,7 @@ def shouldSaveRight(player):
 def shouldSaveLeft(player):
     ball= player.brain.ball
 
-    if(ball.endY < -goalCon.CENTER_SAVE_THRESH and goalieInBox()):
+    if(ball.endY < -goalCon.CENTER_SAVE_THRESH and goalieInBox(player)):
         player.counterLeftSave += 1
         if( player.counterLeftSave > 3) :
             player.counterLeftSave = 0

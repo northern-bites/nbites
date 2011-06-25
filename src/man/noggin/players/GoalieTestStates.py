@@ -34,7 +34,7 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.INITIAL_POS)
-    return player.goNow('testHeat')
+    return player.goNow('testDX')
 
 def gamePenalized(player):
     angles = player.brain.sensors.angles
@@ -61,7 +61,7 @@ def testHeat(player):
         print ball.heat
 
     if ball.heat >= 10:
-        player.brain.speech.sat("Save")
+        player.brain.speech.say("Save")
 
     return player.stay()
 
@@ -73,6 +73,10 @@ def testDive(player):
 
 def testDX(player):
     ball=player.brain.ball
+
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
     if player.counter % 3 == 1:
         print "relX"
         print ball.relX
@@ -82,6 +86,12 @@ def testDX(player):
         print ball.dx
         print "dy"
         print ball.dy
+        print "relVelX"
+        print ball.relVelX
+        print "relVelY"
+        print ball.relVelY
+        print "heat"
+        print ball.heat
 
     return player.stay()
 
