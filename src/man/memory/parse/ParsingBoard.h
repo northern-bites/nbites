@@ -27,18 +27,13 @@ class ParsingBoard;
 }
 
 #include "memory/Memory.h"
+#include "memory/MemoryIOBoard.h"
 
 namespace man {
 namespace memory {
 namespace parse {
 
-typedef std::pair< MObject_ID, Parser::ptr> ObjectParserPair;
-typedef std::map< MObject_ID, Parser::ptr> ObjectParserMap;
-
-class ParsingBoard {
-
-private:
-    typedef include::io::BulkIO<MObject_ID> IOProvider;
+class ParsingBoard : public MemoryIOBoard<Parser> {
 
 public:
     ParsingBoard(Memory::ptr memory,
@@ -47,16 +42,11 @@ public:
 
     void newIOProvider(IOProvider::const_ptr ioProvider);
 
-    void parse(MObject_ID);
+    void parse(MObject_ID id);
     void parseAll();
-
-protected:
-    void initParsingObjects(const IOProvider::FDProviderMap* fdmap);
 
 private:
     Memory::ptr memory;
-    ObjectParserMap objectParserMap;
-
 };
 }
 }

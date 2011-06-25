@@ -18,27 +18,6 @@ ParsingBoard::ParsingBoard(Memory::ptr memory,
 
 ParsingBoard::~ParsingBoard(){}
 
-void ParsingBoard::initParsingObjects(const IOProvider::FDProviderMap* fdmap) {
-
-//
-//        MObject_ID logID = static_cast<MObject_ID>(Parser::peekAtLogID(*i));
-//        std::cout<< logID << std::endl;
-//        if (logID == MIMAGE_ID) {
-//            shared_ptr<RoboImage> roboImage = memory->getMutableRoboImage();
-//            objectParserMap[MIMAGE_ID] = new ImageParser(roboImage, *i);
-//        } else {
-//            shared_ptr<ProtoMessage> mobject =
-//                    memory->getMutableProtoMessage(logID);
-//            if (mobject != NULL) {
-//                objectParserMap[logID] = new MessageParser(mobject, *i);
-//            } else {
-//                std::cout<<"Could not read valid log ID from file descriptor :"
-//                        << *i << std::endl;
-//            }
-//        }
-//    }
-}
-
 void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
     objectParserMap.clear();
 
