@@ -264,6 +264,10 @@ protected:
                   isinf(xhat_k(i)) || isinf(xhat_k_bar(i))) {
                    std::cout << "Resetting EKF due to nan or inf value."
                              << std::endl;
+                   std::cout << "xhat_k: " << xhat_k << std::endl;
+                   std::cout << "xhat_k_bar: " << xhat_k_bar << std::endl;
+                   std::cout << "P_k: " << P_k << std::endl;
+                   std::cout << "P_k_bar: " << P_k_bar << std::endl;
                    reset();
                    return true;
                }
