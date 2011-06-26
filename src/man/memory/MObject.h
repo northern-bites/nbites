@@ -23,8 +23,19 @@ enum MObject_ID {
     MVISION_ID = 1,
     MMOTION_SENSORS_ID,
     MVISION_SENSORS_ID,
-    MIMAGE_ID
+    MIMAGE_ID,
+    LAST_OBJECT //dummy object
 };
+
+inline void operator++(MObject_ID& id) {
+    id = MObject_ID(id+1);
+}
+
+inline void operator++(MObject_ID& id, int) {
+    id = MObject_ID(id+1);
+}
+
+static const MObject_ID FIRST_OBJECT = MVISION_ID;
 
 static const std::string MObject_names[] = {
             "unknown",
@@ -47,8 +58,8 @@ public:
      * the proto message fields with values from its respective man counterpart
      */
     virtual void update() = 0;
-    static const std::string* NameFromID(MObject_ID id) {
-        return &MObject_names[static_cast<int>(id)];
+    static const std::string NameFromID(MObject_ID id) {
+        return MObject_names[static_cast<int>(id)];
     }
 
 private:
