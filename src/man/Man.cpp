@@ -36,12 +36,15 @@ using namespace boost::assign;
 #include "PySensors.h"
 #include "PyLights.h"
 #include "PySpeech.h"
+#include "memory/log/IOProviderFactory.h"
 
 //#include <valgrind/callgrind.h>
 
 using namespace std;
 using boost::shared_ptr;
 using man::memory::Memory;
+using man::memory::log::LoggingBoard;
+using man::memory::log::IOProviderFactory;
 
 /////////////////////////////////////////
 //                                     //
@@ -105,6 +108,8 @@ Man::Man (shared_ptr<Profiler> _profiler,
 #endif// USE_NOGGIN
 #ifdef USE_MEMORY
   memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
+  loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory));
+  loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
 #endif
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
