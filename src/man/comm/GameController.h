@@ -57,6 +57,7 @@ public:
     const uint16 penaltySeconds();
     const uint16 penaltySeconds(uint16 player);
     const bool isManuallyPenalized(void) const;
+	const bool isPenalized(void);
     void setTeam(uint8 team);
     void setColor(uint8 color);
     void setPlayer(uint16 player);
