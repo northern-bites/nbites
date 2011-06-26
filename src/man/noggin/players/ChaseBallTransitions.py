@@ -111,8 +111,7 @@ def shouldKickAgain(player):
     """
     Ball hasn't changed enough to warrant new kick decision.
     """
-    return (shouldKick(player) and ballNearPosition(player)
-
+    return (shouldKick(player) and ballNearPosition(player))
 
 def shouldDribble(player):
     """
