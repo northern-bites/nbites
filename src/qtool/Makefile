@@ -53,6 +53,9 @@ cfg: $(GEN_MAKEFILE)
 clean:
 	rm -rf $(BIN_DIR)
 
+clean_soft:
+	$(MAKE) clean -C $(BIN_DIR)
+
 $(EXECUTABLE): build
 
 run: $(EXECUTABLE)
