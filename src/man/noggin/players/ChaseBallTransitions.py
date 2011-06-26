@@ -75,6 +75,32 @@ def shouldSpinToBall(player):
              ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST) or
              ball.relX <= 9.5))
 
+def ballInPosition(player):
+    """
+    Make sure ball is somewhere we will kick it
+    """
+    ball = player.brain.ball
+    kick = player.brain.kickDecider.getKick()
+    #Get the current kick sweet spot information
+    (x_offset, y_offset, heading) = kick.getPosition()
+
+    #Get the difference
+    diff_x = fabs(x_offset - ball.relX)
+    diff_y = fabs(y_offset - ball.rely)
+
+    #Compare the sweet spot with the actual values and make sure they
+    #are within the threshold
+    return (diff_x < constants.X_POS_THRESH and
+            diff_y < constants.Y_POS_THRESH)
+
+def ballNearPosition(player):
+
+    ball = player.brain.ball
+    return ((constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.relX <
+              constants.SHOULD_KICK_AGAIN_FAR_X) and
+             fabs(ball.relY) < constants.SHOULD_KICK_AGAIN_Y)
+
+
 def shouldKick(player):
     """
     Ball is in correct position to kick
@@ -85,11 +111,8 @@ def shouldKickAgain(player):
     """
     Ball hasn't changed enough to warrant new kick decision.
     """
-    ball = player.brain.ball
-    return (shouldKick(player) and
-            (constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.relX <
-             constants.SHOULD_KICK_AGAIN_FAR_X) and
-            fabs(ball.relY) < constants.SHOULD_KICK_AGAIN_Y)
+    return (shouldKick(player) and ballNearPosition(player)
+
 
 def shouldDribble(player):
     """

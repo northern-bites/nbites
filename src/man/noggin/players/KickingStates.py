@@ -11,8 +11,15 @@ def kickBallExecute(player):
     Kick the ball
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()
-        player.executeMove(player.brain.kickDecider.getSweetMove())
+         player.brain.tracker.trackBall()
+         if transitions.ballInPosition(player):
+             print "sweet, ball is still there"
+             player.executeMove(player.brain.kickDecider.getSweetMove())
+         else:
+             #Either it's close and we can kick or it's far away and
+             #we should search.  Lets hope it's close and let
+             #positionForKick put us in findBall if needed
+             player.goNow('positionForKick')
 
         #if player.penaltyKicking:
         if not player.penaltyMadeFirstKick:
