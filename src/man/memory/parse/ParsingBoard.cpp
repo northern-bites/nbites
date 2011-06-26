@@ -19,7 +19,7 @@ ParsingBoard::ParsingBoard(Memory::ptr memory,
 ParsingBoard::~ParsingBoard(){}
 
 void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
-    objectParserMap.clear();
+    objectIOMap.clear();
 
     const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
     for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
@@ -27,13 +27,13 @@ void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
 
         if (i->first == MIMAGE_ID) {
             shared_ptr<RoboImage> roboImage = memory->getMutableRoboImage();
-            objectParserMap[MIMAGE_ID] = Parser::ptr(new ImageParser(i->second,
+            objectIOMap[MIMAGE_ID] = Parser::ptr(new ImageParser(i->second,
                     roboImage));
         } else {
             shared_ptr<ProtoMessage> mobject =
                     memory->getMutableProtoMessage(i->first);
             if (mobject != shared_ptr<ProtoMessage>()) {
-                objectParserMap[i->first] = Parser::ptr(new MessageParser(i->second,
+                objectIOMap[i->first] = Parser::ptr(new MessageParser(i->second,
                         mobject));
             } else {
                 std::cout<<"Could not read valid log ID from file descriptor: "
@@ -46,37 +46,22 @@ void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
 
 void ParsingBoard::parse(MObject_ID id) {
 
-    ObjectParserMap::iterator it = objectParserMap.find(id);
-    // if this is true, then we found a legitimate logger
+    ObjectIOMap::iterator it = objectIOMap.find(id);
+    // if this is true, then we found a legitimate parser
     // corresponding to our mobject in the map
-    if (it != objectParserMap.end()) {
-        //it->second is the logger associated with the specified mobject
+    if (it != objectIOMap.end()) {
+        //it->second is the parser associated with the specified mobject
         it->second->getNext();
     }
 }
 
 void ParsingBoard::parseAll() {
-    for (ObjectParserMap::iterator it = objectParserMap.begin();
-            it != objectParserMap.end(); it++ ) {
+    for (ObjectIOMap::iterator it = objectIOMap.begin();
+            it != objectIOMap.end(); it++ ) {
         it->second->getNext();
     }
 
 }
-
-//const ImageParser* ParsingBoard::getImageLogger(const MImage* mimage) const {
-//    return dynamic_cast<const ImageParser*>(this->getLogger(mimage));
-//}
-
-//const Parser* ParsingBoard::getLogger(const MObject* mobject) const {
-//    ObjectFDLoggerMap::const_iterator it = objectFDLoggerMap.find(mobject);
-//    // if this is true, then we found a legitimate logger
-//    // corresponding to our mobject in the map
-//    if (it != objectFDLoggerMap.end()) {
-//        return it->second;
-//    } else {
-//        return NULL;
-//    }
-//}
 
 
 }

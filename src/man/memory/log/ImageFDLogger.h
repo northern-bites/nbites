@@ -37,7 +37,7 @@ class ImageFDLogger : public FDLogger {
 
 public:
     typedef boost::shared_ptr<ImageFDLogger> ptr;
-    typedef boost::shared_ptr<ImageFDLogger> const_ptr;
+    typedef boost::shared_ptr<const ImageFDLogger> const_ptr;
 
 public:
     /**

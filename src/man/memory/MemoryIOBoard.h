@@ -20,9 +20,9 @@ class MemoryIOBoard {
 
 public:
     typedef std::pair< MObject_ID,
-            boost::shared_ptr<IOobject> > ObjectParserPair;
+            boost::shared_ptr<IOobject> > ObjectIOPair;
     typedef std::map< MObject_ID,
-            boost::shared_ptr<IOobject> > ObjectParserMap;
+            boost::shared_ptr<IOobject> > ObjectIOMap;
 
 protected:
     typedef include::io::BulkIO<MObject_ID> IOProvider;
@@ -33,7 +33,7 @@ public:
     virtual void newIOProvider(IOProvider::const_ptr ioProvider) = 0;
 
 protected:
-    ObjectParserMap objectParserMap;
+    ObjectIOMap objectIOMap;
 };
 
 }

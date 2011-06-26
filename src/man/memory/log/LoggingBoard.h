@@ -44,13 +44,19 @@ class LoggingBoard : MemoryIOBoard<FDLogger> {
 public:
     LoggingBoard(const Memory* memory,
                 IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
-    virtual ~LoggingBoard() {};
+    virtual ~LoggingBoard() {}
 
-    void log(const MObject* mobject);
+    void log(MObject_ID id);
 
     void newIOProvider(IOProvider::const_ptr ioProvider);
-//    const ImageFDLogger* getImageLogger(const MImage* mimage) const;
-//    const FDLogger* getLogger(const MObject* mobject) const;
+    //returns a NULL pointer if such a logger doesn't exist
+    ImageFDLogger::const_ptr getImageLogger(MObject_ID id) const;
+
+protected:
+    //returns a NULL pointer if such a logger doesn't exist
+    FDLogger::const_ptr getLogger(MObject_ID id) const;
+    //returns a NULL pointer if such a logger doesn't exist
+    FDLogger::ptr getMutableLogger(MObject_ID id);
 
 private:
     const Memory* memory;
