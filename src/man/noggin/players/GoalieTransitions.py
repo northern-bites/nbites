@@ -56,11 +56,6 @@ def shouldSaveRight(player):
     ball= player.brain.ball
 
     if(ball.endY < -goalCon.CENTER_SAVE_THRESH and goalieInBox(player)):
-        # player.counterRightSave += 1
-        # if(player.counterRightSave > 3):
-        #     player.counterRightSave = 0
-        #     player.counterLeftSave = 0
-        #     player.counterCenterSave = 0
         return True
     return False
 
@@ -68,11 +63,6 @@ def shouldSaveLeft(player):
     ball= player.brain.ball
 
     if(ball.endY > goalCon.CENTER_SAVE_THRESH and goalieInBox(player)):
-        # player.counterLeftSave += 1
-        # if( player.counterLeftSave > 3) :
-        #     player.counterLeftSave = 0
-        #     player.counterRightSave = 0
-        #     player.counterCenterSave = 0
         return True
 
     return False
@@ -81,13 +71,6 @@ def shouldSaveLeft(player):
 def shouldSaveCenter(player):
     ball= player.brain.ball
 
-    if(not shouldSaveRight and not shouldSaveLeft):
-        player.counterCenterSave += 1
-        if (player.counterCenterSave > 3):
-            player.counterCenterSave = 0
-            player.counterLeftSave = 0
-            player.counterRightSave = 0
-            return True
     return False
 
 # need to figure out how this works

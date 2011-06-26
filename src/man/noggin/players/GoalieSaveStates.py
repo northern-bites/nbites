@@ -151,7 +151,7 @@ def postDiveSave(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.STAND_UP_BACK)
 
-    if player.counter == 50:
+    if player.counter == 150:
         return player.goLater('doneSaving')
 
     return player.stay()
