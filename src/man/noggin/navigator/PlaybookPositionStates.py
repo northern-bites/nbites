@@ -2,7 +2,6 @@ from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
-from man.noggin.util import MyMath
 
 DEBUG = False
 
@@ -15,7 +14,7 @@ def playbookWalk(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    if (navTrans.atDestinationCloser(my, dest) and 
+    if (navTrans.atDestinationCloser(my, dest) and
         navTrans.atHeading(my, dest.h)):
             nav.playbookAtPositionCount += 1
             if nav.playbookAtPositionCount > constants.FRAMES_THRESHOLD_TO_POSITION_PLAYBOOK:

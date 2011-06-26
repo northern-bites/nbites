@@ -3,7 +3,7 @@ from .Location import Location
 
 class VisualObject(Location):
     """VisualObject is a class for all objects that need general vision information
-    in python. the fields common to all are centerX, centerY, width, height, 
+    in python. the fields common to all are centerX, centerY, width, height,
     dist, bearing
     """
     def __init__(self):

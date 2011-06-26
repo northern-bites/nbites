@@ -2,7 +2,6 @@
 This file contains an implementation of a finite state automaton.
 """
 import time
-from . import NaoOutput
 
 DEBUG = False
 
