@@ -30,7 +30,6 @@ class Memory; //forward declaration
 #include "MImage.h"
 #include "Sensors.h"
 #include "Profiler.h"
-#include "log/LoggingBoard.h"
 
 namespace man {
 namespace memory {
@@ -41,6 +40,7 @@ class Memory : public Subscriber<SensorsEvent> {
 
 public:
     typedef boost::shared_ptr<Memory> ptr;
+    typedef boost::shared_ptr<const Memory> const_ptr;
     typedef std::pair<MObject_ID,
             boost::shared_ptr<ProtoMessage> > ProtoMessagePair;
     typedef std::map<MObject_ID,
@@ -85,8 +85,6 @@ private:
     boost::shared_ptr<MVisionSensors> mVisionSensors;
     boost::shared_ptr<MMotionSensors> mMotionSensors;
     boost::shared_ptr<MImage> mImage;
-
-    log::LoggingBoard* loggingBoard;
 };
 }
 }
