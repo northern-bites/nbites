@@ -22,16 +22,6 @@
 #include "CodedFileLogger.h"
 #include "ImageFDLogger.h"
 #include "memory/MObject.h"
-
-//forward declaration
-namespace man {
-namespace memory {
-namespace log {
-class LoggingBoard;
-}
-}
-}
-
 #include "memory/Memory.h"
 #include "memory/MemoryIOBoard.h"
 
@@ -42,7 +32,7 @@ namespace log {
 class LoggingBoard : MemoryIOBoard<FDLogger> {
 
 public:
-    LoggingBoard(const Memory* memory,
+    LoggingBoard(Memory::const_ptr memory,
                 IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
     virtual ~LoggingBoard() {}
 
@@ -59,7 +49,7 @@ protected:
     FDLogger::ptr getMutableLogger(MObject_ID id);
 
 private:
-    const Memory* memory;
+    Memory::const_ptr memory;
 
 };
 }

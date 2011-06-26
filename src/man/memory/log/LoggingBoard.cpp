@@ -8,18 +8,15 @@ namespace log {
 using namespace man::include::paths;
 using boost::shared_ptr;
 
-//const string LoggingBoard::MVISION_PATH = NAO_LOG_DIR + "/Vision.log";
-//const string LoggingBoard::MMOTION_SENSORS_PATH = NAO_LOG_DIR + "/MotionSensors.log";
-//const string LoggingBoard::MVISION_SENSORS_PATH = NAO_LOG_DIR + "/VisionSensors.log";
-//const string LoggingBoard::MIMAGE_PATH = NAO_LOG_DIR + "/Image.log";
-
-LoggingBoard::LoggingBoard(const Memory* memory,
+LoggingBoard::LoggingBoard(Memory::const_ptr memory,
         IOProvider::const_ptr ioProvider) :
     memory(memory) {
     newIOProvider(ioProvider);
 }
 
 void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
+
+    this->ioProvider = ioProvider;
 
     const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
     for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
