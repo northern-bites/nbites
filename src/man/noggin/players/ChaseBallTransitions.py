@@ -86,7 +86,12 @@ def ballInPosition(player):
 
     #Get the difference
     diff_x = fabs(x_offset - ball.relX)
-    diff_y = fabs(y_offset - ball.rely)
+    diff_y = fabs(y_offset - ball.relY)
+
+    print "diff_x:"
+    print diff_x
+    print "diff_y:"
+    print diff_y
 
     #Compare the sweet spot with the actual values and make sure they
     #are within the threshold
