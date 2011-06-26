@@ -704,7 +704,9 @@ void Comm::send () throw(socket_error)
              broadcast_addr);
     }
 	else
+	{
 		pthread_mutex_unlock (&comm_mutex);
+	}
 }
 
 void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error)

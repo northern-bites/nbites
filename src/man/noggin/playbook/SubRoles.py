@@ -302,7 +302,7 @@ def pReadyChaser(team, workingPlay):
         else:
             y = PBConstants.READY_NON_KICKOFF_CHASER_1_Y
     dest = Location(x, y)
-    h = dest.headingTo(team.brain.ball)
+    h = dest.headingTo(PBConstants.CENTER_FIELD)
 
     pos = (x,y,h)
     workingPlay.setPosition(pos)
@@ -323,7 +323,7 @@ def pReadyOffender(team, workingPlay):
         else:
             y = PBConstants.READY_NON_KICKOFF_OFFENDER_1_Y
     dest = Location(x, y)
-    h = dest.headingTo(team.brain.ball)
+    h = dest.headingTo(PBConstants.CENTER_FIELD)
 
     pos = (x,y,h)
     workingPlay.setPosition(pos)
@@ -344,7 +344,7 @@ def pReadyDefender(team, workingPlay):
         else:
             y = PBConstants.READY_NON_KICKOFF_DEFENDER_1_Y
     dest = Location(x, y)
-    h = dest.headingTo(team.brain.ball)
+    h = dest.headingTo(PBConstants.CENTER_FIELD)
 
     pos = (x,y,h)
     workingPlay.setPosition(pos)
@@ -355,5 +355,5 @@ def pReadyGoalie(team, workingPlay):
     dest = Location(PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y)
     position = (PBConstants.GOALIE_HOME_X,
                 PBConstants.GOALIE_HOME_Y,
-                dest.headingTo(team.brain.ball))
+                dest.headingTo(PBConstants.CENTER_FIELD))
     workingPlay.setPosition(position)
