@@ -24,11 +24,13 @@ template <class T>
 class BulkIO {
 
 public:
+    typedef boost::shared_ptr<BulkIO> ptr;
     typedef boost::shared_ptr<const BulkIO> const_ptr;
     typedef std::pair< T, FDProvider::ptr > FDProviderPair;
     typedef std::map< T, FDProvider::ptr > FDProviderMap;
 
 public:
+    BulkIO(){}
     static const_ptr NullBulkIO() {
         static const_ptr NullPtr(new BulkIO());
         return NullPtr;
@@ -41,8 +43,6 @@ public:
 
     const FDProviderMap* getMap() const { return &fdProviderMap; }
 
-protected:
-    BulkIO(){}
 
 protected:
     FDProviderMap fdProviderMap;
