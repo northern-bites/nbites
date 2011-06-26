@@ -51,21 +51,35 @@ BallEKF::BallEKF()
           dist_bearing_meas_dim>(BETA_BALL,GAMMA_BALL), robotPose(),
       lastUpdateTime(0), frameLength(0.0f)
 {
-    // ones on the diagonal
-    A_k(x_index,x_index) = 1.0;
-    A_k(y_index,y_index) = 1.0;
-    A_k(2,2) = 1.0;
-    A_k(3,3) = 1.0;
 
-    // Assummed change in position necessary for velocity to work correctly
-    A_k(0,vel_x_index) = 1.0f / ASSUMED_FPS;
-    A_k(1,vel_y_index) = 1.0f / ASSUMED_FPS;
+    ///////////////////////
+    // Derivatives of ball position update re:x,y,vel_x,vel_y
+    //
+    // NOTE: These values are constant, so we set them here to avoid
+    //       unnecessary resetting every frame
+    ///////////////////////
+
+    // derivatives of x
+    A_k(0,x_index)     = 1.0;
+    A_k(0,y_index)     = 0.0;
+
+    // derivatives of y
+    A_k(1,x_index)     = 0.0;
+    A_k(1,y_index)     = 1.0;
+
+    // derivatives of vel_x
+    A_k(2,x_index)     = 0.0;
+    A_k(2,y_index)     = 0.0;
+
+    // derivatives of vel_y
+    A_k(3,x_index)     = 0.0;
+    A_k(3,y_index)     = 0.0;
 
     // Set velocity uncertainty parameters
-    // betas(2) = BETA_BALL_VEL;
-    // betas(3) = BETA_BALL_VEL;
-    // gammas(2) = GAMMA_BALL_VEL;
-    // gammas(3) = GAMMA_BALL_VEL;
+    betas(2) = BETA_BALL_VEL;
+    betas(3) = BETA_BALL_VEL;
+    gammas(2) = GAMMA_BALL_VEL;
+    gammas(3) = GAMMA_BALL_VEL;
 }
 
 
@@ -89,15 +103,7 @@ BallEKF::BallEKF(float initX, float initY,
     : EKF<RangeBearingMeasurement, MotionModel, ball_ekf_dimension,
           dist_bearing_meas_dim>(BETA_BALL,GAMMA_BALL)
 {
-    // ones on the diagonal
-    A_k(x_index,x_index) = 1.0;
-    A_k(y_index,y_index) = 1.0;
-    A_k(vel_x_index,vel_x_index) = 1.0;
-    A_k(vel_y_index,vel_y_index) = 1.0;
 
-    // Assummed change in position necessary for velocity to work correctly
-    A_k(0,vel_x_index) = 1.0f / ASSUMED_FPS;
-    A_k(1,vel_y_index) = 1.0f / ASSUMED_FPS;
 }
 
 
@@ -149,8 +155,6 @@ void BallEKF::updateModel(const MotionModel& odo,
         noCorrectionStep();
     }
 
-    cout << "x_hat: " << xhat_k << endl;
-
     // limitPosteriorUncert();
     // limitPosteriorEst();
 
@@ -176,9 +180,8 @@ BallEKF::associateTimeUpdate(MotionModel odo)
     // Get time since last update
     long long int time = monotonic_micro_time();
     frameLength = static_cast<float>(time - lastUpdateTime)/
-        1000000; // u_s to sec
+        1000000.0f; // u_s to sec
     lastUpdateTime = time;
-
 
     StateVector deltaBall(ball_ekf_dimension);
 
@@ -201,15 +204,39 @@ BallEKF::associateTimeUpdate(MotionModel odo)
     deltaBall(y_index) += newVelY * frameLength;
 
     // Change in velocity direction from odometry
-    deltaBall(vel_x_index) = newVelX - getRelativeXVelocity();
-    deltaBall(vel_y_index) = newVelY - getRelativeYVelocity();
+    deltaBall(vel_x_index) = newVelX - velX;
+    deltaBall(vel_y_index) = newVelY - velY;
 
     // Deceleration of ball due to friction (physics!)
-    deltaBall(vel_x_index) += (CARPET_FRICTION * newVelX * frameLength);
-    deltaBall(vel_y_index) += (CARPET_FRICTION * newVelY * frameLength);
+    deltaBall(vel_x_index) += CARPET_FRICTION * newVelX * frameLength;
+    deltaBall(vel_y_index) += CARPET_FRICTION * newVelY * frameLength;
 
-    A_k(0,vel_x_index) = frameLength;
-    A_k(1,vel_y_index) = frameLength;
+    ///////////////////////
+    // Derivatives of ball position update re:x,y,vel_x,vel_y
+    //
+    // NOTE: These are the values which change every frame. The
+    //       constant values are all set once in the constructor.
+    ///////////////////////
+
+    // derivatives of x
+    A_k(0,vel_x_index) = cos(odo.deltaR) * frameLength;
+    A_k(0,vel_y_index) = -sin(odo.deltaR) * frameLength;
+
+    // derivatives of y
+    A_k(1,vel_x_index) = sin(odo.deltaR) * frameLength;
+    A_k(1,vel_y_index) = cos(odo.deltaR) * frameLength;
+
+    // derivatives of vel_x
+    A_k(2,vel_x_index) = (cos(odo.deltaR) - 1.0f +
+                          cos(odo.deltaR) * CARPET_FRICTION * frameLength);
+    A_k(2,vel_y_index) = (-sin(odo.deltaR) -
+                          sin(odo.deltaR) * CARPET_FRICTION * frameLength);
+
+    // derivatives of vel_y
+    A_k(3,vel_x_index) = (sin(odo.deltaR) +
+                          sin(odo.deltaR) * CARPET_FRICTION * frameLength);
+    A_k(3,vel_y_index) = (cos(odo.deltaR) - 1 +
+                          cos(odo.deltaR) * CARPET_FRICTION * frameLength);
 
     return deltaBall;
 }
@@ -484,22 +511,22 @@ void BallEKF::clipBallEstimate()
  */
 const float BallEKF::getGlobalX() const
 {
-    return xhat_k(x_index) * cos(robotPose.h) +
+    return xhat_k(x_index) * cos(robotPose.h) -
         xhat_k(y_index) * sin(robotPose.h) + robotPose.x;
 }
 const float BallEKF::getGlobalY() const
 {
-    return -xhat_k(x_index) * sin(robotPose.h) +
+    return xhat_k(x_index) * sin(robotPose.h) +
         xhat_k(y_index) * cos(robotPose.h) + robotPose.y;
 }
 const float BallEKF::getGlobalXVelocity() const
 {
-    return xhat_k(vel_x_index) * cos(robotPose.h) +
+    return xhat_k(vel_x_index) * cos(robotPose.h) -
         xhat_k(vel_y_index) * sin(robotPose.h);
 }
 const float BallEKF::getGlobalYVelocity() const
 {
-    return -xhat_k(vel_x_index) * sin(robotPose.h) +
+    return xhat_k(vel_x_index) * sin(robotPose.h) +
         xhat_k(vel_y_index) * cos(robotPose.h);
 }
 

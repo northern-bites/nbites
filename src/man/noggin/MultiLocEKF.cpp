@@ -172,9 +172,16 @@ MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
       useAmbiguous(true), errorLog(error_log_width),
       resetFlag(false)
 {
-    // ones on the diagonal
+    // These jacobian values are unchanging and independent of the
+    // motion updates, so we initialize them here.
     A_k(0,0) = 1.0;
+    A_k(0,1) = 0.0;
+
+    A_k(1,0) = 0.0;
     A_k(1,1) = 1.0;
+
+    A_k(2,0) = 0.0;
+    A_k(2,1) = 0.0;
     A_k(2,2) = 1.0;
 
     // Setup initial values
@@ -356,8 +363,10 @@ MultiLocEKF::associateTimeUpdate(MotionModel u)
     deltaLoc(1) = u.deltaF * sinh + u.deltaL * cosh;
     deltaLoc(2) = u.deltaR;
 
-    A_k(0,2) =  0;//-u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) =  0;//u.deltaF * cosh - u.deltaL * sinh;
+    // Derivatives of motion updates re:x,y,h
+    // Other values are set in the constructor and are unchanging
+    A_k(0,2) = -u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) = u.deltaF * cosh - u.deltaL * sinh;
 
     return deltaLoc;
 }
