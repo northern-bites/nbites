@@ -66,16 +66,6 @@ BallEKF::BallEKF()
     // betas(3) = BETA_BALL_VEL;
     // gammas(2) = GAMMA_BALL_VEL;
     // gammas(3) = GAMMA_BALL_VEL;
-
-    // Setup initial values
-    setGlobalXEst(INIT_BALL_X);
-    setGlobalYEst(INIT_BALL_Y);
-    setGlobalXVelocityEst(INIT_BALL_X_VEL);
-    setGlobalYVelocityEst(INIT_BALL_Y_VEL);
-    setGlobalXUncert(INIT_X_UNCERT);
-    setGlobalYUncert(INIT_Y_UNCERT);
-    setGlobalXVelocityUncert(INIT_X_VEL_UNCERT);
-    setGlobalYVelocityUncert(INIT_Y_VEL_UNCERT);
 }
 
 
@@ -108,16 +98,6 @@ BallEKF::BallEKF(float initX, float initY,
     // Assummed change in position necessary for velocity to work correctly
     A_k(0,vel_x_index) = 1.0f / ASSUMED_FPS;
     A_k(1,vel_y_index) = 1.0f / ASSUMED_FPS;
-
-    // Setup initial values
-    setGlobalXEst(initX);
-    setGlobalYEst(initY);
-    setGlobalXVelocityEst(initVelX);
-    setGlobalYVelocityEst(initVelY);
-    setGlobalXUncert(initXUncert);
-    setGlobalYUncert(initYUncert);
-    setGlobalXVelocityUncert(initVelXUncert);
-    setGlobalYVelocityUncert(initVelYUncert);
 }
 
 
@@ -132,17 +112,9 @@ void BallEKF::reset()
         }
     }
     // Set the initial values
-    setGlobalXEst(INIT_BALL_X);
-    setGlobalYEst(INIT_BALL_Y);
-    setGlobalXVelocityEst(INIT_BALL_X_VEL);
-    setGlobalYVelocityEst(INIT_BALL_Y_VEL);
-    setGlobalXUncert(INIT_X_UNCERT);
     P_k_bar(x_index,x_index) = INIT_X_UNCERT;
-    setGlobalYUncert(INIT_Y_UNCERT);
     P_k_bar(y_index,y_index) = INIT_Y_UNCERT;
-    setGlobalXVelocityUncert(INIT_X_VEL_UNCERT);
     P_k_bar(vel_x_index,vel_x_index) = INIT_X_VEL_UNCERT;
-    setGlobalYVelocityUncert(INIT_X_VEL_UNCERT);
     P_k_bar(vel_y_index,vel_y_index) = INIT_Y_VEL_UNCERT;
 }
 
@@ -165,7 +137,7 @@ void BallEKF::updateModel(const MotionModel& odo,
 
     // Update expected ball movement
     timeUpdate(odo);
-    limitAPrioriUncert();
+    // limitAPrioriUncert();
 
     // We've seen a ball
     if (ball.distance > 0.0) {
@@ -177,8 +149,10 @@ void BallEKF::updateModel(const MotionModel& odo,
         noCorrectionStep();
     }
 
+    cout << "x_hat: " << xhat_k << endl;
+
     // limitPosteriorUncert();
-    limitPosteriorEst();
+    // limitPosteriorEst();
 
     if (testForNaNReset()) {
         cout << "\tBallEKF reset to " << *this << endl;
@@ -231,10 +205,8 @@ BallEKF::associateTimeUpdate(MotionModel odo)
     deltaBall(vel_y_index) = newVelY - getRelativeYVelocity();
 
     // Deceleration of ball due to friction (physics!)
-    deltaBall(vel_x_index) -= (copysignf(1.0f, newVelX) *
-                               CARPET_FRICTION * newVelX * frameLength);
-    deltaBall(vel_y_index) -= (copysignf(1.0f, newVelY) *
-                               CARPET_FRICTION * newVelY * frameLength);
+    deltaBall(vel_x_index) += (CARPET_FRICTION * newVelX * frameLength);
+    deltaBall(vel_y_index) += (CARPET_FRICTION * newVelY * frameLength);
 
     A_k(0,vel_x_index) = frameLength;
     A_k(1,vel_y_index) = frameLength;
@@ -262,47 +234,35 @@ void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
     const float x_b_r = z.distance * cos(z.bearing);
     const float y_b_r = z.distance * sin(z.bearing);
 
-    // Measured values
-    MeasurementVector z_x(2);
-    z_x(x_index) = x_b_r;
-    z_x(y_index) = y_b_r;
-
-    z_x(vel_x_index) = (x_b_r - xhat_k_bar(x_index)) / frameLength;
-    z_x(vel_y_index) = (y_b_r - xhat_k_bar(y_index)) / frameLength;
-
     // Calculate invariance
-    V_k = z_x - xhat_k_bar;
+    V_k(x_index) = x_b_r - xhat_k_bar(x_index);
+    V_k(y_index) = y_b_r - xhat_k_bar(y_index);
 
     // Calculate jacobians
     float sinB = sin(z.bearing);
     float cosB = cos(z.bearing);
 
-    // Derivatives with respect to distance
-    H_k(0,x_index)     = cosB;
-    H_k(0,y_index)     = sinB;
-    H_k(0,vel_x_index) = cosB/frameLength;
-    H_k(0,vel_y_index) = sinB/frameLength;
+    // Derivatives with respect to x
+    H_k(0,x_index)     = 1;
+    H_k(0,y_index)     = 0;
+    H_k(0,vel_x_index) = 1/frameLength;
+    H_k(0,vel_y_index) = 0;
 
-    // Derivatives with respect to bearing
-    H_k(1,x_index)     = -sinB             * z.distance;
-    H_k(1,y_index)     =  cosB             * z.distance;
-    H_k(1,vel_x_index) = -sinB/frameLength * z.distance;
-    H_k(1,vel_y_index) =  cosB/frameLength * z.distance;
+    // Derivatives with respect to y
+    H_k(1,x_index)     = 0;
+    H_k(1,y_index)     = 1;
+    H_k(1,vel_x_index) = 0;
+    H_k(1,vel_y_index) = 1/frameLength;
 
     // Update the measurement covariance matrix
 
     const float sd_dist_sq = z.distanceSD * z.distanceSD;
     const float var = sd_dist_sq * sin(z.bearing) * cos(z.bearing);
 
-    R_k(0,x_index) = sd_dist_sq * cosB;
-    R_k(0,y_index) = sd_dist_sq * sinB;
-    R_k(0,vel_x_index) = sd_dist_sq * cosB / frameLength;
-    R_k(0,vel_y_index) = sd_dist_sq * sinB / frameLength;
-
-    R_k(1,x_index) = z.bearingSD * z.bearingSD;
-    R_k(1,y_index) = z.bearingSD * z.bearingSD;
-    R_k(1,vel_x_index) = z.bearingSD * z.bearingSD / frameLength;
-    R_k(1,vel_y_index) = z.bearingSD * z.bearingSD / frameLength;
+    R_k(x_index,x_index)     = sd_dist_sq * cosB;
+    R_k(x_index,y_index)     = 0;
+    R_k(y_index,x_index)     = 0;
+    R_k(y_index,y_index)     = sd_dist_sq * sinB;
 }
 
 void BallEKF::beforeCorrectionFinish(void)

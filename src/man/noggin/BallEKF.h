@@ -95,26 +95,28 @@ public:
     /**
      * Set relative position, velocity and uncertainty values
      */
-    void setRelativeXEst(float val) { xhat_k(x_index) = val; }
-    void setRelativeYEst(float val) { xhat_k(y_index) = val; }
+    void setRelativeX               (float val) { xhat_k(x_index)      = val; }
+    void setRelativeY               (float val) { xhat_k(y_index)      = val; }
 
-    void setRelativeXVelocityEst(float val) { xhat_k(vel_x_index) = val; }
-    void setRelativeYVelocityEst(float val) { xhat_k(vel_y_index) = val; }
+    void setRelativeXVelocity       (float val) { xhat_k(vel_x_index)  = val; }
+    void setRelativeYVelocity       (float val) { xhat_k(vel_y_index)  = val; }
 
-    void setRelativeXUncert(float val) { P_k(x_index,x_index) = val; }
-    void setRelativeYUncert(float val) { P_k(y_index,y_index) = val; }
+    void setRelativeXUncert         (float val) { P_k(x_index,x_index) = val; }
+    void setRelativeYUncert         (float val) { P_k(y_index,y_index) = val; }
 
-    void setRelativeXVelocityUncert(float val) { P_k(vel_x_index,vel_x_index) = val; }
-    void setRelativeYVelocityUncert(float val) { P_k(vel_y_index,vel_y_index) = val; }
+    void setRelativeXVelocityUncert (float val) { P_k(vel_x_index,
+                                                      vel_x_index) = val;     }
+    void setRelativeYVelocityUncert (float val) { P_k(vel_y_index,
+                                                      vel_y_index) = val;     }
 
     /**
      * Set global position, velocity and uncertainty values
      */
-    void setGlobalXEst(float val);
-    void setGlobalYEst(float val);
+    void setGlobalX(float val);
+    void setGlobalY(float val);
 
-    void setGlobalXVelocityEst(float val);
-    void setGlobalYVelocityEst(float val);
+    void setGlobalXVelocity(float val);
+    void setGlobalYVelocity(float val);
 
     void setGlobalXUncert(float val);
     void setGlobalYUncert(float val);
