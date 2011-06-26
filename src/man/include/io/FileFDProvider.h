@@ -17,26 +17,27 @@ namespace man {
 namespace include {
 namespace io {
 
-//TODO: create a separate C++ class
+enum OpenType {
+    NEW = O_WRONLY | O_CREAT | O_TRUNC,
+    EXISTING = O_RDONLY
+};
 
 class FileFDProvider : public FDProvider {
 
 public:
     FileFDProvider(const char* file_name,
-            int	flags = O_WRONLY | O_CREAT | O_TRUNC,
-            int permissions = S_IRWXU | S_IRWXG | S_IRWXO) :
+            int	flags = EXISTING) :
                 FDProvider(),
                 file_name(file_name),
-                flags(flags), permissions(permissions){
+                flags(flags) {
         openFileDescriptor();
     }
 
     FileFDProvider(std::string file_name,
-            int flags = O_WRONLY | O_CREAT | O_TRUNC,
-            int permissions = S_IRWXU | S_IRWXG | S_IRWXO) :
+            int flags = EXISTING ) :
                 FDProvider(),
                 file_name(file_name),
-                flags(flags), permissions(permissions){
+                flags(flags) {
         openFileDescriptor();
     }
 
@@ -51,8 +52,7 @@ public:
 protected:
     void openFileDescriptor() {
 
-        file_descriptor = open(file_name.c_str(),
-                flags, permissions);
+        file_descriptor = open(file_name.c_str(), flags);
 
         if (file_descriptor < 0) {
             std::cout << "Could not open file: " << file_name << std::endl;
@@ -62,7 +62,7 @@ protected:
 
 private:
     std::string file_name;
-    int flags, permissions;
+    int flags;
 
 };
 
