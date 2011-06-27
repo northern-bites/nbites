@@ -1916,11 +1916,16 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 	int indexr = 0;
 	int indexl = 0;
     int mind = min(100, height / 2 + (right - left) / 2);
+	int nextX = 0;
+	int nextY = 0;
+	int nextH = 0;
+	int count = 0;
+	int horX = horizonAt(nextX);
     for (int i = 0; i < numberOfRuns; i++) {
-        int nextX = runs[i].x;
-        int nextY = runs[i].y;
-        int nextH = runs[i].h;
-        int horX = horizonAt(nextX);
+        nextX = runs[i].x;
+        nextY = runs[i].y;
+        nextH = runs[i].h;
+        horX = horizonAt(nextX);
         // meanwhile collect some information on which post we're looking at
         if (nextH > MIN_GOAL_HEIGHT && nextY < horX &&
             nextX > 5 && nextX < IMAGE_WIDTH - 5 &&
@@ -1941,12 +1946,12 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
     if ((larger > height / 2 || larger > MIN_OTHER_THRESHOLD) && larger >
         largel) {
 		// watch out for tiny swatches
-		int count = 0;
+		count = 0;
 		for (int i = indexr + 1; i < numberOfRuns && runs[i].x - runs[i-1].x < 3;
 			 i++) {
 			count++;
 		}
-		for (int i = indexr - 1; i >= 0 && runs[i+1].x - runs[i].x < 3; i++) {
+		for (int i = indexr - 1; i >= 0 && runs[i+1].x - runs[i].x < 3; i--) {
 			count++;
 		}
 		if (count > 4) {
@@ -1957,12 +1962,12 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 			return LEFT;
 		}
     } else if (largel > MIN_OTHER_THRESHOLD || largel > height / 2) {
-		int count = 0;
+		count = 0;
 		for (int i = indexl + 1; i < numberOfRuns && runs[i].x - runs[i-1].x < 3;
 			 i++) {
 			count++;
 		}
-		for (int i = indexl - 1; i >= 0 && runs[i+1].x - runs[i].x < 3; i++) {
+		for (int i = indexl - 1; i >= 0 && runs[i+1].x - runs[i].x < 3; i--) {
 			count++;
 		}
 		if (count > 4) {
@@ -2005,16 +2010,7 @@ int ObjectFragments::classifyFirstPost(unsigned char c, Blob pole)
 
     // Our first test is whether we see a big blob of the same color
     // somewhere else
-    int post = classifyByOtherRuns(pole.getLeft(), pole.getRight(),
-                                   fakeBottom - pole.getTop());
-    if (post != NOPOST) {
-        if (POSTLOGIC) {
-            cout << "Found from checkOther" << endl;
-        }
-        return post;
-    }
-
-    post = classifyByCrossbar(pole);		  // look for the crossbar
+    int post = classifyByCrossbar(pole);		  // look for the crossbar
     if (post != NOPOST) {
         if (POSTLOGIC) {
             cout << "Found crossbar " << post << endl;
@@ -2048,6 +2044,16 @@ int ObjectFragments::classifyFirstPost(unsigned char c, Blob pole)
             return post;
         }
     }
+
+    post = classifyByOtherRuns(pole.getLeft(), pole.getRight(),
+                                   fakeBottom - pole.getTop());
+    if (post != NOPOST) {
+        if (POSTLOGIC) {
+            cout << "Found from checkOther" << endl;
+        }
+        return post;
+    }
+
     /*
     post = classifyByCheckingLines(pole);
     if (post != NOPOST) {
