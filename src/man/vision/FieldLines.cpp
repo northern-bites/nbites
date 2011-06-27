@@ -365,7 +365,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points)
                     }
                 } // end isGreenWhiteEdge
 
-                else if (isSecondUphillButInvalid(x, greenWhiteY, y, x,
+                else if (isSecondUphillButInvalid(x, greenWhiteY, x, y,
                                                   VERTICAL)) {
                     resetLineCounters(numWhite, numUndefined, numNonWhite);
                     greenWhiteY = NO_EDGE;
@@ -3398,7 +3398,7 @@ const bool FieldLines::isGreenWhiteEdge(int x, int y,
     if (print && !enoughGreen)
         cout << "\t\tisGreenWhiteEdge(): Green before failed. Found "
              << greenPercent << "%, expected " << GREEN_PERCENT_CLEARANCE
-             << "%" << endl;
+             << "% at: " << x << " " << y << endl;
     return enoughGreen;
 }
 
