@@ -1328,12 +1328,27 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 		distant = max((*i)->getDistance(), distant);
 	}
 	// check that the post isn't too far away
+	// basically the goalie view - the post to one side, corner in view
 	if (distant > corner.getLine1()->getDistance() &&
 		distant > corner.getLine2()->getDistance()) {
 		if (x > post.getLeft()) {
 			return LEFT;
 		} else {
 			return RIGHT;
+		}
+	}
+	float diff = realDistance(x, y, post.getLeftBottomX(),
+							  post.getLeftBottomY());
+	float further = max(corner.getLine1()->getDistance(),
+						corner.getLine2()->getDistance());
+	// field corner
+	if (distant <= further) {
+		if (diff < FIELD_WHITE_HEIGHT / 2) {
+			if (x > post.getLeft()) {
+				return RIGHT;
+			} else {
+				return LEFT;
+			}
 		}
 	}
 	estimate e = vision->pose->pixEstimate(x, y, 0.0);
@@ -1348,8 +1363,6 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 	// if we can't see the bottom of the post it is too dangerous
 	if (y < post.getBottom() && post.getBottom() < IMAGE_HEIGHT - 2) {
 		// roughly how far away is it?
-		float diff = realDistance(x, y, post.getLeftBottomX(),
-								  post.getLeftBottomY());
 		// if it is in the right position we can figure out which post
 		if (POSTLOGIC) {
 			cout << "Checking a corner " << x << " " <<
