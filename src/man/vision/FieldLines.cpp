@@ -3075,7 +3075,7 @@ const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
     // These are based on 640x480 images
     // See https://robocup.bowdoin.edu/files/nao/NaoLineWidthData.xls
     if (distance < 100)
-        return width < 65;
+        return width < 65 && width > 5;
     else if (distance < 150)
         return width < 40;
     else if (distance < 200)
@@ -3100,6 +3100,9 @@ const bool FieldLines::isReasonableHorizontalWidth(const int x, const int y,
     if (width < 0) {
         return false;
     }
+	if (distance < 100 && width < 6) {
+		return false;
+	}
     if (distance <= 0) {
         if (debugHorEdgeDetect) {
             point<int> badP(x,y);
