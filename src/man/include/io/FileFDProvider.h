@@ -18,7 +18,7 @@ namespace include {
 namespace io {
 
 enum OpenType {
-    NEW = O_WRONLY | O_CREAT | O_TRUNC | O_FSYNC,
+    NEW = O_WRONLY | O_CREAT | O_TRUNC,
     EXISTING = O_RDONLY
 };
 
