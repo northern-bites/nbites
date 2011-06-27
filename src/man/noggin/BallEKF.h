@@ -157,46 +157,35 @@ private:
                                             StateVector& deltaBall);
 
     virtual void beforeCorrectionFinish();
-    void limitAPrioriEst(void);
-    void limitPosteriorEst(void);
-    void limitAPrioriUncert(void);
-    void limitPosteriorUncert(void);
-    void clipBallEstimate(void);
+    void limitAPrioriEst();
+    void limitPosteriorEst();
+
+    void initMatrices();
+    float applyFriction(float vel);
 
     PoseEst robotPose;
     long long int lastUpdateTime;
     float dt;
     MotionModel curOdo;
 
-    const static float ASSUMED_FPS;
     const static float BETA_BALL;
     const static float BETA_BALL_VEL;
     const static float GAMMA_BALL;
     const static float GAMMA_BALL_VEL;
     const static float CARPET_FRICTION;
-    const static float BALL_DECAY_PERCENT;
-    const static float INIT_BALL_X;
-    const static float INIT_BALL_Y;
-    const static float INIT_BALL_X_VEL;
-    const static float INIT_BALL_Y_VEL;
-    const static float X_UNCERT_MAX;
-    const static float Y_UNCERT_MAX;
-    const static float VELOCITY_UNCERT_MAX;
-    const static float X_UNCERT_MIN;
-    const static float Y_UNCERT_MIN;
-    const static float VELOCITY_UNCERT_MIN;
-    const static float INIT_X_UNCERT;
-    const static float INIT_Y_UNCERT;
-    const static float INIT_X_VEL_UNCERT;
-    const static float INIT_Y_VEL_UNCERT;
-    const static float X_EST_MIN;
-    const static float Y_EST_MIN;
-    const static float X_EST_MAX;
-    const static float Y_EST_MAX;
-    const static float VELOCITY_EST_MAX;
-    const static float VELOCITY_EST_MIN;
+
+    const static float INIT_BALL_X, INIT_BALL_Y;
+    const static float INIT_BALL_X_VEL, INIT_BALL_Y_VEL;
+
+    const static float INIT_X_UNCERT, INIT_Y_UNCERT;
+    const static float INIT_X_VEL_UNCERT, INIT_Y_VEL_UNCERT;
+
+    const static float X_EST_MIN, X_EST_MAX;
+    const static float Y_EST_MIN, Y_EST_MAX;
+
+    const static float VELOCITY_EST_MAX, VELOCITY_EST_MIN;
+    const static float ACC_EST_MAX, ACC_EST_MIN;
+
     const static float VELOCITY_EST_MIN_SPEED;
-    const static float BALL_JUMP_VEL_THRESH;
-    const static float USE_CARTESIAN_BALL_DIST;
 };
 #endif // File
