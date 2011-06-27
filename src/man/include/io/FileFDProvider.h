@@ -18,7 +18,7 @@ namespace include {
 namespace io {
 
 enum OpenType {
-    NEW = O_WRONLY | O_CREAT | O_TRUNC,
+    NEW = O_WRONLY | O_CREAT | O_TRUNC | O_FSYNC,
     EXISTING = O_RDONLY
 };
 
@@ -45,7 +45,7 @@ public:
         close(file_descriptor);
     }
 
-    virtual std::string debugInfo() {
+    virtual std::string debugInfo() const {
         return "file name: " + file_name;
     }
 
