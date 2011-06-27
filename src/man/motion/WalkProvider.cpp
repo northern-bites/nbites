@@ -104,12 +104,13 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     pendingStepCommands=false;
 
     if (pendingDestCommands) {
-        stepGenerator.setDestination(nextDestCommand->x_mm,
-                                     nextDestCommand->y_mm,
-                                     nextDestCommand->theta_rads,
-                                     nextDestCommand->gain);
-	}
-	pendingDestCommands = false;
+        int framesToDest = stepGenerator.setDestination(nextDestCommand->x_mm,
+							nextDestCommand->y_mm,
+							nextDestCommand->theta_rads,
+							nextDestCommand->gain);
+	nextDestCommand->framesRemaining(framesToDest);
+    }
+    pendingDestCommands = false;
 
     //Also need to process stepCommands here
 

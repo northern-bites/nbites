@@ -42,6 +42,7 @@ using namespace NBMath;
 //#define DEBUG_ZMP
 //#define DEBUG_ZMP_REF
 //#define DEBUG_COM_TRANSFORMS
+#define DEBUG_DESTINATION
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s,
                              shared_ptr<NaoPose> p,
@@ -141,12 +142,12 @@ zmp_xy_tuple StepGenerator::generate_zmp_ref() {
            // VERY IMPORTANT: make sure we have enough ZMPed steps
            currentZMPDSteps.size() < MIN_NUM_ENQUEUED_STEPS) {
         if (futureSteps.size() == 0) {
-			if (hasDestination) {
-				x = y = theta = 0; // stop the robot
-				hasDestination = false;
-			}
+	    if (hasDestination) {
+		x = y = theta = 0; // stop the robot
+		hasDestination = false;
+	    }
 
-			// replenish with the current walk vector, when we don't have a destination
+	    // replenish with the current walk vector, when we don't have a destination
             generateStep(x, y, theta);
         }
         else {
@@ -462,13 +463,13 @@ void StepGenerator::swapSupportLegs(){
     // the three footholds from above
     supportStep_f =
 	Step::ptr(new Step(supp_pos_f(0),supp_pos_f(1),
-				  0.0f,*supportStep_s));
+			   0.0f,*supportStep_s));
     swingingStep_f =
 	Step::ptr(new Step(swing_pos_f(0),swing_pos_f(1),
-				  swing_dest_angle,*swingingStep_s));
+			   swing_dest_angle,*swingingStep_s));
     swingingStepSource_f  =
 	Step::ptr(new Step(swing_src_f(0),swing_src_f(1),
-				  swing_src_angle,*lastStep_s));
+			   swing_src_angle,*lastStep_s));
 
 }
 
@@ -578,8 +579,8 @@ void StepGenerator::fillZMPRegular(const Step::ptr newSupportStep ){
 
     //First, split up the frames:
     const int halfNumDSChops = //DS - DoubleStaticChops
-       static_cast<int>(static_cast<float>(newSupportStep->doubleSupportFrames)*
-                        newSupportStep->zmpConfig[WP::DBL_SUP_STATIC_P]/2.0f);
+	static_cast<int>(static_cast<float>(newSupportStep->doubleSupportFrames)*
+			 newSupportStep->zmpConfig[WP::DBL_SUP_STATIC_P]/2.0f);
     const int numDMChops = //DM - DoubleMovingChops
         newSupportStep->doubleSupportFrames - halfNumDSChops*2;
 
@@ -655,7 +656,7 @@ void StepGenerator::fillZMPEnd(const Step::ptr newSupportStep) {
  * Set the speed of the walk eninge in mm/s and rad/s
  */
 void StepGenerator::setSpeed(const float _x, const float _y,
-							 const float _theta)  {
+			     const float _theta)  {
 
     //Regardless, we are changing the walk vector, so we need to scrap any future plans
     clearFutureSteps();
@@ -701,12 +702,15 @@ void StepGenerator::setSpeed(const float _x, const float _y,
  *
  * @param gain optional speed modification parameter, range [0,1]
  */
-void StepGenerator::setDestination(const float rel_x, const float rel_y,
-                                   const float rel_theta, float gain) {
-#ifdef DEBUG_STEPGENERATOR
-    cout << "StepGenerator::setDestination() destination x=" << rel_x
-         << " y=" << rel_y << " theta=" << rel_theta << endl;
+int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
+				   float gain) {
+#ifdef DEBUG_DESTINATION
+    cout << "StepGenerator::setDestination() destination x=" << dest_x
+         << " y=" << dest_y << " theta=" << dest_theta << endl;
 #endif
+
+    using std::abs;
+    using NBMath::sign;
 
     // sanity
     if (gain <= 0.0f || gain > 1.0f) {
@@ -714,72 +718,86 @@ void StepGenerator::setDestination(const float rel_x, const float rel_y,
         gain = 1.0f;
     }
 
-    float step_x, step_y, step_theta;
+    float speed_x, speed_y, speed_theta;
 
-    // if setSpeed isn't explicity called, default to maximum allowed x,y,theta
-    if (rel_x > 0)
-        step_x = gain*gait->step[WP::MAX_VEL_X];
+    // use the maximum allowed x,y,theta
+    if (dest_x > 0)
+        speed_x = gain*gait->step[WP::MAX_VEL_X];
     else
-        step_x = gain*gait->step[WP::MIN_VEL_X];
+        speed_x = gain*gait->step[WP::MIN_VEL_X];
 
-    step_y = gain*gait->step[WP::MAX_VEL_Y];
-    step_theta = gain*gait->step[WP::MAX_VEL_THETA];
+    speed_y = gain*gait->step[WP::MAX_VEL_Y];
+    speed_theta = gain*gait->step[WP::MAX_VEL_THETA];
 
-	// find the limiting component of our speeds (x,y,theta)
-	// @TODO make this more accurate by taking acceleration into account
-	const float x_time = std::abs(rel_x / step_x);
-	const float y_time = std::abs(rel_y / step_y);
-	const float theta_time = std::abs(rel_theta / step_theta);
+    // we've finished calculating, now deal with the motion queues
+    if (hasDestination || !done) {
+	clearFutureSteps();
+    } else {
+	resetQueues();
+	const bool startLeft = decideStartLeft(dest_y,dest_theta);
+	resetSteps(startLeft);
+    }
+    hasDestination = true;
+    done = false;
 
-	//printf("limiting time-- x: %f y: %f theta: %f\n", x_time, y_time, theta_time);
+    int framesToDestination = 0;
 
-	// figure out how long it will take at the limiting speeds
-	float timeToDest;
+    const float CLOSE_ENOUGH_XY = 10.0f;
+    const float CLOSE_ENOUGH_THETA = 0.17f; // 10 degrees
 
-	// x is limiting direction
-	if (x_time >=  y_time && x_time >= theta_time) {
-		//cout << "x limiting" << endl;
-		timeToDest = x_time;
-	}
-	// y limiting
-	else if (y_time >= x_time && y_time >= theta_time) {
-		//cout << "y limiting" << endl;
-		timeToDest = y_time;
-	}
-	// theta limiting
-	else {
-		//cout << "theta limiting" << endl;
-		timeToDest = theta_time;
-	}
+    // loop until we get to our destination
+    while (abs(dest_x) > CLOSE_ENOUGH_XY ||
+	   abs(dest_y) > CLOSE_ENOUGH_XY ||
+	   abs(dest_theta) > CLOSE_ENOUGH_THETA) {
+	float step_x, step_y, step_theta;
 
-	const float x_vel = rel_x / timeToDest;
-	const float y_vel = rel_y / timeToDest;
-	const float thetaPerStep = rel_theta / timeToDest;
+	// check if we're close enough to our destination to make it this step
+	if (abs(dest_x) > abs(speed_x))
+	    step_x = speed_x * sign(dest_x);
+	else if (abs(dest_x) <= CLOSE_ENOUGH_XY)
+	    step_x = 0.0f;
+	else
+	    step_x = dest_x;
 
-	const int numberSteps = static_cast<int>(
-		ceil(timeToDest / gait->step[WP::DURATION]));
+	if (abs(dest_y) > abs(speed_y))
+	    step_y = speed_y * sign(dest_y);
+	else if (abs(dest_y) <= CLOSE_ENOUGH_XY)
+	    step_y = 0.0f;
+	else
+	    step_y = dest_y;
 
-	// slow down, run calculations again (since takeSteps sucks for <3 steps)
-	// @HACK :-)
-	if (numberSteps < 3) {
-		const float SCALE_DOWN = 0.95f;
-		return setDestination(rel_x, rel_y, rel_theta, gain*SCALE_DOWN);
-	}
+	if (abs(dest_theta) > abs(speed_theta))
+	    step_theta = speed_theta * sign(dest_theta);
+	else if (abs(dest_theta) <= CLOSE_ENOUGH_THETA)
+	    step_theta = 0.0f;
+	else
+	    step_theta = dest_theta;
 
-	// we've finished calculating, now deal with the motion queues
-	if (hasDestination || !done) {
-		clearFutureSteps();
-	} else {
-		resetQueues();
-	}
-	hasDestination = true;
+	generateStep(step_x, step_y, step_theta);
 
-#ifdef DEBUG_STEPGENERATOR
-	printf("Making %d steps of (%f,%f,%f)\n", numberSteps+1, x_vel, y_vel, thetaPerStep);
+	// update the destination based on how far this step went
+	dest_x -= lastQueuedStep->x;
+
+	if (sign(dest_y) == sign(step_y))
+	    dest_y -= lastQueuedStep->y;
+
+	if (sign(dest_theta) == sign(step_theta))
+	    dest_theta -= lastQueuedStep->theta;
+
+	framesToDestination += lastQueuedStep->stepDurationFrames;
+
+#ifdef DEBUG_DESTINATION
+	cout << "created step: " << *lastQueuedStep << endl;
+	printf("distance to destination is now %f %f %f\n",
+	       dest_x, dest_y, dest_theta);
+#endif
+    }
+
+#ifdef DEBUG_DESTINATION
+    printf("Frames to destination: %d\n", framesToDestination);
 #endif
 
-	// use takeSteps to do the dirty work
-	takeSteps(x_vel, y_vel, thetaPerStep, numberSteps+1);
+    return framesToDestination;
 }
 
 /**
@@ -800,7 +818,7 @@ void StepGenerator::takeSteps(const float _x, const float _y, const float _theta
             <<") and with "<<_numSteps<<" Steps were APPENDED because"
             "StepGenerator is already active!!" <<endl;
     }else{
-       //we are starting fresh from a stopped state, so we need to clear all remaining
+	//we are starting fresh from a stopped state, so we need to clear all remaining
         //steps and zmp values.
         resetQueues();
 
@@ -909,12 +927,12 @@ void StepGenerator::resetSteps(const bool startLeft){
     //in generateStep, is REGULAR type.
     Step::ptr firstSupportStep =
 	Step::ptr(new Step(ZERO_WALKVECTOR,
-                                  *gait,
-                                  firstSupportFoot,ZERO_WALKVECTOR,END_STEP));
+			   *gait,
+			   firstSupportFoot,ZERO_WALKVECTOR,END_STEP));
     Step::ptr dummyStep =
         Step::ptr(new Step(ZERO_WALKVECTOR,
-                                  *gait,
-                                  dummyFoot));
+			   *gait,
+			   dummyFoot));
     //need to indicate what the current support foot is:
     currentZMPDSteps.push_back(dummyStep);//right gets popped right away
     fillZMP(firstSupportStep);
@@ -979,7 +997,7 @@ void StepGenerator::generateStep( float _x,
                 type = REGULAR_STEP;
                 _x = 0.0f;
                 _y = 0.0f;
-                 _theta = 0.0f;
+		_theta = 0.0f;
             }else{
                 type = REGULAR_STEP;
                 lastQueuedStep->type = REGULAR_STEP;
@@ -998,11 +1016,11 @@ void StepGenerator::generateStep( float _x,
     const WalkVector new_walk = {_x,_y,_theta};
 
     Step::ptr step(new Step(new_walk,
-                                   *gait,
-                                   (nextStepIsLeft ?
-                                    LEFT_FOOT : RIGHT_FOOT),
-				   lastQueuedStep->walkVector,
-                                   type));
+			    *gait,
+			    (nextStepIsLeft ?
+			     LEFT_FOOT : RIGHT_FOOT),
+			    lastQueuedStep->walkVector,
+			    type));
 
 #ifdef DEBUG_STEPGENERATOR
     cout << "Generated a new step: "<<*step<<endl;
@@ -1197,7 +1215,7 @@ void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
  * Method to figure out when to start swinging with the left vs. right left
  */
 const bool StepGenerator::decideStartLeft(const float lateralVelocity,
-                                       const float radialVelocity){
+					  const float radialVelocity){
     //Currently, the logic is very simple: if the strafe direction
     //or the turn direction go left, then start that way
     //Strafing takes precedence over turning.
