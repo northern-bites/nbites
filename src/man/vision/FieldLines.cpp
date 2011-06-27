@@ -475,7 +475,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
         // starting edge value
         for (int x = 1; x < IMAGE_WIDTH - 1; x++) {
             const int current_y_value = vision->thresh->getY(x,y);
-            const unsigned thresholdedColor = vision->thresh->getThresholded(y,x);
+            const unsigned char thresholdedColor = vision->thresh->getThresholded(y,x);
 
             const bool isAtAnUphillEdge = isUphillEdge(current_y_value,
                                                        last_y_value,
@@ -4401,7 +4401,7 @@ void FieldLines::drawLinePoint(const linePoint &p, const int color) const
     vision->drawPoint(p.x, p.y, color);
 }
 
-void FieldLines::updateLineCounters(const int threshColor, int &numWhite,
+void FieldLines::updateLineCounters(const unsigned char threshColor, int &numWhite,
                                     int &numUndefined, int &numNonWhite)
 {
     if (Utility::isWhite(threshColor)) {

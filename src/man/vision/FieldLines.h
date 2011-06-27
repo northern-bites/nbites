@@ -485,7 +485,7 @@ private:
     const bool isWhiteGreenEdge(int x, int y, int potentialMidPoint,
                                 const ScanDirection direction) const;
 
-    static void updateLineCounters(const int threshColor, int &numWhite,
+    static void updateLineCounters(const unsigned char threshColor, int &numWhite,
                                    int &numUndefined, int &numNonWhite);
 
 #ifdef OFFLINE
