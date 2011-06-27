@@ -324,6 +324,10 @@ private:
     const bool tooMuchGreenAtCorner(const point<int>& intersection,
                                     const int& numChecksPassed);
 
+    const bool tooMuchWhitePastEndpoint(const point<int>& line1Closer,
+										const point<int>& line2Closer,
+										const point<int>& intersection) const;
+
     const bool areLinesTooSmall(boost::shared_ptr<VisualLine> i,
                                 boost::shared_ptr<VisualLine> j,
                                 const int& numChecksPassed) const;

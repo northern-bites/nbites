@@ -89,9 +89,16 @@ void VisualCorner::determineCornerShape() {
     if (Utility::tValueInMiddleOfLine(t1, line1->getLength(),
                                       max(line2->getAvgWidth(),
                                           MIN_EXTEND_DIST))) {
-        cornerType = T;
-        tBar = line1;
-        tStem = line2;
+		if(Utility::tValueInMiddleOfLine(t2, line2->getLength(),
+										 max(line1->getAvgWidth(),
+											 MIN_EXTEND_DIST))) {
+			cornerType = CIRCLE;
+			cout << "Caught a bad T" << endl;
+		} else {
+			cornerType = T;
+			tBar = line1;
+			tStem = line2;
+		}
     } else if(Utility::tValueInMiddleOfLine(t2, line2->getLength(),
                                             max(line1->getAvgWidth(),
                                                 MIN_EXTEND_DIST))) {
