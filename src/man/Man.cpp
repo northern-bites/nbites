@@ -42,9 +42,9 @@ using namespace boost::assign;
 
 using namespace std;
 using boost::shared_ptr;
-using man::memory::Memory;
-using man::memory::log::LoggingBoard;
-using man::memory::log::IOProviderFactory;
+using namespace man::memory;
+using log::LoggingBoard;
+using log::IOProviderFactory;
 
 /////////////////////////////////////////
 //                                     //
@@ -196,6 +196,12 @@ Man::processFrame ()
     // Need to lock image and vision angles for duration of
     // vision processing to ensure consistency.
     sensors->lockImage();
+#ifdef USE_MEMORY
+    // TODO: this is temporarily here
+    loggingBoard->log(MIMAGE_ID);
+    sensors->setNaoImage(loggingBoard->getImageLogger(MIMAGE_ID)->
+            getCurrentImage());
+#endif
 
     vision->notifyImage(sensors->getImage());
 
@@ -203,6 +209,7 @@ Man::processFrame ()
 #endif
 #ifdef USE_MEMORY
     memory->updateVision();
+    loggingBoard->log(MVISION_ID);
 #endif
 #ifdef USE_NOGGIN
     noggin->runStep();
