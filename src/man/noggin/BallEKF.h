@@ -15,7 +15,7 @@
 #include "NogginStructs.h"
 
 /**
- * @brief Class for tracking of ball position and velocity.  Tracks
+ * @brief Class for tracking of ball position and velocity. Tracks
  * the ball in a totally relative frame of reference. Robot pose
  * estimate (from localization) is used only when a global ball
  * position is required, as it may be for communicating with other
@@ -24,13 +24,15 @@
 class BallEKF : public ekf::EKF<RangeBearingMeasurement,
                                 MotionModel,
                                 ekf::ball_ekf_dimension,
-                                ekf::dist_bearing_meas_dim>
+                                ekf::ball_ekf_meas_dim>
 {
-    enum StateIndices{
+    enum StateIndices {
         x_index = 0,
         y_index,
         vel_x_index,
-        vel_y_index
+        vel_y_index,
+        acc_x_index,
+        acc_y_index
     };
 
 public:
@@ -144,6 +146,16 @@ private:
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
 
+    inline void updateFrameLength();
+    inline void updatePosition(const MotionModel& odo,
+                               StateVector& deltaBall);
+    inline void updateVelocity(const MotionModel& odo,
+                               StateVector& deltaBall);
+    inline void updateAcceleration(const MotionModel& odo,
+                                   StateVector& deltaBall);
+    inline void calculateTimeUpdateJacobian(const MotionModel& odo,
+                                            StateVector& deltaBall);
+
     virtual void beforeCorrectionFinish();
     void limitAPrioriEst(void);
     void limitPosteriorEst(void);
@@ -153,7 +165,8 @@ private:
 
     PoseEst robotPose;
     long long int lastUpdateTime;
-    float frameLength;
+    float dt;
+    MotionModel curOdo;
 
     const static float ASSUMED_FPS;
     const static float BETA_BALL;

@@ -32,7 +32,8 @@ enum {
     dist_bearing_meas_dim = 2, // (Dist, Bearing) measurements
     corner_measurement_dim = 3, // (Dist, Bearing, Orientation) meas.
     loc_ekf_dimension = 3,  // # of states in Loc EKF
-    ball_ekf_dimension = 4, // # of states in Ball EKF
+    ball_ekf_meas_dim = 6,
+    ball_ekf_dimension = 6, // # of states in Ball EKF
     acc_num_dimensions = 3,
     acc_num_measurements = 3,
     angle_num_dimensions = 2,

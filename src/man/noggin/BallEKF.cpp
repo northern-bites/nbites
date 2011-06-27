@@ -17,7 +17,7 @@ const float BallEKF::BETA_BALL_VEL = 50.0f;
 // How much ball velocity should effect uncertainty
 const float BallEKF::GAMMA_BALL = 0.4f;
 const float BallEKF::GAMMA_BALL_VEL = 1.0f;
-const float BallEKF::CARPET_FRICTION = -(1.0f / 4.0f);//25.0f; // 25 cm/s^2
+const float BallEKF::CARPET_FRICTION = -(1.0f / 2.0f);//25.0f; // 25 cm/s^2
 const float BallEKF::BALL_DECAY_PERCENT = 0.25f;
 
 // Default initialization values
@@ -48,8 +48,8 @@ static const bool USE_BALL_JUMP_RESET = true;
 
 BallEKF::BallEKF()
     : EKF<RangeBearingMeasurement, MotionModel, ball_ekf_dimension,
-          dist_bearing_meas_dim>(BETA_BALL,GAMMA_BALL), robotPose(),
-      lastUpdateTime(0), frameLength(0.0f)
+          ball_ekf_meas_dim>(BETA_BALL,GAMMA_BALL), robotPose(),
+      lastUpdateTime(0), dt(0.0f)
 {
 
     ///////////////////////
@@ -60,26 +60,18 @@ BallEKF::BallEKF()
     ///////////////////////
 
     // derivatives of x
-    A_k(0,x_index)     = 1.0;
-    A_k(0,y_index)     = 0.0;
 
     // derivatives of y
-    A_k(1,x_index)     = 0.0;
-    A_k(1,y_index)     = 1.0;
 
     // derivatives of vel_x
-    A_k(2,x_index)     = 0.0;
-    A_k(2,y_index)     = 0.0;
 
     // derivatives of vel_y
-    A_k(3,x_index)     = 0.0;
-    A_k(3,y_index)     = 0.0;
 
     // Set velocity uncertainty parameters
-    betas(2) = BETA_BALL_VEL;
-    betas(3) = BETA_BALL_VEL;
-    gammas(2) = GAMMA_BALL_VEL;
-    gammas(3) = GAMMA_BALL_VEL;
+    // betas(2) = BETA_BALL_VEL;
+    // betas(3) = BETA_BALL_VEL;
+    // gammas(2) = GAMMA_BALL_VEL;
+    // gammas(3) = GAMMA_BALL_VEL;
 }
 
 
@@ -101,7 +93,7 @@ BallEKF::BallEKF(float initX, float initY,
                  float initXUncert,float initYUncert,
                  float initVelXUncert, float initVelYUncert)
     : EKF<RangeBearingMeasurement, MotionModel, ball_ekf_dimension,
-          dist_bearing_meas_dim>(BETA_BALL,GAMMA_BALL)
+          ball_ekf_meas_dim>(BETA_BALL,GAMMA_BALL)
 {
 
 }
@@ -156,7 +148,7 @@ void BallEKF::updateModel(const MotionModel& odo,
     }
 
     // limitPosteriorUncert();
-    // limitPosteriorEst();
+    limitPosteriorEst();
 
     if (testForNaNReset()) {
         cout << "\tBallEKF reset to " << *this << endl;
@@ -177,40 +169,94 @@ EKF<RangeBearingMeasurement,
     dist_bearing_meas_dim>::StateVector
 BallEKF::associateTimeUpdate(MotionModel odo)
 {
-    // Get time since last update
-    long long int time = monotonic_micro_time();
-    frameLength = static_cast<float>(time - lastUpdateTime)/
-        1000000.0f; // u_s to sec
-    lastUpdateTime = time;
-
+    curOdo = odo;
     StateVector deltaBall(ball_ekf_dimension);
 
-    // Changes to ball position from odometry
-    deltaBall(x_index) = sin(odo.deltaR) * odo.deltaL -
+    updateFrameLength();
+    updatePosition              ( odo, deltaBall);
+    updateVelocity              ( odo, deltaBall);
+    updateAcceleration          ( odo, deltaBall);
+    calculateTimeUpdateJacobian ( odo, deltaBall);
+
+    return deltaBall;
+}
+
+void BallEKF::updateFrameLength()
+{
+    // Get time since last update
+    const long long int time = monotonic_micro_time();
+    dt = static_cast<float>(time - lastUpdateTime)/
+        1000000.0f; // u_s to sec
+    lastUpdateTime = time;
+    cout << "dt: " << dt << endl;
+}
+
+void BallEKF::updatePosition(const MotionModel& odo, StateVector& deltaBall)
+{
+
+    // Calculate change in position from velocity and acceleration
+    // ds = vt + .5*a*t^2 + .5*(friction deceleration)*t^2
+    deltaBall(x_index) = (xhat_k(vel_x_index)*dt +
+                          .5f * (xhat_k(acc_x_index) +
+                                copysignf(1.0f, vel_x_index) * CARPET_FRICTION )
+                          *dt*dt ); // Friction needs correct sign
+
+    deltaBall(y_index) = (xhat_k(vel_y_index)*dt +
+                          .5f * (xhat_k(acc_y_index) +
+                                copysignf(1.0f, vel_y_index) * CARPET_FRICTION )
+                          *dt*dt ); // Friction needs correct sign
+
+    // Ensure that the change in direction is in the same direction as
+    // the velocity
+    deltaBall(x_index) = xhat_k(vel_x_index) > 0 ?
+        max(0.0f, deltaBall(x_index)) :
+        deltaBall(x_index) = min(0.0f, deltaBall(x_index));
+    deltaBall(y_index) = xhat_k(vel_y_index) > 0 ?
+        max(0.0f, deltaBall(y_index)) :
+        deltaBall(y_index) = min(0.0f, deltaBall(y_index));
+
+    // Rotate the position according to odometry
+    deltaBall(x_index) += -sin(odo.deltaR) * odo.deltaL -
         cos(odo.deltaR) * odo.deltaF;
-
-    deltaBall(y_index) = -sin(odo.deltaR) * odo.deltaF -
+    deltaBall(y_index) += sin(odo.deltaR) * odo.deltaF -
         cos(odo.deltaR) * odo.deltaL;
+}
 
-    const float velX = getRelativeXVelocity();
-    const float velY = getRelativeYVelocity();
+void BallEKF::updateVelocity(const MotionModel& odo, StateVector& deltaBall)
+{
+    // Velocities
+    float velX = xhat_k(vel_x_index) +
+        xhat_k(acc_x_index) * dt;
+    float velY = xhat_k(vel_y_index) +
+        xhat_k(acc_y_index) * dt;
+
+    // Deceleration of ball due to friction (physics! sort of).  This
+    // is not the proper method of slowing an object. The magnitude
+    // should be slowed by the friction amount, not the components
+    // individually.
+    velX += CARPET_FRICTION * velX * dt;
+    velY += CARPET_FRICTION * velY * dt;
 
     // Rotate the velocity components into the new coordinate frame
-    float newVelX = cos(odo.deltaR) * velX - sin(odo.deltaR) * velY;
-    float newVelY = cos(odo.deltaR) * velY + sin(odo.deltaR) * velX;
-
-    // Add position changes from velocity
-    deltaBall(x_index) += newVelX * frameLength;
-    deltaBall(y_index) += newVelY * frameLength;
+    float newVelX = cos(odo.deltaR) * velX + sin(odo.deltaR) * velY;
+    float newVelY = cos(odo.deltaR) * velY - sin(odo.deltaR) * velX;
 
     // Change in velocity direction from odometry
     deltaBall(vel_x_index) = newVelX - velX;
     deltaBall(vel_y_index) = newVelY - velY;
+}
 
-    // Deceleration of ball due to friction (physics!)
-    deltaBall(vel_x_index) += CARPET_FRICTION * newVelX * frameLength;
-    deltaBall(vel_y_index) += CARPET_FRICTION * newVelY * frameLength;
+void BallEKF::updateAcceleration(const MotionModel& odo, StateVector& deltaBall)
+{
+    // We know no better way of dealing with change in acceleration
+    // than leaving it up to the correction step
+    deltaBall(acc_x_index) = deltaBall(acc_y_index) = 0.0;
+}
 
+void BallEKF::calculateTimeUpdateJacobian(const MotionModel& odo,
+                                          StateVector& deltaBall)
+{
+    const float dt2 = dt*dt;
     ///////////////////////
     // Derivatives of ball position update re:x,y,vel_x,vel_y
     //
@@ -219,27 +265,55 @@ BallEKF::associateTimeUpdate(MotionModel odo)
     ///////////////////////
 
     // derivatives of x
-    A_k(0,vel_x_index) = cos(odo.deltaR) * frameLength;
-    A_k(0,vel_y_index) = -sin(odo.deltaR) * frameLength;
+    A_k(x_index,x_index)         = 1.0;
+    A_k(x_index,y_index)         = 0.0;
+    A_k(x_index,vel_x_index)     = dt;
+    A_k(x_index,vel_y_index)     = 0.0;
+    A_k(x_index,acc_x_index)     = .5f * dt2;
+    A_k(x_index,acc_y_index)     = 0.0;
 
     // derivatives of y
-    A_k(1,vel_x_index) = sin(odo.deltaR) * frameLength;
-    A_k(1,vel_y_index) = cos(odo.deltaR) * frameLength;
+    A_k(y_index,x_index)         = 0.0;
+    A_k(y_index,y_index)         = 1.0;
+    A_k(y_index,vel_x_index)     = 0;
+    A_k(y_index,vel_y_index)     = dt;
+    A_k(y_index,acc_x_index)     = 0.0;
+    A_k(y_index,acc_y_index)     = .5f * dt2;
 
     // derivatives of vel_x
-    A_k(2,vel_x_index) = (cos(odo.deltaR) - 1.0f +
-                          cos(odo.deltaR) * CARPET_FRICTION * frameLength);
-    A_k(2,vel_y_index) = (-sin(odo.deltaR) -
-                          sin(odo.deltaR) * CARPET_FRICTION * frameLength);
+    A_k(vel_x_index,x_index)     =  0.0;
+    A_k(vel_x_index,y_index)     =  0.0;
+    A_k(vel_x_index,vel_x_index) = cos(odo.deltaR);
+    A_k(vel_x_index,vel_y_index) = sin(odo.deltaR);
+    A_k(vel_x_index,acc_x_index) = cos(odo.deltaR) * dt;
+    A_k(vel_x_index,acc_y_index) = sin(odo.deltaR) * dt;
 
     // derivatives of vel_y
-    A_k(3,vel_x_index) = (sin(odo.deltaR) +
-                          sin(odo.deltaR) * CARPET_FRICTION * frameLength);
-    A_k(3,vel_y_index) = (cos(odo.deltaR) - 1 +
-                          cos(odo.deltaR) * CARPET_FRICTION * frameLength);
+    A_k(vel_y_index,x_index)     = 0.0;
+    A_k(vel_y_index,y_index)     = 0.0;
+    A_k(vel_y_index,vel_x_index) = -sin(odo.deltaR);
+    A_k(vel_y_index,vel_y_index) =  cos(odo.deltaR);
+    A_k(vel_y_index,acc_x_index) = -sin(odo.deltaR) * dt;
+    A_k(vel_y_index,acc_y_index) =  cos(odo.deltaR) * dt;
 
-    return deltaBall;
+    // derivatives of acc_x
+    A_k(acc_x_index,x_index)     = 0.0;
+    A_k(acc_x_index,y_index)     = 0.0;
+    A_k(acc_x_index,vel_x_index) = 0.0;
+    A_k(acc_x_index,vel_y_index) = 0.0;
+    A_k(acc_x_index,acc_x_index) = 1.0;
+    A_k(acc_x_index,acc_y_index) = 0.0;
+
+    // derivatives of acc_y
+    A_k(acc_y_index,x_index)     = 0.0;
+    A_k(acc_y_index,y_index)     = 0.0;
+    A_k(acc_y_index,vel_x_index) = 0.0;
+    A_k(acc_y_index,vel_y_index) = 0.0;
+    A_k(acc_y_index,acc_x_index) = 0.0;
+    A_k(acc_y_index,acc_y_index) = 1.0;
 }
+
+
 
 /**
  * Method to deal with incorporating a ball measurement into the EKF
@@ -256,40 +330,105 @@ void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
                                      MeasurementMatrix &R_k,
                                      MeasurementVector &V_k)
 {
+    // We need to translate/rotate the old values into our new
+    // coordinate frame based on the odometry update
+    StateVector xhat_k_prev(ball_ekf_dimension);
+    xhat_k_prev(x_index)     = (xhat_k(x_index) -
+                                cos(curOdo.deltaR) * curOdo.deltaF -
+                                sin(curOdo.deltaR) * curOdo.deltaL);
+    xhat_k_prev(y_index)     = (xhat_k(y_index) +
+                                sin(curOdo.deltaR) * curOdo.deltaF -
+                                cos(curOdo.deltaR) * curOdo.deltaL);
 
-    // Convert our sighting to cartesian coordinates
-    const float x_b_r = z.distance * cos(z.bearing);
-    const float y_b_r = z.distance * sin(z.bearing);
+    xhat_k_prev(vel_x_index) = (cos(curOdo.deltaR) * xhat_k(vel_x_index) +
+                                sin(curOdo.deltaR) * xhat_k(vel_y_index));
+    xhat_k_prev(vel_y_index) = (cos(curOdo.deltaR) * xhat_k(vel_y_index) -
+                                sin(curOdo.deltaR) * xhat_k(vel_x_index));
+
+    xhat_k_prev(acc_x_index) = (cos(curOdo.deltaR) * xhat_k(acc_x_index) +
+                                sin(curOdo.deltaR) * xhat_k(acc_y_index));
+    xhat_k_prev(acc_y_index) = (cos(curOdo.deltaR) * xhat_k(acc_y_index) -
+                                sin(curOdo.deltaR) * xhat_k(acc_x_index));
+
+    // Calculate new velocities and accelerations
+    MeasurementVector z_x(ball_ekf_meas_dim);
+    z_x(x_index)     = z.distance * cos(z.bearing);
+    z_x(y_index)     = z.distance * sin(z.bearing);
+
+    z_x(vel_x_index) = (z_x(x_index) - xhat_k_prev(x_index)) / dt;
+    z_x(vel_y_index) = (z_x(y_index) - xhat_k_prev(y_index)) / dt;
+
+    z_x(acc_x_index) = (z_x(vel_x_index) -
+                        xhat_k_prev(vel_x_index)) / dt;
+    z_x(acc_y_index) = (z_x(vel_y_index) -
+                        xhat_k_prev(vel_y_index)) / dt;
 
     // Calculate invariance
-    V_k(x_index) = x_b_r - xhat_k_bar(x_index);
-    V_k(y_index) = y_b_r - xhat_k_bar(y_index);
+    V_k = z_x - xhat_k_bar;
 
     // Calculate jacobians
     float sinB = sin(z.bearing);
     float cosB = cos(z.bearing);
 
-    // Derivatives with respect to x
-    H_k(0,x_index)     = 1;
-    H_k(0,y_index)     = 0;
-    H_k(0,vel_x_index) = 1/frameLength;
-    H_k(0,vel_y_index) = 0;
-
-    // Derivatives with respect to y
-    H_k(1,x_index)     = 0;
-    H_k(1,y_index)     = 1;
-    H_k(1,vel_x_index) = 0;
-    H_k(1,vel_y_index) = 1/frameLength;
+    // The derivatives of each state are differentiated with respect
+    // to themselves only and undergo no further operations, H_k
+    // (the Jacobian) is simply the identity matrix.
+    H_k = boost::numeric::ublas::identity_matrix<float>(ball_ekf_meas_dim);
 
     // Update the measurement covariance matrix
 
     const float sd_dist_sq = z.distanceSD * z.distanceSD;
     const float var = sd_dist_sq * sin(z.bearing) * cos(z.bearing);
 
-    R_k(x_index,x_index)     = sd_dist_sq * cosB;
-    R_k(x_index,y_index)     = 0;
-    R_k(y_index,x_index)     = 0;
-    R_k(y_index,y_index)     = sd_dist_sq * sinB;
+    R_k(x_index,x_index)         = sd_dist_sq;
+    R_k(x_index,y_index)         = 0.0f;
+    R_k(x_index,vel_x_index)     = 0.0f;
+    R_k(x_index,vel_y_index)     = 0.0f;
+    R_k(x_index,acc_x_index)     = 0.0f;
+    R_k(x_index,acc_y_index)     = 0.0f;
+
+    R_k(y_index,x_index)         = 0.0f;
+    R_k(y_index,y_index)         = sd_dist_sq;
+    R_k(y_index,vel_x_index)     = 0.0f;
+    R_k(y_index,vel_y_index)     = 0.0f;
+    R_k(y_index,acc_x_index)     = 0.0f;
+    R_k(y_index,acc_y_index)     = 0.0f;
+
+    R_k(vel_x_index,x_index)     = 0.0f;
+    R_k(vel_x_index,y_index)     = 0.0f;
+    R_k(vel_x_index,vel_x_index) = sd_dist_sq * 2/ dt;
+    R_k(vel_x_index,vel_y_index) = 0.0f;
+    R_k(vel_x_index,acc_x_index) = 0.0f;
+    R_k(vel_x_index,acc_y_index) = 0.0f;
+
+    R_k(vel_y_index,x_index)     = 0.0f;
+    R_k(vel_y_index,y_index)     = 0.0f;
+    R_k(vel_y_index,vel_x_index) = 0.0f;
+    R_k(vel_y_index,vel_y_index) = sd_dist_sq * 2 / dt;
+    R_k(vel_y_index,acc_x_index) = 0.0f;
+    R_k(vel_y_index,acc_y_index) = 0.0f;
+
+    R_k(acc_x_index,x_index)     = 0.0f;
+    R_k(acc_x_index,y_index)     = 0.0f;
+    R_k(acc_x_index,vel_x_index) = 0.0f;
+    R_k(acc_x_index,vel_y_index) = 0.0f;
+    R_k(acc_x_index,acc_x_index) = sd_dist_sq * 2 * 2 / (dt * dt);
+    R_k(acc_x_index,acc_y_index) = 0.0f;
+
+    R_k(acc_y_index,x_index)     = 0.0f;
+    R_k(acc_y_index,y_index)     = 0.0f;
+    R_k(acc_y_index,vel_x_index) = 0.0f;
+    R_k(acc_y_index,vel_y_index) = 0.0f;
+    R_k(acc_y_index,acc_x_index) = 0.0f;
+    R_k(acc_y_index,acc_y_index) = sd_dist_sq * 2 * 2 / (dt*dt);
+
+    cout << "odo: " << curOdo << endl
+         << "z_x: " << z_x << endl
+         << "xhat_k_prev: " << xhat_k_prev << endl
+         << "xhat_k_bar: " << xhat_k_bar << endl
+         << "V_k: " << V_k << endl
+         << "R_k: " << R_k << endl
+         << endl;
 }
 
 void BallEKF::beforeCorrectionFinish(void)
@@ -303,9 +442,13 @@ void BallEKF::beforeCorrectionFinish(void)
 void BallEKF::limitAPrioriEst()
 {
     xhat_k_bar(vel_x_index) =
-        NBMath::clip(xhat_k_bar(vel_x_index), VELOCITY_EST_MIN, VELOCITY_EST_MAX);
+        NBMath::clip(xhat_k_bar(vel_x_index),
+                     VELOCITY_EST_MIN,
+                     VELOCITY_EST_MAX);
     xhat_k_bar(vel_y_index) =
-        NBMath::clip(xhat_k_bar(vel_y_index), VELOCITY_EST_MIN, VELOCITY_EST_MAX);
+        NBMath::clip(xhat_k_bar(vel_y_index),
+                     VELOCITY_EST_MIN,
+                     VELOCITY_EST_MAX);
 }
 
 /**
@@ -315,65 +458,81 @@ void BallEKF::limitPosteriorEst()
 {
     // Clip the ball position estimate if it goes off of the field
     // Reset the velocity to zero if we do this
-    if(xhat_k(x_index) > X_EST_MAX) {
-        xhat_k_bar(x_index) = X_EST_MAX;
-        xhat_k(x_index) = X_EST_MAX;
-        xhat_k_bar(vel_x_index) = 0.0f;
-        xhat_k(vel_x_index) = 0.0f;
-        xhat_k_bar(vel_y_index) = 0.0f;
-        xhat_k(vel_y_index) = 0.0f;
+    // if(xhat_k(x_index) > X_EST_MAX) {
+    //     xhat_k_bar(x_index) = X_EST_MAX;
+    //     xhat_k(x_index) = X_EST_MAX;
+    //     xhat_k_bar(vel_x_index) = 0.0f;
+    //     xhat_k(vel_x_index) = 0.0f;
+    //     xhat_k_bar(vel_y_index) = 0.0f;
+    //     xhat_k(vel_y_index) = 0.0f;
 
-    }
-    if(xhat_k(x_index) < X_EST_MIN) {
-        xhat_k_bar(x_index) = X_EST_MIN;
-        xhat_k(x_index) = X_EST_MIN;
-        xhat_k_bar(vel_x_index) = 0.0f;
-        xhat_k(vel_x_index) = 0.0f;
-        xhat_k_bar(vel_y_index) = 0.0f;
-        xhat_k(vel_y_index) = 0.0f;
+    // }
+    // if(xhat_k(x_index) < X_EST_MIN) {
+    //     xhat_k_bar(x_index) = X_EST_MIN;
+    //     xhat_k(x_index) = X_EST_MIN;
+    //     xhat_k_bar(vel_x_index) = 0.0f;
+    //     xhat_k(vel_x_index) = 0.0f;
+    //     xhat_k_bar(vel_y_index) = 0.0f;
+    //     xhat_k(vel_y_index) = 0.0f;
 
-    }
-    if(xhat_k(y_index) > Y_EST_MAX) {
-        xhat_k_bar(y_index) = Y_EST_MAX;
-        xhat_k(y_index) = Y_EST_MAX;
-        xhat_k_bar(vel_x_index) = 0.0f;
-        xhat_k(vel_x_index) = 0.0f;
-        xhat_k_bar(vel_y_index) = 0.0f;
-        xhat_k(vel_y_index) = 0.0f;
-    }
-    if(xhat_k(y_index) < Y_EST_MIN) {
-        xhat_k_bar(y_index) = Y_EST_MIN;
-        xhat_k(y_index) = Y_EST_MIN;
-        xhat_k_bar(vel_x_index) = 0.0f;
-        xhat_k(vel_x_index) = 0.0f;
-        xhat_k_bar(vel_y_index) = 0.0f;
-        xhat_k(vel_y_index) = 0.0f;
-    }
-    if(xhat_k(vel_x_index) > VELOCITY_EST_MAX) {
-        xhat_k_bar(vel_x_index) = VELOCITY_EST_MAX;
-        xhat_k(vel_x_index) = VELOCITY_EST_MAX;
-    }
-    if(xhat_k(vel_x_index) < VELOCITY_EST_MIN) {
-        xhat_k_bar(vel_x_index) = VELOCITY_EST_MIN;
-        xhat_k(vel_x_index) = VELOCITY_EST_MIN;
-    }
-    if(xhat_k(vel_y_index) > VELOCITY_EST_MAX) {
-        xhat_k_bar(vel_y_index) = VELOCITY_EST_MAX;
-        xhat_k(vel_y_index) = VELOCITY_EST_MAX;
-    }
-    if(xhat_k(vel_y_index) < VELOCITY_EST_MIN) {
-        xhat_k_bar(vel_y_index) = VELOCITY_EST_MIN;
-        xhat_k(vel_y_index) = VELOCITY_EST_MIN;
-    }
+    // }
+    // if(xhat_k(y_index) > Y_EST_MAX) {
+    //     xhat_k_bar(y_index) = Y_EST_MAX;
+    //     xhat_k(y_index) = Y_EST_MAX;
+    //     xhat_k_bar(vel_x_index) = 0.0f;
+    //     xhat_k(vel_x_index) = 0.0f;
+    //     xhat_k_bar(vel_y_index) = 0.0f;
+    //     xhat_k(vel_y_index) = 0.0f;
+    // }
+    // if(xhat_k(y_index) < Y_EST_MIN) {
+    //     xhat_k_bar(y_index) = Y_EST_MIN;
+    //     xhat_k(y_index) = Y_EST_MIN;
+    //     xhat_k_bar(vel_x_index) = 0.0f;
+    //     xhat_k(vel_x_index) = 0.0f;
+    //     xhat_k_bar(vel_y_index) = 0.0f;
+    //     xhat_k(vel_y_index) = 0.0f;
+    // }
+    xhat_k_bar(vel_x_index) =
+        xhat_k(vel_x_index) = NBMath::clip(xhat_k(vel_x_index),
+                                           -70,
+                                           70);
+    xhat_k_bar(vel_y_index) =
+        xhat_k(vel_y_index) = NBMath::clip(xhat_k(vel_y_index),
+                                           -70,
+                                           70);
+    xhat_k_bar(acc_x_index) =
+        xhat_k(acc_x_index) = NBMath::clip(xhat_k(acc_x_index),
+                                           -150,
+                                           150);
+    xhat_k_bar(acc_y_index) =
+        xhat_k(acc_y_index) = NBMath::clip(xhat_k(acc_y_index),
+                                           -150,
+                                           150);
+    // if(xhat_k(vel_x_index) > VELOCITY_EST_MAX) {
+    //     xhat_k_bar(vel_x_index) = VELOCITY_EST_MAX;
+    //     xhat_k(vel_x_index) = VELOCITY_EST_MAX;
+    // }
+    // if(xhat_k(vel_x_index) < VELOCITY_EST_MIN) {
+    //     xhat_k_bar(vel_x_index) = VELOCITY_EST_MIN;
+    //     xhat_k(vel_x_index) = VELOCITY_EST_MIN;
+    // }
+    // if(xhat_k(vel_y_index) > VELOCITY_EST_MAX) {
+    //     xhat_k_bar(vel_y_index) = VELOCITY_EST_MAX;
+    //     xhat_k(vel_y_index) = VELOCITY_EST_MAX;
+    // }
+    // if(xhat_k(vel_y_index) < VELOCITY_EST_MIN) {
+    //     xhat_k_bar(vel_y_index) = VELOCITY_EST_MIN;
+    //     xhat_k(vel_y_index) = VELOCITY_EST_MIN;
+    // }
 
-    if(std::abs(xhat_k(vel_x_index)) < VELOCITY_EST_MIN_SPEED) {
-        xhat_k_bar(vel_x_index) = 0.0f;
-        xhat_k(vel_x_index) = 0.0f;
-    }
-    if(std::abs(xhat_k(vel_y_index)) < VELOCITY_EST_MIN_SPEED) {
-        xhat_k_bar(vel_y_index) = 0.0f;
-        xhat_k(vel_y_index) = 0.0f;
-    }
+    // if(std::abs(xhat_k(vel_x_index)) < VELOCITY_EST_MIN_SPEED) {
+    //     xhat_k_bar(vel_x_index) = 0.0f;
+    //     xhat_k(vel_x_index) = 0.0f;
+    // }
+    // if(std::abs(xhat_k(vel_y_index)) < VELOCITY_EST_MIN_SPEED) {
+    //     xhat_k_bar(vel_y_index) = 0.0f;
+    //     xhat_k(vel_y_index) = 0.0f;
+    // }
 }
 
 /**
@@ -553,3 +712,51 @@ const float BallEKF::getGlobalYVelocityUncert() const
     return -P_k(vel_x_index,vel_x_index) * sin(robotPose.h) +
         P_k(vel_y_index,vel_y_index) * cos(robotPose.h);
 }
+
+// /**
+//  * Transform relative positions and velocities to global
+//  */
+// const float BallEKF::setGlobalX(float v)
+// {
+//     return xhat_k(x_index) * cos(robotPose.h) +
+//         xhat_k(y_index) * sin(robotPose.h) + robotPose.x;
+// }
+// const float BallEKF::setGlobalY(float v)
+// {
+//     return -xhat_k(x_index) * sin(robotPose.h) +
+//         xhat_k(y_index) * cos(robotPose.h) + robotPose.y;
+// }
+// const float BallEKF::setGlobalXVelocity(float v)
+// {
+//     return xhat_k(vel_x_index) * cos(robotPose.h) +
+//         xhat_k(vel_y_index) * sin(robotPose.h);
+// }
+// const float BallEKF::setGlobalYVelocity(float v)
+// {
+//     return -xhat_k(vel_x_index) * sin(robotPose.h) +
+//         xhat_k(vel_y_index) * cos(robotPose.h);
+// }
+
+// /**
+//  * Global uncertainties
+//  */
+// const float BallEKF::setGlobalXUncert(float v)
+// {
+//     return P_k(x_index,x_index) * cos(robotPose.h) +
+//         P_k(y_index,y_index) * sin(robotPose.h);
+// }
+// const float BallEKF::setGlobalYUncert(float v)
+// {
+//     return -P_k(x_index,x_index) * sin(robotPose.h) +
+//         P_k(y_index,y_index) * cos(robotPose.h);
+// }
+// const float BallEKF::setGlobalXVelocityUncert(float v)
+// {
+//     return P_k(vel_x_index,vel_x_index) * cos(robotPose.h) +
+//         P_k(vel_y_index,vel_y_index) * sin(robotPose.h);
+// }
+// const float BallEKF::setGlobalYVelocityUncert(float v)
+// {
+//     return -P_k(vel_x_index,vel_x_index) * sin(robotPose.h) +
+//         P_k(vel_y_index,vel_y_index) * cos(robotPose.h);
+// }
