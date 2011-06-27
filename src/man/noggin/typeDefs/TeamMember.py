@@ -17,12 +17,9 @@ DEFAULT_CHASER_NUMBER = 4
 DEBUG_DETERMINE_CHASE_TIME = False
 SEC_TO_MILLIS = 1000.0
 CHASE_SPEED = 15.00 #cm/sec
+CHASE_TIME_SCALE = 0.5               # How much new measurement is used.
 BALL_OFF_PENALTY = 1000.             # Big penalty for not seeing the ball.
 BALL_GOAL_LINE_PENALTY = 10.
-# penalty is: (ball_dist*heading)/scale
-PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
-# penalty is: (ball_dist*ball_bearing)/scale
-BALL_BEARING_PENALTY_SCALE = 200.0 # max 90% of distance
 
 
 class TeamMember(RobotLocation):
@@ -179,9 +176,17 @@ class TeamMember(RobotLocation):
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after fallen over penalty " + str(t))
+
+        tm = t*SEC_TO_MILLIS
+
+        # Filter by IIR
+        tm = tm * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
+
+        if DEBUG_DETERMINE_CHASE_TIME:
+            self.brain.out.printf("\tChase time after filter " +str(tm))
             self.brain.out.printf("")
 
-        return t*SEC_TO_MILLIS
+        return tm
 
     def hasBall(self):
         return self.grabbing
