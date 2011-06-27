@@ -21,7 +21,6 @@ IOProvider::const_ptr IOProviderFactory::newAllObjectsProvider() {
         string file_name = NAO_LOG_DIR + MObject::NameFromID(id) + NAO_LOG_EXTENSION;
         ioProvider->addFDProvider(id,
                 FDProvider::ptr(new FileFDProvider(file_name, NEW)));
-        cout << file_name << endl;
     }
     return ioProvider;
 }
