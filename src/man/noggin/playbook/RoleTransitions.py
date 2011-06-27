@@ -1,8 +1,5 @@
-from math import fabs
-from . import PBConstants as PBCon
 from .. import NogginConstants as NogCon
 from ..players import GoalieConstants as goalCon
-from ..players import ChaseBallTransitions as chaseTran
 
 #********
 # GOALIE*
@@ -29,6 +26,7 @@ def shouldPositionForSave(team):
 def shouldChase(team):
     ball = team.brain.ball
 
+    # Not allowed to touch the ball outside of the box
     if (team.brain.player.penaltyKicking):
         return False
 
