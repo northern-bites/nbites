@@ -52,7 +52,8 @@ public:
 protected:
     void openFileDescriptor() {
 
-        file_descriptor = open(file_name.c_str(), flags);
+        file_descriptor = open(file_name.c_str(),
+                flags, S_IRWXU | S_IRWXG | S_IRWXO);
 
         if (file_descriptor < 0) {
             std::cout << "Could not open file: " << file_name << std::endl;
