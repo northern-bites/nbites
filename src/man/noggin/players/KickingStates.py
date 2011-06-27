@@ -45,7 +45,9 @@ def afterKick(player):
             elif kick is kicks.RIGHT_SIDE_KICK:
                 player.brain.tracker.lookToDir("left")
             elif (kick is kicks.RIGHT_DYNAMIC_STRAIGHT_KICK or
-                  kick is kicks.LEFT_DYNAMIC_STRAIGHT_KICK):
+                  kick is kicks.LEFT_DYNAMIC_STRAIGHT_KICK or
+                  kick is kicks.SHORT_QUICK_LEFT_KICK or
+                  kick is kicks.SHORT_QUICK_RIGHT_KICK):
                 player.brain.tracker.kickDecideScan() # should scan upper reaches.
             else:
                 return player.goLater('spinAfterBackKick')
