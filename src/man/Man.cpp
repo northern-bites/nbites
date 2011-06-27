@@ -199,8 +199,6 @@ Man::processFrame ()
 #ifdef USE_MEMORY
     // TODO: this is temporarily here
     loggingBoard->log(MIMAGE_ID);
-    sensors->setNaoImage(loggingBoard->getImageLogger(MIMAGE_ID)->
-            getCurrentImage());
 #endif
 
     vision->notifyImage(sensors->getImage());

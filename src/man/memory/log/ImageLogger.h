@@ -56,11 +56,9 @@ public:
     virtual ~ImageLogger();
 
     void writeToLog();
-    const uint8_t* getCurrentImage() const;
 
 
 private:
-    void getNextBuffer();
     void writeHead();
     /*
      * Writes a value of type T to the current buffer.

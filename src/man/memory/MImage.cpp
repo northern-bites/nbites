@@ -33,7 +33,7 @@ void MImage::update() {
 
     //ADD_PROTO_TIMESTAMP;
 //    cout << "MImage_updata timestamp is " << process_micro_time() << endl;
-    this->updateImage(sensors->getRawNaoImage());
+    this->updateImage(sensors->getNaoImage());
 
 //    string* image_string =  this->mutable_image();
 //    image_string->assign((char *) (sensors->getNaoImage()), 640*480*sizeof(char)*2);
