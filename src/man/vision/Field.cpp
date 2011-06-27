@@ -162,6 +162,14 @@ void Field::initialScanForTopGreenPoints(int pH) {
 			convex[i].y = convex[i-1].y;
 		}
 	}
+	if (convex[0].y - convex[2].y > 10) {
+		convex[0].y = convex[2].y;
+		convex[1].y = convex[2].y;
+	}
+	if (convex[HULLS - 1].y - convex[HULLS - 3].y > 10) {
+		convex[HULLS - 1].y = convex[HULLS - 3].y;
+		convex[HULLS - 2].y = convex[HULLS - 3].y;
+	}
 }
 
 /* At this point we have found our convex hull as defined for the scanlines.

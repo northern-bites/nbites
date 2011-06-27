@@ -451,6 +451,61 @@ void Context::checkLowOuterL(VisualCorner & corner, bool line1IsLonger) {
     }
 }
 
+/* Handles case where orientation is between 45 and 135 (absolute value)
+   In this case we can't rely on the endpoints of the line to be outside
+   the post.  See:  223-11/slarti/leftbluecorner/12.FRM
+   Fortunately it isn't that hard.  We just determine if the shorter line
+   is up or to the side, that tells us if we are looking from the side
+   of the goal box or from the front.  From there it is easy to determine
+   the corner.
+ */
+void Context::classifyOuterLMidAngle(VisualCorner & corner,
+									 boost::shared_ptr<VisualLine> shorty,
+									 boost::shared_ptr<VisualLine> longy) {
+	const point<int> top1 = shorty->getTopEndpoint();
+	const point<int> top2 = longy->getTopEndpoint();
+
+	if (top1.y > top2.y) {
+		// we're at the side of the goal - just check direction
+		if (corner.doesItPointRight()) {
+			if (face == FACING_YELLOW_GOAL) {
+				corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+			} else if (face == FACING_BLUE_GOAL) {
+				corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
+			} else {
+				corner.setSecondaryShape(LEFT_GOAL_L);
+			}
+		} else {
+			if (face == FACING_YELLOW_GOAL) {
+				corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+			} else if (face == FACING_BLUE_GOAL) {
+				corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+			} else {
+				corner.setSecondaryShape(RIGHT_GOAL_L);
+			}
+		}
+	} else {
+		// we're staring towards the goal, again check direction
+		if (corner.doesItPointRight()) {
+			if (face == FACING_YELLOW_GOAL) {
+				corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+			} else if (face == FACING_BLUE_GOAL) {
+				corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+			} else {
+				corner.setSecondaryShape(RIGHT_GOAL_L);
+			}
+		} else {
+			if (face == FACING_YELLOW_GOAL) {
+				corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+			} else if (face == FACING_BLUE_GOAL) {
+				corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
+			} else {
+				corner.setSecondaryShape(LEFT_GOAL_L);
+			}
+		}
+	}
+}
+
 /** If we have a single OUTER_L corner we can often glean a lot of information
     about what it might be - especially if it is connected to a field object.
     Our main goal here is to see if we can tell if it is a left or a right
@@ -502,48 +557,59 @@ void Context::classifyOuterL(VisualCorner & corner) {
 		return;
     } // for now we let compareObjsOuterL handle the else
 
+	const point<int> top = corner.getLine1()->getTopEndpoint();
+	const point<int> top2 = corner.getLine2()->getTopEndpoint();
+
 	// if we can definitively determine the correct short line
 	if (l1 < GOALBOX_FUDGE * GOALBOX_DEPTH &&
         l2 > GOALBOX_FUDGE * GOALBOX_DEPTH) {
-		// it is l1 so fine its high endpoint
-		const point<int> top = corner.getLine1()->getTopEndpoint();
-		if (objectRightX > -1) {
-			if (top.x > objectRightX) {
-				if (face == FACING_YELLOW_GOAL) {
-					corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+		if (abs(corner.getOrientation())  < 45) {
+			// it is l1 so fine its high endpoint
+			if (objectRightX > -1) {
+				if (top.x > objectRightX) {
+					if (face == FACING_YELLOW_GOAL) {
+						corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+					} else {
+						corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
+					}
 				} else {
-					corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
-				}
-			} else {
-				if (face == FACING_YELLOW_GOAL) {
-					corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-				} else {
-					corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+					if (face == FACING_YELLOW_GOAL) {
+						corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+					} else {
+						corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+					}
 				}
 			}
+		} else {
+			classifyOuterLMidAngle(corner, corner.getLine1(),
+									   corner.getLine2());
 		}
 	} else if (l1 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
-        l2 < GOALBOX_FUDGE * GOALBOX_DEPTH) {
-		const point<int> top = corner.getLine2()->getTopEndpoint();
-		// bug:  223-11/slarti/leftbluecorner/NBFRM.12
-		// basically on the side of the goal this idea doesn't work
-		if (objectRightX > -1) {
-			if (top.x > objectRightX) {
-				if (face == FACING_YELLOW_GOAL) {
-					corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+			   l2 < GOALBOX_FUDGE * GOALBOX_DEPTH) {
+		if (abs(corner.getOrientation()) < 45) {
+			// bug:  223-11/slarti/leftbluecorner/NBFRM.12
+			// basically on the side of the goal this idea doesn't work
+			if (objectRightX > -1) {
+				if (top2.x > objectRightX) {
+					if (face == FACING_YELLOW_GOAL) {
+						corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+					} else {
+						corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
+					}
 				} else {
-					corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
-				}
-			} else {
-				if (face == FACING_YELLOW_GOAL) {
-					corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-				} else {
-					corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+					if (face == FACING_YELLOW_GOAL) {
+						corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+					} else {
+						corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+					}
 				}
 			}
+		} else {
+			classifyOuterLMidAngle(corner, corner.getLine2(),
+								   corner.getLine1());
 		}
 	}
-    // eventually we should be able to figure some stuff out anyway
+	// eventually we should be able to figure some stuff out anyway
     // but let's get the low-hanging fruit first
     if (l1 < GOALBOX_FUDGE * GOALBOX_DEPTH &&
         l2 < GOALBOX_FUDGE * GOALBOX_DEPTH) {
@@ -1577,8 +1643,23 @@ const list<const ConcreteCorner*> Context::classifyCornerWithObjects(
             compareObjsInnerL(corner, possibleCorners, visibleObjects);
         break;
     default:
-        possibleClassifications =
-            compareObjsCenterCorners(corner, possibleCorners, visibleObjects);
+		// before we waste our time let's make sure it isn't a misclassified
+		// T or L corner
+		if (face != FACING_UNKNOWN && objectDistance < 200) {
+			// 223-11/slarti/bg-sideview-lp/8..FRM
+			boost::shared_ptr<VisualLine> l1 = corner.getLine1();
+			boost::shared_ptr<VisualLine> l2 = corner.getLine2();
+			VisualCorner temp = corner;
+			if (l1->getLength() > l2->getLength()) {
+				temp.changeToT(l2);
+			} else {
+				temp.changeToT(l1);
+			}
+            compareObjsT(corner, possibleCorners, visibleObjects);
+		} else {
+			possibleClassifications =
+				compareObjsCenterCorners(corner, possibleCorners, visibleObjects);
+		}
         break;
     }
 
@@ -1895,6 +1976,7 @@ list <const ConcreteCorner*> Context::compareObjsCenterCorners(
 	const vector<const ConcreteCorner*>& possibleCorners,
 	const vector<const VisualFieldObject*>& visibleObjects) const
 {
+
 	list<const ConcreteCorner*> possibleClassifications;
 
     // For each field object that we see, calculate its real distance to
