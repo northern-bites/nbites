@@ -81,12 +81,8 @@ class KickDecider(object):
 
         # if there are too few players on the field to do a side kick pass.
         if smallTeam:
-            if self.brain.ball.relY >= 0:
-                self.setKick(kicks.LEFT_DYNAMIC_STRAIGHT_KICK)
-                print "Kickoff STRAIGHT_LEFT_KICK"
-            else:
-                self.setKick(kicks.RIGHT_DYNAMIC_STRAIGHT_KICK)
-                print "Kickoff STRAIGHT_RIGHT_KICK"
+            print "Kickoff!"
+            self.setKick(self.chooseShortQuickKick())
             self.info.destDist = 100.
         # do a side kick pass depending on where the offender is.
         elif self.brain.playbook.pb.kickoffFormation == 0:
