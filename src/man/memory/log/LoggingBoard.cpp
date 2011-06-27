@@ -6,69 +6,72 @@ namespace memory {
 namespace log {
 
 using namespace man::include::paths;
+using boost::shared_ptr;
 
-const string LoggingBoard::MVISION_PATH = NAO_LOG_DIR + "/Vision.log";
-const string LoggingBoard::MMOTION_SENSORS_PATH = NAO_LOG_DIR + "/MotionSensors.log";
-const string LoggingBoard::MVISION_SENSORS_PATH = NAO_LOG_DIR + "/VisionSensors.log";
-const string LoggingBoard::MIMAGE_PATH = NAO_LOG_DIR + "/Image.log";
-
-LoggingBoard::LoggingBoard(const Memory* _memory) :
-    memory(_memory) {
-    initLoggingObjects();
+LoggingBoard::LoggingBoard(Memory::const_ptr memory,
+        IOProvider::const_ptr ioProvider) :
+    memory(memory) {
+    newIOProvider(ioProvider);
 }
 
-void LoggingBoard::initLoggingObjects() {
+void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
 
-    const MVision* mvision = memory->getMVision();
-    FDProvider* mvisionFDprovider = new FileFDProvider(MVISION_PATH);
-    objectFDProviderMap[mvision] = mvisionFDprovider;
-    objectFDLoggerMap[mvision] = new CodedFileLogger(mvisionFDprovider,
-            MVISION_ID, mvision);
+    this->ioProvider = ioProvider;
 
-    const MMotionSensors* mmotionSensors = memory->getMMotionSensors();
-    FDProvider* mmotionSensorsFDprovider = new FileFDProvider(
-            MMOTION_SENSORS_PATH);
-    objectFDProviderMap[mmotionSensors] = mmotionSensorsFDprovider;
-    objectFDLoggerMap[mmotionSensors] = new CodedFileLogger(
-            mmotionSensorsFDprovider, MMOTION_SENSORS_ID, mmotionSensors);
+    const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
+    for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
+            i!= fdmap->end(); i++) {
 
-    const MVisionSensors* mvisionSensors = memory->getMVisionSensors();
-    FDProvider* mvisionSensorsFDprovider = new FileFDProvider(
-            MVISION_SENSORS_PATH);
-    objectFDProviderMap[mvisionSensors] = mvisionSensorsFDprovider;
-    objectFDLoggerMap[mvisionSensors] = new CodedFileLogger(
-            mvisionSensorsFDprovider, MVISION_SENSORS_ID, mvisionSensors);
-
-    const MImage* mimage = memory->getMImage();
-    FDProvider* mimageFDprovider = new FileFDProvider(MIMAGE_PATH);
-    objectFDProviderMap[mimage] = mimageFDprovider;
-    objectFDLoggerMap[mimage] = new ImageFDLogger(mimageFDprovider,
-            MIMAGE_ID, mimage);
-}
-
-void LoggingBoard::log(const MObject* mobject) {
-
-    ObjectFDLoggerMap::iterator it = objectFDLoggerMap.find(mobject);
-    // if this is true, then we found a legitimate logger
-    // corresponding to our mobject in the map
-    if (it != objectFDLoggerMap.end()) {
-        //it->second is the logger associated with the specified mobject
-        it->second->write();
+        if (i->first == MIMAGE_ID) {
+            shared_ptr<const RoboImage> roboImage = memory->getRoboImage();
+            objectIOMap[MIMAGE_ID] = FDLogger::ptr(new ImageLogger(i->second.get(),
+                    static_cast<int>(i->first), roboImage.get()));
+        } else {
+            shared_ptr<const ProtoMessage> mobject =
+                    memory->getProtoMessage(i->first);
+            if (mobject != shared_ptr<ProtoMessage>()) {
+                objectIOMap[i->first] = FDLogger::ptr(new MessageLogger(i->second.get(),
+                        static_cast<int> (i->first), mobject.get()));
+            } else {
+                std::cout<<"Invalid Object ID passed for logging: "
+                        << "log ID: " << i->first << " "
+                        << i->second->debugInfo() << std::endl;
+            }
+        }
     }
 }
 
-const ImageFDLogger* LoggingBoard::getImageLogger(const MImage* mimage) const {
-    return dynamic_cast<const ImageFDLogger*>(this->getLogger(mimage));
+void LoggingBoard::log(MObject_ID id) {
+    FDLogger::ptr logger = getMutableLogger(id);
+    if (logger.get() != NULL) {
+        logger->writeToLog();
+    }
 }
 
-const FDLogger* LoggingBoard::getLogger(const MObject* mobject) const {
-    ObjectFDLoggerMap::const_iterator it = objectFDLoggerMap.find(mobject);
+ImageLogger::const_ptr LoggingBoard::getImageLogger(MObject_ID id) const {
+    return boost::dynamic_pointer_cast<const ImageLogger>(
+            this->getLogger(MIMAGE_ID));
+}
+
+FDLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
+    ObjectIOMap::const_iterator it = objectIOMap.find(id);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
-    if (it != objectFDLoggerMap.end()) {
+    if (it != objectIOMap.end()) {
         return it->second;
     } else {
-        return NULL;
+        return FDLogger::const_ptr();
+    }
+}
+
+FDLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
+    ObjectIOMap::iterator it = objectIOMap.find(id);
+    // if this is true, then we found a legitimate logger
+    // corresponding to our mobject in the map
+    if (it != objectIOMap.end()) {
+        return it->second;
+    } else {
+        return FDLogger::ptr();
     }
 }
 

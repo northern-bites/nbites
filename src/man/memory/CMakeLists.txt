@@ -78,6 +78,8 @@ target_link_libraries(
   ${PROTOS_TARGET}
   ${PARSE_TARGET}
   ${LOG_TARGET}
+  ${VISION_TARGET}
+  ${SENSORS_TARGET}
   )
 
 

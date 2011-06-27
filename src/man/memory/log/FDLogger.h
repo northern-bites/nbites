@@ -13,6 +13,7 @@
 #pragma once
 
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 #include "include/io/FileFDProvider.h"
 
 namespace man {
@@ -20,6 +21,13 @@ namespace memory {
 namespace log {
 
 class FDLogger {
+
+public:
+    typedef boost::shared_ptr<FDLogger> ptr;
+    typedef boost::shared_ptr<FDLogger> const_ptr;
+
+protected:
+    typedef include::io::FDProvider FDProvider;
 
 public:
     /**
@@ -40,7 +48,7 @@ public:
      * sort of output buffer implemented in the respective
      * Logger subclass
      */
-    virtual void write() = 0;
+    virtual void writeToLog() = 0;
 
 private:
     /**

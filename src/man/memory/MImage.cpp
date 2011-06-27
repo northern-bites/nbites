@@ -5,6 +5,7 @@
  */
 
 #include <string>
+#include <typeinfo>
 
 #include "Common.h" //for micro_time
 #include "MemoryMacros.h"
@@ -14,16 +15,15 @@ namespace man {
 namespace memory {
 
 using boost::shared_ptr;
-using namespace proto;
 using namespace std;
 
-MImage::MImage(shared_ptr<Sensors> s) : RoboImage(), sensors(s) {
+MImage::MImage(MObject_ID id, std::string name, shared_ptr<Sensors> s) :
+        MObject(id, name),RoboImage(), sensors(s) {
     //string* image_string = this->mutable_image();
     //image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
     //cout << " string capacity " << NAO_IMAGE_BYTE_SIZE << " "<<  image_string->capacity() << endl;
     //char* image_string_data = const_cast<char *>(image_string->data());
     //sensors->setNaoImagePointer(image_string_data);
-
 }
 
 MImage::~MImage() {

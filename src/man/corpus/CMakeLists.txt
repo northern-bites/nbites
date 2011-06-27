@@ -93,25 +93,7 @@ SET( ROBOT_CONNECT_SRCS
   Speech
   PySpeech
   ColorParams
-  ImageAcquisition
   )
-
-# Add the assembly files if we're not on Mac OSX
-IF (UNIX AND NOT APPLE)
-  LIST( APPEND ROBOT_CONNECT_SRCS
-    ImageAcquisition.s
-    ImageAcquisitionFast.s
-    CopyImage.s
-    )
-
-SET_PROPERTY(SOURCE
-  ImageAcquisition.s
-  ImageAcquisitionFast.s
-  CopyImage.s
- PROPERTY LANGUAGE C
- )
-
-ENDIF()
 
 IF(WEBOTS_BACKEND)
   LIST( APPEND ROBOT_CONNECT_SRCS
@@ -152,12 +134,31 @@ SET( CORPUS_TEST_DIR test )
 
 SET( NBINCLUDE_SRCS ${NBCOMMON_INCLUDE_DIR}/NBMatrixMath
   ${NBCOMMON_INCLUDE_DIR}/NBMath
+  ImageAcquisition
   ${NBCOMMON_INCLUDE_DIR}/dsp
   ${NBCOMMON_INCLUDE_DIR}/SensorMonitor
   ${NBCOMMON_INCLUDE_DIR}/BulkMonitor
   CoordFrame4D
   CoordFrame3D
   )
+
+# Add the assembly files if we're not on Mac OSX
+IF (UNIX AND NOT APPLE)
+  LIST( APPEND NBINCLUDE_SRCS
+    ImageAcquisition.s
+    ImageAcquisitionFast.s
+    CopyImage.s
+    )
+
+SET_PROPERTY(SOURCE
+  ImageAcquisition.s
+  ImageAcquisitionFast.s
+  CopyImage.s
+ PROPERTY LANGUAGE C
+ )
+
+ENDIF()
+
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install

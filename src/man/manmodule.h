@@ -20,7 +20,6 @@
 #include "alcore/alerror.h"
 #include "alcore/alptr.h"
 #include "alcore/altypes.h"
-#include "alproxies/alsentinelproxy.h"
 #include "altools/alxplatform.h"
 
 #include "manconfig.h"
