@@ -90,15 +90,17 @@ def ballInPosition(player):
 
     #Compare the sweet spot with the actual values and make sure they
     #are within the threshold
-    return (diff_x < constants.X_POS_THRESH and
-            diff_y < constants.Y_POS_THRESH)
+    return (diff_x < constants.BALL_X_OFFSET and
+            diff_y < constants.BALL_Y_OFFSET)
 
 def ballNearPosition(player):
+    """
+    Ball is around our feet. Maybe we wiffed?
+    """
     ball = player.brain.ball
     return ((constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.relX <
               constants.SHOULD_KICK_AGAIN_FAR_X) and
              fabs(ball.relY) < constants.SHOULD_KICK_AGAIN_Y)
-
 
 def shouldKick(player):
     """

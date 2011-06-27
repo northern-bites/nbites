@@ -26,6 +26,12 @@ SHOULD_KICK_AGAIN_CLOSE_X = SHOULD_SPIN_TO_KICK_X
 SHOULD_KICK_AGAIN_FAR_X = 16
 SHOULD_KICK_AGAIN_Y = 9
 
+# Ball in position
+## NOTE: important that these values slightly overestimate the values in
+##        navigator's PFK. Otherwise there can be bad looping.
+BALL_X_OFFEST = 5
+BALL_Y_OFFSET = 5
+
 # Should dribble should and should stop dribbling
 SHOULD_DRIBBLE_X = 68.
 SHOULD_DRIBBLE_Y = BALL_PFK_LEFT_Y
@@ -45,6 +51,3 @@ WALK_FIND_BALL_FRAMES_THRESH = 720
 SCAN_FIND_BEARING_THRESH = 50
 
 STOP_PENALTY_DRIBBLE_COUNT = 120
-
-X_POS_THRESH = 12
-Y_POS_THRESH = 12
