@@ -377,7 +377,9 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper,
 				run = 0;
 			} else {
 				good++;
-				bad--;
+				if (c != BLUE_BIT || dir != 1) {
+					bad--;
+				}
 				run++;
 				if (run > 1) {
 					scan.x = x;
@@ -1424,32 +1426,41 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 	}
 	// if one line is long enough we can determine its relationship
 	if (POSTLOGIC) {
-		cout << "Checking outer L corner " << l1 << " " << l2 << endl;
+		cout << "Checking outer L corner " << l1 << " " << l2 << " " <<
+			dist << endl;
 	}
 	if (abs(corner.getOrientation()) < 90) {
+		int classification = NOPOST;
 		if (l1 > l2 && l1 > GOALBOX_DEPTH + 20.0f) {
 			if (endl1.y < end2.y) {
 				if (endl1.x > post.getRight()) {
-					return RIGHT;
+					classification = RIGHT;
 				} else {
-					return LEFT;
+					classification =  LEFT;
 				}
 			} else if (endl2.x > post.getRight()) {
-				return RIGHT;
+				classification = RIGHT;
 			} else {
-				return LEFT;
+				classification = LEFT;
 			}
 		} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 20.0f) {
 			if (end1.y < end2.y) {
 				if (end1.x > post.getRight()) {
-					return RIGHT;
+					classification =  RIGHT;
 				} else {
-					return LEFT;
+					classification = LEFT;
 				}
 			} else if (end2.x > post.getRight()) {
-				return RIGHT;
+				classification = RIGHT;
 			} else {
+				classification = LEFT;
+			}
+		}
+		if (dist > CROSSBAR_CM_WIDTH) {
+			if (classification == RIGHT) {
 				return LEFT;
+			} else {
+				return RIGHT;
 			}
 		}
 	}
