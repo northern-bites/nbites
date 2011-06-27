@@ -14,10 +14,10 @@ DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
-DEBUG_DETERMINE_CHASE_TIME = False
+DEBUG_DETERMINE_CHASE_TIME = True
 SEC_TO_MILLIS = 1000.0
 CHASE_SPEED = 15.00 #cm/sec
-CHASE_TIME_SCALE = 0.5               # How much new measurement is used.
+CHASE_TIME_SCALE = 0.45              # How much new measurement is used.
 BALL_OFF_PENALTY = 1000.             # Big penalty for not seeing the ball.
 BALL_GOAL_LINE_PENALTY = 10.
 
@@ -169,7 +169,7 @@ class TeamMember(RobotLocation):
             t += BALL_GOAL_LINE_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after ball-goal-line bonus " +str(t))
+            self.brain.out.printf("\tChase time after ball-goal-line penalty "+str(t))
 
         # Add a penalty for being fallen over
         t += self.brain.fallController.getTimeRemainingEst()
@@ -179,7 +179,7 @@ class TeamMember(RobotLocation):
 
         tm = t*SEC_TO_MILLIS
 
-        # Filter by IIR
+        # Filter by IIR to reduce noise
         tm = tm * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
 
         if DEBUG_DETERMINE_CHASE_TIME:
