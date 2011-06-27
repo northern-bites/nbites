@@ -77,21 +77,12 @@ def testDX(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
-    if player.counter % 3 == 1:
-        print "relX"
-        print ball.relX
-        print "relY"
-        print ball.relY
-        print "dx"
-        print ball.dx
-        print "dy"
-        print ball.dy
-        print "relVelX"
-        print ball.relVelX
-        print "relVelY"
-        print ball.relVelY
-        print "heat"
-        print ball.heat
+    print "dx"
+    print ball.dx
+    print "relVelX"
+    print ball.relVelX
+    print "heat"
+    print ball.heat
 
     return player.stay()
 

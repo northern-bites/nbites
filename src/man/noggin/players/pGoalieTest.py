@@ -41,3 +41,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.angleToOrbit = 0.0
 
         self.inKickingSate = False
+        self.penaltyKicking = False

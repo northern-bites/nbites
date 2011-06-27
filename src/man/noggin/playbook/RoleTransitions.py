@@ -183,3 +183,15 @@ def shouldPositionLeft(team):
         return True
 
     return False
+
+def shouldNotSave(team):
+    ball = team.brain.ball
+
+    if team.brain.player.penaltyKicking:
+        return False
+
+
+    # Want to stop saving when no longer worried about
+    # A robot shooting and the ball is not moving ??
+
+    return False

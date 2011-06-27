@@ -22,6 +22,9 @@ def goalieSave(player):
         player.isSaving = True
 
 
+    print ball.heat
+    print ball.dx
+
     if helper.shouldSave(player):
         brain.fallController.enableFallProtection(False)
         print ball.endY
