@@ -106,6 +106,7 @@ def spinToBall(player):
     if transitions.shouldFindBall(player):
         return player.goLater('findBall')
     elif transitions.shouldChaseFromSpinToBall(player):
+        player.brain.nav.chaseBall()
         return player.goNow('chase')
 
     return player.stay()
