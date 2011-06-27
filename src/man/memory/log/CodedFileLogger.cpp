@@ -51,7 +51,7 @@ void CodedFileLogger::writeHead() {
     coded_output->WriteLittleEndian64(birth_time);
 }
 
-void CodedFileLogger::write() {
+void CodedFileLogger::writeToLog() {
 
     //TODO: can we use cached size here?
     //cout << message->

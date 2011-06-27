@@ -53,7 +53,7 @@ public:
      * @return
      */
     virtual ~CodedFileLogger();
-    void write();
+    void writeToLog();
     void writeHead();
 
 private:

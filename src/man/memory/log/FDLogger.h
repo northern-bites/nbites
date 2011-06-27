@@ -48,7 +48,7 @@ public:
      * sort of output buffer implemented in the respective
      * Logger subclass
      */
-    virtual void write() = 0;
+    virtual void writeToLog() = 0;
 
 private:
     /**
