@@ -845,12 +845,12 @@ void Sensors::setNaoImagePointer(char* _naoImage) {
 void Sensors::setRawNaoImage(uint8_t *img)
 {
     rawNaoImage = img;
-    this->notifySubscribers(NEW_IMAGE);
 }
 
 void Sensors::setNaoImage(const uint8_t *img)
 {
     naoImage = img;
+    this->notifySubscribers(NEW_IMAGE);
 }
 
 void Sensors::setImage (const uint16_t *img)
