@@ -24,7 +24,7 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
 
         if (i->first == MIMAGE_ID) {
             shared_ptr<const RoboImage> roboImage = memory->getRoboImage();
-            objectIOMap[MIMAGE_ID] = FDLogger::ptr(new ImageFDLogger(i->second.get(),
+            objectIOMap[MIMAGE_ID] = FDLogger::ptr(new ImageLogger(i->second.get(),
                     static_cast<int>(i->first), roboImage.get()));
         } else {
             shared_ptr<const ProtoMessage> mobject =
@@ -44,12 +44,12 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
 void LoggingBoard::log(MObject_ID id) {
     FDLogger::ptr logger = getMutableLogger(id);
     if (logger.get() != NULL) {
-        logger->write();
+        logger->writeToLog();
     }
 }
 
-ImageFDLogger::const_ptr LoggingBoard::getImageLogger(MObject_ID id) const {
-    return boost::dynamic_pointer_cast<const ImageFDLogger>(
+ImageLogger::const_ptr LoggingBoard::getImageLogger(MObject_ID id) const {
+    return boost::dynamic_pointer_cast<const ImageLogger>(
             this->getLogger(MIMAGE_ID));
 }
 

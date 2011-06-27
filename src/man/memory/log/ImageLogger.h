@@ -1,7 +1,7 @@
 /**
- * ImageFDLogger.hpp
+ * ImageLogger.h
  *
- * @class ImageFDLogger
+ * @class ImageLogger
  *
  * This class provides a way to serialize a robo image to a file
  * in a sequential manner.
@@ -33,11 +33,11 @@ namespace log {
 
 using namespace google::protobuf::io;
 
-class ImageFDLogger : public FDLogger {
+class ImageLogger : public FDLogger {
 
 public:
-    typedef boost::shared_ptr<ImageFDLogger> ptr;
-    typedef boost::shared_ptr<const ImageFDLogger> const_ptr;
+    typedef boost::shared_ptr<ImageLogger> ptr;
+    typedef boost::shared_ptr<const ImageLogger> const_ptr;
 
 public:
     /**
@@ -45,7 +45,7 @@ public:
      *
      * @param logTypeID : an ID written to the head of the log identifying the log
      */
-    ImageFDLogger(const FDProvider* fdp,
+    ImageLogger(const FDProvider* fdp,
                   int logTypeID,
                   const RoboImage* roboImage);
 
@@ -53,9 +53,9 @@ public:
      * Closes the file, which will flush the output buffer
      * to ensure that the file on disk is in sync with the buffer
      */
-    virtual ~ImageFDLogger();
+    virtual ~ImageLogger();
 
-    void write();
+    void writeToLog();
     const uint8_t* getCurrentImage() const;
 
 
@@ -68,27 +68,16 @@ private:
      * increments the offset with the size of the value written.
      */
     template <class T>
-    void writeValue(T value, uint32_t* offset) {
-        uint8_t* byte_ptr_to_write_to =
-                reinterpret_cast<uint8_t*> (*current_buffer) + *offset;
-    	*(reinterpret_cast<T*>(byte_ptr_to_write_to)) = value;
-    	*offset += sizeof(T);
+    unsigned int writeValue(T value) {
+        //TODO: assert if we actually write everything
+        return write(file_descriptor, &value, sizeof(value));
     }
 
 
 private:
-    void** current_buffer;
-    int current_buffer_size;
     unsigned long long bytes_written;
     int logID;
     const RoboImage* roboImage;
-
-   /**
-    * @var raw_output : a ZeroCopyOutputStream, an abstract I/O interface
-    * which will minimize the amount of copying to the buffer
-    */
-    FileOutputStream* raw_output;
-
 };
 }
 }

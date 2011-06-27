@@ -17,7 +17,7 @@ include_directories( ${PROTOBUF_INCLUDE_DIRS}/
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 set( LOG_SRCS CodedFileLogger.cpp
-              ImageFDLogger.cpp
+              ImageLogger.cpp
               LoggingBoard.cpp
               IOProviderFactory.cpp)
 

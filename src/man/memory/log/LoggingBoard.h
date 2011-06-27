@@ -20,7 +20,7 @@
 #include "include/io/FileFDProvider.h"
 
 #include "CodedFileLogger.h"
-#include "ImageFDLogger.h"
+#include "ImageLogger.h"
 #include "memory/MObject.h"
 #include "memory/Memory.h"
 #include "memory/MemoryIOBoard.h"
@@ -40,7 +40,7 @@ public:
 
     void newIOProvider(IOProvider::const_ptr ioProvider);
     //returns a NULL pointer if such a logger doesn't exist
-    ImageFDLogger::const_ptr getImageLogger(MObject_ID id) const;
+    ImageLogger::const_ptr getImageLogger(MObject_ID id) const;
 
 protected:
     //returns a NULL pointer if such a logger doesn't exist
