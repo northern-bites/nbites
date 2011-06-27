@@ -30,7 +30,7 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
             shared_ptr<const ProtoMessage> mobject =
                     memory->getProtoMessage(i->first);
             if (mobject != shared_ptr<ProtoMessage>()) {
-                objectIOMap[i->first] = FDLogger::ptr(new CodedFileLogger(i->second.get(),
+                objectIOMap[i->first] = FDLogger::ptr(new MessageLogger(i->second.get(),
                         static_cast<int> (i->first), mobject.get()));
             } else {
                 std::cout<<"Invalid Object ID passed for logging: "

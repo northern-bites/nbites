@@ -1,5 +1,5 @@
 /**
- * CodedFileLogger.cpp
+ * MessageLogger.cpp
  *
  *  The structure for a log file:
  *  -- ID number for the type of object logged
@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include <iostream>
 
-#include "CodedFileLogger.h"
+#include "MessageLogger.h"
 
 namespace man {
 namespace memory {
@@ -28,7 +28,7 @@ namespace log {
 
 using namespace std;
 
-CodedFileLogger::CodedFileLogger(const FDProvider* fdp,
+MessageLogger::MessageLogger(const FDProvider* fdp,
 		int logTypeID, const ProtoMessage* m) :
         FDLogger(fdp), logID(logTypeID), message(m) {
 
@@ -45,13 +45,13 @@ CodedFileLogger::CodedFileLogger(const FDProvider* fdp,
     this->writeHead();
 }
 
-void CodedFileLogger::writeHead() {
+void MessageLogger::writeHead() {
     coded_output->WriteLittleEndian32(logID);
     // this time stamps the log
     coded_output->WriteLittleEndian64(birth_time);
 }
 
-void CodedFileLogger::writeToLog() {
+void MessageLogger::writeToLog() {
 
     //TODO: can we use cached size here?
     //cout << message->
@@ -59,7 +59,7 @@ void CodedFileLogger::writeToLog() {
     message->SerializeToCodedStream(coded_output);
 }
 
-CodedFileLogger::~CodedFileLogger() {
+MessageLogger::~MessageLogger() {
     //TODO: this might not be flushing properly
     raw_output->Close();
     delete coded_output;

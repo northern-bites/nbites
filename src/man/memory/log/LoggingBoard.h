@@ -19,7 +19,7 @@
 
 #include "include/io/FileFDProvider.h"
 
-#include "CodedFileLogger.h"
+#include "MessageLogger.h"
 #include "ImageLogger.h"
 #include "memory/MObject.h"
 #include "memory/Memory.h"
