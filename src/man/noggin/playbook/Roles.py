@@ -34,9 +34,9 @@ def rGoalie(team, workingPlay):
         else:
             SubRoles.pGoalieKickOff(team, workingPlay)
 
-    # Penalty Kick
-    elif workingPlay.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
-        SubRoles.pGoaliePenaltySaver(team, workingPlay)
+    # #Penalty Kick
+    # elif workingPlay.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
+    #     SubRoles.pGoaliePenaltySaver(team, workingPlay)
 
     # Saving
     elif workingPlay.isSubRole(PBConstants.GOALIE_SAVE):

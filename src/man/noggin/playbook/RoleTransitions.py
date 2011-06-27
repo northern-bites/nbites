@@ -29,6 +29,9 @@ def shouldPositionForSave(team):
 def shouldChase(team):
     ball = team.brain.ball
 
+    if (team.brain.player.penaltyKicking):
+        return False
+
     if (ball.framesOff > 30):
         return False
 
