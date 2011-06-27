@@ -167,7 +167,7 @@ class KickDecider(object):
             # difference between dists is small enough
             if (rightPostBearing >= 0 and leftPostBearing <= 0 and
                 distDiff <= constants.CLEAR_POST_DIST_DIFF):
-                return self.chooseLongBackKick()
+                return self.chooseShortBackKick()
             elif (rightPostDist <= leftPostDist):
                 print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
