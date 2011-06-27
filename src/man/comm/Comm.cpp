@@ -457,9 +457,7 @@ void Comm::run()
     interval.tv_sec = 0;
     interval.tv_nsec = SLEEP_MILLIS * 1000;
 
-#ifdef DEBUG_COMM
     llong lastMonitorOutput = timer.timestamp();
-#endif
 
     try
     {
@@ -473,14 +471,14 @@ void Comm::run()
 
 	    monitor.performHealthCheck();
 
-#ifdef DEBUG_COMM
 	    // Update the monitor output logs every half minute.
 	    if(timer.timestamp() - lastMonitorOutput > 30 * MICROS_PER_SECOND)
 	    {
 		monitor.logOutput();
+		// Allow a warning every 30 seconds at most.
+		monitor.setSentWarning(false);
 		lastMonitorOutput = timer.timestamp();
 	    }
-#endif
 
 	    receive();
 	    nanosleep(&interval, &remainder);
@@ -577,12 +575,12 @@ void Comm::bind() throw(socket_error)
     // create socket
     sockn = ::socket(AF_INET, SOCK_DGRAM, 0);
     if (sockn == -1)
-	{
+    {
         stop();
         throw SOCKET_ERROR(errno);
     }
 
-	int one = 1;
+    int one = 1;
 #ifdef COMM_LISTEN
     // set bind address parameters
     bind_addr.sin_family = AF_INET;

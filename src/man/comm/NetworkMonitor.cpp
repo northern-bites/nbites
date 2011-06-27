@@ -16,7 +16,6 @@ static const int NUM_BINS_DROPPED = 2;
 static const double LOW_BIN_DROPPED = 0.0f;
 static const double HIGH_BIN_DROPPED = 1.0f;
 static const bool LOG_SCALE_DROPPED = false;
-
 static const int PACKET_RECEIVED = 0;
 static const int PACKET_DROPPED = 1;
 
@@ -29,7 +28,7 @@ NetworkMonitor::NetworkMonitor()
     :  Boxcar(BOXCAR_WIDTH),
        latency(NUM_BINS_LATENCY, LOW_BIN_LATENCY, HIGH_BIN_LATENCY, LOG_SCALE_LATENCY),
        droppedPackets(NUM_BINS_DROPPED, LOW_BIN_DROPPED, HIGH_BIN_DROPPED, LOG_SCALE_DROPPED),
-       lastPacketReceivedAt(0), initialLatencyPeak(0)
+       lastPacketReceivedAt(0), initialLatencyPeak(0), sentWarning(false)
 {
     Reset();
 }
@@ -113,22 +112,27 @@ void NetworkMonitor::performHealthCheck()
 
     using namespace std;
 
-    int peak = findPeakLatency();
-    // Check to see if the latency has changed drastically.
-    if(initialLatencyPeak != 0 && peak - initialLatencyPeak >= LATENCY_CHANGE_THRESHOLD)
+    // Limit the number of warning messages sent so as not to clog the logs.
+    if(!sentWarning)
     {
-	cout << "NETWORK WARNING: packet latency has increased significantly!"
-	     << endl;
-    }
-    // Also, are we dropping more packets than we should be suddenly?
-    if(Y() > PACKETS_DROPPED_THRESHOLD)
-    {
-	cout << "NETWORK WARNING: packets dropped on average has increased to " 
-	     << Y() << "!" << endl;
+	int peak = findPeakLatency();
+	// Check to see if the latency has changed drastically.
+	if(initialLatencyPeak != 0 && peak - initialLatencyPeak >= LATENCY_CHANGE_THRESHOLD)
+	{
+	    cout << "NETWORK WARNING: packet latency has increased significantly!"
+		 << endl;
+	    setSentWarning(true);
+	}
+	// Also, are we dropping more packets than we should be suddenly?
+	if(Y() > PACKETS_DROPPED_THRESHOLD)
+	{
+	    cout << "NETWORK WARNING: packets dropped on average has increased to " 
+		 << Y() << "!" << endl;
+	    setSentWarning(true);
+	}
     }
 }
 
-// Saves the latency and dropped packets histograms to an output file.
 void NetworkMonitor::logOutput()
 {
     using namespace std;
@@ -156,9 +160,16 @@ void NetworkMonitor::logOutput()
 	logFile << setw(width) << "DROPPED" << setw(width) 
 		<< droppedPackets.binCount(PACKET_DROPPED)
 		<< endl;
-	logFile << setw(width) << "Mid" << setw(width)
-		<< Mid() << endl;
+	logFile << setw(width) << "Current average" << setw(width)
+		<< Y() << endl;
+
+	logFile.close();
     }
     else
 	cerr << "NetworkMonitor::logOutput() : error opening log file!" << endl;
+}
+
+void NetworkMonitor::setSentWarning(bool sent)
+{
+    sentWarning = sent;
 }
