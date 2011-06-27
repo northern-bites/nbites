@@ -56,38 +56,43 @@ void Memory::updateVision() {
 
 void Memory::update(SensorsEvent event) {
 
-//    if (event== NEW_MOTION_SENSORS) {
-//        PROF_ENTER(_profiler.get(), P_MEMORY_MOTION_SENSORS);
-//        mMotionSensors->update();
-//        loggingBoard->log(mMotionSensors);
-//        PROF_EXIT(_profiler.get(), P_MEMORY_MOTION_SENSORS);
-//    }
-//
-//    if (event== NEW_VISION_SENSORS) {
-//        PROF_ENTER(_profiler.get(), P_MEMORY_VISION_SENSORS);
-//        mVisionSensors->update();
-//        loggingBoard->log(mVisionSensors);
-//        PROF_EXIT(_profiler.get(), P_MEMORY_VISION_SENSORS);
-//    }
-//
+    if (event== NEW_MOTION_SENSORS) {
+        PROF_ENTER(_profiler.get(), P_MEMORY_MOTION_SENSORS);
+        mMotionSensors->update();
+        PROF_EXIT(_profiler.get(), P_MEMORY_MOTION_SENSORS);
+    }
+
+    if (event== NEW_VISION_SENSORS) {
+        PROF_ENTER(_profiler.get(), P_MEMORY_VISION_SENSORS);
+        mVisionSensors->update();
+        PROF_EXIT(_profiler.get(), P_MEMORY_VISION_SENSORS);
+    }
+
     if (event== NEW_IMAGE) {
         PROF_ENTER(_profiler.get(), P_MEMORY_IMAGE);
         mImage->update();
-//        loggingBoard->log(mImage);
-        //TODO: move this somewhere else
-//        _sensors->setNaoImage(loggingBoard->getImageLogger(mImage)->
-//                getCurrentImage());
         PROF_EXIT(_profiler.get(), P_MEMORY_IMAGE);
     }
 }
 
 boost::shared_ptr<const ProtoMessage> Memory::getProtoMessage(MObject_ID id) const {
+    ProtoMessageMap::const_iterator it = protoMessageMap.find(id);
 
+    if (it != protoMessageMap.end()) {
+        return it->second;
+    } else {
+        return boost::shared_ptr<const ProtoMessage>();
+    }
 }
 
 boost::shared_ptr<ProtoMessage> Memory::getMutableProtoMessage(MObject_ID id) {
-    //TODO: replace this with a call to find?
-    return protoMessageMap[id];
+    ProtoMessageMap::iterator it = protoMessageMap.find(id);
+
+    if (it != protoMessageMap.end()) {
+        return it->second;
+    } else {
+        return boost::shared_ptr<ProtoMessage>();
+    }
 }
 
 }
