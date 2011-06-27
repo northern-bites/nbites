@@ -97,23 +97,10 @@ def trackLoc(tracker):
     TRACKER_FRAMES_STARE_THRESH frames.
     """
     # ** # more debugging code
-    print "locObjectList size:",len(tracker.locObjectList)
     for obj in tracker.locObjectList:
-        if obj isinstance FieldCorner:
-            print "FieldCorner:",obj.Id
+        if isinstance(obj, FieldCorner):
             if obj.Id == 3:
                 tracker.target = obj
-                print "Target set as corner for debugging"
-        elif obj isinstance FieldObject:
-            print "FieldObject:",obj.visionId
-
-    # ** # debugging code
-    if tracker.target isinstance FieldCorner:
-        print "target is corner:",tracker.target.Id
-    elif tracker.target isinstance FieldObject:
-        print "target is post:",tracker.target.visionId
-    else:
-        print "target is neither a post nor a corner... wtf??"
 
     # make sure head is inactive first
     if tracker.firstFrame():
@@ -124,6 +111,8 @@ def trackLoc(tracker):
         print "target is None, or the ball"
         return tracker.goLater(tracker.decisionState)
 
+    print "my coords:",tracker.brain.my.x,tracker.brain.my.y
+    print "looking to rel coords:",tracker.target.relX,tracker.target.relY
     tracker.helper.lookToTargetCoords(tracker.target)
 
     # if close enough to target, switch to stareLoc
@@ -167,8 +156,10 @@ def stareLoc(tracker):
     # Second safety check that something was on frame
     if stareTarget is None:
         print "no possible target currently visible"
+        print "expect target at rel coords:",tracker.target.relX,tracker.target.relY
         return tracker.stay()
 
+    print "target visible"
     tracker.helper.lookToTargetAngles(stareTarget)
 
     return tracker.stay()

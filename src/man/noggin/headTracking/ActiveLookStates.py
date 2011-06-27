@@ -102,7 +102,6 @@ def trackLandmarks(tracker):
     # Assert: no change in list order
 
     # Check for no target (or ball target)
-    # Always occurs in the first pass in trackLandmarks state
     if tracker.target is None or tracker.target == tracker.brain.ball:
         print "ALS: target is None"# ** #debugging
         tracker.target = tracker.locObjectList[0]

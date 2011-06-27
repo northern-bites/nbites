@@ -144,7 +144,7 @@ class FieldCorner(LocObject):
         self.locBearing = my.getRelativeBearing(self, forceCalc=True)
 
     def updateBestValues(self):
-        if self.framesOn > 0: # Effectively, if self.on
+        if self.on > 0: # Effectively, if self.on
             self.bearing = self.visBearing
             self.dist = self.visDist
         else:

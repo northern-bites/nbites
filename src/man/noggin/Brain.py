@@ -340,6 +340,7 @@ class Brain(object):
         Update estimates of robot and ball positions on the field
         """
         self.my.updateLoc(self.loc)
+
         self.ball.updateLoc(self.loc, self.my)
         self.yglp.updateLoc(self.loc, self.my)
         self.ygrp.updateLoc(self.loc, self.my)
