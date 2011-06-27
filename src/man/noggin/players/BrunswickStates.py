@@ -157,7 +157,7 @@ def penaltyShotsGamePlaying(player):
             player.firstFrame():
         player.brain.resetLocalization()
     if player.brain.play.isRole(GOALIE):
-        player.brain.play.setSubRole(GOALIE_PENALTY_SAVER)
+        player.brain.play.setSubRole(GOALIE_KICKOFF)
         return player.goNow('penaltyGoalie')
     return player.goNow('penaltyKick')
 
