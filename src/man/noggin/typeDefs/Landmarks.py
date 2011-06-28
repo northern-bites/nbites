@@ -88,7 +88,7 @@ class FieldCorner(LocObject):
     FieldCorner is a class for corners, storing localization information.
     """
     def __init__(self, Id):
-        LocObject.__init__(self)
+        super(FieldCorner,self).__init__()
         self.visionId = Id
         self.elevation = 0
         self.framesOn = 0

@@ -101,6 +101,9 @@ def trackLoc(tracker):
         tracker.brain.motion.stopHeadMoves()
 
     # ** # debugging
+    print "my loc:",tracker.brain.my.x,tracker.brain.my.y,tracker.brain.my.h
+
+    # ** # debugging
     if isinstance(tracker.target, FieldCorner):
         print "target is corner:",tracker.target.visionId
     elif isinstance(tracker.target, FieldObject):
@@ -139,6 +142,9 @@ def stareLoc(tracker):
     # Make sure head is inactive first
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
+
+    # ** # debugging
+    print "my loc:",tracker.brain.my.x,tracker.brain.my.y,tracker.brain.my.h
 
     if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
         ###print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"

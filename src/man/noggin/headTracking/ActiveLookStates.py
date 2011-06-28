@@ -100,7 +100,7 @@ def trackLandmarks(tracker):
         objID = obj.visionId
         if isinstance(obj, FieldObject):
             objID += 20
-        print "ID:",objID,"  fitness:",obj.trackingFitness
+        print "ID:",objID,"  fitness:",obj.trackingFitness,"  on?:",obj.framesOn>0
 
     if not newlist == tracker.locObjectList:
         #Landmarks have changed fitness ranking. Track most fit.

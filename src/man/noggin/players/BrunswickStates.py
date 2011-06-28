@@ -31,8 +31,7 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.standup()
-        # ** #player.brain.tracker.locPans()
-        player.brain.tracker.readyLoc()# ** #new tracking behavior
+        player.brain.tracker.readyLoc()
         player.brain.sensors.startSavingFrames()
 
         if player.lastDiffState == 'gameInitial':
@@ -51,7 +50,7 @@ def gameSet(player):
         player.inKickingState = False
         player.stopWalking()
         player.brain.loc.resetBall()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.passiveLoc()
 
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
