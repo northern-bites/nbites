@@ -93,7 +93,7 @@ void VisualCorner::determineCornerShape() {
 										 max(line1->getAvgWidth(),
 											 MIN_EXTEND_DIST))) {
 			cornerType = CIRCLE;
-			cout << "Caught a bad T" << endl;
+			//cout << "Caught a bad T" << endl;
 		} else {
 			cornerType = T;
 			tBar = line1;
