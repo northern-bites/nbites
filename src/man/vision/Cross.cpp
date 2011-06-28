@@ -99,8 +99,10 @@ void Cross::checkForCrosses() {
     for (int i = 0; i < blobs->number(); i++) {
         Blob candidate = blobs->get(i);
         if (CROSSDEBUG) {
-            cout << "Blob " << candidate.width() << " " << candidate.height() << endl;
-            cout << "Coords " << candidate.getLeft() << " " << candidate.getTop() << endl;
+            cout << "Blob " << candidate.width() << " " << candidate.height() <<
+				endl;
+            cout << "Coords " << candidate.getLeft() << " " <<
+				candidate.getTop() << endl;
             vision->drawRect(candidate.getLeft(), candidate.getTop(),
                              candidate.width(), candidate.height(), BLACK);
         }
@@ -128,6 +130,9 @@ bool Cross::checkSizeAgainstPixEstimate(Blob b) {
         return false;
     }
     estimate e = vision->pose->pixEstimate(x, y, 0.0);
+	if (CROSSDEBUG) {
+		cout << "Distance check: " << e.dist << " " << w << endl;
+	}
     if (e.dist < 100.0f && w < 20) {
         return false;
     } else if (e.dist < 150.0f && w < 12) {
@@ -135,7 +140,7 @@ bool Cross::checkSizeAgainstPixEstimate(Blob b) {
     } else if (e.dist < 200.0f && w < 8) {
         return false;
     }
-    if (e.dist > 200.0f && w > 12) {
+    if (e.dist > 200.0f && w > 20) {
         return false;
     }
     return true;
@@ -233,7 +238,8 @@ bool Cross::checkForLineIntersection(Blob b) {
                                                         (*k)->getStartpoint(),
                                                         (*k)->getEndpoint());
 
-        if (foo.first != Utility::NO_INTERSECTION && foo.second != Utility::NO_INTERSECTION) {
+        if (foo.first != Utility::NO_INTERSECTION && foo.second !=
+			Utility::NO_INTERSECTION) {
             if (CROSSDEBUG)
                 cout << "Throwing out blob that is part of a line" << endl;
             return true;

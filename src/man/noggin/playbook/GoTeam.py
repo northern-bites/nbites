@@ -34,11 +34,14 @@ class GoTeam:
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
         self.subRoleSwitchTime = 0
+        self.goalieChaserCount = 0
         self.ellipse = Ellipse(PBConstants.LARGE_ELLIPSE_CENTER_X,
                                PBConstants.LARGE_ELLIPSE_CENTER_Y,
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
                                PBConstants.LARGE_ELLIPSE_WIDTH)
 
+
+        # Goalie
         self.shouldPositionLeftCounter = 0
         self.shouldPositionRightCounter = 0
         self.shouldPositionCenterCounter = 0
@@ -394,11 +397,19 @@ class GoTeam:
             return False
 
     def shouldUseDubD(self):
+        """
+        Uses goalieChaserCount to buffer when we let the goalie call us off.
+        """
         if not PBConstants.USE_DUB_D:
             return False
         goalie = self.brain.teamMembers[0]
-        return (goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER) and
-                not self.brain.player.inKickingState)
+        if goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER):
+            self.goalieChaserCount += 1
+        else:
+            self.goalieChaserCount = 0
+            return False
+        if self.goalieChaserCount > PBConstants.GOALIE_CHASER_COUNT_THRESH:
+            return not self.brain.player.inKickingState
 
     def defenderShouldChase(self):
         ballX = self.brain.ball.relX

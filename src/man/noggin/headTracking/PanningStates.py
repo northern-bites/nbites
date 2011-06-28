@@ -266,6 +266,8 @@ def scanQuickUp(tracker):
 MOTION_START_BUFFER = 2
 
 # ** # old method
+# anything that calls this should make sure that
+# goalieActiveLoc is set to proper value ( most likely false)
 def trianglePan(tracker):
     motionAngles = tracker.brain.sensors.motionAngles
     tracker.preTriPanHeads = (

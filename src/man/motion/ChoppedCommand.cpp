@@ -31,9 +31,11 @@ ChoppedCommand::ChoppedCommand(const JointCommand::ptr command, int chops )
       numChopped(NUM_CHAINS,0),
       motionType( command->getType() ),
       interpolationType( command->getInterpolation() ),
-      finished(false)
+      finished(false),
+      sourceCommand(command)
 {
     constructStiffness(command);
+    sourceCommand->framesRemaining(chops);
 }
 
 void ChoppedCommand::constructStiffness(const JointCommand::ptr command) {
@@ -75,6 +77,9 @@ void ChoppedCommand::checkDone() {
     }
 
     finished = allDone;
+
+    if (finished)
+	sourceCommand->finishedExecuting();
 }
 
 vector<float> ChoppedCommand::getFinalJoints(const JointCommand::ptr command,

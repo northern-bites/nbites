@@ -21,15 +21,33 @@ def rGoalie(team, workingPlay):
         # Special case for ready goalie.
         SubRoles.pReadyGoalie(team, workingPlay)
 
-    # Get out of ready
+    # Get out of ready -> Just after kick off
     elif workingPlay.isSubRole(PBConstants.READY_GOALIE):
+        SubRoles.pGoalieKickOff(team, workingPlay)
+
+    # Make sure we position when we come out of Penalized
+    elif workingPlay.isSubRole(PBConstants.PENALTY_SUB_ROLE):
         SubRoles.pGoalieCenter(team, workingPlay)
 
-    # Penalty Kick
-    elif workingPlay.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
-        SubRoles.pGoaliePenaltySaver(team, workingPlay)
+    # Kick off just happened
+    elif workingPlay.isSubRole(PBConstants.GOALIE_KICKOFF):
+        if RoleTran.shouldPositionForSave(team):
+            SubRoles.pGoalieSave(team, workingPlay)
+        elif RoleTran.shouldChase(team):
+            SubRoles.pGoalieChaser(team, workingPlay)
+        else:
+            SubRoles.pGoalieKickOff(team, workingPlay)
 
-    # Saving will go here
+    # Saving
+    elif workingPlay.isSubRole(PBConstants.GOALIE_SAVE):
+        # if RoleTran.shouldNotSave(team):
+        #   SubRoles.pGoalieCenter(team, workingPlay)
+        if (team.brain.player.isSaving):
+            SubRoles.pGoalieSave(team, workingPlay)
+        elif RoleTran.shouldChase(team):
+            SubRoles.pGoalieChaser(team, workingPlay)
+        else:
+            SubRoles.pGoalieCenter(team, workingPlay)
 
     # Chase
     elif workingPlay.isSubRole(PBConstants.GOALIE_CHASER):
@@ -46,7 +64,10 @@ def rGoalie(team, workingPlay):
     elif (workingPlay.isSubRole(PBConstants.GOALIE_CENTER) or
           workingPlay.isSubRole(PBConstants.GOALIE_RIGHT) or
           workingPlay.isSubRole(PBConstants.GOALIE_LEFT)):
-        if RoleTran.shouldChase(team):
+        if RoleTran.shouldPositionForSave(team):
+            SubRoles.pGoalieSave(team, workingPlay)
+
+        elif RoleTran.shouldChase(team):
             SubRoles.pGoalieChaser(team, workingPlay)
 
         # elif RoleTran.shouldPositionRight(team):

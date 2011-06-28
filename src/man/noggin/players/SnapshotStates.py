@@ -16,12 +16,10 @@ def gameReady(player):
 def gameSet(player):
     if player.firstFrame:
         player.numFramesSaved = 0
-        player.brain.tracker.performHeadMove(HeadMoves.OVER_RIGHT_SHOULDER)
 
     return player.stay()
 
 def gamePlaying(player):
-    player.brain.tracker.performHeadMove(HeadMoves.OVER_LEFT_SHOULDER)
 
     #if player.brain.ball.on:
     #player.brain.sensors.saveFrame()

@@ -136,6 +136,10 @@ public:
     void lookForFieldCorner(VisualCorner & first, float l1, float l2);
     void classifyInnerL(VisualCorner & first);
     void classifyOuterL(VisualCorner &first);
+	void classifyOuterLMidAngle(VisualCorner & corner,
+								boost::shared_ptr<VisualLine> shorty,
+								boost::shared_ptr<VisualLine> longy);
+
     void classifyT(VisualCorner &first);
 
     const std::list<const ConcreteCorner*> classifyCornerWithObjects(

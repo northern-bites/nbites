@@ -31,7 +31,6 @@ ScriptedProvider::ScriptedProvider(shared_ptr<Sensors> s,
       sensors(s),
       chopper(sensors),
       currCommand(),
-      currCommand_unchopped(),
       bodyCommandQueue()
 
 {
@@ -58,11 +57,9 @@ void ScriptedProvider::requestStopFirstInstance() { }
 void ScriptedProvider::hardReset(){
     pthread_mutex_lock(&scripted_mutex);
     while(!bodyCommandQueue.empty()){
+	BodyJointCommand::ptr next = bodyCommandQueue.front();
+	next->finishedExecuting();
         bodyCommandQueue.pop();
-    }
-    if (currCommand_unchopped) {
-	currCommand_unchopped->finishedExecuting();
-	currCommand_unchopped = BodyJointCommand::ptr();
     }
 
     if (currCommand)
@@ -110,7 +107,7 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
     // joints from the ChoppedCommand.
     shared_ptr<vector <vector <float> > > currentChains(getCurrentChains());
 
-    currCommand_unchopped->tick();
+    currCommand->nextFrame(); // so Python can keep track of progress
 
     for (unsigned int id=0; id< Kinematics::NUM_CHAINS; ++id ) {
 	Kinematics::ChainID cid = static_cast<Kinematics::ChainID>(id);
@@ -159,21 +156,14 @@ void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand::ptr> &seq) 
 void ScriptedProvider::setNextBodyCommand() {
     // If there are no more commands, don't try to enqueue one
     if ( !bodyCommandQueue.empty() ) {
-	// tell the last command its finished
-	if (currCommand_unchopped)
-	    currCommand_unchopped->finishedExecuting();
-
-	currCommand_unchopped = bodyCommandQueue.front();
+	BodyJointCommand::ptr nextCommand = bodyCommandQueue.front();
 	bodyCommandQueue.pop();
 
 	// Replace the current command
 	PROF_ENTER(profiler, P_CHOPPED);
 	const bool useComPreviews = true;
-	currCommand = chopper.chopCommand(currCommand_unchopped,
-					  useComPreviews);
+	currCommand = chopper.chopCommand(nextCommand, useComPreviews);
 	PROF_EXIT(profiler, P_CHOPPED);
-
-	currCommand_unchopped->framesRemaining(currCommand->NumChops());
     }
 }
 
