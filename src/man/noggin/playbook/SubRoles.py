@@ -74,17 +74,6 @@ def pGoalieChaser(team, workingPlay):
 
     workingPlay.setPosition(pos)
 
-def pGoaliePenaltySaver(team, workingPlay):
-    """ goalie is in penalty kick situation"""
-    workingPlay.setSubRole(PBConstants.GOALIE_PENALTY_SAVER)
-    h = team.brain.ball.heading
-    pos = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
-
-    if PBConstants.USE_FANCY_GOALIE:
-       pos = team.fancyGoaliePosition()
-
-    workingPlay.setPosition(pos)
-
 
 #### Chaser sub roles ####
 
