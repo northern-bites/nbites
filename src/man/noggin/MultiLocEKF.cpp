@@ -884,7 +884,7 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
 
     // Clamp the input to asin to within (-1 , 1) due to measurement
     // inaccuracies. This prevents a nan return from asin.
-    float angleB = asinf( clip( (sideB * sin(angleC)) /sideC, 1.0f, -1.0f));
+    float angleB = asinf( clip( (sideB * sin(angleC)) /sideC, -1.0f, 1.0f));
 
      // Swap sign of angle B to place us on the correct side of the
     // line (pt1 -> pt2)
@@ -903,7 +903,7 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
 
     // Heading of line (self -> pt2)
     // Clamp the input to (-1,1) to prevent illegal trig call and a nan return
-    float headingPt2 = acosf( clip( (pt2.x - newX)/sideB, -1.0f, 1.0f) );
+    float headingPt2 = acosf(( (pt2.x - newX)/sideB) );
 
     // Sign based on y direction of vector (self -> pt2)
     float signedHeadingPt2 = copysignf(1.0f, pt2.y - newY) * headingPt2;
