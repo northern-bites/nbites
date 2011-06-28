@@ -1,5 +1,7 @@
-from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_PENALTY_SAVER)
+from ..playbook.PBConstants import (GOALIE, CHASER,
+                                    GOALIE_PENALTY_SAVER, GOALIE_KICKOFF)
 import man.motion.SweetMoves as SweetMoves
+
 ###
 # Reimplementation of Game Controller States for pBrunswick
 ###
@@ -157,7 +159,7 @@ def penaltyShotsGamePlaying(player):
             player.firstFrame():
         player.brain.resetLocalization()
     if player.brain.play.isRole(GOALIE):
-        player.brain.play.setSubRole(GOALIE_PENALTY_SAVER)
+        player.brain.play.setSubRole(GOALIE_KICKOFF)
         return player.goNow('penaltyGoalie')
     return player.goNow('penaltyKick')
 

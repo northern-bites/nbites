@@ -1,21 +1,40 @@
-from math import fabs
-from . import PBConstants as PBCon
 from .. import NogginConstants as NogCon
 from ..players import GoalieConstants as goalCon
-from ..players import ChaseBallTransitions as chaseTran
 
 #********
 # GOALIE*
 #********
 
-def shouldSave(team):
+
+def shouldPositionForSave(team):
+    """ We should get ready to save because a robot is
+    in a position to shoot or is getting close """
+
     ball = team.brain.ball
 
-     ## NEED TO FIGURE THIS OUT ###
+    if ball.heat > 10 :
+        team.shouldSaveCounter += 1
+        if team.shouldSaveCounter > 1:
+            team.shouldChaseCounter = 0
+            team.shouldStopChaseCounter = 0
+            team.shouldPositionCenterCounter = 0
+            team.shouldPositionLeftCounter = 0
+            team.shouldPositionRightCounter = 0
+            team.shouldSaveCounter = 0
+            return True
+
     return False
 
+
 def shouldChase(team):
+    """ Ball is inside the field cross and we should
+    get it and kick it away """
+
     ball = team.brain.ball
+
+    # Not allowed to touch the ball outside of the box
+    if (team.brain.player.penaltyKicking):
+        return False
 
     if (ball.framesOff > 30):
         return False
@@ -35,11 +54,19 @@ def shouldChase(team):
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
     return False
 
+
 def shouldStopChase(team):
+    """ We should stop chasing because:
+    We are 1/4 way up the field
+    We have lost the ball
+    We are outside the box and ball not chasable.
+    Ball is not in chase area. """
+
     ball= team.brain.ball
     my = team.brain.my
 
@@ -49,15 +76,16 @@ def shouldStopChase(team):
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
-    # I'm 1/4 of the way up the field
     if my.x > NogCon.MIDFIELD_X * 0.5:
         team.shouldChaseCounter = 0
         team.shouldStopChaseCounter = 0
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X  and my.uncertX < 90):
@@ -67,6 +95,7 @@ def shouldStopChase(team):
             team.shouldPositionCenterCounter = 0
             team.shouldPositionLeftCounter = 0
             team.shouldPositionRightCounter = 0
+            team.shouldSaveCounter = 0
             return True
 
     elif (ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER
@@ -82,13 +111,17 @@ def shouldStopChase(team):
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
     return False
 
 
-
 def shouldPositionCenter(team):
+    """ Right now we only position Center so this
+    is not really necessary but will be when
+    position mulitple places """
+
     ball = team.brain.ball
 
     if ball.framesOff > 30:
@@ -97,9 +130,10 @@ def shouldPositionCenter(team):
         team.shouldPositionCenterCounter = 0
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
+        team.shouldSaveCounter = 0
         return True
 
-    if ball.x > goalCon.CHASE_RIGHT_X_LIMIT:
+    if ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER:
         team.shouldPositionCenterCounter += 1
         if team.shouldPositionCenterCounter > 3:
             team.shouldStopChaseCounter = 0
@@ -107,17 +141,21 @@ def shouldPositionCenter(team):
             team.shouldPositionCenterCounter = 0
             team.shouldPositionLeftCounter = 0
             team.shouldPositionRightCounter = 0
+            team.shouldSaveCounter = 0
         return True
 
     return False
 
+
 def shouldPositionRight(team):
+    """ Position right not used """
+
     ball = team.brain.ball
 
     if ball.framesOff > 30:
         return False
 
-    if (ball.y < goalCon.CHASE_LOWER_Y_LIMIT
+    if (ball.y < goalCon.CHASE_LOWER_Y_LIMIT + goalCon.CHASE_BUFFER
         and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.on):
         team.shouldPositionRightCounter += 1
@@ -127,18 +165,21 @@ def shouldPositionRight(team):
             team.shouldPositionRightCounter = 0
             team.shouldPositionLeftCounter = 0
             team.shouldPositionCenterCounter = 0
+            team.shouldSaveCounter = 0
         return True
 
     return False
 
 
 def shouldPositionLeft(team):
+    """ Position left not used """
+
     ball = team.brain.ball
 
     if ball.framesOff > 30:
         return False
 
-    if (ball.y > goalCon.CHASE_UPPER_Y_LIMIT
+    if (ball.y > goalCon.CHASE_UPPER_Y_LIMIT + goalCon.CHASE_BUFFER
         and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.on):
         team.shouldPositionLeftCounter += 1
@@ -148,6 +189,18 @@ def shouldPositionLeft(team):
             team.shouldPositionRightCounter = 0
             team.shouldPositionLeftCounter = 0
             team.shouldPositionCenterCounter = 0
+            team.shouldSaveCounter = 0
         return True
+
+    return False
+
+def shouldNotSave(team):
+    ball = team.brain.ball
+
+    if team.brain.player.penaltyKicking:
+        return False
+
+    # Want to stop saving when no longer worried about
+    # A robot shooting and the ball is not moving ??
 
     return False

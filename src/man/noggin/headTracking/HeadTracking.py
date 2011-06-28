@@ -102,6 +102,7 @@ class HeadTracking(FSA.FSA):
 
     def kickDecideScan(self):
         self.lastDiffState = 'stop'
+        self.goalieActiveLoc = False
         if self.currentState != 'trianglePan':
             self.switchTo('trianglePan')
 

@@ -37,6 +37,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.counterLeftSave = 0
         self.counterCenterSave = 0
 
+        self.isSaving = False
+        self.shouldSaveCounter = 0
+
         #END GOALIE COUNTERS AND BOOLEANS
 
         self.frameCounter = 0
@@ -90,9 +93,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'playbookPosition'
 
     def getRoleStateGoalie(self):
-        if self.play.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
-            return 'penaltyGoalie'
-        if self.play.isSubRole(PBConstants.GOALIE_CHASER):
+        # if self.play.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
+        #     return 'penaltyGoalie'
+        if self.play.isSubRole(PBConstants.GOALIE_KICKOFF):
+            return 'kickOffPosition'
+        elif self.play.isSubRole(PBConstants.GOALIE_CHASER):
             return 'goalieChase'
         elif self.play.isSubRole(PBConstants.GOALIE_SAVE):
             return 'goalieSave'
