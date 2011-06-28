@@ -3,12 +3,8 @@
 # Covers chase, position and save.
 #
 
-from math import fabs
-from ..playbook import PBConstants as PBCon
 from .. import NogginConstants as NogCon
 import GoalieConstants as goalCon
-import ChaseBallTransitions as chaseTran
-
 
 DEBUG = False
 
@@ -24,19 +20,6 @@ def shouldSave(player):
             return True
 
     return False
-
-
-#not using right now
-#uses ball velocity information which
-#im not sure I want to use
-def getTimeUntilSave(player):
-    ball = player.brain.ball
-    time = 0
-    if ball.relVelX < 0.0:
-        time = ball.relX/ -ball.relVelX
-    else:
-        time = -1
-    return time
 
 # not used right now
 #should move goalie but with dive right now shouldnt need
@@ -73,20 +56,10 @@ def shouldSaveCenter(player):
 
     return False
 
-# need to figure out how this works
 def shouldHoldSave(player):
-    # same as shouldSave() except for the ball.framesOn check
-    # try to come up with better conditions to test
-    """    if the ball is still in front of me and coming at me, hold save
-    if it's going to arrive anytime soon  """
-
-    ball = player.brain.ball
-
-    timeUntilSave = getTimeUntilSave(player)
-    if timeUntilSave < goalCon.BALL_SAVE_LIMIT_TIME*2 and ball.relVelX < 0 and \
-            0 < ball.relX < goalCon.MOVE_TO_SAVE_DIST_THRESH:
-        if DEBUG: player.brain.sensors.saveFrame()
+    if player.stateTime <= 5:
         return True
+
     return False
 
 #POSITION TRANSITIONS

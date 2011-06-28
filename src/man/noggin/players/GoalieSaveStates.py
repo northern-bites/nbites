@@ -28,12 +28,20 @@ def goalieSave(player):
     if helper.shouldSave(player):
         brain.fallController.enableFallProtection(False)
         print ball.endY
-        if helper.shouldSaveRight(player):
-            return player.goNow('saveRight')
-        if helper.shouldSaveLeft(player):
-            return player.goNow('saveLeft')
+        if TESTING:
+            if helper.shouldSaveRight(player):
+                return player.goNow('testSaveRight')
+            elif helper.shouldSaveLeft(player):
+                return player.goNow('testSaveLeft')
+            else:
+                return player.goNow('saveCenter')
         else:
-            return player.goNow('saveCenter')
+            if helper.shouldSaveRight(player):
+                return player.goNow('saveRight')
+            if helper.shouldSaveLeft(player):
+                return player.goNow('saveLeft')
+            else:
+                return player.goNow('saveCenter')
     #add check for strafe in future
 
     return player.stay()
@@ -101,16 +109,15 @@ def testSaveCenter(player):
 # HOLD SAVE
 
 def holdRightSave(player):
-    if helper.shouldHoldSave(player):
+    if player.stateTime <= 5:
         return player.stay()
     else:
-        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
         return player.goLater('rollOutRight')
 
     return player.stay()
 
 def holdLeftSave(player):
-    if helper.shouldHoldSave(player):
+    if player.stateTime <= 5:
         return player.stay()
     else:
         return player.goLater('rollOutLeft')
@@ -118,7 +125,7 @@ def holdLeftSave(player):
     return player.stay()
 
 def holdCenterSave(player):
-    if helper.shouldHoldSave(player):
+    if player.stateTime <= 5:
         return player.stay()
     else:
         return player.goLater('postCenterSave')
@@ -128,14 +135,14 @@ def holdCenterSave(player):
 # POST SAVE
 
 def rollOutRight(player):
-    if player.counter == 5:
+    if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
         return player.goLater('postDiveSave')
 
     return player.stay()
 
 def rollOutLeft(player):
-    if player.counter == 5:
+    if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
         return player.goLater('postDiveSave')
 
