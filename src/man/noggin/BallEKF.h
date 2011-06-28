@@ -70,8 +70,12 @@ public:
      */
     const float getRelativeXUncert() const { return P_k(x_index,x_index); }
     const float getRelativeYUncert() const { return P_k(y_index,y_index); }
-    const float getRelativeXVelocityUncert() const { return P_k(vel_x_index,vel_x_index); }
-    const float getRelativeYVelocityUncert() const { return P_k(vel_y_index,vel_y_index); }
+    const float getRelativeXVelocityUncert() const {
+        return P_k(vel_x_index,vel_x_index);
+    }
+    const float getRelativeYVelocityUncert() const {
+        return P_k(vel_y_index,vel_y_index);
+    }
 
     /**
      * Global ball location and velocities calculated using current
@@ -89,6 +93,12 @@ public:
     const float getGlobalYUncert() const;
     const float getGlobalXVelocityUncert() const;
     const float getGlobalYVelocityUncert() const;
+
+    /**
+     * Distance, bearing getters
+     */
+    float getDistance() { return hypot(getRelativeX(), getRelativeY());      }
+    float getBearing()  { return safe_atan2(getRelativeY(), getRelativeX()); }
 
     ///////////////////////////////
     // Setters

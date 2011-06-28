@@ -226,13 +226,18 @@ EKF<RangeBearingMeasurement,
 BallEKF::associateTimeUpdate(MotionModel odo)
 {
     curOdo = odo;
-    StateVector deltaBall(ball_ekf_dimension);
+    StateVector deltaBall(ball_ekf_dimension, 0.0f);
 
     // Calculate expected ball deltas
     updatePosition              ( odo, deltaBall);
     updateVelocity              ( odo, deltaBall);
     updateAcceleration          ( odo, deltaBall);
     calculateTimeUpdateJacobian ( odo, deltaBall);
+
+#ifdef DEBUG_BALL_EKF
+    cout << "deltaBall: " << deltaBall << endl
+         << "dt: "        << dt        << endl;
+#endif
 
     return deltaBall;
 }
@@ -246,6 +251,11 @@ void BallEKF::updateFrameLength()
     const long long int time = monotonic_micro_time();
     dt = static_cast<float>(time - lastUpdateTime)/
         1000000.0f; // u_s to sec
+
+    // Guard against a zero dt (maybe possible?)
+    if (dt == 0.0){
+        dt = 0.0001;
+    }
     lastUpdateTime = time;
 }
 
@@ -271,7 +281,7 @@ void BallEKF::updatePosition(const MotionModel& odo, StateVector& deltaBall)
             deltaBall(x_index) = min(0.0f, deltaBall(x_index));
     }
 
-    if (xhat_k(vel_x_index) > VELOCITY_EST_MIN_SPEED){
+    if (xhat_k(vel_y_index) > VELOCITY_EST_MIN_SPEED){
 
         deltaBall(y_index) = (xhat_k(vel_y_index)*dt +
                               .5f * (xhat_k(acc_y_index) +
