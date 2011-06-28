@@ -87,9 +87,9 @@ class FieldCorner(LocObject):
     """
     FieldCorner is a class for corners, storing localization information.
     """
-    def __init__(self, _Id):
+    def __init__(self, Id):
         LocObject.__init__(self)
-        self.Id = _Id
+        self.visionId = Id
         self.elevation = 0
         self.framesOn = 0
         self.height = 0
@@ -144,7 +144,7 @@ class FieldCorner(LocObject):
         self.locBearing = my.getRelativeBearing(self, forceCalc=True)
 
     def updateBestValues(self):
-        if self.on > 0: # Effectively, if self.on
+        if self.framesOn > 0: # Effectively, if self.on
             self.bearing = self.visBearing
             self.dist = self.visDist
         else:

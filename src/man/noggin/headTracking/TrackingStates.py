@@ -96,23 +96,21 @@ def trackLoc(tracker):
     Look towards the current target, then stare at it for
     TRACKER_FRAMES_STARE_THRESH frames.
     """
-    # ** # more debugging code
-    for obj in tracker.locObjectList:
-        if isinstance(obj, FieldCorner):
-            if obj.Id == 3:
-                tracker.target = obj
-
     # make sure head is inactive first
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
+
+    # ** # debugging
+    if isinstance(tracker.target, FieldCorner):
+        print "target is corner:",tracker.target.visionId
+    elif isinstance(tracker.target, FieldObject):
+        print "target is post:",tracker.target.visionId
 
     # safety check that target was not set to a ball
     if tracker.target is None or tracker.target == tracker.brain.ball:
         print "target is None, or the ball"
         return tracker.goLater(tracker.decisionState)
 
-    print "my coords:",tracker.brain.my.x,tracker.brain.my.y
-    print "looking to rel coords:",tracker.target.relX,tracker.target.relY
     tracker.helper.lookToTargetCoords(tracker.target)
 
     # if close enough to target, switch to stareLoc
@@ -156,7 +154,6 @@ def stareLoc(tracker):
     # Second safety check that something was on frame
     if stareTarget is None:
         print "no possible target currently visible"
-        print "expect target at rel coords:",tracker.target.relX,tracker.target.relY
         return tracker.stay()
 
     print "target visible"

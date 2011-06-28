@@ -2,6 +2,8 @@ from . import TrackingConstants as constants
 from .. import NogginConstants
 import man.motion.HeadMoves as HeadMoves
 from math import (fabs)
+from ..typeDefs.Landmarks import FieldCorner # ** # imported for debugging
+from ..typeDefs.Landmarks import FieldObject # ** # imported for debugging
 
 TIME_TO_LOOK_TO_TARGET = 1.0
 
@@ -91,6 +93,14 @@ def trackLandmarks(tracker):
         tracker.helper.updateGeneralTrackingFitness(obj)
     # Sort list of locObjects
     newlist = sorted(tracker.locObjectList)
+
+    # ** # debugging
+    for i in range(5):
+        obj = newlist[i]
+        objID = obj.visionId
+        if isinstance(obj, FieldObject):
+            objID += 20
+        print "ID:",objID,"  fitness:",obj.trackingFitness
 
     if not newlist == tracker.locObjectList:
         #Landmarks have changed fitness ranking. Track most fit.

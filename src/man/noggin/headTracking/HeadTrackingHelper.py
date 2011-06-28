@@ -197,7 +197,7 @@ class HeadTrackingHelper(object):
         """
         Finds the given corner in the vision frame.
         """
-        if corner.on:
+        if corner.framesOn > 0: # HACK from Landmarks.FieldCorner
             return corner
         else:
             return None
