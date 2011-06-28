@@ -165,17 +165,20 @@ void BallEKF::reset()
 {
     // Reset all of the matrices to zeros
     for(unsigned i = 0; i < numStates; ++i) {
+
+        xhat_k(i) = xhat_k_bar(i) = 0.0f;
+
         for(unsigned j = 0; j < numStates; ++j) {
-            Q_k(i,j) = 0.0f;
-            P_k(i,j) = 0.0f;
-            P_k_bar(i,j) = 0.0f;
+            A_k(i,j) = Q_k(i,j) = P_k(i,j) = P_k_bar(i,j) = 0.0f;
         }
     }
     // Set the initial values
-    P_k_bar(x_index,x_index) = INIT_X_UNCERT;
-    P_k_bar(y_index,y_index) = INIT_Y_UNCERT;
-    P_k_bar(vel_x_index,vel_x_index) = INIT_X_VEL_UNCERT;
-    P_k_bar(vel_y_index,vel_y_index) = INIT_Y_VEL_UNCERT;
+    P_k(x_index,x_index) = P_k_bar(x_index,x_index) = INIT_X_UNCERT;
+    P_k(y_index,y_index) = P_k_bar(y_index,y_index) = INIT_Y_UNCERT;
+    P_k(vel_x_index,vel_x_index) =
+        P_k_bar(vel_x_index,vel_x_index) = INIT_X_VEL_UNCERT;
+    P_k(vel_y_index,vel_y_index) =
+        P_k_bar(vel_y_index,vel_y_index) = INIT_Y_VEL_UNCERT;
 }
 
 /**
