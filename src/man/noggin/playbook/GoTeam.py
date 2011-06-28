@@ -399,11 +399,15 @@ class GoTeam:
     def shouldUseDubD(self):
         """
         Uses goalieChaserCount to buffer when we let the goalie call us off.
+        If the ball is in our box goalie should be chaser.
         """
+        ball = self.brain.ball
+
         if not PBConstants.USE_DUB_D:
             return False
         goalie = self.brain.teamMembers[0]
-        if goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER):
+        if (goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER)
+            or ball.inMyGoalBox()):
             self.goalieChaserCount += 1
         else:
             self.goalieChaserCount = 0
