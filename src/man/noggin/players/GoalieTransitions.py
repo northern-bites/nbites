@@ -45,12 +45,10 @@ def shouldSaveRight(player):
 def shouldSaveLeft(player):
     ball= player.brain.ball
 
-    if(ball.endY > goalCon.CENTER_SAVE_THRESH
-       and ball.endY < goalCon.DONT_SAVE_LIMIT
-       and goalieInBox(player)):
-        return True
+    return (ball.endY > goalCon.CENTER_SAVE_THRESH
+            and ball.endY < goalCon.DONT_SAVE_LIMIT
+            and goalieInBox(player))
 
-    return False
 
 # Not used
 def shouldSaveCenter(player):
@@ -59,10 +57,7 @@ def shouldSaveCenter(player):
     return False
 
 def shouldHoldSave(player):
-    if player.stateTime <= goalCon.TIME_ON_GROUND:
-        return True
-
-    return False
+    return player.stateTime <= goalCon.TIME_ON_GROUND
 
 #POSITION TRANSITIONS
 
@@ -71,14 +66,7 @@ def shouldHoldSave(player):
 def goalieInBox(player):
     my = player.brain.my
 
-    if  (my.x < (NogCon.MY_GOALBOX_RIGHT_X + 10)
-         and my.x > (NogCon.MY_GOALBOX_LEFT_X - 10)
-         and my.y < (NogCon.MY_GOALBOX_TOP_Y + 10)
-         and my.y > (NogCon.MY_GOALBOX_BOTTOM_Y - 10)):
-        return True
-
-    return False
-
+    return (my.inMyGoalBox)
 
 #CHASE TRANSITIONS
 
@@ -87,9 +75,6 @@ def dangerousBall(player):
 
     # in box and behind me and close to me
     # if inBox(player):
-    if (ball.relX < 0):
-        #and ball.dist < 30):
-        return True
-
-    return False
+    return (ball.relX < 0 and self.goalieInBox(player))
+        #and ball.dist < 30)
 
