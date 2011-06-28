@@ -3,7 +3,7 @@
  *
  *  @author: Octavian Neamtu <oneamtu89@gmail.com>
  *
- *  @class MultiMultiProvider : an extension to MultiProvider that has subscribers
+ *  @class MultiProvider : an extension to Provider that has subscribers
  *  that subscribe to specific events
  */
 
