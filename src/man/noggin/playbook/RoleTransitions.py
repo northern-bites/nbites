@@ -12,7 +12,7 @@ def shouldPositionForSave(team):
 
     ball = team.brain.ball
 
-    if ball.heat > 10 :
+    if ball.heat > goalCon.HEAT_BUFFER:
         team.shouldSaveCounter += 1
         if team.shouldSaveCounter > 1:
             team.shouldChaseCounter = 0
@@ -36,7 +36,7 @@ def shouldChase(team):
     if (team.brain.player.penaltyKicking):
         return False
 
-    if (ball.framesOff > 30):
+    if (ball.framesOff > goalCon.BALL_LOST):
         return False
 
     # close enough to chase
@@ -48,7 +48,7 @@ def shouldChase(team):
         ):
         team.shouldChaseCounter += 1
 
-    if team.shouldChaseCounter > 3:
+    if team.shouldChaseCounter > goalCon.CHANGE_THRESH:
         team.shouldChaseCounter = 0
         team.shouldStopChaseCounter = 0
         team.shouldPositionCenterCounter = 0
@@ -70,7 +70,7 @@ def shouldStopChase(team):
     ball= team.brain.ball
     my = team.brain.my
 
-    if(ball.framesOff > 30):
+    if(ball.framesOff > goalCon.BALL_LOST):
         team.shouldStopChaseCounter = 0
         team.shouldChaseCounter = 0
         team.shouldPositionCenterCounter = 0
@@ -105,7 +105,7 @@ def shouldStopChase(team):
         ):
         team.shouldStopChaseCounter += 1
 
-    if team.shouldStopChaseCounter > 3:
+    if team.shouldStopChaseCounter > goalCon.CHANGE_THRESH:
         team.shouldStopChaseCounter = 0
         team.shouldChaseCounter = 0
         team.shouldPositionCenterCounter = 0
@@ -124,7 +124,7 @@ def shouldPositionCenter(team):
 
     ball = team.brain.ball
 
-    if ball.framesOff > 30:
+    if ball.framesOff > goalCon.BALL_LOST:
         team.shouldStopChaseCounter = 0
         team.shouldChaseCounter = 0
         team.shouldPositionCenterCounter = 0
@@ -135,7 +135,7 @@ def shouldPositionCenter(team):
 
     if ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER:
         team.shouldPositionCenterCounter += 1
-        if team.shouldPositionCenterCounter > 3:
+        if team.shouldPositionCenterCounter > goalCon.CHANGE_THRESH:
             team.shouldStopChaseCounter = 0
             team.shouldChaseCounter = 0
             team.shouldPositionCenterCounter = 0
@@ -152,14 +152,14 @@ def shouldPositionRight(team):
 
     ball = team.brain.ball
 
-    if ball.framesOff > 30:
+    if ball.framesOff > goalCon.BALL_LOST:
         return False
 
     if (ball.y < goalCon.CHASE_LOWER_Y_LIMIT + goalCon.CHASE_BUFFER
         and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.on):
         team.shouldPositionRightCounter += 1
-        if team.shouldPositionRightCounter > 3:
+        if team.shouldPositionRightCounter > goalCon.CHANGE_THRESH:
             team.shouldStopChaseCounter = 0
             team.shouldChaseCounter = 0
             team.shouldPositionRightCounter = 0
@@ -176,14 +176,14 @@ def shouldPositionLeft(team):
 
     ball = team.brain.ball
 
-    if ball.framesOff > 30:
+    if ball.framesOff > goalCon.BALL_LOST:
         return False
 
     if (ball.y > goalCon.CHASE_UPPER_Y_LIMIT + goalCon.CHASE_BUFFER
         and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.on):
         team.shouldPositionLeftCounter += 1
-        if team.shouldPositionLeftCounter > 3:
+        if team.shouldPositionLeftCounter > goalCon.CHANGE_THRESH:
             team.shouldStopChaseCounter = 0
             team.shouldChaseCounter = 0
             team.shouldPositionRightCounter = 0

@@ -4,6 +4,7 @@
 
 import man.motion.SweetMoves as SweetMoves
 import GoalieTransitions as helper
+import GoalieConstants as goalCon
 
 TESTING = True
 
@@ -82,7 +83,7 @@ def saveCenter(player):
 def testSaveRight(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
-    if player.counter > 50:
+    if player.counter > goalCon.TEST_SAVE_WAIT:
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.goNow('doneSaving')
     return player.stay()
@@ -90,7 +91,7 @@ def testSaveRight(player):
 def testSaveLeft(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
-    if player.counter > 50:
+    if player.counter > goalCon.TEST_SAVE_WAIT:
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.goNow('doneSaving')
     return player.stay()
@@ -98,7 +99,7 @@ def testSaveLeft(player):
 def testSaveCenter(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
-    if player.counter > 50:
+    if player.counter > goalCon.TEST_SAVE_WAIT:
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.goNow('doneSaving')
     return player.stay()
@@ -106,7 +107,7 @@ def testSaveCenter(player):
 # HOLD SAVE
 
 def holdRightSave(player):
-    if player.stateTime <= 5:
+    if helper.shouldHoldSave(player):
         return player.stay()
     else:
         return player.goLater('rollOutRight')
@@ -114,7 +115,7 @@ def holdRightSave(player):
     return player.stay()
 
 def holdLeftSave(player):
-    if player.stateTime <= 5:
+    if helper.shouldHoldSave(player):
         return player.stay()
     else:
         return player.goLater('rollOutLeft')
@@ -122,7 +123,7 @@ def holdLeftSave(player):
     return player.stay()
 
 def holdCenterSave(player):
-    if player.stateTime <= 5:
+    if helper.shouldHoldSave(player):
         return player.stay()
     else:
         return player.goLater('postCenterSave')
@@ -149,7 +150,7 @@ def postCenterSave(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
 
-    if player.counter == 25:
+    if player.counter == goalCon.SQUAT_WAIT:
         return player.goLater('doneSaving')
 
     return player.stay()
@@ -158,7 +159,7 @@ def postDiveSave(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.STAND_UP_BACK)
 
-    if player.counter == 150:
+    if player.counter == goalCon.DIVE_WAIT:
         return player.goLater('doneSaving')
 
     return player.stay()
