@@ -216,7 +216,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "GOALIE_LEFT",
                                             "GOALIE_SAVE",
                                             "GOALIE_CHASER",
-                                            "GOALIE_PENALTY_SAVER",
+                                            "GOALIE_KICKOFF",
 
                                             # KICKOFF SUB ROLES 23-24
                                             "KICKOFF_SWEEPER",
@@ -255,7 +255,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  GOALIE_LEFT,
  GOALIE_SAVE,
  GOALIE_CHASER,
- GOALIE_PENALTY_SAVER,
+ GOALIE_KICKOFF,
 
  KICKOFF_SWEEPER,
  KICKOFF_STRIKER,

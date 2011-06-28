@@ -40,6 +40,8 @@ class GoTeam:
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
                                PBConstants.LARGE_ELLIPSE_WIDTH)
 
+
+        # Goalie
         self.shouldPositionLeftCounter = 0
         self.shouldPositionRightCounter = 0
         self.shouldPositionCenterCounter = 0

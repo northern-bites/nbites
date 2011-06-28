@@ -5,6 +5,17 @@ from ..typeDefs.Location import Location
 
 #### Goalie sub roles ####
 
+def pGoalieKickOff(team, workingPlay):
+    """ keeps the goalie from moving on kickoff"""
+    workingPlay.setSubRole(PBConstants.GOALIE_KICKOFF)
+    h = team.brain.ball.heading
+    pos = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
+
+    if PBConstants.USE_FANCY_GOALIE:
+        pos = team.fancyGoaliePosition()
+
+    workingPlay.setPosition(pos)
+
 def pGoalieCenter(team, workingPlay):
     """normal goalie position in the center of the goal"""
     workingPlay.setSubRole(PBConstants.GOALIE_CENTER)
@@ -73,20 +84,6 @@ def pGoalieChaser(team, workingPlay):
        pos = team.fancyGoaliePosition()
 
     workingPlay.setPosition(pos)
-
-def pGoaliePenaltySaver(team, workingPlay):
-    """ goalie is in penalty kick situation"""
-    workingPlay.setSubRole(PBConstants.GOALIE_PENALTY_SAVER)
-    dest = Location(PBConstants.GOALIE_HOME_X,
-                             PBConstants.GOALIE_HOME_Y)
-    h = dest.headingTo(team.brain.ball)
-    pos = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
-
-    if PBConstants.USE_FANCY_GOALIE:
-       pos = team.fancyGoaliePosition()
-
-    workingPlay.setPosition(pos)
-
 
 #### Chaser sub roles ####
 

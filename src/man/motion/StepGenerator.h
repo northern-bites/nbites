@@ -129,8 +129,8 @@ public:
     bool isDone() const { return done; }
 
     void setSpeed(const float _x, const float _y, const float _theta);
-	void setDestination(const float rel_x, const float rel_y, const float rel_theta,
-						float gain = 1.0f);
+    int setDestination(const float rel_x, const float rel_y, const float rel_theta,
+		       float gain = 1.0f);
     void takeSteps(const float _x, const float _y, const float _theta,
                    const int _numSteps);
 
