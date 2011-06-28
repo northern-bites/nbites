@@ -80,7 +80,7 @@ public class RobotDef {
      * If you want to add a version, you need to add one more entry to the
      * array.
      **/
-    private static int [] sensorsForVersions = {22};
+    private static int [] sensorsForVersions = {22, 0};
     public static final RobotDef NAO_DEF_VERSIONED =
         new RobotDef(ImageType.NAO_VER,
                      640, 480,
