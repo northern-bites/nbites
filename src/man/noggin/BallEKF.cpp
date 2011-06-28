@@ -190,6 +190,7 @@ void BallEKF::updateModel(const MotionModel& odo,
                           const PoseEst& p)
 {
     robotPose = p;
+    updateFrameLength();
 
     // Update expected ball movement
     timeUpdate(odo);
@@ -226,8 +227,6 @@ BallEKF::associateTimeUpdate(MotionModel odo)
 {
     curOdo = odo;
     StateVector deltaBall(ball_ekf_dimension);
-
-    updateFrameLength();
 
     // Calculate expected ball deltas
     updatePosition              ( odo, deltaBall);
