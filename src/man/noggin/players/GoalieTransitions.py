@@ -59,7 +59,7 @@ def shouldSaveCenter(player):
     return False
 
 def shouldHoldSave(player):
-    if player.stateTime <= 5:
+    if player.stateTime <= goalCon.TIME_ON_GROUND:
         return True
 
     return False
