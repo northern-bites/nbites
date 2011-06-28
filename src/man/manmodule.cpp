@@ -53,7 +53,11 @@ using boost::shared_ptr;
 
 void ALCreateMan( ALPtr<ALBroker> broker){
     static shared_ptr<Synchro> synchro(new Synchro());
+#ifdef USE_ALSPEECH
     static shared_ptr<Speech> speech(new ALSpeech(broker));
+#else
+    static shared_ptr<Speech> speech(new Speech());
+#endif
     static shared_ptr<Sensors> sensors(new Sensors(speech));
     static shared_ptr<ALTranscriber> transcriber(new ALTranscriber(broker,sensors));
     static shared_ptr<ALImageTranscriber> imageTranscriber(

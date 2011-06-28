@@ -23,20 +23,17 @@ namespace parse {
 
 namespace proto_io = google::protobuf::io;
 
-class ImageParser : Parser <RoboImage>{
+class ImageParser : public TemplatedParser <RoboImage>{
 
 public:
-    ImageParser(boost::shared_ptr<RoboImage> image,
-               const char* _file_name);
-//    ImageParser(boost::shared_ptr<const RoboImage> image,
-//               int _file_descriptor);
-
-    ~ImageParser();
+    ImageParser(include::io::FDProvider::const_ptr fdProvider,
+            boost::shared_ptr<RoboImage> image);
+    virtual ~ImageParser();
 
     void initStreams();
 
     const LogHeader getHeader();
-    boost::shared_ptr<const RoboImage> getNext();
+    virtual bool getNext();
     boost::shared_ptr<const RoboImage> getPrev();
 
 private:
@@ -60,7 +57,6 @@ private:
 private:
     const void** current_buffer;
     int current_buffer_size;
-    int file_descriptor;
     bool finished;
 
     proto_io::FileInputStream* raw_input;
