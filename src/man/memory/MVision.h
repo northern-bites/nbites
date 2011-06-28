@@ -11,7 +11,7 @@
 
 #include "protos/Vision.pb.h"
 #include "MObject.h"
-#include "Vision.h"
+#include "vision/Vision.h"
 
 namespace man {
 namespace memory {
@@ -23,8 +23,8 @@ public:
      * links to
      * @return
      */
-    MVision(boost::shared_ptr<Vision> v);
-    ~MVision();
+    MVision(MObject_ID id, std::string name, boost::shared_ptr<Vision> v);
+    virtual ~MVision();
     /**
      * Updates all the fields of the underlying proto::PVision with values
      * from the Vision object
