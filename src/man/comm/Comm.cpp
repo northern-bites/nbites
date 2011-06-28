@@ -686,8 +686,10 @@ void Comm::send () throw(socket_error)
         pthread_mutex_unlock (&comm_mutex);
 
         send(&buf[0], sizeof(returnPacket), gc_broadcast_addr);
-    } else {
-
+    }
+	// don't send packets if we are penalized.
+	else if (!(gc->isPenalized()))
+	{
         // C++ header data
         const CommPacketHeader header = {PACKET_HEADER, timer.timestamp(),
                                          gc->team(), gc->player(), gc->color()};
@@ -701,7 +703,10 @@ void Comm::send () throw(socket_error)
         send(&buf[0], sizeof(header) + sizeof(float) * data.size(),
              broadcast_addr);
     }
-
+	else
+	{
+		pthread_mutex_unlock (&comm_mutex);
+	}
 }
 
 void Comm::send (const char *msg, int len, sockaddr_in &addr) throw(socket_error)

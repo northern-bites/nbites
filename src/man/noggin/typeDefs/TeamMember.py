@@ -14,15 +14,12 @@ DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
-DEBUG_DETERMINE_CHASE_TIME = False
-BALL_ON_BONUS = 1000.
-CHASE_SPEED = 15.00 #cm/sec
-BALL_GOAL_LINE_BONUS = CHASE_SPEED*10 #takes a little less than 10 secs to orbit 180
+DEBUG_DETERMINE_CHASE_TIME = True
 SEC_TO_MILLIS = 1000.0
-# penalty is: (ball_dist*heading)/scale
-PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
-# penalty is: (ball_dist*ball_bearing)/scale
-BALL_BEARING_PENALTY_SCALE = 200.0 # max 90% of distance
+CHASE_SPEED = 15.00 #cm/sec
+CHASE_TIME_SCALE = 0.45              # How much new measurement is used.
+BALL_OFF_PENALTY = 1000.             # Big penalty for not seeing the ball.
+BALL_GOAL_LINE_PENALTY = 10.
 
 
 class TeamMember(RobotLocation):
@@ -93,7 +90,6 @@ class TeamMember(RobotLocation):
 
         my = self.brain.my
         ball = self.brain.ball
-        pb = self.brain.playbook
 
         self.x = my.x
         self.y = my.y
@@ -117,7 +113,7 @@ class TeamMember(RobotLocation):
                          (fabs(self.ballBearing) <
                           NogginConstants.BALL_TEAMMATE_BEARING_GRABBING)
 
-        self.lastPacketTime = self.brain.time
+        self.lastPacketTime = time.time()
 
     def reset(self):
         '''Reset all important Teammate variables'''
@@ -138,50 +134,68 @@ class TeamMember(RobotLocation):
 
     def determineChaseTime(self):
         """
-        Metric for deciding chaser.
-        Attempt to define a time to get to the ball.
-        Can give bonuses or penalties in certain situations.
+        Attempt to define a time in seconds to get to the ball.
+        Can give penalties in certain situations.
+        @ return: returns a time in milliseconds with penalties.
+        Note: Don't give bonuses. It can result in negative chase times
+              which can screw up the math later on. --Wils (06/25/11)
         """
-        time = 0.0
+        t = 0.0
 
         ## if DEBUG_DETERMINE_CHASE_TIME:
         ##     self.printf("DETERMINE CHASE TIME DEBUG")
 
-        time += (self.ballDist / CHASE_SPEED)*SEC_TO_MILLIS
+        t += (self.ballDist / CHASE_SPEED)
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time base is " + str(time))
+            self.brain.out.printf("\tChase time base is " + str(t))
 
-        # Give a bonus for seeing the ball
-        if self.brain.ball.on:
-            time -= BALL_ON_BONUS
+        # Give a penalty for not seeing the ball
+        if not self.brain.ball.on:
+            t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after ball on bonus " + str(time))
+            self.brain.out.printf("\tChase time after ball on bonus " + str(t))
 
-        # Give a bonus for lining up along the ball-goal line
+        # Give penalties for not lining up along the ball-goal line
         lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
         rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
-        if (lpb < self.ballBearing < rpb):
-            time -= BALL_GOAL_LINE_BONUS
+        # TODO: scale these by how far off we are??
+        # ball is not lined up
+        if (self.ballBearing > lpb or rpb > self.ballBearing):
+            t += BALL_GOAL_LINE_PENALTY
+        # we are not lined up
+        if (lpb < 0 or rpb > 0):
+            t += BALL_GOAL_LINE_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after ball-goal-line bonus " +str(time))
+            self.brain.out.printf("\tChase time after ball-goal-line penalty "+str(t))
 
         # Add a penalty for being fallen over
-        time += (self.brain.fallController.getTimeRemainingEst()*SEC_TO_MILLIS)
+        t += self.brain.fallController.getTimeRemainingEst()
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after fallen over penalty " + str(time))
+            self.brain.out.printf("\tChase time after fallen over penalty " + str(t))
+
+        tm = t*SEC_TO_MILLIS
+
+        # Filter by IIR to reduce noise
+        tm = tm * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
+
+        if DEBUG_DETERMINE_CHASE_TIME:
+            self.brain.out.printf("\tChase time after filter " +str(tm))
             self.brain.out.printf("")
 
-        return time
+        return tm
 
     def hasBall(self):
         return self.grabbing
 
     def isTeammateRole(self, roleToTest):
         return (self.role == roleToTest)
+
+    def isTeammateSubRole(self, subRoleToTest):
+        return (self.subRole == subRoleToTest)
 
     def isDefaultGoalie(self):
         return (self.playerNumber == DEFAULT_GOALIE_NUMBER)
@@ -211,10 +225,18 @@ class TeamMember(RobotLocation):
     def isDead(self):
         """
         returns True if teammates last timestamp is sufficiently behind ours.
-        however, the dog could still be on but sending really laggy packets.
+        however, the bot could still be on but sending really laggy packets.
         """
-        return (PACKET_DEAD_PERIOD <
-                (self.brain.time - self.lastPacketTime))
+        if ((self.brain.time + PACKET_DEAD_PERIOD) < self.lastPacketTime):
+            print "\nTIME GOT RESET! AH!!!!!!!!!!!!!!!!!!!\n"
+        return (PACKET_DEAD_PERIOD < (self.brain.time - self.lastPacketTime))
 
     def __str__(self):
         return "I am player number " + self.playerNumber
+
+    def __eq__(self, other):
+        return self.playerNumber == other.playerNumber
+
+    def __ne__(self, other):
+        return self.playerNumber != other.playerNumber
+

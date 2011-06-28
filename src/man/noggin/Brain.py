@@ -47,6 +47,7 @@ class Brain(object):
         Class constructor
         """
         self.counter = 0
+        self.time = time.time()
 
         self.on = True
         # Output Class
@@ -213,6 +214,7 @@ class Brain(object):
 
         # order here is very important
         # Update Environment
+        self.time = time.time()
         self.updateVisualObjects()
         self.sonar.updateSensors(self.sensors)
 
@@ -227,7 +229,6 @@ class Brain(object):
         self.leds.processLeds()
 
         # Behavior stuff
-        self.time = time.time()
         self.gameController.run()
         self.fallController.run()
         self.updatePlaybook()
@@ -261,6 +262,11 @@ class Brain(object):
                 packet = Packet.Packet(packet)
                 if packet.playerNumber != self.my.playerNumber:
                     self.teamMembers[packet.playerNumber-1].update(packet)
+        # update the activity of our teammates here
+        # active field is set to true upon recipt of a new packet.
+        for mate in self.teamMembers:
+            if (mate.active and mate.isDead()):
+                mate.active = False
 
     def updateLocalization(self):
         """

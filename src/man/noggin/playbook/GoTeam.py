@@ -34,6 +34,7 @@ class GoTeam:
         self.kickoffFormation = 0
         self.timeSinceCaptureChase = 0
         self.subRoleSwitchTime = 0
+        self.goalieChaserCount = 0
         self.ellipse = Ellipse(PBConstants.LARGE_ELLIPSE_CENTER_X,
                                PBConstants.LARGE_ELLIPSE_CENTER_Y,
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
@@ -123,27 +124,28 @@ class GoTeam:
     ######################################################
     def determineChaser(self, play):
         """return the team member who is the chaser"""
-        chaser_mate = self.me
+        chaser_mate = self.activeFieldPlayers[0]
 
         if PBConstants.DEBUG_DET_CHASER:
             self.printf("chaser det: me == #%g"% self.brain.my.playerNumber)
 
-        #save processing time and skip the rest if we have the ball
-        if self.me.hasBall() and play.isChaser():
+        # save processing time and skip the rest if we have the ball
+        if self.brain.player.inKickingState and play.isChaser():
             if PBConstants.DEBUG_DET_CHASER:
-                self.printf("I have the ball")
-            return chaser_mate
+                self.printf("I should Chase")
+            return self.me
 
         # scroll through the teammates
         for mate in self.activeFieldPlayers:
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf("\t mate #%g"% mate.playerNumber)
 
-            # If the player number is me, or our ball models are super divergent ignore
-            if (mate.playerNumber == self.me.playerNumber):# or
-                #fabs(mate.ballX - self.me.ballX) > 150.):
+            # We can skip computation if the mate we are now considering
+            # is the chaser_mate.
+            if (mate == chaser_mate):
                 if PBConstants.DEBUG_DET_CHASER:
-                    self.printf("it's me")
+                    self.printf("mate %g is chaser_mate already."
+                                % mate.playerNumber)
                 continue
 
             elif mate.hasBall():
@@ -152,25 +154,25 @@ class GoTeam:
                 chaser_mate = mate
 
             else:
-                # Tie break stuff
-                if chaser_mate.chaseTime < mate.chaseTime:
-                    chaseTimeScale = chaser_mate.chaseTime
-                else:
-                    chaseTimeScale = mate.chaseTime
-
-                if self.shouldCallOff(mate, chaser_mate, chaseTimeScale):
+                # Tie breaking. Method described in Robust Team Play, by Henry Work
+                ## NOTE: Took out chaseTimeScale (which was just the minimum chase-
+                ##      time between two robots) because it wansn't guaranteeing that
+                ##      the thresholds would be appropriately tiered. A good idea,
+                ##      but bad implementation. May work with some futsing around.
+                ##      -- Wils (06/24/11)
+                if self.shouldCallOff(chaser_mate, mate):
                     if PBConstants.DEBUG_DET_CHASER:
                         self.printf("\t #%d @ %g >= #%d @ %g, shouldCallOff" %
                                (mate.playerNumber, mate.chaseTime,
-                                chaser_mate.playerNumber,
-                                chaser_mate.chaseTime))
+                                chaser_mate.playerNumber, chaser_mate.chaseTime))
+                    if self.shouldListen(chaser_mate, mate):
+                        if PBConstants.DEBUG_DET_CHASER:
+                            self.printf(("\t #%d @ %g <= #%d @ %g, shouldListen" %
+                                         (mate.playerNumber, mate.chaseTime,
+                                          chaser_mate.playerNumber,
+                                          chaser_mate.chaseTime)))
+                        continue
 
-                elif self.shouldListen(mate, chaser_mate, chaseTimeScale):
-                    if PBConstants.DEBUG_DET_CHASER:
-                        self.printf(("\t #%d @ %g <= #%d @ %g, shouldListen" %
-                                      (mate.playerNumber, mate.chaseTime,
-                                       chaser_mate.playerNumber,
-                                       chaser_mate.chaseTime)))
                     chaser_mate = mate
 
                 # else pick the lowest chaseTime
@@ -188,30 +190,26 @@ class GoTeam:
         # returns teammate instance (could be mine)
         return chaser_mate
 
-    def shouldCallOff(self, mate, chaser_mate, chaseTimeScale):
-        """Helper method for determineChaser"""
-        # chaser_mate = A, mate = B.
-        # A will still be chaser_mate if:
-        # [ (chaseTime(A) - minChaseTime(A,B) < e) or
-        #   (chaseTime(A) - minChaseTime(A,B) < d and already chasing)]
-        # and no higher robot calling off A.
-        return((chaser_mate.chaseTime - mate.chaseTime <
-                PBConstants.CALL_OFF_THRESH + .15 *chaseTimeScale or
-                (chaser_mate.chaseTime - mate.chaseTime <
-                 PBConstants.STOP_CALLING_THRESH + .35 * chaseTimeScale and
-                 chaser_mate.isTeammateRole(PBConstants.CHASER))) and
-               mate.playerNumber < chaser_mate.playerNumber)
-
-    def shouldListen(self, mate, chaser_mate, chaseTimeScale):
-        """Helper method for determineChaser"""
+    def shouldCallOff(self, chaser_mate, mate):
+        """Decides if mate shouldCallOff the chaser_mate"""
         # mate = A, chaser_mate = B.
         # A will become chaser_mate if:
-        # chaseTime(A) < chaseTime(B) - m and
-        # A is higher robot that is already chaser.
-        return (mate.playerNumber > chaser_mate.playerNumber and
-                mate.chaseTime - chaser_mate.chaseTime <
-                PBConstants.LISTEN_THRESH + .45 * chaseTimeScale and
-                mate.isTeammateRole(PBConstants.CHASER))
+        # [ (chaseTime(A) - chaseTime(B) < e) or
+        #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
+        return(((mate.chaseTime - chaser_mate.chaseTime) <
+                PBConstants.CALL_OFF_THRESH) or
+               ((mate.chaseTime - chaser_mate.chaseTime) <
+                PBConstants.STOP_CALLING_THRESH and
+                mate.isTeammateRole(PBConstants.CHASER)))
+
+    def shouldListen(self, chaser_mate, mate):
+        """Decides if mate should listen to the chaser_mate after calling off"""
+        # mate = A, chaser_mate = B.
+        # A will relinquish chaser to chaser_mate if:
+        # chaseTime(B) < chaseTime(A) - m
+        # A is higher robot that has decided to be chaser.
+        return (chaser_mate.chaseTime < (mate.chaseTime -
+                PBConstants.LISTEN_THRESH))
 
     def getLeastWeightPosition(self, positions, mates = None):
         """Gets the position for the robot such that the distance
@@ -316,10 +314,9 @@ class GoTeam:
         append = self.activeFieldPlayers.append
 
         self.numActiveFieldPlayers = 0
-        for mate in self.brain.teamMembers:
-            if (mate.active and mate.isDead()): #no need to check inactive mates
-                mate.active = False # we set active True when we get a new packet from mate
-            elif (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
+        for mate in self.brain.teamMembers: ## @TODO!!!! figure out what happened here. We thought we were with another bot when it was in penalty.
+            # don't check inactive mates or the goalie.
+            if (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
                 append(mate)
                 self.numActiveFieldPlayers += 1
 
@@ -376,16 +373,16 @@ class GoTeam:
     def noCalledChaser(self):
         """Returns true if no one is chasing and they are not searching"""
         # If everyone else is out, let's not go for the ball
-        #if len(self.getActiveFieldPlayers()) == 0:
+        #if self.numActiveFieldPlayers == 0:
             #return False
 
         if self.brain.gameController.currentState == 'gameReady' or\
                 self.brain.gameController.currentState =='gameSet':
             return False
 
-        # TO-DO: switch this to activeFieldPlayers
-        for mate in self.activeFieldPlayers:
-            if mate.isTeammateRole(PBConstants.CHASER):
+        for mate in self.brain.teamMembers:
+            if (mate.isTeammateRole(PBConstants.CHASER) or
+                mate.isTeammateSubRole(PBConstants.GOALIE_CHASER)):
                 return False
 
         return True
@@ -398,26 +395,25 @@ class GoTeam:
             return False
 
     def shouldUseDubD(self):
+        """
+        Uses goalieChaserCount to buffer when we let the goalie call us off.
+        """
         if not PBConstants.USE_DUB_D:
             return False
-        ballY = self.brain.ball.y
-        ballX = self.brain.ball.x
         goalie = self.brain.teamMembers[0]
-        return (
-            ( ballY > NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-              ballY < NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-              ballX < NogginConstants.MY_GOALBOX_RIGHT_X - 5.) or
-            ( ballY > NogginConstants.MY_GOALBOX_TOP_Y - 5. and
-              ballY < NogginConstants.MY_GOALBOX_BOTTOM_Y + 5. and
-              ballX < NogginConstants.MY_GOALBOX_RIGHT_X + 5. and
-              goalie.isTeammateRole(PBConstants.CHASER) )
-            )
+        if goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER):
+            self.goalieChaserCount += 1
+        else:
+            self.goalieChaserCount = 0
+            return False
+        if self.goalieChaserCount > PBConstants.GOALIE_CHASER_COUNT_THRESH:
+            return not self.brain.player.inKickingState
 
     def defenderShouldChase(self):
         ballX = self.brain.ball.relX
         goalie = self.brain.teamMembers[0]
-        return(ballX < PBConstants.CENTER_FIELD_DIST_THRESH and
-               not goalie.isTeammateRole(PBConstants.CHASER) )
+        return(ballX < PBConstants.DEFENDER_SHOULD_CHASE_THRESH and
+               not goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER) )
 
     def shouldSwitchSubRole(self, subRoleOnDeck, workingPlay):
         """Returns true if switched into a new role (if time is -1) or
