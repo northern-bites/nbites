@@ -43,3 +43,16 @@ def kickOffPosition(player):
         player.brain.tracker.trackBall()
 
     return player.stay()
+
+def goaliePenaltyKick(player):
+    """
+    Do nothing until you know something happened.
+    Meant for penalty kick.  TRACK BALL
+    """
+    ball = player.brain.ball
+
+    if player.firstFrame():
+        player.brain.resetGoalieLocalization()
+        player.brain.tracker.trackBall()
+
+    return player.stay()

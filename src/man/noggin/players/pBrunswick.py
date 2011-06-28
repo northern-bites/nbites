@@ -93,6 +93,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'playbookPosition'
 
     def getRoleStateGoalie(self):
+        if self.play.isSubRole(PBConstants.GOALIE_PENALTY_KICK):
+            return 'goaliePenaltyKick'
         if self.play.isSubRole(PBConstants.GOALIE_KICKOFF):
             return 'kickOffPosition'
         elif self.play.isSubRole(PBConstants.GOALIE_CHASER):
