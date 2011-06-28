@@ -220,15 +220,20 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
         vector<float> loc_values;
 
         if (loc.get()) {
-			loc_values += loc->getXEst(), loc->getYEst(),
-				loc->getHEst(), loc->getXUncert(),
-				loc->getYUncert(),
-				loc->getHUncert();
-			loc_values += ballEKF->getXEst(), ballEKF->getYEst(),
-				ballEKF->getXUncert(), ballEKF->getYUncert(),
-				ballEKF->getXVelocityEst(), ballEKF->getYVelocityEst(),
-				ballEKF->getXVelocityUncert(),
-				ballEKF->getYVelocityUncert();
+            loc_values += loc->getXEst(), loc->getYEst(),
+                loc->getHEst(), loc->getXUncert(),
+                loc->getYUncert(),
+                loc->getHUncert();
+
+            loc_values += ballEKF->getGlobalX(),
+                ballEKF->getGlobalY(),
+                ballEKF->getGlobalXUncert(),
+                ballEKF->getGlobalYUncert(),
+                ballEKF->getGlobalXVelocity(),
+                ballEKF->getGlobalYVelocity(),
+                ballEKF->getGlobalXVelocityUncert(),
+                ballEKF->getGlobalYVelocityUncert();
+
           loc_values += loc->getLastOdo().deltaF, loc->getLastOdo().deltaL,
                         loc->getLastOdo().deltaR;
         } else

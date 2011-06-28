@@ -65,20 +65,84 @@ public:
 
     // Ball localization
     // Global Coordinates
-    const float getBallXEst() const { return ballEKF->getXEst(); }
-    const float getBallYEst() const { return ballEKF->getYEst(); }
-    const float getXVelocityEst() const { return ballEKF->getXVelocityEst(); }
-    const float getYVelocityEst() const { return ballEKF->getYVelocityEst(); }
+    const float getBallXEst() const { return ballEKF->getGlobalX(); }
+    const float getBallYEst() const { return ballEKF->getGlobalY(); }
+    const float getBallXVelocityEst() const {
+        return ballEKF->getGlobalXVelocity();
+    }
+    const float getBallYVelocityEst() const {
+        return ballEKF->getGlobalYVelocity();
+    }
+    const float getBallXAccelerationEst() const {
+        return ballEKF->getGlobalXAcceleration();
+    }
+    const float getBallYAccelerationEst() const {
+        return ballEKF->getGlobalYAcceleration();
+    }
+
+    // Relative coordinates
+    const float getBallRelXEst() const { return ballEKF->getRelativeX(); }
+    const float getBallRelYEst() const { return ballEKF->getRelativeY(); }
+    const float getRelXVelocityEst() const {
+        return ballEKF->getRelativeXVelocity();
+    }
+    const float getRelYVelocityEst() const {
+        return ballEKF->getRelativeYVelocity();
+    }
+    const float getRelXAccelerationEst() const {
+        return ballEKF->getRelativeXAcceleration();
+    }
+    const float getRelYAccelerationEst() const {
+        return ballEKF->getRelativeYAcceleration();
+    }
 
     // Ball Uncertainty
     // Global Coordinates
-    const float getBallXUncert() const { return ballEKF->getXUncert(); }
-    const float getBallYUncert() const { return ballEKF->getYUncert(); }
+    const float getBallXUncert() const { return ballEKF->getGlobalXUncert(); }
+    const float getBallYUncert() const { return ballEKF->getGlobalYUncert(); }
     const float getXVelocityUncert() const {
-        return ballEKF->getXVelocityUncert();
+        return ballEKF->getGlobalXVelocityUncert();
     }
     const float getYVelocityUncert() const {
-        return ballEKF->getYVelocityUncert();
+        return ballEKF->getGlobalYVelocityUncert();
+    }
+    const float getXAccelerationUncert() const {
+        return ballEKF->getGlobalXAccelerationUncert();
+    }
+    const float getYAccelerationUncert() const {
+        return ballEKF->getGlobalYAccelerationUncert();
+    }
+
+    // Relative coordinates
+    const float getBallRelXUncert() const {
+        return ballEKF->getRelativeXUncert();
+    }
+    const float getBallRelYUncert() const {
+        return ballEKF->getRelativeYUncert();
+    }
+    const float getRelXVelocityUncert() const {
+        return ballEKF->getRelativeXVelocityUncert();
+    }
+    const float getRelYVelocityUncert() const {
+        return ballEKF->getRelativeYVelocityUncert();
+    }
+    const float getRelXAccelerationUncert() const {
+        return ballEKF->getRelativeXAccelerationUncert();
+    }
+    const float getRelYAccelerationUncert() const {
+        return ballEKF->getRelativeYAccelerationUncert();
+    }
+
+    float getBallDistance() const {
+        return ballEKF->getDistance();
+    }
+
+    float getBallBearing() const {
+        return ballEKF->getBearing();
+    }
+
+    float getBallBearingDeg() const {
+        return ballEKF->getBearingDeg();
     }
 
     // Odometry
@@ -95,19 +159,43 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("y", &PyLoc::getYEst)
         .add_property("h", &PyLoc::getHEst)
         .add_property("radH", &PyLoc::getRadHEst)
+
+        .add_property("ballDistance", &PyLoc::getBallDistance)
+        .add_property("ballBearing", &PyLoc::getBallBearingDeg)
+
+        // Relative coordinates
+        .add_property("ballRelX", &PyLoc::getBallRelXEst)
+        .add_property("ballRelY", &PyLoc::getBallRelYEst)
+        .add_property("ballRelVelX", &PyLoc::getRelXVelocityEst)
+        .add_property("ballRelVelY", &PyLoc::getRelYVelocityEst)
+        .add_property("ballRelAccX", &PyLoc::getRelXAccelerationEst)
+        .add_property("ballRelAccY", &PyLoc::getRelYAccelerationEst)
+        .add_property("ballRelXUncert", &PyLoc::getBallRelXUncert)
+        .add_property("ballRelYUncert", &PyLoc::getBallRelYUncert)
+        .add_property("ballRelVelXUncert", &PyLoc::getRelXVelocityUncert)
+        .add_property("ballRelVelYUncert", &PyLoc::getRelYVelocityUncert)
+        .add_property("ballRelAccXUncert", &PyLoc::getRelXAccelerationUncert)
+        .add_property("ballRelAccYUncert", &PyLoc::getRelYAccelerationUncert)
+
+        // Global coordinates
         .add_property("ballX", &PyLoc::getBallXEst)
         .add_property("ballY", &PyLoc::getBallYEst)
-        .add_property("ballVelX", &PyLoc::getXVelocityEst)
-        .add_property("ballVelY", &PyLoc::getYVelocityEst)
+        .add_property("ballVelX", &PyLoc::getBallXVelocityEst)
+        .add_property("ballVelY", &PyLoc::getBallYVelocityEst)
+        .add_property("ballAccX", &PyLoc::getBallXAccelerationEst)
+        .add_property("ballAccY", &PyLoc::getBallYAccelerationEst)
+        .add_property("ballXUncert", &PyLoc::getBallXUncert)
+        .add_property("ballYUncert", &PyLoc::getBallYUncert)
+        .add_property("ballVelXUncert", &PyLoc::getXVelocityUncert)
+        .add_property("ballVelYUncert", &PyLoc::getYVelocityUncert)
+        .add_property("ballAccXUncert", &PyLoc::getXAccelerationUncert)
+        .add_property("ballAccYUncert", &PyLoc::getYAccelerationUncert)
+
         // Uncertainty
         .add_property("xUncert", &PyLoc::getXUncert)
         .add_property("yUncert", &PyLoc::getYUncert)
         .add_property("hUncert", &PyLoc::getHUncert)
         .add_property("radHUncert", &PyLoc::getRadHUncert)
-        .add_property("ballXUncert", &PyLoc::getBallXUncert)
-        .add_property("ballYUncert", &PyLoc::getBallYUncert)
-        .add_property("ballVelXUncert", &PyLoc::getXVelocityUncert)
-        .add_property("ballVelYUncert", &PyLoc::getYVelocityUncert)
         // Odometry
         .add_property("lastOdoF", &PyLoc::getOdoF)
         .add_property("lastOdoL", &PyLoc::getOdoL)

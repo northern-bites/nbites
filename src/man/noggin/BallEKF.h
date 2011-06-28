@@ -15,14 +15,26 @@
 #include "NogginStructs.h"
 
 /**
- * @brief Class for tracking of ball position and velocity.  Extends the abstract
- * EKF class.
+ * @brief Class for tracking of ball position and velocity. Tracks
+ * the ball in a totally relative frame of reference. Robot pose
+ * estimate (from localization) is used only when a global ball
+ * position is required, as it may be for communicating with other
+ * robots, for example.
  */
 class BallEKF : public ekf::EKF<RangeBearingMeasurement,
                                 MotionModel,
                                 ekf::ball_ekf_dimension,
-                                ekf::dist_bearing_meas_dim>
+                                ekf::ball_ekf_meas_dim>
 {
+    enum StateIndices {
+        x_index = 0,
+        y_index,
+        vel_x_index,
+        vel_y_index,
+        acc_x_index,
+        acc_y_index
+    };
+
 public:
     // Constructors & Destructors
     BallEKF();
@@ -33,98 +45,124 @@ public:
     virtual ~BallEKF() {}
 
     // Update functions
-    void updateModel(RangeBearingMeasurement  ball, PoseEst p);
+    void updateModel(const MotionModel& odo,
+                     const RangeBearingMeasurement& ball,
+                     const PoseEst& p);
     void reset();
+
+    ///////////////////////////////
     // Getters
-    /**
-     * @return The current estimate of the ball x position
-     */
-    const float getXEst() const { return xhat_k(0); }
+    ///////////////////////////////
 
     /**
-     * @return The current estimate of the ball y position
+     * Relative ball location getters: ball is in our relative x,y
+     *
+     * Velocity is in cm/s
      */
-    const float getYEst() const { return xhat_k(1); }
+    const float getRelativeX() const             { return xhat_k(x_index);     }
+    const float getRelativeY() const             { return xhat_k(y_index);     }
+    const float getRelativeXVelocity() const     { return xhat_k(vel_x_index); }
+    const float getRelativeYVelocity() const     { return xhat_k(vel_y_index); }
+    const float getRelativeXAcceleration() const { return xhat_k(acc_x_index); }
+    const float getRelativeYAcceleration() const { return xhat_k(acc_y_index); }
+
+
 
     /**
-     * @return The current estimate of the ball x velocity
+     * Relative uncertainties
      */
-    const float getXVelocityEst() const { return xhat_k(2); }
+    const float getRelativeXUncert() const { return P_k(x_index,x_index); }
+    const float getRelativeYUncert() const { return P_k(y_index,y_index); }
+    const float getRelativeXVelocityUncert() const {
+        return P_k(vel_x_index,vel_x_index);
+    }
+    const float getRelativeYVelocityUncert() const {
+        return P_k(vel_y_index,vel_y_index);
+    }
+    const float getRelativeXAccelerationUncert() const {
+        return P_k(acc_x_index,acc_x_index);
+    }
+    const float getRelativeYAccelerationUncert() const {
+        return P_k(acc_y_index,acc_y_index);
+    }
 
     /**
-     * @return The current estimate of the ball y velocity
+     * Global ball location and velocities calculated using current
+     * robot position estimate
      */
-    const float getYVelocityEst() const { return xhat_k(3); }
+    const float getGlobalX() const;
+    const float getGlobalY() const;
+    const float getGlobalXVelocity() const;
+    const float getGlobalYVelocity() const;
+    const float getGlobalXAcceleration() const;
+    const float getGlobalYAcceleration() const;
 
     /**
-     * @return The current uncertainty for ball x position
+     * Global uncertainties
      */
-    const float getXUncert() const { return P_k(0,0); }
+    const float getGlobalXUncert() const;
+    const float getGlobalYUncert() const;
+    const float getGlobalXVelocityUncert() const;
+    const float getGlobalYVelocityUncert() const;
+    const float getGlobalXAccelerationUncert() const;
+    const float getGlobalYAccelerationUncert() const;
 
     /**
-     * @return The current uncertainty for ball y position
+     * Distance, bearing getters
      */
-    const float getYUncert() const { return P_k(1,1); }
+    float getDistance() { return hypotf(getRelativeX(), getRelativeY());      }
+    float getBearing()  { return safe_atan2(getRelativeY(), getRelativeX()); }
+    float getBearingDeg() {
+        return TO_DEG * safe_atan2(getRelativeY(), getRelativeX());
+    }
 
-    /**
-     * @return The current uncertainty for ball x velocity
-     */
-    const float getXVelocityUncert() const { return P_k(2,2); }
-
-    /**
-     * @return The current uncertainty for ball y velocity
-     */
-    const float getYVelocityUncert() const { return P_k(3,3); }
-
+    ///////////////////////////////
     // Setters
-    /**
-     * @param val The new estimate of the ball x position
-     */
-    void setXEst(float val) { xhat_k(0) = val; }
+    ///////////////////////////////
 
     /**
-     * @param val The new estimate of the ball y position
+     * Set relative position, velocity and uncertainty values
      */
-    void setYEst(float val) { xhat_k(1) = val; }
+    void setRelativeX               (float val) { xhat_k(x_index)      = val; }
+    void setRelativeY               (float val) { xhat_k(y_index)      = val; }
+
+    void setRelativeXVelocity       (float val) { xhat_k(vel_x_index)  = val; }
+    void setRelativeYVelocity       (float val) { xhat_k(vel_y_index)  = val; }
+
+    void setRelativeXUncert         (float val) { P_k(x_index,x_index) = val; }
+    void setRelativeYUncert         (float val) { P_k(y_index,y_index) = val; }
+
+    void setRelativeXVelocityUncert (float val) { P_k(vel_x_index,
+                                                      vel_x_index) = val;     }
+    void setRelativeYVelocityUncert (float val) { P_k(vel_y_index,
+                                                      vel_y_index) = val;     }
 
     /**
-     * @param val The new estimate of the ball x velocity
+     * Set global position, velocity and uncertainty values
      */
-    void setXVelocityEst(float val) { xhat_k(2) = val; }
+    void setGlobalX(float val);
+    void setGlobalY(float val);
 
-    /**
-     * @param val The new estimate of the ball y velocity
-     */
-    void setYVelocityEst(float val) { xhat_k(3) = val; }
+    void setGlobalXVelocity(float val);
+    void setGlobalYVelocity(float val);
 
-    /**
-     * @param val The new uncertainty for ball x position
-     */
-    void setXUncert(float val) { P_k(0,0) = val; }
+    void setGlobalXUncert(float val);
+    void setGlobalYUncert(float val);
 
-    /**
-     * @param val The new uncertainty for ball y position
-     */
-    void setYUncert(float val) { P_k(1,1) = val; }
-
-    /**
-     * @param val The new uncertainty for ball x velocity
-     */
-    void setXVelocityUncert(float val) { P_k(2,2) = val; }
-
-    /**
-     * @param val The new uncertainty for ball y velocity
-     */
-    void setYVelocityUncert(float val) { P_k(3,3) = val; }
+    void setGlobalXVelocityUncert(float val);
+    void setGlobalYVelocityUncert(float val);
 
     // Output methods
     friend std::ostream& operator<< (std::ostream &o, const BallEKF &c) {
-        return o << "Est: (" << c.getXEst() << ", " << c.getYEst() << ", "
-                 << c.getXVelocityEst() << ", " << c.getYVelocityEst() << ")\t"
-                 << "Uncert: (" << c.getXUncert() << ", " << c.getYUncert()
-                 << ", "
-                 << c.getXVelocityUncert() << ", " << c.getYVelocityUncert()
-                 << ")";
+        return o << "Est: (" << c.getRelativeX() << ", "
+                 << c.getRelativeY() << ", "
+                 << c.getRelativeXVelocity() << ", "
+                 << c.getRelativeYVelocity() << ")\t"
+                 << "Uncert: ("
+                 << c.getRelativeXUncert() << ", "
+                 << c.getRelativeYUncert() << ", "
+                 << c.getRelativeXVelocityUncert() << ", "
+                 << c.getRelativeYVelocityUncert() << ")";
     }
 private:
     // Core Functions
@@ -133,44 +171,55 @@ private:
                                         StateMeasurementMatrix &H_k,
                                         MeasurementMatrix &R_k,
                                         MeasurementVector &V_k);
-    virtual void beforeCorrectionFinish(void);
-    void limitAPrioriEst(void);
-    void limitPosteriorEst(void);
-    void limitAPrioriUncert(void);
-    void limitPosteriorUncert(void);
-    void clipBallEstimate(void);
 
-    bool useCartesian;
+    inline void updateFrameLength();
+    inline void updatePosition(const MotionModel& odo,
+                               StateVector& deltaBall);
+    inline void updateVelocity(const MotionModel& odo,
+                               StateVector& deltaBall);
+    inline void updateAcceleration(const MotionModel& odo,
+                                   StateVector& deltaBall);
+    inline void calculateTimeUpdateJacobian(const MotionModel& odo,
+                                            StateVector& deltaBall);
+
+    virtual void beforeCorrectionFinish();
+    void limitPosteriorEst();
+    void limitPosteriorUncert();
+
+    void initMatrices();
+    float applyFriction(float vel);
+    StateVector transformStateWithOdometry(const StateVector& x,
+                                           const MotionModel& odo);
+    MeasurementVector
+    calculateObservedState(const RangeBearingMeasurement& z,
+                           const StateVector& xhat_k_prev);
+
+    static inline float transformToGlobalX(float x, float y, float theta);
+    static inline float transformToGlobalY(float x, float y, float theta);
+
     PoseEst robotPose;
-    const static float ASSUMED_FPS;
+    long long int lastUpdateTime;
+    float dt;
+    MotionModel curOdo;
+
     const static float BETA_BALL;
     const static float BETA_BALL_VEL;
     const static float GAMMA_BALL;
     const static float GAMMA_BALL_VEL;
     const static float CARPET_FRICTION;
-    const static float BALL_DECAY_PERCENT;
-    const static float INIT_BALL_X;
-    const static float INIT_BALL_Y;
-    const static float INIT_BALL_X_VEL;
-    const static float INIT_BALL_Y_VEL;
-    const static float X_UNCERT_MAX;
-    const static float Y_UNCERT_MAX;
-    const static float VELOCITY_UNCERT_MAX;
-    const static float X_UNCERT_MIN;
-    const static float Y_UNCERT_MIN;
-    const static float VELOCITY_UNCERT_MIN;
-    const static float INIT_X_UNCERT;
-    const static float INIT_Y_UNCERT;
-    const static float INIT_X_VEL_UNCERT;
-    const static float INIT_Y_VEL_UNCERT;
-    const static float X_EST_MIN;
-    const static float Y_EST_MIN;
-    const static float X_EST_MAX;
-    const static float Y_EST_MAX;
-    const static float VELOCITY_EST_MAX;
-    const static float VELOCITY_EST_MIN;
+
+    const static float INIT_BALL_X, INIT_BALL_Y;
+    const static float INIT_BALL_X_VEL, INIT_BALL_Y_VEL;
+
+    const static float INIT_X_UNCERT, INIT_Y_UNCERT;
+    const static float INIT_X_VEL_UNCERT, INIT_Y_VEL_UNCERT;
+
+    const static float X_EST_MIN, X_EST_MAX;
+    const static float Y_EST_MIN, Y_EST_MAX;
+
+    const static float VELOCITY_EST_MAX, VELOCITY_EST_MIN;
+    const static float ACC_EST_MAX, ACC_EST_MIN;
+
     const static float VELOCITY_EST_MIN_SPEED;
-    const static float BALL_JUMP_VEL_THRESH;
-    const static float USE_CARTESIAN_BALL_DIST;
 };
 #endif // File
