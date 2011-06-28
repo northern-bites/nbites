@@ -56,7 +56,6 @@ private:
 
     // The current chopped command which is being enacted
     ChoppedCommand::ptr currCommand;
-    BodyJointCommand::ptr currCommand_unchopped;
 
     // Queue to hold the next body commands
     std::queue<BodyJointCommand::ptr> bodyCommandQueue;
