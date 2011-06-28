@@ -59,10 +59,13 @@ public:
      *
      * Velocity is in cm/s
      */
-    const float getRelativeX() const { return xhat_k(x_index); }
-    const float getRelativeY() const { return xhat_k(y_index); }
-    const float getRelativeXVelocity() const { return xhat_k(vel_x_index); }
-    const float getRelativeYVelocity() const { return xhat_k(vel_y_index); }
+    const float getRelativeX() const             { return xhat_k(x_index);     }
+    const float getRelativeY() const             { return xhat_k(y_index);     }
+    const float getRelativeXVelocity() const     { return xhat_k(vel_x_index); }
+    const float getRelativeYVelocity() const     { return xhat_k(vel_y_index); }
+    const float getRelativeXAcceleration() const { return xhat_k(acc_x_index); }
+    const float getRelativeYAcceleration() const { return xhat_k(acc_y_index); }
+
 
 
     /**
@@ -76,6 +79,12 @@ public:
     const float getRelativeYVelocityUncert() const {
         return P_k(vel_y_index,vel_y_index);
     }
+    const float getRelativeXAccelerationUncert() const {
+        return P_k(acc_x_index,acc_x_index);
+    }
+    const float getRelativeYAccelerationUncert() const {
+        return P_k(acc_y_index,acc_y_index);
+    }
 
     /**
      * Global ball location and velocities calculated using current
@@ -85,6 +94,8 @@ public:
     const float getGlobalY() const;
     const float getGlobalXVelocity() const;
     const float getGlobalYVelocity() const;
+    const float getGlobalXAcceleration() const;
+    const float getGlobalYAcceleration() const;
 
     /**
      * Global uncertainties
@@ -93,6 +104,8 @@ public:
     const float getGlobalYUncert() const;
     const float getGlobalXVelocityUncert() const;
     const float getGlobalYVelocityUncert() const;
+    const float getGlobalXAccelerationUncert() const;
+    const float getGlobalYAccelerationUncert() const;
 
     /**
      * Distance, bearing getters
@@ -171,6 +184,7 @@ private:
 
     virtual void beforeCorrectionFinish();
     void limitPosteriorEst();
+    void limitPosteriorUncert();
 
     void initMatrices();
     float applyFriction(float vel);
@@ -179,6 +193,9 @@ private:
     MeasurementVector
     calculateObservedState(const RangeBearingMeasurement& z,
                            const StateVector& xhat_k_prev);
+
+    static inline float transformToGlobalX(float x, float y, float theta);
+    static inline float transformToGlobalY(float x, float y, float theta);
 
     PoseEst robotPose;
     long long int lastUpdateTime;

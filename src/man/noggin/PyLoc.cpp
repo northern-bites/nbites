@@ -67,11 +67,17 @@ public:
     // Global Coordinates
     const float getBallXEst() const { return ballEKF->getGlobalX(); }
     const float getBallYEst() const { return ballEKF->getGlobalY(); }
-    const float getXVelocityEst() const {
+    const float getBallXVelocityEst() const {
         return ballEKF->getGlobalXVelocity();
     }
-    const float getYVelocityEst() const {
+    const float getBallYVelocityEst() const {
         return ballEKF->getGlobalYVelocity();
+    }
+    const float getBallXAccelerationEst() const {
+        return ballEKF->getGlobalXAcceleration();
+    }
+    const float getBallYAccelerationEst() const {
+        return ballEKF->getGlobalYAcceleration();
     }
 
     // Relative coordinates
@@ -83,6 +89,12 @@ public:
     const float getRelYVelocityEst() const {
         return ballEKF->getRelativeYVelocity();
     }
+    const float getRelXAccelerationEst() const {
+        return ballEKF->getRelativeXAcceleration();
+    }
+    const float getRelYAccelerationEst() const {
+        return ballEKF->getRelativeYAcceleration();
+    }
 
     // Ball Uncertainty
     // Global Coordinates
@@ -93,6 +105,12 @@ public:
     }
     const float getYVelocityUncert() const {
         return ballEKF->getGlobalYVelocityUncert();
+    }
+    const float getXAccelerationUncert() const {
+        return ballEKF->getGlobalXAccelerationUncert();
+    }
+    const float getYAccelerationUncert() const {
+        return ballEKF->getGlobalYAccelerationUncert();
     }
 
     // Relative coordinates
@@ -107,6 +125,12 @@ public:
     }
     const float getRelYVelocityUncert() const {
         return ballEKF->getRelativeYVelocityUncert();
+    }
+    const float getRelXAccelerationUncert() const {
+        return ballEKF->getRelativeXAccelerationUncert();
+    }
+    const float getRelYAccelerationUncert() const {
+        return ballEKF->getRelativeYAccelerationUncert();
     }
 
     float getBallDistance() const {
@@ -144,20 +168,28 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("ballRelY", &PyLoc::getBallRelYEst)
         .add_property("ballRelVelX", &PyLoc::getRelXVelocityEst)
         .add_property("ballRelVelY", &PyLoc::getRelYVelocityEst)
+        .add_property("ballRelAccX", &PyLoc::getRelXAccelerationEst)
+        .add_property("ballRelAccY", &PyLoc::getRelYAccelerationEst)
         .add_property("ballRelXUncert", &PyLoc::getBallRelXUncert)
         .add_property("ballRelYUncert", &PyLoc::getBallRelYUncert)
         .add_property("ballRelVelXUncert", &PyLoc::getRelXVelocityUncert)
         .add_property("ballRelVelYUncert", &PyLoc::getRelYVelocityUncert)
+        .add_property("ballRelAccXUncert", &PyLoc::getRelXAccelerationUncert)
+        .add_property("ballRelAccYUncert", &PyLoc::getRelYAccelerationUncert)
 
         // Global coordinates
         .add_property("ballX", &PyLoc::getBallXEst)
         .add_property("ballY", &PyLoc::getBallYEst)
-        .add_property("ballVelX", &PyLoc::getXVelocityEst)
-        .add_property("ballVelY", &PyLoc::getYVelocityEst)
+        .add_property("ballVelX", &PyLoc::getBallXVelocityEst)
+        .add_property("ballVelY", &PyLoc::getBallYVelocityEst)
+        .add_property("ballAccX", &PyLoc::getBallXAccelerationEst)
+        .add_property("ballAccY", &PyLoc::getBallYAccelerationEst)
         .add_property("ballXUncert", &PyLoc::getBallXUncert)
         .add_property("ballYUncert", &PyLoc::getBallYUncert)
         .add_property("ballVelXUncert", &PyLoc::getXVelocityUncert)
         .add_property("ballVelYUncert", &PyLoc::getYVelocityUncert)
+        .add_property("ballAccXUncert", &PyLoc::getXAccelerationUncert)
+        .add_property("ballAccYUncert", &PyLoc::getYAccelerationUncert)
 
         // Uncertainty
         .add_property("xUncert", &PyLoc::getXUncert)

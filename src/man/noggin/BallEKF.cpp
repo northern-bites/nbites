@@ -539,27 +539,44 @@ void BallEKF::limitPosteriorUncert()
 
 
 /**
- * Transform relative positions and velocities to global
+ * Transform relative positions, velocities, and acceleration to
+ * global for outside use
  */
 const float BallEKF::getGlobalX() const
 {
-    return xhat_k(x_index) * cos(robotPose.h) -
-        xhat_k(y_index) * sin(robotPose.h) + robotPose.x;
+    return robotPose.x + transformToGlobalX(xhat_k(x_index),
+                                            xhat_k(y_index),
+                                            robotPose.h);
 }
 const float BallEKF::getGlobalY() const
 {
-    return xhat_k(x_index) * sin(robotPose.h) +
-        xhat_k(y_index) * cos(robotPose.h) + robotPose.y;
+    return robotPose.y + transformToGlobalY(xhat_k(x_index),
+                                            xhat_k(y_index),
+                                            robotPose.h);
 }
 const float BallEKF::getGlobalXVelocity() const
 {
-    return xhat_k(vel_x_index) * cos(robotPose.h) -
-        xhat_k(vel_y_index) * sin(robotPose.h);
+    return transformToGlobalX(xhat_k(vel_x_index),
+                              xhat_k(vel_y_index),
+                              robotPose.h);
 }
 const float BallEKF::getGlobalYVelocity() const
 {
-    return xhat_k(vel_x_index) * sin(robotPose.h) +
-        xhat_k(vel_y_index) * cos(robotPose.h);
+    return transformToGlobalY(xhat_k(vel_x_index),
+                              xhat_k(vel_y_index),
+                              robotPose.h);
+}
+const float BallEKF::getGlobalXAcceleration() const
+{
+    return transformToGlobalX(xhat_k(acc_x_index),
+                              xhat_k(acc_y_index),
+                              robotPose.h);
+}
+const float BallEKF::getGlobalYAcceleration() const
+{
+    return transformToGlobalY(xhat_k(acc_x_index),
+                              xhat_k(acc_y_index),
+                              robotPose.h);
 }
 
 /**
@@ -567,24 +584,50 @@ const float BallEKF::getGlobalYVelocity() const
  */
 const float BallEKF::getGlobalXUncert() const
 {
-    return P_k(x_index,x_index) * cos(robotPose.h) +
-        P_k(y_index,y_index) * sin(robotPose.h);
+    return transformToGlobalX(P_k(x_index,x_index),
+                              P_k(y_index,y_index),
+                              robotPose.h);
 }
 const float BallEKF::getGlobalYUncert() const
 {
-    return -P_k(x_index,x_index) * sin(robotPose.h) +
-        P_k(y_index,y_index) * cos(robotPose.h);
+    return transformToGlobalY(P_k(x_index,x_index),
+                              P_k(y_index,y_index),
+                              robotPose.h);
 }
 const float BallEKF::getGlobalXVelocityUncert() const
 {
-    return P_k(vel_x_index,vel_x_index) * cos(robotPose.h) +
-        P_k(vel_y_index,vel_y_index) * sin(robotPose.h);
+    return transformToGlobalX(P_k(vel_x_index,vel_x_index),
+                              P_k(vel_y_index,vel_y_index),
+                              robotPose.h);
 }
 const float BallEKF::getGlobalYVelocityUncert() const
 {
-    return -P_k(vel_x_index,vel_x_index) * sin(robotPose.h) +
-        P_k(vel_y_index,vel_y_index) * cos(robotPose.h);
+    return transformToGlobalY(P_k(vel_x_index,vel_x_index),
+                              P_k(vel_y_index,vel_y_index),
+                              robotPose.h);
 }
+const float BallEKF::getGlobalXAccelerationUncert() const
+{
+    return transformToGlobalX(P_k(acc_x_index,acc_x_index),
+                              P_k(acc_y_index,acc_y_index),
+                              robotPose.h);
+}
+const float BallEKF::getGlobalYAccelerationUncert() const
+{
+    return transformToGlobalY(P_k(acc_x_index,acc_x_index),
+                              P_k(acc_y_index,acc_y_index),
+                              robotPose.h);
+}
+
+float BallEKF::transformToGlobalX(float x, float y, float theta)
+{
+    return x * cos(theta) - y * sin(theta);
+}
+float BallEKF::transformToGlobalY(float x, float y, float theta)
+{
+    return x * sin(theta) + y * cos(theta);
+}
+
 
 // /**
 //  * Transform relative positions and velocities to global
