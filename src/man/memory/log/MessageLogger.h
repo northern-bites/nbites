@@ -44,8 +44,8 @@ public:
      * @param m : the proto message we will log
      * @return
      */
-    MessageLogger(const FDProvider* fdp,
-    		int logTypeID, const ProtoMessage* m);
+    MessageLogger(FDProvider::const_ptr fdp,
+    		int logTypeID, boost::shared_ptr<const ProtoMessage> m);
 
     /**
      * Closes the file, which will flush the output buffer
@@ -58,7 +58,7 @@ public:
 
 private:
     int logID;
-    const ProtoMessage* message;
+    boost::shared_ptr<const ProtoMessage> message;
    /**
     * @var raw_output : a ZeroCopyOutputStream, an abstract I/O interface
     * which will minimize the amount of copying to the buffer

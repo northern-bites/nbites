@@ -28,8 +28,8 @@ namespace log {
 
 using namespace std;
 
-MessageLogger::MessageLogger(const FDProvider* fdp,
-		int logTypeID, const ProtoMessage* m) :
+MessageLogger::MessageLogger(FDProvider::const_ptr fdp,
+		int logTypeID, boost::shared_ptr<const ProtoMessage> m) :
         FDLogger(fdp), logID(logTypeID), message(m) {
 
     raw_output = new FileOutputStream(file_descriptor);

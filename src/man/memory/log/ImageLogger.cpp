@@ -30,9 +30,9 @@ namespace log {
 
 using namespace std;
 
-ImageLogger::ImageLogger(const FDProvider* fdp,
+ImageLogger::ImageLogger(FDProvider::const_ptr fdp,
         int logTypeID,
-        const RoboImage* roboImage) :
+        boost::shared_ptr<const RoboImage> roboImage) :
         FDLogger(fdp),
         bytes_written(0),
         logID(logTypeID),

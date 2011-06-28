@@ -45,9 +45,9 @@ public:
      *
      * @param logTypeID : an ID written to the head of the log identifying the log
      */
-    ImageLogger(const FDProvider* fdp,
-                  int logTypeID,
-                  const RoboImage* roboImage);
+    ImageLogger(FDProvider::const_ptr fdp,
+                int logTypeID,
+                boost::shared_ptr<const RoboImage> roboImage);
 
     /**
      * Closes the file, which will flush the output buffer
@@ -75,7 +75,7 @@ private:
 private:
     unsigned long long bytes_written;
     int logID;
-    const RoboImage* roboImage;
+    boost::shared_ptr<const RoboImage> roboImage;
 };
 }
 }

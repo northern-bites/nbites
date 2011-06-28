@@ -34,7 +34,7 @@ public:
      * fdp : a FileFDProvider for the file descriptor where we want
      * to log to
      */
-    FDLogger(const FDProvider* fdp):
+    FDLogger(FDProvider::const_ptr fdp):
         file_descriptor_provider(fdp),
         file_descriptor(fdp->getFileDescriptor())
     {
@@ -59,7 +59,7 @@ private:
 
 
 protected:
-    const FDProvider* file_descriptor_provider;
+    const FDProvider::const_ptr file_descriptor_provider;
     int file_descriptor;
 };
 
