@@ -106,6 +106,7 @@ def spinToBall(player):
     if transitions.shouldFindBall(player):
         return player.goLater('findBall')
     elif transitions.shouldChaseFromSpinToBall(player):
+        player.brain.nav.chaseBall()
         return player.goNow('chase')
 
     return player.stay()
@@ -119,6 +120,7 @@ def decideKick(player):
         # Re-initialize to clear data from decideKick
         player.brain.kickDecider.resetInfo()
         player.brain.tracker.kickDecideScan()
+        player.inKickingState = True
 
     #TODO change this to be better.
     elif player.counter > 43: #time required for scan

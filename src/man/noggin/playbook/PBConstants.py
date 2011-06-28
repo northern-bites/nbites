@@ -24,8 +24,7 @@ DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
 
-# Length of time to spend in the kickoff play
-KICKOFF_FORMATION_TIME = 10
+KICKOFF_FORMATION_TIME = 10 # Length of time to spend in the kickoff play
 
 NUM_TEAM_PLAYERS = NogginConstants.NUM_PLAYERS_PER_TEAM
 
@@ -33,9 +32,11 @@ NUM_TEAM_PLAYERS = NogginConstants.NUM_PLAYERS_PER_TEAM
 #### Role Switching / Tie Breaking ####
 ####
 # The following constants are in milliseconds
-CALL_OFF_THRESH = 1250.             # how likely it is to be chaser
-LISTEN_THRESH = 2500.               # how likely it is to stop being chaser
-STOP_CALLING_THRESH = 2750.         # how likely you are to ignore teammates ideas.
+CALL_OFF_THRESH = 1500.             # how likely it is to be chaser
+LISTEN_THRESH = 3000.               # how likely it is to stop being chaser
+STOP_CALLING_THRESH = 3500.         # how likely you are to ignore teammates ideas.
+
+GOALIE_CHASER_COUNT_THRESH = 25      # how long we wait before goalie calls us off.
 
 # Special cases for waiting for the ball at half field
 NEAR_LINE_THRESH = 25.
