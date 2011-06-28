@@ -6,7 +6,7 @@ using namespace NBMath;
 using namespace std;
 using namespace ekf;
 
-#define DEBUG_BALL_EKF
+// #define DEBUG_BALL_EKF
 
 // How much uncertainty naturally grows per update
 const float BallEKF::BETA_BALL              = 5.0f;
@@ -392,49 +392,17 @@ void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
 {
     // We need to translate/rotate the old values into our new
     // coordinate frame based on the odometry update
-    StateVector xhat_k_prev(ball_ekf_dimension);
-    xhat_k_prev(x_index)     = (xhat_k(x_index) -
-                                cos(curOdo.deltaR) * curOdo.deltaF -
-                                sin(curOdo.deltaR) * curOdo.deltaL);
-    xhat_k_prev(y_index)     = (xhat_k(y_index) +
-                                sin(curOdo.deltaR) * curOdo.deltaF -
-                                cos(curOdo.deltaR) * curOdo.deltaL);
-
-    xhat_k_prev(vel_x_index) = (cos(curOdo.deltaR) * xhat_k(vel_x_index) +
-                                sin(curOdo.deltaR) * xhat_k(vel_y_index));
-    xhat_k_prev(vel_y_index) = (cos(curOdo.deltaR) * xhat_k(vel_y_index) -
-                                sin(curOdo.deltaR) * xhat_k(vel_x_index));
-
-    xhat_k_prev(acc_x_index) = (cos(curOdo.deltaR) * xhat_k(acc_x_index) +
-                                sin(curOdo.deltaR) * xhat_k(acc_y_index));
-    xhat_k_prev(acc_y_index) = (cos(curOdo.deltaR) * xhat_k(acc_y_index) -
-                                sin(curOdo.deltaR) * xhat_k(acc_x_index));
+    StateVector xhat_k_prev = transformStateWithOdometry(xhat_k, curOdo);
 
     // Calculate new velocities and accelerations
-    MeasurementVector z_x(ball_ekf_meas_dim);
-    z_x(x_index)     = z.distance * cos(z.bearing);
-    z_x(y_index)     = z.distance * sin(z.bearing);
-
-    z_x(vel_x_index) = (z_x(x_index) - xhat_k_prev(x_index)) / dt;
-    z_x(vel_y_index) = (z_x(y_index) - xhat_k_prev(y_index)) / dt;
-
-    z_x(acc_x_index) = (z_x(vel_x_index) -
-                        xhat_k_prev(vel_x_index)) / dt;
-    z_x(acc_y_index) = (z_x(vel_y_index) -
-                        xhat_k_prev(vel_y_index)) / dt;
+    MeasurementVector z_x = calculateObservedState(z, xhat_k_prev);
 
     // Calculate invariance
     V_k = z_x - xhat_k_bar;
 
-    // Calculate jacobians
-    float sinB = sin(z.bearing);
-    float cosB = cos(z.bearing);
+    const float sd_dist_sq = z.distanceSD * z.distanceSD;
 
     // Update the measurement covariance matrix
-
-    const float sd_dist_sq = z.distanceSD * z.distanceSD;
-    const float var = sd_dist_sq * sin(z.bearing) * cos(z.bearing);
-
     R_k(x_index,x_index)         = sd_dist_sq;
     R_k(y_index,y_index)         = sd_dist_sq;
     R_k(vel_x_index,vel_x_index) = sd_dist_sq * 2/ dt;
@@ -443,33 +411,69 @@ void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
     R_k(acc_y_index,acc_y_index) = sd_dist_sq * 2 * 2 / (dt*dt);
 
 #ifdef DEBUG_BALL_EKF
-    cout << "odo: " << curOdo << endl
-         << "z_x: " << z_x << endl
+    cout << "Odometry: " << curOdo << endl
          << "xhat_k_prev: " << xhat_k_prev << endl
-         << "xhat_k_bar: " << xhat_k_bar << endl
+         << "z_x: " << z_x << endl
          << "V_k: " << V_k << endl
          << "R_k: " << R_k << endl
          << endl;
 #endif
 }
 
-void BallEKF::beforeCorrectionFinish()
+/**
+ * Using odometry, give the location of the last state vector in the
+ * current coordinate frame.
+ */
+BallEKF::StateVector BallEKF::transformStateWithOdometry(const StateVector& x,
+                                                         const MotionModel& odo)
 {
+    StateVector prev(ball_ekf_dimension);
+    prev(x_index)     = (x(x_index) -
+                         cos(odo.deltaR) * odo.deltaF -
+                         sin(odo.deltaR) * odo.deltaL);
+    prev(y_index)     = (x(y_index) +
+                         sin(odo.deltaR) * odo.deltaF -
+                         cos(odo.deltaR) * odo.deltaL);
+
+    prev(vel_x_index) = (cos(odo.deltaR) * x(vel_x_index) +
+                         sin(odo.deltaR) * x(vel_y_index));
+    prev(vel_y_index) = (cos(odo.deltaR) * x(vel_y_index) -
+                         sin(odo.deltaR) * x(vel_x_index));
+
+    prev(acc_x_index) = (cos(odo.deltaR) * x(acc_x_index) +
+                         sin(odo.deltaR) * x(acc_y_index));
+    prev(acc_y_index) = (cos(odo.deltaR) * x(acc_y_index) -
+                         sin(odo.deltaR) * x(acc_x_index));
+    return prev;
 }
 
 /**
- * Method to ensure that the ball estimate does have any unrealistic values
+ * Use the given range and bearing, plus the previous state of the
+ * ball, to calculate the current state as was observed.
  */
-void BallEKF::limitAPrioriEst()
+BallEKF::MeasurementVector
+BallEKF::calculateObservedState(const RangeBearingMeasurement& z,
+                                const StateVector& xhat_k_prev)
 {
-    xhat_k_bar(vel_x_index) =
-        NBMath::clip(xhat_k_bar(vel_x_index),
-                     VELOCITY_EST_MIN,
-                     VELOCITY_EST_MAX);
-    xhat_k_bar(vel_y_index) =
-        NBMath::clip(xhat_k_bar(vel_y_index),
-                     VELOCITY_EST_MIN,
-                     VELOCITY_EST_MAX);
+    MeasurementVector z_x(ball_ekf_meas_dim);
+
+    z_x(x_index)     = z.distance * cos(z.bearing);
+    z_x(y_index)     = z.distance * sin(z.bearing);
+
+    // v = ds/dt
+    z_x(vel_x_index) = (z_x(x_index) - xhat_k_prev(x_index)) / dt;
+    z_x(vel_y_index) = (z_x(y_index) - xhat_k_prev(y_index)) / dt;
+
+    // a = dv/dt
+    z_x(acc_x_index) = (z_x(vel_x_index) -
+                        xhat_k_prev(vel_x_index)) / dt;
+    z_x(acc_y_index) = (z_x(vel_y_index) -
+                        xhat_k_prev(vel_y_index)) / dt;
+    return z_x;
+}
+
+void BallEKF::beforeCorrectionFinish()
+{
 }
 
 /**

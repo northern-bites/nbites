@@ -157,11 +157,15 @@ private:
                                             StateVector& deltaBall);
 
     virtual void beforeCorrectionFinish();
-    void limitAPrioriEst();
     void limitPosteriorEst();
 
     void initMatrices();
     float applyFriction(float vel);
+    StateVector transformStateWithOdometry(const StateVector& x,
+                                           const MotionModel& odo);
+    MeasurementVector
+    calculateObservedState(const RangeBearingMeasurement& z,
+                           const StateVector& xhat_k_prev);
 
     PoseEst robotPose;
     long long int lastUpdateTime;
