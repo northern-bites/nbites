@@ -57,6 +57,8 @@ public:
 
     void writeToLog();
 
+public:
+    static const unsigned long long BYTES_MAX = 1200000000; //1.2 GB
 
 private:
     void writeHead();
@@ -76,6 +78,7 @@ private:
     unsigned long long bytes_written;
     int logID;
     boost::shared_ptr<const RoboImage> roboImage;
+    bool exceeded;
 };
 }
 }

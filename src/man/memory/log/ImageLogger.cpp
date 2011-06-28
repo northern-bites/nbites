@@ -36,7 +36,8 @@ ImageLogger::ImageLogger(FDProvider::const_ptr fdp,
         FDLogger(fdp),
         bytes_written(0),
         logID(logTypeID),
-        roboImage(roboImage)
+        roboImage(roboImage),
+        exceeded(false)
 {
     writeHead();
 }
@@ -53,9 +54,16 @@ void ImageLogger::writeHead() {
 }
 
 void ImageLogger::writeToLog() {
-    bytes_written += writeValue<int64_t>(process_micro_time() - birth_time);
-    bytes_written += write(file_descriptor,
-            roboImage->getImage(), roboImage->getByteSize());
+    if (bytes_written < BYTES_MAX) {
+        bytes_written += writeValue<int64_t>(process_micro_time() - birth_time);
+        bytes_written += write(file_descriptor,
+                roboImage->getImage(), roboImage->getByteSize());
+    } else {
+        if (!exceeded) {
+            cout << "Stopped Image logging because we reached size limit!" << endl;
+            exceeded = true;
+        }
+    }
 }
 
 
