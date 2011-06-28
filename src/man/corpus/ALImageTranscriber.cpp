@@ -123,8 +123,8 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
 
 ALImageTranscriber::~ALImageTranscriber()
 {
+    cout << "ALImageTranscriber destructor" << endl;
     delete [] image;
-    stop();
 }
 
 
