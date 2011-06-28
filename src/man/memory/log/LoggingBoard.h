@@ -41,8 +41,11 @@ public:
 
     void newIOProvider(IOProvider::const_ptr ioProvider);
     //returns a NULL pointer if such a logger doesn't exist
-    ImageLogger::const_ptr getImageLogger(MObject_ID id) const;
     void update(MObject_ID id);
+
+    void startLogging() { logging = true; }
+    void stopLogging() { logging = false; }
+    bool isLogging() { return logging; }
 
 protected:
     //returns a NULL pointer if such a logger doesn't exist
@@ -52,6 +55,7 @@ protected:
 
 private:
     Memory::const_ptr memory;
+    bool logging;
 
 };
 }
