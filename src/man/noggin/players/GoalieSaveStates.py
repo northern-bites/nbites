@@ -27,7 +27,7 @@ def goalieSave(player):
             elif helper.shouldSaveLeft(player):
                 return player.goNow('testSaveLeft')
             else:
-                return player.goNow('saveCenter')
+                return player.goNow('testSaveCenter')
         else:
             if helper.shouldSaveRight(player):
                 return player.goNow('saveRight')
