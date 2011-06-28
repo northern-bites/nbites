@@ -109,6 +109,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 #ifdef USE_MEMORY
   memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
   loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory));
+  memory->addSubscriber(loggingBoard.get());
   loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
 #endif
   PROF_ENTER(profiler.get(), P_GETIMAGE);
@@ -198,7 +199,7 @@ Man::processFrame ()
     sensors->lockImage();
 #ifdef USE_MEMORY
     // TODO: this is temporarily here
-    loggingBoard->log(MIMAGE_ID);
+    //loggingBoard->log(MIMAGE_ID);
 #endif
 
     vision->notifyImage(sensors->getImage());

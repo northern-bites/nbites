@@ -41,6 +41,10 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
     }
 }
 
+void LoggingBoard::update(MObject_ID id) {
+    this->log(id);
+}
+
 void LoggingBoard::log(MObject_ID id) {
     FDLogger::ptr logger = getMutableLogger(id);
     if (logger.get() != NULL) {
