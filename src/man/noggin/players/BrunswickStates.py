@@ -49,7 +49,7 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.stopWalking()
+        player.standup()
         player.brain.loc.resetBall()
         player.brain.tracker.trackBall()
 
@@ -69,6 +69,8 @@ def gamePlaying(player):
     if player.firstFrame():
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
+            player.stopWalking()
+            player.gainsOn()
 
             if player.lastStateTime > 25:
                 # 25 is arbitrary. This check is meant to catch human error and

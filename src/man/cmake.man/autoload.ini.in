@@ -1,8 +1,8 @@
 [core]
 albase
 #framemanager
-${USE_TTS_POUND}audiodevice
-${USE_TTS_POUND}audioout
+${USE_ALSPEECH_POUND}audiodevice
+${USE_ALSPEECH_POUND}audioout
 #albonjour
 
 [extra]
