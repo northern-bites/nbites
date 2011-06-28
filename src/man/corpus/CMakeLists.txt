@@ -92,7 +92,6 @@ SET( ROBOT_CONNECT_SRCS
   PyLights
   Speech
   PySpeech
-  ColorParams
   )
 
 IF(WEBOTS_BACKEND)
@@ -135,6 +134,7 @@ SET( CORPUS_TEST_DIR test )
 SET( NBINCLUDE_SRCS ${NBCOMMON_INCLUDE_DIR}/NBMatrixMath
   ${NBCOMMON_INCLUDE_DIR}/NBMath
   ImageAcquisition
+  ColorParams
   ${NBCOMMON_INCLUDE_DIR}/dsp
   ${NBCOMMON_INCLUDE_DIR}/SensorMonitor
   ${NBCOMMON_INCLUDE_DIR}/BulkMonitor
