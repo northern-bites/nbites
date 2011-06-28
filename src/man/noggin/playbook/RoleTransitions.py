@@ -40,7 +40,7 @@ def shouldChase(team):
         return False
 
     # close enough to chase
-    if (ball.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.BOX_BUFFER
+    if (ball.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.CHASE_BUFFER
         and ball.relX < goalCon.CHASE_RELX_BUFFER
         and ball.on
           #and ball.y > goalCon.CHASE_LOWER_Y_LIMIT
