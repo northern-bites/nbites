@@ -29,7 +29,7 @@ SHOULD_KICK_AGAIN_Y = 9
 # Ball in position
 ## NOTE: important that these values slightly overestimate the values in
 ##        navigator's PFK. Otherwise there can be bad looping.
-BALL_X_OFFEST = 5
+BALL_X_OFFSET = 5
 BALL_Y_OFFSET = 5
 
 # Should dribble should and should stop dribbling
