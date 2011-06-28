@@ -238,6 +238,12 @@ void MultiLocEKF::redGoalieReset()
  */
 void MultiLocEKF::resetLocTo(float x, float y, float h)
 {
+    for (int i=0; i < loc_ekf_dimension; ++i){
+        xhat_k(i) = xhat_k_bar(i) = 0.0f;
+        for (int j=0; j < loc_ekf_dimension; ++j){
+            A_k(i,j) = Q_k(i,j) = P_k(i,j) = P_k_bar(i,j) = 0.0f;
+        }
+    }
     setXEst(x);
     setYEst(y);
     setHEst(subPIAngle(h));
@@ -558,8 +564,9 @@ void MultiLocEKF::incorporateCorner(int index,
     V_k(2) = orientation_error;
 
     // The jacobian's denomitator
-    float denom = sqrt( 1 - ((dot_prod * dot_prod) /
-                             (pt_dist*pt_dist)));
+    // Clipped to prevent sqrt of negative
+    float denom = sqrt( max(1 - ((dot_prod * dot_prod) /
+                                 (pt_dist*pt_dist)), 0.0f));
     float sign = copysignf(1.0f, dot_sign);
 
     // Derivatives of orientation with respect to x,y,h
@@ -903,7 +910,7 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
 
     // Heading of line (self -> pt2)
     // Clamp the input to (-1,1) to prevent illegal trig call and a nan return
-    float headingPt2 = acosf(( (pt2.x - newX)/sideB) );
+    float headingPt2 = acosf(clip( (pt2.x - newX)/sideB, -1.0f, 1.0f) );
 
     // Sign based on y direction of vector (self -> pt2)
     float signedHeadingPt2 = copysignf(1.0f, pt2.y - newY) * headingPt2;
