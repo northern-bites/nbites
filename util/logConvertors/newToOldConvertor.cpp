@@ -36,6 +36,8 @@ int main(int argc, char** argv) {
   ImageParser imageParser(fdp, roboImage);
 
   int i = 1;
+  string version = boost::lexical_cast<string>(0) + " ";
+  float* junk = new float[100];
 
   while(!imageParser.getNext()) {
 	  string number = boost::lexical_cast<string>(i);
@@ -46,6 +48,7 @@ int main(int argc, char** argv) {
 	  if (fd > 0) {
 		  printf("%s\n", frame_path.c_str());
 		  write(fd, roboImage->getImage(), roboImage->getByteSize());
+		  write(fd, version.c_str() , 2); //version
 		  close(fd);
 		  i++;
 	  }
