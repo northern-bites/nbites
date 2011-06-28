@@ -1,4 +1,4 @@
-from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_PENALY_KICK)
+from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_PENALTY_KICK)
 import man.motion.SweetMoves as SweetMoves
 
 ###
