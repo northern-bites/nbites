@@ -1,6 +1,4 @@
 from .. import NogginConstants
-from . import ChaseBallConstants as ChaseConstants
-import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
 
@@ -16,8 +14,6 @@ def playbookPosition(player):
     """
     brain = player.brain
     nav = brain.nav
-    my = brain.my
-    ball = brain.ball
     gcState = brain.gameController.currentState
 
     if player.firstFrame():

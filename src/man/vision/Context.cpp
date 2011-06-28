@@ -2205,6 +2205,7 @@ void Context::checkForKickDangerNoRobots() {
 	float topDist = thresh->getPixDistance(ballY) + 30.0f;
 	int count = 0, total = 0;
 	float heat = 0.0f;
+	int row = ballY - 1;
 	// zone 1 - right above the ball
 	for (int i = ballY - 1; i >= 0 && thresh->getPixDistance(i) < topDist; i--) {
 		for (int j = ballX; j < ballX + width; j++) {
@@ -2214,7 +2215,10 @@ void Context::checkForKickDangerNoRobots() {
 			}
 			total++;
 		}
+		row = i;
 	}
+	int gap = ballY - row;
+	row = row - gap - gap / 2;
 	if (count * 2 > total) {
 		heat += 5.0f;
 	} else if (count * 3 > total) {
@@ -2238,7 +2242,7 @@ void Context::checkForKickDangerNoRobots() {
 	} else if (count * 3 > total) {
 		heat += 2.5f;
 	}
-	// zone 3 to the left and above the ball
+	// zone 3 to the right and above the ball
 	count = 0;
 	total = 0;
 	for (int i = ballY + height / 2; i >= 0 && thresh->getPixDistance(i) <
@@ -2256,6 +2260,34 @@ void Context::checkForKickDangerNoRobots() {
 		heat += 5.0f;
 	} else if (count * 3 > total) {
 		heat += 2.5f;
+	}
+	if (heat >= 5.0f && vision->ball->getDistance() > 50 &&
+		vision->ball->getDistance() <  350) {
+		// do some extra scanning for uniforms
+		count = 0;
+		total = 0;
+		for (int i = row; i >=0 && i > row - 20; i--) {
+			for (int col = max(0, ballX - width / 2); col < min(IMAGE_WIDTH - 1,
+																ballX + 2 * width);
+				 col++) {
+				unsigned char pixel = thresh->getThresholded(i, col);
+				if (Utility::isRed(pixel) || Utility::isNavy(pixel)) {
+					count++;
+				}
+				total++;
+			}
+		}
+		int target = width * height / 5;
+		if (count > target) {
+			heat += 7.5f;
+		} else if (count * 2 > target) {
+			heat += 5.0f;
+		} else if (count * 3 > target) {
+			heat += 2.5f;
+		}
+		if (debugDangerousBall) {
+			cout << "Uniform count " << count << " " << target << endl;
+		}
 	}
 	vision->ball->setHeat(heat);
 	if (debugDangerousBall) {
