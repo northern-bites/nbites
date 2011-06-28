@@ -10,9 +10,6 @@ from . import GoalieTransitions
 
 from .. import NogginConstants
 from ..playbook import PBConstants
-from . import ChaseBallConstants as ChaseConstants
-
-from man.noggin.typeDefs.Location import Location
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):

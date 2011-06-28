@@ -1,8 +1,5 @@
 from .. import NogginConstants as NogCon
 
-BALL_SAVE_LIMIT_TIME = 2.5
-MOVE_TO_SAVE_DIST_THRESH = 200.
-
 # We dont use STRAFE RIGHT NOW
 STRAFE_ONLY = True
 STRAFE_SPEED = 0.3

@@ -94,46 +94,6 @@ def testSaveDecision(player):
 
     return player.stay()
 
-    # if ball.framesOn > 0 :
-    #     if(ball.dx > 11 or ball.dx < -11):
-    #         print "moving"
-    #         if ball.relY > goalCon.CENTER_SAVE_THRESH:
-    #             print "save right + 1"
-    #             player.counterRightSave +=1
-    #             if player.counterRightSave > 3:
-    #                 player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
-    #                 print "save right"
-    #                 player.counterRightSave = 0
-    #                 player.counterLeftSave = 0
-    #                 player.counterCenterSave = 0
-    #         elif ball.relY < -goalCon.CENTER_SAVE_THRESH:
-    #             print "save left + 1"
-    #             player.counterLeftSave +=1
-    #             if player.counterLeftSave > 3:
-    #                 player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
-    #                 print "save left"
-    #                 player.counterRightSave = 0
-    #                 player.counterLeftSave = 0
-    #                 player.counterCenterSave = 0
-    #         elif( ball.relY > -goalCon.CENTER_SAVE_THRESH and
-    #               ball.relY < goalCon.CENTER_SAVE_THRESH):
-    #             print "save center + 1"
-    #             player.counterCenterSave +=1
-    #             if player.counterCenterSave > 3:
-    #                 player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
-    #                 print "save center"
-    #                 player.counterRightSave = 0
-    #                 player.counterLeftSave = 0
-    #                 player.counterCenterSave = 0
-
-    #    # if ball.relX < 85:
-    #         #print "save now"
-    #    # else:
-    #        # print "save later"
-
-    # return player.stay()
-
-
 # not using below here for now
 def testDangerousBall(player):
     if player.counter % 100 == 0:

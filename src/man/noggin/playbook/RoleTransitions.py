@@ -201,7 +201,6 @@ def shouldNotSave(team):
     if team.brain.player.penaltyKicking:
         return False
 
-
     # Want to stop saving when no longer worried about
     # A robot shooting and the ball is not moving ??
 

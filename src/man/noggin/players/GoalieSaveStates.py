@@ -6,8 +6,6 @@
 import man.motion.SweetMoves as SweetMoves
 import GoalieTransitions as helper
 
-CENTER_SAVE_THRESH = 15
-
 TESTING = False
 
 def goalieSave(player):

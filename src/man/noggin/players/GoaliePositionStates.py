@@ -1,9 +1,7 @@
-
-import GoalieTransitions as goalTran
-from ..import NogginConstants as nogCon
+#
+# States for positioning the goalie.
+#
 import GoalieConstants as goalCon
-import ChaseBallStates as chaseBall
-from man.noggin.typeDefs.Location import RobotLocation
 
 def goaliePosition(player):
     """
