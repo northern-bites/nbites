@@ -97,8 +97,11 @@ public:
     /**
      * Distance, bearing getters
      */
-    float getDistance() { return hypot(getRelativeX(), getRelativeY());      }
+    float getDistance() { return hypotf(getRelativeX(), getRelativeY());      }
     float getBearing()  { return safe_atan2(getRelativeY(), getRelativeX()); }
+    float getBearingDeg() {
+        return TO_DEG * safe_atan2(getRelativeY(), getRelativeX());
+    }
 
     ///////////////////////////////
     // Setters

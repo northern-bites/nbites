@@ -205,6 +205,7 @@ void BallEKF::updateModel(const MotionModel& odo,
         noCorrectionStep();
     }
     limitPosteriorEst();
+    limitPosteriorUncert();
 
     if (testForNaNReset()) {
         cout << "\tBallEKF reset to " << *this << endl;
@@ -254,7 +255,7 @@ void BallEKF::updateFrameLength()
 
     // Guard against a zero dt (maybe possible?)
     if (dt == 0.0){
-        dt = 0.0001;
+        dt = 0.0001f;
     }
     lastUpdateTime = time;
 }
@@ -521,6 +522,21 @@ void BallEKF::limitPosteriorEst()
         xhat_k(acc_y_index) = xhat_k_bar(acc_y_index) = 0.0;
     }
 }
+
+/**
+ * Limit the uncertainty, mostly to prevent overflow.
+ */
+void BallEKF::limitPosteriorUncert()
+{
+    for (int i=0; i < ball_ekf_meas_dim; ++i){
+        for (int j=0; j < ball_ekf_meas_dim; ++j) {
+            P_k_bar(i,j) = P_k(i,j) = clip(P_k(i,j),
+                                           0.0f,
+                                           10000000.0f);
+        }
+    }
+}
+
 
 /**
  * Transform relative positions and velocities to global
