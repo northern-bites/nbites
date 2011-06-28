@@ -71,7 +71,7 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
                                                                         \
     /* Heading from me to landmark */                                   \
     /* Opposite of pt_rel_x needed to get vector direction right  */    \
-    float heading_mag = acosf(-pt_rel_x / pt_dist);                     \
+    float heading_mag = acosf(clip(-pt_rel_x / pt_dist, -1.0f, 1.0f));  \
                                                                         \
     /* Sign the heading and subtract our heading to get bearing */      \
     float pt_bearing = subPIAngle(copysignf(1.0f, -pt_rel_y) *          \
@@ -101,7 +101,7 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
                                                                         \
     /* Acos always returns positive, so we have the magnitude of our */ \
     /* orientation to the corner */                                     \
-    float mag_orientation = acosf(dot_prod/pt_dist);                    \
+    float mag_orientation = acosf(clip(dot_prod/pt_dist, -1.0f, 1.0f)); \
     float pt_orientation = copysignf(1.0f,dot_sign) * mag_orientation;  \
                                                                         \
     float orientation_error = subPIAngle(z.getVisOrientation() -        \
@@ -172,9 +172,16 @@ MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
       useAmbiguous(true), errorLog(error_log_width),
       resetFlag(false)
 {
-    // ones on the diagonal
+    // These jacobian values are unchanging and independent of the
+    // motion updates, so we initialize them here.
     A_k(0,0) = 1.0;
+    A_k(0,1) = 0.0;
+
+    A_k(1,0) = 0.0;
     A_k(1,1) = 1.0;
+
+    A_k(2,0) = 0.0;
+    A_k(2,1) = 0.0;
     A_k(2,2) = 1.0;
 
     // Setup initial values
@@ -356,8 +363,10 @@ MultiLocEKF::associateTimeUpdate(MotionModel u)
     deltaLoc(1) = u.deltaF * sinh + u.deltaL * cosh;
     deltaLoc(2) = u.deltaR;
 
-    A_k(0,2) =  0;//-u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) =  0;//u.deltaF * cosh - u.deltaL * sinh;
+    // Derivatives of motion updates re:x,y,h
+    // Other values are set in the constructor and are unchanging
+    A_k(0,2) = -u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) = u.deltaF * cosh - u.deltaL * sinh;
 
     return deltaLoc;
 }
@@ -868,16 +877,14 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
     float sideC = hypotf(i,j);
 
     // Calculate angle between vector (pt1,pt2) and north (zero heading)
-    float ptVecHeading = copysignf(1.0f, j) * acosf(i/sideC);
+    float ptVecHeading = copysignf(1.0f, j) * acosf(clip(i/sideC, -1.0f, 1.0f));
 
     float angleC = abs(subPIAngle(obs1->getVisBearing() -
                                   obs2->getVisBearing()));
 
     // Clamp the input to asin to within (-1 , 1) due to measurement
     // inaccuracies. This prevents a nan return from asin.
-    float angleB = asinf( max( min( (sideB * sin(angleC)) /sideC,
-                                    1.0f),
-                               -1.0f));
+    float angleB = asinf( clip( (sideB * sin(angleC)) /sideC, -1.0f, 1.0f));
 
      // Swap sign of angle B to place us on the correct side of the
     // line (pt1 -> pt2)
@@ -896,7 +903,7 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
 
     // Heading of line (self -> pt2)
     // Clamp the input to (-1,1) to prevent illegal trig call and a nan return
-    float headingPt2 = acosf( min(max( (pt2.x - newX)/sideB, -1.0f), 1.0f) );
+    float headingPt2 = acosf(( (pt2.x - newX)/sideB) );
 
     // Sign based on y direction of vector (self -> pt2)
     float signedHeadingPt2 = copysignf(1.0f, pt2.y - newY) * headingPt2;
