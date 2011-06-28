@@ -404,7 +404,8 @@ void Noggin::updateLocalization()
 #       endif
     }
 
-    ballEKF->updateModel(m, loc->getCurrentEstimate());
+    ballEKF->updateModel(odometery, m, loc->getCurrentEstimate());
+
 #   ifdef LOG_LOCALIZATION
     if (loggingLoc) {
         // Print out odometry and ball readings
