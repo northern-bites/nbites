@@ -1,8 +1,7 @@
 # These are the states for goalie saves.
-#They should be able to dive right and left
-#and save center however right now they only
-#allow you to saveCenter which is the goalie
-#squat.
+# They should be able to dive right and left
+# and save center.
+
 import man.motion.SweetMoves as SweetMoves
 import GoalieTransitions as helper
 

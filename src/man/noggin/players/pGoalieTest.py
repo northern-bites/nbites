@@ -19,7 +19,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(PositionStates)
 
         self.setName('pGoalieTest')
- 
+
         #GOALIE COUNTERS AND BOOLEANS
         # Counters for goalie dive decision making
         self.counterRightSave = 0
