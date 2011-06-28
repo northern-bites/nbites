@@ -7,12 +7,13 @@ STRAFE_SPEED = 0.3
 # Distance at which we use active localization
 ACTIVE_LOC_THRESH = 150.
 
+
+
+# SAVE
+DONT_SAVE_LIMIT = 120
+
 #The goalie squat save width to one side
 CENTER_SAVE_THRESH = 15
-
-# TODO: Improve this when dive goes into action
-SAVE_BUFFER = 20
-VEL_THRES = 11
 
 # The chasing box
 BOX_BUFFER = 10

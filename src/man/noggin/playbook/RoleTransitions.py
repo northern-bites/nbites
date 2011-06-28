@@ -7,7 +7,7 @@ from ..players import GoalieConstants as goalCon
 
 
 def shouldPositionForSave(team):
-""" We should get ready to save because a robot is
+    """ We should get ready to save because a robot is
     in a position to shoot or is getting close """
 
     ball = team.brain.ball
@@ -27,7 +27,7 @@ def shouldPositionForSave(team):
 
 
 def shouldChase(team):
-""" Ball is inside the field cross and we should
+    """ Ball is inside the field cross and we should
     get it and kick it away """
 
     ball = team.brain.ball
@@ -61,12 +61,11 @@ def shouldChase(team):
 
 
 def shouldStopChase(team):
-""" We should stop chasing because:
-         We are 1/4 way up the field
-         We have lost the ball
-         We are outside the box and ball not
-         chasable.
-         Ball is not in chase area. """
+    """ We should stop chasing because:
+    We are 1/4 way up the field
+    We have lost the ball
+    We are outside the box and ball not chasable.
+    Ball is not in chase area. """
 
     ball= team.brain.ball
     my = team.brain.my
@@ -119,7 +118,7 @@ def shouldStopChase(team):
 
 
 def shouldPositionCenter(team):
-""" Right now we only position Center so this
+    """ Right now we only position Center so this
     is not really necessary but will be when
     position mulitple places """
 
@@ -149,7 +148,7 @@ def shouldPositionCenter(team):
 
 
 def shouldPositionRight(team):
-""" Position right not used """
+    """ Position right not used """
 
     ball = team.brain.ball
 
@@ -173,7 +172,7 @@ def shouldPositionRight(team):
 
 
 def shouldPositionLeft(team):
-""" Position left not used """
+    """ Position left not used """
 
     ball = team.brain.ball
 

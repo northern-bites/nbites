@@ -25,6 +25,9 @@ def rGoalie(team, workingPlay):
     elif workingPlay.isSubRole(PBConstants.READY_GOALIE):
         SubRoles.pGoalieKickOff(team, workingPlay)
 
+    elif workingPlay.isSubRole(PBConstants.PENALTY_SUB_ROLE):
+        SubRoles.pGoalieCenter(team, workingPlay)
+
     # Kick off just happened
     elif workingPlay.isSubRole(PBConstants.GOALIE_KICKOFF):
         if RoleTran.shouldPositionForSave(team):

@@ -6,8 +6,6 @@
 from .. import NogginConstants as NogCon
 import GoalieConstants as goalCon
 
-DEBUG = False
-
 #SAVING TRANSITIONS
 
 def shouldSave(player):
@@ -38,14 +36,18 @@ def strafeDirForSave(player):
 def shouldSaveRight(player):
     ball= player.brain.ball
 
-    if(ball.endY < -goalCon.CENTER_SAVE_THRESH and goalieInBox(player)):
+    if(ball.endY < -goalCon.CENTER_SAVE_THRESH
+       and ball.endY > -goalCon.DONT_SAVE_LIMIT
+       and goalieInBox(player)):
         return True
     return False
 
 def shouldSaveLeft(player):
     ball= player.brain.ball
 
-    if(ball.endY > goalCon.CENTER_SAVE_THRESH and goalieInBox(player)):
+    if(ball.endY > goalCon.CENTER_SAVE_THRESH
+       and ball.endY < goalCon.DONT_SAVE_LIMIT
+       and goalieInBox(player)):
         return True
 
     return False
