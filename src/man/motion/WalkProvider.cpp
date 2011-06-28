@@ -119,6 +119,10 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
             " it thinks its DONE if I were you!" <<endl;
     }
 
+    // advance the in-progress DestinationCommand
+    if (nextDestCommand)
+	nextDestCommand->tick();
+
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
 
@@ -171,11 +175,15 @@ void WalkProvider::setCommand(const WalkCommand::ptr command){
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 
-void WalkProvider::setCommand(const boost::shared_ptr<DestinationCommand> command){
+void WalkProvider::setCommand(const DestinationCommand::ptr command){
     pthread_mutex_lock(&walk_provider_mutex);
-	nextDestCommand = command;
-	pendingDestCommands = true;
-	setActive();
+    // mark the old command as finished, for Python
+    if (nextDestCommand)
+	nextDestCommand->finishedExecuting();
+
+    nextDestCommand = command;
+    pendingDestCommands = true;
+    setActive();
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 

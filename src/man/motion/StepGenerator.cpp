@@ -718,6 +718,8 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
         gain = 1.0f;
     }
 
+    dest_y *= 2; /// @see Step.h HACK HACK HACK
+
     float speed_x, speed_y, speed_theta;
 
     // use the maximum allowed x,y,theta
@@ -736,6 +738,7 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 	resetQueues();
 	const bool startLeft = decideStartLeft(dest_y,dest_theta);
 	resetSteps(startLeft);
+	generateStep(dest_x, dest_y, dest_theta);
     }
     hasDestination = true;
     done = false;
