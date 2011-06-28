@@ -57,7 +57,6 @@ private:
 private:
     const void** current_buffer;
     int current_buffer_size;
-    int file_descriptor;
     bool finished;
 
     proto_io::FileInputStream* raw_input;

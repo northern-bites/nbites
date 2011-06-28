@@ -17,16 +17,15 @@ ImageParser::ImageParser(include::io::FDProvider::const_ptr fdProvider,
         boost::shared_ptr<RoboImage> image) :
         TemplatedParser<RoboImage>(fdProvider, image),
        current_buffer(new const void*),
-       current_buffer_size(1) {
+       current_buffer_size(1),
+       finished(false){
 
     initStreams();
     readHeader();
 }
 
 ImageParser::~ImageParser() {
-
     delete raw_input;
-    close(file_descriptor);
 }
 
 void ImageParser::readHeader() {
@@ -63,7 +62,7 @@ bool ImageParser::getNext() {
         container->updateImage(
                 reinterpret_cast<const uint8_t*>(*current_buffer) + bytes_read);
     }
-    return container;
+    return finished;
 }
 
 shared_ptr<const RoboImage> ImageParser::getPrev() {
