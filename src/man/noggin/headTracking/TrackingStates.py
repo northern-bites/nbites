@@ -183,6 +183,11 @@ def trackingBall(tracker):
     else:
         tracker.helper.lookToTargetCoords(tracker.brain.ball)
 
+    # If we haven't seen the ball in some time, switch to panning
+    if tracker.brain.ball.framesOff > constants.TRACKER_BALL_STARE_THRESH*3/4:
+        print "lost ball for some time, panning"
+        return tracker.goLater('scanBall')
+
     if tracker.counter > constants.TRACKER_BALL_STARE_THRESH:
         print "Past stare thresh for ball, going to:",tracker.decisionState
         return tracker.goLater(tracker.decisionState)

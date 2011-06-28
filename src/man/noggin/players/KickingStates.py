@@ -11,7 +11,7 @@ def kickBallExecute(player):
     Kick the ball
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.stareBall()
         if transitions.ballInPosition(player):
             player.executeMove(player.brain.kickDecider.getSweetMove())
         else:
@@ -86,7 +86,7 @@ def spinAfterBackKick(player):
     """
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        player.brain.tracker.trackBall()
+        # ** #player.brain.tracker.trackBall()
         return player.goNow('chase')
 
     if player.firstFrame():
@@ -100,6 +100,6 @@ def spinAfterBackKick(player):
         else:
             player.setWalk(0, 0, -1*constants.FIND_BALL_SPIN_SPEED)
 
-        player.brain.tracker.trackBallSpin()
+        player.brain.tracker.spinFindBall()
 
     return player.stay()

@@ -34,7 +34,7 @@ class HeadTracking(FSA.FSA):
         self.activePanOut = False # ** # deprecated?
         self.activePanUp = False # ** # deprecated?
         # Enable safeBallTracking to always keep ball in frame while tracking
-        self.safeBallTracking = False
+        self.safeBallTracking = True
         self.isPreKickScanning = False # ** # deprecated?
         self.preActivePanHeads = None # ** # deprecated? should probably stay
         self.locObjectList = []
@@ -69,13 +69,13 @@ class HeadTracking(FSA.FSA):
         self.switchTo('doHeadMove')
 
 # ** # old method (main input method) - deprecated
-    def trackBall(self):
-        """automatically tracks the ball. scans for the ball if not in view"""
-        self.target = self.brain.ball
-        self.gain = 1.0
-        if ( (not self.currentState == 'tracking')
-            and (not self.currentState == 'scanBall') ):
-            self.switchTo('ballTracking')
+#    def trackBall(self):
+#        """automatically tracks the ball. scans for the ball if not in view"""
+#        self.target = self.brain.ball
+#        self.gain = 1.0
+#        if ( (not self.currentState == 'tracking')
+#            and (not self.currentState == 'scanBall') ):
+#            self.switchTo('ballTracking')
 
 # ** # old method (main input method) - deprecated
     def trackBallSpin(self):

@@ -8,7 +8,7 @@ def scanBall(tracker):
     if tracker.target == ball and \
             tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.activeLocOn = False
-        return tracker.goNow('ballTracking')
+        return tracker.goNow(tracker.lastDiffState)# ** #HACK for new system
     #Here we choose where to look for the ball first
     if not tracker.brain.motion.isHeadActive():
         if ball.dist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:

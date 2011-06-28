@@ -13,6 +13,9 @@ def chase(player):
     if player.brain.play.isRole(GOALIE):
         return player.goNow('goalieChase')
 
+    # ** # Set tracker to track ball.
+    player.brain.tracker.trackBall()
+
     # Check in order of importance
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
@@ -67,7 +70,7 @@ def approachBall(player):
 
     if player.firstFrame():
         player.brain.nav.chaseBall()
-        player.brain.tracker.trackBall()
+        # ** #player.brain.tracker.trackBall()
 
     return player.stay()
 
@@ -79,7 +82,7 @@ def claimBall(player):
     """
     if player.firstFrame():
         kick = player.brain.kickDecider.getCenterKickPosition()
-        player.brain.tracker.trackBall()
+        # ** #player.brain.tracker.trackBall()
         player.brain.nav.kickPosition(kick)
         player.inKickingState = True
 
@@ -143,7 +146,7 @@ def positionForKick(player):
 
         player.inKickingState = True
 
-        player.brain.tracker.trackBall()
+        player.brain.tracker.stareBall()
         player.brain.nav.kickPosition(kick)
 
     if transitions.shouldKick(player):

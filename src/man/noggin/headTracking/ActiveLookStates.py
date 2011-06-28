@@ -94,14 +94,6 @@ def trackLandmarks(tracker):
     # Sort list of locObjects
     newlist = sorted(tracker.locObjectList)
 
-    # ** # debugging
-    for i in range(5):
-        obj = newlist[i]
-        objID = obj.visionId
-        if isinstance(obj, FieldObject):
-            objID += 20
-        print "ID:",objID,"  fitness:",obj.trackingFitness,"  on?:",obj.framesOn>0
-
     if not newlist == tracker.locObjectList:
         #Landmarks have changed fitness ranking. Track most fit.
         tracker.locObjectList = newlist
@@ -199,13 +191,16 @@ def passiveLoc(tracker):
     Then looks to center of field for ball.
     """
     my = tracker.brain.my
-    if my.locScoreXY == NogginConstants.GOOD_LOC and \
+    if my.locScoreXY == NogginConstants.OK_LOC or \
+            my.locScoreXY == NogginConstants.GOOD_LOC and \
+            my.locScoreTheta == NogginConstants.OK_LOC or \
             my.locScoreTheta == NogginConstants.GOOD_LOC:
         print "I am sure about my position. Now looking to the ball."
         # Set ball position to center of field.
         tracker.target = tracker.brain.ball
         tracker.target.x = 370
         tracker.target.y = 270
+        tracker.brain.ball.updateLoc(tracker.brain.loc,tracker.brain.my)
         tracker.helper.lookToTargetCoords(tracker.target)
         return tracker.stay()
 
