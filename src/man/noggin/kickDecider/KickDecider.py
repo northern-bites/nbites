@@ -58,21 +58,6 @@ class KickDecider(object):
     def getCenterKickPosition(self):
         return kicks.CENTER_KICK_POSITION
 
-    def decideKick(self):
-        """
-        using objective and heuristics and localization determines best kick
-        In April 2011, Localization is too unreliable. We use it as a last resort
-        """
-        self.getKickObjective()
-
-        print self.info
-
-        if self.info.kickObjective == constants.OBJECTIVE_SHOOT:
-            return self.shoot()
-        #elif self.info.kickObjective == constants.OBJECTIVE_CLEAR:
-        else:
-            return self.clear()
-
     def setKickOff(self):
         """
         sets the kick we should do in the kickOff situation
@@ -93,6 +78,21 @@ class KickDecider(object):
             print "Kickoff LEFT_SIDE_KICK"
 
         self.info.kickObjective = constants.OBJECTIVE_KICKOFF
+
+    def decideKick(self):
+        """
+        using objective and heuristics and localization determines best kick
+        In April 2011, Localization is too unreliable. We use it as a last resort
+        """
+        self.getKickObjective()
+
+        print self.info
+
+        if self.info.kickObjective == constants.OBJECTIVE_SHOOT:
+            return self.shoot()
+        #elif self.info.kickObjective == constants.OBJECTIVE_CLEAR:
+        else:
+            return self.clear()
 
     def shoot(self):
         """
@@ -159,11 +159,22 @@ class KickDecider(object):
         # first determine if both my goal posts were seen
         if (rightPostBearing is not None and leftPostBearing is not None):
             distDiff = rightPostDist - leftPostDist
-            # if we are facing between our posts and
-            # difference between dists is small enough
-            if (rightPostBearing >= 0 and leftPostBearing <= 0 and
-                distDiff <= constants.CLEAR_POST_DIST_DIFF):
-                return self.chooseShortBackKick()
+            if (distDiff <= constants.CLEAR_POST_DIST_DIFF):
+                # we are in a channel in the middle of the field.
+                if (rightPostBearing >= 0 and leftPostBearing <= 0):
+                    # we are facing between our posts
+                    return self.chooseShortBackKick()
+                elif leftPostBearing > 0:
+                    # our goal is to our left.
+                    print "LEFT_SIDE"
+                    return kicks.LEFT_SIDE_KICK
+                else:
+                    # our goal is to our right.
+                    print "RIGHT_SIDE"
+                    return kicks.RIGHT_SIDE_KICK
+            # We don't kick out of bounds here. We try to center it.
+            # Maybe bad? Chown doesn't like when we kick out of bounds
+            # Even though it is a common strategy in real soccer. Oh well.
             elif (rightPostDist <= leftPostDist):
                 print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
@@ -172,14 +183,16 @@ class KickDecider(object):
                 return kicks.RIGHT_SIDE_KICK
         # if only one was seen
         elif (rightPostBearing is not None):
-            if (rightPostBearing > 0):
-                print "LEFT_SIDE"
-                return kicks.LEFT_SIDE_KICK
-            else:
+            if (rightPostBearing > 0 or
+                rightPostDist < constants.KICK_SIDE_DIST_THRESH):
                 print "RIGHT_SIDE"
                 return kicks.RIGHT_SIDE_KICK
+            else:
+                print "LEFT_SIDE"
+                return kicks.LEFT_SIDE_KICK
         elif (leftPostBearing is not None):
-            if (leftPostBearing > 0):
+            if (leftPostBearing > 0 or
+                leftPostDist < constants.KICK_SIDE_DIST_THRESH):
                 print "LEFT_SIDE"
                 return kicks.LEFT_SIDE_KICK
             else:
