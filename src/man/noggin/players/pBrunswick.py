@@ -8,12 +8,9 @@ from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieSaveStates
 from . import BrunswickStates
-from . import GoalieChanges
-from . import GoalieTransitions
 
 from .. import NogginConstants
 from ..playbook import PBConstants
-from . import ChaseBallConstants as ChaseConstants
 
 from man.noggin.typeDefs.Location import Location
 

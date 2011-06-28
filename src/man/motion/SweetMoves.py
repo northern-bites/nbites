@@ -1,4 +1,3 @@
-
 #constants file to store all our sweet ass-moves for the Nao
 #import MotionConstants
 
@@ -490,6 +489,14 @@ def LEFT_D_KICK(y,dist):
     kick_hip_pitch = -((MIN_KICK_DIST - dist) * INTERVAL_RATIO - \
         MAX_KICK_HIP_PITCH)
 
+    print "kick_hip_pitch ="
+    print kick_hip_pitch
+    print "support_arm_shoulder_roll ="
+    print support_arm_shoulder_roll
+    print "kick_leg_hip_roll = "
+    print kick_leg_hip_roll
+
+
     return (
         #swing to the right
         ((80.,40.,-50.,-70.),
@@ -958,34 +965,32 @@ LEFT_BIG_KICK = (
 RIGHT_BIG_KICK = mirrorMove(LEFT_BIG_KICK)
 
 SHORT_QUICK_LEFT_KICK = (
-    ((90,15,0,0),
-     (0.,0.,-15.,20.,-10.,0.),
-     (0.,0.,-15.,20.,-10.,0.),
-     (90,-15,0,0),
-     0.4,0, stiff.LOW_HEAD_STIFFNESSES),
+    #swing to the right
+    ((80.,40.,-50.,-70.),
+     (0.,0.,-35.,73.,-40.,-13.),
+     (0.,0,-38.,76.,-40.,-13.),
+     (80.,-40.,50.,70.),0.33,0, stiff.NORMAL_STIFFNESSES),
 
-    ((90,15,0,0),
-     (0.,15.,-25.,50.,-20.,-20.),
-     (0.,17.,-15.,20.,-10.,-20.),
-     (90,-15,0,0),
-     0.8,0, stiff.LOW_HEAD_STIFFNESSES),
+    # Lift/cock leg
+    ((80.,0.,-50.,-90.),
+     (0.,5.5, -30.,100.,-68.,-20.),
+     (0.,0,-40.,86.,-45.,-20.),
+     (80.,45,50.,70.),
+     .3,0, stiff.NORMAL_STIFFNESSES),
 
-    ((90,15,0,0),
-     (0.,15.,-45.,20.,-20.,-20.),
-     (0.,16.,-15.,20.,-8.,-20.),
-     (90,-15,0,0),
-     0.08,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+    # kick left leg
+    ((80.,0.,-50.,-90.),
+     (0.,10.5, -95, 60.,40.,-20.),
+     (0.,0.,-40.,86.,-45.,-20.),
+     (80.,45,50.,70.),
+     .35,0, stiff.NORMAL_STIFFNESSES),
 
-    ((90,15,0,0),
-     (0.,15.,-25.,50.,-25.,-20.),
-     (0.,15.,-10.,20.,-10.,-20.),
-     (90,-15,0,0),
-     0.3,0, stiff.LOW_HEAD_STIFFNESSES),
-
-    ((90,15,0,0),
-     (0.,0.,-15.,20.,-10.,0.),
-     (0.,0.,-15.,20.,-10.,0.),
-     (90,-15,0,0),0.6,0, stiff.LOW_HEAD_STIFFNESSES),
+    # return to normal position
+    ((60., 35., 0.,0.),
+     (0.0,  0.0,  -22., 50., -30., 0.0),
+     (0.0,  0.0,  -21., 52., -30., 0.0),
+     (60., -35, 0., 0.),
+     .37,0, stiff.LOW_HEAD_STIFFNESSES)
     )
 
 SHORT_QUICK_RIGHT_KICK = mirrorMove(SHORT_QUICK_LEFT_KICK)

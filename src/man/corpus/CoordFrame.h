@@ -35,13 +35,13 @@ namespace CoordFrame3D{
 
     // -------------------- Helper matrix methods --------------------
     const NBMath::ufmatrix3 rotation3D(const Axis axis,
-                                              const float angle);
+				       const float angle);
 
     const NBMath::ufmatrix3 translation3D(const float dx,
-                                                 const float dy);
+					  const float dy);
 
     const NBMath::ufvector3 vector3D(const float x, const float y,
-                                            const float z = 1.0f);
+				     const float z = 1.0f);
 
     const NBMath::ufrowVector3 rowVector3D(const float x,
                                            const float y,

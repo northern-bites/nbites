@@ -43,10 +43,10 @@ public:
     FifoBuffer(int maxCount = 0);
     ~FifoBuffer();
 
-	// we have to define our own copy and assignment to make sure the ring gets copied
-	// effect Construct a FIFO that is identical to other
+    // we have to define our own copy and assignment to make sure the ring gets copied
+    // effect Construct a FIFO that is identical to other
     FifoBuffer(const FifoBuffer& other);
-	// effect make this FIFO a copy of other
+    // effect make this FIFO a copy of other
     FifoBuffer& operator= (const FifoBuffer& other);
 
     // effect   Get/set maximum number of items. Setting clears the FIFO.
@@ -95,7 +95,7 @@ public:
     FifoBuffer& operator>> (T& x) { x = Read(); return *this;}
 
     // returns  True if there have been any errors since construction
-    bool Error() const { return overflows > 0 | underflows > 0;}
+    bool Error() const { return (overflows > 0) | (underflows > 0);}
 
     // returns  Number of underflows/overflows since construction
     int Overflows () const { return overflows; }
@@ -137,34 +137,36 @@ FifoBuffer<T>::~FifoBuffer()
 //       constructor is a class member function (access is by class, not by obj)
 template <class T>
 FifoBuffer<T>::FifoBuffer(const FifoBuffer& other) :
-	ringSize(other.ringSize),
-	readIndex(other.readIndex),
-	writeIndex(other.writeIndex),
-	count(other.count),
-	nullValue(other.nullValue),
-	overflows(other.overflows),
-	underflows(other.underflows)
+    ringSize(other.ringSize),
+    readIndex(other.readIndex),
+    writeIndex(other.writeIndex),
+    count(other.count),
+    nullValue(other.nullValue),
+    overflows(other.overflows),
+    underflows(other.underflows)
 {
-	ring = new T[ringSize];
-	for (int i = 0; i < ringSize; ++i)
-		ring[i] = other.ring[i];
+    ring = new T[ringSize];
+    for (int i = 0; i < ringSize; ++i)
+	ring[i] = other.ring[i];
 }
 
 template <class T>
 FifoBuffer<T>& FifoBuffer<T>::operator= (const FifoBuffer& other)
 {
-	ringSize = other.ringSize;
-	readIndex = other.readIndex;
-	writeIndex = other.writeIndex;
-	count = other.count;
-	nullValue = other.nullValue;
-	overflows = other.overflows;
-	underflows = other.underflows;
+    ringSize = other.ringSize;
+    readIndex = other.readIndex;
+    writeIndex = other.writeIndex;
+    count = other.count;
+    nullValue = other.nullValue;
+    overflows = other.overflows;
+    underflows = other.underflows;
 
-	delete [] ring;
-	ring = new T[ringSize];
-	for (int i = 0; i < ringSize; ++i)
-		ring[i] = other.ring[i];
+    delete [] ring;
+    ring = new T[ringSize];
+    for (int i = 0; i < ringSize; ++i)
+	ring[i] = other.ring[i];
+
+    return *this;
 }
 
 template <class T>
@@ -753,9 +755,9 @@ public:
     // effect   Clear the histogram
     void Reset();
 
-	const int NumberOfBins() const { return numBins; }
-	const int binCount(int index) const;
-	const double binMidPoint(int index) const;
+    const int NumberOfBins() const { return numBins; }
+    const int binCount(int index) const;
+    const double binMidPoint(int index) const;
 
     // effect   Print the histogram, using the specified format string for
     //           printing signal values

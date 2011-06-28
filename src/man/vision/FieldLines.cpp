@@ -365,7 +365,7 @@ void FieldLines::findVerticalLinePoints(vector <linePoint> &points)
                     }
                 } // end isGreenWhiteEdge
 
-                else if (isSecondUphillButInvalid(x, greenWhiteY, y, x,
+                else if (isSecondUphillButInvalid(x, greenWhiteY, x, y,
                                                   VERTICAL)) {
                     resetLineCounters(numWhite, numUndefined, numNonWhite);
                     greenWhiteY = NO_EDGE;
@@ -475,7 +475,7 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
         // starting edge value
         for (int x = 1; x < IMAGE_WIDTH - 1; x++) {
             const int current_y_value = vision->thresh->getY(x,y);
-            const unsigned thresholdedColor = vision->thresh->getThresholded(y,x);
+            const unsigned char thresholdedColor = vision->thresh->getThresholded(y,x);
 
             const bool isAtAnUphillEdge = isUphillEdge(current_y_value,
                                                        last_y_value,
@@ -2129,6 +2129,10 @@ list< VisualCorner > FieldLines::intersectLines()
 			}
             ++numChecksPassed;
 
+			if (tooMuchWhitePastEndpoint(line1Closest, line2Closest,
+										 intersection)) {
+			}
+
             // Duplicate corner check:  ensure that corner is not too close to
             // any previously found corners
             if (dupeCorner(corners, intersection, numChecksPassed)) {
@@ -2859,6 +2863,27 @@ FieldLines::tooMuchGreenEndpointToCorner(const point<int>& line1Closer,
     return false;
 }
 
+/* Try and ensure that we don't misclassify T corners as CCs
+ */
+const bool FieldLines::tooMuchWhitePastEndpoint(const point<int>& line1Closer,
+												const point<int>& line2Closer,
+												const point<int>& intersection) const
+{
+	/*float dist1 = getEstimatedDistance(line1Closer, intersection);
+	float dist2 = getEstimatedDistance(line2Closer, intersection);
+	cout << "Distances " << dist1 << " " << dist2 << endl;
+	// we have endpoints - how far away are they?  Is there potential for
+	// danger?
+	int xoffset = intersection.x - line1Closer.x;
+	int yoffset = intersection.y - line1Closer.y;
+	point<int> newpoint;
+	newpoint.x = intersection.x - 2 * xoffset;
+	newpoint.y = intersection.y - 2 * yoffset;
+	vision->drawPoint(newpoint.x, newpoint.y, MAROON);*/
+	return false;
+}
+
+
 // Checks if a corner is too dangerous when it is near the edge of the screen
 const bool FieldLines::dangerousEdgeCorner(const VisualCorner& corner,
                                            const point<int>& intersection)
@@ -3075,7 +3100,7 @@ const bool FieldLines::isReasonableVerticalWidth(const int x, const int y,
     // These are based on 640x480 images
     // See https://robocup.bowdoin.edu/files/nao/NaoLineWidthData.xls
     if (distance < 100)
-        return width < 65;
+        return width < 65 && width > 5;
     else if (distance < 150)
         return width < 40;
     else if (distance < 200)
@@ -3100,6 +3125,9 @@ const bool FieldLines::isReasonableHorizontalWidth(const int x, const int y,
     if (width < 0) {
         return false;
     }
+	if (distance < 100 && width < 6) {
+		return false;
+	}
     if (distance <= 0) {
         if (debugHorEdgeDetect) {
             point<int> badP(x,y);
@@ -3370,7 +3398,7 @@ const bool FieldLines::isGreenWhiteEdge(int x, int y,
     if (print && !enoughGreen)
         cout << "\t\tisGreenWhiteEdge(): Green before failed. Found "
              << greenPercent << "%, expected " << GREEN_PERCENT_CLEARANCE
-             << "%" << endl;
+             << "% at: " << x << " " << y << endl;
     return enoughGreen;
 }
 
@@ -3984,6 +4012,7 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
             return true;
         }
     }
+	// let's check this a bit more directly
 	return false;
 }
 
@@ -4398,7 +4427,7 @@ void FieldLines::drawLinePoint(const linePoint &p, const int color) const
     vision->drawPoint(p.x, p.y, color);
 }
 
-void FieldLines::updateLineCounters(const int threshColor, int &numWhite,
+void FieldLines::updateLineCounters(const unsigned char threshColor, int &numWhite,
                                     int &numUndefined, int &numNonWhite)
 {
     if (Utility::isWhite(threshColor)) {

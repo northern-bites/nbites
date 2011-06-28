@@ -42,11 +42,12 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
       stepGenerator(sensors, pose, &metaGait),
       pendingCommands(false),
       pendingStepCommands(false),
+      pendingDestCommands(false),
       pendingGaitCommands(false),
       pendingStartGaitCommands(false),
-      nextCommand(NULL)
+      nextCommand()
 {
-    pthread_mutex_init(&walk_provider_mutex,NULL);
+    pthread_mutex_init(&walk_provider_mutex, NULL);
 
     setActive();
 }
@@ -56,13 +57,13 @@ WalkProvider::~WalkProvider() {
 }
 
 void WalkProvider::requestStopFirstInstance() {
-    setCommand(new WalkCommand(0.0f, 0.0f, 0.0f));
+    setCommand(WalkCommand::ptr( new WalkCommand(0.0f, 0.0f, 0.0f) ));
 }
 
 void WalkProvider::hardReset(){
     pthread_mutex_lock(&walk_provider_mutex);
     stepGenerator.resetHard();
-    pendingCommands = pendingStepCommands =false;
+    pendingCommands = pendingStepCommands = pendingDestCommands = false;
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);
 }
@@ -92,7 +93,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
                                nextCommand->theta_rads);
     }
     pendingCommands = false;
-    nextCommand = NULL;
+    nextCommand = WalkCommand::ptr();
 
     if(pendingStepCommands){
         stepGenerator.takeSteps(nextStepCommand->x_mms,
@@ -102,12 +103,25 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     }
     pendingStepCommands=false;
 
+    if (pendingDestCommands) {
+        int framesToDest = stepGenerator.setDestination(nextDestCommand->x_mm,
+							nextDestCommand->y_mm,
+							nextDestCommand->theta_rads,
+							nextDestCommand->gain);
+	nextDestCommand->framesRemaining(framesToDest);
+    }
+    pendingDestCommands = false;
+
     //Also need to process stepCommands here
 
     if(!isActive()){
         cout << "WARNING, I wouldn't be calling the Walkprovider while"
             " it thinks its DONE if I were you!" <<endl;
     }
+
+    // advance the in-progress DestinationCommand
+    if (nextDestCommand)
+	nextDestCommand->tick();
 
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
@@ -150,25 +164,36 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     PROF_EXIT(profiler,P_WALK);
 }
 
-void WalkProvider::setCommand(const WalkCommand * command){
+void WalkProvider::setCommand(const WalkCommand::ptr command){
     //grab the velocities in mm/second rad/second from WalkCommand
     pthread_mutex_lock(&walk_provider_mutex);
-    delete nextCommand;
+
     nextCommand = command;
     pendingCommands = true;
+    setActive();
 
+    pthread_mutex_unlock(&walk_provider_mutex);
+}
+
+void WalkProvider::setCommand(const DestinationCommand::ptr command){
+    pthread_mutex_lock(&walk_provider_mutex);
+    // mark the old command as finished, for Python
+    if (nextDestCommand)
+	nextDestCommand->finishedExecuting();
+
+    nextDestCommand = command;
+    pendingDestCommands = true;
     setActive();
     pthread_mutex_unlock(&walk_provider_mutex);
 }
 
-
-void WalkProvider::setCommand(const boost::shared_ptr<Gait> command){
+void WalkProvider::setCommand(const Gait::ptr command){
     pthread_mutex_lock(&walk_provider_mutex);
     nextGait = Gait(*command);
     pendingGaitCommands = true;
     pthread_mutex_unlock(&walk_provider_mutex);
 }
-void WalkProvider::setCommand(const boost::shared_ptr<StepCommand> command){
+void WalkProvider::setCommand(const StepCommand::ptr command){
     pthread_mutex_lock(&walk_provider_mutex);
     nextStepCommand = command;
     pendingStepCommands = true;
@@ -177,14 +202,15 @@ void WalkProvider::setCommand(const boost::shared_ptr<StepCommand> command){
 }
 void WalkProvider::setActive(){
     //check to see if the walk engine is active
-    if(stepGenerator.isDone() && !pendingCommands && !pendingStepCommands){
+    if(stepGenerator.isDone() && !pendingCommands && !pendingStepCommands
+	   && !pendingDestCommands){
         inactive();
     }else{
         active();
     }
 }
 
-std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
+std::vector<BodyJointCommand::ptr> WalkProvider::getGaitTransitionCommand(){
     pthread_mutex_lock(&walk_provider_mutex);
     vector<float> curJoints = sensors->getMotionBodyAngles();
     vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
@@ -203,7 +229,7 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     const float  MAX_RAD_PER_SEC =  M_PI_FLOAT*0.3f;
     float time = max_change/MAX_RAD_PER_SEC;
 
-    vector<BodyJointCommand *> commands;
+    vector<BodyJointCommand::ptr> commands;
 
     if(time <= MOTION_FRAME_LENGTH_S){
         return commands;
@@ -225,13 +251,17 @@ std::vector<BodyJointCommand *> WalkProvider::getGaitTransitionCommand(){
     vector<float> * stiffness2 = new vector<float>(Kinematics::NUM_JOINTS,
                                                    0.85f);
 
-    commands.push_back(new BodyJointCommand(0.5f,safe_larm,NULL,NULL,safe_rarm,
-                                            stiffness,
-                                            Kinematics::INTERPOLATION_SMOOTH));
+    commands.push_back(BodyJointCommand::ptr (
+			   new BodyJointCommand(0.5f,safe_larm,NULL,NULL,safe_rarm,
+						stiffness,
+						Kinematics::INTERPOLATION_SMOOTH)
+			   ) );
 
-    commands.push_back(new BodyJointCommand(time,gaitJoints,
-                                            stiffness2,
-                                            Kinematics::INTERPOLATION_SMOOTH));
+    commands.push_back(BodyJointCommand::ptr (
+			   new BodyJointCommand(time,gaitJoints,
+						stiffness2,
+						Kinematics::INTERPOLATION_SMOOTH)
+			   )  );
     pthread_mutex_unlock(&walk_provider_mutex);
     return commands;
 }

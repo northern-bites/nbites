@@ -60,10 +60,10 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       //       buttonClicks(0),
       lastInertial(sensors->getInertial()), fallingFrames(0),
       notFallingFrames(0),fallenCounter(0),
-	  groundOnCounter(0),groundOffCounter(0),
+      groundOnCounter(0),groundOffCounter(0),
       registeredFalling(false),registeredShutdown(false),
-	  wifiReconnectTimeout(0),
-	  falling(false),fallen(false),feetOnGround(true),
+      wifiReconnectTimeout(0),
+      falling(false),fallen(false),feetOnGround(true),
       useFallProtection(false),
       lastHeatAudioWarning(0), lastHeatPrintWarning(0),
       wifiAngel()
@@ -90,7 +90,7 @@ void RoboGuardian::run(){
         countButtonPushes();
         checkFalling();
         checkFallen();
-		checkFeetOnGround();
+	checkFeetOnGround();
         checkBatteryLevels();
         checkTemperatures();
         processFallingProtection();
@@ -134,7 +134,7 @@ bool isFalling(float angle_pos, float angle_vel) {
     if (angle_pos >= FALLING_ANGLE_THRESH) {
 	//cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos
 	//     << ", angle_vel == " << angle_vel << endl;
-            return true;
+	return true;
     } else {
         if(angle_vel > FALL_SPEED_THRESH)
             return true;
@@ -155,7 +155,7 @@ void RoboGuardian::checkFallen() {
         std::abs(inertial.angleX) > FALLEN_ANGLE_THRESH ||
         std::abs(inertial.angleY) > FALLEN_ANGLE_THRESH;
 
-	//cout << inertial.angleX << " " <<  inertial.angleY << endl;
+    //cout << inertial.angleX << " " <<  inertial.angleY << endl;
 
     if(fallen_now)
         fallenCounter +=1;
@@ -164,11 +164,11 @@ void RoboGuardian::checkFallen() {
 
     static const int FALLEN_FRAMES_THRESH  = 2;
 
-	fallen = fallenCounter > FALLEN_FRAMES_THRESH;
+    fallen = fallenCounter > FALLEN_FRAMES_THRESH;
 
 #ifdef DEBUG_GUARDIAN_FALLING
-		if (fallen)
-			cout << "Robot has fallen" <<endl;
+    if (fallen)
+	cout << "Robot has fallen" <<endl;
 #endif
 }
 
@@ -183,45 +183,53 @@ void RoboGuardian::checkFallen() {
  *
  */
 void RoboGuardian::checkFeetOnGround() {
-//this can be higher than the falling thresholds since stopping the walk
-//engine is less critical
-	static const int GROUND_FRAMES_THRESH = 10;
-// lower than this, the robot is off the ground
-	static const float onGroundFSRThresh = 1.0f;
+    //this can be higher than the falling thresholds since stopping the walk
+    //engine is less critical
+    static const int GROUND_FRAMES_THRESH = 10;
+    // lower pthan this, the robot is off the ground
+    static const float onGroundFSRThresh = 1.0f;
 
-	const FSR left = sensors->getLeftFootFSR();
-	const float leftSum = left.frontLeft + left.frontRight + left.rearLeft +
-		left.rearRight;
-	const FSR right = sensors->getRightFootFSR();
-	const float rightSum = right.frontLeft + right.frontRight + right.rearLeft +
-		right.rearRight;
+    /* If the FSRs are broken, we don't want to accidentally assume that we're
+       off the ground (ruins SweetMoves, walking, etc) so this method will stop
+       early and feetOnGround will always be true */
+    if (sensors->percentBrokenFSR() > 0) {
+	feetOnGround = true;
+	return;
+    }
 
-	//printf("left: %f, right: %f, total: %f\n", leftSum, rightSum, (leftSum + rightSum));
+    const FSR left = sensors->getLeftFootFSR();
+    const float leftSum = left.frontLeft + left.frontRight + left.rearLeft +
+	left.rearRight;
+    const FSR right = sensors->getRightFootFSR();
+    const float rightSum = right.frontLeft + right.frontRight + right.rearLeft +
+	right.rearRight;
 
-	// buffer the transition in both directions
-	if (feetOnGround) {
-		if (leftSum + rightSum < onGroundFSRThresh) {
-			groundOffCounter++;
-		} else {
-			groundOffCounter = 0;
-		}
+    //printf("left: %f, right: %f, total: %f\n", leftSum, rightSum, (leftSum + rightSum));
+
+    // buffer the transition in both directions
+    if (feetOnGround) {
+	if (leftSum + rightSum < onGroundFSRThresh) {
+	    groundOffCounter++;
+	} else {
+	    groundOffCounter = 0;
+	}
+    }
+    else {
+	if (leftSum + rightSum > onGroundFSRThresh) {
+	    groundOnCounter++;
 	}
 	else {
-		if (leftSum + rightSum > onGroundFSRThresh) {
-			groundOnCounter++;
-		}
-		else {
-			groundOnCounter = 0;
-		}
+	    groundOnCounter = 0;
 	}
+    }
 
-	if (groundOffCounter > GROUND_FRAMES_THRESH) {
-		feetOnGround = false;
-		groundOnCounter = groundOffCounter = 0;
-	} else if (groundOnCounter > GROUND_FRAMES_THRESH) {
-		feetOnGround = true;
-		groundOnCounter = groundOffCounter = 0;
-	}
+    if (groundOffCounter > GROUND_FRAMES_THRESH) {
+	feetOnGround = false;
+	groundOnCounter = groundOffCounter = 0;
+    } else if (groundOnCounter > GROUND_FRAMES_THRESH) {
+	feetOnGround = true;
+	groundOnCounter = groundOffCounter = 0;
+    }
 }
 
 /**
@@ -265,12 +273,12 @@ void RoboGuardian::checkFalling(){
     }
 
     /*
-    if(angleMag >= FALLING_ANGLE_THRESH) {
-         cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
-              << "  fallingFrames is " << fallingFrames
-	      << " notFallingFrames is " << notFallingFrames
-              << " and critical angle is "<< falling_critical_angle<< endl;
-    }
+      if(angleMag >= FALLING_ANGLE_THRESH) {
+      cout << "angleSpeed "<<angleSpeed << " and angleMag "<<angleMag<<endl
+      << "  fallingFrames is " << fallingFrames
+      << " notFallingFrames is " << notFallingFrames
+      << " and critical angle is "<< falling_critical_angle<< endl;
+      }
     */
 
     //If the robot has been falling for a while, and the robot is inclined

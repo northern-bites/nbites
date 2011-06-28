@@ -9,6 +9,13 @@ BACKWARDS_GAIT_THRESH = -0.2
 SPIN_GAIT_THRESH = 0.2
 
 
+def setDestination(nav, x, y, theta, gain):
+    """
+    Calls setDestination within the motion engine
+    """
+    nav.currentCommand = motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
+    nav.brain.motion.sendDestCommand(nav.currentCommand)
+
 def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
