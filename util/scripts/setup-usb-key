@@ -30,6 +30,5 @@ cp $LIB_DIR/nao/libprotobuf.so $ROOT_PART/usr/lib/
 # Change hostname
 echo $HOSTNAME > $ROOT_PART/etc/hostname
 
-# Add aliases to /etc/profile
-cp  $ROOT_PART/etc/profile $ROOT_PART/etc/profile.dist
-cat $CONFIG_DIR/profile >> $ROOT_PART/etc/profile
+# Set up init
+cp  -r $CONFIG_DIR/etc $ROOT_PART/
