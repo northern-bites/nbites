@@ -101,9 +101,6 @@ def trackLoc(tracker):
         tracker.brain.motion.stopHeadMoves()
 
     # ** # debugging
-    print "my loc:",tracker.brain.my.x,tracker.brain.my.y,tracker.brain.my.h
-
-    # ** # debugging
     if isinstance(tracker.target, FieldCorner):
         print "target is corner:",tracker.target.visionId
     elif isinstance(tracker.target, FieldObject):
@@ -143,9 +140,6 @@ def stareLoc(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
-    # ** # debugging
-    print "my loc:",tracker.brain.my.x,tracker.brain.my.y,tracker.brain.my.h
-
     if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
         ###print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
         print "Past stare thresh, switching to new target"
@@ -184,7 +178,7 @@ def trackingBall(tracker):
         tracker.helper.lookToTargetCoords(tracker.brain.ball)
 
     # If we haven't seen the ball in some time, switch to panning
-    if tracker.brain.ball.framesOff > constants.TRACKER_BALL_STARE_THRESH*3/4:
+    if tracker.brain.ball.framesOff > constants.TRACKER_BALL_STARE_THRESH/2:
         print "lost ball for some time, panning"
         return tracker.goLater('scanBall')
 

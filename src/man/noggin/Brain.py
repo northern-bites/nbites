@@ -224,8 +224,10 @@ class Brain(object):
             Constants.LANDMARK_CENTER_LEFT_T)
         self.centerRightT.associateWithRelativeLandmark(
             Constants.LANDMARK_CENTER_RIGHT_T)
-        # ** #self.centerLeftCross
-        # ** #self.centerRightCross
+        self.centerLeftCross.associateWithRelativeLandmark(
+            Constants.LANDMARK_CENTER_LEFT_CROSS)
+        self.centerRightCross.associateWithRelativeLandmark(
+            Constants.LANDMARK_CENTER_RIGHT_CROSS)
         self.oppHalfLeftCorner.associateWithRelativeLandmark(
             Constants.LANDMARK_OPP_CORNER_LEFT_L)
         self.oppHalfRightCorner.associateWithRelativeLandmark(

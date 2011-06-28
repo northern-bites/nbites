@@ -34,7 +34,7 @@ class HeadTracking(FSA.FSA):
         self.activePanOut = False # ** # deprecated?
         self.activePanUp = False # ** # deprecated?
         # Enable safeBallTracking to always keep ball in frame while tracking
-        self.safeBallTracking = True
+        self.safeBallTracking = False
         self.isPreKickScanning = False # ** # deprecated?
         self.preActivePanHeads = None # ** # deprecated? should probably stay
         self.locObjectList = []
@@ -69,13 +69,13 @@ class HeadTracking(FSA.FSA):
         self.switchTo('doHeadMove')
 
 # ** # old method (main input method) - deprecated
-#    def trackBall(self):
-#        """automatically tracks the ball. scans for the ball if not in view"""
-#        self.target = self.brain.ball
-#        self.gain = 1.0
-#        if ( (not self.currentState == 'tracking')
-#            and (not self.currentState == 'scanBall') ):
-#            self.switchTo('ballTracking')
+    def trackBall(self):
+        """automatically tracks the ball. scans for the ball if not in view"""
+        self.target = self.brain.ball
+        self.gain = 1.0
+        if ( (not self.currentState == 'tracking')
+            and (not self.currentState == 'scanBall') ):
+            self.switchTo('ballTracking')
 
 # ** # old method (main input method) - deprecated
     def trackBallSpin(self):
@@ -219,19 +219,19 @@ class HeadTracking(FSA.FSA):
         self.switchTo('trackLandmarks')
 
 # ** # new method
-    def trackBall(self):
-        """
-        Should be called by chaser.
-        The robot will switch between looking at the ball and
-        periodically looking at nearby landmarks. Landmark fitness
-        is determined by angular change from the ball to minimize
-        time between targets.
-        If safeBallTracking is True, robot will not lose sight of
-        ball while checking landmarks.
-        """
-        self.target = self.brain.ball
-        self.decisionState = 'trackingBallLoc'
-        self.switchTo('trackingBall')
+#    def trackBall(self):
+#        """
+#        Should be called by chaser.
+#        The robot will switch between looking at the ball and
+#        periodically looking at nearby landmarks. Landmark fitness
+#        is determined by angular change from the ball to minimize
+#        time between targets.
+#        If safeBallTracking is True, robot will not lose sight of
+#        ball while checking landmarks.
+#        """
+#        self.target = self.brain.ball
+#        self.decisionState = 'trackingBallLoc'
+#        self.switchTo('trackingBall')
 
 # ** # new method
     def passiveLoc(self):

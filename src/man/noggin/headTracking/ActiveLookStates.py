@@ -93,7 +93,7 @@ def trackLandmarks(tracker):
         tracker.helper.updateGeneralTrackingFitness(obj)
     # Sort list of locObjects
     newlist = sorted(tracker.locObjectList)
-
+    """
     if not newlist == tracker.locObjectList:
         #Landmarks have changed fitness ranking. Track most fit.
         tracker.locObjectList = newlist
@@ -117,6 +117,10 @@ def trackLandmarks(tracker):
         tracker.target = tracker.locObjectList[0]
 
     print "going to: track target"# ** #debugging
+    """
+    # ** # temp code debugging
+    tracker.locObjectList = newlist
+    tracker.target = tracker.locObjectList[0]
 
     # Track target
     return tracker.goLater('trackLoc')
