@@ -42,7 +42,7 @@ Motion::Motion (shared_ptr<Synchro> _synchro,
 }
 
 Motion::~Motion() {
-    enactor->setSwitchboard(NULL);
+    //enactor->setSwitchboard(NULL);
 }
 int Motion::start() {
     switchboard.start();
