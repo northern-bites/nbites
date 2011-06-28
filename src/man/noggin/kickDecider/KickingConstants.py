@@ -28,11 +28,11 @@ LEFT_CLEAR_POINT = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
 RIGHT_CLEAR_POINT = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
                              NogginConstants.OPP_GOALBOX_BOTTOM_Y)
 
-SHOOT_AT_LEFT_AIM_POINT = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
+SHOOT_LEFT_AIM_POINT = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
                                    NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y -
                                    SHOOT_Y_OFFSET)
 
-SHOOT_AT_RIGHT_AIM_POINT = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
+SHOOT_RIGHT_AIM_POINT = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
                                     NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y +
                                     SHOOT_Y_OFFSET)
 
@@ -63,3 +63,5 @@ KICK_SIDE_DIST_THRESH = NogginConstants.GOAL_WIDTH
 
 #Constants to help decide back kick
 CLEAR_POST_DIST_DIFF = .2*NogginConstants.GOAL_WIDTH
+
+BALL_NEAR_LINE_THRESH = 25.

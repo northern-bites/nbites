@@ -1,173 +1,118 @@
 import KickingConstants as constants
 from .. import NogginConstants
+from ..typeDefs.Location import Location
+"""
+Rewritten by Wils Dawson (6/28/11)
+"""
+
 
 class KickInformation:
     """
     Class to hold all the things we need to decide a kick
     """
-    def __init__(self, decider, brain):
-        self.decider = decider
+    def __init__(self, brain):
         self.brain = brain
 
-        self.oppGoalLeftPostBearings = []
-        self.oppGoalRightPostBearings = []
-        self.myGoalLeftPostBearings = []
-        self.myGoalRightPostBearings = []
-
-        self.oppGoalLeftPostDists = []
-        self.oppGoalRightPostDists = []
-        self.myGoalLeftPostDists = []
-        self.myGoalRightPostDists = []
-
-        self.oppLeftPostBearing = None
-        self.oppRightPostBearing = None
-        self.oppAvgPostBearing = None
-        self.myLeftPostBearing = None
-        self.myRightPostBearing = None
-        self.myAvgPostBearing = None
-
-        self.oppLeftPostDist = 0.0
-        self.oppRightPostDist = 0.0
-        self.oppAvgPostDist = 0.0
-        self.myLeftPostDist = 0.0
-        self.myRightPostDist = 0.0
-        self.myAvgPostDist = 0.0
-
-        self.sawOwnGoal = False
-        self.sawOppGoal = False
-
-        self.haveData = False
-
+        self.kickPossibilities = {"scoringKick"   : None,
+                                  "passingKick"   : None,
+                                  "clearingKick"  : None,
+                                 # "AdvancingKick" : None,
+                                 # "CrossingKick"  : None,
+                                  "PassBackKick"  : None }
+        self.passingTeammate = None     # Teammate to pass to.
         self.kickObjective = None
         self.kick = None
-        self.kickDest = None
-        self.destDist = 500.
+        self.kickDest = None # put in kick
+        self.destDist = 0.0       # put in kick
+        self.orbitAngle = 0.0      # put in kick
 
-        self.orbitAngle = 0.0
+    def canScoreAll(self):
+        return (self.brain.ball.distTo(self.brain.oppGoalRightPost) <
+                constants.SHORT_RANGE_KICK_DIST and
+                self.brain.ball.distTo(self.brain.oppGoalLeftPost) <
+                constants.SHORT_RANGE_KICK_DIST) # and open field
 
-    def getKickObjective(self):
+    def canScoreSome(self):
+        return (self.brain.ball.distTo(self.brain.oppGoalRightPost) <
+                constants.LONG_RANGE_KICK_DIST or
+                self.brain.ball.distTo(self.brain.oppGoalLeftPost) <
+                constants.LONG_RANGE_KICK_DIST) # and open field.
+
+    def openTeammateCanScore(self):
+        # determine out of which teammates are open and in front of us,
+        # if there is one that can score. Set it to PassingTeammate.
+        teammates = self.openForwardTeammates()
+        bestMate = None
+        minDist = NogginConstants.FIELD_WIDTH
+        for mate in teammates:
+            if (mate.distTo(self.brain.oppGoalRightPost) <
+                constants.LONG_RANGE_KICK_DIST or
+                mate.distTo(self.brain.oppGoalLeftPost) <
+                constants.LONG_RANGE_KICK_DIST):
+                # minimize on longest distance to select mate with
+                # most scoring options.
+                longest = max(mate.distTo(self.brain.oppGoalRightPost),
+                              mate.distTo(self.brain.oppGoalLeftPost))
+                if longest < minDist:
+                    minDist = longest
+                    bestMate = mate
+        if bestMate != None:
+            self.passingTeammate = bestMate
+            return True
+        return False
+
+    def openTeammate(self):
+        # determine out of which teammates are open and in front of us, is best.
+        teammates = self.openForwardTeammates()
+        bestMate = None
+        minDist = NogginConstants.FIELD_WIDTH
+        for mate in teammates:
+            if mate.distTo(constants.CENTER_BALL_POINT) < minDist:
+                minDist = mate.distTo(constants.CENTER_BALL_POINT)
+                bestMate = mate
+        if bestMate != None:
+            self.passingTeammate = bestMate
+            return True
+        return False
+
+    def canClear(self):
         """
-        Return a kick objective based on what we've observed
+        use instead of advance and cross. simpler. let chooseClearingKick do the work
         """
-        self.calculateDataAverages()
+        # don't use open field for now (6/28/11)
+        return True
 
-        if self.sawOppGoal:
-            self.kickObjective = constants.OBJECTIVE_SHOOT
-            return self.kickObjective
-        else:
-            self.kickObjective = constants.OBJECTIVE_CLEAR
-            return self.kickObjective
-
-    def collectData(self):
+    def canAdvance(self):
         """
-        Collect info on any observed goals
+        Make sure the possibility of kicking out of bounds is small
+        and that there is open field in front of us.
         """
-        self.haveData = True
+        # don't use open field for now (6/28/11)
+        return (self.brain.ball.x < NogginConstants.LANDMARK_OPP_FIELD_CROSS[0] and
+                self.brain.ball.y < (NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y -
+                                     constants.BALL_NEAR_LINE_THRESH) and
+                self.brain.ball.y > (NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
+                                     constants.BALL_NEAR_LINE_THRESH))
 
-        if self.brain.myGoalLeftPost.on:
-            if self.brain.myGoalLeftPost.certainty == NogginConstants.SURE:
-                self.sawOwnGoal = True
-                self.myGoalLeftPostBearings.append(self.brain.myGoalLeftPost.visBearing)
-                self.myGoalLeftPostDists.append(self.brain.myGoalLeftPost.visDist)
-
-        if self.brain.myGoalRightPost.on:
-            if self.brain.myGoalRightPost.certainty == NogginConstants.SURE:
-                self.sawOwnGoal = True
-                self.myGoalRightPostBearings.append(self.brain.myGoalRightPost.visBearing)
-                self.myGoalRightPostDists.append(self.brain.myGoalRightPost.visDist)
-
-        if self.brain.oppGoalLeftPost.on:
-            if self.brain.oppGoalLeftPost.certainty == NogginConstants.SURE:
-                self.sawOppGoal = True
-                self.oppGoalLeftPostBearings.append(self.brain.oppGoalLeftPost.visBearing)
-                self.oppGoalLeftPostDists.append(self.brain.oppGoalLeftPost.visDist)
-
-        if self.brain.oppGoalRightPost.on:
-            if self.brain.oppGoalRightPost.certainty == NogginConstants.SURE:
-                self.sawOppGoal = True
-                self.oppGoalRightPostBearings.append(self.brain.oppGoalRightPost.visBearing)
-                self.oppGoalRightPostDists.append(self.brain.oppGoalRightPost.visDist)
-
-    def calculateDataAverages(self):
+    def canCross(self):
         """
-        calculates averages based on data collected
+        Make sure we can cross and there is open field for us to cross.
         """
-        if not self.haveData:
-            return
+        # don't use open field for now (6/28/11)
+        return True
 
-        # specific post bearings
-        if len(self.myGoalLeftPostBearings) > 0:
-            self.myLeftPostBearing = (sum(self.myGoalLeftPostBearings) /
-                                      len(self.myGoalLeftPostBearings))
-        if len(self.myGoalRightPostBearings) > 0:
-            self.myRightPostBearing = (sum(self.myGoalRightPostBearings) /
-                                       len(self.myGoalRightPostBearings))
-        if len(self.oppGoalLeftPostBearings) > 0:
-            self.oppLeftPostBearing = (sum(self.oppGoalLeftPostBearings) /
-                                       len(self.oppGoalLeftPostBearings))
-        if len(self.oppGoalRightPostBearings) > 0:
-            self.oppRightPostBearing = (sum(self.oppGoalRightPostBearings) /
-                                        len(self.oppGoalRightPostBearings))
-        # average post bearings
-        if self.myLeftPostBearing is not None and self.myRightPostBearing is not None:
-            self.myAvgPostBearing = (self.myLeftPostBearing + self.myRightPostBearing)*.5
-        elif self.myLeftPostBearing is not None:
-            self.myAvgPostBearing = self.myLeftPostBearing + 5. #somewhere in middle
-        elif self.myRightPostBearing is not None:
-            self.myAvgPostBearing = self.myRightPostBearing - 5. #somewhere in middle
-        if self.oppLeftPostBearing is not None and self.oppRightPostBearing is not None:
-            self.oppAvgPostBearing = (self.oppLeftPostBearing + self.oppRightPostBearing)*.5
-        elif self.oppLeftPostBearing is not None:
-            self.oppAvgPostBearing = self.oppLeftPostBearing + 5. #somewhere in middle
-        elif self.oppRightPostBearing is not None:
-            self.oppAvgPostBearing = self.oppRightPostBearing - 5. #somewhere in middle
+    def canPassBack(self):
+        # don't use this for now (6/28/11)
+        return False
 
-        # distance averages
-        if len(self.myGoalLeftPostDists) > 0:
-            self.myLeftPostDist = (sum(self.myGoalLeftPostDists) /
-                                   len(self.myGoalLeftPostDists))
-        if len(self.myGoalRightPostDists) > 0:
-            self.myRightPostDist = (sum(self.myGoalRightPostDists) /
-                                    len(self.myGoalRightPostDists))
-        if len(self.oppGoalLeftPostDists) > 0:
-            self.oppLeftPostDist = (sum(self.oppGoalLeftPostDists) /
-                                    len(self.oppGoalLeftPostDists))
-        if len(self.oppGoalRightPostDists) > 0:
-            self.oppRightPostDist = (sum(self.oppGoalRightPostDists) /
-                                     len(self.oppGoalRightPostDists))
-        # average post distances
-        if self.myLeftPostBearing is not None and self.myRightPostBearing is not None:
-            self.myAvgPostDist = (self.myLeftPostDist + self.myRightPostDist)*.5
-        elif self.myLeftPostBearing is not None:
-            self.myAvgPostDist = self.myLeftPostDist
-        elif self.myRightPostBearing is not None:
-            self.myAvgPostDist = self.myRightPostDist
-        if self.oppLeftPostBearing is not None and self.oppRightPostBearing is not None:
-            self.oppAvgPostDist = (self.oppLeftPostDist + self.oppRightPostDist)*.5
-        elif self.oppLeftPostBearing is not None:
-            self.oppAvgPostDist = self.oppLeftPostDist
-        elif self.oppRightPostBearing is not None:
-            self.oppAvgPostDist = self.oppRightPostDist
-
-
-    def __str__(self):
-        s = ""
-        if self.myLeftPostBearing is not None:
-            s += ("My left post bearing is: " + str(self.myLeftPostBearing) +
-                  " dist is: " + str(self.myLeftPostDist) + "\n")
-        if self.myRightPostBearing is not None:
-            s += ("My right post bearing is: " + str(self.myRightPostBearing) +
-                  " dist is: " + str(self.myRightPostDist) +  "\n")
-        if self.oppLeftPostBearing is not None:
-            s += ("Opp left post bearing is: " + str(self.oppLeftPostBearing) +
-                  " dist is: " + str(self.oppLeftPostDist) + "\n")
-        if self.oppRightPostBearing is not None:
-            s += ("Opp right post bearing is: " + str(self.oppRightPostBearing)
-                  + " dist is: " + str(self.oppRightPostDist) +  "\n")
-        if s == "":
-            s = "No goal posts observed\n"
-        if self.kickObjective == constants.OBJECTIVE_SHOOT:
-            s += "Objective is: SHOOT\n"
-        if self.kickObjective == constants.OBJECTIVE_CLEAR:
-            s += "Objective is: CLEAR\n"
-        return s
+    def openForwardTeammates(self):
+        """
+        Returns a list of open teammates that are farther down the field than us.
+        """
+        # currently returns all teammates father down the field, since open field
+        # calculations are harder --Wils (6/28/11)
+        forwardMates = []
+        for mate in self.brain.teamMembers:
+            if mate.x > self.brain.my.x:
+                forwardMates.append(mate)
+        return forwardMates
