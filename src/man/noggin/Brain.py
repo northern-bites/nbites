@@ -14,6 +14,7 @@ from man import motion
 import vision
 #from man.corpus import leds
 import sensors
+import loggingBoard
 
 # Modules from this directory
 from . import GameController
@@ -56,6 +57,7 @@ class Brain(object):
         # Setup nao modules inside brain for easy access
         self.vision = vision.vision
         self.sensors = sensors.sensors
+        self.logger = loggingBoard.loggingBoard
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
         self.comm.gc.player = TeamConfig.PLAYER_NUMBER

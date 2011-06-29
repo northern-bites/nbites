@@ -20,6 +20,7 @@ ALSpeech::ALSpeech(AL::ALPtr<AL::ALBroker> broker) : Speech(), volume(0)
                   << std::endl;
     }
     volume = alProxy->getVolume();
+    setVolume(.95f);
 }
 
 ALSpeech::~ALSpeech()

@@ -30,13 +30,15 @@ class Memory; //forward declaration
 #include "MImage.h"
 #include "Sensors.h"
 #include "Profiler.h"
+#include "include/MultiProvider.h"
 
 namespace man {
 namespace memory {
 
 typedef google::protobuf::Message ProtoMessage;
 
-class Memory : public Subscriber<SensorsEvent> {
+class Memory : public Subscriber<SensorsEvent>,
+               public MultiProvider<MObject_ID> {
 
 public:
     typedef boost::shared_ptr<Memory> ptr;

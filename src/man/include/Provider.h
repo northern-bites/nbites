@@ -30,13 +30,15 @@ public:
     Provider(){
     }
 
-    virtual void addSubscriber(Subscriber<event_type>* s) {
+    virtual ~Provider(){}
+
+    virtual void inline addSubscriber(Subscriber<event_type>* s) {
         subscribers.push_back(s);
     }
 
 protected:
 
-    virtual void notifySubscribers(event_type event) const {
+    virtual void inline notifySubscribers(event_type event) const {
         for (subscriber_iter i = subscribers.begin();
                 i != subscribers.end(); i++) {
             (*i)->update(event);
