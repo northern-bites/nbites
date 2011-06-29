@@ -39,6 +39,10 @@
                                      (**i).getFieldY());                \
             possibilities.push_back(objectLandmark);                    \
         }                                                               \
+        if (sigma_b == 0.0 || sigma_d == 0.0){                          \
+            std::cout << "Zero standard deviation IS ZERO for obs: "    \
+                      << *this << std::endl;                            \
+        }                                                               \
     }
 
 
@@ -141,7 +145,14 @@ public:
     CornerObservation(const VisualCorner& _c) :
         Observation<CornerLandmark>(_c),
         visOrientation(_c.getPhysicalOrientation()),
-        sigma_o(_c.getPhysicalOrientationSD()) { }
+        sigma_o(_c.getPhysicalOrientationSD()) {
+
+        // Ensure that the sd is not zero (will cause errors later)
+        if (sigma_o == 0.0){
+            std::cout << "Zero standard deviation is ZERO for obs: "
+                      << *this << std::endl;
+        }
+    }
 
     virtual ~CornerObservation() { }
 
