@@ -2,7 +2,6 @@ import kicks
 import KickInformation
 import KickingConstants as constants
 from .. import NogginConstants
-from math import fabs
 
 class KickDecider(object):
     """
@@ -79,50 +78,34 @@ class KickDecider(object):
             return
 
         if self.info.canScoreAll():
+            self.score()
+        elif self.info.canScoreSome():
             self.chooseScoringKick()
-
-        else:
-            if self.info.canScoreSome():
-                self.chooseScoringKick()
-            if self.info.openTeammateCanScore():
-                self.chooseOneTimerKick()
-            elif self.info.openTeammate():
-                self.choosePassingKick()
-            if self.info.canClear():
-                self.chooseClearingKick()
-            if self.info.canPassBack():
-                self.choosePassBackKick()
+        if self.info.openTeammateCanScore():
+            self.chooseOneTimerKick()
+        elif self.info.openTeammate():
+            self.choosePassingKick()
+        if self.info.canClear():
+            self.chooseClearingKick()
+        if self.info.canPassBack():
+            self.choosePassBackKick()
 
         self.info.kick = self.chooseKick()
 
-    def chooseScoringKick(self):
+    def score(self):
         """
-        choose the best kick to score with
+        We are confident we can score with any kick.
         """
-        my = self.brain.my
-        ball = self.brain.ball
 
         # First we want to figure out which aim point is better.
         # For now just worry about which is faster to kick for,
         # Don't worry about open field yet (6/28/11)
 
-        # we get our relative heading to the ball based on a 0 heading to each
-        # of the aim points. We adjust these values to put them in a range from
-        # 0 to 45 degrees, with 45 being aligned just right with the ball to
-        # execute one of our kicks. We find out which one later, we just want
-        # to know where to shoot. This conversion lets us decide which aim point
-        # we are better lined up to shoot for easily (ie with a single compare)
-        rightKickHeading = fabs(((my.headingTo(ball) -
-                                  ball.headingTo(constants.SHOOT_RIGHT_AIM_POINT))
-                                 % 90) - 45)
-        leftKickHeading = fabs(((my.headingTo(ball) -
-                                 ball.headingTo(constants.SHOOT_LEFT_AIM_POINT))
-                                % 90) - 45)
-        if rightKickHeading >= leftKickHeading:
-            self.info.kickDest = constants.SHOOT_RIGHT_AIM_POINT
-        else:
-            self.info.kickDest = constants.SHOOT_LEFT_AIM_POINT
+        kickDest = self.info.bestAlignedDest([constants.SHOOT_RIGHT_AIM_POINT,
+                                              constants.SHOOT_LEFT_AIM_POINT])
 
+        # Next we want to find the best kick that will hit that point.
+        direction = self.info.bestAlignedKick()
 
 
         """

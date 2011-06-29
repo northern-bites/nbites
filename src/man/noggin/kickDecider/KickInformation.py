@@ -1,10 +1,10 @@
 import KickingConstants as constants
 from .. import NogginConstants
 from ..typeDefs.Location import Location
+from math import fabs
 """
 Rewritten by Wils Dawson (6/28/11)
 """
-
 
 class KickInformation:
     """
@@ -13,12 +13,13 @@ class KickInformation:
     def __init__(self, brain):
         self.brain = brain
 
-        self.kickPossibilities = {"scoringKick"   : None,
-                                  "passingKick"   : None,
-                                  "clearingKick"  : None,
-                                 # "AdvancingKick" : None,
-                                 # "CrossingKick"  : None,
-                                  "PassBackKick"  : None }
+        # Stores the kicks in a dictionary before setting the kick field.
+        self.kickChoices = {"scoringKick"   : None,
+                            "passingKick"   : None,
+                            "clearingKick"  : None,
+                            # "AdvancingKick" : None,
+                            # "CrossingKick"  : None,
+                            "PassBackKick"  : None, }
         self.passingTeammate = None     # Teammate to pass to.
         self.kickObjective = None
         self.kick = None
@@ -27,15 +28,15 @@ class KickInformation:
         self.orbitAngle = 0.0      # put in kick
 
     def canScoreAll(self):
-        return (self.brain.ball.distTo(self.brain.oppGoalRightPost) <
+        return (self.brain.ball.distTo(constants.SHOOT_LEFT_AIM_POINT) <
                 constants.SHORT_RANGE_KICK_DIST and
-                self.brain.ball.distTo(self.brain.oppGoalLeftPost) <
+                self.brain.ball.distTo(constants.SHOOT_RIGHT_AIM_POINT) <
                 constants.SHORT_RANGE_KICK_DIST) # and open field
 
     def canScoreSome(self):
-        return (self.brain.ball.distTo(self.brain.oppGoalRightPost) <
+        return (self.brain.ball.distTo(constants.SHOOT_LEFT_AIM_POINT) <
                 constants.LONG_RANGE_KICK_DIST or
-                self.brain.ball.distTo(self.brain.oppGoalLeftPost) <
+                self.brain.ball.distTo(constants.SHOOT_RIGHT_AIM_POINT) <
                 constants.LONG_RANGE_KICK_DIST) # and open field.
 
     def openTeammateCanScore(self):
@@ -45,14 +46,14 @@ class KickInformation:
         bestMate = None
         minDist = NogginConstants.FIELD_WIDTH
         for mate in teammates:
-            if (mate.distTo(self.brain.oppGoalRightPost) <
+            if (mate.distTo(constants.SHOOT_LEFT_AIM_POINT) <
                 constants.LONG_RANGE_KICK_DIST or
-                mate.distTo(self.brain.oppGoalLeftPost) <
+                mate.distTo(constants.SHOOT_RIGHT_AIM_POINT) <
                 constants.LONG_RANGE_KICK_DIST):
                 # minimize on longest distance to select mate with
                 # most scoring options.
-                longest = max(mate.distTo(self.brain.oppGoalRightPost),
-                              mate.distTo(self.brain.oppGoalLeftPost))
+                longest = max(mate.distTo(constants.SHOOT_LEFT_AIM_POINT),
+                              mate.distTo(constants.SHOOT_RIGHT_AIM_POINT))
                 if longest < minDist:
                     minDist = longest
                     bestMate = mate
@@ -116,3 +117,28 @@ class KickInformation:
             if mate.x > self.brain.my.x:
                 forwardMates.append(mate)
         return forwardMates
+
+    def bestAlignedDest(self, dests):
+        """
+        We get our relative heading to the ball based on a 0 heading to each
+        of the aim points. We adjust these values to put them in a range from
+        0 to 45 degrees, with 45 being aligned just right with the ball to
+        execute one of our kicks. We find out which one later, we just want
+        to know where to shoot. This conversion lets us decide which aim point
+        we are better lined up to shoot for easily (ie with a single compare)
+        """
+
+        my = self.brain.my
+        ball = self.brain.ball
+        bestHeading = -1.
+        bestDest = None
+
+        for dest in dests:
+            bestHeading = max((fabs(((my.headingTo(ball) -
+                                     ball.headingTo(dest))
+                                    % 90) - 45)), bestHeading)
+            bestDest = dest
+        return bestDest
+
+    def bestAlignedKick(self):
+        
