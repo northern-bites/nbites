@@ -37,11 +37,9 @@ def strafeDirForSave(player):
 def shouldSaveRight(player):
     ball= player.brain.ball
 
-    if(ball.endY < -goalCon.CENTER_SAVE_THRESH
-       and ball.endY > -goalCon.DONT_SAVE_LIMIT
-       and goalieInBox(player)):
-        return True
-    return False
+    return(ball.endY < -goalCon.CENTER_SAVE_THRESH
+           and ball.endY > -goalCon.DONT_SAVE_LIMIT
+           and goalieInBox(player))
 
 def shouldSaveLeft(player):
     ball= player.brain.ball
@@ -67,7 +65,11 @@ def shouldHoldSave(player):
 def goalieInBox(player):
     my = player.brain.my
 
-    return (my.inMyGoalBox)
+    return (my.x < NogginConstants.MY_GOALBOX_RIGHT_X + 10 and
+            NogginConstants.MY_GOALBOX_TOP_Y + 10 > my.y and
+            my.y > NogginConstants.MY_GOALBOX_BOTTOM_Y - 10)
+
+#return (my.inMyGoalBox)
 
 #CHASE TRANSITIONS
 
