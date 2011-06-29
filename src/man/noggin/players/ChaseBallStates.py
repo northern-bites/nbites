@@ -126,7 +126,7 @@ def decideKick(player):
         # Re-initialize to clear data from decideKick
         player.brain.kickDecider.resetInfo()
         # ** # scanning to decide which kick to use
-        player.brain.tracker.newKickDecideScan()
+        player.brain.tracker.newKickDecidePan()
         player.inKickingState = True
 
     #TODO change this to be better.
