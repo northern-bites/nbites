@@ -101,10 +101,10 @@ def trackLoc(tracker):
         tracker.brain.motion.stopHeadMoves()
 
     # ** # debugging
-    if isinstance(tracker.target, FieldCorner):
-        print "target is corner:",tracker.target.visionId
-    elif isinstance(tracker.target, FieldObject):
-        print "target is post:",tracker.target.visionId
+    #if isinstance(tracker.target, FieldCorner):
+    #    print "target is corner:",tracker.target.visionId
+    #elif isinstance(tracker.target, FieldObject):
+    #    print "target is post:",tracker.target.visionId
 
     # safety check that target was not set to a ball
     if tracker.target is None or tracker.target == tracker.brain.ball:
@@ -127,7 +127,6 @@ def trackLoc(tracker):
             return tracker.goLater('stareLoc')
 
     if tracker.counter > constants.TRACKER_FRAMES_SEARCH_THRESH:
-        #print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
         print "Past search thresh, switching to new target"
         return tracker.goLater(tracker.decisionState)
 
@@ -143,10 +142,9 @@ def stareLoc(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
         # ** # debugging
-        print "staring at target Id:",tracker.target.visionId
+        #print "staring at target Id:",tracker.target.visionId
 
     if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
-        ###print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
         print "Past stare thresh, switching to new target"
         return tracker.goLater(tracker.decisionState)
 

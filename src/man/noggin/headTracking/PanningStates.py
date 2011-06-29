@@ -26,12 +26,16 @@ def scanBall(tracker):
     #     tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
     return tracker.stay()
 
-# ** # new hacked method
+# ** # new method
 def panScanForLoc(tracker):
+    """
+    Perform full scans until a corner or post is seen. Then, stare at that
+    corner or post.
+    """
     # If any visual object is sighted, stare at it
     for obj in tracker.locObjectList:
         if obj.on:
-            print "found a target. angles:",obj.angleX,obj.angleY
+            #print "found a target. angles:",obj.angleX,obj.angleY
             tracker.target = obj
             return tracker.goLater('stareLoc')
 
@@ -41,8 +45,11 @@ def panScanForLoc(tracker):
 
     return tracker.stay()
 
-# ** # new hacked method
+# ** # new method
 def scanForPost(tracker):
+    """
+    Perform high wide scans until a post is seen. Then, stare at that post.
+    """
     # Make sure that head is inactive
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()

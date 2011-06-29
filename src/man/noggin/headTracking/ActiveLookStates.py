@@ -101,11 +101,6 @@ def trackLandmarks(tracker):
     else:
         tracker.target = tracker.locObjectList[1]
 
-    # ** # debugging
-    print "my coords:",tracker.brain.my.x,tracker.brain.my.y,tracker.brain.my.h
-    for obj in tracker.locObjectList:
-        print obj.visionId,obj.dist
-
     """# ** # debugging checks
     for obj in tracker.locObjectList:
         if obj.visionId == 10:

@@ -34,6 +34,7 @@ class HeadTracking(FSA.FSA):
         self.activePanOut = False # ** # deprecated?
         self.activePanUp = False # ** # deprecated?
         # Enable safeBallTracking to always keep ball in frame while tracking
+        # Currently not support. Leave false.
         self.safeBallTracking = False
         self.isPreKickScanning = False # ** # deprecated?
         self.preActivePanHeads = None # ** # deprecated? should probably stay
@@ -223,11 +224,7 @@ class HeadTracking(FSA.FSA):
         """
         Should be called by chaser.
         The robot will switch between looking at the ball and
-        periodically looking at nearby landmarks. Landmark fitness
-        is determined by angular change from the ball to minimize
-        time between targets.
-        If safeBallTracking is True, robot will not lose sight of
-        ball while checking landmarks.
+        periodically looking up for nearby posts.
         """
         self.target = self.brain.ball
         self.decisionState = 'trackingBallLoc'
@@ -273,14 +270,24 @@ class HeadTracking(FSA.FSA):
         self.decisionState = 'trackingBall'
         self.switchTo('trackingBall')
 
-# ** # new hacked method
+# ** # new method
     def panScan(self):
+        """
+        The robot will perform full scans until a corner or post is located in
+        vision. Then, they will stare at that corner or post until it is lost
+        from vision, at which point the robot will resume scanning.
+        """
         self.target = None
         self.decisionState = 'panScanForLoc'
         self.switchTo('panScanForLoc')
 
-# ** # new hacked method
+# ** # new method
     def newKickDecidePan(self):
+        """
+        The robot should already be in the newTrackBall state cycle. If not already
+        scanning for a post, the robot will begin one such scan. Afterwards,
+        states will continue in identical manner to newTrackBall.
+        """
         if self.currentState != 'scanForPost':
             self.decisionState = 'trackingBallLoc'
             self.switchTo('trackingBallLoc')
