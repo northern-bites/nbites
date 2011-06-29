@@ -10,15 +10,15 @@ import GoalieConstants as goalCon
 def shouldSave(player):
     ball = player.brain.ball
 
-    # Not sure if we want velocity or accel here
-    # and do we want ball.heat?
-    if (ball.relVelX < -2 and ball.heat == 0):
-        #player.shouldSaveCounter += 1
-        #if player.shouldSaveCounter > 1:
-            #player.shouldSaveCounter = 0
-        return True
+    if(ball.relVelX < -40 and ball.heat <= 5):
+        player.shouldSaveCounter += 1
+        if player.shouldSaveCounter > 1:
+            player.shouldSaveCounter = 0
+            return True
 
-    return False
+    else:
+        player.shouldSaveCounter = 0
+        return False
 
 # not used right now
 #should move goalie but with dive right now shouldnt need
@@ -48,7 +48,6 @@ def shouldSaveLeft(player):
             and ball.endY < goalCon.DONT_SAVE_LIMIT
             and goalieInBox(player))
 
-
 # Not used
 def shouldSaveCenter(player):
     ball= player.brain.ball
@@ -65,11 +64,11 @@ def shouldHoldSave(player):
 def goalieInBox(player):
     my = player.brain.my
 
-    return (my.x < NogginConstants.MY_GOALBOX_RIGHT_X + 10 and
-            NogginConstants.MY_GOALBOX_TOP_Y + 10 > my.y and
-            my.y > NogginConstants.MY_GOALBOX_BOTTOM_Y - 10)
+    return (my.x < NogCon.MY_GOALBOX_RIGHT_X + 10 and
+            NogCon.MY_GOALBOX_TOP_Y + 10 > my.y and
+            my.y > NogCon.MY_GOALBOX_BOTTOM_Y - 10)
 
-#return (my.inMyGoalBox)
+#return (my.inMyGoalBox())
 
 #CHASE TRANSITIONS
 

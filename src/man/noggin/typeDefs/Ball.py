@@ -170,6 +170,7 @@ class Ball(VisualObject):
         # calculation for the goalie to figure out
         # what the y value of the ball will be when it
         # gets to the goalie
+        # TODO: use new ball information
         if(self.dx != 0):
             self.endY = self.relY - (self.dy*(self.relX/self.dx))
 

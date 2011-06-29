@@ -20,13 +20,13 @@ def goalieSave(player):
 
    # print ball.velX
    # print ball.accX
-    print ball.relX
+   # print ball.relX
     print ball.relVelX
     print ball.relAccX
     print ball.heat
     print ""
 
-    if False: #helper.shouldSave(player):
+    if helper.shouldSave(player):
         print ball.relAccX
         print ball.heat
         brain.tracker.stopHeadMoves()

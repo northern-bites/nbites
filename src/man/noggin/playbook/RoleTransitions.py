@@ -18,11 +18,33 @@ def shouldPositionForSave(team):
             resetCounters(team)
             return True
 
-    #elif ball.relVelX < -20 :
+    #elif ball.relVelX < -60 or ball.relAccX < -30:
         #return True
 
     return False
 
+def shouldNotSave(team):
+    ball = team.brain.ball
+
+    if team.brain.player.penaltyKicking:
+        return False
+
+    if (ball.relAccX < 0.5 and ball.heat == 0):
+        team.shouldStopSaveCounter += 1
+        if team.shouldStopSaveCounter > 30:
+            resetCounters(team)
+            return True
+
+    elif (ball.inMyGoalBox() and ball.relAccX < 0.5):
+        team.shouldStopSaveCounter += 1
+        if team.shouldStopSaveCounter > 30:
+            resetCounters(team)
+            return True
+
+    # Want to stop saving when no longer worried about
+    # A robot shooting and the ball is not moving
+
+    return False
 
 def shouldChase(team):
     """ Ball is inside the field cross and we should
@@ -153,22 +175,6 @@ def shouldPositionLeft(team):
 
     return False
 
-def shouldNotSave(team):
-    ball = team.brain.ball
-
-    if team.brain.player.penaltyKicking:
-        return False
-
-    if (ball.relAccX < 0.5 and ball.heat == 0):
-        team.shouldStopSaveCounter += 1
-        if team.shouldStopSaveCounter > 30:
-            resetCounters(team)
-            return True
-
-    # Want to stop saving when no longer worried about
-    # A robot shooting and the ball is not moving ??
-
-    return False
 
 
 # Reset counters for role transitions
