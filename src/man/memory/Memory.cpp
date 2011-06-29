@@ -59,7 +59,7 @@ void Memory::update(SensorsEvent event) {
     if (event == NEW_MOTION_SENSORS) {
         PROF_ENTER(_profiler.get(), P_MEMORY_MOTION_SENSORS);
         mMotionSensors->update();
-        notifySubscribers(MMOTION_SENSORS_ID)
+        notifySubscribers(MMOTION_SENSORS_ID);
         PROF_EXIT(_profiler.get(), P_MEMORY_MOTION_SENSORS);
     }
 
