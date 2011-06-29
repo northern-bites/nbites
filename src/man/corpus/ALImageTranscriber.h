@@ -11,6 +11,8 @@
 #include "synchro.h"
 #include "ColorParams.h"
 
+#include "Camera.h"
+
 class ALImageTranscriber : public ThreadedImageTranscriber {
 public:
     ALImageTranscriber(boost::shared_ptr<Synchro> synchro,

@@ -70,6 +70,8 @@
 typedef unsigned char byte;
 #endif
 
+#define CHECK_SUCCESS(x) if((x) < 0) { printf("Problem with " #x "\n"); }
+
 #include <time.h>
 #include <sys/time.h>
 

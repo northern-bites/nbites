@@ -107,6 +107,7 @@ ELSE(WEBOTS_BACKEND)
     NaoEnactor
     ALTranscriber
     ALImageTranscriber
+   	V4L2ImageTranscriber
     NaoLights
     NaoRGBLight
     ALSpeech

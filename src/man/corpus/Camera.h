@@ -68,7 +68,7 @@ public:
 
 
     static const Settings getDefaultSettings() {
-        static const Settings defaultSettings = {
+        const Settings defaultSettings = {
                 DEFAULT_TYPE,
                 DEFAULT_RESOLUTION,
                 DEFAULT_FRAMERATE,
@@ -88,6 +88,14 @@ public:
                 DEFAULT_EXPOSURE
         };
         return defaultSettings;
+    }
+
+    static const Type getOtherCameraType(Type type) {
+        if (type == TOP) {
+            return BOTTOM;
+        } else {
+            return TOP;
+        }
     }
 };
 

@@ -98,6 +98,8 @@ Man::Man (shared_ptr<Profiler> _profiler,
 
   vision = shared_ptr<Vision>(new Vision(pose, profiler));
 
+  CHECK_SUCCESS(-1);
+
   set_vision_pointer(vision);
 
   comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
