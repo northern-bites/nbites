@@ -27,7 +27,7 @@
 #  undef  USE_PYTHON_GC
 #endif
 
-// Set/unset a COMM_DEBUG flag.
+// Set/unset a DEBUG_COMM flag.
 #define DEBUG_COMM_${DEBUG_COMM}
 #ifdef  DEBUG_COMM_ON
 #   define DEBUG_COMM

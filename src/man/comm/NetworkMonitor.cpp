@@ -54,8 +54,7 @@ void NetworkMonitor::packetReceived(long long timeSent, long long timeReceived)
 {
     // Add the packet as not dropped.
     droppedPackets.X(0.0f);
-    std::cout << "NetworkMonitor::packetReceived : avg: " << X(0.0f) << std::endl;
-    
+   
     if(totalPackets() <= 1)
 	lastPacketReceivedAt = timeReceived;
     else
@@ -71,7 +70,6 @@ void NetworkMonitor::packetsDropped(int numDropped)
     for(int i = 0; i < numDropped; ++i)
     {
 	droppedPackets.X(1.0f);
-	std::cout << "NetworkMonitor::packetsDropped : avg: " << X(1.0f) << std::endl;
     }
 }
 
