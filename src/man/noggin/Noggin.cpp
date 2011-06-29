@@ -37,13 +37,12 @@ fstream outputFile;
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
-Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
+Noggin::Noggin (shared_ptr<Vision> v,
                 shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
                 shared_ptr<Sensors> _sensors, shared_ptr<LoggingBoard> loggingBoard,
                 MotionInterface * _minterface
                 )
-    : profiler(p),
-      vision(v),
+    : vision(v),
       comm(c),
       gc(c->getGC()),
       sensors(_sensors),
@@ -252,18 +251,18 @@ void Noggin::runStep ()
     //Check button pushes for game controller signals
     processGCButtonClicks();
 
-    PROF_ENTER(profiler, P_PYTHON);
+    PROF_ENTER(P_PYTHON);
 
 #   ifdef RUN_LOCALIZATION
     // Update localization information
-    PROF_ENTER(profiler, P_LOC);
+    PROF_ENTER(P_LOC);
     updateLocalization();
-    PROF_EXIT(profiler, P_LOC);
+    PROF_EXIT(P_LOC);
 #   endif //RUN_LOCALIZATION
 
 
     // Call main run() method of Brain
-    PROF_ENTER(profiler, P_PYRUN);
+    PROF_ENTER(P_PYRUN);
     if (brain_instance != NULL) {
         PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
         if (result == NULL) {
@@ -281,9 +280,9 @@ void Noggin::runStep ()
             Py_DECREF(result);
         }
     }
-    PROF_EXIT(profiler, P_PYRUN);
+    PROF_EXIT(P_PYRUN);
 
-    PROF_EXIT(profiler, P_PYTHON);
+    PROF_EXIT(P_PYTHON);
 }
 
 void Noggin::updateLocalization()
@@ -363,9 +362,9 @@ void Noggin::updateLocalization()
 #   endif
 
     // Process the information
-    PROF_ENTER(profiler, P_MCL);
+    PROF_ENTER(P_MCL);
     loc->updateLocalization(odometery, pt_observations, corner_observations);
-    PROF_EXIT(profiler, P_MCL);
+    PROF_EXIT(P_MCL);
 
     // Ball Tracking
     if (vision->ball->getDistance() > 0.0) {

@@ -13,7 +13,7 @@
 class FieldLinesDetector : VisualDetector
 {
 public:
-    FieldLinesDetector(boost::shared_ptr<Profiler> p);
+    FieldLinesDetector();
     virtual ~FieldLinesDetector() { };
 
     // VisualDetector interface

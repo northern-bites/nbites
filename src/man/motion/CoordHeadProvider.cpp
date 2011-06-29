@@ -29,8 +29,8 @@ using boost::shared_ptr;
 
 //#define DEBUG_HEADPROVIDER
 
-CoordHeadProvider::CoordHeadProvider(shared_ptr<Sensors> s,shared_ptr<Profiler> p,shared_ptr<NaoPose> _pose)
-    : MotionProvider(HEAD_PROVIDER, p),
+CoordHeadProvider::CoordHeadProvider(shared_ptr<Sensors> s,shared_ptr<NaoPose> _pose)
+    : MotionProvider(HEAD_PROVIDER),
       sensors(s),
       pose(_pose),
       chopper(sensors),
@@ -71,14 +71,14 @@ void CoordHeadProvider::hardReset(){
 
 //Method called from MotionSwitchboard
 void CoordHeadProvider::calculateNextJointsAndStiffnesses() {
-    PROF_ENTER(profiler,P_HEAD);
+    PROF_ENTER(P_HEAD);
     pthread_mutex_lock(&coord_head_provider_mutex);
 
     coordMode();
 
     setActive();
     pthread_mutex_unlock(&coord_head_provider_mutex);
-    PROF_EXIT(profiler,P_HEAD);
+    PROF_EXIT(P_HEAD);
 }
 
 //Method called during the 'COORD' Mode
