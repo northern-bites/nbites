@@ -2,7 +2,7 @@
 # The transitions for the goalie for the goalie states.
 # Covers chase, position and save.
 #
-
+from math import fabs
 from .. import NogginConstants as NogCon
 import GoalieConstants as goalCon
 
@@ -11,7 +11,7 @@ import GoalieConstants as goalCon
 def shouldSave(player):
     ball = player.brain.ball
 
-    if (ball.dx > 2 and ball.heat == 0):
+    if (fabs(ball.relAccX) > 1 and ball.heat == 0):
         player.shouldSaveCounter += 1
         if player.shouldSaveCounter > 1:
             player.shouldSaveCounter = 0
@@ -77,4 +77,5 @@ def dangerousBall(player):
     # if inBox(player):
     return (ball.relX < 0 and goalieInBox(player))
         #and ball.dist < 30)
+
 

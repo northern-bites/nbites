@@ -48,6 +48,7 @@ class GoTeam:
         self.shouldSaveCounter = 0
         self.shouldChaseCounter = 0
         self.shouldStopChaseCounter = 0
+        self.shouldStopSaveCounter = 0
 
     def run(self, play):
         """We run this each frame to get the latest info"""

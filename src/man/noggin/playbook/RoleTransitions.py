@@ -15,12 +15,7 @@ def shouldPositionForSave(team):
     if ball.heat > goalCon.HEAT_BUFFER:
         team.shouldSaveCounter += 1
         if team.shouldSaveCounter > 1:
-            team.shouldChaseCounter = 0
-            team.shouldStopChaseCounter = 0
-            team.shouldPositionCenterCounter = 0
-            team.shouldPositionLeftCounter = 0
-            team.shouldPositionRightCounter = 0
-            team.shouldSaveCounter = 0
+            resetCounters(team)
             return True
 
     return False
@@ -49,12 +44,7 @@ def shouldChase(team):
         team.shouldChaseCounter += 1
 
     if team.shouldChaseCounter > goalCon.CHANGE_THRESH:
-        team.shouldChaseCounter = 0
-        team.shouldStopChaseCounter = 0
-        team.shouldPositionCenterCounter = 0
-        team.shouldPositionLeftCounter = 0
-        team.shouldPositionRightCounter = 0
-        team.shouldSaveCounter = 0
+        resetCounters(team)
         return True
 
     return False
@@ -71,31 +61,16 @@ def shouldStopChase(team):
     my = team.brain.my
 
     if(ball.framesOff > goalCon.BALL_LOST):
-        team.shouldStopChaseCounter = 0
-        team.shouldChaseCounter = 0
-        team.shouldPositionCenterCounter = 0
-        team.shouldPositionLeftCounter = 0
-        team.shouldPositionRightCounter = 0
-        team.shouldSaveCounter = 0
+        resetCounters(team)
         return True
 
     if my.x > NogCon.MIDFIELD_X * 0.5:
-        team.shouldChaseCounter = 0
-        team.shouldStopChaseCounter = 0
-        team.shouldPositionCenterCounter = 0
-        team.shouldPositionLeftCounter = 0
-        team.shouldPositionRightCounter = 0
-        team.shouldSaveCounter = 0
+        resetCounters(team)
         return True
 
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X  and my.uncertX < 90):
         if(ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER):
-            team.shouldChaseCounter = 0
-            team.shouldStopChaseCounter = 0
-            team.shouldPositionCenterCounter = 0
-            team.shouldPositionLeftCounter = 0
-            team.shouldPositionRightCounter = 0
-            team.shouldSaveCounter = 0
+            resetCounters(team)
             return True
 
     elif (ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER
@@ -106,12 +81,7 @@ def shouldStopChase(team):
         team.shouldStopChaseCounter += 1
 
     if team.shouldStopChaseCounter > goalCon.CHANGE_THRESH:
-        team.shouldStopChaseCounter = 0
-        team.shouldChaseCounter = 0
-        team.shouldPositionCenterCounter = 0
-        team.shouldPositionLeftCounter = 0
-        team.shouldPositionRightCounter = 0
-        team.shouldSaveCounter = 0
+        resetCounters(team)
         return True
 
     return False
@@ -131,18 +101,14 @@ def shouldPositionCenter(team):
         team.shouldPositionLeftCounter = 0
         team.shouldPositionRightCounter = 0
         team.shouldSaveCounter = 0
+        team.shouldStopSaveCounter = 0
         return True
 
     if ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER:
         team.shouldPositionCenterCounter += 1
         if team.shouldPositionCenterCounter > goalCon.CHANGE_THRESH:
-            team.shouldStopChaseCounter = 0
-            team.shouldChaseCounter = 0
-            team.shouldPositionCenterCounter = 0
-            team.shouldPositionLeftCounter = 0
-            team.shouldPositionRightCounter = 0
-            team.shouldSaveCounter = 0
-        return True
+            resetCounters(team)
+            return True
 
     return False
 
@@ -160,13 +126,8 @@ def shouldPositionRight(team):
         and ball.on):
         team.shouldPositionRightCounter += 1
         if team.shouldPositionRightCounter > goalCon.CHANGE_THRESH:
-            team.shouldStopChaseCounter = 0
-            team.shouldChaseCounter = 0
-            team.shouldPositionRightCounter = 0
-            team.shouldPositionLeftCounter = 0
-            team.shouldPositionCenterCounter = 0
-            team.shouldSaveCounter = 0
-        return True
+            resetCounters(team)
+            return True
 
     return False
 
@@ -184,13 +145,8 @@ def shouldPositionLeft(team):
         and ball.on):
         team.shouldPositionLeftCounter += 1
         if team.shouldPositionLeftCounter > goalCon.CHANGE_THRESH:
-            team.shouldStopChaseCounter = 0
-            team.shouldChaseCounter = 0
-            team.shouldPositionRightCounter = 0
-            team.shouldPositionLeftCounter = 0
-            team.shouldPositionCenterCounter = 0
-            team.shouldSaveCounter = 0
-        return True
+            resetCounters(team)
+            return True
 
     return False
 
@@ -200,7 +156,25 @@ def shouldNotSave(team):
     if team.brain.player.penaltyKicking:
         return False
 
+    if (ball.relAccX < 0.5 and ball.heat == 0):
+        team.shouldStopSaveCounter += 1
+        if team.shouldStopSaveCounter > 30:
+            resetCounters(team)
+            return True
+
     # Want to stop saving when no longer worried about
     # A robot shooting and the ball is not moving ??
 
     return False
+
+
+# Reset counters for role transitions
+def resetCounters(team):
+
+    team.shouldStopChaseCounter = 0
+    team.shouldChaseCounter = 0
+    team.shouldPositionRightCounter = 0
+    team.shouldPositionLeftCounter = 0
+    team.shouldPositionCenterCounter = 0
+    team.shouldSaveCounter = 0
+    team.shouldStopSaveCounter = 0

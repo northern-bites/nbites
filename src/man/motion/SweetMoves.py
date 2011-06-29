@@ -362,11 +362,11 @@ GOALIE_ROLL_OUT_LEFT = mirrorMove(GOALIE_ROLL_OUT_RIGHT)
 GOALIE_TEST_DIVE_RIGHT = ( ((0, 0, 0, 0),
                             INITIAL_POS[0][1],
                             INITIAL_POS[0][2],
-                            (0, -70.0, 0, 0),
+                            (0, -75, 0, 0),
                             1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
 
 #Points right when would dive left
-GOALIE_TEST_DIVE_LEFT = ( ((0, 70.0, 0, 0),
+GOALIE_TEST_DIVE_LEFT = ( ((0, 75.0, 0, 0),
                             INITIAL_POS[0][1],
                             INITIAL_POS[0][2],
                             (0, 0, 0, 0),

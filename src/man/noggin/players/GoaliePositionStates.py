@@ -17,7 +17,9 @@ def goaliePosition(player):
 
     # When the ball is far away we want to make sure we
     # are in position
-    if ball.dist >= goalCon.ACTIVE_LOC_THRESH:
+    if player.penaltyKicking:
+        player.brain.tracker.trackBall()
+    elif ball.dist >= goalCon.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLocGoaliePos()
     else:
         player.brain.tracker.trackBall()
