@@ -60,7 +60,7 @@ static void PyComm_dealloc (PyComm *self)
 
 static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
 {
-    list<vector<float> >* latest;
+    list<vector<float> > latest;
     Py_BEGIN_ALLOW_THREADS
 
         latest = reinterpret_cast<PyComm*>(self)->comm->latestComm();
@@ -68,13 +68,13 @@ static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
     Py_END_ALLOW_THREADS
 
         // Build tuple of tuples of joint values
-        PyObject *outer = PyList_New(latest->size()), *inner, *f;
+        PyObject *outer = PyList_New(latest.size()), *inner, *f;
     bool success = true;
     int i, j;
     if (outer != NULL) {
         i = 0;
-        while (!latest->empty()) {
-            vector<float> &v = latest->front();
+        while (!latest.empty()) {
+            vector<float> &v = latest.front();
             inner = PyList_New(v.size());
             if (inner != NULL) {
                 for (unsigned int j = 0; j < v.size(); j++) {
@@ -89,7 +89,7 @@ static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
                 PyList_SET_ITEM(outer, i, inner);
                 if (!success)
                     break;
-                latest->pop_front();
+                latest.pop_front();
                 i++;
             }else {
                 success = false;
@@ -439,7 +439,7 @@ PyMODINIT_FUNC init_comm (void)
 Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
     : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
-	  latest(new list<vector<float> >), sensors(s), timer(&monotonic_micro_time),
+	  latest(), sensors(s), timer(&monotonic_micro_time),
 	  gc(new GameController()), tool(_synchro, s, v, gc)
 {
     pthread_mutex_init(&comm_mutex,NULL);
@@ -895,9 +895,9 @@ void Comm::parse_packet (const CommPacketHeader &packet, const char* data, int s
     v[2] = static_cast<float>(packet.color);
     memcpy(&v[3], data, len * sizeof(float));
 
-    if (latest->size() >= MAX_MESSAGE_MEMORY)
-        latest->pop_front();
-    latest->push_back(v);
+    if (latest.size() >= MAX_MESSAGE_MEMORY)
+        latest.pop_front();
+    latest.push_back(v);
 }
 
 void Comm::add_to_module ()
@@ -915,10 +915,12 @@ void Comm::add_to_module ()
     }
 }
 
-list<vector<float> >* Comm::latestComm()
+list<vector<float> > Comm::latestComm()
 {
-    list<vector<float> >* old = latest;
-    latest = new list<vector<float> >();
+    list<vector<float> > old(latest);
+
+    latest.clear();
+
     return old;
 }
 
@@ -929,7 +931,7 @@ TeammateBallMeasurement Comm::getTeammateBallReport()
     list<vector<float> >::iterator i;
     TeammateBallMeasurement m;
     float minUncert = 10000.0f;
-    for (i = latest->begin(); i != latest->end(); ++i) {
+    for (i = latest.begin(); i != latest.end(); ++i) {
         // Get the combined uncert x and y
         float curUncert = static_cast<float>( hypot((*i)[6],(*i)[7]) );
         // If the teammate sees the ball and its uncertainty is less than the
