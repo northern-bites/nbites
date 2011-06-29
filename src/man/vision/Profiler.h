@@ -84,6 +84,7 @@ class Profiler {
   public:
 
     Profiler(long long (*thread_time_f)(),
+             long long (*process_time_f)(),
              long long (*global_time_f)());
     ~Profiler();
 
@@ -123,6 +124,7 @@ class Profiler {
   private:
 
     long long (*thread_timeFunction) ();
+    long long (*process_timeFunction) ();
     long long (*global_timeFunction) ();
 
     bool start_next_frame;
@@ -130,7 +132,8 @@ class Profiler {
     int current_frame;
     long long enterTime[NUM_PCOMPONENTS];
     long long lastTime[NUM_PCOMPONENTS];
-    long long profile_start_time;
+    long long profile_process_start_time;
+    long long profile_global_start_time;
 
     static Profiler* instance;
 

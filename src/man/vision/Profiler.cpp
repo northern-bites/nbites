@@ -174,9 +174,11 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 Profiler* Profiler::instance = NULL;
 
 Profiler::Profiler (long long (*thread_time_f)(),
+        long long (*process_time_f)(),
         long long (*global_time_f)())
     : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),
       thread_timeFunction(thread_time_f),
+      process_timeFunction(process_time_f),
       global_timeFunction(global_time_f),
       verbose(false) {
 
@@ -219,7 +221,8 @@ Profiler::nextFrame() {
   // trigger start of profiling
   if (start_next_frame) {
     profiling = true;
-    profile_start_time = global_timeFunction();
+    profile_process_start_time = process_timeFunction();
+    profile_global_start_time = global_timeFunction();
     printf("Starting profiling next frame!\n");
     return start_next_frame = false;
   }
@@ -344,12 +347,16 @@ Profiler::printIndentedSummary()
         }
     }
   }
-  long long run_time = global_timeFunction() - profile_start_time;
-  long long avg_time = run_time/(current_frame+1);
+  long long process_run_time =
+          process_timeFunction() - profile_process_start_time;
+  long long avg_process_time = process_run_time/(current_frame+1);
+  long long global_run_time =
+            global_timeFunction() - profile_global_start_time;
+    long long avg_global_time = global_run_time/(current_frame+1);
+  printf("\n Process-wise, we ran for an average of %lli per frame\n",
+           avg_process_time);
   printf("\n Ran for a total of %lli, for an average of %lli per frame\n",
-          run_time, avg_time);
-  float fps = MICROS_PER_SECOND/static_cast<float>(avg_time);
+          global_run_time, avg_global_time);
+  float fps = MICROS_PER_SECOND/static_cast<float>(avg_global_time);
   printf("FPS: %f\n", fps);
 }
-
-
