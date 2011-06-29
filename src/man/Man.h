@@ -116,10 +116,9 @@ public:
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
-#ifdef USE_MEMORY
     boost::shared_ptr<man::memory::Memory> memory;
     boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard;
-#endif
+
 #ifdef USE_NOGGIN
     boost::shared_ptr<Noggin> noggin;
 #endif// USE_NOGGIN
