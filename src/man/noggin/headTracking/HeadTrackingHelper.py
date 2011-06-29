@@ -4,11 +4,13 @@ from man.motion import MotionConstants
 from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
 from math import (fabs, atan, radians, hypot)
+from ..typeDefs.Landmarks import FieldObject
 
 class HeadTrackingHelper(object):
     def __init__(self, tracker):
         self.tracker = tracker
 
+# ** # old method
     def executeHeadMove(self, headMove):
         """performs a sweetmove"""
         for position in headMove:
@@ -24,6 +26,7 @@ class HeadTrackingHelper(object):
             self.tracker.brain.motion.enqueue(move)
 
 
+# ** # old method
     def trackObject(self):
         """
         Method to actually perform the tracking.
@@ -64,6 +67,67 @@ class HeadTrackingHelper(object):
                                          maxSpeed, maxSpeed)
         self.tracker.brain.motion.setHead(headMove)
 
+# ** # new method
+    def lookToTargetAngles(self, target):
+        """
+        Uses setHeadCommands to bring given target to center of frame.
+        """
+        # Get current head angles
+        motionAngles = self.tracker.brain.sensors.motionAngles
+        yaw = motionAngles[MotionConstants.HeadYaw]
+        pitch = motionAngles[MotionConstants.HeadPitch]
+
+        # ** #debugging print lines
+        #print "old angles:",MyMath.radians(curYaw),MyMath.radians(curPitch)
+
+        # Find the target's angular distance from the center of vision
+        if not target is None and target.on:
+            yaw += target.angleX
+            pitch -= target.angleY
+            #note: angleY is positive up from center of vision frame
+            #note: angleX is positive left from center of vision frame
+        else:
+            # by default, do nothing
+            return
+
+        # ** # debugging print lines
+        #print "new angles:",MyMath.radians(curYaw),MyMath.radians(curPitch)
+        #print "target ID is:",target.visionId
+        #print "visDist,visBearing:",target.visDist,target.visBearing
+        #print "locDist,locBearing:",target.locDist,target.locBearing
+
+        headMove = motion.SetHeadCommand(yaw,pitch)
+        self.tracker.brain.motion.setHead(headMove)
+        # boost converts to radians for setHeadCommand
+
+    # ** # new method
+    def lookToTargetCoords(self, target):
+        """
+        Looks at given target's relative coordinates
+        """
+
+        # ** # debugging print lines
+        #print "my location:", self.tracker.brain.my.x, self.tracker.brain.my.y
+        #print "object list:"
+        #for obj in self.tracker.locObjectList:
+        #    print obj.visionId, obj.dist, obj.bearing, obj.on
+        #print "target ID is:",target.visionId
+        #print "target on?:",target.on
+        #print "target is on? ", target.on
+        #print "target location:",target.x,target.y
+        #print "target dist/bearing:",target.dist,target.bearing
+        #print "target to left:",target.bearing>0
+        #print "target visLoc:",target.visDist,target.visBearing
+        #print "target locLoc:",target.locDist,target.locBearing
+        #print "target rel coords:", target.relX, target.relY
+        #print "target fitness:",target.trackingFitness
+        #print "target center:",target.angleX,target.angleY
+
+        #convert from cm to mm for c++ code
+        headMove = motion.CoordHeadCommand(10*target.relX, 10*target.relY, 10*target.height,.1065*.1,.1227*.1)# arbitrary slow down for debugging
+        self.tracker.brain.motion.coordHead(headMove)
+
+# ** # old method
     def panTo(self, heads):
         """
         Pan heads at appropriate speed to given heads
@@ -82,16 +146,91 @@ class HeadTrackingHelper(object):
         self.executeHeadMove( ((heads, panTime, 0,
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
+# ** # new method
+    def updateGeneralTrackingFitness(self, locObj):
+        """
+        Updates the fitness value for each given landmark,
+        based on distance.
+        """
+        locObj.trackingFitness = locObj.dist
+        #if bearing is unusable, set fitness to auto fail
+        if fabs(locObj.bearing) > constants.BEARING_THRESHOLD:
+            locObj.trackingFitness = constants.FITNESS_THRESHOLD+1
+
+# ** # new method
+    def updateAngularTrackingFitness(self, locObj, target):
+        """
+        Updates the fitness value for each given landmark,
+        based on angular distance from target.
+        """
+        locObj.trackingFitness = target.bearing - locObj.bearing
+
+# ** # new method
+    def findPostInVision(self, post, brain):
+        """
+        Find the given post in the vision frame.
+        Returns a post which is in the frame, or None.
+        """
+        # Return the given post,
+        # then the right post (stores unknown post values),
+        # then the left post (in case of incorrect assignment)
+        if post == brain.yglp or post == brain.ygrp:
+            if post.on:
+                return post
+            elif brain.ygrp.on:
+                return brain.ygrp
+            elif brain.yglp.on:
+                return brain.yglp
+
+        if post == brain.bglp or brain.bgrp:
+            if post.on:
+                return post
+            elif brain.bgrp.on:
+                return brain.bgrp
+            elif brain.bglp.on:
+                return brain.bglp
+
+        return None
+
+# ** # new method
+    def findCornerInVision(self, corner, brain):
+        """
+        Finds the given corner in the vision frame.
+        """
+        if corner.framesOn > 0: # HACK from Landmarks.FieldCorner
+            return corner
+        else:
+            return None
+
+# ** # new method
+    def inView(self, target):
+        """
+        Returns confidence that target is in the vision frame.
+        """
+        if target is FieldObject:
+            return target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH
+        else: # Target is a corner.
+            return target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH
+
+# ** # old method - replaced?
     def lookToPoint(self, target):
-        headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
+        #convert from cm to mm for c++ code
+        headMove = motion.CoordHeadCommand(10*target.x, 10*target.y, 10*target.height,.1065*.1,.1227*.1)
         self.tracker.brain.motion.coordHead(headMove)
 
+# ** # debugging method
+    def lookToAngles(self, yaw=0, pitch=0):
+        headMove = motion.SetHeadCommand(MyMath.degrees(yaw),MyMath.degrees(pitch))
+        self.tracker.brain.motion.setHead(headMove)
+
+# ** # old method
     def calcBearing(self, target):
         """returns the bearing to target in degrees. usable as headYaw"""
         my = self.tracker.brain.my
 
         return my.getRelativeBearing(target)
 
+# ** # old method
     def calcHeadPitch(self, target):
         """returns the pitch to target in degrees"""
         my = self.tracker.brain.my
@@ -107,6 +246,7 @@ class HeadTrackingHelper(object):
         headPitch = atan(relHeight/dist) - CAMERA_ANGLE
         return headPitch
 
+# ** # old method
     def getCameraHeight(self):
         """gets the height of the lower camera in cm"""
         pose = self.tracker.brain.vision.pose
