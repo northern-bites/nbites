@@ -127,7 +127,7 @@ void CoordHeadProvider::setCommand(const CoordHeadCommand::ptr command) {
     float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()-300;//adjust for robot center's distance above ground
     yawDest = atan(relY/relX);
     float hypoDist = sqrt((relY*relY)+(relX*relX));
-    pitchDest = atan(relZ/hypoDist)-CAMERA_ANGLE;//constant for lower camera
+    pitchDest = -1*atan(relZ/hypoDist)-CAMERA_ANGLE;//constant for lower camera
     yawMaxSpeed = command->getMaxSpeedYaw();
     pitchMaxSpeed = command->getMaxSpeedPitch();
 

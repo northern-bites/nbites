@@ -93,6 +93,28 @@ def trackLandmarks(tracker):
         tracker.helper.updateGeneralTrackingFitness(obj)
     # Sort list of locObjects
     newlist = sorted(tracker.locObjectList)
+
+    tracker.locObjectList = newlist
+    if tracker.target is None or \
+            tracker.target.visionId != tracker.locObjectList[0].visionId:
+        tracker.target = tracker.locObjectList[0]
+    else:
+        tracker.target = tracker.locObjectList[1]
+
+    # ** # debugging
+    print "my coords:",tracker.brain.my.x,tracker.brain.my.y,tracker.brain.my.h
+    for obj in tracker.locObjectList:
+        print obj.visionId,obj.dist
+
+    """# ** # debugging checks
+    for obj in tracker.locObjectList:
+        if obj.visionId == 10:
+            print "left t dist:",obj.dist
+        elif obj.visionId == 20:
+            print "left post dist:",obj.dist
+        elif obj.visionId == 12:
+            print "left l bearing:",obj.bearing,"  my heading:",tracker.brain.my.h
+            print "left l coords:",obj.relX,obj.relY"""
     """
     if not newlist == tracker.locObjectList:
         #Landmarks have changed fitness ranking. Track most fit.
@@ -115,12 +137,8 @@ def trackLandmarks(tracker):
     if tracker.target.trackingFitness > constants.FITNESS_THRESHOLD:
         # Cycle to most fit locObject
         tracker.target = tracker.locObjectList[0]
-
+        """
     print "going to: track target"# ** #debugging
-    """
-    # ** # temp code debugging
-    tracker.locObjectList = newlist
-    tracker.target = tracker.locObjectList[0]
 
     # Track target
     return tracker.goLater('trackLoc')

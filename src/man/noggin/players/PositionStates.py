@@ -20,7 +20,7 @@ def playbookPosition(player):
         nav.positionPlaybook()
 
         if gcState == 'gameReady':
-            brain.tracker.locPans()
+            brain.tracker.panScan()
         else:
             brain.tracker.activeLoc()
 

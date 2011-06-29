@@ -32,7 +32,7 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.standup()
-        player.brain.tracker.readyLoc()
+        player.brain.tracker.panScan()
         player.brain.sensors.startSavingFrames()
 
         if player.lastDiffState == 'gameInitial':

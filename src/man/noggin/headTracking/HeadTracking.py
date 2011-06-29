@@ -272,3 +272,7 @@ class HeadTracking(FSA.FSA):
         self.target = self.brain.ball
         self.decisionState = 'trackingBall'
         self.switchTo('trackingBall')
+
+# ** # new hacked method
+    def panScan(self):
+        self.switchTo('panScanForLoc')

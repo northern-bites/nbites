@@ -26,6 +26,22 @@ def scanBall(tracker):
     #     tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
     return tracker.stay()
 
+# ** # new hacked method
+def panScanForLoc(tracker):
+    # If any visual object is sighted, stare at it
+    for obj in tracker.locObjectList:
+        if obj.on:
+            print "found a target. angles:",obj.angleX,obj.angleY
+            tracker.brain.sensors.saveFrame()
+            tracker.target = obj
+            return tracker.goLater('stareLoc')
+
+    # Nothing on frame? Look around
+    if not tracker.brain.motion.isHeadActive():
+        tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
+
+    return tracker.stay()
+
 # ** # old method
 def spinScanBall(tracker):
     ball = tracker.brain.ball

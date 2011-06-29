@@ -113,15 +113,18 @@ def trackLoc(tracker):
 
     tracker.helper.lookToTargetCoords(tracker.target)
 
+    """
     # if close enough to target, switch to stareLoc
     if tracker.helper.inView(tracker.target):
         print "found target on frame, now staring"
         return tracker.goLater('stareLoc')
+        """
 
-    # debugging
-    #print "bglp on?:",tracker.target.on
-    #print "target on?:",target.on
-
+    # Once any visual object is in frame, stare at it
+    for obj in tracker.locObjectList:
+        if obj.on:
+            tracker.target = obj
+            return tracker.goLater('stareLoc')
 
     if tracker.counter > constants.TRACKER_FRAMES_SEARCH_THRESH:
         #print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
@@ -140,10 +143,13 @@ def stareLoc(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
+    # ** # debugging
+    print "target Id:",tracker.target.visionId
+
     if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
         ###print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
         print "Past stare thresh, switching to new target"
-        return tracker.goLater(tracker.decisionState)
+        return tracker.goLater('panScanForLoc')#tracker.decisionState)
 
     # Find the real post in vision frame
     if tracker.target is FieldObject:
@@ -153,10 +159,10 @@ def stareLoc(tracker):
 
     # Second safety check that something was on frame
     if stareTarget is None:
-        print "no possible target currently visible"
+        #print "no possible target currently visible"
         return tracker.stay()
 
-    print "target visible"
+    #print "target visible"
     tracker.helper.lookToTargetAngles(stareTarget)
 
     return tracker.stay()
@@ -170,20 +176,25 @@ def trackingBall(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
+    print "new frame"
+    for c in tracker.brain.corners:
+        if c.on:
+            print c.visionId
+
     # Look to the ball for TRACKER_BALL_STARE_THRESH frames
     # If ball is lost on frame, look towards coordinates.
     if tracker.brain.ball.on:
         tracker.helper.lookToTargetAngles(tracker.brain.ball)
     else:
         tracker.helper.lookToTargetCoords(tracker.brain.ball)
-
+        """
     # If we haven't seen the ball in some time, switch to panning
     if tracker.brain.ball.framesOff > constants.TRACKER_BALL_STARE_THRESH/2:
         print "lost ball for some time, panning"
         return tracker.goLater('scanBall')
-
+        """
     if tracker.counter > constants.TRACKER_BALL_STARE_THRESH:
-        print "Past stare thresh for ball, going to:",tracker.decisionState
+        #print "Past stare thresh for ball, going to:",tracker.decisionState
         return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()

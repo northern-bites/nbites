@@ -37,7 +37,7 @@ class FieldObject(VisualObject, LocObject):
         self.elevation = 0
 
         # Setup the data from vision
-        self.visionId = visionName
+        self.visionId = visionName+20# ** # for clarity compared to field corners
         self.updateVision(visionInfos)
 
     def associateWithRelativeLandmark(self, relativeLandmark):
@@ -92,6 +92,7 @@ class FieldCorner(LocObject):
         self.visionId = Id
         self.elevation = 0
         self.framesOn = 0
+        self.framesOff = 0
         self.height = 0
         self.dist = 0
         self.bearing = 0
@@ -101,10 +102,8 @@ class FieldCorner(LocObject):
         self.y = 0
         self.angleX = 0
         self.angleY = 0
-        self.certainOnFrame = False
-        self.on = False # ** # replace certainOnFrame with this
-        # Marked true when corner was seen with high confidence.
-        # Reset every frame in updateVision
+        self.on = False # Is the corner in vision this frame?
+        self.onThisFrame = False
 
     def associateWithRelativeLandmark(self, relativeLandmark):
         """
@@ -114,21 +113,24 @@ class FieldCorner(LocObject):
         self.y = relativeLandmark[1]
 
     def updateVision(self):
-        if not self.certainOnFrame:
+        if not self.onThisFrame:
             # Was not on frame; reset vision values
             self.framesOn = 0
+            self.framesOff += 1
             self.angleX = 0
             self.angleY = 0
             self.visDist = 0
             self.visBearing = 0
+            self.on = False
 
-        self.certainOnFrame = False
-        self.on = False
+        self.onThisFrame = False
 
     def setVisualCorner(self, corner):
+        # Found a visual corner we believe is this field corner.
         self.framesOn += 1
-        self.certainOnFrame = True
+        self.framesOff = 0
         self.on = True
+        self.onThisFrame = True
 
         # Update visual angle values.
         self.angleX = corner.angleX
@@ -144,7 +146,7 @@ class FieldCorner(LocObject):
         self.locBearing = my.getRelativeBearing(self, forceCalc=True)
 
     def updateBestValues(self):
-        if self.framesOn > 0: # Effectively, if self.on
+        if self.on > 0:
             self.bearing = self.visBearing
             self.dist = self.visDist
         else:

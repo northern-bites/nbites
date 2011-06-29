@@ -7,6 +7,8 @@ sys.stderr = sys.stdout
 ## import cProfile
 ## import pstats
 
+from math import (fabs) # ** # debugging? or keep?
+
 
 # Packages and modules from super-directories
 from man import comm
@@ -143,6 +145,7 @@ class Brain(object):
         Builds a list of fieldObjects based on their relative names to the robot
         Needs to be called when team color is determined
         """
+        # Note: corner directions are relative to perspective of own goalie
 
         # Blue team setup
         if self.my.teamColor == Constants.TEAM_BLUE:
@@ -350,18 +353,17 @@ class Brain(object):
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
 
-        # If there are ANY possible corners in vision, set values for
-        # ALL corners.
+        cornerList = []
+        distList = []
         for c in self.vision.fieldLines.corners:
-            for i in range(len(self.corners)):
-                self.corners[i].setVisualCorner(c)
+            cornerList = c.possibilities[:] # copy values into new list
+            distList = []
+            for i in range(len(cornerList)):
+                distList.append(fabs(c.dist - self.corners[cornerList[i]-15].locDist) + \
+                    fabs(c.bearing - self.corners[cornerList[i]-15].locBearing))
+            closestIndex = distList.index(min(distList))
+            self.corners[cornerList[closestIndex]-15].setVisualCorner(c)
 
-        # If a possible visualCorner is definite, set it's visual values
-        # to the correct FieldCorner object.
-        for c in self.vision.fieldLines.corners:
-            for p in c.possibilities:
-                if p > 14:
-                    self.corners[p-15].setVisualCorner(c)
         # Check all FieldCorners and reset values if not in this frame.
         for i in range(len(self.corners)):
             self.corners[i].updateVision()
