@@ -72,7 +72,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 
 #ifdef USE_TIME_PROFILING
   profiler->profiling = true;
-  profiler->profileFrames(1400);
+  profiler->profileFrames(500);
 #endif
   // give python a pointer to the sensors structure. Method defined in
   // Sensors.h
@@ -118,6 +118,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
                                          motion->getInterface()));
 #endif// USE_NOGGIN
 
+  PROF_ENTER(profiler.get(), P_MAIN);
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
@@ -200,7 +201,6 @@ void Man::stopSubThreads() {
 void
 Man::processFrame ()
 {
-    PROF_ENTER(profiler.get(), P_FINAL);
     PROF_EXIT(profiler.get(), P_GETIMAGE);
 
 #ifdef USE_VISION
@@ -228,9 +228,10 @@ Man::processFrame ()
     lights->sendLights();
     PROF_EXIT(profiler.get(), P_LIGHTS);
 
-    PROF_ENTER(profiler.get(), P_GETIMAGE);
-    PROF_EXIT(profiler.get(), P_FINAL);
+    PROF_EXIT(profiler.get(), P_MAIN);
     PROF_NFRAME(profiler.get());
+    PROF_ENTER(profiler.get(), P_MAIN);
+    PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
 
