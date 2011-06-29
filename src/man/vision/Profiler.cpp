@@ -345,9 +345,10 @@ Profiler::printIndentedSummary()
     }
   }
   long long run_time = global_timeFunction() - profile_start_time;
+  long long avg_time = run_time/(current_frame+1);
   printf("\n Ran for a total of %lli, for an average of %lli per frame\n",
-          run_time, run_time/(current_frame+1));
-  float fps = MICROS_PER_SECOND/static_cast<float>(run_time);
+          run_time, avg_time);
+  float fps = MICROS_PER_SECOND/static_cast<float>(avg_time);
   printf("FPS: %f\n", fps);
 }
 
