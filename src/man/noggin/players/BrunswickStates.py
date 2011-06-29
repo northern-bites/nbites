@@ -1,4 +1,4 @@
-from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_PENALTY_KICK)
+from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_KICKOFF)
 import man.motion.SweetMoves as SweetMoves
 
 ###
@@ -161,8 +161,9 @@ def penaltyShotsGamePlaying(player):
             player.firstFrame():
         player.brain.resetLocalization()
     if player.brain.play.isRole(GOALIE):
-        player.brain.play.setSubRole(GOALIE_PENALTY_KICK)
-        return player.goNow('penaltyGoalie')
+        player.penaltyKicking = True
+        roleState = player.getRoleState()
+        return player.goNow(roleState)
     return player.goNow('penaltyKick')
 
 

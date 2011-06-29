@@ -75,6 +75,6 @@ def dangerousBall(player):
 
     # in box and behind me and close to me
     # if inBox(player):
-    return (ball.relX < 0 and self.goalieInBox(player))
+    return (ball.relX < 0 and goalieInBox(player))
         #and ball.dist < 30)
 

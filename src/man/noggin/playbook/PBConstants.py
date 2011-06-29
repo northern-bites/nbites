@@ -183,7 +183,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 30
+NUM_SUB_ROLES = 29
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
 
@@ -210,20 +210,19 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             # CHASER SUB ROLES 16
                                             "CHASE_NORMAL",
 
-                                            # GOALIE SUB ROLE 17-23
+                                            # GOALIE SUB ROLE 17-22
                                             "GOALIE_CENTER",
                                             "GOALIE_RIGHT",
                                             "GOALIE_LEFT",
                                             "GOALIE_SAVE",
                                             "GOALIE_CHASER",
                                             "GOALIE_KICKOFF",
-                                            "GOALIE_PENALTY_KICK",
 
-                                            # KICKOFF SUB ROLES 24-25
+                                            # KICKOFF SUB ROLES 23-24
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 26-29
+                                            # READY SUB ROLES 25-28
                                             "READY_GOALIE",
                                             "READY_CHASER",
                                             "READY_DEFENDER",
@@ -257,7 +256,6 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  GOALIE_SAVE,
  GOALIE_CHASER,
  GOALIE_KICKOFF,
- GOALIE_PENALTY_KICK,
 
  KICKOFF_SWEEPER,
  KICKOFF_STRIKER,

@@ -17,7 +17,9 @@ def rGoalie(team, workingPlay):
     if not workingPlay.isRole(PBConstants.GOALIE):
         workingPlay.setRole(PBConstants.GOALIE)
     if (team.brain.gameController.currentState == 'gameReady' or
-        team.brain.gameController.currentState =='gameSet'):
+        team.brain.gameController.currentState =='gameSet' or
+        team.brain.gameController.currentState == 'penaltyShotsGameReady' or
+        team.brain.gameController.currentState == 'penaltyShotsGameSet'):
         # Special case for ready goalie.
         SubRoles.pReadyGoalie(team, workingPlay)
 
@@ -30,8 +32,7 @@ def rGoalie(team, workingPlay):
         SubRoles.pGoalieCenter(team, workingPlay)
 
     # Kick off just happened or Penalty Kicking
-    elif (workingPlay.isSubRole(PBConstants.GOALIE_KICKOFF)
-          or workingPlay.isSubRole(PBConstants.GOALIE_PENALTY_KICK)):
+    elif workingPlay.isSubRole(PBConstants.GOALIE_KICKOFF):
         if RoleTran.shouldPositionForSave(team):
             SubRoles.pGoalieSave(team, workingPlay)
         elif RoleTran.shouldChase(team):
