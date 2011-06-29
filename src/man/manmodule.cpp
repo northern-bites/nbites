@@ -20,6 +20,9 @@
 #include <signal.h>
 #endif
 
+#include <signal.h> //for kill
+#include <sys/types.h> //for pid_t
+
 #include "manmodule.h"
 
 //NBites includes
@@ -112,7 +115,7 @@ public:
 
   ManModule(AL::ALPtr<AL::ALBroker> pBroker, const std::string& pName): ALModule(pBroker, pName)
   {
-    setModuleDescription( "A module that provides basic ipc NaoQi DCM access using shared memory." );
+    setModuleDescription( "A module that kicks ass." );
 
     if(ALCreateMan(pBroker) != 0)
       throw ALERROR("ManModule", "constructor", "");

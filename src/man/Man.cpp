@@ -124,6 +124,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 Man::~Man ()
 {
   cout << "Man destructor" << endl;
+  exit(0);
 }
 
 void Man::startSubThreads() {
@@ -184,13 +185,16 @@ void Man::stopSubThreads() {
 #endif
 
 #endif
-  comm->stop();
-  comm->getTrigger()->await_off();
+  //TODO: fix this from hanging
+//  comm->stop();
+//  comm->getTrigger()->await_off();
   // @jfishman - tool will not exit, due to socket blocking
   //comm->getTOOLTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
   cout << "  Comm thread is stopped" << endl;
 #endif
+  //hack - this ensures we exit with no segfault
+  //atm naoqi crashes when it tries to call exit on the dcm
 }
 
 void
