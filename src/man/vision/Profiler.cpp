@@ -5,7 +5,7 @@
 #include <climits>
 
 #include "Profiler.h"
-
+#include "Common.h" //MICROS_PER_SECOND
 // #define PRINT_CSV
 
 static const char *PCOMPONENT_NAMES[] = {
@@ -173,9 +173,13 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 
 Profiler* Profiler::instance = NULL;
 
-Profiler::Profiler (long long (*f) ())
+Profiler::Profiler (long long (*thread_time_f)(),
+        long long (*global_time_f)())
     : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),
-      timeFunction(f), verbose(false) {
+      thread_timeFunction(thread_time_f),
+      global_timeFunction(global_time_f),
+      verbose(false) {
+
     if (instance == NULL) {
         instance = this;
     }
@@ -215,6 +219,8 @@ Profiler::nextFrame() {
   // trigger start of profiling
   if (start_next_frame) {
     profiling = true;
+    profile_start_time = global_timeFunction();
+    printf("Starting profiling next frame!\n");
     return start_next_frame = false;
   }
 
@@ -319,25 +325,30 @@ Profiler::printIndentedSummary()
       printf("  %-*s:      0%% (0000000000 total, 000000 avg.)\n",
           (max_length-depths[i]*2), PCOMPONENT_NAMES[i]);
     else if (parent_sum == 0)
-      printf("  %-*s: 100.00%% (%.10llu total, %.6llu avg.,"
-             " %llu min, %.6llu max )\n",
+      printf("  %-*s: 100.00%% (%.10lli total, %.6lli avg.,"
+             " %lli min, %.6lli max )\n",
              (max_length-depths[i]*2), PCOMPONENT_NAMES[i], sumTime[i],
              (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
     else {
         if (verbose == true) {
-            printf("  %-*s: %6.2f%% (%.10llu total, %.6llu avg.,"
-                    " %.6llu min, %.6llu max)\n",
+            printf("  %-*s: %6.2f%% (%.10lli total, %.6lli avg.,"
+                    " %.6lli min, %.6lli max)\n",
                     (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
                     ((float)sumTime[i] / parent_sum * 100), sumTime[i],
                     (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
         } else {
-            printf("  %-*s: %6.2f%% (%.10llu total, %.6llu avg.)\n",
+            printf("  %-*s: %6.2f%% (%.10lli total, %.6lli avg.)\n",
                             (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
                             ((float)sumTime[i] / parent_sum * 100), sumTime[i],
                             (sumTime[i] / (current_frame+1)));
         }
     }
   }
+  long long run_time = global_timeFunction() - profile_start_time;
+  printf("\n Ran for a total of %lli, for an average of %lli per frame\n",
+          run_time, run_time/(current_frame+1));
+  float fps = MICROS_PER_SECOND/static_cast<float>(run_time);
+  printf("FPS: %f\n", fps);
 }
 
 

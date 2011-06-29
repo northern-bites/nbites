@@ -83,7 +83,8 @@ static const int NUM_PCOMPONENTS = P_TOTAL + 1;
 class Profiler {
   public:
 
-    Profiler(long long (*f)());
+    Profiler(long long (*thread_time_f)(),
+             long long (*global_time_f)());
     ~Profiler();
 
     void profileFrames(int num_frames);
@@ -99,11 +100,11 @@ class Profiler {
     static Profiler* getInstance() { return instance;}
 
     inline bool enterComponent(ProfiledComponent c) {
-      enterTime[c] = timeFunction();
+      enterTime[c] = thread_timeFunction();
       return profiling;
     }
     inline bool exitComponent(ProfiledComponent c) {
-      lastTime[c] = timeFunction() - enterTime[c];
+      lastTime[c] = thread_timeFunction() - enterTime[c];
       minTime[c] = std::min(lastTime[c], minTime[c]);
       maxTime[c] = std::max(lastTime[c], maxTime[c]);
       return profiling;
@@ -121,13 +122,15 @@ class Profiler {
 
   private:
 
-    long long (*timeFunction) ();
+    long long (*thread_timeFunction) ();
+    long long (*global_timeFunction) ();
 
     bool start_next_frame;
     int num_profile_frames;
     int current_frame;
     long long enterTime[NUM_PCOMPONENTS];
     long long lastTime[NUM_PCOMPONENTS];
+    long long profile_start_time;
 
     static Profiler* instance;
 
