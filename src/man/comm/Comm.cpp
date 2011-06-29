@@ -486,8 +486,10 @@ void Comm::run ()
             send();
 
             while (running && !timer.time_for_packet()) {
+                PROFS_ENTER(P_COMM);
                 receive();
                 nanosleep(&interval, &remainder);
+                PROFS_EXIT(P_COMM);
             }
         }
     } catch (socket_error &e) {

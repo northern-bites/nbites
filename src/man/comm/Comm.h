@@ -17,6 +17,7 @@
 #include "Vision.h"
 #include "CommTimer.h"
 #include "NogginStructs.h"
+#include "Profiler.h"
 
 class Comm
     : public Thread
@@ -24,7 +25,7 @@ class Comm
 public:
     Comm(boost::shared_ptr<Synchro> _synchro, boost::shared_ptr<Sensors> s,
          boost::shared_ptr<Vision> v);
-    ~Comm();
+    virtual ~Comm();
 
     int start();
     void stop();
@@ -84,6 +85,7 @@ private:
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     CommTimer timer;
     boost::shared_ptr<GameController> gc;
+    boost::shared_ptr<Profiler> profiler;
 
     // TOOLConnect sub-thread controller
     TOOLConnect tool;

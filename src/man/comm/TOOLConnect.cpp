@@ -60,6 +60,7 @@ TOOLConnect::run ()
         serial.bind();
 
         while (running) {
+            PROFS_ENTER(P_TOOLCONNECT);
             serial.accept();
 #ifdef DEBUG_TOOL_CONNECTS
             printf("Connection received from the TOOL\n");
@@ -75,6 +76,7 @@ TOOLConnect::run ()
                     fprintf(stderr, "%s\n", e.what());
                 }
             }
+            PROFS_EXIT(P_TOOLCONNECT);
         }
     }catch (socket_error &e) {
         if (running) {
@@ -151,11 +153,6 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Robot information request
     if (r.info) {
         serial.write_byte(ROBOT_TYPE);
-        //TODO: this is dumb, remove it
-        std::string name = "";
-        serial.write_bytes((const byte*)name.c_str(), name.size());
-        // TODO - get calibration file name access
-        serial.write_bytes((byte*)"table.mtb", strlen("table.mtb"));
     }
 
     std::vector<float> v;
