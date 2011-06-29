@@ -26,6 +26,8 @@ const float BallEKF::INIT_X_UNCERT          = FIELD_WIDTH / 4.0f;
 const float BallEKF::INIT_Y_UNCERT          = FIELD_HEIGHT / 4.0f;
 const float BallEKF::INIT_X_VEL_UNCERT      = 300.0f;
 const float BallEKF::INIT_Y_VEL_UNCERT      = 300.0f;
+const float BallEKF::INIT_X_ACC_UNCERT      = 300.0f;
+const float BallEKF::INIT_Y_ACC_UNCERT      = 300.0f;
 
 const float BallEKF::VELOCITY_EST_MAX       = 70.0f;
 const float BallEKF::VELOCITY_EST_MIN       = -VELOCITY_EST_MAX;
@@ -33,6 +35,7 @@ const float BallEKF::ACC_EST_MAX            = 150.0f;
 const float BallEKF::ACC_EST_MIN            = -ACC_EST_MAX;
 
 const float BallEKF::VELOCITY_EST_MIN_SPEED = 0.01f;
+const int BallEKF::ERROR_RESET_THRESH = 3;
 
 BallEKF::BallEKF()
     : EKF<RangeBearingMeasurement, MotionModel, ball_ekf_dimension,
@@ -165,18 +168,47 @@ void BallEKF::reset()
 {
     // Reset all of the matrices to zeros
     for(unsigned i = 0; i < numStates; ++i) {
+
+        xhat_k(i) = xhat_k_bar(i) = 0.0f;
+
         for(unsigned j = 0; j < numStates; ++j) {
-            Q_k(i,j) = 0.0f;
-            P_k(i,j) = 0.0f;
-            P_k_bar(i,j) = 0.0f;
+            A_k(i,j) = Q_k(i,j) = P_k(i,j) = P_k_bar(i,j) = 0.0f;
         }
     }
     // Set the initial values
-    P_k_bar(x_index,x_index) = INIT_X_UNCERT;
-    P_k_bar(y_index,y_index) = INIT_Y_UNCERT;
-    P_k_bar(vel_x_index,vel_x_index) = INIT_X_VEL_UNCERT;
-    P_k_bar(vel_y_index,vel_y_index) = INIT_Y_VEL_UNCERT;
+    P_k(x_index,x_index) = P_k_bar(x_index,x_index) = INIT_X_UNCERT;
+    P_k(y_index,y_index) = P_k_bar(y_index,y_index) = INIT_Y_UNCERT;
+    P_k(vel_x_index,vel_x_index) =
+        P_k_bar(vel_x_index,vel_x_index) = INIT_X_VEL_UNCERT;
+    P_k(vel_y_index,vel_y_index) =
+        P_k_bar(vel_y_index,vel_y_index) = INIT_Y_VEL_UNCERT;
+    P_k(acc_x_index,acc_x_index) =
+        P_k_bar(acc_x_index,acc_x_index) = INIT_X_ACC_UNCERT;
+    P_k(acc_y_index,acc_y_index) =
+        P_k_bar(acc_y_index,acc_y_index) = INIT_Y_ACC_UNCERT;
 }
+
+void BallEKF::resetModelTo(const RangeBearingMeasurement& ball)
+{
+    if (ball.distance > 0.0){
+        xhat_k(x_index) = ball.distance * cos(ball.bearing);
+        xhat_k(y_index) = ball.distance * sin(ball.bearing);
+
+        xhat_k(vel_y_index) = xhat_k(vel_y_index) = 0.0f;
+        xhat_k(acc_y_index) = xhat_k(acc_y_index) = 0.0f;
+
+        // Set the initial values
+        P_k(x_index,x_index) = ball.distanceSD * ball.distanceSD;
+        P_k(y_index,y_index) = ball.distanceSD * ball.distanceSD;
+        P_k(vel_x_index,vel_x_index) = INIT_X_VEL_UNCERT;
+        P_k(vel_y_index,vel_y_index) = INIT_Y_VEL_UNCERT;
+        P_k(acc_x_index,acc_x_index) = INIT_X_ACC_UNCERT;
+        P_k(acc_y_index,acc_y_index) = INIT_Y_ACC_UNCERT;
+
+        errorCounter = 0;
+    }
+}
+
 
 /**
  * Method to deal with updating the entire ball model
@@ -192,6 +224,10 @@ void BallEKF::updateModel(const MotionModel& odo,
     robotPose = p;
     updateFrameLength();
 
+    if (errorCounter > ERROR_RESET_THRESH){
+        resetModelTo(ball);
+    }
+
     // Update expected ball movement
     timeUpdate(odo);
 
@@ -202,6 +238,7 @@ void BallEKF::updateModel(const MotionModel& odo,
         correctionStep(z);
 
     } else { // No ball seen
+        errorCounter = 0;
         noCorrectionStep();
     }
     limitPosteriorEst();
@@ -419,6 +456,32 @@ void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
     R_k(vel_y_index,vel_y_index) = sd_dist_sq * 2 / dt;
     R_k(acc_x_index,acc_x_index) = sd_dist_sq * 2 * 2 / (dt * dt);
     R_k(acc_y_index,acc_y_index) = sd_dist_sq * 2 * 2 / (dt*dt);
+
+    // Calculate the standard error of the measurement
+    const StateMeasurementMatrix newP = prod(P_k, trans(H_k));
+    MeasurementMatrix se = prod(H_k, newP) + R_k;
+
+    // se is actually the variance (square of standard deviation)
+    // se(0,0) = sqrt(se(0,0));
+    // se(1,1) = sqrt(se(1,1));
+
+    // Square of the position error (standard deviation)
+    float errorDistSq = se(0,0) + se(1,1);
+    float measurementErrorSq = (V_k(x_index)*V_k(x_index) +
+                                V_k(y_index)*V_k(y_index));
+
+    // Ignore observations based on standard error
+    if ( errorDistSq*36.0f < measurementErrorSq) {
+#ifdef DEBUG_STANDARD_ERROR
+        cout << "\t Ignoring measurement " << endl;
+        cout << "\t Standard error is " << se << endl;
+        cout << "\t Invariance (V_k) is " << V_k(0) << endl;
+#endif
+        R_k(0,0) = DONT_PROCESS_KEY;
+    }
+
+    // If we've seen to many erroneous frames, let's reset to be safe
+    (R_k(0,0) == DONT_PROCESS_KEY) ? errorCounter++ : errorCounter = 0;
 
 #ifdef DEBUG_BALL_EKF
     cout << "Odometry: " << curOdo << endl
