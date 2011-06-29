@@ -132,7 +132,7 @@ void MotionSwitchboard::run() {
         processJoints();
         processStiffness();
         bool active  = postProcess();
-        PROF_EXIT(profiler, P_SWITCHBOARD);
+
 
         if(active)
         {
@@ -146,6 +146,7 @@ void MotionSwitchboard::run() {
         pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
         pthread_mutex_unlock(&calc_new_joints_mutex);
         frameCount++;
+        PROF_EXIT(profiler, P_SWITCHBOARD);
     }
     cout << "Switchboard run has exited" <<endl;
 }
