@@ -37,6 +37,7 @@ public:
 
     bool check_packet(const CommPacketHeader& packet);
     void updateTeamPackets(const CommPacketHeader& packet);
+    void checkDeadTeammates();
     void get_time_from_others();
     void reset();
 

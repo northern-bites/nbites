@@ -17,6 +17,17 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+/**
+ * This class provides the necessary mechanisms to monitor 
+ * network health according to trends in latencies and the
+ * number of packets dropped. It makes use of the SignalMonitor
+ * and Boxcar classes from the DSP library to store histograms of 
+ * the number of packets dropped and the distributions of packet
+ * latencies, as well as monitor the trend in packet loss.
+ * @author Ellis Ratner
+ * @date June 2011
+ */
+
 #ifndef NETWORK_MONITOR_H
 #define NETWORK_MONITOR_H
 
@@ -25,34 +36,67 @@
 class NetworkMonitor : public Boxcar
 {
 public:
+    /**
+     * Class constructor
+     */
     NetworkMonitor();
+
+    /**
+     * Class destructor.
+     */
     ~NetworkMonitor();
 
-    // Inherited from the Boxcar filter class, useful for determining
-    // what the trend is in packet loss.
     void Reset();
+
     double X(double);
 
+    /**
+     * Records that a packet has been received, and adds its latency to 
+     * the histogram, as well as notifying the dropped packets monitor
+     * that a packet has been received but not dropped.
+     * @param timeSent Time the packet was sent (microseconds).
+     * @param timeReceived Time the packet was received (microseconds).
+     */
     void packetReceived(long long timeSent, long long timeReceived);
+
+    /**
+     * Records that a number of packets have been dropped and updates
+     * the packets dropped histogram.
+     * @param numDropped The number of packets dropped.
+     */
     void packetsDropped(int numDropped);
+
 
     const int totalPacketsReceived() const;
     const int totalPacketsDropped() const;
     const int totalPackets() const { return totalPacketsReceived() + totalPacketsDropped(); }
 
-    // Returns the index of the bin with the highest number of entries; the
-    // midpoint of this bin can be considered the "peak" of the latency.
+    /**
+     * Finds the bin in the latency histogram with the highest number of
+     * entries. The midpoint of this bin is considered the peak of the 
+     * latency.
+     * @return Returns the index of peak latency bin.
+     */
     int findPeakLatency();
 
-    // Determines whether network health has deteriorated using shifts in the 
-    // peak latency and significant increases in packet loss as critera. Sends
-    // warnings by printing to the log.
+    /**
+     * Determines whether network health has deteriorated by using shifts in
+     * the latency peak and significant increases in packet loss as criteria.
+     * Sends warning notifications. 
+     */
     void performHealthCheck();
 
-    // Saves a report on the network to ~/naoqi/log/network.xls, including a histogram
-    // of the latency and dropped packets.
+    /**
+     * Saves a report on network health to ~/naoqi/log/network.xls on the robot,
+     * including a histogram of the latency and of dropped packets.
+     */
     void logOutput();
     
+    /**
+     * Sets a flag indicating whether or not a network health deterioration
+     * warning has been sent.
+     * @param sent True if sent; false if not.
+     */
     void setSentWarning(bool);
 
 private:

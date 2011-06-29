@@ -87,7 +87,6 @@ const int NetworkMonitor::totalPacketsDropped() const
     return droppedPackets.binCount(PACKET_DROPPED);
 }
 
-// Finds the index of the maximum bin in the latency signal monitor.
 int NetworkMonitor::findPeakLatency()
 {
     int maxBin = 0;

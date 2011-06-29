@@ -109,8 +109,30 @@ void CommTimer::updateTeamPackets(const CommPacketHeader& packet)
     teamPackets[packet.player - 1].lastNumber = packet.number;
     numPacketsChecked++;
 
+    // Also check if a teammate has not been heard from for more than 
+    // the TEAMMATE_DEAD_THRESHOLD time.
+    
+
     if (need_to_update)
 	get_time_from_others(); 
+}
+
+void CommTimer::checkDeadTeammates()
+{
+    llong currentTime = timestamp();
+
+    for(vector<CommTeammatePacketInfo>::iterator t = teamPackets.begin();
+	t != teamPackets.end(); ++t)
+    {
+	// If a teammate has not been heard from in more than 5 seconds,
+	// reset their lastNumber so that subsequent packets are not
+	// considered too old to process if they have been reset.
+	if(currentTime - t->timestamp > TEAMMATE_DEAD_THRESHOLD)
+	{
+	    // Needs to be reset.
+	    t->lastNumber = 0;
+	}
+    }
 }
 
 // Not sure yet what this does...may be redundant.
