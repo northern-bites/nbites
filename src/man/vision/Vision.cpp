@@ -42,9 +42,9 @@ static uint8_t global_8_image[IMAGE_BYTE_SIZE];
 static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 
 // Vision Class Constructor
-Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
-    : pose(_pose), profiler(_prof),
-      yImg(&global_16_image[0]), linesDetector(profiler),
+Vision::Vision(shared_ptr<NaoPose> _pose)
+    : pose(_pose),
+      yImg(&global_16_image[0]), linesDetector(),
       frameNumber(0), colorTable("table.mtb")
 {
     // variable initialization
@@ -67,7 +67,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose, shared_ptr<Profiler> _prof)
 	fieldEdge = new VisualFieldEdge();
 
     thresh = new Threshold(this, pose);
-    fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose, profiler));
+    fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose));
     thresh->setYUV(&global_16_image[0]);
 }
 
@@ -119,7 +119,7 @@ void Vision::notifyImage(const uint16_t* y) {
  *
  */
 void Vision::notifyImage() {
-    PROF_ENTER(profiler, P_VISION);
+    PROF_ENTER(P_VISION);
 
     // NORMAL VISION LOOP
     frameNumber++;
@@ -127,15 +127,15 @@ void Vision::notifyImage() {
     if (frameNumber > 1000000) frameNumber = 0;
 
     // Transform joints into pose estimations and horizon line
-    PROF_ENTER(profiler, P_TRANSFORM);
+    PROF_ENTER(P_TRANSFORM);
     pose->transform();
-    PROF_EXIT(profiler, P_TRANSFORM);
+    PROF_EXIT(P_TRANSFORM);
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
 
     // linesDetector.detect(yImg);
-    PROF_EXIT(profiler, P_VISION);
+    PROF_EXIT(P_VISION);
 }
 
 void Vision::setImage(const uint16_t *image) {

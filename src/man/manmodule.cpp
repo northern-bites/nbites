@@ -69,8 +69,8 @@ int ALCreateMan( ALPtr<ALBroker> broker){
             new ALImageTranscriber(synchro, sensors, broker));
     static shared_ptr<Profiler> profiler(new Profiler(&thread_micro_time));
 #ifdef USE_DCM
-    static shared_ptr<EnactorT> enactor(new EnactorT(profiler, sensors,
-                                                transcriber,broker));
+    static shared_ptr<EnactorT> enactor(new EnactorT(sensors,
+            transcriber, broker));
 #else
     static shared_ptr<EnactorT> enactor(new EnactorT(sensors,synchro,
                                                 transcriber,broker));

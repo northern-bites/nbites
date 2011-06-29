@@ -202,8 +202,7 @@ private:
 public:
 
     FieldLines(Vision *visPtr,
-               boost::shared_ptr<NaoPose> posePtr,
-               boost::shared_ptr<Profiler> profilerPtr);
+               boost::shared_ptr<NaoPose> posePtr);
     virtual ~FieldLines() {}
 
     // master loop
@@ -689,7 +688,6 @@ private:
 private:
     Vision *vision;
     boost::shared_ptr<NaoPose> pose;
-    boost::shared_ptr<Profiler> profiler;
 
     std::vector <boost::shared_ptr<VisualLine> > linesList;
     std::list <VisualCorner> cornersList;

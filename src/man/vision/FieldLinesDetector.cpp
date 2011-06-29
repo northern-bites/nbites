@@ -3,8 +3,8 @@
 using namespace std;
 using boost::shared_ptr;
 
-FieldLinesDetector::FieldLinesDetector(shared_ptr<Profiler> p) :
-    VisualDetector(), edges(p), hough(p), gradient(new Gradient()),
+FieldLinesDetector::FieldLinesDetector() :
+    VisualDetector(), edges(), hough(), gradient(new Gradient()),
     houghLines()
 {
 

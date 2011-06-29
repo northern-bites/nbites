@@ -15,10 +15,8 @@ long long int birth_time; //the time we initialized memory
 
 using boost::shared_ptr;
 
-Memory::Memory(shared_ptr<Profiler> profiler_ptr,
-        shared_ptr<Vision> vision_ptr,
+Memory::Memory(shared_ptr<Vision> vision_ptr,
         shared_ptr<Sensors> sensors_ptr) :
-        _profiler(profiler_ptr),
         _sensors(sensors_ptr),
         mVision(new MVision(MVISION_ID,
                 MObject::NameFromID(MVISION_ID),
@@ -57,23 +55,23 @@ void Memory::updateVision() {
 void Memory::update(SensorsEvent event) {
 #ifdef USE_MEMORY
     if (event == NEW_MOTION_SENSORS) {
-        PROF_ENTER(_profiler.get(), P_MEMORY_MOTION_SENSORS);
+        PROF_ENTER(P_MEMORY_MOTION_SENSORS);
         mMotionSensors->update();
         notifySubscribers(MMOTION_SENSORS_ID);
-        PROF_EXIT(_profiler.get(), P_MEMORY_MOTION_SENSORS);
+        PROF_EXIT(P_MEMORY_MOTION_SENSORS);
     }
 
     if (event == NEW_VISION_SENSORS) {
-        PROF_ENTER(_profiler.get(), P_MEMORY_VISION_SENSORS);
+        PROF_ENTER(P_MEMORY_VISION_SENSORS);
         mVisionSensors->update();
         notifySubscribers(MVISION_SENSORS_ID);
-        PROF_EXIT(_profiler.get(), P_MEMORY_VISION_SENSORS);
+        PROF_EXIT(P_MEMORY_VISION_SENSORS);
     }
 
     if (event == NEW_IMAGE) {
-        PROF_ENTER(_profiler.get(), P_MEMORY_IMAGE);
+        PROF_ENTER(P_MEMORY_IMAGE);
         mImage->update();
-        PROF_EXIT(_profiler.get(), P_MEMORY_IMAGE);
+        PROF_EXIT(P_MEMORY_IMAGE);
         notifySubscribers(MIMAGE_ID);
     }
 #endif

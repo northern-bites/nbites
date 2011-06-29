@@ -414,7 +414,6 @@ bool c_init_comm (void)
     shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());
     shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
 
-    shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&micro_time));
     shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
     shared_ptr<Vision> vision = shared_ptr<Vision>(new Vision(pose, prof));
 
@@ -486,10 +485,10 @@ void Comm::run ()
             send();
 
             while (running && !timer.time_for_packet()) {
-                PROFS_ENTER(P_COMM);
+                PROF_ENTER(P_COMM);
                 receive();
                 nanosleep(&interval, &remainder);
-                PROFS_EXIT(P_COMM);
+                PROF_EXIT(P_COMM);
             }
         }
     } catch (socket_error &e) {

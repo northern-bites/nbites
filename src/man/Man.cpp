@@ -59,11 +59,11 @@ Man::Man (shared_ptr<Profiler> _profiler,
           shared_ptr<Synchro> synchro,
           shared_ptr<Lights> _lights,
           shared_ptr<Speech> _speech)
-    :     sensors(_sensors),
+    :     profiler(_profiler),
+          sensors(_sensors),
           transcriber(_transcriber),
           imageTranscriber(_imageTranscriber),
           enactor(_enactor),
-          profiler(_profiler),
           lights(_lights),
           speech(_speech)
 {
@@ -86,7 +86,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 
   // initialize core processing modules
 #ifdef USE_MOTION
-  motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors,profiler,pose));
+  motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors,pose));
   guardian->setMotionInterface(motion->getInterface());
 #endif
   // initialize python roboguardian module.
@@ -96,13 +96,13 @@ Man::Man (shared_ptr<Profiler> _profiler,
   set_lights_pointer(_lights);
   set_speech_pointer(_speech);
 
-  vision = shared_ptr<Vision>(new Vision(pose, profiler));
+  vision = shared_ptr<Vision>(new Vision(pose));
 
   set_vision_pointer(vision);
 
   comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
 
-  memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
+  memory = shared_ptr<Memory>(new Memory(vision, sensors));
 
   loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory));
   set_logging_board_pointer(loggingBoard);
@@ -113,13 +113,13 @@ Man::Man (shared_ptr<Profiler> _profiler,
 #endif
 
 #ifdef USE_NOGGIN
-  noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
+  noggin = shared_ptr<Noggin>(new Noggin(vision,comm,guardian,
                                          sensors, loggingBoard,
                                          motion->getInterface()));
 #endif// USE_NOGGIN
 
-  PROF_ENTER(profiler.get(), P_MAIN);
-  PROF_ENTER(profiler.get(), P_GETIMAGE);
+  PROF_ENTER(P_MAIN);
+  PROF_ENTER(P_GETIMAGE);
 }
 
 Man::~Man ()
@@ -201,7 +201,7 @@ void Man::stopSubThreads() {
 void
 Man::processFrame ()
 {
-    PROF_EXIT(profiler.get(), P_GETIMAGE);
+    PROF_EXIT(P_GETIMAGE);
 
 #ifdef USE_VISION
     // Need to lock image and vision angles for duration of
@@ -224,14 +224,14 @@ Man::processFrame ()
     noggin->runStep();
 #endif
 
-    PROF_ENTER(profiler.get(), P_LIGHTS);
+    PROF_ENTER(P_LIGHTS);
     lights->sendLights();
-    PROF_EXIT(profiler.get(), P_LIGHTS);
+    PROF_EXIT(P_LIGHTS);
 
-    PROF_EXIT(profiler.get(), P_MAIN);
-    PROF_NFRAME(profiler.get());
-    PROF_ENTER(profiler.get(), P_MAIN);
-    PROF_ENTER(profiler.get(), P_GETIMAGE);
+    PROF_EXIT(P_MAIN);
+    PROF_NFRAME();
+    PROF_ENTER(P_MAIN);
+    PROF_ENTER(P_GETIMAGE);
 }
 
 

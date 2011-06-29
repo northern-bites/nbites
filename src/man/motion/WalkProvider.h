@@ -55,8 +55,7 @@
 class WalkProvider : public MotionProvider {
 public:
     WalkProvider(boost::shared_ptr<Sensors> s,
-                 boost::shared_ptr<NaoPose> pose,
-		 boost::shared_ptr<Profiler> p);
+                 boost::shared_ptr<NaoPose> pose);
     virtual ~WalkProvider();
 
     void requestStopFirstInstance();

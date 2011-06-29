@@ -85,7 +85,6 @@ private:
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     CommTimer timer;
     boost::shared_ptr<GameController> gc;
-    boost::shared_ptr<Profiler> profiler;
 
     // TOOLConnect sub-thread controller
     TOOLConnect tool;

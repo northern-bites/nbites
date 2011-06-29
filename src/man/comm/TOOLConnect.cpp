@@ -60,7 +60,7 @@ TOOLConnect::run ()
         serial.bind();
 
         while (running) {
-            PROFS_ENTER(P_TOOLCONNECT);
+            PROF_ENTER(P_TOOLCONNECT);
             serial.accept();
 #ifdef DEBUG_TOOL_CONNECTS
             printf("Connection received from the TOOL\n");
@@ -76,7 +76,7 @@ TOOLConnect::run ()
                     fprintf(stderr, "%s\n", e.what());
                 }
             }
-            PROFS_EXIT(P_TOOLCONNECT);
+            PROF_EXIT(P_TOOLCONNECT);
         }
     }catch (socket_error &e) {
         if (running) {
