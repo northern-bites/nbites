@@ -117,9 +117,6 @@ Man::Man (shared_ptr<Profiler> _profiler,
                                          sensors, loggingBoard,
                                          motion->getInterface()));
 #endif// USE_NOGGIN
-
-  PROF_ENTER(P_MAIN);
-  PROF_ENTER(P_GETIMAGE);
 }
 
 Man::~Man ()
@@ -201,7 +198,6 @@ void Man::stopSubThreads() {
 void
 Man::processFrame ()
 {
-    PROF_EXIT(P_GETIMAGE);
 
 #ifdef USE_VISION
     // Need to lock image and vision angles for duration of
@@ -211,9 +207,9 @@ Man::processFrame ()
     // TODO: this is temporarily here
     //loggingBoard->log(MIMAGE_ID);
 #endif
-
+    PROF_ENTER(P_VISION);
     vision->notifyImage(sensors->getImage());
-
+    PROF_EXIT(P_VISION);
     sensors->releaseImage();
 #endif
 #ifdef USE_MEMORY
@@ -227,11 +223,6 @@ Man::processFrame ()
     PROF_ENTER(P_LIGHTS);
     lights->sendLights();
     PROF_EXIT(P_LIGHTS);
-
-    PROF_EXIT(P_MAIN);
-    PROF_NFRAME();
-    PROF_ENTER(P_MAIN);
-    PROF_ENTER(P_GETIMAGE);
 }
 
 

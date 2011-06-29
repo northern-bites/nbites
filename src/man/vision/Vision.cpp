@@ -119,7 +119,6 @@ void Vision::notifyImage(const uint16_t* y) {
  *
  */
 void Vision::notifyImage() {
-    PROF_ENTER(P_VISION);
 
     // NORMAL VISION LOOP
     frameNumber++;
@@ -135,7 +134,6 @@ void Vision::notifyImage() {
     thresh->visionLoop();
 
     // linesDetector.detect(yImg);
-    PROF_EXIT(P_VISION);
 }
 
 void Vision::setImage(const uint16_t *image) {
