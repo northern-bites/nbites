@@ -2,7 +2,6 @@
 # The transitions for the goalie for the goalie states.
 # Covers chase, position and save.
 #
-from math import fabs
 from .. import NogginConstants as NogCon
 import GoalieConstants as goalCon
 
@@ -11,11 +10,13 @@ import GoalieConstants as goalCon
 def shouldSave(player):
     ball = player.brain.ball
 
-    if (fabs(ball.relAccX) > 1 and ball.heat == 0):
-        player.shouldSaveCounter += 1
-        if player.shouldSaveCounter > 1:
-            player.shouldSaveCounter = 0
-            return True
+    # Not sure if we want velocity or accel here
+    # and do we want ball.heat?
+    if (ball.relVelX < -2 and ball.heat == 0):
+        #player.shouldSaveCounter += 1
+        #if player.shouldSaveCounter > 1:
+            #player.shouldSaveCounter = 0
+        return True
 
     return False
 

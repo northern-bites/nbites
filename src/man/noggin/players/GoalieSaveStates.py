@@ -22,8 +22,8 @@ def goalieSave(player):
     #print ball.velX
     #print "accX"
     #print ball.accX
-    #print "relVelX"
-    #print ball.relVelX
+    print "relVelX"
+    print ball.relVelX
     print "relAccX"
     print ball.relAccX
     print "heat"

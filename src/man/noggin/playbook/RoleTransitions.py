@@ -18,6 +18,9 @@ def shouldPositionForSave(team):
             resetCounters(team)
             return True
 
+    #elif ball.relVelX < -20 :
+        #return True
+
     return False
 
 
