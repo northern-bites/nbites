@@ -28,6 +28,8 @@ static const float MAX_CROSS_DISTANCE = 150.0f;
 using namespace std;
 using namespace boost;
 
+using namespace man::memory::log;
+
 #ifdef LOG_LOCALIZATION
 fstream outputFile;
 #include <ctime>
@@ -37,12 +39,15 @@ const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (shared_ptr<Profiler> p, shared_ptr<Vision> v,
                 shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
-                shared_ptr<Sensors> _sensors, MotionInterface * _minterface)
+                shared_ptr<Sensors> _sensors, shared_ptr<LoggingBoard> loggingBoard,
+                MotionInterface * _minterface
+                )
     : profiler(p),
       vision(v),
       comm(c),
       gc(c->getGC()),
       sensors(_sensors),
+      loggingBoard(loggingBoard),
       chestButton(rbg->getButton(CHEST_BUTTON)),
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
@@ -101,6 +106,7 @@ void Noggin::initializePython()
     c_init_roboguardian();
     c_init_motion();
     c_init_comm();
+    c_init_logging();
     comm->add_to_module();
 
     // Initialize PyVision module

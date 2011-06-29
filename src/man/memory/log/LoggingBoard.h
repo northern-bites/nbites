@@ -29,7 +29,8 @@ namespace man {
 namespace memory {
 namespace log {
 
-class LoggingBoard : MemoryIOBoard<FDLogger> {
+class LoggingBoard : public MemoryIOBoard<FDLogger> ,
+                     public Subscriber<MObject_ID> {
 
 public:
     LoggingBoard(Memory::const_ptr memory,
@@ -40,7 +41,11 @@ public:
 
     void newIOProvider(IOProvider::const_ptr ioProvider);
     //returns a NULL pointer if such a logger doesn't exist
-    ImageLogger::const_ptr getImageLogger(MObject_ID id) const;
+    void update(MObject_ID id);
+
+    void startLogging();
+    void stopLogging();
+    bool isLogging() { return logging; }
 
 protected:
     //returns a NULL pointer if such a logger doesn't exist
@@ -50,6 +55,7 @@ protected:
 
 private:
     Memory::const_ptr memory;
+    bool logging;
 
 };
 }
