@@ -12,12 +12,13 @@
 
 #pragma once
 
-#include "ProviderEvent.h"
-
+template <class T>
 class Subscriber {
+
+    typedef T event_type;
 
 public:
     Subscriber(){};
 
-    virtual void update(const ProviderEvent ProviderEvent) = 0;
+    virtual void update(event_type event) = 0;
 };

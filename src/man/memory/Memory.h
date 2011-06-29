@@ -15,6 +15,7 @@
 #pragma once
 
 #include <boost/shared_ptr.hpp>
+#include <map>
 
 namespace man {
 namespace memory {
@@ -29,51 +30,63 @@ class Memory; //forward declaration
 #include "MImage.h"
 #include "Sensors.h"
 #include "Profiler.h"
-#include "log/LoggingBoard.h"
+#include "include/MultiProvider.h"
 
 namespace man {
 namespace memory {
 
-using boost::shared_ptr;
+typedef google::protobuf::Message ProtoMessage;
 
-class Memory : public Subscriber {
+class Memory : public Subscriber<SensorsEvent>,
+               public MultiProvider<MObject_ID> {
 
 public:
-    Memory( shared_ptr<Profiler> profiler_ptr,
-            shared_ptr<Vision> vision_ptr,
-            shared_ptr<Sensors> sensors_ptr);
-    ~Memory();
+    typedef boost::shared_ptr<Memory> ptr;
+    typedef boost::shared_ptr<const Memory> const_ptr;
+    typedef std::pair<MObject_ID,
+            boost::shared_ptr<ProtoMessage> > ProtoMessagePair;
+    typedef std::map<MObject_ID,
+            boost::shared_ptr<ProtoMessage> > ProtoMessageMap;
+
+public:
+    Memory( boost::shared_ptr<Profiler> profiler_ptr = boost::shared_ptr<Profiler>(),
+            boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
+            boost::shared_ptr<Sensors> sensors_ptr = boost::shared_ptr<Sensors>());
+    virtual ~Memory();
     /**
      * calls the update function on @obj
      * this will usually make the MObject pull data
      * from its corresponding man object and maybe log it
      */
-    void update(MObject* obj);
+    void update(boost::shared_ptr<MObject> obj);
     void updateVision();
-//    void updateMotionSensors();
-//    void updateVisionSensors();
-//    void updateImage();
+
     /**
      * This function is called whenever one of the Providers we are subscribed
      * to has something new/updated
      */
-    void update(const ProviderEvent e);
+    void update(SensorsEvent eventID);
 
 public:
-    const MVision* getMVision() const {return mVision;}
-    const MVisionSensors* getMVisionSensors() const {return mVisionSensors;}
-    const MMotionSensors* getMMotionSensors() const {return mMotionSensors;}
-    const MImage* getMImage() const {return mImage;}
+    const MVision* getMVision() const {return mVision.get();}
+    const MVisionSensors* getMVisionSensors() const {return mVisionSensors.get();}
+    const MMotionSensors* getMMotionSensors() const {return mMotionSensors.get();}
+    const MImage* getMImage() const {return mImage.get();}
+
+    boost::shared_ptr<const RoboImage> getRoboImage() const {return mImage;}
+    boost::shared_ptr<const ProtoMessage> getProtoMessage(MObject_ID id) const;
+
+    boost::shared_ptr<RoboImage> getMutableRoboImage() {return mImage;}
+    boost::shared_ptr<ProtoMessage> getMutableProtoMessage(MObject_ID id);
 
 private:
-    shared_ptr<Profiler> _profiler;
-    shared_ptr<Sensors> _sensors;
-    MVision* mVision;
-    MVisionSensors* mVisionSensors;
-    MMotionSensors* mMotionSensors;
-    MImage* mImage;
-
-    log::LoggingBoard* loggingBoard;
+    ProtoMessageMap protoMessageMap;
+    boost::shared_ptr<Profiler> _profiler;
+    boost::shared_ptr<Sensors> _sensors;
+    boost::shared_ptr<MVision> mVision;
+    boost::shared_ptr<MVisionSensors> mVisionSensors;
+    boost::shared_ptr<MMotionSensors> mMotionSensors;
+    boost::shared_ptr<MImage> mImage;
 };
 }
 }

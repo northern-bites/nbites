@@ -32,7 +32,7 @@ def penaltyGoalie(player):
     player.penaltyMadeFirstKick = True
     player.penaltyMadeSecondKick = False
 
-    roleState = player.getRoleState(GOALIE)
+    roleState = player.getRoleState()
     return player.goLater(roleState)
 
 def penaltyBallInOppGoalbox(player):

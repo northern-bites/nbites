@@ -13,8 +13,8 @@ def setDestination(nav, x, y, theta, gain):
     """
     Calls setDestination within the motion engine
     """
-    destination = motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
-    nav.brain.motion.sendDestCommand(destination)
+    nav.currentCommand = motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
+    nav.brain.motion.sendDestCommand(nav.currentCommand)
 
 def setSpeed(nav, x, y, theta):
     """

@@ -51,9 +51,15 @@ using namespace std;
 using namespace AL;
 using boost::shared_ptr;
 
-void ALCreateMan( ALPtr<ALBroker> broker){
+static shared_ptr<ALMan> man_pointer;
+
+int ALCreateMan( ALPtr<ALBroker> broker){
     static shared_ptr<Synchro> synchro(new Synchro());
+#ifdef USE_ALSPEECH
     static shared_ptr<Speech> speech(new ALSpeech(broker));
+#else
+    static shared_ptr<Speech> speech(new Speech());
+#endif
     static shared_ptr<Sensors> sensors(new Sensors(speech));
     static shared_ptr<ALTranscriber> transcriber(new ALTranscriber(broker,sensors));
     static shared_ptr<ALImageTranscriber> imageTranscriber(
@@ -70,7 +76,7 @@ void ALCreateMan( ALPtr<ALBroker> broker){
 
     //setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
-    static shared_ptr<ALMan> man = boost::shared_ptr<ALMan> (new ALMan(profiler,
+    man_pointer = boost::shared_ptr<ALMan> (new ALMan(profiler,
                                               sensors,
                                               transcriber,
                                               imageTranscriber,
@@ -78,14 +84,13 @@ void ALCreateMan( ALPtr<ALBroker> broker){
                                               synchro,
                                               lights,
                                               speech));
-    man->startSubThreads();
+    man_pointer->startSubThreads();
+    return 0;
 }
 
 // it appears that Aldebaran doesn't actually call this method for us
 void ALDestroyMan(){
-//    man->stopSubThreads();
 }
-
 
 
 #ifndef MAN_IS_REMOTE
@@ -101,50 +106,43 @@ extern "C"
 {
 #endif
 
-ALCALL int _createModule( ALPtr<ALBroker> pBroker )
+class ManModule : public AL::ALModule
 {
-#ifdef REDIRECT_C_STDERR
-  // Redirect stderr to stdout
-  FILE *_syderr = stderr;
-#ifndef __APPLE__
-  stderr = stdout;
-#endif
-#endif
+public:
 
-  // init broker with the main broker inctance
-  // from the parent executable
-  ALBrokerManager::setInstance(pBroker->fBrokerManager.lock());
-  ALBrokerManager::getInstance()->addBroker(pBroker);
+  ManModule(AL::ALPtr<AL::ALBroker> pBroker, const std::string& pName): ALModule(pBroker, pName)
+  {
+    setModuleDescription( "A module that provides basic ipc NaoQi DCM access using shared memory." );
 
-  // create modules instance
-  //<OGETINSTANCE> don't remove this comment
+    if(ALCreateMan(pBroker) != 0)
+      throw ALERROR("ManModule", "constructor", "");
+  }
 
-  //</OGETINSTANCE> don't remove this comment
+  virtual ~ManModule()
+  {
+      cout << "Destroying man module" << endl;
+      man_pointer->stopSubThreads();
+  }
 
-  //NBites code
-  ALCreateMan(pBroker);
-  //man  = boost::shared_ptr<Man>(new Man(pBroker,"Man"));
-  //man->manStart();
+};
 
-  return 0;
+
+ALCALL int _createModule( ALPtr<ALBroker> pBroker ) {
+    AL::ALModule::createModule<ManModule>(pBroker, "ManModule");
+    return 0;
 }
 
-ALCALL int _closeModule(  )
-{
-  // Delete module instance
-  //<OKILLINSTANCE> don't remove this comment
-  //ALPtr<ALProxy>
-  // man  = pBroker->getProxy("Man");
+ALCALL int _closeModule(  ) {
     ALDestroyMan();
-  //</OKILLINSTANCE> don't remove this comment
-
-  return 0;
+    return 0;
 }
 
 # ifdef __cplusplus
 }
 # endif
 
+//The wasteland from here down - Man is never remote anymore
+//TODO (fun) : remove this
 #else//MAN_IS_REMOTE
 void _terminationHandler( int signum )
 {

@@ -10,6 +10,9 @@
 #pragma once
 
 #include <string>
+
+class ProviderEvent;
+
 #include "Provider.h"
 
 class ProviderEvent {

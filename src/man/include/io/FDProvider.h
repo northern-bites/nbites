@@ -14,16 +14,34 @@
 
 #pragma once
 
+#include <boost/shared_ptr.hpp>
+#include <string>
+
+namespace man {
+namespace include {
+namespace io {
 
 class FDProvider {
 
 public:
-    FDProvider() {};
+    typedef boost::shared_ptr<FDProvider> ptr;
+    typedef boost::shared_ptr<const FDProvider> const_ptr;
+
+public:
+    FDProvider() : file_descriptor(0) {}
+    virtual ~FDProvider() {};
     int getFileDescriptor() const { return file_descriptor; }
 
+    virtual std::string debugInfo() const = 0;
+
+protected:
     virtual void openFileDescriptor() = 0;
 
 protected:
     int file_descriptor;
 
 };
+
+}
+}
+}

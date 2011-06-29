@@ -9,7 +9,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "protos/Sensors.pb.h"
 #include "RoboImage.h"
 #include "MObject.h"
 #include "Sensors.h"
@@ -23,8 +22,8 @@ public:
      * @param v : the shared pointer to the instance of Sensors this MImage
      * links to
      */
-    MImage(boost::shared_ptr<Sensors> s);
-    ~MImage();
+    MImage(MObject_ID id, std::string name, boost::shared_ptr<Sensors> s);
+    virtual ~MImage();
     /**
      * Updates all the fields of the underlying proto::PSensors with values
      * from the Sensors object

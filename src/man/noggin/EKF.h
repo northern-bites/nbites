@@ -32,7 +32,8 @@ enum {
     dist_bearing_meas_dim = 2, // (Dist, Bearing) measurements
     corner_measurement_dim = 3, // (Dist, Bearing, Orientation) meas.
     loc_ekf_dimension = 3,  // # of states in Loc EKF
-    ball_ekf_dimension = 4, // # of states in Ball EKF
+    ball_ekf_meas_dim = 6,
+    ball_ekf_dimension = 6, // # of states in Ball EKF
     acc_num_dimensions = 3,
     acc_num_measurements = 3,
     angle_num_dimensions = 2,
@@ -264,6 +265,10 @@ protected:
                   isinf(xhat_k(i)) || isinf(xhat_k_bar(i))) {
                    std::cout << "Resetting EKF due to nan or inf value."
                              << std::endl;
+                   std::cout << "xhat_k: " << xhat_k << std::endl;
+                   std::cout << "xhat_k_bar: " << xhat_k_bar << std::endl;
+                   std::cout << "P_k: " << P_k << std::endl;
+                   std::cout << "P_k_bar: " << P_k_bar << std::endl;
                    reset();
                    return true;
                }

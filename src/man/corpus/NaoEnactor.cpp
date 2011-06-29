@@ -21,10 +21,14 @@ using namespace ALNames;
 using Kinematics::jointsMaxVelNoLoad;
 
 void staticPostSensors(NaoEnactor * n) {
-    n->postSensors();
+    if (n != NULL) {
+        n->postSensors();
+    }
 }
 void staticSendCommands(NaoEnactor * n) {
-    n->sendCommands();
+    if (n != NULL) {
+        n->sendCommands();
+    }
 }
 
 NaoEnactor::NaoEnactor(boost::shared_ptr<Profiler> p,

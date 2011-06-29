@@ -36,12 +36,14 @@ using namespace boost::assign;
 #include "PySensors.h"
 #include "PyLights.h"
 #include "PySpeech.h"
+#include "memory/log/IOProviderFactory.h"
 
 //#include <valgrind/callgrind.h>
 
 using namespace std;
 using boost::shared_ptr;
-using man::memory::Memory;
+using namespace man::memory;
+using namespace man::memory::log;
 
 /////////////////////////////////////////
 //                                     //
@@ -99,13 +101,23 @@ Man::Man (shared_ptr<Profiler> _profiler,
   set_vision_pointer(vision);
 
   comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
+
+  memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
+
+  loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory));
+  set_logging_board_pointer(loggingBoard);
+  memory->addSubscriber(loggingBoard.get());
+
+#ifdef USE_MEMORY
+  loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
+#endif
+
 #ifdef USE_NOGGIN
   noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
-                                         sensors, motion->getInterface()));
+                                         sensors, loggingBoard,
+                                         motion->getInterface()));
 #endif// USE_NOGGIN
-#ifdef USE_MEMORY
-  memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
-#endif
+
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
@@ -191,6 +203,10 @@ Man::processFrame ()
     // Need to lock image and vision angles for duration of
     // vision processing to ensure consistency.
     sensors->lockImage();
+#ifdef USE_MEMORY
+    // TODO: this is temporarily here
+    //loggingBoard->log(MIMAGE_ID);
+#endif
 
     vision->notifyImage(sensors->getImage());
 
@@ -198,6 +214,7 @@ Man::processFrame ()
 #endif
 #ifdef USE_MEMORY
     memory->updateVision();
+    loggingBoard->log(MVISION_ID);
 #endif
 #ifdef USE_NOGGIN
     noggin->runStep();

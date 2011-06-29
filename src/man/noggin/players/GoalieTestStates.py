@@ -14,16 +14,16 @@ import GoalieConstants as goalCon
 def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
-        player.standup()
+        player.excuteMove(SweetMoves.INITIAL_POS)
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
+        player.excuteMove(SweetMoves.INITIAL_POS)
         #player.brain.fallController.enableFallProtection(False)
         player.brain.tracker.trackBall()
         #player.brain.tracker.activeLoc()
-        player.standup()
 
     return player.stay()
 
@@ -32,7 +32,8 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
-    player.walkPose()
+    if player.firstFrame():
+        player.executeMove(SweetMoves.INITIAL_POS)
     return player.goNow('testDX')
 
 def gamePenalized(player):
@@ -51,6 +52,19 @@ def gamePenalized(player):
 
     return player.stay()
 
+def testHeat(player):
+    ball = player.brain.ball
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+    if player.counter % 10 == 0:
+        print ball.heat
+
+    if ball.heat >= 10:
+        player.brain.speech.say("Save")
+
+    return player.stay()
+
 def testDive(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
@@ -59,15 +73,16 @@ def testDive(player):
 
 def testDX(player):
     ball=player.brain.ball
-    if player.counter % 3 == 1:
-        print "relX"
-        print ball.relX
-        print "relY"
-        print ball.relY
-        print "dx"
-        print ball.dx
-        print "dy"
-        print ball.dy
+
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
+    print "dx"
+    print ball.dx
+    print "relVelX"
+    print ball.relVelX
+    print "heat"
+    print ball.heat
 
     return player.stay()
 
@@ -78,46 +93,6 @@ def testSaveDecision(player):
         return player.goNow('goalieSave')
 
     return player.stay()
-
-    # if ball.framesOn > 0 :
-    #     if(ball.dx > 11 or ball.dx < -11):
-    #         print "moving"
-    #         if ball.relY > goalCon.CENTER_SAVE_THRESH:
-    #             print "save right + 1"
-    #             player.counterRightSave +=1
-    #             if player.counterRightSave > 3:
-    #                 player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
-    #                 print "save right"
-    #                 player.counterRightSave = 0
-    #                 player.counterLeftSave = 0
-    #                 player.counterCenterSave = 0
-    #         elif ball.relY < -goalCon.CENTER_SAVE_THRESH:
-    #             print "save left + 1"
-    #             player.counterLeftSave +=1
-    #             if player.counterLeftSave > 3:
-    #                 player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
-    #                 print "save left"
-    #                 player.counterRightSave = 0
-    #                 player.counterLeftSave = 0
-    #                 player.counterCenterSave = 0
-    #         elif( ball.relY > -goalCon.CENTER_SAVE_THRESH and
-    #               ball.relY < goalCon.CENTER_SAVE_THRESH):
-    #             print "save center + 1"
-    #             player.counterCenterSave +=1
-    #             if player.counterCenterSave > 3:
-    #                 player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
-    #                 print "save center"
-    #                 player.counterRightSave = 0
-    #                 player.counterLeftSave = 0
-    #                 player.counterCenterSave = 0
-
-    #    # if ball.relX < 85:
-    #         #print "save now"
-    #    # else:
-    #        # print "save later"
-
-    # return player.stay()
-
 
 # not using below here for now
 def testDangerousBall(player):

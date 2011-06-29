@@ -1,9 +1,7 @@
-
-import GoalieTransitions as goalTran
-from ..import NogginConstants as nogCon
+#
+# States for positioning the goalie.
+#
 import GoalieConstants as goalCon
-import ChaseBallStates as chaseBall
-from man.noggin.typeDefs.Location import RobotLocation
 
 def goaliePosition(player):
     """
@@ -26,3 +24,22 @@ def goaliePosition(player):
 
     return player.stay()
 
+
+def kickOffPosition(player):
+    """
+    Do nothing until you know something happened.
+    Meant for kickoff situations
+    """
+    ball = player.brain.ball
+
+    if player.firstFrame():
+        player.brain.resetGoalieLocalization()
+
+    # When the ball is far away we want to make sure we
+    # are in position
+    if ball.dist >= goalCon.ACTIVE_LOC_THRESH:
+        player.brain.tracker.activeLocGoaliePos()
+    else:
+        player.brain.tracker.trackBall()
+
+    return player.stay()

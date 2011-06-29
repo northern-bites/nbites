@@ -102,17 +102,22 @@ class Ball(VisualObject):
         """
         Update all of our inforamtion pased on the newest localization info
         """
+        globalX = loc.ballX
+        globalY = loc.ballY
+        globalVelX = loc.ballVelX
+        globalVelY = loc.ballVelY
+
         # Get latest estimates
         if my.teamColor == Constants.TEAM_BLUE:
-            self.x = loc.ballX
-            self.y = loc.ballY
-            self.velX = loc.ballVelX
-            self.velY = loc.ballVelY
+            self.x = globalX
+            self.y = globalY
+            self.velX = globalVelX
+            self.velY = globalVelY
         else:
-            self.x = Constants.FIELD_GREEN_WIDTH - loc.ballX
-            self.y = Constants.FIELD_GREEN_HEIGHT - loc.ballY
-            self.velX = -loc.ballVelX
-            self.velY = -loc.ballVelY
+            self.x = Constants.FIELD_GREEN_WIDTH - globalX
+            self.y = Constants.FIELD_GREEN_HEIGHT - globalY
+            self.velX = -globalVelX
+            self.velY = -globalVelY
 
         self.uncertX = loc.ballXUncert
         self.uncertY = loc.ballYUncert
@@ -121,34 +126,28 @@ class Ball(VisualObject):
         self.sd = self.uncertX * self.uncertY
 
         # Determine other values
-        self.locDist = my.distTo(self, forceCalc=True)
-        self.locBearing = my.getRelativeBearing(self, forceCalc=True)
-        self.relVelX = getRelativeVelocityX(my.h, self.velX, self.velY)
-        self.relVelY = getRelativeVelocityY(my.h, self.velX, self.velY)
+        self.locDist = loc.ballDistance
+        self.locBearing = loc.ballBearing
+        self.relVelX = loc.ballRelVelX
+        self.relVelY = loc.ballRelVelY
+
+        self.locRelX = loc.ballRelX
+        self.locRelY = loc.ballRelY
 
     def updateBestValues(self, my):
-        if self.on:
-            self.bearing = self.visBearing
-            self.dist = self.visDist
-            self.heading = sub180Angle(my.h + self.bearing)
-
-        # use old vision data for several frames after we last see the ball.
-        elif self.framesOff <= FRAMES_AFTER_LOST_BALL_TO_USE_VISION:
-            pass
-
-        else:
-            self.bearing = self.locBearing
-            self.dist = self.locDist
-            # uses my.x, my.y which are loc determined to get heading
-            self.heading = my.headingTo(self, forceCalc=True)
+        self.bearing  = self.locBearing
+        self.dist     = self.locDist
 
         self.lastRelX = self.relX
         self.lastRelY = self.relY
 
-        self.relX = getRelativeX(self.dist, self.bearing)
-        self.relY = getRelativeY(self.dist, self.bearing)
+        self.relX     = self.locRelX
+        self.relY     = self.locRelY
 
-        if not self.on:
+        # uses my.x, my.y which are loc determined to get heading
+        self.heading = my.headingTo(self, forceCalc=True)
+
+        if self.framesOn > 1:
             self.dx = self.lastRelX - self.relX
             self.dy = self.lastRelY - self.relY
 

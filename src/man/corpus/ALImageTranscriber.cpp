@@ -123,8 +123,8 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
 
 ALImageTranscriber::~ALImageTranscriber()
 {
+    cout << "ALImageTranscriber destructor" << endl;
     delete [] image;
-    stop();
 }
 
 
@@ -549,14 +549,9 @@ void ALImageTranscriber::waitForImage ()
 
             sensors->lockImage();
 #ifdef CAN_SAVE_FRAMES
-#ifdef USE_MEMORY
-            sensors->setRawNaoImage(ALimage->getData());
-            ImageAcquisition::_acquire_image_fast(table, &params, const_cast<uint8_t*>(sensors->getNaoImage()), image);
-#else
             _copy_image(ALimage->getData(), naoImage);
             ImageAcquisition::acquire_image_fast(table, params,
                     	naoImage, image);
-#endif
 #else
             ImageAcquisition::acquire_image_fast(table, params,
                                                  ALimage->getData(), image);

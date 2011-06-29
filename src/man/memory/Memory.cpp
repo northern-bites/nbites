@@ -5,7 +5,6 @@
  */
 
 #include "Common.h"
-
 #include "Memory.h"
 
 namespace man {
@@ -14,64 +13,89 @@ namespace memory {
 long long int birth_time; //the time we initialized memory
 //everything else is time stamped relative to this
 
-using log::LoggingBoard;
+using boost::shared_ptr;
 
 Memory::Memory(shared_ptr<Profiler> profiler_ptr,
         shared_ptr<Vision> vision_ptr,
         shared_ptr<Sensors> sensors_ptr) :
         _profiler(profiler_ptr),
         _sensors(sensors_ptr),
-        mVision(new MVision(vision_ptr)),
-        mVisionSensors(new MVisionSensors(sensors_ptr)),
-        mMotionSensors(new MMotionSensors(sensors_ptr)),
-        mImage(new MImage(sensors_ptr)),
-        loggingBoard(new LoggingBoard(this)){
+        mVision(new MVision(MVISION_ID,
+                MObject::NameFromID(MVISION_ID),
+                vision_ptr)),
+        mVisionSensors(new MVisionSensors(MVISION_SENSORS_ID,
+                MObject::NameFromID(MVISION_SENSORS_ID),
+                sensors_ptr)),
+        mMotionSensors(new MMotionSensors(MMOTION_SENSORS_ID,
+                MObject::NameFromID(MMOTION_SENSORS_ID),
+                sensors_ptr)),
+        mImage(new MImage(MIMAGE_ID,
+                MObject::NameFromID(MIMAGE_ID),
+                sensors_ptr)) {
     birth_time = process_micro_time();
-    sensors_ptr->addSubscriber(this);
+    if(_sensors.get()) {
+        sensors_ptr->addSubscriber(this);
+    }
+
+    protoMessageMap.insert(ProtoMessagePair(MVISION_ID, mVision));
+    protoMessageMap.insert(ProtoMessagePair(MVISION_SENSORS_ID, mVisionSensors));
+    protoMessageMap.insert(ProtoMessagePair(MMOTION_SENSORS_ID, mMotionSensors));
 }
 
 Memory::~Memory() {
-    delete mVision;
-    delete mVisionSensors;
-    delete mMotionSensors;
-    delete mImage;
-
-    delete loggingBoard;
 }
 
-void Memory::update(MObject* obj) {
+void Memory::update(boost::shared_ptr<MObject> obj) {
     obj->update();
 }
 
 void Memory::updateVision() {
     update(mVision);
-    loggingBoard->log(mVision);
+//    loggingBoard->log(mVision);
 }
 
-void Memory::update(const ProviderEvent e) {
-
-    if (e.getType() == NEW_MOTION_SENSORS) {
+void Memory::update(SensorsEvent event) {
+#ifdef USE_MEMORY
+    if (event == NEW_MOTION_SENSORS) {
         PROF_ENTER(_profiler.get(), P_MEMORY_MOTION_SENSORS);
         mMotionSensors->update();
-        loggingBoard->log(mMotionSensors);
+        notifySubscribers(MMOTION_SENSORS_ID)
         PROF_EXIT(_profiler.get(), P_MEMORY_MOTION_SENSORS);
     }
 
-    if (e.getType() == NEW_VISION_SENSORS) {
+    if (event == NEW_VISION_SENSORS) {
         PROF_ENTER(_profiler.get(), P_MEMORY_VISION_SENSORS);
         mVisionSensors->update();
-        loggingBoard->log(mVisionSensors);
+        notifySubscribers(MVISION_SENSORS_ID);
         PROF_EXIT(_profiler.get(), P_MEMORY_VISION_SENSORS);
     }
 
-    if (e.getType() == NEW_IMAGE) {
+    if (event == NEW_IMAGE) {
         PROF_ENTER(_profiler.get(), P_MEMORY_IMAGE);
         mImage->update();
-        loggingBoard->log(mImage);
-        //TODO: move this somewhere else
-        _sensors->setNaoImage(loggingBoard->getImageLogger(mImage)->
-                getCurrentImage());
         PROF_EXIT(_profiler.get(), P_MEMORY_IMAGE);
+        notifySubscribers(MIMAGE_ID);
+    }
+#endif
+}
+
+boost::shared_ptr<const ProtoMessage> Memory::getProtoMessage(MObject_ID id) const {
+    ProtoMessageMap::const_iterator it = protoMessageMap.find(id);
+
+    if (it != protoMessageMap.end()) {
+        return it->second;
+    } else {
+        return boost::shared_ptr<const ProtoMessage>();
+    }
+}
+
+boost::shared_ptr<ProtoMessage> Memory::getMutableProtoMessage(MObject_ID id) {
+    ProtoMessageMap::iterator it = protoMessageMap.find(id);
+
+    if (it != protoMessageMap.end()) {
+        return it->second;
+    } else {
+        return boost::shared_ptr<ProtoMessage>();
     }
 }
 
