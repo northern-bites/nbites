@@ -11,7 +11,8 @@ def kickBallExecute(player):
     Kick the ball
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        # ** # we are kicking the ball
+        player.brain.tracker.stareBall()
         if transitions.ballInPosition(player):
             player.executeMove(player.brain.kickDecider.getSweetMove())
         else:

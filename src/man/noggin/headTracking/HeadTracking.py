@@ -99,17 +99,17 @@ class HeadTracking(FSA.FSA):
         self.switchTo('locPans')
 
 # ** # old method (main input method) MODIFIED BY NBITES MASTER
-#    def activeLoc(self):
-#        """tracks the ball but periodically looks away"""
-#        self.target = self.brain.ball
-#        self.gain = 1.0
-#        self.goalieActiveLoc = False
-#        if (not self.activeLocOn):
-#            self.switchTo('activeTracking')
-#
-#    # only need to set goalieActiveLoc in this
-#    # and activeLoc because they are the only states
-#    # that directly initially call activeTracking
+    def activeLoc(self):
+        """tracks the ball but periodically looks away"""
+        self.target = self.brain.ball
+        self.gain = 1.0
+        self.goalieActiveLoc = False
+        if (not self.activeLocOn):
+            self.switchTo('activeTracking')
+
+    # only need to set goalieActiveLoc in this
+    # and activeLoc because they are the only states
+    # that directly initially call activeTracking
 
 # ** # new method MODIFIED BY NBITES MASTER
     def activeLocGoaliePos(self):
@@ -248,17 +248,17 @@ class HeadTracking(FSA.FSA):
         self.switchTo('passiveLoc')
 
 # ** # new method
-    def activeLoc(self):
-        """
-        Should be called by all field players (offender, defender).
-        While localization is poor, the robot will cycle through nearby
-        landmarks, looking at each for a short time. When localization is
-        good enough, the robot will look to the ball for a short time.
-        NOTE: If localization stays good, the robot will stare at the ball.
-        """
-        self.target = None
-        self.decisionState = 'activeLoc'
-        self.switchTo('activeLoc')
+#    def activeLoc(self):
+#        """
+#        Should be called by all field players (offender, defender).
+#        While localization is poor, the robot will cycle through nearby
+#        landmarks, looking at each for a short time. When localization is
+#        good enough, the robot will look to the ball for a short time.
+#        NOTE: If localization stays good, the robot will stare at the ball.
+#        """
+#        self.target = None
+#        self.decisionState = 'activeLoc'
+#        self.switchTo('activeLoc')
 
 # ** # new method
     def stareBall(self):
@@ -278,3 +278,9 @@ class HeadTracking(FSA.FSA):
         self.target = None
         self.decisionState = 'panScanForLoc'
         self.switchTo('panScanForLoc')
+
+# ** # new hacked method
+    def newKickDecidePan(self):
+        if self.currentState != 'scanForPost':
+            self.decisionState = 'trackingBallLoc'
+            self.switchTo('trackingBallLoc')
