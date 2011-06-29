@@ -43,8 +43,8 @@ public:
     //returns a NULL pointer if such a logger doesn't exist
     void update(MObject_ID id);
 
-    void startLogging() { logging = true; }
-    void stopLogging() { logging = false; }
+    void startLogging();
+    void stopLogging();
     bool isLogging() { return logging; }
 
 protected:

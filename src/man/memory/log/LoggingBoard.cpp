@@ -1,6 +1,8 @@
 #include "LoggingBoard.h"
 #include "NaoPaths.h"
 
+#include <cstdio>
+
 namespace man {
 namespace memory {
 namespace log {
@@ -76,6 +78,15 @@ FDLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
     }
 }
 
+void LoggingBoard::startLogging() {
+    printf("Starting logging!\n");
+    logging = true;
+}
+
+void LoggingBoard::stopLogging() {
+    printf("Stopped logging!\n");
+    logging = false;
+}
 
 }
 }

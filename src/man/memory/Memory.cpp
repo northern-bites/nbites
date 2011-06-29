@@ -55,7 +55,7 @@ void Memory::updateVision() {
 }
 
 void Memory::update(SensorsEvent event) {
-
+#ifdef USE_MEMORY
     if (event == NEW_MOTION_SENSORS) {
         PROF_ENTER(_profiler.get(), P_MEMORY_MOTION_SENSORS);
         mMotionSensors->update();
@@ -76,6 +76,7 @@ void Memory::update(SensorsEvent event) {
         PROF_EXIT(_profiler.get(), P_MEMORY_IMAGE);
         notifySubscribers(MIMAGE_ID);
     }
+#endif
 }
 
 boost::shared_ptr<const ProtoMessage> Memory::getProtoMessage(MObject_ID id) const {

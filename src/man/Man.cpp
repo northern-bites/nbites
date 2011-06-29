@@ -43,8 +43,7 @@ using namespace boost::assign;
 using namespace std;
 using boost::shared_ptr;
 using namespace man::memory;
-using log::LoggingBoard;
-using log::IOProviderFactory;
+using namespace man::memory::log;
 
 /////////////////////////////////////////
 //                                     //
@@ -102,16 +101,23 @@ Man::Man (shared_ptr<Profiler> _profiler,
   set_vision_pointer(vision);
 
   comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
-#ifdef USE_NOGGIN
-  noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
-                                         sensors, motion->getInterface()));
-#endif// USE_NOGGIN
-#ifdef USE_MEMORY
+
   memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
+
   loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory));
+  set_logging_board_pointer(loggingBoard);
   memory->addSubscriber(loggingBoard.get());
+
+#ifdef USE_MEMORY
   loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
 #endif
+
+#ifdef USE_NOGGIN
+  noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
+                                         sensors, loggingBoard,
+                                         motion->getInterface()));
+#endif// USE_NOGGIN
+
   PROF_ENTER(profiler.get(), P_GETIMAGE);
 }
 
