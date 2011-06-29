@@ -219,19 +219,19 @@ class HeadTracking(FSA.FSA):
         self.switchTo('trackLandmarks')
 
 # ** # new method
-#    def trackBall(self):
-#        """
-#        Should be called by chaser.
-#        The robot will switch between looking at the ball and
-#        periodically looking at nearby landmarks. Landmark fitness
-#        is determined by angular change from the ball to minimize
-#        time between targets.
-#        If safeBallTracking is True, robot will not lose sight of
-#        ball while checking landmarks.
-#        """
-#        self.target = self.brain.ball
-#        self.decisionState = 'trackingBallLoc'
-#        self.switchTo('trackingBall')
+    def newTrackBall(self):
+        """
+        Should be called by chaser.
+        The robot will switch between looking at the ball and
+        periodically looking at nearby landmarks. Landmark fitness
+        is determined by angular change from the ball to minimize
+        time between targets.
+        If safeBallTracking is True, robot will not lose sight of
+        ball while checking landmarks.
+        """
+        self.target = self.brain.ball
+        self.decisionState = 'trackingBallLoc'
+        self.switchTo('trackingBallLoc')
 
 # ** # new method
     def passiveLoc(self):
@@ -275,4 +275,6 @@ class HeadTracking(FSA.FSA):
 
 # ** # new hacked method
     def panScan(self):
+        self.target = None
+        self.decisionState = 'panScanForLoc'
         self.switchTo('panScanForLoc')

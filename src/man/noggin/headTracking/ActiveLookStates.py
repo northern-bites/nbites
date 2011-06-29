@@ -160,6 +160,10 @@ def trackingBallLoc(tracker):
     if tracker.lastDiffState != 'trackingBall':
         return tracker.goLater('trackingBall')
 
+    # Otherwise, pan high for a post.
+    return tracker.goLater('scanForPost')
+
+    """
     # Update landmark fitness by angular distance from ball
     for obj in tracker.locObjectList:
         tracker.helper.updateAngularTrackingFitness(obj,tracker.target)
@@ -202,6 +206,7 @@ def trackingBallLoc(tracker):
         else:
             # Cycle to most fit landmark, then sanity check it.
             tracker.target = tracker.locObjectList[0]
+            """
 
     # Track target
     return tracker.goLater('trackLoc')

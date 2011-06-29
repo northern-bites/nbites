@@ -142,14 +142,13 @@ def stareLoc(tracker):
     # Make sure head is inactive first
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-
-    # ** # debugging
-    print "target Id:",tracker.target.visionId
+        # ** # debugging
+        print "staring at target Id:",tracker.target.visionId
 
     if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
         ###print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
         print "Past stare thresh, switching to new target"
-        return tracker.goLater('panScanForLoc')#tracker.decisionState)
+        return tracker.goLater(tracker.decisionState)
 
     # Find the real post in vision frame
     if tracker.target is FieldObject:
@@ -176,11 +175,6 @@ def trackingBall(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
-    print "new frame"
-    for c in tracker.brain.corners:
-        if c.on:
-            print c.visionId
-
     # Look to the ball for TRACKER_BALL_STARE_THRESH frames
     # If ball is lost on frame, look towards coordinates.
     if tracker.brain.ball.on:
@@ -194,7 +188,7 @@ def trackingBall(tracker):
         return tracker.goLater('scanBall')
         """
     if tracker.counter > constants.TRACKER_BALL_STARE_THRESH:
-        #print "Past stare thresh for ball, going to:",tracker.decisionState
+        print "Past stare thresh for ball"
         return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()

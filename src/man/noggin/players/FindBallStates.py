@@ -41,7 +41,7 @@ def spinFindBall(player):
     """
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        # ** #player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall()
         return player.goNow('chase')
 
     if player.firstFrame():
@@ -53,7 +53,7 @@ def spinFindBall(player):
         spinDir = my.spinDirToPoint(ball)
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
-        player.brain.tracker.spinFindBall()
+        player.brain.tracker.trackBallSpin()
 
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldWalkFindBall(player):
@@ -67,7 +67,7 @@ def walkFindBall(player):
     """
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        # ** #player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall()
         return player.goNow('chase')
 
     if player.brain.nav.isStopped():

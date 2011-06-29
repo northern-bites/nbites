@@ -32,7 +32,7 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.standup()
-        player.brain.tracker.panScan()
+        player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
 
         if player.lastDiffState == 'gameInitial':
@@ -49,9 +49,9 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.stopWalking()
+        player.standup()
         player.brain.loc.resetBall()
-        player.brain.tracker.passiveLoc()
+        player.brain.tracker.trackBall()
 
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
@@ -69,6 +69,8 @@ def gamePlaying(player):
     if player.firstFrame():
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
+            player.stopWalking()
+            player.gainsOn()
 
             if player.lastStateTime > 25:
                 # 25 is arbitrary. This check is meant to catch human error and

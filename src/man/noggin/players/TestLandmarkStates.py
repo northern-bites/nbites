@@ -17,7 +17,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
-        player.brain.tracker.panScan()
+        player.brain.tracker.newTrackBall()
     return player.stay()
 
 def gamePenalized(player):

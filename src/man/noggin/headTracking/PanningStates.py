@@ -32,13 +32,36 @@ def panScanForLoc(tracker):
     for obj in tracker.locObjectList:
         if obj.on:
             print "found a target. angles:",obj.angleX,obj.angleY
-            tracker.brain.sensors.saveFrame()
             tracker.target = obj
             return tracker.goLater('stareLoc')
 
     # Nothing on frame? Look around
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
+
+    return tracker.stay()
+
+# ** # new hacked method
+def scanForPost(tracker):
+    # Make sure that head is inactive
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+
+    # Do a high wide scan for a post
+    if not tracker.brain.motion.isHeadActive():
+        tracker.helper.executeHeadMove(HeadMoves.HIGH_WIDE_SCAN_BALL)
+
+    # Check for posts.
+    for obj in tracker.locObjectList:
+        if obj.on and obj.visionId > 19:
+            tracker.target = obj
+            print "found a post:",obj.visionId
+            return tracker.goLater('stareLoc')
+
+    # Check search threshold
+    if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
+        print "Past search thresh, switching to new target"
+        return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()
 
