@@ -46,7 +46,7 @@ public:
 
     int getTOOLState();
     std::string getRobotName();
-    std::list<std::vector<float> >* latestComm();
+    std::list<std::vector<float> > latestComm();
     TeammateBallMeasurement getTeammateBallReport();
     void setData(std::vector<float> &data);
 
@@ -78,7 +78,7 @@ private:
     // Sending packet data
     std::vector<float> data;
     // Received data
-    std::list<std::vector<float> >* latest;
+    std::list<std::vector<float> > latest;
 
     // References to global data structures
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
