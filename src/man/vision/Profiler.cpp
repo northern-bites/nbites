@@ -64,6 +64,7 @@ static const char *PCOMPONENT_NAMES[] = {
 
   "Comm",
   "TOOLConnect",
+  "RoboGuardian",
 
   "Total"
 };
@@ -126,6 +127,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 
 	/*P_COMM                    --> */ P_TOTAL,
 	/*P_TOOLCONNECT             --> */ P_TOTAL,
+	/*P_ROBOGUARDIAN            --> */ P_TOTAL,
 
 	/*P_TOTAL                   --> */ P_TOTAL
 };
@@ -172,8 +174,8 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 Profiler* Profiler::instance = NULL;
 
 Profiler::Profiler (long long (*f) ())
-    : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),timeFunction(f)
-{
+    : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),
+      timeFunction(f), verbose(false) {
     if (instance == NULL) {
         instance = this;
     }
@@ -314,19 +316,27 @@ Profiler::printIndentedSummary()
     // depth-based indentation
     printf("%*s", depths[i]*2, "");
     if (sumTime[i] == 0)
-      printf("  %-*s:      0%% (0000000000us total, 000000us avg.)\n",
+      printf("  %-*s:      0%% (0000000000 total, 000000 avg.)\n",
           (max_length-depths[i]*2), PCOMPONENT_NAMES[i]);
     else if (parent_sum == 0)
       printf("  %-*s: 100.00%% (%.10llu total, %.6llu avg.,"
              " %llu min, %.6llu max )\n",
              (max_length-depths[i]*2), PCOMPONENT_NAMES[i], sumTime[i],
              (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
-    else
-      printf("  %-*s: %6.2f%% (%.10llu total, %.6llu avg.,"
-             " %.6llu min, %.6llu max)\n",
-          (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
-          ((float)sumTime[i] / parent_sum * 100), sumTime[i],
-             (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
+    else {
+        if (verbose == true) {
+            printf("  %-*s: %6.2f%% (%.10llu total, %.6llu avg.,"
+                    " %.6llu min, %.6llu max)\n",
+                    (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
+                    ((float)sumTime[i] / parent_sum * 100), sumTime[i],
+                    (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
+        } else {
+            printf("  %-*s: %6.2f%% (%.10llu total, %.6llu avg.)\n",
+                            (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
+                            ((float)sumTime[i] / parent_sum * 100), sumTime[i],
+                            (sumTime[i] / (current_frame+1)));
+        }
+    }
   }
 }
 

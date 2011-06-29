@@ -74,6 +74,7 @@ enum ProfiledComponent {
 
     P_COMM,
     P_TOOLCONNECT,
+    P_ROBOGUARDIAN,
 
     P_TOTAL
 };
@@ -129,6 +130,8 @@ class Profiler {
     long long lastTime[NUM_PCOMPONENTS];
 
     static Profiler* instance;
+
+    bool verbose;
 
 public:
     long long minTime[NUM_PCOMPONENTS];
