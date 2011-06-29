@@ -363,7 +363,7 @@ GOALIE_TEST_DIVE_LEFT = ( ((0 , 70, -50, 0),
                             INITIAL_POS[0][1],
                             INITIAL_POS[0][2],
                             INITIAL_POS[0][3],
-                            1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+                            1.0,0,stiff.STANDUP_STIFFNESSES),)
 
 #Points left when would dive right
 GOALIE_TEST_DIVE_RIGHT = mirrorMove(GOALIE_TEST_DIVE_LEFT)
@@ -375,7 +375,7 @@ GOALIE_TEST_CENTER_SAVE = ( ((0, -5, -90, 0),
                              INITIAL_POS[0][1],
                              INITIAL_POS[0][2],
                              (0, 5, 90, 0),
-                             1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+                             1.0,0,stiff.STANDUP_STIFFNESSES),)
 
 #Stand up for GOALIE_SQUAT
 GOALIE_SQUAT_STAND_UP = ( ((0.0, 55.0, 0.0, -0),
