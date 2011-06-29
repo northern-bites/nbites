@@ -106,6 +106,8 @@ class Ball(VisualObject):
         globalY = loc.ballY
         globalVelX = loc.ballVelX
         globalVelY = loc.ballVelY
+        globalAccX = loc.ballAccX
+        globalAccY = loc.ballAccY
 
         # Get latest estimates
         if my.teamColor == Constants.TEAM_BLUE:
@@ -113,16 +115,22 @@ class Ball(VisualObject):
             self.y = globalY
             self.velX = globalVelX
             self.velY = globalVelY
+            self.accX = globalAccX
+            self.accY = globalAccY
         else:
             self.x = Constants.FIELD_GREEN_WIDTH - globalX
             self.y = Constants.FIELD_GREEN_HEIGHT - globalY
             self.velX = -globalVelX
             self.velY = -globalVelY
+            self.accX = -globalAccX
+            self.accY = -globalAccY
 
         self.uncertX = loc.ballXUncert
         self.uncertY = loc.ballYUncert
         self.uncertVelX = loc.ballVelXUncert
         self.uncertVelY = loc.ballVelYUncert
+        self.uncertAccX = loc.ballAccXUncert
+        self.uncertAccY = loc.ballAccYUncert
         self.sd = self.uncertX * self.uncertY
 
         # Determine other values
@@ -130,6 +138,8 @@ class Ball(VisualObject):
         self.locBearing = loc.ballBearing
         self.relVelX = loc.ballRelVelX
         self.relVelY = loc.ballRelVelY
+        self.relAccX = loc.ballRelAccX
+        self.relAccY = loc.ballRelAccY
 
         self.locRelX = loc.ballRelX
         self.locRelY = loc.ballRelY
