@@ -1,6 +1,8 @@
 #include "LoggingBoard.h"
 #include "NaoPaths.h"
 
+#include <cstdio>
+
 namespace man {
 namespace memory {
 namespace log {
@@ -10,7 +12,7 @@ using boost::shared_ptr;
 
 LoggingBoard::LoggingBoard(Memory::const_ptr memory,
         IOProvider::const_ptr ioProvider) :
-    memory(memory) {
+    memory(memory), logging(false) {
     newIOProvider(ioProvider);
 }
 
@@ -41,16 +43,17 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
     }
 }
 
-void LoggingBoard::log(MObject_ID id) {
-    FDLogger::ptr logger = getMutableLogger(id);
-    if (logger.get() != NULL) {
-        logger->writeToLog();
-    }
+void LoggingBoard::update(MObject_ID id) {
+    this->log(id);
 }
 
-ImageLogger::const_ptr LoggingBoard::getImageLogger(MObject_ID id) const {
-    return boost::dynamic_pointer_cast<const ImageLogger>(
-            this->getLogger(MIMAGE_ID));
+void LoggingBoard::log(MObject_ID id) {
+    if (logging) {
+        FDLogger::ptr logger = getMutableLogger(id);
+        if (logger.get() != NULL) {
+            logger->writeToLog();
+        }
+    }
 }
 
 FDLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
@@ -75,6 +78,15 @@ FDLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
     }
 }
 
+void LoggingBoard::startLogging() {
+    printf("Starting logging!\n");
+    logging = true;
+}
+
+void LoggingBoard::stopLogging() {
+    printf("Stopped logging!\n");
+    logging = false;
+}
 
 }
 }
