@@ -10,7 +10,8 @@ import GoalieConstants as goalCon
 def shouldSave(player):
     ball = player.brain.ball
 
-    if(ball.relVelX < -40 and ball.heat <= 5):
+    if(ball.relVelX < goalCon.VEL_HIGH
+       and ball.heat <= goalCon.HEAT_LOW):
         player.shouldSaveCounter += 1
         if player.shouldSaveCounter > 1:
             player.shouldSaveCounter = 0
@@ -68,7 +69,6 @@ def goalieInBox(player):
             NogCon.MY_GOALBOX_TOP_Y + 10 > my.y and
             my.y > NogCon.MY_GOALBOX_BOTTOM_Y - 10)
 
-#return (my.inMyGoalBox())
 
 #CHASE TRANSITIONS
 
@@ -78,6 +78,5 @@ def dangerousBall(player):
     # in box and behind me and close to me
     # if inBox(player):
     return (ball.relX < 0 and goalieInBox(player))
-        #and ball.dist < 30)
 
 

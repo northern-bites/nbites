@@ -25,67 +25,48 @@ def rGoalie(team, workingPlay):
 
     # Get out of ready -> Just after kick off
     elif workingPlay.isSubRole(PBConstants.READY_GOALIE):
-        print "1"
         SubRoles.pGoalieKickOff(team, workingPlay)
 
     # Make sure we position when we come out of Penalized
     elif workingPlay.isSubRole(PBConstants.PENALTY_SUB_ROLE):
-        print "2"
         SubRoles.pGoalieCenter(team, workingPlay)
 
     # Kick off just happened or Penalty Kicking
     elif workingPlay.isSubRole(PBConstants.GOALIE_KICKOFF):
         if RoleTran.shouldPositionForSave(team):
-            print "3"
             SubRoles.pGoalieSave(team, workingPlay)
         elif RoleTran.shouldChase(team):
-            print "4"
             SubRoles.pGoalieChaser(team, workingPlay)
         else:
-            print "5"
             SubRoles.pGoalieKickOff(team, workingPlay)
 
     # Saving
     elif workingPlay.isSubRole(PBConstants.GOALIE_SAVE):
         if RoleTran.shouldNotSave(team):
-            print "15"
             SubRoles.pGoalieCenter(team, workingPlay)
         elif (team.brain.player.isSaving):
-            print "6"
             SubRoles.pGoalieSave(team, workingPlay)
         elif RoleTran.shouldChase(team):
-            print "7"
             SubRoles.pGoalieChaser(team, workingPlay)
         else:
-            print "8"
             SubRoles.pGoalieCenter(team, workingPlay)
 
     # Chase
     elif workingPlay.isSubRole(PBConstants.GOALIE_CHASER):
         if team.brain.player.inKickingState:
-            print "9"
             SubRoles.pGoalieChaser(team, workingPlay)
-
         elif RoleTran.shouldStopChase(team):
-            print "10"
             SubRoles.pGoalieCenter(team, workingPlay)
-
         else:
-            print "11"
             SubRoles.pGoalieChaser(team, workingPlay)
 
     # Position
     elif workingPlay.isSubRole(PBConstants.GOALIE_CENTER):
         if RoleTran.shouldPositionForSave(team):
-            print "12"
             SubRoles.pGoalieSave(team, workingPlay)
-
         elif RoleTran.shouldChase(team):
-            print "13"
             SubRoles.pGoalieChaser(team, workingPlay)
-
         else:
-            print "14"
             SubRoles.pGoalieCenter(team, workingPlay)
 
 

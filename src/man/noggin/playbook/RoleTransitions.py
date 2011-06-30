@@ -14,13 +14,13 @@ def shouldPositionForSave(team):
 
     if ball.heat > goalCon.HEAT_BUFFER:
         team.shouldSaveCounter += 1
-        if team.shouldSaveCounter > 3:
+        if team.shouldSaveCounter > goalCon.CHANGE_THRESH:
             team.resetGoalieRoleCounters()
             return True
 
-    elif ball.relAccX < -20:
+    elif ball.relAccX < goalCon.ACCEL_SAVE_THRESH:
         team.shouldSaveCounter += 1
-        if team.shouldSaveCounter > 3:
+        if team.shouldSaveCounter > goalCon.CHANGE_THRESH:
             team.resetGoalieRoleCounters()
             return True
 
@@ -29,27 +29,29 @@ def shouldPositionForSave(team):
         return False
 
 def shouldNotSave(team):
+    """ Want to stop saving when no longer worried about
+    A robot shooting and the ball is not moving """
+
     ball = team.brain.ball
 
     if team.brain.player.penaltyKicking:
         return False
 
-    if (ball.relAccX < 0.5 and ball.heat == 0):
+    if (ball.relAccX < goalCon.BALL_NO_MOVEMENT
+        and ball.heat == 0):
         team.shouldStopSaveCounter += 1
-        if team.shouldStopSaveCounter > 30:
+        if team.shouldStopSaveCounter > goalCon.OUT_OF_SAVE:
             team.brain.player.isSaving = False
             team.resetGoalieRoleCounters()
             return True
 
-    elif (ball.inMyGoalBox() and ball.relAccX < 0.5):
+    elif (ball.inMyGoalBox() and
+          ball.relAccX < goalCon.BALL_NO_MOVEMENT):
         team.shouldStopSaveCounter += 1
-        if team.shouldStopSaveCounter > 30:
+        if team.shouldStopSaveCounter > goalCon.OUT_OF_SAVE:
             team.brain.player.isSaving = False
             team.resetGoalieRoleCounters()
             return True
-
-    # Want to stop saving when no longer worried about
-    # A robot shooting and the ball is not moving
 
     return False
 
@@ -66,7 +68,6 @@ def shouldChase(team):
     if (ball.framesOff > goalCon.BALL_LOST):
         return False
 
-    # close enough to chase
     if (ball.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.CHASE_BUFFER
         and ball.relX < goalCon.CHASE_RELX_BUFFER
         and ball.on
