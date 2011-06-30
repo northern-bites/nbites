@@ -207,7 +207,6 @@ class KickDecider(object):
         """
         my = self.brain.my
         """
-        print "Kick Loc"
         # Note: may want to use headingTo(yglp) etc...
         oppLeftPost = self.brain.oppGoalLeftPost
         oppRightPost = self.brain.oppGoalRightPost
@@ -227,17 +226,16 @@ class KickDecider(object):
         """
         print "No Kick Chosen"
         return None
-        if (my.h <= 20. and my.h >= -20.):
-            return self.chooseDynamicKick()
-        elif (my.h <= 160. and my.h > 20.):
-            print "LEFT_SIDE"
-            return kicks.LEFT_SIDE_KICK
-        elif (my.h >= -160. and my.h < -20.):
-            print "RIGHT_SIDE"
-            return kicks.RIGHT_SIDE_KICK
-        else:
-            print "BACK_KICK"
-            return kicks.chooseShortBackKick(self)
+        # if (my.h <= 20. and my.h >= -20.):
+        #     return self.chooseDynamicKick()
+        # elif (my.h <= 160. and my.h > 20.):
+        #     print "LEFT_SIDE"
+        #     return kicks.LEFT_SIDE_KICK
+        # elif (my.h >= -160. and my.h < -20.):
+        #     print "RIGHT_SIDE"
+        #     return kicks.RIGHT_SIDE_KICK
+        # else:
+        #     return kicks.chooseShortBackKick(self)
 
     def chooseDynamicKick(self):
         ball = self.brain.ball

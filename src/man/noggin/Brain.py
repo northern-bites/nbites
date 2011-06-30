@@ -1,4 +1,3 @@
-
 # Redirect standard error to standard out
 import time
 import sys
@@ -34,7 +33,6 @@ from .util import NaoOutput
 from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
-from .kickDecider import KickInformation as kickInfo
 
 import _roboguardian
 import _speech

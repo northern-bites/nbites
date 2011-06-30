@@ -332,8 +332,6 @@ def orbitPointThruAngle(nav):
     if fabs(nav.angleToOrbit) < constants.MIN_ORBIT_ANGLE:
         return nav.goNow('stop')
 
-    print nav.angleToOrbit
-
     if nav.updatedTrajectory:
         if nav.angleToOrbit < 0:
             orbitDir = constants.ORBIT_LEFT
@@ -344,7 +342,7 @@ def orbitPointThruAngle(nav):
         ball = nav.brain.ball
         #want x to keep a radius of 17 from the ball, increase and
         #decrease x velocity as we move farther away from that dist
-        walkX = (ball.relX - 17) * .05
+        walkX = (ball.relX - 18) * .05
         #keep constant y velocity, let x and theta changea
         walkY = orbitDir * .8
         #Vary theta based on ball bearing.  increase theta velocity as
