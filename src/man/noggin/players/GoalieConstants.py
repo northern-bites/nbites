@@ -30,7 +30,18 @@ HEAT_BUFFER = 10
 
 #Saving limits
 CENTER_SAVE_THRESH = 15
-DONT_SAVE_LIMIT = 120
+DONT_SAVE_LIMIT = 200
+ACCEL_SAVE_THRESH = -20
+
+# Accel value below which "Not Moving"
+BALL_NO_MOVEMENT = 0.5
+
+# Should save thresholds
+HEAT_LOW = 5
+VEL_HIGH = -40
+
+# Number of frames before leave saving
+OUT_OF_SAVE = 30
 
 
 # *****************
@@ -40,11 +51,9 @@ DONT_SAVE_LIMIT = 120
 # The chasing box
 CHASE_BUFFER = 10
 CHASE_RIGHT_X_LIMIT = NogCon.MY_GOALBOX_RIGHT_X + 80
-CHASE_UPPER_Y_LIMIT = NogCon.MY_GOALBOX_BOTTOM_Y - CHASE_BUFFER
-CHASE_LOWER_Y_LIMIT = NogCon.MY_GOALBOX_TOP_Y + CHASE_BUFFER
 
 # Sanity checks for chasing
-CHASE_RELX_BUFFER = 200
+CHASE_RELX_BUFFER = 160
 STOP_CHASE_RELX_BUFFER = 160
 
 # *****************

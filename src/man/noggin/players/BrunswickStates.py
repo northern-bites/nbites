@@ -141,6 +141,7 @@ def penaltyShotsGameReady(player):
 
 def penaltyShotsGameSet(player):
     if player.firstFrame():
+        player.walkPose()
         player.stopWalking()
         player.brain.loc.resetBall()
 
@@ -160,8 +161,9 @@ def penaltyShotsGamePlaying(player):
             player.firstFrame():
         player.brain.resetLocalization()
     if player.brain.play.isRole(GOALIE):
-        player.brain.play.setSubRole(GOALIE_KICKOFF)
-        return player.goNow('penaltyGoalie')
+        player.penaltyKicking = True
+        roleState = player.getRoleState()
+        return player.goNow(roleState)
     return player.goNow('penaltyKick')
 
 

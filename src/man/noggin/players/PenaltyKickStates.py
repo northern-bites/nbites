@@ -24,17 +24,6 @@ def penaltyKickRelocalize(player):
         return player.stay()
     return player.goLater('findBall')
 
-def penaltyGoalie(player):
-    """
-    Set penalty kicking variables. Acts as a layer above 'goaliePosition'
-    """
-    player.penaltyKicking = True
-    player.penaltyMadeFirstKick = True
-    player.penaltyMadeSecondKick = False
-
-    roleState = player.getRoleState()
-    return player.goLater(roleState)
-
 def penaltyBallInOppGoalbox(player):
     """
     We can't do anything if the ball is in the opponent's goalbox
