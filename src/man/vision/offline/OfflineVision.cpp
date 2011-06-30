@@ -49,10 +49,10 @@ int OfflineVision::runOnDirectory(std::string path)
             framePath << path << "/" << i << ".frm";
             sensors->loadFrame(framePath.str());
             vision->notifyImage(sensors->getImage());
-            PROF_NFRAME(profiler);
+            PROF_NFRAME();
         }
     }
-    PROF_NFRAME(profiler);
+    PROF_NFRAME();
     cout << endl;
     return 0;
 }

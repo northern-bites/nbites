@@ -27,7 +27,7 @@
 class Noggin
 {
 public:
-    Noggin(boost::shared_ptr<Profiler> p, boost::shared_ptr<Vision> v,
+    Noggin(boost::shared_ptr<Vision> v,
            boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
            boost::shared_ptr<Sensors> _sensors,
            boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard,
@@ -64,7 +64,6 @@ private:
     void processGCButtonClicks();
 
 private:
-    boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
     boost::shared_ptr<GameController> gc;

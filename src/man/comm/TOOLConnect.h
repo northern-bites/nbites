@@ -63,8 +63,8 @@ public:
     TOOLConnect(boost::shared_ptr<Synchro> _synchro,
                 boost::shared_ptr<Sensors> s,
                 boost::shared_ptr<Vision> v,
-				boost::shared_ptr<GameController> gc);
-    ~TOOLConnect();
+                boost::shared_ptr<GameController> gc);
+    virtual ~TOOLConnect();
 
     void run();
 

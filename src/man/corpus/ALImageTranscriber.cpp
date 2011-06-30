@@ -11,6 +11,8 @@
 #include "corpusconfig.h"
 #include "ImageAcquisition.h"
 
+#include "vision/Profiler.h"
+
 #ifdef DEBUG_ALIMAGE
 #  define DEBUG_ALIMAGE_LOOP
 #endif
@@ -143,10 +145,13 @@ void ALImageTranscriber::run()
     struct timespec interval, remainder;
     while (Thread::running) {
         //start timer
+        PROF_ENTER(P_MAIN);
+        PROF_ENTER(P_GETIMAGE);
         const long long startTime = process_micro_time();
 
         if (camera_active)
             waitForImage();
+        PROF_EXIT(P_GETIMAGE);
         subscriber->notifyNextVisionImage();
 
 #ifdef SAVE_ALL_FRAMES
@@ -187,6 +192,8 @@ void ALImageTranscriber::run()
 
             nanosleep(&interval, &remainder);
         }
+        PROF_EXIT(P_MAIN);
+        PROF_NFRAME();
     }
     Thread::trigger->off();
 }
