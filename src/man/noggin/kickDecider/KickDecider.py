@@ -109,7 +109,20 @@ class KickDecider(object):
         # Since we know any kick will score, we don't have to worry about
         # any range determinations.
 
-        kick = self.info.bestAlignedKick(kickDest)
+        kickDirection = self.info.bestAlignedKickDirection(kickDest)
+
+        if kickDirection == 0:
+            #STRAIGHT_KICK
+            return
+        elif kickDirection == 90:
+            #RIGHT_SIDE_KICK
+            return
+        elif kickDirection == -90:
+            #LEFT_SIDE_KICK
+            return
+        else:
+            #BACK_KICK
+            return
 
 
         """

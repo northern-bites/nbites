@@ -8,7 +8,7 @@ class Kick(object):
     def __init__(self, x=DEFAULT_KICK_X_OFFSET, y=0, h=0, move=None):
         self.x_offset = x
         self.y_offset = y
-        self.heading = h
+        self.heading = h           # set manually.
         self.sweetMove = move
         self.moveTime = SweetMoves.getMoveTime(self.sweetMove)
 

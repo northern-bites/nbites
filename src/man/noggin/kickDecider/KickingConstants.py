@@ -3,12 +3,7 @@ from ..typeDefs.Location import Location
 
 DEBUG_KICKS = False
 
-ALIGN_FOR_KICK_BEARING_THRESH = 60
-
 DEFAULT_KICK_X_OFFSET = 13
-
-# clearBall constants
-CLEAR_CENTER_FIELD_STRAIGHT_ANGLE = 60
 
 # Kick objectives
 NUM_OBJECTIVES = 6
@@ -53,15 +48,12 @@ FORWARD_KICKOFF_POINT = Location(NogginConstants.CENTER_FIELD_X +
                                  NogginConstants.CENTER_CIRCLE_RADIUS + 15.,
                                  NogginConstants.CENTER_FIELD_Y)
 
-SHOOT_BALL_SIDE_KICK_ANGLE = 45
-SHOOT_BALL_FAR_LOC_ALIGN_ANGLE = 15
-SHOOT_BALL_FAR_SIDE_KICK_ANGLE = 45
-
-KICK_STRAIGHT_POST_BEARING = 10
-KICK_STRAIGHT_BEARING_THRESH = 70
-KICK_SIDE_DIST_THRESH = NogginConstants.GOAL_WIDTH
-
-#Constants to help decide back kick
-CLEAR_POST_DIST_DIFF = .2*NogginConstants.GOAL_WIDTH
-
+#************************#
+# Constants & Thresholds #
+#************************#
 BALL_NEAR_LINE_THRESH = 25.
+
+# Used in bestAlignedKickDirection. Right now we just want to get to the ball
+# and kick it. Could use these to give preference to a straight kick.
+STRAIGHT_KICK_ALIGNMENT_BEARING = 45.
+BACK_KICK_ALIGNMENT_BEARING = 135.

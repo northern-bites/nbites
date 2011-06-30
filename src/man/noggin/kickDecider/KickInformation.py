@@ -2,6 +2,7 @@ import kicks
 import KickingConstants as constants
 from .. import NogginConstants
 from ..typeDefs.Location import Location
+from ..util import MyMath
 from math import fabs
 """
 Rewritten by Wils Dawson (6/28/11)
@@ -69,6 +70,7 @@ class KickInformation:
         bestMate = None
         minDist = NogginConstants.FIELD_WIDTH
         for mate in teammates:
+            # TODO: check if mate is in our kicking range.
             if mate.distTo(constants.CENTER_BALL_POINT) < minDist:
                 minDist = mate.distTo(constants.CENTER_BALL_POINT)
                 bestMate = mate
@@ -135,8 +137,8 @@ class KickInformation:
         bestDest = None
 
         for dest in dests:
-            bestHeading = max((fabs(((my.headingTo(ball) -
-                                     ball.headingTo(dest))
+            bestHeading = max((fabs(((ball.headingTo(dest) -
+                                     my.headingTo(ball))
                                     % 90) - 45)), bestHeading)
             bestDest = dest
         return bestDest
@@ -144,6 +146,40 @@ class KickInformation:
     def bestAlignedKick(self, dest):
         """
         Assumes all kicks can get to the specified param 'dest'. Chooses
-        Best kick based on alignment (i.e. least cost in real time)
+        Best kick based on alignment (i.e. least cost in real time).
+        We rotate our reference frame so that the ball's heading to the
+        dest is 0 degrees and we use our heading to the ball as the best
+        guess of what our orientation will be once we get to the ball. Using
+        the ball line to the dest as the 0 degree line, we can use the rotated
+        heading to let us choose the best kick based on alignment.
         """
-        
+        my = self.brain.my
+        ball = self.brain.ball
+        rotatedHeading = ball.headingTo(dest) - my.headingTo(ball)
+        kick = None
+
+        if (fabs(rotatedHeading) < constants.STRAIGHT_KICK_ALIGNMENT_BEARING):
+            kick = self.chooseStraightKick()
+            kick.heading = ball.headingTo(dest)
+        elif (fabs(rotatedHeading) < constants.BACK_KICK_ALIGNMENT_BEARING):
+            if MyMath.sign(rotatedHeading) == -1:
+                kick = kicks.LEFT_SIDE_KICK
+                kick.heading = ball.headingTo(dest) + 90
+            else:
+                kick = kicks.RIGHT_SIDE_KICK
+                kick.heading = ball.headingTo(dest) - 90
+        else:
+            kick = self.chooseBackKick()
+            kick.heading = ball.headingTo(dest) -180
+
+
+
+
+    def chooseStraightKick(self):
+        """
+        Picks the straight kick based on our heading to the ball.
+        """
+        if self.brain.my.headingTo(self.brain.ball) > 0:
+            return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
+        else:
+            return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
