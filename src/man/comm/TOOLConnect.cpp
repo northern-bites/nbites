@@ -165,8 +165,6 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 
     // Sensor data request
     if (r.sensors) {
-        v = sensors->getAllSensors();
-        serial.write_floats(v);
     }
 
     // Image data request

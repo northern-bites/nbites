@@ -937,10 +937,38 @@ void Sensors::saveFrame()
     releaseVisionAngles();
 
     // Write sensors
-    vector<float> sensor_data = getAllSensors();
-    for (vector<float>::const_iterator i = sensor_data.begin();
-         i != sensor_data.end(); ++i) {
-        fout << *i << " ";
+    float sensor_data[NUM_SENSORS];
+    uint bytes_copied;
+    FSR lfsr = getLeftFootFSR();
+    sensor_data[0] = lfsr.frontLeft;
+    sensor_data[1] = lfsr.frontRight;
+    sensor_data[2] = lfsr.rearLeft;
+    sensor_data[3] = lfsr.rearRight;
+    FSR rfsr = getRightFootFSR();
+    sensor_data[4] = rfsr.frontLeft;
+    sensor_data[5] = rfsr.frontRight;
+    sensor_data[6] = rfsr.rearLeft;
+    sensor_data[7] = rfsr.rearRight;
+    FootBumper lfb = getLeftFootBumper();
+    sensor_data[8] = lfb.left;
+    sensor_data[9] = lfb.right;
+    FootBumper rfb = getRightFootBumper();
+    sensor_data[10] = rfb.left;
+    sensor_data[11] = rfb.right;
+    Inertial inertial = getInertial();
+    sensor_data[12] = inertial.accX;
+    sensor_data[13] = inertial.accY;
+    sensor_data[14] = inertial.accZ;
+    sensor_data[15] = inertial.gyrX;
+    sensor_data[16] = inertial.gyrY;
+    sensor_data[17] = inertial.angleX;
+    sensor_data[18] = inertial.angleY;
+    sensor_data[19] = getUltraSoundLeft();
+    sensor_data[20] = getUltraSoundRight();
+    sensor_data[21] = getSupportFoot();
+
+    for (int i = 0; i < NUM_SENSORS; i) {
+        fout << sensor_data[i] << " ";
     }
 
     fout.close();
@@ -1000,7 +1028,17 @@ void Sensors::loadFrame(string path)
         fin >> v;
         sensor_data += v;
     }
-    setAllSensors(sensor_data);
+    setLeftFootFSR(sensor_data[0], sensor_data[1],
+                   sensor_data[2], sensor_data[3]);
+    setRightFootFSR(sensor_data[4], sensor_data[5],
+                    sensor_data[6], sensor_data[7]);
+    setLeftFootBumper(sensor_data[8], sensor_data[9]);
+    setLeftFootBumper(sensor_data[10], sensor_data[11]);
+    setInertial(sensor_data[12], sensor_data[13], sensor_data[14],
+                sensor_data[15], sensor_data[16], sensor_data[17],
+                sensor_data[18]);
+    setUltraSound(sensor_data[19], sensor_data[20]);
+    setSupportFoot(static_cast<SupportFoot>(sensor_data[21]));
 
     fin.close();
 }
