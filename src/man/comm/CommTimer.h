@@ -5,51 +5,56 @@
 #include <vector>
 
 #include "CommDef.h"
+#include "commconfig.h"
 
-
-class CommTimer 
+class CommTimer
 {
-  public:
+public:
     CommTimer(llong (*f)());
     virtual ~CommTimer() { }
 
-    inline llong timestamp(void) {
-      return time() - epoch;
-    }
-    inline bool time_for_packet(void) {
-      return timestamp() - packet_timer > MICROS_PER_PACKET;
-    }
-    inline void sent_packet(void) {
-      packet_timer = timestamp();
-    }
-    inline void mark(void) {
-      mark_time = timestamp();
-    }
-    inline llong elapsed(void) {
-      return timestamp() - mark_time;
-    }
-    inline llong elapsed_seconds(void) {
-      return timestamp() - mark_time;
-    }
+    llong timestamp() { return time() - epoch + offsetMicros; }
 
-    bool check_packet(const CommPacketHeader &packet);
+    bool timeToSend() { return timestamp() - lastPacketSentAt() > nextSendDelay; }
+
+    void packetSent();
+
+    void mark() { mark_time = timestamp(); }
+
+    llong elapsed() { return timestamp() - mark_time; }
+
+    llong lastPacketSentAt() const { return lastPacketSent; }
+
+    void packetReceived() { lastPacketReceived = timestamp(); }
+
+    llong lastPacketReceivedAt() const { return lastPacketReceived; }
+
+    void setOffset(llong micros) { offsetMicros += micros; }
+
+    llong getOffset() const { return offsetMicros; }
+
+    int packetsDropped(const CommPacketHeader& packet);
+
+    bool check_packet(const CommPacketHeader& packet);
+    void updateTeamPackets(const CommPacketHeader& packet);
+    void checkDeadTeammates();
     void get_time_from_others();
     void reset();
 
-
-  private:
-    llong (*time)();
+private:
+    llong (*time)();                 // Pointer to function that returns current
+                                     // time.
     llong epoch;
-
-    llong packet_timer;
+    llong lastPacketReceived;        // Time last packet was received.
+    llong lastPacketSent;            // Time last packet was sent.
+    llong offsetMicros;              // The number of microseconds by which the 
+                                     // timer must be offset to be synced with the 
+                                     // other robots' clocks.
+    llong nextSendDelay;             // The timestamp when the next packet must be sent.
     llong mark_time;
-    std::vector<llong> team_times;
-    unsigned int packets_checked;
+    std::vector<CommTeammatePacketInfo> teamPackets;
+    unsigned int numPacketsChecked;
     bool need_to_update;
-    //float point_fps;
-    //float fps;
-    //std::vector<float> fps_list;
-
 };
 
 #endif // _CommTimer_h_DEFINED

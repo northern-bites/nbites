@@ -147,9 +147,9 @@ bool isFalling(float angle_pos, float angle_vel) {
 
 
 void RoboGuardian::checkFallen() {
-    if (!useFallProtection){
+    if (!useFallProtection)
         return;
-    }
+
     const Inertial inertial  = sensors->getInertial();
 
     /***** Determine if the robot has FALLEN OVER *****/
