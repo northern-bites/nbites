@@ -25,6 +25,7 @@ public:
  */
 public:
     void detectEdges(int upperBound,
+                     int* field_edge,
                      const uint16_t* channel,
                      Gradient& gradient);
 
@@ -36,7 +37,9 @@ private:
                        const uint16_t* channel,
                        Gradient& gradient);
 
-    void findPeaks(int upperBound, Gradient& gradient);
+    void findPeaks(int upperBound,
+                   int* field_edge,
+                   Gradient& gradient);
 
 private:
     enum {

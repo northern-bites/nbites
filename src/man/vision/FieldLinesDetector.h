@@ -19,7 +19,9 @@ public:
     virtual ~FieldLinesDetector() { };
 
     // VisualDetector interface
-    virtual void detect(int upperBound, const uint16_t *img);
+    virtual void detect(int upperBound,
+                        int* field_edge,
+                        const uint16_t *img);
 
     // Parameter Interface
     void setEdgeThreshold(int thresh);
@@ -37,7 +39,9 @@ public:
     }
 
 private:
-    void findHoughLines(int upperBound, const uint16_t *img);
+    void findHoughLines(int upperBound,
+                        int* field_edge,
+                        const uint16_t *img);
     void findFieldLines();
 
 private:

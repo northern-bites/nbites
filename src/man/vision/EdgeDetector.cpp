@@ -11,7 +11,8 @@ extern "C" void _sobel_operator(int bound,
                                 uint16_t *out);
 extern "C" int _find_edge_peaks(int bound,
                                 const uint16_t *gradients,
-                                AnglePeak *angles);
+                                AnglePeak *angles,
+                                int* field_edge);
 using boost::shared_ptr;
 using namespace std;
 
@@ -27,12 +28,13 @@ EdgeDetector::EdgeDetector(boost::shared_ptr<Profiler> p, uint8_t thresh):
  * @param channel      The entire channel (one of Y, U, or V)
  */
 void EdgeDetector::detectEdges(int upperBound,
+                               int* field_edge,
                                const uint16_t* channel,
                                Gradient& gradient)
 {
     PROF_ENTER(profiler, P_EDGES);
     sobelOperator(upperBound, channel, gradient);
-    findPeaks(upperBound, gradient);
+    findPeaks(upperBound, field_edge, gradient);
     PROF_EXIT(profiler,P_EDGES);
 }
 
@@ -123,13 +125,16 @@ void EdgeDetector::sobelOperator(int upperBound,
  *
  * @param gradient Gradient to check for points.
  */
-void EdgeDetector::findPeaks(int upperBound, Gradient& gradient)
+void EdgeDetector::findPeaks(int upperBound,
+                             int * field_edge,
+                             Gradient& gradient)
 {
     PROF_ENTER(profiler, P_EDGE_PEAKS);
 #ifdef USE_MMX
     gradient.numPeaks = _find_edge_peaks(upperBound,
                                          &gradient.values[0][0],
-                                         gradient.angles);
+                                         gradient.angles,
+                                         field_edge);
 #else
     /**************** IMPORTANT NOTE: **********************
      *

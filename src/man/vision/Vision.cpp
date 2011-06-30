@@ -135,7 +135,9 @@ void Vision::notifyImage() {
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
 
-    linesDetector.detect(thresh->getVisionHorizon(), yImg);
+    linesDetector.detect(thresh->getVisionHorizon(),
+                         thresh->field->getTopEdge(),
+                         yImg);
 
     drawEdges(*linesDetector.getEdges());
     drawHoughLines(linesDetector.getHoughLines());

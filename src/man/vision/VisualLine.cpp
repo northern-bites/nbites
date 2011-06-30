@@ -45,28 +45,50 @@ VisualLine::PointsPair
 VisualLine::findHoughLineEndpoints(const HoughLine& l,
                                    const Gradient& g)
 {
-    // If it had a point at every pixel from corner to corner, it
-    // works out to 400
-    ActiveArray<AnglePeak> pts(400);
+    const float sn = l.getSinT();
+    const float cs = l.getCosT();
+
+    const float x0 = l.getRadius() * cs;
+    const float y0 = l.getRadius() * sn;
+
+    // vector along line is (sin, -cos)
+    float uMean = 0, uMeanSq = 0;
+    int numPts = 0;
 
     // Scan through the gradient's edges
     for (int i = 0; g.isPeak(i); ++i) {
         // Find points which lie on the HoughLine
         // Add them to the ActiveArray
         if ( l.isOnLine(g.angles[i]) ){
-            pts.add(g.angles[i]);
+
+            float u = (sn * (static_cast<float>(g.angles[i].x) - x0) +
+                       -cs * (static_cast<float>(g.angles[i].y) - y0));
+
+            uMean   += u;
+            uMeanSq += u*u;
+            numPts++;
         }
     }
 
-    // Eliminate five percent of the points on each side
-    int numToDelete = max(pts.size() / 20, 1);
+    const float numPtsF = static_cast<float>(numPts);
+    uMean   /= numPtsF;
+    uMeanSq /= numPtsF;
+
+    float uVar = uMeanSq - uMean*uMean;
+    float uSd = sqrtf(uVar);
+
+    point<int> meanPt(static_cast<int>(uMean *  sn + x0) + IMAGE_WIDTH/2,
+                      static_cast<int>(uMean * -cs + y0) + IMAGE_HEIGHT/2);
+
+    float xOff = sn * uSd * 1.5;
+    float yOff = -cs * uSd * 1.5;
 
     // Package and return endpoints
-    point<int> endA(pts[numToDelete].x + IMAGE_WIDTH/2,
-                    pts[numToDelete].y + IMAGE_HEIGHT/2);
+    point<int> endA(meanPt.x + xOff,
+                    meanPt.y + yOff);
 
-    point<int> endB(pts[pts.size() - numToDelete -1].x + IMAGE_WIDTH/2,
-                    pts[pts.size() - numToDelete -1].y + IMAGE_HEIGHT/2);
+    point<int> endB(meanPt.x - xOff,
+                    meanPt.y - yOff);
 
     return PointsPair(endA, endB);
 }

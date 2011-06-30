@@ -191,7 +191,12 @@ int EdgeDetectorTest::test_peaks()
                 c[(i) * IMAGE_WIDTH + j] = 0;
             else
                 c[(i) * IMAGE_WIDTH + j] = 250;
-    edges.detectEdges(0, c,g);
+    int topEdge[IMAGE_WIDTH + 1];
+    for (int i=0; i < IMAGE_WIDTH+1; ++i){
+        topEdge[i] = 0;
+    }
+
+    edges.detectEdges(0, &topEdge[0], c,g);
 
     for (int i = 0; g.isPeak(i); ++i) {
         // x,y are in image center relative coords
@@ -247,12 +252,11 @@ int EdgeDetectorTest::test_peaks()
     float e = 1.5;
     int i_0 = 120, j_0 = 160;
 
-
 /*************** CIRCLE TESTS ************************************/
     g.reset();
 
     create_circle_image(c, r, e, i_0, j_0);
-    edges.detectEdges(0, c,g);
+    edges.detectEdges(0, &topEdge[0], c,g);
     int n = 0;
 
     for (int i = 2; i < Gradient::rows-2; ++i) {
@@ -301,8 +305,13 @@ int EdgeDetectorTest::test_angles()
 
     Gradient g;
 
+    int topEdge[IMAGE_WIDTH+1];
+    for (int i=0; i < IMAGE_WIDTH+1; ++i){
+        topEdge[i] = 0;
+    }
+
     create_circle_image(c, r, e, i_0, j_0);
-    edges.detectEdges(0, c,g);
+    edges.detectEdges(0, &topEdge[0], c,g);
 
     for (int i = 0; i < Gradient::num_angles_limit; ++i) {
         if (g.isPeak(i)){
