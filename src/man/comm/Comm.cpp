@@ -391,11 +391,6 @@ bool c_init_comm (void)
 #ifdef USE_PYCOMM_FAKE_BACKEND
     shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());
     shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
-<<<<<<< HEAD
-
-=======
-	shared_ptr<Profiler> prof = shared_ptr<Profiler>(new Profiler(&monotonic_micro_time));
->>>>>>> eratner/comm
     shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
     shared_ptr<Vision> vision = shared_ptr<Vision>(new Vision(pose, prof));
     PyObject *pcomm = PyComm_new(new Comm(synchro, sensors, vision));
