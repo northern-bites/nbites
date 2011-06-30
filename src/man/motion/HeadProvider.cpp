@@ -81,6 +81,9 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
     case SET:
         setMode();
         break;
+	case COORD:
+		//dummy case to remove unnecessary cmake warning
+		break;
     }
     setActive();
     pthread_mutex_unlock(&head_provider_mutex);
@@ -90,7 +93,7 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
 //Method called during the 'SET' Mode
 void HeadProvider::setMode(){
     //Maximum head movement is Rad/motion frame (6 deg/20ms from AL docs)
-    const float MAX_HEAD_VEL = 6.0f*TO_RAD;
+    const float MAX_HEAD_VEL = 6.0f*TO_RAD;/* ** *///we don't use this...
 
     //Calculate how much we can move toward the goal
     const float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
@@ -106,15 +109,16 @@ void HeadProvider::setMode(){
 	 <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
 #endif
 
+
     //update memory for next  run
     lastYawDest = lastYawDest+yawChangeTarget;
     lastPitchDest = lastPitchDest +pitchChangeTarget;
 
 
     //update the chain angles
-    float newHeads[Kinematics::HEAD_JOINTS] = {lastYawDest,lastPitchDest};
-    vector<float> newChainAngles  =
-        vector<float>(newHeads,newHeads + Kinematics::HEAD_JOINTS);
+    vector<float> newChainAngles;
+	newChainAngles.push_back(lastYawDest);
+	newChainAngles.push_back(lastPitchDest);
     setNextChainJoints(HEAD_CHAIN,newChainAngles);
 
     vector<float> head_gains(HEAD_JOINTS, headSetStiffness);
@@ -149,8 +153,13 @@ void HeadProvider::setCommand(const SetHeadCommand::ptr command) {
     transitionTo(SET);
     yawDest = command->getYaw();
     pitchDest = command->getPitch();
-    yawMaxSpeed = command->getMaxSpeedYaw();
-    pitchMaxSpeed = command->getMaxSpeedPitch();
+	yawMaxSpeed = command->getMaxSpeedYaw();
+	pitchMaxSpeed = command->getMaxSpeedPitch();
+
+    /* ** *///debugging speed clipping (should probably stay in some form)
+	yawMaxSpeed = clip(yawMaxSpeed,0,Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*.1);
+	pitchMaxSpeed = clip(pitchMaxSpeed,0,Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*.1);
+
     setActive();
 
     pthread_mutex_unlock(&head_provider_mutex);
@@ -230,13 +239,17 @@ void HeadProvider::transitionTo(HeadMode newMode){
         case SCRIPTED:
             stopScripted();
             break;
-        case SET:
+        case SET:{
             //If we need to switch modes, then we may not know what the latest
             //angles are, so lets get them again from sensors
             vector<float> mAngles = sensors->getMotionBodyAngles();
             lastYawDest =mAngles[0];
             lastPitchDest =mAngles[1];
             break;
+		}
+		case COORD:
+			//dummy case to remove unnecessary cmake warning
+			break;
         }
         curMode = newMode;
 #ifdef DEBUG_HEADPROVIDER

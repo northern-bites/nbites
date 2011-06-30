@@ -6,6 +6,8 @@ sys.stderr = sys.stdout
 ## import cProfile
 ## import pstats
 
+from math import (fabs) # ** # debugging? or keep?
+
 
 # Packages and modules from super-directories
 from man import comm
@@ -121,10 +123,10 @@ class Brain(object):
         """
 
         # Build instances of the vision based field objects
+        # Left post is on that goalie's left
         # Yellow goal left and right posts
         self.yglp = Landmarks.FieldObject(self.vision.yglp,
                                           Constants.VISION_YGLP)
-
         self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
                                           Constants.VISION_YGRP)
 
@@ -134,6 +136,11 @@ class Brain(object):
         self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
                                           Constants.VISION_BGRP)
 
+        # Add field corners
+        self.corners = []
+        for i in range(17): # See PyVision.cpp for index meanings, 15-31
+            self.corners.append(Landmarks.FieldCorner(i))
+
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
 
@@ -142,37 +149,104 @@ class Brain(object):
         Builds a list of fieldObjects based on their relative names to the robot
         Needs to be called when team color is determined
         """
+        # Note: corner directions are relative to perspective of own goalie
 
         # Blue team setup
         if self.my.teamColor == Constants.TEAM_BLUE:
             # Yellow goal
             self.oppGoalRightPost = self.yglp
             self.oppGoalLeftPost = self.ygrp
-
             # Blue Goal
             self.myGoalLeftPost = self.bglp
             self.myGoalRightPost = self.bgrp
+            # Corners
+            self.myHalfLeftCorner = self.corners[0]
+            self.myHalfRightCorner = self.corners[1]
+            self.myBoxLeftT = self.corners[2]
+            self.myBoxRightT = self.corners[3]
+            self.myBoxLeftL = self.corners[4]
+            self.myBoxRightL = self.corners[5]
+            self.centerLeftT = self.corners[7]
+            self.centerRightT = self.corners[8]
+            self.centerLeftCross = self.corners[15]
+            self.centerRightCross = self.corners[16]
+            self.oppHalfLeftCorner = self.corners[9]
+            self.oppHalfRightCorner = self.corners[8]
+            self.oppBoxLeftT = self.corners[11]
+            self.oppBoxRightT = self.corners[10]
+            self.oppBoxLeftL = self.corners[13]
+            self.oppBoxRightL = self.corners[12]
 
         # Yellow team setup
         else:
             # Yellow goal
             self.myGoalLeftPost = self.yglp
             self.myGoalRightPost = self.ygrp
-
             # Blue Goal
             self.oppGoalRightPost = self.bglp
             self.oppGoalLeftPost = self.bgrp
+            # Corners
+            self.myHalfLeftCorner = self.corners[8]
+            self.myHalfRightCorner = self.corners[9]
+            self.myBoxLeftT = self.corners[10]
+            self.myBoxRightT = self.corners[11]
+            self.myBoxLeftL = self.corners[12]
+            self.myBoxRightL = self.corners[13]
+            self.centerLeftT = self.corners[8]
+            self.centerRightT = self.corners[7]
+            self.centerLeftCross = self.corners[16]
+            self.centerRightCross = self.corners[15]
+            self.oppHalfLeftCorner = self.corners[1]
+            self.oppHalfRightCorner = self.corners[0]
+            self.oppBoxLeftT = self.corners[3]
+            self.oppBoxRightT = self.corners[2]
+            self.oppBoxLeftL = self.corners[5]
+            self.oppBoxRightL = self.corners[4]
 
-        # Since, for ex.  bgrp points to the same thins as myGoalLeftPost,
+        # Since, for ex.  bgrp points to the same things as myGoalLeftPost,
         # we can set these regardless of our team color
         self.myGoalLeftPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_MY_GOAL_LEFT_POST)
+            Constants.LANDMARK_MY_GOAL_LEFT_POST)
         self.myGoalRightPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_MY_GOAL_RIGHT_POST)
+            Constants.LANDMARK_MY_GOAL_RIGHT_POST)
         self.oppGoalLeftPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_OPP_GOAL_LEFT_POST)
+            Constants.LANDMARK_OPP_GOAL_LEFT_POST)
         self.oppGoalRightPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
+            Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
+
+        # Set x and y values for corners
+        self.myHalfLeftCorner.associateWithRelativeLandmark(
+            Constants.LANDMARK_MY_CORNER_LEFT_L)
+        self.myHalfRightCorner.associateWithRelativeLandmark(
+            Constants.LANDMARK_MY_CORNER_RIGHT_L)
+        self.myBoxLeftT.associateWithRelativeLandmark(
+            Constants.LANDMARK_MY_GOAL_LEFT_T)
+        self.myBoxRightT.associateWithRelativeLandmark(
+            Constants.LANDMARK_MY_GOAL_RIGHT_T)
+        self.myBoxLeftL.associateWithRelativeLandmark(
+            Constants.LANDMARK_MY_GOAL_LEFT_L)
+        self.myBoxRightL.associateWithRelativeLandmark(
+            Constants.LANDMARK_MY_GOAL_RIGHT_L)
+        self.centerLeftT.associateWithRelativeLandmark(
+            Constants.LANDMARK_CENTER_LEFT_T)
+        self.centerRightT.associateWithRelativeLandmark(
+            Constants.LANDMARK_CENTER_RIGHT_T)
+        self.centerLeftCross.associateWithRelativeLandmark(
+            Constants.LANDMARK_CENTER_LEFT_CROSS)
+        self.centerRightCross.associateWithRelativeLandmark(
+            Constants.LANDMARK_CENTER_RIGHT_CROSS)
+        self.oppHalfLeftCorner.associateWithRelativeLandmark(
+            Constants.LANDMARK_OPP_CORNER_LEFT_L)
+        self.oppHalfRightCorner.associateWithRelativeLandmark(
+            Constants.LANDMARK_OPP_CORNER_RIGHT_L)
+        self.oppBoxLeftT.associateWithRelativeLandmark(
+            Constants.LANDMARK_OPP_GOAL_LEFT_T)
+        self.oppBoxRightT.associateWithRelativeLandmark(
+            Constants.LANDMARK_OPP_GOAL_RIGHT_T)
+        self.oppBoxLeftL.associateWithRelativeLandmark(
+            Constants.LANDMARK_OPP_GOAL_LEFT_L)
+        self.oppBoxRightL.associateWithRelativeLandmark(
+            Constants.LANDMARK_OPP_GOAL_RIGHT_L)
 
         # Build a list of all of the field objects with respect to team color
         self.myFieldObjects = [self.yglp, self.ygrp, self.bglp, self.bgrp]
@@ -220,6 +294,15 @@ class Brain(object):
         # Update Environment
         self.time = time.time()
         self.updateVisualObjects()
+
+
+        # ** # debugging
+        #print "visual update:"
+        #print "yglp:",self.yglp.visDist,self.yglp.visBearing
+        #print "ygrp:",self.ygrp.visDist,self.ygrp.visBearing
+        # ** #
+
+
         self.sonar.updateSensors(self.sensors)
 
         # Communications update
@@ -227,7 +310,24 @@ class Brain(object):
 
         # Localization Update
         self.updateLocalization()
-        self.ball.updateBestValues(self.my)
+
+        # ** # debugging
+        #print "loc update:"
+        #print "yglp:",self.yglp.locDist,self.yglp.locBearing
+        #print "ygrp:",self.ygrp.locDist,self.ygrp.locBearing
+        # ** #
+
+        # Choose whether we use Vision or Localization
+        self.updateBestValues()
+
+        # ** # debugging
+        #print "best values:"
+        #print "yglp:",self.yglp.dist,self.yglp.bearing
+        #print "ygrp:",self.ygrp.dist,self.ygrp.bearing
+        #print "rel values:"
+        #print "yglp:",self.yglp.relX,self.yglp.relY
+        #print "ygrp:",self.ygrp.relX,self.ygrp.relY
+        # ** #
 
         #Set LEDS
         self.leds.processLeds()
@@ -257,6 +357,21 @@ class Brain(object):
         self.bglp.updateVision(self.vision.bglp)
         self.bgrp.updateVision(self.vision.bgrp)
 
+        cornerList = []
+        distList = []
+        for c in self.vision.fieldLines.corners:
+            cornerList = c.possibilities[:] # copy values into new list
+            distList = []
+            for i in range(len(cornerList)):
+                distList.append(fabs(c.dist - self.corners[cornerList[i]-15].locDist) + \
+                    fabs(c.bearing - self.corners[cornerList[i]-15].locBearing))
+            closestIndex = distList.index(min(distList))
+            self.corners[cornerList[closestIndex]-15].setVisualCorner(c)
+
+        # Check all FieldCorners and reset values if not in this frame.
+        for i in range(len(self.corners)):
+            self.corners[i].updateVision()
+
         self.time = time.time()
 
     def updateComm(self):
@@ -278,10 +393,29 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-
-        # Update global information to current estimates
         self.my.updateLoc(self.loc)
+
         self.ball.updateLoc(self.loc, self.my)
+        self.yglp.updateLoc(self.loc, self.my)
+        self.ygrp.updateLoc(self.loc, self.my)
+        self.bglp.updateLoc(self.loc, self.my)
+        self.bgrp.updateLoc(self.loc, self.my)
+
+        for i in range(len(self.corners)):
+            self.corners[i].updateLoc(self.loc, self.my)
+
+    def updateBestValues(self):
+        """
+        Update estimates about objects using best information available
+        """
+        self.ball.updateBestValues(self.my)
+        self.yglp.updateBestValues()
+        self.ygrp.updateBestValues()
+        self.bglp.updateBestValues()
+        self.bgrp.updateBestValues()
+
+        for i in range(len(self.corners)):
+            self.corners[i].updateBestValues()
 
     def updatePlaybook(self):
         """

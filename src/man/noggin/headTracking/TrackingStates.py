@@ -1,8 +1,11 @@
 from man.motion import MotionConstants
 from . import TrackingConstants as constants
+from ..typeDefs.Landmarks import FieldObject
+from ..typeDefs.Landmarks import FieldCorner
 
 DEBUG = False
 
+# ** # old method
 def ballTracking(tracker):
     '''Super state which handles following/refinding the ball'''
     if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -10,6 +13,7 @@ def ballTracking(tracker):
     else:
         return tracker.goNow('scanBall')
 
+# ** # old method
 def tracking(tracker):
     """
     state askes it's parent (the tracker) for an object or angles to track
@@ -32,6 +36,7 @@ def tracking(tracker):
 
     return tracker.stay()
 
+# ** # old method
 def ballSpinTracking(tracker):
     '''Super state which handles following/refinding the ball'''
     if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -40,6 +45,7 @@ def ballSpinTracking(tracker):
         return tracker.goNow('spinScanBall')
 
 
+# ** # old method
 def activeTracking(tracker):
     """
     Method to perform tracking
@@ -81,6 +87,107 @@ def activeTracking(tracker):
             motionAngles[MotionConstants.HeadPitch])
 
         return tracker.goLater('trianglePan')
+
+    return tracker.stay()
+
+# ** # new method
+def trackLoc(tracker):
+    """
+    Look towards the current target, then stare at it for
+    TRACKER_FRAMES_STARE_THRESH frames.
+    """
+    # make sure head is inactive first
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+
+    # ** # debugging
+    #if isinstance(tracker.target, FieldCorner):
+    #    print "target is corner:",tracker.target.visionId
+    #elif isinstance(tracker.target, FieldObject):
+    #    print "target is post:",tracker.target.visionId
+
+    # safety check that target was not set to a ball
+    if tracker.target is None or tracker.target == tracker.brain.ball:
+        print "target is None, or the ball"
+        return tracker.goLater(tracker.decisionState)
+
+    tracker.helper.lookToTargetCoords(tracker.target)
+
+    """
+    # if close enough to target, switch to stareLoc
+    if tracker.helper.inView(tracker.target):
+        print "found target on frame, now staring"
+        return tracker.goLater('stareLoc')
+        """
+
+    # Once any visual object is in frame, stare at it
+    for obj in tracker.locObjectList:
+        if obj.on:
+            tracker.target = obj
+            return tracker.goLater('stareLoc')
+
+    if tracker.counter > constants.TRACKER_FRAMES_SEARCH_THRESH:
+        print "Past search thresh, switching to new target"
+        return tracker.goLater(tracker.decisionState)
+
+    return tracker.stay()
+
+# ** # new state
+def stareLoc(tracker):
+    """
+    Dynamically stare at the target, then return to decisionState.
+    Note: Does not alter tracker.target
+    """
+    # Make sure head is inactive first
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        # ** # debugging
+        #print "staring at target Id:",tracker.target.visionId
+
+    if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
+        print "Past stare thresh, switching to new target"
+        return tracker.goLater(tracker.decisionState)
+
+    # Find the real post in vision frame
+    if tracker.target is FieldObject:
+        stareTarget = tracker.helper.findPostInVision(tracker.target, tracker.brain)
+    else: # Target is a corner.
+        stareTarget = tracker.helper.findCornerInVision(tracker.target, tracker.brain)
+
+    # Second safety check that something was on frame
+    if stareTarget is None:
+        #print "no possible target currently visible"
+        return tracker.stay()
+
+    #print "target visible"
+    tracker.helper.lookToTargetAngles(stareTarget)
+
+    return tracker.stay()
+
+# ** # new state
+def trackingBall(tracker):
+    """
+    Look directly at ball for a short time.
+    """
+    # make sure head is inactive first
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+
+    # Look to the ball for TRACKER_BALL_STARE_THRESH frames
+    # If ball is lost on frame, look towards coordinates.
+    if tracker.brain.ball.on:
+        tracker.helper.lookToTargetAngles(tracker.brain.ball)
+    else:
+        tracker.helper.lookToTargetCoords(tracker.brain.ball)
+        """
+    # If we haven't seen the ball in some time, switch to panning
+    if tracker.brain.ball.framesOff > constants.TRACKER_BALL_STARE_THRESH/2:
+        print "lost ball for some time, panning"
+        return tracker.goLater('scanBall')
+        """
+    if tracker.counter > constants.TRACKER_BALL_STARE_THRESH:
+        print "Past stare thresh for ball"
+        return tracker.goLater(tracker.decisionState)
 
     return tracker.stay()
 
