@@ -25,7 +25,7 @@
 #include <string>
 #include <pthread.h>
 #include <boost/shared_ptr.hpp>
-
+#include <vector>
 
 #undef MUTEX_TYPE
 #ifdef NDEBUG
@@ -35,6 +35,31 @@
 #  define STATIC_MUTEX_TYPE PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP
 #  define MUTEX_INIT errchkmutex
 #endif
+
+class multi_mutex {
+protected:
+    typedef std::vector<pthread_mutex_t*> mutex_vector;
+public:
+    multi_mutex() {}
+    multi_mutex(pthread_mutex_t* mutex_array[]) :
+        mutices(mutex_array,
+                mutex_array + sizeof(mutex_array) / sizeof(pthread_mutex_t*)){
+    }
+    void lock() {
+        for (mutex_vector::iterator i = mutices.begin();
+                i != mutices.end(); i++) {
+            pthread_mutex_lock(*i);
+        }
+    }
+    void unlock() {
+        for (mutex_vector::reverse_iterator i = mutices.rbegin();
+                i != mutices.rend(); i++) {
+            pthread_mutex_unlock(*i);
+        }
+    }
+private:
+    mutex_vector mutices;
+};
 
 struct MutexDeleter
 {
@@ -128,7 +153,7 @@ class Trigger
   public:
     Trigger(boost::shared_ptr<Synchro> _synchro, std::string name,
             bool _value=false);
-    ~Trigger() { }
+    virtual ~Trigger() { }
 
     void flip();
     void on();
