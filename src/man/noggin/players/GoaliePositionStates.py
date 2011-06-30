@@ -21,6 +21,8 @@ def goaliePosition(player):
         player.brain.tracker.trackBall()
     elif ball.dist >= goalCon.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLocGoaliePos()
+    elif( my.uncertX> 90 or my.uncertY > 90) :
+        player.brain.tracker.activeLocGoaliePos()
     else:
         player.brain.tracker.trackBall()
 
