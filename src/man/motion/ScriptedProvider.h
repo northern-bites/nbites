@@ -37,8 +37,7 @@
 
 class ScriptedProvider : public MotionProvider {
 public:
-    ScriptedProvider(boost::shared_ptr<Sensors> s,
-		     boost::shared_ptr<Profiler> p);
+    ScriptedProvider(boost::shared_ptr<Sensors> s);
     virtual ~ScriptedProvider();
 
     void requestStopFirstInstance();

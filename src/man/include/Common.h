@@ -135,4 +135,5 @@ static long long monotonic_micro_time(void)
     return tv.tv_sec * MICROS_PER_SECOND + tv.tv_nsec / 1000;
 #endif
 }
+
 #endif // Common_h_DEFINED

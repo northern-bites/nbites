@@ -18,7 +18,7 @@
 class HoughSpace
 {
 public:
-    HoughSpace(boost::shared_ptr<Profiler> p);
+    HoughSpace();
     virtual ~HoughSpace() { };
 
     std::list<HoughLine> findLines(boost::shared_ptr<Gradient> g);
@@ -50,7 +50,6 @@ private:       // Member variables
            DEFAULT_ANGLE_SPREAD  = 5,
            PEAK_POINTS = 4 };
 
-    boost::shared_ptr<Profiler> profiler;
     int acceptThreshold, angleSpread;
 
 

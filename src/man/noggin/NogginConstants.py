@@ -7,7 +7,8 @@
 # *              *
 # ****************
 
-LOG_LOC = True
+LOG_LOC = False
+LOG_COMM = False
 
 # *******************
 # *                 *

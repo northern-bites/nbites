@@ -932,6 +932,54 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
             }
         }
     }
+	// because we are over-caution about BLUE_BIT
+	if (color == BLUE_BIT && context->getGoalBoxLines()) {
+		float distant = 0.0f;
+		boost::shared_ptr<VisualLine> goalLine;
+		const vector < boost::shared_ptr<VisualLine> > * lines =
+			vision->fieldLines->getLines();
+		for (vector < boost::shared_ptr<VisualLine> >::const_iterator i =
+				 lines->begin();
+			 i != lines->end(); ++i) {
+			if ((*i)->getDistance() > distant) {
+				distant = (*i)->getDistance();
+				goalLine = *i;
+			}
+		}
+		// make sure the supposed goalline crosses completely over post
+		if (goalLine->getLeftEndpoint().x < leftBottom.x &&
+			goalLine->getRightEndpoint().x > rightBottom.x) {
+			if (POSTDEBUG) {
+				cout << "Extending bottom of blue goal" << endl;
+			}
+			point<int> leftBig;
+			leftBig.x = leftBottom.x;
+			leftBig.y = IMAGE_HEIGHT - 1;
+			std::pair<int, int> intersect = Utility::plumbIntersection(
+				leftBottom, leftBig, goalLine->getLeftEndpoint(),
+				goalLine->getRightEndpoint());
+			vision->drawPoint(intersect.first, intersect.second, MAROON);
+			leftBottom.x = xProject(leftBottom.x, leftBottom.y,
+									intersect.second);
+			leftBottom.y = intersect.second;
+			leftBig.x = rightBottom.x;
+			leftBig.y = IMAGE_HEIGHT - 1;
+			intersect = Utility::plumbIntersection(
+				leftBottom, leftBig, goalLine->getLeftEndpoint(),
+				goalLine->getRightEndpoint());
+			rightBottom.x = xProject(rightBottom.x, rightBottom.y,
+									 intersect.second);
+			rightBottom.y = intersect.second;
+			if (leftBottom.x > -1 && leftBottom.x < IMAGE_WIDTH &&
+				rightBottom.x > -1 && rightBottom.x < IMAGE_WIDTH) {
+				obj.setBlob(leftTop, rightTop, leftBottom, rightBottom);
+				if (POSTDEBUG) {
+					cout << "New Xs " << leftBottom.x << " " << rightBottom.x << endl;
+				}
+			}
+		}
+	}
+
 }
 
 /* A collection of miscelaneous methods used in processing goals.
@@ -1456,13 +1504,16 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 				classification = LEFT;
 			}
 		}
-		if (dist > CROSSBAR_CM_WIDTH) {
+		if (dist > CROSSBAR_CM_WIDTH + 20.0f) {
 			if (classification == RIGHT) {
 				return LEFT;
 			} else {
 				return RIGHT;
 			}
+		} else if (dist >  GOALBOX_DEPTH * 1.5) {
+			return NOPOST;
 		}
+		return classification;
 	}
 	// perhaps it is a field corner
 	if (post.getBottom() - corner.getY() > 20 &&
@@ -2434,12 +2485,15 @@ bool ObjectFragments::postBigEnough(Blob b) {
         if (b.getTop() > 5) {
             return false;
         }
-        if (color == BLUE_BIT && b.width() < 20) {
-            return false;
-		}
 		if (b.height() < MIN_GOAL_HEIGHT / 2) {
 			return false;
 		}
+
+		int tCorners = context->getTCorner();
+        if (color == BLUE_BIT && b.width() < 20 && tCorners == 0) {
+            return false;
+		}
+
     }
     return true;
 }

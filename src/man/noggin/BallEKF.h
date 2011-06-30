@@ -49,6 +49,7 @@ public:
                      const RangeBearingMeasurement& ball,
                      const PoseEst& p);
     void reset();
+    void resetModelTo(const RangeBearingMeasurement& ball);
 
     ///////////////////////////////
     // Getters
@@ -201,6 +202,7 @@ private:
     long long int lastUpdateTime;
     float dt;
     MotionModel curOdo;
+    int errorCounter;
 
     const static float BETA_BALL;
     const static float BETA_BALL_VEL;
@@ -213,6 +215,7 @@ private:
 
     const static float INIT_X_UNCERT, INIT_Y_UNCERT;
     const static float INIT_X_VEL_UNCERT, INIT_Y_VEL_UNCERT;
+    const static float INIT_X_ACC_UNCERT, INIT_Y_ACC_UNCERT;
 
     const static float X_EST_MIN, X_EST_MAX;
     const static float Y_EST_MIN, Y_EST_MAX;
@@ -221,5 +224,6 @@ private:
     const static float ACC_EST_MAX, ACC_EST_MIN;
 
     const static float VELOCITY_EST_MIN_SPEED;
+    const static int ERROR_RESET_THRESH;
 };
 #endif // File

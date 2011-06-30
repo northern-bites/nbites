@@ -45,8 +45,10 @@ const float MultiLocEKF::INIT_H_UNCERT = M_PI_FLOAT * 2.0f;
 // Estimate limits
 const float MultiLocEKF::X_EST_MIN = 0.0f;
 const float MultiLocEKF::Y_EST_MIN = 0.0f;
+const float MultiLocEKF::H_EST_MIN = -M_PI_FLOAT;
 const float MultiLocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
 const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
+const float MultiLocEKF::H_EST_MAX = M_PI_FLOAT;
 
 const float MultiLocEKF::ERROR_RESET_THRESH = 0.6f;
 const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
@@ -238,6 +240,12 @@ void MultiLocEKF::redGoalieReset()
  */
 void MultiLocEKF::resetLocTo(float x, float y, float h)
 {
+    for (int i=0; i < loc_ekf_dimension; ++i){
+        xhat_k(i) = xhat_k_bar(i) = 0.0f;
+        for (int j=0; j < loc_ekf_dimension; ++j){
+            A_k(i,j) = Q_k(i,j) = P_k(i,j) = P_k_bar(i,j) = 0.0f;
+        }
+    }
     setXEst(x);
     setYEst(y);
     setHEst(subPIAngle(h));
@@ -325,7 +333,7 @@ void MultiLocEKF::endFrame()
     // Clip values if our estimate is off the field
     clipRobotPose();
     if (testForNaNReset()) {
-        cout << "MultiLocEKF reset to: "<< *this << endl;
+        cout << "MultiLocEKF reset to: " << endl << *this << endl;
         cout << "\tLast odo is: " << lastOdo << endl;
         cout << endl;
     }
@@ -365,8 +373,12 @@ MultiLocEKF::associateTimeUpdate(MotionModel u)
 
     // Derivatives of motion updates re:x,y,h
     // Other values are set in the constructor and are unchanging
-    A_k(0,2) = -u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) = u.deltaF * cosh - u.deltaL * sinh;
+    //
+    // THESE ARE UNUSED:
+    //    They cause a negative value to be generated in P_k which
+    //    is very bad. Disabled until a solution can be found. --Jack and Yoni
+    A_k(0,2) = 0; //-u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) = 0; //u.deltaF * cosh - u.deltaL * sinh;
 
     return deltaLoc;
 }
@@ -558,8 +570,9 @@ void MultiLocEKF::incorporateCorner(int index,
     V_k(2) = orientation_error;
 
     // The jacobian's denomitator
-    float denom = sqrt( 1 - ((dot_prod * dot_prod) /
-                             (pt_dist*pt_dist)));
+    // Clipped to prevent sqrt of negative
+    float denom = sqrt( max(1 - ((dot_prod * dot_prod) /
+                                 (pt_dist*pt_dist)), 0.0f));
     float sign = copysignf(1.0f, dot_sign);
 
     // Derivatives of orientation with respect to x,y,h
@@ -703,39 +716,24 @@ void MultiLocEKF::limitPosteriorUncert()
 }
 
 /**
- * Method to use the estimate ellipse to intelligently clip the pose estimate
- * of the robot using the information of the uncertainty ellipse.
+ * Very simple clipping to the edges of the field.
  */
 void MultiLocEKF::clipRobotPose()
 {
-    // Limit our X estimate
-    if (xhat_k(0) > X_EST_MAX) {
-        StateVector v(loc_ekf_dimension);
-        v(0) = 1.0f;
-        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - X_EST_MAX) /
-            inner_prod(v, prod(P_k,v));
-    }
-    else if (xhat_k(0) < X_EST_MIN) {
-        StateVector v(loc_ekf_dimension);
-        v(0) = 1.0f;
-        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
-            inner_prod(v, prod(P_k,v));
-    }
+    // Check x uncertainty
+    xhat_k(0) =
+        xhat_k_bar(0) =
+        clip(xhat_k(0), X_EST_MIN, X_EST_MAX);
 
-    // Limit our Y estimate
-    if (xhat_k(1) < Y_EST_MIN) {
-        StateVector v(loc_ekf_dimension);
-        v(1) = 1.0f;
-        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
-            inner_prod(v, prod(P_k,v));
-    }
-    else if (xhat_k(1) > Y_EST_MAX) {
-        StateVector v(loc_ekf_dimension);
-        v(1) = 1.0f;
-        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - Y_EST_MAX) /
-            inner_prod(v, prod(P_k,v));
+    // Check y uncertainty
+    xhat_k(1) =
+        xhat_k_bar(1) =
+        clip(xhat_k(1), Y_EST_MIN, Y_EST_MAX);
 
-    }
+    // Check h uncertainty
+    xhat_k(2) =
+        xhat_k_bar(2) =
+        clip(xhat_k(2), H_EST_MIN, H_EST_MAX);
 }
 
 void MultiLocEKF::printBeforeUpdateInfo()
@@ -743,10 +741,14 @@ void MultiLocEKF::printBeforeUpdateInfo()
     cout << "Loc update: " << endl;
     cout << "Before updates: " << *this << endl;
     cout << "\tOdometery is " << lastOdo <<endl;
-    cout << "\tObservations are: " << endl;
-    // for(unsigned int i = 0; i < lastObservations.size(); ++i) {
-    //     cout << "\t\t" << lastObservations[i] <<endl;
-    // }
+    cout << "\tPoint Observations are: " << endl;
+    for(unsigned int i = 0; i < lastPointObservations.size(); ++i) {
+        cout << "\t\t" << lastPointObservations[i] <<endl;
+    }
+    cout << "\tCorner Observations are: " << endl;
+    for(unsigned int i = 0; i < lastCornerObservations.size(); ++i) {
+        cout << "\t\t" << lastCornerObservations[i] <<endl;
+    }
 }
 
 void MultiLocEKF::printAfterUpdateInfo()
@@ -903,7 +905,7 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
 
     // Heading of line (self -> pt2)
     // Clamp the input to (-1,1) to prevent illegal trig call and a nan return
-    float headingPt2 = acosf(( (pt2.x - newX)/sideB) );
+    float headingPt2 = acosf(clip( (pt2.x - newX)/sideB, -1.0f, 1.0f) );
 
     // Sign based on y direction of vector (self -> pt2)
     float signedHeadingPt2 = copysignf(1.0f, pt2.y - newY) * headingPt2;
