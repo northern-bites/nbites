@@ -384,6 +384,7 @@ void Noggin::updateLocalization()
         RangeBearingMeasurement k(vision->ball);
         m = k;
     } else {
+
         // If it's off for more then the threshold, then try and use mate data
         TeammateBallMeasurement n;
 #       ifdef USE_TEAMMATE_BALL_REPORTS
@@ -391,13 +392,16 @@ void Noggin::updateLocalization()
         if (!(n.ballX == 0.0 && n.ballY == 0.0) &&
             !(gc->gameState() == STATE_INITIAL ||
               gc->gameState() == STATE_FINISHED)) {
+
             m.distance = hypotf(loc->getXEst() - n.ballX,
                                loc->getYEst() - n.ballY);
             m.bearing = subPIAngle(atan2(n.ballY - loc->getYEst(),
                                          n.ballX - loc->getXEst()) -
                                    loc->getHEst());
+
             m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
             m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
+
 #           ifdef DEBUG_TEAMMATE_BALL_OBSERVATIONS
             cout << setprecision(4)
                  << "Using teammate ball report of (" << m.distance << ", "
@@ -405,6 +409,7 @@ void Noggin::updateLocalization()
                  << "(" << n.ballX << ", " << n.ballY << ")" << endl;
             cout << *ballEKF << endl;
 #           endif
+
         }
 #       endif
     }

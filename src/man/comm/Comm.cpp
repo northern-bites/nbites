@@ -67,7 +67,7 @@ static void PyComm_dealloc (PyComm *self)
 //       June 18, 2011 :: Wils Dawson
 static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
 {
-    list<vector<float> >* latest;
+    list<vector<float> > latest;
     Py_BEGIN_ALLOW_THREADS
 
 		//grabs latestComm from C++
@@ -75,12 +75,12 @@ static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
 
     Py_END_ALLOW_THREADS;
 
-	PyObject *packets = PyList_New(latest->size()), *fields, *f;
+	PyObject *packets = PyList_New(latest.size()), *fields, *f;
     if (packets == NULL)
 		goto abort;     // used goto statements because it's clearer and Bill said so.
-	for (int i = 0; !latest->empty(); latest->pop_front(), i++)
+	for (int i = 0; !latest.empty(); latest.pop_front(), i++)
 	{
-		vector<float> &v = latest->front();
+		vector<float> &v = latest.front();
 		fields = PyList_New(v.size());
 		if (fields == NULL)
 			goto abort;
@@ -414,7 +414,7 @@ PyMODINIT_FUNC init_comm (void)
 Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
             shared_ptr<Vision> v)
     : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
-	  latest(new list<vector<float> >), sensors(s), timer(&monotonic_micro_time),
+	  latest(), sensors(s), timer(&monotonic_micro_time),
       gc(new GameController()), tool(_synchro, s, v, gc), averagePacketDelay(0),
       totalPacketsReceived(0), ourPacketsReceived(0), lastPacketNumber(0)
 {
@@ -983,10 +983,9 @@ void Comm::parse_packet(const CommPacketHeader &packet,
     // copies actual message
     memcpy(&v[3], msg, size);
 
-    // push message onto queue and pops off the front if we have too many.
-    if (latest->size() >= MAX_MESSAGE_MEMORY)
-        latest->pop_front();
-    latest->push_back(v);
+    if (latest.size() >= MAX_MESSAGE_MEMORY)
+        latest.pop_front();
+    latest.push_back(v);
 }
 
 // Adds Comm to Python Module
@@ -1007,11 +1006,12 @@ void Comm::add_to_module()
     }
 }
 
-// Generates new list for latest and returns the old one.
-list<vector<float> >* Comm::latestComm()
+list<vector<float> > Comm::latestComm()
 {
-    list<vector<float> >* old = latest;
-    latest = new list<vector<float> >();
+    list<vector<float> > old(latest);
+
+    latest.clear();
+
     return old;
 }
 
@@ -1022,8 +1022,7 @@ TeammateBallMeasurement Comm::getTeammateBallReport()
     list<vector<float> >::iterator i;
     TeammateBallMeasurement m;
     float minUncert = 10000.0f;
-    for (i = latest->begin(); i != latest->end(); ++i)
-    {
+    for (i = latest.begin(); i != latest.end(); ++i) {
         // Get the combined uncert x and y
         float curUncert = static_cast<float>( hypot((*i)[6],(*i)[7]) );
         // If the teammate sees the ball and its uncertainty is less than the
