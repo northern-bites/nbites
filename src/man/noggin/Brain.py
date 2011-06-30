@@ -1,4 +1,3 @@
-
 # Redirect standard error to standard out
 import time
 import sys
