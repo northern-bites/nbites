@@ -114,11 +114,6 @@ def shouldStopChase(team):
         team.resetGoalieRoleCounters()
         return True
 
-    print "Not stopping chase because"
-    print "My X is" + str(my.x)
-    print "My X Uncert is" + str(my.uncertX)
-    print "The ball X is" + str(ball.x)
-    print "The ball relX is" + str(ball.relX)
     return False
 
 
