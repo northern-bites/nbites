@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -48,31 +47,22 @@ static uint16_t global_image[NAO_IMAGE_BYTE_SIZE];
 //
 int Sensors::saved_frames = 0;
 
-Sensors::Sensors (boost::shared_ptr<Speech> s)
-    : speech(s),
-      bodyAngles(Kinematics::NUM_JOINTS),
-      visionBodyAngles(Kinematics::NUM_JOINTS),
-      motionBodyAngles(Kinematics::NUM_JOINTS),
-      bodyAnglesError(Kinematics::NUM_JOINTS),
-      bodyTemperatures(Kinematics::NUM_JOINTS,0.0f),
-      leftFootFSR(),
-      rightFootFSR(leftFootFSR),
-      leftFootBumper(0.0f, 0.0f),
-      rightFootBumper(0.0f, 0.0f),
-      inertial(),
-      ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(0.0f),
-      yImage(&global_image[0]), uvImage(&global_image[0]),
-      colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
-      naoImage(NULL),
-      //naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
-      supportFoot(LEFT_SUPPORT),
-      varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
-      fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
-      unfilteredInertial(),
-      chestButton(0.0f),batteryCharge(0.0f),batteryCurrent(0.0f),
-      FRM_FOLDER("/home/nao/naoqi/frames"),
-      saving_frames_on(false)
-{
+Sensors::Sensors(boost::shared_ptr<Speech> s) :
+        speech(s), bodyAngles(Kinematics::NUM_JOINTS), visionBodyAngles(
+                Kinematics::NUM_JOINTS), motionBodyAngles(
+                Kinematics::NUM_JOINTS), bodyAnglesError(
+                Kinematics::NUM_JOINTS), bodyTemperatures(
+                Kinematics::NUM_JOINTS, 0.0f), leftFootFSR(), rightFootFSR(
+                leftFootFSR), leftFootBumper(0.0f, 0.0f), rightFootBumper(0.0f,
+                0.0f), inertial(), ultraSoundDistanceLeft(0.0f), ultraSoundDistanceRight(
+                0.0f), yImage(&global_image[0]), uvImage(&global_image[0]), colorImage(
+                reinterpret_cast<uint8_t*>(&global_image[0])), naoImage(NULL),
+        //naoImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+        supportFoot(LEFT_SUPPORT), varianceMonitor(MONITOR_COUNT,
+                "SensorVariance", sensorNames), fsrMonitor(BUMPER_LEFT_L,
+                "FSR_Variance", fsrNames), unfilteredInertial(), chestButton(
+                0.0f), batteryCharge(0.0f), batteryCurrent(0.0f), FRM_FOLDER(
+                "/home/nao/naoqi/frames"), saving_frames_on(false) {
     pthread_mutex_init(&angles_mutex, NULL);
     pthread_mutex_init(&vision_angles_mutex, NULL);
     pthread_mutex_init(&motion_angles_mutex, NULL);
@@ -80,6 +70,7 @@ Sensors::Sensors (boost::shared_ptr<Speech> s)
     pthread_mutex_init(&errors_mutex, NULL);
     pthread_mutex_init(&fsr_mutex, NULL);
     pthread_mutex_init(&button_mutex, NULL);
+    pthread_mutex_init(&bumper_mutex, NULL);
     pthread_mutex_init(&inertial_mutex, NULL);
     pthread_mutex_init(&unfiltered_inertial_mutex, NULL);
     pthread_mutex_init(&ultra_sound_mutex, NULL);
@@ -89,31 +80,37 @@ Sensors::Sensors (boost::shared_ptr<Speech> s)
     pthread_mutex_init(&image_mutex, NULL);
 #endif
     pthread_mutex_init(&variance_mutex, NULL);
+    pthread_mutex_t* vision_mutices[] = { &battery_mutex, &bumper_mutex,
+            &ultra_sound_mutex };
+    vision_sensors_mutex = multi_mutex(vision_mutices);
+    pthread_mutex_t* motion_mutices[] = { &button_mutex, &fsr_mutex,
+            &inertial_mutex, &unfiltered_inertial_mutex };
+    motion_sensors_mutex = multi_mutex(motion_mutices);
 
     // set up the sensor monitoring
     varianceMonitor.Sensor(ACCX).setVarianceBounds(SensorMonitor::DONT_CHECK,
-                                                   ACCELEROMETER_HIGH_XY);
+            ACCELEROMETER_HIGH_XY);
     varianceMonitor.Sensor(ACCY).setVarianceBounds(SensorMonitor::DONT_CHECK,
-                                                   ACCELEROMETER_HIGH_XY);
+            ACCELEROMETER_HIGH_XY);
     varianceMonitor.Sensor(ACCZ).setVarianceBounds(SensorMonitor::DONT_CHECK,
-                                                   ACCELEROMETER_HIGH_Z);
+            ACCELEROMETER_HIGH_Z);
     varianceMonitor.Sensor(GYROX).setVarianceBounds(GYRO_LOW,
-                                                    SensorMonitor::DONT_CHECK);
+            SensorMonitor::DONT_CHECK);
     varianceMonitor.Sensor(GYROY).setVarianceBounds(GYRO_LOW,
-                                                    SensorMonitor::DONT_CHECK);
+            SensorMonitor::DONT_CHECK);
     varianceMonitor.Sensor(ANGLEX).setVarianceBounds(SensorMonitor::DONT_CHECK,
-                                                     ANGLE_XY_HIGH);
+            ANGLE_XY_HIGH);
     varianceMonitor.Sensor(ANGLEY).setVarianceBounds(SensorMonitor::DONT_CHECK,
-                                                     ANGLE_XY_HIGH);
+            ANGLE_XY_HIGH);
     varianceMonitor.Sensor(SONARL).setVarianceBounds(SensorMonitor::DONT_CHECK,
-                                                     SONAR_HIGH);
+            SONAR_HIGH);
     varianceMonitor.Sensor(SONARR).setVarianceBounds(SensorMonitor::DONT_CHECK,
-                                                     SONAR_HIGH);
+            SONAR_HIGH);
 
     // all FSRs have the same variance range
     for (int i = 0; i <= FSR_RIGHT_B_R; ++i)
-	fsrMonitor.Sensor(i).setVarianceBounds(SensorMonitor::DONT_CHECK,
-					       FSR_HIGH);
+        fsrMonitor.Sensor(i).setVarianceBounds(SensorMonitor::DONT_CHECK,
+                FSR_HIGH);
 
     // give the variance monitors access to speech
     varianceMonitor.SpeechPointer(speech);
@@ -123,8 +120,7 @@ Sensors::Sensors (boost::shared_ptr<Speech> s)
     mkdir(FRM_FOLDER.c_str(), 0755); // permissions: u+rwx, og+rx
 }
 
-Sensors::~Sensors ()
-{
+Sensors::~Sensors() {
     pthread_mutex_destroy(&angles_mutex);
     pthread_mutex_destroy(&vision_angles_mutex);
     pthread_mutex_destroy(&motion_angles_mutex);
@@ -132,6 +128,7 @@ Sensors::~Sensors ()
     pthread_mutex_destroy(&errors_mutex);
     pthread_mutex_destroy(&fsr_mutex);
     pthread_mutex_destroy(&button_mutex);
+    pthread_mutex_destroy(&bumper_mutex);
     pthread_mutex_destroy(&inertial_mutex);
     pthread_mutex_destroy(&unfiltered_inertial_mutex);
     pthread_mutex_destroy(&ultra_sound_mutex);
@@ -143,179 +140,169 @@ Sensors::~Sensors ()
     pthread_mutex_destroy(&variance_mutex);
 }
 
-const vector<float> Sensors::getBodyAngles () const
-{
-    pthread_mutex_lock (&angles_mutex);
+const vector<float> Sensors::getBodyAngles() const {
+    pthread_mutex_lock(&angles_mutex);
 
     vector<float> vec(bodyAngles);
 
-    pthread_mutex_unlock (&angles_mutex);
-
-    return vec;
-}
-
-const vector<float> Sensors::getBodyAngles_degs () const
-{
-    pthread_mutex_lock (&angles_mutex);
-
-    vector<float> vec(bodyAngles);
-
-    pthread_mutex_unlock (&angles_mutex);
-
-    // Convert the angles from radians to degrees
-    std::for_each(vec.begin(), vec.end(), _1 = _1 * TO_DEG);
-
-    return vec;
-}
-
-const vector<float> Sensors::getVisionBodyAngles() const
-{
-    pthread_mutex_lock (&vision_angles_mutex);
-
-    vector<float> vec(visionBodyAngles);
-
-    pthread_mutex_unlock (&vision_angles_mutex);
-
-    return vec;
-}
-
-float Sensors::getVisionAngle(Kinematics::JointName joint) const {
-    pthread_mutex_lock (&vision_angles_mutex);
-    float value = visionBodyAngles[static_cast<int>(joint)];
-    pthread_mutex_unlock (&vision_angles_mutex);
-    return value;
-}
-
-const vector<float> Sensors::getMotionBodyAngles_degs () const
-{
-    pthread_mutex_lock (&motion_angles_mutex);
-
-    vector<float> vec(motionBodyAngles);
-
-    pthread_mutex_unlock (&motion_angles_mutex);
-
-    // Convert the angles from radians to degrees
-    std::for_each(vec.begin(), vec.end(), _1 = _1 * TO_DEG);
-
-    return vec;
-}
-
-const vector<float> Sensors::getMotionBodyAngles() const
-{
-    pthread_mutex_lock (&motion_angles_mutex);
-
-    vector<float> vec(motionBodyAngles);
-
-    pthread_mutex_unlock (&motion_angles_mutex);
-
-    return vec;
-}
-
-const vector<float> Sensors::getBodyTemperatures() const
-{
-    pthread_mutex_lock (&temperatures_mutex);
-
-    vector<float> vec(bodyTemperatures);
-
-    pthread_mutex_unlock (&temperatures_mutex);
+    pthread_mutex_unlock(&angles_mutex);
 
     return vec;
 }
 
 float Sensors::getBodyAngle(Kinematics::JointName joint) const {
-    pthread_mutex_lock (&angles_mutex);
+    pthread_mutex_lock(&angles_mutex);
 
     const float angle = bodyAngles[static_cast<int>(joint)];
 
-    pthread_mutex_unlock (&angles_mutex);
+    pthread_mutex_unlock(&angles_mutex);
 
     return angle;
 }
 
-const vector<float> Sensors::getBodyAngleErrors () const
-{
-    pthread_mutex_lock (&errors_mutex);
+const vector<float> Sensors::getBodyAngles_degs() const {
+    pthread_mutex_lock(&angles_mutex);
 
-    vector<float> vec(bodyAnglesError);
+    vector<float> vec(bodyAngles);
 
-    pthread_mutex_unlock (&errors_mutex);
+    pthread_mutex_unlock(&angles_mutex);
+
+    // Convert the angles from radians to degrees
+    std::for_each(vec.begin(), vec.end(), _1 = _1 * TO_DEG);
 
     return vec;
 }
 
-float Sensors::getBodyAngleError (Kinematics::JointName joint) const
-{
-    pthread_mutex_lock (&errors_mutex);
+const vector<float> Sensors::getVisionBodyAngles() const {
+    pthread_mutex_lock(&vision_angles_mutex);
+
+    vector<float> vec(visionBodyAngles);
+
+    pthread_mutex_unlock(&vision_angles_mutex);
+
+    return vec;
+}
+
+float Sensors::getVisionAngle(Kinematics::JointName joint) const {
+
+    pthread_mutex_lock(&vision_angles_mutex);
+
+    float angle = visionBodyAngles[static_cast<int>(joint)];
+
+    pthread_mutex_unlock(&vision_angles_mutex);
+
+    return angle;
+}
+
+const vector<float> Sensors::getMotionBodyAngles_degs() const {
+    pthread_mutex_lock(&motion_angles_mutex);
+
+    vector<float> vec(motionBodyAngles);
+
+    pthread_mutex_unlock(&motion_angles_mutex);
+
+    // Convert the angles from radians to degrees
+    std::for_each(vec.begin(), vec.end(), _1 = _1 * TO_DEG);
+
+    return vec;
+}
+
+const vector<float> Sensors::getMotionBodyAngles() const {
+    pthread_mutex_lock(&motion_angles_mutex);
+
+    vector<float> vec(motionBodyAngles);
+
+    pthread_mutex_unlock(&motion_angles_mutex);
+
+    return vec;
+}
+
+const vector<float> Sensors::getBodyTemperatures() const {
+    pthread_mutex_lock(&temperatures_mutex);
+
+    vector<float> vec(bodyTemperatures);
+
+    pthread_mutex_unlock(&temperatures_mutex);
+
+    return vec;
+}
+
+const vector<float> Sensors::getBodyAngleErrors() const {
+    pthread_mutex_lock(&errors_mutex);
+
+    vector<float> vec(bodyAnglesError);
+
+    pthread_mutex_unlock(&errors_mutex);
+
+    return vec;
+}
+
+float Sensors::getBodyAngleError(Kinematics::JointName joint) const {
+    pthread_mutex_lock(&errors_mutex);
 
     const float angleError = bodyAnglesError[static_cast<int>(joint)];
 
-    pthread_mutex_unlock (&errors_mutex);
+    pthread_mutex_unlock(&errors_mutex);
 
     return angleError;
 }
 
-const FSR Sensors::getLeftFootFSR () const
-{
-    pthread_mutex_lock (&fsr_mutex);
+const FSR Sensors::getLeftFootFSR() const {
+    pthread_mutex_lock(&fsr_mutex);
 
     const FSR left(leftFootFSR);
 
-    pthread_mutex_unlock (&fsr_mutex);
+    pthread_mutex_unlock(&fsr_mutex);
 
     return left;
 }
 
-const FSR Sensors::getRightFootFSR () const
-{
-    pthread_mutex_lock (&fsr_mutex);
+const FSR Sensors::getRightFootFSR() const {
+    pthread_mutex_lock(&fsr_mutex);
 
     const FSR right(rightFootFSR);
 
-    pthread_mutex_unlock (&fsr_mutex);
+    pthread_mutex_unlock(&fsr_mutex);
 
     return right;
 }
 
-const FootBumper Sensors::getLeftFootBumper() const
-{
-    pthread_mutex_lock (&button_mutex);
+const FootBumper Sensors::getLeftFootBumper() const {
+    pthread_mutex_lock(&bumper_mutex);
 
     const FootBumper bumper = leftFootBumper;
 
-    pthread_mutex_unlock (&button_mutex);
+    pthread_mutex_unlock(&bumper_mutex);
 
     return bumper;
 }
 
-const FootBumper Sensors::getRightFootBumper() const
-{
-    pthread_mutex_lock (&button_mutex);
+const FootBumper Sensors::getRightFootBumper() const {
+    pthread_mutex_lock(&bumper_mutex);
 
     const FootBumper bumper = rightFootBumper;
 
-    pthread_mutex_unlock (&button_mutex);
+    pthread_mutex_unlock(&bumper_mutex);
 
     return bumper;
 }
 
-const Inertial Sensors::getInertial () const
-{
-    pthread_mutex_lock (&inertial_mutex);
+const Inertial Sensors::getInertial() const {
+    pthread_mutex_lock(&inertial_mutex);
 
     const Inertial inert(inertial);
 
-    pthread_mutex_unlock (&inertial_mutex);
+    pthread_mutex_unlock(&inertial_mutex);
 
     return inert;
 }
 
-const Inertial Sensors::getInertial_degs () const
-{
-    pthread_mutex_lock (&inertial_mutex);
+const Inertial Sensors::getInertial_degs() const {
+    pthread_mutex_lock(&inertial_mutex);
 
     Inertial inert(inertial);
 
-    pthread_mutex_unlock (&inertial_mutex);
+    pthread_mutex_unlock(&inertial_mutex);
 
     inert.angleX *= TO_DEG;
     inert.angleY *= TO_DEG;
@@ -323,303 +310,267 @@ const Inertial Sensors::getInertial_degs () const
     return inert;
 }
 
-const Inertial Sensors::getUnfilteredInertial () const
-{
-    pthread_mutex_lock (&unfiltered_inertial_mutex);
+const Inertial Sensors::getUnfilteredInertial() const {
+    pthread_mutex_lock(&unfiltered_inertial_mutex);
 
     const Inertial inert(unfilteredInertial);
 
-    pthread_mutex_unlock (&unfiltered_inertial_mutex);
+    pthread_mutex_unlock(&unfiltered_inertial_mutex);
 
     return inert;
 }
 
-const float Sensors::getUltraSoundLeft () const
-{
-    pthread_mutex_lock (&ultra_sound_mutex);
+const float Sensors::getUltraSoundLeft() const {
+    pthread_mutex_lock(&ultra_sound_mutex);
 
     float dist = ultraSoundDistanceLeft;
 
-    pthread_mutex_unlock (&ultra_sound_mutex);
+    pthread_mutex_unlock(&ultra_sound_mutex);
 
     return dist;
 }
 
-const float Sensors::getUltraSoundRight () const
-{
-    pthread_mutex_lock (&ultra_sound_mutex);
+const float Sensors::getUltraSoundRight() const {
+    pthread_mutex_lock(&ultra_sound_mutex);
 
     float dist = ultraSoundDistanceRight;
 
-    pthread_mutex_unlock (&ultra_sound_mutex);
+    pthread_mutex_unlock(&ultra_sound_mutex);
 
     return dist;
 }
 
-
-const float Sensors::getUltraSoundLeft_cm () const
-{
-    pthread_mutex_lock (&ultra_sound_mutex);
+const float Sensors::getUltraSoundLeft_cm() const {
+    pthread_mutex_lock(&ultra_sound_mutex);
 
     float dist = ultraSoundDistanceLeft;
 
-    pthread_mutex_unlock (&ultra_sound_mutex);
+    pthread_mutex_unlock(&ultra_sound_mutex);
 
     return dist * M_TO_CM;
 }
 
-const float Sensors::getUltraSoundRight_cm () const
-{
-    pthread_mutex_lock (&ultra_sound_mutex);
+const float Sensors::getUltraSoundRight_cm() const {
+    pthread_mutex_lock(&ultra_sound_mutex);
 
     float dist = ultraSoundDistanceRight;
 
-    pthread_mutex_unlock (&ultra_sound_mutex);
+    pthread_mutex_unlock(&ultra_sound_mutex);
 
     return dist * M_TO_CM;
 }
 
-const SupportFoot Sensors::getSupportFoot () const
-{
-    pthread_mutex_lock (&support_foot_mutex);
+const SupportFoot Sensors::getSupportFoot() const {
+    pthread_mutex_lock(&support_foot_mutex);
 
     SupportFoot foot = supportFoot;
 
-    pthread_mutex_unlock (&support_foot_mutex);
+    pthread_mutex_unlock(&support_foot_mutex);
 
     return foot;
 }
 
-const float Sensors::getChestButton () const
-{
-    pthread_mutex_lock (&button_mutex);
+const float Sensors::getChestButton() const {
+    pthread_mutex_lock(&button_mutex);
 
     float button = chestButton;
 
-    pthread_mutex_unlock (&button_mutex);
+    pthread_mutex_unlock(&button_mutex);
 
     return button;
 }
 
-const float Sensors::getBatteryCharge () const
-{
-    pthread_mutex_lock (&battery_mutex);
+const float Sensors::getBatteryCharge() const {
+    pthread_mutex_lock(&battery_mutex);
 
     const float charge = batteryCharge;
 
-    pthread_mutex_unlock (&battery_mutex);
+    pthread_mutex_unlock(&battery_mutex);
 
     return charge;
 }
-const float Sensors::getBatteryCurrent () const
-{
-    pthread_mutex_lock (&battery_mutex);
+const float Sensors::getBatteryCurrent() const {
+    pthread_mutex_lock(&battery_mutex);
 
     const float current = batteryCurrent;
 
-    pthread_mutex_unlock (&battery_mutex);
+    pthread_mutex_unlock(&battery_mutex);
 
     return current;
 }
 
-void Sensors::setBodyAngles (const vector<float>& v)
-{
-    pthread_mutex_lock (&angles_mutex);
+void Sensors::setBodyAngles(const vector<float>& v) {
+    pthread_mutex_lock(&angles_mutex);
 
     bodyAngles = v;
     /*
-      cout << "Body angles in sensors";
-      for (int i = 0 ; i < 22; i++){
-      cout <<  bodyAngles[i] << " ";
+     cout << "Body angles in sensors";
+     for (int i = 0 ; i < 22; i++){
+     cout <<  bodyAngles[i] << " ";
 
-      }
-      cout << endl;
-    */
-    pthread_mutex_unlock (&angles_mutex);
+     }
+     cout << endl;
+     */
+    pthread_mutex_unlock(&angles_mutex);
 }
 
-void Sensors::setVisionBodyAngles (const vector<float>& v)
-{
-    pthread_mutex_lock (&vision_angles_mutex);
+void Sensors::setVisionBodyAngles(const vector<float>& v) {
+    pthread_mutex_lock(&vision_angles_mutex);
 
     visionBodyAngles = v;
 
-    pthread_mutex_unlock (&vision_angles_mutex);
+    pthread_mutex_unlock(&vision_angles_mutex);
 }
 
-void Sensors::setMotionBodyAngles (const vector<float>& v)
-{
-    pthread_mutex_lock (&motion_angles_mutex);
+void Sensors::setMotionBodyAngles(const vector<float>& v) {
+    pthread_mutex_lock(&motion_angles_mutex);
 
     motionBodyAngles = v;
 
-    pthread_mutex_unlock (&motion_angles_mutex);
+    pthread_mutex_unlock(&motion_angles_mutex);
 }
 
-void Sensors::setBodyAngleErrors (const vector<float>& v)
-{
-    pthread_mutex_lock (&errors_mutex);
+void Sensors::setBodyAngleErrors(const vector<float>& v) {
+    pthread_mutex_lock(&errors_mutex);
 
     bodyAnglesError = v;
 
-    pthread_mutex_unlock (&errors_mutex);
+    pthread_mutex_unlock(&errors_mutex);
 }
 
-
-void Sensors::setBodyTemperatures (const vector<float>& v)
-{
-    pthread_mutex_lock (&temperatures_mutex);
+void Sensors::setBodyTemperatures(const vector<float>& v) {
+    pthread_mutex_lock(&temperatures_mutex);
 
     bodyTemperatures = v;
 
-    pthread_mutex_unlock (&temperatures_mutex);
+    pthread_mutex_unlock(&temperatures_mutex);
 }
 
 void Sensors::setLeftFootFSR(const float frontLeft, const float frontRight,
-                             const float rearLeft, const float rearRight)
-{
-    pthread_mutex_lock (&fsr_mutex);
+        const float rearLeft, const float rearRight) {
+    pthread_mutex_lock(&fsr_mutex);
 
     leftFootFSR = FSR(frontLeft, frontRight, rearLeft, rearRight);
 
-    pthread_mutex_unlock (&fsr_mutex);
+    pthread_mutex_unlock(&fsr_mutex);
 }
 
 void Sensors::setRightFootFSR(const float frontLeft, const float frontRight,
-                              const float rearLeft, const float rearRight)
-{
-    pthread_mutex_lock (&fsr_mutex);
+        const float rearLeft, const float rearRight) {
+    pthread_mutex_lock(&fsr_mutex);
 
     rightFootFSR = FSR(frontLeft, frontRight, rearLeft, rearRight);
 
-    pthread_mutex_unlock (&fsr_mutex);
+    pthread_mutex_unlock(&fsr_mutex);
 }
 
-void Sensors::setFSR(const FSR &_leftFootFSR, const FSR &_rightFootFSR)
-{
-    pthread_mutex_lock (&fsr_mutex);
+void Sensors::setFSR(const FSR &_leftFootFSR, const FSR &_rightFootFSR) {
+    pthread_mutex_lock(&fsr_mutex);
 
     leftFootFSR = _leftFootFSR;
     rightFootFSR = _rightFootFSR;
 
-    pthread_mutex_unlock (&fsr_mutex);
+    pthread_mutex_unlock(&fsr_mutex);
 }
 
-void Sensors::setLeftFootBumper(const float left, const float right)
-{
-    pthread_mutex_lock (&button_mutex);
+void Sensors::setLeftFootBumper(const float left, const float right) {
+    pthread_mutex_lock(&bumper_mutex);
 
     leftFootBumper = FootBumper(left, right);
 
-    pthread_mutex_unlock (&button_mutex);
+    pthread_mutex_unlock(&bumper_mutex);
 }
 
-void Sensors::setLeftFootBumper(const FootBumper& bumper)
-{
-    pthread_mutex_lock (&button_mutex);
+void Sensors::setLeftFootBumper(const FootBumper& bumper) {
+    pthread_mutex_lock(&bumper_mutex);
 
     leftFootBumper = bumper;
 
-    pthread_mutex_unlock (&button_mutex);
+    pthread_mutex_unlock(&bumper_mutex);
 }
 
-void Sensors::setRightFootBumper(const float left, const float right)
-{
-    pthread_mutex_lock (&button_mutex);
+void Sensors::setRightFootBumper(const float left, const float right) {
+    pthread_mutex_lock(&bumper_mutex);
 
     rightFootBumper = FootBumper(left, right);
 
-    pthread_mutex_unlock (&button_mutex);
+    pthread_mutex_unlock(&bumper_mutex);
 }
 
-void Sensors::setRightFootBumper(const FootBumper& bumper)
-{
-    pthread_mutex_lock (&button_mutex);
+void Sensors::setRightFootBumper(const FootBumper& bumper) {
+    pthread_mutex_lock(&bumper_mutex);
 
     rightFootBumper = bumper;
 
-    pthread_mutex_unlock (&button_mutex);
+    pthread_mutex_unlock(&bumper_mutex);
 }
 
 void Sensors::setInertial(const float accX, const float accY, const float accZ,
-                          const float gyrX, const float gyrY,
-                          const float angleX, const float angleY)
-{
-    pthread_mutex_lock (&inertial_mutex);
+        const float gyrX, const float gyrY, const float angleX,
+        const float angleY) {
+    pthread_mutex_lock(&inertial_mutex);
 
     inertial = Inertial(accX, accY, accZ, gyrX, gyrY, angleX, angleY);
 
-    pthread_mutex_unlock (&inertial_mutex);
+    pthread_mutex_unlock(&inertial_mutex);
 }
 
-void Sensors::setInertial (const Inertial &v)
-{
-    pthread_mutex_lock (&inertial_mutex);
+void Sensors::setInertial(const Inertial &v) {
+    pthread_mutex_lock(&inertial_mutex);
 
     inertial = v;
 
-    pthread_mutex_unlock (&inertial_mutex);
+    pthread_mutex_unlock(&inertial_mutex);
 }
 
-void Sensors::setUnfilteredInertial(const float accX, const float accY, const float accZ,
-                                    const float gyrX, const float gyrY,
-                                    const float angleX, const float angleY)
-{
-    pthread_mutex_lock (&unfiltered_inertial_mutex);
+void Sensors::setUnfilteredInertial(const float accX, const float accY,
+        const float accZ, const float gyrX, const float gyrY,
+        const float angleX, const float angleY) {
+    pthread_mutex_lock(&unfiltered_inertial_mutex);
 
     unfilteredInertial = Inertial(accX, accY, accZ, gyrX, gyrY, angleX, angleY);
 
     updateMotionDataVariance();
 
-    pthread_mutex_unlock (&unfiltered_inertial_mutex);
+    pthread_mutex_unlock(&unfiltered_inertial_mutex);
 }
 
-void Sensors::setUnfilteredInertial (const Inertial &v)
-{
-    pthread_mutex_lock (&unfiltered_inertial_mutex);
+void Sensors::setUnfilteredInertial(const Inertial &v) {
+    pthread_mutex_lock(&unfiltered_inertial_mutex);
 
     unfilteredInertial = v;
 
     updateMotionDataVariance();
 
-    pthread_mutex_unlock (&unfiltered_inertial_mutex);
+    pthread_mutex_unlock(&unfiltered_inertial_mutex);
 }
 
-void Sensors::setUltraSound (const float distLeft,
-                             const float distRight)
-{
-    pthread_mutex_lock (&ultra_sound_mutex);
+void Sensors::setUltraSound(const float distLeft, const float distRight) {
+    pthread_mutex_lock(&ultra_sound_mutex);
 
     ultraSoundDistanceLeft = distLeft;
     ultraSoundDistanceRight = distRight;
 
     updateVisionDataVariance();
 
-    pthread_mutex_unlock (&ultra_sound_mutex);
+    pthread_mutex_unlock(&ultra_sound_mutex);
 }
 
-void Sensors::setSupportFoot (const SupportFoot _supportFoot)
-{
-    pthread_mutex_lock (&support_foot_mutex);
+void Sensors::setSupportFoot(const SupportFoot _supportFoot) {
+    pthread_mutex_lock(&support_foot_mutex);
 
     supportFoot = _supportFoot;
 
-    pthread_mutex_unlock (&support_foot_mutex);
+    pthread_mutex_unlock(&support_foot_mutex);
 }
-
 
 /**
  * Sets the sensors which are updated on the motion frequency (every 20ms)
  */
-void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
-                                const float _chestButton,
-                                const Inertial &_inertial,
-                                const Inertial & _unfilteredInertial)
-{
-    pthread_mutex_lock(&button_mutex);
-    pthread_mutex_lock(&fsr_mutex);
-    pthread_mutex_lock(&inertial_mutex);
-    pthread_mutex_lock(&unfiltered_inertial_mutex);
+void Sensors::setMotionSensors(const FSR &_leftFoot, const FSR &_rightFoot,
+        const float _chestButton, const Inertial &_inertial,
+        const Inertial & _unfilteredInertial) {
+    motion_sensors_mutex.lock();
 
     leftFootFSR = _leftFoot;
     rightFootFSR = _rightFoot;
@@ -629,10 +580,7 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
 
     updateMotionDataVariance();
 
-    pthread_mutex_unlock(&unfiltered_inertial_mutex);
-    pthread_mutex_unlock(&inertial_mutex);
-    pthread_mutex_unlock(&fsr_mutex);
-    pthread_mutex_unlock(&button_mutex);
+    motion_sensors_mutex.unlock();
 
     this->notifySubscribers(NEW_MOTION_SENSORS);
 }
@@ -640,15 +588,11 @@ void Sensors::setMotionSensors (const FSR &_leftFoot, const FSR &_rightFoot,
 /**
  * Sets the sensors which are updated on the vision frequency (every ?? ms)
  */
-void Sensors::setVisionSensors (const FootBumper &_leftBumper,
-                                const FootBumper &_rightBumper,
-                                const float ultraSoundLeft,
-                                const float ultraSoundRight,
-                                const float bCharge, const float bCurrent)
-{
-    pthread_mutex_lock (&battery_mutex);
-    pthread_mutex_lock (&button_mutex);
-    pthread_mutex_lock(&ultra_sound_mutex);
+void Sensors::setVisionSensors(const FootBumper &_leftBumper,
+        const FootBumper &_rightBumper, const float ultraSoundLeft,
+        const float ultraSoundRight, const float bCharge,
+        const float bCurrent) {
+    vision_sensors_mutex.lock();
 
     leftFootBumper = _leftBumper;
     rightFootBumper = _rightBumper;
@@ -659,23 +603,19 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
 
     updateVisionDataVariance();
 
-    pthread_mutex_unlock(&ultra_sound_mutex);
-    pthread_mutex_unlock (&button_mutex);
-    pthread_mutex_unlock (&battery_mutex);
+    vision_sensors_mutex.unlock();
     this->notifySubscribers(NEW_VISION_SENSORS);
 }
 
-void Sensors::lockImage() const
-{
+void Sensors::lockImage() const {
 #ifdef USE_SENSORS_IMAGE_LOCKING
-    pthread_mutex_lock (&image_mutex);
+    pthread_mutex_lock(&image_mutex);
 #endif
 }
 
-void Sensors::releaseImage() const
-{
+void Sensors::releaseImage() const {
 #ifdef USE_SENSORS_IMAGE_LOCKING
-    pthread_mutex_unlock (&image_mutex);
+    pthread_mutex_unlock(&image_mutex);
 #endif
 }
 
@@ -688,91 +628,71 @@ void Sensors::releaseImage() const
  * nonetheless.
  */
 void Sensors::updateVisionAngles() {
-    pthread_mutex_lock (&angles_mutex);
-    pthread_mutex_lock (&vision_angles_mutex);
+    pthread_mutex_lock(&angles_mutex);
+    pthread_mutex_lock(&vision_angles_mutex);
 
     visionBodyAngles = bodyAngles;
 
-    pthread_mutex_unlock (&vision_angles_mutex);
-    pthread_mutex_unlock (&angles_mutex);
-}
-
-void Sensors::lockVisionAngles() {
-    pthread_mutex_lock (&vision_angles_mutex);
-}
-
-void Sensors::releaseVisionAngles() {
-    pthread_mutex_unlock (&vision_angles_mutex);
+    pthread_mutex_unlock(&vision_angles_mutex);
+    pthread_mutex_unlock(&angles_mutex);
 }
 
 //get a pointer to the full size Nao image
 //the pointer comes straight from the transcriber (no copying)
-uint8_t* Sensors::getRawNaoImage()
-{
+uint8_t* Sensors::getRawNaoImage() {
     return rawNaoImage;
 }
 
 //get a pointer to the full size Nao image
 //this image has been copied to some local buffer
-const uint8_t* Sensors::getNaoImage() const
-{
+const uint8_t* Sensors::getNaoImage() const {
     return naoImage;
 }
 
-const uint16_t* Sensors::getYImage () const
-{
+const uint16_t* Sensors::getYImage() const {
     return yImage;
 }
 
-const uint16_t* Sensors::getImage () const
-{
+const uint16_t* Sensors::getImage() const {
     return yImage;
 }
 
-const uint16_t* Sensors::getUVImage() const
-{
+const uint16_t* Sensors::getUVImage() const {
     return uvImage;
 }
 
-const uint8_t* Sensors::getColorImage() const
-{
+const uint8_t* Sensors::getColorImage() const {
     return colorImage;
 }
 
 void Sensors::setNaoImagePointer(char* _naoImage) {
-    cout << "I am being set!"<<endl;
+    cout << "I am being set!" << endl;
     naoImage = (uint8_t*) _naoImage;
 }
 
-void Sensors::setRawNaoImage(uint8_t *img)
-{
+void Sensors::setRawNaoImage(uint8_t *img) {
     rawNaoImage = img;
 }
 
-void Sensors::setNaoImage(const uint8_t *img)
-{
+void Sensors::setNaoImage(const uint8_t *img) {
     naoImage = img;
     this->notifySubscribers(NEW_IMAGE);
 }
 
-void Sensors::setImage (const uint16_t *img)
-{
+void Sensors::setImage(const uint16_t *img) {
     yImage = img;
     uvImage = img + AVERAGED_IMAGE_SIZE;
-    colorImage = reinterpret_cast<const uint8_t*>(img + AVERAGED_IMAGE_SIZE*3);
-}
+    colorImage = reinterpret_cast<const uint8_t*>(img
+            + AVERAGED_IMAGE_SIZE * 3);}
 
-
-void Sensors::resetSaveFrame()
-{
+void Sensors::resetSaveFrame() {
     saved_frames = 0;
 }
 
 // The version for the frame format
 static const int VERSION = 0;
 
-void Sensors::startSavingFrames()
-{
+void Sensors::startSavingFrames() {
 #ifdef SAVE_ALL_FRAMES
     if (!isSavingFrames())
     {
@@ -782,8 +702,7 @@ void Sensors::startSavingFrames()
 #endif
 }
 
-void Sensors::stopSavingFrames()
-{
+void Sensors::stopSavingFrames() {
 #ifdef SAVE_ALL_FRAMES
     if (isSavingFrames())
     {
@@ -793,8 +712,7 @@ void Sensors::stopSavingFrames()
 #endif
 }
 
-bool Sensors::isSavingFrames() const
-{
+bool Sensors::isSavingFrames() const {
     return saving_frames_on;
 }
 
@@ -804,7 +722,7 @@ void Sensors::updateMotionDataVariance() {
     int i = 0; // so re-ordering of sensors is easy
 
     // Inertial stuff
-    varianceMonitor.update(i,   unfilteredInertial.accX);
+    varianceMonitor.update(i, unfilteredInertial.accX);
     varianceMonitor.update(++i, unfilteredInertial.accY);
     varianceMonitor.update(++i, unfilteredInertial.accZ);
     varianceMonitor.update(++i, unfilteredInertial.gyrX);
@@ -815,7 +733,7 @@ void Sensors::updateMotionDataVariance() {
     // FSRs (in their own monitor)
     i = 0;
 
-    fsrMonitor.update(i,   leftFootFSR.frontLeft);
+    fsrMonitor.update(i, leftFootFSR.frontLeft);
     fsrMonitor.update(++i, leftFootFSR.frontRight);
     fsrMonitor.update(++i, leftFootFSR.rearLeft);
     fsrMonitor.update(++i, leftFootFSR.rearRight);
@@ -832,7 +750,7 @@ void Sensors::updateVisionDataVariance() {
 
     int i = 7; /// @see updateMotionDataVariance()
 
-    varianceMonitor.update( i, ultraSoundDistanceLeft);
+    varianceMonitor.update(i, ultraSoundDistanceLeft);
     varianceMonitor.update(++i, ultraSoundDistanceRight);
 
     pthread_mutex_unlock(&variance_mutex);
@@ -862,11 +780,10 @@ float Sensors::percentBrokenFSR() {
     int numberFSRs = fsrMonitor.NumberMonitors();
 
     for (int i = 0; i < numberFSRs; ++i)
-	if (!fsrMonitor.Sensor(i).isTrustworthy())
-	    ++brokenFSRs;
+        if (!fsrMonitor.Sensor(i).isTrustworthy())
+            ++brokenFSRs;
 
-    return static_cast<float> (brokenFSRs) /
-	static_cast<float> (numberFSRs);
+    return static_cast<float>(brokenFSRs) / static_cast<float>(numberFSRs);
 }
 
 float Sensors::percentBrokenMotionSensors() {
@@ -875,33 +792,31 @@ float Sensors::percentBrokenMotionSensors() {
     int motionSensors = varianceMonitor.NumberMonitors() - 2;
 
     for (int i = 0; i < motionSensors; ++i)
-	if (!varianceMonitor.Sensor(i).isTrustworthy())
-	    ++brokenMotion;
+        if (!varianceMonitor.Sensor(i).isTrustworthy())
+            ++brokenMotion;
 
-    return static_cast<float> (brokenMotion) /
-    static_cast<float> (motionSensors);
+    return static_cast<float>(brokenMotion) / static_cast<float>(motionSensors);
 }
 
 bool Sensors::angleXYBroken() {
-    return !(varianceMonitor.Sensor(ANGLEX).isTrustworthy() &&
-	     varianceMonitor.Sensor(ANGLEY).isTrustworthy());
+    return !(varianceMonitor.Sensor(ANGLEX).isTrustworthy()
+            && varianceMonitor.Sensor(ANGLEY).isTrustworthy());
 }
 
 float Sensors::percentBrokenSonar() {
     int brokenSonars = 0;
 
     if (!varianceMonitor.Sensor(SONARL).isTrustworthy())
-	++brokenSonars;
+        ++brokenSonars;
 
     if (!varianceMonitor.Sensor(SONARR).isTrustworthy())
-	++brokenSonars;
+        ++brokenSonars;
 
-    return static_cast<float>(brokenSonars) * 0.5f;// only two Sonar sensors
+    return static_cast<float>(brokenSonars) * 0.5f; // only two Sonar sensors
 }
 
 // @TODO move this to Transcriber to write out from full size image...
-void Sensors::saveFrame()
-{
+void Sensors::saveFrame() {
     int MAX_FRAMES = 5000;
     if (saved_frames > MAX_FRAMES)
         return;
@@ -916,22 +831,21 @@ void Sensors::saveFrame()
     // Lock and write image possibility of deadlock if something has
     // the image locked and is waiting for visionAngles to unlock -
     // not happening in our code atm
-    lockVisionAngles();
+    pthread_mutex_lock(&vision_angles_mutex);
     lockImage();
 
     // @TODO Write out entire 640x480 image
-    fout.write(reinterpret_cast<const char*>(getNaoImage()),
-               NAO_IMAGE_BYTE_SIZE);
+    fout.write(reinterpret_cast<const char*>(getNaoImage()), NAO_IMAGE_BYTE_SIZE);
     // write the version of the frame format at the end before joints/sensors
     fout << VERSION << " ";
 
     // Write joints
     for (vector<float>::const_iterator i = visionBodyAngles.begin();
-         i < visionBodyAngles.end(); ++i) {
+            i < visionBodyAngles.end(); ++i) {
         fout << *i << " ";
     }
     releaseImage();
-    releaseVisionAngles();
+    pthread_mutex_unlock(&vision_angles_mutex);
 
     // Write sensors
     float sensor_data[NUM_SENSORS];
@@ -976,30 +890,29 @@ void Sensors::saveFrame()
  * Load a frame from a file and set the sensors and image data as
  * appropriate. Useful for running offline.
  */
-void Sensors::loadFrame(string path)
-{
-    fstream fin(path.c_str() , fstream::in);
-    if (fin.fail()){
+void Sensors::loadFrame(string path) {
+    fstream fin(path.c_str(), fstream::in);
+    if (fin.fail()) {
         cout << "Frame load failed: " << path << endl;
-        return ;
+        return;
     }
 
     lockImage();
     // Load the image from the file, puts it straight into Sensors'
     // image buffer so it doesn't have to allocate its own buffer and
     // worry about deleting it
-    uint16_t * img = const_cast<uint16_t*>(getImage());
-    uint8_t * byte_img = new uint8_t[320 * 240 * 2];
-    fin.read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
+    uint16_t * img = const_cast<uint16_t*>(getImage());uint8_t
+    * byte_img = new uint8_t[320 * 240 * 2];fin
+    .read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
     releaseImage();
 
     lockImage();
 
     // Translate the loaded image into the proper format.
     // @TODO: Convert images to new format.
-    for (int i=0; i < 320*240; ++i){
+    for (int i = 0; i < 320 * 240; ++i) {
         img[i] = 0;
-        img[i] = static_cast<uint16_t>(byte_img[i<<1]);
+        img[i] = static_cast<uint16_t>(byte_img[i << 1]);
     }
     delete byte_img;
 
@@ -1025,15 +938,14 @@ void Sensors::loadFrame(string path)
         fin >> v;
         sensor_data += v;
     }
-    setLeftFootFSR(sensor_data[0], sensor_data[1],
-                   sensor_data[2], sensor_data[3]);
-    setRightFootFSR(sensor_data[4], sensor_data[5],
-                    sensor_data[6], sensor_data[7]);
+    setLeftFootFSR(sensor_data[0], sensor_data[1], sensor_data[2],
+            sensor_data[3]);
+    setRightFootFSR(sensor_data[4], sensor_data[5], sensor_data[6],
+            sensor_data[7]);
     setLeftFootBumper(sensor_data[8], sensor_data[9]);
     setLeftFootBumper(sensor_data[10], sensor_data[11]);
     setInertial(sensor_data[12], sensor_data[13], sensor_data[14],
-                sensor_data[15], sensor_data[16], sensor_data[17],
-                sensor_data[18]);
+            sensor_data[15], sensor_data[16], sensor_data[17], sensor_data[18]);
     setUltraSound(sensor_data[19], sensor_data[20]);
     setSupportFoot(static_cast<SupportFoot>(sensor_data[21]));
 

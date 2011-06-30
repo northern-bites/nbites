@@ -33,7 +33,7 @@
 #include "Provider.h"
 #include "Speech.h"
 #include "BulkMonitor.h"
-
+#include "synchro.h"
 #include "Kinematics.h"
 
 enum SupportFoot {
@@ -204,8 +204,6 @@ public:
     // current image. At the same time, the bodyAngles vector will still have the
     // most recent angles if some other module needs them.
     void updateVisionAngles();
-    void lockVisionAngles();
-    void releaseVisionAngles();
 
     // Save a vision frame with associated sensor data
     void saveFrame();
@@ -241,6 +239,7 @@ private:
     mutable pthread_mutex_t temperatures_mutex;
     mutable pthread_mutex_t fsr_mutex;
     mutable pthread_mutex_t button_mutex;
+    mutable pthread_mutex_t bumper_mutex;
     mutable pthread_mutex_t inertial_mutex;
     mutable pthread_mutex_t unfiltered_inertial_mutex;
     mutable pthread_mutex_t ultra_sound_mutex;
@@ -248,6 +247,8 @@ private:
     mutable pthread_mutex_t battery_mutex;
     mutable pthread_mutex_t image_mutex;
     mutable pthread_mutex_t variance_mutex;
+    multi_mutex vision_sensors_mutex;
+    multi_mutex motion_sensors_mutex;
 
     // Joint angles and sensors
     // Make the following distinction: bodyAngles is a vector of the most current
