@@ -31,18 +31,15 @@ public:
 
     void reset() {
         loc->reset();
-        ballEKF->reset();
     }
     void resetBall() {
         ballEKF->reset();
     }
     void blueGoalieReset() {
         loc->blueGoalieReset();
-        ballEKF->reset();
     }
     void redGoalieReset() {
         loc->redGoalieReset();
-        ballEKF->reset();
     }
 
 	void resetLocTo(float x, float y, float h){
