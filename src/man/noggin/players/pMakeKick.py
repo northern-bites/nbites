@@ -10,6 +10,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(MakeKickStates)
         self.setName('pMakeKick')
 
+        self.penaltyKicking = False
+
 
     # def executeMove(self,sweetMove):
     #     """
