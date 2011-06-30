@@ -63,6 +63,10 @@ enum ProfiledComponent {
     P_LIGHTS,
 
     P_DCM,
+    P_PRE_PROCESS,
+    P_SEND_JOINTS,
+    P_SEND_HARDNESS,
+    P_POST_PROCESS,
 
     P_SWITCHBOARD,
     P_SCRIPTED,
