@@ -190,7 +190,6 @@ def trianglePanLeft(tracker):
     if tracker.firstFrame():
         if tracker.goalieActiveLoc:
             tracker.helper.executeHeadMove(HeadMoves.GOALIE_POST_LEFT_SCAN)
-            #tracker.helper.panTo(HeadMoves.PAN_LEFT_SHOULDER_HEADS)
         else:
             tracker.helper.executeHeadMove(HeadMoves.POST_LEFT_SCAN)
 
@@ -204,7 +203,6 @@ def trianglePanRight(tracker):
     if tracker.firstFrame():
         if tracker.goalieActiveLoc:
             tracker.helper.executeHeadMove(HeadMoves.GOALIE_POST_RIGHT_SCAN)
-            #tracker.helper.panTo(HeadMoves.PAN_RIGHT_SHOULDER_HEADS)
         else:
             tracker.helper.executeHeadMove(HeadMoves.POST_RIGHT_SCAN)
 
