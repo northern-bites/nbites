@@ -51,11 +51,24 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
     // connect to dcm using the static methods declared above
 
     // TODO: Should use specialized proxy created at start
-    broker->getProxy("DCM")->getModule()->
-        atPostProcess(boost::bind(&staticPostSensors,this));
-    broker->getProxy("DCM")->getModule()->
-        atPreProcess(boost::bind(&staticSendCommands,this));
+    try {
+        dcmPreConnection =
+            broker->getProxy("DCM")->getModule()->
+            atPostProcess(boost::bind(&staticPostSensors,this));
+        dcmPostConnection =
+            broker->getProxy("DCM")->getModule()->
+            atPreProcess(boost::bind(&staticSendCommands,this));
+    } catch (AL::ALError& e){
+        cout << "Failed to set pre/postprocess DCM commands" << endl;
+    }
 }
+
+NaoEnactor::~NaoEnactor()
+{
+    dcmPreConnection.disconnect();
+    dcmPostConnection.disconnect();
+}
+
 
 void NaoEnactor::sendCommands(){
 
