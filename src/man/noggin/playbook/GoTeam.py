@@ -515,6 +515,19 @@ class GoTeam:
         else:
             self.brain.out.printf(str(outputString))
 
+
+    # Reset counters for role transitions
+    def resetGoalieRoleCounters(self):
+
+        self.shouldStopChaseCounter = 0
+        self.shouldChaseCounter = 0
+        self.shouldPositionRightCounter = 0
+        self.shouldPositionLeftCounter = 0
+        self.shouldPositionCenterCounter = 0
+        self.shouldSaveCounter = 0
+        self.shouldStopSaveCounter = 0
+
+
 class Ellipse:
   """
   Class to hold information about an ellipse
