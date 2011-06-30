@@ -1082,7 +1082,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                                       static_cast<int>(bottomOfObjectY));
             //TODO: hack
             float distnew = chooseGoalDistance(cert, disthnew, distw, poseDist,
-                                                  static_cast<int>(bottomOfObjectY));
+											   static_cast<int>(bottomOfObjectY));
             dist = distnew;
 
             // sanity check: throw ridiculous distance estimates out
@@ -1126,6 +1126,7 @@ float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
                                     float distw, float poseDist, int bottom) {
     float dist = 0.0f;
 	if (poseDist < 200.0f && poseDist > 0 && bottom <= IMAGE_HEIGHT - 5) {
+		cout << "Returning pose dist " << poseDist << endl;
 		return poseDist;
 	}
     switch (cert) {
@@ -1146,15 +1147,19 @@ float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
         break;
     case BOTH_UNSURE:
         // We choose the min distance here, since that means more pixels
-        if (bottom <= IMAGE_HEIGHT - 5)
-            dist = min( poseDist, min(disth, distw));
-        else
+		dist = min( poseDist, min(disth, distw));
+        if (bottom <= IMAGE_HEIGHT - 5) {
+            //dist = min( poseDist, min(disth, distw));
+        } else if (dist > 100) {
             dist = 0.0f;
+		}
         break;
     case BOTH_SURE:
         dist = min(disth, distw);
         break;
     }
+	cout << "Distances disth " << disth << " distw " << distw <<
+		" posedist " << poseDist << " returning " << dist << endl;
     return dist;
 }
 
