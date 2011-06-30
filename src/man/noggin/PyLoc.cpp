@@ -44,7 +44,6 @@ public:
 
 	void resetLocTo(float x, float y, float h){
 		loc->resetLocTo(x, y, h * TO_RAD);
-		ballEKF->reset();
 	}
 
     /* Getters */
