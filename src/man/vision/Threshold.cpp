@@ -1137,6 +1137,12 @@ float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
         break;
     case WIDTH_UNSURE:
         dist = disth;
+		if (disth > distw) {
+			dist = distw;
+			if (bottom <= IMAGE_HEIGHT - 5) {
+				dist = poseDist;
+			}
+		}
         break;
     case BOTH_UNSURE:
         // We choose the min distance here, since that means more pixels
@@ -1146,7 +1152,7 @@ float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
             dist = 0.0f;
         break;
     case BOTH_SURE:
-        dist = disth;
+        dist = min(disth, distw);
         break;
     }
     return dist;
