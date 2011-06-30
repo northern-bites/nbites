@@ -81,8 +81,14 @@ void NaoLights::generateLeds(){
                                           ALNames::NUM_RGB_LEDS[i],
                                           ALNames::LED_START_COLOR[i],
                                           ALNames::LED_END_COLOR[i]));
-        AL::ALValue newAlias = *ledList[i]->getAlias();
-        dcmProxy->createAlias(newAlias);
+
+        try {
+            AL::ALValue newAlias = *ledList[i]->getAlias();
+            dcmProxy->createAlias(newAlias);
+        } catch (AL::ALError &e){
+            std::cout << "dcm error in generateLeds"
+                      << e.toString() << std::endl;
+        }
     }
 }
 
@@ -90,13 +96,16 @@ void NaoLights::sendLightCommand(AL::ALValue & command){
 #ifdef DEBUG_NAOLIGHTS_COMMAND
     std::cout << "  NaoLights::sendCommand() " <<command.serializeToText()<< std::endl;
 #endif
-    command[4][0] = dcmProxy->getTime(20);
+
+    try{
+        command[4][0] = dcmProxy->getTime(20);
+
 #ifdef LEDS_ENABLED
-    try {
         dcmProxy->setAlias(command);
-    } catch(AL::ALError& e) {
-        std::cout << "dcm value set error " << e.toString() << std::endl;
-    }
 #endif
 
+    } catch(AL::ALError& e) {
+        std::cout << "dcm value set error in sendLightCommand:"
+                  << e.toString() << std::endl;
+    }
 }

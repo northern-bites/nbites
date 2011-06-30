@@ -67,8 +67,7 @@ extern "C" {
 static shared_ptr<Sensors> sensors(new Sensors(
                                        shared_ptr<Speech>(new Speech())));
 static shared_ptr<NaoPose> pose(new NaoPose(sensors));
-static shared_ptr<Profiler> profiler(new Profiler(thread_micro_time));
-static Vision vision(pose, profiler);
+static Vision vision(pose);
 
 JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,

@@ -67,7 +67,13 @@ class Ball(VisualObject):
          self.endY,
          self.lastSeenDist,
          self.lastSeenBearing,
-         self.heat) = [0]*Constants.NUM_TOTAL_BALL_VALUES
+         self.heat,
+         self.accX,
+         self.accY,
+         self.uncertAccX,
+         self.uncertAccY,
+         self.relAccX,
+         self.relAccY) = [0]*Constants.NUM_TOTAL_BALL_VALUES
 
         self.updateVision(visionBall)
 
@@ -164,6 +170,7 @@ class Ball(VisualObject):
         # calculation for the goalie to figure out
         # what the y value of the ball will be when it
         # gets to the goalie
+        # TODO: use new ball information
         if(self.dx != 0):
             self.endY = self.relY - (self.dy*(self.relX/self.dx))
 

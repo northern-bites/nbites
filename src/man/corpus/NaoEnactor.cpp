@@ -75,7 +75,12 @@ void NaoEnactor::sendJoints()
     // Send the array with a 25 ms delay. This delay removes the jitter.
     // Note: I tried 20 ms and it didn't work quite as well. Maybe there is
     // a value in between that works though. Will look into it.
-    joint_command[4][0] = dcmProxy->getTime(20);
+    try {
+        joint_command[4][0] = dcmProxy->getTime(20);
+    } catch ( AL::ALError &e){
+        std::cout << "dcm value set error in sendJoints(): "
+                  << e.toString() << std::endl;
+    }
 
     // Get the angles we want to go to this frame from the switchboard
     motionValues = switchboard->getNextJoints();
@@ -120,8 +125,12 @@ void NaoEnactor::sendHardness(){
     if(!diffStiff)
         return;
 
-
-    hardness_command[4][0] = dcmProxy->getTime(0);
+    try {
+        hardness_command[4][0] = dcmProxy->getTime(10);
+    } catch(AL::ALError& e){
+        std::cout << "dcm value set error in sendHardness()"
+                  << e.toString() << std::endl;
+    }
     // #ifdef ROBOT_NAME_zaphod
 /*    #ifdef ROBOT_NAME_zaphod
     //     // turn off broken shoulder
@@ -175,8 +184,13 @@ void NaoEnactor::initDCMAliases(){
         hardCommandsAlias[1][i] = jointsH[i];
     }
 
-    dcmProxy->createAlias(positionCommandsAlias);
-    dcmProxy->createAlias(hardCommandsAlias);
+    try {
+        dcmProxy->createAlias(positionCommandsAlias);
+        dcmProxy->createAlias(hardCommandsAlias);
+    } catch (AL::ALError& e){
+        std::cout << "dcm error in initDCMAliases"
+                  << e.toString() << std::endl;
+    }
 }
 
 
@@ -220,8 +234,8 @@ void NaoEnactor::initDCMCommands(){
     us_command[2].arraySetSize(1);
     us_command[2][0].arraySetSize(2);
     us_command[2][0][0] = (4.0 + 64.0);
-    us_command[2][0][1] = dcmProxy->getTime(5);
     try {
+        us_command[2][0][1] = dcmProxy->getTime(5);
         dcmProxy->set(us_command);
     } catch(AL::ALError& a) {
         std::cout << "DCM ultrasound set error" << a.toString() << "    "
