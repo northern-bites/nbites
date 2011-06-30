@@ -10,6 +10,7 @@ LOOK_TO_TIME_TO_FIND = 45
 TRACKER_FRAMES_SEARCH_THRESH = 15 # ** # debugging values
 TRACKER_FRAMES_STARE_THRESH = 10 # ** # debugging values
 TRACKER_BALL_STARE_THRESH = 20 # ** # debugging values
+BALL_DISTANCE_THRESH = 30 # cm within which we will only stareBall
 
 MAX_ACTIVE_TRACKING_DIST = 80
 

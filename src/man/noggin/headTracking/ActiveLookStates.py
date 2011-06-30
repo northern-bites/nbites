@@ -204,7 +204,7 @@ def trackingBallLoc(tracker):
             """
 
     # Track target
-    return tracker.goLater('trackLoc')
+    #return tracker.goLater('trackLoc')
 
 # ** # new method
 def passiveLoc(tracker):

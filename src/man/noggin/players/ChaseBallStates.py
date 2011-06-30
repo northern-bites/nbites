@@ -177,7 +177,8 @@ def kickOff(player):
 
     if player.firstFrame():
         player.brain.nav.chaseBall()
-        player.brain.tracker.trackBall()
+        # ** # we are kicking off
+        player.brain.tracker.newTrackBall()
 
     return player.stay()
 

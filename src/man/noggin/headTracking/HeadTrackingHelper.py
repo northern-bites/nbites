@@ -77,9 +77,6 @@ class HeadTrackingHelper(object):
         yaw = motionAngles[MotionConstants.HeadYaw]
         pitch = motionAngles[MotionConstants.HeadPitch]
 
-        # ** #debugging print lines
-        #print "old angles:",MyMath.radians(curYaw),MyMath.radians(curPitch)
-
         # Find the target's angular distance from the center of vision
         if not target is None and target.on:
             yaw += target.angleX
@@ -90,11 +87,7 @@ class HeadTrackingHelper(object):
             # by default, do nothing
             return
 
-        # ** # debugging print lines
-        #print "new angles:",MyMath.radians(curYaw),MyMath.radians(curPitch)
-        #print "target ID is:",target.visionId
-        #print "visDist,visBearing:",target.visDist,target.visBearing
-        #print "locDist,locBearing:",target.locDist,target.locBearing
+        #print "ball loc:",self.tracker.brain.ball.relX,self.tracker.brain.ball.relY
 
         headMove = motion.SetHeadCommand(yaw,pitch)
         self.tracker.brain.motion.setHead(headMove)
@@ -105,23 +98,6 @@ class HeadTrackingHelper(object):
         """
         Looks at given target's relative coordinates
         """
-
-        # ** # debugging print lines
-        #print "my location:", self.tracker.brain.my.x, self.tracker.brain.my.y
-        #print "object list:"
-        #for obj in self.tracker.locObjectList:
-        #    print obj.visionId, obj.dist, obj.bearing, obj.on
-        #print "target ID is:",target.visionId
-        #print "target on?:",target.on
-        #print "target is on? ", target.on
-        #print "target location:",target.x,target.y
-        #print "target dist/bearing:",target.dist,target.bearing
-        #print "target to left:",target.bearing>0
-        #print "target visLoc:",target.visDist,target.visBearing
-        #print "target locLoc:",target.locDist,target.locBearing
-        #print "target rel coords:", target.relX, target.relY
-        #print "target fitness:",target.trackingFitness
-        #print "target center:",target.angleX,target.angleY
 
         #convert from cm to mm for c++ code
         headMove = motion.CoordHeadCommand(10*target.relX, 10*target.relY, 10*target.height,.1065*.1,.1227*.1)# arbitrary slow down for debugging
@@ -197,7 +173,7 @@ class HeadTrackingHelper(object):
         """
         Finds the given corner in the vision frame.
         """
-        if corner.framesOn > 0: # HACK from Landmarks.FieldCorner
+        if corner.on:
             return corner
         else:
             return None
