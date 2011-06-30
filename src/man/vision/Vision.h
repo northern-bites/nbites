@@ -58,7 +58,7 @@ class Vision
     friend class Threshold;
 
 public:
-    Vision(boost::shared_ptr<NaoPose> _pose, boost::shared_ptr<Profiler> _prof);
+    Vision(boost::shared_ptr<NaoPose> _pose);
     ~Vision();
 
 private:
@@ -148,9 +148,6 @@ public:
 
     fieldOpening fieldOpenings[3];
 #define NUM_OPEN_FIELD_SEGMENTS 3
-
-    // Profiling
-    boost::shared_ptr<Profiler> profiler;
 
     const uint16_t * yImg, *uvImg;
 

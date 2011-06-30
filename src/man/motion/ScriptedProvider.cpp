@@ -25,9 +25,8 @@ using namespace std;
 using namespace Kinematics;
 using boost::shared_ptr;
 
-ScriptedProvider::ScriptedProvider(shared_ptr<Sensors> s,
-				   shared_ptr<Profiler> p)
-    : MotionProvider(SCRIPTED_PROVIDER, p),
+ScriptedProvider::ScriptedProvider(shared_ptr<Sensors> s)
+    : MotionProvider(SCRIPTED_PROVIDER),
       sensors(s),
       chopper(sensors),
       currCommand(),
@@ -97,7 +96,7 @@ bool ScriptedProvider::commandQueueEmpty(){
 }
 
 void ScriptedProvider::calculateNextJointsAndStiffnesses() {
-    PROF_ENTER(profiler,P_SCRIPTED);
+    PROF_ENTER(P_SCRIPTED);
     pthread_mutex_lock(&scripted_mutex);
     if (currCommandEmpty())
 	setNextBodyCommand();
@@ -126,7 +125,7 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
 
     setActive();
     pthread_mutex_unlock(&scripted_mutex);
-    PROF_EXIT(profiler,P_SCRIPTED);
+    PROF_EXIT(P_SCRIPTED);
 }
 
 /*
@@ -160,10 +159,10 @@ void ScriptedProvider::setNextBodyCommand() {
 	bodyCommandQueue.pop();
 
 	// Replace the current command
-	PROF_ENTER(profiler, P_CHOPPED);
+	PROF_ENTER(P_CHOPPED);
 	const bool useComPreviews = true;
 	currCommand = chopper.chopCommand(nextCommand, useComPreviews);
-	PROF_EXIT(profiler, P_CHOPPED);
+	PROF_EXIT(P_CHOPPED);
     }
 }
 

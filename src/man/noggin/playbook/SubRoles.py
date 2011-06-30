@@ -29,35 +29,6 @@ def pGoalieCenter(team, workingPlay):
 
     workingPlay.setPosition(pos)
 
-def pGoaliePosRight(team, workingPlay):
-    """goalie position right side of goal"""
-
-    workingPlay.setSubRole(PBConstants.GOALIE_RIGHT)
-    dest = Location(PBConstants.GOALIE_RIGHT_X,
-                             PBConstants.GOALIE_RIGHT_Y)
-    h = dest.headingTo(team.brain.ball)
-    pos = (PBConstants.GOALIE_RIGHT_X,
-           PBConstants.GOALIE_RIGHT_Y, h)
-
-    if PBConstants.USE_FANCY_GOALIE:
-        pos = team.fancyGoaliePosition()
-
-    workingPlay.setPosition(pos)
-
-def pGoaliePosLeft(team, workingPlay):
-    """goalie position left side of goal"""
-
-    workingPlay.setSubRole(PBConstants.GOALIE_LEFT)
-    dest = Location(PBConstants.GOALIE_LEFT_X,
-                             PBConstants.GOALIE_LEFT_Y)
-    h = dest.headingTo(team.brain.ball)
-    pos = (PBConstants.GOALIE_LEFT_X, PBConstants.GOALIE_LEFT_Y, h)
-
-    if PBConstants.USE_FANCY_GOALIE:
-        pos = team.fancyGoaliePosition()
-
-    workingPlay.setPosition(pos)
-
 def pGoalieSave(team, workingPlay):
     """ goalie saving """
     workingPlay.setSubRole(PBConstants.GOALIE_SAVE)

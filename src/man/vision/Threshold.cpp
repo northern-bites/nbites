@@ -116,14 +116,14 @@ void Threshold::visionLoop() {
     // This will form all lines and all corners. After this call, fieldLines
     // will be able to supply information about them through getLines() and
     // getCorners().
-    PROF_ENTER(vision->profiler, P_LINES);
+    PROF_ENTER(P_LINES);
     vision->fieldLines->lineLoop();
-    PROF_EXIT(vision->profiler, P_LINES);
+    PROF_EXIT(P_LINES);
 
     // do recognition
-    PROF_ENTER(vision->profiler, P_OBJECT);
+    PROF_ENTER(P_OBJECT);
     objectRecognition();
-    PROF_EXIT(vision->profiler, P_OBJECT);
+    PROF_EXIT(P_OBJECT);
 
     vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
@@ -156,22 +156,22 @@ void Threshold::visionLoop() {
  * NOTE: The name is now a misnomer.  We no longer threshold here.
  */
 void Threshold::thresholdAndRuns() {
-    PROF_ENTER(vision->profiler, P_THRESHRUNS); // profiling
+    PROF_ENTER(P_THRESHRUNS); // profiling
 
     initColors();
 
     // Determine where the field horizon is
-    PROF_ENTER(vision->profiler, P_FGHORIZON);
+    PROF_ENTER(P_FGHORIZON);
     horizon = field->findGreenHorizon(pose->getHorizonY(0),
                                       pose->getHorizonSlope());
-    PROF_EXIT(vision->profiler, P_FGHORIZON);
+    PROF_EXIT(P_FGHORIZON);
 
     // 'Run' up the image to find color-grouped pixel sequences
-    PROF_ENTER(vision->profiler, P_RUNS);
+    PROF_ENTER(P_RUNS);
     runs();
-    PROF_EXIT(vision->profiler, P_RUNS);
+    PROF_EXIT(P_RUNS);
 
-    PROF_EXIT(vision->profiler, P_THRESHRUNS);
+    PROF_EXIT(P_THRESHRUNS);
 }
 
 /* Thresholding.  Since there's no real benefit (and in fact can it can be a
@@ -1137,6 +1137,12 @@ float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
         break;
     case WIDTH_UNSURE:
         dist = disth;
+		if (disth > distw) {
+			dist = distw;
+			if (bottom <= IMAGE_HEIGHT - 5) {
+				dist = poseDist;
+			}
+		}
         break;
     case BOTH_UNSURE:
         // We choose the min distance here, since that means more pixels
@@ -1146,7 +1152,7 @@ float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
             dist = 0.0f;
         break;
     case BOTH_SURE:
-        dist = disth;
+        dist = min(disth, distw);
         break;
     }
     return dist;

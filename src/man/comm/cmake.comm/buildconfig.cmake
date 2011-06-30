@@ -32,4 +32,8 @@ OPTION(
   "Build with the Python GameController interface"
   ON
   )
-
+OPTION(
+  DEBUG_COMM
+  "Toggle comm debug mode"
+  OFF
+)

@@ -56,6 +56,10 @@ void GameController::handle_packet(const char *msg, int len)
     if (!validatePacket(msg, len, packet))
         return;
 
+    // Possibly log packet data?
+    //printGCData(packet);
+    //cout << "GameController::handle_packet() -- packet recieved." << endl;
+
     if (packet.teams[TEAM_BLUE].teamColor != TEAM_BLUE){
         rawSwapTeams(packet);
 	}

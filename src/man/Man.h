@@ -97,6 +97,7 @@ private:
   // Variables
   //
 public:
+    boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<Transcriber> transcriber;
     boost::shared_ptr<ImageTranscriber> imageTranscriber;
@@ -109,17 +110,15 @@ public:
     //   if the modules are not instantiated in this order, some dependedcies
     //   (i.e. the Python modules exported) will not be available by the time
     //   other modules are imported
-    boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<NaoPose> pose;
 #ifdef USE_MOTION
     boost::shared_ptr<Motion> motion;
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
-#ifdef USE_MEMORY
     boost::shared_ptr<man::memory::Memory> memory;
     boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard;
-#endif
+
 #ifdef USE_NOGGIN
     boost::shared_ptr<Noggin> noggin;
 #endif// USE_NOGGIN

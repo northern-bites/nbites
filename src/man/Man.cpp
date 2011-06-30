@@ -43,8 +43,7 @@ using namespace boost::assign;
 using namespace std;
 using boost::shared_ptr;
 using namespace man::memory;
-using log::LoggingBoard;
-using log::IOProviderFactory;
+using namespace man::memory::log;
 
 /////////////////////////////////////////
 //                                     //
@@ -60,11 +59,11 @@ Man::Man (shared_ptr<Profiler> _profiler,
           shared_ptr<Synchro> synchro,
           shared_ptr<Lights> _lights,
           shared_ptr<Speech> _speech)
-    :     sensors(_sensors),
+    :     profiler(_profiler),
+          sensors(_sensors),
           transcriber(_transcriber),
           imageTranscriber(_imageTranscriber),
           enactor(_enactor),
-          profiler(_profiler),
           lights(_lights),
           speech(_speech)
 {
@@ -87,7 +86,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 
   // initialize core processing modules
 #ifdef USE_MOTION
-  motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors,profiler,pose));
+  motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors,pose));
   guardian->setMotionInterface(motion->getInterface());
 #endif
   // initialize python roboguardian module.
@@ -97,26 +96,33 @@ Man::Man (shared_ptr<Profiler> _profiler,
   set_lights_pointer(_lights);
   set_speech_pointer(_speech);
 
-  vision = shared_ptr<Vision>(new Vision(pose, profiler));
+  vision = shared_ptr<Vision>(new Vision(pose));
 
   set_vision_pointer(vision);
 
   comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
-#ifdef USE_NOGGIN
-  noggin = shared_ptr<Noggin>(new Noggin(profiler,vision,comm,guardian,
-                                         sensors, motion->getInterface()));
-#endif// USE_NOGGIN
-#ifdef USE_MEMORY
-  memory = shared_ptr<Memory>(new Memory(profiler, vision, sensors));
+
+  memory = shared_ptr<Memory>(new Memory(vision, sensors));
+
   loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory));
+  set_logging_board_pointer(loggingBoard);
+  memory->addSubscriber(loggingBoard.get());
+
+#ifdef USE_MEMORY
   loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
 #endif
-  PROF_ENTER(profiler.get(), P_GETIMAGE);
+
+#ifdef USE_NOGGIN
+  noggin = shared_ptr<Noggin>(new Noggin(vision,comm,guardian,
+                                         sensors, loggingBoard,
+                                         motion->getInterface()));
+#endif// USE_NOGGIN
 }
 
 Man::~Man ()
 {
   cout << "Man destructor" << endl;
+  exit(0);
 }
 
 void Man::startSubThreads() {
@@ -177,20 +183,21 @@ void Man::stopSubThreads() {
 #endif
 
 #endif
-  comm->stop();
-  comm->getTrigger()->await_off();
+  //TODO: fix this from hanging
+//  comm->stop();
+//  comm->getTrigger()->await_off();
   // @jfishman - tool will not exit, due to socket blocking
   //comm->getTOOLTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
   cout << "  Comm thread is stopped" << endl;
 #endif
+  //hack - this ensures we exit with no segfault
+  //atm naoqi crashes when it tries to call exit on the dcm
 }
 
 void
 Man::processFrame ()
 {
-    PROF_ENTER(profiler.get(), P_FINAL);
-    PROF_EXIT(profiler.get(), P_GETIMAGE);
 
 #ifdef USE_VISION
     // Need to lock image and vision angles for duration of
@@ -198,11 +205,11 @@ Man::processFrame ()
     sensors->lockImage();
 #ifdef USE_MEMORY
     // TODO: this is temporarily here
-    loggingBoard->log(MIMAGE_ID);
+    //loggingBoard->log(MIMAGE_ID);
 #endif
-
+    PROF_ENTER(P_VISION);
     vision->notifyImage(sensors->getImage());
-
+    PROF_EXIT(P_VISION);
     sensors->releaseImage();
 #endif
 #ifdef USE_MEMORY
@@ -213,13 +220,9 @@ Man::processFrame ()
     noggin->runStep();
 #endif
 
-    PROF_ENTER(profiler.get(), P_LIGHTS);
+    PROF_ENTER(P_LIGHTS);
     lights->sendLights();
-    PROF_EXIT(profiler.get(), P_LIGHTS);
-
-    PROF_ENTER(profiler.get(), P_GETIMAGE);
-    PROF_EXIT(profiler.get(), P_FINAL);
-    PROF_NFRAME(profiler.get());
+    PROF_EXIT(P_LIGHTS);
 }
 
 

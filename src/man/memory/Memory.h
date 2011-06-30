@@ -30,13 +30,15 @@ class Memory; //forward declaration
 #include "MImage.h"
 #include "Sensors.h"
 #include "Profiler.h"
+#include "include/MultiProvider.h"
 
 namespace man {
 namespace memory {
 
 typedef google::protobuf::Message ProtoMessage;
 
-class Memory : public Subscriber<SensorsEvent> {
+class Memory : public Subscriber<SensorsEvent>,
+               public MultiProvider<MObject_ID> {
 
 public:
     typedef boost::shared_ptr<Memory> ptr;
@@ -47,8 +49,7 @@ public:
             boost::shared_ptr<ProtoMessage> > ProtoMessageMap;
 
 public:
-    Memory( boost::shared_ptr<Profiler> profiler_ptr = boost::shared_ptr<Profiler>(),
-            boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
+    Memory( boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
             boost::shared_ptr<Sensors> sensors_ptr = boost::shared_ptr<Sensors>());
     virtual ~Memory();
     /**
@@ -79,7 +80,6 @@ public:
 
 private:
     ProtoMessageMap protoMessageMap;
-    boost::shared_ptr<Profiler> _profiler;
     boost::shared_ptr<Sensors> _sensors;
     boost::shared_ptr<MVision> mVision;
     boost::shared_ptr<MVisionSensors> mVisionSensors;
