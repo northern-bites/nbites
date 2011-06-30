@@ -3,16 +3,18 @@
  *
  *  Created on: Jun 27, 2011
  *      Author: oneamtu
- *      Credits go to Colin Graf and Thomas Rofer of BHuman from which this
+ *      Credits go to Colin Graf and Thomas Rofer of BHuman from where this
  *      code is mostly inspired from
  */
 
 #pragma once
 
 #include <boost/shared_ptr.hpp>
+#include <linux/videodev2.h>
 
 #include "ThreadedImageTranscriber.h"
 #include "Camera.h"
+#include "ColorParams.h"
 
 namespace man {
 namespace corpus {
@@ -30,6 +32,11 @@ public:
         return &settings;
     }
 
+    int start();
+    void run();
+    void stop();
+    bool waitForImage();
+    void releaseImage(){}
     /**
      * Note: this method blocks until it gets a new image
      */
@@ -46,6 +53,9 @@ public:
      * Unconditional write of the camera settings
      */
     void writeCameraSettings();
+
+    void initTable(std::string path);
+    void initTable(unsigned char* buffer);
 
 private:
     Camera::Settings settings;
@@ -65,6 +75,9 @@ private:
     struct v4l2_buffer* currentBuf; /**< The last dequeued frame buffer. */
     unsigned long long timeStamp;
 
+    uint16_t* image;
+    unsigned char *table;
+    ColorParams params;
 
     int getControlSetting(unsigned int id);
     bool setControlSetting(unsigned int id, int value);
@@ -79,6 +92,22 @@ private:
     void initQueueAllBuffers();
     void initDefaultControlSettings();
     void startCapturing();
+
+    enum {
+        y0 = 0,
+        u0 = 0,
+        v0 = 0,
+
+        y1 = 256,
+        u1 = 256,
+        v1 = 256,
+
+        yLimit = 128,
+        uLimit = 128,
+        vLimit = 128,
+
+        tableByteSize = yLimit * uLimit * vLimit
+    };
 };
 } /* namespace corpus */
 } /* namespace man */

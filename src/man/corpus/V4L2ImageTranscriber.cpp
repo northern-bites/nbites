@@ -3,29 +3,28 @@
  *
  *  Created on: Jun 27, 2011
  *      Author: oneamtu
- *      Credits go to Colin Graf and Thomas Rofer of BHuman from which this
+ *      Credits go to Colin Graf and Thomas Rofer of BHuman from where this
  *      code is mostly inspired from
  */
 
 #include "V4L2ImageTranscriber.h"
 
-namespace man {
-namespace corpus {
-
 #include <cstring>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#define USE_USERPTR
 #ifdef USE_USERPTR
 #include <malloc.h> // memalign
 #endif
 
 #undef __STRICT_ANSI__
-#include <linux/videodev.h>
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
 //#include <linux/i2c.h>
 #define __STRICT_ANSI__
+
+#include "ImageAcquisition.h"
 
 #ifndef V4L2_CID_AUTOEXPOSURE
 #  define V4L2_CID_AUTOEXPOSURE     (V4L2_CID_BASE+32)
@@ -80,16 +79,24 @@ enum v4l2_exposure_auto_type {
 #endif /* LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26) */
 
 //V4L2ImageTranscriber* V4L2ImageTranscriber::theInstance = 0;
+namespace man {
+namespace corpus {
 
 using boost::shared_ptr;
 
 V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Synchro> synchro,
         shared_ptr<Sensors> s) :
         ThreadedImageTranscriber(s, synchro, "V4L2ImageTranscriber"),
-        settings(Camera::getDefaultSettings()), currentBuf(0), timeStamp(0) {
-    Camera::Type current = settings.type;
+        settings(Camera::getDefaultSettings()), currentBuf(0), timeStamp(0),
+        image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
+        table(new unsigned char[yLimit * uLimit * vLimit]),
+        params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit){
+
+    initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
+
+//    Camera::Type current = settings.type;
     //first we set up the other camera
-    settings.type = Camera::getOtherCameraType(settings.type);
+//    settings.type = Camera::getOtherCameraType(settings.type);
     initOpenI2CAdapter();
     initSelectCamera();
     initOpenVideoDevice();
@@ -98,17 +105,19 @@ V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Synchro> synchro,
     initSetFrameRate();
     initRequestAndMapBuffers();
     initQueueAllBuffers();
-    initDefaultControlSettings();
+//    initDefaultControlSettings();
+//
+//    //and then the camera we want to use
+//    settings.type = current;
+//    initSelectCamera();
+//    initSetCameraDefaults();
+//    initSetImageFormat();
+//    initSetFrameRate();
+//    initRequestAndMapBuffers();
+//    initQueueAllBuffers();
+//    initDefaultControlSettings();
 
-    //and then the camera we want to use
-    settings.type = current;
-    initSelectCamera();
-    initSetCameraDefaults();
-    initSetImageFormat();
-    initSetFrameRate();
-    initRequestAndMapBuffers();
-    initQueueAllBuffers();
-    initDefaultControlSettings();
+    setSettings(settings);
 
     startCapturing();
 }
@@ -134,14 +143,139 @@ V4L2ImageTranscriber::~V4L2ImageTranscriber() {
     free(buf);
 }
 
+int V4L2ImageTranscriber::start()
+{
+    return Thread::start();
+}
+
+void V4L2ImageTranscriber::run()
+{
+    Thread::running = true;
+    Thread::trigger->on();
+
+    long long lastProcessTimeAvg = VISION_FRAME_LENGTH_uS;
+
+    struct timespec interval, remainder;
+    while (Thread::running) {
+        //start timer
+        const long long startTime = monotonic_micro_time();
+
+        if (waitForImage()) {
+            subscriber->notifyNextVisionImage();
+        }
+
+        //stop timer
+        const long long processTime = monotonic_micro_time() - startTime;
+        //sleep until next frame
+
+        lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
+
+        if (processTime > VISION_FRAME_LENGTH_uS) {
+            if (processTime > VISION_FRAME_LENGTH_PRINT_THRESH_uS) {
+#ifdef DEBUG_ALIMAGE_LOOP
+                cout << "Time spent in ALImageTranscriber loop longer than"
+                          << " frame length: " << processTime <<endl;
+#endif
+            }
+            //Don't sleep at all
+        } else{
+            const long int microSleepTime =
+                static_cast<long int>(VISION_FRAME_LENGTH_uS - processTime);
+            const long int nanoSleepTime =
+                static_cast<long int>((microSleepTime %(1000 * 1000)) * 1000);
+
+            const long int secSleepTime =
+                static_cast<long int>(microSleepTime / (1000*1000));
+
+            // cout << "Sleeping for nano: " << nanoSleepTime
+            //      << " and sec:" << secSleepTime << endl;
+
+            interval.tv_sec = static_cast<time_t>(secSleepTime);
+            interval.tv_nsec = nanoSleepTime;
+
+            nanosleep(&interval, &remainder);
+        }
+    }
+    Thread::trigger->off();
+}
+
+void V4L2ImageTranscriber::stop()
+{
+//    cout << "Stopping ALImageTranscriber" << endl;
+    running = false;
+    Thread::stop();
+}
+
+bool V4L2ImageTranscriber::waitForImage() {
+    this->captureNew();
+    //uint8_t* current_image = static_cast<uint8_t*>(mem[currentBuf->index]);
+    uint8_t* current_image = (uint8_t*) (currentBuf->m.userptr);
+    printf("currentBuf %lu \n", currentBuf->m.userptr);
+    if (current_image) {
+#ifdef CAN_SAVE_FRAMES
+    _copy_image(image, naoImage);
+    ImageAcquisition::acquire_image_fast(table, params,
+            naoImage, image);
+#else
+    unsigned long long startTime = monotonic_micro_time();
+    ImageAcquisition::acquire_image_fast(table, params,
+            current_image, image);
+    printf("Acquisition time %llu\n", monotonic_micro_time() - startTime);
+#endif
+    sensors->setImage(image);
+    return true;
+    }
+    return false;
+}
+
+void V4L2ImageTranscriber::initTable(string filename)
+{
+    FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
+
+    if (fp == NULL) {
+        printf("initTable() FAILED to open filename: %s", filename.c_str());
+#ifdef OFFLINE
+        exit(0);
+#else
+        return;
+#endif
+    }
+
+    // actually read the table into memory
+    // Color table is in VUY ordering
+    int rval;
+    for(int v=0; v < vLimit; ++v){
+        for(int u=0; u< uLimit; ++u){
+            rval = fread(&table[v * uLimit * yLimit + u * yLimit],
+                         sizeof(unsigned char), yLimit, fp);
+        }
+    }
+
+#ifndef OFFLINE
+    printf("Loaded colortable %s\n",filename.c_str());
+#endif
+
+    fclose(fp);
+}
+
+void V4L2ImageTranscriber::initTable(unsigned char* buffer)
+{
+    memcpy(table, buffer, yLimit * uLimit * vLimit);
+}
+
+
 bool V4L2ImageTranscriber::captureNew() {
     // requeue the buffer of the last captured image which is obsolete now
     if (currentBuf) {
+        unsigned long long startTime = monotonic_micro_time();
         CHECK_SUCCESS(ioctl(fd, VIDIOC_QBUF, currentBuf));
+        printf("QBUF time %llu\n", monotonic_micro_time() - startTime);
     }
 
     // dequeue a frame buffer (this call blocks when there is no new image available) */
+    unsigned long long startTime = monotonic_micro_time();
     CHECK_SUCCESS(ioctl(fd, VIDIOC_DQBUF, buf));
+    printf("DQBUF time %llu\n", monotonic_micro_time() - startTime);
     //timeStamp = SystemCall::getCurrentSystemTime();
     //ASSERT(buf->bytesused == SIZE);
     currentBuf = buf;
@@ -352,16 +486,17 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
     // map or prepare the buffers
     buf = static_cast<struct v4l2_buffer*>(calloc(1,
             sizeof(struct v4l2_buffer)));
-#ifdef USE_USERPTR
-            unsigned int bufferSize = fmt.fmt.pix.sizeimage;
-            unsigned int pageSize = getpagesize();
-            bufferSize = (bufferSize + pageSize - 1) & ~(pageSize - 1);
-#endif
+//#ifdef USE_USERPTR
+//            unsigned int bufferSize = SIZE;
+//            unsigned int pageSize = getpagesize();
+//            bufferSize = (bufferSize + pageSize - 1) & ~(pageSize - 1);
+//#endif
 for(    int i = 0; i < frameBufferCount; ++i)
     {
 #ifdef USE_USERPTR
-        memLength[i] = bufferSize;
-        mem[i] = memalign(pageSize, bufferSize);
+        memLength[i] = SIZE;
+        mem[i] = malloc(SIZE);
+        printf("malloc : %lu\n", (long unsigned) mem[i]);
 #else
         buf->index = i;
         buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -381,12 +516,14 @@ void V4L2ImageTranscriber::initQueueAllBuffers() {
         buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 #ifdef USE_USERPTR
         buf->memory = V4L2_MEMORY_USERPTR;
-        buf->m.userptr = (unsigned long)mem[i];
+        buf->m.userptr = (unsigned long) mem[i];
         buf->length = memLength[i];
 #else
         buf->memory = V4L2_MEMORY_MMAP;
 #endif
         CHECK_SUCCESS(ioctl(fd, VIDIOC_QBUF, buf));
+        CHECK_SUCCESS(ioctl(fd, VIDIOC_QUERYBUF, buf));
+        printf("querybuf : %lu\n", (long unsigned) buf->m.userptr);
     }
 }
 

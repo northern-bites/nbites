@@ -13,6 +13,7 @@
 #include "nameconfig.h"
 #include "visionconfig.h"
 #include <time.h>
+#include <cstdio>
 
 // ROBOT TYPES
 #define NAO_RL    3
@@ -70,7 +71,13 @@
 typedef unsigned char byte;
 #endif
 
-#define CHECK_SUCCESS(x) if((x) < 0) { printf("Problem with " #x "\n"); }
+#define CHECK_SUCCESS(x) {\
+        int result; \
+        if( (result = (x)) < 0) { \
+            printf("Problem with " #x ", returned %i\n", result); \
+            perror("Error message"); \
+        } \
+}
 
 #include <time.h>
 #include <sys/time.h>
