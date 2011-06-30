@@ -28,8 +28,8 @@ using boost::shared_ptr;
 
 //#define DEBUG_HEADPROVIDER
 
-HeadProvider::HeadProvider(shared_ptr<Sensors> s,shared_ptr<Profiler> p)
-    : MotionProvider(HEAD_PROVIDER, p),
+HeadProvider::HeadProvider(shared_ptr<Sensors> s)
+    : MotionProvider(HEAD_PROVIDER),
       sensors(s),
       chopper(sensors),
       nextJoints(),
@@ -72,7 +72,7 @@ void HeadProvider::hardReset(){
 
 //Method called from MotionSwitchboard
 void HeadProvider::calculateNextJointsAndStiffnesses() {
-    PROF_ENTER(profiler,P_HEAD);
+    PROF_ENTER(P_HEAD);
     pthread_mutex_lock(&head_provider_mutex);
     switch(curMode){
     case SCRIPTED:
@@ -87,7 +87,7 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
     }
     setActive();
     pthread_mutex_unlock(&head_provider_mutex);
-    PROF_EXIT(profiler,P_HEAD);
+    PROF_EXIT(P_HEAD);
 }
 
 //Method called during the 'SET' Mode

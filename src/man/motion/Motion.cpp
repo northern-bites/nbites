@@ -29,20 +29,18 @@ using namespace boost;
 Motion::Motion (shared_ptr<Synchro> _synchro,
                 shared_ptr<MotionEnactor> _enactor,
                 shared_ptr<Sensors> s,
-                shared_ptr<Profiler> p,
                 shared_ptr<NaoPose> _pose)
   : Thread(_synchro, "Motion"),
-    switchboard(s,p,_pose),
+    switchboard(s, _pose),
     interface(&switchboard),
     enactor(_enactor),
-    profiler(p),
     pose(_pose)
 {
     set_motion_interface(&interface);
 }
 
 Motion::~Motion() {
-    enactor->setSwitchboard(NULL);
+    //enactor->setSwitchboard(NULL);
 }
 int Motion::start() {
     switchboard.start();

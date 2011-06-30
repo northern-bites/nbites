@@ -45,8 +45,10 @@ const float MultiLocEKF::INIT_H_UNCERT = M_PI_FLOAT * 2.0f;
 // Estimate limits
 const float MultiLocEKF::X_EST_MIN = 0.0f;
 const float MultiLocEKF::Y_EST_MIN = 0.0f;
+const float MultiLocEKF::H_EST_MIN = -M_PI_FLOAT;
 const float MultiLocEKF::X_EST_MAX = FIELD_GREEN_WIDTH;
 const float MultiLocEKF::Y_EST_MAX = FIELD_GREEN_HEIGHT;
+const float MultiLocEKF::H_EST_MAX = M_PI_FLOAT;
 
 const float MultiLocEKF::ERROR_RESET_THRESH = 0.6f;
 const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
@@ -71,7 +73,7 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
                                                                         \
     /* Heading from me to landmark */                                   \
     /* Opposite of pt_rel_x needed to get vector direction right  */    \
-    float heading_mag = acosf(-pt_rel_x / pt_dist);                     \
+    float heading_mag = acosf(clip(-pt_rel_x / pt_dist, -1.0f, 1.0f));  \
                                                                         \
     /* Sign the heading and subtract our heading to get bearing */      \
     float pt_bearing = subPIAngle(copysignf(1.0f, -pt_rel_y) *          \
@@ -101,7 +103,7 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
                                                                         \
     /* Acos always returns positive, so we have the magnitude of our */ \
     /* orientation to the corner */                                     \
-    float mag_orientation = acosf(dot_prod/pt_dist);                    \
+    float mag_orientation = acosf(clip(dot_prod/pt_dist, -1.0f, 1.0f)); \
     float pt_orientation = copysignf(1.0f,dot_sign) * mag_orientation;  \
                                                                         \
     float orientation_error = subPIAngle(z.getVisOrientation() -        \
@@ -172,9 +174,16 @@ MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
       useAmbiguous(true), errorLog(error_log_width),
       resetFlag(false)
 {
-    // ones on the diagonal
+    // These jacobian values are unchanging and independent of the
+    // motion updates, so we initialize them here.
     A_k(0,0) = 1.0;
+    A_k(0,1) = 0.0;
+
+    A_k(1,0) = 0.0;
     A_k(1,1) = 1.0;
+
+    A_k(2,0) = 0.0;
+    A_k(2,1) = 0.0;
     A_k(2,2) = 1.0;
 
     // Setup initial values
@@ -231,6 +240,12 @@ void MultiLocEKF::redGoalieReset()
  */
 void MultiLocEKF::resetLocTo(float x, float y, float h)
 {
+    for (int i=0; i < loc_ekf_dimension; ++i){
+        xhat_k(i) = xhat_k_bar(i) = 0.0f;
+        for (int j=0; j < loc_ekf_dimension; ++j){
+            A_k(i,j) = Q_k(i,j) = P_k(i,j) = P_k_bar(i,j) = 0.0f;
+        }
+    }
     setXEst(x);
     setYEst(y);
     setHEst(subPIAngle(h));
@@ -318,7 +333,7 @@ void MultiLocEKF::endFrame()
     // Clip values if our estimate is off the field
     clipRobotPose();
     if (testForNaNReset()) {
-        cout << "MultiLocEKF reset to: "<< *this << endl;
+        cout << "MultiLocEKF reset to: " << endl << *this << endl;
         cout << "\tLast odo is: " << lastOdo << endl;
         cout << endl;
     }
@@ -356,8 +371,14 @@ MultiLocEKF::associateTimeUpdate(MotionModel u)
     deltaLoc(1) = u.deltaF * sinh + u.deltaL * cosh;
     deltaLoc(2) = u.deltaR;
 
-    A_k(0,2) =  0;//-u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) =  0;//u.deltaF * cosh - u.deltaL * sinh;
+    // Derivatives of motion updates re:x,y,h
+    // Other values are set in the constructor and are unchanging
+    //
+    // THESE ARE UNUSED:
+    //    They cause a negative value to be generated in P_k which
+    //    is very bad. Disabled until a solution can be found. --Jack and Yoni
+    A_k(0,2) = 0; //-u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) = 0; //u.deltaF * cosh - u.deltaL * sinh;
 
     return deltaLoc;
 }
@@ -549,8 +570,9 @@ void MultiLocEKF::incorporateCorner(int index,
     V_k(2) = orientation_error;
 
     // The jacobian's denomitator
-    float denom = sqrt( 1 - ((dot_prod * dot_prod) /
-                             (pt_dist*pt_dist)));
+    // Clipped to prevent sqrt of negative
+    float denom = sqrt( max(1 - ((dot_prod * dot_prod) /
+                                 (pt_dist*pt_dist)), 0.0f));
     float sign = copysignf(1.0f, dot_sign);
 
     // Derivatives of orientation with respect to x,y,h
@@ -694,39 +716,24 @@ void MultiLocEKF::limitPosteriorUncert()
 }
 
 /**
- * Method to use the estimate ellipse to intelligently clip the pose estimate
- * of the robot using the information of the uncertainty ellipse.
+ * Very simple clipping to the edges of the field.
  */
 void MultiLocEKF::clipRobotPose()
 {
-    // Limit our X estimate
-    if (xhat_k(0) > X_EST_MAX) {
-        StateVector v(loc_ekf_dimension);
-        v(0) = 1.0f;
-        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - X_EST_MAX) /
-            inner_prod(v, prod(P_k,v));
-    }
-    else if (xhat_k(0) < X_EST_MIN) {
-        StateVector v(loc_ekf_dimension);
-        v(0) = 1.0f;
-        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
-            inner_prod(v, prod(P_k,v));
-    }
+    // Check x uncertainty
+    xhat_k(0) =
+        xhat_k_bar(0) =
+        clip(xhat_k(0), X_EST_MIN, X_EST_MAX);
 
-    // Limit our Y estimate
-    if (xhat_k(1) < Y_EST_MIN) {
-        StateVector v(loc_ekf_dimension);
-        v(1) = 1.0f;
-        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k)) /
-            inner_prod(v, prod(P_k,v));
-    }
-    else if (xhat_k(1) > Y_EST_MAX) {
-        StateVector v(loc_ekf_dimension);
-        v(1) = 1.0f;
-        xhat_k = xhat_k - prod(P_k,v)* (inner_prod(v,xhat_k) - Y_EST_MAX) /
-            inner_prod(v, prod(P_k,v));
+    // Check y uncertainty
+    xhat_k(1) =
+        xhat_k_bar(1) =
+        clip(xhat_k(1), Y_EST_MIN, Y_EST_MAX);
 
-    }
+    // Check h uncertainty
+    xhat_k(2) =
+        xhat_k_bar(2) =
+        clip(xhat_k(2), H_EST_MIN, H_EST_MAX);
 }
 
 void MultiLocEKF::printBeforeUpdateInfo()
@@ -734,10 +741,14 @@ void MultiLocEKF::printBeforeUpdateInfo()
     cout << "Loc update: " << endl;
     cout << "Before updates: " << *this << endl;
     cout << "\tOdometery is " << lastOdo <<endl;
-    cout << "\tObservations are: " << endl;
-    // for(unsigned int i = 0; i < lastObservations.size(); ++i) {
-    //     cout << "\t\t" << lastObservations[i] <<endl;
-    // }
+    cout << "\tPoint Observations are: " << endl;
+    for(unsigned int i = 0; i < lastPointObservations.size(); ++i) {
+        cout << "\t\t" << lastPointObservations[i] <<endl;
+    }
+    cout << "\tCorner Observations are: " << endl;
+    for(unsigned int i = 0; i < lastCornerObservations.size(); ++i) {
+        cout << "\t\t" << lastCornerObservations[i] <<endl;
+    }
 }
 
 void MultiLocEKF::printAfterUpdateInfo()
@@ -868,16 +879,14 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
     float sideC = hypotf(i,j);
 
     // Calculate angle between vector (pt1,pt2) and north (zero heading)
-    float ptVecHeading = copysignf(1.0f, j) * acosf(i/sideC);
+    float ptVecHeading = copysignf(1.0f, j) * acosf(clip(i/sideC, -1.0f, 1.0f));
 
     float angleC = abs(subPIAngle(obs1->getVisBearing() -
                                   obs2->getVisBearing()));
 
     // Clamp the input to asin to within (-1 , 1) due to measurement
     // inaccuracies. This prevents a nan return from asin.
-    float angleB = asinf( max( min( (sideB * sin(angleC)) /sideC,
-                                    1.0f),
-                               -1.0f));
+    float angleB = asinf( clip( (sideB * sin(angleC)) /sideC, -1.0f, 1.0f));
 
      // Swap sign of angle B to place us on the correct side of the
     // line (pt1 -> pt2)
@@ -896,7 +905,7 @@ void MultiLocEKF::resetLoc(const PointObservation* obs1,
 
     // Heading of line (self -> pt2)
     // Clamp the input to (-1,1) to prevent illegal trig call and a nan return
-    float headingPt2 = acosf( min(max( (pt2.x - newX)/sideB, -1.0f), 1.0f) );
+    float headingPt2 = acosf(clip( (pt2.x - newX)/sideB, -1.0f, 1.0f) );
 
     // Sign based on y direction of vector (self -> pt2)
     float signedHeadingPt2 = copysignf(1.0f, pt2.y - newY) * headingPt2;

@@ -64,6 +64,7 @@ SET( COMM_SRCS Comm
                GameController
                RoboCupGameControlData
                TOOLConnect
+	       NetworkMonitor
                )
 
 IF( PYTHON_SHARED_COMM )

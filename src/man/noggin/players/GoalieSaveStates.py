@@ -18,7 +18,17 @@ def goalieSave(player):
         brain.tracker.trackBall()
         player.isSaving = True
 
+   # print ball.velX
+   # print ball.accX
+   # print ball.relX
+    print ball.relVelX
+    print ball.relAccX
+    print ball.heat
+    print ""
+
     if helper.shouldSave(player):
+        print ball.relAccX
+        print ball.heat
         brain.tracker.stopHeadMoves()
         brain.fallController.enableFallProtection(False)
         if TESTING:
@@ -27,7 +37,7 @@ def goalieSave(player):
             elif helper.shouldSaveLeft(player):
                 return player.goNow('testSaveLeft')
             else:
-                return player.goNow('saveCenter')
+                return player.goNow('testSaveCenter')
         else:
             if helper.shouldSaveRight(player):
                 return player.goNow('saveRight')

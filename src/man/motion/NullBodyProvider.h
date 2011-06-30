@@ -5,10 +5,9 @@
 
 class NullBodyProvider : public NullProvider {
 public:
-    NullBodyProvider(boost::shared_ptr<Sensors> s,
-					 boost::shared_ptr<Profiler> p) :
-        NullProvider(s, p, MotionConstants::null_body_mask){}
-    ~NullBodyProvider(){};
+    NullBodyProvider(boost::shared_ptr<Sensors> s) :
+        NullProvider(s, MotionConstants::null_body_mask){}
+    virtual ~NullBodyProvider(){};
 };
 
 #endif

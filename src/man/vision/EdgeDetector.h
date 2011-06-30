@@ -15,8 +15,7 @@
 class EdgeDetector
 {
 public:
-    EdgeDetector(boost::shared_ptr<Profiler> p,
-                 uint8_t thresh = default_edge_value);
+    EdgeDetector(uint8_t thresh = default_edge_value);
     virtual ~EdgeDetector(){ };
 
 /**
@@ -39,7 +38,6 @@ private:
     };
 
 private:
-    boost::shared_ptr<Profiler> profiler;
     uint8_t threshold;
 };
 

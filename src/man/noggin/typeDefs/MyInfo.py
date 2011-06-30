@@ -68,7 +68,7 @@ class MyInfo(RobotLocation):
             return Constants.BAD_LOC
 
     def __str__(self):
-        return ("name: %s #%d on team: %d color: %s @ (%g,%g,%g) uncert: (%g,%g,%g)" %
-                (self.name, self.playerNumber, self.teamNumber,
+        return ("#%d on team color: %s @ (%g,%g,%g) uncert: (%g,%g,%g)" %
+                (self.playerNumber,
                  Constants.teamColorDict[self.teamColor], self.x, self.y,
                  self.h, self.uncertX, self.uncertY, self.uncertH))

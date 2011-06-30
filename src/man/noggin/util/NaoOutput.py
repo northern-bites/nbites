@@ -6,9 +6,12 @@ import time
 
 # CONSTANTS
 # Logging
-LOG_DIR = "./lib/man/noggin/util/"
+#LOG_DIR = "./lib/man/noggin/util/"
+LOG_DIR = "/home/nao/naoqi/log/"
 # Localization Logs
 LOC_LOG_TYPE = "loc"
+RCOMM_LOG_TYPE = "rcomm"
+SCOMM_LOG_TYPE = "scomm"
 GREEN_COLOR_CODE = '\033[32m'
 RESET_COLORS_CODE = '\033[0m'
 class NaoOutput:
@@ -19,6 +22,7 @@ class NaoOutput:
         self.brain = brain
         self.locLogCount = 0
         self.loggingLoc = False
+        self.loggingComm = False
 
     def printf(self,outputString):
         """
@@ -57,7 +61,8 @@ class NaoOutput:
 
         # Write the first line holding teamColor and playerNumber
         headerLine = (str(self.brain.my.teamColor) + " " +
-                      str(self.brain.my.playerNumber))
+                      str(self.brain.my.playerNumber) + " " +
+                      time.strftime("%Y-%m-%d-%H-%M-%S"))
 
         # The second line holds the current loc values needed for self init
         initLine = ("%g %g %g %g %g %g %g %g %g %g %g %g %g %g"
@@ -107,13 +112,66 @@ class NaoOutput:
 
     def stopLocLog(self):
         """
-        Method to start logging
+        Method to stop logging
         """
         if not self.loggingLoc:
             return
         self.printf("Stopping Localization Logging")
         self.loggingLoc = False
         self.locLog.closeLog()
+
+    # Functions for Logging Comm
+    def startCommLog(self):
+        """
+        Log our stuff
+        """
+        # Do not start a new log if logging
+        if self.loggingComm:
+            return
+
+        self.printf("Starting Communication Logging")
+        self.loggingComm = True
+        self.rCommLog = self.newLog(RCOMM_LOG_TYPE, 0)
+        self.sCommLog = self.newLog(SCOMM_LOG_TYPE, 0)
+
+        # Write the first line holding teamColor and playerNumber
+        headerLine = (str(self.brain.my.teamColor) + " " +
+                      str(self.brain.my.playerNumber) + " " +
+                      time.strftime("%Y-%m-%d-%H-%M-%S") + "\n" +
+                      "================================================\n" +
+                      "================================================")
+
+        # Write our first line
+        self.rCommLog.writeLine(headerLine)
+        self.sCommLog.writeLine(headerLine)
+
+    def logRComm(self, packet):
+        """
+        Writes to the Recieved Comm Log
+        """
+        commLine = str(packet)
+        self.rCommLog.writeLine(time.strftime("%H-%M-%S-%f"))
+        self.rCommLog.writeLine(commLine)
+        self.rCommLog.writeLine("===========================")
+
+    def logSComm(self, packet):
+        """
+        Writes to the Sent Comm Log
+        """
+        commLine = str(packet)
+        self.sCommLog.writeLine(time.strftime("%H-%M-%S-%f"))
+        self.sCommLog.writeLine(commLine)
+        self.sCommLog.writeLine("===========================")
+
+    def stopCommLog(self):
+        """
+        Stop Logging
+        """
+        if not self.loggingComm:
+            return
+        self.printf("Stopping Communication Logging")
+        self.loggingComm = False
+        self.commLog.closeLog()
 
 class Log:
     """
@@ -123,16 +181,14 @@ class Log:
         """
         set it up
         """
-        self.frame = 0
         self.logType = logType
-        logTitle = LOG_DIR + time.strftime("%Y-%m-%d-%H-%M-%S") + "." + logType
+        logTitle = LOG_DIR + logType + " " + str(count) + ".txt"
         self.logFile = open(logTitle, 'w')
 
     def writeLine(self, line):
         """
         write a line to the log file
         """
-        self.frame += 1
         try:
             self.logFile.write(line+"\n")
         except Exception, e:

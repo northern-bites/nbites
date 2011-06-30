@@ -60,6 +60,7 @@ TOOLConnect::run ()
         serial.bind();
 
         while (running) {
+            PROF_ENTER(P_TOOLCONNECT);
             serial.accept();
 #ifdef DEBUG_TOOL_CONNECTS
             printf("Connection received from the TOOL\n");
@@ -75,6 +76,7 @@ TOOLConnect::run ()
                     fprintf(stderr, "%s\n", e.what());
                 }
             }
+            PROF_EXIT(P_TOOLCONNECT);
         }
     }catch (socket_error &e) {
         if (running) {
@@ -151,11 +153,6 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Robot information request
     if (r.info) {
         serial.write_byte(ROBOT_TYPE);
-        //TODO: this is dumb, remove it
-        std::string name = "";
-        serial.write_bytes((const byte*)name.c_str(), name.size());
-        // TODO - get calibration file name access
-        serial.write_bytes((byte*)"table.mtb", strlen("table.mtb"));
     }
 
     std::vector<float> v;
@@ -220,15 +217,20 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
         vector<float> loc_values;
 
         if (loc.get()) {
-			loc_values += loc->getXEst(), loc->getYEst(),
-				loc->getHEst(), loc->getXUncert(),
-				loc->getYUncert(),
-				loc->getHUncert();
-			loc_values += ballEKF->getXEst(), ballEKF->getYEst(),
-				ballEKF->getXUncert(), ballEKF->getYUncert(),
-				ballEKF->getXVelocityEst(), ballEKF->getYVelocityEst(),
-				ballEKF->getXVelocityUncert(),
-				ballEKF->getYVelocityUncert();
+            loc_values += loc->getXEst(), loc->getYEst(),
+                loc->getHEst(), loc->getXUncert(),
+                loc->getYUncert(),
+                loc->getHUncert();
+
+            loc_values += ballEKF->getGlobalX(),
+                ballEKF->getGlobalY(),
+                ballEKF->getGlobalXUncert(),
+                ballEKF->getGlobalYUncert(),
+                ballEKF->getGlobalXVelocity(),
+                ballEKF->getGlobalYVelocity(),
+                ballEKF->getGlobalXVelocityUncert(),
+                ballEKF->getGlobalYVelocityUncert();
+
           loc_values += loc->getLastOdo().deltaF, loc->getLastOdo().deltaL,
                         loc->getLastOdo().deltaR;
         } else

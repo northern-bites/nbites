@@ -9,7 +9,7 @@ ELSE( WEBOTS_BACKEND )
   IF( OE_CROSS_BUILD )
     SET( ALCOMMON_INCLUDE_DIR ${OE_SYSROOT}/usr/include/ )
   ELSE ( OE_CROSS_BUILD )
-    SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include )
+#    SET( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include )
   ENDIF( OE_CROSS_BUILD )
 ENDIF( WEBOTS_BACKEND )
 
@@ -19,15 +19,15 @@ IF( OE_CROSS_BUILD )
     ${OE_SYSROOT}/usr/lib/libalmemoryfastaccess.so)
 ELSE(OE_CROSS_BUILD )
   IF( WIN32 )
-    SET( ALCOMMON_LIBRARIES ${AL_DIR}/lib/alcommon.lib)
+#    SET( ALCOMMON_LIBRARIES ${AL_DIR}/lib/alcommon.lib)
   ELSE( WIN32 )
     IF (APPLE)
       SET( ALCOMMON_LIBRARIES
-        ${AL_DIR}/lib/libalcommon.a
+#       ${AL_DIR}/lib/libalcommon.a
         )
     ELSE(APPLE)
       SET( ALCOMMON_LIBRARIES
-	${AL_DIR}/lib/libalcommon.so
+#	${AL_DIR}/lib/libalcommon.so
         )
     ENDIF(APPLE)
   ENDIF( WIN32 )

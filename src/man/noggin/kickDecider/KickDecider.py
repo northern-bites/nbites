@@ -29,6 +29,7 @@ class KickDecider(object):
         """
         returns the kick and decides on one if we haven't picked one yet
         """
+
         if self.info.kick is None:
             self.info.kick = self.decideKick()
         return self.info.kick
@@ -223,17 +224,18 @@ class KickDecider(object):
             print "RIGHT_SIDE"
             return kicks.RIGHT_SIDE_KICK
         """
-
-        if (my.h <= 20. and my.h >= -20.):
-            return self.chooseDynamicKick()
-        elif (my.h <= 160. and my.h > 20.):
-            print "LEFT_SIDE"
-            return kicks.LEFT_SIDE_KICK
-        elif (my.h >= -160. and my.h < -20.):
-            print "RIGHT_SIDE"
-            return kicks.RIGHT_SIDE_KICK
-        else:
-            return self.chooseShortBackKick()
+        print "No Kick Chosen"
+        return None
+        # if (my.h <= 20. and my.h >= -20.):
+        #     return self.chooseDynamicKick()
+        # elif (my.h <= 160. and my.h > 20.):
+        #     print "LEFT_SIDE"
+        #     return kicks.LEFT_SIDE_KICK
+        # elif (my.h >= -160. and my.h < -20.):
+        #     print "RIGHT_SIDE"
+        #     return kicks.RIGHT_SIDE_KICK
+        # else:
+        #     return kicks.chooseShortBackKick(self)
 
     def chooseDynamicKick(self):
         ball = self.brain.ball

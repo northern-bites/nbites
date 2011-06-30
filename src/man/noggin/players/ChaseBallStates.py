@@ -145,7 +145,7 @@ def positionForKick(player):
         kick = player.brain.kickDecider.getKick()
 
         if kick is None:
-            player.angleToOrbit = player.brain.kickDecider.kickInfo.orbitAngle
+            player.angleToOrbit = player.brain.kickDecider.info.orbitAngle
             return player.goLater('orbitBall')
 
         player.inKickingState = True
