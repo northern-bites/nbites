@@ -306,7 +306,7 @@ READY_KICKOFF_OFFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y -
 # Use offset to leave room for chaser's feet/ room to position on the kick.
 READY_KICKOFF_CHASER_OFFSET = NogginConstants.CENTER_CIRCLE_RADIUS * 0.5
 READY_KICKOFF_CHASER_X = NogginConstants.CENTER_FIELD_X - READY_KICKOFF_CHASER_OFFSET
-READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
+READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y - 15 # near center
 
 # READY_NON_KICKOFF
 # ____________________
