@@ -36,6 +36,7 @@ public:
     void run();
     void stop();
     bool waitForImage();
+    bool releaseBuffer();
     void releaseImage(){}
     /**
      * Note: this method blocks until it gets a new image
@@ -65,7 +66,7 @@ private:
 #endif
 
     enum {
-        frameBufferCount = 3, /**< Amount of available frame buffers. */
+        frameBufferCount = 2, /**< Amount of available frame buffers. */
         WIDTH = 640, HEIGHT = 480, SIZE = WIDTH * HEIGHT * 2
     };
     int fd;

@@ -13,7 +13,6 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#define USE_USERPTR
 #ifdef USE_USERPTR
 #include <malloc.h> // memalign
 #endif
@@ -25,6 +24,7 @@
 #define __STRICT_ANSI__
 
 #include "ImageAcquisition.h"
+#include "Profiler.h"
 
 #ifndef V4L2_CID_AUTOEXPOSURE
 #  define V4L2_CID_AUTOEXPOSURE     (V4L2_CID_BASE+32)
@@ -157,10 +157,13 @@ void V4L2ImageTranscriber::run()
 
     struct timespec interval, remainder;
     while (Thread::running) {
+        PROF_ENTER(P_MAIN);
+        PROF_ENTER(P_GETIMAGE);
         //start timer
         const long long startTime = monotonic_micro_time();
 
         if (waitForImage()) {
+            PROF_EXIT(P_GETIMAGE);
             subscriber->notifyNextVisionImage();
         }
 
@@ -195,6 +198,8 @@ void V4L2ImageTranscriber::run()
 
             nanosleep(&interval, &remainder);
         }
+        PROF_EXIT(P_MAIN);
+        PROF_NFRAME();
     }
     Thread::trigger->off();
 }
@@ -207,23 +212,28 @@ void V4L2ImageTranscriber::stop()
 }
 
 bool V4L2ImageTranscriber::waitForImage() {
+    PROF_ENTER(P_DQBUF);
     this->captureNew();
-    //uint8_t* current_image = static_cast<uint8_t*>(mem[currentBuf->index]);
-    uint8_t* current_image = (uint8_t*) (currentBuf->m.userptr);
-    printf("currentBuf %lu \n", currentBuf->m.userptr);
+    PROF_EXIT(P_DQBUF);
+    uint8_t* current_image = static_cast<uint8_t*>(mem[currentBuf->index]);
     if (current_image) {
+        PROF_ENTER(P_ACQUIRE_IMAGE);
 #ifdef CAN_SAVE_FRAMES
-    _copy_image(image, naoImage);
-    ImageAcquisition::acquire_image_fast(table, params,
-            naoImage, image);
+        _copy_image(image, naoImage);
+        ImageAcquisition::acquire_image_fast(table, params,
+                naoImage, image);
 #else
-    unsigned long long startTime = monotonic_micro_time();
-    ImageAcquisition::acquire_image_fast(table, params,
-            current_image, image);
-    printf("Acquisition time %llu\n", monotonic_micro_time() - startTime);
+        ImageAcquisition::acquire_image_fast(table, params,
+                current_image, image);
 #endif
-    sensors->setImage(image);
-    return true;
+        PROF_EXIT(P_ACQUIRE_IMAGE);
+        PROF_ENTER(P_QBUF);
+        this->releaseBuffer();
+        PROF_EXIT(P_QBUF);
+        sensors->setImage(image);
+        return true;
+    } else {
+        printf("Warning - the buffer we dequeued was NULL\n");
     }
     return false;
 }
@@ -265,17 +275,9 @@ void V4L2ImageTranscriber::initTable(unsigned char* buffer)
 
 
 bool V4L2ImageTranscriber::captureNew() {
-    // requeue the buffer of the last captured image which is obsolete now
-    if (currentBuf) {
-        unsigned long long startTime = monotonic_micro_time();
-        CHECK_SUCCESS(ioctl(fd, VIDIOC_QBUF, currentBuf));
-        printf("QBUF time %llu\n", monotonic_micro_time() - startTime);
-    }
 
     // dequeue a frame buffer (this call blocks when there is no new image available) */
-    unsigned long long startTime = monotonic_micro_time();
     CHECK_SUCCESS(ioctl(fd, VIDIOC_DQBUF, buf));
-    printf("DQBUF time %llu\n", monotonic_micro_time() - startTime);
     //timeStamp = SystemCall::getCurrentSystemTime();
     //ASSERT(buf->bytesused == SIZE);
     currentBuf = buf;
@@ -286,6 +288,13 @@ bool V4L2ImageTranscriber::captureNew() {
         printf("Camera is working\n");
     }
 
+    return true;
+}
+
+bool V4L2ImageTranscriber::releaseBuffer() {
+    if (currentBuf) {
+        CHECK_SUCCESS(ioctl(fd, VIDIOC_QBUF, currentBuf));
+    }
     return true;
 }
 
@@ -522,8 +531,6 @@ void V4L2ImageTranscriber::initQueueAllBuffers() {
         buf->memory = V4L2_MEMORY_MMAP;
 #endif
         CHECK_SUCCESS(ioctl(fd, VIDIOC_QBUF, buf));
-        CHECK_SUCCESS(ioctl(fd, VIDIOC_QUERYBUF, buf));
-        printf("querybuf : %lu\n", (long unsigned) buf->m.userptr);
     }
 }
 

@@ -72,7 +72,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 
 #ifdef USE_TIME_PROFILING
   profiler->profiling = true;
-  profiler->profileFrames(1400);
+  profiler->profileFrames(600);
 #endif
   // give python a pointer to the sensors structure. Method defined in
   // Sensors.h

@@ -11,6 +11,10 @@
 static const char *PCOMPONENT_NAMES[] = {
   "Main Loop",
   "GetImage",
+  "Dequeue buf",
+  "Acquire image",
+  "Queue buf",
+
   "Vision",
   "Transform",
   "ThreshRuns",
@@ -74,6 +78,10 @@ static const char *PCOMPONENT_NAMES[] = {
 static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_MAIN                    --> */ P_TOTAL,
 	/*P_GETIMAGE				--> */ P_MAIN,
+	/*P_DQBUF                   --> */ P_GETIMAGE,
+	/*P_ACQUIRE_IMAGE           --> */ P_GETIMAGE,
+	/*P_QBUF                    --> */ P_GETIMAGE,
+
 	/*P_VISION					--> */ P_MAIN,
 	/*P_TRANSFORM				--> */ P_VISION,
 	/*P_THRESHRUNS				--> */ P_VISION,
