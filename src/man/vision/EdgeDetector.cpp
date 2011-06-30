@@ -11,7 +11,7 @@ extern "C" void _sobel_operator(int bound,
                                 uint16_t *out);
 extern "C" int _find_edge_peaks(int bound,
                                 const uint16_t *gradients,
-                                Gradient::AnglePeak *angles);
+                                AnglePeak *angles);
 using boost::shared_ptr;
 using namespace std;
 

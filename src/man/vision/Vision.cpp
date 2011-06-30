@@ -591,8 +591,12 @@ void Vision::drawVisualLines(const vector<VisualLine>& lines)
     if (thresh->debugVisualLines){
         vector<VisualLine>::const_iterator line;
         for (line = lines.begin(); line != lines.end(); line++){
-            drawLine(line->tr, line->tl, MAROON);
-            drawLine(line->br, line->bl, MAROON);
+            drawLine(line->getTopRightEndpoint(),
+                     line->getTopLeftEndpoint(),
+                     POWDER_BLUE);
+            drawLine(line->getBottomRightEndpoint(),
+                     line->getBottomLeftEndpoint(),
+                     POWDER_BLUE);
         }
     }
 #endif

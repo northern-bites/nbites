@@ -1,9 +1,9 @@
 #ifndef _HoughLine_h_DEFINED
 #define _HoughLine_h_DEFINED
 
-#include <ostream>
-#include <cmath>
-
+#include <iostream>
+#include <math.h>
+#include "Gradient.h"
 
 /**
  * A line defined in polar coordinates, also storing information from the
@@ -40,6 +40,30 @@ public:
         return cosT;
     }
 
+    inline bool isOnLine(const AnglePeak& a) const {
+        if (abs(a.angle - tIndex) < acceptable_angle_diff){
+
+            float rTemp = r;
+            float cs = getCosT();
+            float sn = getSinT();
+            if (rTemp < 0){
+                rTemp = -rTemp;
+                cs = -cs;
+                sn = -sn;
+            }
+
+            // Find dot product of (cosT, sinT) and (pt.x, pt.y)
+            float dot = (cs * static_cast<float>(a.x) +
+                         sn * static_cast<float>(a.y));
+
+            // Difference from r is its magnitude from the line
+            float diff = std::abs(dot - rTemp);
+            return diff < acceptable_xy_diff;
+        }
+
+        return false;
+    }
+
     static bool intersect(int x0, int y0,
                           const HoughLine& a, const HoughLine& b);
     friend std::ostream& operator<< (std::ostream &o,
@@ -61,6 +85,11 @@ private:
 
     mutable float sinT, cosT;   // These get computed on the fly, if needed
     mutable bool didSin, didCos;
+
+    enum {
+        acceptable_angle_diff = 5,
+        acceptable_xy_diff = 5,
+    };
 };
 
 #endif /* _HoughLine_h_DEFINED */

@@ -1,9 +1,12 @@
+#include "VisualLine.h"
 
 #include <algorithm>    // for sort()
 #include <cstdlib>      // git rid of overloaded abs() errors
 #include "NBMath.h"
+#include "ActiveArray.h"
 
-#include "VisualLine.h"
+// #define DEBUG_VISUAL_LINE
+
 using namespace std;
 
 // Return true if y is higher in the image (towards 0)
@@ -17,104 +20,136 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 VisualLine::VisualLine(const HoughLine& a,
                        const HoughLine& b,
                        const Gradient& g) :
-    VisualLandmark<lineID>(UNKNOWN_LINE)
+    VisualLandmark<lineID>(UNKNOWN_LINE), hLine1(a), hLine2(b)
 {
     findEndpoints(a,b,g);
-    findDimensions();
-    find3DCoords();
+    // findDimensions();
+    // find3DCoords();
 }
 
 /**
- * Find the endpoints of the line from the given HoughLines.
- *
+ * Find the endpoints of the line from the gradient
  */
 void VisualLine::findEndpoints(const HoughLine& a,
                                const HoughLine& b,
                                const Gradient& g)
 {
-    // Find the line (of the pair) which is above (in the image) the other one
-    const HoughLine& top = (a.getSinT() * a.getRadius() <
-                            b.getSinT() * b.getRadius()) ? a : b;
-    const HoughLine& bottom = (top == a) ? b : a;
+    PointsPair aEnds = findHoughLineEndpoints(a,g);
+    PointsPair bEnds = findHoughLineEndpoints(b,g);
 
-    findLineEdgeEnds(top, g, tr, tl);
-    findLineEdgeEnds(bottom, g, br, bl);
+    setDirectionalEndpoints(aEnds, bEnds);
+    trimEndpoints();
 }
 
-void VisualLine::findLineEdgeEnds(const HoughLine& line, const Gradient& g,
-                                 point<int>& r, point<int>& l)
+VisualLine::PointsPair
+VisualLine::findHoughLineEndpoints(const HoughLine& l,
+                                   const Gradient& g)
 {
-    // Search along line from one end to other keeping track of last
-    // runs of edge points. Look for start, then end runs.
-    double u1 = 0, u2 = 0;
-    HoughLine::findLineImageIntersects(line, u1, u2);
+    // If it had a point at every pixel from corner to corner, it
+    // works out to 400
+    ActiveArray<AnglePeak> pts(400);
 
-    const double x0 = line.getRadius() * line.getCosT() + IMAGE_WIDTH/2;
-    const double y0 = line.getRadius() * line.getSinT() + IMAGE_HEIGHT/2;
-
-    const double cs = -line.getCosT();
-    const double sn = line.getSinT();
-
-    int edgeStreak = 0;
-    bool foundStart = false, foundEnd = false;
-
-    // Iterate across entire line
-    double u;
-    int outX, outY;
-    for(u=u1; u <= u2; u += 1.0){
-        double x = x0 + u * sn;
-        double y = y0 + u * cs;
-
-        // Look for first edge points in direction of line
-        if (isLineEdge(line, g, x, y, outX, outY)){
-            edgeStreak = max(1, edgeStreak+1);
-
-            // Mark first long streak
-            if (edgeStreak >= edge_pts_for_line){
-                foundEnd = false;
-
-                if (!foundStart){
-                    foundStart = true;
-
-                    // Mark it (we'll correct ordering later)
-                    // note: we want it to be the first point in the streak
-                    r.x = outX; //static_cast<int>((u-2.) * sn + x0);
-                    r.y = outY; //static_cast<int>((u-2.) * cs + y0);
-                }
-            }
-        } else {
-            // Keep track of negative streaks too
-            edgeStreak = min(-1, edgeStreak-1);
-
-            // Look for last edge points in a row
-            if (foundStart && !foundEnd &&
-                edgeStreak <= -edge_pts_for_line){
-                foundEnd = true;
-
-                // Mark end of line segment
-                l.x = outX;//static_cast<int>((u-2.) * sn + x0);
-                l.y = outY;//static_cast<int>((u-2.) * cs + y0);
-            }
+    // Scan through the gradient's edges
+    for (int i = 0; g.isPeak(i); ++i) {
+        // Find points which lie on the HoughLine
+        // Add them to the ActiveArray
+        if ( l.isOnLine(g.angles[i]) ){
+            pts.add(g.angles[i]);
         }
     }
 
-    if (!foundEnd){
-        // Mark end of line segment
-        l.x = outX; // static_cast<int>((u-2.) * sn + x0);
-        l.y = outY; static_cast<int>((u-2.) * cs + y0);
+    // Eliminate five percent of the points on each side
+    int numToDelete = max(pts.size() / 20, 1);
+
+    // Package and return endpoints
+    point<int> endA(pts[numToDelete].x + IMAGE_WIDTH/2,
+                    pts[numToDelete].y + IMAGE_HEIGHT/2);
+
+    point<int> endB(pts[pts.size() - numToDelete -1].x + IMAGE_WIDTH/2,
+                    pts[pts.size() - numToDelete -1].y + IMAGE_HEIGHT/2);
+
+    return PointsPair(endA, endB);
+}
+
+/**
+ * Assign the various endpoints of the visual line
+ */
+void VisualLine::setDirectionalEndpoints(const PointsPair& a,
+                                         const PointsPair& b )
+{
+    const PointsPair* top, *bottom;
+
+    // Y is inverted (top is actually the lesser of the two for human
+    // viewing purposes)
+    if (a.first.y < b.first.y){
+        top    = &a;
+        bottom = &b;
+    } else {
+        top    = &b;
+        bottom = &a;
     }
 
-    // Put points in the correct order
-    if (r.x < l.x){
-        swap(r,l);
+    if (top->first.x < top->second.x){
+        tl = top->first;
+        tr = top->second;
+    } else {
+        tl = top->second;
+        tr = top->first;
+    }
+
+    if (bottom->first.x < bottom->second.x){
+        bl = bottom->first;
+        br = bottom->second;
+    } else {
+        bl = bottom->second;
+        br = bottom->first;
+    }
+}
+
+/**
+ * Trim the two lines outlining the VisualLine to be of roughly the same length
+ */
+void VisualLine::trimEndpoints()
+{
+    // We find the closest point on the bottom line to the top right
+    // point. If that point is between the bottom endpoints, it means
+    // the bottom line is longer and should be truncated. We truncate
+    // it to the intersection point.
+
+
+    // Truncate the right side
+    point<int> perp = Utility::getClosestPointOnLine(tr, bl, br);
+    if (Utility::between(perp, bl, br)){
+        br = perp;
+    } else {
+        perp = Utility::getClosestPointOnLine(br, tl, tr);
+
+        if (!Utility::between(perp, tl, tr)){
+
+#ifdef DEBUG_VISUAL_LINE
+            cout << "The sides of this line don't overlap. Throwing away."
+                 << endl;
+#endif
+                // Set line to bad.
+
+                return;
+        }
+
+        tr = perp;
+    }
+
+    // Truncate the left side
+    perp = Utility::getClosestPointOnLine(tl, bl, br);
+    if (Utility::between(perp, bl, br)){
+        bl = perp;
+    } else {
+        tl = Utility::getClosestPointOnLine(bl, tl, tr);
     }
 }
 
 /**
  * Find various line dimensions:
- *                            - Height
- *                            - Width
- *                            - Length
+ *                            - Angle
  */
 void VisualLine::findDimensions()
 {
@@ -208,7 +243,6 @@ VisualLine::VisualLine(list<linePoint> &linePoints)
 
 VisualLine::VisualLine(const VisualLine& other)
     : VisualLandmark<lineID>(other),
-      tr(other.tr), tl(other.tl), br(other.br), bl(other.bl),
       start(other.start), end(other.end), leftBound(other.leftBound),
       rightBound(other.rightBound),
       bottomBound(other.bottomBound),
@@ -226,7 +260,8 @@ VisualLine::VisualLine(const VisualLine& other)
       distance(other.getDistance()), bearing(other.getBearing()),
       distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
       ccLine(other.getCCLine()),
-      possibleLines(other.getPossibleLines())
+      possibleLines(other.getPossibleLines()),
+      tr(other.tr), tl(other.tl), br(other.br), bl(other.bl)
 {
 }
 

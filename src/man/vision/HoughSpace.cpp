@@ -9,11 +9,11 @@ const int HoughSpace::drTab[peak_points] = {  1,  1,  0, -1 };
 const int HoughSpace::dtTab[peak_points] = {  0,  1,  1,  1 };
 
 extern "C" void _mark_edges(int numPeaks, int angleSpread,
-                            Gradient::AnglePeak *peaks, uint16_t *houghSpace);
+                            AnglePeak *peaks, uint16_t *houghSpace);
 extern "C" void _smooth_hough(uint16_t *hs, uint32_t threshold);
 
 extern "C" void _houghMain(uint16_t* hs,
-                           Gradient::AnglePeak* edges, int numEdges);
+                           AnglePeak* edges, int numEdges);
 
 HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
     profiler(p),

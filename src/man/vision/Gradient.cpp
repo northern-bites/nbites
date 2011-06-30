@@ -137,8 +137,8 @@ void Gradient::createSegment(const point<int>& l,
 
     float length = Utility::getLength(l,r);
 
-    float xDiff = (r.x - l.x)/length;
-    float yDiff = (r.y - l.y)/length;
+    float xDiff = static_cast<float>(r.x - l.x)/length;
+    float yDiff = static_cast<float>(r.y - l.y)/length;
 
     for (double u = 0; u <= length; u+=1.){
         int x = (int)round(x0 + u * xDiff);
