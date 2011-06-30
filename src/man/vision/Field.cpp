@@ -534,6 +534,10 @@ void Field::bestShot(VisualFieldObject* left,
  */
 
 int Field::horizonAt(int x) {
+	if (x < 0 || x >= IMAGE_WIDTH) {
+		cout << "Problem in horizon " << x << endl;
+		return 0;
+	}
 	return topEdge[x];
 	//return yProject(0, horizon, x);
 }
