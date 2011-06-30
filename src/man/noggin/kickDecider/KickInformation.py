@@ -43,7 +43,7 @@ class KickInformation:
         self.kickDest = None
         self.destDist = 500.
 
-        self.orbitAngle = 0.0
+        self.orbitAngle = 180
 
     def getKickObjective(self):
         """
