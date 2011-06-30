@@ -1,8 +1,8 @@
 import man.motion.SweetMoves as SweetMoves
 from .. import NogginConstants as FC
 from math import hypot
+from ..typeDefs.Location import RobotLocation
 
-POINTS_FILE = "/media/userdata/points.cfg"
 GOTO_POINTS = [(FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING),
                (FC.OPP_GOALBOX_LEFT_X, FC.FIELD_HEIGHT*0.75, FC.MY_GOAL_HEADING),
                (FC.OPP_GOALBOX_LEFT_X, FC.FIELD_HEIGHT*0.25, FC.MY_GOAL_HEADING),
@@ -24,20 +24,17 @@ def getNextPoint(player):
     closestPoint = [0,0]
     minDist = 1000000.
 
-    for x in player.GOTO_POINTS:
+    for x in GOTO_POINTS:
         d = hypot(player.brain.my.x - x[0],
                   player.brain.my.y - x[1])
         if d < minDist:
             minDist = d
             closestPoint = x
 
-    player.GOTO_POINTS.remove(closestPoint)
+    GOTO_POINTS.remove(closestPoint)
     return closestPoint
 
 def gamePlaying(player):
-    f = open(POINTS_FILE, 'r')
-    player.GOTO_POINTS = [convertCoords(x) for x in
-                          [[float(i) for i in l.split()] for l in f.readlines()]]
     player.goToPoint = getNextPoint(player)
     player.goToCounter = 0
     return player.goNow('goToPoint')
@@ -45,7 +42,10 @@ def gamePlaying(player):
 def goToPoint(player):
     if player.firstFrame():
         player.brain.tracker.locPans()
-        player.brain.nav.goTo(getNextPoint(player))
+
+        pt = getNextPoint(player)
+        dest = RobotLocation(pt[0], pt[1], pt[2])
+        player.brain.nav.goTo(dest)
     if player.brain.nav.isStopped() and not player.firstFrame():
         return player.goLater('atPoint')
 
