@@ -150,8 +150,8 @@ class TeamMember(RobotLocation):
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time base is " + str(t))
 
-        # Give a penalty for not seeing the ball
-        if not self.brain.ball.on:
+        # Give a penalty for not seeing the ball if we aren't in a kickingState
+        if not self.brain.ball.on and not self.brain.player.inKickingState:
             t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
