@@ -144,7 +144,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
             sensors_vector[15], sensors_vector[16], sensors_vector[17],
             sensors_vector[18]);
     sensors->setUltraSound(sensors_vector[19], sensors_vector[20]);
-    sensors->setSupportFoot(sensors_vector[21]);
+    sensors->setSupportFoot(static_cast<SupportFoot>(sensors_vector[21]));
 
 
     // Clear the debug image on which the vision algorithm can draw
