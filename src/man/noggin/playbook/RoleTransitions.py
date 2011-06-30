@@ -37,12 +37,14 @@ def shouldNotSave(team):
     if (ball.relAccX < 0.5 and ball.heat == 0):
         team.shouldStopSaveCounter += 1
         if team.shouldStopSaveCounter > 30:
+            team.brain.player.isSaving = False
             team.resetGoalieRoleCounters()
             return True
 
     elif (ball.inMyGoalBox() and ball.relAccX < 0.5):
         team.shouldStopSaveCounter += 1
         if team.shouldStopSaveCounter > 30:
+            team.brain.player.isSaving = False
             team.resetGoalieRoleCounters()
             return True
 

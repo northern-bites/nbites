@@ -47,9 +47,10 @@ def rGoalie(team, workingPlay):
 
     # Saving
     elif workingPlay.isSubRole(PBConstants.GOALIE_SAVE):
-        #if RoleTran.shouldNotSave(team):
-            #SubRoles.pGoalieCenter(team, workingPlay)
-        if (team.brain.player.isSaving):
+        if RoleTran.shouldNotSave(team):
+            print "15"
+            SubRoles.pGoalieCenter(team, workingPlay)
+        elif (team.brain.player.isSaving):
             print "6"
             SubRoles.pGoalieSave(team, workingPlay)
         elif RoleTran.shouldChase(team):
