@@ -29,7 +29,6 @@
 
 #include "SensorDef.h"
 #include "SensorConfigs.h"
-#include "NaoDef.h"
 #include "VisionDef.h"
 #include "Provider.h"
 #include "Speech.h"

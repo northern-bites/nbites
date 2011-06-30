@@ -50,10 +50,11 @@ int Sensors::saved_frames = 0;
 
 Sensors::Sensors (boost::shared_ptr<Speech> s)
     : speech(s),
-      bodyAngles(NUM_ACTUATORS), visionBodyAngles(NUM_ACTUATORS),
-      motionBodyAngles(NUM_ACTUATORS),
-      bodyAnglesError(NUM_ACTUATORS),
-      bodyTemperatures(NUM_ACTUATORS,0.0f),
+      bodyAngles(Kinematics::NUM_JOINTS),
+      visionBodyAngles(Kinematics::NUM_JOINTS),
+      motionBodyAngles(Kinematics::NUM_JOINTS),
+      bodyAnglesError(Kinematics::NUM_JOINTS),
+      bodyTemperatures(Kinematics::NUM_JOINTS,0.0f),
       leftFootFSR(),
       rightFootFSR(leftFootFSR),
       leftFootBumper(0.0f, 0.0f),
@@ -1011,7 +1012,7 @@ void Sensors::loadFrame(string path)
     vector<float> vba;
 
     // Read in the body angles
-    for (unsigned int i = 0; i < NUM_ACTUATORS; ++i) {
+    for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; ++i) {
         fin >> v;
         vba += v;
     }
