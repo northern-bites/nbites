@@ -36,29 +36,30 @@
 #  define MUTEX_INIT errchkmutex
 #endif
 
+class mutex {
+public:
+    mutex(std::string name);
+    virtual ~mutex();
+
+    void lock();
+    void unlock();
+private:
+    mutable pthread_mutex_t my_mutex;
+    std::string name;
+};
+
 class multi_mutex {
 protected:
     typedef std::vector<pthread_mutex_t*> mutex_vector;
 public:
-    multi_mutex() {}
-    multi_mutex(pthread_mutex_t* mutex_array[]) :
-        mutices(mutex_array,
-                mutex_array + sizeof(mutex_array) / sizeof(pthread_mutex_t*)){
-    }
-    void lock() {
-        for (mutex_vector::iterator i = mutices.begin();
-                i != mutices.end(); i++) {
-            pthread_mutex_lock(*i);
-        }
-    }
-    void unlock() {
-        for (mutex_vector::reverse_iterator i = mutices.rbegin();
-                i != mutices.rend(); i++) {
-            pthread_mutex_unlock(*i);
-        }
-    }
+    multi_mutex(pthread_mutex_t* mutex_array[], std::string name);
+    virtual ~multi_mutex(){}
+
+    void lock();
+    void unlock();
 private:
     mutex_vector mutices;
+    std::string name;
 };
 
 struct MutexDeleter

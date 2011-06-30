@@ -34,6 +34,52 @@ using namespace boost;
 #  define DEBUG_THREAD_EXIT
 #endif
 
+#define DEBUG_MUTEX
+
+mutex::mutex(std::string name) : name(name){
+    pthread_mutex_init(&my_mutex, NULL);
+}
+mutex::~mutex() {
+    pthread_mutex_destroy(&my_mutex);
+}
+void mutex::lock() {
+#ifdef DEBUG_MUTEX
+    cout << "Trying to lock" << name << endl;
+#endif
+    pthread_mutex_lock(&my_mutex);
+}
+void mutex::unlock() {
+#ifdef DEBUG_MUTEX
+    cout << "Unlocking " << name << endl;
+#endif
+    pthread_mutex_unlock(&my_mutex);
+}
+
+//multi_mutex
+
+multi_mutex::multi_mutex(pthread_mutex_t* mutex_array[], std::string name) :
+                mutices(mutex_array,
+                        mutex_array + sizeof(mutex_array) / sizeof(pthread_mutex_t*)),
+                name(name){}
+void multi_mutex::lock() {
+#ifdef DEBUG_MUTEX
+    cout << "Trying to lock multi_mutex " << name << endl;
+#endif
+    for (mutex_vector::iterator i = mutices.begin();
+            i != mutices.end(); i++) {
+        pthread_mutex_lock(*i);
+    }
+}
+void multi_mutex::unlock() {
+#ifdef DEBUG_MUTEX
+    cout << "Unlocking multi_mutex " << name << endl;
+#endif
+    for (mutex_vector::reverse_iterator i = mutices.rbegin();
+            i != mutices.rend(); i++) {
+        pthread_mutex_unlock(*i);
+    }
+}
+
 Event::Event (string _name)
   : name(_name), signalled(false)
 {
