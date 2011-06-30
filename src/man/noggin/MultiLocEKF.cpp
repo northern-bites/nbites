@@ -571,8 +571,14 @@ void MultiLocEKF::incorporateCorner(int index,
 
     // The jacobian's denomitator
     // Clipped to prevent sqrt of negative
-    float denom = sqrt( max(1 - ((dot_prod * dot_prod) /
-                                 (pt_dist*pt_dist)), 0.0f));
+    float denom = 1 - ((dot_prod * dot_prod) / (pt_dist*pt_dist));
+
+    if (denom < 0){
+        denom = 0.001;
+    } else {
+        denom = sqrtf(denom);
+    }
+
     float sign = copysignf(1.0f, dot_sign);
 
     // Derivatives of orientation with respect to x,y,h
