@@ -425,50 +425,6 @@ const float Sensors::getBatteryCurrent () const
     return current;
 }
 
-const vector<float> Sensors::getAllSensors () const
-{
-    //All sensors sans unfiltered Inertials and Temperatures
-    //and the chest button preses
-    pthread_mutex_lock (&fsr_mutex);
-    pthread_mutex_lock (&button_mutex);
-    pthread_mutex_lock (&inertial_mutex);
-    pthread_mutex_lock (&ultra_sound_mutex);
-    pthread_mutex_lock (&support_foot_mutex);
-
-    vector<float> allSensors;
-
-    // write the FSR values
-    allSensors += leftFootFSR.frontLeft, leftFootFSR.frontRight,
-        leftFootFSR.rearLeft, leftFootFSR.rearRight,
-        rightFootFSR.frontLeft, rightFootFSR.frontRight,
-        rightFootFSR.rearLeft, rightFootFSR.rearRight;
-
-    // write the foot bumper values
-    allSensors += static_cast<float>(leftFootBumper.left),
-        static_cast<float>(leftFootBumper.right),
-        static_cast<float>(rightFootBumper.left),
-        static_cast<float>(rightFootBumper.right);
-
-    // write the accelerometers + gyros + filtered angleX and angleY
-    allSensors += inertial.accX, inertial.accY, inertial.accZ,
-        inertial.gyrX, inertial.gyrY,
-        inertial.angleX, inertial.angleY;
-
-    // write the ultrasound values
-    allSensors += ultraSoundDistanceLeft;
-    allSensors += ultraSoundDistanceRight;
-
-    allSensors += supportFoot;
-
-    pthread_mutex_unlock (&support_foot_mutex);
-    pthread_mutex_unlock (&fsr_mutex);
-    pthread_mutex_unlock (&button_mutex);
-    pthread_mutex_unlock (&inertial_mutex);
-    pthread_mutex_unlock (&ultra_sound_mutex);
-
-    return allSensors;
-}
-
 void Sensors::setBodyAngles (const vector<float>& v)
 {
     pthread_mutex_lock (&angles_mutex);
@@ -711,57 +667,6 @@ void Sensors::setVisionSensors (const FootBumper &_leftBumper,
     pthread_mutex_unlock (&battery_mutex);
     this->notifySubscribers(NEW_VISION_SENSORS);
 }
-
-void Sensors::setAllSensors (vector<float> sensorValues) {
-    //All sensors sans unfiltered Inertials and Temperatures
-    //and the chest button preses
-    pthread_mutex_lock (&fsr_mutex);
-    pthread_mutex_lock (&button_mutex);
-    pthread_mutex_lock (&inertial_mutex);
-    pthread_mutex_lock (&ultra_sound_mutex);
-    pthread_mutex_lock (&support_foot_mutex);
-
-    // we have to be EXTRA careful about this order. If someone can think of
-    // a better way to assign these so that it's checked at compile time
-    // please do!
-
-    // foot force sensors
-    leftFootFSR = FSR(sensorValues[FSR_LEFT_F_L], sensorValues[FSR_LEFT_F_R],
-                      sensorValues[FSR_LEFT_B_L], sensorValues[FSR_LEFT_B_R]);
-    rightFootFSR = FSR(sensorValues[FSR_RIGHT_F_L], sensorValues[FSR_RIGHT_F_R],
-                       sensorValues[FSR_RIGHT_B_L], sensorValues[FSR_RIGHT_B_R]);
-
-    // foot bumpers
-    leftFootBumper = FootBumper(sensorValues[BUMPER_LEFT_L],
-                                sensorValues[BUMPER_LEFT_R]);
-    rightFootBumper = FootBumper(sensorValues[BUMPER_RIGHT_L],
-                                 sensorValues[BUMPER_RIGHT_R]);
-
-    inertial = Inertial(sensorValues[ACC_X], // accelerometers
-                        sensorValues[ACC_Y],
-                        sensorValues[ACC_Z],
-                        sensorValues[GYRO_X],  // gyros
-                        sensorValues[GYRO_Y],
-                        sensorValues[ANGLE_X], // angleX/angleY
-                        sensorValues[ANGLE_Y]);
-
-    // sonar
-    ultraSoundDistanceLeft = sensorValues[SONAR_LEFT];
-    ultraSoundDistanceRight = sensorValues[SONAR_RIGHT];
-
-    supportFoot =
-        static_cast<SupportFoot>(static_cast<int>(sensorValues[SUPPORT_FOOT]));
-
-    updateMotionDataVariance();
-    updateVisionDataVariance();
-
-    pthread_mutex_unlock (&support_foot_mutex);
-    pthread_mutex_unlock (&ultra_sound_mutex);
-    pthread_mutex_unlock (&inertial_mutex);
-    pthread_mutex_unlock (&button_mutex);
-    pthread_mutex_unlock (&fsr_mutex);
-}
-
 
 void Sensors::lockImage() const
 {
