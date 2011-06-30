@@ -1,3 +1,4 @@
+import kicks
 import KickingConstants as constants
 from .. import NogginConstants
 from ..typeDefs.Location import Location
@@ -140,5 +141,9 @@ class KickInformation:
             bestDest = dest
         return bestDest
 
-    def bestAlignedKick(self):
+    def bestAlignedKick(self, dest):
+        """
+        Assumes all kicks can get to the specified param 'dest'. Chooses
+        Best kick based on alignment (i.e. least cost in real time)
+        """
         

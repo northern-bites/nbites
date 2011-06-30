@@ -36,6 +36,7 @@ class KickDecider(object):
         returns the sweet move required for motion to kick
         """
         kick = self.info.kick
+        # TODO make this check unneccessary by making all kicks dynamic.
         if kick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
                 kick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
             ball = self.brain.ball
@@ -105,7 +106,10 @@ class KickDecider(object):
                                               constants.SHOOT_LEFT_AIM_POINT])
 
         # Next we want to find the best kick that will hit that point.
-        direction = self.info.bestAlignedKick()
+        # Since we know any kick will score, we don't have to worry about
+        # any range determinations.
+
+        kick = self.info.bestAlignedKick(kickDest)
 
 
         """

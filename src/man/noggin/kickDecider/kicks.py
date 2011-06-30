@@ -10,6 +10,7 @@ class Kick(object):
         self.y_offset = y
         self.heading = h
         self.sweetMove = move
+        self.moveTime = SweetMoves.getMoveTime(self.sweetMove)
 
     def getPosition(self):
         """returns all position info as a tuple"""
@@ -25,6 +26,7 @@ RIGHT_SIDE_KICK = Kick(x = 12, y = -5, move=SweetMoves.DREW_RIGHT_SIDE_KICK)
 RIGHT_DYNAMIC_STRAIGHT_KICK = Kick(y = -8, move=SweetMoves.DREW_KICK)
 LEFT_DYNAMIC_STRAIGHT_KICK =  Kick(y =  8, move=SweetMoves.DREW_KICK)
 
+# TODO ! make a null kick here.
 CENTER_KICK_POSITION = Kick(x = DEFAULT_KICK_X_OFFSET + 5, y = 0)
 
 LEFT_LONG_BACK_KICK =  Kick(x = 12.5, y =  6.5, move=SweetMoves.LEFT_LONG_BACK_KICK)
@@ -37,3 +39,22 @@ SHORT_QUICK_LEFT_KICK =  Kick(x = DEFAULT_KICK_X_OFFSET, y = 5,
                               move = SweetMoves.SHORT_QUICK_LEFT_KICK)
 SHORT_QUICK_RIGHT_KICK =  Kick(x = DEFAULT_KICK_X_OFFSET, y = -5,
                                move = SweetMoves.SHORT_QUICK_RIGHT_KICK)
+
+#*****************#
+# Range Constants #
+#*****************#
+"""
+Add your own range constants if you have a new kick, or update them
+if you change the kick. These are maximum ranges in centimeters.
+"""
+
+# TODO! make these accurate.
+SIDE_KICK_RANGE = 150.
+
+DYNAMIC_STRAIGHT_KICK_RANGE = 300.
+
+LONG_BACK_KICK_RANGE = 500.
+
+SHORT_BACK_KICK_RANGE = 200.
+
+SHORT_QUICK_KICK_RANGE = 200.
