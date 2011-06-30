@@ -1,7 +1,6 @@
 import kicks
 import KickingConstants as constants
 from .. import NogginConstants
-from ..typeDefs.Location import Location
 from ..util import MyMath
 from math import fabs
 """
@@ -16,18 +15,15 @@ class KickInformation:
         self.brain = brain
 
         # Stores the kicks in a dictionary before setting the kick field.
-        self.kickChoices = {"scoringKick"   : None,
-                            "passingKick"   : None,
-                            "clearingKick"  : None,
-                            # "AdvancingKick" : None,
-                            # "CrossingKick"  : None,
-                            "PassBackKick"  : None, }
+        self.kickChoices = {'scoringKick'   : None,
+                            'passingKick'   : None,
+                            'clearingKick'  : None,
+                            # 'AdvancingKick' : None,
+                            # 'CrossingKick'  : None,
+                            'PassBackKick'  : None, }
         self.passingTeammate = None     # Teammate to pass to.
         self.kickObjective = None
         self.kick = None
-        self.kickDest = None # put in kick
-        self.destDist = 0.0       # put in kick
-        self.orbitAngle = 0.0      # put in kick
 
     def canScoreAll(self):
         return (self.brain.ball.distTo(constants.SHOOT_LEFT_AIM_POINT) <
@@ -70,7 +66,6 @@ class KickInformation:
         bestMate = None
         minDist = NogginConstants.FIELD_WIDTH
         for mate in teammates:
-            # TODO: check if mate is in our kicking range.
             if mate.distTo(constants.CENTER_BALL_POINT) < minDist:
                 minDist = mate.distTo(constants.CENTER_BALL_POINT)
                 bestMate = mate
@@ -117,6 +112,7 @@ class KickInformation:
         # calculations are harder --Wils (6/28/11)
         forwardMates = []
         for mate in self.brain.teamMembers:
+            # TODO: make sure mate is in our range.
             if mate.x > self.brain.my.x:
                 forwardMates.append(mate)
         return forwardMates
@@ -164,13 +160,16 @@ class KickInformation:
         elif (fabs(rotatedHeading) < constants.BACK_KICK_ALIGNMENT_BEARING):
             if MyMath.sign(rotatedHeading) == -1:
                 kick = kicks.LEFT_SIDE_KICK
-                kick.heading = ball.headingTo(dest) + 90
+                kick.heading = MyMath.sub180Angle(ball.headingTo(dest) + 90)
             else:
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.heading = ball.headingTo(dest) - 90
+                kick.heading = MyMath.sub180Angle(ball.headingTo(dest) - 90)
         else:
             kick = self.chooseBackKick()
-            kick.heading = ball.headingTo(dest) -180
+            kick.heading = MyMath.sub180Angle(ball.headingTo(dest) + 180)
+
+        kick.dest = dest
+        return kick
 
 
 
@@ -183,3 +182,13 @@ class KickInformation:
             return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
         else:
             return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+
+    def chooseBackKick(self):
+        """
+        Picks the back kick based on which foot is closer to center field.
+        This way, we minimize the chance of kicking out of bounds.
+        """
+        if self.brain.my.y > NogginConstants.CENTER_FIELD_Y:
+            return kicks.LEFT_SHORT_BACK_KICK
+        else:
+            return kicks.RIGHT_SHORT_BACK_KICK

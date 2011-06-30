@@ -5,11 +5,12 @@ class Kick(object):
     """
     stores everything we need to know for a given kick
     """
-    def __init__(self, x=DEFAULT_KICK_X_OFFSET, y=0, h=0, move=None):
+    def __init__(self, x=DEFAULT_KICK_X_OFFSET, y=0, h=0, move=None, dest = None):
         self.x_offset = x
         self.y_offset = y
         self.heading = h           # set manually.
         self.sweetMove = move
+        self.dest = dest           # set manually.
         self.moveTime = SweetMoves.getMoveTime(self.sweetMove)
 
     def getPosition(self):
@@ -17,9 +18,11 @@ class Kick(object):
         return (self.x_offset, self.y_offset, self.heading)
 
     def __str__(self):
-        return ("x_offset: %g y_offset: %g heading: %g" %
-                (self.x_offset, self.y_offset, self.heading))
-# Some standard kicks. x,y and move should not be modified, h will be
+        return ("x_offset: %g y_offset: %g heading: %g ==> dest: %s" %
+                (self.x_offset, self.y_offset, self.heading, self.dest))
+
+# Some standard kicks. x,y and move should not be modified unless you change
+# the sweetMove.  Heading will be modified when the kick is constructed.
 LEFT_SIDE_KICK =  Kick(x = 12, y =  5, move=SweetMoves.DREW_LEFT_SIDE_KICK)
 RIGHT_SIDE_KICK = Kick(x = 12, y = -5, move=SweetMoves.DREW_RIGHT_SIDE_KICK)
 

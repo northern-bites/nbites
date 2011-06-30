@@ -71,11 +71,11 @@ class KickDecider(object):
 
     def decideKick(self):
         """
-        using objective and heuristics and localization determines best kick
+        using objective and heuristics and localization determines/returns best kick
         """
         # Check localization to make sure it's good enough.
         if self.brain.my.locScore != NogginConstants.GOOD_LOC:
-            self.info.kick = None
+            self.info.kick = None # TODO set this to "Null Kick" for orbiting.
             return
 
         if self.info.canScoreAll():
@@ -88,10 +88,16 @@ class KickDecider(object):
             self.choosePassingKick()
         if self.info.canClear():
             self.chooseClearingKick()
+        """Don't use these for now. just clearing is simpler??"""
+        #if self.info.canAdvance():
+        #    self.chooseAdvancingKick()
+        #if self.info.canCross():
+        #    self.chooseCrossingKick()
         if self.info.canPassBack():
             self.choosePassBackKick()
 
         self.info.kick = self.chooseKick()
+        return self.info.kick
 
     def score(self):
         """
@@ -109,20 +115,43 @@ class KickDecider(object):
         # Since we know any kick will score, we don't have to worry about
         # any range determinations.
 
-        kickDirection = self.info.bestAlignedKickDirection(kickDest)
+        self.info.kickChoices['scoringKick'] = self.info.bestAlignedKick(kickDest)
 
-        if kickDirection == 0:
-            #STRAIGHT_KICK
-            return
-        elif kickDirection == 90:
-            #RIGHT_SIDE_KICK
-            return
-        elif kickDirection == -90:
-            #LEFT_SIDE_KICK
-            return
-        else:
-            #BACK_KICK
-            return
+    def chooseScoringKick(self):
+        return
+
+    def chooseOneTimerKick(self):
+        return
+
+    def choosePassingKick(self):
+        return
+
+    def chooseClearingKick(self):
+        return
+
+    def chooseAdvancingKick(self):
+        return
+
+    def chooseCrossingKick(self):
+        return
+
+    def choosePassBackKick(self):
+        return
+
+
+    def chooseKick(self):
+        """
+        Chooses out of all possibilities, which kick to do.
+        Currently preferences by speed of dividends
+        (i.e. Scoring, passing, clearing). Passing comes before
+        clearing because the ball travels faster than robots.
+        """
+        # Since this order is the order of the dictionary,
+        # iterate through and find the first that isn't None.
+        for kind, kick in self.info.kickChoices.iteritems():
+            if kick == None:
+                continue
+            return kick
 
 
         """
