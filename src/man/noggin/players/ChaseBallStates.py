@@ -86,8 +86,10 @@ def claimBall(player):
     if transitions.shouldKick(player):
         return player.goNow('decideKick')
     elif transitions.shouldFindBall(player):
+        player.inKickingState = False
         return player.goLater('findBall')
     elif transitions.shouldChaseFromClaimBall(player):
+        player.inKickingState = False
         return player.goNow('chase')
 
     return player.stay()
