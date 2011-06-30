@@ -153,17 +153,6 @@ const vector<float> Sensors::getBodyAngles () const
     return vec;
 }
 
-const vector<float> Sensors::getHeadAngles () const
-{
-    pthread_mutex_lock (&vision_angles_mutex);
-    vector<float> vec(2);
-    vec[0] = visionBodyAngles[0];
-    vec[1] = visionBodyAngles[1];
-    pthread_mutex_unlock (&vision_angles_mutex);
-
-    return vec;
-}
-
 const vector<float> Sensors::getBodyAngles_degs () const
 {
     pthread_mutex_lock (&angles_mutex);
@@ -187,6 +176,13 @@ const vector<float> Sensors::getVisionBodyAngles() const
     pthread_mutex_unlock (&vision_angles_mutex);
 
     return vec;
+}
+
+float Sensors::getVisionAngle(Kinematics::JointName joint) const {
+    pthread_mutex_lock (&vision_angles_mutex);
+    float value = visionBodyAngles[static_cast<int>(joint)];
+    pthread_mutex_unlock (&vision_angles_mutex);
+    return value;
 }
 
 const vector<float> Sensors::getMotionBodyAngles_degs () const
@@ -225,10 +221,10 @@ const vector<float> Sensors::getBodyTemperatures() const
     return vec;
 }
 
-const float Sensors::getBodyAngle(const int index) const {
+float Sensors::getBodyAngle(Kinematics::JointName joint) const {
     pthread_mutex_lock (&angles_mutex);
 
-    const float angle = bodyAngles[index];
+    const float angle = bodyAngles[static_cast<int>(joint)];
 
     pthread_mutex_unlock (&angles_mutex);
 
@@ -246,11 +242,11 @@ const vector<float> Sensors::getBodyAngleErrors () const
     return vec;
 }
 
-const float Sensors::getBodyAngleError (int index) const
+float Sensors::getBodyAngleError (Kinematics::JointName joint) const
 {
     pthread_mutex_lock (&errors_mutex);
 
-    const float angleError = bodyAnglesError[index];
+    const float angleError = bodyAnglesError[static_cast<int>(joint)];
 
     pthread_mutex_unlock (&errors_mutex);
 

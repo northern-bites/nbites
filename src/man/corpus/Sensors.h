@@ -35,6 +35,8 @@
 #include "Speech.h"
 #include "BulkMonitor.h"
 
+#include "Kinematics.h"
+
 enum SupportFoot {
     LEFT_SUPPORT = 0,
     RIGHT_SUPPORT
@@ -100,21 +102,21 @@ class Sensors : public Provider<SensorsEvent>{
     //friend class Man;
 public:
     Sensors(boost::shared_ptr<Speech> s);
-    ~Sensors();
+    virtual ~Sensors();
 
     // Locking data retrieval methods
     //   Each of these methods first locks the associated mutex, copies the
     //   requested values, then unlocks the mutex before returning
     const std::vector<float> getBodyAngles() const;
-    const std::vector<float> getHeadAngles() const;
     const std::vector<float> getBodyAngles_degs() const;
     const std::vector<float> getVisionBodyAngles() const;
+    float getVisionAngle(Kinematics::JointName joint) const;
     const std::vector<float> getMotionBodyAngles() const;
     const std::vector<float> getMotionBodyAngles_degs() const;
     const std::vector<float> getBodyTemperatures() const;
-    const float getBodyAngle(const int index) const;
+    float getBodyAngle(Kinematics::JointName joint) const;
     const std::vector<float> getBodyAngleErrors() const ;
-    const float getBodyAngleError(int index) const;
+    float getBodyAngleError(Kinematics::JointName joint) const;
     const FSR getLeftFootFSR() const;
     const FSR getRightFootFSR() const;
     const FootBumper getLeftFootBumper() const;
@@ -130,7 +132,6 @@ public:
     const float getChestButton() const;
     const float getBatteryCharge() const;
     const float getBatteryCurrent() const;
-    const std::vector<float> getAllSensors() const;
 
     // Locking data storage methods
     //   Each of these methods first locks the associated mutex, stores
@@ -172,10 +173,6 @@ public:
                           const float ultraSoundRight,
                           const float batteryCharge,
                           const float batteryCurrent);
-
-    // this method is very useful for serialization and parsing sensors
-    void setAllSensors(const std::vector<float> sensorValues);
-
 
     // special methods
     //   the image retrieval and locking methods are a little different, as we
@@ -261,7 +258,6 @@ private:
     std::vector<float> visionBodyAngles;
     std::vector<float> motionBodyAngles;
     std::vector<float> bodyAnglesError;
-
     std::vector<float> bodyTemperatures;
 
     // FSR sensors
