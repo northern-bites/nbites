@@ -71,7 +71,11 @@ class HeadTracking(FSA.FSA):
 
 # ** # old method (main input method)
     def trackBall(self):
-        """automatically tracks the ball. scans for the ball if not in view"""
+        """
+        Enters a state cycle:
+        When ball is in view, tracks via vision values.
+        When ball is not in view, executes naive pans.
+        """
         self.target = self.brain.ball
         self.gain = 1.0
         if ( (not self.currentState == 'tracking')
@@ -80,7 +84,12 @@ class HeadTracking(FSA.FSA):
 
 # ** # old method (main input method)
     def trackBallSpin(self):
-        """automatically tracks the ball. spins if not in view"""
+        """
+        Enters a state cycle:
+        When ball is in view, tracks via vision values.
+        When ball is not in view, continuously executes short pans
+        based on direction robot is spinning.
+        """
         self.target = self.brain.ball
         self.gain = 1.0
         if ( (not self.currentState == 'tracking')
@@ -95,13 +104,19 @@ class HeadTracking(FSA.FSA):
 
 # ** # old method
     def locPans(self):
-        """repeatedly performs quick pan"""
+        """Repeatedly performs quick pan."""
         self.activeLocOn = False
         self.switchTo('locPans')
 
-# ** # old method (main input method) MODIFIED BY NBITES MASTER
+# ** # old method (main input method)
     def activeLoc(self):
-        """tracks the ball but periodically looks away"""
+        """
+        If ball is visible and close, track it via vision values.
+        If ball is not visible, execute naive pans.
+        If state counter is low enough, track ball via vision values.
+        If state counter is high enough, perform triangle pans
+        and return to last head angles.
+        """
         self.target = self.brain.ball
         self.gain = 1.0
         self.goalieActiveLoc = False
@@ -112,7 +127,7 @@ class HeadTracking(FSA.FSA):
     # and activeLoc because they are the only states
     # that directly initially call activeTracking
 
-# ** # new method MODIFIED BY NBITES MASTER
+# ** # goalie method
     def activeLocGoaliePos(self):
         """looks at the ball for shorter amount of time that activeLoc"""
         self.target = self.brain.ball
@@ -123,37 +138,47 @@ class HeadTracking(FSA.FSA):
 
 # ** # old method
     def preKickScan(self):
-        """Scans up very quickly to see  """
+        """
+        Pan up once (quickly), then stop.
+        """
         if not self.isPreKickScanning:
             self.isPreKickScanning = True
             self.switchTo('scanQuickUp')
 
 # ** # old method
     def kickDecideScan(self):
-        self.lastDiffState = 'stop'
+        """Execute a triangle pan."""
+        self.lastDiffState = 'stop' # doesn't seem to do anything...
         self.goalieActiveLoc = False
         if self.currentState != 'trianglePan':
             self.switchTo('trianglePan')
 
 # ** # old method
     def startScan(self,  newScan):
-        """repeatedly performs passed in scan"""
+        """Repeatedly performs the given scan."""
         if newScan != self.currentHeadScan:
             self.currentHeadScan = newScan
             self.switchTo('scanning')
 
 # ** # old method
     def lookToDir(self,  direction):
-        """performs scripted look: down, up, right, or left"""
+        """
+        Performs scripted look: down, up, right, or left.
+        If ball becomes visible, go to state 'ballTracking'.
+        """
         if self.currentState is not 'look' or \
                 self.lookDirection != direction:
             self.lookDirection = direction
             self.switchTo('look')
 
-# ** # old method (main input method) - deprecated
+# ** # old method (main input method)
     def trackTarget(self, target):
-        """automatically tracks landmark, scans for landmark if not in view
-        only works if target has attribute locDist, framesOn, framesOff,x,y"""
+        """
+        Track given target via vision information while possible.
+        Once target is no longer visible, perform naive pans.
+        If target becomes visible again, either return to state
+        'targetTracking' or go to state 'activeTracking'.
+        """
         self.target = target
         self.target.height = 0
         self.gain = 1.0
@@ -164,7 +189,7 @@ class HeadTracking(FSA.FSA):
 
 # ** # old method - deprecated (replaced by helper.lookToTargetCoords)
     def lookToTarget(self, target):
-        """looks toward our best guess of landmark position based on loc"""
+        """Look towards given target, using localization values."""
         self.target.height = 0
         self.switchTo('lookToPoint')
 
@@ -203,6 +228,9 @@ class HeadTracking(FSA.FSA):
 
 # ** # old method
     def bounceHead(self):
+        """
+        Continually bounce head up and down.
+        """
         self.switchTo('bounceUp')
 
     # PRIMARY INPUT METHODS FOR TRACKING FSA:

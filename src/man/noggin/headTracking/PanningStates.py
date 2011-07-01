@@ -4,11 +4,15 @@ from man.motion import MotionConstants
 
 # ** # old method
 def scanBall(tracker):
+    """
+    While ball is not in view, execute naive pans.
+    If ball is in view, go to last diff state.
+    """
     ball = tracker.brain.ball
     if tracker.target == ball and \
             tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.activeLocOn = False
-        return tracker.goNow(tracker.lastDiffState)# ** #HACK for new system
+        return tracker.goNow(tracker.lastDiffState)
     #Here we choose where to look for the ball first
     if not tracker.brain.motion.isHeadActive():
         if ball.dist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
@@ -78,6 +82,10 @@ def scanForPost(tracker):
 
 # ** # old method
 def spinScanBall(tracker):
+    """
+    If ball is in view, goes to state cycle decider.
+    If ball is not in view, execute pans based on direction robot is spinning.
+    """
     ball = tracker.brain.ball
     nav = tracker.brain.nav
 
@@ -244,6 +252,10 @@ def postScan(tracker):
 
 # ** # old method
 def activeLocScan(tracker):
+    """
+    Execute naive mid-height scans.
+    If ball is visible, return to state 'activeTracking'.
+    """
     if tracker.target.on:
         return tracker.goLater('activeTracking')
 
@@ -256,7 +268,7 @@ def activeLocScan(tracker):
 # ** # old method
 def returnHeadsPan(tracker):
     """
-    Return the heads to pre-active pan position
+    Return the head angles to pre-active pan position.
     """
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
@@ -286,6 +298,7 @@ def scanQuickUp(tracker):
     if tracker.firstFrame():
         tracker.isPreKickScanning = True
 
+        # always true...
         if tracker.lastDiffState != 'panUpOnce' or \
                 tracker.lastDiffState != 'returnHeadsPan':
             tracker.activePanUp = False
@@ -319,6 +332,10 @@ MOTION_START_BUFFER = 2
 # anything that calls this should make sure that
 # goalieActiveLoc is set to proper value ( most likely false)
 def trianglePan(tracker):
+    """
+    Execute either a left or right scan. Then, return to original
+    head angles.
+    """
     motionAngles = tracker.brain.sensors.motionAngles
     tracker.preTriPanHeads = (
         motionAngles[MotionConstants.HeadYaw],
