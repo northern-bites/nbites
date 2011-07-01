@@ -27,13 +27,17 @@ LEFT_DYNAMIC_STRAIGHT_KICK =  Kick(y =  8, move=SweetMoves.DREW_KICK)
 
 CENTER_KICK_POSITION = Kick(x = DEFAULT_KICK_X_OFFSET + 5, y = 0)
 
-LEFT_LONG_BACK_KICK =  Kick(x = 12.5, y =  6.5, move=SweetMoves.LEFT_LONG_BACK_KICK)
-RIGHT_LONG_BACK_KICK = Kick(x = 12.5, y = -6.5, move=SweetMoves.RIGHT_LONG_BACK_KICK)
+LEFT_LONG_BACK_KICK =  Kick(x = 12.5, y =  6.5,
+                            move=SweetMoves.LEFT_LONG_BACK_KICK)
+RIGHT_LONG_BACK_KICK = Kick(x = 12.5, y = -6.5,
+                            move=SweetMoves.RIGHT_LONG_BACK_KICK)
 
-LEFT_SHORT_BACK_KICK =  Kick(x = 12.5, y =  6.5,move=SweetMoves.LEFT_SHORT_BACK_KICK)
-RIGHT_SHORT_BACK_KICK = Kick(x = 12.5, y = -6.5,move=SweetMoves.RIGHT_SHORT_BACK_KICK)
+LEFT_SHORT_BACK_KICK =  Kick(x = 12.5, y =  6.5,
+                             move=SweetMoves.LEFT_SHORT_BACK_KICK)
+RIGHT_SHORT_BACK_KICK = Kick(x = 12.5, y = -6.5,
+                             move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
-SHORT_QUICK_LEFT_KICK =  Kick(x = DEFAULT_KICK_X_OFFSET, y = 5,
+SHORT_QUICK_LEFT_KICK =  Kick(x = 12.75, y = 6.5,
                               move = SweetMoves.SHORT_QUICK_LEFT_KICK)
-SHORT_QUICK_RIGHT_KICK =  Kick(x = DEFAULT_KICK_X_OFFSET, y = -5,
+SHORT_QUICK_RIGHT_KICK =  Kick(x = 12.75, y = -6.5,
                                move = SweetMoves.SHORT_QUICK_RIGHT_KICK)

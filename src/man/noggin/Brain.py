@@ -15,20 +15,20 @@ from man import motion
 import vision
 #from man.corpus import leds
 import sensors
+import noggin_constants as Constants
 import loggingBoard
 
 # Modules from this directory
 from . import GameController
 from . import FallController
 from . import Stability
-from . import NogginConstants as Constants
 from . import Loc
 from . import TeamConfig
 from . import Leds
 from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
-from .typeDefs import (MyInfo, Ball, Landmarks, Sonar, Packet,
+from .typeDefs import (Ball, Sonar, Packet,
                        Play, TeamMember)
 from .navigator import Navigator
 from .util import NaoOutput
@@ -38,6 +38,8 @@ from .kickDecider import KickDecider
 
 import _roboguardian
 import _speech
+
+from objects import (MyInfo, FieldObject, RobotLocation)
 
 class Brain(object):
     """
@@ -89,11 +91,14 @@ class Brain(object):
         self.out.printf("GC:  I am player  "+str(TeamConfig.PLAYER_NUMBER))
 
         # Initialize various components
-        self.my = MyInfo.MyInfo()
+        self.my = MyInfo(self.loc)
 
         # Functional Variables
         self.my.playerNumber = self.comm.gc.player
-        self.my.teamColor = self.comm.gc.color
+        if self.comm.gc.color == GameController.TEAM_BLUE:
+            self.my.teamColor = Constants.teamColor.TEAM_BLUE
+        else:
+            self.my.teamColor = Constants.teamColor.TEAM_RED
 
         # Information about the environment
         self.initFieldObjects()
@@ -125,16 +130,22 @@ class Brain(object):
         # Build instances of the vision based field objects
         # Left post is on that goalie's left
         # Yellow goal left and right posts
-        self.yglp = Landmarks.FieldObject(self.vision.yglp,
-                                          Constants.VISION_YGLP)
-        self.ygrp = Landmarks.FieldObject(self.vision.ygrp,
-                                          Constants.VISION_YGRP)
+        self.yglp = FieldObject(self.vision.yglp,
+                                Constants.vis_landmark.VISION_YGLP,
+                                self.my)
+
+        self.ygrp = FieldObject(self.vision.ygrp,
+                                Constants.vis_landmark.VISION_YGRP,
+                                self.my)
 
         # Blue Goal left and right posts
-        self.bglp = Landmarks.FieldObject(self.vision.bglp,
-                                          Constants.VISION_BGLP)
-        self.bgrp = Landmarks.FieldObject(self.vision.bgrp,
-                                          Constants.VISION_BGRP)
+        self.bglp = FieldObject(self.vision.bglp,
+                                Constants.vis_landmark.VISION_BGLP,
+                                self.my)
+
+        self.bgrp = FieldObject(self.vision.bgrp,
+                                Constants.vis_landmark.VISION_BGRP,
+                                self.my)
 
         # Add field corners
         self.corners = []
@@ -152,7 +163,7 @@ class Brain(object):
         # Note: corner directions are relative to perspective of own goalie
 
         # Blue team setup
-        if self.my.teamColor == Constants.TEAM_BLUE:
+        if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
             # Yellow goal
             self.oppGoalRightPost = self.yglp
             self.oppGoalLeftPost = self.ygrp
@@ -289,12 +300,9 @@ class Brain(object):
         """
         Main control loop called every TIME_STEP milliseconds
         """
-
         # order here is very important
         # Update Environment
         self.time = time.time()
-        self.updateVisualObjects()
-
         self.sonar.updateSensors(self.sensors)
 
         # Communications update
@@ -323,36 +331,6 @@ class Brain(object):
         # Update any logs we have
         self.out.updateLogs()
 
-    def updateVisualObjects(self):
-        """
-        Update information about seen objects
-        """
-        self.ball.updateVision(self.vision.ball)
-
-        self.yglp.updateVision(self.vision.yglp)
-        self.ygrp.updateVision(self.vision.ygrp)
-        self.bglp.updateVision(self.vision.bglp)
-        self.bgrp.updateVision(self.vision.bgrp)
-
-        """ Corners abandonded due to insufficient reliability"""
-        cornerList = []
-        distList = []
-        for c in self.vision.fieldLines.corners:
-            cornerList = c.possibilities[:] # copy values into new list
-            distList = []
-            for i in range(len(cornerList)):
-                distList.append(fabs(c.dist - self.corners[cornerList[i]-15].locDist) + \
-                    fabs(c.bearing - self.corners[cornerList[i]-15].locBearing))
-            closestIndex = distList.index(min(distList))
-            self.corners[cornerList[closestIndex]-15].setVisualCorner(c)
-
-        # Check all FieldCorners and reset values if not in this frame.
-        for i in range(len(self.corners)):
-            self.corners[i].updateVision()
-            """ """
-
-        self.time = time.time()
-
     def updateComm(self):
         temp = self.comm.latestComm()
         for packet in temp:
@@ -372,13 +350,8 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.my.updateLoc(self.loc)
-
         self.ball.updateLoc(self.loc, self.my)
-        self.yglp.updateLoc(self.loc, self.my)
-        self.ygrp.updateLoc(self.loc, self.my)
-        self.bglp.updateLoc(self.loc, self.my)
-        self.bgrp.updateLoc(self.loc, self.my)
+        self.my.update()
 
         """ Corners abandonded due to insufficient reliability"""
         for i in range(len(self.corners)):
@@ -390,10 +363,11 @@ class Brain(object):
         Update estimates about objects using best information available
         """
         self.ball.updateBestValues(self.my)
-        self.yglp.updateBestValues()
-        self.ygrp.updateBestValues()
-        self.bglp.updateBestValues()
-        self.bgrp.updateBestValues()
+
+        self.yglp.setBest()
+        self.ygrp.setBest()
+        self.bglp.setBest()
+        self.bgrp.setBest()
 
         for i in range(len(self.corners)):
             self.corners[i].updateBestValues()

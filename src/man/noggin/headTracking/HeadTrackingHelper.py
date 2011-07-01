@@ -39,9 +39,9 @@ class HeadTrackingHelper(object):
         # Find the target's angular distance from the center of the screen
         # if we have an object, track that
         if self.tracker.target and \
-                self.tracker.target.on:
-            changeX = self.tracker.target.angleX
-            changeY = self.tracker.target.angleY #the pitch is pos = down
+                self.tracker.target.vis.on:
+            changeX = self.tracker.target.vis.angleX
+            changeY = self.tracker.target.vis.angleY #the pitch is pos = down
         else:
             # by default, the change is none
             #self.printf( "No object")

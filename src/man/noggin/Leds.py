@@ -102,16 +102,16 @@ class Leds():
 
         ### for the ball ###
         if DEBUG_BALL_LEDS:
-            if self.brain.ball.on:
+            if self.brain.ball.vis.on:
                 self.executeLeds(BALL_ON_LEDS)
             else:
                 self.executeLeds(BALL_OFF_LEDS)
 
         if DEBUG_GOAL_LEDS:
-            if (self.brain.myGoalLeftPost.on or
-                self.brain.oppGoalLeftPost.on or
-                self.brain.myGoalRightPost.on or
-                self.brain.oppGoalRightPost.on):
+            if (self.brain.myGoalLeftPost.vis.on or
+                self.brain.oppGoalLeftPost.vis.on or
+                self.brain.myGoalRightPost.vis.on or
+                self.brain.oppGoalRightPost.vis.on):
                 self.executeLeds(LEFT_GOAL_ON_LEDS)
                 self.executeLeds(RIGHT_GOAL_ON_LEDS)
             else:

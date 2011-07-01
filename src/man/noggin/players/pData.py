@@ -16,7 +16,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def savePostInfo(self):
         both_zero = True
         for obj in self.objects:
-            if obj.visDist != 0.0:
+            if obj.vis.dist != 0.0:
                 both_zero = False
                 break
 
@@ -37,7 +37,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             csv = open(filename,'a+')
 
         for obj in self.objects:
-            if obj.visDist !=0.0 and abs(obj.visDist - self.postDistance) < 100:
-                csv.write(str(obj.visDist) + "," + str(obj.bearing) + '\n')
-                print obj.visDist, obj.bearing
+            if obj.vis.dist !=0.0 and abs(obj.vis.dist - self.postDistance) < 100:
+                csv.write(str(obj.vis.dist) + "," + str(obj.vis.bearing) + '\n')
+                print obj.vis.dist, obj.vis.bearing
         csv.close()
