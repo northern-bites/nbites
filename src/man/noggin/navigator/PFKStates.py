@@ -21,7 +21,6 @@ PFK_CLOSE_ENOUGH_X = 2.0
 PFK_CLOSE_ENOUGH_Y = 2.0
 PFK_CLOSE_ENOUGH_THETA = 11
 
-
 def positionForKick(nav):
     """
     This state is called by player through Navigator::kickPosition(kick)
@@ -36,9 +35,13 @@ def positionForKick(nav):
     # we've either just started, or are close to our last destination
     # tell the robot where to go!
     if nav.firstFrame():
-        nav.destX = ball.relX - nav.kick.x_offset -1 # HACK!!!
+        nav.destX = ball.relX - nav.kick.x_offset -2 # HACK!!!
         nav.destY = ball.relY - nav.kick.y_offset
-        nav.destTheta = nav.kick.heading - nav.brain.my.h
+
+        nav.destTheta = ball.bearing
+
+        # TODO later?
+        #nav.destTheta = nav.kick.heading - nav.brain.my.h
 
         # slow down as we get near the ball (max 80% speed)
         if ball.dist < 40:
