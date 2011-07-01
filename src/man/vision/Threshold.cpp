@@ -1126,7 +1126,7 @@ float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
                                     float distw, float poseDist, int bottom) {
     float dist = 0.0f;
 	if (poseDist < 200.0f && poseDist > 0 && bottom <= IMAGE_HEIGHT - 5) {
-		cout << "Returning pose dist " << poseDist << endl;
+		//cout << "Returning pose dist " << poseDist << endl;
 		return poseDist;
 	}
     switch (cert) {
@@ -1171,8 +1171,8 @@ float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
 		}
         break;
     }
-	cout << "Distances disth " << disth << " distw " << distw <<
-	  " posedist " << poseDist << " returning " << dist << endl;
+	/*cout << "Distances disth " << disth << " distw " << distw <<
+	  " posedist " << poseDist << " returning " << dist << endl;*/
     return dist;
 }
 
