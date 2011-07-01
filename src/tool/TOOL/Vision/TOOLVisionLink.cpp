@@ -134,7 +134,18 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     for (unsigned int i = 0; i < NUM_SENSORS - numSensorsInFrame; ++i)
     sensors_vector.push_back(0.0f);
 
-    sensors->setAllSensors(sensors_vector);
+    sensors->setLeftFootFSR(sensors_vector[0], sensors_vector[1],
+            sensors_vector[2], sensors_vector[3]);
+    sensors->setRightFootFSR(sensors_vector[4], sensors_vector[5],
+                sensors_vector[6], sensors_vector[7]);
+    sensors->setLeftFootBumper(sensors_vector[8], sensors_vector[9]);
+    sensors->setLeftFootBumper(sensors_vector[10], sensors_vector[11]);
+    sensors->setInertial(sensors_vector[12], sensors_vector[13], sensors_vector[14],
+            sensors_vector[15], sensors_vector[16], sensors_vector[17],
+            sensors_vector[18]);
+    sensors->setUltraSound(sensors_vector[19], sensors_vector[20]);
+    sensors->setSupportFoot(static_cast<SupportFoot>(sensors_vector[21]));
+
 
     // Clear the debug image on which the vision algorithm can draw
     vision.thresh->initDebugImage();

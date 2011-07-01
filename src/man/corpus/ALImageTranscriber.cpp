@@ -176,6 +176,7 @@ void ALImageTranscriber::run()
             }
             //Don't sleep at all
         } else{
+            //TODO @refactor
             const long int microSleepTime =
                 static_cast<long int>(VISION_FRAME_LENGTH_uS - processTime);
             const long int nanoSleepTime =
