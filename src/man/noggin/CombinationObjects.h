@@ -34,6 +34,10 @@ namespace noggin {
     class FieldObject;
     class MyInfo;
 
+    // Sections of the field for Location use
+    static const float TOP_LIMIT = FIELD_HEIGHT*2.0/3.0;
+    static const float BOTTOM_LIMIT = FIELD_HEIGHT/3.0;
+
     /**
      * Degrees and radians are both floats, but used to indicate when
      * values are expected to be in degrees or radians. This gets complicated

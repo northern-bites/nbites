@@ -69,17 +69,17 @@ namespace noggin {
 
     const bool Location::inCenterOfField()
     {
-        return ((FIELD_HEIGHT*2.0/3.0) > y && y > (FIELD_HEIGHT/3.0));
+        return (TOP_LIMIT > y && y > BOTTOM_LIMIT);
     }
 
     const bool Location::inTopOfField()
     {
-        return ((FIELD_HEIGHT*2.0/3.0) < y);
+        return (TOP_LIMIT < y);
     }
 
     const bool Location::inBottomOfField()
     {
-        return ((FIELD_HEIGHT/3.0) > y);
+        return (BOTTOM_LIMIT > y);
     }
 
 ///////// RobotLocation Methods //////////////
