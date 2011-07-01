@@ -126,7 +126,6 @@ def getWalkStraightParam(my, dest):
         sX = MyMath.clip(sX,
                          constants.GOTO_BACKWARD_SPEED,
                          constants.GOTO_FORWARD_SPEED)
-
     return (sX, 0, 0)
 
 def getWalkBackParam(my, dest):

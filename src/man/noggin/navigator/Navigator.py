@@ -36,7 +36,6 @@ class Navigator(FSA.FSA):
         self.walkTheta = 0
         self.orbitDir = 0
         self.angleToOrbit = 0
-        self.curSpinDir = 0
         self.destX = 0
         self.destY = 0
         self.destTheta = 0
@@ -47,12 +46,17 @@ class Navigator(FSA.FSA):
         self.shouldAvoidObstacleLeftCounter = 0
         self.shouldAvoidObstacleRightCounter = 0
 
+        self.resetSpeedMemory()
+        self.resetDestMemory()
+
     def performSweetMove(self, move):
         """
         Navigator function to do the sweet move
         """
         self.sweetMove = move
         self.brain.player.stopWalking()
+        self.resetSpeedMemory()
+        self.resetDestMemory()
         helper.executeMove(self.brain.motion, self.sweetMove)
         self.switchTo('doingSweetMove')
 
@@ -146,3 +150,45 @@ class Navigator(FSA.FSA):
     # Have we reached our destination?
     def isAtPositition(self):
         return self.currentState is 'atPosition'
+
+    #################################################################
+    #             ::Walk speed memory::                             #
+    #                                                               #
+    #         DO NOT SET IN THE NORMAL NAVIGATOR BEHAVIOR           #
+    #         ONLY TO BE USED IN NAV HELPER SPEED SETTERS           #
+    #               AND HERE.                                       #
+    #                                                               #
+    #      self.lastXSpeed, self.lastYSpeed, self.lastThetaSpeed    #
+    #      self.lastDestX,  self.lastDestY,  self.lastDestTheta     #
+    #           self.lastDestGain                                   #
+    #################################################################
+
+    # Is the given vector equal to our current values
+    def speedVectorsEqual(self, x, y, theta):
+        return (fabs(self.lastSpeedX - x) < constants.FORWARD_EPSILON and
+                fabs(self.lastSpeedY - y) < constants.STRAFE_EPSILON and
+                fabs(self.lastSpeedTheta - theta) < constants.SPIN_EPSILON)
+
+    # Update the speed values and reset the others
+    def updateSpeeds(self, x, y, theta):
+        self.lastSpeedX, self.lastSpeedY, self.lastSpeedTheta = x,y,theta
+        self.resetDestMemory()
+
+    def updateDests(self, x, y, theta, gain):
+        self.lastDestX, \
+            self.lastDestY, \
+            self.lastDestTheta, \
+            self.lastDestGain= x,y,theta, gain
+        self.resetSpeedMemory()
+
+    def resetSpeedMemory(self):
+        self.lastSpeedX,  \
+            self.lastSpeedY,\
+            self.lastSpeedTheta  = (constants.WALK_VECTOR_INIT,)*3
+
+    def resetDestMemory(self):
+        self.lastDestX, \
+            self.lastDestY, \
+            self.lastDestTheta, \
+            self.lastDestGain = (constants.WALK_VECTOR_INIT,)*4
+

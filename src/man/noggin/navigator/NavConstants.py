@@ -87,10 +87,16 @@ HEADING_NEAR_SCALE = 0.3
 HEADING_MEDIUM_SCALE = 0.4
 HEADING_FAR_SCALE = .6
 
-###Walk Constants
-SPIN_EPSILON = 0.02
-FORWARD_EPSILON = 0.015
-STRAFE_EPSILON = 0.05
+### Walk Constants
+### Values used to compare walk vectors
+SPIN_EPSILON = 0.1
+FORWARD_EPSILON = 0.1
+STRAFE_EPSILON = 0.1
+
+### Walk Speed initialization values
+### Used to initialize or reset walk vector memory
+WALK_VECTOR_INIT = -1337
+
 
 OMNI_WALK_DIST_THRESH = 400.
 POSITION_NEAR_THRESH = CLOSER_XY

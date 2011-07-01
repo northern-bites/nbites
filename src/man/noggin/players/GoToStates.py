@@ -15,6 +15,8 @@ NUM_POINTS = len(GOTO_POINTS)
 def gameReady(player):
     if player.firstFrame():
         player.brain.tracker.locPans()
+        player.walkPose()
+
     return player.stay()
 
 def convertCoords(x):
