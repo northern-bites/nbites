@@ -2,8 +2,6 @@ from . import TrackingConstants as constants
 from .. import NogginConstants
 import man.motion.HeadMoves as HeadMoves
 from math import (fabs)
-from ..typeDefs.Landmarks import FieldCorner # ** # imported for debugging
-from ..typeDefs.Landmarks import FieldObject # ** # imported for debugging
 
 TIME_TO_LOOK_TO_TARGET = 1.0
 

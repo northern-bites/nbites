@@ -1,7 +1,5 @@
 from man.motion import MotionConstants
 from . import TrackingConstants as constants
-from ..typeDefs.Landmarks import FieldObject
-from ..typeDefs.Landmarks import FieldCorner
 
 DEBUG = False
 
