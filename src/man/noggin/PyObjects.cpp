@@ -8,10 +8,10 @@
 using namespace boost::python;
 using namespace noggin;
 
-//For boost, overloaded function pointers
+//Overloaded function from MyInfo and its base class Location. Provides
+// with proper pointers to these functions, for use in MyInfo
 const float (MyInfo::*distTo1)(FieldObject&, bool) = &MyInfo::distTo;
 const float (MyInfo::*distTo2)(const Location&) = &Location::distTo;
-
 
 BOOST_PYTHON_MODULE(objects)
 {

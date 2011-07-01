@@ -1,5 +1,6 @@
 /**
  * Objects for python usage that contain pointers to both vision and loc.
+ * See the header for in-depth descriptions.
  */
 #include "CombinationObjects.h"
 
@@ -29,12 +30,12 @@ namespace noggin {
 
     boost::python::tuple Location::toTupleXY()
     {
-        return boost::python::make_tuple(x, y); 
+        return boost::python::make_tuple(x, y);
     }
 
     const float Location::distTo(const Location& other)
     {
-        // HACK for infinity values
+        // HACK for infinity values, shouldn't happen
         if (isinf(other.x) || isinf(other.y)) {
             std::cout << "INFINITY DISTANCE" << std::endl;
             return INFINITE_DISTANCE;
@@ -53,6 +54,7 @@ namespace noggin {
         return (std::atan2((other.y-y), (other.x-x)));
     }
 
+    // In methods check if loc is in a certain field region
     const bool Location::inOppGoalBox()
     {
         return ( OPP_GOALBOX_LEFT_X < x &&  OPP_GOALBOX_RIGHT_X > x
@@ -107,6 +109,7 @@ namespace noggin {
         return (NBMath::subPIAngle(headingToInRad(other) - h))*TO_DEG;
     }
 
+    // Returns -1, 0, 1 to tell the robot which way to spin
     const float RobotLocation::spinDirToPoint(Location& other)
     {
         float targetH = getRelativeBearing(other);
@@ -138,10 +141,12 @@ namespace noggin {
     {
     }
 
+    // Used by MyInfo, calculated from me
     const float FieldObject::getLocDist() {
         return my->distTo(*this, true);
     }
 
+    // Used by MyInfo, calculated from me also
     const degrees FieldObject::getLocBearing()
     {
         return my->getRelativeBearing(*this);
@@ -157,12 +162,15 @@ namespace noggin {
         return std::fabs(dist)*std::sin(bearing);
     }
 
+    // Determine whether vis or loc values are better
     void FieldObject::setBest()
     {
+        // Use vis values if the object is seen
         if (vis->isOn()) {
             bearing = vis->getBearing();
             dist = vis->getDistance();
         }
+        // Or if it was seen recently
         else if (vis->getFramesOff() < LOST_OBJECT_FRAMES_THRESH) return;
 
         else {
@@ -171,6 +179,7 @@ namespace noggin {
         }
     }
 
+    // Links this object to a relative landmark, gives it an x, y, and name
     void FieldObject::associateWithRelativeLandmark(
         boost::python::tuple relLandmark)
     {
@@ -186,6 +195,7 @@ namespace noggin {
     {
     }
 
+    // < and > are based on objects' tracking fitnesses
     bool LocObject::operator < (const LocObject& other) const
     {
         return trackingFitness < other.trackingFitness;
@@ -204,8 +214,10 @@ namespace noggin {
     {
     }
 
+    // Copy from loc
     void MyInfo::update()
     {
+        // x, y and h are relative, based on my team
         if (team_color == PY_TEAM_BLUE) {
             x = loc->getXEst();
             y = loc->getYEst();

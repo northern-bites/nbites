@@ -1,5 +1,10 @@
 /**
  * Objects for python usage that contain pointers to both vision and loc.
+ * Prevents unneccessary copying of vision, localization values into Python and
+ * allows most calculations to be done here rather than in Python. Includes
+ * Location, the base class for all of the others, RobotLocation, RelLocation,
+ * LocObject, FieldObject, and MyInfo. See below for further description of
+ * each class. These are wrapped using boost/python in PyObjects.*.
  */
 
 #ifndef CombObjects_h_DEFINED
@@ -29,11 +34,21 @@ namespace noggin {
     class FieldObject;
     class MyInfo;
 
-    /***************************
-     *     LOCATION            *
-     **************************/
+    /**
+     * Degrees and radians are both floats, but used to indicate when
+     * values are expected to be in degrees or radians. This gets complicated
+     * since python requires degrees but all C++ values are stored in rads.
+     */
+     typedef float degrees, radians;
 
-    typedef float degrees, radians;
+    /*
+     * LOCATION
+     * The base class for all others in this file. Holds x, y values
+     * representing a location on the field. Contains methods to convert
+     * these to a python tuple, get the distance and bearing to a location
+     * from another location, and to determine whether a location is in
+     * various parts of the field.
+     */
 
     class Location
     {
@@ -69,9 +84,14 @@ namespace noggin {
         const radians headingToInRad(const Location& other);
     };
 
-    /***************************
-     *     ROBOT LOCATION      *
-     **************************/
+    /*
+     * ROBOT LOCATION
+     * A location that also contains a heading, since a robot needs to know
+     * the direction in which it's facing. Heading is stored in rads but
+     * passed to python in degrees. Provides a method to get the relative
+     * bearing to another location and to determine which way to spin to
+     * face another point.
+     */
 
     class RobotLocation : public Location
     {
@@ -96,9 +116,12 @@ namespace noggin {
         radians h;
     };
 
-    /***************************
-     *     RELATIVE LOCATION   *
-     **************************/
+    /*
+     * REL LOCATION
+     * A robot location that is created by specifying differences in
+     * x, y, and h from a given existing location. The dx, dy, and dh
+     * are also stored.
+     */
 
     class RelLocation : public RobotLocation
     {
@@ -122,9 +145,11 @@ namespace noggin {
         radians relH;
     };
 
-    /***************************
-     *     LOC OBJECT          *
-     **************************/
+    /*
+     * LOC OBJECT
+     * A class for objects that have locations. Provides a way to hold basic
+     * tracking info.
+     */
 
     class LocObject : public Location
     {
@@ -139,19 +164,21 @@ namespace noggin {
         bool operator < (const LocObject& other) const;
         bool operator > (const LocObject& other) const;
 
-        // Implemented in inheriting classes:
-        // virtual const float getLocDist();
-        // virtual const float getLocBearing();
-        // virtual const float getRelX();
-        // virtual const float getRelY();
-
     private:
         int trackingFitness;
     };
 
-    /***************************
-     *     FIELD OBJECT        *
-     **************************/
+    /*
+     * FIELD OBJECT
+     * Currently means one of the four goalposts. A LocObject that also
+     * holds a pointer to the visual object connected with a particular
+     * location for quick access of vision info. VisID and localID describe
+     * which landmark this object is; see PyNogginConstants for their
+     * possible values. Dist and bearing are the best dist and bearing value,
+     * depending on whether loc values or vision values are more reliable
+     * for a particular frame. MyInfo is a pointer to the robot's current
+     * information.
+     */
 
     class FieldObject : public LocObject
     {
@@ -191,12 +218,16 @@ namespace noggin {
         void associateWithRelativeLandmark(boost::python::tuple relLandmark);
     };
 
-   /***************************
-     *     MY INFO            *
-     **************************/
-    // Copies 3 values per frame from Loc. Needed for Location inheritance
-    // compatibility.
-
+    /*
+     * MY INFO
+     * A RobotLocation that stores localization information for the robot as
+     * well as a few other useful infos, such as team color and number. Stores
+     * a pointer to the loc system for easy access. Overloads distTo from
+     * location so that it doesn't have to be calculated if not needed. Update
+     * gets the latest x, y, h values from loc. This copying is necessary for
+     * using the Location interface. LocScores represent how good localization
+     * is, based on the three uncert values. 
+     */
     class MyInfo : public RobotLocation
     {
     public:
