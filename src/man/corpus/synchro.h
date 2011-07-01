@@ -36,32 +36,6 @@
 #  define MUTEX_INIT errchkmutex
 #endif
 
-class mutex {
-public:
-    mutex(std::string name);
-    virtual ~mutex();
-
-    void lock();
-    void unlock();
-private:
-    mutable pthread_mutex_t my_mutex;
-    std::string name;
-};
-
-class multi_mutex {
-protected:
-    typedef std::vector<pthread_mutex_t*> mutex_vector;
-public:
-    multi_mutex(pthread_mutex_t* mutex_array[], std::string name);
-    virtual ~multi_mutex(){}
-
-    void lock();
-    void unlock();
-private:
-    mutex_vector mutices;
-    std::string name;
-};
-
 struct MutexDeleter
 {
     void operator() (pthread_mutex_t *mutex) { pthread_mutex_destroy(mutex); }
