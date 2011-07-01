@@ -110,11 +110,11 @@ namespace noggin {
     }
 
     // Returns -1, 0, 1 to tell the robot which way to spin
-    const float RobotLocation::spinDirToPoint(Location& other)
+    const int RobotLocation::spinDirToPoint(Location& other)
     {
         float targetH = getRelativeBearing(other);
         if(targetH == 0) return 0;
-        else return NBMath::sign(targetH);
+        else return int(NBMath::sign(targetH));
     }
 
 
