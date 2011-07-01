@@ -880,9 +880,9 @@ void Sensors::loadFrame(string path) {
     // Load the image from the file, puts it straight into Sensors'
     // image buffer so it doesn't have to allocate its own buffer and
     // worry about deleting it
-    uint16_t * img = const_cast<uint16_t*>(getImage());uint8_t
-    * byte_img = new uint8_t[320 * 240 * 2];fin
-    .read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
+    uint16_t * img = const_cast<uint16_t*>(getImage());
+    uint8_t  * byte_img = new uint8_t[320 * 240 * 2];
+    fin.read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
     releaseImage();
 
     lockImage();
