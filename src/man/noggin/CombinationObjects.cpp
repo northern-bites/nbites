@@ -8,7 +8,7 @@ namespace noggin {
     using namespace py_constants;
 
 //////////// Base Location Class Methods //////////////
-    Location::Location(float _x = 0, float _y = 0)
+    Location::Location(float _x, float _y)
         : x(_x), y(_y)
     {
     }
@@ -84,7 +84,7 @@ namespace noggin {
 
 ///////// RobotLocation Methods //////////////
 
-    RobotLocation::RobotLocation(float _x = 0, float _y = 0, degrees _h = 0)
+    RobotLocation::RobotLocation(float _x, float _y, degrees _h)
         : Location(_x, _y), h(_h*TO_RAD)
     {
     }
