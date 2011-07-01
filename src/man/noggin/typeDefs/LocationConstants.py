@@ -1,4 +1,4 @@
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 # inOppCorner constants
 TOP_OPP_CORNER_SLOPE = -1
 BOTTOM_OPP_CORNER_SLOPE = 1

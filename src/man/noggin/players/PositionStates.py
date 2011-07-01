@@ -1,4 +1,6 @@
-from .. import NogginConstants
+import noggin_constants as NogginConstants
+from . import ChaseBallConstants as ChaseConstants
+import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
 

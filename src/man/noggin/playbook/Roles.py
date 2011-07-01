@@ -1,4 +1,4 @@
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 from . import PBConstants
 from . import SubRoles
 from . import RoleTransitions as RoleTran

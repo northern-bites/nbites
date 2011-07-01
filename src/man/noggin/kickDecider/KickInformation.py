@@ -1,6 +1,5 @@
 import kicks
 import KickingConstants as constants
-from .. import NogginConstants
 from ..util import MyMath
 from math import fabs
 """
@@ -204,3 +203,4 @@ class KickInformation:
             return kicks.LEFT_SHORT_BACK_KICK
         else:
             return kicks.RIGHT_SHORT_BACK_KICK
+

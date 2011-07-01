@@ -1,4 +1,4 @@
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 from ..playbook.PBConstants import GOALIE
 import ChaseBallTransitions as transitions
 PENALTY_RELOCALIZE_FRAMES = 100

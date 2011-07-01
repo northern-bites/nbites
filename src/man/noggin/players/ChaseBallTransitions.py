@@ -1,7 +1,7 @@
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import ChaseBallConstants as constants
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 from math import fabs
 
 ####### CHASING STUFF ##############
@@ -11,7 +11,7 @@ def shouldChaseBall(player):
     We see the ball. So go get it.
     """
     ball = player.brain.ball
-    return (ball.framesOn > constants.BALL_ON_THRESH)
+    return (ball.vis.framesOn > constants.BALL_ON_THRESH)
 
 def shouldChaseFromPositionForKick(player):
     """
@@ -188,13 +188,13 @@ def shouldFindBall(player):
     """
     We lost the ball, scan to find it
     """
-    return (player.brain.ball.framesOff > constants.BALL_OFF_THRESH)
+    return (player.brain.ball.vis.framesOff > constants.BALL_OFF_THRESH)
 
 def shouldFindBallKick(player):
     """
     We lost the ball while in a kicking state, be more generous before looking
     """
-    return (player.brain.ball.framesOff > constants.BALL_OFF_KICK_THRESH)
+    return (player.brain.ball.vis.framesOff > constants.BALL_OFF_KICK_THRESH)
 
 def shouldSpinFindBall(player):
     """

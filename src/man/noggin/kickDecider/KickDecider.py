@@ -175,3 +175,35 @@ class KickDecider(object):
             print "RIGHT_SIDE"
             return kicks.RIGHT_SIDE_KICK
         """
+
+    def chooseDynamicKick(self):
+        ball = self.brain.ball
+        if ball.relY >= 0:
+            print "LEFT_DYNAMIC_STRAIGHT"
+            return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+        print "RIGHT_DYNAMIC_STRAIGHT"
+        return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
+
+    def chooseLongBackKick(self):
+        ball = self.brain.ball
+        if ball.relY > 0:
+            print "LEFT_LONG_BACK"
+            return kicks.LEFT_LONG_BACK_KICK
+        print "RIGHT_LONG_BACK"
+        return kicks.RIGHT_LONG_BACK_KICK
+
+    def chooseShortBackKick(self):
+        ball = self.brain.ball
+        if ball.relY > 0:
+            print "LEFT_SHORT_BACK"
+            return kicks.LEFT_SHORT_BACK_KICK
+        print "RIGHT_SHORT_BACK"
+        return kicks.RIGHT_SHORT_BACK_KICK
+
+    def chooseShortQuickKick(self):
+        ball = self.brain.ball
+        if ball.relY > 0:
+            print "SHORT_QUICK_LEFT"
+            return kicks.SHORT_QUICK_LEFT_KICK
+        print "SHORT_QUICK_RIGHT"
+        return kicks.SHORT_QUICK_RIGHT_KICK

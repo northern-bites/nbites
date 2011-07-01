@@ -1,4 +1,9 @@
-#include <Python.h>
+/*
+ * Wrapper for all vision information needed in Python. See header for list
+ * of wrapped classes. In Python, import vision to use these. Generally
+ * accessed through a FieldObject (see CombinationObjects) or through
+ * brain.vision (an instance of the main vision class).
+ */
 
 #include <boost/shared_ptr.hpp>
 using boost::shared_ptr;
@@ -16,10 +21,6 @@ BOOST_PYTHON_MODULE(vision)
 {
     class_<VisualBall>("Ball", no_init)
         // Note that getters are in VisualDetection, parent to VisualBall
-        .def_readonly("centerX", &VisualBall::getCenterX)
-        .def_readonly("centerY", &VisualBall::getCenterY)
-        .def_readonly("width", &VisualBall::getWidth)
-        .def_readonly("height", &VisualBall::getHeight)
         .def_readonly("dist", &VisualBall::getDistance)
         .def_readonly("bearing", &VisualBall::getBearingDeg)
         .def_readonly("angleX", &VisualBall::getAngleXDeg)
@@ -34,12 +35,9 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("framesOff", &VisualBall::getFramesOff)
         ;
 
-    class_<VisualFieldObject>("FieldObject", no_init)
+    class_<VisualFieldObject, shared_ptr<VisualFieldObject> >
+        ("FieldObject", no_init)
         // From VisualDetection
-        .def_readonly("centerX", &VisualFieldObject::getCenterX)
-        .def_readonly("centerY", &VisualFieldObject::getCenterY)
-        .def_readonly("width", &VisualFieldObject::getWidth)
-        .def_readonly("height", &VisualFieldObject::getHeight)
         .def_readonly("dist", &VisualFieldObject::getDistance)
         .def_readonly("bearing", &VisualFieldObject::getBearingDeg)
         .def_readonly("angleX", &VisualFieldObject::getAngleXDeg)
@@ -86,32 +84,22 @@ BOOST_PYTHON_MODULE(vision)
 
     class_<VisualRobot>("VisualRobot", no_init)
         // From VisualDetection
-        .def_readonly("centerX", &VisualRobot::getCenterX)
-        .def_readonly("centerY", &VisualRobot::getCenterY)
-        .def_readonly("width", &VisualRobot::getWidth)
-        .def_readonly("height", &VisualRobot::getHeight)
         .def_readonly("dist", &VisualRobot::getDistance)
         .def_readonly("bearing", &VisualRobot::getBearingDeg)
         .def_readonly("angleX", &VisualRobot::getAngleXDeg)
         .def_readonly("angleY", &VisualRobot::getAngleYDeg)
-        .def_readonly("x", &VisualRobot::getX)
-        .def_readonly("y", &VisualRobot::getY)
+        .def_readonly("cornerX", &VisualRobot::getX)
+        .def_readonly("cornerY", &VisualRobot::getY)
         .def_readonly("elevation", &VisualRobot::getElevationDeg)
         ;
 
     // Currently unused, but fully avaliable to python if uncommented
     class_<VisualCrossbar>("Crossbar", no_init)
         // From VisualDetection
-        .def_readonly("centerX", &VisualCrossbar::getCenterX)
-        .def_readonly("centerY", &VisualCrossbar::getCenterY)
-        .def_readonly("width", &VisualCrossbar::getWidth)
-        .def_readonly("height", &VisualCrossbar::getHeight)
         .def_readonly("dist", &VisualCrossbar::getDistance)
         .def_readonly("bearing", &VisualCrossbar::getBearingDeg)
         .def_readonly("angleX", &VisualCrossbar::getAngleXDeg)
         .def_readonly("angleY", &VisualCrossbar::getAngleYDeg)
-        .def_readonly("x", &VisualCrossbar::getX)
-        .def_readonly("y", &VisualCrossbar::getY)
         .def_readonly("elevation", &VisualCrossbar::getElevationDeg)
         // From VisualCrossbar
         .def_readonly("shoot", &VisualCrossbar::shotAvailable)
@@ -190,6 +178,8 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("x", &VisualCorner::getX)
         .def_readonly("y", &VisualCorner::getY)
         .def_readonly("possibilities", &VisualCorner::getIDs)
+        .def_readonly("angleX", &VisualCorner::getAngleXDeg)
+        .def_readonly("angleY", &VisualCorner::getAngleYDeg)
         ;
 
     // VisualCorner can return a vector of IDs from ConcreteCorner
@@ -274,8 +264,7 @@ BOOST_PYTHON_MODULE(vision)
         .add_property("navy3", make_getter(&Vision::navy3, return_value_policy
                                           <reference_existing_object>()))
 
-        /* Crossbars: not used right now, uncomment here and Brain.py to use
-           in python
+        /* Crossbars: not used right now
            .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar,
            return_value_policy<reference_existing_object>()))
            .add_property("bgCrossbar", make_getter(&Vision::bgCrossbar,
