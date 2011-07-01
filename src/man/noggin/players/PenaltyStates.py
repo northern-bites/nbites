@@ -113,7 +113,7 @@ def penaltyRelocalize(player):
         player.brain.tracker.trackBall()
         return player.goLater(gcState)
 
-    if player.brain.my.locScore != NogginConstants.BAD_LOC:
+    if player.brain.my.locScore != NogginConstants.locScore.BAD_LOC:
         player.shouldRelocalizeCounter += 1
 
         if player.shouldRelocalizeCounter > 30:

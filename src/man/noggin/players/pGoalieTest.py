@@ -8,7 +8,7 @@ from . import GoalieSaveStates
 from . import GoalieChanges
 from . import GoalieTransitions
 
-from .. import NogginConstants
+import noggin_constants as  NogginConstants
 from ..playbook import PBConstants
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):

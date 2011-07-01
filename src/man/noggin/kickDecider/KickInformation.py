@@ -2,6 +2,7 @@ import kicks
 import KickingConstants as constants
 from ..util import MyMath
 from math import fabs
+import noggin_constants as NogginConstants
 """
 Rewritten by Wils Dawson (6/28/11)
 """

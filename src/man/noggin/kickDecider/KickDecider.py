@@ -1,7 +1,7 @@
 import kicks
 import KickInformation
 import KickingConstants as constants
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 
 class KickDecider(object):
     """
@@ -77,7 +77,7 @@ class KickDecider(object):
         using objective and heuristics and localization determines best kick
         """
         # Check localization to make sure it's good enough.
-        if self.brain.my.locScore == NogginConstants.BAD_LOC:
+        if self.brain.my.locScore == NogginConstants.locScore.BAD_LOC:
             print "BAD_LOC!"
             self.info.kick = None # TODO set this to "Null Kick" for orbiting.
             return

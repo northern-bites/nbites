@@ -19,7 +19,7 @@ def penaltyKickRelocalize(player):
     my = player.brain.my
     if player.firstFrame():
         player.brain.tracker.locPans()
-    if my.locScore == NogginConstants.BAD_LOC and \
+    if my.locScore == NogginConstants.locScore.BAD_LOC and \
             player.counter < PENALTY_RELOCALIZE_FRAMES:
         return player.stay()
     return player.goLater('findBall')
