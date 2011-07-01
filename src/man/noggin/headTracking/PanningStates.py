@@ -5,7 +5,7 @@ from man.motion import MotionConstants
 def scanBall(tracker):
     ball = tracker.brain.ball
     if tracker.target == ball and \
-            tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+            tracker.target.vis.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.activeLocOn = False
         return tracker.goNow('ballTracking')
     #Here we choose where to look for the ball first
@@ -30,7 +30,7 @@ def spinScanBall(tracker):
     nav = tracker.brain.nav
 
     if tracker.target == ball and \
-            tracker.target.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+            tracker.target.vis.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.activeLocOn = False
         return tracker.goNow('ballSpinTracking')
 
@@ -104,7 +104,7 @@ def postScan(tracker):
     return tracker.stay()
 
 def activeLocScan(tracker):
-    if tracker.target.on:
+    if tracker.target.vis.on:
         return tracker.goLater('activeTracking')
 
     if tracker.firstFrame() \
@@ -123,7 +123,7 @@ def returnHeadsPan(tracker):
         return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive() or \
-            tracker.target.on:
+            tracker.target.vis.on:
         tracker.helper.trackObject()
         return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
@@ -135,7 +135,7 @@ def look(tracker):
         heads = HeadMoves.LOOK_HEADS[tracker.lookDirection]
         tracker.helper.panTo(heads)
         return tracker.stay()
-    if tracker.brain.ball.on:
+    if tracker.brain.ball.vis.on:
         return tracker.goNow('ballTracking')
     return tracker.stay()
 
@@ -217,7 +217,7 @@ def trianglePanReturn(tracker):
         tracker.helper.panTo(tracker.preTriPanHeads)
     elif (not tracker.brain.motion.isHeadActive() and
           tracker.counter > MOTION_START_BUFFER)  or \
-          tracker.target.on:
+          tracker.target.vis.on:
         return tracker.goLater('ballTracking')
     return tracker.stay()
 

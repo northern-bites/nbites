@@ -14,6 +14,9 @@
 #include "PyMotion.h"
 #include "PyLights.h"
 #include "PySpeech.h"
+#include "PyObjects.h"
+
+#include "CombinationObjects.h"
 
 //#define DEBUG_POST_OBSERVATIONS
 //#define DEBUG_CORNER_OBSERVATIONS
@@ -91,6 +94,9 @@ void Noggin::initializePython()
     printf("  Initializing interpreter and extension modules\n");
 #   endif
 
+    // Initialize localization stuff
+    initializeLocalization();
+
     Py_Initialize();
 
     modifySysPath();
@@ -111,9 +117,11 @@ void Noggin::initializePython()
     // Initialize PyVision module
     c_init_vision();
 
-    // Initialize localization stuff
-    initializeLocalization();
+    // Initlialize PyConstants module
+    c_init_noggin_constants();
 
+    // Initialize PyLocation module
+    c_init_objects();
 }
 
 void Noggin::initializeLocalization()

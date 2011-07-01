@@ -1,7 +1,7 @@
 
 from man import comm
 
-from . import NogginConstants as Constants
+import noggin_constants as Constants
 from . import GameStates
 from .util import FSA
 from . import Leds
