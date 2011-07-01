@@ -5,7 +5,9 @@ from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
+
 from math import fabs
+import copy
 
 DEBUG = False
 
@@ -21,6 +23,80 @@ def doingSweetMove(nav):
 
     return nav.stay()
 
+def goToPosition(nav):
+    """
+    Go to a position set in the navigator. General go to state.  Goes
+    towards an x,y position on the field without regard to the
+    destination heading. Switches over to omni to finish the heading changes.
+    """
+    if nav.firstFrame():
+        nav.omniWalkToCount = 0
+        nav.atPositionCount = 0
+
+    my = nav.brain.my
+    dest = nav.dest
+
+    if (navTrans.atDestinationCloser(my, dest) and
+        navTrans.atHeading(my, dest.h)):
+            nav.atPositionCount += 1
+            if nav.atPositionCount > \
+            constants.FRAMES_THRESHOLD_TO_AT_POSITION:
+                return nav.goNow('atPosition')
+    else:
+        if not nav.atPositionCount == 0:
+            nav.atPositionCount -= 1
+
+    # We don't want to alter the actual destination, we just want a
+    # temporary destination for getting the params to walk straight at
+    tempDest = copy.copy(dest)
+    tempDest.h = my.headingTo(dest)
+
+    walkX, walkY, walkTheta = walker.getWalkSpinParam(my, tempDest)
+    helper.setSpeed(nav, walkX, walkY, walkTheta)
+
+    if navTrans.useFinalHeading(nav.brain, dest):
+        nav.omniWalkToCount += 1
+        if nav.omniWalkToCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
+            return nav.goLater('omniGoTo')
+    else:
+        nav.omniWalkToCount = 0
+
+    if navTrans.shouldAvoidObstacle(nav):
+        return nav.goLater('avoidObstacle')
+
+    return nav.stay()
+
+def omniGoTo(nav):
+    if nav.firstFrame():
+        nav.stopOmniCount = 0
+        nav.atPositionCount = 0
+
+    my = nav.brain.my
+    dest = nav.dest
+
+    if (navTrans.atDestinationCloser(my, dest) and
+        navTrans.atHeading(my, dest.h)):
+        nav.atPositionCount += 1
+        if (nav.atPositionCount >
+            constants.FRAMES_THRESHOLD_TO_AT_POSITION):
+            return nav.goNow('atPosition')
+    else:
+        nav.atPositionCount = 0
+
+    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
+    helper.setSpeed(nav, walkX, walkY, walkTheta)
+
+    if not navTrans.useFinalHeading(nav.brain, dest):
+        nav.stopOmniCount += 1
+        if nav.stopOmniCount > constants.FRAMES_THRESHOLD_TO_GOTO_POSITION:
+            return nav.goLater('goToPosition')
+    else:
+        nav.stopOmniCount = 0
+
+    if navTrans.shouldAvoidObstacle(nav):
+        return nav.goLater('avoidObstacle')
+
+    return nav.stay()
 
 # States for the standard spin - walk - spin go to
 def walkStraightToPoint(nav):
@@ -348,3 +424,24 @@ def orbitPointThruAngle(nav):
     if nav.counter >= nav.angleToOrbit:
         return nav.goLater('stop')
     return nav.stay()
+
+def atPosition(nav):
+    if nav.firstFrame():
+        nav.brain.speech.say("At Position")
+        helper.setSpeed(nav, 0, 0, 0)
+        nav.startOmniCount = 0
+
+    my = nav.brain.my
+    dest = nav.dest
+
+    if navTrans.atDestinationCloser(my, dest) and \
+            navTrans.atHeading(my, dest.h):
+        nav.startOmniCount = 0
+        return nav.stay()
+
+    else:
+        nav.startOmniCount += 1
+        if nav.startOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
+            return nav.goLater('omniGoTo')
+        else:
+            return nav.stay()

@@ -10,6 +10,8 @@ GOTO_POINTS = [(FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING),
                (FC.MY_GOALBOX_RIGHT_X, FC.FIELD_HEIGHT*0.75, FC.OPP_GOAL_HEADING),
                (FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING)]
 
+NUM_POINTS = len(GOTO_POINTS)
+
 def gameReady(player):
     if player.firstFrame():
         player.brain.tracker.locPans()
@@ -41,12 +43,13 @@ def gamePlaying(player):
 
 def goToPoint(player):
     if player.firstFrame():
+        player.brain.speech.say(str(len(GOTO_POINTS)) + " more points to go!")
         player.brain.tracker.locPans()
 
         pt = getNextPoint(player)
         dest = RobotLocation(pt[0], pt[1], pt[2])
         player.brain.nav.goTo(dest)
-    if player.brain.nav.isStopped() and not player.firstFrame():
+    if player.brain.nav.isAtPositition() and not player.firstFrame():
         return player.goLater('atPoint')
 
     return player.stay()
@@ -55,9 +58,10 @@ def atPoint(player):
     if player.firstFrame():
         player.goToCounter += 1
         player.brain.leds.startFlashing()
+        player.brain.speech.say("At position number " + str(player.goToCounter))
     elif player.stateTime > 10.0:
         player.brain.leds.stopFlashing()
-        if player.goToCounter >= len(GOTO_POINTS):
+        if player.goToCounter >= NUM_POINTS:
             return player.goLater('atFinalPoint')
         else:
             return player.goLater('goToPoint')

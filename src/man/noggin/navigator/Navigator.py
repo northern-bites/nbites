@@ -81,14 +81,7 @@ class Navigator(FSA.FSA):
 
     def goTo(self,dest):
         self.dest = dest
-
-        if not self.currentState == 'spinToWalkHeading' and \
-               not self.currentState == 'walkStraightToPoint' and \
-               not self.currentState == 'spinToFinalHeading':
-            if not navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
-                self.switchTo('spinToWalkHeading')
-            elif navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
-                self.switchTo('walkStraightToPoint')
+        self.switchTo('goToPosition')
 
     def stop(self):
         if ((self.currentState =='stop' or self.currentState == 'stopped')
@@ -148,3 +141,8 @@ class Navigator(FSA.FSA):
         self.stepTheta = theta
         self.numSteps = numSteps
         self.switchTo('stepping')
+
+
+    # Have we reached our destination?
+    def isAtPositition(self):
+        return self.currentState is 'atPosition'

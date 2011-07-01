@@ -49,31 +49,34 @@ def getOmniWalkParam(my, dest):
                              constants.OMNI_MAX_RIGHT_SPIN_SPEED,
                              constants.OMNI_MAX_LEFT_SPIN_SPEED)
 
-    denom = sqrt(sX*sX + sY*sY + sTheta*sTheta)
+    denom = sqrt(sX*sX + sY*sY + sTheta*sTheta) / constants.OMNI_GAIN
     if denom != 0:
         sX     /= denom
         sY     /= denom
         sTheta /= denom
 
-    print (sX, sY, sTheta)
     return (sX, sY, sTheta)
 
 def getWalkSpinParam(my, dest):
-    relX, relH = 0, 0
-    if hasattr(dest, "relX") and \
-            hasattr(dest, "relH"):
-        relX = dest.relX
-        relH = dest.relH
+    """
+    Takes an x, y destinatino and walks towards it. Does not worry
+    about final heading, only about getting to the x,y.
+    """
+    if hasattr(dest, "bearing"):
+        bearing = dest.bearing
     else:
-        bearingDeg = my.getRelativeBearing(dest)
-        distToDest = my.distTo(dest)
-        relX = MyMath.getRelativeX(distToDest, bearingDeg)
-        relH = MyMath.sub180Angle(dest.h - my.h)
+        bearing = my.getRelativeBearing(dest)
+
+    if hasattr(dest, "dist"):
+        dist = dest.dist
+    else:
+        dist = my.distTo(dest)
 
    # calculate forward speed
-    forwardGain = 1./constants.APPROACH_X_WITH_GAIN_DIST
-    sX = relX * forwardGain
-    if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
+    sX = dist * constants.APPROACH_X_WITH_GAIN_DIST
+
+    if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE or \
+            fabs(bearing) > 40.:
         sX = 0
     else:
         sX = MyMath.clip(sX,
@@ -81,17 +84,13 @@ def getWalkSpinParam(my, dest):
                          constants.OMNI_FWD_MAX_SPEED)
 
     # calculate spin speed
-    if (fabs(relH) < 5.0):
+    if (fabs(bearing) < 5.0):
         sTheta = 0.0
     else:
-        spinGain = 1./constants.APPROACH_THETA_WITH_GAIN_DIST
-        sTheta = relH * spinGain
+        sTheta = bearing * constants.APPROACH_THETA_WITH_GAIN_DIST
         sTheta = MyMath.clip(sTheta,
                              constants.OMNI_MAX_RIGHT_SPIN_SPEED,
                              constants.OMNI_MAX_LEFT_SPIN_SPEED)
-    # Correct sX
-    if fabs(relH)  > 50.:
-        sX = 0
 
     return (sX, 0, sTheta)
 

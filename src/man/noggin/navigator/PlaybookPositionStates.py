@@ -81,7 +81,8 @@ def playbookAtPosition(nav):
     my = nav.brain.my
     dest = nav.brain.play.getPosition()
 
-    if navTrans.atDestinationCloser(my, dest) and navTrans.atHeading(my, dest.h):
+    if navTrans.atDestinationCloser(my, dest) and \
+            navTrans.atHeading(my, dest.h):
         nav.startOmniCount = 0
         return nav.stay()
 
