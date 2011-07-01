@@ -317,14 +317,6 @@ def stop(nav):
 def stopped(nav):
     return nav.stay()
 
-def orbitPoint(nav):
-    if nav.updatedTrajectory:
-        helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
-        nav.updatedTrajectory = False
-
-    return nav.stay()
-
-
 def orbitPointThruAngle(nav):
     """
     Circles around a point in front of robot, for a certain angle
@@ -342,7 +334,7 @@ def orbitPointThruAngle(nav):
         ball = nav.brain.ball
         #want x to keep a radius of 17 from the ball, increase and
         #decrease x velocity as we move farther away from that dist
-        walkX = (ball.relX - 18) * .05
+        walkX = (ball.relX - 18) * .045
         #keep constant y velocity, let x and theta changea
         walkY = orbitDir * .8
         #Vary theta based on ball bearing.  increase theta velocity as
