@@ -140,9 +140,8 @@ def stareLoc(tracker):
     """
     # Make sure head is inactive first
     if tracker.firstFrame():
+        print "stare target is:",tracker.target.visionId
         tracker.brain.motion.stopHeadMoves()
-    # ** # debugging
-    print "staring at target Id:",tracker.target.visionId
 
     if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
         print "Past stare thresh, switching to new target"
@@ -156,11 +155,12 @@ def stareLoc(tracker):
 
     # Second safety check that something was on frame
     if stareTarget is None:
-        print "no possible target currently visible"
+        print "stare target not in vision"
         return tracker.stay()
 
-    #print "target visible"
+    print "target visible"
     tracker.helper.lookToTargetAngles(stareTarget)
+    print "target at d/b:",tracker.target.visDist,tracker.target.visBearing
 
     return tracker.stay()
 

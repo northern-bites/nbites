@@ -14,7 +14,7 @@ def chase(player):
         return player.goNow('goalieChase')
 
     # ** # We are chasing ball
-    player.brain.tracker.newTrackBall()
+    player.brain.tracker.stareBall()
 
     # Check in order of importance
     if transitions.shouldFindBall(player):
@@ -71,7 +71,7 @@ def approachBall(player):
     if player.firstFrame():
         player.brain.nav.chaseBall()
         # ** # We are approaching the ball
-        player.brain.tracker.newTrackBall()
+        player.brain.tracker.stareBall()
 
     return player.stay()
 
@@ -178,7 +178,7 @@ def kickOff(player):
     if player.firstFrame():
         player.brain.nav.chaseBall()
         # ** # we are kicking off
-        player.brain.tracker.newTrackBall()
+        player.brain.tracker.stareBall()
 
     return player.stay()
 

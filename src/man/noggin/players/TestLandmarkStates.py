@@ -14,6 +14,7 @@ def gameReady(player):
     return player.stay()
 
 def gameSet(player):
+    """
     print "counter:",player.counter
     print "my loc:",player.brain.my.x,player.brain.my.y,player.brain.my.h
 
@@ -25,12 +26,13 @@ def gameSet(player):
         print "locScoreTheta is OK"
     if player.brain.my.locScoreTheta == NogginConstants.GOOD_LOC:
         print "locScoreTheta is GOOD"
+        """
 
     return player.stay()
 
 def gamePlaying(player):
     if player.firstFrame():
-        pass#player.brain.tracker.newTrackBall()
+        player.brain.tracker.panScan()
     return player.stay()
 
 def gamePenalized(player):

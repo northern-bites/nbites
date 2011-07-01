@@ -20,7 +20,7 @@ def playbookPosition(player):
         nav.positionPlaybook()
 
         if gcState == 'gameReady':
-            # ** # player position for 'gameReady'
+            # ** # playbook position is gameReady
             brain.tracker.panScan()
         else:
             brain.tracker.activeLoc()
@@ -42,8 +42,8 @@ def relocalize(player):
     else:
         player.shouldRelocalizeCounter = 0
 
+    # ** # relocalizing at start of game
     if not player.brain.motion.isHeadActive():
-        # ** # player is relocalizing
         player.brain.tracker.panScan()
 
     if player.counter > constants.RELOC_SPIN_FRAME_THRESH:

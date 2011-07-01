@@ -29,11 +29,10 @@ def gameReady(player):
     """
     Stand up, and pan for localization
     """
-
     if player.firstFrame():
         player.inKickingState = False
         player.standup()
-        # ** # player is in 'gameReady'
+        # ** # in gameReady
         player.brain.tracker.panScan()
         player.brain.sensors.startSavingFrames()
 

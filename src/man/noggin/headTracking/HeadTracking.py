@@ -24,26 +24,26 @@ class HeadTracking(FSA.FSA):
         self.setName('headTracking')
         self.decisionState = 'stopped'
 
-        self.currentHeadScan = None # ** # deprecated?
+        self.currentHeadScan = None
         self.headMove = None
 
         self.goalieActiveLoc = False
 
-        self.activePanDir = False # ** # deprecated?
-        self.activeLocOn = False # ** # deprecated?
-        self.activePanOut = False # ** # deprecated?
-        self.activePanUp = False # ** # deprecated?
+        self.activePanDir = False
+        self.activeLocOn = False
+        self.activePanOut = False
+        self.activePanUp = False
         # Enable safeBallTracking to always keep ball in frame while tracking
-        # Currently not support. Leave false.
+        # Currently not supported. Leave false.
         self.safeBallTracking = False
-        self.isPreKickScanning = False # ** # deprecated?
-        self.preActivePanHeads = None # ** # deprecated? should probably stay
+        self.isPreKickScanning = False
+        self.preActivePanHeads = None
         self.locObjectList = []
         self.locObjectList.extend(self.brain.myFieldObjects)
         self.locObjectList.extend(self.brain.corners)
         self.helper = helper.HeadTrackingHelper(self)
 
-        self.lookDirection = None # ** # deprecated?
+        self.lookDirection = None
         self.kickDirection = None
         self.target = self.brain.ball #default
         # target should either be ball or instance of FieldObject
@@ -69,7 +69,7 @@ class HeadTracking(FSA.FSA):
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
-# ** # old method (main input method) - deprecated
+# ** # old method (main input method)
     def trackBall(self):
         """automatically tracks the ball. scans for the ball if not in view"""
         self.target = self.brain.ball
@@ -78,7 +78,7 @@ class HeadTracking(FSA.FSA):
             and (not self.currentState == 'scanBall') ):
             self.switchTo('ballTracking')
 
-# ** # old method (main input method) - deprecated
+# ** # old method (main input method)
     def trackBallSpin(self):
         """automatically tracks the ball. spins if not in view"""
         self.target = self.brain.ball
