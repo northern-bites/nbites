@@ -83,8 +83,6 @@ SET( NOGGIN_SRCS Noggin
                  # LocEKF
 		 MultiMeasurementEKF
 		 MultiLocEKF
-                 NogginStructs.h
-		 PyNogginConstants.h
 		 PyConstants
 		 PyObjects
 		 CombinationObjects
