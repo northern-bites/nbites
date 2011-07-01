@@ -1,6 +1,7 @@
 import kicks
 import KickingConstants as constants
 from .. import NogginConstants
+from ..typeDefs.Location import Location
 from ..util import MyMath
 from math import fabs
 """
@@ -24,6 +25,19 @@ class KickInformation:
         self.passingTeammate = None     # Teammate to pass to.
         self.kickObjective = None
         self.kick = None
+
+    def shouldKickOff(self):
+        """
+        Tells the decider if we should kickOff. Also sets the player constant.
+        """
+        if self.brain.player.shouldKickOff:
+            centerField = Location(NogginConstants.CENTER_FIELD_X,
+                                   NogginConstants.CENTER_FIELD_Y)
+            self.brain.player.shouldKickOff = (centerField.distTo(self.brain.ball) <
+                                               NogginConstants.CENTER_CIRCLE_RADIUS)
+            return self.brain.player.shouldKickOff
+        else:
+            return False
 
     def canScoreAll(self):
         if True:

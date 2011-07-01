@@ -13,68 +13,6 @@ def shouldChaseBall(player):
     ball = player.brain.ball
     return (ball.framesOn > constants.BALL_ON_THRESH)
 
-def shouldChaseFromPositionForKick(player):
-    """
-    Exit PFK if the ball is too far away. This should be
-    like shouldPFK but with a slightly larger range to avoid
-    oscillations between chase and PFK.
-    """
-    ball = player.brain.ball
-    return (shouldChaseBall(player) and
-            (ball.dist > constants.BALL_PFK_DIST+5 or
-             fabs(ball.relY) > constants.BALL_PFK_LEFT_Y))
-
-def shouldChaseFromSpinToBall(player):
-    """
-    Exit spinToBall if the ball is now in front of us or suddenly
-    far away.
-    """
-    ball = player.brain.ball
-    return (shouldChaseBall(player) and
-            (ball.relX > constants.SHOULD_SPIN_TO_KICK_X and
-             (shouldPositionForKick(player) or
-              (fabs(ball.relY) > constants.BALL_PFK_LEFT_Y and
-               ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST + 5))))
-
-def shouldChaseFromClaimBall(player):
-    """
-    Exit claimBall if the ball is no longer too close to us.
-    """
-    ball = player.brain.ball
-    return (shouldChaseBall(player) and
-            (shouldChaseFromPositionForKick(player) or
-             ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST or
-             ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
-
-def shouldPositionForKick(player):
-    """
-    Should begin aligning on the ball for a kick when close
-    """
-    ball = player.brain.ball
-    return (shouldChaseBall(player) and
-            ball.dist < constants.BALL_PFK_DIST and
-            (constants.BALL_PFK_LEFT_Y > ball.relY >
-             constants.BALL_PFK_RIGHT_Y))
-
-def shouldClaimBall(player):
-    """
-    Ball is right in front of us but we would kick it away if we tried
-    to decide the kick on the move. So go claim it first.
-    """
-    ball = player.brain.ball
-    return (shouldPositionForKick(player) and
-            ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST)
-
-def shouldSpinToBall(player):
-    """
-    Ball is close and we should spin before we decide our kick
-    """
-    ball = player.brain.ball
-    return (shouldChaseBall(player) and
-            ((fabs(ball.relY) > constants.BALL_PFK_LEFT_Y and
-             ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST) or
-             ball.relX <= 9.5))
-
 def ballInPosition(player):
     """
     Make sure ball is somewhere we will kick it
@@ -114,45 +52,11 @@ def shouldKickAgain(player):
     """
     return (shouldKick(player) and ballNearPosition(player))
 
-def shouldDribble(player):
+def shouldOrbit(player):
     """
-    Ball is in between us and the opp goal, let's dribble for a while
+    We are lost but are chaser and are at the ball.
     """
-    if constants.USE_DRIBBLE:
-        my = player.brain.my
-        # helpers is no longer used. Find a different way.
-        dribbleAimPoint = helpers.getShotCloseAimPoint(player)
-        goalBearing = my.getRelativeBearing(dribbleAimPoint)
-        return  (not player.penaltyKicking and
-                 0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
-                 0 < fabs(player.brain.ball.relY) < constants.SHOULD_DRIBBLE_Y and
-                 fabs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING and
-                 not player.brain.my.inOppGoalbox() and
-                 player.brain.my.x > (
-                     NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
-                     NogginConstants.GREEN_PAD_X) )
-
-def shouldStopDribbling(player):
-    """
-    While dribbling we should stop
-    """
-    my = player.brain.my
-    # helpers is no longer used. Find a different way.
-    dribbleAimPoint = helpers.getShotCloseAimPoint(player)
-    goalBearing = my.getRelativeBearing(dribbleAimPoint)
-    return (player.penaltyKicking or
-            player.brain.my.inOppGoalbox() or
-            player.brain.ball.relX > constants.STOP_DRIBBLE_X or
-            fabs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
-            fabs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
-            player.brain.my.x < ( NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
-                                  NogginConstants.GREEN_PAD_X))
-
-def shouldKickOff(player):
-    """
-    Determines whether we should do our KickOff play as chaser
-    """
-    return (not player.hasKickedOff)
+    return player.shouldOrbit
 
 ####### PENALTY KICK STUFF ###########
 

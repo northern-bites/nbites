@@ -28,8 +28,8 @@ def positionForKick(player):
     """
     if player.brain.ball.dist > 60:
         player.brain.nav.chaseBall()
-        player.kickDecideScan()
-
+        if player.brain.ball.framesOn > 10:
+            player.brain.tracker.kickDecideScan()
     else:
         kick = player.brain.kickDecider.getKick()
 
@@ -37,19 +37,20 @@ def positionForKick(player):
         player.inKickingState = True
         player.brain.nav.kickPosition(kick)
 
-        # TODO make this a better way to tell if the ball has moved. also we should go back to chase.
+        # TODO make this a better way to tell if the ball has moved.
+        # also we should go back to chase.
         # if we're getting close, decide whether to set another destination
-        if player.brain.nav.nearDestination and player.brain.nav.brain.ball.dist > 20:
+        if player.brain.nav.nearDestination and \
+                player.brain.nav.brain.ball.dist > 20:
             print 'Ball far away ({0}), setting new destination' \
                 .format(player.brain.nav.brain.ball.dist)
             player.brain.nav.kickPosition(kick)
 
+        if transitions.shouldOrbit(player):
+            print "Don't have a kick, orbitting"
+            return player.goNow('orbitBall')
         if transitions.ballInPosition(player) and transitions.shouldKick(player):
-            if kick.nullKick:
-                print "Don't have a kick, orbitting"
-                return player.goNow('orbitBall')
-            else:
-                return player.goNow('kickBallExecute')
+            return player.goNow('kickBallExecute')
 
     if transitions.shouldFindBallKick(player):
         player.inKickingState = False
@@ -66,9 +67,11 @@ def orbitBall(player):
         player.brain.tracker.bounceHead()
 
     if transitions.shouldFindBall(player):
+        player.shouldOrbit = False
         return player.goLater('findBall')
 
     elif player.brain.nav.isStopped():
+        player.shouldOrbit = False
         return player.goLater('chase')
 
     return player.stay()

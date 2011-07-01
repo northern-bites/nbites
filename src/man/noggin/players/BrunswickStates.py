@@ -58,7 +58,7 @@ def gameSet(player):
 
         if (player.brain.play.isRole(CHASER) and
             player.brain.gameController.ownKickOff):
-            player.hasKickedOff = False
+            player.shouldKickOff = True
 
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()

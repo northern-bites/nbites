@@ -52,10 +52,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyMadeSecondKick = False
 
         # Kickoff kick
-        self.hasKickedOff = True
+        self.shouldKickOff = False
 
         # Orbiting
-        self.angleToOrbit = 0.0
+        self.shouldOrbit = False
 
     def run(self):
         self.play = self.brain.play
