@@ -9,10 +9,10 @@ from . import GoaliePositionStates
 from . import GoalieSaveStates
 from . import BrunswickStates
 
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 from ..playbook import PBConstants
 
-from man.noggin.typeDefs.Location import Location
+from objects import Location
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):

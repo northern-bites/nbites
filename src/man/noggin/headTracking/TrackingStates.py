@@ -5,7 +5,7 @@ DEBUG = False
 
 def ballTracking(tracker):
     '''Super state which handles following/refinding the ball'''
-    if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+    if tracker.target.vis.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
         return tracker.goNow('scanBall')
@@ -24,9 +24,9 @@ def tracking(tracker):
         tracker.activeLocOn = False
 
     tracker.helper.trackObject()
-    if not tracker.target.on:
+    if not tracker.target.vis.on:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
-        if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+        if tracker.target.vis.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
             return tracker.goLater(tracker.lastDiffState)
         return tracker.stay()
 
@@ -34,7 +34,7 @@ def tracking(tracker):
 
 def ballSpinTracking(tracker):
     '''Super state which handles following/refinding the ball'''
-    if tracker.target.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+    if tracker.target.vis.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
         return tracker.goNow('spinScanBall')
@@ -48,10 +48,10 @@ def activeTracking(tracker):
         tracker.activeLocOn = True
 
     if tracker.target.locDist < constants.MAX_ACTIVE_TRACKING_DIST and \
-            tracker.target.framesOn > 2:
+            tracker.target.vis.framesOn > 2:
         return tracker.goLater('tracking')
 
-    if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH \
+    if tracker.target.vis.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH \
             and not tracker.brain.motion.isHeadActive() \
             and not (tracker.activePanOut):
         return tracker.goLater('activeLocScan')

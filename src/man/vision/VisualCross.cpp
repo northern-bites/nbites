@@ -3,12 +3,16 @@ VisualCross::VisualCross() :
     VisualObject(ABSTRACT_CROSS)
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 VisualCross::VisualCross(const crossID _id) :
     VisualObject(_id)
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 
@@ -30,6 +34,7 @@ void VisualCross::init()
     setDistance(0);
     setBearing(0);
     elevation = 0;
+    on = false;
 
 	switch (id) {
 	case YELLOW_GOAL_CROSS:

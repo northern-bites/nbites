@@ -968,6 +968,8 @@ void Threshold::storeFieldObjects() {
     setFramesOnAndOff(vision->bgrp);
 
     setVisualCrossInfo(vision->cross);
+    setFramesOnAndOff(vision->cross);
+
     vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->ygCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
@@ -998,7 +1000,7 @@ void Threshold::storeFieldObjects() {
 /*
  * Sets frames on/off to the correct number for a VisualFieldObject
  */
-void Threshold::setFramesOnAndOff(VisualFieldObject *objPtr) {
+void Threshold::setFramesOnAndOff(VisualDetection *objPtr) {
    if (objPtr->isOn()) {
         objPtr->setFramesOn(objPtr->getFramesOn()+1);
         objPtr->setFramesOff(0);
@@ -1223,25 +1225,14 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
     }
 }
 
-// Keeps track of frames on/off for VisualRobots
-void Threshold::setFramesOnAndOff(VisualRobot *objPtr) {
-   if (objPtr->isOn()) {
-        objPtr->setFramesOn(objPtr->getFramesOn()+1);
-        objPtr->setFramesOff(0);
-    }
-    else {
-        objPtr->setFramesOff(objPtr->getFramesOff()+1);
-        objPtr->setFramesOn(0);
-    }
- }
-
-
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
  * @param objPtr    the field object to study
  */
 void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
     // if the object is on screen, basically
     if (objPtr->getHeight() > 0) {
+        objPtr->setOn(true);
+
         // set center x,y
         objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));

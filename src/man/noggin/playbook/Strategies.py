@@ -16,7 +16,8 @@ def sOneField(team, workingPlay):
     # No Kickoff play because it would be identical
     if (team.shouldUseDubD()):
         Formations.fOneFieldD(team, workingPlay)
-    Formations.fOneField(team, workingPlay)
+    else:
+        Formations.fOneField(team, workingPlay)
 
 #### Two Field Players ####
 
