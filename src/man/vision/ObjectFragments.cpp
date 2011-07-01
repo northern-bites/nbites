@@ -944,9 +944,10 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 		for (vector < boost::shared_ptr<VisualLine> >::const_iterator i =
 				 lines->begin();
 			 i != lines->end(); ++i) {
-			if ((*i)->getLeftEndpoint().x < leftBottom.x &&
-											(*i)->getRightEndpoint().x >
-				rightBottom.x) {
+			int lineLeft = (*i)->getLeftEndpoint().x;
+			int lineRight = (*i)->getRightEndpoint().x;
+			if (lineLeft < leftBottom.x && lineRight > rightBottom.x &&
+				lineRight - lineLeft > IMAGE_WIDTH / 3) {
 				if ((*i)->getDistance() > distant) {
 					distant = (*i)->getDistance();
 					goalLine = *i;
@@ -961,6 +962,8 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 					rightBottom.y << endl;
 			}
 			int oldy = leftBottom.y;
+			int oldy2 = rightBottom.y;
+			int size = 0;
 			point<int> leftBig;
 			leftBig.x = leftBottom.x;
 			leftBig.y = IMAGE_HEIGHT - 1;
@@ -971,6 +974,9 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 			leftBottom.x = xProject(leftBottom.x, leftBottom.y,
 									intersect.second);
 			leftBottom.y = intersect.second;
+			if (!goodValuePoint(leftBottom) || !goodValuePoint(rightBottom)) {
+				return;
+			}
 			leftBig.x = rightBottom.x;
 			leftBig.y = IMAGE_HEIGHT - 1;
 			intersect = Utility::plumbIntersection(
@@ -979,19 +985,22 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 			rightBottom.x = xProject(rightBottom.x, rightBottom.y,
 									 intersect.second);
 			rightBottom.y = intersect.second;
+			size = min(leftBottom.y - oldy, rightBottom.y - oldy2);
+			leftBottom.y = oldy + size;
+			rightBottom.y = oldy2 + size;
 			if (leftBottom.x > -1 && leftBottom.x < IMAGE_WIDTH &&
-				rightBottom.x > -1 && rightBottom.x < IMAGE_WIDTH) {
+				rightBottom.x > -1 && rightBottom.x < IMAGE_WIDTH &&
+				size > 3) {
 				// make sure we aren't extending to the goal front line
 				int bad = 0;
 				int xCheck = (leftBottom.x + rightBottom.x) / 2;
-				if (linesFound < 2) {
-					for (int i = oldy; i <= leftBottom.y; i++) {
-						if (Utility::isGreen(thresh->getThresholded(i, xCheck))) {
-							bad++;
-						}
+				for (int i = oldy; i <= leftBottom.y; i++) {
+					if (Utility::isGreen(thresh->getThresholded(i, xCheck))) {
+						bad++;
 					}
 				}
-				if (!(bad * 2 > leftBottom.y - oldy)) {
+				if (!(bad * 2 > size) || (linesFound > 1 &&
+										  bad * 3 < size * 2)) {
 					obj.setBlob(leftTop, rightTop, leftBottom, rightBottom);
 					if (POSTDEBUG) {
 						cout << "New Ys " << leftBottom.y << " " << rightBottom.y <<
@@ -1404,10 +1413,13 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 	// basically the goalie view - the post to one side, corner in view
 	if (distant > corner.getLine1()->getDistance() &&
 		distant > corner.getLine2()->getDistance()) {
+		if (POSTLOGIC) {
+			cout << "Goalie view " << endl;
+		}
 		if (x > post.getLeft()) {
-			return LEFT;
-		} else {
 			return RIGHT;
+		} else {
+			return LEFT;
 		}
 	}
 	float diff = realDistance(x, y, post.getLeftBottomX(),
@@ -1417,6 +1429,9 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 	// field corner
 	if (distant <= further) {
 		if (diff < FIELD_WHITE_HEIGHT / 2) {
+			if (POSTLOGIC) {
+				cout << "Field corner" << endl;
+			}
 			if (x > post.getLeft()) {
 				return RIGHT;
 			} else {
@@ -1426,6 +1441,9 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 	}
 	estimate e = vision->pose->pixEstimate(x, y, 0.0);
 	if (e.dist < FIELD_WHITE_HEIGHT / 2) {
+		if (POSTLOGIC) {
+			cout << "Distance use" << endl;
+		}
 		if (x > post.getLeft()) {
 			return RIGHT;
 		} else {
@@ -2250,8 +2268,6 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
     // make sure we're looking at something big enough to be a post
     if (isItAPost == NOPOST) {
         return;
-    } else if (POSTDEBUG) {
-        cout << "We have a good candidate" << endl;
     }
     if (!isPostReasonableSizeShapeAndPlace(pole)) {
         if (POSTDEBUG) {
