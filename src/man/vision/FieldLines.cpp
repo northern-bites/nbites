@@ -472,153 +472,156 @@ void FieldLines::findHorizontalLinePoints(vector <linePoint> &points)
         // Start 1 pixel from left so we can test the pixel before to determine
         // starting edge value
         for (int x = 1; x < IMAGE_WIDTH - 1; x++) {
-            const int current_y_value = vision->thresh->getY(x,y);
-            const unsigned char thresholdedColor = vision->thresh->getThresholded(y,x);
+			// don't bother processing over the convex hull top
+			if (vision->thresh->field->horizonAt(x) <= y) {
+				const int current_y_value = vision->thresh->getY(x,y);
+				const unsigned char thresholdedColor = vision->thresh->getThresholded(y,x);
 
-            const bool isAtAnUphillEdge = isUphillEdge(current_y_value,
-                                                       last_y_value,
-                                                       HORIZONTAL);
-            // Do some checks before we actively search for edges
-            if (haveFound(greenWhiteX)) {
+				const bool isAtAnUphillEdge = isUphillEdge(current_y_value,
+														   last_y_value,
+														   HORIZONTAL);
+				// Do some checks before we actively search for edges
+				if (haveFound(greenWhiteX)) {
 
-                // We have found a whiteGreen (right) edge, we might accept it
-                // right now or we might wait a little longer to ensure we get
-                // the full width of the line
-                if (haveFound(whiteGreenX)) {
+					// We have found a whiteGreen (right) edge, we might accept it
+					// right now or we might wait a little longer to ensure we get
+					// the full width of the line
+					if (haveFound(whiteGreenX)) {
 
-                    // We're beyond the point where we could possibly find
-                    // another legitimate right to the line, go ahead and add
-                    // the line point
-                    if (Utility::isGreen(thresholdedColor) || isAtAnUphillEdge ||
-                        !isWaitingForAnotherRightEdge(whiteGreenX, x)
-                        // About to exit this iteration due to x position
-                        || isAtRightOfImage(x, IMAGE_WIDTH - 1)) {
+						// We're beyond the point where we could possibly find
+						// another legitimate right to the line, go ahead and add
+						// the line point
+						if (Utility::isGreen(thresholdedColor) || isAtAnUphillEdge ||
+							!isWaitingForAnotherRightEdge(whiteGreenX, x)
+							// About to exit this iteration due to x position
+							|| isAtRightOfImage(x, IMAGE_WIDTH - 1)) {
 
-                        // SANITY CHECK: lines have a much bigger width when
-                        // they are up close
-                        const int linePointX = (whiteGreenX + greenWhiteX) / 2;
-                        const int width = whiteGreenX - greenWhiteX;
-						const estimate pixEst = pose->pixEstimate(linePointX,
-																  y, 0);
-                        const float distance = pixEst.dist;
-						const float bearing = pixEst.bearing;
-                        if (isReasonableHorizontalWidth(linePointX, y, distance,
-                                                        width)) {
-                            // assign x, y, lineWidth
-                            const linePoint point(linePointX, y,
-                                                  static_cast<float>(width),
-                                                  distance, bearing, HORIZONTAL);
-                            if (debugHorEdgeDetect) {
-                                cout << "\t\tPoint " << point << " accepted."
-                                     << endl;
-                            }
+							// SANITY CHECK: lines have a much bigger width when
+							// they are up close
+							const int linePointX = (whiteGreenX + greenWhiteX) / 2;
+							const int width = whiteGreenX - greenWhiteX;
+							const estimate pixEst = pose->pixEstimate(linePointX,
+																	  y, 0);
+							const float distance = pixEst.dist;
+							const float bearing = pixEst.bearing;
+							if (isReasonableHorizontalWidth(linePointX, y, distance,
+															width)) {
+								// assign x, y, lineWidth
+								const linePoint point(linePointX, y,
+													  static_cast<float>(width),
+													  distance, bearing, HORIZONTAL);
+								if (debugHorEdgeDetect) {
+									cout << "\t\tPoint " << point << " accepted."
+										 << endl;
+								}
 
-                            if (printLinePointInfo) {
-                                fprintf(lp, "%f\t%d\t(%d,%d)\n",distance,width,
-                                        linePointX,y);
-                            }
+								if (printLinePointInfo) {
+									fprintf(lp, "%f\t%d\t(%d,%d)\n",distance,width,
+											linePointX,y);
+								}
 
-                            vision->drawPoint(point.x, point.y,
-                                              UNUSED_HOR_POINT_COLOR);
-                            points.push_back(point);
-                        }
-                        else {
-                            if (debugHorEdgeDetect)
-                                cout << "Width was invalid, ignoring line point"
-                                     << endl;
-                        }
-                        resetLineCounters(numWhite, numUndefined, numNonWhite);
-                        greenWhiteX = NO_EDGE;
-                        whiteGreenX = NO_EDGE;
-                    }
-                }
-                else {
-                    // We are currently "in" a line so keep track of the pixel
-                    // value at this point so we know whether the line has too
-                    // much undefined or nonwhite, or is too thick
-                    updateLineCounters(thresholdedColor, numWhite, numUndefined,
-                                       numNonWhite);
-                }
-            }
-            // end if (haveFound(whiteGreenX))
+								vision->drawPoint(point.x, point.y,
+												  UNUSED_HOR_POINT_COLOR);
+								points.push_back(point);
+							}
+							else {
+								if (debugHorEdgeDetect)
+									cout << "Width was invalid, ignoring line point"
+										 << endl;
+							}
+							resetLineCounters(numWhite, numUndefined, numNonWhite);
+							greenWhiteX = NO_EDGE;
+							whiteGreenX = NO_EDGE;
+						}
+					}
+					else {
+						// We are currently "in" a line so keep track of the pixel
+						// value at this point so we know whether the line has too
+						// much undefined or nonwhite, or is too thick
+						updateLineCounters(thresholdedColor, numWhite, numUndefined,
+										   numNonWhite);
+					}
+				}
+				// end if (haveFound(whiteGreenX))
 
-            if (countersHitSanityChecks(numWhite, numUndefined, numNonWhite,
-                                        debugHorEdgeDetect)) {
-                resetLineCounters(numWhite, numUndefined, numNonWhite);
-                greenWhiteX = NO_EDGE;
-                whiteGreenX = NO_EDGE;
-            }
+				if (countersHitSanityChecks(numWhite, numUndefined, numNonWhite,
+											debugHorEdgeDetect)) {
+					resetLineCounters(numWhite, numUndefined, numNonWhite);
+					greenWhiteX = NO_EDGE;
+					whiteGreenX = NO_EDGE;
+				}
 
-            // Possible left edge to line
-            if (isAtAnUphillEdge) {
-                if (isGreenWhiteEdge(x, y, HORIZONTAL)) {
+				// Possible left edge to line
+				if (isAtAnUphillEdge) {
+					if (isGreenWhiteEdge(x, y, HORIZONTAL)) {
 
-                    if (isFirstUphillEdge(greenWhiteX, x, y, HORIZONTAL)) {
-                        // Mark this pixel as left
-                        greenWhiteX = x;
-                    }
-                    else if (isSecondCloseUphillEdge(greenWhiteX, y, x, y,
-                                                     HORIZONTAL)) {
-                        // Do nothing.  Keep going
-                    }
-                    // It's the second uphill edge but far away from first.
-                    // We missed the last line. Start anew from this point
-                    else if (isSecondFarUphillEdge(greenWhiteX, y, x, y,
-                                                   HORIZONTAL)) {
-                        vision->drawPoint(x, y, YELLOW);
-                        resetLineCounters(numWhite, numUndefined, numNonWhite);
-                        greenWhiteX = x;
-                    }
-                    else {
-                        cout << " Should not be reaching this statement at ("
-                             << x << ", " << y << ")" << endl;
-                    }
-                } // end isGreenWhiteEdge
+						if (isFirstUphillEdge(greenWhiteX, x, y, HORIZONTAL)) {
+							// Mark this pixel as left
+							greenWhiteX = x;
+						}
+						else if (isSecondCloseUphillEdge(greenWhiteX, y, x, y,
+														 HORIZONTAL)) {
+							// Do nothing.  Keep going
+						}
+						// It's the second uphill edge but far away from first.
+						// We missed the last line. Start anew from this point
+						else if (isSecondFarUphillEdge(greenWhiteX, y, x, y,
+													   HORIZONTAL)) {
+							vision->drawPoint(x, y, YELLOW);
+							resetLineCounters(numWhite, numUndefined, numNonWhite);
+							greenWhiteX = x;
+						}
+						else {
+							cout << " Should not be reaching this statement at ("
+								 << x << ", " << y << ")" << endl;
+						}
+					} // end isGreenWhiteEdge
 
-                else if (isSecondUphillButInvalid(greenWhiteX, y, x, y,
-                                                  HORIZONTAL)) {
-                    resetLineCounters(numWhite, numUndefined, numNonWhite);
-                    greenWhiteX = NO_EDGE;
-                    whiteGreenX = NO_EDGE;
-                }
-                else {
-                    if (debugHorEdgeDetect) {
-                        cout << "\t\tHit an uphill edge but it was not green "
-                             << "white or a second close uphill edge, or "
-                             << "second far uphill edge at (" << x << ", "
-                             << y<< ")" << endl;
-                    }
-                }
+					else if (isSecondUphillButInvalid(greenWhiteX, y, x, y,
+													  HORIZONTAL)) {
+						resetLineCounters(numWhite, numUndefined, numNonWhite);
+						greenWhiteX = NO_EDGE;
+						whiteGreenX = NO_EDGE;
+					}
+					else {
+						if (debugHorEdgeDetect) {
+							cout << "\t\tHit an uphill edge but it was not green "
+								 << "white or a second close uphill edge, or "
+								 << "second far uphill edge at (" << x << ", "
+								 << y<< ")" << endl;
+						}
+					}
 
-            } // End isUphillEdge()
+				} // End isUphillEdge()
 
-            // Possible right edge to line
-            else if (isDownhillEdge(current_y_value, last_y_value, HORIZONTAL)){
+				// Possible right edge to line
+				else if (isDownhillEdge(current_y_value, last_y_value, HORIZONTAL)){
 
-                if (haveFound(greenWhiteX)) {
-                    // point position would be midway between left and right
-                    // edge
-                    const int potentialMidpointX = (greenWhiteX + x) / 2;
-                    if (isWhiteGreenEdge(x, y, potentialMidpointX,HORIZONTAL)) {
-                        // Even if we had already found a right edge, this one
-                        // might be more suitable.
-                        if (isMoreSuitableRightEdge(whiteGreenX, x, y)) {
-                            whiteGreenX = x;
-                        }
-                        // right edge was too far away
-                        else downhillEdgeWasTooFar(x, y, HORIZONTAL);
-                    } // end isWhiteGreenEdge
+					if (haveFound(greenWhiteX)) {
+						// point position would be midway between left and right
+						// edge
+						const int potentialMidpointX = (greenWhiteX + x) / 2;
+						if (isWhiteGreenEdge(x, y, potentialMidpointX,HORIZONTAL)) {
+							// Even if we had already found a right edge, this one
+							// might be more suitable.
+							if (isMoreSuitableRightEdge(whiteGreenX, x, y)) {
+								whiteGreenX = x;
+							}
+							// right edge was too far away
+							else downhillEdgeWasTooFar(x, y, HORIZONTAL);
+						} // end isWhiteGreenEdge
 
-                    else secondDownhillButInvalid(x, y, HORIZONTAL);
-                } // end haveFound
+						else secondDownhillButInvalid(x, y, HORIZONTAL);
+					} // end haveFound
 
-                // We haven't found a left edge.
-                else {
-                    foundDownhillNoUphill(x,y, HORIZONTAL);
-                }
-            } // end else if (isDownhillEdge)
-            last_y_value = current_y_value;
-        } // end x loop
+					// We haven't found a left edge.
+					else {
+						foundDownhillNoUphill(x,y, HORIZONTAL);
+					}
+				} // end else if (isDownhillEdge)
+				last_y_value = current_y_value;
+			}
+		} // end x loop
     } // end y loop
 
     if (printLinePointInfo) {
@@ -3585,6 +3588,23 @@ float FieldLines::getRealDistance(const ConcreteCorner *c,
 								  obj->getFieldX2(), obj->getFieldY2());
 }
 
+/*	Calculate the actual distance between two points.  Uses functions
+	from NaoPose.cpp in Noggin
+	@param x1	x coord of object 1
+	@param y1	y coord of object 1
+	@param x2	x coord of object 2
+	@param y2	y coord of object 2
+	@return		the distance in centimeters
+ */
+
+float FieldLines::realDistance(int x1, int y1, int x2, int y2)  const {
+	estimate r = vision->pose->pixEstimate(x1, y1, 0.0);
+	estimate l = vision->pose->pixEstimate(x2, y2, 0.0);
+	return vision->pose->getDistanceBetweenTwoObjects(l, r);
+}
+
+
+
 #ifdef OFFLINE
 /*
  * This method prints out every pixel in the image, the Y channel value at
@@ -3979,22 +3999,26 @@ FieldLines::isTActuallyCC(const VisualCorner& c,
         // Check if we can find a few stray points on the other side of
         // the TBar, relatively close.
         const point<int> strayPt(firstPoint->x, firstPoint->y);
-        const int maxLineOffset = 100;
-        const int maxIntersectDist = 100;
-        const float minLineOffset = c.getTBar()->getAvgWidth()/3.0f;
+		int newY = vision->thresh->field->horizonAt(strayPt.x);
+		if (realDistance(strayPt.x, strayPt.y, strayPt.x, newY) > 100) {
+			const int maxLineOffset = 100;
+			const int maxIntersectDist = 100;
+			const float minLineOffset = c.getTBar()->getAvgWidth()/3.0f;
 
-        const float distFromLine = Utility::distToLine(*c.getTBar(), strayPt);
+			const float distFromLine = Utility::distToLine(*c.getTBar(), strayPt);
 
-        if (Utility::areAcrossLine(*c.getTBar(), strayPt, stemEndpoint) &&
-            Utility::getLength(intersection, strayPt) < maxIntersectDist &&
-            distFromLine < maxLineOffset &&
-            distFromLine > minLineOffset){
+			if (Utility::areAcrossLine(*c.getTBar(), strayPt, stemEndpoint) &&
+				Utility::getLength(intersection, strayPt) < maxIntersectDist &&
+				distFromLine < maxLineOffset &&
+							   distFromLine > minLineOffset){
 
-            if (debugIntersectLines)
-                cout << endl<< "Found possible CC point at " << *firstPoint << endl;
+				if (debugIntersectLines)
+					cout << endl<< "Found possible CC point at " << *firstPoint <<
+						endl;
 
-            oppPointCount++;
-        }
+				oppPointCount++;
+			}
+		}
 	}
     if (debugIntersectLines){
         cout << "Found " << oppPointCount << " points across TCorner." << endl;

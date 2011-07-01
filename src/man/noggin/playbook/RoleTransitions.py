@@ -91,6 +91,7 @@ def shouldStopChase(team):
     ball= team.brain.ball
     my = team.brain.my
 
+
     if(ball.framesOff > goalCon.BALL_LOST):
         team.resetGoalieRoleCounters()
         return True
