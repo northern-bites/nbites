@@ -33,7 +33,7 @@
 #include "Provider.h"
 #include "Speech.h"
 #include "BulkMonitor.h"
-#include "synchro.h"
+#include "include/synchro/mutex.h"
 #include "Kinematics.h"
 
 enum SupportFoot {
@@ -64,6 +64,7 @@ struct FSR {
 };
 
 struct FootBumper {
+    FootBumper() : left(0.0f), right(0.0f) {}
     // Since the foot bumpers only have pressed/unpressed states, but are stored
     // as floats with values 0.0f and 1.0f, we just test whether the value is
     // bigger than a half or not and assign a boolean based on that.
@@ -232,21 +233,21 @@ private:
     boost::shared_ptr<Speech> speech;
 
     // Locking mutexes
-    mutable pthread_mutex_t angles_mutex;
-    mutable pthread_mutex_t vision_angles_mutex;
-    mutable pthread_mutex_t motion_angles_mutex;
-    mutable pthread_mutex_t errors_mutex;
-    mutable pthread_mutex_t temperatures_mutex;
-    mutable pthread_mutex_t fsr_mutex;
-    mutable pthread_mutex_t button_mutex;
-    mutable pthread_mutex_t bumper_mutex;
-    mutable pthread_mutex_t inertial_mutex;
-    mutable pthread_mutex_t unfiltered_inertial_mutex;
-    mutable pthread_mutex_t ultra_sound_mutex;
-    mutable pthread_mutex_t support_foot_mutex;
-    mutable pthread_mutex_t battery_mutex;
-    mutable pthread_mutex_t image_mutex;
-    mutable pthread_mutex_t variance_mutex;
+    mutex angles_mutex;
+    mutex vision_angles_mutex;
+    mutex motion_angles_mutex;
+    mutex errors_mutex;
+    mutex temperatures_mutex;
+    mutex fsr_mutex;
+    mutex button_mutex;
+    mutex bumper_mutex;
+    mutex inertial_mutex;
+    mutex unfiltered_inertial_mutex;
+    mutex ultra_sound_mutex;
+    mutex support_foot_mutex;
+    mutex battery_mutex;
+    mutex image_mutex;
+    mutex variance_mutex;
     multi_mutex vision_sensors_mutex;
     multi_mutex motion_sensors_mutex;
 
