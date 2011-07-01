@@ -75,9 +75,7 @@ def shouldHoldSave(player):
 def goalieInBox(player):
     my = player.brain.my
 
-    return (my.x < NogCon.MY_GOALBOX_RIGHT_X + 10 and
-            NogCon.MY_GOALBOX_TOP_Y + 10 > my.y and
-            my.y > NogCon.MY_GOALBOX_BOTTOM_Y - 10)
+    return my.inMyGoalBox()
 
 
 #CHASE TRANSITIONS
