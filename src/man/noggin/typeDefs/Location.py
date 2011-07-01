@@ -65,9 +65,9 @@ class Location (object):
 
     def inMyGoalBox(self):
 
-        return self.x < NogginConstants.MY_GOALBOX_RIGHT_X + 10 and \
-               NogginConstants.MY_GOALBOX_TOP_Y + 10 > self.y > \
-               NogginConstants.MY_GOALBOX_BOTTOM_Y - 10
+        return self.x < NogginConstants.MY_GOALBOX_RIGHT_X  and \
+               NogginConstants.MY_GOALBOX_TOP_Y  > self.y  and \
+               self.y > NogginConstants.MY_GOALBOX_BOTTOM_Y
 
     def inCenterOfField(self):
         return NogginConstants.FIELD_HEIGHT *2./3. > self.y > \

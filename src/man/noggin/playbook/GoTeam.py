@@ -116,7 +116,7 @@ class GoTeam:
         """
         Update information specific to the coordinated behaviors
         """
-        # Print changes
+        # Print changes and Say changes
         if play.changed:
             self.brain.speech.say(PBConstants.SUB_ROLES[play.subRole])
             if self.printStateChanges:
