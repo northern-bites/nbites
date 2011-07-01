@@ -73,16 +73,6 @@ class SoccerFSA(FSA.FSA):
         """
         self.brain.nav.setDest(x, y, theta)
 
-    def setSteps(self, x, y, theta, numSteps=1):
-        """
-        Have the robot walk a specified number of steps
-        """
-        if self.brain.motion.isWalkActive():
-            return False
-        else:
-            self.brain.nav.takeSteps(x, y, theta, numSteps)
-            return True
-
     def standup(self):
         self.brain.nav.stop()
 

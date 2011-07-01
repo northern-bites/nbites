@@ -745,26 +745,27 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 
     int framesToDestination = 0;
 
-    const float CLOSE_ENOUGH_XY = 10.0f;
+    const float CLOSE_ENOUGH_X = 15.0f; // 10mm
+    const float CLOSE_ENOUGH_Y = 15.0f;
     const float CLOSE_ENOUGH_THETA = 0.17f; // 10 degrees
 
     // loop until we get to our destination
-    while (abs(dest_x) > CLOSE_ENOUGH_XY ||
-	   abs(dest_y) > CLOSE_ENOUGH_XY ||
+    while (abs(dest_x) > CLOSE_ENOUGH_X ||
+	   abs(dest_y) > CLOSE_ENOUGH_Y ||
 	   abs(dest_theta) > CLOSE_ENOUGH_THETA) {
 	float step_x, step_y, step_theta;
 
 	// check if we're close enough to our destination to make it this step
 	if (abs(dest_x) > abs(speed_x))
-	    step_x = speed_x * sign(dest_x);
-	else if (abs(dest_x) <= CLOSE_ENOUGH_XY)
+	    step_x = speed_x;
+	else if (abs(dest_x) <= CLOSE_ENOUGH_X)
 	    step_x = 0.0f;
 	else
 	    step_x = dest_x;
 
 	if (abs(dest_y) > abs(speed_y))
 	    step_y = speed_y * sign(dest_y);
-	else if (abs(dest_y) <= CLOSE_ENOUGH_XY)
+	else if (abs(dest_y) <= CLOSE_ENOUGH_Y)
 	    step_y = 0.0f;
 	else
 	    step_y = dest_y;
@@ -781,10 +782,11 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 	// update the destination based on how far this step went
 	dest_x -= lastQueuedStep->x;
 
-	if (sign(dest_y) == sign(step_y))
+	// necessary (HACK!) because steps will alternate +/- in Y and Theta
+	if (sign(dest_y) == sign(lastQueuedStep->y))
 	    dest_y -= lastQueuedStep->y;
 
-	if (sign(dest_theta) == sign(step_theta))
+	if (sign(dest_theta) == sign(lastQueuedStep->theta))
 	    dest_theta -= lastQueuedStep->theta;
 
 	framesToDestination += lastQueuedStep->stepDurationFrames;

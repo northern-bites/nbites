@@ -21,7 +21,6 @@ def doingSweetMove(nav):
 
     return nav.stay()
 
-
 # States for the standard spin - walk - spin go to
 def walkStraightToPoint(nav):
     """
@@ -277,25 +276,24 @@ def destWalking(nav):
     if nav.firstFrame() or nav.newDestination:
         if (nav.destGain < 0):
             nav.destGain = 1;
-            # @todo Leaving the actual interface of the destGain parameter unimplemented
-            # Wils, figure out how you want to set it up --Nathan
+
+        nav.nearDestination = False
+
+        if nav.destX == 0 and nav.destY == 0 and nav.destTheta == 0:
+            nav.goNow('stop')
 
         helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta, nav.destGain)
         nav.newDestination = False
 
-    return nav.stay()
+    framesLeft = nav.currentCommand.framesRemaining()
 
-# State to use with the setSteps method
-def stepping(nav):
-    """
-    We use this to go a specified number of steps.
-    This is different from walking.
-    """
-    if nav.firstFrame():
-        helper.step(nav, nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
+    # the frames remaining counter is sometimes set to -1 initially
+    if framesLeft != -1 and framesLeft < 40:
+        nav.nearDestination = True
 
-    elif not nav.brain.motion.isWalkActive():
-        return nav.goNow("stopped")
+    if nav.currentCommand.isDone():
+        nav.nearDestination = True
+        return nav.goNow('stop')
 
     return nav.stay()
 
@@ -305,9 +303,14 @@ def stop(nav):
     Wait until the walk is finished.
     """
     if nav.firstFrame():
+        # stop walk vectors
         helper.setSpeed(nav, 0, 0, 0)
         nav.walkX = nav.walkY = nav.walkTheta = \
                     nav.stepX = nav.stepY = nav.stepTheta = nav.numSteps = 0
+
+        # stop destination walking
+        nav.destX = nav.destY = nav.destTheta = 0
+        helper.setDestination(nav, 0, 0, 0, 1)
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
