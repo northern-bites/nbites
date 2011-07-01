@@ -2,7 +2,7 @@
 # Goalie constants
 #
 
-from .. import NogginConstants as NogCon
+import noggin_constants as NogCon
 
 # *****************
 #     Position    *

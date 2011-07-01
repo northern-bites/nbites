@@ -2,7 +2,7 @@ from math import (fabs, hypot, atan2, cos, sin, acos, asin)
 from ..util import MyMath
 from . import PBConstants
 from . import Strategies
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 import time
 
 # ANSI terminal color codes

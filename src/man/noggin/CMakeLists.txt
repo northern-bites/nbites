@@ -83,7 +83,9 @@ SET( NOGGIN_SRCS Noggin
                  # LocEKF
 		 MultiMeasurementEKF
 		 MultiLocEKF
-                 NogginStructs.h
+		 PyConstants
+		 PyObjects
+		 CombinationObjects
                  )
 
 
@@ -94,7 +96,6 @@ SET( NOGGIN_PYTHON_SRCS __init__.py
                         FallController.py
 			Stability.py
                         FallStates.py
-                        NogginConstants.py
                         Leds.py
                         ${CMAKE_CURRENT_BINARY_DIR}/TeamConfig.py
                         ${CMAKE_CURRENT_BINARY_DIR}/WebotsConfig.py

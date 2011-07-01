@@ -13,6 +13,7 @@
 #include "GameController.h"
 #include "RoboGuardian.h"
 #include "Sensors.h"
+#include "PyConstants.h"
 #include "memory/log/LoggingBoard.h"
 #include "memory/log/PyLoggingBoard.h"
 
