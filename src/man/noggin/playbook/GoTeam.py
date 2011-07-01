@@ -407,8 +407,8 @@ class GoTeam:
         if not PBConstants.USE_DUB_D:
             return False
         goalie = self.brain.teamMembers[0]
-        if (goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER)
-            or ball.inMyGoalBox()):
+        if (goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER)):
+            #or ball.inMyGoalBox()):
             self.goalieChaserCount += 1
         else:
             self.goalieChaserCount = 0
