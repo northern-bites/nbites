@@ -90,7 +90,7 @@ def chaseAroundBox(nav):
 
     if nav.firstFrame():
         # reset dest to new RobotLocation to avoid problems w/dist calculations
-        nav.dest = RobotLocation(0.0, 0.0)
+        nav.dest = RobotLocation(0, 0, 0)
         nav.shouldChaseAroundBox = 0
 
     ball = nav.brain.ball
