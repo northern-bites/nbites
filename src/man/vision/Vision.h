@@ -33,9 +33,6 @@
 #include "Common.h"
 #include "VisionDef.h"
 #include "Profiler.h"
-#if defined(OFFLINE) || !ROBOT(NAO_RL)
-#  include "MotionDef.h"
-#endif
 #include "FieldLinesDetector.h"
 
 class Vision;   // forward reference
