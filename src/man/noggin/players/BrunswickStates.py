@@ -81,7 +81,6 @@ def gamePlaying(player):
                 # but check should be here if there is.
             #else human error
 
-    print "Getting role state in BrunswickStates?"
     roleState = player.getRoleState()
     return player.goNow(roleState)
 
