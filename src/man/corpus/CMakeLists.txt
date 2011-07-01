@@ -138,6 +138,7 @@ SET( NBINCLUDE_SRCS ${NBCOMMON_INCLUDE_DIR}/NBMatrixMath
   ${NBCOMMON_INCLUDE_DIR}/dsp
   ${NBCOMMON_INCLUDE_DIR}/SensorMonitor
   ${NBCOMMON_INCLUDE_DIR}/BulkMonitor
+  ${NBCOMMON_INCLUDE_DIR}/synchro/mutex
   CoordFrame4D
   CoordFrame3D
   )

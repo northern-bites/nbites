@@ -198,14 +198,14 @@ class NaoPose {
     const float pixHeightToDistance(float pixHeight, float cmHeight) const;
     const float pixWidthToDistance(float pixWidth, float cmWidth) const;
     const float getHeadYaw() {
-        return sensors->getHeadAngles()[0];
+        return sensors->getVisionAngle(Kinematics::HEAD_YAW);
     }
     const float getDistanceBetweenTwoObjects(estimate e1, estimate e2);
     std::vector<VisualLine> getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
     const boost::numeric::ublas::vector <float> worldPointToPixel(boost::numeric::ublas::vector <float> point);
 
     const float getHeadPitch() {
-        return sensors->getHeadAngles()[1];
+        return sensors->getVisionAngle(Kinematics::HEAD_PITCH);
     }
     const float getBodyCenterHeight() const { return comHeight; }
     const float getFocalPointInWorldFrameZ() const { return focalPointInWorldFrame.z;}

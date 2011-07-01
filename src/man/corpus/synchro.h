@@ -25,7 +25,7 @@
 #include <string>
 #include <pthread.h>
 #include <boost/shared_ptr.hpp>
-
+#include <vector>
 
 #undef MUTEX_TYPE
 #ifdef NDEBUG
@@ -128,7 +128,7 @@ class Trigger
   public:
     Trigger(boost::shared_ptr<Synchro> _synchro, std::string name,
             bool _value=false);
-    ~Trigger() { }
+    virtual ~Trigger() { }
 
     void flip();
     void on();

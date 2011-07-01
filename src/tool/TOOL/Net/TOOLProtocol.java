@@ -203,13 +203,6 @@ public class TOOLProtocol {
 
             if (r.info()) {
                 robotType = serial.readByte();
-
-                byte buf[] = new byte[1024];
-                int length = serial.readBytes(buf, true);
-                robotName = new String(buf, 0, length, "US-ASCII");
-
-                length = serial.readBytes(buf, true);
-                calFile = new String(buf, 0, length, "US-ASCII");
                 processInfo();
             }
 

@@ -11,7 +11,6 @@
 
 #include "Common.h"
 #include "MotionEnactor.h"
-#include "NaoDef.h"
 #include "Sensors.h"
 #include "Transcriber.h"
 

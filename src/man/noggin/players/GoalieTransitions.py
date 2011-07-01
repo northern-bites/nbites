@@ -55,8 +55,10 @@ def shouldSaveCenter(player):
 
     return False
 
+# If penalty kicking do not get up
 def shouldHoldSave(player):
-    return player.stateTime <= goalCon.TIME_ON_GROUND
+    return (player.penaltyKicking or
+            player.stateTime <= goalCon.TIME_ON_GROUND)
 
 #POSITION TRANSITIONS
 
