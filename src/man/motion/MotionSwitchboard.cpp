@@ -172,53 +172,52 @@ void MotionSwitchboard::processJoints()
  * too much too it:
  */
 void MotionSwitchboard::processStiffness(){
-    try{
-        if(curHeadProvider->isActive()){
-            const vector <float > headStiffnesses =
-                curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
+    pthread_mutex_lock(&stiffness_mutex);
 
-            pthread_mutex_lock(&stiffness_mutex);
+    if(curHeadProvider->isActive()){
+        const vector <float > headStiffnesses =
+            curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
 
-            for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
-                nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
-            }
-
-            pthread_mutex_unlock(&stiffness_mutex);
-        }
-
-        if(curProvider->isActive()){
-            const vector <float > llegStiffnesses =
-                curProvider->getChainStiffnesses(LLEG_CHAIN);
-
-            const vector <float > rlegStiffnesses =
-                curProvider->getChainStiffnesses(RLEG_CHAIN);
-
-            const vector <float > rarmStiffnesses =
-                curProvider->getChainStiffnesses(RARM_CHAIN);
-
-            const vector <float > larmStiffnesses =
-                curProvider->getChainStiffnesses(LARM_CHAIN);
-
-            pthread_mutex_lock(&stiffness_mutex);
-
-            for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-                nextStiffnesses[L_HIP_YAW_PITCH + i] = llegStiffnesses.at(i);
-                nextStiffnesses[R_HIP_YAW_PITCH + i] = rlegStiffnesses.at(i);
-            }
-
-            for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-                nextStiffnesses[L_SHOULDER_PITCH + i] = larmStiffnesses.at(i);
-                nextStiffnesses[R_SHOULDER_PITCH + i] = rarmStiffnesses.at(i);
-            }
-
-            pthread_mutex_unlock(&stiffness_mutex);
+        for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
+            nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
         }
     }
 
-    catch(std::out_of_range & e){
-        cout << "Out of range exception caught in processStiffness"<< e.what()<<endl;
-        exit(0);
+    if(curProvider->isActive()){
+        const vector <float > llegStiffnesses =
+            curProvider->getChainStiffnesses(LLEG_CHAIN);
+
+        const vector <float > rlegStiffnesses =
+            curProvider->getChainStiffnesses(RLEG_CHAIN);
+
+        const vector <float > rarmStiffnesses =
+            curProvider->getChainStiffnesses(RARM_CHAIN);
+
+        const vector <float > larmStiffnesses =
+            curProvider->getChainStiffnesses(LARM_CHAIN);
+
+        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
+            nextStiffnesses[L_HIP_YAW_PITCH + i] = llegStiffnesses.at(i);
+            nextStiffnesses[R_HIP_YAW_PITCH + i] = rlegStiffnesses.at(i);
+        }
+
+        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+            nextStiffnesses[L_SHOULDER_PITCH + i] = larmStiffnesses.at(i);
+            nextStiffnesses[R_SHOULDER_PITCH + i] = rarmStiffnesses.at(i);
+        }
     }
+
+    vector<float>::iterator i = nextStiffnesses.begin();
+    for (; i != nextStiffnesses.end(); ++i) {
+        if (*i < MotionConstants::MIN_STIFFNESS){
+            *i = MotionConstants::NO_STIFFNESS;
+        } else {
+            *i = NBMath::clip(*i,
+                              MotionConstants::MIN_STIFFNESS,
+                              MotionConstants::MAX_STIFFNESS);
+        }
+    }
+    pthread_mutex_unlock(&stiffness_mutex);
 }
 
 
@@ -549,6 +548,7 @@ const vector <float> MotionSwitchboard::getNextJoints() const {
 }
 
 const vector<float>  MotionSwitchboard::getNextStiffness() const{
+
     pthread_mutex_lock(&stiffness_mutex);
     vector<float> result(nextStiffnesses);
     pthread_mutex_unlock(&stiffness_mutex);
