@@ -31,7 +31,8 @@ def gameReady(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.standup()
+        player.stopWalking()
+        player.walkPose()
         player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
 
@@ -49,7 +50,8 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.standup()
+        player.stopWalking()
+        player.walkPose()
         player.brain.loc.resetBall()
         player.brain.tracker.trackBall()
 
@@ -141,8 +143,8 @@ def penaltyShotsGameReady(player):
 
 def penaltyShotsGameSet(player):
     if player.firstFrame():
-        player.walkPose()
         player.stopWalking()
+        player.walkPose()
         player.brain.loc.resetBall()
 
         if player.lastDiffState == 'gamePenalized':

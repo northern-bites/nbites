@@ -37,9 +37,8 @@ def afterKick(player):
     State to follow up after a kick.
     Currently exits after one frame.
     """
-    # trick the robot into standing up instead of leaning to the side
     if player.firstFrame():
-        player.standup()
+        player.walkPose()        # stand up right, ready to walk
         player.brain.tracker.trackBall()
 
         kick = player.brain.kickDecider.getKick()

@@ -21,7 +21,6 @@ def setSpeed(nav, x, y, theta):
     Wrapper method to easily change the walk vector of the robot
     """
 
-    #print (theta**2 + x**2 + y**2)
     # use backwards gait if appropriate
     if x < BACKWARDS_GAIT_THRESH:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)

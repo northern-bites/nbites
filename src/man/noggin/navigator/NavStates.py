@@ -264,9 +264,7 @@ def walking(nav):
     """
     State to be used when setSpeed is called
     """
-    if nav.updatedTrajectory:
-        helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
-        nav.updatedTrajectory = False
+    helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
 
     return nav.stay()
 
@@ -306,8 +304,6 @@ def stop(nav):
     """
     if nav.firstFrame():
         helper.setSpeed(nav, 0, 0, 0)
-        nav.walkX = nav.walkY = nav.walkTheta = \
-                    nav.stepX = nav.stepY = nav.stepTheta = nav.numSteps = 0
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
@@ -318,9 +314,7 @@ def stopped(nav):
     return nav.stay()
 
 def orbitPoint(nav):
-    if nav.updatedTrajectory:
-        helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
-        nav.updatedTrajectory = False
+    helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
 
     return nav.stay()
 
@@ -332,24 +326,27 @@ def orbitPointThruAngle(nav):
     if fabs(nav.angleToOrbit) < constants.MIN_ORBIT_ANGLE:
         return nav.goNow('stop')
 
-    if nav.updatedTrajectory:
-        if nav.angleToOrbit < 0:
-            orbitDir = constants.ORBIT_LEFT
-        else:
-            orbitDir = constants.ORBIT_RIGHT
+    if nav.angleToOrbit < 0:
+        orbitDir = constants.ORBIT_LEFT
+    else:
+        orbitDir = constants.ORBIT_RIGHT
 
-        #determine speeds for orbit
-        ball = nav.brain.ball
-        #want x to keep a radius of 17 from the ball, increase and
-        #decrease x velocity as we move farther away from that dist
-        walkX = (ball.relX - 18) * .05
-        #keep constant y velocity, let x and theta changea
-        walkY = orbitDir * .8
-        #Vary theta based on ball bearing.  increase theta velocity as
-        #we get farther away from facing the ball
-        walkTheta = orbitDir * ball.bearing * .035
-        #set speed for orbit
-        helper.setSpeed(nav, walkX, walkY, walkTheta )
+    #determine speeds for orbit
+    ball = nav.brain.ball
+
+    #want x to keep a radius of 17 from the ball, increase and
+    #decrease x velocity as we move farther away from that dist
+    walkX = (ball.relX - 18) * .05
+
+    #keep constant y velocity, let x and theta changea
+    walkY = orbitDir * .8
+
+    #Vary theta based on ball bearing.  increase theta velocity as
+    #we get farther away from facing the ball
+    walkTheta = orbitDir * ball.bearing * .035
+
+    #set speed for orbit
+    helper.setSpeed(nav, walkX, walkY, walkTheta )
 
     #Funny enough, we orbit about 1 degree a frame,
     #So the angle can be used as a thresh

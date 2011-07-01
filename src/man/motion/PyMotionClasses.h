@@ -404,6 +404,10 @@ public:
         motionInterface->stopHeadMoves();
     }
 
+    void walkPose() {
+        motionInterface->walkPose();
+    }
+
 private:
     MotionInterface *motionInterface;
 };

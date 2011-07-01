@@ -80,14 +80,11 @@ class SoccerFSA(FSA.FSA):
             self.brain.nav.takeSteps(x, y, theta, numSteps)
             return True
 
-    def standup(self):
-        self.brain.nav.stop()
-
     def walkPose(self):
         """
         we return to std walk pose when we stop walking
         """
-        self.brain.nav.stop()
+        self.brain.motion.walkPose()
 
     def stopWalking(self):
         """

@@ -11,7 +11,7 @@ def gameInitial(player):
 
 def gameReady(player):
     if player.firstFrame():
-        player.standup()
+        player.walkPose()
     return player.stay()
 
 def gameSet(player):

@@ -104,14 +104,12 @@ class Navigator(FSA.FSA):
 
         # If the orbit direction is the same ignore the command
         if (self.orbitDir == orbitDir):
-            self.updatedTrajectory = False
             return
 
         self.orbitDir = orbitDir
         self.walkX = 0
         self.walkY = self.orbitDir*constants.ORBIT_STRAFE_SPEED
         self.walkTheta = self.orbitDir*constants.ORBIT_SPIN_SPEED
-        self.updatedTrajectory = True
 
         self.switchTo('orbitPoint')
 
@@ -119,12 +117,9 @@ class Navigator(FSA.FSA):
 
         if (self.angleToOrbit == angleToOrbit and \
                 self.currentState == 'orbitPointThruAngle'):
-            self.updatedTrajectory = False
             return
 
         self.angleToOrbit = angleToOrbit
-
-        self.updatedTrajectory = True
 
         self.switchTo('orbitPointThruAngle')
 
@@ -138,18 +133,10 @@ class Navigator(FSA.FSA):
         if (x == 0 and y == 0 and theta == 0):
             self.printf("!!!!!! USE player.stopWalking() NOT walk(0,0,0)!!!!!")
             return
-        # If the walk changes are really small, then ignore them
-        if (fabs(self.walkX - x) < constants.FORWARD_EPSILON and
-            fabs(self.walkY - y) < constants.STRAFE_EPSILON and
-            fabs(self.walkTheta - theta) < constants.SPIN_EPSILON):
-            self.updatedTrajectory = False
-            return
-
         self.walkX = x
         self.walkY = y
         self.walkTheta = theta
 
-        self.updatedTrajectory = True
         self.switchTo('walking')
 
     def setDest(self, x, y, theta):
