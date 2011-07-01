@@ -61,10 +61,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.play = self.brain.play
         gcState = self.brain.gameController.currentState
 
-        # WHY: do we not change on the first frame???
-        if (gcState == 'gamePlaying' or\
-                (gcState == 'penaltyShotsGamePlaying'
-                 and self.play.isRole(PBConstants.GOALIE))):
+        if (gcState == 'gamePlaying'):
+            roleState = self.getNextState()
+
+        # Goalie Penalty Kicking
+        if (gcState == 'penaltyShotsGamePlaying'
+                 and self.play.isRole(PBConstants.GOALIE)):
+            self.penaltyKicking = True
             roleState = self.getNextState()
 
             if roleState != self.currentState:

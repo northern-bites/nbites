@@ -81,7 +81,8 @@ def saveCenter(player):
 def testSaveRight(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
-    if player.counter > goalCon.TEST_SAVE_WAIT:
+    if (player.counter > goalCon.TEST_SAVE_WAIT and
+        not helper.shouldHoldSave(player)):
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.goNow('doneSaving')
     return player.stay()
@@ -89,7 +90,8 @@ def testSaveRight(player):
 def testSaveLeft(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
-    if player.counter > goalCon.TEST_SAVE_WAIT:
+    if(player.counter > goalCon.TEST_SAVE_WAIT and
+        not helper.shouldHoldSave(player)):
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.goNow('doneSaving')
     return player.stay()
@@ -97,7 +99,8 @@ def testSaveLeft(player):
 def testSaveCenter(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
-    if player.counter > goalCon.TEST_SAVE_WAIT:
+    if (player.counter > goalCon.TEST_SAVE_WAIT and
+        not helper.shouldHoldSave(player)):
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.goNow('doneSaving')
     return player.stay()
