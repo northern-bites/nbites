@@ -1,9 +1,8 @@
 /*
- * Wrapper for all vision information needed in Python. Exposes VisualBall,
- * VisualFieldObject, VisualFieldEdge, VisualCrossbar(unused), VisualLine,
- * VisualCorner, VisualRobot, FieldLines, and the main Vision class through
- * which all of the information is accessible. 
- *
+ * Wrapper for all vision information needed in Python. See header for list
+ * of wrapped classes. In Python, import vision to use these. Generally
+ * accessed through a FieldObject (see CombinationObjects) or through
+ * brain.vision (an instance of the main vision class).
  */
 
 #include <boost/shared_ptr.hpp>
@@ -265,8 +264,7 @@ BOOST_PYTHON_MODULE(vision)
         .add_property("navy3", make_getter(&Vision::navy3, return_value_policy
                                           <reference_existing_object>()))
 
-        /* Crossbars: not used right now, uncomment here and Brain.py to use
-           in python
+        /* Crossbars: not used right now
            .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar,
            return_value_policy<reference_existing_object>()))
            .add_property("bgCrossbar", make_getter(&Vision::bgCrossbar,
