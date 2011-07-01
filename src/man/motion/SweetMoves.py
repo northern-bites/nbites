@@ -358,26 +358,24 @@ GOALIE_ROLL_OUT_RIGHT = (((0,70.92,0,0),
 
 GOALIE_ROLL_OUT_LEFT = mirrorMove(GOALIE_ROLL_OUT_RIGHT)
 
-#Points left when would dive right
-GOALIE_TEST_DIVE_RIGHT = ( ((0, 0, 0, 0),
-                            INITIAL_POS[0][1],
-                            INITIAL_POS[0][2],
-                            (0, -70.0, 0, 0),
-                            1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
-
 #Points right when would dive left
-GOALIE_TEST_DIVE_LEFT = ( ((0, 70.0, 0, 0),
+GOALIE_TEST_DIVE_LEFT = ( ((0 , 70, -50, 0),
                             INITIAL_POS[0][1],
                             INITIAL_POS[0][2],
-                            (0, 0, 0, 0),
-                            1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+                            INITIAL_POS[0][3],
+                            1.0,0,stiff.STANDUP_STIFFNESSES),)
+
+#Points left when would dive right
+GOALIE_TEST_DIVE_RIGHT = mirrorMove(GOALIE_TEST_DIVE_LEFT)
+
+
 
 #Both arms point forward when would save center
-GOALIE_TEST_CENTER_SAVE = ( ((0, 0, 0, 0),
+GOALIE_TEST_CENTER_SAVE = ( ((0, -5, -90, 0),
                              INITIAL_POS[0][1],
                              INITIAL_POS[0][2],
-                             (0, 0, 0, 0),
-                             1.0,0,stiff.LOOSE_ARMS_STIFFNESSES),)
+                             (0, 5, 90, 0),
+                             1.0,0,stiff.STANDUP_STIFFNESSES),)
 
 #Stand up for GOALIE_SQUAT
 GOALIE_SQUAT_STAND_UP = ( ((0.0, 55.0, 0.0, -0),
@@ -488,14 +486,6 @@ def LEFT_D_KICK(y,dist):
 
     kick_hip_pitch = -((MIN_KICK_DIST - dist) * INTERVAL_RATIO - \
         MAX_KICK_HIP_PITCH)
-
-    print "kick_hip_pitch ="
-    print kick_hip_pitch
-    print "support_arm_shoulder_roll ="
-    print support_arm_shoulder_roll
-    print "kick_leg_hip_roll = "
-    print kick_leg_hip_roll
-
 
     return (
         #swing to the right

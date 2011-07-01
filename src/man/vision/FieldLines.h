@@ -202,8 +202,7 @@ private:
 public:
 
     FieldLines(Vision *visPtr,
-               boost::shared_ptr<NaoPose> posePtr,
-               boost::shared_ptr<Profiler> profilerPtr);
+               boost::shared_ptr<NaoPose> posePtr);
     virtual ~FieldLines() {}
 
     // master loop
@@ -404,6 +403,7 @@ private:
     // line distance
     float getRealDistance(const ConcreteCorner *c,
                           const VisualFieldObject *obj, int w) const;
+	float realDistance(int x1, int y1, int x2, int y2) const;
 
     // Estimates how long the line is on the field
     float getEstimatedLength(boost::shared_ptr<VisualLine> line) const;
@@ -689,7 +689,6 @@ private:
 private:
     Vision *vision;
     boost::shared_ptr<NaoPose> pose;
-    boost::shared_ptr<Profiler> profiler;
 
     std::vector <boost::shared_ptr<VisualLine> > linesList;
     std::list <VisualCorner> cornersList;

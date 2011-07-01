@@ -31,16 +31,13 @@ void staticSendCommands(NaoEnactor * n) {
     }
 }
 
-NaoEnactor::NaoEnactor(boost::shared_ptr<Profiler> p,
-                       boost::shared_ptr<Sensors> s,
+NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
                        boost::shared_ptr<Transcriber> t,
                        AL::ALPtr<AL::ALBroker> _pbroker)
     : MotionEnactor(), broker(_pbroker), sensors(s),
       transcriber(t),
       motionValues(Kinematics::NUM_JOINTS,0.0f),  // commands sent to joints
-      lastMotionHardness(Kinematics::NUM_JOINTS,0.0f),
-      profiler(p)
-{
+      lastMotionHardness(Kinematics::NUM_JOINTS,0.0f) {
     try {
         dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
     } catch(AL::ALError &e) {
@@ -54,95 +51,99 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Profiler> p,
     // connect to dcm using the static methods declared above
 
     // TODO: Should use specialized proxy created at start
-    broker->getProxy("DCM")->getModule()->
-        atPostProcess(boost::bind(&staticPostSensors,this));
-    broker->getProxy("DCM")->getModule()->
-        atPreProcess(boost::bind(&staticSendCommands,this));
+    try {
+        dcmPreConnection =
+            broker->getProxy("DCM")->getModule()->
+            atPostProcess(boost::bind(&staticPostSensors,this));
+        dcmPostConnection =
+            broker->getProxy("DCM")->getModule()->
+            atPreProcess(boost::bind(&staticSendCommands,this));
+    } catch (AL::ALError& e){
+        cout << "Failed to set pre/postprocess DCM commands" << endl;
+    }
 }
+
+NaoEnactor::~NaoEnactor()
+{
+    dcmPreConnection.disconnect();
+    dcmPostConnection.disconnect();
+}
+
 
 void NaoEnactor::sendCommands(){
 
-    PROF_ENTER(profiler.get(), P_DCM);
+    PROF_ENTER(P_DCM);
+    PROF_ENTER(P_PRE_PROCESS);
     if(!switchboard){
         if(switchboardSet)
             cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
         return;
     }
 
-    sendJoints();
     sendHardness();
+    sendJoints();
+    PROF_EXIT(P_PRE_PROCESS);
 }
 
 void NaoEnactor::sendJoints()
 {
-    // Send the array with a 25 ms delay. This delay removes the jitter.
-    // Note: I tried 20 ms and it didn't work quite as well. Maybe there is
-    // a value in between that works though. Will look into it.
-    joint_command[4][0] = dcmProxy->getTime(20);
-
+    PROF_ENTER(P_SEND_JOINTS);
     // Get the angles we want to go to this frame from the switchboard
     motionValues = switchboard->getNextJoints();
 
-    for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++)
-        {
-            joint_command[5][i][0] = motionValues[i];
-        }
+    for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++) {
+        joint_command[5][i][0] = motionValues[i];
+    }
 
 #ifndef NO_ACTUAL_MOTION
-    try
-        {
-            dcmProxy->setAlias(joint_command);
-        }
+    try {
+        joint_command[4][0] = dcmProxy->getTime(20);
+        dcmProxy->setAlias(joint_command); // Takes a long time for some reason
+    }
     catch(AL::ALError& a)
-        {
-            std::cout << "dcm value set error " << a.toString() << std::endl;
-        }
+    {
+        std::cout << "dcm value set error " << a.toString() << std::endl;
+    }
 #endif
+    PROF_EXIT(P_SEND_JOINTS);
 }
 
 
-void NaoEnactor::sendHardness(){
+void NaoEnactor::sendHardness()
+{
+    PROF_ENTER(P_SEND_HARDNESS);
     motionHardness = switchboard->getNextStiffness();
 
     bool diffStiff = false;
-    static float hardness = 0.0f;
+    float hardness = 0.0;
     //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++) {
-
-        hardness = NBMath::clip(motionHardness[i], -1.0f, 1.0f);
-
+        hardness = motionHardness[i];
         //sets the value for hardness
         if(lastMotionHardness[i] != hardness){
             diffStiff = true;
-            hardness_command[5][i][0] = hardness;
-            //store for next time
-            lastMotionHardness[i] = hardness;
+            lastMotionHardness[i] = hardness; // store for next time
+            hardness_command[5][i][0] = hardness; // set for this time
         }
     }
 
     if(!diffStiff)
         return;
 
-
-    hardness_command[4][0] = dcmProxy->getTime(0);
-    // #ifdef ROBOT_NAME_zaphod
-/*    #ifdef ROBOT_NAME_zaphod
-    //     // turn off broken shoulder
-    hardness_command[5][Kinematics::L_SHOULDER_PITCH][0] = -1.0f;
-    hardness_command[5][Kinematics::L_SHOULDER_ROLL][0] = -1.0f;
-    #endif
-*/
 #ifndef NO_ACTUAL_MOTION
     try {
+        hardness_command[4][0] = dcmProxy->getTime(10);
         dcmProxy->setAlias(hardness_command);
     } catch(AL::ALError& a) {
         std::cout << "DCM Hardness set error" << a.toString() << "    "
                   << hardness_command.toString() << std::endl;
     }
 #endif
+    PROF_EXIT(P_SEND_HARDNESS);
 }
 
 void NaoEnactor::postSensors(){
+    PROF_ENTER(P_POST_PROCESS);
     //At the beginning of each cycle, we need to update the sensor values
     //We also call this from the Motion run method
     //This is important to ensure that the providers have access to the
@@ -156,7 +157,8 @@ void NaoEnactor::postSensors(){
     //We only want the switchboard to start calculating new joints once we've
     //updated the latest sensor information into Sensors
     switchboard->signalNextFrame();
-    PROF_EXIT(profiler.get(), P_DCM);
+    PROF_EXIT(P_POST_PROCESS);
+    PROF_EXIT(P_DCM);
 }
 
 /**
@@ -178,8 +180,13 @@ void NaoEnactor::initDCMAliases(){
         hardCommandsAlias[1][i] = jointsH[i];
     }
 
-    dcmProxy->createAlias(positionCommandsAlias);
-    dcmProxy->createAlias(hardCommandsAlias);
+    try {
+        dcmProxy->createAlias(positionCommandsAlias);
+        dcmProxy->createAlias(hardCommandsAlias);
+    } catch (AL::ALError& e){
+        std::cout << "dcm error in initDCMAliases"
+                  << e.toString() << std::endl;
+    }
 }
 
 
@@ -223,8 +230,8 @@ void NaoEnactor::initDCMCommands(){
     us_command[2].arraySetSize(1);
     us_command[2][0].arraySetSize(2);
     us_command[2][0][0] = (4.0 + 64.0);
-    us_command[2][0][1] = dcmProxy->getTime(5);
     try {
+        us_command[2][0][1] = dcmProxy->getTime(5);
         dcmProxy->set(us_command);
     } catch(AL::ALError& a) {
         std::cout << "DCM ultrasound set error" << a.toString() << "    "

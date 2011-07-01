@@ -317,14 +317,6 @@ def stop(nav):
 def stopped(nav):
     return nav.stay()
 
-def orbitPoint(nav):
-    if nav.updatedTrajectory:
-        helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
-        nav.updatedTrajectory = False
-
-    return nav.stay()
-
-
 def orbitPointThruAngle(nav):
     """
     Circles around a point in front of robot, for a certain angle
@@ -338,19 +330,22 @@ def orbitPointThruAngle(nav):
         else:
             orbitDir = constants.ORBIT_RIGHT
 
-        sY = constants.ORBIT_STRAFE_SPEED
-
-        sT = constants.ORBIT_SPIN_SPEED
-
-        walkX = (nav.brain.ball.relX - 25) * .8
-        walkY = -1 * MyMath.sign(nav.angleToOrbit) * 10
-        walkTheta = MyMath.sign(nav.angleToOrbit) * 20
-
+        #determine speeds for orbit
+        ball = nav.brain.ball
+        #want x to keep a radius of 17 from the ball, increase and
+        #decrease x velocity as we move farther away from that dist
+        walkX = (ball.relX - 18) * .045
+        #keep constant y velocity, let x and theta changea
+        walkY = orbitDir * .8
+        #Vary theta based on ball bearing.  increase theta velocity as
+        #we get farther away from facing the ball
+        walkTheta = orbitDir * ball.bearing * .035
+        #set speed for orbit
         helper.setSpeed(nav, walkX, walkY, walkTheta )
 
-    #  (frames/second) / (degrees/second) * degrees
-    framesToOrbit = 100
+    #Funny enough, we orbit about 1 degree a frame,
+    #So the angle can be used as a thresh
 
-    if nav.counter >= framesToOrbit:
+    if nav.counter >= nav.angleToOrbit:
         return nav.goLater('stop')
     return nav.stay()

@@ -5,10 +5,11 @@
 #include <climits>
 
 #include "Profiler.h"
-
+#include "Common.h" //MICROS_PER_SECOND
 // #define PRINT_CSV
 
 static const char *PCOMPONENT_NAMES[] = {
+  "Main Loop",
   "GetImage",
   "Vision",
   "Transform",
@@ -41,10 +42,22 @@ static const char *PCOMPONENT_NAMES[] = {
   "MemoryMotionSensors",
   "MemoryImage",
 
+  "Localization",
+  "MCL",
+  "Logging",
+
   "Python",
   "PyUpdate",
   "PyRun",
+
+  "Lights",
+
   "DCM",
+  "Pre-Process",
+  "Send Joints",
+  "Send Hardness",
+  "Post-Process",
+
   "Switchboard",
   "Scripted Provider CalcJS",
   "ChoppedCommand",
@@ -52,68 +65,79 @@ static const char *PCOMPONENT_NAMES[] = {
   "tick_legs()",
   "Head Provider CalcJS",
   "Enactor",
-  "Localization",
-  "MCL",
-  "Logging",
-  "AiboConnect",
+
+  "Comm",
   "TOOLConnect",
-  "Lights",
-  "Final"
+  "RoboGuardian",
+
+  "Total"
 };
 
 // Map from subcomponent (index) to meta-component (value) for calculating
 // summary percentages.  Mapping to self means no parent.
 static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
-	/*P_GETIMAGE				--> */ P_GETIMAGE,
-	/*P_VISION					--> */ P_FINAL,
-	/*P_TRANSFORM				--> */ P_VISION,
-	/*P_THRESHRUNS				--> */ P_VISION,
-	/*P_THRESHOLD				--> */ P_THRESHRUNS,
-	/*P_FGHORIZON				--> */ P_THRESHRUNS,
-	/*P_RUNS					--> */ P_THRESHRUNS,
-	/*P_OBJECT					--> */ P_VISION,
+    /*P_MAIN                   --> */ P_TOTAL,
+    /*P_GETIMAGE               --> */ P_MAIN,
+    /*P_VISION                 --> */ P_MAIN,
+    /*P_TRANSFORM              --> */ P_VISION,
+    /*P_THRESHRUNS             --> */ P_VISION,
+    /*P_THRESHOLD              --> */ P_THRESHRUNS,
+    /*P_FGHORIZON              --> */ P_THRESHRUNS,
+    /*P_RUNS                   --> */ P_THRESHRUNS,
+    /*P_OBJECT                 --> */ P_VISION,
 
-    /*P_EDGES,                  --> */ P_VISION,
-    /*P_SOBEL,                  --> */ P_EDGES,
-    /*P_EDGE_PEAKS,             --> */ P_EDGES,
+    /*P_EDGES,                 --> */ P_VISION,
+    /*P_SOBEL,                 --> */ P_EDGES,
+    /*P_EDGE_PEAKS,            --> */ P_EDGES,
 
-    /*P_HOUGH,                  --> */ P_VISION,
-    /*P_MARK_EDGES,             --> */ P_HOUGH,
-    /*P_SMOOTH,                 --> */ P_HOUGH,
-    /*P_HOUGH_PEAKS,            --> */ P_HOUGH,
-    /*P_SUPPRESS,               --> */ P_HOUGH,
+    /*P_HOUGH,                 --> */ P_VISION,
+    /*P_MARK_EDGES,            --> */ P_HOUGH,
+    /*P_SMOOTH,                --> */ P_HOUGH,
+    /*P_HOUGH_PEAKS,           --> */ P_HOUGH,
+    /*P_SUPPRESS,              --> */ P_HOUGH,
 
-	/*P_LINES					--> */ P_VISION,
-	/*P_VERT_LINES,				--> */ P_LINES,
-	/*P_HOR_LINES,				--> */ P_LINES,
-	/*P_CREATE_LINES,			--> */ P_LINES,
-	/*P_JOIN_LINES,				--> */ P_LINES,
-	/*P_FIT_UNUSED,				--> */ P_LINES,
-	/*P_INTERSECT_LINES,		--> */ P_LINES,
+    /*P_LINES                  --> */ P_VISION,
+    /*P_VERT_LINES,            --> */ P_LINES,
+    /*P_HOR_LINES,             --> */ P_LINES,
+    /*P_CREATE_LINES,          --> */ P_LINES,
+    /*P_JOIN_LINES,            --> */ P_LINES,
+    /*P_FIT_UNUSED,            --> */ P_LINES,
+    /*P_INTERSECT_LINES,       --> */ P_LINES,
 
-	/*P_MEMORY_VISION,          --> */ P_FINAL,
-	/*P_MEMORY_VISION_SENSORS,  --> */ P_FINAL,
-	/*P_MEMORY_MOTION_SENSORS,  --> */ P_FINAL,
-	/*P_MEMORY_IMAGE,           --> */ P_FINAL,
+    /*P_MEMORY_VISION,         --> */ P_MAIN,
+    /*P_MEMORY_VISION_SENSORS, --> */ P_MAIN,
+    /*P_MEMORY_MOTION_SENSORS, --> */ P_MAIN,
+    /*P_MEMORY_IMAGE,          --> */ P_MAIN,
 
-	/*P_PYTHON					--> */ P_FINAL,
-	/*P_PYUPDATE				--> */ P_PYTHON,
-	/*P_PYRUN					--> */ P_PYTHON,
-	/*P_DCM                     --> */ P_DCM,
-	/*P_SWITCHBOARD				--> */ P_SWITCHBOARD,
-	/*P_SCRIPTED				--> */ P_SWITCHBOARD,
-	/*P_CHOPPED					--> */ P_SCRIPTED,
-	/*P_WALK					--> */ P_SWITCHBOARD,
-	/*P_TICKLEGS				--> */ P_WALK,
-	/*P_HEAD					--> */ P_SWITCHBOARD,
-	/*P_ENACTOR					--> */ P_SWITCHBOARD,
-	/*P_LOC						--> */ P_FINAL,
-	/*P_MCL						--> */ P_LOC,
-	/*P_LOGGING					--> */ P_FINAL,
-	/*P_AIBOCONNECT				--> */ P_FINAL,
-	/*P_TOOLCONNECT				--> */ P_FINAL,
-    /*P_LIGHTS					--> */ P_FINAL,
-	/*P_FINAL					--> */ P_FINAL
+    /*P_LOC                    --> */ P_MAIN,
+    /*P_MCL                    --> */ P_LOC,
+    /*P_LOGGING                --> */ P_MAIN,
+
+    /*P_PYTHON                 --> */ P_MAIN,
+    /*P_PYUPDATE               --> */ P_PYTHON,
+    /*P_PYRUN                  --> */ P_PYTHON,
+
+    /*P_LIGHTS                 --> */ P_MAIN,
+
+    /*P_DCM                    --> */ P_TOTAL,
+    /*P_PRE_PROCESS            --> */ P_DCM,
+    /*P_SEND_JOINTS            --> */ P_PRE_PROCESS,
+    /*P_SEND_HARDNESS          --> */ P_PRE_PROCESS,
+    /*P_POST_PROCESS           --> */ P_DCM,
+
+    /*P_SWITCHBOARD            --> */ P_TOTAL,
+    /*P_SCRIPTED               --> */ P_SWITCHBOARD,
+    /*P_CHOPPED                --> */ P_SCRIPTED,
+    /*P_WALK                   --> */ P_SWITCHBOARD,
+    /*P_TICKLEGS               --> */ P_WALK,
+    /*P_HEAD                   --> */ P_SWITCHBOARD,
+    /*P_ENACTOR                --> */ P_SWITCHBOARD,
+
+    /*P_COMM                   --> */ P_TOTAL,
+    /*P_TOOLCONNECT            --> */ P_TOTAL,
+    /*P_ROBOGUARDIAN           --> */ P_TOTAL,
+
+    /*P_TOTAL                  --> */ P_TOTAL
 };
 
 
@@ -155,10 +179,21 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
  * That's all for now, folks.
  */
 
-Profiler::Profiler (long long (*f) ())
-    : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),timeFunction(f)
-{
-  reset();
+Profiler* Profiler::instance = NULL;
+
+Profiler::Profiler (long long (*thread_time_f)(),
+        long long (*process_time_f)(),
+        long long (*global_time_f)())
+    : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),
+      thread_timeFunction(thread_time_f),
+      process_timeFunction(process_time_f),
+      global_timeFunction(global_time_f),
+      verbose(false) {
+
+    if (instance == NULL) {
+        instance = this;
+    }
+    reset();
 }
 
 Profiler::~Profiler ()
@@ -194,6 +229,9 @@ Profiler::nextFrame() {
   // trigger start of profiling
   if (start_next_frame) {
     profiling = true;
+    profile_process_start_time = process_timeFunction();
+    profile_global_start_time = global_timeFunction();
+    printf("Starting profiling next frame!\n");
     return start_next_frame = false;
   }
 
@@ -211,6 +249,9 @@ Profiler::nextFrame() {
       // add this frame's times to the sums
       for (int i = 0; i < NUM_PCOMPONENTS; i++) {
         sumTime[i] += lastTime[i];
+        if (PCOMPONENT_SUB_ORDER[i] == P_TOTAL) {
+            sumTime[P_TOTAL] += lastTime[i];
+        }
         lastTime[i] = 0;
       }
       // continue to the next frame
@@ -292,20 +333,38 @@ Profiler::printIndentedSummary()
     // depth-based indentation
     printf("%*s", depths[i]*2, "");
     if (sumTime[i] == 0)
-      printf("  %-*s:      0%% (0000000000us total, 000000us avg.)\n",
+      printf("  %-*s:      0%% (0000000000 total, 000000 avg.)\n",
           (max_length-depths[i]*2), PCOMPONENT_NAMES[i]);
     else if (parent_sum == 0)
-      printf("  %-*s: 100.00%% (%.10llu total, %.6llu avg.,"
-             " %llu min, %.6llu max )\n",
+      printf("  %-*s: 100.00%% (%.10lli total, %.6lli avg.,"
+             " %lli min, %.6lli max )\n",
              (max_length-depths[i]*2), PCOMPONENT_NAMES[i], sumTime[i],
              (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
-    else
-      printf("  %-*s: %6.2f%% (%.10llu total, %.6llu avg.,"
-             " %.6llu min, %.6llu max)\n",
-          (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
-          ((float)sumTime[i] / parent_sum * 100), sumTime[i],
-             (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
+    else {
+        if (verbose == true) {
+            printf("  %-*s: %6.2f%% (%.10lli total, %.6lli avg.,"
+                    " %.6lli min, %.6lli max)\n",
+                    (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
+                    ((float)sumTime[i] / parent_sum * 100), sumTime[i],
+                    (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
+        } else {
+            printf("  %-*s: %6.2f%% (%.10lli total, %.6lli avg.)\n",
+                            (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
+                            ((float)sumTime[i] / parent_sum * 100), sumTime[i],
+                            (sumTime[i] / (current_frame+1)));
+        }
+    }
   }
+  long long process_run_time =
+          process_timeFunction() - profile_process_start_time;
+  long long avg_process_time = process_run_time/(current_frame+1);
+  long long global_run_time =
+            global_timeFunction() - profile_global_start_time;
+    long long avg_global_time = global_run_time/(current_frame+1);
+  printf("\n Process-wise, we ran for an average of %lli per frame\n",
+           avg_process_time);
+  printf("\n Ran for a total of %lli, for an average of %lli per frame\n",
+          global_run_time, avg_global_time);
+  float fps = MICROS_PER_SECOND/static_cast<float>(avg_global_time);
+  printf("FPS: %f\n", fps);
 }
-
-

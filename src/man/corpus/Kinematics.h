@@ -45,7 +45,7 @@ namespace Kinematics {
     };
 
     /// Joint Name constants ///
-    enum JointNames {
+    enum JointName {
         HEAD_YAW = 0,
         HEAD_PITCH,
         // LARM,

@@ -10,8 +10,8 @@ using namespace std;
 
 #include "FreezeCommand.h"
 #include "UnfreezeCommand.h"
-
 #include "guardian/SoundPaths.h"
+#include "Profiler.h"
 
 //#define DEBUG_GUARDIAN_CLICKS
 //check for a connection once in 20 secs
@@ -87,10 +87,11 @@ void RoboGuardian::run(){
     int connectionCheckCount = 0;
     while(Thread::running){
         // @TODO: Thread safe?
+        PROF_ENTER(P_ROBOGUARDIAN);
         countButtonPushes();
         checkFalling();
         checkFallen();
-	checkFeetOnGround();
+        checkFeetOnGround();
         checkBatteryLevels();
         checkTemperatures();
         processFallingProtection();
@@ -100,6 +101,7 @@ void RoboGuardian::run(){
         }
         frameCount++;
         nanosleep(&interval, &remainder);
+        PROF_EXIT(P_ROBOGUARDIAN);
     }
 
     Thread::trigger->off();
@@ -145,9 +147,9 @@ bool isFalling(float angle_pos, float angle_vel) {
 
 
 void RoboGuardian::checkFallen() {
-    if (!useFallProtection){
+    if (!useFallProtection)
         return;
-    }
+
     const Inertial inertial  = sensors->getInertial();
 
     /***** Determine if the robot has FALLEN OVER *****/

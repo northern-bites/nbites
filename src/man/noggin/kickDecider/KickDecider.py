@@ -1,6 +1,8 @@
 import kicks
 import KickInformation
 import KickingConstants as constants
+from ..playbook.PBConstants import GOALIE
+import vision
 
 class KickDecider(object):
     """
@@ -12,7 +14,6 @@ class KickDecider(object):
         self.brain = brain
 
         self.info = KickInformation.KickInformation(self, brain)
-
     def resetInfo(self):
         """
         resets kickInfo so we can decide on next kick
@@ -204,26 +205,14 @@ class KickDecider(object):
         """
         returns kick using localization
         """
+        print "KickLoc"
         my = self.brain.my
-        """
-        # Note: may want to use headingTo(yglp) etc...
-        oppLeftPost = self.brain.oppGoalLeftPost
-        oppRightPost = self.brain.oppGoalRightPost
 
-        if (my.headingTo(oppLeftPost, forceCalc = True) > my.h >
-            my.headingTo(oppRightPost, forceCalc = True)):
-            return self.chooseDynamicKick()
-        elif (my.headingTo(oppLeftPost, forceCalc = True) > -1*my.h >
-              my.headingTo(oppRightPost, forceCalc = True)):
-            return self.chooseShortBackKick()
-        elif (my.h > 0):
-            print "LEFT_SIDE"
-            return kicks.LEFT_SIDE_KICK
-        else:
-            print "RIGHT_SIDE"
-            return kicks.RIGHT_SIDE_KICK
-        """
+        #First decide if we want to orbit
+        if not self.brain.play.isRole(GOALIE):
+            return None
 
+        #Now guess a kick
         if (my.h <= 20. and my.h >= -20.):
             return self.chooseDynamicKick()
         elif (my.h <= 160. and my.h > 20.):
@@ -233,7 +222,24 @@ class KickDecider(object):
             print "RIGHT_SIDE"
             return kicks.RIGHT_SIDE_KICK
         else:
-            return self.chooseShortBackKick()
+            return kicks.chooseShortBackKick(self)
+
+        # # Note: may want to use headingTo(yglp) etc...
+        # oppLeftPost = self.brain.oppGoalLeftPost
+        # oppRightPost = self.brain.oppGoalRightPost
+
+        # if (my.headingTo(oppLeftPost, forceCalc = True) > my.h >
+        #     my.headingTo(oppRightPost, forceCalc = True)):
+        #     return self.chooseDynamicKick()
+        # elif (my.headingTo(oppLeftPost, forceCalc = True) > -1*my.h >
+        #       my.headingTo(oppRightPost, forceCalc = True)):
+        #     return self.chooseShortBackKick()
+        # elif (my.h > 0):
+        #     print "LEFT_SIDE"
+        #     return kicks.LEFT_SIDE_KICK
+        # else:
+        #     print "RIGHT_SIDE"
+        #     return kicks.RIGHT_SIDE_KICK
 
     def chooseDynamicKick(self):
         ball = self.brain.ball

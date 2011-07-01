@@ -57,6 +57,7 @@ def afterKick(player):
                   kick is kicks.SHORT_QUICK_RIGHT_KICK):
                 player.brain.tracker.kickDecideScan() # should scan upper reaches.
             else:
+                player.inKickingState = False
                 return player.goLater('spinAfterBackKick')
 
         if player.penaltyKicking:

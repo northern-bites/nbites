@@ -361,7 +361,6 @@ void BallEKF::updateVelocity(const MotionModel& odo, StateVector& deltaBall)
     // Change in velocity
     deltaBall(vel_x_index) = estVelX - xhat_k(vel_x_index);
     deltaBall(vel_y_index) = estVelY - xhat_k(vel_y_index);
-
 }
 
 /**
@@ -452,10 +451,10 @@ void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
     // Update the measurement covariance matrix
     R_k(x_index,x_index)         = sd_dist_sq;
     R_k(y_index,y_index)         = sd_dist_sq;
-    R_k(vel_x_index,vel_x_index) = sd_dist_sq * 2/ dt;
-    R_k(vel_y_index,vel_y_index) = sd_dist_sq * 2 / dt;
-    R_k(acc_x_index,acc_x_index) = sd_dist_sq * 2 * 2 / (dt * dt);
-    R_k(acc_y_index,acc_y_index) = sd_dist_sq * 2 * 2 / (dt*dt);
+    R_k(vel_x_index,vel_x_index) = sd_dist_sq * 2 / (dt*dt);
+    R_k(vel_y_index,vel_y_index) = sd_dist_sq * 2 / (dt*dt);
+    R_k(acc_x_index,acc_x_index) = sd_dist_sq * 2 / (dt*dt);
+    R_k(acc_y_index,acc_y_index) = sd_dist_sq * 2 / (dt*dt);
 
     // Calculate the standard error of the measurement
     const StateMeasurementMatrix newP = prod(P_k, trans(H_k));

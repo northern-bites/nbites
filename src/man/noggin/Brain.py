@@ -1,4 +1,3 @@
-
 # Redirect standard error to standard out
 import time
 import sys
@@ -94,6 +93,7 @@ class Brain(object):
 
         # Functional Variables
         self.my.playerNumber = self.comm.gc.player
+        self.my.teamColor = self.comm.gc.color
 
         # Information about the environment
         self.initFieldObjects()
@@ -101,6 +101,8 @@ class Brain(object):
         self.ball = Ball.Ball(self.vision.ball)
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
+        if Constants.LOG_COMM:
+            self.out.startCommLog()
 
         # Stability data
         self.stability = Stability.Stability(self.sensors)
@@ -379,6 +381,8 @@ class Brain(object):
                 packet = Packet.Packet(packet)
                 if packet.playerNumber != self.my.playerNumber:
                     self.teamMembers[packet.playerNumber-1].update(packet)
+                if Constants.LOG_COMM:
+                    self.out.logRComm(packet)
         # update the activity of our teammates here
         # active field is set to true upon recipt of a new packet.
         for mate in self.teamMembers:
@@ -441,6 +445,29 @@ class Brain(object):
                           self.playbook.pb.me.chaseTime,
                           loc.ballVelX,
                           loc.ballVelY)
+
+        if Constants.LOG_COMM:
+            packet = Packet.Packet((TeamConfig.TEAM_NUMBER,
+                                    TeamConfig.PLAYER_NUMBER,
+                                    self.my.teamColor,
+                                    loc.x,
+                                    loc.y,
+                                    loc.h,
+                                    loc.xUncert,
+                                    loc.yUncert,
+                                    loc.hUncert,
+                                    loc.ballX,
+                                    loc.ballY,
+                                    loc.ballXUncert,
+                                    loc.ballYUncert,
+                                    self.ball.dist,
+                                    self.ball.bearing,
+                                    self.play.role,
+                                    self.play.subRole,
+                                    self.playbook.pb.me.chaseTime,
+                                    loc.ballVelX,
+                                    loc.ballVelY))
+            self.out.logSComm(packet)
 
     def resetLocalization(self):
         """

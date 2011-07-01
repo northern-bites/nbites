@@ -40,7 +40,6 @@
 class CoordHeadProvider : public MotionProvider {
 public:
     CoordHeadProvider(boost::shared_ptr<Sensors> s,
-                      boost::shared_ptr<Profiler> p,
                       boost::shared_ptr<NaoPose> _pose);
     virtual ~CoordHeadProvider();
 
