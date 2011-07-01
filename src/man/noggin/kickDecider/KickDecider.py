@@ -2,6 +2,7 @@ import kicks
 import KickInformation
 import KickingConstants as constants
 from ..playbook.PBConstants import GOALIE
+import vision
 
 class KickDecider(object):
     """
@@ -13,7 +14,6 @@ class KickDecider(object):
         self.brain = brain
 
         self.info = KickInformation.KickInformation(self, brain)
-        
     def resetInfo(self):
         """
         resets kickInfo so we can decide on next kick
@@ -146,7 +146,7 @@ class KickDecider(object):
                 print "RIGHT_SIDE"
                 return kicks.RIGHT_SIDE_KICK
         # if none were seen
-        return self.kickLoc(True)
+        return self.kickLoc()
 
     def clear(self):
         """
@@ -199,30 +199,18 @@ class KickDecider(object):
             else:
                 print "RIGHT_SIDE"
                 return kicks.RIGHT_SIDE_KICK
-        return self.kickLoc(False)
+        return self.kickLoc()
 
-    def kickLoc(self, shooting):
+    def kickLoc(self):
         """
         returns kick using localization
         """
+        print "KickLoc"
         my = self.brain.my
-
-        #do we see any sidelines?
-        seeSidelines = False
-        vision = self.brain.vision
-        lines = vision.fieldLines.lines
-        for line in vision.fieldLines.lines:
-            if vision.lineID.SIDELINE_LINE in line.possibilities or \
-                    vision.lineID.SIDE_OR_ENDLINE in line.possibilities or \
-                    vision.lineID.TOP_SIDELINE in line.possibilies or \
-                    vision.lineID.BOTTOM_SIDELINE in line.possibilities:
-                seeSidelines = True
-                break
 
         #First decide if we want to orbit
         if not self.brain.play.isRole(GOALIE):
-            if seeSidelines and (not shooting):
-                return None
+            return None
 
         #Now guess a kick
         if (my.h <= 20. and my.h >= -20.):

@@ -487,14 +487,6 @@ def LEFT_D_KICK(y,dist):
     kick_hip_pitch = -((MIN_KICK_DIST - dist) * INTERVAL_RATIO - \
         MAX_KICK_HIP_PITCH)
 
-    print "kick_hip_pitch ="
-    print kick_hip_pitch
-    print "support_arm_shoulder_roll ="
-    print support_arm_shoulder_roll
-    print "kick_leg_hip_roll = "
-    print kick_leg_hip_roll
-
-
     return (
         #swing to the right
         ((80.,40.,-50.,-70.),
