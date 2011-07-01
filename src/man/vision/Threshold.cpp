@@ -1155,7 +1155,7 @@ float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
 		}
         break;
     case BOTH_SURE:
-        dist = min(disth, distw);
+		dist = min( poseDist, min(disth, distw));
         break;
     }
 	/*cout << "Distances disth " << disth << " distw " << distw <<

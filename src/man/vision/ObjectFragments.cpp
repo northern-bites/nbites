@@ -558,8 +558,8 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
 	  for (int i = 0; i < NUMSCANS; i++) {
 		  bool found = false;
 		  values[i] = 0;
-		  int tempx = qx;
-		  int tempy = qy;
+		  int tempx = min(max(qx, 0), IMAGE_WIDTH - 1);
+		  int tempy = min(max(qy, 0), IMAGE_HEIGHT -1);
 		  while (!found) {
 			  if (Utility::colorsEqual(color,
 									   thresh->getThresholded(tempy, tempx))) {
@@ -645,6 +645,8 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
 			values[i] = 0;
 			int tempx = qx;
 			int tempy = qy;
+			tempx = min(max(tempx, 0), IMAGE_WIDTH - 1);
+			tempy = min(max(tempy, 0), IMAGE_HEIGHT - 1);
 			while (!found) {
 				if (Utility::colorsEqual(color,
 										 thresh->getThresholded(tempy, tempx))) {
@@ -860,10 +862,10 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
     stop scan;
     int top = minY;
     int spanY = maxY - minY;
-	int bottom = top + spanY;
-    int topx = xProject(left, maxY, minY);
-    int rightx = topx + (right - left);
-    int topry = yProject(topx, top, rightx);
+	int bottom = min(top + spanY, IMAGE_HEIGHT - 1);
+    int topx = min(max(0, xProject(left, maxY, minY)), IMAGE_WIDTH - 1);
+    int rightx = min(topx + (right - left), IMAGE_WIDTH - 1);
+    int topry = max(yProject(topx, top, rightx), 0);
     point <int> leftTop = point<int>(topx, top);
     point <int> rightTop = point<int>(rightx, topry);
     point <int> leftBottom = point<int>(left, maxY);
@@ -933,25 +935,32 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
         }
     }
 	// because we are over-caution about BLUE_BIT
-	if (color == BLUE_BIT && context->getGoalBoxLines()) {
+	if (color == BLUE_BIT) {
 		float distant = 0.0f;
 		boost::shared_ptr<VisualLine> goalLine;
 		const vector < boost::shared_ptr<VisualLine> > * lines =
 			vision->fieldLines->getLines();
+		int linesFound = 0;
 		for (vector < boost::shared_ptr<VisualLine> >::const_iterator i =
 				 lines->begin();
 			 i != lines->end(); ++i) {
-			if ((*i)->getDistance() > distant) {
-				distant = (*i)->getDistance();
-				goalLine = *i;
+			if ((*i)->getLeftEndpoint().x < leftBottom.x &&
+											(*i)->getRightEndpoint().x >
+				rightBottom.x) {
+				if ((*i)->getDistance() > distant) {
+					distant = (*i)->getDistance();
+					goalLine = *i;
+				}
+				linesFound++;
 			}
 		}
-		// make sure the supposed goalline crosses completely over post
-		if (goalLine->getLeftEndpoint().x < leftBottom.x &&
-			goalLine->getRightEndpoint().x > rightBottom.x) {
+		if (distant > 0.0f) {
 			if (POSTDEBUG) {
 				cout << "Extending bottom of blue goal" << endl;
+				cout << "Old ys are " << leftBottom.y << " " <<
+					rightBottom.y << endl;
 			}
+			int oldy = leftBottom.y;
 			point<int> leftBig;
 			leftBig.x = leftBottom.x;
 			leftBig.y = IMAGE_HEIGHT - 1;
@@ -972,9 +981,22 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 			rightBottom.y = intersect.second;
 			if (leftBottom.x > -1 && leftBottom.x < IMAGE_WIDTH &&
 				rightBottom.x > -1 && rightBottom.x < IMAGE_WIDTH) {
-				obj.setBlob(leftTop, rightTop, leftBottom, rightBottom);
-				if (POSTDEBUG) {
-					cout << "New Xs " << leftBottom.x << " " << rightBottom.x << endl;
+				// make sure we aren't extending to the goal front line
+				int bad = 0;
+				int xCheck = (leftBottom.x + rightBottom.x) / 2;
+				if (linesFound < 2) {
+					for (int i = oldy; i <= leftBottom.y; i++) {
+						if (Utility::isGreen(thresh->getThresholded(i, xCheck))) {
+							bad++;
+						}
+					}
+				}
+				if (!(bad * 2 > leftBottom.y - oldy)) {
+					obj.setBlob(leftTop, rightTop, leftBottom, rightBottom);
+					if (POSTDEBUG) {
+						cout << "New Ys " << leftBottom.y << " " << rightBottom.y <<
+							endl;
+					}
 				}
 			}
 		}
@@ -1231,7 +1253,8 @@ int ObjectFragments::grabPost(unsigned char c, int leftx,
 		index = getBigRunExpanded(leftx, rightx, runs[index].x);
 		if (index != BADVALUE) {
 			if (POSTDEBUG) {
-				cout << "First post was too small, trying again" << endl;
+				cout << "First post was too small, trying again " << index <<
+					endl;
 				drawBlob(obj, ORANGE);
 			}
 			lookForPost(index, obj);
