@@ -151,6 +151,10 @@ public:
 	bool badDistance(Blob b);
     bool locationOk(Blob b);
     bool relativeSizesOk(Blob a, Blob b);
+	bool goodValueX(int x) {return x >= 0 && x < IMAGE_WIDTH;}
+	bool goodValueY(int y) {return y >= 0 && y < IMAGE_HEIGHT;}
+	bool goodValuePoint(point<int> p) {return goodValueX(p.x) &&
+			goodValueY(p.y);}
 
     // misc.
     bool withinMargin(float n, float n1, float n2);

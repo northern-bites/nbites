@@ -116,7 +116,7 @@ class GoTeam:
         """
         Update information specific to the coordinated behaviors
         """
-        # Print changes
+        # Print changes and Say changes
         if play.changed:
             self.brain.speech.say(PBConstants.SUB_ROLES[play.subRole])
             if self.printStateChanges:
@@ -296,7 +296,9 @@ class GoTeam:
                     min_dist = d[0]
                     chosenPositions = d
 
-            # chosen Postitions is an array of size 4 where 1,2,3 are the positions
+            # chosen Postitions is an array of size 4
+            #where 1,2,3 are the positions
+
             # returns a Location
             return chosenPositions[self.me.playerNumber -1]
 
@@ -307,7 +309,9 @@ class GoTeam:
     ######################################################
 
     def aPrioriTeammateUpdate(self):
-        """Here we update information about teammates before running a new frame"""
+        """Here we update information about teammates
+        before running a new frame"""
+
         # update my own information for role switching
         self.time = time.time()
         self.me.updateMe()
@@ -317,7 +321,11 @@ class GoTeam:
         append = self.activeFieldPlayers.append
 
         self.numActiveFieldPlayers = 0
-        for mate in self.brain.teamMembers: ## @TODO!!!! figure out what happened here. We thought we were with another bot when it was in penalty.
+
+        for mate in self.brain.teamMembers:## @TODO!!!! figure out
+            #what happened here. We thought we were with another bot
+            #when it was in penalty.
+
             # don't check inactive mates or the goalie.
             if (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
                 append(mate)
@@ -332,7 +340,9 @@ class GoTeam:
         return highNumber
 
     def getOtherActiveFieldPlayers(self, exceptNumbers):
-        """returns the active teammates who don't have a number in exceptNumbers"""
+        """returns the active teammates who don't have
+        a number in exceptNumbers"""
+
         mates = []
         append = mates.append
         for mate in self.activeFieldPlayers:
@@ -373,6 +383,7 @@ class GoTeam:
     ############   Strategy Decision Stuff     ###########
     ######################################################
 
+    # Not used - 7/1/11
     def noCalledChaser(self):
         """Returns true if no one is chasing and they are not searching"""
         # If everyone else is out, let's not go for the ball
@@ -400,11 +411,16 @@ class GoTeam:
     def shouldUseDubD(self):
         """
         Uses goalieChaserCount to buffer when we let the goalie call us off.
+        If the ball is in our box goalie should be chaser.
         """
+
+        ball = self.brain.ball
+
         if not PBConstants.USE_DUB_D:
             return False
         goalie = self.brain.teamMembers[0]
-        if goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER):
+        if (goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER)
+            or ball.inMyGoalBox()):
             self.goalieChaserCount += 1
         else:
             self.goalieChaserCount = 0
