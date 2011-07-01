@@ -14,12 +14,11 @@ ALSpeech::ALSpeech(AL::ALPtr<AL::ALBroker> broker) : Speech(), volume(0)
         alProxy =
             AL::ALPtr<AL::ALTextToSpeechProxy>(
                 new AL::ALTextToSpeechProxy(broker));
-
+        volume = alProxy->getVolume();
     } catch(AL::ALError &e) {
         std::cout << "Failed to initialize proxy to ALTextToSpeech"
                   << std::endl;
     }
-    volume = alProxy->getVolume();
     setVolume(.95f);
 }
 
@@ -32,7 +31,12 @@ void ALSpeech::say(std::string text)
 {
     if (isEnabled){
         replaceSymbols(text);
-        alProxy->say(text);
+        try {
+            alProxy->say(text);
+        } catch(AL::ALError &e) {
+            std::cout << "Failed to say something in ALTextToSpeech"
+                      << std::endl;
+        }
     }
 }
 
@@ -40,7 +44,12 @@ void ALSpeech::setVolume(float v)
 {
     if (v != volume){
         volume = v;
-        alProxy->setVolume(v);
+        try {
+            alProxy->setVolume(v);
+        } catch(AL::ALError &e) {
+            std::cout << "Failed to set ALTextToSpeech volume"
+                      << std::endl;
+        }
     }
 }
 
@@ -49,6 +58,9 @@ float ALSpeech::getVolume()
     return volume;
 }
 
+/**
+ * We don't want to pronounce punctuation
+ */
 void ALSpeech::replaceSymbols(std::string& text)
 {
     replace(text.begin(), text.end(), '_', ' ');

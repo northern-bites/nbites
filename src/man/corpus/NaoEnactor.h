@@ -8,10 +8,10 @@
 #include "almemoryfastaccess/almemoryfastaccess.h"
 #include "alproxies/almemoryproxy.h"
 #include "alproxies/dcmproxy.h"
+#include "althread/alprocesssignals.h"
 
 #include "Common.h"
 #include "MotionEnactor.h"
-#include "NaoDef.h"
 #include "Sensors.h"
 #include "Transcriber.h"
 
@@ -22,7 +22,7 @@ public:
 	NaoEnactor(boost::shared_ptr<Sensors> s,
                boost::shared_ptr<Transcriber> transcriber,
                AL::ALPtr<AL::ALBroker> broker);
-    virtual ~NaoEnactor() { };
+    virtual ~NaoEnactor();
     void sendCommands();
     void postSensors();
 
@@ -39,6 +39,8 @@ private: // Members
     AL::ALValue hardness_command;
     AL::ALValue joint_command;
     AL::ALValue us_command;
+    AL::ALProcessSignals::ProcessSignalConnection dcmPreConnection,
+        dcmPostConnection;
 
 private: // Helper methods
     void sendHardness();
