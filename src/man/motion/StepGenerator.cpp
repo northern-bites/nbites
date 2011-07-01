@@ -747,7 +747,13 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 
     const float CLOSE_ENOUGH_X = 15.0f; // 10mm
     const float CLOSE_ENOUGH_Y = 15.0f;
-    const float CLOSE_ENOUGH_THETA = 0.17f; // 10 degrees
+    float CLOSE_ENOUGH_THETA;
+
+    // be more sensitive to rotation if we're going really far (40cm)
+    if (dest_x*dest_x + dest_y*dest_y > 1600)
+	CLOSE_ENOUGH_THETA = 0.087; // 5 degrees
+    else
+	CLOSE_ENOUGH_THETA = 0.17f; // 10 degrees
 
     // loop until we get to our destination
     while (abs(dest_x) > CLOSE_ENOUGH_X ||

@@ -38,12 +38,7 @@ def positionForKick(nav):
     if nav.firstFrame():
         nav.destX = ball.relX - nav.kick.x_offset -1 # HACK!!!
         nav.destY = ball.relY - nav.kick.y_offset
-
-        # @TODO check if rotating the other way is quicker?
-        # wait for heading to actually be there
-        #nav.destTheta = nav.brain.my.h
-
-        nav.destTheta = ball.bearing # temporary until we have a global heading
+        nav.destTheta = nav.kick.heading - nav.brain.my.h
 
         # slow down as we get near the ball (max 80% speed)
         if ball.dist < 40:
@@ -53,10 +48,10 @@ def positionForKick(nav):
 
         nav.newDestination = True
 
-        print 'Ball rel X: {0} Y: {1} bearing: {2}' \
-              .format(ball.relX, ball.relY, ball.bearing)
+        print 'Ball rel X: {0} Y: {1} kick heading: {2}' \
+              .format(ball.relX, ball.relY, nav.kick.heading)
 
-        print 'Set new PFK destination of ({0},{1},{2},gain={3})' \
+        print 'Set new PFK destination of ({0}, {1}, {2}, gain={3})' \
               .format(nav.destX, nav.destY, nav.destTheta, nav.destGain)
 
         nav.brain.speech.say("New destination")
