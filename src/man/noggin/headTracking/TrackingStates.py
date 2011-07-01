@@ -100,12 +100,6 @@ def trackLoc(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
-    # ** # debugging
-    #if isinstance(tracker.target, FieldCorner):
-    #    print "target is corner:",tracker.target.visionId
-    #elif isinstance(tracker.target, FieldObject):
-    #    print "target is post:",tracker.target.visionId
-
     # safety check that target was not set to a ball
     if tracker.target is None or tracker.target == tracker.brain.ball:
         print "target is None, or the ball"

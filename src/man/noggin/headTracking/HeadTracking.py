@@ -109,6 +109,7 @@ class HeadTracking(FSA.FSA):
         self.switchTo('locPans')
 
 # ** # old method (main input method)
+# ** # look into cleaning this up
     def activeLoc(self):
         """
         If ball is visible and close, track it via vision values.
@@ -137,6 +138,7 @@ class HeadTracking(FSA.FSA):
             self.switchTo('activeTracking')
 
 # ** # old method
+# ** # CLEAN THIS UP
     def preKickScan(self):
         """
         Pan up once (quickly), then stop.
@@ -154,7 +156,7 @@ class HeadTracking(FSA.FSA):
             self.switchTo('trianglePan')
 
 # ** # old method
-    def startScan(self,  newScan):
+    def startScan(self, newScan):
         """Repeatedly performs the given scan."""
         if newScan != self.currentHeadScan:
             self.currentHeadScan = newScan
@@ -206,7 +208,7 @@ class HeadTracking(FSA.FSA):
 # ** # new method - helper method
     def lookToPoint(self, goalX=0, goalY=0, goalZ=0):
         """
-        Look at given relative coordinates.
+        Continuously looks at given relative coordinates.
         """
         self.target.x = goalX
         self.target.y = goalY
@@ -214,23 +216,13 @@ class HeadTracking(FSA.FSA):
         self.helper.lookToPoint(self.target)
 
 # ** # debugging method
-    def nudge(self):
-        self.nudged = True
-
-# ** # debugging method
     def lookToAngles(self,pitch,yaw):
+        """Looks to the given head angles. """
         self.helper.lookToAngles(yaw,pitch)
-
-# ** # debugging method
-    def printAngles(self):
-        motionAngles = self.brain.sensors.motionAngles
-        print MyMath.radians(motionAngles[MotionConstants.HeadYaw]),MyMath.radians(motionAngles[MotionConstants.HeadPitch])
 
 # ** # old method
     def bounceHead(self):
-        """
-        Continually bounce head up and down.
-        """
+        """Continually bounce head up and down."""
         self.switchTo('bounceUp')
 
     # PRIMARY INPUT METHODS FOR TRACKING FSA:
@@ -312,7 +304,7 @@ class HeadTracking(FSA.FSA):
 # ** # new method
     def newKickDecidePan(self):
         """
-        The robot should already be in the newTrackBall state cycle. If not already
+        The robot should already be in the newTrackBall state cycle. If not
         scanning for a post, the robot will begin one such scan. Afterwards,
         states will continue in identical manner to newTrackBall.
         """

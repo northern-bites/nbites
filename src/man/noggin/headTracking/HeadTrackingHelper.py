@@ -199,14 +199,14 @@ class HeadTrackingHelper(object):
         headMove = motion.SetHeadCommand(MyMath.degrees(yaw),MyMath.degrees(pitch))
         self.tracker.brain.motion.setHead(headMove)
 
-# ** # old method
+# ** # old method - replaced in c++
     def calcBearing(self, target):
         """returns the bearing to target in degrees. usable as headYaw"""
         my = self.tracker.brain.my
 
         return my.getRelativeBearing(target)
 
-# ** # old method
+# ** # old method - replaced in c++
     def calcHeadPitch(self, target):
         """returns the pitch to target in degrees"""
         my = self.tracker.brain.my
@@ -222,7 +222,7 @@ class HeadTrackingHelper(object):
         headPitch = atan(relHeight/dist) - CAMERA_ANGLE
         return headPitch
 
-# ** # old method
+# ** # old method - replaced in c++
     def getCameraHeight(self):
         """gets the height of the lower camera in cm"""
         pose = self.tracker.brain.vision.pose

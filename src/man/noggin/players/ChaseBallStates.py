@@ -13,9 +13,6 @@ def chase(player):
     if player.brain.play.isRole(GOALIE):
         return player.goNow('goalieChase')
 
-    # ** # We are chasing ball
-    player.brain.tracker.stareBall()
-
     # Check in order of importance
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
@@ -70,8 +67,7 @@ def approachBall(player):
 
     if player.firstFrame():
         player.brain.nav.chaseBall()
-        # ** # We are approaching the ball
-        player.brain.tracker.stareBall()
+        player.brain.tracker.trackBall()
 
     return player.stay()
 
@@ -83,16 +79,17 @@ def claimBall(player):
     """
     if player.firstFrame():
         kick = player.brain.kickDecider.getCenterKickPosition()
-        # ** # Reaching ball before deciding kick
-        player.brain.tracker.newTrackBall()
+        player.brain.tracker.trackBall()
         player.brain.nav.kickPosition(kick)
         player.inKickingState = True
 
     if transitions.shouldKick(player):
         return player.goNow('decideKick')
     elif transitions.shouldFindBall(player):
+        player.inKickingState = False
         return player.goLater('findBall')
     elif transitions.shouldChaseFromClaimBall(player):
+        player.inKickingState = False
         return player.goNow('chase')
 
     return player.stay()
@@ -103,8 +100,7 @@ def spinToBall(player):
     stop and spin toward it, then decide your kick.
     """
     # in case we lose the ball in our shoulder, always trackBall.
-    # ** # Ball not in our alley, spin to it
-    player.brain.tracker.newTrackBall()
+    player.brain.tracker.trackBall()
     ball = player.brain.ball
     spinDir = player.brain.my.spinDirToPoint(ball)
     player.setWalk(0, 0, spinDir*constants.BALL_SPIN_SPEED)
@@ -125,8 +121,7 @@ def decideKick(player):
     if player.firstFrame():
         # Re-initialize to clear data from decideKick
         player.brain.kickDecider.resetInfo()
-        # ** # scanning to decide which kick to use
-        player.brain.tracker.newKickDecidePan()
+        player.brain.tracker.kickDecideScan()
         player.inKickingState = True
 
     #TODO change this to be better.
@@ -150,8 +145,7 @@ def positionForKick(player):
 
         player.inKickingState = True
 
-        # ** # Fine-tuning our position over the ball
-        player.brain.tracker.stareBall()
+        player.brain.tracker.trackBall()
         player.brain.nav.kickPosition(kick)
 
     if transitions.shouldKick(player):
@@ -177,8 +171,7 @@ def kickOff(player):
 
     if player.firstFrame():
         player.brain.nav.chaseBall()
-        # ** # we are kicking off
-        player.brain.tracker.stareBall()
+        player.brain.tracker.trackBall()
 
     return player.stay()
 

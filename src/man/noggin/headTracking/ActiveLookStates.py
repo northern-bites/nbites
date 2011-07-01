@@ -9,13 +9,17 @@ TIME_TO_LOOK_TO_TARGET = 1.0
 
 # ** # old method
 def lookToPoint(tracker):
+    """Look to the localization coords of the stored target."""
     tracker.helper.lookToPoint(tracker.target)
     return tracker.stay()
 
 # ** # old method
 def lookToTarget(tracker):
-    """looks to best guess of where target is"""
-
+    """
+    Look to localization coords of target.
+    If too much time passes, perform naive pans.
+    If ball is seen, go to 'targetTracking' or 'activeTracking'.
+    """
     if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.brain.motion.stopHeadMoves()
         if tracker.activeLocOn:
@@ -35,7 +39,10 @@ def lookToTarget(tracker):
 
 # ** # old method
 def scanForTarget(tracker):
-    """performs naive scan for target"""
+    """
+    Performs naive scan for target.
+    If ball is seen, go to 'targetTracking' or 'activeTracking'.
+    """
     if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         print "target on"
         if tracker.activeLocOn:
@@ -64,12 +71,9 @@ def scanForTarget(tracker):
 # ** # old method
 def targetTracking(tracker):
     """
-    state askes it's parent (the tracker) for an object or angles to track
-    while the object is on screen, or angles are passed, we track it.
-    Otherwise, we continually write the current values into motion via setHeads.
-
-    If a sweet move is begun while we are tracking, the current setup is to let
-    the sweet move conclude and then resume tracking afterward.
+    Track the target via vision values.
+    If target is lost, look to localization values.
+    If that fails, use naive scans.
     """
 
     if tracker.firstFrame():
@@ -101,15 +105,6 @@ def trackLandmarks(tracker):
     else:
         tracker.target = tracker.locObjectList[1]
 
-    """# ** # debugging checks
-    for obj in tracker.locObjectList:
-        if obj.visionId == 10:
-            print "left t dist:",obj.dist
-        elif obj.visionId == 20:
-            print "left post dist:",obj.dist
-        elif obj.visionId == 12:
-            print "left l bearing:",obj.bearing,"  my heading:",tracker.brain.my.h
-            print "left l coords:",obj.relX,obj.relY"""
     """
     if not newlist == tracker.locObjectList:
         #Landmarks have changed fitness ranking. Track most fit.
@@ -133,7 +128,6 @@ def trackLandmarks(tracker):
         # Cycle to most fit locObject
         tracker.target = tracker.locObjectList[0]
         """
-    print "going to: track target"# ** #debugging
 
     # Track target
     return tracker.goLater('trackLoc')
