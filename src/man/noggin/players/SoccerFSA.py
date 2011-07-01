@@ -25,6 +25,9 @@ class SoccerFSA(FSA.FSA):
         # for writing variance data only once per appropriate state
         self.wroteVarianceData = False
 
+        # stuff so players don't crash.
+        self.inKickingState = False
+
     def run(self):
         # gamePenalized is a good time for a lot of i/o, since we won't be moving
         if self.currentState == 'gamePenalized' or \
