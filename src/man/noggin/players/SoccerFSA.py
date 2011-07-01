@@ -28,8 +28,17 @@ class SoccerFSA(FSA.FSA):
         # stuff so players don't crash.
         self.inKickingState = False
 
+        # Penalty kick player variables
+        self.penaltyKicking = False
+        self.penaltyMadeFirstKick = True
+        self.penaltyMadeSecondKick = False
+
+        # Kickoff kick
+        self.hasKickedOff = True
+
     def run(self):
-        # gamePenalized is a good time for a lot of i/o, since we won't be moving
+        # gamePenalized is a good time for a lot of i/o, since we
+        # won't be moving
         if self.currentState == 'gamePenalized' or \
                self.currentState == 'gameFinished':
             if not self.wroteVarianceData:
