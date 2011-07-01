@@ -16,12 +16,8 @@ def ballTracking(tracker):
 # ** # old method
 def tracking(tracker):
     """
-    state askes it's parent (the tracker) for an object or angles to track
-    while the object is on screen, or angles are passed, we track it.
-    Otherwise, we continually write the current values into motion via setHeads.
-
-    If a sweet move is begun while we are tracking, the current setup is to let
-    the sweet move conclude and then resume tracking afterward.
+    While the target is visible, track it via vision values.
+    If the ball is lost, go to last diff state.
     """
 
     if tracker.firstFrame():
@@ -48,7 +44,11 @@ def ballSpinTracking(tracker):
 # ** # old method
 def activeTracking(tracker):
     """
-    Method to perform tracking
+    If ball is visible and close, track it via vision values.
+    If ball is not visible, execute naive pans.
+    If state counter is low enough, track ball via vision values.
+    If state counter is high enough, perform triangle pans
+    and return to last head angles.
     """
     if tracker.firstFrame():
         tracker.activeLocOn = True
@@ -100,12 +100,6 @@ def trackLoc(tracker):
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
 
-    # ** # debugging
-    #if isinstance(tracker.target, FieldCorner):
-    #    print "target is corner:",tracker.target.visionId
-    #elif isinstance(tracker.target, FieldObject):
-    #    print "target is post:",tracker.target.visionId
-
     # safety check that target was not set to a ball
     if tracker.target is None or tracker.target == tracker.brain.ball:
         print "target is None, or the ball"
@@ -140,9 +134,8 @@ def stareLoc(tracker):
     """
     # Make sure head is inactive first
     if tracker.firstFrame():
+        print "stare target is:",tracker.target.visionId
         tracker.brain.motion.stopHeadMoves()
-        # ** # debugging
-        #print "staring at target Id:",tracker.target.visionId
 
     if tracker.counter > constants.TRACKER_FRAMES_STARE_THRESH:
         print "Past stare thresh, switching to new target"
@@ -156,11 +149,12 @@ def stareLoc(tracker):
 
     # Second safety check that something was on frame
     if stareTarget is None:
-        #print "no possible target currently visible"
+        print "stare target not in vision"
         return tracker.stay()
 
-    #print "target visible"
+    print "target visible"
     tracker.helper.lookToTargetAngles(stareTarget)
+    print "target at d/b:",tracker.target.visDist,tracker.target.visBearing
 
     return tracker.stay()
 
@@ -172,6 +166,8 @@ def trackingBall(tracker):
     # make sure head is inactive first
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
+    # ** # debugging
+    print "tracking ball"
 
     # Look to the ball for TRACKER_BALL_STARE_THRESH frames
     # If ball is lost on frame, look towards coordinates.

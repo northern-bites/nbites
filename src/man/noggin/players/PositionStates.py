@@ -20,8 +20,7 @@ def playbookPosition(player):
         nav.positionPlaybook()
 
         if gcState == 'gameReady':
-            # ** # player position for 'gameReady'
-            brain.tracker.panScan()
+            brain.tracker.locPans()
         else:
             brain.tracker.activeLoc()
 
@@ -43,8 +42,7 @@ def relocalize(player):
         player.shouldRelocalizeCounter = 0
 
     if not player.brain.motion.isHeadActive():
-        # ** # player is relocalizing
-        player.brain.tracker.panScan()
+        player.brain.tracker.locPans()
 
     if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
         direction = MyMath.sign(player.getWalk()[2])
