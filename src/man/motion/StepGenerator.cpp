@@ -1038,7 +1038,7 @@ void StepGenerator::generateStep( float _x,
  * Method to return the default stance of the robot (including arms)
  *
  */
-vector<float>*
+vector<float>
 StepGenerator::getDefaultStance(const Gait& wp){
     const ufvector3 lleg_goal =
         CoordFrame3D::vector3D(-wp.stance[WP::BODY_OFF_X],
@@ -1059,13 +1059,13 @@ StepGenerator::getDefaultStance(const Gait& wp){
     const vector<float> larm(LARM_WALK_ANGLES,&LARM_WALK_ANGLES[ARM_JOINTS]);
     const vector<float> rarm(RARM_WALK_ANGLES,&RARM_WALK_ANGLES[ARM_JOINTS]);
 
-    vector<float> *allJoints = new vector<float>();
+    vector<float> allJoints;
 
     //now combine all the vectors together
-    allJoints->insert(allJoints->end(),larm.begin(),larm.end());
-    allJoints->insert(allJoints->end(),lleg.begin(),lleg.end());
-    allJoints->insert(allJoints->end(),rleg.begin(),rleg.end());
-    allJoints->insert(allJoints->end(),rarm.begin(),rarm.end());
+    allJoints.insert(allJoints.end(),larm.begin(),larm.end());
+    allJoints.insert(allJoints.end(),lleg.begin(),lleg.end());
+    allJoints.insert(allJoints.end(),rleg.begin(),rleg.end());
+    allJoints.insert(allJoints.end(),rarm.begin(),rarm.end());
     return allJoints;
 }
 
