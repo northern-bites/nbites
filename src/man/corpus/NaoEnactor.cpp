@@ -115,16 +115,15 @@ void NaoEnactor::sendHardness()
     motionHardness = switchboard->getNextStiffness();
 
     bool diffStiff = false;
-    static float hardness = 0.0f;
-
+    float hardness = 0.0;
     //TODO!!! ONLY ONCE PER CHANGE!sends the hardness command to the DCM
     for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++) {
-
+        hardness = motionHardness[i];
         //sets the value for hardness
         if(lastMotionHardness[i] != hardness){
             diffStiff = true;
-            lastMotionHardness[i] = motionHardness[i]; // store for next time
-            hardness_command[5][i][0] = motionHardness[i]; // set for this time
+            lastMotionHardness[i] = hardness; // store for next time
+            hardness_command[5][i][0] = hardness; // set for this time
         }
     }
 
