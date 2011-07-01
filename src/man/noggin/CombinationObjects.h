@@ -114,7 +114,7 @@ namespace noggin {
 
         // Other
         const degrees getRelativeBearing(Location& other);
-        const int spinDirToPoint(Location& other);
+        const float spinDirToPoint(Location& other);
 
     protected:
         radians h;
