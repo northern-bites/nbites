@@ -574,7 +574,7 @@ void MultiLocEKF::incorporateCorner(int index,
     float denom = 1 - ((dot_prod * dot_prod) / (pt_dist*pt_dist));
 
     if (denom < 0){
-        denom = 0.001;
+        denom = 0.001f;
     } else {
         denom = sqrtf(denom);
     }
