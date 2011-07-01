@@ -78,12 +78,11 @@ def claimBall(player):
     it and then decide.
     """
     if player.firstFrame():
-        kick = player.brain.kickDecider.getCenterKickPosition()
+        player.brain.nav.chaseBall()
         player.brain.tracker.trackBall()
-        player.brain.nav.kickPosition(kick)
-        player.inKickingState = True
 
-    if transitions.shouldKick(player):
+    if transitions.ballNearPosition(player):
+        player.stopWalking()
         return player.goNow('decideKick')
     elif transitions.shouldFindBall(player):
         return player.goLater('findBall')
@@ -124,9 +123,8 @@ def decideKick(player):
 
     #TODO change this to be better.
     elif player.counter > 43: #time required for scan
+        player.brain.kickDecider.decideKick()
         return player.goNow('positionForKick')
-
-    player.brain.kickDecider.collectInfo()
 
     return player.stay()
 
@@ -138,8 +136,7 @@ def positionForKick(player):
         kick = player.brain.kickDecider.getKick()
 
         if kick is None:
-            player.angleToOrbit = player.brain.kickDecider.kickInfo.orbitAngle
-            return player.goLater('orbitBall')
+            return player.goLater('claimBall')
 
         player.inKickingState = True
 

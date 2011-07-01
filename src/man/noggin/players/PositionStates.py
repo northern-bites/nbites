@@ -30,8 +30,7 @@ def relocalize(player):
     if player.firstFrame():
         player.setWalk(constants.RELOC_X_SPEED, 0, 0)
 
-    if player.brain.my.locScore == NogginConstants.GOOD_LOC or \
-            player.brain.my.locScore == NogginConstants.OK_LOC:
+    if player.brain.my.locScore != NogginConstants.BAD_LOC:
         player.shouldRelocalizeCounter += 1
 
         if player.shouldRelocalizeCounter > 30:

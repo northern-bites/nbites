@@ -17,8 +17,8 @@ PFK_MIN_X_MAGNITUDE = speeds.MIN_OMNI_X_MAGNITUDE
 PFK_MIN_SPIN_MAGNITUDE = speeds.MIN_SPIN_WHILE_X_MAGNITUDE
 
 # Buffering values, insure that we eventually kick the ball
-PFK_CLOSE_ENOUGH_X = 2.7
-PFK_CLOSE_ENOUGH_Y = 2.7
+PFK_CLOSE_ENOUGH_X = 2.0
+PFK_CLOSE_ENOUGH_Y = 2.0
 PFK_CLOSE_ENOUGH_THETA = 11
 PFK_MAX_X_SPEED_DIST = 80
 PFK_MAX_Y_SPEED_DIST = 20
@@ -132,15 +132,10 @@ def pfk_x(nav, ball, targetX):
         nav.stopX = True
         return 0
 
-    if (targetDist > 0):
-        # Move foward to match ball with target
-        # Change the distance to a speed and clip within vector limits
-        sX = MyMath.clip(targetDist/PFK_MAX_X_SPEED_DIST,
-                           PFK_MIN_X_MAGNITUDE,
-                           PFK_FWD_SPEED)
+    # Move foward to match ball with target
+    # Change the distance to a speed and clip within vector limits
+    sX = MyMath.clip(targetDist/PFK_MAX_X_SPEED_DIST,
+                     PFK_MIN_X_MAGNITUDE,
+                     PFK_FWD_SPEED)
 
-        return sX
-
-    else:
-        # Move Backwards Slowly
-        return -.5
+    return sX

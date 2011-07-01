@@ -11,7 +11,6 @@ class Kick(object):
         self.heading = h           # set manually.
         self.sweetMove = move
         self.dest = dest           # set manually.
-        self.moveTime = SweetMoves.getMoveTime(self.sweetMove)
 
     def getPosition(self):
         """returns all position info as a tuple"""

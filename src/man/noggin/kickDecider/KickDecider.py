@@ -17,7 +17,7 @@ class KickDecider(object):
         """
         resets kickInfo so we can decide on next kick
         """
-        self.info = KickInformation.KickInformation(self, self.brain)
+        self.info = KickInformation.KickInformation(self.brain)
 
     def getKick(self):
         """
@@ -40,7 +40,7 @@ class KickDecider(object):
         if kick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
                 kick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
             ball = self.brain.ball
-            dist = self.info.destDist
+            dist = ball.distTo(kick.dest)
             return kick.sweetMove(ball.relY, dist)
         else:
             return kick.sweetMove
@@ -57,8 +57,7 @@ class KickDecider(object):
         # if there are too few players on the field to do a side kick pass.
         if smallTeam:
             print "Kickoff!"
-            self.setKick(self.chooseShortQuickKick())
-            self.info.destDist = 100.
+            self.setKick(self.info.chooseShortQuickKick())
         # do a side kick pass depending on where the offender is.
         elif self.brain.playbook.pb.kickoffFormation == 0:
             self.setKick(kicks.RIGHT_SIDE_KICK)
@@ -71,10 +70,11 @@ class KickDecider(object):
 
     def decideKick(self):
         """
-        using objective and heuristics and localization determines/returns best kick
+        using objective and heuristics and localization determines best kick
         """
         # Check localization to make sure it's good enough.
-        if self.brain.my.locScore != NogginConstants.GOOD_LOC:
+        if self.brain.my.locScore == NogginConstants.BAD_LOC:
+            print "BAD_LOC!"
             self.info.kick = None # TODO set this to "Null Kick" for orbiting.
             return
 

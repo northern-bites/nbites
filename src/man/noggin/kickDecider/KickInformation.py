@@ -14,7 +14,7 @@ class KickInformation:
     def __init__(self, brain):
         self.brain = brain
 
-        # Stores the kicks in a dictionary before setting the kick field.
+        # Stores the kicks in a dictionary before setting the actual kick.
         self.kickChoices = {'scoringKick'   : None,
                             'passingKick'   : None,
                             'clearingKick'  : None,
@@ -26,6 +26,8 @@ class KickInformation:
         self.kick = None
 
     def canScoreAll(self):
+        if True:
+            return True
         return (self.brain.ball.distTo(constants.SHOOT_LEFT_AIM_POINT) <
                 constants.SHORT_RANGE_KICK_DIST and
                 self.brain.ball.distTo(constants.SHOOT_RIGHT_AIM_POINT) <
@@ -40,6 +42,8 @@ class KickInformation:
     def openTeammateCanScore(self):
         # determine out of which teammates are open and in front of us,
         # if there is one that can score. Set it to PassingTeammate.
+        if True:
+            return False
         teammates = self.openForwardTeammates()
         bestMate = None
         minDist = NogginConstants.FIELD_WIDTH
@@ -62,6 +66,8 @@ class KickInformation:
 
     def openTeammate(self):
         # determine out of which teammates are open and in front of us, is best.
+        if True:
+            return False
         teammates = self.openForwardTeammates()
         bestMate = None
         minDist = NogginConstants.FIELD_WIDTH
@@ -79,7 +85,7 @@ class KickInformation:
         use instead of advance and cross. simpler. let chooseClearingKick do the work
         """
         # don't use open field for now (6/28/11)
-        return True
+        return False
 
     def canAdvance(self):
         """
@@ -98,7 +104,7 @@ class KickInformation:
         Make sure we can cross and there is open field for us to cross.
         """
         # don't use open field for now (6/28/11)
-        return True
+        return False
 
     def canPassBack(self):
         # don't use this for now (6/28/11)
@@ -182,6 +188,15 @@ class KickInformation:
             return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
         else:
             return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+
+    def chooseShortQuickKick(self):
+        """
+        Picks quick straight kick based on our heading to the ball.
+        """
+        if self.brain.my.headingTo(self.brain.ball) > 0:
+            return kicks.SHORT_QUICK_RIGHT_KICK
+        else:
+            return kicks.SHORT_QUICK_LEFT_KICK
 
     def chooseBackKick(self):
         """
