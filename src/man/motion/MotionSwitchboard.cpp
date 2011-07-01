@@ -20,16 +20,14 @@ const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
 
 
 MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
-                                     shared_ptr<Profiler> p,
                                      shared_ptr<NaoPose> pose)
     : sensors(s),
-      profiler(p),
-      walkProvider(sensors, pose, p),
-      scriptedProvider(sensors, p),
-      headProvider(sensors, p),
-      coordHeadProvider(sensors, p, pose),
-      nullHeadProvider(sensors, p),
-      nullBodyProvider(sensors, p),
+      walkProvider(sensors, pose),
+      scriptedProvider(sensors),
+      headProvider(sensors),
+      coordHeadProvider(sensors, pose),
+      nullHeadProvider(sensors),
+      nullBodyProvider(sensors),
       curProvider(&nullBodyProvider),
       nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
@@ -125,14 +123,14 @@ void MotionSwitchboard::run() {
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
     while(running) {
-        PROF_ENTER(profiler, P_SWITCHBOARD);
+        PROF_ENTER(P_SWITCHBOARD);
         realityCheckJoints();
 
         preProcess();
         processJoints();
         processStiffness();
         bool active  = postProcess();
-        PROF_EXIT(profiler, P_SWITCHBOARD);
+
 
         if(active)
         {
@@ -146,6 +144,7 @@ void MotionSwitchboard::run() {
         pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
         pthread_mutex_unlock(&calc_new_joints_mutex);
         frameCount++;
+        PROF_EXIT(P_SWITCHBOARD);
     }
     cout << "Switchboard run has exited" <<endl;
 }

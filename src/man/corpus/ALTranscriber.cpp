@@ -49,7 +49,7 @@ void ALTranscriber::initSensorBodyJoints(){
     syncMotionWithALMemory();
 
     //HACK: this should be moved to MotionSwitchboard
-    sensors->setMotionBodyAngles(jointValues);
+    //sensors->setMotionBodyAngles(jointValues);
 }
 
 /**
@@ -168,6 +168,7 @@ const float ALTranscriber::calibrate_acc_z(const float z) {
 }
 
 void ALTranscriber::syncMotionWithALMemory() {
+    static vector<float> jointValues(Kinematics::NUM_JOINTS, 0.0f);
     alfastaccessJoints->GetValues(jointValues);
     sensors->setBodyAngles(jointValues);
 

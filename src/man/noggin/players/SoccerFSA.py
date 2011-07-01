@@ -25,6 +25,9 @@ class SoccerFSA(FSA.FSA):
         # for writing variance data only once per appropriate state
         self.wroteVarianceData = False
 
+        # stuff so players don't crash.
+        self.inKickingState = False
+
     def run(self):
         # gamePenalized is a good time for a lot of i/o, since we won't be moving
         if self.currentState == 'gamePenalized' or \
@@ -69,16 +72,6 @@ class SoccerFSA(FSA.FSA):
         Wrapper method to set the robot's destination
         """
         self.brain.nav.setDest(x, y, theta)
-
-    def setSteps(self, x, y, theta, numSteps=1):
-        """
-        Have the robot walk a specified number of steps
-        """
-        if self.brain.motion.isWalkActive():
-            return False
-        else:
-            self.brain.nav.takeSteps(x, y, theta, numSteps)
-            return True
 
     def standup(self):
         self.brain.nav.stop()

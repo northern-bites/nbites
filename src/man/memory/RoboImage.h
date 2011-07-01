@@ -18,8 +18,7 @@
 namespace man {
 namespace memory {
 
-class RoboImage
-{
+class RoboImage {
 
 public:
     RoboImage(unsigned int wd = NAO_IMAGE_WIDTH,
@@ -27,6 +26,8 @@ public:
     		const byte* im = NULL,
     		int32_t byte_size = NAO_IMAGE_BYTE_SIZE) :
     width(wd), height(ht), image(im), byte_size(byte_size), timestamp(0) {}
+
+    virtual ~RoboImage(){}
 
     virtual void updateImage(const byte* _image) {
     	image = _image;

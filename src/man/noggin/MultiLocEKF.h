@@ -375,7 +375,9 @@ private:
     const static float INIT_H_UNCERT;
     const static float X_EST_MIN;
     const static float Y_EST_MIN;
+    const static float H_EST_MIN;
     const static float X_EST_MAX;
     const static float Y_EST_MAX;
+    const static float H_EST_MAX;
 };
 #endif // File

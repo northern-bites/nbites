@@ -46,7 +46,7 @@ public:
 
     // Sent through to Python (override them for nicer behavior)
     virtual int framesRemaining() { return framesLeft; }
-    virtual bool isDoneExecuting() { return commandFinished || framesLeft <= 0; }
+    virtual bool isDoneExecuting() { return commandFinished; }
     virtual float timeRemaining() {
 	if (isDoneExecuting())
 	    return 0.0f;
@@ -56,7 +56,11 @@ public:
     // ONLY CALL THESE FROM PROVIDERS (aren't exposed to Python)
     void finishedExecuting() { commandFinished = true; }
     void framesRemaining(int _frames) { framesLeft = _frames; }
-    void tick() { --framesLeft; }
+
+    void tick() {
+	if (--framesLeft < 0)
+	    commandFinished = true;
+    }
 
 private:
     bool commandFinished;

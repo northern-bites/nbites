@@ -1,5 +1,6 @@
-from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_PENALTY_SAVER)
+from ..playbook.PBConstants import (GOALIE, CHASER)
 import man.motion.SweetMoves as SweetMoves
+
 ###
 # Reimplementation of Game Controller States for pBrunswick
 ###
@@ -48,7 +49,7 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.stopWalking()
+        player.standup()
         player.brain.loc.resetBall()
         player.brain.tracker.trackBall()
 
@@ -68,6 +69,8 @@ def gamePlaying(player):
     if player.firstFrame():
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
+            player.stopWalking()
+            player.gainsOn()
 
             if player.lastStateTime > 25:
                 # 25 is arbitrary. This check is meant to catch human error and
@@ -138,6 +141,8 @@ def penaltyShotsGameReady(player):
 
 def penaltyShotsGameSet(player):
     if player.firstFrame():
+        player.gainsOn()
+        player.walkPose()
         player.stopWalking()
         player.brain.loc.resetBall()
 
@@ -153,12 +158,15 @@ def penaltyShotsGameSet(player):
     return player.stay()
 
 def penaltyShotsGamePlaying(player):
-    if player.lastDiffState == 'gamePenalized' and \
-            player.firstFrame():
+    if (player.lastDiffState == 'gamePenalized' and
+            player.firstFrame()):
         player.brain.resetLocalization()
+
+    # Not used
     if player.brain.play.isRole(GOALIE):
-        player.brain.play.setSubRole(GOALIE_PENALTY_SAVER)
-        return player.goNow('penaltyGoalie')
+        player.penaltyKicking = True
+        roleState = player.getRoleState()
+        return player.goNow(roleState)
     return player.goNow('penaltyKick')
 
 

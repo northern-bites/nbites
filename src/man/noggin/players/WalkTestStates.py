@@ -13,8 +13,7 @@ from ..WebotsConfig import WEBOTS_ACTIVE
 import man.motion.SweetMoves as SweetMoves
 
 #Types
-DEST = 2
-STEP = 1 #currently broken in Nav.
+DEST = 1
 WALK = 0
 
 # all walk vector values must be in the range [-1,1]
@@ -76,11 +75,6 @@ def walkTest(player):
             player.setWalk(currentVector[0],
                            currentVector[1],
                            currentVector[2],)
-        elif currentCommand[0] == STEP:
-            player.setSteps(currentVector[0],
-                            currentVector[1],
-                            currentVector[2],
-                            currentVector[3],)
         elif currentCommand[0] == DEST:
             player.setDestination(currentVector[0],
                                   currentVector[1],

@@ -22,20 +22,18 @@ namespace parse {
 namespace proto_io = google::protobuf::io;
 namespace proto = google::protobuf;
 
-class MessageParser : Parser <proto::Message>{
+class MessageParser : public TemplatedParser <proto::Message>{
 
 public:
-    MessageParser(boost::shared_ptr<proto::Message> message,
-               const char* _file_name);
-    MessageParser(boost::shared_ptr<proto::Message> message,
-               int _file_descriptor);
+    MessageParser(include::io::FDProvider::const_ptr fdProvider,
+            boost::shared_ptr<proto::Message> message);
 
-    ~MessageParser();
+    virtual ~MessageParser();
 
     void initStreams();
 
     const LogHeader getHeader();
-    boost::shared_ptr<const proto::Message> getNext();
+    bool getNext();
     boost::shared_ptr<const proto::Message> getPrev();
     boost::shared_ptr<const proto::Message> getCurrent();
 
@@ -43,7 +41,6 @@ private:
     void readHeader();
 
 private:
-    int file_descriptor;
     int current_size;
 
     bool finished;

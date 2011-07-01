@@ -59,9 +59,9 @@ void (PyMotionInterface::*frz2)(const PyUnfreezeCommand*) =
 BOOST_PYTHON_MODULE(_motion)
 {
     // generic interface available to all PyMotionCommands
-    class_<PyMotionCommand, boost::noncopyable>("PyMotionCommand", no_init)
+    class_<PyMotionCommand>("PyMotionCommand", no_init)
 	.def("framesRemaining", &PyMotionCommand::framesRemaining)
-	.def("isDone", &PyMotionCommand::isDoneExecuting)
+	.def("isDone", &PyMotionCommand::isDone)
 	.def("timeRemaining", &PyMotionCommand::timeRemaining)
 	;
 

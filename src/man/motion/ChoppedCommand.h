@@ -22,13 +22,19 @@ class ChoppedCommand
     ChoppedCommand ( const JointCommand::ptr command, int chops );
     virtual ~ChoppedCommand(void) { }
 
+    // derived classes need to call this command
     virtual std::vector<float> getNextJoints(int id) {
         return std::vector<float>(0);
     }
-    virtual const std::vector<float> getStiffness( Kinematics::ChainID chaindID) const;
+    virtual const std::vector<float> getStiffness( Kinematics::ChainID chainID) const;
     virtual bool isDone() const { return finished; }
 
     int NumChops() const { return numChops; }
+
+    void nextFrame() { sourceCommand->tick(); }
+    void finishedExecuting() {
+	sourceCommand->finishedExecuting();
+    }
 
  protected:
     void checkDone();
@@ -50,6 +56,7 @@ private:
     bool finished;
 
  private:
+    JointCommand::ptr sourceCommand;
     std::vector<float> head_stiff, larm_stiff, rarm_stiff;
     std::vector<float> lleg_stiff, rleg_stiff;
 

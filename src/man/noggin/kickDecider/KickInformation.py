@@ -132,7 +132,6 @@ class KickInformation:
         to know where to shoot. This conversion lets us decide which aim point
         we are better lined up to shoot for easily (ie with a single compare)
         """
-
         my = self.brain.my
         ball = self.brain.ball
         bestHeading = -1.

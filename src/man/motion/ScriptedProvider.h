@@ -37,8 +37,7 @@
 
 class ScriptedProvider : public MotionProvider {
 public:
-    ScriptedProvider(boost::shared_ptr<Sensors> s,
-		     boost::shared_ptr<Profiler> p);
+    ScriptedProvider(boost::shared_ptr<Sensors> s);
     virtual ~ScriptedProvider();
 
     void requestStopFirstInstance();
@@ -56,7 +55,6 @@ private:
 
     // The current chopped command which is being enacted
     ChoppedCommand::ptr currCommand;
-    BodyJointCommand::ptr currCommand_unchopped;
 
     // Queue to hold the next body commands
     std::queue<BodyJointCommand::ptr> bodyCommandQueue;

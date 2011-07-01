@@ -21,19 +21,21 @@ use warnings;
 use File::Find;
 use Env '@PATH';
 
+# Constants, colors, debug, etc.
 my $DEBUG = "";
 my $BUILD = "yes";
 my $DOT_OPTS = '-Tpng -O'; # outputs in png format
 
-my @addedStateFiles;
-my $lastBehavior;
-
 my $nowChar = '*';
 my $laterChar = '^';
 
-# colors chosen in no particular order
+# (colors chosen in no particular order)
 my @stateFileColors = qw ( blue Brown Crimson Green Indigo
-Peru deeppink goldenrod firebrick dodgerblue cyan4 chocolate4 yellow4 );
+cyan4 Peru deeppink goldenrod dodgerblue firebrick chocolate4 yellow4 );
+
+# Per FSA data structures
+my @addedStateFiles;
+my $lastBehavior;
 
 # access each StateFile by its behaviorName (eg pBrunswick)
 # for example, @{$stateFiles{PenaltyKickStates}{penaltyBallInOppGoalbox}{chase}}
@@ -308,4 +310,10 @@ foreach my $behaviorFile (@ARGV) {
 
     print "\n:::building .dot and .png files:::\n";
     buildDOT($behaviorFile, $initialBehavior);
+
+    # and reset the data structures for the next FSA
+    %stateFiles = ();
+    %stateFileUsedColors = ();
+    @addedStateFiles = ();
+    undef $lastBehavior
 }

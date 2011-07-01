@@ -80,6 +80,17 @@ const static float MOTION_FRAME_LENGTH_S = 0.01f;
 const float MOTION_FRAME_LENGTH_uS = 1000.0f * 1000.0f * MOTION_FRAME_LENGTH_S;
 const float MOTION_FRAME_RATE = 1.0f / MOTION_FRAME_LENGTH_S;
 
+/**
+ * Copies a struct using memcpy
+ *
+ * @returns the number of bytes copied
+ */
+template <class S, class D>
+int copy_struct(const S* source, D* destination) {
+    memcpy(source, destination, sizeof(S));
+    return sizeof(S);
+}
+
 //TODO: if we ever want to time stuff offline proper, then fix the ifdefs
 static long long thread_micro_time (void)
 {
@@ -133,4 +144,5 @@ static long long monotonic_micro_time(void)
     return tv.tv_sec * MICROS_PER_SECOND + tv.tv_nsec / 1000;
 #endif
 }
+
 #endif // Common_h_DEFINED

@@ -48,9 +48,8 @@ enum ProviderType{
 
 class MotionProvider {
 public:
-    MotionProvider(ProviderType _provider_type,
-				   boost::shared_ptr<Profiler> p)
-        : profiler(p),_active(false), _stopping(false),
+    MotionProvider(ProviderType _provider_type)
+        : _active(false), _stopping(false),
           nextJoints(Kinematics::NUM_CHAINS,std::vector<float>()),
           nextStiffnesses(Kinematics::NUM_CHAINS,std::vector<float>()),
           provider_type(_provider_type)
@@ -135,9 +134,6 @@ protected:
     virtual void requestStopFirstInstance() = 0;
     void active() { _active = true; }
     void inactive() { _active = false; _stopping = false; }
-
-protected:
-	boost::shared_ptr<Profiler> profiler;
 
 private:
 

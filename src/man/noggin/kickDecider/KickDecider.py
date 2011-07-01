@@ -23,6 +23,9 @@ class KickDecider(object):
         """
         returns the kick we have decided. If None, then orbit for Loc.
         """
+        if self.info.kick is None:
+            self.info.kick = kicks.CENTER_KICK_POSITION
+            self.info.kick.nullKick = True
         return self.info.kick
 
     def setKick(self, k):
@@ -72,6 +75,9 @@ class KickDecider(object):
         """
         using objective and heuristics and localization determines best kick
         """
+        # Re-initialize to clear data
+        self.resetInfo()
+
         # Check localization to make sure it's good enough.
         if self.brain.my.locScore == NogginConstants.BAD_LOC:
             print "BAD_LOC!"
@@ -97,6 +103,7 @@ class KickDecider(object):
             self.choosePassBackKick()
 
         self.info.kick = self.chooseKick()
+        print "Chose: {0}".format(self.info.kick)
         return self.info.kick
 
     def score(self):

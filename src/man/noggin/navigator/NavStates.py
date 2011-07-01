@@ -21,7 +21,6 @@ def doingSweetMove(nav):
 
     return nav.stay()
 
-
 # States for the standard spin - walk - spin go to
 def walkStraightToPoint(nav):
     """
@@ -277,25 +276,24 @@ def destWalking(nav):
     if nav.firstFrame() or nav.newDestination:
         if (nav.destGain < 0):
             nav.destGain = 1;
-            # @todo Leaving the actual interface of the destGain parameter unimplemented
-            # Wils, figure out how you want to set it up --Nathan
+
+        nav.nearDestination = False
+
+        if nav.destX == 0 and nav.destY == 0 and nav.destTheta == 0:
+            nav.goNow('stop')
 
         helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta, nav.destGain)
         nav.newDestination = False
 
-    return nav.stay()
+    framesLeft = nav.currentCommand.framesRemaining()
 
-# State to use with the setSteps method
-def stepping(nav):
-    """
-    We use this to go a specified number of steps.
-    This is different from walking.
-    """
-    if nav.firstFrame():
-        helper.step(nav, nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
+    # the frames remaining counter is sometimes set to -1 initially
+    if framesLeft != -1 and framesLeft < 40:
+        nav.nearDestination = True
 
-    elif not nav.brain.motion.isWalkActive():
-        return nav.goNow("stopped")
+    if nav.currentCommand.isDone():
+        nav.nearDestination = True
+        return nav.goNow('stop')
 
     return nav.stay()
 
@@ -305,9 +303,14 @@ def stop(nav):
     Wait until the walk is finished.
     """
     if nav.firstFrame():
+        # stop walk vectors
         helper.setSpeed(nav, 0, 0, 0)
         nav.walkX = nav.walkY = nav.walkTheta = \
                     nav.stepX = nav.stepY = nav.stepTheta = nav.numSteps = 0
+
+        # stop destination walking
+        nav.destX = nav.destY = nav.destTheta = 0
+        helper.setDestination(nav, 0, 0, 0, 1)
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
@@ -316,14 +319,6 @@ def stop(nav):
 
 def stopped(nav):
     return nav.stay()
-
-def orbitPoint(nav):
-    if nav.updatedTrajectory:
-        helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
-        nav.updatedTrajectory = False
-
-    return nav.stay()
-
 
 def orbitPointThruAngle(nav):
     """
@@ -338,19 +333,22 @@ def orbitPointThruAngle(nav):
         else:
             orbitDir = constants.ORBIT_RIGHT
 
-        sY = constants.ORBIT_STRAFE_SPEED
-
-        sT = constants.ORBIT_SPIN_SPEED
-
-        walkX = (nav.brain.ball.relX - 25) * .8
-        walkY = -1 * MyMath.sign(nav.angleToOrbit) * 10
-        walkTheta = MyMath.sign(nav.angleToOrbit) * 20
-
+        #determine speeds for orbit
+        ball = nav.brain.ball
+        #want x to keep a radius of 17 from the ball, increase and
+        #decrease x velocity as we move farther away from that dist
+        walkX = (ball.relX - 18) * .045
+        #keep constant y velocity, let x and theta changea
+        walkY = orbitDir * .8
+        #Vary theta based on ball bearing.  increase theta velocity as
+        #we get farther away from facing the ball
+        walkTheta = orbitDir * ball.bearing * .035
+        #set speed for orbit
         helper.setSpeed(nav, walkX, walkY, walkTheta )
 
-    #  (frames/second) / (degrees/second) * degrees
-    framesToOrbit = 100
+    #Funny enough, we orbit about 1 degree a frame,
+    #So the angle can be used as a thresh
 
-    if nav.counter >= framesToOrbit:
+    if nav.counter >= nav.angleToOrbit:
         return nav.goLater('stop')
     return nav.stay()

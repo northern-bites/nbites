@@ -202,8 +202,7 @@ private:
 public:
 
     FieldLines(Vision *visPtr,
-               boost::shared_ptr<NaoPose> posePtr,
-               boost::shared_ptr<Profiler> profilerPtr);
+               boost::shared_ptr<NaoPose> posePtr);
     virtual ~FieldLines() {}
 
     // master loop
@@ -324,6 +323,10 @@ private:
     const bool tooMuchGreenAtCorner(const point<int>& intersection,
                                     const int& numChecksPassed);
 
+    const bool tooMuchWhitePastEndpoint(const point<int>& line1Closer,
+										const point<int>& line2Closer,
+										const point<int>& intersection) const;
+
     const bool areLinesTooSmall(boost::shared_ptr<VisualLine> i,
                                 boost::shared_ptr<VisualLine> j,
                                 const int& numChecksPassed) const;
@@ -400,6 +403,7 @@ private:
     // line distance
     float getRealDistance(const ConcreteCorner *c,
                           const VisualFieldObject *obj, int w) const;
+	float realDistance(int x1, int y1, int x2, int y2) const;
 
     // Estimates how long the line is on the field
     float getEstimatedLength(boost::shared_ptr<VisualLine> line) const;
@@ -485,7 +489,7 @@ private:
     const bool isWhiteGreenEdge(int x, int y, int potentialMidPoint,
                                 const ScanDirection direction) const;
 
-    static void updateLineCounters(const int threshColor, int &numWhite,
+    static void updateLineCounters(const unsigned char threshColor, int &numWhite,
                                    int &numUndefined, int &numNonWhite);
 
 #ifdef OFFLINE
@@ -685,7 +689,6 @@ private:
 private:
     Vision *vision;
     boost::shared_ptr<NaoPose> pose;
-    boost::shared_ptr<Profiler> profiler;
 
     std::vector <boost::shared_ptr<VisualLine> > linesList;
     std::list <VisualCorner> cornersList;

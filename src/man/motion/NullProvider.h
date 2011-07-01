@@ -13,7 +13,6 @@
 class NullProvider : public MotionProvider {
 public:
     NullProvider(boost::shared_ptr<Sensors> s,
-				 boost::shared_ptr<Profiler> p,
                  const bool chain_mask[Kinematics::NUM_CHAINS]);
     virtual ~NullProvider();
 

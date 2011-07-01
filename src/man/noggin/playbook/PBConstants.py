@@ -183,7 +183,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 29
+NUM_SUB_ROLES = 27
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
 
@@ -210,19 +210,17 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             # CHASER SUB ROLES 16
                                             "CHASE_NORMAL",
 
-                                            # GOALIE SUB ROLE 17-22
+                                            # GOALIE SUB ROLE 17-20
                                             "GOALIE_CENTER",
-                                            "GOALIE_RIGHT",
-                                            "GOALIE_LEFT",
                                             "GOALIE_SAVE",
                                             "GOALIE_CHASER",
-                                            "GOALIE_PENALTY_SAVER",
+                                            "GOALIE_KICKOFF",
 
-                                            # KICKOFF SUB ROLES 23-24
+                                            # KICKOFF SUB ROLES 21-22
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 25-28
+                                            # READY SUB ROLES 23-26
                                             "READY_GOALIE",
                                             "READY_CHASER",
                                             "READY_DEFENDER",
@@ -251,11 +249,9 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  CHASE_NORMAL,
 
  GOALIE_CENTER,
- GOALIE_RIGHT,
- GOALIE_LEFT,
  GOALIE_SAVE,
  GOALIE_CHASER,
- GOALIE_PENALTY_SAVER,
+ GOALIE_KICKOFF,
 
  KICKOFF_SWEEPER,
  KICKOFF_STRIKER,
@@ -382,12 +378,8 @@ DEG_TO_RAD = pi / 180.
 BALL_FOCUS_UNCERT_THRESH = 100.
 
 #Home positioning
-GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X + 20 #LARGE_ELLIPSE_HEIGHT??
+GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X + 30 #LARGE_ELLIPSE_HEIGHT??
 GOALIE_HOME_Y = NogginConstants.CENTER_FIELD_Y
-GOALIE_RIGHT_X = NogginConstants.MY_GOALBOX_LEFT_X + 20
-GOALIE_RIGHT_Y = NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y + 10
-GOALIE_LEFT_X = NogginConstants.MY_GOALBOX_LEFT_X + 20
-GOALIE_LEFT_Y = NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y - 10
 
 ### Defender
 """

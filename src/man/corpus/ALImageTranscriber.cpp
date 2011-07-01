@@ -11,6 +11,8 @@
 #include "corpusconfig.h"
 #include "ImageAcquisition.h"
 
+#include "vision/Profiler.h"
+
 #ifdef DEBUG_ALIMAGE
 #  define DEBUG_ALIMAGE_LOOP
 #endif
@@ -123,8 +125,8 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
 
 ALImageTranscriber::~ALImageTranscriber()
 {
+    cout << "ALImageTranscriber destructor" << endl;
     delete [] image;
-    stop();
 }
 
 
@@ -143,10 +145,13 @@ void ALImageTranscriber::run()
     struct timespec interval, remainder;
     while (Thread::running) {
         //start timer
+        PROF_ENTER(P_MAIN);
+        PROF_ENTER(P_GETIMAGE);
         const long long startTime = process_micro_time();
 
         if (camera_active)
             waitForImage();
+        PROF_EXIT(P_GETIMAGE);
         subscriber->notifyNextVisionImage();
 
 #ifdef SAVE_ALL_FRAMES
@@ -171,6 +176,7 @@ void ALImageTranscriber::run()
             }
             //Don't sleep at all
         } else{
+            //TODO @refactor
             const long int microSleepTime =
                 static_cast<long int>(VISION_FRAME_LENGTH_uS - processTime);
             const long int nanoSleepTime =
@@ -187,6 +193,8 @@ void ALImageTranscriber::run()
 
             nanosleep(&interval, &remainder);
         }
+        PROF_EXIT(P_MAIN);
+        PROF_NFRAME();
     }
     Thread::trigger->off();
 }
@@ -549,14 +557,9 @@ void ALImageTranscriber::waitForImage ()
 
             sensors->lockImage();
 #ifdef CAN_SAVE_FRAMES
-#ifdef USE_MEMORY
-            sensors->setRawNaoImage(ALimage->getData());
-            ImageAcquisition::_acquire_image_fast(table, &params, const_cast<uint8_t*>(sensors->getNaoImage()), image);
-#else
             _copy_image(ALimage->getData(), naoImage);
             ImageAcquisition::acquire_image_fast(table, params,
                     	naoImage, image);
-#endif
 #else
             ImageAcquisition::acquire_image_fast(table, params,
                                                  ALimage->getData(), image);

@@ -12,13 +12,14 @@ def kickBallExecute(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
+
         if transitions.ballInPosition(player):
             player.executeMove(player.brain.kickDecider.getSweetMove())
         else:
             #Either it's close and we can't kick it now or it's far
             #away and we should search.  Lets hope its close and let
             #positionForKick put us in findBall if needed
-            player.goNow('positionForKick')
+            return player.goLater('positionForKick')
 
         #if player.penaltyKicking:
         if not player.penaltyMadeFirstKick:
@@ -26,7 +27,7 @@ def kickBallExecute(player):
         elif not player.penaltyMadeSecondKick:
             player.penaltyMadeSecondKick = True
 
-    if player.counter > 1 and player.brain.nav.isStopped():
+    if player.counter > 10 and player.brain.nav.isStopped():
         player.brain.nav.justKicked = True
         return player.goLater('afterKick')
 
@@ -56,6 +57,7 @@ def afterKick(player):
                   kick is kicks.SHORT_QUICK_RIGHT_KICK):
                 player.brain.tracker.kickDecideScan() # should scan upper reaches.
             else:
+                player.inKickingState = False
                 return player.goLater('spinAfterBackKick')
 
         if player.penaltyKicking:

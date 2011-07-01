@@ -13,8 +13,8 @@ def setDestination(nav, x, y, theta, gain):
     """
     Calls setDestination within the motion engine
     """
-    destination = motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
-    nav.brain.motion.sendDestCommand(destination)
+    nav.currentCommand = motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
+    nav.brain.motion.sendDestCommand(nav.currentCommand)
 
 def setSpeed(nav, x, y, theta):
     """
@@ -98,7 +98,6 @@ def executeMove(motionInst, sweetMove):
     Can either take in a head move or a body command
     (see SweetMove files for descriptions of command tuples)
     """
-
     for position in sweetMove:
         if len(position) == 7:
             move = motion.BodyJointCommand(position[4], #time
@@ -120,7 +119,6 @@ def executeMove(motionInst, sweetMove):
 
         else:
             print("What kind of sweet ass-Move is this?")
-
         motionInst.enqueue(move)
 
 def convertWalkVector(brain, x_abs, y_abs, theta_abs):
