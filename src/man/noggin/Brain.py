@@ -147,11 +147,6 @@ class Brain(object):
                                 Constants.vis_landmark.VISION_BGRP,
                                 self.my)
 
-        # Add field corners
-        self.corners = []
-        for i in range(17): # See PyVision.cpp for index meanings, 15-31
-            self.corners.append(Landmarks.FieldCorner(i))
-
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
 
@@ -170,23 +165,6 @@ class Brain(object):
             # Blue Goal
             self.myGoalLeftPost = self.bglp
             self.myGoalRightPost = self.bgrp
-            # Corners
-            self.myHalfLeftCorner = self.corners[0]
-            self.myHalfRightCorner = self.corners[1]
-            self.myBoxLeftT = self.corners[2]
-            self.myBoxRightT = self.corners[3]
-            self.myBoxLeftL = self.corners[4]
-            self.myBoxRightL = self.corners[5]
-            self.centerLeftT = self.corners[7]
-            self.centerRightT = self.corners[8]
-            self.centerLeftCross = self.corners[15]
-            self.centerRightCross = self.corners[16]
-            self.oppHalfLeftCorner = self.corners[9]
-            self.oppHalfRightCorner = self.corners[8]
-            self.oppBoxLeftT = self.corners[11]
-            self.oppBoxRightT = self.corners[10]
-            self.oppBoxLeftL = self.corners[13]
-            self.oppBoxRightL = self.corners[12]
 
         # Yellow team setup
         else:
@@ -196,23 +174,6 @@ class Brain(object):
             # Blue Goal
             self.oppGoalRightPost = self.bglp
             self.oppGoalLeftPost = self.bgrp
-            # Corners
-            self.myHalfLeftCorner = self.corners[8]
-            self.myHalfRightCorner = self.corners[9]
-            self.myBoxLeftT = self.corners[10]
-            self.myBoxRightT = self.corners[11]
-            self.myBoxLeftL = self.corners[12]
-            self.myBoxRightL = self.corners[13]
-            self.centerLeftT = self.corners[8]
-            self.centerRightT = self.corners[7]
-            self.centerLeftCross = self.corners[16]
-            self.centerRightCross = self.corners[15]
-            self.oppHalfLeftCorner = self.corners[1]
-            self.oppHalfRightCorner = self.corners[0]
-            self.oppBoxLeftT = self.corners[3]
-            self.oppBoxRightT = self.corners[2]
-            self.oppBoxLeftL = self.corners[5]
-            self.oppBoxRightL = self.corners[4]
 
         # Since, for ex.  bgrp points to the same things as myGoalLeftPost,
         # we can set these regardless of our team color
@@ -224,40 +185,6 @@ class Brain(object):
             Constants.LANDMARK_OPP_GOAL_LEFT_POST)
         self.oppGoalRightPost.associateWithRelativeLandmark(
             Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
-
-        # Set x and y values for corners
-        self.myHalfLeftCorner.associateWithRelativeLandmark(
-            Constants.LANDMARK_MY_CORNER_LEFT_L)
-        self.myHalfRightCorner.associateWithRelativeLandmark(
-            Constants.LANDMARK_MY_CORNER_RIGHT_L)
-        self.myBoxLeftT.associateWithRelativeLandmark(
-            Constants.LANDMARK_MY_GOAL_LEFT_T)
-        self.myBoxRightT.associateWithRelativeLandmark(
-            Constants.LANDMARK_MY_GOAL_RIGHT_T)
-        self.myBoxLeftL.associateWithRelativeLandmark(
-            Constants.LANDMARK_MY_GOAL_LEFT_L)
-        self.myBoxRightL.associateWithRelativeLandmark(
-            Constants.LANDMARK_MY_GOAL_RIGHT_L)
-        self.centerLeftT.associateWithRelativeLandmark(
-            Constants.LANDMARK_CENTER_LEFT_T)
-        self.centerRightT.associateWithRelativeLandmark(
-            Constants.LANDMARK_CENTER_RIGHT_T)
-        self.centerLeftCross.associateWithRelativeLandmark(
-            Constants.LANDMARK_CENTER_LEFT_CROSS)
-        self.centerRightCross.associateWithRelativeLandmark(
-            Constants.LANDMARK_CENTER_RIGHT_CROSS)
-        self.oppHalfLeftCorner.associateWithRelativeLandmark(
-            Constants.LANDMARK_OPP_CORNER_LEFT_L)
-        self.oppHalfRightCorner.associateWithRelativeLandmark(
-            Constants.LANDMARK_OPP_CORNER_RIGHT_L)
-        self.oppBoxLeftT.associateWithRelativeLandmark(
-            Constants.LANDMARK_OPP_GOAL_LEFT_T)
-        self.oppBoxRightT.associateWithRelativeLandmark(
-            Constants.LANDMARK_OPP_GOAL_RIGHT_T)
-        self.oppBoxLeftL.associateWithRelativeLandmark(
-            Constants.LANDMARK_OPP_GOAL_LEFT_L)
-        self.oppBoxRightL.associateWithRelativeLandmark(
-            Constants.LANDMARK_OPP_GOAL_RIGHT_L)
 
         # Build a list of all of the field objects with respect to team color
         self.myFieldObjects = [self.yglp, self.ygrp, self.bglp, self.bgrp]
@@ -353,11 +280,6 @@ class Brain(object):
         self.ball.updateLoc(self.loc, self.my)
         self.my.update()
 
-        """ Corners abandonded due to insufficient reliability"""
-        for i in range(len(self.corners)):
-            self.corners[i].updateLoc(self.loc, self.my)
-            """ """
-
     def updateBestValues(self):
         """
         Update estimates about objects using best information available
@@ -368,9 +290,6 @@ class Brain(object):
         self.ygrp.setBest()
         self.bglp.setBest()
         self.bgrp.setBest()
-
-        for i in range(len(self.corners)):
-            self.corners[i].updateBestValues()
 
     def updatePlaybook(self):
         """

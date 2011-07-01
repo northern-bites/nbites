@@ -37,7 +37,6 @@ class HeadTracking(FSA.FSA):
         self.preActivePanHeads = None
         self.locObjectList = []
         self.locObjectList.extend(self.brain.myFieldObjects)
-        self.locObjectList.extend(self.brain.corners)
         self.helper = helper.HeadTrackingHelper(self)
 
         self.lookDirection = None
