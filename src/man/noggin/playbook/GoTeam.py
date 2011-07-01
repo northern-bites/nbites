@@ -35,6 +35,7 @@ class GoTeam:
         self.timeSinceCaptureChase = 0
         self.subRoleSwitchTime = 0
         self.goalieChaserCount = 0
+        self.willBeIllegalD = 0
         self.ellipse = Ellipse(PBConstants.LARGE_ELLIPSE_CENTER_X,
                                PBConstants.LARGE_ELLIPSE_CENTER_Y,
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
@@ -415,6 +416,13 @@ class GoTeam:
         """
 
         ball = self.brain.ball
+
+        # No matter what state we are we don't
+        # Want to become an illegal defender
+        if ball.inMyGoalBox():
+            self.willBeIllegalD += 1
+            if self.willBeIllegalD > PBConstants.DONT_ILLEGAL_D_THRESH:
+                return True
 
         if not PBConstants.USE_DUB_D:
             return False
