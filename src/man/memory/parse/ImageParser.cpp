@@ -11,34 +11,21 @@ namespace parse {
 using namespace std;
 using namespace google::protobuf::io;
 using boost::shared_ptr;
+using namespace include::io;
 
-//TODO: use file descriptor providers
-//ImageParser::ImageParser(boost::shared_ptr<ProtoImage> image,
-//                       int _file_descriptor) :
-//        Parser<ProtoImage>(image),
-//        file_descriptor(_file_descriptor)
-//{
-//    initStreams();
-//    readHeader();
-//
-//}
-
-ImageParser::ImageParser(boost::shared_ptr<RoboImage> image,
-                       const char* _file_name) :
-       Parser<RoboImage>(image),
+ImageParser::ImageParser(include::io::FDProvider::const_ptr fdProvider,
+        boost::shared_ptr<RoboImage> image) :
+        TemplatedParser<RoboImage>(fdProvider, image),
        current_buffer(new const void*),
-       current_buffer_size(1) {
-
-    file_descriptor = open(_file_name, O_RDONLY);
+       current_buffer_size(1),
+       finished(false){
 
     initStreams();
     readHeader();
 }
 
 ImageParser::~ImageParser() {
-
     delete raw_input;
-    close(file_descriptor);
 }
 
 void ImageParser::readHeader() {
@@ -66,7 +53,7 @@ const LogHeader ImageParser::getHeader() {
     return log_header;
 }
 
-shared_ptr<const RoboImage> ImageParser::getNext() {
+bool ImageParser::getNext() {
 
     uint32_t bytes_read = 0;
     this->getNextBuffer();
@@ -75,7 +62,7 @@ shared_ptr<const RoboImage> ImageParser::getNext() {
         container->updateImage(
                 reinterpret_cast<const uint8_t*>(*current_buffer) + bytes_read);
     }
-    return container;
+    return finished;
 }
 
 shared_ptr<const RoboImage> ImageParser::getPrev() {
@@ -105,7 +92,7 @@ void ImageParser::getNextBuffer() {
 
 void ImageParser::initStreams() {
 
-    raw_input = new FileInputStream(file_descriptor,
+    raw_input = new FileInputStream(fdProvider->getFileDescriptor(),
             container->getByteSize() + sizeof(container->getTimestamp()));
 }
 

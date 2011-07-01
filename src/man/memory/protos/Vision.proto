@@ -46,8 +46,5 @@ message PVision {
     	optional uint32 secondary_shape = 4;
     	optional float angle_between_lines = 5;
     	optional float orientation = 6;
-    	optional bool up = 7;
-    	optional bool right = 8;
-
     }
 }

@@ -19,6 +19,9 @@ def goalieSave(player):
         player.isSaving = True
 
     if helper.shouldSave(player):
+        print "Saving because"
+        print  "Ball.relVelX is" + str(ball.relVelX)
+        print  "And Ball.heat is" + str(ball.heat)
         brain.tracker.stopHeadMoves()
         brain.fallController.enableFallProtection(False)
         if TESTING:
@@ -27,7 +30,7 @@ def goalieSave(player):
             elif helper.shouldSaveLeft(player):
                 return player.goNow('testSaveLeft')
             else:
-                return player.goNow('saveCenter')
+                return player.goNow('testSaveCenter')
         else:
             if helper.shouldSaveRight(player):
                 return player.goNow('saveRight')
@@ -78,7 +81,8 @@ def saveCenter(player):
 def testSaveRight(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
-    if player.counter > goalCon.TEST_SAVE_WAIT:
+    if (player.counter > goalCon.TEST_SAVE_WAIT and
+        not helper.shouldHoldSave(player)):
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.goNow('doneSaving')
     return player.stay()
@@ -86,7 +90,8 @@ def testSaveRight(player):
 def testSaveLeft(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
-    if player.counter > goalCon.TEST_SAVE_WAIT:
+    if(player.counter > goalCon.TEST_SAVE_WAIT and
+        not helper.shouldHoldSave(player)):
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.goNow('doneSaving')
     return player.stay()
@@ -94,7 +99,8 @@ def testSaveLeft(player):
 def testSaveCenter(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
-    if player.counter > goalCon.TEST_SAVE_WAIT:
+    if (player.counter > goalCon.TEST_SAVE_WAIT and
+        not helper.shouldHoldSave(player)):
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.goNow('doneSaving')
     return player.stay()

@@ -42,10 +42,13 @@ class FallController(FSA.FSA):
                 #             self.switchTo('falling')
 
             # if not falling, check if our feet are on the ground
+            # disabled due to flakey FSRs
+            """
             elif (not self.standingUp and
                   not self.brain.nav.doingSweetMove and
                   not self.brain.roboguardian.isFeetOnGround()):
                 self.switchTo('feetOffGround')
+            """
 
         FSA.FSA.run(self)
 

@@ -13,6 +13,7 @@
 #pragma once
 
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 #include "include/io/FileFDProvider.h"
 
 namespace man {
@@ -22,11 +23,18 @@ namespace log {
 class FDLogger {
 
 public:
+    typedef boost::shared_ptr<FDLogger> ptr;
+    typedef boost::shared_ptr<FDLogger> const_ptr;
+
+protected:
+    typedef include::io::FDProvider FDProvider;
+
+public:
     /**
      * fdp : a FileFDProvider for the file descriptor where we want
      * to log to
      */
-    FDLogger(const FDProvider* fdp):
+    FDLogger(FDProvider::const_ptr fdp):
         file_descriptor_provider(fdp),
         file_descriptor(fdp->getFileDescriptor())
     {
@@ -40,7 +48,7 @@ public:
      * sort of output buffer implemented in the respective
      * Logger subclass
      */
-    virtual void write() = 0;
+    virtual void writeToLog() = 0;
 
 private:
     /**
@@ -51,7 +59,7 @@ private:
 
 
 protected:
-    const FDProvider* file_descriptor_provider;
+    const FDProvider::const_ptr file_descriptor_provider;
     int file_descriptor;
 };
 

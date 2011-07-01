@@ -2,7 +2,6 @@
 # The transitions for the goalie for the goalie states.
 # Covers chase, position and save.
 #
-
 from .. import NogginConstants as NogCon
 import GoalieConstants as goalCon
 
@@ -11,13 +10,16 @@ import GoalieConstants as goalCon
 def shouldSave(player):
     ball = player.brain.ball
 
-    if (ball.dx > 2 and ball.heat == 0):
+    if(ball.relVelX < goalCon.VEL_HIGH
+       and ball.heat <= goalCon.HEAT_LOW):
         player.shouldSaveCounter += 1
         if player.shouldSaveCounter > 1:
             player.shouldSaveCounter = 0
             return True
 
-    return False
+    else:
+        player.shouldSaveCounter = 0
+        return False
 
 # not used right now
 #should move goalie but with dive right now shouldnt need
@@ -36,21 +38,16 @@ def strafeDirForSave(player):
 def shouldSaveRight(player):
     ball= player.brain.ball
 
-    if(ball.endY < -goalCon.CENTER_SAVE_THRESH
-       and ball.endY > -goalCon.DONT_SAVE_LIMIT
-       and goalieInBox(player)):
-        return True
-    return False
+    return(ball.endY < -goalCon.CENTER_SAVE_THRESH
+           and ball.endY > -goalCon.DONT_SAVE_LIMIT
+           and goalieInBox(player))
 
 def shouldSaveLeft(player):
     ball= player.brain.ball
 
-    if(ball.endY > goalCon.CENTER_SAVE_THRESH
-       and ball.endY < goalCon.DONT_SAVE_LIMIT
-       and goalieInBox(player)):
-        return True
-
-    return False
+    return (ball.endY > goalCon.CENTER_SAVE_THRESH
+            and ball.endY < goalCon.DONT_SAVE_LIMIT
+            and goalieInBox(player))
 
 # Not used
 def shouldSaveCenter(player):
@@ -58,11 +55,10 @@ def shouldSaveCenter(player):
 
     return False
 
+# If penalty kicking do not get up
 def shouldHoldSave(player):
-    if player.stateTime <= goalCon.TIME_ON_GROUND:
-        return True
-
-    return False
+    return (player.penaltyKicking or
+            player.stateTime <= goalCon.TIME_ON_GROUND)
 
 #POSITION TRANSITIONS
 
@@ -71,13 +67,9 @@ def shouldHoldSave(player):
 def goalieInBox(player):
     my = player.brain.my
 
-    if  (my.x < (NogCon.MY_GOALBOX_RIGHT_X + 10)
-         and my.x > (NogCon.MY_GOALBOX_LEFT_X - 10)
-         and my.y < (NogCon.MY_GOALBOX_TOP_Y + 10)
-         and my.y > (NogCon.MY_GOALBOX_BOTTOM_Y - 10)):
-        return True
-
-    return False
+    return (my.x < NogCon.MY_GOALBOX_RIGHT_X + 10 and
+            NogCon.MY_GOALBOX_TOP_Y + 10 > my.y and
+            my.y > NogCon.MY_GOALBOX_BOTTOM_Y - 10)
 
 
 #CHASE TRANSITIONS
@@ -87,9 +79,6 @@ def dangerousBall(player):
 
     # in box and behind me and close to me
     # if inBox(player):
-    if (ball.relX < 0):
-        #and ball.dist < 30):
-        return True
+    return (ball.relX < 0 and goalieInBox(player))
 
-    return False
 

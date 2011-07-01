@@ -40,7 +40,9 @@ enum SupportFoot {
     RIGHT_SUPPORT
 };
 
-enum SENSORS_EVENT {
+class Sensors;
+
+enum SensorsEvent {
     NEW_MOTION_SENSORS = 1,
     NEW_VISION_SENSORS,
     NEW_IMAGE
@@ -94,7 +96,7 @@ struct Inertial {
 };
 
 
-class Sensors : public Provider{
+class Sensors : public Provider<SensorsEvent>{
     //friend class Man;
 public:
     Sensors(boost::shared_ptr<Speech> s);

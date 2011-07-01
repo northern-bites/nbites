@@ -86,8 +86,10 @@ def claimBall(player):
     if transitions.shouldKick(player):
         return player.goNow('decideKick')
     elif transitions.shouldFindBall(player):
+        player.inKickingState = False
         return player.goLater('findBall')
     elif transitions.shouldChaseFromClaimBall(player):
+        player.inKickingState = False
         return player.goNow('chase')
 
     return player.stay()
@@ -138,7 +140,7 @@ def positionForKick(player):
         kick = player.brain.kickDecider.getKick()
 
         if kick is None:
-            player.angleToOrbit = player.brain.kickDecider.kickInfo.orbitAngle
+            player.angleToOrbit = player.brain.kickDecider.info.orbitAngle
             return player.goLater('orbitBall')
 
         player.inKickingState = True

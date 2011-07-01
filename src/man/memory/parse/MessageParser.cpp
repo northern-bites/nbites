@@ -11,25 +11,12 @@ namespace parse {
 using namespace std;
 using namespace google::protobuf::io;
 using boost::shared_ptr;
+using namespace include::io;
 
-//TODO: use file descriptor providers
-MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
-                       int _file_descriptor) :
-        Parser<proto::Message>(message),
-        file_descriptor(_file_descriptor)
+MessageParser::MessageParser(FDProvider::const_ptr fdProvider,
+        boost::shared_ptr<proto::Message> message) :
+        TemplatedParser<proto::Message>(fdProvider, message)
 {
-
-    initStreams();
-    readHeader();
-
-}
-
-MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
-                       const char* _file_name) :
-       Parser<proto::Message>(message) {
-
-    file_descriptor = open(_file_name, O_RDONLY);
-
     initStreams();
     readHeader();
 }
@@ -38,12 +25,11 @@ MessageParser::~MessageParser() {
 
     delete coded_input;
     delete raw_input;
-    close(file_descriptor);
 }
 
 void MessageParser::readHeader() {
 
-
+    coded_input->ReadLittleEndian32(&(log_header.log_id));
     cout << "Log ID: " << log_header.log_id << endl;
 
     coded_input->ReadLittleEndian64(&(log_header.birth_time));
@@ -54,7 +40,7 @@ const LogHeader MessageParser::getHeader() {
     return log_header;
 }
 
-shared_ptr<const proto::Message> MessageParser::getNext() {
+bool MessageParser::getNext() {
 
     proto::uint32 size;
     uint64_t byte_count = raw_input->ByteCount();
@@ -87,7 +73,7 @@ shared_ptr<const proto::Message> MessageParser::getPrev() {
 
 void MessageParser::initStreams() {
 
-    raw_input = new FileInputStream(file_descriptor);
+    raw_input = new FileInputStream(fdProvider->getFileDescriptor());
     coded_input = new CodedInputStream(raw_input);
     coded_input->SetTotalBytesLimit(2000000000, 2000000000);
 

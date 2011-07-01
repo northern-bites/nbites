@@ -117,7 +117,8 @@ public class Robot {
             }
             // parse header data
             long timeStamp = RobotData.swapb_long(input.readLong());
-            input.readInt();
+            input.readInt();    // Just read another int. Why? Good question...
+            int packetNum = RobotData.swapb_int(input.readInt());
             int team = RobotData.swapb_int(input.readInt());
             int player = RobotData.swapb_int(input.readInt());
             int color = RobotData.swapb_int(input.readInt());

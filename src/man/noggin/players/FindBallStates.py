@@ -65,6 +65,9 @@ def walkFindBall(player):
     """
     State to walk to find the ball. If we find the ball we chase it.
     """
+    if player.firstFrame():
+        player.stopWalking()
+
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()

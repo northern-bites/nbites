@@ -5,36 +5,68 @@
  * to the generic wrapper class to the protobuffer subsystem we employ to
  * manage important data
  *
+ * N.B. All derived classes should call setName or REGISTER_MOBJECT in their constructor
+ *
  *      Author: Octavian Neamtu
  */
 
 #pragma once
 
+#include <boost/shared_ptr.hpp>
+#include <string>
+
 namespace man {
 namespace memory {
 
-/**
- * @enum MObject_ID
- *
- * This enum is written as an int in the log head in order to identify it
- *
- */
+//IDs and names are tightly linked, be sure to modify both when needed!
 enum MObject_ID {
-    MVISION_ID = 1,//!< MVISION_ID
-    MMOTION_SENSORS_ID = 2,//!< MMOTION_SENSORS_ID
-    MVISION_SENSORS_ID = 3,//!< MVISION_SENSORS_ID
-    MIMAGE_ID = 5,//!< MIMAGE_ID
+    MVISION_ID = 1,
+    MMOTION_SENSORS_ID,
+    MVISION_SENSORS_ID,
+    MIMAGE_ID,
+    LAST_OBJECT //dummy object
+};
+
+inline void operator++(MObject_ID& id) {
+    id = MObject_ID(id+1);
+}
+
+inline void operator++(MObject_ID& id, int) {
+    id = MObject_ID(id+1);
+}
+
+static const MObject_ID FIRST_OBJECT = MVISION_ID;
+
+static const std::string MObject_names[] = {
+            "unknown",
+            "Vision",
+            "MotionSensors",
+            "VisionSensors",
+            "Image"
 };
 
 class MObject {
 
 public:
+    typedef boost::shared_ptr<MObject> ptr;
+    typedef boost::shared_ptr<const MObject> const_ptr;
+
+    MObject(MObject_ID id, std::string name) : id(id), name(name) {
+    }
     /**
      * method update - this should be overwritten by a method that sets all of
      * the proto message fields with values from its respective man counterpart
      */
     virtual void update() = 0;
+    static const std::string NameFromID(MObject_ID id) {
+        return MObject_names[static_cast<int>(id)];
+    }
+
+private:
+    MObject_ID id;
+    std::string name;
 
 };
+
 }
 }

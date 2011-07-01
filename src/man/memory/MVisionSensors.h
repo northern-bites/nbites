@@ -23,8 +23,8 @@ public:
      * links to
      * @return
      */
-    MVisionSensors(boost::shared_ptr<Sensors> s);
-    ~MVisionSensors();
+    MVisionSensors(MObject_ID id, std::string name, boost::shared_ptr<Sensors> s);
+    virtual ~MVisionSensors();
     /**
      * Updates all the fields of the underlying proto::PSensors with values
      * from the Sensors object

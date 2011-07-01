@@ -1,0 +1,8 @@
+# !/bin/sh
+ln -sf /dev/i2c-0 /dev/i2c-head
+setears --init 30
+#nbites
+#su -c 'sysctl -w kernel.core_uses_pid="1"'
+su -c 'sysctl -w kernel.core_pattern="/home/nao/core-dump"'
+su -c 'sysctl -w fs.suid_dumpable="2"'
+

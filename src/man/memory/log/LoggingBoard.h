@@ -9,6 +9,7 @@
  * provider) to provide the file descriptor necessary. Some stuff
  * might go to a file, some might go to wifi, etc.
  *
+ * @author Octavian Neamtu
  */
 
 #pragma once
@@ -18,57 +19,43 @@
 
 #include "include/io/FileFDProvider.h"
 
-#include "CodedFileLogger.h"
-#include "ImageFDLogger.h"
+#include "MessageLogger.h"
+#include "ImageLogger.h"
 #include "memory/MObject.h"
-
-//forward declaration
-namespace man {
-namespace memory {
-namespace log {
-class LoggingBoard;
-}
-}
-}
-
 #include "memory/Memory.h"
+#include "memory/MemoryIOBoard.h"
 
 namespace man {
 namespace memory {
 namespace log {
 
-typedef std::pair< const MObject*, FDLogger*> ObjectFDLoggerPair;
-typedef std::pair< const MObject*, FDProvider*> ObjectFDProviderPair;
-
-typedef std::map< const MObject*, FDLogger*> ObjectFDLoggerMap;
-typedef std::map< const MObject*, FDProvider*> ObjectFDProviderMap;
-
-class LoggingBoard {
+class LoggingBoard : public MemoryIOBoard<FDLogger> ,
+                     public Subscriber<MObject_ID> {
 
 public:
-    LoggingBoard(const Memory* _memory);
-    //TODO: make sure to delete all of the logger objects
-    //~LoggingBoard();
+    LoggingBoard(Memory::const_ptr memory,
+                IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
+    virtual ~LoggingBoard() {}
 
-    void log(const MObject* mobject);
+    void log(MObject_ID id);
 
-    const ImageFDLogger* getImageLogger(const MImage* mimage) const;
-    const FDLogger* getLogger(const MObject* mobject) const;
+    void newIOProvider(IOProvider::const_ptr ioProvider);
+    //returns a NULL pointer if such a logger doesn't exist
+    void update(MObject_ID id);
+
+    void startLogging();
+    void stopLogging();
+    bool isLogging() { return logging; }
+
+protected:
+    //returns a NULL pointer if such a logger doesn't exist
+    FDLogger::const_ptr getLogger(MObject_ID id) const;
+    //returns a NULL pointer if such a logger doesn't exist
+    FDLogger::ptr getMutableLogger(MObject_ID id);
 
 private:
-    void initLoggingObjects();
-
-public:
-    static const std::string MVISION_PATH;
-    static const std::string MVISION_SENSORS_PATH;
-    static const std::string MMOTION_SENSORS_PATH;
-    static const std::string MIMAGE_PATH;
-
-private:
-    const Memory* memory;
-    ObjectFDLoggerMap objectFDLoggerMap;
-    ObjectFDProviderMap objectFDProviderMap;
-
+    Memory::const_ptr memory;
+    bool logging;
 
 };
 }
