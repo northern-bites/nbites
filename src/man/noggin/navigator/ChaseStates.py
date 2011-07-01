@@ -92,17 +92,17 @@ def chaseAroundBox(nav):
     if nav.firstFrame():
         # reset dest to new RobotLocation to avoid problems w/dist calculations
         nav.dest = RobotLocation()
-        nav.shouldNotChaseAroundBox = 0
+        nav.stopChaseAroundBox = 0
 
     ball = nav.brain.ball
     my = nav.brain.my
 
     if not navTrans.shouldChaseAroundBox(my, ball):
-        nav.shouldNotChaseAroundBox += 1
+        nav.stopChaseAroundBox += 1
     else:
-        nav.shouldNotChaseAroundBox = 0
+        nav.stopChaseAroundBox = 0
 
-    if nav.shouldNotChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
+    if nav.stopChaseAroundBox > constants.STOP_CHASING_AROUND_BOX:
         return nav.goNow('walkSpinToBall')
 
     elif navTrans.shouldAvoidObstacleDuringApproachBall(nav):
