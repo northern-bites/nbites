@@ -93,7 +93,10 @@ class Brain(object):
 
         # Functional Variables
         self.my.playerNumber = self.comm.gc.player
-        self.my.teamColor = self.comm.gc.color
+        if self.comm.gc.color == GameController.TEAM_BLUE:
+            self.my.teamColor = Constants.teamColor.TEAM_BLUE
+        else:
+            self.my.teamColor = Constants.teamColor.TEAM_RED
 
         # Information about the environment
         self.initFieldObjects()

@@ -15,7 +15,6 @@
 
 #include "VisionDef.h"
 #include "FieldConstants.h"
-#include "NaoDef.h"
 #include <vector>
 
 namespace noggin {
@@ -38,6 +37,7 @@ namespace noggin {
         static const int NUM_PACKET_ELEMENTS = 20;
 
         ///// WALK TIME CONSTANTS /////
+        static const float TIME_STEP = 40.0;
         static const float TIME_PER_STEP = TIME_STEP/float(1000.0);
 
         ///// TEAM STUFF ////
@@ -60,7 +60,7 @@ namespace noggin {
         static const float IMAGE_ANGLE_Y = IMAGE_WIDTH/FOV_Y_DEG;
 
         ///// BALL /////
-        static const int NUM_TOTAL_BALL_VALUES = 21;
+        static const int NUM_TOTAL_BALL_VALUES = 27;
 
         ///// LOCALIZATION CONSTANTS /////
         static const float OPP_GOAL_HEADING = 0.0;
