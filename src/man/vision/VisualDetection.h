@@ -42,6 +42,10 @@ public:
     virtual void setDistanceWithSD(float _distance) = 0;
     virtual void setBearingWithSD(float _bearing) = 0;
 
+    void setOn(bool _on){ on = _on; }
+    void setFramesOn(int numOn){ framesOn = numOn; }
+    void setFramesOff(int numOff){ framesOff = numOff; }
+
     /* GETTERS */
     const int getX() const {return x;}
     const int getY() const {return y;}
@@ -63,6 +67,10 @@ public:
     const float getDistanceSD() const { return distanceSD; }
     const float getBearingSD() const { return bearingSD; }
 
+    const bool isOn() const{ return on; }
+    int getFramesOn() { return framesOn; }
+    int getFramesOff(){ return framesOff; }
+
 protected:
     /* Best guessed Ball Variables */
     int x, y;
@@ -79,6 +87,8 @@ protected:
     // Standard deviation of measurements
     float distanceSD;
     float bearingSD;
+    bool on;
+    int framesOn, framesOff;
 
 };
 

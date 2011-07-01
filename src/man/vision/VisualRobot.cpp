@@ -6,7 +6,8 @@ VisualRobot::VisualRobot() : VisualDetection()
     framesOff = 0;
 }
 
-VisualRobot::VisualRobot(const VisualRobot& o) : VisualDetection(o) {}
+VisualRobot::VisualRobot(const VisualRobot& o) : VisualDetection(o)
+{}
 
 // Initialization, happens every frame.
 void VisualRobot::init()
