@@ -61,7 +61,7 @@ def atPoint(player):
         player.brain.speech.say("At position number " + str(player.goToCounter))
     elif player.stateTime > 10.0:
         player.brain.leds.stopFlashing()
-        if player.goToCounter >= NUM_POINTS:
+        if len(GOTO_POINTS) == 0:
             return player.goLater('atFinalPoint')
         else:
             return player.goLater('goToPoint')

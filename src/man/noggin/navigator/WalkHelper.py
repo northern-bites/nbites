@@ -20,7 +20,7 @@ def getOmniWalkParam(my, dest):
         relH = MyMath.sub180Angle(dest.h - my.h)
 
     # calculate forward speed
-    forwardGain = 1./constants.APPROACH_X_WITH_GAIN_DIST
+    forwardGain = constants.APPROACH_X_WITH_GAIN_DIST
     sX = relX * forwardGain
     if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
         sX = 0
@@ -30,7 +30,7 @@ def getOmniWalkParam(my, dest):
                          constants.OMNI_FWD_MAX_SPEED)
 
     # calculate sideways speed
-    strafeGain = 1./constants.APPROACH_Y_WITH_GAIN_DIST
+    strafeGain = constants.APPROACH_Y_WITH_GAIN_DIST
     sY = relY * strafeGain
     if fabs(sY) < constants.OMNI_MIN_Y_MAGNITUDE:
         sY = 0
@@ -40,10 +40,10 @@ def getOmniWalkParam(my, dest):
                          constants.OMNI_LEFT_MAX_SPEED,)
 
     # calculate spin speed
-    if (fabs(relH) < 5.0):
+    if (fabs(relH) < 10.0):
         sTheta = 0.0
     else:
-        spinGain = 1./constants.APPROACH_THETA_WITH_GAIN_DIST
+        spinGain = constants.APPROACH_THETA_WITH_GAIN_DIST
         sTheta = relH * spinGain
         sTheta = MyMath.clip(sTheta,
                              constants.OMNI_MAX_RIGHT_SPIN_SPEED,
@@ -110,7 +110,7 @@ def getWalkStraightParam(my, dest):
     if (fabs(relH) < 5.0):
         sTheta = 0.0
     else: #spin first
-        spinGain = 1./constants.APPROACH_THETA_WITH_GAIN_DIST
+        spinGain = constants.APPROACH_THETA_WITH_GAIN_DIST
         sTheta = relH * spinGain
         sTheta = MyMath.clip(sTheta,
                              constants.OMNI_MAX_RIGHT_SPIN_SPEED,
@@ -118,7 +118,7 @@ def getWalkStraightParam(my, dest):
         return (0, 0, sTheta)
 
    # calculate forward speed if h is good.
-    forwardGain = 1./constants.APPROACH_X_WITH_GAIN_DIST
+    forwardGain = constants.APPROACH_X_WITH_GAIN_DIST
     sX = relX * forwardGain
     if fabs(sX) < constants.OMNI_MIN_X_MAGNITUDE:
         sX = 0
@@ -142,14 +142,14 @@ def getWalkBackParam(my, dest):
         relH = MyMath.sub180Angle(dest.h - my.h)
 
     if not fabs(relH) > 150 :
-        spinGain = 1./constants.APPROACH_THETA_WITH_GAIN_DIST
+        spinGain = constants.APPROACH_THETA_WITH_GAIN_DIST
         sTheta = (180-relH) * spinGain
         sTheta = MyMath.clip(sTheta,
                              constants.OMNI_MAX_RIGHT_SPIN_SPEED,
                              constants.OMNI_MAX_LEFT_SPIN_SPEED)
         return ( 0, 0, sTheta)
 
-    forwardGain = 1./constants.APPROACH_X_WITH_GAIN_DIST
+    forwardGain = constants.APPROACH_X_WITH_GAIN_DIST
     sX = relX * forwardGain
     sX = MyMath.clip(sX,
                      constants.GOTO_BACKWARD_SPEED,
@@ -165,7 +165,7 @@ def getSpinOnlyParam(my, dest):
     if (fabs(bearing) < 5.0):
         sTheta = 0.0
     else:
-        spinGain = 1./constants.APPROACH_THETA_WITH_GAIN_DIST
+        spinGain = constants.APPROACH_THETA_WITH_GAIN_DIST
         sTheta = bearing * spinGain
         sTheta = MyMath.clip(sTheta,
                              constants.GOTO_RIGHT_SPIN_SPEED,
