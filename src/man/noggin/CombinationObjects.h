@@ -177,7 +177,8 @@ namespace noggin {
      * possible values. Dist and bearing are the best dist and bearing value,
      * depending on whether loc values or vision values are more reliable
      * for a particular frame. MyInfo is a pointer to the robot's current
-     * information.
+     * information. Other info is available through the vis pointer. See
+     * PyVision.cpp for the VisualFieldObject values exposed to Python.
      */
 
     class FieldObject : public LocObject

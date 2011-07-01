@@ -1,6 +1,6 @@
 /*
- * Wrapper for Location.*. Provides a class for location computations done for
- * python.
+ * Wrapper for CombinationObjects.*. See header for more information. Import
+ * objects in python to use these classes. 
  */
 
 #include "PyObjects.h"

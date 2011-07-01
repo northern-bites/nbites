@@ -12,22 +12,24 @@ class Ball(Location):
     """
     Class for holding all current Ball information, contains:
 
-    -centerX,centerY -- center (x,y) coordinates of ball on image screen
-    -angleX,angleY -- angles of center (x,y) to focal point in degrees
-    -dist -- distance from center of the body to ball in cms
-    -bearing -- angle in x-axis from center of body to ball
-    -elevation -- angle in y-axis from center of body to ball
-    -framesOn -- # of consecutive frames the ball has been recognized in vision
-    -framesOff -- # of consecutive frames the ball has been not recognized
-    NOTE: if framesOn > 0, framesOff == 0, and vice versa
-    -x,y -- (x,y) coordinate of ball in cms of dog on field via ekf
+    -dist -- best distance, either vis or loc
+    -bearing -- best bearing, either vis or loc
+    -x,y -- (x,y) coordinate of ball on field via ekf
     -uncertX,uncertY -- uncertainty in x,y axis from ekf
     -velX,velY -- velocity in x,y axis of ball from ekf
     -locDist -- euclidian distance between (x,y) of self to (x,y) of ball (ekf)
     -locBearing -- relative bearing between self (x,y) and ball (x,y) via ekf
-    -on -- simple bool if ball is on vision frame or not
     -lastRel keeps track of the last relX and Y values
     -dx and dy are the difference between lastRel and Rel values
+
+    Others accessible through ball.vis: vision dist and bearing, angleX,
+    angleY, elevation, confidence, radius, heat, on, and framesOn/Off.
+    -dist, bearing -- self-explanatory
+    -angleX,angleY -- angles of center (x,y) to focal point in degrees
+    -elevation -- angle in y-axis from center of body to ball
+    -on -- simple bool if ball is on vision frame or not
+    -framesOn -- # of consecutive frames the ball has been recognized in vision
+    -framesOff -- # of consecutive frames the ball has been not recognized
     """
     def __init__(self, visionBall):
         Location.__init__(self, 0.0, 0.0)
