@@ -30,6 +30,7 @@ class KickDecider(object):
         returns the kick and decides on one if we haven't picked one yet
         """
 
+        return kicks.SHORT_QUICK_LEFT_KICK
         if self.info.kick is None:
             self.info.kick = self.decideKick()
         return self.info.kick
