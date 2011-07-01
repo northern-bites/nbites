@@ -55,9 +55,6 @@ public:
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     void updateRobot(Blob b);
-    void setOn(bool _on){ on = _on; }
-    void setFramesOn(int _on){ framesOn = _on; }
-    void setFramesOff(int _off){ framesOff = _off; }
 
     // GETTERS
     const int getLeftTopX() const{ return leftTop.x; }
@@ -68,9 +65,6 @@ public:
     const int getLeftBottomY() const{ return leftBottom.y; }
     const int getRightBottomX() const{ return rightBottom.x; }
     const int getRightBottomY() const{ return rightBottom.y; }
-    const bool isOn() const{return on; }
-    int getFramesOn(){ return framesOn; }
-    int getFramesOff(){ return framesOff; }
 
 private: // Class Variables
 
@@ -82,9 +76,6 @@ private: // Class Variables
     int backLeft;
     int backRight;
     int backDir;
-
-    bool on;
-    int framesOn, framesOff;
 
     // Member functions
     float robotDistanceToSD(float _distance) {
