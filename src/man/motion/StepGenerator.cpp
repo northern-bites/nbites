@@ -718,7 +718,12 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
         gain = 1.0f;
     }
 
-    dest_y *= 2; /// @see Step.h HACK HACK HACK
+    // these parameters determined experimentally by trying lots of destinations
+    // probably indicates something broken in our odometry
+    if (dest_x == 0)
+	dest_x = -5.0f; // 5mm
+    dest_theta += 0.088f; // natural rotation of the robot
+    dest_y *= 3; /// @see Step.h HACK HACK HACK
 
     float speed_x, speed_y, speed_theta;
 
@@ -751,7 +756,7 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 
     // be more sensitive to rotation if we're going really far (40cm)
     if (dest_x*dest_x + dest_y*dest_y > 1600)
-	CLOSE_ENOUGH_THETA = 0.087; // 5 degrees
+	CLOSE_ENOUGH_THETA = 0.087f; // 5 degrees
     else
 	CLOSE_ENOUGH_THETA = 0.17f; // 10 degrees
 
@@ -805,6 +810,8 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
     }
 
 #ifdef DEBUG_DESTINATION
+    printf("\n final distance from dest: %f %f %f\n",
+	   dest_x, dest_y, dest_theta);
     printf("Frames to destination: %d\n", framesToDestination);
 #endif
 
