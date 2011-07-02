@@ -84,6 +84,21 @@ def locPans(tracker):
 
     return tracker.stay()
 
+# ** # new method
+def afterKickScan(tracker):
+    """
+    Looks in the direction the ball was kicked in.
+    If the ball is seen, go to state 'ballTracking'.
+    """
+    if tracker.counter < 2:
+        tracker.brain.motion.stopHeadMoves()
+        tracker.helper.executeHeadMove(constants.KICK_DICT[tracker.kickName])
+
+    if tracker.brain.ball.vis.framesOn > 2:
+        return tracker.goLater('ballTracking')
+
+    return tracker.stay()
+
 # ** # old method
 def panLeftOnce(tracker):
     """

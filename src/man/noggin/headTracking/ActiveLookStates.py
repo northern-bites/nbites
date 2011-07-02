@@ -21,10 +21,8 @@ def lookToTarget(tracker):
     if tracker.target.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.brain.motion.stopHeadMoves()
         if tracker.activeLocOn:
-            tracker.brain.motion.stopHeadMoves() # redundant...
             return tracker.goNow('activeTracking')
         else:
-            tracker.brain.motion.stopHeadMoves() # redundant...
             return tracker.goNow('targetTracking')
 
     elif tracker.stateTime >= TIME_TO_LOOK_TO_TARGET:

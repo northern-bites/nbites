@@ -35,6 +35,7 @@ def gamePenalized(player):
 
 def standup(player):
     if player.firstFrame():
+        player.brain.tracker.setNeutralHead()
         player.gainsOn()
         walkCommand = motion.WalkCommand(x=0,y=0,theta=0)
         player.motion.setNextWalkCommand(walkCommand)
@@ -46,14 +47,18 @@ def standup(player):
 def kickStraight(player):
     if player.firstFrame():
 
-        player.executeMove(SweetMoves.STAND_UP_FRONT)
+        player.executeMove(SweetMoves.DREW_KICK(-1, 500))
 
-    if player.counter == 50:
+    if player.brain.nav.isStopped() and player.counter > 1:
         return player.goLater('done')
     return player.stay()
 
 def done(player):
     if player.firstFrame():
-        #player.walkPose()
+        player.tempBool = True
+        player.executeMove(SweetMoves.INITIAL_POS)
         return player.stay()
+    if player.brain.nav.isStopped() and player.tempBool:
+        player.brain.tracker.afterKickScan(1)
+        player.tempBool = False
     return player.stay()
