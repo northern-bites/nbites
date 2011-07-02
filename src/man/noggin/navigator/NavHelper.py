@@ -13,33 +13,33 @@ def setDestination(nav, x, y, theta, gain):
     """
     Calls setDestination within the motion engine
     """
-    nav.currentCommand = motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
+    nav.currentCommand = \
+        motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
     nav.brain.motion.sendDestCommand(nav.currentCommand)
+    nav.updateDests(x,y,theta)
 
 def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
     """
 
-    #print (theta**2 + x**2 + y**2)
-    # use backwards gait if appropriate
-    if x < BACKWARDS_GAIT_THRESH:
-        nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
-    elif fabs(theta) > SPIN_GAIT_THRESH and \
-            fabs(x) < 0.1 and fabs(y) < 0.15 and \
-            fabs(theta) > fabs(x) and \
-            (theta**2 + x**2 + y**2) > 0.1:
+    if x == 0 and y == 0 and theta == 0 and \
+            not nav.brain.motion.isWalkActive():
+        createAndSendWalkVector(nav, 0,0,0) # Ensure that STOP commands get sent
 
-        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
-    else:
-        nav.brain.CoA.setRobotGait(nav.brain.motion)
+    # If our speed vector is already being used, don't bother changing
+    # it. If we're not walking, however, we definitely want to send
+    # the command, since it is certainly different.
+    if nav.speedVectorsEqual(x, y, theta) and \
+            nav.brain.motion.isWalkActive():
+        return
+
+    nav.updateSpeeds(x, y, theta)
+    updateGait(nav, x, y, theta)
 
     x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
 
     createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
-
-    nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
-    nav.curSpinDir = MyMath.sign(theta)
 
 def setDribbleSpeed(nav, x, y, theta):
     """
@@ -54,32 +54,13 @@ def setDribbleSpeed(nav, x, y, theta):
 
     createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
 
-    nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
-    nav.curSpinDir = MyMath.sign(theta)
-
-def setSlowSpeed(nav, x, y, theta):
-    """
-    Wrapper to set walk vector while using slow gait
-    TODO: dynamic gait so this is unnecessary
-    """
-    setSpeed(nav, x, y, theta)
-
-#     if x < BACKWARDS_GAIT_THRESH:
-#         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
-#     else:
-#         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
-
-#     x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
-
-#     createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
-
-#     nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
-#    nav.curSpinDir = MyMath.sign(theta)
+    nav.updateSpeeds(x,y, theta)
 
 def step(nav, x, y, theta, numSteps):
     """
     Wrapper method to easily change the walk vector of the robot
     """
+
     if x < BACKWARDS_GAIT_THRESH:
         nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
     else:
@@ -89,8 +70,6 @@ def step(nav, x, y, theta, numSteps):
 
     createAndSendStepsVector(nav, x_cms, y_cms, theta_degs)
 
-    nav.walkX, nav.walkY, nav.walkTheta = x, y, theta
-    nav.curSpinDir = MyMath.sign(theta)
 
 def executeMove(motionInst, sweetMove):
     """
@@ -125,6 +104,7 @@ def executeMove(motionInst, sweetMove):
 
 def convertWalkVector(brain, x_abs, y_abs, theta_abs):
     """
+    Convert the 0->1 values into actual cm values for the WalkCommand
     NOTE: x_abs means that x is bound on [-1,1] (not an absolute value)
     """
 
@@ -163,3 +143,17 @@ def createAndSendStepsVector(nav, x, y, theta):
 def createAndSendWalkVector(nav, x, y, theta):
     walk = motion.WalkCommand(x=x,y=y,theta=theta)
     nav.brain.motion.setNextWalkCommand(walk)
+
+def updateGait(nav, x, y, theta):
+    # use backwards gait if appropriate
+    if x < BACKWARDS_GAIT_THRESH:
+        nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
+    elif fabs(theta) > SPIN_GAIT_THRESH and \
+            fabs(x) < 0.1 and fabs(y) < 0.15 and \
+            fabs(theta) > fabs(x) and \
+            (theta**2 + x**2 + y**2) > 0.1:
+
+        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
+    else:
+        nav.brain.CoA.setRobotGait(nav.brain.motion)
+

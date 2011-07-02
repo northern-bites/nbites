@@ -9,7 +9,7 @@ def gameInitial(player):
 def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
-        player.standup()
+        player.walkPose()
     return player.stay()
 
 # Put the robot in a position to be manipulated, probably with low stiffnesses

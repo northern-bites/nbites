@@ -5,7 +5,10 @@ from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
+from ..objects import RobotLocation
+
 from math import fabs
+import copy
 
 DEBUG = False
 
@@ -21,115 +24,79 @@ def doingSweetMove(nav):
 
     return nav.stay()
 
-
-# States for the standard spin - walk - spin go to
-def walkStraightToPoint(nav):
+def goToPosition(nav):
     """
-    State to walk forward w/some turning
-    until localization thinks we are close to the point
-    Stops if we get there
-    If we no longer are heading towards it change to the spin state.
+    Go to a position set in the navigator. General go to state.  Goes
+    towards an x,y position on the field without regard to the
+    destination heading. Switches over to omni to finish the heading changes.
     """
     if nav.firstFrame():
-        nav.walkToPointCount = 0
-        nav.walkToPointSpinCount = 0
+        nav.omniWalkToCount = 0
+        nav.atPositionCount = 0
 
     my = nav.brain.my
-    if navTrans.atDestinationCloser(my, nav.dest):
-        nav.walkToPointCount += 1
-    else :
-        nav.walkToPointCount = 0
+    dest = nav.getDestination()
 
-    if nav.walkToPointCount > constants.GOTO_SURE_THRESH:
-        return nav.goLater('spinToFinalHeading')
+    if (navTrans.atDestinationCloser(my, dest) and
+        navTrans.atHeading(my, dest.h)):
+            nav.atPositionCount += 1
+            if nav.atPositionCount > \
+            constants.FRAMES_THRESHOLD_TO_AT_POSITION:
+                return nav.goNow('atPosition')
+    else:
+        if not nav.atPositionCount == 0:
+            nav.atPositionCount -= 1
 
-    destH = nav.brain.my.headingTo(nav.dest)
+    # We don't want to alter the actual destination, we just want a
+    # temporary destination for getting the params to walk straight at
+    intermediateH = my.headingTo(dest)
+    tempDest = RobotLocation(dest.x, dest.y, intermediateH)
 
-    if not navTrans.atHeadingGoTo(my, destH):
-        nav.walkToPointSpinCount += 1
-        if nav.walkToPointSpinCount > constants.GOTO_SURE_THRESH + 25:
-            return nav.goLater('spinToWalkHeading')
-
-    else :
-        nav.walkToPointSpinCount = 0
-
-    walkX, walkY, walkTheta = walker.getWalkStraightParam(my, nav.dest)
-
+    walkX, walkY, walkTheta = walker.getWalkSpinParam(my, tempDest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
 
+    if navTrans.useFinalHeading(nav.brain, dest):
+        nav.omniWalkToCount += 1
+        if nav.omniWalkToCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
+            return nav.goLater('omniGoTo')
+    else:
+        nav.omniWalkToCount = 0
+
+    if navTrans.shouldAvoidObstacle(nav):
+        return nav.goLater('avoidObstacle')
+
     return nav.stay()
 
-def spinToWalkHeading(nav):
-    """
-    Spin to the heading needed to walk to a specific point
-    """
+def omniGoTo(nav):
+    if nav.firstFrame():
+        nav.stopOmniCount = 0
+        nav.atPositionCount = 0
+
     my = nav.brain.my
-    headingDiff = my.getRelativeBearing(nav.dest)
-    newSpinDir = MyMath.sign(headingDiff)
+    dest = nav.getDestination()
 
-    if nav.firstFrame():
-        nav.changeSpinDirCounter = 0
-        nav.stopSpinToWalkCount = 0
-        nav.curSpinDir = newSpinDir
-
-    if newSpinDir != nav.curSpinDir:
-        nav.changeSpinDirCounter += 1
+    if (navTrans.atDestinationCloser(my, dest) and
+        navTrans.atHeading(my, dest.h)):
+        nav.atPositionCount += 1
+        if (nav.atPositionCount >
+            constants.FRAMES_THRESHOLD_TO_AT_POSITION):
+            return nav.goNow('atPosition')
     else:
-        nav.changeSpinDirCounter = 0
+        nav.atPositionCount = 0
 
-    if nav.changeSpinDirCounter >  constants.CHANGE_SPIN_DIR_THRESH:
-        nav.curSpinDir = newSpinDir
-        nav.changeSpinDirCounter = 0
-        if DEBUG: nav.printf("Switching spin directions my.h " +
-                             str(nav.brain.my.h)+
-                             " and my h diff: " + str(headingDiff))
+    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
+    helper.setSpeed(nav, walkX, walkY, walkTheta)
 
-    if headingDiff < 20.:
-        nav.stopSpinToWalkCount += 1
-        if nav.stopSpinToWalkCount > constants.GOTO_SURE_THRESH:
-            return nav.goLater('walkStraightToPoint')
-
-    else :
-        nav.stopSpinToWalkCount = 0
-
-    sTheta = nav.curSpinDir * constants.MAX_SPIN_MAGNITUDE * \
-        walker.getRotScale(headingDiff)
-
-    if sTheta != nav.walkTheta:
-        helper.setSpeed(nav, 0, 0, sTheta)
-
-    if navTrans.atDestinationCloser(my, nav.dest):
-        return nav.goLater('spinToFinalHeading')
-
-    return nav.stay()
-
-def spinToFinalHeading(nav):
-    """
-    Spins until we are facing the final desired heading
-    Stops when at heading
-    """
-    if nav.firstFrame():
-        nav.stopSpinToWalkCount = 0
-
-    targetH = nav.dest.h
-    headingDiff = MyMath.sub180Angle(nav.brain.my.h - targetH)
-
-    if DEBUG:
-        nav.printf("Need to spin to %g, heading diff is %g,heading uncert is %g"
-                   % (targetH, headingDiff, nav.brain.my.uncertH))
-    spinDir = MyMath.sign(headingDiff)
-
-    spin = spinDir*constants.MAX_SPIN_MAGNITUDE*walker.getRotScale(headingDiff)
-
-    if navTrans.atHeading(nav.brain.my, targetH):
-        nav.stopSpinToWalkCount += 1
+    if not navTrans.useFinalHeading(nav.brain, dest):
+        nav.stopOmniCount += 1
+        if nav.stopOmniCount > constants.FRAMES_THRESHOLD_TO_GOTO_POSITION:
+            return nav.goLater('goToPosition')
     else:
-        nav.stopSpinToWalkCount = 0
+        nav.stopOmniCount = 0
 
-    if nav.stopSpinToWalkCount > constants.CHANGE_SPIN_DIR_THRESH:
-        return nav.goLater('stop')
+    if navTrans.shouldAvoidObstacle(nav):
+        return nav.goLater('avoidObstacle')
 
-    helper.setSpeed(nav, 0, 0, spin)
     return nav.stay()
 
 # WARNING: avoidObstacle could possibly go into our own box
@@ -264,9 +231,7 @@ def walking(nav):
     """
     State to be used when setSpeed is called
     """
-    if nav.updatedTrajectory:
-        helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
-        nav.updatedTrajectory = False
+    helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
 
     return nav.stay()
 
@@ -306,8 +271,6 @@ def stop(nav):
     """
     if nav.firstFrame():
         helper.setSpeed(nav, 0, 0, 0)
-        nav.walkX = nav.walkY = nav.walkTheta = \
-                    nav.stepX = nav.stepY = nav.stepTheta = nav.numSteps = 0
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
@@ -324,24 +287,27 @@ def orbitPointThruAngle(nav):
     if fabs(nav.angleToOrbit) < constants.MIN_ORBIT_ANGLE:
         return nav.goNow('stop')
 
-    if nav.updatedTrajectory:
-        if nav.angleToOrbit < 0:
-            orbitDir = constants.ORBIT_LEFT
-        else:
-            orbitDir = constants.ORBIT_RIGHT
+    if nav.angleToOrbit < 0:
+        orbitDir = constants.ORBIT_LEFT
+    else:
+        orbitDir = constants.ORBIT_RIGHT
 
-        #determine speeds for orbit
-        ball = nav.brain.ball
-        #want x to keep a radius of 17 from the ball, increase and
-        #decrease x velocity as we move farther away from that dist
-        walkX = (ball.relX - 18) * .045
-        #keep constant y velocity, let x and theta changea
-        walkY = orbitDir * .8
-        #Vary theta based on ball bearing.  increase theta velocity as
-        #we get farther away from facing the ball
-        walkTheta = orbitDir * ball.bearing * .035
-        #set speed for orbit
-        helper.setSpeed(nav, walkX, walkY, walkTheta )
+    #determine speeds for orbit
+    ball = nav.brain.ball
+
+    #want x to keep a radius of 17 from the ball, increase and
+    #decrease x velocity as we move farther away from that dist
+    walkX = (ball.relX - 18) * .045
+
+    #keep constant y velocity, let x and theta changea
+    walkY = orbitDir * .8
+
+    #Vary theta based on ball bearing.  increase theta velocity as
+    #we get farther away from facing the ball
+    walkTheta = orbitDir * ball.bearing * .035
+
+    #set speed for orbit
+    helper.setSpeed(nav, walkX, walkY, walkTheta )
 
     #Funny enough, we orbit about 1 degree a frame,
     #So the angle can be used as a thresh
@@ -349,3 +315,24 @@ def orbitPointThruAngle(nav):
     if nav.counter >= nav.angleToOrbit:
         return nav.goLater('stop')
     return nav.stay()
+
+def atPosition(nav):
+    if nav.firstFrame():
+        nav.brain.speech.say("At Position")
+        helper.setSpeed(nav, 0, 0, 0)
+        nav.startOmniCount = 0
+
+    my = nav.brain.my
+    dest = nav.getDestination()
+
+    if navTrans.atDestinationCloser(my, dest) and \
+            navTrans.atHeading(my, dest.h):
+        nav.startOmniCount = 0
+        return nav.stay()
+
+    else:
+        nav.startOmniCount += 1
+        if nav.startOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
+            return nav.goLater('omniGoTo')
+        else:
+            return nav.stay()

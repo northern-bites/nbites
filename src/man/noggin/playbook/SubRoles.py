@@ -239,13 +239,15 @@ def pKickoffSweeper(team, workingPlay):
     """position kickoff sweeper"""
     workingPlay.setSubRole(PBConstants.KICKOFF_SWEEPER)
     x = PBConstants.KICKOFF_DEFENDER_X
+
     if team.kickoffFormation == 0:
         y = PBConstants.KICKOFF_DEFENDER_0_Y
     else:
         y = PBConstants.KICKOFF_DEFENDER_1_Y
 
-    dest = Location(x, y)
-    h = dest.headingTo(team.brain.ball)
+    # We want to face the center (where the ball is, from our location)
+    dest = Location(x,y)
+    h = dest.headingTo(PBConstants.CENTER_FIELD)
 
     pos = (x,y,h)
     workingPlay.setPosition(pos)
@@ -254,20 +256,22 @@ def pKickoffStriker(team, workingPlay):
     """position kickoff striker"""
     workingPlay.setSubRole(PBConstants.KICKOFF_STRIKER)
     x = PBConstants.KICKOFF_OFFENDER_X
+
     if team.kickoffFormation == 0:
         y = PBConstants.KICKOFF_OFFENDER_0_Y
     else:
         y = PBConstants.KICKOFF_OFFENDER_1_Y
 
-    dest = Location(x, y)
-    h = dest.headingTo(team.brain.ball)
+    # We want to face the center (where the ball is, from our location)
+    dest = Location(x,y)
+    h = dest.headingTo(PBConstants.CENTER_FIELD)
 
     pos = (x,y,h)
     workingPlay.setPosition(pos)
 
 #### SubRoles for ready state ####
 def pReadyChaser(team, workingPlay):
-    workingPlay.setSubRole(PBConstants.READY_CHASER)
+    workingPlay.setSubRole(PBConstants.READ_CHASER)
     kickOff = team.brain.gameController.ownKickOff
     if kickOff:
         x = PBConstants.READY_KICKOFF_CHASER_X
@@ -278,6 +282,7 @@ def pReadyChaser(team, workingPlay):
             y = PBConstants.READY_NON_KICKOFF_CHASER_0_Y
         else:
             y = PBConstants.READY_NON_KICKOFF_CHASER_1_Y
+
     dest = Location(x, y)
     h = dest.headingTo(PBConstants.CENTER_FIELD)
 
@@ -299,6 +304,7 @@ def pReadyOffender(team, workingPlay):
             y = PBConstants.READY_NON_KICKOFF_OFFENDER_0_Y
         else:
             y = PBConstants.READY_NON_KICKOFF_OFFENDER_1_Y
+
     dest = Location(x, y)
     h = dest.headingTo(PBConstants.CENTER_FIELD)
 
@@ -320,6 +326,7 @@ def pReadyDefender(team, workingPlay):
             y = PBConstants.READY_NON_KICKOFF_DEFENDER_0_Y
         else:
             y = PBConstants.READY_NON_KICKOFF_DEFENDER_1_Y
+
     dest = Location(x, y)
     h = dest.headingTo(PBConstants.CENTER_FIELD)
 
@@ -333,5 +340,5 @@ def pReadyGoalie(team, workingPlay):
                              PBConstants.GOALIE_HOME_Y)
     position = (PBConstants.GOALIE_HOME_X,
                 PBConstants.GOALIE_HOME_Y,
-                dest.headingTo(PBConstants.CENTER_FIELD))
+                0)              # Face the other goal
     workingPlay.setPosition(position)
