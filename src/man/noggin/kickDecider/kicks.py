@@ -27,8 +27,8 @@ class Kick(object):
 LEFT_SIDE_KICK =  Kick("L_Side", x = 12, y =  5, move=SweetMoves.DREW_LEFT_SIDE_KICK)
 RIGHT_SIDE_KICK = Kick("R_Side", x = 12, y = -5, move=SweetMoves.DREW_RIGHT_SIDE_KICK)
 
-RIGHT_DYNAMIC_STRAIGHT_KICK = Kick("R_D_Straight", y = -8, move=SweetMoves.DREW_KICK)
-LEFT_DYNAMIC_STRAIGHT_KICK =  Kick("L_D_Straight", y =  8, move=SweetMoves.DREW_KICK)
+LEFT_DYNAMIC_STRAIGHT_KICK =  Kick("L_D_Straight", y =  5, move=SweetMoves.DREW_KICK)
+RIGHT_DYNAMIC_STRAIGHT_KICK = Kick("R_D_Straight", y = -5, move=SweetMoves.DREW_KICK)
 
 # TODO ! make a null kick here.
 # used when we haven't decided what kick to do yet

@@ -76,6 +76,9 @@ class KickDecider(object):
         """
         using objective and heuristics and localization determines best kick
         """
+        # reset any hanging information
+        self.resetInfo()
+
         # Check localization to make sure it's good enough.
         if self.brain.my.locScore == NogginConstants.locScore.BAD_LOC:
             print "BAD_LOC!"

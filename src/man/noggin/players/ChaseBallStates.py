@@ -41,7 +41,7 @@ def goalieChase(player):
         return player.goNow('spinToBall')
 
     elif transitions.shouldPositionForKick(player):
-        return player.goNow('decideKick')
+        return player.goNow('positionForKick')
     else:
         return player.goNow('approachBall')
 
@@ -60,7 +60,7 @@ def approachBall(player):
         return player.goNow('spinToBall')
 
     elif transitions.shouldPositionForKick(player):
-        return player.goNow('decideKick')
+        return player.goNow('positionForKick')
 
     if player.firstFrame():
         player.brain.nav.chaseBall()
@@ -87,31 +87,14 @@ def spinToBall(player):
 
     return player.stay()
 
-def decideKick(player):
-    """
-    Do a scan to determine where the goal is.
-    Decide which kick to do accordingly.
-    """
-    if player.firstFrame():
-        # Re-initialize to clear data from decideKick
-        player.brain.kickDecider.resetInfo()
-        player.brain.tracker.kickDecideScan()
-        player.inKickingState = True
-
-    #TODO change this to be better.
-    elif player.counter > 43: #time required for scan
-        player.brain.kickDecider.decideKick()
-        return player.goNow('positionForKick')
-
-    return player.stay()
-
 def positionForKick(player):
     """
     State to align on the ball once we are near it.
     """
-    kick = player.brain.kickDecider.getKick()
-
     if player.firstFrame():
+        player.brain.kickDecider.decideKick()
+        kick = player.brain.kickDecider.getKick()
+
         print "Chose: {0}".format(kick)
         player.inKickingState = True
 
@@ -121,24 +104,26 @@ def positionForKick(player):
             print "Don't have a kick, orbitting"
             return player.goNow('orbitBall')
         else:
+            player.saveBallPosition()
             player.brain.nav.kickPosition(kick)
 
     # if we're getting close, decide whether to set another destination
-    if player.brain.nav.nearDestination and player.brain.nav.brain.ball.dist > 20:
+    # also, set a new destination if the ball has moved from its absolute loc
+    if player.brain.nav.nearDestination and player.brain.nav.brain.ball.dist > 30:
         print 'Ball far away ({0}), setting new destination' \
               .format(player.brain.nav.brain.ball.dist)
+        kick = player.brain.kickDecider.getKick()
         player.brain.nav.kickPosition(kick)
 
     if transitions.shouldKick(player):
         return player.goNow('kickBallExecute')
-    """
+
+    elif player.ballMoved():
+        return player.goLater('chase')
+
     elif transitions.shouldFindBallKick(player):
         player.inKickingState = False
         return player.goLater('findBall')
-    elif transitions.shouldChaseFromPositionForKick(player):
-        player.inKickingState = False
-        return player.goLater('chase')
-    """
 
     return player.stay()
 
@@ -198,8 +183,8 @@ def orbitBall(player):
     State to orbit the ball
     """
     if player.firstFrame():
-        player.brain.nav.orbitAngle(170) # TODO HACK HACK
-        player.brain.tracker.trackBall()
+        player.brain.nav.orbitAngle(45) # TODO HACK HACK
+        player.brain.tracker.kickDecideScan()
 
     if transitions.shouldFindBall(player):
         return player.goLater('findBall')

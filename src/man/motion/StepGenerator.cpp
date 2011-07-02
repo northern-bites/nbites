@@ -720,10 +720,11 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 
     // these parameters determined experimentally by trying lots of destinations
     // probably indicates something broken in our odometry
+    // I personally apologize for this :-) --Nathan
     if (dest_x == 0)
-	dest_x = -5.0f; // 5mm
+	dest_x = -5.0f; // 15mm
     dest_theta += 0.088f; // natural rotation of the robot
-    dest_y *= 3; /// @see Step.h HACK HACK HACK
+    dest_y *= 2; /// @see Step.h HACK HACK HACK
 
     float speed_x, speed_y, speed_theta;
 
@@ -739,6 +740,8 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
     // we've finished calculating, now deal with the motion queues
     if (hasDestination || !done) {
 	clearFutureSteps();
+	// reduce the dest_x here since we will take an extra step
+	dest_x -= lastQueuedStep->x;
     } else {
 	resetQueues();
 	const bool startLeft = decideStartLeft(dest_y,dest_theta);

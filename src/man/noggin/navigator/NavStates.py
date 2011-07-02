@@ -278,12 +278,13 @@ def destWalking(nav):
             nav.destGain = 1;
 
         nav.nearDestination = False
+        nav.newDestination = False
 
-        if nav.destX == 0 and nav.destY == 0 and nav.destTheta == 0:
-            nav.goNow('stop')
+        if (nav.destX == 0 and nav.destY == 0 and nav.destTheta == 0) \
+               or nav.destGain == 0:
+            return nav.goNow('stop')
 
         helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta, nav.destGain)
-        nav.newDestination = False
 
     framesLeft = nav.currentCommand.framesRemaining()
 

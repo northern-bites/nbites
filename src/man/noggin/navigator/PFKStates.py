@@ -44,15 +44,15 @@ def positionForKick(nav):
         #nav.destTheta = nav.kick.heading - nav.brain.my.h
 
         # slow down as we get near the ball (max 80% speed)
-        if ball.dist < 40:
-            nav.destGain = (0.5 + (ball.dist / 40)) * .8
+        if ball.dist < 30:
+            nav.destGain = (0.4 + (ball.dist / 30)) * .8
         else:
             nav.destGain = .8
 
         nav.newDestination = True
 
-        print 'Ball rel X: {0} Y: {1} kick heading: {2}' \
-              .format(ball.relX, ball.relY, nav.kick.heading)
+        print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
+              .format(ball.relX, ball.relY, ball.bearing)
 
         print 'Set new PFK destination of ({0}, {1}, {2}, gain={3})' \
               .format(nav.destX, nav.destY, nav.destTheta, nav.destGain)
