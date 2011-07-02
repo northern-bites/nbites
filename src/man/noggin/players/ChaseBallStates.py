@@ -2,6 +2,7 @@
 Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
+import ChaseBallConstants as constants
 import GoalieTransitions as goalTran
 from ..playbook.PBConstants import GOALIE
 
@@ -23,36 +24,30 @@ def chase(player):
 
 def positionForKick(player):
     """
-    Get to the ball
+    Get to the ball.
+    Uses chaseBall to walk to the ball when its far away, and positionForKick
+    once we get close. This allows Player to monitor Navigator's progress as it
+    positions.
     """
-
-    """
-    if player.brain.ball.dist > 80:
-        player.brain.nav.chaseBall()
-        if player.brain.ball.framesOn > 20:
-            player.brain.tracker.kickDecideScan()
-    else:
-        # should be in a firstFrame
-        player.brain.kickDecider.decideKick()
-        kick = player.brain.kickDecider.getKick()
-    """
-
     if player.firstFrame():
-        player.brain.kickDecider.decideKick()
-        kick = player.brain.kickDecider.getKick()
-
-        player.inKickingState = True
-        player.brain.tracker.trackBall()
         player.saveBallPosition()
-        player.brain.nav.kickPosition(kick)
 
-    # if we're getting close, decide whether to set another destination
-    # also, set a new destination if the ball has moved from its absolute loc
-    if player.brain.nav.nearDestination and player.brain.nav.brain.ball.dist > 30:
-        print 'Ball far away ({0}), setting new destination' \
-              .format(player.brain.nav.brain.ball.dist)
-        kick = player.brain.kickDecider.getKick()
-        player.brain.nav.kickPosition(kick)
+        if player.brain.ball.dist > constants.BALL_SET_DEST_CUTOFF:
+            player.brain.speech.say("Speed walking")
+            player.brain.nav.chaseBall()
+
+            if player.brain.ball.vis.framesOn > 20:
+                #player.brain.tracker.kickDecideScan()
+                #else:
+                player.brain.tracker.trackBall()
+
+        else:
+            player.brain.kickDecider.decideKick()
+            kick = player.brain.kickDecider.getKick()
+
+            player.inKickingState = True
+            player.brain.tracker.trackBall()
+            player.brain.nav.kickPosition(kick)
 
     if transitions.shouldKick(player):
         if transitions.shouldOrbit(player):
@@ -61,11 +56,11 @@ def positionForKick(player):
         else:
             return player.goNow('kickBallExecute')
 
-    if player.ballMoved():
-        player.inKickingState = False
-        return player.goLater('chase')
+    # most of the time going to chase will kick back to here, lets us reset
+    if (player.ballMoved() or transitions.ballTooFar(player) or
+        transitions.shouldSwitchPFKModes(player) or
+        transitions.shouldFindBallKick(player)):
 
-    if transitions.shouldFindBallKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 

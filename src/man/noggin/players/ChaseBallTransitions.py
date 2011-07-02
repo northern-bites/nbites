@@ -57,6 +57,31 @@ def shouldKickAgain(player):
     """
     return (shouldKick(player) and ballNearPosition(player))
 
+def ballTooFar(player):
+    """
+    Navigator is almost at its destination, but we're still far away from
+    the ball
+    """
+    if player.brain.nav.nearDestination and player.brain.ball.dist > 30:
+        print "ballTooFar"
+        return True
+    return False
+
+def shouldSwitchPFKModes(player):
+    """
+    True if we're near to the ball and using setSpeed, or far away and using setDest
+    """
+    ball = player.brain.ball
+
+    # using setDestination
+    if player.brain.nav.currentState == 'destWalking' or \
+           player.brain.nav.currentState == 'positionForKick':
+        return ball.dist > constants.BALL_SET_DEST_CUTOFF
+
+    # using setSpeed
+    return ball.dist <= constants.BALL_SET_DEST_CUTOFF
+
+
 def shouldOrbit(player):
     """
     We are lost but are chaser and are at the ball.

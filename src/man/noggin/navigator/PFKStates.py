@@ -5,6 +5,7 @@ from . import NavConstants as constants
 from . import BrunswickSpeeds as speeds
 from math import fabs
 
+
 def positionForKick(nav):
     """
     This state is called by player through Navigator::kickPosition(kick)
@@ -37,7 +38,6 @@ def positionForKick(nav):
 
         print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
               .format(ball.relX, ball.relY, ball.bearing)
-
         print 'Set new PFK destination of ({0}, {1}, {2}, gain={3})' \
               .format(nav.destX, nav.destY, nav.destTheta, nav.destGain)
 

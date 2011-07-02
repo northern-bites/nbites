@@ -71,7 +71,7 @@ class Navigator(FSA.FSA):
         robot will walk to the ball with it centered at his feet.
         if no ball is visible, localization will be usedn
         """
-        self.destType = constants.BALL_DEST
+        self.destType = constants.BALL
         self.switchTo('goToPosition')
 
     def kickPosition(self, kick):
@@ -211,4 +211,7 @@ class Navigator(FSA.FSA):
             return self.dest
 
         elif self.destType is constants.BALL:
-            return self.brain.ball
+            ballPosition = RobotLocation(self.brain.ball.x,
+                                         self.brain.ball.y.
+                                         self.brain.ball.heading)
+            return ballPosition
