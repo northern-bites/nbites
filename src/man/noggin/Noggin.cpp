@@ -516,7 +516,6 @@ void Noggin::modifySysPath ()
 {
     // Enter the current working directory into the python module path
     //
-#if ROBOT(NAO)
 #  ifdef WEBOTS_BACKEND
      const string test = std::string(getenv("WEBOTS_HOME")) +
          std::string("/projects/contests") +
@@ -529,9 +528,6 @@ void Noggin::modifySysPath ()
        const char *cwd = "/home/nao/naoqi/lib/naoqi";
 #    endif
 #  endif
-#else//ROBOT(NAO)
-    const char *cwd = get_current_dir_name();
-#endif
 
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Adding %s to sys.path\n", cwd);
