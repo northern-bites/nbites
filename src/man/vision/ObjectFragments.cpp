@@ -998,6 +998,9 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 					if (Utility::isGreen(thresh->getThresholded(i, xCheck))) {
 						bad++;
 					}
+					if (Utility::isWhite(thresh->getThresholded(i, xCheck))) {
+						bad++;
+					}
 				}
 				if (!(bad * 2 > size) || (linesFound > 1 &&
 										  bad * 3 < size * 2)) {
@@ -1443,10 +1446,10 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 				cout << "Field corner" << endl;
 			}
 			if (corner.getDistance() < 200) {
-				if (x > post.getLeft()) {
-					return RIGHT;
-				} else {
+				if (corner.doesItPointLeft()) {
 					return LEFT;
+				} else {
+					return RIGHT;
 				}
 			}
 		}
@@ -1533,8 +1536,7 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 	if (abs(corner.getOrientation()) < 90) {
 		int classification = NOPOST;
 		if (l1 > l2 && l1 > GOALBOX_DEPTH + 40.0f) {
-			cout << "Check 1 " << endl1.x << endl;
-			if (endl1.y < end2.y) {
+			if (endl1.y < endl2.y) {
 				if (endl1.x > post.getRight()) {
 					classification = RIGHT;
 				} else {
@@ -1546,7 +1548,6 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 				classification = LEFT;
 			}
 		} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 40.0f) {
-			cout << "check 2 " << end1.x << endl;
 			if (end1.y < end2.y) {
 				if (end1.x > post.getRight()) {
 					classification =  RIGHT;
