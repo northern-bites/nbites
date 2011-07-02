@@ -43,7 +43,6 @@ def standup(player):
     return player.stay()
 
 def kickStraight(player):
-    printLoc = False
     if player.firstFrame():
         player.executeMove(SweetMoves.STAND_UP_FRONT)
     if player.counter == 50:
