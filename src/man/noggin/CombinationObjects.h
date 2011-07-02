@@ -218,6 +218,10 @@ namespace noggin {
 
         // Other
         void update();
+        void setDX(float _dx) { dx = _dx; }
+        void setDY(float _dy) { dy = _dy; }
+        const float getLastRelX() { return lastRelX; }
+        const float getLastRelY() { return lastRelY; }
 
     private:
         MyInfo* my;
@@ -321,5 +325,26 @@ namespace noggin {
      * ball and a vision ball, accessible through loc and vis. Also stores the
      * best values for dist and bearing.
      */
+
+    class Ball
+    {
+    public:
+        Ball(VisualBall&, PyLoc&, MyInfo&);
+        ~Ball() {};
+
+        LocBall* loc;
+        VisualBall* vis;
+
+        // Getters
+        const float getDist() { return dist; }
+        const float getBearing() { return bearing; }
+
+        void update();
+
+    private:
+        Ball(const Ball& other);
+        float dist;
+        degrees bearing;
+    };
 }
 #endif //CombObjects_h_DEFINED

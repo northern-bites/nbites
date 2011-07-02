@@ -271,9 +271,6 @@ namespace noggin {
             y = FIELD_GREEN_HEIGHT - loc->getBallYEst();
         }
 
-        dx = lastRelX - getRelX();
-        dy = lastRelY - getRelY();
-
         lastRelX = getRelX();
         lastRelY = getRelY();
 
@@ -330,4 +327,23 @@ namespace noggin {
         return std::min(getLocScoreTheta(), getLocScoreXY());
     }
 
+//////////// Ball Methods /////////////
+
+    Ball::Ball(VisualBall& vb, PyLoc& pl, MyInfo& mi)
+        : loc(new LocBall(pl, mi)), vis(&vb), dist(0.f), bearing(0.f)
+    {
+    }
+
+    void Ball::update()
+    {
+        bearing = loc->getBearing();
+        dist = loc->getDist();
+
+        if (vis->isOn()) {
+            loc->setDX(loc->getLastRelX() - loc->getRelX());
+            loc->setDY(loc->getLastRelY() - loc->getRelY());
+        }
+
+        loc->update();
+    }
 }
