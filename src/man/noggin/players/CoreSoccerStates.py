@@ -39,7 +39,8 @@ def gameReady(player):
     Stand up, and pan for localization
     """
     if player.firstFrame():
-        player.standup()
+        player.stopWalking()
+        player.walkPose()
         player.brain.tracker.switchTo('locPans')
     return player.stay()
 

@@ -36,8 +36,7 @@ def gamePenalized(player):
 def standup(player):
     if player.firstFrame():
         player.gainsOn()
-        walkCommand = motion.WalkCommand(x=0,y=0,theta=0)
-        player.motion.setNextWalkCommand(walkCommand)
+        player.walkPose()
 
     if player.counter == 1:
         return player.goLater('kickStraight')

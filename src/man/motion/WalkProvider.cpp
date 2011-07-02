@@ -120,7 +120,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 
     // advance the in-progress DestinationCommand
     if (nextDestCommand)
-	nextDestCommand->tick();
+        nextDestCommand->tick();
 
     //ask the step Generator to update ZMP values, com targets
     stepGenerator.tick_controller();
@@ -209,13 +209,18 @@ void WalkProvider::setActive(){
     }
 }
 
-std::vector<BodyJointCommand::ptr> WalkProvider::getGaitTransitionCommand(){
-    pthread_mutex_lock(&walk_provider_mutex);
+std::vector<BodyJointCommand::ptr> WalkProvider::getGaitTransitionCommand()
+{
     vector<float> curJoints = sensors->getMotionBodyAngles();
+
+    pthread_mutex_lock(&walk_provider_mutex);
+
     vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
 
     startGait = nextGait;
     pendingStartGaitCommands = true;
+
+    pthread_mutex_unlock(&walk_provider_mutex);
 
     float max_change = -M_PI_FLOAT*10.0f;
 
@@ -250,17 +255,19 @@ std::vector<BodyJointCommand::ptr> WalkProvider::getGaitTransitionCommand(){
     vector<float> * stiffness2 = new vector<float>(Kinematics::NUM_JOINTS,
                                                    0.85f);
 
-    commands.push_back(BodyJointCommand::ptr (
-			   new BodyJointCommand(0.5f,safe_larm,NULL,NULL,safe_rarm,
-						stiffness,
-						Kinematics::INTERPOLATION_SMOOTH)
-			   ) );
+    if (time > MOTION_FRAME_LENGTH_S * 30){
+        commands.push_back(
+            BodyJointCommand::ptr (
+                new BodyJointCommand(0.5f,safe_larm,NULL,NULL,safe_rarm,
+                                     stiffness,
+                                     Kinematics::INTERPOLATION_SMOOTH)
+                ) );
+    }
 
     commands.push_back(BodyJointCommand::ptr (
-			   new BodyJointCommand(time,gaitJoints,
-						stiffness2,
-						Kinematics::INTERPOLATION_SMOOTH)
-			   )  );
-    pthread_mutex_unlock(&walk_provider_mutex);
+               new BodyJointCommand(time,gaitJoints,
+                        stiffness2,
+                        Kinematics::INTERPOLATION_SMOOTH)
+               )  );
     return commands;
 }

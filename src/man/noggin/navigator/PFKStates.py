@@ -64,14 +64,14 @@ def pfk_all(nav):
         sX = pfk_x(nav, ball, x_offset)
         if (sX < 0):
             #print "dangerous ball detected during PFK"
-            helper.setSlowSpeed(nav, sX, 0, 0)
+            helper.setSpeed(nav, sX, 0, 0)
             return nav.stay()
 
     if (nav.stopX and nav.stopY and nav.stopTheta):
         # in good position for kick
         return nav.goNow('stop')
 
-    helper.setSlowSpeed(nav, sX, sY, sTheta)
+    helper.setSpeed(nav, sX, sY, sTheta)
 
     return nav.stay()
 
