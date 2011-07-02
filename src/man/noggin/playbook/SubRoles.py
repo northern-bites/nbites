@@ -271,7 +271,7 @@ def pKickoffStriker(team, workingPlay):
 
 #### SubRoles for ready state ####
 def pReadyChaser(team, workingPlay):
-    workingPlay.setSubRole(PBConstants.READ_CHASER)
+    workingPlay.setSubRole(PBConstants.READY_CHASER)
     kickOff = team.brain.gameController.ownKickOff
     if kickOff:
         x = PBConstants.READY_KICKOFF_CHASER_X
