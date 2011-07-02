@@ -3,6 +3,7 @@ from . import TrackingConstants as constants
 
 DEBUG = False
 
+# ** # old method
 def ballTracking(tracker):
     '''Super state which handles following/refinding the ball'''
     if tracker.target.vis.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -10,14 +11,11 @@ def ballTracking(tracker):
     else:
         return tracker.goNow('scanBall')
 
+# ** # old method
 def tracking(tracker):
     """
-    state askes it's parent (the tracker) for an object or angles to track
-    while the object is on screen, or angles are passed, we track it.
-    Otherwise, we continually write the current values into motion via setHeads.
-
-    If a sweet move is begun while we are tracking, the current setup is to let
-    the sweet move conclude and then resume tracking afterward.
+    While the target is visible, track it via vision values.
+    If the ball is lost, go to last diff state.
     """
 
     if tracker.firstFrame():
@@ -32,6 +30,7 @@ def tracking(tracker):
 
     return tracker.stay()
 
+# ** # old method
 def ballSpinTracking(tracker):
     '''Super state which handles following/refinding the ball'''
     if tracker.target.vis.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -40,9 +39,14 @@ def ballSpinTracking(tracker):
         return tracker.goNow('spinScanBall')
 
 
+# ** # old method
 def activeTracking(tracker):
     """
-    Method to perform tracking
+    If ball is visible and close, track it via vision values.
+    If ball is not visible, execute naive pans.
+    If state counter is low enough, track ball via vision values.
+    If state counter is high enough, perform triangle pans
+    and return to last head angles.
     """
     if tracker.firstFrame():
         tracker.activeLocOn = True
@@ -83,4 +87,3 @@ def activeTracking(tracker):
         return tracker.goLater('trianglePan')
 
     return tracker.stay()
-

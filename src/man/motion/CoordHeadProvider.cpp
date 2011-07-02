@@ -88,18 +88,11 @@ void CoordHeadProvider::coordMode(){
 
     //Calculate how much we can move toward the goal
     float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
-					 - yawMaxSpeed,
-					 yawMaxSpeed);
+										 -yawMaxSpeed,
+										 yawMaxSpeed);
     float pitchChangeTarget = NBMath::clip(pitchDest - lastPitchDest,
-					   -pitchMaxSpeed,
-					   pitchMaxSpeed);
-
-    //avoid potential head collisions with shoulder pads
-    if (lastPitchDest < 0) {
-        if (lastYawDest < -.35 || lastYawDest > .35) {
-            pitchChangeTarget = clip(pitchChangeTarget,-lastPitchDest,pitchChangeTarget);
-        }
-    }
+										   -pitchMaxSpeed,
+										   pitchMaxSpeed);
 
 #ifdef DEBUG_HEADPROVIDER
     cout << "Last values "<<endl
@@ -125,30 +118,27 @@ void CoordHeadProvider::coordMode(){
 }
 
 
+// All distances are expected to be in mm
 void CoordHeadProvider::setCommand(const CoordHeadCommand::ptr command) {
     pthread_mutex_lock(&coord_head_provider_mutex);
     transitionTo(COORD);
-    float relY = command->getRelY()-pose->getFocalPointInWorldFrameY();//adjust from mm to cm
+    float relY = command->getRelY()-pose->getFocalPointInWorldFrameY();
     float relX = command->getRelX()-pose->getFocalPointInWorldFrameX();
     float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()-300;//adjust for robot center's distance above ground
     yawDest = atan(relY/relX);
     float hypoDist = sqrt((relY*relY)+(relX*relX));
-    pitchDest = atan(relZ/hypoDist)-CAMERA_ANGLE;//constant for lower camera
+    pitchDest = -1*atan(relZ/hypoDist)-CAMERA_ANGLE;//constant for lower camera
     yawMaxSpeed = command->getMaxSpeedYaw();
     pitchMaxSpeed = command->getMaxSpeedPitch();
 
     //clip dest and maxVel values to safe limits
     //these limits are currently pretty arbitrary
-    yawDest = clip(yawDest,YAW_CLIP);
     pitchDest = clip(pitchDest,PITCH_MIN_CLIP,PITCH_MAX_CLIP);
+    yawDest = Kinematics::boundHeadYaw(yawDest,pitchDest);
     yawMaxSpeed = clip(yawMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW]*SPEED_CLIP_FACTOR);
     pitchMaxSpeed = clip(pitchMaxSpeed, 0, Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]*SPEED_CLIP_FACTOR);
 
     setActive();
-    /* ** *///cout <<"looking at yaw:  "<<yawDest<<"  and pitch: "<<pitchDest<<endl;
-    /* ** *///cout <<"currently at:   "<<lastYawDest<<"   "<<lastPitchDest<<endl;
-    /* ** *///cout <<"relative position: "<<command->getRelX()<<"  "<<command->getRelY()<<"  "<<command->getRelZ()<<endl;
-    /* ** *///cout <<"adjusted position: "<<relX<<"  "<<relY<<"  "<<relZ<<endl;
     pthread_mutex_unlock(&coord_head_provider_mutex);
 }
 

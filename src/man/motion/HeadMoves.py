@@ -309,7 +309,7 @@ KICK_SCAN = (
     ((0.0,40.),0.5,1,stiff.LOW_HEAD_STIFFNESSES))
 
 PAN_UP = (
-    ((0.,-40.),0.3,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.,-40.),0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.,-40.),0.3, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 PAN_LEFT_HEADS = ( 65.0, -30.0)
