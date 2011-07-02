@@ -8,11 +8,6 @@ def atDestinationCloser(my, dest):
     Returns true if we are at an (x, y) close enough to the one we want
 
     """
-    #diffX = fabs(dest.x - my.x)
-    #diffY = fabs(dest.y - my.y)
-
-    #return diffX < my.uncertX and diffY < my.uncertY
-
     return my.distTo(dest) < (constants.CLOSER_XY +
                               sqrt(my.uncertX**2. +
                                    my.uncertY**2.))
@@ -140,7 +135,9 @@ def shouldAvoidObstacle(nav):
 def shouldAvoidObstacleDuringApproachBall(nav):
     return (nav.brain.ball.dist >
             constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST and \
-            shouldAvoidObstacle(nav))
+            shouldAvoidObstacle(nav) and
+            (nav.brain.ball.dist > nav.brain.sonar.leftDist or
+            nav.brain.ball.dist > nav.brain.sonar.rightDist))
 
 KICK_STRAIGHT_BEARING_THRESH = 20.
 ########## CHASE STUFF ##############

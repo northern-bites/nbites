@@ -613,7 +613,7 @@ void Context::classifyOuterL(VisualCorner & corner) {
 		if (abs(corner.getOrientation())  < 45) {
 			// it is l1 so fine its high endpoint
 			if (objectRightX > -1) {
-				if (top.x > objectRightX) {
+				if (top.x > top2.x) {
 					if (face == FACING_YELLOW_GOAL) {
 						corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
 					} else {
@@ -637,7 +637,7 @@ void Context::classifyOuterL(VisualCorner & corner) {
 			// bug:  223-11/slarti/leftbluecorner/NBFRM.12
 			// basically on the side of the goal this idea doesn't work
 			if (objectRightX > -1) {
-				if (top2.x > objectRightX) {
+				if (top2.x > top.x) {
 					if (face == FACING_YELLOW_GOAL) {
 						corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
 					} else {
@@ -1321,6 +1321,27 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
     }
     // can we determine which side?
     if (l1.getShape() == OUTER_L) {
+		// check if we're right on the side
+		if (objectDistance > t.getDistance() + GOALBOX_OVERAGE / 2) {
+			if (t.doesItPointRight()) {
+				if (face == FACING_YELLOW_GOAL) {
+					t.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
+					l1.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+				} else {
+					t.setSecondaryShape(RIGHT_GOAL_BLUE_T);
+					l1.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+				}
+			} else {
+				if (face == FACING_YELLOW_GOAL) {
+					t.setSecondaryShape(LEFT_GOAL_YELLOW_T);
+					l1.setSecondaryShape(LEFT_GOAL_YELLOW_L);
+				} else {
+					t.setSecondaryShape(LEFT_GOAL_BLUE_T);
+					l1.setSecondaryShape(LEFT_GOAL_BLUE_L);
+				}
+			}
+			return;
+		}
         // look at the non-common line, figure out which direction it goes
         // if it goes in the same as left T, then it is a RIGHT L
         point<int> left;
@@ -1561,7 +1582,12 @@ void Context::checkForBadTID(VisualCorner & first, VisualCorner & second,
 			} else {
 				first.changeToT(first.getLine1());
 			}
-			checkTToFieldCorner(first, second);
+			// check if it is a goal or field corner
+			if (realLineDistance(common) < GOALBOX_DEPTH + 20.0f) {
+				checkTToGoal(first, second, common);
+			} else {
+				checkTToFieldCorner(first, second);
+			}
 		}
 	}
 }

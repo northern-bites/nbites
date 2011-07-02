@@ -39,6 +39,9 @@ def kickOffPosition(player):
 
     if player.firstFrame():
         player.brain.resetGoalieLocalization()
+        if player.penaltyKicking:
+            player.gainsOn()
+            player.walkPose()
 
     # When the ball is far away we want to make sure we
     # are in position

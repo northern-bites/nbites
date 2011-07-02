@@ -35,6 +35,8 @@ class GoTeam:
         self.timeSinceCaptureChase = 0
         self.subRoleSwitchTime = 0
         self.goalieChaserCount = 0
+        self.willBeIllegalD = 0
+        self.stopAvoidingBox = 0
         self.ellipse = Ellipse(PBConstants.LARGE_ELLIPSE_CENTER_X,
                                PBConstants.LARGE_ELLIPSE_CENTER_Y,
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
@@ -416,11 +418,24 @@ class GoTeam:
 
         ball = self.brain.ball
 
+        # No matter what state we are we don't
+        # Want to become an illegal defender
+        # TODO: When ball information is better make this inMyGoalBox
+        if ball.x < (NogginConstants.MY_GOALBOX_RIGHT_X + 10):
+            self.willBeIllegalD += 1
+            if self.willBeIllegalD > PBConstants.DONT_ILLEGAL_D_THRESH:
+                self.brain.player.inKickingState = False
+                self.stopAvoidingBox = 0
+                return True
+        elif ball.vis.on:
+            self.stopAvoidingBox += 1
+            if self.stopAvoidingBox > PBConstants.STOP_AVOID_BOX_THRESH:
+                self.willBeIllegalD = 0
+
         if not PBConstants.USE_DUB_D:
             return False
         goalie = self.brain.teamMembers[0]
-        if (goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER)
-            or ball.inMyGoalBox()):
+        if goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER):
             self.goalieChaserCount += 1
         else:
             self.goalieChaserCount = 0

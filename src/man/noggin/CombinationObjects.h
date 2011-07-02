@@ -38,6 +38,9 @@ namespace noggin {
     static const float TOP_LIMIT = FIELD_HEIGHT*2.0/3.0;
     static const float BOTTOM_LIMIT = FIELD_HEIGHT/3.0;
 
+    // Buffer for size of Box
+    static const int BOX_BUFFER = 10;
+
     /**
      * Degrees and radians are both floats, but used to indicate when
      * values are expected to be in degrees or radians. This gets complicated
