@@ -19,7 +19,6 @@ def chase(player):
         return player.goNow('penaltyBallInOppGoalbox')
 
     else:
-        player.brain.kickDecider.decideKick()
         return player.goNow('positionForKick')
 
 def positionForKick(player):
@@ -28,9 +27,11 @@ def positionForKick(player):
     """
     if player.brain.ball.dist > 80:
         player.brain.nav.chaseBall()
-        if player.brain.ball.framesOn > 10:
+        if player.brain.ball.framesOn > 20:
             player.brain.tracker.kickDecideScan()
     else:
+        # should be in a firstFrame
+        player.brain.kickDecider.decideKick()
         kick = player.brain.kickDecider.getKick()
 
         #if player.firstFrame():
@@ -73,6 +74,7 @@ def orbitBall(player):
 
     elif player.brain.nav.isStopped():
         player.shouldOrbit = False
+        player.brain.tracker.trackBall()
         return player.goLater('chase')
 
     return player.stay()
