@@ -250,8 +250,10 @@ void Noggin::runStep ()
 #   ifdef USE_NOGGIN_AUTO_HALT
     // don't bother doing anything if there's a Python error and we
     // haven't reloaded
-    if (error_state)
-        return;
+    if (error_state) {
+        this->reload_hard();
+        error_state = false;
+    }
 #   endif
 
     //Check button pushes for game controller signals
@@ -516,7 +518,6 @@ void Noggin::modifySysPath ()
 {
     // Enter the current working directory into the python module path
     //
-#if ROBOT(NAO)
 #  ifdef WEBOTS_BACKEND
      const string test = std::string(getenv("WEBOTS_HOME")) +
          std::string("/projects/contests") +
@@ -529,9 +530,6 @@ void Noggin::modifySysPath ()
        const char *cwd = "/home/nao/naoqi/lib/naoqi";
 #    endif
 #  endif
-#else//ROBOT(NAO)
-    const char *cwd = get_current_dir_name();
-#endif
 
 #ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Adding %s to sys.path\n", cwd);

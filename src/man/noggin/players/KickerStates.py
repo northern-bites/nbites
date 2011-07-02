@@ -37,8 +37,7 @@ def standup(player):
     if player.firstFrame():
         player.brain.tracker.setNeutralHead()
         player.gainsOn()
-        walkCommand = motion.WalkCommand(x=0,y=0,theta=0)
-        player.motion.setNextWalkCommand(walkCommand)
+        player.walkPose()
 
     if player.counter == 1:
         return player.goLater('kickStraight')
@@ -46,10 +45,8 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-
-        player.executeMove(SweetMoves.DREW_KICK(-1, 500))
-
-    if player.brain.nav.isStopped() and player.counter > 1:
+        player.executeMove(SweetMoves.STAND_UP_FRONT)
+    if player.counter == 50:
         return player.goLater('done')
     return player.stay()
 

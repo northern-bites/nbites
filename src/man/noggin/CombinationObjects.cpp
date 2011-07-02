@@ -57,14 +57,17 @@ namespace noggin {
     // In methods check if loc is in a certain field region
     const bool Location::inOppGoalBox()
     {
-        return ( OPP_GOALBOX_LEFT_X < x &&  OPP_GOALBOX_RIGHT_X > x
-                 && OPP_GOALBOX_TOP_Y > y && y > OPP_GOALBOX_BOTTOM_Y );
+        return ((OPP_GOALBOX_LEFT_X - BOX_BUFFER < x) &&
+                 (OPP_GOALBOX_RIGHT_X + BOX_BUFFER > x) &&
+                (OPP_GOALBOX_TOP_Y + BOX_BUFFER) > y &&
+                y > (OPP_GOALBOX_BOTTOM_Y - BOX_BUFFER));
     }
 
     const bool Location::inMyGoalBox()
     {
-        return ( x < MY_GOALBOX_RIGHT_X && MY_GOALBOX_TOP_Y > y &&
-                 y > OPP_GOALBOX_BOTTOM_Y );
+        return ( x < (MY_GOALBOX_RIGHT_X + BOX_BUFFER) &&
+                 (MY_GOALBOX_TOP_Y + BOX_BUFFER) > y &&
+                 y > (OPP_GOALBOX_BOTTOM_Y - BOX_BUFFER));
     }
 
     const bool Location::inCenterOfField()
