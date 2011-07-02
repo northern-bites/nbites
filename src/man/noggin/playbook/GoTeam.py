@@ -433,14 +433,11 @@ class GoTeam:
             return False
         goalie = self.brain.teamMembers[0]
         if goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER):
-            print "goalie chaser"
             self.goalieChaserCount += 1
         else:
-            print "goalie not chaser"
             self.goalieChaserCount = 0
             return False
         if self.goalieChaserCount > PBConstants.GOALIE_CHASER_COUNT_THRESH:
-            print "should be using dubD"
             return not self.brain.player.inKickingState
 
     def defenderShouldChase(self):

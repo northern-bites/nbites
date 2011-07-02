@@ -397,8 +397,8 @@ A Stopper will move back and forth on a line behind the center circle,
             far toward the edge of the field.
 """
 DEFENDER_BALL_DIST = 100
-SWEEPER_X_THRESH = NogginConstants.MY_GOALBOX_RIGHT_X + 90.
-SWEEPER_X = NogginConstants.MY_GOALBOX_RIGHT_X + 25.
+SWEEPER_X_THRESH = NogginConstants.LANDMARK_MY_FIELD_CROSS[0]
+SWEEPER_X = NogginConstants.MY_GOALBOX_RIGHT_X + 60.
 SWEEPER_Y = NogginConstants.CENTER_FIELD_Y
 SWEEPER_Y_OFFSET = 20.
 STOPPER_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[0]
