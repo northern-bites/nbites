@@ -165,6 +165,35 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 
     // Sensor data request
     if (r.sensors) {
+        std::vector<float> sensor_data(NUM_SENSORS);
+        FSR lfsr = sensors->getLeftFootFSR();
+        sensor_data[0] = lfsr.frontLeft;
+        sensor_data[1] = lfsr.frontRight;
+        sensor_data[2] = lfsr.rearLeft;
+        sensor_data[3] = lfsr.rearRight;
+        FSR rfsr = sensors->getRightFootFSR();
+        sensor_data[4] = rfsr.frontLeft;
+        sensor_data[5] = rfsr.frontRight;
+        sensor_data[6] = rfsr.rearLeft;
+        sensor_data[7] = rfsr.rearRight;
+        FootBumper lfb = sensors->getLeftFootBumper();
+        sensor_data[8] = lfb.left;
+        sensor_data[9] = lfb.right;
+        FootBumper rfb = sensors->getRightFootBumper();
+        sensor_data[10] = rfb.left;
+        sensor_data[11] = rfb.right;
+        Inertial inertial = sensors->getInertial();
+        sensor_data[12] = inertial.accX;
+        sensor_data[13] = inertial.accY;
+        sensor_data[14] = inertial.accZ;
+        sensor_data[15] = inertial.gyrX;
+        sensor_data[16] = inertial.gyrY;
+        sensor_data[17] = inertial.angleX;
+        sensor_data[18] = inertial.angleY;
+        sensor_data[19] = sensors->getUltraSoundLeft();
+        sensor_data[20] = sensors->getUltraSoundRight();
+        sensor_data[21] = sensors->getSupportFoot();
+        serial.write_floats(sensor_data);
     }
 
     // Image data request
