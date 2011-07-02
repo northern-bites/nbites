@@ -35,18 +35,3 @@ def penaltyBallInOppGoalbox(player):
         return player.goLater('chase')
     return player.stay()
 
-def penaltyKickShortDribble(player):
-    """
-    Acts as a layer above dribble for penalty shots.
-    """
-    if player.firstFrame():
-        player.penaltyMadeFirstKick = True
-    if transitions.shouldStopPenaltyKickDribbling(player):
-        if transitions.shouldClaimBall(player):
-            return player.goLater('chase')
-        elif transitions.shouldPositionForKick(player):
-            return player.goLater('positionForKick')
-        elif transitions.shouldChaseBall(player):
-            return player.goLater('chase')
-
-    return player.goLater('dribble')

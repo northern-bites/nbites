@@ -106,6 +106,9 @@ class KickDecider(object):
             self.choosePassBackKick()
 
         self.info.kick = self.chooseKick()
+        print "I'm at position x: {0} y: {1} h: {2}".format(self.brain.my.x,
+                                                            self.brain.my.y,
+                                                            self.brain.my.h)
         print "Chose: {0}".format(self.info.kick)
 
     def score(self):

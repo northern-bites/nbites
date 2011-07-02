@@ -13,7 +13,7 @@ def chase(player):
         return player.goNow('findBall')
 
     if player.brain.play.isRole(GOALIE) and goalTran.dangerousBall(player):
-        return player.goNow('goalieChase')
+        return player.goNow('approachDangerousBall')
 
     elif player.penaltyKicking and player.brain.ball.inOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')

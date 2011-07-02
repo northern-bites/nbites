@@ -70,10 +70,8 @@ class Navigator(FSA.FSA):
         """
         state to align on the ball once we are near it
         """
-        if not (self.currentState == 'positionForKick' or
-                self.currentState == 'destWalking'):
-            self.kick = kick
-            self.switchTo('positionForKick')
+        self.kick = kick
+        self.switchTo('positionForKick')
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
