@@ -60,4 +60,3 @@ def positionForKick(nav):
         nav.brain.speech.say("New destination")
 
         return nav.goNow('destWalking')
-

@@ -7,7 +7,6 @@ class Kick(object):
     """
     def __init__(self, _name, x=DEFAULT_KICK_X_OFFSET, y=0, h=0, move=None, dest = None):
         self.name = _name
-        self.nullKick = False # TODO be more elegant
         self.x_offset = x
         self.y_offset = y
         self.heading = h           # set manually.
@@ -32,7 +31,7 @@ RIGHT_DYNAMIC_STRAIGHT_KICK = Kick("R_D_Straight", y = -5, move=SweetMoves.DREW_
 
 # TODO ! make a null kick here.
 # used when we haven't decided what kick to do yet
-CENTER_KICK_POSITION = Kick("NULL_KICK", x = DEFAULT_KICK_X_OFFSET + 5, y = 5)
+ORBIT_KICK_POSITION = Kick("NULL_KICK", x = DEFAULT_KICK_X_OFFSET + 5, y = -5)
 
 LEFT_LONG_BACK_KICK =  Kick("L_LongBack", x = 12.5, y =  6.5, move=SweetMoves.LEFT_LONG_BACK_KICK)
 RIGHT_LONG_BACK_KICK = Kick("R_LongBack", x = 12.5, y = -6.5, move=SweetMoves.RIGHT_LONG_BACK_KICK)

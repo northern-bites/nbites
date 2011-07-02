@@ -17,9 +17,8 @@ def kickBallExecute(player):
             player.executeMove(player.brain.kickDecider.getSweetMove())
         else:
             #Either it's close and we can't kick it now or it's far
-            #away and we should search.  Lets hope its close and let
-            #positionForKick put us in findBall if needed
-            return player.goLater('positionForKick')
+            #away and we should search.
+            return player.goLater('chase')
 
         #if player.penaltyKicking:
         if not player.penaltyMadeFirstKick:
@@ -70,13 +69,11 @@ def afterKick(player):
         return player.goNow('positionForKick')
     if transitions.shouldFindBallKick(player):
         player.inKickingState = False
-        player.hasKickedOff = True
         player.brain.nav.justKicked = False
         return player.goLater('findBall')
     if ((player.counter > 1 and player.brain.nav.isStopped()) or
         transitions.shouldChaseBall(player)):
         player.inKickingState = False
-        player.hasKickedOff = True
         player.brain.nav.justKicked = False
         return player.goNow('chase')
 

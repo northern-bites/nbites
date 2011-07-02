@@ -35,7 +35,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.shouldRelocalizeCounter = 0
 
         # Orbiting
-        self.angleToOrbit = 0.0
+        self.shouldOrbit = False
 
         self.inKickingSate = False
         self.penaltyKicking = False

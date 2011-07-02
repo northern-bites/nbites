@@ -1,5 +1,7 @@
 import kicks
 import KickingConstants as constants
+import noggin_constants as NogginConstants
+from objects import Location
 from ..util import MyMath
 from math import fabs
 import noggin_constants as NogginConstants
@@ -24,6 +26,19 @@ class KickInformation:
         self.passingTeammate = None     # Teammate to pass to.
         self.kickObjective = None
         self.kick = None
+
+    def shouldKickOff(self):
+        """
+        Tells the decider if we should kickOff. Also sets the player constant.
+        """
+        if self.brain.player.shouldKickOff:
+            centerField = Location(NogginConstants.CENTER_FIELD_X,
+                                   NogginConstants.CENTER_FIELD_Y)
+            self.brain.player.shouldKickOff = (centerField.distTo(self.brain.ball) <
+                                               NogginConstants.CENTER_CIRCLE_RADIUS)
+            return self.brain.player.shouldKickOff
+        else:
+            return False
 
     def canScoreAll(self):
         if True:
@@ -132,13 +147,15 @@ class KickInformation:
         to know where to shoot. This conversion lets us decide which aim point
         we are better lined up to shoot for easily (ie with a single compare)
         """
-
         my = self.brain.my
         ball = self.brain.ball
         bestHeading = -1.
         bestDest = None
 
         for dest in dests:
+            # Don't need to sub180Angle here because we mod. I know it looks
+            # wierd and suspiciously complicated, but it makes for an easy
+            # compare and I promise I unit tested it. -- Wils (7/1/11)
             bestHeading = max((fabs(((ball.headingTo(dest) -
                                      my.headingTo(ball))
                                     % 90) - 45)), bestHeading)
@@ -157,7 +174,8 @@ class KickInformation:
         """
         my = self.brain.my
         ball = self.brain.ball
-        rotatedHeading = ball.headingTo(dest) - my.headingTo(ball)
+        rotatedHeading = MyMath.sub180Angle(ball.headingTo(dest) -
+                                            my.headingTo(ball))
         kick = None
 
         if (fabs(rotatedHeading) < constants.STRAIGHT_KICK_ALIGNMENT_BEARING):
@@ -176,6 +194,9 @@ class KickInformation:
 
         kick.dest = dest
         return kick
+
+
+
 
     def chooseStraightKick(self):
         """

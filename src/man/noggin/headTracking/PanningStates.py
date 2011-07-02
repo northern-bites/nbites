@@ -175,12 +175,6 @@ MOTION_START_BUFFER = 2
 # anything that calls this should make sure that
 # goalieActiveLoc is set to proper value ( most likely false)
 def trianglePan(tracker):
-    motionAngles = tracker.brain.sensors.motionAngles
-    tracker.preTriPanHeads = (
-        motionAngles[MotionConstants.HeadYaw],
-        motionAngles[MotionConstants.HeadPitch]
-        )
-
     if tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw] > 0:
         return tracker.goNow('trianglePanLeft')
     else :
@@ -213,8 +207,7 @@ def trianglePanRight(tracker):
 
 def trianglePanReturn(tracker):
     if tracker.firstFrame():
-        # TODO! Should be look to ball.
-        tracker.helper.panTo(tracker.preTriPanHeads)
+        tracker.helper.lookToPoint(tracker.brain.ball)
     elif (not tracker.brain.motion.isHeadActive() and
           tracker.counter > MOTION_START_BUFFER)  or \
           tracker.target.vis.on:

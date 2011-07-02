@@ -23,10 +23,6 @@ class KickDecider(object):
         """
         returns the kick we have decided. If None, then orbit for Loc.
         """
-        if self.info.kick is None:
-            self.info.kick = kicks.CENTER_KICK_POSITION
-            self.info.kick.nullKick = True
-
         return self.info.kick
 
     def setKick(self, k):
@@ -60,7 +56,7 @@ class KickDecider(object):
 
         # if there are too few players on the field to do a side kick pass.
         if smallTeam:
-            print "Kickoff!"
+            print "Kickoff Alone!"
             self.setKick(self.info.chooseShortQuickKick())
         # do a side kick pass depending on where the offender is.
         elif self.brain.playbook.pb.kickoffFormation == 0:
@@ -76,13 +72,19 @@ class KickDecider(object):
         """
         using objective and heuristics and localization determines best kick
         """
-        # reset any hanging information
+        # Re-initialize to clear data
         self.resetInfo()
+
+        # Yay scripted Kickoffs!
+        if self.info.shouldKickOff():
+            self.setKickOff()
+            return
 
         # Check localization to make sure it's good enough.
         if self.brain.my.locScore == NogginConstants.locScore.BAD_LOC:
             print "BAD_LOC!"
-            self.info.kick = None # TODO set this to "Null Kick" for orbiting.
+            self.brain.player.shouldOrbit = True
+            self.info.kick = kicks.ORBIT_KICK_POSITION
             return
 
         if self.info.canScoreAll():
@@ -104,7 +106,7 @@ class KickDecider(object):
             self.choosePassBackKick()
 
         self.info.kick = self.chooseKick()
-        return self.info.kick
+        print "Chose: {0}".format(self.info.kick)
 
     def score(self):
         """
@@ -159,6 +161,7 @@ class KickDecider(object):
             if kick == None:
                 continue
             return kick
+
 
         """
         # Note: may want to use headingTo(yglp) etc...

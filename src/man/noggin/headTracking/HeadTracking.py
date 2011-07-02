@@ -100,10 +100,14 @@ class HeadTracking(FSA.FSA):
             self.isPreKickScanning = True
             self.switchTo('scanQuickUp')
 
+    # TODO rename.
     def kickDecideScan(self):
         self.lastDiffState = 'stop'
         self.goalieActiveLoc = False
-        if self.currentState != 'trianglePan':
+        if (self.currentState != 'trianglePan' or
+            self.currentState != 'trianglePanLeft' or
+            self.currentState != 'trianglePanRight' or
+            self.currentState != 'trianglePanReturn'):
             self.switchTo('trianglePan')
 
     def startScan(self,  newScan):
