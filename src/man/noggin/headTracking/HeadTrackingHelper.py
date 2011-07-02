@@ -40,10 +40,11 @@ class HeadTrackingHelper(object):
 
         # If we don't see it, let's try to use our model of it to find
         # it and track it
+        #
+        # If the ball (or target) is set as being under us,
+        # don't try to look at it. Perhaps should be
+        # generalized to objects which we cannot see.
         if not target or \
-                # If the ball (or target) is set as being under us,
-                # don't try to look at it. Perhaps should be
-                # generalized to objects which we cannot see.
                 (target.relX == 0.0 and target.relY == 0.0):
             return
 

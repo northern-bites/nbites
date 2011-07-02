@@ -85,6 +85,7 @@ def panToFieldObject(tracker):
 
     # Calculate closest field object
     if tracker.firstFrame():
+        tracker.shouldStareAtBall = 0 # Reuse this counter
 
         closest = tracker.helper.calculateClosestLandmark()
 
@@ -94,11 +95,15 @@ def panToFieldObject(tracker):
             return tracker.goLater('activeTracking')
 
         target = RelLocation(tracker.brain.my, closest.x, closest.y, 0)
-        target.height = 45
+        target.height = 45      # stare at the center of the post
+                                # rather than the bottom
 
         tracker.lastMove = tracker.helper.lookToPoint(target)
 
     elif tracker.lastMove.isDone():
-        return tracker.goLater('activeTracking')
+        tracker.shouldStareAtBall += 1
+
+        if tracker.shouldStareAtBall > constants.LOOK_FIELD_OBJ_FRAMES:
+            return tracker.goLater('activeTracking')
 
     return tracker.stay()
