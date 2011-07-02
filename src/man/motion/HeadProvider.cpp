@@ -263,7 +263,7 @@ bool HeadProvider::isDone(){
                                && headCommandQueue.empty());
     switch(curMode){
     case SET:
-        if (setDone) { currHeadCommand->isDoneExecuting(); }
+        if (setDone) { currHeadCommand->finishedExecuting(); }
         return setDone;
         break;
     case SCRIPTED:

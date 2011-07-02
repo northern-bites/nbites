@@ -41,7 +41,6 @@ class HeadTrackingHelper(object):
         # If we don't see it, let's try to use our model of it to find
         # it and track it
         if not target or not target.vis.on:
-            self.lookToPoint(target)
             return
 
         # Find the target's angular distance from the center of the screen
