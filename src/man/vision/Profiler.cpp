@@ -198,6 +198,9 @@ Profiler::Profiler (long long (*thread_time_f)(),
 
 Profiler::~Profiler ()
 {
+    if (instance == this) {
+        instance = NULL;
+    }
 }
 
 void
