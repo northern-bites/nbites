@@ -998,6 +998,9 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 					if (Utility::isGreen(thresh->getThresholded(i, xCheck))) {
 						bad++;
 					}
+					if (Utility::isWhite(thresh->getThresholded(i, xCheck))) {
+						bad++;
+					}
 				}
 				if (!(bad * 2 > size) || (linesFound > 1 &&
 										  bad * 3 < size * 2)) {
@@ -1411,15 +1414,22 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 	}
 	// check that the post isn't too far away
 	// basically the goalie view - the post to one side, corner in view
+	bool pointsAt = false;
+	if ((x > post.getLeft() && corner.doesItPointLeft()) ||
+		(x < post.getLeft() && corner.doesItPointRight())) {
+		pointsAt = true;
+	}
 	if (distant > corner.getLine1()->getDistance() &&
-		distant > corner.getLine2()->getDistance()) {
+		distant > corner.getLine2()->getDistance() && pointsAt) {
 		if (POSTLOGIC) {
 			cout << "Goalie view " << endl;
 		}
-		if (x > post.getLeft()) {
-			return RIGHT;
-		} else {
-			return LEFT;
+		if (corner.getDistance() < CROSSBAR_CM_WIDTH) {
+			if (x > post.getLeft()) {
+				return RIGHT;
+			} else {
+				return LEFT;
+			}
 		}
 	}
 	float diff = realDistance(x, y, post.getLeftBottomX(),
@@ -1427,15 +1437,20 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 	float further = max(corner.getLine1()->getDistance(),
 						corner.getLine2()->getDistance());
 	// field corner
-	if (distant <= further) {
+	if (distant <= further && realDistance(corner.getX(), corner.getY(),
+										   corner.getX(),
+										   horizonAt(corner.getX())) <
+		GREEN_PAD_X * 1.5 && horizonAt(corner.getX() > 15)) {
 		if (diff < FIELD_WHITE_HEIGHT / 2) {
 			if (POSTLOGIC) {
 				cout << "Field corner" << endl;
 			}
-			if (x > post.getLeft()) {
-				return RIGHT;
-			} else {
-				return LEFT;
+			if (corner.getDistance() < 200) {
+				if (corner.doesItPointLeft()) {
+					return LEFT;
+				} else {
+					return RIGHT;
+				}
 			}
 		}
 	}
@@ -1465,7 +1480,7 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 			}
 			cout << "Distances: " << diff << " " << e.dist << endl;
 		}
-		if (x <= post.getLeftBottomX()) {
+		/*if (x <= post.getLeftBottomX()) {
 			if (right) {
 				return cornerClassifier(diff, e.dist,
 										post.getLeftBottomX(),
@@ -1489,7 +1504,7 @@ int ObjectFragments::classifyByInnerL(Blob post, VisualCorner & corner) {
 										post.getRightBottomY(), RIGHT,
 										LEFT, true);
 			}
-		}
+			}*/
 	}
 	return NOPOST;
 }
@@ -1520,8 +1535,8 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 	}
 	if (abs(corner.getOrientation()) < 90) {
 		int classification = NOPOST;
-		if (l1 > l2 && l1 > GOALBOX_DEPTH + 20.0f) {
-			if (endl1.y < end2.y) {
+		if (l1 > l2 && l1 > GOALBOX_DEPTH + 40.0f) {
+			if (endl1.y < endl2.y) {
 				if (endl1.x > post.getRight()) {
 					classification = RIGHT;
 				} else {
@@ -1532,7 +1547,7 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 			} else {
 				classification = LEFT;
 			}
-		} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 20.0f) {
+		} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 40.0f) {
 			if (end1.y < end2.y) {
 				if (end1.x > post.getRight()) {
 					classification =  RIGHT;
@@ -1548,7 +1563,7 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 		if (dist > CROSSBAR_CM_WIDTH + 20.0f) {
 			if (classification == RIGHT) {
 				return LEFT;
-			} else {
+			} else  if (classification == LEFT) {
 				return RIGHT;
 			}
 		} else if (dist >  GOALBOX_DEPTH * 1.5) {

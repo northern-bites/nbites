@@ -29,8 +29,17 @@ class SoccerFSA(FSA.FSA):
         self.inKickingState = False
         self.saveBallPosition()
 
+        # Penalty kick player variables
+        self.penaltyKicking = False
+        self.penaltyMadeFirstKick = True
+        self.penaltyMadeSecondKick = False
+
+        # Kickoff kick
+        self.hasKickedOff = True
+
     def run(self):
-        # gamePenalized is a good time for a lot of i/o, since we won't be moving
+        # gamePenalized is a good time for a lot of i/o, since we
+        # won't be moving
         if self.currentState == 'gamePenalized' or \
                self.currentState == 'gameFinished':
             if not self.wroteVarianceData:
@@ -74,14 +83,21 @@ class SoccerFSA(FSA.FSA):
         """
         self.brain.nav.setDest(x, y, theta)
 
-    def standup(self):
-        self.brain.nav.stop()
+    def setSteps(self, x, y, theta, numSteps=1):
+        """
+        Have the robot walk a specified number of steps
+        """
+        if self.brain.motion.isWalkActive():
+            return False
+        else:
+            self.brain.nav.takeSteps(x, y, theta, numSteps)
+            return True
 
     def walkPose(self):
         """
         we return to std walk pose when we stop walking
         """
-        self.brain.nav.stop()
+        self.brain.motion.walkPose()
 
     def stopWalking(self):
         """

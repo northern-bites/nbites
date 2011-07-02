@@ -84,6 +84,7 @@ public:
     void sendMotionCommand(const UnfreezeCommand::ptr command);
     void sendMotionCommand(const StepCommand::ptr command);
     void sendMotionCommand(const DestinationCommand::ptr command);
+    void walkPose();
 
 public:
     void stopHeadMoves(){headProvider.requestStop();}
@@ -147,6 +148,7 @@ private:
 
     int frameCount;
     bool running;
+    bool shouldWalkPose;
     mutable bool newJoints; //Way to track if we ever use the same joints twice
 
     bool readyToSend;

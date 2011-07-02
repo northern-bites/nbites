@@ -64,6 +64,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if (gcState == 'gamePlaying'):
             roleState = self.getNextState()
 
+            if roleState != self.currentState:
+                self.switchTo(roleState)
+
         # Goalie Penalty Kicking
         if (gcState == 'penaltyShotsGamePlaying'
                  and self.play.isRole(PBConstants.GOALIE)):
