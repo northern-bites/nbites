@@ -67,12 +67,10 @@ def afterKick(player):
     if transitions.shouldKickAgain(player):
         player.brain.nav.justKicked = False
         return player.goNow('positionForKick')
-    if transitions.shouldFindBallKick(player):
-        player.inKickingState = False
-        player.brain.nav.justKicked = False
-        return player.goLater('findBall')
+
     if ((player.counter > 1 and player.brain.nav.isStopped()) or
-        transitions.shouldChaseBall(player)):
+        transitions.shouldChaseBall(player) or
+        transitions.shouldFindBallKick(player)):
         player.inKickingState = False
         player.brain.nav.justKicked = False
         return player.goNow('chase')

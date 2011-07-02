@@ -67,7 +67,7 @@ def positionForKick(player):
 
     if transitions.shouldFindBallKick(player):
         player.inKickingState = False
-        return player.goLater('findBall')
+        return player.goLater('chase')
 
     return player.stay()
 
@@ -79,12 +79,7 @@ def orbitBall(player):
         player.brain.nav.orbitAngle(45) # TODO HACK HACK
         player.brain.tracker.bounceHead()
 
-    if transitions.shouldFindBall(player):
-        player.inKickingState = False
-        player.shouldOrbit = False
-        return player.goLater('findBall')
-
-    elif player.brain.nav.isStopped():
+    if transitions.shouldFindBall(player) or player.brain.nav.isStopped():
         player.inKickingState = False
         player.shouldOrbit = False
         player.brain.tracker.trackBall()
@@ -106,10 +101,8 @@ def approachDangerousBall(player):
         else:
             player.brain.nav.walk(0, 15, 0)
 
-    if not goalTran.dangerousBall(player):
+    if not goalTran.dangerousBall(player) or transitions.shouldFindBall(player):
         return player.goLater('chase')
-    if transitions.shouldFindBall(player):
-        return player.goLater('findBall')
 
     return player.stay()
 

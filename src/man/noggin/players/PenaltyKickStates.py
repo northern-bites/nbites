@@ -22,7 +22,7 @@ def penaltyKickRelocalize(player):
     if my.locScore == NogginConstants.locScore.BAD_LOC and \
             player.counter < PENALTY_RELOCALIZE_FRAMES:
         return player.stay()
-    return player.goLater('findBall')
+    return player.goLater('chase')
 
 def penaltyBallInOppGoalbox(player):
     """
