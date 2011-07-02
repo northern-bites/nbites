@@ -82,6 +82,30 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("uncertY", &MyInfo::getYUncert)
         .add_property("uncertH", &MyInfo::getHUncert)
         ;
+
+    class_<LocBall, bases<LocObject> >("LocBall", init<PyLoc&, MyInfo&>())
+        .add_property("uncertX", &LocBall::getXUncert)
+        .add_property("uncertY", &LocBall::getYUncert)
+        .add_property("sd", &LocBall::getSD)
+        .add_property("velX", &LocBall::getVelX)
+        .add_property("velY", &LocBall::getVelY)
+        .add_property("uncertVelX", &LocBall::getVelXUncert)
+        .add_property("uncertVelY", &LocBall::getVelYUncert)
+        .add_property("heading", &LocBall::getHeading)
+        .add_property("relX", &LocBall::getRelX)
+        .add_property("relY", &LocBall::getRelY)
+        .add_property("relVelX", &LocBall::getRelVelX)
+        .add_property("relVelY", &LocBall::getRelVelY)
+        .add_property("accX", &LocBall::getAccX)
+        .add_property("accy", &LocBall::getAccY)
+        .add_property("dx", &LocBall::dX)
+        .add_property("dy", &LocBall::dY)
+        .add_property("endY", &LocBall::getEndY)
+        .add_property("uncertAccX", &LocBall::getAccXUncert)
+        .add_property("uncertAccY", &LocBall::getAccYUncert)
+        .add_property("relAccX", &LocBall::getRelAccX)
+        .add_property("relAccY", &LocBall::getRelAccY)
+        ;
 }
 
 void c_init_objects() {
