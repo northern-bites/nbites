@@ -39,10 +39,6 @@ def shouldSaveRight(player):
     ball= player.brain.ball
     my = player.brain.my
 
-    if ((my.y - NogCon.LANDMARK_MY_GOAL_RIGHT_POST_Y) <
-        goalCon.CENTER_SAVE_THRESH):
-        return False
-
     return(ball.endY < -goalCon.CENTER_SAVE_THRESH
            and ball.endY > -goalCon.DONT_SAVE_LIMIT
            and goalieInBox(player))
@@ -51,13 +47,9 @@ def shouldSaveLeft(player):
     ball= player.brain.ball
     my = player.brain.my
 
-    if ((NogCon.LANDMARK_MY_GOAL_LEFT_POST_Y - my.y) <
-        goalCon.CENTER_SAVE_THRESH):
-        return False
-    else:
-        return (ball.endY > goalCon.CENTER_SAVE_THRESH
-                and ball.endY < goalCon.DONT_SAVE_LIMIT
-                and goalieInBox(player))
+    return (ball.endY > goalCon.CENTER_SAVE_THRESH
+            and ball.endY < goalCon.DONT_SAVE_LIMIT
+            and goalieInBox(player))
 
 # Not used
 def shouldSaveCenter(player):
