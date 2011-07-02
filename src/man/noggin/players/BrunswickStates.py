@@ -15,7 +15,6 @@ def gameInitial(player):
         player.inKickingState = False
         player.stopWalking()
         player.gainsOn()
-        player.walkPose()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
 

@@ -7,8 +7,9 @@ def findBall(player):
     """
     State to stop all activity and begin finding the ball
     """
-    player.stopWalking()
-    player.brain.tracker.stopHeadMoves()
+    if player.firstFrame():
+        player.stopWalking()
+        player.brain.tracker.stopHeadMoves()
 
     if player.brain.nav.isStopped():
         return player.goLater('scanFindBall')
