@@ -47,6 +47,7 @@ def activeTracking(tracker):
     if tracker.firstFrame():
         tracker.activeLocOn = True
 
+        #this doesn't actually work. temporary.
     if tracker.target.hasattr("locDist"):
         if tracker.target.locDist < constants.MAX_ACTIVE_TRACKING_DIST and \
                 tracker.target.vis.framesOn > 2:
