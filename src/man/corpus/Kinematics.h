@@ -73,6 +73,7 @@ namespace Kinematics {
         R_ELBOW_YAW,
         R_ELBOW_ROLL
     };
+
     static const unsigned int FIRST_HEAD_JOINT = HEAD_YAW;
 
     static const unsigned int HEAD_JOINTS = 2;
