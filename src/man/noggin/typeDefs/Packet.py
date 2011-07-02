@@ -1,4 +1,4 @@
-from ..NogginConstants import NUM_PACKET_ELEMENTS
+from noggin_constants import NUM_PACKET_ELEMENTS
 
 class Packet:
     """

@@ -1,8 +1,8 @@
 """
 File to hold all of the cross field constants for the cooperative behavior system
 """
-from .. import NogginConstants
-from ..typeDefs.Location import Location
+import noggin_constants as NogginConstants
+from objects import Location
 from math import pi
 
 # Test switches to force one role to always be given out

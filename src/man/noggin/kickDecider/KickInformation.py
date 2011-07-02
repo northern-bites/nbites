@@ -1,5 +1,5 @@
 import KickingConstants as constants
-from .. import NogginConstants
+import vision
 
 class KickInformation:
     """
@@ -64,29 +64,41 @@ class KickInformation:
         """
         self.haveData = True
 
-        if self.brain.myGoalLeftPost.on:
-            if self.brain.myGoalLeftPost.certainty == NogginConstants.SURE:
+        if self.brain.myGoalLeftPost.vis.on:
+            if self.brain.myGoalLeftPost.vis.certainty ==\
+                    vision.certainty._SURE:
                 self.sawOwnGoal = True
-                self.myGoalLeftPostBearings.append(self.brain.myGoalLeftPost.visBearing)
-                self.myGoalLeftPostDists.append(self.brain.myGoalLeftPost.visDist)
+                self.myGoalLeftPostBearings.\
+                    append(self.brain.myGoalLeftPost.vis.bearing)
+                self.myGoalLeftPostDists.\
+                    append(self.brain.myGoalLeftPost.vis.dist)
 
-        if self.brain.myGoalRightPost.on:
-            if self.brain.myGoalRightPost.certainty == NogginConstants.SURE:
+        if self.brain.myGoalRightPost.vis.on:
+            if self.brain.myGoalRightPost.vis.certainty ==\
+                    vision.certainty._SURE:
                 self.sawOwnGoal = True
-                self.myGoalRightPostBearings.append(self.brain.myGoalRightPost.visBearing)
-                self.myGoalRightPostDists.append(self.brain.myGoalRightPost.visDist)
+                self.myGoalRightPostBearings.append\
+                    (self.brain.myGoalRightPost.vis.bearing)
+                self.myGoalRightPostDists.append\
+                    (self.brain.myGoalRightPost.vis.dist)
 
-        if self.brain.oppGoalLeftPost.on:
-            if self.brain.oppGoalLeftPost.certainty == NogginConstants.SURE:
+        if self.brain.oppGoalLeftPost.vis.on:
+            if self.brain.oppGoalLeftPost.vis.certainty ==\
+                    vision.certainty._SURE:
                 self.sawOppGoal = True
-                self.oppGoalLeftPostBearings.append(self.brain.oppGoalLeftPost.visBearing)
-                self.oppGoalLeftPostDists.append(self.brain.oppGoalLeftPost.visDist)
+                self.oppGoalLeftPostBearings.append\
+                    (self.brain.oppGoalLeftPost.vis.bearing)
+                self.oppGoalLeftPostDists.append\
+                    (self.brain.oppGoalLeftPost.vis.dist)
 
-        if self.brain.oppGoalRightPost.on:
-            if self.brain.oppGoalRightPost.certainty == NogginConstants.SURE:
+        if self.brain.oppGoalRightPost.vis.on:
+            if self.brain.oppGoalRightPost.vis.certainty == \
+                    vision.certainty._SURE:
                 self.sawOppGoal = True
-                self.oppGoalRightPostBearings.append(self.brain.oppGoalRightPost.visBearing)
-                self.oppGoalRightPostDists.append(self.brain.oppGoalRightPost.visDist)
+                self.oppGoalRightPostBearings.append\
+                    (self.brain.oppGoalRightPost.vis.bearing)
+                self.oppGoalRightPostDists.append\
+                    (self.brain.oppGoalRightPost.vis.dist)
 
     def calculateDataAverages(self):
         """

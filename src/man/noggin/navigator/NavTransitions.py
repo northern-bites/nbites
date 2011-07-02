@@ -1,18 +1,13 @@
 from math import fabs, sqrt
 from . import NavConstants as constants
 from man.noggin.util import MyMath
-from man.noggin import NogginConstants
+import noggin_constants as NogginConstants
 
 def atDestinationCloser(my, dest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
 
     """
-    #diffX = fabs(dest.x - my.x)
-    #diffY = fabs(dest.y - my.y)
-
-    #return diffX < my.uncertX and diffY < my.uncertY
-
     return my.distTo(dest) < (constants.CLOSER_XY +
                               sqrt(my.uncertX**2. +
                                    my.uncertY**2.))

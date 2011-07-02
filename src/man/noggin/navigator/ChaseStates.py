@@ -3,10 +3,9 @@ from . import WalkHelper as walker
 from . import NavTransitions as navTrans
 from . import NavConstants as constants
 from man.noggin.util import MyMath
-from man.noggin.typeDefs.Location import RobotLocation
-from man.noggin.typeDefs.Location import RelLocation
+from objects import (RobotLocation, RelLocation)
 
-from man.noggin import NogginConstants
+import noggin_constants as NogginConstants
 from man.noggin.playbook.PBConstants import GOALIE
 from math import fabs
 
@@ -43,7 +42,7 @@ def crossoverTowardsBall(nav):
                                               nonRelDest,
                                               ball.bearing) or
         (abs(ball.bearing) < 20)
-        and ball.on):
+        and ball.vis.on):
         return nav.goLater('walkSpinToBall')
 
     if not nav.brain.play.isRole(GOALIE):
@@ -91,7 +90,8 @@ def chaseAroundBox(nav):
 
     if nav.firstFrame():
         # reset dest to new RobotLocation to avoid problems w/dist calculations
-        nav.dest = RobotLocation()
+
+        nav.dest = RobotLocation(0, 0, 0)
         nav.stopChaseAroundBox = 0
 
     ball = nav.brain.ball
