@@ -661,7 +661,7 @@ GOOGZ_LEFT_SIDE_KICK = (
      (0.,-22.,-70.,25.,31.,0.),
      (0.,15.,-38.,76.,-40.,-22.),
      (90.,-10.,50.,70.),
-     .15, 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     .2, 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     # start recover
     ((80.,0.,-50.,-70.),

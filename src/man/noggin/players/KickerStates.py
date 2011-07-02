@@ -43,11 +43,19 @@ def standup(player):
     return player.stay()
 
 def kickStraight(player):
+    printLoc = False
     if player.firstFrame():
+        player.brain.tracker.trackBall()
+        printLoc = True
+    if printLoc:
+        print player.brain.ball.relX
+        print player.brain.ball.relY
 
+    if player.counter == 30:
+        printLoc = False
         player.executeMove(SweetMoves.GOOGZ_LEFT_SIDE_KICK)
 
-    if player.counter == 50:
+    if player.counter == 80:
         return player.goLater('done')
     return player.stay()
 

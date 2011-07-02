@@ -19,8 +19,12 @@ class Kick(object):
         return ("x_offset: %g y_offset: %g heading: %g" %
                 (self.x_offset, self.y_offset, self.heading))
 # Some standard kicks. x,y and move should not be modified, h will be
-LEFT_SIDE_KICK =  Kick(x = 12, y =  5, move=SweetMoves.GOOGZ_LEFT_SIDE_KICK)
-RIGHT_SIDE_KICK = Kick(x = 12, y = -5, move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
+
+#The sweet spot needs testing once the approach ball is fixed.
+#From extensve testing in pKicker and with printlines of the balls
+#relX and relY, this appears accurate
+LEFT_SIDE_KICK =  Kick(x = 12, y =  .5, move=SweetMoves.GOOGZ_LEFT_SIDE_KICK)
+RIGHT_SIDE_KICK = Kick(x = 12, y = -.5, move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
 
 RIGHT_DYNAMIC_STRAIGHT_KICK = Kick(y = -8, move=SweetMoves.DREW_KICK)
 LEFT_DYNAMIC_STRAIGHT_KICK =  Kick(y =  8, move=SweetMoves.DREW_KICK)
@@ -36,7 +40,6 @@ LEFT_SHORT_BACK_KICK =  Kick(x = 12.5, y =  6.5,
                              move=SweetMoves.LEFT_SHORT_BACK_KICK)
 RIGHT_SHORT_BACK_KICK = Kick(x = 12.5, y = -6.5,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
-
 
 SHORT_QUICK_LEFT_KICK =  Kick(x = 12.75, y = 6.5,
                               move = SweetMoves.SHORT_QUICK_LEFT_KICK)
