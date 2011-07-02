@@ -16,7 +16,6 @@ class Navigator(FSA.FSA):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.addStates(NavStates)
-        self.addStates(PlaybookPositionStates)
         self.addStates(ChaseStates)
         self.addStates(PFKStates)
         self.currentState = 'stopped'
