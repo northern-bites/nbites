@@ -351,10 +351,12 @@ def positionForKick(nav):
 
         nav.newDestination = True
 
+        """
         print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
               .format(ball.relX, ball.relY, ball.bearing)
         print 'Set new PFK destination of ({0}, {1}, {2}, gain={3})' \
               .format(nav.destX, nav.destY, nav.destTheta, nav.destGain)
+        """
 
         nav.brain.speech.say("New destination")
 

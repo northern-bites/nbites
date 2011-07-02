@@ -42,7 +42,7 @@ using namespace NBMath;
 //#define DEBUG_ZMP
 //#define DEBUG_ZMP_REF
 //#define DEBUG_COM_TRANSFORMS
-#define DEBUG_DESTINATION
+//#define DEBUG_DESTINATION
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s,
                              shared_ptr<NaoPose> p,
