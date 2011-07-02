@@ -91,7 +91,7 @@ def shouldStopChase(team):
     ball= team.brain.ball
     my = team.brain.my
 
-    if(ball.framesOff > goalCon.BALL_LOST):
+    if(ball.vis.framesOff > goalCon.BALL_LOST):
         team.resetGoalieRoleCounters()
         return True
 
@@ -105,8 +105,7 @@ def shouldStopChase(team):
             return True
 
     elif (ball.x > goalCon.CHASE_RIGHT_X_LIMIT
-        or ball.relX > goalCon.STOP_CHASE_RELX_BUFFER
-        ):
+        or ball.relX > goalCon.STOP_CHASE_RELX_BUFFER):
         team.shouldStopChaseCounter += 1
 
     if team.shouldStopChaseCounter > goalCon.CHANGE_THRESH:
