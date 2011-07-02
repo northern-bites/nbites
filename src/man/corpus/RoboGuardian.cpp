@@ -13,13 +13,9 @@ using namespace std;
 #include "guardian/SoundPaths.h"
 #include "Profiler.h"
 
-//#define DEBUG_GUARDIAN_CLICKS
-//check for a connection once in 20 secs
-//the connection checking takes ~ 200 us if a connection is present
-//TODO: make this a static variable
-#define CONNECTION_CHECK_RATE 20*RoboGuardian::GUARDIAN_FRAME_RATE
-
 const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
+//check the wifi connection every 10 seconds
+const int RoboGuardian::CONNECTION_CHECK_RATE = 10*RoboGuardian::GUARDIAN_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
 const int RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1 * 1000 * 1000 /
     RoboGuardian::GUARDIAN_FRAME_RATE;
@@ -55,9 +51,6 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
       leftFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
       rightFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
       frameCount(0),
-      // buttonOnCounter(0),buttonOffCounter(0),
-      //       lastButtonOnCounter(0),lastButtonOffCounter(0),
-      //       buttonClicks(0),
       lastInertial(sensors->getInertial()), fallingFrames(0),
       notFallingFrames(0),fallenCounter(0),
       groundOnCounter(0),groundOffCounter(0),
@@ -84,7 +77,6 @@ void RoboGuardian::run(){
     struct timespec interval, remainder;
     interval.tv_sec = 0;
     interval.tv_nsec = static_cast<long long int> (GUARDIAN_FRAME_LENGTH_uS * 1000);
-    int connectionCheckCount = 0;
     while(Thread::running){
         // @TODO: Thread safe?
         PROF_ENTER(P_ROBOGUARDIAN);
@@ -439,7 +431,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         enableGains();
         break;
     case 7:
-        wifiAngel.try_to_reconnect();
+        wifiAngel.reset_hard();
         break;
     case 9:
         //Easter EGG!

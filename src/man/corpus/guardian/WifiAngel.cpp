@@ -3,7 +3,6 @@
 
 #include <stdio.h> //printf()
 #include <cstdlib> //system()
-#include <cstring> //strcat()
 
 #include "SoundPaths.h"
 
@@ -13,36 +12,46 @@ namespace guardian {
 
 using std::string;
 using namespace sound_paths;
+using namespace conn_consts;
 
-WifiAngel::WifiAngel(string connection_name,
-        int wifi_reconnects_max) :
-        connection_name(connection_name),
-        wifi_reconnects_max(wifi_reconnects_max),
+WifiAngel::WifiAngel(string connection_name, string connection_pswd) :
+        connection_name(connection_name), connection_pswd(connection_pswd),
+        frames_with_no_wifi(0),
         wifi_reconnect_attempts(0) {
 }
 
 bool WifiAngel::check_on_wifi() {
     if (this->connected()) {
         wifi_reconnect_attempts = 0;
+        frames_with_no_wifi = 0;
         return true;
     } else {
-        if (wifi_reconnect_attempts < wifi_reconnects_max) {
-            wifi_reconnect_attempts++;
-            this->try_to_reconnect();
+        frames_with_no_wifi++;
+        switch (frames_with_no_wifi) {
+        case WIFI_SOFT_RESET_THRESHOLD :
+            reset_soft();
+            break;
+        case WIFI_HARD_RESET_THRESHOLD :
+#ifndef NO_WIFI_RESET_HARD
+            reset_hard();
+#else
+            reset_soft();
+#endif
+            break;
+        default:
+            break;
         }
-        return false;
     }
+    return false;
 }
 
-//TODO: this returns false always - is there a way to check if we're successful?
 //TODO: #FunProject not essential, but it could be a fun little project to
 //use the dbus to communicate with connman
 //that will make it faster, and also give us more control over our connection
-//TODO: make a more hardcore version that kills wpa_supplicant and maybe even connman
 //Octavian
-bool WifiAngel::try_to_reconnect() {
+bool WifiAngel::reset_soft() {
 
-    printf("Attempting to reconnect to wifi\n");
+    printf("Attempting to do a soft reset of wifi\n");
 
     FILE * f3 = popen(("connman services | awk '/" + connection_name +
                       "/ {print $4}'").c_str(), "r");
@@ -51,18 +60,50 @@ bool WifiAngel::try_to_reconnect() {
     pclose(f3);
 
     if (service[0] != ' ') {
+        std::string connman_service(service);
         //TODO: make this a call to roboguardian
         system((sout+wifi_restart_wav+" &").c_str());
-        char command[100] = "";
-        strcat(command, "su -c \" connman connect ");
-        strcat(command, service);
-        strcat(command, " \" & ");
-        system(command);
+        system(("su -c \" connman connect " + connman_service + " \" & ").c_str());
+        printf(("su -c \" connman connect " + connman_service + " \" & ").c_str());
+        return true;
     } else {
         printf("Couldn't find specified wifi network to reconnect to\n");
+        return false;
     }
+}
 
-    return false;
+bool WifiAngel::reset_hard() {
+    printf("Attempting to do a hard reset of wifi\n");
+
+    system("su -c /etc/init.d/wireless restart");
+    system("su -c /etc/init.d/connman restart");
+    system("su -c connman scan");
+    FILE * f3 = popen(("connman services | awk '/" + connection_name +
+            "/ {print $3}'").c_str(), "r");
+    char service[100] = "";
+    fscanf(f3,"%s\n", service);
+    pclose(f3);
+
+    if (service[0] != ' ') {
+        std::string connman_service(service);
+        //TODO: make this a call to roboguardian
+        system((sout+wifi_restart_wav+" &").c_str());
+        system(("su -c \" connman passphrase " + connman_service +
+                " " + connection_pswd + "\"").c_str());
+        printf(("su -c \" connman passphrase " + connman_service +
+                " " + connection_pswd + "\"").c_str());
+        system(("su -c \" connman autoconnect " + connman_service +
+                " true" + "\"").c_str());
+        printf(("su -c \" connman autoconnect " + connman_service +
+                        " true" + "\"").c_str());
+        system(("su -c \" connman connect " + connman_service + "\" &").c_str());
+        printf(("su -c \" connman connect " + connman_service + "\" &").c_str());
+
+        return true;
+    } else {
+        printf("Couldn't find specified wifi network to reconnect to\n");
+        return false;
+    }
 }
 
 }
