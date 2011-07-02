@@ -423,15 +423,12 @@ class GoTeam:
         # TODO: When ball information is better make this inMyGoalBox
         if ball.x < (NogginConstants.MY_GOALBOX_RIGHT_X + 10):
             self.willBeIllegalD += 1
-            print "ball in box and ball.x is" + str(ball.x)
             if self.willBeIllegalD > PBConstants.DONT_ILLEGAL_D_THRESH:
-                print "should be using dubD cuz illegalD"
                 self.brain.player.inKickingState = False
                 self.stopAvoidingBox = 0
                 return True
         elif ball.vis.on:
             self.stopAvoidingBox += 1
-            print "ball not in box and ball.x is" + str(ball.x)
             if self.stopAvoidingBox > PBConstants.STOP_AVOID_BOX_THRESH:
                 self.willBeIllegalD = 0
 
