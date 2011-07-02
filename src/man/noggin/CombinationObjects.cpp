@@ -65,7 +65,6 @@ namespace noggin {
 
     const bool Location::inMyGoalBox()
     {
-        std::cout << (MY_GOALBOX_RIGHT_X + BOX_BUFFER) << std::endl;
         return ( x < (MY_GOALBOX_RIGHT_X + BOX_BUFFER) &&
                  (MY_GOALBOX_TOP_Y + BOX_BUFFER) > y &&
                  y > (OPP_GOALBOX_BOTTOM_Y - BOX_BUFFER));
