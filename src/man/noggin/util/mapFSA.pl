@@ -180,7 +180,7 @@ sub findFile ($) {
     my $behavior = shift;
     our $behaviorFile = $behavior . '.py';
 
-    my $dir = $ENV{'PWD'};
+    my $dir = $ENV{'NBITES_DIR'};
 
     # `find ./ -name $behaviorFile"
     sub matchesName {
