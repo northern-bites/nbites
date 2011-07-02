@@ -34,13 +34,12 @@ def positionForKick(player):
         player.saveBallPosition()
 
         if player.brain.ball.dist > constants.BALL_SET_DEST_CUTOFF:
-            player.brain.speech.say("Speed walking")
             player.brain.nav.chaseBall()
 
-            if player.brain.ball.vis.framesOn > 20:
+            #if player.brain.ball.vis.framesOn > 20:
                 #player.brain.tracker.kickDecideScan()
                 #else:
-                player.brain.tracker.trackBall()
+            player.brain.tracker.trackBall()
 
         else:
             player.brain.kickDecider.decideKick()
@@ -50,13 +49,6 @@ def positionForKick(player):
             player.brain.tracker.trackBall()
             player.brain.nav.kickPosition(kick)
 
-    if transitions.shouldKick(player):
-        if transitions.shouldOrbit(player):
-            print "Don't have a kick, orbitting"
-            return player.goNow('orbitBall')
-        else:
-            return player.goNow('kickBallExecute')
-
     # most of the time going to chase will kick back to here, lets us reset
     if (transitions.ballTooFar(player) or
         transitions.shouldSwitchPFKModes(player) or
@@ -64,6 +56,13 @@ def positionForKick(player):
 
         player.inKickingState = False
         return player.goLater('chase')
+
+    if transitions.shouldKick(player):
+        if transitions.shouldOrbit(player):
+            print "Don't have a kick, orbitting"
+            return player.goNow('orbitBall')
+        else:
+            return player.goNow('kickBallExecute')
 
     return player.stay()
 

@@ -335,7 +335,7 @@ def positionForKick(nav):
     # we've either just started, or are close to our last destination
     # tell the robot where to go!
     if nav.firstFrame():
-        nav.destX = ball.relX - nav.kick.x_offset -2 # HACK!!!
+        nav.destX = ball.relX - nav.kick.x_offset -4 # HACK!!!
         nav.destY = ball.relY - nav.kick.y_offset
 
         nav.destTheta = ball.bearing

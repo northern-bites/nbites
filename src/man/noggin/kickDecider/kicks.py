@@ -44,9 +44,9 @@ RIGHT_LONG_BACK_KICK = Kick("R_LongBack", x = 12.5, y = -6.5, move=SweetMoves.RI
 LEFT_SHORT_BACK_KICK =  Kick("L_ShortBack", x = 12.5, y =  6.5, move=SweetMoves.LEFT_SHORT_BACK_KICK)
 RIGHT_SHORT_BACK_KICK = Kick("R_ShortBack", x = 12.5, y = -6.5, move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
-SHORT_QUICK_LEFT_KICK =  Kick("L_ShortStraight", x = DEFAULT_KICK_X_OFFSET, y = 5,
+SHORT_QUICK_LEFT_KICK =  Kick("L_ShortStraight", x = DEFAULT_KICK_X_OFFSET -5, y = 5,
                               move = SweetMoves.SHORT_QUICK_LEFT_KICK)
-SHORT_QUICK_RIGHT_KICK =  Kick("R_ShortStraight", x = DEFAULT_KICK_X_OFFSET, y = -5,
+SHORT_QUICK_RIGHT_KICK =  Kick("R_ShortStraight", x = DEFAULT_KICK_X_OFFSET -5, y = -5,
                                move = SweetMoves.SHORT_QUICK_RIGHT_KICK)
 
 #*****************#

@@ -76,7 +76,7 @@ def shouldSwitchPFKModes(player):
     # using setSpeed
     if player.brain.nav.currentState == 'goToPosition':
         # forces the vector to update in case the ball moved
-        if player.counter() > constants.BALL_APPROACH_REFRESH_FRAMES:
+        if player.counter > constants.BALL_APPROACH_REFRESH_FRAMES:
             return True
 
         return ball.dist <= constants.BALL_SET_DEST_CUTOFF
