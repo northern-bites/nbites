@@ -220,9 +220,56 @@ namespace noggin {
 
 //////////// LocBall Methods //////////////////
 
-    LocBall::LocBall(PyLoc& pl)
-        : LocObject(pl)
+    LocBall::LocBall(PyLoc& pl, MyInfo& _my)
+        : LocObject(pl), my(&_my)
     {
+    }
+
+    const float LocBall::getVelX()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return loc->getBallXVelocityEst();
+        else return -(loc->getBallXVelocityEst());
+    }
+
+    const float LocBall::getVelY()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return loc->getBallYVelocityEst();
+        else return -(loc->getBallYVelocityEst());
+    }
+
+    const float LocBall::getAccX()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return loc->getBallXAccelerationEst();
+        else return -(loc->getBallXAccelerationEst());
+    }
+
+    const float LocBall::getAccY()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return loc->getBallYAccelerationEst();
+        else return -(loc->getBallYAccelerationEst());
+    }
+
+    const degrees LocBall::getHeading()
+    {
+        return (NBMath::safe_atan2((loc->getBallYEst()-loc->getYEst()),
+                                   (loc->getBallXEst()-loc->getXEst())))*TO_DEG;
+    }
+
+    // Copies x and y values to comply with the location interface. 
+    void LocBall::update()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE) {
+            x = loc->getBallXEst();
+            y = loc->getBallYEst();
+        }
+        else {
+            x = FIELD_GREEN_WIDTH - loc->getBallXEst();
+            y = FIELD_GREEN_HEIGHT - loc->getBallYEst();
+        }
     }
 
 /////////// MyInfo Methods /////////////////

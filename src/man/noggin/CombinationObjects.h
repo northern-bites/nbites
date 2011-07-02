@@ -183,14 +183,41 @@ namespace noggin {
 
     /*
      * LOC BALL
-     * A loc object specialized to get all of the ball's loc values.
+     * A loc object specialized to get all of the ball's loc values. Also needs
+     * a pointer to MyInfo to make position, velocity, acceleration values
+     * relative to the correct team.
      */
 
     class LocBall : public LocObject
     {
     public:
-        LocBall(PyLoc&);
+        LocBall(PyLoc&, MyInfo&);
 
+        //Loc getters
+        const float getXUncert() { return loc->getBallXUncert(); }
+        const float getYUncert() { return loc-> getBallYUncert(); }
+        const float getSD() { return getXUncert()*getYUncert(); }
+        const float getVelX();
+        const float getVelY();
+        const float getVelXUncert() { return loc->getXVelocityUncert(); }
+        const float getVelYUncert() { return loc->getYVelocityUncert(); }
+        const degrees getHeading();
+        const float getRelX() { return loc->getBallRelXEst(); }
+        const float getRelY() { return loc->getBallRelYEst(); }
+        const float getRelVelX() { return loc->getRelXVelocityEst(); }
+        const float getRelVelY() { return loc->getRelYVelocityEst(); }
+        const float getAccX();
+        const float getAccY();
+        const float getAccXUncert() { return loc->getXAccelerationUncert(); }
+        const float getAccYUncert() { return loc->getYAccelerationUncert(); }
+        const float getRelAccX() { return loc->getRelXAccelerationUncert(); }
+        const float getRelAccY() { return loc->getRelYAccelerationUncert(); }
+
+        // Other
+        void update();
+
+    private:
+        MyInfo* my;
     };
 
     /*
