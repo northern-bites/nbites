@@ -113,7 +113,7 @@ sub readBehavior {
           }
 
           # this line defines a function, set state variables accordingly
-	  # don't use elsif here incase eof is in one of the lines already found
+          # don't use elsif here incase eof is in one of the lines already found
           if (/def\ (\w+)/ || eof) {
               # we were already parsing a function, it must have ended
               # currentFunction is a state? if so add its transitions
@@ -121,15 +121,17 @@ sub readBehavior {
               if ($currentFunction && $found_legal_return)  {
                   # add the transitions
                   foreach my $transition (@currentTransitions) {
-                      uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}}, $transition);
+                      uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}},
+                                $transition);
                   }
 
-		  # clear the transitions so we don't add them in wrong places
-		  @currentTransitions = ();
+                  # clear the transitions so we don't add them in wrong places
+                  @currentTransitions = ();
 
                   # and note if the state contains a loop
                   if ($current_can_loop) {
-                      push @{$stateFiles{$currentBehavior}{$currentFunction}}, "player.stay()";
+                      uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}},
+                                ($currentFunction . $nowChar));
                       $current_can_loop = "";
                   }
                   $found_legal_return = "";
@@ -232,19 +234,14 @@ sub buildDOT {
     foreach my $file ( keys %stateFiles ) {
         foreach my $state ( keys %{$stateFiles{$file}}) {
           TRANSITION: foreach my $toState (@{$stateFiles{$file}{$state}}) {
-              if ($toState !~ /player\.stay/) {
-                  if ($toState =~ /\*/) { # nowChar marker
-                      $toState =~ s/\*//;
-                      print DOT "$state -> $toState;\n";
-                  }
-                  else {
-                      $toState =~ s/\^//; # goLater transitions are dotted
-                      print DOT "$state -> $toState [style=\"dotted\"];\n";
-                  }
+              if ($toState =~ /\*/) { # nowChar marker
+                  $toState =~ s/\*//;
+                  print DOT "$state -> $toState;\n";
               }
-	      else { # add loops to ourselves
-		  print DOT "$state -> $state;\n";
-	      }
+              else {
+                  $toState =~ s/\^//; # goLater transitions are dotted
+                  print DOT "$state -> $toState [style=\"dotted\"];\n";
+              }
           }
         }
     }
