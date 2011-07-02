@@ -49,6 +49,8 @@ class Navigator(FSA.FSA):
         self.resetSpeedMemory()
         self.resetDestMemory()
 
+        self.destType = None
+
     def performSweetMove(self, move):
         """
         Navigator function to do the sweet move
@@ -81,10 +83,12 @@ class Navigator(FSA.FSA):
         """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
 
-        self.switchTo('playbookWalk')
+        self.destType = constants.PLAYBOOK_DEST
+        self.switchTo('goToPosition')
 
     def goTo(self,dest):
         self.dest = dest
+        self.destType = constants.GO_TO_DEST
         self.switchTo('goToPosition')
 
     def stop(self):
@@ -169,12 +173,17 @@ class Navigator(FSA.FSA):
                 fabs(self.lastSpeedY - y) < constants.STRAFE_EPSILON and
                 fabs(self.lastSpeedTheta - theta) < constants.SPIN_EPSILON)
 
-    # Update the speed values and reset the others
     def updateSpeeds(self, x, y, theta):
+        """
+        Update the speed values and reset the others
+        """
         self.lastSpeedX, self.lastSpeedY, self.lastSpeedTheta = x,y,theta
         self.resetDestMemory()
 
     def updateDests(self, x, y, theta, gain):
+        """
+        Update the last destination we were sent to
+        """
         self.lastDestX, \
             self.lastDestY, \
             self.lastDestTheta, \
@@ -182,13 +191,33 @@ class Navigator(FSA.FSA):
         self.resetSpeedMemory()
 
     def resetSpeedMemory(self):
+        """
+        Reset our idea of the last walk vector we had
+        """
         self.lastSpeedX,  \
             self.lastSpeedY,\
             self.lastSpeedTheta  = (constants.WALK_VECTOR_INIT,)*3
 
     def resetDestMemory(self):
+        """
+        Reset our idea of the last walk destination vector we had
+        """
         self.lastDestX, \
             self.lastDestY, \
             self.lastDestTheta, \
             self.lastDestGain = (constants.WALK_VECTOR_INIT,)*4
 
+
+    # Choose our next position based on our mode of locomotion:
+    #      - Playbook
+    #      - GoTo Dest
+    #      - Ball
+    def getDestination(self):
+        if self.destType is constants.PLAYBOOK_DEST:
+            return self.brain.play.getPosition()
+
+        elif self.destType is constants.GO_TO_DEST:
+            return self.dest
+
+        elif self.destType is constants.BALL:
+            return self.brain.ball

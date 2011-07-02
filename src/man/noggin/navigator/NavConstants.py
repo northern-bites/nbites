@@ -97,6 +97,12 @@ STRAFE_EPSILON = 0.1
 ### Used to initialize or reset walk vector memory
 WALK_VECTOR_INIT = -1337
 
+# Types of destinations for Navigator
+NUM_DEST_TYPES = 3
+(PLAYBOOK_DEST,
+ GO_TO_DEST,
+ BALL) = range(NUM_DEST_TYPES)
+
 
 OMNI_WALK_DIST_THRESH = 400.
 POSITION_NEAR_THRESH = CLOSER_XY

@@ -5,6 +5,7 @@ from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
+from ..objects import RobotLocation
 
 from math import fabs
 import copy
@@ -34,7 +35,7 @@ def goToPosition(nav):
         nav.atPositionCount = 0
 
     my = nav.brain.my
-    dest = nav.dest
+    dest = nav.getDestination()
 
     if (navTrans.atDestinationCloser(my, dest) and
         navTrans.atHeading(my, dest.h)):
@@ -48,8 +49,8 @@ def goToPosition(nav):
 
     # We don't want to alter the actual destination, we just want a
     # temporary destination for getting the params to walk straight at
-    tempDest = copy.copy(dest)
-    tempDest.h = my.headingTo(dest)
+    intermediateH = my.headingTo(dest)
+    tempDest = RobotLocation(dest.x, dest.y, intermediateH)
 
     walkX, walkY, walkTheta = walker.getWalkSpinParam(my, tempDest)
     helper.setSpeed(nav, walkX, walkY, walkTheta)
@@ -72,7 +73,7 @@ def omniGoTo(nav):
         nav.atPositionCount = 0
 
     my = nav.brain.my
-    dest = nav.dest
+    dest = nav.getDestination()
 
     if (navTrans.atDestinationCloser(my, dest) and
         navTrans.atHeading(my, dest.h)):
@@ -322,7 +323,7 @@ def atPosition(nav):
         nav.startOmniCount = 0
 
     my = nav.brain.my
-    dest = nav.dest
+    dest = nav.getDestination()
 
     if navTrans.atDestinationCloser(my, dest) and \
             navTrans.atHeading(my, dest.h):
