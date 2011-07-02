@@ -315,3 +315,24 @@ def bounceDown(tracker):
         return tracker.goLater('bounceUp')
     return tracker.stay()
 
+# ** # new method
+def orbitPanUp(tracker):
+    """
+    Pan head up, then back down to the ball.
+    """
+    if tracker.firstFrame():
+        tracker.helper.executeHeadMove(HeadMoves.LOOK_UP)
+    elif not tracker.brain.motion.isHeadActive():
+        return tracker.goLater('orbitPanDown')
+    return tracker.stay()
+
+def orbitPanDown(tracker):
+    """
+    Pan head down until ball is seen for several frames.
+    Then, pan head back up.
+    """
+    if tracker.firstFrame():
+        tracker.helper.executeHeadMove(HeadMoves.LOOK_DOWN)
+    if tracker.brain.ball.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        return tracker.goLater('orbitPanUp')
+    return tracker.stay()

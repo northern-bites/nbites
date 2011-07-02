@@ -197,3 +197,10 @@ class HeadTracking(FSA.FSA):
     def bounceHead(self):
         """Continually bounce head up and down."""
         self.switchTo('bounceUp')
+
+    def orbitPan(self):
+        """
+        Continually bounces head up to see goalposts, then
+        back down to see the ball.
+        """
+        self.switchTo('orbitPanUp')
