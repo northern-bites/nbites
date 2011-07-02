@@ -106,6 +106,17 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("relAccX", &LocBall::getRelAccX)
         .add_property("relAccY", &LocBall::getRelAccY)
         ;
+
+    class_<Ball, boost::noncopyable>("Ball", init<VisualBall&,
+                                     PyLoc&, MyInfo&>())
+        .add_property("vis", make_getter(&Ball::vis, return_value_policy
+                                         <reference_existing_object>()))
+        .add_property("loc", make_getter(&Ball::loc, return_value_policy
+                                         <reference_existing_object>()))
+        .add_property("dist", &Ball::getDist)
+        .add_property("bearing", &Ball::getBearing)
+        .def("update", &Ball::update)
+        ;
 }
 
 void c_init_objects() {
