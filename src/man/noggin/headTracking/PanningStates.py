@@ -241,8 +241,8 @@ MOTION_START_BUFFER = 2
 # goalieActiveLoc is set to proper value ( most likely false)
 def trianglePan(tracker):
     """
-    Execute either a left or right scan. Then, return to original
-    head angles.
+    Execute either a left or right triangle scan. Then, return to
+    original head angles.
     """
     motionAngles = tracker.brain.sensors.motionAngles
     tracker.preTriPanHeads = (

@@ -44,7 +44,7 @@ def activeTracking(tracker):
     """
     If ball is visible and close, track it via vision values.
     If ball is not visible, execute naive pans.
-    If state counter is low enough, track ball via vision values.
+    If state counter is low enough (< 45), track ball via vision values.
     If state counter is high enough, perform triangle pans
     and return to last head angles.
     """
