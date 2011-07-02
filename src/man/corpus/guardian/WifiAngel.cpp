@@ -16,13 +16,11 @@ using namespace conn_consts;
 
 WifiAngel::WifiAngel(string connection_name, string connection_pswd) :
         connection_name(connection_name), connection_pswd(connection_pswd),
-        frames_with_no_wifi(0),
-        wifi_reconnect_attempts(0) {
+        frames_with_no_wifi(0) {
 }
 
 bool WifiAngel::check_on_wifi() {
     if (this->connected()) {
-        wifi_reconnect_attempts = 0;
         frames_with_no_wifi = 0;
         return true;
     } else {
