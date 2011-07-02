@@ -285,7 +285,7 @@ def trianglePanRight(tracker):
 # ** # old method
 def trianglePanReturn(tracker):
     if tracker.firstFrame():
-        # TODO! Should be look to ball.
+        # TODO! Should be look to ball. (Wils has fix ready to push)
         tracker.helper.panTo(tracker.preTriPanHeads)
     elif (not tracker.brain.motion.isHeadActive() and
           tracker.counter > MOTION_START_BUFFER)  or \

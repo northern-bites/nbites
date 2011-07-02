@@ -78,9 +78,9 @@ class HeadTrackingHelper(object):
         pitch = motionAngles[MotionConstants.HeadPitch]
 
         # Find the target's angular distance from the center of vision
-        if not target is None and target.on:
-            yaw += target.angleX
-            pitch -= target.angleY
+        if not target is None and target.vis.on:
+            yaw += target.vis.angleX
+            pitch -= target.vis.angleY
             #note: angleY is positive up from center of vision frame
             #note: angleX is positive left from center of vision frame
         else:
@@ -100,7 +100,7 @@ class HeadTrackingHelper(object):
         """
 
         #convert from cm to mm for c++ code
-        headMove = motion.CoordHeadCommand(target.relX, target.relY, target.height,.1065*.1,.1227*.1)# arbitrary slow down for debugging
+        headMove = motion.CoordHeadCommand(target.relX, target.relY, 0,.1065*.1,.1227*.1)# arbitrary slow down for debugging (doesn't seem to do anything)
         self.tracker.brain.motion.coordHead(headMove)
 
 # ** # old method
