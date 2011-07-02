@@ -46,12 +46,12 @@ namespace noggin {
 
     const degrees Location::headingToInDeg(const Location& other)
     {
-        return (std::atan2((other.y-y), (other.x-x)))*TO_DEG;
+        return (NBMath::safe_atan2((other.y-y), (other.x-x)))*TO_DEG;
     }
 
     const radians Location::headingToInRad(const Location& other)
     {
-        return (std::atan2((other.y-y), (other.x-x)));
+        return (NBMath::safe_atan2((other.y-y), (other.x-x)));
     }
 
     // In methods check if loc is in a certain field region
@@ -135,21 +135,11 @@ namespace noggin {
 ////////// FieldObject Methods //////////////
 
     FieldObject::FieldObject(VisualFieldObject& vfo,
-                             vis_landmark id, MyInfo& _my)
-        : LocObject(), vis(&vfo), visID(id), localID(0), bearing(0), dist(0),
+                             vis_landmark id, MyInfo& _my, PyLoc& _pl)
+        : vis(&vfo), loc(new LocObject(_pl)),
+          visID(id), localID(0), bearing(0), dist(0),
           my(&_my)
     {
-    }
-
-    // Used by MyInfo, calculated from me
-    const float FieldObject::getLocDist() {
-        return my->distTo(*this, true);
-    }
-
-    // Used by MyInfo, calculated from me also
-    const degrees FieldObject::getLocBearing()
-    {
-        return my->getRelativeBearing(*this);
     }
 
     const float FieldObject::getRelX()
@@ -174,8 +164,8 @@ namespace noggin {
         else if (vis->getFramesOff() < LOST_OBJECT_FRAMES_THRESH) return;
 
         else {
-            bearing = getLocBearing()*TO_RAD;
-            dist = getLocDist();
+            bearing = loc->getBearing()*TO_RAD;
+            dist = loc->getDist();
         }
     }
 
@@ -183,15 +173,15 @@ namespace noggin {
     void FieldObject::associateWithRelativeLandmark(
         boost::python::tuple relLandmark)
     {
-        x = boost::python::extract<float>(relLandmark[0])();
-        y = boost::python::extract<float>(relLandmark[1])();
+        loc->setX(boost::python::extract<float>(relLandmark[0])());
+        loc->setY(boost::python::extract<float>(relLandmark[1])());
         localID = boost::python::extract<int>(relLandmark[2])();
     }
 
 /////////////// LocObject Methods //////////////
 
-    LocObject::LocObject()
-        : Location(0.0, 0.0), trackingFitness(0)
+    LocObject::LocObject(PyLoc& pl)
+        : Location(0.0, 0.0), loc(&pl), trackingFitness(0)
     {
     }
 
@@ -205,6 +195,27 @@ namespace noggin {
     {
         return trackingFitness > other.trackingFitness;
     }
+
+    // From me
+    const float LocObject::getDist()
+    {
+        // HACK for infinity values, shouldn't happen
+        if (isinf(loc->getXEst()) || isinf(loc->getYEst())) {
+            std::cout << "INFINITY DISTANCE" << std::endl;
+            return INFINITE_DISTANCE;
+        }
+
+        return hypotf((loc->getYEst()-y), (loc->getXEst()-x));
+    }
+
+    // From me
+    const degrees LocObject::getBearing()
+    {
+        return (NBMath::subPIAngle((NBMath::safe_atan2((loc->getYEst()-y),
+                                                       (loc->getXEst()-x)))
+                                   - loc->getHEst()))*TO_DEG;
+    }
+
 
 /////////// MyInfo Methods /////////////////
 
@@ -255,12 +266,5 @@ namespace noggin {
     {
         return std::min(getLocScoreTheta(), getLocScoreXY());
     }
-
-    const float MyInfo::distTo(FieldObject& other, bool forceCalc)
-    {
-        if (!forceCalc) return other.getDist();
-        else return Location::distTo(other);
-    }
-
 
 }

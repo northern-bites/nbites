@@ -8,11 +8,6 @@
 using namespace boost::python;
 using namespace noggin;
 
-//Overloaded function from MyInfo and its base class Location. Provides
-// with proper pointers to these functions, for use in MyInfo
-const float (MyInfo::*distTo1)(FieldObject&, bool) = &MyInfo::distTo;
-const float (MyInfo::*distTo2)(const Location&) = &Location::distTo;
-
 BOOST_PYTHON_MODULE(objects)
 {
     class_<Location>("Location", init<float, float>())
@@ -47,16 +42,16 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("relH", &RelLocation::getRelH, &RelLocation::setRelH)
         ;
 
-    class_<LocObject, bases<Location> >("LocObject")
+    class_<LocObject, bases<Location> >("LocObject", init<PyLoc&>())
         .add_property("trackingFitness", &LocObject::getTrackingFitness,
                       &LocObject::setTrackingFitness)
         .def(self < self)
         .def(self > self)
         ;
 
-    class_<FieldObject, bases<LocObject>, boost::noncopyable>
+    class_<FieldObject, boost::noncopyable>
         ("FieldObject", init<VisualFieldObject&, py_constants::vis_landmark,
-         MyInfo&>())
+         MyInfo&, PyLoc&>())
         .add_property("vis", make_getter(&FieldObject::vis, return_value_policy
                                          <reference_existing_object>()))
         .add_property("localId", &FieldObject::getLocalID)
@@ -65,8 +60,8 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("relY", &FieldObject::getRelY)
         .add_property("dist", &FieldObject::getDist)
         .add_property("bearing", &FieldObject::getBearing)
-        .add_property("locDist", &FieldObject::getLocDist)
-        .add_property("locBearing", &FieldObject::getLocBearing)
+        //.add_property("locDist", &FieldObject::getLocDist)
+        //.add_property("locBearing", &FieldObject::getLocBearing)
         .def("setBest", &FieldObject::setBest)
         .def("associateWithRelativeLandmark",
              &FieldObject::associateWithRelativeLandmark)
@@ -75,8 +70,6 @@ BOOST_PYTHON_MODULE(objects)
     class_<MyInfo, bases<RobotLocation>,
            boost::noncopyable>("MyInfo", init<PyLoc&>())
         .def("update", &MyInfo::update)
-        .def("distTo", distTo1)
-        .def("distTo", distTo2)
         .add_property("teamColor", &MyInfo::getTeamColor, &MyInfo::setTeamColor)
         .add_property("locScoreTheta", &MyInfo::getLocScoreTheta)
         .add_property("locScoreXY", &MyInfo::getLocScoreXY)

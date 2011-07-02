@@ -158,8 +158,14 @@ namespace noggin {
     class LocObject : public Location
     {
     public:
-        LocObject();
+        LocObject(PyLoc&);
         virtual ~LocObject() {};
+
+        PyLoc* loc;
+
+        // Loc getters
+        const float getDist();
+        const degrees getBearing();
 
         // Tracking
         const int getTrackingFitness() { return trackingFitness; }
@@ -185,15 +191,16 @@ namespace noggin {
      * PyVision.cpp for the VisualFieldObject values exposed to Python.
      */
 
-    class FieldObject : public LocObject
+    class FieldObject
     {
     public:
         FieldObject(VisualFieldObject&,
                     py_constants::vis_landmark,
-                    MyInfo&);
+                    MyInfo&, PyLoc&);
         ~FieldObject() {};
 
         VisualFieldObject* vis;
+        LocObject* loc;
 
     private:
         // These shouldn't be copied!
@@ -208,9 +215,6 @@ namespace noggin {
     public:
         static const int LOST_OBJECT_FRAMES_THRESH = 7;
 
-        // Loc getters
-        const float getLocDist();
-        const degrees getLocBearing();
         const float getRelX();
         const float getRelY();
         const float getDist() { return dist; }
@@ -245,7 +249,6 @@ namespace noggin {
 
     public:
         void update();
-        const float distTo(FieldObject& other, bool forceCalc);
 
         //Getters
         const py_constants::teamColor getTeamColor() { return team_color; }
