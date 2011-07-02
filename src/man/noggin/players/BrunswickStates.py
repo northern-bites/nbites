@@ -58,6 +58,7 @@ def gameSet(player):
 
         if (player.brain.play.isRole(CHASER) and
             player.brain.gameController.ownKickOff):
+            print "Setting Kickoff to True"
             player.shouldKickOff = True
 
         if player.lastDiffState == 'gamePenalized':

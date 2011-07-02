@@ -30,11 +30,15 @@ class KickInformation:
         """
         Tells the decider if we should kickOff. Also sets the player constant.
         """
+        print "KickInformation::shouldKickOff()"
         if self.brain.player.shouldKickOff:
+            print "player kickoff was set to true"
             centerField = Location(NogginConstants.CENTER_FIELD_X,
                                    NogginConstants.CENTER_FIELD_Y)
             self.brain.player.shouldKickOff = (centerField.distTo(self.brain.ball) <
                                                NogginConstants.CENTER_CIRCLE_RADIUS)
+            print "player kickoff is set to {0}"\
+                .format(self.brain.player.shouldKickOff)
             return self.brain.player.shouldKickOff
         else:
             return False
@@ -152,6 +156,9 @@ class KickInformation:
         bestDest = None
 
         for dest in dests:
+            # Don't need to sub180Angle here because we mod. I know it looks
+            # wierd and suspiciously complicated, but it makes for an easy
+            # compare and I promise I unit tested it. -- Wils (7/1/11)
             bestHeading = max((fabs(((ball.headingTo(dest) -
                                      my.headingTo(ball))
                                     % 90) - 45)), bestHeading)
@@ -170,7 +177,8 @@ class KickInformation:
         """
         my = self.brain.my
         ball = self.brain.ball
-        rotatedHeading = ball.headingTo(dest) - my.headingTo(ball)
+        rotatedHeading = MyMath.sub180Angle(ball.headingTo(dest) -
+                                            my.headingTo(ball))
         kick = None
 
         if (fabs(rotatedHeading) < constants.STRAIGHT_KICK_ALIGNMENT_BEARING):

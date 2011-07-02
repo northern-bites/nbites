@@ -26,7 +26,7 @@ def positionForKick(player):
     """
     Get to the ball
     """
-    if player.brain.ball.dist > 60:
+    if player.brain.ball.dist > 80:
         player.brain.nav.chaseBall()
         if player.brain.ball.framesOn > 10:
             player.brain.tracker.kickDecideScan()
@@ -35,10 +35,9 @@ def positionForKick(player):
 
         #if player.firstFrame():
         player.inKickingState = True
+        player.brain.tracker.trackBall()
         player.brain.nav.kickPosition(kick)
 
-        # TODO make this a better way to tell if the ball has moved.
-        # also we should go back to chase.
         # if we're getting close, decide whether to set another destination
         if player.brain.nav.nearDestination and \
                 player.brain.nav.brain.ball.dist > 20:
@@ -46,10 +45,12 @@ def positionForKick(player):
                 .format(player.brain.nav.brain.ball.dist)
             player.brain.nav.kickPosition(kick)
 
+        #TODO if the ball moved, go back to chase.
+
         if transitions.shouldOrbit(player):
             print "Don't have a kick, orbitting"
             return player.goNow('orbitBall')
-        if transitions.ballInPosition(player) and transitions.shouldKick(player):
+        if transitions.shouldKick(player):
             return player.goNow('kickBallExecute')
 
     if transitions.shouldFindBallKick(player):

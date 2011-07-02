@@ -77,6 +77,7 @@ class KickDecider(object):
 
         # Yay scripted Kickoffs!
         if self.info.shouldKickOff():
+            print "Passed shouldKickOff()"
             self.setKickOff()
             return
 
