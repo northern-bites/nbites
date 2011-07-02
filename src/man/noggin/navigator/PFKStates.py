@@ -5,22 +5,6 @@ from . import NavConstants as constants
 from . import BrunswickSpeeds as speeds
 from math import fabs
 
-# Values for controlling the speeds
-PFK_LEFT_SPIN_SPEED = speeds.LEFT_SPIN_WHILE_X_MAX_SPEED
-PFK_RIGHT_SPIN_SPEED = speeds.RIGHT_SPIN_WHILE_X_MAX_SPEED
-PFK_LEFT_SPEED = speeds.OMNI_LEFT_MAX_SPEED
-PFK_RIGHT_SPEED = speeds.OMNI_RIGHT_MAX_SPEED
-PFK_FWD_SPEED = speeds.OMNI_FWD_MAX_SPEED
-PFK_REV_SPEED = speeds.OMNI_REV_MAX_SPEED
-PFK_MIN_Y_MAGNITUDE = speeds.MIN_OMNI_Y_MAGNITUDE
-PFK_MIN_X_MAGNITUDE = speeds.MIN_OMNI_X_MAGNITUDE
-PFK_MIN_SPIN_MAGNITUDE = speeds.MIN_SPIN_WHILE_X_MAGNITUDE
-
-# Buffering values, insure that we eventually kick the ball
-PFK_CLOSE_ENOUGH_X = 2.0
-PFK_CLOSE_ENOUGH_Y = 2.0
-PFK_CLOSE_ENOUGH_THETA = 11
-
 def positionForKick(nav):
     """
     This state is called by player through Navigator::kickPosition(kick)

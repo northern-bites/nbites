@@ -16,7 +16,6 @@ class Navigator(FSA.FSA):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.addStates(NavStates)
-        self.addStates(ChaseStates)
         self.addStates(PFKStates)
         self.currentState = 'stopped'
         self.doingSweetMove = False
@@ -72,7 +71,8 @@ class Navigator(FSA.FSA):
         robot will walk to the ball with it centered at his feet.
         if no ball is visible, localization will be usedn
         """
-        self.switchTo('walkSpinToBall')
+        self.destType = constants.BALL_DEST
+        self.switchTo('goToPosition')
 
     def kickPosition(self, kick):
         """
