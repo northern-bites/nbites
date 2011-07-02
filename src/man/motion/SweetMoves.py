@@ -654,18 +654,18 @@ GOOGZ_LEFT_SIDE_KICK = (
      (0.,40.,-65.,55.,-20.,0.),
      (0.,10.,-38.,76.,-40.,-22.),
      (90.,-90.,50.,70.),
-     .4 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     .2 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
     # kick across body
-    ((80.,0.,-50.,-70.),
+    ((80.,80.,-50.,-70.),
      (0.,-22.,-70.,25.,31.,0.),
      (0.,15.,-38.,76.,-40.,-22.),
-     (90.,-90.,50.,70.),
-     .2, 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
+     (90.,-10.,50.,70.),
+     .15, 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
 
-    # move leg forward
+    # start recover
     ((80.,0.,-50.,-70.),
-     (0.,20.,-65.,55.,-20.,0.),
+     (0.,20.,-65.,60.,-21.,0.),
      (0.,10.,-38.,76.,-40.,-22.),
      (90.,-90.,50.,70.),
      .2 , 0, stiff.LEFT_SIDE_KICK_STIFFNESSES),
