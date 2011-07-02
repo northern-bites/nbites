@@ -218,6 +218,12 @@ namespace noggin {
                                    - loc->getHEst()))*TO_DEG;
     }
 
+//////////// LocBall Methods //////////////////
+
+    LocBall::LocBall(PyLoc& pl)
+        : LocObject(pl)
+    {
+    }
 
 /////////// MyInfo Methods /////////////////
 

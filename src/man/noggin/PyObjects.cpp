@@ -56,6 +56,8 @@ BOOST_PYTHON_MODULE(objects)
          PyLoc&>())
         .add_property("vis", make_getter(&FieldObject::vis, return_value_policy
                                          <reference_existing_object>()))
+        .add_property("loc", make_getter(&FieldObject::loc, return_value_policy
+                                         <reference_existing_object>()))
         .add_property("localId", &FieldObject::getLocalID)
         .add_property("visId", &FieldObject::getVisID)
         .add_property("relX", &FieldObject::getRelX)

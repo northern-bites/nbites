@@ -182,6 +182,18 @@ namespace noggin {
     };
 
     /*
+     * LOC BALL
+     * A loc object specialized to get all of the ball's loc values.
+     */
+
+    class LocBall : public LocObject
+    {
+    public:
+        LocBall(PyLoc&);
+
+    };
+
+    /*
      * FIELD OBJECT
      * Currently means one of the four goalposts. A LocObject that also
      * holds a pointer to the visual object connected with a particular
@@ -238,7 +250,7 @@ namespace noggin {
      * location so that it doesn't have to be calculated if not needed. Update
      * gets the latest x, y, h values from loc. This copying is necessary for
      * using the Location interface. LocScores represent how good localization
-     * is, based on the three uncert values. 
+     * is, based on the three uncert values.
      */
     class MyInfo : public RobotLocation
     {
