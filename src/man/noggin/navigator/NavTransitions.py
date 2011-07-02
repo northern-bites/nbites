@@ -1,7 +1,7 @@
 from math import fabs, sqrt
 from . import NavConstants as constants
 from man.noggin.util import MyMath
-from man.noggin import NogginConstants
+import noggin_constants as NogginConstants
 
 def atDestinationCloser(my, dest):
     """

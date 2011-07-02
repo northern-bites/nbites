@@ -1,4 +1,4 @@
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
@@ -14,14 +14,14 @@ def afterPenalty(player):
         initPenaltyReloc(player)
         player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
 
-    if player.brain.ball.framesOn > OBJ_SEEN_THRESH:
+    if player.brain.ball.vis.framesOn > OBJ_SEEN_THRESH:
         #deal with ball and don't worry about loc
         player.brain.tracker.trackBall()
         return player.goLater(gcState)
 
     if not player.brain.motion.isHeadActive():
         ##looking to the side
-        if player.brain.yglp.on or player.brain.ygrp.on:
+        if player.brain.yglp.vis.on or player.brain.ygrp.vis.on:
             #see the goal posts in multiple frames for safety
             seeYellow(player)
             if player.yellowCount >= OBJ_SEEN_THRESH:
@@ -29,7 +29,7 @@ def afterPenalty(player):
                 #now you know where you are!
                 return player.goLater(gcState)
 
-        if player.brain.bglp.on or player.brain.bgrp.on:
+        if player.brain.bglp.vis.on or player.brain.bgrp.vis.on:
             #see the goal posts in multiple frames for safety
             seeBlue(player)
             if player.blueCount >= OBJ_SEEN_THRESH:
@@ -109,7 +109,7 @@ def penaltyRelocalize(player):
     if player.firstFrame():
         player.setWalk(1, 0, 0)
 
-    if player.brain.ball.framesOn >= OBJ_SEEN_THRESH:
+    if player.brain.ball.vis.framesOn >= OBJ_SEEN_THRESH:
         player.brain.tracker.trackBall()
         return player.goLater(gcState)
 

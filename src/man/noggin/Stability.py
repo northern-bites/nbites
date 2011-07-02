@@ -1,6 +1,5 @@
-from . import NogginConstants as Constants
 from math import fabs
-from .typeDefs import Location
+from objects import Location
 
 try:
     from numpy import corrcoef

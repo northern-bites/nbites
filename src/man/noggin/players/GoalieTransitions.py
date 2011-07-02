@@ -2,7 +2,8 @@
 # The transitions for the goalie for the goalie states.
 # Covers chase, position and save.
 #
-from .. import NogginConstants as NogCon
+
+import noggin_constants as NogCon
 import GoalieConstants as goalCon
 
 #SAVING TRANSITIONS

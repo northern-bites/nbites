@@ -222,7 +222,7 @@ class KickDecider(object):
             print "RIGHT_SIDE"
             return kicks.RIGHT_SIDE_KICK
         else:
-            return kicks.chooseShortBackKick(self)
+            return self.chooseShortBackKick(self)
 
         # # Note: may want to use headingTo(yglp) etc...
         # oppLeftPost = self.brain.oppGoalLeftPost
