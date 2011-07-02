@@ -152,7 +152,7 @@ def avoidObstacle(nav):
     elif avoidRight:
         return nav.goNow('avoidRightObstacle')
     else:
-        return nav.goNow(nav.lastDiffState)
+        return nav.goLater(nav.lastDiffState)
 
 
 def avoidFrontObstacle(nav):
@@ -179,10 +179,10 @@ def avoidFrontObstacle(nav):
         return nav.stay()
 
     elif avoidRight:
-        return nav.goNow('avoidRightObstacle')
+        return nav.goLater('avoidRightObstacle')
 
     elif avoidLeft:
-        return nav.goNow('avoidLeftObstacle')
+        return nav.goLater('avoidLeftObstacle')
 
     else:
         nav.doneAvoidingCounter += 1
@@ -209,9 +209,9 @@ def avoidLeftObstacle(nav):
     avoidRight = navTrans.shouldAvoidObstacleRight(nav)
 
     if (avoidLeft and avoidRight):
-        return nav.goNow('avoidFrontObstacle')
+        return nav.goLater('avoidFrontObstacle')
     elif avoidRight:
-        return nav.goNow('avoidRightObstacle')
+        return nav.goLater('avoidRightObstacle')
     elif avoidLeft:
         nav.doneAvoidingCounter -= 1
         nav.doneAvoidingCounter = max(0, nav.doneAvoidingCounter)
@@ -241,9 +241,9 @@ def avoidRightObstacle(nav):
     avoidRight = navTrans.shouldAvoidObstacleRight(nav)
 
     if (avoidLeft and avoidRight):
-        return nav.goNow('avoidFrontObstacle')
+        return nav.goLater('avoidFrontObstacle')
     elif avoidLeft:
-        return nav.goNow('avoidLeftObstacle')
+        return nav.goLater('avoidLeftObstacle')
     elif avoidRight:
         nav.doneAvoidingCounter -= 1
         nav.doneAvoidingCounter = max(0, nav.doneAvoidingCounter)
