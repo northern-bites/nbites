@@ -73,13 +73,16 @@ def shouldSwitchPFKModes(player):
     """
     ball = player.brain.ball
 
-    # using setDestination
-    if player.brain.nav.currentState == 'destWalking' or \
-           player.brain.nav.currentState == 'positionForKick':
-        return ball.dist > constants.BALL_SET_DEST_CUTOFF
-
     # using setSpeed
-    return ball.dist <= constants.BALL_SET_DEST_CUTOFF
+    if player.brain.nav.currentState == 'goToPosition':
+        # forces the vector to update in case the ball moved
+        if player.counter() > constants.BALL_APPROACH_REFRESH_FRAMES:
+            return True
+
+        return ball.dist <= constants.BALL_SET_DEST_CUTOFF
+
+    # using setDestination
+    return ball.dist > constants.BALL_SET_DEST_CUTOFF
 
 
 def shouldOrbit(player):

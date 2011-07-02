@@ -30,6 +30,7 @@ def positionForKick(player):
     positions.
     """
     if player.firstFrame():
+        # This doesn't seem to help any more, need to investigate
         player.saveBallPosition()
 
         if player.brain.ball.dist > constants.BALL_SET_DEST_CUTOFF:
@@ -57,7 +58,7 @@ def positionForKick(player):
             return player.goNow('kickBallExecute')
 
     # most of the time going to chase will kick back to here, lets us reset
-    if (player.ballMoved() or transitions.ballTooFar(player) or
+    if (transitions.ballTooFar(player) or
         transitions.shouldSwitchPFKModes(player) or
         transitions.shouldFindBallKick(player)):
 

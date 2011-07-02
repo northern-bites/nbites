@@ -212,6 +212,6 @@ class Navigator(FSA.FSA):
 
         elif self.destType is constants.BALL:
             ballPosition = RobotLocation(self.brain.ball.x,
-                                         self.brain.ball.y.
+                                         self.brain.ball.y,
                                          self.brain.ball.heading)
             return ballPosition
