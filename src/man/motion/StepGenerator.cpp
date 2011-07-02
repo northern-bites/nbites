@@ -42,7 +42,7 @@ using namespace NBMath;
 //#define DEBUG_ZMP
 //#define DEBUG_ZMP_REF
 //#define DEBUG_COM_TRANSFORMS
-//#define DEBUG_DESTINATION
+#define DEBUG_DESTINATION
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s,
                              shared_ptr<NaoPose> p,
@@ -728,7 +728,7 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 
     float speed_x, speed_y, speed_theta;
 
-    // use the maximum allowed x,y,theta
+    // use the gait's maximum allowed x,y,theta
     if (dest_x > 0)
         speed_x = gain*gait->step[WP::MAX_VEL_X];
     else
@@ -737,11 +737,16 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
     speed_y = gain*gait->step[WP::MAX_VEL_Y];
     speed_theta = gain*gait->step[WP::MAX_VEL_THETA];
 
-    // we've finished calculating, now deal with the motion queues
+    // now deal with the motion queues
     if (hasDestination || !done) {
 	clearFutureSteps();
-	// reduce the dest_x here since we will take an extra step
-	dest_x -= lastQueuedStep->x;
+
+	// check the distances of any steps we've already commited to taking
+	for (std::list<Step::ptr>::iterator step = currentZMPDSteps.begin();
+	     step != currentZMPDSteps.end(); ++step)
+	{
+	    countStepTowardsDestination(*step, dest_x, dest_y, dest_theta);
+	}
     } else {
 	resetQueues();
 	const bool startLeft = decideStartLeft(dest_y,dest_theta);
@@ -751,57 +756,55 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
     hasDestination = true;
     done = false;
 
+
+#ifdef DEBUG_DESTINATION
+    cout << "destination after removing current zmp steps: x=" << dest_x
+         << " y=" << dest_y << " theta=" << dest_theta << endl;
+#endif
+
     int framesToDestination = 0;
 
-    const float CLOSE_ENOUGH_X = 15.0f; // 10mm
-    const float CLOSE_ENOUGH_Y = 15.0f;
-    float CLOSE_ENOUGH_THETA;
+    const float CLOSE_ENOUGH_X_mm = 15.0f;
+    const float CLOSE_ENOUGH_Y_mm = 15.0f;
+    float CLOSE_ENOUGH_THETA_rad;
 
     // be more sensitive to rotation if we're going really far (40cm)
     if (dest_x*dest_x + dest_y*dest_y > 1600)
-	CLOSE_ENOUGH_THETA = 0.087f; // 5 degrees
+	CLOSE_ENOUGH_THETA_rad = 0.087f; // 5 degrees
     else
-	CLOSE_ENOUGH_THETA = 0.17f; // 10 degrees
+	CLOSE_ENOUGH_THETA_rad = 0.17f; // 10 degrees
 
     // loop until we get to our destination
-    while (abs(dest_x) > CLOSE_ENOUGH_X ||
-	   abs(dest_y) > CLOSE_ENOUGH_Y ||
-	   abs(dest_theta) > CLOSE_ENOUGH_THETA) {
+    while (abs(dest_x) > CLOSE_ENOUGH_X_mm ||
+	   abs(dest_y) > CLOSE_ENOUGH_Y_mm ||
+	   abs(dest_theta) > CLOSE_ENOUGH_THETA_rad) {
 	float step_x, step_y, step_theta;
 
 	// check if we're close enough to our destination to make it this step
 	if (abs(dest_x) > abs(speed_x))
 	    step_x = speed_x;
-	else if (abs(dest_x) <= CLOSE_ENOUGH_X)
+	else if (abs(dest_x) <= CLOSE_ENOUGH_X_mm)
 	    step_x = 0.0f;
 	else
 	    step_x = dest_x;
 
 	if (abs(dest_y) > abs(speed_y))
 	    step_y = speed_y * sign(dest_y);
-	else if (abs(dest_y) <= CLOSE_ENOUGH_Y)
+	else if (abs(dest_y) <= CLOSE_ENOUGH_Y_mm)
 	    step_y = 0.0f;
 	else
 	    step_y = dest_y;
 
 	if (abs(dest_theta) > abs(speed_theta))
 	    step_theta = speed_theta * sign(dest_theta);
-	else if (abs(dest_theta) <= CLOSE_ENOUGH_THETA)
+	else if (abs(dest_theta) <= CLOSE_ENOUGH_THETA_rad)
 	    step_theta = 0.0f;
 	else
 	    step_theta = dest_theta;
 
 	generateStep(step_x, step_y, step_theta);
 
-	// update the destination based on how far this step went
-	dest_x -= lastQueuedStep->x;
-
-	// necessary (HACK!) because steps will alternate +/- in Y and Theta
-	if (sign(dest_y) == sign(lastQueuedStep->y))
-	    dest_y -= lastQueuedStep->y;
-
-	if (sign(dest_theta) == sign(lastQueuedStep->theta))
-	    dest_theta -= lastQueuedStep->theta;
+	countStepTowardsDestination(lastQueuedStep, dest_x, dest_y, dest_theta);
 
 	framesToDestination += lastQueuedStep->stepDurationFrames;
 
@@ -820,6 +823,21 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 
     return framesToDestination;
 }
+
+
+// updates the destination based on how far this step went
+void StepGenerator::countStepTowardsDestination(Step::ptr step, float& dest_x,
+						float& dest_y, float &dest_theta) {
+    dest_x -= step->x;
+
+    // necessary (HACK!) because steps will alternate +/- in Y and Theta
+    if (sign(dest_y) == sign(step->y))
+	    dest_y -= step->y;
+
+    if (sign(dest_theta) == sign(step->theta))
+	dest_theta -= step->theta;
+}
+
 
 /**
  * Method to enqueue a specific number of steps and then stop
