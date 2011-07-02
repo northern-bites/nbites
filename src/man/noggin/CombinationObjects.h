@@ -196,7 +196,7 @@ namespace noggin {
     public:
         FieldObject(VisualFieldObject&,
                     py_constants::vis_landmark,
-                    MyInfo&, PyLoc&);
+                    PyLoc&);
         ~FieldObject() {};
 
         VisualFieldObject* vis;

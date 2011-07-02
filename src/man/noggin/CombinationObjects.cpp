@@ -135,10 +135,9 @@ namespace noggin {
 ////////// FieldObject Methods //////////////
 
     FieldObject::FieldObject(VisualFieldObject& vfo,
-                             vis_landmark id, MyInfo& _my, PyLoc& _pl)
+                             vis_landmark id, PyLoc& _pl)
         : vis(&vfo), loc(new LocObject(_pl)),
-          visID(id), localID(0), bearing(0), dist(0),
-          my(&_my)
+          visID(id), localID(0), bearing(0), dist(0)
     {
     }
 

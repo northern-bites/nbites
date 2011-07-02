@@ -47,11 +47,13 @@ BOOST_PYTHON_MODULE(objects)
                       &LocObject::setTrackingFitness)
         .def(self < self)
         .def(self > self)
+        .add_property("dist", &LocObject::getDist)
+        .add_property("bearing", &FieldObject::getBearing)
         ;
 
     class_<FieldObject, boost::noncopyable>
         ("FieldObject", init<VisualFieldObject&, py_constants::vis_landmark,
-         MyInfo&, PyLoc&>())
+         PyLoc&>())
         .add_property("vis", make_getter(&FieldObject::vis, return_value_policy
                                          <reference_existing_object>()))
         .add_property("localId", &FieldObject::getLocalID)
@@ -60,8 +62,6 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("relY", &FieldObject::getRelY)
         .add_property("dist", &FieldObject::getDist)
         .add_property("bearing", &FieldObject::getBearing)
-        //.add_property("locDist", &FieldObject::getLocDist)
-        //.add_property("locBearing", &FieldObject::getLocBearing)
         .def("setBest", &FieldObject::setBest)
         .def("associateWithRelativeLandmark",
              &FieldObject::associateWithRelativeLandmark)

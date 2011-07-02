@@ -129,20 +129,20 @@ class Brain(object):
         # Yellow goal left and right posts
         self.yglp = FieldObject(self.vision.yglp,
                                 Constants.vis_landmark.VISION_YGLP,
-                                self.my)
+                                self.loc)
 
         self.ygrp = FieldObject(self.vision.ygrp,
                                 Constants.vis_landmark.VISION_YGRP,
-                                self.my)
+                                self.loc)
 
         # Blue Goal left and right posts
         self.bglp = FieldObject(self.vision.bglp,
                                 Constants.vis_landmark.VISION_BGLP,
-                                self.my)
+                                self.loc)
 
         self.bgrp = FieldObject(self.vision.bgrp,
                                 Constants.vis_landmark.VISION_BGRP,
-                                self.my)
+                                self.loc)
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
