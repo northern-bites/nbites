@@ -39,7 +39,7 @@ namespace noggin {
     static const float BOTTOM_LIMIT = FIELD_HEIGHT/3.0;
 
     // Buffer for size of Box
-    static const int BOX_BUFFER = 10
+    static const int BOX_BUFFER = 10;
 
     /**
      * Degrees and radians are both floats, but used to indicate when
