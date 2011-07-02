@@ -105,8 +105,7 @@ def shouldStopChase(team):
             return True
 
     elif (ball.x > goalCon.CHASE_RIGHT_X_LIMIT
-        or ball.relX > goalCon.STOP_CHASE_RELX_BUFFER
-        ):
+        or ball.relX > goalCon.STOP_CHASE_RELX_BUFFER):
         team.shouldStopChaseCounter += 1
 
     if team.shouldStopChaseCounter > goalCon.CHANGE_THRESH:
