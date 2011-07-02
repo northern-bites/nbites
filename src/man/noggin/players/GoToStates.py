@@ -1,8 +1,8 @@
 import man.motion.SweetMoves as SweetMoves
 import noggin_constants as FC
 from math import hypot
+from ..typeDefs.Location import RobotLocation
 
-POINTS_FILE = "/media/userdata/points.cfg"
 GOTO_POINTS = [(FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING),
                (FC.OPP_GOALBOX_LEFT_X, FC.FIELD_HEIGHT*0.75, FC.MY_GOAL_HEADING),
                (FC.OPP_GOALBOX_LEFT_X, FC.FIELD_HEIGHT*0.25, FC.MY_GOAL_HEADING),
@@ -10,9 +10,13 @@ GOTO_POINTS = [(FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING),
                (FC.MY_GOALBOX_RIGHT_X, FC.FIELD_HEIGHT*0.75, FC.OPP_GOAL_HEADING),
                (FC.CENTER_FIELD_X, FC.CENTER_FIELD_Y, FC.OPP_GOAL_HEADING)]
 
+NUM_POINTS = len(GOTO_POINTS)
+
 def gameReady(player):
     if player.firstFrame():
         player.brain.tracker.locPans()
+        player.walkPose()
+
     return player.stay()
 
 def convertCoords(x):
@@ -24,29 +28,30 @@ def getNextPoint(player):
     closestPoint = [0,0]
     minDist = 1000000.
 
-    for x in player.GOTO_POINTS:
+    for x in GOTO_POINTS:
         d = hypot(player.brain.my.x - x[0],
                   player.brain.my.y - x[1])
         if d < minDist:
             minDist = d
             closestPoint = x
 
-    player.GOTO_POINTS.remove(closestPoint)
+    GOTO_POINTS.remove(closestPoint)
     return closestPoint
 
 def gamePlaying(player):
-    f = open(POINTS_FILE, 'r')
-    player.GOTO_POINTS = [convertCoords(x) for x in
-                          [[float(i) for i in l.split()] for l in f.readlines()]]
     player.goToPoint = getNextPoint(player)
     player.goToCounter = 0
     return player.goNow('goToPoint')
 
 def goToPoint(player):
     if player.firstFrame():
+        player.brain.speech.say(str(len(GOTO_POINTS)) + " more points to go!")
         player.brain.tracker.locPans()
-        player.brain.nav.goTo(getNextPoint(player))
-    if player.brain.nav.isStopped() and not player.firstFrame():
+
+        pt = getNextPoint(player)
+        dest = RobotLocation(pt[0], pt[1], pt[2])
+        player.brain.nav.goTo(dest)
+    if player.brain.nav.isAtPositition() and not player.firstFrame():
         return player.goLater('atPoint')
 
     return player.stay()
@@ -55,9 +60,10 @@ def atPoint(player):
     if player.firstFrame():
         player.goToCounter += 1
         player.brain.leds.startFlashing()
+        player.brain.speech.say("At position number " + str(player.goToCounter))
     elif player.stateTime > 10.0:
         player.brain.leds.stopFlashing()
-        if player.goToCounter >= len(GOTO_POINTS):
+        if len(GOTO_POINTS) == 0:
             return player.goLater('atFinalPoint')
         else:
             return player.goLater('goToPoint')

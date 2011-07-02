@@ -46,14 +46,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.shouldRelocalizeCounter = 0
 
-        # Penalty kick player variables
-        self.penaltyKicking = False
-        self.penaltyMadeFirstKick = True
-        self.penaltyMadeSecondKick = False
-
-        # Kickoff kick
-        self.hasKickedOff = True
-
         # Orbiting
         self.angleToOrbit = 0.0
 

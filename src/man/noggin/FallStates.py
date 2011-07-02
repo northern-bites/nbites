@@ -78,7 +78,7 @@ def doneStanding(guard):
     """
     if guard.firstFrame():
         guard.brain.player.gainsOn()
-        guard.brain.player.stopWalking()
+        guard.brain.motion.walkPose()
 
     guard.brain.player.switchTo(guard.brain.gameController.currentState)
     return guard.goLater('notFallen')
