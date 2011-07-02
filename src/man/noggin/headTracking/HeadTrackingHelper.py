@@ -40,7 +40,19 @@ class HeadTrackingHelper(object):
 
         # If we don't see it, let's try to use our model of it to find
         # it and track it
-        if not target or not target.vis.on:
+        if not target or \
+                # If the ball (or target) is set as being under us,
+                # don't try to look at it. Perhaps should be
+                # generalized to objects which we cannot see.
+                (target.relX == 0.0 and target.relY == 0.0):
+            return
+
+        # If we haven't seen the object in the very recent past, look
+        # towards where the model says it is. The framesOff > 3
+        # provides a buffer to ensure that it's not just a flickering
+        # image problem (prevents twitchy robot).
+        if target.vis.framesOff > 3:
+            self.lookToPoint(target)
             return
 
         # Find the target's angular distance from the center of the screen
@@ -128,3 +140,25 @@ class HeadTrackingHelper(object):
         headMove = motion.SetHeadCommand(MyMath.degrees(yaw),
                                          MyMath.degrees(pitch))
         self.tracker.brain.motion.setHead(headMove)
+
+    def calculateClosestLandmark(self):
+        brain = self.tracker.brain
+        posts = [brain.yglp, brain.ygrp, brain.bgrp, brain.bglp]
+
+        currYaw = brain.sensors.motionAngles[MotionConstants.HeadYaw]
+
+        minDiff = 1000000000
+        bestPost = None
+
+        for p in posts:
+
+            # angles = \
+            #     brain.vision.pose.getHeadAnglesToPoint(p.relX, p.relY)
+
+            diff = MyMath.sub180Angle(currYaw - p.bearing)
+
+            if diff < minDiff:
+                bestPost = p
+                minDiff = diff
+        return bestPost
+

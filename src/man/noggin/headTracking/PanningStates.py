@@ -8,10 +8,13 @@ def scanBall(tracker):
     If ball is in view, go to last diff state.
     """
     ball = tracker.brain.ball
-    if tracker.target == ball and \
-            tracker.target.vis.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+    if (tracker.target == ball and
+        tracker.target.vis.framesOn >=
+        constants.TRACKER_FRAMES_ON_TRACK_THRESH):
+
         tracker.activeLocOn = False
         return tracker.goNow('ballTracking')
+
     #Here we choose where to look for the ball first
     if not tracker.brain.motion.isHeadActive():
         if ball.dist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
@@ -277,4 +280,3 @@ def bounceDown(tracker):
     elif not tracker.brain.motion.isHeadActive():
         return tracker.goLater('bounceUp')
     return tracker.stay()
-
