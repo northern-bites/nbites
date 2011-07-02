@@ -3,16 +3,23 @@ MAX_PAN_SPEED = 125.0              # deg/sec
 
 TRACKER_FRAMES_ON_TRACK_THRESH = 1 # ** # look into
 TRACKER_FRAMES_OFF_REFIND_THRESH = 5 # ** # look into
+
 ACTIVE_LOC_STARE_THRESH = 45
 ACTIVE_LOC_STARE_GOALIE_THRESH = 25
 ACTIVE_LOC_OFF_REFIND_THRESH = 40
+
 LOOK_TO_TIME_TO_FIND = 45
+
 TRACKER_FRAMES_SEARCH_THRESH = 15 # ** # debugging values
 TRACKER_FRAMES_STARE_THRESH = 5 # ** # debugging values
 TRACKER_BALL_STARE_THRESH = 20 # ** # debugging values
-BALL_DISTANCE_THRESH = 30 # cm within which we will only stareBall
 
-MAX_ACTIVE_TRACKING_DIST = 80
+####
+#### Active tracking constants
+####
+ACTIVE_TRACK_DIST = 70
+STARE_TRACK_DIST = 40
+BALL_ON_ACTIVE_PAN_THRESH = 30
 
 NUM_ACTIVE_PANS = 2
 (PAN_LEFT,

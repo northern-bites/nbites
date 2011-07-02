@@ -44,28 +44,25 @@ class HeadTracking(FSA.FSA):
         self.target = self.brain.ball #default
         # target should either be ball or instance of FieldObject
 
-# ** # old method - should keep
     def stopHeadMoves(self):
         """Stop all head moves."""
-        self.switchTo('stop')
+        if self.currentState is not 'stopped' or \
+                self.currentState is not 'stop':
+            self.switchTo('stop')
 
-# ** # new method - Used in player FSA
     def isStopped(self):
         """Checks that all head moves have stopped."""
         return self.currentState == 'stopped'
 
-# ** # old method - should keep
     def setNeutralHead(self):
         """Executes sweet move to move head to neutral position."""
         self.switchTo('neutralHead')
 
-# ** # old method - kept unchanged
     def performHeadMove(self, headMove):
         """Executes the given headMove, then stops."""
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
-# ** # old method (main input method)
     def trackBall(self):
         """
         Enters a state cycle:
@@ -74,11 +71,13 @@ class HeadTracking(FSA.FSA):
         """
         self.target = self.brain.ball
         self.gain = 1.0
-        if ( (not self.currentState == 'tracking')
-            and (not self.currentState == 'scanBall') ):
+        if ( self.currentState is not 'tracking'
+             and self.currentState is not 'scanBall'
+             and self.currentState is not 'ballTracking'
+             and self.currentState is not 'activeTracking'
+             and self.currentState is not 'trianglePan'):
             self.switchTo('ballTracking')
 
-# ** # old method (main input method)
     def trackBallSpin(self):
         """
         Enters a state cycle:
@@ -92,14 +91,11 @@ class HeadTracking(FSA.FSA):
             and (not self.currentState == 'spinScanBall') ):
             self.switchTo('ballSpinTracking')
 
-# ** # old method
     def locPans(self):
         """Repeatedly performs quick pan."""
         self.activeLocOn = False
         self.switchTo('locPans')
 
-# ** # old method (main input method)
-# ** # look into cleaning this up
     def activeLoc(self):
         """
         If ball is visible and close, track it via vision values.
@@ -118,7 +114,6 @@ class HeadTracking(FSA.FSA):
     # and activeLoc because they are the only states
     # that directly initially call activeTracking
 
-# ** # goalie method
     def activeLocGoaliePos(self):
         """looks at the ball for shorter amount of time that activeLoc"""
         self.target = self.brain.ball
@@ -127,8 +122,6 @@ class HeadTracking(FSA.FSA):
         if (not self.activeLocOn):
             self.switchTo('activeTracking')
 
-# ** # old method
-# ** # CLEAN THIS UP
     def preKickScan(self):
         """
         Pan up once (quickly), then stop.
@@ -147,14 +140,12 @@ class HeadTracking(FSA.FSA):
             self.currentState != 'trianglePanReturn'):
             self.switchTo('trianglePan')
 
-# ** # old method
     def startScan(self, newScan):
         """Repeatedly performs the given scan."""
         if newScan != self.currentHeadScan:
             self.currentHeadScan = newScan
             self.switchTo('scanning')
 
-# ** # old method
     def lookToDir(self,  direction):
         """
         Performs scripted look: down, up, right, or left.
@@ -165,7 +156,6 @@ class HeadTracking(FSA.FSA):
             self.lookDirection = direction
             self.switchTo('look')
 
-# ** # old method (main input method)
     def trackTarget(self, target):
         """
         Track given target via vision information while possible.
@@ -181,23 +171,11 @@ class HeadTracking(FSA.FSA):
             not self.currentState == 'scanForTarget' ):
             self.switchTo('targetTracking')
 
-# ** # old method - deprecated (replaced by helper.lookToTargetCoords)
     def lookToTarget(self, target):
         """Look towards given target, using localization values."""
         self.target.height = 0
         self.switchTo('lookToPoint')
 
-# ** # old method - deprecated (replaced)
-#    def lookToPoint(self, goalX=0, goalY=0, goalHeight=0):
-#        """continuously looks toward our best guess of goal based on loc"""
-#        self.target.x = goalX
-#        self.target.y = goalY
-#        self.target.height = goalHeight
-#        #allows us to update target values but not confuse FSA
-#        if not self.currentState == 'lookToPoint':
-#            self.switchTo('lookToPoint')
-
-# ** # new method - helper method
     def lookToPoint(self, goalX=0, goalY=0, goalZ=0):
         """
         Continuously looks at given relative coordinates.
@@ -212,7 +190,7 @@ class HeadTracking(FSA.FSA):
         """Looks to the given head angles. """
         self.helper.lookToAngles(yaw,pitch)
 
-# ** # old method
     def bounceHead(self):
         """Continually bounce head up and down."""
         self.switchTo('bounceUp')
+

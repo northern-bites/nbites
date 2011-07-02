@@ -16,7 +16,7 @@ def setDestination(nav, x, y, theta, gain):
     nav.currentCommand = \
         motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
     nav.brain.motion.sendDestCommand(nav.currentCommand)
-    nav.updateDests(x,y,theta)
+    nav.updateDests( x, y, theta, gain)
 
 def setSpeed(nav, x, y, theta):
     """

@@ -24,8 +24,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
     : sensors(s),
       walkProvider(sensors, pose),
       scriptedProvider(sensors),
-      headProvider(sensors),
-      coordHeadProvider(sensors, pose),
+      headProvider(sensors, pose),
       nullHeadProvider(sensors),
       nullBodyProvider(sensors),
       curProvider(&nullBodyProvider),
@@ -371,7 +370,6 @@ void MotionSwitchboard::preProcessHead()
         nextHeadProvider == &nullHeadProvider)
     {
         headProvider.hardReset();
-        coordHeadProvider.hardReset();
     }
 
     if (curHeadProvider != nextHeadProvider)
@@ -766,8 +764,8 @@ void MotionSwitchboard::sendMotionCommand(const SetHeadCommand::ptr command){
 }
 void MotionSwitchboard::sendMotionCommand(const CoordHeadCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
-    nextHeadProvider = &coordHeadProvider;
-    coordHeadProvider.setCommand(command);
+    nextHeadProvider = &headProvider;
+    headProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
 
 }

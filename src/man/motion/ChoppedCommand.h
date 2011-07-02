@@ -33,7 +33,7 @@ class ChoppedCommand
 
     void nextFrame() { sourceCommand->tick(); }
     void finishedExecuting() {
-	sourceCommand->finishedExecuting();
+        sourceCommand->finishedExecuting();
     }
 
  protected:

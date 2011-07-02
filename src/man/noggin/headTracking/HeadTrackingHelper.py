@@ -10,7 +10,6 @@ class HeadTrackingHelper(object):
     def __init__(self, tracker):
         self.tracker = tracker
 
-# ** # old method
     def executeHeadMove(self, headMove):
         """performs a sweetmove"""
         for position in headMove:
@@ -25,27 +24,30 @@ class HeadTrackingHelper(object):
 
             self.tracker.brain.motion.enqueue(move)
 
+        # Returns the last HJC in the HeadMove for keeping track of
+        # when a move is done
+        return move
 
-# ** # old method
     def trackObject(self):
         """
         Method to actually perform the tracking.
         Should only be called explicitly from state
         methods in TrackingStates.py
         """
-        #if self.firstFrame():
-         #   self.brain.motion.stopHeadMoves()
-        (changeX,changeY) = (0., 0.)
+        target = self.tracker.target
+
+        changeX, changeY = 0.0 , 0.0
+
+        # If we don't see it, let's try to use our model of it to find
+        # it and track it
+        if not target or not target.vis.on:
+            self.lookToPoint(target)
+            return
+
         # Find the target's angular distance from the center of the screen
         # if we have an object, track that
-        if self.tracker.target and \
-                self.tracker.target.vis.on:
-            changeX = self.tracker.target.vis.angleX
-            changeY = self.tracker.target.vis.angleY #the pitch is pos = down
-        else:
-            # by default, the change is none
-            #self.printf( "No object")
-            return
+        changeX = target.vis.angleX
+        changeY = target.vis.angleY #the pitch is pos = down
 
         motionAngles = self.tracker.brain.sensors.motionAngles
         curPitch = motionAngles[MotionConstants.HeadPitch]
@@ -67,7 +69,6 @@ class HeadTrackingHelper(object):
                                          maxSpeed, maxSpeed)
         self.tracker.brain.motion.setHead(headMove)
 
-# ** # new method
     def lookToTargetAngles(self, target):
         """
         Uses setHeadCommands to bring given target to center of frame.
@@ -93,17 +94,6 @@ class HeadTrackingHelper(object):
         self.tracker.brain.motion.setHead(headMove)
         # boost converts to radians for setHeadCommand
 
-    # ** # new method
-    def lookToTargetCoords(self, target):
-        """
-        Looks at given target's relative coordinates
-        """
-
-        #convert from cm to mm for c++ code
-        headMove = motion.CoordHeadCommand(10*target.relX, 10*target.relY, 10*target.height,.1065*.1,.1227*.1)# arbitrary slow down for debugging
-        self.tracker.brain.motion.coordHead(headMove)
-
-# ** # old method
     def panTo(self, heads):
         """
         Pan heads at appropriate speed to given heads
@@ -122,51 +112,20 @@ class HeadTrackingHelper(object):
         self.executeHeadMove( ((heads, panTime, 0,
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
-# ** # old method - replaced?
     def lookToPoint(self, target):
-        #convert from cm to mm for c++ code
-        headMove = motion.CoordHeadCommand(10*target.x, 10*target.y, 10*target.height,.1065*.1,.1227*.1)
+        if hasattr(target, "height"):
+            height = target.height
+        else:
+            height = 0
+
+        headMove = \
+            motion.CoordHeadCommand(relX = target.relX,
+                                    relY = target.relY,
+                                    relZ = height)
         self.tracker.brain.motion.coordHead(headMove)
+        return headMove
 
-# ** # debugging method
     def lookToAngles(self, yaw=0, pitch=0):
-        headMove = motion.SetHeadCommand(MyMath.degrees(yaw),MyMath.degrees(pitch))
+        headMove = motion.SetHeadCommand(MyMath.degrees(yaw),
+                                         MyMath.degrees(pitch))
         self.tracker.brain.motion.setHead(headMove)
-
-# ** # old method - replaced in c++
-    def calcBearing(self, target):
-        """returns the bearing to target in degrees. usable as headYaw"""
-        my = self.tracker.brain.my
-
-        return my.getRelativeBearing(target)
-
-# ** # old method - replaced in c++
-    def calcHeadPitch(self, target):
-        """returns the pitch to target in degrees"""
-        my = self.tracker.brain.my
-
-        relX = target.x - my.x
-        relY = target.y - my.y
-        dist = hypot(relX, relY)
-
-        lensHeightInCM = self.getCameraHeight()
-        relHeight = lensHeightInCM - target.height
-
-        #b/c we use lower angled camera we need to adjust by constant angle
-        headPitch = atan(relHeight/dist) - CAMERA_ANGLE
-        return headPitch
-
-# ** # old method - replaced in c++
-    def getCameraHeight(self):
-        """gets the height of the lower camera in cm"""
-        pose = self.tracker.brain.vision.pose
-
-        cameraInWorldFrameZ = pose.cameraInWorldFrameZ
-        comHeight = pose.bodyCenterHeight
-        lensHeight = cameraInWorldFrameZ + comHeight
-        lensHeightInCM = lensHeight/10.
-
-        return lensHeightInCM
-    """ already had to calculate bearing and groundDist to get xRelMe, yRelMe. those were stupid in the first place because they were used in CoordHeadCommand to calculate bearing again (doh!) with groundDist already calculated all that was needed was a single call to atan. """
-
-CAMERA_ANGLE = 40.0 # from reddoc

@@ -371,6 +371,8 @@ namespace Kinematics {
     static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {3,2,3,3,2};
     static const int NUM_JOINTS_CHAIN[NUM_CHAINS] = {2,4,6,6,4};
 
+    // Angle of the lower camera?
+    static const float LOWER_CAMERA_ANGLE = 0.6981f;
 };
 
 #endif

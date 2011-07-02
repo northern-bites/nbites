@@ -3,15 +3,14 @@ from . import TrackingConstants as constants
 
 DEBUG = False
 
-# ** # old method
 def ballTracking(tracker):
     '''Super state which handles following/refinding the ball'''
-    if tracker.target.vis.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+    if tracker.target.vis.framesOff <= \
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
         return tracker.goNow('scanBall')
 
-# ** # old method
 def tracking(tracker):
     """
     While the target is visible, track it via vision values.
@@ -21,25 +20,28 @@ def tracking(tracker):
     if tracker.firstFrame():
         tracker.activeLocOn = False
 
+    if tracker.target.dist > constants.ACTIVE_TRACK_DIST:
+        return tracker.goLater('activeTracking')
+
     tracker.helper.trackObject()
+
     if not tracker.target.vis.on:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
-        if tracker.target.vis.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+        if tracker.target.vis.framesOff > \
+                constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
             return tracker.goLater(tracker.lastDiffState)
         return tracker.stay()
 
     return tracker.stay()
 
-# ** # old method
 def ballSpinTracking(tracker):
     '''Super state which handles following/refinding the ball'''
-    if tracker.target.vis.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+    if tracker.target.vis.framesOff <= \
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
         return tracker.goNow('spinScanBall')
 
-
-# ** # old method
 def activeTracking(tracker):
     """
     If ball is visible and close, track it via vision values.
@@ -51,39 +53,18 @@ def activeTracking(tracker):
     if tracker.firstFrame():
         tracker.activeLocOn = True
 
-    if tracker.target.locDist < constants.MAX_ACTIVE_TRACKING_DIST and \
-            tracker.target.vis.framesOn > 2:
+    tracker.helper.trackObject()
+
+    # If we are close to the ball and have seen it consistently
+    if tracker.target.dist < constants.STARE_TRACK_DIST:
         return tracker.goLater('tracking')
 
-    if tracker.target.vis.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH \
-            and not tracker.brain.motion.isHeadActive() \
-            and not (tracker.activePanOut):
+    if tracker.target.vis.framesOff > \
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goLater('activeLocScan')
 
-    elif not tracker.activePanOut and \
-            tracker.counter <= constants.ACTIVE_LOC_STARE_THRESH \
-            and not tracker.goalieActiveLoc:
-        tracker.helper.trackObject()
-        tracker.activePanOut = False
-        return tracker.stay()
-
-    elif not tracker.activePanOut and \
-            tracker.counter <= constants.ACTIVE_LOC_STARE_GOALIE_THRESH \
-            and tracker.goalieActiveLoc:
-        tracker.helper.trackObject()
-        tracker.activePanOut = False
-        return tracker.stay()
-
-    elif tracker.activePanOut:
-        tracker.activePanOut = False
-        return tracker.goLater('returnHeadsPan')
-    else :
-        tracker.activePanOut = True
-        motionAngles = tracker.brain.sensors.motionAngles
-        tracker.preActivePanHeads = (
-            motionAngles[MotionConstants.HeadYaw],
-            motionAngles[MotionConstants.HeadPitch])
-
+    elif tracker.counter >= constants.BALL_ON_ACTIVE_PAN_THRESH and \
+            tracker.target.vis.on:
         return tracker.goLater('trianglePan')
 
     return tracker.stay()

@@ -28,13 +28,15 @@
 #include "MotionProvider.h"
 #include "HeadJointCommand.h"
 #include "SetHeadCommand.h"
+#include "CoordHeadCommand.h"
 #include "Sensors.h"
 #include "ChopShop.h"
 #include "Kinematics.h"
 
 class HeadProvider : public MotionProvider {
 public:
-    HeadProvider(boost::shared_ptr<Sensors> s);
+    HeadProvider(boost::shared_ptr<Sensors> s,
+                 boost::shared_ptr<NaoPose> p);
     virtual ~HeadProvider();
 
     void requestStopFirstInstance();
@@ -45,6 +47,7 @@ public:
     void enqueueSequence(std::vector<HeadJointCommand::ptr> &seq);
     void setCommand(const HeadJointCommand::ptr command);
     void setCommand(const SetHeadCommand::ptr command);
+    void setCommand(const CoordHeadCommand::ptr command);
 
 private:
     enum HeadMode {
@@ -56,6 +59,7 @@ private:
     void transitionTo(HeadMode newMode);
     void setMode();
     void scriptedMode();
+    void coordMode();
     void stopScripted();
     void stopSet();
 
@@ -63,10 +67,12 @@ private:
     bool isDone();
 
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<NaoPose> pose;
     ChopShop chopper;
     std::vector< std::vector<float> > nextJoints;
 
-    ChoppedCommand::ptr currCommand;
+    ChoppedCommand::ptr currChoppedCommand;
+    AbstractCommand::ptr currHeadCommand;
     // Queue of all future commands
     std::queue<HeadJointCommand::ptr> headCommandQueue;
 
@@ -79,6 +85,8 @@ private:
 
     std::vector<float> getCurrentHeads();
     void setNextHeadCommand();
+
+    static const float SPEED_CLIP_FACTOR = 0.1f;
 };
 
 #endif
