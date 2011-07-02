@@ -421,19 +421,26 @@ class GoTeam:
         # Want to become an illegal defender
         if ball.inMyGoalBox():
             self.willBeIllegalD += 1
+            print "ball in box and ball.x is" + str(ball.x)
             if self.willBeIllegalD > PBConstants.DONT_ILLEGAL_D_THRESH:
+                print "should be using dubD cuz illegalD"
                 return True
+        elif ball.vis.on:
+            self.willBeIllegalD = 0
+            print "ball not in box and ball.x is" + str(ball.x)
 
         if not PBConstants.USE_DUB_D:
             return False
         goalie = self.brain.teamMembers[0]
-        if (goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER)
-            or ball.inMyGoalBox()):
+        if goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER):
+            print "goalie chaser"
             self.goalieChaserCount += 1
         else:
+            print "goalie not chaser"
             self.goalieChaserCount = 0
             return False
         if self.goalieChaserCount > PBConstants.GOALIE_CHASER_COUNT_THRESH:
+            print "should be using dubD"
             return not self.brain.player.inKickingState
 
     def defenderShouldChase(self):
