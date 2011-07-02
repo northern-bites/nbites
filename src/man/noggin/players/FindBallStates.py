@@ -10,8 +10,9 @@ def findBall(player):
     if transitions.shouldChaseBall(player):
         return player.goLater('chase')
 
-    player.stopWalking()
-    player.brain.tracker.stopHeadMoves()
+    if player.firstFrame():
+        player.stopWalking()
+        player.brain.tracker.stopHeadMoves()
 
     if player.brain.nav.isStopped():
         return player.goLater('scanFindBall')

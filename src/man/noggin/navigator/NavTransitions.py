@@ -136,8 +136,8 @@ def shouldAvoidObstacleDuringApproachBall(nav):
     return (nav.brain.ball.dist >
             constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST and \
             shouldAvoidObstacle(nav) and
-            nav.brain.ball.dist > nav.brain.sonar.leftDist or
-            nav.brain.ball.dist > nav.brain.sonar.rightDist)
+            (nav.brain.ball.dist > nav.brain.sonar.leftDist or
+            nav.brain.ball.dist > nav.brain.sonar.rightDist))
 
 KICK_STRAIGHT_BEARING_THRESH = 20.
 ########## CHASE STUFF ##############

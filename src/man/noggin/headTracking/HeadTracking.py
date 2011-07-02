@@ -45,8 +45,8 @@ class HeadTracking(FSA.FSA):
         # target should either be ball or instance of FieldObject
 
     def stopHeadMoves(self):
-        """Stop all head moves."""
-        if self.currentState is not 'stopped' or \
+        """stop all head moves. In TrackingStates.py"""
+        if self.currentState is not 'stopped' and \
                 self.currentState is not 'stop':
             self.switchTo('stop')
 
