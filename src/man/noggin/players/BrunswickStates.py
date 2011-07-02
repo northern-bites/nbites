@@ -43,7 +43,10 @@ def gameReady(player):
             player.brain.resetLocalization()
             return player.goLater('afterPenalty')
 
-    return player.goLater('playbookPosition')
+    if player.brain.play.isRole(GOALIE):
+        return player.stay()
+    else:
+        return player.goLater('playbookPosition')
 
 def gameSet(player):
     """
