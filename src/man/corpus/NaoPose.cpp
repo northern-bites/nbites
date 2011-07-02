@@ -26,6 +26,7 @@ using namespace boost::numeric;
 using namespace Kinematics;
 using namespace NBMath;
 using namespace CoordFrame4D;
+using angle::radians;
 
 // From camera docs:
 const float NaoPose::IMAGE_WIDTH_MM = 2.36f;
@@ -107,8 +108,6 @@ void NaoPose::transform() {
                                      CameraCalibrate::Transforms[i]);
     }
 
-
-    ublas::matrix<float> supportLegToBodyTransform;
 
     //support leg is determined by which leg is further from the body!
     //this should be changed in one or more of the following ways:
@@ -713,6 +712,20 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
     if (t < 0) {x = 0;  y = 0;}
 
     return CoordFrame3D::vector3D(x, y);
+}
+
+std::vector<radians> NaoPose::headAnglesToRobotPoint(ublas::vector <float> point) {
+
+    NBMath::ufvector3 dest_pixel = this->worldPointToPixel(point);
+    float x = dest_pixel(X);
+    float y = dest_pixel(Y);
+    x -= IMAGE_CENTER_X;
+    y -= IMAGE_CENTER_Y;
+    static std::vector<radians> headAngles(NUM_JOINTS_CHAIN[HEAD_CHAIN]);
+    headAngles[HEAD_YAW] = x*PIX_TO_RAD_X;
+    headAngles[HEAD_PITCH] = y*PIX_TO_RAD_Y;
+    cout << headAngles[HEAD_YAW]*TO_DEG << " " << headAngles[HEAD_PITCH]*TO_DEG << endl;
+    return headAngles;
 }
 
 const estimate NaoPose::sizeBasedEstimate(int pixelX, int pixelY, float objectHeight, float pixelSize, float realSize) {

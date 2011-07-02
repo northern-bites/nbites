@@ -203,6 +203,7 @@ class NaoPose {
     const float getDistanceBetweenTwoObjects(estimate e1, estimate e2);
     std::vector<VisualLine> getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
     const boost::numeric::ublas::vector <float> worldPointToPixel(boost::numeric::ublas::vector <float> point);
+    std::vector<angle::radians> headAnglesToRobotPoint(boost::numeric::ublas::vector <float> point);
 
     const float getHeadPitch() {
         return sensors->getVisionAngle(Kinematics::HEAD_PITCH);
@@ -249,6 +250,7 @@ class NaoPose {
     point <int> horizonLeft, horizonRight;
     float horizonSlope,perpenHorizonSlope;
     point3 <float> focalPointInWorldFrame;
+    boost::numeric::ublas::matrix<float> supportLegToBodyTransform;
     float comHeight; // center of mass height in mm
     // In this array we hold the matrix transformation which takes us from the
     // originn to the end of each chain of the body.
