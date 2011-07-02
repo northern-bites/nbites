@@ -10,7 +10,7 @@ def lookToPoint(tracker):
 def lookToTarget(tracker):
     """looks to best guess of where target is"""
 
-    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+    if tracker.target.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.brain.motion.stopHeadMoves()
         if tracker.activeLocOn:
             tracker.brain.motion.stopHeadMoves()
@@ -29,7 +29,7 @@ def lookToTarget(tracker):
 
 def scanForTarget(tracker):
     """performs naive scan for target"""
-    if tracker.target.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+    if tracker.target.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         print "target on"
         if tracker.activeLocOn:
             tracker.brain.motion.stopHeadMoves()
@@ -68,7 +68,7 @@ def targetTracking(tracker):
         tracker.brain.motion.stopHeadMoves()
         tracker.activeLocOn = False
 
-    if tracker.target.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+    if tracker.target.vis.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goLater('lookToTarget')
 
     tracker.helper.trackObject()

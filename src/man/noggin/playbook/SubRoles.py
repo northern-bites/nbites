@@ -1,7 +1,7 @@
 from . import PBConstants
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 from ..util import MyMath
-from ..typeDefs.Location import Location
+from objects import Location
 
 #### Goalie sub roles ####
 

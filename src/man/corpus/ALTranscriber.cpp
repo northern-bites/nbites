@@ -264,26 +264,32 @@ void ALTranscriber::initSyncVisionWithALMemory() {
     try{
         alfastaccessVision =
             AL::ALPtr<AL::ALMemoryFastAccess >(new AL::ALMemoryFastAccess());
+
+        vector<string> varNames;
+        varNames +=
+            string("Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value"),
+            string("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"),
+            string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"),
+            string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"),
+            string("Device/SubDeviceList/US/Left/Sensor/Value"),
+            string("Device/SubDeviceList/US/Right/Sensor/Value"),
+            string("Device/SubDeviceList/Battery/Charge/Sensor/Value"),
+            string("Device/SubDeviceList/Battery/Current/Sensor/Value");
+
+        alfastaccessVision->ConnectToVariables(broker,varNames);
     } catch(AL::ALError &e){
         cout << "Failed to initialize proxy to ALFastAccess"<<endl;
     }
-
-    vector<string> varNames;
-    varNames += string("Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value"),
-        string("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value"),
-        string("Device/SubDeviceList/US/Left/Sensor/Value"),
-        string("Device/SubDeviceList/US/Right/Sensor/Value"),
-        string("Device/SubDeviceList/Battery/Charge/Sensor/Value"),
-        string("Device/SubDeviceList/Battery/Current/Sensor/Value");
-
-    alfastaccessVision->ConnectToVariables(broker,varNames);
 }
 
 void ALTranscriber::syncVisionWithALMemory() {
     static vector<float> varValues(6, 0.0f);
-    alfastaccessVision->GetValues(varValues);
+
+    try {
+        alfastaccessVision->GetValues(varValues);
+    } catch(AL::ALError &e){
+        cout << "Failed to initialize proxy to ALFastAccess"<<endl;
+    }
 
     const float leftFootBumperLeft  = varValues[0];
     const float leftFootBumperRight = varValues[1];

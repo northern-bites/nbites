@@ -49,9 +49,7 @@
     (t == NAO  && \
       (ROBOT_TYPE == NAO_RL || ROBOT_TYPE == NAO_RL_33 || ROBOT_TYPE == NAO_SIM) ))
 
-#ifndef NUM_PLAYERS_PER_TEAM
-# define NUM_PLAYERS_PER_TEAM 4
-#endif
+static const int NUM_PLAYERS_PER_TEAM = 4;
 
 // game controller constants for structure information
 #define GAME_CONTROLLER_LIST_SIZE 11

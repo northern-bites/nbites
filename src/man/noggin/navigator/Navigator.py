@@ -7,7 +7,7 @@ from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from man.noggin.typeDefs.Location import RobotLocation
+from objects import RobotLocation
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
