@@ -49,7 +49,6 @@ private:
     std::string connection_name;
     std::string connection_pswd;
     unsigned frames_with_no_wifi;
-    unsigned wifi_reconnect_attempts;
 
 };
 

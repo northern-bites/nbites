@@ -38,6 +38,9 @@ STOP_CALLING_THRESH = 3500.         # how likely you are to ignore teammates ide
 
 GOALIE_CHASER_COUNT_THRESH = 25      # how long we wait before goalie calls us off.
 
+DONT_ILLEGAL_D_THRESH = 4  # Amount to wait before stopping from chasing
+STOP_AVOID_BOX_THRESH = 5 # Amount to wait before going back to chasing
+
 # Special cases for waiting for the ball at half field
 NEAR_LINE_THRESH = 25.
 DEFENDER_SHOULD_CHASE_THRESH = 125.
@@ -287,13 +290,13 @@ CENTER_FIELD = Location(NogginConstants.CENTER_FIELD_X,
                         NogginConstants.CENTER_FIELD_Y)
 """DEFENDER"""
 READY_KICKOFF_DEFENDER_X = (NogginConstants.CENTER_FIELD_X -
-                            NogginConstants.GREEN_PAD_X) * 0.3
+                            NogginConstants.GREEN_PAD_X) * 0.3 + 15
 READY_KICKOFF_DEFENDER_0_Y = NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y
 READY_KICKOFF_DEFENDER_1_Y = NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y
 """OFFENDER"""
 READY_KICKOFF_OFFENDER_X = (NogginConstants.CENTER_FIELD_X -
                             NogginConstants.CENTER_CIRCLE_RADIUS * 0.5)
-READY_KICKOFF_OFFENDER_OFFSET = 150. # Can be as large as you want as long as robot can side-kick that distance
+READY_KICKOFF_OFFENDER_OFFSET = 165. # Can be as large as you want as long as robot can side-kick that distance
 READY_KICKOFF_OFFENDER_0_Y = (NogginConstants.CENTER_FIELD_Y +
                               READY_KICKOFF_OFFENDER_OFFSET)
 READY_KICKOFF_OFFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y -
@@ -302,7 +305,7 @@ READY_KICKOFF_OFFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y -
 # Use offset to leave room for chaser's feet/ room to position on the kick.
 READY_KICKOFF_CHASER_OFFSET = NogginConstants.CENTER_CIRCLE_RADIUS * 0.5
 READY_KICKOFF_CHASER_X = NogginConstants.CENTER_FIELD_X - READY_KICKOFF_CHASER_OFFSET
-READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
+READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y - 15 # near center
 
 # READY_NON_KICKOFF
 # ____________________
@@ -395,8 +398,8 @@ A Stopper will move back and forth on a line behind the center circle,
             far toward the edge of the field.
 """
 DEFENDER_BALL_DIST = 100
-SWEEPER_X_THRESH = NogginConstants.MY_GOALBOX_RIGHT_X + 90.
-SWEEPER_X = NogginConstants.MY_GOALBOX_RIGHT_X + 25.
+SWEEPER_X_THRESH = NogginConstants.LANDMARK_MY_FIELD_CROSS[0]
+SWEEPER_X = NogginConstants.MY_GOALBOX_RIGHT_X + 60.
 SWEEPER_Y = NogginConstants.CENTER_FIELD_Y
 SWEEPER_Y_OFFSET = 20.
 STOPPER_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[0]

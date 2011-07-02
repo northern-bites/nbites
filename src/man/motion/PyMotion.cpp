@@ -60,78 +60,78 @@ BOOST_PYTHON_MODULE(_motion)
 {
     // generic interface available to all PyMotionCommands
     class_<PyMotionCommand, boost::noncopyable>("PyMotionCommand", no_init)
-	.def("framesRemaining", &PyMotionCommand::framesRemaining)
-	.def("isDone", &PyMotionCommand::isDoneExecuting)
-	.def("timeRemaining", &PyMotionCommand::timeRemaining)
-	;
+    .def("framesRemaining", &PyMotionCommand::framesRemaining)
+    .def("isDone", &PyMotionCommand::isDoneExecuting)
+    .def("timeRemaining", &PyMotionCommand::timeRemaining)
+    ;
 
     class_<PyHeadJointCommand, bases<PyMotionCommand> >("HeadJointCommand",
-							init<float, tuple, tuple, int>(
-							    "A container for a head joint command passed to the motion engine"))
+                            init<float, tuple, tuple, int>(
+                                "A container for a head joint command passed to the motion engine"))
         ;
     class_<PyGaitCommand, bases<PyMotionCommand> >("GaitCommand",
-						   init<
-						   tuple, tuple, tuple, tuple,
-						   tuple, tuple, tuple, tuple>
-						   (args("stance,step,zmp,joint_hack,sensor,"
-							 "stiffness,odo,arms"),
-						    "Parameterization of the"
-						    " walk engine"))
+                           init<
+                           tuple, tuple, tuple, tuple,
+                           tuple, tuple, tuple, tuple>
+                           (args("stance,step,zmp,joint_hack,sensor,"
+                             "stiffness,odo,arms"),
+                            "Parameterization of the"
+                            " walk engine"))
         .def("getStepValue", &PyGaitCommand::getStepValue)
-	;
+    ;
 
     class_<PyBodyJointCommand, bases<PyMotionCommand> >("BodyJointCommand",
-							init<float, tuple, tuple, tuple,
-							tuple, tuple, int>(
-							    "A container for a body joint command passed to the motion engine"))
-	.def(init<float, int, tuple, tuple, int>( // Single chain command
-		 args("time","chainID", "joints","body_stiffness","interpolation"),
-		 "A container for a body joint command passed to the motion engine"))
-	;
+                            init<float, tuple, tuple, tuple,
+                            tuple, tuple, int>(
+                                "A container for a body joint command passed to the motion engine"))
+    .def(init<float, int, tuple, tuple, int>( // Single chain command
+         args("time","chainID", "joints","body_stiffness","interpolation"),
+         "A container for a body joint command passed to the motion engine"))
+    ;
     class_<PySetHeadCommand, bases<PyMotionCommand> >("SetHeadCommand",
-						      init<float, float>(args("yaw", "pitch"),
-									 "A container for a set head command. Holds yaw and pitch angles in degrees."))
-	.def(init<float,float,float,float>(args("yaw","pitch",
-						"maxYawSpeed","maxPitchSpeed")))
+                              init<float, float>(args("yaw", "pitch"),
+                                     "A container for a set head command. Holds yaw and pitch angles in degrees."))
+    .def(init<float,float,float,float>(args("yaw","pitch",
+                        "maxYawSpeed","maxPitchSpeed")))
         ;
 
     class_<PyCoordHeadCommand, bases<PyMotionCommand> >("CoordHeadCommand",
-							init<float, float, float>
-							(args("relX", "relY", "relZ"),
-							 "A container for a coord head command."))
-	.def(init<float, float, float, float, float> (
-		 args( "relX", "relY", "relZ", "maxYawSpeed", "maxPitchSpeed")))
-	;
+                            init<float, float, float>
+                            (args("relX", "relY", "relZ"),
+                             "A container for a coord head command."))
+    .def(init<float, float, float, float, float> (
+         args( "relX", "relY", "relZ", "maxYawSpeed", "maxPitchSpeed")))
+    ;
 
     class_<PyWalkCommand, bases<PyMotionCommand> >("WalkCommand",
-						   init<float, float, float>(args("x","y","theta"),
-									     "A container for a walk command. Holds an x, y and theta which represents a"
-									     " walk vector"))
+                           init<float, float, float>(args("x","y","theta"),
+                                         "A container for a walk command. Holds an x, y and theta which represents a"
+                                         " walk vector"))
         ;
 
     class_<PyDestinationCommand, bases<PyMotionCommand> >("DestinationCommand",
-							  init<float, float, float, float>
-							  (args("x","y","theta","gain"),
-							   "A container for a destination command. Holds an x, y and theta which represent a"
-							   " destination relative to the origin of the robot, and a speed (gain)"))
+                              init<float, float, float, float>
+                              (args("x","y","theta","gain"),
+                               "A container for a destination command. Holds an x, y and theta which represent a"
+                               " destination relative to the origin of the robot, and a speed (gain)"))
         ;
 
     class_<PyStepCommand, bases<PyMotionCommand> >("StepCommand",
-						   init<float, float, float, int>(args("x","y","theta",
-										       "numSteps"),
-										  "A container for a step command. Holds an x, y and theta which represents a"
-										  " walk vector, in addition to the number of desired steps."))
+                           init<float, float, float, int>(args("x","y","theta",
+                                               "numSteps"),
+                                          "A container for a step command. ""Holds an x, y and theta which represents a"
+                                          " walk vector, in addition to the number of desired steps."))
         ;
 
     class_<PyFreezeCommand, bases<PyMotionCommand> >("FreezeCommand",
-						     init<>("A container for a "
-							    "command to freeze the robot"))
+                             init<>("A container for a "
+                                "command to freeze the robot"))
         ;
 
     class_<PyUnfreezeCommand, bases<PyMotionCommand> >("UnfreezeCommand",
-						       init<float>(args("stiffness"),
-								   "A container for a command to "
-								   "UNfreeze the robot"))
+                               init<float>(args("stiffness"),
+                                   "A container for a command to "
+                                   "UNfreeze the robot"))
 
         ;
     class_<PyMotionInterface>("MotionInterface")
@@ -139,7 +139,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("sendStepCommand", &PyMotionInterface::sendStepCommand)
-	.def("sendDestCommand", &PyMotionInterface::sendDestCommand)
+    .def("sendDestCommand", &PyMotionInterface::sendDestCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead", &PyMotionInterface::setHead)
         .def("coordHead", &PyMotionInterface::coordHead)
@@ -152,6 +152,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
         .def("resetWalk", &PyMotionInterface::resetWalkProvider)
         .def("resetScripted", &PyMotionInterface::resetScriptedProvider)
+        .def("walkPose", &PyMotionInterface::walkPose)
         ;
 }
 

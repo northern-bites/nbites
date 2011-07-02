@@ -46,14 +46,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.shouldRelocalizeCounter = 0
 
-        # Penalty kick player variables
-        self.penaltyKicking = False
-        self.penaltyMadeFirstKick = True
-        self.penaltyMadeSecondKick = False
-
-        # Kickoff kick
-        self.hasKickedOff = True
-
         # Orbiting
         self.angleToOrbit = 0.0
 
@@ -64,7 +56,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if (gcState == 'gamePlaying'):
             roleState = self.getNextState()
 
-        # Goalie Penalty Kicking
+            if roleState != self.currentState:
+                self.switchTo(roleState)
+
+        #Goalie Penalty Kicking
         if (gcState == 'penaltyShotsGamePlaying'
                  and self.play.isRole(PBConstants.GOALIE)):
             self.penaltyKicking = True

@@ -18,7 +18,7 @@ def gamePenalized(player):
 def standup(player):
     player.gainsOn()
     if player.firstFrame():
-        player.standup()
+        player.walkPose()
         return player.stay()
     return player.goLater('lookCenterRight')
 

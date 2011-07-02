@@ -19,6 +19,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "MotionInterface.h"
+#include <iostream>
 
 void MotionInterface::setNextWalkCommand(const WalkCommand::ptr command){
     switchboard->sendMotionCommand(command);
@@ -54,7 +55,7 @@ void MotionInterface::sendFreezeCommand(const UnfreezeCommand::ptr command){
 
 
 void MotionInterface::stopBodyMoves() {
-	switchboard->stopBodyMoves();
+    switchboard->stopBodyMoves();
 }
 
 void MotionInterface::stopHeadMoves() {
@@ -73,21 +74,24 @@ float MotionInterface::getHeadSpeed() const {
     return DUMMY_F;
 }
 
-void MotionInterface::setWalkConfig ( float pMaxStepLength, float pMaxStepHeight,
-				      float pMaxStepSide, float pMaxStepTurn,
-				      float pZmpOffsetX, float pZmpOffsetY) const {
+void MotionInterface::setWalkConfig ( float pMaxStepLength,
+                                      float pMaxStepHeight,
+                                      float pMaxStepSide,
+                                      float pMaxStepTurn,
+                                      float pZmpOffsetX,
+                                      float pZmpOffsetY) const {
 }
 
 void MotionInterface::setWalkArmsConfig ( float pShoulderMedian,
-					  float pShoulderApmlitude,
-					  float pElbowMedian,
-					  float pElbowAmplitude) const {
+                      float pShoulderApmlitude,
+                      float pElbowMedian,
+                      float pElbowAmplitude) const {
 }
 
 void MotionInterface::setWalkExtraConfig( float pLHipRollBacklashCompensator,
-					  float pRHipRollBacklashCompensator,
-					  float pHipHeight,
-					  float pTorsoYOrientation) const {
+                      float pRHipRollBacklashCompensator,
+                      float pHipHeight,
+                      float pTorsoYOrientation) const {
 }
 
 void MotionInterface::setGait(const Gait::ptr command){
@@ -107,4 +111,9 @@ void MotionInterface::setBalanceMode(int pBalanceMode) const {
 
 int MotionInterface::getBalanceMode() const {
     return DUMMY_I;
+}
+
+void MotionInterface::walkPose() const
+{
+    switchboard->walkPose();
 }
