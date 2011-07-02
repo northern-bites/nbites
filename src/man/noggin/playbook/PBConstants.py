@@ -38,7 +38,8 @@ STOP_CALLING_THRESH = 3500.         # how likely you are to ignore teammates ide
 
 GOALIE_CHASER_COUNT_THRESH = 25      # how long we wait before goalie calls us off.
 
-DONT_ILLEGAL_D_THRESH = 4  #Amount to wait before stopping from chasing
+DONT_ILLEGAL_D_THRESH = 4  # Amount to wait before stopping from chasing
+STOP_AVOID_BOX_THRESH = 5 # Amount to wait before going back to chasing
 
 # Special cases for waiting for the ball at half field
 NEAR_LINE_THRESH = 25.
