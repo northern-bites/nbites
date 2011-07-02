@@ -59,7 +59,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             if roleState != self.currentState:
                 self.switchTo(roleState)
 
-        # Goalie Penalty Kicking
+        #Goalie Penalty Kicking
         if (gcState == 'penaltyShotsGamePlaying'
                  and self.play.isRole(PBConstants.GOALIE)):
             self.penaltyKicking = True

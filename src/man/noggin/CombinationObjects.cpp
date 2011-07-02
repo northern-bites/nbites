@@ -58,16 +58,16 @@ namespace noggin {
     const bool Location::inOppGoalBox()
     {
         return ((OPP_GOALBOX_LEFT_X - BOX_BUFFER < x) &&
-                 OPP_GOALBOX_RIGHT_X + BOX_BUFFER > x &&
-                OPP_GOALBOX_TOP_Y + BOX_BUFFER > y &&
-                y > OPP_GOALBOX_BOTTOM_Y - BOX_BUFFER );
+                 (OPP_GOALBOX_RIGHT_X + BOX_BUFFER > x) &&
+                (OPP_GOALBOX_TOP_Y + BOX_BUFFER) > y &&
+                y > (OPP_GOALBOX_BOTTOM_Y - BOX_BUFFER));
     }
 
     const bool Location::inMyGoalBox()
     {
-        return ( x < MY_GOALBOX_RIGHT_X + BOX_BUFFER &&
-                 MY_GOALBOX_TOP_Y + BOX_BUFFER > y &&
-                 y > OPP_GOALBOX_BOTTOM_Y - BOX_BUFFER);
+        return ( x < (MY_GOALBOX_RIGHT_X + BOX_BUFFER) &&
+                 (MY_GOALBOX_TOP_Y + BOX_BUFFER) > y &&
+                 y > (OPP_GOALBOX_BOTTOM_Y - BOX_BUFFER));
     }
 
     const bool Location::inCenterOfField()
