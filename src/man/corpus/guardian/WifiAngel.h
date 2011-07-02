@@ -12,6 +12,8 @@
 #include "ConnectionAngel.h"
 #include "ConnectionConstants.h"
 
+#include "Common.h"
+
 #include <string>
 
 namespace man {
@@ -22,13 +24,11 @@ namespace conn_consts = connection_constants;
 
 class WifiAngel : public ConnectionAngel {
 
-
-
 public:
     WifiAngel(std::string connection_name =
                       conn_consts::CONNECTION_NAME_DEFAULT,
-              int wifi_reconnects_max =
-                      conn_consts::WIFI_RECONNECTS_MAX_DEFAULT);
+              std::string connection_pswd =
+                      conn_consts::CONNECTION_PSWD_DEFAULT);
 
     virtual ~WifiAngel(){}
 
@@ -42,12 +42,14 @@ public:
      * @return true if wifi was up, false if it was down
      */
     bool check_on_wifi();
-    bool try_to_reconnect();
+    bool reset_soft();
+    bool reset_hard();
 
 private:
     std::string connection_name;
-    int wifi_reconnects_max;
-    int wifi_reconnect_attempts;
+    std::string connection_pswd;
+    unsigned frames_with_no_wifi;
+    unsigned wifi_reconnect_attempts;
 
 };
 

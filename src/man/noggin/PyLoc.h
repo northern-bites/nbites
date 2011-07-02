@@ -27,7 +27,6 @@ public:
 
     void reset() {
         loc->reset();
-        ballEKF->reset();
     }
     void resetBall() {
         ballEKF->reset();
