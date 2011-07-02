@@ -296,14 +296,14 @@ class PyCoordHeadCommand : public PyMotionCommand {
 public:
     PyCoordHeadCommand( const float _x, const float _y, const float _z) {
 	command = CoordHeadCommand::ptr (
-	    new CoordHeadCommand(_x,_y,_z)
+	    new CoordHeadCommand(_x * 10, _y * 10, _z * 10)
 	    );
     }
     PyCoordHeadCommand( const float _x, const float _y, const float _z,
                         const float maxYawSpeed,
                         const float maxPitchSpeed ) {
 	command = CoordHeadCommand::ptr(
-	    new CoordHeadCommand( _x, _y, _z,
+	    new CoordHeadCommand( _x * 10, _y * 10, _z * 10,
 				  maxYawSpeed, maxPitchSpeed )
 	    );
     }

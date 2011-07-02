@@ -100,7 +100,7 @@ class HeadTrackingHelper(object):
         """
 
         #convert from cm to mm for c++ code
-        headMove = motion.CoordHeadCommand(10*target.relX, 10*target.relY, 10*target.height,.1065*.1,.1227*.1)# arbitrary slow down for debugging
+        headMove = motion.CoordHeadCommand(target.relX, target.relY, target.height,.1065*.1,.1227*.1)# arbitrary slow down for debugging
         self.tracker.brain.motion.coordHead(headMove)
 
 # ** # old method
@@ -125,7 +125,7 @@ class HeadTrackingHelper(object):
 # ** # old method - replaced?
     def lookToPoint(self, target):
         #convert from cm to mm for c++ code
-        headMove = motion.CoordHeadCommand(10*target.x, 10*target.y, 10*target.height,.1065*.1,.1227*.1)
+        headMove = motion.CoordHeadCommand(target.x, target.y, target.height,.1065*.1,.1227*.1)
         self.tracker.brain.motion.coordHead(headMove)
 
 # ** # debugging method
