@@ -212,12 +212,16 @@ namespace noggin {
         const float getAccYUncert() { return loc->getYAccelerationUncert(); }
         const float getRelAccX() { return loc->getRelXAccelerationUncert(); }
         const float getRelAccY() { return loc->getRelYAccelerationUncert(); }
+        const float dX() { return dx; }
+        const float dY() { return dy; }
+        const float getEndY() { return endY; }
 
         // Other
         void update();
 
     private:
         MyInfo* my;
+        float lastRelX, lastRelY, dx, dy, endY;
     };
 
     /*
@@ -311,5 +315,11 @@ namespace noggin {
         int playerNumber;
     };
 
+    /*
+     * BALL
+     * Similar to a FieldObject, but for the ball. Holds a pointer to both a loc
+     * ball and a vision ball, accessible through loc and vis. Also stores the
+     * best values for dist and bearing.
+     */
 }
 #endif //CombObjects_h_DEFINED

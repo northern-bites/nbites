@@ -270,6 +270,14 @@ namespace noggin {
             x = FIELD_GREEN_WIDTH - loc->getBallXEst();
             y = FIELD_GREEN_HEIGHT - loc->getBallYEst();
         }
+
+        dx = lastRelX - getRelX();
+        dy = lastRelY - getRelY();
+
+        lastRelX = getRelX();
+        lastRelY = getRelY();
+
+        if (dx != 0) endY = getRelY() - (dy*(getRelX()/dx));
     }
 
 /////////// MyInfo Methods /////////////////
