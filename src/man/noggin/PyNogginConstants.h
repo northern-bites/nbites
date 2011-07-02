@@ -23,7 +23,7 @@ namespace noggin {
 
         ///// SWITCH BOARD /////
         static const bool LOG_LOC = false;
-        static const bool LOG_COMM = true;
+        static const bool LOG_COMM = false;
 
         ///// MODULE SWITCHES /////
 #ifdef USE_VISION
