@@ -45,8 +45,9 @@ def gameReady(player):
             player.brain.resetLocalization()
             return player.goLater('afterPenalty')
 
-    #See above about rules(2011)
-    if player.brain.play.isRole(GOALIE):
+    #See above about rules(2011) - we should still reposition after goals
+    if (player.lastDiffState == 'gameInitial'
+        and player.brain.play.isRole(GOALIE)):
         return player.stay()
     else:
         return player.goLater('playbookPosition')
