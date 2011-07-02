@@ -7,7 +7,7 @@ from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from man.noggin.typeDefs.Location import RobotLocation
+from objects import RobotLocation
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
@@ -16,7 +16,6 @@ class Navigator(FSA.FSA):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.addStates(NavStates)
-        self.addStates(PlaybookPositionStates)
         self.addStates(ChaseStates)
         self.addStates(PFKStates)
         self.currentState = 'stopped'
@@ -36,7 +35,6 @@ class Navigator(FSA.FSA):
         self.walkTheta = 0
         self.orbitDir = 0
         self.angleToOrbit = 0
-        self.curSpinDir = 0
         self.destX = 0
         self.destY = 0
         self.destTheta = 0
@@ -47,12 +45,19 @@ class Navigator(FSA.FSA):
         self.shouldAvoidObstacleLeftCounter = 0
         self.shouldAvoidObstacleRightCounter = 0
 
+        self.resetSpeedMemory()
+        self.resetDestMemory()
+
+        self.destType = None
+
     def performSweetMove(self, move):
         """
         Navigator function to do the sweet move
         """
         self.sweetMove = move
         self.brain.player.stopWalking()
+        self.resetSpeedMemory()
+        self.resetDestMemory()
         helper.executeMove(self.brain.motion, self.sweetMove)
         self.switchTo('doingSweetMove')
 
@@ -77,18 +82,13 @@ class Navigator(FSA.FSA):
         """robot will walk to the x,y,h from playbook using a mix of omni,
         straight walks and spins"""
 
-        self.switchTo('playbookWalk')
+        self.destType = constants.PLAYBOOK_DEST
+        self.switchTo('goToPosition')
 
     def goTo(self,dest):
         self.dest = dest
-
-        if not self.currentState == 'spinToWalkHeading' and \
-               not self.currentState == 'walkStraightToPoint' and \
-               not self.currentState == 'spinToFinalHeading':
-            if not navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
-                self.switchTo('spinToWalkHeading')
-            elif navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
-                self.switchTo('walkStraightToPoint')
+        self.destType = constants.GO_TO_DEST
+        self.switchTo('goToPosition')
 
     def stop(self):
         if ((self.currentState =='stop' or self.currentState == 'stopped')
@@ -104,12 +104,9 @@ class Navigator(FSA.FSA):
 
         if (self.angleToOrbit == angleToOrbit and \
                 self.currentState == 'orbitPointThruAngle'):
-            self.updatedTrajectory = False
             return
 
         self.angleToOrbit = angleToOrbit
-
-        self.updatedTrajectory = True
 
         self.switchTo('orbitPointThruAngle')
 
@@ -123,18 +120,10 @@ class Navigator(FSA.FSA):
         if (x == 0 and y == 0 and theta == 0):
             self.printf("!!!!!! USE player.stopWalking() NOT walk(0,0,0)!!!!!")
             return
-        # If the walk changes are really small, then ignore them
-        if (fabs(self.walkX - x) < constants.FORWARD_EPSILON and
-            fabs(self.walkY - y) < constants.STRAFE_EPSILON and
-            fabs(self.walkTheta - theta) < constants.SPIN_EPSILON):
-            self.updatedTrajectory = False
-            return
-
         self.walkX = x
         self.walkY = y
         self.walkTheta = theta
 
-        self.updatedTrajectory = True
         self.switchTo('walking')
 
     def setDest(self, x, y, theta):
@@ -159,3 +148,75 @@ class Navigator(FSA.FSA):
         self.stepTheta = theta
         self.numSteps = numSteps
         self.switchTo('stepping')
+
+
+    # Have we reached our destination?
+    def isAtPositition(self):
+        return self.currentState is 'atPosition'
+
+    #################################################################
+    #             ::Walk speed memory::                             #
+    #                                                               #
+    #         DO NOT SET IN THE NORMAL NAVIGATOR BEHAVIOR           #
+    #         ONLY TO BE USED IN NAV HELPER SPEED SETTERS           #
+    #               AND HERE.                                       #
+    #                                                               #
+    #      self.lastXSpeed, self.lastYSpeed, self.lastThetaSpeed    #
+    #      self.lastDestX,  self.lastDestY,  self.lastDestTheta     #
+    #           self.lastDestGain                                   #
+    #################################################################
+
+    # Is the given vector equal to our current values
+    def speedVectorsEqual(self, x, y, theta):
+        return (fabs(self.lastSpeedX - x) < constants.FORWARD_EPSILON and
+                fabs(self.lastSpeedY - y) < constants.STRAFE_EPSILON and
+                fabs(self.lastSpeedTheta - theta) < constants.SPIN_EPSILON)
+
+    def updateSpeeds(self, x, y, theta):
+        """
+        Update the speed values and reset the others
+        """
+        self.lastSpeedX, self.lastSpeedY, self.lastSpeedTheta = x,y,theta
+        self.resetDestMemory()
+
+    def updateDests(self, x, y, theta, gain):
+        """
+        Update the last destination we were sent to
+        """
+        self.lastDestX, \
+            self.lastDestY, \
+            self.lastDestTheta, \
+            self.lastDestGain= x,y,theta, gain
+        self.resetSpeedMemory()
+
+    def resetSpeedMemory(self):
+        """
+        Reset our idea of the last walk vector we had
+        """
+        self.lastSpeedX,  \
+            self.lastSpeedY,\
+            self.lastSpeedTheta  = (constants.WALK_VECTOR_INIT,)*3
+
+    def resetDestMemory(self):
+        """
+        Reset our idea of the last walk destination vector we had
+        """
+        self.lastDestX, \
+            self.lastDestY, \
+            self.lastDestTheta, \
+            self.lastDestGain = (constants.WALK_VECTOR_INIT,)*4
+
+
+    # Choose our next position based on our mode of locomotion:
+    #      - Playbook
+    #      - GoTo Dest
+    #      - Ball
+    def getDestination(self):
+        if self.destType is constants.PLAYBOOK_DEST:
+            return self.brain.play.getPosition()
+
+        elif self.destType is constants.GO_TO_DEST:
+            return self.dest
+
+        elif self.destType is constants.BALL:
+            return self.brain.ball

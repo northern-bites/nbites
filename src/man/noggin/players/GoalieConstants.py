@@ -2,7 +2,7 @@
 # Goalie constants
 #
 
-from .. import NogginConstants as NogCon
+import noggin_constants as NogCon
 
 # *****************
 #     Position    *
@@ -30,7 +30,7 @@ HEAT_BUFFER = 10
 
 #Saving limits
 CENTER_SAVE_THRESH = 15
-DONT_SAVE_LIMIT = 200
+DONT_SAVE_LIMIT = 250
 ACCEL_SAVE_THRESH = -20
 
 # Accel value below which "Not Moving"

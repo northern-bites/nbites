@@ -35,7 +35,7 @@ class MultiLocEKF : public ekf::TwoMeasurementEKF<PointObservation,
                     public LocSystem
 {
     enum {
-        max_pt_divergence = 5,
+        max_pt_divergence = 6,
         max_corner_divergence = 8
     };
 

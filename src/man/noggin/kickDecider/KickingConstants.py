@@ -1,5 +1,5 @@
-from .. import NogginConstants
-from ..typeDefs.Location import Location
+import noggin_constants as NogginConstants
+from objects import Location
 
 DEBUG_KICKS = False
 

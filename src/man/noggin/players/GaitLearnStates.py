@@ -15,7 +15,7 @@ import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
 import man.motion.RobotGaits as RobotGaits
 import man.motion.MotionConstants as MotionConstants
-import man.noggin.typeDefs.Location as Location
+from objects import Location
 import man.noggin.navigator.NavHelper as helper
 import man.noggin.navigator.WalkHelper as walkhelper
 

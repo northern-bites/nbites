@@ -42,7 +42,7 @@
 
 class MotionInterface
 {
-  public:
+public:
     MotionInterface(MotionSwitchboard *_switchboard)
         : switchboard(_switchboard) {}
     virtual ~MotionInterface() {}
@@ -86,22 +86,24 @@ class MotionInterface
     void setHead(float time, float yaw, float pitch,
                  Kinematics::InterpolationType type) const { }
     void setWalkConfig ( float pMaxStepLength, float pMaxStepHeight,
-			 float pMaxStepSide, float pMaxStepTurn,
-			 float pZmpOffsetX, float pZmpOffsetY) const ;
+                         float pMaxStepSide, float pMaxStepTurn,
+                         float pZmpOffsetX, float pZmpOffsetY) const ;
     void setWalkArmsConfig ( float pShoulderMedian, float pShoulderAmplitude,
-			     float pElbowMedian, float pElbowAmplitude) const ;
+                             float pElbowMedian, float pElbowAmplitude) const ;
     void setWalkExtraConfig( float pLHipRollBacklashCompensator,
-			     float pRHipRollBacklashCompensator,
-			     float pHipHeight , float pTorsoYOrientation) const;
+                             float pRHipRollBacklashCompensator,
+                             float pHipHeight , float pTorsoYOrientation) const;
 
     void setSupportMode( int pSupportMode ) const ;
     int getSupportMode() const;
     void setBalanceMode( int pBalanceMode ) const ;
     int getBalanceMode() const;
 
+    void walkPose() const;
+
     int getFrameCount() const { return switchboard->getFrameCount(); }
 
-  private:
+private:
     MotionSwitchboard *switchboard;
 };
 
