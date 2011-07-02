@@ -250,8 +250,10 @@ void Noggin::runStep ()
 #   ifdef USE_NOGGIN_AUTO_HALT
     // don't bother doing anything if there's a Python error and we
     // haven't reloaded
-    if (error_state)
-        return;
+    if (error_state) {
+        this->reload_hard();
+        error_state = false;
+    }
 #   endif
 
     //Check button pushes for game controller signals
