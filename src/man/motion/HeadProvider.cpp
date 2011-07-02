@@ -82,9 +82,6 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
     case SET:
         setMode();
         break;
-    case COORD:
-        coordMode();
-        break;
     }
     setActive();
     pthread_mutex_unlock(&head_provider_mutex);
@@ -148,40 +145,6 @@ void HeadProvider::scriptedMode(){
     currChoppedCommand->nextFrame();
 }
 
-void HeadProvider::coordMode(){
-    //Maximum head movement is Rad/motion frame (6 deg/20ms from AL docs)
-    const float MAX_HEAD_VEL = 6.0f*TO_RAD;
-
-    //Calculate how much we can move toward the goal
-    float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
-                                         -yawMaxSpeed,
-                                         yawMaxSpeed);
-    float pitchChangeTarget = NBMath::clip(pitchDest - lastPitchDest,
-                                           -pitchMaxSpeed,
-                                           pitchMaxSpeed);
-
-#ifdef DEBUG_HEADPROVIDER
-    cout << "Last values "<<endl
-         <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
-         <<"   added      ("<<yawChangeTarget<<","<<pitchChangeTarget<<")"<<endl
-         <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
-#endif
-
-    //update memory for next  run
-    lastYawDest = lastYawDest + yawChangeTarget;
-    lastPitchDest = lastPitchDest + pitchChangeTarget;
-
-    //update the chain angles
-    vector<float> newChainAngles;
-    newChainAngles.push_back(lastYawDest);
-    newChainAngles.push_back(lastPitchDest);
-    setNextChainJoints(HEAD_CHAIN,newChainAngles);
-
-    vector<float> head_gains(HEAD_JOINTS, headSetStiffness);
-    //Return the stiffnesses for each joint
-    setNextChainStiffnesses(HEAD_CHAIN,head_gains);
-}
-
 void HeadProvider::setCommand(const SetHeadCommand::ptr command) {
     pthread_mutex_lock(&head_provider_mutex);
 
@@ -218,20 +181,29 @@ void HeadProvider::setCommand(const HeadJointCommand::ptr command) {
     pthread_mutex_unlock(&head_provider_mutex);
 }
 
+/**
+ * A coord command is really just a set command with extra computation
+ * to find the destination angles. We calculate the angles and then
+ * run like a set command.
+ */
 void HeadProvider::setCommand(const CoordHeadCommand::ptr command) {
     pthread_mutex_lock(&head_provider_mutex);
 
-    transitionTo(COORD);
+    transitionTo(SET);
 
-    float relY = command->getRelY()-pose->getFocalPointInWorldFrameY();
-    float relX = command->getRelX()-pose->getFocalPointInWorldFrameX();
+    float relY = command->getRelY() - pose->getFocalPointInWorldFrameY();
+    float relX = command->getRelX() - pose->getFocalPointInWorldFrameX();
 
     //adjust for robot center's distance above ground
-    float relZ = command->getRelZ()-pose->getFocalPointInWorldFrameZ()-300;
+    float relZ = (command->getRelZ() -
+                  pose->getFocalPointInWorldFrameZ() -
+                  pose->getBodyCenterHeight());
+
     yawDest = atan(relY/relX);
 
-    float hypoDist = sqrt((relY*relY)+(relX*relX));
-    pitchDest = -1*atan(relZ/hypoDist) -
+    float hypoDist = hypotf(relY, relX);
+
+    pitchDest = -atan(relZ/hypoDist) -
         Kinematics::LOWER_CAMERA_ANGLE; //constant for lower camera
 
     yawMaxSpeed = command->getMaxSpeedYaw();
@@ -291,7 +263,6 @@ bool HeadProvider::isDone(){
                                && headCommandQueue.empty());
     switch(curMode){
     case SET:
-    case COORD:
         if (setDone) { currHeadCommand->isDoneExecuting(); }
         return setDone;
         break;
@@ -324,7 +295,6 @@ void HeadProvider::transitionTo(HeadMode newMode){
             stopScripted();
             break;
         case SET:
-        case COORD:
             vector<float> mAngles = sensors->getMotionBodyAngles();
             lastYawDest =mAngles[0];
             lastPitchDest =mAngles[1];

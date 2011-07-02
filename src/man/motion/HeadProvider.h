@@ -52,14 +52,12 @@ public:
 private:
     enum HeadMode {
         SCRIPTED,
-        SET,
-	COORD
+        SET
     };
 
     void transitionTo(HeadMode newMode);
     void setMode();
     void scriptedMode();
-    void coordMode();
     void stopScripted();
     void stopSet();
 
