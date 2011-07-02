@@ -5,13 +5,11 @@ from math import (fabs)
 
 TIME_TO_LOOK_TO_TARGET = 1.0
 
-# ** # old method
 def lookToPoint(tracker):
     """Look to the localization coords of the stored target."""
     tracker.helper.lookToPoint(tracker.target)
     return tracker.stay()
 
-# ** # old method
 def lookToTarget(tracker):
     """
     Look to localization coords of target.
@@ -33,7 +31,6 @@ def lookToTarget(tracker):
 
     return tracker.stay()
 
-# ** # old method
 def scanForTarget(tracker):
     """
     Performs naive scan for target.
@@ -64,7 +61,6 @@ def scanForTarget(tracker):
 
     return tracker.stay()
 
-# ** # old method
 def targetTracking(tracker):
     """
     Track the target via vision values.

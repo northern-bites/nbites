@@ -5,7 +5,6 @@ from . import BasicStates
 from . import HeadTrackingHelper as helper
 from ..util import FSA
 from ..util import MyMath
-from man.motion import MotionConstants# ** # debugging code
 
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""

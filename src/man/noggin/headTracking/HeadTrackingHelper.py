@@ -10,7 +10,6 @@ class HeadTrackingHelper(object):
     def __init__(self, tracker):
         self.tracker = tracker
 
-# ** # old method
     def executeHeadMove(self, headMove):
         """performs a sweetmove"""
         for position in headMove:
@@ -25,8 +24,6 @@ class HeadTrackingHelper(object):
 
             self.tracker.brain.motion.enqueue(move)
 
-
-# ** # old method
     def trackObject(self):
         """
         Method to actually perform the tracking.
@@ -67,7 +64,6 @@ class HeadTrackingHelper(object):
                                          maxSpeed, maxSpeed)
         self.tracker.brain.motion.setHead(headMove)
 
-# ** # new method
     def lookToTargetAngles(self, target):
         """
         Uses setHeadCommands to bring given target to center of frame.
@@ -93,7 +89,6 @@ class HeadTrackingHelper(object):
         self.tracker.brain.motion.setHead(headMove)
         # boost converts to radians for setHeadCommand
 
-    # ** # new method
     def lookToTargetCoords(self, target):
         """
         Looks at given target's relative coordinates
@@ -103,7 +98,6 @@ class HeadTrackingHelper(object):
         headMove = motion.CoordHeadCommand(target.relX, target.relY, 0,.1065*.1,.1227*.1)# arbitrary slow down for debugging (doesn't seem to do anything)
         self.tracker.brain.motion.coordHead(headMove)
 
-# ** # old method
     def panTo(self, heads):
         """
         Pan heads at appropriate speed to given heads
@@ -122,25 +116,21 @@ class HeadTrackingHelper(object):
         self.executeHeadMove( ((heads, panTime, 0,
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
-# ** # old method - replaced?
     def lookToPoint(self, target):
         #convert from cm to mm for c++ code
         headMove = motion.CoordHeadCommand(target.x, target.y, target.height,.1065*.1,.1227*.1)
         self.tracker.brain.motion.coordHead(headMove)
 
-# ** # debugging method
     def lookToAngles(self, yaw=0, pitch=0):
         headMove = motion.SetHeadCommand(MyMath.degrees(yaw),MyMath.degrees(pitch))
         self.tracker.brain.motion.setHead(headMove)
 
-# ** # old method - replaced in c++
     def calcBearing(self, target):
         """returns the bearing to target in degrees. usable as headYaw"""
         my = self.tracker.brain.my
 
         return my.getRelativeBearing(target)
 
-# ** # old method - replaced in c++
     def calcHeadPitch(self, target):
         """returns the pitch to target in degrees"""
         my = self.tracker.brain.my
@@ -156,7 +146,6 @@ class HeadTrackingHelper(object):
         headPitch = atan(relHeight/dist) - CAMERA_ANGLE
         return headPitch
 
-# ** # old method - replaced in c++
     def getCameraHeight(self):
         """gets the height of the lower camera in cm"""
         pose = self.tracker.brain.vision.pose

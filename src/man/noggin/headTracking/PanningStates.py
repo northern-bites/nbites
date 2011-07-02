@@ -2,7 +2,6 @@ import man.motion.HeadMoves as HeadMoves
 from . import TrackingConstants as constants
 from man.motion import MotionConstants
 
-# ** # old method
 def scanBall(tracker):
     """
     While ball is not in view, execute naive pans.
@@ -21,16 +20,9 @@ def scanBall(tracker):
                 ball.dist < HeadMoves.MID_SCAN_FAR_BOUND:
             tracker.helper.executeHeadMove(HeadMoves.MID_DOWN_WIDE_SCAN_BALL)
         else:
-            tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
-
-    # # Instead because our ball information is poor, lets just do one
-    # # scan and make sure we don't miss it.  If our ball EKF is better
-    # # and trustworthy than we can put the above code back in
-    # if not tracker.brain.motion.isHeadActive():
-    #     tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
+            tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_
     return tracker.stay()
 
-# ** # old method
 def spinScanBall(tracker):
     """
     If ball is in view, goes to state cycle decider.
@@ -54,7 +46,6 @@ def spinScanBall(tracker):
 
     return tracker.stay()
 
-# ** # old method
 def scanning(tracker):
     """
     Repeatedly run the stored headScan.
@@ -69,7 +60,6 @@ def scanning(tracker):
 
     return tracker.stay()
 
-# ** # old method
 def locPans(tracker):
     """
     Repeatedly execute the headMove QUICK_PANS.
@@ -84,7 +74,6 @@ def locPans(tracker):
 
     return tracker.stay()
 
-# ** # new method
 def afterKickScan(tracker):
     """
     Looks in the direction the ball was kicked in.
@@ -99,7 +88,6 @@ def afterKickScan(tracker):
 
     return tracker.stay()
 
-# ** # old method
 def panLeftOnce(tracker):
     """
     Pan to the left, then return to last diff state.
@@ -113,7 +101,6 @@ def panLeftOnce(tracker):
         return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
 
-# ** # old method
 def panRightOnce(tracker):
     """
     Pan to the right, then return to last diff state.
@@ -127,7 +114,6 @@ def panRightOnce(tracker):
         return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
 
-# ** # old method
 def panUpOnce(tracker):
     """
     Pan to up, then return to last diff state.
@@ -141,7 +127,6 @@ def panUpOnce(tracker):
         return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
 
-# ** # old method
 def postScan(tracker):
     """
     Repeatedly execute the headMove POST_SCAN.
@@ -152,7 +137,6 @@ def postScan(tracker):
         tracker.helper.executeHeadMove(HeadMoves.POST_SCAN)
     return tracker.stay()
 
-# ** # old method
 def activeLocScan(tracker):
     """
     Execute naive mid-height scans.
@@ -167,7 +151,6 @@ def activeLocScan(tracker):
 
     return tracker.stay()
 
-# ** # old method
 def returnHeadsPan(tracker):
     """
     Return the head angles to pre-active pan position.
@@ -183,7 +166,6 @@ def returnHeadsPan(tracker):
         return tracker.goLater(tracker.lastDiffState)
     return tracker.stay()
 
-# ** # old method
 def look(tracker):
     """
     Look continuously in stored direction.
@@ -198,7 +180,6 @@ def look(tracker):
         return tracker.goNow('ballTracking')
     return tracker.stay()
 
-# ** # old method
 def scanQuickUp(tracker):
     """
     Pan up quickly, back to original angles, then stop.
@@ -236,7 +217,6 @@ def scanQuickUp(tracker):
 
 MOTION_START_BUFFER = 2
 
-# ** # old method
 # anything that calls this should make sure that
 # goalieActiveLoc is set to proper value ( most likely false)
 def trianglePan(tracker):
@@ -255,7 +235,6 @@ def trianglePan(tracker):
     else :
         return tracker.goNow('trianglePanRight')
 
-# ** # old method
 def trianglePanLeft(tracker):
     if tracker.firstFrame():
         if tracker.goalieActiveLoc:
@@ -269,7 +248,6 @@ def trianglePanLeft(tracker):
 
     return tracker.stay()
 
-# ** # old method
 def trianglePanRight(tracker):
     if tracker.firstFrame():
         if tracker.goalieActiveLoc:
@@ -282,7 +260,6 @@ def trianglePanRight(tracker):
         return tracker.goLater('trianglePanReturn')
     return tracker.stay()
 
-# ** # old method
 def trianglePanReturn(tracker):
     if tracker.firstFrame():
         # TODO! Should be look to ball. (Wils has fix ready to push)
@@ -293,7 +270,6 @@ def trianglePanReturn(tracker):
         return tracker.goLater('ballTracking')
     return tracker.stay()
 
-# ** # old method
 def bounceUp(tracker):
     """
     Repeatedly pan head up, then down.
@@ -304,7 +280,6 @@ def bounceUp(tracker):
         return tracker.goLater('bounceDown')
     return tracker.stay()
 
-# ** # old method
 def bounceDown(tracker):
     """
     Repeatedly pan head down, then up.
@@ -315,7 +290,6 @@ def bounceDown(tracker):
         return tracker.goLater('bounceUp')
     return tracker.stay()
 
-# ** # new method
 def orbitPanUp(tracker):
     """
     Pan head up, then back down to the ball.

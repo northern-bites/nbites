@@ -3,7 +3,6 @@ from . import TrackingConstants as constants
 
 DEBUG = False
 
-# ** # old method
 def ballTracking(tracker):
     '''Super state which handles following/refinding the ball'''
     if tracker.target.vis.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -11,7 +10,6 @@ def ballTracking(tracker):
     else:
         return tracker.goNow('scanBall')
 
-# ** # old method
 def tracking(tracker):
     """
     While the target is visible, track it via vision values.
@@ -30,7 +28,6 @@ def tracking(tracker):
 
     return tracker.stay()
 
-# ** # old method
 def ballSpinTracking(tracker):
     '''Super state which handles following/refinding the ball'''
     if tracker.target.vis.framesOff <= constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -39,7 +36,6 @@ def ballSpinTracking(tracker):
         return tracker.goNow('spinScanBall')
 
 
-# ** # old method
 def activeTracking(tracker):
     """
     If ball is visible and close, track it via vision values.
