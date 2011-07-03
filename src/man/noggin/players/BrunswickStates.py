@@ -32,14 +32,15 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.stopWalking()
-        player.gainsOn()
         player.walkPose()
         player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
 
         if player.lastDiffState == 'gameInitial':
+            player.gainsOn()
             return player.goLater('relocalize')
-        if player.lastDiffState == 'gamePenalized':
+
+        elif player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
             return player.goLater('afterPenalty')
 
