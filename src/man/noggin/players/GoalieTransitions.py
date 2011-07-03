@@ -12,7 +12,7 @@ def shouldSave(player):
     ball = player.brain.ball
 
     if(ball.loc.relVelX < goalCon.VEL_HIGH
-       and ball.heat <= goalCon.HEAT_LOW):
+       and ball.vis.heat <= goalCon.HEAT_LOW):
         player.shouldSaveCounter += 1
         if player.shouldSaveCounter > 1:
             player.shouldSaveCounter = 0

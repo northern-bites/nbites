@@ -21,7 +21,8 @@ def goaliePosition(player):
         player.brain.tracker.trackBall()
     elif ball.dist >= goalCon.ACTIVE_LOC_THRESH:
         player.brain.tracker.activeLocGoaliePos()
-    elif( my.uncertX> 90 or my.uncertY > 90) :
+    elif( my.uncertX> goalCon.UNCERT_TOO_HIGH
+          or my.uncertY > goalCon.UNCERT_TOO_HIGH) :
         player.brain.tracker.activeLocGoaliePos()
     else:
         player.brain.tracker.trackBall()
@@ -33,18 +34,19 @@ def kickOffPosition(player):
     """
     Do nothing until you know something happened.
     Meant for kickoff situations (For penalty kicks
-    Track ball)
+    track ball)
     """
     ball = player.brain.ball
 
     if player.firstFrame():
         player.brain.resetGoalieLocalization()
+        player.brain.nav.setDest(goalCon.MOVE_IN_KICKOFF, 0, 0)
         if player.penaltyKicking:
             player.gainsOn()
             player.walkPose()
 
     # When the ball is far away we want to make sure we
-    # are in position
+    # are in position3
     if player.penaltyKicking :
         player.brain.tracker.trackBall()
     elif ball.dist >= goalCon.ACTIVE_LOC_THRESH:

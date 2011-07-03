@@ -11,6 +11,12 @@ import noggin_constants as NogCon
 # Distance at which we use active localization
 ACTIVE_LOC_THRESH = 150.
 
+# Move up so that in center of box
+MOVE_IN_KICKOFF = 18
+
+# Stop tracking ball until uncertainty is down
+UNCERT_TOO_HIGH = 100
+
 # *****************
 #       Save      *
 # *****************

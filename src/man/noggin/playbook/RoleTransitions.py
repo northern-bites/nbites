@@ -99,7 +99,7 @@ def shouldStopChase(team):
         team.resetGoalieRoleCounters()
         return True
 
-    if (my.x > NogCon.MY_GOALBOX_RIGHT_X  and my.uncertX < 90):
+    if (my.x > NogCon.MY_GOALBOX_RIGHT_X):
         if(ball.loc.x > goalCon.CHASE_RIGHT_X_LIMIT):
             team.resetGoalieRoleCounters()
             return True
