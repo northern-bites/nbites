@@ -122,35 +122,6 @@ class Brain(object):
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
-    def testBall(self, old, new):
-        # print "********BALL VALUES***********"
-        # print "x, y %s, %s | %s, %s" % (old.x, old.y, new.loc.x, new.loc.y)
-        # print "dist %s | %s" % (old.dist, new.dist)
-        # print "bearing %s | %s" % (old.bearing, new.bearing)
-        # print "uncertx, y %s, %s | %s, %s" % (old.uncertX, old.uncertY,
-        #                                       new.loc.uncertX, new.loc.uncertY)
-        # print "sd %s | %s" % (old.sd, new.loc.sd)
-        # print "velx, y %s, %s | %s, %s" % (old.velX, old.velY,
-        #                                       new.loc.velX, new.loc.velY)
-        # print "uncertvelx, y %s, %s | %s, %s" % (old.uncertVelX, old.uncertVelY,
-        #                                       new.loc.uncertVelX, new.loc.uncertVelY)
-        print "heading %s | %s" % (old.heading, new.loc.heading)
-        # print "loc dist %s | %s" % (old.locDist, new.loc.dist)
-        # print "loc bearing %s | %s" % (old.locBearing, new.loc.bearing)
-        # print "relx, y %s, %s | %s, %s" % (old.relX, old.relY,
-        #                            new.loc.relX, new.loc.relY)
-        # print "relvelx, y %s, %s | %s, %s" % (old.relVelX, old.relVelY,
-        #                            new.loc.relVelX, new.loc.relVelY)
-        # print "dx, y %s, %s | %s, %s" % (old.dx, old.dy,
-        #                            new.loc.dx, new.loc.dy)
-        # print "endy %s | %s" % (old.endY, new.loc.endY)
-        # print "accx, y %s, %s | %s, %s" % (old.accX, old.accY,
-        #                            new.loc.accX, new.loc.accY)
-        # print "relaccx, y %s, %s | %s, %s" % (old.relAccX, old.relAccY,
-        #                            new.loc.relAccX, new.loc.relAccY)
-        # print "uncertaccx, y %s, %s | %s, %s" % (old.uncertAccX, old.uncertAccY,
-        #                                       new.loc.uncertAccX, new.loc.uncertAccY)
-
     def initFieldObjects(self):
         """
         Build our set of Field Objects which are team specific compared
@@ -287,8 +258,6 @@ class Brain(object):
 
         # Update any logs we have
         self.out.updateLogs()
-
-        self.testBall(self.oldBall, self.ball)
 
     def updateComm(self):
         temp = self.comm.latestComm()
