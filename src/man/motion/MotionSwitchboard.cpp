@@ -516,6 +516,7 @@ void MotionSwitchboard::swapBodyProvider(){
         if(noWalkTransitionCommand){//only enqueue one
             noWalkTransitionCommand = false;
             gaitSwitches = walkProvider.getGaitTransitionCommand();
+
             if(gaitSwitches.size() >= 1){
                 for(unsigned int i = 0; i< gaitSwitches.size(); i++){
                     scriptedProvider.setCommand(gaitSwitches[i]);

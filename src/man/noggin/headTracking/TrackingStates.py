@@ -1,6 +1,7 @@
 from man.motion import MotionConstants
 from . import TrackingConstants as constants
 from objects import RelLocation
+from .. import NogginConstants
 
 DEBUG = False
 
@@ -73,7 +74,10 @@ def activeTracking(tracker):
 
     elif tracker.counter >= constants.BALL_ON_ACTIVE_PAN_THRESH and \
             tracker.target.vis.on:
-        return tracker.goLater('panToFieldObject')
+        if tracker.brain.my.locScore == NogginConstants.GOOD_LOC:
+            return tracker.goLater('panToFieldObject')
+        else:
+            return tracker.goLater('trianglePan')
 
     return tracker.stay()
 

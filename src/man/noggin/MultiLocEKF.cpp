@@ -80,8 +80,7 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
                                   heading_mag - h);                     \
                                                                         \
     float dist_error = z.getVisDistance() - pt_dist;                    \
-    float bearing_error = (subPIAngle(z.getVisBearing() - pt_bearing) / \
-                           z.getBearingSD());
+    float bearing_error = subPIAngle(z.getVisBearing() - pt_bearing);
 
 
 /**
@@ -134,7 +133,7 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
         H_k(1,2) = -1;                                                  \
                                                                         \
         /* Update the measurement covariance matrix */                  \
-        /* Indices: (Dist, bearing, orientation) */                     \
+        /* Indices: (Dist, bearing) */                                  \
         R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();               \
         R_k(0,1) = 0.0f;                                                \
                                                                         \
@@ -373,12 +372,8 @@ MultiLocEKF::associateTimeUpdate(MotionModel u)
 
     // Derivatives of motion updates re:x,y,h
     // Other values are set in the constructor and are unchanging
-    //
-    // THESE ARE UNUSED:
-    //    They cause a negative value to be generated in P_k which
-    //    is very bad. Disabled until a solution can be found. --Jack and Yoni
-    A_k(0,2) = 0; //-u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) = 0; //u.deltaF * cosh - u.deltaL * sinh;
+    A_k(0,2) = -u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) = u.deltaF * cosh - u.deltaL * sinh;
 
     return deltaLoc;
 }
@@ -712,13 +707,13 @@ void MultiLocEKF::limitAPrioriUncert()
 void MultiLocEKF::limitPosteriorUncert()
 {
     // Check x uncertainty
-    P_k(0,0) = P_k_bar(0,0) = clip(P_k(0,0), X_UNCERT_MIN, X_UNCERT_MAX);
+    P_k(0,0) = P_k_bar(0,0) = clip(P_k(0,0), X_UNCERT_MAX);
 
     // Check y uncertainty
-    P_k(1,1) = P_k_bar(1,1) = clip(P_k(1,1), Y_UNCERT_MIN, Y_UNCERT_MAX);
+    P_k(1,1) = P_k_bar(1,1) = clip(P_k(1,1), Y_UNCERT_MAX);
 
     // Check h uncertainty
-    P_k(2,2) = P_k_bar(2,2) = clip(P_k(2,2), H_UNCERT_MIN, H_UNCERT_MAX);
+    P_k(2,2) = P_k_bar(2,2) = clip(P_k(2,2), H_UNCERT_MAX);
 }
 
 /**
@@ -776,7 +771,7 @@ void MultiLocEKF::printAfterUpdateInfo()
 bool MultiLocEKF::resetLoc(const vector<PointObservation> pt_z,
                            const vector<CornerObservation>& c_z)
 {
-    return (resetLoc(pt_z)|| resetLoc(c_z));
+    return (resetLoc(pt_z) || resetLoc(c_z));
 }
 
 /**

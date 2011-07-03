@@ -129,6 +129,7 @@ void HeadProvider::scriptedMode(){
         setNextHeadCommand();
 
     if (!currChoppedCommand->isDone() ) {
+        currChoppedCommand->nextFrame();
         setNextChainJoints( HEAD_CHAIN,
                             currChoppedCommand->getNextJoints(HEAD_CHAIN) );
         setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
@@ -141,8 +142,6 @@ void HeadProvider::scriptedMode(){
         setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
                                  vector<float>(HEAD_JOINTS, 0.0f) );
     }
-
-    currChoppedCommand->nextFrame();
 }
 
 void HeadProvider::setCommand(const SetHeadCommand::ptr command) {
