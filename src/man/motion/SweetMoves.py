@@ -397,7 +397,6 @@ GOALIE_SQUAT_STAND_UP = ( ((0.0, 55.0, 0.0, -0),
                            0.4, 1, stiff.STANDUP_STIFFNESSES),
 
                           # should push the ball out from between legs
-                          # NEEDS MORE WORK
                           ((76.90,27.60,-104.33,1.58),
                            (-51.85,23.56,-15.20,123.31,-69.52,-4.48),
                            (-51.85,-31.11,-19.43,124.54,-65.30,9.06),
