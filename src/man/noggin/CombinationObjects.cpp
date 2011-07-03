@@ -183,7 +183,7 @@ namespace noggin {
 /////////////// LocObject Methods //////////////
 
     LocObject::LocObject(PyLoc& pl)
-        : Location(0.0, 0.0), loc(&pl), trackingFitness(0)
+        : Location(0.0, 0.0), trackingFitness(0), loc(&pl)
     {
     }
 
@@ -221,7 +221,7 @@ namespace noggin {
 //////////// LocBall Methods //////////////////
 
     LocBall::LocBall(PyLoc& pl, MyInfo& _my)
-        : LocObject(pl), my(&_my)
+        : Location(0.f, 0.f), my(&_my), loc(&pl)
     {
     }
 

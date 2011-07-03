@@ -48,7 +48,7 @@ BOOST_PYTHON_MODULE(objects)
         .def(self < self)
         .def(self > self)
         .add_property("dist", &LocObject::getDist)
-        .add_property("bearing", &FieldObject::getBearing)
+        .add_property("bearing", &LocObject::getBearing)
         ;
 
     class_<FieldObject, boost::noncopyable>
@@ -83,7 +83,7 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("uncertH", &MyInfo::getHUncert)
         ;
 
-    class_<LocBall, bases<LocObject> >("LocBall", init<PyLoc&, MyInfo&>())
+    class_<LocBall, bases<Location> >("LocBall", init<PyLoc&, MyInfo&>())
         .add_property("uncertX", &LocBall::getXUncert)
         .add_property("uncertY", &LocBall::getYUncert)
         .add_property("sd", &LocBall::getSD)
@@ -97,7 +97,7 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("relVelX", &LocBall::getRelVelX)
         .add_property("relVelY", &LocBall::getRelVelY)
         .add_property("accX", &LocBall::getAccX)
-        .add_property("accy", &LocBall::getAccY)
+        .add_property("accY", &LocBall::getAccY)
         .add_property("dx", &LocBall::dX)
         .add_property("dy", &LocBall::dY)
         .add_property("endY", &LocBall::getEndY)
@@ -105,6 +105,8 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("uncertAccY", &LocBall::getAccYUncert)
         .add_property("relAccX", &LocBall::getRelAccX)
         .add_property("relAccY", &LocBall::getRelAccY)
+        .add_property("dist", &LocBall::getDist)
+        .add_property("bearing", &LocBall::getBearing)
         ;
 
     class_<Ball, boost::noncopyable>("Ball", init<VisualBall&,

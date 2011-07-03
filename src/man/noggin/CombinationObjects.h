@@ -164,13 +164,11 @@ namespace noggin {
         LocObject(PyLoc&);
         virtual ~LocObject() {};
 
-        PyLoc* loc;
-
         // Loc getters
         const float getDist();
         const degrees getBearing();
 
-        // Tracking
+        // Tracking: Is this used?
         const int getTrackingFitness() { return trackingFitness; }
         void setTrackingFitness(int tf) { trackingFitness = tf; }
 
@@ -179,6 +177,7 @@ namespace noggin {
 
     private:
         int trackingFitness;
+        PyLoc* loc;
     };
 
     /*
@@ -188,7 +187,7 @@ namespace noggin {
      * relative to the correct team.
      */
 
-    class LocBall : public LocObject
+    class LocBall : public Location
     {
     public:
         LocBall(PyLoc&, MyInfo&);
@@ -210,11 +209,13 @@ namespace noggin {
         const float getAccY();
         const float getAccXUncert() { return loc->getXAccelerationUncert(); }
         const float getAccYUncert() { return loc->getYAccelerationUncert(); }
-        const float getRelAccX() { return loc->getRelXAccelerationUncert(); }
-        const float getRelAccY() { return loc->getRelYAccelerationUncert(); }
+        const float getRelAccX() { return loc->getRelXAccelerationEst(); }
+        const float getRelAccY() { return loc->getRelYAccelerationEst(); }
         const float dX() { return dx; }
         const float dY() { return dy; }
         const float getEndY() { return endY; }
+        const float getDist() { return loc->getBallDistance(); }
+        const degrees getBearing() { return loc->getBallBearingDeg(); }
 
         // Other
         void update();
@@ -225,6 +226,7 @@ namespace noggin {
 
     private:
         MyInfo* my;
+        PyLoc* loc;
         float lastRelX, lastRelY, dx, dy, endY;
     };
 
