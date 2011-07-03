@@ -718,15 +718,20 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
         gain = 1.0f;
     }
 
+    bool stopping = (dest_x == 0.0f && dest_y == 0.0f && dest_theta == 0.0f);
+
     // these parameters determined experimentally by trying lots of destinations
     // probably indicates something broken in our odometry
     // I personally apologize for this :-) --Nathan
-    if (dest_x == 0)
-	dest_x = -5.0f; // 15mm
-    dest_theta += 0.088f; // natural rotation of the robot
-    dest_y *= 2; /// @see Step.h HACK HACK HACK
+    if (!stopping) {
+	if (dest_x == 0)
+	    dest_x = -5.0f;
+	dest_theta += 0.088f; // natural rotation of the robot
+	dest_y *= 2; /// @see Step.h HACK HACK HACK
+    }
 
     float speed_x, speed_y, speed_theta;
+    int framesToDestination = 0;
 
     // use the gait's maximum allowed x,y,theta
     if (dest_x > 0)
@@ -742,10 +747,11 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 	clearFutureSteps();
 
 	// check the distances of any steps we've already commited to taking
-	for (std::list<Step::ptr>::iterator step = currentZMPDSteps.begin();
-	     step != currentZMPDSteps.end(); ++step)
-	{
-	    countStepTowardsDestination(*step, dest_x, dest_y, dest_theta);
+	if (!stopping) {
+	    for (std::list<Step::ptr>::iterator step = currentZMPDSteps.begin();
+		 step != currentZMPDSteps.end(); ++step)
+		countStepTowardsDestination(*step, dest_x, dest_y, dest_theta,
+					    framesToDestination);
 	}
     } else {
 	resetQueues();
@@ -758,11 +764,9 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 
 
 #ifdef DEBUG_DESTINATION
-    cout << "destination after removing current zmp steps: x=" << dest_x
+    cout << "destination after counting current zmp steps: x=" << dest_x
          << " y=" << dest_y << " theta=" << dest_theta << endl;
 #endif
-
-    int framesToDestination = 0;
 
     const float CLOSE_ENOUGH_X_mm = 15.0f;
     const float CLOSE_ENOUGH_Y_mm = 15.0f;
@@ -802,11 +806,11 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 	else
 	    step_theta = dest_theta;
 
+	// take the step, and use its odometry to update our progress towards dest
 	generateStep(step_x, step_y, step_theta);
 
-	countStepTowardsDestination(lastQueuedStep, dest_x, dest_y, dest_theta);
-
-	framesToDestination += lastQueuedStep->stepDurationFrames;
+	countStepTowardsDestination(lastQueuedStep, dest_x, dest_y, dest_theta,
+				    framesToDestination);
 
 #ifdef DEBUG_DESTINATION
 	cout << "created step: " << *lastQueuedStep << endl;
@@ -827,7 +831,8 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 
 // updates the destination based on how far this step went
 void StepGenerator::countStepTowardsDestination(Step::ptr step, float& dest_x,
-						float& dest_y, float &dest_theta) {
+						float& dest_y, float &dest_theta,
+						int& framesToDestination) {
     dest_x -= step->x;
 
     // necessary (HACK!) because steps will alternate +/- in Y and Theta
@@ -836,6 +841,8 @@ void StepGenerator::countStepTowardsDestination(Step::ptr step, float& dest_x,
 
     if (sign(dest_theta) == sign(step->theta))
 	dest_theta -= step->theta;
+
+    framesToDestination += step->stepDurationFrames;
 }
 
 
