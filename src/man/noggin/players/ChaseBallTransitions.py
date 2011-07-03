@@ -20,16 +20,21 @@ def ballInPosition(player):
     ball = player.brain.ball
     kick = player.brain.kickDecider.getKick()
     #Get the current kick sweet spot information
-    (x_offset, y_offset, heading) = kick.getPosition()
+    if kick is None:
+        (x_offset, y_offset, heading) = (0,0,0)
+    else:
+        (x_offset, y_offset, heading) = kick.getPosition()
 
     #Get the difference
-    diff_x = x_offset - ball.relX # not absolute value, if ball is closer kick anyway
-    diff_y = fabs(y_offset - ball.relY)
+    diff_x = ball.relX - x_offset # not absolute value, if ball is closer kick anyway
+    diff_y = fabs(ball.relY - y_offset)
 
+    """
     if diff_x < constants.BALL_X_OFFSET:
         print "Ball X OK"
     if diff_y < constants.BALL_Y_OFFSET:
         print "Ball Y OK"
+    """
 
     #Compare the sweet spot with the actual values and make sure they
     #are within the threshold
@@ -49,7 +54,7 @@ def shouldKick(player):
     """
     Ball is in correct position to kick
     """
-    return player.brain.nav.isStopped() and player.counter > 1
+    return player.brain.nav.isAtPosition() and player.counter > 1
 
 def shouldKickAgain(player):
     """
@@ -67,29 +72,11 @@ def ballTooFar(player):
         return True
     return False
 
-def shouldSwitchPFKModes(player):
-    """
-    True if we're near to the ball and using setSpeed, or far away and using setDest
-    """
-    ball = player.brain.ball
-
-    # using setSpeed
-    if player.brain.nav.currentState == 'goToPosition':
-        # forces the vector to update in case the ball moved
-        if player.counter > constants.BALL_APPROACH_REFRESH_FRAMES:
-            return True
-
-        return ball.dist <= constants.BALL_SET_DEST_CUTOFF
-
-    # using setDestination
-    return ball.dist > constants.BALL_SET_DEST_CUTOFF
-
-
 def shouldOrbit(player):
     """
-    We are lost but are chaser and are at the ball.
+    We are lost (no kick) but are chaser and are at the ball.
     """
-    return player.shouldOrbit
+    return player.brain.kickDecider.getSweetMove() is None
 
 ####### PENALTY KICK STUFF ###########
 

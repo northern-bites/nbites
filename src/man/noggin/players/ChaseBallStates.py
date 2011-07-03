@@ -30,34 +30,20 @@ def positionForKick(player):
     positions.
     """
     if player.firstFrame():
-        # This doesn't seem to help any more, need to investigate
-        player.saveBallPosition()
+        player.brain.tracker.trackBall()
+        player.inKickingState = True
 
-        if player.brain.ball.dist > constants.BALL_SET_DEST_CUTOFF:
-            player.brain.nav.chaseBall()
-
-            #if player.brain.ball.vis.framesOn > 20:
-                #player.brain.tracker.kickDecideScan()
-                #else:
-            player.brain.tracker.trackBall()
-
-        else:
-            player.brain.kickDecider.decideKick()
-            kick = player.brain.kickDecider.getKick()
-
-            player.inKickingState = True
-            player.brain.tracker.trackBall()
-            player.brain.nav.kickPosition(kick)
+    if player.counter % 10 is 0:
+        player.brain.kickDecider.decideKick()
+        player.brain.nav.kickPosition(player.brain.kickDecider.getKick())
 
     # most of the time going to chase will kick back to here, lets us reset
-    if (transitions.ballTooFar(player) or
-        transitions.shouldSwitchPFKModes(player) or
-        transitions.shouldFindBallKick(player)):
-
+    if transitions.shouldFindBallKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if transitions.shouldKick(player):
+    #if transitions.shouldKick(player):
+    if transitions.ballInPosition(player):
         if transitions.shouldOrbit(player):
             print "Don't have a kick, orbitting"
             return player.goNow('orbitBall')

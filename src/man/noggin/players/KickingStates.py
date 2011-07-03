@@ -13,8 +13,10 @@ def kickBallExecute(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
-        if transitions.ballInPosition(player):
-            player.executeMove(player.brain.kickDecider.getSweetMove())
+        kick = player.brain.kickDecider.getSweetMove()
+
+        if transitions.ballInPosition(player) and kick is not None:
+            player.executeMove(kick)
         else:
             #Either it's close and we can't kick it now or it's far
             #away and we should search.

@@ -1,29 +1,37 @@
-from math import fabs, sqrt
+from math import fabs, sqrt, hypot
 from . import NavConstants as constants
 from man.noggin.util import MyMath
 import noggin_constants as NogginConstants
+from ..players import ChaseBallTransitions
 
-def atDestinationCloser(my, dest):
+def atDestinationCloser(nav):
     """
     Returns true if we are at an (x, y) close enough to the one we want
 
     """
-    return my.distTo(dest) < (constants.CLOSER_XY +
-                              sqrt(my.uncertX**2. +
-                                   my.uncertY**2.))
+    my = nav.brain.my
 
-def atDestinationCloserAndFacing(my, dest, bearing):
-    return (atDestinationCloser(my, dest) and \
-            fabs(bearing) < constants.CLOSE_ENOUGH_H)
+    if nav.destType is constants.BALL:
+        return ChaseBallTransitions.ballInPosition(nav.brain.player)
+
+    return my.distTo(nav.getDestination()) < (constants.CLOSER_XY +
+                                              hypot(my.uncertX,
+                                                         my.uncertY))
 
 def atHeadingGoTo(my, targetHeading):
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
     return hDiff < constants.AT_HEADING_GOTO_DEG
 
-def atHeading(my, targetHeading):
+def atHeading(nav):
     """
     Returns true if we are at a heading close enough to what we want
     """
+    my = nav.brain.my
+    dest = nav.getDestination()
+
+    if nav.destType is constants.BALL:
+        return abs(nav.brain.ball.bearing) < constants.CLOSE_ENOUGH_H
+
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
     return hDiff < constants.CLOSE_ENOUGH_H and \
            my.uncertH < constants.LOC_IS_ACTIVE_H
@@ -44,6 +52,20 @@ def useFinalHeading(brain, position):
     distToPoint = brain.my.distTo(position)
 
     return (distToPoint <= useFinalHeadingDist)
+
+def shouldSwitchPFKModes(nav):
+    """
+    True if we're near to the ball and using setSpeed, or far away and using setDest
+    """
+    ball = nav.brain.ball
+
+    # using setSpeed
+    if nav.currentState == 'goToPosition' or \
+           nav.currentState == 'omniGoTo' :
+        if ball.dist < 30:
+            return True
+
+    return False
 
 ######### BALL IN BOX ###############
 

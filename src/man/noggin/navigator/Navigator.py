@@ -7,7 +7,10 @@ from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from objects import RobotLocation
+from objects import RelLocation, RobotLocation
+from ..kickDecider import kicks
+
+DEBUG_DESTINATION = True
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
@@ -48,6 +51,17 @@ class Navigator(FSA.FSA):
         self.resetDestMemory()
 
         self.destType = None
+        self.kick = None
+
+    def run(self):
+        if self.destType is constants.BALL:
+            if navTrans.shouldSwitchPFKModes(self):
+                if self.kick is None:
+                    self.kick = kicks.ORBIT_KICK_POSITION
+
+                self.kickPositionDest(self.kick)
+
+        FSA.FSA.run(self)
 
     def performSweetMove(self, move):
         """
@@ -75,10 +89,43 @@ class Navigator(FSA.FSA):
 
     def kickPosition(self, kick):
         """
-        state to align on the ball once we are near it
+        It will position the robot at the ball using self.kick to determine the x,y
+        offset and the final heading.
+
+        This state will aggresively omni-walk, so it's probably best if we don't call
+        it until we're near the ball.
         """
         self.kick = kick
-        self.switchTo('positionForKick')
+
+        if (self.currentState is not 'destWalking' or
+            self.destType is not constants.BALL):
+
+            self.destType = constants.BALL
+            self.switchTo('goToPosition')
+
+    def kickPositionDest(self, kick):
+        if self.currentState is 'destWalking':
+            return
+
+        ball = self.brain.ball
+
+        # slow down as we get near the ball (max 80% speed)
+        if ball.dist < 30:
+            gain = min(.8, (0.4 + (ball.dist / 30)) * .8)
+        else:
+            gain = .8
+
+        # TODO later?
+        #self.destTheta = self.kick.heading - self.brain.my.h
+
+        if DEBUG_DESTINATION:
+            print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
+                  .format(ball.relX, ball.relY, ball.bearing)
+
+        self.setDest(ball.relX - self.kick.x_offset, # HACK!!!
+                     ball.relY - self.kick.y_offset,
+                     ball.bearing,
+                     gain)
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
@@ -129,20 +176,28 @@ class Navigator(FSA.FSA):
 
         self.switchTo('walking')
 
-    def setDest(self, x, y, theta):
+    def setDest(self, x, y, theta, gain):
         """
         Sets a new destination
         Always does something, since destinations are relative and time sensitive
         """
+        if DEBUG_DESTINATION:
+            print 'Set new destination of ({0}, {1}, {2}, gain={3})' \
+                  .format(self.destX, self.destY, self.destTheta, self.destGain)
+            self.brain.speech.say("New destination")
+
         self.destX = x
         self.destY = y
         self.destTheta = theta
+        self.destGain = gain
+
+        self.updateDests(x, y, theta, gain)
 
         self.newDestination = True
         self.switchTo('destWalking')
 
     # Have we reached our destination?
-    def isAtPositition(self):
+    def isAtPosition(self):
         return self.currentState is 'atPosition'
 
     #################################################################
@@ -179,6 +234,8 @@ class Navigator(FSA.FSA):
             self.lastDestTheta, \
             self.lastDestGain= x,y,theta, gain
         self.resetSpeedMemory()
+        self.newDestination = True
+        self.nearDestination = False
 
     def resetSpeedMemory(self):
         """
@@ -196,6 +253,7 @@ class Navigator(FSA.FSA):
             self.lastDestY, \
             self.lastDestTheta, \
             self.lastDestGain = (constants.WALK_VECTOR_INIT,)*4
+        self.newDestination = False
 
 
     # Choose our next position based on our mode of locomotion:
@@ -210,7 +268,14 @@ class Navigator(FSA.FSA):
             return self.dest
 
         elif self.destType is constants.BALL:
-            ballPosition = RobotLocation(self.brain.ball.x,
-                                         self.brain.ball.y,
-                                         self.brain.ball.heading)
-            return ballPosition
+            return self.brain.ball
+#             kick_x = kick_y = 0
+#             if self.kick is not None:
+#                 kick_x = self.kick.x_offset
+#                 kick_y = self.kick.y_offset
+#             return RelLocation(self.brain.my,
+#                                self.brain.ball.relX - kick_x,
+#                                self.brain.ball.relY - kick_y,
+#                                self.brain.ball.bearing)
+
+

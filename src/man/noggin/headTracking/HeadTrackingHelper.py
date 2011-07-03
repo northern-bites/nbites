@@ -83,7 +83,11 @@ class HeadTrackingHelper(object):
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
     def lookToPoint(self, target):
-        headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
+        if hasattr(target, "height"):
+            height = target.height
+        else:
+            height = 0
+        headMove = motion.CoordHeadCommand(target.x, target.y, height)
         self.tracker.brain.motion.coordHead(headMove)
 
     def calcBearing(self, target):

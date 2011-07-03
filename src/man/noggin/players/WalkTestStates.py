@@ -43,6 +43,11 @@ MIXED_DEST_TEST = ((DEST, (15, 15, 0), 200),
                    (DEST, (-30, -15, -90), 300),
                    )
 
+START_STOP_DEST = ((DEST, (1000, 0, 0), 100),
+                   (DEST, (0, 0, 0), 100),
+                   (DEST, (15, 15, 0), 300),
+                   )
+
 def gamePlaying(player):
     """
     This method must be overriden by interested SoccerPlayers
@@ -52,7 +57,7 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0
-        player.unitTest = MIXED_DEST_TEST
+        player.unitTest = START_STOP_DEST
     return player.goLater('walkTest')
 
 def walkTest(player):

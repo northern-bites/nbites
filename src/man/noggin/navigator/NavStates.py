@@ -37,8 +37,8 @@ def goToPosition(nav):
     my = nav.brain.my
     dest = nav.getDestination()
 
-    if (navTrans.atDestinationCloser(my, dest) and
-        navTrans.atHeading(my, dest.h)):
+    if (navTrans.atDestinationCloser(nav) and
+        navTrans.atHeading(nav)):
             nav.atPositionCount += 1
             if nav.atPositionCount > \
             constants.FRAMES_THRESHOLD_TO_AT_POSITION:
@@ -75,8 +75,8 @@ def omniGoTo(nav):
     my = nav.brain.my
     dest = nav.getDestination()
 
-    if (navTrans.atDestinationCloser(my, dest) and
-        navTrans.atHeading(my, dest.h)):
+    if (navTrans.atDestinationCloser(nav) and
+        navTrans.atHeading(nav)):
         nav.atPositionCount += 1
         if (nav.atPositionCount >
             constants.FRAMES_THRESHOLD_TO_AT_POSITION):
@@ -239,7 +239,7 @@ def destWalking(nav):
     """
     State to be used when we are walking to a destination
     """
-    if nav.firstFrame() or nav.newDestination:
+    if nav.firstFrame():
         if (nav.destGain < 0):
             nav.destGain = 1;
 
@@ -252,15 +252,13 @@ def destWalking(nav):
 
         helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta, nav.destGain)
 
-    framesLeft = nav.currentCommand.framesRemaining()
-
     # the frames remaining counter is sometimes set to -1 initially
-    if framesLeft != -1 and framesLeft < 40:
+    elif -1 != nav.currentCommand.framesRemaining() < 40:
         nav.nearDestination = True
 
     if nav.currentCommand.isDone():
         nav.nearDestination = True
-        return nav.goNow('stop')
+        return nav.goNow('atPosition')
 
     return nav.stay()
 
@@ -321,47 +319,6 @@ def orbitPointThruAngle(nav):
         return nav.goLater('stop')
     return nav.stay()
 
-def positionForKick(nav):
-    """
-    This state is called by player through Navigator::kickPosition(kick)
-    It will position the robot at the ball using self.kick to determine the x,y
-    offset and the final heading.
-
-    This state will aggresively omni-walk, so it's probably best if we don't call
-    it until we're near the ball.
-    """
-    ball = nav.brain.ball
-
-    # we've either just started, or are close to our last destination
-    # tell the robot where to go!
-    if nav.firstFrame():
-        nav.destX = ball.relX - nav.kick.x_offset -4 # HACK!!!
-        nav.destY = ball.relY - nav.kick.y_offset
-
-        nav.destTheta = ball.bearing
-
-        # TODO later?
-        #nav.destTheta = nav.kick.heading - nav.brain.my.h
-
-        # slow down as we get near the ball (max 80% speed)
-        if ball.dist < 30:
-            nav.destGain = (0.4 + (ball.dist / 30)) * .8
-        else:
-            nav.destGain = .8
-
-        nav.newDestination = True
-
-        """
-        print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
-              .format(ball.relX, ball.relY, ball.bearing)
-        print 'Set new PFK destination of ({0}, {1}, {2}, gain={3})' \
-              .format(nav.destX, nav.destY, nav.destTheta, nav.destGain)
-        """
-
-        nav.brain.speech.say("New destination")
-
-        return nav.goNow('destWalking')
-
 
 def atPosition(nav):
     if nav.firstFrame():
@@ -372,8 +329,8 @@ def atPosition(nav):
     my = nav.brain.my
     dest = nav.getDestination()
 
-    if navTrans.atDestinationCloser(my, dest) and \
-            navTrans.atHeading(my, dest.h):
+    if navTrans.atDestinationCloser(nav) and \
+            navTrans.atHeading(nav):
         nav.startOmniCount = 0
         return nav.stay()
 
