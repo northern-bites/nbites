@@ -8,7 +8,7 @@ from objects import Location
 def pGoalieKickOff(team, workingPlay):
     """ keeps the goalie from moving on kickoff"""
     workingPlay.setSubRole(PBConstants.GOALIE_KICKOFF)
-    h = team.brain.ball.heading
+    h = team.brain.ball.loc.heading
     pos = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
 
     if PBConstants.USE_FANCY_GOALIE:

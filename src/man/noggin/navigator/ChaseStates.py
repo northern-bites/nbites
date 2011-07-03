@@ -61,17 +61,17 @@ def walkSpinToBall(nav):
     ball = nav.brain.ball
 
     nav.dest = ball
-    nav.dest.loc.relX += LEFT_FOOT_OFFSET
-    nav.dest.h = ball.heading
+    #nav.dest.relX += LEFT_FOOT_OFFSET
+    nav.dest.h = ball.loc.heading
     nav.dest.relH = ball.bearing
 
     # Set our walk towards the ball
-    if (nav.dest.dist > constants.OMNI_WALK_DIST_THRESH):
-        walkX, walkY, walkTheta = walker.getWalkStraightParam(nav.brain.my, nav.dest)
-    else:
-        walkX, walkY, walkTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
+    # if (nav.dest.dist > constants.OMNI_WALK_DIST_THRESH):
+    #     walkX, walkY, walkTheta = walker.getWalkStraightParam(nav.brain.my, nav.dest)
+    # else:
+    #     walkX, walkY, walkTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
 
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
+    #helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     if not nav.brain.play.isRole(GOALIE):
         if navTrans.shouldNotGoInBox(ball):
@@ -166,7 +166,7 @@ def ballInMyBox(nav):
 def dribble(nav):
     ball = nav.brain.ball
     nav.dest = ball
-    nav.dest.h = ball.heading
+    nav.dest.h = ball.loc.heading
 
     # Set our walk towards the ball
     walkX, walkY, walkTheta = \

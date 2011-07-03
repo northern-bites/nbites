@@ -497,7 +497,7 @@ class GoTeam:
         # lets try maintaining home position until the ball is closer in
         # might help us stay localized better
         ball = self.brain.ball
-        h = ball.heading
+        h = ball.loc.heading
         position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
 
         if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:

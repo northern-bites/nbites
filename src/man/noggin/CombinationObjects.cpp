@@ -266,8 +266,14 @@ namespace noggin {
 
     const degrees LocBall::getHeading()
     {
-        return (NBMath::safe_atan2((loc->getBallYEst()-loc->getYEst()),
-                                   (loc->getBallXEst()-loc->getXEst())))*TO_DEG;
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return (NBMath::safe_atan2((loc->getBallYEst()-loc->getYEst()),
+                                       (loc->getBallXEst()-loc->getXEst())))
+                *TO_DEG;
+        else return (NBMath::safe_atan2((loc->getYEst()-loc->getBallYEst()),
+                                       (loc->getXEst()-loc->getBallXEst())))
+                *TO_DEG;
+
     }
 
     // Copies x and y values to comply with the location interface.
