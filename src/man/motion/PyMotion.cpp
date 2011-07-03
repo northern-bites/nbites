@@ -61,7 +61,7 @@ BOOST_PYTHON_MODULE(_motion)
     // generic interface available to all PyMotionCommands
     class_<PyMotionCommand, boost::noncopyable>("PyMotionCommand", no_init)
     .def("framesRemaining", &PyMotionCommand::framesRemaining)
-    .def("isDone", &PyMotionCommand::isDone)
+    .def("isDone", &PyMotionCommand::isDone) // @TODO make just "done"; more Pythonic
     .def("timeRemaining", &PyMotionCommand::timeRemaining)
     ;
 
@@ -101,6 +101,8 @@ BOOST_PYTHON_MODULE(_motion)
                              "A container for a coord head command."))
     .def(init<float, float, float, float, float> (
          args( "relX", "relY", "relZ", "maxYawSpeed", "maxPitchSpeed")))
+    .def(init<float, float, float> (
+         args( "relX", "relY", "relZ")))
     ;
 
     class_<PyWalkCommand, bases<PyMotionCommand> >("WalkCommand",

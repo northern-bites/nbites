@@ -20,6 +20,11 @@
 #define NAO       5
 #define NAO_RL_33 6  // longer arms, new heads
 
+namespace angle {
+    typedef float radians;
+    typedef float degrees;
+}
+
 // we set ROBOT_TYPE here for now, not in cmake anymore
 // Nathan 4/18/11
 // @TODO Make this less stupid

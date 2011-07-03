@@ -16,7 +16,9 @@ def setDestination(nav, x, y, theta, gain):
     nav.currentCommand = \
         motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
     nav.brain.motion.sendDestCommand(nav.currentCommand)
+
     nav.updateDests(x, y, theta, gain)
+
 
 def setSpeed(nav, x, y, theta):
     """
@@ -24,7 +26,7 @@ def setSpeed(nav, x, y, theta):
     """
 
     if x == 0 and y == 0 and theta == 0 and \
-            not nav.brain.motion.isWalkActive():
+            nav.brain.motion.isWalkActive():
         createAndSendWalkVector(nav, 0,0,0) # Ensure that STOP commands get sent
 
     # If our speed vector is already being used, don't bother changing

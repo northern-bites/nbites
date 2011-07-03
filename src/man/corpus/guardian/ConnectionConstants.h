@@ -17,8 +17,15 @@ namespace connection_constants {
 static const char* LOOPBACK_IF_NAME = "lo";
 static const char* WIRED_IF_NAME = "eth0";
 
-static std::string CONNECTION_NAME_DEFAULT = "ROBOTICS";
-static const int   WIFI_RECONNECTS_MAX_DEFAULT = 3;
+static const std::string CONNECTION_NAME_DEFAULT = "ROBOTICS";
+static const std::string CONNECTION_PSWD_DEFAULT = "Singapore1234";
+
+// the threshold is the number of checks that return no wifi
+// before the wifi resets
+// we check the connection every CONNECTION_CHECK_RATE frames
+// of roboguardian
+static const unsigned WIFI_SOFT_RESET_THRESHOLD = 1;
+static const unsigned WIFI_HARD_RESET_THRESHOLD = 3;
 
 }
 }
