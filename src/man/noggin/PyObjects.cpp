@@ -32,7 +32,6 @@ BOOST_PYTHON_MODULE(objects)
         .def(self == self)
         .def(self != self)
         .def("getRelativeBearing", &RobotLocation::getRelativeBearing)
-        .def("spinDirToPoint", &RobotLocation::spinDirToPoint)
         ;
 
     class_<RelLocation, bases<RobotLocation> >("RelLocation",
@@ -83,6 +82,7 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("uncertX", &MyInfo::getXUncert)
         .add_property("uncertY", &MyInfo::getYUncert)
         .add_property("uncertH", &MyInfo::getHUncert)
+        .def("spinDirToPoint", &RobotLocation::spinDirToPoint)
         ;
 
     class_<LocBall, bases<Location> >("LocBall", init<PyLoc&, MyInfo&>())

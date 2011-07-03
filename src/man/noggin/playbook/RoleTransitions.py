@@ -18,7 +18,7 @@ def shouldPositionForSave(team):
             team.resetGoalieRoleCounters()
             return True
 
-    elif ball.relAccX < goalCon.ACCEL_SAVE_THRESH:
+    elif ball.loc.relAccX < goalCon.ACCEL_SAVE_THRESH:
         team.shouldSaveCounter += 1
         if team.shouldSaveCounter > goalCon.CHANGE_THRESH:
             team.resetGoalieRoleCounters()
@@ -37,7 +37,7 @@ def shouldNotSave(team):
     if team.brain.player.penaltyKicking:
         return False
 
-    if (ball.relAccX < goalCon.BALL_NO_MOVEMENT
+    if (ball.loc.relAccX < goalCon.BALL_NO_MOVEMENT
         and ball.vis.heat == 0):
         team.shouldStopSaveCounter += 1
         if team.shouldStopSaveCounter > goalCon.OUT_OF_SAVE:
@@ -45,8 +45,8 @@ def shouldNotSave(team):
             team.resetGoalieRoleCounters()
             return True
 
-    elif (ball.inMyGoalBox() and
-          ball.relAccX < goalCon.BALL_NO_MOVEMENT):
+    elif (ball.loc.inMyGoalBox() and
+          ball.loc.relAccX < goalCon.BALL_NO_MOVEMENT):
         team.shouldStopSaveCounter += 1
         if team.shouldStopSaveCounter > goalCon.OUT_OF_SAVE:
             team.brain.player.isSaving = False

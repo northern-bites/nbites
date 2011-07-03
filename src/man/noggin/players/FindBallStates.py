@@ -51,7 +51,7 @@ def spinFindBall(player):
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
         my = player.brain.my
         ball = player.brain.ball
-        spinDir = my.spinDirToPoint(ball)
+        spinDir = my.spinDirToPoint(ball.loc)
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
         player.brain.tracker.trackBallSpin()

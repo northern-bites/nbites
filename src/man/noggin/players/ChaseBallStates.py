@@ -102,7 +102,7 @@ def spinToBall(player):
     # in case we lose the ball in our shoulder, always trackBall.
     player.brain.tracker.trackBall()
     ball = player.brain.ball
-    spinDir = player.brain.my.spinDirToPoint(ball)
+    spinDir = player.brain.my.spinDirToPoint(ball.loc)
     player.setWalk(0, 0, spinDir*constants.BALL_SPIN_SPEED)
 
     if transitions.shouldFindBall(player):

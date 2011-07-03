@@ -125,7 +125,6 @@ namespace noggin {
         else return NBMath::sign(targetH);
     }
 
-
 //////////// RelLocation Methods ///////////////
 
     RelLocation::RelLocation(RobotLocation& my, float dx, float dy, degrees dh)
