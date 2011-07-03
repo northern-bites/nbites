@@ -23,6 +23,7 @@ BOOST_PYTHON_MODULE(objects)
         .def("inTopOfField", &Location::inTopOfField)
         .def("inBottomOfField", &Location::inBottomOfField)
         .def("inCenterOfField", &Location::inCenterOfField)
+        .def("__hasattr__", &Location::hasattr)
         ;
 
     class_<RobotLocation, bases<Location> >("RobotLocation",
@@ -49,6 +50,8 @@ BOOST_PYTHON_MODULE(objects)
         .def(self > self)
         .add_property("dist", &LocObject::getDist)
         .add_property("bearing", &LocObject::getBearing)
+        .add_property("relX", &LocObject::getRelX)
+        .add_property("relY", &LocObject::getRelY)
         ;
 
     class_<FieldObject, boost::noncopyable>
@@ -60,13 +63,12 @@ BOOST_PYTHON_MODULE(objects)
                                          <reference_existing_object>()))
         .add_property("localId", &FieldObject::getLocalID)
         .add_property("visId", &FieldObject::getVisID)
-        .add_property("relX", &FieldObject::getRelX)
-        .add_property("relY", &FieldObject::getRelY)
         .add_property("dist", &FieldObject::getDist)
         .add_property("bearing", &FieldObject::getBearing)
         .def("setBest", &FieldObject::setBest)
         .def("associateWithRelativeLandmark",
              &FieldObject::associateWithRelativeLandmark)
+        .def("__hasattr__", &FieldObject::hasattr)
         ;
 
     class_<MyInfo, bases<RobotLocation>,
@@ -118,6 +120,7 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("dist", &Ball::getDist)
         .add_property("bearing", &Ball::getBearing)
         .def("update", &Ball::update)
+        .def("__hasattr__", &Ball::hasattr)
         ;
 }
 

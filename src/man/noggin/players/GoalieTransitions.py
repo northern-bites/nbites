@@ -11,7 +11,7 @@ import GoalieConstants as goalCon
 def shouldSave(player):
     ball = player.brain.ball
 
-    if(ball.relVelX < goalCon.VEL_HIGH
+    if(ball.loc.relVelX < goalCon.VEL_HIGH
        and ball.heat <= goalCon.HEAT_LOW):
         player.shouldSaveCounter += 1
         if player.shouldSaveCounter > 1:
@@ -28,7 +28,7 @@ def strafeDirForSave(player):
     ball = player.brain.ball
     my = player.brain.my
     timeUntilSave = getTimeUntilSave(player)
-    anticipatedY = (ball.relY + ball.relVelY * timeUntilSave)
+    anticipatedY = (ball.loc.relY + ball.loc.relVelY * timeUntilSave)
     if anticipatedY < my.y - goalCon.CENTER_SAVE_THRESH:
         return -1
     elif anticipatedY > my.y + goalCon.CENTER_SAVE_THRESH:
@@ -40,16 +40,16 @@ def shouldSaveRight(player):
     ball= player.brain.ball
     my = player.brain.my
 
-    return(ball.endY < -goalCon.CENTER_SAVE_THRESH
-           and ball.endY > -goalCon.DONT_SAVE_LIMIT
+    return(ball.loc.endY < -goalCon.CENTER_SAVE_THRESH
+           and ball.loc.endY > -goalCon.DONT_SAVE_LIMIT
            and goalieInBox(player))
 
 def shouldSaveLeft(player):
     ball= player.brain.ball
     my = player.brain.my
 
-    return (ball.endY > goalCon.CENTER_SAVE_THRESH
-            and ball.endY < goalCon.DONT_SAVE_LIMIT
+    return (ball.loc.endY > goalCon.CENTER_SAVE_THRESH
+            and ball.loc.endY < goalCon.DONT_SAVE_LIMIT
             and goalieInBox(player))
 
 # Not used
@@ -80,6 +80,6 @@ def dangerousBall(player):
 
     # in box and behind me and close to me
     # if inBox(player):
-    return (ball.relX < 0 and goalieInBox(player))
+    return (ball.loc.relX < 0 and goalieInBox(player))
 
 

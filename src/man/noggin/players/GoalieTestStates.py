@@ -78,9 +78,9 @@ def testDX(player):
         player.brain.tracker.trackBall()
 
     print "dx"
-    print ball.dx
+    print ball.loc.dx
     print "relVelX"
-    print ball.relVelX
+    print ball.loc.relVelX
     print "heat"
     print ball.heat
 

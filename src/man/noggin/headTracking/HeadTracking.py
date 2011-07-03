@@ -123,7 +123,7 @@ class HeadTracking(FSA.FSA):
 
     def trackTarget(self, target):
         """automatically tracks landmark, scans for landmark if not in view
-        only works if target has attribute locDist, framesOn, framesOff,x,y"""
+        only works if target has attribute loc.dist, framesOn, framesOff,x,y"""
         self.target = target
         self.target.height = 0
         self.gain = 1.0

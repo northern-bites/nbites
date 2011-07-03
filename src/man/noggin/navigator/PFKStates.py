@@ -98,7 +98,7 @@ accurately on the ball and returns that value
 """
 def pfk_y(nav, ball, targetY):
 
-    targetDist = ball.relY - targetY
+    targetDist = ball.loc.relY - targetY
 
     if (fabs(targetDist) <= PFK_CLOSE_ENOUGH_Y):
         nav.stopY = True
@@ -126,7 +126,7 @@ accurately on the ball and returns that value
 """
 def pfk_x(nav, ball, targetX):
 
-    targetDist = ball.relX - targetX
+    targetDist = ball.loc.relX - targetX
 
     if (fabs(targetDist) <= PFK_CLOSE_ENOUGH_X):
         nav.stopX = True

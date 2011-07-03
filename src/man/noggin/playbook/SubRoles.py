@@ -71,7 +71,7 @@ def pSweeper(team, workingPlay):
     x = PBConstants.SWEEPER_X
     y = PBConstants.SWEEPER_Y
     y += PBConstants.SWEEPER_Y_OFFSET * \
-        MyMath.sign(team.brain.ball.y-NogginConstants.CENTER_FIELD_Y)
+        MyMath.sign(team.brain.ball.loc.y-NogginConstants.CENTER_FIELD_Y)
     dest = Location(x, y)
     h = dest.headingTo(team.brain.ball)
 
@@ -117,7 +117,7 @@ def pStopper(team, workingPlay):
     """position stopper"""
     workingPlay.setSubRole(PBConstants.STOPPER)
     x = PBConstants.STOPPER_X
-    y = MyMath.clip(team.brain.ball.y,
+    y = MyMath.clip(team.brain.ball.loc.y,
                     PBConstants.MIN_STOPPER_Y,
                     PBConstants.MAX_STOPPER_Y)
     dest = Location(x, y)
@@ -146,7 +146,7 @@ def pLeftWing(team, workingPlay):
     midpoint = (PBConstants.WING_MAX_X - PBConstants.WING_MIN_X)*.5
     scale = (PBConstants.WING_MAX_X - midpoint)/(PBConstants.PICKER_X_THRESH -
                                                  midpoint)
-    x = -1*scale*(team.brain.ball.x - midpoint)
+    x = -1*scale*(team.brain.ball.loc.x - midpoint)
     y = PBConstants.LEFT_WING_Y
     dest = Location(x, y)
     h = dest.headingTo(team.brain.ball)
@@ -160,7 +160,7 @@ def pRightWing(team, workingPlay):
     midpoint = (PBConstants.WING_MAX_X - PBConstants.WING_MIN_X)*.5
     scale = (PBConstants.WING_MAX_X - midpoint)/(PBConstants.PICKER_X_THRESH -
                                                  midpoint)
-    x = -1*scale*(team.brain.ball.x - midpoint)
+    x = -1*scale*(team.brain.ball.loc.x - midpoint)
     y = PBConstants.RIGHT_WING_Y
     dest = Location(x, y)
     h = dest.headingTo(team.brain.ball)
@@ -172,7 +172,7 @@ def pStriker(team, workingPlay):
     """position striker"""
     workingPlay.setSubRole(PBConstants.STRIKER)
     x = PBConstants.STRIKER_X
-    if team.brain.ball.y < NogginConstants.CENTER_FIELD_Y:
+    if team.brain.ball.loc.y < NogginConstants.CENTER_FIELD_Y:
         y = PBConstants.LEFT_STRIKER_Y
     else:
         y = PBConstants.RIGHT_STRIKER_Y
@@ -186,7 +186,7 @@ def pForward(team, workingPlay):
     """position forward"""
     workingPlay.setSubRole(PBConstants.FORWARD)
     x = PBConstants.FORWARD_X
-    if team.brain.ball.y < NogginConstants.CENTER_FIELD_Y:
+    if team.brain.ball.loc.y < NogginConstants.CENTER_FIELD_Y:
         y = PBConstants.LEFT_FORWARD_Y
     else:
         y = PBConstants.RIGHT_FORWARD_Y
@@ -200,7 +200,7 @@ def pForward(team, workingPlay):
 
 def pDefensiveMiddie(team, workingPlay):
     workingPlay.setSubRole(PBConstants.DEFENSIVE_MIDDIE)
-    y = MyMath.clip(team.brain.ball.y,
+    y = MyMath.clip(team.brain.ball.loc.y,
                     PBConstants.MIN_MIDDIE_Y,
                     PBConstants.MAX_MIDDIE_Y)
     dest = Location(PBConstants.DEFENSIVE_MIDDIE_X, y)
@@ -211,7 +211,7 @@ def pDefensiveMiddie(team, workingPlay):
 
 def pOffensiveMiddie(team, workingPlay):
     workingPlay.setSubRole(PBConstants.OFFENSIVE_MIDDIE)
-    y = MyMath.clip(team.brain.ball.y,
+    y = MyMath.clip(team.brain.ball.loc.y,
                     PBConstants.MIN_MIDDIE_Y,
                     PBConstants.MAX_MIDDIE_Y)
     dest = Location(PBConstants.OFFENSIVE_MIDDIE_X, y)
@@ -223,7 +223,7 @@ def pOffensiveMiddie(team, workingPlay):
 def pDubDMiddie(team, workingPlay):
     """middie for when in dubD"""
     workingPlay.setSubRole(PBConstants.DUB_D_MIDDIE)
-    y = MyMath.clip(team.brain.ball.y,
+    y = MyMath.clip(team.brain.ball.loc.y,
                     PBConstants.MIN_MIDDIE_Y,
                     PBConstants.MAX_MIDDIE_Y)
     x = PBConstants.OFFENSIVE_MIDDIE_X

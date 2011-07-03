@@ -68,8 +68,8 @@ def shouldChase(team):
     if (ball.vis.framesOff > goalCon.BALL_LOST):
         return False
 
-    if (ball.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.CHASE_BUFFER
-        and ball.relX < goalCon.CHASE_RELX_BUFFER
+    if (ball.loc.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.CHASE_BUFFER
+        and ball.loc.relX < goalCon.CHASE_RELX_BUFFER
         and ball.vis.on
         ):
         team.shouldChaseCounter += 1
@@ -100,12 +100,12 @@ def shouldStopChase(team):
         return True
 
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X  and my.uncertX < 90):
-        if(ball.x > goalCon.CHASE_RIGHT_X_LIMIT):
+        if(ball.loc.x > goalCon.CHASE_RIGHT_X_LIMIT):
             team.resetGoalieRoleCounters()
             return True
 
-    elif (ball.x > goalCon.CHASE_RIGHT_X_LIMIT
-        or ball.relX > goalCon.STOP_CHASE_RELX_BUFFER):
+    elif (ball.loc.x > goalCon.CHASE_RIGHT_X_LIMIT
+        or ball.loc.relX > goalCon.STOP_CHASE_RELX_BUFFER):
         team.shouldStopChaseCounter += 1
 
     if team.shouldStopChaseCounter > goalCon.CHANGE_THRESH:
@@ -126,7 +126,7 @@ def shouldPositionCenter(team):
         team.resetGoalieRoleCounters()
         return True
 
-    if ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER:
+    if ball.loc.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER:
         team.shouldPositionCenterCounter += 1
         if team.shouldPositionCenterCounter > goalCon.CHANGE_THRESH:
             team.resetGoalieRoleCounters()
@@ -143,8 +143,8 @@ def shouldPositionRight(team):
     if ball.vis.framesOff > goalCon.BALL_LOST:
         return False
 
-    if (ball.y < goalCon.CHASE_LOWER_Y_LIMIT + goalCon.CHASE_BUFFER
-        and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
+    if (ball.loc.y < goalCon.CHASE_LOWER_Y_LIMIT + goalCon.CHASE_BUFFER
+        and ball.loc.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.vis.on):
         team.shouldPositionRightCounter += 1
         if team.shouldPositionRightCounter > goalCon.CHANGE_THRESH:
@@ -162,8 +162,8 @@ def shouldPositionLeft(team):
     if ball.vis.framesOff > goalCon.BALL_LOST:
         return False
 
-    if (ball.y > goalCon.CHASE_UPPER_Y_LIMIT + goalCon.CHASE_BUFFER
-        and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
+    if (ball.loc.y > goalCon.CHASE_UPPER_Y_LIMIT + goalCon.CHASE_BUFFER
+        and ball.loc.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.vis.on):
         team.shouldPositionLeftCounter += 1
         if team.shouldPositionLeftCounter > goalCon.CHANGE_THRESH:

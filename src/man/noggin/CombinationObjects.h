@@ -50,7 +50,7 @@ namespace noggin {
 
     /*
      * LOCATION
-     * The base class for all others in this file. Holds x, y values
+     * The base class for many others in this file. Holds x, y values
      * representing a location on the field. Contains methods to convert
      * these to a python tuple, get the distance and bearing to a location
      * from another location, and to determine whether a location is in
@@ -85,6 +85,9 @@ namespace noggin {
         virtual const bool inCenterOfField();
         virtual const bool inTopOfField();
         virtual const bool inBottomOfField();
+
+        // For Python
+        bool hasattr(boost::python::object, const std::string&);
 
     protected:
         float x, y;
@@ -167,6 +170,8 @@ namespace noggin {
         // Loc getters
         const float getDist();
         const degrees getBearing();
+        const float getRelX();
+        const float getRelY();
 
         // Tracking: Is this used?
         const int getTrackingFitness() { return trackingFitness; }
@@ -267,8 +272,6 @@ namespace noggin {
     public:
         static const int LOST_OBJECT_FRAMES_THRESH = 7;
 
-        const float getRelX();
-        const float getRelY();
         const float getDist() { return dist; }
         const degrees getBearing() { return bearing*TO_DEG; }
         const py_constants::vis_landmark getVisID() { return visID; }
@@ -277,6 +280,9 @@ namespace noggin {
         // Other
         void setBest();
         void associateWithRelativeLandmark(boost::python::tuple relLandmark);
+
+        // For Python
+        bool hasattr(boost::python::object, const std::string&);
     };
 
     /*
@@ -342,6 +348,9 @@ namespace noggin {
         const float getBearing() { return bearing; }
 
         void update();
+
+        // For Python
+        bool hasattr(boost::python::object, const std::string&);
 
     private:
         Ball(const Ball& other);

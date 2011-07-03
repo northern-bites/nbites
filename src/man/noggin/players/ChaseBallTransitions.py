@@ -22,7 +22,7 @@ def shouldChaseFromPositionForKick(player):
     ball = player.brain.ball
     return (shouldChaseBall(player) and
             (ball.dist > constants.BALL_PFK_DIST+5 or
-             fabs(ball.relY) > constants.BALL_PFK_LEFT_Y))
+             fabs(ball.loc.relY) > constants.BALL_PFK_LEFT_Y))
 
 def shouldChaseFromSpinToBall(player):
     """
@@ -31,9 +31,9 @@ def shouldChaseFromSpinToBall(player):
     """
     ball = player.brain.ball
     return (shouldChaseBall(player) and
-            (ball.relX > constants.SHOULD_SPIN_TO_KICK_X and
+            (ball.loc.relX > constants.SHOULD_SPIN_TO_KICK_X and
              (shouldPositionForKick(player) or
-              (fabs(ball.relY) > constants.BALL_PFK_LEFT_Y and
+              (fabs(ball.loc.relY) > constants.BALL_PFK_LEFT_Y and
                ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST + 5))))
 
 def shouldChaseFromClaimBall(player):
@@ -44,7 +44,7 @@ def shouldChaseFromClaimBall(player):
     return (shouldChaseBall(player) and
             (shouldChaseFromPositionForKick(player) or
              ball.dist > constants.SHOULD_STOP_BEFORE_KICK_DIST or
-             ball.relX < constants.SHOULD_SPIN_TO_KICK_X))
+             ball.loc.relX < constants.SHOULD_SPIN_TO_KICK_X))
 
 def shouldPositionForKick(player):
     """
@@ -53,7 +53,7 @@ def shouldPositionForKick(player):
     ball = player.brain.ball
     return (shouldChaseBall(player) and
             ball.dist < constants.BALL_PFK_DIST and
-            (constants.BALL_PFK_LEFT_Y > ball.relY >
+            (constants.BALL_PFK_LEFT_Y > ball.loc.relY >
              constants.BALL_PFK_RIGHT_Y))
 
 def shouldClaimBall(player):
@@ -71,9 +71,9 @@ def shouldSpinToBall(player):
     """
     ball = player.brain.ball
     return (shouldChaseBall(player) and
-            ((fabs(ball.relY) > constants.BALL_PFK_LEFT_Y and
+            ((fabs(ball.loc.relY) > constants.BALL_PFK_LEFT_Y and
              ball.dist < constants.SHOULD_STOP_BEFORE_KICK_DIST) or
-             ball.relX <= 9.5))
+             ball.loc.relX <= 9.5))
 
 def ballInPosition(player):
     """
@@ -85,8 +85,8 @@ def ballInPosition(player):
     (x_offset, y_offset, heading) = kick.getPosition()
 
     #Get the difference
-    diff_x = fabs(x_offset - ball.relX)
-    diff_y = fabs(y_offset - ball.relY)
+    diff_x = fabs(x_offset - ball.loc.relX)
+    diff_y = fabs(y_offset - ball.loc.relY)
 
     #Compare the sweet spot with the actual values and make sure they
     #are within the threshold
@@ -98,9 +98,9 @@ def ballNearPosition(player):
     Ball is around our feet. Maybe we wiffed?
     """
     ball = player.brain.ball
-    return ((constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.relX <
+    return ((constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.loc.relX <
               constants.SHOULD_KICK_AGAIN_FAR_X) and
-             fabs(ball.relY) < constants.SHOULD_KICK_AGAIN_Y)
+             fabs(ball.loc.relY) < constants.SHOULD_KICK_AGAIN_Y)
 
 def shouldKick(player):
     """
@@ -124,8 +124,8 @@ def shouldDribble(player):
         dribbleAimPoint = helpers.getShotCloseAimPoint(player)
         goalBearing = my.getRelativeBearing(dribbleAimPoint)
         return  (not player.penaltyKicking and
-                 0 < player.brain.ball.relX < constants.SHOULD_DRIBBLE_X and
-                 0 < fabs(player.brain.ball.relY) < constants.SHOULD_DRIBBLE_Y and
+                 0 < player.brain.ball.loc.relX < constants.SHOULD_DRIBBLE_X and
+                 0 < fabs(player.brain.ball.loc.relY) < constants.SHOULD_DRIBBLE_Y and
                  fabs(goalBearing) < constants.SHOULD_DRIBBLE_BEARING and
                  not player.brain.my.inOppGoalbox() and
                  player.brain.my.x > (
@@ -142,8 +142,8 @@ def shouldStopDribbling(player):
     goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (player.penaltyKicking or
             player.brain.my.inOppGoalbox() or
-            player.brain.ball.relX > constants.STOP_DRIBBLE_X or
-            fabs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
+            player.brain.ball.loc.relX > constants.STOP_DRIBBLE_X or
+            fabs(player.brain.ball.loc.relY) > constants.STOP_DRIBBLE_Y or
             fabs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
             player.brain.my.x < ( NogginConstants.FIELD_WHITE_WIDTH / 3.0 +
                                   NogginConstants.GREEN_PAD_X))
@@ -165,8 +165,8 @@ def shouldStopPenaltyKickDribbling(player):
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
     goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (inPenaltyKickStrikezone(player) or
-            player.brain.ball.relX > constants.STOP_DRIBBLE_X or
-            fabs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
+            player.brain.ball.loc.relX > constants.STOP_DRIBBLE_X or
+            fabs(player.brain.ball.loc.relY) > constants.STOP_DRIBBLE_Y or
             fabs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
             player.counter > constants.STOP_PENALTY_DRIBBLE_COUNT)
 

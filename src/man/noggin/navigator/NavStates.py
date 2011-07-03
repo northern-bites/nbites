@@ -297,7 +297,7 @@ def orbitPointThruAngle(nav):
 
     #want x to keep a radius of 17 from the ball, increase and
     #decrease x velocity as we move farther away from that dist
-    walkX = (ball.relX - 18) * .045
+    walkX = (ball.loc.relX - 18) * .045
 
     #keep constant y velocity, let x and theta changea
     walkY = orbitDir * .8

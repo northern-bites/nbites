@@ -85,6 +85,11 @@ namespace noggin {
         return (BOTTOM_LIMIT > y);
     }
 
+    bool Location::hasattr(boost::python::object obj,
+                           std::string const &attrName) {
+        return PyObject_HasAttrString(obj.ptr(), attrName.c_str());
+    }
+
 ///////// RobotLocation Methods //////////////
 
     RobotLocation::RobotLocation(float _x, float _y, degrees _h)
@@ -144,16 +149,6 @@ namespace noggin {
     {
     }
 
-    const float FieldObject::getRelX()
-    {
-        return std::fabs(dist)*std::cos(bearing);
-    }
-
-    const float FieldObject::getRelY()
-    {
-        return std::fabs(dist)*std::sin(bearing);
-    }
-
     // Determine whether vis or loc values are better
     void FieldObject::setBest()
     {
@@ -178,6 +173,11 @@ namespace noggin {
         loc->setX(boost::python::extract<float>(relLandmark[0])());
         loc->setY(boost::python::extract<float>(relLandmark[1])());
         localID = boost::python::extract<int>(relLandmark[2])();
+    }
+
+    bool FieldObject::hasattr(boost::python::object obj,
+                           std::string const &attrName) {
+        return PyObject_HasAttrString(obj.ptr(), attrName.c_str());
     }
 
 /////////////// LocObject Methods //////////////
@@ -217,6 +217,17 @@ namespace noggin {
                                                        (loc->getXEst()-x)))
                                    - loc->getHEst()))*TO_DEG;
     }
+
+    const float LocObject::getRelX()
+    {
+        return std::fabs(getDist())*std::cos(getBearing());
+    }
+
+    const float LocObject::getRelY()
+    {
+        return std::fabs(getDist())*std::sin(getBearing());
+    }
+
 
 //////////// LocBall Methods //////////////////
 
@@ -259,7 +270,7 @@ namespace noggin {
                                    (loc->getBallXEst()-loc->getXEst())))*TO_DEG;
     }
 
-    // Copies x and y values to comply with the location interface. 
+    // Copies x and y values to comply with the location interface.
     void LocBall::update()
     {
         if (my->getTeamColor() == PY_TEAM_BLUE) {
@@ -346,4 +357,10 @@ namespace noggin {
 
         loc->update();
     }
+
+    bool Ball::hasattr(boost::python::object obj,
+                           std::string const &attrName) {
+        return PyObject_HasAttrString(obj.ptr(), attrName.c_str());
+    }
+
 }

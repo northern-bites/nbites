@@ -26,8 +26,8 @@ def crossoverTowardsBall(nav):
     destH = my.headingTo(ball)
     distToBall = ball.dist
 
-    relDestX = ball.relX * CROSSOVER_DIST / distToBall
-    relDestY = ball.relY * CROSSOVER_DIST / distToBall
+    relDestX = ball.loc.relX * CROSSOVER_DIST / distToBall
+    relDestY = ball.loc.relY * CROSSOVER_DIST / distToBall
 
     nonRelDest = RobotLocation(relDestX + my.x,
                                relDestY + my.y,
@@ -61,7 +61,7 @@ def walkSpinToBall(nav):
     ball = nav.brain.ball
 
     nav.dest = ball
-    nav.dest.relX += LEFT_FOOT_OFFSET
+    nav.dest.loc.relX += LEFT_FOOT_OFFSET
     nav.dest.h = ball.heading
     nav.dest.relH = ball.bearing
 
@@ -110,14 +110,14 @@ def chaseAroundBox(nav):
 
     if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
         # go to corner nearest ball
-        if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
+        if ball.loc.y > NogginConstants.MY_GOALBOX_TOP_Y:
             nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
                           constants.GOALBOX_OFFSET)
             nav.dest.y = (NogginConstants.MY_GOALBOX_TOP_Y +
                           constants.GOALBOX_OFFSET)
             nav.dest.h = my.headingTo(nav.dest)
 
-        elif ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+        elif ball.loc.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
             nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
                           constants.GOALBOX_OFFSET)
             nav.dest.y = (NogginConstants.MY_GOALBOX_BOTTOM_Y -
