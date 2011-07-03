@@ -156,10 +156,13 @@ class KickInformation:
             # Don't need to sub180Angle here because we mod. I know it looks
             # wierd and suspiciously complicated, but it makes for an easy
             # compare and I promise I unit tested it. -- Wils (7/1/11)
-            bestHeading = max((fabs(((ball.headingTo(dest) -
-                                     my.headingTo(ball))
-                                    % 90) - 45)), bestHeading)
-            bestDest = dest
+            heading = (fabs(((ball.headingTo(dest) - my.headingTo(ball))
+                             % 90) - 45))
+
+            if heading > bestHeading:
+                bestHeading = heading
+                bestDest = dest
+
         return bestDest
 
     def bestAlignedKick(self, dest):
