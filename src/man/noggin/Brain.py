@@ -26,7 +26,7 @@ from . import Leds
 from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
-from .typeDefs import (Ball, Sonar, Packet,
+from .typeDefs import (Sonar, Packet,
                        Play, TeamMember)
 from .navigator import Navigator
 from .util import NaoOutput
@@ -37,8 +37,7 @@ from .kickDecider import KickDecider
 import _roboguardian
 import _speech
 
-from objects import (MyInfo, FieldObject, RobotLocation)
-from objects import Ball as newBall
+from objects import (MyInfo, FieldObject, RobotLocation, Ball)
 
 class Brain(object):
     """
@@ -102,8 +101,7 @@ class Brain(object):
         # Information about the environment
         self.initFieldObjects()
         self.initTeamMembers()
-        self.ball = newBall(self.vision.ball, self.loc, self.my)
-        self.oldBall = Ball.Ball(self.vision.ball)
+        self.ball = Ball(self.vision.ball, self.loc, self.my)
 
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
@@ -236,11 +234,8 @@ class Brain(object):
         # Communications update
         self.updateComm()
 
-        # Localization Update
-        self.updateLocalization()
-
-        # Choose whether we use Vision or Localization
-        self.updateBestValues()
+        # Update objects
+        self.update()
 
         #Set LEDS
         self.leds.processLeds()
@@ -274,19 +269,12 @@ class Brain(object):
             if (mate.active and mate.isDead()):
                 mate.active = False
 
-    def updateLocalization(self):
+    def update(self):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.oldBall.updateLoc(self.loc, self.my)
         self.ball.update()
         self.my.update()
-
-    def updateBestValues(self):
-        """
-        Update estimates about objects using best information available
-        """
-        self.oldBall.updateBestValues(self.my)
         self.yglp.setBest()
         self.ygrp.setBest()
         self.bglp.setBest()
