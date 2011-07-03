@@ -44,13 +44,14 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.STAND_UP_FRONT)
-    if player.counter == 50:
+        player.executeMove(SweetMoves.GOALIE_SQUAT)
+    if player.counter == 100:
         return player.goLater('done')
     return player.stay()
 
 def done(player):
     if player.firstFrame():
         #player.walkPose()
+        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
         return player.stay()
     return player.stay()
