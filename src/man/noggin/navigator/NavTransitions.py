@@ -32,7 +32,7 @@ def atHeading(nav):
     if nav.destType is constants.BALL:
         return abs(nav.brain.ball.bearing) < constants.CLOSE_ENOUGH_H
 
-    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
+    hDiff = fabs(MyMath.sub180Angle(my.h - dest.h))
     return hDiff < constants.CLOSE_ENOUGH_H and \
            my.uncertH < constants.LOC_IS_ACTIVE_H
 

@@ -28,9 +28,9 @@ class Kick(object):
 #The sweet spot needs testing once the approach ball is fixed.
 #From extensve testing in pKicker and with printlines of the balls
 #relX and relY, this appears accurate
-LEFT_SIDE_KICK =  Kick("L_Side", x = 12, y =  .5,
+LEFT_SIDE_KICK =  Kick("L_Side", x = 12, y = 0,
                        move=SweetMoves.GOOGZ_LEFT_SIDE_KICK)
-RIGHT_SIDE_KICK = Kick("L_Side", x = 12, y = -.5,
+RIGHT_SIDE_KICK = Kick("L_Side", x = 12, y = 0,
                        move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
 
 LEFT_DYNAMIC_STRAIGHT_KICK =  Kick("L_D_Straight", y =  5,
@@ -40,7 +40,7 @@ RIGHT_DYNAMIC_STRAIGHT_KICK = Kick("R_D_Straight", y = -5,
 
 # TODO ! make a null kick here.
 # used when we haven't decided what kick to do yet
-ORBIT_KICK_POSITION = Kick("NULL_KICK", x = DEFAULT_KICK_X_OFFSET + 5, y = -5)
+ORBIT_KICK_POSITION = Kick("NULL_KICK", x = DEFAULT_KICK_X_OFFSET + 5, y = 0)
 
 LEFT_LONG_BACK_KICK =  Kick("L_LongBack", x = 12.5, y =  6.5,
                             move=SweetMoves.LEFT_LONG_BACK_KICK)

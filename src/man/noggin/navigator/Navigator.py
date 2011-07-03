@@ -122,7 +122,7 @@ class Navigator(FSA.FSA):
             print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
                   .format(ball.relX, ball.relY, ball.bearing)
 
-        self.setDest(ball.relX - self.kick.x_offset, # HACK!!!
+        self.setDest(ball.relX - self.kick.x_offset -2, # HACK!!!
                      ball.relY - self.kick.y_offset,
                      ball.bearing,
                      gain)
