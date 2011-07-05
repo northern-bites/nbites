@@ -316,6 +316,7 @@ void Threshold::findGoals(int column, int topEdge) {
 		if (Utility::isRed(pixel)) {
 			lastPink = j;
 			pinks++;
+			bad++;
 			if (firstPink == topEdge) {
 				firstPink = j;
 			}
@@ -323,7 +324,7 @@ void Threshold::findGoals(int column, int topEdge) {
         if (Utility::isUndefined(pixel)) {
             bad++;
         }
-		if (lastYellow - j > GAP && lastBlue - j > GAP && lastPink - j > GAP) {
+		if (lastYellow - j > GAP && lastBlue - j > GAP) {
 			break;
 		}
     }
