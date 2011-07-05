@@ -8,7 +8,7 @@ from . import GoalieSaveStates
 from . import GoalieChanges
 from . import GoalieTransitions
 
-from .. import NogginConstants
+import noggin_constants as  NogginConstants
 from ..playbook import PBConstants
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
@@ -35,7 +35,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.shouldRelocalizeCounter = 0
 
         # Orbiting
-        self.angleToOrbit = 0.0
+        self.shouldOrbit = False
 
         self.inKickingSate = False
         self.penaltyKicking = False

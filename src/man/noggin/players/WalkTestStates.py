@@ -13,8 +13,7 @@ from ..WebotsConfig import WEBOTS_ACTIVE
 import man.motion.SweetMoves as SweetMoves
 
 #Types
-DEST = 2
-STEP = 1 #currently broken in Nav.
+DEST = 1
 WALK = 0
 
 # all walk vector values must be in the range [-1,1]
@@ -44,6 +43,11 @@ MIXED_DEST_TEST = ((DEST, (15, 15, 0), 200),
                    (DEST, (-30, -15, -90), 300),
                    )
 
+START_STOP_DEST = ((DEST, (1000, 0, 0), 100),
+                   (DEST, (0, 0, 0), 100),
+                   (DEST, (15, 15, 0), 300),
+                   )
+
 def gamePlaying(player):
     """
     This method must be overriden by interested SoccerPlayers
@@ -53,7 +57,7 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0
-        player.unitTest = MIXED_DEST_TEST
+        player.unitTest = START_STOP_DEST
     return player.goLater('walkTest')
 
 def walkTest(player):
@@ -76,11 +80,6 @@ def walkTest(player):
             player.setWalk(currentVector[0],
                            currentVector[1],
                            currentVector[2],)
-        elif currentCommand[0] == STEP:
-            player.setSteps(currentVector[0],
-                            currentVector[1],
-                            currentVector[2],
-                            currentVector[3],)
         elif currentCommand[0] == DEST:
             player.setDestination(currentVector[0],
                                   currentVector[1],

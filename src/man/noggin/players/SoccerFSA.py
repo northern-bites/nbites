@@ -27,6 +27,7 @@ class SoccerFSA(FSA.FSA):
 
         # stuff so players don't crash.
         self.inKickingState = False
+        self.saveBallPosition()
 
         # Penalty kick player variables
         self.penaltyKicking = False
@@ -105,6 +106,23 @@ class SoccerFSA(FSA.FSA):
         nav = self.brain.nav
         if not nav.isStopped():
             self.brain.nav.stop()
+
+    def ballMoved(self):
+        """
+        Returns true if the ball has moved in the absolute frame since the last time
+        saveBallPosition() was called, or if the uncertainty is too high
+        """
+        if abs(self.brain.ball.x - self.lastBall_x) > 20 or \
+               abs(self.brain.ball.y - self.lastBall_y) > 20:
+            print "Ball has moved globally since we last saved"
+            self.brain.speech.say("Ball moved")
+            return True
+
+        return False
+
+    def saveBallPosition(self):
+        self.lastBall_x = self.brain.ball.x
+        self.lastBall_y = self.brain.ball.y
 
     def atDestinationCloser(self):
         nav = self.brain.nav

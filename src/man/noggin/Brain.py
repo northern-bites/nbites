@@ -6,6 +6,8 @@ sys.stderr = sys.stdout
 ## import cProfile
 ## import pstats
 
+from math import (fabs) # ** # debugging? or keep?
+
 
 # Packages and modules from super-directories
 from man import comm
@@ -126,6 +128,7 @@ class Brain(object):
         """
 
         # Build instances of the vision based field objects
+        # Left post is on that goalie's left
         # Yellow goal left and right posts
         self.yglp = FieldObject(self.vision.yglp,
                                 Constants.vis_landmark.VISION_YGLP,
@@ -152,13 +155,13 @@ class Brain(object):
         Builds a list of fieldObjects based on their relative names to the robot
         Needs to be called when team color is determined
         """
+        # Note: corner directions are relative to perspective of own goalie
 
         # Blue team setup
         if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
             # Yellow goal
             self.oppGoalRightPost = self.yglp
             self.oppGoalLeftPost = self.ygrp
-
             # Blue Goal
             self.myGoalLeftPost = self.bglp
             self.myGoalRightPost = self.bgrp
@@ -168,21 +171,20 @@ class Brain(object):
             # Yellow goal
             self.myGoalLeftPost = self.yglp
             self.myGoalRightPost = self.ygrp
-
             # Blue Goal
             self.oppGoalRightPost = self.bglp
             self.oppGoalLeftPost = self.bgrp
 
-        # Since, for ex.  bgrp points to the same thins as myGoalLeftPost,
+        # Since, for ex.  bgrp points to the same things as myGoalLeftPost,
         # we can set these regardless of our team color
         self.myGoalLeftPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_MY_GOAL_LEFT_POST)
+            Constants.LANDMARK_MY_GOAL_LEFT_POST)
         self.myGoalRightPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_MY_GOAL_RIGHT_POST)
+            Constants.LANDMARK_MY_GOAL_RIGHT_POST)
         self.oppGoalLeftPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_OPP_GOAL_LEFT_POST)
+            Constants.LANDMARK_OPP_GOAL_LEFT_POST)
         self.oppGoalRightPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
+            Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
 
         # Build a list of all of the field objects with respect to team color
         self.myFieldObjects = [self.yglp, self.ygrp, self.bglp, self.bgrp]
@@ -283,6 +285,7 @@ class Brain(object):
         Update estimates about objects using best information available
         """
         self.ball.updateBestValues(self.my)
+
         self.yglp.setBest()
         self.ygrp.setBest()
         self.bglp.setBest()

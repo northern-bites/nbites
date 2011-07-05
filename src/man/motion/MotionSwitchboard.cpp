@@ -24,8 +24,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
     : sensors(s),
       walkProvider(sensors, pose),
       scriptedProvider(sensors),
-      headProvider(sensors),
-      coordHeadProvider(sensors, pose),
+      headProvider(sensors, pose),
       nullHeadProvider(sensors),
       nullBodyProvider(sensors),
       curProvider(&nullBodyProvider),
@@ -371,7 +370,6 @@ void MotionSwitchboard::preProcessHead()
         nextHeadProvider == &nullHeadProvider)
     {
         headProvider.hardReset();
-        coordHeadProvider.hardReset();
     }
 
     if (curHeadProvider != nextHeadProvider)
@@ -518,6 +516,7 @@ void MotionSwitchboard::swapBodyProvider(){
         if(noWalkTransitionCommand){//only enqueue one
             noWalkTransitionCommand = false;
             gaitSwitches = walkProvider.getGaitTransitionCommand();
+
             if(gaitSwitches.size() >= 1){
                 for(unsigned int i = 0; i< gaitSwitches.size(); i++){
                     scriptedProvider.setCommand(gaitSwitches[i]);
@@ -766,8 +765,8 @@ void MotionSwitchboard::sendMotionCommand(const SetHeadCommand::ptr command){
 }
 void MotionSwitchboard::sendMotionCommand(const CoordHeadCommand::ptr command){
     pthread_mutex_lock(&next_provider_mutex);
-    nextHeadProvider = &coordHeadProvider;
-    coordHeadProvider.setCommand(command);
+    nextHeadProvider = &headProvider;
+    headProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
 
 }
