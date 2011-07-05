@@ -198,34 +198,47 @@ class KickInformation:
         kick.dest = dest
         return kick
 
-
-
-
     def chooseStraightKick(self):
         """
         Picks the straight kick based on our heading to the ball.
         """
-        if self.brain.my.headingTo(self.brain.ball) > 0:
-            return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
-        else:
+        if self.shouldFrontKickLeft():
             return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+        else:
+            return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
 
     def chooseShortQuickKick(self):
         """
         Picks quick straight kick based on our heading to the ball.
         """
-        if self.brain.my.headingTo(self.brain.ball) > 0:
-            return kicks.SHORT_QUICK_RIGHT_KICK
-        else:
+        if self.shouldFrontKickLeft():
             return kicks.SHORT_QUICK_LEFT_KICK
+        else:
+            return kicks.SHORT_QUICK_RIGHT_KICK
 
     def chooseBackKick(self):
         """
         Picks the back kick based on which foot is closer to center field.
         This way, we minimize the chance of kicking out of bounds.
         """
+        #Disabled for now, need more testing
+        """
         if self.brain.my.y > NogginConstants.CENTER_FIELD_Y:
             return kicks.LEFT_SHORT_BACK_KICK
         else:
             return kicks.RIGHT_SHORT_BACK_KICK
+        """
+        if self.shouldFrontKickLeft():
+            return kicks.LEFT_SHORT_BACK_KICK
+        else:
+            return kicks.RIGHT_SHORT_BACK_KICK
 
+    def shouldFrontKickLeft(self):
+        """
+        How we choose which kick to do when we're facing the ball. For now,
+        simply pick the foot that's closer to the ball.
+        """
+        if self.brain.ball.relY > 0:
+            return True
+        else:
+            return False
