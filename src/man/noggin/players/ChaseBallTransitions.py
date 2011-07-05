@@ -15,8 +15,12 @@ def shouldChaseBall(player):
 
 def ballInPosition(player):
     """
-    Make sure ball is somewhere we will kick it
+    Make sure ball is somewhere we will kick it. Also makes sure we're looking
+    at the ball.
     """
+    if not self.shouldChaseBall():
+        return False
+
     ball = player.brain.ball
     kick = player.brain.kickDecider.getKick()
     #Get the current kick sweet spot information
