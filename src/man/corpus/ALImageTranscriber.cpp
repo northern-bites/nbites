@@ -147,7 +147,7 @@ void ALImageTranscriber::run()
         //start timer
         PROF_ENTER(P_MAIN);
         PROF_ENTER(P_GETIMAGE);
-        const long long startTime = process_micro_time();
+        const long long startTime = monotonic_micro_time();
 
         if (camera_active)
             waitForImage();
@@ -162,7 +162,7 @@ void ALImageTranscriber::run()
 #endif
 
         //stop timer
-        const long long processTime = process_micro_time() - startTime;
+        const long long processTime = monotonic_micro_time() - startTime;
         //sleep until next frame
 
         lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
