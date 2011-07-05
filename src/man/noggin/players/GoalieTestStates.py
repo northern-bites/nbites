@@ -58,9 +58,9 @@ def testHeat(player):
         player.brain.tracker.trackBall()
 
     if player.counter % 10 == 0:
-        print ball.heat
+        print ball.vis.heat
 
-    if ball.heat >= 10:
+    if ball.vis.heat >= 10:
         player.brain.speech.say("Save")
 
     return player.stay()
@@ -82,7 +82,7 @@ def testDX(player):
     print "relVelX"
     print ball.relVelX
     print "heat"
-    print ball.heat
+    print ball.vis.heat
 
     return player.stay()
 

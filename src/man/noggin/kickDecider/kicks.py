@@ -18,6 +18,12 @@ class Kick(object):
         """returns all position info as a tuple"""
         return (self.x_offset, self.y_offset, self.heading)
 
+    def isBackKick(self):
+        return (self is LEFT_LONG_BACK_KICK or
+                self is RIGHT_LONG_BACK_KICK or
+                self is LEFT_SHORT_BACK_KICK or
+                self is RIGHT_SHORT_BACK_KICK)
+
     def __str__(self):
         return ("%s: \n x_offset: %g y_offset: %g heading: %g ==> dest: %s" %
                 (self.name, self.x_offset, self.y_offset, self.heading, self.dest))

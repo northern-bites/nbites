@@ -19,7 +19,6 @@ def setDestination(nav, x, y, theta, gain):
 
     nav.updateDests(x, y, theta, gain)
 
-
 def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot

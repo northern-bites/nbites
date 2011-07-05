@@ -5,7 +5,6 @@ from . import BasicStates
 from . import HeadTrackingHelper as helper
 from ..util import FSA
 from ..util import MyMath
-from man.motion import MotionConstants# ** # debugging code
 
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""
@@ -40,7 +39,7 @@ class HeadTracking(FSA.FSA):
         self.helper = helper.HeadTrackingHelper(self)
 
         self.lookDirection = None
-        self.kickDirection = None
+        self.kickName = ""
         self.target = self.brain.ball #default
 
         # target should either be ball or instance of FieldObject
@@ -141,6 +140,15 @@ class HeadTracking(FSA.FSA):
             self.currentState != 'trianglePanReturn'):
             self.switchTo('trianglePan')
 
+    def afterKickScan(self, name):
+        """
+        After a kick, looks in the appropriate direction
+        that the ball was kicked in.
+        """
+        self.target = self.brain.ball
+        self.kickName = name
+        self.switchTo('afterKickScan')
+
     def startScan(self, newScan):
         """Repeatedly performs the given scan."""
         if newScan != self.currentHeadScan:
@@ -186,7 +194,6 @@ class HeadTracking(FSA.FSA):
         self.target.height = goalZ
         self.helper.lookToPoint(self.target)
 
-# ** # debugging method
     def lookToAngles(self,pitch,yaw):
         """Looks to the given head angles. """
         self.helper.lookToAngles(yaw,pitch)
@@ -195,3 +202,9 @@ class HeadTracking(FSA.FSA):
         """Continually bounce head up and down."""
         self.switchTo('bounceUp')
 
+    def orbitPan(self):
+        """
+        Continually bounces head up to see goalposts, then
+        back down to see the ball.
+        """
+        self.switchTo('orbitPanUp')

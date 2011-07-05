@@ -45,23 +45,11 @@ def afterKick(player):
 
         kick = player.brain.kickDecider.getKick()
 
-        # We need to find it!
-        if not player.brain.ball.vis.on:
-            if kick is kicks.LEFT_SIDE_KICK:
-                player.brain.tracker.lookToDir("right")
-            elif kick is kicks.RIGHT_SIDE_KICK:
-                player.brain.tracker.lookToDir("left")
-            elif (kick is kicks.RIGHT_DYNAMIC_STRAIGHT_KICK or
-                  kick is kicks.LEFT_DYNAMIC_STRAIGHT_KICK or
-                  kick is kicks.SHORT_QUICK_LEFT_KICK or
-                  kick is kicks.SHORT_QUICK_RIGHT_KICK):
-                player.brain.tracker.kickDecideScan() # should scan upper reaches.
-            else:
-                player.inKickingState = False
-                return player.goLater('spinAfterBackKick')
+        player.brain.tracker.afterKickScan(kick.name)
 
-        if player.penaltyKicking:
-            return player.goLater('penaltyKickRelocalize')
+        if kick.isBackKick():
+            player.inKickingState = False
+            return player.goLater('spinAfterBackKick')
 
         return player.stay()
 
@@ -93,7 +81,8 @@ def spinAfterBackKick(player):
 
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
         kick = player.brain.kickDecider.getKick()
-        if kick is kicks.LEFT_LONG_BACK_KICK or kick is kicks.LEFT_SHORT_BACK_KICK:
+        if (kick is kicks.LEFT_LONG_BACK_KICK or
+            kick is kicks.LEFT_SHORT_BACK_KICK):
             player.setWalk(0, 0, constants.FIND_BALL_SPIN_SPEED)
         else:
             player.setWalk(0, 0, -1*constants.FIND_BALL_SPIN_SPEED)

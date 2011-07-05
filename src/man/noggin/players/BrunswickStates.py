@@ -35,16 +35,23 @@ def gameReady(player):
         player.walkPose()
         player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
+        player.gainsOn()
 
-        if player.lastDiffState == 'gameInitial':
-            player.gainsOn()
+        # Works with rules (2011) to get goalie manually positioned
+        if (player.lastDiffState == 'gameInitial'
+            and not player.brain.play.isRole(GOALIE)):
             return player.goLater('relocalize')
 
         elif player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
             return player.goLater('afterPenalty')
 
-    return player.goLater('playbookPosition')
+    #See above about rules(2011) - we should still reposition after goals
+    if (player.lastDiffState == 'gameInitial'
+        and player.brain.play.isRole(GOALIE)):
+        return player.stay()
+    else:
+        return player.goLater('playbookPosition')
 
 def gameSet(player):
     """
