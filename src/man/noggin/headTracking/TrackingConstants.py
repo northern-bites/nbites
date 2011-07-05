@@ -1,3 +1,4 @@
+from man.motion import HeadMoves
 
 MAX_PAN_SPEED = 125.0              # deg/sec
 
@@ -7,6 +8,9 @@ ACTIVE_LOC_STARE_THRESH = 45
 ACTIVE_LOC_STARE_GOALIE_THRESH = 25
 ACTIVE_LOC_OFF_REFIND_THRESH = 40
 LOOK_TO_TIME_TO_FIND = 45
+TRACKER_FRAMES_SEARCH_THRESH = 15 # ** # debugging values
+TRACKER_FRAMES_STARE_THRESH = 5 # ** # debugging values
+TRACKER_BALL_STARE_THRESH = 20 # ** # debugging values
 
 MAX_ACTIVE_TRACKING_DIST = 80
 
@@ -22,3 +26,13 @@ NUM_LOOK_DIRS = 4
  LOOK_RIGHT,
  LOOK_DOWN) = range(NUM_LOOK_DIRS)
 
+KICK_DICT = {"L_Side"          : HeadMoves.SIDEKICK_PAN_RIGHT,
+             "R_Side"          : HeadMoves.SIDEKICK_PAN_LEFT,
+             "L_D_Straight"    : HeadMoves.FRONTKICK_PAN_LEFT,
+             "R_D_Straight"    : HeadMoves.FRONTKICK_PAN_RIGHT,
+             "L_ShortStraight" : HeadMoves.FRONTKICK_PAN_LEFT,
+             "R_ShortStraight" : HeadMoves.FRONTKICK_PAN_RIGHT,
+             "L_LongBack"      : HeadMoves.LOOK_DOWN,
+             "R_LongBack"      : HeadMoves.LOOK_DOWN,
+             "L_ShortBack"     : HeadMoves.LOOK_DOWN,
+             "R_ShortBack"     : HeadMoves.LOOK_DOWN}

@@ -20,91 +20,131 @@ def standup(player):
     if player.firstFrame():
         player.walkPose()
         return player.stay()
-    return player.goLater('lookCenterRight')
+    return player.goLater('lookState0')
 
 # alternate testing path
 
-def lookRightPostBase(player):
+def lookState0(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(1800,-1100,0)
+    brain.tracker.printAngles()
 
-    if player.counter == 30:
-        player.brain.tracker.stopHeadMoves()
-        player.brain.sensors.saveFrame()
-        return player.goLater('lookRightPostTop')
     return player.stay()
 
-def lookRightPostTop(player):
+def lookState1(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(1800,-1100,8000)
+    if player.counter > 100:
+        return player.goLater('lookState2')
+    elif player.counter > 50:
+        brain.tracker.lookToAngles(.5,-.4)
+        return player.stay()
+    else:
+        brain.tracker.lookToAngles(.5,.4)
 
-    if player.counter == 30:
-        player.brain.tracker.stopHeadMoves()
-        player.brain.sensors.saveFrame()
-        return player.goLater('lookLeftPostBase')
     return player.stay()
 
-def lookCenterRight(player):
+def lookState2(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(900,0,0)
+    if player.counter > 100:
+        return player.goLater('lookState3')
+    elif player.counter > 50:
+        brain.tracker.lookToAngles(.3,-1)
+        return player.stay()
+    else:
+        brain.tracker.lookToAngles(.3,1)
 
-    if player.counter == 30:
-        player.brain.tracker.stopHeadMoves()
-        player.brain.sensors.saveFrame()
-        return player.goLater('lookCenter')
     return player.stay()
 
-def lookCenter(player):
-    brain = player.brain
-    brain.tracker.lookToPoint(900,-600,0)
-    if player.counter == 30:
-        player.brain.tracker.stopHeadMoves()
-        player.brain.sensors.saveFrame()
-        return player.goLater('lookCenterLeft')
-    return player.stay()
-
-def lookCenterLeft(player):
+def lookState3(player):
     brain = player.brain
     my = brain.my
 
-    brain.tracker.lookToPoint(2000,-1800,0)
+    brain.tracker.printAngles()
 
-    if player.counter == 30:
-        player.brain.tracker.stopHeadMoves()
-        player.brain.sensors.saveFrame()
+    if player.counter > 140:
+        return player.goLater('lookState5')
+    elif player.counter > 70:
+        brain.tracker.lookToAngles(.2,-2)
+        return player.stay()
+    else:
+        brain.tracker.lookToAngles(.2,2)
+
+    return player.stay()
+
+def lookState5(player):
+    brain = player.brain
+    my = brain.my
+
+    if player.counter > 140:
+        return player.goLater('lookState6')
+    elif player.counter > 70:
+        brain.tracker.lookToAngles(-.4,-2)
+        return player.stay()
+    else:
+        brain.tracker.lookToAngles(-.4,2)
+
+    return player.stay()
+
+def lookState6(player):
+    brain = player.brain
+    my = brain.my
+
+    if player.counter > 100:
+        return player.goLater('lookState7')
+    elif player.counter > 50:
+        brain.tracker.lookToAngles(-.5,-.7)
+        return player.stay()
+    else:
+        brain.tracker.lookToAngles(-.5,.7)
+
+    return player.stay()
+
+def lookState7(player):
+    brain = player.brain
+    my = brain.my
+
+    if player.counter > 100:
+        return player.goLater('lookState8')
+    elif player.counter > 50:
+        brain.tracker.lookToAngles(-.6,-.3)
+        return player.stay()
+    else:
+        brain.tracker.lookToAngles(-.6,.3)
+
+    return player.stay()
+
+def lookState8(player):
+    brain = player.brain
+    my = brain.my
+
+    if player.counter > 100:
+        return player.goLater('lookState9')
+    elif player.counter > 50:
+        brain.tracker.lookToAngles(-.7,-.2)
+        return player.stay()
+    else:
+        brain.tracker.lookToAngles(-.7,.2)
+
+    return player.stay()
+
+def lookState9(player):
+    brain = player.brain
+    my = brain.my
+
+    if player.counter > 100:
         return player.goLater('done')
+    elif player.counter > 50:
+        brain.tracker.lookToAngles(-.75,-.2)
+        return player.stay()
+    else:
+        brain.tracker.lookToAngles(-.75,.2)
+
     return player.stay()
-
-def lookLeftPostBase(player):
-    brain = player.brain
-    my = brain.my
-
-    brain.tracker.lookToPoint(1800,1100,0)
-
-    if player.counter == 30:
-        player.brain.tracker.stopHeadMoves()
-        player.brain.sensors.saveFrame()
-        return player.goLater('lookLeftPostTop')
-    return player.stay()
-
-def lookLeftPostTop(player):
-    brain = player.brain
-    my = brain.my
-
-    brain.tracker.lookToPoint(1800,1100,8000)
-
-    if player.counter == 30:
-        player.brain.tracker.stopHeadMoves()
-        player.brain.sensors.saveFrame()
-        return player.goLater('done')
-    return player.stay()
-        
 
 # end alternate testing path
 

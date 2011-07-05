@@ -4,6 +4,7 @@ from man.motion import MotionConstants
 from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
 from math import (fabs, atan, radians, hypot)
+from ..typeDefs.Landmarks import FieldObject
 
 class HeadTrackingHelper(object):
     def __init__(self, tracker):
@@ -22,7 +23,6 @@ class HeadTrackingHelper(object):
                 self.printf("What kind of sweet ass-Move is this?")
 
             self.tracker.brain.motion.enqueue(move)
-
 
     def trackObject(self):
         """
@@ -64,6 +64,40 @@ class HeadTrackingHelper(object):
                                          maxSpeed, maxSpeed)
         self.tracker.brain.motion.setHead(headMove)
 
+    def lookToTargetAngles(self, target):
+        """
+        Uses setHeadCommands to bring given target to center of frame.
+        """
+        # Get current head angles
+        motionAngles = self.tracker.brain.sensors.motionAngles
+        yaw = motionAngles[MotionConstants.HeadYaw]
+        pitch = motionAngles[MotionConstants.HeadPitch]
+
+        # Find the target's angular distance from the center of vision
+        if not target is None and target.vis.on:
+            yaw += target.vis.angleX
+            pitch -= target.vis.angleY
+            #note: angleY is positive up from center of vision frame
+            #note: angleX is positive left from center of vision frame
+        else:
+            # by default, do nothing
+            return
+
+        #print "ball loc:",self.tracker.brain.ball.relX,self.tracker.brain.ball.relY
+
+        headMove = motion.SetHeadCommand(yaw,pitch)
+        self.tracker.brain.motion.setHead(headMove)
+        # boost converts to radians for setHeadCommand
+
+    def lookToTargetCoords(self, target):
+        """
+        Looks at given target's relative coordinates
+        """
+
+        # Boost handles conversion of units.
+        headMove = motion.CoordHeadCommand(target.relX, target.relY, 0,.1065*.1,.1227*.1)# arbitrary slow down for debugging (doesn't seem to do anything)
+        self.tracker.brain.motion.coordHead(headMove)
+
     def panTo(self, heads):
         """
         Pan heads at appropriate speed to given heads
@@ -83,8 +117,13 @@ class HeadTrackingHelper(object):
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
     def lookToPoint(self, target):
-        headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
+        # Boost handles conversion of units.
+        headMove = motion.CoordHeadCommand(target.x, target.y, target.height,.1065*.1,.1227*.1)
         self.tracker.brain.motion.coordHead(headMove)
+
+    def lookToAngles(self, yaw=0, pitch=0):
+        headMove = motion.SetHeadCommand(MyMath.degrees(yaw),MyMath.degrees(pitch))
+        self.tracker.brain.motion.setHead(headMove)
 
     def calcBearing(self, target):
         """returns the bearing to target in degrees. usable as headYaw"""
