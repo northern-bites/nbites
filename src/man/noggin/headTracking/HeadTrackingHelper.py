@@ -94,7 +94,7 @@ class HeadTrackingHelper(object):
         Looks at given target's relative coordinates
         """
 
-        #convert from cm to mm for c++ code
+        # Boost handles conversion of units.
         headMove = motion.CoordHeadCommand(target.relX, target.relY, 0,.1065*.1,.1227*.1)# arbitrary slow down for debugging (doesn't seem to do anything)
         self.tracker.brain.motion.coordHead(headMove)
 
@@ -117,7 +117,7 @@ class HeadTrackingHelper(object):
                                  StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
 
     def lookToPoint(self, target):
-        #convert from cm to mm for c++ code
+        # Boost handles conversion of units.
         headMove = motion.CoordHeadCommand(target.x, target.y, target.height,.1065*.1,.1227*.1)
         self.tracker.brain.motion.coordHead(headMove)
 

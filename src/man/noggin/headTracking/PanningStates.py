@@ -20,7 +20,7 @@ def scanBall(tracker):
                 ball.dist < HeadMoves.MID_SCAN_FAR_BOUND:
             tracker.helper.executeHeadMove(HeadMoves.MID_DOWN_WIDE_SCAN_BALL)
         else:
-            tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_
+            tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
     return tracker.stay()
 
 def spinScanBall(tracker):

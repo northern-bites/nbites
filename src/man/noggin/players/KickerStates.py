@@ -37,7 +37,7 @@ def standup(player):
     if player.firstFrame():
         player.brain.tracker.setNeutralHead()
         player.gainsOn()
-        player.walkPose()
+        player.executeMove(SweetMoves.INITIAL_POS)
 
     if player.counter == 1:
         return player.goLater('kickStraight')
@@ -45,8 +45,8 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.STAND_UP_FRONT)
-    if player.counter == 50:
+        player.executeMove(SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
+    if player.brain.nav.isStopped() and player.counter > 1:
         return player.goLater('done')
     return player.stay()
 
@@ -56,6 +56,6 @@ def done(player):
         player.executeMove(SweetMoves.INITIAL_POS)
         return player.stay()
     if player.brain.nav.isStopped() and player.tempBool:
-        player.brain.tracker.afterKickScan(1)
+        player.brain.tracker.afterKickScan('R_Side')
         player.tempBool = False
     return player.stay()

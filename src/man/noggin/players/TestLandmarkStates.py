@@ -5,15 +5,9 @@ from .. import NogginConstants
 from man.motion import MotionConstants
 
 def gameInitial(player):
+    # Turn on gains and stand up.
     player.gainsOn()
     player.executeMove(SweetMoves.INITIAL_POS)
-
-    # we don't want to auto-stand after falling
-    player.brain.fallController.executeStandup = False
-    player.brain.fallController.enabled = False
-
-    #debugging
-    print player.brain.sensors.motionAngles[MotionConstants.HeadPitch],player.brain.sensors.motionAngles[MotionConstants.HeadYaw]
 
     return player.stay()
 
@@ -27,11 +21,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.RIGHT_SIDE_KICK)
-        player.executeMove(SweetMoves.RIGHT_SIDE_KICK)
-
-    if player.stateTime > SweetMoves.getMoveTime(SweetMoves.RIGHT_SIDE_KICK):
-        player.brain.tracker.afterKickScan(0)
+        player.brain.tracker.orbitPan()
     return player.stay()
 
 def gamePenalized(player):
