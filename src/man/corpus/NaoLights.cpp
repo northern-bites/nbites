@@ -98,7 +98,7 @@ void NaoLights::sendLightCommand(AL::ALValue & command){
 #endif
 
     try{
-        command[4][0] = dcmProxy->getTime(20);
+        command[4][0] = dcmProxy->getTime(0);
 
 #ifdef LEDS_ENABLED
         dcmProxy->setAlias(command);
