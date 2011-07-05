@@ -1,3 +1,5 @@
+import time
+
 from . import SoccerFSA
 from . import ChaseBallStates
 from . import PositionStates
@@ -13,6 +15,8 @@ import noggin_constants as NogginConstants
 from ..playbook import PBConstants
 
 from objects import Location
+
+COUNT_FPS = False
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -75,6 +79,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             if roleState != self.currentState:
                 self.switchTo(roleState)
+
+        # takes our average fps over 1000 frames (without profiling)
+        if COUNT_FPS:
+            if self.counter == 0:
+                self.startTime = time.time()
+                print "time at start: {0}".format(self.startTime)
+            if self.counter == 1000:
+                self.stopTime = time.time()
+                print "time at end: {0}".format(self.stopTime)
+                print "{0} s for 1000 frames = {1} fps" \
+                      .format(self.stopTime - self.startTime,
+                              1000/(self.stopTime - self.startTime))
 
         SoccerFSA.SoccerFSA.run(self)
 
