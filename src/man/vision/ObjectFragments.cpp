@@ -372,20 +372,15 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper,
             pixel = thresh->getExpandedColor(x, y, c);
         if (Utility::colorsEqual(pixel, c)) {
 			// when we're below the horizon ignore bluegreen
-			if (c == BLUE_BIT && dir == 1 && y > hor && Utility::isGreen(pixel)) {
-				bad++;
-				run = 0;
-			} else {
-				good++;
-				if (c != BLUE_BIT || dir != 1) {
-					bad--;
-				}
-				run++;
-				if (run > 1) {
-					scan.x = x;
-					scan.y = y;
-				}
-            }
+			good++;
+			if (c != BLUE_BIT || dir != 1) {
+				bad--;
+			}
+			run++;
+			if (run > 1) {
+				scan.x = x;
+				scan.y = y;
+			}
         } else {
             bad++;
             run = 0;
@@ -935,7 +930,7 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
         }
     }
 	// because we are over-caution about BLUE_BIT
-	if (color == BLUE_BIT) {
+	/*if (color == BLUE_BIT) {
 		float distant = 0.0f;
 		boost::shared_ptr<VisualLine> goalLine;
 		const vector < boost::shared_ptr<VisualLine> > * lines =
@@ -1012,7 +1007,7 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
 				}
 			}
 		}
-	}
+		}*/
 
 }
 
@@ -2543,11 +2538,6 @@ bool ObjectFragments::postBigEnough(Blob b) {
 			return false;
 		}
 
-		int tCorners = context->getTCorner();
-        if (color == BLUE_BIT && b.width() < 20 && tCorners == 0) {
-            return false;
-		}
-
     }
     return true;
 }
@@ -2558,8 +2548,7 @@ bool ObjectFragments::postBigEnough(Blob b) {
  */
 
 bool ObjectFragments::badDistance(Blob b) {
-    if (b.height() < MIN_GOAL_HEIGHT + 25 ||
-		(vision->pose->getHorizonY(0) < 0 && color == BLUE_BIT)) {
+    if (b.height() < MIN_GOAL_HEIGHT + 25) {
         int x = b.getLeftBottomX();
         int y = b.getLeftBottomY();
         int bottom = b.getBottom();
@@ -2583,7 +2572,7 @@ bool ObjectFragments::badDistance(Blob b) {
         }
 
         float diste = e.dist;
-        if (diste > 0.0f && (choose * 2 < diste || diste * 2 < choose) &&
+        if (diste > 0.0f && diste < 600 && (choose * 2 < diste || diste * 2 < choose) &&
 			choose > 150.0f) {
             if (POSTDEBUG) {
                 cout << "Throwing out post.	 Distance estimate is " << e.dist
@@ -2709,13 +2698,6 @@ bool ObjectFragments::horizonBottomOk(int spanX, int spanY, int minHeight,
     //int fudge = 20;
     if (spanY > TALL_POST) {
         return true;
-    }
-    if (color == BLUE_BIT) {
-        if (bottom + BOTTOM_FUDGE_FACTOR < minHeight) {
-            if (SANITY)
-                cout << "Removed risky blue post" << endl;
-            return false;
-        }
     }
     if (bottom + BOTTOM_FUDGE_FACTOR + 5 * spanX < minHeight) {
         if (SANITY) {
