@@ -660,6 +660,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
     //Regardless, we are changing the walk vector, so we need to scrap any future plans
     clearFutureSteps();
+    hasDestination = false;
 
     x = _x;
     y = _y;
@@ -718,17 +719,18 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
         gain = 1.0f;
     }
 
-    bool stopping = (dest_x == 0.0f && dest_y == 0.0f && dest_theta == 0.0f);
+    if (dest_x == 0.0f && dest_y == 0.0f && dest_theta == 0.0f) {
+	setSpeed(0,0,0);
+	return 0; // all done!
+    }
 
     // these parameters determined experimentally by trying lots of destinations
     // probably indicates something broken in our odometry
     // I personally apologize for this :-) --Nathan
-    if (!stopping) {
-	if (dest_x == 0)
-	    dest_x = -5.0f;
-	dest_theta += 0.088f; // natural rotation of the robot
-	dest_y *= 2; /// @see Step.h HACK HACK HACK
-    }
+    if (dest_x == 0)
+	dest_x = -5.0f;
+    dest_theta += 0.088f; // natural rotation of the robot
+    dest_y *= 2; /// @see Step.h HACK HACK HACK
 
     float speed_x, speed_y, speed_theta;
     int framesToDestination = 0;
@@ -747,12 +749,10 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
 	clearFutureSteps();
 
 	// check the distances of any steps we've already commited to taking
-	if (!stopping) {
-	    for (std::list<Step::ptr>::iterator step = currentZMPDSteps.begin();
-		 step != currentZMPDSteps.end(); ++step)
-		countStepTowardsDestination(*step, dest_x, dest_y, dest_theta,
-					    framesToDestination);
-	}
+	for (std::list<Step::ptr>::iterator step = currentZMPDSteps.begin();
+	     step != currentZMPDSteps.end(); ++step)
+	    countStepTowardsDestination(*step, dest_x, dest_y, dest_theta,
+					framesToDestination);
     } else {
 	resetQueues();
 	const bool startLeft = decideStartLeft(dest_y,dest_theta);
