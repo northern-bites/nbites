@@ -40,7 +40,7 @@ def kickOffPosition(player):
 
     if player.firstFrame():
         player.brain.resetGoalieLocalization()
-        player.brain.nav.setDest(goalCon.MOVE_IN_KICKOFF, 0, 0)
+        player.brain.nav.setDest(goalCon.MOVE_IN_KICKOFF, 0, 0, 1)
         if player.penaltyKicking:
             player.gainsOn()
             player.walkPose()
