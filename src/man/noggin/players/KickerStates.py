@@ -52,8 +52,8 @@ def kickStraight(player):
 
 def done(player):
     if player.firstFrame():
-        player.tempBool = True
-        player.executeMove(SweetMoves.INITIAL_POS)
+        #player.walkPose()
+        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
         return player.stay()
     if player.brain.nav.isStopped() and player.tempBool:
         player.brain.tracker.afterKickScan('R_Side')
