@@ -24,23 +24,26 @@
 #include "Kinematics.h"
 #include "NaoPose.h"
 #include <cmath>
+#include <iostream>
 
 class CoordHeadCommand : public MotionCommand
 {
 public:
     typedef boost::shared_ptr<CoordHeadCommand> ptr;
 
-    CoordHeadCommand(const float _x, const float _y,
-                     //_x, _y relative to robot center in mm
-                     const float _z,
-                     //_z relative to ground in mm
+    //_x, _y relative to robot center in centimeters
+    CoordHeadCommand(const float _x, const float _y, const float _z,
+                     //_z relative to ground in centimeters
                      const float _maxSpeedYaw =
                      Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
                      const float _maxSpeedPitch =
                      Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
         )
         : MotionCommand(MotionConstants::COORD_HEAD),
-          relX(_x), relY(_y), relZ(_z),
+
+          // We must convert the given position to millimeters for
+          // use with pose information
+          relX(_x * CM_TO_MM), relY(_y * CM_TO_MM), relZ(_z * CM_TO_MM),
           maxSpeedYaw(_maxSpeedYaw), maxSpeedPitch(_maxSpeedPitch)
         {
             setChainList();

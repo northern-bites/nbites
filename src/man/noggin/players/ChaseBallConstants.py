@@ -32,6 +32,11 @@ SHOULD_KICK_AGAIN_Y = 9
 BALL_X_OFFSET = 5
 BALL_Y_OFFSET = 5
 
+# Switch between speed and destination modes when positioning for kick
+BALL_SET_DEST_CUTOFF = 80
+# lower number here will be less stable but more responsive to ball movement
+BALL_APPROACH_REFRESH_FRAMES = 30
+
 # Should dribble should and should stop dribbling
 SHOULD_DRIBBLE_X = 68.
 SHOULD_DRIBBLE_Y = BALL_PFK_LEFT_Y

@@ -7,6 +7,9 @@ def findBall(player):
     """
     State to stop all activity and begin finding the ball
     """
+    if transitions.shouldChaseBall(player):
+        return player.goLater('chase')
+
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.stopHeadMoves()
@@ -25,7 +28,7 @@ def scanFindBall(player):
     player.brain.tracker.trackBall()
 
     if transitions.shouldChaseBall(player):
-        return player.goNow('chase')
+        return player.goNow('findBall')
 
     # a time based check. may be a problem for goalie. if it's not
     # good for him to spin, he should prbly not be chaser anymore, so
@@ -43,7 +46,7 @@ def spinFindBall(player):
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
-        return player.goNow('chase')
+        return player.goNow('findBall')
 
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()
@@ -72,7 +75,7 @@ def walkFindBall(player):
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
-        return player.goNow('chase')
+        return player.goNow('findBall')
 
     if player.brain.nav.isStopped():
         player.brain.nav.chaseBall()

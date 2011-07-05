@@ -37,8 +37,8 @@ def goToPosition(nav):
     my = nav.brain.my
     dest = nav.getDestination()
 
-    if (navTrans.atDestinationCloser(my, dest) and
-        navTrans.atHeading(my, dest.h)):
+    if (navTrans.atDestinationCloser(nav) and
+        navTrans.atHeading(nav)):
             nav.atPositionCount += 1
             if nav.atPositionCount > \
             constants.FRAMES_THRESHOLD_TO_AT_POSITION:
@@ -75,8 +75,8 @@ def omniGoTo(nav):
     my = nav.brain.my
     dest = nav.getDestination()
 
-    if (navTrans.atDestinationCloser(my, dest) and
-        navTrans.atHeading(my, dest.h)):
+    if (navTrans.atDestinationCloser(nav) and
+        navTrans.atHeading(nav)):
         nav.atPositionCount += 1
         if (nav.atPositionCount >
             constants.FRAMES_THRESHOLD_TO_AT_POSITION):
@@ -239,28 +239,26 @@ def destWalking(nav):
     """
     State to be used when we are walking to a destination
     """
-    if nav.firstFrame() or nav.newDestination:
+    if nav.firstFrame():
         if (nav.destGain < 0):
             nav.destGain = 1;
-            # @todo Leaving the actual interface of the destGain parameter unimplemented
-            # Wils, figure out how you want to set it up --Nathan
 
-        helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta, nav.destGain)
+        nav.nearDestination = False
         nav.newDestination = False
 
-    return nav.stay()
+        if (nav.destX == 0 and nav.destY == 0 and nav.destTheta == 0) \
+               or nav.destGain == 0:
+            return nav.goNow('stop')
 
-# State to use with the setSteps method
-def stepping(nav):
-    """
-    We use this to go a specified number of steps.
-    This is different from walking.
-    """
-    if nav.firstFrame():
-        helper.step(nav, nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
+        helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta, nav.destGain)
 
-    elif not nav.brain.motion.isWalkActive():
-        return nav.goNow("stopped")
+    # the frames remaining counter is sometimes set to -1 initially
+    elif -1 != nav.currentCommand.framesRemaining() < 40:
+        nav.nearDestination = True
+
+    if nav.currentCommand.isDone():
+        nav.nearDestination = True
+        return nav.goNow('atPosition')
 
     return nav.stay()
 
@@ -270,7 +268,12 @@ def stop(nav):
     Wait until the walk is finished.
     """
     if nav.firstFrame():
+        # stop walk vectors
         helper.setSpeed(nav, 0, 0, 0)
+
+        # stop destination walking
+        nav.destX = nav.destY = nav.destTheta = 0
+        helper.setDestination(nav, 0, 0, 0, 1)
 
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
@@ -316,6 +319,7 @@ def orbitPointThruAngle(nav):
         return nav.goLater('stop')
     return nav.stay()
 
+
 def atPosition(nav):
     if nav.firstFrame():
         nav.brain.speech.say("At Position")
@@ -325,8 +329,8 @@ def atPosition(nav):
     my = nav.brain.my
     dest = nav.getDestination()
 
-    if navTrans.atDestinationCloser(my, dest) and \
-            navTrans.atHeading(my, dest.h):
+    if navTrans.atDestinationCloser(nav) and \
+            navTrans.atHeading(nav):
         nav.startOmniCount = 0
         return nav.stay()
 
