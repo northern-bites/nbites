@@ -26,6 +26,7 @@
 #define USE_LOC_CORNERS
 static const float MAX_CORNER_DISTANCE = 150.0f;
 static const float MAX_CROSS_DISTANCE = 150.0f;
+static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 using namespace std;
 using namespace boost;
 
@@ -248,11 +249,11 @@ void Noggin::runStep ()
     }
 
 #   ifdef USE_NOGGIN_AUTO_HALT
-    // don't bother doing anything if there's a Python error and we
-    // haven't reloaded
-    if (error_state) {
+    static unsigned int num_crashed = 0;
+    if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
         this->reload_hard();
         error_state = false;
+        num_crashed++;
     }
 #   endif
 
