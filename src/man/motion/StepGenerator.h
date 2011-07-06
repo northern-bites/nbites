@@ -138,7 +138,7 @@ public:
 
     void resetHard();
 
-    static std::vector<float>*
+    static std::vector<float>
     getDefaultStance(const Gait & wp);
 
     const SupportFoot getSupportFoot() const {

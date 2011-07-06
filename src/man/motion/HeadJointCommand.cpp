@@ -23,8 +23,8 @@ using namespace MotionConstants;
 using namespace Kinematics;
 
 HeadJointCommand::HeadJointCommand(const float time,
-                                   const std::vector<float> *joints,
-                                   const std::vector<float> *head_stiffness,
+                                   const std::vector<float>& joints,
+                                   const std::vector<float>& head_stiffness,
                                    const Kinematics::InterpolationType _type)
     : JointCommand(HEAD_JOINT, time, _type, head_stiffness),
       headJoints(joints), noJoints(0)
@@ -32,22 +32,8 @@ HeadJointCommand::HeadJointCommand(const float time,
     setChainList();
 }
 
-HeadJointCommand::HeadJointCommand(const HeadJointCommand &other)
-    : JointCommand(HEAD_JOINT,
-                   other.getDuration(),
-                   other.getInterpolation(),
-                   other.getStiffness()),
-      noJoints(0)
-{
-    setChainList();
-
-    if(other.headJoints){
-        headJoints = new std::vector<float>(*other.headJoints);
-    }
-}
-
 HeadJointCommand::~HeadJointCommand() {
-    delete headJoints;
+
 }
 void
 HeadJointCommand::setChainList() {

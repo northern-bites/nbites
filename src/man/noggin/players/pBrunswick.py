@@ -118,7 +118,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if self.play.isSubRole(PBConstants.GOALIE_KICKOFF):
             return 'kickOffPosition'
         elif self.play.isSubRole(PBConstants.GOALIE_CHASER):
-            return 'goalieChase'
+            return 'chase'
         elif self.play.isSubRole(PBConstants.GOALIE_SAVE):
             return 'goalieSave'
         else:

@@ -29,7 +29,6 @@ class Navigator(FSA.FSA):
 
         # Goto controls
         self.dest = RobotLocation(0, 0, 0)
-        self.newDestination = False
 
         # Walk controls
         self.walkX = 0
@@ -68,6 +67,7 @@ class Navigator(FSA.FSA):
         Navigator function to do the sweet move
         """
         self.sweetMove = move
+        self.destType = None
 
         self.brain.player.stopWalking()
         self.resetSpeedMemory()
@@ -89,16 +89,15 @@ class Navigator(FSA.FSA):
 
     def kickPosition(self, kick):
         """
-        It will position the robot at the ball using self.kick to determine the x,y
-        offset and the final heading.
+        It will position the robot at the ball using self.kick to
+        determine the x,y offset and the final heading.
 
-        This state will aggresively omni-walk, so it's probably best if we don't call
-        it until we're near the ball.
+        This state will aggresively omni-walk, so it's probably best
+        if we don't call it until we're near the ball.
         """
         self.kick = kick
 
-        if (self.currentState is not 'destWalking' or
-            self.destType is not constants.BALL):
+        if self.destType is not constants.BALL:
 
             self.destType = constants.BALL
             self.switchTo('goToPosition')
@@ -122,7 +121,8 @@ class Navigator(FSA.FSA):
             print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
                   .format(ball.relX, ball.relY, ball.bearing)
 
-        self.setDest(ball.relX - self.kick.x_offset -2, # HACK!!!
+            # HACK so we don't walk into the ball
+        self.setDest(ball.relX - self.kick.x_offset - 5,
                      ball.relY - self.kick.y_offset,
                      ball.bearing,
                      gain)
@@ -176,7 +176,7 @@ class Navigator(FSA.FSA):
 
         self.switchTo('walking')
 
-    def setDest(self, x, y, theta, gain):
+    def setDest(self, x, y, theta, gain=1.0):
         """
         Sets a new destination
         Always does something, since destinations are relative and time sensitive
@@ -193,7 +193,6 @@ class Navigator(FSA.FSA):
 
         self.updateDests(x, y, theta, gain)
 
-        self.newDestination = True
         self.switchTo('destWalking')
 
     # Have we reached our destination?
@@ -234,7 +233,6 @@ class Navigator(FSA.FSA):
             self.lastDestTheta, \
             self.lastDestGain= x,y,theta, gain
         self.resetSpeedMemory()
-        self.newDestination = True
         self.nearDestination = False
 
     def resetSpeedMemory(self):
@@ -253,7 +251,6 @@ class Navigator(FSA.FSA):
             self.lastDestY, \
             self.lastDestTheta, \
             self.lastDestGain = (constants.WALK_VECTOR_INIT,)*4
-        self.newDestination = False
 
 
     # Choose our next position based on our mode of locomotion:

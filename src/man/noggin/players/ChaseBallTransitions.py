@@ -18,7 +18,7 @@ def ballInPosition(player):
     Make sure ball is somewhere we will kick it. Also makes sure we're looking
     at the ball.
     """
-    if not self.shouldChaseBall():
+    if not shouldChaseBall(player):
         return False
 
     ball = player.brain.ball
@@ -30,15 +30,15 @@ def ballInPosition(player):
         (x_offset, y_offset, heading) = kick.getPosition()
 
     #Get the difference
-    diff_x = ball.relX - x_offset # not absolute value, if ball is closer kick anyway
+    # not absolute value for x, if ball is closer kick anyway
+    diff_x = ball.relX - x_offset
+
     diff_y = fabs(ball.relY - y_offset)
 
-    """
     if diff_x < constants.BALL_X_OFFSET:
-        print "Ball X OK"
+        print "Ball X OK at {0}".format(diff_x)
     if diff_y < constants.BALL_Y_OFFSET:
-        print "Ball Y OK"
-    """
+        print "Ball Y OK at {0}".format(diff_y)
 
     #Compare the sweet spot with the actual values and make sure they
     #are within the threshold
