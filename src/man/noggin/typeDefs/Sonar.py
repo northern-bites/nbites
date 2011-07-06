@@ -20,13 +20,6 @@ class Sonar:
         self.leftDist = sensors.ultraSoundDistanceLeft
         self.rightDist = sensors.ultraSoundDistanceRight
 
-        #check for sonar bug, print big warning
-        if (self.leftDist < self.MIN_DIST and
-            self.rightDist < self.MIN_DIST and
-            not self.hasPrintedError):
-            self.hasPrintedError = True
-            print "*\n*\n*  possible sonar problem, restart robot!! *\n*\n*"
-
         if (self.leftDist <= self.MIN_DIST or
             self.leftDist >= self.MAX_DIST):
             self.leftDist = self.UNKNOWN_VALUE
