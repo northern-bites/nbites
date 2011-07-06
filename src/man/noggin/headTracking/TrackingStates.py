@@ -3,6 +3,7 @@ from . import TrackingConstants as constants
 from objects import RelLocation
 from .. import NogginConstants
 from ..playbook import PBConstants
+from ..players import GoalieConstants
 
 DEBUG = False
 
@@ -23,7 +24,12 @@ def tracking(tracker):
     if tracker.firstFrame():
         tracker.activeLocOn = False
 
-    if tracker.target.dist > constants.ACTIVE_TRACK_DIST:
+    if tracker.brain.play.isRole(PBConstants.GOALIE):
+        minActiveDist = GoalieConstants.ACTIVE_LOC_THRESH
+    else:
+        minActiveDist = constants.ACTIVE_TRACK_DIST
+
+    if tracker.target.dist > minActiveDist:
         return tracker.goLater('activeTracking')
 
     tracker.helper.trackObject()

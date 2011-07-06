@@ -58,17 +58,18 @@ def orbitBall(player):
     State to orbit the ball
     """
     if player.firstFrame():
-        player.brain.tracker.performHeadMove(HeadMoves.KICK_SCAN)
+        player.brain.tracker.stopHeadMoves()
+        player.brain.tracker.kickDecideScan()
 
-    if player.brain.tracker.isStopped():
-        player.brain.tracker.trackBall()
+    # if player.brain.tracker.isStopped():
+    #     player.brain.tracker.trackBall()
 
         # Only orbit if we still don't have a kick
-        player.brain.kickDecider.decideKick()
-        if not transitions.shouldOrbit(player):
-            return player.goLater('chase')
+        # player.brain.kickDecider.decideKick()
+        # if not transitions.shouldOrbit(player):
+        #     return player.goLater('chase')
 
-        player.brain.nav.orbitAngle(45) # TODO HACK HACK
+    player.brain.nav.orbitAngle(90) # TODO HACK HACK
 
     if transitions.shouldFindBall(player) or player.brain.nav.isStopped():
         player.inKickingState = False
