@@ -125,7 +125,6 @@ void ALTranscriber::initSyncMotionWithALMemory(){
         std::cout << "ALTranscriber " << a.toString() << std::endl;
     }
 
-
     vector<string> jointTemperatureNames;
     jointTemperatureNames +=
         string(jointsT[0]), string(jointsT[1]), string(jointsT[2]),
@@ -145,26 +144,44 @@ void ALTranscriber::initSyncMotionWithALMemory(){
 
 }
 
-// for marvin!
-// TODO FIX THIS BECAUSE ITS PROBABLY TOTALLY WRONG
-static const float ACCEL_OFFSET_X = 3.5f;
-static const float ACCEL_OFFSET_Y = 0.5f;
-static const float ACCEL_OFFSET_Z = 4.0f;
+/**
+ * Sensor unit outputs are 8-bit binary, we normalize them here to
+ * gravity (-9.8m/s^2) so that they're in units (m/s^2) that we can
+ * use in motion etc.  This calibration was done by hand and should
+ * probably be checked every so often.
+ * -Nathan, June 2011
+ */
+static const float ACCEL_OFFSET_X = 0.0f;
+static const float ACCEL_OFFSET_Y = 0.0f;
+static const float ACCEL_OFFSET_Z = 0.0f;
 
-static const float ACCEL_CONVERSION_X = (-GRAVITY_mss) / 52.5f;
-static const float ACCEL_CONVERSION_Y = (-GRAVITY_mss) / 53.5f;
-static const float ACCEL_CONVERSION_Z = (-GRAVITY_mss) / 54.0f;
+// converts from sensor units to m/ss
+static const float ACCEL_CONVERSION_X = -GRAVITY_mss * 0.0153f;
+static const float ACCEL_CONVERSION_Y = -GRAVITY_mss * 0.016f;
+static const float ACCEL_CONVERSION_Z = ACCEL_CONVERSION_X;
+
+// TODO: convert the gyro here similarly. For more information, see:
+// http://users.aldebaran-robotics.com/docs/save_doc_1.10.37/site_en/reddoc/dcm/mandatory_specific_almemory_keys.html
+
+/* The calls to the BoardError class filter out large jumps (usually board errors)
+   for accX/Y/Z before other filtering */
 
 const float ALTranscriber::calibrate_acc_x(const float x) {
-    return (x + ACCEL_OFFSET_X) * ACCEL_CONVERSION_X;
+    float moved = (x + ACCEL_OFFSET_X) * ACCEL_CONVERSION_X;
+    //cout << "accX raw: " << x << " calibrated: " << moved << endl;
+    return moved;
 }
 
 const float ALTranscriber::calibrate_acc_y(const float y) {
-	return (y + ACCEL_OFFSET_Y) * ACCEL_CONVERSION_Y;
+    const float moved = (y + ACCEL_OFFSET_Y) * ACCEL_CONVERSION_Y;
+    //cout << "accY raw: " << y << " calibrated: " << moved << endl;
+    return moved;
 }
 
 const float ALTranscriber::calibrate_acc_z(const float z) {
-    return (z + ACCEL_OFFSET_Z) * ACCEL_CONVERSION_Z;
+    const float moved = (z + ACCEL_OFFSET_Z) * ACCEL_CONVERSION_Z;
+    //cout << "accZ raw: " << z << " calibrated " << moved << endl;
+    return moved;
 }
 
 void ALTranscriber::syncMotionWithALMemory() {
@@ -199,6 +216,7 @@ void ALTranscriber::syncMotionWithALMemory() {
         angleY = sensorValues[15];//,-M_PI_FLOAT,M_PI_FLOAT);
 
     accelerationFilter.update(accX, accY, accZ);
+
     const float filteredX = accelerationFilter.getX();
     const float filteredY = accelerationFilter.getY();
     const float filteredZ = accelerationFilter.getZ();
@@ -221,42 +239,42 @@ void ALTranscriber::syncMotionWithALMemory() {
     lastReadAngleX = angleX;
     lastReadAngleY = angleY;
 
-	// so the FSRs etc. aren't allocated each time
-	static FSR leftFSR, rightFSR;
+    // so the FSRs etc. aren't allocated each time
+    static FSR leftFSR, rightFSR;
 
-	leftFSR.frontLeft = LfrontLeft;
-	leftFSR.frontRight = LfrontRight;
-	leftFSR.rearLeft = LrearLeft;
-	leftFSR.rearRight = LrearRight;
+    leftFSR.frontLeft = LfrontLeft;
+    leftFSR.frontRight = LfrontRight;
+    leftFSR.rearLeft = LrearLeft;
+    leftFSR.rearRight = LrearRight;
 
-	rightFSR.frontLeft = RfrontLeft;
-	rightFSR.frontRight = RfrontRight;
-	rightFSR.rearLeft = RrearLeft;
-	rightFSR.rearRight = RrearRight;
+    rightFSR.frontLeft = RfrontLeft;
+    rightFSR.frontRight = RfrontRight;
+    rightFSR.rearLeft = RrearLeft;
+    rightFSR.rearRight = RrearRight;
 
-	static Inertial filtered, unfiltered;
+    static Inertial filtered, unfiltered;
 
-	filtered.accX = filteredX;
-	filtered.accY = filteredY;
-	filtered.accZ = filteredZ;
-	filtered.gyrX = gyrX;
-	filtered.gyrY = gyrY;
-	filtered.angleX = filteredAngleX;
-	filtered.angleY = filteredAngleY;
+    filtered.accX = filteredX;
+    filtered.accY = filteredY;
+    filtered.accZ = filteredZ;
+    filtered.gyrX = gyrX;
+    filtered.gyrY = gyrY;
+    filtered.angleX = filteredAngleX;
+    filtered.angleY = filteredAngleY;
 
-	unfiltered.accX = accX;
-	unfiltered.accY = accY;
-	unfiltered.accZ = accZ;
-	unfiltered.gyrX = gyrX;
-	unfiltered.gyrY = gyrY;
-	unfiltered.angleX = angleX;
-	unfiltered.angleY = angleY;
+    unfiltered.accX = accX;
+    unfiltered.accY = accY;
+    unfiltered.accZ = accZ;
+    unfiltered.gyrX = gyrX;
+    unfiltered.gyrY = gyrY;
+    unfiltered.angleX = angleX;
+    unfiltered.angleY = angleY;
 
     sensors->
         setMotionSensors(leftFSR, rightFSR,
                          chestButton,
-						 filtered,
-						 unfiltered);
+			 filtered,
+			 unfiltered);
 }
 
 

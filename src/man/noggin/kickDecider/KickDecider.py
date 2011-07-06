@@ -125,8 +125,9 @@ class KickDecider(object):
         # For now just worry about which is faster to kick for,
         # Don't worry about open field yet (6/28/11)
 
-        kickDest = self.info.bestAlignedDest([constants.SHOOT_RIGHT_AIM_POINT,
-                                              constants.SHOOT_LEFT_AIM_POINT])
+        #kickDest = self.info.bestAlignedDest([constants.SHOOT_RIGHT_AIM_POINT,
+        #                                      constants.SHOOT_LEFT_AIM_POINT])
+        kickDest = constants.SHOOT_CENTER_AIM_POINT # HACK just want to hit the target
 
         # Next we want to find the best kick that will hit that point.
         # Since we know any kick will score, we don't have to worry about

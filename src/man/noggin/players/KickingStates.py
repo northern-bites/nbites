@@ -22,12 +22,6 @@ def kickBallExecute(player):
             #away and we should search.
             return player.goLater('chase')
 
-        #if player.penaltyKicking:
-        if not player.penaltyMadeFirstKick:
-            player.penaltyMadeFirstKick = True
-        elif not player.penaltyMadeSecondKick:
-            player.penaltyMadeSecondKick = True
-
     if player.counter > 10 and player.brain.nav.isStopped():
         player.brain.nav.justKicked = True
         return player.goLater('afterKick')

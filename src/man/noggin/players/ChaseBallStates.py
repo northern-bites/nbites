@@ -17,9 +17,6 @@ def chase(player):
     if player.brain.play.isRole(GOALIE) and goalTran.dangerousBall(player):
         return player.goNow('approachDangerousBall')
 
-    elif player.penaltyKicking and player.brain.ball.inOppGoalBox():
-        return player.goNow('penaltyBallInOppGoalbox')
-
     else:
         return player.goNow('positionForKick')
 
@@ -30,6 +27,9 @@ def positionForKick(player):
     once we get close. This allows Player to monitor Navigator's progress as it
     positions.
     """
+    if player.penaltyKicking and player.brain.ball.inOppGoalBox():
+        return player.goNow('penaltyBallInOppGoalbox')
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.inKickingState = False
@@ -46,8 +46,11 @@ def positionForKick(player):
     #if transitions.shouldKick(player):
     if transitions.ballInPosition(player):
         if transitions.shouldOrbit(player):
-            print "Don't have a kick, orbitting"
-            return player.goNow('orbitBall')
+            if player.penaltyKicking:
+                return player.goNow('penaltyKickRelocalize')
+            else:
+                print "Don't have a kick, orbitting"
+                return player.goNow('orbitBall')
         else:
             return player.goNow('kickBallExecute')
 

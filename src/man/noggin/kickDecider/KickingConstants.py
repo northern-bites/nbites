@@ -34,6 +34,9 @@ SHOOT_RIGHT_AIM_POINT = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
                                     NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y +
                                     SHOOT_Y_OFFSET)
 
+SHOOT_CENTER_AIM_POINT = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
+                                  NogginConstants.CENTER_FIELD_Y)
+
 CENTER_BALL_POINT = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
                              NogginConstants.CENTER_FIELD_Y)
 
