@@ -114,9 +114,6 @@ vector<float> ChoppedCommand::getFinalJoints(const JointCommand::ptr command,
         currentStart += chain_lengths[chain];
     }
 
-    cout << "FINAL JOINTS:" << endl;
-    for(int i=0; i < finalJoints.size(); ++i)
-        cout << finalJoints[i] << endl;
     return finalJoints;
 
 }
