@@ -119,11 +119,11 @@ class Navigator(FSA.FSA):
 
         if DEBUG_DESTINATION:
             print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
-                  .format(ball.relX, ball.relY, ball.bearing)
+                .format(ball.loc.relX, ball.loc.relY, ball.bearing)
 
             # HACK so we don't walk into the ball
-        self.setDest(ball.relX - self.kick.x_offset - 5,
-                     ball.relY - self.kick.y_offset,
+        self.setDest(ball.loc.relX - self.kick.x_offset - 5,
+                     ball.loc.relY - self.kick.y_offset,
                      ball.bearing,
                      gain)
 
@@ -265,7 +265,7 @@ class Navigator(FSA.FSA):
             return self.dest
 
         elif self.destType is constants.BALL:
-            return self.brain.ball
+            return self.brain.ball.loc
 
         # This can happen when setDest is called
         else:          # destType is None

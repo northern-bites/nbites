@@ -34,8 +34,9 @@ class KickInformation:
         if self.brain.player.shouldKickOff:
             centerField = Location(NogginConstants.CENTER_FIELD_X,
                                    NogginConstants.CENTER_FIELD_Y)
-            self.brain.player.shouldKickOff = (centerField.distTo(self.brain.ball) <
-                                               NogginConstants.CENTER_CIRCLE_RADIUS)
+            self.brain.player.shouldKickOff = \
+                (centerField.distTo(self.brain.ball.loc) <
+                 NogginConstants.CENTER_CIRCLE_RADIUS)
             return self.brain.player.shouldKickOff
         else:
             return False
@@ -108,11 +109,11 @@ class KickInformation:
         and that there is open field in front of us.
         """
         # don't use open field for now (6/28/11)
-        return (self.brain.ball.x < NogginConstants.LANDMARK_OPP_FIELD_CROSS[0] and
-                self.brain.ball.y < (NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y -
-                                     constants.BALL_NEAR_LINE_THRESH) and
-                self.brain.ball.y > (NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
-                                     constants.BALL_NEAR_LINE_THRESH))
+        return (self.brain.ball.loc.x < NogginConstants.LANDMARK_OPP_FIELD_CROSS[0] and
+                self.brain.ball.loc.y < (NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y -
+                                         constants.BALL_NEAR_LINE_THRESH) and
+                self.brain.ball.loc.y > (NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y +
+                                         constants.BALL_NEAR_LINE_THRESH))
 
     def canCross(self):
         """
@@ -156,7 +157,7 @@ class KickInformation:
             # Don't need to sub180Angle here because we mod. I know it looks
             # wierd and suspiciously complicated, but it makes for an easy
             # compare and I promise I unit tested it. -- Wils (7/1/11)
-            heading = (fabs(((ball.headingTo(dest) - my.headingTo(ball))
+            heading = (fabs(((ball.loc.headingTo(dest) - my.headingTo(ball.loc))
                              % 90) - 45))
 
             if heading > bestHeading:
@@ -177,23 +178,23 @@ class KickInformation:
         """
         my = self.brain.my
         ball = self.brain.ball
-        rotatedHeading = MyMath.sub180Angle(ball.headingTo(dest) -
-                                            my.headingTo(ball))
+        rotatedHeading = MyMath.sub180Angle(ball.loc.headingTo(dest) -
+                                            my.headingTo(ball.loc))
         kick = None
 
         if (fabs(rotatedHeading) < constants.STRAIGHT_KICK_ALIGNMENT_BEARING):
             kick = self.chooseStraightKick()
-            kick.heading = ball.headingTo(dest)
+            kick.heading = ball.loc.headingTo(dest)
         elif (fabs(rotatedHeading) < constants.BACK_KICK_ALIGNMENT_BEARING):
             if MyMath.sign(rotatedHeading) == -1:
                 kick = kicks.LEFT_SIDE_KICK
-                kick.heading = MyMath.sub180Angle(ball.headingTo(dest) + 90)
+                kick.heading = MyMath.sub180Angle(ball.loc.headingTo(dest) + 90)
             else:
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.heading = MyMath.sub180Angle(ball.headingTo(dest) - 90)
+                kick.heading = MyMath.sub180Angle(ball.loc.headingTo(dest) - 90)
         else:
             kick = self.chooseBackKick()
-            kick.heading = MyMath.sub180Angle(ball.headingTo(dest) + 180)
+            kick.heading = MyMath.sub180Angle(ball.loc.headingTo(dest) + 180)
 
         kick.dest = dest
         return kick
@@ -238,7 +239,7 @@ class KickInformation:
         How we choose which kick to do when we're facing the ball. For now,
         simply pick the foot that's closer to the ball.
         """
-        if self.brain.ball.relY > 0:
+        if self.brain.ball.loc.relY > 0:
             return True
         else:
             return False

@@ -107,6 +107,9 @@ def panToFieldObject(tracker):
         if closest is None:
             return tracker.goLater('activeTracking')
 
+        if hasattr(closest, "loc"):
+            closest = closest.loc
+
         target = RelLocation(tracker.brain.my, closest.x, closest.y, 0)
         target.height = 45      # stare at the center of the post
                                 # rather than the bottom

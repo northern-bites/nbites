@@ -45,7 +45,7 @@ class HeadTrackingHelper(object):
         # don't try to look at it. Perhaps should be
         # generalized to objects which we cannot see.
         if not target or \
-                (target.relX == 0.0 and target.relY == 0.0):
+                (target.loc.relX == 0.0 and target.loc.relY == 0.0):
             return
 
         # If we haven't seen the object in the very recent past, look
@@ -100,7 +100,8 @@ class HeadTrackingHelper(object):
             # by default, do nothing
             return
 
-        #print "ball loc:",self.tracker.brain.ball.relX,self.tracker.brain.ball.relY
+        #print "ball loc:", \
+        # self.tracker.brain.ball.loc.relX,self.tracker.brain.ball.loc.relY
 
         headMove = motion.SetHeadCommand(yaw,pitch)
         self.tracker.brain.motion.setHead(headMove)
@@ -129,6 +130,9 @@ class HeadTrackingHelper(object):
             height = target.height
         else:
             height = 0
+
+        if hasattr(target, "loc"):
+            target = target.loc
 
         headMove = \
             motion.CoordHeadCommand(relX = target.relX,

@@ -49,6 +49,9 @@ def goToPosition(nav):
 
     # We don't want to alter the actual destination, we just want a
     # temporary destination for getting the params to walk straight at
+    if hasattr(dest, "loc"):
+        dest = dest.loc
+
     intermediateH = my.headingTo(dest)
     tempDest = RobotLocation(dest.x, dest.y, intermediateH)
 
