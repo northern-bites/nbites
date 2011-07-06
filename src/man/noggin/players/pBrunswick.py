@@ -52,8 +52,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         # Penalty kick player variables
         self.penaltyKicking = False
-        self.penaltyMadeFirstKick = True
-        self.penaltyMadeSecondKick = False
 
         # Kickoff kick
         self.shouldKickOff = False
@@ -124,11 +122,3 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         else:
             return 'goaliePosition'
 
-    ###### HELPER METHODS ######
-    def getPenaltyKickingBallDest(self):
-        if not self.penaltyMadeFirstKick:
-            return Location(NogginConstants.FIELD_WIDTH * 3./4.,
-                            NogginConstants.FIELD_HEIGHT /4.)
-
-        return Location(NogginConstants.OPP_GOAL_MIDPOINT[0],
-                        NogginConstants.OPP_GOAL_MIDPOINT[1] )

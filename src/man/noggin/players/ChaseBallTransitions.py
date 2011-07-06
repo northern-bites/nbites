@@ -18,7 +18,7 @@ def ballInPosition(player):
     Make sure ball is somewhere we will kick it. Also makes sure we're looking
     at the ball.
     """
-    if not self.shouldChaseBall():
+    if not shouldChaseBall(player):
         return False
 
     ball = player.brain.ball
