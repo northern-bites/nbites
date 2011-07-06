@@ -214,8 +214,7 @@ std::vector<BodyJointCommand::ptr> WalkProvider::getGaitTransitionCommand()
     vector<float> curJoints = sensors->getMotionBodyAngles();
 
     pthread_mutex_lock(&walk_provider_mutex);
-
-    vector<float> * gaitJoints = stepGenerator.getDefaultStance(nextGait);
+    vector<float> gaitJoints = stepGenerator.getDefaultStance(nextGait);
 
     startGait = nextGait;
     pendingStartGaitCommands = true;
@@ -224,9 +223,9 @@ std::vector<BodyJointCommand::ptr> WalkProvider::getGaitTransitionCommand()
 
     float max_change = -M_PI_FLOAT*10.0f;
 
-    for(unsigned int i = 0; i < gaitJoints->size(); i++){
+    for(unsigned int i = 0; i < gaitJoints.size(); i++){
         max_change = max(max_change,
-                         fabs(gaitJoints->at(i) - curJoints.at(i+HEAD_JOINTS)));
+                         fabs(gaitJoints.at(i) - curJoints.at(i+HEAD_JOINTS)));
     }
 
     // this is the max we allow, not the max the hardware can do
@@ -244,30 +243,30 @@ std::vector<BodyJointCommand::ptr> WalkProvider::getGaitTransitionCommand()
     float larm_angles[] = {0.9f, 0.3f,0.0f,0.0f};
     float rarm_angles[] = {0.9f,-0.3f,0.0f,0.0f};
 
-    vector<float> *safe_larm = new vector<float>(larm_angles,
-                                                 &larm_angles[ARM_JOINTS]);
-    vector<float> * safe_rarm =new vector<float>(rarm_angles,
-                                                 &rarm_angles[ARM_JOINTS]);
+    vector<float>safe_larm(larm_angles,
+                           &larm_angles[ARM_JOINTS]);
+    vector<float> safe_rarm(rarm_angles,
+                            &rarm_angles[ARM_JOINTS]);
 
-    // HACK @joho get gait stiffness params. nextGait->maxStiffness
-    vector<float> * stiffness = new vector<float>(Kinematics::NUM_JOINTS,
-                                                  0.85f);
-    vector<float> * stiffness2 = new vector<float>(Kinematics::NUM_JOINTS,
-                                                   0.85f);
+    // HACK @joho get gait stiffness params. nextGait.maxStiffness
+    vector<float> stiffness(Kinematics::NUM_JOINTS,
+                            0.85f);
+    vector<float> stiffness2(Kinematics::NUM_JOINTS,
+                             0.85f);
 
+    vector<float> empty(0);
     if (time > MOTION_FRAME_LENGTH_S * 30){
         commands.push_back(
             BodyJointCommand::ptr (
-                new BodyJointCommand(0.5f,safe_larm,NULL,NULL,safe_rarm,
+                new BodyJointCommand(0.5f,safe_larm, empty,empty,safe_rarm,
                                      stiffness,
-                                     Kinematics::INTERPOLATION_SMOOTH)
-                ) );
+                                     Kinematics::INTERPOLATION_SMOOTH)) );
     }
 
-    commands.push_back(BodyJointCommand::ptr (
-               new BodyJointCommand(time,gaitJoints,
-                        stiffness2,
-                        Kinematics::INTERPOLATION_SMOOTH)
-               )  );
+    commands.push_back(
+        BodyJointCommand::ptr (
+            new BodyJointCommand(time, gaitJoints, stiffness2,
+                                 Kinematics::INTERPOLATION_SMOOTH))  );
+    pthread_mutex_unlock(&walk_provider_mutex);
     return commands;
 }
