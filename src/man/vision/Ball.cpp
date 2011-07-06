@@ -251,7 +251,7 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
     } else if (distanceDifference > DISTANCE_MISMATCH &&
                (e.dist *2 <  focalDist.dist ||
                 focalDist.dist * 2 < e.dist)
-               && e.dist < PIXACC && e.dist > 0) {
+               && e.dist < PIXACC && e.dist > 0 && w < 12) {
         if (BALLDEBUG) {
             cout << "Screening due to distance mismatch " << e.dist <<
                 " " << focalDist.dist << endl;
