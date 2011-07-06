@@ -23,6 +23,13 @@ ALTranscriber::ALTranscriber (AL::ALPtr<AL::ALBroker> _broker,
      accelerationFilter(),
      lastAngleX(0.0f), lastAngleY(0.0f)
 {
+	try {
+		almemory = AL::ALPtr<AL::ALMemoryFastAccess >(
+				new AL::ALMemoryFastAccess());
+	} catch(AL::ALError &e){
+		cout << "Failed to initialize ALMemory for joints"<<endl;
+	}
+
     try{
         initSyncMotionWithALMemory();
     } catch(AL::ALError &e){
@@ -60,89 +67,45 @@ void ALTranscriber::initSensorBodyJoints(){
  * rest are synced in Man.cpp (may change).
  */
 void ALTranscriber::initSyncMotionWithALMemory(){
-    try{
-        alfastaccessJoints =
-            AL::ALPtr<AL::ALMemoryFastAccess >(new AL::ALMemoryFastAccess());
-    } catch(AL::ALError &e){
-        cout << "Failed to initialize proxy to ALFastAccess for joints"<<endl;
-    }
 
-    try{
-        alfastaccessSensors =
-            AL::ALPtr<AL::ALMemoryFastAccess >(new AL::ALMemoryFastAccess());
-    } catch(AL::ALError &e){
-        cout << "Failed to initialize proxy to ALFastAccess for sensors"<<endl;
-    }
-
-    try{
-        alfastaccessTemps =
-            AL::ALPtr<AL::ALMemoryFastAccess >(new AL::ALMemoryFastAccess());
-    } catch(AL::ALError &e){
-        cout << "Failed to initialize proxy to ALFastAccess for temps"<<endl;
-    }
-
-    vector<string> jointNames;
-    jointNames +=
-        string(jointsV[0]), string(jointsV[1]), string(jointsV[2]),
-        string(jointsV[3]), string(jointsV[4]), string(jointsV[5]),
-        string(jointsV[6]), string(jointsV[7]), string(jointsV[8]),
-        string(jointsV[9]), string(jointsV[10]), string(jointsV[11]),
-        string(jointsV[12]), string(jointsV[13]), string(jointsV[14]),
-        string(jointsV[15]), string(jointsV[16]), string(jointsV[17]),
-        string(jointsV[18]), string(jointsV[19]), string(jointsV[20]),
-        string(jointsV[21]);
-
-    try{
-        alfastaccessJoints->ConnectToVariables(broker,jointNames);
-    } catch(AL::ALError& a) {
-        std::cout << "ALTranscriber " << a.toString() << std::endl;
+    for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++) {
+    	jointValuePointers[i] =
+    			reinterpret_cast<float*>(almemory->getDataPtr(broker,
+    					ALNames::jointsV[i], false));
     }
 
     // Now connect to all the sensor values we need to update on the motion
     // frame rate: FSR and inertial sensors for now.
     vector<string> sensorNames;
     sensorNames +=
-        string("Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value"),
-        string("Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value"),
-        string("Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value"),
-        string("Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"),
-        string("Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"),
-        string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AccX/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AccY/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value"),
-        string("Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value");
+    		string("Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value"),
+    		string("Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value"),
+    		string("Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value"),
+    		string("Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value"),
+    		string("Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value"),
+    		string("Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value"),
+    		string("Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value"),
+    		string("Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value"),
+    		string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value"),
+    		string("Device/SubDeviceList/InertialSensor/AccX/Sensor/Value"),
+    		string("Device/SubDeviceList/InertialSensor/AccY/Sensor/Value"),
+    		string("Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value"),
+    		string("Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value"),
+    		string("Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value"),
+    		string("Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value"),
+    		string("Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value");
 
-    try {
-        alfastaccessSensors->ConnectToVariables(broker, sensorNames);
-    } catch(AL::ALError& a) {
-        std::cout << "ALTranscriber " << a.toString() << std::endl;
+    for (unsigned int i = 0; i < 16; i++ ) {
+    	motionSensorPointers[i] =
+    			reinterpret_cast<float*> (almemory->getDataPtr(broker,
+    					sensorNames[i], false));
     }
 
-
-    vector<string> jointTemperatureNames;
-    jointTemperatureNames +=
-        string(jointsT[0]), string(jointsT[1]), string(jointsT[2]),
-        string(jointsT[3]), string(jointsT[4]), string(jointsT[5]),
-        string(jointsT[6]), string(jointsT[7]), string(jointsT[8]),
-        string(jointsT[9]), string(jointsT[10]), string(jointsT[11]),
-        string(jointsT[12]), string(jointsT[13]), string(jointsT[14]),
-        string(jointsT[15]), string(jointsT[16]), string(jointsT[17]),
-        string(jointsT[18]), string(jointsT[19]), string(jointsT[20]),
-        string(jointsT[21]);
-
-    try{
-        alfastaccessTemps->ConnectToVariables(broker,jointTemperatureNames);
-    }catch(AL::ALError& a) {
-        std::cout << "ALTranscriber " << a.toString() << std::endl;
+    for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++) {
+    	jointTempPointers[i] =
+    			reinterpret_cast<float*> (almemory->getDataPtr(broker,
+    					ALNames::jointsT[i], false));
     }
-
 }
 
 // for marvin!
@@ -168,35 +131,22 @@ const float ALTranscriber::calibrate_acc_z(const float z) {
 }
 
 void ALTranscriber::syncMotionWithALMemory() {
-    static vector<float> jointValues(Kinematics::NUM_JOINTS, 0.0f);
-    alfastaccessJoints->GetValues(jointValues);
-    sensors->setBodyAngles(jointValues);
+    sensors->setBodyAngles(jointValuePointers);
+    sensors->setBodyTemperatures(jointTempPointers);
 
-    static vector<float> jointTemps(NUM_JOINTS,0.0f);
-    alfastaccessTemps->GetValues(jointTemps);
-    sensors->setBodyTemperatures(jointTemps);
+    const float LfrontLeft = *motionSensorPointers[0], LfrontRight = *motionSensorPointers[1],
+        LrearLeft = *motionSensorPointers[2], LrearRight = *motionSensorPointers[3],
+        RfrontLeft = *motionSensorPointers[4], RfrontRight = *motionSensorPointers[5],
+        RrearLeft = *motionSensorPointers[6], RrearRight = *motionSensorPointers[7];
 
-    // There are 16 sensor values we want.
-    // The vector is static so that it is initialized only once for this
-    // method.
-    static vector<float> sensorValues(16, 0.0f);
-    alfastaccessSensors->GetValues(sensorValues);
+    const float chestButton = *motionSensorPointers[8];
 
-    // The indices here are determined by the order in which we requested
-    // the sensors values (see initSyncWithALMemory).
-    const float LfrontLeft = sensorValues[0], LfrontRight = sensorValues[1],
-        LrearLeft = sensorValues[2], LrearRight = sensorValues[3],
-        RfrontLeft = sensorValues[4], RfrontRight = sensorValues[5],
-        RrearLeft = sensorValues[6], RrearRight = sensorValues[7];
-
-    const float chestButton = sensorValues[8];
-
-    const float accX = calibrate_acc_x(sensorValues[9]),
-        accY = calibrate_acc_y(sensorValues[10]),
-        accZ = calibrate_acc_z(sensorValues[11]),
-        gyrX = sensorValues[12], gyrY = sensorValues[13],
-        angleX = sensorValues[14],//,-M_PI_FLOAT,M_PI_FLOAT),
-        angleY = sensorValues[15];//,-M_PI_FLOAT,M_PI_FLOAT);
+    const float accX = calibrate_acc_x(*motionSensorPointers[9]),
+        accY = calibrate_acc_y(*motionSensorPointers[10]),
+        accZ = calibrate_acc_z(*motionSensorPointers[11]),
+        gyrX = *motionSensorPointers[12], gyrY = *motionSensorPointers[13],
+        angleX = *motionSensorPointers[14],//,-M_PI_FLOAT,M_PI_FLOAT),
+        angleY = *motionSensorPointers[15];//,-M_PI_FLOAT,M_PI_FLOAT);
 
     accelerationFilter.update(accX, accY, accZ);
     const float filteredX = accelerationFilter.getX();
@@ -261,9 +211,6 @@ void ALTranscriber::syncMotionWithALMemory() {
 
 
 void ALTranscriber::initSyncVisionWithALMemory() {
-    try{
-        alfastaccessVision =
-            AL::ALPtr<AL::ALMemoryFastAccess >(new AL::ALMemoryFastAccess());
 
         vector<string> varNames;
         varNames +=
@@ -276,29 +223,23 @@ void ALTranscriber::initSyncVisionWithALMemory() {
             string("Device/SubDeviceList/Battery/Charge/Sensor/Value"),
             string("Device/SubDeviceList/Battery/Current/Sensor/Value");
 
-        alfastaccessVision->ConnectToVariables(broker,varNames);
-    } catch(AL::ALError &e){
-        cout << "Failed to initialize proxy to ALFastAccess"<<endl;
-    }
+        for (unsigned int i = 0; i < 8; i++ ) {
+        	visionSensorPointers[i] =
+        			reinterpret_cast<float*> (almemory->getDataPtr(broker,
+        					varNames[i], false));
+        }
 }
 
 void ALTranscriber::syncVisionWithALMemory() {
-    static vector<float> varValues(6, 0.0f);
 
-    try {
-        alfastaccessVision->GetValues(varValues);
-    } catch(AL::ALError &e){
-        cout << "Failed to initialize proxy to ALFastAccess"<<endl;
-    }
-
-    const float leftFootBumperLeft  = varValues[0];
-    const float leftFootBumperRight = varValues[1];
-    const float rightFootBumperLeft = varValues[2];
-    const float rightFootBumperRight = varValues[3];
-    const float ultraSoundDistLeft = varValues[4];
-    const float ultraSoundDistRight = varValues[5];
-    const float batteryCharge = varValues[6];
-    const float batteryCurrent = varValues[7];
+    const float leftFootBumperLeft  = *visionSensorPointers[0];
+    const float leftFootBumperRight = *visionSensorPointers[1];
+    const float rightFootBumperLeft = *visionSensorPointers[2];
+    const float rightFootBumperRight = *visionSensorPointers[3];
+    const float ultraSoundDistLeft = *visionSensorPointers[4];
+    const float ultraSoundDistRight = *visionSensorPointers[5];
+    const float batteryCharge = *visionSensorPointers[6];
+    const float batteryCurrent = *visionSensorPointers[7];
 
     sensors->
         setVisionSensors(FootBumper(leftFootBumperLeft, leftFootBumperRight),
