@@ -884,6 +884,15 @@ void Context::checkUnknownGoalCorner(VisualCorner & corner,
     // we have one corner and no field objects
     corner.setSecondaryShape(GOAL_L);
     // now see if we can figure out exactly which L
+	if (debugIdentifyCorners) {
+		cout << "In checkunknown " << l1 << " " << l2 << endl;
+		if (l1IsLeft) {
+			cout << "L1 is left " << endl;
+		} else {
+			cout << "L2 is left " << endl;
+		}
+	}
+
     if (l1IsLonger) {
         if (l1 > GOALBOX_FUDGE * GOALBOX_DEPTH) {
             // we have enough information - is big line to left or right?
@@ -894,7 +903,7 @@ void Context::checkUnknownGoalCorner(VisualCorner & corner,
             }
         }
     } else if (l2 > GOALBOX_FUDGE * GOALBOX_DEPTH) {
-        if (!l1IsLeft) {
+        if (l1IsLeft) {
             corner.setSecondaryShape(RIGHT_GOAL_L);
         } else {
             corner.setSecondaryShape(LEFT_GOAL_L);
