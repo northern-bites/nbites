@@ -58,10 +58,7 @@ BALL_ON_LEDS = ((LEFT_EYE_LED, RED, NOW),)
 BALL_OFF_LEDS = ((LEFT_EYE_LED, BLUE, NOW),)
 
 ############### Roles ###############
-#### Chaser #######
 CHASER_ON_LEDS = ((RIGHT_EYE_LED, GREEN, NOW),)
-LOC_CHASER_ON_LEDS = ((RIGHT_EYE_LED, WHITE, NOW),)
-#### Other ####
 MIDDIE_ON_LEDS = ((RIGHT_EYE_LED, PURPLE, NOW),)
 DEFENDER_ON_LEDS = ((RIGHT_EYE_LED, CYAN, NOW),)
 OFFENDER_ON_LEDS =  ((RIGHT_EYE_LED, YELLOW, NOW),)
@@ -82,8 +79,6 @@ FLASH_OFF_LEDS = ((LEFT_EYE_LED,  OFF, NOW),
                   (RIGHT_EYE_LED, OFF, NOW),
                   (LEFT_EAR_LED,  OFF, NOW),
                   (RIGHT_EAR_LED, OFF, NOW),)
-
-
 
 class Leds():
     def __init__(self, brainPtr):
