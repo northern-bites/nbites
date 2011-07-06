@@ -31,7 +31,7 @@ def ballInPosition(player):
 
     #Get the difference
     # not absolute value for x, if ball is closer kick anyway
-    diff_x = ball.relX - x_offset
+    diff_x = fabs(ball.relX - x_offset)
 
     diff_y = fabs(ball.relY - y_offset)
 

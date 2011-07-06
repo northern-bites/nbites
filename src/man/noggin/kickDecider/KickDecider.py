@@ -2,6 +2,7 @@ import kicks
 import KickInformation
 import KickingConstants as constants
 import noggin_constants as NogginConstants
+from ..playbook import PBConstants
 
 class KickDecider(object):
     """
@@ -105,6 +106,11 @@ class KickDecider(object):
             self.choosePassBackKick()
 
         self.info.kick = self.chooseKick()
+
+        if self.brain.play.isRole(PBConstants.GOALIE) and \
+                self.info.kick.isBackKick():
+            self.info.kick = kicks.ORBIT_KICK_POSITION
+
         print "I'm at position x: {0} y: {1} h: {2}".format(self.brain.my.x,
                                                             self.brain.my.y,
                                                             self.brain.my.h)

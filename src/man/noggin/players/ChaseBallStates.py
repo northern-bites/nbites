@@ -32,7 +32,7 @@ def positionForKick(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.inKickingState = True
+        player.inKickingState = False
 
     if player.counter % 10 is 0:
         player.brain.kickDecider.decideKick()

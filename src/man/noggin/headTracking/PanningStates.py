@@ -1,6 +1,7 @@
 import man.motion.HeadMoves as HeadMoves
 from . import TrackingConstants as constants
 from man.motion import MotionConstants
+from ..playbook import PBConstants
 
 def scanBall(tracker):
     """
@@ -235,7 +236,7 @@ def trianglePan(tracker):
 
 def trianglePanLeft(tracker):
     if tracker.firstFrame():
-        if tracker.goalieActiveLoc:
+        if tracker.brain.play.isRole(PBConstants.GOALIE):
             tracker.lastMove = \
                 tracker.helper.executeHeadMove(HeadMoves.GOALIE_POST_LEFT_SCAN)
         else:
@@ -249,7 +250,7 @@ def trianglePanLeft(tracker):
 
 def trianglePanRight(tracker):
     if tracker.firstFrame():
-        if tracker.goalieActiveLoc:
+        if tracker.brain.play.isRole(PBConstants.GOALIE):
             tracker.lastMove = \
                 tracker.helper.executeHeadMove(HeadMoves.GOALIE_POST_RIGHT_SCAN)
         else:
