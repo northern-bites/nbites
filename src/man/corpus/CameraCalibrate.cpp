@@ -15,7 +15,7 @@ float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.04f};
 float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.0f, 0.068f};
 #else
 #ifdef ROBOT_NAME_spock
-float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.017f, 0.113f};
+float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {-0.0045f, 0.138f};
 #else
 #ifdef ROBOT_NAME_annika
 float CameraCalibrate::Params[CameraCalibrate::NUM_PARAMS] = {0.015f, 0.075f};
