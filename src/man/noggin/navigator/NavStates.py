@@ -255,7 +255,9 @@ def destWalking(nav):
     elif -1 != nav.currentCommand.framesRemaining() < 40:
         nav.nearDestination = True
 
-    if nav.currentCommand.isDone():
+    if nav.counter > 1 and \
+            (nav.currentCommand.isDone() or
+             not nav.brain.motion.isWalkActive()):
         nav.nearDestination = True
         return nav.goNow('atPosition')
 
@@ -338,5 +340,4 @@ def atPosition(nav):
         nav.startOmniCount += 1
         if nav.startOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
             return nav.goLater('omniGoTo')
-        else:
-            return nav.stay()
+    return nav.stay()

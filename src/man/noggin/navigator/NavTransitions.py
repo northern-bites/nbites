@@ -16,7 +16,7 @@ def atDestinationCloser(nav):
 
     return my.distTo(nav.getDestination()) < (constants.CLOSER_XY +
                                               hypot(my.uncertX,
-                                                         my.uncertY))
+                                                    my.uncertY))
 
 def atHeadingGoTo(my, targetHeading):
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
