@@ -207,4 +207,4 @@ class HeadTracking(FSA.FSA):
         Continually bounces head up to see goalposts, then
         back down to see the ball.
         """
-        self.switchTo('orbitPanUp')
+        self.switchTo('panOrbit')

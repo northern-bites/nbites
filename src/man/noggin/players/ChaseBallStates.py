@@ -4,6 +4,7 @@ Here we house all of the state methods used for chasing the ball
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import GoalieTransitions as goalTran
+from man.motion import HeadMoves
 from ..playbook.PBConstants import GOALIE
 
 def chase(player):
@@ -57,13 +58,21 @@ def orbitBall(player):
     State to orbit the ball
     """
     if player.firstFrame():
+        player.brain.tracker.performHeadMove(HeadMoves.KICK_SCAN)
+
+    if player.brain.tracker.isStopped():
+        player.brain.tracker.trackBall()
+
+        # Only orbit if we still don't have a kick
+        player.brain.kickDecider.decideKick()
+        if not transitions.shouldOrbit(player):
+            return player.goLater('chase')
+
         player.brain.nav.orbitAngle(45) # TODO HACK HACK
-        player.brain.tracker.bounceHead()
 
     if transitions.shouldFindBall(player) or player.brain.nav.isStopped():
         player.inKickingState = False
         player.shouldOrbit = False
-        player.brain.tracker.trackBall()
         return player.goLater('chase')
 
     return player.stay()

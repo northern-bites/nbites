@@ -244,9 +244,12 @@ def destWalking(nav):
             nav.destGain = 1;
 
         nav.nearDestination = False
-        nav.newDestination = False
 
-        helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta, nav.destGain)
+        helper.setDestination(nav,
+                              nav.destX,
+                              nav.destY,
+                              nav.destTheta,
+                              nav.destGain)
 
     # the frames remaining counter is sometimes set to -1 initially
     elif -1 != nav.currentCommand.framesRemaining() < 40:
@@ -266,7 +269,7 @@ def stop(nav):
     if nav.firstFrame():
         # stop walk vectors
         helper.setSpeed(nav, 0, 0, 0)
-
+        nav.destType = None
         nav.resetDestMemory()
         nav.resetSpeedMemory()
 
@@ -276,6 +279,8 @@ def stop(nav):
     return nav.stay()
 
 def stopped(nav):
+    if nav.firstFrame():
+        nav.destType = None
     return nav.stay()
 
 def orbitPointThruAngle(nav):

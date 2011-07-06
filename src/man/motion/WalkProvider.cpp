@@ -44,7 +44,8 @@ WalkProvider::WalkProvider(shared_ptr<Sensors> s,
       pendingDestCommands(false),
       pendingGaitCommands(false),
       pendingStartGaitCommands(false),
-      nextCommand()
+      nextCommand(new WalkCommand(0,0,0)),
+      nextDestCommand(new DestinationCommand(0,0,0))
 {
     pthread_mutex_init(&walk_provider_mutex, NULL);
 
@@ -90,6 +91,8 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
         stepGenerator.setSpeed(nextCommand->x_mms,
                                nextCommand->y_mms,
                                nextCommand->theta_rads);
+        if (nextDestCommand )
+        nextDestCommand->finishedExecuting();
     }
     pendingCommands = false;
     nextCommand = WalkCommand::ptr();
@@ -99,6 +102,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
                                 nextStepCommand->y_mms,
                                 nextStepCommand->theta_rads,
                                 nextStepCommand->numSteps);
+        nextDestCommand->finishedExecuting();
     }
     pendingStepCommands=false;
 
@@ -107,7 +111,7 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
 							nextDestCommand->y_mm,
 							nextDestCommand->theta_rads,
 							nextDestCommand->gain);
-	nextDestCommand->framesRemaining(framesToDest);
+        nextDestCommand->framesRemaining(framesToDest);
     }
     pendingDestCommands = false;
 

@@ -227,6 +227,7 @@ def trianglePan(tracker):
     Execute either a left or right triangle scan. Then, return to
     original head angles.
     """
+    tracker.preTriangleState = tracker.lastDiffState
     if tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw] > 0:
         return tracker.goNow('trianglePanLeft')
     else :
@@ -265,7 +266,7 @@ def trianglePanReturn(tracker):
         tracker.lastMove = tracker.helper.lookToPoint(tracker.brain.ball)
 
     elif tracker.lastMove.isDone() or tracker.target.vis.on:
-        return tracker.goLater('ballTracking')
+        return tracker.goLater(tracker.preTriangleState)
 
     return tracker.stay()
 
