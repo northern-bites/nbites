@@ -41,8 +41,8 @@ class KickDecider(object):
         if kick == kicks.LEFT_DYNAMIC_STRAIGHT_KICK or \
                 kick == kicks.RIGHT_DYNAMIC_STRAIGHT_KICK:
             ball = self.brain.ball
-            dist = ball.distTo(kick.dest)
-            return kick.sweetMove(ball.relY, dist)
+            dist = ball.loc.distTo(kick.dest)
+            return kick.sweetMove(ball.loc.relY, dist)
         else:
             return kick.sweetMove
 
@@ -192,7 +192,7 @@ class KickDecider(object):
 
     def chooseDynamicKick(self):
         ball = self.brain.ball
-        if ball.relY >= 0:
+        if ball.loc.relY >= 0:
             print "LEFT_DYNAMIC_STRAIGHT"
             return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
         print "RIGHT_DYNAMIC_STRAIGHT"
@@ -200,7 +200,7 @@ class KickDecider(object):
 
     def chooseLongBackKick(self):
         ball = self.brain.ball
-        if ball.relY > 0:
+        if ball.loc.relY > 0:
             print "LEFT_LONG_BACK"
             return kicks.LEFT_LONG_BACK_KICK
         print "RIGHT_LONG_BACK"
@@ -208,7 +208,7 @@ class KickDecider(object):
 
     def chooseShortBackKick(self):
         ball = self.brain.ball
-        if ball.relY > 0:
+        if ball.loc.relY > 0:
             print "LEFT_SHORT_BACK"
             return kicks.LEFT_SHORT_BACK_KICK
         print "RIGHT_SHORT_BACK"
@@ -216,7 +216,7 @@ class KickDecider(object):
 
     def chooseShortQuickKick(self):
         ball = self.brain.ball
-        if ball.relY > 0:
+        if ball.loc.relY > 0:
             print "SHORT_QUICK_LEFT"
             return kicks.SHORT_QUICK_LEFT_KICK
         print "SHORT_QUICK_RIGHT"

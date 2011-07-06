@@ -87,7 +87,7 @@ def approachDangerousBall(player):
 
     #move away from the ball so it is no longer dangerous
     if player.brain.nav.isStopped():
-        if player.brain.ball.relY > 0:
+        if player.brain.ball.loc.relY > 0:
             player.brain.nav.walk(0, -15, 0)
         else:
             player.brain.nav.walk(0, 15, 0)

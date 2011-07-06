@@ -167,11 +167,15 @@ class HeadTracking(FSA.FSA):
 
     def trackTarget(self, target):
         """
-        Track given target via vision information while possible.
+        Someone else: Track given target via vision information while possible.
         Once target is no longer visible, perform naive pans.
         If target becomes visible again, either return to state
         'targetTracking' or go to state 'activeTracking'.
+
+        Lizzie: automatically tracks landmark, scans for landmark if not in view
+        only works if target has attribute loc.dist, framesOn, framesOff,x,y
         """
+
         self.target = target
         self.target.height = 0
         self.gain = 1.0

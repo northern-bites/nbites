@@ -100,8 +100,8 @@ class TeamMember(RobotLocation):
         self.h = my.h
         self.ballDist = ball.dist
         self.ballBearing = ball.bearing
-        self.ballX = ball.x
-        self.ballY = ball.y
+        self.ballX = ball.loc.x
+        self.ballY = ball.loc.y
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()

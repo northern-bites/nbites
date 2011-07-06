@@ -31,9 +31,9 @@ def ballInPosition(player):
 
     #Get the difference
     # not absolute value for x, if ball is closer kick anyway
-    diff_x = fabs(ball.relX - x_offset)
+    diff_x = fabs(ball.loc.relX - x_offset)
 
-    diff_y = fabs(ball.relY - y_offset)
+    diff_y = fabs(ball.loc.relY - y_offset)
 
     if diff_x < constants.BALL_X_OFFSET:
         print "Ball X OK at {0}".format(diff_x)
@@ -50,9 +50,9 @@ def ballNearPosition(player):
     Ball is around our feet. Maybe we wiffed?
     """
     ball = player.brain.ball
-    return ((constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.relX <
+    return ((constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.loc.relX <
               constants.SHOULD_KICK_AGAIN_FAR_X) and
-             fabs(ball.relY) < constants.SHOULD_KICK_AGAIN_Y)
+             fabs(ball.loc.relY) < constants.SHOULD_KICK_AGAIN_Y)
 
 def shouldKick(player):
     """
@@ -68,8 +68,8 @@ def shouldKickAgain(player):
 
 def ballTooFar(player):
     """
-    Navigator is almost at its destination, but we're still far away from
-    the ball
+    Navigator is almost at its destination, but we're still far away
+    from the ball
     """
     if player.brain.nav.nearDestination and player.brain.ball.dist > 30:
         print "ballTooFar"
@@ -93,8 +93,8 @@ def shouldStopPenaltyKickDribbling(player):
     dribbleAimPoint = helpers.getShotCloseAimPoint(player)
     goalBearing = my.getRelativeBearing(dribbleAimPoint)
     return (inPenaltyKickStrikezone(player) or
-            player.brain.ball.relX > constants.STOP_DRIBBLE_X or
-            fabs(player.brain.ball.relY) > constants.STOP_DRIBBLE_Y or
+            player.brain.ball.loc.relX > constants.STOP_DRIBBLE_X or
+            fabs(player.brain.ball.loc.relY) > constants.STOP_DRIBBLE_Y or
             fabs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
             player.counter > constants.STOP_PENALTY_DRIBBLE_COUNT)
 

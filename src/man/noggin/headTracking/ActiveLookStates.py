@@ -47,7 +47,7 @@ def scanForTarget(tracker):
 
     if not tracker.brain.motion.isHeadActive():
         print "head not active"
-        targetDist = tracker.target.locDist
+        targetDist = tracker.target.loc.dist
 
         if targetDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.helper.executeHeadMove(HeadMoves.HIGH_SCAN_BALL)

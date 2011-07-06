@@ -28,7 +28,7 @@ from . import Leds
 from . import robots
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
-from .typeDefs import (Ball, Sonar, Packet,
+from .typeDefs import (Sonar, Packet,
                        Play, TeamMember)
 from .navigator import Navigator
 from .util import NaoOutput
@@ -39,7 +39,7 @@ from .kickDecider import KickDecider
 import _roboguardian
 import _speech
 
-from objects import (MyInfo, FieldObject, RobotLocation)
+from objects import (MyInfo, FieldObject, RobotLocation, Ball)
 
 class Brain(object):
     """
@@ -103,7 +103,8 @@ class Brain(object):
         # Information about the environment
         self.initFieldObjects()
         self.initTeamMembers()
-        self.ball = Ball.Ball(self.vision.ball)
+        self.ball = Ball(self.vision.ball, self.loc, self.my)
+
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
         if Constants.LOG_COMM:
@@ -132,20 +133,20 @@ class Brain(object):
         # Yellow goal left and right posts
         self.yglp = FieldObject(self.vision.yglp,
                                 Constants.vis_landmark.VISION_YGLP,
-                                self.my)
+                                self.loc)
 
         self.ygrp = FieldObject(self.vision.ygrp,
                                 Constants.vis_landmark.VISION_YGRP,
-                                self.my)
+                                self.loc)
 
         # Blue Goal left and right posts
         self.bglp = FieldObject(self.vision.bglp,
                                 Constants.vis_landmark.VISION_BGLP,
-                                self.my)
+                                self.loc)
 
         self.bgrp = FieldObject(self.vision.bgrp,
                                 Constants.vis_landmark.VISION_BGRP,
-                                self.my)
+                                self.loc)
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
@@ -235,11 +236,8 @@ class Brain(object):
         # Communications update
         self.updateComm()
 
-        # Localization Update
-        self.updateLocalization()
-
-        # Choose whether we use Vision or Localization
-        self.updateBestValues()
+        # Update objects
+        self.update()
 
         #Set LEDS
         self.leds.processLeds()
@@ -273,19 +271,12 @@ class Brain(object):
             if (mate.active and mate.isDead()):
                 mate.active = False
 
-    def updateLocalization(self):
+    def update(self):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.ball.updateLoc(self.loc, self.my)
+        self.ball.update()
         self.my.update()
-
-    def updateBestValues(self):
-        """
-        Update estimates about objects using best information available
-        """
-        self.ball.updateBestValues(self.my)
-
         self.yglp.setBest()
         self.ygrp.setBest()
         self.bglp.setBest()

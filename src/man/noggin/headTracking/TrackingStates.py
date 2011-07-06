@@ -29,7 +29,7 @@ def tracking(tracker):
     else:
         minActiveDist = constants.ACTIVE_TRACK_DIST
 
-    if tracker.target.dist > minActiveDist:
+    if tracker.target.loc.dist > minActiveDist:
         return tracker.goLater('activeTracking')
 
     tracker.helper.trackObject()
@@ -66,7 +66,7 @@ def activeTracking(tracker):
     tracker.helper.trackObject()
 
     # If we are close to the ball and have seen it consistently
-    if tracker.target.dist < constants.STARE_TRACK_DIST:
+    if tracker.target.loc.dist < constants.STARE_TRACK_DIST:
         tracker.shouldStareAtBall += 1
 
         if tracker.shouldStareAtBall > constants.STARE_TRACK_THRESH:

@@ -8,7 +8,7 @@ namespace noggin {
     using namespace py_constants;
 
 //////////// Base Location Class Methods //////////////
-    Location::Location(float _x = 0, float _y = 0)
+    Location::Location(float _x, float _y)
         : x(_x), y(_y)
     {
     }
@@ -46,12 +46,12 @@ namespace noggin {
 
     const degrees Location::headingToInDeg(const Location& other)
     {
-        return (std::atan2((other.y-y), (other.x-x)))*TO_DEG;
+        return (NBMath::safe_atan2((other.y-y), (other.x-x)))*TO_DEG;
     }
 
     const radians Location::headingToInRad(const Location& other)
     {
-        return (std::atan2((other.y-y), (other.x-x)));
+        return (NBMath::safe_atan2((other.y-y), (other.x-x)));
     }
 
     // In methods check if loc is in a certain field region
@@ -85,9 +85,14 @@ namespace noggin {
         return (BOTTOM_LIMIT > y);
     }
 
+    bool Location::hasattr(boost::python::object obj,
+                           std::string const &attrName) {
+        return PyObject_HasAttrString(obj.ptr(), attrName.c_str());
+    }
+
 ///////// RobotLocation Methods //////////////
 
-    RobotLocation::RobotLocation(float _x = 0, float _y = 0, degrees _h = 0)
+    RobotLocation::RobotLocation(float _x, float _y, degrees _h)
         : Location(_x, _y), h(_h*TO_RAD)
     {
     }
@@ -120,7 +125,6 @@ namespace noggin {
         else return NBMath::sign(targetH);
     }
 
-
 //////////// RelLocation Methods ///////////////
 
     RelLocation::RelLocation(RobotLocation& my, float dx, float dy, degrees dh)
@@ -138,31 +142,10 @@ namespace noggin {
 ////////// FieldObject Methods //////////////
 
     FieldObject::FieldObject(VisualFieldObject& vfo,
-                             vis_landmark id, MyInfo& _my)
-        : LocObject(), vis(&vfo), visID(id), localID(0), bearing(0), dist(0),
-          my(&_my)
+                             vis_landmark id, PyLoc& _pl)
+        : vis(&vfo), loc(new LocObject(_pl)),
+          visID(id), localID(0), bearing(0), dist(0)
     {
-    }
-
-    // Used by MyInfo, calculated from me
-    const float FieldObject::getLocDist() {
-        return my->distTo(*this, true);
-    }
-
-    // Used by MyInfo, calculated from me also
-    const degrees FieldObject::getLocBearing()
-    {
-        return my->getRelativeBearing(*this);
-    }
-
-    const float FieldObject::getRelX()
-    {
-        return std::fabs(dist)*std::cos(bearing);
-    }
-
-    const float FieldObject::getRelY()
-    {
-        return std::fabs(dist)*std::sin(bearing);
     }
 
     // Determine whether vis or loc values are better
@@ -177,8 +160,8 @@ namespace noggin {
         else if (vis->getFramesOff() < LOST_OBJECT_FRAMES_THRESH) return;
 
         else {
-            bearing = getLocBearing()*TO_RAD;
-            dist = getLocDist();
+            bearing = loc->getBearing()*TO_RAD;
+            dist = loc->getDist();
         }
     }
 
@@ -186,15 +169,20 @@ namespace noggin {
     void FieldObject::associateWithRelativeLandmark(
         boost::python::tuple relLandmark)
     {
-        x = boost::python::extract<float>(relLandmark[0])();
-        y = boost::python::extract<float>(relLandmark[1])();
+        loc->setX(boost::python::extract<float>(relLandmark[0])());
+        loc->setY(boost::python::extract<float>(relLandmark[1])());
         localID = boost::python::extract<int>(relLandmark[2])();
+    }
+
+    bool FieldObject::hasattr(boost::python::object obj,
+                           std::string const &attrName) {
+        return PyObject_HasAttrString(obj.ptr(), attrName.c_str());
     }
 
 /////////////// LocObject Methods //////////////
 
-    LocObject::LocObject()
-        : Location(0.0, 0.0), trackingFitness(0)
+    LocObject::LocObject(PyLoc& pl)
+        : Location(0.0, 0.0), trackingFitness(0), loc(&pl)
     {
     }
 
@@ -207,6 +195,102 @@ namespace noggin {
     bool LocObject::operator > (const LocObject& other) const
     {
         return trackingFitness > other.trackingFitness;
+    }
+
+    // From me
+    const float LocObject::getDist()
+    {
+        // HACK for infinity values, shouldn't happen
+        if (isinf(loc->getXEst()) || isinf(loc->getYEst())) {
+            std::cout << "INFINITY DISTANCE" << std::endl;
+            return INFINITE_DISTANCE;
+        }
+
+        return hypotf((loc->getYEst()-y), (loc->getXEst()-x));
+    }
+
+    // From me
+    const degrees LocObject::getBearing()
+    {
+        return (NBMath::subPIAngle((NBMath::safe_atan2((loc->getYEst()-y),
+                                                       (loc->getXEst()-x)))
+                                   - loc->getHEst()))*TO_DEG;
+    }
+
+    const float LocObject::getRelX()
+    {
+        return std::fabs(getDist())*std::cos(getBearing());
+    }
+
+    const float LocObject::getRelY()
+    {
+        return std::fabs(getDist())*std::sin(getBearing());
+    }
+
+
+//////////// LocBall Methods //////////////////
+
+    LocBall::LocBall(PyLoc& pl, MyInfo& _my)
+        : Location(0.f, 0.f), my(&_my), loc(&pl)
+    {
+    }
+
+    const float LocBall::getVelX()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return loc->getBallXVelocityEst();
+        else return -(loc->getBallXVelocityEst());
+    }
+
+    const float LocBall::getVelY()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return loc->getBallYVelocityEst();
+        else return -(loc->getBallYVelocityEst());
+    }
+
+    const float LocBall::getAccX()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return loc->getBallXAccelerationEst();
+        else return -(loc->getBallXAccelerationEst());
+    }
+
+    const float LocBall::getAccY()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return loc->getBallYAccelerationEst();
+        else return -(loc->getBallYAccelerationEst());
+    }
+
+    const degrees LocBall::getHeading()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE)
+            return (NBMath::safe_atan2((loc->getBallYEst()-loc->getYEst()),
+                                       (loc->getBallXEst()-loc->getXEst())))
+                *TO_DEG;
+        else return (NBMath::safe_atan2((loc->getYEst()-loc->getBallYEst()),
+                                       (loc->getXEst()-loc->getBallXEst())))
+                *TO_DEG;
+
+    }
+
+    // Copies x and y values to comply with the location interface.
+    void LocBall::update()
+    {
+        if (my->getTeamColor() == PY_TEAM_BLUE) {
+            x = loc->getBallXEst();
+            y = loc->getBallYEst();
+        }
+        else {
+            x = FIELD_GREEN_WIDTH - loc->getBallXEst();
+            y = FIELD_GREEN_HEIGHT - loc->getBallYEst();
+        }
+
+        lastRelX = getRelX();
+        lastRelY = getRelY();
+
+        if (dx != 0) endY = getRelY() - (dy*(getRelX()/dx));
     }
 
 /////////// MyInfo Methods /////////////////
@@ -259,11 +343,29 @@ namespace noggin {
         return std::min(getLocScoreTheta(), getLocScoreXY());
     }
 
-    const float MyInfo::distTo(FieldObject& other, bool forceCalc)
+//////////// Ball Methods /////////////
+
+    Ball::Ball(VisualBall& vb, PyLoc& pl, MyInfo& mi)
+        : loc(new LocBall(pl, mi)), vis(&vb), dist(0.f), bearing(0.f)
     {
-        if (!forceCalc) return other.getDist();
-        else return Location::distTo(other);
     }
 
+    void Ball::update()
+    {
+        bearing = loc->getBearing();
+        dist = loc->getDist();
+
+        if (vis->isOn()) {
+            loc->setDX(loc->getLastRelX() - loc->getRelX());
+            loc->setDY(loc->getLastRelY() - loc->getRelY());
+        }
+
+        loc->update();
+    }
+
+    bool Ball::hasattr(boost::python::object obj,
+                           std::string const &attrName) {
+        return PyObject_HasAttrString(obj.ptr(), attrName.c_str());
+    }
 
 }
