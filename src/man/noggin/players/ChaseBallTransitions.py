@@ -21,6 +21,9 @@ def ballInPosition(player):
     if not shouldChaseBall(player):
         return False
 
+    if player.brain.ball.framesOn < 4:
+        return False
+
     ball = player.brain.ball
     kick = player.brain.kickDecider.getKick()
     #Get the current kick sweet spot information

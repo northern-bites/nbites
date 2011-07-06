@@ -15,9 +15,9 @@ using namespace ekf;
 const float MultiLocEKF::USE_CARTESIAN_DIST = 50.0f;
 // Uncertainty
 const float MultiLocEKF::BETA_LOC = 0.0f;
-const float MultiLocEKF::GAMMA_LOC = 0.1f;
+const float MultiLocEKF::GAMMA_LOC = 0.3f;
 const float MultiLocEKF::BETA_ROT = 0.0f; //M_PI_FLOAT/256.0f;
-const float MultiLocEKF::GAMMA_ROT = 0.1f;
+const float MultiLocEKF::GAMMA_ROT = 0.3f;
 
 // Default initialization values
 const float MultiLocEKF::INIT_LOC_X = CENTER_FIELD_X;

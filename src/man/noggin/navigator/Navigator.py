@@ -122,7 +122,7 @@ class Navigator(FSA.FSA):
                 .format(ball.loc.relX, ball.loc.relY, ball.bearing)
 
             # HACK so we don't walk into the ball
-        self.setDest(ball.loc.relX - self.kick.x_offset - 5,
+        self.setDest(ball.loc.relX - self.kick.x_offset - 2,
                      ball.loc.relY - self.kick.y_offset,
                      ball.bearing,
                      gain)
