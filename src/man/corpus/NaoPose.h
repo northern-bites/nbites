@@ -243,6 +243,13 @@ class NaoPose {
     // that function.
     static const float correctDistance(const float uncorrectedDist);
 
+    // Variance as a function of distance
+    // computed by Yoni Ackerman (c) 2011
+    // to update - see the one file that Yoni added
+    // to robobiteS
+    static float getDistanceVariance(float distance);
+    static float getBearingVariance(float distance);
+
  protected: // members
     float bodyInclinationX;
     float bodyInclinationY;
