@@ -95,10 +95,10 @@ def gameFinished(player):
 
 ########## PENALTY SHOT STATES #################
 def penaltyShotsGameInitial(player):
-    return player.goNow('gameInitial')
+    return player.goLater('penaltyShotsGameSet')
 
 def penaltyShotsGameReady(player):
-    return player.stay()
+    return player.goLater('penaltyShotsGameSet')
 
 def penaltyShotsGameSet(player):
     return player.stay()
