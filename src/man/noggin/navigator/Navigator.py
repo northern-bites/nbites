@@ -266,13 +266,9 @@ class Navigator(FSA.FSA):
 
         elif self.destType is constants.BALL:
             return self.brain.ball
-#             kick_x = kick_y = 0
-#             if self.kick is not None:
-#                 kick_x = self.kick.x_offset
-#                 kick_y = self.kick.y_offset
-#             return RelLocation(self.brain.my,
-#                                self.brain.ball.relX - kick_x,
-#                                self.brain.ball.relY - kick_y,
-#                                self.brain.ball.bearing)
+
+        # This can happen when setDest is called
+        else:          # destType is None
+            return self.brain.my
 
 
