@@ -972,7 +972,7 @@ void Context::lookForFieldCorner(VisualCorner & corner, float l1, float l2) {
 		} else {
 			corner.setSecondaryShape(RIGHT_GOAL_CORNER);
 		}
-	} else if (dist < 2 * GREEN_PAD_X) {
+	} else if (dist < 2 * GREEN_PAD_X && field->horizonAt(corner.getX()) > 10) {
         // if we have a long line and it isn't far from edge -> field corner
         int otherX, otherY;
         if (l1 > GOALBOX_DEPTH * GOALBOX_FUDGE) {
@@ -1086,7 +1086,8 @@ void Context::classifyInnerL(VisualCorner & corner) {
 		isInner = true;
 	}
 
-	if (face == FACING_UNKNOWN && !isInner && dist < 2.0f * GREEN_PAD_X) {
+	if (face == FACING_UNKNOWN && !isInner && dist < 2.0f * GREEN_PAD_X &&
+		horizon > 10) {
 		lookForFieldCorner(corner, l1, l2);
 	}
 
@@ -2418,6 +2419,10 @@ void Context::checkForKickDanger(VisualRobot *robot) {
 	int robotY = robot->getCenterY();
 	int ballX = vision->ball->getCenterX();
 	int ballY = vision->ball->getCenterY();
+	// sometimes we see ourselves when looking straight down
+	if (robotY > ballY) {
+		return;
+	}
 	float heat = 0.0f;
 	float distance = abs(robot->getDistance() - vision->ball->getDistance());
 	float dist = realDistance(robotX, ballY, ballX, ballY);
