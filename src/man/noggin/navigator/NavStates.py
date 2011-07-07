@@ -317,10 +317,10 @@ def orbitPointThruAngle(nav):
     #set speed for orbit
     helper.setSpeed(nav, walkX, walkY, walkTheta )
 
-    #Funny enough, we orbit about 1 degree a frame,
+    #Funny enough, we orbit about 1 degree per two frames,
     #So the angle can be used as a thresh
 
-    if nav.counter >= nav.angleToOrbit:
+    if nav.counter >= nav.angleToOrbit*2:
         return nav.goLater('stop')
     return nav.stay()
 

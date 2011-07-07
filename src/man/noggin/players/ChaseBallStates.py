@@ -56,7 +56,7 @@ def lookAround(player):
     Nav is stopped. We want to look around to get better loc.
     """
     if player.firstFrame():
-        player.brain.tracker.stopHeadMoves() # Hack so that tracker goes back to stopped.
+        player.brain.tracker.stopHeadMoves() # HACK so that tracker goes back to stopped.
         player.brain.tracker.kickDecideScan()
 
     if player.brain.tracker.isStopped() and player.counter > 2:
@@ -67,15 +67,18 @@ def lookAround(player):
         else:
             return player.goLater('chase')
 
+    return player.stay()
+
 def orbitBall(player):
     """
     State to orbit the ball
     """
     if player.firstFrame():
-        player.brain.tracker.kickDecideScan()
+        player.brain.tracker.trackBall()
         player.brain.nav.orbitAngle(90) # TODO HACK HACK
 
     if transitions.shouldFindBall(player) or player.brain.nav.isStopped():
+        print "GOING OUT OF ORBIT: ", transitions.shouldFindBall, player.brain.nav.isStopped()
         player.inKickingState = False
         player.shouldOrbit = False
         return player.goLater('chase')
