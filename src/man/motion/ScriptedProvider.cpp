@@ -109,7 +109,7 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
     currCommand->nextFrame(); // so Python can keep track of progress
 
     for (unsigned int id=0; id< Kinematics::NUM_CHAINS; ++id ) {
-	Kinematics::ChainID cid = static_cast<Kinematics::ChainID>(id);
+        Kinematics::ChainID cid = static_cast<Kinematics::ChainID>(id);
 	if ( currCommand->isDone() ){
 	    setNextChainJoints( cid,
 				currentChains->at(cid) );

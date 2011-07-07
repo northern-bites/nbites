@@ -19,11 +19,18 @@ if [ "$1" = "" ]; then
     exit 1
 fi
 
-echo "Type username for RoboCup server, followed by [ENTER]"
-read username
+# modified for Istanbul
+# commented out lines should be re-enabled at Bowdoin
 
-SERVER=$username@robocup.bowdoin.edu
-ROBOCUP_DIR=/mnt/research/robocup
+#echo "Type username for RoboCup server, followed by [ENTER]"
+#read username
+username=nbites
+
+#HOST=robocup.bowdoin.edu
+HOST=eisbaer.local
+SERVER=$username@$HOST
+#ROBOCUP_DIR=/mnt/research/robocup
+ROBOCUP_DIR=/home/nbites/
 PSO_DIR=gait-pso/swarms
 PICKLE="PSO_pGaitLearner.pickle"
 

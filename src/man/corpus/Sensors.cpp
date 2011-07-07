@@ -105,13 +105,15 @@ Sensors::Sensors(boost::shared_ptr<Speech> s) :
             SensorMonitor::DONT_CHECK, SONAR_HIGH);
 
     // all FSRs have the same variance range
-    for (int i = 0; i <= FSR_RIGHT_B_R; ++i)
+    for (int i = 0; i <= FSR_RIGHT_B_R; ++i) {
         fsrMonitor.Sensor(i).setVarianceBounds(SensorMonitor::DONT_CHECK,
                 FSR_HIGH);
+    }
 
     // give the variance monitors access to speech
     varianceMonitor.SpeechPointer(speech);
-    fsrMonitor.SpeechPointer(speech);
+    // talking robots are annoying
+    //fsrMonitor.SpeechPointer(speech);
 
     // THIS IS AN OCTAL NUMBER, must start with 0
     mkdir(FRM_FOLDER.c_str(), 0755); // permissions: u+rwx, og+rx
@@ -378,10 +380,12 @@ const float Sensors::getBatteryCurrent() const {
     return current;
 }
 
-void Sensors::setBodyAngles(const vector<float>& v) {
+void Sensors::setBodyAngles(float* jointVPointers[]) {
     angles_mutex.lock();
 
-    bodyAngles = v;
+    for (int i = 0; i < Kinematics::NUM_JOINTS; i++) {
+    	bodyAngles[i] = *jointVPointers[i];
+    }
     /*
      cout << "Body angles in sensors";
      for (int i = 0 ; i < 22; i++){
@@ -417,10 +421,12 @@ void Sensors::setBodyAngleErrors(const vector<float>& v) {
     errors_mutex.unlock();;
 }
 
-void Sensors::setBodyTemperatures(const vector<float>& v) {
+void Sensors::setBodyTemperatures(float* jointTPointers[]) {
     temperatures_mutex.lock();
 
-    bodyTemperatures = v;
+    for (int i = 0; i < Kinematics::NUM_JOINTS; i++) {
+    	bodyTemperatures[i] = *jointTPointers[i];
+    }
 
     temperatures_mutex.unlock();;
 }

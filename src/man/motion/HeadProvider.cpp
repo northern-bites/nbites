@@ -28,12 +28,12 @@ using boost::shared_ptr;
 
 //#define DEBUG_HEADPROVIDER
 
-HeadProvider::HeadProvider(shared_ptr<Sensors> s)
+HeadProvider::HeadProvider(shared_ptr<Sensors> s, shared_ptr<NaoPose> p)
     : MotionProvider(HEAD_PROVIDER),
-      sensors(s),
+      sensors(s), pose(p),
       chopper(sensors),
       nextJoints(),
-      currCommand(new ChoppedCommand() ),
+      currChoppedCommand(new ChoppedCommand() ),
       headCommandQueue(),
       curMode(SCRIPTED),
       yawDest(0.0f), pitchDest(0.0f),
@@ -74,6 +74,7 @@ void HeadProvider::hardReset(){
 void HeadProvider::calculateNextJointsAndStiffnesses() {
     PROF_ENTER(P_HEAD);
     pthread_mutex_lock(&head_provider_mutex);
+
     switch(curMode){
     case SCRIPTED:
         scriptedMode();
@@ -90,7 +91,7 @@ void HeadProvider::calculateNextJointsAndStiffnesses() {
 //Method called during the 'SET' Mode
 void HeadProvider::setMode(){
     //Maximum head movement is Rad/motion frame (6 deg/20ms from AL docs)
-    const float MAX_HEAD_VEL = 6.0f*TO_RAD;
+    const float MAX_HEAD_VEL = 6.0f*TO_RAD;/* ** *///we don't use this...
 
     //Calculate how much we can move toward the goal
     const float yawChangeTarget = NBMath::clip(yawDest - lastYawDest,
@@ -101,10 +102,11 @@ void HeadProvider::setMode(){
                                                  pitchMaxSpeed);
 #ifdef DEBUG_HEADPROVIDER
     cout << "Last values "<<endl
-	 <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
-	 <<"   added      ("<<yawChangeTarget<<","<<pitchChangeTarget<<")"<<endl
-	 <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
+         <<"   were       (" << lastYawDest <<","<< lastPitchDest <<")"<<endl
+         <<"   added      ("<<yawChangeTarget<<","<<pitchChangeTarget<<")"<<endl
+         <<"   target was ("<<yawDest<<","<<pitchDest<<")"<<endl;
 #endif
+
 
     //update memory for next  run
     lastYawDest = lastYawDest+yawChangeTarget;
@@ -112,9 +114,9 @@ void HeadProvider::setMode(){
 
 
     //update the chain angles
-    float newHeads[Kinematics::HEAD_JOINTS] = {lastYawDest,lastPitchDest};
-    vector<float> newChainAngles  =
-        vector<float>(newHeads,newHeads + Kinematics::HEAD_JOINTS);
+    vector<float> newChainAngles;
+    newChainAngles.push_back(lastYawDest);
+    newChainAngles.push_back(lastPitchDest);
     setNextChainJoints(HEAD_CHAIN,newChainAngles);
 
     vector<float> head_gains(HEAD_JOINTS, headSetStiffness);
@@ -123,24 +125,23 @@ void HeadProvider::setMode(){
 }
 
 void HeadProvider::scriptedMode(){
-    if ( currCommand->isDone() )
+    if ( currChoppedCommand->isDone() )
         setNextHeadCommand();
 
-    if (!currCommand->isDone() ) {
+    if (!currChoppedCommand->isDone() ) {
+        currChoppedCommand->nextFrame();
         setNextChainJoints( HEAD_CHAIN,
-			    currCommand->getNextJoints(HEAD_CHAIN) );
-	setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
-				 currCommand->getStiffness(
-				     Kinematics::HEAD_CHAIN) );
+                            currChoppedCommand->getNextJoints(HEAD_CHAIN) );
+        setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
+                                 currChoppedCommand->getStiffness(
+                                     Kinematics::HEAD_CHAIN) );
 
     }
     else {
         setNextChainJoints( HEAD_CHAIN, getCurrentHeads() );
-	setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
-				 vector<float>(HEAD_JOINTS, 0.0f) );
+        setNextChainStiffnesses( Kinematics::HEAD_CHAIN,
+                                 vector<float>(HEAD_JOINTS, 0.0f) );
     }
-
-
 }
 
 void HeadProvider::setCommand(const SetHeadCommand::ptr command) {
@@ -151,7 +152,20 @@ void HeadProvider::setCommand(const SetHeadCommand::ptr command) {
     pitchDest = command->getPitch();
     yawMaxSpeed = command->getMaxSpeedYaw();
     pitchMaxSpeed = command->getMaxSpeedPitch();
+
+    /* ** *///debugging speed clipping (should probably stay in some form)
+    yawMaxSpeed = clip(yawMaxSpeed,
+                       0,
+                       Kinematics::jointsMaxVelNominal
+                       [Kinematics::HEAD_YAW]*.1f);
+    pitchMaxSpeed = clip(pitchMaxSpeed,
+                         0,
+                         Kinematics::jointsMaxVelNominal
+                         [Kinematics::HEAD_PITCH]*.1f);
+
     setActive();
+
+    currHeadCommand = command;
 
     pthread_mutex_unlock(&head_provider_mutex);
 }
@@ -160,9 +174,54 @@ void HeadProvider::setCommand(const HeadJointCommand::ptr command) {
     pthread_mutex_lock(&head_provider_mutex);
 
     transitionTo(SCRIPTED);
-    headCommandQueue.push(command); //HACK this should probably be mutexed
+    headCommandQueue.push(command);
     setActive();
 
+    pthread_mutex_unlock(&head_provider_mutex);
+}
+
+/**
+ * A coord command is really just a set command with extra computation
+ * to find the destination angles. We calculate the angles and then
+ * run like a set command.
+ */
+void HeadProvider::setCommand(const CoordHeadCommand::ptr command) {
+    pthread_mutex_lock(&head_provider_mutex);
+
+    transitionTo(SET);
+
+    float relY = command->getRelY() - pose->getFocalPointInWorldFrameY();
+    float relX = command->getRelX() - pose->getFocalPointInWorldFrameX();
+
+    //adjust for robot center's distance above ground
+    float relZ = (command->getRelZ() -
+                  pose->getFocalPointInWorldFrameZ() -
+                  pose->getBodyCenterHeight());
+
+    yawDest = atan(relY/relX);
+
+    float hypoDist = hypotf(relY, relX);
+
+    pitchDest = -atan(relZ/hypoDist) -
+        Kinematics::LOWER_CAMERA_ANGLE; //constant for lower camera
+
+    yawMaxSpeed = command->getMaxSpeedYaw();
+    pitchMaxSpeed = command->getMaxSpeedPitch();
+
+    yawDest = Kinematics::boundHeadYaw(yawDest,pitchDest);
+
+    yawMaxSpeed = clip(yawMaxSpeed,
+                       0,
+                       Kinematics::jointsMaxVelNominal
+                       [Kinematics::HEAD_YAW] * 0.2f);
+    pitchMaxSpeed = clip(pitchMaxSpeed,
+                         0,
+                         Kinematics::jointsMaxVelNominal
+                         [Kinematics::HEAD_PITCH] * 0.2f);
+
+    currHeadCommand = command;
+
+    setActive();
     pthread_mutex_unlock(&head_provider_mutex);
 }
 
@@ -170,13 +229,13 @@ void HeadProvider::enqueueSequence(std::vector<HeadJointCommand::ptr> &seq) {
     // Take in vec of commands and enqueue them all
     vector<HeadJointCommand::ptr>::iterator i;
     for (i = seq.begin(); i != seq.end(); ++i)
-	setCommand(*i);
+        setCommand(*i);
 }
 
 void HeadProvider::setNextHeadCommand() {
     if ( !headCommandQueue.empty() ) {
-	currCommand = chopper.chopCommand(headCommandQueue.front());
-	headCommandQueue.pop();
+        currChoppedCommand = chopper.chopCommand(headCommandQueue.front());
+        headCommandQueue.pop();
     }
 }
 
@@ -197,13 +256,19 @@ void HeadProvider::setActive(){
 
 
 bool HeadProvider::isDone(){
-    const bool setDone = ((yawDest == lastYawDest) && (pitchDest == lastPitchDest));
-    const bool scriptedDone = (currCommand->isDone()  && headCommandQueue.empty());
+    bool setDone, scriptedDone;
     switch(curMode){
     case SET:
+        setDone = ((yawDest == lastYawDest)
+                   && (pitchDest == lastPitchDest));
+        if (setDone && currHeadCommand) {
+            currHeadCommand->finishedExecuting();
+        }
         return setDone;
         break;
     case SCRIPTED:
+        scriptedDone = (currChoppedCommand->isDone()
+                        && headCommandQueue.empty());
         return scriptedDone;
         break;
     default:
@@ -211,10 +276,11 @@ bool HeadProvider::isDone(){
     }
 }
 void HeadProvider::stopScripted(){
-    while(!headCommandQueue.empty())
+    while(!headCommandQueue.empty()){
         headCommandQueue.pop();
+    }
 
-    currCommand = ChoppedCommand::ptr(new ChoppedCommand());
+    currChoppedCommand = ChoppedCommand::ptr(new ChoppedCommand());
 }
 
 void HeadProvider::stopSet(){
@@ -231,8 +297,6 @@ void HeadProvider::transitionTo(HeadMode newMode){
             stopScripted();
             break;
         case SET:
-            //If we need to switch modes, then we may not know what the latest
-            //angles are, so lets get them again from sensors
             vector<float> mAngles = sensors->getMotionBodyAngles();
             lastYawDest =mAngles[0];
             lastPitchDest =mAngles[1];
@@ -240,11 +304,11 @@ void HeadProvider::transitionTo(HeadMode newMode){
         }
         curMode = newMode;
 #ifdef DEBUG_HEADPROVIDER
-	cout << "Transitioned to mode :"<<curMode<<endl;
+        cout << "Transitioned to mode :"<<curMode<<endl;
 #endif
     }else{
 #ifdef DEBUG_HEADPROVIDER
-	cout << "No transition need to get to :"<<curMode<<endl;
+        cout << "No transition need to get to :"<<curMode<<endl;
 #endif
     }
 

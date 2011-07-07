@@ -7,7 +7,10 @@ from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from objects import RobotLocation
+from objects import RelLocation, RobotLocation
+from ..kickDecider import kicks
+
+DEBUG_DESTINATION = True
 
 class Navigator(FSA.FSA):
     def __init__(self,brain):
@@ -16,8 +19,6 @@ class Navigator(FSA.FSA):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.addStates(NavStates)
-        self.addStates(ChaseStates)
-        self.addStates(PFKStates)
         self.currentState = 'stopped'
         self.doingSweetMove = False
         self.setName('Navigator')
@@ -35,12 +36,12 @@ class Navigator(FSA.FSA):
         self.walkTheta = 0
         self.orbitDir = 0
         self.angleToOrbit = 0
+
         self.destX = 0
         self.destY = 0
         self.destTheta = 0
         self.destGain = 1
-
-        self.newDestination = False
+        self.nearDestination = False
 
         self.shouldAvoidObstacleLeftCounter = 0
         self.shouldAvoidObstacleRightCounter = 0
@@ -49,15 +50,29 @@ class Navigator(FSA.FSA):
         self.resetDestMemory()
 
         self.destType = None
+        self.kick = None
+
+    def run(self):
+        if self.destType is constants.BALL:
+            if navTrans.shouldSwitchPFKModes(self):
+                if self.kick is None:
+                    self.kick = kicks.ORBIT_KICK_POSITION
+
+                self.kickPositionDest(self.kick)
+
+        FSA.FSA.run(self)
 
     def performSweetMove(self, move):
         """
         Navigator function to do the sweet move
         """
         self.sweetMove = move
+        self.destType = None
+
         self.brain.player.stopWalking()
         self.resetSpeedMemory()
         self.resetDestMemory()
+
         helper.executeMove(self.brain.motion, self.sweetMove)
         self.switchTo('doingSweetMove')
 
@@ -69,14 +84,48 @@ class Navigator(FSA.FSA):
         robot will walk to the ball with it centered at his feet.
         if no ball is visible, localization will be usedn
         """
-        self.switchTo('walkSpinToBall')
+        self.destType = constants.BALL
+        self.switchTo('goToPosition')
 
     def kickPosition(self, kick):
         """
-        state to align on the ball once we are near it
+        It will position the robot at the ball using self.kick to
+        determine the x,y offset and the final heading.
+
+        This state will aggresively omni-walk, so it's probably best
+        if we don't call it until we're near the ball.
         """
         self.kick = kick
-        self.switchTo('pfk_all')
+
+        if self.destType is not constants.BALL:
+
+            self.destType = constants.BALL
+            self.switchTo('goToPosition')
+
+    def kickPositionDest(self, kick):
+        if self.currentState is 'destWalking':
+            return
+
+        ball = self.brain.ball
+
+        # slow down as we get near the ball (max 80% speed)
+        if ball.dist < 30:
+            gain = min(.8, (0.4 + (ball.dist / 30)) * .8)
+        else:
+            gain = .8
+
+        # TODO later?
+        #self.destTheta = self.kick.heading - self.brain.my.h
+
+        if DEBUG_DESTINATION:
+            print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
+                .format(ball.loc.relX, ball.loc.relY, ball.bearing)
+
+            # HACK so we don't walk into the ball
+        self.setDest(ball.loc.relX - self.kick.x_offset - 5,
+                     ball.loc.relY - self.kick.y_offset,
+                     ball.bearing,
+                     gain)
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,
@@ -89,6 +138,7 @@ class Navigator(FSA.FSA):
         self.dest = dest
         self.destType = constants.GO_TO_DEST
         self.switchTo('goToPosition')
+
 
     def stop(self):
         if ((self.currentState =='stop' or self.currentState == 'stopped')
@@ -126,32 +176,27 @@ class Navigator(FSA.FSA):
 
         self.switchTo('walking')
 
-    def setDest(self, x, y, theta):
+    def setDest(self, x, y, theta, gain=1.0):
         """
         Sets a new destination
         Always does something, since destinations are relative and time sensitive
         """
+        if DEBUG_DESTINATION:
+            print 'Set new destination of ({0}, {1}, {2}, gain={3})' \
+                  .format(self.destX, self.destY, self.destTheta, self.destGain)
+            self.brain.speech.say("New destination")
+
         self.destX = x
         self.destY = y
         self.destTheta = theta
+        self.destGain = gain
 
-        self.newDestination = True
+        self.updateDests(x, y, theta, gain)
+
         self.switchTo('destWalking')
 
-    def takeSteps(self, x, y, theta, numSteps):
-        """
-        Set the step commands
-        """
-        self.walkX, self.walkY, self.walkTheta = 0, 0, 0
-        self.stepX = x
-        self.stepY = y
-        self.stepTheta = theta
-        self.numSteps = numSteps
-        self.switchTo('stepping')
-
-
     # Have we reached our destination?
-    def isAtPositition(self):
+    def isAtPosition(self):
         return self.currentState is 'atPosition'
 
     #################################################################
@@ -188,6 +233,7 @@ class Navigator(FSA.FSA):
             self.lastDestTheta, \
             self.lastDestGain= x,y,theta, gain
         self.resetSpeedMemory()
+        self.nearDestination = False
 
     def resetSpeedMemory(self):
         """
@@ -219,4 +265,10 @@ class Navigator(FSA.FSA):
             return self.dest
 
         elif self.destType is constants.BALL:
-            return self.brain.ball
+            return self.brain.ball.loc
+
+        # This can happen when setDest is called
+        else:          # destType is None
+            return self.brain.my
+
+

@@ -32,16 +32,17 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.stopWalking()
-        player.gainsOn()
         player.walkPose()
         player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
+        player.gainsOn()
 
         # Works with rules (2011) to get goalie manually positioned
         if (player.lastDiffState == 'gameInitial'
             and not player.brain.play.isRole(GOALIE)):
             return player.goLater('relocalize')
-        if player.lastDiffState == 'gamePenalized':
+
+        elif player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
             return player.goLater('afterPenalty')
 
@@ -69,7 +70,8 @@ def gameSet(player):
 
         if (player.brain.play.isRole(CHASER) and
             player.brain.gameController.ownKickOff):
-            player.hasKickedOff = False
+            print "Setting Kickoff to True"
+            player.shouldKickOff = True
 
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
@@ -140,24 +142,13 @@ def gameFinished(player):
 
 ########### PENALTY SHOTS STATES ############
 
-def penaltyShotsGameReady(player):
-    if player.firstFrame():
-        if player.lastDiffState == 'gamePenalized':
-            player.brain.resetLocalization()
-        player.brain.tracker.locPans()
-        player.gainsOn()
-        player.walkPose()
-        if player.brain.play.isRole(GOALIE):
-            player.brain.resetGoalieLocalization()
-
-    return player.stay()
-
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.gainsOn()
         player.stopWalking()
         player.walkPose()
         player.brain.loc.resetBall()
+        player.inKickingState = False
 
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
@@ -178,12 +169,12 @@ def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.walkPose()
+        player.penaltyKicking = True
 
     if player.brain.play.isRole(GOALIE):
-        player.penaltyKicking = True
-        player.brain.play.setSubRole(PBConstants.GOALIE_KICKOFF)
+        player.brain.play.setSubRole(GOALIE_KICKOFF)
         roleState = player.getRoleState()
         return player.goNow(roleState)
-    return player.goNow('penaltyKick')
+    return player.goNow('chase')
 
 

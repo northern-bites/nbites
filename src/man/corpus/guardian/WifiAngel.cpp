@@ -14,6 +14,8 @@ using std::string;
 using namespace sound_paths;
 using namespace conn_consts;
 
+#define NO_WIFI_RESET_HARD
+
 WifiAngel::WifiAngel(string connection_name, string connection_pswd) :
         connection_name(connection_name), connection_pswd(connection_pswd),
         frames_with_no_wifi(0) {
@@ -73,9 +75,10 @@ bool WifiAngel::reset_soft() {
 bool WifiAngel::reset_hard() {
     printf("Attempting to do a hard reset of wifi\n");
 
-    system("su -c /etc/init.d/wireless restart");
-    system("su -c /etc/init.d/connman restart");
-    system("su -c connman scan");
+    std::string command;
+    command += "su -c /etc/init.d/wireless restart";
+    command += " && su -c /etc/init.d/connman restart";
+    command += " && su -c connman scan";
     FILE * f3 = popen(("connman services | awk '/" + connection_name +
             "/ {print $3}'").c_str(), "r");
     char service[100] = "";
@@ -86,16 +89,13 @@ bool WifiAngel::reset_hard() {
         std::string connman_service(service);
         //TODO: make this a call to roboguardian
         system((sout+wifi_restart_wav+" &").c_str());
-        system(("su -c \" connman passphrase " + connman_service +
-                " " + connection_pswd + "\"").c_str());
-        printf(("su -c \" connman passphrase " + connman_service +
-                " " + connection_pswd + "\"").c_str());
-        system(("su -c \" connman autoconnect " + connman_service +
-                " true" + "\"").c_str());
-        printf(("su -c \" connman autoconnect " + connman_service +
-                        " true" + "\"").c_str());
-        system(("su -c \" connman connect " + connman_service + "\" &").c_str());
-        printf(("su -c \" connman connect " + connman_service + "\" &").c_str());
+        command += " && su -c \" connman passphrase " + connman_service +
+                " " + connection_pswd + "\" " +
+                " && su -c \" connman autoconnect " + connman_service +
+                                " true" + "\" " +
+                " && su -c \" connman connect " + connman_service + "\" &";
+        printf(command.c_str());
+        system(command.c_str());
 
         return true;
     } else {
