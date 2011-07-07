@@ -307,7 +307,7 @@ def orbitPointThruAngle(nav):
     #decrease x velocity as we move farther away from that dist
     walkX = (ball.loc.relX - 18) * .045
 
-    #keep constant y velocity, let x and theta changea
+    #keep constant y velocity, let x and theta change
     walkY = orbitDir * .8
 
     #Vary theta based on ball bearing.  increase theta velocity as

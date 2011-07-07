@@ -18,10 +18,7 @@ def ballInPosition(player):
     Make sure ball is somewhere we will kick it. Also makes sure we're looking
     at the ball.
     """
-    if not shouldChaseBall(player):
-        return False
-
-    if player.brain.ball.vis.framesOn < 4:
+    if player.brain.ball.framesOn < 4:
         return False
 
     ball = player.brain.ball

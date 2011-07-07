@@ -1,17 +1,4 @@
-import noggin_constants as NogginConstants
-PENALTY_RELOCALIZE_FRAMES = 100
-
-def penaltyKickRelocalize(player):
-    """
-    Since you will be facing the goal, do loc pans if you are lost
-    """
-    my = player.brain.my
-    if player.firstFrame():
-        player.brain.tracker.locPans()
-    if my.locScore == NogginConstants.locScore.BAD_LOC and \
-            player.counter < PENALTY_RELOCALIZE_FRAMES:
-        return player.stay()
-    return player.goLater('chase')
+# TODO: get rid of this file ??
 
 def penaltyBallInOppGoalbox(player):
     """

@@ -151,9 +151,7 @@ class Navigator(FSA.FSA):
         return self.currentState == 'stopped'
 
     def orbitAngle(self, angleToOrbit):
-
-        if (self.angleToOrbit == angleToOrbit and \
-                self.currentState == 'orbitPointThruAngle'):
+        if (self.currentState == 'orbitPointThruAngle'):
             return
 
         self.angleToOrbit = angleToOrbit
