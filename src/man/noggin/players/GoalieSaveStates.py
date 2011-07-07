@@ -6,7 +6,7 @@ import man.motion.SweetMoves as SweetMoves
 import GoalieTransitions as helper
 import GoalieConstants as goalCon
 
-TESTING = True
+TESTING = False
 
 def goalieSave(player):
 
