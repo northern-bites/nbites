@@ -80,6 +80,7 @@ SET( MOTION_SRCS
 		     SensorAngles
 		     SpringSensor
 		     WalkingLeg
+		     OdometryFilter
 		     WalkingArm
 		     BalancingArm
 		     PreviewController

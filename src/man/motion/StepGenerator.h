@@ -95,6 +95,7 @@
 #include "NBMatrixMath.h"
 #include "ZmpEKF.h"
 #include "ZmpAccExp.h"
+#include "OdometryFilter.h"
 
 //Debugging flags:
 #ifdef WALK_DEBUG
@@ -232,7 +233,9 @@ private:
     NBMath::ufmatrix3 fi_Transform;
     NBMath::ufmatrix3 fc_Transform;
     NBMath::ufmatrix3 cf_Transform;
+
     NBMath::ufmatrix3 cc_Transform; //odometry
+    OdoFilter::ptr odometry;
 
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<NaoPose> pose;

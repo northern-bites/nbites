@@ -18,6 +18,8 @@
 // and the GNU Lesser Public License along with Man.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include <iomanip>
+
 #include "WalkingLeg.h"
 
 using namespace std;
@@ -26,10 +28,13 @@ using namespace Kinematics;
 using namespace NBMath;
 
 //#define DEBUG_WALKINGLEG
+//#define USE_COM_CONTROL
+//#define WALKING_LOCUS_LOGGING
 
 WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
                        const MetaGait * _gait,
                        const SensorAngles * _sensorAngles,
+		       OdoFilter::ptr _odometry,
                        ChainID id)
     :sensors(s),
      state(SUPPORTING),
@@ -39,7 +44,8 @@ WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
      chainID(id), gait(_gait),
      goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      last_goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
-     lastRotation(0.0f),odoUpdate(3,0.0f),
+     odometry(_odometry),
+     lastRotation(0.0f),
      leg_sign(id == LLEG_CHAIN ? 1 : -1),
      leg_name(id == LLEG_CHAIN ? "left" : "right"),
      sensorAngles(_sensorAngles), sensorAngleX(0.0f), sensorAngleY(0.0f)
@@ -123,9 +129,11 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
         throw "Invalid SupportMode passed to WalkingLeg::tick";
     }
 
-    debugProcessing();
+//    cout << "Step: " << step << endl;
+    //  cout << "F->C Transform: " << fc_Transform << endl;
 
     computeOdoUpdate();
+    debugProcessing(fc_Transform);
 
     last_goal = goal;
     lastRotation = getFootRotation();
@@ -229,6 +237,8 @@ LegJointStiffTuple WalkingLeg::supporting(ufmatrix3 fc_Transform){//float dest_x
     goal(1) = dest_y;  //targetY
     goal(2) = -gait->stance[WP::BODY_HEIGHT] - com_height_adjustment; //targetZ
 
+    //cout << "goal X: " << dest_x << " Y: " << dest_y << " Z: " << goal(2) << endl;
+
     vector<float> joint_result = finalizeJoints(goal);
     vector<float> stiff_result = getStiffnesses();
     return LegJointStiffTuple(joint_result,stiff_result);
@@ -270,10 +280,9 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
                                                              footAngleY,
                                                              footAngleZ);
 
-    const ufvector3 bodyGoal =
-	CoordFrame3D::vector3D( -com_c(0)*COM_SCALE,
-				-com_c(1)*COM_SCALE,
-				COM_Z_OFF*COM_SCALE);
+    const ufvector3 bodyGoal = COM_SCALE * CoordFrame3D::vector3D( -com_c(0),
+								   -com_c(1),
+								   COM_Z_OFF);
     IKLegResult result =
         Kinematics::legIK(chainID,comFootGoal,footOrientation,
                           bodyGoal,bodyOrientation);
@@ -282,7 +291,6 @@ const vector<float> WalkingLeg::finalizeJoints(const ufvector3& footGoal){
 
     memcpy(lastJoints, result.angles, LEG_JOINTS*sizeof(float));
     return vector<float>(result.angles, &result.angles[LEG_JOINTS]);
-
 }
 
 const boost::tuple <const float, const float >
@@ -482,23 +490,25 @@ const vector<float> WalkingLeg::getStiffnesses(){
 
 
 inline ChainID WalkingLeg::getOtherLegChainID(){
-    return (chainID==LLEG_CHAIN ?
+    return (chainID==LLEG_CHAIN ? 
             RLEG_CHAIN : LLEG_CHAIN);
 }
 
 
-void WalkingLeg::computeOdoUpdate(){
-    const float thetaDiff = getFootRotation() - lastRotation;
-    //TODO: add a odometry calibration section to walkParams
-    const float thetaCOMMovement = -thetaDiff*0.33f; //.33 is somewhat experimental
-
+void WalkingLeg::computeOdoUpdate() {
     const ufvector3 diff = goal-last_goal;
     const float xCOMMovement = -diff(0);
     const float yCOMMovement = -diff(1);
+    const float thetaCOMMovement = NBMath::safe_atan2(yCOMMovement, xCOMMovement);
 
-    odoUpdate[0] =xCOMMovement*gait->odo[WP::X_SCALE];
-    odoUpdate[1] = yCOMMovement*gait->odo[WP::Y_SCALE];
-    odoUpdate[2] = thetaCOMMovement*gait->odo[WP::THETA_SCALE];
+    odometry->update(xCOMMovement*gait->odo[WP::X_SCALE],
+		     yCOMMovement*gait->odo[WP::Y_SCALE],
+		     thetaCOMMovement*gait->odo[WP::THETA_SCALE]);
+
+    static int counter;
+    std::vector<float> odo = odometry->getOdometry();
+    cout << counter++ << " , " << odo[0] << " , " << odo[1] << " , "
+	 << odo[2] << endl;
 }
 
 /**
@@ -539,7 +549,7 @@ WalkingLeg::getAnglesFromGoal(const ChainID chainID,
  * Assuming this is the support foot, then we can return how far we have moved
  */
 vector<float> WalkingLeg::getOdoUpdate(){
-    return odoUpdate;
+    return odometry->getOdometry();
 }
 
 void WalkingLeg::startLeft(){
@@ -615,7 +625,7 @@ void WalkingLeg::assignStateTimes(boost::shared_ptr<Step> step){
     cycleFrames = step->stepDurationFrames;
 }
 
-void WalkingLeg::debugProcessing(){
+void WalkingLeg::debugProcessing(ufmatrix3 fc_Transform){
 #ifdef DEBUG_WALKING_STATE_TRANSITIONS
     if (firstFrame()){
         if(chainID == LLEG_CHAIN){
@@ -632,21 +642,28 @@ void WalkingLeg::debugProcessing(){
     }
 #endif
 
+//#define DEBUG_WALKING_GOAL_CONTINUITY
 #ifdef DEBUG_WALKING_GOAL_CONTINUITY
     ufvector3 diff = goal - last_goal;
-#define GTHRSH 6
+#define GTHRSH 3
 
+    static int counter;
+    ++counter;
 
-
-    if(diff(0) > GTHRSH || diff(1) > GTHRSH ||diff(2) > GTHRSH ){
+    if(diff(0) > GTHRSH || diff(1) > GTHRSH ){
         if(chainID == LLEG_CHAIN){
             cout << "Left leg ";
         }else
             cout << "Right leg ";
+
         cout << "noticed a big jump from last frame"<< diff<<endl;
         cout << "  from: "<< last_goal<<endl;
         cout << "  to: "<< goal<<endl;
+	cout << " F->C Transform: " << endl << fc_Transform << endl;
 
+	// don't die right away...
+//	if (counter > 60)
+	    //throw "Quitting, examine the matrices";
     }
 #endif
 
