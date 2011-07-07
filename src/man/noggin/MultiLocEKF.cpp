@@ -734,7 +734,8 @@ void MultiLocEKF::clipRobotPose()
     // Check h uncertainty
     xhat_k(2) =
         xhat_k_bar(2) =
-        clip(xhat_k(2), H_EST_MIN, H_EST_MAX);
+        		NBMath::subPIAngle(xhat_k(2));
+    //    clip(xhat_k(2), H_EST_MIN, H_EST_MAX);
 }
 
 void MultiLocEKF::printBeforeUpdateInfo()
