@@ -42,7 +42,8 @@ def positionForKick(player):
         return player.goLater('chase')
 
     #if transitions.shouldKick(player):
-    if transitions.ballInPosition(player) and player.brain.nav.isStopped():
+    if transitions.ballInPosition(player) and (player.brain.nav.isStopped() or
+                                               player.brain.nav.isAtPosition()):
         if transitions.shouldOrbit(player):
             return player.goNow('lookAround')
         else:

@@ -331,9 +331,6 @@ def atPosition(nav):
         helper.setSpeed(nav, 0, 0, 0)
         nav.startOmniCount = 0
 
-    my = nav.brain.my
-    dest = nav.getDestination()
-
     if navTrans.atDestinationCloser(nav) and \
             navTrans.atHeading(nav):
         nav.startOmniCount = 0

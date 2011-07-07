@@ -84,7 +84,7 @@ class KickDecider(object):
         # Check localization to make sure it's good enough.
         if self.brain.my.locScore == NogginConstants.locScore.BAD_LOC:
             print "BAD_LOC!"
-            self.info.kick = self.info.chooseShortQuickKick()
+            self.info.kick = kicks.ORBIT_KICK_POSITION
             return
 
         if self.info.canScoreAll():
