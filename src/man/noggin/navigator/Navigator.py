@@ -1,14 +1,12 @@
 from math import fabs
 from ..util import FSA
 from . import NavStates
-from . import PlaybookPositionStates
-from . import ChaseStates
-from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from objects import RelLocation, RobotLocation
+from objects import RobotLocation
 from ..kickDecider import kicks
+from ..util import MyMath
 
 DEBUG_DESTINATION = True
 
@@ -121,11 +119,17 @@ class Navigator(FSA.FSA):
             print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
                 .format(ball.loc.relX, ball.loc.relY, ball.bearing)
 
-            # HACK so we don't walk into the ball
-        self.setDest(max(ball.loc.relX - self.kick.x_offset - 5, 3),
-                     max(ball.loc.relY - self.kick.y_offset, 3),
-                     max(ball.bearing, 10),
-                     gain)
+        # HACK so we don't walk into the ball
+        changeX = ball.loc.relX - self.kick.x_offset
+        if fabs(changeX) < 3:
+            changeX = 3 * MyMath.sign(changeX)
+        changeY = ball.loc.relY - self.kick.y_offset
+        if fabs(changeY) < 3:
+            changeY = 3 * MyMath.sign(changeY)
+        changeT = ball.bearing
+        if fabs(changeT) < 10:
+            changeT = 10 * MyMath.sign(changeT)
+        self.setDest(changeX,changeY,changeT,gain)
 
     def positionPlaybook(self):
         """robot will walk to the x,y,h from playbook using a mix of omni,

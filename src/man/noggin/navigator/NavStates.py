@@ -1,6 +1,5 @@
 """ States for finding our way on the field """
 
-from ..util import MyMath
 from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
@@ -8,7 +7,6 @@ from . import NavTransitions as navTrans
 from ..objects import RobotLocation
 
 from math import fabs
-import copy
 
 DEBUG = False
 
@@ -300,20 +298,32 @@ def orbitPointThruAngle(nav):
     else:
         orbitDir = constants.ORBIT_RIGHT
 
-    if nav.counter % 10 == 0:
+    if nav.counter % 8 == 0:
         #determine speeds for orbit
         ball = nav.brain.ball
 
         #want x to keep a radius of 17 from the ball, increase and
         #decrease x velocity as we move farther away from that dist
-        walkX = (ball.loc.relX - 18) * .045
+        walkX = (ball.loc.relX - 15) * .037
+        if walkX > 1:
+            walkX = 1
+        elif walkX < -1:
+            walkX = -1
 
         #keep constant y velocity, let x and theta change
         walkY = orbitDir * .85
+        if walkY > 1:
+            walkY = 1
+        elif walkY < -1:
+            walkY = -1
 
         #Vary theta based on ball bearing.  increase theta velocity as
         #we get farther away from facing the ball
-        walkTheta = orbitDir * ball.bearing * .035
+        walkTheta = orbitDir * ball.bearing * .036
+        if walkTheta > 1:
+            walkTheta = 1
+        elif walkTheta < -1:
+            walkTheta = -1
 
         #set speed for orbit
         helper.setSpeed(nav, walkX, walkY, walkTheta )
@@ -321,7 +331,7 @@ def orbitPointThruAngle(nav):
     #Funny enough, we orbit about 1 degree per two frames,
     #So the angle can be used as a thresh
 
-    if nav.counter >= nav.angleToOrbit*2:
+    if nav.counter >= nav.angleToOrbit:
         return nav.goLater('stop')
     return nav.stay()
 

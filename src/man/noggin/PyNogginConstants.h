@@ -161,7 +161,7 @@ namespace noggin {
 
         enum vis_landmark {
             DEFAULT = 0,
-            VISION_YGLP, 
+            VISION_YGLP,
             VISION_YGRP,
             VISION_BGLP,
             VISION_BGRP,
@@ -186,10 +186,10 @@ namespace noggin {
             GOOD_LOC
         };
 
-        static const int GOOD_LOC_XY_UNCERT_THRESH = 30;
+        static const int GOOD_LOC_XY_UNCERT_THRESH = 50;
         static const int GOOD_LOC_THETA_UNCERT_THRESH = 20;
 
-        static const int OK_LOC_XY_UNCERT_THRESH = 130;
+        static const int OK_LOC_XY_UNCERT_THRESH = 100;
         static const int OK_LOC_THETA_UNCERT_THRESH = 30;
 
         static const int BAD_LOC_XY_UNCERT_THRESH = 200;
