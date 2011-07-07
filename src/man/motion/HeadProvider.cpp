@@ -256,16 +256,19 @@ void HeadProvider::setActive(){
 
 
 bool HeadProvider::isDone(){
-    const bool setDone = ((yawDest == lastYawDest)
-                          && (pitchDest == lastPitchDest));
-    const bool scriptedDone = (currChoppedCommand->isDone()
-                               && headCommandQueue.empty());
+    bool setDone, scriptedDone;
     switch(curMode){
     case SET:
-        if (setDone) { currHeadCommand->finishedExecuting(); }
+        setDone = ((yawDest == lastYawDest)
+                   && (pitchDest == lastPitchDest));
+        if (setDone && currHeadCommand) {
+            currHeadCommand->finishedExecuting();
+        }
         return setDone;
         break;
     case SCRIPTED:
+        scriptedDone = (currChoppedCommand->isDone()
+                        && headCommandQueue.empty());
         return scriptedDone;
         break;
     default:
