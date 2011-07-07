@@ -294,12 +294,14 @@ POST_RIGHT_SCAN = (((-65.,-25.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
 GOALIE_POST_LEFT_SCAN = ((( 115.,10.), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
                          (( 35.,-35.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
                          ((-35.,-35.), 0.9, 1, stiff.LOW_HEAD_STIFFNESSES),
-                         ((-115.,10.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES))
+                         ((-115.,10.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+                         ((-115.,10.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 GOALIE_POST_RIGHT_SCAN = (((-115.,10.), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
                           ((-35.,-35.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
                           (( 35.,-35.), 0.9, 1, stiff.LOW_HEAD_STIFFNESSES),
-                          (( 115.,10.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES))
+                          (( 115.,10.), 0.4, 1, stiff.LOW_HEAD_STIFFNESSES),
+                          (( 115.,10.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 KICK_SCAN = (
     ((0.0,-45),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
@@ -308,8 +310,30 @@ KICK_SCAN = (
     ((-90.,-20.),0.5, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0,40.),0.5,1,stiff.LOW_HEAD_STIFFNESSES))
 
+SIDEKICK_PAN_LEFT = (
+    ((0.0,30.0),0.3,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((28.0,7.0),0.7,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((62.0,-20.0),0.8,1,stiff.LOW_HEAD_STIFFNESSES))
+
+SIDEKICK_PAN_RIGHT = (
+    ((0.0,30.0),0.3,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((-23.0,7.0),0.7,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((-62.0,-20.0),0.8,1,stiff.LOW_HEAD_STIFFNESSES))
+
+FRONTKICK_PAN_LEFT = (
+    ((0.0,30.0),0.3,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((35.0,-35.0),0.8,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((-35.0,-35.0),1.2,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0,30.0),0.8,1,stiff.LOW_HEAD_STIFFNESSES))
+
+FRONTKICK_PAN_RIGHT = (
+    ((0.0,30.0),0.3,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((-35.0,-35.0),0.8,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((35.0,-35.0),1.2,1,stiff.LOW_HEAD_STIFFNESSES),
+    ((0.0,30.0),0.8,1,stiff.LOW_HEAD_STIFFNESSES))
+
 PAN_UP = (
-    ((0.,-40.),0.3,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0.,-40.),0.3, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((0.,-40.),0.3, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 PAN_LEFT_HEADS = ( 65.0, -30.0)

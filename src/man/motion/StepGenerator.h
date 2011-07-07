@@ -138,7 +138,7 @@ public:
 
     void resetHard();
 
-    static std::vector<float>*
+    static std::vector<float>
     getDefaultStance(const Gait & wp);
 
     const SupportFoot getSupportFoot() const {
@@ -162,6 +162,10 @@ private: // Helper methods
     void fillZMPEnd(const Step::ptr newStep);
 
     void resetSteps(const bool startLeft);
+    // updates our relative position to a destination based on the Step distances
+    static void countStepTowardsDestination(Step::ptr step, float& dest_x,
+					    float& dest_y, float& dest_theta,
+					    int& framesToDestination);
 
     static const NBMath::ufmatrix3 get_f_fprime(const Step::ptr step);
     static const NBMath::ufmatrix3 get_fprime_f(const Step::ptr step);

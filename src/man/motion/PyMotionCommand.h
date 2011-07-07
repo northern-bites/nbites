@@ -41,8 +41,10 @@ public:
     virtual ~PyMotionCommand() {}
 
     // Generic, exposed to Python for all commands
+
+    // NOTE: this returns motion frames remaining, not Python frames
     int framesRemaining() const { return command->framesRemaining(); }
-    bool isDoneExecuting() const { return command->isDoneExecuting(); }
+    bool isDone() const { return command->isDoneExecuting(); }
     float timeRemaining() const { return command->timeRemaining(); }
 
 protected:

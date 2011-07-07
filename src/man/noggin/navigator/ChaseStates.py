@@ -26,8 +26,8 @@ def crossoverTowardsBall(nav):
     destH = my.headingTo(ball)
     distToBall = ball.dist
 
-    relDestX = ball.relX * CROSSOVER_DIST / distToBall
-    relDestY = ball.relY * CROSSOVER_DIST / distToBall
+    relDestX = ball.loc.relX * CROSSOVER_DIST / distToBall
+    relDestY = ball.loc.relY * CROSSOVER_DIST / distToBall
 
     nonRelDest = RobotLocation(relDestX + my.x,
                                relDestY + my.y,
@@ -61,17 +61,17 @@ def walkSpinToBall(nav):
     ball = nav.brain.ball
 
     nav.dest = ball
-    nav.dest.relX += LEFT_FOOT_OFFSET
-    nav.dest.h = ball.heading
+    #nav.dest.relX += LEFT_FOOT_OFFSET
+    nav.dest.h = ball.loc.heading
     nav.dest.relH = ball.bearing
 
     # Set our walk towards the ball
-    if (nav.dest.dist > constants.OMNI_WALK_DIST_THRESH):
-        walkX, walkY, walkTheta = walker.getWalkStraightParam(nav.brain.my, nav.dest)
-    else:
-        walkX, walkY, walkTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
+    # if (nav.dest.dist > constants.OMNI_WALK_DIST_THRESH):
+    #     walkX, walkY, walkTheta = walker.getWalkStraightParam(nav.brain.my, nav.dest)
+    # else:
+    #     walkX, walkY, walkTheta = walker.getOmniWalkParam(nav.brain.my, nav.dest)
 
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
+    #helper.setSpeed(nav, walkX, walkY, walkTheta)
 
     if not nav.brain.play.isRole(GOALIE):
         if navTrans.shouldNotGoInBox(ball):
@@ -110,14 +110,14 @@ def chaseAroundBox(nav):
 
     if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
         # go to corner nearest ball
-        if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
+        if ball.loc.y > NogginConstants.MY_GOALBOX_TOP_Y:
             nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
                           constants.GOALBOX_OFFSET)
             nav.dest.y = (NogginConstants.MY_GOALBOX_TOP_Y +
                           constants.GOALBOX_OFFSET)
             nav.dest.h = my.headingTo(nav.dest)
 
-        elif ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+        elif ball.loc.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
             nav.dest.x = (NogginConstants.MY_GOALBOX_RIGHT_X +
                           constants.GOALBOX_OFFSET)
             nav.dest.y = (NogginConstants.MY_GOALBOX_BOTTOM_Y -
@@ -166,7 +166,7 @@ def ballInMyBox(nav):
 def dribble(nav):
     ball = nav.brain.ball
     nav.dest = ball
-    nav.dest.h = ball.heading
+    nav.dest.h = ball.loc.heading
 
     # Set our walk towards the ball
     walkX, walkY, walkTheta = \

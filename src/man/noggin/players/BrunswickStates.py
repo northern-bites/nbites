@@ -32,16 +32,17 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.stopWalking()
-        player.gainsOn()
         player.walkPose()
         player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
+        player.gainsOn()
 
         # Works with rules (2011) to get goalie manually positioned
         if (player.lastDiffState == 'gameInitial'
             and not player.brain.play.isRole(GOALIE)):
             return player.goLater('relocalize')
-        if player.lastDiffState == 'gamePenalized':
+
+        elif player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
             return player.goLater('afterPenalty')
 
@@ -69,7 +70,8 @@ def gameSet(player):
 
         if (player.brain.play.isRole(CHASER) and
             player.brain.gameController.ownKickOff):
-            player.hasKickedOff = False
+            print "Setting Kickoff to True"
+            player.shouldKickOff = True
 
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()

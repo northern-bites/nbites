@@ -97,7 +97,7 @@ void NaoEnactor::sendJoints()
 
 #ifndef NO_ACTUAL_MOTION
     try {
-        joint_command[4][0] = dcmProxy->getTime(20);
+        joint_command[4][0] = dcmProxy->getTime(0);
         dcmProxy->setAlias(joint_command); // Takes a long time for some reason
     }
     catch(AL::ALError& a)
@@ -132,7 +132,7 @@ void NaoEnactor::sendHardness()
 
 #ifndef NO_ACTUAL_MOTION
     try {
-        hardness_command[4][0] = dcmProxy->getTime(10);
+        hardness_command[4][0] = dcmProxy->getTime(0);
         dcmProxy->setAlias(hardness_command);
     } catch(AL::ALError& a) {
         std::cout << "DCM Hardness set error" << a.toString() << "    "
@@ -231,7 +231,7 @@ void NaoEnactor::initDCMCommands(){
     us_command[2][0].arraySetSize(2);
     us_command[2][0][0] = (4.0 + 64.0);
     try {
-        us_command[2][0][1] = dcmProxy->getTime(5);
+        us_command[2][0][1] = dcmProxy->getTime(0);
         dcmProxy->set(us_command);
     } catch(AL::ALError& a) {
         std::cout << "DCM ultrasound set error" << a.toString() << "    "

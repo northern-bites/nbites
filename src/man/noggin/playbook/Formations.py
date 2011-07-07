@@ -235,14 +235,14 @@ def fReady(team, workingPlay):
 
 def fTestDefender(team, workingPlay):
     workingPlay.setFormation(PBConstants.TEST_DEFEND)
-    if team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+    if team.brain.ball.loc.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
         Roles.rMiddie(team, workingPlay)
     else:
         Roles.rDefender(team, workingPlay)
 
 def fTestOffender(team, workingPlay):
     workingPlay.setFormation(PBConstants.TEST_OFFEND)
-    if team.brain.ball.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
+    if team.brain.ball.loc.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
         Roles.rMiddie(team, workingPlay)
     else:
         Roles.rOffender(team, workingPlay)

@@ -136,8 +136,14 @@ struct estimate {
     float x;
     // Field coordinate Y, relative to robot's body
     float y;
+    // Distance variance
+    float distance_variance;
+    // Bearing variance
+    float bearing_variance;
+
     estimate() :
-        dist(0.0f), elevation(0.0f), bearing(0.0f), x(0.0f), y(0.0f)
+        dist(0.0f), elevation(0.0f), bearing(0.0f), x(0.0f), y(0.0f),
+        distance_variance(0.0f), bearing_variance(0.0f)
         {}
 
     friend std::ostream& operator<< (std::ostream &o, const estimate &e)
