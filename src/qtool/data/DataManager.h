@@ -17,16 +17,10 @@
 #include "man/memory/Memory.h"
 #include "man/memory/parse/ParsingBoard.h"
 #include "include/MultiProvider.h"
+#include "DataTypes.h"
 
 namespace qtool {
 namespace data {
-
-enum DataEvent {
-    NEW_IMAGE = 17,
-    NEW_VISION_SENSORS,
-    NEW_MOTION_SENSORS,
-    NEW_VISION_INFO
-};
 
 class DataManager : public MultiProvider<DataEvent> {
 
