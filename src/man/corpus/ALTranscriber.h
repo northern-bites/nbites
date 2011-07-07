@@ -56,11 +56,13 @@ public:
     virtual void postVisionSensors(){ syncVisionWithALMemory(); }
 
 private: //Members
-    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessJoints;
-    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessSensors;
-    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessTemps;
-    AL::ALPtr<AL::ALMemoryFastAccess> alfastaccessVision;
+    AL::ALPtr<AL::ALMemoryFastAccess> almemory;
     AL::ALPtr<AL::ALBroker> broker;
+
+    float* jointValuePointers[Kinematics::NUM_JOINTS];
+    float* motionSensorPointers[16];
+    float* jointTempPointers[Kinematics::NUM_JOINTS];
+    float* visionSensorPointers[8];
 
     AccEKF accelerationFilter;
 

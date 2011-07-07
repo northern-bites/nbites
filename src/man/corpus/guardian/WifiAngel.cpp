@@ -14,6 +14,8 @@ using std::string;
 using namespace sound_paths;
 using namespace conn_consts;
 
+#define NO_WIFI_RESET_HARD
+
 WifiAngel::WifiAngel(string connection_name, string connection_pswd) :
         connection_name(connection_name), connection_pswd(connection_pswd),
         frames_with_no_wifi(0) {
