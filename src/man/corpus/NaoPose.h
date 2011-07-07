@@ -203,6 +203,7 @@ class NaoPose {
     const float getDistanceBetweenTwoObjects(estimate e1, estimate e2);
     std::vector<VisualLine> getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
     const boost::numeric::ublas::vector <float> worldPointToPixel(boost::numeric::ublas::vector <float> point);
+    std::vector<angle::radians> headAnglesToRobotPoint(boost::numeric::ublas::vector <float> point);
 
     const float getHeadPitch() {
         return sensors->getVisionAngle(Kinematics::HEAD_PITCH);
@@ -242,6 +243,13 @@ class NaoPose {
     // that function.
     static const float correctDistance(const float uncorrectedDist);
 
+    // Variance as a function of distance
+    // computed by Yoni Ackerman (c) 2011
+    // to update - see the one file that Yoni added
+    // to robobiteS
+    static float getDistanceVariance(float distance);
+    static float getBearingVariance(float distance);
+
  protected: // members
     float bodyInclinationX;
     float bodyInclinationY;
@@ -249,6 +257,7 @@ class NaoPose {
     point <int> horizonLeft, horizonRight;
     float horizonSlope,perpenHorizonSlope;
     point3 <float> focalPointInWorldFrame;
+    boost::numeric::ublas::matrix<float> supportLegToBodyTransform;
     float comHeight; // center of mass height in mm
     // In this array we hold the matrix transformation which takes us from the
     // originn to the end of each chain of the body.

@@ -15,16 +15,8 @@ def goaliePosition(player):
     if player.firstFrame():
         nav.positionPlaybook()
 
-    # When the ball is far away we want to make sure we
-    # are in position
-    if player.penaltyKicking:
-        player.brain.tracker.trackBall()
-    elif ball.dist >= goalCon.ACTIVE_LOC_THRESH:
-        player.brain.tracker.activeLocGoaliePos()
-    elif( my.uncertX> goalCon.UNCERT_TOO_HIGH
-          or my.uncertY > goalCon.UNCERT_TOO_HIGH) :
-        player.brain.tracker.activeLocGoaliePos()
-    else:
+        # When the ball is far away we want to make sure we
+        # are in position
         player.brain.tracker.trackBall()
 
     return player.stay()
@@ -47,12 +39,6 @@ def kickOffPosition(player):
 
     # When the ball is far away we want to make sure we
     # are in position3
-    if player.penaltyKicking :
-        player.brain.tracker.trackBall()
-    elif ball.dist >= goalCon.ACTIVE_LOC_THRESH:
-        player.brain.tracker.activeLocGoaliePos()
-    else:
-        player.brain.tracker.trackBall()
-
+    player.brain.tracker.trackBall()
     return player.stay()
 

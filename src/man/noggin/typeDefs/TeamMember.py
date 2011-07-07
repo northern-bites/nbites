@@ -100,8 +100,8 @@ class TeamMember(RobotLocation):
         self.h = my.h
         self.ballDist = ball.dist
         self.ballBearing = ball.bearing
-        self.ballX = ball.x
-        self.ballY = ball.y
+        self.ballX = ball.loc.x
+        self.ballY = ball.loc.y
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
@@ -155,7 +155,7 @@ class TeamMember(RobotLocation):
             self.brain.out.printf("\tChase time base is " + str(t))
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
-        if not self.brain.ball.vis.on and not self.brain.player.inKickingState:
+        if not self.brain.ball.vis.on and not self.brain.play.isChaser():
             t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:

@@ -12,6 +12,8 @@ class PBInterface:
         self.pb = GoTeam.GoTeam(brain)
         self.subRole = None
         self.lastSubRole = None
+        self.role = None
+        self.lastRole = None
 
     def update(self, play):
         '''
@@ -19,7 +21,12 @@ class PBInterface:
         '''
         self.pb.run(play)
         self.lastSubRole = self.subRole
+        self.lastRole = self.role
         self.subRole = play.subRole
+        self.role = play.role
 
     def subRoleUnchanged(self):
         return (self.subRole == self.lastSubRole)
+
+    def roleChanged(self):
+        return (self.role!= self.lastRole)

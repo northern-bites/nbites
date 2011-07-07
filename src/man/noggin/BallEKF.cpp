@@ -17,7 +17,7 @@ const float BallEKF::GAMMA_BALL_VEL         = 1.0f;
 const float BallEKF::CARPET_FRICTION        = -15; // 25 cm/s^2
 
 // Default initialization values
-const float BallEKF::INIT_BALL_X            = 0.0f;
+const float BallEKF::INIT_BALL_X            = 100.0f;
 const float BallEKF::INIT_BALL_Y            = 0.0f;
 const float BallEKF::INIT_BALL_X_VEL        = 0.0f;
 const float BallEKF::INIT_BALL_Y_VEL        = 0.0f;

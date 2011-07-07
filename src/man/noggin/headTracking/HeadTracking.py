@@ -4,6 +4,7 @@ from . import ActiveLookStates
 from . import BasicStates
 from . import HeadTrackingHelper as helper
 from ..util import FSA
+from ..util import MyMath
 
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""
@@ -17,9 +18,10 @@ class HeadTracking(FSA.FSA):
 
         self.currentState = 'stopped'
         self.setPrintFunction(self.brain.out.printf)
-        self.setPrintStateChanges(False)
+        self.setPrintStateChanges(True)
         self.stateChangeColor = 'yellow'
         self.setName('headTracking')
+        self.decisionState = 'stopped'
 
         self.currentHeadScan = None
         self.headMove = None
@@ -32,10 +34,15 @@ class HeadTracking(FSA.FSA):
         self.activePanUp = False
         self.isPreKickScanning = False
         self.preActivePanHeads = None
+        self.locObjectList = []
+        self.locObjectList.extend(self.brain.myFieldObjects)
         self.helper = helper.HeadTrackingHelper(self)
 
         self.lookDirection = None
+        self.kickName = ""
         self.target = self.brain.ball #default
+
+        # target should either be ball or instance of FieldObject
 
     def stopHeadMoves(self):
         """stop all head moves. In TrackingStates.py"""
@@ -44,28 +51,40 @@ class HeadTracking(FSA.FSA):
             self.switchTo('stop')
 
     def isStopped(self):
-        """Checks that all head moves have stopped"""
+        """Checks that all head moves have stopped."""
         return self.currentState == 'stopped'
 
     def setNeutralHead(self):
-        """executes sweet move to move head to neutral position.
-        Does not call stop head moves. In TrackingStates.py"""
+        """Executes sweet move to move head to neutral position."""
         self.switchTo('neutralHead')
 
     def performHeadMove(self, headMove):
+        """Executes the given headMove, then stops."""
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
     def trackBall(self):
-        """automatically tracks the ball. scans for the ball if not in view"""
+        """
+        Enters a state cycle:
+        When ball is in view, tracks via vision values.
+        When ball is not in view, executes naive pans.
+        """
         self.target = self.brain.ball
         self.gain = 1.0
-        if ( (not self.currentState == 'tracking')
-            and (not self.currentState == 'scanBall') ):
+        if ( self.currentState is not 'tracking'
+             and self.currentState is not 'scanBall'
+             and self.currentState is not 'ballTracking'
+             and self.currentState is not 'activeTracking'
+             and self.currentState is not 'trianglePan'):
             self.switchTo('ballTracking')
 
     def trackBallSpin(self):
-        """automatically tracks the ball. spins if not in view"""
+        """
+        Enters a state cycle:
+        When ball is in view, tracks via vision values.
+        When ball is not in view, continuously executes short pans
+        based on direction robot is spinning.
+        """
         self.target = self.brain.ball
         self.gain = 1.0
         if ( (not self.currentState == 'tracking')
@@ -73,12 +92,18 @@ class HeadTracking(FSA.FSA):
             self.switchTo('ballSpinTracking')
 
     def locPans(self):
-        """repeatedly performs quick pan"""
+        """Repeatedly performs quick pan."""
         self.activeLocOn = False
         self.switchTo('locPans')
 
     def activeLoc(self):
-        """tracks the ball but periodically looks away"""
+        """
+        If ball is visible and close, track it via vision values.
+        If ball is not visible, execute naive pans.
+        If state counter is low enough, track ball via vision values.
+        If state counter is high enough, perform triangle pans
+        and return to last head angles.
+        """
         self.target = self.brain.ball
         self.gain = 1.0
         self.goalieActiveLoc = False
@@ -88,6 +113,7 @@ class HeadTracking(FSA.FSA):
     # only need to set goalieActiveLoc in this
     # and activeLoc because they are the only states
     # that directly initially call activeTracking
+
     def activeLocGoaliePos(self):
         """looks at the ball for shorter amount of time that activeLoc"""
         self.target = self.brain.ball
@@ -97,33 +123,59 @@ class HeadTracking(FSA.FSA):
             self.switchTo('activeTracking')
 
     def preKickScan(self):
-        """Scans up very quickly to see  """
+        """
+        Pan up once (quickly), then stop.
+        """
         if not self.isPreKickScanning:
             self.isPreKickScanning = True
             self.switchTo('scanQuickUp')
 
     def kickDecideScan(self):
-        self.lastDiffState = 'stop'
+        """Execute a triangle pan."""
+        self.lastDiffState = 'stop' # doesn't seem to do anything...
         self.goalieActiveLoc = False
-        if self.currentState != 'trianglePan':
+        if (self.currentState != 'trianglePan' or
+            self.currentState != 'trianglePanLeft' or
+            self.currentState != 'trianglePanRight' or
+            self.currentState != 'trianglePanReturn'):
             self.switchTo('trianglePan')
 
-    def startScan(self,  newScan):
-        """repeatedly performs passed in scan"""
+    def afterKickScan(self, name):
+        """
+        After a kick, looks in the appropriate direction
+        that the ball was kicked in.
+        """
+        self.target = self.brain.ball
+        self.kickName = name
+        self.switchTo('afterKickScan')
+
+    def startScan(self, newScan):
+        """Repeatedly performs the given scan."""
         if newScan != self.currentHeadScan:
             self.currentHeadScan = newScan
             self.switchTo('scanning')
 
     def lookToDir(self,  direction):
-        """performs scripted look: down, up, right, or left"""
+        """
+        Performs scripted look: down, up, right, or left.
+        If ball becomes visible, go to state 'ballTracking'.
+        """
         if self.currentState is not 'look' or \
                 self.lookDirection != direction:
             self.lookDirection = direction
             self.switchTo('look')
 
     def trackTarget(self, target):
-        """automatically tracks landmark, scans for landmark if not in view
-        only works if target has attribute locDist, framesOn, framesOff,x,y"""
+        """
+        Someone else: Track given target via vision information while possible.
+        Once target is no longer visible, perform naive pans.
+        If target becomes visible again, either return to state
+        'targetTracking' or go to state 'activeTracking'.
+
+        Lizzie: automatically tracks landmark, scans for landmark if not in view
+        only works if target has attribute loc.dist, framesOn, framesOff,x,y
+        """
+
         self.target = target
         self.target.height = 0
         self.gain = 1.0
@@ -133,18 +185,30 @@ class HeadTracking(FSA.FSA):
             self.switchTo('targetTracking')
 
     def lookToTarget(self, target):
-        """looks toward our best guess of landmark position based on loc"""
+        """Look towards given target, using localization values."""
         self.target.height = 0
         self.switchTo('lookToPoint')
 
-    def lookToPoint(self, goalX=0, goalY=0, goalHeight=0):
-        """continuously looks toward our best guess of goal based on loc"""
+    def lookToPoint(self, goalX=0, goalY=0, goalZ=0):
+        """
+        Continuously looks at given relative coordinates.
+        """
         self.target.x = goalX
         self.target.y = goalY
-        self.target.height = goalHeight
-        #allows us to update target values but not confuse FSA
-        if not self.currentState == 'lookToPoint':
-            self.switchTo('lookToPoint')
+        self.target.height = goalZ
+        self.helper.lookToPoint(self.target)
+
+    def lookToAngles(self,pitch,yaw):
+        """Looks to the given head angles. """
+        self.helper.lookToAngles(yaw,pitch)
 
     def bounceHead(self):
+        """Continually bounce head up and down."""
         self.switchTo('bounceUp')
+
+    def orbitPan(self):
+        """
+        Continually bounces head up to see goalposts, then
+        back down to see the ball.
+        """
+        self.switchTo('panOrbit')

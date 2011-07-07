@@ -21,19 +21,21 @@ use warnings;
 use File::Find;
 use Env '@PATH';
 
+# Constants, colors, debug, etc.
 my $DEBUG = "";
 my $BUILD = "yes";
 my $DOT_OPTS = '-Tpng -O'; # outputs in png format
 
-my @addedStateFiles;
-my $lastBehavior;
-
 my $nowChar = '*';
 my $laterChar = '^';
 
-# colors chosen in no particular order
+# (colors chosen in no particular order)
 my @stateFileColors = qw ( blue Brown Crimson Green Indigo
-Peru deeppink goldenrod firebrick dodgerblue cyan4 chocolate4 yellow4 );
+cyan4 Peru deeppink goldenrod dodgerblue firebrick chocolate4 yellow4 );
+
+# Per FSA data structures
+my @addedStateFiles;
+my $lastBehavior;
 
 # access each StateFile by its behaviorName (eg pBrunswick)
 # for example, @{$stateFiles{PenaltyKickStates}{penaltyBallInOppGoalbox}{chase}}
@@ -111,7 +113,7 @@ sub readBehavior {
           }
 
           # this line defines a function, set state variables accordingly
-	  # don't use elsif here incase eof is in one of the lines already found
+          # don't use elsif here incase eof is in one of the lines already found
           if (/def\ (\w+)/ || eof) {
               # we were already parsing a function, it must have ended
               # currentFunction is a state? if so add its transitions
@@ -119,15 +121,17 @@ sub readBehavior {
               if ($currentFunction && $found_legal_return)  {
                   # add the transitions
                   foreach my $transition (@currentTransitions) {
-                      uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}}, $transition);
+                      uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}},
+                                $transition);
                   }
 
-		  # clear the transitions so we don't add them in wrong places
-		  @currentTransitions = ();
+                  # clear the transitions so we don't add them in wrong places
+                  @currentTransitions = ();
 
                   # and note if the state contains a loop
                   if ($current_can_loop) {
-                      push @{$stateFiles{$currentBehavior}{$currentFunction}}, "player.stay()";
+                      uniqueAdd(\@{$stateFiles{$currentBehavior}{$currentFunction}},
+                                ($currentFunction . $nowChar));
                       $current_can_loop = "";
                   }
                   $found_legal_return = "";
@@ -178,7 +182,7 @@ sub findFile ($) {
     my $behavior = shift;
     our $behaviorFile = $behavior . '.py';
 
-    my $dir = $ENV{'PWD'};
+    my $dir = $ENV{'NBITES_DIR'};
 
     # `find ./ -name $behaviorFile"
     sub matchesName {
@@ -230,19 +234,14 @@ sub buildDOT {
     foreach my $file ( keys %stateFiles ) {
         foreach my $state ( keys %{$stateFiles{$file}}) {
           TRANSITION: foreach my $toState (@{$stateFiles{$file}{$state}}) {
-              if ($toState !~ /player\.stay/) {
-                  if ($toState =~ /\*/) { # nowChar marker
-                      $toState =~ s/\*//;
-                      print DOT "$state -> $toState;\n";
-                  }
-                  else {
-                      $toState =~ s/\^//; # goLater transitions are dotted
-                      print DOT "$state -> $toState [style=\"dotted\"];\n";
-                  }
+              if ($toState =~ /\*/) { # nowChar marker
+                  $toState =~ s/\*//;
+                  print DOT "$state -> $toState;\n";
               }
-	      else { # add loops to ourselves
-		  print DOT "$state -> $state;\n";
-	      }
+              else {
+                  $toState =~ s/\^//; # goLater transitions are dotted
+                  print DOT "$state -> $toState [style=\"dotted\"];\n";
+              }
           }
         }
     }
@@ -308,4 +307,10 @@ foreach my $behaviorFile (@ARGV) {
 
     print "\n:::building .dot and .png files:::\n";
     buildDOT($behaviorFile, $initialBehavior);
+
+    # and reset the data structures for the next FSA
+    %stateFiles = ();
+    %stateFileUsedColors = ();
+    @addedStateFiles = ();
+    undef $lastBehavior
 }
