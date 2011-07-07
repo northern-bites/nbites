@@ -122,9 +122,9 @@ class Navigator(FSA.FSA):
                 .format(ball.loc.relX, ball.loc.relY, ball.bearing)
 
             # HACK so we don't walk into the ball
-        self.setDest(max(ball.loc.relX - self.kick.x_offset - 5, 1),
-                     max(ball.loc.relY - self.kick.y_offset, 1),
-                     max(ball.bearing, 5),
+        self.setDest(max(ball.loc.relX - self.kick.x_offset - 5, 3),
+                     max(ball.loc.relY - self.kick.y_offset, 3),
+                     max(ball.bearing, 10),
                      gain)
 
     def positionPlaybook(self):

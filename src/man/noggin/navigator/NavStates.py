@@ -300,22 +300,23 @@ def orbitPointThruAngle(nav):
     else:
         orbitDir = constants.ORBIT_RIGHT
 
-    #determine speeds for orbit
-    ball = nav.brain.ball
+    if nav.counter % 10 == 0:
+        #determine speeds for orbit
+        ball = nav.brain.ball
 
-    #want x to keep a radius of 17 from the ball, increase and
-    #decrease x velocity as we move farther away from that dist
-    walkX = (ball.loc.relX - 18) * .045
+        #want x to keep a radius of 17 from the ball, increase and
+        #decrease x velocity as we move farther away from that dist
+        walkX = (ball.loc.relX - 18) * .045
 
-    #keep constant y velocity, let x and theta change
-    walkY = orbitDir * .8
+        #keep constant y velocity, let x and theta change
+        walkY = orbitDir * .85
 
-    #Vary theta based on ball bearing.  increase theta velocity as
-    #we get farther away from facing the ball
-    walkTheta = orbitDir * ball.bearing * .035
+        #Vary theta based on ball bearing.  increase theta velocity as
+        #we get farther away from facing the ball
+        walkTheta = orbitDir * ball.bearing * .035
 
-    #set speed for orbit
-    helper.setSpeed(nav, walkX, walkY, walkTheta )
+        #set speed for orbit
+        helper.setSpeed(nav, walkX, walkY, walkTheta )
 
     #Funny enough, we orbit about 1 degree per two frames,
     #So the angle can be used as a thresh
