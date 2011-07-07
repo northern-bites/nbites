@@ -29,8 +29,6 @@ QTool::~QTool() {
     delete colorCreator;
     delete dataLoader;
     delete toolTabs;
-
-    delete dataManager;
 }
 
 }

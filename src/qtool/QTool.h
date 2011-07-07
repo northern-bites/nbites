@@ -28,7 +28,7 @@ public:
 private:
     QTabWidget* toolTabs;
 
-    data::DataManager* dataManager;
+    data::DataManager::ptr dataManager;
     data::DataLoader* dataLoader;
     colorcreator::ColorCreator* colorCreator;
 };

@@ -17,7 +17,7 @@ namespace colorcreator {
 using data::DataManager;
 using man::memory::RoboImage;
 
-ColorCreator::ColorCreator(DataManager* dataManager, QWidget *parent) :
+ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     QWidget(parent),
     dataManager(dataManager),
     ui(new Ui::ColorCreator),

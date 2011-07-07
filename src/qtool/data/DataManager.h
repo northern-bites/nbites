@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <boost/shared_ptr.hpp>
+
 #include "DataSource.h"
 #include "man/memory/Memory.h"
 #include "man/memory/parse/ParsingBoard.h"
@@ -27,6 +29,9 @@ enum DataEvent {
 };
 
 class DataManager : public MultiProvider<DataEvent> {
+
+public:
+	typedef boost::shared_ptr<DataManager> ptr;
 
 public:
     DataManager();

@@ -56,7 +56,7 @@ public:
     enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black, BlueGreen, BlueNavy, OrangeRed};
     enum Choices {Single, Multiple};
     enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE, Table};
-    ColorCreator(qtool::data::DataManager* dataManager,
+    ColorCreator(qtool::data::DataManager::ptr dataManager,
             QWidget *parent = 0);
     ~ColorCreator();
     void updateDisplays();
@@ -133,7 +133,7 @@ private:
     Ui::ColorCreator *ui;
     const man::memory::RoboImage* roboImage;
     YUVImage yuvImage;
-    qtool::data::DataManager* dataManager;
+    qtool::data::DataManager::ptr dataManager;
     ColorTable *table;
     QString baseDirectory;
     QString currentDirectory;

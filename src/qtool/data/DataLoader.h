@@ -23,7 +23,7 @@ class DataLoader : public QWidget
     Q_OBJECT
 
 public:
-    DataLoader(DataManager* dataManager ,QWidget *parent = 0);
+    DataLoader(DataManager::ptr dataManager ,QWidget *parent = 0);
     ~DataLoader();
 
 private:
@@ -33,7 +33,7 @@ private slots:
     void newDataSource(DataSource::ptr dataSource);
 
 private:
-    DataManager* dataManager;
+    DataManager::ptr dataManager;
     DataFinder* dataFinder;
 };
 
