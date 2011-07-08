@@ -1,7 +1,7 @@
 # Test class for landmark tracking localization system
 
 import man.motion.SweetMoves as SweetMoves
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 from man.motion import MotionConstants
 
 def gameInitial(player):

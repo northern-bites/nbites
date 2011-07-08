@@ -2,6 +2,7 @@
 # States for positioning the goalie.
 #
 import GoalieConstants as goalCon
+import GoalieTransitions as goalTran
 
 def goaliePosition(player):
     """
@@ -14,10 +15,10 @@ def goaliePosition(player):
 
     if player.firstFrame():
         nav.positionPlaybook()
-
-        # When the ball is far away we want to make sure we
-        # are in position
         player.brain.tracker.trackBall()
+
+    if goalTran.goalieIsLost(player):
+        return player.goLater('spinToField')
 
     return player.stay()
 
@@ -41,4 +42,6 @@ def kickOffPosition(player):
     # are in position3
     player.brain.tracker.trackBall()
     return player.stay()
+
+
 
