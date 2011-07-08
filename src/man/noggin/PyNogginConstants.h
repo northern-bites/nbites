@@ -189,7 +189,7 @@ namespace noggin {
         static const int GOOD_LOC_XY_UNCERT_THRESH = 50;
         static const int GOOD_LOC_THETA_UNCERT_THRESH = 20;
 
-        static const int OK_LOC_XY_UNCERT_THRESH = 100;
+        static const int OK_LOC_XY_UNCERT_THRESH = 90;
         static const int OK_LOC_THETA_UNCERT_THRESH = 30;
 
         static const int BAD_LOC_XY_UNCERT_THRESH = 200;

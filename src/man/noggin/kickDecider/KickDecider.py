@@ -129,6 +129,7 @@ class KickDecider(object):
 
         #kickDest = self.info.bestAlignedDest([constants.SHOOT_RIGHT_AIM_POINT,
         #                                      constants.SHOOT_LEFT_AIM_POINT])
+        #                                      constants.SHOOT_CENTER_AIM_POINT])
         kickDest = constants.SHOOT_CENTER_AIM_POINT # HACK just want to hit the target
 
         # Next we want to find the best kick that will hit that point.

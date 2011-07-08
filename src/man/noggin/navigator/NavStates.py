@@ -319,7 +319,7 @@ def orbitPointThruAngle(nav):
 
         #Vary theta based on ball bearing.  increase theta velocity as
         #we get farther away from facing the ball
-        walkTheta = orbitDir * ball.bearing * .036
+        walkTheta = orbitDir * ball.bearing * .052
         if walkTheta > 1:
             walkTheta = 1
         elif walkTheta < -1:
