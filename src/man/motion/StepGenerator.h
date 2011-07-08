@@ -179,7 +179,7 @@ private: // Helper methods
 
     void resetQueues();
     void resetOdometry(const float initX, const float initY);
-    void updateOdometry(const std::vector<float> &deltaOdo);
+    void updateOdometry();
     void debugLogging();
     void update_FtoI_transform();
 private:

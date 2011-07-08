@@ -380,11 +380,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     LegJointStiffTuple right = rightLeg.tick(rightStep_f,swingingStepSource_f,
 					     swingingStep_f,fc_Transform);
 
-    if(supportStep_f->foot == LEFT_FOOT){
-        updateOdometry(leftLeg.getOdoUpdate());
-    }else{
-        updateOdometry(rightLeg.getOdoUpdate());
-    }
+    updateOdometry();
 
     //HACK check to see if we are done - still too soon, but works! (see graphs)
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
@@ -838,7 +834,7 @@ void StepGenerator::countStepTowardsDestination(Step::ptr step, float& dest_x,
 
     // necessary (HACK!) because steps will alternate +/- in Y and Theta
     if (sign(dest_y) == sign(step->y))
-	    dest_y -= step->y;
+	dest_y -= step->y;
 
     if (sign(dest_theta) == sign(step->theta))
 	dest_theta -= step->theta;
@@ -1247,8 +1243,21 @@ void StepGenerator::resetOdometry(const float initX, const float initY){
  *  We may not correctly account for the rotation around the S frame
  *  rather than the C frame, which is what we are actually returning.
  */
+void StepGenerator::updateOdometry() {
+    vector<float> left = leftLeg.getOdoUpdate();
+    vector<float> right = rightLeg.getOdoUpdate();
 
-void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
+    vector<float> deltaOdo(3,0);
+
+    //static int fCount;
+    //cout << fCount << " ";
+    for (unsigned int i = 0; i < 3; ++i) {
+	deltaOdo[i] = (left[i] + right[i])*0.5f;
+	cout << deltaOdo[i] << " ";
+    }
+    //cout << endl;
+    //fCount++;
+
     const ufmatrix3 odoUpdate = prod(CoordFrame3D::translation3D(deltaOdo[0],
                                                                  deltaOdo[1]),
                                      CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,

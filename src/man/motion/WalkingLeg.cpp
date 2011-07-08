@@ -136,7 +136,7 @@ LegJointStiffTuple WalkingLeg::tick(boost::shared_ptr<Step> step,
     debugProcessing(fc_Transform);
 
     last_goal = goal;
-    lastRotation = getFootRotation();
+    lastRotation = getFootRotation_c();
     frameCounter++;
     //Decide if it's time to switch states
 
@@ -499,16 +499,12 @@ void WalkingLeg::computeOdoUpdate() {
     const ufvector3 diff = goal-last_goal;
     const float xCOMMovement = -diff(0);
     const float yCOMMovement = -diff(1);
-    const float thetaCOMMovement = NBMath::safe_atan2(yCOMMovement, xCOMMovement);
+    const float thetaCOMMovement = getFootRotation_c() - lastRotation;
 
+    // TODO: move last_goal - goal tracking into OdoFilter class
     odometry->update(xCOMMovement*gait->odo[WP::X_SCALE],
 		     yCOMMovement*gait->odo[WP::Y_SCALE],
 		     thetaCOMMovement*gait->odo[WP::THETA_SCALE]);
-
-    static int counter;
-    std::vector<float> odo = odometry->getOdometry();
-    cout << counter++ << " , " << odo[0] << " , " << odo[1] << " , "
-	 << odo[2] << endl;
 }
 
 /**
@@ -549,7 +545,15 @@ WalkingLeg::getAnglesFromGoal(const ChainID chainID,
  * Assuming this is the support foot, then we can return how far we have moved
  */
 vector<float> WalkingLeg::getOdoUpdate(){
-    return odometry->getOdometry();
+    std::vector<float> odo = odometry->getOdometry();
+
+#ifdef POOPIES
+    static int counter;
+    cout << counter++ << " , " << odo[0] << " , " << odo[1] << " , "
+	 << odo[2] << endl;
+#endif
+
+    return odo;
 }
 
 void WalkingLeg::startLeft(){
