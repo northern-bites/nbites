@@ -1,7 +1,7 @@
 from man.motion import MotionConstants
 from . import TrackingConstants as constants
 from objects import RelLocation
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 from ..playbook import PBConstants
 from ..players import GoalieConstants
 
@@ -83,7 +83,7 @@ def activeTracking(tracker):
             tracker.target.vis.on:
         if tracker.brain.play.isRole(PBConstants.GOALIE):
             return tracker.goLater('trianglePan')
-        if tracker.brain.my.locScore == NogginConstants.GOOD_LOC:
+        if tracker.brain.my.locScore == NogginConstants.locScore.GOOD_LOC:
             return tracker.goLater('panToFieldObject')
         else:
             return tracker.goLater('trianglePan')

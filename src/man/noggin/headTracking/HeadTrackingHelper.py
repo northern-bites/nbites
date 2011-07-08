@@ -4,7 +4,7 @@ from man.motion import MotionConstants
 from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
 from math import (fabs, atan, radians, hypot)
-from ..typeDefs.Landmarks import FieldObject
+from objects import FieldObject
 
 class HeadTrackingHelper(object):
     def __init__(self, tracker):

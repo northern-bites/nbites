@@ -1,5 +1,5 @@
 from . import TrackingConstants as constants
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 import man.motion.HeadMoves as HeadMoves
 from math import (fabs)
 
