@@ -8,7 +8,10 @@ def findBall(player):
     State to stop all activity and begin finding the ball
     """
     if transitions.shouldChaseBall(player):
-        return player.goLater('chase')
+        if not player.brain.play.isChaser():
+            return player.goLater('playbookPosition')
+        else:
+            return player.goLater('chase')
 
     if player.firstFrame():
         player.stopWalking()

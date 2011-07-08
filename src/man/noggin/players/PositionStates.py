@@ -1,6 +1,5 @@
 import noggin_constants as NogginConstants
-from . import ChaseBallConstants as ChaseConstants
-import man.motion.HeadMoves as HeadMoves
+import ChaseBallTransitions as transitions
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
 import PositionTransitions as PosTran
@@ -31,6 +30,9 @@ def playbookPosition(player):
     if PosTran.leavingTheField(player):
         return player.goLater('spinToField')
 
+    if transitions.shouldFindBall(player):
+        return player.goLater('findBall')
+
     return player.stay()
 
 def spinToField(player):
@@ -47,7 +49,6 @@ def spinToField(player):
 
     elif player.brain.nav.isAtPosition():
         return player.goLater('playbookPosition')
-
     return player.stay()
 
 
