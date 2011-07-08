@@ -263,11 +263,12 @@ def trianglePanRight(tracker):
 
 def trianglePanReturn(tracker):
 
-    if tracker.firstFrame():
-        tracker.lastMove = tracker.helper.lookToPoint(tracker.brain.ball)
-
-    elif tracker.lastMove.isDone() or tracker.target.vis.on:
+    if not tracker.firstFrame() and \
+            (tracker.lastMove.isDone() or tracker.target.vis.on):
         return tracker.goLater(tracker.preTriangleState)
+
+    if tracker.counter % 5 == 0:
+        tracker.lastMove = tracker.helper.lookToPoint(tracker.brain.ball)
 
     return tracker.stay()
 
