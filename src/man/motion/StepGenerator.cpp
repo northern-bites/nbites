@@ -1275,24 +1275,25 @@ void StepGenerator::updateOdometry() {
 
     vector<float> deltaOdo(3,0);
 
-    /* odometry explodes in the X sometimes during the swinging phase, so we
-       always ask the supporting leg.
-       Explanation: the swinging leg swings from negative to positive in X in the
+    /* odometry explodes in the X during the swinging phase, so we always ask
+       the supporting leg.
+       Explanation: the swinging leg moves from negative to positive in X in the
          F frame, and the difference values used for odometry explode when the leg
 	 crosses the zero of its own axis.
      */
     if (leftLeg.isSupporting())
-	deltaOdo[0] = xOdoFilter.X(left[0]);
+	deltaOdo[0] = static_cast<float>(xOdoFilter.X(left[0]));
     else
-	deltaOdo[0] = xOdoFilter.X(right[0]);
+	deltaOdo[0] = static_cast<float>(xOdoFilter.X(right[0]));
 
-    // average the motion delta from the legs (Y)
+    /* average the motion delta from the legs (Y)
+       this tracks a point approximately between our two legs, and reflects
+       actual robot motion much better */
     deltaOdo[1] = (left[1] + right[1])*0.5f;
 
     // use the hacked delta theta calculated in swapSupportLegs
     deltaOdo[2] = dThetaPerMotionFrame;
 
-#define DEBUG_ODOMETRY_UPDATE
 #ifdef DEBUG_ODOMETRY_UPDATE
     static int fCount;
     cout << fCount++ << " "

@@ -29,6 +29,7 @@ using namespace std;
 using namespace Kinematics;
 
 //#define DEBUG_WALKPROVIDER
+//#define DEBUG_ODOMETRY
 
 WalkProvider::WalkProvider(shared_ptr<Sensors> s,
                            shared_ptr<NaoPose> _pose)

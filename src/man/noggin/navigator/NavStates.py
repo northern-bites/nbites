@@ -256,9 +256,21 @@ def destWalking(nav):
     elif -1 != nav.currentCommand.framesRemaining() < 40:
         nav.nearDestination = True
 
+    if DEBUG and nav.counter % 3 is 0:
+        print "destCommand in progress: {0} frames, {1} X {2} Y remaining"\
+              .format(nav.currentCommand.framesRemaining(),
+                      nav.currentCommand.remainingX(),
+                      nav.currentCommand.remainingY())
+
     if nav.counter > 1 and \
-            (nav.currentCommand.isDone() or
-             not nav.brain.motion.isWalkActive()):
+           (nav.currentCommand.isDone() or
+            not nav.brain.motion.isWalkActive()):
+        # see why we went to atPosition
+        if DEBUG:
+            print "isWalkActive? {0}, commandDone? {1}, counter? {2}"\
+                  .format(nav.brain.motion.isWalkActive(),
+                          nav.currentCommand.isDone(),
+                          nav.counter)
         nav.nearDestination = True
         return nav.goNow('atPosition')
 
