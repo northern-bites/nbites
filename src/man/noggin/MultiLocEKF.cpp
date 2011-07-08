@@ -242,7 +242,7 @@ void MultiLocEKF::resetLocTo(float x, float y, float h)
     for (int i=0; i < loc_ekf_dimension; ++i){
         xhat_k(i) = xhat_k_bar(i) = 0.0f;
         for (int j=0; j < loc_ekf_dimension; ++j){
-            A_k(i,j) = Q_k(i,j) = P_k(i,j) = P_k_bar(i,j) = 0.0f;
+            P_k(i,j) = P_k_bar(i,j) = 0.0f;
         }
     }
     setXEst(x);

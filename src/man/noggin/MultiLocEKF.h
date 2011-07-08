@@ -143,17 +143,17 @@ public:
     /**
      * @param val The new uncertainty for loc x position
      */
-    void setXUncert(float val) { P_k(0,0) = val; }
+    void setXUncert(float val) { P_k(0,0) = P_k_bar(0,0) = val; }
 
     /**
      * @param val The new uncertainty for loc y position
      */
-    void setYUncert(float val) { P_k(1,1) = val; }
+    void setYUncert(float val) { P_k(1,1) = P_k_bar(1,1) = val; }
 
     /**
      * @param val The new uncertainty for loc h position
      */
-    void setHUncert(float val) { P_k(2,2) = val; }
+    void setHUncert(float val) { P_k(2,2) = P_k_bar(2,2) = val; }
 
     /**
      * @param _use True if we are to use ambiguous landmark observations
