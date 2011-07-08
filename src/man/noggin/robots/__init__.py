@@ -3,6 +3,7 @@ import os
 from . import BirthCertificate
 
 from man.motion import RobotGaits as gaits
+from man.motion import SweetMoves as moves
 
 def read_hostname():
 	"""
@@ -34,6 +35,7 @@ and is thus responsible for saving the Universe.''',
 			backwards_gait = gaits.MARVIN_BACKWARDS_GAIT,
 			slow_gait = gaits.MARVIN_SLOW_GAIT,
 			spin_gait = gaits.CUR_SPIN_GAIT,
+            back_standup = moves.STAND_UP_BACK,
 			)
 
 slarti = BirthCertificate.BirthCertificate(
@@ -50,6 +52,7 @@ pieces of the Wikkit Gate!''',
 			backwards_gait = gaits.SLARTI_BACKWARDS_GAIT,
 			slow_gait = gaits.SLARTI_SLOW_GAIT,
 			spin_gait = gaits.CUR_SPIN_GAIT,
+            back_standup = moves.STAND_UP_BACK,
 			)
 
 trillian = BirthCertificate.BirthCertificate(
@@ -64,6 +67,7 @@ rebellion, I became a highly successful Sub Etha radio reporter.''',
 			backwards_gait = gaits.TRILLIAN_BACKWARDS_GAIT,
 			slow_gait = gaits.TRILLIAN_SLOW_GAIT,
 			spin_gait = gaits.CUR_SPIN_GAIT,
+            back_standup = moves.STAND_UP_BACK,
 			)
 
 zaphod = BirthCertificate.BirthCertificate(
@@ -80,6 +84,7 @@ Krikkit robots.''',
 			backwards_gait = gaits.ZAPHOD_BACKWARDS_GAIT,
 			slow_gait = gaits.ZAPHOD_SLOW_GAIT,
 			spin_gait = gaits.CUR_SPIN_GAIT,
+            back_standup = moves.STAND_UP_BACK,
 			)
 
 spock = BirthCertificate.BirthCertificate(
