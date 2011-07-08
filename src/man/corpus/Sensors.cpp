@@ -834,7 +834,6 @@ void Sensors::saveFrame() {
 
     // Write sensors
     float sensor_data[NUM_SENSORS];
-    uint bytes_copied;
     FSR lfsr = getLeftFootFSR();
     sensor_data[0] = lfsr.frontLeft;
     sensor_data[1] = lfsr.frontRight;

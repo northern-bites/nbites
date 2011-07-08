@@ -5,6 +5,8 @@
 
 import noggin_constants as NogCon
 import GoalieConstants as goalCon
+import PositionTransitions as PosTran
+
 
 #SAVING TRANSITIONS
 
@@ -71,6 +73,10 @@ def goalieInBox(player):
     my = player.brain.my
 
     return my.inMyGoalBox()
+
+def goalieIsLost(player):
+
+    return PosTran.leavingTheField(player)
 
 
 #CHASE TRANSITIONS
