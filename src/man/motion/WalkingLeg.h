@@ -180,9 +180,9 @@ private:
     Kinematics::ChainID chainID; //keep track of which leg this is
     const MetaGait *gait;
     float lastJoints[Kinematics::LEG_JOINTS];
-    NBMath::ufvector3 goal;
-    NBMath::ufvector3 last_goal;
+    NBMath::ufvector3 goal, last_goal;
     OdoFilter::ptr odometry;
+    std::vector<float> odoDiff;
     float lastRotation;
     int leg_sign; //-1 for right leg, 1 for left leg
     std::string leg_name;

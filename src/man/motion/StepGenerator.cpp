@@ -67,6 +67,7 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s,
       cf_Transform(CoordFrame3D::identity3D()),
       cc_Transform(CoordFrame3D::identity3D()),
       lastRotation(0), avgStepRotation(0), dThetaPerMotionFrame(0),
+      xOdoFilter(Boxcar(1)),
       sensors(s), pose(p), gait(_gait), nextStepIsLeft(true),
       leftLeg(s,gait,&sensorAngles, LLEG_CHAIN),
       rightLeg(s,gait,&sensorAngles, RLEG_CHAIN),
@@ -464,7 +465,7 @@ void StepGenerator::swapSupportLegs(){
      * angle, since it comes from the reverse transformation.
      */
     const float rotationThisStep = -1*swing_dest_angle;
-    cout << "step rotation " << rotationThisStep;
+    //cout << "step rotation " << rotationThisStep;
 
     avgStepRotation = (lastRotation + rotationThisStep)*0.5f;
     lastRotation = rotationThisStep;
@@ -472,7 +473,7 @@ void StepGenerator::swapSupportLegs(){
     dThetaPerMotionFrame = avgStepRotation /
 	static_cast<float>(lastQueuedStep->stepDurationFrames);
 
-    cout << " rotation per motion frame " << dThetaPerMotionFrame << endl;
+    //cout << " rotation per motion frame " << dThetaPerMotionFrame << endl;
 
     //we use the swinging source to calc. a path for the swinging foot
     //it is not clear now if we will need to angle offset or what
@@ -1274,15 +1275,32 @@ void StepGenerator::updateOdometry() {
 
     vector<float> deltaOdo(3,0);
 
-    //static int fCount;
-    //cout << fCount << " ";
-    for (unsigned int i = 0; i < 3; ++i) {
-	deltaOdo[i] = (left[i] + right[i])*0.5f;
-	//cout << deltaOdo[i] << " ";
-    }
-    //cout << endl;
-    //fCount++;
+    /* odometry explodes in the X sometimes during the swinging phase, so we
+       always ask the supporting leg.
+       Explanation: the swinging leg swings from negative to positive in X in the
+         F frame, and the difference values used for odometry explode when the leg
+	 crosses the zero of its own axis.
+     */
+    if (leftLeg.isSupporting())
+	deltaOdo[0] = xOdoFilter.X(left[0]);
+    else
+	deltaOdo[0] = xOdoFilter.X(right[0]);
 
+    // average the motion delta from the legs (Y)
+    deltaOdo[1] = (left[1] + right[1])*0.5f;
+
+    // use the hacked delta theta calculated in swapSupportLegs
+    deltaOdo[2] = dThetaPerMotionFrame;
+
+#define DEBUG_ODOMETRY_UPDATE
+#ifdef DEBUG_ODOMETRY_UPDATE
+    static int fCount;
+    cout << fCount++ << " "
+	 << deltaOdo[0] << " "
+	 << deltaOdo[1] << " "
+	 << deltaOdo[2] << " "
+	 << endl;
+#endif
     const ufmatrix3 odoUpdate = prod(CoordFrame3D::translation3D(deltaOdo[0],
                                                                  deltaOdo[1]),
                                      CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,

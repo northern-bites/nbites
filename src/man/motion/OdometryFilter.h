@@ -51,7 +51,8 @@ public:
     virtual double X(double X) { return X; }
 
 private:
-    Butterworth velX, velY, velTheta; // separate filter for each dimension
+    Boxcar velX, velTheta; // separate filter for each dimension
+    Butterworth velY;
 };
 
 #endif

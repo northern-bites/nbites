@@ -44,6 +44,7 @@ WalkingLeg::WalkingLeg(boost::shared_ptr<Sensors> s,
      goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      last_goal(CoordFrame3D::vector3D(0.0f,0.0f,0.0f)),
      odometry(new OdoFilter()),
+     odoDiff(std::vector<float>()),
      lastRotation(0.0f),
      leg_sign(id == LLEG_CHAIN ? 1 : -1),
      leg_name(id == LLEG_CHAIN ? "left" : "right"),
@@ -164,7 +165,6 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
 	dist_to_cover_y = cur_dest->y - swing_src->y;
     }
 
-
     //There are two attirbutes to control - the height off the ground, and
     //the progress towards the goal.
 
@@ -192,6 +192,22 @@ LegJointStiffTuple WalkingLeg::swinging(ufmatrix3 fc_Transform){
     goal(0) = target_c_x;
     goal(1) = target_c_y;
     goal(2) = -gait->stance[WP::BODY_HEIGHT] + heightOffGround;
+
+/*
+    if ( (goal(0) - last_goal(0) ) > 5) {
+	cout << "broken goal x" << endl
+	     << "fc_Transform: " << fc_Transform << endl
+	     << "dest_f " << dest_f
+	     << "src_f " << src_f
+	     << "dest_c " << dest_c << endl
+	     << "src_c " << src_c << endl
+	     << "target_f " << target_f << endl
+	     << "target_c " << target_c << endl
+	     << "percent complete " << percent_complete << "theta " << theta
+	     << " percent to horizontal " << percent_to_dest_horizontal << endl;
+	throw "Found a bad value, dying";
+    }
+*/
 
     vector<float> joint_result = finalizeJoints(goal);
 
@@ -498,12 +514,11 @@ void WalkingLeg::computeOdoUpdate() {
     const ufvector3 diff = goal-last_goal;
     const float xCOMMovement = -diff(0);
     const float yCOMMovement = -diff(1);
-    const float thetaCOMMovement = getFootRotation_c() - lastRotation;
+    const float thetaCOMMovement = 0; // set elsewhere
 
-    // TODO: move last_goal - goal tracking into OdoFilter class
-    odometry->update(xCOMMovement*gait->odo[WP::X_SCALE],
-		     yCOMMovement*gait->odo[WP::Y_SCALE],
-		     thetaCOMMovement*gait->odo[WP::THETA_SCALE]);
+    odometry->update(    xCOMMovement * gait->odo[WP::X_SCALE],
+		         yCOMMovement * gait->odo[WP::Y_SCALE],
+		     thetaCOMMovement * gait->odo[WP::THETA_SCALE]);
 }
 
 /**
@@ -659,14 +674,11 @@ void WalkingLeg::debugProcessing(ufmatrix3 fc_Transform){
         }else
             cout << "Right leg ";
 
-        cout << "noticed a big jump from last frame"<< diff<<endl;
-        cout << "  from: "<< last_goal<<endl;
-        cout << "  to: "<< goal<<endl;
-	cout << " F->C Transform: " << endl << fc_Transform << endl;
-
-	// don't die right away...
-//	if (counter > 60)
-	    //throw "Quitting, examine the matrices";
+        cout << "noticed a big jump from last frame" << endl
+	     << " difference: " << diff
+	     << "  from: "<< last_goal << endl
+	     << "  to: "<< goal << endl
+	     << " F->C Transform: " << endl << fc_Transform << endl;
     }
 #endif
 

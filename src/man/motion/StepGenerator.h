@@ -96,6 +96,7 @@
 #include "ZmpEKF.h"
 #include "ZmpAccExp.h"
 #include "OdometryFilter.h"
+#include "dsp.h"
 
 //Debugging flags:
 #ifdef WALK_DEBUG
@@ -236,6 +237,7 @@ private:
 
     NBMath::ufmatrix3 cc_Transform;
     float lastRotation, avgStepRotation, dThetaPerMotionFrame;
+    Boxcar xOdoFilter;
 
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<NaoPose> pose;

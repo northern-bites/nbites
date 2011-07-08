@@ -1,12 +1,14 @@
 
 #include "OdometryFilter.h"
 
-const int width = 20;
+const int y_width = 20;
+const int x_width = 1;
+const int theta_width = 1;
 
 OdoFilter::OdoFilter()
-    : velX(width),
-      velY(width),
-      velTheta(width)
+    : velX(x_width),
+      velY(y_width),
+      velTheta(theta_width)
 {
     Reset();
 }
