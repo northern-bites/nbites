@@ -17,7 +17,7 @@ NUM_OBJECTIVES = 6
  OBJECTIVE_ORBIT,
  OBJECTIVE_UNCLEAR) = range(NUM_OBJECTIVES)
 
-SHOOT_FRACTION = 0.125 # how far in along goal width should we shoot?
+SHOOT_FRACTION = 0.145 # how far in along goal width should we shoot?
 SHOOT_Y_OFFSET = NogginConstants.GOAL_WIDTH*SHOOT_FRACTION
 SIDELINE_KICKOFF_OFFSET = 80.
 LEFT_CLEAR_POINT = Location(NogginConstants.OPP_GOALBOX_LEFT_X,

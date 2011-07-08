@@ -1,5 +1,4 @@
 import man.motion as motion
-from man.noggin.util import MyMath
 from math import fabs
 import NavConstants as constants
 
@@ -155,4 +154,3 @@ def updateGait(nav, x, y, theta):
         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
     else:
         nav.brain.CoA.setRobotGait(nav.brain.motion)
-

@@ -426,6 +426,7 @@ class GoTeam:
             if self.willBeIllegalD > PBConstants.DONT_ILLEGAL_D_THRESH:
                 self.brain.player.inKickingState = False
                 self.stopAvoidingBox = 0
+                return False    # HACK loc is too broken to do this. we keep being defender.
                 return True
         elif ball.vis.on:
             self.stopAvoidingBox += 1

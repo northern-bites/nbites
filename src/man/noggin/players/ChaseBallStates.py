@@ -2,9 +2,7 @@
 Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
-import ChaseBallConstants as constants
 import GoalieTransitions as goalTran
-from man.motion import HeadMoves
 from ..playbook.PBConstants import GOALIE
 
 def chase(player):
@@ -44,15 +42,30 @@ def positionForKick(player):
         return player.goLater('chase')
 
     #if transitions.shouldKick(player):
-    if transitions.ballInPosition(player):
+    if transitions.ballInPosition(player) and (player.brain.nav.isStopped() or
+                                               player.brain.nav.isAtPosition()):
         if transitions.shouldOrbit(player):
-            if player.penaltyKicking:
-                return player.goNow('penaltyKickRelocalize')
-            else:
+            return player.goNow('lookAround')
+        else:
+            return player.goNow('kickBallExecute')
+
+    return player.stay()
+
+def lookAround(player):
+    """
+    Nav is stopped. We want to look around to get better loc.
+    """
+    if player.firstFrame():
+        player.brain.tracker.stopHeadMoves() # HACK so that tracker goes back to stopped.
+        player.brain.tracker.kickDecideScan()
+
+    if player.brain.tracker.isStopped() and player.counter > 2:
+        player.brain.kickDecider.decideKick()
+        if transitions.shouldOrbit(player) and not player.penaltyKicking:
                 print "Don't have a kick, orbitting"
                 return player.goNow('orbitBall')
         else:
-            return player.goNow('kickBallExecute')
+            return player.goLater('chase')
 
     return player.stay()
 
@@ -61,18 +74,8 @@ def orbitBall(player):
     State to orbit the ball
     """
     if player.firstFrame():
-        player.brain.tracker.stopHeadMoves()
-        player.brain.tracker.kickDecideScan()
-
-    # if player.brain.tracker.isStopped():
-    #     player.brain.tracker.trackBall()
-
-        # Only orbit if we still don't have a kick
-        # player.brain.kickDecider.decideKick()
-        # if not transitions.shouldOrbit(player):
-        #     return player.goLater('chase')
-
-    player.brain.nav.orbitAngle(90) # TODO HACK HACK
+        player.brain.tracker.trackBall()
+        player.brain.nav.orbitAngle(90) # TODO HACK HACK
 
     if transitions.shouldFindBall(player) or player.brain.nav.isStopped():
         player.inKickingState = False

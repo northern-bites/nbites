@@ -38,6 +38,8 @@ NUM_LOOK_DIRS = 4
 
 KICK_DICT = {"L_Side"          : HeadMoves.SIDEKICK_PAN_RIGHT,
              "R_Side"          : HeadMoves.SIDEKICK_PAN_LEFT,
+             "L_Short_Side"    : HeadMoves.SIDEKICK_PAN_RIGHT,
+             "R_Short_Side"    : HeadMoves.SIDEKICK_PAN_LEFT,
              "L_D_Straight"    : HeadMoves.FRONTKICK_PAN_LEFT,
              "R_D_Straight"    : HeadMoves.FRONTKICK_PAN_RIGHT,
              "L_ShortStraight" : HeadMoves.FRONTKICK_PAN_LEFT,

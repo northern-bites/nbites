@@ -61,10 +61,10 @@ class KickDecider(object):
             self.setKick(self.info.chooseShortQuickKick())
         # do a side kick pass depending on where the offender is.
         elif self.brain.playbook.pb.kickoffFormation == 0:
-            self.setKick(kicks.RIGHT_SIDE_KICK)
+            self.setKick(kicks.SHORT_RIGHT_SIDE_KICK)
             print "Kickoff RIGHT_SIDE_KICK"
         else:
-            self.setKick(kicks.LEFT_SIDE_KICK)
+            self.setKick(kicks.SHORT_LEFT_SIDE_KICK)
             print "Kickoff LEFT_SIDE_KICK"
 
         self.info.kickObjective = constants.OBJECTIVE_KICKOFF
@@ -84,7 +84,9 @@ class KickDecider(object):
         # Check localization to make sure it's good enough.
         if self.brain.my.locScore == NogginConstants.locScore.BAD_LOC:
             print "BAD_LOC!"
-            self.info.kick = self.info.chooseShortQuickKick()
+            print "Uncertainty: ", self.brain.loc.xUncert, self.brain.loc.yUncert,\
+                self.brain.loc.hUncert
+            self.info.kick = kicks.ORBIT_KICK_POSITION
             return
 
         if self.info.canScoreAll():
@@ -127,6 +129,7 @@ class KickDecider(object):
 
         #kickDest = self.info.bestAlignedDest([constants.SHOOT_RIGHT_AIM_POINT,
         #                                      constants.SHOOT_LEFT_AIM_POINT])
+        #                                      constants.SHOOT_CENTER_AIM_POINT])
         kickDest = constants.SHOOT_CENTER_AIM_POINT # HACK just want to hit the target
 
         # Next we want to find the best kick that will hit that point.
