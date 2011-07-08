@@ -11,20 +11,28 @@ using namespace man::memory;
 
 LogViewer::LogViewer(DataManager::ptr dataManager) :
 		dataManager(dataManager),
-		roboImageViewer(dataManager->getMemory()->getRoboImage().get()){
+		roboImageViewer(new RoboImageViewer(
+				dataManager->getMemory()->getRoboImage())){
 
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->setAlignment(Qt::AlignTop);
 
+	dataManager->addSubscriber(roboImageViewer, NEW_IMAGE);
+
 	std::vector<QTreeView> messageViewers;
 	for (MObject_ID id = FIRST_OBJECT;
 					id != LAST_OBJECT; id++) {
-		if (id == MIMAGE_ID) {
-			connect(dataManager.get(), SIGNAL(newDataEvent(DataEvent)),
-					roboImageViewer, SLOT(newDataEvent(DataEvent)));
+		if (id != MIMAGE_ID) {
+			data::treemodel::ProtoNode* root =
+					new data::treemodel::ProtoNode(NULL, NULL,
+							dataManager->getMemory()->getProtoMessage(id).get());
+			data::treemodel::TreeModel* messageModel = new data::treemodel::TreeModel(root);
+			QTreeView* view = new QTreeView;
+			view->setModel(messageModel);
+			layout->addWidget(view);
 		}
 	}
-	layout->addWidget(&roboImageViewer);
+	layout->addWidget(roboImageViewer);
 	this->setLayout(layout);
 
 }

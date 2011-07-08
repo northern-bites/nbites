@@ -33,6 +33,7 @@ add_library(viewer
 target_link_libraries(
   viewer
   treemodel
+  image
   memory
   ${QT_LIBRARIES}
   )

@@ -14,6 +14,7 @@
 #include "data/DataLoader.h"
 #include "data/DataManager.h"
 #include "colorcreator/ColorCreator.h"
+#include "viewer/LogViewer.h"
 
 namespace qtool {
 
@@ -31,6 +32,7 @@ private:
     data::DataManager::ptr dataManager;
     data::DataLoader* dataLoader;
     colorcreator::ColorCreator* colorCreator;
+    viewer::LogViewer* logViewer;
 };
 
 }

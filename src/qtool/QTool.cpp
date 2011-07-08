@@ -7,13 +7,14 @@ namespace qtool {
 using data::DataManager;
 using data::DataLoader;
 using colorcreator::ColorCreator;
-
+using viewer::LogViewer;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
-        colorCreator(new ColorCreator(dataManager)){
+        colorCreator(new ColorCreator(dataManager)),
+        logViewer(new LogViewer(dataManager)){
 
     this->setWindowTitle(tr("HackTool"));
 
@@ -21,6 +22,7 @@ QTool::QTool() : QMainWindow(),
 
     toolTabs->addTab(colorCreator, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
+    toolTabs->addTab(logViewer, tr("Log Viewer"));
 
     dataManager->addSubscriber(colorCreator, data::NEW_IMAGE);
 }

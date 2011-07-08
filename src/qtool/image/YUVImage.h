@@ -25,7 +25,7 @@ class YUVImage
 {
 
 public:
-    YUVImage(const man::memory::RoboImage* _roboImage);
+    YUVImage(man::memory::RoboImage::const_ptr _roboImage);
     virtual ~YUVImage();
     virtual void updateFromRoboImage();
     void read(QString filename);
@@ -47,7 +47,7 @@ public:
 
 
 protected:
-    const man::memory::RoboImage* roboImage;
+    man::memory::RoboImage::const_ptr roboImage;
 
     unsigned int width;
     unsigned int height;

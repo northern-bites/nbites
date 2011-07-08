@@ -28,7 +28,7 @@ public:
 
 private:
 	data::DataManager::ptr dataManager;
-	RoboImageViewer roboImageViewer;
+	RoboImageViewer* roboImageViewer;
 
 };
 
