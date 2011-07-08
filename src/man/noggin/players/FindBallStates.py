@@ -7,8 +7,13 @@ def findBall(player):
     """
     State to stop all activity and begin finding the ball
     """
+    if player.firstFrame():
+        player.doneFindBallState = player.lastDiffState
     if transitions.shouldChaseBall(player):
-        return player.goLater('chase')
+        if player.doneFindBallState == 'playbookPosition':
+            return player.goLater('playbookPosition')
+        else:
+            return player.goLater('chase')
 
     if player.firstFrame():
         player.stopWalking()

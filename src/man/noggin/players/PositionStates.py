@@ -1,6 +1,5 @@
 import noggin_constants as NogginConstants
-from . import ChaseBallConstants as ChaseConstants
-import man.motion.HeadMoves as HeadMoves
+import ChaseBallTransitions as transitions
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
 
@@ -25,6 +24,9 @@ def playbookPosition(player):
             brain.tracker.locPans()
         else:
             brain.tracker.activeLoc()
+
+    if transitions.shouldFindBall(player):
+        return player.goLater('findBall')
 
     return player.stay()
 
