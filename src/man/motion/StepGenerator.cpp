@@ -66,10 +66,10 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s,
       fc_Transform(CoordFrame3D::identity3D()),
       cf_Transform(CoordFrame3D::identity3D()),
       cc_Transform(CoordFrame3D::identity3D()),
+      lastRotation(0), avgStepRotation(0), dThetaPerMotionFrame(0),
       sensors(s), pose(p), gait(_gait), nextStepIsLeft(true),
-      odometry(new OdoFilter()),
-      leftLeg(s,gait,&sensorAngles, odometry, LLEG_CHAIN),
-      rightLeg(s,gait,&sensorAngles, odometry, RLEG_CHAIN),
+      leftLeg(s,gait,&sensorAngles, LLEG_CHAIN),
+      rightLeg(s,gait,&sensorAngles, RLEG_CHAIN),
       leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),
       supportFoot(LEFT_SUPPORT),
       controller_x(new Observer()),
@@ -436,6 +436,7 @@ void StepGenerator::swapSupportLegs(){
     //using the stepTransform matrix from above
     ufvector3 swing_src_f = prod(stepTransform,origin);
 
+
     //Third, do the dest. of the swinging leg, which is more complicated
     //We get the translation matrix that takes points in next f-type
     //coordinate frame, namely the one that will be centered at the swinging
@@ -451,6 +452,27 @@ void StepGenerator::swapSupportLegs(){
     //we can simply read this out of the aforementioned translation matr.
     //this only works because its a 3D homog. coord matr - 4D would break
     float swing_dest_angle = -safe_asin(swing_reverse_trans(1,0));
+
+    /* save the rotation of this step, so we can use it to update odometry
+     * this is kind of a HACK but it gives us a dTheta per motion frame
+     * that is proportional to our actual dTheta, and in the correct direction.
+     *
+     * To make it better, look at the odometry methods inside WalkingLeg and use
+     * the matrices there possibly?
+     *
+     * NOTE: The sign of the rotation is switched to get our movement from the
+     * angle, since it comes from the reverse transformation.
+     */
+    const float rotationThisStep = -1*swing_dest_angle;
+    cout << "step rotation " << rotationThisStep;
+
+    avgStepRotation = (lastRotation + rotationThisStep)*0.5f;
+    lastRotation = rotationThisStep;
+
+    dThetaPerMotionFrame = avgStepRotation /
+	static_cast<float>(lastQueuedStep->stepDurationFrames);
+
+    cout << " rotation per motion frame " << dThetaPerMotionFrame << endl;
 
     //we use the swinging source to calc. a path for the swinging foot
     //it is not clear now if we will need to angle offset or what
@@ -1240,8 +1262,11 @@ void StepGenerator::resetOdometry(const float initX, const float initY){
 /**
  * Called once per motion frame to update the odometry
  *
- *  We may not correctly account for the rotation around the S frame
- *  rather than the C frame, which is what we are actually returning.
+ * For odometry, we average the position of both legs to find a point that
+ * is approximately in the middle of our convex hull. We do this so that
+ * the odometry remains stable over time, instead of oscillating in the X/Y/T
+ * as the robot takes steps. This method also applies the delta odometry to
+ * build cc_Transform (doc'd elsewhere)
  */
 void StepGenerator::updateOdometry() {
     vector<float> left = leftLeg.getOdoUpdate();
@@ -1253,7 +1278,7 @@ void StepGenerator::updateOdometry() {
     //cout << fCount << " ";
     for (unsigned int i = 0; i < 3; ++i) {
 	deltaOdo[i] = (left[i] + right[i])*0.5f;
-	cout << deltaOdo[i] << " ";
+	//cout << deltaOdo[i] << " ";
     }
     //cout << endl;
     //fCount++;

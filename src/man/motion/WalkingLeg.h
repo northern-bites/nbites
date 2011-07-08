@@ -86,7 +86,6 @@ public:
     WalkingLeg(    boost::shared_ptr<Sensors> s,
                    const MetaGait * _gait,
                    const SensorAngles * _sensorAngles,
-		   OdoFilter::ptr _odometry,
                    Kinematics::ChainID id);
     ~WalkingLeg();
 

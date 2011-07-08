@@ -234,8 +234,8 @@ private:
     NBMath::ufmatrix3 fc_Transform;
     NBMath::ufmatrix3 cf_Transform;
 
-    NBMath::ufmatrix3 cc_Transform; //odometry
-    OdoFilter::ptr odometry;
+    NBMath::ufmatrix3 cc_Transform;
+    float lastRotation, avgStepRotation, dThetaPerMotionFrame;
 
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<NaoPose> pose;
