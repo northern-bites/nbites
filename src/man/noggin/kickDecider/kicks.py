@@ -52,7 +52,7 @@ RIGHT_DYNAMIC_STRAIGHT_KICK = Kick("R_D_Straight", y = -5,
 
 # TODO ! make a null kick here.
 # used when we haven't decided what kick to do yet
-ORBIT_KICK_POSITION = Kick("NULL_KICK", x = DEFAULT_KICK_X_OFFSET + 6, y = 0)
+ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 10, y = 0)
 
 LEFT_LONG_BACK_KICK =  Kick("L_LongBack", x = 12, y =  6.5,
                             move=SweetMoves.LEFT_LONG_BACK_KICK)

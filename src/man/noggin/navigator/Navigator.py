@@ -106,11 +106,11 @@ class Navigator(FSA.FSA):
 
         ball = self.brain.ball
 
-        # slow down as we get near the ball (max 80% speed)
-        if ball.dist < 30:
-            gain = min(.8, (0.4 + (ball.dist / 30)) * .8)
-        else:
-            gain = .8
+        # # slow down as we get near the ball (max 80% speed)
+        # if ball.dist < 30:
+        #     gain = min(.8, (0.4 + (ball.dist / 30)) * .8)
+        # else:
+        gain = .6
 
         # TODO later?
         #self.destTheta = self.kick.heading - self.brain.my.h
@@ -123,14 +123,16 @@ class Navigator(FSA.FSA):
 
         # HACK so we don't walk into the ball
         changeX = ball.loc.relX - self.kick.x_offset - 3
-        if fabs(changeX) < min_step:
-            changeX = min_step * MyMath.sign(changeX)
+        # if fabs(changeX) < min_step:
+        #     changeX = min_step * MyMath.sign(changeX)
+
         changeY = ball.loc.relY - self.kick.y_offset
-        if fabs(changeY) < min_step:
-            changeY = min_step * MyMath.sign(changeY)
+        # if fabs(changeY) < min_step:
+        #     changeY = min_step * MyMath.sign(changeY)
+
         changeT = ball.bearing
-        if fabs(changeT) < 10:
-            changeT = 10 * MyMath.sign(changeT)
+        # if fabs(changeT) < 10:
+        #     changeT = 10 * MyMath.sign(changeT)
         self.setDest(changeX,changeY,changeT,gain)
 
     def positionPlaybook(self):

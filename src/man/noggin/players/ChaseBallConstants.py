@@ -29,8 +29,8 @@ SHOULD_KICK_AGAIN_Y = 9
 # Ball in position
 ## NOTE: important that these values slightly overestimate the values in
 ##        navigator's PFK. Otherwise there can be bad looping.
-BALL_X_OFFSET = 5
-BALL_Y_OFFSET = 5
+BALL_X_OFFSET = 8
+BALL_Y_OFFSET = 8
 
 # Switch between speed and destination modes when positioning for kick
 BALL_SET_DEST_CUTOFF = 80

@@ -59,8 +59,8 @@ CHASE_BUFFER = 10
 CHASE_RIGHT_X_LIMIT = NogCon.MY_GOALBOX_RIGHT_X + 80
 
 # Sanity checks for chasing
-CHASE_RELX_BUFFER = 150
-STOP_CHASE_RELX_BUFFER = 150
+CHASE_RELX_BUFFER = 80
+STOP_CHASE_RELX_BUFFER = 80
 
 # *****************
 #       Other     *
