@@ -70,8 +70,7 @@ def shouldChase(team):
 
     if (ball.loc.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.CHASE_BUFFER
         and ball.loc.relX < goalCon.CHASE_RELX_BUFFER
-        and ball.vis.on
-        ):
+        and ball.vis.on):
         team.shouldChaseCounter += 1
 
     if team.shouldChaseCounter > goalCon.CHANGE_THRESH:
@@ -104,7 +103,7 @@ def shouldStopChase(team):
             team.resetGoalieRoleCounters()
             return True
 
-    elif (ball.loc.x > goalCon.CHASE_RIGHT_X_LIMIT
+    if (ball.loc.x > goalCon.CHASE_RIGHT_X_LIMIT
         or ball.loc.relX > goalCon.STOP_CHASE_RELX_BUFFER):
         team.shouldStopChaseCounter += 1
 
