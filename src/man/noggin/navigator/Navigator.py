@@ -119,13 +119,15 @@ class Navigator(FSA.FSA):
             print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
                 .format(ball.loc.relX, ball.loc.relY, ball.bearing)
 
+        min_step = 2
+
         # HACK so we don't walk into the ball
-        changeX = ball.loc.relX - self.kick.x_offset
-        if fabs(changeX) < 3:
-            changeX = 3 * MyMath.sign(changeX)
+        changeX = ball.loc.relX - self.kick.x_offset - 3
+        if fabs(changeX) < min_step:
+            changeX = min_step * MyMath.sign(changeX)
         changeY = ball.loc.relY - self.kick.y_offset
-        if fabs(changeY) < 3:
-            changeY = 3 * MyMath.sign(changeY)
+        if fabs(changeY) < min_step:
+            changeY = min_step * MyMath.sign(changeY)
         changeT = ball.bearing
         if fabs(changeT) < 10:
             changeT = 10 * MyMath.sign(changeT)
