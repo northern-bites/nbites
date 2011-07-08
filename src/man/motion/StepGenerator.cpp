@@ -1279,8 +1279,10 @@ void StepGenerator::updateOdometry() {
        the supporting leg.
        Explanation: the swinging leg moves from negative to positive in X in the
          F frame, and the difference values used for odometry explode when the leg
-	 crosses the zero of its own axis.
+	 crosses X-axis zero.
      */
+    // NOTE: x odometry is currently set up to be filtered, but we're using a 1-width
+    // Boxcar filter so no filtering actually takes place.
     if (leftLeg.isSupporting())
 	deltaOdo[0] = static_cast<float>(xOdoFilter.X(left[0]));
     else
