@@ -25,7 +25,7 @@ def positionForKick(player):
     once we get close. This allows Player to monitor Navigator's progress as it
     positions.
     """
-    if player.penaltyKicking and player.brain.ball.inOppGoalBox():
+    if player.penaltyKicking and player.brain.ball.loc.inOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
 
     if player.firstFrame():
