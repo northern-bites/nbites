@@ -30,9 +30,6 @@ def playbookPosition(player):
     if PosTran.leavingTheField(player):
         return player.goLater('spinToField')
 
-    if transitions.shouldFindBall(player):
-        return player.goLater('findBall')
-
     return player.stay()
 
 def spinToField(player):
