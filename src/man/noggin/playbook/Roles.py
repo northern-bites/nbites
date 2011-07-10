@@ -69,7 +69,6 @@ def rGoalie(team, workingPlay):
         else:
             SubRoles.pGoalieCenter(team, workingPlay)
 
-
 def rChaser(team, workingPlay):
     '''sets current position for chaser since positioning is done by player'''
     if not workingPlay.isRole(PBConstants.CHASER):

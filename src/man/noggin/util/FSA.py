@@ -203,7 +203,6 @@ class FSA:
             self.counter +=1
             self.stateTime = self.getTime() - self.startTime
 
-
     #Debug methods
     def setPrintStateChanges(self, bool):
         ''' Pass True to enable printing of the state name after state switch'''

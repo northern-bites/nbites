@@ -9,6 +9,7 @@ def scanBall(tracker):
     If ball is in view, go to last diff state.
     """
     ball = tracker.brain.ball
+
     if (tracker.target == ball and
         tracker.target.vis.framesOn >=
         constants.TRACKER_FRAMES_ON_TRACK_THRESH):
@@ -16,7 +17,6 @@ def scanBall(tracker):
         tracker.activeLocOn = False
         return tracker.goNow('ballTracking')
 
-    #Here we choose where to look for the ball first
     if not tracker.brain.motion.isHeadActive():
         if ball.dist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.helper.executeHeadMove(HeadMoves.HIGH_WIDE_SCAN_BALL)
@@ -25,6 +25,7 @@ def scanBall(tracker):
             tracker.helper.executeHeadMove(HeadMoves.MID_DOWN_WIDE_SCAN_BALL)
         else:
             tracker.helper.executeHeadMove(HeadMoves.FULL_SCAN_BALL)
+
     return tracker.stay()
 
 def spinScanBall(tracker):
@@ -103,6 +104,7 @@ def panLeftOnce(tracker):
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)
+
     return tracker.stay()
 
 def panRightOnce(tracker):
@@ -116,6 +118,7 @@ def panRightOnce(tracker):
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)
+
     return tracker.stay()
 
 def panUpOnce(tracker):
@@ -129,6 +132,7 @@ def panUpOnce(tracker):
 
     elif not tracker.brain.motion.isHeadActive():
         return tracker.goLater(tracker.lastDiffState)
+
     return tracker.stay()
 
 def postScan(tracker):
@@ -139,6 +143,7 @@ def postScan(tracker):
             or not tracker.brain.motion.isHeadActive():
         tracker.activeLocOn = False
         tracker.helper.executeHeadMove(HeadMoves.POST_SCAN)
+
     return tracker.stay()
 
 def activeLocScan(tracker):
@@ -168,6 +173,7 @@ def returnHeadsPan(tracker):
             tracker.target.vis.on:
         tracker.helper.trackObject()
         return tracker.goLater(tracker.lastDiffState)
+
     return tracker.stay()
 
 def look(tracker):
@@ -182,6 +188,7 @@ def look(tracker):
         return tracker.stay()
     if tracker.brain.ball.vis.on:
         return tracker.goNow('ballTracking')
+
     return tracker.stay()
 
 def scanQuickUp(tracker):
@@ -219,10 +226,10 @@ def scanQuickUp(tracker):
         return tracker.goNow('panUpOnce')
 
 
-MOTION_START_BUFFER = 2
-
 # anything that calls this should make sure that
 # goalieActiveLoc is set to proper value ( most likely false)
+# TODO: These pans are different. so make them different states so
+# the boolean flag doesn't mess us up.
 def trianglePan(tracker):
     """
     Execute either a left or right triangle scan. Then, return to
@@ -280,6 +287,7 @@ def bounceUp(tracker):
         tracker.helper.panTo(HeadMoves.PAN_UP_HEADS)
     elif not tracker.brain.motion.isHeadActive():
         return tracker.goLater('bounceDown')
+
     return tracker.stay()
 
 def bounceDown(tracker):
@@ -290,6 +298,7 @@ def bounceDown(tracker):
         tracker.helper.panTo(HeadMoves.PAN_DOWN_HEADS)
     elif not tracker.brain.motion.isHeadActive():
         return tracker.goLater('bounceUp')
+
     return tracker.stay()
 
 def orbitPanUp(tracker):
@@ -300,6 +309,7 @@ def orbitPanUp(tracker):
         tracker.helper.executeHeadMove(HeadMoves.LOOK_UP)
     elif not tracker.brain.motion.isHeadActive():
         return tracker.goLater('orbitPanDown')
+
     return tracker.stay()
 
 def orbitPanDown(tracker):
@@ -309,6 +319,8 @@ def orbitPanDown(tracker):
     """
     if tracker.firstFrame():
         tracker.helper.executeHeadMove(HeadMoves.LOOK_DOWN)
+
     if tracker.brain.ball.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         return tracker.goLater('orbitPanUp')
+
     return tracker.stay()

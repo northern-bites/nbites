@@ -6,14 +6,13 @@ from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation
 from ..kickDecider import kicks
-from ..util import MyMath
 
-DEBUG_DESTINATION = True
+DEBUG_DESTINATION = False
 
 class Navigator(FSA.FSA):
-    def __init__(self,brain):
-        """it gets you where you want to go"""
+    """it gets you where you want to go"""
 
+    def __init__(self,brain):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.addStates(NavStates)
@@ -119,8 +118,6 @@ class Navigator(FSA.FSA):
             print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
                 .format(ball.loc.relX, ball.loc.relY, ball.bearing)
 
-        min_step = 2
-
         # HACK so we don't walk into the ball
         changeX = ball.loc.relX - self.kick.x_offset - 3
         # if fabs(changeX) < min_step:
@@ -146,7 +143,6 @@ class Navigator(FSA.FSA):
         self.dest = dest
         self.destType = constants.GO_TO_DEST
         self.switchTo('goToPosition')
-
 
     def stop(self):
         if ((self.currentState =='stop' or self.currentState == 'stopped')
@@ -205,6 +201,8 @@ class Navigator(FSA.FSA):
     def isAtPosition(self):
         return self.currentState is 'atPosition'
 
+
+    # TODO: put in helper or something not accessible to other FSAs
     #################################################################
     #             ::Walk speed memory::                             #
     #                                                               #

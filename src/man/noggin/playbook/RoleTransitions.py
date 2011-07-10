@@ -5,7 +5,6 @@ from ..players import GoalieConstants as goalCon
 # GOALIE*
 #********
 
-
 def shouldPositionForSave(team):
     """ We should get ready to save because a robot is
     in a position to shoot or is getting close """

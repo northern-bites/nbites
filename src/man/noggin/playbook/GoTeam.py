@@ -1,4 +1,4 @@
-from math import (fabs, hypot, atan2, cos, sin, acos, asin)
+from math import (hypot, atan2, cos, sin, acos, asin)
 from ..util import MyMath
 from . import PBConstants
 from . import Strategies

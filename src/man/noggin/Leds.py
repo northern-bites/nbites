@@ -21,8 +21,7 @@ CHEST_LED,
 LEFT_FOOT_LED,
 RIGHT_FOOT_LED) = range(_lights.NUM_LED_GROUPS)
 
-
-#COLORS
+###COLORS
 RED   = 0xFF0000
 GREEN = 0x00FF00
 BLUE  = 0x0000FF
@@ -33,18 +32,15 @@ WHITE = 0xFFFFFF
 OFF   = 0x000000
 NOW = 0.0
 
-
-
-###### GC LEDS ##########
-###### KICKOFF ##########
+##### KICKOFF #####
 HAVE_KICKOFF_LEDS  = ((RIGHT_FOOT_LED, WHITE, NOW),)
 NO_KICKOFF_LEDS    = ((RIGHT_FOOT_LED, OFF, NOW),)
 
-###### TEAM COLOR ##########
+##### TEAM COLOR #####
 TEAM_BLUE_LEDS = ((LEFT_FOOT_LED, BLUE, NOW),)
 TEAM_RED_LEDS = ((LEFT_FOOT_LED, RED, NOW),)
 
-###### STATES ###########
+##### STATES #####
 STATE_INITIAL_LEDS =  ((CHEST_LED, OFF,    NOW),)
 STATE_READY_LEDS =    ((CHEST_LED, BLUE,   NOW),)
 STATE_SET_LEDS =      ((CHEST_LED, YELLOW, NOW),)
@@ -52,12 +48,11 @@ STATE_PLAYING_LEDS =  ((CHEST_LED, GREEN,  NOW),)
 STATE_PENALIZED_LEDS =((CHEST_LED, RED,    NOW),)
 STATE_FINISHED_LEDS = ((CHEST_LED, OFF,    NOW),)
 
-##### Brain ######
-#### Ball #######
+##### Ball  #####
 BALL_ON_LEDS = ((LEFT_EYE_LED, RED, NOW),)
 BALL_OFF_LEDS = ((LEFT_EYE_LED, BLUE, NOW),)
 
-############### Roles ###############
+##### Roles #####
 CHASER_ON_LEDS = ((RIGHT_EYE_LED, GREEN, NOW),)
 MIDDIE_ON_LEDS = ((RIGHT_EYE_LED, PURPLE, NOW),)
 DEFENDER_ON_LEDS = ((RIGHT_EYE_LED, CYAN, NOW),)
@@ -81,6 +76,7 @@ FLASH_OFF_LEDS = ((LEFT_EYE_LED,  OFF, NOW),
                   (RIGHT_EAR_LED, OFF, NOW),)
 
 class Leds():
+
     def __init__(self, brainPtr):
         self.lights = _lights.lights
         self.brain = brainPtr
@@ -95,7 +91,6 @@ class Leds():
             self.flashLeds()
             return
 
-        ### for the ball ###
         if DEBUG_BALL_LEDS:
             if self.brain.ball.vis.framesOn == 1:
                 self.executeLeds(BALL_ON_LEDS)

@@ -4,7 +4,6 @@ import noggin_constants as NogginConstants
 from objects import Location
 from ..util import MyMath
 from math import fabs
-import noggin_constants as NogginConstants
 """
 Rewritten by Wils Dawson (6/28/11)
 """
@@ -13,6 +12,7 @@ class KickInformation:
     """
     Class to hold all the things we need to decide a kick
     """
+
     def __init__(self, brain):
         self.brain = brain
 
@@ -42,18 +42,17 @@ class KickInformation:
             return False
 
     def canScoreAll(self):
-        if True:
-            return True
+        return True  # HACK until other stuff is implemented
         return (self.brain.ball.distTo(constants.SHOOT_LEFT_AIM_POINT) <
                 constants.SHORT_RANGE_KICK_DIST and
                 self.brain.ball.distTo(constants.SHOOT_RIGHT_AIM_POINT) <
-                constants.SHORT_RANGE_KICK_DIST) # and open field
+                constants.SHORT_RANGE_KICK_DIST) # TODO and open field
 
     def canScoreSome(self):
         return (self.brain.ball.distTo(constants.SHOOT_LEFT_AIM_POINT) <
                 constants.LONG_RANGE_KICK_DIST or
                 self.brain.ball.distTo(constants.SHOOT_RIGHT_AIM_POINT) <
-                constants.LONG_RANGE_KICK_DIST) # and open field.
+                constants.LONG_RANGE_KICK_DIST) # TODO and open field.
 
     def openTeammateCanScore(self):
         # determine out of which teammates are open and in front of us,
@@ -78,6 +77,7 @@ class KickInformation:
         if bestMate != None:
             self.passingTeammate = bestMate
             return True
+
         return False
 
     def openTeammate(self):
@@ -94,6 +94,7 @@ class KickInformation:
         if bestMate != None:
             self.passingTeammate = bestMate
             return True
+
         return False
 
     def canClear(self):
