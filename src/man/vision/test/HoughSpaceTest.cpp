@@ -6,12 +6,11 @@
 
 #include "Profiler.h"
 
-
 using namespace std;
 using boost::shared_ptr;
 
- // approx. 3 degrees in radians
-const float HoughSpaceTest::ACCEPT_ANGLE = 0.1f;
+ // 1 bin in the hough space error allowed (plus a floating point error)
+const float HoughSpaceTest::ACCEPT_ANGLE = 1 * M_PI_FLOAT/128.0f + 0.0001;
 
 HoughSpaceTest::HoughSpaceTest() :
     hs(shared_ptr<Profiler>(new Profiler(&thread_micro_time)))
@@ -104,11 +103,14 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
         }
     }
 
+    FALSE(lines.empty());
+
     float maxRadius = sqrtf(IMAGE_WIDTH * IMAGE_WIDTH +
                            IMAGE_HEIGHT * IMAGE_HEIGHT);
 
     bool foundFixedLine = false;
     list<HoughLine>::iterator l = lines.begin();
+
     while (l != lines.end()){
         LTE(l->getRadius() , maxRadius); // Line must be in image
         GTE(l->getRadius(), -maxRadius); // in either direction
@@ -120,7 +122,6 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
         if (isDesiredLine(radius, radAngle, *l)){
             foundFixedLine = true;
         }
-
         l++;
     }
     // We better have found that line
@@ -287,17 +288,17 @@ bool HoughSpaceTest::isDesiredLine(float goalR, float goalT,
     float goalLowerT = goalT - ACCEPT_ANGLE;
     float goalUpperT = goalT + ACCEPT_ANGLE;
 
-    float tDiff = fabs(lineT - goalT);
+    float tDiff = lineT - goalT;
     float rDiff = fabs(lineR - goalR);
 
     return (
         // Correct radius
-        (rDiff < ACCEPT_RADIUS) &&
+        (rDiff <= ACCEPT_RADIUS) &&
 
         // Correct angle
         // Greater than lower bound
-        (tDiff < ACCEPT_ANGLE ||
-         fabs(2*M_PI_FLOAT - tDiff) < ACCEPT_ANGLE));
+        NBMath::subPIAngle(tDiff) <= ACCEPT_ANGLE);
+
 
 }
 

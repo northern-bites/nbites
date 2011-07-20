@@ -37,7 +37,7 @@ private:
 
     // arbitrary acceptance thresholds
     const static float ACCEPT_ANGLE;
-    const static int ACCEPT_RADIUS = 3;
+    const static int ACCEPT_RADIUS = 0;
     enum { max_parallel_tdiff = 5 };
 };
 
