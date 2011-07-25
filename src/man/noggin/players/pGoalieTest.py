@@ -20,21 +20,16 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.setName('pGoalieTest')
 
-        #GOALIE COUNTERS AND BOOLEANS
-        # Counters for goalie dive decision making
         self.counterRightSave = 0
         self.counterLeftSave = 0
         self.counterCenterSave = 0
 
         self.isSaving = False
 
-        #END GOALIE COUNTERS AND BOOLEANS
-
         self.frameCounter = 0
 
         self.shouldRelocalizeCounter = 0
 
-        # Orbiting
         self.shouldOrbit = False
 
         self.inKickingSate = False
