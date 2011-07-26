@@ -1,3 +1,7 @@
+#
+# Subroles for all the players on the field
+#
+
 from . import PBConstants
 import noggin_constants as NogginConstants
 from ..util import MyMath
