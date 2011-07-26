@@ -4,7 +4,10 @@ from ..players import GoalieConstants as goalCon
 #********
 # GOALIE*
 #********
-
+#
+# The transitions decide if the goalie is going to change roles.
+# They have counters built in which keep track of the number of
+# times the transition is true.
 
 def shouldPositionForSave(team):
     """ We should get ready to save because a robot is
