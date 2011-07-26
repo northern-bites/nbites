@@ -16,16 +16,15 @@ PURPLE_COLOR_CODE = '\033[35m'
 CYAN_COLOR_CODE = '\033[36m'
 
 class GoTeam:
-    """This is the class which controls all of our coordinated behavior system.
-       Should act as a replacement to the old PlayBook monolith approach"""
+    """This is the class which controls all of our coordinated
+       behavior system. Should act as a replacement to the old
+       PlayBook monolith approach"""
     def __init__(self, brain):
         self.brain = brain
         self.printStateChanges = True
-
         self.time = time.time()
 
         # Information about teammates
-
         #self.position = []
         self.me = self.brain.teamMembers[self.brain.my.playerNumber - 1]
         self.me.playerNumber = self.brain.my.playerNumber
@@ -159,11 +158,13 @@ class GoTeam:
                 chaser_mate = mate
 
             else:
-                # Tie breaking. Method described in Robust Team Play, by Henry Work
-                ## NOTE: Took out chaseTimeScale (which was just the minimum chase-
-                ##      time between two robots) because it wansn't guaranteeing that
-                ##      the thresholds would be appropriately tiered. A good idea,
-                ##      but bad implementation. May work with some futsing around.
+                # Tie breaking. Method described in Robust Team Play, by
+                # Henry Work
+                ## NOTE: Took out chaseTimeScale (which was just the
+                ## minimum chase-time between two robots) because it
+                ## wansn't guaranteeing that the thresholds would be
+                ## appropriately tiered. A good idea, but bad
+                ## implementation. May work with some futsing around.
                 ##      -- Wils (06/24/11)
                 if self.shouldCallOff(chaser_mate, mate):
                     if PBConstants.DEBUG_DET_CHASER:
@@ -492,6 +493,9 @@ class GoTeam:
 
         return pos_x,pos_y
 
+
+    # This is not used right now but when Loc and walking are better
+    # a TODO should be to make this work.
     def fancyGoaliePosition(self):
         """returns a goalie position using ellipse"""
 
@@ -502,14 +506,16 @@ class GoTeam:
         position = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
 
         if ball.dist < PBConstants.ELLIPSE_POSITION_LIMIT:
-            # Use an ellipse just above the goalline to determine x and y position
-            # We get the angle from goal center to the ball to determine our X,Y
+            # Use an ellipse just above the goalline to determine x and
+            # y position. We get the angle from goal center to the ball
+            # to determine our X,Y
             theta = atan2( ball.loc.y - PBConstants.LARGE_ELLIPSE_CENTER_Y,
                            ball.loc.x - PBConstants.LARGE_ELLIPSE_CENTER_X)
 
             thetaDeg = PBConstants.RAD_TO_DEG * theta
 
-            # Clip the angle so that the (x,y)-coordinate is not too close to the posts
+            # Clip the angle so that the (x,y)-coordinate is not too
+            # close to the posts
             if PBConstants.ELLIPSE_ANGLE_MIN > MyMath.sub180Angle(thetaDeg):
                 theta = PBConstants.ELLIPSE_ANGLE_MIN * PBConstants.DEG_TO_RAD
             elif PBConstants.ELLIPSE_ANGLE_MAX < MyMath.sub180Angle(thetaDeg):
@@ -523,9 +529,9 @@ class GoTeam:
 
 
 
-################################################################################
-#####################     Utility Functions      ###############################
-################################################################################
+#############################################################################
+#####################     Utility Functions      ############################
+#############################################################################
 
     def printf(self, outputString, printingColor='purple'):
         """FSA print function that allows colors to be specified"""
@@ -549,6 +555,7 @@ class GoTeam:
 
 
     # Reset counters for role transitions
+    # TODO: find a way to make the counters unneeded
     def resetGoalieRoleCounters(self):
 
         self.shouldStopChaseCounter = 0
