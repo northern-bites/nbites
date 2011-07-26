@@ -51,7 +51,7 @@ class Matrix:
 
     #  m     number of rows in matrix
     #  n     number of columns in matrix
-    #  rows  list of individual rows in matrix, which are in turn lists 
+    #  rows  list of individual rows in matrix, which are in turn lists
 
     def __init__(self, num_rows, num_columns = 1, initialize_value = 0.0):
         """Matrix.__init__(rows, columns): if called with 2 arguments, constructs a 0.0-valued matrix with the specified number of rows and columns.  If a 3rd argument is provided and that value is a scalar, constructs a matrix with all entries set to the constant value.  If the provided 3rd argument is a list, constructs a matrix with the entries drawn from that list, filling the entries in from left to right and then from top to bottom.  If the first argument is a matrix instance, creates a copy of that instance.  Usage: my_new_0_valued_matrix = Matrix(my_num_rows, my_num_columns)  OR  my_new_constant_valued_matrix = Matrix(my_num_rows, my_num_columns, my_constant_value)"""
@@ -74,7 +74,7 @@ class Matrix:
             self.m = num_rows
             self.n = num_columns
             self.rows = [ [initialize_value]*self.n for i in xrange(self.m)]
-            
+
     def copy(self):
         """copy(): returns a deep copy of self"""
         return self.scale(1.0)
@@ -86,8 +86,7 @@ class Matrix:
         for row_index in xrange(self.m):
             for column_index in xrange(self.n):
                 self.rows[row_index][column_index] = from_matrix.rows[row_index][column_index]
-        
-    
+
     def get(self, row_index, column_index):
         """get(row, column): returns the value at a specific location in the matrix"""
         return self.rows[row_index][column_index]
@@ -122,7 +121,6 @@ class Matrix:
                 scaled_matrix.rows[row_index][column_index] = self.rows[row_index][column_index] * scalar
         return scaled_matrix
 
-    
     def scaleEquals(self, scalar):
         """
         scaleEquals(c): scale in place, changing the values in self such that equal the previous values times the scalar
@@ -131,7 +129,6 @@ class Matrix:
             for column_index in xrange(self.n):
                 self.rows[row_index][column_index] *= scalar
 
-        
     def plus(self, adding_matrix):
         """plus(A): returns B such that B = self - A"""
         sum_matrix = Matrix(self.m, self.n)
@@ -148,7 +145,6 @@ class Matrix:
         for row_index in xrange(self.m):
             for column_index in xrange(self.n):
                 self.rows[row_index][column_index] += adding_array[row_index][column_index]
-    
 
     def plusEquals(self, adding_matrix):
         """
@@ -202,7 +198,7 @@ class Matrix:
             for orig_column_index in xrange(self.n):
                 transposed_matrix.rows[orig_column_index][orig_row_index] = self.rows[orig_row_index][orig_column_index]
         return transposed_matrix
-    
+
     def inverse(self):
         """self(A): returns B such that B = A^-1"""
         # First make sure that all of the entries are in decimal, and not integer, form
@@ -237,7 +233,6 @@ class Matrix:
         return self.times(multiplying_matrix)
     def invert(self):
         return self.inverse()
-    
 
 
 class LUDecomposition:
@@ -250,7 +245,6 @@ class LUDecomposition:
     # LU       list of individual rows in LU matrix
     # piv      pivot vector
     # pivsign  pivot sign
-    
 
     def __init__(self, A):
         """Preform an LU decomposition on the matrix argument, using Gaussian elimination.  Usage: my_LU_decomposition = LUDecomposition(matrix_to_decompose)"""
@@ -266,7 +260,7 @@ class LUDecomposition:
             for i in xrange(k+1, self.m):
                 if abs(self.LU[i][k]) > abs(self.LU[p][k]):
                     p = i
-            
+
             if p != k:
                 for j in xrange(self.n):
                     t = self.LU[p][j]
@@ -287,7 +281,7 @@ class LUDecomposition:
         nx = B.n
         Xmat = B.getMatrix(self.piv, 0, nx-1)
         X = Xmat.getArrayCopy()
-        
+
         for k in xrange(self.n):
             for i in xrange(k+1, self.n):
                 for j in xrange(0, nx):
@@ -428,7 +422,7 @@ def __interpolate(x_values, y_values, for_x_value):
     #Find a pair of data points to intepolate between
     left_index = 0
     while not __between(for_x_value, x_values[left_index], x_values[left_index + 1]):
-        left_index += 1        
+        left_index += 1
     # Interpolate
     interpolated_slope = (y_values[left_index] - y_values[left_index + 1]) / (x_values[left_index] - x_values[left_index + 1])
     x_displacement = for_x_value - x_values[left_index]
@@ -442,60 +436,56 @@ def __between(for_value, a, b):
         return True
     else:
         return False
-    
-                    
-
-
 
 # Tests
 # To check the state of any of the test matricies, insert print(vars(<matrix_name>)) after the operation in question
 
 def test(verbose=False):
-    
+
     if verbose:
         print '---Matrix Tests---\n'
 
     if verbose:
         print 'Constructing empty matrix'
     test1 = Matrix(3,3)
-    
+
     if verbose:
         print 'Creating arbitrary constant-valued matrix'
     test2 = Matrix(1, 4, 3.1415)
-    
+
     if verbose:
         print 'Getting previosly set value'
     test2.get(0, 2)
-    
+
     if verbose:
         print 'Changing single value in matrix'
     test2.set(0,0, 7.0)
-    
+
     if verbose:
         print 'Creating additional matrix as a scaling of existing matrix'
     test3 = test2.scale(4)
-    
+
     if verbose:
         print 'Creating new scaled matrix and replincing existing matrix'
     test3 = test3.scale(2)
-    
+
     if verbose:
         print 'Constructing matrix with arbitrary values'
     test4 = withValues(2, 2, [[1,2],[3,4]])
-       
+
     if verbose:
         print 'Creating an identity matrix'
     test5 = identity(2)
-    
+
     if verbose:
         print 'Adding matricies'
     test6 = withValues(2,2,[[5,6],[7,8]])
     sum_matrix = test6.plus(test4)
-    
+
     if verbose:
         print 'Subtracting matricies'
     test7 = test6.minus(test4)
-    
+
     if verbose:
         print 'Multiplying matricies'
     test7half = test6.times(test4)
@@ -504,29 +494,29 @@ def test(verbose=False):
         print 'Performing transpose'
     test8 = withValues(2, 3, [[1,2,3,4],[5,6,7,8]])
     test9 = test8.transpose()
-    
+
     if verbose:
         print 'Calculating LU of a matrix'
     test10 = withValues(3, 3, [[6., -2., 0.],[9., -1., 1.],[3., 7., 5.]])
     test11 = LUDecomposition(test10)
-    
+
     if verbose:
         print 'Using LU decomposition to calculate inverse of a square matrix'
     test12 = withValues(3, 3, [[1.,-1.,3.],[2.,1.,2.],[-2.,-2.,1.]])
-    test13 = test12.inverse() 
+    test13 = test12.inverse()
     if verbose:
         print test13.rows
 
     test14 = withValues(3, 3, [[8., 36., 204.], [36., 204., 1296.], [204., 1296., 8772.]])
-    test15 = test14.inverse() 
+    test15 = test14.inverse()
     if verbose:
         print test15.rows
 
     test16 = withValues(3, 3, [[8, 36, 204], [36, 204, 1296], [204, 1296, 8772]])
-    test17 = test16.inverse() 
+    test17 = test16.inverse()
     if verbose:
         print test17.rows
-    
+
     print '\n\n'
 
     """if verbose:
@@ -542,7 +532,7 @@ def test(verbose=False):
 
     if verbose:
         print 'Using cubic regression to approximate mapping of x to y values'
-    cubic_function, min_x, max_x = leastSquares(x_values, y_values, 3) 
+    cubic_function, min_x, max_x = leastSquares(x_values, y_values, 3)
     if verbose:
         print 'We can apply this regression to x values between', min_x, 'and', max_x
     if verbose:
