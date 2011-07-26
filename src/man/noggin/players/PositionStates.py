@@ -1,5 +1,4 @@
 import noggin_constants as NogginConstants
-import ChaseBallTransitions as transitions
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
 import PositionTransitions as PosTran
