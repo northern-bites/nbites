@@ -33,7 +33,7 @@ class Kick(object):
 
 #The sweet spot needs testing once the approach ball is fixed.
 #From extensve testing in pKicker and with printlines of the balls
-#relX and relY, this appears accurate
+#relX and relY, this appears accurate TODO TODO TODO
 
 LEFT_SIDE_KICK =  Kick("L_Side", x = 12.5, y =  5,
                        move=SweetMoves.GOOGZ_MID_LEFT_SIDE_KICK)
@@ -50,9 +50,8 @@ LEFT_DYNAMIC_STRAIGHT_KICK =  Kick("L_D_Straight", y =  5,
 RIGHT_DYNAMIC_STRAIGHT_KICK = Kick("R_D_Straight", y = -5,
                                    move=SweetMoves.DREW_KICK)
 
-# TODO ! make a null kick here.
 # used when we haven't decided what kick to do yet
-ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 10, y = 0)
+ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)
 
 LEFT_LONG_BACK_KICK =  Kick("L_LongBack", x = 12, y =  6.5,
                             move=SweetMoves.LEFT_LONG_BACK_KICK)
@@ -68,22 +67,3 @@ SHORT_QUICK_LEFT_KICK =  Kick("L_ShortStraight", x = DEFAULT_KICK_X_OFFSET -5, y
                               move = SweetMoves.SHORT_QUICK_LEFT_KICK)
 SHORT_QUICK_RIGHT_KICK =  Kick("R_ShortStraight", x = DEFAULT_KICK_X_OFFSET -5, y=-5,
                                move = SweetMoves.SHORT_QUICK_RIGHT_KICK)
-
-#*****************#
-# Range Constants #
-#*****************#
-"""
-Add your own range constants if you have a new kick, or update them
-if you change the kick. These are maximum ranges in centimeters.
-"""
-
-# TODO! make these accurate.
-SIDE_KICK_RANGE = 150.
-
-DYNAMIC_STRAIGHT_KICK_RANGE = 300.
-
-LONG_BACK_KICK_RANGE = 500.
-
-SHORT_BACK_KICK_RANGE = 200.
-
-SHORT_QUICK_KICK_RANGE = 200.

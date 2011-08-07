@@ -1,5 +1,7 @@
 from . import BrunswickSpeeds as speeds
 
+#TODO TODO TODO TODO!!!!!!!! clean this shit up.
+
 #navstates.py
 MAX_X_MAGNITUDE = speeds.MAX_X_MAGNITUDE
 MIN_X_MAGNITUDE = speeds.MIN_X_MAGNITUDE

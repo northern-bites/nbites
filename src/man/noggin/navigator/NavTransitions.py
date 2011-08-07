@@ -1,4 +1,4 @@
-from math import fabs, sqrt, hypot
+from math import fabs, hypot
 from . import NavConstants as constants
 from man.noggin.util import MyMath
 import noggin_constants as NogginConstants
@@ -7,7 +7,6 @@ from ..players import ChaseBallTransitions
 def atDestinationCloser(nav):
     """
     Returns true if we are at an (x, y) close enough to the one we want
-
     """
     my = nav.brain.my
 
@@ -34,13 +33,6 @@ def atHeading(nav):
 
     hDiff = fabs(MyMath.sub180Angle(my.h - dest.h))
     return hDiff < constants.CLOSE_ENOUGH_H and \
-           my.uncertH < constants.LOC_IS_ACTIVE_H
-
-#not used
-def notAtHeading(my, targetHeading):
-    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
-
-    return hDiff > constants.ALMOST_CLOSE_ENOUGH_H and \
            my.uncertH < constants.LOC_IS_ACTIVE_H
 
 def useFinalHeading(brain, position):

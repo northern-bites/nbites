@@ -3,8 +3,7 @@ import man.motion as motion
 from man.motion import MotionConstants
 from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
-from math import (fabs, atan, radians, hypot)
-from objects import FieldObject
+from math import fabs
 
 class HeadTrackingHelper(object):
     def __init__(self, tracker):
@@ -40,10 +39,8 @@ class HeadTrackingHelper(object):
 
         # If we don't see it, let's try to use our model of it to find
         # it and track it
-        #
-        # If the ball (or target) is set as being under us,
-        # don't try to look at it. Perhaps should be
-        # generalized to objects which we cannot see.
+
+        # TODO: generalize this to objects which we cannot see.
         if not target or \
                 (target.loc.relX == 0.0 and target.loc.relY == 0.0):
             return
@@ -51,7 +48,7 @@ class HeadTrackingHelper(object):
         # If we haven't seen the object in the very recent past, look
         # towards where the model says it is. The framesOff > 3
         # provides a buffer to ensure that it's not just a flickering
-        # image problem (prevents twitchy robot).
+        # image problem (prevents twitchy robot)
         if target.vis.framesOff > 3:
             self.lookToPoint(target)
             return
@@ -67,7 +64,7 @@ class HeadTrackingHelper(object):
 
         maxChange = 13.0
 
-        #Warning- no gain is applied currently!
+        # Warning- no gain is applied currently!
         safeChangeX = MyMath.clip(changeX, -maxChange, maxChange )
         safeChangeY = MyMath.clip(changeY, -maxChange, maxChange )
 
@@ -85,7 +82,6 @@ class HeadTrackingHelper(object):
         """
         Uses setHeadCommands to bring given target to center of frame.
         """
-        # Get current head angles
         motionAngles = self.tracker.brain.sensors.motionAngles
         yaw = motionAngles[MotionConstants.HeadYaw]
         pitch = motionAngles[MotionConstants.HeadPitch]
@@ -100,12 +96,8 @@ class HeadTrackingHelper(object):
             # by default, do nothing
             return
 
-        #print "ball loc:", \
-        # self.tracker.brain.ball.loc.relX,self.tracker.brain.ball.loc.relY
-
         headMove = motion.SetHeadCommand(yaw,pitch)
         self.tracker.brain.motion.setHead(headMove)
-        # boost converts to radians for setHeadCommand
 
     def panTo(self, heads):
         """
@@ -119,11 +111,10 @@ class HeadTrackingHelper(object):
         yawDiff = fabs(heads[0] - headYaw)
         pitchDiff = fabs(heads[1] - headPitch)
 
-
         maxDiff = max(pitchDiff, yawDiff)
         panTime = maxDiff/constants.MAX_PAN_SPEED
-        self.executeHeadMove( ((heads, panTime, 0,
-                                 StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
+        self.executeHeadMove(((heads, panTime, 0,
+                               StiffnessModes.LOW_HEAD_STIFFNESSES), ))
 
     def lookToPoint(self, target):
         if hasattr(target, "height"):
@@ -134,10 +125,10 @@ class HeadTrackingHelper(object):
         if hasattr(target, "loc"):
             target = target.loc
 
-        headMove = \
-            motion.CoordHeadCommand(relX = target.relX,
-                                    relY = target.relY,
-                                    relZ = height)
+        headMove = motion.CoordHeadCommand(relX = target.relX,
+                                           relY = target.relY,
+                                           relZ = height)
+
         self.tracker.brain.motion.coordHead(headMove)
         return headMove
 
@@ -156,10 +147,6 @@ class HeadTrackingHelper(object):
         bestPost = None
 
         for p in posts:
-
-            # angles = \
-            #     brain.vision.pose.getHeadAnglesToPoint(p.relX, p.relY)
-
             diff = MyMath.sub180Angle(currYaw - p.bearing)
 
             if diff < minDiff:

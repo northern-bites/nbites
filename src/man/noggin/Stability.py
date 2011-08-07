@@ -1,5 +1,4 @@
 from math import fabs
-from objects import Location
 
 try:
     from numpy import corrcoef
@@ -62,7 +61,6 @@ class Stability:
         xStabilityHeuristic = X_STABILITY_WEIGHT * xVariance
         yStabilityHeuristic = Y_STABILITY_WEIGHT * yVariance
 
-        # new style python print formatting - READ ABOUT IT (it's awesome)
         print 'X/Y accelerometer variance: {0:.3f}/{1:.3f}'.format(xVariance, yVariance)
 
         return xStabilityHeuristic**2 + yStabilityHeuristic**2

@@ -9,6 +9,7 @@ from ..players import GoalieConstants as goalCon
 # They have counters built in which keep track of the number of
 # times the transition is true.
 
+
 def shouldPositionForSave(team):
     """ We should get ready to save because a robot is
     in a position to shoot or is getting close """

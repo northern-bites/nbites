@@ -2,6 +2,9 @@
 # with -1 being backwards and 1 being forwards
 # converted to the appropriate cm/s value by the walk engine according to gait limits
 
+#TODO TODO TODO TODO!!!!!!!!!! clean this shit up.
+
+
 MAX_X_MAGNITUDE = 1
 MIN_X_MAGNITUDE = 0.05
 FWD_MAX_SPEED = MAX_X_MAGNITUDE
