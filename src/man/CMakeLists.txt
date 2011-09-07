@@ -101,7 +101,7 @@ SET( ROBOT_NAME ${@ROBOT_NAME@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( COLOR_TABLE
-  "../../data/tables/lab120/nathanWils.mtb"
+  "../../data/tables/120lab-lizzie.mtb"
   CACHE STRING
   "Path relative to man directory for the desired color table"
   )
