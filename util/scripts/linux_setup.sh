@@ -8,7 +8,7 @@ fi
 echo "Downloading awesome free stuff! Also accept the Sun Java licence by \
 pressing TAB!"
 
-PACKAGES="build-essential cmake git-core sun-java6-jdk \
+PACKAGES="build-essential cmake git-core \
 python2.6-dev emacs cmake-curses-gui ccache curl aptitude \
 ant qt4-dev"
 
@@ -23,15 +23,18 @@ fi
 
 if [ $VERSION == '10.10' ]; then
     sudo add-apt-repository ppa:sun-java-community-team/sun-java6
+    sudo apt-get update
+    sudo apt-get install sun-java6-jdk
+    sudo update-java-alternatives -s java-6-sun
 elif [ $VERSION == '11.04' ]; then
     sudo add-apt-repository ppa:ferramroberto/java
+    sudo apt-get update
+    sudo apt-get install java6-sdk
 else
     echo "That version is not supported. Please use 10.10 or 11.04"
     exit 1
 fi
-sudo apt-get update
 sudo apt-get install $PACKAGES
-sudo update-java-alternatives -s java-6-sun
 
 echo "Downloading and unpacking NBites files"
 
