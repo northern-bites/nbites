@@ -27,6 +27,7 @@ if [ $VERSION == '10.10' ]; then
     sudo apt-get install sun-java6-jdk
     sudo update-java-alternatives -s java-6-sun
 elif [ $VERSION == '11.04' ]; then
+    sudo add-apt-repository ppa:ferramroberto/java
     sudo apt-get update
     sudo apt-get install sun-java6-jdk
 else
