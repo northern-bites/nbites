@@ -61,7 +61,7 @@ prsync -v $USER_NAME@$naoqi_robocup $lib_dir/
 echo "Unpacking NaoQi"
 
 pushd $lib_dir
-tar -xvzf $naoqi
+tar -xzf $naoqi
 rm $naoqi
 popd
 
@@ -76,7 +76,7 @@ rsync -v $USER@$ctc_robocup $naoqi_local/
 echo "Unpacking the CTC"
 
 pushd $naoqi_local
-tar -xvzf $ctc
+tar -xzf $ctc
 rm $ctc
 popd
 fi
@@ -87,7 +87,7 @@ rsync -v $USER_NAME@$ext_robocup $nbites_dir/
 
 echo "Unpacking ext"
 pushd $nbites_dir
-tar -xvzf $ext
+tar -xzf $ext
 rm $ext
 popd
 
