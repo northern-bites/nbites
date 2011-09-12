@@ -18,6 +18,8 @@
 namespace man {
 namespace memory {
 
+//TODO: move these to a different class
+
 //IDs and names are tightly linked, be sure to modify both when needed!
 enum MObject_ID {
     MVISION_ID = 1,
