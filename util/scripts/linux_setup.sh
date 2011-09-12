@@ -56,7 +56,7 @@ read USER_NAME
 
 echo "Downloading NaoQi"
 mkdir -p $lib_dir
-prsync -v $USER_NAME@$naoqi_robocup $lib_dir/
+rsync -v $USER_NAME@$naoqi_robocup $lib_dir/
 
 echo "Unpacking NaoQi"
 
