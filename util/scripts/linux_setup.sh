@@ -10,7 +10,7 @@ pressing TAB!"
 
 PACKAGES="build-essential cmake git-core \
 python2.6-dev emacs cmake-curses-gui ccache curl aptitude \
-ant qt4-dev-tools"
+ant qt4-dev-tools libmpfr1ldbl"
 
 echo "Are you on 64-bit linux?(y/n)"
 read IS64BIT
