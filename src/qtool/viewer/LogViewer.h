@@ -11,22 +11,23 @@
 
 #include <QWidget>
 #include <QtGui>
+#include <vector>
 
 #include "data/DataManager.h"
 #include "image/RoboImageViewer.h"
-#include "data/treemodel/TreeModel.h"
-#include "data/treemodel/ProtoNode.h"
+#include "MObjectView.h"
 
 namespace qtool {
 namespace viewer {
 
-class LogViewer : public QWidget {
+class LogViewer : public QMainWindow{
 	Q_OBJECT
 
 public:
 	LogViewer(data::DataManager::ptr dataManager);
 
 private:
+	std::vector<QDockWidget*> dockWidget;
 	data::DataManager::ptr dataManager;
 	RoboImageViewer* roboImageViewer;
 
