@@ -9,16 +9,26 @@ echo "Downloading awesome free stuff! Also accept the Sun Java licence by \
 pressing TAB!"
 
 PACKAGES="build-essential cmake git-core sun-java6-jdk \
-python2.6-dev emacs cmake-curses-gui ccache curl aptitude"
+python2.6-dev emacs cmake-curses-gui ccache curl aptitude \
+ant qt4-dev"
 
 echo "Are you on 64-bit linux?(y/n)"
 read IS64BIT
+echo "What version of Ubuntu are you on? (example: 11.04)"
+read VERSION
 
 if [ $IS64BIT == 'y' ]; then
   PACKAGES="$PACKAGES g++-4.4-multilib"
 fi
 
-sudo add-apt-repository ppa:sun-java-community-team/sun-java6
+if [ $VERSION == '10.10' ]; then
+    sudo add-apt-repository ppa:sun-java-community-team/sun-java6
+elif [ $VERSION == '11.04' ]; then
+    sudo add-apt-repository ppa:ferramroberto/java
+else
+    echo "That version is not supported. Please use 10.10 or 11.04"
+    exit 1
+fi
 sudo apt-get update
 sudo apt-get install $PACKAGES
 sudo update-java-alternatives -s java-6-sun
@@ -43,7 +53,7 @@ read USER_NAME
 
 echo "Downloading NaoQi"
 mkdir -p $lib_dir
-rsync -v $USER_NAME@$naoqi_robocup $lib_dir/
+prsync -v $USER_NAME@$naoqi_robocup $lib_dir/
 
 echo "Unpacking NaoQi"
 
