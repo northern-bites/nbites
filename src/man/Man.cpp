@@ -205,7 +205,7 @@ Man::processFrame ()
     sensors->lockImage();
 #ifdef USE_MEMORY
     // TODO: this is temporarily here
-    //loggingBoard->log(MIMAGE_ID);
+    loggingBoard->log(MIMAGE_ID);
 #endif
     PROF_ENTER(P_VISION);
     vision->notifyImage(sensors->getImage());
