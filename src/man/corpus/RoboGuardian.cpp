@@ -89,7 +89,7 @@ void RoboGuardian::run(){
         processFallingProtection();
         processChestButtonPushes();
         if (frameCount % CONNECTION_CHECK_RATE == 0) {
-            wifiAngel.check_on_wifi();
+            //wifiAngel.check_on_wifi();
         }
         frameCount++;
         nanosleep(&interval, &remainder);
