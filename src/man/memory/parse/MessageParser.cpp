@@ -44,8 +44,9 @@ bool MessageParser::getNext() {
 
     proto::uint32 size;
     uint64_t byte_count = raw_input->ByteCount();
-    coded_input->ReadVarint32(&size);
 
+    coded_input->ReadLittleEndian32(&size);
+    cout << size << endl;
     //current_size = size;
 
     CodedInputStream::Limit l = coded_input->PushLimit(size);
@@ -53,7 +54,7 @@ bool MessageParser::getNext() {
     coded_input->PopLimit(l);
 
     //current_size = raw_input->ByteCount() - byte_count;
-
+    //TODO: fixo - return
     return container;
 }
 
