@@ -13,7 +13,8 @@ add_definitions(${QT_DEFINITIONS})
 
 ########### Sources
 
-set( viewer_srcs LogViewer.cpp               )
+set( viewer_srcs LogViewer.cpp
+                 MObjectView.cpp)
 
 set( viewer_headers LogViewer.h )
 
