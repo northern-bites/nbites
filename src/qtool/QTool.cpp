@@ -24,7 +24,7 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(logViewer, tr("Log Viewer"));
 
-    dataManager->addSubscriber(colorCreator, data::NEW_IMAGE);
+    dataManager->addSubscriber(colorCreator, man::memory::MIMAGE_ID);
 }
 
 QTool::~QTool() {

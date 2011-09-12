@@ -13,7 +13,7 @@
 
 //TODO: add this to a namespace
 class RoboImageViewer: public QWidget,
-	public Subscriber<qtool::data::DataEvent>
+	public Subscriber<qtool::data::MObject_ID>
 {
     Q_OBJECT
 public:
@@ -26,7 +26,7 @@ public:
     QSize sizeHint() const;
     void updateBitmap();
 
-    void update(qtool::data::DataEvent) {
+    void update(qtool::data::MObject_ID) {
     	this->updateBitmap();
     }
 

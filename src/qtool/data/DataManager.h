@@ -19,10 +19,12 @@
 #include "include/MultiProvider.h"
 #include "DataTypes.h"
 
+#include <iostream>
+
 namespace qtool {
 namespace data {
 
-class DataManager : public MultiProvider<DataEvent> {
+class DataManager : public MultiProvider<MObject_ID> {
 
 public:
 	typedef boost::shared_ptr<DataManager> ptr;
@@ -33,8 +35,8 @@ public:
     virtual ~DataManager();
 
     void getNext() {
-        parsingBoard.parse(man::memory::MIMAGE_ID);
-        this->notifySubscribers(NEW_IMAGE);
+        parsingBoard.parseAll();
+        this->notifySubscribers(man::memory::MIMAGE_ID);
     }
 
     man::memory::Memory::ptr getMemory() const {
