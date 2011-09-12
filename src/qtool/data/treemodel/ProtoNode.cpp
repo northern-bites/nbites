@@ -22,11 +22,13 @@ namespace treemodel {
 
 using namespace google::protobuf;
 
+//TODO: split this into two constructors
+
 ProtoNode::ProtoNode(ProtoNode* _parent,
           const FieldDescriptor* _fieldDescriptor,
           const Message* _message) :
     Node(_parent), fieldDescriptor(_fieldDescriptor), message(_message) {
-    if (isMessage() && message == NULL && !isRepeated()) {
+    if (isOfTypeMessage() && message == NULL && !isRepeated()) {
 
         const Message* parentM = _parent->getMessage();
         message = &(parentM->GetReflection()->GetMessage(*parentM, fieldDescriptor));
@@ -50,7 +52,7 @@ void ProtoNode::constructTree() {
         if (parent->isRepeated()) {
             nodes.append(parent->constructRepeatedChildren());
         } else {
-            if (parent->isMessage()) {
+            if (parent->isOfTypeMessage()) {
                 nodes.append(parent->constructMessageChildren());
             }
         }
@@ -67,7 +69,7 @@ QList<ProtoNode*> ProtoNode::constructMessageChildren() {
         ProtoNode* childNode = new ProtoNode(this, childFD);
         this->addChild(childNode);
 
-        if (childNode->isMessage() || childNode->isRepeated()) {
+        if (childNode->isOfTypeMessage() || childNode->isRepeated()) {
             nodes.push_back(childNode);
         }
     }
@@ -78,7 +80,7 @@ QList<ProtoNode*> ProtoNode::constructRepeatedChildren() {
     QList<ProtoNode*> nodes;
     for (int i = 0; i < this->getSizeOfField(); i++) {
         ProtoNode* childNode;
-        if (this->isMessage()) {
+        if (this->isOfTypeMessage()) {
             const Message* message = this->getRepeatedMessageAt(i);
             childNode = new ProtoNode(this, NULL, message);
             nodes.append(childNode);
@@ -106,7 +108,7 @@ bool ProtoNode::isRepeated() const {
     return fieldDescriptor && fieldDescriptor->is_repeated();
 }
 
-bool ProtoNode::isMessage() const {
+bool ProtoNode::isOfTypeMessage() const {
     return (fieldDescriptor &&
            fieldDescriptor->type() == FieldDescriptor::TYPE_MESSAGE)
            || message != NULL;

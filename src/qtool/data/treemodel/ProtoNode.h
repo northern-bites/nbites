@@ -35,7 +35,7 @@ public:
     int getNumColumns() const;
     int childCount() const;
     bool isRepeated() const;
-    bool isMessage() const;
+    bool isOfTypeMessage() const;
     int getSizeOfField() const;
     QVariant getName(int index) const;
     QVariant getValue(int index) const;
