@@ -15,7 +15,7 @@
 
 #include "data/DataManager.h"
 #include "image/RoboImageViewer.h"
-#include "MObjectView.h"
+#include "MObjectViewer.h"
 
 namespace qtool {
 namespace viewer {

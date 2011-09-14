@@ -1,5 +1,5 @@
 
-#include "MObjectView.h"
+#include "MObjectViewer.h"
 
 #include "data/treemodel/ProtoNode.h"
 
@@ -11,23 +11,23 @@ using namespace data::treemodel;
 using boost::shared_ptr;
 using namespace man::memory;
 
-MObjectView::MObjectView(shared_ptr<const ProtoMessage> messageViewed, QWidget* parent) :
+MObjectViewer::MObjectViewer(shared_ptr<const ProtoMessage> messageViewed, QWidget* parent) :
         QTreeView(parent), messageViewed(messageViewed) {
     this->createNewTreeModel();
 }
 
-MObjectView::~MObjectView() {
+MObjectViewer::~MObjectViewer() {
     delete treeModel;
 }
 
-void MObjectView::createNewTreeModel() {
+void MObjectViewer::createNewTreeModel() {
     ProtoNode* root = new ProtoNode(NULL, NULL,
                                     messageViewed.get());
     treeModel = new TreeModel(root);
     this->setModel(treeModel);
 }
 
-void MObjectView::update(MObject_ID) {
+void MObjectViewer::update(MObject_ID) {
     delete treeModel;
     this->createNewTreeModel();
 }

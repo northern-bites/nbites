@@ -1,6 +1,6 @@
 /**
  *
- * @class MObjectView
+ * @class MObjectViewer
  *
  * A widget that shows the contents of a proto message in a tree view widget
  * using a TreeModel; it can subscribe to receive updates
@@ -21,12 +21,12 @@
 namespace qtool {
 namespace viewer {
 
-class MObjectView : public QTreeView, public Subscriber<data::MObject_ID> {
+class MObjectViewer : public QTreeView, public Subscriber<data::MObject_ID> {
 
 public:
-    MObjectView(boost::shared_ptr<const man::memory::ProtoMessage> messageViewed,
+    MObjectViewer(boost::shared_ptr<const man::memory::ProtoMessage> messageViewed,
                 QWidget* parent = 0);
-    virtual ~MObjectView();
+    virtual ~MObjectViewer();
 
     void update(data::MObject_ID);
 

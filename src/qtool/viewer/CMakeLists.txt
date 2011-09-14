@@ -14,7 +14,7 @@ add_definitions(${QT_DEFINITIONS})
 ########### Sources
 
 set( viewer_srcs LogViewer.cpp
-                 MObjectView.cpp)
+                 MObjectViewer.cpp)
 
 set( viewer_headers LogViewer.h )
 
