@@ -116,7 +116,7 @@ echo "Would you like this to be done automatically? (y/n)"
 read AUTO
 
 if [ $AUTO == 'y' ]; then
-    echo "source nbites_bash" >> ~/.bashrc
+    echo "source $nbites_bash" >> ~/.bashrc
 else
     echo "Add the line manually, and you'll be all set up!"
 fi
