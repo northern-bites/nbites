@@ -23,6 +23,7 @@ namespace viewer {
 
 class MObjectViewer : public QTreeView, public Subscriber<data::MObject_ID> {
 
+    Q_OBJECT
 public:
     MObjectViewer(boost::shared_ptr<const man::memory::ProtoMessage> messageViewed,
                 QWidget* parent = 0);

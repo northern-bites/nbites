@@ -14,9 +14,12 @@ add_definitions(${QT_DEFINITIONS})
 ########### Sources
 
 set( viewer_srcs LogViewer.cpp
-                 MObjectViewer.cpp)
+                 MObjectViewer.cpp
+                 RoboImageViewer.cpp )
 
-set( viewer_headers LogViewer.h )
+set( viewer_headers LogViewer.h
+                    RoboImageViewer.h
+                    MObjectViewer.h )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

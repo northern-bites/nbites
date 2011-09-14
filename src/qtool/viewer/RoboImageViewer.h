@@ -2,16 +2,15 @@
 #define RENDERAREA_H
 
 #include <QWidget>
-#include <QBrush>
-#include <QPen>
-#include <QPixmap>
 #include <QLabel>
 #include "data/DataTypes.h"
 #include "man/include/Subscriber.h"
-#include "BMPYUVImage.h"
+#include "image/BMPYUVImage.h"
 #include <iostream>
 
-//TODO: add this to a namespace
+namespace qtool {
+namespace viewer {
+
 class RoboImageViewer: public QWidget,
 	public Subscriber<qtool::data::MObject_ID>
 {
@@ -26,9 +25,7 @@ public:
     QSize sizeHint() const;
     void updateBitmap();
 
-    void update(qtool::data::MObject_ID) {
-    	this->updateBitmap();
-    }
+    void update(qtool::data::MObject_ID);
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -38,5 +35,8 @@ private:
     QLabel* infoLabel;
 
 };
+
+}
+}
 
 #endif // RENDERAREA_H
