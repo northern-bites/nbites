@@ -5,9 +5,6 @@ if [ $# -ne 1 ]; then
 	exit 1
 fi
 
-echo "Downloading awesome free stuff! Also accept the Sun Java licence by \
-pressing TAB!"
-
 PACKAGES="build-essential cmake git-core \
 python2.6-dev emacs cmake-curses-gui ccache curl aptitude \
 ant qt4-dev-tools libmpfr1ldbl"
@@ -22,18 +19,30 @@ if [ $IS64BIT == 'y' ]; then
 fi
 
 if [ $VERSION == '10.10' ]; then
+    echo "Downloading Java. Accept the license by pressing TAB!"
     sudo add-apt-repository ppa:sun-java-community-team/sun-java6
     sudo apt-get update
     sudo apt-get install sun-java6-jdk
     sudo update-java-alternatives -s java-6-sun
-elif [ $VERSION == '11.04' ]; then
+elif [ $VERSION == '11.04' ]; the
+    echo "Downloading Java. Accept the license by pressing TAB!"
     sudo add-apt-repository ppa:ferramroberto/java
     sudo apt-get update
     sudo apt-get install sun-java6-jdk
 else
-    echo "That version is not supported. Please use 10.10 or 11.04"
-    exit 1
+    echo "That version is not supported. Please use 10.10 or 11.04. However, \
+if you are very sure of what you're doing, you can \
+finish running the script and install Sun Java manually when it is done."
+    echo ""
+    echo "Continue? (y/n)"
+    read CONTINUE
+    if [ $CONTINUE == 'n' ]; then
+	echo "Exiting."
+	exit 1
+    fi
 fi
+
+echo "Downloading awesome free stuff!"
 sudo apt-get install $PACKAGES
 
 echo "Downloading and unpacking NBites files"
@@ -93,10 +102,19 @@ popd
 
 echo "Setting up bash stuff ..."
 
-echo "export NBITES_DIR=$nbites_dir" >> nbites.bash
-echo "export AL_DIR=$naoqi_local" >> nbites.bash
-echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$nbites_dir/ext/lib" >> ~/nbites.bash
-echo "export PATH=$PATH:$nbites_dir/ext/bin" >> ~/nbites.bash
+nbites_bash=$nbites_dir/util/scripts/nbites.bash
+
+echo "export NBITES_DIR=$nbites_dir" >> nbites_bash
+echo "export AL_DIR=$naoqi_local" >> nbites_bash
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$nbites_dir/ext/lib" >> nbites_bash
+echo "export PATH=$nbites_dir/ext/bin:$PATH" >> nbites_bash
 echo "Done! The last step is just to add the following line"
-echo "source $PWD/nbites.bash"
+echo "source $nbites_bash"
 echo "to your .bashrc (which is in your home directory)"
+
+echo "Would you like this to be done automatically? (y/n)"
+read AUTO
+
+if [AUTO == 'y']; then
+    echo "source nbites_bash" >> ~/.bashrc
+fi
