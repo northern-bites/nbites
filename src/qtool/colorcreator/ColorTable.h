@@ -29,6 +29,8 @@ public:
     void writeNewFormat(QString filename);
     int tableIndex(int high7, int mid7, int low7);
     unsigned index(int y, int u, int v);
+    void setColor(int y, int u, int v, unsigned col);
+    void unSetColor(int y, int u, int v, unsigned col);
     Stats** colorStats();
     bool isEnabled() {return enabled;}
     int getUpdatedColor(int y, int u, int v);

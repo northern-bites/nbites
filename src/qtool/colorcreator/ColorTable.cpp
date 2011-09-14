@@ -212,6 +212,18 @@ unsigned ColorTable::index(int y, int u, int v)
     return table[v / 2][u / 2][y / 2];
 }
 
+void ColorTable::setColor(int y, int u, int v, unsigned col)
+{
+    table[v / 2][u / 2][y / 2] = table[v / 2][u / 2][y / 2] | col;
+}
+
+void ColorTable::unSetColor(int y, int u, int v, unsigned col)
+{
+    unsigned allCol = 0xFF;
+    col = col ^ allCol;
+    table[v / 2][u / 2][y / 2] = table[v / 2][u / 2][y / 2] & col;
+}
+
 int ColorTable::getUpdatedColor(int y, int u, int v)
 {
     unsigned temp = index(y, u, v);
