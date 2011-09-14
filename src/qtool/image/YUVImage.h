@@ -7,7 +7,7 @@
  * Takes a robo image and splits it into 3 component images for each of the
  * three channels.
  * One instance of this class should rely on one instance of a roboImage.
- * Once the pointer in the roboImage gets updated, make sure to update this
+ * Once the image data in the roboImage gets updated, make sure to update this
  * class as well by using updateFromRoboImage().
  *
  * This could be extended by adding in a listener to some data manager that will

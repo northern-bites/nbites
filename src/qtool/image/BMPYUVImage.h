@@ -1,8 +1,8 @@
 /**
  * @class BMPYUVImage
  *
- * Extends YUVImage in that it keeps an instance of a QImage that we update
- * each time the image gets updated
+ * Extends YUVImage in that it keeps an instance of a QImage (a bitmap) that we
+ * update each time the image gets updated
  *
  */
 
