@@ -122,3 +122,5 @@ if [ $AUTO == 'y' ]; then
 else
     echo "Add the line manually, and you'll be all set up!"
 fi
+
+echo "NOW RESTART THE TERMINAL SO THAT .bashrc GETS RUN!"
