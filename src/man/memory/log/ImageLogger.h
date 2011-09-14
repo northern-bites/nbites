@@ -56,23 +56,13 @@ public:
     virtual ~ImageLogger();
 
     void writeToLog();
+    bool exceededByteLimit();
 
 public:
     static const unsigned long long BYTES_MAX = 1200000000; //1.2 GB
 
 private:
     void writeHead();
-    /*
-     * Writes a value of type T to the current buffer.
-     * It writes it at the specified offset and then
-     * increments the offset with the size of the value written.
-     */
-    template <class T>
-    unsigned int writeValue(T value) {
-        //TODO: assert if we actually write everything
-        return write(file_descriptor, &value, sizeof(value));
-    }
-
 
 private:
     unsigned long long bytes_written;

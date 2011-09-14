@@ -12,7 +12,7 @@ using boost::shared_ptr;
 
 LoggingBoard::LoggingBoard(Memory::const_ptr memory,
         IOProvider::const_ptr ioProvider) :
-    memory(memory), logging(false) {
+    memory(memory), logging(true) {
     newIOProvider(ioProvider);
 }
 

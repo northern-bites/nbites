@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
+#include <stdint.h>
 #include "include/io/FileFDProvider.h"
 
 namespace man {
@@ -36,19 +37,35 @@ public:
      */
     FDLogger(FDProvider::const_ptr fdp):
         file_descriptor_provider(fdp),
-        file_descriptor(fdp->getFileDescriptor())
-    {
+        file_descriptor(fdp->getFileDescriptor()), bytes_written(0) {
         if (file_descriptor < 0) {
-            std::cout << "Warning: invalid file descriptor passed for logging! "
+            std::cout << "Warning: invalid file descriptor passed for logging!"
                     << std::endl;
         }
     }
     /**
-     * The write() method should write the message to some
+     * The writeToLog() method should write the message to some
      * sort of output buffer implemented in the respective
      * Logger subclass
      */
     virtual void writeToLog() = 0;
+
+protected:
+    /*
+     * Writes a value of type T to the current buffer.
+     * It writes it at the specified offset and then
+     * increments the offset with the size of the value written.
+     */
+    //TODO: assert if we actually write everything
+    // and detect if an error happens
+    template <class T>
+    void writeValue(T value) {
+        bytes_written += write(file_descriptor, &value, sizeof(value));
+    }
+
+    void writeCharBuffer(const char* buffer, uint32_t size) {
+        bytes_written += write(file_descriptor, buffer, size);
+    }
 
 private:
     /**
@@ -61,6 +78,7 @@ private:
 protected:
     const FDProvider::const_ptr file_descriptor_provider;
     int file_descriptor;
+    unsigned long long bytes_written;
 };
 
 }

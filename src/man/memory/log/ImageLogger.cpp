@@ -45,25 +45,27 @@ ImageLogger::ImageLogger(FDProvider::const_ptr fdp,
 void ImageLogger::writeHead() {
 
     // this helps us ID the log
-    bytes_written += this->writeValue<int32_t>(logID);
+    this->writeValue<int32_t>(logID);
     // this time stamps the log
-    bytes_written += this->writeValue<int64_t>(birth_time);
-    bytes_written += this->writeValue<uint32_t>(roboImage->getWidth());
-    bytes_written += this->writeValue<uint32_t>(roboImage->getHeight());
-    bytes_written += this->writeValue<uint32_t>(roboImage->getByteSize());
+    this->writeValue<int64_t>(birth_time);
+    this->writeValue<uint32_t>(roboImage->getWidth());
+    this->writeValue<uint32_t>(roboImage->getHeight());
+    this->writeValue<uint32_t>(roboImage->getByteSize());
 }
 
 void ImageLogger::writeToLog() {
-    if (bytes_written < BYTES_MAX) {
-        bytes_written += writeValue<int64_t>(process_micro_time() - birth_time);
-        bytes_written += write(file_descriptor,
+    if (!exceededByteLimit()) {
+        writeValue<int64_t>(process_micro_time() - birth_time);
+        write(file_descriptor,
                 roboImage->getImage(), roboImage->getByteSize());
     } else {
-        if (!exceeded) {
-            cout << "Stopped Image logging because we reached size limit!" << endl;
-            exceeded = true;
-        }
+        cout << "Stopped Image logging because we reached size limit!" << endl;
+        exceeded = true;
     }
+}
+
+bool ImageLogger::exceededByteLimit() {
+    return exceeded || bytes_written > BYTES_MAX;
 }
 
 

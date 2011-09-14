@@ -59,6 +59,7 @@ public:
 private:
     int logID;
     boost::shared_ptr<const ProtoMessage> message;
+    std::string write_buffer;
    /**
     * @var raw_output : a ZeroCopyOutputStream, an abstract I/O interface
     * which will minimize the amount of copying to the buffer
