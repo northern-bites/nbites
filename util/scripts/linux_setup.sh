@@ -24,7 +24,7 @@ if [ $VERSION == '10.10' ]; then
     sudo apt-get update
     sudo apt-get install sun-java6-jdk
     sudo update-java-alternatives -s java-6-sun
-elif [ $VERSION == '11.04' ]; the
+elif [ $VERSION == '11.04' ]; then
     echo "Downloading Java. Accept the license by pressing TAB!"
     sudo add-apt-repository ppa:ferramroberto/java
     sudo apt-get update
@@ -108,13 +108,15 @@ echo "export NBITES_DIR=$nbites_dir" >> nbites_bash
 echo "export AL_DIR=$naoqi_local" >> nbites_bash
 echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$nbites_dir/ext/lib" >> nbites_bash
 echo "export PATH=$nbites_dir/ext/bin:$PATH" >> nbites_bash
-echo "Done! The last step is just to add the following line"
+echo "Done! The last step is just to add the following line:"
 echo "source $nbites_bash"
 echo "to your .bashrc (which is in your home directory)"
 
 echo "Would you like this to be done automatically? (y/n)"
 read AUTO
 
-if [AUTO == 'y']; then
+if [ $AUTO == 'y' ]; then
     echo "source nbites_bash" >> ~/.bashrc
+else
+    echo "Add the line manually, and you'll be all set up!"
 fi
