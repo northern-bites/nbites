@@ -1,6 +1,7 @@
 #ifndef COLORCREATOR_H
 #define COLORCREATOR_H
 
+#include <QMouseEvent>
 #include <QWidget>
 //man
 #include "man/memory/RoboImage.h"
@@ -48,7 +49,7 @@ namespace Ui {
 namespace qtool {
 namespace colorcreator {
 
-class ColorCreator : public QWidget, public Subscriber<data::DataEvent>
+class ColorCreator : public QWidget, public Subscriber<data::MObject_ID>
 {
     Q_OBJECT
 
@@ -56,13 +57,13 @@ public:
     enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black, BlueGreen, BlueNavy, OrangeRed};
     enum Choices {Single, Multiple};
     enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE, Table};
-    ColorCreator(qtool::data::DataManager* dataManager,
+    ColorCreator(qtool::data::DataManager::ptr dataManager,
             QWidget *parent = 0);
     ~ColorCreator();
     void updateDisplays();
     void updateColors();
-    void updateThresh();
-    void update(data::DataEvent event) {
+    void updateThresh(bool imageChanged, bool choiceChanged, bool colorsChanged);
+    void update(data::MObject_ID) {
         yuvImage.updateFromRoboImage();
         updateDisplays();
     }
@@ -78,7 +79,12 @@ public:
     QColor getChannelView(int i, int j);
     void largeDisplay();
     QColor displayColorTable(int i, int j);
-    bool testValue(float h, float s, float z, int y, int v, int color);
+    bool testValue(float h, float s, float z, int y, int u, int v, int color);
+
+protected:
+    void mouseMoveEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
 
 private slots:
     void on_pushButton_clicked();
@@ -121,6 +127,14 @@ private slots:
 
     void on_getOldTable_clicked();
 
+    void on_radioButton_clicked();
+
+    void on_ColorChange_clicked();
+
+    void on_cornerDefine_clicked();
+
+    void on_changeColor_clicked();
+
     void on_edgeDiff_actionTriggered(int action);
 
     void on_edgeDiff_valueChanged(int value);
@@ -131,9 +145,9 @@ private slots:
 
 private:
     Ui::ColorCreator *ui;
-    const man::memory::RoboImage* roboImage;
+    man::memory::RoboImage::const_ptr roboImage;
     YUVImage yuvImage;
-    qtool::data::DataManager* dataManager;
+    qtool::data::DataManager::ptr dataManager;
     ColorTable *table;
     QString baseDirectory;
     QString currentDirectory;
@@ -148,6 +162,11 @@ private:
     QImage *img3;
     QImage *img4;
     QImage *wheel;
+    bool tableMode;
+    bool defineMode;
+    bool cornerStatus;
+    QPoint firstPoint;
+    QPoint lastPoint;
     int shape;
     int currentFrameNumber;
     int edgediff;

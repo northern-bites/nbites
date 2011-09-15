@@ -51,6 +51,7 @@ Qt4_wrap_ui(qtool_forms_headers ${qtool_forms})
 add_subdirectory( image )
 add_subdirectory( colorcreator )
 add_subdirectory( data )
+add_subdirectory( viewer )
 
 ######### The executable
 
@@ -64,6 +65,7 @@ target_link_libraries(
   colorcreator
   image
   data
+  viewer
   ${QT_LIBRARIES}
   )
 

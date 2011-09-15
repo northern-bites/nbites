@@ -1,7 +1,10 @@
 #include "RoboImageViewer.h"
 #include <QMouseEvent>
 
-RoboImageViewer::RoboImageViewer(const man::memory::RoboImage* roboImage,
+namespace qtool {
+namespace viewer {
+
+RoboImageViewer::RoboImageViewer(man::memory::RoboImage::const_ptr roboImage,
                                  QLabel *infoLabel, QWidget *parent)
     : QWidget(parent),
       image(new BMPYUVImage(roboImage)),
@@ -13,6 +16,10 @@ RoboImageViewer::RoboImageViewer(const man::memory::RoboImage* roboImage,
 
 RoboImageViewer::~RoboImageViewer() {
 	delete image;
+}
+
+void RoboImageViewer::update(qtool::data::MObject_ID) {
+    this->updateBitmap();
 }
 
 void RoboImageViewer::updateBitmap() {
@@ -31,25 +38,10 @@ QSize RoboImageViewer::sizeHint() const
 
 void RoboImageViewer::paintEvent(QPaintEvent * /* event */)
 {
-
     QPainter painter(this);
+    this->updateBitmap();
     painter.drawImage(QPoint(0, 0), image->getBitmap());
+}
 
-//    QRect draw;
-//    int red, green, blue;
-//    bool found;
-//    for (int i = 0; i < yuvImage->getHeight(); i++)
-//    {
-//        for (int j = 0; j < yuvImage->getWidth(); j++)
-//        {
-//        	red = yuvImage->getRed(j, i);
-//            green = yuvImage->getGreen(j, i);
-//            blue = yuvImage->getBlue(j, i);
-//
-//            QColor col(red, green, blue);
-//            painter.setPen(col);
-//            draw.setCoords(j, i, j + 1, i + 1);
-//            painter.fillRect(draw, col);
-//        }
-//    }
+}
 }

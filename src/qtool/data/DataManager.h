@@ -11,22 +11,23 @@
 
 #pragma once
 
+#include <boost/shared_ptr.hpp>
+
 #include "DataSource.h"
 #include "man/memory/Memory.h"
 #include "man/memory/parse/ParsingBoard.h"
 #include "include/MultiProvider.h"
+#include "DataTypes.h"
+
+#include <iostream>
 
 namespace qtool {
 namespace data {
 
-enum DataEvent {
-    NEW_IMAGE = 17,
-    NEW_VISION_SENSORS,
-    NEW_MOTION_SENSORS,
-    NEW_VISION_INFO
-};
+class DataManager : public MultiProvider<MObject_ID> {
 
-class DataManager : public MultiProvider<DataEvent> {
+public:
+	typedef boost::shared_ptr<DataManager> ptr;
 
 public:
     DataManager();
@@ -34,8 +35,8 @@ public:
     virtual ~DataManager();
 
     void getNext() {
-        parsingBoard.parse(man::memory::MIMAGE_ID);
-        this->notifySubscribers(NEW_IMAGE);
+        parsingBoard.parseAll();
+        this->notifySubscribers(man::memory::MIMAGE_ID);
     }
 
     man::memory::Memory::ptr getMemory() const {
