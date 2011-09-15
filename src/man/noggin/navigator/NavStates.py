@@ -1,5 +1,4 @@
 """ States for finding our way on the field """
-
 from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
@@ -132,6 +131,7 @@ def avoidFrontObstacle(nav):
     # we'll probably want to go forward again and most obstacle
     # are moving, so pausing might make more sense
 
+    # TODO figure this out maybe potential field will fix this for us???
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
         nav.printf(nav.brain.sonar)
@@ -166,7 +166,6 @@ def avoidLeftObstacle(nav):
     """
     dodges right if we only detect something to the left of us
     """
-
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
         nav.printf(nav.brain.sonar)
@@ -198,7 +197,6 @@ def avoidRightObstacle(nav):
     """
     dodges left if we only detect something to the left of us
     """
-
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
         nav.printf(nav.brain.sonar)
@@ -265,7 +263,6 @@ def destWalking(nav):
     if nav.counter > 1 and \
            (nav.currentCommand.isDone() or
             not nav.brain.motion.isWalkActive()):
-        # see why we went to atPosition
         if DEBUG:
             print "isWalkActive? {0}, commandDone? {1}, counter? {2}"\
                   .format(nav.brain.motion.isWalkActive(),
@@ -274,28 +271,6 @@ def destWalking(nav):
         nav.nearDestination = True
         return nav.goNow('atPosition')
 
-    return nav.stay()
-
-### Stopping States ###
-def stop(nav):
-    """
-    Wait until the walk is finished.
-    """
-    if nav.firstFrame():
-        # stop walk vectors
-        helper.setSpeed(nav, 0, 0, 0)
-        nav.destType = None
-        nav.resetDestMemory()
-        nav.resetSpeedMemory()
-
-    if not nav.brain.motion.isWalkActive():
-        return nav.goNow('stopped')
-
-    return nav.stay()
-
-def stopped(nav):
-    if nav.firstFrame():
-        nav.destType = None
     return nav.stay()
 
 def orbitPointThruAngle(nav):
@@ -347,7 +322,29 @@ def orbitPointThruAngle(nav):
         return nav.goLater('stop')
     return nav.stay()
 
+### Stopping States ###
+def stop(nav):
+    """
+    Wait until the walk is finished.
+    """
+    if nav.firstFrame():
+        # stop walk vectors
+        helper.setSpeed(nav, 0, 0, 0)
+        nav.destType = None
+        nav.resetDestMemory()
+        nav.resetSpeedMemory()
 
+    if not nav.brain.motion.isWalkActive():
+        return nav.goNow('stopped')
+
+    return nav.stay()
+
+def stopped(nav):
+    if nav.firstFrame():
+        nav.destType = None
+    return nav.stay()
+
+# TODO: make this a stopping state elsewhere in the code.
 def atPosition(nav):
     if nav.firstFrame():
         nav.brain.speech.say("At Position")
@@ -364,3 +361,4 @@ def atPosition(nav):
         if nav.startOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
             return nav.goLater('omniGoTo')
     return nav.stay()
+

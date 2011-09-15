@@ -1,7 +1,6 @@
 from . import PBConstants
 from . import Formations
 
-
 #### No Field Players ####
 
 def sNoFieldPlayers(team, workingPlay):

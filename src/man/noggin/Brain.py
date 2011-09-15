@@ -1,13 +1,11 @@
-# Redirect standard error to standard out
 import time
 import sys
+
+# Redirect standard error to standard out
 _stderr = sys.stderr
 sys.stderr = sys.stdout
 ## import cProfile
 ## import pstats
-
-from math import (fabs) # ** # debugging? or keep?
-
 
 # Packages and modules from super-directories
 from man import comm
@@ -26,6 +24,7 @@ from . import Loc
 from . import TeamConfig
 from . import Leds
 from . import robots
+
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
 from .typeDefs import (Sonar, Packet,
@@ -39,7 +38,7 @@ from .kickDecider import KickDecider
 import _roboguardian
 import _speech
 
-from objects import (MyInfo, FieldObject, RobotLocation, Ball)
+from objects import (MyInfo, FieldObject, Ball)
 
 class Brain(object):
     """
@@ -127,7 +126,6 @@ class Brain(object):
         Build our set of Field Objects which are team specific compared
         to the generic forms used in the vision system
         """
-
         # Build instances of the vision based field objects
         # Left post is on that goalie's left
         # Yellow goal left and right posts
@@ -237,7 +235,7 @@ class Brain(object):
         self.updateComm()
 
         # Update objects
-        self.update()
+        self.updateObjects()
 
         #Set LEDS
         self.leds.processLeds()
@@ -271,7 +269,7 @@ class Brain(object):
             if (mate.active and mate.isDead()):
                 mate.active = False
 
-    def update(self):
+    def updateObjects(self):
         """
         Update estimates of robot and ball positions on the field
         """
@@ -311,6 +309,7 @@ class Brain(object):
                           loc.ballVelX,
                           loc.ballVelY)
 
+        # TODO: remove this and log through C++ and the Logger instead.
         if Constants.LOG_COMM:
             packet = Packet.Packet((TeamConfig.TEAM_NUMBER,
                                     TeamConfig.PLAYER_NUMBER,
@@ -338,7 +337,6 @@ class Brain(object):
         """
         Reset our localization
         """
-
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
@@ -348,7 +346,6 @@ class Brain(object):
         """
         Reset our localization
         """
-
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
@@ -356,5 +353,3 @@ class Brain(object):
             self.loc.blueGoalieReset()
         else:
             self.loc.redGoalieReset()
-
-

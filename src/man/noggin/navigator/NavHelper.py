@@ -22,7 +22,6 @@ def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
     """
-
     if x == 0 and y == 0 and theta == 0 and \
             nav.brain.motion.isWalkActive():
         createAndSendWalkVector(nav, 0,0,0) # Ensure that STOP commands get sent
@@ -55,21 +54,6 @@ def setDribbleSpeed(nav, x, y, theta):
     createAndSendWalkVector(nav, x_cms, y_cms, theta_degs)
 
     nav.updateSpeeds(x,y, theta)
-
-def step(nav, x, y, theta, numSteps):
-    """
-    Wrapper method to easily change the walk vector of the robot
-    """
-
-    if x < BACKWARDS_GAIT_THRESH:
-        nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
-    else:
-        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
-
-    x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
-
-    createAndSendStepsVector(nav, x_cms, y_cms, theta_degs)
-
 
 def executeMove(motionInst, sweetMove):
     """
@@ -105,7 +89,6 @@ def convertWalkVector(brain, x_abs, y_abs, theta_abs):
     Convert the 0->1 values into actual cm values for the WalkCommand
     NOTE: x_abs means that x is bound on [-1,1] (not an absolute value)
     """
-
     checkWalkVector(x_abs, y_abs, theta_abs)
 
     gait = brain.CoA.current_gait
@@ -133,10 +116,6 @@ def checkWalkVector(x, y, theta):
     assert fabs(x) <= 1
     assert fabs(y) <= 1
     assert fabs(theta) <= 1
-
-def createAndSendStepsVector(nav, x, y, theta):
-    steps = motion.StepCommand(x=x, y=y, theta=theta, numSteps=numSteps)
-    nav.brain.motion.sendStepCommand(steps)
 
 def createAndSendWalkVector(nav, x, y, theta):
     walk = motion.WalkCommand(x=x,y=y,theta=theta)

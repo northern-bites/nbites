@@ -1,7 +1,6 @@
 """
 NaoOutput.py - File for holding all sorts of output and logging functions
 """
-
 import time
 
 # CONSTANTS

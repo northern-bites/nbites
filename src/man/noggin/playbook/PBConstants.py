@@ -14,19 +14,10 @@ TEST_CHASER = False
 DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
 
-USE_ZONE_STRATEGY = False
 USE_DUB_D = True
-PULL_THE_GOALIE = False
 USE_FANCY_GOALIE = False
 
-DEFAULT_GOALIE_NUMBER = 1
-DEFAULT_DEFENDER_NUMBER = 2
-DEFAULT_OFFENDER_NUMBER = 3
-DEFAULT_CHASER_NUMBER = 4
-
 KICKOFF_FORMATION_TIME = 10 # Length of time to spend in the kickoff play
-
-NUM_TEAM_PLAYERS = NogginConstants.NUM_PLAYERS_PER_TEAM
 
 ####
 #### Role Switching / Tie Breaking ####
@@ -42,7 +33,6 @@ DONT_ILLEGAL_D_THRESH = 4  # Amount to wait before stopping from chasing
 STOP_AVOID_BOX_THRESH = 5 # Amount to wait before going back to chasing
 
 # Special cases for waiting for the ball at half field
-NEAR_LINE_THRESH = 25.
 DEFENDER_SHOULD_CHASE_THRESH = 125.
 # S_DEFENSIVE_MID strategy
 S_MIDDIE_DEFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 1.5
@@ -362,23 +352,19 @@ KICKOFF_OFFENDER_1_Y = READY_KICKOFF_OFFENDER_1_Y
 
 ########### NORMAL POSITIONS ###########
 
-###GOALIE
-BALL_LOC_LIMIT = 220. # Dist at which we stop active localization and just track
 #Elliptical positioning
 GOAL_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
 GOAL_CENTER_Y = NogginConstants.CENTER_FIELD_Y
-ELLIPSE_X_SHIFT = 5. # Increase this to account for the goalposts
 LARGE_ELLIPSE_HEIGHT = NogginConstants.GOALBOX_DEPTH * 0.65 #radius
 LARGE_ELLIPSE_WIDTH = NogginConstants.CROSSBAR_CM_WIDTH * 0.5 #radius
 LARGE_ELLIPSE_CENTER_Y = NogginConstants.CENTER_FIELD_Y
 LARGE_ELLIPSE_CENTER_X = NogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
-ELLIPSE_POSITION_LIMIT = BALL_LOC_LIMIT
+ELLIPSE_POSITION_LIMIT = 220
 # Angle limits for moving about ellipse
 ELLIPSE_ANGLE_MAX = 80
 ELLIPSE_ANGLE_MIN = -80.0
 RAD_TO_DEG = 180. / pi
 DEG_TO_RAD = pi / 180.
-BALL_FOCUS_UNCERT_THRESH = 100.
 
 #Home positioning
 GOALIE_HOME_X = NogginConstants.MY_GOALBOX_LEFT_X + 30 #LARGE_ELLIPSE_HEIGHT??

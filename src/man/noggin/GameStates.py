@@ -79,4 +79,3 @@ def penaltyShotsGamePenalized(game):
         game.brain.leds.executeLeds(Leds.STATE_PENALIZED_LEDS)
         game.brain.player.switchTo('penaltyShotsGamePenalized')
     return game.stay()
-

@@ -46,9 +46,6 @@ class KickDecider(object):
         else:
             return kick.sweetMove
 
-    def getKickObjective(self):
-        self.info.kickObjective
-
     def setKickOff(self):
         """
         sets the kick we should do in the kickOff situation
@@ -66,8 +63,6 @@ class KickDecider(object):
         else:
             self.setKick(kicks.SHORT_LEFT_SIDE_KICK)
             print "Kickoff LEFT_SIDE_KICK"
-
-        self.info.kickObjective = constants.OBJECTIVE_KICKOFF
 
     def decideKick(self):
         """
@@ -174,7 +169,7 @@ class KickDecider(object):
                 continue
             return kick
 
-
+        # OLD approach. saved for safe keeping.
         """
         # Note: may want to use headingTo(yglp) etc...
         oppLeftPost = self.brain.oppGoalLeftPost

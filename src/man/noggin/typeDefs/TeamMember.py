@@ -144,12 +144,7 @@ class TeamMember(RobotLocation):
         Note: Don't give bonuses. It can result in negative chase times
               which can screw up the math later on. --Wils (06/25/11)
         """
-        t = 0.0
-
-        ## if DEBUG_DETERMINE_CHASE_TIME:
-        ##     self.printf("DETERMINE CHASE TIME DEBUG")
-
-        t += (self.ballDist / CHASE_SPEED)
+        t = (self.ballDist / CHASE_SPEED)
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time base is " + str(t))
