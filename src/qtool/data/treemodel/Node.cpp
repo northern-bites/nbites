@@ -17,9 +17,14 @@ Node::Node(const Node* _parent) : parent(_parent){
 }
 
 Node::~Node() {
-    for (int i = 0; i < childCount(); i++ ) {
-        delete children.at(i);
-    }
+	clearChildren();
+}
+
+void Node::clearChildren() {
+	for (int i = 0; i < childCount(); i++ ) {
+		delete children.at(i);
+	}
+	children.clear();
 }
 
 void Node::addChild(const Node * child) {
@@ -29,6 +34,8 @@ void Node::addChild(const Node * child) {
 const Node* Node::getChild(int index) const {
     if (0 <= index && index < childCount()) {
         return children.at(index);
+    } else {
+    	return NULL;
     }
 }
 

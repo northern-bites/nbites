@@ -13,15 +13,13 @@ add_definitions(${QT_DEFINITIONS})
 
 ########### Sources
 
-set( Image_srcs RoboImageViewer.cpp
+set( Image_srcs
     YUVImage.cpp
     BMPYUVImage.cpp
     ColorSpace.cpp
     )
 
-set( Image_headers
-    RoboImageViewer.h
-)
+set( Image_headers )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 

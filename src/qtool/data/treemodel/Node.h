@@ -26,6 +26,7 @@ public:
     virtual int getNumColumns() const = 0;
 
     void addChild(const Node* child);
+    void clearChildren();
     const Node* getChild(int index) const;
     virtual int childCount() const;
 

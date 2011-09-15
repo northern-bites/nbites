@@ -12,13 +12,17 @@
 #pragma once
 
 #include <stdint.h>
-
+#include <boost/shared_ptr.hpp>
 #include "include/VisionDef.h"
 
 namespace man {
 namespace memory {
 
 class RoboImage {
+
+public:
+	typedef boost::shared_ptr<RoboImage> ptr;
+	typedef boost::shared_ptr<const RoboImage> const_ptr;
 
 public:
     RoboImage(unsigned int wd = NAO_IMAGE_WIDTH,

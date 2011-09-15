@@ -71,8 +71,8 @@ void Memory::update(SensorsEvent event) {
     if (event == NEW_IMAGE) {
         PROF_ENTER(P_MEMORY_IMAGE);
         mImage->update();
-        PROF_EXIT(P_MEMORY_IMAGE);
         notifySubscribers(MIMAGE_ID);
+        PROF_EXIT(P_MEMORY_IMAGE);
     }
 #endif
 }
