@@ -1,16 +1,11 @@
-
 """
 myMath.py - a number of methods for simple often used math
 """
-
-from math import (atan2,
-                  cos,
+from math import (cos,
                   fabs,
                   radians,
-                  degrees,
                   sin,
                   sqrt)
-
 
 def sub180Angle(angle):
     """
@@ -23,7 +18,6 @@ def sub180Angle(angle):
         if angle < -180.:
             angle += 360.
     return angle
-
 
 def sub180Diff(angle, from_angle):
     """

@@ -4,10 +4,10 @@ from . import ActiveLookStates
 from . import BasicStates
 from . import HeadTrackingHelper as helper
 from ..util import FSA
-from ..util import MyMath
 
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""
+
     def __init__(self, brain):
         FSA.FSA.__init__(self, brain)
         self.brain = brain
@@ -115,7 +115,7 @@ class HeadTracking(FSA.FSA):
     # that directly initially call activeTracking
 
     def activeLocGoaliePos(self):
-        """looks at the ball for shorter amount of time that activeLoc"""
+        """looks at the ball for shorter amount of time than activeLoc"""
         self.target = self.brain.ball
         self.gain = 1.0
         self.goalieActiveLoc = True
@@ -132,7 +132,7 @@ class HeadTracking(FSA.FSA):
 
     def kickDecideScan(self):
         """Execute a triangle pan."""
-        self.lastDiffState = 'stop' # doesn't seem to do anything...
+        self.lastDiffState = 'stop' # ensure we go back to stop after return
         self.goalieActiveLoc = False
         if (self.currentState != 'trianglePan' or
             self.currentState != 'trianglePanLeft' or
@@ -167,6 +167,8 @@ class HeadTracking(FSA.FSA):
 
     def trackTarget(self, target):
         """
+        TODO: Pick a comment!!!!
+
         Someone else: Track given target via vision information while possible.
         Once target is no longer visible, perform naive pans.
         If target becomes visible again, either return to state
@@ -175,7 +177,6 @@ class HeadTracking(FSA.FSA):
         Lizzie: automatically tracks landmark, scans for landmark if not in view
         only works if target has attribute loc.dist, framesOn, framesOff,x,y
         """
-
         self.target = target
         self.target.height = 0
         self.gain = 1.0

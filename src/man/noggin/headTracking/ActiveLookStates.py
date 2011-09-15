@@ -1,7 +1,5 @@
 from . import TrackingConstants as constants
-import noggin_constants as NogginConstants
 import man.motion.HeadMoves as HeadMoves
-from math import (fabs)
 
 TIME_TO_LOOK_TO_TARGET = 1.0
 
@@ -37,7 +35,6 @@ def scanForTarget(tracker):
     If ball is seen, go to 'targetTracking' or 'activeTracking'.
     """
     if tracker.target.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
-        print "target on"
         if tracker.activeLocOn:
             tracker.brain.motion.stopHeadMoves()
             return tracker.goNow('activeTracking')
@@ -46,7 +43,6 @@ def scanForTarget(tracker):
             return tracker.goNow('targetTracking')
 
     if not tracker.brain.motion.isHeadActive():
-        print "head not active"
         targetDist = tracker.target.loc.dist
 
         if targetDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
@@ -67,7 +63,6 @@ def targetTracking(tracker):
     If target is lost, look to localization values.
     If that fails, use naive scans.
     """
-
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
         tracker.activeLocOn = False

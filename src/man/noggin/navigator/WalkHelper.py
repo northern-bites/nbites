@@ -162,8 +162,6 @@ def getWalkBackParam(my, dest):
 
 def getSpinOnlyParam(my, dest):
     # Determine the speed to turn
-    # see if getRotScale can go faster
-
     bearing = my.getRelativeBearing(dest)
     if (fabs(bearing) < 5.0):
         sTheta = 0.0
@@ -176,13 +174,3 @@ def getSpinOnlyParam(my, dest):
 
     sX, sY = 0, 0
     return (sX, sY, sTheta)
-
-def getRotScale(headingDiff):
-    absHDiff = fabs(headingDiff)
-
-    return absHDiff / 90.0
-
-def getCloseRotScale(headingDiff):
-    absHDiff = fabs(headingDiff)
-
-    return absHDiff / 50.0

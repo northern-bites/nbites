@@ -1,4 +1,3 @@
-from man.motion import MotionConstants
 from . import TrackingConstants as constants
 from objects import RelLocation
 import noggin_constants as NogginConstants
@@ -20,7 +19,6 @@ def tracking(tracker):
     While the target is visible, track it via vision values.
     If the ball is lost, go to last diff state.
     """
-
     if tracker.firstFrame():
         tracker.activeLocOn = False
 
@@ -95,7 +93,6 @@ def panToFieldObject(tracker):
     Calculate which goalpost is easiest to look at and look to it.
     After we look at it for a bit, look back at target.
     """
-
     # Calculate closest field object
     if tracker.firstFrame():
         tracker.shouldStareAtBall = 0 # Reuse this counter

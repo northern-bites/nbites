@@ -2,7 +2,6 @@ from . import Roles
 from . import SubRoles
 from . import PBConstants
 
-
 #### No Field Players ####
 
 def fNoFieldPlayers(team, workingPlay):

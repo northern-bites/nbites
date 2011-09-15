@@ -8,19 +8,27 @@ from . import RoleTransitions as RoleTran
 # This prevents hysteresis. We also set the subRoleSwitchTime to a special
 # value (i.e. -1) if we are in a new role because we want to reset our counter for that.
 
+
+# *THE GOALIE*
+# The goalie uses a different method to decide if it should switch than
+# the other field players. The counters for switching for the goalie are
+# built into the RoleTransitions. The goalie has 3 basic roles.  The three
+# basic roles are saving, positioning, and chasing. In addition there
+# are roles for when the goalie is in ready, and when the goalie has just
+# left ready.
+
 def rGoalie(team, workingPlay):
     '''The Goalie'''
-    ''' We don't use shouldSwitchSubRole because of need to switch at
-    different points for different actions with the goalies. Use
-    counters instead to keep track of when to change.  Counters are done
-    through RoleTransitions. '''
+
+    # Make sure the goalie's role is set
     if not workingPlay.isRole(PBConstants.GOALIE):
         workingPlay.setRole(PBConstants.GOALIE)
+
+    # Goalie starts in Ready Goalie
     if (team.brain.gameController.currentState == 'gameReady' or
         team.brain.gameController.currentState =='gameSet' or
         team.brain.gameController.currentState == 'penaltyShotsGameReady' or
         team.brain.gameController.currentState == 'penaltyShotsGameSet'):
-        # Special case for ready goalie.
         SubRoles.pReadyGoalie(team, workingPlay)
 
     # Get out of ready -> Just after kick off
@@ -28,6 +36,7 @@ def rGoalie(team, workingPlay):
         SubRoles.pGoalieKickOff(team, workingPlay)
 
     # Make sure we position when we come out of Penalized
+    # ToDo: find a way to use the after penalty states
     elif workingPlay.isSubRole(PBConstants.PENALTY_SUB_ROLE):
         SubRoles.pGoalieCenter(team, workingPlay)
 
@@ -41,6 +50,8 @@ def rGoalie(team, workingPlay):
             SubRoles.pGoalieKickOff(team, workingPlay)
 
     # Saving
+    # When saving gets more consistent going to want a
+    # way to get out of saving if ball is not coming.
     elif workingPlay.isSubRole(PBConstants.GOALIE_SAVE):
         # if RoleTran.shouldNotSave(team):
         #     SubRoles.pGoalieCenter(team, workingPlay)
@@ -68,7 +79,6 @@ def rGoalie(team, workingPlay):
             SubRoles.pGoalieChaser(team, workingPlay)
         else:
             SubRoles.pGoalieCenter(team, workingPlay)
-
 
 def rChaser(team, workingPlay):
     '''sets current position for chaser since positioning is done by player'''
