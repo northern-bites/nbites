@@ -48,3 +48,4 @@ src/remote/dist/javadoc/
 *.o 
 ext/*
 lib/*
+/util/scripts/nbites.bash
