@@ -100,6 +100,9 @@ tar -xzf $ext
 rm $ext
 popd
 
+echo "Setting up git stuff .."
+./git_setup.sh
+
 echo "Setting up bash stuff ..."
 
 nbites_bash=$nbites_dir/util/scripts/nbites.bash
