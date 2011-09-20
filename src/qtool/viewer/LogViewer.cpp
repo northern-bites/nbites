@@ -14,8 +14,15 @@ LogViewer::LogViewer(DataManager::ptr dataManager) :
 		dataManager(dataManager),
 		roboImageViewer(new RoboImageViewer(
 				dataManager->getMemory()->getRoboImage())){
+    toolbar = new QToolBar();
+    nextButton = new QPushButton(tr("&Next"));
+    prevButton = new QPushButton(tr("&Previous"));
+    toolbar->addWidget(prevButton);
+    toolbar->addWidget(nextButton);
 
 	this->setCentralWidget(roboImageViewer);
+    this->addToolBar(Qt::TopToolBarArea, toolbar);
+
 	dataManager->addSubscriber(roboImageViewer, MIMAGE_ID);
 
 	std::vector<QTreeView> messageViewers;
