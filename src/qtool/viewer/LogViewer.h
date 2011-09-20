@@ -26,6 +26,10 @@ class LogViewer : public QMainWindow{
 public:
 	LogViewer(data::DataManager::ptr dataManager);
 
+public slots:
+    void nextImage();
+    void prevImage();
+
 private:
 	std::vector<QDockWidget*> dockWidget;
 	data::DataManager::ptr dataManager;
