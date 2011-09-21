@@ -80,6 +80,7 @@ public:
     void largeDisplay();
     QColor displayColorTable(int i, int j);
     bool testValue(float h, float s, float z, int y, int u, int v, int color);
+    void modeChanged();
 
 protected:
     void mouseMoveEvent(QMouseEvent* event);
@@ -127,9 +128,7 @@ private slots:
 
     void on_getOldTable_clicked();
 
-    void on_radioButton_clicked();
-
-    void on_ColorChange_clicked();
+    void on_modeSelect_currentIndexChanged(int index);
 
     void on_cornerDefine_clicked();
 
