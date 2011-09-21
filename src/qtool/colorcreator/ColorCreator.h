@@ -42,6 +42,9 @@
 #define RED_COL 0x20
 #define NAVY_COL 0x40
 
+#define FLT_SLIDERS 6
+#define INT_SLIDERS 4
+
 namespace Ui {
     class ColorCreator;
 }
@@ -172,17 +175,14 @@ private:
     int edgediff;
     int mode;
     QColor *cols;
-    float *hMin;
-    float *hMax;
-    float *sMin;
-    float *sMax;
-    float *zMin;
-    float *zMax;
+    float **fltSliders;
+    int   **intSliders;
+    enum fltChannels {hMin, hMax,
+                      sMin, sMax,
+                      zMin, zMax};
+    enum intChannels {yMin, yMax,
+                      vMin, vMax};
     float zSlice;
-    int *yMin;
-    int *yMax;
-    int *vMin;
-    int *vMax;
     float statsHMin, statsHMax, statsSMin, statsSMax, statsZMin, statsZMax;
     int statsYMin, statsYMax, statsUMin, statsUMax, statsVMin, statsVMax;
     int currentColor;

@@ -58,16 +58,16 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     img4 = new QImage(320, 240, QImage::Format_RGB32);
     wheel = new QImage(200, 200, QImage::Format_RGB32);
     // Each color gets its own value for everything specified by sliders
-    hMin = new float[COLORS];
-    hMax = new float[COLORS];
-    sMin = new float[COLORS];
-    sMax = new float[COLORS];
-    zMin = new float[COLORS];
-    zMax = new float[COLORS];
-    yMin = new int[COLORS];
-    yMax = new int[COLORS];
-    vMin = new int[COLORS];
-    vMax = new int[COLORS];
+    fltSliders = new float*[FLT_SLIDERS];
+    intSliders = new int*[INT_SLIDERS];
+
+    register int i;
+    for (i = 0; i < FLT_SLIDERS; ++i) {
+      fltSliders[i] = new float[COLORS];
+      if (i < INT_SLIDERS)
+        intSliders[i] = new int[COLORS];
+    }
+
     cols = new QColor[COLORS+SOFT];
     bitColor = new unsigned[COLORS];
 
@@ -150,114 +150,114 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
         switch(i)
         {
         case Orange:
-            hMin[i] = 0.80f;
-            hMax[i] = 0.13f;
-            sMin[i] = 0.25f;
-            sMax[i] = 1.0f;
-            zMin[i] = 0.12f;
-            zMax[i] = 1.0f;
-            yMin[i] = 34;
-            yMax[i] = 145;
-            vMin[i] = 115;
-            vMax[i] = 171;
+            fltSliders[hMin][i] = 0.80f;
+            fltSliders[hMax][i] = 0.13f;
+            fltSliders[sMin][i] = 0.25f;
+            fltSliders[sMax][i] = 1.0f;
+            fltSliders[zMin][i] = 0.12f;
+            fltSliders[zMax][i] = 1.0f;
+            intSliders[yMin][i] = 34;
+            intSliders[yMax][i] = 145;
+            intSliders[vMin][i] = 115;
+            intSliders[vMax][i] = 171;
             break;
         case Green:
-            hMin[i] = 0.37f;
-            hMax[i] = 0.45f;
-            sMin[i] = 0.28f;
-            sMax[i] = 0.46f;
-            zMin[i] = 0.22f;
-            zMax[i] = 0.53f;
-            yMin[i] = 55;
-            yMax[i] = 105;
-            vMin[i] = 90;
-            vMax[i] = 131;
+            fltSliders[hMin][i] = 0.37f;
+            fltSliders[hMax][i] = 0.45f;
+            fltSliders[sMin][i] = 0.28f;
+            fltSliders[sMax][i] = 0.46f;
+            fltSliders[zMin][i] = 0.22f;
+            fltSliders[zMax][i] = 0.53f;
+            intSliders[yMin][i] = 55;
+            intSliders[yMax][i] = 105;
+            intSliders[vMin][i] = 90;
+            intSliders[vMax][i] = 131;
             break;
         case Yellow:
-            hMin[i] = 0.17f;
-            hMax[i] = 0.26f;
-            sMin[i] = 0.32f;
-            sMax[i] = 0.69f;
-            zMin[i] = 0.27f;
-            zMax[i] = 0.48f;
-            yMin[i] = 56;
-            yMax[i] = 105;
-            vMin[i] = 111;
-            vMax[i] = 128;
+            fltSliders[hMin][i] = 0.17f;
+            fltSliders[hMax][i] = 0.26f;
+            fltSliders[sMin][i] = 0.32f;
+            fltSliders[sMax][i] = 0.69f;
+            fltSliders[zMin][i] = 0.27f;
+            fltSliders[zMax][i] = 0.48f;
+            intSliders[yMin][i] = 56;
+            intSliders[yMax][i] = 105;
+            intSliders[vMin][i] = 111;
+            intSliders[vMax][i] = 128;
             break;
         case Blue:
-            hMin[i] = 0.54f;
-            hMax[i] = 0.67f;
-            sMin[i] = 0.30f;
-            sMax[i] = 0.65f;
-            zMin[i] = 0.23f;
-            zMax[i] = 0.48f;
-            yMin[i] = 33;
-            yMax[i] = 105;
-            vMin[i] = 109;
-            vMax[i] = 127;
+            fltSliders[hMin][i] = 0.54f;
+            fltSliders[hMax][i] = 0.67f;
+            fltSliders[sMin][i] = 0.30f;
+            fltSliders[sMax][i] = 0.65f;
+            fltSliders[zMin][i] = 0.23f;
+            fltSliders[zMax][i] = 0.48f;
+            intSliders[yMin][i] = 33;
+            intSliders[yMax][i] = 105;
+            intSliders[vMin][i] = 109;
+            intSliders[vMax][i] = 127;
             break;
         case White:
-            hMin[i] = 0.01f;
-            hMax[i] = 0.01f;
-            sMin[i] = 0.0f;
-            sMax[i] = 0.38f;
-            zMin[i] = 0.39f;
-            zMax[i] = 1.0f;
-            yMin[i] = 102;
-            yMax[i] = 250;
-            vMin[i] = 99;
-            vMax[i] = 128;
+            fltSliders[hMin][i] = 0.01f;
+            fltSliders[hMax][i] = 0.01f;
+            fltSliders[sMin][i] = 0.0f;
+            fltSliders[sMax][i] = 0.38f;
+            fltSliders[zMin][i] = 0.39f;
+            fltSliders[zMax][i] = 1.0f;
+            intSliders[yMin][i] = 102;
+            intSliders[yMax][i] = 250;
+            intSliders[vMin][i] = 99;
+            intSliders[vMax][i] = 128;
             break;
         case Pink:
-            hMin[i] = 0.75f;
-            hMax[i] = 0.22f;
-            sMin[i] = 0.0f;
-            sMax[i] = 0.29f;
-            zMin[i] = 0.21f;
-            zMax[i] = 0.54f;
-            yMin[i] = 58;
-            yMax[i] = 139;
-            vMin[i] = 127;
-            vMax[i] = 143;
+            fltSliders[hMin][i] = 0.75f;
+            fltSliders[hMax][i] = 0.22f;
+            fltSliders[sMin][i] = 0.0f;
+            fltSliders[sMax][i] = 0.29f;
+            fltSliders[zMin][i] = 0.21f;
+            fltSliders[zMax][i] = 0.54f;
+            intSliders[yMin][i] = 58;
+            intSliders[yMax][i] = 139;
+            intSliders[vMin][i] = 127;
+            intSliders[vMax][i] = 143;
             break;
         case Navy:
-            hMin[i] = 0.57f;
-            hMax[i] = 0.68f;
-            sMin[i] = 0.23f;
-            sMax[i] = 0.42f;
-            zMin[i] = 0.17f;
-            zMax[i] = 0.45f;
-            yMin[i] = 39;
-            yMax[i] = 105;
-            vMin[i] = 106;
-            vMax[i] = 132;
+            fltSliders[hMin][i] = 0.57f;
+            fltSliders[hMax][i] = 0.68f;
+            fltSliders[sMin][i] = 0.23f;
+            fltSliders[sMax][i] = 0.42f;
+            fltSliders[zMin][i] = 0.17f;
+            fltSliders[zMax][i] = 0.45f;
+            intSliders[yMin][i] = 39;
+            intSliders[yMax][i] = 105;
+            intSliders[vMin][i] = 106;
+            intSliders[vMax][i] = 132;
             break;
         default:
-            hMin[i] = 0.0f;
-            hMax[i] = 0.01f;
-            sMin[i] = 0.99f;
-            sMax[i] = 1.0f;
-            zMin[i] = 0.0f;
-            zMax[i] = 1.0f;
-            yMin[i] = 30;
-            yMax[i] = 230;
-            vMin[i] = 40;
-            vMax[i] = 150;
+            fltSliders[hMin][i] = 0.0f;
+            fltSliders[hMax][i] = 0.01f;
+            fltSliders[sMin][i] = 0.99f;
+            fltSliders[sMax][i] = 1.0f;
+            fltSliders[zMin][i] = 0.0f;
+            fltSliders[zMax][i] = 1.0f;
+            intSliders[yMin][i] = 30;
+            intSliders[yMax][i] = 230;
+            intSliders[vMin][i] = 40;
+            intSliders[vMax][i] = 150;
             break;
         }
     }
     // set the sliders to start at correct values
-    ui->hMin->setValue(hMin[currentColor] * 100);
-    ui->hMax->setValue(hMax[currentColor] * 100);
-    ui->sMin->setValue(sMin[currentColor] * 100);
-    ui->sMax->setValue(sMax[currentColor] * 100);
-    ui->zMin->setValue(zMin[currentColor] * 100);
-    ui->zMax->setValue(zMax[currentColor] * 100);
-    ui->yMin->setValue(yMin[currentColor]);
-    ui->yMax->setValue(yMax[currentColor]);
-    ui->vMin->setValue(vMin[currentColor]);
-    ui->vMax->setValue(vMax[currentColor]);
+    ui->hMin->setValue(fltSliders[hMin][currentColor] * 100);
+    ui->hMax->setValue(fltSliders[hMax][currentColor] * 100);
+    ui->sMin->setValue(fltSliders[sMin][currentColor] * 100);
+    ui->sMax->setValue(fltSliders[sMax][currentColor] * 100);
+    ui->zMin->setValue(fltSliders[zMin][currentColor] * 100);
+    ui->zMax->setValue(fltSliders[zMax][currentColor] * 100);
+    ui->yMin->setValue(intSliders[yMin][currentColor]);
+    ui->yMax->setValue(intSliders[yMax][currentColor]);
+    ui->vMin->setValue(intSliders[vMin][currentColor]);
+    ui->vMax->setValue(intSliders[vMax][currentColor]);
     ui->zSlice->setValue(zSlice);
 
     firstPoint.setX(-1);
@@ -366,17 +366,17 @@ void ColorCreator::updateColors()
                         h = 1.0f + h;
                     }
                     // Since H is an angle the math is modulo.
-                    if (hMax[currentColor] > hMin[currentColor])
+                    if (fltSliders[hMax][currentColor] > fltSliders[hMin][currentColor])
                     {
-                        if (hMin[currentColor] > h || hMax[currentColor] < h)
+                        if (fltSliders[hMin][currentColor] > h || fltSliders[hMax][currentColor] < h)
                         {
                             display = false;
                         }
-                    } else if (hMin[currentColor] > h && hMax[currentColor] < h )
+                    } else if (fltSliders[hMin][currentColor] > h && fltSliders[hMax][currentColor] < h )
                     {
                         display = false;
                     }
-                    if (s < sMin[currentColor] || s > sMax[currentColor])
+                    if (s < fltSliders[sMin][currentColor] || s > fltSliders[sMax][currentColor])
                     {
                         display = false;
                     }
@@ -384,11 +384,11 @@ void ColorCreator::updateColors()
                     col.setHsz(h, s, zSlice);
                     int y = col.getYb();
                     int v = col.getVb();
-                    if (y < yMin[currentColor] || y > yMax[currentColor])
+                    if (y < intSliders[yMin][currentColor] || y > intSliders[yMax][currentColor])
                     {
                         display = false;
                     }
-                    if (v < vMin[currentColor] || v > vMax[currentColor])
+                    if (v < intSliders[vMin][currentColor] || v > intSliders[vMax][currentColor])
                     {
                         display = false;
                     }
@@ -559,28 +559,28 @@ QColor ColorCreator::displayColorTable(int i, int j)
 bool ColorCreator::testValue(float h, float s, float z, int y, int u, int v, int color)
 {
     if (!tableMode || !haveFile) {
-        if (hMax[color] > hMin[color])
+        if (fltSliders[hMax][color] > fltSliders[hMin][color])
         {
-            if (hMin[color] > h || hMax[color] < h)
+            if (fltSliders[hMin][color] > h || fltSliders[hMax][color] < h)
             {
                 return false;
             }
-        } else if (hMin[color] > h && hMax[color] < h )
+        } else if (fltSliders[hMin][color] > h && fltSliders[hMax][color] < h )
         {
             return false;
         }
-        if (s < sMin[color] || s > sMax[color])
+        if (s < fltSliders[sMin][color] || s > fltSliders[sMax][color])
         {
             return false;
         }
-        else if (z < zMin[color] || z > zMax[color])
+        else if (z < fltSliders[zMin][color] || z > fltSliders[zMax][color])
         {
             return false;
         }
-        else if (y < yMin[color] || y > yMax[color])
+        else if (y < intSliders[yMin][color] || y > intSliders[yMax][color])
         {
             return false;
-        } else if (v < vMin[color] || v > vMax[color])
+        } else if (v < intSliders[vMin][color] || v > intSliders[vMax][color])
         {
             return false;
         }
@@ -823,7 +823,7 @@ void ColorCreator::on_nextButton_clicked()
 
 void ColorCreator::on_hMin_valueChanged(int value)
 {
-    hMin[currentColor] = (float)value / 100.0f;
+    fltSliders[hMin][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set H Min value to " << value << "\n";
@@ -831,7 +831,7 @@ void ColorCreator::on_hMin_valueChanged(int value)
 
 void ColorCreator::on_hMax_valueChanged(int value)
 {
-    hMax[currentColor] = (float)value / 100.0f;
+    fltSliders[hMax][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set H Max value to " << value << "\n";
@@ -839,7 +839,7 @@ void ColorCreator::on_hMax_valueChanged(int value)
 
 void ColorCreator::on_sMin_valueChanged(int value)
 {
-    sMin[currentColor] = (float)value / 100.0f;
+    fltSliders[sMin][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set S Min value to " << value << "\n";
@@ -847,7 +847,7 @@ void ColorCreator::on_sMin_valueChanged(int value)
 
 void ColorCreator::on_sMax_valueChanged(int value)
 {
-    sMax[currentColor] = (float)value / 100.0f;
+    fltSliders[sMax][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set S Max value to " << value << "\n";
@@ -855,7 +855,7 @@ void ColorCreator::on_sMax_valueChanged(int value)
 
 void ColorCreator::on_yMin_valueChanged(int value)
 {
-    yMin[currentColor] = value;
+    intSliders[yMin][currentColor] = value;
     updateColors();
     QTextStream out(stdout);
     out << "Set Y Min value to " << value << "\n";
@@ -863,7 +863,7 @@ void ColorCreator::on_yMin_valueChanged(int value)
 
 void ColorCreator::on_yMax_valueChanged(int value)
 {
-    yMax[currentColor] = value;
+    intSliders[yMax][currentColor] = value;
     updateColors();
     QTextStream out(stdout);
     out << "Set Y Max value to " << value << "\n";
@@ -880,17 +880,17 @@ void ColorCreator::on_zSlice_valueChanged(int value)
 void ColorCreator::on_colorSelect_currentIndexChanged(int index)
 {
     currentColor = index;
-    ui->hMin->setValue(hMin[currentColor] * 100);
-    ui->hMax->setValue(hMax[currentColor] * 100);
-    ui->sMin->setValue(sMin[currentColor] * 100);
-    ui->sMax->setValue(sMax[currentColor] * 100);
-    ui->zMin->setValue(zMin[currentColor] * 100);
-    ui->zMax->setValue(zMax[currentColor] * 100);
-    ui->yMin->setValue(yMin[currentColor]);
-    ui->yMax->setValue(yMax[currentColor]);
-    ui->vMin->setValue(vMin[currentColor]);
-    ui->vMax->setValue(vMax[currentColor]);
-    ui->zSlice->setValue((zMin[currentColor] + zMax[currentColor]) * 50);
+    ui->hMin->setValue(fltSliders[hMin][currentColor] * 100);
+    ui->hMax->setValue(fltSliders[hMax][currentColor] * 100);
+    ui->sMin->setValue(fltSliders[sMin][currentColor] * 100);
+    ui->sMax->setValue(fltSliders[sMax][currentColor] * 100);
+    ui->zMin->setValue(fltSliders[zMin][currentColor] * 100);
+    ui->zMax->setValue(fltSliders[zMax][currentColor] * 100);
+    ui->yMin->setValue(intSliders[yMin][currentColor]);
+    ui->yMax->setValue(intSliders[yMax][currentColor]);
+    ui->vMin->setValue(intSliders[vMin][currentColor]);
+    ui->vMax->setValue(intSliders[vMax][currentColor]);
+    ui->zSlice->setValue((fltSliders[zMin][currentColor] + fltSliders[zMax][currentColor]) * 50);
 }
 
 /* Called when the user wants to view something different.
@@ -904,7 +904,7 @@ void ColorCreator::on_viewChoice_currentIndexChanged(int index)
 
 void ColorCreator::on_zMin_valueChanged(int value)
 {
-    zMin[currentColor] = (float)value / 100.0f;
+    fltSliders[zMin][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set Z Min value to " << value << "\n";
@@ -912,7 +912,7 @@ void ColorCreator::on_zMin_valueChanged(int value)
 
 void ColorCreator::on_zMax_valueChanged(int value)
 {
-    zMax[currentColor] = (float)value / 100.0f;
+    fltSliders[zMax][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set Z Max value to " << value << "\n";
@@ -958,22 +958,22 @@ void ColorCreator::writeNewFormat(QString filename)
                 for (int c = Orange; c < Black; c++)
                 {
                     bool ok = false;
-                    if (hMin[c] >= hMax[c])
+                    if (fltSliders[hMin][c] >= fltSliders[hMax][c])
                     {
-                        if (col.getH() >= hMin[c] || col.getH() <= hMax[c])
+                        if (col.getH() >= fltSliders[hMin][c] || col.getH() <= fltSliders[hMax][c])
                         {
                             ok = true;
                         }
                     } else
                     {
-                        if (col.getH() >= hMin[c] && col.getH() <= hMax[c])
+                        if (col.getH() >= fltSliders[hMin][c] && col.getH() <= fltSliders[hMax][c])
                         {
                             ok = true;
                         }
                     }
-                    if (ok && y * 2 >= yMin[c] && y * 2 <= yMax[c] &&
-                            col.getS() >= sMin[c] && col.getS() <= sMax[c] && col.getZ() >= zMin[c] &&
-                            col.getZ() <= zMax[c])
+                    if (ok && y * 2 >= intSliders[yMin][c] && y * 2 <= intSliders[yMax][c] &&
+                            col.getS() >= fltSliders[sMin][c] && col.getS() <= fltSliders[sMax][c] && col.getZ() >= fltSliders[zMin][c] &&
+                            col.getZ() <= fltSliders[zMax][c])
                     {
                         if (c == Orange) {
                             count++;
@@ -1020,22 +1020,22 @@ void ColorCreator::writeOldFormat(QString filename)
                 for (int c = Orange; c < Black; c++)
                 {
                     bool ok = false;
-                    if (hMin[c] > hMax[c])
+                    if (fltSliders[hMin][c] > fltSliders[hMax][c])
                     {
-                        if (col.getH() >= hMin[c] || col.getH() <= hMax[c])
+                        if (col.getH() >= fltSliders[hMin][c] || col.getH() <= fltSliders[hMax][c])
                         {
                             ok = true;
                         }
                     } else
                     {
-                        if (col.getH() >= hMin[c] && col.getH() <= hMax[c])
+                        if (col.getH() >= fltSliders[hMin][c] && col.getH() <= fltSliders[hMax][c])
                         {
                             ok = true;
                         }
                     }
-                    if (ok && y * 2 >= yMin[c] && y * 2 <= yMax[c] &&
-                            col.getS() >= sMin[c] && col.getS() <= sMax[c] && col.getZ() >= zMin[c] &&
-                            col.getZ() <= zMax[c])
+                    if (ok && y * 2 >= intSliders[yMin][c] && y * 2 <= intSliders[yMax][c] &&
+                            col.getS() >= fltSliders[sMin][c] && col.getS() <= fltSliders[sMax][c] && col.getZ() >= fltSliders[zMin][c] &&
+                            col.getZ() <= fltSliders[zMax][c])
                     {
                         switch (c)
                         {
@@ -1164,7 +1164,7 @@ void ColorCreator::on_edgeDiff_valueChanged(int value)
 
 void ColorCreator::on_vMin_valueChanged(int value)
 {
-    vMin[currentColor] = value;
+    intSliders[vMin][currentColor] = value;
     updateColors();
     QTextStream out(stdout);
     out << "Set V Min value to " << value << "\n";
@@ -1172,7 +1172,7 @@ void ColorCreator::on_vMin_valueChanged(int value)
 
 void ColorCreator::on_vMax_valueChanged(int value)
 {
-    vMax[currentColor] = value;
+    intSliders[vMax][currentColor] = value;
     updateColors();
     QTextStream out(stdout);
     out << "Set V Max value to " << value << "\n";
