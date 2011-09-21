@@ -98,8 +98,8 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
 
     ui->setupUi(this);
     //  default directories - should not be user specific
-    baseDirectory = "/Users/ericchown/nbites/data/frames";
-    baseColorTable = "/Users/ericchown/nbites/data/tables";
+    baseDirectory = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites/data/frames";
+    baseColorTable = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites/data/tables";
     haveFile = false;
     viewerEnabled = false;
 
@@ -929,182 +929,13 @@ void ColorCreator::on_getColorTable_clicked()
     currentColorDirectory.chop(currentColorDirectory.size() - last);
 }
 
-/* Writes out a color table.  The "new" part of the format is that it
-  writes the color table using bitwise color definitions instead of the
-  old integer definitions.
-  @param filename        the name to write
-  */
-void ColorCreator::writeNewFormat(QString filename)
-{
-    QFile file(filename);
-    QTextStream out(stdout);
-    QByteArray temp;
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        out << "The file would not open properly" << "\n";
-        return;
-    }
-    // loop through all possible table values - our tables are v-u-y
-    int count = 0;
-    for (int z = 0; z < 128; ++z)
-    {
-        for (int x = 0; x < 128; x ++)
-        {
-            for (int y = 0; y < 128; y++)
-            {
-                temp[0] = GREY_COL;
-                ColorSpace col;
-                col.setYuv(y * 2, x * 2, z * 2);
-                for (int c = Orange; c < Black; c++)
-                {
-                    bool ok = false;
-                    if (fltSliders[hMin][c] >= fltSliders[hMax][c])
-                    {
-                        if (col.getH() >= fltSliders[hMin][c] || col.getH() <= fltSliders[hMax][c])
-                        {
-                            ok = true;
-                        }
-                    } else
-                    {
-                        if (col.getH() >= fltSliders[hMin][c] && col.getH() <= fltSliders[hMax][c])
-                        {
-                            ok = true;
-                        }
-                    }
-                    if (ok && y * 2 >= intSliders[yMin][c] && y * 2 <= intSliders[yMax][c] &&
-                            col.getS() >= fltSliders[sMin][c] && col.getS() <= fltSliders[sMax][c] && col.getZ() >= fltSliders[zMin][c] &&
-                            col.getZ() <= fltSliders[zMax][c])
-                    {
-                        if (c == Orange) {
-                            count++;
-                        }
-                        temp[0] = temp[0] | bitColor[c];
-                    }
-                }
-                file.write(temp);
-            }
-        }
-    }
-    out << "Count was " << count << "\n" << endl;
-    file.close();
-}
-
-/* Writes a color table of the old format.  Old meaning integer definitions.
-  So we should never use this anymore.
-  @param filename        the name of the file to write
-  */
-void ColorCreator::writeOldFormat(QString filename)
-{
-    QFile file(filename);
-    QTextStream out(stdout);
-    QByteArray temp;
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        out << "The file would not open properly" << "\n";
-        return;
-    }
-    // loop through all possible table values - our tables are v-u-y
-    int count = 0;
-    for (int z = 0; z < 128; ++z)
-    {
-        for (int x = 0; x < 128; x ++)
-        {
-            for (int y = 0; y < 128; y++)
-            {
-                temp[0] = GREY_COL;
-                ColorSpace col;
-                col.setYuv(y * 2, x * 2, z * 2);
-                bool orange = false;
-                bool yellow = false;
-                bool blue = false;
-                for (int c = Orange; c < Black; c++)
-                {
-                    bool ok = false;
-                    if (fltSliders[hMin][c] > fltSliders[hMax][c])
-                    {
-                        if (col.getH() >= fltSliders[hMin][c] || col.getH() <= fltSliders[hMax][c])
-                        {
-                            ok = true;
-                        }
-                    } else
-                    {
-                        if (col.getH() >= fltSliders[hMin][c] && col.getH() <= fltSliders[hMax][c])
-                        {
-                            ok = true;
-                        }
-                    }
-                    if (ok && y * 2 >= intSliders[yMin][c] && y * 2 <= intSliders[yMax][c] &&
-                            col.getS() >= fltSliders[sMin][c] && col.getS() <= fltSliders[sMax][c] && col.getZ() >= fltSliders[zMin][c] &&
-                            col.getZ() <= fltSliders[zMax][c])
-                    {
-                        switch (c)
-                        {
-                        case Orange:
-                            temp[0] = ORANGE_COL;
-                            orange = true;
-                            count++;
-                            break;
-                        case Blue:
-                            temp[0] = BLUE_COL;
-                            blue = true;
-                            break;
-                        case Yellow:
-                            if (orange)
-                            {
-                                temp[0] = ORANGEYELLOW_COL;
-                            } else
-                            {
-                                temp[0] = YELLOW_COL;
-                            }
-                            yellow = true;
-                            break;
-                        case Green:
-                            if (blue)
-                            {
-                                temp[0] = BLUEGREEN_COL;
-                            } else{
-                                temp[0] = GREEN_COL;
-                            }
-                            break;
-                        case White:
-                            if (yellow)
-                            {
-                                temp[0] = YELLOWWHITE_COL;
-                            } else
-                            {
-                                temp[0] = WHITE;
-                            }
-                            break;
-                        case Pink:
-                            if (orange)
-                            {
-                                temp[0] = ORANGERED_COL;
-                            } else
-                            {
-                                temp[0] = RED_COL;
-                            }
-                            break;
-                        case Navy:
-                            temp[0] = NAVY_COL;
-                            break;
-                        }
-                    }
-                }
-                file.write(temp);
-            }
-        }
-    }
-    out << "Count was " << count << "\n";
-    file.close();
-}
-
 /* The user wants to write a color table.
   */
 void ColorCreator::on_writeNew_clicked()
 {
     QString filename = baseColorTable + "/new.mtb";
     //writeOldFormat(filename);
-    writeNewFormat(filename);
+    table->write(filename, fltSliders, intSliders, bitColor);
 }
 
 
