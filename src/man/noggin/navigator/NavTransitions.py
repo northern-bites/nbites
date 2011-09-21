@@ -1,38 +1,38 @@
-from math import fabs, sqrt
+from math import fabs, hypot
 from . import NavConstants as constants
 from man.noggin.util import MyMath
 import noggin_constants as NogginConstants
+from ..players import ChaseBallTransitions
 
-def atDestinationCloser(my, dest):
+def atDestinationCloser(nav):
     """
     Returns true if we are at an (x, y) close enough to the one we want
-
     """
-    return my.distTo(dest) < (constants.CLOSER_XY +
-                              sqrt(my.uncertX**2. +
-                                   my.uncertY**2.))
+    my = nav.brain.my
 
-def atDestinationCloserAndFacing(my, dest, bearing):
-    return (atDestinationCloser(my, dest) and \
-            fabs(bearing) < constants.CLOSE_ENOUGH_H)
+    if nav.destType is constants.BALL:
+        return ChaseBallTransitions.ballInPosition(nav.brain.player)
+
+    return my.distTo(nav.getDestination()) < (constants.CLOSER_XY +
+                                              hypot(my.uncertX,
+                                                    my.uncertY))
 
 def atHeadingGoTo(my, targetHeading):
     hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
     return hDiff < constants.AT_HEADING_GOTO_DEG
 
-def atHeading(my, targetHeading):
+def atHeading(nav):
     """
     Returns true if we are at a heading close enough to what we want
     """
-    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
+    my = nav.brain.my
+    dest = nav.getDestination()
+
+    if nav.destType is constants.BALL:
+        return abs(nav.brain.ball.bearing) < constants.CLOSE_ENOUGH_H
+
+    hDiff = fabs(MyMath.sub180Angle(my.h - dest.h))
     return hDiff < constants.CLOSE_ENOUGH_H and \
-           my.uncertH < constants.LOC_IS_ACTIVE_H
-
-#not used
-def notAtHeading(my, targetHeading):
-    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
-
-    return hDiff > constants.ALMOST_CLOSE_ENOUGH_H and \
            my.uncertH < constants.LOC_IS_ACTIVE_H
 
 def useFinalHeading(brain, position):
@@ -45,45 +45,55 @@ def useFinalHeading(brain, position):
 
     return (distToPoint <= useFinalHeadingDist)
 
+def shouldSwitchPFKModes(nav):
+    """
+    True if we're near to the ball and using setSpeed, or far away and using setDest
+    """
+    ball = nav.brain.ball
+
+    # using setSpeed
+    if nav.currentState == 'goToPosition' or \
+           nav.currentState == 'omniGoTo' :
+        if ball.dist < 30:
+            return True
+
+    return False
+
 ######### BALL IN BOX ###############
 
 def shouldChaseAroundBox(my, ball):
 
     # 3 common, simple cases where we don't need to worry about the box.
     if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
-        if ball.x > NogginConstants.MY_GOALBOX_RIGHT_X:
+        if ball.loc.x > NogginConstants.MY_GOALBOX_RIGHT_X:
             return False
 
     if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
-        if ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+        if ball.loc.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
             return False
 
     if my.y > NogginConstants.MY_GOALBOX_TOP_Y:
-        if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
+        if ball.loc.y > NogginConstants.MY_GOALBOX_TOP_Y:
             return False
 
     # handle more complex cases where correct behavior isn't obvious
     intersect = MyMath.linesIntersect
 
-    return ( intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
+    return ( intersect( my.x, my.y, ball.loc.x, ball.loc.y, # BOTTOM_GOALBOX_LINE
                         NogginConstants.MY_GOALBOX_LEFT_X,
                         NogginConstants.MY_GOALBOX_BOTTOM_Y,
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-             intersect( my.x, my.y, ball.x, ball.y, # LEFT_GOALBOX_LINE
+             intersect( my.x, my.y, ball.loc.x, ball.loc.y, # LEFT_GOALBOX_LINE
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y,
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-             intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
+             intersect( my.x, my.y, ball.loc.x, ball.loc.y, # BOTTOM_GOALBOX_LINE
                         NogginConstants.MY_GOALBOX_LEFT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y,
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y) )
-
-def shouldNotGoInBox(ball):
-    return (False and ball.inMyGoalBox() and
-            ball.dist < constants.IGNORE_BALL_IN_BOX_DIST)
 
 ####### AVOIDANCE STUFF ##############
 

@@ -40,41 +40,49 @@ public:
     typedef boost::shared_ptr<BodyJointCommand> ptr;
 
     BodyJointCommand(const float time,
-                     const std::vector<float> *body_joints,
-                     const std::vector<float> *body_stiffness,
+                     const std::vector<float>& body_joints,
+                     const std::vector<float>& body_stiffness,
                      const Kinematics::InterpolationType _type);
 
     BodyJointCommand(const float time,
                      Kinematics::ChainID chainId,
-                     const std::vector<float> *joints,
-                     const std::vector<float> *body_stiffness,
+                     const std::vector<float>& joints,
+                     const std::vector<float>& body_stiffness,
                      const Kinematics::InterpolationType _type);
     BodyJointCommand(const float time,
-                     const std::vector<float> *larm,
-                     const std::vector<float> *lleg,
-                     const std::vector<float> *rleg,
-                     const std::vector<float> *rarm,
-                     const std::vector<float> *body_stiffness,
+                     const std::vector<float>& larm,
+                     const std::vector<float>& lleg,
+                     const std::vector<float>& rleg,
+                     const std::vector<float>& rarm,
+                     const std::vector<float>& body_stiffness,
                      const Kinematics::InterpolationType _type);
 
-    BodyJointCommand(const BodyJointCommand &other);
     virtual ~BodyJointCommand(void);
 
-    virtual const std::vector<float>* getJoints(Kinematics::ChainID chainID) const;
-    const std::vector<float>* getLArmJoints(void) const { return larm_joints; }
-    const std::vector<float>* getLLegJoints(void) const { return lleg_joints; }
-    const std::vector<float>* getRLegJoints(void) const { return rleg_joints; }
-    const std::vector<float>* getRArmJoints(void) const { return rarm_joints; }
+    virtual const std::vector<float>&
+    getJoints(Kinematics::ChainID chainID) const;
+
+    const std::vector<float>& getLArmJoints(void) const { return larm_joints; }
+    const std::vector<float>& getLLegJoints(void) const { return lleg_joints; }
+    const std::vector<float>& getRLegJoints(void) const { return rleg_joints; }
+    const std::vector<float>& getRArmJoints(void) const { return rarm_joints; }
 
     const bool conflicts(const BodyJointCommand &other) const;
-    const bool conflicts(const float chainTimeRemaining[Kinematics::NUM_CHAINS]) const;
+
+    const bool
+    conflicts(const float chainTimeRemaining[Kinematics::NUM_CHAINS]) const;
 
 private:
+    BodyJointCommand(const BodyJointCommand &other);
     virtual void setChainList();
-    const std::vector<float> *larm_joints;
-    const std::vector<float> *lleg_joints;
-    const std::vector<float> *rleg_joints;
-    const std::vector<float> *rarm_joints;
+
+    std::vector<float>*
+    getJoints(Kinematics::ChainID chainID);
+
+    std::vector<float> larm_joints;
+    std::vector<float> lleg_joints;
+    std::vector<float> rleg_joints;
+    std::vector<float> rarm_joints;
 };
 
 #endif

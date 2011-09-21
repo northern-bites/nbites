@@ -1,11 +1,11 @@
-# Redirect standard error to standard out
 import time
 import sys
+
+# Redirect standard error to standard out
 _stderr = sys.stderr
 sys.stderr = sys.stdout
 ## import cProfile
 ## import pstats
-
 
 # Packages and modules from super-directories
 from man import comm
@@ -24,9 +24,10 @@ from . import Loc
 from . import TeamConfig
 from . import Leds
 from . import robots
+
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
-from .typeDefs import (Ball, Sonar, Packet,
+from .typeDefs import (Sonar, Packet,
                        Play, TeamMember)
 from .navigator import Navigator
 from .util import NaoOutput
@@ -37,7 +38,7 @@ from .kickDecider import KickDecider
 import _roboguardian
 import _speech
 
-from objects import (MyInfo, FieldObject, RobotLocation)
+from objects import (MyInfo, FieldObject, Ball)
 
 class Brain(object):
     """
@@ -101,7 +102,8 @@ class Brain(object):
         # Information about the environment
         self.initFieldObjects()
         self.initTeamMembers()
-        self.ball = Ball.Ball(self.vision.ball)
+        self.ball = Ball(self.vision.ball, self.loc, self.my)
+
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
         if Constants.LOG_COMM:
@@ -124,25 +126,25 @@ class Brain(object):
         Build our set of Field Objects which are team specific compared
         to the generic forms used in the vision system
         """
-
         # Build instances of the vision based field objects
+        # Left post is on that goalie's left
         # Yellow goal left and right posts
         self.yglp = FieldObject(self.vision.yglp,
                                 Constants.vis_landmark.VISION_YGLP,
-                                self.my)
+                                self.loc)
 
         self.ygrp = FieldObject(self.vision.ygrp,
                                 Constants.vis_landmark.VISION_YGRP,
-                                self.my)
+                                self.loc)
 
         # Blue Goal left and right posts
         self.bglp = FieldObject(self.vision.bglp,
                                 Constants.vis_landmark.VISION_BGLP,
-                                self.my)
+                                self.loc)
 
         self.bgrp = FieldObject(self.vision.bgrp,
                                 Constants.vis_landmark.VISION_BGRP,
-                                self.my)
+                                self.loc)
 
         # Now we build the field objects to be based on our team color
         self.makeFieldObjectsRelative()
@@ -152,13 +154,13 @@ class Brain(object):
         Builds a list of fieldObjects based on their relative names to the robot
         Needs to be called when team color is determined
         """
+        # Note: corner directions are relative to perspective of own goalie
 
         # Blue team setup
         if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
             # Yellow goal
             self.oppGoalRightPost = self.yglp
             self.oppGoalLeftPost = self.ygrp
-
             # Blue Goal
             self.myGoalLeftPost = self.bglp
             self.myGoalRightPost = self.bgrp
@@ -168,21 +170,20 @@ class Brain(object):
             # Yellow goal
             self.myGoalLeftPost = self.yglp
             self.myGoalRightPost = self.ygrp
-
             # Blue Goal
             self.oppGoalRightPost = self.bglp
             self.oppGoalLeftPost = self.bgrp
 
-        # Since, for ex.  bgrp points to the same thins as myGoalLeftPost,
+        # Since, for ex.  bgrp points to the same things as myGoalLeftPost,
         # we can set these regardless of our team color
         self.myGoalLeftPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_MY_GOAL_LEFT_POST)
+            Constants.LANDMARK_MY_GOAL_LEFT_POST)
         self.myGoalRightPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_MY_GOAL_RIGHT_POST)
+            Constants.LANDMARK_MY_GOAL_RIGHT_POST)
         self.oppGoalLeftPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_OPP_GOAL_LEFT_POST)
+            Constants.LANDMARK_OPP_GOAL_LEFT_POST)
         self.oppGoalRightPost.associateWithRelativeLandmark(
-                Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
+            Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
 
         # Build a list of all of the field objects with respect to team color
         self.myFieldObjects = [self.yglp, self.ygrp, self.bglp, self.bgrp]
@@ -233,11 +234,8 @@ class Brain(object):
         # Communications update
         self.updateComm()
 
-        # Localization Update
-        self.updateLocalization()
-
-        # Choose whether we use Vision or Localization
-        self.updateBestValues()
+        # Update objects
+        self.updateObjects()
 
         #Set LEDS
         self.leds.processLeds()
@@ -271,18 +269,12 @@ class Brain(object):
             if (mate.active and mate.isDead()):
                 mate.active = False
 
-    def updateLocalization(self):
+    def updateObjects(self):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.ball.updateLoc(self.loc, self.my)
+        self.ball.update()
         self.my.update()
-
-    def updateBestValues(self):
-        """
-        Update estimates about objects using best information available
-        """
-        self.ball.updateBestValues(self.my)
         self.yglp.setBest()
         self.ygrp.setBest()
         self.bglp.setBest()
@@ -317,6 +309,7 @@ class Brain(object):
                           loc.ballVelX,
                           loc.ballVelY)
 
+        # TODO: remove this and log through C++ and the Logger instead.
         if Constants.LOG_COMM:
             packet = Packet.Packet((TeamConfig.TEAM_NUMBER,
                                     TeamConfig.PLAYER_NUMBER,
@@ -344,7 +337,6 @@ class Brain(object):
         """
         Reset our localization
         """
-
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
@@ -354,7 +346,6 @@ class Brain(object):
         """
         Reset our localization
         """
-
         if self.out.loggingLoc:
             self.out.stopLocLog()
             self.out.startLocLog()
@@ -362,5 +353,3 @@ class Brain(object):
             self.loc.blueGoalieReset()
         else:
             self.loc.redGoalieReset()
-
-

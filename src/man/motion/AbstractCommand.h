@@ -31,6 +31,7 @@
 #define ABSTRACT_COMMAND_H
 
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 
 #include "Common.h"
 
@@ -40,24 +41,33 @@ public:
     typedef boost::shared_ptr<AbstractCommand> ptr;
 
     AbstractCommand()
-	: commandFinished(false), framesLeft(-1)
-	{}
+        : commandFinished(false), framesLeft(-1)
+        {}
     virtual ~AbstractCommand() {}
 
     // Sent through to Python (override them for nicer behavior)
     virtual int framesRemaining() { return framesLeft; }
-    virtual bool isDoneExecuting() { return commandFinished || framesLeft <= 0; }
+    virtual bool isDoneExecuting() { return commandFinished; }
     virtual float timeRemaining() {
-	if (isDoneExecuting())
-	    return 0.0f;
-	return static_cast<float>(framesRemaining()) * MOTION_FRAME_RATE;
+        if (isDoneExecuting())
+            return 0.0f;
+        return static_cast<float>(framesRemaining()) * MOTION_FRAME_RATE;
     }
 
     // ONLY CALL THESE FROM PROVIDERS (aren't exposed to Python)
     void finishedExecuting() { commandFinished = true; }
-    void framesRemaining(int _frames) { framesLeft = _frames; }
+    void framesRemaining(int _frames) {
+        framesLeft = _frames;
 
-    void tick() { --framesLeft; }
+        if (framesLeft > 0){
+            commandFinished = false;
+        }
+    }
+
+    void tick() {
+        if (--framesLeft < 0)
+            commandFinished = true;
+    }
 
 private:
     bool commandFinished;

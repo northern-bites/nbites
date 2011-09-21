@@ -4,6 +4,10 @@ from ..players import GoalieConstants as goalCon
 #********
 # GOALIE*
 #********
+#
+# The transitions decide if the goalie is going to change roles.
+# They have counters built in which keep track of the number of
+# times the transition is true.
 
 
 def shouldPositionForSave(team):
@@ -18,7 +22,7 @@ def shouldPositionForSave(team):
             team.resetGoalieRoleCounters()
             return True
 
-    elif ball.relAccX < goalCon.ACCEL_SAVE_THRESH:
+    elif ball.loc.relAccX < goalCon.ACCEL_SAVE_THRESH:
         team.shouldSaveCounter += 1
         if team.shouldSaveCounter > goalCon.CHANGE_THRESH:
             team.resetGoalieRoleCounters()
@@ -37,7 +41,7 @@ def shouldNotSave(team):
     if team.brain.player.penaltyKicking:
         return False
 
-    if (ball.relAccX < goalCon.BALL_NO_MOVEMENT
+    if (ball.loc.relAccX < goalCon.BALL_NO_MOVEMENT
         and ball.vis.heat == 0):
         team.shouldStopSaveCounter += 1
         if team.shouldStopSaveCounter > goalCon.OUT_OF_SAVE:
@@ -45,8 +49,8 @@ def shouldNotSave(team):
             team.resetGoalieRoleCounters()
             return True
 
-    elif (ball.inMyGoalBox() and
-          ball.relAccX < goalCon.BALL_NO_MOVEMENT):
+    elif (ball.loc.inMyGoalBox() and
+          ball.loc.relAccX < goalCon.BALL_NO_MOVEMENT):
         team.shouldStopSaveCounter += 1
         if team.shouldStopSaveCounter > goalCon.OUT_OF_SAVE:
             team.brain.player.isSaving = False
@@ -68,10 +72,9 @@ def shouldChase(team):
     if (ball.vis.framesOff > goalCon.BALL_LOST):
         return False
 
-    if (ball.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.CHASE_BUFFER
-        and ball.relX < goalCon.CHASE_RELX_BUFFER
-        and ball.vis.on
-        ):
+    if (ball.loc.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.CHASE_BUFFER
+        and ball.loc.relX < goalCon.CHASE_RELX_BUFFER
+        and ball.vis.on):
         team.shouldChaseCounter += 1
 
     if team.shouldChaseCounter > goalCon.CHANGE_THRESH:
@@ -100,12 +103,12 @@ def shouldStopChase(team):
         return True
 
     if (my.x > NogCon.MY_GOALBOX_RIGHT_X):
-        if(ball.x > goalCon.CHASE_RIGHT_X_LIMIT):
+        if(ball.loc.x > goalCon.CHASE_RIGHT_X_LIMIT):
             team.resetGoalieRoleCounters()
             return True
 
-    elif (ball.x > goalCon.CHASE_RIGHT_X_LIMIT
-        or ball.relX > goalCon.STOP_CHASE_RELX_BUFFER):
+    if (ball.loc.x > goalCon.CHASE_RIGHT_X_LIMIT
+        or ball.loc.relX > goalCon.STOP_CHASE_RELX_BUFFER):
         team.shouldStopChaseCounter += 1
 
     if team.shouldStopChaseCounter > goalCon.CHANGE_THRESH:
@@ -126,7 +129,7 @@ def shouldPositionCenter(team):
         team.resetGoalieRoleCounters()
         return True
 
-    if ball.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER:
+    if ball.loc.x > goalCon.CHASE_RIGHT_X_LIMIT + goalCon.CHASE_BUFFER:
         team.shouldPositionCenterCounter += 1
         if team.shouldPositionCenterCounter > goalCon.CHANGE_THRESH:
             team.resetGoalieRoleCounters()
@@ -143,8 +146,8 @@ def shouldPositionRight(team):
     if ball.vis.framesOff > goalCon.BALL_LOST:
         return False
 
-    if (ball.y < goalCon.CHASE_LOWER_Y_LIMIT + goalCon.CHASE_BUFFER
-        and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
+    if (ball.loc.y < goalCon.CHASE_LOWER_Y_LIMIT + goalCon.CHASE_BUFFER
+        and ball.loc.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.vis.on):
         team.shouldPositionRightCounter += 1
         if team.shouldPositionRightCounter > goalCon.CHANGE_THRESH:
@@ -162,8 +165,8 @@ def shouldPositionLeft(team):
     if ball.vis.framesOff > goalCon.BALL_LOST:
         return False
 
-    if (ball.y > goalCon.CHASE_UPPER_Y_LIMIT + goalCon.CHASE_BUFFER
-        and ball.x < goalCon.CHASE_RIGHT_X_LIMIT
+    if (ball.loc.y > goalCon.CHASE_UPPER_Y_LIMIT + goalCon.CHASE_BUFFER
+        and ball.loc.x < goalCon.CHASE_RIGHT_X_LIMIT
         and ball.vis.on):
         team.shouldPositionLeftCounter += 1
         if team.shouldPositionLeftCounter > goalCon.CHANGE_THRESH:

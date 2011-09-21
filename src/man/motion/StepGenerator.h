@@ -95,6 +95,8 @@
 #include "NBMatrixMath.h"
 #include "ZmpEKF.h"
 #include "ZmpAccExp.h"
+#include "OdometryFilter.h"
+#include "dsp.h"
 
 //Debugging flags:
 #ifdef WALK_DEBUG
@@ -138,7 +140,7 @@ public:
 
     void resetHard();
 
-    static std::vector<float>*
+    static std::vector<float>
     getDefaultStance(const Gait & wp);
 
     const SupportFoot getSupportFoot() const {
@@ -162,6 +164,10 @@ private: // Helper methods
     void fillZMPEnd(const Step::ptr newStep);
 
     void resetSteps(const bool startLeft);
+    // updates our relative position to a destination based on the Step distances
+    static void countStepTowardsDestination(Step::ptr step, float& dest_x,
+					    float& dest_y, float& dest_theta,
+					    int& framesToDestination);
 
     static const NBMath::ufmatrix3 get_f_fprime(const Step::ptr step);
     static const NBMath::ufmatrix3 get_fprime_f(const Step::ptr step);
@@ -174,7 +180,7 @@ private: // Helper methods
 
     void resetQueues();
     void resetOdometry(const float initX, const float initY);
-    void updateOdometry(const std::vector<float> &deltaOdo);
+    void updateOdometry();
     void debugLogging();
     void update_FtoI_transform();
 private:
@@ -228,7 +234,10 @@ private:
     NBMath::ufmatrix3 fi_Transform;
     NBMath::ufmatrix3 fc_Transform;
     NBMath::ufmatrix3 cf_Transform;
-    NBMath::ufmatrix3 cc_Transform; //odometry
+
+    NBMath::ufmatrix3 cc_Transform;
+    float lastRotation, avgStepRotation, dThetaPerMotionFrame;
+    Boxcar xOdoFilter;
 
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<NaoPose> pose;

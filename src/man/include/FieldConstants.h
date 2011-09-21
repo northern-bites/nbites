@@ -15,8 +15,8 @@ static const float GREEN_PAD_Y = 15.f;
 #else
 static const float FIELD_WHITE_WIDTH = 600.f;
 static const float FIELD_WHITE_HEIGHT = 400.f;
-static const float GREEN_PAD_X = 67.0f;
-static const float GREEN_PAD_Y = 70.0f;
+static const float GREEN_PAD_X = 71.0f;
+static const float GREEN_PAD_Y = 71.0f;
 #endif // USING_LAB_FIELD
 
 static const float FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + 2.0f * GREEN_PAD_Y;
@@ -75,7 +75,7 @@ static const float GOALBOX_DEPTH = 60.f;
 static const float GOALBOX_WIDTH = 200.f;
 #else
 static const float GOALBOX_DEPTH = 60.f;
-static const float GOALBOX_WIDTH = 230.f;
+static const float GOALBOX_WIDTH = 220.f;
 #endif // USING_LAB_FIELD
 
 

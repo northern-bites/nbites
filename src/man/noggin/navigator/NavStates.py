@@ -1,6 +1,4 @@
 """ States for finding our way on the field """
-
-from ..util import MyMath
 from . import NavConstants as constants
 from . import NavHelper as helper
 from . import WalkHelper as walker
@@ -8,7 +6,6 @@ from . import NavTransitions as navTrans
 from ..objects import RobotLocation
 
 from math import fabs
-import copy
 
 DEBUG = False
 
@@ -37,8 +34,8 @@ def goToPosition(nav):
     my = nav.brain.my
     dest = nav.getDestination()
 
-    if (navTrans.atDestinationCloser(my, dest) and
-        navTrans.atHeading(my, dest.h)):
+    if (navTrans.atDestinationCloser(nav) and
+        navTrans.atHeading(nav)):
             nav.atPositionCount += 1
             if nav.atPositionCount > \
             constants.FRAMES_THRESHOLD_TO_AT_POSITION:
@@ -49,6 +46,9 @@ def goToPosition(nav):
 
     # We don't want to alter the actual destination, we just want a
     # temporary destination for getting the params to walk straight at
+    if hasattr(dest, "loc"):
+        dest = dest.loc
+
     intermediateH = my.headingTo(dest)
     tempDest = RobotLocation(dest.x, dest.y, intermediateH)
 
@@ -75,8 +75,8 @@ def omniGoTo(nav):
     my = nav.brain.my
     dest = nav.getDestination()
 
-    if (navTrans.atDestinationCloser(my, dest) and
-        navTrans.atHeading(my, dest.h)):
+    if (navTrans.atDestinationCloser(nav) and
+        navTrans.atHeading(nav)):
         nav.atPositionCount += 1
         if (nav.atPositionCount >
             constants.FRAMES_THRESHOLD_TO_AT_POSITION):
@@ -131,6 +131,7 @@ def avoidFrontObstacle(nav):
     # we'll probably want to go forward again and most obstacle
     # are moving, so pausing might make more sense
 
+    # TODO figure this out maybe potential field will fix this for us???
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
         nav.printf(nav.brain.sonar)
@@ -165,7 +166,6 @@ def avoidLeftObstacle(nav):
     """
     dodges right if we only detect something to the left of us
     """
-
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
         nav.printf(nav.brain.sonar)
@@ -197,7 +197,6 @@ def avoidRightObstacle(nav):
     """
     dodges left if we only detect something to the left of us
     """
-
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
         nav.printf(nav.brain.sonar)
@@ -239,45 +238,39 @@ def destWalking(nav):
     """
     State to be used when we are walking to a destination
     """
-    if nav.firstFrame() or nav.newDestination:
+    if nav.firstFrame():
         if (nav.destGain < 0):
             nav.destGain = 1;
-            # @todo Leaving the actual interface of the destGain parameter unimplemented
-            # Wils, figure out how you want to set it up --Nathan
 
-        helper.setDestination(nav, nav.destX, nav.destY, nav.destTheta, nav.destGain)
-        nav.newDestination = False
+        nav.nearDestination = False
 
-    return nav.stay()
+        helper.setDestination(nav,
+                              nav.destX,
+                              nav.destY,
+                              nav.destTheta,
+                              nav.destGain)
 
-# State to use with the setSteps method
-def stepping(nav):
-    """
-    We use this to go a specified number of steps.
-    This is different from walking.
-    """
-    if nav.firstFrame():
-        helper.step(nav, nav.stepX, nav.stepY, nav.stepTheta, nav.numSteps)
+    # the frames remaining counter is sometimes set to -1 initially
+    elif -1 != nav.currentCommand.framesRemaining() < 40:
+        nav.nearDestination = True
 
-    elif not nav.brain.motion.isWalkActive():
-        return nav.goNow("stopped")
+    if DEBUG and nav.counter % 3 is 0:
+        print "destCommand in progress: {0} frames, {1} X {2} Y remaining"\
+              .format(nav.currentCommand.framesRemaining(),
+                      nav.currentCommand.remainingX(),
+                      nav.currentCommand.remainingY())
 
-    return nav.stay()
+    if nav.counter > 1 and \
+           (nav.currentCommand.isDone() or
+            not nav.brain.motion.isWalkActive()):
+        if DEBUG:
+            print "isWalkActive? {0}, commandDone? {1}, counter? {2}"\
+                  .format(nav.brain.motion.isWalkActive(),
+                          nav.currentCommand.isDone(),
+                          nav.counter)
+        nav.nearDestination = True
+        return nav.goNow('atPosition')
 
-### Stopping States ###
-def stop(nav):
-    """
-    Wait until the walk is finished.
-    """
-    if nav.firstFrame():
-        helper.setSpeed(nav, 0, 0, 0)
-
-    if not nav.brain.motion.isWalkActive():
-        return nav.goNow('stopped')
-
-    return nav.stay()
-
-def stopped(nav):
     return nav.stay()
 
 def orbitPointThruAngle(nav):
@@ -292,41 +285,74 @@ def orbitPointThruAngle(nav):
     else:
         orbitDir = constants.ORBIT_RIGHT
 
-    #determine speeds for orbit
-    ball = nav.brain.ball
+    if nav.counter % 8 == 0:
+        #determine speeds for orbit
+        ball = nav.brain.ball
 
-    #want x to keep a radius of 17 from the ball, increase and
-    #decrease x velocity as we move farther away from that dist
-    walkX = (ball.relX - 18) * .045
+        #want x to keep a radius of 17 from the ball, increase and
+        #decrease x velocity as we move farther away from that dist
+        walkX = (ball.loc.relX - 15) * .037
+        if walkX > 1:
+            walkX = 1
+        elif walkX < -1:
+            walkX = -1
 
-    #keep constant y velocity, let x and theta changea
-    walkY = orbitDir * .8
+        #keep constant y velocity, let x and theta change
+        walkY = orbitDir * .85
+        if walkY > 1:
+            walkY = 1
+        elif walkY < -1:
+            walkY = -1
 
-    #Vary theta based on ball bearing.  increase theta velocity as
-    #we get farther away from facing the ball
-    walkTheta = orbitDir * ball.bearing * .035
+        #Vary theta based on ball bearing.  increase theta velocity as
+        #we get farther away from facing the ball
+        walkTheta = orbitDir * ball.bearing * .052
+        if walkTheta > 1:
+            walkTheta = 1
+        elif walkTheta < -1:
+            walkTheta = -1
 
-    #set speed for orbit
-    helper.setSpeed(nav, walkX, walkY, walkTheta )
+        #set speed for orbit
+        helper.setSpeed(nav, walkX, walkY, walkTheta )
 
-    #Funny enough, we orbit about 1 degree a frame,
+    #Funny enough, we orbit about 1 degree per two frames,
     #So the angle can be used as a thresh
 
     if nav.counter >= nav.angleToOrbit:
         return nav.goLater('stop')
     return nav.stay()
 
+### Stopping States ###
+def stop(nav):
+    """
+    Wait until the walk is finished.
+    """
+    if nav.firstFrame():
+        # stop walk vectors
+        helper.setSpeed(nav, 0, 0, 0)
+        nav.destType = None
+        nav.resetDestMemory()
+        nav.resetSpeedMemory()
+
+    if not nav.brain.motion.isWalkActive():
+        return nav.goNow('stopped')
+
+    return nav.stay()
+
+def stopped(nav):
+    if nav.firstFrame():
+        nav.destType = None
+    return nav.stay()
+
+# TODO: make this a stopping state elsewhere in the code.
 def atPosition(nav):
     if nav.firstFrame():
         nav.brain.speech.say("At Position")
         helper.setSpeed(nav, 0, 0, 0)
         nav.startOmniCount = 0
 
-    my = nav.brain.my
-    dest = nav.getDestination()
-
-    if navTrans.atDestinationCloser(my, dest) and \
-            navTrans.atHeading(my, dest.h):
+    if navTrans.atDestinationCloser(nav) and \
+            navTrans.atHeading(nav):
         nav.startOmniCount = 0
         return nav.stay()
 
@@ -334,5 +360,5 @@ def atPosition(nav):
         nav.startOmniCount += 1
         if nav.startOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
             return nav.goLater('omniGoTo')
-        else:
-            return nav.stay()
+    return nav.stay()
+

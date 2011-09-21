@@ -7,16 +7,20 @@ def getOmniWalkParam(my, dest):
     # for the ball. be nice not to recalculate it.
     relX, relY, relH = 0, 0, 0
     if hasattr(dest, "relX") and \
-            hasattr(dest, "relY") and \
-            hasattr(dest, "relH"):
+           hasattr(dest, "relY"):
         relX = dest.relX
         relY = dest.relY
-        relH = dest.relH
     else:
         bearingDeg = my.getRelativeBearing(dest)
         distToDest = my.distTo(dest)
         relX = MyMath.getRelativeX(distToDest, bearingDeg)
         relY = MyMath.getRelativeY(distToDest, bearingDeg)
+
+    if hasattr(dest, "relH"):
+        relH = dest.relH
+    elif hasattr(dest, "bearing"):
+        relH = dest.bearing
+    else:
         relH = MyMath.sub180Angle(dest.h - my.h)
 
     # calculate forward speed
@@ -158,8 +162,6 @@ def getWalkBackParam(my, dest):
 
 def getSpinOnlyParam(my, dest):
     # Determine the speed to turn
-    # see if getRotScale can go faster
-
     bearing = my.getRelativeBearing(dest)
     if (fabs(bearing) < 5.0):
         sTheta = 0.0
@@ -172,13 +174,3 @@ def getSpinOnlyParam(my, dest):
 
     sX, sY = 0, 0
     return (sX, sY, sTheta)
-
-def getRotScale(headingDiff):
-    absHDiff = fabs(headingDiff)
-
-    return absHDiff / 90.0
-
-def getCloseRotScale(headingDiff):
-    absHDiff = fabs(headingDiff)
-
-    return absHDiff / 50.0

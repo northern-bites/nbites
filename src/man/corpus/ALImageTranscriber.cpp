@@ -37,14 +37,15 @@ const int ALImageTranscriber::DEFAULT_CAMERA_BUFFERSIZE = 16;
 // Gain: 26 / Exp: 83
 // Gain: 28 / Exp: 60
 // Gain: 35 / Exp: 40
+// Camera parameters go HERE, **NOT** in Camera.h
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 30;
+const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 28;
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 113;
-const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 60;
-const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 154;
-const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 85;
-const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 140;
+const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 133;
+const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 64;
+const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 130;
+const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 93;
+const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 151;
 const int ALImageTranscriber::DEFAULT_CAMERA_HUE = 0;
 // Lens correction
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSX = 0;
@@ -147,7 +148,7 @@ void ALImageTranscriber::run()
         //start timer
         PROF_ENTER(P_MAIN);
         PROF_ENTER(P_GETIMAGE);
-        const long long startTime = process_micro_time();
+        const long long startTime = monotonic_micro_time();
 
         if (camera_active)
             waitForImage();
@@ -162,7 +163,7 @@ void ALImageTranscriber::run()
 #endif
 
         //stop timer
-        const long long processTime = process_micro_time() - startTime;
+        const long long processTime = monotonic_micro_time() - startTime;
         //sleep until next frame
 
         lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;

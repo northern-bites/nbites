@@ -34,9 +34,9 @@ public:
     SetHeadCommand(const float _yaw,
 		   const float _pitch,
 		   const float _maxSpeedYaw =
-		   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
+				   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
 		   const float _maxSpeedPitch =
-		   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
+				   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		   )
         : MotionCommand(MotionConstants::SET_HEAD),
            yaw(_yaw),

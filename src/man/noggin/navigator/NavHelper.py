@@ -1,5 +1,4 @@
 import man.motion as motion
-from man.noggin.util import MyMath
 from math import fabs
 import NavConstants as constants
 
@@ -16,13 +15,13 @@ def setDestination(nav, x, y, theta, gain):
     nav.currentCommand = \
         motion.DestinationCommand(x=x, y=y, theta=theta, gain=gain)
     nav.brain.motion.sendDestCommand(nav.currentCommand)
-    nav.updateDests(x,y,theta,gain)
+
+    nav.updateDests(x, y, theta, gain)
 
 def setSpeed(nav, x, y, theta):
     """
     Wrapper method to easily change the walk vector of the robot
     """
-
     if x == 0 and y == 0 and theta == 0 and \
             nav.brain.motion.isWalkActive():
         createAndSendWalkVector(nav, 0,0,0) # Ensure that STOP commands get sent
@@ -56,28 +55,12 @@ def setDribbleSpeed(nav, x, y, theta):
 
     nav.updateSpeeds(x,y, theta)
 
-def step(nav, x, y, theta, numSteps):
-    """
-    Wrapper method to easily change the walk vector of the robot
-    """
-
-    if x < BACKWARDS_GAIT_THRESH:
-        nav.brain.CoA.setRobotBackwardsGait(nav.brain.motion)
-    else:
-        nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
-
-    x_cms, y_cms, theta_degs = convertWalkVector(nav.brain, x, y, theta)
-
-    createAndSendStepsVector(nav, x_cms, y_cms, theta_degs)
-
-
 def executeMove(motionInst, sweetMove):
     """
     Method to enqueue a SweetMove
     Can either take in a head move or a body command
     (see SweetMove files for descriptions of command tuples)
     """
-
     for position in sweetMove:
         if len(position) == 7:
             move = motion.BodyJointCommand(position[4], #time
@@ -99,7 +82,6 @@ def executeMove(motionInst, sweetMove):
 
         else:
             print("What kind of sweet ass-Move is this?")
-
         motionInst.enqueue(move)
 
 def convertWalkVector(brain, x_abs, y_abs, theta_abs):
@@ -107,7 +89,6 @@ def convertWalkVector(brain, x_abs, y_abs, theta_abs):
     Convert the 0->1 values into actual cm values for the WalkCommand
     NOTE: x_abs means that x is bound on [-1,1] (not an absolute value)
     """
-
     checkWalkVector(x_abs, y_abs, theta_abs)
 
     gait = brain.CoA.current_gait
@@ -136,10 +117,6 @@ def checkWalkVector(x, y, theta):
     assert fabs(y) <= 1
     assert fabs(theta) <= 1
 
-def createAndSendStepsVector(nav, x, y, theta):
-    steps = motion.StepCommand(x=x, y=y, theta=theta, numSteps=numSteps)
-    nav.brain.motion.sendStepCommand(steps)
-
 def createAndSendWalkVector(nav, x, y, theta):
     walk = motion.WalkCommand(x=x,y=y,theta=theta)
     nav.brain.motion.setNextWalkCommand(walk)
@@ -156,4 +133,3 @@ def updateGait(nav, x, y, theta):
         nav.brain.CoA.setRobotSlowGait(nav.brain.motion)
     else:
         nav.brain.CoA.setRobotGait(nav.brain.motion)
-

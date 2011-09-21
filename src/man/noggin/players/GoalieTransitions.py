@@ -1,17 +1,25 @@
 #
 # The transitions for the goalie for the goalie states.
-# Covers chase, position and save.
+# Covers chase, position and save. Most of the counters
+# for transitions are contained in these transitions.
 #
 
 import noggin_constants as NogCon
 import GoalieConstants as goalCon
+import PositionTransitions as PosTran
 
-#SAVING TRANSITIONS
+# ******************
+# SAVING TRANSITIONS
+# ******************
+
 
 def shouldSave(player):
+    """
+    Decision on if goalie should prepare to save
+    """
     ball = player.brain.ball
 
-    if(ball.relVelX < goalCon.VEL_HIGH
+    if(ball.loc.relVelX < goalCon.VEL_HIGH
        and ball.vis.heat <= goalCon.HEAT_LOW):
         player.shouldSaveCounter += 1
         if player.shouldSaveCounter > 1:
@@ -22,13 +30,13 @@ def shouldSave(player):
         player.shouldSaveCounter = 0
         return False
 
-# not used right now
-#should move goalie but with dive right now shouldnt need
+# NOT USED
+# Unsure if it works
 def strafeDirForSave(player):
     ball = player.brain.ball
     my = player.brain.my
     timeUntilSave = getTimeUntilSave(player)
-    anticipatedY = (ball.relY + ball.relVelY * timeUntilSave)
+    anticipatedY = (ball.loc.relY + ball.loc.relVelY * timeUntilSave)
     if anticipatedY < my.y - goalCon.CENTER_SAVE_THRESH:
         return -1
     elif anticipatedY > my.y + goalCon.CENTER_SAVE_THRESH:
@@ -37,49 +45,69 @@ def strafeDirForSave(player):
         return 0
 
 def shouldSaveRight(player):
+    """
+    Decision for saving diving right
+    """
     ball= player.brain.ball
     my = player.brain.my
 
-    return(ball.endY < -goalCon.CENTER_SAVE_THRESH
-           and ball.endY > -goalCon.DONT_SAVE_LIMIT
+    return(ball.loc.endY < -goalCon.CENTER_SAVE_THRESH
+           and ball.loc.endY > -goalCon.DONT_SAVE_LIMIT
            and goalieInBox(player))
 
 def shouldSaveLeft(player):
+    """
+    Decision for saving diving left
+    """
     ball= player.brain.ball
     my = player.brain.my
 
-    return (ball.endY > goalCon.CENTER_SAVE_THRESH
-            and ball.endY < goalCon.DONT_SAVE_LIMIT
+    return (ball.loc.endY > goalCon.CENTER_SAVE_THRESH
+            and ball.loc.endY < goalCon.DONT_SAVE_LIMIT
             and goalieInBox(player))
 
 # Not used
+# If you should save but you shouldnt
+# dive you will always center save
 def shouldSaveCenter(player):
     ball= player.brain.ball
 
     return False
 
-# If penalty kicking do not get up
 def shouldHoldSave(player):
+    """
+    Decision to keep goalie in save.
+    If penalty kick then dont ever get
+    up.
+    """
     return (player.penaltyKicking or
             player.stateTime <= goalCon.TIME_ON_GROUND)
 
-#POSITION TRANSITIONS
+# ********************
+# POSITION TRANSITIONS
+# ********************
 
-# player is inside the box with a small buffer
-#localization not good enough for this?
 def goalieInBox(player):
-    my = player.brain.my
+    """
+    The goalie is in its box
+    """
+    return player.brain.my.inMyGoalBox()
 
-    return my.inMyGoalBox()
+def goalieIsLost(player):
+    """
+    Goalie is facing off field
+    """
+    return PosTran.leavingTheField(player)
 
-
-#CHASE TRANSITIONS
+# *****************
+# CHASE TRANSITIONS
+# *****************
 
 def dangerousBall(player):
-    ball = player.brain.ball
+    """
+    The ball is in the box behind the goalie
+    """
 
-    # in box and behind me and close to me
-    # if inBox(player):
-    return (ball.relX < 0 and goalieInBox(player))
+    return (player.brain.ball.loc.relX < 0 and goalieInBox(player))
 
 

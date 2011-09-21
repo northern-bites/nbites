@@ -14,10 +14,10 @@ using namespace ekf;
 // Measurement conversion form
 const float MultiLocEKF::USE_CARTESIAN_DIST = 50.0f;
 // Uncertainty
-const float MultiLocEKF::BETA_LOC = 0.2f;
-const float MultiLocEKF::GAMMA_LOC = 0.1f;
-const float MultiLocEKF::BETA_ROT = M_PI_FLOAT/256.0f;
-const float MultiLocEKF::GAMMA_ROT = 0.1f;
+const float MultiLocEKF::BETA_LOC = 0.0f;
+const float MultiLocEKF::GAMMA_LOC = 0.3f;
+const float MultiLocEKF::BETA_ROT = 0.0f; //M_PI_FLOAT/256.0f;
+const float MultiLocEKF::GAMMA_ROT = 0.3f;
 
 // Default initialization values
 const float MultiLocEKF::INIT_LOC_X = CENTER_FIELD_X;
@@ -80,8 +80,7 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
                                   heading_mag - h);                     \
                                                                         \
     float dist_error = z.getVisDistance() - pt_dist;                    \
-    float bearing_error = (subPIAngle(z.getVisBearing() - pt_bearing) / \
-                           z.getBearingSD());
+    float bearing_error = subPIAngle(z.getVisBearing() - pt_bearing);
 
 
 /**
@@ -134,7 +133,7 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
         H_k(1,2) = -1;                                                  \
                                                                         \
         /* Update the measurement covariance matrix */                  \
-        /* Indices: (Dist, bearing, orientation) */                     \
+        /* Indices: (Dist, bearing) */                                  \
         R_k(0,0) = z.getDistanceSD() * z.getDistanceSD();               \
         R_k(0,1) = 0.0f;                                                \
                                                                         \
@@ -243,7 +242,7 @@ void MultiLocEKF::resetLocTo(float x, float y, float h)
     for (int i=0; i < loc_ekf_dimension; ++i){
         xhat_k(i) = xhat_k_bar(i) = 0.0f;
         for (int j=0; j < loc_ekf_dimension; ++j){
-            A_k(i,j) = Q_k(i,j) = P_k(i,j) = P_k_bar(i,j) = 0.0f;
+            P_k(i,j) = P_k_bar(i,j) = 0.0f;
         }
     }
     setXEst(x);
@@ -373,12 +372,8 @@ MultiLocEKF::associateTimeUpdate(MotionModel u)
 
     // Derivatives of motion updates re:x,y,h
     // Other values are set in the constructor and are unchanging
-    //
-    // THESE ARE UNUSED:
-    //    They cause a negative value to be generated in P_k which
-    //    is very bad. Disabled until a solution can be found. --Jack and Yoni
-    A_k(0,2) = 0; //-u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) = 0; //u.deltaF * cosh - u.deltaL * sinh;
+    A_k(0,2) = -u.deltaF * sinh - u.deltaL * cosh;
+    A_k(1,2) = u.deltaF * cosh - u.deltaL * sinh;
 
     return deltaLoc;
 }
@@ -712,13 +707,13 @@ void MultiLocEKF::limitAPrioriUncert()
 void MultiLocEKF::limitPosteriorUncert()
 {
     // Check x uncertainty
-    P_k(0,0) = P_k_bar(0,0) = clip(P_k(0,0), X_UNCERT_MIN, X_UNCERT_MAX);
+    P_k(0,0) = P_k_bar(0,0) = clip(P_k(0,0), X_UNCERT_MAX);
 
     // Check y uncertainty
-    P_k(1,1) = P_k_bar(1,1) = clip(P_k(1,1), Y_UNCERT_MIN, Y_UNCERT_MAX);
+    P_k(1,1) = P_k_bar(1,1) = clip(P_k(1,1), Y_UNCERT_MAX);
 
     // Check h uncertainty
-    P_k(2,2) = P_k_bar(2,2) = clip(P_k(2,2), H_UNCERT_MIN, H_UNCERT_MAX);
+    P_k(2,2) = P_k_bar(2,2) = clip(P_k(2,2), H_UNCERT_MAX);
 }
 
 /**
@@ -739,7 +734,8 @@ void MultiLocEKF::clipRobotPose()
     // Check h uncertainty
     xhat_k(2) =
         xhat_k_bar(2) =
-        clip(xhat_k(2), H_EST_MIN, H_EST_MAX);
+        		NBMath::subPIAngle(xhat_k(2));
+    //    clip(xhat_k(2), H_EST_MIN, H_EST_MAX);
 }
 
 void MultiLocEKF::printBeforeUpdateInfo()
@@ -776,7 +772,7 @@ void MultiLocEKF::printAfterUpdateInfo()
 bool MultiLocEKF::resetLoc(const vector<PointObservation> pt_z,
                            const vector<CornerObservation>& c_z)
 {
-    return (resetLoc(pt_z)|| resetLoc(c_z));
+    return (resetLoc(pt_z) || resetLoc(c_z));
 }
 
 /**

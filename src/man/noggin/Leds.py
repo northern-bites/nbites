@@ -4,8 +4,8 @@ from playbook import PBConstants
 # LED Related #
 DEBUG_BALL_LEDS = True
 DEBUG_GOAL_LEDS = True
-DEBUG_CHASER_LEDS = True
-DEBUG_DEFENDER_LEDS = True
+DEBUG_ROLE_LEDS = False
+DEBUG_DEFENDER_LEDS = False
 
 ####### LED DEFINITIONS #############
 LED_OFF = 0
@@ -21,8 +21,7 @@ CHEST_LED,
 LEFT_FOOT_LED,
 RIGHT_FOOT_LED) = range(_lights.NUM_LED_GROUPS)
 
-
-#COLORS
+###COLORS
 RED   = 0xFF0000
 GREEN = 0x00FF00
 BLUE  = 0x0000FF
@@ -33,18 +32,15 @@ WHITE = 0xFFFFFF
 OFF   = 0x000000
 NOW = 0.0
 
-
-
-###### GC LEDS ##########
-###### KICKOFF ##########
+##### KICKOFF #####
 HAVE_KICKOFF_LEDS  = ((RIGHT_FOOT_LED, WHITE, NOW),)
 NO_KICKOFF_LEDS    = ((RIGHT_FOOT_LED, OFF, NOW),)
 
-###### TEAM COLOR ##########
+##### TEAM COLOR #####
 TEAM_BLUE_LEDS = ((LEFT_FOOT_LED, BLUE, NOW),)
 TEAM_RED_LEDS = ((LEFT_FOOT_LED, RED, NOW),)
 
-###### STATES ###########
+##### STATES #####
 STATE_INITIAL_LEDS =  ((CHEST_LED, OFF,    NOW),)
 STATE_READY_LEDS =    ((CHEST_LED, BLUE,   NOW),)
 STATE_SET_LEDS =      ((CHEST_LED, YELLOW, NOW),)
@@ -52,16 +48,12 @@ STATE_PLAYING_LEDS =  ((CHEST_LED, GREEN,  NOW),)
 STATE_PENALIZED_LEDS =((CHEST_LED, RED,    NOW),)
 STATE_FINISHED_LEDS = ((CHEST_LED, OFF,    NOW),)
 
-##### Brain ######
-#### Ball #######
+##### Ball  #####
 BALL_ON_LEDS = ((LEFT_EYE_LED, RED, NOW),)
 BALL_OFF_LEDS = ((LEFT_EYE_LED, BLUE, NOW),)
 
-############### Roles ###############
-#### Chaser #######
+##### Roles #####
 CHASER_ON_LEDS = ((RIGHT_EYE_LED, GREEN, NOW),)
-LOC_CHASER_ON_LEDS = ((RIGHT_EYE_LED, WHITE, NOW),)
-#### Other ####
 MIDDIE_ON_LEDS = ((RIGHT_EYE_LED, PURPLE, NOW),)
 DEFENDER_ON_LEDS = ((RIGHT_EYE_LED, CYAN, NOW),)
 OFFENDER_ON_LEDS =  ((RIGHT_EYE_LED, YELLOW, NOW),)
@@ -83,9 +75,8 @@ FLASH_OFF_LEDS = ((LEFT_EYE_LED,  OFF, NOW),
                   (LEFT_EAR_LED,  OFF, NOW),
                   (RIGHT_EAR_LED, OFF, NOW),)
 
-
-
 class Leds():
+
     def __init__(self, brainPtr):
         self.lights = _lights.lights
         self.brain = brainPtr
@@ -100,38 +91,41 @@ class Leds():
             self.flashLeds()
             return
 
-        ### for the ball ###
         if DEBUG_BALL_LEDS:
-            if self.brain.ball.vis.on:
+            if self.brain.ball.vis.framesOn == 1:
                 self.executeLeds(BALL_ON_LEDS)
-            else:
+            elif self.brain.ball.vis.framesOff == 1:
                 self.executeLeds(BALL_OFF_LEDS)
 
         if DEBUG_GOAL_LEDS:
-            if (self.brain.myGoalLeftPost.vis.on or
-                self.brain.oppGoalLeftPost.vis.on or
-                self.brain.myGoalRightPost.vis.on or
-                self.brain.oppGoalRightPost.vis.on):
+            if (self.brain.myGoalLeftPost.vis.framesOn == 1 or
+                self.brain.oppGoalLeftPost.vis.framesOn == 1 or
+                self.brain.myGoalRightPost.vis.framesOn == 1 or
+                self.brain.oppGoalRightPost.vis.framesOn == 1):
+
                 self.executeLeds(LEFT_GOAL_ON_LEDS)
                 self.executeLeds(RIGHT_GOAL_ON_LEDS)
-            else:
+
+            elif (self.brain.myGoalLeftPost.vis.framesOff == 1 or
+                self.brain.oppGoalLeftPost.vis.framesOff == 1 or
+                self.brain.myGoalRightPost.vis.framesOff == 1 or
+                self.brain.oppGoalRightPost.vis.framesOff == 1):
+
                 self.executeLeds(LEFT_GOAL_OFF_LEDS)
                 self.executeLeds(RIGHT_GOAL_OFF_LEDS)
 
-        if DEBUG_CHASER_LEDS:
-            if self.brain.play.isRole(PBConstants.CHASER):
-                if self.brain.player.currentState == "approachBallWithLoc":
-                    self.executeLeds(LOC_CHASER_ON_LEDS)
-                else:
-                    self.executeLeds(CHASER_ON_LEDS)
-            elif self.brain.play.isRole(PBConstants.DEFENDER):
-                self.executeLeds(DEFENDER_ON_LEDS)
-            elif self.brain.play.isRole(PBConstants.OFFENDER):
-                self.executeLeds(OFFENDER_ON_LEDS)
-            elif self.brain.play.isRole(PBConstants.MIDDIE):
-                self.executeLeds(MIDDIE_ON_LEDS)
-            else:
-                self.executeLeds(CHASER_OFF_LEDS)
+        if DEBUG_ROLE_LEDS:
+            if self.playbook.roleChanged:
+                if self.brain.play.isRole(PBConstants.CHASER):
+                        self.executeLeds(CHASER_ON_LEDS)
+                elif self.brain.play.isRole(PBConstants.DEFENDER):
+                        self.executeLeds(DEFENDER_ON_LEDS)
+                elif self.brain.play.isRole(PBConstants.OFFENDER):
+                        self.executeLeds(OFFENDER_ON_LEDS)
+                elif self.brain.play.isRole(PBConstants.MIDDIE):
+                        self.executeLeds(MIDDIE_ON_LEDS)
+                elif self.brain.play.roleChanged():
+                        self.executeLeds(CHASER_OFF_LEDS)
 
     def executeLeds(self,listOfLeds):
 

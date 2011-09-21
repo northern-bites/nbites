@@ -73,7 +73,6 @@ SET( MOTION_SRCS
 		     ChopShop
 		     NullProvider
 		     WalkProvider
-		     CoordHeadProvider
 		     Step
 		     Gait
 		     AbstractGait
@@ -81,6 +80,7 @@ SET( MOTION_SRCS
 		     SensorAngles
 		     SpringSensor
 		     WalkingLeg
+		     OdometryFilter
 		     WalkingArm
 		     BalancingArm
 		     PreviewController

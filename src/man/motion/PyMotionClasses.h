@@ -59,15 +59,15 @@ public:
     PyHeadJointCommand(float time, tuple joints,
 		       tuple stiffness, int interpolationType) {
 
-        vector<float> * jointsVector = new vector<float>;
-        vector<float> * head_stiffness = new vector<float>;
+        vector<float> jointsVector;
+        vector<float> head_stiffness;
         // Head joint commands are sent in as degree values and we deal with
         // radians in the motion engine. They get converted here.
         for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
-            jointsVector->push_back(extract<float>(joints[i]) * TO_RAD);
+            jointsVector.push_back(extract<float>(joints[i]) * TO_RAD);
 
 	for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
-	    head_stiffness->push_back(extract<float>(stiffness[i]));
+	    head_stiffness.push_back(extract<float>(stiffness[i]));
 
         command =
 	    HeadJointCommand::ptr (
@@ -213,61 +213,58 @@ public:
     PyBodyJointCommand(float time,
                        tuple larmJoints, tuple llegJoints,
                        tuple rlegJoints, tuple rarmJoints,
-		       tuple stiffness,
+                       tuple stiffness,
                        int interpolationType) {
-        vector<float> * larm = new vector<float>;
-        vector<float> * lleg = new vector<float>;
-        vector<float> * rleg = new vector<float>;
-        vector<float> * rarm = new vector<float>;
-	vector<float> * body_stiffness = new vector<float>;
+        vector<float> larm, lleg, rleg, rarm, body_stiffness;
 
         // The joints come in in degrees. Convert them to radians here
-        for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++)
-            larm->push_back(extract<float>(larmJoints[i]) * TO_RAD);
+        for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++){
+            larm.push_back(extract<float>(larmJoints[i]) * TO_RAD);
+            rarm.push_back(extract<float>(rarmJoints[i]) * TO_RAD);
+        }
 
-        for (unsigned int i=0; i < Kinematics::LEG_JOINTS; i++)
-            lleg->push_back(extract<float>(llegJoints[i]) * TO_RAD);
+        for (unsigned int i=0; i < Kinematics::LEG_JOINTS; i++){
+            lleg.push_back(extract<float>(llegJoints[i]) * TO_RAD);
+            rleg.push_back(extract<float>(rlegJoints[i]) * TO_RAD);
+        }
 
-        for (unsigned int i=0; i < Kinematics::LEG_JOINTS; i++)
-            rleg->push_back(extract<float>(rlegJoints[i]) * TO_RAD);
-
-        for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++)
-            rarm->push_back(extract<float>(rarmJoints[i]) * TO_RAD);
-
-	for (unsigned int i=0; i < Kinematics::NUM_JOINTS; i++)
-	    body_stiffness->push_back(extract<float>(stiffness[i]));
+        for (unsigned int i=0; i < Kinematics::NUM_JOINTS; i++){
+            body_stiffness.push_back(extract<float>(stiffness[i]));
+        }
 
         command = BodyJointCommand::ptr (
-	    new BodyJointCommand(time, larm, lleg, rleg, rarm,
-				 body_stiffness,
-				 static_cast<InterpolationType>(interpolationType))
-	    );
+            new BodyJointCommand(time, larm, lleg, rleg, rarm,
+                                 body_stiffness,
+                                 static_cast<InterpolationType>(
+                                     interpolationType))
+            );
     }
 
     // Single chain command
     PyBodyJointCommand(float time,
-		       int chainID, tuple chainJoints,
-		       tuple stiffness,
-		       int interpolationType) {
-        vector<float> * chain = new vector<float>;
-	vector<float> * body_stiffness = new vector<float>;
+                       int chainID, tuple chainJoints,
+                       tuple stiffness,
+                       int interpolationType) {
+
+        vector<float> chain, body_stiffness;
 
         // The joints come in in degrees. Convert them to radians here
         for (unsigned int i=0; i < chain_lengths[chainID] ; i++)
-            chain->push_back(extract<float>(chainJoints[i]) * TO_RAD);
+            chain.push_back(extract<float>(chainJoints[i]) * TO_RAD);
 
-	for (unsigned int i=0; i < Kinematics::NUM_BODY_JOINTS; i++)
-	    body_stiffness->push_back(extract<float>(stiffness[i]));
+        for (unsigned int i=0; i < Kinematics::NUM_BODY_JOINTS; i++)
+            body_stiffness.push_back(extract<float>(stiffness[i]));
 
         command = BodyJointCommand::ptr (
-	    new BodyJointCommand(time, static_cast<ChainID>(chainID),
-				 chain, body_stiffness,
-				 static_cast<InterpolationType>(interpolationType))
-	    );
+            new BodyJointCommand(time, static_cast<ChainID>(chainID),
+                                 chain, body_stiffness,
+                                 static_cast<InterpolationType>(
+                                     interpolationType))
+            );
     }
 
     BodyJointCommand::ptr getCommand() const {
-	return dynamic_pointer_cast<BodyJointCommand>(command);
+        return dynamic_pointer_cast<BodyJointCommand>(command);
     }
 };
 
@@ -296,14 +293,14 @@ class PyCoordHeadCommand : public PyMotionCommand {
 public:
     PyCoordHeadCommand( const float _x, const float _y, const float _z) {
 	command = CoordHeadCommand::ptr (
-	    new CoordHeadCommand(_x,_y,_z)
+	    new CoordHeadCommand(_x * 10, _y * 10, _z * 10)
 	    );
     }
     PyCoordHeadCommand( const float _x, const float _y, const float _z,
                         const float maxYawSpeed,
                         const float maxPitchSpeed ) {
 	command = CoordHeadCommand::ptr(
-	    new CoordHeadCommand( _x, _y, _z,
+	    new CoordHeadCommand( _x * 10, _y * 10, _z * 10,
 				  maxYawSpeed, maxPitchSpeed )
 	    );
     }

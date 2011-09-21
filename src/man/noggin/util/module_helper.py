@@ -186,7 +186,7 @@ def reload_module(name, delete_pycs=False, ignore_case=False):
     extension, but not for the file name.  Specify ignore_case as True to
     remove all .pyc files whose basenames match alphanumerically in lower
     case. '''
-    
+
     global name_map, ns_map, attr_map
 
     module = name_map.get(name)
@@ -204,7 +204,7 @@ def reload_module(name, delete_pycs=False, ignore_case=False):
             dirname = os.path.dirname(path)
             if not dirname:
                 dirname = os.path.curdir
-        
+
         # Delete pyc file/s
         pyc_file = os.path.extsep.join((fname, 'pyc'))
         # List all pyc files in the directory
@@ -222,7 +222,7 @@ def reload_module(name, delete_pycs=False, ignore_case=False):
         for path in file_list:
             print "Removing", os.path.join(dirname, path)
             os.remove(os.path.join(dirname, path))
-    
+
     # Reload the module
     reload(module)
     # Update all attribute dependencies
@@ -237,7 +237,7 @@ class ReloadableModuleReference(object):
     ''' A transparent wrapper-class around an underlying module object.
 
     The ReloadableModuleReference is intended to supplant the use of the
-    raw module and overloads the __getattr__() method to provide direct 
+    raw module and overloads the __getattr__() method to provide direct
     access to the underlying module's data, mathods, and other attributes.
 
     The only attributes specific to the wrapper class are:

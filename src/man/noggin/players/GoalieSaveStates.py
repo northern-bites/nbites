@@ -1,12 +1,29 @@
-# These are the states for goalie saves.
-# They should be able to dive right and left
-# and save center.
+# This is the set of states that the goalie enters
+# when it is saving.  The states include testing states
+# which keep the goalie from diving.  To have the goalie
+# dive you need to turn the TESTING boolean to false.
+#
+# The states work by entering a super state that makes
+# the decision about how to save.  From there the goalie
+# enters one of three states (center, left, right). After
+# saving the goalie enters a hold state.  They all do the
+# same thing but we have different states so that the goalie
+# knows what state it just came from so it knows how to get up.
+# If the goalie dove it will then do the roll out of the dive
+# and get up otherwise it will just get up.
+#
+# We disable fall protection at the beginning of saving
+# because otherwise the goalie wont save.  We also have
+# an isSaving boolean which keeps the goalie from switching
+# roles while it is in the process of saving.  Both isSaving
+# and fall protection are dealt with in the doneSaving state.
 
 import man.motion.SweetMoves as SweetMoves
 import GoalieTransitions as helper
 import GoalieConstants as goalCon
 
-TESTING = True
+# Goalie will only dive when false *****
+TESTING = False
 
 def goalieSave(player):
 
@@ -19,12 +36,12 @@ def goalieSave(player):
         player.isSaving = True
 
     if helper.shouldSave(player):
-        print "Saving because"
-        print  "Ball.relVelX is" + str(ball.relVelX)
-        print  "And Ball.heat is" + str(ball.vis.heat)
         brain.tracker.stopHeadMoves()
         brain.fallController.enableFallProtection(False)
         if TESTING:
+            print "Saving because"
+            print  "Ball.relVelX is" + str(ball.loc.relVelX)
+            print  "And Ball.heat is" + str(ball.vis.heat)
             if helper.shouldSaveRight(player):
                 return player.goNow('testSaveRight')
             elif helper.shouldSaveLeft(player):
@@ -38,13 +55,14 @@ def goalieSave(player):
                 return player.goNow('saveLeft')
             else:
                 return player.goNow('saveCenter')
-    #add check for strafe in future
 
     return player.stay()
 
-#moves left or right
-#NEEDS WORK
-#NOT USED RIGHT NOW
+# Strafe was created a while ago for the goalie
+# I dont think it works entirely plus with the
+# goalie dive we can pretty much cover the entire
+# goal from the center without having to strafe.
+# I left it here incase it was wanted in the future.
 def saveStrafe(player):
     strafeDir = helper.strafeDirForSave(player)
     if fabs(strafeDir) > 0:
@@ -53,7 +71,7 @@ def saveStrafe(player):
         player.stopWalking()
 
 
-# REAL SAVES
+# REAL SAVES - states make goalie dive or squat
 
 def saveRight(player):
     if player.firstFrame():
@@ -106,6 +124,9 @@ def testSaveCenter(player):
     return player.stay()
 
 # HOLD SAVE
+# The goalie is allowed 5 seconds to hold the save
+# so these states keep the goalie in position for
+# five seconds (2011 rules)
 
 def holdRightSave(player):
     if helper.shouldHoldSave(player):
@@ -147,6 +168,9 @@ def rollOutLeft(player):
 
     return player.stay()
 
+# TODO: Get rid of the random numbers which decide stand up
+# They have been tested and work but are not robust.
+
 def postCenterSave(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
@@ -165,6 +189,7 @@ def postDiveSave(player):
 
     return player.stay()
 
+# Will remain here until role is changed
 def doneSaving(player):
     if player.firstFrame():
         player.brain.fallController.enableFallProtection(True)

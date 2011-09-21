@@ -1,5 +1,6 @@
 #
-# Goalie constants
+# All of the constants used for the Goalie
+# are kept here.
 #
 
 import noggin_constants as NogCon
@@ -8,7 +9,7 @@ import noggin_constants as NogCon
 #     Position    *
 # *****************
 
-# Distance at which we use active localization
+# Distance from the ball at which we use active localization
 ACTIVE_LOC_THRESH = 150.
 
 # Move up so that in center of box
@@ -21,6 +22,12 @@ UNCERT_TOO_HIGH = 100
 #       Save      *
 # *****************
 
+# NOTE: A lot of saving decisions right now are
+# based on extensive testing for values that seemed
+# to offer good results in terms of saving.  When
+# an improved ball system is put in place you will
+# not need a lot of the weird numbers.
+
 # We dont use STRAFE RIGHT NOW
 STRAFE_ONLY = True
 STRAFE_SPEED = 0.3
@@ -32,11 +39,15 @@ SQUAT_WAIT = 25
 DIVE_WAIT = 150
 
 #Save decision
-HEAT_BUFFER = 10
+HEAT_BUFFER = 10 # Based on testing
 
-#Saving limits
+# Distance from center that can squat save
 CENTER_SAVE_THRESH = 15
+
+# Too far away to save distance
 DONT_SAVE_LIMIT = 250
+
+# Needs to be accelerating my direction
 ACCEL_SAVE_THRESH = -20
 
 # Accel value below which "Not Moving"
@@ -53,18 +64,25 @@ OUT_OF_SAVE = 30
 # *****************
 #       Chase     *
 # *****************
+# Right now chasing is turned down to a conservative
+# level because the goalie keeps getting lost
 
 # The chasing box
 CHASE_BUFFER = 10
 CHASE_RIGHT_X_LIMIT = NogCon.MY_GOALBOX_RIGHT_X + 80
 
 # Sanity checks for chasing
-CHASE_RELX_BUFFER = 160
-STOP_CHASE_RELX_BUFFER = 160
+CHASE_RELX_BUFFER = 80
+STOP_CHASE_RELX_BUFFER = 80
 
 # *****************
 #       Other     *
 # *****************
 
-BALL_LOST = 30
+BALL_LOST = 80
+
+# Goalie changes after 3 true calls to
+# a new state.  It is so fast because
+# we want a goalie that is quick to react
+# when necessary
 CHANGE_THRESH = 3

@@ -251,7 +251,7 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
     } else if (distanceDifference > DISTANCE_MISMATCH &&
                (e.dist *2 <  focalDist.dist ||
                 focalDist.dist * 2 < e.dist)
-               && e.dist < PIXACC && e.dist > 0) {
+               && e.dist < PIXACC && e.dist > 0 && w < 12) {
         if (BALLDEBUG) {
             cout << "Screening due to distance mismatch " << e.dist <<
                 " " << focalDist.dist << endl;
@@ -399,7 +399,7 @@ int Ball::findBallEdgeX(int x, int y, int dir) {
             }
         }
     }
-    return changex;
+    return min(max(0,changex), IMAGE_WIDTH);
 }
 
 /* From a given coordinate scan out in a given direction until the apparent
@@ -478,10 +478,11 @@ void Ball::adjustBallDimensions() {
             topBlob->getLeft() - newleft;
         if (abs(change - (h - w)) < DIAMETERMISMATCH) {
             if (BALLDEBUG) {
-                cout << "Adjusting width of blob" << endl;
+                cout << "Adjusting width of blob " << change << endl;
             }
             topBlob->setLeft(newleft);
             topBlob->setRight(newright);
+			printBlob(*topBlob);
         }
     }
 }

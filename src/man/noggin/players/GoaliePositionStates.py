@@ -1,7 +1,22 @@
 #
-# States for positioning the goalie.
+# These are the two positioning states for the goalie.
+# They are very similar.  The goaliePosition state is
+# the general positioning state which (when loc works)
+# centers the goalie in the goal facing the ball.
+# If the goalie is looking at the field edge and it is
+# really close and straight in front of him. He will
+# spin 180 to hopefully get him looking back at the field.
+#
+# The other positioning state is used straight out of kick
+# off so that goalie does not try repositioning itself
+# because it should already be in position. The only
+# movement it does do it take a couple steps forward
+# because manual position (2011) is too far back.
+# This state will probably become unnecessary when loc
+# improves.
 #
 import GoalieConstants as goalCon
+import GoalieTransitions as goalTran
 
 def goaliePosition(player):
     """
@@ -14,18 +29,10 @@ def goaliePosition(player):
 
     if player.firstFrame():
         nav.positionPlaybook()
+        player.brain.tracker.trackBall()
 
-    # When the ball is far away we want to make sure we
-    # are in position
-    if player.penaltyKicking:
-        player.brain.tracker.trackBall()
-    elif ball.dist >= goalCon.ACTIVE_LOC_THRESH:
-        player.brain.tracker.activeLocGoaliePos()
-    elif( my.uncertX> goalCon.UNCERT_TOO_HIGH
-          or my.uncertY > goalCon.UNCERT_TOO_HIGH) :
-        player.brain.tracker.activeLocGoaliePos()
-    else:
-        player.brain.tracker.trackBall()
+    if goalTran.goalieIsLost(player):
+        return player.goLater('spinToField')
 
     return player.stay()
 
@@ -40,19 +47,13 @@ def kickOffPosition(player):
 
     if player.firstFrame():
         player.brain.resetGoalieLocalization()
+        player.brain.tracker.trackBall()
         player.brain.nav.setDest(goalCon.MOVE_IN_KICKOFF, 0, 0)
         if player.penaltyKicking:
             player.gainsOn()
             player.walkPose()
 
-    # When the ball is far away we want to make sure we
-    # are in position3
-    if player.penaltyKicking :
-        player.brain.tracker.trackBall()
-    elif ball.dist >= goalCon.ACTIVE_LOC_THRESH:
-        player.brain.tracker.activeLocGoaliePos()
-    else:
-        player.brain.tracker.trackBall()
-
     return player.stay()
+
+
 

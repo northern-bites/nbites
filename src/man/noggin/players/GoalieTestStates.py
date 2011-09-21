@@ -1,15 +1,15 @@
 #
-#Tests for the different areas of goalie actions.
+# This contains the methods for testing different
+# parts of goalie behaviors.  The tests change
+# as necessary to test new parts of goalie behavior.
 #
 
-import math
-
-import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
-import man.motion.MotionConstants as MotionConstants
 import GoalieTransitions as goalTran
-import GoalieConstants as goalCon
 
+# ****************************
+# Normal states to run through.
+# ****************************
 
 def gameInitial(player):
     if player.firstFrame():
@@ -23,7 +23,6 @@ def gameReady(player):
         player.excuteMove(SweetMoves.INITIAL_POS)
         #player.brain.fallController.enableFallProtection(False)
         player.brain.tracker.trackBall()
-        #player.brain.tracker.activeLoc()
 
     return player.stay()
 
@@ -31,26 +30,18 @@ def gameSet(player):
     player.brain.resetGoalieLocalization()
     return player.stay()
 
+# To use a test put it in the goNow in this method
 def gamePlaying(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.INITIAL_POS)
     return player.goNow('testDX')
 
 def gamePenalized(player):
-    angles = player.brain.sensors.angles
-    if player.firstFrame():
-        print "((%.2f,%.2f,%.2f,%.2f),"%(angles[2],angles[3],angles[4],angles[5])
-        print "(%.2f,%.2f,%.2f,%.2f,%.2f,%.2f),"%(angles[6],angles[7],angles[8], \
-                                                      angles[9],angles[10], \
-                                                angles[11])
-        print "(%.2f,%.2f,%.2f,%.2f,%.2f,%.2f),"%(angles[12],angles[13],angles[14], \
-                                                angles[15],angles[16], \
-                                                angles[17])
-        print "(%.2f,%.2f,%.2f,%.2f), ),"%(angles[18],angles[19],angles[20],angles[21])
-        print " "
-        print " "
-
     return player.stay()
+
+# **************
+# *** TESTS ****
+# **************
 
 def testHeat(player):
     ball = player.brain.ball
@@ -71,21 +62,6 @@ def testDive(player):
 
     return player.stay()
 
-def testDX(player):
-    ball=player.brain.ball
-
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-
-    print "dx"
-    print ball.dx
-    print "relVelX"
-    print ball.relVelX
-    print "heat"
-    print ball.vis.heat
-
-    return player.stay()
-
 def testSaveDecision(player):
     ball = player.brain.ball
 
@@ -94,7 +70,6 @@ def testSaveDecision(player):
 
     return player.stay()
 
-# not using below here for now
 def testDangerousBall(player):
     if player.counter % 100 == 0:
         if goalTran.dangerousBall(player):

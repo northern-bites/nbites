@@ -1,8 +1,8 @@
 import noggin_constants as NogginConstants
-from . import ChaseBallConstants as ChaseConstants
-import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
+import PositionTransitions as PosTran
+import vision
 
 def positionLocalize(player):
     """
@@ -26,14 +26,33 @@ def playbookPosition(player):
         else:
             brain.tracker.activeLoc()
 
+    if PosTran.leavingTheField(player):
+        return player.goLater('spinToField')
+
     return player.stay()
+
+def spinToField(player):
+
+    fieldEdge = player.brain.vision.fieldEdge
+
+    if player.firstFrame():
+        if fieldEdge.shape == vision.basicShape.RISING_LEFT:
+            player.brain.nav.setDest(0,0,constants.SPIN_AROUND_LEFT)
+            player.brain.tracker.activeLoc()
+        else:
+            player.brain.nav.setDest(0,0,constants.SPIN_AROUND_RIGHT)
+            player.brain.tracker.activeLoc()
+
+    elif player.brain.nav.isAtPosition():
+        return player.goLater('playbookPosition')
+    return player.stay()
+
 
 def relocalize(player):
     if player.firstFrame():
         player.setWalk(constants.RELOC_X_SPEED, 0, 0)
 
-    if player.brain.my.locScore == NogginConstants.locScore.GOOD_LOC or \
-            player.brain.my.locScore == NogginConstants.locScore.OK_LOC:
+    if player.brain.my.locScore != NogginConstants.locScore.BAD_LOC:
         player.shouldRelocalizeCounter += 1
 
         if player.shouldRelocalizeCounter > 30:

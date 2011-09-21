@@ -23,11 +23,12 @@ using Kinematics::jointsMaxVelNoLoad;
 void staticPostSensors(NaoEnactor * n) {
     if (n != NULL) {
         n->postSensors();
+        n->sendCommands();
     }
 }
 void staticSendCommands(NaoEnactor * n) {
     if (n != NULL) {
-        n->sendCommands();
+        // n->sendCommands();
     }
 }
 
@@ -52,12 +53,12 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
 
     // TODO: Should use specialized proxy created at start
     try {
-        dcmPreConnection =
-            broker->getProxy("DCM")->getModule()->
-            atPostProcess(boost::bind(&staticPostSensors,this));
         dcmPostConnection =
             broker->getProxy("DCM")->getModule()->
-            atPreProcess(boost::bind(&staticSendCommands,this));
+            atPostProcess(boost::bind(&staticPostSensors,this));
+        // dcmPreConnection =
+        //     broker->getProxy("DCM")->getModule()->
+        //     atPreProcess(boost::bind(&staticSendCommands,this));
     } catch (AL::ALError& e){
         cout << "Failed to set pre/postprocess DCM commands" << endl;
     }
@@ -97,7 +98,7 @@ void NaoEnactor::sendJoints()
 
 #ifndef NO_ACTUAL_MOTION
     try {
-        joint_command[4][0] = dcmProxy->getTime(20);
+        joint_command[4][0] = dcmProxy->getTime(10);
         dcmProxy->setAlias(joint_command); // Takes a long time for some reason
     }
     catch(AL::ALError& a)
@@ -231,7 +232,7 @@ void NaoEnactor::initDCMCommands(){
     us_command[2][0].arraySetSize(2);
     us_command[2][0][0] = (4.0 + 64.0);
     try {
-        us_command[2][0][1] = dcmProxy->getTime(5);
+        us_command[2][0][1] = dcmProxy->getTime(0);
         dcmProxy->set(us_command);
     } catch(AL::ALError& a) {
         std::cout << "DCM ultrasound set error" << a.toString() << "    "

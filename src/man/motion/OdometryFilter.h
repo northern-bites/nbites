@@ -18,49 +18,41 @@
 // <http://www.gnu.org/licenses/>.
 
 /**
- * A simple container class for monitoring several sensors at once. This
- * class will print error messages if any of the sensors begins to deviate
- * significantly from its expected level of error.
+ * Filter class for odometry velocity measurements. We use a Butterworth
+ * filter, the odometry seems fairly stable and periodic except for extremely
+ * regular disturbances in X. Not sure if these are caused by some sort of
+ * bug in the matrices we use (fc_Transform, primarily) or reflect an actual
+ * phenomenon.
  *
- * @see SensorMonitor.h
- * @see dsp.h
  * @author Nathan Merritt
- * @date June 2011
+ * @date July 2011 (Istanbul)
  */
 
 #pragma once
-#ifndef BULK_MONITOR_H
-#define BULK_MONITOR_H
+#ifndef ODOMETRY_FILETER_DEFINED
+#define ODOMETRY_FILETER_DEFINED
 
-#include <string>
-using std::string;
+#include <boost/shared_ptr.hpp>
+#include <vector>
 
-#include "SensorMonitor.h"
+#include "dsp.h"
 
-class BulkMonitor
-{
+class OdoFilter : public Filter {
 public:
-    BulkMonitor(int _numberMonitors, string _bulkName, const string _sensorNames[]);
-    ~BulkMonitor();
+    typedef boost::shared_ptr<OdoFilter> ptr; // in case WalkingLeg needs a ptr
 
-    double update(int sensor, double input);
+    OdoFilter();
 
-    SensorMonitor& Sensor(int sensor);
+    virtual void Reset();
+    void update (float velX, float velY, float velTheta);
+    std::vector<float> getOdometry();
 
-    void Reset();
-    void LogOutput();
-
-<<<<<<< HEAD
-    int NumberMonitors() const { return numberMonitors; }
-=======
-    void SpeechPointer(boost::shared_ptr<Speech> s);
->>>>>>> master
+    // have to override the pure virtual
+    virtual double X(double X) { return X; }
 
 private:
-    boost::shared_ptr<Speech> speech;
-    SensorMonitor* monitors;
-    int numberMonitors;
-    string bulkName; // output file we log to in /home/nao/naoqi/log/
+    Boxcar velX, velTheta; // separate filter for each dimension
+    Butterworth velY;
 };
 
 #endif

@@ -39,15 +39,19 @@ ChoppedCommand::ChoppedCommand(const JointCommand::ptr command, int chops )
 }
 
 void ChoppedCommand::constructStiffness(const JointCommand::ptr command) {
-    for (unsigned int i=0; i < NUM_CHAINS; i++)
-        constructChainStiffness(static_cast<ChainID>(i),
+
+    const list<int>* chainList = command->getChainList();
+    list<int>::const_iterator i = chainList->begin();
+    for( ; i != chainList->end() ; ++i){
+        constructChainStiffness(static_cast<ChainID>(*i),
                                 command);
+    }
 }
 
 void ChoppedCommand::constructChainStiffness(ChainID id,
-					     const JointCommand::ptr command) {
-    const vector<float> *body_stiff = command->getStiffness();
-    vector<float>::const_iterator bodyStart = body_stiff->begin();
+                                             const JointCommand::ptr command) {
+    const vector<float> body_stiff = command->getStiffness();
+    vector<float>::const_iterator bodyStart = body_stiff.begin();
 
     vector<float> *chain = getStiffnessRef(id);
 
@@ -88,28 +92,28 @@ vector<float> ChoppedCommand::getFinalJoints(const JointCommand::ptr command,
     vector<float>::iterator currentStart = currentJoints.begin();
     vector<float>::iterator currentEnd = currentJoints.begin();
 
-    for (unsigned int chain=0; chain < NUM_CHAINS;chain++) {
+    for (uint chain=0; chain < NUM_CHAINS; ++chain){
         // First, get chain joints from command
-        const vector<float> *nextChain = command->getJoints((ChainID)chain);
+        const vector<float> nextChain =
+            command->getJoints(static_cast<ChainID>(chain));
 
         // Set the end iterator
         currentEnd += chain_lengths[chain];
 
         // If the next chain is not queued (empty), add current joints
-        if ( nextChain == 0 ||
-             nextChain->empty() ) {
+        if ( nextChain.empty() ) {
             finalJoints.insert(finalJoints.end(), currentStart, currentEnd );
-
         }else {
             // Add each chain of joints to the final joints
             finalJoints.insert( finalJoints.end(),
-                                nextChain->begin(),
-                                nextChain->end() );
+                                nextChain.begin(),
+                                nextChain.end() );
         }
         // Set the start iterator into the right position for the
         // next chain
         currentStart += chain_lengths[chain];
     }
+
     return finalJoints;
 
 }

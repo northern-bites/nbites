@@ -42,7 +42,7 @@ using namespace NBMath;
 //#define DEBUG_ZMP
 //#define DEBUG_ZMP_REF
 //#define DEBUG_COM_TRANSFORMS
-#define DEBUG_DESTINATION
+//#define DEBUG_DESTINATION
 
 StepGenerator::StepGenerator(shared_ptr<Sensors> s,
                              shared_ptr<NaoPose> p,
@@ -66,9 +66,11 @@ StepGenerator::StepGenerator(shared_ptr<Sensors> s,
       fc_Transform(CoordFrame3D::identity3D()),
       cf_Transform(CoordFrame3D::identity3D()),
       cc_Transform(CoordFrame3D::identity3D()),
+      lastRotation(0), avgStepRotation(0), dThetaPerMotionFrame(0),
+      xOdoFilter(Boxcar(1)),
       sensors(s), pose(p), gait(_gait), nextStepIsLeft(true),
-      leftLeg(s,gait,&sensorAngles,LLEG_CHAIN),
-      rightLeg(s,gait,&sensorAngles,RLEG_CHAIN),
+      leftLeg(s,gait,&sensorAngles, LLEG_CHAIN),
+      rightLeg(s,gait,&sensorAngles, RLEG_CHAIN),
       leftArm(gait,LARM_CHAIN), rightArm(gait,RARM_CHAIN),
       supportFoot(LEFT_SUPPORT),
       controller_x(new Observer()),
@@ -379,11 +381,7 @@ WalkLegsTuple StepGenerator::tick_legs(){
     LegJointStiffTuple right = rightLeg.tick(rightStep_f,swingingStepSource_f,
 					     swingingStep_f,fc_Transform);
 
-    if(supportStep_f->foot == LEFT_FOOT){
-        updateOdometry(leftLeg.getOdoUpdate());
-    }else{
-        updateOdometry(rightLeg.getOdoUpdate());
-    }
+    updateOdometry();
 
     //HACK check to see if we are done - still too soon, but works! (see graphs)
     if(supportStep_s->type == END_STEP && swingingStep_s->type == END_STEP
@@ -439,6 +437,7 @@ void StepGenerator::swapSupportLegs(){
     //using the stepTransform matrix from above
     ufvector3 swing_src_f = prod(stepTransform,origin);
 
+
     //Third, do the dest. of the swinging leg, which is more complicated
     //We get the translation matrix that takes points in next f-type
     //coordinate frame, namely the one that will be centered at the swinging
@@ -454,6 +453,27 @@ void StepGenerator::swapSupportLegs(){
     //we can simply read this out of the aforementioned translation matr.
     //this only works because its a 3D homog. coord matr - 4D would break
     float swing_dest_angle = -safe_asin(swing_reverse_trans(1,0));
+
+    /* save the rotation of this step, so we can use it to update odometry
+     * this is kind of a HACK but it gives us a dTheta per motion frame
+     * that is proportional to our actual dTheta, and in the correct direction.
+     *
+     * To make it better, look at the odometry methods inside WalkingLeg and use
+     * the matrices there possibly?
+     *
+     * NOTE: The sign of the rotation is switched to get our movement from the
+     * angle, since it comes from the reverse transformation.
+     */
+    const float rotationThisStep = -1*swing_dest_angle;
+    //cout << "step rotation " << rotationThisStep;
+
+    avgStepRotation = (lastRotation + rotationThisStep)*0.5f;
+    lastRotation = rotationThisStep;
+
+    dThetaPerMotionFrame = avgStepRotation /
+	static_cast<float>(lastQueuedStep->stepDurationFrames);
+
+    //cout << " rotation per motion frame " << dThetaPerMotionFrame << endl;
 
     //we use the swinging source to calc. a path for the swinging foot
     //it is not clear now if we will need to angle offset or what
@@ -660,6 +680,7 @@ void StepGenerator::setSpeed(const float _x, const float _y,
 
     //Regardless, we are changing the walk vector, so we need to scrap any future plans
     clearFutureSteps();
+    hasDestination = false;
 
     x = _x;
     y = _y;
@@ -718,11 +739,23 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
         gain = 1.0f;
     }
 
+    if (dest_x == 0.0f && dest_y == 0.0f && dest_theta == 0.0f) {
+	setSpeed(0,0,0);
+	return 0; // all done!
+    }
+
+    // these parameters determined experimentally by trying lots of destinations
+    // probably indicates something broken in our odometry
+    // I personally apologize for this :-) --Nathan
+    if (dest_x == 0)
+	dest_x = -5.0f;
+    dest_theta += 0.088f; // natural rotation of the robot
     dest_y *= 2; /// @see Step.h HACK HACK HACK
 
     float speed_x, speed_y, speed_theta;
+    int framesToDestination = 0;
 
-    // use the maximum allowed x,y,theta
+    // use the gait's maximum allowed x,y,theta
     if (dest_x > 0)
         speed_x = gain*gait->step[WP::MAX_VEL_X];
     else
@@ -731,9 +764,15 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
     speed_y = gain*gait->step[WP::MAX_VEL_Y];
     speed_theta = gain*gait->step[WP::MAX_VEL_THETA];
 
-    // we've finished calculating, now deal with the motion queues
+    // now deal with the motion queues
     if (hasDestination || !done) {
 	clearFutureSteps();
+
+	// check the distances of any steps we've already commited to taking
+	for (std::list<Step::ptr>::iterator step = currentZMPDSteps.begin();
+	     step != currentZMPDSteps.end(); ++step)
+	    countStepTowardsDestination(*step, dest_x, dest_y, dest_theta,
+					framesToDestination);
     } else {
 	resetQueues();
 	const bool startLeft = decideStartLeft(dest_y,dest_theta);
@@ -743,51 +782,55 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
     hasDestination = true;
     done = false;
 
-    int framesToDestination = 0;
 
-    const float CLOSE_ENOUGH_XY = 10.0f;
-    const float CLOSE_ENOUGH_THETA = 0.17f; // 10 degrees
+#ifdef DEBUG_DESTINATION
+    cout << "destination after counting current zmp steps: x=" << dest_x
+         << " y=" << dest_y << " theta=" << dest_theta << endl;
+#endif
+
+    const float CLOSE_ENOUGH_X_mm = 15.0f;
+    const float CLOSE_ENOUGH_Y_mm = 15.0f;
+    float CLOSE_ENOUGH_THETA_rad;
+
+    // be more sensitive to rotation if we're going really far (40cm)
+    if (dest_x*dest_x + dest_y*dest_y > 1600)
+	CLOSE_ENOUGH_THETA_rad = 0.087f; // 5 degrees
+    else
+	CLOSE_ENOUGH_THETA_rad = 0.17f; // 10 degrees
 
     // loop until we get to our destination
-    while (abs(dest_x) > CLOSE_ENOUGH_XY ||
-	   abs(dest_y) > CLOSE_ENOUGH_XY ||
-	   abs(dest_theta) > CLOSE_ENOUGH_THETA) {
+    while (abs(dest_x) > CLOSE_ENOUGH_X_mm ||
+	   abs(dest_y) > CLOSE_ENOUGH_Y_mm ||
+	   abs(dest_theta) > CLOSE_ENOUGH_THETA_rad) {
 	float step_x, step_y, step_theta;
 
 	// check if we're close enough to our destination to make it this step
 	if (abs(dest_x) > abs(speed_x))
-	    step_x = speed_x * sign(dest_x);
-	else if (abs(dest_x) <= CLOSE_ENOUGH_XY)
+	    step_x = speed_x;
+	else if (abs(dest_x) <= CLOSE_ENOUGH_X_mm)
 	    step_x = 0.0f;
 	else
 	    step_x = dest_x;
 
 	if (abs(dest_y) > abs(speed_y))
 	    step_y = speed_y * sign(dest_y);
-	else if (abs(dest_y) <= CLOSE_ENOUGH_XY)
+	else if (abs(dest_y) <= CLOSE_ENOUGH_Y_mm)
 	    step_y = 0.0f;
 	else
 	    step_y = dest_y;
 
 	if (abs(dest_theta) > abs(speed_theta))
 	    step_theta = speed_theta * sign(dest_theta);
-	else if (abs(dest_theta) <= CLOSE_ENOUGH_THETA)
+	else if (abs(dest_theta) <= CLOSE_ENOUGH_THETA_rad)
 	    step_theta = 0.0f;
 	else
 	    step_theta = dest_theta;
 
+	// take the step, and use its odometry to update our progress towards dest
 	generateStep(step_x, step_y, step_theta);
 
-	// update the destination based on how far this step went
-	dest_x -= lastQueuedStep->x;
-
-	if (sign(dest_y) == sign(step_y))
-	    dest_y -= lastQueuedStep->y;
-
-	if (sign(dest_theta) == sign(step_theta))
-	    dest_theta -= lastQueuedStep->theta;
-
-	framesToDestination += lastQueuedStep->stepDurationFrames;
+	countStepTowardsDestination(lastQueuedStep, dest_x, dest_y, dest_theta,
+				    framesToDestination);
 
 #ifdef DEBUG_DESTINATION
 	cout << "created step: " << *lastQueuedStep << endl;
@@ -797,11 +840,31 @@ int StepGenerator::setDestination(float dest_x, float dest_y, float dest_theta,
     }
 
 #ifdef DEBUG_DESTINATION
+    printf("\n final distance from dest: %f %f %f\n",
+	   dest_x, dest_y, dest_theta);
     printf("Frames to destination: %d\n", framesToDestination);
 #endif
 
     return framesToDestination;
 }
+
+
+// updates the destination based on how far this step went
+void StepGenerator::countStepTowardsDestination(Step::ptr step, float& dest_x,
+						float& dest_y, float &dest_theta,
+						int& framesToDestination) {
+    dest_x -= step->x;
+
+    // necessary (HACK!) because steps will alternate +/- in Y and Theta
+    if (sign(dest_y) == sign(step->y))
+	dest_y -= step->y;
+
+    if (sign(dest_theta) == sign(step->theta))
+	dest_theta -= step->theta;
+
+    framesToDestination += step->stepDurationFrames;
+}
+
 
 /**
  * Method to enqueue a specific number of steps and then stop
@@ -1038,7 +1101,7 @@ void StepGenerator::generateStep( float _x,
  * Method to return the default stance of the robot (including arms)
  *
  */
-vector<float>*
+vector<float>
 StepGenerator::getDefaultStance(const Gait& wp){
     const ufvector3 lleg_goal =
         CoordFrame3D::vector3D(-wp.stance[WP::BODY_OFF_X],
@@ -1059,13 +1122,13 @@ StepGenerator::getDefaultStance(const Gait& wp){
     const vector<float> larm(LARM_WALK_ANGLES,&LARM_WALK_ANGLES[ARM_JOINTS]);
     const vector<float> rarm(RARM_WALK_ANGLES,&RARM_WALK_ANGLES[ARM_JOINTS]);
 
-    vector<float> *allJoints = new vector<float>();
+    vector<float> allJoints;
 
     //now combine all the vectors together
-    allJoints->insert(allJoints->end(),larm.begin(),larm.end());
-    allJoints->insert(allJoints->end(),lleg.begin(),lleg.end());
-    allJoints->insert(allJoints->end(),rleg.begin(),rleg.end());
-    allJoints->insert(allJoints->end(),rarm.begin(),rarm.end());
+    allJoints.insert(allJoints.end(),larm.begin(),larm.end());
+    allJoints.insert(allJoints.end(),lleg.begin(),lleg.end());
+    allJoints.insert(allJoints.end(),rleg.begin(),rleg.end());
+    allJoints.insert(allJoints.end(),rarm.begin(),rarm.end());
     return allJoints;
 }
 
@@ -1200,11 +1263,47 @@ void StepGenerator::resetOdometry(const float initX, const float initY){
 /**
  * Called once per motion frame to update the odometry
  *
- *  We may not correctly account for the rotation around the S frame
- *  rather than the C frame, which is what we are actually returning.
+ * For odometry, we average the position of both legs to find a point that
+ * is approximately in the middle of our convex hull. We do this so that
+ * the odometry remains stable over time, instead of oscillating in the X/Y/T
+ * as the robot takes steps. This method also applies the delta odometry to
+ * build cc_Transform (doc'd elsewhere)
  */
+void StepGenerator::updateOdometry() {
+    vector<float> left = leftLeg.getOdoUpdate();
+    vector<float> right = rightLeg.getOdoUpdate();
 
-void StepGenerator::updateOdometry(const vector<float> &deltaOdo){
+    vector<float> deltaOdo(3,0);
+
+    /* odometry explodes in the X during the swinging phase, so we always ask
+       the supporting leg.
+       Explanation: the swinging leg moves from negative to positive in X in the
+         F frame, and the difference values used for odometry explode when the leg
+	 crosses X-axis zero.
+     */
+    // NOTE: x odometry is currently set up to be filtered, but we're using a 1-width
+    // Boxcar filter so no filtering actually takes place.
+    if (leftLeg.isSupporting())
+	deltaOdo[0] = static_cast<float>(xOdoFilter.X(left[0]));
+    else
+	deltaOdo[0] = static_cast<float>(xOdoFilter.X(right[0]));
+
+    /* average the motion delta from the legs (Y)
+       this tracks a point approximately between our two legs, and reflects
+       actual robot motion much better */
+    deltaOdo[1] = (left[1] + right[1])*0.5f;
+
+    // use the hacked delta theta calculated in swapSupportLegs
+    deltaOdo[2] = dThetaPerMotionFrame;
+
+#ifdef DEBUG_ODOMETRY_UPDATE
+    static int fCount;
+    cout << fCount++ << " "
+	 << deltaOdo[0] << " "
+	 << deltaOdo[1] << " "
+	 << deltaOdo[2] << " "
+	 << endl;
+#endif
     const ufmatrix3 odoUpdate = prod(CoordFrame3D::translation3D(deltaOdo[0],
                                                                  deltaOdo[1]),
                                      CoordFrame3D::rotation3D(CoordFrame3D::Z_AXIS,

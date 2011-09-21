@@ -8,7 +8,7 @@ from . import GoalieSaveStates
 from . import GoalieChanges
 from . import GoalieTransitions
 
-from .. import NogginConstants
+import noggin_constants as  NogginConstants
 from ..playbook import PBConstants
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
@@ -20,22 +20,17 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.setName('pGoalieTest')
 
-        #GOALIE COUNTERS AND BOOLEANS
-        # Counters for goalie dive decision making
         self.counterRightSave = 0
         self.counterLeftSave = 0
         self.counterCenterSave = 0
 
         self.isSaving = False
 
-        #END GOALIE COUNTERS AND BOOLEANS
-
         self.frameCounter = 0
 
         self.shouldRelocalizeCounter = 0
 
-        # Orbiting
-        self.angleToOrbit = 0.0
+        self.shouldOrbit = False
 
         self.inKickingSate = False
         self.penaltyKicking = False

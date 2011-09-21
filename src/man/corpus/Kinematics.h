@@ -73,6 +73,7 @@ namespace Kinematics {
         R_ELBOW_YAW,
         R_ELBOW_ROLL
     };
+
     static const unsigned int FIRST_HEAD_JOINT = HEAD_YAW;
 
     static const unsigned int HEAD_JOINTS = 2;
@@ -144,6 +145,27 @@ namespace Kinematics {
 
     /**********       Joint Bounds       ***********/
     static const float HEAD_BOUNDS[2][2] = {{-2.09f,2.09f},{-.785f,.785f}};
+
+	// Head bounds to prevent significant collisions with shoulder pads
+	static const float boundHeadYaw(float yaw, float pitch) {
+		float yawLimit = 2.0f;
+
+		if (pitch > .3) {
+			yawLimit = .4f;
+		} else if (pitch > .2) {
+			yawLimit = 1.0f;
+		}
+		if (pitch < -.6) {
+			yawLimit = .2f;
+		} else if (pitch < -.5) {
+			yawLimit = .3f;
+		} else if (pitch < -.4) {
+			yawLimit = .7f;
+		}
+
+		//bound abs(yaw) < yawLimit
+		return NBMath::clip(yaw, yawLimit);
+	}
 
     // Order of arm joints: ShoulderPitch, SRoll, ElbowYaw, ERoll
     static const float LEFT_ARM_BOUNDS[][2] = {{-2.09f,2.09f},
@@ -350,6 +372,8 @@ namespace Kinematics {
     static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {3,2,3,3,2};
     static const int NUM_JOINTS_CHAIN[NUM_CHAINS] = {2,4,6,6,4};
 
+    // Angle of the lower camera?
+    static const float LOWER_CAMERA_ANGLE = 0.6981f;
 };
 
 #endif

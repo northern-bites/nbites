@@ -40,25 +40,27 @@ public:
     JointCommand(const MotionConstants::MotionType motionType,
 		 const float _duration,
 		 const Kinematics::InterpolationType _type,
-		 const std::vector<float>* _stiffness)
+		 const std::vector<float>& _stiffness)
 	: MotionCommand(motionType),
 	  duration(_duration),
 	  type(_type),
 	  stiffness(_stiffness)
 	{ }
 
-    virtual ~JointCommand() { delete stiffness; };
+    virtual ~JointCommand() { };
 
     const float getDuration() const { return duration; }
     const Kinematics::InterpolationType getInterpolation() const {return type;}
-    const std::vector<float>* getStiffness() const{ return stiffness; }
-    virtual const std::vector<float>* getJoints(Kinematics::ChainID chain) const = 0;
+    const std::vector<float>& getStiffness() const { return stiffness; }
+    virtual const
+    std::vector<float>& getJoints(Kinematics::ChainID chain) const = 0;
 
 protected:
     const float duration;
     const Kinematics::InterpolationType type;
 
 private:
-    const std::vector<float> *stiffness;
+    JointCommand(const JointCommand& other);
+    const std::vector<float> stiffness;
 };
 #endif

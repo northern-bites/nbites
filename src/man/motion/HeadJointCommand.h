@@ -40,21 +40,22 @@ class HeadJointCommand : public JointCommand {
 public:
     typedef boost::shared_ptr<HeadJointCommand> ptr;
 
-    HeadJointCommand(const float time, const std::vector<float> *joints,
-		     const std::vector<float> *head_stiffness,
+    HeadJointCommand(const float time, const std::vector<float>& joints,
+		     const std::vector<float>& head_stiffness,
 		     const Kinematics::InterpolationType _type);
-    HeadJointCommand(const HeadJointCommand &other);
     virtual ~HeadJointCommand();
 
-    virtual const std::vector<float>* getJoints(Kinematics::ChainID chain) const {
+    virtual const std::vector<float>&
+    getJoints(Kinematics::ChainID chain) const {
 	if (chain == Kinematics::HEAD_CHAIN) {
 	    return headJoints;
 	} else {
-	    return &noJoints;
+	    return noJoints;
 	}
     }
 private:
-    const std::vector<float> *headJoints;
+    HeadJointCommand(const HeadJointCommand &other);
+    const std::vector<float> headJoints;
     virtual void setChainList();
     const std::vector<float> noJoints;
 };

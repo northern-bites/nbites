@@ -50,7 +50,7 @@ namespace noggin {
 
     /*
      * LOCATION
-     * The base class for all others in this file. Holds x, y values
+     * The base class for many others in this file. Holds x, y values
      * representing a location on the field. Contains methods to convert
      * these to a python tuple, get the distance and bearing to a location
      * from another location, and to determine whether a location is in
@@ -85,6 +85,9 @@ namespace noggin {
         virtual const bool inCenterOfField();
         virtual const bool inTopOfField();
         virtual const bool inBottomOfField();
+
+        // For Python
+        bool hasattr(boost::python::object, const std::string&);
 
     protected:
         float x, y;
@@ -161,10 +164,16 @@ namespace noggin {
     class LocObject : public Location
     {
     public:
-        LocObject();
+        LocObject(PyLoc&);
         virtual ~LocObject() {};
 
-        // Tracking
+        // Loc getters
+        const float getDist();
+        const degrees getBearing();
+        const float getRelX();
+        const float getRelY();
+
+        // Tracking: Is this used?
         const int getTrackingFitness() { return trackingFitness; }
         void setTrackingFitness(int tf) { trackingFitness = tf; }
 
@@ -173,6 +182,57 @@ namespace noggin {
 
     private:
         int trackingFitness;
+        PyLoc* loc;
+    };
+
+    /*
+     * LOC BALL
+     * A loc object specialized to get all of the ball's loc values. Also needs
+     * a pointer to MyInfo to make position, velocity, acceleration values
+     * relative to the correct team.
+     */
+
+    class LocBall : public Location
+    {
+    public:
+        LocBall(PyLoc&, MyInfo&);
+
+        //Loc getters
+        const float getXUncert() { return loc->getBallXUncert(); }
+        const float getYUncert() { return loc-> getBallYUncert(); }
+        const float getSD() { return getXUncert()*getYUncert(); }
+        const float getVelX();
+        const float getVelY();
+        const float getVelXUncert() { return loc->getXVelocityUncert(); }
+        const float getVelYUncert() { return loc->getYVelocityUncert(); }
+        const degrees getHeading();
+        const float getRelX() { return loc->getBallRelXEst(); }
+        const float getRelY() { return loc->getBallRelYEst(); }
+        const float getRelVelX() { return loc->getRelXVelocityEst(); }
+        const float getRelVelY() { return loc->getRelYVelocityEst(); }
+        const float getAccX();
+        const float getAccY();
+        const float getAccXUncert() { return loc->getXAccelerationUncert(); }
+        const float getAccYUncert() { return loc->getYAccelerationUncert(); }
+        const float getRelAccX() { return loc->getRelXAccelerationEst(); }
+        const float getRelAccY() { return loc->getRelYAccelerationEst(); }
+        const float dX() { return dx; }
+        const float dY() { return dy; }
+        const float getEndY() { return endY; }
+        const float getDist() { return loc->getBallDistance(); }
+        const degrees getBearing() { return loc->getBallBearingDeg(); }
+
+        // Other
+        void update();
+        void setDX(float _dx) { dx = _dx; }
+        void setDY(float _dy) { dy = _dy; }
+        const float getLastRelX() { return lastRelX; }
+        const float getLastRelY() { return lastRelY; }
+
+    private:
+        MyInfo* my;
+        PyLoc* loc;
+        float lastRelX, lastRelY, dx, dy, endY;
     };
 
     /*
@@ -188,15 +248,16 @@ namespace noggin {
      * PyVision.cpp for the VisualFieldObject values exposed to Python.
      */
 
-    class FieldObject : public LocObject
+    class FieldObject
     {
     public:
         FieldObject(VisualFieldObject&,
                     py_constants::vis_landmark,
-                    MyInfo&);
+                    PyLoc&);
         ~FieldObject() {};
 
         VisualFieldObject* vis;
+        LocObject* loc;
 
     private:
         // These shouldn't be copied!
@@ -211,11 +272,6 @@ namespace noggin {
     public:
         static const int LOST_OBJECT_FRAMES_THRESH = 7;
 
-        // Loc getters
-        const float getLocDist();
-        const degrees getLocBearing();
-        const float getRelX();
-        const float getRelY();
         const float getDist() { return dist; }
         const degrees getBearing() { return bearing*TO_DEG; }
         const py_constants::vis_landmark getVisID() { return visID; }
@@ -224,6 +280,9 @@ namespace noggin {
         // Other
         void setBest();
         void associateWithRelativeLandmark(boost::python::tuple relLandmark);
+
+        // For Python
+        bool hasattr(boost::python::object, const std::string&);
     };
 
     /*
@@ -234,7 +293,7 @@ namespace noggin {
      * location so that it doesn't have to be calculated if not needed. Update
      * gets the latest x, y, h values from loc. This copying is necessary for
      * using the Location interface. LocScores represent how good localization
-     * is, based on the three uncert values. 
+     * is, based on the three uncert values.
      */
     class MyInfo : public RobotLocation
     {
@@ -248,7 +307,6 @@ namespace noggin {
 
     public:
         void update();
-        const float distTo(FieldObject& other, bool forceCalc);
 
         //Getters
         const py_constants::teamColor getTeamColor() { return team_color; }
@@ -269,5 +327,35 @@ namespace noggin {
         int playerNumber;
     };
 
+    /*
+     * BALL
+     * Similar to a FieldObject, but for the ball. Holds a pointer to both a loc
+     * ball and a vision ball, accessible through loc and vis. Also stores the
+     * best values for dist and bearing.
+     */
+
+    class Ball
+    {
+    public:
+        Ball(VisualBall&, PyLoc&, MyInfo&);
+        ~Ball() {};
+
+        LocBall* loc;
+        VisualBall* vis;
+
+        // Getters
+        const float getDist() { return dist; }
+        const float getBearing() { return bearing; }
+
+        void update();
+
+        // For Python
+        bool hasattr(boost::python::object, const std::string&);
+
+    private:
+        Ball(const Ball& other);
+        float dist;
+        degrees bearing;
+    };
 }
 #endif //CombObjects_h_DEFINED

@@ -42,7 +42,6 @@
 #include "WalkingConstants.h"
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
-#include "CoordHeadProvider.h"
 #include "NullHeadProvider.h"
 #include "NullBodyProvider.h"
 #include "Sensors.h"
@@ -131,7 +130,6 @@ private:
     WalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
-    CoordHeadProvider coordHeadProvider;
     NullHeadProvider nullHeadProvider;
     NullBodyProvider nullBodyProvider;
 

@@ -3,7 +3,7 @@ import man.motion as motion
 from man.motion import MotionConstants
 from ..util import MyMath as MyMath
 from man.motion import StiffnessModes
-from math import (fabs, atan, radians, hypot)
+from math import fabs
 
 class HeadTrackingHelper(object):
     def __init__(self, tracker):
@@ -23,6 +23,9 @@ class HeadTrackingHelper(object):
 
             self.tracker.brain.motion.enqueue(move)
 
+        # Returns the last HJC in the HeadMove for keeping track of
+        # when a move is done
+        return move
 
     def trackObject(self):
         """
@@ -30,19 +33,30 @@ class HeadTrackingHelper(object):
         Should only be called explicitly from state
         methods in TrackingStates.py
         """
-        #if self.firstFrame():
-         #   self.brain.motion.stopHeadMoves()
-        (changeX,changeY) = (0., 0.)
+        target = self.tracker.target
+
+        changeX, changeY = 0.0 , 0.0
+
+        # If we don't see it, let's try to use our model of it to find
+        # it and track it
+
+        # TODO: generalize this to objects which we cannot see.
+        if not target or \
+                (target.loc.relX == 0.0 and target.loc.relY == 0.0):
+            return
+
+        # If we haven't seen the object in the very recent past, look
+        # towards where the model says it is. The framesOff > 3
+        # provides a buffer to ensure that it's not just a flickering
+        # image problem (prevents twitchy robot)
+        if target.vis.framesOff > 3:
+            self.lookToPoint(target)
+            return
+
         # Find the target's angular distance from the center of the screen
         # if we have an object, track that
-        if self.tracker.target and \
-                self.tracker.target.vis.on:
-            changeX = self.tracker.target.vis.angleX
-            changeY = self.tracker.target.vis.angleY #the pitch is pos = down
-        else:
-            # by default, the change is none
-            #self.printf( "No object")
-            return
+        changeX = target.vis.angleX
+        changeY = target.vis.angleY #the pitch is pos = down
 
         motionAngles = self.tracker.brain.sensors.motionAngles
         curPitch = motionAngles[MotionConstants.HeadPitch]
@@ -50,7 +64,7 @@ class HeadTrackingHelper(object):
 
         maxChange = 13.0
 
-        #Warning- no gain is applied currently!
+        # Warning- no gain is applied currently!
         safeChangeX = MyMath.clip(changeX, -maxChange, maxChange )
         safeChangeY = MyMath.clip(changeY, -maxChange, maxChange )
 
@@ -62,6 +76,27 @@ class HeadTrackingHelper(object):
         maxSpeed = 2.0
         headMove = motion.SetHeadCommand(newYaw, newPitch,
                                          maxSpeed, maxSpeed)
+        self.tracker.brain.motion.setHead(headMove)
+
+    def lookToTargetAngles(self, target):
+        """
+        Uses setHeadCommands to bring given target to center of frame.
+        """
+        motionAngles = self.tracker.brain.sensors.motionAngles
+        yaw = motionAngles[MotionConstants.HeadYaw]
+        pitch = motionAngles[MotionConstants.HeadPitch]
+
+        # Find the target's angular distance from the center of vision
+        if not target is None and target.vis.on:
+            yaw += target.vis.angleX
+            pitch -= target.vis.angleY
+            #note: angleY is positive up from center of vision frame
+            #note: angleX is positive left from center of vision frame
+        else:
+            # by default, do nothing
+            return
+
+        headMove = motion.SetHeadCommand(yaw,pitch)
         self.tracker.brain.motion.setHead(headMove)
 
     def panTo(self, heads):
@@ -76,47 +111,46 @@ class HeadTrackingHelper(object):
         yawDiff = fabs(heads[0] - headYaw)
         pitchDiff = fabs(heads[1] - headPitch)
 
-
         maxDiff = max(pitchDiff, yawDiff)
         panTime = maxDiff/constants.MAX_PAN_SPEED
-        self.executeHeadMove( ((heads, panTime, 0,
-                                 StiffnessModes.LOW_HEAD_STIFFNESSES), ) )
+        self.executeHeadMove(((heads, panTime, 0,
+                               StiffnessModes.LOW_HEAD_STIFFNESSES), ))
 
     def lookToPoint(self, target):
-        headMove = motion.CoordHeadCommand(target.x, target.y, target.height)
+        if hasattr(target, "height"):
+            height = target.height
+        else:
+            height = 0
+
+        if hasattr(target, "loc"):
+            target = target.loc
+
+        headMove = motion.CoordHeadCommand(relX = target.relX,
+                                           relY = target.relY,
+                                           relZ = height)
+
         self.tracker.brain.motion.coordHead(headMove)
+        return headMove
 
-    def calcBearing(self, target):
-        """returns the bearing to target in degrees. usable as headYaw"""
-        my = self.tracker.brain.my
+    def lookToAngles(self, yaw=0, pitch=0):
+        headMove = motion.SetHeadCommand(MyMath.degrees(yaw),
+                                         MyMath.degrees(pitch))
+        self.tracker.brain.motion.setHead(headMove)
 
-        return my.getRelativeBearing(target)
+    def calculateClosestLandmark(self):
+        brain = self.tracker.brain
+        posts = [brain.yglp, brain.ygrp, brain.bgrp, brain.bglp]
 
-    def calcHeadPitch(self, target):
-        """returns the pitch to target in degrees"""
-        my = self.tracker.brain.my
+        currYaw = brain.sensors.motionAngles[MotionConstants.HeadYaw]
 
-        relX = target.x - my.x
-        relY = target.y - my.y
-        dist = hypot(relX, relY)
+        minDiff = 1000000000
+        bestPost = None
 
-        lensHeightInCM = self.getCameraHeight()
-        relHeight = lensHeightInCM - target.height
+        for p in posts:
+            diff = MyMath.sub180Angle(currYaw - p.bearing)
 
-        #b/c we use lower angled camera we need to adjust by constant angle
-        headPitch = atan(relHeight/dist) - CAMERA_ANGLE
-        return headPitch
+            if diff < minDiff:
+                bestPost = p
+                minDiff = diff
+        return bestPost
 
-    def getCameraHeight(self):
-        """gets the height of the lower camera in cm"""
-        pose = self.tracker.brain.vision.pose
-
-        cameraInWorldFrameZ = pose.cameraInWorldFrameZ
-        comHeight = pose.bodyCenterHeight
-        lensHeight = cameraInWorldFrameZ + comHeight
-        lensHeightInCM = lensHeight/10.
-
-        return lensHeightInCM
-    """ already had to calculate bearing and groundDist to get xRelMe, yRelMe. those were stupid in the first place because they were used in CoordHeadCommand to calculate bearing again (doh!) with groundDist already calculated all that was needed was a single call to atan. """
-
-CAMERA_ANGLE = 40.0 # from reddoc
