@@ -373,7 +373,7 @@
     <string>Z Max</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="getColorTable">
+  <widget class="QPushButton" name="readTable">
    <property name="geometry">
     <rect>
      <x>800</x>
@@ -408,7 +408,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QPushButton" name="writeNew">
+  <widget class="QPushButton" name="writeTable">
    <property name="geometry">
     <rect>
      <x>800</x>
@@ -483,7 +483,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="getOldTable">
+  <widget class="QPushButton" name="writeOldTable">
    <property name="geometry">
     <rect>
      <x>800</x>

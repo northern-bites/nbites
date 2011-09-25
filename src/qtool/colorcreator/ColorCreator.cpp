@@ -875,6 +875,7 @@ void ColorCreator::modeChanged()
     firstPoint.setX(-1);
     largeDisplay();
 }
+
 void ColorCreator::on_pushButton_clicked()
 {
     currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
@@ -898,6 +899,19 @@ void ColorCreator::on_nextButton_clicked()
     currentFrameNumber++;
 }
 
+void ColorCreator::on_plusTen_clicked()
+{
+    //yuvImage.read(tenthFrame);
+    currentFrameNumber += 10;
+    updateDisplays();
+}
+
+void ColorCreator::on_minusTen_clicked()
+{
+    //yuvImage.read(minusTenthFrame);
+    currentFrameNumber -= 10;
+    updateDisplays();
+}
 
 void ColorCreator::on_hMin_valueChanged(int value)
 {
@@ -931,6 +945,22 @@ void ColorCreator::on_sMax_valueChanged(int value)
     out << "Set S Max value to " << value << "\n";
 }
 
+void ColorCreator::on_zMin_valueChanged(int value)
+{
+    fltSliders[zMin][currentColor] = (float)value / 100.0f;
+    updateColors();
+    QTextStream out(stdout);
+    out << "Set Z Min value to " << value << "\n";
+}
+
+void ColorCreator::on_zMax_valueChanged(int value)
+{
+    fltSliders[zMax][currentColor] = (float)value / 100.0f;
+    updateColors();
+    QTextStream out(stdout);
+    out << "Set Z Max value to " << value << "\n";
+}
+
 void ColorCreator::on_yMin_valueChanged(int value)
 {
     intSliders[yMin][currentColor] = value;
@@ -947,10 +977,96 @@ void ColorCreator::on_yMax_valueChanged(int value)
     out << "Set Y Max value to " << value << "\n";
 }
 
+void ColorCreator::on_vMin_valueChanged(int value)
+{
+    intSliders[vMin][currentColor] = value;
+    updateColors();
+    QTextStream out(stdout);
+    out << "Set V Min value to " << value << "\n";
+}
+
+void ColorCreator::on_vMax_valueChanged(int value)
+{
+    intSliders[vMax][currentColor] = value;
+    updateColors();
+    QTextStream out(stdout);
+    out << "Set V Max value to " << value << "\n";
+}
+
 void ColorCreator::on_zSlice_valueChanged(int value)
 {
     zSlice = (float)value / 100.0f;
     updateColors();
+}
+
+
+void ColorCreator::on_readTable_clicked()
+{
+    currentColorDirectory = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
+                                            currentColorDirectory,
+                                            tr("Table Files (*.mtb)"));
+    table->read(currentColorDirectory);
+    int last = currentColorDirectory.lastIndexOf("/");
+    currentColorDirectory.chop(currentColorDirectory.size() - last);
+}
+
+/* The user wants to write a color table.
+  */
+void ColorCreator::on_writeTable_clicked()
+{
+    QString filename = baseColorTable + "/new.mtb";
+    //writeOldFormat(filename);
+    table->write(filename, fltSliders, intSliders, bitColor);
+}
+
+/* Loads and old style color table.  Note: it will be automatically
+  converted to the new format (which is the main reason to do this).
+  */
+void ColorCreator::on_writeOldTable_clicked()
+{
+    currentColorDirectory = QFileDialog::getOpenFileName(this, tr("Open Old Color Table"),
+                                            currentColorDirectory,
+                                            tr("Table Files (*.mtb)"));
+    table->readOld(currentColorDirectory);
+    int last = currentColorDirectory.lastIndexOf("/");
+    currentColorDirectory.chop(currentColorDirectory.size() - last);
+}
+
+void ColorCreator::on_channel_currentIndexChanged(int index)
+{
+    shape = index;
+    updateThresh(false, true, false);
+}
+
+/* User changes the edge threshold.  When displaying edge
+  images we use an int to determine what constitutes an edge.
+  @param value      the new value to use
+  */
+void ColorCreator::on_edgeDiff_valueChanged(int value)
+{
+    QTextStream out(stdout);
+    out << "Set threshold to " << value << "\n";
+    edgediff = value;
+    updateThresh(false, true, false);
+}
+
+/* User wants a new edge thing.  This was inadvertently added.
+  */
+void ColorCreator::on_edgeDiff_actionTriggered(int action)
+{
+
+}
+
+void ColorCreator::on_modeSelect_currentIndexChanged(int index)
+{
+  defineMode = !index;
+  tableMode = index;
+  modeChanged();
+}
+
+void ColorCreator::on_changeColor_clicked()
+{
+  modeChanged();
 }
 
 /* Called when the user picks a new color to work on.
@@ -980,128 +1096,9 @@ void ColorCreator::on_viewChoice_currentIndexChanged(int index)
     updateThresh(false, true, false);
 }
 
-void ColorCreator::on_zMin_valueChanged(int value)
-{
-    fltSliders[zMin][currentColor] = (float)value / 100.0f;
-    updateColors();
-    QTextStream out(stdout);
-    out << "Set Z Min value to " << value << "\n";
-}
-
-void ColorCreator::on_zMax_valueChanged(int value)
-{
-    fltSliders[zMax][currentColor] = (float)value / 100.0f;
-    updateColors();
-    QTextStream out(stdout);
-    out << "Set Z Max value to " << value << "\n";
-}
-
-
-void ColorCreator::on_getColorTable_clicked()
-{
-    currentColorDirectory = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
-                                            currentColorDirectory,
-                                            tr("Table Files (*.mtb)"));
-    table->read(currentColorDirectory);
-    int last = currentColorDirectory.lastIndexOf("/");
-    currentColorDirectory.chop(currentColorDirectory.size() - last);
-}
-
-/* The user wants to write a color table.
-  */
-void ColorCreator::on_writeNew_clicked()
-{
-    QString filename = baseColorTable + "/new.mtb";
-    //writeOldFormat(filename);
-    table->write(filename, fltSliders, intSliders, bitColor);
-}
-
-
-void ColorCreator::on_plusTen_clicked()
-{
-    //yuvImage.read(tenthFrame);
-    currentFrameNumber += 10;
-    updateDisplays();
-}
-
-void ColorCreator::on_minusTen_clicked()
-{
-    //yuvImage.read(minusTenthFrame);
-    currentFrameNumber -= 10;
-    updateDisplays();
-}
-
-
-
-void ColorCreator::on_channel_currentIndexChanged(int index)
-{
-    shape = index;
-    updateThresh(false, true, false);
-}
-
-/* Loads and old style color table.  Note: it will be automatically
-  converted to the new format (which is the main reason to do this).
-  */
-void ColorCreator::on_getOldTable_clicked()
-{
-    currentColorDirectory = QFileDialog::getOpenFileName(this, tr("Open Old Color Table"),
-                                            currentColorDirectory,
-                                            tr("Table Files (*.mtb)"));
-    table->readOld(currentColorDirectory);
-    int last = currentColorDirectory.lastIndexOf("/");
-    currentColorDirectory.chop(currentColorDirectory.size() - last);
-}
-
-/* User wants a new edge thing.  This was inadvertently added.
-  */
-void ColorCreator::on_edgeDiff_actionTriggered(int action)
-{
-
-}
-
-/* User changes the edge threshold.  When displaying edge
-  images we use an int to determine what constitutes an edge.
-  @param value      the new value to use
-  */
-void ColorCreator::on_edgeDiff_valueChanged(int value)
-{
-    QTextStream out(stdout);
-    out << "Set threshold to " << value << "\n";
-    edgediff = value;
-    updateThresh(false, true, false);
-}
-
-void ColorCreator::on_vMin_valueChanged(int value)
-{
-    intSliders[vMin][currentColor] = value;
-    updateColors();
-    QTextStream out(stdout);
-    out << "Set V Min value to " << value << "\n";
-}
-
-void ColorCreator::on_vMax_valueChanged(int value)
-{
-    intSliders[vMax][currentColor] = value;
-    updateColors();
-    QTextStream out(stdout);
-    out << "Set V Max value to " << value << "\n";
-}
-
-void ColorCreator::on_modeSelect_currentIndexChanged(int index)
-{
-  defineMode = !index;
-  tableMode = index;
-  modeChanged();
-}
-
 void ColorCreator::on_cornerDefine_clicked()
 {
     cornerStatus = !cornerStatus;
-}
-
-void ColorCreator::on_changeColor_clicked()
-{
-  modeChanged();
 }
 
 }

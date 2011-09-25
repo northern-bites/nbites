@@ -91,59 +91,44 @@ protected:
     void mousePressEvent(QMouseEvent* event);
 
 private slots:
+
+    //frame navigation
     void on_pushButton_clicked();
-
     void on_previousButton_clicked();
-
     void on_nextButton_clicked();
-
-    void on_hMin_valueChanged(int value);
-
-    void on_hMax_valueChanged(int value);
-
-    void on_sMin_valueChanged(int value);
-
-    void on_sMax_valueChanged(int value);
-
-    void on_yMin_valueChanged(int value);
-
-    void on_yMax_valueChanged(int value);
-
-    void on_zSlice_valueChanged(int value);
-
-    void on_colorSelect_currentIndexChanged(int index);
-
-    void on_viewChoice_currentIndexChanged(int index);
-
-    void on_zMin_valueChanged(int value);
-
-    void on_zMax_valueChanged(int value);
-
-    void on_getColorTable_clicked();
-
-    void on_writeNew_clicked();
-
     void on_plusTen_clicked();
-
     void on_minusTen_clicked();
 
+    //sliders
+    void on_hMin_valueChanged(int value);
+    void on_hMax_valueChanged(int value);
+    void on_sMin_valueChanged(int value);
+    void on_sMax_valueChanged(int value);
+    void on_zMin_valueChanged(int value);
+    void on_zMax_valueChanged(int value);
+    void on_yMin_valueChanged(int value);
+    void on_yMax_valueChanged(int value);
+    void on_vMin_valueChanged(int value);
+    void on_vMax_valueChanged(int value);
+    void on_zSlice_valueChanged(int value);
+
+    //load/save color tables
+    void on_readTable_clicked();
+    void on_writeTable_clicked();
+    void on_writeOldTable_clicked();
+
+    //threshold image
     void on_channel_currentIndexChanged(int index);
-
-    void on_getOldTable_clicked();
-
-    void on_modeSelect_currentIndexChanged(int index);
-
-    void on_cornerDefine_clicked();
-
-    void on_changeColor_clicked();
-
+    void on_edgeDiff_valueChanged(int value);
     void on_edgeDiff_actionTriggered(int action);
 
-    void on_edgeDiff_valueChanged(int value);
+    //other
+    void on_modeSelect_currentIndexChanged(int index);
+    void on_changeColor_clicked();
+    void on_colorSelect_currentIndexChanged(int index);
+    void on_viewChoice_currentIndexChanged(int index);
 
-    void on_vMin_valueChanged(int value);
-
-    void on_vMax_valueChanged(int value);
+    void on_cornerDefine_clicked();
 
 private:
     Ui::ColorCreator *ui;
