@@ -1002,12 +1002,16 @@ void ColorCreator::on_zSlice_valueChanged(int value)
 
 void ColorCreator::on_readTable_clicked()
 {
-    currentColorDirectory = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
+    currentColorDirectory =
+      QFileDialog::getOpenFileName(this, tr("Open Color Table"),
                                             currentColorDirectory,
                                             tr("Table Files (*.mtb)"));
     table->read(currentColorDirectory);
     int last = currentColorDirectory.lastIndexOf("/");
     currentColorDirectory.chop(currentColorDirectory.size() - last);
+
+    if (ui->channel->currentIndex() == Table)
+      updateThresh(false, true, false);
 }
 
 /* The user wants to write a color table.
