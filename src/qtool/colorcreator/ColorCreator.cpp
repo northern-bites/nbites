@@ -107,6 +107,9 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     defineMode = false;
     cornerStatus = true;
 
+    ui->modeSelect->addItem(tr("Define Mode"), 0); 
+    ui->modeSelect->addItem(tr("Table Mode"), 1);
+
     ui->colorSelect->addItem(tr("Orange"), Orange);
     ui->colorSelect->addItem(tr("Blue"), Blue);
     ui->colorSelect->addItem(tr("Yellow"), Yellow);
@@ -797,6 +800,81 @@ void ColorCreator::outputStats()
     out << "V: " << statsVMin << " " << statsVMax << "\n";
 }
 
+void ColorCreator::modeChanged()
+{
+    if (tableMode && firstPoint.x() > -1)
+    {
+        int y, u, v, yHigh, uHigh, vHigh, yLow, uLow, vLow;
+        if (defineMode)
+        {
+            // collect up all of the pixels in the region that are not the right color
+            y = u = v = 255;
+            yLow = uLow = vLow = 255;
+            yHigh = uHigh = vHigh = 0;
+            for (int k = firstPoint.x(); k < lastPoint.x(); k++)
+            {
+                for (int l = firstPoint.y(); l < lastPoint.y(); l++)
+                {
+                    y = yuvImage.getY(k, l);
+                    u = yuvImage.getU(k, l);
+                    v = yuvImage.getV(k, l);
+                    if (y < yLow)
+                    {
+                        yLow = y;
+                    }
+                    if (u < uLow)
+                    {
+                        uLow = u;
+                    }
+                    if (v < vLow)
+                    {
+                        vLow = v;
+                    }
+                    if (y > yHigh)
+                    {
+                        yHigh = y;
+                    }
+                    if (u > uHigh)
+                    {
+                        uHigh = u;
+                    }
+                    if (v > vHigh)
+                    {
+                        vHigh = v;
+                    }
+                }
+            }
+            QTextStream out(stdout);
+            out << "Set Y Stuff value to " << yLow << " " << yHigh << "\n";
+            // we have defined a region in the space to make that color
+            for (y = yLow; y <= yHigh; y++)
+            {
+                for (u = uLow; u <= uHigh; u++)
+                {
+                    for (v = vLow; v <= vHigh; v++)
+                    {
+                        table->setColor(y, u, v, bitColor[currentColor]);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (int k = firstPoint.x(); k < lastPoint.x(); k++)
+            {
+                for (int l = firstPoint.y(); l < lastPoint.y(); l++)
+                {
+                    y = yuvImage.getY(k, l);
+                    u = yuvImage.getU(k, l);
+                    v = yuvImage.getV(k, l);
+                    table->unSetColor(y, u, v, bitColor[currentColor]);
+                }
+            }
+        }
+    }
+    firstPoint.setX(-1);
+    largeDisplay();
+}
 void ColorCreator::on_pushButton_clicked()
 {
     currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
@@ -1009,14 +1087,11 @@ void ColorCreator::on_vMax_valueChanged(int value)
     out << "Set V Max value to " << value << "\n";
 }
 
-void ColorCreator::on_radioButton_clicked()
+void ColorCreator::on_modeSelect_currentIndexChanged(int index)
 {
-    tableMode = !tableMode;
-}
-
-void ColorCreator::on_ColorChange_clicked()
-{
-    defineMode = !defineMode;
+  defineMode = !index;
+  tableMode = index;
+  modeChanged();
 }
 
 void ColorCreator::on_cornerDefine_clicked()
@@ -1026,80 +1101,8 @@ void ColorCreator::on_cornerDefine_clicked()
 
 void ColorCreator::on_changeColor_clicked()
 {
-    if (tableMode && firstPoint.x() > -1)
-    {
-        int y, u, v, yHigh, uHigh, vHigh, yLow, uLow, vLow;
-        if (defineMode)
-        {
-            // collect up all of the pixels in the region that are not the right color
-            y = u = v = 255;
-            yLow = uLow = vLow = 255;
-            yHigh = uHigh = vHigh = 0;
-            for (int k = firstPoint.x(); k < lastPoint.x(); k++)
-            {
-                for (int l = firstPoint.y(); l < lastPoint.y(); l++)
-                {
-                    y = yuvImage.getY(k, l);
-                    u = yuvImage.getU(k, l);
-                    v = yuvImage.getV(k, l);
-                    if (y < yLow)
-                    {
-                        yLow = y;
-                    }
-                    if (u < uLow)
-                    {
-                        uLow = u;
-                    }
-                    if (v < vLow)
-                    {
-                        vLow = v;
-                    }
-                    if (y > yHigh)
-                    {
-                        yHigh = y;
-                    }
-                    if (u > uHigh)
-                    {
-                        uHigh = u;
-                    }
-                    if (v > vHigh)
-                    {
-                        vHigh = v;
-                    }
-                }
-            }
-            QTextStream out(stdout);
-            out << "Set Y Stuff value to " << yLow << " " << yHigh << "\n";
-            // we have defined a region in the space to make that color
-            for (y = yLow; y <= yHigh; y++)
-            {
-                for (u = uLow; u <= uHigh; u++)
-                {
-                    for (v = vLow; v <= vHigh; v++)
-                    {
-                        table->setColor(y, u, v, bitColor[currentColor]);
-                    }
-                }
-            }
-        }
-        else
-        {
-            for (int k = firstPoint.x(); k < lastPoint.x(); k++)
-            {
-                for (int l = firstPoint.y(); l < lastPoint.y(); l++)
-                {
-                    y = yuvImage.getY(k, l);
-                    u = yuvImage.getU(k, l);
-                    v = yuvImage.getV(k, l);
-                    table->unSetColor(y, u, v, bitColor[currentColor]);
-                }
-            }
-        }
-    }
-    firstPoint.setX(-1);
-    largeDisplay();
+  modeChanged();
 }
-
 
 }
 }
