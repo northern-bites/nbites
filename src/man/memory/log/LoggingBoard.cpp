@@ -29,9 +29,9 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
             objectIOMap[MIMAGE_ID] = FDLogger::ptr(new ImageLogger(i->second,
                     static_cast<int>(i->first), roboImage));
         } else {
-            shared_ptr<const ProtoMessage> mobject =
-                    memory->getProtoMessage(i->first);
-            if (mobject != shared_ptr<ProtoMessage>()) {
+            MObject::const_ptr mobject =
+                    memory->getMObject(i->first);
+            if (mobject != MObject::const_ptr()) {
                 objectIOMap[i->first] = FDLogger::ptr(new MessageLogger(i->second,
                         static_cast<int> (i->first), mobject));
             } else {

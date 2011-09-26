@@ -1,7 +1,7 @@
 /*
  * Memory.cpp
  *
- *      Author: oneamtu
+ * @author Octavian Neamtu
  */
 
 #include "Common.h"
@@ -14,30 +14,28 @@ long long int birth_time; //the time we initialized memory
 //everything else is time stamped relative to this
 
 using boost::shared_ptr;
+using namespace proto;
 
 Memory::Memory(shared_ptr<Vision> vision_ptr,
         shared_ptr<Sensors> sensors_ptr) :
         _sensors(sensors_ptr),
         mVision(new MVision(MVISION_ID,
-                MObject::NameFromID(MVISION_ID),
-                vision_ptr)),
+                vision_ptr, shared_ptr<PVision>(new PVision))),
         mVisionSensors(new MVisionSensors(MVISION_SENSORS_ID,
-                MObject::NameFromID(MVISION_SENSORS_ID),
-                sensors_ptr)),
+                sensors_ptr, shared_ptr<PVisionSensors>(new PVisionSensors))),
         mMotionSensors(new MMotionSensors(MMOTION_SENSORS_ID,
-                MObject::NameFromID(MMOTION_SENSORS_ID),
-                sensors_ptr)),
+                sensors_ptr, shared_ptr<PMotionSensors>(new PMotionSensors))),
         mImage(new MImage(MIMAGE_ID,
-                MObject::NameFromID(MIMAGE_ID),
-                sensors_ptr)) {
+                sensors_ptr, shared_ptr<PImage>(new PImage))) {
     birth_time = process_micro_time();
+
     if(_sensors.get()) {
         sensors_ptr->addSubscriber(this);
     }
 
-    protoMessageMap.insert(ProtoMessagePair(MVISION_ID, mVision));
-    protoMessageMap.insert(ProtoMessagePair(MVISION_SENSORS_ID, mVisionSensors));
-    protoMessageMap.insert(ProtoMessagePair(MMOTION_SENSORS_ID, mMotionSensors));
+    mobject_IDMap.insert(MObject_IDPair(MVISION_ID, mVision));
+    mobject_IDMap.insert(MObject_IDPair(MVISION_SENSORS_ID, mVisionSensors));
+    mobject_IDMap.insert(MObject_IDPair(MMOTION_SENSORS_ID, mMotionSensors));
 }
 
 Memory::~Memory() {
@@ -77,23 +75,23 @@ void Memory::update(SensorsEvent event) {
 #endif
 }
 
-boost::shared_ptr<const ProtoMessage> Memory::getProtoMessage(MObject_ID id) const {
-    ProtoMessageMap::const_iterator it = protoMessageMap.find(id);
+MObject::const_ptr Memory::getMObject(MObject_ID id) const {
+    MObject_IDMap::const_iterator it = mobject_IDMap.find(id);
 
-    if (it != protoMessageMap.end()) {
+    if (it != mobject_IDMap.end()) {
         return it->second;
     } else {
-        return boost::shared_ptr<const ProtoMessage>();
+        return MObject::const_ptr();
     }
 }
 
-boost::shared_ptr<ProtoMessage> Memory::getMutableProtoMessage(MObject_ID id) {
-    ProtoMessageMap::iterator it = protoMessageMap.find(id);
+MObject::ptr Memory::getMutableMObject(MObject_ID id) {
+    MObject_IDMap::iterator it = mobject_IDMap.find(id);
 
-    if (it != protoMessageMap.end()) {
+    if (it != mobject_IDMap.end()) {
         return it->second;
     } else {
-        return boost::shared_ptr<ProtoMessage>();
+        return MObject::ptr();
     }
 }
 

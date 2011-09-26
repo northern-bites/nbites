@@ -16,9 +16,13 @@ namespace memory {
 
 using boost::shared_ptr;
 using namespace std;
+using proto::PImage;
 
-MImage::MImage(MObject_ID id, std::string name, shared_ptr<Sensors> s) :
-        MObject(id, name),RoboImage(), sensors(s) {
+MImage::MImage(MObject_ID id, shared_ptr<Sensors> s,
+               shared_ptr<PImage> image_data) :
+        MObject(id, image_data), RoboImage(),
+        sensors(s),
+        data(image_data) {
     //string* image_string = this->mutable_image();
     //image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
     //cout << " string capacity " << NAO_IMAGE_BYTE_SIZE << " "<<  image_string->capacity() << endl;

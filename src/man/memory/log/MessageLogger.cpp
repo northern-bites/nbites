@@ -13,10 +13,6 @@
  *      E-mail: oneamtu@bowdoin.edu
  */
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <iostream>
-
 #include "MessageLogger.h"
 
 namespace man {
@@ -29,8 +25,8 @@ namespace log {
 using namespace std;
 
 MessageLogger::MessageLogger(FDProvider::const_ptr fdp,
-		int logTypeID, boost::shared_ptr<const ProtoMessage> m) :
-        FDLogger(fdp), logID(logTypeID), message(m) {
+		int logTypeID, MObject::const_ptr objectToLog) :
+        FDLogger(fdp), logID(logTypeID), objectToLog(objectToLog) {
     // this helps us ID the log
     writeHead();
 }
@@ -44,12 +40,9 @@ void MessageLogger::writeHead() {
 
 void MessageLogger::writeToLog() {
 
-    this->writeValue<uint32_t>(message->ByteSize());
-    message->SerializeToString(&write_buffer);
+    this->writeValue<uint32_t>(objectToLog->byteSize());
+    objectToLog->serializeToString(&write_buffer);
     this->writeCharBuffer(write_buffer.data(), write_buffer.length());
-}
-
-MessageLogger::~MessageLogger() {
 }
 
 }

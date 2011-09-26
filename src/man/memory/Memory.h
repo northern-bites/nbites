@@ -1,5 +1,5 @@
 /**
- * Memory.hpp
+ * Memory.h
  *
  * @class Memory
  *
@@ -23,6 +23,7 @@ class Memory; //forward declaration
 }
 }
 
+#include "MObject.h"
 #include "MVision.h"
 #include "Vision.h"
 #include "MVisionSensors.h"
@@ -35,8 +36,6 @@ class Memory; //forward declaration
 namespace man {
 namespace memory {
 
-typedef google::protobuf::Message ProtoMessage;
-
 class Memory : public Subscriber<SensorsEvent>,
                public MultiProvider<MObject_ID> {
 
@@ -44,9 +43,9 @@ public:
     typedef boost::shared_ptr<Memory> ptr;
     typedef boost::shared_ptr<const Memory> const_ptr;
     typedef std::pair<MObject_ID,
-            boost::shared_ptr<ProtoMessage> > ProtoMessagePair;
+            boost::shared_ptr<MObject> > MObject_IDPair;
     typedef std::map<MObject_ID,
-            boost::shared_ptr<ProtoMessage> > ProtoMessageMap;
+            boost::shared_ptr<MObject> > MObject_IDMap;
 
 public:
     Memory( boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
@@ -73,13 +72,13 @@ public:
     const MImage* getMImage() const {return mImage.get();}
 
     boost::shared_ptr<const RoboImage> getRoboImage() const {return mImage;}
-    boost::shared_ptr<const ProtoMessage> getProtoMessage(MObject_ID id) const;
+    MObject::const_ptr getMObject(MObject_ID id) const;
 
     boost::shared_ptr<RoboImage> getMutableRoboImage() {return mImage;}
-    boost::shared_ptr<ProtoMessage> getMutableProtoMessage(MObject_ID id);
+    MObject::ptr getMutableMObject(MObject_ID id);
 
 private:
-    ProtoMessageMap protoMessageMap;
+    MObject_IDMap mobject_IDMap;
     boost::shared_ptr<Sensors> _sensors;
     boost::shared_ptr<MVision> mVision;
     boost::shared_ptr<MVisionSensors> mVisionSensors;

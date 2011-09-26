@@ -30,11 +30,11 @@ void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
             objectIOMap[MIMAGE_ID] = Parser::ptr(new ImageParser(i->second,
                     roboImage));
         } else {
-            shared_ptr<ProtoMessage> mobject =
-                    memory->getMutableProtoMessage(i->first);
-            if (mobject != shared_ptr<ProtoMessage>()) {
+            MObject::ptr mobject =
+                    memory->getMutableMObject(i->first);
+            if (mobject != MObject::const_ptr()) {
                 objectIOMap[i->first] = Parser::ptr(new MessageParser(i->second,
-                        mobject));
+                        mobject->getMutableProtoMessage()));
             } else {
                 std::cout<<"Could not read valid log ID from file descriptor: "
                         << "log ID: " << i->first << " "

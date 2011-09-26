@@ -5,7 +5,8 @@
  * to the generic wrapper class to the protobuffer subsystem we employ to
  * manage important data
  *
- * N.B. All derived classes should call setName or REGISTER_MOBJECT in their constructor
+ * Most essential functions are virtual, so each inheriting class can modify the
+ * way it gets serialized, etc.
  *
  *      Author: Octavian Neamtu
  */
@@ -15,37 +16,13 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 
+#include "MemoryCommon.h"
+
 namespace man {
 namespace memory {
 
-//TODO: move these to a different class
-
-//IDs and names are tightly linked, be sure to modify both when needed!
-enum MObject_ID {
-    MVISION_ID = 1,
-    MMOTION_SENSORS_ID,
-    MVISION_SENSORS_ID,
-    MIMAGE_ID,
-    LAST_OBJECT //dummy object
-};
-
-inline void operator++(MObject_ID& id) {
-    id = MObject_ID(id+1);
-}
-
-inline void operator++(MObject_ID& id, int) {
-    id = MObject_ID(id+1);
-}
-
-static const MObject_ID FIRST_OBJECT = MVISION_ID;
-
-static const std::string MObject_names[] = {
-            "unknown",
-            "Vision",
-            "MotionSensors",
-            "VisionSensors",
-            "Image"
-};
+//TODO: add a specialized Null object class and use it instead of a null
+// pointer for when we don't want an object to be initialized
 
 class MObject {
 
@@ -53,19 +30,35 @@ public:
     typedef boost::shared_ptr<MObject> ptr;
     typedef boost::shared_ptr<const MObject> const_ptr;
 
-    MObject(MObject_ID id, std::string name) : id(id), name(name) {
-    }
+protected:
+    /*
+     * @params:
+     * id : the id of this MObject (each MObject should have a unique
+     * MObject_ID associated with it)
+     * protoMessage : the protocol message associated with this MObject
+     */
+    MObject(MObject_ID id, ProtoMessage_ptr protoMessage);
+
+public:
+    virtual ~MObject(){}
     /**
      * method update - this should be overwritten by a method that sets all of
      * the proto message fields with values from its respective man counterpart
      */
     virtual void update() = 0;
-    static const std::string NameFromID(MObject_ID id) {
-        return MObject_names[static_cast<int>(id)];
-    }
 
-private:
+    //TODO: make this pure virtual and implement in other class
+    //or find generic way to implement
+    virtual const std::string& getName() const {};
+    virtual void serializeToString(std::string* write_buffer) const;
+    virtual unsigned byteSize() const;
+
+    ProtoMessage_const_ptr getProtoMessage() const { return protoMessage;}
+    ProtoMessage_ptr getMutableProtoMessage() { return protoMessage;}
+
+protected:
     MObject_ID id;
+    ProtoMessage_ptr protoMessage;
     std::string name;
 
 };

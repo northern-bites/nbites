@@ -46,6 +46,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 # Add here source files needed to compile this project
 
 set( MEMORY_SRCS Memory
+                 MObject
                  MVision
                  MVisionSensors
                  MMotionSensors
@@ -97,6 +98,7 @@ add_library(
 ############################ Set linked libraries
 target_link_libraries(
   ${MEMORY_TARGET}
+  ${PROTOBUF_LIBRARY}
   ${PROTOS_TARGET}
   ${VISION_TARGET}
   ${SENSORS_TARGET}
@@ -104,7 +106,7 @@ target_link_libraries(
 
 target_link_libraries(
     ${LOG_TARGET}
-    ${PROTOBUF_LIBRARIES}
+    ${PROTOBUF_LIBRARY}
     ${Boost_PYTHON_LIBRARY}
     ${NBINCLUDE_TARGET}
     ${MEMORY_TARGET}
@@ -112,6 +114,6 @@ target_link_libraries(
 
 target_link_libraries(
     ${PARSE_TARGET}
-    ${PROTOBUF_LIBRARIES}
+    ${PROTOBUF_LIBRARY}
     ${MEMORY_TARGET}
     )
