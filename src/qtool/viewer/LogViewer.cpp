@@ -22,8 +22,9 @@ LogViewer::LogViewer(DataManager::ptr dataManager) :
 	for (MObject_ID id = FIRST_OBJECT;
 					id != LAST_OBJECT; id++) {
 		if (id != MIMAGE_ID) {
-			QDockWidget* dockWidget = new QDockWidget(QString(MObject::NameFromID(id).c_str()), this);
-			MObjectViewer* view = new MObjectViewer(dataManager->getMemory()->getProtoMessage(id));
+			QDockWidget* dockWidget = new QDockWidget(QString(MObject_names[id].c_str()), this);
+			MObjectViewer* view = new MObjectViewer(dataManager->getMemory()->
+			                                        getMObject(id)->getProtoMessage());
 			dockWidget->setWidget(view);
 			this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 			dataManager->addSubscriber(view);
