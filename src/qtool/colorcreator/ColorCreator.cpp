@@ -826,6 +826,7 @@ void ColorCreator::on_hMin_valueChanged(int value)
     hMin[currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
+    ui->hMinLabel->setText(QString::number(value));
     out << "Set H Min value to " << value << "\n";
 }
 
@@ -834,6 +835,7 @@ void ColorCreator::on_hMax_valueChanged(int value)
     hMax[currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
+    ui->hMaxLabel->setText(QString::number(value));
     out << "Set H Max value to " << value << "\n";
 }
 
@@ -842,6 +844,7 @@ void ColorCreator::on_sMin_valueChanged(int value)
     sMin[currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
+    ui->sMinLabel->setText(QString::number(value));
     out << "Set S Min value to " << value << "\n";
 }
 
@@ -850,6 +853,7 @@ void ColorCreator::on_sMax_valueChanged(int value)
     sMax[currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
+    ui->sMaxLabel->setText(QString::number(value));
     out << "Set S Max value to " << value << "\n";
 }
 
@@ -858,6 +862,7 @@ void ColorCreator::on_yMin_valueChanged(int value)
     yMin[currentColor] = value;
     updateColors();
     QTextStream out(stdout);
+    ui->yMinLabel->setText(QString::number(value));
     out << "Set Y Min value to " << value << "\n";
 }
 
@@ -865,6 +870,7 @@ void ColorCreator::on_yMax_valueChanged(int value)
 {
     yMax[currentColor] = value;
     updateColors();
+    ui->yMaxLabel->setText(QString::number(value));
     QTextStream out(stdout);
     out << "Set Y Max value to " << value << "\n";
 }
@@ -907,6 +913,7 @@ void ColorCreator::on_zMin_valueChanged(int value)
     zMin[currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
+    ui->zMinLabel->setText(QString::number(value));
     out << "Set Z Min value to " << value << "\n";
 }
 
@@ -915,6 +922,7 @@ void ColorCreator::on_zMax_valueChanged(int value)
     zMax[currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
+    ui->zMaxLabel->setText(QString::number(value));
     out << "Set Z Max value to " << value << "\n";
 }
 
@@ -1167,6 +1175,7 @@ void ColorCreator::on_vMin_valueChanged(int value)
     vMin[currentColor] = value;
     updateColors();
     QTextStream out(stdout);
+    ui->vMinLabel->setText(QString::number(value));
     out << "Set V Min value to " << value << "\n";
 }
 
@@ -1175,6 +1184,7 @@ void ColorCreator::on_vMax_valueChanged(int value)
     vMax[currentColor] = value;
     updateColors();
     QTextStream out(stdout);
+    ui->vMaxLabel->setText(QString::number(value));
     out << "Set V Max value to " << value << "\n";
 }
 
