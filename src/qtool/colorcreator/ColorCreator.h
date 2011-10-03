@@ -14,6 +14,8 @@
 #include "ColorEdit.h"
 #include "ColorTable.h"
 
+#include <qmainwindow.h>
+
 #define  NEWFRAMES
 #ifdef   NEWFRAMES
 #define  COLORS 8
@@ -49,7 +51,7 @@ namespace Ui {
 namespace qtool {
 namespace colorcreator {
 
-class ColorCreator : public QWidget, public Subscriber<data::MObject_ID>
+class ColorCreator : public QMainWindow, public Subscriber<data::MObject_ID>
 {
     Q_OBJECT
 

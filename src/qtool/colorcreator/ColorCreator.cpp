@@ -45,7 +45,7 @@ using data::DataManager;
 using man::memory::RoboImage;
 
 ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     dataManager(dataManager),
     ui(new Ui::ColorCreator),
     roboImage(dataManager->getMemory()->getMImage()),
