@@ -16,32 +16,6 @@
   <property name="windowTitle">
    <string>ColorCreator</string>
   </property>
-  <widget class="QPushButton" name="previousButton">
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>20</y>
-     <width>114</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Previous</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="nextButton">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>20</y>
-     <width>114</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Next</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="colorWheel">
    <property name="geometry">
     <rect>
@@ -214,7 +188,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Thresholded Image</string>
    </property>
   </widget>
   <widget class="QComboBox" name="viewChoice">
@@ -386,28 +360,6 @@
     <string>Get Table</string>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>20</y>
-     <width>161</width>
-     <height>34</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>Find</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="lineEdit"/>
-    </item>
-   </layout>
-  </widget>
   <widget class="QPushButton" name="writeNew">
    <property name="geometry">
     <rect>
@@ -421,32 +373,6 @@
     <string>Make New</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="plusTen">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>20</y>
-     <width>114</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>+ 10</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="minusTen">
-   <property name="geometry">
-    <rect>
-     <x>550</x>
-     <y>20</y>
-     <width>114</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>- 10</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="view2">
    <property name="geometry">
     <rect>
@@ -457,7 +383,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Full-Color Image</string>
    </property>
   </widget>
   <widget class="QLabel" name="view3">
@@ -470,7 +396,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Single-Channel Image</string>
    </property>
   </widget>
   <widget class="QComboBox" name="channel">
@@ -635,6 +561,79 @@
    <property name="text">
     <string>Update Color</string>
    </property>
+  </widget>
+  <widget class="QDockWidget" name="buttonsWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>-10</y>
+     <width>541</width>
+     <height>80</height>
+    </rect>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetMovable</set>
+   </property>
+   <widget class="QWidget" name="buttons">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <widget class="QPushButton" name="previousButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Previous</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="nextButton">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>0</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Next</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="plusTen">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>0</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>+ 10</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="minusTen">
+     <property name="geometry">
+      <rect>
+       <x>390</x>
+       <y>0</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>- 10</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

@@ -87,8 +87,6 @@ protected:
     void mousePressEvent(QMouseEvent* event);
 
 private slots:
-    void on_pushButton_clicked();
-
     void on_previousButton_clicked();
 
     void on_nextButton_clicked();

@@ -797,15 +797,6 @@ void ColorCreator::outputStats()
     out << "V: " << statsVMin << " " << statsVMax << "\n";
 }
 
-void ColorCreator::on_pushButton_clicked()
-{
-    currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
-                                            currentDirectory,
-                                            tr("Image Files (*.log)"));
-    yuvImage.updateFromRoboImage();
-    updateDisplays();
-}
-
 void ColorCreator::on_previousButton_clicked()
 {
     //TODO: parsing doesn't work backwards atm
