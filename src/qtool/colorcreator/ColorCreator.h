@@ -127,10 +127,6 @@ private slots:
 
     void on_getOldTable_clicked();
 
-    void on_radioButton_clicked();
-
-    void on_ColorChange_clicked();
-
     void on_cornerDefine_clicked();
 
     void on_changeColor_clicked();
@@ -162,8 +158,6 @@ private:
     QImage *img3;
     QImage *img4;
     QImage *wheel;
-    bool tableMode;
-    bool defineMode;
     bool cornerStatus;
     QPoint firstPoint;
     QPoint lastPoint;

@@ -226,19 +226,6 @@
       <string>Old Table</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="ColorChange">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>760</y>
-       <width>111</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Define/Undef</string>
-     </property>
-    </widget>
     <widget class="QSlider" name="zSlice">
      <property name="geometry">
       <rect>
@@ -265,19 +252,6 @@
       <string>Update Color</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="radioButton">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>740</y>
-       <width>102</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Table Mode</string>
-     </property>
-    </widget>
     <widget class="QWidget" name="gridLayoutWidget">
      <property name="geometry">
       <rect>
@@ -287,7 +261,7 @@
        <height>341</height>
       </rect>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="sliderLayout">
       <item row="0" column="0">
        <widget class="QSlider" name="hMin">
         <property name="maximum">
@@ -507,6 +481,32 @@
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="QCheckBox" name="tableMode">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>740</y>
+       <width>111</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Table Mode</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="defUndef">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>760</y>
+       <width>95</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Def-Undef</string>
+     </property>
     </widget>
    </widget>
   </widget>
