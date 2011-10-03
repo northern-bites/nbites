@@ -50,6 +50,7 @@ using namespace man::memory;
     void LogViewer::nextImage()
     {
         dataManager->getNext();
+        roboImageViewer->repaint();
     }
 
     void LogViewer::prevImage()
