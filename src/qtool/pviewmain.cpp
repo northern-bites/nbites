@@ -13,10 +13,6 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     //MainWindow w;
     //w.show();
-    QmlApplicationViewer viewer;
-        viewer.setMainQmlFile(QLatin1String("qmlfilerelativepath"));
-        viewer.setResizeMode(QDeclarativeView::SizeRootObjectToView);
-        viewer.showFullScreen();
 
     memory::proto::PMotionSensors* ms =
             new memory::proto::PMotionSensors();
