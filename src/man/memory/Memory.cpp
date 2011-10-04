@@ -18,7 +18,6 @@ using namespace proto;
 
 Memory::Memory(shared_ptr<Vision> vision_ptr,
         shared_ptr<Sensors> sensors_ptr) :
-        _sensors(sensors_ptr),
         mVision(new MVision(MVISION_ID,
                 vision_ptr, shared_ptr<PVision>(new PVision))),
         mVisionSensors(new MVisionSensors(MVISION_SENSORS_ID,
@@ -29,13 +28,14 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
                 sensors_ptr, shared_ptr<PImage>(new PImage))) {
     birth_time = process_micro_time();
 
-    if(_sensors.get()) {
+    if(sensors_ptr.get()) {
         sensors_ptr->addSubscriber(this);
     }
 
     mobject_IDMap.insert(MObject_IDPair(MVISION_ID, mVision));
     mobject_IDMap.insert(MObject_IDPair(MVISION_SENSORS_ID, mVisionSensors));
     mobject_IDMap.insert(MObject_IDPair(MMOTION_SENSORS_ID, mMotionSensors));
+    mobject_IDMap.insert(MObject_IDPair(MIMAGE_ID, mImage));
 }
 
 Memory::~Memory() {

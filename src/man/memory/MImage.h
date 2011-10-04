@@ -15,7 +15,7 @@
 
 namespace man {
 namespace memory {
-class MImage: public MObject, public RoboImage {
+class MImage: public MObject {
 
 public:
     /**

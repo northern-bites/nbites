@@ -71,15 +71,11 @@ public:
     const MMotionSensors* getMMotionSensors() const {return mMotionSensors.get();}
     const MImage* getMImage() const {return mImage.get();}
 
-    boost::shared_ptr<const RoboImage> getRoboImage() const {return mImage;}
     MObject::const_ptr getMObject(MObject_ID id) const;
-
-    boost::shared_ptr<RoboImage> getMutableRoboImage() {return mImage;}
     MObject::ptr getMutableMObject(MObject_ID id);
 
 private:
     MObject_IDMap mobject_IDMap;
-    boost::shared_ptr<Sensors> _sensors;
     boost::shared_ptr<MVision> mVision;
     boost::shared_ptr<MVisionSensors> mVisionSensors;
     boost::shared_ptr<MMotionSensors> mMotionSensors;

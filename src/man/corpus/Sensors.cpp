@@ -70,7 +70,9 @@ Sensors::Sensors(boost::shared_ptr<Speech> s) :
         bodyAnglesError(Kinematics::NUM_JOINTS, 0.0f),
         bodyTemperatures(Kinematics::NUM_JOINTS, 0.0f),
         yImage(&global_image[0]), uvImage(&global_image[0]),
-        colorImage(reinterpret_cast<uint8_t*>(&global_image[0])), naoImage(NULL),
+        colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+        naoImage(NULL),
+        roboImage(),
         varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
         fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
         unfilteredInertial(), chestButton(0.0f), batteryCharge(0.0f),
@@ -623,14 +625,14 @@ void Sensors::updateVisionAngles() {
 }
 
 //get a pointer to the full size Nao image
-//the pointer comes straight from the transcriber (no copying)
-uint8_t* Sensors::getRawNaoImage() {
-    return rawNaoImage;
+//this image has been copied to some local buffer
+const uint8_t* Sensors::getNaoImage() const {
+    return naoImage;
 }
 
 //get a pointer to the full size Nao image
 //this image has been copied to some local buffer
-const uint8_t* Sensors::getNaoImage() const {
+uint8_t* Sensors::getWriteableNaoImage() {
     return naoImage;
 }
 
@@ -651,17 +653,16 @@ const uint8_t* Sensors::getColorImage() const {
 }
 
 void Sensors::setNaoImagePointer(char* _naoImage) {
-    cout << "I am being set!" << endl;
-    naoImage = (uint8_t*) _naoImage;
+    naoImage = reinterpret_cast<uint8_t*>(_naoImage);
+    roboImage.updateImagePointer(naoImage);
 }
 
-void Sensors::setRawNaoImage(uint8_t *img) {
-    rawNaoImage = img;
-}
-
-void Sensors::setNaoImage(const uint8_t *img) {
-    naoImage = img;
+void Sensors::notifyNewNaoImage() {
     this->notifySubscribers(NEW_IMAGE);
+}
+
+const man::memory::RoboImage* Sensors::getRoboImage() const {
+    return &roboImage;
 }
 
 void Sensors::setImage(const uint16_t *img) {
