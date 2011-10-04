@@ -59,7 +59,7 @@ bool ImageParser::getNext() {
     this->getNextBuffer();
     if (!finished) {
         container->setTimestamp(this->readValue<int64_t>(&bytes_read));
-        container->updateImage(
+        container->updateImagePointer(
                 reinterpret_cast<const uint8_t*>(*current_buffer) + bytes_read);
     }
     return finished;
