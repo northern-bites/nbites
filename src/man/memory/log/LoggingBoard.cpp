@@ -24,21 +24,16 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
     for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
             i!= fdmap->end(); i++) {
 
-        if (i->first == MIMAGE_ID) {
-            shared_ptr<const RoboImage> roboImage = memory->getRoboImage();
-            objectIOMap[MIMAGE_ID] = FDLogger::ptr(new ImageLogger(i->second,
-                    static_cast<int>(i->first), roboImage));
+        MObject::const_ptr mobject =
+                memory->getMObject(i->first);
+        if (mobject != MObject::const_ptr()) {
+            objectIOMap[i->first] = FDLogger::ptr(
+                    new MessageLogger(i->second,
+                                      static_cast<int> (i->first), mobject));
         } else {
-            MObject::const_ptr mobject =
-                    memory->getMObject(i->first);
-            if (mobject != MObject::const_ptr()) {
-                objectIOMap[i->first] = FDLogger::ptr(new MessageLogger(i->second,
-                        static_cast<int> (i->first), mobject));
-            } else {
-                std::cout<<"Invalid Object ID passed for logging: "
-                        << "log ID: " << i->first << " "
-                        << i->second->debugInfo() << std::endl;
-            }
+            std::cout<<"Invalid Object ID passed for logging: "
+                    << "log ID: " << i->first << " "
+                    << i->second->debugInfo() << std::endl;
         }
     }
 }

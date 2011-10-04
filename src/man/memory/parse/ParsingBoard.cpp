@@ -18,28 +18,24 @@ ParsingBoard::ParsingBoard(Memory::ptr memory,
 
 ParsingBoard::~ParsingBoard(){}
 
+//TODO: this could be moved to MemoryIOBoard, since it's very similar to
+// the LoggingBoard method
 void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
     objectIOMap.clear();
 
     const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
     for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
             i!= fdmap->end(); i++) {
-
-        if (i->first == MIMAGE_ID) {
-            shared_ptr<RoboImage> roboImage = memory->getMutableRoboImage();
-            objectIOMap[MIMAGE_ID] = Parser::ptr(new ImageParser(i->second,
-                    roboImage));
+        MObject::ptr mobject =
+                memory->getMutableMObject(i->first);
+        if (mobject != MObject::const_ptr()) {
+            objectIOMap[i->first] = Parser::ptr(
+                    new MessageParser(i->second,
+                                      mobject->getMutableProtoMessage()));
         } else {
-            MObject::ptr mobject =
-                    memory->getMutableMObject(i->first);
-            if (mobject != MObject::const_ptr()) {
-                objectIOMap[i->first] = Parser::ptr(new MessageParser(i->second,
-                        mobject->getMutableProtoMessage()));
-            } else {
-                std::cout<<"Could not read valid log ID from file descriptor: "
-                        << "log ID: " << i->first << " "
-                        << i->second->debugInfo() << std::endl;
-            }
+            std::cout<<"Could not read valid log ID from file descriptor: "
+                    << "log ID: " << i->first << " "
+                    << i->second->debugInfo() << std::endl;
         }
     }
 }
