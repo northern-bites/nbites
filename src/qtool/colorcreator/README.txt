@@ -41,3 +41,7 @@ into their own windows.
 Also, the deprecated go to file button was removed, and initial loading of a file
 was improved so that images load immediately instead of after clicking "next" for
 the first time. 
+
+Also fixed the table mode/defundef buttons. They are now check boxes instead of
+radio buttons because this better reflects the logic of how they seem to work.
+Table mode can be on or off, and you can be in def or undef. 
