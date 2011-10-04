@@ -385,7 +385,7 @@ const float Sensors::getBatteryCurrent() const {
 void Sensors::setBodyAngles(float* jointVPointers[]) {
     angles_mutex.lock();
 
-    for (int i = 0; i < Kinematics::NUM_JOINTS; i++) {
+    for (uint i = 0; i < Kinematics::NUM_JOINTS; i++) {
     	bodyAngles[i] = *jointVPointers[i];
     }
     /*
@@ -426,7 +426,7 @@ void Sensors::setBodyAngleErrors(const vector<float>& v) {
 void Sensors::setBodyTemperatures(float* jointTPointers[]) {
     temperatures_mutex.lock();
 
-    for (int i = 0; i < Kinematics::NUM_JOINTS; i++) {
+    for (uint i = 0; i < Kinematics::NUM_JOINTS; i++) {
     	bodyTemperatures[i] = *jointTPointers[i];
     }
 
