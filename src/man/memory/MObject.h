@@ -49,7 +49,7 @@ public:
 
     //TODO: make this pure virtual and implement in other class
     //or find generic way to implement
-    virtual const std::string& getName() const {};
+    virtual const std::string& getName() const {return MObject_names[id];}
     virtual void serializeToString(std::string* write_buffer) const;
     virtual unsigned byteSize() const;
 
