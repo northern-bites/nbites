@@ -69,6 +69,10 @@ static const int NUM_PLAYERS_PER_TEAM = 4;
 #  define false 0
 #endif
 
+#ifndef uint
+typedef unsigned int uint;
+#endif
+
 #ifndef byte
 typedef unsigned char byte;
 #endif
