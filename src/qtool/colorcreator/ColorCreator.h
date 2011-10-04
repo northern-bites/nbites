@@ -8,7 +8,7 @@
 #include "man/memory/parse/ImageParser.h"
 #include "man/include/Subscriber.h"
 //qtool
-#include "image/YUVImage.h"
+#include "image/YUVImage.h"public Subscriber<data::MObject_ID>
 #include "data/DataManager.h"
 //colorcreator
 #include "ColorEdit.h"

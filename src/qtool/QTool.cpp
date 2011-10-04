@@ -11,16 +11,19 @@ using viewer::LogViewer;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
+        colorScrollArea(new QScrollArea()),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCreator(new ColorCreator(dataManager)),
         logViewer(new LogViewer(dataManager)){
 
-    this->setWindowTitle(tr("HackTool"));
+    this->setWindowTitle(tr("QTool"));
 
     this->setCentralWidget(toolTabs);
 
-    toolTabs->addTab(colorCreator, tr("Color Creator"));
+    colorScrollArea->setWidget(colorCreator);
+
+    toolTabs->addTab(colorScrollArea, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(logViewer, tr("Log Viewer"));
 

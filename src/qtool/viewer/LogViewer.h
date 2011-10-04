@@ -31,6 +31,9 @@ private:
 	data::DataManager::ptr dataManager;
 	RoboImageViewer* roboImageViewer;
 
+private slots:
+        void nextClicked();
+
 };
 
 }

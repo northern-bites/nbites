@@ -19,6 +19,7 @@ DataManager::~DataManager() {
 
 void DataManager::newDataSource(DataSource::ptr dataSource) {
     parsingBoard.newIOProvider(dataSource);
+    this->getNext();
 }
 
 }
