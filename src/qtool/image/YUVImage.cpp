@@ -2,41 +2,63 @@
 
 using namespace std;
 
-using man::memory::RoboImage;
+using man::memory::MImage;
 
-YUVImage::YUVImage(RoboImage::const_ptr _roboImage) :
-		roboImage(_roboImage) {
+YUVImage::YUVImage(MImage::const_ptr rawImage) :
+		rawImage(rawImage), width(0), height(0),
+		yImg(NULL), uImg(NULL), vImg(NULL) {
 
-	height = roboImage->getHeight();
-	width = roboImage->getWidth();
-
-	yImg = new int*[width];
-	uImg = new int*[width];
-	vImg = new int*[width];
-	for (int i = 0; i < width; i++) {
-		yImg[i] = new int[height];
-		vImg[i] = new int[height];
-		uImg[i] = new int[height];
-	}
-
-	updateFromRoboImage();
+	updateFromRawImage();
 }
 
 YUVImage::~YUVImage() {
-	for (int i = 0; i < width; i++) {
-		delete yImg[i];
-		delete vImg[i];
-		delete uImg[i];
-	}
-	delete yImg;
-	delete uImg;
-	delete vImg;
+	deallocateYUVArrays();
 }
 
-void YUVImage::updateFromRoboImage() {
-	const byte* data = roboImage->getImage();
-	if (data == NULL)
-		return ;
+bool YUVImage::rawImageDimensionsEnlarged() {
+    return this->height < rawImage->get()->height() ||
+           this->width < rawImage->get()->width();
+}
+
+void YUVImage::deallocateYUVArrays() {
+    if (yImg && uImg && vImg) {
+        for (int i = 0; i < width; i++) {
+            delete yImg[i];
+            delete vImg[i];
+            delete uImg[i];
+        }
+        delete yImg;
+        delete uImg;
+        delete vImg;
+    }
+}
+
+void YUVImage::resizeYUVArrays() {
+
+    height = rawImage->get()->height();
+    width = rawImage->get()->width();
+
+    deallocateYUVArrays();
+
+    yImg = new int*[width];
+    uImg = new int*[width];
+    vImg = new int*[width];
+    for (int i = 0; i < width; i++) {
+        yImg[i] = new int[height];
+        uImg[i] = new int[height];
+        vImg[i] = new int[height];
+    }
+}
+
+void YUVImage::updateFromRawImage() {
+	const byte* data =
+	        reinterpret_cast<const byte*>(rawImage->get()->image().data());
+
+	if (rawImageDimensionsEnlarged()) {
+	    resizeYUVArrays();
+	}
+
+	assert(data != NULL);
 	//copy the Y/U/V stuff
 	int i = 0;
 	for (int y = 0; y < height; ++y) {

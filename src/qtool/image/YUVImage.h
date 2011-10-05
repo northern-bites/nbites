@@ -19,15 +19,15 @@
 #include <QGraphicsItem>
 #include <QColor>
 #include "ColorSpace.h"
-#include "man/memory/RoboImage.h"
+#include "man/memory/MImage.h"
 
 class YUVImage
 {
 
 public:
-    YUVImage(man::memory::RoboImage::const_ptr _roboImage);
+    YUVImage(man::memory::MImage::const_ptr rawImage);
     virtual ~YUVImage();
-    virtual void updateFromRoboImage();
+    virtual void updateFromRawImage();
     void read(QString filename);
     void read(std::string s);
     unsigned int getWidth() const { return width;}
@@ -45,9 +45,16 @@ public:
     int getS(int x, int y) const;
     int getZ(int x, int y) const;
 
+protected:
+    bool rawImageDimensionsEnlarged();
+
+private:
+    void deallocateYUVArrays();
+    void resizeYUVArrays();
+
 
 protected:
-    man::memory::RoboImage::const_ptr roboImage;
+    man::memory::MImage::const_ptr rawImage;
 
     unsigned int width;
     unsigned int height;

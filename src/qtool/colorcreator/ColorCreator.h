@@ -64,7 +64,7 @@ public:
     void updateColors();
     void updateThresh(bool imageChanged, bool choiceChanged, bool colorsChanged);
     void update(data::MObject_ID) {
-        yuvImage.updateFromRoboImage();
+        yuvImage.updateFromRawImage();
         updateDisplays();
     }
     void initStats();
@@ -145,7 +145,7 @@ private slots:
 
 private:
     Ui::ColorCreator *ui;
-    man::memory::RoboImage::const_ptr roboImage;
+    man::memory::MImage::const_ptr roboImage;
     YUVImage yuvImage;
     qtool::data::DataManager::ptr dataManager;
     ColorTable *table;

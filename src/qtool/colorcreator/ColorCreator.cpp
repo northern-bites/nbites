@@ -42,14 +42,12 @@ namespace qtool {
 namespace colorcreator {
 
 using data::DataManager;
-using man::memory::RoboImage;
 
 ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     QWidget(parent),
     dataManager(dataManager),
     ui(new Ui::ColorCreator),
-    roboImage(dataManager->getMemory()->getMImage()),
-    yuvImage(roboImage)
+    yuvImage(dataManager->getMemory()->getMImage())
 {
     // Display images
     img = new QImage(640, 480, QImage::Format_RGB32);
@@ -799,11 +797,6 @@ void ColorCreator::outputStats()
 
 void ColorCreator::on_pushButton_clicked()
 {
-    currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
-                                            currentDirectory,
-                                            tr("Image Files (*.log)"));
-    yuvImage.updateFromRoboImage();
-    updateDisplays();
 }
 
 void ColorCreator::on_previousButton_clicked()

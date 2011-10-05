@@ -13,7 +13,7 @@ LogViewer::LogViewer(DataManager::ptr dataManager) :
 		QMainWindow(),
 		dataManager(dataManager),
 		roboImageViewer(new RoboImageViewer(
-				dataManager->getMemory()->getRoboImage())){
+				dataManager->getMemory()->getMImage())){
 
 	this->setCentralWidget(roboImageViewer);
 	dataManager->addSubscriber(roboImageViewer, MIMAGE_ID);
