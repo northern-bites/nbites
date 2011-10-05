@@ -31,7 +31,7 @@ void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
 
         if (mobject != MObject::ptr()) {
             objectIOMap[i->first] = Parser::ptr(
-                    new MessageParser(i->second, mobject));
+                    new MObjectParser(i->second, mobject));
         } else {
             std::cout<<"Could not read valid log ID from file descriptor: "
                     << "log ID: " << i->first << " "

@@ -22,13 +22,13 @@ namespace parse {
 namespace proto_io = google::protobuf::io;
 namespace proto = google::protobuf;
 
-class MessageParser : public Parser {
+class MObjectParser : public Parser {
 
 public:
-    MessageParser(include::io::FDProvider::const_ptr fdProvider,
+    MObjectParser(include::io::FDProvider::const_ptr fdProvider,
             MObject::ptr objectToParseTo);
 
-    virtual ~MessageParser();
+    virtual ~MObjectParser();
 
     void initStreams();
 

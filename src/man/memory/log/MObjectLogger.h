@@ -1,7 +1,7 @@
 /**
- * MessageLogger.hpp
+ * MObjectLogger.hpp
  *
- * @class MessageLogger
+ * @class MObjectLogger
  *
  *
  * some of the code is inspired from the example provided in the link
@@ -20,7 +20,7 @@ namespace man {
 namespace memory {
 namespace log {
 
-class MessageLogger : public Logger {
+class MObjectLogger : public Logger {
 
 public:
     /**
@@ -31,10 +31,10 @@ public:
      * @param objectToLog : the object we need to log
      * @return
      */
-    MessageLogger(FDProvider::const_ptr fdp,
+    MObjectLogger(FDProvider::const_ptr fdp,
     		int logTypeID, MObject::const_ptr objectToLog);
 
-    virtual ~MessageLogger() {}
+    virtual ~MObjectLogger() {}
     void writeToLog();
     void writeHead();
 

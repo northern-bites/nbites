@@ -53,10 +53,10 @@ set( MEMORY_SRCS Memory
                  MImage
                  )
 
-set( PARSE_SRCS parse/MessageParser
+set( PARSE_SRCS parse/MObjectParser
                 parse/ParsingBoard )
 
-set( LOG_SRCS log/MessageLogger
+set( LOG_SRCS log/MObjectLogger
               log/LoggingBoard
               log/IOProviderFactory
               log/PyLoggingBoard)

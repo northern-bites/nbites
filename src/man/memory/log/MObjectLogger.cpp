@@ -1,5 +1,5 @@
 /**
- * MessageLogger.cpp
+ * MObjectLogger.cpp
  *
  *  The structure for a log file:
  *  -- ID number for the type of object logged
@@ -13,7 +13,7 @@
  *      E-mail: oneamtu@bowdoin.edu
  */
 
-#include "MessageLogger.h"
+#include "MObjectLogger.h"
 
 namespace man {
 namespace memory {
@@ -24,21 +24,21 @@ namespace log {
 
 using namespace std;
 
-MessageLogger::MessageLogger(FDProvider::const_ptr fdp,
+MObjectLogger::MObjectLogger(FDProvider::const_ptr fdp,
 		int logTypeID, MObject::const_ptr objectToLog) :
         Logger(fdp), logID(logTypeID), objectToLog(objectToLog) {
     // this helps us ID the log
     writeHead();
 }
 
-void MessageLogger::writeHead() {
+void MObjectLogger::writeHead() {
 
     this->writeValue<int32_t>(logID);
     // this time stamps the log
     this->writeValue<int64_t>(birth_time);
 }
 
-void MessageLogger::writeToLog() {
+void MObjectLogger::writeToLog() {
 
     this->writeValue<uint32_t>(objectToLog->byteSize());
     objectToLog->serializeToString(&write_buffer);

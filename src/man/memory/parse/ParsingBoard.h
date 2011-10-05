@@ -13,7 +13,7 @@
 #include <map>
 
 #include "include/io/BulkIO.h"
-#include "MessageParser.h"
+#include "MObjectParser.h"
 #include "memory/MObject.h"
 
 //forward declaration

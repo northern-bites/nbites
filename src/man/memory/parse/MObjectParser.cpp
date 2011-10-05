@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fcntl.h>
 
-#include "MessageParser.h"
+#include "MObjectParser.h"
 
 namespace man {
 namespace memory {
@@ -13,7 +13,7 @@ using namespace google::protobuf::io;
 using boost::shared_ptr;
 using namespace include::io;
 
-MessageParser::MessageParser(FDProvider::const_ptr fdProvider,
+MObjectParser::MObjectParser(FDProvider::const_ptr fdProvider,
         MObject::ptr objectToParseTo) :
         Parser(fdProvider),
         objectToParseTo(objectToParseTo),
@@ -23,14 +23,14 @@ MessageParser::MessageParser(FDProvider::const_ptr fdProvider,
     readHeader();
 }
 
-MessageParser::~MessageParser() {
+MObjectParser::~MObjectParser() {
 
     if (current_buffer) {
         free(current_buffer);
     }
 }
 
-void MessageParser::readHeader() {
+void MObjectParser::readHeader() {
 
     this->readValue<int32_t>(log_header.log_id);
     cout << "Log ID: " << log_header.log_id << endl;
@@ -39,7 +39,7 @@ void MessageParser::readHeader() {
     cout << "Birth time: " << log_header.birth_time << endl;
 }
 
-void MessageParser::increaseBufferSizeTo(uint32_t new_size) {
+void MObjectParser::increaseBufferSizeTo(uint32_t new_size) {
     void* new_buffer = realloc(current_buffer, new_size);
 
     assert(new_buffer != NULL);
@@ -47,7 +47,7 @@ void MessageParser::increaseBufferSizeTo(uint32_t new_size) {
     current_buffer_size = new_size;
 }
 
-bool MessageParser::getNext() {
+bool MObjectParser::getNext() {
 
     this->readValue<uint32_t>(current_message_size);
 
@@ -59,7 +59,7 @@ bool MessageParser::getNext() {
     objectToParseTo->parseFromBuffer(current_buffer, current_message_size);
 }
 
-bool MessageParser::getPrev() {
+bool MObjectParser::getPrev() {
 
 
 //    raw_input->BackUp(current_size);

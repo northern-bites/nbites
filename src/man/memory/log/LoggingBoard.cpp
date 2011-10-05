@@ -28,7 +28,7 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
                 memory->getMObject(i->first);
         if (mobject != MObject::const_ptr()) {
             objectIOMap[i->first] = Logger::ptr(
-                    new MessageLogger(i->second,
+                    new MObjectLogger(i->second,
                                       static_cast<int> (i->first), mobject));
         } else {
             std::cout<<"Invalid Object ID passed for logging: "
