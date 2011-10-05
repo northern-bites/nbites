@@ -37,7 +37,7 @@ public:
                 bytes_read(0) {
     }
 
-    virtual const LogHeader* getHeader() const {return &log_header;}
+    virtual LogHeader getHeader() const {return log_header;}
 
     virtual bool getNext() = 0;
     virtual bool getPrev() = 0;

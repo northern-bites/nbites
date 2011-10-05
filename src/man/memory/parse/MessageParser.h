@@ -17,7 +17,6 @@
 
 namespace man {
 namespace memory {
-
 namespace parse {
 
 namespace proto_io = google::protobuf::io;
@@ -33,14 +32,12 @@ public:
 
     void initStreams();
 
-    const LogHeader getHeader();
     bool getNext();
     bool getPrev();
 
 private:
     void readHeader();
     void increaseBufferSizeTo(uint32_t new_size);
-
 
 private:
     ProtoMessage_ptr objectToParseTo;
@@ -50,9 +47,6 @@ private:
     uint32_t current_buffer_size;
 
     bool finished;
-
-    proto_io::FileInputStream* raw_input;
-    proto_io::CodedInputStream* coded_input;
 
 };
 

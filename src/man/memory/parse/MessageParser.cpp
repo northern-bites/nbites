@@ -20,7 +20,6 @@ MessageParser::MessageParser(FDProvider::const_ptr fdProvider,
         current_message_size(0),
         current_buffer(NULL), current_buffer_size(0)
 {
-//    initStreams();
     readHeader();
 }
 
@@ -29,8 +28,6 @@ MessageParser::~MessageParser() {
     if (current_buffer) {
         free(current_buffer);
     }
-//    delete coded_input;
-//    delete raw_input;
 }
 
 void MessageParser::readHeader() {
@@ -40,10 +37,6 @@ void MessageParser::readHeader() {
 
     this->readValue<int64_t>(log_header.birth_time);
     cout << "Birth time: " << log_header.birth_time << endl;
-}
-
-const LogHeader MessageParser::getHeader() {
-    return log_header;
 }
 
 void MessageParser::increaseBufferSizeTo(uint32_t new_size) {
@@ -77,14 +70,6 @@ bool MessageParser::getPrev() {
 //    CodedInputStream::Limit l = coded_input->PushLimit(size);
 //    finished = container->ParseFromCodedStream(coded_input);
 //    coded_input->PopLimit(l);
-}
-
-
-void MessageParser::initStreams() {
-
-    raw_input = new FileInputStream(fdProvider->getFileDescriptor());
-    coded_input = new CodedInputStream(raw_input);
-    coded_input->SetTotalBytesLimit(2000000000, 2000000000);
 }
 
 }
