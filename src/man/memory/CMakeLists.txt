@@ -53,14 +53,13 @@ set( MEMORY_SRCS Memory
                  MImage
                  )
 
-set( PARSE_SRCS parse/MessageParser.cpp
-                parse/ParsingBoard.cpp )
+set( PARSE_SRCS parse/MessageParser
+                parse/ParsingBoard )
 
-set( LOG_SRCS log/MessageLogger.cpp
-              log/ImageLogger.cpp
-              log/LoggingBoard.cpp
-              log/IOProviderFactory.cpp
-              log/PyLoggingBoard.cpp)
+set( LOG_SRCS log/MessageLogger
+              log/LoggingBoard
+              log/IOProviderFactory
+              log/PyLoggingBoard)
 ############################ (SUB)DIRECTORY COMPILATION
 # add the protobuffer C++ source subdirectory
 # it's where we house all our generated protobuggers

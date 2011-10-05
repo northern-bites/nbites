@@ -20,7 +20,6 @@
 #include "include/io/FileFDProvider.h"
 
 #include "MessageLogger.h"
-#include "ImageLogger.h"
 #include "memory/MObject.h"
 #include "memory/Memory.h"
 #include "memory/MemoryIOBoard.h"
@@ -40,7 +39,6 @@ public:
     void log(MObject_ID id);
 
     void newIOProvider(IOProvider::const_ptr ioProvider);
-    //returns a NULL pointer if such a logger doesn't exist
     void update(MObject_ID id);
 
     void startLogging();
