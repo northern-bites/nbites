@@ -18,6 +18,10 @@ namespace memory {
 class MImage: public MObject {
 
 public:
+    typedef boost::shared_ptr<MImage> ptr;
+    typedef boost::shared_ptr<const MImage> const_ptr;
+
+public:
     /**
      * @param v : the shared pointer to the instance of Sensors this MImage
      * links to
@@ -31,6 +35,8 @@ public:
      */
     void update();
     void log() const;
+
+    boost::shared_ptr<const proto::PImage> get() const { return data; }
 
 private:
     boost::shared_ptr<Sensors> sensors;
