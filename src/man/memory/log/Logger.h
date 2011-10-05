@@ -21,11 +21,11 @@ namespace man {
 namespace memory {
 namespace log {
 
-class FDLogger {
+class Logger {
 
 public:
-    typedef boost::shared_ptr<FDLogger> ptr;
-    typedef boost::shared_ptr<FDLogger> const_ptr;
+    typedef boost::shared_ptr<Logger> ptr;
+    typedef boost::shared_ptr<Logger> const_ptr;
 
 protected:
     typedef include::io::FDProvider FDProvider;
@@ -35,7 +35,7 @@ public:
      * fdp : a FileFDProvider for the file descriptor where we want
      * to log to
      */
-    FDLogger(FDProvider::const_ptr fdp):
+    Logger(FDProvider::const_ptr fdp):
         file_descriptor_provider(fdp),
         file_descriptor(fdp->getFileDescriptor()), bytes_written(0) {
         if (file_descriptor < 0) {

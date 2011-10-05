@@ -27,7 +27,7 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
         MObject::const_ptr mobject =
                 memory->getMObject(i->first);
         if (mobject != MObject::const_ptr()) {
-            objectIOMap[i->first] = FDLogger::ptr(
+            objectIOMap[i->first] = Logger::ptr(
                     new MessageLogger(i->second,
                                       static_cast<int> (i->first), mobject));
         } else {
@@ -44,32 +44,32 @@ void LoggingBoard::update(MObject_ID id) {
 
 void LoggingBoard::log(MObject_ID id) {
     if (logging) {
-        FDLogger::ptr logger = getMutableLogger(id);
+        Logger::ptr logger = getMutableLogger(id);
         if (logger.get() != NULL) {
             logger->writeToLog();
         }
     }
 }
 
-FDLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
+Logger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
     ObjectIOMap::const_iterator it = objectIOMap.find(id);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
         return it->second;
     } else {
-        return FDLogger::const_ptr();
+        return Logger::const_ptr();
     }
 }
 
-FDLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
+Logger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
     ObjectIOMap::iterator it = objectIOMap.find(id);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
         return it->second;
     } else {
-        return FDLogger::ptr();
+        return Logger::ptr();
     }
 }
 

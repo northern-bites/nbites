@@ -26,7 +26,7 @@ using namespace std;
 
 MessageLogger::MessageLogger(FDProvider::const_ptr fdp,
 		int logTypeID, MObject::const_ptr objectToLog) :
-        FDLogger(fdp), logID(logTypeID), objectToLog(objectToLog) {
+        Logger(fdp), logID(logTypeID), objectToLog(objectToLog) {
     // this helps us ID the log
     writeHead();
 }

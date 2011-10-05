@@ -14,13 +14,13 @@
 
 #include <string>
 #include "memory/MObject.h"
-#include "FDLogger.h"
+#include "Logger.h"
 
 namespace man {
 namespace memory {
 namespace log {
 
-class MessageLogger : public FDLogger {
+class MessageLogger : public Logger {
 
 public:
     /**
