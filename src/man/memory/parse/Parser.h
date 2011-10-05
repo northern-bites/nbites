@@ -33,8 +33,7 @@ protected:
 
 public:
     Parser(FDProvider::const_ptr fdProvider) :
-                fdProvider(fdProvider),
-                bytes_read(0) {
+                fdProvider(fdProvider) {
     }
 
     virtual LogHeader getHeader() const {return log_header;}
@@ -52,21 +51,28 @@ public:
         return id;
     }
 
-    template <class T>
-    void readValue(T &value) {
-        bytes_read+= read(fdProvider->getFileDescriptor(),
-                          &value, sizeof(value));
+    uint32_t getBytesRead() {
+        return fdProvider->getCurrentPosition();
     }
 
-    void readCharBuffer(char* buffer, uint32_t size) {
-        bytes_read += read(fdProvider->getFileDescriptor(),
-                           buffer, size);
+protected:
+    template <class T>
+    void readValue(T &value) {
+        read(fdProvider->getFileDescriptor(), &value, sizeof(value));
+    }
+
+    bool readCharBuffer(char* buffer, uint32_t size) {
+        uint32_t result = 0;
+        result = read(fdProvider->getFileDescriptor(), buffer, size);
+
+        if (result != size)
+            return false;
+        else
+            return true;
     }
 
 protected:
     FDProvider::const_ptr fdProvider;
-
-    unsigned long long bytes_read;
     LogHeader log_header;
 };
 

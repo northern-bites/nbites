@@ -55,21 +55,22 @@ bool MObjectParser::getNext() {
         increaseBufferSizeTo(current_message_size);
     }
 
-    this->readCharBuffer(current_buffer, current_message_size);
-    objectToParseTo->parseFromBuffer(current_buffer, current_message_size);
+    bool success = this->readCharBuffer(current_buffer, current_message_size);
+    if (success) {
+        objectToParseTo->parseFromBuffer(current_buffer, current_message_size);
+        return true;
+    }
+    return false;
 }
 
 bool MObjectParser::getPrev() {
 
-
-//    raw_input->BackUp(current_size);
-//
-//    proto::uint32 size;
-//    coded_input->ReadVarint32(&size);
-//
-//    CodedInputStream::Limit l = coded_input->PushLimit(size);
-//    finished = container->ParseFromCodedStream(coded_input);
-//    coded_input->PopLimit(l);
+    bool success = fdProvider->rewind(current_message_size);
+    // A step back is sometimes a step forward too - the Tao of Octavian
+    if (success) {
+        return this->getNext();
+    }
+    return false;
 }
 
 }
