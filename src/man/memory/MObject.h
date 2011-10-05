@@ -51,6 +51,7 @@ public:
     //or find generic way to implement
     virtual const std::string& getName() const {return MObject_names[id];}
     virtual void serializeToString(std::string* write_buffer) const;
+    virtual void parseFromBuffer(const char* read_buffer, uint32_t buffer_size);
     virtual unsigned byteSize() const;
 
     ProtoMessage_const_ptr getProtoMessage() const { return protoMessage;}

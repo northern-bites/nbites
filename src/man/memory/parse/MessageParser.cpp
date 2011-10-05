@@ -14,9 +14,9 @@ using boost::shared_ptr;
 using namespace include::io;
 
 MessageParser::MessageParser(FDProvider::const_ptr fdProvider,
-        boost::shared_ptr<proto::Message> message) :
+        MObject::ptr objectToParseTo) :
         Parser(fdProvider),
-        objectToParseTo(message),
+        objectToParseTo(objectToParseTo),
         current_message_size(0),
         current_buffer(NULL), current_buffer_size(0)
 {
@@ -56,7 +56,7 @@ bool MessageParser::getNext() {
     }
 
     this->readCharBuffer(current_buffer, current_message_size);
-    objectToParseTo->ParseFromArray(current_buffer, current_message_size);
+    objectToParseTo->parseFromBuffer(current_buffer, current_message_size);
 }
 
 bool MessageParser::getPrev() {

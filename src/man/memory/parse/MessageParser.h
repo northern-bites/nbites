@@ -26,7 +26,7 @@ class MessageParser : public Parser {
 
 public:
     MessageParser(include::io::FDProvider::const_ptr fdProvider,
-            ProtoMessage_ptr message);
+            MObject::ptr objectToParseTo);
 
     virtual ~MessageParser();
 
@@ -40,7 +40,7 @@ private:
     void increaseBufferSizeTo(uint32_t new_size);
 
 private:
-    ProtoMessage_ptr objectToParseTo;
+    MObject::ptr objectToParseTo;
 
     uint32_t current_message_size;
     char* current_buffer;
