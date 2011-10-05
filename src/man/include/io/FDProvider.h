@@ -16,6 +16,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include "include/Common.h"
 
 namespace man {
 namespace include {
@@ -33,6 +34,12 @@ public:
     int getFileDescriptor() const { return file_descriptor; }
 
     virtual std::string debugInfo() const = 0;
+
+    virtual uint32_t getCurrentPosition() const {
+        return lseek(file_descriptor, 0, SEEK_CUR);
+    }
+
+    virtual bool rewind(uint32_t offset) const { return true; }
 
 protected:
     virtual void openFileDescriptor() = 0;
