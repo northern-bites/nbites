@@ -37,7 +37,9 @@ MImage::MImage(MObject_ID id, shared_ptr<Sensors> s,
     // allocate the memory necessary for the image;
     image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
     char* image_string_data = const_cast<char *>(image_string->data());
-    sensors->setNaoImagePointer(image_string_data);
+    if (sensors.get()) {
+        sensors->setNaoImagePointer(image_string_data);
+    }
 }
 
 MImage::~MImage() {
@@ -53,5 +55,6 @@ void MImage::update() {
     this->data->set_height(sensors->getRoboImage()->getHeight());
 
 }
+
 }
 }
