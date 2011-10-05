@@ -44,6 +44,9 @@ public:
         return id;
     }
 
+    virtual bool getNext() = 0;
+    virtual bool getPrev() = 0;
+
 protected:
     LogHeader log_header;
 };
@@ -57,9 +60,8 @@ public:
                 fdProvider(fdProvider), container(container) {
     }
 
-    //TODO: change these to void/bool move them to the generic parser
     virtual bool getNext() = 0;
-    virtual boost::shared_ptr<const T> getPrev() = 0;
+    virtual bool getPrev() = 0;
 
 
 protected:
