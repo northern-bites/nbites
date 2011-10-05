@@ -14,6 +14,7 @@
 #include "visionconfig.h"
 #include <time.h>
 #include <assert.h>
+#include <stdint.h>
 
 // ROBOT TYPES
 #define NAO_RL    3
