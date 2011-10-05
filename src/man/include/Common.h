@@ -13,6 +13,7 @@
 #include "nameconfig.h"
 #include "visionconfig.h"
 #include <time.h>
+#include <assert.h>
 
 // ROBOT TYPES
 #define NAO_RL    3
