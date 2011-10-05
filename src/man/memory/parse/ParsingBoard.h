@@ -14,7 +14,6 @@
 
 #include "include/io/BulkIO.h"
 #include "MessageParser.h"
-#include "ImageParser.h"
 #include "memory/MObject.h"
 
 //forward declaration

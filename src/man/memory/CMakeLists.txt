@@ -54,7 +54,6 @@ set( MEMORY_SRCS Memory
                  )
 
 set( PARSE_SRCS parse/MessageParser.cpp
-                parse/ImageParser.cpp
                 parse/ParsingBoard.cpp )
 
 set( LOG_SRCS log/MessageLogger.cpp

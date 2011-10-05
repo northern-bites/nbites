@@ -74,7 +74,7 @@ private:
      */
     virtual void writeHead() = 0;
 
-
+//TODO: do NOT use file_descriptor
 protected:
     const FDProvider::const_ptr file_descriptor_provider;
     int file_descriptor;

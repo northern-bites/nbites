@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
 #include <unistd.h>
-
+#include <stdint.h>
 #include <include/io/FDProvider.h>
 
 namespace man {
@@ -18,8 +18,8 @@ namespace parse {
 
 struct LogHeader {
 
-    uint32_t log_id;
-    uint64_t birth_time;
+    int32_t log_id;
+    int64_t birth_time;
 
 };
 
@@ -28,11 +28,19 @@ class Parser {
 public:
     typedef boost::shared_ptr<Parser> ptr;
 
-public:
-    Parser() {}
+protected:
+    typedef include::io::FDProvider FDProvider;
 
-    virtual const LogHeader getHeader() {return log_header;}
+public:
+    Parser(FDProvider::const_ptr fdProvider) :
+                fdProvider(fdProvider),
+                bytes_read(0) {
+    }
+
+    virtual const LogHeader* getHeader() const {return &log_header;}
+
     virtual bool getNext() = 0;
+    virtual bool getPrev() = 0;
 
     // this method will try to look at a log represented by a file_descriptor
     // and read the first int, which represents the log ID
@@ -44,30 +52,22 @@ public:
         return id;
     }
 
-    virtual bool getNext() = 0;
-    virtual bool getPrev() = 0;
-
-protected:
-    LogHeader log_header;
-};
-
-template <class T>
-class TemplatedParser : public Parser {
-
-public:
-    TemplatedParser(include::io::FDProvider::const_ptr fdProvider,
-            boost::shared_ptr<T> container) :
-                fdProvider(fdProvider), container(container) {
+    template <class T>
+    void readValue(T &value) {
+        bytes_read+= read(fdProvider->getFileDescriptor(),
+                          &value, sizeof(value));
     }
 
-    virtual bool getNext() = 0;
-    virtual bool getPrev() = 0;
-
+    void readCharBuffer(char* buffer, uint32_t size) {
+        bytes_read += read(fdProvider->getFileDescriptor(),
+                           buffer, size);
+    }
 
 protected:
-    include::io::FDProvider::const_ptr fdProvider;
-    boost::shared_ptr<T> container;
+    FDProvider::const_ptr fdProvider;
 
+    unsigned long long bytes_read;
+    LogHeader log_header;
 };
 
 }

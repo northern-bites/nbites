@@ -4,8 +4,6 @@
 #include <QMouseEvent>
 #include <QWidget>
 //man
-#include "man/memory/RoboImage.h"
-#include "man/memory/parse/ImageParser.h"
 #include "man/include/Subscriber.h"
 //qtool
 #include "image/YUVImage.h"

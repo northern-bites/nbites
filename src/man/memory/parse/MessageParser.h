@@ -12,6 +12,7 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
+#include "memory/MObject.h"
 #include "Parser.h"
 
 namespace man {
@@ -22,11 +23,11 @@ namespace parse {
 namespace proto_io = google::protobuf::io;
 namespace proto = google::protobuf;
 
-class MessageParser : public TemplatedParser <proto::Message>{
+class MessageParser : public Parser {
 
 public:
     MessageParser(include::io::FDProvider::const_ptr fdProvider,
-            boost::shared_ptr<proto::Message> message);
+            ProtoMessage_ptr message);
 
     virtual ~MessageParser();
 
@@ -34,14 +35,19 @@ public:
 
     const LogHeader getHeader();
     bool getNext();
-    boost::shared_ptr<const proto::Message> getPrev();
-    boost::shared_ptr<const proto::Message> getCurrent();
+    bool getPrev();
 
 private:
     void readHeader();
+    void increaseBufferSizeTo(uint32_t new_size);
+
 
 private:
-    int current_size;
+    ProtoMessage_ptr objectToParseTo;
+
+    uint32_t current_message_size;
+    char* current_buffer;
+    uint32_t current_buffer_size;
 
     bool finished;
 
