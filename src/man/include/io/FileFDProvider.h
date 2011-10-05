@@ -58,7 +58,10 @@ public:
             //by a smaller offset than what we want;
             //in the latter case we could try to revert
             //the changes done - Octavian
-            if (true_offset == -offset) {
+
+            //if the return value is the same as (-offset) -1
+            //then lseek is signaling an error
+            if (true_offset != -offset-1) {
                 return true;
             }
         }

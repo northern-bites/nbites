@@ -5,12 +5,7 @@
 
 #pragma once
 
-#include <unistd.h>
-#include <iostream>
 #include <string>
-#include <google/protobuf/message.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
 
 #include "memory/MObject.h"
 #include "Parser.h"
@@ -35,6 +30,8 @@ public:
     bool getNext();
     bool getPrev();
 
+    uint32_t sizeOfLastNumMessages(uint32_t n) const;
+
 private:
     void readHeader();
     void increaseBufferSizeTo(uint32_t new_size);
@@ -43,6 +40,7 @@ private:
     MObject::ptr objectToParseTo;
 
     uint32_t current_message_size;
+    std::vector<uint32_t> message_sizes;
     char* current_buffer;
     uint32_t current_buffer_size;
 

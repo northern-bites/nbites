@@ -59,6 +59,24 @@ void ParsingBoard::parseAll() {
 
 }
 
+void ParsingBoard::rewind(MObject_ID id) {
+
+    ObjectIOMap::iterator it = objectIOMap.find(id);
+    // if this is true, then we found a legitimate parser
+    // corresponding to our mobject in the map
+    if (it != objectIOMap.end()) {
+        //it->second is the parser associated with the specified mobject
+        it->second->getPrev();
+    }
+}
+
+void ParsingBoard::rewindAll() {
+    for (ObjectIOMap::iterator it = objectIOMap.begin();
+            it != objectIOMap.end(); it++ ) {
+        it->second->getPrev();
+    }
+
+}
 
 }
 }

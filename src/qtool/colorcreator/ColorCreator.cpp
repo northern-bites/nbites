@@ -801,10 +801,8 @@ void ColorCreator::on_pushButton_clicked()
 
 void ColorCreator::on_previousButton_clicked()
 {
-    //TODO: parsing doesn't work backwards atm
-    //yuvImage.read(previousFrame);
+    dataManager->getPrev();
     currentFrameNumber--;
-    updateDisplays();
 }
 
 void ColorCreator::on_nextButton_clicked()

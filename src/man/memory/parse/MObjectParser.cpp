@@ -1,6 +1,5 @@
 
 #include <iostream>
-#include <fcntl.h>
 
 #include "MObjectParser.h"
 
@@ -50,6 +49,7 @@ void MObjectParser::increaseBufferSizeTo(uint32_t new_size) {
 bool MObjectParser::getNext() {
 
     this->readValue<uint32_t>(current_message_size);
+    message_sizes.push_back(current_message_size);
 
     if (current_message_size > current_buffer_size) {
         increaseBufferSizeTo(current_message_size);
@@ -63,9 +63,24 @@ bool MObjectParser::getNext() {
     return false;
 }
 
-bool MObjectParser::getPrev() {
+uint32_t MObjectParser::sizeOfLastNumMessages(uint32_t n) const {
+    uint32_t total_size = 0;
+    for (int i = message_sizes.size() - n; i < message_sizes.size(); i++) {
+        total_size += message_sizes[i];
+    }
+    //also add the size taken up by the message sizes themselves
+    total_size += n*sizeof(uint32_t);
+    return total_size;
+}
 
-    bool success = fdProvider->rewind(current_message_size);
+//TODO: make generic getPrev that can rewind a number of messages back
+
+bool MObjectParser::getPrev() {
+    //we can't read backwards; that's why we rewind 2 messages
+    //then go forward one
+    bool success = fdProvider->rewind(sizeOfLastNumMessages(2));
+    message_sizes.pop_back();
+    message_sizes.pop_back();
     // A step back is sometimes a step forward too - the Tao of Octavian
     if (success) {
         return this->getNext();

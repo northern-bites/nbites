@@ -44,6 +44,9 @@ public:
     void parse(MObject_ID id);
     void parseAll();
 
+    void rewind(MObject_ID id);
+    void rewindAll();
+
 private:
     Memory::ptr memory;
 };
