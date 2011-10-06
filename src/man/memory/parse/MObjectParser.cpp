@@ -73,19 +73,32 @@ uint32_t MObjectParser::sizeOfLastNumMessages(uint32_t n) const {
     return total_size;
 }
 
-//TODO: make generic getPrev that can rewind a number of messages back
+uint32_t MObjectParser::truncateNumberOfFramesToRewind(uint32_t n) const {
+    if (n >= message_sizes.size()) {
+        return message_sizes.size() - 1;
+    } else {
+        return n;
+    }
+}
 
-bool MObjectParser::getPrev() {
-    //we can't read backwards; that's why we rewind 2 messages
+bool MObjectParser::getPrev(uint32_t n) {
+    n = truncateNumberOfFramesToRewind(n);
+    //we can't read backwards; that's why we rewind n+1 messages
     //then go forward one
-    bool success = fdProvider->rewind(sizeOfLastNumMessages(2));
-    message_sizes.pop_back();
-    message_sizes.pop_back();
+    bool success = fdProvider->rewind(sizeOfLastNumMessages(n+1));
+    //rewind the message_sizes read
+    for (int i = 0; i < n+1; i++) {
+        message_sizes.pop_back();
+    }
     // A step back is sometimes a step forward too - the Tao of Octavian
     if (success) {
         return this->getNext();
     }
     return false;
+}
+
+bool MObjectParser::getPrev() {
+    return getPrev(1);
 }
 
 }

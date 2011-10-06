@@ -28,6 +28,7 @@ public:
     void initStreams();
 
     bool getNext();
+    bool getPrev(uint32_t n);
     bool getPrev();
 
     uint32_t sizeOfLastNumMessages(uint32_t n) const;
@@ -35,16 +36,17 @@ public:
 private:
     void readHeader();
     void increaseBufferSizeTo(uint32_t new_size);
+    uint32_t truncateNumberOfFramesToRewind(uint32_t n) const;
 
 private:
     MObject::ptr objectToParseTo;
 
     uint32_t current_message_size;
+    //history of message sizes read, useful for rewinding
     std::vector<uint32_t> message_sizes;
+
     char* current_buffer;
     uint32_t current_buffer_size;
-
-    bool finished;
 
 };
 
