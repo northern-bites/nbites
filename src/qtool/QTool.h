@@ -16,6 +16,7 @@
 #include "colorcreator/ColorCreator.h"
 #include "viewer/LogViewer.h"
 #include "viewer/BallEKFViewer.h"
+#include "viewer/FieldViewer.h"
 
 namespace qtool {
 
@@ -35,6 +36,7 @@ private:
     colorcreator::ColorCreator* colorCreator;
     viewer::LogViewer* logViewer;
     viewer::BallEKFViewer* ballEKFViewer;
+    viewer::FieldViewer* fieldViewer;
 };
 
 }

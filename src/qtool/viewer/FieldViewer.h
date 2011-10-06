@@ -1,9 +1,10 @@
 /**
  * @class Viewer
  *
- * This class will be for testing the BallEKF.
- * It will allow you to input values into the BallEKF
- * and get back the predicted values.
+ * This class is going to be the WorldController from
+ * the previous Tool.  It will show the field with 
+ * robots and balls in their positions which are 
+ * passed in.
  *
  * @author Dani McAvoy
  */
@@ -21,11 +22,11 @@
 namespace qtool {
 namespace viewer {
 
-class BallEKFViewer : public QMainWindow{
+class FieldViewer : public QMainWindow{
 	Q_OBJECT
 
 public:
-	BallEKFViewer(data::DataManager::ptr dataManager);
+	FieldViewer(data::DataManager::ptr dataManager);
 
 private:
 	std::vector<QDockWidget*> dockWidget;
