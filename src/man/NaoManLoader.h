@@ -22,7 +22,6 @@
 #include "altools/alxplatform.h"
 
 #include "manconfig.h"
-#include "vision/Profiler.h"
 
 // ..::: Version Information ::
 /** Major release version */
@@ -31,8 +30,6 @@
 /** Minor release version */
 #define MANMODULE_VERSION_MINOR    "0"
 
-//#define ALVALUE_STRING( val ) ((val.getType() == ALValue::TypeString) ? std::string(val) : std::string("") )
-//#define ALVALUE_DOUBLE( val ) ((val.getType() == ALValue::TypeDouble || val.getType() == ALValue::TypeInt) ? double(val) : 0.0 )
-//#define ALVALUE_INT( val ) ((val.getType() == ALValue::TypeInt || val.getType() == ALValue::TypeDouble) ? int(val) : 0)
+void loadMan();
 
 #endif // MANMODULE_H
