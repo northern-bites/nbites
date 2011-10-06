@@ -40,6 +40,7 @@ DataLoader::~DataLoader()
 
 void DataLoader::newDataSource(DataSource::ptr dataSource) {
     dataManager->newDataSource(dataSource);
+    dataManager->getNext();
 }
 
 }
