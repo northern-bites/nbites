@@ -12,6 +12,8 @@
 #include "ColorEdit.h"
 #include "ColorTable.h"
 
+#include <qmainwindow.h>
+
 #define  NEWFRAMES
 #ifdef   NEWFRAMES
 #define  COLORS 8
@@ -47,7 +49,7 @@ namespace Ui {
 namespace qtool {
 namespace colorcreator {
 
-class ColorCreator : public QWidget, public Subscriber<data::MObject_ID>
+class ColorCreator : public QMainWindow, public Subscriber<data::MObject_ID>
 {
     Q_OBJECT
 
@@ -85,8 +87,6 @@ protected:
     void mousePressEvent(QMouseEvent* event);
 
 private slots:
-    void on_pushButton_clicked();
-
     void on_previousButton_clicked();
 
     void on_nextButton_clicked();
@@ -125,10 +125,6 @@ private slots:
 
     void on_getOldTable_clicked();
 
-    void on_radioButton_clicked();
-
-    void on_ColorChange_clicked();
-
     void on_cornerDefine_clicked();
 
     void on_changeColor_clicked();
@@ -160,8 +156,6 @@ private:
     QImage *img3;
     QImage *img4;
     QImage *wheel;
-    bool tableMode;
-    bool defineMode;
     bool cornerStatus;
     QPoint firstPoint;
     QPoint lastPoint;
