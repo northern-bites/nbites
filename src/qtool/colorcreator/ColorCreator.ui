@@ -10,6 +10,12 @@
     <height>1081</height>
    </rect>
   </property>
+  <property name="baseSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -58,7 +64,7 @@
   <widget class="QDockWidget" name="buttonsDock">
    <property name="minimumSize">
     <size>
-     <width>40</width>
+     <width>56</width>
      <height>80</height>
     </size>
    </property>
@@ -127,11 +133,6 @@
       <string>- 10</string>
      </property>
     </widget>
-    <zorder>previousButton</zorder>
-    <zorder>previousButton</zorder>
-    <zorder>nextButton</zorder>
-    <zorder>plusTen</zorder>
-    <zorder>minusTen</zorder>
    </widget>
   </widget>
   <widget class="QDockWidget" name="colorEditorDock">
@@ -258,7 +259,7 @@
        <x>0</x>
        <y>230</y>
        <width>271</width>
-       <height>341</height>
+       <height>356</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="sliderLayout">
