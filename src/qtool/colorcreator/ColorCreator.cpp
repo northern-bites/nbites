@@ -96,6 +96,9 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     bitColor[Navy] = NAVY_COL;
     bitColor[Black] = GREY_COL;
 
+    this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+
     ui->setupUi(this);
     //  default directories - should not be user specific
     baseDirectory = "/Users/ericchown/nbites/data/frames";
