@@ -23,6 +23,8 @@ using namespace man::memory;
         toolbar->addWidget(prevButton);
         toolbar->addWidget(nextButton);
 
+        this->addToolBar(toolbar);
+
         this->setCentralWidget(roboImageViewer);
         dataManager->addSubscriber(roboImageViewer, MIMAGE_ID);
 
@@ -36,7 +38,6 @@ using namespace man::memory;
                 dockWidget->setWidget(view);
                 this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
                 dataManager->addSubscriber(view);
-                //view->
             }
         }
 
