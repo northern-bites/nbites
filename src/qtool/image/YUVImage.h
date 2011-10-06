@@ -35,9 +35,10 @@ public:
     int** getYImage() const { return yImg;}
     int** getUImage() const { return uImg;}
     int** getVImage() const { return vImg;}
-    int getY(int x, int y) const { return yImg[x][y];}
-    int getU(int x, int y) const { return uImg[x][y];}
-    int getV(int x, int y) const { return vImg[x][y];}
+    bool areWithinImage(int x, int y) const;
+    int getY(int x, int y) const;
+    int getU(int x, int y) const;
+    int getV(int x, int y) const;
     int getRed(int x, int y) const;
     int getGreen(int x, int y) const;
     int getBlue(int x, int y) const;
@@ -49,8 +50,10 @@ protected:
     bool rawImageDimensionsEnlarged();
 
 private:
+    void allocateYUVArrays(unsigned width, unsigned height);
     void deallocateYUVArrays();
-    void resizeYUVArrays();
+    void resizeYUVArraysToFitRawImage();
+    void resizeYUVArrays(unsigned width, unsigned height);
 
 
 protected:

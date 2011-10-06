@@ -269,23 +269,22 @@ ColorCreator::~ColorCreator()
     delete ui;
 }
 
-//TODO: hack hack hack
-// we need to get IMAGE_WIDTH and HEIGHT from roboImage
-// and X and Y are the offset of the large display image - get those from the widget
-#define IMAGE_X 50
-#define IMAGE_Y 60
-#define IMAGE_WIDTH 640
-#define IMAGE_HEIGHT 480
-
 void ColorCreator::mouseMoveEvent(QMouseEvent *event)
 {
+    //TODO: this is currently broken
+    // the right way to do it is not to capture the mouse event in colorcreator
+    // and then translate it to the thresh widget, but to actually implement
+    // on the thresh widget itself - Octavian
     QTextStream out(stdout);
-    QPoint thePoint = event->pos();
-    int x = thePoint.x();
-    int y = thePoint.y();
-    if (x > IMAGE_X && x < IMAGE_X + IMAGE_WIDTH && y > IMAGE_Y && y < IMAGE_Y + IMAGE_HEIGHT && haveFile) {
-        x = x - IMAGE_X;
-        y = y - IMAGE_Y;
+    //translate the pointer point to widget coordinates
+    QPoint thePoint = ui->thresh->mapFrom(this, event->pos());
+    QRect thresholdedImageFrame = ui->thresh->frameRect();
+    if (thresholdedImageFrame.contains(thePoint) && haveFile
+            && ui->thresh->isVisible()) {
+        //we want coordinates relative to the top left corner
+        //of the thresholded image
+        int x = thePoint.x();
+        int y = thePoint.y();
         int Y = yuvImage.getY(x, y);
         int U = yuvImage.getU(x, y);
         int V = yuvImage.getV(x, y);
@@ -299,9 +298,7 @@ void ColorCreator::mouseMoveEvent(QMouseEvent *event)
 
 void ColorCreator::mouseReleaseEvent(QMouseEvent *event)
 {
-    lastPoint = event->pos();
-    lastPoint.setX(lastPoint.x() - IMAGE_X);
-    lastPoint.setY(lastPoint.y() - IMAGE_Y);
+    lastPoint = event->pos() - ui->thresh->pos();
     if (lastPoint.x() - firstPoint.x() > 20) {
         largeDisplay();
     }
@@ -309,9 +306,7 @@ void ColorCreator::mouseReleaseEvent(QMouseEvent *event)
 
 void ColorCreator::mousePressEvent(QMouseEvent *event)
 {
-    firstPoint = event->pos();
-    firstPoint.setX(firstPoint.x() - IMAGE_X);
-    firstPoint.setY(firstPoint.y() - IMAGE_Y);
+   firstPoint = event->pos() - ui->thresh->pos();
 }
 
 void ColorCreator::updateDisplays()
@@ -597,9 +592,9 @@ void ColorCreator::largeDisplay()
     bool display;
     QColor c;
     bool regionSet = firstPoint.x() > -1;
-    for (int i = 0; i < WIDTH; i++)
+    for (int i = 0; i < yuvImage.getWidth(); i++)
     {
-        for (int j = 0; j < HEIGHT; j++)
+        for (int j = 0; j < yuvImage.getHeight(); j++)
         {
             bool looping = true;
             int start = Orange;
@@ -693,9 +688,9 @@ void ColorCreator::updateThresh(bool imageChanged, bool choiceChanged, bool colo
         int red, blue, green;
         initStats();
         largeDisplay();
-        for (int i = 0; i < WIDTH; i+=2)
+        for (int i = 0; i < yuvImage.getWidth(); i+=2)
         {
-            for (int j = 0; j < HEIGHT; j+=2)
+            for (int j = 0; j < yuvImage.getHeight(); j+=2)
             {
                 bool looping = true;
                 int start = Orange;
