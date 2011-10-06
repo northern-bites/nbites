@@ -31,3 +31,17 @@ with this system and then refine it with the old if they were so inclined.
 
 4) Converts old color tables into the new format.  Obviously in the long run
 this functionality will be dropped.
+
+edit 10/4/11 (Lizzie) The color creator is now broken down into several widgets.
+The main widget includes the three different views of robot images. There are also
+three dock widgets that contain buttons, the color editor, and the view options.
+Each of these widgets' size can be increased, and they can also be "popped out"
+into their own windows. 
+
+Also, the deprecated go to file button was removed, and initial loading of a file
+was improved so that images load immediately instead of after clicking "next" for
+the first time. 
+
+Also fixed the table mode/defundef buttons. They are now check boxes instead of
+radio buttons because this better reflects the logic of how they seem to work.
+Table mode can be on or off, and you can be in def or undef. 

@@ -45,7 +45,7 @@ using data::DataManager;
 using man::memory::RoboImage;
 
 ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     dataManager(dataManager),
     ui(new Ui::ColorCreator),
     roboImage(dataManager->getMemory()->getMImage()),
@@ -103,8 +103,6 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     haveFile = false;
     viewerEnabled = false;
 
-    tableMode = false;
-    defineMode = false;
     cornerStatus = true;
 
     ui->colorSelect->addItem(tr("Orange"), Orange);
@@ -345,7 +343,7 @@ void ColorCreator::updateColors()
     //QImage img(200, 200, QImage::Format_RGB32);
     bool display;
     QColor c;
-    if (!tableMode) {
+    if (!ui->tableMode->isChecked()) {
       /* Our color wheel has a radius of 100.  Loop through the rectangle
       looking for pixels within that radius. For good pixels we calculate
       the H value based on the angle from the origin.  The S value is
@@ -558,7 +556,7 @@ QColor ColorCreator::displayColorTable(int i, int j)
 // Tests if the given parameters are legal for the given color.
 bool ColorCreator::testValue(float h, float s, float z, int y, int u, int v, int color)
 {
-    if (!tableMode || !haveFile) {
+    if (!ui->tableMode->isChecked() || !haveFile) {
         if (hMax[color] > hMin[color])
         {
             if (hMin[color] > h || hMax[color] < h)
@@ -656,7 +654,7 @@ void ColorCreator::largeDisplay()
             } while (looping);
         }
     }
-    if (regionSet && tableMode) {
+    if (regionSet && ui->tableMode->isChecked()) {
         c = cols[Black];
         for (int k = firstPoint.x(); k < lastPoint.x(); k++)
         {
@@ -795,15 +793,6 @@ void ColorCreator::outputStats()
     out << "Y: " << statsYMin << " " << statsYMax << "\n";
     out << "U: " << statsUMin << " " << statsUMax << "\n";
     out << "V: " << statsVMin << " " << statsVMax << "\n";
-}
-
-void ColorCreator::on_pushButton_clicked()
-{
-    currentDirectory = QFileDialog::getOpenFileName(this, tr("Open Image"),
-                                            currentDirectory,
-                                            tr("Image Files (*.log)"));
-    yuvImage.updateFromRoboImage();
-    updateDisplays();
 }
 
 void ColorCreator::on_previousButton_clicked()
@@ -1178,16 +1167,6 @@ void ColorCreator::on_vMax_valueChanged(int value)
     out << "Set V Max value to " << value << "\n";
 }
 
-void ColorCreator::on_radioButton_clicked()
-{
-    tableMode = !tableMode;
-}
-
-void ColorCreator::on_ColorChange_clicked()
-{
-    defineMode = !defineMode;
-}
-
 void ColorCreator::on_cornerDefine_clicked()
 {
     cornerStatus = !cornerStatus;
@@ -1195,10 +1174,10 @@ void ColorCreator::on_cornerDefine_clicked()
 
 void ColorCreator::on_changeColor_clicked()
 {
-    if (tableMode && firstPoint.x() > -1)
+    if (ui->tableMode->isChecked() && firstPoint.x() > -1)
     {
         int y, u, v, yHigh, uHigh, vHigh, yLow, uLow, vLow;
-        if (defineMode)
+        if (ui->defUndef->isChecked())
         {
             // collect up all of the pixels in the region that are not the right color
             y = u = v = 255;
