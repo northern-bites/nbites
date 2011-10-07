@@ -1,5 +1,6 @@
 #include <signal.h> //for kill
 #include <sys/types.h> //for pid_t
+#include <dlfcn.h>
 #include "NaoManLoader.h"
 
 //NBites includes

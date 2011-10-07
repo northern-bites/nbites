@@ -172,14 +172,18 @@ IF(WEBOTS_BACKEND)
   LIST(APPEND MAN_SRCS nao_soccer_player
     )
 ELSE(WEBOTS_BACKEND)
-  LIST(APPEND MAN_SRCS NaoManLoader
+  SET(MAN_LOADER_SRCS NaoManLoader)
+  ADD_LIBRARY(
+    ${MAN_LOADER_TARGET}
+    SHARED
+    ${MAN_LOADER_SRCS}
     )
 ENDIF(WEBOTS_BACKEND)
 
 SET( MAN_PYTHON_SRCS __init__.py )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
-# Configure the output execuatable or shared library, and the install
+# Configure the output executable or shared library, and the install
 # commands
 
 GET_TARGET_PROPERTY( MAN_LOCATION ${MAN_TARGET} LOCATION )
@@ -197,7 +201,7 @@ ELSE( MAN_IS_REMOTE )
     )
 ENDIF( MAN_IS_REMOTE )
 INSTALL(
-  TARGETS ${MAN_TARGET}
+  TARGETS ${MAN_TARGET} ${MAN_LOADER_TARGET}
   RUNTIME DESTINATION ${OUTPUT_ROOT_DIR_BIN}
   LIBRARY DESTINATION ${OUTPUT_ROOT_DIR_LIB}
   CONFIGURATIONS "" Debug Release

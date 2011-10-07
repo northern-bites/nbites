@@ -42,7 +42,7 @@ CCMAKE_GUI=cmake-gui
 MKDIR=mkdir
 TOUCH=touch
 MAKE_OPTIONS=--no-print-directory
-MAN_TARGET=man
+MAN_TARGET=man manloader
 
 .PHONY: default_target all straight cross cclean clean install noconfig
 .PHONY: clean_install
