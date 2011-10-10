@@ -98,7 +98,8 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
 
     ui->setupUi(this);
     //  default directories - should not be user specific
-    baseDirectory = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites/data/frames";
+    baseDirectory = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites";
+    baseFrameDirectory = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites/data/frames";
     baseColorTable = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites/data/tables";
     haveFile = false;
     viewerEnabled = false;
@@ -138,7 +139,7 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     shape = Y;
 
     currentColor = Orange;
-    currentDirectory = baseDirectory;
+    currentDirectory = baseFrameDirectory;
     currentColorDirectory = baseColorTable;
     zSlice = 0.75f;
 
@@ -997,6 +998,32 @@ void ColorCreator::on_zSlice_valueChanged(int value)
 {
     zSlice = (float)value / 100.0f;
     updateColors();
+}
+
+
+void ColorCreator::on_readSliders_clicked()
+{
+  QString filename =
+    QFileDialog::getOpenFileName(this, tr("Load Sliders from File"),
+                                          baseDirectory,
+                                          tr("")/*
+                                                  IF YOU GIVE YOUR SLIDERS AN
+                                                  EXTENSION, REPLACE THE
+                                                  PREVIOUS ARG WITH THIS:
+                                                  tr("Slider Files (*.<extension>)")
+                                                */);
+  QFile file(filename);
+
+  //EJ, PUT YOUR READING CODE HERE!!!!
+}
+
+void ColorCreator::on_writeSliders_clicked()
+{
+  //EJ, YOUR WRITING CODE GOES HERE!!!!!
+  //you need to uncomment the line bellow and add a directory name
+  //and file name like the example i provided.  your code goes after
+  //that line.
+//  QString filename = "directory" + "/filename";
 }
 
 

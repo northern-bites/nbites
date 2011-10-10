@@ -112,6 +112,10 @@ private slots:
     void on_vMax_valueChanged(int value);
     void on_zSlice_valueChanged(int value);
 
+    //load/save slider values
+    void on_readSliders_clicked();
+    void on_writeSliders_clicked();
+
     //load/save color tables
     void on_readTable_clicked();
     void on_writeTable_clicked();
@@ -137,6 +141,7 @@ private:
     qtool::data::DataManager::ptr dataManager;
     ColorTable *table;
     QString baseDirectory;
+    QString baseFrameDirectory;
     QString currentDirectory;
     QString baseColorTable;
     QString currentColorDirectory;
