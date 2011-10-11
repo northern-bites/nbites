@@ -1003,27 +1003,16 @@ void ColorCreator::on_zSlice_valueChanged(int value)
 
 void ColorCreator::on_readSliders_clicked()
 {
-  QString filename =
+  QString qFilename =
     QFileDialog::getOpenFileName(this, tr("Load Sliders from File"),
                                           baseDirectory,
-                                          tr("")/*
-                                                  IF YOU GIVE YOUR SLIDERS AN
-                                                  EXTENSION, REPLACE THE
-                                                  PREVIOUS ARG WITH THIS:
-                                                  tr("Slider Files (*.<extension>)")
-                                                */);
-  QFile file(filename);
-
-  //EJ, PUT YOUR READING CODE HERE!!!!
+                                          tr(""));
+  string filename = qFilename.toStdString();
 }
 
 void ColorCreator::on_writeSliders_clicked()
 {
-  //EJ, YOUR WRITING CODE GOES HERE!!!!!
-  //you need to uncomment the line bellow and add a directory name
-  //and file name like the example i provided.  your code goes after
-  //that line.
-//  QString filename = "directory" + "/filename";
+  string filename = baseDirectory.toStdString() + "/newSliders";
 }
 
 
