@@ -154,6 +154,7 @@ class Trigger
 class Thread
 {
   public:
+      //TODO: make threads not depend on synchro (Octavian)
     Thread(boost::shared_ptr<Synchro> _synchro, std::string _name);
     virtual ~Thread();
 
