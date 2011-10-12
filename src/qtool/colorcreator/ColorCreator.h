@@ -1,6 +1,9 @@
 #ifndef COLORCREATOR_H
 #define COLORCREATOR_H
 
+#include <qfile.h>
+#include <qtextstream.h>
+
 #include <QMouseEvent>
 #include <QWidget>
 //man
@@ -84,6 +87,8 @@ public:
     QColor displayColorTable(int i, int j);
     bool testValue(float h, float s, float z, int y, int u, int v, int color);
     void modeChanged();
+    short setInitialColorValuesFromFile(QString filename);
+    void writeInitialColorValues(QString filename);
 
 protected:
     void mouseMoveEvent(QMouseEvent* event);
@@ -142,6 +147,7 @@ private:
     ColorTable *table;
     QString baseDirectory;
     QString baseFrameDirectory;
+    QString baseSliderDirectory;
     QString currentDirectory;
     QString baseColorTable;
     QString currentColorDirectory;

@@ -29,8 +29,11 @@
 #include "ui_ColorCreator.h"
 #include "math.h"
 
+#include <QtDebug>
+
 #include <QTextStream>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QString>
 #include <QStringRef>
 #include <QRgb>
@@ -99,8 +102,9 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     ui->setupUi(this);
     //  default directories - should not be user specific
     baseDirectory = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites";
-    baseFrameDirectory = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites/data/frames";
-    baseColorTable = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites/data/tables";
+    baseFrameDirectory = baseDirectory + "/data/frames";
+    baseColorTable = baseDirectory + "/data/tables";
+    baseSliderDirectory = baseDirectory + "/data/sliders";
     haveFile = false;
     viewerEnabled = false;
 
@@ -145,112 +149,134 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
 
     edgediff = 12;
 
-    // initialize all of our values.  Ideally these will serve as a pretty good table
-    // for virtually any environment
-    // Note: it would be nice to be able to save values from various locations and
-    // load the appropriate one here
-    for (int i = 0; i < COLORS; i++)
-    {
-        switch(i)
-        {
-        case Orange:
-            fltSliders[hMin][i] = 0.80f;
-            fltSliders[hMax][i] = 0.13f;
-            fltSliders[sMin][i] = 0.25f;
-            fltSliders[sMax][i] = 1.0f;
-            fltSliders[zMin][i] = 0.12f;
-            fltSliders[zMax][i] = 1.0f;
-            intSliders[yMin][i] = 34;
-            intSliders[yMax][i] = 145;
-            intSliders[vMin][i] = 115;
-            intSliders[vMax][i] = 171;
-            break;
-        case Green:
-            fltSliders[hMin][i] = 0.37f;
-            fltSliders[hMax][i] = 0.45f;
-            fltSliders[sMin][i] = 0.28f;
-            fltSliders[sMax][i] = 0.46f;
-            fltSliders[zMin][i] = 0.22f;
-            fltSliders[zMax][i] = 0.53f;
-            intSliders[yMin][i] = 55;
-            intSliders[yMax][i] = 105;
-            intSliders[vMin][i] = 90;
-            intSliders[vMax][i] = 131;
-            break;
-        case Yellow:
-            fltSliders[hMin][i] = 0.17f;
-            fltSliders[hMax][i] = 0.26f;
-            fltSliders[sMin][i] = 0.32f;
-            fltSliders[sMax][i] = 0.69f;
-            fltSliders[zMin][i] = 0.27f;
-            fltSliders[zMax][i] = 0.48f;
-            intSliders[yMin][i] = 56;
-            intSliders[yMax][i] = 105;
-            intSliders[vMin][i] = 111;
-            intSliders[vMax][i] = 128;
-            break;
-        case Blue:
-            fltSliders[hMin][i] = 0.54f;
-            fltSliders[hMax][i] = 0.67f;
-            fltSliders[sMin][i] = 0.30f;
-            fltSliders[sMax][i] = 0.65f;
-            fltSliders[zMin][i] = 0.23f;
-            fltSliders[zMax][i] = 0.48f;
-            intSliders[yMin][i] = 33;
-            intSliders[yMax][i] = 105;
-            intSliders[vMin][i] = 109;
-            intSliders[vMax][i] = 127;
-            break;
-        case White:
-            fltSliders[hMin][i] = 0.01f;
-            fltSliders[hMax][i] = 0.01f;
-            fltSliders[sMin][i] = 0.0f;
-            fltSliders[sMax][i] = 0.38f;
-            fltSliders[zMin][i] = 0.39f;
-            fltSliders[zMax][i] = 1.0f;
-            intSliders[yMin][i] = 102;
-            intSliders[yMax][i] = 250;
-            intSliders[vMin][i] = 99;
-            intSliders[vMax][i] = 128;
-            break;
-        case Pink:
-            fltSliders[hMin][i] = 0.75f;
-            fltSliders[hMax][i] = 0.22f;
-            fltSliders[sMin][i] = 0.0f;
-            fltSliders[sMax][i] = 0.29f;
-            fltSliders[zMin][i] = 0.21f;
-            fltSliders[zMax][i] = 0.54f;
-            intSliders[yMin][i] = 58;
-            intSliders[yMax][i] = 139;
-            intSliders[vMin][i] = 127;
-            intSliders[vMax][i] = 143;
-            break;
-        case Navy:
-            fltSliders[hMin][i] = 0.57f;
-            fltSliders[hMax][i] = 0.68f;
-            fltSliders[sMin][i] = 0.23f;
-            fltSliders[sMax][i] = 0.42f;
-            fltSliders[zMin][i] = 0.17f;
-            fltSliders[zMax][i] = 0.45f;
-            intSliders[yMin][i] = 39;
-            intSliders[yMax][i] = 105;
-            intSliders[vMin][i] = 106;
-            intSliders[vMax][i] = 132;
-            break;
-        default:
-            fltSliders[hMin][i] = 0.0f;
-            fltSliders[hMax][i] = 0.01f;
-            fltSliders[sMin][i] = 0.99f;
-            fltSliders[sMax][i] = 1.0f;
-            fltSliders[zMin][i] = 0.0f;
-            fltSliders[zMax][i] = 1.0f;
-            intSliders[yMin][i] = 30;
-            intSliders[yMax][i] = 230;
-            intSliders[vMin][i] = 40;
-            intSliders[vMax][i] = 150;
-            break;
-        }
-    }
+    QString fileLoc = baseDirectory + "/src/qtool/pref/previousSliderFile";
+    QFile previousSliderFile(fileLoc);
+    short succesful = 0;
+    if (previousSliderFile.open(QIODevice::Text))
+      {
+	QString previousFileName;
+	QTextStream fileLocStream(&previousSliderFile);
+	previousFileName = fileLocStream.readLine();
+	qDebug() << "load previous" << endl;
+	succesful = setInitialColorValuesFromFile(previousFileName);
+      }
+
+    
+    if (succesful == 0)
+      qDebug() << "load default" << endl;
+	succesful = setInitialColorValuesFromFile("default");
+
+    if (succesful == 0)
+      {
+	qDebug() <<"load from c++"<<endl;
+
+	//initialize all of our values.  Ideally these will serve as a pretty good table
+	//for virtually any environment
+	//Note: it would be nice to be able to save values from various locations and load the appropriate one here
+	for (int i = 0; i < COLORS; i++)
+	  {
+	    switch(i)
+	      {
+	      case Orange:
+		fltSliders[hMin][i] = 0.80f;
+		fltSliders[hMax][i] = 0.13f;
+		fltSliders[sMin][i] = 0.25f;
+		fltSliders[sMax][i] = 1.0f;
+		fltSliders[zMin][i] = 0.12f;
+		fltSliders[zMax][i] = 1.0f;
+		intSliders[yMin][i] = 34;
+		intSliders[yMax][i] = 145;
+		intSliders[vMin][i] = 115;
+		intSliders[vMax][i] = 171;
+		break;
+	      case Green:
+		fltSliders[hMin][i] = 0.37f;
+		fltSliders[hMax][i] = 0.45f;
+		fltSliders[sMin][i] = 0.28f;
+		fltSliders[sMax][i] = 0.46f;
+		fltSliders[zMin][i] = 0.22f;
+		fltSliders[zMax][i] = 0.53f;
+		intSliders[yMin][i] = 55;
+		intSliders[yMax][i] = 105;
+		intSliders[vMin][i] = 90;
+		intSliders[vMax][i] = 131;
+		break;
+	      case Yellow:
+		fltSliders[hMin][i] = 0.17f;
+		fltSliders[hMax][i] = 0.26f;
+		fltSliders[sMin][i] = 0.32f;
+		fltSliders[sMax][i] = 0.69f;
+		fltSliders[zMin][i] = 0.27f;
+		fltSliders[zMax][i] = 0.48f;
+		intSliders[yMin][i] = 56;
+		intSliders[yMax][i] = 105;
+		intSliders[vMin][i] = 111;
+		intSliders[vMax][i] = 128;
+		break;
+	      case Blue:
+		fltSliders[hMin][i] = 0.54f;
+		fltSliders[hMax][i] = 0.67f;
+		fltSliders[sMin][i] = 0.30f;
+		fltSliders[sMax][i] = 0.65f;
+		fltSliders[zMin][i] = 0.23f;
+		fltSliders[zMax][i] = 0.48f;
+		intSliders[yMin][i] = 33;
+		intSliders[yMax][i] = 105;
+		intSliders[vMin][i] = 109;
+		intSliders[vMax][i] = 127;
+		break;
+	      case White:
+		fltSliders[hMin][i] = 0.01f;
+		fltSliders[hMax][i] = 0.01f;
+		fltSliders[sMin][i] = 0.0f;
+		fltSliders[sMax][i] = 0.38f;
+		fltSliders[zMin][i] = 0.39f;
+		fltSliders[zMax][i] = 1.0f;
+		intSliders[yMin][i] = 102;
+		intSliders[yMax][i] = 250;
+		intSliders[vMin][i] = 99;
+		intSliders[vMax][i] = 128;
+		break;
+	      case Pink:
+		fltSliders[hMin][i] = 0.75f;
+		fltSliders[hMax][i] = 0.22f;
+		fltSliders[sMin][i] = 0.0f;
+		fltSliders[sMax][i] = 0.29f;
+		fltSliders[zMin][i] = 0.21f;
+		fltSliders[zMax][i] = 0.54f;
+		intSliders[yMin][i] = 58;
+		intSliders[yMax][i] = 139;
+		intSliders[vMin][i] = 127;
+		intSliders[vMax][i] = 143;
+		break;
+	      case Navy:
+		fltSliders[hMin][i] = 0.57f;
+		fltSliders[hMax][i] = 0.68f;
+		fltSliders[sMin][i] = 0.23f;
+		fltSliders[sMax][i] = 0.42f;
+		fltSliders[zMin][i] = 0.17f;
+		fltSliders[zMax][i] = 0.45f;
+		intSliders[yMin][i] = 39;
+		intSliders[yMax][i] = 105;
+		intSliders[vMin][i] = 106;
+		intSliders[vMax][i] = 132;
+		break;
+	      default:
+		fltSliders[hMin][i] = 0.0f;
+		fltSliders[hMax][i] = 0.01f;
+		fltSliders[sMin][i] = 0.99f;
+		fltSliders[sMax][i] = 1.0f;
+		fltSliders[zMin][i] = 0.0f;
+		fltSliders[zMax][i] = 1.0f;
+		intSliders[yMin][i] = 30;
+		intSliders[yMax][i] = 230;
+		intSliders[vMin][i] = 40;
+		intSliders[vMax][i] = 150;
+		break;
+	      }
+	  }
+      }
+
     // set the sliders to start at correct values
     ui->hMin->setValue(fltSliders[hMin][currentColor] * 100);
     ui->hMax->setValue(fltSliders[hMax][currentColor] * 100);
@@ -273,6 +299,108 @@ ColorCreator::~ColorCreator()
 {
     delete ui;
 }
+
+  short ColorCreator::setInitialColorValuesFromFile(QString filename)
+  {
+    QFile dataFile(filename);
+    if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text))
+      {
+	QString nextString;
+	QTextStream dataFileStream(&dataFile);
+
+	//_____FOR_FORMATTING____//
+	//read the first line
+	dataFileStream.readLine();
+
+	for (int i=0; i<6; i++)
+	  {
+	    for (int j=0; j<9; j++)
+	      {
+		dataFileStream >> nextString;
+		if (!(j==0))
+		  fltSliders[i][j-1] = nextString.toFloat();
+	      }
+	  }
+
+	for (int i=0; i<4; i++)
+	  {
+	    for (int j=0; j<9; j++)
+	      {
+		dataFileStream >> nextString;
+		if (!(j==0))
+		  intSliders[i][j-1] = nextString.toInt();
+	      }
+	  }
+	qDebug() << "return 1 as the short" << endl;
+	return 1;
+	
+      }
+
+    return 0;
+  }
+
+  void ColorCreator::writeInitialColorValues(QString filename)
+  {
+    //Set the current file to be loaded next time QTool is used
+    // QFile fileLoc("fileLoc");
+    // if (fileLoc.open(QIODevice::WriteOnly | QIODevice::Text))
+    //   {
+    // 	QTextStream fileLocStream(&fileLoc);
+    // 	fileLocStream << filename << endl;
+    //   }
+
+    //Create the file to store the current values
+    QFile newFile(filename);
+    if (newFile.open(QIODevice::WriteOnly | QIODevice::Text))
+      {
+	QTextStream newFileStream(&newFile);    
+
+	//____FOR_FORMATTING____//
+	//Write the first line
+	newFileStream << "[] Orange Blue Yellow Green White Pink Navy Black" << endl;
+
+	for (int i=0; i<6; i++)
+	  {
+	    //___FOR_FORMATTING____//
+	    if (i==0)
+	      newFileStream << "hMin ";
+	    else if (i==1)
+	      newFileStream << "hMax ";
+	    else if (i==2)
+	      newFileStream << "sMin ";
+	    else if (i==3)
+	      newFileStream << "sMax ";
+	    else if (i==4)
+	      newFileStream << "zMin ";
+	    else if (i==5)
+	      newFileStream << "zMax ";
+
+	    for (int j=0; j<8; j++)
+	      newFileStream << fltSliders[i][j] << " ";
+	    newFileStream << endl;
+	  }
+
+	for (int i=0; i<4; i++)
+	  {
+	    //____FOR_FORMATTING___//
+	    if (i==0)
+	      newFileStream << "yMin ";
+	    else if (i==1)
+	      newFileStream << "yMax ";
+	    else if (i==2)
+	      newFileStream << "vMin ";
+	    else if (i==3)
+	      newFileStream << "vMax ";
+	    
+	    for (int j=0; j<8; j++)
+	      newFileStream << intSliders[i][j] << " ";
+	    newFileStream << endl;
+	  }
+      }
+
+    
+  }
+
 
 //TODO: hack hack hack
 // we need to get IMAGE_WIDTH and HEIGHT from roboImage
@@ -1003,16 +1131,37 @@ void ColorCreator::on_zSlice_valueChanged(int value)
 
 void ColorCreator::on_readSliders_clicked()
 {
-  QString qFilename =
-    QFileDialog::getOpenFileName(this, tr("Load Sliders from File"),
-                                          baseDirectory,
-                                          tr(""));
-  string filename = qFilename.toStdString();
+  QString filename =
+    QFileDialog::getOpenFileName(this,
+				 tr("Load Sliders from File"),
+				 baseDirectory,
+				 tr(""));
+  setInitialColorValuesFromFile(filename);
+
+   ui->hMin->setValue(fltSliders[hMin][currentColor] * 100);
+    ui->hMax->setValue(fltSliders[hMax][currentColor] * 100);
+    ui->sMin->setValue(fltSliders[sMin][currentColor] * 100);
+    ui->sMax->setValue(fltSliders[sMax][currentColor] * 100);
+    ui->zMin->setValue(fltSliders[zMin][currentColor] * 100);
+    ui->zMax->setValue(fltSliders[zMax][currentColor] * 100);
+    ui->yMin->setValue(intSliders[yMin][currentColor]);
+    ui->yMax->setValue(intSliders[yMax][currentColor]);
+    ui->vMin->setValue(intSliders[vMin][currentColor]);
+    ui->vMax->setValue(intSliders[vMax][currentColor]);
 }
 
 void ColorCreator::on_writeSliders_clicked()
 {
-  string filename = baseDirectory.toStdString() + "/newSliders";
+  bool ok;
+  QString filename =
+    baseSliderDirectory + "/" + QInputDialog::getText(this,
+						      tr("Save Sliders to FIle"),
+						      tr("File Name:"),
+						      QLineEdit::Normal,
+						      "new_sliders",
+						      &ok);
+  if (ok && !filename.isEmpty())
+    writeInitialColorValues(filename);
 }
 
 
@@ -1034,9 +1183,16 @@ void ColorCreator::on_readTable_clicked()
   */
 void ColorCreator::on_writeTable_clicked()
 {
-    QString filename = baseColorTable + "/new.mtb";
+  bool ok;
+  QString filename = baseColorTable + "/" +
+    QInputDialog::getText(this, tr("Save Sliders to FIle"),
+			  tr("File Name:"),QLineEdit::Normal,
+			  "new_sliders",&ok) +
+    ".mtb";
+  if (ok && !filename.isEmpty()) {
     //writeOldFormat(filename);
     table->write(filename, fltSliders, intSliders, bitColor);
+  }
 }
 
 /* Loads and old style color table.  Note: it will be automatically
