@@ -25,8 +25,10 @@ namespace log {
 using namespace std;
 
 MObjectLogger::MObjectLogger(FDProvider::const_ptr fdp,
-		int logTypeID, MObject::const_ptr objectToLog) :
-        Logger(fdp), logID(logTypeID), objectToLog(objectToLog) {
+                             boost::shared_ptr<Synchro> synchro,
+                             int logTypeID, MObject::const_ptr objectToLog) :
+        ThreadedLogger(fdp, synchro, "Log" + MObject_names[logTypeID]),
+        logID(logTypeID), objectToLog(objectToLog) {
     // this helps us ID the log
     writeHead();
 }

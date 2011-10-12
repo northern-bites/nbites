@@ -28,11 +28,11 @@ namespace man {
 namespace memory {
 namespace log {
 
-class LoggingBoard : public MemoryIOBoard<Logger> ,
+class LoggingBoard : public MemoryIOBoard<MObjectLogger> ,
                      public Subscriber<MObject_ID> {
 
 public:
-    LoggingBoard(Memory::const_ptr memory,
+    LoggingBoard(Memory::const_ptr memory, boost::shared_ptr<Synchro> synchro,
                 IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
     virtual ~LoggingBoard() {}
 
@@ -47,14 +47,14 @@ public:
 
 protected:
     //returns a NULL pointer if such a logger doesn't exist
-    Logger::const_ptr getLogger(MObject_ID id) const;
+    MObjectLogger::const_ptr getLogger(MObject_ID id) const;
     //returns a NULL pointer if such a logger doesn't exist
-    Logger::ptr getMutableLogger(MObject_ID id);
+    MObjectLogger::ptr getMutableLogger(MObject_ID id);
 
 private:
     Memory::const_ptr memory;
     bool logging;
-
+    boost::shared_ptr<Synchro> synchro;
 };
 }
 }

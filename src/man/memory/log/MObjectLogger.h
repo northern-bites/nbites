@@ -14,13 +14,17 @@
 
 #include <string>
 #include "memory/MObject.h"
-#include "Logger.h"
+#include "ThreadedLogger.h"
 
 namespace man {
 namespace memory {
 namespace log {
 
-class MObjectLogger : public Logger {
+class MObjectLogger : public ThreadedLogger {
+
+public:
+    typedef boost::shared_ptr<MObjectLogger> ptr;
+    typedef boost::shared_ptr<const MObjectLogger> const_ptr;
 
 public:
     /**
@@ -32,7 +36,8 @@ public:
      * @return
      */
     MObjectLogger(FDProvider::const_ptr fdp,
-    		int logTypeID, MObject::const_ptr objectToLog);
+                  boost::shared_ptr<Synchro> synchro,
+                  int logTypeID, MObject::const_ptr objectToLog);
 
     virtual ~MObjectLogger() {}
     void writeToLog();

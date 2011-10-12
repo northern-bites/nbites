@@ -10,9 +10,9 @@ namespace log {
 using namespace man::include::paths;
 using boost::shared_ptr;
 
-LoggingBoard::LoggingBoard(Memory::const_ptr memory,
+LoggingBoard::LoggingBoard(Memory::const_ptr memory, boost::shared_ptr<Synchro> synchro,
         IOProvider::const_ptr ioProvider) :
-    memory(memory), logging(true) {
+    memory(memory), logging(true), synchro(synchro) {
     newIOProvider(ioProvider);
 }
 
@@ -27,9 +27,10 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
         MObject::const_ptr mobject =
                 memory->getMObject(i->first);
         if (mobject != MObject::const_ptr()) {
-            objectIOMap[i->first] = Logger::ptr(
-                    new MObjectLogger(i->second,
+            objectIOMap[i->first] = MObjectLogger::ptr(
+                    new MObjectLogger(i->second, synchro,
                                       static_cast<int> (i->first), mobject));
+            objectIOMap[i->first]->start();
         } else {
             std::cout<<"Invalid Object ID passed for logging: "
                     << "log ID: " << i->first << " "
@@ -44,32 +45,32 @@ void LoggingBoard::update(MObject_ID id) {
 
 void LoggingBoard::log(MObject_ID id) {
     if (logging) {
-        Logger::ptr logger = getMutableLogger(id);
+        MObjectLogger::ptr logger = getMutableLogger(id);
         if (logger.get() != NULL) {
-            logger->writeToLog();
+            logger->signalToLog();
         }
     }
 }
 
-Logger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
+MObjectLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
     ObjectIOMap::const_iterator it = objectIOMap.find(id);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
         return it->second;
     } else {
-        return Logger::const_ptr();
+        return MObjectLogger::const_ptr();
     }
 }
 
-Logger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
+MObjectLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
     ObjectIOMap::iterator it = objectIOMap.find(id);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
         return it->second;
     } else {
-        return Logger::ptr();
+        return MObjectLogger::ptr();
     }
 }
 
