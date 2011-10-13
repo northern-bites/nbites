@@ -31,7 +31,6 @@ START_FUNCTION_EXPORT
 void loadMan(ALPtr<ALBroker> broker, shared_ptr<Speech> speech,
              shared_ptr<Sensors> sensors) {
 
-    shared_ptr<Synchro> synchro(new Synchro());
 //#ifdef USE_ALSPEECH
 //    shared_ptr<Speech> speech(new ALSpeech(broker));
 //#else
@@ -43,7 +42,7 @@ void loadMan(ALPtr<ALBroker> broker, shared_ptr<Speech> speech,
     transcriber(new ALTranscriber(broker, sensors));
 
     shared_ptr<ALImageTranscriber>
-        imageTranscriber(new ALImageTranscriber(synchro, sensors,
+        imageTranscriber(new ALImageTranscriber(sensors,
                                             broker));
     shared_ptr<Profiler>
         profiler(new Profiler(&thread_micro_time, &process_micro_time,
@@ -58,8 +57,7 @@ void loadMan(ALPtr<ALBroker> broker, shared_ptr<Speech> speech,
     man_pointer = boost::shared_ptr<ALMan>(new ALMan(profiler, sensors,
                                                      transcriber,
                                                      imageTranscriber,
-                                                     enactor, synchro,
-                                                     lights, speech));
+                                                     enactor, lights, speech));
     man_pointer->startSubThreads();
 }
 

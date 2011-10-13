@@ -87,10 +87,9 @@ const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
 #endif
 
-ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
-                                       shared_ptr<Sensors> s,
+ALImageTranscriber::ALImageTranscriber(shared_ptr<Sensors> s,
                                        ALPtr<ALBroker> broker)
-    : ThreadedImageTranscriber(s,synchro,"ALImageTranscriber"),
+    : ThreadedImageTranscriber(s,"ALImageTranscriber"),
       log(), camera(), lem_name(""), camera_active(false),
       image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
       table(new unsigned char[yLimit * uLimit * vLimit]),

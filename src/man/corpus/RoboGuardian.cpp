@@ -41,9 +41,8 @@ void RoboGuardian::playFile(string str)const{
 
 
 
-RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
-                           boost::shared_ptr<Sensors> s)
-    : Thread(_synchro,"RoboGuardian"), sensors(s),
+RoboGuardian::RoboGuardian(boost::shared_ptr<Sensors> s)
+    : Thread("RoboGuardian"), sensors(s),
       motion_interface(NULL),
       lastTemps(sensors->getBodyTemperatures()),
       lastBatteryCharge(sensors->getBatteryCharge()),

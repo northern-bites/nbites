@@ -13,9 +13,8 @@ public:
     typedef boost::shared_ptr<ThreadedLogger> const_ptr;
 
 public:
-    ThreadedLogger(FDProvider::const_ptr fdp,
-                   boost::shared_ptr<Synchro> synchro, std::string name) :
-                   Logger(fdp), Thread(synchro, name) {
+    ThreadedLogger(FDProvider::const_ptr fdp, std::string name) :
+                   Logger(fdp), Thread(name) {
     }
 
     virtual ~ThreadedLogger(){}

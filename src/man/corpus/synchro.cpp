@@ -71,7 +71,6 @@ bool Event::poll ()
     pthread_mutex_lock(mutex.get());
 
     const bool result = signalled;
-    signalled = false;
 
     pthread_mutex_unlock(mutex.get());
     return result;
@@ -139,8 +138,9 @@ void Synchro::signal (Event* ev)
 
 static const std::string SIGNAL_SUFFIX = "_signal";
 
-Thread::Thread (shared_ptr<Synchro> _synchro, string _name)
-  : name(_name), synchro(_synchro), running(false),
+
+Thread::Thread (string _name)
+  : name(_name), running(false),
     trigger(new Trigger(_name, false)),
     signal(name + SIGNAL_SUFFIX)
 {

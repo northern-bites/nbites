@@ -8,9 +8,8 @@
 class ThreadedImageTranscriber : public ImageTranscriber , public Thread{
  public:
  ThreadedImageTranscriber(boost::shared_ptr<Sensors> sensors,
-                          boost::shared_ptr<Synchro> synchro,
                           std::string name)
-     : ImageTranscriber(sensors), Thread(synchro, name){};
+     : ImageTranscriber(sensors), Thread(name){};
     virtual ~ThreadedImageTranscriber() { }
 
 };

@@ -24,7 +24,7 @@
 class Comm : public Thread
 {
 public:
-    Comm(boost::shared_ptr<Synchro> _synchro, boost::shared_ptr<Sensors> s,
+    Comm(boost::shared_ptr<Sensors> s,
          boost::shared_ptr<Vision> v);
     virtual ~Comm();
 

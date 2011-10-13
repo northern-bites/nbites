@@ -56,7 +56,6 @@ Man::Man (shared_ptr<Profiler> _profiler,
           shared_ptr<Transcriber> _transcriber,
           shared_ptr<ImageTranscriber> _imageTranscriber,
           shared_ptr<MotionEnactor> _enactor,
-          shared_ptr<Synchro> synchro,
           shared_ptr<Lights> _lights,
           shared_ptr<Speech> _speech)
     :     profiler(_profiler),
@@ -82,11 +81,11 @@ Man::Man (shared_ptr<Profiler> _profiler,
 
   pose = shared_ptr<NaoPose>(new NaoPose(sensors));
 
-  guardian = shared_ptr<RoboGuardian>(new RoboGuardian(synchro, sensors));
+  guardian = shared_ptr<RoboGuardian>(new RoboGuardian(sensors));
 
   // initialize core processing modules
 #ifdef USE_MOTION
-  motion = shared_ptr<Motion>(new Motion(synchro, enactor, sensors,pose));
+  motion = shared_ptr<Motion>(new Motion(enactor, sensors,pose));
   guardian->setMotionInterface(motion->getInterface());
 #endif
   // initialize python roboguardian module.
@@ -100,11 +99,11 @@ Man::Man (shared_ptr<Profiler> _profiler,
 
   set_vision_pointer(vision);
 
-  comm = shared_ptr<Comm>(new Comm(synchro, sensors, vision));
+  comm = shared_ptr<Comm>(new Comm(sensors, vision));
 
   memory = shared_ptr<Memory>(new Memory(vision, sensors));
 
-  loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory, synchro));
+  loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory));
   set_logging_board_pointer(loggingBoard);
   memory->addSubscriber(loggingBoard.get());
 

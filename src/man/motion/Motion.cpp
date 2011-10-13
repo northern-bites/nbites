@@ -21,16 +21,14 @@
 #include <boost/shared_ptr.hpp>
 using namespace boost;
 
-#include "synchro.h"
 #include "Motion.h"
 #include "PyMotion.h"
 //#include "NaoEnactor.h"
 
-Motion::Motion (shared_ptr<Synchro> _synchro,
-                shared_ptr<MotionEnactor> _enactor,
+Motion::Motion (shared_ptr<MotionEnactor> _enactor,
                 shared_ptr<Sensors> s,
                 shared_ptr<NaoPose> _pose)
-  : Thread(_synchro, "Motion"),
+  : Thread("Motion"),
     switchboard(s, _pose),
     interface(&switchboard),
     enactor(_enactor),

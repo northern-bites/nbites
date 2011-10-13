@@ -9,11 +9,10 @@ TTMan::TTMan(shared_ptr<Profiler> _profiler,
              shared_ptr<Transcriber> _transcriber,
              shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
              shared_ptr<ThreadedMotionEnactor> _enactor,
-             shared_ptr<Synchro> synchro,
              shared_ptr<Lights> _lights,
              shared_ptr<Speech> _speech)
     :Man(_profiler,_sensors, _transcriber, _imageTranscriber,
-         _enactor, synchro, _lights, _speech),
+         _enactor, _lights, _speech),
      threadedImageTranscriber(_imageTranscriber),
      threadedEnactor(_enactor){}
 

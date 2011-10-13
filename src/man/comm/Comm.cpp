@@ -411,11 +411,10 @@ PyMODINIT_FUNC init_comm (void)
 /**************************/
 
 // Constructor
-Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
-            shared_ptr<Vision> v)
-    : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
+Comm::Comm (shared_ptr<Sensors> s, shared_ptr<Vision> v)
+    : Thread("Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
 	  latest(), sensors(s), timer(&monotonic_micro_time),
-      gc(new GameController()), tool(_synchro, s, v, gc), averagePacketDelay(0),
+      gc(new GameController()), tool(s, v, gc), averagePacketDelay(0),
       totalPacketsReceived(0), ourPacketsReceived(0), lastPacketNumber(0)
 {
     pthread_mutex_init(&comm_mutex,NULL);

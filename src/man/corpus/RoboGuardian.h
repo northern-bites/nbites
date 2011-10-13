@@ -26,11 +26,11 @@
 #include <string.h>
 #include <boost/shared_ptr.hpp>
 
-#include "synchro.h"
 #include "Sensors.h"
 #include "MotionInterface.h"
 #include "ClickableButton.h"
 
+#include "synchro.h"
 #include "guardian/WifiAngel.h"
 
 //TODO: move this to the guardian folder
@@ -43,8 +43,7 @@ enum  ButtonID {
 
 class RoboGuardian : public Thread {
 public:
-    RoboGuardian(boost::shared_ptr<Synchro>,
-                 boost::shared_ptr<Sensors>);
+    RoboGuardian(boost::shared_ptr<Sensors>);
     virtual ~RoboGuardian();
 
     void run();

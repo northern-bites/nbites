@@ -26,9 +26,9 @@ using namespace boost;
 // Begin class code
 //
 
-TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
-                          shared_ptr<Vision> v, shared_ptr<GameController> gc)
-    : Thread(_synchro, "TOOLConnect"),
+TOOLConnect::TOOLConnect (shared_ptr<Sensors> s, shared_ptr<Vision> v,
+                          shared_ptr<GameController> gc)
+    : Thread("TOOLConnect"),
       state(TOOL_REQUESTING),
       sensors(s), vision(v), gameController(gc),
       loc(), ballEKF()
