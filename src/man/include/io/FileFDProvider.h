@@ -49,10 +49,10 @@ public:
         return "file name: " + file_name;
     }
 
-    virtual bool rewind(uint32_t offset) const {
+    virtual bool rewind(uint64_t offset) const {
         if (offset < getCurrentPosition()) {
-            uint32_t true_offset = 0;
-            true_offset = lseek(file_descriptor, -offset, SEEK_CUR);
+            uint64_t true_offset = 0;
+            true_offset = lseek64(file_descriptor, -offset, SEEK_CUR);
             //TODO: we could check to see if the true_offset
             //signals an error or just moves the pointer
             //by a smaller offset than what we want;

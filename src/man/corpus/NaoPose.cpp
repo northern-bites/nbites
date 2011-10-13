@@ -278,7 +278,7 @@ ublas::vector<float> NaoPose::intersectLineWithXYPlane(const std::vector<
     target(0) = l1(0);
     target(1) = l1(1);
     target(2) = l1(2);
-    ublas::permutation_matrix<float> P(3);
+    ublas::permutation_matrix<> P(3);
     // If the matrix is near singular, this value will be != 0
     int singularRow = lu_factorize(eqSystem, P);
     if (singularRow != 0) {

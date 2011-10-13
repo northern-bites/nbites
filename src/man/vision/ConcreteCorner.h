@@ -237,12 +237,13 @@ public:
     static const std::vector <const ConcreteCorner*>& centerCircleBottom();
 
 private: // Instance variables recording location on field and identifier
-    cornerID id;
-    shape cornerType;
 
     // Angle which the left leg (L Corner) or T-Stem (T Corner) mkaes
     // with the Y-Axis ("north")
     float fieldAngle;
+
+    cornerID id;
+    shape cornerType;
 
     const ConcreteLine * line1;
     const ConcreteLine * line2;
