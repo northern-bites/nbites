@@ -71,8 +71,6 @@ RoboGuardian::~RoboGuardian(){
 
 
 void RoboGuardian::run(){
-    Thread::running = true;
-    Thread::trigger->on();
 
     struct timespec interval, remainder;
     interval.tv_sec = 0;
@@ -95,8 +93,6 @@ void RoboGuardian::run(){
         nanosleep(&interval, &remainder);
         PROF_EXIT(P_ROBOGUARDIAN);
     }
-
-    Thread::trigger->off();
 }
 
 void RoboGuardian::shutoffGains(){

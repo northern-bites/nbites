@@ -23,7 +23,7 @@ public:
     virtual void writeToLog() = 0;
 
     virtual void run() {
-        while (true) {
+        while (running) {
             this->waitForSignal();
             this->writeToLog();
         }

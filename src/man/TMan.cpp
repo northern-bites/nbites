@@ -21,18 +21,13 @@ TMan::~TMan(){
 
 }
 
-
-
 void TMan::startSubThreads(){
 
     Man::startSubThreads();
 
     // Start Image transcriber thread (it handles its own threading
-    if (threadedImageTranscriber->start() != 0) {
+    if (threadedImageTranscriber->start() != 0)
         cerr << "Image transcriber failed to start" << endl;
-    }
-    else
-        threadedImageTranscriber->getTrigger()->await_on();
 
 }
 

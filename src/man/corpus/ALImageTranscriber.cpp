@@ -138,9 +138,6 @@ int ALImageTranscriber::start()
 
 void ALImageTranscriber::run()
 {
-    Thread::running = true;
-    Thread::trigger->on();
-
     long long lastProcessTimeAvg = VISION_FRAME_LENGTH_uS;
 
     struct timespec interval, remainder;
@@ -197,7 +194,6 @@ void ALImageTranscriber::run()
         PROF_EXIT(P_MAIN);
         PROF_NFRAME();
     }
-    Thread::trigger->off();
 }
 
 void ALImageTranscriber::stop()

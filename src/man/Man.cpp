@@ -131,26 +131,18 @@ void Man::startSubThreads() {
   cout << "Man::start" << endl;
 #endif
 
-
-  // Start Comm thread (it handles its own threading
   if (comm->start() != 0)
     cerr << "Comm failed to start" << endl;
-  else
-    comm->getTrigger()->await_on();
 
 #ifdef USE_MOTION
   // Start Motion thread (it handles its own threading
   if (motion->start() != 0)
     cerr << "Motion failed to start" << endl;
-  else
-    motion->getTrigger()->await_on();
 #endif
 
 
   if(guardian->start() != 0)
     cout << "RoboGuardian failed to start" << endl;
-  else
-    guardian->getTrigger()->await_on();
 
 
 #ifdef DEBUG_MAN_THREADING

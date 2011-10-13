@@ -168,9 +168,9 @@ int Thread::start ()
 
     // Create thread
     const int result = pthread_create(&thread, &attr, runThread, (void*)this);
-#ifdef DEBUG_THREAD_START
-    cout << "Created thread '" << name << "' with result " << result << endl;
-#endif
+
+    // Wait for thread to start running
+    trigger->await_on();
 
     // Free attribute data
     pthread_attr_destroy(&attr);
@@ -184,7 +184,14 @@ void Thread::stop ()
 
 void* Thread::runThread (void* _this)
 {
-    reinterpret_cast<Thread*>(_this)->run();
+    Thread* this_instance = reinterpret_cast<Thread*>(_this);
+    this_instance->running = true;
+    this_instance->trigger->on();
+
+    this_instance->run();
+
+    this_instance->running = false;
+    this_instance->trigger->off();
 
 #ifdef DEBUG_THREAD_EXIT
     cout << "Exit thread '" << reinterpret_cast<Thread*>(_this)->name << "'" <<

@@ -53,9 +53,6 @@ void TOOLConnect::setLocalizationAccess (shared_ptr<LocSystem> _loc,
 void
 TOOLConnect::run ()
 {
-    running = true;
-    trigger->on();
-
     try {
         serial.bind();
 
@@ -87,8 +84,6 @@ TOOLConnect::run ()
 
     serial.closeAll();
 
-    running = false;
-    trigger->off();
 }
 
 void

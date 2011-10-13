@@ -23,17 +23,13 @@ TTMan::~TTMan(){}
 void TTMan::startSubThreads(){
     if(threadedEnactor->start()!=0)
         cout << "Failed to start enactor" <<endl;
-    else
-        threadedEnactor->getTrigger()->await_on();
 
     Man::startSubThreads();
 
     // Start Image transcriber thread (it handles its own threading
-    if (threadedImageTranscriber->start() != 0) {
+    if (threadedImageTranscriber->start() != 0)
         cerr << "Image transcriber failed to start" << endl;
-    }
-    else
-        threadedImageTranscriber->getTrigger()->await_on();
+
 }
 void TTMan::stopSubThreads(){
 #ifdef DEBUG_MAN_THREADING
