@@ -31,6 +31,7 @@ using namespace boost;
 #ifdef DEBUG_THREAD
 #  define DEBUG_THREAD_CREATE
 #  define DEBUG_THREAD_START
+#  define DEUBG_THREAD_RUN
 #  define DEBUG_THREAD_EXIT
 #endif
 
@@ -184,6 +185,10 @@ void Thread::stop ()
 
 void* Thread::runThread (void* _this)
 {
+#ifdef DEBUG_THREAD_RUN
+    cout << name << " run" << endl;
+#endif
+
     Thread* this_instance = reinterpret_cast<Thread*>(_this);
     this_instance->running = true;
     this_instance->trigger->on();
