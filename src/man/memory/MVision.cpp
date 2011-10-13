@@ -12,10 +12,12 @@ namespace memory {
 
 using boost::shared_ptr;
 using std::list;
+using proto::PVision;
 
-MVision::MVision(MObject_ID id, std::string name, shared_ptr<Vision> v) :
-        MObject(id, name),
-        vision(v) {
+MVision::MVision(MObject_ID id, shared_ptr<Vision> v, shared_ptr<PVision> vision_data) :
+        MObject(id, vision_data),
+        vision(v),
+        data(vision_data) {
 }
 
 MVision::~MVision() {
@@ -24,12 +26,11 @@ MVision::~MVision() {
 void MVision::update() {
 
     ADD_PROTO_TIMESTAMP;
-//    cout << "MVision_updata timestamp is " << process_micro_time() << endl;
 
     using namespace proto;
     //VisualBall
     PVision::PVisualBall* visual_ball;
-    visual_ball = this->mutable_visual_ball();
+    visual_ball = this->data->mutable_visual_ball();
 
     //VisualBall::VisualDetection
     PVision::PVisualDetection* visual_detection;
@@ -41,12 +42,13 @@ void MVision::update() {
     visual_ball->set_confidence(vision->ball->getConfidence());
 
     //VisualCorners
-    this->clear_visual_corner();
+    this->data->clear_visual_corner();
     list<VisualCorner>* visualCorners = vision->fieldLines->getCorners();
     for (list<VisualCorner>::iterator i = visualCorners->begin(); i
             != visualCorners->end(); i++) {
         //VisualCorner
-        PVision::PVisualCorner* visual_corner = this->add_visual_corner();
+        PVision::PVisualCorner* visual_corner =
+                this->data->add_visual_corner();
 
         //VisualCorner::VisualDetection
         visual_detection = visual_corner->mutable_visual_detection();

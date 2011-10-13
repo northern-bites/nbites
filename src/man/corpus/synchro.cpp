@@ -58,7 +58,7 @@ void Event::await ()
 {
     pthread_mutex_lock(mutex.get());
 
-    while (!signalled)
+    if (!signalled)
         pthread_cond_wait(&cond, mutex.get());
     signalled = false;
 
@@ -136,10 +136,12 @@ void Synchro::signal (Event* ev)
     ev->signal();
 }
 
+static const std::string SIGNAL_SUFFIX = "_signal";
 
 Thread::Thread (shared_ptr<Synchro> _synchro, string _name)
   : name(_name), synchro(_synchro), running(false),
-    trigger(new Trigger(_synchro, _name, false))
+    trigger(new Trigger(_synchro, _name, false)),
+    signal(name + SIGNAL_SUFFIX)
 {
 #ifdef DEBUG_THREAD_CREATE
     cout << "Creating Thread instance '" << name << "'" << endl;
@@ -172,10 +174,6 @@ int Thread::start ()
 
     // Free attribute data
     pthread_attr_destroy(&attr);
-
-#ifdef DEBUG_THREAD_START
-    cout << name << "::start is DONE" << endl;
-#endif
     return result;
 }
 
@@ -195,6 +193,13 @@ void* Thread::runThread (void* _this)
     pthread_exit(NULL);
 }
 
+void Thread::signalToResume() {
+    this->signal.signal();
+}
+
+void Thread::waitForSignal() {
+    this->signal.await();
+}
 
 Trigger::Trigger (shared_ptr<Synchro> _synchro, string name, bool _v)
   : mutex(shared_ptr<pthread_mutex_t>(new pthread_mutex_t(), MutexDeleter())),

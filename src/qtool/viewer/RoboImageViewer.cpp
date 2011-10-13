@@ -4,10 +4,10 @@
 namespace qtool {
 namespace viewer {
 
-RoboImageViewer::RoboImageViewer(man::memory::RoboImage::const_ptr roboImage,
+RoboImageViewer::RoboImageViewer(man::memory::MImage::const_ptr rawImage,
                                  QLabel *infoLabel, QWidget *parent)
     : QWidget(parent),
-      image(new BMPYUVImage(roboImage)),
+      image(new BMPYUVImage(rawImage)),
       infoLabel(infoLabel)
 {
     setBackgroundRole(QPalette::Base);
@@ -23,7 +23,7 @@ void RoboImageViewer::update(qtool::data::MObject_ID) {
 }
 
 void RoboImageViewer::updateBitmap() {
-	image->updateFromRoboImage();
+	image->updateFromRawImage();
 }
 
 QSize RoboImageViewer::minimumSizeHint() const

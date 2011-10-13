@@ -35,8 +35,8 @@ namespace noggin {
     class MyInfo;
 
     // Sections of the field for Location use
-    static const float TOP_LIMIT = FIELD_HEIGHT*2.0/3.0;
-    static const float BOTTOM_LIMIT = FIELD_HEIGHT/3.0;
+    static const float TOP_LIMIT = FIELD_HEIGHT*2.0f/3.0f;
+    static const float BOTTOM_LIMIT = FIELD_HEIGHT/3.0f;
 
     // Buffer for size of Box
     static const int BOX_BUFFER = 10;

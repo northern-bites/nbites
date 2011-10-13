@@ -15,6 +15,9 @@
 #include <boost/shared_ptr.hpp>
 #include "include/VisionDef.h"
 
+// TODO: move this to sensors; this should be the standard
+// way of passing the image around
+
 namespace man {
 namespace memory {
 
@@ -33,7 +36,7 @@ public:
 
     virtual ~RoboImage(){}
 
-    virtual void updateImage(const byte* _image) {
+    virtual void updateImagePointer(const byte* _image) {
     	image = _image;
     }
 
@@ -53,7 +56,6 @@ public:
 protected:
     unsigned int width;
     unsigned int height;
-    //TODO: make byte into uint8_t
     const uint8_t* image;
     int32_t byte_size;
     int64_t timestamp;

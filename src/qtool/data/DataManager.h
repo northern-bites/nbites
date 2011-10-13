@@ -39,6 +39,11 @@ public:
         this->notifySubscribers(man::memory::MIMAGE_ID);
     }
 
+    void getPrev() {
+        parsingBoard.rewindAll();
+        this->notifySubscribers(man::memory::MIMAGE_ID);
+    }
+
     man::memory::Memory::ptr getMemory() const {
         return memory;}
 
