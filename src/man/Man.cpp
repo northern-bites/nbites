@@ -104,7 +104,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 
   memory = shared_ptr<Memory>(new Memory(vision, sensors));
 
-  loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory));
+  loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory, synchro));
   set_logging_board_pointer(loggingBoard);
   memory->addSubscriber(loggingBoard.get());
 
@@ -205,7 +205,7 @@ Man::processFrame ()
     sensors->lockImage();
 #ifdef USE_MEMORY
     // TODO: this is temporarily here
-    loggingBoard->log(MIMAGE_ID);
+//    loggingBoard->log(MIMAGE_ID);
 #endif
     PROF_ENTER(P_VISION);
     vision->notifyImage(sensors->getImage());

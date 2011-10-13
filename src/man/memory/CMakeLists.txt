@@ -46,21 +46,20 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 # Add here source files needed to compile this project
 
 set( MEMORY_SRCS Memory
+                 MObject
                  MVision
                  MVisionSensors
                  MMotionSensors
                  MImage
                  )
 
-set( PARSE_SRCS parse/MessageParser.cpp
-                parse/ImageParser.cpp
-                parse/ParsingBoard.cpp )
+set( PARSE_SRCS parse/MObjectParser
+                parse/ParsingBoard )
 
-set( LOG_SRCS log/MessageLogger.cpp
-              log/ImageLogger.cpp
-              log/LoggingBoard.cpp
-              log/IOProviderFactory.cpp
-              log/PyLoggingBoard.cpp)
+set( LOG_SRCS log/MObjectLogger
+              log/LoggingBoard
+              log/IOProviderFactory
+              log/PyLoggingBoard)
 ############################ (SUB)DIRECTORY COMPILATION
 # add the protobuffer C++ source subdirectory
 # it's where we house all our generated protobuggers
@@ -97,6 +96,7 @@ add_library(
 ############################ Set linked libraries
 target_link_libraries(
   ${MEMORY_TARGET}
+  ${PROTOBUF_LIBRARY}
   ${PROTOS_TARGET}
   ${VISION_TARGET}
   ${SENSORS_TARGET}
@@ -104,7 +104,7 @@ target_link_libraries(
 
 target_link_libraries(
     ${LOG_TARGET}
-    ${PROTOBUF_LIBRARIES}
+    ${PROTOBUF_LIBRARY}
     ${Boost_PYTHON_LIBRARY}
     ${NBINCLUDE_TARGET}
     ${MEMORY_TARGET}
@@ -112,6 +112,6 @@ target_link_libraries(
 
 target_link_libraries(
     ${PARSE_TARGET}
-    ${PROTOBUF_LIBRARIES}
+    ${PROTOBUF_LIBRARY}
     ${MEMORY_TARGET}
     )

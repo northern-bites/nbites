@@ -74,4 +74,6 @@ message PImage {
 	optional int64 timestamp = 1;
 
 	optional bytes image = 2;
+	optional uint32 width = 3;
+	optional uint32 height = 4;
 }

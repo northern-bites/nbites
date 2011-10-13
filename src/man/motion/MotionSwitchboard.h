@@ -148,6 +148,7 @@ private:
     bool running;
     bool shouldWalkPose;
     mutable bool newJoints; //Way to track if we ever use the same joints twice
+    mutable bool newInputJoints;
 
     bool readyToSend;
 

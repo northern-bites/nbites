@@ -9,7 +9,7 @@
 #pragma once
 
 #include "memory/MemoryIOBoard.h"
-#include "memory/MObject.h"
+#include "memory/MemoryCommon.h"
 
 namespace man {
 namespace memory {

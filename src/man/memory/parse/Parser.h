@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
 #include <unistd.h>
-
+#include <stdint.h>
 #include <include/io/FDProvider.h>
 
 namespace man {
@@ -18,8 +18,8 @@ namespace parse {
 
 struct LogHeader {
 
-    uint32_t log_id;
-    uint64_t birth_time;
+    int32_t log_id;
+    int64_t birth_time;
 
 };
 
@@ -28,11 +28,18 @@ class Parser {
 public:
     typedef boost::shared_ptr<Parser> ptr;
 
-public:
-    Parser() {}
+protected:
+    typedef include::io::FDProvider FDProvider;
 
-    virtual const LogHeader getHeader() {return log_header;}
+public:
+    Parser(FDProvider::const_ptr fdProvider) :
+                fdProvider(fdProvider) {
+    }
+
+    virtual LogHeader getHeader() const {return log_header;}
+
     virtual bool getNext() = 0;
+    virtual bool getPrev() = 0;
 
     // this method will try to look at a log represented by a file_descriptor
     // and read the first int, which represents the log ID
@@ -44,28 +51,29 @@ public:
         return id;
     }
 
-protected:
-    LogHeader log_header;
-};
-
-template <class T>
-class TemplatedParser : public Parser {
-
-public:
-    TemplatedParser(include::io::FDProvider::const_ptr fdProvider,
-            boost::shared_ptr<T> container) :
-                fdProvider(fdProvider), container(container) {
+    uint32_t getBytesRead() {
+        return fdProvider->getCurrentPosition();
     }
 
-    //TODO: change these to void/bool move them to the generic parser
-    virtual bool getNext() = 0;
-    virtual boost::shared_ptr<const T> getPrev() = 0;
+protected:
+    template <class T>
+    void readValue(T &value) {
+        read(fdProvider->getFileDescriptor(), &value, sizeof(value));
+    }
 
+    bool readCharBuffer(char* buffer, uint32_t size) {
+        uint32_t result = 0;
+        result = read(fdProvider->getFileDescriptor(), buffer, size);
+
+        if (result != size)
+            return false;
+        else
+            return true;
+    }
 
 protected:
-    include::io::FDProvider::const_ptr fdProvider;
-    boost::shared_ptr<T> container;
-
+    FDProvider::const_ptr fdProvider;
+    LogHeader log_header;
 };
 
 }
