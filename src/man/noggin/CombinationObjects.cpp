@@ -3,6 +3,7 @@
  * See the header for in-depth descriptions.
  */
 #include "CombinationObjects.h"
+#include <boost/lexical_cast.hpp>
 
 namespace noggin {
     using namespace py_constants;
@@ -88,6 +89,14 @@ namespace noggin {
     bool Location::hasattr(boost::python::object obj,
                            std::string const &attrName) {
         return PyObject_HasAttrString(obj.ptr(), attrName.c_str());
+    }
+
+    boost::python::str Location::toString()
+    {
+        std::string info = "(" + boost::lexical_cast<std::string>(x) +
+            ", " + boost::lexical_cast<std::string>(y) + ")";
+        std::cout << "x " << x << " y " << y;
+        return *(new boost::python::str(info));
     }
 
 ///////// RobotLocation Methods //////////////

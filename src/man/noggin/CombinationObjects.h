@@ -88,6 +88,7 @@ namespace noggin {
 
         // For Python
         bool hasattr(boost::python::object, const std::string&);
+        boost::python::str toString();
 
     protected:
         float x, y;

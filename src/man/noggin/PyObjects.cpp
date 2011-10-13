@@ -24,6 +24,7 @@ BOOST_PYTHON_MODULE(objects)
         .def("inBottomOfField", &Location::inBottomOfField)
         .def("inCenterOfField", &Location::inCenterOfField)
         .def("__hasattr__", &Location::hasattr)
+        .def("__str__", &Location::toString)
         ;
 
     class_<RobotLocation, bases<Location> >("RobotLocation",
