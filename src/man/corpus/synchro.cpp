@@ -66,14 +66,10 @@ void Event::await ()
     pthread_mutex_unlock(mutex.get());
 }
 
+//TODO: delete this after we get rid of PySynchro
 bool Event::poll ()
 {
-    pthread_mutex_lock(mutex.get());
 
-    const bool result = signalled;
-
-    pthread_mutex_unlock(mutex.get());
-    return result;
 }
 
 void Event::signal ()
@@ -124,11 +120,6 @@ const map<string, shared_ptr<Event> >& Synchro::available ()
 void Synchro::await (Event* ev)
 {
     ev->await();
-}
-
-bool Synchro::poll (Event* ev)
-{
-    return ev->poll();
 }
 
 void Synchro::signal (Event* ev)
