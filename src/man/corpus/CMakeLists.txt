@@ -76,7 +76,6 @@ SET( SENSORS_SRCS Sensors
 ###### SYNCHRO ############
 
 SET( SYNCHRO_SRCS synchro
-  _synchromodule
   messaging
   )
 

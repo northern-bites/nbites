@@ -313,7 +313,7 @@ namespace noggin {
         else {
             x = FIELD_GREEN_WIDTH - loc->getXEst();
             y = FIELD_GREEN_HEIGHT - loc->getYEst();
-            h = radians(subPIAngle(loc->getRadHEst() - PI));
+            h = radians(subPIAngle(float(loc->getRadHEst() - PI)));
         }
     }
 
