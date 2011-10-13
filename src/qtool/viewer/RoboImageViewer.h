@@ -17,7 +17,7 @@ class RoboImageViewer: public QWidget,
     Q_OBJECT
 public:
 
-    RoboImageViewer(man::memory::RoboImage::const_ptr roboImage,
+    RoboImageViewer(man::memory::MImage::const_ptr rawImage,
     		QLabel *infoLabel = NULL,
     		QWidget *parent = NULL);
     virtual ~RoboImageViewer();

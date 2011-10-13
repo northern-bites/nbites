@@ -38,6 +38,7 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
       running(false),
       shouldWalkPose(false),
       newJoints(false),
+      newInputJoints(false),
       readyToSend(false),
       noWalkTransitionCommand(true)
 {
@@ -119,7 +120,10 @@ void MotionSwitchboard::run() {
     sensors->setMotionBodyAngles(sensors->getBodyAngles());
 
     pthread_mutex_lock(&calc_new_joints_mutex);
-    pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
+    if (!newInputJoints) {
+        pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
+    }
+    newInputJoints = false;
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
     while(running) {
@@ -161,7 +165,10 @@ void MotionSwitchboard::run() {
         }
 
         pthread_mutex_lock(&calc_new_joints_mutex);
-        pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
+        if (!newInputJoints) {
+            pthread_cond_wait(&calc_new_joints_cond, &calc_new_joints_mutex);
+        }
+        newInputJoints = false;
         pthread_mutex_unlock(&calc_new_joints_mutex);
         frameCount++;
         PROF_EXIT(P_SWITCHBOARD);
@@ -552,12 +559,10 @@ void MotionSwitchboard::swapHeadProvider(){
 const vector <float> MotionSwitchboard::getNextJoints() const {
     pthread_mutex_lock(&next_joints_mutex);
 #ifndef WEBOTS_BACKEND
-#ifdef DEBUG_SWITCHBOARD
     if(!newJoints && readyToSend){
         cout << "An enactor is grabbing old joints from switchboard."
              <<" Must have missed a frame!" <<endl;
     }
-#endif
 #endif
     const vector <float> vec(nextJoints);
     newJoints = false;
@@ -578,6 +583,7 @@ const vector<float>  MotionSwitchboard::getNextStiffness() const{
 void MotionSwitchboard::signalNextFrame(){
     pthread_mutex_lock(&calc_new_joints_mutex);
     pthread_cond_signal(&calc_new_joints_cond);
+    newInputJoints = true;
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
 }
