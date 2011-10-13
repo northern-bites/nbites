@@ -34,7 +34,7 @@ CONFIGURE_FILE(
 
 ############################ DEFINITIONS
 # Add here definition needed.
-ADD_DEFINITIONS( 
+ADD_DEFINITIONS(
                ${CMAKE_THREAD_LIBS_INIT}
                )
 
@@ -49,7 +49,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 		     )
 
 
-############################ PROJECT SOURCES FILES 
+############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 SET( MOTION_SRCS
   #CallbackAction
@@ -160,7 +160,7 @@ INSTALL(
 
 #IF( APPLE )
   SET_TARGET_PROPERTIES(
-    ${MOTION_TARGET} 
+    ${MOTION_TARGET}
     PROPERTIES LINKER_LANGUAGE CXX
     )
 #ENDIF( APPLE )

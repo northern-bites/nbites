@@ -59,6 +59,9 @@ public:
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
+    //this should be mutex locked - if you set the pointer to NULL it might
+    //after the guardian thread checked to see if the pointer was NULL
+    //(and it wasn't) it might result in a segfault - Octavian
     void setMotionInterface(MotionInterface * minterface)
         { motion_interface = minterface; }
 

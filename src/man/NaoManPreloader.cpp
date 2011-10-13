@@ -32,14 +32,19 @@ NaoManPreloader::NaoManPreloader(AL::ALPtr<AL::ALBroker> pBroker,
                                  const std::string& pName) :
                 ALModule(pBroker, pName), broker(pBroker),
                 speech(new Speech()),
-                sensors(new Sensors(speech)){
+                sensors(new Sensors(speech)),
+                guardian(new RoboGuardian(sensors)){
 
     this->setModuleDescription("A module that kicks ass.");
+    guardian->start();
     preloadMan();
 }
 
 NaoManPreloader::~NaoManPreloader() {
+    //TODO: this should call the man destructor in some way
     cout << "Destroying the man preloader" << endl;
+    guardian->stop();
+    guardian->waitForThreadToFinish();
 }
 
 void NaoManPreloader::preloadMan() {
@@ -75,6 +80,6 @@ void NaoManPreloader::linkManLoaderMethod() {
 void NaoManPreloader::launchMan() {
     cout << "Launching man loader ... " << endl;
     assert(loadMan != NULL);
-    (*loadMan)(broker, speech, sensors);
+    (*loadMan)(broker, speech, sensors, guardian);
 }
 

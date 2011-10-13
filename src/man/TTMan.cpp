@@ -6,12 +6,13 @@ using namespace std;
 
 TTMan::TTMan(shared_ptr<Profiler> _profiler,
              shared_ptr<Sensors> _sensors,
+             boost::shared_ptr<RoboGuardian> guardian,
              shared_ptr<Transcriber> _transcriber,
              shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
              shared_ptr<ThreadedMotionEnactor> _enactor,
              shared_ptr<Lights> _lights,
              shared_ptr<Speech> _speech)
-    :Man(_profiler,_sensors, _transcriber, _imageTranscriber,
+    :Man(_profiler,_sensors, guardian, _transcriber, _imageTranscriber,
          _enactor, _lights, _speech),
      threadedImageTranscriber(_imageTranscriber),
      threadedEnactor(_enactor){}

@@ -19,15 +19,19 @@
 
 #include "ALSpeech.h"
 #include "Sensors.h"
+#include "RoboGuardian.h"
 
 typedef void (*loadManMethod)(AL::ALPtr<AL::ALBroker> broker,
                               boost::shared_ptr<Speech> speech,
-                              boost::shared_ptr<Sensors> sensors);
+                              boost::shared_ptr<Sensors> sensors,
+                              boost::shared_ptr<RoboGuardian> guardian);
 
 START_FUNCTION_EXPORT
 
-void loadMan(AL::ALPtr<AL::ALBroker> broker, boost::shared_ptr<Speech> speech,
-             boost::shared_ptr<Sensors> sensors);
+void loadMan(AL::ALPtr<AL::ALBroker> broker,
+             boost::shared_ptr<Speech> speech,
+             boost::shared_ptr<Sensors> sensors,
+             boost::shared_ptr<RoboGuardian> guardian);
 
 END_FUNCTION_EXPORT
 

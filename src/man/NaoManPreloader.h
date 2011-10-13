@@ -14,6 +14,7 @@
 
 #include "Speech.h"
 #include "Sensors.h"
+#include "RoboGuardian.h"
 
 START_FUNCTION_EXPORT
 
@@ -47,4 +48,5 @@ private:
 
     boost::shared_ptr<Speech> speech;
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<RoboGuardian> guardian;
 };

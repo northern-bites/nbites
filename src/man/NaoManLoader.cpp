@@ -29,7 +29,7 @@ static shared_ptr<ALMan> man_pointer;
 START_FUNCTION_EXPORT
 
 void loadMan(ALPtr<ALBroker> broker, shared_ptr<Speech> speech,
-             shared_ptr<Sensors> sensors) {
+             shared_ptr<Sensors> sensors, shared_ptr<RoboGuardian> guardian) {
 
 //#ifdef USE_ALSPEECH
 //    shared_ptr<Speech> speech(new ALSpeech(broker));
@@ -55,6 +55,7 @@ void loadMan(ALPtr<ALBroker> broker, shared_ptr<Speech> speech,
     //setLedsProxy(AL::ALPtr<AL::ALLedsProxy>(new AL::ALLedsProxy(broker)));
 
     man_pointer = boost::shared_ptr<ALMan>(new ALMan(profiler, sensors,
+                                                     guardian,
                                                      transcriber,
                                                      imageTranscriber,
                                                      enactor, lights, speech));

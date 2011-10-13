@@ -53,6 +53,7 @@ using namespace man::memory::log;
 
 Man::Man (shared_ptr<Profiler> _profiler,
           shared_ptr<Sensors> _sensors,
+          shared_ptr<RoboGuardian> guardian,
           shared_ptr<Transcriber> _transcriber,
           shared_ptr<ImageTranscriber> _imageTranscriber,
           shared_ptr<MotionEnactor> _enactor,
@@ -60,6 +61,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
           shared_ptr<Speech> _speech)
     :     profiler(_profiler),
           sensors(_sensors),
+          guardian(guardian),
           transcriber(_transcriber),
           imageTranscriber(_imageTranscriber),
           enactor(_enactor),
@@ -67,54 +69,51 @@ Man::Man (shared_ptr<Profiler> _profiler,
           speech(_speech)
 {
 
-  // initialize system helper modules
-
 #ifdef USE_TIME_PROFILING
-  profiler->profiling = true;
-  profiler->profileFrames(1400);
+    profiler->profiling = true;
+    profiler->profileFrames(1400);
 #endif
-  // give python a pointer to the sensors structure. Method defined in
-  // Sensors.h
-  set_sensors_pointer(sensors);
 
-  imageTranscriber->setSubscriber(this);
+    // give python a pointer to the sensors structure. Method defined in
+    // Sensors.h
+    set_sensors_pointer(sensors);
 
-  pose = shared_ptr<NaoPose>(new NaoPose(sensors));
+    imageTranscriber->setSubscriber(this);
 
-  guardian = shared_ptr<RoboGuardian>(new RoboGuardian(sensors));
+    pose = shared_ptr<NaoPose> (new NaoPose(sensors));
 
-  // initialize core processing modules
+    // initialize core processing modules
 #ifdef USE_MOTION
-  motion = shared_ptr<Motion>(new Motion(enactor, sensors,pose));
-  guardian->setMotionInterface(motion->getInterface());
+    motion = shared_ptr<Motion> (new Motion(enactor, sensors, pose));
+    guardian->setMotionInterface(motion->getInterface());
 #endif
-  // initialize python roboguardian module.
-  // give python a pointer to the guardian. Method defined in PyRoboguardian.h
-  set_guardian_pointer(guardian);
+    // initialize python roboguardian module.
+    // give python a pointer to the guardian. Method defined in PyRoboguardian.h
+    set_guardian_pointer(guardian);
+    set_lights_pointer(_lights);
+    set_speech_pointer(_speech);
 
-  set_lights_pointer(_lights);
-  set_speech_pointer(_speech);
+    vision = shared_ptr<Vision> (new Vision(pose));
 
-  vision = shared_ptr<Vision>(new Vision(pose));
+    set_vision_pointer(vision);
 
-  set_vision_pointer(vision);
+    comm = shared_ptr<Comm> (new Comm(sensors, vision));
 
-  comm = shared_ptr<Comm>(new Comm(sensors, vision));
+    memory = shared_ptr<Memory> (new Memory(vision, sensors));
 
-  memory = shared_ptr<Memory>(new Memory(vision, sensors));
-
-  loggingBoard = shared_ptr<LoggingBoard>(new LoggingBoard(memory));
-  set_logging_board_pointer(loggingBoard);
-  memory->addSubscriber(loggingBoard.get());
+    loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
+    set_logging_board_pointer(loggingBoard);
+    memory->addSubscriber(loggingBoard.get());
 
 #ifdef USE_MEMORY
-  loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
+    loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
 #endif
 
 #ifdef USE_NOGGIN
-  noggin = shared_ptr<Noggin>(new Noggin(vision,comm,guardian,
-                                         sensors, loggingBoard,
-                                         motion->getInterface()));
+    noggin = shared_ptr<Noggin> (
+                                 new Noggin(vision, comm, guardian, sensors,
+                                            loggingBoard,
+                                            motion->getInterface()));
 #endif// USE_NOGGIN
 }
 
@@ -139,10 +138,6 @@ void Man::startSubThreads() {
         cerr << "Motion failed to start" << endl;
 #endif
 
-
-    if(guardian->start() != 0)
-        cout << "RoboGuardian failed to start" << endl;
-
     //  CALLGRIND_START_INSTRUMENTATION;
     //  CALLGRIND_TOGGLE_COLLECT;
 }
@@ -152,9 +147,6 @@ void Man::stopSubThreads() {
 #ifdef DEBUG_MAN_THREADING
     cout << "Man stopping: " << endl;
 #endif
-
-    guardian->stop();
-    guardian->waitForThreadToFinish();
 
 #ifdef USE_MOTION
     motion->stop();
