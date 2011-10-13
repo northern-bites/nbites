@@ -183,7 +183,7 @@ void Thread::stop ()
     running = false;
 
     #ifdef DEBUG_THREAD_EXIT
-        cout << this->name << "stopping" << endl;
+        cout << this->name << "::stopping" << endl;
     #endif
 }
 
