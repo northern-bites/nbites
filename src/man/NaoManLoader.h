@@ -22,14 +22,8 @@
 #include "altools/alxplatform.h"
 
 #include "manconfig.h"
+#include "include/ExportDefines.h"
 
-// ..::: Version Information ::
-/** Major release version */
-#define MANMODULE_VERSION_MAJOR    "1"
-
-/** Minor release version */
-#define MANMODULE_VERSION_MINOR    "0"
-
-void loadMan();
+typedef void (*loadManMethod)(AL::ALPtr<AL::ALBroker> broker);
 
 #endif // MANMODULE_H

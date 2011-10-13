@@ -8,7 +8,7 @@ ${USE_ALSPEECH_POUND}audioout
 [extra]
 devicecommunicationmanager
 videoinput
-man
+manpreloader
 #sensors
 #motion
 #motionrecorder

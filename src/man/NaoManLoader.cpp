@@ -18,19 +18,17 @@ typedef TMan ALMan;
 #include "ALSpeech.h"
 
 #include "vision/Profiler.h"
+#include "include/ExportDefines.h"
 
 using namespace std;
 using namespace AL;
 using boost::shared_ptr;
 
 static shared_ptr<ALMan> man_pointer;
-static ALPtr<ALBroker> broker;
 
-void loadMan() {
-    if (!broker) {
-        cout << "Invalid broker pointer, cannot load man!" << endl;
-    }
+START_FUNCTION_EXPORT
 
+void loadMan(ALPtr<ALBroker> broker) {
     shared_ptr<Synchro> synchro(new Synchro());
 #ifdef USE_ALSPEECH
     shared_ptr<Speech> speech(new ALSpeech(broker));
@@ -48,6 +46,7 @@ void loadMan() {
     shared_ptr<Profiler>
         profiler(new Profiler(&thread_micro_time, &process_micro_time,
                           &monotonic_micro_time));
+    cout << " I'm betting we get this far" << endl;
     shared_ptr<EnactorT> enactor(new EnactorT(sensors, transcriber,
                                                      broker));
 
@@ -63,40 +62,4 @@ void loadMan() {
     man_pointer->startSubThreads();
 }
 
-
-#ifdef __cplusplus
-extern "C" //required so that the compiler doesn't mangle the name
-{
-#endif
-
-class NaoManLoader: public AL::ALModule {
-
-public:
-    NaoManLoader(AL::ALPtr<AL::ALBroker> pBroker, const std::string& pName) :
-        ALModule(pBroker, pName) {
-
-        this->setModuleDescription("A module that kicks ass.");
-
-        broker = pBroker;
-        loadMan();
-    }
-
-    virtual ~NaoManLoader() {
-        cout << "Destroying the man loader" << endl;
-        man_pointer->stopSubThreads();
-    }
-};
-
-int _createModule(ALPtr<ALBroker> pBroker) {
-    AL::ALModule::createModule<NaoManLoader>(pBroker, "NaoManLoader");
-    return 0;
-}
-
-//Aldebaran apparently never calls this - Octavian
-int _closeModule() {
-    return 0;
-}
-
-# ifdef __cplusplus
-}
-# endif
+END_FUNCTION_EXPORT

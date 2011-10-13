@@ -7,9 +7,7 @@
  */
 
 #include "Man.h"
-
 #include "ThreadedImageTranscriber.h"
-
 
 class TMan : public Man {
 public:
