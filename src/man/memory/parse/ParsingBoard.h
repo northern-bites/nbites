@@ -13,8 +13,7 @@
 #include <map>
 
 #include "include/io/BulkIO.h"
-#include "MessageParser.h"
-#include "ImageParser.h"
+#include "MObjectParser.h"
 #include "memory/MObject.h"
 
 //forward declaration
@@ -44,6 +43,9 @@ public:
 
     void parse(MObject_ID id);
     void parseAll();
+
+    void rewind(MObject_ID id);
+    void rewindAll();
 
 private:
     Memory::ptr memory;

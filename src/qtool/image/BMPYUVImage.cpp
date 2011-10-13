@@ -1,13 +1,18 @@
 
 #include "BMPYUVImage.h"
 
-BMPYUVImage::BMPYUVImage(man::memory::RoboImage::const_ptr _roboImage) :
-	YUVImage(_roboImage),
+BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage) :
+	YUVImage(rawImage),
 	bitmap(width, height, QImage::Format_RGB32)
 { }
 
-void BMPYUVImage::updateFromRoboImage() {
-	YUVImage::updateFromRoboImage();
+void BMPYUVImage::updateFromRawImage() {
+    if (YUVImage::rawImageDimensionsEnlarged()) {
+        bitmap = QImage(rawImage->get()->width(),
+                        rawImage->get()->height(),
+                        QImage::Format_RGB32);
+    }
+	YUVImage::updateFromRawImage();
 	updateBitmap();
 }
 
