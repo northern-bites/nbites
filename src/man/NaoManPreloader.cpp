@@ -6,8 +6,6 @@
 #include <iostream> //cout
 #include <assert.h>
 
-#include "ALSpeech.h"
-
 using namespace std;
 using namespace AL;
 
@@ -32,7 +30,9 @@ static string LOAD_MAN_METHOD_NAME="loadMan";
 
 NaoManPreloader::NaoManPreloader(AL::ALPtr<AL::ALBroker> pBroker,
                                  const std::string& pName) :
-                ALModule(pBroker, pName), broker(pBroker) {
+                ALModule(pBroker, pName), broker(pBroker),
+                speech(new Speech()),
+                sensors(new Sensors(speech)){
 
     this->setModuleDescription("A module that kicks ass.");
     preloadMan();
@@ -63,7 +63,7 @@ void NaoManPreloader::importMan() {
 void NaoManPreloader::linkManLoaderMethod() {
     cout << "Linking to " + LOAD_MAN_METHOD_NAME + " ... ";
     loadMan = reinterpret_cast<loadManMethod>(
-            dlsym(libman_handle, "loadMan"));
+            dlsym(libman_handle, LOAD_MAN_METHOD_NAME.c_str()));
     if (loadMan == NULL)
     {
         cout << dlerror() << endl;
@@ -73,9 +73,8 @@ void NaoManPreloader::linkManLoaderMethod() {
 }
 
 void NaoManPreloader::launchMan() {
-    cout << "Launching man loader ... ";
+    cout << "Launching man loader ... " << endl;
     assert(loadMan != NULL);
-    (*loadMan)(broker);
-    cout << "done" << endl;
+    (*loadMan)(broker, speech, sensors);
 }
 

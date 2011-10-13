@@ -12,6 +12,9 @@
 #include "NaoManLoader.h" // for loadManMethod
 #include "include/ExportDefines.h"
 
+#include "Speech.h"
+#include "Sensors.h"
+
 START_FUNCTION_EXPORT
 
 //This is what Aldebaran will call when it loads this module
@@ -30,6 +33,7 @@ public:
     NaoManPreloader(AL::ALPtr<AL::ALBroker> pBroker, const std::string& pName);
     virtual ~NaoManPreloader();
 
+private:
     void preloadMan();
     void importMan();
     void linkManLoaderMethod();
@@ -37,6 +41,10 @@ public:
 
 private:
     AL::ALPtr<AL::ALBroker> broker;
+    //man link variables
     void* libman_handle;
     loadManMethod loadMan;
+
+    boost::shared_ptr<Speech> speech;
+    boost::shared_ptr<Sensors> sensors;
 };

@@ -8,27 +8,26 @@
 #ifndef MANMODULE_H
 #define MANMODULE_H
 
-// ..::: Headers ::
-#include <fstream>
-#include <sstream>
+#include <boost/shared_ptr.hpp>
 
-#include "alcommon/albroker.h"
-#include "alcommon/albrokermanager.h"
-#include "alcommon/almodule.h"
-#include "alcommon/alproxy.h"
-#include "alcore/alerror.h"
-#include "alcore/alptr.h"
-#include "alcore/altypes.h"
-#include "altools/alxplatform.h"
+#include <alcommon/albroker.h>
+#include <alcommon/alproxy.h>
+#include <alcore/alptr.h>
 
 #include "manconfig.h"
 #include "include/ExportDefines.h"
 
-typedef void (*loadManMethod)(AL::ALPtr<AL::ALBroker> broker);
+#include "ALSpeech.h"
+#include "Sensors.h"
+
+typedef void (*loadManMethod)(AL::ALPtr<AL::ALBroker> broker,
+                              boost::shared_ptr<Speech> speech,
+                              boost::shared_ptr<Sensors> sensors);
 
 START_FUNCTION_EXPORT
 
-void loadMan(AL::ALPtr<AL::ALBroker> broker);
+void loadMan(AL::ALPtr<AL::ALBroker> broker, boost::shared_ptr<Speech> speech,
+             boost::shared_ptr<Sensors> sensors);
 
 END_FUNCTION_EXPORT
 
