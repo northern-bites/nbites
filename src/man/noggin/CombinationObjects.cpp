@@ -3,6 +3,7 @@
  * See the header for in-depth descriptions.
  */
 #include "CombinationObjects.h"
+#include <boost/lexical_cast.hpp>
 
 namespace noggin {
     using namespace py_constants;
@@ -90,6 +91,13 @@ namespace noggin {
         return PyObject_HasAttrString(obj.ptr(), attrName.c_str());
     }
 
+    boost::python::str Location::toString()
+    {
+        std::string info = "x = " + boost::lexical_cast<std::string>(x) +
+            ", y = " + boost::lexical_cast<std::string>(y);
+        return *(new boost::python::str(info));
+    }
+
 ///////// RobotLocation Methods //////////////
 
     RobotLocation::RobotLocation(float _x, float _y, degrees _h)
@@ -125,6 +133,14 @@ namespace noggin {
         else return NBMath::sign(targetH);
     }
 
+    boost::python::str RobotLocation::toString()
+    {
+        std::string info = "x = " + boost::lexical_cast<std::string>(x) +
+            ", y = " + boost::lexical_cast<std::string>(y) + ", h = " +
+            boost::lexical_cast<std::string>(h*TO_DEG) + " (in degrees)";
+        return *(new boost::python::str(info));
+    }
+
 //////////// RelLocation Methods ///////////////
 
     RelLocation::RelLocation(RobotLocation& my, float dx, float dy, degrees dh)
@@ -137,6 +153,18 @@ namespace noggin {
         :RobotLocation(other.x, other.y, other.h), relX(other.relX),
          relY(other.relY), relH(other.relH)
     {
+    }
+
+    boost::python::str RelLocation::toString()
+    {
+        std::string info = "x = " + boost::lexical_cast<std::string>(x) +
+            ", y = " + boost::lexical_cast<std::string>(y) + ", h = " +
+            boost::lexical_cast<std::string>(h*TO_DEG) +
+            " (in degrees), relx = " + boost::lexical_cast<std::string>(relX)
+            + ", rely = " + boost::lexical_cast<std::string>(relY) +
+            ", relh = " + boost::lexical_cast<std::string>(relH) +
+            " (in degrees)";
+        return *(new boost::python::str(info));
     }
 
 ////////// FieldObject Methods //////////////
