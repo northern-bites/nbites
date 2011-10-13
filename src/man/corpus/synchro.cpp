@@ -28,11 +28,12 @@
 using namespace std;
 using namespace boost;
 
+#include "NullStream.h"
+
 #ifdef DEBUG_THREAD
-#  define DEBUG_THREAD_CREATE
-#  define DEBUG_THREAD_START
-#  define DEBUG_THREAD_RUN
-#  define DEBUG_THREAD_EXIT
+#define debug_thread_out cout
+#else
+#define debug_thread_out (*NullStream::NullInstance())
 #endif
 
 Event::Event (string _name)
@@ -135,9 +136,7 @@ Thread::Thread (string _name)
     trigger(new Trigger(_name, false)),
     signal(name + SIGNAL_SUFFIX)
 {
-    #ifdef DEBUG_THREAD_CREATE
-        cout << name << "::created" << endl;
-    #endif
+    debug_thread_out << name << "::created" << endl;
 }
 
 Thread::~Thread ()
@@ -149,9 +148,7 @@ int Thread::start ()
     if (running)
         return -1;
 
-    #ifdef DEBUG_THREAD_START
-        cout << name << "::starting" << endl;
-    #endif
+    debug_thread_out << name << "::starting" << endl;
 
     // Set thread attributes
     pthread_attr_t attr;
@@ -173,18 +170,14 @@ void Thread::stop ()
 {
     running = false;
 
-    #ifdef DEBUG_THREAD_EXIT
-        cout << this->name << "::stopping" << endl;
-    #endif
+    debug_thread_out << this->name << "::stopping" << endl;
 }
 
 void* Thread::runThread (void* _this)
 {
     Thread* this_instance = reinterpret_cast<Thread*>(_this);
 
-    #ifdef DEBUG_THREAD_RUN
-        cout << this_instance->name << "::run" << endl;
-    #endif
+    debug_thread_out << this_instance->name << "::run" << endl;
 
     this_instance->running = true;
     this_instance->trigger->on();
@@ -194,9 +187,7 @@ void* Thread::runThread (void* _this)
     this_instance->running = false;
     this_instance->trigger->off();
 
-    #ifdef DEBUG_THREAD_EXIT
-        cout << this_instance->name << "::exiting" << endl;
-    #endif
+    debug_thread_out << this_instance->name << "::exiting" << endl;
     pthread_exit(NULL);
 }
 
