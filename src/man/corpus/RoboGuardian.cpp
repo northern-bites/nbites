@@ -41,9 +41,11 @@ void RoboGuardian::playFile(string str)const{
 
 
 
-RoboGuardian::RoboGuardian(boost::shared_ptr<Sensors> s)
+RoboGuardian::RoboGuardian(boost::shared_ptr<Sensors> s,
+                           ManPreloaderInterface* manPreloader)
     : Thread("RoboGuardian"), sensors(s),
       motion_interface(NULL),
+      manPreloader(manPreloader),
       lastTemps(sensors->getBodyTemperatures()),
       lastBatteryCharge(sensors->getBatteryCharge()),
       chestButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
@@ -420,7 +422,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         break;
     case 3:
         //Say IP Address
-        speakIPAddress();
+        reloadMan();
         break;
     case 5:
         enableGains();
@@ -441,6 +443,13 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
     return true;
 }
 
+void RoboGuardian::reloadMan() {
+    if (manPreloader != NULL) {
+        manPreloader->reloadMan();
+    } else {
+        cout << "Invalid pointer to preloader in attempt to reload man"<< endl;
+    }
+}
 
 void RoboGuardian::executeFallProtection(){
     if(useFallProtection){

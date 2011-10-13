@@ -27,17 +27,18 @@ END_FUNCTION_EXPORT
 
 static string LIBMAN_NAME="libman.so";
 static string LOAD_MAN_METHOD_NAME="loadMan";
+static string UNLOAD_MAN_METHOD_NAME="unloadMan";
 
 NaoManPreloader::NaoManPreloader(AL::ALPtr<AL::ALBroker> pBroker,
                                  const std::string& pName) :
                 ALModule(pBroker, pName), broker(pBroker),
                 speech(new Speech()),
                 sensors(new Sensors(speech)),
-                guardian(new RoboGuardian(sensors)){
+                guardian(new RoboGuardian(sensors, this)){
 
     this->setModuleDescription("A module that kicks ass.");
     guardian->start();
-    preloadMan();
+    createMan();
 }
 
 NaoManPreloader::~NaoManPreloader() {
@@ -47,10 +48,25 @@ NaoManPreloader::~NaoManPreloader() {
     guardian->waitForThreadToFinish();
 }
 
-void NaoManPreloader::preloadMan() {
+void NaoManPreloader::createMan() {
     importMan();
-    linkManLoaderMethod();
+    linkManLoaderMethods();
     launchMan();
+}
+
+void NaoManPreloader::reloadMan() {
+    cout << "Trying to reload man ... " << endl;
+    destroyMan();
+    createMan();
+}
+
+void NaoManPreloader::destroyMan() {
+    cout << "Trying to unload man ... " << endl;
+    (*unloadMan)();
+    if (dlclose(libman_handle) != 0) {
+        cout << dlerror() << endl;
+        std::exit(1);
+    }
 }
 
 void NaoManPreloader::importMan() {
@@ -65,16 +81,23 @@ void NaoManPreloader::importMan() {
     cout << "done"<<endl;
 }
 
-void NaoManPreloader::linkManLoaderMethod() {
-    cout << "Linking to " + LOAD_MAN_METHOD_NAME + " ... ";
-    loadMan = reinterpret_cast<loadManMethod>(
-            dlsym(libman_handle, LOAD_MAN_METHOD_NAME.c_str()));
-    if (loadMan == NULL)
+void NaoManPreloader::linkManLoaderMethods() {
+
+    loadMan = linkToManMethod<loadManMethod>(LOAD_MAN_METHOD_NAME);
+    unloadMan = linkToManMethod<unloadManMethod>(UNLOAD_MAN_METHOD_NAME);
+}
+
+template <class T>
+T NaoManPreloader::linkToManMethod(std::string name) {
+    cout << "Manually linking to " + name + " ... ";
+    T method = reinterpret_cast<T>(
+            dlsym(libman_handle, name.c_str()));
+    if (method == NULL)
     {
         cout << dlerror() << endl;
         std::exit(1);
     }
-    cout << "done" << endl;
+    return method;
 }
 
 void NaoManPreloader::launchMan() {

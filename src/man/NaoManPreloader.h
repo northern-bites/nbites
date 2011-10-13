@@ -12,6 +12,10 @@
 #include "NaoManLoader.h" // for loadManMethod
 #include "include/ExportDefines.h"
 
+#include "ManPreloaderInterface.h"
+
+class NaoManPreloader;
+
 #include "Speech.h"
 #include "Sensors.h"
 #include "RoboGuardian.h"
@@ -27,7 +31,7 @@ int _closeModule();
 
 END_FUNCTION_EXPORT
 
-class NaoManPreloader: public AL::ALModule {
+class NaoManPreloader: public AL::ALModule, public ManPreloaderInterface {
 
 public:
 
@@ -35,16 +39,27 @@ public:
     virtual ~NaoManPreloader();
 
 private:
-    void preloadMan();
+    void reloadMan();
+    void createMan();
+    void destroyMan();
+
+protected:
+
+    //imports the man library
     void importMan();
-    void linkManLoaderMethod();
+    //links the functions that are used to create man
+    void linkManLoaderMethods();
+    //call the loadMan function from the man library
     void launchMan();
+    //manually links to a method exported in man
+    template <class T> T linkToManMethod(std::string name);
 
 private:
     AL::ALPtr<AL::ALBroker> broker;
     //man link variables
     void* libman_handle;
     loadManMethod loadMan;
+    unloadManMethod unloadMan;
 
     boost::shared_ptr<Speech> speech;
     boost::shared_ptr<Sensors> sensors;

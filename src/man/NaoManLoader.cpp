@@ -62,4 +62,9 @@ void loadMan(ALPtr<ALBroker> broker, shared_ptr<Speech> speech,
     man_pointer->startSubThreads();
 }
 
+void unloadMan() {
+    man_pointer->stopSubThreads();
+    man_pointer.reset();
+}
+
 END_FUNCTION_EXPORT

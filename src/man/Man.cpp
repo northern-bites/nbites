@@ -120,7 +120,6 @@ Man::Man (shared_ptr<Profiler> _profiler,
 Man::~Man ()
 {
   cout << "Man destructor" << endl;
-  exit(0);
 }
 
 void Man::startSubThreads() {

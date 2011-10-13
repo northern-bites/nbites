@@ -29,6 +29,7 @@
 #include "Sensors.h"
 #include "MotionInterface.h"
 #include "ClickableButton.h"
+#include "ManPreloaderInterface.h"
 
 #include "synchro.h"
 #include "guardian/WifiAngel.h"
@@ -43,7 +44,9 @@ enum  ButtonID {
 
 class RoboGuardian : public Thread {
 public:
-    RoboGuardian(boost::shared_ptr<Sensors>);
+    RoboGuardian(boost::shared_ptr<Sensors>,
+                 ManPreloaderInterface* manPreloader
+                     = ManPreloaderInterface::NullInstance());
     virtual ~RoboGuardian();
 
     void run();
@@ -62,8 +65,11 @@ public:
     //this should be mutex locked - if you set the pointer to NULL it might
     //after the guardian thread checked to see if the pointer was NULL
     //(and it wasn't) it might result in a segfault - Octavian
-    void setMotionInterface(MotionInterface * minterface)
+    void setMotionInterface(MotionInterface* minterface)
         { motion_interface = minterface; }
+
+    void setPreloader(ManPreloaderInterface* _preloader)
+        { manPreloader = _preloader; }
 
     void enableFallProtection(bool _useFallProtection) const
         { useFallProtection = _useFallProtection; };
@@ -92,6 +98,7 @@ private:
     //helpers
     std::string getHostName()const;
     void playFile(std::string filePath)const; //non-blocking
+    void reloadMan();
 
 public:
     static const int GUARDIAN_FRAME_RATE;
@@ -103,7 +110,8 @@ public:
 private:
 
     boost::shared_ptr<Sensors> sensors;
-    MotionInterface * motion_interface;
+    MotionInterface* motion_interface;
+    ManPreloaderInterface* manPreloader;
     std::vector<float> lastTemps;
     float lastBatteryCharge;
 
