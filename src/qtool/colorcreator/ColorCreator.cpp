@@ -100,7 +100,8 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     bitColor[Black] = GREY_COL;
 
     ui->setupUi(this);
-    //  default directories - should not be user specific
+    //  default directories - should not be user specific, but they are...
+    // Everyone needs to change baseDirectory before using
     baseDirectory = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites";
     baseFrameDirectory = baseDirectory + "/data/frames";
     baseColorTable = baseDirectory + "/data/tables";
@@ -152,130 +153,134 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     QString fileLoc = baseDirectory + "/src/qtool/pref/previousSliderFile";
     QFile previousSliderFile(fileLoc);
     short succesful = 0;
-    if (previousSliderFile.open(QIODevice::Text))
+    if (previousSliderFile.open(QIODevice::ReadOnly | QIODevice::Text))
       {
 	QString previousFileName;
 	QTextStream fileLocStream(&previousSliderFile);
 	previousFileName = fileLocStream.readLine();
-	qDebug() << "load previous" << endl;
-	succesful = setInitialColorValuesFromFile(previousFileName);
+	qDebug() << "load previous file opened: " << previousFileName << endl;
+	succesful = setInitialColorValuesFromFile(baseSliderDirectory + "/" + previousFileName);
       }
-
-    
-    if (succesful == 0)
-      qDebug() << "load default" << endl;
-	succesful = setInitialColorValuesFromFile("default");
 
     if (succesful == 0)
       {
-	qDebug() <<"load from c++"<<endl;
-
-	//initialize all of our values.  Ideally these will serve as a pretty good table
-	//for virtually any environment
-	//Note: it would be nice to be able to save values from various locations and load the appropriate one here
-	for (int i = 0; i < COLORS; i++)
-	  {
-	    switch(i)
-	      {
-	      case Orange:
-		fltSliders[hMin][i] = 0.80f;
-		fltSliders[hMax][i] = 0.13f;
-		fltSliders[sMin][i] = 0.25f;
-		fltSliders[sMax][i] = 1.0f;
-		fltSliders[zMin][i] = 0.12f;
-		fltSliders[zMax][i] = 1.0f;
-		intSliders[yMin][i] = 34;
-		intSliders[yMax][i] = 145;
-		intSliders[vMin][i] = 115;
-		intSliders[vMax][i] = 171;
-		break;
-	      case Green:
-		fltSliders[hMin][i] = 0.37f;
-		fltSliders[hMax][i] = 0.45f;
-		fltSliders[sMin][i] = 0.28f;
-		fltSliders[sMax][i] = 0.46f;
-		fltSliders[zMin][i] = 0.22f;
-		fltSliders[zMax][i] = 0.53f;
-		intSliders[yMin][i] = 55;
-		intSliders[yMax][i] = 105;
-		intSliders[vMin][i] = 90;
-		intSliders[vMax][i] = 131;
-		break;
-	      case Yellow:
-		fltSliders[hMin][i] = 0.17f;
-		fltSliders[hMax][i] = 0.26f;
-		fltSliders[sMin][i] = 0.32f;
-		fltSliders[sMax][i] = 0.69f;
-		fltSliders[zMin][i] = 0.27f;
-		fltSliders[zMax][i] = 0.48f;
-		intSliders[yMin][i] = 56;
-		intSliders[yMax][i] = 105;
-		intSliders[vMin][i] = 111;
-		intSliders[vMax][i] = 128;
-		break;
-	      case Blue:
-		fltSliders[hMin][i] = 0.54f;
-		fltSliders[hMax][i] = 0.67f;
-		fltSliders[sMin][i] = 0.30f;
-		fltSliders[sMax][i] = 0.65f;
-		fltSliders[zMin][i] = 0.23f;
-		fltSliders[zMax][i] = 0.48f;
-		intSliders[yMin][i] = 33;
-		intSliders[yMax][i] = 105;
-		intSliders[vMin][i] = 109;
-		intSliders[vMax][i] = 127;
-		break;
-	      case White:
-		fltSliders[hMin][i] = 0.01f;
-		fltSliders[hMax][i] = 0.01f;
-		fltSliders[sMin][i] = 0.0f;
-		fltSliders[sMax][i] = 0.38f;
-		fltSliders[zMin][i] = 0.39f;
-		fltSliders[zMax][i] = 1.0f;
-		intSliders[yMin][i] = 102;
-		intSliders[yMax][i] = 250;
-		intSliders[vMin][i] = 99;
-		intSliders[vMax][i] = 128;
-		break;
-	      case Pink:
-		fltSliders[hMin][i] = 0.75f;
-		fltSliders[hMax][i] = 0.22f;
-		fltSliders[sMin][i] = 0.0f;
-		fltSliders[sMax][i] = 0.29f;
-		fltSliders[zMin][i] = 0.21f;
-		fltSliders[zMax][i] = 0.54f;
-		intSliders[yMin][i] = 58;
-		intSliders[yMax][i] = 139;
-		intSliders[vMin][i] = 127;
-		intSliders[vMax][i] = 143;
-		break;
-	      case Navy:
-		fltSliders[hMin][i] = 0.57f;
-		fltSliders[hMax][i] = 0.68f;
-		fltSliders[sMin][i] = 0.23f;
-		fltSliders[sMax][i] = 0.42f;
-		fltSliders[zMin][i] = 0.17f;
-		fltSliders[zMax][i] = 0.45f;
-		intSliders[yMin][i] = 39;
-		intSliders[yMax][i] = 105;
-		intSliders[vMin][i] = 106;
-		intSliders[vMax][i] = 132;
-		break;
-	      default:
-		fltSliders[hMin][i] = 0.0f;
-		fltSliders[hMax][i] = 0.01f;
-		fltSliders[sMin][i] = 0.99f;
-		fltSliders[sMax][i] = 1.0f;
-		fltSliders[zMin][i] = 0.0f;
-		fltSliders[zMax][i] = 1.0f;
-		intSliders[yMin][i] = 30;
-		intSliders[yMax][i] = 230;
-		intSliders[vMin][i] = 40;
-		intSliders[vMax][i] = 150;
-		break;
-	      }
-	  }
+	qDebug() << "load default" << endl;
+	succesful = setInitialColorValuesFromFile("default");
       }
+
+    else
+	qDebug() << "Couldn't find a file to load!" << endl;
+
+    // if (succesful == 0)
+    //   {
+    // 	qDebug() <<"load from c++"<<endl;
+
+    // 	//initialize all of our values.  Ideally these will serve as a pretty good table
+    // 	//for virtually any environment
+    // 	//Note: it would be nice to be able to save values from various locations and load the appropriate one here
+    // 	for (int i = 0; i < COLORS; i++)
+    // 	  {
+    // 	    switch(i)
+    // 	      {
+    // 	      case Orange:
+    // 		fltSliders[hMin][i] = 0.80f;
+    // 		fltSliders[hMax][i] = 0.13f;
+    // 		fltSliders[sMin][i] = 0.25f;
+    // 		fltSliders[sMax][i] = 1.0f;
+    // 		fltSliders[zMin][i] = 0.12f;
+    // 		fltSliders[zMax][i] = 1.0f;
+    // 		intSliders[yMin][i] = 34;
+    // 		intSliders[yMax][i] = 145;
+    // 		intSliders[vMin][i] = 115;
+    // 		intSliders[vMax][i] = 171;
+    // 		break;
+    // 	      case Green:
+    // 		fltSliders[hMin][i] = 0.37f;
+    // 		fltSliders[hMax][i] = 0.45f;
+    // 		fltSliders[sMin][i] = 0.28f;
+    // 		fltSliders[sMax][i] = 0.46f;
+    // 		fltSliders[zMin][i] = 0.22f;
+    // 		fltSliders[zMax][i] = 0.53f;
+    // 		intSliders[yMin][i] = 55;
+    // 		intSliders[yMax][i] = 105;
+    // 		intSliders[vMin][i] = 90;
+    // 		intSliders[vMax][i] = 131;
+    // 		break;
+    // 	      case Yellow:
+    // 		fltSliders[hMin][i] = 0.17f;
+    // 		fltSliders[hMax][i] = 0.26f;
+    // 		fltSliders[sMin][i] = 0.32f;
+    // 		fltSliders[sMax][i] = 0.69f;
+    // 		fltSliders[zMin][i] = 0.27f;
+    // 		fltSliders[zMax][i] = 0.48f;
+    // 		intSliders[yMin][i] = 56;
+    // 		intSliders[yMax][i] = 105;
+    // 		intSliders[vMin][i] = 111;
+    // 		intSliders[vMax][i] = 128;
+    // 		break;
+    // 	      case Blue:
+    // 		fltSliders[hMin][i] = 0.54f;
+    // 		fltSliders[hMax][i] = 0.67f;
+    // 		fltSliders[sMin][i] = 0.30f;
+    // 		fltSliders[sMax][i] = 0.65f;
+    // 		fltSliders[zMin][i] = 0.23f;
+    // 		fltSliders[zMax][i] = 0.48f;
+    // 		intSliders[yMin][i] = 33;
+    // 		intSliders[yMax][i] = 105;
+    // 		intSliders[vMin][i] = 109;
+    // 		intSliders[vMax][i] = 127;
+    // 		break;
+    // 	      case White:
+    // 		fltSliders[hMin][i] = 0.01f;
+    // 		fltSliders[hMax][i] = 0.01f;
+    // 		fltSliders[sMin][i] = 0.0f;
+    // 		fltSliders[sMax][i] = 0.38f;
+    // 		fltSliders[zMin][i] = 0.39f;
+    // 		fltSliders[zMax][i] = 1.0f;
+    // 		intSliders[yMin][i] = 102;
+    // 		intSliders[yMax][i] = 250;
+    // 		intSliders[vMin][i] = 99;
+    // 		intSliders[vMax][i] = 128;
+    // 		break;
+    // 	      case Pink:
+    // 		fltSliders[hMin][i] = 0.75f;
+    // 		fltSliders[hMax][i] = 0.22f;
+    // 		fltSliders[sMin][i] = 0.0f;
+    // 		fltSliders[sMax][i] = 0.29f;
+    // 		fltSliders[zMin][i] = 0.21f;
+    // 		fltSliders[zMax][i] = 0.54f;
+    // 		intSliders[yMin][i] = 58;
+    // 		intSliders[yMax][i] = 139;
+    // 		intSliders[vMin][i] = 127;
+    // 		intSliders[vMax][i] = 143;
+    // 		break;
+    // 	      case Navy:
+    // 		fltSliders[hMin][i] = 0.57f;
+    // 		fltSliders[hMax][i] = 0.68f;
+    // 		fltSliders[sMin][i] = 0.23f;
+    // 		fltSliders[sMax][i] = 0.42f;
+    // 		fltSliders[zMin][i] = 0.17f;
+    // 		fltSliders[zMax][i] = 0.45f;
+    // 		intSliders[yMin][i] = 39;
+    // 		intSliders[yMax][i] = 105;
+    // 		intSliders[vMin][i] = 106;
+    // 		intSliders[vMax][i] = 132;
+    // 		break;
+    // 	      default:
+    // 		fltSliders[hMin][i] = 0.0f;
+    // 		fltSliders[hMax][i] = 0.01f;
+    // 		fltSliders[sMin][i] = 0.99f;
+    // 		fltSliders[sMax][i] = 1.0f;
+    // 		fltSliders[zMin][i] = 0.0f;
+    // 		fltSliders[zMax][i] = 1.0f;
+    // 		intSliders[yMin][i] = 30;
+    // 		intSliders[yMax][i] = 230;
+    // 		intSliders[vMin][i] = 40;
+    // 		intSliders[vMax][i] = 150;
+    // 		break;
+    // 	      }
+    // 	  }
+    //   }
 
     // set the sliders to start at correct values
     ui->hMin->setValue(fltSliders[hMin][currentColor] * 100);
@@ -302,9 +307,22 @@ ColorCreator::~ColorCreator()
 
   short ColorCreator::setInitialColorValuesFromFile(QString filename)
   {
+    //Set the current file to be loaded next time QTool is used
+    QString fileLoc = baseDirectory + "/src/qtool/pref/previousSliderFile";
+    QFile previousSliderFile(fileLoc);
+    if (previousSliderFile.open(QIODevice::WriteOnly | QIODevice::Text))
+      {
+    	qDebug() << "Now Write the prefs file to: " << filename << endl;
+    	QTextStream previousSliderFileStream(&previousSliderFile);
+    	previousSliderFileStream << filename << endl;
+      }
+
+
     QFile dataFile(filename);
+    qDebug() << "Attempt to open filename = " << filename << endl;
     if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text))
       {
+	qDebug() << "Succeed" << endl;
 	QString nextString;
 	QTextStream dataFileStream(&dataFile);
 
@@ -331,10 +349,10 @@ ColorCreator::~ColorCreator()
 		  intSliders[i][j-1] = nextString.toInt();
 	      }
 	  }
-	qDebug() << "return 1 as the short" << endl;
+	qDebug() << "Succesfully Set Slider values from: " << filename << endl;
 	return 1;
-	
       }
+    qDebug() << "FAIL" << endl;
 
     return 0;
   }
@@ -342,12 +360,13 @@ ColorCreator::~ColorCreator()
   void ColorCreator::writeInitialColorValues(QString filename)
   {
     //Set the current file to be loaded next time QTool is used
-    // QFile fileLoc("fileLoc");
-    // if (fileLoc.open(QIODevice::WriteOnly | QIODevice::Text))
-    //   {
-    // 	QTextStream fileLocStream(&fileLoc);
-    // 	fileLocStream << filename << endl;
-    //   }
+    QString fileLoc = baseDirectory + "/src/qtool/pref/previousSliderFile";
+    QFile previousSliderFile(fileLoc);
+    if (previousSliderFile.open(QIODevice::WriteOnly | QIODevice::Text))
+      {
+	QTextStream previousSliderFileStream(&fileLoc);
+	previousSliderFileStream >> filename >> endl;
+      }
 
     //Create the file to store the current values
     QFile newFile(filename);
