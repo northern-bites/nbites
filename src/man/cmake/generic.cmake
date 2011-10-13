@@ -25,6 +25,11 @@ if (CCACHE)
   SET( CMAKE_C_COMPILER ${CCACHE})
 endif()
 
+######## PyVersion
+### Note: the robots currently use 2.6, so this is to make sure cmake
+### looks for the right thing
+SET( CMAKE_USE_PYTHON_VERSION 2.6 )
+
 ########################## FIND PATH
 # we should look in the naoqi sdk folder for the libraries we need first
 # so we use the same version as on the robot
