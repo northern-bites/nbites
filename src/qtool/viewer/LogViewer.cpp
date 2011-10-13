@@ -19,6 +19,7 @@ using namespace man::memory;
         prevButton = new QPushButton(tr("&Previous"));
 
         connect(nextButton, SIGNAL(clicked()), this, SLOT(nextImage()));
+        connect(prevButton, SIGNAL(clicked()), this, SLOT(prevImage()));
 
         toolbar->addWidget(prevButton);
         toolbar->addWidget(nextButton);
