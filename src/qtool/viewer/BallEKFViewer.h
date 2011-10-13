@@ -15,23 +15,23 @@
 #include <vector>
 
 #include "data/DataManager.h"
-#include "RoboImageViewer.h"
+#include "EKFDataViewer.h"
 #include "MObjectViewer.h"
 
 namespace qtool {
 namespace viewer {
 
 class BallEKFViewer : public QMainWindow{
-	Q_OBJECT
+        Q_OBJECT
 
 public:
 	BallEKFViewer(data::DataManager::ptr dataManager);
 
 private:
-	std::vector<QDockWidget*> dockWidget;
-	data::DataManager::ptr dataManager;
-	RoboImageViewer* roboImageViewer;
-
+    std::vector<QDockWidget*> dockWidget;
+    data::DataManager::ptr dataManager;
+    EKFDataViewer* ekfDataViewer;
+ 
 };
 
 }

@@ -17,13 +17,15 @@ set( viewer_srcs LogViewer.cpp
                  MObjectViewer.cpp
                  RoboImageViewer.cpp
 		 BallEKFViewer.cpp
-		 FieldViewer.cpp)
+		 FieldViewer.cpp
+		 EKFDataViewer.cpp)
 
 set( viewer_headers LogViewer.h
                     MObjectViewer.h
                     RoboImageViewer.h
 		    BallEKFViewer.h
-		    FieldViewer.h)
+		    FieldViewer.h
+		    EKFDataViewer.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
