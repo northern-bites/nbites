@@ -159,7 +159,7 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
 	QTextStream fileLocStream(&previousSliderFile);
 	previousFileName = fileLocStream.readLine();
 	qDebug() << "load previous file opened: " << previousFileName << endl;
-	succesful = setInitialColorValuesFromFile(baseSliderDirectory + "/" + previousFileName);
+	succesful = setInitialColorValuesFromFile(previousFileName);
       }
 
     if (succesful == 0)
@@ -168,7 +168,7 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
 	succesful = setInitialColorValuesFromFile("default");
       }
 
-    else
+    if (succesful == 0)
 	qDebug() << "Couldn't find a file to load!" << endl;
 
     // if (succesful == 0)
