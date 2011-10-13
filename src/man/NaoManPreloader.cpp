@@ -42,8 +42,8 @@ NaoManPreloader::NaoManPreloader(AL::ALPtr<AL::ALBroker> pBroker,
 }
 
 NaoManPreloader::~NaoManPreloader() {
-    //TODO: this should call the man destructor in some way
     debug_preloader_out << "Destroying the man preloader" << endl;
+    destroyMan();
     guardian->stop();
     guardian->waitForThreadToFinish();
 }
