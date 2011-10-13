@@ -128,63 +128,45 @@ Man::~Man ()
 void Man::startSubThreads() {
 
 #ifdef DEBUG_MAN_THREADING
-  cout << "Man::start" << endl;
+    cout << "Man starting" << endl;
 #endif
 
-  if (comm->start() != 0)
-    cerr << "Comm failed to start" << endl;
+    if (comm->start() != 0)
+        cerr << "Comm failed to start" << endl;
 
 #ifdef USE_MOTION
-  // Start Motion thread (it handles its own threading
-  if (motion->start() != 0)
-    cerr << "Motion failed to start" << endl;
+    // Start Motion thread (it handles its own threading
+    if (motion->start() != 0)
+        cerr << "Motion failed to start" << endl;
 #endif
 
 
-  if(guardian->start() != 0)
-    cout << "RoboGuardian failed to start" << endl;
+    if(guardian->start() != 0)
+        cout << "RoboGuardian failed to start" << endl;
 
-
-#ifdef DEBUG_MAN_THREADING
-  cout << "  run :: Signalling start" << endl;
-#endif
-
-//  printf("Start time: %lli \n", process_micro_time());
-//  CALLGRIND_START_INSTRUMENTATION;
-//  CALLGRIND_TOGGLE_COLLECT;
+    //  CALLGRIND_START_INSTRUMENTATION;
+    //  CALLGRIND_TOGGLE_COLLECT;
 }
 
 void Man::stopSubThreads() {
 
-  guardian->stop();
-  guardian->getTrigger()->await_off();
 #ifdef DEBUG_MAN_THREADING
-  cout << "  Guardian thread is stopped" << endl;
+    cout << "Man stopping: " << endl;
 #endif
 
-#ifdef DEBUG_MAN_THREADING
-  cout << "  Man stoping:" << endl;
-#endif
+    guardian->stop();
+    guardian->waitForThreadToFinish();
 
 #ifdef USE_MOTION
-  // Finished with run loop, stop sub-threads and exit
-  motion->stop();
-  motion->getTrigger()->await_off();
-#ifdef DEBUG_MAN_THREADING
-  cout << "  Motion thread is stopped" << endl;
+    motion->stop();
+    motion->waitForThreadToFinish();
 #endif
 
-#endif
-  //TODO: fix this from hanging
-//  comm->stop();
-//  comm->getTrigger()->await_off();
-  // @jfishman - tool will not exit, due to socket blocking
-  //comm->getTOOLTrigger()->await_off();
-#ifdef DEBUG_MAN_THREADING
-  cout << "  Comm thread is stopped" << endl;
-#endif
-  //hack - this ensures we exit with no segfault
-  //atm naoqi crashes when it tries to call exit on the dcm
+    //TODO: fix this from hanging
+    //  comm->stop();
+    //  comm->getTrigger()->await_off();
+    // @jfishman - tool will not exit, due to socket blocking
+    //comm->getTOOLTrigger()->await_off();
 }
 
 void

@@ -134,8 +134,7 @@ class Trigger
   : public TriggeredEvent
 {
   public:
-    Trigger(boost::shared_ptr<Synchro> _synchro, std::string name,
-            bool _value=false);
+    Trigger(std::string name, bool _value=false);
     virtual ~Trigger() { }
 
     void flip();
@@ -153,9 +152,9 @@ class Trigger
 
   private:
     boost::shared_ptr<pthread_mutex_t> mutex;
-    boost::shared_ptr<Event> on_event;
-    boost::shared_ptr<Event> off_event;
-    boost::shared_ptr<Event> flip_event;
+    Event on_event;
+    Event off_event;
+    Event flip_event;
     bool value;
 };
 
@@ -173,14 +172,10 @@ public:
     virtual void stop();
 
     void signalToResume();
+    void waitForThreadToFinish();
 
     // Overload this method to run your thread code
     virtual void run() = 0;
-
-    // These are/should only fired once!  be careful, or deadlock could ensue
-    const boost::shared_ptr<TriggeredEvent> getTrigger() const {
-        return trigger;
-    }
 
 protected:
     void waitForSignal();

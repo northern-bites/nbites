@@ -34,9 +34,7 @@ public:
 
     int  startTOOL();
     void stopTOOL();
-    const boost::shared_ptr<TriggeredEvent> getTOOLTrigger() {
-        return tool.getTrigger();
-    }
+
     void setLocalizationAccess(boost::shared_ptr<LocSystem> _loc,
                                boost::shared_ptr<BallEKF> _ballEKF);
 
@@ -88,8 +86,8 @@ private:
     // or from itself.
     void updatePercentReceived();
 
-    // Gives an estimate for the latency in communications (i.e., the 
-    // difference between the timestamp of time sent contained in the 
+    // Gives an estimate for the latency in communications (i.e., the
+    // difference between the timestamp of time sent contained in the
     // packet data and the current time.)
     llong estimatePacketLatency(const CommPacketHeader &latestPacket);
 
@@ -113,7 +111,7 @@ private:
     int toolCommandState;
 
     // Socket information
-    int sockn;                               // Socket file descriptor. 
+    int sockn;                               // Socket file descriptor.
     int gc_sockn;                            // GameController socket file descriptor.
     struct sockaddr_in bind_addr;
     struct sockaddr_in broadcast_addr;

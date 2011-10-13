@@ -32,22 +32,17 @@ void TTMan::startSubThreads(){
 
 }
 void TTMan::stopSubThreads(){
+
 #ifdef DEBUG_MAN_THREADING
-    cout << "  TTMan stoping:" << endl;
+    cout << "  TTMan stopping:" << endl;
 #endif
 
     threadedImageTranscriber->stop();
-    threadedImageTranscriber->getTrigger()->await_off();
-#ifdef DEBUG_MAN_THREADING
-    cout << "  Image Transcriber thread is stopped" << endl;
-#endif
+    threadedImageTranscriber->waitForThreadToFinish();
 
     Man::stopSubThreads();
 
     threadedEnactor->stop();
-    threadedEnactor->getTrigger()->await_off();
-#ifdef DEBUG_MAN_THREADING
-    cout << "  Enactor thread is stopped" << endl;
-#endif
+    threadedEnactor->waitForThreadToFinish();
 }
 

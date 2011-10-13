@@ -31,7 +31,7 @@ using namespace boost;
 #ifdef DEBUG_THREAD
 #  define DEBUG_THREAD_CREATE
 #  define DEBUG_THREAD_START
-#  define DEUBG_THREAD_RUN
+#  define DEBUG_THREAD_RUN
 #  define DEBUG_THREAD_EXIT
 #endif
 
@@ -141,12 +141,12 @@ static const std::string SIGNAL_SUFFIX = "_signal";
 
 Thread::Thread (shared_ptr<Synchro> _synchro, string _name)
   : name(_name), synchro(_synchro), running(false),
-    trigger(new Trigger(_synchro, _name, false)),
+    trigger(new Trigger(_name, false)),
     signal(name + SIGNAL_SUFFIX)
 {
-#ifdef DEBUG_THREAD_CREATE
-    cout << "Creating Thread instance '" << name << "'" << endl;
-#endif
+    #ifdef DEBUG_THREAD_CREATE
+        cout << name << "::created" << endl;
+    #endif
 }
 
 Thread::~Thread ()
@@ -158,9 +158,9 @@ int Thread::start ()
     if (running)
         return -1;
 
-#ifdef DEBUG_THREAD_START
-    cout << "Start thread '" << name << "'" << endl;
-#endif
+    #ifdef DEBUG_THREAD_START
+        cout << name << "::starting" << endl;
+    #endif
 
     // Set thread attributes
     pthread_attr_t attr;
@@ -181,15 +181,20 @@ int Thread::start ()
 void Thread::stop ()
 {
     running = false;
+
+    #ifdef DEBUG_THREAD_EXIT
+        cout << this->name << "stopping" << endl;
+    #endif
 }
 
 void* Thread::runThread (void* _this)
 {
-#ifdef DEBUG_THREAD_RUN
-    cout << name << " run" << endl;
-#endif
-
     Thread* this_instance = reinterpret_cast<Thread*>(_this);
+
+    #ifdef DEBUG_THREAD_RUN
+        cout << this_instance->name << "::run" << endl;
+    #endif
+
     this_instance->running = true;
     this_instance->trigger->on();
 
@@ -198,10 +203,9 @@ void* Thread::runThread (void* _this)
     this_instance->running = false;
     this_instance->trigger->off();
 
-#ifdef DEBUG_THREAD_EXIT
-    cout << "Exit thread '" << reinterpret_cast<Thread*>(_this)->name << "'" <<
-        endl;
-#endif
+    #ifdef DEBUG_THREAD_EXIT
+        cout << this_instance->name << "::exiting" << endl;
+    #endif
     pthread_exit(NULL);
 }
 
@@ -213,11 +217,15 @@ void Thread::waitForSignal() {
     this->signal.await();
 }
 
-Trigger::Trigger (shared_ptr<Synchro> _synchro, string name, bool _v)
+void Thread::waitForThreadToFinish() {
+    this->trigger->await_off();
+}
+
+Trigger::Trigger (string name, bool _v)
   : mutex(shared_ptr<pthread_mutex_t>(new pthread_mutex_t(), MutexDeleter())),
-    on_event(_synchro->create(name + TRIGGER_ON_SUFFIX, mutex)),
-    off_event(_synchro->create(name + TRIGGER_OFF_SUFFIX, mutex)),
-    flip_event(_synchro->create(name + TRIGGER_FLIP_SUFFIX, mutex)),
+    on_event(name + TRIGGER_ON_SUFFIX, mutex),
+    off_event(name + TRIGGER_OFF_SUFFIX, mutex),
+    flip_event(name + TRIGGER_FLIP_SUFFIX, mutex),
     value(_v)
 {
     // Set mutex to recursive (reentrant)
@@ -234,10 +242,10 @@ void Trigger::flip ()
 
     value = !value;
     if (value)
-        on_event->signal();
+        on_event.signal();
     else
-        off_event->signal();
-    flip_event->signal();
+        off_event.signal();
+    flip_event.signal();
 
     release();
 }
@@ -249,8 +257,8 @@ void Trigger::on ()
     if (!value) {
         // flip and signal
         value = true;
-        on_event->signal();
-        flip_event->signal();
+        on_event.signal();
+        flip_event.signal();
     }
 
     release();
@@ -263,8 +271,8 @@ void Trigger::off ()
     if (value) {
         // flip and signal
         value = false;
-        off_event->signal();
-        flip_event->signal();
+        off_event.signal();
+        flip_event.signal();
     }
 
     release();
@@ -282,16 +290,16 @@ bool Trigger::poll ()
 void Trigger::await_on ()
 {
     if (!poll())
-        on_event->await();
+        on_event.await();
 }
 
 void Trigger::await_off ()
 {
     if (poll())
-        off_event->await();
+        off_event.await();
 }
 
 void Trigger::await_flip ()
 {
-    flip_event->await();
+    flip_event.await();
 }
