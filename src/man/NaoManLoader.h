@@ -26,4 +26,10 @@
 
 typedef void (*loadManMethod)(AL::ALPtr<AL::ALBroker> broker);
 
+START_FUNCTION_EXPORT
+
+void loadMan(AL::ALPtr<AL::ALBroker> broker);
+
+END_FUNCTION_EXPORT
+
 #endif // MANMODULE_H

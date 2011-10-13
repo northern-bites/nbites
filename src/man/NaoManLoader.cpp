@@ -18,7 +18,6 @@ typedef TMan ALMan;
 #include "ALSpeech.h"
 
 #include "vision/Profiler.h"
-#include "include/ExportDefines.h"
 
 using namespace std;
 using namespace AL;
