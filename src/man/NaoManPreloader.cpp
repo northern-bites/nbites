@@ -43,7 +43,7 @@ NaoManPreloader::NaoManPreloader(AL::ALPtr<AL::ALBroker> pBroker,
 
 NaoManPreloader::~NaoManPreloader() {
     //TODO: this should call the man destructor in some way
-    cout << "Destroying the man preloader" << endl;
+    debug_preloader_out << "Destroying the man preloader" << endl;
     guardian->stop();
     guardian->waitForThreadToFinish();
 }
@@ -55,13 +55,13 @@ void NaoManPreloader::createMan() {
 }
 
 void NaoManPreloader::reloadMan() {
-    cout << "Trying to reload man ... " << endl;
+    debug_preloader_out << "Trying to reload man ... " << endl;
     destroyMan();
     createMan();
 }
 
 void NaoManPreloader::destroyMan() {
-    cout << "Trying to unload man ... " << endl;
+    debug_preloader_out << "Trying to destroy man ... " << endl;
     (*unloadMan)();
     if (dlclose(libman_handle) != 0) {
         cout << dlerror() << endl;
@@ -70,7 +70,7 @@ void NaoManPreloader::destroyMan() {
 }
 
 void NaoManPreloader::importMan() {
-    cout << "Importing " + LIBMAN_NAME + " ... ";
+    debug_preloader_out << "Importing " + LIBMAN_NAME + " ... ";
     libman_handle = dlopen(LIBMAN_NAME.c_str(),
                            RTLD_LAZY);
     if (!libman_handle)
@@ -78,7 +78,7 @@ void NaoManPreloader::importMan() {
         cout << dlerror() << endl;
         std::exit(1);
     }
-    cout << "done"<<endl;
+    debug_preloader_out << "done"<<endl;
 }
 
 void NaoManPreloader::linkManLoaderMethods() {
@@ -89,7 +89,7 @@ void NaoManPreloader::linkManLoaderMethods() {
 
 template <class T>
 T NaoManPreloader::linkToManMethod(std::string name) {
-    cout << "Manually linking to " + name + " ... ";
+    debug_preloader_out << "Manually linking to " + name + " ... ";
     T method = reinterpret_cast<T>(
             dlsym(libman_handle, name.c_str()));
     if (method == NULL)
@@ -101,7 +101,7 @@ T NaoManPreloader::linkToManMethod(std::string name) {
 }
 
 void NaoManPreloader::launchMan() {
-    cout << "Launching man loader ... " << endl;
+    debug_preloader_out << "Launching man loader ... " << endl;
     assert(loadMan != NULL);
     (*loadMan)(broker, speech, sensors, guardian);
 }

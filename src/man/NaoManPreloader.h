@@ -13,6 +13,7 @@
 #include "include/ExportDefines.h"
 
 #include "ManPreloaderInterface.h"
+#include "NullStream.h"
 
 class NaoManPreloader;
 
@@ -30,6 +31,13 @@ int _createModule(AL::ALPtr<AL::ALBroker> pBroker);
 int _closeModule();
 
 END_FUNCTION_EXPORT
+
+#define DEBUG_PRELOADER
+#ifdef DEBUG_PRELOADER
+#define debug_preloader_out cout
+#else
+#define debug_preloader_out (*NullStream::NullInstance())
+#endif
 
 class NaoManPreloader: public AL::ALModule, public ManPreloaderInterface {
 
