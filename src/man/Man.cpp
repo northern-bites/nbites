@@ -27,7 +27,7 @@ using namespace man::memory::log;
 
 Man::Man (shared_ptr<Profiler> _profiler,
           shared_ptr<Sensors> _sensors,
-          shared_ptr<RoboGuardian> guardian,
+          shared_ptr<RoboGuardian> _guardian,
           shared_ptr<Transcriber> _transcriber,
           shared_ptr<ImageTranscriber> _imageTranscriber,
           shared_ptr<MotionEnactor> _enactor,
@@ -35,7 +35,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
           shared_ptr<Speech> _speech)
     :     profiler(_profiler),
           sensors(_sensors),
-          guardian(guardian),
+          guardian(_guardian),
           transcriber(_transcriber),
           imageTranscriber(_imageTranscriber),
           enactor(_enactor),
