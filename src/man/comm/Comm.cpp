@@ -431,6 +431,7 @@ Comm::Comm (shared_ptr<Sensors> s, shared_ptr<Vision> v)
 // Deconstructor
 Comm::~Comm ()
 {
+    cout << "Comm destructor" << endl;
     pthread_mutex_destroy(&comm_mutex);
 }
 

@@ -59,7 +59,7 @@ Noggin::Noggin (shared_ptr<Vision> v,
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
 #   endif
-    
+
     // Initialize the interpreter and C python extensions
     initializePython();
 
@@ -80,6 +80,7 @@ Noggin::Noggin (shared_ptr<Vision> v,
 
 Noggin::~Noggin ()
 {
+    cout << "Noggin destructor" << endl;
     Py_XDECREF(brain_instance);
     Py_XDECREF(brain_module);
 #   ifdef LOG_LOC

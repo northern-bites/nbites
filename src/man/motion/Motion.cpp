@@ -20,9 +20,12 @@
 
 #include <boost/shared_ptr.hpp>
 using namespace boost;
+#include <iostream>
+using namespace std;
 
 #include "Motion.h"
 #include "PyMotion.h"
+
 //#include "NaoEnactor.h"
 
 Motion::Motion (shared_ptr<MotionEnactor> _enactor,
@@ -38,6 +41,7 @@ Motion::Motion (shared_ptr<MotionEnactor> _enactor,
 }
 
 Motion::~Motion() {
+    cout << "Motion destructor" << endl;
     //enactor->setSwitchboard(NULL);
 }
 int Motion::start() {
