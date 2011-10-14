@@ -422,7 +422,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         break;
     case 3:
         //Say IP Address
-        reloadMan();
+        speakIPAddress();
         break;
     case 5:
         enableGains();
