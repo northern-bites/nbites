@@ -7,4 +7,7 @@
     static class_name* NullInstance() {\
         static boost::shared_ptr<class_name>NullInstancePtr(new class_name());\
         return NullInstancePtr.get();\
-    }
+    }\
+    static bool isTheNullInstance(class_name* instance) {\
+        return instance == NullInstance();\
+    }\
