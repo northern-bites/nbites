@@ -110,8 +110,7 @@ Man::Man (shared_ptr<Profiler> _profiler,
 #endif
 
 #ifdef USE_NOGGIN
-    noggin = shared_ptr<Noggin> (
-                                 new Noggin(vision, comm, guardian, sensors,
+    noggin = shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
                                             loggingBoard,
                                             motion->getInterface()));
 #endif// USE_NOGGIN
@@ -153,8 +152,8 @@ void Man::stopSubThreads() {
 #endif
 
     //TODO: fix this from hanging
-    //  comm->stop();
-    //  comm->getTrigger()->await_off();
+    comm->stop();
+    comm->waitForThreadToFinish();
     // @jfishman - tool will not exit, due to socket blocking
     //comm->getTOOLTrigger()->await_off();
 }
