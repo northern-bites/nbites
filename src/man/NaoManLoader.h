@@ -1,5 +1,6 @@
 /**
- * Naoqi module to load man.
+ * Naoqi module to create a static instance of man
+ * Useful when loading man as a dynamic library
  *
  * @author The Northern Bites - Bowdoin College, Brunswick, ME
  *
@@ -10,30 +11,34 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <alcommon/albroker.h>
-#include <alcommon/alproxy.h>
-#include <alcore/alptr.h>
-
-#include "manconfig.h"
 #include "include/ExportDefines.h"
 
-#include "ALSpeech.h"
-#include "Sensors.h"
-#include "RoboGuardian.h"
+#include "TMan.h"
 
-typedef void (*loadManMethod)(AL::ALPtr<AL::ALBroker> broker,
-                              boost::shared_ptr<Speech> speech,
-                              boost::shared_ptr<Sensors> sensors,
-                              boost::shared_ptr<RoboGuardian> guardian);
+//This is the method loadMan's signature
+typedef void (*loadManMethod)(
+        boost::shared_ptr<Profiler> profiler,
+        boost::shared_ptr<Sensors> sensors,
+        boost::shared_ptr<RoboGuardian> guardian,
+        boost::shared_ptr<Transcriber> transcriber,
+        boost::shared_ptr<ThreadedImageTranscriber> imageTranscriber,
+        boost::shared_ptr<MotionEnactor> enactor,
+        boost::shared_ptr<Lights> lights,
+        boost::shared_ptr<Speech> speech);
 
+//This is the method unloadMan's signature
 typedef void (*unloadManMethod)();
 
 START_FUNCTION_EXPORT
 
-void loadMan(AL::ALPtr<AL::ALBroker> broker,
-             boost::shared_ptr<Speech> speech,
+void loadMan(boost::shared_ptr<Profiler> profiler,
              boost::shared_ptr<Sensors> sensors,
-             boost::shared_ptr<RoboGuardian> guardian);
+             boost::shared_ptr<RoboGuardian> guardian,
+             boost::shared_ptr<Transcriber> transcriber,
+             boost::shared_ptr<ThreadedImageTranscriber> imageTranscriber,
+             boost::shared_ptr<MotionEnactor> enactor,
+             boost::shared_ptr<Lights> lights,
+             boost::shared_ptr<Speech> speech);
 
 void unloadMan();
 

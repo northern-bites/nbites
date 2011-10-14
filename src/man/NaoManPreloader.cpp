@@ -32,9 +32,16 @@ static string UNLOAD_MAN_METHOD_NAME="unloadMan";
 NaoManPreloader::NaoManPreloader(AL::ALPtr<AL::ALBroker> pBroker,
                                  const std::string& pName) :
                 ALModule(pBroker, pName), broker(pBroker),
-                speech(new Speech()),
+                profiler(new Profiler(&thread_micro_time,
+                                      &process_micro_time,
+                                      &monotonic_micro_time)),
                 sensors(new Sensors(speech)),
-                guardian(new RoboGuardian(sensors, this)){
+                guardian(new RoboGuardian(sensors, this)),
+                transcriber(new ALTranscriber(broker, sensors)),
+                imageTranscriber(new ALImageTranscriber(sensors, broker)),
+                enactor(new NaoEnactor(sensors, transcriber, broker)),
+                lights(new NaoLights(broker)),
+                speech(new ALSpeech(broker)){
 
     this->setModuleDescription("A module that kicks ass.");
     guardian->start();
@@ -103,6 +110,7 @@ T NaoManPreloader::linkToManMethod(std::string name) {
 void NaoManPreloader::launchMan() {
     debug_preloader_out << "Launching man loader ... " << endl;
     assert(loadMan != NULL);
-    (*loadMan)(broker, speech, sensors, guardian);
+    (*loadMan)(profiler, sensors, guardian, transcriber,
+               imageTranscriber, enactor, lights, speech);
 }
 
