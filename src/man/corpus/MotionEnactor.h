@@ -56,7 +56,6 @@ public:
     virtual void postSensors() = 0;
 
     void resetSwitchboard() {
-        std::cout << "Switchboard resetting to the NullInstance" <<std::endl;
         this->setSwitchboard(MotionSwitchboardInterface::NullInstance());
     }
 
