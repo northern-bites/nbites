@@ -128,12 +128,12 @@ void Man::startSubThreads() {
 #endif
 
     if (comm->start() != 0)
-        cerr << "Comm failed to start" << endl;
+        cout << "Comm failed to start" << endl;
 
 #ifdef USE_MOTION
     // Start Motion thread (it handles its own threading
     if (motion->start() != 0)
-        cerr << "Motion failed to start" << endl;
+        cout << "Motion failed to start" << endl;
 #endif
 
     //  CALLGRIND_START_INSTRUMENTATION;

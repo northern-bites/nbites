@@ -102,7 +102,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Sensors> s,
         // lowDebug, debug, lowInfo, info, warning, error, fatal
         log->setVerbosity("error");
     }catch (ALError &e) {
-        cerr << "Could not create a proxy to ALLogger module" << endl;
+        cout << "Could not create a proxy to ALLogger module" << endl;
     }
 
 #ifdef USE_VISION

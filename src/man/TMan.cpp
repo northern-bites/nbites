@@ -27,7 +27,7 @@ void TMan::startSubThreads(){
 
     // Start Image transcriber thread (it handles its own threading
     if (threadedImageTranscriber->start() != 0)
-        cerr << "Image transcriber failed to start" << endl;
+        cout << "Image transcriber failed to start" << endl;
 
 }
 

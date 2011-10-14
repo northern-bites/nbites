@@ -722,7 +722,7 @@ void Comm::send(const char *msg, int len, sockaddr_in &addr) throw(socket_error)
         if (result == -1 && errno == EAGAIN)
 	{
             result = -2;
-	    cerr << "Comm::send() : EAGAIN error!" << endl;
+	    cout << "Comm::send() : EAGAIN error!" << endl;
             nanosleep(&interval, &remainder);
         }
     }
@@ -988,7 +988,7 @@ void Comm::add_to_module()
     {
         if (!c_init_comm())
 	{
-            cerr << "Comm module failed to initialize the backend" << endl;
+            cout << "Comm module failed to initialize the backend" << endl;
             PyErr_Print();
         }
     }
