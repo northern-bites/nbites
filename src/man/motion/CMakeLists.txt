@@ -58,7 +58,7 @@ SET( MOTION_SRCS
 		     JointCommand
 		     MotionCommand
                      MotionConstants
-                     Motion.cpp
+                     Motion
                      MotionInterface
 		     MotionSwitchboard
 		     ScriptedProvider
@@ -155,21 +155,9 @@ INSTALL(
   PATTERN "*.py"
   )
 
-############################ LINKER LANGUAGE
-# For Mac's, set the target link language to use
-
-#IF( APPLE )
-  SET_TARGET_PROPERTIES(
-    ${MOTION_TARGET}
-    PROPERTIES LINKER_LANGUAGE CXX
-    )
-#ENDIF( APPLE )
-
-
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES(
   ${MOTION_TARGET}
-  ${ALCOMMON_LIBRARIES}
   ${PYTHON_LIBRARY}
   ${SENSORS_TARGET}
   ${Boost_PYTHON_LIBRARY}
