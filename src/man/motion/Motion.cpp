@@ -42,11 +42,10 @@ Motion::Motion (shared_ptr<MotionEnactor> _enactor,
 
 Motion::~Motion() {
     cout << "Motion destructor" << endl;
-    //enactor->setSwitchboard(NULL);
+    enactor->resetSwitchboard();
 }
 int Motion::start() {
     switchboard.start();
-
     return Thread::start();
 }
 
@@ -58,6 +57,5 @@ void Motion::stop() {
 void Motion::run(){
     //Setup the callback  in the enactor so it knows to call the switchboard
     enactor->setSwitchboard(&switchboard);
-
     switchboard.run();
 }

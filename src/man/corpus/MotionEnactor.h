@@ -34,8 +34,7 @@
  *
  * Future improvements. The interface could be more generalize by making
  * the switchboard private, and require lower classes to call methods in this
- * class to access information from the switchboard. One could also abstract
- * the switchboard to make it easier to swap components. At this point,
+ * class to access information from the switchboard. At this point,
  * there is no need for that extra effort however. Also this class should be
  * named "Enactor" not MotionEnactor
  *
@@ -50,20 +49,29 @@
 class MotionEnactor {
 public:
     MotionEnactor()
-        : switchboard(NULL),switchboardSet(false){};
+        : switchboard(MotionSwitchboardInterface::NullInstance()) {}
     virtual ~MotionEnactor() { }
 
     virtual void sendCommands() = 0;
     virtual void postSensors() = 0;
 
-    void setSwitchboard(MotionSwitchboard * s){
-        std::cout << "Switchboard Set" <<std::endl;
+    void resetSwitchboard() {
+        std::cout << "Switchboard resetting to the NullInstance" <<std::endl;
+        this->setSwitchboard(MotionSwitchboardInterface::NullInstance());
+    }
+
+    void setSwitchboard(MotionSwitchboardInterface * s){
+        assert(s != NULL);
+        if (MotionSwitchboardInterface::isTheNullInstance(s)) {
+            std::cout << "Switchboard reset to the Null Instance" << std::endl;
+        } else {
+            std::cout << "Switchboard set" <<std::endl;
+        }
         switchboard = s;
-        switchboardSet = true;
     }
 
 protected:
-    MotionSwitchboard *switchboard;
+    MotionSwitchboardInterface *switchboard;
     bool switchboardSet; //Only true once the switchboard is set.
                          //Helps generate valid error messages when
                          //switchboard is deconstructed
