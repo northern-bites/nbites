@@ -25,4 +25,4 @@
     }\
     static bool isTheNullInstance(class_name* instance) {\
         return instance == NullInstance();\
-    }\
+    }
