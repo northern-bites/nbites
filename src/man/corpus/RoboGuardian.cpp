@@ -8,8 +8,6 @@ using namespace std;
 
 #include "Kinematics.h"
 
-#include "FreezeCommand.h"
-#include "UnfreezeCommand.h"
 #include "guardian/SoundPaths.h"
 #include "Profiler.h"
 
