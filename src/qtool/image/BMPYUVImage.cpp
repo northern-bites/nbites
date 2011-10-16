@@ -3,7 +3,8 @@
 
 BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage) :
 	YUVImage(rawImage),
-	bitmap(width, height, QImage::Format_RGB32)
+	bitmap(width, height, QImage::Format_RGB32),
+	bitmapType(Color)
 { }
 
 void BMPYUVImage::updateFromRawImage() {
