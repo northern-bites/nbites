@@ -35,8 +35,8 @@ public:
 
     virtual std::string debugInfo() const = 0;
 
-    virtual uint32_t getCurrentPosition() const {
-        return lseek(file_descriptor, 0, SEEK_CUR);
+    virtual uint64_t getCurrentPosition() const {
+        return lseek64(file_descriptor, 0, SEEK_CUR);
     }
 
     virtual bool rewind(uint32_t offset) const { return true; }

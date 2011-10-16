@@ -7,8 +7,8 @@ const int theta_width = 1;
 
 OdoFilter::OdoFilter()
     : velX(x_width),
-      velY(y_width),
-      velTheta(theta_width)
+      velTheta(theta_width),
+      velY(y_width)
 {
     Reset();
 }
@@ -32,19 +32,19 @@ std::vector<float> OdoFilter::getOdometry()
 {
     float dy;
     if (velY.Steady())
-	dy = velY.Y();
+        dy = float(velY.Y());
     else
 	dy = 0;
 
     float dx;
     if (velX.Steady())
-	dx = velX.Y();
+        dx = float(velX.Y());
     else
 	dx = 0;
 
     float dt;
     if (velTheta.Steady())
-	dt = velTheta.Y();
+        dt = float(velTheta.Y());
     else
 	dt = 0;
 

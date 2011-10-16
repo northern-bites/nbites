@@ -60,7 +60,7 @@ void NetworkMonitor::packetReceived(long long timeSent, long long timeReceived)
     else
     {
 	// Calculate the latency. Add to latency monitor.
-	latency.X(timeReceived - timeSent);
+        latency.X(double(timeReceived - timeSent));
     }
 }
 

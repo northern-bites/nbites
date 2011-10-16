@@ -108,9 +108,8 @@ class KickDecider(object):
                 self.info.kick.isBackKick():
             self.info.kick = kicks.ORBIT_KICK_POSITION
 
-        print "I'm at position x: {0} y: {1} h: {2}".format(self.brain.my.x,
-                                                            self.brain.my.y,
-                                                            self.brain.my.h)
+        print "I'm at position " + str(self.brain.my)
+
         print "Chose: {0}".format(self.info.kick)
 
     def score(self):
