@@ -20,6 +20,7 @@ using namespace ALNames;
 #include "Kinematics.h"
 using Kinematics::jointsMaxVelNoLoad;
 
+//TODO: this might cause a segfault if the pointer n becomes invalid
 void staticPostSensors(NaoEnactor * n) {
     if (n != NULL) {
         n->postSensors();
