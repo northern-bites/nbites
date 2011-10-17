@@ -84,7 +84,7 @@ static PyObject * PyComm_latestComm (PyObject *self, PyObject *args)
 		fields = PyList_New(v.size());
 		if (fields == NULL)
 			goto abort;
-		for (int j = 0; j < v.size(); j++)
+		for (uint j = 0; j < v.size(); j++)
 		{
 			f = PyFloat_FromDouble(v[j]);
 			if (f == NULL)
@@ -413,9 +413,10 @@ PyMODINIT_FUNC init_comm (void)
 // Constructor
 Comm::Comm (shared_ptr<Sensors> s, shared_ptr<Vision> v)
     : Thread("Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
-	  latest(), sensors(s), timer(&monotonic_micro_time),
-      gc(new GameController()), tool(s, v, gc), averagePacketDelay(0),
-      totalPacketsReceived(0), ourPacketsReceived(0), lastPacketNumber(0)
+      lastPacketNumber(0),  latest(), sensors(s),
+      timer(&monotonic_micro_time), gc(new GameController()),
+      tool(s, v, gc), averagePacketDelay(0),
+      totalPacketsReceived(0), ourPacketsReceived(0)
 {
     pthread_mutex_init(&comm_mutex,NULL);
     // initialize broadcast address structure
@@ -1075,7 +1076,7 @@ void Comm::updateAverageDelay()
     if(averagePacketDelay == 0)
         newAverage = delay;
     else
-	newAverage = (llong)(0.5 * (averagePacketDelay + delay));
+        newAverage = (llong)(0.5 * double(averagePacketDelay + delay));
 
 #ifdef DEBUG_COMM
     cout << Thread::name << ": updateAverageDelay() : average delay == "

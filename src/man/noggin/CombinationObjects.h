@@ -88,6 +88,7 @@ namespace noggin {
 
         // For Python
         bool hasattr(boost::python::object, const std::string&);
+        boost::python::str toString();
 
     protected:
         float x, y;
@@ -122,6 +123,9 @@ namespace noggin {
         const degrees getRelativeBearing(Location& other);
         const float spinDirToPoint(Location& other);
 
+        //For python
+        boost::python::str toString();
+
     protected:
         radians h;
     };
@@ -149,6 +153,9 @@ namespace noggin {
         void setRelX(float _x){ relX = _x; }
         void setRelY(float _y){ relY = _y; }
         void setRelH(degrees _h){ relH = _h*TO_RAD; }
+
+        // For python
+        boost::python::str toString();
 
     private:
         float relX, relY;

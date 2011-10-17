@@ -27,7 +27,6 @@ SET( NBINCLUDE_SRCS NBMatrixMath
   synchro/mutex
   synchro/synchro
   synchro/messaging
-  synchro/_synchromodule
   CoordFrame4D
   CoordFrame3D
   Profiler
