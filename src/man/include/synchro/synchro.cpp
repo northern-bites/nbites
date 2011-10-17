@@ -67,12 +67,6 @@ void Event::await ()
     pthread_mutex_unlock(mutex.get());
 }
 
-//TODO: delete this after we get rid of PySynchro
-bool Event::poll ()
-{
-
-}
-
 void Event::signal ()
 {
     pthread_mutex_lock(mutex.get());

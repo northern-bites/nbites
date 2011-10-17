@@ -70,7 +70,6 @@ public:
     // Note : that holds true only for the first thread calling await,
     // since await sets signalled to false afterwards
     void await();
-    bool poll();
     // Signals threads waiting on this event to resume
     // It also sets signalled to true, so that if a thread starts waiting
     // on the event after it's been signalled, it doesn't get stuck on it
