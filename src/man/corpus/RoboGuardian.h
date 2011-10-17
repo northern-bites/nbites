@@ -31,7 +31,7 @@
 #include "ClickableButton.h"
 #include "ManPreloaderInterface.h"
 
-#include "synchro.h"
+#include "synchro/synchro.h"
 #include "guardian/WifiAngel.h"
 
 //TODO: move this to the guardian folder

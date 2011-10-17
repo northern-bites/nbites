@@ -3,7 +3,7 @@
 
 #include "Man.h"
 #include "manconfig.h"
-#include "corpus/synchro.h"
+#include "synchro/synchro.h"
 #include "VisionDef.h"
 #include "Common.h"
 #include "PyRoboGuardian.h"

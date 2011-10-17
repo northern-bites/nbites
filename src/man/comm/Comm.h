@@ -8,7 +8,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Common.h"
-#include "synchro.h"
+#include "synchro/synchro.h"
 #include "Sensors.h"
 #include "CommDef.h"
 #include "RoboCupGameControlData.h"

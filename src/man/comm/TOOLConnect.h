@@ -6,7 +6,7 @@
 class TOOLConnect; // forward reference
 
 #  include <boost/shared_ptr.hpp>
-#  include "synchro.h"
+#  include "synchro/synchro.h"
 #  include "Sensors.h"
 #  include "Vision.h"
 

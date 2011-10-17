@@ -35,14 +35,6 @@ CONFIGURE_FILE(
   ESCAPE_QUOTES
   )
 
-
-############################ DEFINITIONS
-# Add here definition needed.
-ADD_DEFINITIONS(
-  ${CMAKE_THREAD_LIBS_INIT}
-  )
-
-
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES(
@@ -52,7 +44,6 @@ INCLUDE_DIRECTORIES(
   ${CFG_DIR}
   ${BOOST_INCLUDE_DIR}
   )
-
 
 #Possibly, don't need to include any AL or WEBOTS stuff in this directory
 # since we may inherit it from man
@@ -72,20 +63,14 @@ SET( SENSORS_SRCS Sensors
   CameraCalibrate
   )
 
-
-###### SYNCHRO ############
-
-SET( SYNCHRO_SRCS synchro
-  _synchromodule
-  messaging
-  )
-
 ########### ROBOT CONNECT #########
 SET( ROBOT_INTERFACE_SRCS
   AccEKF
   RoboGuardian
   guardian/ConnectionAngel
   guardian/WifiAngel
+  ImageAcquisition
+  ColorParams
   ClickableButton
   PyRoboGuardian
   Lights
@@ -113,53 +98,28 @@ ELSE(WEBOTS_BACKEND)
     )
 ENDIF(WEBOTS_BACKEND)
 
-
-#IF( PYTHON_SHARED_CORPUS )
-#  LIST( APPEND SENSORS_SRCS ${VISION_INCLUDE_DIR}/Pose
-#                            ${VISION_INCLUDE_DIR}/PoseMatrix
-#                            )
-#ENDIF( PYTHON_SHARED_CORPUS )
-
 SET( CORPUS_PYTHON_SRCS
   leds.py
   sensors.py
-  synchro.py
   )
 
-SET( CORPUS_TEST_DIR test )
-
-
-###### NBINCLUDE STUFF ####
-
-SET( NBINCLUDE_SRCS ${NBCOMMON_INCLUDE_DIR}/NBMatrixMath
-  ${NBCOMMON_INCLUDE_DIR}/NBMath
-  ImageAcquisition
-  ColorParams
-  ${NBCOMMON_INCLUDE_DIR}/dsp
-  ${NBCOMMON_INCLUDE_DIR}/SensorMonitor
-  ${NBCOMMON_INCLUDE_DIR}/BulkMonitor
-  ${NBCOMMON_INCLUDE_DIR}/synchro/mutex
-  CoordFrame4D
-  CoordFrame3D
-  )
-
-# Add the assembly files if we're not on Mac OSX
+# Add the assembly files if we're on Linux
 IF (UNIX AND NOT APPLE)
-  LIST( APPEND NBINCLUDE_SRCS
+  LIST( APPEND ROBOT_INTERFACE_SRCS
     ImageAcquisition.s
     ImageAcquisitionFast.s
     CopyImage.s
     )
 
-SET_PROPERTY(SOURCE
-  ImageAcquisition.s
-  ImageAcquisitionFast.s
-  CopyImage.s
- PROPERTY LANGUAGE C
- )
+  SET_PROPERTY(SOURCE
+    ImageAcquisition.s
+    ImageAcquisitionFast.s
+    CopyImage.s
+    PROPERTY LANGUAGE C )
 
 ENDIF()
 
+SET( CORPUS_TEST_DIR test )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
@@ -171,29 +131,14 @@ IF( PYTHON_SHARED_CORPUS )
     SHARED
     ${SENSORS_SRCS}
     )
-
-  ADD_LIBRARY(
-    ${SYNCHRO_TARGET}
-    SHARED
-    ${SYNCHRO_SRCS}
-    )
   ADD_LIBRARY(
     ${ROBOT_CONNECT_TARGET}
     SHARED
     ${ROBOT_CONNECT_SRCS}
     )
-  ADD_LIBRARY(
-    ${NBINCLUDE_TARGET}
-    SHARED
-    ${NBINCLUDE_SRCS}
-    )
-
   GET_TARGET_PROPERTY( SENSORS_TARGET_LOCATION ${SENSORS_TARGET} LOCATION )
-  GET_TARGET_PROPERTY( SYNCHRO_TARGET_LOCATION   ${SYNCHRO_TARGET}   LOCATION )
   GET_TARGET_PROPERTY( ROBOT_CONNECT_TARGET_LOCATION
     ${ROBOT_CONNECT_TARGET}   LOCATION )
-  GET_TARGET_PROPERTY( NBINCLUDE_TARGET_LOCATION
-    ${NBINCLUDE_TARGET}   LOCATION )
   # Install to TARGETmodule.so, instead of lib_TARGET.so
   INSTALL(
     FILES ${SENSORS_TARGET_LOCATION}
@@ -202,22 +147,10 @@ IF( PYTHON_SHARED_CORPUS )
     RENAME ${SENSORS_TARGET}module.so
     )
   INSTALL(
-    FILES ${SYNCHRO_TARGET_LOCATION}
-    DESTINATION ${CORPUS_PYTHON_TARGET_DIR}
-    CONFIGURATIONS "" Debug Release
-    RENAME ${SYNCHRO_TARGET}module.so
-    )
-  INSTALL(
     FILES ${ROBOT_CONNECT_TARGET_LOCATION}
     DESTINATION ${CORPUS_PYTHON_TARGET_DIR}
     CONFIGURATIONS "" Debug Release
     RENAME ${ROBOT_CONNECT_TARGET}module.so
-    )
-  INSTALL(
-    FILES ${NBINCLUDE_TARGET_LOCATION}
-    DESTINATION ${CORPUS_PYTHON_TARGET_DIR}
-    CONFIGURATIONS "" Debug Release
-    RENAME ${NBINCLUDE_TARGET_LOCATION}module.so
     )
 
 ELSE( PYTHON_SHARED_CORPUS )
@@ -225,11 +158,6 @@ ELSE( PYTHON_SHARED_CORPUS )
     ${SENSORS_TARGET}
     STATIC
     ${SENSORS_SRCS}
-    )
-  ADD_LIBRARY(
-    ${SYNCHRO_TARGET}
-    STATIC
-    ${SYNCHRO_SRCS}
     )
   ADD_LIBRARY(
     ${ROBOT_CONNECT_TARGET}
@@ -240,11 +168,6 @@ ELSE( PYTHON_SHARED_CORPUS )
     ${ROBOT_INTERFACE_TARGET}
     STATIC
     ${ROBOT_INTERFACE_SRCS}
-    )
-  ADD_LIBRARY(
-    ${NBINCLUDE_TARGET}
-    STATIC
-    ${NBINCLUDE_SRCS}
     )
   # No INSTALL target when static
 ENDIF( PYTHON_SHARED_CORPUS )
@@ -265,22 +188,20 @@ SET_TARGET_PROPERTIES( ${SENSORS_TARGET} PROPERTIES LINKER_LANGUAGE CXX )
 TARGET_LINK_LIBRARIES( ${SENSORS_TARGET}
   ${PYTHON_LIBRARY}
   ${Boost_PYTHON_LIBRARY}
+  ${NBINCLUDE_TARGET}
   )
 
 TARGET_LINK_LIBRARIES( ${ROBOT_INTERFACE_TARGET}
   ${SENSORS_TARGET}
-  ${SYNCHRO_TARGET}
   ${PYTHON_LIBRARIES}
-  ${MOTION_TARGET}
+  ${MOTION_TARGET} #for motioninterface in roboguardian
+  ${NBINCLUDE_TARGET}
   ${Boost_PYTHON_LIBRARY}
   )
 
 TARGET_LINK_LIBRARIES( ${ROBOT_CONNECT_TARGET}
   ${ALCOMMON_LIBRARIES}
   ${ROBOT_INTERFACE_TARGET}
-  )
-
-TARGET_LINK_LIBRARIES( ${NBINCLUDE_TARGET}
   )
 
 ############################ (SUB)DIRECTORY COMPILATION

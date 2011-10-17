@@ -186,7 +186,6 @@ TARGET_LINK_LIBRARIES(
   ${MAN_TARGET}
   ${COMM_TARGET}
   ${SENSORS_TARGET}
-  ${SYNCHRO_TARGET}
   ${ROBOT_INTERFACE_TARGET}
   ${NBINCLUDE_TARGET}
   ${VISION_TARGET}
@@ -214,9 +213,8 @@ TARGET_LINK_LIBRARIES(
   ${MAN_PRELOADER_TARGET}
   ${NBINCLUDE_TARGET}
   ${SENSORS_TARGET}
+  ${ROBOT_INTERFACE_TARGET}
   ${ROBOT_CONNECT_TARGET}
-  ${MOTION_TARGET}
-  ${VISION_TARGET}
   )
 
 ############################# INSTALL PATHS
@@ -253,3 +251,4 @@ add_subdirectory( corpus )
 add_subdirectory( vision )
 add_subdirectory( motion )
 add_subdirectory( noggin )
+add_subdirectory( include )

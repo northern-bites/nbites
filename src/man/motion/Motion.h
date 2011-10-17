@@ -45,7 +45,7 @@
 #include "MotionInterface.h"
 #include "Sensors.h"
 #include "NaoPose.h"
-#include "synchro.h"
+#include "synchro/synchro.h"
 
 class Motion : public Thread
 {

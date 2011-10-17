@@ -25,7 +25,7 @@
 #include "NaoPose.h"
 #include "memory/Memory.h"
 #include "memory/log/LoggingBoard.h"
-#include "synchro.h"
+#include "synchro/synchro.h"
 #include "RoboGuardian.h"
 
 /**

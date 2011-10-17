@@ -8,7 +8,7 @@
 #include "alproxies/alvideodeviceproxy.h"
 
 #include "ThreadedImageTranscriber.h"
-#include "synchro.h"
+#include "synchro/synchro.h"
 #include "ColorParams.h"
 
 class ALImageTranscriber : public ThreadedImageTranscriber {

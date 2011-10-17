@@ -1,6 +1,6 @@
 
 #include "Logger.h"
-#include "synchro.h"
+#include "synchro/synchro.h"
 
 namespace man {
 namespace memory {

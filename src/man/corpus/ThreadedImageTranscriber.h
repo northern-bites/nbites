@@ -3,7 +3,7 @@
 
 
 #include "ImageTranscriber.h"
-#include "synchro.h"
+#include "synchro/synchro.h"
 
 class ThreadedImageTranscriber : public ImageTranscriber , public Thread{
  public:

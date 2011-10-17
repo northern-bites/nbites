@@ -12,7 +12,7 @@
 #include "corpusconfig.h"
 #include "ImageAcquisition.h"
 
-#include "vision/Profiler.h"
+#include "Profiler.h"
 
 #ifdef DEBUG_ALIMAGE
 #  define DEBUG_ALIMAGE_LOOP

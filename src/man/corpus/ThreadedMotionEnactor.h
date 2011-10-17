@@ -15,7 +15,7 @@
 #define _ThreadedMotionEnactor_h_DEFINED
 
 #include "MotionEnactor.h"
-#include "synchro.h"
+#include "synchro/synchro.h"
 
 class ThreadedMotionEnactor : public MotionEnactor , public Thread{
 public:
