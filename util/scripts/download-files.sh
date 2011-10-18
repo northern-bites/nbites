@@ -1,9 +1,6 @@
 
 # Script to download the extra libraries needed to run the Northern Bites man package on the Aldebaran Nao
 
-# LIBRARIES TO DOWNLOAD:
-LIBS=libboost_python-mt.so
-
 if [ $# -ne 1 ]; then
     echo "usage: ./download-libs.sh <Bowdoin username>"
     exit 1
