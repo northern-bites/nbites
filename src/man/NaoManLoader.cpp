@@ -3,6 +3,17 @@
 
 #include "NaoManLoader.h"
 
+#include "TMan.h"
+
+#include "Profiler.h"
+#include "ALSpeech.h"
+#include "Sensors.h"
+#include "RoboGuardian.h"
+#include "ALTranscriber.h"
+#include "ALImageTranscriber.h"
+#include "NaoEnactor.h"
+#include "NaoLights.h"
+
 using namespace std;
 using boost::shared_ptr;
 
@@ -10,17 +21,19 @@ static shared_ptr<TMan> man_pointer;
 
 START_FUNCTION_EXPORT
 
-void loadMan(shared_ptr<Profiler> profiler,
-             shared_ptr<Sensors> sensors,
-             shared_ptr<RoboGuardian> guardian,
-             shared_ptr<Transcriber> transcriber,
-             shared_ptr<ThreadedImageTranscriber> imageTranscriber,
-             shared_ptr<MotionEnactor> enactor,
-             shared_ptr<Lights> lights,
-             shared_ptr<Speech> speech) {
+void loadMan(AL::ALPtr<AL::ALBroker> broker) {
 
-    man_pointer = shared_ptr<TMan>(new TMan(profiler, sensors, guardian,
-                                            transcriber, imageTranscriber,
+    shared_ptr<Speech> speech(new ALSpeech(broker));
+    shared_ptr<Sensors> sensors(new Sensors(speech));
+    shared_ptr<Transcriber> transcriber(new ALTranscriber(broker, sensors));
+    shared_ptr<ThreadedImageTranscriber>
+        imageTranscriber(new ALImageTranscriber(sensors, broker));
+    shared_ptr<MotionEnactor>
+        enactor(new NaoEnactor(sensors, transcriber, broker));
+    shared_ptr<Lights> lights(new NaoLights(broker));
+
+    man_pointer = shared_ptr<TMan>(new TMan(sensors, transcriber,
+                                            imageTranscriber,
                                             enactor, lights, speech));
     man_pointer->startSubThreads();
 }

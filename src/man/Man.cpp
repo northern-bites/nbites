@@ -25,27 +25,21 @@ using namespace man::memory::log;
 //                                     //
 /////////////////////////////////////////
 
-Man::Man (shared_ptr<Profiler> _profiler,
-          shared_ptr<Sensors> _sensors,
-          shared_ptr<RoboGuardian> _guardian,
+Man::Man (shared_ptr<Sensors> _sensors,
           shared_ptr<Transcriber> _transcriber,
           shared_ptr<ImageTranscriber> _imageTranscriber,
           shared_ptr<MotionEnactor> _enactor,
           shared_ptr<Lights> _lights,
           shared_ptr<Speech> _speech)
-    :     profiler(_profiler),
-          sensors(_sensors),
-          guardian(_guardian),
+    :     sensors(_sensors),
           transcriber(_transcriber),
           imageTranscriber(_imageTranscriber),
           enactor(_enactor),
           lights(_lights),
           speech(_speech)
 {
-
 #ifdef USE_TIME_PROFILING
-    profiler->profiling = true;
-    profiler->profileFrames(1400);
+    Profiler::getInstance()->profileFrames(700);
 #endif
 
     // give python a pointer to the sensors structure. Method defined in
@@ -53,6 +47,8 @@ Man::Man (shared_ptr<Profiler> _profiler,
     set_sensors_pointer(sensors);
 
     imageTranscriber->setSubscriber(this);
+
+    guardian = shared_ptr<RoboGuardian>(new RoboGuardian(sensors));
 
     pose = shared_ptr<NaoPose> (new NaoPose(sensors));
 
@@ -101,6 +97,9 @@ void Man::startSubThreads() {
     cout << "Man starting" << endl;
 #endif
 
+    if (guardian->start() != 0)
+        cout << "Guardian failer to start" << endl;
+
     if (comm->start() != 0)
         cout << "Comm failed to start" << endl;
 
@@ -119,6 +118,9 @@ void Man::stopSubThreads() {
 #ifdef DEBUG_MAN_THREADING
     cout << "Man stopping: " << endl;
 #endif
+
+    guardian->stop();
+    guardian->waitForThreadToFinish();
 
 #ifdef USE_MOTION
     motion->stop();

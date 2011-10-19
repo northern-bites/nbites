@@ -67,6 +67,7 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
 
 NaoEnactor::~NaoEnactor()
 {
+    cout << "Nao enactor destructor" << endl;
     dcmPreConnection.disconnect();
     dcmPostConnection.disconnect();
 }

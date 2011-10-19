@@ -2,15 +2,13 @@
 
 using namespace std;
 
-TMan::TMan(boost::shared_ptr<Profiler> _profiler,
-           boost::shared_ptr<Sensors> _sensors,
-           boost::shared_ptr<RoboGuardian> guardian,
+TMan::TMan(boost::shared_ptr<Sensors> _sensors,
            boost::shared_ptr<Transcriber> _transcriber,
            boost::shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
            boost::shared_ptr<MotionEnactor> _enactor,
            boost::shared_ptr<Lights> _lights,
            boost::shared_ptr<Speech> _speech)
-    :Man(_profiler,_sensors, guardian, _transcriber, _imageTranscriber,
+    :Man(_sensors, _transcriber, _imageTranscriber,
          _enactor, _lights, _speech),
      threadedImageTranscriber(_imageTranscriber)
 {

@@ -15,17 +15,6 @@
 #include "ManPreloaderInterface.h"
 #include "NullStream.h"
 
-class NaoManPreloader;
-
-#include "Profiler.h"
-#include "ALSpeech.h"
-#include "Sensors.h"
-#include "RoboGuardian.h"
-#include "ALTranscriber.h"
-#include "ALImageTranscriber.h"
-#include "NaoEnactor.h"
-#include "NaoLights.h"
-
 START_FUNCTION_EXPORT
 
 //This is what Aldebaran will call when it loads this module
@@ -73,13 +62,4 @@ private:
     void* libman_handle;
     loadManMethod loadMan;
     unloadManMethod unloadMan;
-
-    boost::shared_ptr<Profiler> profiler;
-    boost::shared_ptr<Sensors> sensors;
-    boost::shared_ptr<RoboGuardian> guardian;
-    boost::shared_ptr<ALTranscriber> transcriber;
-    boost::shared_ptr<ALImageTranscriber> imageTranscriber;
-    boost::shared_ptr<NaoEnactor> enactor;
-    boost::shared_ptr<NaoLights> lights;
-    boost::shared_ptr<Speech> speech;
 };

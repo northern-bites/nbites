@@ -29,7 +29,6 @@
 #include "Sensors.h"
 #include "MotionInterface.h"
 #include "ClickableButton.h"
-#include "ManPreloaderInterface.h"
 
 #include "synchro/synchro.h"
 #include "guardian/WifiAngel.h"
@@ -44,9 +43,7 @@ enum  ButtonID {
 
 class RoboGuardian : public Thread {
 public:
-    RoboGuardian(boost::shared_ptr<Sensors>,
-                 ManPreloaderInterface* manPreloader
-                     = ManPreloaderInterface::NullInstance());
+    RoboGuardian(boost::shared_ptr<Sensors>);
     virtual ~RoboGuardian();
 
     void run();
@@ -67,9 +64,6 @@ public:
     //(and it wasn't) it might result in a segfault - Octavian
     void setMotionInterface(MotionInterface* minterface)
         { motion_interface = minterface; }
-
-    void setPreloader(ManPreloaderInterface* _preloader)
-        { manPreloader = _preloader; }
 
     void enableFallProtection(bool _useFallProtection) const
         { useFallProtection = _useFallProtection; };
@@ -111,7 +105,6 @@ private:
 
     boost::shared_ptr<Sensors> sensors;
     MotionInterface* motion_interface;
-    ManPreloaderInterface* manPreloader;
     std::vector<float> lastTemps;
     float lastBatteryCharge;
 

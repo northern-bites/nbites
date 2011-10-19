@@ -14,6 +14,7 @@
  */
 
 #include "MObjectLogger.h"
+#include "Profiler.h"
 
 namespace man {
 namespace memory {
@@ -33,17 +34,17 @@ MObjectLogger::MObjectLogger(FDProvider::const_ptr fdp,
 }
 
 void MObjectLogger::writeHead() {
-
     this->writeValue<int32_t>(logID);
     // this time stamps the log
     this->writeValue<int64_t>(birth_time);
 }
 
 void MObjectLogger::writeToLog() {
-
+    PROF_ENTER(P_LOGGING);
     this->writeValue<uint32_t>(objectToLog->byteSize());
     objectToLog->serializeToString(&write_buffer);
     this->writeCharBuffer(write_buffer.data(), write_buffer.length());
+    PROF_EXIT(P_LOGGING);
 }
 
 }

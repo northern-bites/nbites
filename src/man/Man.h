@@ -39,9 +39,7 @@ class Man : public ImageSubscriber
 public:
 
     // contructors
-    Man(boost::shared_ptr<Profiler> _profiler,
-        boost::shared_ptr<Sensors> _sensors,
-        boost::shared_ptr<RoboGuardian> _guardian,
+    Man(boost::shared_ptr<Sensors> _sensors,
         boost::shared_ptr<Transcriber> _transcriber,
         boost::shared_ptr<ImageTranscriber> _imageTranscriber,
         boost::shared_ptr<MotionEnactor> _enactor,
@@ -53,15 +51,6 @@ public:
     //
     // Our methods
     //
-
-    // Profiling methods
-    void startProfiling(int nframes) {
-       profiler->reset();
-       profiler->profileFrames(nframes);
-    }
-    void stopProfiling() {
-       profiler->profiling = false;
-    }
 
     // start/stop called by manmodule
     virtual void startSubThreads();
@@ -77,7 +66,6 @@ private:
   // Variables
   //
 public:
-    boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<RoboGuardian> guardian;
     boost::shared_ptr<Transcriber> transcriber;
