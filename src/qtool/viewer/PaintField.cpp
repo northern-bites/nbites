@@ -81,6 +81,18 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
      painter.drawLine(485, 270, 495, 270);
      painter.drawLine(490, 265, 490, 275);
 
+     QPoint topBluePost = QPoint(70, 200);
+     QPoint bottomBluePost = QPoint(70, 340);
+     QPoint topYellowPost = QPoint(670, 200);
+     QPoint bottomYellowPost = QPoint(670, 340);
+     
+     int radius = 5;
+
+     painter.drawEllipse(topBluePost, radius, radius);
+     painter.drawEllipse(bottomBluePost, radius, radius);
+     painter.drawEllipse(topYellowPost, radius, radius);
+     painter.drawEllipse(bottomYellowPost, radius, radius);
+
      
      /*
      switch (shape) {
