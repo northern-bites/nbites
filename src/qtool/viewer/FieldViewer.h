@@ -18,6 +18,7 @@
 #include "data/DataManager.h"
 #include "RoboImageViewer.h"
 #include "MObjectViewer.h"
+#include "PaintField.h"
 
 namespace qtool {
 namespace viewer {
@@ -26,12 +27,13 @@ class FieldViewer : public QMainWindow{
 	Q_OBJECT
 
 public:
-	FieldViewer(data::DataManager::ptr dataManager);
+  FieldViewer(data::DataManager::ptr dataManager);
 
 private:
-	std::vector<QDockWidget*> dockWidget;
-	data::DataManager::ptr dataManager;
-	RoboImageViewer* roboImageViewer;
+  std::vector<QDockWidget*> dockWidget;
+  data::DataManager::ptr dataManager;
+  RoboImageViewer* roboImageViewer;
+  PaintField* paintField;
 
 };
 

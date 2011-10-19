@@ -12,7 +12,10 @@ using namespace man::memory;
 FieldViewer::FieldViewer(DataManager::ptr dataManager) :
 		QMainWindow(),
 		dataManager(dataManager){
+  
+  paintField = new PaintField();
 
+  this->setCentralWidget(paintField);
 
 
 }

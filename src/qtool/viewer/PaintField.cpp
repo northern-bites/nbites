@@ -7,8 +7,9 @@ namespace viewer {
 using namespace data;
 using namespace man::memory;
 
-PaintField::PaintField(QWidget *parent):
-    QWidget(parent){
+PaintField::PaintField(QWidget *parent): 
+		   QWidget(parent)
+{
 
   setBackgroundRole(QPalette::Base);
   setAutoFillBackground(true);
@@ -17,7 +18,7 @@ PaintField::PaintField(QWidget *parent):
 
 QSize PaintField::sizeHint() const
 {
-  return QSize(400, 200);
+  return QSize(800, 800);
 }
 
 QSize PaintField::minimumSizeHint() const
@@ -26,34 +27,57 @@ QSize PaintField::minimumSizeHint() const
 }
 
 void PaintField::ballDataChanged(const QBrush &brush)
- {
+{
+  update(); // updates the painting
+}
 
-   update(); // updates the painting
- }
-
-void RenderArea::paintEvent(QPaintEvent * /* event */)
+void PaintField::paintEvent(QPaintEvent * /* event */)
  {
-     static const QPoint points[4] = {
-         QPoint(10, 80),
-         QPoint(20, 10),
-         QPoint(80, 30),
-         QPoint(90, 70)
+     static const QPoint corners[5] = {
+         QPoint(70, 70),
+         QPoint(670, 70),
+         QPoint(670, 470),
+         QPoint(70, 470),
+	 QPoint(70, 70)
      };
+     static const QPoint blueBox[4] = {
+       QPoint(70, 160),
+       QPoint(130, 160),
+       QPoint(130, 380),
+       QPoint(70, 380)
+     };
+     static const QPoint yellowBox[4] = {
+       QPoint(670, 160),
+       QPoint(610, 160),
+       QPoint(610, 380),
+       QPoint(670, 380)
+     };
+		      
 
-     QRect rect(10, 20, 80, 60);
+     QRect rect(70, 70, 600, 400);
 
-     QPainterPath path;
-     path.moveTo(20, 80);
-     path.lineTo(20, 30);
-     path.cubicTo(80, 0, 50, 50, 80, 80);
-
+     /*
      int startAngle = 20 * 16;
      int arcLength = 120 * 16;
+     */
 
      QPainter painter(this);
+     /*
      painter.setPen(pen);
      painter.setBrush(brush);
+     */
+ 
+     painter.drawPolyline(blueBox, 4);
+     painter.drawPolyline(yellowBox, 4);
+     painter.drawRect(rect);
+     painter.drawLine(((rect.topLeft()+rect.topRight())/2),
+		      ((rect.bottomLeft()+rect.bottomRight())/2));
 
+     QPoint centerField = QPoint(370, 270);
+     painter.drawEllipse (centerField, 60, 60);
+
+     
+     /*
      switch (shape) {
      case Line:
        painter.drawLine(rect.bottomLeft(), rect.topRight());
@@ -79,6 +103,8 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
      case Pixmap:
        painter.drawPixmap(10, 10, pixmap);
      }
+     */
+}
 
 }
 }

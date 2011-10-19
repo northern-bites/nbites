@@ -24,10 +24,12 @@ class PaintField : public QWidget{
         Q_OBJECT
 
 public:
-  PaintField(QWidget *parent = NULL);
+  PaintField(QWidget *parent = 0);
 
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
+
+  void ballDataChanged(const QBrush &brush);
 
 private slots:
 
