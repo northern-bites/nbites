@@ -75,6 +75,11 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
 
      QPoint centerField = QPoint(370, 270);
      painter.drawEllipse (centerField, 60, 60);
+     
+     painter.drawLine(250, 265, 250, 275);
+     painter.drawLine(245, 270, 255, 270);
+     painter.drawLine(485, 270, 495, 270);
+     painter.drawLine(490, 265, 490, 275);
 
      
      /*
