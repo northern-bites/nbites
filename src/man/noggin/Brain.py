@@ -232,7 +232,7 @@ class Brain(object):
         self.sonar.updateSensors(self.sensors)
 
         # Communications update
-#        self.updateComm()
+        self.updateComm()
 
         # Update objects
         self.updateObjects()
