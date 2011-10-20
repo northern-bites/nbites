@@ -18,7 +18,7 @@ PaintField::PaintField(QWidget *parent):
 
 QSize PaintField::sizeHint() const
 {
-  return QSize(800, 800);
+  return QSize(800, 600);
 }
 
 QSize PaintField::minimumSizeHint() const
@@ -53,8 +53,10 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
        QPoint(670, 380)
      };
 		      
-
-     QRect rect(70, 70, 600, 400);
+     QRect field(0, 0, 740, 540);
+     QRect playArea(70, 70, 600, 400);
+     QRect blueGoal(30, 200, 40, 140);
+     QRect yellowGoal(670, 200, 40, 140);
 
      /*
      int startAngle = 20 * 16;
@@ -63,15 +65,19 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
 
      QPainter painter(this);
      /*
-     painter.setPen(pen);
-     painter.setBrush(brush);
+       painter.setPen(pen);
      */
- 
+     painter.fillRect(field, Qt::darkGreen);
+
+     painter.setBrush(Qt::NoBrush);
+     painter.setPen(Qt::white);
      painter.drawPolyline(blueBox, 4);
      painter.drawPolyline(yellowBox, 4);
-     painter.drawRect(rect);
-     painter.drawLine(((rect.topLeft()+rect.topRight())/2),
-		      ((rect.bottomLeft()+rect.bottomRight())/2));
+     painter.drawRect(playArea);
+     painter.drawLine(((playArea.topLeft()+
+			playArea.topRight())/2),
+		      ((playArea.bottomLeft()+
+			playArea.bottomRight())/2));
 
      QPoint centerField = QPoint(370, 270);
      painter.drawEllipse (centerField, 60, 60);
@@ -88,10 +94,21 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
      
      int radius = 5;
 
+     painter.setBrush(Qt::blue);
+     painter.setPen(Qt::blue);
      painter.drawEllipse(topBluePost, radius, radius);
      painter.drawEllipse(bottomBluePost, radius, radius);
+     painter.setBrush(Qt::yellow);
+     painter.setPen(Qt::yellow);
      painter.drawEllipse(topYellowPost, radius, radius);
      painter.drawEllipse(bottomYellowPost, radius, radius);
+
+     QBrush goals = QBrush(Qt::white, Qt::CrossPattern);
+     painter.setBrush(goals);
+     painter.setPen(Qt::blue);
+     painter.drawRect(blueGoal);
+     painter.setPen(Qt::yellow);
+     painter.drawRect(yellowGoal);
 
      
      /*
