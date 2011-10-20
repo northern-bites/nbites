@@ -81,20 +81,20 @@ SET( ROBOT_INTERFACE_SRCS
 
 IF(WEBOTS_BACKEND)
   SET( ROBOT_CONNECT_SRCS
-    WBEnactor
-    AngleEKF
-    WBTranscriber
-    WBImageTranscriber
+    WBConnect/WBEnactor
+    WBConnect/AngleEKF
+    WBConnect/WBTranscriber
+    WBConnectWBImageTranscriber
     )
 ELSE(WEBOTS_BACKEND)
   SET( ROBOT_CONNECT_SRCS
-    ALEnactor
-    NaoEnactor
-    ALTranscriber
-    ALImageTranscriber
-    NaoLights
-    NaoRGBLight
-    ALSpeech
+    ALConnect/ALEnactor
+    ALConnect/NaoEnactor
+    ALConnect/ALTranscriber
+    ALConnect/ALImageTranscriber
+    ALConnect/NaoLights
+    ALConnect/NaoRGBLight
+    ALConnect/ALSpeech
     )
 ENDIF(WEBOTS_BACKEND)
 

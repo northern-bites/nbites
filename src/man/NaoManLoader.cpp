@@ -6,13 +6,13 @@
 #include "TMan.h"
 
 #include "Profiler.h"
-#include "ALSpeech.h"
-#include "Sensors.h"
-#include "RoboGuardian.h"
-#include "ALTranscriber.h"
-#include "ALImageTranscriber.h"
-#include "NaoEnactor.h"
-#include "NaoLights.h"
+#include "corpus/Sensors.h"
+#include "corpus/RoboGuardian.h"
+#include "corpus/ALConnect/NaoEnactor.h"
+#include "corpus/ALConnect/ALTranscriber.h"
+#include "corpus/ALConnect/ALImageTranscriber.h"
+#include "corpus/ALConnect/ALSpeech.h"
+#include "corpus/ALConnect/NaoLights.h"
 
 using namespace std;
 using boost::shared_ptr;
