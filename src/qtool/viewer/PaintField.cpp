@@ -39,19 +39,28 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
 		 FIELD_GREEN_WIDTH, FIELD_GREEN_HEIGHT);
      QRect playArea(FIELD_WHITE_LEFT_SIDELINE_X, 
 		    FIELD_WHITE_BOTTOM_SIDELINE_Y,
-		    FIELD_WIDTH, FIELD_HEIGHT);
-     QRect blueGoalBox(10, 10, GOALBOX_DEPTH, GOALBOX_WIDTH);
-     QRect yellowGoalBox(10, 10, GOALBOX_DEPTH, GOALBOX_WIDTH);
-     QRect blueGoal(LANDMARK_BLUE_GOAL_BOTTOM_POST_X - 40, LANDMARK_BLUE_GOAL_BOTTOM_POST_Y, 40, CROSSBAR_CM_WIDTH);
+		    FIELD_WHITE_WIDTH, FIELD_WHITE_HEIGHT);
+     QRect blueGoalBox(FIELD_WHITE_LEFT_SIDELINE_X, 
+		       MIDFIELD_Y -(GOALBOX_WIDTH/2), 
+		       GOALBOX_DEPTH, GOALBOX_WIDTH);
+     QRect yellowGoalBox(FIELD_WHITE_RIGHT_SIDELINE_X - 
+			 (GOALBOX_DEPTH), 
+			 MIDFIELD_Y - (GOALBOX_WIDTH/2), 
+			 GOALBOX_DEPTH, GOALBOX_WIDTH);
+     QRect blueGoal(LANDMARK_BLUE_GOAL_BOTTOM_POST_X - 
+		    GOAL_DEPTH, 
+		    LANDMARK_BLUE_GOAL_BOTTOM_POST_Y, 
+		    GOAL_DEPTH, 
+		    CROSSBAR_CM_WIDTH);
      QRect yellowGoal(LANDMARK_YELLOW_GOAL_BOTTOM_POST_X, 
 		      LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y, 
-		      40, CROSSBAR_CM_WIDTH);
+		      GOAL_DEPTH, CROSSBAR_CM_WIDTH);
 
      QPainter painter(this);
      painter.fillRect(field, Qt::darkGreen);
      
-     QPen pen(Qt::white, 5, Qt::SolidLine, Qt::SquareCap, 
-	      Qt::MiterJoin);
+     QPen pen(Qt::white, LINE_WIDTH, Qt::SolidLine, 
+	      Qt::SquareCap, Qt::MiterJoin);
      painter.setBrush(Qt::NoBrush);
      painter.setPen(pen);
      painter.drawRect(blueGoalBox);
