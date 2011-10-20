@@ -32,24 +32,20 @@ void PaintField::ballDataChanged(const QBrush &brush)
 }
 
 void PaintField::paintEvent(QPaintEvent * /* event */)
- {
-     static const QPoint blueBox[4] = {
-       QPoint(70, 160),
-       QPoint(130, 160),
-       QPoint(130, 380),
-       QPoint(70, 380)
-     };
-     static const QPoint yellowBox[4] = {
-       QPoint(670, 160),
-       QPoint(610, 160),
-       QPoint(610, 380),
-       QPoint(670, 380)
-     };
+{
 		      
-     QRect field(0, 0, 740, 540);
-     QRect playArea(70, 70, 600, 400);
-     QRect blueGoal(30, 200, 40, 140);
-     QRect yellowGoal(670, 200, 40, 140);
+     QRect field(FIELD_GREEN_LEFT_SIDELINE_X, 
+		 FIELD_GREEN_BOTTOM_SIDELINE_Y, 
+		 FIELD_GREEN_WIDTH, FIELD_GREEN_HEIGHT);
+     QRect playArea(FIELD_WHITE_LEFT_SIDELINE_X, 
+		    FIELD_WHITE_BOTTOM_SIDELINE_Y,
+		    FIELD_WIDTH, FIELD_HEIGHT);
+     QRect blueGoalBox(10, 10, GOALBOX_DEPTH, GOALBOX_WIDTH);
+     QRect yellowGoalBox(10, 10, GOALBOX_DEPTH, GOALBOX_WIDTH);
+     QRect blueGoal(LANDMARK_BLUE_GOAL_BOTTOM_POST_X - 40, LANDMARK_BLUE_GOAL_BOTTOM_POST_Y, 40, CROSSBAR_CM_WIDTH);
+     QRect yellowGoal(LANDMARK_YELLOW_GOAL_BOTTOM_POST_X, 
+		      LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y, 
+		      40, CROSSBAR_CM_WIDTH);
 
      QPainter painter(this);
      painter.fillRect(field, Qt::darkGreen);
@@ -58,37 +54,65 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
 	      Qt::MiterJoin);
      painter.setBrush(Qt::NoBrush);
      painter.setPen(pen);
-     painter.drawPolyline(blueBox, 4);
-     painter.drawPolyline(yellowBox, 4);
+     painter.drawRect(blueGoalBox);
+     painter.drawRect(yellowGoalBox);
      painter.drawRect(playArea);
      painter.drawLine(((playArea.topLeft()+
 			playArea.topRight())/2),
 		      ((playArea.bottomLeft()+
 			playArea.bottomRight())/2));
 
-     QPoint centerField = QPoint(370, 270);
-     painter.drawEllipse (centerField, 60, 60);
+     QPoint centerField = QPoint(CENTER_FIELD_X, CENTER_FIELD_Y);
+     painter.drawEllipse (centerField, 
+			  CENTER_CIRCLE_RADIUS, 
+			  CENTER_CIRCLE_RADIUS);
      
-     painter.drawLine(250, 265, 250, 275);
-     painter.drawLine(245, 270, 255, 270);
-     painter.drawLine(485, 270, 495, 270);
-     painter.drawLine(490, 265, 490, 275);
+     painter.drawLine(LANDMARK_BLUE_GOAL_CROSS_X - 
+		      (LINE_CROSS_LENGTH/2), 
+		      LANDMARK_BLUE_GOAL_CROSS_Y,
+		      LANDMARK_BLUE_GOAL_CROSS_X + 
+		      (LINE_CROSS_LENGTH/2), 
+		      LANDMARK_BLUE_GOAL_CROSS_Y);
+     painter.drawLine(LANDMARK_YELLOW_GOAL_CROSS_X - 
+		      (LINE_CROSS_LENGTH/2), 
+		      LANDMARK_YELLOW_GOAL_CROSS_Y,
+		      LANDMARK_YELLOW_GOAL_CROSS_X + 
+		      (LINE_CROSS_LENGTH/2), 
+		      LANDMARK_YELLOW_GOAL_CROSS_Y);
+     painter.drawLine(LANDMARK_BLUE_GOAL_CROSS_X, 
+		      LANDMARK_BLUE_GOAL_CROSS_Y - 
+		      (LINE_CROSS_LENGTH/2),
+		      LANDMARK_BLUE_GOAL_CROSS_X , 
+		      LANDMARK_BLUE_GOAL_CROSS_Y + 
+		      (LINE_CROSS_LENGTH/2));
+     painter.drawLine(LANDMARK_YELLOW_GOAL_CROSS_X, 
+		      LANDMARK_YELLOW_GOAL_CROSS_Y- 
+		      (LINE_CROSS_LENGTH/2),
+		      LANDMARK_YELLOW_GOAL_CROSS_X, 
+		      LANDMARK_YELLOW_GOAL_CROSS_Y + 
+		      (LINE_CROSS_LENGTH/2));
 
-     QPoint topBluePost = QPoint(70, 200);
-     QPoint bottomBluePost = QPoint(70, 340);
-     QPoint topYellowPost = QPoint(670, 200);
-     QPoint bottomYellowPost = QPoint(670, 340);
-     
-     int radius = 5;
+     QPoint topBluePost = QPoint(LANDMARK_BLUE_GOAL_TOP_POST_X, 
+				 LANDMARK_BLUE_GOAL_TOP_POST_Y);
+     QPoint bottomBluePost = QPoint(LANDMARK_BLUE_GOAL_BOTTOM_POST_X, 
+				    LANDMARK_BLUE_GOAL_BOTTOM_POST_Y);
+     QPoint topYellowPost = QPoint(LANDMARK_YELLOW_GOAL_TOP_POST_X, 
+				 LANDMARK_YELLOW_GOAL_TOP_POST_Y);
+     QPoint bottomYellowPost = QPoint(LANDMARK_YELLOW_GOAL_BOTTOM_POST_X, 
+				    LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y);
 
      painter.setBrush(Qt::blue);
      painter.setPen(Qt::blue);
-     painter.drawEllipse(topBluePost, radius, radius);
-     painter.drawEllipse(bottomBluePost, radius, radius);
+     painter.drawEllipse(topBluePost, 
+			 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
+     painter.drawEllipse(bottomBluePost, 
+			 GOAL_POST_RADIUS, GOAL_POST_RADIUS);
      painter.setBrush(Qt::yellow);
      painter.setPen(Qt::yellow);
-     painter.drawEllipse(topYellowPost, radius, radius);
-     painter.drawEllipse(bottomYellowPost, radius, radius);
+     painter.drawEllipse(topYellowPost, GOAL_POST_RADIUS, 
+			 GOAL_POST_RADIUS);
+     painter.drawEllipse(bottomYellowPost,GOAL_POST_RADIUS,
+			 GOAL_POST_RADIUS);
 
      QBrush goals = QBrush(Qt::white, Qt::CrossPattern);
      painter.setBrush(goals);
@@ -96,35 +120,6 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
      painter.drawRect(blueGoal);
      painter.setPen(Qt::yellow);
      painter.drawRect(yellowGoal);
-
-     
-     /*
-     switch (shape) {
-     case Line:
-       painter.drawLine(rect.bottomLeft(), rect.topRight());
-       break;
-     case Polyline:
-       painter.drawPolyline(points, 4);
-       break;
-     case Polygon:
-       painter.drawPolygon(points, 4);
-       break;
-     case Rect:
-       painter.drawRect(rect);
-       break;
-     case Ellipse:
-       painter.drawEllipse(rect);
-       break;
-     case Arc:
-       painter.drawArc(rect, startAngle, arcLength);
-       break;
-     case Path:
-       painter.drawPath(path);
-       break;
-     case Pixmap:
-       painter.drawPixmap(10, 10, pixmap);
-     }
-     */
 }
 
 }

@@ -16,6 +16,7 @@
 
 #include "data/DataManager.h"
 #include "MObjectViewer.h"
+#include "man/include/FieldConstants.h"
 
 namespace qtool {
 namespace viewer {
