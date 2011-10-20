@@ -1,11 +1,14 @@
 /**
  * @class Viewer
  *
- * This class will be for testing the BallEKF.
- * It will allow you to input values into the BallEKF
- * and get back the predicted values.
+ * This class draws the field so that we can display the
+ * movement of robots and the ball on the field.  The 
+ * painting uses all the constants from FieldConstants
+ * so that if the field changes dimensions it should
+ * still work.
  *
  * @author Dani McAvoy
+ * @date October 2011
  */
 
 #pragma once
@@ -45,6 +48,8 @@ private:
   
   QStandardItemModel *model;
   QDataWidgetMapper *mapper; 
+  
+ 
 
 };
 
