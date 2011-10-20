@@ -68,9 +68,11 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
        painter.setPen(pen);
      */
      painter.fillRect(field, Qt::darkGreen);
-
+     
+     QPen pen(Qt::white, 5, Qt::SolidLine, Qt::SquareCap, 
+	      Qt::MiterJoin);
      painter.setBrush(Qt::NoBrush);
-     painter.setPen(Qt::white);
+     painter.setPen(pen);
      painter.drawPolyline(blueBox, 4);
      painter.drawPolyline(yellowBox, 4);
      painter.drawRect(playArea);
