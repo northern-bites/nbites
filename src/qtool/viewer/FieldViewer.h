@@ -7,6 +7,7 @@
  * passed in.
  *
  * @author Dani McAvoy
+ * @date October 2011
  */
 
 #pragma once

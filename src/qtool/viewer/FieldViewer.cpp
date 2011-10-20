@@ -15,6 +15,7 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
   
   paintField = new PaintField();
 
+  // Adds the Field
   this->setCentralWidget(paintField);
 
 
