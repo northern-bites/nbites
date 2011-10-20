@@ -33,13 +33,6 @@ void PaintField::ballDataChanged(const QBrush &brush)
 
 void PaintField::paintEvent(QPaintEvent * /* event */)
  {
-     static const QPoint corners[5] = {
-         QPoint(70, 70),
-         QPoint(670, 70),
-         QPoint(670, 470),
-         QPoint(70, 470),
-	 QPoint(70, 70)
-     };
      static const QPoint blueBox[4] = {
        QPoint(70, 160),
        QPoint(130, 160),
@@ -58,15 +51,7 @@ void PaintField::paintEvent(QPaintEvent * /* event */)
      QRect blueGoal(30, 200, 40, 140);
      QRect yellowGoal(670, 200, 40, 140);
 
-     /*
-     int startAngle = 20 * 16;
-     int arcLength = 120 * 16;
-     */
-
      QPainter painter(this);
-     /*
-       painter.setPen(pen);
-     */
      painter.fillRect(field, Qt::darkGreen);
      
      QPen pen(Qt::white, 5, Qt::SolidLine, Qt::SquareCap, 
