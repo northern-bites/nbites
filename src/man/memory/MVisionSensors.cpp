@@ -52,5 +52,17 @@ void MVisionSensors::update() {
 
     //std::cout << this->DebugString() << std::endl;
 }
+
+void MVisionSensors::copyTo(shared_ptr<Sensors> sensorsDestination) {
+    vector<float> body_angles(data->vision_body_angles()->begin(),
+                              data->vision_body_angles()->end());
+    sensorsDestination->setVisionBodyAngles(body_angles);
+
+    sensorsDestination->setLeftFootBumper(data->left_foot_bumper()->left(),
+                                          data->left_foot_bumper()->right());
+    sensorsDestination->setRightFootBumper(data->right_foot_bumper()->left(),
+                                           data->right_foot_bumper()->right());
+}
+
 }
 }

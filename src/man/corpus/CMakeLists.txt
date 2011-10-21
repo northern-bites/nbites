@@ -79,14 +79,22 @@ SET( ROBOT_INTERFACE_SRCS
   PySpeech
   )
 
+IF(OFFLINE)
+  SET( ROBOT_CONNECT_SRCS
+    OfflineConnect/OfflineTranscriber
+    )
+ENDIF()
+
 IF(WEBOTS_BACKEND)
   SET( ROBOT_CONNECT_SRCS
     WBConnect/WBEnactor
     WBConnect/AngleEKF
     WBConnect/WBTranscriber
-    WBConnectWBImageTranscriber
+    WBConnect/WBImageTranscriber
     )
-ELSE(WEBOTS_BACKEND)
+ENDIF()
+
+IF(BUILDING_FOR_A_REMOTE_NAO)
   SET( ROBOT_CONNECT_SRCS
     ALConnect/ALEnactor
     ALConnect/NaoEnactor
@@ -96,7 +104,7 @@ ELSE(WEBOTS_BACKEND)
     ALConnect/NaoRGBLight
     ALConnect/ALSpeech
     )
-ENDIF(WEBOTS_BACKEND)
+ENDIF()
 
 SET( CORPUS_PYTHON_SRCS
   leds.py

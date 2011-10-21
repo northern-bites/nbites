@@ -30,6 +30,7 @@ public:
      * from the Sensors object
      */
     void update();
+    void copyTo(boost::shared_ptr<Sensors> sensors);
 
 private:
     boost::shared_ptr<Sensors> sensors;
