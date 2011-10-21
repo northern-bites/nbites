@@ -594,6 +594,17 @@ void Sensors::setVisionSensors(const FootBumper &_leftBumper,
     this->notifySubscribers(NEW_VISION_SENSORS);
 }
 
+void Sensors::setBatteryCharge(float charge) {
+    battery_mutex.lock();
+    batteryCharge = charge;
+    battery_mutex.unlock();;
+}
+void Sensors::setBatteryCurrent(float current) {
+    battery_mutex.lock();
+    batteryCurrent = current;
+    battery_mutex.unlock();;
+}
+
 void Sensors::lockImage() const {
 #ifdef USE_SENSORS_IMAGE_LOCKING
     image_mutex.lock();

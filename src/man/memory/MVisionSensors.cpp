@@ -62,6 +62,12 @@ void MVisionSensors::copyTo(shared_ptr<Sensors> sensorsDestination) {
                                           data->left_foot_bumper()->right());
     sensorsDestination->setRightFootBumper(data->right_foot_bumper()->left(),
                                            data->right_foot_bumper()->right());
+
+    sensorsDestination->setUltraSound(data->ultra_sound_distance_left(),
+    								  data->ultra_sound_distance_right());
+
+    sensorsDestination->setBatteryCharge(charge);
+    sensorsDestination->setBatteryCurrent(current);
 }
 
 }
