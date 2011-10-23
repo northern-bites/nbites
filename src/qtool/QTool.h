@@ -15,6 +15,8 @@
 #include "data/DataManager.h"
 #include "colorcreator/ColorCreator.h"
 #include "viewer/LogViewer.h"
+#include "viewer/BallEKFViewer.h"
+#include "viewer/FieldViewer.h"
 
 namespace qtool {
 
@@ -33,6 +35,8 @@ private:
     data::DataLoader* dataLoader;
     colorcreator::ColorCreator* colorCreator;
     viewer::LogViewer* logViewer;
+    viewer::BallEKFViewer* ballEKFViewer;
+    viewer::FieldViewer* fieldViewer;
 };
 
 }
