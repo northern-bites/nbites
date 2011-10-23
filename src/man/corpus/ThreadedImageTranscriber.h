@@ -6,12 +6,14 @@
 #include "synchro/synchro.h"
 
 class ThreadedImageTranscriber : public ImageTranscriber , public Thread{
- public:
- ThreadedImageTranscriber(boost::shared_ptr<Sensors> sensors,
-                          std::string name)
-     : ImageTranscriber(sensors), Thread(name){};
-    virtual ~ThreadedImageTranscriber() { }
 
+public:
+	ThreadedImageTranscriber(boost::shared_ptr<Sensors> sensors,
+			std::string name)
+		: ImageTranscriber(sensors), Thread(name){};
+	virtual ~ThreadedImageTranscriber() { }
+
+	virtual void run() = 0;
 };
 
 
