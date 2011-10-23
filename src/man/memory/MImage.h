@@ -7,19 +7,17 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
 #include <protos/Sensors.pb.h>
 #include "RoboImage.h"
 #include "MObject.h"
 #include "Sensors.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 class MImage: public MObject {
 
-public:
-    typedef boost::shared_ptr<MImage> ptr;
-    typedef boost::shared_ptr<const MImage> const_ptr;
+ADD_SHARED_PTR(MImage);
 
 public:
     /**
