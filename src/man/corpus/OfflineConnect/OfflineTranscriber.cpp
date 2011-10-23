@@ -2,7 +2,10 @@
 
 using boost::shared_ptr;
 using namespace std;
-using namespace memory;
+using namespace man::memory;
+
+namespace man {
+namespace corpus {
 
 OfflineTranscriber::OfflineTranscriber(shared_ptr<Sensors> s,
 			MVisionSensors::const_ptr mvisionSensors,
@@ -14,4 +17,10 @@ OfflineTranscriber::OfflineTranscriber(shared_ptr<Sensors> s,
 
 void OfflineTranscriber::postVisionSensors() {
 	mvisionSensors->copyTo(sensors);
+}
+
+void OfflineTranscriber::postMotionSensors() {
+}
+
+}
 }

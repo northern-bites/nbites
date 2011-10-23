@@ -7,15 +7,16 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
-
 #include "protos/Sensors.pb.h"
 #include "MObject.h"
 #include "Sensors.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 class MVisionSensors: public proto::PVisionSensors, public MObject {
+
+ADD_SHARED_PTR(MVisionSensors);
 
 public:
     /**
@@ -30,7 +31,7 @@ public:
      * from the Sensors object
      */
     void update();
-    void copyTo(boost::shared_ptr<Sensors> sensors);
+    void copyTo(boost::shared_ptr<Sensors> sensors) const;
 
 private:
     boost::shared_ptr<Sensors> sensors;
