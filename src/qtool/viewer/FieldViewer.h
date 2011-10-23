@@ -17,7 +17,6 @@
 #include <vector>
 
 #include "data/DataManager.h"
-#include "RoboImageViewer.h"
 #include "MObjectViewer.h"
 #include "PaintField.h"
 
@@ -33,7 +32,6 @@ public:
 private:
   std::vector<QDockWidget*> dockWidget;
   data::DataManager::ptr dataManager;
-  RoboImageViewer* roboImageViewer;
   PaintField* paintField;
 
 };
