@@ -23,7 +23,7 @@ void OfflineImageTranscriber::signalNewImage() {
 }
 
 void OfflineImageTranscriber::waitForNewImage() {
-	this->waitForSignal()();
+	this->waitForSignal();
 }
 
 void OfflineImageTranscriber::copyNewImage() {
