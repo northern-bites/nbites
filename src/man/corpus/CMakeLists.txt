@@ -81,28 +81,28 @@ SET( ROBOT_INTERFACE_SRCS
 
 IF(OFFLINE)
   SET( ROBOT_CONNECT_SRCS
-    OfflineConnect/OfflineTranscriber
+    offlineconnect/OfflineTranscriber
     )
 ENDIF()
 
 IF(WEBOTS_BACKEND)
   SET( ROBOT_CONNECT_SRCS
-    WBConnect/WBEnactor
-    WBConnect/AngleEKF
-    WBConnect/WBTranscriber
-    WBConnect/WBImageTranscriber
+    wbconnect/WBEnactor
+    wbconnect/AngleEKF
+    wbconnect/WBTranscriber
+    wbconnect/WBImageTranscriber
     )
 ENDIF()
 
 IF(BUILDING_FOR_A_REMOTE_NAO)
   SET( ROBOT_CONNECT_SRCS
-    ALConnect/ALEnactor
-    ALConnect/NaoEnactor
-    ALConnect/ALTranscriber
-    ALConnect/ALImageTranscriber
-    ALConnect/NaoLights
-    ALConnect/NaoRGBLight
-    ALConnect/ALSpeech
+    alconnect/ALEnactor
+    alconnect/NaoEnactor
+    alconnect/ALTranscriber
+    alconnect/ALImageTranscriber
+    alconnect/NaoLights
+    alconnect/NaoRGBLight
+    alconnect/ALSpeech
     )
 ENDIF()
 
