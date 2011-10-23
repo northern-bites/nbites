@@ -82,6 +82,7 @@ SET( ROBOT_INTERFACE_SRCS
 IF(OFFLINE)
   SET( ROBOT_CONNECT_SRCS
     offlineconnect/OfflineTranscriber
+    offlineconnect/OfflineImageTranscriber
     )
 ENDIF()
 
