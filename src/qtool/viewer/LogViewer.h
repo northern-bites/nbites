@@ -31,9 +31,9 @@ public slots:
     void prevImage();
 
 private:
-	std::vector<QDockWidget*> dockWidget;
-	data::DataManager::ptr dataManager;
-	RoboImageViewer* roboImageViewer;
+    std::vector<QDockWidget*> dockWidget;
+    data::DataManager::ptr dataManager;
+    RoboImageViewer* roboImageViewer;
     QPushButton* prevButton;
     QPushButton* nextButton;
     QToolBar* toolbar;
