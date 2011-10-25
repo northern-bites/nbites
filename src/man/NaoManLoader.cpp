@@ -1,6 +1,3 @@
-#include <dlfcn.h>
-#include <iostream>
-
 #include "NaoManLoader.h"
 
 #include "TMan.h"
@@ -8,11 +5,11 @@
 #include "Profiler.h"
 #include "corpus/Sensors.h"
 #include "corpus/RoboGuardian.h"
-#include "corpus/ALConnect/NaoEnactor.h"
-#include "corpus/ALConnect/ALTranscriber.h"
-#include "corpus/ALConnect/ALImageTranscriber.h"
-#include "corpus/ALConnect/ALSpeech.h"
-#include "corpus/ALConnect/NaoLights.h"
+#include "corpus/alconnect/NaoEnactor.h"
+#include "corpus/alconnect/ALTranscriber.h"
+#include "corpus/alconnect/ALImageTranscriber.h"
+#include "corpus/alconnect/ALSpeech.h"
+#include "corpus/alconnect/NaoLights.h"
 
 using namespace std;
 using boost::shared_ptr;
