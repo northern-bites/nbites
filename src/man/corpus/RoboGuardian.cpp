@@ -431,7 +431,7 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         enableGains();
         break;
     case 7:
-        wifiAngel.reset_hard();
+        wifiAngel.reset_soft();
         break;
     case 9:
         //Easter EGG!
