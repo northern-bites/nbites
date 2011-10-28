@@ -39,7 +39,7 @@ public:
     BitmapType getCurrentBitmapType() const { return bitmapType; }
     void setBitmapType(BitmapType type) { bitmapType = type; updateBitmap();}
 
-    QImage getBitmap(BitmapType type = Color) const { return bitmap; }
+    QImage getBitmap() const { return bitmap; }
 
 
 private:

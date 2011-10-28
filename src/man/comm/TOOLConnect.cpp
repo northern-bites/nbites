@@ -26,9 +26,9 @@ using namespace boost;
 // Begin class code
 //
 
-TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
-                          shared_ptr<Vision> v, shared_ptr<GameController> gc)
-    : Thread(_synchro, "TOOLConnect"),
+TOOLConnect::TOOLConnect (shared_ptr<Sensors> s, shared_ptr<Vision> v,
+                          shared_ptr<GameController> gc)
+    : Thread("TOOLConnect"),
       state(TOOL_REQUESTING),
       sensors(s), vision(v), gameController(gc),
       loc(), ballEKF()
@@ -53,9 +53,6 @@ void TOOLConnect::setLocalizationAccess (shared_ptr<LocSystem> _loc,
 void
 TOOLConnect::run ()
 {
-    running = true;
-    trigger->on();
-
     try {
         serial.bind();
 
@@ -87,8 +84,6 @@ TOOLConnect::run ()
 
     serial.closeAll();
 
-    running = false;
-    trigger->off();
 }
 
 void

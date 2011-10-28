@@ -10,9 +10,8 @@ namespace log {
 using namespace man::include::paths;
 using boost::shared_ptr;
 
-LoggingBoard::LoggingBoard(Memory::const_ptr memory, boost::shared_ptr<Synchro> synchro,
-        IOProvider::const_ptr ioProvider) :
-    memory(memory), logging(true), synchro(synchro) {
+LoggingBoard::LoggingBoard(Memory::const_ptr memory, IOProvider::const_ptr ioProvider) :
+    memory(memory), logging(true) {
     newIOProvider(ioProvider);
 }
 
@@ -28,7 +27,7 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
                 memory->getMObject(i->first);
         if (mobject != MObject::const_ptr()) {
             objectIOMap[i->first] = MObjectLogger::ptr(
-                    new MObjectLogger(i->second, synchro,
+                    new MObjectLogger(i->second,
                                       static_cast<int> (i->first), mobject));
             objectIOMap[i->first]->start();
         } else {

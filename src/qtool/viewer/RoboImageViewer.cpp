@@ -9,10 +9,7 @@ RoboImageViewer::RoboImageViewer(man::memory::MImage::const_ptr rawImage,
     : QWidget(parent),
       image(new BMPYUVImage(rawImage)),
       infoLabel(infoLabel)
-{
-    setBackgroundRole(QPalette::Base);
-    setAutoFillBackground(true);
-}
+{}
 
 RoboImageViewer::~RoboImageViewer() {
 	delete image;

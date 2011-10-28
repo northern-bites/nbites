@@ -70,7 +70,6 @@ public:
     // Note : that holds true only for the first thread calling await,
     // since await sets signalled to false afterwards
     void await();
-    bool poll();
     // Signals threads waiting on this event to resume
     // It also sets signalled to true, so that if a thread starts waiting
     // on the event after it's been signalled, it doesn't get stuck on it
@@ -134,8 +133,7 @@ class Trigger
   : public TriggeredEvent
 {
   public:
-    Trigger(boost::shared_ptr<Synchro> _synchro, std::string name,
-            bool _value=false);
+    Trigger(std::string name, bool _value=false);
     virtual ~Trigger() { }
 
     void flip();
@@ -153,17 +151,16 @@ class Trigger
 
   private:
     boost::shared_ptr<pthread_mutex_t> mutex;
-    boost::shared_ptr<Event> on_event;
-    boost::shared_ptr<Event> off_event;
-    boost::shared_ptr<Event> flip_event;
+    Event on_event;
+    Event off_event;
+    Event flip_event;
     bool value;
 };
 
 class Thread {
 
 public:
-    //TODO: make threads not depend on synchro (Octavian)
-    Thread(boost::shared_ptr<Synchro> _synchro, std::string _name);
+    Thread(std::string _name);
     virtual ~Thread();
 
 public:
@@ -173,14 +170,10 @@ public:
     virtual void stop();
 
     void signalToResume();
+    void waitForThreadToFinish();
 
     // Overload this method to run your thread code
     virtual void run() = 0;
-
-    // These are/should only fired once!  be careful, or deadlock could ensue
-    const boost::shared_ptr<TriggeredEvent> getTrigger() const {
-        return trigger;
-    }
 
 protected:
     void waitForSignal();
@@ -195,7 +188,6 @@ private:
     pthread_t thread;
 
 protected:
-    boost::shared_ptr<Synchro> synchro;
     bool running;
     boost::shared_ptr<Trigger> trigger;
     Event signal;
