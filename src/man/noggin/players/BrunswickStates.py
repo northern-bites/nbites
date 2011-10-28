@@ -83,6 +83,7 @@ def gamePlaying(player):
         player.stopWalking()
         player.gainsOn()
         player.walkPose()
+        player.brain.logger.startLogging()
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
 
@@ -105,6 +106,7 @@ def gamePenalized(player):
         player.stopWalking()
         player.penalizeHeads()
         player.brain.sensors.stopSavingFrames()
+        player.brain.logger.stopLogging()
 
     return player.stay()
 
