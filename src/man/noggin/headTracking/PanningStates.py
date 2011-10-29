@@ -10,6 +10,10 @@ def scanBall(tracker):
     """
     ball = tracker.brain.ball
 
+    #Should we really have to check that the target is ball?
+    #this method will just loop infinitely if the target is 
+    #not the ball 
+    #TODO: handle case of target is not ball?
     if (tracker.target == ball and
         tracker.target.vis.framesOn >=
         constants.TRACKER_FRAMES_ON_TRACK_THRESH):
