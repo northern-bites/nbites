@@ -40,13 +40,13 @@ const int ALImageTranscriber::DEFAULT_CAMERA_BUFFERSIZE = 16;
 // Gain: 35 / Exp: 40
 // Camera parameters go HERE, **NOT** in Camera.h
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_GAIN = 0; // AUTO GAIN OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 28;
+const int ALImageTranscriber::DEFAULT_CAMERA_GAIN = 42;
 const int ALImageTranscriber::DEFAULT_CAMERA_AUTO_WHITEBALANCE = 0; // AUTO WB OFF
-const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 133;
-const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 64;
-const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 130;
-const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 93;
-const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 151;
+const int ALImageTranscriber::DEFAULT_CAMERA_BLUECHROMA = 103;
+const int ALImageTranscriber::DEFAULT_CAMERA_REDCHROMA = 85;
+const int ALImageTranscriber::DEFAULT_CAMERA_BRIGHTNESS = 127;
+const int ALImageTranscriber::DEFAULT_CAMERA_CONTRAST = 82;
+const int ALImageTranscriber::DEFAULT_CAMERA_SATURATION = 180;
 const int ALImageTranscriber::DEFAULT_CAMERA_HUE = 0;
 // Lens correction
 const int ALImageTranscriber::DEFAULT_CAMERA_LENSX = 0;
