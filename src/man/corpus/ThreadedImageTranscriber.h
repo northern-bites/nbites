@@ -1,11 +1,13 @@
 #ifndef _ThreadedImageTranscriber_h
 #define _ThreadedImageTranscriber_h
 
-
 #include "ImageTranscriber.h"
 #include "synchro/synchro.h"
+#include "ClassHelper.h"
 
 class ThreadedImageTranscriber : public ImageTranscriber , public Thread{
+
+ADD_SHARED_PTR(ThreadedImageTranscriber);
 
 public:
 	ThreadedImageTranscriber(boost::shared_ptr<Sensors> sensors,
