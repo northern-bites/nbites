@@ -265,7 +265,7 @@ public class TOOL implements ActionListener, PropertyChangeListener{
     private void initMainWindow(){
 
         //start the main window
-        mainWindow = new JFrame("TOOL - Main Window");
+        mainWindow = new JFrame("TOOL - Main Window of Awesome");
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Try to set the look and feel to the appropriate OS setting
