@@ -28,6 +28,10 @@ public:
     QTool();
     ~QTool();
 
+private slots:
+    void next();
+    void prev();
+
 private:
     QTabWidget* toolTabs;
 
@@ -37,6 +41,11 @@ private:
     viewer::LogViewer* logViewer;
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::FieldViewer* fieldViewer;
+    QPushButton* prevButton;
+    QPushButton* nextButton;
+    QToolBar* toolbar;
+
+
 };
 
 }
