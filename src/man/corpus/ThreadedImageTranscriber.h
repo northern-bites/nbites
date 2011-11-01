@@ -14,6 +14,16 @@ public:
 	virtual ~ThreadedImageTranscriber() { }
 
 	virtual void run() = 0;
+
+	virtual void signalNewImage() {
+		this->signalToResume();
+	}
+
+protected:
+	virtual void waitForNewImage() {
+		this->waitForSignal();
+	}
+
 };
 
 
