@@ -70,7 +70,6 @@ SET( VISION_SRCS Ball
                  Field
                  FieldLines
                  ObjectFragments
-                 Profiler
                  PyVision
                  Robots
                  Threshold

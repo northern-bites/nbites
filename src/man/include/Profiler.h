@@ -4,14 +4,14 @@
 
 #include "profileconfig.h"
 #include <algorithm>
+#include <boost/shared_ptr.hpp>
+#include "Common.h"
 class Profiler;
 
 #ifdef USE_TIME_PROFILING
 #  define PROF_NFRAME()  (Profiler::getInstance()->nextFrame());
-#  define PROF_ENTER(c) (Profiler::getInstance()->profiling && \
-        Profiler::getInstance()->enterComponent(c));
-#  define PROF_EXIT(c)  (Profiler::getInstance()->profiling && \
-        Profiler::getInstance()->exitComponent(c));
+#  define PROF_ENTER(c) (Profiler::getInstance()->enterComponent(c));
+#  define PROF_EXIT(c)  (Profiler::getInstance()->exitComponent(c));
 #else
 #  define PROF_NFRAME()
 #  define PROF_ENTER(c)
@@ -102,17 +102,19 @@ class Profiler {
 
     bool nextFrame();
 
-    static Profiler* getInstance() { return instance;}
+    static Profiler* getInstance();
 
-    inline bool enterComponent(ProfiledComponent c) {
-      enterTime[c] = thread_timeFunction();
-      return profiling;
+    inline void enterComponent(ProfiledComponent c) {
+        if (!profiling)
+            return;
+        enterTime[c] = thread_timeFunction();
     }
-    inline bool exitComponent(ProfiledComponent c) {
-      lastTime[c] = thread_timeFunction() - enterTime[c];
-      minTime[c] = std::min(lastTime[c], minTime[c]);
-      maxTime[c] = std::max(lastTime[c], maxTime[c]);
-      return profiling;
+    inline void exitComponent(ProfiledComponent c) {
+        if (!profiling)
+            return;
+        lastTime[c] = thread_timeFunction() - enterTime[c];
+        minTime[c] = std::min(lastTime[c], minTime[c]);
+        maxTime[c] = std::max(lastTime[c], maxTime[c]);
     }
 
     inline bool shouldNotPrintLine(int i) {
@@ -121,11 +123,13 @@ class Profiler {
     }
 
   public:
-    bool profiling, printEmpty;
-    int maxPrintDepth;
     enum { PRINT_ALL_DEPTHS = -1 };
 
   private:
+
+    bool profiling;
+    bool printEmpty;
+    int maxPrintDepth;
 
     long long (*thread_timeFunction) ();
     long long (*process_timeFunction) ();
@@ -138,8 +142,6 @@ class Profiler {
     long long lastTime[NUM_PCOMPONENTS];
     long long profile_process_start_time;
     long long profile_global_start_time;
-
-    static Profiler* instance;
 
     bool verbose;
 

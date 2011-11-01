@@ -3,10 +3,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <climits>
+#include <iostream>
 
 #include "Profiler.h"
 #include "Common.h" //MICROS_PER_SECOND
 // #define PRINT_CSV
+
+using namespace std;
 
 static const char *PCOMPONENT_NAMES[] = {
   "Main Loop",
@@ -111,7 +114,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 
     /*P_LOC                    --> */ P_MAIN,
     /*P_MCL                    --> */ P_LOC,
-    /*P_LOGGING                --> */ P_MAIN,
+    /*P_LOGGING                --> */ P_TOTAL,
 
     /*P_PYTHON                 --> */ P_MAIN,
     /*P_PYUPDATE               --> */ P_PYTHON,
@@ -179,8 +182,6 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
  * That's all for now, folks.
  */
 
-Profiler* Profiler::instance = NULL;
-
 Profiler::Profiler (long long (*thread_time_f)(),
         long long (*process_time_f)(),
         long long (*global_time_f)())
@@ -190,24 +191,29 @@ Profiler::Profiler (long long (*thread_time_f)(),
       global_timeFunction(global_time_f),
       verbose(false) {
 
-    if (instance == NULL) {
-        instance = this;
-    }
     reset();
 }
 
 Profiler::~Profiler ()
 {
-    if (instance == this) {
-        instance = NULL;
-    }
 }
+
+Profiler* Profiler::getInstance() {
+    static boost::shared_ptr<Profiler>instance(
+            new Profiler(&thread_micro_time,
+                         &process_micro_time,
+                         &monotonic_micro_time));
+    return instance.get();
+}
+
 
 void
 Profiler::profileFrames (int num_frames)
 {
-  num_profile_frames = num_frames;
-  start_next_frame = true;
+    printf("Profiling for %i frames\n", num_frames);
+    this->reset();
+    num_profile_frames = num_frames;
+    start_next_frame = true;
 }
 
 void

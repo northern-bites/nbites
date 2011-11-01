@@ -20,17 +20,18 @@
 
 #include <boost/shared_ptr.hpp>
 using namespace boost;
+#include <iostream>
+using namespace std;
 
-#include "synchro.h"
 #include "Motion.h"
 #include "PyMotion.h"
+
 //#include "NaoEnactor.h"
 
-Motion::Motion (shared_ptr<Synchro> _synchro,
-                shared_ptr<MotionEnactor> _enactor,
+Motion::Motion (shared_ptr<MotionEnactor> _enactor,
                 shared_ptr<Sensors> s,
                 shared_ptr<NaoPose> _pose)
-  : Thread(_synchro, "Motion"),
+  : Thread("Motion"),
     switchboard(s, _pose),
     interface(&switchboard),
     enactor(_enactor),
@@ -40,11 +41,11 @@ Motion::Motion (shared_ptr<Synchro> _synchro,
 }
 
 Motion::~Motion() {
-    //enactor->setSwitchboard(NULL);
+    cout << "Motion destructor" << endl;
+    enactor->resetSwitchboard();
 }
 int Motion::start() {
     switchboard.start();
-
     return Thread::start();
 }
 
@@ -54,12 +55,7 @@ void Motion::stop() {
 }
 
 void Motion::run(){
-    std::cout <<"Motion::run"<< std::endl;
-    Thread::trigger->on();
-
     //Setup the callback  in the enactor so it knows to call the switchboard
     enactor->setSwitchboard(&switchboard);
-
     switchboard.run();
-    Thread::trigger->off();
 }

@@ -32,7 +32,7 @@ class LoggingBoard : public MemoryIOBoard<MObjectLogger> ,
                      public Subscriber<MObject_ID> {
 
 public:
-    LoggingBoard(Memory::const_ptr memory, boost::shared_ptr<Synchro> synchro,
+    LoggingBoard(Memory::const_ptr memory,
                 IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
     virtual ~LoggingBoard() {}
 
@@ -54,7 +54,6 @@ protected:
 private:
     Memory::const_ptr memory;
     bool logging;
-    boost::shared_ptr<Synchro> synchro;
 };
 }
 }

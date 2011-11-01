@@ -26,11 +26,11 @@
 #include <string.h>
 #include <boost/shared_ptr.hpp>
 
-#include "synchro.h"
 #include "Sensors.h"
 #include "MotionInterface.h"
 #include "ClickableButton.h"
 
+#include "synchro/synchro.h"
 #include "guardian/WifiAngel.h"
 
 //TODO: move this to the guardian folder
@@ -43,8 +43,7 @@ enum  ButtonID {
 
 class RoboGuardian : public Thread {
 public:
-    RoboGuardian(boost::shared_ptr<Synchro>,
-                 boost::shared_ptr<Sensors>);
+    RoboGuardian(boost::shared_ptr<Sensors>);
     virtual ~RoboGuardian();
 
     void run();
@@ -60,7 +59,10 @@ public:
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
-    void setMotionInterface(MotionInterface * minterface)
+    //this should be mutex locked - if you set the pointer to NULL it might
+    //after the guardian thread checked to see if the pointer was NULL
+    //(and it wasn't) it might result in a segfault - Octavian
+    void setMotionInterface(MotionInterface* minterface)
         { motion_interface = minterface; }
 
     void enableFallProtection(bool _useFallProtection) const
@@ -90,6 +92,7 @@ private:
     //helpers
     std::string getHostName()const;
     void playFile(std::string filePath)const; //non-blocking
+    void reloadMan();
 
 public:
     static const int GUARDIAN_FRAME_RATE;
@@ -101,7 +104,7 @@ public:
 private:
 
     boost::shared_ptr<Sensors> sensors;
-    MotionInterface * motion_interface;
+    MotionInterface* motion_interface;
     std::vector<float> lastTemps;
     float lastBatteryCharge;
 

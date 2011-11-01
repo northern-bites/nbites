@@ -74,6 +74,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose)
 // Vision Class Deconstructor
 Vision::~Vision()
 {
+    cout << "Vision destructor" << endl;
     delete thresh;
     delete navy2;
     delete navy1;
