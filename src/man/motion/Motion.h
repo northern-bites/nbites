@@ -40,18 +40,17 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "synchro.h"
 #include "MotionSwitchboard.h"
 #include "MotionEnactor.h"
 #include "MotionInterface.h"
 #include "Sensors.h"
 #include "NaoPose.h"
+#include "synchro/synchro.h"
 
 class Motion : public Thread
 {
 public:
-    Motion(boost::shared_ptr<Synchro> synchro,
-           boost::shared_ptr<MotionEnactor> _enactor,
+    Motion(boost::shared_ptr<MotionEnactor> _enactor,
            boost::shared_ptr<Sensors> s,
            boost::shared_ptr<NaoPose> _pose);
     virtual ~Motion();

@@ -4,6 +4,8 @@
  * @author Octavian Neamtu
  */
 
+#include <iostream>
+
 #include "Common.h"
 #include "Memory.h"
 
@@ -15,6 +17,7 @@ long long int birth_time; //the time we initialized memory
 
 using boost::shared_ptr;
 using namespace proto;
+using namespace std;
 
 Memory::Memory(shared_ptr<Vision> vision_ptr,
         shared_ptr<Sensors> sensors_ptr) :
@@ -39,6 +42,7 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
 }
 
 Memory::~Memory() {
+    cout << "Memory destructor" << endl;
 }
 
 void Memory::update(boost::shared_ptr<MObject> obj) {

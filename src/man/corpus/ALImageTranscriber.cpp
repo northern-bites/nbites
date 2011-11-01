@@ -12,7 +12,7 @@
 #include "corpusconfig.h"
 #include "ImageAcquisition.h"
 
-#include "vision/Profiler.h"
+#include "Profiler.h"
 
 #ifdef DEBUG_ALIMAGE
 #  define DEBUG_ALIMAGE_LOOP
@@ -87,10 +87,9 @@ const int ALImageTranscriber::DEFAULT_CAMERA_HFLIP = 0;
 const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
 #endif
 
-ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
-                                       shared_ptr<Sensors> s,
+ALImageTranscriber::ALImageTranscriber(shared_ptr<Sensors> s,
                                        ALPtr<ALBroker> broker)
-    : ThreadedImageTranscriber(s,synchro,"ALImageTranscriber"),
+    : ThreadedImageTranscriber(s,"ALImageTranscriber"),
       log(), camera(), lem_name(""), camera_active(false),
       image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
       table(new unsigned char[yLimit * uLimit * vLimit]),
@@ -103,7 +102,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Synchro> synchro,
         // lowDebug, debug, lowInfo, info, warning, error, fatal
         log->setVerbosity("error");
     }catch (ALError &e) {
-        cerr << "Could not create a proxy to ALLogger module" << endl;
+        cout << "Could not create a proxy to ALLogger module" << endl;
     }
 
 #ifdef USE_VISION
@@ -138,9 +137,6 @@ int ALImageTranscriber::start()
 
 void ALImageTranscriber::run()
 {
-    Thread::running = true;
-    Thread::trigger->on();
-
     long long lastProcessTimeAvg = VISION_FRAME_LENGTH_uS;
 
     struct timespec interval, remainder;
@@ -197,7 +193,6 @@ void ALImageTranscriber::run()
         PROF_EXIT(P_MAIN);
         PROF_NFRAME();
     }
-    Thread::trigger->off();
 }
 
 void ALImageTranscriber::stop()

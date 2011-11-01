@@ -59,7 +59,7 @@ Noggin::Noggin (shared_ptr<Vision> v,
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("Noggin::initializing\n");
 #   endif
-    
+
     // Initialize the interpreter and C python extensions
     initializePython();
 
@@ -80,6 +80,7 @@ Noggin::Noggin (shared_ptr<Vision> v,
 
 Noggin::~Noggin ()
 {
+    cout << "Noggin destructor" << endl;
     Py_XDECREF(brain_instance);
     Py_XDECREF(brain_module);
 #   ifdef LOG_LOC
@@ -528,7 +529,7 @@ void Noggin::modifySysPath ()
 #    if defined OFFLINE || defined STRAIGHT
        const char *cwd = "/usr/local/nao-1.6/modules/lib";
 #    else
-       const char *cwd = "/home/nao/naoqi/lib/naoqi";
+       const char *cwd = "/home/nao/naoqi/lib";
 #    endif
 #  endif
 
@@ -549,11 +550,6 @@ void Noggin::modifySysPath ()
         PyList_Append(path, PyString_FromString(cwd));
         Py_DECREF(sys_module);
     }
-
-#if !ROBOT(NAO)
-    free(cwd);
-#endif
-
 }
 
 #ifdef LOG_LOCALIZATION

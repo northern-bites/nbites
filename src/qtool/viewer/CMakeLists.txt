@@ -15,11 +15,19 @@ add_definitions(${QT_DEFINITIONS})
 
 set( viewer_srcs LogViewer.cpp
                  MObjectViewer.cpp
-                 RoboImageViewer.cpp )
+                 RoboImageViewer.cpp
+		 BallEKFViewer.cpp
+		 FieldViewer.cpp
+		 EKFDataViewer.cpp
+		 PaintField.cpp)
 
 set( viewer_headers LogViewer.h
+                    MObjectViewer.h
                     RoboImageViewer.h
-                    MObjectViewer.h )
+		    BallEKFViewer.h
+		    FieldViewer.h
+		    EKFDataViewer.h
+		    PaintField.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
