@@ -11,7 +11,7 @@
 #include <string>
 #include <stdint.h>
 
-#include "ThreadedImageTranscriber.h"
+#include "corpus/ThreadedImageTranscriber.h"
 #include "ClassHelper.h"
 #include "memory/MImage.h"
 #include "ColorParams.h"

@@ -8,7 +8,8 @@ using namespace std;
 namespace man {
 namespace corpus {
 
-OfflineImageTranscriber::OfflineImageTranscriber(boost::shared_ptr<Sensors> s,
+OfflineImageTranscriber::OfflineImageTranscriber(
+		boost::shared_ptr<Sensors> s,
 		memory::MImage::const_ptr mImage)
 		: ThreadedImageTranscriber(s, "OfflineImageTranscriber"),
 		  mImage(mImage),
@@ -16,6 +17,9 @@ OfflineImageTranscriber::OfflineImageTranscriber(boost::shared_ptr<Sensors> s,
 		  params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
 		  image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])){
 	initTable("/home/oneamtu/nbites/data/tables/120lab-lizzie.mtb");
+}
+
+OfflineImageTranscriber::~OfflineImageTranscriber() {
 }
 
 void OfflineImageTranscriber::run() {
@@ -50,7 +54,7 @@ void OfflineImageTranscriber::initTable(string filename) {
 
 void OfflineImageTranscriber::acquireNewImage() {
 	ImageAcquisition::acquire_image_fast(table, params,
-			reinterpret_cast<const uint8_t>(mImage->get()->image().data()),
+			reinterpret_cast<const uint8_t*>(mImage->get()->image().data()),
 			image);
 }
 
