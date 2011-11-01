@@ -22,7 +22,6 @@ class ImageTranscriber {
 
  protected:
     boost::shared_ptr<Sensors> sensors;
-    //void(ImageSubscriber::*imageCallback)();
     ImageSubscriber *subscriber;
 };
 
