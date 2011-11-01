@@ -35,11 +35,15 @@ void loadMan(OfflineManController::ptr offlineController) {
     man_pointer = shared_ptr<TMan>(new TMan(sensors, transcriber,
                                             imageTranscriber,
                                             enactor, lights, speech));
+    offlineController->setImageTranscriber(imageTranscriber);
+    offlineController->setManMemory(man_pointer->memory);
     man_pointer->startSubThreads();
 }
 
-void unloadMan() {
+void unloadMan(OfflineManController::ptr offlineController) {
     man_pointer->stopSubThreads();
+    offlineController->resetImageTranscriber();
+    offlineController->resetManMemory();
     //decrements the man_pointer count by one, effectively destructing man
     man_pointer.reset();
 }
