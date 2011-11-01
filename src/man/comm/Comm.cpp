@@ -411,12 +411,11 @@ PyMODINIT_FUNC init_comm (void)
 /**************************/
 
 // Constructor
-Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
-            shared_ptr<Vision> v)
-    : Thread(_synchro, "Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
-	  lastPacketNumber(0),  latest(), sensors(s),
+Comm::Comm (shared_ptr<Sensors> s, shared_ptr<Vision> v)
+    : Thread("Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
+      lastPacketNumber(0),  latest(), sensors(s),
       timer(&monotonic_micro_time), gc(new GameController()),
-      tool(_synchro, s, v, gc), averagePacketDelay(0),
+      tool(s, v, gc), averagePacketDelay(0),
       totalPacketsReceived(0), ourPacketsReceived(0)
 {
     pthread_mutex_init(&comm_mutex,NULL);
@@ -433,6 +432,7 @@ Comm::Comm (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
 // Deconstructor
 Comm::~Comm ()
 {
+    cout << "Comm destructor" << endl;
     pthread_mutex_destroy(&comm_mutex);
 }
 
@@ -449,9 +449,6 @@ int Comm::start ()
 // Main control loop for Comm
 void Comm::run()
 {
-    // Signal thread start
-    running = true;
-    trigger->on();
 
     struct timespec interval, remainder;
     interval.tv_sec = 0;
@@ -492,10 +489,6 @@ void Comm::run()
 
     // Close the UDP socket
     ::close(sockn);
-
-    // Signal thread end
-    //running = false;
-    //trigger->off();
 }
 
 // Stops ToolConnect thread and Comm thread
@@ -566,7 +559,7 @@ void Comm::discover_broadcast()
         //cout<<"Failed to discover broadcast address -- command returned error";
 	}
 	else if(len <= 0)
-	{ 
+	{
         //cout<<"Failed to discover broadcast address -- find broadcast returned no output";
 	}
 }
@@ -730,7 +723,7 @@ void Comm::send(const char *msg, int len, sockaddr_in &addr) throw(socket_error)
         if (result == -1 && errno == EAGAIN)
 	{
             result = -2;
-	    cerr << "Comm::send() : EAGAIN error!" << endl;
+	    cout << "Comm::send() : EAGAIN error!" << endl;
             nanosleep(&interval, &remainder);
         }
     }
@@ -741,7 +734,7 @@ void Comm::send(const char *msg, int len, sockaddr_in &addr) throw(socket_error)
             broadcast_addr.sin_addr.s_addr == htonl(INADDR_BROADCAST))
             // attempt to discover our specific broadcast address
             discover_broadcast();
-	
+
         else if (errno != EAGAIN)
             error(SOCKET_ERROR(errno));
     }
@@ -749,8 +742,8 @@ void Comm::send(const char *msg, int len, sockaddr_in &addr) throw(socket_error)
 
     // record last time we sent a message
     timer.packetSent();
-#ifdef DEBUG_COMM  
-    cout << Thread::name << ": Last packet sent at " << timer.lastPacketSentAt() 
+#ifdef DEBUG_COMM
+    cout << Thread::name << ": Last packet sent at " << timer.lastPacketSentAt()
 	 << "." << endl;
 #endif
 }
@@ -773,7 +766,7 @@ void Comm::receive() throw(socket_error)
 	// Received a packet! Update the average delay.
 	if(timer.lastPacketReceivedAt() != 0)
 	    updateAverageDelay();
-	
+
 	totalPacketsReceived++;
 	updatePercentReceived();
         // Handle messages from not for GameController.
@@ -873,7 +866,7 @@ void Comm::handle_comm (struct sockaddr_in &addr, const char *msg, int len)
 
 // Handles packet from GameController
 void Comm::handle_gc(struct sockaddr_in &addr,
-		     const char *msg, int len) 
+		     const char *msg, int len)
     throw()
 {
 	gc->handle_packet(msg, len);
@@ -882,7 +875,7 @@ void Comm::handle_gc(struct sockaddr_in &addr,
 }
 
 // Ensure packet is one of ours, that it is not the robot's own packet, and that it's not a
-// packet from another team. Also calls the timer method to validate the packet to make sure 
+// packet from another team. Also calls the timer method to validate the packet to make sure
 // that it is not too old, etc.
 bool Comm::validate_packet(const char* msg, int len,
 			   CommPacketHeader& packet)
@@ -927,7 +920,7 @@ bool Comm::validate_packet(const char* msg, int len,
 #endif
         return false;
     }
-    
+
     if (!timer.check_packet(packet))
         return false;
 
@@ -996,7 +989,7 @@ void Comm::add_to_module()
     {
         if (!c_init_comm())
 	{
-            cerr << "Comm module failed to initialize the backend" << endl;
+            cout << "Comm module failed to initialize the backend" << endl;
             PyErr_Print();
         }
     }

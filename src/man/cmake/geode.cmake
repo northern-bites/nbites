@@ -35,6 +35,8 @@ ENDIF( APPLE )
 
 ############################ DEFINES && DEFINITIONS
 SET( OE_CROSS_BUILD ON )
+SET( OFFLINE OFF )
+SET( BUILDING_FOR_A_REMOTE_NAO ON )
 
 ############################# CROSS-COMPILATION VARIABLES
 # Set the variable for the cross-compilation directory, cmake variables

@@ -4,7 +4,7 @@
  * Keeps track of a bunch of FDProviders stored in a map that's indexed by
  * the template
  *
- * Also it should have a 1-1 correspondance with its subscriber
+ * There is a 1-1 correspondance between the FDProvider and its subscriber/owner
  *
  * @author Octavian Neamtu <oneamtu89@gmail.com>
  */

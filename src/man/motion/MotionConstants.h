@@ -101,5 +101,16 @@ namespace MotionConstants {
     static const bool null_body_mask[Kinematics::NUM_CHAINS] =
     {false, true, true, true, true};
 
+    static const float SIT_DOWN_ANGLES[] =
+    { 0.0f, 0.0f,
+     1.57f, 0.0f, -1.13f, -1.0f,
+      0.0f, 0.0f, -0.96f,  2.18f,
+    -1.22f, 0.0f,  0.0f,   0.0f,
+    -0.96f, 2.18f,-1.22f,  0.0f,
+     1.57f, 0.0f,  1.13f,  1.01f};
+
+    static const std::vector<float> OFF_STIFFNESSES(
+                             Kinematics::NUM_JOINTS,
+                             MotionConstants::DEFAULT_OFF_STIFFNESS);
 };
 #endif

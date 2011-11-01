@@ -3535,7 +3535,7 @@ int FieldLines::numPixelsToHitColor(const int x, const int y,
     }
     // TestDirection wrong
     else {
-        cerr << "testDir is invalid: " << testDir << endl;
+        cout << "testDir is invalid: " << testDir << endl;
         return -1;
     }
 
