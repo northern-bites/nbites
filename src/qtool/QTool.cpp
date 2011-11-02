@@ -16,9 +16,9 @@ QTool::QTool() : QMainWindow(),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCreator(new ColorCreator(dataManager)),
-	logViewer(new LogViewer(dataManager)),
-	ballEKFViewer(new BallEKFViewer(dataManager)),
-	fieldViewer(new FieldViewer(dataManager)){
+        logViewer(new LogViewer(dataManager)),
+        ballEKFViewer(new BallEKFViewer(dataManager)),
+        fieldViewer(new FieldViewer(dataManager)){
 
     this->setWindowTitle(tr("HackTool"));
 
