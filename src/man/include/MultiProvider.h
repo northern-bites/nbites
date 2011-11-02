@@ -30,6 +30,8 @@ public:
     MultiProvider(){
     }
 
+    virtual ~MultiProvider();
+
     virtual void inline addSubscriber(Subscriber<event_type>* s) {
         Provider<event_type>::addSubscriber(s);
     }
@@ -40,7 +42,6 @@ public:
                 EventSubscriberPair(event_to_subscribe_to, s));
     }
 
-protected:
     //this checks to see if a subscriber is NULL and removes it as well
     virtual void notifySubscribers(event_type event) {
         //first update all of the general subscribers
