@@ -31,7 +31,7 @@ void OfflineManPreloader::reloadMan() {
 
 void OfflineManPreloader::destroyMan() {
     debug_preloader_out << "Trying to destroy man ... " << endl;
-    (*unloadMan)();
+    (*unloadMan)(offlineControl);
     this->closeLibMan();
 }
 

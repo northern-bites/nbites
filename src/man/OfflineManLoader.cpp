@@ -8,7 +8,6 @@
 #include "corpus/offlineconnect/OfflineImageTranscriber.h"
 #include "corpus/offlineconnect/OfflineTranscriber.h"
 #include "corpus/offlineconnect/OfflineEnactor.h"
-#include "corpus/offlineconnect/OfflineManController.h"
 
 using namespace std;
 using boost::shared_ptr;

@@ -16,7 +16,7 @@
 typedef void (*loadManMethod)(man::corpus::OfflineManController::ptr);
 
 //This is the method unloadMan's signature
-typedef void (*unloadManMethod)();
+typedef void (*unloadManMethod)(man::corpus::OfflineManController::ptr);
 
 START_FUNCTION_EXPORT
 
