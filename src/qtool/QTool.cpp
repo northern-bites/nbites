@@ -7,7 +7,7 @@ namespace qtool {
 using data::DataManager;
 using data::DataLoader;
 using colorcreator::ColorCreator;
-using viewer::LogViewer;
+using viewer::MemoryViewer;
 using viewer::BallEKFViewer;
 using viewer::FieldViewer;
 
@@ -16,7 +16,7 @@ QTool::QTool() : QMainWindow(),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCreator(new ColorCreator(dataManager)),
-        logViewer(new LogViewer(dataManager)),
+        memoryViewer(new MemoryViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
         fieldViewer(new FieldViewer(dataManager)){
 
@@ -26,7 +26,7 @@ QTool::QTool() : QMainWindow(),
 
     toolTabs->addTab(colorCreator, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
-    toolTabs->addTab(logViewer, tr("Log Viewer"));
+    toolTabs->addTab(memoryViewer, tr("Log Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
 

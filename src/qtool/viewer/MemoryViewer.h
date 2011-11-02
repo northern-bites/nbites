@@ -13,18 +13,18 @@
 #include <QtGui>
 #include <vector>
 
-#include "data/DataManager.h"
+#include "man/memory/Memory.h"
 #include "RoboImageViewer.h"
 #include "MObjectViewer.h"
 
 namespace qtool {
 namespace viewer {
 
-class LogViewer : public QMainWindow{
-	Q_OBJECT
+class MemoryViewer : public QMainWindow{
+    Q_OBJECT
 
 public:
-	LogViewer(data::DataManager::ptr dataManager);
+    MemoryViewer(man::memory::Memory::const_ptr memory);
 
 public slots:
     void nextImage();
@@ -32,7 +32,7 @@ public slots:
 
 private:
     std::vector<QDockWidget*> dockWidget;
-    data::DataManager::ptr dataManager;
+    man::memory::Memory::const_ptr memory;
     RoboImageViewer* roboImageViewer;
     QPushButton* prevButton;
     QPushButton* nextButton;

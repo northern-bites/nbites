@@ -37,11 +37,17 @@ public:
     void getNext() {
         parsingBoard.parseAll();
         memory->notifySubscribers(man::memory::MIMAGE_ID);
+        memory->notifySubscribers(man::memory::MVISION_ID);
+        memory->notifySubscribers(man::memory::MVISION_SENSORS_ID);
+        memory->notifySubscribers(man::memory::MMOTION_SENSORS_ID);
     }
 
     void getPrev() {
         parsingBoard.rewindAll();
         memory->notifySubscribers(man::memory::MIMAGE_ID);
+        memory->notifySubscribers(man::memory::MVISION_ID);
+        memory->notifySubscribers(man::memory::MVISION_SENSORS_ID);
+        memory->notifySubscribers(man::memory::MMOTION_SENSORS_ID);
     }
 
     man::memory::Memory::const_ptr getMemory() const {

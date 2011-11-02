@@ -1,7 +1,6 @@
 
-#include "LogViewer.h"
+#include "MemoryViewer.h"
 #include <vector>
-#include "man/memory/Memory.h"
 
 namespace qtool {
 namespace viewer {
@@ -9,10 +8,9 @@ namespace viewer {
 using namespace data;
 using namespace man::memory;
 
-    LogViewer::LogViewer(DataManager::ptr dataManager) :
-         dataManager(dataManager),
-         roboImageViewer(new RoboImageViewer(
-                 dataManager->getMemory()->getMImage())) {
+    MemoryViewer::MemoryViewer(Memory::const_ptr memory) :
+         memory(memory),
+         roboImageViewer(new RoboImageViewer(memory->getMImage())) {
 
         toolbar = new QToolBar();
         nextButton = new QPushButton(tr("&Next"));
@@ -27,29 +25,28 @@ using namespace man::memory;
         this->addToolBar(toolbar);
 
         this->setCentralWidget(roboImageViewer);
-        dataManager->addSubscriber(roboImageViewer, MIMAGE_ID);
+        memory->addSubscriber(roboImageViewer, MIMAGE_ID);
 
         std::vector<QTreeView> messageViewers;
         for (MObject_ID id = FIRST_OBJECT;
                 id != LAST_OBJECT; id++) {
             if (id != MIMAGE_ID) {
-                QDockWidget* dockWidget = new QDockWidget(QString(MObject_names[id].c_str()), this);
-                MObjectViewer* view = new MObjectViewer(dataManager->getMemory()->
+                QDockWidget* dockWidget =
+                        new QDockWidget(QString(MObject_names[id].c_str()), this);
+                MObjectViewer* view = new MObjectViewer(memory->
                                                         getMObject(id)->getProtoMessage());
                 dockWidget->setWidget(view);
                 this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-                dataManager->addSubscriber(view);
+                memory->addSubscriber(view, id);
             }
         }
 
     }
 
-    void LogViewer::nextImage() {
-        dataManager->getNext();
+    void MemoryViewer::nextImage() {
     }
 
-    void LogViewer::prevImage() {
-        dataManager->getPrev();
+    void MemoryViewer::prevImage() {
     }
 
 }
