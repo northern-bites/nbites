@@ -8,8 +8,11 @@
  *
  */
 
+#pragma once
+
 #include "corpus/ThreadedImageTranscriber.h"
 #include "ClassHelper.h"
+#include "man/memory/Memory.h"
 
 namespace man {
 namespace corpus{
@@ -30,6 +33,10 @@ public:
 
 	void resetImageTranscriber() {
 		imageTranscriber = ThreadedImageTranscriber::ptr();
+	}
+
+	memory::Memory::const_ptr getManMemory() const {
+	    return man_memory;
 	}
 
 	void setManMemory(memory::Memory::ptr memory) {
