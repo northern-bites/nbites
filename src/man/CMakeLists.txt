@@ -163,8 +163,6 @@ INCLUDE_DIRECTORIES(
 
 ############################ Platform settings
 
-SET( MAN_PRELOADER_SRCS ManPreloader )
-
 IF(BUILDING_FOR_A_REMOTE_NAO)
   SET( MAN_LOADER_SRC NaoManLoader )
   LIST(APPEND MAN_PRELOADER_SRCS NaoManPreloader )
