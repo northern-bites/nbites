@@ -12,7 +12,7 @@ public:
     OfflineTranscriber(boost::shared_ptr<Sensors> s,
     		memory::MVisionSensors::const_ptr mvisionSensors,
     		memory::MMotionSensors::const_ptr mmotionSensors);
-    virtual ~OfflineTranscriber();
+    virtual ~OfflineTranscriber() {}
 
     void postMotionSensors();
     void postVisionSensors();
