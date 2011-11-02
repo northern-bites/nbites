@@ -163,13 +163,15 @@ INCLUDE_DIRECTORIES(
 
 ############################ Platform settings
 
+SET( MAN_PRELOADER_SRCS ManPreloader )
+
 IF(BUILDING_FOR_A_REMOTE_NAO)
   SET( MAN_LOADER_SRC NaoManLoader )
-  SET( MAN_PRELOADER_SRC NaoManPreloader )
+  LIST(APPEND MAN_PRELOADER_SRCS NaoManPreloader )
 ENDIF()
 IF(OFFLINE)
-  SET( MAN_LOADER_SRC FakeManLoader )
-  SET( MAN_PRELOADER_SRC FakeManPreloader )
+  SET( MAN_LOADER_SRC OfflineManLoader )
+  LIST(APPEND MAN_PRELOADER_SRCS OfflineManPreloader )
 ENDIF()
 
 ############################ Setting up Man
@@ -212,7 +214,7 @@ TARGET_LINK_LIBRARIES(
 ADD_LIBRARY(
   ${MAN_PRELOADER_TARGET}
   SHARED
-  ${MAN_PRELOADER_SRC}
+  ${MAN_PRELOADER_SRCS}
   )
 
 ############################# INSTALL PATHS
