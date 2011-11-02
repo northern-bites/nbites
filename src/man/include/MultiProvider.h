@@ -30,14 +30,14 @@ public:
     MultiProvider(){
     }
 
-    virtual ~MultiProvider();
+    virtual ~MultiProvider() {}
 
-    virtual void inline addSubscriber(Subscriber<event_type>* s) {
+    virtual void inline addSubscriber(Subscriber<event_type>* s) const {
         Provider<event_type>::addSubscriber(s);
     }
 
     virtual void inline addSubscriber(Subscriber<event_type>* s,
-            event_type event_to_subscribe_to) {
+            event_type event_to_subscribe_to) const {
         eventSubscriberMap.insert(
                 EventSubscriberPair(event_to_subscribe_to, s));
     }
@@ -59,6 +59,6 @@ public:
     }
 
 private:
-     EventSubscriberMap eventSubscriberMap;
+     mutable EventSubscriberMap eventSubscriberMap;
 
 };

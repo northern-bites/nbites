@@ -32,11 +32,11 @@ public:
 
     virtual ~Provider(){}
 
-    virtual void inline addSubscriber(Subscriber<event_type>* s) {
+    virtual void inline addSubscriber(Subscriber<event_type>* s) const {
         subscribers.push_back(s);
     }
 
-    virtual void inline notifySubscribers(event_type event) const {
+    virtual void inline notifySubscribers(event_type event) {
         for (subscriber_iter i = subscribers.begin();
                 i != subscribers.end(); i++) {
             (*i)->update(event);
