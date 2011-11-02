@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1053</width>
-    <height>1029</height>
+    <height>900</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,7 +26,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>9</x>
@@ -85,85 +85,11 @@
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="buttonsDock">
-   <property name="minimumSize">
-    <size>
-     <width>56</width>
-     <height>80</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>524287</width>
-     <height>524287</height>
-    </size>
-   </property>
-   <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>4</number>
-   </attribute>
-   <widget class="QWidget" name="buttons">
-    <widget class="QPushButton" name="previousButton">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>114</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Previous</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="nextButton">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>10</y>
-       <width>114</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Next</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="plusTen">
-     <property name="geometry">
-      <rect>
-       <x>280</x>
-       <y>10</y>
-       <width>114</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>+ 10</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="minusTen">
-     <property name="geometry">
-      <rect>
-       <x>390</x>
-       <y>10</y>
-       <width>114</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>- 10</string>
-     </property>
-    </widget>
-   </widget>
-  </widget>
   <widget class="QDockWidget" name="colorEditorDock">
    <property name="minimumSize">
     <size>
      <width>280</width>
-     <height>897</height>
+     <height>855</height>
     </size>
    </property>
    <property name="features">

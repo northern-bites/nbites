@@ -68,7 +68,7 @@ uint32_t MObjectParser::sizeOfLastNumMessages(uint32_t n) const {
     for (int i = message_sizes.size() - n; i < message_sizes.size(); i++) {
         total_size += message_sizes[i];
     }
-    //also add the size taken up by the message sizes themselves
+    //also add the size taken up by the message size information themselves
     total_size += n*sizeof(uint32_t);
     return total_size;
 }
