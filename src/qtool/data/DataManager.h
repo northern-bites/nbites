@@ -18,16 +18,16 @@
 #include "man/memory/parse/ParsingBoard.h"
 #include "include/MultiProvider.h"
 #include "DataTypes.h"
+#include "ClassHelper.h"
 
 #include <iostream>
 
 namespace qtool {
 namespace data {
 
-class DataManager : public MultiProvider<MObject_ID> {
+class DataManager {
 
-public:
-	typedef boost::shared_ptr<DataManager> ptr;
+ADD_SHARED_PTR(DataManager);
 
 public:
     DataManager();
@@ -36,18 +36,22 @@ public:
 
     void getNext() {
         parsingBoard.parseAll();
-        this->notifySubscribers(man::memory::MIMAGE_ID);
+        memory->notifySubscribers(man::memory::MIMAGE_ID);
     }
 
     void getPrev() {
         parsingBoard.rewindAll();
-        this->notifySubscribers(man::memory::MIMAGE_ID);
+        memory->notifySubscribers(man::memory::MIMAGE_ID);
     }
 
-    man::memory::Memory::ptr getMemory() const {
+    man::memory::Memory::const_ptr getMemory() const {
         return memory;}
 
     void newDataSource(DataSource::ptr dataSource);
+
+    void addSubscriber(Subscriber<MObject_ID>* subscriber,
+            MObject_ID mobject_id);
+    void addSubscriber(Subscriber<MObject_ID>* subscriber);
 
 private:
     man::memory::Memory::ptr memory;
