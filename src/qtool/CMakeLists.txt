@@ -52,6 +52,7 @@ add_subdirectory( image )
 add_subdirectory( colorcreator )
 add_subdirectory( data )
 add_subdirectory( viewer )
+add_subdirectory( offline )
 
 ######### The executable
 
@@ -66,6 +67,7 @@ target_link_libraries(
   image
   data
   viewer
+  offline
   ${QT_LIBRARIES}
   )
 

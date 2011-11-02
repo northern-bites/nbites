@@ -15,6 +15,7 @@
 #include "data/DataManager.h"
 #include "colorcreator/ColorCreator.h"
 #include "viewer/MemoryViewer.h"
+#include "offline/OfflineViewer.h"
 #include "viewer/BallEKFViewer.h"
 #include "viewer/FieldViewer.h"
 
@@ -35,6 +36,7 @@ private:
     data::DataLoader* dataLoader;
     colorcreator::ColorCreator* colorCreator;
     viewer::MemoryViewer* memoryViewer;
+    offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::FieldViewer* fieldViewer;
 };
