@@ -163,7 +163,9 @@ int Thread::start ()
 void Thread::stop ()
 {
     running = false;
-
+    //thread might be waiting for a signal, so if we're just waiting
+    //for it to stop, then we might wait forever
+    this->signalToResume();
     debug_thread_out << this->name << "::stopping" << endl;
 }
 
@@ -183,6 +185,7 @@ void* Thread::runThread (void* _this)
 
     debug_thread_out << this_instance->name << "::exiting" << endl;
     pthread_exit(NULL);
+    return _this;
 }
 
 void Thread::signalToResume() {
