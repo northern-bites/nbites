@@ -18,8 +18,8 @@ class RoboImageViewer: public QWidget,
 public:
 
     RoboImageViewer(man::memory::MImage::const_ptr rawImage,
-    		QLabel *infoLabel = NULL,
-    		QWidget *parent = NULL);
+            QLabel *infoLabel = NULL,
+            QWidget *parent = NULL);
     virtual ~RoboImageViewer();
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
