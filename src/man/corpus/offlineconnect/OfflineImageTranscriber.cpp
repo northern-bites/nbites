@@ -26,6 +26,7 @@ void OfflineImageTranscriber::run() {
 	while(running) {
 		this->waitForNewImage();
 		this->acquireNewImage();
+		subscriber->notifyNextVisionImage();
 	}
 }
 
@@ -53,9 +54,23 @@ void OfflineImageTranscriber::initTable(string filename) {
 }
 
 void OfflineImageTranscriber::acquireNewImage() {
-	ImageAcquisition::acquire_image_fast(table, params,
-			reinterpret_cast<const uint8_t*>(mImage->get()->image().data()),
-			image);
+    if (sensors->getWriteableNaoImage() != NULL) {
+        // TODO:
+        // this is how we make the image that gets passed to man offline
+        // appear valid in the memory viewer; this is slow; investigate a
+        // better way to do this
+        memcpy(sensors->getWriteableNaoImage(),
+              reinterpret_cast<const uint8_t*>(mImage->get()->image().data()),
+               NAO_IMAGE_BYTE_SIZE);
+        ImageAcquisition::acquire_image_fast(table, params,
+                sensors->getNaoImage(),
+                image);
+        sensors->notifyNewNaoImage();
+    } else {
+        ImageAcquisition::acquire_image_fast(table, params,
+                reinterpret_cast<const uint8_t*>(mImage->get()->image().data()),
+                image);
+    }
 }
 
 }

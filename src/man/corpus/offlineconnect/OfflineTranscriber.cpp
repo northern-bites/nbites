@@ -17,6 +17,7 @@ OfflineTranscriber::OfflineTranscriber(shared_ptr<Sensors> s,
 
 void OfflineTranscriber::postVisionSensors() {
 	mvisionSensors->copyTo(sensors);
+	sensors->notifySubscribers(NEW_VISION_SENSORS);
 }
 
 void OfflineTranscriber::postMotionSensors() {
