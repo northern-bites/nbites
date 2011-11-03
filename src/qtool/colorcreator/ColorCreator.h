@@ -87,9 +87,6 @@ protected:
     void mousePressEvent(QMouseEvent* event);
 
 private slots:
-    void on_previousButton_clicked();
-
-    void on_nextButton_clicked();
 
     void on_hMin_valueChanged(int value);
 
@@ -116,10 +113,6 @@ private slots:
     void on_getColorTable_clicked();
 
     void on_writeNew_clicked();
-
-    void on_plusTen_clicked();
-
-    void on_minusTen_clicked();
 
     void on_channel_currentIndexChanged(int index);
 

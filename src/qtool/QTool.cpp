@@ -24,6 +24,18 @@ QTool::QTool() : QMainWindow(),
 
     this->setWindowTitle(tr("HackTool"));
 
+    toolbar = new QToolBar();
+    nextButton = new QPushButton(tr("&Next"));
+    prevButton = new QPushButton(tr("&Previous"));
+
+    connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
+    connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
+
+    toolbar->addWidget(prevButton);
+    toolbar->addWidget(nextButton);
+
+    this->addToolBar(toolbar);
+
     this->setCentralWidget(toolTabs);
 
     toolTabs->addTab(colorCreator, tr("Color Creator"));
@@ -40,6 +52,14 @@ QTool::~QTool() {
     delete colorCreator;
     delete dataLoader;
     delete toolTabs;
+}
+
+void QTool::next() {
+    dataManager->getNext();
+}
+
+void QTool::prev() {
+    dataManager->getPrev();
 }
 
 }
