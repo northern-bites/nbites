@@ -38,6 +38,18 @@ ProtoNode::ProtoNode(ProtoNode* _parent,
 ProtoNode::~ProtoNode() {
 }
 
+ProtoNode* ProtoNode::createNewSingleValueNode(const FieldDescriptor* childFD) {
+    return new ProtoNode(this, childFD);
+}
+
+ProtoNode* ProtoNode::createNewMessageNodeFromRepeated(const Message* message) {
+    return new ProtoNode(this, NULL, message);
+}
+
+ProtoNode* ProtoNode::createNewSingularNodeFromRepeated() {
+    return new ProtoNode(this, NULL);
+}
+
 void ProtoNode::constructTree() {
 
     //do a breadth-first search through all the descriptors
@@ -66,7 +78,7 @@ QList<ProtoNode*> ProtoNode::constructMessageChildren() {
     for (int i = 0; i < d->field_count(); i++) {
 
         const FieldDescriptor* childFD = d->field(i);
-        ProtoNode* childNode = new ProtoNode(this, childFD);
+        ProtoNode* childNode = createNewSingleValueNode(childFD);
         this->addChild(childNode);
 
         if (childNode->isOfTypeMessage() || childNode->isRepeated()) {
@@ -82,26 +94,36 @@ QList<ProtoNode*> ProtoNode::constructRepeatedChildren() {
         ProtoNode* childNode;
         if (this->isOfTypeMessage()) {
             const Message* message = this->getRepeatedMessageAt(i);
-            childNode = new ProtoNode(this, NULL, message);
+            childNode = createNewMessageNodeFromRepeated(message);
             nodes.append(childNode);
         } else {
-            childNode = new ProtoNode(this, NULL);
+            childNode = createNewSingularNodeFromRepeated();
         }
         this->addChild(childNode);
     }
     return nodes;
 }
 
-int ProtoNode::getNumColumns() const {
-    return NUM_DATA_COLUMNS;
+void ProtoNode::revalidate() {
+    if (this->isRepeated()) {
+        int sizeChange = getSizeOfField() - children.size();
+        if (sizeChange > 0) {
+            for (int i = 0; i < sizeChange; i++) {
+                this->addChild(createNewSingularNodeFromRepeated());
+            }
+        } else {
+            for (int i = sizeChange; i < 0; i++) {
+                this->popChild();
+            }
+        }
+    }
+    for (NodeList::iterator i = children.begin(); i != children.end(); i++) {
+        (*i)->revalidate();
+    }
 }
 
-int ProtoNode::childCount() const {
-    if (isRepeated()) {
-        return getSizeOfField();
-    } else {
-        return Node::childCount();
-    }
+int ProtoNode::getNumColumns() const {
+    return NUM_DATA_COLUMNS;
 }
 
 bool ProtoNode::isRepeated() const {
