@@ -17,7 +17,7 @@ RoboImageViewer::~RoboImageViewer() {
 
 void RoboImageViewer::update(qtool::data::MObject_ID) {
     this->updateBitmap();
-    this->repaint();
+    this->QWidget::update();
 }
 
 void RoboImageViewer::updateBitmap() {
