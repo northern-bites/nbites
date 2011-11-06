@@ -45,7 +45,7 @@ public:
     virtual ~ProtoNode();
 
     ProtoNode* createNewSingleValueNode(const proto::FieldDescriptor* childFD);
-    ProtoNode* createNewMessageNodeFromRepeated(const proto::Message* message);
+    ProtoNode* createNewMessageNodeFromRepeatedAt(int index);
     ProtoNode* createNewSingularNodeFromRepeated();
 
     void constructTree();
@@ -57,21 +57,33 @@ public:
     int getSizeOfField() const;
     QVariant getName(int index) const;
     QVariant getValue(int index) const;
-    //checks if repeated fields can grow or shrink, so this method should
-    //make sure that everything is valid
-    //Note: does NOT deal with repeated messages
+    //repeated fields can grow or shrink, so this method should
+    //make sure that each node that represents a repeated field
+    //has the valid number of children
+    //it also recurses on children
     void revalidate();
 
     const proto::FieldDescriptor *getFieldDescriptor() const;
     const proto::Message *getMessage() const;
 
 private:
-    QList<ProtoNode*> constructMessageChildren();
-    QList<ProtoNode*> constructRepeatedChildren();
+    //constructs children from a message node
+    void constructMessageChildren();
+    //constructs children of a repeated field node;
+    void constructRepeatedChildren();
+
     QVariant getRepeatedChildValue(int index) const;
     const proto::Message* getRepeatedMessageAt(int index) const;
     QVariant getSingleValueAt(int index) const;
     QVariant getSingleValue() const;
+
+    //adds or substracts the necessary number of children to keep
+    //the number of children the same as the number of values
+    //in the repeated field the node represents
+    void fixRepeatedSingularChildren();
+    //clears this nodes' children and re-builds the subtree rooted
+    //at this node
+    void fixRepeatedMessageChildren();
 
 private:
     const static int NUM_DATA_COLUMNS = 2;

@@ -4,8 +4,8 @@
  * @class ProtoNode
  *
  * A ProtoNode is either:
+ * * a message node (usually root)
  * * a repeated field node
- * * a message node
  * * a repeated field leaf
  * * a singular field leaf
  *
@@ -42,7 +42,8 @@ ProtoNode* ProtoNode::createNewSingleValueNode(const FieldDescriptor* childFD) {
     return new ProtoNode(this, childFD);
 }
 
-ProtoNode* ProtoNode::createNewMessageNodeFromRepeated(const Message* message) {
+ProtoNode* ProtoNode::createNewMessageNodeFromRepeatedAt(int index) {
+    const Message* message = this->getRepeatedMessageAt(index);
     return new ProtoNode(this, NULL, message);
 }
 
@@ -52,28 +53,17 @@ ProtoNode* ProtoNode::createNewSingularNodeFromRepeated() {
 
 void ProtoNode::constructTree() {
 
-    //do a breadth-first search through all the descriptors
-    QList<ProtoNode*> nodes;
-    //add the root
-    nodes.push_back(this);
-
-    while (!nodes.empty()) {
-        ProtoNode* parent = nodes.front();
-        nodes.pop_front();
-
-        if (parent->isRepeated()) {
-            nodes.append(parent->constructRepeatedChildren());
-        } else {
-            if (parent->isOfTypeMessage()) {
-                nodes.append(parent->constructMessageChildren());
-            }
+    if (this->isRepeated()) {
+        this->constructRepeatedChildren();
+    } else {
+        if (this->isOfTypeMessage()) {
+            this->constructMessageChildren();
         }
     }
 }
 
-QList<ProtoNode*> ProtoNode::constructMessageChildren() {
+void ProtoNode::constructMessageChildren() {
 
-    QList<ProtoNode*> nodes;
     const Descriptor* d = this->getMessage()->GetDescriptor();
     for (int i = 0; i < d->field_count(); i++) {
 
@@ -82,39 +72,49 @@ QList<ProtoNode*> ProtoNode::constructMessageChildren() {
         this->addChild(childNode);
 
         if (childNode->isOfTypeMessage() || childNode->isRepeated()) {
-            nodes.push_back(childNode);
+            childNode->constructTree();
         }
     }
-    return nodes;
 }
 
-QList<ProtoNode*> ProtoNode::constructRepeatedChildren() {
-    QList<ProtoNode*> nodes;
+void ProtoNode::constructRepeatedChildren() {
+
     for (int i = 0; i < this->getSizeOfField(); i++) {
         ProtoNode* childNode;
         if (this->isOfTypeMessage()) {
-            const Message* message = this->getRepeatedMessageAt(i);
-            childNode = createNewMessageNodeFromRepeated(message);
-            nodes.append(childNode);
+            childNode = createNewMessageNodeFromRepeatedAt(i);
+            childNode->constructTree();
         } else {
             childNode = createNewSingularNodeFromRepeated();
         }
         this->addChild(childNode);
     }
-    return nodes;
+}
+
+void ProtoNode::fixRepeatedMessageChildren() {
+    this->clearChildren();
+    this->constructTree();
+}
+
+void ProtoNode::fixRepeatedSingularChildren() {
+    int sizeChange = getSizeOfField() - children.size();
+    if (sizeChange > 0) {
+        for (int i = 0; i < sizeChange; i++) {
+            this->addChild(createNewSingularNodeFromRepeated());
+        }
+    } else {
+        for (int i = sizeChange; i < 0; i++) {
+            this->popChild();
+        }
+    }
 }
 
 void ProtoNode::revalidate() {
     if (this->isRepeated()) {
-        int sizeChange = getSizeOfField() - children.size();
-        if (sizeChange > 0) {
-            for (int i = 0; i < sizeChange; i++) {
-                this->addChild(createNewSingularNodeFromRepeated());
-            }
+        if (this->isOfTypeMessage()) {
+            this->fixRepeatedMessageChildren();
         } else {
-            for (int i = sizeChange; i < 0; i++) {
-                this->popChild();
-            }
+            this->fixRepeatedSingularChildren();
         }
     }
     for (NodeList::iterator i = children.begin(); i != children.end(); i++) {
