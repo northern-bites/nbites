@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "man/memory/Memory.h"
+#include "image/BMPYUVImage.h"
 #include "RoboImageViewer.h"
 #include "MObjectViewer.h"
 
@@ -29,6 +30,7 @@ public:
 private:
     std::vector<QDockWidget*> dockWidget;
     man::memory::Memory::const_ptr memory;
+    image::BMPImage::ptr image;
     RoboImageViewer* roboImageViewer;
 
 };
