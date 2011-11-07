@@ -51,6 +51,7 @@ void Memory::update(boost::shared_ptr<MObject> obj) {
 
 void Memory::updateVision() {
     update(mVision);
+    notifySubscribers(MVISION_ID);
 //    loggingBoard->log(mVision);
 }
 
