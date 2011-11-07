@@ -1,18 +1,17 @@
 #include "RoboImageViewer.h"
-#include <QMouseEvent>
+
+using namespace qtool::image;
 
 namespace qtool {
 namespace viewer {
 
-RoboImageViewer::RoboImageViewer(man::memory::MImage::const_ptr rawImage,
-                                 QLabel *infoLabel, QWidget *parent)
+RoboImageViewer::RoboImageViewer(image::BMPImage::ptr image,
+                                 QWidget *parent)
     : QWidget(parent),
-      image(new BMPYUVImage(rawImage)),
-      infoLabel(infoLabel)
+      image(image)
 {}
 
 RoboImageViewer::~RoboImageViewer() {
-	delete image;
 }
 
 void RoboImageViewer::update(qtool::data::MObject_ID) {
@@ -21,7 +20,7 @@ void RoboImageViewer::update(qtool::data::MObject_ID) {
 }
 
 void RoboImageViewer::updateBitmap() {
-	image->updateFromRawImage();
+	image->updateBitmap();
 }
 
 QSize RoboImageViewer::minimumSizeHint() const
