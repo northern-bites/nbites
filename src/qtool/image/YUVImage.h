@@ -45,8 +45,6 @@ public:
     int getH(int x, int y) const;
     int getS(int x, int y) const;
     int getZ(int x, int y) const;
-
-protected:
     bool rawImageDimensionsEnlarged();
 
 private:
