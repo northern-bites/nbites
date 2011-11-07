@@ -35,10 +35,14 @@ public:
     void log() const;
 
     boost::shared_ptr<const proto::PImage> get() const { return data; }
+    boost::shared_ptr<const proto::PImage> getThresholded() const {
+        return thresholded_data;
+    }
 
 private:
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<proto::PImage> data;
+    boost::shared_ptr<proto::PImage> thresholded_data;
 };
 }
 }
