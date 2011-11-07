@@ -83,7 +83,7 @@ private:
     void fixRepeatedSingularChildren();
     //clears this nodes' children and re-builds the subtree rooted
     //at this node
-    void fixRepeatedMessageChildren();
+    void reconstructTree();
 
 private:
     const static int NUM_DATA_COLUMNS = 2;

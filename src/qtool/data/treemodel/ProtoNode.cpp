@@ -91,7 +91,7 @@ void ProtoNode::constructRepeatedChildren() {
     }
 }
 
-void ProtoNode::fixRepeatedMessageChildren() {
+void ProtoNode::reconstructTree() {
     this->clearChildren();
     this->constructTree();
 }
@@ -112,9 +112,13 @@ void ProtoNode::fixRepeatedSingularChildren() {
 void ProtoNode::revalidate() {
     if (this->isRepeated()) {
         if (this->isOfTypeMessage()) {
-            this->fixRepeatedMessageChildren();
+            this->reconstructTree();
         } else {
             this->fixRepeatedSingularChildren();
+        }
+    } else {
+        if (this->isOfTypeMessage()) {
+//            this->reconstructTree();
         }
     }
     for (NodeList::iterator i = children.begin(); i != children.end(); i++) {
