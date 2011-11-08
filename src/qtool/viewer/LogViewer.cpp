@@ -14,18 +14,6 @@ using namespace man::memory;
          roboImageViewer(new RoboImageViewer(
                  dataManager->getMemory()->getMImage())) {
 
-        toolbar = new QToolBar();
-        nextButton = new QPushButton(tr("&Next"));
-        prevButton = new QPushButton(tr("&Previous"));
-
-        connect(nextButton, SIGNAL(clicked()), this, SLOT(nextImage()));
-        connect(prevButton, SIGNAL(clicked()), this, SLOT(prevImage()));
-
-        toolbar->addWidget(prevButton);
-        toolbar->addWidget(nextButton);
-
-        this->addToolBar(toolbar);
-
         this->setCentralWidget(roboImageViewer);
         dataManager->addSubscriber(roboImageViewer, MIMAGE_ID);
 
@@ -42,14 +30,6 @@ using namespace man::memory;
             }
         }
 
-    }
-
-    void LogViewer::nextImage() {
-        dataManager->getNext();
-    }
-
-    void LogViewer::prevImage() {
-        dataManager->getPrev();
     }
 
 }
