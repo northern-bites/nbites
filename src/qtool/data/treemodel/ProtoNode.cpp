@@ -30,8 +30,7 @@ ProtoNode::ProtoNode(ProtoNode* _parent,
     Node(_parent), fieldDescriptor(_fieldDescriptor), message(_message) {
     if (isOfTypeMessage() && message == NULL && !isRepeated()) {
 
-        const Message* parentM = _parent->getMessage();
-        message = &(parentM->GetReflection()->GetMessage(*parentM, fieldDescriptor));
+        message = getMessageFromParentDescriptor();
     }
 }
 
@@ -109,18 +108,23 @@ void ProtoNode::fixRepeatedSingularChildren() {
     }
 }
 
-void ProtoNode::revalidate() {
-    if (this->isRepeated()) {
-        if (this->isOfTypeMessage()) {
-            this->reconstructTree();
-        } else {
-            this->fixRepeatedSingularChildren();
-        }
-    } else {
-        if (this->isOfTypeMessage()) {
-//            this->reconstructTree();
-        }
+void ProtoNode::fixMessageField() {
+    if (this->isOfTypeMessageField()) {
+        message = getMessageFromParentDescriptor();
     }
+}
+
+void ProtoNode::revalidate() {
+    if (this->isOfTypeRepeatedMessage()) {
+        this->reconstructTree();
+    }
+    if (this->isOfTypeRepeatedSingular()) {
+        this->fixRepeatedSingularChildren();
+    }
+    if (this->isOfTypeMessageField() && !this->isRepeated()){
+        this->fixMessageField();
+    }
+
     for (NodeList::iterator i = children.begin(); i != children.end(); i++) {
         (*i)->revalidate();
     }
@@ -134,10 +138,21 @@ bool ProtoNode::isRepeated() const {
     return fieldDescriptor && fieldDescriptor->is_repeated();
 }
 
-bool ProtoNode::isOfTypeMessage() const {
+bool ProtoNode::isOfTypeRepeatedSingular() const {
+    return this->isRepeated() && !this->isOfTypeMessageField();
+}
+
+bool ProtoNode::isOfTypeRepeatedMessage() const {
+    return this->isRepeated() && this->isOfTypeMessageField();
+}
+
+bool ProtoNode::isOfTypeMessageField() const {
     return (fieldDescriptor &&
-           fieldDescriptor->type() == FieldDescriptor::TYPE_MESSAGE)
-           || message != NULL;
+            fieldDescriptor->type() == FieldDescriptor::TYPE_MESSAGE);
+}
+
+bool ProtoNode::isOfTypeMessage() const {
+    return this->isOfTypeMessageField() || message != NULL;
 }
 
 int ProtoNode::getSizeOfField() const {
@@ -187,6 +202,12 @@ QVariant ProtoNode::getRepeatedChildValue(int index) const {
     const ProtoNode* parent =
                     static_cast<const ProtoNode *>(this->getParent());
             return parent->getSingleValueAt(index);
+}
+
+const Message* ProtoNode::getMessageFromParentDescriptor() const {
+    const Message* parentM =
+            reinterpret_cast<const ProtoNode*>(getParent())->getMessage();
+    return &(parentM->GetReflection()->GetMessage(*parentM, fieldDescriptor));
 }
 
 const Message* ProtoNode::getRepeatedMessageAt(int index) const {

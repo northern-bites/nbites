@@ -53,6 +53,9 @@ public:
     QVariant getData(int row, int column) const;
     int getNumColumns() const;
     bool isRepeated() const;
+    bool isOfTypeRepeatedSingular() const;
+    bool isOfTypeRepeatedMessage() const;
+    bool isOfTypeMessageField() const;
     bool isOfTypeMessage() const;
     int getSizeOfField() const;
     QVariant getName(int index) const;
@@ -65,6 +68,7 @@ public:
 
     const proto::FieldDescriptor *getFieldDescriptor() const;
     const proto::Message *getMessage() const;
+    const proto::Message* getMessageFromParentDescriptor() const;
 
 private:
     //constructs children from a message node
@@ -84,6 +88,8 @@ private:
     //clears this nodes' children and re-builds the subtree rooted
     //at this node
     void reconstructTree();
+    //the message pointer might point to a different message on update
+    void fixMessageField();
 
 private:
     const static int NUM_DATA_COLUMNS = 2;
