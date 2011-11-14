@@ -1,0 +1,12 @@
+package man.memory.proto
+
+message PLoc {
+
+	optional int64 = 1;
+	optional xEst = 2;
+	optional yEst = 3;
+	optional hEst = 4;
+	optional xUncert = 5;
+	optional yUncert = 6;
+	optional hUncert = 7;
+}
