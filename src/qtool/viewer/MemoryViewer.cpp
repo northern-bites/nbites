@@ -1,7 +1,6 @@
 
 #include "MemoryViewer.h"
 #include <vector>
-#include "image/ThresholdedImage.h"
 
 namespace qtool {
 namespace viewer {
@@ -12,11 +11,14 @@ using namespace qtool::image;
 
 MemoryViewer::MemoryViewer(Memory::const_ptr memory) :
                  memory(memory),
-                 image(new ThresholdedImage(memory->getMImage()->getThresholded())),
+                 image(new BMPYUVImage(memory->getMImage())),
                  roboImageViewer(new RoboImageViewer(image, this)) {
 
     this->setCentralWidget(roboImageViewer);
     memory->addSubscriber(roboImageViewer, MIMAGE_ID);
+    //corner ownership
+    this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
     std::vector<QTreeView> messageViewers;
     for (MObject_ID id = FIRST_OBJECT;
