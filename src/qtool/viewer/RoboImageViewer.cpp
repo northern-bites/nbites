@@ -16,6 +16,7 @@ RoboImageViewer::~RoboImageViewer() {
 
 void RoboImageViewer::update(qtool::data::MObject_ID) {
     this->updateBitmap();
+    //enqueues a repaint - thread-safe
     this->QWidget::update();
 }
 
@@ -36,7 +37,6 @@ QSize RoboImageViewer::sizeHint() const
 void RoboImageViewer::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
-    this->updateBitmap();
     painter.drawImage(QPoint(0, 0), image->getBitmap());
 }
 
