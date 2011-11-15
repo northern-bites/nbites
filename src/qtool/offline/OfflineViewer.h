@@ -34,7 +34,6 @@ private:
     OfflineManPreloader manPreloader;
     viewer::MemoryViewer* manMemoryViewer;
 
-
 };
 
 }
