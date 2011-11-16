@@ -17,15 +17,19 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) : QWidge
 
     memory->addSubscriber(this, MIMAGE_ID);
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setAlignment(Qt::AlignTop);
+    QVBoxLayout *vertLayout = new QVBoxLayout;
+    QHBoxLayout* buttonLayout = new QHBoxLayout;
+    vertLayout->addLayout(buttonLayout);
+
+    QPushButton* reloadManButton = new QPushButton(tr("&Reload Man"));
+    connect(reloadManButton, SIGNAL(clicked()), this, SLOT(reloadMan()));
+//    buttonLayout->addWidget(reloadManButton);
 
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
-    layout->addWidget(loadTableButton);
+    buttonLayout->addWidget(loadTableButton);
 
-    layout->addWidget(manMemoryViewer);
-
+    vertLayout->addWidget(manMemoryViewer);
     //add the thresholded image to the memory viewer
     ThresholdedImage::ptr threshImage(new ThresholdedImage(
             offlineControl->getManMemory()->getMImage()->getThresholded()));
@@ -37,7 +41,7 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) : QWidge
     dockWidget->setMinimumSize(350, 300);
     manMemoryViewer->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
-    this->setLayout(layout);
+    this->setLayout(vertLayout);
 }
 
 void OfflineViewer::update(data::MObject_ID id) {
@@ -49,6 +53,10 @@ void OfflineViewer::loadColorTable() {
                                                 "../../data/tables",
                                                 tr("Table Files (*.mtb)"));
     offlineControl->loadTable(colorTablePath.toStdString());
+}
+
+void OfflineViewer::reloadMan() {
+    manPreloader.reloadMan();
 }
 
 }

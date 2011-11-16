@@ -33,7 +33,6 @@ public:
     NaoManPreloader(AL::ALPtr<AL::ALBroker> pBroker, const std::string& pName);
     virtual ~NaoManPreloader();
 
-private:
     void reloadMan();
     void createMan();
     void destroyMan();

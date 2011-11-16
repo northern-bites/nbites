@@ -36,7 +36,6 @@ public:
 
     virtual ~ManPreloader() {}
 
-private:
     virtual void reloadMan() {}
     virtual void createMan() {}
     virtual void destroyMan() {}
@@ -60,10 +59,12 @@ protected:
     }
     //closes the library
     void closeLibMan() {
+        debug_preloader_out << "Closing " + libman_name + " ... ";
         if (dlclose(libman_handle) != 0) {
              std::cout << dlerror() << std::endl;
              std::exit(1);
-         }
+        }
+        debug_preloader_out << "done"<<std::endl;
     }
 
     //manually links to a method exported in man

@@ -19,7 +19,6 @@ public:
     OfflineManPreloader(man::corpus::OfflineManController::ptr offlineControl);
     virtual ~OfflineManPreloader();
 
-private:
     void reloadMan();
     void createMan();
     void destroyMan();

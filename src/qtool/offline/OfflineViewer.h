@@ -31,6 +31,7 @@ public:
 
 private slots:
     void loadColorTable();
+    void reloadMan();
 
 private:
     man::corpus::OfflineManController::ptr offlineControl;
