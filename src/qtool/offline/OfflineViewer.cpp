@@ -46,7 +46,7 @@ void OfflineViewer::update(data::MObject_ID id) {
 
 void OfflineViewer::loadColorTable() {
     QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
-                                                "~/nbites/data/tables",
+                                                "../../data/tables",
                                                 tr("Table Files (*.mtb)"));
     offlineControl->loadTable(colorTablePath.toStdString());
 }
