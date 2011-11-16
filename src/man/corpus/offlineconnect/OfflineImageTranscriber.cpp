@@ -16,7 +16,6 @@ OfflineImageTranscriber::OfflineImageTranscriber(
 		  table(new unsigned char[yLimit * uLimit * vLimit]),
 		  params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
 		  image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])){
-	initTable("/home/oneamtu/nbites/data/tables/lab120/lab120-11-dax.mtb");
 }
 
 OfflineImageTranscriber::~OfflineImageTranscriber() {
