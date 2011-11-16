@@ -2,7 +2,7 @@
  *
  * @class OfflineManController
  *
- * Provides a way to control the OfflineImageTranscriber and OfflineEnactor
+ * Provides a way to control the ThreadedImageTranscriber and OfflineEnactor
  *
  * @author Octavian Neamtu
  *
@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <string>
 #include "corpus/ThreadedImageTranscriber.h"
 #include "ClassHelper.h"
 #include "man/memory/Memory.h"
@@ -26,6 +27,12 @@ public:
 		: offline_memory(offline_memory) { }
 
 	memory::Memory::const_ptr getOfflineMemory() const { return offline_memory; }
+
+	void loadTable(const std::string &path) {
+	    if (imageTranscriber.get()) {
+	        imageTranscriber->initTable(path);
+	    }
+	}
 
 	void setImageTranscriber(ThreadedImageTranscriber::ptr imTrans) {
 		imageTranscriber = imTrans;

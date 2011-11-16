@@ -19,6 +19,11 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) : QWidge
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setAlignment(Qt::AlignTop);
+
+    QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
+    connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
+    layout->addWidget(loadTableButton);
+
     layout->addWidget(manMemoryViewer);
 
     //add the thresholded image to the memory viewer
@@ -37,6 +42,13 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) : QWidge
 
 void OfflineViewer::update(data::MObject_ID id) {
     offlineControl->signalNextImageFrame();
+}
+
+void OfflineViewer::loadColorTable() {
+    QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
+                                                "~/nbites/data/tables",
+                                                tr("Table Files (*.mtb)"));
+    offlineControl->loadTable(colorTablePath.toStdString());
 }
 
 }

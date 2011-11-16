@@ -19,46 +19,38 @@
 namespace man {
 namespace corpus {
 
-class OfflineImageTranscriber : public ThreadedImageTranscriber {
+class OfflineImageTranscriber: public ThreadedImageTranscriber {
 
-ADD_SHARED_PTR(OfflineImageTranscriber);
+ADD_SHARED_PTR(OfflineImageTranscriber)
+    ;
 
 public:
-	OfflineImageTranscriber(
-			boost::shared_ptr<Sensors> s,
-			memory::MImage::const_ptr mImage);
-	virtual ~OfflineImageTranscriber();
+    OfflineImageTranscriber(boost::shared_ptr<Sensors> s,
+            memory::MImage::const_ptr mImage);
+    virtual ~OfflineImageTranscriber();
 
-	void releaseImage() {}
-	void run();
+    void releaseImage() {
+    }
+    void run();
+
+    void initTable(const std::string& filename);
 
 protected:
-	void acquireNewImage();
-	//we should not have to do this here, but somewhere else;
-	void initTable(std::string filename);
+    void acquireNewImage();
 
 public:
     enum {
-        y0 = 0,
-        u0 = 0,
-        v0 = 0,
-
-        y1 = 256,
-        u1 = 256,
-        v1 = 256,
-
-        yLimit = 128,
-        uLimit = 128,
-        vLimit = 128,
-
+        y0 = 0, u0 = 0, v0 = 0,
+        y1 = 256, u1 = 256, v1 = 256,
+        yLimit = 128, uLimit = 128, vLimit = 128,
         tableByteSize = yLimit * uLimit * vLimit
     };
 
 private:
-	memory::MImage::const_ptr mImage;
-	unsigned char* table;
-	ColorParams params;
-	uint16_t *image;
+    memory::MImage::const_ptr mImage;
+    unsigned char* table;
+    ColorParams params;
+    uint16_t *image;
 };
 
 }

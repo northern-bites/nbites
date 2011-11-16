@@ -31,7 +31,7 @@ void OfflineImageTranscriber::run() {
 }
 
 
-void OfflineImageTranscriber::initTable(string filename) {
+void OfflineImageTranscriber::initTable(const string &filename) {
     FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
 
     if (fp == NULL) {

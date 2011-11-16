@@ -29,6 +29,9 @@ public:
 
     void update(data::MObject_ID id);
 
+private slots:
+    void loadColorTable();
+
 private:
     man::corpus::OfflineManController::ptr offlineControl;
     OfflineManPreloader manPreloader;
