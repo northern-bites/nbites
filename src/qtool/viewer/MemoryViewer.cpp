@@ -21,8 +21,8 @@ MemoryViewer::MemoryViewer(Memory::const_ptr memory) :
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
     std::vector<QTreeView> messageViewers;
-    for (MObject_ID id = FIRST_OBJECT;
-            id != LAST_OBJECT; id++) {
+    for (MObject_ID id = FIRST_OBJECT_ID;
+            id != LAST_OBJECT_ID; id++) {
         if (id != MIMAGE_ID) {
             QDockWidget* dockWidget =
                     new QDockWidget(QString(MObject_names[id].c_str()), this);
