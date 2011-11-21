@@ -8,6 +8,7 @@
 #include "EKFStructs.h"
 #include <cstdlib>
 #include "MultiLocEKF.h"
+#include "NaoPaths.h"
 
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
@@ -527,8 +528,8 @@ void Noggin::modifySysPath ()
      const char *cwd = test.c_str();
 #  else //WEBOTS
 #    if defined OFFLINE || defined STRAIGHT
-       string dir1 = string(getenv("NBITES_DIR")) + "/build/qtool";
-       string dir2 = string(getenv("NBITES_DIR")) + "/build/qtool/man";
+       string dir1 = NBITES_DIR"/build/qtool";
+       string dir2 = NBITES_DIR"/build/qtool/man";
 #    else
        const char *cwd = "/home/nao/naoqi/lib";
 #    endif
