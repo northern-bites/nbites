@@ -87,6 +87,7 @@ static const char *TOOL_REQUEST_MSG = "TOOL:request";
 static const int TOOL_REQUEST_LEN = strlen(TOOL_REQUEST_MSG);
 static const char *TOOL_ACCEPT_MSG = "TOOL:accept";
 static const int TOOL_ACCEPT_LEN = strlen(TOOL_ACCEPT_MSG);
+static const int TOOL_ACCEPT_NAME_OFFSET = TOOL_ACCEPT_LEN + 3;
 
 
 //

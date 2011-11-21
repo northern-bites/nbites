@@ -17,8 +17,8 @@ DataManager::DataManager() :
 DataManager::~DataManager() {
 }
 
-void DataManager::newDataSource(DataSource::ptr dataSource) {
-    parsingBoard.newIOProvider(dataSource);
+void DataManager::newInputProvider(common::io::InProvider::const_ptr newInput) {
+    parsingBoard.newInputProvider(newInput);
 }
 
 void DataManager::addSubscriber(Subscriber<MObject_ID>* subscriber) {

@@ -12,19 +12,9 @@
 
 #include <map>
 
-#include "include/io/BulkIO.h"
+#include "io/InProvider.h"
 #include "MObjectParser.h"
 #include "memory/MObject.h"
-
-//forward declaration
-namespace man {
-namespace memory {
-namespace parse {
-class ParsingBoard;
-}
-}
-}
-
 #include "memory/Memory.h"
 #include "memory/MemoryIOBoard.h"
 
@@ -32,17 +22,16 @@ namespace man {
 namespace memory {
 namespace parse {
 
-class ParsingBoard : public MemoryIOBoard<Parser> {
+class ParsingBoard : public MemoryIOBoard<MObjectParser> {
 
 public:
-    ParsingBoard(Memory::ptr memory,
-            IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
+    ParsingBoard(Memory::ptr memory);
     virtual ~ParsingBoard();
 
-    void newIOProvider(IOProvider::const_ptr ioProvider);
+    void newInputProvider(common::io::InProvider::const_ptr inProvider);
 
-    void parse(MObject_ID id);
-    void parseAll();
+    void parseNext(MObject_ID id);
+    void parseNextAll();
 
     void rewind(MObject_ID id);
     void rewindAll();

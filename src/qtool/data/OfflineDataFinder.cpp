@@ -4,16 +4,13 @@
 #include <QCoreApplication>
 
 #include "NaoPaths.h"
-#include "man/memory/parse/Parser.h"
-#include "man/include/io/FileFDProvider.h"
+#include "io/FileInProvider.h"
 
 namespace qtool {
 namespace data {
 
-using man::include::io::FDProvider;
-using man::include::io::FileFDProvider;
-using man::memory::parse::Parser;
-using namespace man::include::paths;
+using namespace common::io;
+using namespace man::common::paths;
 
 static const int DEFAULT_NAME_COLUMN_WIDTH = 300;
 
@@ -66,23 +63,20 @@ void OfflineDataFinder::scanFolderForLogs(QString path) {
     QDir dir(path, filter);
     QFileInfoList list = dir.entryInfoList();
 
-    DataSource::ptr dataSource;
     if (list.size() == 0) {
         return;
     }
 
-    dataSource = DataSource::ptr(new DataSource(DataSource::offline));
     for (int i = 0; i < list.size(); i++) {
         QFileInfo fileInfo = list.at(i);
         if (fileInfo.size() != 0) {
             std::string path = fileInfo.absoluteFilePath().toStdString();
-            FDProvider::ptr fdprovider = FDProvider::ptr(new FileFDProvider(path, O_RDONLY));
-            MObject_ID logID = static_cast<MObject_ID>(Parser::peekAtLogID(
-                    fdprovider->getFileDescriptor()));
-            dataSource->addFDProvider(logID, fdprovider);
+            InProvider::ptr file_in(new FileInProvider(path));
+            file_in->openCommunicationChannel();
+            emit signalNewInputProvider(file_in);
         }
     }
-    emit signalNewDataSource(dataSource);
 }
+
 }
 }

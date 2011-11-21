@@ -14,41 +14,48 @@
 
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include "FDProvider.h"
+#include "IOProvider.h"
+#include "ClassHelper.h"
 
-namespace man {
-namespace include {
+namespace common {
 namespace io {
 
 template <class T>
 class BulkIO {
 
+    ADD_SHARED_PTR(BulkIO)
+    ADD_NULL_INSTANCE(BulkIO)
+
 public:
-    typedef boost::shared_ptr<BulkIO> ptr;
-    typedef boost::shared_ptr<const BulkIO> const_ptr;
-    typedef std::pair< T, FDProvider::ptr > FDProviderPair;
-    typedef std::map< T, FDProvider::ptr > FDProviderMap;
+    typedef std::pair< T, IOProvider::ptr > IOProviderPair;
+    typedef std::map< T, IOProvider::ptr > IOProviderMap;
 
 public:
     BulkIO(){}
-    static const_ptr NullBulkIO() {
-        static const_ptr NullPtr(new BulkIO());
-        return NullPtr;
-    }
     virtual ~BulkIO() {};
 
-    virtual void addFDProvider(T index, FDProvider::ptr fdProvider) {
-        fdProviderMap.insert(FDProviderPair(index, fdProvider));
+public:
+    virtual void addIOProvider(T index, IOProvider::ptr ioProvider) {
+        ioProviderMap.insert(IOProviderPair(index, ioProvider));
     }
 
-    const FDProviderMap* getMap() const { return &fdProviderMap; }
+protected:
+    virtual IOProvider::ptr tempIOProvider(T index) const {
+        typename std::map< T, IOProvider::ptr >::const_iterator it =
+                ioProviderMap.find(index);
+
+        if (it != ioProviderMap.end()) {
+            return it->second;
+        } else {
+            return IOProvider::ptr();
+        }
+    }
 
 
 protected:
-    FDProviderMap fdProviderMap;
+    IOProviderMap ioProviderMap;
 };
 
-}
 }
 }
 

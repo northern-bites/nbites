@@ -76,7 +76,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
     memory->addSubscriber(loggingBoard.get());
 
 #ifdef USE_MEMORY
-    loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
+//    loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
 #endif
 
 #ifdef USE_NOGGIN
@@ -137,7 +137,7 @@ void Man::stopSubThreads() {
 void
 Man::processFrame ()
 {
-
+    cout << "processing fuss!"<<endl;
 #ifdef USE_VISION
     // Need to lock image and vision angles for duration of
     // vision processing to ensure consistency.
@@ -150,6 +150,7 @@ Man::processFrame ()
     vision->notifyImage(sensors->getImage());
     PROF_EXIT(P_VISION);
     sensors->releaseImage();
+//    cout<<vision->ball->getDistance() << endl;
 #endif
 #ifdef USE_MEMORY
     memory->updateVision();

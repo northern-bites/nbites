@@ -7,35 +7,35 @@ namespace man {
 namespace memory {
 namespace log {
 
-using namespace man::include::paths;
+using namespace man::common::paths;
 using boost::shared_ptr;
 
-LoggingBoard::LoggingBoard(Memory::const_ptr memory, IOProvider::const_ptr ioProvider) :
+LoggingBoard::LoggingBoard(Memory::const_ptr memory, BulkFDProvider::const_ptr ioProvider) :
     memory(memory), logging(false) {
     newIOProvider(ioProvider);
 }
 
-void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
+void LoggingBoard::newIOProvider(BulkFDProvider::const_ptr ioProvider) {
 
     this->ioProvider = ioProvider;
     //if we have a new ioProvider, then we need to re-create all logger objects
-    const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
-    for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
-            i!= fdmap->end(); i++) {
-
-        MObject::const_ptr mobject =
-                memory->getMObject(i->first);
-        if (mobject != MObject::const_ptr()) {
-            objectIOMap[i->first] = MObjectLogger::ptr(
-                    new MObjectLogger(i->second,
-                                      static_cast<int> (i->first), mobject));
-            objectIOMap[i->first]->start();
-        } else {
-            std::cout<<"Invalid Object ID passed for logging: "
-                    << "log ID: " << i->first << " "
-                    << i->second->debugInfo() << std::endl;
-        }
-    }
+//    const BulkFDProvider::FDProviderMap* fdmap = ioProvider->getMap();
+//    for (BulkFDProvider::FDProviderMap::const_iterator i = fdmap->begin();
+//            i!= fdmap->end(); i++) {
+//
+//        MObject::const_ptr mobject =
+//                memory->getMObject(i->first);
+//        if (mobject != MObject::const_ptr()) {
+//            objectIOMap[i->first] = MObjectLogger::ptr(
+//                    new MObjectLogger(i->second,
+//                                      static_cast<int> (i->first), mobject));
+//            objectIOMap[i->first]->start();
+//        } else {
+//            std::cout<<"Invalid Object ID passed for logging: "
+//                    << "log ID: " << i->first << " "
+//                    << i->second->debugInfo() << std::endl;
+//        }
+//    }
 }
 
 void LoggingBoard::update(MObject_ID id) {

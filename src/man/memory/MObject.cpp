@@ -11,15 +11,22 @@ MObject::MObject(MObject_ID id, ProtoMessage_ptr protoMessage)
 }
 
 void MObject::serializeToString(string* write_buffer) const {
-    protoMessage->SerializeToString(write_buffer);
+    if (protoMessage.get()) {
+        protoMessage->SerializeToString(write_buffer);
+    }
 }
 
 void MObject::parseFromBuffer(const char* read_buffer, uint32_t buffer_size) {
-    protoMessage->ParseFromArray(read_buffer, buffer_size);
+    if (protoMessage.get()) {
+        protoMessage->ParseFromArray(read_buffer, buffer_size);
+    }
 }
 
 unsigned MObject::byteSize() const {
-    return protoMessage->ByteSize();
+    if (protoMessage.get()) {
+        return protoMessage->ByteSize();
+    }
+    return 0;
 }
 
 }

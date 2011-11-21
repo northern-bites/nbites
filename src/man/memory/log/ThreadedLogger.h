@@ -26,10 +26,9 @@ public:
     typedef boost::shared_ptr<ThreadedLogger> const_ptr;
 
 public:
-    ThreadedLogger(FDProvider::const_ptr fdp, std::string name) :
+    ThreadedLogger(FDProvider::ptr fdp, std::string name) :
                    Logger(fdp), Thread(name) {
         memset(&control_block, 0, sizeof(control_block));
-        control_block.aio_fildes = fdp->getFileDescriptor();
     }
 
     virtual ~ThreadedLogger(){}
@@ -37,6 +36,8 @@ public:
     virtual void writeToLog() = 0;
 
     virtual void run() {
+        //blocking for socket fds, (almost) instant for file ones
+        fd_provider->openCommunicationChannel();
         while (running) {
             this->waitForSignal();
             this->writeToLog();

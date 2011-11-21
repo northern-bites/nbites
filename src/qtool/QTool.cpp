@@ -44,6 +44,7 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
+    toolTabs->addTab(new remote::RobotSelect, tr("remote"));
 
     dataManager->addSubscriber(colorCreator, man::memory::MIMAGE_ID);
 }

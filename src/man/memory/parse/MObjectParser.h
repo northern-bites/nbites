@@ -1,5 +1,11 @@
 /**
- * File parser implementation
+ * @class MObjectParser
+ *
+ * Parser a MObject-stream type log
+ *
+ * First reads the log header, then calls to getNext() and getPrev()
+ * advance or rewind the log
+ *
  * @author Octavian Neamtu
  */
 
@@ -9,19 +15,26 @@
 
 #include "memory/MObject.h"
 #include "Parser.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 namespace parse {
 
-namespace proto_io = google::protobuf::io;
-namespace proto = google::protobuf;
+struct LogHeader {
+
+    MObject_ID log_id;
+    int64_t birth_time;
+
+};
 
 class MObjectParser : public Parser {
 
+    ADD_SHARED_PTR(MObjectParser)
+
 public:
-    MObjectParser(include::io::FDProvider::const_ptr fdProvider,
-            MObject::ptr objectToParseTo);
+    MObjectParser(common::io::InProvider::const_ptr fdProvider,
+            MObject::ptr objectToParseTo = MObject::NullInstanceSharedPtr());
 
     virtual ~MObjectParser();
 
@@ -31,7 +44,13 @@ public:
     bool getPrev(uint32_t n);
     bool getPrev();
 
+    virtual LogHeader getHeader() const {return log_header;}
+
     uint32_t sizeOfLastNumMessages(uint32_t n) const;
+
+    void setObjectToParseTo(MObject::ptr newObject) {
+        objectToParseTo = newObject;
+    }
 
 private:
     void readHeader();
@@ -40,6 +59,8 @@ private:
 
 private:
     MObject::ptr objectToParseTo;
+
+    LogHeader log_header;
 
     uint32_t current_message_size;
     //history of message sizes read, useful for rewinding

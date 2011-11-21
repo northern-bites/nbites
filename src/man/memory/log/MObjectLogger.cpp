@@ -25,7 +25,7 @@ namespace log {
 
 using namespace std;
 
-MObjectLogger::MObjectLogger(FDProvider::const_ptr fdp,
+MObjectLogger::MObjectLogger(FDProvider::ptr fdp,
                              int logTypeID, MObject::const_ptr objectToLog) :
         ThreadedLogger(fdp, "Log" + MObject_names[logTypeID]),
         logID(logTypeID), objectToLog(objectToLog) {

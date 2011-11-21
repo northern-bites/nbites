@@ -16,12 +16,12 @@ add_definitions(${QT_DEFINITIONS})
 set( data_srcs DataManager.cpp
                DataLoader.cpp
                OfflineDataFinder.cpp
-               DataSource.cpp
                )
 
 set( data_headers DataLoader.h
                   DataFinder.h
-                  OfflineDataFinder.h )
+                  OfflineDataFinder.h 
+                  DataManager.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

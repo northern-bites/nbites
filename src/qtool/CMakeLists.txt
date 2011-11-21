@@ -52,6 +52,7 @@ add_subdirectory( colorcreator )
 add_subdirectory( data )
 add_subdirectory( viewer )
 add_subdirectory( offline )
+add_subdirectory( remote )
 
 ######### The executable
 
@@ -67,5 +68,6 @@ target_link_libraries(
   data
   viewer
   offline
+  remote
   ${QT_LIBRARIES}
   )

@@ -18,6 +18,7 @@
 #include "offline/OfflineViewer.h"
 #include "viewer/BallEKFViewer.h"
 #include "viewer/FieldViewer.h"
+#include "remote/RobotSelect.h"
 
 namespace qtool {
 

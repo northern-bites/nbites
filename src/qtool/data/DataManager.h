@@ -12,20 +12,21 @@
 #pragma once
 
 #include <boost/shared_ptr.hpp>
+#include <QObject>
 
-#include "DataSource.h"
+#include "io/InProvider.h"
 #include "man/memory/Memory.h"
 #include "man/memory/parse/ParsingBoard.h"
 #include "include/MultiProvider.h"
 #include "DataTypes.h"
 #include "ClassHelper.h"
 
-#include <iostream>
-
 namespace qtool {
 namespace data {
 
-class DataManager {
+class DataManager : public QObject {
+
+    Q_OBJECT
 
 ADD_SHARED_PTR(DataManager);
 
@@ -35,7 +36,7 @@ public:
     virtual ~DataManager();
 
     void getNext() {
-        parsingBoard.parseAll();
+        parsingBoard.parseNextAll();
         memory->notifySubscribers(man::memory::MIMAGE_ID);
         memory->notifySubscribers(man::memory::MVISION_ID);
         memory->notifySubscribers(man::memory::MVISION_SENSORS_ID);
@@ -53,7 +54,8 @@ public:
     man::memory::Memory::const_ptr getMemory() const {
         return memory;}
 
-    void newDataSource(DataSource::ptr dataSource);
+public slots:
+    void newInputProvider(common::io::InProvider::const_ptr newInput);
 
     void addSubscriber(Subscriber<MObject_ID>* subscriber,
             MObject_ID mobject_id);
@@ -62,7 +64,6 @@ public:
 private:
     man::memory::Memory::ptr memory;
     man::memory::parse::ParsingBoard parsingBoard;
-    DataSource::ptr dataSource;
 
 };
 

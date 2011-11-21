@@ -17,18 +17,15 @@
 #include <string>
 
 #include "MemoryCommon.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 
-//TODO: add a specialized Null object class and use it instead of a null
-// pointer for when we don't want an object to be initialized
-
 class MObject {
 
-public:
-    typedef boost::shared_ptr<MObject> ptr;
-    typedef boost::shared_ptr<const MObject> const_ptr;
+    ADD_SHARED_PTR(MObject)
+    ADD_NULL_INSTANCE(MObject)
 
 protected:
     /*
@@ -37,7 +34,8 @@ protected:
      * MObject_ID associated with it)
      * protoMessage : the protocol message associated with this MObject
      */
-    MObject(MObject_ID id, ProtoMessage_ptr protoMessage);
+    MObject(MObject_ID id = UNKOWN_OBJECT,
+            ProtoMessage_ptr protoMessage = ProtoMessage_ptr());
 
 public:
     virtual ~MObject(){}
@@ -45,7 +43,7 @@ public:
      * method update - this should be overwritten by a method that sets all of
      * the proto message fields with values from its respective man counterpart
      */
-    virtual void update() = 0;
+    virtual void update() {}
 
     //TODO: make this pure virtual and implement in other class
     //or find generic way to implement

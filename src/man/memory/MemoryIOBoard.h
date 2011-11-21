@@ -10,13 +10,13 @@
 #pragma once
 
 #include <boost/shared_ptr.hpp>
-#include "include/io/BulkIO.h"
+#include "include/io/BulkIn.h"
 #include "MObject.h"
 
 namespace man {
 namespace memory {
 
-typedef include::io::BulkIO<MObject_ID> IOProvider;
+typedef common::io::BulkIn<MObject_ID> BulkFDProvider;
 
 template <class IOobject>
 class MemoryIOBoard {
@@ -29,16 +29,17 @@ public:
 
 public:
     MemoryIOBoard() { }
+    virtual ~MemoryIOBoard() {}
     // this function should create new IO Objects based on the
     // what the IOProvider is providing us with
     // Note: this function should also save the instance of IOProvider
     // passed to it - since we want to keep ownership of the IOProvider
     // until we get a new one (if we don't it might get destroyed
     // and then we are screwed
-    virtual void newIOProvider(IOProvider::const_ptr ioProvider) = 0;
+    virtual void newIOProvider(BulkFDProvider::const_ptr ioProvider) {};
 
 protected:
-    IOProvider::const_ptr ioProvider;
+    BulkFDProvider::const_ptr ioProvider;
     ObjectIOMap objectIOMap;
 };
 

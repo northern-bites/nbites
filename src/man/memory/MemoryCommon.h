@@ -21,7 +21,8 @@ enum MObject_ID {
     MMOTION_SENSORS_ID,
     MVISION_SENSORS_ID,
     MIMAGE_ID,
-    LAST_OBJECT //dummy object
+    LAST_OBJECT, //dummy object
+    UNKOWN_OBJECT = 666
 };
 
 inline void operator++(MObject_ID& id) {

@@ -13,7 +13,7 @@
 #include <string>
 
 namespace man {
-namespace include {
+namespace common {
 namespace paths {
 
 #ifdef OFFLINE

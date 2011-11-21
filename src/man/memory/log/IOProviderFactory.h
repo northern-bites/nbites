@@ -18,7 +18,7 @@ namespace log {
 class IOProviderFactory {
 
 public:
-    static IOProvider::const_ptr newAllObjectsProvider();
+//    static BulkFDProvider::const_ptr createAllFileFDProviders();
 
 };
 

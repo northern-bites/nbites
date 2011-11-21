@@ -32,12 +32,12 @@ class LoggingBoard : public MemoryIOBoard<MObjectLogger> ,
 
 public:
     LoggingBoard(Memory::const_ptr memory,
-                IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
+                BulkFDProvider::const_ptr ioProvider = BulkFDProvider::NullInstanceSharedPtr());
     virtual ~LoggingBoard() {}
 
     void log(MObject_ID id);
 
-    void newIOProvider(IOProvider::const_ptr ioProvider);
+    void newIOProvider(BulkFDProvider::const_ptr ioProvider);
     void update(MObject_ID id);
 
     void startLogging();

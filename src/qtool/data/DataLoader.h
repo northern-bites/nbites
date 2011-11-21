@@ -13,7 +13,7 @@
 
 #include "OfflineDataFinder.h"
 #include "DataManager.h"
-#include "DataSource.h"
+#include "io/InProvider.h"
 
 namespace qtool {
 namespace data {
@@ -28,9 +28,6 @@ public:
 
 private:
     QComboBox* setupDataSelectorBox();
-
-private slots:
-    void newDataSource(DataSource::ptr dataSource);
 
 private:
     DataManager::ptr dataManager;
