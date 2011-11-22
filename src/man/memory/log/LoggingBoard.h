@@ -27,8 +27,7 @@ namespace man {
 namespace memory {
 namespace log {
 
-class LoggingBoard : public MemoryIOBoard<MObjectLogger> ,
-                     public Subscriber<MObject_ID> {
+class LoggingBoard : public MemoryIOBoard<MObjectLogger> {
 
 public:
     LoggingBoard(Memory::const_ptr memory,

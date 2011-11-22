@@ -15,7 +15,7 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <stdint.h>
-#include "include/io/FileFDProvider.h"
+#include "io/OutProvider.h"
 
 namespace man {
 namespace memory {
@@ -28,16 +28,15 @@ public:
     typedef boost::shared_ptr<Logger> const_ptr;
 
 protected:
-    typedef common::io::IOProvider FDProvider;
+    typedef common::io::OutProvider OutProvider;
 
 public:
     /**
      * fdp : a FileFDProvider for the file descriptor where we want
      * to log to
      */
-    Logger(FDProvider::ptr fdp):
-        fd_provider(fdp),
-        bytes_written(0) {
+    Logger(OutProvider::ptr out_provider):
+        out_provider(out_provider) {
     }
 
     virtual ~Logger() {}
@@ -48,21 +47,6 @@ public:
      */
     virtual void writeToLog() = 0;
 
-protected:
-
-    // helper write methods
-    //TODO: assert if we actually write everything
-    // and detect if an error happens
-
-    virtual void writeCharBuffer(const char* buffer, uint32_t size) {
-        bytes_written += write(fd_provider->getFileDescriptor(), buffer, size);
-    }
-
-    template <class T>
-    void writeValue(T value) {
-        writeCharBuffer(reinterpret_cast<char *>(&value), sizeof(value));
-    }
-
 private:
     /**
      * This method should write to the head of the file; this is only done
@@ -70,10 +54,8 @@ private:
      */
     virtual void writeHead() = 0;
 
-//TODO: do NOT use file_descriptor
 protected:
-    const FDProvider::ptr fd_provider;
-    unsigned long long bytes_written;
+    const OutProvider::ptr out_provider;
 };
 
 }

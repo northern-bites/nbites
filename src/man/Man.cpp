@@ -73,7 +73,6 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
     loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
     set_logging_board_pointer(loggingBoard);
-    memory->addSubscriber(loggingBoard.get());
 
 #ifdef USE_MEMORY
 //    loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());

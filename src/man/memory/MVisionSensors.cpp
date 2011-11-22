@@ -25,7 +25,7 @@ MVisionSensors::MVisionSensors(MObject_ID id, shared_ptr<Sensors> s,
 MVisionSensors::~MVisionSensors() {
 }
 
-void MVisionSensors::update() {
+void MVisionSensors::updateData() {
 
     ADD_PROTO_TIMESTAMP;
 

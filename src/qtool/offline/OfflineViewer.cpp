@@ -44,7 +44,7 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) : QWidge
     this->setLayout(vertLayout);
 }
 
-void OfflineViewer::update(data::MObject_ID id) {
+void OfflineViewer::update() {
     offlineControl->signalNextImageFrame();
 }
 

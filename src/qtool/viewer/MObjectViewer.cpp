@@ -27,7 +27,7 @@ void MObjectViewer::createNewTreeModel() {
     this->setModel(treeModel);
 }
 
-void MObjectViewer::update(MObject_ID) {
+void MObjectViewer::update() {
     treeModel->revalidateModel();
     QModelIndex top = treeModel->index(0, 0, QModelIndex());
     QModelIndex bottom = treeModel->index(treeModel->rowCount(QModelIndex())-1,

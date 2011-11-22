@@ -49,7 +49,7 @@ namespace Ui {
 namespace qtool {
 namespace colorcreator {
 
-class ColorCreator : public QMainWindow, public Subscriber<data::MObject_ID>
+class ColorCreator : public QMainWindow, public Subscriber
 {
     Q_OBJECT
 
@@ -65,7 +65,7 @@ public:
     void updateDisplays();
     void updateColors();
     void updateThresh(bool imageChanged, bool choiceChanged, bool colorsChanged);
-    void update(data::MObject_ID) {
+    void update() {
         yuvImage.updateFromRawImage();
         updateDisplays();
     }

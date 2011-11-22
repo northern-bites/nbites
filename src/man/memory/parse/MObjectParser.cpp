@@ -12,9 +12,9 @@ using namespace google::protobuf::io;
 using boost::shared_ptr;
 using namespace common::io;
 
-MObjectParser::MObjectParser(InProvider::const_ptr fdProvider,
+MObjectParser::MObjectParser(InProvider::const_ptr inProvider,
                              MObject::ptr objectToParseTo) :
-        Parser(fdProvider),
+        Parser(inProvider),
         objectToParseTo(objectToParseTo),
         current_message_size(0),
         current_buffer(NULL), current_buffer_size(0)

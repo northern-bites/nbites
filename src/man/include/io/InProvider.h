@@ -30,8 +30,15 @@ public:
     virtual std::string debugInfo() const = 0;
     virtual bool rewind(uint64_t offset) const = 0;
     virtual void openCommunicationChannel() = 0;
+    virtual bool opened() const = 0;
 
     virtual bool readCharBuffer(char* buffer, uint32_t size)  const {
+        if (!opened()) {
+            std::cout<<"Cannot read from not yet open channel "
+                     <<debugInfo()<<std::endl;
+            return false;
+        }
+
         uint32_t result = 0;
         result = read(file_descriptor, buffer, size);
 

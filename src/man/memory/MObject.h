@@ -15,14 +15,17 @@
 
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include <stdint.h>
 
 #include "MemoryCommon.h"
 #include "ClassHelper.h"
 
+#include "Notifier.h"
+
 namespace man {
 namespace memory {
 
-class MObject {
+class MObject : public Notifier, public Subscriber {
 
     ADD_SHARED_PTR(MObject)
     ADD_NULL_INSTANCE(MObject)
@@ -39,11 +42,13 @@ protected:
 
 public:
     virtual ~MObject(){}
+
     /**
-     * method update - this should be overwritten by a method that sets all of
-     * the proto message fields with values from its respective man counterpart
+     * method update - this should be overwritten by a method that fills all of
+     * the proto message fields with relevant values
      */
-    virtual void update() {}
+    virtual void updateData() {}
+    virtual void update();
 
     //TODO: make this pure virtual and implement in other class
     //or find generic way to implement

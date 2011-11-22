@@ -31,7 +31,7 @@ public:
      * Updates all the fields of the underlying proto::PSensors with values
      * from the Sensors object
      */
-    void update();
+    void updateData();
     void log() const;
 
     boost::shared_ptr<const proto::PImage> get() const { return data; }

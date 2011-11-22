@@ -23,7 +23,7 @@ MVision::MVision(MObject_ID id, shared_ptr<Vision> v, shared_ptr<PVision> vision
 MVision::~MVision() {
 }
 
-void MVision::update() {
+void MVision::updateData() {
 
     ADD_PROTO_TIMESTAMP;
 

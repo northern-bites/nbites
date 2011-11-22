@@ -46,7 +46,7 @@ MImage::MImage(MObject_ID id, shared_ptr<Sensors> s,
 MImage::~MImage() {
 }
 
-void MImage::update() {
+void MImage::updateData() {
 
     ADD_PROTO_TIMESTAMP;
 //    cout << "MImage_updata timestamp is " << process_micro_time() << endl;

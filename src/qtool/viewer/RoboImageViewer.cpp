@@ -14,7 +14,7 @@ RoboImageViewer::RoboImageViewer(image::BMPImage::ptr image,
 RoboImageViewer::~RoboImageViewer() {
 }
 
-void RoboImageViewer::update(qtool::data::MObject_ID) {
+void RoboImageViewer::update() {
     this->updateBitmap();
     //enqueues a repaint - thread-safe
     this->QWidget::update();

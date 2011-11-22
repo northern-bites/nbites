@@ -25,7 +25,7 @@ MMotionSensors::MMotionSensors(MObject_ID id, shared_ptr<Sensors> s,
 MMotionSensors::~MMotionSensors() {
 }
 
-void MMotionSensors::update() {
+void MMotionSensors::updateData() {
 
     ADD_PROTO_TIMESTAMP;
 

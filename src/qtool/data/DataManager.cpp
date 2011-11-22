@@ -21,12 +21,7 @@ void DataManager::newInputProvider(common::io::InProvider::const_ptr newInput) {
     parsingBoard.newInputProvider(newInput);
 }
 
-void DataManager::addSubscriber(Subscriber<MObject_ID>* subscriber) {
-    memory->addSubscriber(subscriber);
-}
-
-void DataManager::addSubscriber(Subscriber<MObject_ID>* subscriber,
-            MObject_ID mobject_id) {
+void DataManager::addSubscriber(Subscriber* subscriber, MObject_ID mobject_id) {
     memory->addSubscriber(subscriber, mobject_id);
 }
 

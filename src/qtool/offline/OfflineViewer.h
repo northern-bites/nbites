@@ -19,7 +19,7 @@
 namespace qtool {
 namespace offline {
 
-class OfflineViewer : public QWidget, public Subscriber<data::MObject_ID> {
+class OfflineViewer : public QWidget, public Subscriber {
     Q_OBJECT
 
 public:
@@ -27,7 +27,7 @@ public:
             QWidget* parent = 0);
     virtual ~OfflineViewer() {}
 
-    void update(data::MObject_ID id);
+    void update();
 
 private slots:
     void loadColorTable();

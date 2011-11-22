@@ -10,9 +10,7 @@
 namespace qtool {
 namespace viewer {
 
-class RoboImageViewer: public QWidget,
-	public Subscriber<qtool::data::MObject_ID>
-{
+class RoboImageViewer: public QWidget, public Subscriber {
     Q_OBJECT
 public:
 
@@ -24,7 +22,7 @@ public:
     QSize sizeHint() const;
     void updateBitmap();
 
-    void update(qtool::data::MObject_ID);
+    void update();
     void setImage(image::BMPImage::ptr _image) { image = _image; }
 
 protected:

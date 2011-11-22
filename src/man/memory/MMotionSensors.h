@@ -32,7 +32,7 @@ public:
      * Updates all the fields of the underlying proto::PSensors with values
      * from the Sensors object
      */
-    void update();
+    void updateData();
 
 private:
     boost::shared_ptr<Sensors> sensors;

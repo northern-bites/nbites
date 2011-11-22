@@ -16,6 +16,7 @@
 #include "memory/MObject.h"
 #include "Parser.h"
 #include "ClassHelper.h"
+#include "Notifier.h"
 
 namespace man {
 namespace memory {
@@ -33,7 +34,7 @@ class MObjectParser : public Parser {
     ADD_SHARED_PTR(MObjectParser)
 
 public:
-    MObjectParser(common::io::InProvider::const_ptr fdProvider,
+    MObjectParser(common::io::InProvider::const_ptr inProvider,
             MObject::ptr objectToParseTo = MObject::NullInstanceSharedPtr());
 
     virtual ~MObjectParser();

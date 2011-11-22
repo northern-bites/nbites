@@ -37,6 +37,7 @@ public:
     virtual std::string debugInfo() const = 0;
 
     virtual void openCommunicationChannel() = 0;
+    virtual bool opened() const = 0;
 
     int getFileDescriptor() { return file_descriptor; }
 protected:

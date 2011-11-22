@@ -21,7 +21,7 @@ class FileInProvider : public InProvider {
 public:
     FileInProvider(std::string file_name) :
                 file_name(file_name),
-                flags(EXISTING) {
+                flags(EXISTING), has_been_opened(false) {
     }
 
     virtual ~FileInProvider() {
@@ -62,12 +62,20 @@ public:
         if (file_descriptor < 0) {
             std::cout << "Could not open file: " << debugInfo() << std::endl;
             file_descriptor = -1;
+            return;
         }
+
+        has_been_opened= true;
+    }
+
+    virtual bool opened() const {
+        return has_been_opened;
     }
 
 private:
     std::string file_name;
     OpenFlags flags;
+    bool has_been_opened;
 
 };
 

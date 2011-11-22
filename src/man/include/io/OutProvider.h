@@ -2,7 +2,7 @@
  * @class OutProvider
  *
  * An abstract class that has the only role of providing means of writing
- * to a file descriptor
+ * asynchronously to a file descriptor
  *
  * @author Octavian Neamtu
  */
@@ -13,42 +13,63 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <unistd.h>
+#include <aio.h>
+#include <errno.h>
 #include "ClassHelper.h"
 #include "IOProvider.h"
 
-namespace man {
 namespace common {
 namespace io {
 
-class InProvider : public IOProvider {
+class OutProvider : public IOProvider {
 
-ADD_SHARED_PTR(InProvider);
+ADD_SHARED_PTR(OutProvider);
 
 public:
-    InProvider() {}
-    virtual ~InProvider() {};
+    OutProvider() : bytes_written(0) {
+        //zeroes the control_block
+        memset(&control_block, 0, sizeof(control_block));
+    }
+    virtual ~OutProvider() {};
 
     virtual std::string debugInfo() const = 0;
     virtual bool rewind(uint64_t offset) const = 0;
     virtual void openCommunicationChannel() = 0;
+    virtual bool opened() const = 0;
 
+    virtual bool writingInProgress() const {
+        return aio_error(&control_block) == EINPROGRESS;
+    }
+
+    //busy blocks before the other write is done
     virtual void writeCharBuffer(const char* buffer, uint32_t size) {
-        uint32_t result = 0;
-        result = write(file_descriptor, buffer, size);
-
-        if (result != size) {
-            std::cout<<"Could not write out " << size <<" bytes for "
-                     << debugInfo() << std::endl;
+        if (!opened()) {
+            std::cout<<"Cannot write to a not yet open channel "
+                    <<debugInfo()<<std::endl;
+            return;
         }
+
+        while(writingInProgress()) {
+            //busy block
+        }
+
+        //const_casting is bad(!!!) but aio_write demands a non-const buffer
+        control_block.aio_fildes = file_descriptor;
+        control_block.aio_buf = const_cast<char *>(buffer);
+        control_block.aio_nbytes = size;
+        bytes_written += size;
+        aio_write(&control_block);
     }
 
     template <class T>
-    void writeValue(T &value) {
-        writeCharBuffer(reinterpret_cast<char *>(&value), sizeof(value));
+    void writeValue(const T &value) {
+        writeCharBuffer(reinterpret_cast<const char *>(&value), sizeof(value));
     }
 
+private:
+    aiocb control_block;
+    unsigned long long bytes_written;
 };
 
-}
 }
 }

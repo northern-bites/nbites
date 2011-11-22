@@ -31,13 +31,12 @@ class Memory; //forward declaration
 #include "MImage.h"
 #include "Sensors.h"
 #include "Profiler.h"
-#include "include/MultiProvider.h"
+#include "Notifier.h"
 
 namespace man {
 namespace memory {
 
-class Memory : public Subscriber<SensorsEvent>,
-               public MultiProvider<MObject_ID> {
+class Memory {
 
 public:
     typedef boost::shared_ptr<Memory> ptr;
@@ -59,12 +58,6 @@ public:
     void update(boost::shared_ptr<MObject> obj);
     void updateVision();
 
-    /**
-     * This function is called whenever one of the Providers we are subscribed
-     * to has something new/updated
-     */
-    void update(SensorsEvent eventID);
-
 public:
     MVision::const_ptr getMVision() const {return mVision;}
     MVisionSensors::const_ptr getMVisionSensors() const {return mVisionSensors;}
@@ -73,6 +66,9 @@ public:
 
     MObject::const_ptr getMObject(MObject_ID id) const;
     MObject::ptr getMutableMObject(MObject_ID id);
+
+    void addSubscriber(Subscriber* subscriber,
+                       MObject_ID objectToSubscribeTo) const;
 
 private:
     MObject_IDMap mobject_IDMap;

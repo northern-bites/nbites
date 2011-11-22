@@ -32,7 +32,9 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
     birth_time = process_micro_time();
 
     if(sensors_ptr.get()) {
-        sensors_ptr->addSubscriber(this);
+        sensors_ptr->addSubscriber(mVisionSensors.get(), NEW_VISION_SENSORS);
+        sensors_ptr->addSubscriber(mMotionSensors.get(), NEW_MOTION_SENSORS);
+        sensors_ptr->addSubscriber(mImage.get(), NEW_IMAGE);
     }
 
     mobject_IDMap.insert(MObject_IDPair(MVISION_ID, mVision));
@@ -51,33 +53,7 @@ void Memory::update(boost::shared_ptr<MObject> obj) {
 
 void Memory::updateVision() {
     update(mVision);
-    notifySubscribers(MVISION_ID);
 //    loggingBoard->log(mVision);
-}
-
-void Memory::update(SensorsEvent event) {
-#ifdef USE_MEMORY
-    if (event == NEW_MOTION_SENSORS) {
-        PROF_ENTER(P_MEMORY_MOTION_SENSORS);
-        mMotionSensors->update();
-        notifySubscribers(MMOTION_SENSORS_ID);
-        PROF_EXIT(P_MEMORY_MOTION_SENSORS);
-    }
-
-    if (event == NEW_VISION_SENSORS) {
-        PROF_ENTER(P_MEMORY_VISION_SENSORS);
-        mVisionSensors->update();
-        notifySubscribers(MVISION_SENSORS_ID);
-        PROF_EXIT(P_MEMORY_VISION_SENSORS);
-    }
-
-    if (event == NEW_IMAGE) {
-        PROF_ENTER(P_MEMORY_IMAGE);
-        mImage->update();
-        notifySubscribers(MIMAGE_ID);
-        PROF_EXIT(P_MEMORY_IMAGE);
-    }
-#endif
 }
 
 MObject::const_ptr Memory::getMObject(MObject_ID id) const {
@@ -98,6 +74,11 @@ MObject::ptr Memory::getMutableMObject(MObject_ID id) {
     } else {
         return MObject::ptr();
     }
+}
+
+void Memory::addSubscriber(Subscriber* subscriber,
+                           MObject_ID objectToSubscribeTo) const {
+    getMObject(objectToSubscribeTo)->addSubscriber(subscriber);
 }
 
 }

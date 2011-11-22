@@ -17,7 +17,6 @@
 #include "io/InProvider.h"
 #include "man/memory/Memory.h"
 #include "man/memory/parse/ParsingBoard.h"
-#include "include/MultiProvider.h"
 #include "DataTypes.h"
 #include "ClassHelper.h"
 
@@ -37,18 +36,10 @@ public:
 
     void getNext() {
         parsingBoard.parseNextAll();
-        memory->notifySubscribers(man::memory::MIMAGE_ID);
-        memory->notifySubscribers(man::memory::MVISION_ID);
-        memory->notifySubscribers(man::memory::MVISION_SENSORS_ID);
-        memory->notifySubscribers(man::memory::MMOTION_SENSORS_ID);
     }
 
     void getPrev() {
         parsingBoard.rewindAll();
-        memory->notifySubscribers(man::memory::MIMAGE_ID);
-        memory->notifySubscribers(man::memory::MVISION_ID);
-        memory->notifySubscribers(man::memory::MVISION_SENSORS_ID);
-        memory->notifySubscribers(man::memory::MMOTION_SENSORS_ID);
     }
 
     man::memory::Memory::const_ptr getMemory() const {
@@ -57,9 +48,7 @@ public:
 public slots:
     void newInputProvider(common::io::InProvider::const_ptr newInput);
 
-    void addSubscriber(Subscriber<MObject_ID>* subscriber,
-            MObject_ID mobject_id);
-    void addSubscriber(Subscriber<MObject_ID>* subscriber);
+    void addSubscriber(Subscriber* subscriber, MObject_ID mobject_id);
 
 private:
     man::memory::Memory::ptr memory;

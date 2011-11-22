@@ -33,7 +33,7 @@ public:
      * Updates all the fields of the underlying proto::PVision with values
      * from the Vision object
      */
-    void update();
+    void updateData();
 
 private:
     //update helper methods

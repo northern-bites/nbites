@@ -35,7 +35,7 @@ public:
      * @param objectToLog : the object we need to log
      * @return
      */
-    MObjectLogger(FDProvider::ptr fdp,
+    MObjectLogger(OutProvider::ptr out_provider,
                   int logTypeID, MObject::const_ptr objectToLog);
 
     virtual ~MObjectLogger() {}
