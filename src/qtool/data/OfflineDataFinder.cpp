@@ -10,7 +10,7 @@ namespace qtool {
 namespace data {
 
 using namespace common::io;
-using namespace man::common::paths;
+using namespace common::paths;
 
 static const int DEFAULT_NAME_COLUMN_WIDTH = 300;
 

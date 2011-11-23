@@ -24,6 +24,10 @@ namespace parse {
 
 class ParsingBoard : public MemoryIOBoard<MObjectParser> {
 
+	typedef common::io::InProvider InProvider;
+	typedef std::pair< MObject_ID, MObjectParser::ptr > ObjectIOPair;
+	typedef std::map< MObject_ID, MObjectParser::ptr > ObjectIOMap;
+
 public:
     ParsingBoard(Memory::ptr memory);
     virtual ~ParsingBoard();
@@ -38,6 +42,7 @@ public:
 
 private:
     Memory::ptr memory;
+    ObjectIOMap objectIOMap;
 };
 }
 }

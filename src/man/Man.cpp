@@ -10,7 +10,7 @@
 #include "PySensors.h"
 #include "PyLights.h"
 #include "PySpeech.h"
-#include "memory/log/IOProviderFactory.h"
+#include "memory/log/OutputProviderFactory.h"
 
 //#include <valgrind/callgrind.h>
 
@@ -75,7 +75,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
     set_logging_board_pointer(loggingBoard);
 
 #ifdef USE_MEMORY
-//    loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
+    OutputProviderFactory::AllFileOutput(loggingBoard);
 #endif
 
 #ifdef USE_NOGGIN

@@ -13,12 +13,13 @@
 
 #include "Logger.h"
 #include "synchro/synchro.h"
+#include "Subscriber.h"
 
 namespace man {
 namespace memory {
 namespace log {
 
-class ThreadedLogger : public Logger, public Thread {
+class ThreadedLogger : public Logger, public Thread, public Subscriber {
 
 public:
     typedef boost::shared_ptr<ThreadedLogger> ptr;
@@ -47,6 +48,10 @@ public:
 
     void signalToLog() {
         this->signalToResume();
+    }
+
+    void update() {
+    	this->signalToLog();
     }
 
 };

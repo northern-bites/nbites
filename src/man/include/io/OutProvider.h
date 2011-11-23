@@ -12,9 +12,11 @@
 
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include <iostream>
 #include <unistd.h>
 #include <aio.h>
 #include <errno.h>
+#include <string.h> //memset()
 #include "ClassHelper.h"
 #include "IOProvider.h"
 
@@ -33,7 +35,6 @@ public:
     virtual ~OutProvider() {};
 
     virtual std::string debugInfo() const = 0;
-    virtual bool rewind(uint64_t offset) const = 0;
     virtual void openCommunicationChannel() = 0;
     virtual bool opened() const = 0;
 

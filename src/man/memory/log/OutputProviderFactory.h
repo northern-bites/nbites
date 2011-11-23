@@ -8,17 +8,16 @@
  */
 #pragma once
 
-#include "memory/MemoryIOBoard.h"
-#include "memory/MemoryCommon.h"
+#include "LoggingBoard.h"
 
 namespace man {
 namespace memory {
 namespace log {
 
-class IOProviderFactory {
+class OutputProviderFactory {
 
 public:
-//    static BulkFDProvider::const_ptr createAllFileFDProviders();
+    static void AllFileOutput(LoggingBoard::ptr loggingBoard);
 
 };
 

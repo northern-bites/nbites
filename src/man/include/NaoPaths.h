@@ -12,7 +12,6 @@
 
 #include <string>
 
-namespace man {
 namespace common {
 namespace paths {
 
@@ -40,6 +39,5 @@ static const std::string NAO_LOG_EXTENSION = ".log";
 #endif
 #endif
 
-}
 }
 }

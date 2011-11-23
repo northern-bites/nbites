@@ -7,48 +7,20 @@ namespace man {
 namespace memory {
 namespace log {
 
-using namespace man::common::paths;
 using boost::shared_ptr;
 
-LoggingBoard::LoggingBoard(Memory::const_ptr memory, BulkFDProvider::const_ptr ioProvider) :
+LoggingBoard::LoggingBoard(Memory::const_ptr memory) :
     memory(memory), logging(false) {
-    newIOProvider(ioProvider);
 }
 
-void LoggingBoard::newIOProvider(BulkFDProvider::const_ptr ioProvider) {
+void LoggingBoard::newOutputProvider(OutProvider::ptr outProvider,
+									 MObject_ID id) {
 
-    this->ioProvider = ioProvider;
-    //if we have a new ioProvider, then we need to re-create all logger objects
-//    const BulkFDProvider::FDProviderMap* fdmap = ioProvider->getMap();
-//    for (BulkFDProvider::FDProviderMap::const_iterator i = fdmap->begin();
-//            i!= fdmap->end(); i++) {
-//
-//        MObject::const_ptr mobject =
-//                memory->getMObject(i->first);
-//        if (mobject != MObject::const_ptr()) {
-//            objectIOMap[i->first] = MObjectLogger::ptr(
-//                    new MObjectLogger(i->second,
-//                                      static_cast<int> (i->first), mobject));
-//            objectIOMap[i->first]->start();
-//        } else {
-//            std::cout<<"Invalid Object ID passed for logging: "
-//                    << "log ID: " << i->first << " "
-//                    << i->second->debugInfo() << std::endl;
-//        }
-//    }
-}
-
-void LoggingBoard::update(MObject_ID id) {
-    this->log(id);
-}
-
-void LoggingBoard::log(MObject_ID id) {
-    if (logging) {
-        MObjectLogger::ptr logger = getMutableLogger(id);
-        if (logger.get() != NULL) {
-            logger->signalToLog();
-        }
-    }
+    MObjectLogger::ptr logger(
+    			new MObjectLogger(outProvider, id, memory->getMObject(id)));
+    memory->addSubscriber(logger.get(), id);
+    //start the logging thread
+    logger->start();
 }
 
 MObjectLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
