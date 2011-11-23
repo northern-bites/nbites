@@ -16,13 +16,12 @@
 #include "MObjectParser.h"
 #include "memory/MObject.h"
 #include "memory/Memory.h"
-#include "memory/MemoryIOBoard.h"
 
 namespace man {
 namespace memory {
 namespace parse {
 
-class ParsingBoard : public MemoryIOBoard<MObjectParser> {
+class ParsingBoard {
 
 	typedef common::io::InProvider InProvider;
 	typedef std::pair< MObject_ID, MObjectParser::ptr > ObjectIOPair;
