@@ -13,6 +13,7 @@ using viewer::FieldViewer;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
+ 	colorScrollArea(new QScrollArea()),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCreator(new ColorCreator(dataManager)),
@@ -20,7 +21,7 @@ QTool::QTool() : QMainWindow(),
 	ballEKFViewer(new BallEKFViewer(dataManager)),
 	fieldViewer(new FieldViewer(dataManager)){
 
-    this->setWindowTitle(tr("HackTool"));
+    this->setWindowTitle(tr("The New Tool of Awesome"));
 
     toolbar = new QToolBar();
     nextButton = new QPushButton(tr("&Next"));
@@ -36,7 +37,9 @@ QTool::QTool() : QMainWindow(),
 
     this->setCentralWidget(toolTabs);
 
-    toolTabs->addTab(colorCreator, tr("Color Creator"));
+    colorScrollArea->setWidget(colorCreator);
+
+    toolTabs->addTab(colorScrollArea, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(logViewer, tr("Log Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
