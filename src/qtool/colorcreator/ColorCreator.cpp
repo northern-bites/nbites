@@ -102,7 +102,7 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     ui->setupUi(this);
     //  default directories - should not be user specific, but they are...
     // Everyone needs to change baseDirectory before using
-    baseDirectory = "/home/nemo/Documents/school/super_fall/robotics_cs320/nbites";
+    baseDirectory = "/home/egoogins/nbites";
     baseFrameDirectory = baseDirectory + "/data/frames";
     baseColorTable = baseDirectory + "/data/tables";
     baseSliderDirectory = baseDirectory + "/data/sliders";
@@ -113,7 +113,7 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     defineMode = false;
     cornerStatus = true;
 
-    ui->modeSelect->addItem(tr("Define Mode"), 0); 
+    ui->modeSelect->addItem(tr("Define Mode"), 0);
     ui->modeSelect->addItem(tr("Table Mode"), 1);
 
     ui->colorSelect->addItem(tr("Orange"), Orange);
@@ -151,25 +151,26 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     edgediff = 12;
 
     QString fileLoc = baseDirectory + "/src/qtool/pref/previousSliderFile";
+    qDebug() << "path to previousSliderFile" << fileLoc << endl;
     QFile previousSliderFile(fileLoc);
     short succesful = 0;
     if (previousSliderFile.open(QIODevice::ReadOnly | QIODevice::Text))
-      {
-	QString previousFileName;
-	QTextStream fileLocStream(&previousSliderFile);
-	previousFileName = fileLocStream.readLine();
-	qDebug() << "load previous file opened: " << previousFileName << endl;
-	succesful = setInitialColorValuesFromFile(previousFileName);
-      }
+    {
+        QString previousFileName;
+        QTextStream fileLocStream(&previousSliderFile);
+        previousFileName = fileLocStream.readLine();
+        qDebug() << "load previous file opened: " << previousFileName << endl;
+        succesful = setInitialColorValuesFromFile(previousFileName);
+    }
 
     if (succesful == 0)
-      {
-	qDebug() << "load default" << endl;
-	succesful = setInitialColorValuesFromFile("default");
-      }
+    {
+        qDebug() << "load default" << endl;
+        succesful = setInitialColorValuesFromFile("default");
+    }
 
     if (succesful == 0)
-	qDebug() << "Couldn't find a file to load!" << endl;
+        qDebug() << "Couldn't find a file to load!" << endl;
 
     // if (succesful == 0)
     //   {
@@ -305,120 +306,121 @@ ColorCreator::~ColorCreator()
     delete ui;
 }
 
-  short ColorCreator::setInitialColorValuesFromFile(QString filename)
-  {
-    //Set the current file to be loaded next time QTool is used
-    QString fileLoc = baseDirectory + "/src/qtool/pref/previousSliderFile";
-    QFile previousSliderFile(fileLoc);
-    if (previousSliderFile.open(QIODevice::WriteOnly | QIODevice::Text))
-      {
-    	qDebug() << "Now Write the prefs file to: " << filename << endl;
-    	QTextStream previousSliderFileStream(&previousSliderFile);
-    	previousSliderFileStream << filename << endl;
-      }
+    short ColorCreator::setInitialColorValuesFromFile(QString filename)
+    {
+        //Set the current file to be loaded next time QTool is used
+        QString fileLoc = baseDirectory + "/src/qtool/pref/previousSliderFile";
+        QFile previousSliderFile(fileLoc);
+        if (previousSliderFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            qDebug() << "Now Write the prefs file to: " << filename << endl;
+            QTextStream previousSliderFileStream(&previousSliderFile);
+            previousSliderFileStream << filename << endl;
+        }
 
 
-    QFile dataFile(filename);
-    qDebug() << "Attempt to open filename = " << filename << endl;
-    if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text))
-      {
-	qDebug() << "Succeed" << endl;
-	QString nextString;
-	QTextStream dataFileStream(&dataFile);
+        QFile dataFile(filename);
+        qDebug() << "Attempt to open filename = " << filename << endl;
+        if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            qDebug() << "Succeed" << endl;
+            QString nextString;
+            QTextStream dataFileStream(&dataFile);
 
-	//_____FOR_FORMATTING____//
-	//read the first line
-	dataFileStream.readLine();
+            //_____FOR_FORMATTING____//
+            //read the first line
+            dataFileStream.readLine();
 
-	for (int i=0; i<6; i++)
-	  {
-	    for (int j=0; j<9; j++)
-	      {
-		dataFileStream >> nextString;
-		if (!(j==0))
-		  fltSliders[i][j-1] = nextString.toFloat();
-	      }
-	  }
+            for (int i=0; i<6; i++)
+            {
+                for (int j=0; j<9; j++)
+                {
+                    dataFileStream >> nextString;
+                    if (!(j==0))
+                        fltSliders[i][j-1] = nextString.toFloat();
+                }
+            }
 
-	for (int i=0; i<4; i++)
-	  {
-	    for (int j=0; j<9; j++)
-	      {
-		dataFileStream >> nextString;
-		if (!(j==0))
-		  intSliders[i][j-1] = nextString.toInt();
-	      }
-	  }
-	qDebug() << "Succesfully Set Slider values from: " << filename << endl;
-	return 1;
-      }
-    qDebug() << "FAIL" << endl;
+            for (int i=0; i<4; i++)
+            {
+                for (int j=0; j<9; j++)
+                {
+                    dataFileStream >> nextString;
+                    if (!(j==0))
+                        intSliders[i][j-1] = nextString.toInt();
+                }
+            }
+            qDebug() << "Succesfully Set Slider values from: " << filename << endl;
+            return 1;
+        }
+        qDebug() << "FAIL" << endl;
 
-    return 0;
-  }
+        return 0;
+    }
 
-  void ColorCreator::writeInitialColorValues(QString filename)
-  {
-    //Set the current file to be loaded next time QTool is used
-    QString fileLoc = baseDirectory + "/src/qtool/pref/previousSliderFile";
-    QFile previousSliderFile(fileLoc);
-    if (previousSliderFile.open(QIODevice::WriteOnly | QIODevice::Text))
-      {
-	QTextStream previousSliderFileStream(&fileLoc);
-	previousSliderFileStream >> filename >> endl;
-      }
+    void ColorCreator::writeInitialColorValues(QString filename)
+    {
+        qDebug() << "filename:" << filename;
+        //Set the current file to be loaded next time QTool is used
+        QString fileLoc = baseDirectory + "/src/qtool/pref/previousSliderFile";
+        QFile previousSliderFile(fileLoc);
+        if (previousSliderFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
 
-    //Create the file to store the current values
-    QFile newFile(filename);
-    if (newFile.open(QIODevice::WriteOnly | QIODevice::Text))
-      {
-	QTextStream newFileStream(&newFile);    
+            qDebug() << "Now Write the prefs file to: " << filename << endl;
+            QTextStream previousSliderFileStream(&previousSliderFile);
+            previousSliderFileStream << filename << endl;
+        }
 
-	//____FOR_FORMATTING____//
-	//Write the first line
-	newFileStream << "[] Orange Blue Yellow Green White Pink Navy Black" << endl;
+        //Create the file to store the current values
+        QFile newFile(filename);
+        if (newFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QTextStream newFileStream(&newFile);
 
-	for (int i=0; i<6; i++)
-	  {
-	    //___FOR_FORMATTING____//
-	    if (i==0)
-	      newFileStream << "hMin ";
-	    else if (i==1)
-	      newFileStream << "hMax ";
-	    else if (i==2)
-	      newFileStream << "sMin ";
-	    else if (i==3)
-	      newFileStream << "sMax ";
-	    else if (i==4)
-	      newFileStream << "zMin ";
-	    else if (i==5)
-	      newFileStream << "zMax ";
+            //____FOR_FORMATTING____//
+            //Write the first line
+            newFileStream << "[] Orange Blue Yellow Green White Pink Navy Black" << endl;
 
-	    for (int j=0; j<8; j++)
-	      newFileStream << fltSliders[i][j] << " ";
-	    newFileStream << endl;
-	  }
+            for (int i=0; i<6; i++)
+            {
+                //___FOR_FORMATTING____//
+                if (i==0)
+                    newFileStream << "hMin ";
+                else if (i==1)
+                    newFileStream << "hMax ";
+                else if (i==2)
+                    newFileStream << "sMin ";
+                else if (i==3)
+                    newFileStream << "sMax ";
+                else if (i==4)
+                    newFileStream << "zMin ";
+                else if (i==5)
+                    newFileStream << "zMax ";
 
-	for (int i=0; i<4; i++)
-	  {
-	    //____FOR_FORMATTING___//
-	    if (i==0)
-	      newFileStream << "yMin ";
-	    else if (i==1)
-	      newFileStream << "yMax ";
-	    else if (i==2)
-	      newFileStream << "vMin ";
-	    else if (i==3)
-	      newFileStream << "vMax ";
-	    
-	    for (int j=0; j<8; j++)
-	      newFileStream << intSliders[i][j] << " ";
-	    newFileStream << endl;
-	  }
-      }
+                for (int j=0; j<8; j++)
+                    newFileStream << fltSliders[i][j] << " ";
+                newFileStream << endl;
+            }
 
-    
-  }
+            for (int i=0; i<4; i++)
+            {
+                //____FOR_FORMATTING___//
+                if (i==0)
+                    newFileStream << "yMin ";
+                else if (i==1)
+                    newFileStream << "yMax ";
+                else if (i==2)
+                    newFileStream << "vMin ";
+                else if (i==3)
+                    newFileStream << "vMax ";
+
+                for (int j=0; j<8; j++)
+                    newFileStream << intSliders[i][j] << " ";
+                newFileStream << endl;
+            }
+        }
+    }
 
 
 //TODO: hack hack hack
