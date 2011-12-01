@@ -37,6 +37,7 @@ public:
     virtual void run() {
         //blocking for socket fds, (almost) instant for other ones
         out_provider->openCommunicationChannel();
+        this->writeHead();
         while (running) {
             this->waitForSignal();
             this->writeToLog();

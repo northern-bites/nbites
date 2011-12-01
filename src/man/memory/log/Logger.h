@@ -47,7 +47,6 @@ public:
      */
     virtual void writeToLog() = 0;
 
-private:
     /**
      * This method should write to the head of the file; this is only done
      * once, versus the other logging which happens in a loop
