@@ -20,7 +20,7 @@ class Notifier {
 
     // typename here "convinces" the compiler that Subscriber<T> is actually
     // a type and then we typedef that to a new type
-    typedef typename std::list<Subscriber* >::const_iterator subscriber_iter;
+    typedef std::list<Subscriber* >::const_iterator subscriber_iter;
 
 public:
 
