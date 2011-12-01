@@ -18,6 +18,7 @@ set( Image_srcs
     BMPYUVImage
     ColorSpace
     ThresholdedImage
+    TestImage
     )
 
 set( Image_headers )
