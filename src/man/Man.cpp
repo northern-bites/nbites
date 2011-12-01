@@ -74,7 +74,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
     loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
     set_logging_board_pointer(loggingBoard);
 
-#ifdef USE_MEMORY
+#if defined USE_MEMORY && !defined OFFLINE
     OutputProviderFactory::AllFileOutput(loggingBoard);
 #endif
 
@@ -136,15 +136,10 @@ void Man::stopSubThreads() {
 void
 Man::processFrame ()
 {
-    cout << "processing fuss!"<<endl;
 #ifdef USE_VISION
     // Need to lock image and vision angles for duration of
     // vision processing to ensure consistency.
     sensors->lockImage();
-#ifdef USE_MEMORY
-    // TODO: this is temporarily here
-//    loggingBoard->log(MIMAGE_ID);
-#endif
     PROF_ENTER(P_VISION);
     vision->notifyImage(sensors->getImage());
     PROF_EXIT(P_VISION);
@@ -153,7 +148,6 @@ Man::processFrame ()
 #endif
 #ifdef USE_MEMORY
     memory->updateVision();
-    loggingBoard->log(MVISION_ID);
 #endif
 #ifdef USE_NOGGIN
     noggin->runStep();
