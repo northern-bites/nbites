@@ -35,10 +35,13 @@ SET( CMAKE_USE_PYTHON_VERSION 2.6 )
 ########################## FIND PATH
 # we should look in the naoqi sdk folder for the libraries we need first
 # so we use the same version as on the robot
+
+# The order matters - this forces cmake to first look in
+# nbites_dir/ext, then the regular system folders
 SET( CMAKE_FIND_ROOT_PATH  $ENV{NBITES_DIR}/ext/ /usr/)
 
 # search for programs in the system root
-SET( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH )
+SET( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )
 # for libraries and headers in the nao sdk preferably, if not defaults to
 # system root
 SET( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY )

@@ -791,19 +791,6 @@ void ColorCreator::outputStats()
     out << "V: " << statsVMin << " " << statsVMax << "\n";
 }
 
-void ColorCreator::on_previousButton_clicked()
-{
-    dataManager->getPrev();
-    currentFrameNumber--;
-}
-
-void ColorCreator::on_nextButton_clicked()
-{
-    dataManager->getNext();
-    currentFrameNumber++;
-}
-
-
 void ColorCreator::on_hMin_valueChanged(int value)
 {
     hMin[currentColor] = (float)value / 100.0f;
@@ -1089,23 +1076,6 @@ void ColorCreator::on_writeNew_clicked()
     //writeOldFormat(filename);
     writeNewFormat(filename);
 }
-
-
-void ColorCreator::on_plusTen_clicked()
-{
-    //yuvImage.read(tenthFrame);
-    currentFrameNumber += 10;
-    updateDisplays();
-}
-
-void ColorCreator::on_minusTen_clicked()
-{
-    //yuvImage.read(minusTenthFrame);
-    currentFrameNumber -= 10;
-    updateDisplays();
-}
-
-
 
 void ColorCreator::on_channel_currentIndexChanged(int index)
 {
