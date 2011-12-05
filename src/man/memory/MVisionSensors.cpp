@@ -11,46 +11,46 @@
 #include <vector>
 
 namespace man {
-namespace memory {
+    namespace memory {
 
-using boost::shared_ptr;
-using namespace proto;
-using namespace std;
+        using boost::shared_ptr;
+        using namespace proto;
+        using namespace std;
 
-MVisionSensors::MVisionSensors(MObject_ID id, shared_ptr<Sensors> s,
-                               shared_ptr<proto::PVisionSensors> vision_s_data)
-    : MObject(id, vision_s_data), sensors(s), data(vision_s_data) {
-}
+        MVisionSensors::MVisionSensors(MObject_ID id, shared_ptr<Sensors> s,
+                                       shared_ptr<proto::PVisionSensors> vision_s_data)
+            : MObject(id, vision_s_data), sensors(s), data(vision_s_data) {
+        }
 
-MVisionSensors::~MVisionSensors() {
-}
+        MVisionSensors::~MVisionSensors() {
+        }
 
-void MVisionSensors::update() {
+        void MVisionSensors::update() {
 
-    ADD_PROTO_TIMESTAMP;
+            ADD_PROTO_TIMESTAMP;
 
-    this->data->clear_vision_body_angles();
-    vector<float> bodyAngles = sensors->getVisionBodyAngles();
-    for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end(); i++) {
-        this->data->add_vision_body_angles(*i);
+            this->data->clear_vision_body_angles();
+            vector<float> bodyAngles = sensors->getVisionBodyAngles();
+            for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end(); i++) {
+                this->data->add_vision_body_angles(*i);
+            }
+
+            FootBumper leftFootBumper = sensors->getLeftFootBumper();
+            PSensors::PFootBumper* lfb = this->data->mutable_left_foot_bumper();
+            lfb->set_left(leftFootBumper.left);
+            lfb->set_right(leftFootBumper.right);
+            FootBumper rightFootBumper = sensors->getRightFootBumper();
+            PSensors::PFootBumper* rfb = this->data->mutable_right_foot_bumper();
+            rfb->set_left(rightFootBumper.left);
+            rfb->set_right(rightFootBumper.right);
+
+            this->data->set_ultra_sound_distance_left(sensors->getUltraSoundLeft());
+            this->data->set_ultra_sound_distance_right(sensors->getUltraSoundRight());
+
+            this->data->set_battery_charge(sensors->getBatteryCharge());
+            this->data->set_battery_current(sensors->getBatteryCurrent());
+
+            //std::cout << this->DebugString() << std::endl;
+        }
     }
-
-    FootBumper leftFootBumper = sensors->getLeftFootBumper();
-    PSensors::PFootBumper* lfb = this->data->mutable_left_foot_bumper();
-    lfb->set_left(leftFootBumper.left);
-    lfb->set_right(leftFootBumper.right);
-    FootBumper rightFootBumper = sensors->getRightFootBumper();
-    PSensors::PFootBumper* rfb = this->data->mutable_right_foot_bumper();
-    rfb->set_left(rightFootBumper.left);
-    rfb->set_right(rightFootBumper.right);
-
-    this->data->set_ultra_sound_distance_left(sensors->getUltraSoundLeft());
-    this->data->set_ultra_sound_distance_right(sensors->getUltraSoundRight());
-
-    this->data->set_battery_charge(sensors->getBatteryCharge());
-    this->data->set_battery_current(sensors->getBatteryCurrent());
-
-    //std::cout << this->DebugString() << std::endl;
-}
-}
 }

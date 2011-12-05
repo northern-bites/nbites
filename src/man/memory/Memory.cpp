@@ -20,7 +20,8 @@ using namespace proto;
 using namespace std;
 
 Memory::Memory(shared_ptr<Vision> vision_ptr,
-        shared_ptr<Sensors> sensors_ptr) :
+               shared_ptr<Sensors> sensors_ptr,
+               shared_ptr<LocSystem> loc_ptr) :
         mVision(new MVision(MVISION_ID,
                 vision_ptr, shared_ptr<PVision>(new PVision))),
         mVisionSensors(new MVisionSensors(MVISION_SENSORS_ID,
@@ -28,7 +29,10 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
         mMotionSensors(new MMotionSensors(MMOTION_SENSORS_ID,
                 sensors_ptr, shared_ptr<PMotionSensors>(new PMotionSensors))),
         mImage(new MImage(MIMAGE_ID,
-                sensors_ptr, shared_ptr<PImage>(new PImage))) {
+                          sensors_ptr, shared_ptr<PImage>(new PImage))),
+        mLocalization(new MLocalization(MLOCALIZATION_ID,
+                                        loc_ptr, shared_ptr<PLoc>(new PLoc)))
+{
     birth_time = process_micro_time();
 
     if(sensors_ptr.get()) {

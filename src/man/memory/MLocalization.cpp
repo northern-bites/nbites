@@ -18,13 +18,22 @@ namespace man {
         using namespace std;
         MLocalization::MLocalization(MObject_ID id, shared_ptr<LocSystem> l,
                                      shared_ptr<proto::PLoc> loc_l_data)
-        {//Octavian had afunny object decleration before brackets in MVisionSnsr
+            : MObject(id, loc_l_data), locSystem(l), data(loc_l_data){
         }
 
+        //Destructor
         MLocalization::~MLocalization() {
         }
 
         void MLocalization::update() {
-            //What is this?
-            ADD_PROTO_TIMESTAMP;
+             ADD_PROTO_TIMESTAMP;
 
+             this->data->set_x_est(locSystem->getXEst());
+             this->data->set_y_est(locSystem->getYEst());
+             this->data->set_h_est(locSystem->getHEst());
+             this->data->set_x_uncert(locSystem->getXUncert());
+             this->data->set_y_uncert(locSystem->getYUncert());
+             this->data->set_h_uncert(locSystem->getHUncert());
+        }
+    }
+}

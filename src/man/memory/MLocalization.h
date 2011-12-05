@@ -16,12 +16,12 @@
 namespace man{
     namespace memory {
 
-        class MLocalization: public proto::PLoc public MObject {
+        class MLocalization: public MObject {
 
         public:
             MLocalization(MObject_ID id, boost::shared_ptr<LocSystem> l,
                            boost::shared_ptr<proto::PLoc> loc_l_data);
-            virtual ~MVisionSensors();
+            virtual ~MLocalization();
 
             /**
              * Updates all the fields of the proto::PLoc
