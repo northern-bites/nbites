@@ -27,8 +27,12 @@ public:
     RobotSelect(QWidget* parent = 0);
     ~RobotSelect() {}
 
+signals:
+    void robotSelected(const RemoteRobot* remoteRobot);
+
 protected slots:
     void updateList();
+    void robotClicked(QListWidgetItem* item);
 
 protected:
     QListWidget robotList;

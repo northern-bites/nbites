@@ -20,9 +20,11 @@ public:
 public:
     RemoteRobot(QHostAddress address, std::string name) :
          address(address), name(name) {}
+    RemoteRobot() {}
     ~RemoteRobot() {}
 
     std::string getName() const {return name;}
+    QHostAddress getAddress() const {return address;}
 
 private:
     std::string name;

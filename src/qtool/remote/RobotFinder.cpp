@@ -12,7 +12,6 @@ namespace remote {
 
 RobotFinder::RobotFinder() {
     udpSocket.bind(TOOL_PORT);
-    refresh();
 }
 
 void RobotFinder::refresh() {

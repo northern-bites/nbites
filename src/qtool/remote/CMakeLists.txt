@@ -16,11 +16,13 @@ add_definitions(${QT_DEFINITIONS})
 set( remote_srcs
     RobotFinder
     RobotSelect
+    RemoteDataFinder
     )
 
 set( remote_headers 
 	RobotFinder.h
-	RobotSelect.h	)
+	RobotSelect.h
+	RemoteDataFinder.h )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -39,6 +41,7 @@ add_library(remote
 
 target_link_libraries(
   remote
+  data
   ${QT_LIBRARIES}
   ${QT_QTNETWORK_LIBRARY}
   )

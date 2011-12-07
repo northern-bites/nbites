@@ -31,9 +31,7 @@ public:
 
     void addRemoteRobot(RemoteRobot& robot);
 
-    void getRemoteRobots(RemoteRobot::list &robots) {
-        robots = remoteRobots;
-    }
+    RemoteRobot::list getRemoteRobots() { return remoteRobots; }
 
 public slots:
     void refresh();
