@@ -67,6 +67,7 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
     private Map<JButton, DataType> typeMap;
     private Map<JMenuItem, RemoteRobot> robotMap;
     private JButton robotButton;
+    private JButton sendCmdButton;
     private JPopupMenu robotMenu;
 
     private ImagePanel imagePanel;
@@ -122,7 +123,10 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
         robotButton = new JButton("Robot");
         robotButton.addActionListener(this);
+        sendCmdButton = new JButton("SEND");
+        sendCmdButton.addActionListener(this);
         subPanel.add(robotButton);
+        subPanel.add(sendCmdButton);
         robotMenu = new JPopupMenu();
         robotMenu.addPopupMenuListener(this);
         subPanel.add(robotMenu);
@@ -365,7 +369,10 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
             if (b == robotButton) {
                 // show popup menu for selecting robots
                 robotMenu.show(b, b.getWidth(), 0);
-            }else {
+            }else if (b == sendCmdButton) {
+                if (selectedRobot != null) selectedRobot.sendCmd();
+            }
+            else {
                 if (!typeMap.containsKey(b))
                     // error?
                     return;

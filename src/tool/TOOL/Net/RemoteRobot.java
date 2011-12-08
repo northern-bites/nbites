@@ -60,8 +60,9 @@ import TOOL.WorldController.PlayerInfo;
 
 public class RemoteRobot extends FileSet {
 
-    public static final String NAME_UNKNOWN = "Unkown";
+    public static final String NAME_UNKNOWN = "Unknown";
     public static final String ADDR_UNKNOWN = "0.0.0.0";
+    public static final int SIZEOF_COMMAND = 256;
 
     private TOOLProtocol proto;
     private DataRequest requestDetails;
@@ -277,4 +278,16 @@ public class RemoteRobot extends FileSet {
 								   e);
 		}
 	}
+
+    public void sendCmd() {
+        System.out.println("\nAttempting to send a command\n");
+        String s = "nbites_rock_a_lot";
+        byte[] sBytes = s.getBytes();
+        byte[] fix = new byte[SIZEOF_COMMAND];
+        for (int i = 0; i < sBytes.length; i++) {
+            fix[i] = sBytes[i];
+        }
+        fix[sBytes.length] = '\0';
+        proto.sendCommand(fix);
+    }
 }

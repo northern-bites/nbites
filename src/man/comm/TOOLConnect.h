@@ -21,6 +21,7 @@ class TOOLConnect; // forward reference
 //
 
 #define SIZEOF_REQUEST 11
+#define SIZEOF_COMMAND 256
 
 struct DataRequest {
     bool info;

@@ -18,9 +18,9 @@ using namespace boost;
 // Debugging ifdef switches
 //
 
-//#define DEBUG_TOOL_CONNECTS
-//#define DEBUG_TOOL_REQUESTS
-//#define DEBUG_TOOL_COMMANDS
+#define DEBUG_TOOL_CONNECTS
+#define DEBUG_TOOL_REQUESTS
+#define DEBUG_TOOL_COMMANDS
 
 //
 // Begin class code
@@ -93,6 +93,8 @@ TOOLConnect::reset ()
     state = TOOL_REQUESTING;
 }
 
+using namespace std;
+
 void
 TOOLConnect::receive () throw(socket_error&)
 {
@@ -122,12 +124,16 @@ TOOLConnect::receive () throw(socket_error&)
     } else if (b == COMMAND_MSG) {
 
         state = TOOL_COMMANDING;
-        int cmd = serial.read_int();
+
+        byte cmd[SIZEOF_COMMAND];
+        serial.read_bytes((byte*)&cmd[0], SIZEOF_COMMAND);
+        cout << "string " << cmd << endl;
+
 #ifdef DEBUG_TOOL_COMMANDS
-        printf("Command received: type=%i\n", cmd);
+        printf("Command received: type=%i\n", 0);
 #endif
 
-        handle_command(cmd);
+        //handle_command(0);
 
     } else if (b == DISCONNECT) {
 
