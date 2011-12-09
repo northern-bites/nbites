@@ -12,10 +12,13 @@
 #include "protos/Sensors.pb.h"
 #include "MObject.h"
 #include "Sensors.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 class MMotionSensors: public proto::PMotionSensors, public MObject {
+
+    ADD_SHARED_PTR(MMotionSensors);
 
 public:
     /**

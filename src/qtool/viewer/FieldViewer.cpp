@@ -10,13 +10,12 @@ using namespace data;
 using namespace man::memory;
 
 FieldViewer::FieldViewer(DataManager::ptr dataManager) :
-		QMainWindow(),
-		dataManager(dataManager){
-  
-  paintField = new PaintField();
+        QMainWindow(), dataManager(dataManager) {
 
-  // Adds the Field
-  this->setCentralWidget(paintField);
+    paintField = new PaintField();
+
+    // Adds the Field
+    this->setCentralWidget(paintField);
 
 
 }

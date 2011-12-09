@@ -15,7 +15,7 @@
 #pragma once
 
 #include <iostream>
-#include "NullInstanceHelper.h"
+#include "ClassHelper.h"
 
 class NullStream {
 

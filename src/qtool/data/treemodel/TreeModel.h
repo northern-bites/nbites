@@ -31,6 +31,8 @@ class TreeModel : public QAbstractItemModel
     Q_OBJECT
 public:
     class Node;
+    //the TreeModel takes ownership of the Node* and will delete it at
+    // destruction
     TreeModel(Node* root, QObject *parent = 0);
     ~TreeModel();
 
@@ -46,6 +48,10 @@ public:
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+    const Node* getRoot() const {return root;}
+
+    void revalidateModel();
 
 signals:
 

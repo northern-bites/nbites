@@ -6,6 +6,7 @@
  */
 
 #include "Node.h"
+#include <assert.h>
 
 namespace qtool {
 namespace data {
@@ -27,16 +28,18 @@ void Node::clearChildren() {
 	children.clear();
 }
 
-void Node::addChild(const Node * child) {
+void Node::addChild(Node * child) {
+    assert(child != NULL);
     this->children.push_back(child);
 }
 
+void Node::popChild() {
+    this->children.pop_back();
+}
+
 const Node* Node::getChild(int index) const {
-    if (0 <= index && index < childCount()) {
-        return children.at(index);
-    } else {
-    	return NULL;
-    }
+    assert(0 <= index && index < children.size());
+    return children.at(index);
 }
 
 int Node::childCount() const {
@@ -52,7 +55,10 @@ int Node::indexInParentList() const {
 }
 
 int Node::indexOfChild(const Node* child) const {
-    return children.indexOf(child);
+    //const casting is BAD but I think there is some bug at work here
+    //the QT API says indexOf takes const T& as the first paramenter,
+    //yet gcc still tries converting child from const Node* to Node*
+    return children.indexOf(const_cast<Node*>(child));
 }
 
 }
