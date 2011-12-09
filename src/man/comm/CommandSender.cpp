@@ -1,7 +1,7 @@
 #include "CommandSender.h"
 
 // Prints for debugging
-#define DEBUG_COMMAND
+//#define DEBUG_COMMAND
 
 using std::string;
 using std::cout;

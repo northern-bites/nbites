@@ -257,7 +257,7 @@ class Brain(object):
         self.out.updateLogs()
 
         if self.sender.changed:
-            eval(self.sender.command)
+            exec(self.sender.command)
             self.sender.changed = False
 
     def updateComm(self):
