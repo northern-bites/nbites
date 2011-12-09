@@ -151,7 +151,7 @@ Man::processFrame ()
     PROF_EXIT(P_VISION);
     sensors->releaseImage();
 #endif
-#ifdef USE_MEMORY
+#if defined USE_MEMORY || defined OFFLINE
     memory->updateVision();
     loggingBoard->log(MVISION_ID);
 #endif
