@@ -257,7 +257,10 @@ class Brain(object):
         self.out.updateLogs()
 
         if self.sender.changed:
-            exec(self.sender.command)
+            try:
+                exec(self.sender.command)
+            except(RuntimeError, SyntaxError, TypeError, NameError):
+                print "Error in command."
             self.sender.changed = False
 
     def updateComm(self):
