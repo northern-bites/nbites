@@ -259,16 +259,34 @@ Blob* Blobs::getWidest()
 */
 int Blobs::getBiggest()
 {
-	int index = 0;
+    int index = 0;
     int size = 0;
     //check each blob in the array
     for (int i = 0; i < numBlobs; i++) {
-		if (blobs[i].getArea() > size) {
+        if (blobs[i].getArea() > size) {
             size = blobs[i].getArea();
-			index = i;
+            index = i;
         }
     }
-	return index;
+    return index;
+}
+
+/*
+  Checks all of the blobs of this color and finds the biggest one.
+  returns its index. Only checks blobs after index i
+*/
+int Blobs::getBiggest(int i)
+{
+    int index = i;
+    int size = 0;
+    //check each blob in the array
+    for (i; i < numBlobs; i++) {
+        if (blobs[i].getArea() > size) {
+            size = blobs[i].getArea();
+            index = i;
+        }
+    }
+    return index;
 }
 
 
@@ -293,4 +311,14 @@ void Blobs::mergeBlobs(int first, int second)
 	zeroTheBlob(second);
 }
 
-
+/* Sort blobs in descending order using selection sort.
+   NOTE: if efficiency is an issue this sort can be improved
+*/
+void Blobs::sort() {
+    for (int i = 0; i < number(); i++){
+        Blob temp = blobs[i];
+        int biggest = getBiggest(i);
+        blobs[i] = blobs[biggest];
+        blobs[biggest] = temp;
+    }
+}

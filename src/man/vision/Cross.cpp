@@ -73,6 +73,7 @@ void Cross::createObject() {
     }
 }
 
+
 bool Cross::checkForRobotBlobs(Blob blob) {
     for (int i = 0; i < blobs->number(); i++) {
         if (blobs->get(i).isAligned(blob)) {
@@ -80,6 +81,31 @@ bool Cross::checkForRobotBlobs(Blob blob) {
         }
     }
     return false;
+}
+
+
+/* Given a uniform blob passed from the Robots object, add all vertically
+   alligned white blobs to create an "area of interest" for where to more
+   rigorously determine where a robot is
+   @param robotBlob     potential uniform blob from Robots
+   @return              blob indicating an area of interest for robot detection
+*/
+Blob Cross::addRobotBlobs(Blob robotBlob) {
+    int left = robotBlob.getLeft();
+    int right = robotBlob.getRight();
+    int width = right-left;
+    for (int i = 0; i < blobs->number(); i++){
+        if (blobs->get(i).isAligned(robotBlob)) {
+            robotBlob.merge(blobs->get(i));
+        }
+    }
+
+    //places constraints the potential robot blob using the fact that
+    //a robot is not likely wider than 3 times its uniform width
+    if (robotBlob.getLeft() < left-width) robotBlob.setLeft(left-width);
+    if (robotBlob.getRight() > right+width) robotBlob.setRight(right+width);
+
+    return robotBlob;
 }
 
 /* See if any of our candidate blobs are actually worthy crosses.
