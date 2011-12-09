@@ -53,7 +53,8 @@ protected:
     typedef std::map<MObject_ID, SubscriberEmiterConvertor*> ms_map;
 
 public:
-    MemorySignalingInterface(man::memory::Memory::const_ptr memory) {
+    MemorySignalingInterface(man::memory::Memory::const_ptr memory) :
+        memory(memory) {
 
         for (MObject_ID id = man::memory::FIRST_OBJECT_ID;
                         id != man::memory::LAST_OBJECT_ID; id++) {
@@ -66,6 +67,7 @@ public:
     virtual ~MemorySignalingInterface() {
         for (ms_map::iterator it = convertors.begin();
                 it != convertors.end(); it++) {
+            memory->unsubscribe(it->second, it->first);
             delete it->second;
         }
     }
@@ -82,6 +84,7 @@ public:
 
 private:
     ms_map convertors;
+    man::memory::Memory::const_ptr memory;
 
 };
 
