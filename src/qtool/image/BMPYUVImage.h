@@ -35,7 +35,7 @@ public:
     BMPYUVImage(man::memory::MImage::const_ptr rawImage);
     virtual ~BMPYUVImage() {};
 
-    void updateBitmap();
+    void buildBitmap();
 
     BitmapType getCurrentBitmapType() const { return bitmapType; }
     void setBitmapType(BitmapType type) { bitmapType = type; updateBitmap();}

@@ -11,7 +11,8 @@
 #include <QWidget>
 #include <QtGui>
 
-#include "OfflineDataFinder.h"
+#include "remote/RemoteDataFinder.h"
+#include "data/OfflineDataFinder.h"
 #include "DataManager.h"
 #include "io/InProvider.h"
 

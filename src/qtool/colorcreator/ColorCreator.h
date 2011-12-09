@@ -3,8 +3,7 @@
 
 #include <QMouseEvent>
 #include <QWidget>
-//man
-#include "man/include/Subscriber.h"
+
 //qtool
 #include "image/YUVImage.h"
 #include "data/DataManager.h"
@@ -49,7 +48,7 @@ namespace Ui {
 namespace qtool {
 namespace colorcreator {
 
-class ColorCreator : public QMainWindow, public Subscriber
+class ColorCreator : public QMainWindow
 {
     Q_OBJECT
 
@@ -65,10 +64,7 @@ public:
     void updateDisplays();
     void updateColors();
     void updateThresh(bool imageChanged, bool choiceChanged, bool colorsChanged);
-    void update() {
-        yuvImage.updateFromRawImage();
-        updateDisplays();
-    }
+
     void initStats();
     void collectStats(int x, int y);
     void outputStats();
@@ -82,6 +78,12 @@ public:
     void largeDisplay();
     QColor displayColorTable(int i, int j);
     bool testValue(float h, float s, float z, int y, int u, int v, int color);
+
+public slots:
+    void updatedImage() {
+        yuvImage.updateFromRawImage();
+        updateDisplays();
+    }
 
 protected:
     void mouseMoveEvent(QMouseEvent* event);

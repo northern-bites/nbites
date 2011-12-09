@@ -24,7 +24,7 @@ public:
     DataFinder(QWidget *parent = 0) : QWidget(parent) {}
 
 signals:
-    void signalNewInputProvider(common::io::InProvider::const_ptr newInput);
+    void signalNewInputProvider(common::io::InProvider::ptr newInput);
 
 };
 

@@ -72,7 +72,7 @@ void OfflineDataFinder::scanFolderForLogs(QString path) {
         if (fileInfo.size() != 0) {
             std::string path = fileInfo.absoluteFilePath().toStdString();
             InProvider::ptr file_in(new FileInProvider(path));
-            file_in->openCommunicationChannel();
+//            file_in->openCommunicationChannel();
             emit signalNewInputProvider(file_in);
         }
     }

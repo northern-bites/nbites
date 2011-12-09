@@ -13,7 +13,7 @@ bool BMPYUVImage::needToResizeBitmap() const {
     return bitmap.width() < yuvImage.getWidth() || bitmap.height() < yuvImage.getHeight();
 }
 
-void BMPYUVImage::updateBitmap() {
+void BMPYUVImage::buildBitmap() {
     yuvImage.updateFromRawImage();
     if (this->needToResizeBitmap()) {
         bitmap = QImage(yuvImage.getWidth(),

@@ -21,7 +21,9 @@ set( data_srcs DataManager.cpp
 set( data_headers DataLoader.h
                   DataFinder.h
                   OfflineDataFinder.h 
-                  DataManager.h)
+                  DataManager.h
+                  MemorySignalingInterface.h
+                  RobotMemoryManager.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

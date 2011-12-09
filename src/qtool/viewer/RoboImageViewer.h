@@ -10,20 +10,18 @@
 namespace qtool {
 namespace viewer {
 
-class RoboImageViewer: public QWidget, public Subscriber {
+class RoboImageViewer: public QWidget {
     Q_OBJECT
 public:
 
-    RoboImageViewer(image::BMPImage::ptr image =
-            image::BMPImage::NullInstanceSharedPtr(),
+    RoboImageViewer(image::BMPImage::ptr image,
             QWidget *parent = NULL);
     virtual ~RoboImageViewer();
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
-    void updateBitmap();
 
-    void update();
-    void setImage(image::BMPImage::ptr _image) { image = _image; }
+protected slots:
+    void updateView();
 
 protected:
     void paintEvent(QPaintEvent *event);

@@ -15,6 +15,7 @@
 
 #include "man/memory/Memory.h"
 #include "image/BMPYUVImage.h"
+#include "data/RobotMemoryManager.h"
 #include "RoboImageViewer.h"
 #include "MObjectViewer.h"
 
@@ -25,11 +26,11 @@ class MemoryViewer : public QMainWindow{
     Q_OBJECT
 
 public:
-    MemoryViewer(man::memory::Memory::const_ptr memory);
+    MemoryViewer(data::RobotMemoryManager::const_ptr memoryManager);
 
 private:
     std::vector<QDockWidget*> dockWidget;
-    man::memory::Memory::const_ptr memory;
+    data::RobotMemoryManager::const_ptr memoryManager;
     image::BMPImage::ptr image;
     RoboImageViewer* roboImageViewer;
 

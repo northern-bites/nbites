@@ -9,13 +9,15 @@ using namespace data;
 using namespace man::memory;
 using namespace qtool::image;
 
-MemoryViewer::MemoryViewer(Memory::const_ptr memory) :
-                 memory(memory),
-                 image(new BMPYUVImage(memory->getMImage())),
+MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
+                 memoryManager(memoryManager),
+                 image(new BMPYUVImage(memoryManager->getMemory()->getMImage())),
                  roboImageViewer(new RoboImageViewer(image, this)) {
 
     this->setCentralWidget(roboImageViewer);
-    memory->addSubscriber(roboImageViewer, MIMAGE_ID);
+    memoryManager->connectSlotToMObject(image.get(),
+                        SLOT(updateBitmap()), MIMAGE_ID);
+
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -26,11 +28,12 @@ MemoryViewer::MemoryViewer(Memory::const_ptr memory) :
         if (id != MIMAGE_ID) {
             QDockWidget* dockWidget =
                     new QDockWidget(QString(MObject_names[id].c_str()), this);
-            MObjectViewer* view = new MObjectViewer(memory->
+            MObjectViewer* view = new MObjectViewer(
+                    memoryManager->getMemory()->
                     getMObject(id)->getProtoMessage());
             dockWidget->setWidget(view);
             this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-            memory->addSubscriber(view, id);
+            memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
         }
     }
 

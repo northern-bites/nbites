@@ -19,11 +19,12 @@
 #include "man/memory/parse/ParsingBoard.h"
 #include "DataTypes.h"
 #include "ClassHelper.h"
+#include "RobotMemoryManager.h"
 
 namespace qtool {
 namespace data {
 
-class DataManager : public QObject {
+class DataManager : public RobotMemoryManager {
 
     Q_OBJECT
 
@@ -42,16 +43,10 @@ public:
         parsingBoard.rewindAll();
     }
 
-    man::memory::Memory::const_ptr getMemory() const {
-        return memory;}
-
 public slots:
-    void newInputProvider(common::io::InProvider::const_ptr newInput);
+    void newInputProvider(common::io::InProvider::ptr newInput);
 
-    void addSubscriber(Subscriber* subscriber, MObject_ID mobject_id);
-
-private:
-    man::memory::Memory::ptr memory;
+protected:
     man::memory::parse::ParsingBoard parsingBoard;
 
 };

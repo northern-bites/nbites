@@ -415,7 +415,7 @@ void ColorCreator::updateColors()
         QPixmap pix;
         pix.convertFromImage(*wheel);
         ui->colorWheel->setPixmap(pix);
-        ui->colorWheel->repaint();
+        ui->colorWheel->update();
         updateThresh(false, false, true);
     }
 }
@@ -684,7 +684,7 @@ void ColorCreator::largeDisplay()
     QPixmap pix;
     pix.convertFromImage(*img);
     ui->thresh->setPixmap(pix);
-    ui->thresh->repaint();
+    ui->thresh->update();
 
 }
 
@@ -732,13 +732,13 @@ void ColorCreator::updateThresh(bool imageChanged, bool choiceChanged, bool colo
             QPixmap pix2;
             pix2.convertFromImage(*img2);
             ui->view2->setPixmap(pix2);
-            ui->view2->repaint();
+            ui->view2->update();
         }
         if (imageChanged || choiceChanged) {
             QPixmap pix3;
             pix3.convertFromImage(*img3);
             ui->view3->setPixmap(pix3);
-            ui->view3->repaint();
+            ui->view3->update();
         }
         if (stats)
         {

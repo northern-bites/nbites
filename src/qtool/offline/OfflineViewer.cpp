@@ -2,18 +2,23 @@
 #include "OfflineViewer.h"
 #include "image/ThresholdedImage.h"
 
-using namespace man::corpus;
-using namespace man::memory;
-using namespace qtool::viewer;
-using namespace qtool::image;
-
 namespace qtool {
 namespace offline {
 
-OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) : QWidget(parent),
+using namespace man::corpus;
+using namespace man::memory;
+using namespace viewer;
+using namespace image;
+using namespace data;
+
+
+OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) :
+        QWidget(parent),
         offlineControl(new OfflineManController(memory)),
         manPreloader(offlineControl),
-        manMemoryViewer(new MemoryViewer(offlineControl->getManMemory())) {
+        manMemoryManager(new
+                RobotMemoryManager(offlineControl->getManMemory())),
+        manMemoryViewer(manMemoryManager) {
 
     memory->addSubscriber(this, MIMAGE_ID);
 
@@ -29,17 +34,17 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) : QWidge
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
     buttonLayout->addWidget(loadTableButton);
 
-    vertLayout->addWidget(manMemoryViewer);
+    vertLayout->addWidget(&manMemoryViewer);
     //add the thresholded image to the memory viewer
     ThresholdedImage::ptr threshImage(new ThresholdedImage(
             offlineControl->getManMemory()->getMImage()->getThresholded()));
     QDockWidget* dockWidget =
-            new QDockWidget(tr("Thresholded"), manMemoryViewer);
+            new QDockWidget(tr("Thresholded"), &manMemoryViewer);
     RoboImageViewer* threshView = new RoboImageViewer(threshImage, dockWidget);
-    offlineControl->getManMemory()->addSubscriber(threshView, MIMAGE_ID);
+//    offlineControl->getManMemory()->addSubscriber(threshView, MIMAGE_ID);
     dockWidget->setWidget(threshView);
     dockWidget->setMinimumSize(350, 300);
-    manMemoryViewer->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
+    manMemoryViewer.addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     this->setLayout(vertLayout);
 }

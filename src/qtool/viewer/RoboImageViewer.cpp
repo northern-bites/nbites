@@ -8,20 +8,18 @@ namespace viewer {
 RoboImageViewer::RoboImageViewer(image::BMPImage::ptr image,
                                  QWidget *parent)
     : QWidget(parent),
-      image(image)
-{}
+      image(image) {
+
+    connect(image.get(), SIGNAL(bitmapUpdated()),
+            this, SLOT(updateView()));
+}
 
 RoboImageViewer::~RoboImageViewer() {
 }
 
-void RoboImageViewer::update() {
-    this->updateBitmap();
+void RoboImageViewer::updateView() {
     //enqueues a repaint - thread-safe
     this->QWidget::update();
-}
-
-void RoboImageViewer::updateBitmap() {
-	image->updateBitmap();
 }
 
 QSize RoboImageViewer::minimumSizeHint() const

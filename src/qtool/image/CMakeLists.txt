@@ -20,7 +20,7 @@ set( Image_srcs
     ThresholdedImage
     )
 
-set( Image_headers )
+set( Image_headers BMPImage.h)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 

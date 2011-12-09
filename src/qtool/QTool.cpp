@@ -17,10 +17,10 @@ QTool::QTool() : QMainWindow(),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCreator(new ColorCreator(dataManager)),
-        memoryViewer(new MemoryViewer(dataManager->getMemory())),
+        memoryViewer(new MemoryViewer(dataManager)),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
-        fieldViewer(new FieldViewer(dataManager)){
+        fieldViewer(new FieldViewer(dataManager)) {
 
     this->setWindowTitle(tr("HackTool"));
 
@@ -46,7 +46,8 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
     toolTabs->addTab(new remote::RobotSelect, tr("remote"));
 
-    dataManager->addSubscriber(colorCreator, man::memory::MIMAGE_ID);
+    dataManager->connectSlotToMObject(colorCreator,
+            SLOT(updatedImage()), man::memory::MIMAGE_ID);
 }
 
 QTool::~QTool() {

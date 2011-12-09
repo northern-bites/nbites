@@ -3,10 +3,12 @@
 namespace qtool {
 namespace data {
 
+using namespace remote;
+
 DataLoader::DataLoader(DataManager::ptr dataManager, QWidget *parent) :
     QWidget(parent),
     dataManager(dataManager),
-    dataFinder(new OfflineDataFinder())
+    dataFinder(new OfflineDataFinder(this))
 {
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setAlignment(Qt::AlignTop);
@@ -16,9 +18,9 @@ DataLoader::DataLoader(DataManager::ptr dataManager, QWidget *parent) :
     layout->addWidget(dataFinder);
 
     connect(dataFinder,
-            SIGNAL(signalNewInputProvider(common::io::InProvider::const_ptr)),
+            SIGNAL(signalNewInputProvider(common::io::InProvider::ptr)),
             dataManager.get(),
-            SLOT(newInputProvider(common::io::InProvider::const_ptr)));
+            SLOT(newInputProvider(common::io::InProvider::ptr)));
 
     this->setLayout(layout);
 }

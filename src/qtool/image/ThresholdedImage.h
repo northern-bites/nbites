@@ -24,7 +24,7 @@ public:
             boost::shared_ptr<const man::memory::proto::PImage> rawImage);
     virtual ~ThresholdedImage() {};
 
-    void updateBitmap();
+    void buildBitmap();
 
     unsigned getWidth() const { return rawImage->width(); }
     unsigned getHeight() const { return rawImage->height(); }

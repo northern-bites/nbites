@@ -15,6 +15,7 @@
 #include "man/corpus/offlineconnect/OfflineManController.h"
 #include "man/memory/Memory.h"
 #include "man/OfflineManPreloader.h"
+#include "data/RobotMemoryManager.h"
 
 namespace qtool {
 namespace offline {
@@ -36,7 +37,8 @@ private slots:
 private:
     man::corpus::OfflineManController::ptr offlineControl;
     OfflineManPreloader manPreloader;
-    viewer::MemoryViewer* manMemoryViewer;
+    data::RobotMemoryManager::const_ptr manMemoryManager;
+    viewer::MemoryViewer manMemoryViewer;
 
 };
 

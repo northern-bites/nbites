@@ -14,7 +14,7 @@ bool ThresholdedImage::needToResizeBitmap() const {
            bitmap.height() < rawImage->height();
 }
 
-void ThresholdedImage::updateBitmap() {
+void ThresholdedImage::buildBitmap() {
     if (this->needToResizeBitmap()) {
         bitmap = QImage(rawImage->width(),
                         rawImage->height(),
