@@ -281,7 +281,7 @@ public class RemoteRobot extends FileSet {
 
     public void sendCmd() {
         System.out.println("\nAttempting to send a command\n");
-        String s = "nbites_rock_a_lot";
+        String s = "self.speech.say('hi')";
         byte[] sBytes = s.getBytes();
         byte[] fix = new byte[SIZEOF_COMMAND];
         for (int i = 0; i < sBytes.length; i++) {
