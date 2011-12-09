@@ -161,11 +161,22 @@ INCLUDE_DIRECTORIES(
   ${CFG_DIR}
   )
 
+############################ Platform settings
+
+IF(BUILDING_FOR_A_REMOTE_NAO)
+  SET( MAN_LOADER_SRC NaoManLoader )
+  LIST(APPEND MAN_PRELOADER_SRCS NaoManPreloader )
+ENDIF()
+IF(OFFLINE)
+  SET( MAN_LOADER_SRC OfflineManLoader )
+  LIST(APPEND MAN_PRELOADER_SRCS OfflineManPreloader )
+ENDIF()
+
 ############################ Setting up Man
 SET( MAN_SRCS Man
               TMan
               TTMan
-              NaoManLoader )
+              ${MAN_LOADER_SRC} )
 
 IF(WEBOTS_BACKEND)
 #NOTE: this doesn't work anymore because we changed the way we
@@ -197,12 +208,6 @@ TARGET_LINK_LIBRARIES(
   )
 
 ############################## Setting up Man Preloader
-
-IF(BUILDING_FOR_A_REMOTE_NAO)
-  SET(MAN_PRELOADER_SRCS NaoManPreloader)
-ELSE()
-  SET(MAN_PRELOADER_SRCS FakeManPreloader)
-ENDIF()
 
 ADD_LIBRARY(
   ${MAN_PRELOADER_TARGET}

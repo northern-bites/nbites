@@ -68,9 +68,9 @@ public:
     void update(SensorsEvent eventID);
 
 public:
-    const MVision* getMVision() const {return mVision.get();}
-    const MVisionSensors* getMVisionSensors() const {return mVisionSensors.get();}
-    const MMotionSensors* getMMotionSensors() const {return mMotionSensors.get();}
+    MVision::const_ptr getMVision() const {return mVision;}
+    MVisionSensors::const_ptr getMVisionSensors() const {return mVisionSensors;}
+    MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
     MImage::const_ptr getMImage() const {return mImage;}
 
     MObject::const_ptr getMObject(MObject_ID id) const;

@@ -39,6 +39,8 @@ public:
                   int logTypeID, MObject::const_ptr objectToLog);
 
     virtual ~MObjectLogger() {}
+    //will write the associated MObject ot
+    //the file descriptor provided by the FDProvider
     void writeToLog();
     void writeHead();
 

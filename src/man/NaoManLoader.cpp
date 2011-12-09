@@ -1,18 +1,15 @@
-#include <dlfcn.h>
-#include <iostream>
-
 #include "NaoManLoader.h"
 
 #include "TMan.h"
 
 #include "Profiler.h"
-#include "ALSpeech.h"
-#include "Sensors.h"
-#include "RoboGuardian.h"
-#include "ALTranscriber.h"
-#include "ALImageTranscriber.h"
-#include "NaoEnactor.h"
-#include "NaoLights.h"
+#include "corpus/Sensors.h"
+#include "corpus/RoboGuardian.h"
+#include "corpus/alconnect/NaoEnactor.h"
+#include "corpus/alconnect/ALTranscriber.h"
+#include "corpus/alconnect/ALImageTranscriber.h"
+#include "corpus/alconnect/ALSpeech.h"
+#include "corpus/alconnect/NaoLights.h"
 
 using namespace std;
 using boost::shared_ptr;

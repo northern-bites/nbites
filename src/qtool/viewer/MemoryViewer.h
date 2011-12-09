@@ -13,22 +13,24 @@
 #include <QtGui>
 #include <vector>
 
-#include "data/DataManager.h"
+#include "man/memory/Memory.h"
+#include "image/BMPYUVImage.h"
 #include "RoboImageViewer.h"
 #include "MObjectViewer.h"
 
 namespace qtool {
 namespace viewer {
 
-class LogViewer : public QMainWindow{
-	Q_OBJECT
+class MemoryViewer : public QMainWindow{
+    Q_OBJECT
 
 public:
-	LogViewer(data::DataManager::ptr dataManager);
+    MemoryViewer(man::memory::Memory::const_ptr memory);
 
 private:
     std::vector<QDockWidget*> dockWidget;
-    data::DataManager::ptr dataManager;
+    man::memory::Memory::const_ptr memory;
+    image::BMPImage::ptr image;
     RoboImageViewer* roboImageViewer;
 
 };

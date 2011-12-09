@@ -5,5 +5,8 @@
 {
 
 #define END_FUNCTION_EXPORT }
+#else
+#define START_FUNCTION_EXPORT
+#define END_FUNCTION_EXPORT
 #endif
 

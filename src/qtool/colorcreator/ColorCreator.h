@@ -57,6 +57,8 @@ public:
     enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black, BlueGreen, BlueNavy, OrangeRed};
     enum Choices {Single, Multiple};
     enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE, Table};
+    static const QColor RGBcolorValue[];
+
     ColorCreator(qtool::data::DataManager::ptr dataManager,
             QWidget *parent = 0);
     ~ColorCreator();
