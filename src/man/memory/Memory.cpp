@@ -56,7 +56,7 @@ void Memory::updateVision() {
 }
 
 void Memory::update(SensorsEvent event) {
-#ifdef USE_MEMORY
+#if defined USE_MEMORY || defined OFFLINE
     if (event == NEW_MOTION_SENSORS) {
         PROF_ENTER(P_MEMORY_MOTION_SENSORS);
         mMotionSensors->update();
