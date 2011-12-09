@@ -15,6 +15,7 @@ import vision
 import sensors
 import noggin_constants as Constants
 import loggingBoard
+import sender
 
 # Modules from this directory
 from . import GameController
@@ -63,6 +64,7 @@ class Brain(object):
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
         self.comm.gc.player = TeamConfig.PLAYER_NUMBER
+        self.sender = sender.sender
 
         #initalize the leds
         #print leds
@@ -253,6 +255,10 @@ class Brain(object):
 
         # Update any logs we have
         self.out.updateLogs()
+
+        if self.sender.changed:
+            print "Sender changed."
+            sender.changed = False
 
     def updateComm(self):
         temp = self.comm.latestComm()
