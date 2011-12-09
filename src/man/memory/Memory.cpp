@@ -43,6 +43,7 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
     mobject_IDMap.insert(MObject_IDPair(MVISION_SENSORS_ID, mVisionSensors));
     mobject_IDMap.insert(MObject_IDPair(MMOTION_SENSORS_ID, mMotionSensors));
     mobject_IDMap.insert(MObject_IDPair(MIMAGE_ID, mImage));
+    mobject_IDMap.insert(MObject_IDPair(MLOCALIZATION_ID, mLocalization));
 }
 
 Memory::~Memory() {
