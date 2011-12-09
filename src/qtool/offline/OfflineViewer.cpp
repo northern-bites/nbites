@@ -38,11 +38,14 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) :
     //add the thresholded image to the memory viewer
     ThresholdedImage::ptr threshImage(new ThresholdedImage(
             offlineControl->getManMemory()->getMImage()->getThresholded()));
+    manMemoryManager->connectSlotToMObject(threshImage.get(),
+                        SLOT(updateBitmap()), MIMAGE_ID);
+
     QDockWidget* dockWidget =
             new QDockWidget(tr("Thresholded"), &manMemoryViewer);
     RoboImageViewer* threshView = new RoboImageViewer(threshImage, dockWidget);
-//    offlineControl->getManMemory()->addSubscriber(threshView, MIMAGE_ID);
     dockWidget->setWidget(threshView);
+
     dockWidget->setMinimumSize(350, 300);
     manMemoryViewer.addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
