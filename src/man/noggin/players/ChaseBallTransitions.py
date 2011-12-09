@@ -35,12 +35,6 @@ def ballInPosition(player):
     diff_y = fabs(ball.loc.relY - y_offset)
 
     diff_y = fabs(ball.loc.relY - y_offset)
-
-    if diff_x < constants.BALL_X_OFFSET:
-        print "Ball X OK at {0}".format(diff_x)
-    if diff_y < constants.BALL_Y_OFFSET:
-        print "Ball Y OK at {0}".format(diff_y)
-
     #Compare the sweet spot with the actual values and make sure they
     #are within the threshold
     return (0 < diff_x < constants.BALL_X_OFFSET and
