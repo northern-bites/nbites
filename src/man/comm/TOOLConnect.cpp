@@ -19,9 +19,9 @@ using namespace boost;
 // Debugging ifdef switches
 //
 
-#define DEBUG_TOOL_CONNECTS
-#define DEBUG_TOOL_REQUESTS
-#define DEBUG_TOOL_COMMANDS
+//#define DEBUG_TOOL_CONNECTS
+//#define DEBUG_TOOL_REQUESTS
+//#define DEBUG_TOOL_COMMANDS
 
 //
 // Begin class code

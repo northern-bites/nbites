@@ -258,6 +258,7 @@ class Brain(object):
 
         if self.sender.changed:
             try:
+                print "Executing command: " + self.sender.command
                 exec(self.sender.command)
             except(RuntimeError, SyntaxError, TypeError, NameError):
                 print "Error in command."
