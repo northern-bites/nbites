@@ -175,6 +175,9 @@ public:
                           const float batteryCharge,
                           const float batteryCurrent);
 
+    void setBatteryCharge(float charge);
+    void setBatteryCurrent(float charge);
+
     // special methods
     //   the image retrieval and locking methods are a little different, as we
     //   don't copy the raw image data.  If locking is needed for some period

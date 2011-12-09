@@ -13,7 +13,7 @@
 
 #include <vector>
 
-#include "NullInstanceHelper.h"
+#include "ClassHelper.h"
 #include "MotionConstants.h"
 
 class MotionSwitchboardInterface {

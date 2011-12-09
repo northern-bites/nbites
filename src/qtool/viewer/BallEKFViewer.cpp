@@ -9,16 +9,13 @@ using namespace data;
 using namespace man::memory;
 
 BallEKFViewer::BallEKFViewer(DataManager::ptr dataManager) :
-		QMainWindow(),
-		dataManager(dataManager),
-                ekfDataViewer(new EKFDataViewer()){
+                QMainWindow(),
+                dataManager(dataManager),
+                ekfDataViewer(new EKFDataViewer()) {
 
-  this->setCentralWidget(ekfDataViewer);
-
+    this->setCentralWidget(ekfDataViewer);
 
 }
-
-
 
 }
 }

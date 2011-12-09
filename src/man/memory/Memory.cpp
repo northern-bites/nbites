@@ -51,11 +51,12 @@ void Memory::update(boost::shared_ptr<MObject> obj) {
 
 void Memory::updateVision() {
     update(mVision);
+    notifySubscribers(MVISION_ID);
 //    loggingBoard->log(mVision);
 }
 
 void Memory::update(SensorsEvent event) {
-#ifdef USE_MEMORY
+#if defined USE_MEMORY || defined OFFLINE
     if (event == NEW_MOTION_SENSORS) {
         PROF_ENTER(P_MEMORY_MOTION_SENSORS);
         mMotionSensors->update();
