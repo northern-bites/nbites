@@ -257,8 +257,8 @@ class Brain(object):
         self.out.updateLogs()
 
         if self.sender.changed:
-            print "Sender changed."
-            sender.changed = False
+            print "New command."
+            self.sender.changed = False
 
     def updateComm(self):
         temp = self.comm.latestComm()
