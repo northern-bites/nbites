@@ -33,12 +33,15 @@ public:
 private slots:
     void loadColorTable();
     void reloadMan();
+    void loadMan();
 
 private:
+    QVBoxLayout *mainLayout;
     man::corpus::OfflineManController::ptr offlineControl;
     OfflineManPreloader manPreloader;
     data::RobotMemoryManager::const_ptr manMemoryManager;
-    viewer::MemoryViewer manMemoryViewer;
+    viewer::MemoryViewer* manMemoryViewer;
+    bool loaded;
 
 };
 

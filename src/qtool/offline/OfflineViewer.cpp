@@ -16,55 +16,70 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) :
         QWidget(parent),
         offlineControl(new OfflineManController(memory)),
         manPreloader(offlineControl),
-        manMemoryManager(new
-                RobotMemoryManager(offlineControl->getManMemory())),
-        manMemoryViewer(manMemoryManager) {
+        loaded(false) {
 
     memory->addSubscriber(this, MIMAGE_ID);
 
-    QVBoxLayout *vertLayout = new QVBoxLayout;
+    mainLayout = new QVBoxLayout;
     QHBoxLayout* buttonLayout = new QHBoxLayout;
-    vertLayout->addLayout(buttonLayout);
+    mainLayout->addLayout(buttonLayout);
 
     QPushButton* reloadManButton = new QPushButton(tr("&Reload Man"));
     connect(reloadManButton, SIGNAL(clicked()), this, SLOT(reloadMan()));
 //    buttonLayout->addWidget(reloadManButton);
 
+    QPushButton* loadManButton = new QPushButton(tr("&Load Man"));
+    connect(loadManButton, SIGNAL(clicked()), this, SLOT(loadMan()));
+    buttonLayout->addWidget(loadManButton);
+
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
     buttonLayout->addWidget(loadTableButton);
 
-    vertLayout->addWidget(&manMemoryViewer);
-    //add the thresholded image to the memory viewer
-    ThresholdedImage::ptr threshImage(new ThresholdedImage(
-            offlineControl->getManMemory()->getMImage()->getThresholded()));
-    manMemoryManager->connectSlotToMObject(threshImage.get(),
-                        SLOT(updateBitmap()), MIMAGE_ID);
-
-    QDockWidget* dockWidget =
-            new QDockWidget(tr("Thresholded"), &manMemoryViewer);
-    RoboImageViewer* threshView = new RoboImageViewer(threshImage, dockWidget);
-    dockWidget->setWidget(threshView);
-
-    dockWidget->setMinimumSize(350, 300);
-    manMemoryViewer.addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
-
-    this->setLayout(vertLayout);
+    this->setLayout(mainLayout);
 }
 
 void OfflineViewer::update() {
-    offlineControl->signalNextImageFrame();
+    if (loaded) {
+        offlineControl->signalNextImageFrame();
+    }
 }
 
 void OfflineViewer::loadColorTable() {
-    QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
-                                                "../../data/tables",
-                                                tr("Table Files (*.mtb)"));
-    offlineControl->loadTable(colorTablePath.toStdString());
+    if (loaded) {
+        QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
+                "../../data/tables",
+                tr("Table Files (*.mtb)"));
+        offlineControl->loadTable(colorTablePath.toStdString());
+    }
 }
 
 void OfflineViewer::reloadMan() {
     manPreloader.reloadMan();
+}
+
+void OfflineViewer::loadMan() {
+
+    manPreloader.createMan();
+    manMemoryManager = RobotMemoryManager::ptr(
+            new RobotMemoryManager(offlineControl->getManMemory()));
+    manMemoryViewer = new viewer::MemoryViewer(manMemoryManager);
+    mainLayout->addWidget(manMemoryViewer);
+    //add the thresholded image to the memory viewer
+    ThresholdedImage::ptr threshImage(new ThresholdedImage(
+            offlineControl->getManMemory()->getMImage()->getThresholded()));
+    manMemoryManager->connectSlotToMObject(threshImage.get(),
+            SLOT(updateBitmap()), MIMAGE_ID);
+
+    QDockWidget* dockWidget =
+            new QDockWidget(tr("Thresholded"), manMemoryViewer);
+    RoboImageViewer* threshView = new RoboImageViewer(threshImage, dockWidget);
+    dockWidget->setWidget(threshView);
+
+    dockWidget->setMinimumSize(350, 300);
+    manMemoryViewer->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
+
+    loaded = true;
 }
 
 }
