@@ -65,6 +65,8 @@ SET( COMM_SRCS Comm
                RoboCupGameControlData
                TOOLConnect
 	       NetworkMonitor
+	       CommandSender
+	       PySender
                )
 
 IF( PYTHON_SHARED_COMM )
