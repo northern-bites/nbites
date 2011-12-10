@@ -59,7 +59,13 @@ public:
         control_block.aio_buf = const_cast<char *>(buffer);
         control_block.aio_nbytes = size;
         bytes_written += size;
-        aio_write(&control_block);
+        int result = aio_write(&control_block);
+
+        if (result != 0) {
+            std::cout<<"AIO write failed on "
+                     <<debugInfo()<<std::endl
+                     <<" with error " << strerror(errno) << std::endl;
+        }
     }
 
     template <class T>
