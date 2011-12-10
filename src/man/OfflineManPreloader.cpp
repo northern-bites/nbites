@@ -9,7 +9,6 @@ using namespace man::corpus;
 
 OfflineManPreloader::OfflineManPreloader(OfflineManController::ptr offlineControl) :
                 offlineControl(offlineControl) {
-    createMan();
 }
 
 OfflineManPreloader::~OfflineManPreloader() {
