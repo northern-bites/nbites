@@ -11,15 +11,15 @@ namespace qtool {
 namespace remote {
 
 RobotFinder::RobotFinder() {
-    udpSocket.bind(TOOL_PORT);
+    udpSocket.bind(TOOL_PORT,
+            QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
+    connect(&udpSocket, SIGNAL(readyRead()),
+            this, SLOT(checkForAnswerMessage()));
 }
 
 void RobotFinder::refresh() {
     remoteRobots.clear();
     broadcastDiscoveryMessage();
-    sleep(1);
-    checkForAnswerMessage();
-    emit refreshedRemoteRobotList();
 }
 
 void RobotFinder::broadcastDiscoveryMessage() {
@@ -41,6 +41,7 @@ void RobotFinder::checkForAnswerMessage() {
             addRemoteRobot(newRemoteRobot);
         }
     }
+    emit refreshedRemoteRobotList();
 }
 
 void RobotFinder::addRemoteRobot(RemoteRobot& remoteRobot) {

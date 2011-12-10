@@ -27,7 +27,6 @@ public:
     ~RobotFinder() {}
 
     void broadcastDiscoveryMessage();
-    void checkForAnswerMessage();
 
     void addRemoteRobot(RemoteRobot& robot);
 
@@ -35,6 +34,7 @@ public:
 
 public slots:
     void refresh();
+    void checkForAnswerMessage();
 
 signals:
     void refreshedRemoteRobotList();
