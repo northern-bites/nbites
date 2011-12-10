@@ -12,14 +12,14 @@ using namespace google::protobuf::io;
 using boost::shared_ptr;
 using namespace common::io;
 
-MObjectParser::MObjectParser(InProvider::const_ptr inProvider,
+MObjectParser::MObjectParser(InProvider::ptr inProvider,
                              MObject::ptr objectToParseTo) :
-        Parser(inProvider),
+        ThreadedParser(inProvider, "a_parser"),
         objectToParseTo(objectToParseTo),
         current_message_size(0),
         current_buffer(NULL), current_buffer_size(0)
 {
-    readHeader();
+
 }
 
 MObjectParser::~MObjectParser() {
@@ -31,10 +31,10 @@ MObjectParser::~MObjectParser() {
 
 void MObjectParser::readHeader() {
 
-    inProvider->readValue<MObject_ID>(log_header.log_id);
+    log_header.log_id = inProvider->readValue<MObject_ID>();
     cout << "Log ID: " << log_header.log_id << endl;
 
-    inProvider->readValue<int64_t>(log_header.birth_time);
+    log_header.birth_time = inProvider->readValue<int64_t>();
     cout << "Birth time: " << log_header.birth_time << endl;
 }
 
@@ -48,8 +48,10 @@ void MObjectParser::increaseBufferSizeTo(uint32_t new_size) {
 
 bool MObjectParser::getNext() {
 
-    inProvider->readValue<uint32_t>(current_message_size);
+    current_message_size = inProvider->readValue<uint32_t>();
     message_sizes.push_back(current_message_size);
+
+    cout << "size " << current_message_size << endl;
 
     if (current_message_size > current_buffer_size) {
         increaseBufferSizeTo(current_message_size);

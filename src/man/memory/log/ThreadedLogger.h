@@ -14,6 +14,7 @@
 #include "Logger.h"
 #include "synchro/synchro.h"
 #include "Subscriber.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
@@ -21,9 +22,7 @@ namespace log {
 
 class ThreadedLogger : public Logger, public Thread, public Subscriber {
 
-public:
-    typedef boost::shared_ptr<ThreadedLogger> ptr;
-    typedef boost::shared_ptr<ThreadedLogger> const_ptr;
+ADD_SHARED_PTR(ThreadedLogger)
 
 public:
     ThreadedLogger(OutProvider::ptr out_provider, std::string name) :
@@ -37,6 +36,7 @@ public:
     virtual void run() {
         //blocking for socket fds, (almost) instant for other ones
         out_provider->openCommunicationChannel();
+        std::cout << "writing head out" << std::endl;
         this->writeHead();
         while (running) {
             this->waitForSignal();

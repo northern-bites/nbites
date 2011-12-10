@@ -69,6 +69,8 @@ public:
 
     void addSubscriber(Subscriber* subscriber,
                        MObject_ID objectToSubscribeTo) const;
+    void unsubscribe(Subscriber* subscriber,
+                     MObject_ID objectToUnsuscribeFrom) const;
 
 private:
     MObject_IDMap mobject_IDMap;

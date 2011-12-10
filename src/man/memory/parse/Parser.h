@@ -23,7 +23,7 @@ protected:
     typedef common::io::InProvider InProvider;
 
 public:
-    Parser(InProvider::const_ptr inProvider) :
+    Parser(InProvider::ptr inProvider) :
                 inProvider(inProvider) {
     }
 
@@ -32,8 +32,10 @@ public:
     virtual bool getNext() = 0;
     virtual bool getPrev() = 0;
 
+    virtual void readHeader() = 0;
+
 protected:
-    InProvider::const_ptr inProvider;
+    InProvider::ptr inProvider;
 
 };
 

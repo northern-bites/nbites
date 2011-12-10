@@ -53,7 +53,6 @@ void Memory::update(boost::shared_ptr<MObject> obj) {
 
 void Memory::updateVision() {
     update(mVision);
-//    loggingBoard->log(mVision);
 }
 
 MObject::const_ptr Memory::getMObject(MObject_ID id) const {
@@ -79,6 +78,11 @@ MObject::ptr Memory::getMutableMObject(MObject_ID id) {
 void Memory::addSubscriber(Subscriber* subscriber,
                            MObject_ID objectToSubscribeTo) const {
     getMObject(objectToSubscribeTo)->addSubscriber(subscriber);
+}
+
+void Memory::unsubscribe(Subscriber* subscriber,
+                         MObject_ID objectToUnsuscribeFrom) const {
+
 }
 
 }

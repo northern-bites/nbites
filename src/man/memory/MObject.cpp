@@ -7,7 +7,7 @@ namespace memory {
 using namespace std;
 
 MObject::MObject(MObject_ID id, ProtoMessage_ptr protoMessage)
-    : id(id), protoMessage(protoMessage){
+    : SpecializedNotifier<MObject_ID>(id), id(id), protoMessage(protoMessage){
 }
 
 void MObject::update() {

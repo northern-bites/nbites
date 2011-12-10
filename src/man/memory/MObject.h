@@ -25,7 +25,7 @@
 namespace man {
 namespace memory {
 
-class MObject : public Notifier, public Subscriber {
+class MObject : public SpecializedNotifier<MObject_ID>, public Subscriber {
 
     ADD_SHARED_PTR(MObject)
     ADD_NULL_INSTANCE(MObject)

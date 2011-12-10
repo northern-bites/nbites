@@ -31,7 +31,7 @@ public:
     ParsingBoard(Memory::ptr memory);
     virtual ~ParsingBoard();
 
-    void newInputProvider(common::io::InProvider::const_ptr inProvider);
+    void newInputProvider(common::io::InProvider::ptr inProvider);
 
     void parseNext(MObject_ID id);
     void parseNextAll();

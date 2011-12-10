@@ -20,7 +20,7 @@ namespace man {
 namespace memory {
 namespace log {
 
-class MObjectLogger : public ThreadedLogger {
+class MObjectLogger : public ThreadedLogger{
 
 public:
     typedef boost::shared_ptr<MObjectLogger> ptr;

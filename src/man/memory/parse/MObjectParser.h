@@ -14,7 +14,7 @@
 #include <string>
 
 #include "memory/MObject.h"
-#include "Parser.h"
+#include "ThreadedParser.h"
 #include "ClassHelper.h"
 #include "Notifier.h"
 
@@ -29,17 +29,20 @@ struct LogHeader {
 
 };
 
-class MObjectParser : public Parser {
+class MObjectParser : public ThreadedParser {
 
     ADD_SHARED_PTR(MObjectParser)
 
 public:
-    MObjectParser(common::io::InProvider::const_ptr inProvider,
+    MObjectParser(common::io::InProvider::ptr inProvider,
             MObject::ptr objectToParseTo = MObject::NullInstanceSharedPtr());
 
     virtual ~MObjectParser();
 
     void initStreams();
+
+    void readNextMessage() {}
+    void parseNextMessage() {}
 
     bool getNext();
     bool getPrev(uint32_t n);
@@ -53,8 +56,8 @@ public:
         objectToParseTo = newObject;
     }
 
-private:
     void readHeader();
+private:
     void increaseBufferSizeTo(uint32_t new_size);
     uint32_t truncateNumberOfFramesToRewind(uint32_t n) const;
 

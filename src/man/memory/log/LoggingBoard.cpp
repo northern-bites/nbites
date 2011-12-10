@@ -10,7 +10,7 @@ namespace log {
 using boost::shared_ptr;
 
 LoggingBoard::LoggingBoard(Memory::const_ptr memory) :
-    memory(memory), logging(false) {
+    memory(memory), logging(true) {
 }
 
 void LoggingBoard::newOutputProvider(OutProvider::ptr outProvider,

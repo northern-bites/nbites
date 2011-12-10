@@ -17,15 +17,19 @@ ParsingBoard::ParsingBoard(Memory::ptr memory) :
 
 ParsingBoard::~ParsingBoard(){}
 
-void ParsingBoard::newInputProvider(InProvider::const_ptr inProvider) {
+void ParsingBoard::newInputProvider(InProvider::ptr inProvider) {
     MObjectParser::ptr mObjectParser(new MObjectParser(inProvider));
-    //TODO
-    MObject_ID id = mObjectParser->getHeader().log_id;
+
+    inProvider->openCommunicationChannel();
+    MObject_ID id;
+    id = inProvider->peekAndGet<MObject_ID>();
+
     if (0 < id && id < LAST_OBJECT_ID) {
         mObjectParser->setObjectToParseTo(memory->getMutableMObject(id));
         objectIOMap[id] = mObjectParser;
+        mObjectParser->start();
     } else {
-        cout<<"Could not read valid log ID from input: "
+        cout<<"Could not read valid log ID " << id << " from input: "
             << inProvider->debugInfo() << endl;
     }
 }
@@ -44,7 +48,7 @@ void ParsingBoard::parseNext(MObject_ID id) {
 void ParsingBoard::parseNextAll() {
     for (ObjectIOMap::iterator it = objectIOMap.begin();
             it != objectIOMap.end(); it++ ) {
-        it->second->getNext();
+        it->second->signalToParse();
     }
 
 }
