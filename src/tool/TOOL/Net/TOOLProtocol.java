@@ -396,9 +396,8 @@ public class TOOLProtocol {
 		return null;
 	}
 
-    // cmd must be 256 bytes for now
+    // cmd must be 256 bytes
     public void sendCommand(byte[] cmd) {
-        System.out.println("\nSending a command now.\n");
         initConnection();
         try {
             serial.writeByte(COMMAND_MSG);

@@ -36,6 +36,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 
 import javax.swing.JComboBox;
 
@@ -67,8 +72,9 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
     private Map<JButton, DataType> typeMap;
     private Map<JMenuItem, RemoteRobot> robotMap;
     private JButton robotButton;
-    private JButton sendCmdButton;
     private JPopupMenu robotMenu;
+    private JTextArea textArea;
+    private JTextField textField;
 
     private ImagePanel imagePanel;
 
@@ -123,10 +129,7 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
 
         robotButton = new JButton("Robot");
         robotButton.addActionListener(this);
-        sendCmdButton = new JButton("SEND");
-        sendCmdButton.addActionListener(this);
         subPanel.add(robotButton);
-        subPanel.add(sendCmdButton);
         robotMenu = new JPopupMenu();
         robotMenu.addPopupMenuListener(this);
         subPanel.add(robotMenu);
@@ -142,6 +145,39 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         subPanel.add(imagePanel);
 
         displayPanel.add(subPanel);
+        setupCommandInput(subPanel);
+    }
+
+    private void setupCommandInput(JPanel subPanel){
+        JPanel cmdPanel = new JPanel(new GridBagLayout());
+
+        textField = new JTextField(20);
+        textField.addActionListener( new ActionListener() {
+                public void actionPerformed(ActionEvent e){
+                    String cmd = textField.getText();
+                    if (selectedRobot != null){
+                        textArea.append(cmd + "\n");
+                        selectedRobot.sendCmd(cmd);
+                    }
+                }
+            });
+
+        textArea = new JTextArea(10, 20);
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridwidth = GridBagConstraints.REMAINDER;
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        cmdPanel.add(textField, c);
+
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        cmdPanel.add(scrollPane, c);
+        cmdPanel.setMaximumSize(new Dimension(500, 600));
+        subPanel.add(cmdPanel, "SOUTH");
     }
 
     private void createUpdateButtons(JPanel subPanel){
@@ -369,8 +405,6 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
             if (b == robotButton) {
                 // show popup menu for selecting robots
                 robotMenu.show(b, b.getWidth(), 0);
-            }else if (b == sendCmdButton) {
-                if (selectedRobot != null) selectedRobot.sendCmd();
             }
             else {
                 if (!typeMap.containsKey(b))

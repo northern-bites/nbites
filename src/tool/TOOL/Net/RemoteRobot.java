@@ -279,9 +279,7 @@ public class RemoteRobot extends FileSet {
 		}
 	}
 
-    public void sendCmd() {
-        System.out.println("\nAttempting to send a command\n");
-        String s = "self.speech.say('hi')";
+    public void sendCmd(String s) {
         byte[] sBytes = s.getBytes();
         byte[] fix = new byte[SIZEOF_COMMAND];
         for (int i = 0; i < sBytes.length; i++) {
@@ -289,5 +287,6 @@ public class RemoteRobot extends FileSet {
         }
         fix[sBytes.length] = '\0';
         proto.sendCommand(fix);
+        System.out.println("Sent command: " + s);
     }
 }
