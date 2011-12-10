@@ -18,7 +18,7 @@ void BMPYUVImage::updateBitmap() {
     if (this->needToResizeBitmap()) {
         bitmap = QImage(yuvImage.getWidth(),
                         yuvImage.getHeight(),
-                        QImage::Format_RGB32);
+                        QImage::Format_ARGB32);
     }
 
     ColorSpace c;

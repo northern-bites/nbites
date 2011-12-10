@@ -6,9 +6,11 @@ namespace qtool {
 namespace viewer {
 
 RoboImageViewer::RoboImageViewer(image::BMPImage::ptr image,
+				 image::TestImage::ptr overlay,
                                  QWidget *parent)
     : QWidget(parent),
-      image(image)
+      image(image),
+      overlay(overlay)
 {}
 
 RoboImageViewer::~RoboImageViewer() {
@@ -22,6 +24,7 @@ void RoboImageViewer::update(qtool::data::MObject_ID) {
 
 void RoboImageViewer::updateBitmap() {
 	image->updateBitmap();
+	overlay->updateBitmap();
 }
 
 QSize RoboImageViewer::minimumSizeHint() const
@@ -37,7 +40,9 @@ QSize RoboImageViewer::sizeHint() const
 void RoboImageViewer::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
+    painter.setBackgroundMode(Qt::TransparentMode);
     painter.drawImage(QPoint(0, 0), image->getBitmap());
+    painter.drawImage(QPoint(0, 0), overlay->getBitmap());
 }
 
 }

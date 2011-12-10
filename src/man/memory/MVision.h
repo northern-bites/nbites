@@ -35,6 +35,8 @@ public:
      */
     void update();
 
+    boost::shared_ptr<const proto::PVision> get() const {return data; }
+
 private:
     //update helper methods
     void update(PVision::PVisualDetection* visual_detection,

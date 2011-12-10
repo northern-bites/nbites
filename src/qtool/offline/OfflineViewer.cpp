@@ -35,7 +35,7 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) : QWidge
             offlineControl->getManMemory()->getMImage()->getThresholded()));
     QDockWidget* dockWidget =
             new QDockWidget(tr("Thresholded"), manMemoryViewer);
-    RoboImageViewer* threshView = new RoboImageViewer(threshImage, dockWidget);
+    RoboImageViewer* threshView = new RoboImageViewer(threshImage);
     offlineControl->getManMemory()->addSubscriber(threshView, MIMAGE_ID);
     dockWidget->setWidget(threshView);
     dockWidget->setMinimumSize(350, 300);

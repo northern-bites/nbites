@@ -12,8 +12,9 @@ using namespace qtool::image;
 
 MemoryViewer::MemoryViewer(Memory::const_ptr memory) :
                  memory(memory),
-                 image(new TestImage()),
-                 roboImageViewer(new RoboImageViewer(image, this)) {
+                 image(new BMPYUVImage(memory->getMImage())),
+		 overlay(new TestImage(memory->getMVision())),
+                 roboImageViewer(new RoboImageViewer(image, overlay, this)) {
 
     this->setCentralWidget(roboImageViewer);
     memory->addSubscriber(roboImageViewer, MIMAGE_ID);
