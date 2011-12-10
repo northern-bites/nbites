@@ -31,28 +31,26 @@ public:
     virtual bool rewind(uint64_t offset) const = 0;
     virtual void openCommunicationChannel() = 0;
     virtual bool opened() const = 0;
+    //return false because read() blocks until it finishes
+    virtual bool readInProgress() const {return false;}
+    virtual bool isOfTypeStreaming() const = 0;
 
-    virtual bool readCharBuffer(char* buffer, uint32_t size)  const {
-        if (!opened()) {
-            std::cout<<"Cannot read from not yet open channel "
-                     <<debugInfo()<<std::endl;
-            return false;
-        }
+    virtual void peekAt(char* buffer, uint32_t size) const = 0;
 
-        uint32_t result = 0;
-        result = read(file_descriptor, buffer, size);
-
-        if (result != size) {
-            std::cout<<"Could not read in " << size <<" bytes for "
-                     << debugInfo() << std::endl;
-            return false;
-        }
-        return true;
+    template<class T>
+    T peekAndGet() const {
+        T value;
+        peekAt(reinterpret_cast<char *>(&value), sizeof(value));
+        return value;
     }
 
+    virtual bool readCharBuffer(char* buffer, uint32_t size) const = 0;
+
     template <class T>
-    void readValue(T &value) const {
+    T readValue() const {
+        T value;
         readCharBuffer(reinterpret_cast<char *>(&value), sizeof(value));
+        return value;
     }
 
 };

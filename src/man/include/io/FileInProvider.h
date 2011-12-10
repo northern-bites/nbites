@@ -32,12 +32,14 @@ public:
         return "file name: " + file_name;
     }
 
+    virtual bool isOfTypeStreaming() const { return false; }
+
     virtual uint64_t getCurrentPosition() const {
         return lseek64(file_descriptor, 0, SEEK_CUR);
     }
 
     virtual bool rewind(uint64_t offset) const {
-        if (offset < getCurrentPosition()) {
+        if (offset <= getCurrentPosition()) {
             uint64_t true_offset = 0;
             true_offset = lseek64(file_descriptor, -offset, SEEK_CUR);
             //TODO: we could check to see if the true_offset
@@ -53,6 +55,29 @@ public:
             }
         }
         return false;
+    }
+
+    virtual bool readCharBuffer(char* buffer, uint32_t size) const {
+        if (!opened()) {
+            std::cout<<"Cannot read from not yet open channel "
+                    <<debugInfo()<<std::endl;
+            return false;
+        }
+
+        uint32_t result = 0;
+        result = read(file_descriptor, buffer, size);
+
+        if (result != size) {
+            std::cout<<"Could not read in " << size <<" bytes from "
+                    << debugInfo() << std::endl;
+            return false;
+        }
+        return true;
+    }
+
+    virtual void peekAt(char* buffer, uint32_t size) const {
+        this->readCharBuffer(buffer, size);
+        this->rewind(size);
     }
 
     void openCommunicationChannel() {
