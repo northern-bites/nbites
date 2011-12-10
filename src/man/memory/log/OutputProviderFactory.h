@@ -18,6 +18,7 @@ class OutputProviderFactory {
 
 public:
     static void AllFileOutput(LoggingBoard::ptr loggingBoard);
+    static void AllSocketOutput(LoggingBoard::ptr loggingBoard);
 
 };
 
