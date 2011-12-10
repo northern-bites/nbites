@@ -29,7 +29,7 @@ public:
     typedef boost::shared_ptr<const FDProvider> const_ptr;
 
 public:
-    FDProvider() : file_descriptor(0) {}
+    FDProvider() : file_descriptor(-1) {}
     virtual ~FDProvider() {};
     int getFileDescriptor() const { return file_descriptor; }
 

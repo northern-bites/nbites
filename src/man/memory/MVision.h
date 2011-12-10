@@ -12,10 +12,13 @@
 #include "protos/Vision.pb.h"
 #include "MObject.h"
 #include "vision/Vision.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 class MVision: public proto::PVision, public MObject {
+
+    ADD_SHARED_PTR(MVision);
 
 public:
     /**
