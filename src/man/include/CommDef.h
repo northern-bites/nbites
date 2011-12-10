@@ -23,6 +23,7 @@
 #define UDP_PORT  4000
 #define TCP_PORT  4001
 #define TOOL_PORT 4002
+static const short STREAMING_PORT_BASE = 4096;
 
 #define UDP_BUF_SIZE 1024
 
