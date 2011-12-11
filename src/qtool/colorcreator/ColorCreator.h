@@ -1,9 +1,13 @@
 #ifndef COLORCREATOR_H
 #define COLORCREATOR_H
 
+#include <qfile.h>
+#include <qtextstream.h>
+
 #include <QMouseEvent>
 #include <QWidget>
 //man
+#include "man/memory/RoboImage.h"
 #include "man/include/Subscriber.h"
 //qtool
 #include "image/YUVImage.h"
@@ -11,8 +15,6 @@
 //colorcreator
 #include "ColorEdit.h"
 #include "ColorTable.h"
-
-#include <qmainwindow.h>
 
 #define  NEWFRAMES
 #ifdef   NEWFRAMES
@@ -42,6 +44,9 @@
 #define RED_COL 0x20
 #define NAVY_COL 0x40
 
+#define FLT_SLIDERS 6
+#define INT_SLIDERS 4
+
 namespace Ui {
     class ColorCreator;
 }
@@ -49,7 +54,7 @@ namespace Ui {
 namespace qtool {
 namespace colorcreator {
 
-class ColorCreator : public QMainWindow, public Subscriber<data::MObject_ID>
+class ColorCreator : public QWidget, public Subscriber<data::MObject_ID>
 {
     Q_OBJECT
 
@@ -82,6 +87,9 @@ public:
     void largeDisplay();
     QColor displayColorTable(int i, int j);
     bool testValue(float h, float s, float z, int y, int u, int v, int color);
+    void modeChanged();
+    short setInitialColorValuesFromFile(QString filename);
+    void writeInitialColorValues(QString filename);
 
 protected:
     void mouseMoveEvent(QMouseEvent* event);
@@ -90,55 +98,49 @@ protected:
 
 private slots:
 
+    //sliders
     void on_hMin_valueChanged(int value);
-
     void on_hMax_valueChanged(int value);
-
     void on_sMin_valueChanged(int value);
-
     void on_sMax_valueChanged(int value);
-
+    void on_zMin_valueChanged(int value);
+    void on_zMax_valueChanged(int value);
     void on_yMin_valueChanged(int value);
-
     void on_yMax_valueChanged(int value);
-
+    void on_vMin_valueChanged(int value);
+    void on_vMax_valueChanged(int value);
     void on_zSlice_valueChanged(int value);
 
-    void on_colorSelect_currentIndexChanged(int index);
+    //load/save slider values
+    void on_readSliders_clicked();
+    void on_writeSliders_clicked();
 
-    void on_viewChoice_currentIndexChanged(int index);
+    //load/save color tables
+    void on_readTable_clicked();
+    void on_writeTable_clicked();
+    void on_writeOldTable_clicked();
 
-    void on_zMin_valueChanged(int value);
-
-    void on_zMax_valueChanged(int value);
-
-    void on_getColorTable_clicked();
-
-    void on_writeNew_clicked();
-
+    //threshold image
     void on_channel_currentIndexChanged(int index);
+    void on_edgeDiff_valueChanged(int value);
+    void on_edgeDiff_actionTriggered(int action);
 
-    void on_getOldTable_clicked();
+    //other
+    void on_modeSelect_currentIndexChanged(int index);
+    void on_changeColor_clicked();
+    void on_colorSelect_currentIndexChanged(int index);
+    void on_viewChoice_currentIndexChanged(int index);
 
     void on_cornerDefine_clicked();
 
-    void on_changeColor_clicked();
-
-    void on_edgeDiff_actionTriggered(int action);
-
-    void on_edgeDiff_valueChanged(int value);
-
-    void on_vMin_valueChanged(int value);
-
-    void on_vMax_valueChanged(int value);
-
 private:
     Ui::ColorCreator *ui;
-    man::memory::MImage::const_ptr roboImage;
     YUVImage yuvImage;
     qtool::data::DataManager::ptr dataManager;
     ColorTable *table;
     QString baseDirectory;
+    QString baseFrameDirectory;
+    QString baseSliderDirectory;
     QString currentDirectory;
     QString baseColorTable;
     QString currentColorDirectory;
@@ -151,6 +153,8 @@ private:
     QImage *img3;
     QImage *img4;
     QImage *wheel;
+    bool tableMode;
+    bool defineMode;
     bool cornerStatus;
     QPoint firstPoint;
     QPoint lastPoint;
@@ -159,17 +163,14 @@ private:
     int edgediff;
     int mode;
     QColor *cols;
-    float *hMin;
-    float *hMax;
-    float *sMin;
-    float *sMax;
-    float *zMin;
-    float *zMax;
+    float **fltSliders;
+    int   **intSliders;
+    enum fltChannels {hMin, hMax,
+                      sMin, sMax,
+                      zMin, zMax};
+    enum intChannels {yMin, yMax,
+                      vMin, vMax};
     float zSlice;
-    int *yMin;
-    int *yMax;
-    int *vMin;
-    int *vMax;
     float statsHMin, statsHMax, statsSMin, statsSMax, statsZMin, statsZMax;
     int statsYMin, statsYMax, statsUMin, statsUMax, statsVMin, statsVMax;
     int currentColor;
