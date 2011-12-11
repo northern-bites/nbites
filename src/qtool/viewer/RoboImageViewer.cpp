@@ -1,29 +1,27 @@
 #include "RoboImageViewer.h"
-#include <QMouseEvent>
+
+using namespace qtool::image;
 
 namespace qtool {
 namespace viewer {
 
-RoboImageViewer::RoboImageViewer(man::memory::RoboImage::const_ptr roboImage,
-                                 QLabel *infoLabel, QWidget *parent)
+RoboImageViewer::RoboImageViewer(image::BMPImage::ptr image,
+                                 QWidget *parent)
     : QWidget(parent),
-      image(new BMPYUVImage(roboImage)),
-      infoLabel(infoLabel)
-{
-    setBackgroundRole(QPalette::Base);
-    setAutoFillBackground(true);
-}
+      image(image)
+{}
 
 RoboImageViewer::~RoboImageViewer() {
-	delete image;
 }
 
 void RoboImageViewer::update(qtool::data::MObject_ID) {
     this->updateBitmap();
+    //enqueues a repaint - thread-safe
+    this->QWidget::update();
 }
 
 void RoboImageViewer::updateBitmap() {
-	image->updateFromRoboImage();
+	image->updateBitmap();
 }
 
 QSize RoboImageViewer::minimumSizeHint() const
@@ -39,7 +37,6 @@ QSize RoboImageViewer::sizeHint() const
 void RoboImageViewer::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
-    this->updateBitmap();
     painter.drawImage(QPoint(0, 0), image->getBitmap());
 }
 

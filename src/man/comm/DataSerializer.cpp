@@ -271,10 +271,10 @@ DataSerializer::read (void *data, int len) throw(socket_error&)
 void
 DataSerializer::raw_write_int (int val) throw(socket_error&)
 {
-  buf[0] = (val >> 24) & 0xff;
-  buf[1] = (val >> 16) & 0xff;
-  buf[2] = (val >>  8) & 0xff;
-  buf[3] =  val        & 0xff;
+    buf[0] = byte((val >> 24) & 0xff);
+    buf[1] = byte((val >> 16) & 0xff);
+    buf[2] = byte((val >>  8) & 0xff);
+    buf[3] = byte(val        & 0xff);
 
   write(&buf[0], SIZEOF_INT);
 }
@@ -319,14 +319,14 @@ DataSerializer::write_byte (byte value) throw(socket_error&)
 void
 DataSerializer::write_float (float value) throw(socket_error&)
 {
-  int val = (int)value;
-  buf[0] = TYPE_FLOAT;
-  buf[1] = (val >> 24) & 0xff;
-  buf[2] = (val >> 16) & 0xff;
-  buf[3] = (val >>  8) & 0xff;
-  buf[4] =  val        & 0xff;
+    int val = (int)value;
+    buf[0] = TYPE_FLOAT;
+    buf[1] = byte((val >> 24) & 0xff);
+    buf[2] = byte((val >> 16) & 0xff);
+    buf[3] = byte((val >>  8) & 0xff);
+    buf[4] = byte(val        & 0xff);
 
-  write(&buf[0], SIZEOF_BYTE + SIZEOF_FLOAT);
+    write(&buf[0], SIZEOF_BYTE + SIZEOF_FLOAT);
 }
 
 void

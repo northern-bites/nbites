@@ -19,15 +19,15 @@
 #include <QGraphicsItem>
 #include <QColor>
 #include "ColorSpace.h"
-#include "man/memory/RoboImage.h"
+#include "man/memory/MImage.h"
 
 class YUVImage
 {
 
 public:
-    YUVImage(man::memory::RoboImage::const_ptr _roboImage);
+    YUVImage(man::memory::MImage::const_ptr rawImage);
     virtual ~YUVImage();
-    virtual void updateFromRoboImage();
+    virtual void updateFromRawImage();
     void read(QString filename);
     void read(std::string s);
     unsigned int getWidth() const { return width;}
@@ -35,19 +35,27 @@ public:
     int** getYImage() const { return yImg;}
     int** getUImage() const { return uImg;}
     int** getVImage() const { return vImg;}
-    int getY(int x, int y) const { return yImg[x][y];}
-    int getU(int x, int y) const { return uImg[x][y];}
-    int getV(int x, int y) const { return vImg[x][y];}
+    bool areWithinImage(int x, int y) const;
+    int getY(int x, int y) const;
+    int getU(int x, int y) const;
+    int getV(int x, int y) const;
     int getRed(int x, int y) const;
     int getGreen(int x, int y) const;
     int getBlue(int x, int y) const;
     int getH(int x, int y) const;
     int getS(int x, int y) const;
     int getZ(int x, int y) const;
+    bool rawImageDimensionsEnlarged();
+
+private:
+    void allocateYUVArrays(unsigned width, unsigned height);
+    void deallocateYUVArrays();
+    void resizeYUVArraysToFitRawImage();
+    void resizeYUVArrays(unsigned width, unsigned height);
 
 
 protected:
-    man::memory::RoboImage::const_ptr roboImage;
+    man::memory::MImage::const_ptr rawImage;
 
     unsigned int width;
     unsigned int height;

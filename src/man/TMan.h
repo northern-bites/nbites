@@ -7,19 +7,15 @@
  */
 
 #include "Man.h"
-
 #include "ThreadedImageTranscriber.h"
-
 
 class TMan : public Man {
 public:
 
-    TMan(boost::shared_ptr<Profiler> _profiler,
-            boost::shared_ptr<Sensors> _sensors,
+    TMan(boost::shared_ptr<Sensors> _sensors,
          boost::shared_ptr<Transcriber> _transcriber,
          boost::shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
          boost::shared_ptr<MotionEnactor> _enactor,
-         boost::shared_ptr<Synchro> synchro,
          boost::shared_ptr<Lights> _lights,
          boost::shared_ptr<Speech> _speech);
 

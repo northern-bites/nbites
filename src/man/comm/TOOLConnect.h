@@ -6,7 +6,7 @@
 class TOOLConnect; // forward reference
 
 #  include <boost/shared_ptr.hpp>
-#  include "synchro.h"
+#  include "synchro/synchro.h"
 #  include "Sensors.h"
 #  include "Vision.h"
 
@@ -60,8 +60,7 @@ class TOOLConnect
     : public Thread
 {
 public:
-    TOOLConnect(boost::shared_ptr<Synchro> _synchro,
-                boost::shared_ptr<Sensors> s,
+    TOOLConnect(boost::shared_ptr<Sensors> s,
                 boost::shared_ptr<Vision> v,
                 boost::shared_ptr<GameController> gc);
     virtual ~TOOLConnect();

@@ -35,6 +35,7 @@
 #include "BulkMonitor.h"
 #include "include/synchro/mutex.h"
 #include "Kinematics.h"
+#include "memory/RoboImage.h"
 
 enum SupportFoot {
     LEFT_SUPPORT = 0,
@@ -174,6 +175,9 @@ public:
                           const float batteryCharge,
                           const float batteryCurrent);
 
+    void setBatteryCharge(float charge);
+    void setBatteryCurrent(float charge);
+
     // special methods
     //   the image retrieval and locking methods are a little different, as we
     //   don't copy the raw image data.  If locking is needed for some period
@@ -187,15 +191,15 @@ public:
     //   its own, and there is no way, even with locking, to guarantee that the
     //   underlying data at the image pointer location is not modified while
     //   the image is locked in Sensors.
-    uint8_t* getRawNaoImage();
     const uint8_t* getNaoImage() const;
+    uint8_t* getWriteableNaoImage();
     const uint16_t* getYImage() const;
     const uint16_t* getImage() const;
     const uint16_t* getUVImage() const;
     const uint8_t* getColorImage() const;
     void setNaoImagePointer(char* img);
-    void setNaoImage(const uint8_t* img);
-    void setRawNaoImage(uint8_t *img);
+    void notifyNewNaoImage();
+    const man::memory::RoboImage* getRoboImage() const;
     void setImage(const uint16_t* img);
     void lockImage() const;
     void releaseImage() const;
@@ -275,8 +279,8 @@ private:
 
     const uint16_t *yImage, *uvImage;
     const uint8_t *colorImage;
-    const uint8_t *naoImage;
-    uint8_t *rawNaoImage;
+    uint8_t *naoImage;
+    man::memory::RoboImage roboImage;
 
     // Pose needs to know which foot is on the ground during a vision frame
     // If both are on the ground (DOUBLE_SUPPORT_MODE/not walking), we assume

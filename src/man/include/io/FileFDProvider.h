@@ -18,7 +18,9 @@ namespace include {
 namespace io {
 
 enum OpenType {
-    NEW = O_WRONLY | O_CREAT | O_TRUNC,
+    //O_APPEND is crucial if you want to use aio_write on the file descriptor
+    //you open
+    NEW = O_WRONLY | O_CREAT | O_TRUNC | O_APPEND,
     EXISTING = O_RDONLY
 };
 
@@ -47,6 +49,25 @@ public:
 
     virtual std::string debugInfo() const {
         return "file name: " + file_name;
+    }
+
+    virtual bool rewind(uint64_t offset) const {
+        if (offset < getCurrentPosition()) {
+            uint64_t true_offset = 0;
+            true_offset = lseek64(file_descriptor, -offset, SEEK_CUR);
+            //TODO: we could check to see if the true_offset
+            //signals an error or just moves the pointer
+            //by a smaller offset than what we want;
+            //in the latter case we could try to revert
+            //the changes done - Octavian
+
+            //if the return value is the same as (-offset) -1
+            //then lseek is signaling an error
+            if (true_offset != -offset-1) {
+                return true;
+            }
+        }
+        return false;
     }
 
 protected:

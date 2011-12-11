@@ -35,8 +35,8 @@ namespace noggin {
     class MyInfo;
 
     // Sections of the field for Location use
-    static const float TOP_LIMIT = FIELD_HEIGHT*2.0/3.0;
-    static const float BOTTOM_LIMIT = FIELD_HEIGHT/3.0;
+    static const float TOP_LIMIT = FIELD_HEIGHT*2.0f/3.0f;
+    static const float BOTTOM_LIMIT = FIELD_HEIGHT/3.0f;
 
     // Buffer for size of Box
     static const int BOX_BUFFER = 10;
@@ -88,6 +88,7 @@ namespace noggin {
 
         // For Python
         bool hasattr(boost::python::object, const std::string&);
+        boost::python::str toString();
 
     protected:
         float x, y;
@@ -122,6 +123,9 @@ namespace noggin {
         const degrees getRelativeBearing(Location& other);
         const float spinDirToPoint(Location& other);
 
+        //For python
+        boost::python::str toString();
+
     protected:
         radians h;
     };
@@ -149,6 +153,9 @@ namespace noggin {
         void setRelX(float _x){ relX = _x; }
         void setRelY(float _y){ relY = _y; }
         void setRelH(degrees _h){ relH = _h*TO_RAD; }
+
+        // For python
+        boost::python::str toString();
 
     private:
         float relX, relY;

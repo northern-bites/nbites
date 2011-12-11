@@ -16,6 +16,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include "include/Common.h"
 
 namespace man {
 namespace include {
@@ -28,11 +29,17 @@ public:
     typedef boost::shared_ptr<const FDProvider> const_ptr;
 
 public:
-    FDProvider() : file_descriptor(0) {}
+    FDProvider() : file_descriptor(-1) {}
     virtual ~FDProvider() {};
     int getFileDescriptor() const { return file_descriptor; }
 
     virtual std::string debugInfo() const = 0;
+
+    virtual uint64_t getCurrentPosition() const {
+        return lseek64(file_descriptor, 0, SEEK_CUR);
+    }
+
+    virtual bool rewind(uint64_t offset) const { return true; }
 
 protected:
     virtual void openFileDescriptor() = 0;

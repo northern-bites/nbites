@@ -60,7 +60,7 @@ void NetworkMonitor::packetReceived(long long timeSent, long long timeReceived)
     else
     {
 	// Calculate the latency. Add to latency monitor.
-	latency.X(timeReceived - timeSent);
+        latency.X(double(timeReceived - timeSent));
     }
 }
 
@@ -163,7 +163,7 @@ void NetworkMonitor::logOutput()
 	logFile.close();
     }
     else
-	cerr << "NetworkMonitor::logOutput() : error opening log file!" << endl;
+	cout << "NetworkMonitor::logOutput() : error opening log file!" << endl;
 }
 
 void NetworkMonitor::setSentWarning(bool sent)

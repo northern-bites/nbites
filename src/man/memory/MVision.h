@@ -12,10 +12,13 @@
 #include "protos/Vision.pb.h"
 #include "MObject.h"
 #include "vision/Vision.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 class MVision: public proto::PVision, public MObject {
+
+    ADD_SHARED_PTR(MVision);
 
 public:
     /**
@@ -23,7 +26,8 @@ public:
      * links to
      * @return
      */
-    MVision(MObject_ID id, std::string name, boost::shared_ptr<Vision> v);
+    MVision(MObject_ID id, boost::shared_ptr<Vision> v,
+            boost::shared_ptr<proto::PVision> vision_data);
     virtual ~MVision();
     /**
      * Updates all the fields of the underlying proto::PVision with values
@@ -38,6 +42,7 @@ private:
 
 private:
     boost::shared_ptr<Vision> vision;
+    boost::shared_ptr<proto::PVision> data;
 
 };
 }

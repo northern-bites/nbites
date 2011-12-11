@@ -18,28 +18,24 @@ ParsingBoard::ParsingBoard(Memory::ptr memory,
 
 ParsingBoard::~ParsingBoard(){}
 
+//TODO: this could be moved to MemoryIOBoard, since it's very similar to
+// the LoggingBoard method
 void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
     objectIOMap.clear();
 
     const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
     for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
             i!= fdmap->end(); i++) {
+        MObject::ptr mobject =
+                memory->getMutableMObject(i->first);
 
-        if (i->first == MIMAGE_ID) {
-            shared_ptr<RoboImage> roboImage = memory->getMutableRoboImage();
-            objectIOMap[MIMAGE_ID] = Parser::ptr(new ImageParser(i->second,
-                    roboImage));
+        if (mobject != MObject::ptr()) {
+            objectIOMap[i->first] = Parser::ptr(
+                    new MObjectParser(i->second, mobject));
         } else {
-            shared_ptr<ProtoMessage> mobject =
-                    memory->getMutableProtoMessage(i->first);
-            if (mobject != shared_ptr<ProtoMessage>()) {
-                objectIOMap[i->first] = Parser::ptr(new MessageParser(i->second,
-                        mobject));
-            } else {
-                std::cout<<"Could not read valid log ID from file descriptor: "
-                        << "log ID: " << i->first << " "
-                        << i->second->debugInfo() << std::endl;
-            }
+            std::cout<<"Could not read valid log ID from file descriptor: "
+                    << "log ID: " << i->first << " "
+                    << i->second->debugInfo() << std::endl;
         }
     }
 }
@@ -63,6 +59,24 @@ void ParsingBoard::parseAll() {
 
 }
 
+void ParsingBoard::rewind(MObject_ID id) {
+
+    ObjectIOMap::iterator it = objectIOMap.find(id);
+    // if this is true, then we found a legitimate parser
+    // corresponding to our mobject in the map
+    if (it != objectIOMap.end()) {
+        //it->second is the parser associated with the specified mobject
+        it->second->getPrev();
+    }
+}
+
+void ParsingBoard::rewindAll() {
+    for (ObjectIOMap::iterator it = objectIOMap.begin();
+            it != objectIOMap.end(); it++ ) {
+        it->second->getPrev();
+    }
+
+}
 
 }
 }

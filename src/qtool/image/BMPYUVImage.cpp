@@ -1,22 +1,31 @@
 
 #include "BMPYUVImage.h"
 
-BMPYUVImage::BMPYUVImage(man::memory::RoboImage::const_ptr _roboImage) :
-	YUVImage(_roboImage),
-	bitmap(width, height, QImage::Format_RGB32)
+namespace qtool {
+namespace image {
+
+BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage) :
+	yuvImage(rawImage),
+	bitmapType(Color)
 { }
 
-void BMPYUVImage::updateFromRoboImage() {
-	YUVImage::updateFromRoboImage();
-	updateBitmap();
+bool BMPYUVImage::needToResizeBitmap() const {
+    return bitmap.width() < yuvImage.getWidth() || bitmap.height() < yuvImage.getHeight();
 }
 
 void BMPYUVImage::updateBitmap() {
-	ColorSpace c;
+    yuvImage.updateFromRawImage();
+    if (this->needToResizeBitmap()) {
+        bitmap = QImage(yuvImage.getWidth(),
+                        yuvImage.getHeight(),
+                        QImage::Format_RGB32);
+    }
 
-	for (int j = 0; j < height; ++j)
-		for (int i = 0; i < width; ++i) {
-			c.setYuv(yImg[i][j], uImg[i][j], vImg[i][j]);
+    ColorSpace c;
+
+	for (int j = 0; j < getHeight(); ++j)
+		for (int i = 0; i < getWidth(); ++i) {
+			c.setYuv(yuvImage.getY(i,j), yuvImage.getU(i,j), yuvImage.getV(i,j));
 			int r, g, b;
 			switch (this->bitmapType) {
 			case Color:
@@ -26,15 +35,15 @@ void BMPYUVImage::updateBitmap() {
 				break;
 
 			case Y:
-				r = g = b = yImg[i][j];
+				r = g = b = c.getY();
 				break;
 
 			case U:
-				r = g = b = uImg[i][j];
+				r = g = b = c.getU();
 				break;
 
 			case V:
-				r = g = b = vImg[i][j];
+				r = g = b = c.getV();
 				break;
 
 			case Red:
@@ -75,4 +84,6 @@ void BMPYUVImage::updateBitmap() {
 			QRgb value = qRgb(r, g, b);
 			bitmap.setPixel(i, j, value);
 		}
+}
+}
 }

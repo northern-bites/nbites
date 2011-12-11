@@ -2,6 +2,7 @@
 #define IMAGE_TRANSCRIBER_H
 
 #include <boost/shared_ptr.hpp>
+#include <string>
 
 #include "Sensors.h"
 #include "ImageSubscriber.h"
@@ -20,9 +21,10 @@ class ImageTranscriber {
 
     virtual void releaseImage() = 0;
 
+    virtual void initTable(const std::string& path) = 0;
+
  protected:
     boost::shared_ptr<Sensors> sensors;
-    //void(ImageSubscriber::*imageCallback)();
     ImageSubscriber *subscriber;
 };
 

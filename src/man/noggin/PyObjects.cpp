@@ -24,6 +24,7 @@ BOOST_PYTHON_MODULE(objects)
         .def("inBottomOfField", &Location::inBottomOfField)
         .def("inCenterOfField", &Location::inCenterOfField)
         .def("__hasattr__", &Location::hasattr)
+        .def("__str__", &Location::toString)
         ;
 
     class_<RobotLocation, bases<Location> >("RobotLocation",
@@ -32,6 +33,7 @@ BOOST_PYTHON_MODULE(objects)
         .def(self == self)
         .def(self != self)
         .def("getRelativeBearing", &RobotLocation::getRelativeBearing)
+        .def("__str__", &RobotLocation::toString)
         ;
 
     class_<RelLocation, bases<RobotLocation> >("RelLocation",
@@ -40,6 +42,7 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("relX", &RelLocation::getRelX, &RelLocation::setRelX)
         .add_property("relY", &RelLocation::getRelY, &RelLocation::setRelY)
         .add_property("relH", &RelLocation::getRelH, &RelLocation::setRelH)
+        .def("__str__", &RelLocation::toString)
         ;
 
     class_<LocObject, bases<Location> >("LocObject", init<PyLoc&>())

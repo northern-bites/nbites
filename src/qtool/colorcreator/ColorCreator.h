@@ -8,7 +8,6 @@
 #include <QWidget>
 //man
 #include "man/memory/RoboImage.h"
-#include "man/memory/parse/ImageParser.h"
 #include "man/include/Subscriber.h"
 //qtool
 #include "image/YUVImage.h"
@@ -63,6 +62,8 @@ public:
     enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black, BlueGreen, BlueNavy, OrangeRed};
     enum Choices {Single, Multiple};
     enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE, Table};
+    static const QColor RGBcolorValue[];
+
     ColorCreator(qtool::data::DataManager::ptr dataManager,
             QWidget *parent = 0);
     ~ColorCreator();
@@ -70,7 +71,7 @@ public:
     void updateColors();
     void updateThresh(bool imageChanged, bool choiceChanged, bool colorsChanged);
     void update(data::MObject_ID) {
-        yuvImage.updateFromRoboImage();
+        yuvImage.updateFromRawImage();
         updateDisplays();
     }
     void initStats();
@@ -96,13 +97,6 @@ protected:
     void mousePressEvent(QMouseEvent* event);
 
 private slots:
-
-    //frame navigation
-    void on_pushButton_clicked();
-    void on_previousButton_clicked();
-    void on_nextButton_clicked();
-    void on_plusTen_clicked();
-    void on_minusTen_clicked();
 
     //sliders
     void on_hMin_valueChanged(int value);
@@ -141,7 +135,6 @@ private slots:
 
 private:
     Ui::ColorCreator *ui;
-    man::memory::RoboImage::const_ptr roboImage;
     YUVImage yuvImage;
     qtool::data::DataManager::ptr dataManager;
     ColorTable *table;

@@ -2,11 +2,10 @@
 #define RENDERAREA_H
 
 #include <QWidget>
-#include <QLabel>
+#include <QPainter>
 #include "data/DataTypes.h"
 #include "man/include/Subscriber.h"
-#include "image/BMPYUVImage.h"
-#include <iostream>
+#include "image/BMPImage.h"
 
 namespace qtool {
 namespace viewer {
@@ -17,22 +16,22 @@ class RoboImageViewer: public QWidget,
     Q_OBJECT
 public:
 
-    RoboImageViewer(man::memory::RoboImage::const_ptr roboImage,
-    		QLabel *infoLabel = NULL,
-    		QWidget *parent = NULL);
+    RoboImageViewer(image::BMPImage::ptr image =
+            image::BMPImage::NullInstanceSharedPtr(),
+            QWidget *parent = NULL);
     virtual ~RoboImageViewer();
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
     void updateBitmap();
 
     void update(qtool::data::MObject_ID);
+    void setImage(image::BMPImage::ptr _image) { image = _image; }
 
 protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-    BMPYUVImage *image;
-    QLabel* infoLabel;
+    image::BMPImage::ptr image;
 
 };
 

@@ -21,5 +21,14 @@ void DataManager::newDataSource(DataSource::ptr dataSource) {
     parsingBoard.newIOProvider(dataSource);
 }
 
+void DataManager::addSubscriber(Subscriber<MObject_ID>* subscriber) {
+    memory->addSubscriber(subscriber);
+}
+
+void DataManager::addSubscriber(Subscriber<MObject_ID>* subscriber,
+            MObject_ID mobject_id) {
+    memory->addSubscriber(subscriber, mobject_id);
+}
+
 }
 }
