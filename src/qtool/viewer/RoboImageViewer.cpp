@@ -6,7 +6,7 @@ namespace qtool {
 namespace viewer {
 
 RoboImageViewer::RoboImageViewer(image::BMPImage::ptr image,
-				 image::TestImage::ptr overlay,
+				 image::OverlayImage::ptr overlay,
                                  QWidget *parent)
     : QWidget(parent),
       image(image),

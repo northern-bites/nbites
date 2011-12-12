@@ -1,7 +1,7 @@
 /**
- * @class TestImage
+ * @class OverlayImage
  * 
- * Tests drawing an image
+ * Draws an overlay of the location of the ball and corners over the image in Qtool.
  *
  */
 
@@ -15,12 +15,12 @@ namespace qtool {
 namespace image {
 
 
-class TestImage : public BMPImage
+class OverlayImage : public BMPImage
 {
 
  public:
-    TestImage(man::memory::MVision::const_ptr visionData);
-    virtual ~TestImage() {};
+    OverlayImage(man::memory::MVision::const_ptr visionData);
+    virtual ~OverlayImage() {};
 
     void updateBitmap();
 

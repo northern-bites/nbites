@@ -6,7 +6,7 @@
 #include "data/DataTypes.h"
 #include "man/include/Subscriber.h"
 #include "image/BMPImage.h"
-#include "image/TestImage.h"
+#include "image/OverlayImage.h"
 
 namespace qtool {
 namespace viewer {
@@ -19,8 +19,8 @@ public:
 
     RoboImageViewer(image::BMPImage::ptr image =
 		    image::BMPImage::NullInstanceSharedPtr(),
-		    image::TestImage::ptr overlay = 
-		    image::TestImage::NullInstanceSharedPtr(),
+		    image::OverlayImage::ptr overlay = 
+		    image::OverlayImage::NullInstanceSharedPtr(),
             QWidget *parent = NULL);
     virtual ~RoboImageViewer();
     QSize minimumSizeHint() const;
@@ -35,7 +35,7 @@ protected:
 
 private:
     image::BMPImage::ptr image;
-    image::TestImage::ptr overlay;
+    image::OverlayImage::ptr overlay;
 
 };
 

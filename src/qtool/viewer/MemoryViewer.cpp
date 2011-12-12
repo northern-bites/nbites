@@ -1,7 +1,7 @@
 
 #include "MemoryViewer.h"
 #include <vector>
-#include "image/TestImage.h"
+#include "image/OverlayImage.h"
 
 namespace qtool {
 namespace viewer {
@@ -13,7 +13,7 @@ using namespace qtool::image;
 MemoryViewer::MemoryViewer(Memory::const_ptr memory) :
                  memory(memory),
                  image(new BMPYUVImage(memory->getMImage())),
-		 overlay(new TestImage(memory->getMVision())),
+		 overlay(new OverlayImage(memory->getMVision())),
                  roboImageViewer(new RoboImageViewer(image, overlay, this)) {
 
     this->setCentralWidget(roboImageViewer);
