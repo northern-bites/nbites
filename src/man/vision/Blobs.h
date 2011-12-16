@@ -16,6 +16,7 @@ public:
     void init();
     void init(int which) {blobs[which].init();}
     void blobIt(int x, int y, int h, bool merge);
+    void add(Blob blob);
     void setLeft(int which, int a);
     void setRight(int which, int a);
     void setTop(int which, int a);

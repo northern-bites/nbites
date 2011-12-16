@@ -99,6 +99,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
                                                              YELLOW_BIT));
     navyblue = new Robots(vision, this, field, context, NAVY_BIT);
     red = new Robots(vision, this, field, context, RED_BIT);
+    unid = new Robots(vision, this, field, context, 0x00);
     orange = new Ball(vision, this, field, context, ORANGE_BIT);
     cross = new Cross(vision, this, field, context);
     for (int i = 0; i < IMAGE_WIDTH; i++) {
@@ -821,10 +822,11 @@ bool Threshold::checkRobotAgainstBluePost(VisualRobot* robot,
 void Threshold::objectRecognition() {
     initObjects();
     // now get the posts and goals
-	// we need to make the white blobs before checking on robots
+        // we need to make the white blobs before checking on robots
     cross->createObject();
     red->findRobots(cross);
     navyblue->findRobots(cross);
+    unid->findRobots(cross);
     yellow->createObject();
     blue->createObject();
     cross->checkForCrosses();

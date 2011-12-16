@@ -44,7 +44,6 @@ Robots::Robots(Vision* vis, Threshold* thr, Field* fie, Context* con,
     allocateColorRuns();
 }
 
-
 /* Initialize the data structure.
  * @param s     the slope corresponding to the robot's head tilt
  */
@@ -53,24 +52,6 @@ void Robots::init()
     blobs->init();
     numberOfRuns = 0;
 }
-
-/* Set the primary color.  Depending on the color, we have different space needs
- * @param c        the color
- */
-void Robots::setColor(unsigned char c)
-{
-    const int RUN_VALUES = 3;           // x, y, and h
-    const int RUNS_PER_LINE = 5;
-    const int RUNS_PER_SCANLINE = 15;
-
-    runsize = 1;
-    int run_num = RUN_VALUES;
-    color = c;
-    run_num = IMAGE_WIDTH * RUNS_PER_SCANLINE;
-    runsize = IMAGE_WIDTH * RUNS_PER_LINE;
-    runs = (run*)malloc(sizeof(run) * run_num);
-}
-
 
 /* Allocate the required amount of memory dependent on the primary color
 */
@@ -102,14 +83,20 @@ void Robots::allocateColorRuns()
 //findRobots is a wrapper that calls findUniforms which in turn calls blobRobots
 //to determine an estimate for the entire robot
 void Robots::findRobots(Cross* cross){
-    findUniforms(cross);
+    whiteBlobs = cross->getBlobs();
+    if (Utility::isUndefined(color)) {
+        findRobotParts();
+    } else {
+        findUniforms();
+    }
+    blobs->init();
 }
 
-void Robots::findUniforms(Cross* cross){
+//finds uniform blobs and deems them viable robot uniform blobs or not
+void Robots::findUniforms(){
     if (numberOfRuns < 1) return;
     const int lastRunXInit = -30;
     const int resConst = 10;
-    const int robotBlobMin = 10;
 
     int lastRunX = lastRunXInit, lastRunY = 0, lastRunHeight = 0;
 
@@ -134,14 +121,14 @@ void Robots::findUniforms(Cross* cross){
     // Perform sanity checks on each blob to see if each might be part of a robot
     int viable = 0;
     for (int i = 0; i < blobs->number(); i++) {
-        if (!sanityChecks(i, cross)) {
+        if (!sanityChecks(i)) {
             if (blobs->get(i).getRight() > 0) {
                 if (debugRobots) {
-                    vision->drawRect(blobs->get(i).getLeft(),
+                    /*vision->drawRect(blobs->get(i).getLeft(),
                                      blobs->get(i).getTop(),
                                      blobs->get(i).width(),
                                      blobs->get(i).height(),
-                                     WHITE);
+                                     WHITE);*/
                 }
             }
             blobs->init(i);
@@ -152,29 +139,83 @@ void Robots::findUniforms(Cross* cross){
                                  MAROON);
             }
             viable++;
-            blobRobots(cross, i);
+            blobs->set(i, correctBlob(createAreaOfInterest(blobs->get(i))));
+            thresh->unid->blobs->add(blobs->get(i));
             updateRobots(viable, i);
         }
     }
 }
 
-/* This method is called only on uniform blobs deemed viable by sanity checks.
-   Uses the white blob info from cross to determine an area of interest in which
-   more rigorous checks will be run to estimate the entire robot's shape. Because
-   of the way we do blobbing, robot shape is limited to a bounding box. Essentially
-   this method refines the area of interest to cut out green (field) and organge (ball)
-   around the edges in the hopes that whats left is robot
-   @param  cross    the cross data structure with white blob info
-   @param  i        the index of the uniform blob to expand in our blobs data structure
- */
+//attempts to find robots where no uniform is visible
+//NOTE: currently dangerous in that it gives false positives. needs work
+void Robots::findRobotParts() {
+    for (int i = 0; i < whiteBlobs->number(); i++){
+        for (int j = 0; j < whiteBlobs->number(); j++){
+            if (i == j) continue;
+            if (whiteBlobs->blobsOverlap(i, j)){
+                whiteBlobs->mergeBlobs(i, j);
+            }
+        }
+    }
+    whiteBlobs->sort();
+    for (int i = 0; i < whiteBlobs->number(); i++){
+        bool aligned = false;
+        bool side = false;
+        if (whiteBlobs->get(i).getLeft() <= 10 ||
+            whiteBlobs->get(i).getRight() >= IMAGE_WIDTH-10 ||
+            whiteBlobs->get(i).getTop() <= 10 ||
+            whiteBlobs->get(i).getBottom() >= IMAGE_HEIGHT-10) {
+            side = true;
+        }
+        if (side)
+        for (int j = 0; j < blobs->number(); j++){
+            if (whiteBlobs->get(i).isAligned(blobs->get(j))) {
+                aligned = true;
+                break;
+            }
+        }
+        if (!aligned && side) {
+            Blob part = correctBlob(whiteBlobs->get(i));
+            vision->drawRect(part.getLeft(),
+                             part.getTop(),
+                             part.width(),
+                             part.height(),
+                             WHITE);
+        }
+    }
+}
 
-void Robots::blobRobots(Cross* cross, int i) {
+/* Given a viable uniform blob, add all vertically
+   alligned white blobs to create an "area of interest" for where to more
+   rigorously determine where a robot is
+   @param robotBlob     potential uniform blob
+   @return              blob indicating an area of interest for robot detection
+*/
+Blob Robots::createAreaOfInterest(Blob robotBlob) {
+    int left = robotBlob.getLeft();
+    int right = robotBlob.getRight();
+    int width = right-left;
+    for (int i = 0; i < whiteBlobs->number(); i++){
+        if (whiteBlobs->get(i).isAligned(robotBlob)) {
+            robotBlob.merge(whiteBlobs->get(i));
+        }
+    }
 
-    Blob robotBlob = cross->addRobotBlobs(blobs->get(i));
-    int left = max(0, robotBlob.getLeft());
-    int right = min(robotBlob.getRight(), IMAGE_WIDTH);
-    int top = max(0, robotBlob.getTop());
-    int bottom = min(robotBlob.getBottom(), IMAGE_HEIGHT);
+    //places constraints the potential robot blob using the fact that
+    //a robot is not likely wider than 3 times its uniform width
+    if (robotBlob.getLeft() < left-width) robotBlob.setLeft(left-width);
+    if (robotBlob.getRight() > right+width) robotBlob.setRight(right+width);
+
+    return robotBlob;
+}
+
+//correct the area of interest to a reasonable estimate of the robot
+Blob Robots::correctBlob(Blob area){
+
+    int left = max(0, area.getLeft());
+    int right = min(area.getRight(), IMAGE_WIDTH);
+    int top = max(0, area.getTop());
+    int bottom = min(area.getBottom(), IMAGE_HEIGHT);
     int width = right - left;
     int height = bottom - top;
 
@@ -191,7 +232,7 @@ void Robots::blobRobots(Cross* cross, int i) {
                 nonRobot++;
             }
             if (nonRobot > .4*height) {
-                robotBlob.setLeft(x+1);
+                area.setLeft(x+1);
                 nonRobot = -1;
                 break;
             }
@@ -208,7 +249,7 @@ void Robots::blobRobots(Cross* cross, int i) {
                 nonRobot++;
             }
             if (nonRobot > .4*height) {
-                robotBlob.setRight(x-1);
+                area.setRight(x-1);
                 nonRobot = -1;
                 break;
             }
@@ -225,7 +266,7 @@ void Robots::blobRobots(Cross* cross, int i) {
                 nonRobot++;
             };
             if (nonRobot > .4*width) {
-                robotBlob.setTop(y+1);
+                area.setTop(y+1);
                 nonRobot = -1;
                 break;
             }
@@ -242,7 +283,7 @@ void Robots::blobRobots(Cross* cross, int i) {
                 nonRobot++;
             }
             if (nonRobot > .4*width) {
-                robotBlob.setBottom(y-1);
+                area.setBottom(y-1);
                 nonRobot = -1;
                 break;
             }
@@ -251,17 +292,16 @@ void Robots::blobRobots(Cross* cross, int i) {
         nonRobot = 0;
     }
 
-    blobs->set(i, robotBlob);
+    return area;
 }
 
 /* Robot sanity checks.  Takes a candidate blob and puts it through a
    bunch of tests to make sure it is ok.
    @param  index        index of the blob to check in our blobs data structure
-   @param  cross        the cross data structure containing white blob info
    @return              whether we judge it to be reasonable
  */
 
-bool Robots::sanityChecks(int index, Cross* cross) {
+bool Robots::sanityChecks(int index) {
     Blob candidate = blobs->get(index);
     //thresholds for smallest allowable blob
     const int blobHeightMin = 3;
@@ -270,6 +310,7 @@ bool Robots::sanityChecks(int index, Cross* cross) {
     int height = candidate.height();
     int bottom = candidate.getBottom();
     if (candidate.getRight() > 0) {
+
         //blobs must be large enough
         if (candidate.height()*candidate.width() < blobAreaMin) {
             if (debugRobots){
@@ -286,21 +327,11 @@ bool Robots::sanityChecks(int index, Cross* cross) {
             return false;
         }
 
-        /*
-        //robV added
-        //the blob should have the uniform color as its primary color
-        if (!Utility::colorsEqual(color, predominantColor(candidate))) {
-            if (debugRobots){
-                cout << "Blob was not mostly uniform color" << endl;
-            }
-            return false;
-        }
-        */
-
         //a robot cannot be inside another robot
-        for (int i = 0; i < blobs->number(); i++){
+        for (int i = 0; i < blobs->number(); i++) {
             if (i == index) continue;
-            if (blobs->get(i).contains(candidate)){
+            if (blobs->blobsOverlap(index, i)) {
+                blobs->mergeBlobs(index, i);
                 if (debugRobots){
                     cout << "Blob was inside other robot" << endl;
                 }
@@ -310,9 +341,9 @@ bool Robots::sanityChecks(int index, Cross* cross) {
 
         // there ought to be some white below the uniform
         if (bottom < IMAGE_HEIGHT - 10 &&
-            !cross->checkForRobotBlobs(candidate)) {
+            !checkWhiteAllignment(candidate)) {
             if (debugRobots) {
-                cout << "Bad robot from cross check" << endl;
+                cout << "Bad robot from white alignment check" << endl;
             }
             return false;
         }
@@ -351,52 +382,6 @@ bool Robots::sanityChecks(int index, Cross* cross) {
     return false;
 }
 
-
-//robV added this
-/* Count the number of each color of pixel that might be part of a
-   potential uniform blob. We want to make sure the blob is predominantly
-   the color of the uniform*/
-char Robots::predominantColor(Blob candidate){
-    int bottom = candidate.getBottom();
-    int top = candidate.getTop();
-    int left = candidate.getLeft();
-    int right = candidate.getRight();
-    int area = candidate.width() * candidate.height() / 5;
-    int green = 0;
-    int white = 0;
-    int red = 0;
-    int navy = 0;
-
-    //horizontally scan pixels
-    for (int y = top; y < bottom; y++){
-        for (int x = left; x < right; x++){
-            if (Utility::isNavy(thresh->getThresholded(y, x))) {
-                navy++;
-            } else if (Utility::isRed(thresh->getThresholded(y, x))) {
-                red++;
-            } else if (Utility::isGreen(thresh->getThresholded(y, x))) {
-                green++;
-            } else if (Utility::isWhite(thresh->getThresholded(y, x))) {
-                white++;
-            }
-        }
-    }
-
-    int predominantPixelCount = max(max(navy,red),max(green,white));
-
-    if (predominantPixelCount == navy) {
-        return NAVY_BIT;
-    } else if (predominantPixelCount == red) {
-        return RED_BIT;
-    } else if (predominantPixelCount == green) {
-        return GREEN_BIT;
-    } else {
-        return WHITE_BIT;
-    }
-
-}
-
-
 /* When we are looking down, the shadowed carpet often has lots of Navy.
    Make sure we aren't just looking at carpet
  */
@@ -415,6 +400,17 @@ bool Robots::notGreen(Blob candidate) {
                     return true;
                 }
             }
+        }
+    }
+    return false;
+}
+
+/* Make sure there is some white alligned with the candidate blob
+ */
+bool Robots::checkWhiteAllignment(Blob candidate) {
+    for (int i = 0; i < whiteBlobs->number(); i++) {
+        if (whiteBlobs->get(i).isAligned(candidate)) {
+            return true;
         }
     }
     return false;
@@ -615,7 +611,6 @@ int Robots::distance(int x1, int x2, int x3, int x4) {
 /* We have a swatch of color.  Let's make sure that there is some white
    around somewhere as befits our robots.
  */
-
 bool Robots::noWhite(Blob b) {
     const int MINWHITE = 5;
 
@@ -660,7 +655,7 @@ void Robots::updateRobots(int which, int index)
         } else {
             vision->red3->updateRobot(blobs->get(index));
         }
-    } else {
+    } else if (color == NAVY_BIT) {
         if (which == 1) {
             vision->navy1->updateRobot(blobs->get(index));
         } else if (which == 2) {
@@ -669,8 +664,6 @@ void Robots::updateRobots(int which, int index)
             vision->navy3->updateRobot(blobs->get(index));
         }
     }
-
-    blobs->zeroTheBlob(index);
 }
 
 /* Adds a new run to the basic data structure.

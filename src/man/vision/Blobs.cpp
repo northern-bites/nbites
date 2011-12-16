@@ -173,6 +173,23 @@ void Blobs::blobIt(int x, int y, int h, bool merge)
     }
 }
 
+//adds a blob to the blobs
+void Blobs::add(Blob blob) {
+
+    // sanity check: too many blobs on screen
+    if (numBlobs >= total) {
+        //cout << "Ran out of blob space " << color << endl;
+        // We're seeing too many blobs -it is unlikely we can do anything
+        // useful with this color
+        numBlobs = 0;
+        numberOfRuns = 0;
+        return;
+    }
+
+    blobs[numBlobs] = blob;
+    numBlobs++;
+}
+
 /* Checks if any of our blobs are overlapping.  If so, then merge then and
    eliminate one of them.
  */

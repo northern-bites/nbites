@@ -42,27 +42,23 @@ public:
 
     void init();
     void findRobots(Cross* cross);
-    void findUniforms(Cross* cross);
-    void blobRobots(Cross* cross, int i);
-    char predominantColor(Blob candidate);
+    void findUniforms();
+    void findRobotParts();
+    Blob correctBlob(Blob area);
+    bool checkWhiteAllignment(Blob candidate);
+    Blob createAreaOfInterest(Blob robotBlob);
     bool noWhite(Blob b);
     void updateRobots(int w, int i);
     void mergeBigBlobs();
     void checkMerge(int i, int j);
     bool closeEnough(int i, int j);
-    bool sanityChecks(int index, Cross* cross);
-    bool bigEnough(Blob a, Blob b);
+    bool sanityChecks(int index);
     bool notGreen(Blob a);
     bool whiteBelow(Blob a);
     bool whiteAbove(Blob b);
-    bool checkHorizontal(int l, int r, int t, int b);
-    bool checkVertical(int l, int r, int t, int b);
-    bool viableRobot(Blob a);
-    void createObject();
     void newRun(int x, int y, int h);
-    void setColor(unsigned char c);
     void allocateColorRuns();
-    int distance(int x, int x1, int x2, int x3);
+    int  distance(int x, int x1, int x2, int x3);
     void printBlob(Blob a);
 
 #ifdef OFFLINE
@@ -78,9 +74,9 @@ private:
     Context* context;
 
     Blobs* blobs;
+    Blobs* whiteBlobs;
     int numberOfRuns, runsize;
     unsigned char color;
-    Blob* topBlob;
     run* runs;
 #ifdef OFFLINE
     bool debugRobots;

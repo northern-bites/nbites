@@ -48,8 +48,8 @@ public:
     void newRun(int x, int y, int h);
     void allocateColorRuns();
     bool rightBlobColor(Blob b, float perc);
-    bool checkForRobotBlobs(Blob b);
-    Blob addRobotBlobs(Blob robotBlob);
+    Blobs* getBlobs();
+
 #ifdef OFFLINE
     void setCrossDebug(bool debug) {CROSSDEBUG = debug;}
 #endif
