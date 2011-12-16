@@ -339,3 +339,71 @@ void Blobs::sort() {
         blobs[biggest] = temp;
     }
 }
+
+void Blobs::newBlobIt(int i, int j, bool newBlob) {
+  int x = 5*i;
+  int y = 5*j;
+  int h = 5;
+  if (numBlobs >= total) {
+    //cout << "Ran out of blob space " << color << endl;
+    // We're seeing too many blobs -it is unlikely we can do anything
+    // useful with this color
+    numBlobs = 0;
+    numberOfRuns = 0;
+    return;
+  }
+  //first, create new blob at coordinates
+
+  //now, check to see if new blob is close to other blob
+  for (int n = 0; n < numBlobs; n++) {
+
+    int contig = 5;
+    //checking to see if newBlob is close enough to an existing one to merge them
+    if ((x+h) >= blobs[n].getLeftTopX()) {
+      if (x <= blobs[n].getRightTopX()) {
+    if ((y+h) >= blobs[n].getRightTopY()) {
+      if (y <= blobs[n].getRightBottomY()) {
+        newBlob = false;
+
+        //so we will merge the blobs, check bounding boxes
+
+        //assign the right, if it is better
+        if (x+h > blobs[n].getRightTopX()) {
+          blobs[n].setRightTopX(x+h);
+          blobs[n].setRightBottomX(x+h);
+        }
+
+        //assign the top, if it is better
+        if (blobs[n].getLeftTopY() > y) {
+          blobs[n].setLeftTopY(y);
+          blobs[n].setRightTopY(y);
+        }
+
+        // assign the bottom, if it is better
+        if ((y+h) > blobs[n].getLeftBottomY()) {
+          blobs[n].setLeftBottomY(y+h);
+          blobs[n].setRightBottomY(y+h);
+        }
+        //in case a blob is newly free
+        checkForMergers();
+        break;
+      }
+    }
+      }
+    }
+  }
+  std::cout << "newBlob is " << newBlob << std::endl;
+  if (newBlob) {
+    blobs[numBlobs].setLeftTopX(x);
+    blobs[numBlobs].setLeftTopY(y);
+    blobs[numBlobs].setRightTopX(x+h);
+    blobs[numBlobs].setRightTopY(y);
+    blobs[numBlobs].setLeftBottomX(x);
+    blobs[numBlobs].setLeftBottomY(y+h);
+    blobs[numBlobs].setRightBottomX(x+h);
+    blobs[numBlobs].setRightBottomY(y+h);
+    blobs[numBlobs].setPixels(25);
+    blobs[numBlobs].setArea(25);
+    numBlobs++;
+  }
+}

@@ -29,6 +29,7 @@ public:
     void checkForMergers();
     bool blobsOverlap(int first, int second);
     void sort();
+    void newBlobIt(int i, int j, bool newBlob);
 
     // getters
     int number() const {return numBlobs;}
@@ -47,7 +48,6 @@ private:
     int numberOfRuns;
     int indexOfBiggestRun;
     int numBlobs;
-    //blob checker, obj, pole, leftBox, rightBox;
     Blob* blobs;
 };
 #endif

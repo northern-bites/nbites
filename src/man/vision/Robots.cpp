@@ -49,6 +49,11 @@ Robots::Robots(Vision* vis, Threshold* thr, Field* fie, Context* con,
  */
 void Robots::init()
 {
+    for (int i = 0; i <64; i++){
+        for (int j = 0; j < 48; j++){
+            imageBoxes[i][j] = 0;
+        }
+    }
     blobs->init();
     numberOfRuns = 0;
 }
@@ -94,24 +99,13 @@ void Robots::findRobots(Cross* cross){
 
 //finds uniform blobs and deems them viable robot uniform blobs or not
 void Robots::findUniforms(){
-    if (numberOfRuns < 1) return;
-    const int lastRunXInit = -30;
-    const int resConst = 10;
-
-    int lastRunX = lastRunXInit, lastRunY = 0, lastRunHeight = 0;
-
-    // loop through all of the runs of this color
-    for (int i = 0; i < numberOfRuns; i++) {
-        //if two runs are closer than resConst together, add space between them to blob
-        if (runs[i].x < lastRunX + resConst) {
-            for (int k = lastRunX; k < runs[i].x; k++) {
-                blobs->blobIt(k, lastRunY, lastRunHeight, true);
+    for (int i = 0; i < 64; i++) {
+        for (int j = 0; j < 48; j++) {
+            if (imageBoxes[i][j] == 1) {
+                imageBoxes[i][j] = 2;
+                blobs->newBlobIt(i, j, true);
             }
         }
-        // now we can add the run normally
-        blobs->blobIt(runs[i].x, runs[i].y, runs[i].h, true);
-        // set the current as the last
-        lastRunX = runs[i].x; lastRunY = runs[i].y; lastRunHeight = runs[i].h;
     }
     mergeBigBlobs();
 
@@ -666,39 +660,8 @@ void Robots::updateRobots(int which, int index)
     }
 }
 
-/* Adds a new run to the basic data structure.
-
-   runs structure contains:
-   -x of start column
-   -y of start column
-   -height of run
-
-   @param x     x value of run
-   @param y     y value of top of run
-   @param h     height of run
-*/
-void Robots::newRun(int x, int y, int h)
-{
-    const int RUN_VALUES = 3;    // x, y, and h of course
-    const int SKIPS = 8;
-
-    if (numberOfRuns < runsize) {
-        int last = numberOfRuns - 1;
-        // skip over noise --- jumps over two pixel noise currently.
-        //HW--added CONSTANT for noise jumps.
-        if (last > 0 && runs[last].x == x &&
-            (runs[last].y - (y + h) <= SKIPS)) {
-            runs[last].h += runs[last].y - y; // merge run lengths
-            runs[last].y = y; // reset the new y val
-            h = runs[last].h;
-            numberOfRuns--; // don't count this merge as a new run
-        } else {
-            runs[numberOfRuns].x = x;
-            runs[numberOfRuns].y = y;
-            runs[numberOfRuns].h = h;
-        }
-        numberOfRuns++;
-    }
+void Robots::setImageBox(int i, int j, int value){
+    imageBoxes[i][j] = value;
 }
 
 /* Print debugging information for a blob.

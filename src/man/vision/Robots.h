@@ -56,10 +56,10 @@ public:
     bool notGreen(Blob a);
     bool whiteBelow(Blob a);
     bool whiteAbove(Blob b);
-    void newRun(int x, int y, int h);
     void allocateColorRuns();
     int  distance(int x, int x1, int x2, int x3);
     void printBlob(Blob a);
+    void setImageBox(int i, int j, int value);
 
 #ifdef OFFLINE
     void setDebugRobots(bool debug) {debugRobots = debug;}
@@ -73,6 +73,7 @@ private:
     Field* field;
     Context* context;
 
+    int imageBoxes[64][48];
     Blobs* blobs;
     Blobs* whiteBlobs;
     int numberOfRuns, runsize;
