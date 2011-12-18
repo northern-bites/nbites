@@ -392,7 +392,6 @@ void Blobs::newBlobIt(int i, int j, bool newBlob) {
       }
     }
   }
-  std::cout << "newBlob is " << newBlob << std::endl;
   if (newBlob) {
     blobs[numBlobs].setLeftTopX(x);
     blobs[numBlobs].setLeftTopY(y);
