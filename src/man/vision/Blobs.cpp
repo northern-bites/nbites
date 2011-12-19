@@ -341,11 +341,11 @@ void Blobs::sort() {
 }
 
 void Blobs::newBlobIt(int i, int j, bool newBlob) {
+  //this method is the blobber for the macropixel array.
   int x = 5*i;
   int y = 5*j;
   int h = 5;
   if (numBlobs >= total) {
-    //cout << "Ran out of blob space " << color << endl;
     // We're seeing too many blobs -it is unlikely we can do anything
     // useful with this color
     numBlobs = 0;
@@ -363,6 +363,7 @@ void Blobs::newBlobIt(int i, int j, bool newBlob) {
       if (x <= blobs[n].getRightTopX()) {
     if ((y+h) >= blobs[n].getRightTopY()) {
       if (y <= blobs[n].getRightBottomY()) {
+        //this pixel will be part of an existing blob.
         newBlob = false;
 
         //so we will merge the blobs, check bounding boxes

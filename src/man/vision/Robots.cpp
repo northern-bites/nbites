@@ -99,6 +99,8 @@ void Robots::findRobots(Cross* cross){
 
 //finds uniform blobs and deems them viable robot uniform blobs or not
 void Robots::findUniforms(){
+    //in the following loop, we go through the entire image, looking for marked pixels.
+    //once we find a pixel, we blob it, and indicate that is has been blobbed.
     for (int i = 0; i < 64; i++) {
         for (int j = 0; j < 48; j++) {
             if (imageBoxes[i][j] == 1) {
@@ -133,16 +135,22 @@ void Robots::findUniforms(){
                                  MAROON);
             }
             viable++;
+            //creates an area of interest for a blob, and performs corrections on it
             blobs->set(i, correctBlob(createAreaOfInterest(blobs->get(i))));
+
+            //add the full robot blob to unid's blobs so that unid has all known robots
             thresh->unid->blobs->add(blobs->get(i));
+
+            //let visual robots know of the robot blob
             updateRobots(viable, i);
         }
     }
 }
 
 //attempts to find robots where no uniform is visible
-//NOTE: currently dangerous in that it gives false positives. needs work
-void Robots::findRobotParts() {
+//NOTE: currently dangerous in that it gives false positives. needs substantial work
+void Robots::findRobotParts(){
+    //merge overlapping white blobs into a single blob
     for (int i = 0; i < whiteBlobs->number(); i++){
         for (int j = 0; j < whiteBlobs->number(); j++){
             if (i == j) continue;
@@ -151,25 +159,37 @@ void Robots::findRobotParts() {
             }
         }
     }
+    //sort the white blobs in descending order by size
     whiteBlobs->sort();
+
     for (int i = 0; i < whiteBlobs->number(); i++){
         bool aligned = false;
         bool side = false;
+
+        //true if the blob is at the edge of the screen. For now we are only looking
+        //at these blobs, since looking at all blobs leads to too many false positives
         if (whiteBlobs->get(i).getLeft() <= 10 ||
             whiteBlobs->get(i).getRight() >= IMAGE_WIDTH-10 ||
             whiteBlobs->get(i).getTop() <= 10 ||
             whiteBlobs->get(i).getBottom() >= IMAGE_HEIGHT-10) {
             side = true;
         }
-        if (side)
-        for (int j = 0; j < blobs->number(); j++){
-            if (whiteBlobs->get(i).isAligned(blobs->get(j))) {
-                aligned = true;
-                break;
+        if (side){
+            //checks if the white blob is aligned with a robot of known team.
+            //if it is, we have already indentified this blob
+            for (int j = 0; j < blobs->number(); j++){
+                if (whiteBlobs->get(i).isAligned(blobs->get(j))) {
+                    aligned = true;
+                    break;
+                }
             }
         }
+
+        //true if we have found a potential robot part
         if (!aligned && side) {
             Blob part = correctBlob(whiteBlobs->get(i));
+            //for now just outlines the region we found. Once this method is functional,
+            //it should also call updateRobots in some manner
             vision->drawRect(part.getLeft(),
                              part.getTop(),
                              part.width(),
@@ -188,17 +208,24 @@ void Robots::findRobotParts() {
 Blob Robots::createAreaOfInterest(Blob robotBlob) {
     int left = robotBlob.getLeft();
     int right = robotBlob.getRight();
+    int top = robotBlob.getTop();
+    int bottom = robotBlob.getBottom();
+    int height = robotBlob.height();
     int width = right-left;
+
     for (int i = 0; i < whiteBlobs->number(); i++){
         if (whiteBlobs->get(i).isAligned(robotBlob)) {
             robotBlob.merge(whiteBlobs->get(i));
         }
     }
 
-    //places constraints the potential robot blob using the fact that
-    //a robot is not likely wider than 3 times its uniform width
+    //places constraints the on the area of interest with knowledge of the relative
+    //ratio of the dimensions of the robot to the dimensions of its uniform
+    //NOTE: this ratio could be more accurately defined
     if (robotBlob.getLeft() < left-width) robotBlob.setLeft(left-width);
     if (robotBlob.getRight() > right+width) robotBlob.setRight(right+width);
+    if (robotBlob.getTop() < top-5*height) robotBlob.setLeft(top-5*height);
+    if (robotBlob.getBottom() > bottom+6*height) robotBlob.setBottom(bottom+6*height);
 
     return robotBlob;
 }

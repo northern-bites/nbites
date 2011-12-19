@@ -808,12 +808,22 @@ bool Threshold::checkRobotAgainstBluePost(VisualRobot* robot,
 }
 
 void Threshold::newFindRobots() {
+    //this is the robot detection method.
+    //we perform robot detection by performing another pass through the image
+    //and looking for filled macro pixels of red or navy.
+
+    //we want macro pixels of this size
     int widthScale = 5;
     int heightScale = 5;
     unsigned char pixel = GREEN;
     float navyColorCount = 0;
     float redColorCount = 0;
     float totalCellCount = (float)(widthScale * heightScale);
+
+    //in this loop, we go first through the macro pixels,
+    //then, in each macro pixel, we count how much red or navy
+    //there is in it. Then we determine if there is enough to be interested
+    //in that particular macro pixel
     for (int i = 0; i < IMAGE_WIDTH; i += widthScale){
         for (int j = 0; j < IMAGE_HEIGHT; j += heightScale) {
             for (int x = 0; x < widthScale; x++) {
@@ -827,6 +837,7 @@ void Threshold::newFindRobots() {
             }
             if (navyColorCount/totalCellCount >= 0.6) {
                 navyblue->setImageBox(i/widthScale, j/heightScale, 1);
+                //the following line allows us to see which pixel has been activated.
                 //vision->drawRect(i, j, widthScale, heightScale, MAROON);
             }
             if (redColorCount/totalCellCount >= 0.4) {
