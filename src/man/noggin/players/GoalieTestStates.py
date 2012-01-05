@@ -14,13 +14,13 @@ import GoalieTransitions as goalTran
 def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
-        player.excuteMove(SweetMoves.INITIAL_POS)
+        player.executeMove(SweetMoves.INITIAL_POS)
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
-        player.excuteMove(SweetMoves.INITIAL_POS)
+        player.executeMove(SweetMoves.INITIAL_POS)
         #player.brain.fallController.enableFallProtection(False)
         player.brain.tracker.trackBall()
 
@@ -34,7 +34,7 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.INITIAL_POS)
-    return player.goNow('testDX')
+    return player.goNow('testSquatSave')
 
 def gamePenalized(player):
     return player.stay()
@@ -42,6 +42,12 @@ def gamePenalized(player):
 # **************
 # *** TESTS ****
 # **************
+
+def testSquatSave(player):
+    ball=player.brain.ball
+    if player.firstFrame():
+        player.executeMove(SweetMoves.GOALIE_SQUAT)
+    return player.stay()
 
 def testHeat(player):
     ball = player.brain.ball
