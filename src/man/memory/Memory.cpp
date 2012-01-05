@@ -4,6 +4,8 @@
  * @author Octavian Neamtu
  */
 
+#include <iostream>
+
 #include "Common.h"
 #include "Memory.h"
 
@@ -15,9 +17,11 @@ long long int birth_time; //the time we initialized memory
 
 using boost::shared_ptr;
 using namespace proto;
+using namespace std;
 
 Memory::Memory(shared_ptr<Vision> vision_ptr,
-        shared_ptr<Sensors> sensors_ptr) :
+               shared_ptr<Sensors> sensors_ptr,
+               shared_ptr<LocSystem> loc_ptr) :
         mVision(new MVision(MVISION_ID,
                 vision_ptr, shared_ptr<PVision>(new PVision))),
         mVisionSensors(new MVisionSensors(MVISION_SENSORS_ID,
@@ -25,7 +29,10 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
         mMotionSensors(new MMotionSensors(MMOTION_SENSORS_ID,
                 sensors_ptr, shared_ptr<PMotionSensors>(new PMotionSensors))),
         mImage(new MImage(MIMAGE_ID,
-                sensors_ptr, shared_ptr<PImage>(new PImage))) {
+                          sensors_ptr, shared_ptr<PImage>(new PImage))),
+        mLocalization(new MLocalization(MLOCALIZATION_ID,
+                                        loc_ptr, shared_ptr<PLoc>(new PLoc)))
+{
     birth_time = process_micro_time();
 
     if(sensors_ptr.get()) {
@@ -36,9 +43,11 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
     mobject_IDMap.insert(MObject_IDPair(MVISION_SENSORS_ID, mVisionSensors));
     mobject_IDMap.insert(MObject_IDPair(MMOTION_SENSORS_ID, mMotionSensors));
     mobject_IDMap.insert(MObject_IDPair(MIMAGE_ID, mImage));
+    mobject_IDMap.insert(MObject_IDPair(MLOCALIZATION_ID, mLocalization));
 }
 
 Memory::~Memory() {
+    cout << "Memory destructor" << endl;
 }
 
 void Memory::update(boost::shared_ptr<MObject> obj) {
@@ -47,11 +56,12 @@ void Memory::update(boost::shared_ptr<MObject> obj) {
 
 void Memory::updateVision() {
     update(mVision);
+    notifySubscribers(MVISION_ID);
 //    loggingBoard->log(mVision);
 }
 
 void Memory::update(SensorsEvent event) {
-#ifdef USE_MEMORY
+#if defined USE_MEMORY || defined OFFLINE
     if (event == NEW_MOTION_SENSORS) {
         PROF_ENTER(P_MEMORY_MOTION_SENSORS);
         mMotionSensors->update();

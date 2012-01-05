@@ -20,6 +20,7 @@ using namespace ALNames;
 #include "Kinematics.h"
 using Kinematics::jointsMaxVelNoLoad;
 
+//TODO: this might cause a segfault if the pointer n becomes invalid
 void staticPostSensors(NaoEnactor * n) {
     if (n != NULL) {
         n->postSensors();
@@ -66,6 +67,7 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
 
 NaoEnactor::~NaoEnactor()
 {
+    cout << "Nao enactor destructor" << endl;
     dcmPreConnection.disconnect();
     dcmPostConnection.disconnect();
 }
@@ -75,11 +77,6 @@ void NaoEnactor::sendCommands(){
 
     PROF_ENTER(P_DCM);
     PROF_ENTER(P_PRE_PROCESS);
-    if(!switchboard){
-        if(switchboardSet)
-            cout<< "Caution!! Switchboard is null, skipping NaoEnactor"<<endl;
-        return;
-    }
 
     sendHardness();
     sendJoints();
@@ -152,9 +149,6 @@ void NaoEnactor::postSensors(){
     sensors->setMotionBodyAngles(motionValues);
     transcriber->postMotionSensors();
 
-    if(!switchboard){
-        return;
-    }
     //We only want the switchboard to start calculating new joints once we've
     //updated the latest sensor information into Sensors
     switchboard->signalNextFrame();

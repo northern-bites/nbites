@@ -28,8 +28,11 @@ void MObjectViewer::createNewTreeModel() {
 }
 
 void MObjectViewer::update(MObject_ID) {
-    delete treeModel;
-    this->createNewTreeModel();
+    treeModel->revalidateModel();
+    QModelIndex top = treeModel->index(0, 0, QModelIndex());
+    QModelIndex bottom = treeModel->index(treeModel->rowCount(QModelIndex())-1,
+            treeModel->columnCount(QModelIndex())-1, QModelIndex());
+    emit dataChanged(top, bottom);
 }
 
 }

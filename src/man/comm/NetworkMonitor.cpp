@@ -163,7 +163,7 @@ void NetworkMonitor::logOutput()
 	logFile.close();
     }
     else
-	cerr << "NetworkMonitor::logOutput() : error opening log file!" << endl;
+	cout << "NetworkMonitor::logOutput() : error opening log file!" << endl;
 }
 
 void NetworkMonitor::setSentWarning(bool sent)

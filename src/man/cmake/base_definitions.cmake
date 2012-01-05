@@ -74,15 +74,15 @@ IF( NOT EXISTS ${TRUNK_PATH} )
     )
 ENDIF( NOT EXISTS ${TRUNK_PATH} )
 
-SET( NBITES_DIR ${TRUNK_PATH}/../.. )
-SET( BUILD_DIR ${NBITES_DIR}/build/man )
-
 ############################ TRUNK REVISION
 # Record the current revision number of the repository
 #SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 
 ############################ NBITES DIRECTORY
 # Ensure the NBITES_DIR variable is set
+
+SET( NBITES_DIR ${TRUNK_PATH}/../.. )
+SET( BUILD_DIR ${NBITES_DIR}/build/man )
 
 IF( "x$ENV{NBITES_DIR}x" STREQUAL "xx")
   SET( NBITES_DIR "${NBITES_DIR}" )
@@ -154,10 +154,11 @@ SET(
   CACHE INTERNAL "Install prefix"
   )
 
-SET( OUTPUT_ROOT_DIR_BIN "${CMAKE_INSTALL_PREFIX}/bin"		  )
-SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc"		  )
-SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib/naoqi/"     )
-SET( OUTPUT_ROOT_DIR_PREF "${CMAKE_INSTALL_PREFIX}/preferences/"  )
+SET( OUTPUT_ROOT_DIR_BIN "${CMAKE_INSTALL_PREFIX}/bin" )
+SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc" )
+SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
+SET( OUTPUT_ROOT_DIR_NAOQI_LIB "${CMAKE_INSTALL_PREFIX}/lib/naoqi" )
+SET( OUTPUT_ROOT_DIR_PREF "${CMAKE_INSTALL_PREFIX}/preferences" )
 
 ########################### NB Common definitions
 include ( ${NBITES_DIR}/src/man/cmake/FindNBCOMMON.cmake )

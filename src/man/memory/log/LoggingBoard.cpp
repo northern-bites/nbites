@@ -10,16 +10,15 @@ namespace log {
 using namespace man::include::paths;
 using boost::shared_ptr;
 
-LoggingBoard::LoggingBoard(Memory::const_ptr memory, boost::shared_ptr<Synchro> synchro,
-        IOProvider::const_ptr ioProvider) :
-    memory(memory), logging(true), synchro(synchro) {
+LoggingBoard::LoggingBoard(Memory::const_ptr memory, IOProvider::const_ptr ioProvider) :
+    memory(memory), logging(false) {
     newIOProvider(ioProvider);
 }
 
 void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
 
     this->ioProvider = ioProvider;
-
+    //if we have a new ioProvider, then we need to re-create all logger objects
     const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
     for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
             i!= fdmap->end(); i++) {
@@ -28,7 +27,7 @@ void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
                 memory->getMObject(i->first);
         if (mobject != MObject::const_ptr()) {
             objectIOMap[i->first] = MObjectLogger::ptr(
-                    new MObjectLogger(i->second, synchro,
+                    new MObjectLogger(i->second,
                                       static_cast<int> (i->first), mobject));
             objectIOMap[i->first]->start();
         } else {

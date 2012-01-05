@@ -1,5 +1,5 @@
 try:
-    from ._comm import (Comm,
+    from _comm import (Comm,
                         GameController,
                         inst,
                         STATE_FINISHED,

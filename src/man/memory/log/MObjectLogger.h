@@ -36,10 +36,11 @@ public:
      * @return
      */
     MObjectLogger(FDProvider::const_ptr fdp,
-                  boost::shared_ptr<Synchro> synchro,
                   int logTypeID, MObject::const_ptr objectToLog);
 
     virtual ~MObjectLogger() {}
+    //will write the associated MObject ot
+    //the file descriptor provided by the FDProvider
     void writeToLog();
     void writeHead();
 

@@ -57,6 +57,8 @@ public:
     enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black, BlueGreen, BlueNavy, OrangeRed};
     enum Choices {Single, Multiple};
     enum Shape { Y, U, V, Bluec, Redc, Greenc, H, S, Z, EDGE, Table};
+    static const QColor RGBcolorValue[];
+
     ColorCreator(qtool::data::DataManager::ptr dataManager,
             QWidget *parent = 0);
     ~ColorCreator();
@@ -87,9 +89,6 @@ protected:
     void mousePressEvent(QMouseEvent* event);
 
 private slots:
-    void on_previousButton_clicked();
-
-    void on_nextButton_clicked();
 
     void on_hMin_valueChanged(int value);
 
@@ -116,10 +115,6 @@ private slots:
     void on_getColorTable_clicked();
 
     void on_writeNew_clicked();
-
-    void on_plusTen_clicked();
-
-    void on_minusTen_clicked();
 
     void on_channel_currentIndexChanged(int index);
 

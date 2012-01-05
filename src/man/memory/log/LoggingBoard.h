@@ -2,12 +2,11 @@
  *
  * @LoggingBoard - a class that will handle all of the logging objects for each
  * of the memory object
- * e.g. MVision can have a ZeroCopyFileLogger, whereas
- * MSensors can have a CodedFileLogger
+ * Each item could potentially have a different logger (a threaded one, a gzip one, etc.)
  *
  * Also each logger depends on a FDProvider (that is a file descriptor
  * provider) to provide the file descriptor necessary. Some stuff
- * might go to a file, some might go to wifi, etc.
+ * might go to a file, some might go to a socket, etc.
  *
  * @author Octavian Neamtu
  */
@@ -32,7 +31,7 @@ class LoggingBoard : public MemoryIOBoard<MObjectLogger> ,
                      public Subscriber<MObject_ID> {
 
 public:
-    LoggingBoard(Memory::const_ptr memory, boost::shared_ptr<Synchro> synchro,
+    LoggingBoard(Memory::const_ptr memory,
                 IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
     virtual ~LoggingBoard() {}
 
@@ -54,7 +53,6 @@ protected:
 private:
     Memory::const_ptr memory;
     bool logging;
-    boost::shared_ptr<Synchro> synchro;
 };
 }
 }

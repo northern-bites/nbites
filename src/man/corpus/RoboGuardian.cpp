@@ -8,8 +8,6 @@ using namespace std;
 
 #include "Kinematics.h"
 
-#include "FreezeCommand.h"
-#include "UnfreezeCommand.h"
 #include "guardian/SoundPaths.h"
 #include "Profiler.h"
 
@@ -41,9 +39,8 @@ void RoboGuardian::playFile(string str)const{
 
 
 
-RoboGuardian::RoboGuardian(boost::shared_ptr<Synchro> _synchro,
-                           boost::shared_ptr<Sensors> s)
-    : Thread(_synchro,"RoboGuardian"), sensors(s),
+RoboGuardian::RoboGuardian(boost::shared_ptr<Sensors> s)
+    : Thread("RoboGuardian"), sensors(s),
       motion_interface(NULL),
       lastTemps(sensors->getBodyTemperatures()),
       lastBatteryCharge(sensors->getBatteryCharge()),
@@ -71,8 +68,6 @@ RoboGuardian::~RoboGuardian(){
 
 
 void RoboGuardian::run(){
-    Thread::running = true;
-    Thread::trigger->on();
 
     struct timespec interval, remainder;
     interval.tv_sec = 0;
@@ -95,8 +90,6 @@ void RoboGuardian::run(){
         nanosleep(&interval, &remainder);
         PROF_EXIT(P_ROBOGUARDIAN);
     }
-
-    Thread::trigger->off();
 }
 
 void RoboGuardian::shutoffGains(){
@@ -446,6 +439,8 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
     return true;
 }
 
+void RoboGuardian::reloadMan() {
+}
 
 void RoboGuardian::executeFallProtection(){
     if(useFallProtection){

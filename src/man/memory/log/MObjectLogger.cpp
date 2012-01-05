@@ -14,6 +14,7 @@
  */
 
 #include "MObjectLogger.h"
+#include "Profiler.h"
 
 namespace man {
 namespace memory {
@@ -25,26 +26,25 @@ namespace log {
 using namespace std;
 
 MObjectLogger::MObjectLogger(FDProvider::const_ptr fdp,
-                             boost::shared_ptr<Synchro> synchro,
                              int logTypeID, MObject::const_ptr objectToLog) :
-        ThreadedLogger(fdp, synchro, "Log" + MObject_names[logTypeID]),
+        ThreadedLogger(fdp, "Log" + MObject_names[logTypeID]),
         logID(logTypeID), objectToLog(objectToLog) {
     // this helps us ID the log
     writeHead();
 }
 
 void MObjectLogger::writeHead() {
-
     this->writeValue<int32_t>(logID);
     // this time stamps the log
     this->writeValue<int64_t>(birth_time);
 }
 
 void MObjectLogger::writeToLog() {
-
+    PROF_ENTER(P_LOGGING);
     this->writeValue<uint32_t>(objectToLog->byteSize());
     objectToLog->serializeToString(&write_buffer);
     this->writeCharBuffer(write_buffer.data(), write_buffer.length());
+    PROF_EXIT(P_LOGGING);
 }
 
 }

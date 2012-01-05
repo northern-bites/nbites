@@ -14,9 +14,10 @@ add_definitions(${QT_DEFINITIONS})
 ########### Sources
 
 set( Image_srcs
-    YUVImage.cpp
-    BMPYUVImage.cpp
-    ColorSpace.cpp
+    YUVImage
+    BMPYUVImage
+    ColorSpace
+    ThresholdedImage
     )
 
 set( Image_headers )
