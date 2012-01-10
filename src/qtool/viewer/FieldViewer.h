@@ -17,7 +17,6 @@
 #include <vector>
 
 #include "data/DataManager.h"
-#include "MObjectViewer.h"
 #include "PaintField.h"
 
 namespace qtool {

@@ -16,7 +16,6 @@
 
 #include "data/DataManager.h"
 #include "EKFDataViewer.h"
-#include "MObjectViewer.h"
 
 namespace qtool {
 namespace viewer {
