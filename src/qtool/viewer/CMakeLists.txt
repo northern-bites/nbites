@@ -19,7 +19,8 @@ set( viewer_srcs LogViewer.cpp
 		 BallEKFViewer.cpp
 		 FieldViewer.cpp
 		 EKFDataViewer.cpp
-		 PaintField.cpp)
+		 PaintField.cpp
+		 WorldDataViewer.cpp)
 
 set( viewer_headers LogViewer.h
                     MObjectViewer.h
@@ -27,7 +28,8 @@ set( viewer_headers LogViewer.h
 		    BallEKFViewer.h
 		    FieldViewer.h
 		    EKFDataViewer.h
-		    PaintField.h)
+		    PaintField.h
+		    WorldDataViewer.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

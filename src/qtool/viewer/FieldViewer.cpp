@@ -18,12 +18,11 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
 
   // Adds the Field
   this->setCentralWidget(paintField);
-  //QDockWidget *dockWidget = new QDockWidget(tr("World Information"), this);
-  // dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
-  //                             Qt::RightDockWidgetArea);
-  // dockWidget->setWidget(dockWidgetContents);
+  QDockWidget *dockWidget = new QDockWidget(tr("World Information"), this);
+  dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
+                               Qt::RightDockWidgetArea);
   dockWidget->setWidget(worldDataViewer);
-  addDockWidget(Qt::LeftDockWidgetArea, worldDataViewer);
+  addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
 }
 

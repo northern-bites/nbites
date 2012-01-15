@@ -18,6 +18,7 @@
 
 #include "data/DataManager.h"
 #include "PaintField.h"
+#include "WorldDataViewer.h"
 
 namespace qtool {
 namespace viewer {
@@ -32,6 +33,7 @@ private:
   std::vector<QDockWidget*> dockWidget;
   data::DataManager::ptr dataManager;
   PaintField* paintField;
+  WorldDataViewer* worldDataViewer;
 
 };
 
