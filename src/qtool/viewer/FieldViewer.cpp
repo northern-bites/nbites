@@ -21,6 +21,7 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
   QDockWidget *dockWidget = new QDockWidget(tr("World Information"), this);
   dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
                                Qt::RightDockWidgetArea);
+  dockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
   dockWidget->setWidget(worldDataViewer);
   addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
