@@ -30,7 +30,8 @@ def tracking(tracker):
     # I think that not having the right distance
     # might be the problem on tracking
     # TODO: Check ball information problem
-    #       tracker.printf(tracker.target.loc.dist);
+    if DEBUG:
+        tracker.printf(tracker.target.loc.dist);
     if tracker.target.loc.dist > minActiveDist:
         return tracker.goLater('activeTracking')
 
