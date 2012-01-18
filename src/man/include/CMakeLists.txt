@@ -9,7 +9,7 @@ INCLUDE( ../cmake/base_definitions.cmake )
 
 ############################ External packages
 
-FIND_PACKAGE( Threads REQUIRED )
+FIND_PACKAGE( Threads )
 
 ############################ DEFINITIONS
 # Add here definition needed.

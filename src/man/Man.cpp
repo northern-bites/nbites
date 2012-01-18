@@ -69,7 +69,13 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
     comm = shared_ptr<Comm> (new Comm(sensors, vision));
 
-    memory = shared_ptr<Memory> (new Memory(vision, sensors));
+#ifdef USE_NOGGIN
+    noggin = shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
+                                            loggingBoard,
+                                            motion->getInterface()));
+#endif// USE_NOGGIN
+
+    memory = shared_ptr<Memory> (new Memory(vision, sensors,noggin->loc));
 
     loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
     set_logging_board_pointer(loggingBoard);
@@ -78,12 +84,6 @@ Man::Man (shared_ptr<Sensors> _sensors,
 #ifdef USE_MEMORY
     loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
 #endif
-
-#ifdef USE_NOGGIN
-    noggin = shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
-                                            loggingBoard,
-                                            motion->getInterface()));
-#endif// USE_NOGGIN
 }
 
 Man::~Man ()
@@ -151,7 +151,7 @@ Man::processFrame ()
     PROF_EXIT(P_VISION);
     sensors->releaseImage();
 #endif
-#ifdef USE_MEMORY
+#if defined USE_MEMORY || defined OFFLINE
     memory->updateVision();
     loggingBoard->log(MVISION_ID);
 #endif
@@ -159,6 +159,8 @@ Man::processFrame ()
     noggin->runStep();
 #endif
 
+    memory->getMutableMObject(MLOCALIZATION_ID)->update();
+    loggingBoard->log(MLOCALIZATION_ID);
     PROF_ENTER(P_LIGHTS);
     lights->sendLights();
     PROF_EXIT(P_LIGHTS);

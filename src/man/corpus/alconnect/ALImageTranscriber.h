@@ -31,7 +31,7 @@ public:
 private: // helper methods
     void registerCamera(AL::ALPtr<AL::ALBroker> broker);
     void initCameraSettings(int whichCam);
-    void initTable(std::string path);
+    void initTable(const std::string& path);
     void initTable(unsigned char* buffer);
     void waitForImage();
 

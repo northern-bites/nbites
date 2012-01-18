@@ -485,7 +485,7 @@ param = camera->getParam(kCameraHueID);
     }
 }
 
-void ALImageTranscriber::initTable(string filename)
+void ALImageTranscriber::initTable(const string& filename)
 {
     FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
 

@@ -26,11 +26,11 @@ def tracking(tracker):
         minActiveDist = GoalieConstants.ACTIVE_LOC_THRESH
     else:
         minActiveDist = constants.ACTIVE_TRACK_DIST
-        
+
     # I think that not having the right distance
     # might be the problem on tracking
     # TODO: Check ball information problem
-    tracker.printf(tracker.target.loc.dist);
+    #       tracker.printf(tracker.target.loc.dist);
     if tracker.target.loc.dist > minActiveDist:
         return tracker.goLater('activeTracking')
 

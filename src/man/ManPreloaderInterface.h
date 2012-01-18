@@ -11,7 +11,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "NullInstanceHelper.h"
+#include "ClassHelper.h"
 
 class ManPreloaderInterface {
 

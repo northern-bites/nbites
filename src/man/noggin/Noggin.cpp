@@ -8,6 +8,7 @@
 #include "EKFStructs.h"
 #include <cstdlib>
 #include "MultiLocEKF.h"
+#include "NaoPaths.h"
 
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
@@ -523,14 +524,15 @@ void Noggin::modifySysPath ()
      const char *cwd = test.c_str();
 #  else //WEBOTS
 #    if defined OFFLINE || defined STRAIGHT
-       const char *cwd = "/usr/local/nao-1.6/modules/lib";
+       string dir1 = NBITES_DIR"/build/qtool";
+       string dir2 = NBITES_DIR"/build/qtool/man";
 #    else
        const char *cwd = "/home/nao/naoqi/lib";
 #    endif
 #  endif
 
 #ifdef DEBUG_NOGGIN_INITIALIZATION
-    printf("  Adding %s to sys.path\n", cwd);
+//    printf("  Adding %s to sys.path\n", cwd);
 #endif
 
     PyObject *sys_module = PyImport_ImportModule("sys");
@@ -543,7 +545,12 @@ void Noggin::modifySysPath ()
     }else {
         PyObject *dict = PyModule_GetDict(sys_module);
         PyObject *path = PyDict_GetItemString(dict, "path");
+#ifdef OFFLINE
+        PyList_Append(path, PyString_FromString(dir1.c_str()));
+        PyList_Append(path, PyString_FromString(dir2.c_str()));
+#else
         PyList_Append(path, PyString_FromString(cwd));
+#endif
         Py_DECREF(sys_module);
     }
 }

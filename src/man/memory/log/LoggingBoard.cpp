@@ -11,14 +11,14 @@ using namespace man::include::paths;
 using boost::shared_ptr;
 
 LoggingBoard::LoggingBoard(Memory::const_ptr memory, IOProvider::const_ptr ioProvider) :
-    memory(memory), logging(true) {
+    memory(memory), logging(false) {
     newIOProvider(ioProvider);
 }
 
 void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
 
     this->ioProvider = ioProvider;
-
+    //if we have a new ioProvider, then we need to re-create all logger objects
     const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
     for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
             i!= fdmap->end(); i++) {
