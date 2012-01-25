@@ -20,6 +20,7 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
+    player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
 
     #if player.brain.ball.vis.on:
     # player.brain.sensors.saveFrame()

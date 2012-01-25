@@ -8,13 +8,12 @@
 #include "alproxies/alvideodeviceproxy.h"
 
 #include "ThreadedImageTranscriber.h"
-#include "synchro.h"
+#include "synchro/synchro.h"
 #include "ColorParams.h"
 
 class ALImageTranscriber : public ThreadedImageTranscriber {
 public:
-    ALImageTranscriber(boost::shared_ptr<Synchro> synchro,
-                       boost::shared_ptr<Sensors> s,
+    ALImageTranscriber(boost::shared_ptr<Sensors> s,
                        AL::ALPtr<AL::ALBroker> broker);
     virtual ~ALImageTranscriber();
 
@@ -32,7 +31,7 @@ public:
 private: // helper methods
     void registerCamera(AL::ALPtr<AL::ALBroker> broker);
     void initCameraSettings(int whichCam);
-    void initTable(std::string path);
+    void initTable(const std::string& path);
     void initTable(unsigned char* buffer);
     void waitForImage();
 

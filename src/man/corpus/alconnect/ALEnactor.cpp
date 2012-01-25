@@ -32,8 +32,6 @@ using namespace std;
 //#define SPEEDY_ENACTOR
 
 void ALEnactor::run() {
-    Thread::running = true;
-    Thread::trigger->on();
 
     long long currentTime;
     struct timespec interval, remainder;
@@ -61,8 +59,6 @@ void ALEnactor::run() {
 #endif
 
     }
-    Thread::running = true;
-    Thread::trigger->off();
 }
 void ALEnactor::sendCommands(){
     if(!switchboard)

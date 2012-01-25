@@ -43,6 +43,8 @@ public:
                     << std::endl;
         }
     }
+
+    virtual ~Logger() {}
     /**
      * The writeToLog() method should write the message to some
      * sort of output buffer implemented in the respective
@@ -51,20 +53,18 @@ public:
     virtual void writeToLog() = 0;
 
 protected:
-    /*
-     * Writes a value of type T to the current buffer.
-     * It writes it at the specified offset and then
-     * increments the offset with the size of the value written.
-     */
+
+    // helper write methods
     //TODO: assert if we actually write everything
     // and detect if an error happens
-    template <class T>
-    void writeValue(T value) {
-        bytes_written += write(file_descriptor, &value, sizeof(value));
+
+    virtual void writeCharBuffer(const char* buffer, uint32_t size) {
+        bytes_written += write(file_descriptor, buffer, size);
     }
 
-    void writeCharBuffer(const char* buffer, uint32_t size) {
-        bytes_written += write(file_descriptor, buffer, size);
+    template <class T>
+    void writeValue(T value) {
+        writeCharBuffer(reinterpret_cast<char *>(&value), sizeof(value));
     }
 
 private:

@@ -15,13 +15,12 @@
 #define _ThreadedMotionEnactor_h_DEFINED
 
 #include "MotionEnactor.h"
-#include "synchro.h"
+#include "synchro/synchro.h"
 
 class ThreadedMotionEnactor : public MotionEnactor , public Thread{
 public:
-    ThreadedMotionEnactor(boost::shared_ptr<Synchro> synchro,
-                          std::string name)
-        : MotionEnactor(), Thread(synchro, name){};
+    ThreadedMotionEnactor(std::string name)
+        : MotionEnactor(), Thread(name){};
     virtual ~ThreadedMotionEnactor() { }
 
 };

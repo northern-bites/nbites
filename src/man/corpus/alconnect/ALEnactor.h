@@ -43,10 +43,9 @@ using namespace std;
 class ALEnactor : public ThreadedMotionEnactor {
 public:
     ALEnactor(boost::shared_ptr<Sensors> s,
-              boost::shared_ptr<Synchro> synchro,
               boost::shared_ptr<Transcriber> t,
               AL::ALPtr<AL::ALBroker> _pbroker )
-        : ThreadedMotionEnactor(synchro,"ALEnactor"),
+        : ThreadedMotionEnactor("ALEnactor"),
           broker(_pbroker), sensors(s),
           transcriber(t), almotion_link(false){
 

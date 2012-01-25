@@ -13,7 +13,7 @@ add_definitions(${QT_DEFINITIONS})
 
 ########### Sources
 
-set( viewer_srcs LogViewer.cpp
+set( viewer_srcs MemoryViewer.cpp
                  MObjectViewer.cpp
                  RoboImageViewer.cpp
 		 BallEKFViewer.cpp
@@ -22,7 +22,7 @@ set( viewer_srcs LogViewer.cpp
 		 PaintField.cpp
 		 WorldDataViewer.cpp)
 
-set( viewer_headers LogViewer.h
+set( viewer_headers MemoryViewer.h
                     MObjectViewer.h
                     RoboImageViewer.h
 		    BallEKFViewer.h

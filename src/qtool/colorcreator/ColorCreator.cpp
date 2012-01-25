@@ -43,6 +43,20 @@ namespace colorcreator {
 
 using data::DataManager;
 
+const QColor ColorCreator::RGBcolorValue[] = {
+        QColor(255, 128, 0), //orange
+        QColor(100, 149, 237), //blue
+        QColor(0, 139, 0), //green
+        QColor(255, 255, 0), //yellow
+        QColor(255, 255, 255), //white
+        QColor(255, 181, 197), //pink
+        QColor(0, 0, 205), //navy
+        QColor(100, 100, 100), //black
+        QColor(238, 64, 0), //orangered
+        QColor(72, 209, 234), //bluegreen
+        QColor(105, 89, 205) //bluenavy
+};
+
 ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     QMainWindow(parent),
     dataManager(dataManager),
@@ -781,28 +795,15 @@ void ColorCreator::collectStats(int x, int y)
 
 void ColorCreator::outputStats()
 {
-    QTextStream out(stdout);
-    out << "Stats for current color\n";
-    out << "H: " << statsHMin << " " << statsHMax << "\n";
-    out << "S: " << statsSMin << " " << statsSMax << "\n";
-    out << "Z: " << statsZMin << " " << statsZMax << "\n";
-    out << "Y: " << statsYMin << " " << statsYMax << "\n";
-    out << "U: " << statsUMin << " " << statsUMax << "\n";
-    out << "V: " << statsVMin << " " << statsVMax << "\n";
+//    QTextStream out(stdout);
+//    out << "Stats for current color\n";
+//    out << "H: " << statsHMin << " " << statsHMax << "\n";
+//    out << "S: " << statsSMin << " " << statsSMax << "\n";
+//    out << "Z: " << statsZMin << " " << statsZMax << "\n";
+//    out << "Y: " << statsYMin << " " << statsYMax << "\n";
+//    out << "U: " << statsUMin << " " << statsUMax << "\n";
+//    out << "V: " << statsVMin << " " << statsVMax << "\n";
 }
-
-void ColorCreator::on_previousButton_clicked()
-{
-    dataManager->getPrev();
-    currentFrameNumber--;
-}
-
-void ColorCreator::on_nextButton_clicked()
-{
-    dataManager->getNext();
-    currentFrameNumber++;
-}
-
 
 void ColorCreator::on_hMin_valueChanged(int value)
 {
@@ -1089,23 +1090,6 @@ void ColorCreator::on_writeNew_clicked()
     //writeOldFormat(filename);
     writeNewFormat(filename);
 }
-
-
-void ColorCreator::on_plusTen_clicked()
-{
-    //yuvImage.read(tenthFrame);
-    currentFrameNumber += 10;
-    updateDisplays();
-}
-
-void ColorCreator::on_minusTen_clicked()
-{
-    //yuvImage.read(minusTenthFrame);
-    currentFrameNumber -= 10;
-    updateDisplays();
-}
-
-
 
 void ColorCreator::on_channel_currentIndexChanged(int index)
 {

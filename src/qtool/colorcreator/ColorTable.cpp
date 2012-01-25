@@ -109,6 +109,7 @@ void ColorTable::readOld(QString filename)
                     break;
                 case 9:
                     table[y][x][z] = ORANGE | YELLOW;
+                    break;
                 case 10:
                     table[y][x][z] = PINK;
                     break;

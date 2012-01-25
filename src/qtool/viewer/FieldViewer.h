@@ -24,10 +24,10 @@ namespace qtool {
 namespace viewer {
 
 class FieldViewer : public QMainWindow{
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-  FieldViewer(data::DataManager::ptr dataManager);
+    FieldViewer(data::DataManager::ptr dataManager);
 
 private:
   std::vector<QDockWidget*> dockWidget;

@@ -30,17 +30,18 @@ public:
     MultiProvider(){
     }
 
-    virtual void inline addSubscriber(Subscriber<event_type>* s) {
+    virtual ~MultiProvider() {}
+
+    virtual void inline addSubscriber(Subscriber<event_type>* s) const {
         Provider<event_type>::addSubscriber(s);
     }
 
     virtual void inline addSubscriber(Subscriber<event_type>* s,
-            event_type event_to_subscribe_to) {
+            event_type event_to_subscribe_to) const {
         eventSubscriberMap.insert(
                 EventSubscriberPair(event_to_subscribe_to, s));
     }
 
-protected:
     //this checks to see if a subscriber is NULL and removes it as well
     virtual void notifySubscribers(event_type event) {
         //first update all of the general subscribers
@@ -58,6 +59,6 @@ protected:
     }
 
 private:
-     EventSubscriberMap eventSubscriberMap;
+     mutable EventSubscriberMap eventSubscriberMap;
 
 };

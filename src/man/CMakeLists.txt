@@ -161,41 +161,68 @@ INCLUDE_DIRECTORIES(
   ${CFG_DIR}
   )
 
-############################ PROJECT SOURCES FILES
-# Add here source files needed to compile this project
+############################ Platform settings
+
+IF(BUILDING_FOR_A_REMOTE_NAO)
+  SET( MAN_LOADER_SRC NaoManLoader )
+  LIST(APPEND MAN_PRELOADER_SRCS NaoManPreloader )
+ENDIF()
+IF(OFFLINE)
+  SET( MAN_LOADER_SRC OfflineManLoader )
+  LIST(APPEND MAN_PRELOADER_SRCS OfflineManPreloader )
+ENDIF()
+
+############################ Setting up Man
 SET( MAN_SRCS Man
               TMan
               TTMan
-  )
+              ${MAN_LOADER_SRC} )
 
 IF(WEBOTS_BACKEND)
+#NOTE: this doesn't work anymore because we changed the way we
+# load man - Octavian
   LIST(APPEND MAN_SRCS nao_soccer_player
     )
-ELSE(WEBOTS_BACKEND)
-  LIST(APPEND MAN_SRCS manmodule
-    )
-ENDIF(WEBOTS_BACKEND)
+ENDIF()
 
 SET( MAN_PYTHON_SRCS __init__.py )
 
-############################ CHECK LIBRARY / EXECUTABLE OPTION
-# Configure the output execuatable or shared library, and the install
-# commands
+ADD_LIBRARY(
+  ${MAN_TARGET}
+  SHARED
+  ${MAN_SRCS}
+  )
 
-GET_TARGET_PROPERTY( MAN_LOCATION ${MAN_TARGET} LOCATION )
+TARGET_LINK_LIBRARIES(
+  ${MAN_TARGET}
+  ${COMM_TARGET}
+  ${SENSORS_TARGET}
+  ${ROBOT_INTERFACE_TARGET}
+  ${ROBOT_CONNECT_TARGET}
+  ${NBINCLUDE_TARGET}
+  ${VISION_TARGET}
+  ${MOTION_TARGET}
+  ${NOGGIN_TARGET}
+  ${MEMORY_TARGET}
+  ${WEBOTS_LIBRARIES}
+  )
 
-IF( MAN_IS_REMOTE )
-  ADD_EXECUTABLE(
-    ${MAN_TARGET}
-    ${MAN_SRCS}
-    )
-ELSE( MAN_IS_REMOTE )
-  ADD_LIBRARY(
-    ${MAN_TARGET}
-    SHARED
-    ${MAN_SRCS}
-    )
-ENDIF( MAN_IS_REMOTE )
+############################## Setting up Man Preloader
+
+ADD_LIBRARY(
+  ${MAN_PRELOADER_TARGET}
+  SHARED
+  ${MAN_PRELOADER_SRCS}
+  )
+
+############################# INSTALL PATHS
+
+INSTALL(
+  TARGETS ${MAN_PRELOADER_TARGET}
+  RUNTIME DESTINATION ${OUTPUT_ROOT_DIR_BIN}
+  LIBRARY DESTINATION ${OUTPUT_ROOT_DIR_NAOQI_LIB}
+  CONFIGURATIONS "" Debug Release
+  )
 INSTALL(
   TARGETS ${MAN_TARGET}
   RUNTIME DESTINATION ${OUTPUT_ROOT_DIR_BIN}
@@ -213,22 +240,6 @@ INSTALL(
   CONFIGURATIONS "" Debug Release
   )
 
-############################ SET LIBRARIES TO LINK WITH
-TARGET_LINK_LIBRARIES(
-  ${MAN_TARGET}
-  ${ALCOMMON_LIBRARIES}
-  ${COMM_TARGET}
-  ${SENSORS_TARGET}
-  ${SYNCHRO_TARGET}
-  ${ROBOT_CONNECT_TARGET}
-  ${NBINCLUDE_TARGET}
-  ${VISION_TARGET}
-  ${MOTION_TARGET}
-  ${NOGGIN_TARGET}
-  ${MEMORY_TARGET}
-  ${WEBOTS_LIBRARIES}
-  )
-
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories to
 # include in this package
@@ -238,3 +249,4 @@ add_subdirectory( corpus )
 add_subdirectory( vision )
 add_subdirectory( motion )
 add_subdirectory( noggin )
+add_subdirectory( include )

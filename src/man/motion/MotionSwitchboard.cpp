@@ -11,14 +11,6 @@ using namespace Kinematics;
 using namespace NBMath;
 //#define DEBUG_SWITCHBOARD
 
-const float MotionSwitchboard::sitDownAngles[NUM_BODY_JOINTS] =
-{1.57f,0.0f,-1.13f,-1.0f,
- 0.0f,0.0f,-0.96f,2.18f,
- -1.22f,0.0f,0.0f,0.0f,
- -0.96f,2.18f,-1.22f,0.0f,
- 1.57f,0.0f,1.13f,1.01f};
-
-
 MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
                                      shared_ptr<NaoPose> pose)
     : sensors(s),

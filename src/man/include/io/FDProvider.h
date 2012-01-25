@@ -29,7 +29,7 @@ public:
     typedef boost::shared_ptr<const FDProvider> const_ptr;
 
 public:
-    FDProvider() : file_descriptor(0) {}
+    FDProvider() : file_descriptor(-1) {}
     virtual ~FDProvider() {};
     int getFileDescriptor() const { return file_descriptor; }
 
@@ -39,7 +39,7 @@ public:
         return lseek64(file_descriptor, 0, SEEK_CUR);
     }
 
-    virtual bool rewind(uint32_t offset) const { return true; }
+    virtual bool rewind(uint64_t offset) const { return true; }
 
 protected:
     virtual void openFileDescriptor() = 0;

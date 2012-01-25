@@ -18,6 +18,7 @@
 
 #include "TreeModel.h"
 #include <iostream>
+#include <assert.h>
 
 namespace qtool {
 namespace data {
@@ -32,7 +33,13 @@ TreeModel::TreeModel(Node* _root, QObject *_parent) :
     root->constructTree();
 }
 
-TreeModel::~TreeModel() {}
+TreeModel::~TreeModel() {
+    delete root;
+}
+
+void TreeModel::revalidateModel() {
+    root->revalidate();
+}
 
 int TreeModel::rowCount(const QModelIndex &index) const {
 
@@ -85,11 +92,12 @@ QModelIndex TreeModel::index(int row, int column,
     } else {
         //means we have a non-root item - safe to typecast it
         parentNode =
-                static_cast<const Node*> (parent.internalPointer());
+                reinterpret_cast<const Node*> (parent.internalPointer());
     }
 
     if (parentNode) {
         const Node* childNode = parentNode->getChild(row);
+        assert(childNode != NULL);
         return createIndex(row, column, (void*) childNode );
     } else {
         return QModelIndex();
@@ -105,6 +113,7 @@ QModelIndex TreeModel::parent(const QModelIndex &child) const {
 
     const Node* childNode =
             static_cast<const Node*> (child.internalPointer());
+
     const Node* parentNode =childNode->getParent();
 
     if (!parentNode) {
