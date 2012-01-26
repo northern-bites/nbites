@@ -45,5 +45,6 @@ target_link_libraries(
   treemodel
   memory
   parse
+  log
   ${QT_LIBRARIES}
   )
