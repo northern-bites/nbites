@@ -10,5 +10,8 @@ enum OpenFlags {
     EXISTING = O_RDONLY
 };
 
+enum OpenPermissions {
+    PERMISSIONS_ALL = S_IRWXU | S_IRWXG | S_IRWXO
+};
 }
 }

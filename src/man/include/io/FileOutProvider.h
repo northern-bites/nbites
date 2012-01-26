@@ -34,7 +34,7 @@ public:
 
     void openCommunicationChannel() {
 
-        file_descriptor = open(file_name.c_str(), flags);
+        file_descriptor = open(file_name.c_str(), flags, PERMISSIONS_ALL);
 
         if (file_descriptor < 0) {
             std::cout << "Could not open file: " << debugInfo() << std::endl;
@@ -49,10 +49,15 @@ public:
         return has_been_opened;
     }
 
+    virtual void closeCommunicationChannel() const {
+        close(file_descriptor);
+        has_been_opened = false;
+    }
+
 private:
     std::string file_name;
     OpenFlags flags;
-    bool has_been_opened;
+    mutable bool has_been_opened;
 
 };
 
