@@ -20,6 +20,12 @@ ParsingBoard::~ParsingBoard(){}
 void ParsingBoard::newInputProvider(InProvider::ptr inProvider) {
     MObjectParser::ptr mObjectParser(new MObjectParser(inProvider));
 
+    //warning - if target is a socket, then this might block (potentially
+    //forever)
+    //TODO: find some way around that (the tricky part is that we use
+    // the id we get from reading the log to identify what memory object
+    // it's going to be parsed to, so we need to wait on the open is some
+    // way)
     inProvider->openCommunicationChannel();
     MObject_ID id;
     id = inProvider->peekAndGet<MObject_ID>();
