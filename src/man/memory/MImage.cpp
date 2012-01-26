@@ -62,7 +62,7 @@ void MImage::updateData() {
             AVERAGED_IMAGE_SIZE);
     this->thresholded_data->set_width(AVERAGED_IMAGE_WIDTH);
     this->thresholded_data->set_height(AVERAGED_IMAGE_HEIGHT);
-    #endif OFFLINE
+    #endif
 }
 
 }

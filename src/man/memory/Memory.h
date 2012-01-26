@@ -29,6 +29,7 @@ class Memory; //forward declaration
 #include "MVisionSensors.h"
 #include "MMotionSensors.h"
 #include "MImage.h"
+#include "MLocalization.h"
 #include "Sensors.h"
 #include "Profiler.h"
 #include "Notifier.h"
@@ -47,8 +48,9 @@ public:
             boost::shared_ptr<MObject> > MObject_IDMap;
 
 public:
-    Memory( boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
-            boost::shared_ptr<Sensors> sensors_ptr = boost::shared_ptr<Sensors>());
+    Memory(boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
+           boost::shared_ptr<Sensors> sensors_ptr = boost::shared_ptr<Sensors>(),
+           boost::shared_ptr<LocSystem> loc_ptr = boost::shared_ptr<LocSystem>());
     virtual ~Memory();
     /**
      * calls the update function on @obj
@@ -78,6 +80,7 @@ private:
     boost::shared_ptr<MVisionSensors> mVisionSensors;
     boost::shared_ptr<MMotionSensors> mMotionSensors;
     boost::shared_ptr<MImage> mImage;
+    boost::shared_ptr<MLocalization> mLocalization;
 };
 }
 }

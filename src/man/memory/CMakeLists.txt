@@ -51,6 +51,7 @@ set( MEMORY_SRCS Memory
                  MVisionSensors
                  MMotionSensors
                  MImage
+		 MLocalization
                  )
 
 set( PARSE_SRCS parse/MObjectParser
