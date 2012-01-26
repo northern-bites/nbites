@@ -33,13 +33,15 @@ MAKE_FLAGS=--no-print-directory qtool
 
 default: build
 
-build: release
+build: $(GEN_MAKEFILE)
 	$(MAKE) $(MAKE_FLAGS) -C $(BIN_DIR)
 
-release:
+$(GEN_MAKEFILE):
 	$(MKDIR) -p $(BIN_DIR); \
 	$(CD) $(BIN_DIR); \
 	$(CMAKE) $(TOOLCHAIN_FLAG) $(CMAKE_RELEASE_CONFIG) $(SRC_DIR)
+
+release: clean $(GEN_MAKEFILE)
 
 eclipse: $(ECLIPSE_PROJECT_FILE)
 
@@ -62,12 +64,10 @@ $(EXECUTABLE): build
 run: $(EXECUTABLE)
 	$(EXECUTABLE)
 
-config_debug: 
+debug: 
 	$(MKDIR) -p $(BIN_DIR); \
 	$(CD) $(BIN_DIR); \
 	$(CMAKE) $(TOOLCHAIN_FLAG) $(CMAKE_DEBUG_CONFIG) .
-
-debug: config_debug build
 
 run_gdb: debug
 	$(GDB) $(EXECUTABLE)
