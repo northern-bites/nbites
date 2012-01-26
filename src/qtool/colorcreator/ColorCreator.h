@@ -81,14 +81,14 @@ public:
 
 public slots:
     void updatedImage() {
-        yuvImage.updateFromRawImage();
-        updateDisplays();
+        this->QWidget::update();
     }
 
 protected:
     void mouseMoveEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
+    void paintEvent(QPaintEvent *event);
 
 private slots:
 

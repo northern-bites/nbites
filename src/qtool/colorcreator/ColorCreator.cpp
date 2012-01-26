@@ -283,6 +283,12 @@ ColorCreator::~ColorCreator()
     delete ui;
 }
 
+void ColorCreator::paintEvent(QPaintEvent * /* event */)
+{
+    yuvImage.updateFromRawImage();
+    updateDisplays();
+}
+
 void ColorCreator::mouseMoveEvent(QMouseEvent *event)
 {
     //TODO: this is currently broken
