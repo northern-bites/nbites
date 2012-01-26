@@ -4,14 +4,17 @@
 /**
  * @class YUVImage
  *
- * Takes a robo image and splits it into 3 component images for each of the
+ * Takes a raw image YUV422 and splits it into 3 component images for each of the
  * three channels.
- * One instance of this class should rely on one instance of a roboImage.
- * Once the image data in the roboImage gets updated, make sure to update this
- * class as well by using updateFromRoboImage().
+ * One instance of this class should rely on one instance of a rawImage.
+ * Once the image data in the rawImage gets updated, make sure to update this
+ * class as well by using the updateFromRawImage()
  *
- * This could be extended by adding in a listener to some data manager that will
- * push updates to the roboImage.
+ * Improvements : make this class actively "listen" for changes in the rawImage
+ * (one could use signals and slots) and update the yuv image members accordingly
+ *
+ *
+ * @author Octavian Neamtu
  */
 
 #include <string>
