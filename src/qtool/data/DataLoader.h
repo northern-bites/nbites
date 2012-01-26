@@ -32,7 +32,8 @@ private:
 
 private:
     DataManager::ptr dataManager;
-    DataFinder* dataFinder;
+    OfflineDataFinder* offlineDataFinder;
+    remote::RemoteDataFinder* remoteDataFinder;
 };
 
 }

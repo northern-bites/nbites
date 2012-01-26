@@ -8,16 +8,20 @@ using namespace remote;
 DataLoader::DataLoader(DataManager::ptr dataManager, QWidget *parent) :
     QWidget(parent),
     dataManager(dataManager),
-    dataFinder(new OfflineDataFinder(this))
+    offlineDataFinder(new OfflineDataFinder(this)),
+    remoteDataFinder(new RemoteDataFinder(this))
 {
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setAlignment(Qt::AlignTop);
+    QHBoxLayout *layout = new QHBoxLayout;
 
-    QComboBox* dataTypeSelector = this->setupDataSelectorBox();
-    layout->addWidget(dataTypeSelector);
-    layout->addWidget(dataFinder);
+    layout->addWidget(offlineDataFinder);
+    layout->addWidget(remoteDataFinder);
 
-    connect(dataFinder,
+    connect(remoteDataFinder,
+            SIGNAL(signalNewInputProvider(common::io::InProvider::ptr)),
+            dataManager.get(),
+            SLOT(newInputProvider(common::io::InProvider::ptr)));
+
+    connect(offlineDataFinder,
             SIGNAL(signalNewInputProvider(common::io::InProvider::ptr)),
             dataManager.get(),
             SLOT(newInputProvider(common::io::InProvider::ptr)));
@@ -25,20 +29,10 @@ DataLoader::DataLoader(DataManager::ptr dataManager, QWidget *parent) :
     this->setLayout(layout);
 }
 
-QComboBox* DataLoader::setupDataSelectorBox() {
-    QComboBox* dataTypeSelector = new QComboBox;
-//    dataTypeSelector->addItem(QString("Offline"),
-//                      QVariant(static_cast<int>(DataSource::offline)));
-//    dataTypeSelector->addItem(QString("Online"),
-//                      QVariant(static_cast<int>(DataSource::online)));
-//    dataTypeSelector->addItem(QString("Old"),
-//                      QVariant(static_cast<int>(DataSource::old)));
-    return dataTypeSelector;
-}
-
 DataLoader::~DataLoader()
 {
-    delete dataFinder;
+    delete offlineDataFinder;
+    delete remoteDataFinder;
 }
 
 }
