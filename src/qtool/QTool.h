@@ -33,6 +33,7 @@ public:
 private slots:
     void next();
     void prev();
+    void record();
 
 private:
     QTabWidget* toolTabs;
@@ -46,6 +47,7 @@ private:
     viewer::FieldViewer* fieldViewer;
     QPushButton* prevButton;
     QPushButton* nextButton;
+    QPushButton* recordButton;
     QToolBar* toolbar;
 
 

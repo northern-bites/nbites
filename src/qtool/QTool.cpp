@@ -1,6 +1,7 @@
 
 #include "QTool.h"
 #include <iostream>
+#include <QFileDialog>
 
 namespace qtool {
 
@@ -25,14 +26,17 @@ QTool::QTool() : QMainWindow(),
     this->setWindowTitle(tr("HackTool"));
 
     toolbar = new QToolBar();
-    nextButton = new QPushButton(tr("&Next"));
-    prevButton = new QPushButton(tr("&Previous"));
+    nextButton = new QPushButton(tr(">"));
+    prevButton = new QPushButton(tr("<"));
+    recordButton = new QPushButton(tr("Rec"));
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
+    connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
+    toolbar->addWidget(recordButton);
 
     this->addToolBar(toolbar);
 
@@ -62,6 +66,11 @@ void QTool::next() {
 
 void QTool::prev() {
     dataManager->getPrev();
+}
+
+void QTool::record() {
+    QString path = QFileDialog::getExistingDirectory(this);
+    dataManager->startRecordingToPath(path.toStdString());
 }
 
 }
