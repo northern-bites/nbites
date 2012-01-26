@@ -9,6 +9,7 @@
 #pragma once
 
 #include "LoggingBoard.h"
+#include "NaoPaths.h"
 
 namespace man {
 namespace memory {
@@ -17,8 +18,9 @@ namespace log {
 class OutputProviderFactory {
 
 public:
-    static void AllFileOutput(LoggingBoard::ptr loggingBoard);
-    static void AllSocketOutput(LoggingBoard::ptr loggingBoard);
+    static void AllFileOutput(LoggingBoard* loggingBoard,
+            std::string log_folder_path = common::paths::NAO_LOG_DIR);
+    static void AllSocketOutput(LoggingBoard* loggingBoard);
 
 };
 
