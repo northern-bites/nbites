@@ -23,15 +23,18 @@ void BMPYUVImage::buildBitmap() {
 
     ColorSpace c;
 
-	for (int j = 0; j < getHeight(); ++j)
+    byte** yImg = yuvImage.getYImage();
+    byte** uImg = yuvImage.getUImage();
+    byte** vImg = yuvImage.getVImage();
+
+	for (int j = 0; j < getHeight(); ++j) {
+	    QRgb* qImageLine = (QRgb*) (bitmap.scanLine((int)(j)));
 		for (int i = 0; i < getWidth(); ++i) {
-			c.setYuv(yuvImage.getY(i,j), yuvImage.getU(i,j), yuvImage.getV(i,j));
+		    byte y = yImg[i][j], u = uImg[i][j], v = vImg[i][j];
 			int r, g, b;
 			switch (this->bitmapType) {
 			case Color:
-				r = c.getRb();
-				g = c.getGb();
-				b = c.getBb();
+			    qImageLine[i] = ColorSpace::RGBFromYUV(y, u, v);
 				break;
 
 			case Y:
@@ -81,9 +84,10 @@ void BMPYUVImage::buildBitmap() {
 				r = g = b = 0;
 				break;
 			}
-			QRgb value = qRgb(r, g, b);
-			bitmap.setPixel(i, j, value);
+//			QRgb value = qRgb(r, g, b);
+//			bitmap.setPixel(i, j, value);
 		}
+	}
 }
 }
 }

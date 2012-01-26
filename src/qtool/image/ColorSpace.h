@@ -1,12 +1,38 @@
 #ifndef COLORSPACE_H
 #define COLORSPACE_H
 
-#include <math.h>
+#include <cmath>
+#include "Common.h"
 
 class ColorSpace
 {
+    // holds an rgb value in the form #XXRRGGBB
+    typedef unsigned int RGB;
+
 public:
     ColorSpace();
+
+    static byte redFromYUV(byte y, byte u, byte v) {
+        return safeFloatToByte(y + 1.13983f * (v - 128.0f));
+    }
+
+    static byte blueFromYUV(byte y, byte u, byte v) {
+        return safeFloatToByte(y + 2.03211f * (u - 128.0f));
+    }
+
+    static byte greenFromYUV(byte y, byte u, byte v) {
+        return safeFloatToByte(y - 0.39465f * (u - 128.0f) - 0.58060f * (v - 128.0f));
+    }
+
+    //topmost bytes are set to #FF
+    static RGB RGBFromYUV(byte y, byte u, byte v) {
+        RGB result = 0xFFFFFFFF;
+        ((byte*) &result)[2] = redFromYUV(y, u, v);
+        ((byte*) &result)[1] = greenFromYUV(y, u, v);
+        ((byte*) &result)[0] = blueFromYUV(y, u, v);
+        return result;
+    }
+
     float getRed() {return red;}
     float getGreen() {return grn;}
     float getBlue() {return blue;}
@@ -27,6 +53,11 @@ public:
                                              (float)(v - 128) / 256.0f);}
     void setHsz(float h, float s, float z);
 
+    // guards against negative values and values that might overflow in a byte
+    static byte safeFloatToByte(float x) {
+        return (byte) min(max(x, 0.0f), 255.0f);
+    }
+
     int cvb(float x) {return (int)(min(max(256 * x, 0.0f), 255.0f));}
     int getRb() { return cvb(red);}
     int getGb() { return cvb(grn);}
@@ -38,9 +69,10 @@ public:
     int getSb() { return cvb(getS());}
     int getZb() { return cvb(getZ());}
 
-    float min(float a, float b) {if (a < b) return a; return b;}
-    float max(float a, float b) {if (a > b) return a; return b;}
+    static float min(float a, float b) {if (a < b) return a; return b;}
+    static float max(float a, float b) {if (a > b) return a; return b;}
 
+private:
 
     float red, grn, blue;
 };
