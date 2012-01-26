@@ -12,8 +12,6 @@ OfflineManPreloader::OfflineManPreloader(OfflineManController::ptr offlineContro
 }
 
 OfflineManPreloader::~OfflineManPreloader() {
-    debug_preloader_out << "Destroying the man preloader" << endl;
-    destroyMan();
 }
 
 void OfflineManPreloader::createMan() {
