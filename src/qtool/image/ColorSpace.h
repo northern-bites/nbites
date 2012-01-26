@@ -26,11 +26,20 @@ public:
 
     //topmost bytes are set to #FF
     static RGB RGBFromYUV(byte y, byte u, byte v) {
-        RGB result = 0xFFFFFFFF;
-        ((byte*) &result)[2] = redFromYUV(y, u, v);
-        ((byte*) &result)[1] = greenFromYUV(y, u, v);
-        ((byte*) &result)[0] = blueFromYUV(y, u, v);
+        return makeRGB(redFromYUV(y, u, v), greenFromYUV(y, u, v),  blueFromYUV(y, u, v));
+    }
+
+    static RGB makeRGB(byte r, byte g, byte b, byte a = 0xFF) {
+        RGB result;
+        ((byte*) &result)[3] = a;
+        ((byte*) &result)[2] = r;
+        ((byte*) &result)[1] = g;
+        ((byte*) &result)[0] = b;
         return result;
+    }
+
+    static RGB makeRGBFromSingleByte(byte single_byte) {
+        return makeRGB(single_byte, single_byte, single_byte);
     }
 
     float getRed() {return red;}

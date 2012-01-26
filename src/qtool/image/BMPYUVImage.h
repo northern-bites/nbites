@@ -32,7 +32,7 @@ class BMPYUVImage : public BMPImage
 {
 
 public:
-    BMPYUVImage(man::memory::MImage::const_ptr rawImage);
+    BMPYUVImage(man::memory::MImage::const_ptr rawImage, BitmapType type = Color);
     virtual ~BMPYUVImage() {};
 
     void buildBitmap();

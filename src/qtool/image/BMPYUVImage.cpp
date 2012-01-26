@@ -4,9 +4,9 @@
 namespace qtool {
 namespace image {
 
-BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage) :
+BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage, BitmapType type) :
 	yuvImage(rawImage),
-	bitmapType(Color)
+	bitmapType(type)
 { }
 
 bool BMPYUVImage::needToResizeBitmap() const {
@@ -31,61 +31,68 @@ void BMPYUVImage::buildBitmap() {
 	    QRgb* qImageLine = (QRgb*) (bitmap.scanLine((int)(j)));
 		for (int i = 0; i < getWidth(); ++i) {
 		    byte y = yImg[i][j], u = uImg[i][j], v = vImg[i][j];
-			int r, g, b;
+		    byte color_byte;
+		    QRgb rgb;
+		    QColor color;
+
 			switch (this->bitmapType) {
 			case Color:
 			    qImageLine[i] = ColorSpace::RGBFromYUV(y, u, v);
 				break;
 
 			case Y:
-				r = g = b = c.getY();
+			    qImageLine[i] = ColorSpace::makeRGB(y, y, y);
 				break;
 
 			case U:
-				r = g = b = c.getU();
-				break;
+			    qImageLine[i] = ColorSpace::makeRGB(u, u, u);
+			    break;
 
 			case V:
-				r = g = b = c.getV();
-				break;
+			    qImageLine[i] = ColorSpace::makeRGB(v, v, v);
+			    break;
 
 			case Red:
-				r = g = b = c.getRb();
+			    color_byte = ColorSpace::redFromYUV(y, u, v);
+			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
 				break;
 
 			case Green:
-				r = g = b = c.getGb();
+			    color_byte = ColorSpace::greenFromYUV(y, u, v);
+			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
 				break;
 
 			case Blue:
-				r = g = b = c.getBb();
+			    color_byte = ColorSpace::blueFromYUV(y, u, v);
+			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
 				break;
 
 			case Hue:
-				if (c.getS() >= 0.25f && c.getY() >= 0.2f) {
-					ColorSpace h = ColorSpace();
-					h.setHsz(c.getH(), c.getS(), 0.875f);
-					r = h.getRb();
-					g = h.getGb();
-					b = h.getBb();
-				} else
-					r = g = b = 0;
+			    rgb = ColorSpace::RGBFromYUV(y, u, v);
+			    color = QColor(rgb);
+			    color.toHsv();
+			    color.setHsv(color.hsvHue(), color.hsvSaturation(), 200);
+			    qImageLine[i] = color.rgb();
 				break;
 
 			case Saturation:
-				r = g = b = c.getSb();
-				break;
+			    rgb = ColorSpace::RGBFromYUV(y, u, v);
+			    color = QColor(rgb);
+			    color_byte = (byte) (color.hsvSaturation());
+			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
+			    break;
 
 			case Value:
-				r = g = b = c.getZb();
-				break;
+			    rgb = ColorSpace::RGBFromYUV(y, u, v);
+			    color = QColor(rgb);
+			    color_byte = static_cast<byte>(color.value());
+			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
+			    break;
 
 			default:
-				r = g = b = 0;
+			    qImageLine[i] = ColorSpace::makeRGB(0, 0, 0);
 				break;
 			}
-//			QRgb value = qRgb(r, g, b);
-//			bitmap.setPixel(i, j, value);
 		}
 	}
 }
