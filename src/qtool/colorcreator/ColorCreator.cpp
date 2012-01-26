@@ -308,11 +308,6 @@ void ColorCreator::mouseMoveEvent(QMouseEvent *event)
         int Y = yuvImage.getY(x, y);
         int U = yuvImage.getU(x, y);
         int V = yuvImage.getV(x, y);
-        int H = yuvImage.getH(x, y);
-        int S = yuvImage.getS(x, y);
-        int Z = yuvImage.getZ(x, y);
-        out << "YUV :" << Y << " " << U << " " << V << "\n";
-        out << "HSZ :" << H << " " << S << " " << Z << "\n";
     }
 }
 
@@ -440,7 +435,7 @@ QColor ColorCreator::getChannelView(int j, int i)
         break;
     case Bluec:
         red = green = 0;
-        blue = yuvImage.getBlue(j, i);
+//        blue = yuvImage.getBlue(j, i);
         break;
     case Y:
         red = green = blue = yuvImage.getY(j, i);
@@ -450,20 +445,20 @@ QColor ColorCreator::getChannelView(int j, int i)
         break;
     case Greenc:
         red = blue = 0;
-        green = yuvImage.getGreen(j, i);
+//        green = yuvImage.getGreen(j, i);
         break;
     case Redc:
         blue = green = 0;
-        red = yuvImage.getRed(j, i);
+//        red = yuvImage.getRed(j, i);
         break;
     case H:
-        red = green = blue = yuvImage.getH(j, i);
+//        red = green = blue = yuvImage.getH(j, i);
         break;
     case S:
-        red = green = blue = yuvImage.getS(j, i);
+//        red = green = blue = yuvImage.getS(j, i);
         break;
     case Z:
-        red = green = blue = yuvImage.getZ(j, i);
+//        red = green = blue = yuvImage.getZ(j, i);
         break;
     case Table:
         if (table->isEnabled())
@@ -628,11 +623,11 @@ void ColorCreator::largeDisplay()
                 int y = yuvImage.getY(i, j);
                 int u = yuvImage.getU(i, j);
                 int v = yuvImage.getV(i, j);
-                float s = (float)yuvImage.getS(i, j) / 256.0f;
-                float h = (float)yuvImage.getH(i, j) / 256.0f;
-                float z = (float)yuvImage.getZ(i, j) / 256.0f;
+//                float s = (float)yuvImage.getS(i, j) / 256.0f;
+//                float h = (float)yuvImage.getH(i, j) / 256.0f;
+//                float z = (float)yuvImage.getZ(i, j) / 256.0f;
                 // Since H is an angle the math is modulo.
-                display = testValue(h, s, z, y, u, v, start);
+//                display = testValue(h, s, z, y, u, v, start);
                 c = cols[start];
                 if (display)
                 {
@@ -640,23 +635,23 @@ void ColorCreator::largeDisplay()
                     // check for some common overlaps
                     if (start == Orange)
                     {
-                        if (testValue(h, s, z, y, u, v, Pink))
-                        {
-                            c = cols[OrangeRed];
-                        }
+//                        if (testValue(h, s, z, y, u, v, Pink))
+//                        {
+//                            c = cols[OrangeRed];
+//                        }
                     } else if (start == Green)
                     {
-                        if (testValue(h, s, z, y, u, v, Blue))
-                        {
-                            c = cols[BlueGreen];
-                        }
+//                        if (testValue(h, s, z, y, u, v, Blue))
+//                        {
+//                            c = cols[BlueGreen];
+//                        }
                     }
                     else if (start == Blue)
                     {
-                        if (testValue(h, s, z, y, u, v, Navy))
-                        {
-                            c = cols[BlueNavy];
-                        }
+//                        if (testValue(h, s, z, y, u, v, Navy))
+//                        {
+//                            c = cols[BlueNavy];
+//                        }
                     }
                 } else{
                     c = cols[Black];
@@ -720,9 +715,9 @@ void ColorCreator::updateThresh(bool imageChanged, bool choiceChanged, bool colo
                     start = currentColor;
                 }
                 if (imageChanged) {
-                    red = yuvImage.getRed(i, j);
-                    green = yuvImage.getGreen(i, j);
-                    blue = yuvImage.getBlue(i, j);
+//                    red = yuvImage.getRed(i, j);
+//                    green = yuvImage.getGreen(i, j);
+//                    blue = yuvImage.getBlue(i, j);
                     c.setRgb(red, green, blue);
                     img2->setPixel(i/2, j/2, c.rgb());
                 }
@@ -779,24 +774,24 @@ void ColorCreator::initStats()
   */
 void ColorCreator::collectStats(int x, int y)
 {
-    float s = (float)yuvImage.getS(x, y) / 256.0f;
-    float h = (float)yuvImage.getH(x, y) / 256.0f;
-    float z = (float)yuvImage.getZ(x, y) / 256.0f;
+//    float s = (float)yuvImage.getS(x, y) / 256.0f;
+//    float h = (float)yuvImage.getH(x, y) / 256.0f;
+//    float z = (float)yuvImage.getZ(x, y) / 256.0f;
     int yy = yuvImage.getY(x, y);
     int u = yuvImage.getU(x, y);
     int v = yuvImage.getV(x, y);
-    statsSMin = min(statsSMin, s);
-    statsSMax = max(statsSMax, s);
-    statsHMin = min(statsHMin, h);
-    statsHMax = max(statsHMax, h);
-    statsZMin = min(statsZMin, z);
-    statsZMax = max(statsZMax, z);
-    statsYMin = min(statsYMin, yy);
-    statsYMax = max(statsYMax, yy);
-    statsUMin = min(statsUMin, u);
-    statsUMax = max(statsUMax, u);
-    statsVMin = min(statsVMin, v);
-    statsVMax = max(statsVMax, v);
+//    statsSMin = min(statsSMin, s);
+//    statsSMax = max(statsSMax, s);
+//    statsHMin = min(statsHMin, h);
+//    statsHMax = max(statsHMax, h);
+//    statsZMin = min(statsZMin, z);
+//    statsZMax = max(statsZMax, z);
+//    statsYMin = min(statsYMin, yy);
+//    statsYMax = max(statsYMax, yy);
+//    statsUMin = min(statsUMin, u);
+//    statsUMax = max(statsUMax, u);
+//    statsVMin = min(statsVMin, v);
+//    statsVMax = max(statsVMax, v);
 }
 
 void ColorCreator::outputStats()
