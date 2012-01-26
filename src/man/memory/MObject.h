@@ -21,6 +21,7 @@
 #include "ClassHelper.h"
 
 #include "Notifier.h"
+#include "synchro/mutex.h"
 
 namespace man {
 namespace memory {
@@ -64,6 +65,7 @@ protected:
     MObject_ID id;
     ProtoMessage_ptr protoMessage;
     std::string name;
+    mutex objectMutex;
 
 };
 
