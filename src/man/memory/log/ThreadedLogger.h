@@ -34,13 +34,18 @@ public:
     virtual void writeToLog() = 0;
 
     virtual void run() {
-        //blocking for socket fds, (almost) instant for other ones
-        out_provider->openCommunicationChannel();
-        std::cout << "writing head out" << std::endl;
-        this->writeHead();
         while (running) {
+
+            if (!out_provider->opened()) {
+                //blocking for socket fds, (almost) instant for other ones
+                out_provider->openCommunicationChannel();
+                std::cout << "writing head out" << std::endl;
+                this->writeHead();
+            }
+
             this->waitForSignal();
             this->writeToLog();
+
             while(out_provider->writingInProgress()) {
                 this->yield();
             }
