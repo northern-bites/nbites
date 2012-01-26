@@ -9,14 +9,14 @@
 #pragma once
 
 #include "BMPImage.h"
-#include "ColorSpace.h"
+#include "Color.h"
 #include "YUVImage.h"
 
 namespace qtool {
 namespace image {
 
 enum BitmapType {
-	Color,
+	RGB,
 	Y,
 	U,
 	V,
@@ -32,7 +32,7 @@ class BMPYUVImage : public BMPImage
 {
 
 public:
-    BMPYUVImage(man::memory::MImage::const_ptr rawImage, BitmapType type = Color);
+    BMPYUVImage(man::memory::MImage::const_ptr rawImage, BitmapType type = RGB);
     virtual ~BMPYUVImage() {};
 
     void buildBitmap();

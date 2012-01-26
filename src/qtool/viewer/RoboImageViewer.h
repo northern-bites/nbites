@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QPainter>
 #include "data/DataTypes.h"
-#include "man/include/Subscriber.h"
 #include "image/BMPImage.h"
 
 namespace qtool {

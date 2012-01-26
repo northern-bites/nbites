@@ -21,7 +21,6 @@
 
 #include <QGraphicsItem>
 #include <QColor>
-#include "ColorSpace.h"
 #include "man/memory/MImage.h"
 
 class YUVImage

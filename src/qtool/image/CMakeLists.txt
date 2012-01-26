@@ -16,7 +16,7 @@ add_definitions(${QT_DEFINITIONS})
 set( Image_srcs
     YUVImage
     BMPYUVImage
-    ColorSpace
+    Color
     ThresholdedImage
     )
 

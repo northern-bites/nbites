@@ -42,6 +42,7 @@ namespace qtool {
 namespace colorcreator {
 
 using data::DataManager;
+using namespace image;
 
 const QColor ColorCreator::RGBcolorValue[] = {
         QColor(255, 128, 0), //orange
@@ -148,6 +149,7 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     shape = Y;
 
     currentColor = Orange;
+    currentColorSpace = colorSpace[currentColor];
     currentDirectory = baseDirectory;
     currentColorDirectory = baseColorTable;
     zSlice = 0.75f;
@@ -360,9 +362,9 @@ void ColorCreator::updateColors()
       the H value based on the angle from the origin.  The S value is
       set according to the distance / radius, and the V is fixed (but
       settable by a slider). */
-        for (int i = 0; i < 200; i++)
+        for (int i = -100; i < 100; i++)
         {
-            for (int j = 0; j < 200; j++)
+            for (int j = -100; j < 100; j++)
             {
                 float dist = sqrt((i - 100) * (i - 100) + (j - 100) * (j - 100));
                 if (dist < 100.0)
@@ -389,7 +391,7 @@ void ColorCreator::updateColors()
                     {
                         display = false;
                     }
-                    ColorSpace col;
+                    Color col;
                     col.setHsz(h, s, zSlice);
                     int y = col.getYb();
                     int v = col.getVb();
@@ -938,7 +940,7 @@ void ColorCreator::writeNewFormat(QString filename)
             for (int y = 0; y < 128; y++)
             {
                 temp[0] = GREY_COL;
-                ColorSpace col;
+                Color col;
                 col.setYuv(y * 2, x * 2, z * 2);
                 for (int c = Orange; c < Black; c++)
                 {
@@ -997,7 +999,7 @@ void ColorCreator::writeOldFormat(QString filename)
             for (int y = 0; y < 128; y++)
             {
                 temp[0] = GREY_COL;
-                ColorSpace col;
+                Color col;
                 col.setYuv(y * 2, x * 2, z * 2);
                 bool orange = false;
                 bool yellow = false;

@@ -1,10 +1,13 @@
-#include "ColorSpace.h"
+#include "Color.h"
 
-ColorSpace::ColorSpace()
+namespace qtool {
+namespace image {
+
+Color::Color()
 {
 }
 
-float ColorSpace::getH()
+float Color::getH()
 {
     float h;
     if (getC() == 0.0f)
@@ -27,7 +30,7 @@ float ColorSpace::getH()
     return h / 6.0f;
 }
 
-void ColorSpace::setHsz(float h, float s, float z)
+void Color::setHsz(float h, float s, float z)
 {
     h = 6.0f * (h - (float)floor(h));
     float a = z * (1 - s);
@@ -73,3 +76,5 @@ void ColorSpace::setHsz(float h, float s, float z)
     }
 }
 
+}
+}

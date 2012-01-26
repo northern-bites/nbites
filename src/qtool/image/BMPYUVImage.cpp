@@ -21,7 +21,7 @@ void BMPYUVImage::buildBitmap() {
                         QImage::Format_RGB32);
     }
 
-    ColorSpace c;
+    Color c;
 
     byte** yImg = yuvImage.getYImage();
     byte** uImg = yuvImage.getUImage();
@@ -36,39 +36,39 @@ void BMPYUVImage::buildBitmap() {
 		    QColor color;
 
 			switch (this->bitmapType) {
-			case Color:
-			    qImageLine[i] = ColorSpace::RGBFromYUV(y, u, v);
+			case RGB:
+			    qImageLine[i] = Color::RGBFromYUV(y, u, v);
 				break;
 
 			case Y:
-			    qImageLine[i] = ColorSpace::makeRGB(y, y, y);
+			    qImageLine[i] = Color::makeRGB(y, y, y);
 				break;
 
 			case U:
-			    qImageLine[i] = ColorSpace::makeRGB(u, u, u);
+			    qImageLine[i] = Color::makeRGB(u, u, u);
 			    break;
 
 			case V:
-			    qImageLine[i] = ColorSpace::makeRGB(v, v, v);
+			    qImageLine[i] = Color::makeRGB(v, v, v);
 			    break;
 
 			case Red:
-			    color_byte = ColorSpace::redFromYUV(y, u, v);
-			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
+			    color_byte = Color::redFromYUV(y, u, v);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
 				break;
 
 			case Green:
-			    color_byte = ColorSpace::greenFromYUV(y, u, v);
-			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
+			    color_byte = Color::greenFromYUV(y, u, v);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
 				break;
 
 			case Blue:
-			    color_byte = ColorSpace::blueFromYUV(y, u, v);
-			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
+			    color_byte = Color::blueFromYUV(y, u, v);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
 				break;
 
 			case Hue:
-			    rgb = ColorSpace::RGBFromYUV(y, u, v);
+			    rgb = Color::RGBFromYUV(y, u, v);
 			    color = QColor(rgb);
 			    color.toHsv();
 			    color.setHsv(color.hsvHue(), color.hsvSaturation(), 200);
@@ -76,21 +76,21 @@ void BMPYUVImage::buildBitmap() {
 				break;
 
 			case Saturation:
-			    rgb = ColorSpace::RGBFromYUV(y, u, v);
+			    rgb = Color::RGBFromYUV(y, u, v);
 			    color = QColor(rgb);
 			    color_byte = (byte) (color.hsvSaturation());
-			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
 			    break;
 
 			case Value:
-			    rgb = ColorSpace::RGBFromYUV(y, u, v);
+			    rgb = Color::RGBFromYUV(y, u, v);
 			    color = QColor(rgb);
 			    color_byte = static_cast<byte>(color.value());
-			    qImageLine[i] = ColorSpace::makeRGBFromSingleByte(color_byte);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
 			    break;
 
 			default:
-			    qImageLine[i] = ColorSpace::makeRGB(0, 0, 0);
+			    qImageLine[i] = Color::makeRGB(0, 0, 0);
 				break;
 			}
 		}

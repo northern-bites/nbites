@@ -5,11 +5,12 @@
 #include <QWidget>
 
 //qtool
-#include "image/YUVImage.h"
+#include "image/BMPYUVImage.h"
 #include "data/DataManager.h"
 //colorcreator
 #include "ColorEdit.h"
 #include "ColorTable.h"
+#include "ColorSpace.h"
 
 #include <qmainwindow.h>
 
@@ -161,17 +162,8 @@ private:
     int edgediff;
     int mode;
     QColor *cols;
-    float *hMin;
-    float *hMax;
-    float *sMin;
-    float *sMax;
-    float *zMin;
-    float *zMax;
-    float zSlice;
-    int *yMin;
-    int *yMax;
-    int *vMin;
-    int *vMax;
+    ColorSpace colorSpace[COLORS];
+    ColorSpace* currentColorSpace;
     float statsHMin, statsHMax, statsSMin, statsSMax, statsZMin, statsZMax;
     int statsYMin, statsYMax, statsUMin, statsUMax, statsVMin, statsVMax;
     int currentColor;

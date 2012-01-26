@@ -4,13 +4,16 @@
 #include <cmath>
 #include "Common.h"
 
-class ColorSpace
+namespace qtool {
+namespace image {
+
+class Color
 {
     // holds an rgb value in the form #XXRRGGBB
     typedef unsigned int RGB;
 
 public:
-    ColorSpace();
+    Color();
 
     static byte redFromYUV(byte y, byte u, byte v) {
         return safeFloatToByte(y + 1.13983f * (v - 128.0f));
@@ -85,4 +88,8 @@ private:
 
     float red, grn, blue;
 };
+
+}
+}
+
 #endif // COLORSPACE_H

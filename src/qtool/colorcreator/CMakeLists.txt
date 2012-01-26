@@ -15,7 +15,6 @@ add_definitions(${QT_DEFINITIONS})
 
 set( ColorCreator_srcs
   ColorCreator.cpp
-  ColorZone.cpp
   ColorEdit.cpp
   ColorTable.cpp
   Stats.cpp )
