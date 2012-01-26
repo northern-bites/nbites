@@ -33,10 +33,10 @@ MAKE_FLAGS=--no-print-directory qtool
 
 default: build
 
-build: $(GEN_MAKEFILE)
+build: release
 	$(MAKE) $(MAKE_FLAGS) -C $(BIN_DIR)
 
-$(GEN_MAKEFILE):
+release:
 	$(MKDIR) -p $(BIN_DIR); \
 	$(CD) $(BIN_DIR); \
 	$(CMAKE) $(TOOLCHAIN_FLAG) $(CMAKE_RELEASE_CONFIG) $(SRC_DIR)
