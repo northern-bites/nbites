@@ -36,6 +36,8 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) :
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
     buttonLayout->addWidget(loadTableButton);
 
+    mainLayout->setAlignment(Qt::AlignTop);
+
     this->setLayout(mainLayout);
 }
 
