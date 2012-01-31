@@ -75,7 +75,7 @@ void OfflineViewer::loadMan() {
 
     QDockWidget* dockWidget =
             new QDockWidget(tr("Thresholded"), manMemoryViewer);
-    RoboImageViewer* threshView = new RoboImageViewer(threshImage, dockWidget);
+    BMPImageViewer* threshView = new BMPImageViewer(threshImage, dockWidget);
     dockWidget->setWidget(threshView);
 
     dockWidget->setMinimumSize(350, 300);

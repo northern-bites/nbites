@@ -1,4 +1,4 @@
-#include "RoboImageViewer.h"
+#include "BMPImageViewer.h"
 
 using namespace qtool::image;
 
@@ -8,41 +8,39 @@ using namespace std;
 namespace qtool {
 namespace viewer {
 
-RoboImageViewer::RoboImageViewer(image::BMPImage::ptr image,
+BMPImageViewer::BMPImageViewer(image::BMPImage::ptr image,
                                  QWidget *parent)
     : QWidget(parent), image(image) {
 
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(&imagePlaceholder);
+
+    this->setLayout(layout);
 }
 
-RoboImageViewer::~RoboImageViewer() {
+BMPImageViewer::~BMPImageViewer() {
 }
 
-void RoboImageViewer::updateView() {
+void BMPImageViewer::updateView() {
     if (this->isVisible()) {
         image->updateBitmap();
         //enqueues a repaint - thread-safe
         this->QWidget::update();
-        cout << "updating view!" << endl;
+        imagePlaceholder.setPixmap(QPixmap::fromImage(image->getBitmap()));
     }
 }
 
-QSize RoboImageViewer::minimumSizeHint() const
+QSize BMPImageViewer::minimumSizeHint() const
 {
     return QSize(image->getWidth(), image->getHeight());
 }
 
-QSize RoboImageViewer::sizeHint() const
+QSize BMPImageViewer::sizeHint() const
 {
     return QSize(image->getWidth(), image->getHeight());
 }
 
-void RoboImageViewer::paintEvent(QPaintEvent * /* event */)
-{
-    QPainter painter(this);
-    painter.drawImage(QPoint(0, 0), image->getBitmap());
-}
-
-void RoboImageViewer::showEvent(QShowEvent * ) {
+void BMPImageViewer::showEvent(QShowEvent * ) {
     //explicitely update the bitmap when the widget becomes visible again
     //since it might have changed!
     this->updateView();

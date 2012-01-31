@@ -16,7 +16,7 @@
 #include "man/memory/Memory.h"
 #include "image/BMPYUVImage.h"
 #include "data/RobotMemoryManager.h"
-#include "RoboImageViewer.h"
+#include "BMPImageViewer.h"
 #include "MObjectViewer.h"
 
 namespace qtool {
@@ -32,7 +32,7 @@ private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
     image::BMPImage::ptr image;
-    RoboImageViewer* roboImageViewer;
+    BMPImageViewer* roboImageViewer;
 
 };
 

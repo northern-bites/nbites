@@ -1,21 +1,27 @@
-#ifndef RENDERAREA_H
-#define RENDERAREA_H
+/**
+ * Renders a BMPImage
+ *
+ * @author Octavian Neamtu
+ */
+
+#pragma once
 
 #include <QWidget>
-#include <QPainter>
+#include <QLabel>
+#include <QLayout>
 #include "data/DataTypes.h"
 #include "image/BMPImage.h"
 
 namespace qtool {
 namespace viewer {
 
-class RoboImageViewer: public QWidget {
+class BMPImageViewer: public QWidget {
     Q_OBJECT
 public:
 
-    RoboImageViewer(image::BMPImage::ptr image,
+    BMPImageViewer(image::BMPImage::ptr image,
             QWidget *parent = NULL);
-    virtual ~RoboImageViewer();
+    virtual ~BMPImageViewer();
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
@@ -23,15 +29,13 @@ protected slots:
     void updateView();
 
 protected:
-    void paintEvent(QPaintEvent *event);
     void showEvent(QShowEvent* event);
 
-private:
+protected:
     image::BMPImage::ptr image;
+    QLabel imagePlaceholder;
 
 };
 
 }
 }
-
-#endif // RENDERAREA_H

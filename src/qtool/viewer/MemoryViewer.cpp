@@ -12,7 +12,7 @@ using namespace qtool::image;
 MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager),
                  image(new BMPYUVImage(memoryManager->getMemory()->getMImage())),
-                 roboImageViewer(new RoboImageViewer(image, this)) {
+                 roboImageViewer(new BMPImageViewer(image, this)) {
 
     this->setCentralWidget(roboImageViewer);
     memoryManager->connectSlotToMObject(roboImageViewer,
