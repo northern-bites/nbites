@@ -13,6 +13,8 @@
 namespace qtool {
 namespace colorcreator {
 
+using namespace image;
+
 ColorTable::ColorTable()
 {
     enabled = false;
@@ -325,7 +327,7 @@ void ColorTable::write(QString filename, float** fltSliders,
             for (int y = 0; y < 128; y++)
             {
                 temp[0] = GREY_COL;
-                ColorSpace col;
+                Color col;
                 col.setYuv(y * 2, x * 2, z * 2);
                 for (int c = Orange; c < Black; c++)
                 {
@@ -385,7 +387,7 @@ void ColorTable::writeOld(QString filename, float** fltSliders,
             for (int y = 0; y < 128; y++)
             {
                 temp[0] = GREY_COL;
-                ColorSpace col;
+                Color col;
                 col.setYuv(y * 2, x * 2, z * 2);
                 bool orange = false;
                 bool yellow = false;

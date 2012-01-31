@@ -42,6 +42,9 @@ signals:
  *
  * Manages a 1-1 map of SubscriberEmiterConvertor to MObjects
  * for all MObjects in the class Memory
+ *
+ * So when an MObject calls its updateSubscribers method, this
+ * interface translates that into a signal
  */
 
 class MemorySignalingInterface {

@@ -7,7 +7,7 @@ namespace qtool {
 
 using data::DataManager;
 using data::DataLoader;
-using colorcreator::ColorCreator;
+using colorcreator::ColorCalibrate;
 using viewer::MemoryViewer;
 using viewer::BallEKFViewer;
 using viewer::FieldViewer;
@@ -17,7 +17,7 @@ QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
-        colorCreator(new ColorCreator(dataManager)),
+        colorCalibrate(new ColorCalibrate(dataManager)),
         memoryViewer(new MemoryViewer(dataManager)),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
@@ -42,7 +42,7 @@ QTool::QTool() : QMainWindow(),
 
     this->setCentralWidget(toolTabs);
 
-    toolTabs->addTab(colorCreator, tr("Color Creator"));
+    toolTabs->addTab(colorCalibrate, tr("Color Calibrate"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
     toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
@@ -50,14 +50,11 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
     toolTabs->addTab(new remote::RobotSelect, tr("remote"));
 
-    dataManager->connectSlotToMObject(colorCreator,
-            SLOT(updatedImage()), man::memory::MIMAGE_ID);
+//    dataManager->connectSlotToMObject(colorCreator,
+//            SLOT(updatedImage()), man::memory::MIMAGE_ID);
 }
 
 QTool::~QTool() {
-    delete colorCreator;
-    delete dataLoader;
-    delete toolTabs;
 }
 
 void QTool::next() {

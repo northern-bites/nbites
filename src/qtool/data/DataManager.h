@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
 #include <QObject>
 
 #include "io/InProvider.h"

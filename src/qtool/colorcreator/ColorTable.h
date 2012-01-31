@@ -5,7 +5,7 @@
 #include <QTextStream>
 
 #include "Stats.h"
-#include "image/ColorSpace.h"
+#include "image/Color.h"
 
 #define UNDEFINED 0x00
 #define WHITE     0x01

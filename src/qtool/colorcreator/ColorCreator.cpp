@@ -62,7 +62,7 @@ const QColor ColorCreator::RGBcolorValue[] = {
 };
 
 ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     dataManager(dataManager),
     ui(new Ui::ColorCreator),
     yuvImage(dataManager->getMemory()->getMImage())
@@ -73,16 +73,6 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     img3 = new QImage(320, 240, QImage::Format_RGB32);
     img4 = new QImage(320, 240, QImage::Format_RGB32);
     wheel = new QImage(200, 200, QImage::Format_RGB32);
-    // Each color gets its own value for everything specified by sliders
-    fltSliders = new float*[FLT_SLIDERS];
-    intSliders = new int*[INT_SLIDERS];
-
-    register int i;
-    for (i = 0; i < FLT_SLIDERS; ++i) {
-      fltSliders[i] = new float[COLORS];
-      if (i < INT_SLIDERS)
-        intSliders[i] = new int[COLORS];
-    }
 
     cols = new QColor[COLORS+SOFT];
     bitColor = new unsigned[COLORS];
@@ -126,8 +116,8 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     defineMode = false;
     cornerStatus = true;
 
-    ui->modeSelect->addItem(tr("Define Mode"), 0);
-    ui->modeSelect->addItem(tr("Table Mode"), 1);
+//    ui->modeSelect->addItem(tr("Define Mode"), 0);
+//    ui->modeSelect->addItem(tr("Table Mode"), 1);
 
     ui->colorSelect->addItem(tr("Orange"), Orange);
     ui->colorSelect->addItem(tr("Blue"), Blue);
@@ -157,12 +147,9 @@ ColorCreator::ColorCreator(DataManager::ptr dataManager, QWidget *parent) :
     shape = Y;
 
     currentColor = Orange;
-<<<<<<< HEAD
-    currentColorSpace = colorSpace[currentColor];
+    currentColorSpace = &colorSpace[currentColor];
+    colorSpaceWidget.setColorSpace(currentColorSpace);
     currentDirectory = baseDirectory;
-=======
-    currentDirectory = baseFrameDirectory;
->>>>>>> ejqtool
     currentColorDirectory = baseColorTable;
     zSlice = 0.75f;
 
@@ -251,7 +238,7 @@ void ColorCreator::paintEvent(QPaintEvent * /* event */)
                 {
                     dataFileStream >> nextString;
                     if (!(j==0))
-                        fltSliders[i][j-1] = nextString.toFloat();
+//                        fltSliders[i][j-1] = nextString.toFloat();
                 }
             }
 
@@ -261,7 +248,7 @@ void ColorCreator::paintEvent(QPaintEvent * /* event */)
                 {
                     dataFileStream >> nextString;
                     if (!(j==0))
-                        intSliders[i][j-1] = nextString.toInt();
+//                        intSliders[i][j-1] = nextString.toInt();
                 }
             }
             qDebug() << "Succesfully Set Slider values from: " << filename << endl;
@@ -313,7 +300,7 @@ void ColorCreator::paintEvent(QPaintEvent * /* event */)
                     newFileStream << "zMax ";
 
                 for (int j=0; j<8; j++)
-                    newFileStream << fltSliders[i][j] << " ";
+//                    newFileStream << fltSliders[i][j] << " ";
                 newFileStream << endl;
             }
 
@@ -330,7 +317,7 @@ void ColorCreator::paintEvent(QPaintEvent * /* event */)
                     newFileStream << "vMax ";
 
                 for (int j=0; j<8; j++)
-                    newFileStream << intSliders[i][j] << " ";
+//                    newFileStream << intSliders[i][j] << " ";
                 newFileStream << endl;
             }
         }
@@ -428,34 +415,10 @@ void ColorCreator::updateColors()
                     {
                         h = 1.0f + h;
                     }
-                    // Since H is an angle the math is modulo.
-                    if (fltSliders[hMax][currentColor] > fltSliders[hMin][currentColor])
-                    {
-                        if (fltSliders[hMin][currentColor] > h || fltSliders[hMax][currentColor] < h)
-                        {
-                            display = false;
-                        }
-                    } else if (fltSliders[hMin][currentColor] > h && fltSliders[hMax][currentColor] < h )
-                    {
-                        display = false;
-                    }
-                    if (s < fltSliders[sMin][currentColor] || s > fltSliders[sMax][currentColor])
-                    {
-                        display = false;
-                    }
-                    Color col;
-                    col.setHsz(h, s, zSlice);
-                    int y = col.getYb();
-                    int v = col.getVb();
-                    if (y < intSliders[yMin][currentColor] || y > intSliders[yMax][currentColor])
-                    {
-                        display = false;
-                    }
-                    if (v < intSliders[vMin][currentColor] || v > intSliders[vMax][currentColor])
-                    {
-                        display = false;
-                    }
-                    if (display)
+                    Color color;
+                    color.setHsz(h, s, zSlice);
+                    QColor c;
+                    if (currentColorSpace->contains(color));
                     {
                         c.setHsvF(h, s, zSlice);
                     } else{
@@ -622,32 +585,9 @@ QColor ColorCreator::displayColorTable(int i, int j)
 bool ColorCreator::testValue(float h, float s, float z, int y, int u, int v, int color)
 {
     if (!tableMode || !haveFile) {
-        if (fltSliders[hMax][color] > fltSliders[hMin][color])
-        {
-            if (fltSliders[hMin][color] > h || fltSliders[hMax][color] < h)
-            {
-                return false;
-            }
-        } else if (fltSliders[hMin][color] > h && fltSliders[hMax][color] < h )
-        {
-            return false;
-        }
-        if (s < fltSliders[sMin][color] || s > fltSliders[sMax][color])
-        {
-            return false;
-        }
-        else if (z < fltSliders[zMin][color] || z > fltSliders[zMax][color])
-        {
-            return false;
-        }
-        else if (y < intSliders[yMin][color] || y > intSliders[yMax][color])
-        {
-            return false;
-        } else if (v < intSliders[vMin][color] || v > intSliders[vMax][color])
-        {
-            return false;
-        }
-        return true;
+        Color c;
+        c.setHsz(h, s, z);
+        return currentColorSpace->contains(c);
     } else {
         unsigned col = table->index(y, u, v);
         return col & bitColor[color];
@@ -938,7 +878,7 @@ void ColorCreator::modeChanged()
 
 void ColorCreator::on_hMin_valueChanged(int value)
 {
-    fltSliders[hMin][currentColor] = (float)value / 100.0f;
+//    fltSliders[hMin][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set H Min value to " << value << "\n";
@@ -946,7 +886,7 @@ void ColorCreator::on_hMin_valueChanged(int value)
 
 void ColorCreator::on_hMax_valueChanged(int value)
 {
-    fltSliders[hMax][currentColor] = (float)value / 100.0f;
+//    fltSliders[hMax][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set H Max value to " << value << "\n";
@@ -954,7 +894,7 @@ void ColorCreator::on_hMax_valueChanged(int value)
 
 void ColorCreator::on_sMin_valueChanged(int value)
 {
-    fltSliders[sMin][currentColor] = (float)value / 100.0f;
+//    fltSliders[sMin][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set S Min value to " << value << "\n";
@@ -962,7 +902,7 @@ void ColorCreator::on_sMin_valueChanged(int value)
 
 void ColorCreator::on_sMax_valueChanged(int value)
 {
-    fltSliders[sMax][currentColor] = (float)value / 100.0f;
+//    fltSliders[sMax][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set S Max value to " << value << "\n";
@@ -970,7 +910,7 @@ void ColorCreator::on_sMax_valueChanged(int value)
 
 void ColorCreator::on_zMin_valueChanged(int value)
 {
-    fltSliders[zMin][currentColor] = (float)value / 100.0f;
+//    fltSliders[zMin][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set Z Min value to " << value << "\n";
@@ -978,7 +918,7 @@ void ColorCreator::on_zMin_valueChanged(int value)
 
 void ColorCreator::on_zMax_valueChanged(int value)
 {
-    fltSliders[zMax][currentColor] = (float)value / 100.0f;
+//    fltSliders[zMax][currentColor] = (float)value / 100.0f;
     updateColors();
     QTextStream out(stdout);
     out << "Set Z Max value to " << value << "\n";
@@ -986,7 +926,7 @@ void ColorCreator::on_zMax_valueChanged(int value)
 
 void ColorCreator::on_yMin_valueChanged(int value)
 {
-    intSliders[yMin][currentColor] = value;
+//    intSliders[yMin][currentColor] = value;
     updateColors();
     QTextStream out(stdout);
     out << "Set Y Min value to " << value << "\n";
@@ -994,7 +934,7 @@ void ColorCreator::on_yMin_valueChanged(int value)
 
 void ColorCreator::on_yMax_valueChanged(int value)
 {
-    intSliders[yMax][currentColor] = value;
+//    intSliders[yMax][currentColor] = value;
     updateColors();
     QTextStream out(stdout);
     out << "Set Y Max value to " << value << "\n";
@@ -1002,7 +942,7 @@ void ColorCreator::on_yMax_valueChanged(int value)
 
 void ColorCreator::on_vMin_valueChanged(int value)
 {
-    intSliders[vMin][currentColor] = value;
+//    intSliders[vMin][currentColor] = value;
     updateColors();
     QTextStream out(stdout);
     out << "Set V Min value to " << value << "\n";
@@ -1010,7 +950,7 @@ void ColorCreator::on_vMin_valueChanged(int value)
 
 void ColorCreator::on_vMax_valueChanged(int value)
 {
-    intSliders[vMax][currentColor] = value;
+//    intSliders[vMax][currentColor] = value;
     updateColors();
     QTextStream out(stdout);
     out << "Set V Max value to " << value << "\n";
@@ -1032,16 +972,16 @@ void ColorCreator::on_readSliders_clicked()
 				 tr(""));
   setInitialColorValuesFromFile(filename);
 
-   ui->hMin->setValue(fltSliders[hMin][currentColor] * 100);
-    ui->hMax->setValue(fltSliders[hMax][currentColor] * 100);
-    ui->sMin->setValue(fltSliders[sMin][currentColor] * 100);
-    ui->sMax->setValue(fltSliders[sMax][currentColor] * 100);
-    ui->zMin->setValue(fltSliders[zMin][currentColor] * 100);
-    ui->zMax->setValue(fltSliders[zMax][currentColor] * 100);
-    ui->yMin->setValue(intSliders[yMin][currentColor]);
-    ui->yMax->setValue(intSliders[yMax][currentColor]);
-    ui->vMin->setValue(intSliders[vMin][currentColor]);
-    ui->vMax->setValue(intSliders[vMax][currentColor]);
+//   ui->hMin->setValue(fltSliders[hMin][currentColor] * 100);
+//    ui->hMax->setValue(fltSliders[hMax][currentColor] * 100);
+//    ui->sMin->setValue(fltSliders[sMin][currentColor] * 100);
+//    ui->sMax->setValue(fltSliders[sMax][currentColor] * 100);
+//    ui->zMin->setValue(fltSliders[zMin][currentColor] * 100);
+//    ui->zMax->setValue(fltSliders[zMax][currentColor] * 100);
+//    ui->yMin->setValue(intSliders[yMin][currentColor]);
+//    ui->yMax->setValue(intSliders[yMax][currentColor]);
+//    ui->vMin->setValue(intSliders[vMin][currentColor]);
+//    ui->vMax->setValue(intSliders[vMax][currentColor]);
 }
 
 void ColorCreator::on_writeSliders_clicked()
@@ -1085,7 +1025,7 @@ void ColorCreator::on_writeTable_clicked()
     ".mtb";
   if (ok && !filename.isEmpty()) {
     //writeOldFormat(filename);
-    table->write(filename, fltSliders, intSliders, bitColor);
+//    table->write(filename, fltSliders, intSliders, bitColor);
   }
 }
 
@@ -1144,17 +1084,18 @@ void ColorCreator::on_changeColor_clicked()
 void ColorCreator::on_colorSelect_currentIndexChanged(int index)
 {
     currentColor = index;
-    ui->hMin->setValue(fltSliders[hMin][currentColor] * 100);
-    ui->hMax->setValue(fltSliders[hMax][currentColor] * 100);
-    ui->sMin->setValue(fltSliders[sMin][currentColor] * 100);
-    ui->sMax->setValue(fltSliders[sMax][currentColor] * 100);
-    ui->zMin->setValue(fltSliders[zMin][currentColor] * 100);
-    ui->zMax->setValue(fltSliders[zMax][currentColor] * 100);
-    ui->yMin->setValue(intSliders[yMin][currentColor]);
-    ui->yMax->setValue(intSliders[yMax][currentColor]);
-    ui->vMin->setValue(intSliders[vMin][currentColor]);
-    ui->vMax->setValue(intSliders[vMax][currentColor]);
-    ui->zSlice->setValue((fltSliders[zMin][currentColor] + fltSliders[zMax][currentColor]) * 50);
+    currentColorSpace = &colorSpace[currentColor];
+//    ui->hMin->setValue(fltSliders[hMin][currentColor] * 100);
+//    ui->hMax->setValue(fltSliders[hMax][currentColor] * 100);
+//    ui->sMin->setValue(fltSliders[sMin][currentColor] * 100);
+//    ui->sMax->setValue(fltSliders[sMax][currentColor] * 100);
+//    ui->zMin->setValue(fltSliders[zMin][currentColor] * 100);
+//    ui->zMax->setValue(fltSliders[zMax][currentColor] * 100);
+//    ui->yMin->setValue(intSliders[yMin][currentColor]);
+//    ui->yMax->setValue(intSliders[yMax][currentColor]);
+//    ui->vMin->setValue(intSliders[vMin][currentColor]);
+//    ui->vMax->setValue(intSliders[vMax][currentColor]);
+//    ui->zSlice->setValue((fltSliders[zMin][currentColor] + fltSliders[zMax][currentColor]) * 50);
 }
 
 /* Called when the user wants to view something different.

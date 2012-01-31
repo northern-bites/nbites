@@ -80,6 +80,7 @@ public:
     int getHb() { return cvb(getH());}
     int getSb() { return cvb(getS());}
     int getZb() { return cvb(getZ());}
+    RGB getRGB() { return makeRGB(getRb(), getGb(), getBb());}
 
     static float min(float a, float b) {if (a < b) return a; return b;}
     static float max(float a, float b) {if (a > b) return a; return b;}

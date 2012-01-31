@@ -13,7 +13,7 @@
 
 #include "data/DataLoader.h"
 #include "data/DataManager.h"
-#include "colorcreator/ColorCreator.h"
+#include "colorcreator/ColorCalibrate.h"
 #include "viewer/MemoryViewer.h"
 #include "offline/OfflineViewer.h"
 #include "viewer/BallEKFViewer.h"
@@ -40,7 +40,7 @@ private:
 
     data::DataManager::ptr dataManager;
     data::DataLoader* dataLoader;
-    colorcreator::ColorCreator* colorCreator;
+    colorcreator::ColorCalibrate* colorCalibrate;
     viewer::MemoryViewer* memoryViewer;
     offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;

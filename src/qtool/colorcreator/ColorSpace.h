@@ -1,51 +1,108 @@
-#ifndef COLORZONE_H
-#define COLORZONE_H
+/**
+ * @class ColorSpace
+ *
+ * Defines a chunk of the entire color space through some parameters
+ * Useful to define a chunk of the color space defines one color
+ * in thresholding
+ *
+ * @author Octavian Neamtu with code from Eric Chown and EJ Googins
+ */
+#pragma once
 
+#include <string>
+#include <QObject>
 #include "image/Color.h"
+#include "ClassHelper.h"
 
 namespace qtool {
 namespace colorcreator {
 
-class ColorSpace {
+static const std::string fltChannel_names[] = {
+        "hMin", "hMax",
+        "sMin", "sMax",
+        "zMin", "zMax"
+};
+
+static const std::string intChannel_names[] = {
+        "yMin", "yMax",
+        "vMin", "vMax"
+};
+
+class ColorSpace : public QObject {
+
+    Q_OBJECT;
+    ADD_NULL_INSTANCE(ColorSpace)
 
 public:
-    ColorSpace();
+    enum fltChannel {
+        hMin, hMax,
+        sMin, sMax,
+        zMin, zMax,
+        NUM_FLOAT_CHANNELS};
 
-    bool contains(image::Color color) {
+    enum intChannel {
+        yMin, yMax,
+        vMin, vMax,
+        NUM_INT_CHANNELS};
+
+
+public:
+
+    ColorSpace() {
+    }
+    virtual ~ColorSpace() {}
+
+    bool contains(image::Color color) const {
 
         // the circle can wrap around
         int h = color.getHb();
         int s = color.getSb();
-        if (hHi > hLo) {
-            if (hLo > h || hHi < h) {
+        if (floatParams[hMin] > floatParams[hMax]) {
+            if (floatParams[hMin] > h || floatParams[hMax] < h) {
                 return false;
             }
-        } else if (hLo > h && hHi < h) {
+        } else if (floatParams[hMin] > h && floatParams[hMax] < h) {
             return false;
         }
-        if (s < sLo || s > sHi) {
+        if (s < floatParams[sMin] || s > floatParams[sMax]) {
             return false;
         }
 
         int y = color.getYb();
         int v = color.getVb();
-        if (y < yLo || y > yHi) {
+        if (y < intParams[yMin] || y > intParams[yMax]) {
             return false;
         }
-        if (v < vLo || v > vHi) {
+        if (v < intParams[vMin] || v > intParams[vMax]) {
             return false;
         }
         return true;
     }
 
-    float hLo, hHi;
-    float sLo, sHi;
-    float yLo, yHi;
-    float vLo, vHi;
-    float zSlice;
+    void setParameter(fltChannel channel, float value) {
+        floatParams[channel] = value;
+        emit parametersChanged();
+    }
+    void setParameter(intChannel channel, int value) {
+        intParams[channel] = value;
+        emit parametersChanged();
+    }
+    int getParameter(intChannel channel) {
+        return intParams[channel];
+    }
+    float getParameter(fltChannel channel) {
+        return floatParams[channel];
+    }
+
+signals:
+    void parametersChanged();
+
+private:
+    float floatParams[NUM_FLOAT_CHANNELS];
+    int   intParams[NUM_INT_CHANNELS];
+
 };
 
 }
 }
 
-#endif // COLORZONE_H
