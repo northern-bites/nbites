@@ -11,9 +11,11 @@ CommandSender::CommandSender() : latestCmd(),
 {
 }
 
+// Gets called when a new command is found.
 void CommandSender::update(string newCmd)
 {
     latestCmd = newCmd;
+    // Python will set this back to false after cmd is recieved.
     changed = true;
 
 #ifdef DEBUG_COMMAND

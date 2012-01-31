@@ -9,8 +9,11 @@ shared_ptr<CommandSender> cs_pointer;
 BOOST_PYTHON_MODULE(sender)
 {
     class_<CommandSender, shared_ptr<CommandSender> >("Sender", no_init)
+        // Boolean for whether there is a new command or not.
+        // Can be both read and set from Python.
         .add_property("changed", &CommandSender::hasNewCommand,
                       &CommandSender::setChanged)
+        // Cmd itself. Can only be read from Python.
         .add_property("command", &CommandSender::getCommand)
         ;
 

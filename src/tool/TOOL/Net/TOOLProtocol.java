@@ -400,7 +400,9 @@ public class TOOLProtocol {
     public void sendCommand(byte[] cmd) {
         initConnection();
         try {
+            // Writes the COMMAND_MSG id byte
             serial.writeByte(COMMAND_MSG);
+            // Writes the message into the data serializer for robot to read
             serial.writeBytes(cmd);
             serial.flush();
         }catch (IOException e) {

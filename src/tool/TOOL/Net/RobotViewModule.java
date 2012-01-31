@@ -148,9 +148,12 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
         setupCommandInput(subPanel);
     }
 
+    // Creates an input field for the command sender.
+    // Type valid Python code here and it will be sent to the Robot.
     private void setupCommandInput(JPanel subPanel){
         JPanel cmdPanel = new JPanel(new GridBagLayout());
 
+        // Text field for input
         textField = new JTextField(20);
         textField.addActionListener( new ActionListener() {
                 public void actionPerformed(ActionEvent e){
@@ -162,6 +165,7 @@ public class RobotViewModule extends TOOLModule implements PopupMenuListener {
                 }
             });
 
+        // Text area holds old commands for reference
         textArea = new JTextArea(10, 20);
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);

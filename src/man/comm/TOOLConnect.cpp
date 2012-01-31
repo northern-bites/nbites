@@ -125,6 +125,7 @@ TOOLConnect::receive () throw(socket_error&)
 
         state = TOOL_COMMANDING;
 
+        // reads the 256-byte message send in from Java
         byte cmd[SIZEOF_COMMAND];
         serial.read_bytes((byte*)&cmd[0], SIZEOF_COMMAND);
 
@@ -132,6 +133,7 @@ TOOLConnect::receive () throw(socket_error&)
         printf("Command recieved: %s\n", cmd);
 #endif
 
+        // Updates the CommandSender with new information
         sender->update((const char*)cmd);
 
     } else if (b == DISCONNECT) {

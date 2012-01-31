@@ -279,13 +279,19 @@ public class RemoteRobot extends FileSet {
 		}
 	}
 
+    // For sending a command; s will come from the input field of the GUI
     public void sendCmd(String s) {
         byte[] sBytes = s.getBytes();
+
+        // Robot expects command to be 256 bytes for simplicity
         byte[] fix = new byte[SIZEOF_COMMAND];
         for (int i = 0; i < sBytes.length; i++) {
             fix[i] = sBytes[i];
         }
+
+        // Terminating characer for the C string
         fix[sBytes.length] = '\0';
+
         proto.sendCommand(fix);
         System.out.println("Sent command: " + s);
     }

@@ -256,13 +256,17 @@ class Brain(object):
         # Update any logs we have
         self.out.updateLogs()
 
+        # Check to see if the tool sent a new command
         if self.sender.changed:
+            # If no syntax error (hopefully), prints cmd and executes it
             try:
                 print "Executing command: " + self.sender.command
                 exec(self.sender.command)
+            # Will catch most syntax errors, prints an error
             except(RuntimeError, SyntaxError, TypeError, \
                    NameError, AttributeError):
                 print "Error in command."
+            # Sets the CommandSender back to normal
             self.sender.changed = False
 
     def updateComm(self):
