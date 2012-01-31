@@ -23,6 +23,7 @@ class ColorWheel : public QWidget {
 
 public:
     static const int DEFAULT_SIZE = 200;
+    static const int DEFAULT_RADIUS = 100;
     static const float ZSLICE_RANGE = 256.0f;
 
 public:
@@ -31,7 +32,10 @@ public:
     virtual ~ColorWheel() {}
 
     QSize minimumSizeHint() const { return sizeHint(); }
-    QSize sizeHint() const { return QSize(DEFAULT_SIZE, DEFAULT_SIZE); }
+    QSize sizeHint() const {
+        //hack to size this widget properly
+        return QSize(DEFAULT_SIZE + zSlider.width() + 25, DEFAULT_SIZE);
+    }
 
 protected slots:
     void updateWheel();
@@ -40,9 +44,9 @@ protected slots:
 
 private:
     ColorSpace* colorSpace;
-    QImage* wheelImage;
-    QLabel* wheelImagePlaceholder;
-    QSlider* zSlider;
+    QImage wheelImage;
+    QLabel wheelImagePlaceholder;
+    QSlider zSlider;
     float zSlice;
 
 };

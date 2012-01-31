@@ -52,21 +52,26 @@ public:
     bool contains(image::Color color) const {
 
         // the circle can wrap around
-        int h = color.getHb();
-        int s = color.getSb();
+        float h = color.getH();
+        float s = color.getS();
+        float z = color.getZ();
         if (params[hMin] > params[hMax]) {
-            if (params[hMin] > h || params[hMax] < h) {
+            if (params[hMax] < h && h < params[hMin]) {
                 return false;
             }
-        } else if (params[hMin] > h && params[hMax] < h) {
+        } else if (params[hMax] < h || h < params[hMin]) {
             return false;
         }
         if (s < params[sMin] || s > params[sMax]) {
             return false;
         }
+        if (z < params[zMin] || z > params[zMax]) {
+            return false;
+        }
 
-        int y = color.getYb();
-        int v = color.getVb();
+        float y = color.getY();
+        // add 0.5f to normalize to a 0 to 1 range
+        float v = color.getV() + 0.5f;
         if (y < params[yMin] || y > params[yMax]) {
             return false;
         }

@@ -32,48 +32,60 @@ float Color::getH()
 
 void Color::setHsz(float h, float s, float z)
 {
-    h = 6.0f * (h - (float)floor(h));
-    float a = z * (1 - s);
-    float b = z * (1 - s * (1 - fabs(((int)h + 5) % 2 - 1)));
+    //h is an angle, so it wraps around, so when it's 1 it should be 0
+    h = h - floor(h);
 
-    switch ((int)h)
+    //h is an angle; this determines which slice of the circle we are
+    //on when the circle is split in 6
+    float h1 = 6.0f * h;
+
+    //f is the angle offset within the current slice
+    float f = h1 - (int)(h1) + (int)(h1)%2;
+
+    float chroma = z*s;
+    float x = chroma*(1 - fabs(f - 1));
+
+    switch ((int)h1)
     {
     case 0:
-        red = z;
-        grn = b;
-        blue = a;
+        red = chroma;
+        grn = x;
+        blue = 0;
         break;
 
     case 1:
-        red = b;
-        grn = z;
-        blue = a;
+        red = x;
+        grn = chroma;
+        blue = 0;
         break;
 
     case 2:
-        red = a;
-        grn = z;
-        blue = b;
+        red = 0;
+        grn = chroma;
+        blue = x;
         break;
 
     case 3:
-        red = a;
-        grn = b;
-        blue = z;
+        red = 0;
+        grn = x;
+        blue = chroma;
         break;
 
     case 4:
-        red = b;
-        grn = a;
-        blue = z;
+        red = x;
+        grn = 0;
+        blue = chroma;
         break;
 
     case 5:
-        red = z;
-        grn = a;
-        blue = b;
+        red = chroma;
+        grn = 0;
+        blue = x;
         break;
     }
+
+    float m = z - chroma;
+    red+=m; grn+=m; blue+=m;
 }
 
 }
