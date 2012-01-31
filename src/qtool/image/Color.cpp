@@ -3,7 +3,7 @@
 namespace qtool {
 namespace image {
 
-Color::Color()
+Color::Color() : red(0), grn(0), blue(0)
 {
 }
 

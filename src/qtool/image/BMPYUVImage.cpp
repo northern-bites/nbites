@@ -33,60 +33,49 @@ void BMPYUVImage::buildBitmap() {
 		    byte y = yImg[i][j], u = uImg[i][j], v = vImg[i][j];
 		    byte color_byte;
 		    QRgb rgb;
-		    QColor color;
+		    Color color;
+		    color.setYuv(y, u, v);
 
 			switch (this->bitmapType) {
 			case RGB:
-			    qImageLine[i] = Color::RGBFromYUV(y, u, v);
+			    qImageLine[i] = color.getRGB();
 				break;
 
 			case Y:
-			    qImageLine[i] = Color::makeRGB(y, y, y);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(y);
 				break;
 
 			case U:
-			    qImageLine[i] = Color::makeRGB(u, u, u);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(u);
 			    break;
 
 			case V:
-			    qImageLine[i] = Color::makeRGB(v, v, v);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(v);
 			    break;
 
 			case Red:
-			    color_byte = Color::redFromYUV(y, u, v);
-			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color.getRb());
 				break;
 
 			case Green:
-			    color_byte = Color::greenFromYUV(y, u, v);
-			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color.getGb());
 				break;
 
 			case Blue:
-			    color_byte = Color::blueFromYUV(y, u, v);
-			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color.getBb());
 				break;
 
 			case Hue:
-			    rgb = Color::RGBFromYUV(y, u, v);
-			    color = QColor(rgb);
-			    color.toHsv();
-			    color.setHsv(color.hsvHue(), color.hsvSaturation(), 200);
-			    qImageLine[i] = color.rgb();
+			    color.setHsz(color.getH(), color.getS(), 0.875f);
+			    qImageLine[i] = color.getRGB();
 				break;
 
 			case Saturation:
-			    rgb = Color::RGBFromYUV(y, u, v);
-			    color = QColor(rgb);
-			    color_byte = (byte) (color.hsvSaturation());
-			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color.getSb());
 			    break;
 
 			case Value:
-			    rgb = Color::RGBFromYUV(y, u, v);
-			    color = QColor(rgb);
-			    color_byte = static_cast<byte>(color.value());
-			    qImageLine[i] = Color::makeRGBFromSingleByte(color_byte);
+			    qImageLine[i] = Color::makeRGBFromSingleByte(color.getVb());
 			    break;
 
 			default:

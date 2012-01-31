@@ -34,16 +34,13 @@ class ColorSpace : public QObject {
     ADD_NULL_INSTANCE(ColorSpace)
 
 public:
-    enum fltChannel {
+    enum Channel {
         hMin, hMax,
         sMin, sMax,
         zMin, zMax,
-        NUM_FLOAT_CHANNELS};
-
-    enum intChannel {
         yMin, yMax,
         vMin, vMax,
-        NUM_INT_CHANNELS};
+        NUM_CHANNELS };
 
 
 public:
@@ -57,49 +54,42 @@ public:
         // the circle can wrap around
         int h = color.getHb();
         int s = color.getSb();
-        if (floatParams[hMin] > floatParams[hMax]) {
-            if (floatParams[hMin] > h || floatParams[hMax] < h) {
+        if (params[hMin] > params[hMax]) {
+            if (params[hMin] > h || params[hMax] < h) {
                 return false;
             }
-        } else if (floatParams[hMin] > h && floatParams[hMax] < h) {
+        } else if (params[hMin] > h && params[hMax] < h) {
             return false;
         }
-        if (s < floatParams[sMin] || s > floatParams[sMax]) {
+        if (s < params[sMin] || s > params[sMax]) {
             return false;
         }
 
         int y = color.getYb();
         int v = color.getVb();
-        if (y < intParams[yMin] || y > intParams[yMax]) {
+        if (y < params[yMin] || y > params[yMax]) {
             return false;
         }
-        if (v < intParams[vMin] || v > intParams[vMax]) {
+        if (v < params[vMin] || v > params[vMax]) {
             return false;
         }
         return true;
     }
 
-    void setParameter(fltChannel channel, float value) {
-        floatParams[channel] = value;
+    void setParameter(Channel channel, float value) {
+        params[channel] = value;
         emit parametersChanged();
     }
-    void setParameter(intChannel channel, int value) {
-        intParams[channel] = value;
-        emit parametersChanged();
-    }
-    int getParameter(intChannel channel) {
-        return intParams[channel];
-    }
-    float getParameter(fltChannel channel) {
-        return floatParams[channel];
+
+    float getParameter(Channel channel) {
+        return params[channel];
     }
 
 signals:
     void parametersChanged();
 
 private:
-    float floatParams[NUM_FLOAT_CHANNELS];
-    int   intParams[NUM_INT_CHANNELS];
+    float params[NUM_CHANNELS];
 
 };
 

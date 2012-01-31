@@ -22,7 +22,6 @@ class ColorSpaceWidget: public QWidget {
 
 public:
     static const float FLOAT_SLIDER_SCALE = 256.0f;
-    static const int INT_SLIDER_MAX = 255;
 
 public:
     ColorSpaceWidget(ColorSpace* colorSpace = ColorSpace::NullInstance(),
@@ -34,8 +33,7 @@ public slots:
     void setColorSpace(ColorSpace* _colorSpace);
 
 private:
-    QMap<QSlider*, ColorSpace::intChannel> intSliders;
-    QMap<QSlider*, ColorSpace::fltChannel> floatSliders;
+    QMap<QSlider*, ColorSpace::Channel> sliders;
     ColorSpace* colorSpace;
 };
 

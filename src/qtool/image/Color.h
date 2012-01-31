@@ -15,23 +15,6 @@ class Color
 public:
     Color();
 
-    static byte redFromYUV(byte y, byte u, byte v) {
-        return safeFloatToByte(y + 1.13983f * (v - 128.0f));
-    }
-
-    static byte blueFromYUV(byte y, byte u, byte v) {
-        return safeFloatToByte(y + 2.03211f * (u - 128.0f));
-    }
-
-    static byte greenFromYUV(byte y, byte u, byte v) {
-        return safeFloatToByte(y - 0.39465f * (u - 128.0f) - 0.58060f * (v - 128.0f));
-    }
-
-    //topmost bytes are set to #FF
-    static RGB RGBFromYUV(byte y, byte u, byte v) {
-        return makeRGB(redFromYUV(y, u, v), greenFromYUV(y, u, v),  blueFromYUV(y, u, v));
-    }
-
     static RGB makeRGB(byte r, byte g, byte b, byte a = 0xFF) {
         RGB result;
         ((byte*) &result)[3] = a;
@@ -58,11 +41,18 @@ public:
     bool valid() { return 0 <= red && red < 1 && 0 <= grn && grn < 1 && 0 <= blue && blue < 1;}
 
     void setRgb(float r, float g, float b) { red = r; grn = g; blue = b;}
-    void setRgb(int r, int g, int b) { setRgb((float)r / 256.0f, (float)g / 256.0f, (float)b / 256.0f);}
-    void setYuv(float y, float u, float v) { red = y + 1.13983f * v; grn = y - 0.39465f * u - 0.58060f * v;
-                                             blue = y + 2.03211f * u;}
-    void setYuv(int y, int u, int v) {setYuv((float)y / 256.0f, (float)(u - 128) / 256.0f,
-                                             (float)(v - 128) / 256.0f);}
+    void setRgb(byte r, byte g, byte b) {
+        setRgb((float)r / 256.0f, (float)g / 256.0f, (float)b / 256.0f);}
+
+    void setYuv(float y, float u, float v) {
+        red = y + 1.13983f * v;
+        grn = y - 0.39465f * u - 0.58060f * v;
+        blue = y + 2.03211f * u;
+    }
+    void setYuv(byte y, byte u, byte v) {
+        setYuv((float)y / 256.0f, (float)u / 256.0f - 0.5f, (float)v / 256.0f - 0.5f);
+    }
+
     void setHsz(float h, float s, float z);
 
     // guards against negative values and values that might overflow in a byte
@@ -70,16 +60,16 @@ public:
         return (byte) min(max(x, 0.0f), 255.0f);
     }
 
-    int cvb(float x) {return (int)(min(max(256 * x, 0.0f), 255.0f));}
-    int getRb() { return cvb(red);}
-    int getGb() { return cvb(grn);}
-    int getBb() { return cvb(blue);}
-    int getYb() { return cvb(getY());}
-    int getUb() { return cvb(getU() + 0.5f);}
-    int getVb() { return cvb(getV() + 0.5f);}
-    int getHb() { return cvb(getH());}
-    int getSb() { return cvb(getS());}
-    int getZb() { return cvb(getZ());}
+    byte cvb(float x) {return (byte)(min(max(256 * x, 0.0f), 255.0f));}
+    byte getRb() { return cvb(red);}
+    byte getGb() { return cvb(grn);}
+    byte getBb() { return cvb(blue);}
+    byte getYb() { return cvb(getY());}
+    byte getUb() { return cvb(getU() + 0.5f);}
+    byte getVb() { return cvb(getV() + 0.5f);}
+    byte getHb() { return cvb(getH());}
+    byte getSb() { return cvb(getS());}
+    byte getZb() { return cvb(getZ());}
     RGB getRGB() { return makeRGB(getRb(), getGb(), getBb());}
 
     static float min(float a, float b) {if (a < b) return a; return b;}

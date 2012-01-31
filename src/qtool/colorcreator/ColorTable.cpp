@@ -320,15 +320,15 @@ void ColorTable::write(QString filename, float** fltSliders,
     }
     // loop through all possible table values - our tables are v-u-y
     int count = 0;
-    for (int z = 0; z < 128; ++z)
+    for (byte z = 0; z < 255; z+=2)
     {
-        for (int x = 0; x < 128; x ++)
+        for (byte x = 0; x < 255; x+=2)
         {
-            for (int y = 0; y < 128; y++)
+            for (byte y = 0; y < 255; y+=2)
             {
                 temp[0] = GREY_COL;
                 Color col;
-                col.setYuv(y * 2, x * 2, z * 2);
+                col.setYuv(y, x, z);
                 for (int c = Orange; c < Black; c++)
                 {
                     bool ok = false;
@@ -345,7 +345,7 @@ void ColorTable::write(QString filename, float** fltSliders,
                             ok = true;
                         }
                     }
-                    if (ok && y * 2 >= intSliders[yMin][c] && y * 2 <= intSliders[yMax][c] &&
+                    if (ok && y >= intSliders[yMin][c] && y <= intSliders[yMax][c] &&
                             col.getS() >= fltSliders[sMin][c] && col.getS() <= fltSliders[sMax][c] && col.getZ() >= fltSliders[zMin][c] &&
                             col.getZ() <= fltSliders[zMax][c])
                     {
@@ -380,15 +380,15 @@ void ColorTable::writeOld(QString filename, float** fltSliders,
     }
     // loop through all possible table values - our tables are v-u-y
     int count = 0;
-    for (int z = 0; z < 128; ++z)
+    for (byte z = 0; z < 255; z+=2)
     {
-        for (int x = 0; x < 128; x ++)
+        for (byte x = 0; x < 255; x+=2)
         {
-            for (int y = 0; y < 128; y++)
+            for (byte y = 0; y < 255; y+=2)
             {
                 temp[0] = GREY_COL;
                 Color col;
-                col.setYuv(y * 2, x * 2, z * 2);
+                col.setYuv(y, x, z);
                 bool orange = false;
                 bool yellow = false;
                 bool blue = false;
@@ -408,7 +408,7 @@ void ColorTable::writeOld(QString filename, float** fltSliders,
                             ok = true;
                         }
                     }
-                    if (ok && y * 2 >= intSliders[yMin][c] && y * 2 <= intSliders[yMax][c] &&
+                    if (ok && y >= intSliders[yMin][c] && y <= intSliders[yMax][c] &&
                             col.getS() >= fltSliders[sMin][c] && col.getS() <= fltSliders[sMax][c] && col.getZ() >= fltSliders[zMin][c] &&
                             col.getZ() <= fltSliders[zMax][c])
                     {
