@@ -24,6 +24,7 @@ protected slots:
 
 protected:
     void paintEvent(QPaintEvent *event);
+    void showEvent(QShowEvent* event);
 
 private:
     image::BMPImage::ptr image;

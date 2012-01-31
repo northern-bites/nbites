@@ -15,8 +15,8 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
                  roboImageViewer(new RoboImageViewer(image, this)) {
 
     this->setCentralWidget(roboImageViewer);
-    memoryManager->connectSlotToMObject(image.get(),
-                        SLOT(updateBitmap()), MIMAGE_ID);
+    memoryManager->connectSlotToMObject(roboImageViewer,
+                        SLOT(updateView()), MIMAGE_ID);
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);

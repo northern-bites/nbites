@@ -2,24 +2,28 @@
 
 using namespace qtool::image;
 
+#include <iostream>
+using namespace std;
+
 namespace qtool {
 namespace viewer {
 
 RoboImageViewer::RoboImageViewer(image::BMPImage::ptr image,
                                  QWidget *parent)
-    : QWidget(parent),
-      image(image) {
+    : QWidget(parent), image(image) {
 
-    connect(image.get(), SIGNAL(bitmapUpdated()),
-            this, SLOT(updateView()));
 }
 
 RoboImageViewer::~RoboImageViewer() {
 }
 
 void RoboImageViewer::updateView() {
-    //enqueues a repaint - thread-safe
-    this->QWidget::update();
+    if (this->isVisible()) {
+        image->updateBitmap();
+        //enqueues a repaint - thread-safe
+        this->QWidget::update();
+        cout << "updating view!" << endl;
+    }
 }
 
 QSize RoboImageViewer::minimumSizeHint() const
@@ -36,6 +40,12 @@ void RoboImageViewer::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
     painter.drawImage(QPoint(0, 0), image->getBitmap());
+}
+
+void RoboImageViewer::showEvent(QShowEvent * ) {
+    //explicitely update the bitmap when the widget becomes visible again
+    //since it might have changed!
+    this->updateView();
 }
 
 }
