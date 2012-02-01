@@ -22,7 +22,8 @@ MImage::MImage(MObject_ID id, shared_ptr<Sensors> s,
                shared_ptr<PImage> image_data) :
         MObject(id, image_data),
         sensors(s),
-        data(image_data) {
+        data(image_data),
+        thresholded_data(new PImage()){
 
     //Note (Octavian): This is a pretty dumb way to get the image data
     // (ideally you would want to just copy the image - that saves any
@@ -54,6 +55,14 @@ void MImage::update() {
     this->data->set_width(sensors->getRoboImage()->getWidth());
     this->data->set_height(sensors->getRoboImage()->getHeight());
 
+    //debugging purposes
+    #ifdef OFFLINE
+    this->thresholded_data->mutable_image()->assign(
+            reinterpret_cast<const char *>(sensors->getColorImage()),
+            AVERAGED_IMAGE_SIZE);
+    this->thresholded_data->set_width(AVERAGED_IMAGE_WIDTH);
+    this->thresholded_data->set_height(AVERAGED_IMAGE_HEIGHT);
+    #endif OFFLINE
 }
 
 }

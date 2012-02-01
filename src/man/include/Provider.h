@@ -23,7 +23,7 @@ class Provider {
             subscriber_iter;
 
 private:
-    std::list <Subscriber<event_type>*> subscribers;
+    mutable std::list <Subscriber<event_type>*> subscribers;
 
 public:
 
@@ -32,13 +32,11 @@ public:
 
     virtual ~Provider(){}
 
-    virtual void inline addSubscriber(Subscriber<event_type>* s) {
+    virtual void inline addSubscriber(Subscriber<event_type>* s) const {
         subscribers.push_back(s);
     }
 
-protected:
-
-    virtual void inline notifySubscribers(event_type event) const {
+    virtual void inline notifySubscribers(event_type event) {
         for (subscriber_iter i = subscribers.begin();
                 i != subscribers.end(); i++) {
             (*i)->update(event);

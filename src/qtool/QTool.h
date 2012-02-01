@@ -14,7 +14,8 @@
 #include "data/DataLoader.h"
 #include "data/DataManager.h"
 #include "colorcreator/ColorCreator.h"
-#include "viewer/LogViewer.h"
+#include "viewer/MemoryViewer.h"
+#include "offline/OfflineViewer.h"
 #include "viewer/BallEKFViewer.h"
 #include "viewer/FieldViewer.h"
 
@@ -39,7 +40,8 @@ private:
     data::DataManager::ptr dataManager;
     data::DataLoader* dataLoader;
     colorcreator::ColorCreator* colorCreator;
-    viewer::LogViewer* logViewer;
+    viewer::MemoryViewer* memoryViewer;
+    offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::FieldViewer* fieldViewer;
     QPushButton* prevButton;

@@ -7,9 +7,10 @@ namespace qtool {
 using data::DataManager;
 using data::DataLoader;
 using colorcreator::ColorCreator;
-using viewer::LogViewer;
+using viewer::MemoryViewer;
 using viewer::BallEKFViewer;
 using viewer::FieldViewer;
+using offline::OfflineViewer;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
@@ -17,9 +18,10 @@ QTool::QTool() : QMainWindow(),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCreator(new ColorCreator(dataManager)),
-	logViewer(new LogViewer(dataManager)),
-	ballEKFViewer(new BallEKFViewer(dataManager)),
-	fieldViewer(new FieldViewer(dataManager)){
+        memoryViewer(new MemoryViewer(dataManager->getMemory())),
+        offlineViewer(new OfflineViewer(dataManager->getMemory())),
+        ballEKFViewer(new BallEKFViewer(dataManager)),
+        fieldViewer(new FieldViewer(dataManager)){
 
     this->setWindowTitle(tr("The New Tool of Awesome"));
 
@@ -41,7 +43,8 @@ QTool::QTool() : QMainWindow(),
 
     toolTabs->addTab(colorScrollArea, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
-    toolTabs->addTab(logViewer, tr("Log Viewer"));
+    toolTabs->addTab(memoryViewer, tr("Log Viewer"));
+    toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
 
