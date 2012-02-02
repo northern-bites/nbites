@@ -19,7 +19,15 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     QVBoxLayout* leftLayout = new QVBoxLayout;
 
     leftLayout->addWidget(&thresholdedImagePlaceholder);
-    connect(currentColorSpace, SIGNAL(parametersChanged()),
+
+    //connect all the color spaces to update the thresholded
+    //image when their parameters change
+    for (int i = 0; i < image::NUM_COLORS; i++) {
+        connect(&colorSpace[i], SIGNAL(parametersChanged()),
+                this, SLOT(updateThresholdedImage()));
+    }
+    //also when the underlying image changes
+    connect(image.get(), SIGNAL(bitmapBuilt()),
             this, SLOT(updateThresholdedImage()));
     leftLayout->addWidget(&channelImage);
 

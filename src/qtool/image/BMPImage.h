@@ -30,7 +30,11 @@ public:
 public slots:
     void updateBitmap() {
         this->buildBitmap();
+        emit bitmapBuilt();
     }
+
+signals:
+    void bitmapBuilt();
 
 protected:
     virtual void buildBitmap() = 0;
