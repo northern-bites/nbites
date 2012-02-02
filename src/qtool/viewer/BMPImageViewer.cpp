@@ -30,16 +30,6 @@ void BMPImageViewer::updateView() {
     }
 }
 
-QSize BMPImageViewer::minimumSizeHint() const
-{
-    return QSize(image->getWidth(), image->getHeight());
-}
-
-QSize BMPImageViewer::sizeHint() const
-{
-    return QSize(image->getWidth(), image->getHeight());
-}
-
 void BMPImageViewer::showEvent(QShowEvent * ) {
     //explicitely update the bitmap when the widget becomes visible again
     //since it might have changed!

@@ -22,8 +22,10 @@ public:
     BMPImageViewer(image::BMPImage::ptr image,
             QWidget *parent = NULL);
     virtual ~BMPImageViewer();
-    QSize minimumSizeHint() const;
-    QSize sizeHint() const;
+    virtual QSize minimumSizeHint() const {
+        return QSize(image->getWidth(), image->getHeight());
+    }
+    virtual QSize sizeHint() const { return minimumSizeHint();}
 
 protected slots:
     void updateView();

@@ -11,11 +11,12 @@
 #include "BMPImage.h"
 #include "Color.h"
 #include "YUVImage.h"
+#include "ClassHelper.h"
 
 namespace qtool {
 namespace image {
 
-enum BitmapType {
+enum ChannelType {
 	RGB,
 	Y,
 	U,
@@ -25,20 +26,36 @@ enum BitmapType {
 	Blue,
 	Hue,
 	Saturation,
-	Value
+	Value,
+	NUM_CHANNELS
+};
+
+static const std::string ChannelType_label[] = {
+    "RGB",
+    "Y",
+    "U",
+    "V",
+    "Red",
+    "Green",
+    "Blue",
+    "Hue",
+    "Saturation",
+    "Value"
 };
 
 class BMPYUVImage : public BMPImage
 {
 
+    ADD_SHARED_PTR(BMPYUVImage);
+
 public:
-    BMPYUVImage(man::memory::MImage::const_ptr rawImage, BitmapType type = RGB);
+    BMPYUVImage(man::memory::MImage::const_ptr rawImage, ChannelType type = RGB);
     virtual ~BMPYUVImage() {};
 
     void buildBitmap();
 
-    BitmapType getCurrentBitmapType() const { return bitmapType; }
-    void setBitmapType(BitmapType type) { bitmapType = type; updateBitmap();}
+    ChannelType getCurrentBitmapType() const { return bitmapType; }
+    void setBitmapType(ChannelType type) { bitmapType = type; updateBitmap();}
 
     unsigned getWidth() const { return yuvImage.getWidth(); }
     unsigned getHeight() const { return yuvImage.getHeight(); }
@@ -47,7 +64,7 @@ protected:
     bool needToResizeBitmap() const;
 
 protected:
-    BitmapType bitmapType;
+    ChannelType bitmapType;
     YUVImage yuvImage;
 
 };

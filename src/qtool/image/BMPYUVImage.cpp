@@ -4,7 +4,7 @@
 namespace qtool {
 namespace image {
 
-BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage, BitmapType type) :
+BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage, ChannelType type) :
 	yuvImage(rawImage),
 	bitmapType(type)
 { }
