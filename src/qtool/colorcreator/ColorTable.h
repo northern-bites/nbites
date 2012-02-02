@@ -7,27 +7,7 @@
 #include "Stats.h"
 #include "image/Color.h"
 
-#define UNDEFINED 0x00
-#define WHITE     0x01
-#define GREEN     0x02
-#define BLUE      0x04
-#define YELLOW    0x08
-#define ORANGE    0x10
-#define PINK      0x20
-#define NAVY      0x40
-
-#define GREY_COL 0x00
-#define WHITE_COL 0x01
-#define GREEN_COL 0x02
-#define BLUE_COL 0x04
-#define YELLOW_COL 0x08
-#define ORANGE_COL 0x10
-#define YELLOWWHITE_COL 0x09
-#define BLUEGREEN_COL 0x06
-#define ORANGERED_COL 0x30
-#define ORANGEYELLOW_COL 0x18
-#define RED_COL 0x20
-#define NAVY_COL 0x40
+#include "VisionDef.h"
 
 namespace qtool {
 namespace colorcreator {

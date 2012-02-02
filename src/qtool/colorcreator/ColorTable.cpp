@@ -83,7 +83,7 @@ void ColorTable::readOld(QString filename)
                 switch(temp[0])
                 {
                 case 0:
-                    table[y][x][z] = UNDEFINED;
+                    table[y][x][z] = GREY;
                     break;
                 case 1:
                     table[y][x][z] = WHITE;
@@ -104,7 +104,7 @@ void ColorTable::readOld(QString filename)
                     table[y][x][z] = YELLOW | WHITE;
                     break;
                 case 7:
-                    table[y][x][z] = BLUE & GREEN;
+                    table[y][x][z] = BLUE | GREEN;
                     break;
                 case 8:
                     table[y][x][z] = ORANGE | PINK;
@@ -119,7 +119,7 @@ void ColorTable::readOld(QString filename)
                     table[y][x][z] = NAVY;
                     break;
                 default:
-                    table[y][x][z] = UNDEFINED;
+                    table[y][x][z] = GREY;
                     break;
                 }
             }
@@ -232,7 +232,7 @@ int ColorTable::getUpdatedColor(int y, int u, int v)
     unsigned temp = index(y, u, v);
     switch (temp)
     {
-    case UNDEFINED:
+    case GREY:
         return Black;
     case WHITE:
         return White;
@@ -326,7 +326,7 @@ void ColorTable::write(QString filename, float** fltSliders,
         {
             for (byte y = 0; y < 255; y+=2)
             {
-                temp[0] = GREY_COL;
+                temp[0] = GREY_BIT;
                 Color col;
                 col.setYuv(y, x, z);
                 for (int c = Orange; c < Black; c++)
@@ -382,11 +382,11 @@ void ColorTable::writeOld(QString filename, float** fltSliders,
     int count = 0;
     for (byte z = 0; z < 255; z+=2)
     {
-        for (byte x = 0; x < 255; x+=2)
+        for (byte x = 0;    x < 255; x+=2)
         {
             for (byte y = 0; y < 255; y+=2)
             {
-                temp[0] = GREY_COL;
+                temp[0] = GREY_BIT;
                 Color col;
                 col.setYuv(y, x, z);
                 bool orange = false;
@@ -415,36 +415,36 @@ void ColorTable::writeOld(QString filename, float** fltSliders,
                         switch (c)
                         {
                         case Orange:
-                            temp[0] = ORANGE_COL;
+                            temp[0] = ORANGE_BIT;
                             orange = true;
                             count++;
                             break;
                         case Blue:
-                            temp[0] = BLUE_COL;
+                            temp[0] = BLUE_BIT;
                             blue = true;
                             break;
                         case Yellow:
                             if (orange)
                             {
-                                temp[0] = ORANGEYELLOW_COL;
+                                temp[0] = ORANGE_BIT | YELLOW_BIT;
                             } else
                             {
-                                temp[0] = YELLOW_COL;
+                                temp[0] = YELLOW_BIT;
                             }
                             yellow = true;
                             break;
                         case Green:
                             if (blue)
                             {
-                                temp[0] = BLUEGREEN_COL;
+                                temp[0] = BLUE_BIT | GREEN_BIT;
                             } else{
-                                temp[0] = GREEN_COL;
+                                temp[0] = GREEN_BIT;
                             }
                             break;
                         case White:
                             if (yellow)
                             {
-                                temp[0] = YELLOWWHITE_COL;
+                                temp[0] = YELLOW_BIT | WHITE_BIT;
                             } else
                             {
                                 temp[0] = WHITE;
@@ -453,14 +453,14 @@ void ColorTable::writeOld(QString filename, float** fltSliders,
                         case Pink:
                             if (orange)
                             {
-                                temp[0] = ORANGERED_COL;
+                                temp[0] = ORANGE_BIT | RED_BIT;
                             } else
                             {
-                                temp[0] = RED_COL;
+                                temp[0] = RED_BIT;
                             }
                             break;
                         case Navy:
-                            temp[0] = NAVY_COL;
+                            temp[0] = NAVY_BIT;
                             break;
                         }
                     }

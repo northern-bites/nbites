@@ -57,6 +57,12 @@ public:
     void setRgb(float r, float g, float b) { red = r; grn = g; blue = b;}
     void setRgb(byte r, byte g, byte b) {
         setRgb((float)r / 256.0f, (float)g / 256.0f, (float)b / 256.0f);}
+    void setRgb(RGB rgb) {
+        byte r = ((byte*) &rgb)[2];
+        byte g = ((byte*) &rgb)[1];
+        byte b = ((byte*) &rgb)[0];
+        setRgb(r, g, b);
+    }
 
     void setYuv(float y, float u, float v) {
         red = y + 1.13983f * v;

@@ -17,6 +17,7 @@ ColorWheel::ColorWheel(ColorSpace* _colorSpace, QWidget* parent) :
         zSlider(this) {
 
     QHBoxLayout* layout = new QHBoxLayout;
+    layout->setSizeConstraint(QLayout::SetFixedSize);
 
     zSlider.setRange(0, (int) ZSLICE_RANGE);
     connect(&zSlider, SIGNAL(valueChanged(int)), this, SLOT(zSliceChanged(int)));
