@@ -59,8 +59,10 @@ public:
     MemorySignalingInterface(man::memory::Memory::const_ptr memory) :
         memory(memory) {
 
-        for (MObject_ID id = man::memory::FIRST_OBJECT_ID;
-                        id != man::memory::LAST_OBJECT_ID; id++) {
+        using namespace man::memory;
+
+        for (MObject_ID id = FIRST_OBJECT_ID;
+                        id != LAST_OBJECT_ID; id++) {
             SubscriberEmiterConvertor* convertor = new SubscriberEmiterConvertor;
             memory->addSubscriber(convertor, id);
             convertors.insert(ms_pair(id, convertor));

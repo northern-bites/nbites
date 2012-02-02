@@ -28,9 +28,10 @@ public:
                      QWidget* parent = NULL);
     ~ColorSpaceWidget() {}
 
-public slots:
-    void sliderValueChanged(int value);
     void setColorSpace(ColorSpace* _colorSpace);
+
+protected slots:
+    void sliderValueChanged(int value);
 
 private:
     QMap<QSlider*, ColorSpace::Channel> sliders;

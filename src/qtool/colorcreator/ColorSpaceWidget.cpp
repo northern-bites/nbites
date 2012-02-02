@@ -39,7 +39,7 @@ void ColorSpaceWidget::setColorSpace(ColorSpace* _colorSpace) {
     QMapIterator<QSlider*, ColorSpace::Channel> it(sliders);
     while (it.hasNext()) {
         it.next();
-        it.key()->setValue(colorSpace->getParameter(it.value()));
+        it.key()->setValue(colorSpace->getParameter(it.value())*FLOAT_SLIDER_SCALE);
     }
 }
 

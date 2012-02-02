@@ -37,10 +37,12 @@ public:
         return QSize(DEFAULT_SIZE + zSlider.width() + 25, DEFAULT_SIZE);
     }
 
-protected slots:
+public slots:
     void updateWheel();
-    void zSliceChanged(int value);
     void setColorSpace(ColorSpace* _colorSpace);
+
+protected slots:
+    void zSliceChanged(int value);
 
 private:
     ColorSpace* colorSpace;

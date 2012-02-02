@@ -1,5 +1,7 @@
 /**
- * Renders a BMPYUVImage with channel selection
+ * Renders a BMPYUVImage (that's usually a robot image)
+ * with a combo box for selecting different render channels
+ * on the image
  *
  * @author Octavian Neamtu
  *
@@ -19,7 +21,10 @@ class ChannelImageViewer: public BMPImageViewer {
 public:
 
     ChannelImageViewer(image::BMPYUVImage::ptr image,
-            QWidget *parent = NULL);
+                QWidget *parent = NULL);
+    ChannelImageViewer(man::memory::MImage::const_ptr mImage,
+                QWidget *parent = NULL);
+
     virtual ~ChannelImageViewer() {}
 
     virtual QSize minimumSizeHint() {
@@ -30,6 +35,9 @@ public:
 
 public slots:
     void selectionChanged(int i);
+
+protected:
+    void setupUI();
 
 protected:
     image::BMPYUVImage::ptr bmpyuvimage;

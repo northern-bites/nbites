@@ -14,7 +14,7 @@
 #include <QWidget>
 
 //qtool
-#include "image/BMPYUVImage.h"
+#include "viewer/ChannelImageViewer.h"
 #include "data/DataManager.h"
 //colorcreator
 #include "ColorEdit.h"
@@ -31,20 +31,22 @@ class ColorCalibrate : public QWidget
     Q_OBJECT
 
 public:
-    enum Colors {Orange, Blue, Yellow, Green, White, Pink, Navy, Black,
-        BlueGreen, BlueNavy, OrangeRed, NUM_COLORS};
-    static const Colors STARTING_COLOR = Orange;
+    static const image::ColorID STARTING_COLOR = image::Orange;
 
 public:
     ColorCalibrate(qtool::data::DataManager::ptr dataManager,
             QWidget *parent = 0);
     ~ColorCalibrate() {}
 
+protected slots:
+    void selectColor(int index);
 
 private:
-    qtool::data::DataManager::ptr dataManager;
-    ColorSpace colorSpace[NUM_COLORS];
+    data::DataManager::ptr dataManager;
+    viewer::ChannelImageViewer channelImage;
+    ColorSpace colorSpace[image::NUM_COLORS];
     ColorSpace* currentColorSpace;
+    QComboBox colorSelect;
     ColorSpaceWidget colorSpaceWidget;
     ColorWheel colorWheel;
     float zSlice;

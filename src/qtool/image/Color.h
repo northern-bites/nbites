@@ -2,10 +2,24 @@
 #define COLORSPACE_H
 
 #include <cmath>
+#include <string>
 #include "Common.h"
 
 namespace qtool {
 namespace image {
+
+enum ColorID {Grey, White, Green, Blue, Yellow, Orange, Red, Navy,
+              BlueGreen, BlueNavy, OrangeRed, NUM_COLORS};
+
+static const std::string Color_label[] = {
+        "Grey", "White", "Green", "Blue", "Yellow", "Orange", "Red", "Navy",
+        "BlueGreen", "BlueNavy", "OrangeRed"
+};
+
+static const int Color_RGB[] = {
+        0xc0c0c0, 0xffffff, 0x66cc66, 0x3366ff, 0xffff00, 0xffcc33, 0xff0000, 0x3300cc,
+        0x339999, 0x3333cc, 0xff6633
+};
 
 class Color
 {

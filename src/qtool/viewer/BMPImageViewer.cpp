@@ -1,9 +1,7 @@
 #include "BMPImageViewer.h"
 
 using namespace qtool::image;
-
-#include <iostream>
-using namespace std;
+using namespace man::memory;
 
 namespace qtool {
 namespace viewer {
@@ -11,14 +9,17 @@ namespace viewer {
 BMPImageViewer::BMPImageViewer(image::BMPImage::ptr image,
                                  QWidget *parent)
     : QWidget(parent), image(image) {
+    setupUI();
+}
 
+BMPImageViewer::~BMPImageViewer() {
+}
+
+void BMPImageViewer::setupUI() {
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(&imagePlaceholder);
 
     this->setLayout(layout);
-}
-
-BMPImageViewer::~BMPImageViewer() {
 }
 
 void BMPImageViewer::updateView() {

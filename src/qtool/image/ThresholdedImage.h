@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include "BMPImage.h"
 #include "memory/MImage.h"
+#include "Color.h"
 
 namespace qtool {
 namespace image {

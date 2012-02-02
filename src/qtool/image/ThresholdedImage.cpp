@@ -24,8 +24,7 @@ void ThresholdedImage::buildBitmap() {
     for (int j = 0; j < getHeight(); ++j)
         for (int i = 0; i < getWidth(); ++i) {
             int color = rawImage->image()[j*rawImage->width() + i];
-//            bitmap.setPixel(i, j,
-//                    colorcreator::ColorCreator::RGBcolorValue[color].rgb());
+            bitmap.setPixel(i, j, Color_RGB[color]);
         }
 }
 }

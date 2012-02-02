@@ -39,8 +39,8 @@ void ColorWheel::setColorSpace(ColorSpace* _colorSpace) {
     connect(colorSpace, SIGNAL(parametersChanged()),
             this, SLOT(updateWheel()));
 
-    zSlider.setValue((int) (colorSpace->getParameter(ColorSpace::hMin) +
-                             colorSpace->getParameter(ColorSpace::hMax))/2);
+    zSlider.setValue((colorSpace->getParameter(ColorSpace::hMin) +
+                      colorSpace->getParameter(ColorSpace::hMax))*ZSLICE_RANGE/2);
     updateWheel();
 }
 

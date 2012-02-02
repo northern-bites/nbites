@@ -1,5 +1,6 @@
 /**
- * Renders a BMPImage
+ * Renders a BMPImage by transforming it to a QPixmap and attaching
+ * it to a QLabel
  *
  * @author Octavian Neamtu
  */
@@ -10,7 +11,7 @@
 #include <QLabel>
 #include <QLayout>
 #include "data/DataTypes.h"
-#include "image/BMPImage.h"
+#include "image/BMPYUVImage.h"
 
 namespace qtool {
 namespace viewer {
@@ -21,17 +22,19 @@ public:
 
     BMPImageViewer(image::BMPImage::ptr image,
             QWidget *parent = NULL);
+
     virtual ~BMPImageViewer();
+
     virtual QSize minimumSizeHint() const {
         return QSize(image->getWidth(), image->getHeight());
     }
-    virtual QSize sizeHint() const { return minimumSizeHint();}
 
 protected slots:
     void updateView();
 
 protected:
     void showEvent(QShowEvent* event);
+    void setupUI();
 
 protected:
     image::BMPImage::ptr image;

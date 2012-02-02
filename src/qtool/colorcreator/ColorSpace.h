@@ -20,10 +20,7 @@ namespace colorcreator {
 static const std::string fltChannel_names[] = {
         "hMin", "hMax",
         "sMin", "sMax",
-        "zMin", "zMax"
-};
-
-static const std::string intChannel_names[] = {
+        "zMin", "zMax",
         "yMin", "yMax",
         "vMin", "vMax"
 };

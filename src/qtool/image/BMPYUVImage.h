@@ -16,20 +16,6 @@
 namespace qtool {
 namespace image {
 
-enum ChannelType {
-	RGB,
-	Y,
-	U,
-	V,
-	Red,
-	Green,
-	Blue,
-	Hue,
-	Saturation,
-	Value,
-	NUM_CHANNELS
-};
-
 static const std::string ChannelType_label[] = {
     "RGB",
     "Y",
@@ -45,6 +31,20 @@ static const std::string ChannelType_label[] = {
 
 class BMPYUVImage : public BMPImage
 {
+public:
+    enum ChannelType {
+        RGB,
+        Y,
+        U,
+        V,
+        Red,
+        Green,
+        Blue,
+        Hue,
+        Saturation,
+        Value,
+        NUM_CHANNELS
+    };
 
     ADD_SHARED_PTR(BMPYUVImage);
 
