@@ -21,11 +21,13 @@ void ThresholdedImage::buildBitmap() {
                         QImage::Format_RGB32);
     }
 
-    for (int j = 0; j < getHeight(); ++j)
+    for (int j = 0; j < getHeight(); ++j) {
+        QRgb* bitmapLine = (QRgb*) bitmap.scanLine(j);
         for (int i = 0; i < getWidth(); ++i) {
             int color = rawImage->image()[j*rawImage->width() + i];
-            bitmap.setPixel(i, j, Color_RGB[color]);
+            bitmapLine[i] = Color_RGB[color];
         }
+    }
 }
 }
 }
