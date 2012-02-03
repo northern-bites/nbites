@@ -12,6 +12,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QPushButton>
 
 //qtool
 #include "viewer/ChannelImageViewer.h"
@@ -42,6 +43,12 @@ public:
 protected slots:
     void selectColorSpace(int index);
     void updateThresholdedImage();
+    void loadSlidersBtnPushed();
+    void saveSlidersBtnPushed();
+
+protected:
+    void loadColorSpaces(QString filename);
+    void writeColorSpaces(QString filename);
 
 private:
     data::DataManager::ptr dataManager;
@@ -54,8 +61,8 @@ private:
     ColorWheel colorWheel;
     QLabel thresholdedImagePlaceholder;
     QImage thresholdedImage;
-    float zSlice;
-    int currentColor;
+    QPushButton loadSlidersBtn, saveSlidersBtn;
+
 
 };
 

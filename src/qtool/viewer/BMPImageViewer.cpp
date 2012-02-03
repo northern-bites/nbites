@@ -27,7 +27,7 @@ void BMPImageViewer::updateView() {
         image->updateBitmap();
         //enqueues a repaint - thread-safe
         this->QWidget::update();
-        imagePlaceholder.setPixmap(QPixmap::fromImage(image->getBitmap()));
+        imagePlaceholder.setPixmap(QPixmap::fromImage(*(image->getBitmap())));
     }
 }
 

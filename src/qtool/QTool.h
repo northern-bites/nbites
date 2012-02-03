@@ -20,6 +20,12 @@
 #include "viewer/FieldViewer.h"
 #include "remote/RobotSelect.h"
 
+#ifndef NBITES_DIR
+#define NBITES_DIR "~/nbites"
+#warning "Could not find NBITES_DIR define! Reverting to " NBITES_DIR
+#endif
+
+
 namespace qtool {
 
 class QTool : public QMainWindow {

@@ -78,6 +78,15 @@ public:
         return true;
     }
 
+    void setParameters(float* values) {
+        setParametersSilently(values);
+        emit parametersChanged();
+    }
+
+    void setParametersSilently(float* values) {
+        memcpy(params, values, sizeof(float) * NUM_CHANNELS);
+    }
+
     void setParameter(Channel channel, float value) {
         params[channel] = value;
         emit parametersChanged();

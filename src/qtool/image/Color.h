@@ -3,28 +3,54 @@
 
 #include <cmath>
 #include <string>
+#include "VisionDef.h"
 #include "Common.h"
 
 namespace qtool {
 namespace image {
 
-enum ColorID {Grey, White, Green, Blue, Yellow, Orange, Red, Navy,
-              BlueGreen, BlueNavy, OrangeRed, NUM_COLORS};
+enum ColorID {Grey, White, Green, Blue, Yellow, Orange, Red, Navy, NUM_COLORS};
+enum MixedColorID {GreenBlue, OrangeRed, BlueNavy, UnknownMixed};
 
 static const std::string Color_label[] = {
-        "Grey", "White", "Green", "Blue", "Yellow", "Orange", "Red", "Navy",
-        "BlueGreen", "BlueNavy", "OrangeRed"
-};
+        "Grey", "White", "Green", "Blue", "Yellow", "Orange", "Red", "Navy" };
 
 static const int Color_RGB[] = {
-        0xc0c0c0, 0xffffff, 0x66cc66, 0x3366ff, 0xffff00, 0xffcc33, 0xff0000, 0x3300cc,
-        0x339999, 0x3333cc, 0xff6633
+        0xc0c0c0, 0xffffff, 0x66cc66, 0x3366ff, 0xffff00, 0xffcc33, 0xff0000, 0x3300cc
+};
+
+static const int Color_bits[] = {
+       GREY_BIT, WHITE_BIT, GREEN_BIT, BLUE_BIT, YELLOW_BIT, ORANGE_BIT,
+       RED_BIT, NAVY_BIT
+};
+
+static const int MixedColor_RGB[] = {
+        0x20b2aa, 0xff4500, 0x191970, 0x9400d3
 };
 
 class Color
 {
     // holds an rgb value in the form #XXRRGGBB
     typedef unsigned int RGB;
+
+public:
+    static MixedColorID getMixedColorIDFromBitColor(int bits) {
+        switch(bits) {
+        case GREEN_BIT | BLUE_BIT :
+            return GreenBlue;
+            break;
+        case RED_BIT | ORANGE_BIT :
+            return OrangeRed;
+            break;
+        case BLUE_BIT | NAVY_BIT :
+            return BlueNavy;
+            break;
+        default :
+            return UnknownMixed;
+            break;
+        }
+        return UnknownMixed;
+    }
 
 public:
     Color();

@@ -22,7 +22,8 @@ public:
     BMPImage() {}
     virtual ~BMPImage() {}
 
-    QImage getBitmap() const { return bitmap; }
+    const QImage* getBitmap() const { return &bitmap; }
+    QImage* getBitmap() { return &bitmap; }
 
     virtual unsigned getWidth() const = 0;
     virtual unsigned getHeight() const = 0;

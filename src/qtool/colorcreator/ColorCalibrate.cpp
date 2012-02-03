@@ -1,5 +1,9 @@
 #include "ColorCalibrate.h"
 
+#include <QtDebug>
+
+#include <QFileDialog>
+
 namespace qtool {
 namespace colorcreator {
 
@@ -48,6 +52,16 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     rightLayout->addWidget(&colorWheel);
     rightLayout->addWidget(&colorSpaceWidget);
 
+    loadSlidersBtn.setText("Load Sliders");
+    rightLayout->addWidget(&loadSlidersBtn);
+    connect(&loadSlidersBtn, SIGNAL(clicked()),
+            this, SLOT(loadSlidersBtnPushed()));
+
+    saveSlidersBtn.setText("Save Sliders");
+    rightLayout->addWidget(&saveSlidersBtn);
+    connect(&saveSlidersBtn, SIGNAL(clicked()),
+            this, SLOT(saveSlidersBtnPushed()));
+
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
 
@@ -75,17 +89,28 @@ void ColorCalibrate::updateThresholdedImage() {
     }
 
     //threshold the image
-    thresholdedImage.fill(image::Color_RGB[image::Grey]);
     for (int j = 0; j < thresholdedImage.height(); j++) {
-        QRgb* qImageLine = (QRgb*) (thresholdedImage.scanLine(j));
+        QRgb* thresholdedImageLine = (QRgb*) (thresholdedImage.scanLine(j));
+        QRgb* bitmapLine = (QRgb*) (image->getBitmap()->scanLine(j));
             for (int i = 0; i < thresholdedImage.width(); i++) {
-            QRgb rgb = image->getBitmap().pixel(i, j);
             Color color;
-            color.setRgb(rgb);
-            for (int t = 0; t < image::NUM_COLORS; t++) {
-                if (colorSpace[t].contains(color)) {
-                    qImageLine[i] = image::Color_RGB[t];
+            color.setRgb(bitmapLine[i]);
+            //default color
+            thresholdedImageLine[i] = image::Grey;
+            //temporary variables for blending colors
+            int count = 0;
+            long long tempColor = 0;
+            for (int c = 0; c < image::NUM_COLORS; c++) {
+                if (colorSpace[c].contains(color)) {
+                    //blend colors in by averaging them
+                    tempColor *= count;
+                    tempColor += image::Color_RGB[c];
+                    count++;
+                    tempColor /= count;
                 }
+            }
+            if (tempColor) {
+                thresholdedImageLine[i] = (QRgb) tempColor;
             }
         }
     }
@@ -93,6 +118,84 @@ void ColorCalibrate::updateThresholdedImage() {
     thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
 }
 
+void ColorCalibrate::loadColorSpaces(QString filename) {
+
+    QFile dataFile(filename);
+    qDebug() << "Attempt to open filename = " << filename << endl;
+    if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Succeed" << endl;
+        QString nextString;
+        QTextStream dataFileStream(&dataFile);
+
+        //_____FOR_FORMATTING____//
+        //read the first line
+        dataFileStream.readLine();
+
+        for (int i = 0; i < image::NUM_COLORS; i++)
+        {
+            //read the dummy label
+            dataFileStream >> nextString;
+            float parameters[ColorSpace::NUM_CHANNELS];
+            for (int j=0; j < ColorSpace::NUM_CHANNELS; j++)
+            {
+                dataFileStream >> nextString;
+                parameters[j] = nextString.toFloat();
+            }
+            colorSpace[i].setParametersSilently(parameters);
+        }
+    }
+    //reset to the default color space
+    colorSelect.setCurrentIndex(STARTING_COLOR);
+    selectColorSpace(STARTING_COLOR);
+    updateThresholdedImage();
+}
+
+void ColorCalibrate::writeColorSpaces(QString filename) {
+
+    //Create the file to store the current values
+    QFile newFile(filename);
+    if (newFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream newFileStream(&newFile);
+
+        //____FOR_FORMATTING____//
+        //Write the first line
+        for (int i = 0; i < ColorSpace::NUM_CHANNELS; i++) {
+            newFileStream << fltChannel_names[i].c_str() << " ";
+        }
+        newFileStream << endl;
+
+        for (int i = 0; i < image::NUM_COLORS; i++)
+        {
+            newFileStream << Color_label[i].c_str() << " ";
+            for (int j = 0; j < ColorSpace::NUM_CHANNELS; j++) {
+                newFileStream << colorSpace[i].getParameter(ColorSpace::Channel(j)) << " ";
+            }
+            newFileStream << endl;
+        }
+    }
+}
+
+void ColorCalibrate::loadSlidersBtnPushed() {
+    QString base_directory = QString(NBITES_DIR) + "/data/sliders";
+    QString filename =
+        QFileDialog::getOpenFileName(this,
+                     tr("Load Sliders from File"),
+                     base_directory,
+                     tr("Slider files (*.sld)"));
+    this->loadColorSpaces(filename);
+}
+
+void ColorCalibrate::saveSlidersBtnPushed() {
+    QString base_directory = QString(NBITES_DIR) + "/data/sliders";
+    QString filename =
+            QFileDialog::getSaveFileName(this,
+                    tr("Save Sliders from File"),
+                    base_directory + "/new_sliders.sld",
+                    tr("Slider files (*.sld)"));
+    this->writeColorSpaces(filename);
+}
 
 }
 }
