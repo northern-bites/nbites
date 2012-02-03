@@ -45,6 +45,7 @@ protected slots:
     void updateThresholdedImage();
     void loadSlidersBtnPushed();
     void saveSlidersBtnPushed();
+    void saveColorTableBtnPushed();
 
 protected:
     void loadColorSpaces(QString filename);
@@ -61,7 +62,7 @@ private:
     ColorWheel colorWheel;
     QLabel thresholdedImagePlaceholder;
     QImage thresholdedImage;
-    QPushButton loadSlidersBtn, saveSlidersBtn;
+    QPushButton loadSlidersBtn, saveSlidersBtn, saveColorTableBtn;
 
 
 };

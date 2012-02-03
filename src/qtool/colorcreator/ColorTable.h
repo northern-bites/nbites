@@ -1,11 +1,17 @@
 #ifndef COLORTABLE_H
 #define COLORTABLE_H
+/**
+ * TODO: this needs cleanup
+ *
+ * -Octavian
+ */
 #include <QString>
 #include <QFile>
 #include <QTextStream>
 
 #include "Stats.h"
 #include "image/Color.h"
+#include "ColorSpace.h"
 
 #include "VisionDef.h"
 
@@ -30,12 +36,7 @@ public:
     int getUpdatedColor(int y, int u, int v);
 
     //color table output methods
-    void write(QString filename, float** fltSliders,
-               int** intSliders, unsigned* bitColor);
-    void writeOld(QString filename, float** fltSliders,
-                  int** intSliders);
-
-
+    static void write(QString filename, ColorSpace* colorSpaces);
 
 private:
     enum fltChannels {hMin, hMax,

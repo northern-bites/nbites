@@ -20,7 +20,7 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
 
     QHBoxLayout* mainLayout = new QHBoxLayout;
 
-    QVBoxLayout* leftLayout = new QVBoxLayout;
+    QHBoxLayout* leftLayout = new QHBoxLayout;
 
     leftLayout->addWidget(&thresholdedImagePlaceholder);
 
@@ -61,6 +61,11 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     rightLayout->addWidget(&saveSlidersBtn);
     connect(&saveSlidersBtn, SIGNAL(clicked()),
             this, SLOT(saveSlidersBtnPushed()));
+
+    saveColorTableBtn.setText("Save Color Table");
+    rightLayout->addWidget(&saveColorTableBtn);
+    connect(&saveColorTableBtn, SIGNAL(clicked()),
+            this, SLOT(saveColorTableBtnPushed()));
 
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
@@ -191,10 +196,20 @@ void ColorCalibrate::saveSlidersBtnPushed() {
     QString base_directory = QString(NBITES_DIR) + "/data/sliders";
     QString filename =
             QFileDialog::getSaveFileName(this,
-                    tr("Save Sliders from File"),
+                    tr("Save Sliders to File"),
                     base_directory + "/new_sliders.sld",
                     tr("Slider files (*.sld)"));
     this->writeColorSpaces(filename);
+}
+
+void ColorCalibrate::saveColorTableBtnPushed() {
+    QString base_directory = QString(NBITES_DIR) + "/data/tables";
+    QString filename =
+            QFileDialog::getSaveFileName(this,
+                    tr("Save Color Table to File"),
+                    base_directory + "/new_table.mtb",
+                    tr("Color Tables(*.mtb)"));
+    ColorTable::write(filename, colorSpace);
 }
 
 }

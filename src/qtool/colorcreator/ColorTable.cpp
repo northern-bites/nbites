@@ -302,174 +302,47 @@ Stats** ColorTable::colorStats()
     return colorStats;
 }
 
-/* Writes out a color table.  The "new" part of the format is that it
-  writes the color table using bitwise color definitions instead of the
-  old integer definitions.
-  @param filename        the name to write
-  */
-void ColorTable::write(QString filename, float** fltSliders,
-                                int** intSliders, unsigned* bitColor)
-{
-    QFile file(filename);
-    QTextStream out(stdout);
-    QByteArray temp;
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        out << "The file would not open properly" << "\n";
-        return;
-    }
-    // loop through all possible table values - our tables are v-u-y
-    int count = 0;
-    for (byte z = 0; z < 255; z+=2)
-    {
-        for (byte x = 0; x < 255; x+=2)
-        {
-            for (byte y = 0; y < 255; y+=2)
-            {
-                temp[0] = GREY_BIT;
-                Color col;
-                col.setYuv(y, x, z);
-                for (int c = Orange; c < Black; c++)
-                {
-                    bool ok = false;
-                    if (fltSliders[hMin][c] >= fltSliders[hMax][c])
-                    {
-                        if (col.getH() >= fltSliders[hMin][c] || col.getH() <= fltSliders[hMax][c])
-                        {
-                            ok = true;
-                        }
-                    } else
-                    {
-                        if (col.getH() >= fltSliders[hMin][c] && col.getH() <= fltSliders[hMax][c])
-                        {
-                            ok = true;
-                        }
-                    }
-                    if (ok && y >= intSliders[yMin][c] && y <= intSliders[yMax][c] &&
-                            col.getS() >= fltSliders[sMin][c] && col.getS() <= fltSliders[sMax][c] && col.getZ() >= fltSliders[zMin][c] &&
-                            col.getZ() <= fltSliders[zMax][c])
-                    {
-                        if (c == Orange) {
-                            count++;
-                        }
-                        temp[0] = temp[0] | bitColor[c];
-                    }
-                }
-                file.write(temp);
-            }
-        }
-    }
-    out << "Count was " << count << "\n" << endl;
-    file.close();
-}
+/* Write out a color table using bitwise definitions
+ * using information from a set of NUM_COLORS colorSpace
+ */
+void ColorTable::write(QString filename, ColorSpace* colorSpaces) {
 
-/* Writes a color table of the old format.  Old meaning integer definitions.
-  So we should never use this anymore.
-  @param filename        the name of the file to write
-  */
-void ColorTable::writeOld(QString filename, float** fltSliders,
-                                int** intSliders)
-{
     QFile file(filename);
     QTextStream out(stdout);
-    QByteArray temp;
+    byte V_MAX = 128, U_MAX = 128, Y_MAX = 128;
+    QByteArray table;
+
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        out << "The file would not open properly" << "\n";
+        out << "Could not open file to write color table properly!" << "\n";
         return;
     }
     // loop through all possible table values - our tables are v-u-y
     int count = 0;
-    for (byte z = 0; z < 255; z+=2)
+    for (int z = 0; z < V_MAX; z++)
     {
-        for (byte x = 0;    x < 255; x+=2)
+        for (int x = 0; x < U_MAX; x++)
         {
-            for (byte y = 0; y < 255; y+=2)
+            for (int y = 0; y < Y_MAX; y++)
             {
-                temp[0] = GREY_BIT;
-                Color col;
-                col.setYuv(y, x, z);
-                bool orange = false;
-                bool yellow = false;
-                bool blue = false;
-                for (int c = Orange; c < Black; c++)
+                byte temp = GREY_BIT;
+                Color color;
+                color.setYuv((byte) y, (byte) x, (byte) z);
+                for (int c = 0; c < image::NUM_COLORS; c++)
                 {
-                    bool ok = false;
-                    if (fltSliders[hMin][c] > fltSliders[hMax][c])
-                    {
-                        if (col.getH() >= fltSliders[hMin][c] || col.getH() <= fltSliders[hMax][c])
-                        {
-                            ok = true;
-                        }
-                    } else
-                    {
-                        if (col.getH() >= fltSliders[hMin][c] && col.getH() <= fltSliders[hMax][c])
-                        {
-                            ok = true;
-                        }
-                    }
-                    if (ok && y >= intSliders[yMin][c] && y <= intSliders[yMax][c] &&
-                            col.getS() >= fltSliders[sMin][c] && col.getS() <= fltSliders[sMax][c] && col.getZ() >= fltSliders[zMin][c] &&
-                            col.getZ() <= fltSliders[zMax][c])
-                    {
-                        switch (c)
-                        {
-                        case Orange:
-                            temp[0] = ORANGE_BIT;
-                            orange = true;
+                    if (colorSpaces[c].contains(color)) {
+                        if (c == image::Orange) {
                             count++;
-                            break;
-                        case Blue:
-                            temp[0] = BLUE_BIT;
-                            blue = true;
-                            break;
-                        case Yellow:
-                            if (orange)
-                            {
-                                temp[0] = ORANGE_BIT | YELLOW_BIT;
-                            } else
-                            {
-                                temp[0] = YELLOW_BIT;
-                            }
-                            yellow = true;
-                            break;
-                        case Green:
-                            if (blue)
-                            {
-                                temp[0] = BLUE_BIT | GREEN_BIT;
-                            } else{
-                                temp[0] = GREEN_BIT;
-                            }
-                            break;
-                        case White:
-                            if (yellow)
-                            {
-                                temp[0] = YELLOW_BIT | WHITE_BIT;
-                            } else
-                            {
-                                temp[0] = WHITE;
-                            }
-                            break;
-                        case Pink:
-                            if (orange)
-                            {
-                                temp[0] = ORANGE_BIT | RED_BIT;
-                            } else
-                            {
-                                temp[0] = RED_BIT;
-                            }
-                            break;
-                        case Navy:
-                            temp[0] = NAVY_BIT;
-                            break;
                         }
+                        temp = temp | image::Color_bits[c];
                     }
                 }
-                file.write(temp);
+                table.append(temp);
             }
         }
     }
-    out << "Count was " << count << "\n";
+    file.write(table);
+    out << "Orange count was " << count << "\n" << endl;
     file.close();
 }
 
