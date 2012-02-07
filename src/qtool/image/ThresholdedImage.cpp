@@ -1,5 +1,4 @@
 #include "ThresholdedImage.h"
-#include "colorcreator/ColorCreator.h"
 
 namespace qtool {
 namespace image {

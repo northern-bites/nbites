@@ -29,8 +29,6 @@ set(ColorCreator_headers
     ColorWheel.h
 )
 
-set(ColorCreator_forms ColorCreator.ui)
-
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ############ Qt4 goodness
