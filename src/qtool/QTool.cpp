@@ -62,7 +62,8 @@ void QTool::prev() {
 }
 
 void QTool::record() {
-    QString path = QFileDialog::getExistingDirectory(this);
+    QString path = QFileDialog::getExistingDirectory(this, "Choose folder",
+            QString(NBITES_DIR) + "/data/logs");
     dataManager->startRecordingToPath(path.toStdString());
 }
 

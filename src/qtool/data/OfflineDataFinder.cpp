@@ -42,7 +42,7 @@ void OfflineDataFinder::setupFSBrowser() {
 
     fsBrowser = new QTreeView();
     fsBrowser->setModel(fsModel);
-    fsBrowser->setRootIndex(fsModel->index(QDir::homePath()));
+    fsBrowser->setRootIndex(fsModel->index(QString(NBITES_DIR) + "/data/logs"));
     fsBrowser->expand(fsModel->index(QDir::currentPath()));
 
     fsBrowser->setColumnWidth(0, DEFAULT_NAME_COLUMN_WIDTH);
