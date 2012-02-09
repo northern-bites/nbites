@@ -40,6 +40,7 @@ namespace memory {
 class Memory {
 
 public:
+    ADD_NULL_INSTANCE(Memory)
     ADD_SHARED_PTR(Memory)
     typedef std::pair<MObject_ID,
             boost::shared_ptr<MObject> > MObject_IDPair;

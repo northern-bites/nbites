@@ -35,7 +35,7 @@ protected:
 	typedef std::map<MObject_ID, MObjectLogger::ptr > ObjectIOMap;
 
 public:
-	LoggingBoard(Memory::const_ptr memory);
+	LoggingBoard(Memory::const_ptr memory = Memory::NullInstanceSharedPtr());
 	virtual ~LoggingBoard() {
 	}
 
@@ -48,6 +48,8 @@ public:
 	}
 
 	void reset() { objectIOMap.clear(); }
+
+	void setMemory(Memory::const_ptr mem) { memory = mem; }
 
 protected:
 	//returns a NULL pointer if such a logger doesn't exist

@@ -29,7 +29,9 @@ public:
                    Parser(in_provider), Thread(name) {
     }
 
-    virtual ~ThreadedParser(){}
+    virtual ~ThreadedParser(){
+        this->stop();
+    }
 
     virtual bool getNext() = 0;
     virtual bool getPrev() = 0;

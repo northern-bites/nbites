@@ -29,7 +29,6 @@ void OutputProviderFactory::AllFileOutput(LoggingBoard* loggingBoard,
 
 void OutputProviderFactory::AllSocketOutput(LoggingBoard* loggingBoard) {
     for (MObject_ID id = FIRST_OBJECT_ID; id != LAST_OBJECT_ID; id++) {
-
         loggingBoard->newOutputProvider(
                 OutProvider::ptr(new SocketOutProvider(STREAMING_PORT_BASE +
                         static_cast<short>(id))), id);

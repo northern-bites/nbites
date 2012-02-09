@@ -69,16 +69,18 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
     comm = shared_ptr<Comm> (new Comm(sensors, vision));
 
+    loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
+    set_logging_board_pointer(loggingBoard);
+
 #ifdef USE_NOGGIN
     noggin = shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
                                             loggingBoard,
                                             motion->getInterface()));
 #endif// USE_NOGGIN
 
-    memory = shared_ptr<Memory> (new Memory(vision, sensors,noggin->loc));
+    memory = shared_ptr<Memory> (new Memory(vision, sensors, noggin->loc));
+    loggingBoard->setMemory(memory);
 
-    loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
-    set_logging_board_pointer(loggingBoard);
 
 #if defined USE_MEMORY && !defined OFFLINE
     OutputProviderFactory::AllSocketOutput(loggingBoard.get());
