@@ -5,7 +5,10 @@ message PVision {
     optional int64 timestamp = 1;
     optional PVisualBall visual_ball = 2;
     repeated PVisualCorner visual_corner = 3;
-
+    optional PVisualFieldObject bglp = 4;
+    optional PVisualFieldObject bgrp = 5;
+    optional PVisualFieldObject yglp = 6; 
+    optional PVisualFieldObject ygrp = 7;
 	message PVisualDetection {
 
 		optional float distance = 1;
@@ -46,5 +49,19 @@ message PVision {
     	optional uint32 secondary_shape = 4;
     	optional float angle_between_lines = 5;
     	optional float orientation = 6;
+    }
+
+    message PVisualFieldObject {
+    
+	required PVisualDetection visual_detection = 1;
+	required PVisualLandmark visual_landmark = 2;
+	optional sint32 left_top_x = 3;
+	optional sint32 left_top_y = 4;
+	optional sint32 right_top_x = 5;
+	optional sint32 right_top_y = 6; 
+	optional sint32 left_bottom_x = 7;
+	optional sint32 left_bottom_y = 8;
+	optional sint32 right_bottom_x = 9;
+	optional sint32 right_bottom_y = 10;
     }
 }

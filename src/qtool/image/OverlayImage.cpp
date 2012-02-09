@@ -20,6 +20,7 @@ void OverlayImage::updateBitmap() {
      int ball_radius = 2*ballData.radius();
      int image_width = 640;
      int image_height = 480;
+     
 
      bitmap= QImage(image_width,image_height, QImage::Format_ARGB32);
      QPainter painter(&bitmap);
@@ -40,7 +41,12 @@ void OverlayImage::updateBitmap() {
        painter.setBrush(QBrush(QColor::QColor(255,255,255,0),Qt::SolidPattern));
        painter.drawLine(2*corner_x-10, 2*corner_y-10, 2*corner_x+10, 2*corner_y+10);
        painter.drawLine(2*corner_x+10, 2*corner_y-10, 2*corner_x-10, 2*corner_y+10);
-     }     
+     }
+
+     /* const RepeatedPtrField<PVision::PVisualFieldObject> postData = visionData->get()->;
+     for(int j=0; j<postData.size(); j++) {
+       const PVision::PVisualLandMark postDatum = postData.Get(j);
+       int post_x=*/
 }
 
 }

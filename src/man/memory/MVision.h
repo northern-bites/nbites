@@ -41,6 +41,10 @@ private:
     //update helper methods
     void update(PVision::PVisualDetection* visual_detection,
             VisualDetection* visualDetection);
+    void update(PVision::PVisualLandmark* visual_landmark,
+	    VisualLandmark* visualLandmark);
+    void update(PVision::PVisualFieldObject* visual_field_object,
+	    VisualFieldObject* visualFieldObject);
 
 private:
     boost::shared_ptr<Vision> vision;

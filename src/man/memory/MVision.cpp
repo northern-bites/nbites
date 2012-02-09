@@ -40,7 +40,25 @@ void MVision::update() {
     //VisualBall::stuff
     visual_ball->set_radius(vision->ball->getRadius());
     visual_ball->set_confidence(vision->ball->getConfidence());
+    
+    //VisualFieldObject
+    PVision::PVisualFieldObject* bglp;
+    bglp= this->data->mutable_bglp();
+    update(bglp, vision->bglp);
+    
+    PVision::PVisualFieldObject* bgrp;
+    bgrp= this->data->mutable_bgrp();
+    update(bgrp, vision->bgrp);
 
+    PVision::PVisualFieldObject* yglp;
+    yglp= this->data->mutable_yglp();
+    update(yglp, vision->yglp);
+
+    PVision::PVisualFieldObject* ygrp;
+    ygrp= this->data->mutable_ygrp();
+    update(ygrp, vision->ygrp);
+    
+    
     //VisualCorners
     this->data->clear_visual_corner();
     list<VisualCorner>* visualCorners = vision->fieldLines->getCorners();
@@ -57,9 +75,8 @@ void MVision::update() {
         //VisualCorner::VisualLandmark
         PVision::PVisualLandmark* visual_landmark =
                 visual_corner->mutable_visual_landmark();
-        visual_landmark->set_id(i->getID());
-        visual_landmark->set_id_certainty(i->getIDCertainty());
-        visual_landmark->set_distance_certainty(i->getDistanceCertainty());
+	update(visual_landmark, &(*i));
+	
 
         //VisualCorner::stuff
         visual_corner->set_corner_type(i->getShape());
@@ -83,6 +100,29 @@ void MVision::update(PVision::PVisualDetection* visual_detection,
     visual_detection->set_elevation(visualDetection->getElevation());
     visual_detection->set_distance_sd(visualDetection->getDistanceSD());
     visual_detection->set_bearing_sd(visualDetection->getBearingSD());
+}
+
+  void MVision::update(PVision::PVisualLandmark* visual_landmark, 
+		       VisualLandmark* visualLandmark) {
+    visual_landmark->set_id(visualLandmark->getID());
+    visual_landmark->set_id_certainty(visualLandmark->getIDCertainty());
+    visual_landmark->set_distance_certainty(visualLandmark->getDistanceCertainty());
+
+}
+  void MVision::update(PVision::PVisualFieldObject* visual_field_object,
+		       VisualFieldObject* visualFieldObject) {
+    PVision::PVisualDetection* visual_detection = visual_field_object->mutable_visual_detection();
+    PVision::PVisualLandmark* visual_landmark = visual_field_object->mutable_visual_landmark();
+    update(visual_detection, visualFieldObject);
+    update(visual_landmark, visualFieldObject);
+    visual_field_object->set_left_top_x(visualFieldObject->getLeftTopX());
+    visual_field_object->set_left_top_y(visualFieldObject->getLeftTopY());
+    visual_field_object->set_left_bottom_x(visualFieldObject->getLeftBottomX());
+    visual_field_object->set_left_bottom_y(visualFieldObject->getLeftBottomY());
+    visual_field_object->set_right_top_x(visualFieldObject->getRightTopX());
+    visual_field_object->set_right_top_y(visualFieldObject->getRightTopY());    
+    visual_field_object->set_right_bottom_x(visualFieldObject->getRightBottomX());
+    visual_field_object->set_right_bottom_y(visualFieldObject->getRightBottomY());
 }
 }
 }
