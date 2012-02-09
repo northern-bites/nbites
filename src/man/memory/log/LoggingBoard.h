@@ -47,6 +47,8 @@ public:
 		return logging;
 	}
 
+	void reset() { objectIOMap.clear(); }
+
 protected:
 	//returns a NULL pointer if such a logger doesn't exist
 	MObjectLogger::const_ptr getLogger(MObject_ID id) const;

@@ -17,9 +17,9 @@ void LoggingBoard::newOutputProvider(OutProvider::ptr outProvider,
 									 MObject_ID id) {
 
     MObjectLogger::ptr logger(
-    			new MObjectLogger(outProvider, id, memory->getMObject(id)));
+    			new MObjectLogger(outProvider,  memory->getMObject(id)));
     objectIOMap[id] = logger;
-    memory->addSubscriber(logger.get(), id);
+    memory->subscribe(logger.get(), id);
     //start the logging thread
     logger->start();
 }

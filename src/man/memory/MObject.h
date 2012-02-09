@@ -5,8 +5,10 @@
  * to the generic wrapper class to the protobuffer subsystem we employ to
  * manage important data
  *
- * Most essential functions are virtual, so each inheriting class can modify the
- * way it gets serialized, etc.
+ * By default it uses the underlying protocol buffer object to implement the serialization/
+ * de-serialization of the data, but most of the function calls all virtual
+ * so they can be overwritten (for example if you want to handle serialization in some different
+ * way or want your inheriting MObject to not use ProtoBuffers at all)
  *
  *      Author: Octavian Neamtu
  */
@@ -18,6 +20,7 @@
 #include <stdint.h>
 
 #include "MemoryCommon.h"
+#include "Common.h"
 #include "ClassHelper.h"
 
 #include "Notifier.h"
@@ -30,6 +33,9 @@ class MObject : public SpecializedNotifier<MObject_ID>, public Subscriber {
 
     ADD_SHARED_PTR(MObject)
     ADD_NULL_INSTANCE(MObject)
+
+public:
+    static long long int time_stamp() { return realtime_micro_time(); }
 
 protected:
     /*
@@ -53,7 +59,9 @@ public:
 
     //TODO: make this pure virtual and implement in other class
     //or find generic way to implement
-    virtual const std::string& getName() const {return MObject_names[id];}
+    virtual const std::string& getName() const {return MObject_names[my_id];}
+    virtual MObject_ID getID() const {return my_id;}
+    virtual long long getBirthTime() const {return birth_time;}
     virtual void serializeToString(std::string* write_buffer) const;
     virtual void parseFromBuffer(const char* read_buffer, uint32_t buffer_size);
     virtual unsigned byteSize() const;
@@ -62,10 +70,10 @@ public:
     ProtoMessage_ptr getMutableProtoMessage() { return protoMessage;}
 
 protected:
-    MObject_ID id;
+    MObject_ID my_id;
     ProtoMessage_ptr protoMessage;
-    std::string name;
     mutex objectMutex;
+    long long int birth_time;
 
 };
 

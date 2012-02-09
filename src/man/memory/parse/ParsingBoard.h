@@ -39,6 +39,8 @@ public:
     void rewind(MObject_ID id);
     void rewindAll();
 
+    void reset() { objectIOMap.clear(); }
+
 private:
     Memory::ptr memory;
     ObjectIOMap objectIOMap;

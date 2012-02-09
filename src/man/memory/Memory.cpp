@@ -1,8 +1,3 @@
-/*
- * Memory.cpp
- *
- * @author Octavian Neamtu
- */
 
 #include <iostream>
 
@@ -12,9 +7,6 @@
 namespace man {
 namespace memory {
 
-long long int birth_time; //the time we initialized memory
-//everything else is time stamped relative to this
-
 using boost::shared_ptr;
 using namespace proto;
 using namespace std;
@@ -22,18 +14,12 @@ using namespace std;
 Memory::Memory(shared_ptr<Vision> vision_ptr,
                shared_ptr<Sensors> sensors_ptr,
                shared_ptr<LocSystem> loc_ptr) :
-        mVision(new MVision(MVISION_ID,
-                vision_ptr, shared_ptr<PVision>(new PVision))),
-        mVisionSensors(new MVisionSensors(MVISION_SENSORS_ID,
-                sensors_ptr, shared_ptr<PVisionSensors>(new PVisionSensors))),
-        mMotionSensors(new MMotionSensors(MMOTION_SENSORS_ID,
-                sensors_ptr, shared_ptr<PMotionSensors>(new PMotionSensors))),
-        mImage(new MImage(MIMAGE_ID,
-                          sensors_ptr, shared_ptr<PImage>(new PImage))),
-        mLocalization(new MLocalization(MLOCALIZATION_ID,
-                                        loc_ptr, shared_ptr<PLoc>(new PLoc)))
+        mVision(new MVision(vision_ptr)),
+        mVisionSensors(new MVisionSensors(sensors_ptr)),
+        mMotionSensors(new MMotionSensors(sensors_ptr)),
+        mImage(new MImage(sensors_ptr)),
+        mLocalization(new MLocalization(loc_ptr))
 {
-    birth_time = process_micro_time();
 
     if(sensors_ptr.get()) {
         sensors_ptr->addSubscriber(mVisionSensors.get(), NEW_VISION_SENSORS);
@@ -41,11 +27,11 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
         sensors_ptr->addSubscriber(mImage.get(), NEW_IMAGE);
     }
 
-    mobject_IDMap.insert(MObject_IDPair(MVISION_ID, mVision));
-    mobject_IDMap.insert(MObject_IDPair(MVISION_SENSORS_ID, mVisionSensors));
-    mobject_IDMap.insert(MObject_IDPair(MMOTION_SENSORS_ID, mMotionSensors));
-    mobject_IDMap.insert(MObject_IDPair(MIMAGE_ID, mImage));
-    mobject_IDMap.insert(MObject_IDPair(MLOCALIZATION_ID, mLocalization));
+    mobject_IDMap.insert(MObject_IDPair(mVision->getID(), mVision));
+    mobject_IDMap.insert(MObject_IDPair(mVisionSensors->getID(), mVisionSensors));
+    mobject_IDMap.insert(MObject_IDPair(mMotionSensors->getID(), mMotionSensors));
+    mobject_IDMap.insert(MObject_IDPair(mImage->getID(), mImage));
+    mobject_IDMap.insert(MObject_IDPair(mLocalization->getID(), mLocalization));
 }
 
 Memory::~Memory() {
@@ -80,14 +66,14 @@ MObject::ptr Memory::getMutableMObject(MObject_ID id) {
     }
 }
 
-void Memory::addSubscriber(Subscriber* subscriber,
+void Memory::subscribe(Subscriber* subscriber,
                            MObject_ID objectToSubscribeTo) const {
     getMObject(objectToSubscribeTo)->addSubscriber(subscriber);
 }
 
 void Memory::unsubscribe(Subscriber* subscriber,
                          MObject_ID objectToUnsuscribeFrom) const {
-
+    getMObject(objectToUnsuscribeFrom)->unsubscribe(subscriber);
 }
 
 }

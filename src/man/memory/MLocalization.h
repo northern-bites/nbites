@@ -1,6 +1,6 @@
 /**
  *
- *@class MLocalization : This is the memory reprensentation of Loc
+ * @class MLocalization : This is the memory reprensentation of Loc
  *
  * @author EJ Googins
  */
@@ -13,25 +13,27 @@
 #include "MObject.h"
 #include "LocSystem.h"
 
-namespace man{
-    namespace memory {
+namespace man {
+namespace memory {
 
-        class MLocalization: public MObject {
+class MLocalization: public MObject {
 
-        public:
-            MLocalization(MObject_ID id, boost::shared_ptr<LocSystem> l,
-                           boost::shared_ptr<proto::PLoc> loc_l_data);
-            virtual ~MLocalization();
+public:
+    static const MObject_ID id = MLOCALIZATION_ID;
 
-            /**
-             * Updates all the fields of the proto::PLoc
-             * with values from the LocSystem pointer
-             */
-            void update();
+public:
+    MLocalization(boost::shared_ptr<LocSystem> locSystem);
+    virtual ~MLocalization();
 
-        private:
-            boost::shared_ptr<LocSystem> locSystem;
-            boost::shared_ptr<proto::PLoc> data;
-        };
-    }
+    /**
+     * Updates all the fields of the proto::PLoc
+     * with values from the LocSystem pointer
+     */
+    void update();
+
+private:
+    boost::shared_ptr<LocSystem> locSystem;
+    boost::shared_ptr<proto::PLoc> data;
+};
+}
 }

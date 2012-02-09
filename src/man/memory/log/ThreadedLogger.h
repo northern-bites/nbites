@@ -29,7 +29,9 @@ public:
                    Logger(out_provider), Thread(name) {
     }
 
-    virtual ~ThreadedLogger(){}
+    virtual ~ThreadedLogger(){
+        this->stop();
+    }
 
     virtual void writeToLog() = 0;
 

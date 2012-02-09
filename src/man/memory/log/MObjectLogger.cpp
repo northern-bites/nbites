@@ -19,24 +19,22 @@
 namespace man {
 namespace memory {
 
-extern long long birth_time;
-
 namespace log {
 
 using namespace std;
 
 MObjectLogger::MObjectLogger(OutProvider::ptr out_provider,
-                             int logTypeID, MObject::const_ptr objectToLog) :
-        ThreadedLogger(out_provider, "Log" + MObject_names[logTypeID]),
-        logID(logTypeID), objectToLog(objectToLog) {
+                             MObject::const_ptr objectToLog) :
+        ThreadedLogger(out_provider, "Log" + objectToLog->getName()),
+        objectToLog(objectToLog) {
 }
 
 void MObjectLogger::writeHead() {
     // log ID
-    out_provider->writeValue<int32_t>(logID);
+    out_provider->writeValue<int32_t>(objectToLog->getID());
     // the absolute time stamp of the log
     //(all other time stamps are relative to this)
-    out_provider->writeValue<int64_t>(birth_time);
+    out_provider->writeValue<int64_t>(objectToLog->getBirthTime());
 }
 
 void MObjectLogger::writeToLog() {

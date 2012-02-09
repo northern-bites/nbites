@@ -28,13 +28,9 @@ enum MObject_ID {
     LAST_OBJECT_ID //dummy object
 };
 
-}
+static const MObject_ID FIRST_OBJECT_ID = MVISION_ID;
 
-//using the combination of namespace and using namespace
-//effectively hides the MObject_ID enum in other namespaces other than
-//man vision; if another namespace wishes to use it, it should do
-//using namespace man::memory::MObject_IDs;
-using namespace MObject_IDs;
+// the ++ give an MObject_ID iterator-like properties
 
 inline void operator++(MObject_ID& id) {
     id = MObject_ID(id+1);
@@ -44,8 +40,6 @@ inline void operator++(MObject_ID& id, int) {
     id = MObject_ID(id+1);
 }
 
-static const MObject_ID FIRST_OBJECT_ID = MVISION_ID;
-
 static const std::string MObject_names[] = {
             "unknown",
             "Vision",
@@ -54,6 +48,15 @@ static const std::string MObject_names[] = {
             "Image",
             "Localization"
 };
+
+}
+
+//using the combination of namespace and using namespace
+//effectively hides the MObject_ID enum in other namespaces other than
+//man vision; if another namespace wishes to use it, it should do
+//using namespace man::memory::MObject_IDs;
+using namespace MObject_IDs;
+
 
 }
 }

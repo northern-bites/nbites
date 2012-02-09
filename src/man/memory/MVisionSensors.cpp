@@ -1,11 +1,5 @@
-/*
- * MVisionSensors.cpp
- *
- *      Author: oneamtu
- */
 
 #include "Common.h" //for micro_time
-#include "MemoryMacros.h"
 #include "MVisionSensors.h"
 
 #include <vector>
@@ -17,9 +11,10 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-MVisionSensors::MVisionSensors(MObject_ID id, shared_ptr<Sensors> s,
-        shared_ptr<proto::PVisionSensors> vision_s_data) :
-        MObject(id, vision_s_data), sensors(s), data(vision_s_data) {
+MVisionSensors::MVisionSensors(shared_ptr<Sensors> sensors) :
+        MObject(id), sensors(sensors),
+        data(new PVisionSensors()) {
+    MObject::protoMessage = data;
 }
 
 MVisionSensors::~MVisionSensors() {
@@ -27,7 +22,7 @@ MVisionSensors::~MVisionSensors() {
 
 void MVisionSensors::updateData() {
 
-    ADD_PROTO_TIMESTAMP;
+    this->data->set_timestamp(time_stamp());
 
     this->data->clear_vision_body_angles();
     vector<float> bodyAngles = sensors->getVisionBodyAngles();

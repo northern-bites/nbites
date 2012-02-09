@@ -7,8 +7,8 @@ namespace memory {
 using namespace std;
 
 MObject::MObject(MObject_ID id, ProtoMessage_ptr protoMessage)
-    : SpecializedNotifier<MObject_ID>(id), id(id), protoMessage(protoMessage),
-      objectMutex(MObject_names[id]) {
+    : SpecializedNotifier<MObject_ID>(id), my_id(id), protoMessage(protoMessage),
+      objectMutex(MObject_names[id]), birth_time(time_stamp()) {
 }
 
 void MObject::update() {
