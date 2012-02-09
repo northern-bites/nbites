@@ -37,32 +37,29 @@ class Robots; // forward reference
 class Robots {
 public:
     Robots(Vision* vis, Threshold* thr, Field* fie, Context* con,
-		   unsigned char c);
+           unsigned char c);
     virtual ~Robots() {}
 
-	void init();
-	void preprocess();
-	void robot(Cross *cross);
-	void expandRobotBlob(int which);
-	bool noWhite(Blob b);
-	void updateRobots(int w, int i);
-	void mergeBigBlobs();
+    void init();
+    void findRobots(Cross* cross);
+    void findUniforms();
+    void findRobotParts();
+    Blob correctBlob(Blob area);
+    bool checkWhiteAllignment(Blob candidate);
+    Blob createAreaOfInterest(Blob robotBlob);
+    bool noWhite(Blob b);
+    void updateRobots(int w, int i);
+    void mergeBigBlobs();
     void checkMerge(int i, int j);
-	bool closeEnough(int i, int j);
-    bool sanityChecks(Blob candidate, Cross* cross);
-	bool bigEnough(Blob a, Blob b);
-	bool notGreen(Blob a);
+    bool closeEnough(int i, int j);
+    bool sanityChecks(int index);
+    bool notGreen(Blob a);
     bool whiteBelow(Blob a);
     bool whiteAbove(Blob b);
-	bool checkHorizontal(int l, int r, int t, int b);
-	bool checkVertical(int l, int r, int t, int b);
-	bool viableRobot(Blob a);
-	void createObject();
-	void newRun(int x, int y, int h);
-	void setColor(unsigned char c);
-	void allocateColorRuns();
-	int distance(int x, int x1, int x2, int x3);
-	void printBlob(Blob a);
+    void allocateColorRuns();
+    int  distance(int x, int x1, int x2, int x3);
+    void printBlob(Blob a);
+    void setImageBox(int i, int j, int value);
 
 #ifdef OFFLINE
     void setDebugRobots(bool debug) {debugRobots = debug;}
@@ -73,14 +70,15 @@ private:
     // class pointers
     Vision* vision;
     Threshold* thresh;
-	Field* field;
+    Field* field;
     Context* context;
 
-	Blobs* blobs;
-	int numberOfRuns, runsize;
-	unsigned char color;
-	Blob* topBlob;
-	run* runs;
+    int imageBoxes[64][48];
+    Blobs* blobs;
+    Blobs* whiteBlobs;
+    int numberOfRuns, runsize;
+    unsigned char color;
+    run* runs;
 #ifdef OFFLINE
     bool debugRobots;
 #else

@@ -33,6 +33,9 @@ private:
     image::BMPImage::ptr image;
     RoboImageViewer* roboImageViewer;
 
+private slots:
+        void nextClicked();
+
 };
 
 }
