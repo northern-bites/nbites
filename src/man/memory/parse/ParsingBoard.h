@@ -16,6 +16,7 @@
 #include "MObjectParser.h"
 #include "memory/MObject.h"
 #include "memory/Memory.h"
+#include "memory/MemoryCommon.h"
 
 namespace man {
 namespace memory {
@@ -31,7 +32,10 @@ public:
     ParsingBoard(Memory::ptr memory);
     virtual ~ParsingBoard();
 
-    void newInputProvider(common::io::InProvider::ptr inProvider);
+    // warning: this function may block in trying to find out the MObject_ID
+    // associated with this input if the MObject_ID is UNKNOWN_OBJECT
+    void newInputProvider(common::io::InProvider::ptr inProvider,
+                          MObject_ID id = UNKNOWN_OBJECT);
 
     void parseNext(MObject_ID id);
     void parseNextAll();

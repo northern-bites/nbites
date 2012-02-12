@@ -34,19 +34,20 @@ class MObjectParser : public ThreadedParser {
     ADD_SHARED_PTR(MObjectParser)
 
 public:
-    MObjectParser(common::io::InProvider::ptr inProvider,
+    static const uint32_t TOO_BIG_THRESHOLD = 2000000; // ~2MB
+
+public:
+    MObjectParser(common::io::InProvider::ptr in_provider,
             MObject::ptr objectToParseTo = MObject::NullInstanceSharedPtr());
 
     virtual ~MObjectParser();
 
-    void initStreams();
-
-    void readNextMessage() {}
-    void parseNextMessage() {}
-
-    bool getNext();
+    void readHeader();
+    bool readNextMessage();
     bool getPrev(uint32_t n);
     bool getPrev();
+
+    virtual void run();
 
     virtual LogHeader getHeader() const {return log_header;}
 
@@ -56,7 +57,10 @@ public:
         objectToParseTo = newObject;
     }
 
-    void readHeader();
+    void signalToParseNext() {
+        this->signalToResume();
+    }
+
 private:
     void increaseBufferSizeTo(uint32_t new_size);
     uint32_t truncateNumberOfFramesToRewind(uint32_t n) const;

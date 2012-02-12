@@ -17,21 +17,22 @@ ParsingBoard::ParsingBoard(Memory::ptr memory) :
 
 ParsingBoard::~ParsingBoard(){}
 
-void ParsingBoard::newInputProvider(InProvider::ptr inProvider) {
-    MObjectParser::ptr mObjectParser(new MObjectParser(inProvider));
+void ParsingBoard::newInputProvider(InProvider::ptr inProvider, MObject_ID id) {
 
-    //warning - if target is a socket, then this might block (potentially
-    //forever)
-    //TODO: find some way around that (the tricky part is that we use
-    // the id we get from reading the log to identify what memory object
-    // it's going to be parsed to, so we need to wait on the open is some
-    // way)
-    inProvider->openCommunicationChannel();
-    MObject_ID id;
-    id = inProvider->peekAndGet<MObject_ID>();
+    if (id == UNKNOWN_OBJECT) {
+        //warning - if target is a socket, then this might block (potentially
+        //forever)
+        //TODO: find some way around that (the tricky part is that we use
+        // the id we get from reading the log to identify what memory object
+        // it's going to be parsed to, so we need to wait on the open is some
+        // way)
+        inProvider->openCommunicationChannel();
+        id = inProvider->peekAndGet<MObject_ID>();
+    }
 
     if (0 < id && id < LAST_OBJECT_ID) {
-        mObjectParser->setObjectToParseTo(memory->getMutableMObject(id));
+        MObjectParser::ptr mObjectParser(new MObjectParser(inProvider,
+                                memory->getMutableMObject(id)));
         objectIOMap[id] = mObjectParser;
         mObjectParser->start();
     } else {
@@ -46,15 +47,14 @@ void ParsingBoard::parseNext(MObject_ID id) {
     // if this is true, then we found a legitimate parser
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
-        //it->second is the parser associated with the specified mobject
-        it->second->getNext();
+        it->second->signalToParseNext();
     }
 }
 
 void ParsingBoard::parseNextAll() {
     for (ObjectIOMap::iterator it = objectIOMap.begin();
             it != objectIOMap.end(); it++ ) {
-        it->second->signalToParse();
+        it->second->signalToParseNext();
     }
 
 }
