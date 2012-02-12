@@ -20,8 +20,14 @@ DataManager::DataManager() :
 DataManager::~DataManager() {
 }
 
-void DataManager::newInputProvider(common::io::InProvider::ptr newInput) {
-    parsingBoard.newInputProvider(newInput);
+void DataManager::newInputProvider(common::io::InProvider::ptr newInput,
+                                   MObject_ID id) {
+    parsingBoard.newInputProvider(newInput, id);
+}
+
+void DataManager::reset() {
+    parsingBoard.reset();
+    loggingBoard.reset();
 }
 
 void DataManager::startRecordingToPath(string path) {

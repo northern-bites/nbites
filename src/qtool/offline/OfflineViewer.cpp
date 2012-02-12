@@ -18,7 +18,7 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) :
         manPreloader(offlineControl),
         loaded(false) {
 
-    memory->addSubscriber(this, MIMAGE_ID);
+    memory->subscribe(this, MIMAGE_ID);
 
     mainLayout = new QVBoxLayout;
     QHBoxLayout* buttonLayout = new QHBoxLayout;

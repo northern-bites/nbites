@@ -64,7 +64,7 @@ public:
         for (MObject_ID id = FIRST_OBJECT_ID;
                         id != LAST_OBJECT_ID; id++) {
             SubscriberEmiterConvertor* convertor = new SubscriberEmiterConvertor;
-            memory->addSubscriber(convertor, id);
+            memory->subscribe(convertor, id);
             convertors.insert(ms_pair(id, convertor));
         }
     }

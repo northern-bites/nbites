@@ -2,8 +2,8 @@
  *
  * @class DataManager
  *
- * This class should handle the notifying all subscribers to new data
- * coming into the system (be it online or offline)
+ * This class is an empowered RobotMemoryManager imbued with a parsing board and
+ * a logging board for easy IO from and to the managed memory.
  *
  * @author Octavian Neamtu
  *
@@ -24,29 +24,30 @@
 namespace qtool {
 namespace data {
 
-class DataManager : public RobotMemoryManager {
+class DataManager: public RobotMemoryManager {
 
-    Q_OBJECT
+Q_OBJECT
 
-ADD_SHARED_PTR(DataManager);
+ADD_SHARED_PTR(DataManager)
 
 public:
     DataManager();
 
     virtual ~DataManager();
 
+    void startRecordingToPath(std::string path);
+
+public slots:
     void getNext() {
         parsingBoard.parseNextAll();
     }
-
     void getPrev() {
         parsingBoard.rewindAll();
     }
 
-    void startRecordingToPath(std::string path);
-
-public slots:
-    void newInputProvider(common::io::InProvider::ptr newInput);
+    void newInputProvider(common::io::InProvider::ptr newInput,
+                          MObject_ID id);
+    void reset();
 
 protected:
     man::memory::parse::ParsingBoard parsingBoard;

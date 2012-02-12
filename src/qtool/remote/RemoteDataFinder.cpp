@@ -28,12 +28,13 @@ RemoteDataFinder::RemoteDataFinder(QWidget* parent) :
 
 void RemoteDataFinder::robotSelected(const RemoteRobot* remoteRobot) {
 
+    emit signalNewDataSet();
+
     for (MObject_ID id = FIRST_OBJECT_ID; id != LAST_OBJECT_ID; id++) {
         InProvider::ptr socket_in = InProvider::ptr(new SocketInProvider(
                 remoteRobot->getAddress().toIPv4Address(),
                 STREAMING_PORT_BASE + static_cast<short>(id)));
-//        socket_in->openCommunicationChannel();
-        emit signalNewInputProvider(socket_in);
+        emit signalNewInputProvider(socket_in, id);
     }
 }
 

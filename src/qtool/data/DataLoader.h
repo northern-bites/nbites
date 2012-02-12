@@ -1,7 +1,9 @@
 /**
  * @class DataLoader
  *
- * A class that maintains a UI to select a DataSource
+ * A class that combines an offlineDataFinder for browsing for logs offline and
+ * a remoteDataFinder for streaming from the robots in a single widget and
+ * also connects these widgets up to the dataManager
  *
  * @author Octavian Neamtu <oneamtu89@gmail.com>
  */
@@ -26,9 +28,6 @@ class DataLoader : public QWidget
 public:
     DataLoader(DataManager::ptr dataManager ,QWidget *parent = 0);
     ~DataLoader();
-
-private:
-    QComboBox* setupDataSelectorBox();
 
 private:
     DataManager::ptr dataManager;
