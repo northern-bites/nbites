@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fcntl.h>
 #include <string>
+#include <cerrno>
 #include "InProvider.h"
 #include "FileDefs.h"
 
@@ -21,11 +22,11 @@ class FileInProvider : public InProvider {
 public:
     FileInProvider(std::string file_name) :
                 file_name(file_name),
-                flags(EXISTING), has_been_opened(false) {
+                is_open(false) {
     }
 
     virtual ~FileInProvider() {
-        close(file_descriptor);
+        fclose(file);
     }
 
     virtual std::string debugInfo() const {
@@ -34,73 +35,65 @@ public:
 
     virtual bool isOfTypeStreaming() const { return false; }
 
-    virtual uint64_t getCurrentPosition() const {
-        return lseek64(file_descriptor, 0, SEEK_CUR);
+    virtual bool reachedEnd() const {
+        return feof(file);
     }
 
-    virtual bool rewind(uint64_t offset) const {
-        if (offset <= getCurrentPosition()) {
-            uint64_t true_offset = 0;
-            true_offset = lseek64(file_descriptor, -offset, SEEK_CUR);
-            //TODO: we could check to see if the true_offset
-            //signals an error or just moves the pointer
-            //by a smaller offset than what we want;
-            //in the latter case we could try to revert
-            //the changes done - Octavian
+    virtual long int getCurrentPosition() const {
+        uint32_t result;
+        return ftell(file);
+        return result;
+    }
 
-            //if the return value is the same as (-offset) -1
-            //then lseek is signaling an error
-            if (true_offset != -offset-1) {
+    virtual bool rewind(long int offset) const {
+        if (offset <= getCurrentPosition()) {
+            int result = fseek(file, -offset, SEEK_CUR);
+            if (result == 0) {
                 return true;
             }
         }
         return false;
     }
 
-    virtual bool readCharBuffer(char* buffer, uint32_t size) const {
+    virtual uint32_t readCharBuffer(char* buffer, uint32_t size) const throw (file_read_exception) {
         if (!opened()) {
-            std::cout<<"Cannot read from not yet open channel "
-                    <<debugInfo()<<std::endl;
-            return false;
+            throw file_read_exception(file_read_exception::NOT_OPEN);
         }
 
         uint32_t result = 0;
-        result = read(file_descriptor, buffer, size);
+        result = fread(buffer, sizeof(char), size, file);
 
-        if (result != size) {
-            std::cout<<"Could not read in " << size <<" bytes from "
-                    << debugInfo() << std::endl;
-            return false;
+        if (ferror(file)) {
+            throw file_read_exception(file_read_exception::READ, ferror(file));
         }
-        return true;
+
+        return result;
     }
 
-    virtual void peekAt(char* buffer, uint32_t size) const {
+    virtual void peekAt(char* buffer, uint32_t size) const throw (file_read_exception) {
         this->readCharBuffer(buffer, size);
         this->rewind(size);
     }
 
-    void openCommunicationChannel() {
+    void openCommunicationChannel() throw (file_exception) {
 
-        file_descriptor = open(file_name.c_str(), flags);
+        file = fopen(file_name.c_str(), "rb");
 
-        if (file_descriptor < 0) {
-            std::cout << "Could not open file: " << debugInfo() << std::endl;
-            file_descriptor = -1;
-            return;
+        if (file == NULL) {
+            throw file_exception(file_exception::CREATE_ERR, errno);
         }
 
-        has_been_opened= true;
+        is_open= true;
     }
 
     virtual bool opened() const {
-        return has_been_opened;
+        return is_open;
     }
 
 private:
     std::string file_name;
-    OpenFlags flags;
-    bool has_been_opened;
+    bool is_open;
+    FILE* file;
 
 };
 

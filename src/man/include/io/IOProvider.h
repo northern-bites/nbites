@@ -31,18 +31,13 @@ class IOProvider {
 ADD_SHARED_PTR(IOProvider);
 
 public:
-    IOProvider() : file_descriptor(-1) {}
+    IOProvider() {}
     virtual ~IOProvider() {};
 
     virtual std::string debugInfo() const = 0;
 
     virtual void openCommunicationChannel() = 0;
     virtual bool opened() const = 0;
-
-    int getFileDescriptor() { return file_descriptor; }
-protected:
-    int file_descriptor;
-
 };
 
 }

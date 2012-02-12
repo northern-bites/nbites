@@ -47,7 +47,7 @@ public:
         return aio_error(&control_block) == EINPROGRESS;
     }
 
-    //busy blocks before the other write is done
+    //yields before the other write is done!
     virtual void writeCharBuffer(const char* buffer, uint32_t size) {
         if (!opened()) {
             std::cout<<"Cannot write to a not yet open channel "
@@ -91,9 +91,10 @@ public:
         writeCharBuffer(reinterpret_cast<const char *>(&value), sizeof(value));
     }
 
-private:
+protected:
     struct aiocb control_block;
     unsigned long long bytes_written;
+    int file_descriptor;
 };
 
 }
