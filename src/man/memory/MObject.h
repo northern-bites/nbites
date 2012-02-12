@@ -44,7 +44,7 @@ protected:
      * MObject_ID associated with it)
      * protoMessage : the protocol message associated with this MObject
      */
-    MObject(MObject_ID id = UNKOWN_OBJECT,
+    MObject(MObject_ID id = UNKNOWN_OBJECT,
             ProtoMessage_ptr protoMessage = ProtoMessage_ptr());
 
 public:

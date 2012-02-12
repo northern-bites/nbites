@@ -19,7 +19,7 @@ typedef boost::shared_ptr<const ProtoMessage> ProtoMessage_const_ptr;
 namespace MObject_IDs {
 
 enum MObject_ID {
-    UNKOWN_OBJECT = 0,
+    UNKNOWN_OBJECT = 0,
     MVISION_ID,
     MMOTION_SENSORS_ID,
     MVISION_SENSORS_ID,
