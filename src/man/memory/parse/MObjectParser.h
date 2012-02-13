@@ -64,6 +64,16 @@ public:
 private:
     void increaseBufferSizeTo(uint32_t new_size);
     uint32_t truncateNumberOfFramesToRewind(uint32_t n) const;
+    void waitForReadToFinish();
+
+    template <typename T>
+    T readValue() {
+        T value;
+        readIntoBuffer((char *)(&value), sizeof(value));
+        return value;
+    }
+
+    bool readIntoBuffer(char* buffer, uint32_t num_bytes);
 
 private:
     MObject::ptr objectToParseTo;

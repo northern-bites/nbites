@@ -10,7 +10,6 @@
  *
  */
 
-
 #include "Logger.h"
 #include "synchro/synchro.h"
 #include "Subscriber.h"
@@ -20,17 +19,17 @@ namespace man {
 namespace memory {
 namespace log {
 
-class ThreadedLogger : public Logger, public Thread, public Subscriber {
+class ThreadedLogger: public Logger, public Thread, public Subscriber {
 
 ADD_SHARED_PTR(ThreadedLogger)
 
 public:
     ThreadedLogger(OutProvider::ptr out_provider, std::string name) :
-                   Logger(out_provider), Thread(name) {
+            Logger(out_provider), Thread(name) {
+
     }
 
-    virtual ~ThreadedLogger(){
-        this->stop();
+    virtual ~ThreadedLogger() {
     }
 
     virtual void writeToLog() = 0;
@@ -48,7 +47,7 @@ public:
             this->waitForSignal();
             this->writeToLog();
 
-            while(out_provider->writingInProgress()) {
+            while (out_provider->writingInProgress()) {
                 this->yield();
             }
         }
@@ -59,7 +58,7 @@ public:
     }
 
     void update() {
-    	this->signalToLog();
+        this->signalToLog();
     }
 
 };

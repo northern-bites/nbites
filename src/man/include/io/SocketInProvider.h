@@ -31,16 +31,21 @@ class SocketInProvider: public InProvider {
 public:
     static const int INVALID_FD = -1;
 
-
 public:
     SocketInProvider(long address, short port) :
-            port(port), address(address), is_open(false),
-            file_descriptor(INVALID_FD) {
+                    port(port),
+                    address(address),
+                    is_open(false),
+                    file_descriptor(INVALID_FD) {
         //zeroes the aio control_block
         memset(&control_block, 0, sizeof(control_block));
     }
 
     virtual ~SocketInProvider() {
+        closeChannel();
+    }
+
+    virtual void closeChannel() {
         is_open = false;
         close(file_descriptor);
     }
@@ -57,7 +62,7 @@ public:
         return false;
     }
 
-    void createSocket() throw(socket_exception) {
+    void createSocket() throw (socket_exception) {
         file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
 
         if (file_descriptor < 0) {
@@ -68,7 +73,7 @@ public:
 
     //non-blocking! times out in 15 s
     //http://developerweb.net/viewtopic.php?id=3196)
-    void connectSocket() throw(socket_exception) {
+    void connectSocket() throw (socket_exception) {
         server_address.sin_family = AF_INET;
         server_address.sin_port = htons(port);
         server_address.sin_addr.s_addr = htonl(address);
@@ -102,7 +107,8 @@ public:
                     getsockopt(file_descriptor, SOL_SOCKET, SO_ERROR,
                             (void*) (&return_code), &lon);
                     if (return_code) {
-                        throw socket_exception(socket_exception::CREATE_ERR, return_code);
+                        throw socket_exception(socket_exception::CREATE_ERR,
+                                return_code);
                     } else {
                         is_open = true;
                     }
@@ -134,44 +140,40 @@ public:
         }
     }
 
-    //warning - does a pthread_yield until finished!
-    virtual void waitForReadToFinish() const throw (aio_read_exception) {
-
-        //TODO: yielding is less than ideal, maybe using a callback with the aio
-        //stuff be worthwhile - Octavian
-        while (readInProgress() && is_open) {
-            pthread_yield();
-        }
-        if (aio_error(&control_block) != 0) {
-            throw aio_read_exception(aio_read_exception::READ, errno);
-        }
-    }
-
-    virtual uint32_t aioReadCharBuffer(char* buffer, uint32_t size) const throw(aio_read_exception) {
+    virtual void aioReadCharBuffer(char* buffer, uint32_t size) const
+            throw (aio_read_exception) {
 
         if (!opened()) {
             throw aio_read_exception(aio_read_exception::NOT_OPEN);
         }
 
-        enqueBuffer(buffer, size);
-        waitForReadToFinish();
+        if (readInProgress()) {
+            throw aio_read_exception(aio_read_exception::IN_PROGRESS);
+        }
 
-        //aio_return returns the number of bytes actually read
-        //after the read is done
-        uint32_t read_bytes = aio_return(&control_block);
-        //read the rest of the buffer if we haven't read enough
-        return read_bytes;
+        enqueBuffer(buffer, size);
     }
 
-    virtual uint32_t readCharBuffer(char* buffer, uint32_t size) const throw(aio_read_exception) {
+    virtual void readCharBuffer(char* buffer, uint32_t size) const
+            throw (aio_read_exception) {
         return aioReadCharBuffer(buffer, size);
+    }
+
+    virtual uint32_t bytesRead() const throw (aio_read_exception) {
+        if (readInProgress()) {
+            throw aio_read_exception(aio_read_exception::IN_PROGRESS);
+        }
+        if (aio_error(&control_block) != 0) {
+            throw aio_read_exception(aio_read_exception::READ, errno);
+        }
+        return aio_return(&control_block);
     }
 
     virtual bool readInProgress() const {
         return aio_error(&control_block) == EINPROGRESS;
     }
 
-    void openCommunicationChannel() throw(socket_exception) {
+    void openCommunicationChannel() throw (socket_exception) {
         if (is_open) {
             return;
         }
@@ -184,7 +186,8 @@ public:
     }
 
     //blocking!
-    virtual void peekAt(char* buffer, uint32_t size) const throw(aio_read_exception) {
+    virtual void peekAt(char* buffer, uint32_t size) const
+            throw (aio_read_exception) {
         if (!opened()) {
             throw aio_read_exception(aio_read_exception::NOT_OPEN);
         }

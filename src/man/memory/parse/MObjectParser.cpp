@@ -26,6 +26,7 @@ MObjectParser::~MObjectParser() {
     if (current_buffer) {
         free(current_buffer);
     }
+    in_provider->closeChannel();
     this->stop();
     this->waitForThreadToFinish();
 }
@@ -35,12 +36,12 @@ void MObjectParser::run() {
     while (running) {
         if (!in_provider->opened()) {
             //blocking for socket fds, (almost) instant for other ones
-            in_provider->openCommunicationChannel();
-            //if it's not yet open, it means the opening failed
-            if (!in_provider->opened()) {
+            try {
+                in_provider->openCommunicationChannel();
+            } catch (io_exception& io_exception) {
+                cout << io_exception.what() << endl;
                 return;
             }
-            std::cout << "reading head in" << std::endl;
             this->readHeader();
         }
         //the order here matters; if getNext is put after waitForSignal
@@ -55,12 +56,18 @@ void MObjectParser::run() {
     }
 }
 
+void MObjectParser::waitForReadToFinish() {
+    while(in_provider->readInProgress() && running) {
+        pthread_yield();
+    }
+}
+
 void MObjectParser::readHeader() {
 
-    log_header.log_id = in_provider->readValue<MObject_ID>();
+    log_header.log_id = this->readValue<MObject_ID>();
     cout << "Log ID: " << log_header.log_id << endl;
 
-    log_header.birth_time = in_provider->readValue<int64_t>();
+    log_header.birth_time = this->readValue<int64_t>();
     cout << "Birth time: " << log_header.birth_time << endl;
 }
 
@@ -78,12 +85,12 @@ bool MObjectParser::readNextMessage() {
         return false;
     }
 
-    current_message_size = in_provider->readValue<uint32_t>();
+    current_message_size = this->readValue<uint32_t>();
     message_sizes.push_back(current_message_size);
 
     if (current_message_size > TOO_BIG_THRESHOLD) {
-        cout << "Message size is too big! Cannot read in "
-             << current_message_size << " bytes" << endl;
+//        cout << "Message size is too big! Cannot read in "
+//             << current_message_size << " bytes" << endl;
         return false;
     }
 
@@ -91,17 +98,29 @@ bool MObjectParser::readNextMessage() {
         increaseBufferSizeTo(current_message_size);
     }
 
+    bool result = readIntoBuffer(current_buffer, current_message_size);
+
+    if (result == true) {
+        objectToParseTo->parseFromBuffer(current_buffer, current_message_size);
+        return true;
+    }
+    return false;
+}
+
+bool MObjectParser::readIntoBuffer(char* buffer, uint32_t num_bytes) {
     uint32_t bytes_read = 0;
-    while (bytes_read < current_message_size) {
+    while (bytes_read < num_bytes) {
         try {
-            bytes_read += in_provider->readCharBuffer(current_buffer, current_message_size);
+            in_provider->readCharBuffer(
+                    buffer + bytes_read, num_bytes - bytes_read);
+            waitForReadToFinish();
+            bytes_read += in_provider->bytesRead();
         }
         catch (read_exception& read_exception) {
-            cout << read_exception.what() << endl;
+            cout << read_exception.what() << " " << in_provider->debugInfo() << endl;
             return false;
         }
     }
-    objectToParseTo->parseFromBuffer(current_buffer, current_message_size);
     return true;
 }
 

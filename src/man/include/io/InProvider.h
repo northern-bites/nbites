@@ -30,30 +30,29 @@ public:
     virtual std::string debugInfo() const = 0;
     virtual bool rewind(long int offset) const = 0;
     virtual void openCommunicationChannel() throw (std::exception) = 0;
+    virtual void closeChannel() = 0;
     virtual bool opened() const = 0;
-    //return false because read() blocks until it finishes
-    virtual bool readInProgress() const {return false;}
+    virtual bool readInProgress() const = 0;
     virtual bool isOfTypeStreaming() const = 0;
     virtual bool reachedEnd() const = 0;
     virtual void peekAt(char* buffer, uint32_t size) const throw (read_exception) = 0;
 
+    // does a read from the source of the input
+    // might be blocking or might be asynchronous (in which case
+    // readInProgress() is going to return true as the read is running)
+    virtual void readCharBuffer(char* buffer, uint32_t size) const
+                                        throw (read_exception) = 0;
+
+    // returns the number of bytes actually read in the last read
+    // call this after making sure a read is done
+    virtual uint32_t bytesRead() const throw (read_exception) = 0;
+
+    // peeks at the stream and interprets the next bytes as a structure of type
+    // T; might block
     template<class T>
     T peekAndGet() const throw (read_exception) {
         T value;
         peekAt(reinterpret_cast<char *>(&value), sizeof(value));
-        return value;
-    }
-
-    // returns the number of bytes actually read
-    virtual uint32_t readCharBuffer(char* buffer, uint32_t size) const
-                                        throw (read_exception) = 0;
-
-    // only works if the size of T is small enough so it fits in one
-    // read; we don't handle the possibility that it might not
-    template <class T>
-    T readValue() const throw (read_exception) {
-        T value;
-        readCharBuffer(reinterpret_cast<char *>(&value), sizeof(value));
         return value;
     }
 

@@ -49,7 +49,7 @@ class aio_read_exception: public read_exception {
 
 public:
     enum code {
-        ENQUE = 4, READ, NOT_OPEN
+        ENQUE = 4, READ, NOT_OPEN, IN_PROGRESS
     };
 
     aio_read_exception(code errcode, int errno = 0) :
@@ -71,6 +71,9 @@ public:
         case (NOT_OPEN):
             return ("SocketIn not open!");
             break;
+        case (IN_PROGRESS):
+            return "Last read is still in progress!";
+            break;
         default:
             return (std::string("AIO unknown error ") + message).c_str();
             break;
@@ -83,7 +86,11 @@ private:
     int errno;
 };
 
-class socket_exception: public std::exception {
+class io_exception : public std::exception {
+
+};
+
+class socket_exception: public io_exception {
 
 public:
     enum code {
@@ -122,7 +129,7 @@ private:
 
 };
 
-class file_exception: public std::exception {
+class file_exception: public io_exception {
 
 public:
     enum code {

@@ -26,7 +26,19 @@ public:
     }
 
     virtual ~FileInProvider() {
-        fclose(file);
+        closeChannel();
+    }
+
+    virtual void closeChannel() {
+        if (is_open) {
+            is_open = false;
+            fclose(file);
+        }
+    }
+
+    //reads block so this is always false
+    virtual bool readInProgress() const {
+        return false;
     }
 
     virtual std::string debugInfo() const {
@@ -55,25 +67,24 @@ public:
         return false;
     }
 
-    virtual uint32_t readCharBuffer(char* buffer, uint32_t size) const throw (file_read_exception) {
+    virtual void readCharBuffer(char* buffer, uint32_t size) const throw (file_read_exception) {
         if (!opened()) {
             throw file_read_exception(file_read_exception::NOT_OPEN);
         }
 
-        uint32_t result = 0;
-        result = fread(buffer, sizeof(char), size, file);
+        bytes_read = fread(buffer, sizeof(char), size, file);
 
         if (ferror(file)) {
             throw file_read_exception(file_read_exception::READ, ferror(file));
         }
-
-        return result;
     }
 
     virtual void peekAt(char* buffer, uint32_t size) const throw (file_read_exception) {
         this->readCharBuffer(buffer, size);
         this->rewind(size);
     }
+
+    virtual uint32_t bytesRead() const throw (read_exception) { return bytes_read; }
 
     void openCommunicationChannel() throw (file_exception) {
 
@@ -94,6 +105,7 @@ private:
     std::string file_name;
     bool is_open;
     FILE* file;
+    mutable uint32_t bytes_read;
 
 };
 
