@@ -29,7 +29,7 @@ public:
      * Updates all the fields of the proto::PLoc
      * with values from the LocSystem pointer
      */
-    void update();
+    void updateData();
 
 private:
     boost::shared_ptr<LocSystem> locSystem;

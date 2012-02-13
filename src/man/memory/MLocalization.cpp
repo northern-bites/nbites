@@ -16,8 +16,7 @@ using namespace proto;
 using namespace std;
 
 MLocalization::MLocalization(shared_ptr<LocSystem> locSystem) :
-        MObject(id), locSystem(locSystem),
-        data(new PLoc()) {
+        MObject(id), locSystem(locSystem), data(new PLoc()) {
     MObject::protoMessage = data;
 }
 
@@ -25,7 +24,7 @@ MLocalization::MLocalization(shared_ptr<LocSystem> locSystem) :
 MLocalization::~MLocalization() {
 }
 
-void MLocalization::update() {
+void MLocalization::updateData() {
     this->data->set_timestamp(time_stamp());
 
     this->data->set_x_est(locSystem->getXEst());
