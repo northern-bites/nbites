@@ -13,7 +13,8 @@ using boost::shared_ptr;
 DataManager::DataManager() :
         RobotMemoryManager(Memory::ptr(new Memory())),
         parsingBoard(memory),
-        loggingBoard(memory) {
+        loggingBoard(memory),
+        is_recording(false) {
 
 }
 
@@ -31,7 +32,13 @@ void DataManager::reset() {
 }
 
 void DataManager::startRecordingToPath(string path) {
+    is_recording = true;
     log::OutputProviderFactory::AllFileOutput(&loggingBoard, path);
+}
+
+void DataManager::stopRecording() {
+    is_recording = false;
+    loggingBoard.reset();
 }
 
 }

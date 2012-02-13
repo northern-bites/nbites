@@ -37,6 +37,10 @@ public:
 
     void startRecordingToPath(std::string path);
 
+    void stopRecording();
+
+    bool isRecording() const { return is_recording; }
+
 public slots:
     void getNext() {
         parsingBoard.parseNextAll();
@@ -52,6 +56,7 @@ public slots:
 protected:
     man::memory::parse::ParsingBoard parsingBoard;
     man::memory::log::LoggingBoard loggingBoard;
+    bool is_recording;
 
 };
 
