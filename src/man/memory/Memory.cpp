@@ -21,11 +21,13 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
         mLocalization(new MLocalization(loc_ptr))
 {
 
+#if defined USE_MEMORY || defined OFFLINE
     if(sensors_ptr.get()) {
         sensors_ptr->addSubscriber(mVisionSensors.get(), NEW_VISION_SENSORS);
         sensors_ptr->addSubscriber(mMotionSensors.get(), NEW_MOTION_SENSORS);
         sensors_ptr->addSubscriber(mImage.get(), NEW_IMAGE);
     }
+#endif
 
     mobject_IDMap.insert(MObject_IDPair(mVision->getID(), mVision));
     mobject_IDMap.insert(MObject_IDPair(mVisionSensors->getID(), mVisionSensors));
