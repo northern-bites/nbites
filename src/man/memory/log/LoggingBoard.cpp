@@ -46,6 +46,14 @@ MObjectLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
     }
 }
 
+void LoggingBoard::reset() {
+    ObjectIOMap::iterator it;
+    for (it = objectIOMap.begin(); it != objectIOMap.end(); it++) {
+        memory->unsubscribe(it->second.get(), it->first);
+    }
+    objectIOMap.clear();
+}
+
 void LoggingBoard::startLogging() {
     printf("Starting logging!\n");
     logging = true;

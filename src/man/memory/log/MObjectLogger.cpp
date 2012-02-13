@@ -29,6 +29,30 @@ MObjectLogger::MObjectLogger(OutProvider::ptr out_provider,
         objectToLog(objectToLog) {
 }
 
+MObjectLogger::~MObjectLogger() {
+    this->stop();
+    this->waitForThreadToFinish();
+}
+
+void MObjectLogger::run() {
+    while (running) {
+
+        if (!out_provider->opened()) {
+            //blocking for socket fds, (almost) instant for other ones
+            out_provider->openCommunicationChannel();
+            std::cout << "writing head out" << std::endl;
+            this->writeHead();
+        }
+
+        this->waitForSignal();
+        this->writeToLog();
+
+        while (out_provider->writingInProgress()) {
+            this->yield();
+        }
+    }
+}
+
 void MObjectLogger::writeHead() {
     // log ID
     out_provider->writeValue<int32_t>(objectToLog->getID());

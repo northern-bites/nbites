@@ -28,10 +28,12 @@ public:
     MObjectLogger(OutProvider::ptr out_provider,
                   MObject::const_ptr objectToLog);
 
-    virtual ~MObjectLogger() {}
+    virtual ~MObjectLogger();
 
     void writeToLog();
     void writeHead();
+
+    void run();
 
 private:
     MObject::const_ptr objectToLog;

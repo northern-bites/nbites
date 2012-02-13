@@ -10,7 +10,7 @@
  *
  */
 
-#include "Logger.h"
+#include "io/OutProvider.h"
 #include "synchro/synchro.h"
 #include "Subscriber.h"
 #include "ClassHelper.h"
@@ -19,13 +19,16 @@ namespace man {
 namespace memory {
 namespace log {
 
-class ThreadedLogger: public Logger, public Thread, public Subscriber {
+class ThreadedLogger: public Thread, public Subscriber {
 
 ADD_SHARED_PTR(ThreadedLogger)
 
+protected:
+    typedef common::io::OutProvider OutProvider;
+
 public:
     ThreadedLogger(OutProvider::ptr out_provider, std::string name) :
-            Logger(out_provider), Thread(name) {
+            Thread(name), out_provider(out_provider) {
 
     }
 
@@ -34,24 +37,7 @@ public:
 
     virtual void writeToLog() = 0;
 
-    virtual void run() {
-        while (running) {
-
-            if (!out_provider->opened()) {
-                //blocking for socket fds, (almost) instant for other ones
-                out_provider->openCommunicationChannel();
-                std::cout << "writing head out" << std::endl;
-                this->writeHead();
-            }
-
-            this->waitForSignal();
-            this->writeToLog();
-
-            while (out_provider->writingInProgress()) {
-                this->yield();
-            }
-        }
-    }
+    virtual void run() = 0;
 
     void signalToLog() {
         this->signalToResume();
@@ -60,6 +46,9 @@ public:
     void update() {
         this->signalToLog();
     }
+
+protected:
+    const OutProvider::ptr out_provider;
 
 };
 

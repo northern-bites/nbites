@@ -47,7 +47,7 @@ public:
 		return logging;
 	}
 
-	void reset() { objectIOMap.clear(); }
+	void reset();
 
 	void setMemory(Memory::const_ptr mem) { memory = mem; }
 

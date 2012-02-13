@@ -89,8 +89,8 @@ bool MObjectParser::readNextMessage() {
     message_sizes.push_back(current_message_size);
 
     if (current_message_size > TOO_BIG_THRESHOLD) {
-//        cout << "Message size is too big! Cannot read in "
-//             << current_message_size << " bytes" << endl;
+        cout << "Message size is too big! Cannot read in "
+             << current_message_size << " bytes" << endl;
         return false;
     }
 
