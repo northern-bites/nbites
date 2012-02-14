@@ -14,7 +14,7 @@
 namespace man {
 namespace memory {
 
-class MVisionSensors: public MObject {
+class MVisionSensors: public Message {
 
 ADD_SHARED_PTR(MVisionSensors);
 

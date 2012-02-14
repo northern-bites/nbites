@@ -19,6 +19,7 @@
 #include <string>
 #include <stdint.h>
 
+#include "io/MessageInterface.h"
 #include "MemoryCommon.h"
 #include "Common.h"
 #include "ClassHelper.h"
@@ -29,10 +30,11 @@
 namespace man {
 namespace memory {
 
-class MObject : public SpecializedNotifier<MObject_ID>, public Subscriber {
+class Message : public SpecializedNotifier<MObject_ID>, public Subscriber,
+                public common::io::MessageInterface {
 
-    ADD_SHARED_PTR(MObject)
-    ADD_NULL_INSTANCE(MObject)
+    ADD_SHARED_PTR(Message)
+    ADD_NULL_INSTANCE(Message)
 
 public:
     static long long int time_stamp() { return realtime_micro_time(); }
@@ -44,11 +46,11 @@ protected:
      * MObject_ID associated with it)
      * protoMessage : the protocol message associated with this MObject
      */
-    MObject(MObject_ID id = UNKNOWN_OBJECT,
+    Message(MObject_ID id = UNKNOWN_OBJECT,
             ProtoMessage_ptr protoMessage = ProtoMessage_ptr());
 
 public:
-    virtual ~MObject(){}
+    virtual ~Message(){}
 
     /**
      * method update - this should be overwritten by a method that fills all of
@@ -59,8 +61,9 @@ public:
 
     //TODO: make this pure virtual and implement in other class
     //or find generic way to implement
-    virtual const std::string& getName() const {return MObject_names[my_id];}
+    virtual std::string getName() const {return MObject_names[my_id];}
     virtual MObject_ID getID() const {return my_id;}
+    virtual int32_t getIDTag() const {return my_id;}
     virtual long long getBirthTime() const {return birth_time;}
     virtual void serializeToString(std::string* write_buffer) const;
     virtual void parseFromBuffer(const char* read_buffer, uint32_t buffer_size);

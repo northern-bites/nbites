@@ -16,7 +16,7 @@
 
 namespace man {
 namespace memory {
-class MVision: public MObject {
+class MVision: public Message {
 
     ADD_SHARED_PTR(MVision);
 

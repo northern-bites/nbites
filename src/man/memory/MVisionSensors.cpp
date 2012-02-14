@@ -12,9 +12,9 @@ using namespace proto;
 using namespace std;
 
 MVisionSensors::MVisionSensors(shared_ptr<Sensors> sensors) :
-        MObject(id), sensors(sensors),
+        Message(id), sensors(sensors),
         data(new PVisionSensors()) {
-    MObject::protoMessage = data;
+    Message::protoMessage = data;
 }
 
 MVisionSensors::~MVisionSensors() {

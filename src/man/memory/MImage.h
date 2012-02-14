@@ -16,7 +16,7 @@
 namespace man {
 namespace memory {
 
-class MImage: public MObject {
+class MImage: public Message {
 
 ADD_SHARED_PTR(MImage);
 

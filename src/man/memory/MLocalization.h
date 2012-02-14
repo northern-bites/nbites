@@ -16,7 +16,7 @@
 namespace man {
 namespace memory {
 
-class MLocalization: public MObject {
+class MLocalization: public Message {
 
 public:
     static const MObject_ID id = MLOCALIZATION_ID;

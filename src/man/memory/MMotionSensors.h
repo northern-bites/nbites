@@ -16,7 +16,7 @@
 
 namespace man {
 namespace memory {
-class MMotionSensors: public MObject {
+class MMotionSensors: public Message {
 
     ADD_SHARED_PTR(MMotionSensors);
 
