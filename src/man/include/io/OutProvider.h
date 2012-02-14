@@ -22,6 +22,7 @@
 #include <string.h> //memset()
 #include "ClassHelper.h"
 #include "IOProvider.h"
+#include "IOExceptions.h"
 
 namespace common {
 namespace io {
@@ -31,7 +32,7 @@ class OutProvider : public IOProvider {
 ADD_SHARED_PTR(OutProvider);
 
 public:
-    OutProvider() : bytes_written(0) {
+    OutProvider() : bytes_written(0), file_descriptor(-1) {
         //zeroes the control_block
         memset(&control_block, 0, sizeof(control_block));
 
@@ -39,7 +40,7 @@ public:
     virtual ~OutProvider() {};
 
     virtual std::string debugInfo() const = 0;
-    virtual void openCommunicationChannel() = 0;
+    virtual void openCommunicationChannel() throw (io_exception)= 0;
     virtual bool opened() const = 0;
     virtual void closeCommunicationChannel() const = 0;
 

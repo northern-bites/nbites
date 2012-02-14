@@ -32,14 +32,12 @@ public:
         return "file name: " + file_name;
     }
 
-    void openCommunicationChannel() {
+    void openCommunicationChannel() throw (file_exception) {
 
         file_descriptor = open(file_name.c_str(), flags, PERMISSIONS_ALL);
 
         if (file_descriptor < 0) {
-            std::cout << "Could not open file: " << debugInfo() << std::endl;
-            file_descriptor = -1;
-            return;
+            throw file_exception(file_exception::CREATE_ERR);
         }
 
         has_been_opened = true;

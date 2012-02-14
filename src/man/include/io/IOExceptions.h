@@ -17,14 +17,14 @@ public:
         READ = 4, NOT_OPEN
     };
 
-    file_read_exception(code errcode, int errno = 0) :
-            errcode(errcode), errno(errno) {
+    file_read_exception(code errcode, int err_no = 0) :
+            errcode(errcode), err_no(err_no) {
     }
 
     virtual const char* what() const throw () {
         std::string error_message = "";
-        if (errno) {
-            error_message = strerror(errno);
+        if (err_no) {
+            error_message = strerror(err_no);
         }
         std::string message = "";
 
@@ -45,7 +45,7 @@ public:
 
 private:
     code errcode;
-    int errno;
+    int err_no;
 };
 
 class aio_read_exception: public read_exception {
@@ -55,14 +55,14 @@ public:
         ENQUE = 4, READ, NOT_OPEN, IN_PROGRESS
     };
 
-    aio_read_exception(code errcode, int errno = 0) :
-            errcode(errcode), errno(errno) {
+    aio_read_exception(code errcode, int err_no = 0) :
+            errcode(errcode), err_no(err_no) {
     }
 
     virtual const char* what() const throw () {
         std::string message;
-        if (errno) {
-            message = strerror(errno);
+        if (err_no) {
+            message = strerror(err_no);
         }
         switch (errcode) {
         case (ENQUE):
@@ -86,7 +86,7 @@ public:
 
 private:
     code errcode;
-    int errno;
+    int err_no;
 };
 
 class io_exception : public std::exception {
@@ -97,38 +97,49 @@ class socket_exception: public io_exception {
 
 public:
     enum code {
-        TIMED_OUT = 17, FCNTL_ERR, CREATE_ERR
+        TIMED_OUT = 17, FCNTL_ERR, CREATE_ERR, BIND_ERR, LISTEN_ERR, ACCEPT_ERR
     };
 
-    socket_exception(code errcode, int errno = 0) :
-            errcode(errcode), errno(errno) {
+    socket_exception(code errcode, int err_no = 0) :
+            errcode(errcode), err_no(err_no) {
     }
 
     virtual const char* what() const throw () {
-        std::string message;
-        if (errno) {
-            message = strerror(errno);
+        std::string err_message = "";
+        if (err_no) {
+            err_message = strerror(err_no);
         }
+
+        std::string message = "";
         switch (errcode) {
         case (TIMED_OUT):
-            return "Connection timed out!";
+            message = "Connection timed out!";
             break;
         case (FCNTL_ERR):
-            return ("fcntl failed on socked fd!" + message).c_str();
+            message = "fcntl failed on socked fd!";
             break;
         case (CREATE_ERR):
-            return ("could not create socket fd" + message).c_str();
+            message = "could not create socket fd";
+            break;
+        case (BIND_ERR):
+            message = "could not bind socket fd";
+            break;
+        case (LISTEN_ERR):
+            message = "could not listen on socket fd";
+            break;
+        case (ACCEPT_ERR):
+            message = "could not accept connections on socket fd";
             break;
         default:
-            return "Unknown socket exception!";
+            message = "Unknown socket exception!";
             break;
         }
-        return "Unknown socket exception!";
+        return (message + ":" + err_message).c_str();
     }
 
 private:
     code errcode;
-    int errno;
+    int err_no;
 
 };
 
@@ -139,14 +150,14 @@ public:
         CREATE_ERR = 17
     };
 
-    file_exception(code errcode, int errno = 0) :
-            errcode(errcode), errno(errno) {
+    file_exception(code errcode, int err_no = 0) :
+            errcode(errcode), err_no(err_no) {
     }
 
     virtual const char* what() const throw () {
         std::string message;
-        if (errno) {
-            message = strerror(errno);
+        if (err_no) {
+            message = strerror(err_no);
         }
         switch (errcode) {
         case (CREATE_ERR):
@@ -161,7 +172,7 @@ public:
 
 private:
     code errcode;
-    int errno;
+    int err_no;
 
 };
 

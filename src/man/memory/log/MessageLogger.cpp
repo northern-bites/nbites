@@ -22,6 +22,7 @@ namespace memory {
 namespace log {
 
 using namespace std;
+using namespace common::io;
 
 MessageLogger::MessageLogger(OutProvider::ptr out_provider,
                              Message::const_ptr objectToLog) :
@@ -36,10 +37,15 @@ MessageLogger::~MessageLogger() {
 
 void MessageLogger::run() {
     while (running) {
-
         if (!out_provider->opened()) {
-            //blocking for socket fds, (almost) instant for other ones
-            out_provider->openCommunicationChannel();
+            try {
+                //blocking for socket fds, (almost) instant for other ones
+                out_provider->openCommunicationChannel();
+            } catch (io_exception& io_exception) {
+                cout << messageToLog->getName() << " logger: " <<
+                        io_exception.what() << " " << out_provider->debugInfo() << endl;
+                return;
+            }
             std::cout << "writing head out" << std::endl;
             this->writeHead();
         }
