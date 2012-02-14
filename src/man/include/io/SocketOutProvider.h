@@ -23,6 +23,7 @@ class SocketOutProvider : public OutProvider {
 
 public:
     SocketOutProvider(unsigned short port) : port(port), is_open(false) {
+        memset(&client_address, 0, sizeof(client_address));
     }
 
     virtual ~SocketOutProvider() {
