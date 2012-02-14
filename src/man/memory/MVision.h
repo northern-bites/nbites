@@ -45,7 +45,8 @@ private:
 	    VisualLandmark* visualLandmark);
     void update(PVision::PVisualFieldObject* visual_field_object,
 	    VisualFieldObject* visualFieldObject);
-
+    void update(PVision::PVisualRobot* visual_robot,
+	    VisualRobot* visualRobot);
 private:
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<proto::PVision> data;

@@ -58,6 +58,30 @@ void MVision::update() {
     ygrp= this->data->mutable_ygrp();
     update(ygrp, vision->ygrp);
     
+    //VisualRobot
+    PVision::PVisualRobot* red1;
+    red1=this->data->mutable_red1();
+    update(red1, vision->red1);
+
+    PVision::PVisualRobot* red2;
+    red2=this->data->mutable_red2();
+    update(red2, vision->red2);
+    
+    PVision::PVisualRobot* red3;
+    red3=this->data->mutable_red3();
+    update(red3, vision->red3);
+    
+    PVision::PVisualRobot* navy1;
+    navy1=this->data->mutable_navy1();
+    update(navy1, vision->navy1);
+    
+    PVision::PVisualRobot* navy2;
+    navy2=this->data->mutable_navy2();
+    update(navy2, vision->navy2);
+    
+    PVision::PVisualRobot* navy3;
+    navy3=this->data->mutable_navy3();
+    update(navy3, vision->navy3);
     
     //VisualCorners
     this->data->clear_visual_corner();
@@ -124,5 +148,21 @@ void MVision::update(PVision::PVisualDetection* visual_detection,
     visual_field_object->set_right_bottom_x(visualFieldObject->getRightBottomX());
     visual_field_object->set_right_bottom_y(visualFieldObject->getRightBottomY());
 }
+  void MVision::update(PVision::PVisualRobot* visual_robot,
+		       VisualRobot* visualRobot) {
+    PVision::PVisualDetection* visual_detection = visual_robot->mutable_visual_detection();
+    //PVision::PVisualLandmark* visual_landmark = visual_robot->mutable_visual_landmark();
+    update(visual_detection, visualRobot);
+    //update(visual_landmark, visualRobot);
+
+    visual_robot->set_left_top_x(visualRobot->getLeftTopX());
+    visual_robot->set_left_top_y(visualRobot->getLeftTopY());
+    visual_robot->set_left_bottom_x(visualRobot->getLeftBottomX());
+    visual_robot->set_left_bottom_y(visualRobot->getLeftBottomY());
+    visual_robot->set_right_top_x(visualRobot->getRightTopX());
+    visual_robot->set_right_top_y(visualRobot->getRightTopY());
+    visual_robot->set_right_bottom_x(visualRobot->getRightBottomX());
+    visual_robot->set_right_bottom_y(visualRobot->getRightBottomY());				    
+  }
 }
 }

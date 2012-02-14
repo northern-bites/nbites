@@ -9,6 +9,12 @@ message PVision {
     optional PVisualFieldObject bgrp = 5;
     optional PVisualFieldObject yglp = 6; 
     optional PVisualFieldObject ygrp = 7;
+    optional PVisualRobot red1=8;
+    optional PVisualRobot red2=9;
+    optional PVisualRobot red3=10;
+    optional PVisualRobot navy1=11;
+    optional PVisualRobot navy2=12;
+    optional PVisualRobot navy3=13;
 	message PVisualDetection {
 
 		optional float distance = 1;
@@ -55,6 +61,19 @@ message PVision {
     
 	required PVisualDetection visual_detection = 1;
 	required PVisualLandmark visual_landmark = 2;
+	optional sint32 left_top_x = 3;
+	optional sint32 left_top_y = 4;
+	optional sint32 right_top_x = 5;
+	optional sint32 right_top_y = 6; 
+	optional sint32 left_bottom_x = 7;
+	optional sint32 left_bottom_y = 8;
+	optional sint32 right_bottom_x = 9;
+	optional sint32 right_bottom_y = 10;
+    }
+
+    message PVisualRobot {
+        required PVisualDetection visual_detection = 1; 
+
 	optional sint32 left_top_x = 3;
 	optional sint32 left_top_y = 4;
 	optional sint32 right_top_x = 5;

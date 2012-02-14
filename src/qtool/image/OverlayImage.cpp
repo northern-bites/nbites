@@ -22,17 +22,35 @@ void OverlayImage::updateBitmap() {
      drawBall(ballData);
 
      const PVision::PVisualFieldObject bglpData = visionData->get()->bglp();
-     drawGoalPosts(bglpData);
+     drawGoalPost(bglpData);
      
      const PVision::PVisualFieldObject bgrpData = visionData->get()->bgrp();
-     drawGoalPosts(bgrpData);
+     drawGoalPost(bgrpData);
      
      const PVision::PVisualFieldObject yglpData = visionData->get()->yglp();
-     drawGoalPosts(yglpData);
+     drawGoalPost(yglpData);
 
      const PVision::PVisualFieldObject ygrpData = visionData->get()->ygrp();
-     drawGoalPosts(ygrpData);
+     drawGoalPost(ygrpData);
+     
+     const PVision::PVisualRobot red1Data = visionData->get()->red1();
+     drawRobot(red1Data);
+     
+     const PVision::PVisualRobot red2Data = visionData->get()->red2();
+     drawRobot(red2Data);
 
+     const PVision::PVisualRobot red3Data = visionData->get()->red3();
+     drawRobot(red3Data);
+
+     const PVision::PVisualRobot navy1Data = visionData->get()->navy1();
+     drawRobot(navy1Data);
+     
+     const PVision::PVisualRobot navy2Data = visionData->get()->navy2();
+     drawRobot(navy2Data);
+     
+     const PVision::PVisualRobot navy3Data = visionData->get()->navy3();
+     drawRobot(navy3Data);
+     
      const RepeatedPtrField<PVision::PVisualCorner> cornerData = visionData->get()->visual_corner();
      for(int i=0; i<cornerData.size(); i++) {
        const PVision::PVisualCorner cornerDatum=cornerData.Get(i);
@@ -70,7 +88,7 @@ void OverlayImage::drawCorner(const PVision::PVisualCorner cornerDatum) {
     
   }
   
-void OverlayImage::drawGoalPosts(const PVision::PVisualFieldObject postData) {
+void OverlayImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     QPainter painter(&bitmap);
     painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -96,5 +114,31 @@ void OverlayImage::drawGoalPosts(const PVision::PVisualFieldObject postData) {
     painter.drawConvexPolygon(points, 4);
 }
 
+  //draw robots-MAKE SEPERATE METHODS FOR DIFF COLORS?
+  void OverlayImage::drawRobot(const PVision::PVisualRobot robotData) {
+    QPainter painter(&bitmap);
+    painter.setBackgroundMode(Qt::TransparentMode);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
+    int left_top_x = 2*robotData.left_top_x();
+    int left_top_y = 2*robotData.left_top_y();
+    int left_bottom_x = 2*robotData.left_bottom_x();
+    int left_bottom_y = 2*robotData.left_bottom_y();
+    int right_top_x = 2*robotData.right_top_x();
+    int right_top_y = 2*robotData.right_top_y();
+    int right_bottom_x = 2*robotData.right_bottom_x();
+    int right_bottom_y = 2*robotData.right_bottom_y();
+
+    QPoint points [4]= {
+      QPoint (left_top_x, left_top_y),
+      QPoint (left_bottom_x, left_bottom_y),
+      QPoint (right_bottom_x, right_bottom_y),
+      QPoint (right_top_x, right_top_y)
+    };
+    
+    painter.setPen(QPen(QColor::QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+    painter.setBrush(QBrush(QColor::QColor(0,0,200,80),Qt::SolidPattern));
+    painter.drawConvexPolygon(points, 4);
+  }
 }
 }

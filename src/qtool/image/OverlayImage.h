@@ -25,8 +25,8 @@ class OverlayImage : public BMPImage
     void updateBitmap();
     void drawBall(const man::memory::proto::PVision::PVisualBall);
     void drawCorner(const man::memory::proto::PVision::PVisualCorner);
-    void drawGoalPosts(const man::memory::proto::PVision::PVisualFieldObject);
-
+    void drawGoalPost(const man::memory::proto::PVision::PVisualFieldObject);
+    void drawRobot(const man::memory::proto::PVision::PVisualRobot);
     unsigned getWidth() {return 640;}
     unsigned getHeight() {return 480;}
 
