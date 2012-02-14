@@ -22,22 +22,25 @@ public:
     }
 
     virtual const char* what() const throw () {
-        std::string message;
+        std::string error_message = "";
         if (errno) {
-            message = strerror(errno);
+            error_message = strerror(errno);
         }
+        std::string message = "";
+
         switch (errcode) {
         case (READ):
-            return (std::string("file read error ") + message).c_str();
+            message = "File read error ";
             break;
         case (NOT_OPEN):
-            return ("FileIn not open!");
+            message = "File not open!";
             break;
         default:
-            return (std::string("file unknown error ") + message).c_str();
+            message = "File unknown error ";
             break;
         }
-        return (std::string("file unknown error ") + message).c_str();
+
+        return (message + ":" + error_message).c_str();
     }
 
 private:
@@ -147,13 +150,13 @@ public:
         }
         switch (errcode) {
         case (CREATE_ERR):
-            return ("could not create socket fd" + message).c_str();
+            return ("could not create file" + message).c_str();
             break;
         default:
-            return "Unknown socket exception!";
+            return "Unknown file exception!";
             break;
         }
-        return "Unknown socket exception!";
+        return "Unknown file exception!";
     }
 
 private:
