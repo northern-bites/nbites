@@ -38,7 +38,6 @@ SET( CMAKE_USE_PYTHON_VERSION 2.6 )
 
 # The order matters - this forces cmake to first look in
 # nbites_dir/ext, then the regular system folders
-
 SET( CMAKE_FIND_ROOT_PATH  $ENV{NBITES_DIR}/ext/ /usr/)
 
 # search for programs in the system root
