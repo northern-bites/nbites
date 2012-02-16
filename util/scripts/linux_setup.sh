@@ -61,7 +61,11 @@ naoqi=naoqi-sdk-$naoqi_version-linux-nbites.tar.gz
 naoqi_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$naoqi
 naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux
 
-ext=ext-nbites-linux.tar.gz
+if [ $IS64BIT == 'y' ]; then
+    ext=ext-nbites-linux64.tar.gz
+else
+    ext=ext-nbites-linux32.tar.gz
+fi
 ext_robocup=$robocup/software/$ext
 
 echo ""
