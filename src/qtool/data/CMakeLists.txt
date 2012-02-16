@@ -16,12 +16,14 @@ add_definitions(${QT_DEFINITIONS})
 set( data_srcs DataManager.cpp
                DataLoader.cpp
                OfflineDataFinder.cpp
-               DataSource.cpp
                )
 
 set( data_headers DataLoader.h
                   DataFinder.h
-                  OfflineDataFinder.h )
+                  OfflineDataFinder.h 
+                  DataManager.h
+                  MemorySignalingInterface.h
+                  RobotMemoryManager.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -43,5 +45,6 @@ target_link_libraries(
   treemodel
   memory
   parse
+  log
   ${QT_LIBRARIES}
   )

@@ -1,19 +1,19 @@
 #ifndef COLORTABLE_H
 #define COLORTABLE_H
+/**
+ * TODO: this needs cleanup
+ *
+ * -Octavian
+ */
 #include <QString>
 #include <QFile>
 #include <QTextStream>
 
 #include "Stats.h"
+#include "image/Color.h"
+#include "ColorSpace.h"
 
-#define UNDEFINED 0x00
-#define WHITE     0x01
-#define GREEN     0x02
-#define BLUE      0x04
-#define YELLOW    0x08
-#define ORANGE    0x10
-#define PINK      0x20
-#define NAVY      0x40
+#include "VisionDef.h"
 
 namespace qtool {
 namespace colorcreator {
@@ -35,7 +35,15 @@ public:
     bool isEnabled() {return enabled;}
     int getUpdatedColor(int y, int u, int v);
 
+    //color table output methods
+    static void write(QString filename, ColorSpace* colorSpaces);
+
 private:
+    enum fltChannels {hMin, hMax,
+                      sMin, sMax,
+                      zMin, zMax};
+    enum intChannels {yMin, yMax,
+                      vMin, vMax};
     static const int mainColors = 5;
     int** colormap;
     unsigned*** table;

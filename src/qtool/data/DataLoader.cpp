@@ -1,46 +1,49 @@
 #include "DataLoader.h"
 
-
 namespace qtool {
 namespace data {
+
+using namespace remote;
+using namespace common::io;
 
 DataLoader::DataLoader(DataManager::ptr dataManager, QWidget *parent) :
     QWidget(parent),
     dataManager(dataManager),
-    dataFinder(new OfflineDataFinder())
+    offlineDataFinder(new OfflineDataFinder(this)),
+    remoteDataFinder(new RemoteDataFinder(this))
 {
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setAlignment(Qt::AlignTop);
+    QHBoxLayout *layout = new QHBoxLayout;
 
-    QComboBox* dataTypeSelector = this->setupDataSelectorBox();
-    layout->addWidget(dataTypeSelector);
-    layout->addWidget(dataFinder);
+    layout->addWidget(offlineDataFinder);
+    layout->addWidget(remoteDataFinder);
 
-    connect(dataFinder, SIGNAL(signalNewDataSource(DataSource::ptr)),
-            this, SLOT(newDataSource(DataSource::ptr)));
+    connect(remoteDataFinder,
+            SIGNAL(signalNewInputProvider(common::io::InProvider::ptr, MObject_ID)),
+            dataManager.get(),
+            SLOT(newInputProvider(common::io::InProvider::ptr, MObject_ID)));
+
+    connect(remoteDataFinder,
+            SIGNAL(signalNewDataSet()),
+            dataManager.get(),
+            SLOT(reset()));
+
+    connect(offlineDataFinder,
+            SIGNAL(signalNewInputProvider(common::io::InProvider::ptr, MObject_ID)),
+            dataManager.get(),
+            SLOT(newInputProvider(common::io::InProvider::ptr, MObject_ID)));
+
+    connect(offlineDataFinder,
+            SIGNAL(signalNewDataSet()),
+            dataManager.get(),
+            SLOT(reset()));
 
     this->setLayout(layout);
 }
 
-QComboBox* DataLoader::setupDataSelectorBox() {
-    QComboBox* dataTypeSelector = new QComboBox;
-    dataTypeSelector->addItem(QString("Offline"),
-                      QVariant(static_cast<int>(DataSource::offline)));
-    dataTypeSelector->addItem(QString("Online"),
-                      QVariant(static_cast<int>(DataSource::online)));
-    dataTypeSelector->addItem(QString("Old"),
-                      QVariant(static_cast<int>(DataSource::old)));
-    return dataTypeSelector;
-}
-
 DataLoader::~DataLoader()
 {
-    delete dataFinder;
-}
-
-void DataLoader::newDataSource(DataSource::ptr dataSource) {
-    dataManager->newDataSource(dataSource);
-    dataManager->getNext();
+    delete offlineDataFinder;
+    delete remoteDataFinder;
 }
 
 }

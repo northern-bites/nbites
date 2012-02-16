@@ -23,6 +23,7 @@
 #define UDP_PORT  4000
 #define TCP_PORT  4001
 #define TOOL_PORT 4002
+static const short STREAMING_PORT_BASE = 4096;
 
 #define UDP_BUF_SIZE 1024
 
@@ -87,6 +88,7 @@ static const char *TOOL_REQUEST_MSG = "TOOL:request";
 static const int TOOL_REQUEST_LEN = strlen(TOOL_REQUEST_MSG);
 static const char *TOOL_ACCEPT_MSG = "TOOL:accept";
 static const int TOOL_ACCEPT_LEN = strlen(TOOL_ACCEPT_MSG);
+static const int TOOL_ACCEPT_NAME_OFFSET = TOOL_ACCEPT_LEN + 3;
 
 
 //
