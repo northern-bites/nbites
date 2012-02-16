@@ -7,20 +7,10 @@ namespace viewer {
 using namespace image;
 using namespace man::memory;
 
-ChannelImageViewer::ChannelImageViewer(BMPYUVImage::ptr image,
+ChannelImageViewer::ChannelImageViewer(BMPYUVImage* image,
                                        QWidget *parent)
     : BMPImageViewer(image, parent), bmpyuvimage(image) {
 
-    setupUI();
-}
-
-ChannelImageViewer::ChannelImageViewer(MImage::const_ptr mImage,
-                                       QWidget *parent)
-    : BMPImageViewer(BMPYUVImage::ptr(new BMPYUVImage(mImage)), parent) {
-
-    //we're certain that image in BMPImageViewer is a BMPYUVImage
-    //because we're passing it
-    bmpyuvimage = BMPYUVImage::ptr(dynamic_cast<BMPYUVImage*>(image.get()));
     setupUI();
 }
 

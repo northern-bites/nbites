@@ -16,10 +16,9 @@ namespace image {
 
 class BMPImage : public QObject {
     Q_OBJECT
-    ADD_SHARED_PTR(BMPImage);
 
 public:
-    BMPImage() {}
+    BMPImage(QObject* parent = 0) : QObject(parent) {}
     virtual ~BMPImage() {}
 
     const QImage* getBitmap() const { return &bitmap; }

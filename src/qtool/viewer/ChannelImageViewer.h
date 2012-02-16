@@ -20,9 +20,7 @@ class ChannelImageViewer: public BMPImageViewer {
     Q_OBJECT;
 public:
 
-    ChannelImageViewer(image::BMPYUVImage::ptr image,
-                QWidget *parent = NULL);
-    ChannelImageViewer(man::memory::MImage::const_ptr mImage,
+    ChannelImageViewer(image::BMPYUVImage* image,
                 QWidget *parent = NULL);
 
     virtual ~ChannelImageViewer() {}
@@ -40,7 +38,7 @@ protected:
     void setupUI();
 
 protected:
-    image::BMPYUVImage::ptr bmpyuvimage;
+    image::BMPYUVImage* bmpyuvimage;
     QComboBox channelSelect;
 
 

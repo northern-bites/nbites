@@ -6,7 +6,7 @@ using namespace man::memory;
 namespace qtool {
 namespace viewer {
 
-BMPImageViewer::BMPImageViewer(image::BMPImage::ptr image,
+BMPImageViewer::BMPImageViewer(image::BMPImage* image,
                                  QWidget *parent)
     : QWidget(parent), image(image) {
     setupUI();
@@ -16,9 +16,8 @@ BMPImageViewer::~BMPImageViewer() {
 }
 
 void BMPImageViewer::setupUI() {
-    QVBoxLayout* layout = new QVBoxLayout;
+    QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(&imagePlaceholder);
-
     this->setLayout(layout);
 }
 
@@ -27,7 +26,12 @@ void BMPImageViewer::updateView() {
         image->updateBitmap();
         //enqueues a repaint - thread-safe
         this->QWidget::update();
-        imagePlaceholder.setPixmap(QPixmap::fromImage(*(image->getBitmap())));
+        QImage* qimage = image->getBitmap();
+        if (qimage) {
+            imagePlaceholder.setPixmap(QPixmap::fromImage(*(qimage)));
+        } else {
+            imagePlaceholder.setText("Underlying Null image pointer!");
+        }
     }
 }
 

@@ -50,4 +50,5 @@ target_link_libraries(
   image
   memory
   ${QT_LIBRARIES}
+
   )
