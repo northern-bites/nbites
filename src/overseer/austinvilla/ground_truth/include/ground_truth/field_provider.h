@@ -8,6 +8,7 @@
  *
  * License: Modified BSD License
  *
+ * Modified by Octavian Neamtu, Northern Bites 2012, changed constants
  * $ Id: 08/10/2011 11:07:07 AM piyushk $
  */
 
@@ -18,24 +19,30 @@
 #include <opencv/cv.h>
 #include <pcl_visualization/pcl_visualizer.h>
 
+#define USING_LAB_FIELD
+#define NO_MANCONFIG
+
+#include "FieldConstants.h"
+
 namespace ground_truth {
 
   /* constants describing the field */
+  //NBites constants include the full length of the LINE_WIDTH
+  //whereas the constants here are measurements from the center of such lines
+  const float FIELD_Y = (FIELD_WHITE_HEIGHT - LINE_WIDTH)/100.0f;            ///< width of the field
+  const float FIELD_X = (FIELD_WHITE_WIDTH - LINE_WIDTH)/100.0f;            ///< length of the field
 
-  const float FIELD_Y = 3.950;            ///< width of the field
-  const float FIELD_X = 5.950;            ///< length of the field
+  const float GRASS_Y = FIELD_GREEN_HEIGHT/100.0f;            ///< width of the grass
+  const float GRASS_X = FIELD_GREEN_WIDTH/100.0f;            ///< length of the grass 
 
-  const float GRASS_Y = 4.725;            ///< width of the grass
-  const float GRASS_X = 6.725;            ///< length of the grass 
+  const float PENALTY_Y = GOALBOX_WIDTH/100.0f;          ///< distance of penalty box along width 
+  const float PENALTY_X =  GOALBOX_DEPTH/100.0f;         ///< distance of penalty box along length
+  const float CIRCLE_RADIUS =  CENTER_CIRCLE_RADIUS/100.0f;     ///< center circle radius
 
-  const float PENALTY_Y = 2.150;          ///< distance of penalty box along width 
-  const float PENALTY_X =  0.550;         ///< distance of penalty box along length
-  const float CIRCLE_RADIUS =  0.650;     ///< center circle radius
+  const float PENALTY_CROSS_X = (MIDFIELD_X - FIELD_WHITE_LEFT_SIDELINE_X - LINE_CROSS_OFFSET + LINE_CROSS_LENGTH/2.0f)/100.0f;    ///< distance of penalty cross from field center
 
-  const float PENALTY_CROSS_X = 1.200;    ///< distance of penalty cross from field center
-
-  const float GOAL_HEIGHT = 0.8;          ///< height of top goal bar
-  const float GOAL_Y = 1.5;               ///< distance between goal posts
+  const float GOAL_HEIGHT = GOAL_POST_CM_HEIGHT/100.0f;          ///< height of top goal bar
+  const float GOAL_Y = (CROSSBAR_CM_WIDTH + GOAL_POST_CM_WIDTH)/100.0f;               ///< distance between goal posts
 
   /* Different points of interest on the field */
 
