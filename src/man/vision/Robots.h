@@ -73,7 +73,7 @@ private:
     Field* field;
     Context* context;
 
-    int imageBoxes[64][48];
+    int imageBoxes[64][48];//depends on image size, however ratio will be correct, given a 4:3 image.
     Blobs* blobs;
     Blobs* whiteBlobs;
     int numberOfRuns, runsize;

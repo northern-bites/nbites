@@ -340,8 +340,13 @@ void Blobs::sort() {
     }
 }
 
+
 void Blobs::newBlobIt(int i, int j, bool newBlob) {
   //this method is the blobber for the macropixel array.
+  //the value 5 reflects the size of the macropixels.
+  //the modifications for using the macropixels instead
+  //of runs is the only real difference between this 
+  //and the other blobbing method.
   int x = 5*i;
   int y = 5*j;
   int h = 5;

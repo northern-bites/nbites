@@ -29,7 +29,7 @@ public:
     void checkForMergers();
     bool blobsOverlap(int first, int second);
     void sort();
-    void newBlobIt(int i, int j, bool newBlob);
+    void newBlobIt(int i, int j, bool newBlob); //to be used for robot blobbing
 
     // getters
     int number() const {return numBlobs;}
