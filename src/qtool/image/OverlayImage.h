@@ -26,7 +26,10 @@ class OverlayImage : public BMPImage
     void drawBall(const man::memory::proto::PVision::PVisualBall);
     void drawCorner(const man::memory::proto::PVision::PVisualCorner);
     void drawGoalPost(const man::memory::proto::PVision::PVisualFieldObject);
-    void drawRobot(const man::memory::proto::PVision::PVisualRobot);
+    void drawRedRobot(const man::memory::proto::PVision::PVisualRobot);
+    void drawNavyRobot(const man::memory::proto::PVision::PVisualRobot);
+    void drawLine(const man::memory::proto::PVision::PVisualLine);
+    void drawCross(const man::memory::proto::PVision::PVisualCross);
     unsigned getWidth() {return 640;}
     unsigned getHeight() {return 480;}
 

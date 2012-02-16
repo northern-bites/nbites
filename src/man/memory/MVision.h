@@ -47,6 +47,10 @@ private:
 	    VisualFieldObject* visualFieldObject);
     void update(PVision::PVisualRobot* visual_robot,
 	    VisualRobot* visualRobot);
+    void update(PVision::PVisualLine* visual_line,
+		boost::shared_ptr<VisualLine> visualLine);
+    void update(PVision::PVisualCross* visual_cross,
+	    VisualCross* visualCross);
 private:
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<proto::PVision> data;

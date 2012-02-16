@@ -12,6 +12,7 @@ namespace memory {
 
 using boost::shared_ptr;
 using std::list;
+using std::vector;
 using proto::PVision;
 
 MVision::MVision(MObject_ID id, shared_ptr<Vision> v, shared_ptr<PVision> vision_data) :
@@ -82,7 +83,22 @@ void MVision::update() {
     PVision::PVisualRobot* navy3;
     navy3=this->data->mutable_navy3();
     update(navy3, vision->navy3);
-    
+
+    PVision::PVisualCross* visual_cross;
+    visual_cross=this->data->mutable_visual_cross();
+    update(visual_cross, vision->cross);
+
+    //VisualLines
+    this->data->clear_visual_line();
+    const vector<boost::shared_ptr<VisualLine> >* visualLines = vision->fieldLines->getLines();
+    for(vector<boost::shared_ptr<VisualLine> >::const_iterator i = visualLines->begin(); 
+	    i != visualLines->end(); i++){
+
+      PVision::PVisualLine* visual_line = this->data->add_visual_line();
+      update(visual_line, (*i));
+    }
+      
+
     //VisualCorners
     this->data->clear_visual_corner();
     list<VisualCorner>* visualCorners = vision->fieldLines->getCorners();
@@ -151,9 +167,7 @@ void MVision::update(PVision::PVisualDetection* visual_detection,
   void MVision::update(PVision::PVisualRobot* visual_robot,
 		       VisualRobot* visualRobot) {
     PVision::PVisualDetection* visual_detection = visual_robot->mutable_visual_detection();
-    //PVision::PVisualLandmark* visual_landmark = visual_robot->mutable_visual_landmark();
     update(visual_detection, visualRobot);
-    //update(visual_landmark, visualRobot);
 
     visual_robot->set_left_top_x(visualRobot->getLeftTopX());
     visual_robot->set_left_top_y(visualRobot->getLeftTopY());
@@ -163,6 +177,36 @@ void MVision::update(PVision::PVisualDetection* visual_detection,
     visual_robot->set_right_top_y(visualRobot->getRightTopY());
     visual_robot->set_right_bottom_x(visualRobot->getRightBottomX());
     visual_robot->set_right_bottom_y(visualRobot->getRightBottomY());				    
+  }
+
+  void MVision::update(PVision::PVisualLine* visual_line, 
+		       boost::shared_ptr<VisualLine> visualLine) {
+    PVision::PVisualLandmark* visual_landmark = visual_line->mutable_visual_landmark();
+    update(visual_landmark, visualLine.get());
+    
+    visual_line->set_start_x(visualLine->getStartpoint().x);
+    visual_line->set_start_y(visualLine->getStartpoint().y);
+    visual_line->set_end_x(visualLine->getEndpoint().x);
+    visual_line->set_end_y(visualLine->getEndpoint().y);
+  }
+  
+  void MVision::update(PVision::PVisualCross* visual_cross,
+		       VisualCross* visualCross) {
+    PVision::PVisualDetection* visual_detection= visual_cross->mutable_visual_detection();
+    update(visual_detection, visualCross);
+    
+    PVision::PVisualLandmark* visual_landmark= visual_cross->mutable_visual_landmark();
+    update(visual_landmark, visualCross);
+
+    visual_cross->set_left_top_x(visualCross->getLeftTopX());
+    visual_cross->set_left_top_y(visualCross->getLeftTopY());
+    visual_cross->set_left_bottom_x(visualCross->getLeftBottomX());
+    visual_cross->set_left_bottom_y(visualCross->getLeftBottomY());
+    visual_cross->set_right_top_x(visualCross->getRightTopX());
+    visual_cross->set_right_top_y(visualCross->getRightTopY());
+    visual_cross->set_right_bottom_x(visualCross->getRightBottomX());
+    visual_cross->set_right_bottom_y(visualCross->getRightBottomY());
+
   }
 }
 }

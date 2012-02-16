@@ -15,7 +15,10 @@ message PVision {
     optional PVisualRobot navy1=11;
     optional PVisualRobot navy2=12;
     optional PVisualRobot navy3=13;
-	message PVisualDetection {
+    repeated PVisualLine visual_line=14;
+    optional PVisualCross visual_cross=15;
+
+    	message PVisualDetection {
 
 		optional float distance = 1;
         optional sint32 x = 2;
@@ -83,4 +86,29 @@ message PVision {
 	optional sint32 right_bottom_x = 9;
 	optional sint32 right_bottom_y = 10;
     }
+    
+    message PVisualLine {
+    	
+        required PVisualLandmark visual_landmark = 1;
+	optional sint32 start_x = 2;
+	optional sint32 start_y = 3;
+	optional sint32 end_x = 4;
+	optional sint32 end_y = 5;
+
+    }
+
+    message PVisualCross {
+        required PVisualDetection visual_detection = 1; 
+	required PVisualLandmark visual_landmark =2;
+	optional sint32 left_top_x = 3;
+	optional sint32 left_top_y = 4;
+	optional sint32 right_top_x = 5;
+	optional sint32 right_top_y = 6; 
+	optional sint32 left_bottom_x = 7;
+	optional sint32 left_bottom_y = 8;
+	optional sint32 right_bottom_x = 9;
+	optional sint32 right_bottom_y = 10;
+    }
+
+    
 }
