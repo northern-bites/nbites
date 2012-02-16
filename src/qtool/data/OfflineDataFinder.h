@@ -2,7 +2,7 @@
  * @class OfflineDataFinder
  *
  * Extends DataFinder
- * A widget that lets the user browse his local files for a data source
+ * A widget that lets the user browse his local files for a log
  *
  * @author Octavian Neamtu <oneamtu89@gmail.com>
  */

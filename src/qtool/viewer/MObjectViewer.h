@@ -21,7 +21,7 @@
 namespace qtool {
 namespace viewer {
 
-class MObjectViewer : public QTreeView, public Subscriber<data::MObject_ID> {
+class MObjectViewer : public QTreeView {
 
     Q_OBJECT
 public:
@@ -29,7 +29,8 @@ public:
                 QWidget* parent = 0);
     virtual ~MObjectViewer();
 
-    void update(data::MObject_ID);
+public slots:
+    void updateView();
 
 private:
     void createNewTreeModel();

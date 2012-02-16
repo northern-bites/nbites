@@ -15,7 +15,9 @@
 
 #include "man/memory/Memory.h"
 #include "image/BMPYUVImage.h"
-#include "RoboImageViewer.h"
+#include "data/RobotMemoryManager.h"
+#include "BMPImageViewer.h"
+#include "ChannelImageViewer.h"
 #include "MObjectViewer.h"
 
 namespace qtool {
@@ -25,13 +27,12 @@ class MemoryViewer : public QMainWindow{
     Q_OBJECT
 
 public:
-    MemoryViewer(man::memory::Memory::const_ptr memory);
+    MemoryViewer(data::RobotMemoryManager::const_ptr memoryManager);
 
 private:
     std::vector<QDockWidget*> dockWidget;
-    man::memory::Memory::const_ptr memory;
-    image::BMPImage::ptr image;
-    RoboImageViewer* roboImageViewer;
+    data::RobotMemoryManager::const_ptr memoryManager;
+    viewer::RoboImageViewer roboImageViewer;
 
 private slots:
         void nextClicked();

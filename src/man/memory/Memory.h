@@ -1,15 +1,15 @@
 /**
- * Memory.h
- *
  * @class Memory
  *
  * This class keeps instances of all the different memory objects and provides
- * an interface through which they get updated (each memory object pulls data
- * from its corresponding object
+ * an interface through which they get updated (each memory object copies data
+ * from its corresponding man object
+ *
+ * Each MObject is associated with a MObject_ID that identifies it
  *
  * Future work: we will be able to keep multiple instances of selected objects
  *
- *      Author: Octavian Neamtu
+ * @author Octavian Neamtu
  */
 
 #pragma once
@@ -32,17 +32,16 @@ class Memory; //forward declaration
 #include "MLocalization.h"
 #include "Sensors.h"
 #include "Profiler.h"
-#include "include/MultiProvider.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 
-class Memory : public Subscriber<SensorsEvent>,
-               public MultiProvider<MObject_ID>{
+class Memory {
 
 public:
-    typedef boost::shared_ptr<Memory> ptr;
-    typedef boost::shared_ptr<const Memory> const_ptr;
+    ADD_NULL_INSTANCE(Memory)
+    ADD_SHARED_PTR(Memory)
     typedef std::pair<MObject_ID,
             boost::shared_ptr<MObject> > MObject_IDPair;
     typedef std::map<MObject_ID,
@@ -56,16 +55,10 @@ public:
     /**
      * calls the update function on @obj
      * this will usually make the MObject pull data
-     * from its corresponding man object and maybe log it
+     * from its corresponding man object
      */
     void update(boost::shared_ptr<MObject> obj);
     void updateVision();
-
-    /**
-     * This function is called whenever one of the Providers we are subscribed
-     * to has something new/updated
-     */
-    void update(SensorsEvent eventID);
 
 public:
     MVision::const_ptr getMVision() const {return mVision;}
@@ -75,6 +68,11 @@ public:
 
     MObject::const_ptr getMObject(MObject_ID id) const;
     MObject::ptr getMutableMObject(MObject_ID id);
+
+    void subscribe(Subscriber* subscriber,
+                       MObject_ID objectToSubscribeTo) const;
+    void unsubscribe(Subscriber* subscriber,
+                     MObject_ID objectToUnsuscribeFrom) const;
 
 private:
     MObject_IDMap mobject_IDMap;

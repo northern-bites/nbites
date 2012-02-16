@@ -1,12 +1,13 @@
 
 #include "QTool.h"
 #include <iostream>
+#include <QFileDialog>
 
 namespace qtool {
 
 using data::DataManager;
 using data::DataLoader;
-using colorcreator::ColorCreator;
+using colorcreator::ColorCalibrate;
 using viewer::MemoryViewer;
 using viewer::BallEKFViewer;
 using viewer::FieldViewer;
@@ -21,24 +22,27 @@ QTool::QTool() : QMainWindow(),
 >>>>>>> newBots
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
-        colorCreator(new ColorCreator(dataManager)),
-        memoryViewer(new MemoryViewer(dataManager->getMemory())),
+        colorCalibrate(new ColorCalibrate(dataManager)),
+        memoryViewer(new MemoryViewer(dataManager)),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
-        fieldViewer(new FieldViewer(dataManager)){
+        fieldViewer(new FieldViewer(dataManager)) {
 
 <<<<<<< HEAD
     this->setWindowTitle(tr("The New Tool of Awesome"));
 
     toolbar = new QToolBar();
-    nextButton = new QPushButton(tr("&Next"));
-    prevButton = new QPushButton(tr("&Previous"));
+    nextButton = new QPushButton(tr(">"));
+    prevButton = new QPushButton(tr("<"));
+    recordButton = new QPushButton(tr("Rec"));
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
+    connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
+    toolbar->addWidget(recordButton);
 
     this->addToolBar(toolbar);
 =======
@@ -55,14 +59,9 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
-
-    dataManager->addSubscriber(colorCreator, man::memory::MIMAGE_ID);
 }
 
 QTool::~QTool() {
-    delete colorCreator;
-    delete dataLoader;
-    delete toolTabs;
 }
 
 void QTool::next() {
@@ -71,6 +70,20 @@ void QTool::next() {
 
 void QTool::prev() {
     dataManager->getPrev();
+}
+
+void QTool::record() {
+    if (dataManager->isRecording()) {
+        dataManager->stopRecording();
+        recordButton->setText("Rec");
+    } else {
+        QString path = QFileDialog::getExistingDirectory(this, "Choose folder",
+                QString(NBITES_DIR) + "/data/logs");
+        if (!path.isEmpty()) {
+            dataManager->startRecordingToPath(path.toStdString());
+            recordButton->setText("Stop");
+        }
+    }
 }
 
 }
