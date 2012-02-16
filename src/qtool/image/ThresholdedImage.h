@@ -10,8 +10,8 @@
 
 #include <boost/shared_ptr.hpp>
 #include "BMPImage.h"
-#include "ColorSpace.h"
 #include "memory/MImage.h"
+#include "Color.h"
 
 namespace qtool {
 namespace image {
@@ -21,10 +21,10 @@ class ThresholdedImage : public BMPImage
 
 public:
     ThresholdedImage(
-            boost::shared_ptr<const man::memory::proto::PImage> rawImage);
+            boost::shared_ptr<const man::memory::proto::PImage> rawImage, QObject* parent = 0);
     virtual ~ThresholdedImage() {};
 
-    void updateBitmap();
+    void buildBitmap();
 
     unsigned getWidth() const { return rawImage->width(); }
     unsigned getHeight() const { return rawImage->height(); }

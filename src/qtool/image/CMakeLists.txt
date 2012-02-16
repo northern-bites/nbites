@@ -7,6 +7,8 @@ cmake_minimum_required(VERSION 2.6.0)
 ########### Dependencies
 
 find_package(Qt4 REQUIRED)
+find_library(SWSCALE_LIBRARY swscale PATHS)
+find_library(AVUTIL_LIBRARY avutil PATHS)
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
@@ -16,11 +18,13 @@ add_definitions(${QT_DEFINITIONS})
 set( Image_srcs
     YUVImage
     BMPYUVImage
-    ColorSpace
+    Color
     ThresholdedImage
+    FastYUVToBMPImage
     )
 
-set( Image_headers )
+set( Image_headers BMPImage.h
+				   FastYUVToBMPImage.h)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -40,4 +44,6 @@ add_library(image
 target_link_libraries(
   image
   ${QT_LIBRARIES}
+  ${SWSCALE_LIBRARY}
+  ${AVUTIL_LIBRARY}
   )

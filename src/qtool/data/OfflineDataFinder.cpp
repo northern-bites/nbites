@@ -4,16 +4,13 @@
 #include <QCoreApplication>
 
 #include "NaoPaths.h"
-#include "man/memory/parse/Parser.h"
-#include "man/include/io/FileFDProvider.h"
+#include "io/FileInProvider.h"
 
 namespace qtool {
 namespace data {
 
-using man::include::io::FDProvider;
-using man::include::io::FileFDProvider;
-using man::memory::parse::Parser;
-using namespace man::include::paths;
+using namespace common::io;
+using namespace common::paths;
 
 static const int DEFAULT_NAME_COLUMN_WIDTH = 300;
 
@@ -45,7 +42,7 @@ void OfflineDataFinder::setupFSBrowser() {
 
     fsBrowser = new QTreeView();
     fsBrowser->setModel(fsModel);
-    fsBrowser->setRootIndex(fsModel->index(QDir::homePath()));
+    fsBrowser->setRootIndex(fsModel->index(QString(NBITES_DIR) + "/data/logs"));
     fsBrowser->expand(fsModel->index(QDir::currentPath()));
 
     fsBrowser->setColumnWidth(0, DEFAULT_NAME_COLUMN_WIDTH);
@@ -66,23 +63,27 @@ void OfflineDataFinder::scanFolderForLogs(QString path) {
     QDir dir(path, filter);
     QFileInfoList list = dir.entryInfoList();
 
-    DataSource::ptr dataSource;
     if (list.size() == 0) {
         return;
     }
 
-    dataSource = DataSource::ptr(new DataSource(DataSource::offline));
+    emit signalNewDataSet();
+
     for (int i = 0; i < list.size(); i++) {
         QFileInfo fileInfo = list.at(i);
         if (fileInfo.size() != 0) {
-            std::string path = fileInfo.absoluteFilePath().toStdString();
-            FDProvider::ptr fdprovider = FDProvider::ptr(new FileFDProvider(path, O_RDONLY));
-            MObject_ID logID = static_cast<MObject_ID>(Parser::peekAtLogID(
-                    fdprovider->getFileDescriptor()));
-            dataSource->addFDProvider(logID, fdprovider);
+            for (int id = FIRST_OBJECT_ID; id < LAST_OBJECT_ID; id++) {
+                if (fileInfo.baseName() == QString(MObject_names[id].c_str())) {
+                    std::string path = fileInfo.absoluteFilePath().toStdString();
+
+                    InProvider::ptr file_in(new FileInProvider(path));
+                    emit signalNewInputProvider(file_in, (MObject_ID)(id));
+
+                }
+            }
         }
     }
-    emit signalNewDataSource(dataSource);
 }
+
 }
 }

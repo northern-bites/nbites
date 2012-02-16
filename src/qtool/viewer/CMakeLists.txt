@@ -15,7 +15,8 @@ add_definitions(${QT_DEFINITIONS})
 
 set( viewer_srcs MemoryViewer.cpp
                  MObjectViewer.cpp
-                 RoboImageViewer.cpp
+                 BMPImageViewer.cpp
+                 ChannelImageViewer.cpp
 		 BallEKFViewer.cpp
 		 FieldViewer.cpp
 		 EKFDataViewer.cpp
@@ -23,7 +24,8 @@ set( viewer_srcs MemoryViewer.cpp
 
 set( viewer_headers MemoryViewer.h
                     MObjectViewer.h
-                    RoboImageViewer.h
+                    BMPImageViewer.h
+                    ChannelImageViewer.h
 		    BallEKFViewer.h
 		    FieldViewer.h
 		    EKFDataViewer.h
@@ -48,4 +50,5 @@ target_link_libraries(
   image
   memory
   ${QT_LIBRARIES}
+
   )
