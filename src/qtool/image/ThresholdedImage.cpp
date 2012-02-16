@@ -4,8 +4,8 @@ namespace qtool {
 namespace image {
 
 ThresholdedImage::ThresholdedImage(
-        boost::shared_ptr<const man::memory::proto::PImage> rawImage) :
-    rawImage(rawImage)
+        boost::shared_ptr<const man::memory::proto::PImage> rawImage, QObject* parent) :
+    BMPImage(parent), rawImage(rawImage)
 { }
 
 bool ThresholdedImage::needToResizeBitmap() const {

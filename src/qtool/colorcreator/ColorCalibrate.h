@@ -53,7 +53,7 @@ protected:
 
 private:
     data::DataManager::ptr dataManager;
-    image::BMPYUVImage::ptr image;
+    image::BMPYUVImage* image;
     viewer::ChannelImageViewer channelImage;
     ColorSpace colorSpace[image::NUM_COLORS];
     ColorSpace* currentColorSpace;

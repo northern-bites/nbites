@@ -12,8 +12,8 @@ using namespace qtool::image;
 
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager),
-        image(new BMPYUVImage(dataManager->getMemory()->getMImage())),
-        channelImage(image),
+        image(new BMPYUVImage(dataManager->getMemory()->getMImage(), BMPYUVImage::RGB, this)),
+        channelImage(image, this),
         currentColorSpace(&colorSpace[STARTING_COLOR]),
         colorSpaceWidget(currentColorSpace, this),
         colorWheel(currentColorSpace, this) {
@@ -31,7 +31,7 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
                 this, SLOT(updateThresholdedImage()));
     }
     //also when the underlying image changes
-    connect(image.get(), SIGNAL(bitmapBuilt()),
+    connect(image, SIGNAL(bitmapBuilt()),
             this, SLOT(updateThresholdedImage()));
     leftLayout->addWidget(&channelImage);
 

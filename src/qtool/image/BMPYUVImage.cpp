@@ -4,9 +4,11 @@
 namespace qtool {
 namespace image {
 
-BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage, ChannelType type) :
-	yuvImage(rawImage),
-	bitmapType(type)
+BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage,
+        ChannelType type, QObject* parent) :
+        BMPImage(parent),
+        yuvImage(rawImage),
+        bitmapType(type)
 { }
 
 bool BMPYUVImage::needToResizeBitmap() const {

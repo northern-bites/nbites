@@ -7,8 +7,6 @@ cmake_minimum_required(VERSION 2.6.0)
 ########### Dependencies
 
 find_package(Qt4 REQUIRED)
-find_library(SWSCALE_LIBRARY swscale PATHS)
-find_library(AVUTIL_LIBRARY avutil PATHS)
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
@@ -19,7 +17,6 @@ set( viewer_srcs MemoryViewer.cpp
                  MObjectViewer.cpp
                  BMPImageViewer.cpp
                  ChannelImageViewer.cpp
-                 RoboImageViewer.cpp
 		 BallEKFViewer.cpp
 		 FieldViewer.cpp
 		 EKFDataViewer.cpp
@@ -29,14 +26,12 @@ set( viewer_headers MemoryViewer.h
                     MObjectViewer.h
                     BMPImageViewer.h
                     ChannelImageViewer.h
-                    RoboImageViewer.h
 		    BallEKFViewer.h
 		    FieldViewer.h
 		    EKFDataViewer.h
 		    PaintField.h)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}
-					${SDL_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ############ Qt4 goodness
 
@@ -55,6 +50,5 @@ target_link_libraries(
   image
   memory
   ${QT_LIBRARIES}
-  ${SWSCALE_LIBRARY}
-  ${AVUTIL_LIBRARY}
+
   )

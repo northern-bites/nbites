@@ -11,7 +11,7 @@
 #include <QLabel>
 #include <QLayout>
 #include "data/DataTypes.h"
-#include "image/BMPYUVImage.h"
+#include "image/FastYUVToBMPImage.h"
 
 namespace qtool {
 namespace viewer {
@@ -20,7 +20,7 @@ class BMPImageViewer: public QWidget {
     Q_OBJECT
 public:
 
-    BMPImageViewer(image::BMPImage::ptr image,
+    BMPImageViewer(image::BMPImage* image,
             QWidget *parent = NULL);
 
     virtual ~BMPImageViewer();
@@ -37,9 +37,19 @@ protected:
     void setupUI();
 
 protected:
-    image::BMPImage::ptr image;
+    image::BMPImage* image;
     QLabel imagePlaceholder;
 
+};
+
+class RoboImageViewer: public BMPImageViewer {
+    Q_OBJECT
+
+public:
+    RoboImageViewer(data::RoboImage::const_ptr rawImage, QWidget* parent = 0) :
+        BMPImageViewer(new image::FastYUVToBMPImage(rawImage, parent), parent) {
+
+        }
 };
 
 }

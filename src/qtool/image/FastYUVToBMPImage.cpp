@@ -1,5 +1,5 @@
 
-#include "RoboImageViewer.h"
+#include "FastYUVToBMPImage.h"
 
 #include <iostream>
 
@@ -15,20 +15,16 @@ extern "C" {
 #endif //__cplusplus
 
 namespace qtool {
-namespace viewer {
+namespace image {
 
 using namespace data;
 using namespace std;
 
-RoboImageViewer::RoboImageViewer(RoboImage::const_ptr roboImage, QWidget* parent = 0) :
-        QWidget(parent), roboImage(roboImage) {
-
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->addWidget(&imagePlaceholder);
-    this->setLayout(layout);
+FastYUVToBMPImage::FastYUVToBMPImage(RoboImage::const_ptr roboImage, QObject* parent) :
+        BMPImage(parent), roboImage(roboImage) {
 }
 
-void RoboImageViewer::updateView() {
+void FastYUVToBMPImage::buildBitmap() {
 
     const byte* yuyv_image_data = (byte*) roboImage->get()->image().data();
     int image_width = roboImage->get()->width();
@@ -50,7 +46,6 @@ void RoboImageViewer::updateView() {
     if (image_convert_context == NULL) {
         std::cerr << "Could not initialize image conversion context "
                   <<__FILE__ << __LINE__ << endl;
-        imagePlaceholder.setText("Problem with YUYV to RGB conversion!");
         sws_freeContext(image_convert_context);
         return;
     }
@@ -68,12 +63,7 @@ void RoboImageViewer::updateView() {
 
     sws_freeContext(image_convert_context);
 
-    QImage image(rgb_image, image_width, image_height, QImage::Format_ARGB32);
-    imagePlaceholder.setPixmap(QPixmap::fromImage(image));
-}
-
-RoboImageViewer::~RoboImageViewer() {
-
+    bitmap = QImage(rgb_image, image_width, image_height, QImage::Format_ARGB32);
 }
 
 }

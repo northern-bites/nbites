@@ -21,7 +21,7 @@ class ThresholdedImage : public BMPImage
 
 public:
     ThresholdedImage(
-            boost::shared_ptr<const man::memory::proto::PImage> rawImage);
+            boost::shared_ptr<const man::memory::proto::PImage> rawImage, QObject* parent = 0);
     virtual ~ThresholdedImage() {};
 
     void buildBitmap();

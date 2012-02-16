@@ -68,9 +68,9 @@ void OfflineViewer::loadMan() {
     manMemoryViewer = new viewer::MemoryViewer(manMemoryManager);
     mainLayout->addWidget(manMemoryViewer);
     //add the thresholded image to the memory viewer
-    ThresholdedImage::ptr threshImage(new ThresholdedImage(
-            offlineControl->getManMemory()->getMImage()->getThresholded()));
-    manMemoryManager->connectSlotToMObject(threshImage.get(),
+    ThresholdedImage* threshImage = new ThresholdedImage(
+            offlineControl->getManMemory()->getMImage()->getThresholded(), this);
+    manMemoryManager->connectSlotToMObject(threshImage,
             SLOT(updateBitmap()), MIMAGE_ID);
 
     QDockWidget* dockWidget =

@@ -49,7 +49,8 @@ public:
     ADD_SHARED_PTR(BMPYUVImage);
 
 public:
-    BMPYUVImage(man::memory::MImage::const_ptr rawImage, ChannelType type = RGB);
+    BMPYUVImage(man::memory::MImage::const_ptr rawImage,
+                ChannelType type = RGB, QObject* parent = 0);
     virtual ~BMPYUVImage() {};
 
     void buildBitmap();
