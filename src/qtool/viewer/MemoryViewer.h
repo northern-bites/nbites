@@ -16,6 +16,7 @@
 #include "man/memory/Memory.h"
 #include "image/BMPYUVImage.h"
 #include "data/RobotMemoryManager.h"
+#include "RoboImageViewer.h"
 #include "ChannelImageViewer.h"
 #include "MObjectViewer.h"
 
@@ -31,8 +32,7 @@ public:
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
-    image::BMPYUVImage::ptr image;
-    BMPImageViewer* bmpImageViewer;
+    viewer::RoboImageViewer roboImageViewer;
 
 };
 

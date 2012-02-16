@@ -11,11 +11,10 @@ using namespace qtool::image;
 
 MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager),
-                 image(new BMPYUVImage(memoryManager->getMemory()->getMImage())),
-                 bmpImageViewer(new ChannelImageViewer(image, this)) {
+                 roboImageViewer(memoryManager->getMemory()->getMImage(), this) {
 
-    this->setCentralWidget(bmpImageViewer);
-    memoryManager->connectSlotToMObject(bmpImageViewer,
+    this->setCentralWidget(&roboImageViewer);
+    memoryManager->connectSlotToMObject(&roboImageViewer,
                         SLOT(updateView()), MIMAGE_ID);
 
     //corner ownership
