@@ -1,0 +1,4 @@
+<launch>
+  <arg name="calibFile" default="$(find ground_truth)/data/calib.txt" />
+  <node pkg="ground_truth" type="calibrate" name="calibrate" args="input:=/camera/rgb/points inputImage:=/camera/rgb/image_color -calibFile $(arg calibFile) -cam 0.01,1000.01/0,0,0/0,0,-3/0,-1,0/640,480/642,5" />
+</launch>

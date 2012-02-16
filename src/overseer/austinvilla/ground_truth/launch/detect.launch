@@ -1,0 +1,7 @@
+<launch>
+  <arg name="mode" default="2" />
+  <arg name="logFile" default="$(find ground_truth)/log.txt" />
+  <arg name="calibFile" default="$(find ground_truth)/data/calib.txt" />
+  <arg name="colorTableFile" default="$(find color_table)/data/default.col" />
+  <node pkg="ground_truth" type="detect" name="detect" args=" input:=/camera/rgb/points -cam 0.01,1000.01/0,0,0/0,0,12/0,1,0/640,480/0,0 -calibFile $(arg calibFile) -colorTableFile $(arg colorTableFile) -logFile $(arg logFile) -mode $(arg mode)" />
+</launch>
