@@ -9,45 +9,63 @@
 #pragma once
 
 #include "BMPImage.h"
-#include "ColorSpace.h"
+#include "Color.h"
 #include "YUVImage.h"
+#include "ClassHelper.h"
 
 namespace qtool {
 namespace image {
 
-enum BitmapType {
-	Color,
-	Y,
-	U,
-	V,
-	Red,
-	Green,
-	Blue,
-	Hue,
-	Saturation,
-	Value
+static const std::string ChannelType_label[] = {
+    "RGB",
+    "Y",
+    "U",
+    "V",
+    "Red",
+    "Green",
+    "Blue",
+    "Hue",
+    "Saturation",
+    "Value"
 };
 
 class BMPYUVImage : public BMPImage
 {
+public:
+    enum ChannelType {
+        RGB,
+        Y,
+        U,
+        V,
+        Red,
+        Green,
+        Blue,
+        Hue,
+        Saturation,
+        Value,
+        NUM_CHANNELS
+    };
+
+    ADD_SHARED_PTR(BMPYUVImage);
 
 public:
-    BMPYUVImage(man::memory::MImage::const_ptr rawImage);
+    BMPYUVImage(man::memory::MImage::const_ptr rawImage,
+                ChannelType type = RGB, QObject* parent = 0);
     virtual ~BMPYUVImage() {};
 
-    void updateBitmap();
+    void buildBitmap();
 
-    BitmapType getCurrentBitmapType() const { return bitmapType; }
-    void setBitmapType(BitmapType type) { bitmapType = type; updateBitmap();}
+    ChannelType getCurrentBitmapType() const { return bitmapType; }
+    void setBitmapType(ChannelType type) { bitmapType = type; updateBitmap();}
 
-    unsigned getWidth() const { return yuvImage.getWidth(); }
-    unsigned getHeight() const { return yuvImage.getHeight(); }
+    unsigned getWidth() const { return bitmap.width(); }
+    unsigned getHeight() const { return bitmap.height(); }
 
 protected:
     bool needToResizeBitmap() const;
 
 protected:
-    BitmapType bitmapType;
+    ChannelType bitmapType;
     YUVImage yuvImage;
 
 };

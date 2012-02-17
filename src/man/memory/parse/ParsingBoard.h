@@ -12,43 +12,42 @@
 
 #include <map>
 
-#include "include/io/BulkIO.h"
+#include "io/InProvider.h"
 #include "MObjectParser.h"
 #include "memory/MObject.h"
-
-//forward declaration
-namespace man {
-namespace memory {
-namespace parse {
-class ParsingBoard;
-}
-}
-}
-
 #include "memory/Memory.h"
-#include "memory/MemoryIOBoard.h"
+#include "memory/MemoryCommon.h"
 
 namespace man {
 namespace memory {
 namespace parse {
 
-class ParsingBoard : public MemoryIOBoard<Parser> {
+class ParsingBoard {
+
+	typedef common::io::InProvider InProvider;
+	typedef std::pair< MObject_ID, MObjectParser::ptr > ObjectIOPair;
+	typedef std::map< MObject_ID, MObjectParser::ptr > ObjectIOMap;
 
 public:
-    ParsingBoard(Memory::ptr memory,
-            IOProvider::const_ptr ioProvider = IOProvider::NullBulkIO());
+    ParsingBoard(Memory::ptr memory);
     virtual ~ParsingBoard();
 
-    void newIOProvider(IOProvider::const_ptr ioProvider);
+    // warning: this function may block in trying to find out the MObject_ID
+    // associated with this input if the MObject_ID is UNKNOWN_OBJECT
+    void newInputProvider(common::io::InProvider::ptr inProvider,
+                          MObject_ID id = UNKNOWN_OBJECT);
 
-    void parse(MObject_ID id);
-    void parseAll();
+    void parseNext(MObject_ID id);
+    void parseNextAll();
 
     void rewind(MObject_ID id);
     void rewindAll();
 
+    void reset() { objectIOMap.clear(); }
+
 private:
     Memory::ptr memory;
+    ObjectIOMap objectIOMap;
 };
 }
 }

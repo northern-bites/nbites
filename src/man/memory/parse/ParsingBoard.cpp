@@ -9,52 +9,52 @@ namespace parse {
 
 using boost::shared_ptr;
 using namespace std;
+using namespace common::io;
 
-ParsingBoard::ParsingBoard(Memory::ptr memory,
-        IOProvider::const_ptr ioProvider) :
+ParsingBoard::ParsingBoard(Memory::ptr memory) :
     memory(memory) {
-    this->newIOProvider(ioProvider);
 }
 
 ParsingBoard::~ParsingBoard(){}
 
-//TODO: this could be moved to MemoryIOBoard, since it's very similar to
-// the LoggingBoard method
-void ParsingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
-    objectIOMap.clear();
+void ParsingBoard::newInputProvider(InProvider::ptr inProvider, MObject_ID id) {
 
-    const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
-    for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
-            i!= fdmap->end(); i++) {
-        MObject::ptr mobject =
-                memory->getMutableMObject(i->first);
+    if (id == UNKNOWN_OBJECT) {
+        //warning - if target is a socket, then this might block (potentially
+        //forever)
+        //TODO: find some way around that (the tricky part is that we use
+        // the id we get from reading the log to identify what memory object
+        // it's going to be parsed to, so we need to wait on the open is some
+        // way)
+        inProvider->openCommunicationChannel();
+        id = inProvider->peekAndGet<MObject_ID>();
+    }
 
-        if (mobject != MObject::ptr()) {
-            objectIOMap[i->first] = Parser::ptr(
-                    new MObjectParser(i->second, mobject));
-        } else {
-            std::cout<<"Could not read valid log ID from file descriptor: "
-                    << "log ID: " << i->first << " "
-                    << i->second->debugInfo() << std::endl;
-        }
+    if (0 < id && id < LAST_OBJECT_ID) {
+        MObjectParser::ptr mObjectParser(new MObjectParser(inProvider,
+                                memory->getMutableMObject(id)));
+        objectIOMap[id] = mObjectParser;
+        mObjectParser->start();
+    } else {
+        cout<<"Could not read valid log ID " << id << " from input: "
+            << inProvider->debugInfo() << endl;
     }
 }
 
-void ParsingBoard::parse(MObject_ID id) {
+void ParsingBoard::parseNext(MObject_ID id) {
 
     ObjectIOMap::iterator it = objectIOMap.find(id);
     // if this is true, then we found a legitimate parser
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
-        //it->second is the parser associated with the specified mobject
-        it->second->getNext();
+        it->second->signalToParseNext();
     }
 }
 
-void ParsingBoard::parseAll() {
+void ParsingBoard::parseNextAll() {
     for (ObjectIOMap::iterator it = objectIOMap.begin();
             it != objectIOMap.end(); it++ ) {
-        it->second->getNext();
+        it->second->signalToParseNext();
     }
 
 }

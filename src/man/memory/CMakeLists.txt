@@ -59,7 +59,7 @@ set( PARSE_SRCS parse/MObjectParser
 
 set( LOG_SRCS log/MObjectLogger
               log/LoggingBoard
-              log/IOProviderFactory
+              log/OutputProviderFactory
               log/PyLoggingBoard)
 ############################ (SUB)DIRECTORY COMPILATION
 # add the protobuffer C++ source subdirectory

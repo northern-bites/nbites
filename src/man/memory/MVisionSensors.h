@@ -1,8 +1,7 @@
 /**
- * MVisionSensors.hpp
+ * @class MVisionSensors : this is the memory object representation of vision Sensors
  *
- * @class MVisionSensors : this is the memory object representation of Sensors
- *
+ * @author Octavian Neamtu
  */
 
 #pragma once
@@ -14,23 +13,23 @@
 
 namespace man {
 namespace memory {
-class MVisionSensors: public proto::PVisionSensors, public MObject {
+
+class MVisionSensors: public MObject {
 
 ADD_SHARED_PTR(MVisionSensors);
 
 public:
-    /**
-     * @param v : the shared pointer to the instance of Sensors this MVisionSensors
-     * links to
-     */
-    MVisionSensors(MObject_ID id, boost::shared_ptr<Sensors> s,
-                   boost::shared_ptr<proto::PVisionSensors> vision_s_data);
+    static const MObject_ID id = MVISION_SENSORS_ID;
+
+public:
+    MVisionSensors(boost::shared_ptr<Sensors> sensors);
     virtual ~MVisionSensors();
+
     /**
      * Updates all the fields of the underlying proto::PSensors with values
      * from the Sensors object
      */
-    void update();
+    void updateData();
     void copyTo(boost::shared_ptr<Sensors> sensors) const;
 
 private:
