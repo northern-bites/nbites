@@ -12,7 +12,8 @@
 
 #include <QWidget>
 
-#include "DataSource.h"
+#include "io/InProvider.h"
+#include "DataTypes.h"
 
 namespace qtool {
 namespace data {
@@ -24,7 +25,9 @@ public:
     DataFinder(QWidget *parent = 0) : QWidget(parent) {}
 
 signals:
-    void signalNewDataSource(DataSource::ptr dataSource);
+    void signalNewDataSet();
+    void signalNewInputProvider(common::io::InProvider::ptr newInput,
+                                MObject_ID id);
 
 };
 

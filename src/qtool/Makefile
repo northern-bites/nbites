@@ -25,6 +25,7 @@ ECLIPSE_FLAGS=-G "Eclipse CDT4 - Unix Makefiles"
 EXECUTABLE=$(BIN_DIR)/qtool/qtool
 
 CMAKE_DEBUG_CONFIG=-DCMAKE_BUILD_TYPE=debug
+CMAKE_RELEASE_CONFIG=-DCMAKE_BUILD_TYPE=release
 
 MAKE_FLAGS=--no-print-directory qtool
 
@@ -38,14 +39,16 @@ build: $(GEN_MAKEFILE)
 $(GEN_MAKEFILE):
 	$(MKDIR) -p $(BIN_DIR); \
 	$(CD) $(BIN_DIR); \
-	$(CMAKE) $(TOOLCHAIN_FLAG) $(SRC_DIR)
+	$(CMAKE) $(TOOLCHAIN_FLAG) $(CMAKE_RELEASE_CONFIG) $(SRC_DIR)
+
+release: clean $(GEN_MAKEFILE)
 
 eclipse: $(ECLIPSE_PROJECT_FILE)
 
 $(ECLIPSE_PROJECT_FILE):
 	$(MKDIR) -p $(BIN_DIR); \
 	$(CD) $(BIN_DIR); \
-	$(CMAKE) $(TOOLCHAIN_FLAG) $(ECLIPSE_FLAGS) $(SRC_DIR)
+	$(CMAKE) $(TOOLCHAIN_FLAG) $(CMAKE_RELEASE_CONFIG) $(ECLIPSE_FLAGS) $(SRC_DIR)
 
 cfg: $(GEN_MAKEFILE)
 	$(CCMAKE) $(BIN_DIR)
@@ -61,11 +64,10 @@ $(EXECUTABLE): build
 run: $(EXECUTABLE)
 	$(EXECUTABLE)
 
-config_debug: $(GEN_MAKEFILE)
+debug: 
+	$(MKDIR) -p $(BIN_DIR); \
 	$(CD) $(BIN_DIR); \
-	$(CMAKE) $(CMAKE_DEBUG_CONFIG) .
-
-debug: config_debug build
+	$(CMAKE) $(TOOLCHAIN_FLAG) $(CMAKE_DEBUG_CONFIG) .
 
 run_gdb: debug
 	$(GDB) $(EXECUTABLE)

@@ -19,6 +19,8 @@ static const float GREEN_PAD_X = 71.0f;
 static const float GREEN_PAD_Y = 71.0f;
 #endif // USING_LAB_FIELD
 
+static const float LINE_WIDTH = 5.0f;
+
 static const float FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + 2.0f * GREEN_PAD_Y;
 static const float FIELD_GREEN_HEIGHT = FIELD_WHITE_HEIGHT + 2.0f * GREEN_PAD_X;
 static const float FIELD_WIDTH = FIELD_GREEN_WIDTH;
@@ -47,6 +49,7 @@ static const float GOAL_POST_CM_HEIGHT = 80.0f;
 static const float GOAL_POST_CM_WIDTH = 10.0f;
 static const float CROSSBAR_CM_WIDTH = 140.f;
 static const float CROSSBAR_CM_HEIGHT = 5.0f;
+static const float GOAL_DEPTH = 40.0f;
 static const float GOAL_POST_RADIUS = GOAL_POST_CM_WIDTH / 2.0f;
 
 // GOAL CONSTANTS

@@ -7,49 +7,21 @@ namespace man {
 namespace memory {
 namespace log {
 
-using namespace man::include::paths;
 using boost::shared_ptr;
 
-LoggingBoard::LoggingBoard(Memory::const_ptr memory, boost::shared_ptr<Synchro> synchro,
-        IOProvider::const_ptr ioProvider) :
-    memory(memory), logging(true), synchro(synchro) {
-    newIOProvider(ioProvider);
+LoggingBoard::LoggingBoard(Memory::const_ptr memory) :
+    memory(memory), logging(true) {
 }
 
-void LoggingBoard::newIOProvider(IOProvider::const_ptr ioProvider) {
+void LoggingBoard::newOutputProvider(OutProvider::ptr outProvider,
+									 MObject_ID id) {
 
-    this->ioProvider = ioProvider;
-
-    const IOProvider::FDProviderMap* fdmap = ioProvider->getMap();
-    for (IOProvider::FDProviderMap::const_iterator i = fdmap->begin();
-            i!= fdmap->end(); i++) {
-
-        MObject::const_ptr mobject =
-                memory->getMObject(i->first);
-        if (mobject != MObject::const_ptr()) {
-            objectIOMap[i->first] = MObjectLogger::ptr(
-                    new MObjectLogger(i->second, synchro,
-                                      static_cast<int> (i->first), mobject));
-            objectIOMap[i->first]->start();
-        } else {
-            std::cout<<"Invalid Object ID passed for logging: "
-                    << "log ID: " << i->first << " "
-                    << i->second->debugInfo() << std::endl;
-        }
-    }
-}
-
-void LoggingBoard::update(MObject_ID id) {
-    this->log(id);
-}
-
-void LoggingBoard::log(MObject_ID id) {
-    if (logging) {
-        MObjectLogger::ptr logger = getMutableLogger(id);
-        if (logger.get() != NULL) {
-            logger->signalToLog();
-        }
-    }
+    MObjectLogger::ptr logger(
+    			new MObjectLogger(outProvider,  memory->getMObject(id)));
+    objectIOMap[id] = logger;
+    memory->subscribe(logger.get(), id);
+    //start the logging thread
+    logger->start();
 }
 
 MObjectLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
@@ -72,6 +44,14 @@ MObjectLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
     } else {
         return MObjectLogger::ptr();
     }
+}
+
+void LoggingBoard::reset() {
+    ObjectIOMap::iterator it;
+    for (it = objectIOMap.begin(); it != objectIOMap.end(); it++) {
+        memory->unsubscribe(it->second.get(), it->first);
+    }
+    objectIOMap.clear();
 }
 
 void LoggingBoard::startLogging() {

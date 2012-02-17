@@ -6,44 +6,69 @@
  *
  */
 
-#include <QGraphicsItem>
-#include <QString>
-#include <QImage>
-#include <QColor>
-#include <QPainter>
-#include "ColorSpace.h"
-#include "YUVImage.h"
+#pragma once
 
-enum BitmapType {
-	Color,
-	Y,
-	U,
-	V,
-	Red,
-	Green,
-	Blue,
-	Hue,
-	Saturation,
-	Value
+#include "BMPImage.h"
+#include "Color.h"
+#include "YUVImage.h"
+#include "ClassHelper.h"
+
+namespace qtool {
+namespace image {
+
+static const std::string ChannelType_label[] = {
+    "RGB",
+    "Y",
+    "U",
+    "V",
+    "Red",
+    "Green",
+    "Blue",
+    "Hue",
+    "Saturation",
+    "Value"
 };
 
-class BMPYUVImage : public YUVImage
+class BMPYUVImage : public BMPImage
 {
+public:
+    enum ChannelType {
+        RGB,
+        Y,
+        U,
+        V,
+        Red,
+        Green,
+        Blue,
+        Hue,
+        Saturation,
+        Value,
+        NUM_CHANNELS
+    };
+
+    ADD_SHARED_PTR(BMPYUVImage);
 
 public:
-    BMPYUVImage(man::memory::MImage::const_ptr rawImage);
+    BMPYUVImage(man::memory::MImage::const_ptr rawImage,
+                ChannelType type = RGB, QObject* parent = 0);
     virtual ~BMPYUVImage() {};
-    virtual void updateFromRawImage();
-    void updateBitmap();
 
-    BitmapType getCurrentBitmapType() const { return bitmapType; }
-    void setBitmapType(BitmapType type) { bitmapType = type; updateBitmap();}
+    void buildBitmap();
 
-    QImage getBitmap(BitmapType type = Color) const { return bitmap; }
+    ChannelType getCurrentBitmapType() const { return bitmapType; }
+    void setBitmapType(ChannelType type) { bitmapType = type; updateBitmap();}
 
+    unsigned getWidth() const { return bitmap.width(); }
+    unsigned getHeight() const { return bitmap.height(); }
 
-private:
-    BitmapType bitmapType;
-    QImage bitmap;
+protected:
+    bool needToResizeBitmap() const;
+
+protected:
+    ChannelType bitmapType;
+    YUVImage yuvImage;
 
 };
+
+}
+}

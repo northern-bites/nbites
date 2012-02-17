@@ -64,10 +64,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         gcState = self.brain.gameController.currentState
 
         if (gcState == 'gamePlaying'):
-            roleState = self.getNextState()
+            if (self.brain.gameController.counter != 1):
+                # Make sure gamePlaying gets run
+                roleState = self.getNextState()
 
-            if roleState != self.currentState:
-                self.switchTo(roleState)
+                if roleState != self.currentState:
+                    self.switchTo(roleState)
 
         #Goalie Penalty Kicking
         if (gcState == 'penaltyShotsGamePlaying'

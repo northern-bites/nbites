@@ -46,12 +46,13 @@ Qt4_wrap_ui(qtool_forms_headers ${qtool_forms})
 #### resources example
 #Qr4_add_resources(qtool_resources_rcc ${qtool_resources})
 
-
 ######### Subdirectory compilation
 add_subdirectory( image )
 add_subdirectory( colorcreator )
 add_subdirectory( data )
 add_subdirectory( viewer )
+add_subdirectory( offline )
+add_subdirectory( remote )
 
 ######### The executable
 
@@ -66,9 +67,7 @@ target_link_libraries(
   image
   data
   viewer
+  offline
+  remote
   ${QT_LIBRARIES}
   )
-
-set_property(
-  TARGET qtool
-  APPEND PROPERTY COMPILE_DEFINITIONS NBITES_DIR=${NBITES_DIR} )

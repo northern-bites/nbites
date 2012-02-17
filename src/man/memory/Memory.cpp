@@ -1,8 +1,5 @@
-/*
- * Memory.cpp
- *
- * @author Octavian Neamtu
- */
+
+#include <iostream>
 
 #include "Common.h"
 #include "Memory.h"
@@ -10,35 +7,37 @@
 namespace man {
 namespace memory {
 
-long long int birth_time; //the time we initialized memory
-//everything else is time stamped relative to this
-
 using boost::shared_ptr;
 using namespace proto;
+using namespace std;
 
 Memory::Memory(shared_ptr<Vision> vision_ptr,
-        shared_ptr<Sensors> sensors_ptr) :
-        mVision(new MVision(MVISION_ID,
-                vision_ptr, shared_ptr<PVision>(new PVision))),
-        mVisionSensors(new MVisionSensors(MVISION_SENSORS_ID,
-                sensors_ptr, shared_ptr<PVisionSensors>(new PVisionSensors))),
-        mMotionSensors(new MMotionSensors(MMOTION_SENSORS_ID,
-                sensors_ptr, shared_ptr<PMotionSensors>(new PMotionSensors))),
-        mImage(new MImage(MIMAGE_ID,
-                sensors_ptr, shared_ptr<PImage>(new PImage))) {
-    birth_time = process_micro_time();
+               shared_ptr<Sensors> sensors_ptr,
+               shared_ptr<LocSystem> loc_ptr) :
+        mVision(new MVision(vision_ptr)),
+        mVisionSensors(new MVisionSensors(sensors_ptr)),
+        mMotionSensors(new MMotionSensors(sensors_ptr)),
+        mImage(new MImage(sensors_ptr)),
+        mLocalization(new MLocalization(loc_ptr))
+{
 
+#if defined USE_MEMORY || defined OFFLINE
     if(sensors_ptr.get()) {
-        sensors_ptr->addSubscriber(this);
+        sensors_ptr->addSubscriber(mVisionSensors.get(), NEW_VISION_SENSORS);
+        sensors_ptr->addSubscriber(mMotionSensors.get(), NEW_MOTION_SENSORS);
+        sensors_ptr->addSubscriber(mImage.get(), NEW_IMAGE);
     }
+#endif
 
-    mobject_IDMap.insert(MObject_IDPair(MVISION_ID, mVision));
-    mobject_IDMap.insert(MObject_IDPair(MVISION_SENSORS_ID, mVisionSensors));
-    mobject_IDMap.insert(MObject_IDPair(MMOTION_SENSORS_ID, mMotionSensors));
-    mobject_IDMap.insert(MObject_IDPair(MIMAGE_ID, mImage));
+    mobject_IDMap.insert(MObject_IDPair(mVision->getID(), mVision));
+    mobject_IDMap.insert(MObject_IDPair(mVisionSensors->getID(), mVisionSensors));
+    mobject_IDMap.insert(MObject_IDPair(mMotionSensors->getID(), mMotionSensors));
+    mobject_IDMap.insert(MObject_IDPair(mImage->getID(), mImage));
+    mobject_IDMap.insert(MObject_IDPair(mLocalization->getID(), mLocalization));
 }
 
 Memory::~Memory() {
+    cout << "Memory destructor" << endl;
 }
 
 void Memory::update(boost::shared_ptr<MObject> obj) {
@@ -47,32 +46,6 @@ void Memory::update(boost::shared_ptr<MObject> obj) {
 
 void Memory::updateVision() {
     update(mVision);
-//    loggingBoard->log(mVision);
-}
-
-void Memory::update(SensorsEvent event) {
-#ifdef USE_MEMORY
-    if (event == NEW_MOTION_SENSORS) {
-        PROF_ENTER(P_MEMORY_MOTION_SENSORS);
-        mMotionSensors->update();
-        notifySubscribers(MMOTION_SENSORS_ID);
-        PROF_EXIT(P_MEMORY_MOTION_SENSORS);
-    }
-
-    if (event == NEW_VISION_SENSORS) {
-        PROF_ENTER(P_MEMORY_VISION_SENSORS);
-        mVisionSensors->update();
-        notifySubscribers(MVISION_SENSORS_ID);
-        PROF_EXIT(P_MEMORY_VISION_SENSORS);
-    }
-
-    if (event == NEW_IMAGE) {
-        PROF_ENTER(P_MEMORY_IMAGE);
-        mImage->update();
-        notifySubscribers(MIMAGE_ID);
-        PROF_EXIT(P_MEMORY_IMAGE);
-    }
-#endif
 }
 
 MObject::const_ptr Memory::getMObject(MObject_ID id) const {
@@ -93,6 +66,16 @@ MObject::ptr Memory::getMutableMObject(MObject_ID id) {
     } else {
         return MObject::ptr();
     }
+}
+
+void Memory::subscribe(Subscriber* subscriber,
+                           MObject_ID objectToSubscribeTo) const {
+    getMObject(objectToSubscribeTo)->addSubscriber(subscriber);
+}
+
+void Memory::unsubscribe(Subscriber* subscriber,
+                         MObject_ID objectToUnsuscribeFrom) const {
+    getMObject(objectToUnsuscribeFrom)->unsubscribe(subscriber);
 }
 
 }

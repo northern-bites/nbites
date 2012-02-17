@@ -30,7 +30,7 @@
 #include "SensorDef.h"
 #include "SensorConfigs.h"
 #include "VisionDef.h"
-#include "Provider.h"
+#include "Notifier.h"
 #include "Speech.h"
 #include "BulkMonitor.h"
 #include "include/synchro/mutex.h"
@@ -99,7 +99,7 @@ struct Inertial {
 };
 
 
-class Sensors : public Provider<SensorsEvent>{
+class Sensors : public EventNotifier<SensorsEvent>{
     //friend class Man;
 public:
     Sensors(boost::shared_ptr<Speech> s);
@@ -174,6 +174,9 @@ public:
                           const float ultraSoundRight,
                           const float batteryCharge,
                           const float batteryCurrent);
+
+    void setBatteryCharge(float charge);
+    void setBatteryCurrent(float charge);
 
     // special methods
     //   the image retrieval and locking methods are a little different, as we

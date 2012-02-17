@@ -13,13 +13,23 @@ add_definitions(${QT_DEFINITIONS})
 
 ########### Sources
 
-set( viewer_srcs LogViewer.cpp
+set( viewer_srcs MemoryViewer.cpp
                  MObjectViewer.cpp
-                 RoboImageViewer.cpp )
+                 BMPImageViewer.cpp
+                 ChannelImageViewer.cpp
+		 BallEKFViewer.cpp
+		 FieldViewer.cpp
+		 EKFDataViewer.cpp
+		 PaintField.cpp)
 
-set( viewer_headers LogViewer.h
-                    RoboImageViewer.h
-                    MObjectViewer.h )
+set( viewer_headers MemoryViewer.h
+                    MObjectViewer.h
+                    BMPImageViewer.h
+                    ChannelImageViewer.h
+		    BallEKFViewer.h
+		    FieldViewer.h
+		    EKFDataViewer.h
+		    PaintField.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -40,4 +50,5 @@ target_link_libraries(
   image
   memory
   ${QT_LIBRARIES}
+
   )

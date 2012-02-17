@@ -12,12 +12,10 @@
 
 class TTMan : public Man {
 public:
-    TTMan(boost::shared_ptr<Profiler> _profiler,
-          boost::shared_ptr<Sensors> _sensors,
+    TTMan(boost::shared_ptr<Sensors> _sensors,
           boost::shared_ptr<Transcriber> _transcriber,
           boost::shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
           boost::shared_ptr<ThreadedMotionEnactor> _enactor,
-          boost::shared_ptr<Synchro> synchro,
           boost::shared_ptr<Lights> _lights,
           boost::shared_ptr<Speech> _speech);
     ~TTMan();

@@ -2,8 +2,8 @@
  *
  * @class DataManager
  *
- * This class should handle the notifying all subscribers to new data
- * coming into the system (be it online or offline)
+ * This class is an empowered RobotMemoryManager imbued with a parsing board and
+ * a logging board for easy IO from and to the managed memory.
  *
  * @author Octavian Neamtu
  *
@@ -11,48 +11,52 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
+#include <QObject>
 
-#include "DataSource.h"
+#include "io/InProvider.h"
 #include "man/memory/Memory.h"
 #include "man/memory/parse/ParsingBoard.h"
-#include "include/MultiProvider.h"
+#include "man/memory/log/LoggingBoard.h"
 #include "DataTypes.h"
-
-#include <iostream>
+#include "ClassHelper.h"
+#include "RobotMemoryManager.h"
 
 namespace qtool {
 namespace data {
 
-class DataManager : public MultiProvider<MObject_ID> {
+class DataManager: public RobotMemoryManager {
 
-public:
-	typedef boost::shared_ptr<DataManager> ptr;
+Q_OBJECT
+
+ADD_SHARED_PTR(DataManager)
 
 public:
     DataManager();
 
     virtual ~DataManager();
 
-    void getNext() {
-        parsingBoard.parseAll();
-        this->notifySubscribers(man::memory::MIMAGE_ID);
-    }
+    void startRecordingToPath(std::string path);
 
+    void stopRecording();
+
+    bool isRecording() const { return is_recording; }
+
+public slots:
+    void getNext() {
+        parsingBoard.parseNextAll();
+    }
     void getPrev() {
         parsingBoard.rewindAll();
-        this->notifySubscribers(man::memory::MIMAGE_ID);
     }
 
-    man::memory::Memory::ptr getMemory() const {
-        return memory;}
+    void newInputProvider(common::io::InProvider::ptr newInput,
+                          MObject_ID id);
+    void reset();
 
-    void newDataSource(DataSource::ptr dataSource);
-
-private:
-    man::memory::Memory::ptr memory;
+protected:
     man::memory::parse::ParsingBoard parsingBoard;
-    DataSource::ptr dataSource;
+    man::memory::log::LoggingBoard loggingBoard;
+    bool is_recording;
 
 };
 

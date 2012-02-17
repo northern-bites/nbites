@@ -1,37 +1,54 @@
+/*
+ * @class ThreadedLogger
+ *
+ * Puts the logger in a thread of its own and puts in some
+ * aio functionality so that the writes don't block anymore
+ * (a blocking write will block the ENTIRE process and not only
+ * one thread)
+ *
+ * @author Octavian Neamtu
+ *
+ */
 
-#include "Logger.h"
-#include "synchro.h"
+#include "io/OutProvider.h"
+#include "synchro/synchro.h"
+#include "Subscriber.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 namespace log {
 
-class ThreadedLogger : public Logger, public Thread{
+class ThreadedLogger: public Thread, public Subscriber {
+
+ADD_SHARED_PTR(ThreadedLogger)
+
+protected:
+    typedef common::io::OutProvider OutProvider;
 
 public:
-    typedef boost::shared_ptr<ThreadedLogger> ptr;
-    typedef boost::shared_ptr<ThreadedLogger> const_ptr;
+    ThreadedLogger(OutProvider::ptr out_provider, std::string name) :
+            Thread(name), out_provider(out_provider) {
 
-public:
-    ThreadedLogger(FDProvider::const_ptr fdp,
-                   boost::shared_ptr<Synchro> synchro, std::string name) :
-                   Logger(fdp), Thread(synchro, name) {
     }
 
-    virtual ~ThreadedLogger(){}
+    virtual ~ThreadedLogger() {
+    }
 
     virtual void writeToLog() = 0;
 
-    virtual void run() {
-        while (true) {
-            this->waitForSignal();
-            this->writeToLog();
-        }
-    }
+    virtual void run() = 0;
 
     void signalToLog() {
         this->signalToResume();
     }
+
+    void update() {
+        this->signalToLog();
+    }
+
+protected:
+    const OutProvider::ptr out_provider;
 
 };
 

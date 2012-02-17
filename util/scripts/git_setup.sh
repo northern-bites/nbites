@@ -1,5 +1,5 @@
 #Script to setup git for Level 1 Noobs
-echo "Enter your full name (ie Robot Ball)
+echo "Enter your full name (ie Robot Ball)"
 read FULL_NAME
 echo "Enter your email"
 read EMAIL

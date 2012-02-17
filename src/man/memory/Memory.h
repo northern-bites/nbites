@@ -1,15 +1,15 @@
 /**
- * Memory.h
- *
  * @class Memory
  *
  * This class keeps instances of all the different memory objects and provides
- * an interface through which they get updated (each memory object pulls data
- * from its corresponding object
+ * an interface through which they get updated (each memory object copies data
+ * from its corresponding man object
+ *
+ * Each MObject is associated with a MObject_ID that identifies it
  *
  * Future work: we will be able to keep multiple instances of selected objects
  *
- *      Author: Octavian Neamtu
+ * @author Octavian Neamtu
  */
 
 #pragma once
@@ -29,50 +29,50 @@ class Memory; //forward declaration
 #include "MVisionSensors.h"
 #include "MMotionSensors.h"
 #include "MImage.h"
+#include "MLocalization.h"
 #include "Sensors.h"
 #include "Profiler.h"
-#include "include/MultiProvider.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 
-class Memory : public Subscriber<SensorsEvent>,
-               public MultiProvider<MObject_ID> {
+class Memory {
 
 public:
-    typedef boost::shared_ptr<Memory> ptr;
-    typedef boost::shared_ptr<const Memory> const_ptr;
+    ADD_NULL_INSTANCE(Memory)
+    ADD_SHARED_PTR(Memory)
     typedef std::pair<MObject_ID,
             boost::shared_ptr<MObject> > MObject_IDPair;
     typedef std::map<MObject_ID,
             boost::shared_ptr<MObject> > MObject_IDMap;
 
 public:
-    Memory( boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
-            boost::shared_ptr<Sensors> sensors_ptr = boost::shared_ptr<Sensors>());
+    Memory(boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
+           boost::shared_ptr<Sensors> sensors_ptr = boost::shared_ptr<Sensors>(),
+           boost::shared_ptr<LocSystem> loc_ptr = boost::shared_ptr<LocSystem>());
     virtual ~Memory();
     /**
      * calls the update function on @obj
      * this will usually make the MObject pull data
-     * from its corresponding man object and maybe log it
+     * from its corresponding man object
      */
     void update(boost::shared_ptr<MObject> obj);
     void updateVision();
 
-    /**
-     * This function is called whenever one of the Providers we are subscribed
-     * to has something new/updated
-     */
-    void update(SensorsEvent eventID);
-
 public:
-    const MVision* getMVision() const {return mVision.get();}
-    const MVisionSensors* getMVisionSensors() const {return mVisionSensors.get();}
-    const MMotionSensors* getMMotionSensors() const {return mMotionSensors.get();}
+    MVision::const_ptr getMVision() const {return mVision;}
+    MVisionSensors::const_ptr getMVisionSensors() const {return mVisionSensors;}
+    MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
     MImage::const_ptr getMImage() const {return mImage;}
 
     MObject::const_ptr getMObject(MObject_ID id) const;
     MObject::ptr getMutableMObject(MObject_ID id);
+
+    void subscribe(Subscriber* subscriber,
+                       MObject_ID objectToSubscribeTo) const;
+    void unsubscribe(Subscriber* subscriber,
+                     MObject_ID objectToUnsuscribeFrom) const;
 
 private:
     MObject_IDMap mobject_IDMap;
@@ -80,6 +80,7 @@ private:
     boost::shared_ptr<MVisionSensors> mVisionSensors;
     boost::shared_ptr<MMotionSensors> mMotionSensors;
     boost::shared_ptr<MImage> mImage;
+    boost::shared_ptr<MLocalization> mLocalization;
 };
 }
 }

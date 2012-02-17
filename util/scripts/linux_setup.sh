@@ -7,7 +7,7 @@ fi
 
 PACKAGES="build-essential cmake git-core \
 python2.6-dev emacs cmake-curses-gui ccache curl aptitude \
-ant qt4-dev-tools libmpfr1ldbl"
+ant qt4-dev-tools"
 
 echo "Are you on 64-bit linux?(y/n)"
 read IS64BIT
@@ -25,6 +25,11 @@ if [ $VERSION == '10.10' ]; then
     sudo apt-get install sun-java6-jdk
     sudo update-java-alternatives -s java-6-sun
 elif [ $VERSION == '11.04' ]; then
+    echo "Downloading Java. Accept the license by pressing TAB!"
+    sudo add-apt-repository ppa:ferramroberto/java
+    sudo apt-get update
+    sudo apt-get install sun-java6-jdk
+elif [ $VERSION == '11.10' ]; then
     echo "Downloading Java. Accept the license by pressing TAB!"
     sudo add-apt-repository ppa:ferramroberto/java
     sudo apt-get update
@@ -56,7 +61,11 @@ naoqi=naoqi-sdk-$naoqi_version-linux-nbites.tar.gz
 naoqi_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$naoqi
 naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux
 
-ext=ext-nbites-linux.tar.gz
+if [ $IS64BIT == 'y' ]; then
+    ext=ext-nbites-linux64.tar.gz
+else
+    ext=ext-nbites-linux32.tar.gz
+fi
 ext_robocup=$robocup/software/$ext
 
 echo ""
@@ -80,7 +89,7 @@ ctc=linux-x64-crosstoolchain.tar.gz
 ctc_robocup=$robocup/software/nao/cross_compiler_stuff/$ctc
 
 echo "Downloading the CTC"
-rsync -v $USER@$ctc_robocup $naoqi_local/
+rsync -v $USER_NAME@$ctc_robocup $naoqi_local/
 
 echo "Unpacking the CTC"
 
