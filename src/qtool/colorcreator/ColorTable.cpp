@@ -17,16 +17,16 @@ using namespace image;
 
 ColorTable::ColorTable()
 {
-    table = new unsigned**[128];
-    for (int i = 0; i < 128; i++)
+    table = new byte**[128];
+    for (byte i = 0; i < 128; i++)
     {
-        table[i] = new unsigned*[128];
+        table[i] = new byte*[128];
     }
-    for (int i = 0; i < 128; i++)
+    for (byte i = 0; i < 128; i++)
     {
-        for (int j = 0; j < 128; j++)
+        for (byte j = 0; j < 128; j++)
         {
-            table[i][j] = new unsigned[128];
+            table[i][j] = new byte[128];
         }
     }
 }
@@ -42,11 +42,11 @@ void ColorTable::read(QString filename)
         out << "The file would not open properly" << "\n";
         return;
     }
-    for (int y = 0; y < 128; ++y)
+    for (byte y = 0; y < 128; ++y)
     {
-        for (int x = 0; x < 128; x ++)
+        for (byte x = 0; x < 128; x ++)
         {
-            for (int z = 0; z < 128; z++)
+            for (byte z = 0; z < 128; z++)
             {
                 temp = file.read(1);
                 table[y][x][z] = temp[0];
@@ -55,11 +55,11 @@ void ColorTable::read(QString filename)
     }
     file.close();
     /*Stats** stats = colorStats();
-    for (int i = 0; i < mainColors; i++)
+    for (byte i = 0; i < mainColors; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (byte j = 0; j < 3; j++)
         {
-            stats[j][i].print(i, j);
+            stats[j][i].prbyte(i, j);
         }
     }*/
     filename.chop(4);
@@ -81,11 +81,11 @@ void ColorTable::writeNewFormat(QString filename)
         out << "The file would not open properly" << "\n";
         return;
     }
-    for (int y = 0; y < 128; ++y)
+    for (byte y = 0; y < 128; ++y)
     {
-        for (int x = 0; x < 128; x ++)
+        for (byte x = 0; x < 128; x ++)
         {
-            for (int z = 0; z < 128; z++)
+            for (byte z = 0; z < 128; z++)
             {
                 temp[0] = table[y][x][z];
                 file.write(temp);
@@ -95,19 +95,19 @@ void ColorTable::writeNewFormat(QString filename)
     file.close();
 }
 
-unsigned ColorTable::getColor(int y, int u, int v)
+byte ColorTable::getColor(byte y, byte u, byte v)
 {
     return table[v / 2][u / 2][y / 2];
 }
 
-void ColorTable::setColor(int y, int u, int v, unsigned col)
+void ColorTable::setColor(byte y, byte u, byte v, byte col)
 {
     table[v / 2][u / 2][y / 2] = table[v / 2][u / 2][y / 2] | col;
 }
 
-void ColorTable::unSetColor(int y, int u, int v, unsigned col)
+void ColorTable::unSetColor(byte y, byte u, byte v, byte col)
 {
-    unsigned allCol = 0xFF;
+    byte allCol = 0xFF;
     col = col ^ allCol;
     table[v / 2][u / 2][y / 2] = table[v / 2][u / 2][y / 2] & col;
 }
@@ -128,17 +128,17 @@ void ColorTable::write(QString filename, ColorSpace* colorSpaces) {
         return;
     }
     // loop through all possible table values - our tables are v-u-y
-    int count = 0;
-    for (int z = 0; z < V_MAX; z++)
+    byte count = 0;
+    for (byte z = 0; z < V_MAX; z++)
     {
-        for (int x = 0; x < U_MAX; x++)
+        for (byte x = 0; x < U_MAX; x++)
         {
-            for (int y = 0; y < Y_MAX; y++)
+            for (byte y = 0; y < Y_MAX; y++)
             {
                 byte temp = GREY_BIT;
                 Color color;
                 color.setYuv((byte) y, (byte) x, (byte) z);
-                for (int c = 0; c < image::NUM_COLORS; c++)
+                for (byte c = 0; c < image::NUM_COLORS; c++)
                 {
                     if (colorSpaces[c].contains(color)) {
                         if (c == image::Orange) {
@@ -160,22 +160,22 @@ void ColorTable::write(QString filename, ColorSpace* colorSpaces) {
 {
     Stats** colorStats;
     colorStats = new Stats*[3];
-    for (int i = 0; i < 3; i++)
+    for (byte i = 0; i < 3; i++)
     {
         colorStats[i] = new Stats[mainColors];
     }
 
     // initialize stats
-    for (int h = 0; h < 3; ++h)
-        for (int c = 0; c < mainColors; ++c)
+    for (byte h = 0; h < 3; ++h)
+        for (byte c = 0; c < mainColors; ++c)
             colorStats[h][c] = Stats();
 
     // loop through the whole table collecting stats
-    for (int y = 0; y < 256; y += 2)
-        for (int v = 0; v < 256; v += 2)
-            for (int u = 0; u < 256; u += 2)
+    for (byte y = 0; y < 256; y += 2)
+        for (byte v = 0; v < 256; v += 2)
+            for (byte u = 0; u < 256; u += 2)
             {
-                int c = index(y, u, v);
+                byte c = index(y, u, v);
                 while (c < 0) {
                     c = 256 + c;
                 }
@@ -186,9 +186,9 @@ void ColorTable::write(QString filename, ColorSpace* colorSpaces) {
                 // assumes old style table - convert values
                 // e.g. ORANGERED hits both ORANGE and RED
                 if (c < 12)
-                    for (int q = 0; q < 2; ++q)
+                    for (byte q = 0; q < 2; ++q)
                     {
-                        int ci = colormap[q][c];
+                        byte ci = colormap[q][c];
                         if (ci < mainColors)
                         {
                             colorStats[0][ci].add(y);

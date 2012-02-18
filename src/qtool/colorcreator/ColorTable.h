@@ -22,18 +22,18 @@ class ColorTable
 {
 public:
     ColorTable();
-    unsigned*** getTable() {return table; }
+    byte*** getTable() {return table; }
     void read(QString filename);
     void writeNewFormat(QString filename);
-    unsigned getColor(int y, int u, int v);
-    void setColor(int y, int u, int v, unsigned col);
-    void unSetColor(int y, int u, int v, unsigned col);
+    byte getColor(byte y, byte u, byte v);
+    void setColor(byte y, byte u, byte v, byte col);
+    void unSetColor(byte y, byte u, byte v, byte col);
 
     //color table output methods
     static void write(QString filename, ColorSpace* colorSpaces);
 
 private:
-    unsigned*** table;
+    byte*** table;
 };
 
 }
