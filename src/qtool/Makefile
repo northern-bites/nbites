@@ -78,7 +78,7 @@ debug:
 run_gdb: debug
 	$(GDB) $(EXECUTABLE)
 	
-overseer_server:
+overseer_server: $(GEN_MAKEFILE)
 	$(MAKE) $(OVERSEER_SERVER_TARGET) $(MAKE_FLAGS) -C $(BIN_DIR); \
 	$(MKDIR) -p $(OVERSEER_DESTINATION_DIR); \
 	cp $(OVERSEER_SERVER_LIB) $(OVERSEER_DESTINATION_DIR)
