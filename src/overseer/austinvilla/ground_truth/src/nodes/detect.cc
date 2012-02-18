@@ -278,6 +278,7 @@ int main (int argc, char** argv) {
   point<float> ballFieldPosition;
   std::vector<pcl::PointXYZ> robotPositions;
   std::vector<point<float> > robotFieldPositions;
+  nbites::overseer::OverseerServer overseerServer(&ballFieldPosition, &robotFieldPositions);
 
   while (nh.ok ()) {
 
@@ -333,6 +334,11 @@ int main (int argc, char** argv) {
         visualizer.addSphere(ballPositions[i], 0.05, 1.0, 0.4, 0.0, getUniqueName("ball", i));
       }
       numBallsDisplayed = ballPositions.size();
+      if (numBallsDisplayed > 0) {
+          ballFieldPosition.x = ballPositions[0].x;
+          ballFieldPosition.y = ballPositions[0].y;
+      }
+
 
       /* 
       //Sample log file code
@@ -354,6 +360,14 @@ int main (int argc, char** argv) {
         visualizer.addSphere(robotPositions[i], 0.1, 1.0, 1.0, 1.0, getUniqueName("robot", i));
       }
       numRobotsDisplayed = robotPositions.size();
+
+      robotFieldPositions.clear();
+      for (int i = 0; i < numRobotsDisplayed; i++) {
+          robotFieldPositions.push_back(
+                  point<float>(robotFieldPositions[i].x, robotFieldPositions[i].y));
+      }
+
+      overseerServer.postData();
 
       /*
       //Sample log file code
