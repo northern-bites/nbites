@@ -15,12 +15,11 @@ using boost::shared_ptr;
 using namespace std;
 using proto::PImage;
 
-MImage::MImage(shared_ptr<Sensors> sensors) :
-        Message(id),
+MImage::MImage(shared_ptr<Sensors> sensors, PImage_ptr data) :
+        MObject(id, data),
         sensors(sensors),
-        data(new PImage()),
+        data(data),
         thresholded_data(new PImage()) {
-    Message::protoMessage = data;
 
     //Note (Octavian): This is a pretty dumb way to get the image data
     // (ideally you would want to just copy the image - that saves any

@@ -43,9 +43,9 @@ public:
     ADD_NULL_INSTANCE(Memory)
     ADD_SHARED_PTR(Memory)
     typedef std::pair<MObject_ID,
-            boost::shared_ptr<Message> > MObject_IDPair;
+            boost::shared_ptr<MObject> > MObject_IDPair;
     typedef std::map<MObject_ID,
-            boost::shared_ptr<Message> > MObject_IDMap;
+            boost::shared_ptr<MObject> > MObject_IDMap;
 
 public:
     Memory(boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
@@ -57,7 +57,7 @@ public:
      * this will usually make the MObject pull data
      * from its corresponding man object
      */
-    void update(boost::shared_ptr<Message> obj);
+    void update(boost::shared_ptr<MObject> obj);
     void updateVision();
 
 public:
@@ -66,8 +66,8 @@ public:
     MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
     MImage::const_ptr getMImage() const {return mImage;}
 
-    Message::const_ptr getMObject(MObject_ID id) const;
-    Message::ptr getMutableMObject(MObject_ID id);
+    MObject::const_ptr getMObject(MObject_ID id) const;
+    MObject::ptr getMutableMObject(MObject_ID id);
 
     void subscribe(Subscriber* subscriber,
                        MObject_ID objectToSubscribeTo) const;

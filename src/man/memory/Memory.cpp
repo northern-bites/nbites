@@ -40,7 +40,7 @@ Memory::~Memory() {
     cout << "Memory destructor" << endl;
 }
 
-void Memory::update(boost::shared_ptr<Message> obj) {
+void Memory::update(boost::shared_ptr<MObject> obj) {
     obj->update();
 }
 
@@ -48,23 +48,23 @@ void Memory::updateVision() {
     update(mVision);
 }
 
-Message::const_ptr Memory::getMObject(MObject_ID id) const {
+MObject::const_ptr Memory::getMObject(MObject_ID id) const {
     MObject_IDMap::const_iterator it = mobject_IDMap.find(id);
 
     if (it != mobject_IDMap.end()) {
         return it->second;
     } else {
-        return Message::const_ptr();
+        return MObject::const_ptr();
     }
 }
 
-Message::ptr Memory::getMutableMObject(MObject_ID id) {
+MObject::ptr Memory::getMutableMObject(MObject_ID id) {
     MObject_IDMap::iterator it = mobject_IDMap.find(id);
 
     if (it != mobject_IDMap.end()) {
         return it->second;
     } else {
-        return Message::ptr();
+        return MObject::ptr();
     }
 }
 

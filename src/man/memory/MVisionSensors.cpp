@@ -11,10 +11,10 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-MVisionSensors::MVisionSensors(shared_ptr<Sensors> sensors) :
-        Message(id), sensors(sensors),
-        data(new PVisionSensors()) {
-    Message::protoMessage = data;
+MVisionSensors::MVisionSensors(shared_ptr<Sensors> sensors, PVisionSensors_ptr data) :
+        MObject(id, data), sensors(sensors),
+        data(data) {
+    MObject::protoMessage = data;
 }
 
 MVisionSensors::~MVisionSensors() {

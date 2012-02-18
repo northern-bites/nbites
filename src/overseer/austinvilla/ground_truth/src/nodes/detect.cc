@@ -12,6 +12,8 @@
  * License: Modified BSD License
  *
  * $ Id: 08/10/2011 12:48:11 PM piyushk $
+ *
+ * @modified Octavian Neamtu, Northern Bites
  */
 
 #include <ros/ros.h>
@@ -32,6 +34,10 @@
 
 #include <color_table/common.h>
 #include <ground_truth/field_provider.h>
+
+//NBites point struct
+#include "Structs.h"
+#include "OverseerServer.h"
 
 /* Display modes */
 #define FULL 1
@@ -268,6 +274,11 @@ int main (int argc, char** argv) {
 
   std::ofstream log(logFile.c_str());
 
+  std::vector<pcl::PointXYZ> ballPositions;
+  point<float> ballFieldPosition;
+  std::vector<pcl::PointXYZ> robotPositions;
+  std::vector<point<float> > robotFieldPositions;
+
   while (nh.ok ()) {
 
     // Spin
@@ -313,7 +324,7 @@ int main (int argc, char** argv) {
 
       cloudDisplay.reset(new pcl::PointCloud<pcl::PointXYZRGB>);
       // Ball
-      std::vector<pcl::PointXYZ> ballPositions;
+
       detectBall(cloudSwap, ballPositions, cloud);
       for (unsigned int i = 0; i < numBallsDisplayed; i++) {
         visualizer.removeShape(getUniqueName("ball", i));
@@ -334,7 +345,6 @@ int main (int argc, char** argv) {
       */
 
       // Robots
-      std::vector<pcl::PointXYZ> robotPositions;
       detectRobots(cloudSwap, robotPositions, cloud);
       *cloudDisplay = *cloud;                           // Display the cloud
       for (unsigned int i = 0; i < numRobotsDisplayed; i++) {

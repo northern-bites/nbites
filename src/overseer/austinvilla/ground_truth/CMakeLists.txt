@@ -14,6 +14,7 @@ rosbuild_init()
 
 #for FieldConstants.h
 include_directories(../../../man/include)
+include_directories(../../../qtool/overseer)
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -33,5 +34,7 @@ rosbuild_add_executable(detect src/nodes/detect.cc)
 target_link_libraries(detect field_provider)
 
 rosbuild_add_executable(calibrate src/nodes/calibrate.cc)
-target_link_libraries(calibrate field_provider)
+target_link_libraries(calibrate 
+                      field_provider 
+                      overseer_server)
 

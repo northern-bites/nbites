@@ -14,15 +14,18 @@
 namespace man {
 namespace memory {
 
-class MVisionSensors: public Message {
+class MVisionSensors: public MObject {
 
 ADD_SHARED_PTR(MVisionSensors);
+
+typedef boost::shared_ptr<proto::PVisionSensors> PVisionSensors_ptr;
 
 public:
     static const MObject_ID id = MVISION_SENSORS_ID;
 
 public:
-    MVisionSensors(boost::shared_ptr<Sensors> sensors);
+    MVisionSensors(boost::shared_ptr<Sensors> sensors,
+            PVisionSensors_ptr data = PVisionSensors_ptr(new proto::PVisionSensors));
     virtual ~MVisionSensors();
 
     /**
@@ -34,7 +37,7 @@ public:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    boost::shared_ptr<proto::PVisionSensors> data;
+    PVisionSensors_ptr data;
 };
 }
 }

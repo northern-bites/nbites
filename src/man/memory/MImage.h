@@ -16,15 +16,18 @@
 namespace man {
 namespace memory {
 
-class MImage: public Message {
+class MImage: public MObject {
 
 ADD_SHARED_PTR(MImage);
 
 public:
     static const MObject_ID id = MIMAGE_ID;
 
+    typedef boost::shared_ptr<proto::PImage> PImage_ptr;
+
 public:
-    MImage(boost::shared_ptr<Sensors> sensors);
+    MImage(boost::shared_ptr<Sensors> sensors,
+           PImage_ptr data = PImage_ptr(new proto::PImage));
     virtual ~MImage();
     /**
      * Updates all the fields of the underlying proto::PSensors with values
@@ -39,8 +42,8 @@ public:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    boost::shared_ptr<proto::PImage> data;
-    boost::shared_ptr<proto::PImage> thresholded_data;
+    PImage_ptr data;
+    PImage_ptr thresholded_data;
 };
 }
 }

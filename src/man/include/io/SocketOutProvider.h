@@ -22,8 +22,15 @@ namespace io {
 class SocketOutProvider : public OutProvider {
 
 public:
-    SocketOutProvider(unsigned short port) : port(port), is_open(false) {
+    SocketOutProvider(unsigned short port) :
+        port(port), is_open(false) {
+
         memset(&client_address, 0, sizeof(client_address));
+    }
+
+    SocketOutProvider(int client_descriptor, sockaddr client_address) :
+        client_address(client_address), is_open(true) {
+        file_descriptor = client_descriptor;
     }
 
     virtual ~SocketOutProvider() {
@@ -39,6 +46,10 @@ public:
     }
 
     void openCommunicationChannel() throw (socket_exception) {
+
+        if (is_open == true) {
+            return;
+        }
         if (file_descriptor == -1) {
             listening_socket = tcp::createSocket();
             tcp::bindSocket(listening_socket, port);

@@ -2,6 +2,7 @@
  * @class ProtobufMessage
  *
  * Basic wrapper to the MessageInterface of a google protocol buffer message
+ * To make it thread-safe a mutex-locked update function is introduced
  *
  * @author Octavian Neamtu
  */
@@ -10,11 +11,14 @@
 
 #include <string>
 #include <stdint.h>
+#include <iostream>
 #include <google/protobuf/message.h>
 
 #include "io/MessageInterface.h"
 #include "Common.h"
 #include "ClassHelper.h"
+
+#include "synchro/mutex.h"
 
 namespace common {
 namespace io {
@@ -30,50 +34,76 @@ public:
 
 public:
     static const int32_t DEFAULT_ID_TAG = 42;
-    static const std::string DEFAULT_NAME = "ProtobufMessage";
 
 public:
     static long long int time_stamp() {
         return realtime_micro_time();
     }
 
-    ProtobufMessage(ProtoMessage_ptr protoMessage) :
-        protoMessage(protoMessage), birth_time(time_stamp()) {
+    ProtobufMessage(ProtoMessage_ptr protoMessage,
+                    std::string name,
+                    int32_t id_tag = DEFAULT_ID_TAG) :
+        protoMessage(protoMessage), objectMutex(name + "mutex"),
+        birth_time(time_stamp()), name(name), id_tag(id_tag) {
     }
 
 public:
     virtual ~ProtobufMessage() {
     }
 
-    virtual std::string getName() const {
-        return DEFAULT_NAME;
-    }
-    virtual int32_t getIDTag() const {
-        return DEFAULT_ID_TAG;
-    }
-    virtual long long getBirthTime() const {
-        return birth_time;
-    }
-    virtual void serializeToString(std::string* write_buffer) const {
-        protoMessage->SerializeToString(write_buffer);
-    }
-    virtual void parseFromBuffer(const char* read_buffer, uint32_t buffer_size) {
-        protoMessage->ParseFromArray(read_buffer, buffer_size);
-    }
-    virtual unsigned byteSize() const {
-        return protoMessage->ByteSize();
+    // this method should update the fields in the protocol buffer
+    // in some meaningful way
+    virtual void updateData() = 0;
+
+    virtual void update() {
+        objectMutex.lock();
+        this->updateData();
+        objectMutex.unlock();
     }
 
-    ProtoMessage_const_ptr getProtoMessage() const {
-        return protoMessage;
+    virtual void serializeToString(std::string* write_buffer) const {
+        if (protoMessage.get()) {
+            objectMutex.lock();
+            protoMessage->SerializeToString(write_buffer);
+            objectMutex.unlock();
+        } else {
+            std::cout << "Warning - trying to serialize NULL protoMessage"
+                      << __FILE__ << " : " << __LINE__ << std::endl;
+        }
     }
-    ProtoMessage_ptr getMutableProtoMessage() {
-        return protoMessage;
+
+    virtual void parseFromBuffer(const char* read_buffer, uint32_t buffer_size) {
+        if (protoMessage.get()) {
+            objectMutex.lock();
+            protoMessage->ParseFromArray(read_buffer, buffer_size);
+            objectMutex.unlock();
+        } else {
+            std::cout << "Warning - trying to parse into NULL protoMessage"
+                      << __FILE__ << " : " << __LINE__ << std::endl;
+        }
     }
+
+    virtual unsigned byteSize() const {
+        if (protoMessage.get()) {
+            return protoMessage->ByteSize();
+        } else {
+            return 0;
+        }
+    }
+
+    ProtoMessage_const_ptr getProtoMessage() const { return protoMessage; }
+    ProtoMessage_ptr getMutableProtoMessage() { return protoMessage; }
+
+    virtual std::string getName() const { return name; }
+    virtual int32_t getIDTag() const { return id_tag; }
+    virtual long long getBirthTime() const { return birth_time; }
 
 protected:
     ProtoMessage_ptr protoMessage;
+    mutex objectMutex;
     long long int birth_time;
+    std::string name;
+    int32_t id_tag;
 
 };
 

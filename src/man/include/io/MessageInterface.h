@@ -29,6 +29,8 @@ public:
     virtual std::string getName() const = 0;
     virtual int32_t getIDTag() const = 0;
     virtual long long getBirthTime() const = 0;
+
+    virtual void update() = 0;
     virtual void serializeToString(std::string* write_buffer) const = 0;
     virtual void parseFromBuffer(const char* read_buffer, uint32_t buffer_size) = 0;
     virtual unsigned byteSize() const = 0;

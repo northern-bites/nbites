@@ -53,6 +53,7 @@ add_subdirectory( data )
 add_subdirectory( viewer )
 add_subdirectory( offline )
 add_subdirectory( remote )
+add_subdirectory( overseer )
 
 ######### The executable
 
