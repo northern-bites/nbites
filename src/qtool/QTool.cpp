@@ -12,6 +12,7 @@ using viewer::MemoryViewer;
 using viewer::BallEKFViewer;
 using viewer::FieldViewer;
 using offline::OfflineViewer;
+using overseer::OverseerClient;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
@@ -21,7 +22,8 @@ QTool::QTool() : QMainWindow(),
         memoryViewer(new MemoryViewer(dataManager)),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
-        fieldViewer(new FieldViewer(dataManager)) {
+        fieldViewer(new FieldViewer(dataManager)),
+        overseerClient(new OverseerClient(this)) {
 
     this->setWindowTitle(tr("HackTool"));
 
@@ -48,6 +50,7 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
+    toolTabs->addTab(overseerClient, tr("Overseer"));
 }
 
 QTool::~QTool() {

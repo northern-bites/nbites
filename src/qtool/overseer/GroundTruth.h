@@ -25,6 +25,9 @@ public:
     typedef std::vector<point<float> > fpoint_vector;
 
 public:
+    GroundTruth(ProtoGroundTruth_ptr data = ProtoGroundTruth_ptr(new proto::GroundTruth))
+        : ProtobufMessage(data, "GroundTruth"), data(data) {}
+
     GroundTruth(point<float>* ballPosition,
                 fpoint_vector* robotPositions,
                 ProtoGroundTruth_ptr data = ProtoGroundTruth_ptr(new proto::GroundTruth))

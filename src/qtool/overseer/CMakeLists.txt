@@ -34,6 +34,10 @@ set( overseer_server_srcs OverseerServer.cpp
                           ${ground_truth_output})
 
 
+set( overseer_client_srcs OverseerClient.cpp
+                          ${ground_truth_output})
+
+set( overseer_client_headers OverseerClient.h )
 
 include_directories(.
                     ${CMAKE_CURRENT_BINARY_DIR}
@@ -42,8 +46,7 @@ include_directories(.
 
 ############ Qt4 goodness
 
-#Qt4_wrap_cpp(qtool_headers_moc ${qtool_headers})
-#Qt4_wrap_ui(qtool_forms_headers ${qtool_forms})
+Qt4_wrap_cpp(overseer_client_header_moc ${overseer_client_headers})
 
 ######### The executable
 
@@ -58,3 +61,14 @@ target_link_libraries(
   _nb_include
   log
   )
+
+add_library(
+    overseer_client
+    STATIC
+    ${overseer_client_srcs} ${overseer_client_header_moc} )
+    
+    
+target_link_libraries(
+    overseer_client
+    ${PROTOBUF_LIBRARY}
+    parse )

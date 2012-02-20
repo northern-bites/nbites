@@ -17,13 +17,12 @@
 #include "io/MessageInterface.h"
 #include "synchro/synchro.h"
 
+#include "OverseerDef.h"
+
 namespace nbites {
 namespace overseer {
 
 class OverseerServer : public Thread {
-
-public:
-    static const unsigned short OVERSEER_PORT = 42424;
 
 public:
 
