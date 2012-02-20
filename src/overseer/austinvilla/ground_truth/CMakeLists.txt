@@ -31,10 +31,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 rosbuild_add_library(field_provider src/lib/field_provider.cpp)
 
 rosbuild_add_executable(detect src/nodes/detect.cc)
-target_link_libraries(detect field_provider)
+target_link_libraries(detect field_provider overseer_server)
 
 rosbuild_add_executable(calibrate src/nodes/calibrate.cc)
-target_link_libraries(calibrate 
-                      field_provider 
-                      overseer_server)
+target_link_libraries(calibrate field_provider)
 

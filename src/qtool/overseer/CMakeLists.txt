@@ -55,5 +55,6 @@ add_library(
 target_link_libraries(
   overseer_server
   ${PROTOBUF_LIBRARY}
-  ${NBINCLUDE_TARGET}
+  _nb_include
+  log
   )

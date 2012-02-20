@@ -362,7 +362,7 @@ int main (int argc, char** argv) {
       numRobotsDisplayed = robotPositions.size();
 
       robotFieldPositions.clear();
-      for (int i = 0; i < numRobotsDisplayed; i++) {
+      for (unsigned i = 0; i < numRobotsDisplayed; i++) {
           robotFieldPositions.push_back(
                   point<float>(robotFieldPositions[i].x, robotFieldPositions[i].y));
       }
