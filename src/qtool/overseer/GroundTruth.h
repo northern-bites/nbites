@@ -12,13 +12,16 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Structs.h"
-#include "io/ProtobufMessage.h"
+#include "data/QProtobufMessage.h"
 #include "GroundTruth.pb.h"
+#include "ClassHelper.h"
 
 namespace qtool {
 namespace overseer {
 
-class GroundTruth : public common::io::ProtobufMessage {
+class GroundTruth : public data::QProtobufMessage {
+
+    ADD_SHARED_PTR(GroundTruth)
 
 public:
     typedef boost::shared_ptr<proto::GroundTruth> ProtoGroundTruth_ptr;
@@ -26,12 +29,12 @@ public:
 
 public:
     GroundTruth(ProtoGroundTruth_ptr data = ProtoGroundTruth_ptr(new proto::GroundTruth))
-        : ProtobufMessage(data, "GroundTruth"), data(data) {}
+        : QProtobufMessage(data, "GroundTruth"), data(data) {}
 
     GroundTruth(point<float>* ballPosition,
                 fpoint_vector* robotPositions,
                 ProtoGroundTruth_ptr data = ProtoGroundTruth_ptr(new proto::GroundTruth))
-        : ProtobufMessage(data, "GroundTruth"), data(data),
+        : QProtobufMessage(data, "GroundTruth"), data(data),
           ballPosition(ballPosition), robotPositions(robotPositions) {}
 
     virtual ~GroundTruth() {}

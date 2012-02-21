@@ -18,6 +18,7 @@
 #include "Common.h"
 #include "ClassHelper.h"
 
+#include "Notifier.h"
 #include "synchro/mutex.h"
 
 namespace common {
@@ -104,6 +105,29 @@ protected:
     long long int birth_time;
     std::string name;
     int32_t id_tag;
+
+};
+
+class NotifyingProtobufMessage : public ProtobufMessage, public Notifier {
+
+public:
+    NotifyingProtobufMessage(ProtoMessage_ptr protoMessage,
+            std::string name) :
+                ProtobufMessage(protoMessage, name) {
+    }
+
+    virtual ~NotifyingProtobufMessage() {
+    }
+
+    void update() {
+        ProtobufMessage::update();
+        this->notifySubscribers();
+    }
+
+    void parseFromBuffer(const char* read_buffer, uint32_t buffer_size) {
+        ProtobufMessage::parseFromBuffer(read_buffer, buffer_size);
+        this->notifySubscribers();
+    }
 
 };
 

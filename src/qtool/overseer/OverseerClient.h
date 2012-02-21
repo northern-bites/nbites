@@ -14,6 +14,7 @@
 #include "GroundTruth.h"
 #include "man/memory/parse/MessageParser.h"
 #include "viewer/MObjectViewer.h"
+#include "data/MemorySignalingInterface.h"
 
 #include "OverseerDef.h"
 

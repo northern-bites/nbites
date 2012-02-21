@@ -22,16 +22,13 @@ OverseerClient::OverseerClient(QWidget* parent) :
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(connectButton);
     connect(connectButton, SIGNAL(clicked()), this, SLOT(connectToOverseer()));
-    layout->addWidget(&groundTruthView);
 
-    QPushButton* refreshButton = new QPushButton("refresh", this);
-    connect(refreshButton, SIGNAL(clicked()), &groundTruthView, SLOT(updateView()));
-    layout->addWidget(refreshButton);
+    layout->addWidget(&groundTruthView);
+    connect(groundTruth.get(), SIGNAL(dataUpdated()),
+            &groundTruthView, SLOT(updateView()));
 
     this->setLayout(layout);
 }
-
-#include <iostream>
 
 void OverseerClient::connectToOverseer() {
 
