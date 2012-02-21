@@ -336,7 +336,7 @@ int main (int argc, char** argv) {
         visualizer.addSphere(ballPositions[i], 0.05, 1.0, 0.4, 0.0, getUniqueName("ball", i));
       }
       numBallsDisplayed = ballPositions.size();
-      // convert to NBites coordinates
+      // convert to NBites coordinates - cm instead of m and 0,0 is the field corner
       if (numBallsDisplayed > 0) {
           float x = ballPositions[0].x * 100.0f + MIDFIELD_X;
           float y = ballPositions[0].y * 100.0f + MIDFIELD_Y;
@@ -365,7 +365,7 @@ int main (int argc, char** argv) {
         visualizer.addSphere(robotPositions[i], 0.1, 1.0, 1.0, 1.0, getUniqueName("robot", i));
       }
       numRobotsDisplayed = robotPositions.size();
-
+      // convert to NBites coordinates - cm instead of m and 0,0 is the field corner
       robotFieldPositions.clear();
       for (unsigned i = 0; i < numRobotsDisplayed; i++) {
           float x = robotPositions[i].x * 100.0f + MIDFIELD_X;
