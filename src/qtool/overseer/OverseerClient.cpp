@@ -2,7 +2,8 @@
 #include "OverseerClient.h"
 
 #include <QVBoxLayout>
-
+#include <QtNetwork/QHostInfo>
+#include <iostream>
 #include "io/SocketInProvider.h"
 
 namespace qtool {
@@ -10,6 +11,7 @@ namespace overseer {
 
 using namespace common::io;
 using namespace nbites::overseer;
+using namespace std;
 
 OverseerClient::OverseerClient(QWidget* parent) :
         QWidget(parent),
@@ -29,13 +31,22 @@ OverseerClient::OverseerClient(QWidget* parent) :
     this->setLayout(layout);
 }
 
+#include <iostream>
+
 void OverseerClient::connectToOverseer() {
 
-    long ip = getIPForHost(OVERSEER_HOST);
+    QHostInfo host_info = QHostInfo::fromName(QString(OVERSEER_HOST.c_str()));
 
-    SocketInProvider::ptr socket_in(new SocketInProvider(ip, OVERSEER_PORT));
+    if (host_info.error() != QHostInfo::NoError) {
+        cout << "Could not connect to " << OVERSEER_HOST
+             << " : " << host_info.errorString().toStdString() << endl;
+        return;
+    }
+
+    SocketInProvider::ptr socket_in(new SocketInProvider(
+            host_info.addresses().first().toIPv4Address(), OVERSEER_PORT));
     messageParser = MessageParser::ptr(new MessageParser(socket_in, groundTruth));
-
+    messageParser->start();
 }
 
 }
