@@ -38,6 +38,7 @@
 //NBites point struct
 #include "Structs.h"
 #include "OverseerServer.h"
+#include "FieldConstants.h"
 
 /* Display modes */
 #define FULL 1
@@ -335,9 +336,12 @@ int main (int argc, char** argv) {
         visualizer.addSphere(ballPositions[i], 0.05, 1.0, 0.4, 0.0, getUniqueName("ball", i));
       }
       numBallsDisplayed = ballPositions.size();
+      // convert to NBites coordinates
       if (numBallsDisplayed > 0) {
-          ballFieldPosition.x = ballPositions[0].x;
-          ballFieldPosition.y = ballPositions[0].y;
+          float x = ballPositions[0].x * 100.0f + MIDFIELD_X;
+          float y = ballPositions[0].y * 100.0f + MIDFIELD_Y;
+          ballFieldPosition.x = x;
+          ballFieldPosition.y = y;
       }
 
 
@@ -364,8 +368,9 @@ int main (int argc, char** argv) {
 
       robotFieldPositions.clear();
       for (unsigned i = 0; i < numRobotsDisplayed; i++) {
-          robotFieldPositions.push_back(
-                  point<float>(robotPositions[i].x, robotPositions[i].y));
+          float x = robotPositions[i].x * 100.0f + MIDFIELD_X;
+          float y = robotPositions[i].y * 100.0f + MIDFIELD_Y;
+          robotFieldPositions.push_back(point<float>(x, y));
       }
 
       overseerServer.postData();
