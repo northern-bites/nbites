@@ -279,6 +279,7 @@ int main (int argc, char** argv) {
   std::vector<pcl::PointXYZ> robotPositions;
   std::vector<point<float> > robotFieldPositions;
   nbites::overseer::OverseerServer overseerServer(&ballFieldPosition, &robotFieldPositions);
+  overseerServer.start();
 
   while (nh.ok ()) {
 

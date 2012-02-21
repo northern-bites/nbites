@@ -11,17 +11,27 @@
 
 #include "IOExceptions.h"
 
+#include <string>
 #include <cerrno>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <netdb.h>
 
 #include <iostream>
 using namespace std;
 
 namespace common {
 namespace io {
+
+static long getIPForHost(std::string host_name) {
+    hostent* host = gethostbyname(host_name.c_str());
+    in_addr address;
+    inet_pton(host->h_addrtype, host->h_addr, &address);
+    return address.s_addr;
+}
+
 namespace tcp {
 
 static int createSocket() throw (socket_exception) {
