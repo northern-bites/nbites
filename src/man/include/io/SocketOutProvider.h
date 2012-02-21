@@ -29,7 +29,7 @@ public:
     }
 
     SocketOutProvider(int client_descriptor, sockaddr client_address) :
-        client_address(client_address), is_open(true) {
+        client_address(client_address), is_open(false) {
         file_descriptor = client_descriptor;
     }
 
@@ -47,16 +47,13 @@ public:
 
     void openCommunicationChannel() throw (socket_exception) {
 
-        if (is_open == true) {
-            return;
-        }
         if (file_descriptor == -1) {
             listening_socket = tcp::createSocket();
             tcp::bindSocket(listening_socket, port);
             tcp::listenOnSocket(listening_socket);
-        }
         file_descriptor = tcp::acceptConnections(listening_socket,
                 client_address, client_address_len);
+	}
         is_open = true;
     }
 

@@ -17,12 +17,18 @@
 #include "io/MessageInterface.h"
 #include "synchro/synchro.h"
 
+//skip including generated man configuration files 
+#define NO_MANCONFIG
+
 #include "OverseerDef.h"
+#include "man/memory/log/MessageLogger.h"
 
 namespace nbites {
 namespace overseer {
 
 class OverseerServer : public Thread {
+
+    typedef std::vector<man::memory::log::MessageLogger::ptr> Loggers;
 
 public:
 
@@ -36,6 +42,7 @@ public:
 
 private:
     common::io::MessageInterface::ptr groundTruthMessage;
+    Loggers loggers;
 
 };
 

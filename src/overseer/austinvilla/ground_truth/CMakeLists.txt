@@ -12,9 +12,10 @@ set(CMAKE_CXX_FLAGS "-Wno-deprecated")
 
 rosbuild_init()
 
-#for FieldConstants.h
+#for nbites overseer
 include_directories(../../../man/include)
 include_directories(../../../qtool/overseer)
+include_directories(../../../)
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)

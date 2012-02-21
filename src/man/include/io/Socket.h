@@ -62,6 +62,7 @@ static void listenOnSocket(int socket_fd) throw (socket_exception) {
 }
 
 //blocking!
+//make sure client_address is zeroed or set beforehand
 static int acceptConnections(int socket_fd, sockaddr& client_address,
         socklen_t& client_address_len) throw (socket_exception) {
     int file_descriptor = accept(socket_fd, &client_address,
