@@ -60,6 +60,8 @@ target_link_libraries(
   ${PROTOBUF_LIBRARY}
   _nb_include
   log
+  data
+  ${QT_LIBRARIES}
   )
 
 add_library(
