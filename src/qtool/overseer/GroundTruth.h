@@ -24,6 +24,7 @@ class GroundTruth : public data::QProtobufMessage {
     ADD_SHARED_PTR(GroundTruth)
 
 public:
+    typedef boost::shared_ptr<const proto::GroundTruth> ProtoGroundTruth_const_ptr;
     typedef boost::shared_ptr<proto::GroundTruth> ProtoGroundTruth_ptr;
     typedef std::vector<point<float> > fpoint_vector;
 
@@ -53,7 +54,10 @@ public:
             robot_position->set_x(it->x);
             robot_position->set_y(it->y);
         }
+    }
 
+    virtual ProtoGroundTruth_const_ptr get() const {
+        return data;
     }
 
 protected:

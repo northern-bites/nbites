@@ -16,6 +16,10 @@
 #include "viewer/MObjectViewer.h"
 #include "data/MemorySignalingInterface.h"
 
+#include "viewer/BMPImageViewer.h"
+#include "image/PaintField.h"
+#include "image/PaintGroundTruth.h"
+
 #include "OverseerDef.h"
 
 namespace qtool {
@@ -37,7 +41,6 @@ public slots:
 protected:
     GroundTruth::ptr groundTruth;
     MessageParser::ptr messageParser;
-    viewer::MObjectViewer groundTruthView;
     QPushButton* connectButton;
 
 };

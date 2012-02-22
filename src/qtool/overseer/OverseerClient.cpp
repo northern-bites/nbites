@@ -12,22 +12,36 @@ namespace overseer {
 using namespace common::io;
 using namespace nbites::overseer;
 using namespace std;
+using namespace viewer;
+using namespace image;
 
 OverseerClient::OverseerClient(QWidget* parent) :
         QWidget(parent),
         groundTruth(new GroundTruth()),
-        groundTruthView(groundTruth->getProtoMessage()),
         connectButton(new QPushButton("Connect", this)){
 
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(connectButton);
+    QHBoxLayout* mainLayout = new QHBoxLayout(this);
+
+    // field and ground truth painter
+    PaintField* fieldImage = new PaintField(this);
+    PaintGroundTruth* groundImage = new PaintGroundTruth(groundTruth, this);
+    OverlayedImage* combinedImage = new OverlayedImage(fieldImage, groundImage, this);
+    viewer::BMPImageViewer* fieldView = new BMPImageViewer(combinedImage, this);
+    connect(groundTruth.get(), SIGNAL(dataUpdated()),
+            fieldView, SLOT(updateView()));
+    mainLayout->addWidget(fieldView);
+
+    QVBoxLayout* rightLayout = new QVBoxLayout();
+    rightLayout->addWidget(connectButton);
     connect(connectButton, SIGNAL(clicked()), this, SLOT(connectToOverseer()));
 
-    layout->addWidget(&groundTruthView);
+    MObjectViewer* groundTruthView = new MObjectViewer(groundTruth->getProtoMessage(), this);
+    rightLayout->addWidget(groundTruthView);
     connect(groundTruth.get(), SIGNAL(dataUpdated()),
-            &groundTruthView, SLOT(updateView()));
+            groundTruthView, SLOT(updateView()));
 
-    this->setLayout(layout);
+    mainLayout->addLayout(rightLayout);
+    this->setLayout(mainLayout);
 }
 
 void OverseerClient::connectToOverseer() {
