@@ -24,9 +24,9 @@ ADD_SHARED_PTR(OfflineManController);
 
 public:
 	OfflineManController(memory::Memory::const_ptr offline_memory)
-		: offline_memory(offline_memory) { }
+		: fake_memory(offline_memory) { }
 
-	memory::Memory::const_ptr getOfflineMemory() const { return offline_memory; }
+	memory::Memory::const_ptr getFakeMemory() const { return fake_memory; }
 
 	void loadTable(const std::string &path) {
 	    if (imageTranscriber.get()) {
@@ -42,7 +42,7 @@ public:
 		imageTranscriber = ThreadedImageTranscriber::ptr();
 	}
 
-	memory::Memory::const_ptr getManMemory() const {
+	memory::Memory::ptr getManMemory() const {
 	    return man_memory;
 	}
 
@@ -62,7 +62,7 @@ public:
 
 private:
 	ThreadedImageTranscriber::ptr imageTranscriber;
-	memory::Memory::const_ptr offline_memory;
+	memory::Memory::const_ptr fake_memory;
 	memory::Memory::ptr man_memory;
 
 };

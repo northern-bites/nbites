@@ -58,6 +58,7 @@ def gameSet(player):
     Fixate on the ball, or scan to look for it
     """
     if player.firstFrame():
+        player.brain.logger.startLogging()
         player.inKickingState = False
         player.stopWalking()
         player.gainsOn()
@@ -85,7 +86,6 @@ def gamePlaying(player):
         player.walkPose()
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
-
             if player.lastStateTime > 25:
                 # 25 is arbitrary. This check is meant to catch human error and
                 # possible 0 sec. penalties for the goalie
@@ -94,13 +94,13 @@ def gamePlaying(player):
                 # 2011 rules have no 0 second penalties for any robot,
                 # but check should be here if there is.
             #else human error
-
     roleState = player.getRoleState()
     return player.goNow(roleState)
 
 
 def gamePenalized(player):
     if player.firstFrame():
+        player.brain.logger.stopLogging()
         player.inKickingState = False
         player.stopWalking()
         player.penalizeHeads()

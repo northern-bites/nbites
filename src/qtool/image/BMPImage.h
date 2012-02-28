@@ -14,21 +14,30 @@
 namespace qtool {
 namespace image {
 
-class BMPImage
-{
-
-ADD_NULL_INSTANCE(BMPImage);
-ADD_SHARED_PTR(BMPImage);
+class BMPImage : public QObject {
+    Q_OBJECT
 
 public:
-    BMPImage() {}
-    virtual ~BMPImage() {};
-    virtual void updateBitmap() {};
+    BMPImage(QObject* parent = 0) : QObject(parent) {}
+    virtual ~BMPImage() {}
 
-    QImage getBitmap() const { return bitmap; }
+    const QImage* getBitmap() const { return &bitmap; }
+    QImage* getBitmap() { return &bitmap; }
 
-    virtual unsigned getWidth() {return 0;}
-    virtual unsigned getHeight() {return 0;}
+    virtual unsigned getWidth() const = 0;
+    virtual unsigned getHeight() const = 0;
+
+public slots:
+    void updateBitmap() {
+        this->buildBitmap();
+        emit bitmapBuilt();
+    }
+
+signals:
+    void bitmapBuilt();
+
+protected:
+    virtual void buildBitmap() = 0;
 
 protected:
     QImage bitmap;

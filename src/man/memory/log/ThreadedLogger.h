@@ -10,57 +10,46 @@
  *
  */
 
-#include <aio.h>
-#include <errno.h>
-#include "Logger.h"
+#include "io/OutProvider.h"
 #include "synchro/synchro.h"
+#include "Subscriber.h"
+#include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 namespace log {
 
-class ThreadedLogger : public Logger, public Thread{
+class ThreadedLogger: public Thread, public Subscriber {
+
+ADD_SHARED_PTR(ThreadedLogger)
+
+protected:
+    typedef common::io::OutProvider OutProvider;
 
 public:
-    typedef boost::shared_ptr<ThreadedLogger> ptr;
-    typedef boost::shared_ptr<ThreadedLogger> const_ptr;
+    ThreadedLogger(OutProvider::ptr out_provider, std::string name) :
+            Thread(name), out_provider(out_provider) {
 
-public:
-    ThreadedLogger(FDProvider::const_ptr fdp, std::string name) :
-                   Logger(fdp), Thread(name) {
-        memset(&control_block, 0, sizeof(control_block));
-        control_block.aio_fildes = fdp->getFileDescriptor();
     }
 
-    virtual ~ThreadedLogger(){}
+    virtual ~ThreadedLogger() {
+    }
 
     virtual void writeToLog() = 0;
 
-    virtual void run() {
-        while (running) {
-            this->waitForSignal();
-            this->writeToLog();
-        }
-    }
+    virtual void run() = 0;
 
     void signalToLog() {
         this->signalToResume();
     }
 
-    // aynchronous writing
-    virtual void writeCharBuffer(const char* buffer, uint32_t size) {
-        //const_casting is bad(!!!) but aio_buf is not const
-        control_block.aio_buf = const_cast<char *>(buffer);
-        control_block.aio_nbytes = size;
-        bytes_written += size;
-        aio_write(&control_block);
-        while (aio_error(&control_block) == EINPROGRESS) {
-            pthread_yield();
-        }
+    void update() {
+        this->signalToLog();
     }
 
-private:
-    aiocb control_block;
+protected:
+    const OutProvider::ptr out_provider;
+
 };
 
 }
