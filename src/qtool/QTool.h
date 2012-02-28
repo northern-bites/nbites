@@ -43,11 +43,8 @@ private slots:
 
 private:
     QTabWidget* toolTabs;
-<<<<<<< HEAD
+
     QScrollArea *colorScrollArea;
-=======
-    QScrollArea* colorScrollArea;
->>>>>>> newBots
 
     data::DataManager::ptr dataManager;
     data::DataLoader* dataLoader;

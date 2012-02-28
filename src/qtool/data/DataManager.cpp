@@ -21,15 +21,9 @@ DataManager::DataManager() :
 DataManager::~DataManager() {
 }
 
-<<<<<<< HEAD
-void DataManager::newDataSource(DataSource::ptr dataSource) {
-    parsingBoard.newIOProvider(dataSource);
-    this->getNext();
-=======
 void DataManager::newInputProvider(common::io::InProvider::ptr newInput,
                                    MObject_ID id) {
     parsingBoard.newInputProvider(newInput, id);
->>>>>>> nbites
 }
 
 void DataManager::reset() {

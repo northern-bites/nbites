@@ -15,11 +15,7 @@ using offline::OfflineViewer;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
-<<<<<<< HEAD
  	colorScrollArea(new QScrollArea()),
-=======
-        colorScrollArea(new QScrollArea()),
->>>>>>> newBots
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCalibrate(new ColorCalibrate(dataManager)),
@@ -28,7 +24,6 @@ QTool::QTool() : QMainWindow(),
         ballEKFViewer(new BallEKFViewer(dataManager)),
         fieldViewer(new FieldViewer(dataManager)) {
 
-<<<<<<< HEAD
     this->setWindowTitle(tr("The New Tool of Awesome"));
 
     toolbar = new QToolBar();
@@ -45,9 +40,6 @@ QTool::QTool() : QMainWindow(),
     toolbar->addWidget(recordButton);
 
     this->addToolBar(toolbar);
-=======
-    this->setWindowTitle(tr("QTool"));
->>>>>>> newBots
 
     this->setCentralWidget(toolTabs);
 
