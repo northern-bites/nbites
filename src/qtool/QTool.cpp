@@ -43,7 +43,7 @@ QTool::QTool() : QMainWindow(),
 
     this->setCentralWidget(toolTabs);
 
-    colorScrollArea->setWidget(colorCreator);
+    colorScrollArea->setWidget(colorCalibrate);
 
     toolTabs->addTab(colorScrollArea, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
