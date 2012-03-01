@@ -42,7 +42,7 @@ public:
     virtual std::string debugInfo() const = 0;
     virtual void openCommunicationChannel() throw (io_exception)= 0;
     virtual bool opened() const = 0;
-    virtual void closeCommunicationChannel() const = 0;
+    virtual void closeCommunicationChannel() = 0;
 
     virtual bool writingInProgress() const {
         return aio_error(&control_block) == EINPROGRESS;

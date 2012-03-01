@@ -51,25 +51,13 @@ public:
         return "SocketIn client connecting to " + std::string(inet_ntoa(addr));
     }
 
-    virtual bool isOfTypeStreaming() const {
-        return true;
-    }
+    virtual bool isOfTypeStreaming() const { return true; }
+    virtual bool reachedEnd() const { return false; }
+    bool rewind(long int) const { return false; }
 
-    virtual bool reachedEnd() const {
-        return false;
-    }
-
-    virtual void enqueBuffer(char* buffer, uint32_t size) const
-            throw (aio_read_exception) {
-        control_block.aio_fildes = file_descriptor;
-        control_block.aio_buf = buffer;
-        control_block.aio_nbytes = size;
-
-        int result = aio_read(&control_block);
-
-        if (result == -1) {
-            throw aio_read_exception(aio_read_exception::ENQUE, errno);
-        }
+    virtual void readCharBuffer(char* buffer, uint32_t size) const
+                throw (aio_read_exception) {
+            aioReadCharBuffer(buffer, size);
     }
 
     virtual void aioReadCharBuffer(char* buffer, uint32_t size) const
@@ -86,18 +74,30 @@ public:
         enqueBuffer(buffer, size);
     }
 
-    virtual void readCharBuffer(char* buffer, uint32_t size) const
-            throw (aio_read_exception) {
-        return aioReadCharBuffer(buffer, size);
+    virtual void enqueBuffer(char* buffer, uint32_t size) const
+                                    throw (aio_read_exception) {
+
+        control_block.aio_fildes = file_descriptor;
+        control_block.aio_buf = buffer;
+        control_block.aio_nbytes = size;
+
+        int result = aio_read(&control_block);
+
+        if (result == -1) {
+            throw aio_read_exception(aio_read_exception::ENQUE, errno);
+        }
     }
 
     virtual uint32_t bytesRead() const throw (aio_read_exception) {
+
         if (readInProgress()) {
             throw aio_read_exception(aio_read_exception::IN_PROGRESS);
         }
+
         if (aio_error(&control_block) != 0) {
             throw aio_read_exception(aio_read_exception::READ, errno);
         }
+
         return aio_return(&control_block);
     }
 
@@ -112,10 +112,6 @@ public:
         file_descriptor = tcp::createSocket();
         tcp::connectSocket(file_descriptor, address, port);
         is_open = true;
-    }
-
-    bool rewind(long int) const {
-        return false;
     }
 
     //blocking!
