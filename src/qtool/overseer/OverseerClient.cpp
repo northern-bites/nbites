@@ -5,6 +5,7 @@
 #include <QtNetwork/QHostInfo>
 #include <iostream>
 #include "io/SocketInProvider.h"
+#include "Common.h"
 
 namespace qtool {
 namespace overseer {
@@ -19,6 +20,9 @@ OverseerClient::OverseerClient(QWidget* parent) :
         QWidget(parent),
         groundTruth(new GroundTruth()),
         connectButton(new QPushButton("Connect", this)){
+
+    connect(groundTruth.get(), SIGNAL(dataUpdated()),
+                this, SLOT(newGroundTruth()));
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
 
@@ -40,8 +44,25 @@ OverseerClient::OverseerClient(QWidget* parent) :
     connect(groundTruth.get(), SIGNAL(dataUpdated()),
             groundTruthView, SLOT(updateView()));
 
+    QLabel* fpsTagLabel = new QLabel("FPS:", this);
+    fpsLabel = new QLabel(this);
+    rightLayout->addWidget(fpsTagLabel);
+    rightLayout->addWidget(fpsLabel);
+
     mainLayout->addLayout(rightLayout);
     this->setLayout(mainLayout);
+}
+
+// naive fps computation based on delay between two messages
+void OverseerClient::newGroundTruth() {
+    uint64_t new_timestamp =  groundTruth->get()->timestamp();
+    float delta_t = (new_timestamp - last_timestamp) / (float) MICROS_PER_SECOND;
+    float fps = 0.0f;
+    if (delta_t != 0) {
+        fps = 1 / delta_t;
+    }
+    fpsLabel->setNum(fps);
+    last_timestamp = new_timestamp;
 }
 
 void OverseerClient::connectToOverseer() {

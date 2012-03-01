@@ -37,11 +37,14 @@ public:
 
 public slots:
     void connectToOverseer();
+    void newGroundTruth();
 
 protected:
     GroundTruth::ptr groundTruth;
     MessageParser::ptr messageParser;
     QPushButton* connectButton;
+    QLabel* fpsLabel;
+    int64_t last_timestamp;
 
 };
 
