@@ -40,6 +40,8 @@
 #include "OverseerServer.h"
 #include "FieldConstants.h"
 
+#define NO_VISUALS
+
 /* Display modes */
 #define FULL 1
 #define RELEVANT 2
@@ -262,10 +264,12 @@ int main (int argc, char** argv) {
   }
   fin.close();
 
+#ifndef NO_VISUALS
   pcl_visualization::PCLVisualizer visualizer(argc, argv, "PointCloud");
   visualizer.addCoordinateSystem(); // Good for reference
   ground_truth::FieldProvider field;
   field.get3dField(visualizer);
+#endif
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudSwap(new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -287,7 +291,9 @@ int main (int argc, char** argv) {
     // Spin
     ros::spinOnce ();
     ros::Duration (0.001).sleep ();
+#ifndef NO_VISUALS
     visualizer.spinOnce(10);
+#endif
 
     // If no cloud received yet, continue
     if (!cloudPtr)
@@ -329,12 +335,14 @@ int main (int argc, char** argv) {
       // Ball
 
       detectBall(cloudSwap, ballPositions, cloud);
+#ifndef NO_VISUALS
       for (unsigned int i = 0; i < numBallsDisplayed; i++) {
         visualizer.removeShape(getUniqueName("ball", i));
       }
       for (unsigned int i = 0; i < ballPositions.size(); i++) {
         visualizer.addSphere(ballPositions[i], 0.05, 1.0, 0.4, 0.0, getUniqueName("ball", i));
       }
+#endif
       numBallsDisplayed = ballPositions.size();
       // convert to NBites coordinates - cm instead of m and 0,0 is the field corner
       if (numBallsDisplayed > 0) {
@@ -358,12 +366,14 @@ int main (int argc, char** argv) {
       // Robots
       detectRobots(cloudSwap, robotPositions, cloud);
       *cloudDisplay = *cloud;                           // Display the cloud
+#ifndef NO_VISUALS
       for (unsigned int i = 0; i < numRobotsDisplayed; i++) {
         visualizer.removeShape(getUniqueName("robot", i));
       }
       for (unsigned int i = 0; i < robotPositions.size(); i++) {
         visualizer.addSphere(robotPositions[i], 0.1, 1.0, 1.0, 1.0, getUniqueName("robot", i));
       }
+#endif
       numRobotsDisplayed = robotPositions.size();
       // convert to NBites coordinates - cm instead of m and 0,0 is the field corner
       robotFieldPositions.clear();
@@ -387,10 +397,12 @@ int main (int argc, char** argv) {
 
     }
 
+#ifndef NO_VISUALS
     visualizer.removePointCloud();
     colorHandler.reset (new pcl_visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> (*cloudDisplay));
     geometryHandler.reset (new pcl_visualization::PointCloudGeometryHandlerXYZ<pcl::PointXYZRGB> (*cloudDisplay));
     visualizer.addPointCloud<pcl::PointXYZRGB>(*cloudDisplay, *colorHandler, *geometryHandler);
+#endif
 
     oldCloudPtr = cloudPtr;
 
