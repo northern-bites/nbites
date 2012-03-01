@@ -269,12 +269,12 @@ int main (int argc, char** argv) {
   visualizer.addCoordinateSystem(); // Good for reference
   ground_truth::FieldProvider field;
   field.get3dField(visualizer);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudDisplay;
 #endif
-
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudSwap(new pcl::PointCloud<pcl::PointXYZRGB>);
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudDisplay;
   
+
   loadColorTable();
 
   std::ofstream log(logFile.c_str());
@@ -290,8 +290,8 @@ int main (int argc, char** argv) {
 
     // Spin
     ros::spinOnce ();
-    ros::Duration (0.001).sleep ();
 #ifndef NO_VISUALS
+    ros::Duration (0.001).sleep ();
     visualizer.spinOnce(10);
 #endif
 
@@ -327,8 +327,10 @@ int main (int argc, char** argv) {
       extract.setNegative(false);
       extract.filter(*cloud);
       
+#ifndef NO_VISUALS
       cloudDisplay.reset(new pcl::PointCloud<pcl::PointXYZRGB>);
       *cloudDisplay = *cloud;
+#endif
     } else {
 
       cloudDisplay.reset(new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -365,7 +367,6 @@ int main (int argc, char** argv) {
 
       // Robots
       detectRobots(cloudSwap, robotPositions, cloud);
-      *cloudDisplay = *cloud;                           // Display the cloud
 #ifndef NO_VISUALS
       for (unsigned int i = 0; i < numRobotsDisplayed; i++) {
         visualizer.removeShape(getUniqueName("robot", i));
@@ -398,6 +399,7 @@ int main (int argc, char** argv) {
     }
 
 #ifndef NO_VISUALS
+    *cloudDisplay = *cloud; // Display the cloud
     visualizer.removePointCloud();
     colorHandler.reset (new pcl_visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> (*cloudDisplay));
     geometryHandler.reset (new pcl_visualization::PointCloudGeometryHandlerXYZ<pcl::PointXYZRGB> (*cloudDisplay));
