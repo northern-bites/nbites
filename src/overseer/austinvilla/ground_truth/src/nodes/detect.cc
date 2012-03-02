@@ -40,6 +40,9 @@
 #include "OverseerServer.h"
 #include "FieldConstants.h"
 
+#include <iostream>
+using namespace std;
+
 #define NO_VISUALS
 
 /* Display modes */
@@ -332,8 +335,10 @@ int main (int argc, char** argv) {
       *cloudDisplay = *cloud;
 #endif
     } else {
-
+      // cout << "yes! point cloud!" << endl;
+#ifndef NO_VISUALS
       cloudDisplay.reset(new pcl::PointCloud<pcl::PointXYZRGB>);
+#endif
       // Ball
 
       detectBall(cloudSwap, ballPositions, cloud);
@@ -354,7 +359,7 @@ int main (int argc, char** argv) {
           ballFieldPosition.y = y;
       }
 
-
+      // cout << "detected ball" << endl;
       /* 
       //Sample log file code
       log << std::fixed << getSystemTime() << ",";
@@ -368,6 +373,7 @@ int main (int argc, char** argv) {
       // Robots
       detectRobots(cloudSwap, robotPositions, cloud);
 #ifndef NO_VISUALS
+      *cloudDisplay = *cloud; // Display the cloud
       for (unsigned int i = 0; i < numRobotsDisplayed; i++) {
         visualizer.removeShape(getUniqueName("robot", i));
       }
@@ -383,9 +389,9 @@ int main (int argc, char** argv) {
           float y = robotPositions[i].y * 100.0f + MIDFIELD_Y;
           robotFieldPositions.push_back(point<float>(x, y));
       }
-
+      // cout << "is post data crashing?" << endl;
       overseerServer.postData();
-
+      // cout << "detected robots!" << endl;
       /*
       //Sample log file code
       if (robotPositions.size() == 0) {
@@ -399,7 +405,6 @@ int main (int argc, char** argv) {
     }
 
 #ifndef NO_VISUALS
-    *cloudDisplay = *cloud; // Display the cloud
     visualizer.removePointCloud();
     colorHandler.reset (new pcl_visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> (*cloudDisplay));
     geometryHandler.reset (new pcl_visualization::PointCloudGeometryHandlerXYZ<pcl::PointXYZRGB> (*cloudDisplay));
