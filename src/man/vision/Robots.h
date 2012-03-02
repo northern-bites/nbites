@@ -65,6 +65,10 @@ public:
     void setDebugRobots(bool debug) {debugRobots = debug;}
 #endif
 
+    //cant be accessed if private
+    static const int widthScale = 5;
+    static const int heightScale = 5;
+
 
 private:
     // class pointers
@@ -72,8 +76,9 @@ private:
     Threshold* thresh;
     Field* field;
     Context* context;
-
-    int imageBoxes[64][48];//depends on image size, however ratio will be correct, given a 4:3 image.
+    
+    int imageBoxes[IMAGE_WIDTH/widthScale][IMAGE_HEIGHT/heightScale];
+    //depends on image size, however ratio will be correct, given a 4:3 image.
     Blobs* blobs;
     Blobs* whiteBlobs;
     int numberOfRuns, runsize;

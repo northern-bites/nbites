@@ -813,8 +813,8 @@ void Threshold::newFindRobots() {
     //and looking for filled macro pixels of red or navy.
 
     //we want macro pixels of this size
-    int widthScale = 5;
-    int heightScale = 5;
+  int widthScale = Robots::widthScale;
+  int heightScale = Robots::heightScale;
     unsigned char pixel = GREEN;
     float navyColorCount = 0;
     float redColorCount = 0;

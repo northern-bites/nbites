@@ -49,8 +49,8 @@ Robots::Robots(Vision* vis, Threshold* thr, Field* fie, Context* con,
  */
 void Robots::init()
 {
-  for (int i = 0; i <64; i++){
-    for (int j = 0; j < 48; j++){
+  for (int i = 0; i <IMAGE_WIDTH/widthScale; i++){
+    for (int j = 0; j < IMAGE_HEIGHT/heightScale; j++){
       imageBoxes[i][j] = 0;
     }
   }
@@ -101,8 +101,8 @@ void Robots::findRobots(Cross* cross){
 void Robots::findUniforms(){
   //in the following loop, we go through the entire image, looking for marked pixels.
   //once we find a pixel, we blob it, and indicate that is has been blobbed.
-  for (int i = 0; i < 64; i++) {
-    for (int j = 0; j < 48; j++) {
+  for (int i = 0; i < IMAGE_WIDTH/widthScale; i++) {
+    for (int j = 0; j < IMAGE_HEIGHT/heightScale; j++) {
       if (imageBoxes[i][j] == 1) {
 	imageBoxes[i][j] = 2;
 	blobs->newBlobIt(i, j, true);

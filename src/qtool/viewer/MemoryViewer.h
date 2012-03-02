@@ -34,9 +34,6 @@ private:
     data::RobotMemoryManager::const_ptr memoryManager;
     viewer::RoboImageViewer roboImageViewer;
 
-private slots:
-        void nextClicked();
-
 };
 
 }
