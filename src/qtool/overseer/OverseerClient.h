@@ -14,11 +14,11 @@
 #include "GroundTruth.h"
 #include "man/memory/parse/MessageParser.h"
 #include "viewer/MObjectViewer.h"
-#include "data/MemorySignalingInterface.h"
 
 #include "viewer/BMPImageViewer.h"
 #include "image/PaintField.h"
 #include "image/PaintGroundTruth.h"
+#include "data/DataManager.h"
 
 #include "OverseerDef.h"
 
@@ -32,7 +32,7 @@ class OverseerClient : public QWidget {
     typedef man::memory::parse::MessageParser MessageParser;
 
 public:
-    OverseerClient(QWidget* parent = 0);
+    OverseerClient(data::DataManager::ptr dataManager, QWidget* parent = 0);
     ~OverseerClient() {}
 
 public slots:
@@ -40,6 +40,7 @@ public slots:
     void newGroundTruth();
 
 protected:
+    data::DataManager::ptr dataManager;
     GroundTruth::ptr groundTruth;
     MessageParser::ptr messageParser;
     QPushButton* connectButton;

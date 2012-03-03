@@ -23,7 +23,7 @@ QTool::QTool() : QMainWindow(),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
         fieldViewer(new FieldViewer(dataManager)),
-        overseerClient(new OverseerClient(this)) {
+        overseerClient(new OverseerClient(dataManager, this)) {
 
     this->setWindowTitle(tr("HackTool"));
 

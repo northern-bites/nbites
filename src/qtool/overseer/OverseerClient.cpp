@@ -12,13 +12,15 @@ namespace overseer {
 
 using namespace common::io;
 using namespace nbites::overseer;
+using namespace data;
 using namespace std;
 using namespace viewer;
 using namespace image;
 
-OverseerClient::OverseerClient(QWidget* parent) :
+OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
         QWidget(parent),
-        groundTruth(new GroundTruth()),
+        dataManager(dataManager),
+        groundTruth(dataManager->getGroundTruth()),
         connectButton(new QPushButton("Connect", this)){
 
     connect(groundTruth.get(), SIGNAL(dataUpdated()),
@@ -77,8 +79,7 @@ void OverseerClient::connectToOverseer() {
 
     SocketInProvider::ptr socket_in(new SocketInProvider(
             host_info.addresses().first().toIPv4Address(), OVERSEER_PORT));
-    messageParser = MessageParser::ptr(new MessageParser(socket_in, groundTruth));
-    messageParser->start();
+    dataManager->newGroundTruthProvider(socket_in);
 }
 
 }
