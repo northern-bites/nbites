@@ -301,6 +301,8 @@ void Noggin::updateLocalization()
     // Self Localization
     MotionModel odometery = motion_interface->getOdometryUpdate();
 
+    cout << "Odometry update: " << odometry << endl;
+
     // Build the observations from vision data
     vector<PointObservation> pt_observations;
     vector<CornerObservation> corner_observations;
