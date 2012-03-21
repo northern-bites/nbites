@@ -4,7 +4,7 @@
  * Constructor
  */
 VisionSystem::VisionSystem(LandmarkMap m = LandmarkMap())
-    : PF::SensorModel(), map(m)
+  : PF::SensorModel(), map(m), hasNewObservations(false)
 { }
 
 /**
@@ -15,8 +15,7 @@ VisionSystem::VisionSystem(LandmarkMap m = LandmarkMap())
  */
 PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 {
-    // Determine which (if any) observations can be made.
-    std::vector<Observation> obs = determineObservations(currentLocation, ROV);
+    std::vector<Observation> obs = currentObservations;
     if(obs.size() == 0)
     {
 #ifdef DEBUG_LOCALIZATION
@@ -24,6 +23,20 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 #endif
         return particles;
     }
+
+    if(!hasNewObservations())
+    {
+#ifdef DEBUG_LOCALIZATION
+        std::cout << "No new observations, do not update weights." << std::endl;
+#endif
+	setUpdated(false);
+	return particles;
+    }
+
+    setUpdated(true);
+
+    hasNewObservations = false;
+
     std::vector<Observation>::iterator obsIter;
 
 #ifdef DEBUG_LOCALIZATION
@@ -110,4 +123,18 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     }
 
     return particles;
+}
+
+/**
+ * Provides the vision module with a new set of observations, and 
+ * resets the flag so that the observations will be used on 
+ * the next update iteration.
+ *
+ * @param newObs the new vector of observations.
+ */
+void VisionSystem::feedObservations(std::vector<Observation> newObs)
+{
+    hasNewObservations = true;
+  
+    currentObservations = newObs;
 }

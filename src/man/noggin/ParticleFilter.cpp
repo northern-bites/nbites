@@ -91,7 +91,8 @@ namespace PF
 	std::cout << particles[0];
 #endif 
 
-	resample();
+	if(sensorModel->hasUpdated())
+	    resample();
     }
 
     /**

@@ -168,6 +168,17 @@ namespace PF
 	virtual ~SensorModel() { }
 
 	virtual ParticleSet update(ParticleSet particles) = 0;
+
+	/**
+	 * These methods allow the client to access information as
+	 * to whether or not the SensorModel has performed an 
+	 * update on the latest iteration.
+	 */
+	bool hasUpdated() const { return updated; }
+	void setUpdated(bool u) { updated = u; }
+
+    private:
+	bool updated;
     };
 
     /**

@@ -301,7 +301,9 @@ void Noggin::updateLocalization()
     // Self Localization
     MotionModel odometery = motion_interface->getOdometryUpdate();
 
-    cout << "Odometry update: " << odometry << endl;
+    // First, update the odometry data and feed to the motion handler.
+    // @todo implement the MotionModel for our odometry system.
+    //locMotion->feedStep(...);
 
     // Build the observations from vision data
     vector<PointObservation> pt_observations;
@@ -309,30 +311,54 @@ void Noggin::updateLocalization()
 
     // FieldObjects
 
+    std::vector<Observation> observations;
+    std::vector<Landmark> landmarks;
+    float dist, theta;
+
     VisualFieldObject fo;
     fo = *vision->bgrp;
 
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
+        //PointObservation seen(fo);
+        // Create a new Observation from the observed VisualFieldObject.
+	landmarks = constructLandmarks(fo);
+	dist = fo.getDistance();
+	theta = fo.getBearing();
+	observations.push_back(Observation(landmarks, dist, theta));
+        //pt_observations.push_back(seen);
     }
 
     fo = *vision->bglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
+        //PointObservation seen(fo);
+        // Create a new Observation from the observed VisualFieldObject.
+	landmarks = constructLandmarks(fo);
+	dist = fo.getDistance();
+	theta = fo.getBearing();
+	observations.push_back(Observation(landmarks, dist, theta));
+        //pt_observations.push_back(seen);
     }
 
     fo = *vision->ygrp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
+        //PointObservation seen(fo);
+        // Create a new Observation from the observed VisualFieldObject.
+	landmarks = constructLandmarks(fo);
+	dist = fo.getDistance();
+	theta = fo.getBearing();
+	observations.push_back(Observation(landmarks, dist, theta));
+        //pt_observations.push_back(seen);
     }
 
     fo = *vision->yglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
+        //PointObservation seen(fo);
+        // Create a new Observation from the observed VisualFieldObject.
+	landmarks = constructLandmarks(fo);
+	dist = fo.getDistance();
+	theta = fo.getBearing();
+	observations.push_back(Observation(landmarks, dist, theta));
+        //pt_observations.push_back(seen);
     }
 
 #       ifdef DEBUG_POST_OBSERVATIONS
