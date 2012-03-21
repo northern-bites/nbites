@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "Tools/Module/Module.h"
+//#include "Tools/Module/Module.h"
 #include "Representations/Configuration/RobotDimensions.h"
 #include "Representations/Configuration/MassCalibration.h"
 #include "Representations/Configuration/JointCalibration.h"
 #include "Representations/Configuration/DamageConfiguration.h"
 #include "Representations/Infrastructure/FrameInfo.h"
-#include "Representations/Infrastructure/KeyStates.h"
+//#include "Representations/Infrastructure/KeyStates.h"
 #include "Representations/Infrastructure/SensorData.h"
 #include "Representations/Sensing/RobotModel.h"
 #include "Representations/Sensing/TorsoMatrix.h"
@@ -21,37 +21,37 @@
 #include "Representations/MotionControl/MotionRequest.h"
 #include "Representations/MotionControl/WalkingEngineStandOutput.h"
 #include "Representations/MotionControl/WalkingEngineOutput.h"
-#include "Representations/MotionControl/HeadJointRequest.h"
+//#include "Representations/MotionControl/HeadJointRequest.h"
 #include "Representations/MotionControl/OdometryData.h"
 #include "Representations/Sensing/GroundContactState.h"
 #include "Tools/RingBuffer.h"
 #include "Tools/RingBufferWithSum.h"
 #include "Tools/Math/Matrix.h"
-#include "Tools/Optimization/ParticleSwarm.h"
+//#include "Tools/Optimization/ParticleSwarm.h"
 #include "WalkingEngineKick.h"
 
-MODULE(WalkingEngine)
-  REQUIRES(MotionSelection)
-  REQUIRES(MotionRequest)
-  REQUIRES(RobotModel)
-  REQUIRES(RobotDimensions)
-  REQUIRES(MassCalibration)
-  REQUIRES(HeadJointRequest)
-  REQUIRES(FrameInfo)
-  REQUIRES(KeyStates)
-  REQUIRES(TorsoMatrix)
-  REQUIRES(GroundContactState)
-  REQUIRES(FallDownState)
-  REQUIRES(JointCalibration)
-  REQUIRES(DamageConfiguration)
-  REQUIRES(SensorData)
-  USES(OdometryData)
-  PROVIDES_WITH_MODIFY(WalkingEngineOutput)
-  REQUIRES(WalkingEngineOutput)
-  PROVIDES_WITH_MODIFY(WalkingEngineStandOutput)
-END_MODULE
+//MODULE(WalkingEngine)
+//  REQUIRES(MotionSelection)
+//  REQUIRES(MotionRequest)
+//  REQUIRES(RobotModel)
+//  REQUIRES(RobotDimensions)
+//  REQUIRES(MassCalibration)
+//  REQUIRES(HeadJointRequest)
+//  REQUIRES(FrameInfo)
+//  REQUIRES(KeyStates)
+//  REQUIRES(TorsoMatrix)
+//  REQUIRES(GroundContactState)
+//  REQUIRES(FallDownState)
+//  REQUIRES(JointCalibration)
+//  REQUIRES(DamageConfiguration)
+//  REQUIRES(SensorData)
+//  USES(OdometryData)
+//  PROVIDES_WITH_MODIFY(WalkingEngineOutput)
+//  REQUIRES(WalkingEngineOutput)
+//  PROVIDES_WITH_MODIFY(WalkingEngineStandOutput)
+//END_MODULE
 
-class WalkingEngine : public WalkingEngineBase
+class WalkingEngine //: public WalkingEngineBase
 {
 public:
   /**
@@ -62,7 +62,7 @@ public:
   /*
   * Destructor
   */
-  ~WalkingEngine() {theInstance = 0;}
+  ~WalkingEngine() {}//theInstance = 0;}
 
   /**
   * Called from a MessageQueue to distribute messages
@@ -532,7 +532,7 @@ private:
     WalkingEngineKick kicks[(WalkRequest::numOfKickTypes - 1) / 2];
   };
 
-  PROCESS_WIDE_STORAGE_STATIC(WalkingEngine) theInstance; /**< Points to the only instance of this class in this process or is 0 if there is none */
+//  PROCESS_WIDE_STORAGE_STATIC(WalkingEngine) theInstance; /**< Points to the only instance of this class in this process or is 0 if there is none */
   Parameters p; /**< The walking engine parameters */
 
   void init();
@@ -567,11 +567,11 @@ private:
   RingBufferWithSum<float, 500> testingCurrent;
 
   // attributes used for module:WalkingEngine:optimize debug response
-  ParticleSwarm optimizeOptimizer;
-  RingBufferWithSum<float, 300> optimizeFitness;
-  bool optimizeStarted;
-  unsigned int optimizeStartTime;
-  Parameters optimizeBestParameters;
+//  ParticleSwarm optimizeOptimizer;
+//  RingBufferWithSum<float, 300> optimizeFitness;
+//  bool optimizeStarted;
+//  unsigned int optimizeStartTime;
+//  Parameters optimizeBestParameters;
 
   void updateMotionRequest();
   MotionType requestedMotionType;

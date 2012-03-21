@@ -7,14 +7,14 @@
 #include <cstdio>
 
 #include "WalkingEngine.h"
-#include "Tools/Debugging/DebugDrawings.h" // PLOT
-#include "Tools/Debugging/DebugDrawings3D.h"
+//#include "Tools/Debugging/DebugDrawings.h" // PLOT
+//#include "Tools/Debugging/DebugDrawings3D.h"
 #include "Tools/InverseKinematic.h"
-#include "Tools/MessageQueue/InMessage.h"
+//#include "Tools/MessageQueue/InMessage.h"
 #include "Tools/Streams/InStreams.h"
-#include "Tools/Settings.h"
+//#include "Tools/Settings.h"
 #include "Tools/Math/Matrix.h"
-#include "Platform/SoundPlayer.h"
+//#include "Platform/SoundPlayer.h"
 
 inline float saveAsinh(float xf)
 {
@@ -43,15 +43,16 @@ inline float saveAcosh(float xf)
 }
 
 
-MAKE_MODULE(WalkingEngine, Motion Control)
+//MAKE_MODULE(WalkingEngine, Motion Control)
 
-PROCESS_WIDE_STORAGE(WalkingEngine) WalkingEngine::theInstance = 0;
+//PROCESS_WIDE_STORAGE(WalkingEngine) WalkingEngine::theInstance = 0;
 
 WalkingEngine::WalkingEngine() : emergencyShutOff(false), currentMotionType(stand),
   testing(false), testingNextParameterSet(0),
-  optimizeStarted(false), optimizeStartTime(0), instable(true), beginOfStable(0), lastExecutedWalkingKick(WalkRequest::none)
+//  optimizeStarted(false), optimizeStartTime(0),
+  instable(true), beginOfStable(0), lastExecutedWalkingKick(WalkRequest::none)
 {
-  theInstance = this;
+//  theInstance = this;
   observedPendulumPlayer.walkingEngine = this;
 
   // default parameters
@@ -157,215 +158,6 @@ void WalkingEngine::init()
 
 void WalkingEngine::update(WalkingEngineOutput& walkingEngineOutput)
 {
-  MODIFY("module:WalkingEngine:parameters", p);
-
-  DECLARE_PLOT("module:WalkingEngine:rX");
-  DECLARE_PLOT("module:WalkingEngine:rY");
-  DECLARE_PLOT("module:WalkingEngine:nextSX");
-  DECLARE_PLOT("module:WalkingEngine:nextSY");
-  DECLARE_PLOT("module:WalkingEngine:x0X");
-  DECLARE_PLOT("module:WalkingEngine:x0Y");
-
-  DECLARE_PLOT("module:WalkingEngine:leftTargetX");
-  DECLARE_PLOT("module:WalkingEngine:leftTargetY");
-  DECLARE_PLOT("module:WalkingEngine:leftTargetZ");
-  DECLARE_PLOT("module:WalkingEngine:rightTargetX");
-  DECLARE_PLOT("module:WalkingEngine:rightTargetY");
-  DECLARE_PLOT("module:WalkingEngine:rightTargetZ");
-
-  DECLARE_PLOT("module:WalkingEngine:refToComX");
-  DECLARE_PLOT("module:WalkingEngine:refToComY");
-  DECLARE_PLOT("module:WalkingEngine:refToComZ");
-
-  DECLARE_PLOT("module:WalkingEngine:expectedLeftToComX");
-  DECLARE_PLOT("module:WalkingEngine:expectedLeftToComY");
-  DECLARE_PLOT("module:WalkingEngine:expectedLeftToComZ");
-  DECLARE_PLOT("module:WalkingEngine:expectedRightToComX");
-  DECLARE_PLOT("module:WalkingEngine:expectedRightToComY");
-  DECLARE_PLOT("module:WalkingEngine:expectedRightToComZ");
-  DECLARE_PLOT("module:WalkingEngine:measuredLeftToComX");
-  DECLARE_PLOT("module:WalkingEngine:measuredLeftToComY");
-  DECLARE_PLOT("module:WalkingEngine:measuredLeftToComZ");
-  DECLARE_PLOT("module:WalkingEngine:measuredRightToComX");
-  DECLARE_PLOT("module:WalkingEngine:measuredRightToComY");
-  DECLARE_PLOT("module:WalkingEngine:measuredRightToComZ");
-
-  DECLARE_PLOT("module:WalkingEngine:errorLeftX");
-  DECLARE_PLOT("module:WalkingEngine:errorLeftY");
-  DECLARE_PLOT("module:WalkingEngine:errorLeftZ");
-  DECLARE_PLOT("module:WalkingEngine:errorRightX");
-  DECLARE_PLOT("module:WalkingEngine:errorRightY");
-  DECLARE_PLOT("module:WalkingEngine:errorRightZ");
-
-  DECLARE_PLOT("module:WalkingEngine:usedErrorX");
-  DECLARE_PLOT("module:WalkingEngine:usedErrorY");
-  DECLARE_PLOT("module:WalkingEngine:expectedQToComX");
-  DECLARE_PLOT("module:WalkingEngine:expectedQToComY");
-  DECLARE_PLOT("module:WalkingEngine:measuredQToComX");
-  DECLARE_PLOT("module:WalkingEngine:measuredQToComY");
-  DECLARE_PLOT("module:WalkingEngine:filteredQToComX");
-  DECLARE_PLOT("module:WalkingEngine:filteredQToComY");
-
-  DECLARE_PLOT("module:WalkingEngine:expectedFootSpanX");
-  DECLARE_PLOT("module:WalkingEngine:measuredFootSpanX");
-
-  DECLARE_PLOT("module:WalkingEngine:requestedMotionType");
-
-  DECLARE_PLOT("module:WalkingEngine:upcomingOdometryOffset:X");
-  DECLARE_PLOT("module:WalkingEngine:upcomingOdometryOffset:Y");
-  DECLARE_PLOT("module:WalkingEngine:upcomingOdometryOffset:R");
-
-  DEBUG_RESPONSE_ONCE("module:WalkingEngine:createInverseKinematicsPlot",
-  {
-    JointRequest jointRequest;
-    RobotModel robotModel;
-    OutTextFile stream("inverseKinematicsPlot.dat");
-    for(int z = -210; z <= -170; ++z)
-    {
-      for(int x = -120; x <= 120; ++x)
-      {
-        Pose3D leftTarget(float(x), 50.f, float(z));
-        Pose3D rightTarget(float(x), -50.f, float(z));
-        InverseKinematic::calcLegJoints(leftTarget, rightTarget, jointRequest, theRobotDimensions, 0.5f);
-        robotModel.setJointData(jointRequest, theRobotDimensions, theMassCalibration);
-        stream << z << x << robotModel.limbs[MassCalibration::footLeft].translation.z << robotModel.limbs[MassCalibration::footLeft].translation.x;
-        for(int i = 0; i < JointData::numOfJoints; ++i)
-        {
-          if(jointRequest.angles[i] != JointData::off)
-          {
-            if(jointRequest.angles[i] > theJointCalibration.joints[i].maxAngle)
-              jointRequest.angles[i] = theJointCalibration.joints[i].maxAngle;
-            else if(jointRequest.angles[i] < theJointCalibration.joints[i].minAngle)
-              jointRequest.angles[i] = theJointCalibration.joints[i].minAngle;
-          }
-        }
-        robotModel.setJointData(jointRequest, theRobotDimensions, theMassCalibration);
-        stream << robotModel.limbs[MassCalibration::footLeft].translation.z << robotModel.limbs[MassCalibration::footLeft].translation.x;
-        stream << endl;
-      }
-      stream << endl;
-    }
-    OUTPUT(idText, text, "created inverseKinematicsPlot.dat");
-  });
-
-  DEBUG_RESPONSE("module:WalkingEngine:testing",
-  {
-    struct ParameterSet
-    {
-      float x;
-      float y;
-      float r;
-    };
-    ParameterSet parameterSets[] = {
-      {0, 0, 0},
-      {200, 0, 0},
-      {60, 0, 0},
-      {30, 0, 0},
-      {0, 200, 0},
-    };
-
-    if(theGroundContactState.contact || !theDamageConfiguration.useGroundContactDetection)
-    {
-      if(!testing && theMotionSelection.ratios[MotionRequest::walk] > 0.99f)
-      {
-        testing = true;
-        testingStartTime = 0;
-        testingStartOdometryData = theOdometryData;
-        OUTPUT(idText, text, "testing: Started walk test with x=" << parameterSets[testingNextParameterSet].x << ", y=" << parameterSets[testingNextParameterSet].y <<
-               ", r=" << parameterSets[testingNextParameterSet].r << ", h=" << p.standComPosition.z);
-      }
-      if(testing)
-      {
-        MotionRequest& motionRequest = const_cast<MotionRequest&>(theMotionRequest); // haxx!
-        motionRequest.walkRequest.mode = WalkRequest::speedMode;
-        motionRequest.walkRequest.speed.rotation = parameterSets[testingNextParameterSet].r;
-        motionRequest.walkRequest.speed.translation.x = parameterSets[testingNextParameterSet].x;
-        motionRequest.walkRequest.speed.translation.y = parameterSets[testingNextParameterSet].y;
-
-        if(testingStartTime == 0 && (testingStartOdometryData - theOdometryData).translation.abs() >= 550)
-        {
-          testingStartTime = theFrameInfo.time;
-          OUTPUT(idText, text, "testing: Started speed measurement");
-        }
-      }
-    }
-    else if(testing)
-    {
-      float current = testingCurrent.getAverage();
-      float avgError = testingComError.getAverage();
-      float stdDev = sqrt(testingComErrorSqr.getAverage());
-
-      if(testingStartTime != 0)
-      {
-        float speed = 1800.f / ((theFrameInfo.time - testingStartTime) * 0.001f);
-
-        OUTPUT(idText, text, "testing: Stopped speed measurement");
-        OUTPUT(idText, text, "testing: Results for walking with x=" << parameterSets[testingNextParameterSet].x << ", y=" << parameterSets[testingNextParameterSet].y <<
-               ", r=" << parameterSets[testingNextParameterSet].r << ", h=" << p.standComPosition.z << ": speed=" << speed << ", avgError=" << avgError << ", stdDev=" << stdDev << ", current=" << current);
-      }
-      else
-      {
-        OUTPUT(idText, text, "testing: Results for walking with x=" << parameterSets[testingNextParameterSet].x << ", y=" << parameterSets[testingNextParameterSet].y <<
-               ", r=" << parameterSets[testingNextParameterSet].r << ", h=" << p.standComPosition.z << ", avgError=" << avgError << ", stdDev=" << stdDev << ", current=" << current);
-      }
-      testing = false;
-      unsigned int parameterSetCount = (sizeof(parameterSets) / sizeof(*parameterSets));
-      testingNextParameterSet = (testingNextParameterSet + 1) % parameterSetCount;
-
-      OUTPUT(idConsole, text, "mv -60 0 400 0 0");
-    }
-  });
-
-  MODIFY("module:WalkingEngine:optimizeBestParameters", optimizeBestParameters);
-  DEBUG_RESPONSE("module:WalkingEngine:optimize",
-  {
-    if(theMotionSelection.ratios[MotionRequest::walk] > 0.9f)
-    {
-      if(!optimizeOptimizer.isInitialized())
-      {
-        float parameters[][3] =
-        {
-          { p.walkHeight.y, p.walkHeight.y - 150.f, p.walkHeight.y + 150.f},
-          { p.walkRefY, p.walkRefY - 10.f, p.walkRefY + 10.f},
-        };
-        unsigned int parametersRef = 13;
-        optimizeOptimizer.init(Global::getSettings().expandRobotFilename("expWalkingOptimizationData.log"), parameters, parametersRef);
-        optimizeBestParameters = p;
-      }
-      if(optimizeStarted && theFrameInfo.getTimeSince(optimizeStartTime) > 4000)
-      {
-        float fitness = optimizeFitness.getAverage();
-        optimizeOptimizer.setFitness(fitness);
-        if(fitness == optimizeOptimizer.getBestFitness())
-          optimizeBestParameters = p;
-        optimizeStarted = false;
-        OUTPUT(idText, text, "optimize: fitness=" << fitness);
-      }
-      if(!optimizeStarted)
-      {
-        optimizeStarted = true;
-        optimizeStartTime = theFrameInfo.time;
-        float* values;
-        optimizeOptimizer.getNextValues(values);
-        p.walkHeight.y = values[0];
-        p.walkRefY = values[1];
-        p.walkRefYAtFullSpeedX = p.walkRefY;
-        p.walkRefYAtFullSpeedY = p.walkRefY;
-
-        p.computeContants();
-        OUTPUT(idText, text, "optimize: Started using new set");
-      }
-    }
-  });
-  DEBUG_RESPONSE_NOT("module:WalkingEngine:optimize",
-  {
-    if(optimizeStarted)
-    {
-      p = optimizeBestParameters;
-      optimizeStarted = false;
-    }
-  });
-
 
   if(theMotionSelection.ratios[MotionRequest::walk] > 0.f || theMotionSelection.ratios[MotionRequest::stand] > 0.f)
   {
@@ -404,373 +196,6 @@ void WalkingEngine::update(WalkingEngineOutput& walkingEngineOutput)
         currentRefX = p.standStandbyRefX;
     generateDummyOutput(walkingEngineOutput);
   }
-
-  DECLARE_DEBUG_DRAWING3D("module:WalkingEngine:Q", "origin");
-  DECLARE_DEBUG_DRAWING3D("module:WalkingEngine:halfQ", "origin");
-  DECLARE_DEBUG_DRAWING3D("module:WalkingEngine:Skeleton", "origin");
-  DECLARE_DEBUG_DRAWING3D("module:WalkingEngine:CenterOfMass", "origin");
-
-  // showcase drawings
-  DECLARE_DEBUG_DRAWING3D("module:WalkingEngine:ip", "origin");
-  DECLARE_DEBUG_DRAWING3D("module:WalkingEngine:instepKickTrajectory", "origin");
-  DECLARE_DEBUG_DRAWING3D("module:WalkingEngine:simpleIp", "origin");
-  DECLARE_DEBUG_DRAWING3D("module:WalkingEngine:zmp", "origin");
-  DECLARE_DEBUG_DRAWING3D("module:WalkingEngine:3dlipm", "origin");
-
-  //DECLARE_DEBUG_DRAWING3D("module:WalkingEngine", "origin");
-
-  COMPLEX_DRAWING3D("module:WalkingEngine:Q",
-  {
-    // compute Q
-    RobotModel robotModel(walkingEngineOutput, theRobotDimensions, theMassCalibration);
-    Pose3D originToQ = robotModel.limbs[pendulumPlayer.supportLeg == left ? MassCalibration::footLeft : MassCalibration::footRight];
-    originToQ.translate(0, 0, -theRobotDimensions.heightLeg5Joint);
-    originToQ.conc(pendulumPlayer.supportLeg == left ? targetStance.leftOriginToFoot.invert() : targetStance.rightOriginToFoot.invert());
-
-    // paint Q in large
-    {
-      Vector3<> px2 = originToQ* Vector3<>(200.f, 0.f, 0.f);
-      Vector3<> px = originToQ* Vector3<>(-200.f, 0.f, 0.f);
-      Vector3<> py2 = originToQ* Vector3<>(0.f, 200.f, 0.f);
-      Vector3<> py = originToQ* Vector3<>(0.f, -200.f, 0.f);
-      Vector3<> pz2 = originToQ* Vector3<>(0.f, 0.f, 200.f);
-      Vector3<> pz = originToQ* Vector3<>(0.f, 0.f, -200.f);
-      CYLINDERARROW3D("module:WalkingEngine:Q", Vector3<>(px.x, px.y, px.z), Vector3<>(px2.x, px2.y, px2.z), 2, 20, 10, ColorRGBA(255, 0, 0));
-      CYLINDERARROW3D("module:WalkingEngine:Q", Vector3<>(py.x, py.y, py.z), Vector3<>(py2.x, py2.y, py2.z), 2, 20, 10, ColorRGBA(0, 255, 0));
-      CYLINDERARROW3D("module:WalkingEngine:Q", Vector3<>(pz.x, pz.y, pz.z), Vector3<>(pz2.x, pz2.y, pz2.z), 2, 20, 10, ColorRGBA(0, 0, 255));
-    }
-  });
-
-  COMPLEX_DRAWING3D("module:WalkingEngine:halfQ",
-  {
-    // compute Q
-    RobotModel robotModel(walkingEngineOutput, theRobotDimensions, theMassCalibration);
-    Pose3D originToQ = robotModel.limbs[pendulumPlayer.supportLeg == left ? MassCalibration::footLeft : MassCalibration::footRight];
-    originToQ.translate(0, 0, -theRobotDimensions.heightLeg5Joint);
-    originToQ.conc(pendulumPlayer.supportLeg == left ? targetStance.leftOriginToFoot.invert() : targetStance.rightOriginToFoot.invert());
-
-    // paint Q in large
-    {
-      Vector3<> px2 = originToQ* Vector3<>(140.f, 0.f, 0.f);
-      Vector3<> p0 = originToQ* Vector3<>(0.f, 0.f, 0.f);
-      Vector3<> py2 = originToQ* Vector3<>(0.f, 140.f, 0.f);
-      Vector3<> pz2 = originToQ* Vector3<>(0.f, 0.f, 140.f);
-      CYLINDERARROW3D("module:WalkingEngine:halfQ", p0, Vector3<>(px2.x, px2.y, px2.z), 2, 20, 10, ColorRGBA(255, 0, 0));
-      CYLINDERARROW3D("module:WalkingEngine:halfQ", p0, Vector3<>(py2.x, py2.y, py2.z), 2, 20, 10, ColorRGBA(0, 255, 0));
-      CYLINDERARROW3D("module:WalkingEngine:halfQ", p0, Vector3<>(pz2.x, pz2.y, pz2.z), 2, 20, 10, ColorRGBA(0, 0, 255));
-    }
-  });
-
-  COMPLEX_DRAWING3D("module:WalkingEngine:simpleIp",
-  {
-    RobotModel robotModel(walkingEngineOutput, theRobotDimensions, theMassCalibration);
-    Pose3D originToQ = robotModel.limbs[pendulumPlayer.supportLeg == left ? MassCalibration::footLeft : MassCalibration::footRight];
-    originToQ.translate(0, 0, -theRobotDimensions.heightLeg5Joint);
-    originToQ.conc(pendulumPlayer.supportLeg == left ? targetStance.leftOriginToFoot.invert() : targetStance.rightOriginToFoot.invert());
-
-    Vector3<> r(pendulumPlayer.r.x + pendulumPlayer.c.x* pendulumPlayer.t, pendulumPlayer.r.y + pendulumPlayer.c.y* pendulumPlayer.t, 0.f);
-    Pose3D originToPendulum = Pose3D(originToQ).translate(r);
-
-    CYLINDERLINE3D("module:WalkingEngine:simpleIp", robotModel.centerOfMass, originToPendulum.translation, 1, ColorRGBA(0, 0, 0));
-    CYLINDERARROW3D("module:WalkingEngine:simpleIp", robotModel.centerOfMass, Vector3<>(robotModel.centerOfMass.x, robotModel.centerOfMass.y, robotModel.centerOfMass.z - 100.f), 2, 10, 6, ColorRGBA(0, 127, 127));
-    SPHERE3D("module:WalkingEngine:simpleIp", robotModel.centerOfMass.x, robotModel.centerOfMass.y, robotModel.centerOfMass.z, 7, ColorRGBA(0, 0, 0));
-    SPHERE3D("module:WalkingEngine:simpleIp", originToPendulum.translation.x, originToPendulum.translation.y, originToPendulum.translation.z, 3, ColorRGBA(0, 0, 127));
-
-    Pose3D originToPendulumInv = originToPendulum.invert();
-    Vector3<> com = originToPendulumInv* robotModel.centerOfMass;
-    Vector3<> nextToCom = RotationMatrix::fromRotationX(fromDegrees(6)) * com;
-    Vector3<> px2 = originToPendulum* nextToCom;
-    CYLINDERARROW3D("module:WalkingEngine:simpleIp", robotModel.centerOfMass, px2, 2, 10, 6, ColorRGBA(0, 127, 127));
-
-    // origin of the inverted pendulum
-    {
-      Vector3<> px2 = originToPendulum* Vector3<>(200.f, 0.f, 0.f);
-      Vector3<> p0 = originToPendulum* Vector3<>(0.f, 0.f, 0.f);
-      Vector3<> py2 = originToPendulum* Vector3<>(0.f, 200.f, 0.f);
-      Vector3<> pz2 = originToPendulum* Vector3<>(0.f, 0.f, 200.f);
-      CYLINDERARROW3D("module:WalkingEngine:simpleIp", p0, Vector3<>(px2.x, px2.y, px2.z), 2, 20, 10, ColorRGBA(255, 0, 0));
-      CYLINDERARROW3D("module:WalkingEngine:simpleIp", p0, Vector3<>(py2.x, py2.y, py2.z), 2, 20, 10, ColorRGBA(0, 255, 0));
-      CYLINDERARROW3D("module:WalkingEngine:simpleIp", p0, Vector3<>(pz2.x, pz2.y, pz2.z), 2, 20, 10, ColorRGBA(0, 0, 255));
-    }
-  });
-
-
-  COMPLEX_DRAWING3D("module:WalkingEngine:ip",
-  {
-    RobotModel robotModel(walkingEngineOutput, theRobotDimensions, theMassCalibration);
-    Pose3D originToQ = robotModel.limbs[pendulumPlayer.supportLeg == left ? MassCalibration::footLeft : MassCalibration::footRight];
-    originToQ.translate(0, 0, -theRobotDimensions.heightLeg5Joint);
-    originToQ.conc(pendulumPlayer.supportLeg == left ? targetStance.leftOriginToFoot.invert() : targetStance.rightOriginToFoot.invert());
-
-    Vector3<> r(pendulumPlayer.r.x + pendulumPlayer.c.x* pendulumPlayer.t, pendulumPlayer.r.y + pendulumPlayer.c.y* pendulumPlayer.t, 0.f);
-    Pose3D originToPendulum = Pose3D(originToQ).translate(r);
-
-    CYLINDERLINE3D("module:WalkingEngine:ip", robotModel.centerOfMass, originToPendulum.translation, 1, ColorRGBA(0, 0, 0));
-    SPHERE3D("module:WalkingEngine:ip", robotModel.centerOfMass.x, robotModel.centerOfMass.y, robotModel.centerOfMass.z, 7, ColorRGBA(0, 0, 0));
-    SPHERE3D("module:WalkingEngine:ip", originToPendulum.translation.x, originToPendulum.translation.y, originToPendulum.translation.z, 3, ColorRGBA(0, 0, 127));
-
-    // Q
-    {
-      Vector3<> px2 = originToQ* Vector3<>(200.f, 0.f, 0.f);
-      Vector3<> p0 = originToQ* Vector3<>(0.f, 0.f, 0.f);
-      Vector3<> py2 = originToQ* Vector3<>(0.f, 200.f, 0.f);
-      Vector3<> pz2 = originToQ* Vector3<>(0.f, 0.f, 200.f);
-      CYLINDERARROW3D("module:WalkingEngine:ip", p0, Vector3<>(px2.x, px2.y, px2.z), 2, 20, 10, ColorRGBA(255, 0, 0));
-      CYLINDERARROW3D("module:WalkingEngine:ip", p0, Vector3<>(py2.x, py2.y, py2.z), 2, 20, 10, ColorRGBA(0, 255, 0));
-      CYLINDERARROW3D("module:WalkingEngine:ip", p0, Vector3<>(pz2.x, pz2.y, pz2.z), 2, 20, 10, ColorRGBA(0, 0, 255));
-    }
-
-    // next Q
-    Pose3D originToNextQ = Pose3D(originToQ).conc(pendulumPlayer.next.s.translation).rotateZ(pendulumPlayer.next.s.rotation);
-    {
-      Vector3<> px2 = originToNextQ* Vector3<>(200.f, 0.f, 0.f);
-      Vector3<> p0 = originToNextQ* Vector3<>(0.f, 0.f, 0.f);
-      Vector3<> py2 = originToNextQ* Vector3<>(0.f, 200.f, 0.f);
-      Vector3<> pz2 = originToNextQ* Vector3<>(0.f, 0.f, 200.f);
-      CYLINDERARROW3D("module:WalkingEngine:ip", p0, Vector3<>(px2.x, px2.y, px2.z), 2, 20, 10, ColorRGBA(255, 0, 0, 90));
-      CYLINDERARROW3D("module:WalkingEngine:ip", p0, Vector3<>(py2.x, py2.y, py2.z), 2, 20, 10, ColorRGBA(0, 255, 0, 90));
-      CYLINDERARROW3D("module:WalkingEngine:ip", p0, Vector3<>(pz2.x, pz2.y, pz2.z), 2, 20, 10, ColorRGBA(0, 0, 255, 90));
-    }
-
-    // next pendulum origin
-    {
-      Vector3<> nextR(pendulumPlayer.next.r.x, pendulumPlayer.next.r.y, 0.f);
-      Vector3<> pz2 = originToNextQ* nextR;
-      SPHERE3D("module:WalkingEngine:ip", pz2.x, pz2.y, pz2.z, 3, ColorRGBA(0, 0, 127, 90));
-    }
-
-    // paint com trajectory
-    Vector3<> lastP;
-    for(float tx = pendulumPlayer.tb; tx <= pendulumPlayer.te; tx += 0.005f)
-    {
-      const Vector2<>& k = pendulumPlayer.k;
-      Vector3<> r(pendulumPlayer.r.x + pendulumPlayer.c.x * tx, pendulumPlayer.r.y + pendulumPlayer.c.y * tx, 0.f);
-      Vector3<> refToCom(
-        p.standComPosition.x + pendulumPlayer.x0.x * cosh(k.x * tx) + pendulumPlayer.xv0.x * sinh(k.x * tx) / k.x,
-        pendulumPlayer.x0.y * cosh(k.y * tx) + pendulumPlayer.xv0.y * sinh(k.y * tx) / k.y,
-        p.standComPosition.z);
-
-      Vector3<> p = originToQ * (r + refToCom);
-      if(tx > pendulumPlayer.tb)
-      {
-        LINE3D("module:WalkingEngine:ip", lastP.x, lastP.y, lastP.z, p.x, p.y, p.z, 3, ColorRGBA(255, 0, 0));
-      }
-      lastP = p;
-    }
-
-    float newXvte = pendulumPlayer.x0.x* pendulumPlayer.k.x* sinh(pendulumPlayer.k.x* pendulumPlayer.te) + pendulumPlayer.xv0.x* cosh(pendulumPlayer.k.x* pendulumPlayer.te);
-    float newNextXvtb = newXvte;
-    float newNextXv0 = newNextXvtb / cosh(pendulumPlayer.next.k.x* pendulumPlayer.next.tb);
-
-    for(float tx = pendulumPlayer.next.tb; tx <= pendulumPlayer.next.te; tx += 0.005f)
-    {
-      const Vector2<>& k = pendulumPlayer.next.k;
-      Vector3<> r(pendulumPlayer.next.r.x + pendulumPlayer.next.c.x * tx, pendulumPlayer.next.r.y + pendulumPlayer.next.c.y * tx, 0.f);
-      Vector3<> refToCom(
-        p.standComPosition.x + pendulumPlayer.next.x0.x * cosh(k.x * tx) + newNextXv0 * sinh(k.x * tx) / k.x,
-        pendulumPlayer.next.x0.y * cosh(k.y * tx) + pendulumPlayer.next.xv0.y * sinh(k.y * tx) / k.y,
-        p.standComPosition.z);
-
-      Vector3<> p = originToNextQ * (r + refToCom);
-      LINE3D("module:WalkingEngine:ip", lastP.x, lastP.y, lastP.z, p.x, p.y, p.z, 3, ColorRGBA(255, 0, 0, 90));
-      lastP = p;
-    }
-  });
-
-  COMPLEX_DRAWING3D("module:WalkingEngine:instepKickTrajectory",
-  {
-    RobotModel robotModel(walkingEngineOutput, theRobotDimensions, theMassCalibration);
-    Pose3D originToQ = robotModel.limbs[pendulumPlayer.supportLeg == left ? MassCalibration::footLeft : MassCalibration::footRight];
-    originToQ.translate(0, 0, -theRobotDimensions.heightLeg5Joint);
-    originToQ.conc(pendulumPlayer.supportLeg == left ? targetStance.leftOriginToFoot.invert() : targetStance.rightOriginToFoot.invert());
-    Pose3D originToNextQ = Pose3D(originToQ).conc(pendulumPlayer.next.s.translation).rotateZ(pendulumPlayer.next.s.rotation);
-
-    // paint Q
-    {
-      Vector3<> px2 = originToQ* Vector3<>(200.f * 0.75f, 0.f, 0.f);
-      Vector3<> p0 = originToQ* Vector3<>(0.f, 0.f, 0.f);
-      Vector3<> py2 = originToQ* Vector3<>(0.f, 200.f * 0.75f, 0.f);
-      Vector3<> pz2 = originToQ* Vector3<>(0.f, 0.f, 200.f * 0.75f);
-      CYLINDERARROW3D("module:WalkingEngine:instepKickTrajectory", p0, Vector3<>(px2.x, px2.y, px2.z), 2, 20, 10, ColorRGBA(255, 0, 0));
-      CYLINDERARROW3D("module:WalkingEngine:instepKickTrajectory", p0, Vector3<>(py2.x, py2.y, py2.z), 2, 20, 10, ColorRGBA(0, 255, 0));
-      CYLINDERARROW3D("module:WalkingEngine:instepKickTrajectory", p0, Vector3<>(pz2.x, pz2.y, pz2.z), 2, 20, 10, ColorRGBA(0, 0, 255));
-    }
-
-    // paint air foot trajectory
-    Vector3<> lastP;
-    Stance tempStance;
-    static KickPlayer txKickPlayer;
-    txKickPlayer.stop();
-    if(kickPlayer.isActive())
-      txKickPlayer.init(kickPlayer.getType(), Vector2<>(), Vector2<>());
-    for(float tx = pendulumPlayer.tb; tx <= pendulumPlayer.te; tx += 0.005f)
-    {
-      PendulumPlayer pendulumPlayer = this->pendulumPlayer;
-      pendulumPlayer.t = tx;
-      pendulumPlayer.getStance(tempStance, 0, 0, 0);
-      if(txKickPlayer.isActive() && tx > pendulumPlayer.tb)
-      {
-        const float phase = (tx - pendulumPlayer.tb) / (pendulumPlayer.te - pendulumPlayer.tb);
-        float newPos = phase * txKickPlayer.getLength();
-        txKickPlayer.seek(newPos - txKickPlayer.getCurrentPosition());
-        txKickPlayer.apply(tempStance);
-      }
-
-      Pose3D& nextOriginToFoot = (pendulumPlayer.supportLeg == left) ? tempStance.rightOriginToFoot : tempStance.leftOriginToFoot;
-
-      Vector3<> point = originToNextQ * nextOriginToFoot.translation;
-      if(tx > pendulumPlayer.tb)
-      {
-        LINE3D("module:WalkingEngine:instepKickTrajectory", lastP.x, lastP.y, lastP.z, point.x, point.y, point.z, 3, ColorRGBA(127, 0, 0));
-      }
-      lastP = point;
-    }
-  });
-
-  COMPLEX_DRAWING3D("module:WalkingEngine:3dlipm",
-  {
-    RobotModel robotModel(walkingEngineOutput, theRobotDimensions, theMassCalibration);
-    Pose3D originToFoot = robotModel.limbs[pendulumPlayer.supportLeg == left ? MassCalibration::footLeft : MassCalibration::footRight];
-    originToFoot.translate(0, 0, -theRobotDimensions.heightLeg5Joint);
-    Pose3D originToFootInv = originToFoot.invert();
-
-    CYLINDERLINE3D("module:WalkingEngine:3dlipm", robotModel.centerOfMass, originToFoot.translation, 1, ColorRGBA(0, 0, 0));
-    SPHERE3D("module:WalkingEngine:3dlipm", robotModel.centerOfMass.x, robotModel.centerOfMass.y, robotModel.centerOfMass.z, 7, ColorRGBA(0, 0, 0));
-
-    // origin of the inverted pendulum
-    {
-      Vector3<> px2 = originToFoot* Vector3<>(200.f, 0.f, 0.f);
-      Vector3<> p0 = originToFoot* Vector3<>(0.f, 0.f, 0.f);
-      Vector3<> py2 = originToFoot* Vector3<>(0.f, 200.f, 0.f);
-      Vector3<> pz2 = originToFoot* Vector3<>(0.f, 0.f, 200.f);
-      CYLINDERARROW3D("module:WalkingEngine:3dlipm", p0, Vector3<>(px2.x, px2.y, px2.z), 2, 20, 10, ColorRGBA(255, 0, 0));
-      CYLINDERARROW3D("module:WalkingEngine:3dlipm", p0, Vector3<>(py2.x, py2.y, py2.z), 2, 20, 10, ColorRGBA(0, 255, 0));
-      CYLINDERARROW3D("module:WalkingEngine:3dlipm", p0, Vector3<>(pz2.x, pz2.y, pz2.z), 2, 20, 10, ColorRGBA(0, 0, 255));
-    }
-
-    // pendulum plane
-    {
-      Vector3<> com = Pose3D(originToFootInv).conc(theRobotModel.centerOfMass).translation;
-      Vector3<> center = originToFoot* Vector3<>(0.f, 0.f /*pendulumPlayer.supportLeg == left ? -50.f : 50.f*/, com.z);
-      //CYLINDER3D("module:WalkingEngine:3dlipm", center.x, center.y, center.z, 0, 0, 0, 200, 0, ColorRGBA(80, 80, 80, 127));
-      Vector3<> ltc = originToFoot* Vector3<>(200.f, 200.f, com.z);
-      Vector3<> rtc = originToFoot* Vector3<>(200.f, -200.f, com.z);
-      Vector3<> lbc = originToFoot* Vector3<>(-200.f, 200.f, com.z);
-      Vector3<> rbc = originToFoot* Vector3<>(-200.f, -200.f, com.z);
-      QUAD3D("module:WalkingEngine:3dlipm", ltc, rtc, rbc, lbc, ColorRGBA(255, 80, 80, 127));
-      QUAD3D("module:WalkingEngine:3dlipm", lbc, rbc, rtc, ltc, ColorRGBA(255, 80, 80, 127));
-    }
-
-  });
-
-  COMPLEX_DRAWING3D("module:WalkingEngine:zmp",
-  {
-    // compute Q
-    RobotModel robotModel(walkingEngineOutput, theRobotDimensions, theMassCalibration);
-    Pose3D originToQ = robotModel.limbs[pendulumPlayer.supportLeg == left ? MassCalibration::footLeft : MassCalibration::footRight];
-    originToQ.translate(0, 0, -theRobotDimensions.heightLeg5Joint);
-    originToQ.conc(pendulumPlayer.supportLeg == left ? targetStance.leftOriginToFoot.invert() : targetStance.rightOriginToFoot.invert());
-
-    Vector3<> ankle = robotModel.limbs[MassCalibration::footLeft].translation;
-    CYLINDERARROW3D("module:WalkingEngine:zmp", Vector3<>(ankle.x + 10, ankle.y - 10, ankle.z + 30), ankle, 1, 6, 3, ColorRGBA(0, 127, 127)); // F_A
-    CYLINDERARROW3D("module:WalkingEngine:zmp", ankle, Vector3<>(ankle.x - 20, ankle.y + 20, ankle.z + 40), 1, 6, 3, ColorRGBA(0x55, 0x0, 0x0));
-
-    Vector3<> footCom = Pose3D(robotModel.limbs[MassCalibration::footLeft]).conc(theMassCalibration.masses[MassCalibration::footLeft].offset).translation;
-    Vector3<> footCom2 = Pose3D(robotModel.limbs[MassCalibration::footLeft]).conc(theMassCalibration.masses[MassCalibration::footLeft].offset).translate(0.f, 0.f, -30).translation;
-    CYLINDERARROW3D("module:WalkingEngine:zmp", footCom, footCom2, 1, 6, 3, ColorRGBA(0, 127, 127)); // m_s * g
-    SPHERE3D("module:WalkingEngine:zmp", footCom.x, footCom.y, footCom.z, 3, ColorRGBA(255, 0, 0));
-
-    Vector3<> p = originToQ* Vector3<>(40.f, 50.f, 0.f);
-    Vector3<> mend = originToQ* Vector3<>(40.f, 50.f, -20.f);
-    Vector3<> rstart = originToQ* Vector3<>(50.f, 60.f, -40.f).normalize(110.f);
-
-    CYLINDERARROW3D("module:WalkingEngine:zmp", rstart, p, 1, 6, 3, ColorRGBA(0, 127, 127));
-    CYLINDERARROW3D("module:WalkingEngine:zmp", p, mend, 1, 6, 3, ColorRGBA(0x55, 0x0, 0x0));
-  });
-
-  COMPLEX_DRAWING3D("module:WalkingEngine:CenterOfMass",
-  {
-    RobotModel robotModel(walkingEngineOutput, theRobotDimensions, theMassCalibration);
-    SPHERE3D("module:WalkingEngine:CenterOfMass", robotModel.centerOfMass.x, robotModel.centerOfMass.y, robotModel.centerOfMass.z, 5, ColorRGBA(255, 0, 0));
-
-    // compute kinematic chain from origin to Q
-    Pose3D originToQ = robotModel.limbs[pendulumPlayer.supportLeg == left ? MassCalibration::footLeft : MassCalibration::footRight];
-    originToQ.translate(0, 0, -theRobotDimensions.heightLeg5Joint);
-    originToQ.conc(pendulumPlayer.supportLeg == left ? targetStance.leftOriginToFoot.invert() : targetStance.rightOriginToFoot.invert());
-
-    // project center of mass to the ground
-    Pose3D qToOrigin = originToQ.invert();
-    Vector3<> centerOfMass = qToOrigin* robotModel.centerOfMass;
-    Vector3<> centerOfMassShadow = originToQ* Vector3<>(centerOfMass.x, centerOfMass.y, 0.f);
-    CYLINDER3D("module:WalkingEngine:CenterOfMass", centerOfMassShadow.x, centerOfMassShadow.y, centerOfMassShadow.z, 0, 0, 0, 5, 0, ColorRGBA(170, 0, 0));
-  });
-
-
-  COMPLEX_DRAWING3D("module:WalkingEngine:Skeleton",
-  {
-    RobotModel robotModel(walkingEngineOutput, theRobotDimensions, theMassCalibration);
-
-    for(int i = 0; i < 2; ++i)
-    {
-      int firstJoint = i == 0 ? MassCalibration::pelvisLeft : MassCalibration::pelvisRight;
-      Pose3D last;
-      for(int i = 0; i < (MassCalibration::footLeft + 1) - MassCalibration::pelvisLeft; ++i)
-      {
-        Pose3D& next = robotModel.limbs[firstJoint + i];
-        LINE3D("module:WalkingEngine:Skeleton", last.translation.x, last.translation.y, last.translation.z, next.translation.x, next.translation.y, next.translation.z, 2, ColorRGBA(0, 0, 0));
-        SPHERE3D("module:WalkingEngine:Skeleton", next.translation.x, next.translation.y, next.translation.z, 3, ColorRGBA(0, 0, 0));
-
-        Vector3<> axis  = i == 0 ? Vector3<>(0.f, firstJoint == MassCalibration::pelvisLeft ? -50.f : 50.f, 50.f).normalize(50.f) : i == 1 || i == 5 ? Vector3<>(50.f, 0.f, 0.f) : Vector3<>(0.f, 50.f, 0.f);
-        ColorRGBA color = i == 0 ? ColorRGBA(0, 0, 255)      : i == 1 || i == 5 ? ColorRGBA(255, 0, 0)      : ColorRGBA(0, 255, 0);
-        Vector3<> p = next * axis;
-        LINE3D("module:WalkingEngine:Skeleton", next.translation.x, next.translation.y, next.translation.z, p.x, p.y, p.z, 1, color);
-
-        last = next;
-      }
-      Pose3D next = Pose3D(last).translate(0, 0, -theRobotDimensions.heightLeg5Joint);
-      LINE3D("module:WalkingEngine:Skeleton", last.translation.x, last.translation.y, last.translation.z, next.translation.x, next.translation.y, next.translation.z, 2, ColorRGBA(0, 0, 0));
-    }
-    Vector3<> armCenter(0.f, 0.f, theRobotDimensions.armOffset.z);
-    LINE3D("module:WalkingEngine:Skeleton", 0, 0, 0, armCenter.x, armCenter.y, armCenter.z, 2, ColorRGBA(0, 0, 0));
-    for(int i = 0; i < 2; ++i)
-    {
-      int firstJoint = i == 0 ? MassCalibration::shoulderLeft : MassCalibration::shoulderRight;
-      Pose3D last(armCenter);
-      for(int i = 0; i < (MassCalibration::foreArmLeft + 1) - MassCalibration::shoulderLeft; ++i)
-      {
-        Pose3D& next = robotModel.limbs[firstJoint + i];
-        LINE3D("module:WalkingEngine:Skeleton", last.translation.x, last.translation.y, last.translation.z, next.translation.x, next.translation.y, next.translation.z, 2, ColorRGBA(0, 0, 0));
-        SPHERE3D("module:WalkingEngine:Skeleton", next.translation.x, next.translation.y, next.translation.z, 3, ColorRGBA(0, 0, 0));
-
-        Vector3<> axis  = i == 1 || i == 3 ? Vector3<>(0.f, 0.f, 50.f) : i == 2 ? Vector3<>(50.f, 0.f, 0.f) : Vector3<>(0.f, 50.f, 0.f);
-        ColorRGBA color = i == 1 || i == 3 ? ColorRGBA(0, 0, 255)      : i == 2 ? ColorRGBA(255, 0, 0)      : ColorRGBA(0, 255, 0);
-        Vector3<> p = next * axis;
-        LINE3D("module:WalkingEngine:Skeleton", next.translation.x, next.translation.y, next.translation.z, p.x, p.y, p.z, 1, color);
-
-        last = next;
-      }
-      Pose3D next = Pose3D(last).translate(theRobotDimensions.lowerArmLength, 0, 0);
-      LINE3D("module:WalkingEngine:Skeleton", last.translation.x, last.translation.y, last.translation.z, next.translation.x, next.translation.y, next.translation.z, 2, ColorRGBA(0, 0, 0));
-    }
-
-    Pose3D last(armCenter);
-    for(int i = 0; i < (MassCalibration::head + 1) - MassCalibration::neck; ++i)
-    {
-      Pose3D& next = robotModel.limbs[MassCalibration::neck + i];
-      LINE3D("module:WalkingEngine:Skeleton", last.translation.x, last.translation.y, last.translation.z, next.translation.x, next.translation.y, next.translation.z, 2, ColorRGBA(0, 0, 0));
-      SPHERE3D("module:WalkingEngine:Skeleton", next.translation.x, next.translation.y, next.translation.z, 3, ColorRGBA(0, 0, 0));
-
-      Vector3<> axis  = i == 0 ? Vector3<>(0.f, 0.f, 50.f) : Vector3<>(0.f, 50.f, 0.f);
-      ColorRGBA color = i == 0 ? ColorRGBA(0, 0, 255)      : ColorRGBA(0, 255, 0);
-      Vector3<> p = next * axis;
-      LINE3D("module:WalkingEngine:Skeleton", next.translation.x, next.translation.y, next.translation.z, p.x, p.y, p.z, 1, color);
-
-      last = next;
-    }
-    Pose3D next = Pose3D(last).translate(0, 0, 100.f);
-    LINE3D("module:WalkingEngine:Skeleton", last.translation.x, last.translation.y, last.translation.z, next.translation.x, next.translation.y, next.translation.z, 2, ColorRGBA(0, 0, 0));
-
-  });
 }
 
 void WalkingEngine::updateMotionRequest()
@@ -786,13 +211,6 @@ void WalkingEngine::updateMotionRequest()
       requestedWalkTarget = theMotionRequest.walkRequest.speed; // just for sgn(requestedWalkTarget.translation.y)
   }
 
-  DEBUG_RESPONSE_ONCE("module:WalkingEngine:walk1000F", requestedWalkTarget = Pose2D(0.f, 1000.f, 0.f););
-  DEBUG_RESPONSE_ONCE("module:WalkingEngine:walk500B", requestedWalkTarget = Pose2D(0.f, -500.f, 0.f););
-  DEBUG_RESPONSE_ONCE("module:WalkingEngine:walk500R", requestedWalkTarget = Pose2D(0.f, 0.f, -500.f););
-  DEBUG_RESPONSE_ONCE("module:WalkingEngine:walk500L", requestedWalkTarget = Pose2D(0.f, 0.f, 500.f););
-  DEBUG_RESPONSE_ONCE("module:WalkingEngine:rotate180L", requestedWalkTarget = Pose2D(pi - 0.001f, 0.f, 0.f););
-  DEBUG_RESPONSE_ONCE("module:WalkingEngine:rotate180R", requestedWalkTarget = Pose2D(-(pi - 0.001f), 0.f, 0.f););
-
   // get requested motion state
   requestedMotionType = stand;
   if((theGroundContactState.contactSafe || !theDamageConfiguration.useGroundContactDetectionForSafeStates) && !theWalkingEngineOutput.enforceStand && theMotionSelection.ratios[MotionRequest::walk] > 0.999f && !instable)
@@ -807,7 +225,6 @@ void WalkingEngine::updateMotionRequest()
         requestedMotionType = stepping;
     }
 
-  PLOT("module:WalkingEngine:requestedMotionType", requestedMotionType != stepping ? 0.1 : 0.9);
 }
 
 void WalkingEngine::updateObservedPendulumPlayer()
@@ -946,12 +363,6 @@ void WalkingEngine::computeExpectedStance()
   expectedLeftToCom = expectedStance->leftOriginToCom - expectedStance->leftOriginToFoot.translation;
   expectedRightToCom = expectedStance->rightOriginToCom - expectedStance->rightOriginToFoot.translation;
 
-  PLOT("module:WalkingEngine:expectedLeftToComX", expectedLeftToCom.x);
-  PLOT("module:WalkingEngine:expectedLeftToComY", expectedLeftToCom.y);
-  PLOT("module:WalkingEngine:expectedLeftToComZ", expectedLeftToCom.z);
-  PLOT("module:WalkingEngine:expectedRightToComX", expectedRightToCom.x);
-  PLOT("module:WalkingEngine:expectedRightToComY", expectedRightToCom.y);
-  PLOT("module:WalkingEngine:expectedRightToComZ", expectedRightToCom.z);
 }
 
 void WalkingEngine::computeError()
@@ -1003,40 +414,16 @@ void WalkingEngine::computeError()
           error[i] = -p.balanceMaxError[i];
       }
     }
-
-    DEBUG_RESPONSE("module:WalkingEngine:testing",
-    {
-      testingComErrorSqr.add(((leftError + rightError) * 0.5f).squareAbs());
-      testingComError.add(((leftError + rightError) * 0.5f).abs());
-
-      float totalCurrent = 0;
-      for(int i = 0; i < JointData::numOfJoints; ++i)
-        totalCurrent += theSensorData.currents[i];
-      testingCurrent.add(totalCurrent);
-    });
-
-    DEBUG_RESPONSE("module:WalkingEngine:optimize",
-    {
-      optimizeFitness.add(sqr((leftError.y + rightError.y) * 0.5f));
-    });
   }
   else
     leftError = rightError = Vector3<>();
 
   float errorX = 0.f;
-  MODIFY("module:WalkingEngine:errorX", errorX);
   if(errorX != 0.f)
   {
     leftError.x = errorX;
     rightError.x = errorX;
   }
-
-  PLOT("module:WalkingEngine:errorLeftX", leftError.x);
-  PLOT("module:WalkingEngine:errorLeftY", leftError.y);
-  PLOT("module:WalkingEngine:errorLeftZ", leftError.z);
-  PLOT("module:WalkingEngine:errorRightX", rightError.x);
-  PLOT("module:WalkingEngine:errorRightY", rightError.y);
-  PLOT("module:WalkingEngine:errorRightZ", rightError.x);
 }
 
 void WalkingEngine::updatePendulumPlayer()
@@ -1047,15 +434,6 @@ void WalkingEngine::updatePendulumPlayer()
       observedPendulumPlayer.applyCorrection(leftError, rightError, theFrameInfo.cycleTime);
 
     computeExpectedStance(); // HACK
-    PLOT("module:WalkingEngine:expectedFootSpanX", expectedLeftToCom.x - expectedRightToCom.x);
-    PLOT("module:WalkingEngine:measuredFootSpanX", measuredLeftToCom.x - measuredRightToCom.x);
-
-    PLOT("module:WalkingEngine:rX", observedPendulumPlayer.isActive() ? (observedPendulumPlayer.r.x + observedPendulumPlayer.c.x * observedPendulumPlayer.t) : 0.f);
-    PLOT("module:WalkingEngine:rY", observedPendulumPlayer.isActive() ? (observedPendulumPlayer.r.y + observedPendulumPlayer.c.y * observedPendulumPlayer.t) : 0.f);
-    PLOT("module:WalkingEngine:nextSX", observedPendulumPlayer.isActive() ? observedPendulumPlayer.next.s.translation.x : 0.f);
-    PLOT("module:WalkingEngine:nextSY", observedPendulumPlayer.isActive() ? observedPendulumPlayer.next.s.translation.y : 0.f);
-    PLOT("module:WalkingEngine:x0X", observedPendulumPlayer.isActive() ? observedPendulumPlayer.x0.x : 0.f);
-    PLOT("module:WalkingEngine:x0Y", observedPendulumPlayer.isActive() ? observedPendulumPlayer.x0.y : 0.f);
 
     pendulumPlayer = observedPendulumPlayer;
     pendulumPlayer.seek(p.observerMeasurementDelay * 0.001f);
@@ -1712,17 +1090,13 @@ void WalkingEngine::computeOdometryOffset()
   upcomingOdometryOffset.translation.y *= p.odometryUpcomingScale.translation.y;
   upcomingOdometryOffset.rotation *= p.odometryUpcomingScale.rotation;
 
-  PLOT("module:WalkingEngine:upcomingOdometryOffset:X", upcomingOdometryOffset.translation.x);
-  PLOT("module:WalkingEngine:upcomingOdometryOffset:Y", upcomingOdometryOffset.translation.y);
-  PLOT("module:WalkingEngine:upcomingOdometryOffset:R", toDegrees(upcomingOdometryOffset.rotation));
-
   if(theMotionRequest.walkRequest.mode == WalkRequest::targetMode)
     requestedWalkTarget -= odometryOffset;
 }
 
 bool WalkingEngine::handleMessage(InMessage& message)
 {
-  return theInstance && theInstance->kickPlayer.handleMessage(message);
+//  return theInstance && theInstance->kickPlayer.handleMessage(message);
 }
 
 void WalkingEngine::ObservedPendulumPlayer::init(StepType stepType, float t, SupportLeg supportLeg, const Vector2<>& r, const Vector2<>& x0, const Vector2<>& k, float deltaTime)
@@ -1860,15 +1234,6 @@ void WalkingEngine::ObservedPendulumPlayer::applyCorrection(const Vector3<>& lef
   Vector2<> xvt(
     this->c.x + k.x * x0.x * sinh(k.x * t) + xv0.x * cosh(k.x * t) + correction[2],
     this->c.y + k.y * x0.y * sinh(k.y * t) + xv0.y * cosh(k.y * t) + correction[3]);
-
-  PLOT("module:WalkingEngine:usedErrorX", error.x);
-  PLOT("module:WalkingEngine:usedErrorY", error.y);
-  PLOT("module:WalkingEngine:expectedQToComX", r.x + this->c.x * t + x0.x * cosh(k.x * t) + xv0.x * sinh(k.x * t) / k.x);
-  PLOT("module:WalkingEngine:expectedQToComY", r.y + this->c.y * t + x0.y * cosh(k.y * t) + xv0.y * sinh(k.y * t) / k.y);
-  PLOT("module:WalkingEngine:measuredQToComX", r.x + this->c.x * t + x0.x * cosh(k.x * t) + xv0.x * sinh(k.x * t) / k.x + error.x);
-  PLOT("module:WalkingEngine:measuredQToComY", r.y + this->c.y * t + x0.y * cosh(k.y * t) + xv0.y * sinh(k.y * t) / k.y + error.y);
-  PLOT("module:WalkingEngine:filteredQToComX", xt.x);
-  PLOT("module:WalkingEngine:filteredQToComY", xt.y);
 
   computeSwapTimes(t, xt.y, xvt.y, error.y);
   computeRefZmp(t, xt.x, xvt.x, error.x);
@@ -2407,7 +1772,7 @@ bool WalkingEngine::KickPlayer::handleMessage(InMessage& message)
     sprintf(filePath, "Kicks/%s.cfg", WalkRequest::getName(WalkRequest::KickType(id)));
     if(kicks[(id - 1) / 2].load(filePath, buffer))
     {
-      OUTPUT(idText, text, filePath << ": ok");
+//      OUTPUT(idText, text, filePath << ": ok");
     }
     delete[] buffer;
     return true;
