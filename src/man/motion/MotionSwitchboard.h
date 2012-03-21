@@ -40,7 +40,7 @@
 #include "MotionSwitchboardInterface.h"
 
 #include "Kinematics.h"
-#include "WalkProvider.h"
+#include "bhwalk/BHWalkProvider.h"
 #include "WalkingConstants.h"
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
@@ -61,6 +61,8 @@
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
 #endif
+
+using namespace man::motion;
 
 class MotionSwitchboard : public MotionSwitchboardInterface {
 public:
@@ -129,7 +131,7 @@ private:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    WalkProvider walkProvider;
+    BHWalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
     NullHeadProvider nullHeadProvider;

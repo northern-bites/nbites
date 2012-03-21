@@ -1,4 +1,6 @@
 
+#include <cstdio>
+
 #include <vector>
 using namespace std;
 
@@ -9,7 +11,7 @@ using namespace boost;
 #include "NBMatrixMath.h"
 using namespace Kinematics;
 using namespace NBMath;
-//#define DEBUG_SWITCHBOARD
+#define DEBUG_SWITCHBOARD
 
 MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
                                      shared_ptr<NaoPose> pose)
@@ -785,7 +787,7 @@ void MotionSwitchboard::sendMotionCommand(const FreezeCommand::ptr command){
     pthread_mutex_unlock(&next_provider_mutex);
 
 #ifdef DEBUG_SWITCHBOARD
-    cout << "Switched to " << *curProvider << endl;
+    cout << "Freeze on " << *curProvider << endl;
 #endif
 
 }
