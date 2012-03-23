@@ -5,20 +5,20 @@
 */
 
 #include "InertiaSensorFilter.h"
-#include "Tools/Debugging/DebugDrawings.h"
+//#include "Tools/Debugging/DebugDrawings.h"
 #include "Representations/MotionControl/MotionInfo.h"
 #include "Representations/MotionControl/WalkingEngineOutput.h"
 
-MAKE_MODULE(InertiaSensorFilter, Sensing)
-
-InertiaSensorFilter::InertiaSensorFilter() : lastTime(0)
-{
-  p.processNoise = Vector2<>(0.004f, 0.004f);
-  p.accNoise = Vector3<>(1.f, 1.f, 1.f);
-  p.calculatedAccLimit = Vector2<>(fromDegrees(20.f), fromDegrees(30.f));
-
-  p.calculateConstants();
-}
+//MAKE_MODULE(InertiaSensorFilter, Sensing)
+//
+//InertiaSensorFilter::InertiaSensorFilter() : lastTime(0)
+//{
+//  p.processNoise = Vector2<>(0.004f, 0.004f);
+//  p.accNoise = Vector3<>(1.f, 1.f, 1.f);
+//  p.calculatedAccLimit = Vector2<>(fromDegrees(20.f), fromDegrees(30.f));
+//
+//  p.calculateConstants();
+//}
 
 void InertiaSensorFilter::Parameters::calculateConstants()
 {
@@ -32,34 +32,40 @@ void InertiaSensorFilter::Parameters::calculateConstants()
 
 void InertiaSensorFilter::reset()
 {
-  x = State<>();
-  cov = p.processCov;
 
-  lastLeftFoot = lastRightFoot = Pose3D();
-  lastTime = theFrameInfo.time - (unsigned int)(theFrameInfo.cycleTime * 1000.f);
 }
 
-void InertiaSensorFilter::update(OrientationData& orientationData)
+void InertiaSensorFilter::update(OrientationData& orientationData,
+        const InertiaSensorData& theInertiaSensorData,
+        const SensorData& theSensorData,
+        const RobotModel& theRobotModel,
+        const FrameInfo& theFrameInfo,
+        const MotionInfo& theMotionInfo,
+        const WalkingEngineOutput& theWalkingEngineOutput)
 {
-  MODIFY("module:InertiaSensorFilter:parameters", p);
-
-  DECLARE_PLOT("module:InertiaSensorFilter:expectedGyroX");
-  DECLARE_PLOT("module:InertiaSensorFilter:gyroX");
-  DECLARE_PLOT("module:InertiaSensorFilter:expectedGyroY");
-  DECLARE_PLOT("module:InertiaSensorFilter:gyroY");
-  DECLARE_PLOT("module:InertiaSensorFilter:expectedAccX");
-  DECLARE_PLOT("module:InertiaSensorFilter:accX");
-  DECLARE_PLOT("module:InertiaSensorFilter:expectedAccY");
-  DECLARE_PLOT("module:InertiaSensorFilter:accY");
-  DECLARE_PLOT("module:InertiaSensorFilter:expectedAccZ");
-  DECLARE_PLOT("module:InertiaSensorFilter:accZ");
+//  MODIFY("module:InertiaSensorFilter:parameters", p);
+//
+//  DECLARE_PLOT("module:InertiaSensorFilter:expectedGyroX");
+//  DECLARE_PLOT("module:InertiaSensorFilter:gyroX");
+//  DECLARE_PLOT("module:InertiaSensorFilter:expectedGyroY");
+//  DECLARE_PLOT("module:InertiaSensorFilter:gyroY");
+//  DECLARE_PLOT("module:InertiaSensorFilter:expectedAccX");
+//  DECLARE_PLOT("module:InertiaSensorFilter:accX");
+//  DECLARE_PLOT("module:InertiaSensorFilter:expectedAccY");
+//  DECLARE_PLOT("module:InertiaSensorFilter:accY");
+//  DECLARE_PLOT("module:InertiaSensorFilter:expectedAccZ");
+//  DECLARE_PLOT("module:InertiaSensorFilter:accZ");
 
   // check whether the filter shall be reset
   if(!lastTime || theFrameInfo.time <= lastTime)
   {
     if(theFrameInfo.time == lastTime)
       return; // weird log file replaying?
-    reset();
+        x = State<>();
+        cov = p.processCov;
+
+        lastLeftFoot = lastRightFoot = Pose3D();
+        lastTime = theFrameInfo.time - (unsigned int)(theFrameInfo.cycleTime * 1000.f);
   }
 
   // get foot positions
@@ -135,11 +141,11 @@ void InertiaSensorFilter::update(OrientationData& orientationData)
   lastTime = theFrameInfo.time;
 
   // plots
-  PLOT("module:InertiaSensorFilter:orientationX", orientationData.orientation.x);
-  PLOT("module:InertiaSensorFilter:orientationY", orientationData.orientation.y);
-  PLOT("module:InertiaSensorFilter:velocityX", orientationData.velocity.x);
-  PLOT("module:InertiaSensorFilter:velocityY", orientationData.velocity.y);
-  PLOT("module:InertiaSensorFilter:velocityZ", orientationData.velocity.z);
+//  PLOT("module:InertiaSensorFilter:orientationX", orientationData.orientation.x);
+//  PLOT("module:InertiaSensorFilter:orientationY", orientationData.orientation.y);
+//  PLOT("module:InertiaSensorFilter:velocityX", orientationData.velocity.x);
+//  PLOT("module:InertiaSensorFilter:velocityY", orientationData.velocity.y);
+//  PLOT("module:InertiaSensorFilter:velocityZ", orientationData.velocity.z);
 }
 
 void InertiaSensorFilter::predict(const RotationMatrix& rotationOffset)
@@ -174,12 +180,12 @@ void InertiaSensorFilter::readingUpdate(const Vector3<>& reading)
 
   meanOfSigmaReadings();
 
-  PLOT("module:InertiaSensorFilter:expectedAccX", readingMean.x);
-  PLOT("module:InertiaSensorFilter:accX", reading.x);
-  PLOT("module:InertiaSensorFilter:expectedAccY", readingMean.y);
-  PLOT("module:InertiaSensorFilter:accY", reading.y);
-  PLOT("module:InertiaSensorFilter:expectedAccZ", readingMean.z);
-  PLOT("module:InertiaSensorFilter:accZ", reading.z);
+//  PLOT("module:InertiaSensorFilter:expectedAccX", readingMean.x);
+//  PLOT("module:InertiaSensorFilter:accX", reading.x);
+//  PLOT("module:InertiaSensorFilter:expectedAccY", readingMean.y);
+//  PLOT("module:InertiaSensorFilter:accY", reading.y);
+//  PLOT("module:InertiaSensorFilter:expectedAccZ", readingMean.z);
+//  PLOT("module:InertiaSensorFilter:accZ", reading.z);
 
   covOfSigmaReadingsAndSigmaPoints();
   covOfSigmaReadings();

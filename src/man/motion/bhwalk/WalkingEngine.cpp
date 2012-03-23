@@ -156,8 +156,28 @@ void WalkingEngine::init()
   balanceStepSize = p.balanceStepSize;
 }
 
-void WalkingEngine::update(WalkingEngineOutput& walkingEngineOutput)
+void WalkingEngine::update()
 {
+
+    //get new joint, sensor and frame info data
+    naoProvider.update(theJointData, theJointCalibration,
+            theSensorData, theSensorCalibration, theFrameInfo);
+    //filter joints
+    jointFilter.update(theFilteredJointData, theJointData);
+    //update the robot model - this computes the CoM
+    robotModelProvider.update(theRobotModel, theFilteredJointData,
+                              theRobotDimensions, theMassCalibration);
+    inertiaSensorInspector.update(theInspectedInertiaSensorData, theSensorData);
+    inertiaSensorCalibrator.update(theInertiaSensorData, theInspectedInertiaSensorData,
+            theFrameInfo, theRobotModel, theGroundContactState, theMotionSelection, theMotionInfo,
+            walkingEngineOutput, theDamageConfiguration);
+    inertiaSensorFilter.update(theOrientationData, theInertiaSensorData, theSensorData, theRobotModel,
+            theFrameInfo, theMotionInfo, walkingEngineOutput);
+    sensorFilter.update(theFilteredSensorData, theInertiaSensorData, theSensorData, theOrientationData);
+
+    fallDownStateDetector.update(theFallDownState, theFilteredSensorData, theFrameInfo);
+    torsoMatrixProvider.update(theTorsoMatrix, theFilteredSensorData, theRobotDimensions, theRobotModel,
+            theGroundContactState, theDamageConfiguration);
 
   if(theMotionSelection.ratios[MotionRequest::walk] > 0.f || theMotionSelection.ratios[MotionRequest::stand] > 0.f)
   {

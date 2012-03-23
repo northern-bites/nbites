@@ -6,7 +6,7 @@
 
 #include "InertiaSensorInspector.h"
 
-MAKE_MODULE(InertiaSensorInspector, Sensing)
+//MAKE_MODULE(InertiaSensorInspector, Sensing)
 
 InertiaSensorInspector::InertiaSensorInspector() : lastAcc(0.f, 0.f, -9.80665f), inertiaSensorDrops(1000)
 {
@@ -14,9 +14,10 @@ InertiaSensorInspector::InertiaSensorInspector() : lastAcc(0.f, 0.f, -9.80665f),
   p.maxAccOffset = Vector3<>(10.f, 10.f, 10.f);
 }
 
-void InertiaSensorInspector::update(InspectedInertiaSensorData& inertiaSensorData)
+void InertiaSensorInspector::update(InspectedInertiaSensorData& inertiaSensorData,
+                                    const SensorData& theSensorData)
 {
-  MODIFY("module:InertiaSensorInspector:parameters", p);
+//  MODIFY("module:InertiaSensorInspector:parameters", p);
 
   // drop corrupted sensor readings
   Vector2<>& newGyro = inertiaSensorData.gyro;

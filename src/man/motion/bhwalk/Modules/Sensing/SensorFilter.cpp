@@ -5,11 +5,14 @@
 */
 
 #include "SensorFilter.h"
-#include "Tools/Debugging/DebugDrawings.h"
+//#include "Tools/Debugging/DebugDrawings.h"
 
-MAKE_MODULE(SensorFilter, Sensing)
+//MAKE_MODULE(SensorFilter, Sensing)
 
-void SensorFilter::update(FilteredSensorData& filteredSensorData)
+void SensorFilter::update(FilteredSensorData& filteredSensorData,
+        const InertiaSensorData& theInertiaSensorData,
+        const SensorData& theSensorData,
+        const OrientationData& theOrientationData)
 {
   // copy sensor data (except gyro and acc)
   Vector2<> gyro(filteredSensorData.data[SensorData::gyroX], filteredSensorData.data[SensorData::gyroY]);
@@ -53,27 +56,27 @@ void SensorFilter::update(FilteredSensorData& filteredSensorData)
 #endif
 
   //
-  PLOT("module:SensorFilter:rawAngleX", theSensorData.data[SensorData::angleX]);
-  PLOT("module:SensorFilter:rawAngleY", theSensorData.data[SensorData::angleY]);
-
-  PLOT("module:SensorFilter:rawAccX", theSensorData.data[SensorData::accX]);
-  PLOT("module:SensorFilter:rawAccY", theSensorData.data[SensorData::accY]);
-  PLOT("module:SensorFilter:rawAccZ", theSensorData.data[SensorData::accZ]);
-
-  PLOT("module:SensorFilter:rawGyroX", theSensorData.data[SensorData::gyroX]);
-  PLOT("module:SensorFilter:rawGyroY", theSensorData.data[SensorData::gyroY]);
-  PLOT("module:SensorFilter:rawGyroZ", theSensorData.data[SensorData::gyroZ]);
-
-  PLOT("module:SensorFilter:angleX", filteredSensorData.data[SensorData::angleX]);
-  PLOT("module:SensorFilter:angleY", filteredSensorData.data[SensorData::angleY]);
-
-  PLOT("module:SensorFilter:accX", filteredSensorData.data[SensorData::accX]);
-  PLOT("module:SensorFilter:accY", filteredSensorData.data[SensorData::accY]);
-  PLOT("module:SensorFilter:accZ", filteredSensorData.data[SensorData::accZ]);
-
-  PLOT("module:SensorFilter:gyroX", filteredSensorData.data[SensorData::gyroX] != float(SensorData::off) ? filteredSensorData.data[SensorData::gyroX] : 0);
-  PLOT("module:SensorFilter:gyroY", filteredSensorData.data[SensorData::gyroY] != float(SensorData::off) ? filteredSensorData.data[SensorData::gyroY] : 0);
-  PLOT("module:SensorFilter:gyroZ", filteredSensorData.data[SensorData::gyroZ] != float(SensorData::off) ? filteredSensorData.data[SensorData::gyroZ] : 0);
+//  PLOT("module:SensorFilter:rawAngleX", theSensorData.data[SensorData::angleX]);
+//  PLOT("module:SensorFilter:rawAngleY", theSensorData.data[SensorData::angleY]);
+//
+//  PLOT("module:SensorFilter:rawAccX", theSensorData.data[SensorData::accX]);
+//  PLOT("module:SensorFilter:rawAccY", theSensorData.data[SensorData::accY]);
+//  PLOT("module:SensorFilter:rawAccZ", theSensorData.data[SensorData::accZ]);
+//
+//  PLOT("module:SensorFilter:rawGyroX", theSensorData.data[SensorData::gyroX]);
+//  PLOT("module:SensorFilter:rawGyroY", theSensorData.data[SensorData::gyroY]);
+//  PLOT("module:SensorFilter:rawGyroZ", theSensorData.data[SensorData::gyroZ]);
+//
+//  PLOT("module:SensorFilter:angleX", filteredSensorData.data[SensorData::angleX]);
+//  PLOT("module:SensorFilter:angleY", filteredSensorData.data[SensorData::angleY]);
+//
+//  PLOT("module:SensorFilter:accX", filteredSensorData.data[SensorData::accX]);
+//  PLOT("module:SensorFilter:accY", filteredSensorData.data[SensorData::accY]);
+//  PLOT("module:SensorFilter:accZ", filteredSensorData.data[SensorData::accZ]);
+//
+//  PLOT("module:SensorFilter:gyroX", filteredSensorData.data[SensorData::gyroX] != float(SensorData::off) ? filteredSensorData.data[SensorData::gyroX] : 0);
+//  PLOT("module:SensorFilter:gyroY", filteredSensorData.data[SensorData::gyroY] != float(SensorData::off) ? filteredSensorData.data[SensorData::gyroY] : 0);
+//  PLOT("module:SensorFilter:gyroZ", filteredSensorData.data[SensorData::gyroZ] != float(SensorData::off) ? filteredSensorData.data[SensorData::gyroZ] : 0);
 
   //PLOT("module:SensorFilter:us", filteredSensorData.data[SensorData::us]);
 }

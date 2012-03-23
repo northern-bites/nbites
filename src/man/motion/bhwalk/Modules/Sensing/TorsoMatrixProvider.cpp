@@ -5,11 +5,16 @@
 */
 
 #include "TorsoMatrixProvider.h"
-#include "Tools/Debugging/DebugDrawings.h"
+//#include "Tools/Debugging/DebugDrawings.h"
 
-MAKE_MODULE(TorsoMatrixProvider, Sensing)
+//MAKE_MODULE(TorsoMatrixProvider, Sensing)
 
-void TorsoMatrixProvider::update(TorsoMatrix& torsoMatrix)
+void TorsoMatrixProvider::update(TorsoMatrix& torsoMatrix,
+        const FilteredSensorData& theFilteredSensorData,
+        const RobotDimensions& theRobotDimensions,
+        const RobotModel& theRobotModel,
+        const GroundContactState& theGroundContactState,
+        const DamageConfiguration& theDamageConfiguration)
 {
   // generate rotation matrix from measured angleX and angleY
   const Vector3<> axis((float) theFilteredSensorData.data[SensorData::angleX], (float) theFilteredSensorData.data[SensorData::angleY], 0);
@@ -67,13 +72,13 @@ void TorsoMatrixProvider::update(TorsoMatrix& torsoMatrix)
   torsoMatrix.isValid = (theGroundContactState.contact || !theDamageConfiguration.useGroundContactDetection);
 
   //
-  PLOT("module:TorsoMatrixProvider:footSpanX", newFootSpan.x);
-  PLOT("module:TorsoMatrixProvider:footSpanY", newFootSpan.y);
-  PLOT("module:TorsoMatrixProvider:footSpanZ", newFootSpan.z);
-
-  PLOT("module:TorsoMatrixProvider:torsoMatrixX", torsoMatrix.translation.x);
-  PLOT("module:TorsoMatrixProvider:torsoMatrixY", torsoMatrix.translation.y);
-  PLOT("module:TorsoMatrixProvider:torsoMatrixZ", torsoMatrix.translation.z);
+//  PLOT("module:TorsoMatrixProvider:footSpanX", newFootSpan.x);
+//  PLOT("module:TorsoMatrixProvider:footSpanY", newFootSpan.y);
+//  PLOT("module:TorsoMatrixProvider:footSpanZ", newFootSpan.z);
+//
+//  PLOT("module:TorsoMatrixProvider:torsoMatrixX", torsoMatrix.translation.x);
+//  PLOT("module:TorsoMatrixProvider:torsoMatrixY", torsoMatrix.translation.y);
+//  PLOT("module:TorsoMatrixProvider:torsoMatrixZ", torsoMatrix.translation.z);
 }
 
 /*
@@ -99,7 +104,8 @@ void TorsoMatrixProvider::update(FilteredOdometryOffset& odometryOffset)
   (Pose3D&)lastTorsoMatrix = theTorsoMatrix;
 }
 */
-void TorsoMatrixProvider::update(OdometryData& odometryData)
+void TorsoMatrixProvider::update(OdometryData& odometryData,
+        const TorsoMatrix& theTorsoMatrix)
 {
   Pose2D odometryOffset;
 
@@ -114,9 +120,9 @@ void TorsoMatrixProvider::update(OdometryData& odometryData)
     odometryOffset.rotation = odometryOffset3D.rotation.getZAngle();
   }
 
-  PLOT("module:TorsoMatrixProvider:odometryOffsetX", odometryOffset.translation.x);
-  PLOT("module:TorsoMatrixProvider:odometryOffsetY", odometryOffset.translation.y);
-  PLOT("module:TorsoMatrixProvider:odometryOffsetRotation", toDegrees(odometryOffset.rotation));
+//  PLOT("module:TorsoMatrixProvider:odometryOffsetX", odometryOffset.translation.x);
+//  PLOT("module:TorsoMatrixProvider:odometryOffsetY", odometryOffset.translation.y);
+//  PLOT("module:TorsoMatrixProvider:odometryOffsetRotation", toDegrees(odometryOffset.rotation));
 
   odometryData += odometryOffset;
 

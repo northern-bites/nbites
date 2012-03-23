@@ -6,20 +6,20 @@
 
 #pragma once
 
-#include "Tools/Module/Module.h"
+//#include "Tools/Module/Module.h"
 #include "Representations/Infrastructure/SensorData.h"
 #include "Representations/Sensing/InertiaSensorData.h"
 
-MODULE(InertiaSensorInspector)
-  REQUIRES(SensorData)
-  PROVIDES_WITH_MODIFY(InspectedInertiaSensorData)
-END_MODULE
+//MODULE(InertiaSensorInspector)
+//  REQUIRES(SensorData)
+//  PROVIDES_WITH_MODIFY(InspectedInertiaSensorData)
+//END_MODULE
 
 /**
 * @class InertiaSensorInspector
 * A module for dropping invalid sensor readings from the imu.
 */
-class InertiaSensorInspector : public InertiaSensorInspectorBase
+class InertiaSensorInspector //: public InertiaSensorInspectorBase
 {
 public:
   /** Default constructor. */
@@ -57,9 +57,10 @@ private:
   Vector3<> lastAcc; /**< Some acceleration sensor readings that might be corruped, used for detecting corrupted readings. */
   int inertiaSensorDrops; /**< The count of continuously dropped sensor readings. */
 
+  public:
   /**
   * Updates the InertiaSensorData representation.
   * @param inertiaSensorData The inertia sensor data representation which is updated by this module.
   */
-  void update(InspectedInertiaSensorData& inertiaSensorData);
+  void update(InspectedInertiaSensorData& inertiaSensorData, const SensorData& theSensorData);
 };

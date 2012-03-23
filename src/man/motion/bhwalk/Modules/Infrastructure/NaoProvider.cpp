@@ -1,7 +1,7 @@
 /**
 * @file Modules/Infrastructure/NaoProvider.cpp
 * The file declares a module that provides information from the Nao via DCM.
-* @author <a href="mailto:Thomas.Roefer@dfki.de">Thomas Röfer</a>
+* @author <a href="mailto:Thomas.Roefer@dfki.de">Thomas Rï¿½fer</a>
 */
 
 //#define MEASURE_DELAY
@@ -10,120 +10,117 @@
 
 #include "NaoProvider.h"
 
-#ifdef TARGET_ROBOT
-
 #ifdef MEASURE_DELAY
 #include "Tools/Streams/InStreams.h"
 #endif
-#include "Tools/Debugging/DebugDrawings.h"
-#include "Tools/Settings.h"
+//#include "Tools/Debugging/DebugDrawings.h"
+//#include "Tools/Settings.h"
 
-#include "libbhuman/bhuman.h"
+//#include "libbhuman/bhuman.h"
 
-PROCESS_WIDE_STORAGE(NaoProvider) NaoProvider::theInstance = 0;
+//PROCESS_WIDE_STORAGE(NaoProvider) NaoProvider::theInstance = 0;
 
-NaoProvider::NaoProvider() : lastUsSendTime(0), lastUsSwitchTime(0), lastUsReadTime(0), currentUsMode(0)
+NaoProvider::NaoProvider()// : lastUsSendTime(0), lastUsSwitchTime(0), lastUsReadTime(0), currentUsMode(0)
 {
-  NaoProvider::theInstance = this;
+//  NaoProvider::theInstance = this;
 
-  OUTPUT(idText, text, "Hi, I am " << Global::getSettings().robot << ".");
-  OUTPUT(idRobotname, bin, Global::getSettings().robot);
+//  OUTPUT(idText, text, "Hi, I am " << Global::getSettings().robot << ".");
+//  OUTPUT(idRobotname, bin, Global::getSettings().robot);
 
 #ifndef RELEASE
   for(int i = 0; i < JointData::numOfJoints; ++i)
     clippedLastFrame[i] = JointData::off;
 #endif
-  for(int i = 0; i < BoardInfo::numOfBoards; ++i)
-  {
-    lastAck[i] = 0;
-    lastTimeWhenAck[i] = 0;
-  }
-
-  usSettings.sendInterval = 70;
-  usSettings.switchInterval = 250;
-  usSettings.ignoreAfterSwitchInterval = 150;
-  usSettings.modes.resize(4);
-  usSettings.modes[0] = 0.f;
-  usSettings.modes[1] = 2.f;
-  usSettings.modes[2] = 3.f;
-  usSettings.modes[3] = 1.f;
+//  for(int i = 0; i < BoardInfo::numOfBoards; ++i)
+//  {
+//    lastAck[i] = 0;
+//    lastTimeWhenAck[i] = 0;
+//  }
+//
+//  usSettings.sendInterval = 70;
+//  usSettings.switchInterval = 250;
+//  usSettings.ignoreAfterSwitchInterval = 150;
+//  usSettings.modes.resize(4);
+//  usSettings.modes[0] = 0.f;
+//  usSettings.modes[1] = 2.f;
+//  usSettings.modes[2] = 3.f;
+//  usSettings.modes[3] = 1.f;
 }
 
 NaoProvider::~NaoProvider()
 {
-  NaoProvider::theInstance = 0;
+//  NaoProvider::theInstance = 0;
 }
 
-bool NaoProvider::isFrameDataComplete()
+//bool NaoProvider::isFrameDataComplete()
+//{
+//  return true;
+//}
+//
+//void NaoProvider::waitForFrameData()
+//{
+//  if(theInstance)
+//    theInstance->naoBody.wait();
+//}
+
+void NaoProvider::send(JointRequest &theJointRequest, JointCalibration &theJointCalibration)
 {
-  return true;
-}
+//  DEBUG_RESPONSE("module:NaoProvider:lag100", SystemCall::sleep(100););
+//  DEBUG_RESPONSE("module:NaoProvider:lag200", SystemCall::sleep(200););
+//  DEBUG_RESPONSE("module:NaoProvider:lag300", SystemCall::sleep(200););
+//  DEBUG_RESPONSE("module:NaoProvider:lag1000", SystemCall::sleep(1000););
+//  DEBUG_RESPONSE("module:NaoProvider:lag3000", SystemCall::sleep(3000););
+//  DEBUG_RESPONSE("module:NaoProvider:lag6000", SystemCall::sleep(6000););
+//  DEBUG_RESPONSE("module:NaoProvider:segfault", *(char*)0 = 0;);
+//
+//  DEBUG_RESPONSE("module:NaoProvider:ClippingInfo",
+//  {
+//    for(int i = 0; i < JointData::numOfJoints; ++i)
+//    {
+//      if(i == JointData::RHipYawPitch) // missing on Nao
+//        ++i;
+//
+//      if(theJointRequest.angles[i] != JointData::off)
+//      {
+//        if(theJointRequest.angles[i] > theJointCalibration.joints[i].maxAngle)
+//        {
+//          if(clippedLastFrame[i] != theJointCalibration.joints[i].maxAngle)
+//          {
+//            char tmp[64];
+//            sprintf(tmp, "warning: clipped joint %s at %.03f, requested %.03f.", JointData::getName((JointData::Joint)i), toDegrees(theJointCalibration.joints[i].maxAngle), toDegrees(theJointRequest.angles[i]));
+//            OUTPUT(idText, text, tmp);
+//            clippedLastFrame[i] = theJointCalibration.joints[i].maxAngle;
+//          }
+//        }
+//        else if(theJointRequest.angles[i] < theJointCalibration.joints[i].minAngle)
+//        {
+//          if(clippedLastFrame[i] != theJointCalibration.joints[i].minAngle)
+//          {
+//            char tmp[64];
+//            sprintf(tmp, "warning: clipped joint %s at %.04f, requested %.03f.", JointData::getName((JointData::Joint)i), toDegrees(theJointCalibration.joints[i].minAngle), toDegrees(theJointRequest.angles[i]));
+//            OUTPUT(idText, text, tmp);
+//            clippedLastFrame[i] = theJointCalibration.joints[i].minAngle;
+//          }
+//        }
+//        else
+//          clippedLastFrame[i] = JointData::off;
+//      }
+//    }
+//  });
+//
+//#ifdef MEASURE_DELAY
+//  OutTextFile stream("delay.log", true);
+//  stream << "jointRequest";
+//  stream << theJointRequest.angles[JointData::LHipPitch];
+//  stream << theJointRequest.angles[JointData::LKneePitch];
+//  stream << theJointRequest.angles[JointData::LAnklePitch];
+//  stream << endl;
+//#endif
 
-void NaoProvider::waitForFrameData()
-{
-  if(theInstance)
-    theInstance->naoBody.wait();
-}
-
-void NaoProvider::send()
-{
-  DEBUG_RESPONSE("module:NaoProvider:lag100", SystemCall::sleep(100););
-  DEBUG_RESPONSE("module:NaoProvider:lag200", SystemCall::sleep(200););
-  DEBUG_RESPONSE("module:NaoProvider:lag300", SystemCall::sleep(200););
-  DEBUG_RESPONSE("module:NaoProvider:lag1000", SystemCall::sleep(1000););
-  DEBUG_RESPONSE("module:NaoProvider:lag3000", SystemCall::sleep(3000););
-  DEBUG_RESPONSE("module:NaoProvider:lag6000", SystemCall::sleep(6000););
-  DEBUG_RESPONSE("module:NaoProvider:segfault", *(char*)0 = 0;);
-
-  DEBUG_RESPONSE("module:NaoProvider:ClippingInfo",
-  {
-    for(int i = 0; i < JointData::numOfJoints; ++i)
-    {
-      if(i == JointData::RHipYawPitch) // missing on Nao
-        ++i;
-
-      if(theJointRequest.angles[i] != JointData::off)
-      {
-        if(theJointRequest.angles[i] > theJointCalibration.joints[i].maxAngle)
-        {
-          if(clippedLastFrame[i] != theJointCalibration.joints[i].maxAngle)
-          {
-            char tmp[64];
-            sprintf(tmp, "warning: clipped joint %s at %.03f, requested %.03f.", JointData::getName((JointData::Joint)i), toDegrees(theJointCalibration.joints[i].maxAngle), toDegrees(theJointRequest.angles[i]));
-            OUTPUT(idText, text, tmp);
-            clippedLastFrame[i] = theJointCalibration.joints[i].maxAngle;
-          }
-        }
-        else if(theJointRequest.angles[i] < theJointCalibration.joints[i].minAngle)
-        {
-          if(clippedLastFrame[i] != theJointCalibration.joints[i].minAngle)
-          {
-            char tmp[64];
-            sprintf(tmp, "warning: clipped joint %s at %.04f, requested %.03f.", JointData::getName((JointData::Joint)i), toDegrees(theJointCalibration.joints[i].minAngle), toDegrees(theJointRequest.angles[i]));
-            OUTPUT(idText, text, tmp);
-            clippedLastFrame[i] = theJointCalibration.joints[i].minAngle;
-          }
-        }
-        else
-          clippedLastFrame[i] = JointData::off;
-      }
-    }
-  });
-
-#ifdef MEASURE_DELAY
-  OutTextFile stream("delay.log", true);
-  stream << "jointRequest";
-  stream << theJointRequest.angles[JointData::LHipPitch];
-  stream << theJointRequest.angles[JointData::LKneePitch];
-  stream << theJointRequest.angles[JointData::LAnklePitch];
-  stream << endl;
-#endif
-
-  float* actuators;
-  naoBody.openActuators(actuators);
+//  naoBody.openActuators(actuators);
   int j = 0;
-  ASSERT(headYawPositionActuator == 0);
-  ASSERT(int(JointData::numOfJoints) - 1 == headYawHardnessActuator);
+  int headYawPositionActuator = 0;
+  int headYawHardnessActuator = int(JointData::numOfJoints) - 1;
 
   for(int i = 0; i < JointData::numOfJoints; ++i)
   {
@@ -143,44 +140,43 @@ void NaoProvider::send()
     ++j;
   }
   j += headYawHardnessActuator;
-  ASSERT(j == faceLedRedLeft0DegActuator);
+//  ASSERT(j == faceLedRedLeft0DegActuator);
 
-  const LEDRequest& ledRequest(theLEDRequest);
+//  const LEDRequest& ledRequest(theLEDRequest);
   //checkBoardState(ledRequest);
 
-  bool on = (theJointData.timeStamp / 50 & 8) != 0;
-  bool fastOn = (theJointData.timeStamp / 10 & 8) != 0;
-  for(int i = 0; i < LEDRequest::numOfLEDs; ++i)
-    actuators[j++] = (ledRequest.ledStates[i] == LEDRequest::on ||
-                      (ledRequest.ledStates[i] == LEDRequest::blinking && on) ||
-                      (ledRequest.ledStates[i] == LEDRequest::fastBlinking && fastOn))
-                     ? 1.0f : (ledRequest.ledStates[i] == LEDRequest::half ? 0.5f : 0.0f);
+//  bool on = (theJointData.timeStamp / 50 & 8) != 0;
+//  bool fastOn = (theJointData.timeStamp / 10 & 8) != 0;
+//  for(int i = 0; i < LEDRequest::numOfLEDs; ++i)
+//    actuators[j++] = (ledRequest.ledStates[i] == LEDRequest::on ||
+//                      (ledRequest.ledStates[i] == LEDRequest::blinking && on) ||
+//                      (ledRequest.ledStates[i] == LEDRequest::fastBlinking && fastOn))
+//                     ? 1.0f : (ledRequest.ledStates[i] == LEDRequest::half ? 0.5f : 0.0f);
 
   // set ultrasound mode
-  MODIFY("module:NaoProvider:usSettings", usSettings);
-  if(theJointData.timeStamp - lastUsSendTime >= usSettings.sendInterval - 5)
-  {
-    if(theJointData.timeStamp - lastUsSwitchTime >= usSettings.switchInterval - 5)
-    {
-      currentUsMode = (currentUsMode + 1) % usSettings.modes.size();
-      lastUsSwitchTime = theJointData.timeStamp;
-    }
-    actuators[usActuator] = usSettings.modes[currentUsMode] + 4.f;
-    lastUsSendTime = theJointData.timeStamp;
-  }
-  else
-    actuators[usActuator] = -1.f;
+//  MODIFY("module:NaoProvider:usSettings", usSettings);
+//  if(theJointData.timeStamp - lastUsSendTime >= usSettings.sendInterval - 5)
+//  {
+//    if(theJointData.timeStamp - lastUsSwitchTime >= usSettings.switchInterval - 5)
+//    {
+//      currentUsMode = (currentUsMode + 1) % usSettings.modes.size();
+//      lastUsSwitchTime = theJointData.timeStamp;
+//    }
+//    actuators[usActuator] = usSettings.modes[currentUsMode] + 4.f;
+//    lastUsSendTime = theJointData.timeStamp;
+//  }
+//  else
+//    actuators[usActuator] = -1.f;
 
 
-  naoBody.closeActuators();
+//  naoBody.closeActuators();
 }
 
-void NaoProvider::update(JointData& jointData)
+void NaoProvider::update(JointData& jointData, const JointCalibration &theJointCalibration,
+        SensorData& sensorData, const SensorCalibration &theSensorCalibration, FrameInfo& frameInfo)
 {
-  jointData.cycleTime = 0.01f;
-  jointData.timeStamp = sensorData.timeStamp = SystemCall::getCurrentSystemTime();
-
-  float* sensors = naoBody.getSensors();
+  frameInfo.cycleTime = 0.01f;
+  frameInfo.time = jointData.timeStamp = sensorData.timeStamp = SystemCall::getCurrentSystemTime();
 
   int j = 0;
   for(int i = 0; i < JointData::numOfJoints; ++i)
@@ -240,116 +236,111 @@ void NaoProvider::update(JointData& jointData)
   stream << sensorData.data[SensorData::gyroX] << sensorData.data[SensorData::gyroY] << sensorData.data[SensorData::accX] << sensorData.data[SensorData::accY] << sensorData.data[SensorData::accZ];
 #endif
 
-  for(int i = 0; i < KeyStates::numOfKeys; ++i)
-    keyStates.pressed[i] = sensors[j++] != 0;
-
-  for(int i = 0; i < BoardInfo::numOfBoards; ++i)
-  {
-    boardInfo.ack[i] = (int) sensors[j++];
-    boardInfo.nack[i] = (int) sensors[j++];
-    boardInfo.error[i] = (int) sensors[j++];
-  }
-
-  // modify internal data structure, so checkBoardState is influenced as well
-  MODIFY("representation:BoardInfo", boardInfo);
+//  for(int i = 0; i < KeyStates::numOfKeys; ++i)
+//    keyStates.pressed[i] = sensors[j++] != 0;
+//
+//  for(int i = 0; i < BoardInfo::numOfBoards; ++i)
+//  {
+//    boardInfo.ack[i] = (int) sensors[j++];
+//    boardInfo.nack[i] = (int) sensors[j++];
+//    boardInfo.error[i] = (int) sensors[j++];
+//  }
+//
+//  // modify internal data structure, so checkBoardState is influenced as well
+//  MODIFY("representation:BoardInfo", boardInfo);
 
   // ultasound
-  if(theJointData.timeStamp - lastUsSwitchTime >= usSettings.ignoreAfterSwitchInterval - 5)
-  {
-    if(theJointData.timeStamp - lastUsReadTime >= usSettings.sendInterval - 5)
-    {
-      lastUsReadTime = theJointData.timeStamp;
-      leftUsSensor = sensors[lUsSensor];
-      rightUsSensor = sensors[rUsSensor];
-      leftUsSensor = leftUsSensor == 0.f ? 3000.f : (leftUsSensor * 1000.f);
-      rightUsSensor = rightUsSensor == 0.f ? 3000.f : (rightUsSensor * 1000.f);
-      usActuatorMode = SensorData::UsActuatorMode(int(usSettings.modes[currentUsMode]));
-    }
-  }
-  sensorData.data[SensorData::usL] = leftUsSensor;
-  sensorData.data[SensorData::usR] = rightUsSensor;
-  sensorData.usTimeStamp = lastUsReadTime;
-  sensorData.usActuatorMode = usActuatorMode;
+//  if(theJointData.timeStamp - lastUsSwitchTime >= usSettings.ignoreAfterSwitchInterval - 5)
+//  {
+//    if(theJointData.timeStamp - lastUsReadTime >= usSettings.sendInterval - 5)
+//    {
+//      lastUsReadTime = theJointData.timeStamp;
+//      leftUsSensor = sensors[lUsSensor];
+//      rightUsSensor = sensors[rUsSensor];
+//      leftUsSensor = leftUsSensor == 0.f ? 3000.f : (leftUsSensor * 1000.f);
+//      rightUsSensor = rightUsSensor == 0.f ? 3000.f : (rightUsSensor * 1000.f);
+//      usActuatorMode = SensorData::UsActuatorMode(int(usSettings.modes[currentUsMode]));
+//    }
+//  }
+//  sensorData.data[SensorData::usL] = leftUsSensor;
+//  sensorData.data[SensorData::usR] = rightUsSensor;
+//  sensorData.usTimeStamp = lastUsReadTime;
+//  sensorData.usActuatorMode = usActuatorMode;
 
-  PLOT("module:NaoProvider:usLeft", leftUsSensor);
-  PLOT("module:NaoProvider:usRight", rightUsSensor);
-  PLOT("module:NaoProvider:usLeft2", sensors[lUsSensor] * 1000.f);
-  PLOT("module:NaoProvider:usRight2", sensors[rUsSensor] * 1000.f);
-
-#ifndef RELEASE
-  JointDataDeg jointDataDeg(jointData);
-#endif
-  MODIFY("representation:JointDataDeg", jointDataDeg);
+//  PLOT("module:NaoProvider:usLeft", leftUsSensor);
+//  PLOT("module:NaoProvider:usRight", rightUsSensor);
+//  PLOT("module:NaoProvider:usLeft2", sensors[lUsSensor] * 1000.f);
+//  PLOT("module:NaoProvider:usRight2", sensors[rUsSensor] * 1000.f);
+//
+//#ifndef RELEASE
+//  JointDataDeg jointDataDeg(jointData);
+//#endif
+//  MODIFY("representation:JointDataDeg", jointDataDeg);
 }
 
-void NaoProvider::checkBoardState(LEDRequest& ledRequest)
-{
-  const static LEDRequest::LED leds[BoardInfo::numOfBoards] =
-  {
-    LEDRequest::earsLeft72Deg, // chestBoard
-    LEDRequest::earsRight72Deg, // battery
-    LEDRequest::earsLeft108Deg, // usBoard
-    LEDRequest::earsRight108Deg, // inertialSensor
-    LEDRequest::earsLeft324Deg, // headBoard
-    LEDRequest::faceRightBlue0Deg, // earLeds
-    LEDRequest::earsRight324Deg, // faceBoard
-    LEDRequest::earsLeft0Deg, // leftShoulderBoard
-    LEDRequest::earsLeft36Deg, //leftArmBoard
-    LEDRequest::earsRight0Deg, // rightShoulderBoard
-    LEDRequest::earsRight36Deg, // rightArmBoard
-    LEDRequest::earsLeft288Deg, // leftHipBoard
-    LEDRequest::earsLeft252Deg, //leftThighBoard
-    LEDRequest::earsLeft216Deg, // leftShinBoard
-    LEDRequest::earsLeft180Deg, // leftFootBoard
-    LEDRequest::earsRight288Deg, // rightHipBoard
-    LEDRequest::earsRight252Deg, // rightThighBoard
-    LEDRequest::earsRight216Deg, // rightShinBoard
-    LEDRequest::earsRight180Deg // rightFootBoard
-  };
+//void NaoProvider::checkBoardState(LEDRequest& ledRequest)
+//{
+//  const static LEDRequest::LED leds[BoardInfo::numOfBoards] =
+//  {
+//    LEDRequest::earsLeft72Deg, // chestBoard
+//    LEDRequest::earsRight72Deg, // battery
+//    LEDRequest::earsLeft108Deg, // usBoard
+//    LEDRequest::earsRight108Deg, // inertialSensor
+//    LEDRequest::earsLeft324Deg, // headBoard
+//    LEDRequest::faceRightBlue0Deg, // earLeds
+//    LEDRequest::earsRight324Deg, // faceBoard
+//    LEDRequest::earsLeft0Deg, // leftShoulderBoard
+//    LEDRequest::earsLeft36Deg, //leftArmBoard
+//    LEDRequest::earsRight0Deg, // rightShoulderBoard
+//    LEDRequest::earsRight36Deg, // rightArmBoard
+//    LEDRequest::earsLeft288Deg, // leftHipBoard
+//    LEDRequest::earsLeft252Deg, //leftThighBoard
+//    LEDRequest::earsLeft216Deg, // leftShinBoard
+//    LEDRequest::earsLeft180Deg, // leftFootBoard
+//    LEDRequest::earsRight288Deg, // rightHipBoard
+//    LEDRequest::earsRight252Deg, // rightThighBoard
+//    LEDRequest::earsRight216Deg, // rightShinBoard
+//    LEDRequest::earsRight180Deg // rightFootBoard
+//  };
+//
+//  unsigned now = SystemCall::getCurrentSystemTime();
+//  bool camera = now - theCognitionFrameInfo.time < 2000,
+//       error = !camera;
+//
+//  int i;
+//  for(i = 0; i < BoardInfo::numOfBoards; ++i)
+//  {
+//    if(lastAck[i] != boardInfo.ack[i])
+//    {
+//      lastTimeWhenAck[i] = now;
+//      lastAck[i] = boardInfo.ack[i];
+//    }
+//    if(now - lastTimeWhenAck[i] > 2000 || (boardInfo.error[i] && (boardInfo.error[i] & 0xf0) != 0xd0))
+//      error = true;
+//  }
+//
+//  if(error)
+//  {
+//    for(i = 0; i < LEDRequest::chestRed; ++i)
+//      ledRequest.ledStates[i] = LEDRequest::off;
+//
+//    for(i = 0; i < BoardInfo::numOfBoards; ++i)
+//      if(now - lastTimeWhenAck[i] > 2000 || (boardInfo.error[i] && (boardInfo.error[i] & 0xf0) != 0xd0))
+//        ledRequest.ledStates[leds[i]] = LEDRequest::on;
+//      else
+//        ledRequest.ledStates[leds[i]] = LEDRequest::blinking;
+//
+//    for(i = LEDRequest::faceLeftBlue0Deg; i < LEDRequest::faceRightRed0Deg; ++i)
+//      ledRequest.ledStates[i] = camera ? LEDRequest::off : LEDRequest::blinking;
+//
+//    bool ear = ledRequest.ledStates[LEDRequest::faceRightBlue0Deg] != LEDRequest::on;
+//    for(i = LEDRequest::faceRightBlue0Deg; i < LEDRequest::LEDRequest::earsLeft0Deg; ++i)
+//      ledRequest.ledStates[i] = ear ? LEDRequest::off : LEDRequest::blinking;
+//  }
+//}
 
-  unsigned now = SystemCall::getCurrentSystemTime();
-  bool camera = now - theCognitionFrameInfo.time < 2000,
-       error = !camera;
-
-  int i;
-  for(i = 0; i < BoardInfo::numOfBoards; ++i)
-  {
-    if(lastAck[i] != boardInfo.ack[i])
-    {
-      lastTimeWhenAck[i] = now;
-      lastAck[i] = boardInfo.ack[i];
-    }
-    if(now - lastTimeWhenAck[i] > 2000 || (boardInfo.error[i] && (boardInfo.error[i] & 0xf0) != 0xd0))
-      error = true;
-  }
-
-  if(error)
-  {
-    for(i = 0; i < LEDRequest::chestRed; ++i)
-      ledRequest.ledStates[i] = LEDRequest::off;
-
-    for(i = 0; i < BoardInfo::numOfBoards; ++i)
-      if(now - lastTimeWhenAck[i] > 2000 || (boardInfo.error[i] && (boardInfo.error[i] & 0xf0) != 0xd0))
-        ledRequest.ledStates[leds[i]] = LEDRequest::on;
-      else
-        ledRequest.ledStates[leds[i]] = LEDRequest::blinking;
-
-    for(i = LEDRequest::faceLeftBlue0Deg; i < LEDRequest::faceRightRed0Deg; ++i)
-      ledRequest.ledStates[i] = camera ? LEDRequest::off : LEDRequest::blinking;
-
-    bool ear = ledRequest.ledStates[LEDRequest::faceRightBlue0Deg] != LEDRequest::on;
-    for(i = LEDRequest::faceRightBlue0Deg; i < LEDRequest::LEDRequest::earsLeft0Deg; ++i)
-      ledRequest.ledStates[i] = ear ? LEDRequest::off : LEDRequest::blinking;
-  }
-}
-
-void NaoProvider::finishFrame()
-{
-  if(theInstance)
-    theInstance->send();
-}
-
-
-#endif // TARGET_ROBOT
-
-MAKE_MODULE(NaoProvider, Infrastructure)
+//void NaoProvider::finishFrame()
+//{
+//  if(theInstance)
+//    theInstance->send();
+//}

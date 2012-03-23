@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Tools/Module/Module.h"
+//#include "Tools/Module/Module.h"
 #include "Tools/RingBufferWithSum.h"
 #include "Representations/Infrastructure/SensorData.h"
 #include "Representations/Infrastructure/FrameInfo.h"
@@ -17,19 +17,19 @@
 #include "Representations/MotionControl/MotionInfo.h"
 #include "Representations/MotionControl/MotionRequest.h"
 
-MODULE(GroundContactDetector)
-  REQUIRES(SensorData)
-  REQUIRES(FrameInfo)
-  REQUIRES(MotionRequest)
-  USES(MotionInfo)
-  PROVIDES_WITH_MODIFY(GroundContactState)
-END_MODULE
+//MODULE(GroundContactDetector)
+//  REQUIRES(SensorData)
+//  REQUIRES(FrameInfo)
+//  REQUIRES(MotionRequest)
+//  USES(MotionInfo)
+//  PROVIDES_WITH_MODIFY(GroundContactState)
+//END_MODULE
 
 /**
 * @class GroundContactDetector
 * A module for sensor data filtering.
 */
-class GroundContactDetector : public GroundContactDetectorBase
+class GroundContactDetector //: public GroundContactDetectorBase
 {
 public:
   /** Default constructor. */

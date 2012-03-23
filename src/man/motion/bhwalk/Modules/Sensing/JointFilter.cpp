@@ -6,14 +6,14 @@
 
 #include "JointFilter.h"
 
-MAKE_MODULE(JointFilter, Sensing)
+//MAKE_MODULE(JointFilter, Sensing)
+//
+//void JointFilter::update(FilteredJointDataPrev& filteredJointDataPrev)
+//{
+//  (FilteredJointData&) filteredJointDataPrev = theFilteredJointData;
+//}
 
-void JointFilter::update(FilteredJointDataPrev& filteredJointDataPrev)
-{
-  (FilteredJointData&) filteredJointDataPrev = theFilteredJointData;
-}
-
-void JointFilter::update(FilteredJointData& filteredJointData)
+void JointFilter::update(FilteredJointData& filteredJointData, const JointData& theJointData)
 {
   for(int i = 0; i < JointData::numOfJoints; ++i)
     if(theJointData.angles[i] != JointData::off)

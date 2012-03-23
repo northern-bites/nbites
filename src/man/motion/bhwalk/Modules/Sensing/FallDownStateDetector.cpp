@@ -8,10 +8,10 @@
 
 #include "FallDownStateDetector.h"
 #include "Representations/Infrastructure/JointData.h"
-#include "Platform/SoundPlayer.h"
+//#include "Platform/SoundPlayer.h"
 #include "Tools/Streams/InStreams.h"
-#include "Tools/Settings.h"
-#include "Tools/Debugging/DebugDrawings.h"
+//#include "Tools/Settings.h"
+//#include "Tools/Debugging/DebugDrawings.h"
 
 FallDownStateDetector::FallDownStateDetector()
 {
@@ -33,10 +33,12 @@ FallDownStateDetector::FallDownStateDetector()
   lastFallDetected = (unsigned int) - parameters.fallTime;
 }
 
-void FallDownStateDetector::update(FallDownState& fallDownState)
+void FallDownStateDetector::update(FallDownState& fallDownState,
+        const FilteredSensorData& theFilteredSensorData,
+        const FrameInfo& theFrameInfo)
 {
-  DECLARE_PLOT("module:FallDownStateDetector:accelerationAngleXZ");
-  DECLARE_PLOT("module:FallDownStateDetector:accelerationAngleYZ");
+//  DECLARE_PLOT("module:FallDownStateDetector:accelerationAngleXZ");
+//  DECLARE_PLOT("module:FallDownStateDetector:accelerationAngleYZ");
 
   // Buffer data:
   buffers[accX].add(theFilteredSensorData.data[SensorData::accX]);
@@ -49,13 +51,13 @@ void FallDownStateDetector::update(FallDownState& fallDownState)
   float accZaverage(buffers[accZ].getAverage());
   float accelerationAngleXZ(atan2(accZaverage, accXaverage));
   float accelerationAngleYZ(atan2(accZaverage, accYaverage));
-  MODIFY("module:FallDownStateDetector:accX",  accXaverage);
-  MODIFY("module:FallDownStateDetector:accY",  accYaverage);
-  MODIFY("module:FallDownStateDetector:accZ",  accZaverage);
-  MODIFY("module:FallDownStateDetector:accAngleXZ", accelerationAngleXZ);
-  MODIFY("module:FallDownStateDetector:accAngleYZ", accelerationAngleYZ);
-  PLOT("module:FallDownStateDetector:accelerationAngleXZ", accelerationAngleXZ);
-  PLOT("module:FallDownStateDetector:accelerationAngleYZ", accelerationAngleYZ);
+//  MODIFY("module:FallDownStateDetector:accX",  accXaverage);
+//  MODIFY("module:FallDownStateDetector:accY",  accYaverage);
+//  MODIFY("module:FallDownStateDetector:accZ",  accZaverage);
+//  MODIFY("module:FallDownStateDetector:accAngleXZ", accelerationAngleXZ);
+//  MODIFY("module:FallDownStateDetector:accAngleYZ", accelerationAngleYZ);
+//  PLOT("module:FallDownStateDetector:accelerationAngleXZ", accelerationAngleXZ);
+//  PLOT("module:FallDownStateDetector:accelerationAngleYZ", accelerationAngleYZ);
 
   fallDownState.odometryRotationOffset = 0;
 
@@ -168,49 +170,49 @@ bool FallDownStateDetector::isUprightOrStaggering(FallDownState& fallDownState)
 
 bool FallDownStateDetector::isGettingUp()
 {
-  return theMotionInfo.motion == MotionRequest::specialAction
-         && (theMotionInfo.specialActionRequest.specialAction == SpecialActionRequest::standUpFrontNao
-             || theMotionInfo.specialActionRequest.specialAction == SpecialActionRequest::standUpBackNao);
+//  return theMotionInfo.motion == MotionRequest::specialAction
+//         && (theMotionInfo.specialActionRequest.specialAction == SpecialActionRequest::standUpFrontNao
+//             || theMotionInfo.specialActionRequest.specialAction == SpecialActionRequest::standUpBackNao);
 }
 
 bool FallDownStateDetector::specialSpecialAction()
 {
-  return theMotionInfo.motion == MotionRequest::specialAction
-          && theMotionInfo.specialActionRequest.specialAction == SpecialActionRequest::playDead;
+//  return theMotionInfo.motion == MotionRequest::specialAction
+//          && theMotionInfo.specialActionRequest.specialAction == SpecialActionRequest::playDead;
 }
 
 bool FallDownStateDetector::isStaggering()
 {
-  return abs(theFilteredSensorData.data[SensorData::angleX]) >= parameters.staggeringAngleX + pi_180
-         || abs(theFilteredSensorData.data[SensorData::angleY]) >= parameters.staggeringAngleY + pi_180;
+//  return abs(theFilteredSensorData.data[SensorData::angleX]) >= parameters.staggeringAngleX + pi_180
+//         || abs(theFilteredSensorData.data[SensorData::angleY]) >= parameters.staggeringAngleY + pi_180;
 }
 
 bool FallDownStateDetector::isFalling()
 {
-  return abs(theFilteredSensorData.data[SensorData::angleX]) >= parameters.fallDownAngleX
-         || abs(theFilteredSensorData.data[SensorData::angleY]) >= parameters.fallDownAngleY;
+//  return abs(theFilteredSensorData.data[SensorData::angleX]) >= parameters.fallDownAngleX
+//         || abs(theFilteredSensorData.data[SensorData::angleY]) >= parameters.fallDownAngleY;
 }
 
 bool FallDownStateDetector::isCalibrated()
 {
-  return theInertiaSensorData.calibrated;
+//  return theInertiaSensorData.calibrated;
 }
 
 bool FallDownStateDetector::impact(FallDownState& fallDownState)
 {
-  switch(fallDownState.direction)
-  {
-  case FallDownState::back:
-    return theFilteredSensorData.accX < -1.15f;
-  case FallDownState::front:
-    return theFilteredSensorData.accX > 1.15f;
-  case FallDownState::left:
-    return theFilteredSensorData.accY < -1.15f;
-  case FallDownState::right:
-    return theFilteredSensorData.accY < -1.15f;
-  default:
-    return false;
-  }
+//  switch(fallDownState.direction)
+//  {
+//  case FallDownState::back:
+//    return theFilteredSensorData.accX < -1.15f;
+//  case FallDownState::front:
+//    return theFilteredSensorData.accX > 1.15f;
+//  case FallDownState::left:
+//    return theFilteredSensorData.accY < -1.15f;
+//  case FallDownState::right:
+//    return theFilteredSensorData.accY < -1.15f;
+//  default:
+//    return false;
+//  }
 }
 
 FallDownState::Direction FallDownStateDetector::directionOf(float angleX, float angleY)
@@ -240,4 +242,4 @@ FallDownState::Sidestate FallDownStateDetector::sidewardsOf(FallDownState::Direc
   }
 }
 
-MAKE_MODULE(FallDownStateDetector, Sensing)
+//MAKE_MODULE(FallDownStateDetector, Sensing)

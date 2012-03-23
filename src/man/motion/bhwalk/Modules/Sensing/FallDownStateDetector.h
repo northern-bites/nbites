@@ -13,17 +13,17 @@
 #include "Representations/MotionControl/MotionInfo.h"
 #include "Representations/Modeling/FallDownState.h"
 #include "Representations/Sensing/InertiaSensorData.h"
-#include "Tools/Module/Module.h"
+//#include "Tools/Module/Module.h"
 #include "Tools/RingBufferWithSum.h"
 
 
-MODULE(FallDownStateDetector)
-  REQUIRES(FilteredSensorData)
-  REQUIRES(InertiaSensorData)
-  USES(MotionInfo)
-  REQUIRES(FrameInfo)
-  PROVIDES_WITH_MODIFY_AND_DRAW(FallDownState)
-END_MODULE
+//MODULE(FallDownStateDetector)
+//  REQUIRES(FilteredSensorData)
+//  REQUIRES(InertiaSensorData)
+//  USES(MotionInfo)
+//  REQUIRES(FrameInfo)
+//  PROVIDES_WITH_MODIFY_AND_DRAW(FallDownState)
+//END_MODULE
 
 
 /**
@@ -31,7 +31,7 @@ END_MODULE
 *
 * A module for computing the current body state from sensor data
 */
-class FallDownStateDetector: public FallDownStateDetectorBase
+class FallDownStateDetector //: public FallDownStateDetectorBase
 {
 private:
   /**
@@ -63,11 +63,13 @@ private:
   };
 
   Parameters parameters; /**< The parameters of this module. */
-
+  public:
   /** Executes this module
   * @param fallDownState The data structure that is filled by this module
   */
-  void update(FallDownState& fallDownState);
+  void update(FallDownState& fallDownState,
+          const FilteredSensorData& theFilteredSensorData,
+          const FrameInfo& theFrameInfo);
 
   bool isGettingUp();
   bool isFalling();

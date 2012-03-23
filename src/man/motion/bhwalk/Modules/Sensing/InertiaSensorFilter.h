@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Tools/Module/Module.h"
+//#include "Tools/Module/Module.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Sensing/InertiaSensorData.h"
 #include "Representations/Sensing/OrientationData.h"
@@ -14,21 +14,21 @@
 #include "Tools/Math/Pose3D.h"
 #include "Tools/Math/Matrix3x3.h"
 
-MODULE(InertiaSensorFilter)
-  REQUIRES(FrameInfo)
-  REQUIRES(InertiaSensorData)
-  REQUIRES(RobotModel)
-  REQUIRES(SensorData)
-  USES(MotionInfo)
-  USES(WalkingEngineOutput)
-  PROVIDES_WITH_MODIFY(OrientationData)
-END_MODULE
+//MODULE(InertiaSensorFilter)
+//  REQUIRES(FrameInfo)
+//  REQUIRES(InertiaSensorData)
+//  REQUIRES(RobotModel)
+//  REQUIRES(SensorData)
+//  USES(MotionInfo)
+//  USES(WalkingEngineOutput)
+//  PROVIDES_WITH_MODIFY(OrientationData)
+//END_MODULE
 
 /**
 * @class InertiaSensorFilter
 * A module for estimating velocity and orientation of the torso.
 */
-class InertiaSensorFilter : public InertiaSensorFilterBase
+class InertiaSensorFilter //: public InertiaSensorFilterBase
 {
 public:
   /** Default constructor. */
@@ -124,11 +124,18 @@ private:
   Matrix3x3<> readingsCov;
   Matrix3x2<> readingsSigmaPointsCov;
 
+  public:
   /**
   * Updates the OrientationData representation.
   * @param orientationData The orientation data representation which is updated by this module.
   */
-  void update(OrientationData& orientationData);
+  void update(OrientationData& orientationData,
+          const InertiaSensorData& theInertiaSensorData,
+          const SensorData& theSensorData,
+          const RobotModel& theRobotModel,
+          const FrameInfo& theFrameInfo,
+          const MotionInfo& theMotionInfo,
+          const WalkingEngineOutput& theWalkingEngineOutput);
 
   /**
   * Restores the initial state.

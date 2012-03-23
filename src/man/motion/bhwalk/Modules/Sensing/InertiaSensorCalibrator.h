@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Tools/Module/Module.h"
+//#include "Tools/Module/Module.h"
 #include "Tools/RingBuffer.h"
 #include "Tools/RingBufferWithSum.h"
 #include "Tools/Math/Kalman.h"
@@ -21,25 +21,25 @@
 #include "Representations/Configuration/JointCalibration.h"
 #include "Representations/Configuration/DamageConfiguration.h"
 
-MODULE(InertiaSensorCalibrator)
-  REQUIRES(InspectedInertiaSensorData)
-  REQUIRES(RobotModel)
-  REQUIRES(FrameInfo)
-  REQUIRES(RobotInfo)
-  REQUIRES(GroundContactState)
-  REQUIRES(JointCalibration)
-  REQUIRES(DamageConfiguration)
-  USES(MotionSelection)
-  USES(MotionInfo)
-  USES(WalkingEngineOutput)
-  PROVIDES_WITH_MODIFY(InertiaSensorData)
-END_MODULE
+//MODULE(InertiaSensorCalibrator)
+//  REQUIRES(InspectedInertiaSensorData)
+//  REQUIRES(RobotModel)
+//  REQUIRES(FrameInfo)
+//  REQUIRES(RobotInfo)
+//  REQUIRES(GroundContactState)
+//  REQUIRES(JointCalibration)
+//  REQUIRES(DamageConfiguration)
+//  USES(MotionSelection)
+//  USES(MotionInfo)
+//  USES(WalkingEngineOutput)
+//  PROVIDES_WITH_MODIFY(InertiaSensorData)
+//END_MODULE
 
 /**
 * @class InertiaSensorCalibrator
 * A module for determining the bias of the inertia sensor readings.
 */
-class InertiaSensorCalibrator : public InertiaSensorCalibratorBase
+class InertiaSensorCalibrator //: public InertiaSensorCalibratorBase
 {
 public:
   /** Default constructor. */
@@ -139,9 +139,18 @@ private:
   */
   void reset();
 
+  public:
   /**
   * Updates the InertiaSensorData representation.
   * @param inertiaSensorData The inertia sensor data representation which is updated by this module.
   */
-  void update(InertiaSensorData& inertiaSensorData);
+  void update(InertiaSensorData& inertiaSensorData,
+          const InspectedInertiaSensorData& theInspectedInertiaSensorData,
+          const FrameInfo& theFrameInfo,
+          const RobotModel& theRobotModel,
+          const GroundContactState& theGroundContactState,
+          const MotionSelection& theMotionSelection,
+          const MotionInfo& theMotionInfo,
+          const WalkingEngineOutput& theWalkingEngineOutput,
+          const DamageConfiguration& theDamageConfiguration);
 };

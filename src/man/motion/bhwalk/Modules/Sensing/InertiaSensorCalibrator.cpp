@@ -7,7 +7,7 @@
 #include "InertiaSensorCalibrator.h"
 #include "Tools/Math/Pose3D.h"
 
-MAKE_MODULE(InertiaSensorCalibrator, Sensing)
+//MAKE_MODULE(InertiaSensorCalibrator, Sensing)
 
 InertiaSensorCalibrator::InertiaSensorCalibrator()
 {
@@ -34,9 +34,17 @@ void InertiaSensorCalibrator::reset()
   inertiaSensorDrops = 1000;
 }
 
-void InertiaSensorCalibrator::update(InertiaSensorData& inertiaSensorData)
+void InertiaSensorCalibrator::update(InertiaSensorData& inertiaSensorData,
+        const InspectedInertiaSensorData& theInspectedInertiaSensorData,
+        const FrameInfo& theFrameInfo,
+        const RobotModel& theRobotModel,
+        const GroundContactState& theGroundContactState,
+        const MotionSelection& theMotionSelection,
+        const MotionInfo& theMotionInfo,
+        const WalkingEngineOutput& theWalkingEngineOutput,
+        const DamageConfiguration& theDamageConfiguration)
 {
-  MODIFY("module:InertiaSensorCalibrator:parameters", p);
+//  MODIFY("module:InertiaSensorCalibrator:parameters", p);
 
   // frame time check
   if(theFrameInfo.time <= lastTime)
@@ -105,8 +113,9 @@ void InertiaSensorCalibrator::update(InertiaSensorData& inertiaSensorData)
   else if(currentMotion != MotionRequest::walk && currentMotion != MotionRequest::stand &&
           !(currentMotion == MotionRequest::specialAction && theMotionSelection.specialActionRequest.specialAction == SpecialActionRequest::sitDownKeeper))
     unstable = true;
-  else if(theRobotInfo.penalty != PENALTY_NONE)
-    unstable = true;
+// TODO: use robot info or tell when we're penalized
+//  else if(theRobotInfo.penalty != PENALTY_NONE)
+//    unstable = true;
   else if(accValues.getNumberOfEntries() >= accValues.getMaxEntries())
     unstable = true;
 
@@ -224,12 +233,12 @@ void InertiaSensorCalibrator::update(InertiaSensorData& inertiaSensorData)
     inertiaSensorData.acc.z = newAcc.z - accZBias.value;
   }
 
-  MODIFY("module:InertiaSensorCalibrator:calibrated", calibrated);
-  MODIFY("module:InertiaSensorCalibrator:gyroXBias", gyroXBias.value);
-  MODIFY("module:InertiaSensorCalibrator:gyroYBias", gyroYBias.value);
-  MODIFY("module:InertiaSensorCalibrator:accXBias", accXBias.value);
-  MODIFY("module:InertiaSensorCalibrator:accYBias", accYBias.value);
-  MODIFY("module:InertiaSensorCalibrator:accZBias", accZBias.value);
+//  MODIFY("module:InertiaSensorCalibrator:calibrated", calibrated);
+//  MODIFY("module:InertiaSensorCalibrator:gyroXBias", gyroXBias.value);
+//  MODIFY("module:InertiaSensorCalibrator:gyroYBias", gyroYBias.value);
+//  MODIFY("module:InertiaSensorCalibrator:accXBias", accXBias.value);
+//  MODIFY("module:InertiaSensorCalibrator:accYBias", accYBias.value);
+//  MODIFY("module:InertiaSensorCalibrator:accZBias", accZBias.value);
 
   // store some values for the next iteration
   lastTime = theFrameInfo.time;

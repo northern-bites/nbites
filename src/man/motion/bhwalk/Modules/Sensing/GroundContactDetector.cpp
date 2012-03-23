@@ -7,12 +7,12 @@
 */
 
 #include "GroundContactDetector.h"
-#include "Tools/Debugging/DebugDrawings.h"
+//#include "Tools/Debugging/DebugDrawings.h"
 #include "Tools/Streams/InStreams.h"
-#include "Tools/Settings.h"
-#include "Platform/SoundPlayer.h"
+//#include "Tools/Settings.h"
+//#include "Platform/SoundPlayer.h"
 
-MAKE_MODULE(GroundContactDetector, Sensing)
+//MAKE_MODULE(GroundContactDetector, Sensing)
 
 GroundContactDetector::GroundContactDetector() :
   contact(true), lastContact(true), contactStartTime(0), noContactStartTime(0)
@@ -101,17 +101,17 @@ struct GroundContactDetector::ContactState GroundContactDetector::checkLoad()
   PLOT("module:GroundContactDetector:contactLoadSum", loadSum);
 
   state.contact = loadSum > p.loadThreshold;
-  //max angleY: pi_4 (45°)
+  //max angleY: pi_4 (45ï¿½)
   state.confidence = 1 - min(abs(theSensorData.data[SensorData::angleY]), pi_4) / pi_4;
   return state;
 }
 
 void GroundContactDetector::update(GroundContactState& groundContactState)
 {
-  MODIFY("module:GroundContactDetector:parameters", p);
-  PLOT("module:GroundContactDetector:groundContact", groundContactState.contact ? 0.75 : 0.25);
-  PLOT("module:GroundContactDetector:groundContactSafe", groundContactState.contactSafe ? 0.75 : 0.25);
-  PLOT("module:GroundContactDetector:noGroundContactSafe", groundContactState.noContactSafe ? 0.75 : 0.25);
+//  MODIFY("module:GroundContactDetector:parameters", p);
+//  PLOT("module:GroundContactDetector:groundContact", groundContactState.contact ? 0.75 : 0.25);
+//  PLOT("module:GroundContactDetector:groundContactSafe", groundContactState.contactSafe ? 0.75 : 0.25);
+//  PLOT("module:GroundContactDetector:noGroundContactSafe", groundContactState.noContactSafe ? 0.75 : 0.25);
 
 #ifdef TARGET_ROBOT
   if(p.forceContact)
@@ -128,13 +128,13 @@ void GroundContactDetector::update(GroundContactState& groundContactState)
   ContactState stateFsrRight = checkFsr(false);
   ContactState stateLoad = checkLoad();
   // contact plots
-  PLOT("module:GroundContactDetector:contactLoad", stateLoad.contact ? 0.75 : 0.25);
-  PLOT("module:GroundContactDetector:contactFsrLeft", stateFsrLeft.contact ? 0.75 : 0.25);
-  PLOT("module:GroundContactDetector:contactFsrRight", stateFsrRight.contact ? 0.75 : 0.25);
+//  PLOT("module:GroundContactDetector:contactLoad", stateLoad.contact ? 0.75 : 0.25);
+//  PLOT("module:GroundContactDetector:contactFsrLeft", stateFsrLeft.contact ? 0.75 : 0.25);
+//  PLOT("module:GroundContactDetector:contactFsrRight", stateFsrRight.contact ? 0.75 : 0.25);
   // confidence plots
-  PLOT("module:GroundContactDetector:confidenceLoad", stateLoad.confidence);
-  PLOT("module:GroundContactDetector:confidenceFsrLeft", stateFsrLeft.confidence);
-  PLOT("module:GroundContactDetector:confidenceFsrRight", stateFsrRight.confidence);
+//  PLOT("module:GroundContactDetector:confidenceLoad", stateLoad.confidence);
+//  PLOT("module:GroundContactDetector:confidenceFsrLeft", stateFsrLeft.confidence);
+//  PLOT("module:GroundContactDetector:confidenceFsrRight", stateFsrRight.confidence);
 
   float confidenceContact = 0.f;
   float confidenceNoContact = 0.f;
@@ -153,10 +153,10 @@ void GroundContactDetector::update(GroundContactState& groundContactState)
     contact = false;
 
   groundContactState.contact = contact || theMotionRequest.motion == MotionRequest::specialAction || theMotionInfo.motion == MotionRequest::specialAction;
-  PLOT("module:GroundContactDetector:contactThreshold", BUFFER_SIZE * p.contactThreshold);
-  PLOT("module:GroundContactDetector:noContactThreshold", BUFFER_SIZE * p.noContactThreshold);
-  PLOT("module:GroundContactDetector:confidenceContact", confidenceContactBuffer.getSum());
-  PLOT("module:GroundContactDetector:confidenceNoContact", confidenceNoContactBuffer.getSum());
+//  PLOT("module:GroundContactDetector:contactThreshold", BUFFER_SIZE * p.contactThreshold);
+//  PLOT("module:GroundContactDetector:noContactThreshold", BUFFER_SIZE * p.noContactThreshold);
+//  PLOT("module:GroundContactDetector:confidenceContact", confidenceContactBuffer.getSum());
+//  PLOT("module:GroundContactDetector:confidenceNoContact", confidenceNoContactBuffer.getSum());
 
   if((contact && !lastContact) || (contact && contactStartTime == 0))
     contactStartTime = theFrameInfo.time;

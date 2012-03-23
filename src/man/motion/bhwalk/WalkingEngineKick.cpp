@@ -265,7 +265,7 @@ bool WalkingEngineKick::load(const char* filePath, char* buf)
     }
     catch(ParseException e)
     {
-      OUTPUT(idText, text, filePath << ":" << lineNumber << ": " << e.message);
+//      OUTPUT(idText, text, filePath << ":" << lineNumber << ": " << e.message);
       (void)e;
       error = true;
     }
@@ -282,7 +282,7 @@ bool WalkingEngineKick::load(const char* filePath, char* buf)
   {
     for(int i = 0; i < numOfTracks; ++i)
       tracks[i].clear();
-    OUTPUT(idText, text, filePath << ": failed to load file");
+//    OUTPUT(idText, text, filePath << ": failed to load file");
     return false;
   }
 

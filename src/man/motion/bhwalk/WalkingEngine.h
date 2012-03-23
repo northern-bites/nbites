@@ -7,6 +7,14 @@
 #pragma once
 
 //#include "Tools/Module/Module.h"
+#include "Modules/Infrastructure/NaoProvider.h"
+#include "Modules/Sensing/JointFilter.h"
+#include "Modules/Sensing/RobotModelProvider.h"
+#include "Modules/Sensing/TorsoMatrixProvider.h"
+#include "Modules/Sensing/InertiaSensorInspector.h"
+#include "Modules/Sensing/InertiaSensorCalibrator.h"
+#include "Modules/Sensing/InertiaSensorFilter.h"
+//#include "Modules/Sensing/GroundContactDetector.h"
 #include "Representations/Configuration/RobotDimensions.h"
 #include "Representations/Configuration/MassCalibration.h"
 #include "Representations/Configuration/JointCalibration.h"
@@ -537,11 +545,63 @@ private:
 
   void init();
 
+  //read from config
+  JointCalibration theJointCalibration;
+  SensorCalibration theSensorCalibration;
+  MassCalibration theMassCalibration;
+  RobotDimensions theRobotDimensions;
+
+  //get these from robot using NaoProvider
+  JointData theJointData;
+  SensorData theSensorData;
+  FrameInfo theFrameInfo;
+  NaoProvider naoProvider;
+
+  //filtered joint data from the joint filter
+  FilteredJointData theFilteredJointData;
+  JointFilter jointFilter;
+
+  RobotModel theRobotModel;
+  RobotModelProvider robotModelProvider;
+
+  //not using this ATM - assume we're contacting the ground safely
+//  GroundContactDetector groundContactDetector;
+  GroundContactState theGroundContactState;
+
+  //removes faulty deviant sensor data
+  InspectedInertiaSensorData theInspectedInertiaSensorData;
+  InertiaSensorInspector inertiaSensorInspector;
+
+  //damage configuration is never configured - always says we should use the ground contact state
+  //potentially a problem for broken robots! (maybe we should alawys not trust it?)
+  DamageConfiguration theDamageConfiguration;
+  InertiaSensorData theInertiaSensorData;
+  InertiaSensorCalibrator inertiaSensorCalibrator;
+
+  OrientationData theOrientationData;
+  InertiaSensorFilter inertiaSensorFilter;
+
+  FilteredSensorData theFilteredSensorData;
+  SensorFilter sensorFilter;
+
+  FallDownState theFallDownState;
+  FallDownStateDetector fallDownStateDetector;
+
+  TorsoMatrix theTorsoMatrix;
+  TorsoMatrixProvider torsoMatrixProvider;
+
+  JointRequest theJointRequest;
+  WalkingEngineOutput walkingEngineOutput;
+
+  MotionSelection theMotionSelection;
+  MotionInfo theMotionInfo;
+  MotionRequest theMotionRequest;
+
   /**
   * The central update method to generate the walking motion
   * @param walkingEngineOutput The WalkingEngineOutput (mainly the resulting joint angles)
   */
-  void update(WalkingEngineOutput& walkingEngineOutput);
+  void update();
   bool emergencyShutOff;
   MotionType currentMotionType;
   float currentRefX;
