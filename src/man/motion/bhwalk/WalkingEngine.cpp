@@ -148,6 +148,13 @@ void WalkingEngine::init()
     else
       p.computeContants();
   }
+  //TODO: make the ground contact detector work
+  //right now the ground contact detection is off - trick motion into thinking it's broken
+  theDamageConfiguration.useGroundContactDetection = false;
+  theDamageConfiguration.useGroundContactDetectionForLEDs = false;
+  theDamageConfiguration.useGroundContactDetectionForSafeStates = false;
+  theDamageConfiguration.useGroundContactDetectionForSensorCalibration = false;
+
 #ifdef TARGET_SIM
   p.observerMeasurementDelay = 60.f;
 #endif

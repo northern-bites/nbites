@@ -572,8 +572,8 @@ private:
   InspectedInertiaSensorData theInspectedInertiaSensorData;
   InertiaSensorInspector inertiaSensorInspector;
 
-  //damage configuration is never configured - always says we should use the ground contact state
-  //potentially a problem for broken robots! (maybe we should alawys not trust it?)
+  //damage configuration should say we don't trust the ground contact state
+  //that's because the ground contact detector is not in use currently;
   DamageConfiguration theDamageConfiguration;
   InertiaSensorData theInertiaSensorData;
   InertiaSensorCalibrator inertiaSensorCalibrator;
