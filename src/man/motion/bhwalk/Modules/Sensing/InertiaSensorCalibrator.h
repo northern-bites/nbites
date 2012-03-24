@@ -11,7 +11,7 @@
 #include "Tools/RingBufferWithSum.h"
 #include "Tools/Math/Kalman.h"
 #include "Representations/Infrastructure/FrameInfo.h"
-#include "Representations/Infrastructure/RobotInfo.h"
+//#include "Representations/Infrastructure/RobotInfo.h"
 #include "Representations/Sensing/InertiaSensorData.h"
 #include "Representations/Sensing/RobotModel.h"
 #include "Representations/Sensing/GroundContactState.h"

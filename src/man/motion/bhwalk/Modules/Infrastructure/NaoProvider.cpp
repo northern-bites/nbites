@@ -9,6 +9,7 @@
 #include <cstdio>
 
 #include "NaoProvider.h"
+#include "Platform/SystemCall.h"
 
 #ifdef MEASURE_DELAY
 #include "Tools/Streams/InStreams.h"

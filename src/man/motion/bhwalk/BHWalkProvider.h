@@ -21,13 +21,7 @@
 #include "MotionProvider.h"
 
 //BH
-#include "Robot/RobotDimensions.h"
-#include "Robot/MassCalibration.h"
-#include "Robot/RobotModel.h"
-#include "Robot/TorsoMatrix.h"
-#include "Robot/JointCalibration.h"
 #include "WalkingEngine.h"
-#include "TorsoMatrixProvider.h"
 
 namespace man {
 namespace motion {
@@ -66,14 +60,7 @@ protected:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    RobotModel robotModel;
-    TorsoMatrix torsoMatrix;
-    RobotDimensions robotDimensions;
-    MassCalibration massCalibration;
-    JointCalibration jointCalibration;
-    TorsoMatrixProvider torsoMatrixProvider;
     WalkingEngine walkingEngine;
-    WalkingEngineOutput walkOutput;
 };
 
 }

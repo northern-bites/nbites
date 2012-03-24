@@ -11,6 +11,8 @@
 #include "Representations/Sensing/InertiaSensorData.h"
 #include "Representations/Sensing/OrientationData.h"
 #include "Representations/Sensing/RobotModel.h"
+#include "Representations/MotionControl/MotionInfo.h"
+#include "Representations/MotionControl/WalkingEngineOutput.h"
 #include "Tools/Math/Pose3D.h"
 #include "Tools/Math/Matrix3x3.h"
 

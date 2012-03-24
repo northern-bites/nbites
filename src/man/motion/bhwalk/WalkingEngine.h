@@ -14,6 +14,8 @@
 #include "Modules/Sensing/InertiaSensorInspector.h"
 #include "Modules/Sensing/InertiaSensorCalibrator.h"
 #include "Modules/Sensing/InertiaSensorFilter.h"
+#include "Modules/Sensing/SensorFilter.h"
+#include "Modules/Sensing/FallDownStateDetector.h"
 //#include "Modules/Sensing/GroundContactDetector.h"
 #include "Representations/Configuration/RobotDimensions.h"
 #include "Representations/Configuration/MassCalibration.h"
@@ -77,7 +79,8 @@ public:
   * @param message The message that can be read
   * @return True if the message was handled
   */
-  static bool handleMessage(InMessage& message);
+  //this sends a kick message to the robot -- we don't use it
+//  static bool handleMessage(InMessage& message);
 
 private:
 
@@ -523,7 +526,7 @@ private:
     inline bool isActive() const {return kick ? true : false;}
     inline WalkRequest::KickType getType() const {return type;}
     void setParameters(const Vector2<>& ballPosition, const Vector2<>& target);
-    bool handleMessage(InMessage& message);
+//    bool handleMessage(InMessage& message);
 
     inline bool isKickMirrored(WalkRequest::KickType type) const {return (type - 1) % 2 != 0;}
     bool isKickStandKick(WalkRequest::KickType type) const;
@@ -544,6 +547,9 @@ private:
   Parameters p; /**< The walking engine parameters */
 
   void init();
+
+  public:
+  void update();
 
   //read from config
   JointCalibration theJointCalibration;
@@ -601,7 +607,6 @@ private:
   * The central update method to generate the walking motion
   * @param walkingEngineOutput The WalkingEngineOutput (mainly the resulting joint angles)
   */
-  void update();
   bool emergencyShutOff;
   MotionType currentMotionType;
   float currentRefX;

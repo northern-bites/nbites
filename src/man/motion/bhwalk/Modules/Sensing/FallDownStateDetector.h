@@ -69,13 +69,14 @@ private:
   */
   void update(FallDownState& fallDownState,
           const FilteredSensorData& theFilteredSensorData,
-          const FrameInfo& theFrameInfo);
+          const FrameInfo& theFrameInfo,
+          const InertiaSensorData& theInertiaSensorData);
 
   bool isGettingUp();
-  bool isFalling();
-  bool isStaggering();
-  bool isCalibrated();
-  bool impact(FallDownState& fallDownState);
+  bool isFalling(const FilteredSensorData& theFilteredSensorData);
+  bool isStaggering(const FilteredSensorData& theFilteredSensorData);
+//  bool isCalibrated();
+//  bool impact(FallDownState& fallDownState);
   bool specialSpecialAction();
   bool isUprightOrStaggering(FallDownState& fallDownState);
   FallDownState::Direction directionOf(float angleX, float angleY);

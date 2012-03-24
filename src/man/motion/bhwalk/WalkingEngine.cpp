@@ -16,6 +16,8 @@
 #include "Tools/Math/Matrix.h"
 //#include "Platform/SoundPlayer.h"
 
+#include "NaoPaths.h"
+
 inline float saveAsinh(float xf)
 {
   double x = xf; // yes, we need double here
@@ -132,12 +134,36 @@ WalkingEngine::WalkingEngine() : emergencyShutOff(false), currentMotionType(stan
   p.odometryScale = Pose2D(1.f, 1.2f, 1.f);
   p.odometryUpcomingScale = Pose2D(1.f, 1.8f, 1.2f);
   p.odometryUpcomingOffset = Pose2D(0.f, 0.f, 0.f);
+
+  this->init();
 }
 
 void WalkingEngine::init()
 {
-  // load parameters from config file
-  InConfigMap stream(Global::getSettings().expandRobotFilename("walking.cfg"));
+    // load parameters from config file
+    InConfigMap massesStream(common::paths::NAO_CONFIG_DIR + "/masses.cfg");
+    if (massesStream.exists()) {
+        massesStream >> theMassCalibration;
+        cout << theMassCalibration.masses[2].mass << endl;
+    } else {
+        cout << "Could not find masses.cfg!" << endl;
+    }
+
+    InConfigMap robotDimStream(common::paths::NAO_CONFIG_DIR + "/robotDimensions.cfg");
+    if (robotDimStream.exists()) {
+        robotDimStream >> theRobotDimensions;
+    } else {
+        cout << "Could not find robotDims.cfg!" << endl;
+    }
+
+    InConfigMap jointCalibrateStream(common::paths::NAO_CONFIG_DIR + "/jointCalibration.cfg");
+    if (jointCalibrateStream.exists()) {
+        jointCalibrateStream >> theJointCalibration;
+    } else {
+        cout << "Could not find jointCalibration.cfg!" << endl;
+    }
+
+  InConfigMap stream(common::paths::NAO_CONFIG_DIR + "walking.cfg");
   if(stream.exists())
     stream >> p;
   else
@@ -182,7 +208,7 @@ void WalkingEngine::update()
             theFrameInfo, theMotionInfo, walkingEngineOutput);
     sensorFilter.update(theFilteredSensorData, theInertiaSensorData, theSensorData, theOrientationData);
 
-    fallDownStateDetector.update(theFallDownState, theFilteredSensorData, theFrameInfo);
+    fallDownStateDetector.update(theFallDownState, theFilteredSensorData, theFrameInfo, theInertiaSensorData);
     torsoMatrixProvider.update(theTorsoMatrix, theFilteredSensorData, theRobotDimensions, theRobotModel,
             theGroundContactState, theDamageConfiguration);
 
@@ -240,7 +266,7 @@ void WalkingEngine::updateMotionRequest()
 
   // get requested motion state
   requestedMotionType = stand;
-  if((theGroundContactState.contactSafe || !theDamageConfiguration.useGroundContactDetectionForSafeStates) && !theWalkingEngineOutput.enforceStand && theMotionSelection.ratios[MotionRequest::walk] > 0.999f && !instable)
+  if((theGroundContactState.contactSafe || !theDamageConfiguration.useGroundContactDetectionForSafeStates) && !walkingEngineOutput.enforceStand && theMotionSelection.ratios[MotionRequest::walk] > 0.999f && !instable)
     if(theMotionRequest.motion == MotionRequest::walk)
     {
       if(theMotionRequest.walkRequest.kickType != WalkRequest::none && kickPlayer.isKickStandKick(theMotionRequest.walkRequest.kickType))
@@ -1122,10 +1148,10 @@ void WalkingEngine::computeOdometryOffset()
     requestedWalkTarget -= odometryOffset;
 }
 
-bool WalkingEngine::handleMessage(InMessage& message)
-{
-//  return theInstance && theInstance->kickPlayer.handleMessage(message);
-}
+//bool WalkingEngine::handleMessage(InMessage& message)
+//{
+////  return theInstance && theInstance->kickPlayer.handleMessage(message);
+//}
 
 void WalkingEngine::ObservedPendulumPlayer::init(StepType stepType, float t, SupportLeg supportLeg, const Vector2<>& r, const Vector2<>& x0, const Vector2<>& k, float deltaTime)
 {
@@ -1786,25 +1812,25 @@ void WalkingEngine::KickPlayer::setParameters(const Vector2<>& ballPosition, con
     kick->setParameters(ballPosition, target);
 }
 
-bool WalkingEngine::KickPlayer::handleMessage(InMessage& message)
-{
-  if(message.getMessageID() == idWalkingEngineKick)
-  {
-    unsigned int id, size;
-    message.bin >> id >> size;
-    ASSERT(id < WalkRequest::numOfKickTypes);
-    char* buffer = new char[size + 1];
-    message.bin.read(buffer, size);
-    buffer[size] = '\0';
-    char filePath[256];
-    sprintf(filePath, "Kicks/%s.cfg", WalkRequest::getName(WalkRequest::KickType(id)));
-    if(kicks[(id - 1) / 2].load(filePath, buffer))
-    {
-//      OUTPUT(idText, text, filePath << ": ok");
-    }
-    delete[] buffer;
-    return true;
-  }
-  else
-    return false;
-}
+//bool WalkingEngine::KickPlayer::handleMessage(InMessage& message)
+//{
+//  if(message.getMessageID() == idWalkingEngineKick)
+//  {
+//    unsigned int id, size;
+//    message.bin >> id >> size;
+//    ASSERT(id < WalkRequest::numOfKickTypes);
+//    char* buffer = new char[size + 1];
+//    message.bin.read(buffer, size);
+//    buffer[size] = '\0';
+//    char filePath[256];
+//    sprintf(filePath, "Kicks/%s.cfg", WalkRequest::getName(WalkRequest::KickType(id)));
+//    if(kicks[(id - 1) / 2].load(filePath, buffer))
+//    {
+////      OUTPUT(idText, text, filePath << ": ok");
+//    }
+//    delete[] buffer;
+//    return true;
+//  }
+//  else
+//    return false;
+//}

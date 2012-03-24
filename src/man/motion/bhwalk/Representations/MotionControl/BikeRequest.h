@@ -1,12 +1,13 @@
 /**
 * @file Representations/MotionControl/BikeRequest.h
-* @author <a href="mailto:judy@informatik.uni-bremen.de">Judith Müller</a>
+* @author <a href="mailto:judy@informatik.uni-bremen.de">Judith Mï¿½ller</a>
 */
 
 #pragma once
 
-#include "Modules/MotionControl/BIKEParameters.h"
-#
+#include "Tools/Enum.h"
+#include "Tools/Streams/Streamable.h"
+//#include "Modules/MotionControl/BIKEParameters.h"
 
 class BikeRequest : public Streamable
 {
@@ -19,7 +20,7 @@ private:
     STREAM(mirror);
     STREAM(dynamical);
     STREAM(ballSpecial);
-    STREAM(dynPoints);
+//    STREAM(dynPoints);
     STREAM_REGISTER_FINISH();
   }
 
@@ -33,14 +34,14 @@ public:
 
   bool mirror, dynamical, ballSpecial;
   BMotionID bMotionType;
-  std::vector<DynPoint> dynPoints;
+//  std::vector<DynPoint> dynPoints;
 
   BikeRequest& operator=(const BikeRequest& other)
   {
     mirror = other.mirror;
     dynamical = other.dynamical;
     bMotionType = other.bMotionType;
-    dynPoints = other.dynPoints;
+//    dynPoints = other.dynPoints;
     ballSpecial = other.ballSpecial;
     return *this;
   }

@@ -9,8 +9,7 @@
 #pragma once
 
 #include "Vector2.h"
-
-template <class T> class Range;
+#include "Tools/Range.h"
 
 /** representation for 2D Transformation and Position (Location + Orientation)*/
 class Pose2D : public Streamable
