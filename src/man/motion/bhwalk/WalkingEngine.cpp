@@ -359,12 +359,12 @@ void WalkingEngine::computeMeasuredStance()
     break;
   }
 
-  PLOT("module:WalkingEngine:measuredLeftToComX", measuredLeftToCom.x);
-  PLOT("module:WalkingEngine:measuredLeftToComY", measuredLeftToCom.y);
-  PLOT("module:WalkingEngine:measuredLeftToComZ", measuredLeftToCom.z);
-  PLOT("module:WalkingEngine:measuredRightToComX", measuredRightToCom.x);
-  PLOT("module:WalkingEngine:measuredRightToComY", measuredRightToCom.y);
-  PLOT("module:WalkingEngine:measuredRightToComZ", measuredRightToCom.z);
+//  PLOT("module:WalkingEngine:measuredLeftToComX", measuredLeftToCom.x);
+//  PLOT("module:WalkingEngine:measuredLeftToComY", measuredLeftToCom.y);
+//  PLOT("module:WalkingEngine:measuredLeftToComZ", measuredLeftToCom.z);
+//  PLOT("module:WalkingEngine:measuredRightToComX", measuredRightToCom.x);
+//  PLOT("module:WalkingEngine:measuredRightToComY", measuredRightToCom.y);
+//  PLOT("module:WalkingEngine:measuredRightToComZ", measuredRightToCom.z);
 }
 
 void WalkingEngine::computeExpectedStance()
@@ -521,8 +521,9 @@ void WalkingEngine::updateKickPlayer()
 
 void WalkingEngine::generateTargetStance()
 {
-  targetStance.headJointAngles[0] = theHeadJointRequest.pan;
-  targetStance.headJointAngles[1] = theHeadJointRequest.tilt;
+    //TODO: do these matter?
+//  targetStance.headJointAngles[0] = theHeadJointRequest.pan;
+//  targetStance.headJointAngles[1] = theHeadJointRequest.tilt;
 
   float leftArmAngle = 0.f, rightArmAngle = 0.f;
   if(currentMotionType == stepping)
@@ -683,12 +684,12 @@ void WalkingEngine::generateJointRequest()
   jointRequest.jointHardness.hardness[JointData::RAnklePitch] = p.standHardnessAnklePitch;
   jointRequest.jointHardness.hardness[JointData::RAnkleRoll] = p.standHardnessAnkleRoll;
 
-  PLOT("module:WalkingEngine:leftTargetX", bodyToLeftAnkle.translation.x);
-  PLOT("module:WalkingEngine:leftTargetY", bodyToLeftAnkle.translation.y);
-  PLOT("module:WalkingEngine:leftTargetZ", bodyToLeftAnkle.translation.z);
-  PLOT("module:WalkingEngine:rightTargetX", bodyToRightAnkle.translation.x);
-  PLOT("module:WalkingEngine:rightTargetY", bodyToRightAnkle.translation.y);
-  PLOT("module:WalkingEngine:rightTargetZ", bodyToRightAnkle.translation.z);
+//  PLOT("module:WalkingEngine:leftTargetX", bodyToLeftAnkle.translation.x);
+//  PLOT("module:WalkingEngine:leftTargetY", bodyToLeftAnkle.translation.y);
+//  PLOT("module:WalkingEngine:leftTargetZ", bodyToLeftAnkle.translation.z);
+//  PLOT("module:WalkingEngine:rightTargetX", bodyToRightAnkle.translation.x);
+//  PLOT("module:WalkingEngine:rightTargetY", bodyToRightAnkle.translation.y);
+//  PLOT("module:WalkingEngine:rightTargetZ", bodyToRightAnkle.translation.z);
 }
 
 void WalkingEngine::generateOutput(WalkingEngineOutput& walkingEngineOutput)

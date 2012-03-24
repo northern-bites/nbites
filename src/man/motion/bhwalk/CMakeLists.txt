@@ -15,6 +15,12 @@ set( bhwalk_srcs BHWalkProvider.cpp
                  Modules/Infrastructure/NaoProvider.cpp
                  Modules/Sensing/TorsoMatrixProvider.cpp
                  Modules/Sensing/RobotModelProvider.cpp
+                 Modules/Sensing/FallDownStateDetector.cpp
+                 Modules/Sensing/InertiaSensorCalibrator.cpp
+                 Modules/Sensing/InertiaSensorFilter.cpp
+                 Modules/Sensing/InertiaSensorInspector.cpp
+                 Modules/Sensing/JointFilter.cpp
+                 Modules/Sensing/SensorFilter.cpp
                  Platform/BHAssert.cpp
                  Platform/File.cpp
                  Platform/SystemCall.cpp
