@@ -120,7 +120,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Sensors> s,
     }
 #endif
 
-    initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
+    initTable("/home/nao/nbites/lib/table/table.mtb");
 }
 
 ALImageTranscriber::~ALImageTranscriber()
