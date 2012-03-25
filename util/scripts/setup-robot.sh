@@ -25,7 +25,7 @@ mv *.wav nbites/audio
 # Move the libraries
 echo "Moving libraries..."
 mv libboost_python-mt.so /usr/lib/
-mv libprotobuf.so /usr/lib
+mv libprotobuf.so.7 /usr/lib/
 mv lxv4l2.ko /lib/modules/2.6.29.6-rt24-aldebaran-rt/kernel/drivers/media/video/lxv4l2/
 
 # Set the hostname
@@ -42,6 +42,11 @@ echo "ulimit -S -c unlimited" >> /etc/profile
 echo "Moving etc files into place..."
 mv init_stuff/* /etc/init.d/
 rmdir init_stuff/
+
+# Move the autoload files
+echo "Moving autoload.ini files into place..."
+mv sys_autoload.ini /etc/naoqi/autoload.ini
+mv usr_autoload.ini naoqi/preferences/autoload.ini
 
 # Change the password
 echo "Change the password..."
