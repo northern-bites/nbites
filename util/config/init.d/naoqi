@@ -1,77 +1,87 @@
-#!/bin/sh
+#!/sbin/runscript
+##
+## Author(s):
+##  - Cedric GESTES <gestes@aldebaran-robotics.com>
+##  - Samuel MARTIN <smartin@aldebaran-robotics.com>
+##
+## Copyright (C) 2010 - 2011 Aldebaran Robotics
+##
 
-#verify if we launched the script using rc0.d .. rc6.d
-if ! [ x$( basename $0) = xnaoqi ] ; then
-  if [ x$(naoconfig get launch_naoqi) = x0 ] ; then
-    echo "Warning: not launching naoqi because it is disabled"
-    exit 1
+LOCK_FILE="/var/lock/naoqi.lock"
+LOG_FILE="/var/log/naoqi.log"
+BINARY="/usr/bin/naoqi-bin"
+NAOQI_USER="nao"
+ARGS=""
+
+depend(){
+  need dbus
+  use sysklog nao-hald
+}
+
+start() {
+
+  local bin=$(basename "${BINARY}")
+  #still a pid file?
+  if [ -f "${LOCK_FILE}" ] ; then
+    #still the running process?
+    if kill -0 $(cat "${LOCK_FILE}") 2>/dev/null ; then
+      ewarn "!! Warning: naoqi is already running !!"
+      ewarn "if you are sure it is not running, remove ${LOCK_FILE}."
+      return 1
+    fi
   fi
-fi
+  if killall -0 "${bin}" 2>/dev/null ; then
+    ewarn "!! Warning: naoqi is already running !!"
+    ewarn "Please, stop it (killall ${bin}) before starting it again."
+    return 1
+  fi
+  ebegin "Starting naoqi"
+  touch "${LOG_FILE}"
+  chown $(id -u "${NAOQI_USER}"):$(id -g "${NAOQI_USER}") "${LOG_FILE}"
+  for f in /etc/babile.conf /etc/babear4.conf ; do
+    [ -f /etc/babear4.conf"${f}" ] && \
+      chown $(id -u "${NAOQI_USER}"):$(id -g "${NAOQI_USER}") "${f}"
+  done
+  chown $(id -u "${NAOQI_USER}"):$(id -g "${NAOQI_USER}") "${LOG_FILE}"
+  if [ nao = $(whoami) ]; then
+    #user nao, already have a dbus session
+    "${BINARY}" --pid "${LOCK_FILE}" ${ARGS} 2>&1 >/home/nao/nbites/log/naoqi.log &
+  else
+    #we want a dbus session
+    su -c ". /etc/profile.d/dbus-session.sh; ${BINARY} --pid ${LOCK_FILE} ${ARGS} 2>&1 >/home/nao/nbites/log/naoqi.log &" - nao
+  fi
+  eend $? "cannot start naoqi"
+}
 
-LOCK_FILE=/var/lock/naoqi.lock
-
-case "$1" in
-  start)
-
-    #still a pid file?
-    if [ -f $LOCK_FILE ] ; then
-      #still the running process?
-      if kill -0 $(cat $LOCK_FILE) 2>/dev/null ; then
-	echo "!! Warning naoqi is already running !!"
-	echo "if you are sure it is not running"
-	echo "remove $LOCK_FILE"
-	exit 1
-      fi
+stop() {
+  ebegin "Stopping naoqi"
+  local bin=$(basename "${BINARY}")
+  if [ -f "${LOCK_FILE}" ] ; then
+    if kill -0 $(cat "${LOCK_FILE}") 2>/dev/null ; then
+      kill $(cat "${LOCK_FILE}")
+      #waiting for naoqi to shutdown
+      einfo "waiting for naoqi to shutdown"
+      while kill -0 $(cat ${LOCK_FILE}) 2>/dev/null ; do
+        sleep 1
+      done
+      einfo "Naoqi stopped"
     fi
+  fi
+  if killall -0 "${bin}" &>/dev/null; then
+    ewarn "kill all remaining ${bin} processes"
+    local try=1
+    while killall -0 "${bin}" &>/dev/null && [ ${try} -gt 0 ] ; do
+      killall -9 "${bin}"
+      try=$(( ${try} - 1 ))
+      sleep 2
+    done
+  fi
+  rm -f "${LOCK_FILE}"
+  eend $?
+}
 
-
-    #launch naoqi
-    #start-stop-daemon -b -S -c root -n naoqi -x /opt/naoqi/bin/naoqi -- --pid ${LOCK_FILE} >/dev/null
-    echo "starting naoqi"
-    if [ nao = `whoami` ]; then
-      /usr/bin/naoqi-bin --pid ${LOCK_FILE} 2>&1 >/home/nao/nbites/log/naoqi.log &
-    else
-      su -c "/usr/bin/naoqi-bin --pid ${LOCK_FILE} 2>&1 >/home/nao/nbites/log/naoqi.log &" - nao
-    fi
-    ;;
-
-  stop)
-    if [ -f $LOCK_FILE ] ; then
-        kill $(cat $LOCK_FILE)
-        #waiting for naoqi to shutdown
-        while kill -0 $(cat $LOCK_FILE) 2>/dev/null ; do
-          echo waiting for naoqi to shutdown
-	  sleep 1
-        done
-        echo "naoqi stopped"
-        rm $LOCK_FILE
-    fi
-    ;;
-
-  force-reload|restart)
-    $0 stop
-    sleep 2
-    $0 start
-    ;;
-
-  log)
-    logread -f | grep 'naoqi'
-    ;;
-
-  on)
-    nao-hardness $IP 9559 on
-    ;;
-
-  off)
-    nao-hardness $IP 9559 off
-    ;;
-
-  *)
-    echo "Usage: /etc/init.d/naoqi {start|stop|restart|force-reload|log|off|on}"
-    exit 1
-    ;;
-
-esac
-
-exit 0
-
+restart() {
+  stop
+  sleep 2
+  start
+}
