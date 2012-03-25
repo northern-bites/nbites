@@ -45,10 +45,10 @@ start() {
   chown $(id -u "${NAOQI_USER}"):$(id -g "${NAOQI_USER}") "${LOG_FILE}"
   if [ nao = $(whoami) ]; then
     #user nao, already have a dbus session
-    "${BINARY}" --pid "${LOCK_FILE}" ${ARGS} 2>&1 >/home/nao/nbites/log/naoqi.log &
+    "${BINARY}" --pid "${LOCK_FILE}" ${ARGS} 2>&1 >/home/nao/nbites/log/nblog &
   else
     #we want a dbus session
-    su -c ". /etc/profile.d/dbus-session.sh; ${BINARY} --pid ${LOCK_FILE} ${ARGS} 2>&1 >/home/nao/nbites/log/naoqi.log &" - nao
+    su -c ". /etc/profile.d/dbus-session.sh; ${BINARY} --pid ${LOCK_FILE} ${ARGS} 2>&1 >/home/nao/nbites/log/nblog &" - nao
   fi
   eend $? "cannot start naoqi"
 }
