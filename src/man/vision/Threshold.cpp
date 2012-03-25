@@ -1416,7 +1416,7 @@ void Threshold::initTable(std::string filename) {
     int return_val;
     for(int i=0; i< UMAX; i++)
         for(int j=0; j<VMAX; j++){
-            return_val = fread(bigTable[i][j], sizeof(unsigned char), YMAX, fp);
+//            return_val = fread(bigTable[i][j], sizeof(unsigned char), YMAX, fp);
         }
 
 #ifndef OFFLINE
