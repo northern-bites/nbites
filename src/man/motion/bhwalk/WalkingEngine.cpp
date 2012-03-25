@@ -44,6 +44,13 @@ inline float saveAcosh(float xf)
   return float(x);
 }
 
+#define DEBUG_BHWALK
+#ifdef DEBUG_BHWALK
+#define bhwalk_out std::cout
+#else
+#define bhwalk_out (*NullStream::NullInstance())
+#endif
+
 
 //MAKE_MODULE(WalkingEngine, Motion Control)
 
@@ -163,6 +170,13 @@ void WalkingEngine::init()
         cout << "Could not find jointCalibration.cfg!" << endl;
     }
 
+    InConfigMap sensorCalibrateStream(common::paths::NAO_CONFIG_DIR + "/sensorCalibration.cfg");
+    if (sensorCalibrateStream.exists()) {
+        sensorCalibrateStream >> theSensorCalibration;
+    } else {
+        cout << "Could not find sensorCalibration.cfg!" << endl;
+    }
+
     InConfigMap hardnessStream(common::paths::NAO_CONFIG_DIR + "/jointHardness.cfg");
     if (hardnessStream.exists()) {
         hardnessStream >> defaultHardnessData;
@@ -198,7 +212,7 @@ void WalkingEngine::init()
 
 void WalkingEngine::update()
 {
-
+    //set the motion slection
     theMotionSelection.walkRequest = theMotionRequest.walkRequest;
     theMotionSelection.targetMotion = theMotionRequest.motion;
     for (int i = 0 ; i < MotionRequest::numOfMotions; i++) {
@@ -207,8 +221,31 @@ void WalkingEngine::update()
     theMotionSelection.ratios[theMotionSelection.targetMotion] = 1.0f;
 
     //get new joint, sensor and frame info data
-    naoProvider.update(theJointData, theJointCalibration,
-            theSensorData, theSensorCalibration, theFrameInfo);
+    theFrameInfo.cycleTime = 0.01f;
+    theFrameInfo.time = theJointData.timeStamp = theSensorData.timeStamp = SystemCall::getCurrentSystemTime();
+    //calibrate joints
+    for(int i = 0; i < JointData::numOfJoints; ++i) {
+        theJointData.angles[i] = theJointData.angles[i] * theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
+    }
+    //calibrate sensors
+    theSensorData.data[SensorData::gyroX] *= theSensorCalibration.gyroXGain / 1600;
+    theSensorData.data[SensorData::gyroY] *= theSensorCalibration.gyroYGain / 1600;
+    theSensorData.data[SensorData::accX] *= theSensorCalibration.accXGain;
+    theSensorData.data[SensorData::accX] += theSensorCalibration.accXOffset;
+    theSensorData.data[SensorData::accY] *= theSensorCalibration.accYGain;
+    theSensorData.data[SensorData::accY] += theSensorCalibration.accYOffset;
+    theSensorData.data[SensorData::accZ] *= theSensorCalibration.accZGain;
+    theSensorData.data[SensorData::accZ] += theSensorCalibration.accZOffset;
+
+    theSensorData.data[SensorData::fsrLFL] = ((theSensorData.data[SensorData::fsrLFL] + theSensorCalibration.fsrLFLOffset) * theSensorCalibration.fsrLFLGain);
+    theSensorData.data[SensorData::fsrLFR] = ((theSensorData.data[SensorData::fsrLFR] + theSensorCalibration.fsrLFROffset) * theSensorCalibration.fsrLFRGain);
+    theSensorData.data[SensorData::fsrLBL] = ((theSensorData.data[SensorData::fsrLBL] + theSensorCalibration.fsrLBLOffset) * theSensorCalibration.fsrLBLGain);
+    theSensorData.data[SensorData::fsrLBR] = ((theSensorData.data[SensorData::fsrLBR] + theSensorCalibration.fsrLBROffset) * theSensorCalibration.fsrLBRGain);
+    theSensorData.data[SensorData::fsrRFL] = ((theSensorData.data[SensorData::fsrRFL] + theSensorCalibration.fsrRFLOffset) * theSensorCalibration.fsrRFLGain);
+    theSensorData.data[SensorData::fsrRFR] = ((theSensorData.data[SensorData::fsrRFR] + theSensorCalibration.fsrRFROffset) * theSensorCalibration.fsrRFRGain);
+    theSensorData.data[SensorData::fsrRBL] = ((theSensorData.data[SensorData::fsrRBL] + theSensorCalibration.fsrRBLOffset) * theSensorCalibration.fsrRBLGain);
+    theSensorData.data[SensorData::fsrRBR] = ((theSensorData.data[SensorData::fsrRBR] + theSensorCalibration.fsrRBROffset) * theSensorCalibration.fsrRBRGain);
+
     //filter joints
     jointFilter.update(theFilteredJointData, theJointData);
     //update the robot model - this computes the CoM
@@ -273,13 +310,22 @@ void WalkingEngine::update()
   theMotionInfo.upcomingOdometryOffset = walkingEngineOutput.upcomingOdometryOffset;
   theMotionInfo.upcomingOdometryOffsetValid = walkingEngineOutput.upcomingOdometryOffsetValid;
 
+  bhwalk_out << "Executed motion type is " <<  getName(requestedMotionType) << endl;
+  bhwalk_out << "Instability is " << instability.getAverage() << endl;
+
   for(int i = 0; i < JointData::numOfJoints; ++i) {
       if (walkingEngineOutput.jointHardness.hardness[i] == HardnessData::useDefault) {
           walkingEngineOutput.jointHardness.hardness[i] = defaultHardnessData.hardness[i];
       }
-  }
 
-  naoProvider.send(walkingEngineOutput, theJointCalibration);
+      if(walkingEngineOutput.angles[i] == JointData::off) {
+          joint_angles[i] = 0.0f;
+          joint_hardnesses[i] = 0.0f; // hardness off
+      } else {
+          joint_angles[i] = (walkingEngineOutput.angles[i] + theJointCalibration.joints[i].offset) * float(theJointCalibration.joints[i].sign);
+          joint_hardnesses[i] = float(walkingEngineOutput.jointHardness.hardness[i]) / 100.f;
+      }
+  }
 }
 
 void WalkingEngine::updateMotionRequest()

@@ -75,36 +75,40 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
     //We only copy joint position, and not temperatures or currents
     //Note: temperatures are unused, and currents are used by the GroundContactDetector
     //which is not used right now
-    float* bh_input_sensors = walkingEngine.naoProvider.sensors;
-
+    JointData& bh_joint_data = walkingEngine.theJointData;
     vector<float> nb_joint_data = sensors->getMotionBodyAngles();
 
     for (int i = 0; i < JointData::numOfJoints; i++) {
-        bh_input_sensors[3*nb_joint_order[i]] = nb_joint_data[i];
+        bh_joint_data.angles[nb_joint_order[i]] = nb_joint_data[i];
     }
+
+    SensorData& bh_sensors = walkingEngine.theSensorData;
 
     Inertial nb_raw_inertial = sensors->getUnfilteredInertial();
 
-    bh_input_sensors[gyroXSensor] = nb_raw_inertial.gyrX;
-    bh_input_sensors[gyroYSensor] = nb_raw_inertial.gyrY;
+    bh_sensors.data[SensorData::gyroX] = nb_raw_inertial.gyrX;
+    bh_sensors.data[SensorData::gyroY] = nb_raw_inertial.gyrY;
 
-    bh_input_sensors[accXSensor] = nb_raw_inertial.accX;
-    bh_input_sensors[accYSensor] = nb_raw_inertial.accY;
-    bh_input_sensors[accZSensor] = nb_raw_inertial.accZ;
+    bh_sensors.data[SensorData::accX] = nb_raw_inertial.accX;
+    bh_sensors.data[SensorData::accY] = nb_raw_inertial.accY;
+    bh_sensors.data[SensorData::accZ] = nb_raw_inertial.accZ;
+
+    bh_sensors.data[SensorData::angleX] = nb_raw_inertial.angleX;
+    bh_sensors.data[SensorData::angleY] = nb_raw_inertial.angleY;
 
     FSR nb_fsr_l = sensors->getLeftFootFSR();
 
-    bh_input_sensors[lFSRFrontLeftSensor] = nb_fsr_l.frontLeft;
-    bh_input_sensors[lFSRFrontRightSensor] = nb_fsr_l.frontRight;
-    bh_input_sensors[lFSRRearLeftSensor] = nb_fsr_l.rearLeft;
-    bh_input_sensors[lFSRRearRightSensor] = nb_fsr_l.rearRight;
+    bh_sensors.data[SensorData::fsrLFL] = nb_fsr_l.frontLeft;
+    bh_sensors.data[SensorData::fsrLFR] = nb_fsr_l.frontRight;
+    bh_sensors.data[SensorData::fsrLBL] = nb_fsr_l.rearLeft;
+    bh_sensors.data[SensorData::fsrLBR] = nb_fsr_l.rearRight;
 
     FSR nb_fsr_r = sensors->getRightFootFSR();
 
-    bh_input_sensors[rFSRFrontLeftSensor] = nb_fsr_r.frontLeft;
-    bh_input_sensors[rFSRFrontRightSensor] = nb_fsr_r.frontRight;
-    bh_input_sensors[rFSRRearLeftSensor] = nb_fsr_r.rearLeft;
-    bh_input_sensors[rFSRRearRightSensor] = nb_fsr_r.rearRight;
+    bh_sensors.data[SensorData::fsrRFL] = nb_fsr_r.frontLeft;
+    bh_sensors.data[SensorData::fsrLFR] = nb_fsr_r.frontRight;
+    bh_sensors.data[SensorData::fsrLBL] = nb_fsr_r.rearLeft;
+    bh_sensors.data[SensorData::fsrLBR] = nb_fsr_r.rearRight;
 
     walkingEngine.update();
 
@@ -115,13 +119,12 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
         for (unsigned j = Kinematics::chain_first_joint[i];
                      j <= Kinematics::chain_last_joint[i]; j++) {
             //position angle
-            chain_angles.push_back(walkingEngine.naoProvider.actuators[nb_joint_order[j]]);
+            chain_angles.push_back(walkingEngine.joint_angles[nb_joint_order[j]]);
             //hardness
-            int hardness_index = nb_joint_order[j] + lbhNumOfPositionActuatorIds;
-            if (walkingEngine.naoProvider.actuators[hardness_index] == 0) {
+            if (walkingEngine.joint_hardnesses[nb_joint_order[j]] == 0) {
                 chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
             } else {
-                chain_hardness.push_back(walkingEngine.naoProvider.actuators[hardness_index]);
+                chain_hardness.push_back(walkingEngine.joint_hardnesses[nb_joint_order[j]]);
             }
 
         }
@@ -129,12 +132,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
         this->setNextChainStiffnesses((Kinematics::ChainID) i, chain_hardness);
     }
 
-    if (walkingEngine.walkingEngineOutput.positionInWalkCycle == 1.0f) {
-        stand();
-    }
+//    if (walkingEngine.walkingEngineOutput.positionInWalkCycle == 1.0f) {
+//        stand();
+//    }
 }
 
 void BHWalkProvider::stand() {
+    bhwalk_out << "BHWalk stand requested";
     walkingEngine.theMotionRequest.motion = MotionRequest::stand;
     walkingEngine.theMotionRequest.walkRequest = WalkRequest();
     inactive();
@@ -158,6 +162,7 @@ void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
 
     walkingEngine.theMotionRequest.motion = MotionRequest::walk;
 
+    bhwalk_out << "BHWalk speed walk requested with command ";
     bhwalk_out << *(command.get());
 
     active();
@@ -181,6 +186,7 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 
     walkingEngine.theMotionRequest.motion = MotionRequest::walk;
 
+    bhwalk_out << "BHWalk destination walk requested with command ";
     bhwalk_out << *(command.get());
 
     active();

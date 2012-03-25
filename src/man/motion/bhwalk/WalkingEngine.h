@@ -7,7 +7,7 @@
 #pragma once
 
 //#include "Tools/Module/Module.h"
-#include "Modules/Infrastructure/NaoProvider.h"
+//#include "Modules/Infrastructure/NaoProvider.h"
 #include "Modules/Sensing/JointFilter.h"
 #include "Modules/Sensing/RobotModelProvider.h"
 #include "Modules/Sensing/TorsoMatrixProvider.h"
@@ -20,6 +20,7 @@
 #include "Representations/Configuration/RobotDimensions.h"
 #include "Representations/Configuration/MassCalibration.h"
 #include "Representations/Configuration/JointCalibration.h"
+#include "Representations/Configuration/SensorCalibration.h"
 #include "Representations/Configuration/DamageConfiguration.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 //#include "Representations/Infrastructure/KeyStates.h"
@@ -37,6 +38,7 @@
 #include "Tools/RingBuffer.h"
 #include "Tools/RingBufferWithSum.h"
 #include "Tools/Math/Matrix.h"
+#include "Platform/SystemCall.h"
 //#include "Tools/Optimization/ParticleSwarm.h"
 #include "WalkingEngineKick.h"
 
@@ -562,7 +564,6 @@ private:
   JointData theJointData;
   SensorData theSensorData;
   FrameInfo theFrameInfo;
-  NaoProvider naoProvider;
 
   //filtered joint data from the joint filter
   FilteredJointData theFilteredJointData;
@@ -603,6 +604,9 @@ private:
   MotionInfo theMotionInfo;
   OdometryData theOdometryData;
   MotionRequest theMotionRequest;
+
+  float joint_angles[JointData::numOfJoints];
+  float joint_hardnesses[JointData::numOfJoints];
 
   SupportLeg getSupportLeg() const {
       return lastSupportLeg;
