@@ -41,25 +41,24 @@ SET( BUILDING_FOR_A_REMOTE_NAO ON )
 ############################# CROSS-COMPILATION VARIABLES
 # Set the variable for the cross-compilation directory, cmake variables
 
-SET( OE_CROSS_DIR "${AL_DIR}/crosstoolchain" )
-SET( OE_SYSROOT "${OE_CROSS_DIR}/staging/geode-linux/" )
-
+SET( OE_CROSS_DIR "${AL_DIR}/../crosstoolchain" )
+SET( OE_SYSROOT "${OE_CROSS_DIR}/sysroot/" )
 
 SET( CMAKE_CROSSCOMPILING   TRUE  )
 SET( CMAKE_SYSTEM_NAME      Linux )
 SET( CMAKE_SYSTEM_VERSION   1     )
 SET( CMAKE_SYSTEM_PROCESSOR geode )
 
-INCLUDE("${AL_DIR}/crosstoolchain/toolchain-geode.cmake")
+INCLUDE("${AL_DIR}/../crosstoolchain/toolchain-geode.cmake")
 
 ################# CCache
 
-if (CCACHE)
-  SET( CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
-  SET( CMAKE_CXX_COMPILER ${CCACHE})
-  SET( CMAKE_C_COMPILER_ARG1 ${CMAKE_C_COMPILER})
-  SET( CMAKE_C_COMPILER ${CCACHE})
-endif()
+# if (CCACHE)
+#   SET( CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
+#   SET( CMAKE_CXX_COMPILER ${CCACHE})
+#   SET( CMAKE_C_COMPILER_ARG1 ${CMAKE_C_COMPILER})
+#   SET( CMAKE_C_COMPILER ${CCACHE})
+# endif()
 
 # where should we look for libraries we need
 SET(CMAKE_FIND_ROOT_PATH  ${OE_SYSROOT} $ENV{NBITES_DIR}/ext/)
