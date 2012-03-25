@@ -596,11 +596,11 @@ private:
   TorsoMatrix theTorsoMatrix;
   TorsoMatrixProvider torsoMatrixProvider;
 
-  JointRequest theJointRequest;
   WalkingEngineOutput walkingEngineOutput;
 
   MotionSelection theMotionSelection;
   MotionInfo theMotionInfo;
+  OdometryData theOdometryData;
   MotionRequest theMotionRequest;
 
   /**

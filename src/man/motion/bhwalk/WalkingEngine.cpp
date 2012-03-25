@@ -192,6 +192,13 @@ void WalkingEngine::init()
 void WalkingEngine::update()
 {
 
+    theMotionSelection.walkRequest = theMotionRequest.walkRequest;
+    theMotionSelection.targetMotion = theMotionRequest.motion;
+    for (int i = 0 ; i < MotionRequest::numOfMotions; i++) {
+        theMotionSelection.ratios[i] = 0;
+    }
+    theMotionSelection.ratios[theMotionSelection.targetMotion] = 1.0f;
+
     //get new joint, sensor and frame info data
     naoProvider.update(theJointData, theJointCalibration,
             theSensorData, theSensorCalibration, theFrameInfo);
@@ -211,6 +218,7 @@ void WalkingEngine::update()
     fallDownStateDetector.update(theFallDownState, theFilteredSensorData, theFrameInfo, theInertiaSensorData);
     torsoMatrixProvider.update(theTorsoMatrix, theFilteredSensorData, theRobotDimensions, theRobotModel,
             theGroundContactState, theDamageConfiguration);
+
 
   if(theMotionSelection.ratios[MotionRequest::walk] > 0.f || theMotionSelection.ratios[MotionRequest::stand] > 0.f)
   {
@@ -249,6 +257,15 @@ void WalkingEngine::update()
         currentRefX = p.standStandbyRefX;
     generateDummyOutput(walkingEngineOutput);
   }
+
+  //this is what motion combinator does more or less
+  theOdometryData += walkingEngineOutput.odometryOffset;
+  theMotionInfo.motion = theMotionRequest.motion;
+  theMotionInfo.isMotionStable = true;
+  theMotionInfo.walkRequest = walkingEngineOutput.executedWalk;
+  theMotionInfo.upcomingOdometryOffset = walkingEngineOutput.upcomingOdometryOffset;
+  theMotionInfo.upcomingOdometryOffsetValid = walkingEngineOutput.upcomingOdometryOffsetValid;
+  naoProvider.send(walkingEngineOutput, theJointCalibration);
 }
 
 void WalkingEngine::updateMotionRequest()
