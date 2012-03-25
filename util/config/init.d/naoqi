@@ -1,0 +1,77 @@
+#!/bin/sh
+
+#verify if we launched the script using rc0.d .. rc6.d
+if ! [ x$( basename $0) = xnaoqi ] ; then
+  if [ x$(naoconfig get launch_naoqi) = x0 ] ; then
+    echo "Warning: not launching naoqi because it is disabled"
+    exit 1
+  fi
+fi
+
+LOCK_FILE=/var/lock/naoqi.lock
+
+case "$1" in
+  start)
+
+    #still a pid file?
+    if [ -f $LOCK_FILE ] ; then
+      #still the running process?
+      if kill -0 $(cat $LOCK_FILE) 2>/dev/null ; then
+	echo "!! Warning naoqi is already running !!"
+	echo "if you are sure it is not running"
+	echo "remove $LOCK_FILE"
+	exit 1
+      fi
+    fi
+
+
+    #launch naoqi
+    #start-stop-daemon -b -S -c root -n naoqi -x /opt/naoqi/bin/naoqi -- --pid ${LOCK_FILE} >/dev/null
+    echo "starting naoqi"
+    if [ nao = `whoami` ]; then
+      /usr/bin/naoqi-bin --pid ${LOCK_FILE} 2>&1 >/home/nao/nbites/log/naoqi.log &
+    else
+      su -c "/usr/bin/naoqi-bin --pid ${LOCK_FILE} 2>&1 >/home/nao/nbites/log/naoqi.log &" - nao
+    fi
+    ;;
+
+  stop)
+    if [ -f $LOCK_FILE ] ; then
+        kill $(cat $LOCK_FILE)
+        #waiting for naoqi to shutdown
+        while kill -0 $(cat $LOCK_FILE) 2>/dev/null ; do
+          echo waiting for naoqi to shutdown
+	  sleep 1
+        done
+        echo "naoqi stopped"
+        rm $LOCK_FILE
+    fi
+    ;;
+
+  force-reload|restart)
+    $0 stop
+    sleep 2
+    $0 start
+    ;;
+
+  log)
+    logread -f | grep 'naoqi'
+    ;;
+
+  on)
+    nao-hardness $IP 9559 on
+    ;;
+
+  off)
+    nao-hardness $IP 9559 off
+    ;;
+
+  *)
+    echo "Usage: /etc/init.d/naoqi {start|stop|restart|force-reload|log|off|on}"
+    exit 1
+    ;;
+
+esac
+
+exit 0
+

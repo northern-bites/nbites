@@ -1,0 +1,33 @@
+#!/sbin/runscript
+##
+## This file was generated.
+##
+## Copyright (C) 2010, 2011 Aldebaran Robotics
+##
+
+depend() {
+  use aldev-i2c
+  before *
+}
+
+start() {
+  [ $(runlevel | cut -d' ' -f2) = '3' ] || return 0
+  ebegin "Starting bootprogress 25"
+  setears --init 25 &>/dev/null
+  ## NBites addition: enables core dumps
+  su -c 'sysctl -w kernel.core_pattern="/home/nao/core-dump"'
+  su -c 'sysctl -w fs.suid_dumpable="2"'
+  sleep 2
+  eend $?
+}
+
+stop() {
+  ebegin "Stopping bootprogress 25"
+  setears --init 25 &>/dev/null
+  sleep 2
+  eend $?
+}
+
+restart() {
+  :
+}
