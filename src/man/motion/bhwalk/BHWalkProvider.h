@@ -35,9 +35,7 @@ public:
     BHWalkProvider(boost::shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p);
     virtual ~BHWalkProvider() {}
 
-    void requestStopFirstInstance() {
-        setCommand(WalkCommand::ptr( new WalkCommand(0.0f, 0.0f, 0.0f) ));
-    }
+    void requestStopFirstInstance();
     void calculateNextJointsAndStiffnesses();
 
     void hardReset();
@@ -56,6 +54,7 @@ public:
     virtual const SupportFoot getSupportFoot() const;
 
 protected:
+    void stand();
     void setActive() {}
 
 private:

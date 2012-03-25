@@ -163,6 +163,13 @@ void WalkingEngine::init()
         cout << "Could not find jointCalibration.cfg!" << endl;
     }
 
+    InConfigMap hardnessStream(common::paths::NAO_CONFIG_DIR + "/jointHardness.cfg");
+    if (hardnessStream.exists()) {
+        hardnessStream >> defaultHardnessData;
+    } else {
+        cout << "Could not find jointHardness.cfg!" << endl;
+    }
+
   InConfigMap stream(common::paths::NAO_CONFIG_DIR + "walking.cfg");
   if(stream.exists())
     stream >> p;
@@ -265,6 +272,13 @@ void WalkingEngine::update()
   theMotionInfo.walkRequest = walkingEngineOutput.executedWalk;
   theMotionInfo.upcomingOdometryOffset = walkingEngineOutput.upcomingOdometryOffset;
   theMotionInfo.upcomingOdometryOffsetValid = walkingEngineOutput.upcomingOdometryOffsetValid;
+
+  for(int i = 0; i < JointData::numOfJoints; ++i) {
+      if (walkingEngineOutput.jointHardness.hardness[i] == HardnessData::useDefault) {
+          walkingEngineOutput.jointHardness.hardness[i] = defaultHardnessData.hardness[i];
+      }
+  }
+
   naoProvider.send(walkingEngineOutput, theJointCalibration);
 }
 

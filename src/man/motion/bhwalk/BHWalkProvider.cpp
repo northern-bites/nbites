@@ -4,7 +4,7 @@
 #include <cassert>
 #include <string>
 
-#include "Tools/Streams/InStreams.h"
+#include "bhuman.h"
 
 namespace man {
 namespace motion {
@@ -54,68 +54,57 @@ static const JointData::Joint nb_joint_order[] = {
 BHWalkProvider::BHWalkProvider(shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p) :
         MotionProvider(WALK_PROVIDER),
         sensors(s) {
+}
 
-//    InConfigMap massesStream(BH_CONFIG_DIR + "/masses.cfg");
-//    if (massesStream.exists()) {
-//        massesStream >> massCalibration;
-//        cout << massCalibration.masses[2].mass << endl;
-//    } else {
-//        cout << "Could not find masses.cfg!" << endl;
-//    }
-//
-//    InConfigMap robotDimStream(BH_CONFIG_DIR + "/robotDimensions.cfg");
-//    if (robotDimStream.exists()) {
-//        robotDimStream >> robotDimensions;
-//    } else {
-//        cout << "Could not find robotDims.cfg!" << endl;
-//    }
-//
-//    InConfigMap jointCalibrateStream(BH_CONFIG_DIR + "/jointCalibration.cfg");
-//    if (jointCalibrateStream.exists()) {
-//        jointCalibrateStream >> jointCalibration;
-//    } else {
-//        cout << "Could not find jointCalibration.cfg!" << endl;
-//    }
-//
-//    // load parameters from config file
-//    InConfigMap walkingCfgStream(BH_CONFIG_DIR + "/walking.cfg", InConfigMap::VERBOSE);
-//    if(walkingCfgStream.exists()) {
-//        walkingCfgStream >> walkingEngine.p;
-//    } else {
-//          cout << "Could not find walking.cfg!" << endl;
-//    //    InConfigMap stream("walking.cfg");
-//    //    if(stream.exists())
-//    //      stream >> p;
-//    //    else
-//          walkingEngine.p.computeContants();
-//      }
+void BHWalkProvider::requestStopFirstInstance() {
+    this->stand();
 }
 
 /**
  * This method converts the NBites sensor and joint input to
  * input suitable for the (BH) B-Human walk, and similarly the output
+ * and then interprets the walk engine output
  *
  * Main differences:
  * * The BH joint data is in a different order;
- * * Some BH joint angles have different signs (found in the jointCalibration)
  */
 void BHWalkProvider::calculateNextJointsAndStiffnesses() {
 
     assert(JointData::numOfJoints == Kinematics::NUM_JOINTS);
 
-    vector<float> nbjointData = sensors->getMotionBodyAngles();
+    //We only copy joint position, and not temperatures or currents
+    //Note: temperatures are unused, and currents are used by the GroundContactDetector
+    //which is not used right now
+    float* bh_input_sensors = walkingEngine.naoProvider.sensors;
 
-    JointData bhjointData;
+    vector<float> nb_joint_data = sensors->getMotionBodyAngles();
 
-//    for (int i = 0; i < JointData::numOfJoints; i++) {
-//        bhjointData.angles[nb_joint_order[i]] =
-//              nbjointData[i] * jointCalibration.joints[nb_joint_order[i]].sign;
-//    }
-//
-//    Inertial inertial = sensors->getInertial();
-//
-//    torsoMatrixProvider.update(torsoMatrix, robotModel, robotDimensions,
-//                               inertial.angleX, inertial.angleY);
+    for (int i = 0; i < JointData::numOfJoints; i++) {
+        bh_input_sensors[3*nb_joint_order[i]] = nb_joint_data[i];
+    }
+
+    Inertial nb_raw_inertial = sensors->getUnfilteredInertial();
+
+    bh_input_sensors[gyroXSensor] = nb_raw_inertial.gyrX;
+    bh_input_sensors[gyroYSensor] = nb_raw_inertial.gyrY;
+
+    bh_input_sensors[accXSensor] = nb_raw_inertial.accX;
+    bh_input_sensors[accYSensor] = nb_raw_inertial.accY;
+    bh_input_sensors[accZSensor] = nb_raw_inertial.accZ;
+
+    FSR nb_fsr_l = sensors->getLeftFootFSR();
+
+    bh_input_sensors[lFSRFrontLeftSensor] = nb_fsr_l.frontLeft;
+    bh_input_sensors[lFSRFrontRightSensor] = nb_fsr_l.frontRight;
+    bh_input_sensors[lFSRRearLeftSensor] = nb_fsr_l.rearLeft;
+    bh_input_sensors[lFSRRearRightSensor] = nb_fsr_l.rearRight;
+
+    FSR nb_fsr_r = sensors->getRightFootFSR();
+
+    bh_input_sensors[rFSRFrontLeftSensor] = nb_fsr_r.frontLeft;
+    bh_input_sensors[rFSRFrontRightSensor] = nb_fsr_r.frontRight;
+    bh_input_sensors[rFSRRearLeftSensor] = nb_fsr_r.rearLeft;
+    bh_input_sensors[rFSRRearRightSensor] = nb_fsr_r.rearRight;
 
     walkingEngine.update();
 
@@ -125,25 +114,27 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
         vector<float> chain_hardness;
         for (unsigned j = Kinematics::chain_first_joint[i];
                      j <= Kinematics::chain_last_joint[i]; j++) {
-
-//            chain_angles.push_back(walkOutput.angles[nb_joint_order[j]]
-//                                   * jointCalibration.joints[nb_joint_order[j]].sign);
-//
-//            if (walkOutput.angles[nb_joint_order[j]] == JointData::off) {
-//                chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
-//            } else {
-//                chain_hardness.push_back(0.75f); //TODO: get them from jointHardness.cfg
-//            }
+            //position angle
+            chain_angles.push_back(walkingEngine.naoProvider.actuators[nb_joint_order[j]]);
+            //hardness
+            int hardness_index = nb_joint_order[j] + lbhNumOfPositionActuatorIds;
+            if (walkingEngine.naoProvider.actuators[hardness_index] == 0) {
+                chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
+            }
         }
         this->setNextChainJoints((Kinematics::ChainID) i, chain_angles);
         this->setNextChainStiffnesses((Kinematics::ChainID) i, chain_hardness);
     }
 
-//    if (walkOutput.positionInWalkCycle == 1.0f) {
-//        inactive();
-//    } else {
-//        active();
-//    }
+    if (walkingEngine.walkingEngineOutput.positionInWalkCycle == 1.0f) {
+        stand();
+    }
+}
+
+void BHWalkProvider::stand() {
+    walkingEngine.theMotionRequest.motion = MotionRequest::stand;
+    walkingEngine.theMotionRequest.walkRequest = WalkRequest();
+    inactive();
 }
 
 MotionModel BHWalkProvider::getOdometryUpdate() {
@@ -151,8 +142,7 @@ MotionModel BHWalkProvider::getOdometryUpdate() {
 }
 
 void BHWalkProvider::hardReset() {
-    inactive();
-    walkingEngine.theMotionRequest.motion = MotionRequest::specialAction;
+    stand();
 }
 
 void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
@@ -194,11 +184,11 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 }
 
 const SupportFoot BHWalkProvider::getSupportFoot() const {
-//    if (walkingEngine.getSupportLeg() == 0) {//TODO: WalkingEngine::left) {
-//        return LEFT_SUPPORT;
-//    } else {
-//        return RIGHT_SUPPORT;
-//    }
+    if (walkingEngine.getSupportLeg() == 0) {//TODO: WalkingEngine::left) {
+        return LEFT_SUPPORT;
+    } else {
+        return RIGHT_SUPPORT;
+    }
 }
 
 }

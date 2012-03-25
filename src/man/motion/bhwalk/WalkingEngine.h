@@ -556,6 +556,7 @@ private:
   SensorCalibration theSensorCalibration;
   MassCalibration theMassCalibration;
   RobotDimensions theRobotDimensions;
+  HardnessData defaultHardnessData;
 
   //get these from robot using NaoProvider
   JointData theJointData;
@@ -602,6 +603,10 @@ private:
   MotionInfo theMotionInfo;
   OdometryData theOdometryData;
   MotionRequest theMotionRequest;
+
+  SupportLeg getSupportLeg() const {
+      return lastSupportLeg;
+  }
 
   /**
   * The central update method to generate the walking motion
