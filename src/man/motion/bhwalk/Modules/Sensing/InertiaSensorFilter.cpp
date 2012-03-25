@@ -11,14 +11,14 @@
 
 //MAKE_MODULE(InertiaSensorFilter, Sensing)
 //
-//InertiaSensorFilter::InertiaSensorFilter() : lastTime(0)
-//{
-//  p.processNoise = Vector2<>(0.004f, 0.004f);
-//  p.accNoise = Vector3<>(1.f, 1.f, 1.f);
-//  p.calculatedAccLimit = Vector2<>(fromDegrees(20.f), fromDegrees(30.f));
-//
-//  p.calculateConstants();
-//}
+InertiaSensorFilter::InertiaSensorFilter() : lastTime(0)
+{
+  p.processNoise = Vector2<>(0.004f, 0.004f);
+  p.accNoise = Vector3<>(1.f, 1.f, 1.f);
+  p.calculatedAccLimit = Vector2<>(fromDegrees(20.f), fromDegrees(30.f));
+
+  p.calculateConstants();
+}
 
 void InertiaSensorFilter::Parameters::calculateConstants()
 {

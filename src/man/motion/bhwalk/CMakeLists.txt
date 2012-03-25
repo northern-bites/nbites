@@ -19,10 +19,13 @@ set( bhwalk_srcs BHWalkProvider.cpp
                  Modules/Sensing/InertiaSensorInspector.cpp
                  Modules/Sensing/JointFilter.cpp
                  Modules/Sensing/SensorFilter.cpp
+                 Representations/Sensing/RobotModel.cpp
+                 Representations/MotionControl/MotionSelection.cpp
                  Platform/BHAssert.cpp
                  Platform/File.cpp
                  Platform/SystemCall.cpp
                  Tools/Enum.cpp
+                 Tools/Global.cpp
                  Tools/Math/Matrix.cpp
                  Tools/Math/Pose2D.cpp
                  Tools/Math/RotationMatrix.cpp
@@ -30,7 +33,7 @@ set( bhwalk_srcs BHWalkProvider.cpp
                  Tools/Streams/InStreams.cpp
                  Tools/Streams/OutStreams.cpp
                  Tools/Streams/StreamHandler.cpp
-#                 Tools/Streams/Streamable.cpp
+                 Tools/Streams/Streamable.cpp
                  Tools/Configuration/ConfigMap.cpp
                  Tools/Configuration/ConfigMapParser.cpp )
 

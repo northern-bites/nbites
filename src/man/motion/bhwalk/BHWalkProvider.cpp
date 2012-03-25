@@ -120,7 +120,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
             int hardness_index = nb_joint_order[j] + lbhNumOfPositionActuatorIds;
             if (walkingEngine.naoProvider.actuators[hardness_index] == 0) {
                 chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
+            } else {
+                chain_hardness.push_back(walkingEngine.naoProvider.actuators[hardness_index]);
             }
+
         }
         this->setNextChainJoints((Kinematics::ChainID) i, chain_angles);
         this->setNextChainStiffnesses((Kinematics::ChainID) i, chain_hardness);

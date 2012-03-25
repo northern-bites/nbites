@@ -17,7 +17,7 @@
 
 FallDownStateDetector::FallDownStateDetector()
 {
-  InConfigMap stream(common::paths::NAO_CONFIG_DIR + "FallDownStateDetector.cfg");
+  InConfigMap stream(common::paths::NAO_CONFIG_DIR + "fallDownStateDetector.cfg");
   if(stream.exists())
     stream >> parameters;
   else
