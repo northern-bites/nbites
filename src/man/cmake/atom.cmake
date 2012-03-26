@@ -41,15 +41,15 @@ SET( BUILDING_FOR_A_REMOTE_NAO ON )
 ############################# CROSS-COMPILATION VARIABLES
 # Set the variable for the cross-compilation directory, cmake variables
 
-SET( OE_CROSS_DIR "${AL_DIR}/../geodetoolchain" )
+SET( OE_CROSS_DIR "${AL_DIR}/../atomtoolchain" )
 SET( OE_SYSROOT "${OE_CROSS_DIR}/sysroot/" )
 
 SET( CMAKE_CROSSCOMPILING   TRUE  )
 SET( CMAKE_SYSTEM_NAME      Linux )
 SET( CMAKE_SYSTEM_VERSION   1     )
-SET( CMAKE_SYSTEM_PROCESSOR geode )
+SET( CMAKE_SYSTEM_PROCESSOR atom  )
 
-INCLUDE("${AL_DIR}/../geodetoolchain/toolchain-geode.cmake")
+INCLUDE("${AL_DIR}/../atomtoolchain/toolchain-atom.cmake")
 
 ################# CCache
 
