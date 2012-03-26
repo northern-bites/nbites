@@ -49,14 +49,15 @@ struct Landmark
  * @param fieldObjects
  * @return a vector of landmarks.
  */
-std::vector<Landmark> constructLandmarks(VisualFieldObject fieldObject)
+template <class VisualType, class ConcreteType>
+static std::vector<Landmark> constructLandmarks(VisualType fieldObject)
 {
     std::vector<Landmark> landmarks;
 
-    const std::list<const ConcreteFieldObject *> * possibilities = 
+    const std::list<const ConcreteType *> * possibilities = 
       fieldObject.getPossibilities();
 
-    std::list<const ConcreteFieldObject *>::const_iterator iter;
+    std::list<const ConcreteType *>::const_iterator iter;
     for(iter = possibilities.begin(); iter != possibilities.end(); ++iter) 
     {
         // Construct landmarks from possibilities.

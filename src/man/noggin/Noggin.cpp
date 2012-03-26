@@ -131,8 +131,15 @@ void Noggin::initializeLocalization()
     printf("Initializing localization modules\n");
 #   endif
 
-    // Initialize the localization module
-    loc = shared_ptr<LocSystem>(new MultiLocEKF());
+    // Initialize the landmark map.
+    // @todo check these. Another possible source of error!
+    landmarkMap.push_back(Landmark());
+
+    locMotionSystem = shared_ptr<MotionSystem>(new MotionSystem());
+    locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem(landmarkMap));
+
+    loc = shared_ptr<LocSystem>(new ParticleFilter(100, FIELD_WHITE_WIDTH, FIELD_WHITE_HEIGHT,
+						   locMotionSystem, locVisionSystem));
 
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
@@ -298,112 +305,107 @@ void Noggin::runStep ()
 
 void Noggin::updateLocalization()
 {
-    // Self Localization
     MotionModel odometery = motion_interface->getOdometryUpdate();
 
     // First, update the odometry data and feed to the motion handler.
-    // @todo implement the MotionModel for our odometry system.
-    //locMotion->feedStep(...);
-
-    // Build the observations from vision data
-    vector<PointObservation> pt_observations;
-    vector<CornerObservation> corner_observations;
-
-    // FieldObjects
+    // @todo this could be a big source of error. What is f, l, and r??
+    locMotion->feedStep(Step(odometry.f, odometry.l, odometry.r));
 
     std::vector<Observation> observations;
     std::vector<Landmark> landmarks;
     float dist, theta;
 
+    // Observe FieldObjects.
     VisualFieldObject fo;
     fo = *vision->bgrp;
 
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        //PointObservation seen(fo);
+    // @todo this seems like a lot of code duplication--make more concise?
+
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    {
         // Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks(fo);
+	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
 	dist = fo.getDistance();
 	theta = fo.getBearing();
 	observations.push_back(Observation(landmarks, dist, theta));
-        //pt_observations.push_back(seen);
     }
 
     fo = *vision->bglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        //PointObservation seen(fo);
-        // Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks(fo);
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    {
+	// Create a new Observation from the observed VisualFieldObject.
+	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
 	dist = fo.getDistance();
 	theta = fo.getBearing();
 	observations.push_back(Observation(landmarks, dist, theta));
-        //pt_observations.push_back(seen);
     }
 
     fo = *vision->ygrp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        //PointObservation seen(fo);
-        // Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks(fo);
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    {
+	// Create a new Observation from the observed VisualFieldObject.
+	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
 	dist = fo.getDistance();
 	theta = fo.getBearing();
 	observations.push_back(Observation(landmarks, dist, theta));
-        //pt_observations.push_back(seen);
     }
 
     fo = *vision->yglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        //PointObservation seen(fo);
-        // Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks(fo);
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
+    {
+	// Create a new Observation from the observed VisualFieldObject.
+	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
 	dist = fo.getDistance();
 	theta = fo.getBearing();
 	observations.push_back(Observation(landmarks, dist, theta));
-        //pt_observations.push_back(seen);
     }
 
-#       ifdef DEBUG_POST_OBSERVATIONS
     vector<PointObservation>::iterator i;
-    for(i = pt_observations.begin(); i != pt_observations.end(); ++i){
+    for(i = pt_observations.begin(); i != pt_observations.end(); ++i)
+    {
         cout << "Spotted post: " << *i << endl;
     }
-#       endif
 
-
-    // Field Cross
+    // Observe Field Cross.
     if (vision->cross->getDistance() > 0 &&
-        vision->cross->getDistance() < MAX_CROSS_DISTANCE) {
+        vision->cross->getDistance() < MAX_CROSS_DISTANCE) 
+    {
 
-        PointObservation seen(*vision->cross);
-        pt_observations.push_back(seen);
-#       ifdef DEBUG_CROSS_OBSERVATIONS
-        cout << "Saw cross " << pt_observations.back() << endl;
-#       endif
+	landmarks = constructLandmarks<VisualCross, ConcreteCross>(*vision->cross);
+	dist = (*vision->cross).getDistance();
+	theta = (*vision->cross).getBearing();
+	observations.push_back(Observation(landmarks, dist, theta));
     }
 
-    // Corners
-#   ifdef USE_LOC_CORNERS
+    // Observe Corners.
     const list<VisualCorner> * corners = vision->fieldLines->getCorners();
     list <VisualCorner>::const_iterator i;
-    for ( i = corners->begin(); i != corners->end(); ++i) {
-        if (i->getDistance() < MAX_CORNER_DISTANCE) {
-            CornerObservation seen(*i);
-            corner_observations.push_back(seen);
+    for(i = corners->begin(); i != corners->end(); ++i) 
+    {
+        if (i->getDistance() < MAX_CORNER_DISTANCE) 
+	{
+	    landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*i);
+	    dist = i->getDistance();
+	    theta = i->getBearing();
+	    observations.push_back(Observation(landmarks, dist, theta));
 
-#           ifdef DEBUG_CORNER_OBSERVATIONS
             cout << "Saw corner "
                  << ConcreteCorner::cornerIDToString(i->getID())
                  << " at distance "
                  << seen.getVisDistance() << " and bearing "
                  << seen.getVisBearing() << endl;
-#           endif
         }
     }
-#   endif
 
-    // Process the information
-    PROF_ENTER(P_MCL);
-    loc->updateLocalization(odometery, pt_observations, corner_observations);
-    PROF_EXIT(P_MCL);
+    // Update the localiztion vision interface with Observations.
+    locVision->feedObservations(observations);
+
+    // Now, run the particle filter.
+    ((ParticleFilter *)loc)->run();
+
+
+    // END LOCALIZATION UPDATE //
+
 
     // Ball Tracking
     if (vision->ball->getDistance() > 0.0) {

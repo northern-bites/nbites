@@ -134,7 +134,10 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
  */
 void VisionSystem::feedObservations(std::vector<Observation> newObs)
 {
-    hasNewObservations = true;
+    if(newObs.size() > 0)
+	hasNewObservations = true;
+    else
+	hasNewObservations = false;
   
     currentObservations = newObs;
 }

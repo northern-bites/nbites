@@ -130,6 +130,50 @@ namespace PF
 	LocalizationParticle getBestParticle();
 
 
+	/**
+	 * Methods inherited from LocSystem. For now, they don't really
+	 * do anything, since LocSystem will change soon.
+	 */
+	void updateLocalization(const MotionModel& u_t,
+				const std::vector<PointObservation>& pt_z,
+				const std::vector<CornerObservation>& c_z) { }
+
+	/**
+	 * @todo implement a reset method for the particle filter.
+	 */
+	void reset() { }
+
+	void blueGoalieReset() { }
+	void redGoalieReset() { }
+	void resetLocTo(float x, float y, float h) { }
+
+	PoseEst getCurrentEstimate() const { return PoseEst(); }
+	PoseEst getCurrentUncertainty() const { return PoseEst(); }
+	float getXEst() const { return 0.0f; }
+	float getYEst() const { return 0.0f; }
+	float getHEst() const { return 0.0f; }
+	float getHEstDeg() const { return 0.0f; }
+	float getXUncert() const { return 0.0f; }
+	float getYUncert() const { return 0.0f; }
+	float getHUncert() const { return 0.0f; }
+	float getHUncertDeg() const { return 0.0f; }
+	MotionModel getLastOdo() const { return 0.0f; }
+
+	std::vector<PointObservation> getLastPointObservations() const { return std::vector<PointObservation>(); }
+
+	
+	std::vector<CornerObservation> getLastCornerObservations() const { return std::vector<CornerObservation>(); }
+
+	bool isActive() const { return active;}
+	
+        void setXEst(float xEst) { }
+	void setYEst(float yEst) { }
+	void setHEst(float hEst) { }
+	void setXUncert(float uncertX) { }
+	void setYUncert(float uncertY) { }
+	void setHUncert(float uncertH) { }
+
+
     private:
 	void resample();
 
