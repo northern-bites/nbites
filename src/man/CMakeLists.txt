@@ -125,14 +125,6 @@ ELSE()
   SET( USE_ALSPEECH_POUND "" )
 ENDIF()
 
-SET( AUTOLOAD_INI ${CFG_DIR}/autoload.ini )
-
-CONFIGURE_FILE(
-  ${MAN_CMAKE_DIR}/autoload.ini.in
-  ${CFG_DIR}/autoload.ini
-  ESCAPE_QUOTES
-  )
-
 ############################ DEFINITIONS
 # Add here definition needed.
 ADD_DEFINITIONS(
@@ -234,11 +226,6 @@ INSTALL(
   DESTINATION ${MAN_PYTHON_TARGET_DIR}
   CONFIGURATIONS "" Debug Release
   )
-#INSTALL(
-#  FILES ${AUTOLOAD_INI}
-#  DESTINATION ${OUTPUT_ROOT_DIR_PREF}
-#  CONFIGURATIONS "" Debug Release
-#  )
 
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories to
