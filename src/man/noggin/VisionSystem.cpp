@@ -4,7 +4,7 @@
  * Constructor
  */
 VisionSystem::VisionSystem(LandmarkMap m = LandmarkMap())
-  : PF::SensorModel(), map(m), hasNewObservations(false)
+  : PF::SensorModel(), map(m), hasNewObs(false)
 { }
 
 /**
@@ -15,7 +15,7 @@ VisionSystem::VisionSystem(LandmarkMap m = LandmarkMap())
  */
 PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 {
-    std::vector<Observation> obs = currentObservations;
+    std::vector<PF::Observation> obs = currentObservations;
     if(obs.size() == 0)
     {
 #ifdef DEBUG_LOCALIZATION
@@ -35,9 +35,9 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 
     setUpdated(true);
 
-    hasNewObservations = false;
+    hasNewObs = false;
 
-    std::vector<Observation>::iterator obsIter;
+    std::vector<PF::Observation>::iterator obsIter;
 
 #ifdef DEBUG_LOCALIZATION
     std::cout << "Using current location " << currentLocation << std::endl;
@@ -54,7 +54,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
         int count = 0;
 	for(obsIter = obs.begin(); obsIter != obs.end(); ++obsIter)
 	{
-      	    Observation o = (*obsIter);
+	    PF::Observation o = (*obsIter);
 	    if(!o.isAmbiguous())
 	    {
 	        // Since the observation is unambiguous, use the first observation.
@@ -132,12 +132,12 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
  *
  * @param newObs the new vector of observations.
  */
-void VisionSystem::feedObservations(std::vector<Observation> newObs)
+void VisionSystem::feedObservations(std::vector<PF::Observation> newObs)
 {
     if(newObs.size() > 0)
-	hasNewObservations = true;
+	hasNewObs = true;
     else
-	hasNewObservations = false;
+	hasNewObs = false;
   
     currentObservations = newObs;
 }

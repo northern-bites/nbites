@@ -138,8 +138,7 @@ void Noggin::initializeLocalization()
     locMotionSystem = shared_ptr<MotionSystem>(new MotionSystem());
     locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem(landmarkMap));
 
-    loc = shared_ptr<LocSystem>(new ParticleFilter(100, FIELD_WHITE_WIDTH, FIELD_WHITE_HEIGHT,
-						   locMotionSystem, locVisionSystem));
+    loc = shared_ptr<LocSystem>(new PF::ParticleFilter(100, FIELD_WHITE_WIDTH, FIELD_WHITE_HEIGHT, locMotionSystem, locVisionSystem));
 
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 
@@ -305,13 +304,15 @@ void Noggin::runStep ()
 
 void Noggin::updateLocalization()
 {
-    MotionModel odometery = motion_interface->getOdometryUpdate();
+    ::MotionModel odometery = motion_interface->getOdometryUpdate();
 
     // First, update the odometry data and feed to the motion handler.
     // @todo this could be a big source of error. What is f, l, and r??
-    locMotion->feedStep(Step(odometry.f, odometry.l, odometry.r));
+    locMotionSystem->feedStep(PF::Step(odometery.deltaF, 
+				       odometery.deltaL, 
+				       odometery.deltaR));
 
-    std::vector<Observation> observations;
+    std::vector<PF::Observation> observations;
     std::vector<Landmark> landmarks;
     float dist, theta;
 
@@ -327,7 +328,7 @@ void Noggin::updateLocalization()
 	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
 	dist = fo.getDistance();
 	theta = fo.getBearing();
-	observations.push_back(Observation(landmarks, dist, theta));
+	observations.push_back(PF::Observation(landmarks, dist, theta));
     }
 
     fo = *vision->bglp;
@@ -337,7 +338,7 @@ void Noggin::updateLocalization()
 	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
 	dist = fo.getDistance();
 	theta = fo.getBearing();
-	observations.push_back(Observation(landmarks, dist, theta));
+	observations.push_back(PF::Observation(landmarks, dist, theta));
     }
 
     fo = *vision->ygrp;
@@ -347,7 +348,7 @@ void Noggin::updateLocalization()
 	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
 	dist = fo.getDistance();
 	theta = fo.getBearing();
-	observations.push_back(Observation(landmarks, dist, theta));
+	observations.push_back(PF::Observation(landmarks, dist, theta));
     }
 
     fo = *vision->yglp;
@@ -357,13 +358,7 @@ void Noggin::updateLocalization()
 	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
 	dist = fo.getDistance();
 	theta = fo.getBearing();
-	observations.push_back(Observation(landmarks, dist, theta));
-    }
-
-    vector<PointObservation>::iterator i;
-    for(i = pt_observations.begin(); i != pt_observations.end(); ++i)
-    {
-        cout << "Spotted post: " << *i << endl;
+	observations.push_back(PF::Observation(landmarks, dist, theta));
     }
 
     // Observe Field Cross.
@@ -374,34 +369,31 @@ void Noggin::updateLocalization()
 	landmarks = constructLandmarks<VisualCross, ConcreteCross>(*vision->cross);
 	dist = (*vision->cross).getDistance();
 	theta = (*vision->cross).getBearing();
-	observations.push_back(Observation(landmarks, dist, theta));
+	observations.push_back(PF::Observation(landmarks, dist, theta));
     }
 
     // Observe Corners.
     const list<VisualCorner> * corners = vision->fieldLines->getCorners();
-    list <VisualCorner>::const_iterator i;
-    for(i = corners->begin(); i != corners->end(); ++i) 
+    list <VisualCorner>::const_iterator ci;
+    for(ci = corners->begin(); ci != corners->end(); ++ci) 
     {
-        if (i->getDistance() < MAX_CORNER_DISTANCE) 
+        if (ci->getDistance() < MAX_CORNER_DISTANCE) 
 	{
-	    landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*i);
-	    dist = i->getDistance();
-	    theta = i->getBearing();
-	    observations.push_back(Observation(landmarks, dist, theta));
-
-            cout << "Saw corner "
-                 << ConcreteCorner::cornerIDToString(i->getID())
-                 << " at distance "
-                 << seen.getVisDistance() << " and bearing "
-                 << seen.getVisBearing() << endl;
+	    landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*ci);
+	    dist = ci->getDistance();
+	    theta = ci->getBearing();
+	    observations.push_back(PF::Observation(landmarks, dist, theta));
         }
     }
 
     // Update the localiztion vision interface with Observations.
-    locVision->feedObservations(observations);
+    locVisionSystem->feedObservations(observations);
 
     // Now, run the particle filter.
-    ((ParticleFilter *)loc)->run();
+    MotionModel u_t;
+    std::vector<PointObservation> pt_z;
+    std::vector<CornerObservation> c_z;
+    loc->updateLocalization(u_t, pt_z, c_z);
 
 
     // END LOCALIZATION UPDATE //

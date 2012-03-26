@@ -136,7 +136,11 @@ namespace PF
 	 */
 	void updateLocalization(const MotionModel& u_t,
 				const std::vector<PointObservation>& pt_z,
-				const std::vector<CornerObservation>& c_z) { }
+				const std::vector<CornerObservation>& c_z)
+	{
+	    // Do nothing with this data.
+	    run();
+	}
 
 	/**
 	 * @todo implement a reset method for the particle filter.
@@ -157,14 +161,14 @@ namespace PF
 	float getYUncert() const { return 0.0f; }
 	float getHUncert() const { return 0.0f; }
 	float getHUncertDeg() const { return 0.0f; }
-	MotionModel getLastOdo() const { return 0.0f; }
+	::MotionModel getLastOdo() const { return ::MotionModel(); }
 
 	std::vector<PointObservation> getLastPointObservations() const { return std::vector<PointObservation>(); }
 
 	
 	std::vector<CornerObservation> getLastCornerObservations() const { return std::vector<CornerObservation>(); }
 
-	bool isActive() const { return active;}
+	bool isActive() const { return true; }
 	
         void setXEst(float xEst) { }
 	void setYEst(float yEst) { }
@@ -172,16 +176,18 @@ namespace PF
 	void setXUncert(float uncertX) { }
 	void setYUncert(float uncertY) { }
 	void setHUncert(float uncertH) { }
-
+	void activate() { }
+	void deactivate() { }
 
     private:
 	void resample();
+
+	int numParticles;
 
 	// Spatial dimensions
 	float width;
 	float height;
 
-	int numParticles;
 	ParticleSet particles;
 	MotionModel* motionModel;
 	SensorModel* sensorModel;

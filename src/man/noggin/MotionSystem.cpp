@@ -22,10 +22,10 @@ void MotionSystem::feedStep(float dx, float dy, float da)
 {
     moved = true;
 
-    lastStep = Step(dx, dy, da);
+    lastStep = PF::Step(dx, dy, da);
 }
 
-void MotionSystem::feedStep(Step s)
+void MotionSystem::feedStep(PF::Step s)
 {
     feedStep(s.dx, s.dy, s.da);
 }
@@ -36,9 +36,9 @@ void MotionSystem::feedStep(Step s)
  * @return a Step object with noise proportional to
  * the magnitude of the step in every direction.
  */
-Step MotionSystem::noisyStep()
+PF::Step MotionSystem::noisyStep()
 {
-    return Step(lastStep.dx + PF::sampleNormal(0.0f, std::sqrt(lastStep.dx)),
+    return PF::Step(lastStep.dx + PF::sampleNormal(0.0f, std::sqrt(lastStep.dx)),
 	        lastStep.dy + PF::sampleNormal(0.0f, std::sqrt(lastStep.dy)),
 	        lastStep.da + PF::sampleNormal(0.0f, std::sqrt(lastStep.da)));
 }
@@ -55,7 +55,7 @@ PF::ParticleSet MotionSystem::update(PF::ParticleSet particles)
 	PF::ParticleIt iter;
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
 	{
-	    Step noisy = noisyStep();
+	    PF::Step noisy = noisyStep();
 	    (*iter).setX((*iter).getLocation().x + noisy.dx);
 	    (*iter).setY((*iter).getLocation().y + noisy.dy);
 	    (*iter).setA((*iter).getLocation().angle + noisy.da);

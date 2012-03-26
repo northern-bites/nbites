@@ -87,6 +87,8 @@ SET( NOGGIN_SRCS Noggin
 		 PyObjects
 		 CombinationObjects
 		 ParticleFilter
+		 VisionSystem
+		 MotionSystem
                  )
 
 

@@ -15,23 +15,26 @@ class VisionSystem;
 /**
  * Holds information about a single step.
  */
-struct Step
+namespace PF
 {
-    Step(float dX = 0.0f, float dY = 0.0f, float dA = 0.0f)
-    : dx(dX), dy(dY), da(dA)
-    { }
-    
-    float dx;
-    float dy;
-    float da;
-
-    friend std::ostream& operator<<(std::ostream& out, Step s)
+    struct Step
     {
-	out << "Step taken, (" << s.dx << ", "
-	    << s.dy << ", " << s.da << ")" << "\n";
-	return out;
-    }
-};
+         Step(float dX = 0.0f, float dY = 0.0f, float dA = 0.0f)
+	 : dx(dX), dy(dY), da(dA)
+	{ }
+	
+	float dx;
+	float dy;
+	float da;
+	
+	friend std::ostream& operator<<(std::ostream& out, Step s)
+	{
+	    out << "Step taken, (" << s.dx << ", "
+		<< s.dy << ", " << s.da << ")" << "\n";
+	    return out;
+	}
+    };
+}
 
 /**
  * @class MotionSystem
@@ -46,13 +49,13 @@ class MotionSystem : public PF::MotionModel
     ~MotionSystem() { }
 
     void feedStep(float dx, float dy, float da);
-    void feedStep(Step s);
-    Step noisyStep();
+    void feedStep(PF::Step s);
+    PF::Step noisyStep();
     PF::ParticleSet update(PF::ParticleSet particles);
 
  private:
     bool moved;
-    Step lastStep;
+    PF::Step lastStep;
 };
 
 #endif // MOTION_SYSTEM_H

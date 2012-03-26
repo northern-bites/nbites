@@ -24,11 +24,11 @@ struct Landmark
     /**
      * Constructs a Landmark from a ConcreteFieldObject.
      */
-    Landmark(const ConcreteFieldObject * fieldObject)
+    Landmark(const ConcreteLandmark& fieldLandmark)
     {
-        x    = fieldObject->getFieldX();
-	y    = fieldObject->getFieldY();
-        what = fieldObject->toString();
+        x    = fieldLandmark.getFieldX();
+	y    = fieldLandmark.getFieldY();
+        what = fieldLandmark.toString();
     }
     
     float x;
@@ -49,19 +49,18 @@ struct Landmark
  * @param fieldObjects
  * @return a vector of landmarks.
  */
-template <class VisualType, class ConcreteType>
-static std::vector<Landmark> constructLandmarks(VisualType fieldObject)
+template <typename VisualT, typename ConcreteT>
+static std::vector<Landmark> constructLandmarks(VisualT fieldObject)
 {
     std::vector<Landmark> landmarks;
 
-    const std::list<const ConcreteType *> * possibilities = 
-      fieldObject.getPossibilities();
+    const std::list<const ConcreteT * > * possibilities = fieldObject.getPossibilities();
 
-    std::list<const ConcreteType *>::const_iterator iter;
-    for(iter = possibilities.begin(); iter != possibilities.end(); ++iter) 
+    typename std::list<const ConcreteT * >::const_iterator i;
+    for(i = possibilities->begin(); i != possibilities->end(); ++i) 
     {
         // Construct landmarks from possibilities.
-        Landmark l(*iter);
+        Landmark l(**i);
 	landmarks.push_back(l);
     }
 
@@ -71,18 +70,21 @@ static std::vector<Landmark> constructLandmarks(VisualType fieldObject)
 /**
  * Holds a single observation.
  */
-struct Observation
+namespace PF
 {
-    Observation(std::vector<Landmark> p, float dist = 0.0f, float theta = 0.0f)
-    : possibilities(p), distance(dist), angle(theta)
-    { }
+    struct Observation
+    {
+         Observation(std::vector<Landmark> p, float dist = 0.0f, float theta = 0.0f)
+	 : possibilities(p), distance(dist), angle(theta)
+	{ }
+	
+	bool isAmbiguous() const { return possibilities.size() > 1 ? true : false; }
 
-    bool isAmbiguous() const { return possibilities.size() > 1 ? true : false; }
-
-    std::vector<Landmark> possibilities;
-    float distance;
-    float angle;
-};
+	std::vector<Landmark> possibilities;
+	float distance;
+	float angle;
+    };
+}
 
 typedef std::vector<Landmark> LandmarkMap;
 
@@ -97,14 +99,14 @@ class VisionSystem : public PF::SensorModel
 
     PF::ParticleSet update(PF::ParticleSet particles);
 
-    bool hasNewObservations() const { return hasNewObservations; }
+    bool hasNewObservations() const { return hasNewObs; }
     
-    void feedObservations(std::vector<Observation> newObs);
+    void feedObservations(std::vector<PF::Observation> newObs);
 
  private:
     LandmarkMap map;
-    bool hasNewObservations;
-    std::vector<Observation> currentObservations;
+    bool hasNewObs;
+    std::vector<PF::Observation> currentObservations;
 };
 
 #endif // VISION_SYSTEM_H
