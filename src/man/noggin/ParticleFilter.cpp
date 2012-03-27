@@ -30,7 +30,8 @@ namespace PF
     }
 
     ParticleFilter::ParticleFilter(int particles, float w, float h,
-				   MotionModel* motion, SensorModel* sensor)
+				   boost::shared_ptr<MotionModel> motion, 
+				   boost::shared_ptr<SensorModel> sensor)
       : numParticles(particles), width(w), height(h)
     {
 	motionModel = motion;
@@ -73,10 +74,7 @@ namespace PF
 
     ParticleFilter::~ParticleFilter()
     {
-	delete motionModel;
-	motionModel = 0;
-	delete sensorModel;
-	sensorModel = 0;
+
     }
 
     void ParticleFilter::run(bool motionUpdate, bool sensorUpdate)

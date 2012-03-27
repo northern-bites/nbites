@@ -19,6 +19,7 @@
 #include <cmath>
 #include <iostream>
 #include <map>
+#include <boost/shared_ptr.hpp>
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/uniform_real.hpp>
@@ -120,7 +121,8 @@ namespace PF
     {
     public:
         ParticleFilter(int particles, float w, float h,
-		       MotionModel* motion, SensorModel* sensor);
+		       boost::shared_ptr<MotionModel> motion, 
+		       boost::shared_ptr<SensorModel> sensor);
 	~ParticleFilter();
 
 	void run(bool motionUpdate = true, bool sensorUpdate = true);
@@ -134,7 +136,7 @@ namespace PF
 	 * Methods inherited from LocSystem. For now, they don't really
 	 * do anything, since LocSystem will change soon.
 	 */
-	void updateLocalization(const MotionModel& u_t,
+	void updateLocalization(const ::MotionModel& u_t,
 				const std::vector<PointObservation>& pt_z,
 				const std::vector<CornerObservation>& c_z)
 	{
@@ -189,8 +191,8 @@ namespace PF
 	float height;
 
 	ParticleSet particles;
-	MotionModel* motionModel;
-	SensorModel* sensorModel;
+	boost::shared_ptr<MotionModel> motionModel;
+	boost::shared_ptr<SensorModel> sensorModel;
     };
 
     /**
