@@ -112,6 +112,49 @@ void ColorTable::unSetColor(byte y, byte u, byte v, byte col)
     table[v / 2][u / 2][y / 2] = table[v / 2][u / 2][y / 2] & col;
 }
 
+/* Write out a color table using bitwise definitions
+ * using information from a set of NUM_COLORS colorSpace
+ */
+void ColorTable::writeFromSliders(QString filename, ColorSpace* colorSpaces) {
+
+    QFile file(filename);
+    QTextStream out(stdout);
+    byte V_MAX = 128, U_MAX = 128, Y_MAX = 128;
+    QByteArray table;
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        out << "Could not open file to write color table properly!" << "\n";
+        return;
+    }
+    // loop through all possible table values - our tables are v-u-y
+    int count = 0;
+    for (int z = 0; z < V_MAX; z++)
+    {
+        for (int x = 0; x < U_MAX; x++)
+        {
+            for (int y = 0; y < Y_MAX; y++)
+            {
+                byte temp = GREY_BIT;
+                Color color;
+                color.setYuv((byte) y, (byte) x, (byte) z);
+                for (int c = 0; c < image::NUM_COLORS; c++)
+                {
+                    if (colorSpaces[c].contains(color)) {
+                        if (c == image::Orange) {
+                            count++;
+                        }
+                        temp = temp | image::Color_bits[c];
+                    }
+                }
+                table.append(temp);
+            }
+        }
+    }
+    file.write(table);
+    out << "Orange count was " << count << "\n" << endl;
+    file.close();
+}
 
 /*Stats** ColorTable::colorStats()
 {

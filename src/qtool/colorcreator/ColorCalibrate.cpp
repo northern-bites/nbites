@@ -209,7 +209,7 @@ void ColorCalibrate::saveColorTableBtnPushed() {
                     tr("Save Color Table to File"),
                     base_directory + "/new_table.mtb",
                     tr("Color Tables(*.mtb)"));
-    ColorTable::write(filename, colorSpace);
+    ColorTable::writeFromSliders(filename, colorSpace);
 }
 
 }
