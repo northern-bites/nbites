@@ -50,7 +50,7 @@ struct Landmark
  * @return a vector of landmarks.
  */
 template <typename VisualT, typename ConcreteT>
-static std::vector<Landmark> constructLandmarks(VisualT fieldObject)
+static std::vector<Landmark> constructLandmarks(const VisualT & fieldObject)
 {
     std::vector<Landmark> landmarks;
 
@@ -60,7 +60,9 @@ static std::vector<Landmark> constructLandmarks(VisualT fieldObject)
     for(i = possibilities->begin(); i != possibilities->end(); ++i) 
     {
         // Construct landmarks from possibilities.
-        Landmark l(**i);
+        Landmark l((**i).getFieldX(),
+		   (**i).getFieldY(),
+		   (**i).toString());
 	landmarks.push_back(l);
     }
 
@@ -79,6 +81,21 @@ namespace PF
 	{ }
 	
 	bool isAmbiguous() const { return possibilities.size() > 1 ? true : false; }
+
+	friend std::ostream& operator<<(std::ostream& out, Observation o)
+        {
+	    out << "Observed landmark at distance " << o.distance 
+	        << " and angle " << o.angle << "\n"
+	        << "Possibilities: \n";
+	    std::vector<Landmark>::iterator lIter;
+	    for(lIter = o.possibilities.begin(); lIter != o.possibilities.end();
+		lIter++)
+	    {
+	        out << *lIter;
+	    }
+	    
+	    return out;
+	}
 
 	std::vector<Landmark> possibilities;
 	float distance;
