@@ -22,15 +22,14 @@ class ColorTable
 {
 public:
     ColorTable();
-    byte*** getTable() {return table; }
+    *** getTable() {return table; }
     void read(QString filename);
-    void writeNewFormat(QString filename);
     byte getColor(byte y, byte u, byte v);
     void setColor(byte y, byte u, byte v, byte col);
     void unSetColor(byte y, byte u, byte v, byte col);
 
     //color table output methods
-    static void write(QString filename, ColorSpace* colorSpaces);
+    static void write(QString filename);
 
 private:
     byte*** table;
