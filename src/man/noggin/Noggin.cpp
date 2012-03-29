@@ -530,6 +530,7 @@ void Noggin::modifySysPath ()
 #    if defined OFFLINE || defined STRAIGHT
        string dir1 = NBITES_DIR"/build/qtool";
        string dir2 = NBITES_DIR"/build/qtool/man";
+       const char* cwd = "";
 #    else
        const char *cwd = "/home/nao/nbites/lib";
 #    endif
