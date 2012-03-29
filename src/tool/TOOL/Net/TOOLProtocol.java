@@ -34,13 +34,6 @@ public class TOOLProtocol {
     public static final byte REQUEST_MSG = 1;
     public static final byte DISCONNECT = 2;
 
-    public static final byte CMD_TABLE  = 0;
-    public static final byte CMD_MOTION = 1;
-    public static final byte CMD_HEAD   = 2;
-    public static final byte CMD_JOINTS = 3;
-
-    public static final byte USE_TOOL_DATA = 0;
-
     public static final int NUM_MOTION_ENG = 4;
     public static final int NUM_HEAD_ENG   = 4;
 
@@ -155,9 +148,8 @@ public class TOOLProtocol {
             if (!connected) {
                 serial.connect();
                 connected = true;
+                request(DataRequest.INFO_ONLY);
             }
-
-            request(DataRequest.INFO_ONLY);
         }catch (IOException e) {
             NetworkModule.logError(NetworkModule.class,
                 "Error on serial connection to remote host.", e);
@@ -404,28 +396,18 @@ public class TOOLProtocol {
 		return null;
 	}
 
-	public void sendMotion(double[] motion) {
+    // cmd must be 256 bytes
+    public void sendCommand(byte[] cmd) {
+        initConnection();
         try {
+            // Writes the COMMAND_MSG id byte
             serial.writeByte(COMMAND_MSG);
-            serial.writeByte(CMD_MOTION);
-            serial.writeDoubles(motion);
+            // Writes the message into the data serializer for robot to read
+            serial.writeBytes(cmd);
             serial.flush();
         }catch (IOException e) {
             NetworkModule.logError(NetworkModule.class,
-                "Sending motion command failed", e);
-            disconnect();
-        }
-    }
-
-    public void sendHead(double[] head) {
-        try {
-            serial.writeByte(COMMAND_MSG);
-            serial.writeByte(CMD_MOTION);
-            serial.writeDoubles(head);
-            serial.flush();
-        }catch (IOException e) {
-            NetworkModule.logError(NetworkModule.class,
-                "Sending head command failed", e);
+                "Sending command failed", e);
             disconnect();
         }
     }

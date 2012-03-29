@@ -15,6 +15,7 @@ import vision
 import sensors
 import noggin_constants as Constants
 import loggingBoard
+import sender
 
 # Modules from this directory
 from . import GameController
@@ -63,6 +64,7 @@ class Brain(object):
         self.comm = comm.inst
         self.comm.gc.team = TeamConfig.TEAM_NUMBER
         self.comm.gc.player = TeamConfig.PLAYER_NUMBER
+        self.sender = sender.sender
 
         #initalize the leds
         #print leds
@@ -253,6 +255,19 @@ class Brain(object):
 
         # Update any logs we have
         self.out.updateLogs()
+
+        # Check to see if the tool sent a new command
+        if self.sender.changed:
+            # If no syntax error (hopefully), prints cmd and executes it
+            try:
+                print "Executing command: " + self.sender.command
+                exec(self.sender.command)
+            # Will catch most syntax errors, prints an error
+            except(RuntimeError, SyntaxError, TypeError, \
+                   NameError, AttributeError):
+                print "Error in command."
+            # Sets the CommandSender back to normal
+            self.sender.changed = False
 
     def updateComm(self):
         temp = self.comm.latestComm()

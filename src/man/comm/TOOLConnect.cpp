@@ -10,6 +10,7 @@ using namespace boost::assign;
 #include "CommDef.h"
 #include "Kinematics.h"
 #include "SensorDef.h"
+#include "PySender.h"
 
 using std::vector;
 using namespace boost;
@@ -31,8 +32,9 @@ TOOLConnect::TOOLConnect (shared_ptr<Sensors> s, shared_ptr<Vision> v,
     : Thread("TOOLConnect"),
       state(TOOL_REQUESTING),
       sensors(s), vision(v), gameController(gc),
-      loc(), ballEKF()
+      loc(), ballEKF(), sender(new CommandSender)
 {
+    set_sender_pointer(sender);
 }
 
 TOOLConnect::~TOOLConnect ()
@@ -122,12 +124,17 @@ TOOLConnect::receive () throw(socket_error&)
     } else if (b == COMMAND_MSG) {
 
         state = TOOL_COMMANDING;
-        int cmd = serial.read_int();
+
+        // reads the 256-byte message send in from Java
+        byte cmd[SIZEOF_COMMAND];
+        serial.read_bytes((byte*)&cmd[0], SIZEOF_COMMAND);
+
 #ifdef DEBUG_TOOL_COMMANDS
-        printf("Command received: type=%i\n", cmd);
+        printf("Command recieved: %s\n", cmd);
 #endif
 
-        handle_command(cmd);
+        // Updates the CommandSender with new information
+        sender->update((const char*)cmd);
 
     } else if (b == DISCONNECT) {
 
@@ -289,25 +296,4 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 		serial.write_floats(mm_values);
 #endif
 	}
-}
-
-void
-TOOLConnect::handle_command (int cmd) throw(socket_error&)
-{
-    switch (cmd) {
-    case CMD_TABLE:
-        break;
-
-    case CMD_MOTION:
-        break;
-
-    case CMD_HEAD:
-        break;
-
-    case CMD_JOINTS:
-        break;
-
-    default:
-        fprintf(stderr, "Unimplemented command type");
-    }
 }

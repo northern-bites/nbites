@@ -15,12 +15,14 @@ class TOOLConnect; // forward reference
 #include "LocSystem.h"
 #include "BallEKF.h"
 #include "GameController.h"
+#include "CommandSender.h"
 
 //
 // DataRequest struct definition
 //
 
 #define SIZEOF_REQUEST 11
+#define SIZEOF_COMMAND 256
 
 struct DataRequest {
     bool info;
@@ -77,7 +79,6 @@ private:
     void reset();
     void receive       ()               throw(socket_error&);
     void handle_request(DataRequest& r) throw(socket_error&);
-    void handle_command(int cmd)        throw(socket_error&);
 
     int state;
     // Serialized connection to remote host
@@ -90,6 +91,8 @@ private:
     boost::shared_ptr<GameController> gameController; // access to GameController
     boost::shared_ptr<LocSystem> loc; // access to localization data
     boost::shared_ptr<BallEKF> ballEKF; // access to localization data
+
+    boost::shared_ptr<CommandSender> sender;
 };
 
 #endif /* TOOLConnect_H */
