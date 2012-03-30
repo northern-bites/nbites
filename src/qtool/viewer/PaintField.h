@@ -21,6 +21,9 @@
 #include "MObjectViewer.h"
 #include "man/include/FieldConstants.h"
 
+// Use this for convience of viewing
+#define BALL_SIZE 10
+
 namespace qtool {
 namespace viewer {
 
@@ -34,6 +37,8 @@ public:
   QSize sizeHint() const;
 
   void ballDataChanged(const QBrush &brush);
+  void paintField();
+  void paintBall();
 
 private slots:
 
@@ -48,8 +53,8 @@ private:
   
   QStandardItemModel *model;
   QDataWidgetMapper *mapper; 
-  
- 
+
+
 
 };
 

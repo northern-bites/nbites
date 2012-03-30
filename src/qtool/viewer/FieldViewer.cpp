@@ -10,13 +10,20 @@ using namespace data;
 using namespace man::memory;
 
 FieldViewer::FieldViewer(DataManager::ptr dataManager) :
-        QMainWindow(), dataManager(dataManager) {
+		QMainWindow(),
+		dataManager(dataManager),
+		worldDataViewer(new WorldDataViewer()){
+  
+  paintField = new PaintField();
 
-    paintField = new PaintField();
-
-    // Adds the Field
-    this->setCentralWidget(paintField);
-
+  // Adds the Field
+  this->setCentralWidget(paintField);
+  QDockWidget *dockWidget = new QDockWidget(tr("World Information"), this);
+  dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
+                               Qt::RightDockWidgetArea);
+  dockWidget->setFeatures(QDockWidget::NoDockWidgetFeatures);
+  dockWidget->setWidget(worldDataViewer);
+  addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
 }
 
