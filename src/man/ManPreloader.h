@@ -26,7 +26,7 @@ template <typename man_load_method, typename man_unload_method>
 class ManPreloader: public ManPreloaderInterface {
 
 public:
-    ManPreloader(std::string libman_name = "libman.so",
+    ManPreloader(std::string libman_name = "/home/nao/nbites/lib/libman.so",
             std::string loadman_method_name = "loadMan",
             std::string unloadman_method_name = "unloadMan")
         :      libman_name(libman_name),

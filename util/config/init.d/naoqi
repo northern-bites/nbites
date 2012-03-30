@@ -1,0 +1,87 @@
+#!/sbin/runscript
+##
+## Author(s):
+##  - Cedric GESTES <gestes@aldebaran-robotics.com>
+##  - Samuel MARTIN <smartin@aldebaran-robotics.com>
+##
+## Copyright (C) 2010 - 2011 Aldebaran Robotics
+##
+
+LOCK_FILE="/var/lock/naoqi.lock"
+LOG_FILE="/var/log/naoqi.log"
+BINARY="/usr/bin/naoqi-bin"
+NAOQI_USER="nao"
+ARGS=""
+
+depend(){
+  need dbus
+  use sysklog nao-hald
+}
+
+start() {
+
+  local bin=$(basename "${BINARY}")
+  #still a pid file?
+  if [ -f "${LOCK_FILE}" ] ; then
+    #still the running process?
+    if kill -0 $(cat "${LOCK_FILE}") 2>/dev/null ; then
+      ewarn "!! Warning: naoqi is already running !!"
+      ewarn "if you are sure it is not running, remove ${LOCK_FILE}."
+      return 1
+    fi
+  fi
+  if killall -0 "${bin}" 2>/dev/null ; then
+    ewarn "!! Warning: naoqi is already running !!"
+    ewarn "Please, stop it (killall ${bin}) before starting it again."
+    return 1
+  fi
+  ebegin "Starting naoqi"
+  touch "${LOG_FILE}"
+  chown $(id -u "${NAOQI_USER}"):$(id -g "${NAOQI_USER}") "${LOG_FILE}"
+  for f in /etc/babile.conf /etc/babear4.conf ; do
+    [ -f /etc/babear4.conf"${f}" ] && \
+      chown $(id -u "${NAOQI_USER}"):$(id -g "${NAOQI_USER}") "${f}"
+  done
+  chown $(id -u "${NAOQI_USER}"):$(id -g "${NAOQI_USER}") "${LOG_FILE}"
+  if [ nao = $(whoami) ]; then
+    #user nao, already have a dbus session
+    "${BINARY}" --pid "${LOCK_FILE}" ${ARGS} 2>&1 >/home/nao/nbites/log/nblog &
+  else
+    #we want a dbus session
+    su -c ". /etc/profile.d/dbus-session.sh; ${BINARY} --pid ${LOCK_FILE} ${ARGS} 2>&1 >/home/nao/nbites/log/nblog &" - nao
+  fi
+  eend $? "cannot start naoqi"
+}
+
+stop() {
+  ebegin "Stopping naoqi"
+  local bin=$(basename "${BINARY}")
+  if [ -f "${LOCK_FILE}" ] ; then
+    if kill -0 $(cat "${LOCK_FILE}") 2>/dev/null ; then
+      kill $(cat "${LOCK_FILE}")
+      #waiting for naoqi to shutdown
+      einfo "waiting for naoqi to shutdown"
+      while kill -0 $(cat ${LOCK_FILE}) 2>/dev/null ; do
+        sleep 1
+      done
+      einfo "Naoqi stopped"
+    fi
+  fi
+  if killall -0 "${bin}" &>/dev/null; then
+    ewarn "kill all remaining ${bin} processes"
+    local try=1
+    while killall -0 "${bin}" &>/dev/null && [ ${try} -gt 0 ] ; do
+      killall -9 "${bin}"
+      try=$(( ${try} - 1 ))
+      sleep 2
+    done
+  fi
+  rm -f "${LOCK_FILE}"
+  eend $?
+}
+
+restart() {
+  stop
+  sleep 2
+  start
+}
