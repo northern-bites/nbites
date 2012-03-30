@@ -18,9 +18,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     std::vector<PF::Observation> obs = currentObservations;
     if(obs.size() == 0)
     {
-#ifdef DEBUG_LOCALIZATION
         std::cout << "Nothing seen, do not update weights." << std::endl;
-#endif
         return particles;
     }
 
@@ -49,7 +47,6 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	// For each particle, compare the estimated distance from 
 	// the robot to the object (and angle) to the actual
 	// distance as calculated by the vision system.
-	//float maxProbability = 0.0f;
         float totalWeight = 0.0f;
         int count = 0;
 	for(obsIter = obs.begin(); obsIter != obs.end(); ++obsIter)
@@ -60,6 +57,10 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	        // Since the observation is unambiguous, use the first observation.
 		Landmark l = o.possibilities[0];
 		PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
+		std::cout << "hypoth dist = " << hypothesisVector.magnitude
+			  << " hypoth ang = " << hypothesisVector.direction;
+		std::cout << " act dist = " << o.distance
+			  << " act ang = " << o.angle;
 		float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
 		float angleDiff = std::abs(o.angle - hypothesisVector.direction);
 		// For now, generate a new importance weight as the inverse of 
@@ -68,6 +69,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 		float distanceProb = 1.0f/distanceDiff;
 		float angleProb = 1.0f/angleDiff;
 		float probability = distanceProb * angleProb;
+		std::cout << " prob = " << probability << std::endl;
 		// Assuming conditional independence between measurements.
 		if(totalWeight == 0.0f)
 		    totalWeight = probability;

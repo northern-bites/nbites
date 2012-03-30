@@ -53,6 +53,8 @@ class MotionSystem : public PF::MotionModel
     PF::Step noisyStep();
     PF::ParticleSet update(PF::ParticleSet particles);
 
+    PF::Step getLastStep() const { return lastStep; }
+
  private:
     bool moved;
     PF::Step lastStep;

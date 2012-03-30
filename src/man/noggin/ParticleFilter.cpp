@@ -80,17 +80,23 @@ namespace PF
     void ParticleFilter::run(bool motionUpdate, bool sensorUpdate)
     {
 	if(motionUpdate && motionModel)
+	{
 	    particles = motionModel->update(particles);
+	    std::cout << "Motion update complete." << std::endl;
+	}
+	
 
 	if(sensorUpdate && sensorModel)
+	{  
 	    particles = sensorModel->update(particles);
-
-#ifdef DEBUG_LOCALIZATION
-	std::cout << particles[0];
-#endif 
+	    std::cout << "Sensor update complete." << std::endl;
+	}
 
 	if(sensorModel->hasUpdated())
+	{
 	    resample();
+	    std::cout << "Resample complete." << std::endl;
+	}
     }
 
     /**
@@ -104,9 +110,9 @@ namespace PF
         // Sort the particles in ascending order.
         std::sort(particles.begin(), particles.end());
 
-	ParticleIt iter;
-	for(iter = particles.begin(); iter != particles.end(); ++iter)
-	    std::cout << (*iter).getWeight() << std::endl;
+	//ParticleIt iter;
+	//for(iter = particles.begin(); iter != particles.end(); ++iter)
+	  //	    std::cout << *iter << std::endl;
 	
 	// The last particle should have the greatest weight.
 	return particles[particles.size()-1];
