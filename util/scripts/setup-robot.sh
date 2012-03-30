@@ -32,11 +32,14 @@ mv *.wav nbites/audio
 # Move the libraries
 echo "Moving libraries..."
 mv libboost_python-mt.so /usr/lib/
-mv libprotobuf.so.7 /usr/lib/
 if [ $TYPE == 'old' ]; then
     mv lxv4l2.ko /lib/modules/2.6.29.6-rt24-aldebaran-rt/kernel/drivers/media/video/lxv4l2/
+    mv geode_libprotobuf.so.7 /usr/lib/libprotobuf.so.7
+    rm atom_libprotobuf.so.7
 elif [ $TYPE == 'new' ]; then
     rm lxv4l2.ko
+    mv atom_libprotobuf.so.7 /usr/lib/libprotobuf.so.7
+    rm geode_libprotobuf.so.7
 fi
 
 # Set the hostname
