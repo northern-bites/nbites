@@ -11,6 +11,7 @@ SET( BUILDING_FOR_A_REMOTE_NAO ON )
 
 SET( TOOLCHAIN_DIR "${NBITES_DIR}/lib/geodetoolchain" )
 SET( OE_SYSROOT "${TOOLCHAIN_DIR}/sysroot/" )
+SET( ROBOT_TYPE "NAO_RL_33" )
 
 SET( CMAKE_CROSSCOMPILING   TRUE  )
 SET( CMAKE_SYSTEM_NAME      Linux )
@@ -20,8 +21,7 @@ SET( CMAKE_SYSTEM_PROCESSOR geode )
 INCLUDE("${TOOLCHAIN_DIR}/toolchain-geode.cmake")
 
 SET( CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} -m32 -march=geode -mmmx -m3dnow -fno-align-jumps
-   -fno-align-functions -fno-align-labels -fno-align-loops -pipe -fomit-frame-pointer")
+  "${CMAKE_CXX_FLAGS} -m32 -march=geode -mmmx -m3dnow -fno-align-jumps -fno-align-functions -fno-align-labels -fno-align-loops -pipe -fomit-frame-pointer")
 SET( CMAKE_C_FLAGS
   "${CMAKE_CXX_FLAGS}" )
 
