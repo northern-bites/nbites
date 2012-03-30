@@ -154,4 +154,20 @@ static long long monotonic_micro_time(void)
 #endif
 }
 
+static long long realtime_micro_time(void) {
+#ifdef OFFLINE
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_usec;
+
+#else
+    // Needed for microseconds which we convert to milliseconds
+    struct timespec tv;
+    clock_gettime(CLOCK_REALTIME, &tv);
+
+    return tv.tv_sec * MICROS_PER_SECOND + tv.tv_nsec / 1000;
+#endif
+}
+
 #endif // Common_h_DEFINED

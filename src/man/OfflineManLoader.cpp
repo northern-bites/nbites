@@ -22,11 +22,11 @@ void loadMan(OfflineManController::ptr offlineController) {
     shared_ptr<Speech> speech(new Speech());
     shared_ptr<Sensors> sensors(new Sensors(speech));
     shared_ptr<Transcriber> transcriber(new OfflineTranscriber(sensors,
-    		offlineController->getOfflineMemory()->getMVisionSensors(),
-    		offlineController->getOfflineMemory()->getMMotionSensors()));
+    		offlineController->getFakeMemory()->getMVisionSensors(),
+    		offlineController->getFakeMemory()->getMMotionSensors()));
     shared_ptr<ThreadedImageTranscriber>
         imageTranscriber(new OfflineImageTranscriber(sensors,
-        	offlineController->getOfflineMemory()->getMImage()));
+        	offlineController->getFakeMemory()->getMImage()));
     shared_ptr<MotionEnactor>
         enactor(new OfflineEnactor());
     shared_ptr<Lights> lights(new Lights());

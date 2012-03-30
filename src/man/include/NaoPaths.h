@@ -12,8 +12,7 @@
 
 #include <string>
 
-namespace man {
-namespace include {
+namespace common {
 namespace paths {
 
 #ifdef OFFLINE
@@ -40,6 +39,5 @@ static const std::string NAO_LOG_EXTENSION = ".log";
 #endif
 #endif
 
-}
 }
 }

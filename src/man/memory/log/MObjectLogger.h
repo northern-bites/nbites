@@ -1,13 +1,11 @@
 /**
  * MObjectLogger.hpp
  *
- * @class MObjectLogger
+ * @class MObjectLogger - provides the methods to write serialized MObject data
+ * to an OutProvider
  *
+ * @author Octavian Neamtu
  *
- * some of the code is inspired from the example provided in the link
- *
- *      Author: Octavian Neamtu
- *      E-mail: oneamtu@bowdoin.edu
  */
 
 #pragma once
@@ -20,32 +18,24 @@ namespace man {
 namespace memory {
 namespace log {
 
-class MObjectLogger : public ThreadedLogger {
+class MObjectLogger : public ThreadedLogger{
 
 public:
     typedef boost::shared_ptr<MObjectLogger> ptr;
     typedef boost::shared_ptr<const MObjectLogger> const_ptr;
 
 public:
-    /**
-     * Opens the file fileName and writes to its head
-     *
-     * @param fdp: this class provides a file descriptor
-     * @param logTypeID : an ID written to the head identifying the log
-     * @param objectToLog : the object we need to log
-     * @return
-     */
-    MObjectLogger(FDProvider::const_ptr fdp,
-                  int logTypeID, MObject::const_ptr objectToLog);
+    MObjectLogger(OutProvider::ptr out_provider,
+                  MObject::const_ptr objectToLog);
 
-    virtual ~MObjectLogger() {}
-    //will write the associated MObject ot
-    //the file descriptor provided by the FDProvider
+    virtual ~MObjectLogger();
+
     void writeToLog();
     void writeHead();
 
+    void run();
+
 private:
-    int logID;
     MObject::const_ptr objectToLog;
     std::string write_buffer;
 

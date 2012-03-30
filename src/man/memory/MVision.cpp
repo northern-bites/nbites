@@ -1,10 +1,4 @@
-/*
- * MVision.cpp
- *
- *      Author: oneamtu
- */
 
-#include "MemoryMacros.h"
 #include "MVision.h"
 
 namespace man {
@@ -15,18 +9,19 @@ using std::list;
 using std::vector;
 using proto::PVision;
 
-MVision::MVision(MObject_ID id, shared_ptr<Vision> v, shared_ptr<PVision> vision_data) :
-        MObject(id, vision_data),
-        vision(v),
-        data(vision_data) {
+MVision::MVision(shared_ptr<Vision> vision) :
+        MObject(id),
+        vision(vision),
+        data(new PVision()) {
+    MObject::protoMessage = data;
 }
 
 MVision::~MVision() {
 }
 
-void MVision::update() {
+void MVision::updateData() {
 
-    ADD_PROTO_TIMESTAMP;
+    this->data->set_timestamp(time_stamp());
 
     using namespace proto;
     //VisualBall

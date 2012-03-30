@@ -1,7 +1,7 @@
 /**
  * @class OverlayImage
  * 
- * Draws an overlay of the location of the ball and corners over the image in Qtool.
+ * Draws an overlay of the location of the ball and corners over the image in qtool.
  *
  */
 
