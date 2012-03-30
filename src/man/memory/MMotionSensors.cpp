@@ -1,13 +1,7 @@
-/*
- * MSensors.cpp
- *
- *      Author: oneamtu
- */
 
 #include <vector>
 
 #include "Common.h" //for micro_time
-#include "MemoryMacros.h"
 #include "MMotionSensors.h"
 
 namespace man {
@@ -17,17 +11,17 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-MMotionSensors::MMotionSensors(MObject_ID id, shared_ptr<Sensors> s,
-                               shared_ptr<PMotionSensors> motion_s_data)
-    : MObject(id, motion_s_data), sensors(s), data(motion_s_data){
+MMotionSensors::MMotionSensors(shared_ptr<Sensors> sensors)
+    : MObject(id), sensors(sensors), data(new PMotionSensors) {
+    MObject::protoMessage = data;
 }
 
 MMotionSensors::~MMotionSensors() {
 }
 
-void MMotionSensors::update() {
+void MMotionSensors::updateData() {
 
-    ADD_PROTO_TIMESTAMP;
+    this->data->set_timestamp(time_stamp());
 
     this->data->clear_body_angles();
     vector<float> bodyAngles = sensors->getBodyAngles();

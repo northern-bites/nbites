@@ -5,10 +5,7 @@
  */
 
 #include <string>
-#include <typeinfo>
 
-#include "Common.h" //for micro_time
-#include "MemoryMacros.h"
 #include "MImage.h"
 
 namespace man {
@@ -18,12 +15,12 @@ using boost::shared_ptr;
 using namespace std;
 using proto::PImage;
 
-MImage::MImage(MObject_ID id, shared_ptr<Sensors> s,
-               shared_ptr<PImage> image_data) :
-        MObject(id, image_data),
-        sensors(s),
-        data(image_data),
-        thresholded_data(new PImage()){
+MImage::MImage(shared_ptr<Sensors> sensors) :
+        MObject(id),
+        sensors(sensors),
+        data(new PImage()),
+        thresholded_data(new PImage()) {
+    MObject::protoMessage = data;
 
     //Note (Octavian): This is a pretty dumb way to get the image data
     // (ideally you would want to just copy the image - that saves any
@@ -46,10 +43,9 @@ MImage::MImage(MObject_ID id, shared_ptr<Sensors> s,
 MImage::~MImage() {
 }
 
-void MImage::update() {
+void MImage::updateData() {
 
-    ADD_PROTO_TIMESTAMP;
-//    cout << "MImage_updata timestamp is " << process_micro_time() << endl;
+    this->data->set_timestamp(time_stamp());
     //Note: we don't need to update the image since it's set to already copy
     //into our image_string
     this->data->set_width(sensors->getRoboImage()->getWidth());
@@ -62,7 +58,7 @@ void MImage::update() {
             AVERAGED_IMAGE_SIZE);
     this->thresholded_data->set_width(AVERAGED_IMAGE_WIDTH);
     this->thresholded_data->set_height(AVERAGED_IMAGE_HEIGHT);
-    #endif OFFLINE
+    #endif
 }
 
 }

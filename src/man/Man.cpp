@@ -10,7 +10,7 @@
 #include "PySensors.h"
 #include "PyLights.h"
 #include "PySpeech.h"
-#include "memory/log/IOProviderFactory.h"
+#include "memory/log/OutputProviderFactory.h"
 
 //#include <valgrind/callgrind.h>
 
@@ -39,7 +39,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
           speech(_speech)
 {
 #ifdef USE_TIME_PROFILING
-    Profiler::getInstance()->profileFrames(700);
+    Profiler::getInstance()->profileFrames(1400);
 #endif
 
     // give python a pointer to the sensors structure. Method defined in
@@ -69,20 +69,21 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
     comm = shared_ptr<Comm> (new Comm(sensors, vision));
 
+    loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
+    set_logging_board_pointer(loggingBoard);
+
 #ifdef USE_NOGGIN
     noggin = shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
                                             loggingBoard,
                                             motion->getInterface()));
 #endif// USE_NOGGIN
 
-    memory = shared_ptr<Memory> (new Memory(vision, sensors,noggin->loc));
+    memory = shared_ptr<Memory> (new Memory(vision, sensors, noggin->loc));
+    loggingBoard->setMemory(memory);
 
-    loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
-    set_logging_board_pointer(loggingBoard);
-    memory->addSubscriber(loggingBoard.get());
 
-#ifdef USE_MEMORY
-    loggingBoard->newIOProvider(IOProviderFactory::newAllObjectsProvider());
+#if defined USE_MEMORY && !defined OFFLINE
+    OutputProviderFactory::AllSocketOutput(loggingBoard.get());
 #endif
 }
 
@@ -137,30 +138,24 @@ void Man::stopSubThreads() {
 void
 Man::processFrame ()
 {
-
 #ifdef USE_VISION
     // Need to lock image and vision angles for duration of
     // vision processing to ensure consistency.
     sensors->lockImage();
-#ifdef USE_MEMORY
-    // TODO: this is temporarily here
-//    loggingBoard->log(MIMAGE_ID);
-#endif
     PROF_ENTER(P_VISION);
     vision->notifyImage(sensors->getImage());
     PROF_EXIT(P_VISION);
     sensors->releaseImage();
+//    cout<<vision->ball->getDistance() << endl;
 #endif
 #if defined USE_MEMORY || defined OFFLINE
     memory->updateVision();
-    loggingBoard->log(MVISION_ID);
 #endif
 #ifdef USE_NOGGIN
     noggin->runStep();
 #endif
 
     memory->getMutableMObject(MLOCALIZATION_ID)->update();
-    loggingBoard->log(MLOCALIZATION_ID);
     PROF_ENTER(P_LIGHTS);
     lights->sendLights();
     PROF_EXIT(P_LIGHTS);
