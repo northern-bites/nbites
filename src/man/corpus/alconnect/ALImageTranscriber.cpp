@@ -88,7 +88,7 @@ const int ALImageTranscriber::DEFAULT_CAMERA_VFLIP = 0;
 #endif
 
 ALImageTranscriber::ALImageTranscriber(shared_ptr<Sensors> s,
-                                       ALPtr<ALBroker> broker)
+                                       shared_ptr<ALBroker> broker)
     : ThreadedImageTranscriber(s,"ALImageTranscriber"),
       log(), camera(), lem_name(""), camera_active(false),
       image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
@@ -120,7 +120,7 @@ ALImageTranscriber::ALImageTranscriber(shared_ptr<Sensors> s,
     }
 #endif
 
-    initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
+    initTable("/home/nao/nbites/lib/table/table.mtb");
 }
 
 ALImageTranscriber::~ALImageTranscriber()
@@ -214,10 +214,11 @@ void ALImageTranscriber::stop()
     Thread::stop();
 }
 
-void ALImageTranscriber::registerCamera(ALPtr<ALBroker> broker)
+void ALImageTranscriber::registerCamera(boost::shared_ptr<ALBroker> broker)
 {
     try {
-        camera = ALPtr<ALVideoDeviceProxy>(new ALVideoDeviceProxy(broker));
+        camera = boost::shared_ptr<ALVideoDeviceProxy>
+            (new ALVideoDeviceProxy(broker));
         camera_active =true;
     }catch (ALError &e) {
         log->error("ALImageTranscriber",

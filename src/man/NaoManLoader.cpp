@@ -18,7 +18,7 @@ static shared_ptr<TMan> man_pointer;
 
 START_FUNCTION_EXPORT
 
-void loadMan(AL::ALPtr<AL::ALBroker> broker) {
+void loadMan(boost::shared_ptr<AL::ALBroker> broker) {
 
     shared_ptr<Speech> speech(new ALSpeech(broker));
     shared_ptr<Sensors> sensors(new Sensors(speech));
