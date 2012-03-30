@@ -135,7 +135,7 @@ void NetworkMonitor::logOutput()
     using namespace std;
 
     ofstream logFile;
-    logFile.open("/home/nao/naoqi/log/network.xls", ios::out);
+    logFile.open("/home/nao/nbites/log/network.xls", ios::out);
 
     if(logFile.is_open())
     {

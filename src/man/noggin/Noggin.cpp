@@ -530,13 +530,14 @@ void Noggin::modifySysPath ()
 #    if defined OFFLINE || defined STRAIGHT
        string dir1 = NBITES_DIR"/build/qtool";
        string dir2 = NBITES_DIR"/build/qtool/man";
+       const char* cwd = "";
 #    else
-       const char *cwd = "/home/nao/naoqi/lib";
+       const char *cwd = "/home/nao/nbites/lib";
 #    endif
 #  endif
 
 #ifdef DEBUG_NOGGIN_INITIALIZATION
-//    printf("  Adding %s to sys.path\n", cwd);
+       printf("  Adding %s to sys.path\n", cwd);
 #endif
 
     PyObject *sys_module = PyImport_ImportModule("sys");
@@ -577,7 +578,7 @@ void Noggin::startLocLog()
 #ifdef WEBOTS_BACKEND
     string s  = "./lib/man/noggin/" + string(buf) + ".loc";
 #else
-    string s  = "/home/nao/naoqi/log/" + string(buf) + ".loc";
+    string s  = "/home/nao/nbites/log/" + string(buf) + ".loc";
 #endif
     cout << "Started localization log at " << s << endl;
     outputFile.open(s.c_str(), ios::out);

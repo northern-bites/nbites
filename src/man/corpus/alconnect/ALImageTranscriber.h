@@ -3,9 +3,9 @@
 
 #include "alproxies/almemoryproxy.h"
 #include "alcommon/albroker.h"
-#include "alcore/alptr.h"
 #include "alproxies/alloggerproxy.h"
 #include "alproxies/alvideodeviceproxy.h"
+#include "alerror/alerror.h"
 
 #include "ThreadedImageTranscriber.h"
 #include "synchro/synchro.h"
@@ -14,7 +14,7 @@
 class ALImageTranscriber : public ThreadedImageTranscriber {
 public:
     ALImageTranscriber(boost::shared_ptr<Sensors> s,
-                       AL::ALPtr<AL::ALBroker> broker);
+                       boost::shared_ptr<AL::ALBroker> broker);
     virtual ~ALImageTranscriber();
 
 private:
@@ -29,7 +29,7 @@ public:
     void releaseImage();
 
 private: // helper methods
-    void registerCamera(AL::ALPtr<AL::ALBroker> broker);
+    void registerCamera(boost::shared_ptr<AL::ALBroker> broker);
     void initCameraSettings(int whichCam);
     void initTable(const std::string& path);
     void initTable(unsigned char* buffer);
@@ -38,8 +38,8 @@ private: // helper methods
 private: // member variables
     // Interfaces/Proxies to robot
 
-    AL::ALPtr<AL::ALLoggerProxy> log;
-    AL::ALPtr<AL::ALVideoDeviceProxy> camera;
+    boost::shared_ptr<AL::ALLoggerProxy> log;
+    boost::shared_ptr<AL::ALVideoDeviceProxy> camera;
 
     std::string lem_name;
 

@@ -24,7 +24,7 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 #include "alcommon/albroker.h"
-#include "alcore/alerror.h"
+#include "alerror/alerror.h"
 #include "alcore/alptr.h"
 #include "almemoryfastaccess/almemoryfastaccess.h"
 #include "alproxies/almemoryproxy.h"
