@@ -39,7 +39,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
           speech(_speech)
 {
 #ifdef USE_TIME_PROFILING
-    Profiler::getInstance()->profileFrames(700);
+    Profiler::getInstance()->profileFrames(1400);
 #endif
 
     // give python a pointer to the sensors structure. Method defined in
