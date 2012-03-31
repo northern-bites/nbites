@@ -46,6 +46,7 @@ add_library(image
 
 target_link_libraries(
   image
+  overseer_client
   ${QT_LIBRARIES}
   ${SWSCALE_LIBRARY}
   ${AVUTIL_LIBRARY}

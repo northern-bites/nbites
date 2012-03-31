@@ -47,5 +47,6 @@ target_link_libraries(
   memory
   parse
   log
+  overseer_client
   ${QT_LIBRARIES}
   )
