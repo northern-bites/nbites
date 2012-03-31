@@ -29,28 +29,6 @@ namespace angle {
     typedef float degrees;
 }
 
-// we set ROBOT_TYPE here for now, not in cmake anymore
-// Nathan 4/18/11
-// @TODO Make this less stupid
-#undef ROBOT_TYPE
-#ifdef ROBOT_NAME_slarti
-  #define ROBOT_TYPE NAO_RL
-#else
-#ifdef ROBOT_NAME_trillian
-  #define ROBOT_TYPE NAO_RL
-#else
-#ifdef ROBOT_NAME_marvin
-  #define ROBOT_TYPE NAO_RL
-#else
-#ifdef ROBOT_NAME_zaphod
-  #define ROBOT_TYPE NAO_RL
-#else
-  #define ROBOT_TYPE NAO_RL_33
-#endif
-#endif
-#endif
-#endif
-
 #define ROBOT(t) ( \
     (t == NAO_RL_33 && ROBOT_TYPE == NAO_RL_33) || \
     (t == NAO_SIM   && ROBOT_TYPE == NAO_SIM) || \
