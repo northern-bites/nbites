@@ -15,14 +15,14 @@
 #include "include/ExportDefines.h"
 
 //This is the method loadMan's signature
-typedef void (*loadManMethod)(AL::ALPtr<AL::ALBroker> pBroker);
+typedef void (*loadManMethod)(boost::shared_ptr<AL::ALBroker> pBroker);
 
 //This is the method unloadMan's signature
 typedef void (*unloadManMethod)();
 
 START_FUNCTION_EXPORT
 
-void loadMan(AL::ALPtr<AL::ALBroker> pBroker);
+void loadMan(boost::shared_ptr<AL::ALBroker> pBroker);
 
 void unloadMan();
 

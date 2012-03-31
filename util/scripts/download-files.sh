@@ -15,5 +15,7 @@ audio_dir=../audio
 echo "Copying libraries from RoboCup."
 rsync -vr $1@$robocup/lib/* $lib_dir/
 
+rm $audio_dir/*
+
 echo "Copying audio files from RoboCup."
-rsync -rv $1@$robocup/random/audio/* $audio_dir/
+rsync -rv $1@$robocup/audio_for_robot/* $audio_dir/
