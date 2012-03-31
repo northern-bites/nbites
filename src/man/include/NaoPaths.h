@@ -25,8 +25,8 @@ static const std::string NAO_HOME_DIR = "/home/nao/";
 
 #endif
 
-static const std::string NAO_NAOQI_DIR = NAO_HOME_DIR + "naoqi/";
-static const std::string NAO_LOG_DIR = NAO_NAOQI_DIR + "log/";
+static const std::string NAO_NBITES_DIR = NAO_HOME_DIR + "nbites/";
+static const std::string NAO_LOG_DIR = NAO_NBITES_DIR + "log/";
 
 static const std::string NAO_LOG_EXTENSION = ".log";
 
