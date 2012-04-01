@@ -19,7 +19,8 @@ set( ColorCreator_srcs
   ColorTable.cpp
   ColorSpaceWidget.cpp
   ColorWheel.cpp
-  Stats.cpp )
+  Stats.cpp
+  ColorTableCreator.cpp)
 
 set(ColorCreator_headers
 	ColorCalibrate.h
@@ -27,6 +28,7 @@ set(ColorCreator_headers
     ColorSpaceWidget.h
     ColorSpace.h
     ColorWheel.h
+    ColorTableCreator.h
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

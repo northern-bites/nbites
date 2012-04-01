@@ -14,6 +14,7 @@
 #include "data/DataLoader.h"
 #include "data/DataManager.h"
 #include "colorcreator/ColorCalibrate.h"
+#include "colorcreator/ColorTableCreator.h"
 #include "viewer/MemoryViewer.h"
 #include "offline/OfflineViewer.h"
 #include "viewer/BallEKFViewer.h"
@@ -47,6 +48,8 @@ private:
     data::DataManager::ptr dataManager;
     data::DataLoader* dataLoader;
     colorcreator::ColorCalibrate* colorCalibrate;
+    //colorcreator::ColorCalibrate* colorTableCreator;
+    colorcreator::ColorTableCreator* colorTableCreator;
     viewer::MemoryViewer* memoryViewer;
     offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;
