@@ -60,10 +60,11 @@ public:
         control_block.aio_fildes = file_descriptor;
         control_block.aio_buf = const_cast<char *>(buffer);
         control_block.aio_nbytes = size;
+        control_block.aio_sigevent.sigev_notify = SIGEV_NONE;
         int result = aio_write(&control_block);
 
-        if (result != 0) {
-            std::cout<<"AIO write failed on "
+        if (result == -1) {
+            std::cout<<"AIO write enque failed on "
                      <<debugInfo()<<std::endl
                      <<" with error " << strerror(errno) << std::endl;
         }
@@ -77,7 +78,7 @@ public:
         if (bytes_written == -1) {
             std::cout<< "AIO write failed on "
                      << debugInfo()<<std::endl
-                     << " with error " << strerror(errno) << std::endl;
+                     << " with error " << strerror(aio_error(&control_block)) << std::endl;
             this->closeCommunicationChannel();
         } else {
             if ((uint32_t) (bytes_written) < size) {
