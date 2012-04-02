@@ -34,12 +34,5 @@ static const std::string NAO_LOG_EXTENSION = ".log";
 
 #endif
 
-#ifdef OFFLINE
-#ifndef NBITES_DIR
-#warning "NBITES_DIR not set, will reset to default!"
-#define NBITES_DIR __FILE__  "/../.."
-#endif
-#endif
-
 }
 }

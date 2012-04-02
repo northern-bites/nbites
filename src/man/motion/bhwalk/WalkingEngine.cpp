@@ -189,12 +189,10 @@ void WalkingEngine::init()
     stream >> p;
   else
   {
-    InConfigMap stream("walking.cfg");
-    if(stream.exists())
-      stream >> p;
-    else
-      p.computeContants();
+      cout << "Could not find walking.cfg!" << endl;
   }
+  p.computeContants();
+
   //TODO: make the ground contact detector work
   //right now the ground contact detection is off - trick motion into thinking it's broken
   theDamageConfiguration.useGroundContactDetection = false;
@@ -212,17 +210,14 @@ void WalkingEngine::init()
 
 void WalkingEngine::update()
 {
-    //set the motion slection
-    theMotionSelection.walkRequest = theMotionRequest.walkRequest;
-    theMotionSelection.targetMotion = theMotionRequest.motion;
-    for (int i = 0 ; i < MotionRequest::numOfMotions; i++) {
-        theMotionSelection.ratios[i] = 0;
-    }
-    theMotionSelection.ratios[theMotionSelection.targetMotion] = 1.0f;
+
+    //set the motion selection
+    theMotionRequest.walkRequest.pedantic = false;
 
     //get new joint, sensor and frame info data
     theFrameInfo.cycleTime = 0.01f;
     theFrameInfo.time = theJointData.timeStamp = theSensorData.timeStamp = SystemCall::getCurrentSystemTime();
+
     //calibrate joints
     for(int i = 0; i < JointData::numOfJoints; ++i) {
         theJointData.angles[i] = theJointData.angles[i] * theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
@@ -263,6 +258,14 @@ void WalkingEngine::update()
     torsoMatrixProvider.update(theTorsoMatrix, theFilteredSensorData, theRobotDimensions, theRobotModel,
             theGroundContactState, theDamageConfiguration);
 
+    motionSelector.update(theMotionSelection, theMotionRequest, walkingEngineOutput,
+            theGroundContactState, theDamageConfiguration, theFrameInfo);
+
+    static bool calibrated = false;
+    if (calibrated != theInertiaSensorData.calibrated) {
+        bhwalk_out << "Calibration status changed to " << theInertiaSensorData.calibrated << endl;
+    }
+    calibrated = theInertiaSensorData.calibrated;
 
   if(theMotionSelection.ratios[MotionRequest::walk] > 0.f || theMotionSelection.ratios[MotionRequest::stand] > 0.f)
   {
@@ -310,9 +313,6 @@ void WalkingEngine::update()
   theMotionInfo.upcomingOdometryOffset = walkingEngineOutput.upcomingOdometryOffset;
   theMotionInfo.upcomingOdometryOffsetValid = walkingEngineOutput.upcomingOdometryOffsetValid;
 
-  bhwalk_out << "Executed motion type is " <<  getName(requestedMotionType) << endl;
-  bhwalk_out << "Instability is " << instability.getAverage() << endl;
-
   for(int i = 0; i < JointData::numOfJoints; ++i) {
       if (walkingEngineOutput.jointHardness.hardness[i] == HardnessData::useDefault) {
           walkingEngineOutput.jointHardness.hardness[i] = defaultHardnessData.hardness[i];
@@ -354,6 +354,23 @@ void WalkingEngine::updateMotionRequest()
       else
         requestedMotionType = stepping;
     }
+
+  // detect whether the walking engine changed modes
+  static bool warned = false;
+  if (requestedMotionType != currentMotionType) {
+      if (!warned) {
+          bhwalk_out << "The walking engine is switching to "
+                  << getName(requestedMotionType)
+                  << "!" << endl;
+          if (instable) {
+              std::cout << "Warning - the walk engine is set to stand because of stability issues" << endl;
+          }
+      }
+      warned = true;
+  } else {
+      warned = false;
+  }
+
 
 }
 

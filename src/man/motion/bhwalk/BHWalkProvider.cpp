@@ -58,6 +58,7 @@ BHWalkProvider::BHWalkProvider(shared_ptr<Sensors> s, boost::shared_ptr<NaoPose>
 
 void BHWalkProvider::requestStopFirstInstance() {
     this->stand();
+    inactive();
 }
 
 /**
@@ -76,7 +77,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
     //Note: temperatures are unused, and currents are used by the GroundContactDetector
     //which is not used right now
     JointData& bh_joint_data = walkingEngine.theJointData;
-    vector<float> nb_joint_data = sensors->getMotionBodyAngles();
+    vector<float> nb_joint_data = sensors->getBodyAngles();
 
     for (int i = 0; i < JointData::numOfJoints; i++) {
         bh_joint_data.angles[nb_joint_order[i]] = nb_joint_data[i];
@@ -135,13 +136,18 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
 //    if (walkingEngine.walkingEngineOutput.positionInWalkCycle == 1.0f) {
 //        stand();
 //    }
+//    if (walkingEngine.walkingEngineOutput.isLeavingPossible == true)
+//        inactive();
+//    else
+//        active();
 }
 
 void BHWalkProvider::stand() {
-    bhwalk_out << "BHWalk stand requested";
+    bhwalk_out << "BHWalk stand requested" << endl;
     walkingEngine.theMotionRequest.motion = MotionRequest::stand;
     walkingEngine.theMotionRequest.walkRequest = WalkRequest();
-    inactive();
+    active();
+//    inactive();
 }
 
 MotionModel BHWalkProvider::getOdometryUpdate() {
@@ -156,11 +162,16 @@ void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
     WalkRequest* walkRequest = &(walkingEngine.theMotionRequest.walkRequest);
     walkRequest->mode = WalkRequest::speedMode;
 
+    if (command->theta_rads == 0 && command->x_mms == 0 && command->y_mms == 0) {
+        this->stand();
+        return;
+    }
+
+    walkingEngine.theMotionRequest.motion = MotionRequest::walk;
+
     walkRequest->speed.rotation = command->theta_rads;
     walkRequest->speed.translation.x = command->x_mms;
     walkRequest->speed.translation.y = command->y_mms;
-
-    walkingEngine.theMotionRequest.motion = MotionRequest::walk;
 
     bhwalk_out << "BHWalk speed walk requested with command ";
     bhwalk_out << *(command.get());

@@ -233,6 +233,7 @@ def walking(nav):
     helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
 
     return nav.stay()
+    
 
 def destWalking(nav):
     """

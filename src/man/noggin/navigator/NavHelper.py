@@ -95,16 +95,18 @@ def convertWalkVector(brain, x_abs, y_abs, theta_abs):
 
     x_mms = y_mms = theta_rads = 0
 
+    #TODO: get these values from somewhere else or
+    #just pass floats to motion and let it convert it to max speeds and such
     if x_abs > 0:
-        x_mms = x_abs * gait.getStepValue(4) # max fwd X speed
+        x_mms = x_abs * 120 #gait.getStepValue(4) # max fwd X speed
     elif x_abs < 0:
-        x_mms = x_abs * fabs(gait.getStepValue(5)) # max rev X speed
+        x_mms = x_abs * 100 #fabs(gait.getStepValue(5)) # max rev X speed
 
     # max Y speed (same in both directions)
-    y_mms = y_abs * gait.getStepValue(6)
+    y_mms = y_abs * 50 #gait.getStepValue(6)
 
     # max theta speed (same in both directions)
-    theta_rads = theta_abs * gait.getStepValue(7)
+    theta_rads = theta_abs * 0.8 #gait.getStepValue(7)
 
     x_cms = x_mms * constants.TO_CMS  # convert back from motion engine's units
     y_cms = y_mms * constants.TO_CMS

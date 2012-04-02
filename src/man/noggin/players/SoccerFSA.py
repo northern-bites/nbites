@@ -75,11 +75,11 @@ class SoccerFSA(FSA.FSA):
         nav = self.brain.nav
         return (nav.walkX, nav.walkY, nav.walkTheta)
 
-    def setDestination(self, x, y, theta):
+    def setDestination(self, x, y, theta, gain=1.0):
         """
         Wrapper method to set the robot's destination
         """
-        self.brain.nav.setDest(x, y, theta)
+        self.brain.nav.setDest(x, y, theta, gain)
 
     def setSteps(self, x, y, theta, numSteps=1):
         """

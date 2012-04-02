@@ -375,17 +375,16 @@ void MotionSwitchboard::preProcessHead()
 
     if (curHeadProvider != nextHeadProvider)
     {
-        if (!curHeadProvider->isActive())
-        {
+        if (!curHeadProvider->isActive()) {
             swapHeadProvider();
-        }
-
-        if (!curHeadProvider->isStopping())
-        {
-#ifdef DEBUG_SWITCHBOARD
-            cout << "Requesting stop on "<< *curHeadProvider <<endl;
-#endif
-            curHeadProvider->requestStop();
+        } else {
+            if (!curHeadProvider->isStopping())
+            {
+                #ifdef DEBUG_SWITCHBOARD
+                cout << "Requesting stop on "<< *curHeadProvider <<endl;
+                #endif
+                curHeadProvider->requestStop();
+            }
         }
     }
 }
@@ -402,16 +401,15 @@ void MotionSwitchboard::preProcessBody()
     //determine the curProvider, and do any necessary swapping
     if (curProvider != nextProvider)
     {
-        if (!curProvider->isActive())
-        {
+        if (!curProvider->isActive()) {
             swapBodyProvider();
-        }
-
-        if (!curProvider->isStopping()){
-#ifdef DEBUG_SWITCHBOARD
-            cout << "Requesting stop on "<< *curProvider <<endl;
-#endif
-            curProvider->requestStop();
+        } else {
+            if (!curProvider->isStopping()){
+                #ifdef DEBUG_SWITCHBOARD
+                cout << "Requesting stop on "<< *curProvider <<endl;
+                #endif
+                curProvider->requestStop();
+            }
         }
     }
 }
@@ -485,13 +483,33 @@ void MotionSwitchboard::safetyCheckJoints()
 
         //considering checking which clip is more restrictive each frame and
         //only applying it
-        nextJoints[i] = NBMath::clip(nextJoints[i],
+        float clipped_joint_value;
+        clipped_joint_value = NBMath::clip(nextJoints[i],
                                      lastJoints[i] - allowedMotionDiffInRad,
                                      lastJoints[i] + allowedMotionDiffInRad);
 
-        nextJoints[i] = NBMath::clip(nextJoints[i],
+#ifdef WARN_CLIPPED_JOINTS
+        if (clipped_joint_value != nextJoints[i]) {
+            cout << "Warning: clipping joint " << i << " from "
+                 << nextJoints[i] << " to " << clipped_joint_value
+                 << " by previous joint information " << endl;
+        }
+#endif
+        nextJoints[i] = clipped_joint_value;
+
+
+        clipped_joint_value = NBMath::clip(nextJoints[i],
                                      sensorAngles[i] - allowedSensorDiffInRad,
                                      sensorAngles[i] + allowedSensorDiffInRad);
+
+#ifdef WARN_CLIPPED_JOINTS
+        if (clipped_joint_value != nextJoints[i]) {
+            cout << "Warning: clipping joint " << i << " from "
+                 << nextJoints[i] << " to " << clipped_joint_value
+                 << " by sensor information " << endl;
+        }
+#endif
+        nextJoints[i] = clipped_joint_value;
 
         lastJoints[i] = nextJoints[i];
     }
@@ -581,7 +599,6 @@ void MotionSwitchboard::signalNextFrame(){
     pthread_mutex_unlock(&calc_new_joints_mutex);
 
 }
-
 
 /**
  * Checks to ensure that the current MotionBodyAngles are close enough to

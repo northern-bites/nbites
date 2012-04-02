@@ -10,6 +10,7 @@ add_definitions(-DLINUX -DRELEASE -DTARGET_ROBOT)
 set( bhwalk_srcs BHWalkProvider.cpp
                  WalkingEngine.cpp
                  WalkingEngineKick.cpp
+                 MotionSelector.cpp
                  Modules/Infrastructure/NaoProvider.cpp
                  Modules/Sensing/TorsoMatrixProvider.cpp
                  Modules/Sensing/RobotModelProvider.cpp
@@ -36,6 +37,11 @@ set( bhwalk_srcs BHWalkProvider.cpp
                  Tools/Streams/Streamable.cpp
                  Tools/Configuration/ConfigMap.cpp
                  Tools/Configuration/ConfigMapParser.cpp )
+
+#install configs
+set( BHWALK_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/config )
+install( DIRECTORY ${BHWALK_CONFIG_DIR} 
+         DESTINATION ${CMAKE_INSTALL_PREFIX} )
 
 add_library(
 	bhwalk

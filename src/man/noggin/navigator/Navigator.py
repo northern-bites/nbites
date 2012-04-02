@@ -178,6 +178,18 @@ class Navigator(FSA.FSA):
 
         self.switchTo('walking')
 
+    def stand(self):
+        """
+        Make the robot stand; Standing should be the default action when we're not 
+        walking/executing a sweet move
+        """
+        self.walkX = 0
+        self.walkY = 0
+        self.walkTheta = 0
+        
+        helper.createAndSendWalkVector(self, 0, 0, 0)
+        
+
     def setDest(self, x, y, theta, gain=1.0):
         """
         Sets a new destination

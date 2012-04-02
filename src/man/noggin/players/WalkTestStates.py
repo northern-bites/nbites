@@ -17,11 +17,11 @@ DEST = 1
 WALK = 0
 
 # all walk vector values must be in the range [-1,1]
-UNIT_TEST1 = ((WALK, (1, 0, 0), 100),
-              (WALK, (0, .5, 0), 100),
-              (WALK, (.5, -.5, .75), 75),
-              (WALK, (-.4, .5, .5), 50),
-              (WALK, (.2, .2, .2), 50),
+UNIT_TEST1 = ((WALK, (.5, 0, 0), 500),
+              (WALK, (0, .5, 0), 500),
+              (WALK, (.5, -.5, .75), 250),
+              (WALK, (-.4, .5, .5), 250),
+              (WALK, (.2, .2, .2), 250),
               )
 
 STRAIGHT_ONLY = ((WALK, (1.0, 0, 0), 150),
@@ -43,10 +43,16 @@ MIXED_DEST_TEST = ((DEST, (15, 15, 0), 200),
                    (DEST, (-30, -15, -90), 300),
                    )
 
-START_STOP_DEST = ((DEST, (1000, 0, 0), 100),
-                   (DEST, (0, 0, 0), 100),
-                   (DEST, (15, 15, 0), 300),
+START_STOP_DEST = ((DEST, (100, 0, 0), 500),
+                   (DEST, (50, 50, 30), 500),
+                   (DEST, (150, 150, 0), 300),
                    )
+
+def gameSet(player):
+    if player.firstFrame():
+        player.brain.nav.stand()
+        
+    return player.stay()
 
 def gamePlaying(player):
     """
@@ -83,7 +89,8 @@ def walkTest(player):
         elif currentCommand[0] == DEST:
             player.setDestination(currentVector[0],
                                   currentVector[1],
-                                  currentVector[2],)
+                                  currentVector[2],
+                                  0.75)
         else:
             player.printf("WARNING! Unrecognized command"
                           " type in WalkUnitTest")
