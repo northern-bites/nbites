@@ -27,14 +27,20 @@ EXECUTABLE=$(BIN_DIR)/qtool/qtool
 CMAKE_DEBUG_CONFIG=-DCMAKE_BUILD_TYPE=debug
 CMAKE_RELEASE_CONFIG=-DCMAKE_BUILD_TYPE=release
 
-MAKE_FLAGS=--no-print-directory qtool
+MAKE_FLAGS=--no-print-directory
+
+OVERSEER_SERVER_TARGET=overseer_server
+QTOOL_TARGET=qtool
+
+OVERSEER_SERVER_LIB=$(BIN_DIR)/qtool/overseer/liboverseer_server.so
+OVERSEER_DESTINATION_DIR=$(SRC_DIR)/overseer/austinvilla/ground_truth/lib/
 
 .phony: build clean cfg eclipse
 
 default: build
 
 build: $(GEN_MAKEFILE)
-	$(MAKE) $(MAKE_FLAGS) -C $(BIN_DIR)
+	$(MAKE) $(MAKE_FLAGS) $(QTOOL_TARGET) -C $(BIN_DIR)
 
 $(GEN_MAKEFILE):
 	$(MKDIR) -p $(BIN_DIR); \
@@ -71,3 +77,8 @@ debug:
 
 run_gdb: debug
 	$(GDB) $(EXECUTABLE)
+	
+overseer_server: $(GEN_MAKEFILE)
+	$(MAKE) $(OVERSEER_SERVER_TARGET) $(MAKE_FLAGS) -C $(BIN_DIR); \
+	$(MKDIR) -p $(OVERSEER_DESTINATION_DIR); \
+	cp $(OVERSEER_SERVER_LIB) $(OVERSEER_DESTINATION_DIR)

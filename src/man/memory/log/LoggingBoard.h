@@ -17,7 +17,7 @@
 #include "include/io/OutProvider.h"
 #include "ClassHelper.h"
 
-#include "MObjectLogger.h"
+#include "MessageLogger.h"
 #include "memory/MObject.h"
 #include "memory/Memory.h"
 
@@ -31,8 +31,8 @@ class LoggingBoard {
 
 protected:
 	typedef common::io::OutProvider OutProvider;
-	typedef std::pair<MObject_ID, MObjectLogger::ptr > ObjectIOPair;
-	typedef std::map<MObject_ID, MObjectLogger::ptr > ObjectIOMap;
+	typedef std::pair<MObject_ID, MessageLogger::ptr > ObjectIOPair;
+	typedef std::map<MObject_ID, MessageLogger::ptr > ObjectIOMap;
 
 public:
 	LoggingBoard(Memory::const_ptr memory = Memory::NullInstanceSharedPtr());
@@ -53,9 +53,9 @@ public:
 
 protected:
 	//returns a NULL pointer if such a logger doesn't exist
-	MObjectLogger::const_ptr getLogger(MObject_ID id) const;
+	MessageLogger::const_ptr getLogger(MObject_ID id) const;
 	//returns a NULL pointer if such a logger doesn't exist
-	MObjectLogger::ptr getMutableLogger(MObject_ID id);
+	MessageLogger::ptr getMutableLogger(MObject_ID id);
 
 private:
 	Memory::const_ptr memory;
