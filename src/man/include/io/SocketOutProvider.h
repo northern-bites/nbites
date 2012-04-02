@@ -28,7 +28,7 @@ public:
      * on that socket
      */
     SocketOutProvider(unsigned short port) :
-        port(port), is_open(false) {
+        port(port), is_open(false), listening_socket(-1) {
 
         memset(&client_address, 0, sizeof(client_address));
     }
@@ -65,10 +65,13 @@ public:
      */
     void openCommunicationChannel() throw (socket_exception) {
 
-        if (file_descriptor == -1) {
+        if (listening_socket == -1) {
             listening_socket = tcp::createSocket();
             tcp::bindSocket(listening_socket, port);
             tcp::listenOnSocket(listening_socket);
+        }
+
+        if (file_descriptor == -1) {
             file_descriptor = tcp::acceptConnections(listening_socket,
                     client_address, client_address_len);
         }

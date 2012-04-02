@@ -64,6 +64,6 @@ loop:
 
 	pop	ebp
 
-	femms
+	emms
 
 	ret

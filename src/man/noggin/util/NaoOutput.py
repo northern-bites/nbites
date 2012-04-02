@@ -6,7 +6,7 @@ import time
 # CONSTANTS
 # Logging
 #LOG_DIR = "./lib/man/noggin/util/"
-LOG_DIR = "/home/nao/naoqi/log/"
+LOG_DIR = "/home/nao/nbites/log/"
 # Localization Logs
 LOC_LOG_TYPE = "loc"
 RCOMM_LOG_TYPE = "rcomm"

@@ -12,7 +12,7 @@
 class ALSpeech : public Speech
 {
 public:
-    ALSpeech(AL::ALPtr<AL::ALBroker> broker);
+    ALSpeech(boost::shared_ptr<AL::ALBroker> broker);
     virtual ~ALSpeech();
 
     // Speech class interface
@@ -23,7 +23,7 @@ public:
     void replaceSymbols(std::string& text);
 
 private:
-    AL::ALPtr<AL::ALTextToSpeechProxy> alProxy;
+    boost::shared_ptr<AL::ALTextToSpeechProxy> alProxy;
     float volume;
 
 };

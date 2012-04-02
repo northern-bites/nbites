@@ -90,7 +90,7 @@ void SensorMonitor::LogOutput() {
     using namespace std;
     stringstream filename;
 
-    filename << "/home/nao/naoqi/log/" << sensorName << ".sensor.csv";
+    filename << "/home/nao/nbites/log/" << sensorName << ".sensor.csv";
     ofstream outFile;
     outFile.open(filename.str().c_str(), ifstream::out);
 

@@ -3,16 +3,16 @@
 #include <algorithm>
 #include <iostream>
 
-#include "alcore/alerror.h"
+#include "alerror/alerror.h"
 
 #include "manconfig.h"
 
 
-ALSpeech::ALSpeech(AL::ALPtr<AL::ALBroker> broker) : Speech(), volume(0)
+ALSpeech::ALSpeech(boost::shared_ptr<AL::ALBroker> broker) : Speech(), volume(0)
 {
     try {
         alProxy =
-            AL::ALPtr<AL::ALTextToSpeechProxy>(
+            boost::shared_ptr<AL::ALTextToSpeechProxy>(
                 new AL::ALTextToSpeechProxy(broker));
         volume = alProxy->getVolume();
     } catch(AL::ALError &e) {
