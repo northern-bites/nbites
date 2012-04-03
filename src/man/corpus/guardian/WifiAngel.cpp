@@ -2,6 +2,7 @@
 #include "WifiAngel.h"
 
 #include <stdio.h> //printf()
+#include <iostream>
 #include <cstdlib> //system()
 
 #include "SoundPaths.h"
@@ -56,15 +57,20 @@ bool WifiAngel::reset_soft() {
     FILE * f3 = popen(("connman services | awk '/" + connection_name +
                       "/ {print $4}'").c_str(), "r");
     char service[100] = "";
-    fscanf(f3,"%s\n", service);
+    if(fscanf(f3,"%s\n", service) != EOF)
+        printf("Warning: reading service failed on soft wifi reset.\n");
     pclose(f3);
 
     if (service[0] != ' ') {
         std::string connman_service(service);
         //TODO: make this a call to roboguardian
-        system((sout+wifi_restart_wav+" &").c_str());
-        system(("su -c \" connman connect " + connman_service + " \" & ").c_str());
-        printf(("su -c \" connman connect " + connman_service + " \" & ").c_str());
+        if(system((sout+wifi_restart_wav+" &").c_str()) != 0)
+            printf("Warning: problem with soft wifi reset.\n");
+        if(system(("su -c \" connman connect " + connman_service +
+                   " \" & ").c_str()) != 0)
+            printf("Warning: problem with soft wifi reset.\n");
+        std::cout << "su -c \" connman connect " << connman_service
+                  << " \" & " << std::endl;
         return true;
     } else {
         printf("Couldn't find specified wifi network to reconnect to\n");
@@ -82,20 +88,23 @@ bool WifiAngel::reset_hard() {
     FILE * f3 = popen(("connman services | awk '/" + connection_name +
             "/ {print $3}'").c_str(), "r");
     char service[100] = "";
-    fscanf(f3,"%s\n", service);
+    if(fscanf(f3,"%s\n", service) != EOF)
+        printf("Warning: reading service failed on hard wifi reset.\n");
     pclose(f3);
 
     if (service[0] != ' ') {
         std::string connman_service(service);
         //TODO: make this a call to roboguardian
-        system((sout+wifi_restart_wav+" &").c_str());
+        if(system((sout+wifi_restart_wav+" &").c_str()) != 0)
+            printf("Warning: problem with hard wifi reset.\n");
         command += " && su -c \" connman passphrase " + connman_service +
                 " " + connection_pswd + "\" " +
                 " && su -c \" connman autoconnect " + connman_service +
                                 " true" + "\" " +
                 " && su -c \" connman connect " + connman_service + "\" &";
-        printf(command.c_str());
-        system(command.c_str());
+        std::cout << command.c_str() << std::endl;
+        if(system(command.c_str()) != 0)
+            printf("Warning: problem with hard wifi reset.\n");
 
         return true;
     } else {
