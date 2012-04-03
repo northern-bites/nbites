@@ -1,19 +1,18 @@
 
 #include <iostream>
 
-#include "MObjectParser.h"
+#include "MessageParser.h"
 
 namespace man {
 namespace memory {
 namespace parse {
 
 using namespace std;
-using namespace google::protobuf::io;
 using boost::shared_ptr;
 using namespace common::io;
 
-MObjectParser::MObjectParser(InProvider::ptr in_provider,
-                             MObject::ptr objectToParseTo) :
+MessageParser::MessageParser(InProvider::ptr in_provider,
+                             MessageInterface::ptr objectToParseTo) :
         ThreadedParser(in_provider, objectToParseTo->getName() + "_parser"),
         objectToParseTo(objectToParseTo),
         current_message_size(0),
@@ -22,7 +21,7 @@ MObjectParser::MObjectParser(InProvider::ptr in_provider,
 
 }
 
-MObjectParser::~MObjectParser() {
+MessageParser::~MessageParser() {
     if (current_buffer) {
         free(current_buffer);
     }
@@ -31,7 +30,7 @@ MObjectParser::~MObjectParser() {
     this->waitForThreadToFinish();
 }
 
-void MObjectParser::run() {
+void MessageParser::run() {
 
     while (running) {
         if (!in_provider->opened()) {
@@ -56,22 +55,22 @@ void MObjectParser::run() {
     }
 }
 
-void MObjectParser::waitForReadToFinish() {
+void MessageParser::waitForReadToFinish() {
     while(in_provider->readInProgress() && running) {
         pthread_yield();
     }
 }
 
-void MObjectParser::readHeader() {
+void MessageParser::readHeader() {
 
-    log_header.log_id = this->readValue<MObject_ID>();
+    log_header.log_id = this->readValue<int32_t>();
     cout << "Log ID: " << log_header.log_id << endl;
 
     log_header.birth_time = this->readValue<int64_t>();
     cout << "Birth time: " << log_header.birth_time << endl;
 }
 
-void MObjectParser::increaseBufferSizeTo(uint32_t new_size) {
+void MessageParser::increaseBufferSizeTo(uint32_t new_size) {
     void* new_buffer = realloc(current_buffer, new_size);
 
     assert(new_buffer != NULL);
@@ -79,7 +78,7 @@ void MObjectParser::increaseBufferSizeTo(uint32_t new_size) {
     current_buffer_size = new_size;
 }
 
-bool MObjectParser::readNextMessage() {
+bool MessageParser::readNextMessage() {
 
     if (in_provider->reachedEnd()) {
         return false;
@@ -107,7 +106,7 @@ bool MObjectParser::readNextMessage() {
     return false;
 }
 
-bool MObjectParser::readIntoBuffer(char* buffer, uint32_t num_bytes) {
+bool MessageParser::readIntoBuffer(char* buffer, uint32_t num_bytes) {
     uint32_t bytes_read = 0;
     while (bytes_read < num_bytes) {
         try {
@@ -124,7 +123,7 @@ bool MObjectParser::readIntoBuffer(char* buffer, uint32_t num_bytes) {
     return true;
 }
 
-uint32_t MObjectParser::sizeOfLastNumMessages(uint32_t n) const {
+uint32_t MessageParser::sizeOfLastNumMessages(uint32_t n) const {
     uint32_t total_size = 0;
     for (uint i = message_sizes.size() - n; i < message_sizes.size(); i++) {
         total_size += message_sizes[i];
@@ -134,7 +133,7 @@ uint32_t MObjectParser::sizeOfLastNumMessages(uint32_t n) const {
     return total_size;
 }
 
-uint32_t MObjectParser::truncateNumberOfFramesToRewind(uint32_t n) const {
+uint32_t MessageParser::truncateNumberOfFramesToRewind(uint32_t n) const {
     if (n >= message_sizes.size()) {
         return message_sizes.size() - 1;
     } else {
@@ -142,7 +141,7 @@ uint32_t MObjectParser::truncateNumberOfFramesToRewind(uint32_t n) const {
     }
 }
 
-bool MObjectParser::getPrev(uint32_t n) {
+bool MessageParser::getPrev(uint32_t n) {
     n = truncateNumberOfFramesToRewind(n);
     //we can't read backwards; that's why we rewind n+1 messages
     //then go forward one
@@ -159,7 +158,7 @@ bool MObjectParser::getPrev(uint32_t n) {
     return false;
 }
 
-bool MObjectParser::getPrev() {
+bool MessageParser::getPrev() {
     return getPrev(1);
 }
 

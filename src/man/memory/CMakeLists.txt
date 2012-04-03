@@ -54,10 +54,10 @@ set( MEMORY_SRCS Memory
 		 MLocalization
                  )
 
-set( PARSE_SRCS parse/MObjectParser
+set( PARSE_SRCS parse/MessageParser
                 parse/ParsingBoard )
 
-set( LOG_SRCS log/MObjectLogger
+set( LOG_SRCS log/MessageLogger
               log/LoggingBoard
               log/OutputProviderFactory
               log/PyLoggingBoard)

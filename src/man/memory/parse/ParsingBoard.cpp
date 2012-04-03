@@ -31,7 +31,7 @@ void ParsingBoard::newInputProvider(InProvider::ptr inProvider, MObject_ID id) {
     }
 
     if (0 < id && id < LAST_OBJECT_ID) {
-        MObjectParser::ptr mObjectParser(new MObjectParser(inProvider,
+        MessageParser::ptr mObjectParser(new MessageParser(inProvider,
                                 memory->getMutableMObject(id)));
         objectIOMap[id] = mObjectParser;
         mObjectParser->start();

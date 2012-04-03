@@ -13,7 +13,7 @@
 
 #include <string>
 
-#include "memory/MObject.h"
+#include "io/MessageInterface.h"
 #include "ThreadedParser.h"
 #include "ClassHelper.h"
 #include "Notifier.h"
@@ -24,23 +24,25 @@ namespace parse {
 
 struct LogHeader {
 
-    MObject_ID log_id;
+    int32_t log_id;
     int64_t birth_time;
 
 };
 
-class MObjectParser : public ThreadedParser {
+class MessageParser : public ThreadedParser {
 
-    ADD_SHARED_PTR(MObjectParser)
+    ADD_SHARED_PTR(MessageParser)
+
+    typedef common::io::MessageInterface Message;
 
 public:
     static const uint32_t TOO_BIG_THRESHOLD = 2000000; // ~2MB
 
 public:
-    MObjectParser(common::io::InProvider::ptr in_provider,
-            MObject::ptr objectToParseTo = MObject::NullInstanceSharedPtr());
+    MessageParser(common::io::InProvider::ptr in_provider,
+                  Message::ptr objectToParseTo);
 
-    virtual ~MObjectParser();
+    virtual ~MessageParser();
 
     void readHeader();
     bool readNextMessage();
@@ -53,7 +55,7 @@ public:
 
     uint32_t sizeOfLastNumMessages(uint32_t n) const;
 
-    void setObjectToParseTo(MObject::ptr newObject) {
+    void setObjectToParseTo(Message::ptr newObject) {
         objectToParseTo = newObject;
     }
 
@@ -76,7 +78,7 @@ private:
     bool readIntoBuffer(char* buffer, uint32_t num_bytes);
 
 private:
-    MObject::ptr objectToParseTo;
+    Message::ptr objectToParseTo;
 
     LogHeader log_header;
 

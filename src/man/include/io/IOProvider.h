@@ -19,7 +19,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <string>
-#include "include/Common.h"
+#include "Common.h"
 #include "ClassHelper.h"
 #include <unistd.h>
 
