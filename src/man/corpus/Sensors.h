@@ -218,7 +218,7 @@ public:
     void stopSavingFrames();
     bool isSavingFrames() const;
 
-    // writes data collected the variance monitor to ~/naoqi/log/
+    // writes data collected the variance monitor to ~/nbites/log/
     void writeVarianceData();
     // checks whether the sensors we're monitoring are "healthy" or not
     float percentBrokenFSR();

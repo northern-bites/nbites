@@ -1,5 +1,5 @@
 /**
- * MObjectLogger.cpp
+ * MessageLogger.cpp
  *
  *  The structure for a log file:
  *  -- ID number for the type of object logged
@@ -13,7 +13,7 @@
  *      E-mail: oneamtu@bowdoin.edu
  */
 
-#include "MObjectLogger.h"
+#include "MessageLogger.h"
 #include "Profiler.h"
 
 namespace man {
@@ -22,24 +22,30 @@ namespace memory {
 namespace log {
 
 using namespace std;
+using namespace common::io;
 
-MObjectLogger::MObjectLogger(OutProvider::ptr out_provider,
-                             MObject::const_ptr objectToLog) :
+MessageLogger::MessageLogger(OutProvider::ptr out_provider,
+                             Message::const_ptr objectToLog) :
         ThreadedLogger(out_provider, "Log" + objectToLog->getName()),
-        objectToLog(objectToLog) {
+        messageToLog(objectToLog) {
 }
 
-MObjectLogger::~MObjectLogger() {
+MessageLogger::~MessageLogger() {
     this->stop();
     this->waitForThreadToFinish();
 }
 
-void MObjectLogger::run() {
+void MessageLogger::run() {
     while (running) {
-
         if (!out_provider->opened()) {
-            //blocking for socket fds, (almost) instant for other ones
-            out_provider->openCommunicationChannel();
+            try {
+                //blocking for socket fds, (almost) instant for other ones
+                out_provider->openCommunicationChannel();
+            } catch (io_exception& io_exception) {
+                cout << messageToLog->getName() << " logger: " <<
+                        io_exception.what() << " " << out_provider->debugInfo() << endl;
+                return;
+            }
             std::cout << "writing head out" << std::endl;
             this->writeHead();
         }
@@ -53,18 +59,18 @@ void MObjectLogger::run() {
     }
 }
 
-void MObjectLogger::writeHead() {
+void MessageLogger::writeHead() {
     // log ID
-    out_provider->writeValue<int32_t>(objectToLog->getID());
+    out_provider->writeValue<int32_t>(messageToLog->getIDTag());
     // the absolute time stamp of the log
     //(all other time stamps are relative to this)
-    out_provider->writeValue<int64_t>(objectToLog->getBirthTime());
+    out_provider->writeValue<int64_t>(messageToLog->getBirthTime());
 }
 
-void MObjectLogger::writeToLog() {
+void MessageLogger::writeToLog() {
     PROF_ENTER(P_LOGGING);
-    out_provider->writeValue<uint32_t>(objectToLog->byteSize());
-    objectToLog->serializeToString(&write_buffer);
+    out_provider->writeValue<uint32_t>(messageToLog->byteSize());
+    messageToLog->serializeToString(&write_buffer);
     out_provider->writeCharBuffer(write_buffer.data(), write_buffer.length());
     PROF_EXIT(P_LOGGING);
 }

@@ -21,10 +21,13 @@ set( Image_srcs
     Color
     ThresholdedImage
     FastYUVToBMPImage
+    PaintField
     )
 
 set( Image_headers BMPImage.h
-				   FastYUVToBMPImage.h)
+				   FastYUVToBMPImage.h
+				   PaintField.h
+				   PaintGroundTruth.h)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -43,6 +46,7 @@ add_library(image
 
 target_link_libraries(
   image
+  overseer_client
   ${QT_LIBRARIES}
   ${SWSCALE_LIBRARY}
   ${AVUTIL_LIBRARY}

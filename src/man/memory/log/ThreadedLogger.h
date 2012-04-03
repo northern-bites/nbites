@@ -10,6 +10,8 @@
  *
  */
 
+#pragma once
+
 #include "io/OutProvider.h"
 #include "synchro/synchro.h"
 #include "Subscriber.h"
