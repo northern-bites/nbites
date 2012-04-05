@@ -1,3 +1,6 @@
+
+#pragma once
+
 #include <fcntl.h>
 
 namespace common {

@@ -37,6 +37,11 @@ DataLoader::DataLoader(DataManager::ptr dataManager, QWidget *parent) :
             dataManager.get(),
             SLOT(reset()));
 
+    connect(offlineDataFinder,
+            SIGNAL(signalGroundTruth(common::io::InProvider::ptr)),
+            dataManager.get(),
+            SLOT(newGroundTruthProvider(common::io::InProvider::ptr)));
+
     this->setLayout(layout);
 }
 

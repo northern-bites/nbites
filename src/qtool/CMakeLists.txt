@@ -36,6 +36,7 @@ set(qtool_headers
 
 include_directories(.
                     ${CMAKE_CURRENT_BINARY_DIR}
+                    ${CMAKE_CURRENT_BINARY_DIR}/overseer #for the GroundTruth.pb.h
                     ${PROTOBUF_INCLUDE_DIRS}
                     )
 
@@ -53,6 +54,7 @@ add_subdirectory( data )
 add_subdirectory( viewer )
 add_subdirectory( offline )
 add_subdirectory( remote )
+add_subdirectory( overseer )
 
 ######### The executable
 
@@ -69,5 +71,6 @@ target_link_libraries(
   viewer
   offline
   remote
+  overseer_client
   ${QT_LIBRARIES}
   )

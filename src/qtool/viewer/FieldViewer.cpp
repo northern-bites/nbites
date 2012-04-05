@@ -8,16 +8,18 @@ namespace viewer {
 
 using namespace data;
 using namespace man::memory;
+using namespace image;
 
 FieldViewer::FieldViewer(DataManager::ptr dataManager) :
         QMainWindow(), dataManager(dataManager) {
 
-    paintField = new PaintField();
+    paintField = new PaintField(this);
+    fieldView = new BMPImageViewer(paintField, this);
 
     // Adds the Field
-    this->setCentralWidget(paintField);
+    this->setCentralWidget(fieldView);
 
-
+    fieldView->updateView();
 }
 
 }
