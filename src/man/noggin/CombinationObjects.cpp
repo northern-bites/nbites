@@ -29,9 +29,18 @@ namespace noggin {
         return (x != other.x || y != other.y);
     }
 
+    RelLocation Location::operator - (const Location& other) const
+    {
+        return RelLocation(x - other.x, y - other.y);
+    }
+
     boost::python::tuple Location::toTupleXY()
     {
         return boost::python::make_tuple(x, y);
+    }
+
+    RelLocation Location::getRelLocationOf(const Location& other) const {
+        return other - *this;
     }
 
     const float Location::distTo(const Location& other)
@@ -120,6 +129,15 @@ namespace noggin {
         return (x != other.x || y != other.y || h != other.h);
     }
 
+    RelRobotLocation RobotLocation::operator - (const RobotLocation& other) const
+    {
+        return RelRobotLocation(x - other.x, y - other.y, h - other.h);
+    }
+
+    RelRobotLocation RobotLocation::getRelLocationOf(const RobotLocation& other) const {
+        return other - *this;
+    }
+
     const degrees RobotLocation::getRelativeBearing(Location& other)
     {
         return (NBMath::subPIAngle(headingToInRad(other) - h))*TO_DEG;
@@ -143,27 +161,41 @@ namespace noggin {
 
 //////////// RelLocation Methods ///////////////
 
-    RelLocation::RelLocation(RobotLocation& my, float dx, float dy, degrees dh)
-        : RobotLocation(my.getX() + dx, my.getY() + dy, my.getH() + dh),
-          relX(dx), relY(dy), relH(dh*TO_RAD)
+    RelLocation::RelLocation(float dx, float dy)
+        : relX(dx), relY(dy)
     {
     }
 
     RelLocation::RelLocation(const RelLocation& other)
-        :RobotLocation(other.x, other.y, other.h), relX(other.relX),
-         relY(other.relY), relH(other.relH)
+        :relX(other.getRelX()), relY(other.getRelY())
     {
     }
 
     boost::python::str RelLocation::toString()
     {
-        std::string info = "x = " + boost::lexical_cast<std::string>(x) +
-            ", y = " + boost::lexical_cast<std::string>(y) + ", h = " +
-            boost::lexical_cast<std::string>(h*TO_DEG) +
-            " (in degrees), relx = " + boost::lexical_cast<std::string>(relX)
-            + ", rely = " + boost::lexical_cast<std::string>(relY) +
-            ", relh = " + boost::lexical_cast<std::string>(relH) +
-            " (in degrees)";
+        std::string info = "relx = " + boost::lexical_cast<std::string>(relX)
+            + ", rely = " + boost::lexical_cast<std::string>(relY);
+        return *(new boost::python::str(info));
+    }
+
+//////////// RelRobotLocation Methods ///////////////
+
+    RelRobotLocation::RelRobotLocation(float dx, float dy, degrees dh)
+    : RelLocation(dx, dy), relH(dh*TO_RAD)
+    {
+    }
+
+    RelRobotLocation::RelRobotLocation(const RelRobotLocation& other)
+    : RelLocation(other.getRelX(), other.getRelY()), relH(other.getRelH())
+    {
+    }
+
+    boost::python::str RelRobotLocation::toString()
+    {
+        std::string info = "relx = " + boost::lexical_cast<std::string>(relX)
+                + ", rely = " + boost::lexical_cast<std::string>(relY) +
+                ", relh = " + boost::lexical_cast<std::string>(getRelH()) +
+                " (in degrees)";
         return *(new boost::python::str(info));
     }
 
