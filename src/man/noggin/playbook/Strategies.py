@@ -118,11 +118,5 @@ def sTestMiddie(team, workingPlay):
     Formations.fTestMiddie(team, workingPlay)
 def sTestChaser(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_TEST_CHASER)
-    # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady' or\
-        team.brain.gameController.currentState =='gameSet':
-        # team is kicking off
-        Formations.fReady(team, workingPlay)
-    else:
-        Formations.fTestChaser(team, workingPlay)
+    Formations.fTestChaser(team, workingPlay)
 
