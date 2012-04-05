@@ -4,21 +4,24 @@ from man.noggin.util import MyMath
 import noggin_constants as NogginConstants
 from ..players import ChaseBallTransitions
 
-def atDestinationCloser(nav):
+def atDestination(nav, relDest):
+    ''' Returns true if we're close enough to relDest '''
+    my = nav.brain.my
+    return fabs(relDest.relX) < constants.CLOSE_ENOUGH_X and \
+           fabs(relDest.relY) < constants.CLOSE_ENOUGH_Y and \
+           fabs(relDest.relH) < constants.CLOSE_ENOUGH_H
+    
+
+def atDestinationCloser(nav, relDest):
     """
     Returns true if we are at an (x, y) close enough to the one we want
     """
     my = nav.brain.my
+    return relDest.relX < constants.CLOSE_X + my.uncertX and \
+           relDest.relY < constants.CLOSE_Y + my.uncertY
 
-    if nav.destType is constants.BALL:
-        return ChaseBallTransitions.ballInPosition(nav.brain.player)
-
-    return my.distTo(nav.getDestination()) < (constants.CLOSER_XY +
-                                              hypot(my.uncertX,
-                                                    my.uncertY))
-
-def atHeadingGoTo(my, targetHeading):
-    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
+def atHeadingGoTo(my, relDest):
+    hDiff = fabs(MyMath.sub180Angle(my.h - relDest.relH))
     return hDiff < constants.AT_HEADING_GOTO_DEG
 
 def atHeading(nav):
@@ -26,10 +29,10 @@ def atHeading(nav):
     Returns true if we are at a heading close enough to what we want
     """
     my = nav.brain.my
-    dest = nav.getDestination()
+    dest = nav.dest
 
-    if nav.destType is constants.BALL:
-        return abs(nav.brain.ball.bearing) < constants.CLOSE_ENOUGH_H
+#    if nav.destType is constants.BALL:
+#        return abs(nav.brain.ball.bearing) < constants.CLOSE_ENOUGH_H
 
     hDiff = fabs(MyMath.sub180Angle(my.h - dest.h))
     return hDiff < constants.CLOSE_ENOUGH_H and \

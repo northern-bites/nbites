@@ -1,14 +1,31 @@
 import man.motion as motion
 from math import fabs
 import NavConstants as constants
+from objects import RelLocation, RelRobotLocation, RobotLocation, RelRobotLocation
 
 # this will prevent us from rapidly switching back and forth between
 # forwards & backwards gaits (happens in spinFindBall sometimes, bad)
 BACKWARDS_GAIT_THRESH = -0.2
 SPIN_GAIT_THRESH = 0.2
 
+def getCurrentRelativeDestination(nav):
+      
+    my = nav.brain.my
+    field_dest = nav.dest
+    
+    relativeDestination = RelRobotLocation(field_dest.x - my.x,
+                                           field_dest.y - my.y,
+                                           0)  
+      
+    if hasattr(field_dest, "h"):
+        relativeDestination.relH = field_dest.h - my.h
+    else:
+        relativeDestination.relH = my.headingTo(field_dest) 
+        
+    return relativeDestination
 
-def setDestination(nav, x, y, theta, gain):
+
+def setDestination(nav, x, y, theta, gain = 1.0):
     """
     Calls setDestination within the motion engine
     """

@@ -24,21 +24,22 @@ def doingSweetMove(nav):
 def goToPosition(nav):
     """
     Go to a position set in the navigator. General go to state.  Goes
-    towards an x,y position on the field without regard to the
-    destination heading. Switches over to omni to finish the heading changes.
+    towards a x, y position on the field stored in dest.
+    If there is an h specified in the destination, that will be the 
+    selected heading. Otherwise, the bearing to the object is used.
     """
+    
+    relDest = helper.getCurrentRelativeDestination(nav)
+    
     if nav.firstFrame():
-        nav.omniWalkToCount = 0
         nav.atPositionCount = 0
+        
+    if nav.counter % 10 is 0:
+        print "going to " + str(relDest)
 
-    my = nav.brain.my
-    dest = nav.getDestination()
-
-    if (navTrans.atDestinationCloser(nav) and
-        navTrans.atHeading(nav)):
+    if (navTrans.atDestination(nav, relDest)):
             nav.atPositionCount += 1
-            if nav.atPositionCount > \
-            constants.FRAMES_THRESHOLD_TO_AT_POSITION:
+            if nav.atPositionCount > constants.FRAMES_THRESHOLD_TO_AT_POSITION:
                 return nav.goNow('atPosition')
     else:
         if not nav.atPositionCount == 0:
@@ -46,21 +47,14 @@ def goToPosition(nav):
 
     # We don't want to alter the actual destination, we just want a
     # temporary destination for getting the params to walk straight at
-    if hasattr(dest, "loc"):
-        dest = dest.loc
+    #if hasattr(dest, "loc"):
+    #    dest = dest.loc
 
-    intermediateH = my.headingTo(dest)
-    tempDest = RobotLocation(dest.x, dest.y, intermediateH)
+    #intermediateH = myLocation.headingTo(destination)
+    
 
-    walkX, walkY, walkTheta = walker.getWalkSpinParam(my, tempDest)
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
-
-    if navTrans.useFinalHeading(nav.brain, dest):
-        nav.omniWalkToCount += 1
-        if nav.omniWalkToCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
-            return nav.goLater('omniGoTo')
-    else:
-        nav.omniWalkToCount = 0
+    #walkX, walkY, walkTheta = walker.getWalkSpinParam(my, tempDest)
+    helper.setDestination(nav, relDest.relX, relDest.relY, relDest.relH)
 
     if navTrans.shouldAvoidObstacle(nav):
         return nav.goLater('avoidObstacle')
@@ -234,22 +228,21 @@ def walking(nav):
 
     return nav.stay()
     
+def standing(nav):
+    return nav.stay()
+    
 
 def destWalking(nav):
     """
     State to be used when we are walking to a destination
     """
     if nav.firstFrame():
-        if (nav.destGain < 0):
-            nav.destGain = 1;
-
         nav.nearDestination = False
 
         helper.setDestination(nav,
                               nav.destX,
                               nav.destY,
-                              nav.destTheta,
-                              nav.destGain)
+                              nav.destTheta)
 
     # the frames remaining counter is sometimes set to -1 initially
     elif -1 != nav.currentCommand.framesRemaining() < 40:
@@ -352,8 +345,8 @@ def atPosition(nav):
         helper.setSpeed(nav, 0, 0, 0)
         nav.startOmniCount = 0
 
-    if navTrans.atDestinationCloser(nav) and \
-            navTrans.atHeading(nav):
+    relDest = helper.getCurrentRelativeDestination(nav)
+    if navTrans.atDestination(nav, relDest):
         nav.startOmniCount = 0
         return nav.stay()
 

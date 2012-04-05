@@ -1,6 +1,9 @@
 from . import NavConstants as constants
 from math import fabs, sqrt
 from man.noggin.util import MyMath
+from objects import RelLocation, RelRobotLocation, RobotLocation, RelRobotLocation
+
+   
 
 def getOmniWalkParam(my, dest):
     # we use distance and bearing to get relX, relY which we already have
