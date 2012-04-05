@@ -10,15 +10,13 @@
 #pragma once
 
 #include <iostream>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <fcntl.h>
-#include <cerrno>
 #include <string>
 #include <aio.h>
 #include <cstring>
 #include <pthread.h>
+
+#include "Socket.h"
 
 #include "IOExceptions.h"
 #include "InProvider.h"
@@ -29,14 +27,11 @@ namespace io {
 class SocketInProvider: public InProvider {
 
 public:
-    static const int INVALID_FD = -1;
-
-public:
-    SocketInProvider(long address, short port) :
+    SocketInProvider(long address, unsigned short port) :
                     port(port),
                     address(address),
                     is_open(false),
-                    file_descriptor(INVALID_FD) {
+                    file_descriptor(-1) {
         //zeroes the aio control_block
         memset(&control_block, 0, sizeof(control_block));
     }
@@ -51,93 +46,18 @@ public:
     }
 
     virtual std::string debugInfo() const {
-        return std::string(inet_ntoa(server_address.sin_addr));
+        struct in_addr addr;
+        addr.s_addr = address;
+        return "SocketIn client connecting to " + std::string(inet_ntoa(addr));
     }
 
-    virtual bool isOfTypeStreaming() const {
-        return true;
-    }
+    virtual bool isOfTypeStreaming() const { return true; }
+    virtual bool reachedEnd() const { return false; }
+    bool rewind(long int) const { return false; }
 
-    virtual bool reachedEnd() const {
-        return false;
-    }
-
-    void createSocket() throw (socket_exception) {
-        file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
-
-        if (file_descriptor < 0) {
-            throw socket_exception(socket_exception::CREATE_ERR, errno);
-            file_descriptor = INVALID_FD;
-        }
-    }
-
-    //non-blocking! times out in 15 s
-    //http://developerweb.net/viewtopic.php?id=3196)
-    void connectSocket() throw (socket_exception) {
-        server_address.sin_family = AF_INET;
-        server_address.sin_port = htons(port);
-        server_address.sin_addr.s_addr = htonl(address);
-
-        // Set non-blocking
-        long arg = fcntl(file_descriptor, F_GETFL, NULL);
-        arg |= O_NONBLOCK;
-        if (fcntl(file_descriptor, F_SETFL, arg) < 0) {
-            throw socket_exception(socket_exception::FCNTL_ERR, errno);
-        }
-
-        int result = connect(file_descriptor,
-                reinterpret_cast<const sockaddr*>(&server_address),
-                sizeof(server_address));
-
-        if (result < 0) {
-            if (errno == EINPROGRESS) {
-                //timeout
-                struct timeval tv;
-                tv.tv_sec = 15;
-                tv.tv_usec = 0;
-                //required for the select
-                fd_set myset;
-                FD_ZERO(&myset);
-                FD_SET(file_descriptor, &myset);
-                //select waits for the file_descriptor to be ready
-                if (select(file_descriptor + 1, NULL, &myset, NULL, &tv) > 0) {
-                    //get the return code
-                    int return_code;
-                    socklen_t lon = sizeof(int);
-                    getsockopt(file_descriptor, SOL_SOCKET, SO_ERROR,
-                            (void*) (&return_code), &lon);
-                    if (return_code) {
-                        throw socket_exception(socket_exception::CREATE_ERR,
-                                return_code);
-                    } else {
-                        is_open = true;
-                    }
-                } else {
-                    throw socket_exception(socket_exception::TIMED_OUT);
-                }
-            } else {
-                throw socket_exception(socket_exception::CREATE_ERR, errno);
-            }
-        }
-        // Set to blocking mode again...
-        arg = fcntl(file_descriptor, F_GETFL, NULL);
-        arg &= (~O_NONBLOCK);
-        if (fcntl(file_descriptor, F_SETFL, arg) < 0) {
-            throw socket_exception(socket_exception::FCNTL_ERR, errno);
-        }
-    }
-
-    virtual void enqueBuffer(char* buffer, uint32_t size) const
-            throw (aio_read_exception) {
-        control_block.aio_fildes = file_descriptor;
-        control_block.aio_buf = buffer;
-        control_block.aio_nbytes = size;
-
-        int result = aio_read(&control_block);
-
-        if (result == -1) {
-            throw aio_read_exception(aio_read_exception::ENQUE, errno);
-        }
+    virtual void readCharBuffer(char* buffer, uint32_t size) const
+                throw (aio_read_exception) {
+            aioReadCharBuffer(buffer, size);
     }
 
     virtual void aioReadCharBuffer(char* buffer, uint32_t size) const
@@ -154,18 +74,30 @@ public:
         enqueBuffer(buffer, size);
     }
 
-    virtual void readCharBuffer(char* buffer, uint32_t size) const
-            throw (aio_read_exception) {
-        return aioReadCharBuffer(buffer, size);
+    virtual void enqueBuffer(char* buffer, uint32_t size) const
+                                    throw (aio_read_exception) {
+
+        control_block.aio_fildes = file_descriptor;
+        control_block.aio_buf = buffer;
+        control_block.aio_nbytes = size;
+
+        int result = aio_read(&control_block);
+
+        if (result == -1) {
+            throw aio_read_exception(aio_read_exception::ENQUE, errno);
+        }
     }
 
     virtual uint32_t bytesRead() const throw (aio_read_exception) {
+
         if (readInProgress()) {
             throw aio_read_exception(aio_read_exception::IN_PROGRESS);
         }
+
         if (aio_error(&control_block) != 0) {
             throw aio_read_exception(aio_read_exception::READ, errno);
         }
+
         return aio_return(&control_block);
     }
 
@@ -177,12 +109,9 @@ public:
         if (is_open) {
             return;
         }
-        createSocket();
-        connectSocket();
-    }
-
-    bool rewind(long int) const {
-        return false;
+        file_descriptor = tcp::createSocket();
+        tcp::connectSocket(file_descriptor, address, port);
+        is_open = true;
     }
 
     //blocking!
@@ -202,10 +131,9 @@ public:
     }
 
 private:
-    short port;
+    unsigned short port;
     long address;
     bool is_open;
-    sockaddr_in server_address;
     mutable aiocb control_block;
     int file_descriptor;
 };

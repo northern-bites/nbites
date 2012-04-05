@@ -23,6 +23,7 @@ set( data_headers DataLoader.h
                   OfflineDataFinder.h 
                   DataManager.h
                   MemorySignalingInterface.h
+                  QProtobufMessage.h
                   RobotMemoryManager.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -46,5 +47,6 @@ target_link_libraries(
   memory
   parse
   log
+  overseer_client
   ${QT_LIBRARIES}
   )

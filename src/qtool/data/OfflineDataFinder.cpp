@@ -72,14 +72,16 @@ void OfflineDataFinder::scanFolderForLogs(QString path) {
     for (int i = 0; i < list.size(); i++) {
         QFileInfo fileInfo = list.at(i);
         if (fileInfo.size() != 0) {
+            std::string path = fileInfo.absoluteFilePath().toStdString();
             for (int id = FIRST_OBJECT_ID; id < LAST_OBJECT_ID; id++) {
                 if (fileInfo.baseName() == QString(MObject_names[id].c_str())) {
-                    std::string path = fileInfo.absoluteFilePath().toStdString();
-
                     InProvider::ptr file_in(new FileInProvider(path));
                     emit signalNewInputProvider(file_in, (MObject_ID)(id));
-
                 }
+            }
+            if (fileInfo.baseName() == "GroundTruth") {
+                InProvider::ptr file_in(new FileInProvider(path));
+                emit signalGroundTruth(file_in);
             }
         }
     }

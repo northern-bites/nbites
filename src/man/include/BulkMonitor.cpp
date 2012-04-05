@@ -68,7 +68,7 @@ void BulkMonitor::LogOutput() {
 
     stringstream filename;
     ofstream outFile;
-    filename << "/home/nao/naoqi/log/" << bulkName << ".monitor.cvs";
+    filename << "/home/nao/nbites/log/" << bulkName << ".monitor.cvs";
     outFile.open(filename.str().c_str(), ifstream::out);
 
     // header line with sensor names

@@ -5,14 +5,10 @@
 #include <Common.h>
 #include "CommDef.h"
 
-#if ROBOT(AIBO)
-#  include <socket.h>
-#else
-#  include <sys/socket.h> // socket(), connect(), send(), recv(), setsockopt()
-#  include <unistd.h>     // close()
-#  include <arpa/inet.h>  // inet_aton(), htonl(), htons()
-#include <netdb.h>      // gethostbyname()
-#endif
+#include <sys/socket.h> // socket(), connect(), send(), recv(), setsockopt()
+#include <unistd.h>     // close()
+#include <arpa/inet.h>  // inet_aton(), htonl(), htons()
+#include <netdb.h>      // gethostbyname()d
 
 //#include <fcntl.h>      // fcntl()
 

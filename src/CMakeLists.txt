@@ -9,7 +9,7 @@ set( NBITES_DIR ${NBITES_SRC_DIR}/.. )
 set( MAN_SRC_DIR ${NBITES_SRC_DIR}/man )
 set( QTOOL_SRC_DIR ${NBITES_SRC_DIR}/qtool )
 
-add_definitions( -DNBITES_DIR="${NBITES_DIR}" )
+add_definitions( -DNBITES_DIR="${NBITES_DIR}" -DROBOT_TYPE=${ROBOT_TYPE} )
 
 include_directories( . ) #current directory
 add_subdirectory(man)
