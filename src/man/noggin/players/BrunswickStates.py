@@ -36,15 +36,24 @@ def gameReady(player):
         player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
         player.gainsOn()
+        if player.lastDiffState == 'gameInitial':
+            player.initialDelayCounter = 0
 
-        # Works with rules (2011) to get goalie manually positioned
-        if (player.lastDiffState == 'gameInitial'
-            and not player.brain.play.isRole(GOALIE)):
-            return player.goLater('relocalize')
+    #HACK! TODO: this delay is to make sure the sensors get calibrated before
+    #we start walking; find a way to query motion to see whether the sensors are
+    #calibrated or not before starting
+    player.initialDelayCounter += 1
+    if player.initialDelayCounter < 250:
+        return player.stay()
 
-        elif player.lastDiffState == 'gamePenalized':
-            player.brain.resetLocalization()
-            return player.goLater('afterPenalty')
+    # Works with rules (2011) to get goalie manually positioned
+    if (player.lastDiffState == 'gameInitial'
+        and not player.brain.play.isRole(GOALIE)):
+        return player.goLater('relocalize')
+
+    elif player.lastDiffState == 'gamePenalized':
+        player.brain.resetLocalization()
+        return player.goLater('afterPenalty')
 
     #See above about rules(2011) - we should still reposition after goals
     if (player.lastDiffState == 'gameInitial'
