@@ -4,6 +4,7 @@
 #include <cassert>
 #include <string>
 
+#include "NullStream.h"
 #include "bhuman.h"
 
 namespace man {
@@ -12,12 +13,20 @@ namespace motion {
 using namespace boost;
 using namespace std;
 
-#define DEBUG_BHWALK
+//#define DEBUG_BHWALK
 #ifdef DEBUG_BHWALK
 #define bhwalk_out std::cout
 #else
 #define bhwalk_out (*NullStream::NullInstance())
 #endif
+
+const float BHWalkProvider::INITIAL_BODY_POSE_ANGLES[] =
+{
+        1.57f, 0.18f, -1.56f, -0.18f,
+        0.0f, 0.0f, -0.39f, 0.76f, -0.37f, 0.0f,
+        0.0f, 0.0f, -0.39f, 0.76f, -0.37f, 0.0f,
+        1.57f, -0.18f, -1.43f, 0.23f
+};
 
 /**
  * Since the NBites use a different order for the joints, we use this
@@ -52,13 +61,13 @@ static const JointData::Joint nb_joint_order[] = {
 };
 
 BHWalkProvider::BHWalkProvider(shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p) :
-        MotionProvider(WALK_PROVIDER),
+        MotionProvider(WALK_PROVIDER), requestedToStop(false),
         sensors(s) {
 }
 
 void BHWalkProvider::requestStopFirstInstance() {
     this->stand();
-    inactive();
+    requestedToStop = true;
 }
 
 /**
@@ -133,13 +142,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
         this->setNextChainStiffnesses((Kinematics::ChainID) i, chain_hardness);
     }
 
-//    if (walkingEngine.walkingEngineOutput.positionInWalkCycle == 1.0f) {
-//        stand();
-//    }
-//    if (walkingEngine.walkingEngineOutput.isLeavingPossible == true)
-//        inactive();
-//    else
-//        active();
+    if (requestedToStop && walkingEngine.walkingEngineOutput.isLeavingPossible) {
+        inactive();
+        requestedToStop = false;
+    }
 }
 
 void BHWalkProvider::stand() {
@@ -147,11 +153,12 @@ void BHWalkProvider::stand() {
     walkingEngine.theMotionRequest.motion = MotionRequest::stand;
     walkingEngine.theMotionRequest.walkRequest = WalkRequest();
     active();
-//    inactive();
 }
 
 MotionModel BHWalkProvider::getOdometryUpdate() {
-    return MotionModel();
+    return MotionModel(walkingEngine.theOdometryData.translation.x * MM_TO_CM,
+                       walkingEngine.theOdometryData.translation.y * MM_TO_CM,
+                       walkingEngine.theOdometryData.rotation);
 }
 
 void BHWalkProvider::hardReset() {
@@ -198,7 +205,7 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
     walkingEngine.theMotionRequest.motion = MotionRequest::walk;
 
     bhwalk_out << "BHWalk destination walk requested with command ";
-    bhwalk_out << *(command.get());
+    bhwalk_out << *(command.get()) << endl;
 
     active();
 }

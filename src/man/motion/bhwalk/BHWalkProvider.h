@@ -50,14 +50,23 @@ public:
     }
 
     MotionModel getOdometryUpdate();
-
     virtual const SupportFoot getSupportFoot() const;
+
+    static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
+    //returns only body angles
+    //TODO: this is in nature due to the fact that we don't separate head providers
+    //from body providers - if we did we could separate the methods for each
+    std::vector<float> getInitialStance() {
+        return std::vector<float>(INITIAL_BODY_POSE_ANGLES,
+                                  INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
+    }
 
 protected:
     void stand();
     void setActive() {}
 
 private:
+    bool requestedToStop;
     boost::shared_ptr<Sensors> sensors;
     WalkingEngine walkingEngine;
 };

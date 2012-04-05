@@ -39,9 +39,11 @@ set( bhwalk_srcs BHWalkProvider.cpp
                  Tools/Configuration/ConfigMapParser.cpp )
 
 #install configs
+if( NOT OFFLINE )
 set( BHWALK_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/config )
 install( DIRECTORY ${BHWALK_CONFIG_DIR} 
          DESTINATION ${CMAKE_INSTALL_PREFIX} )
+endif()
 
 add_library(
 	bhwalk
