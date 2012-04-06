@@ -18,7 +18,7 @@
 #include "image/BMPYUVImage.h"
 
 //qtool
-#include "viewer/ChannelImageViewer.h"
+#include "viewer/BMPImageViewerListener.h"
 #include "ColorEdit.h"
 #include "ColorSpace.h"
 #include "ColorSpaceWidget.h"
@@ -38,12 +38,14 @@ namespace qtool {
         protected slots:
             void loadColorTableBtnPushed();
             void saveColorTableBtnPushed();
+            void updateThresholdedImage();
 
         private:
             data::DataManager::ptr dataManager;
-            image::BMPYUVImage* currentImage;
-            QPushButton nextImageBtn, previousImageBtn,
-                saveColorTableBtn;
+            image::BMPYUVImage* image;
+            viewer::BMPImageViewerListener* imageViewer;
+            QPushButton saveColorTableBtn;
+
 
         };
     }

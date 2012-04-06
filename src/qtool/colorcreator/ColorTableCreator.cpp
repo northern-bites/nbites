@@ -8,7 +8,8 @@
 
 #include "ColorTableCreator.h"
 
-#include <QtDebug>
+
+#include <QMouseEvent>
 
 #include <QFileDialog>
 
@@ -19,9 +20,26 @@ namespace qtool {
 
         ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
                                              QWidget *parent) :
-            QWidget(parent), dataManager(dataManager)
+            QWidget(parent), dataManager(dataManager),
+            image(new BMPYUVImage(dataManager->getMemory()->getMImage(),
+                                  BMPYUVImage::RGB, this))
+            // imageViewer(image, this)
         {
+            imageViewer = new viewer::BMPImageViewerListener(image, this);
+            QHBoxLayout* mainLayout = new QHBoxLayout;
+            QHBoxLayout* leftLayout = new QHBoxLayout;
 
+            dataManager->connectSlotToMObject(imageViewer,
+                                              SLOT(updateView()),
+                                              MIMAGE_ID);
+
+            leftLayout->addWidget(imageViewer);
+            mainLayout->addLayout(leftLayout);
+
+            this->setLayout(mainLayout);
+            // connect(image, SIGNAL(bitmapBuilt()),
+            //         this, SLOT(updateThresholdedImage()));
+            // leftLayout->addWidget(&imageViewer);
 
         }
 
@@ -43,6 +61,9 @@ namespace qtool {
                                         base_directory + "/new_sliders.tbl",
                                         tr("Color Table files (*.tbl)"));
             // Use the filename
+        }
+
+        void ColorTableCreator::updateThresholdedImage(){
         }
     }
 }

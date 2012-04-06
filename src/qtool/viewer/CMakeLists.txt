@@ -16,6 +16,7 @@ add_definitions(${QT_DEFINITIONS})
 set( viewer_srcs MemoryViewer.cpp
                  MObjectViewer.cpp
                  BMPImageViewer.cpp
+		 BMPImageViewerListener.cpp
                  ChannelImageViewer.cpp
 		 BallEKFViewer.cpp
 		 FieldViewer.cpp
@@ -25,6 +26,7 @@ set( viewer_srcs MemoryViewer.cpp
 set( viewer_headers MemoryViewer.h
                     MObjectViewer.h
                     BMPImageViewer.h
+		    BMPImageViewerListener.h
                     ChannelImageViewer.h
 		    BallEKFViewer.h
 		    FieldViewer.h
