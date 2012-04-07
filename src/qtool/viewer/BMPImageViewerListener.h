@@ -11,14 +11,16 @@
 namespace qtool {
     namespace viewer {
         class BMPImageViewerListener: public BMPImageViewer {
-            // Q_OBJECT
+             Q_OBJECT
 
              public:
 
              BMPImageViewerListener(image::BMPImage* image,
                                     QWidget *parent = NULL);
             void mouseReleaseEvent ( QMouseEvent *event);
-            void mouseMoveEvent (QMouseEvent *event);
+
+            signals:
+            void fetchColorToDefine(int x,int y);
 
         };
     }

@@ -18,15 +18,12 @@ namespace qtool {
         {
             if(event->button() == Qt::LeftButton)
             {
-                qDebug() << event->x() << endl;
+                qDebug() << QString::number(event->pos().x());
+                qDebug() << QString::number(event->pos().y());
 
+                emit fetchColorToDefine(event->pos().x(), event->pos().y());
 
             }
-        }
-
-        void BMPImageViewerListener::mouseMoveEvent(QMouseEvent* event) {
-            qDebug() << QString::number(event->pos().x());
-            qDebug() << QString::number(event->pos().y());
         }
 
     }

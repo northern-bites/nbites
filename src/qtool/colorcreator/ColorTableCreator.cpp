@@ -26,15 +26,27 @@ namespace qtool {
             // imageViewer(image, this)
         {
             imageViewer = new viewer::BMPImageViewerListener(image, this);
+            rightImageViewer = new viewer::BMPImageViewer(image, this);
             QHBoxLayout* mainLayout = new QHBoxLayout;
             QHBoxLayout* leftLayout = new QHBoxLayout;
+
+            QHBoxLayout* rightLayout = new QHBoxLayout;
 
             dataManager->connectSlotToMObject(imageViewer,
                                               SLOT(updateView()),
                                               MIMAGE_ID);
+            dataManager->connectSlotToMObject(rightImageViewer,
+                                              SLOT(updateView()),
+                                              MIMAGE_ID);
+            QObject::connect(imageViewer, SIGNAL(fetchColorToDefine(int,int)),
+                             this, SLOT(updateColorTable(int,int)));
 
             leftLayout->addWidget(imageViewer);
+            rightLayout->addWidget(rightImageViewer);
             mainLayout->addLayout(leftLayout);
+            mainLayout->addLayout(rightLayout);
+
+
 
             this->setLayout(mainLayout);
             // connect(image, SIGNAL(bitmapBuilt()),
@@ -64,6 +76,11 @@ namespace qtool {
         }
 
         void ColorTableCreator::updateThresholdedImage(){
+        }
+
+        void ColorTableCreator::updateColorTable(int x, int y)
+        {
+            printf("X: %d, Y: %d\n",x,y);
         }
     }
 }

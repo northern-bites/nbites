@@ -39,11 +39,13 @@ namespace qtool {
             void loadColorTableBtnPushed();
             void saveColorTableBtnPushed();
             void updateThresholdedImage();
+            void updateColorTable(int x, int y);
 
         private:
             data::DataManager::ptr dataManager;
             image::BMPYUVImage* image;
             viewer::BMPImageViewerListener* imageViewer;
+            viewer::BMPImageViewer* rightImageViewer;
             QPushButton saveColorTableBtn;
 
 
