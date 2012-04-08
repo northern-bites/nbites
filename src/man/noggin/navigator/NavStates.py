@@ -12,11 +12,9 @@ DEBUG = False
 def doingSweetMove(nav):
     '''State that we stay in while doing sweet moves'''
     if nav.firstFrame():
-        nav.doingSweetMove = True
         return nav.stay()
 
     if not nav.brain.motion.isBodyActive():
-        nav.doingSweetMove = False
         return nav.goNow('stopped')
 
     return nav.stay()
@@ -29,69 +27,21 @@ def goToPosition(nav):
     selected heading. Otherwise, the bearing to the object is used.
     """
     
-    relDest = helper.getCurrentRelativeDestination(nav)
-    
     if nav.firstFrame():
-        nav.atPositionCount = 0
+        navTrans.atDestination.count = 0
         
     if nav.counter % 10 is 0:
         print "going to " + str(relDest)
+        print "trans counter " + str(navTrans.atDestination.count)
 
-    if (navTrans.atDestination(nav, relDest)):
-            nav.atPositionCount += 1
-            if nav.atPositionCount > constants.FRAMES_THRESHOLD_TO_AT_POSITION:
-                return nav.goNow('atPosition')
-    else:
-        if not nav.atPositionCount == 0:
-            nav.atPositionCount -= 1
-
-    # We don't want to alter the actual destination, we just want a
-    # temporary destination for getting the params to walk straight at
-    #if hasattr(dest, "loc"):
-    #    dest = dest.loc
-
-    #intermediateH = myLocation.headingTo(destination)
-    
-
-    #walkX, walkY, walkTheta = walker.getWalkSpinParam(my, tempDest)
+    relDest = helper.getCurrentRelativeDestination(nav) 
     helper.setDestination(nav, relDest.relX, relDest.relY, relDest.relH)
 
     if navTrans.shouldAvoidObstacle(nav):
         return nav.goLater('avoidObstacle')
 
-    return nav.stay()
-
-def omniGoTo(nav):
-    if nav.firstFrame():
-        nav.stopOmniCount = 0
-        nav.atPositionCount = 0
-
-    my = nav.brain.my
-    dest = nav.getDestination()
-
-    if (navTrans.atDestinationCloser(nav) and
-        navTrans.atHeading(nav)):
-        nav.atPositionCount += 1
-        if (nav.atPositionCount >
-            constants.FRAMES_THRESHOLD_TO_AT_POSITION):
-            return nav.goNow('atPosition')
-    else:
-        nav.atPositionCount = 0
-
-    walkX, walkY, walkTheta = walker.getOmniWalkParam(my, dest)
-    helper.setSpeed(nav, walkX, walkY, walkTheta)
-
-    if not navTrans.useFinalHeading(nav.brain, dest):
-        nav.stopOmniCount += 1
-        if nav.stopOmniCount > constants.FRAMES_THRESHOLD_TO_GOTO_POSITION:
-            return nav.goLater('goToPosition')
-    else:
-        nav.stopOmniCount = 0
-
-    if navTrans.shouldAvoidObstacle(nav):
-        return nav.goLater('avoidObstacle')
-
-    return nav.stay()
+    return navTrans.transition(nav, navTrans.atDestination, 'atPosition', 
+                               constants.FRAMES_THRESHOLD_TO_AT_POSITION)
 
 # WARNING: avoidObstacle could possibly go into our own box
 def avoidObstacle(nav):
@@ -342,17 +292,10 @@ def stopped(nav):
 def atPosition(nav):
     if nav.firstFrame():
         nav.brain.speech.say("At Position")
+        navTrans.notAtDestination.count = 0
         helper.setSpeed(nav, 0, 0, 0)
-        nav.startOmniCount = 0
 
     relDest = helper.getCurrentRelativeDestination(nav)
-    if navTrans.atDestination(nav, relDest):
-        nav.startOmniCount = 0
-        return nav.stay()
-
-    else:
-        nav.startOmniCount += 1
-        if nav.startOmniCount > constants.FRAMES_THRESHOLD_TO_POSITION_OMNI:
-            return nav.goLater('omniGoTo')
-    return nav.stay()
-
+    
+    return navTrans.transition(nav, navTrans.notAtDestination, 'goToPosition',
+                               constants.FRAMES_THRESHOLD_TO_AT_POSITION)

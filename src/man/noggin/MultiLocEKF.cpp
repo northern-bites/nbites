@@ -169,7 +169,7 @@ MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
                         CornerObservation, corner_measurement_dim,
                         MotionModel,
                         loc_ekf_dimension>(BETA_LOC,GAMMA_LOC), LocSystem(),
-      lastOdo(0,0,0), lastPointObservations(), lastCornerObservations(),
+      lastOdometry(0,0,0), lastPointObservations(), lastCornerObservations(),
       useAmbiguous(true), errorLog(error_log_width),
       resetFlag(false)
 {
@@ -279,9 +279,10 @@ void MultiLocEKF::updateLocalization(const MotionModel& u,
 // Update expected position based on odometry
 void MultiLocEKF::odometryUpdate(const MotionModel& u)
 {
-    timeUpdate(u);
+    DeltaMotionModel deltaOdometry = u - lastOdometry;
+    timeUpdate(deltaOdometry);
     limitAPrioriUncert();
-    lastOdo = u;
+    lastOdometry = u;
 }
 
 /**
@@ -333,7 +334,7 @@ void MultiLocEKF::endFrame()
     clipRobotPose();
     if (testForNaNReset()) {
         cout << "MultiLocEKF reset to: " << endl << *this << endl;
-        cout << "\tLast odo is: " << lastOdo << endl;
+        cout << "\tLast odo is: " << lastOdometry << endl;
         cout << endl;
     }
 }
@@ -344,7 +345,7 @@ void MultiLocEKF::endFrame()
  * frame.  Updates the values of the covariance matrix Q_k and the jacobian
  * A_k.
  *
- * @param u The motion model of the last frame.  Ignored for the loc.
+ * @param deltaOdometry The motion model of the last frame.  Ignored for the loc.
  * @return The expected change in loc position (x,y, xVelocity, yVelocity)
  */
 TwoMeasurementEKF<PointObservation,
@@ -353,7 +354,7 @@ TwoMeasurementEKF<PointObservation,
                   corner_measurement_dim,
                   MotionModel,
                   loc_ekf_dimension>::StateVector
-MultiLocEKF::associateTimeUpdate(MotionModel u)
+MultiLocEKF::associateTimeUpdate(const DeltaMotionModel& u)
 {
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "\t\t\tUpdating Odometry of " << u << endl;
@@ -366,14 +367,14 @@ MultiLocEKF::associateTimeUpdate(MotionModel u)
     float sinh, cosh;
     sincosf(h, &sinh, &cosh);
 
-    deltaLoc(0) = u.deltaF * cosh - u.deltaL * sinh;
-    deltaLoc(1) = u.deltaF * sinh + u.deltaL * cosh;
-    deltaLoc(2) = u.deltaR;
+    deltaLoc(0) = u.x * cosh - u.y * sinh;
+    deltaLoc(1) = u.x * sinh + u.y * cosh;
+    deltaLoc(2) = u.theta;
 
     // Derivatives of motion updates re:x,y,h
     // Other values are set in the constructor and are unchanging
-    A_k(0,2) = -u.deltaF * sinh - u.deltaL * cosh;
-    A_k(1,2) = u.deltaF * cosh - u.deltaL * sinh;
+    A_k(0,2) = -u.x * sinh - u.y * cosh;
+    A_k(1,2) = u.x * cosh - u.y * sinh;
 
     return deltaLoc;
 }
@@ -742,7 +743,7 @@ void MultiLocEKF::printBeforeUpdateInfo()
 {
     cout << "Loc update: " << endl;
     cout << "Before updates: " << *this << endl;
-    cout << "\tOdometery is " << lastOdo <<endl;
+    cout << "\tOdometery is " << lastOdometry <<endl;
     cout << "\tPoint Observations are: " << endl;
     for(unsigned int i = 0; i < lastPointObservations.size(); ++i) {
         cout << "\t\t" << lastPointObservations[i] <<endl;

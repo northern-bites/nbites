@@ -3,14 +3,32 @@ from . import NavConstants as constants
 from man.noggin.util import MyMath
 import noggin_constants as NogginConstants
 from ..players import ChaseBallTransitions
+from . import NavHelper as helper
 
-def atDestination(nav, relDest):
-    ''' Returns true if we're close enough to relDest '''
-    my = nav.brain.my
-    return fabs(relDest.relX) < constants.CLOSE_ENOUGH_X and \
-           fabs(relDest.relY) < constants.CLOSE_ENOUGH_Y and \
-           fabs(relDest.relH) < constants.CLOSE_ENOUGH_H
+def transition(nav, check, targetState, threshold):
     
+    if check(nav):
+        check.count += 1
+    elif check.count > 0:
+        check.count -= 1
+        
+    if check.count > threshold:
+        return nav.goNow(targetState)
+    else:
+        return nav.stay()
+    
+
+def atDestination(nav):
+    ''' Returns true if we're close enough to relDest '''
+    relDest = helper.getCurrentRelativeDestination(nav)
+    my = nav.brain.my
+    return fabs(relDest.relX) < constants.CLOSE_ENOUGH_X + my.uncertX and \
+           fabs(relDest.relY) < constants.CLOSE_ENOUGH_Y + my.uncertY and \
+           fabs(relDest.relH) < constants.CLOSE_ENOUGH_H + my.uncertH
+    
+def notAtDestination(nav):
+    return not atDestination(nav)
+
 
 def atDestinationCloser(nav, relDest):
     """

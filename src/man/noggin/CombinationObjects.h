@@ -115,7 +115,8 @@ namespace noggin {
         RobotLocation(const RobotLocation& other);
         bool operator == (const RobotLocation& other) const;
         bool operator != (const RobotLocation& other) const;
-        RelRobotLocation operator - (const RobotLocation& other) const;
+        RelRobotLocation operator- (const RobotLocation& other) const;
+        RobotLocation operator+ (const RelRobotLocation& other) const;
         RelRobotLocation getRelLocationOf(const RobotLocation& other) const;
 
         // Extra getter
@@ -146,14 +147,17 @@ namespace noggin {
     {
     public:
         RelLocation(float dx = 0, float dy = 0);
-        ~RelLocation() {};
+        virtual ~RelLocation() {};
         RelLocation(const RelLocation& other);
 
         //Getters
         virtual const float getRelX() const { return relX; }
         virtual const float getRelY() const { return relY; }
-        virtual const float getBearing() const {
-            return NBMath::safe_atan2(relY, relX);
+        virtual const degrees getBearing() const {
+            return NBMath::safe_atan2(relY, relX) * TO_DEG;
+        }
+        virtual const float getDist() const {
+            return hypotf(relY, relX);
         }
 
         //Setters
@@ -178,7 +182,7 @@ namespace noggin {
     {
     public:
         RelRobotLocation(float dx = 0, float dy = 0, degrees dh = 0);
-        ~RelRobotLocation() {};
+        virtual ~RelRobotLocation() {};
         RelRobotLocation(const RelRobotLocation& other);
 
         virtual const degrees getRelH() const { return relH*TO_DEG; }
@@ -228,7 +232,7 @@ namespace noggin {
      * relative to the correct team.
      */
 
-    class LocBall : public Location, public RelLocation
+    class LocBall : public Location
     {
     public:
         LocBall(PyLoc&, MyInfo&);
@@ -242,8 +246,8 @@ namespace noggin {
         const float getVelXUncert() { return loc->getXVelocityUncert(); }
         const float getVelYUncert() { return loc->getYVelocityUncert(); }
         const degrees getHeading();
-        const float getRelX() const { return loc->getBallRelXEst(); }
-        const float getRelY() const { return loc->getBallRelYEst(); }
+        const float getRelX() { return loc->getBallRelXEst(); }
+        const float getRelY() { return loc->getBallRelYEst(); }
         const float getRelVelX() { return loc->getRelXVelocityEst(); }
         const float getRelVelY() { return loc->getRelYVelocityEst(); }
         const float getAccX();

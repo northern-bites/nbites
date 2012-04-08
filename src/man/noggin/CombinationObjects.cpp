@@ -134,6 +134,11 @@ namespace noggin {
         return RelRobotLocation(x - other.x, y - other.y, h - other.h);
     }
 
+    RobotLocation RobotLocation::operator+ (const RelRobotLocation& other) const
+    {
+        return RobotLocation(x + other.getRelX(), y + other.getRelY(), h + other.getRelH());
+    }
+
     RelRobotLocation RobotLocation::getRelLocationOf(const RobotLocation& other) const {
         return other - *this;
     }

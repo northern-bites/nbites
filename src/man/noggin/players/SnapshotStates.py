@@ -10,20 +10,20 @@ NUM_FRAMES_TO_SAVE = 150
 def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
-        player.executeMove(SweetMoves.INITIAL_POS)
+        #player.executeMove(SweetMoves.INITIAL_POS)
     return player.stay()
 
 def gameSet(player):
-    if player.firstFrame:
-        player.numFramesSaved = 0
+    if player.firstFrame():
+        player.brain.nav.stand()
 
     return player.stay()
 
 def gamePlaying(player):
-    player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
     
-    if player.firstFrame:
-        player.brain.nav.walk(0.5, 0, 0)
+    if player.firstFrame():
+        player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
+        player.brain.nav.walk(0, 0, 1)
 
     #if player.brain.ball.vis.on:
     # player.brain.sensors.saveFrame()

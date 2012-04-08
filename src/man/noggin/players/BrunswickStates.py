@@ -43,7 +43,7 @@ def gameReady(player):
     #we start walking; find a way to query motion to see whether the sensors are
     #calibrated or not before starting
     player.initialDelayCounter += 1
-    if player.initialDelayCounter < 250:
+    if player.initialDelayCounter < 230:
         return player.stay()
 
     # Works with rules (2011) to get goalie manually positioned

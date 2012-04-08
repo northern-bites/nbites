@@ -17,8 +17,8 @@ DEST = 1
 WALK = 0
 
 # all walk vector values must be in the range [-1,1]
-UNIT_TEST1 = ((WALK, (.5, 0, 0), 500),
-              (WALK, (0, .5, 0), 500),
+UNIT_TEST1 = ((WALK, (1, 0, 0), 250),
+              (WALK, (0, 1, 0), 250),
               (WALK, (.5, -.5, .75), 250),
               (WALK, (-.4, .5, .5), 250),
               (WALK, (.2, .2, .2), 250),
@@ -63,7 +63,7 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0
-        player.unitTest = START_STOP_DEST
+        player.unitTest = UNIT_TEST1
     return player.goLater('walkTest')
 
 def walkTest(player):

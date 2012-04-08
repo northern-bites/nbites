@@ -113,7 +113,7 @@ public:
 
     // Get last odomotery update
     virtual MotionModel getLastOdo() const {
-        return lastOdo;
+        return lastOdometry;
     }
 
     virtual std::vector<PointObservation> getLastPointObservations() const {
@@ -165,7 +165,7 @@ private:
     MultiLocEKF operator=(const MultiLocEKF& other);
 
     // Core Functions
-    virtual StateVector associateTimeUpdate(MotionModel u_k);
+    virtual StateVector associateTimeUpdate(const DeltaMotionModel& u_k);
 
     virtual void incorporateMeasurement(const PointObservation& z,
                                         StateMeasurementMatrix1 &H_k,
@@ -329,7 +329,7 @@ private:
     void clipRobotPose();
 
     // Last odometry update
-    MotionModel lastOdo;
+    MotionModel lastOdometry;
     std::vector<PointObservation> lastPointObservations;
     std::vector<CornerObservation> lastCornerObservations;
     bool useAmbiguous;
