@@ -78,6 +78,14 @@ public:
         };
         return defaultSettings;
     }
+
+    static const Type getOtherCameraType(Type type) {
+        if (type == TOP) {
+            return BOTTOM;
+        } else {
+            return TOP;
+        }
+    }
 };
 
 }
