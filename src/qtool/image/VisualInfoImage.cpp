@@ -13,7 +13,7 @@ namespace image {
 
 { } 
 
-void OverlayImage::updateBitmap() {
+void OverlayImage::buildBitmap() {
      int image_width = 640;
      int image_height = 480;
      bitmap= QImage(image_width,image_height, QImage::Format_ARGB32);
@@ -78,8 +78,8 @@ void OverlayImage::drawBall(const PVision::PVisualBall ballData) {
     int ball_y = 2*ballData.visual_detection().y();
     int ball_radius = 2*ballData.radius();
      
-    painter.setPen(QPen(QColor::QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
-    painter.setBrush(QBrush(QColor::QColor(255,0,0,80),Qt::SolidPattern));
+    painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+    painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
     painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
   }
 
@@ -120,8 +120,8 @@ void OverlayImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_top_x, right_top_y)
     };
     
-    painter.setPen(QPen(QColor::QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
-    painter.setBrush(QBrush(QColor::QColor(255,255,0,80),Qt::SolidPattern));
+    painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+    painter.setBrush(QBrush(QColor(255,255,0,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
 }
 
@@ -146,8 +146,8 @@ void OverlayImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_top_x, right_top_y)
     };
     
-    painter.setPen(QPen(QColor::QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
-    painter.setBrush(QBrush(QColor::QColor(0,0,200,80),Qt::SolidPattern));
+    painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+    painter.setBrush(QBrush(QColor(0,0,200,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
   }
  void OverlayImage::drawRedRobot(const PVision::PVisualRobot robotData) {
@@ -171,8 +171,8 @@ void OverlayImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_top_x, right_top_y)
     };
     
-    painter.setPen(QPen(QColor::QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
-    painter.setBrush(QBrush(QColor::QColor(200,0,0,80),Qt::SolidPattern));
+    painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+    painter.setBrush(QBrush(QColor(200,0,0,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
   }
 

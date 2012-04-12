@@ -35,8 +35,8 @@ public:
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
-    viewer::RoboImageViewer roboImageViewer;
-
+    //viewer::BMPImageViewer imageViewer;
+    //    image::Overlaye
 };
 
 }

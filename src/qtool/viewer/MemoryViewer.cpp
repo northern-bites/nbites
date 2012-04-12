@@ -1,7 +1,7 @@
 
 #include "MemoryViewer.h"
 #include <vector>
-#include "image/OverlayImage.h"
+#include "image/FastYUVToBMPImage.h"
 
 namespace qtool {
 namespace viewer {
@@ -11,11 +11,17 @@ using namespace man::memory;
 using namespace qtool::image;
 
 MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
-                 memoryManager(memoryManager),
-                 roboImageViewer(memoryManager->getMemory()->getMImage(), this) {
+                 memoryManager(memoryManager) {
+    MImage::const_ptr rawMImage = memoryManager->getMemory()->getMImage();
+    FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(rawMImage, this);
 
-    this->setCentralWidget(&roboImageViewer);
-    memoryManager->connectSlotToMObject(&roboImageViewer,
+    OverlayImage shapes = new OverlayImage(memoryManager->getMemory()->getMVision());
+    OverlayedImage combo = new OverlayedImage(rawBMP, shapes, this);
+    
+    BMPImageViewer imageViewer = new BMPImageViewer(combo, this);
+
+    this->setCentralWidget(&imageViewer);
+    memoryManager->connectSlotToMObject(imageViewer,
                         SLOT(updateView()), MIMAGE_ID);
 
     //corner ownership
