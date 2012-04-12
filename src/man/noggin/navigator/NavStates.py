@@ -4,6 +4,7 @@ from . import NavHelper as helper
 from . import WalkHelper as walker
 from . import NavTransitions as navTrans
 from objects import RobotLocation
+from ..util import Transition
 
 from math import fabs
 
@@ -22,32 +23,36 @@ def doingSweetMove(nav):
 def goToPosition(nav):
     """
     Go to a position set in the navigator. General go to state.  Goes
-    towards a x, y position on the field stored in dest.
-    If there is an h specified in the destination, that will be the 
-    selected heading. Otherwise, the bearing to the object is used.
+    towards a location on the field stored in dest.
+    The location can be a RobotLocation, Location, RelRobotLocation, RelLocation
+    Absolute locations get transformed to relative locations based on current loc
+    For relative locations we use our bearing to that point as the heading 
     """
-    
-    if nav.firstFrame():
-        navTrans.atDestination.count = 0
         
-    if nav.counter % 10 is 0:
+    relDest = helper.getCurrentRelativeDestination(nav)
+        
+    if nav.counter % 20 is 0:
         print "going to " + str(relDest)
-        print "trans counter " + str(navTrans.atDestination.count)
+        print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX, 
+                                                 nav.brain.ball.loc.relY, 
+                                                 nav.brain.ball.loc.bearing)
 
-    relDest = helper.getCurrentRelativeDestination(nav) 
-    helper.setDestination(nav, relDest.relX, relDest.relY, relDest.relH)
+    #reduce the speed if we're close to the target
+    helper.setDestination(nav, relDest.relX, relDest.relY, relDest.relH, nav.destGain)
 
     if navTrans.shouldAvoidObstacle(nav):
         return nav.goLater('avoidObstacle')
 
-    return navTrans.transition(nav, navTrans.atDestination, 'atPosition', 
-                               constants.FRAMES_THRESHOLD_TO_AT_POSITION)
+    return Transition.getNextState(nav, goToPosition)
 
 # WARNING: avoidObstacle could possibly go into our own box
 def avoidObstacle(nav):
     """
     If we detect something in front of us, dodge it
     """
+
+    if nav.firstFrame():
+        nav.brain.speech.say("Avoid obstacle")
 
     avoidLeft = navTrans.shouldAvoidObstacleLeft(nav)
     avoidRight = navTrans.shouldAvoidObstacleRight(nav)
@@ -177,10 +182,6 @@ def walking(nav):
     helper.setSpeed(nav, nav.walkX, nav.walkY, nav.walkTheta)
 
     return nav.stay()
-    
-def standing(nav):
-    return nav.stay()
-    
 
 def destWalking(nav):
     """
@@ -273,7 +274,7 @@ def stop(nav):
     """
     if nav.firstFrame():
         # stop walk vectors
-        helper.setSpeed(nav, 0, 0, 0)
+        helper.stand(nav)
         nav.destType = None
         nav.resetDestMemory()
         nav.resetSpeedMemory()
@@ -292,10 +293,9 @@ def stopped(nav):
 def atPosition(nav):
     if nav.firstFrame():
         nav.brain.speech.say("At Position")
-        navTrans.notAtDestination.count = 0
-        helper.setSpeed(nav, 0, 0, 0)
-
-    relDest = helper.getCurrentRelativeDestination(nav)
+        helper.stand(nav)
     
-    return navTrans.transition(nav, navTrans.notAtDestination, 'goToPosition',
-                               constants.FRAMES_THRESHOLD_TO_AT_POSITION)
+    return Transition.getNextState(nav, atPosition)
+
+def standing(nav):
+    return nav.stay()

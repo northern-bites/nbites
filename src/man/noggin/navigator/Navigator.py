@@ -6,6 +6,7 @@ from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation
 from ..kickDecider import kicks
+from ..util import Transition 
 
 DEBUG_DESTINATION = False
 
@@ -47,6 +48,14 @@ class Navigator(FSA.FSA):
 
         self.destType = None
         self.kick = None
+        
+        self.atLocPositionTransition = Transition.CountTransition(navTrans.atLocPosition)
+        self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition, 
+                                                                  Transition.SOME_OF_THE_TIME,
+                                                                  Transition.LOW_PRECISION)
+        
+        NavStates.goToPosition.transitions = { NavStates.atPosition: self.atLocPositionTransition }
+        NavStates.atPosition.transitions = { NavStates.goToPosition: self.locRepositionTransition }
 
     def run(self):
         if self.destType is constants.BALL:
@@ -72,75 +81,22 @@ class Navigator(FSA.FSA):
         helper.executeMove(self.brain.motion, self.sweetMove)
         self.switchTo('doingSweetMove')
 
-    def dribble(self):
-        self.switchTo('dribble')
-
-    def chaseBall(self):
-        """
-        robot will walk to the ball with it centered at his feet.
-        if no ball is visible, localization will be used
-        """ 
-        self.dest = self.brain.ball.loc
-        self.switchTo('goToPosition')
-
-    def kickPosition(self, kick):
-        """
-        It will position the robot at the ball using self.kick to
-        determine the x,y offset and the final heading.
-
-        This state will aggresively omni-walk, so it's probably best
-        if we don't call it until we're near the ball.
-        """
-        self.kick = kick
-        
-        self.chaseBall()
-
-    def kickPositionDest(self, kick):
-        if self.currentState is 'destWalking':
-            return
-
-        ball = self.brain.ball
-        self.kick = kick
-
-        # # slow down as we get near the ball (max 80% speed)
-        # if ball.dist < 30:
-        #     gain = min(.8, (0.4 + (ball.dist / 30)) * .8)
-        # else:
-
-        # TODO later?
-        #self.destTheta = self.kick.heading - self.brain.my.h
-
-        if DEBUG_DESTINATION:
-            print 'Ball rel X: {0} Y: {1} ball bearing: {2}' \
-                .format(ball.loc.relX, ball.loc.relY, ball.bearing)
-
-        # HACK so we don't walk into the ball
-        changeX = ball.loc.relX - self.kick.x_offset - 3
-        # if fabs(changeX) < min_step:
-        #     changeX = min_step * MyMath.sign(changeX)
-
-        changeY = ball.loc.relY - self.kick.y_offset
-        # if fabs(changeY) < min_step:
-        #     changeY = min_step * MyMath.sign(changeY)
-
-        changeT = ball.bearing
-        # if fabs(changeT) < 10:
-        #     changeT = 10 * MyMath.sign(changeT)
-        self.setDest(changeX,changeY,changeT)
-
     def positionPlaybook(self):
-        self.dest = self.brain.play.getPosition()
-        self.switchTo('goToPosition')
+        self.goTo(self.brain.play.getPosition())
 
-    def goTo(self, dest):
+    def goTo(self, dest, speedGain = 1.0,
+             precision = constants.CLOSE_ENOUGH,
+             accountForLocUncertainty = True):
+        
         self.dest = dest
-        self.switchTo('goToPosition')
+        self.destGain = speedGain
+        self.destPrecision = precision
+        self.accountForLocUncertainty = True
+        if self.currentState is not 'goToPosition':
+            self.switchTo('goToPosition')
 
     def stop(self):
-        if ((self.currentState =='stop' or self.currentState == 'stopped')
-            and not self.justKicked):
-            pass
-        else:
+        if self.currentState not in ['stop', 'stopped']:
             self.switchTo('stop')
 
     def isStopped(self):
@@ -175,11 +131,7 @@ class Navigator(FSA.FSA):
         Make the robot stand; Standing should be the default action when we're not 
         walking/executing a sweet move
         """
-        self.walkX = 0
-        self.walkY = 0
-        self.walkTheta = 0
-        
-        helper.createAndSendWalkVector(self, 0, 0, 0)
+        helper.stand(self)
         self.switchTo('standing')
         
 

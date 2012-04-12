@@ -31,11 +31,10 @@ def gameReady(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.stopWalking()
-        player.walkPose()
+        player.gainsOn()
+        player.brain.nav.stand()
         player.brain.tracker.locPans()
         player.brain.sensors.startSavingFrames()
-        player.gainsOn()
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
@@ -69,9 +68,8 @@ def gameSet(player):
     if player.firstFrame():
         player.brain.logger.startLogging()
         player.inKickingState = False
-        player.stopWalking()
+        player.brain.nav.stand()
         player.gainsOn()
-        player.walkPose()
         player.brain.loc.resetBall()
         player.brain.tracker.trackBall()
 
@@ -90,9 +88,9 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
-        player.stopWalking()
         player.gainsOn()
-        player.walkPose()
+        player.brain.nav.stand()
+        player.brain.tracker.trackBall()
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
             if player.lastStateTime > 25:
@@ -155,7 +153,7 @@ def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.gainsOn()
         player.stopWalking()
-        player.walkPose()
+        player.stand()
         player.brain.loc.resetBall()
         player.inKickingState = False
 
@@ -177,7 +175,7 @@ def penaltyShotsGamePlaying(player):
 
     if player.firstFrame():
         player.gainsOn()
-        player.walkPose()
+        player.stand()
         player.penaltyKicking = True
 
     if player.brain.play.isRole(GOALIE):

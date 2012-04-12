@@ -2,8 +2,10 @@
 Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
+import ChaseBallConstants as constants
 import GoalieTransitions as goalTran
 from ..playbook.PBConstants import GOALIE
+from objects import RelRobotLocation
 
 def chase(player):
     """
@@ -16,7 +18,23 @@ def chase(player):
         return player.goNow('approachDangerousBall')
 
     else:
+        return player.goNow('approachBall')
+
+def approachBall(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.brain.nav.goTo(player.brain.ball.loc,
+                              1.0,
+                              constants.CLOSE_ENOUGH, False)
+        
+    # most of the time going to chase will kick back to here, lets us reset
+    if transitions.shouldFindBallKick(player):
+        return player.goLater('chase')
+        
+    if transitions.shouldPrepareForKick(player):
         return player.goNow('positionForKick')
+    else:
+        return player.stay()
 
 def positionForKick(player):
     """
@@ -32,9 +50,23 @@ def positionForKick(player):
         player.brain.tracker.trackBall()
         player.inKickingState = False
 
+    kickDecider = player.brain.kickDecider
+
     if player.counter % 10 is 0:
-        player.brain.kickDecider.decideKick()
-        player.brain.nav.kickPosition(player.brain.kickDecider.getKick())
+        kickDecider.decideKick()
+
+    #only enque the new goTo destination once
+    if player.firstFrame():    
+        player.idealKickPosition = RelRobotLocation(*kickDecider.getIdealKickPosition())      
+        player.brain.nav.goTo(player.idealKickPosition, 
+                              constants.KICK_POSITIONING_GAIN,
+                              constants.CLOSE_ENOUGH, False)
+    else:
+        (bestX, bestY, bestH) = kickDecider.getIdealKickPosition()
+        player.idealKickPosition.relX = bestX
+        player.idealKickPosition.relY = bestY
+        player.idealKickPosition.relH = bestH
+        
 
     # most of the time going to chase will kick back to here, lets us reset
     if transitions.shouldFindBallKick(player):
@@ -42,8 +74,7 @@ def positionForKick(player):
         return player.goLater('chase')
 
     #if transitions.shouldKick(player):
-    if transitions.ballInPosition(player) and (player.brain.nav.isStopped() or
-                                               player.brain.nav.isAtPosition()):
+    if transitions.ballInPosition(player) or player.brain.nav.isAtPosition():
         if transitions.shouldOrbit(player):
             return player.goNow('lookAround')
         else:

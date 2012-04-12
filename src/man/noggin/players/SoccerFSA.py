@@ -56,7 +56,7 @@ class SoccerFSA(FSA.FSA):
         """
         self.brain.nav.performSweetMove(sweetMove)
 
-    def setWalk(self,x,y,theta):
+    def setWalk(self, x, y, theta):
         """
         Wrapper method to easily change the walk vector of the robot
         """
@@ -64,9 +64,6 @@ class SoccerFSA(FSA.FSA):
             self.stopWalking()
         else:
             self.brain.nav.walk(x,y,theta)
-            # else:
-            #     self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) +
-            #                 " is ignored")
 
     def getWalk(self):
         """
@@ -81,15 +78,9 @@ class SoccerFSA(FSA.FSA):
         """
         self.brain.nav.setDest(x, y, theta, gain)
 
-    def setSteps(self, x, y, theta, numSteps=1):
-        """
-        Have the robot walk a specified number of steps
-        """
-        if self.brain.motion.isWalkActive():
-            return False
-        else:
-            self.brain.nav.takeSteps(x, y, theta, numSteps)
-            return True
+    def stand(self):
+        """ Set the navigator/motion engine to stand"""
+        self.brain.nav.stand()
 
     def walkPose(self):
         """

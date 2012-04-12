@@ -8,6 +8,12 @@ BALL_OFF_KICK_THRESH = 120
 
 # Should position for kick
 BALL_PFK_LEFT_Y = 16.0
+PREPARE_FOR_KICK_DIST = 20.0
+
+#Kick positioning parameters
+#TODO: maybe make these fuzzy variables in nav?
+CLOSE_ENOUGH = (5.0, 5.0, 10)
+KICK_POSITIONING_GAIN = 0.3
 
 # Should spin to ball
 SHOULD_SPIN_TO_KICK_X = 9.5
@@ -20,8 +26,9 @@ SHOULD_KICK_AGAIN_Y = 9
 # Ball in position
 ## NOTE: important that these values slightly overestimate the values in
 ##        navigator's PFK. Otherwise there can be bad looping.
-BALL_X_OFFSET = 8
-BALL_Y_OFFSET = 8
+BALL_X_OFFSET = 4
+BALL_Y_OFFSET = 4
+GOOD_ENOUGH_H = 10
 
 # Should dribble should and should stop dribbling
 SHOULD_DRIBBLE_X = 68.

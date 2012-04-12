@@ -103,7 +103,7 @@ def penaltyRelocalize(player):
     Note: This is the old code that I'm using as a back-up in case we can't
     see any goal posts. It may be possible to make this smarter. -Wils
     """
-
+    #@todo: Go back to game playing rather than the gameControllerState?
     gcState = player.brain.gameController.currentState
 
     if player.firstFrame():
@@ -125,12 +125,5 @@ def penaltyRelocalize(player):
 
     if not player.brain.motion.isHeadActive():
         player.brain.tracker.locPans()
-
-    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
-        direction = MyMath.sign(player.getWalk()[2])
-        if direction == 0:
-            direction = 1
-
-        player.setWalk(0 , 0, constants.RELOC_SPIN_SPEED * direction)
 
     return player.stay()

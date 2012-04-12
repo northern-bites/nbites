@@ -19,7 +19,7 @@ def scanBall(tracker):
         constants.TRACKER_FRAMES_ON_TRACK_THRESH):
 
         tracker.activeLocOn = False
-        return tracker.goNow('ballTracking')
+        return tracker.goNow('tracking')
 
     if not tracker.brain.motion.isHeadActive():
         if ball.dist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:

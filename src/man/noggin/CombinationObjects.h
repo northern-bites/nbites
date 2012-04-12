@@ -117,7 +117,7 @@ namespace noggin {
         bool operator != (const RobotLocation& other) const;
         RelRobotLocation operator- (const RobotLocation& other) const;
         RobotLocation operator+ (const RelRobotLocation& other) const;
-        RelRobotLocation getRelLocationOf(const RobotLocation& other) const;
+        RelRobotLocation getRelRobotLocationOf(const RobotLocation& other) const;
 
         // Extra getter
         virtual const degrees getH(){ return h*TO_DEG; }
@@ -232,7 +232,7 @@ namespace noggin {
      * relative to the correct team.
      */
 
-    class LocBall : public Location
+    class LocBall : public Location, public RelLocation
     {
     public:
         LocBall(PyLoc&, MyInfo&);
@@ -246,8 +246,8 @@ namespace noggin {
         const float getVelXUncert() { return loc->getXVelocityUncert(); }
         const float getVelYUncert() { return loc->getYVelocityUncert(); }
         const degrees getHeading();
-        const float getRelX() { return loc->getBallRelXEst(); }
-        const float getRelY() { return loc->getBallRelYEst(); }
+        const float getRelX() const { return loc->getBallRelXEst(); }
+        const float getRelY() const { return loc->getBallRelYEst(); }
         const float getRelVelX() { return loc->getRelXVelocityEst(); }
         const float getRelVelY() { return loc->getRelYVelocityEst(); }
         const float getAccX();
@@ -259,8 +259,8 @@ namespace noggin {
         const float dX() { return dx; }
         const float dY() { return dy; }
         const float getEndY() { return endY; }
-        const float getDist() { return loc->getBallDistance(); }
-        const degrees getBearing() { return loc->getBallBearingDeg(); }
+        const float getDist() const { return loc->getBallDistance(); }
+        const degrees getBearing() const { return loc->getBallBearingDeg(); }
 
         // Other
         void update();

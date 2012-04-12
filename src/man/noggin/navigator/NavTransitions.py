@@ -5,29 +5,30 @@ import noggin_constants as NogginConstants
 from ..players import ChaseBallTransitions
 from . import NavHelper as helper
 
-def transition(nav, check, targetState, threshold):
-    
-    if check(nav):
-        check.count += 1
-    elif check.count > 0:
-        check.count -= 1
-        
-    if check.count > threshold:
-        return nav.goNow(targetState)
-    else:
-        return nav.stay()
-    
+DEBUG = True
 
-def atDestination(nav):
-    ''' Returns true if we're close enough to relDest '''
+def atLocPosition(nav):
+    """
+    Returns true if we're close enough to nav's current destination;
+    Takes into account loc uncertainty to check if we're at least close to
+    the destination according to our belief
+    """
     relDest = helper.getCurrentRelativeDestination(nav)
     my = nav.brain.my
-    return fabs(relDest.relX) < constants.CLOSE_ENOUGH_X + my.uncertX and \
-           fabs(relDest.relY) < constants.CLOSE_ENOUGH_Y + my.uncertY and \
-           fabs(relDest.relH) < constants.CLOSE_ENOUGH_H + my.uncertH
+    (x, y, h) = nav.destPrecision
     
-def notAtDestination(nav):
-    return not atDestination(nav)
+    if (nav.accountForLocUncertainty):
+        return fabs(relDest.relX) < x + my.uncertX and \
+            fabs(relDest.relY) < y + my.uncertY and \
+            fabs(relDest.relH) < h + my.uncertH
+    else:
+        return fabs(relDest.relX) < x and \
+            fabs(relDest.relY) < y and \
+            fabs(relDest.relH) < h
+            
+    
+def notAtLocPosition(nav):
+    return not atLocPosition(nav)
 
 
 def atDestinationCloser(nav, relDest):

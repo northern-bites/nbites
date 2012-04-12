@@ -45,7 +45,6 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
         cout << "Failed to initialize proxy to DCM" << endl;
     }
 
-
     initDCMAliases();
     initDCMCommands();
 

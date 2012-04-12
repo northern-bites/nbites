@@ -61,6 +61,11 @@ public:
                                   INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
     }
 
+    const bool isWalkActive() const {
+        return walkingEngine.theMotionRequest.motion == MotionRequest::stand &&
+               walkingEngine.walkingEngineOutput.isLeavingPossible;
+    }
+
 protected:
     void stand();
     void setActive() {}

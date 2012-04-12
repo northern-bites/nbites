@@ -1,29 +1,45 @@
 import man.motion as motion
 from math import fabs
 import NavConstants as constants
-from objects import RelLocation, RelRobotLocation, RobotLocation, RelRobotLocation
+from objects import RelLocation, RelRobotLocation, RobotLocation, Location
 
 # this will prevent us from rapidly switching back and forth between
 # forwards & backwards gaits (happens in spinFindBall sometimes, bad)
 BACKWARDS_GAIT_THRESH = -0.2
 SPIN_GAIT_THRESH = 0.2
 
+def stand(nav):
+    nav.walkX = 0
+    nav.walkY = 0
+    nav.walkTheta = 0
+        
+    createAndSendWalkVector(nav, 0, 0, 0)
+    
+
 def getCurrentRelativeDestination(nav):
       
     my = nav.brain.my
     field_dest = nav.dest
     
-    relativeDestination = RelRobotLocation(field_dest.x - my.x,
-                                           field_dest.y - my.y,
-                                           0)  
-      
-    if hasattr(field_dest, "h"):
-        relativeDestination.relH = field_dest.h - my.h
+    if isinstance(field_dest, RelRobotLocation):
+        return field_dest
+    
+    elif isinstance(field_dest, RelLocation):
+        return RelRobotLocation(field_dest.relX,
+                                field_dest.relY,
+                                field_dest.bearing)
+          
+    elif isinstance(field_dest, RobotLocation):
+        return my.relativeRobotLocationOf(field_dest)
+    
+    elif isinstance(field_dest, Location):
+        relLocation = my.relativeLocationOf(field_dest)
+        return RelRobotLocation(relLocation.relX,
+                                relLocation.relY,
+                                relLocation.bearing)  
+    
     else:
-        relativeDestination.relH = my.headingTo(field_dest) 
-        
-    return relativeDestination
-
+        raise TypeError, "nav.dest is not a Location type"
 
 def setDestination(nav, x, y, theta, gain = 1.0):
     """
