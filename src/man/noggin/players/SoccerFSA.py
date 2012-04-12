@@ -82,19 +82,11 @@ class SoccerFSA(FSA.FSA):
         """ Set the navigator/motion engine to stand"""
         self.brain.nav.stand()
 
-    def walkPose(self):
-        """
-        we return to std walk pose when we stop walking
-        """
-        self.brain.motion.walkPose()
-
     def stopWalking(self):
         """
         Wrapper method to navigator to easily stop the robot from walking
         """
-        nav = self.brain.nav
-        if not nav.isStopped():
-            self.brain.nav.stop()
+        self.brain.nav.stand()
 
     def ballMoved(self):
         """

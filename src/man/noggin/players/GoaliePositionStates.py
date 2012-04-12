@@ -51,7 +51,7 @@ def kickOffPosition(player):
         player.brain.nav.setDest(goalCon.MOVE_IN_KICKOFF, 0, 0)
         if player.penaltyKicking:
             player.gainsOn()
-            player.walkPose()
+            player.stand()
 
     return player.stay()
 

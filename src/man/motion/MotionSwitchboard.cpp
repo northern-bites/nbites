@@ -28,7 +28,6 @@ MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
       nextStiffnesses(vector<float>(NUM_JOINTS,0.0f)),
       lastJoints(sensorAngles),
       running(false),
-      shouldWalkPose(false),
       newJoints(false),
       newInputJoints(false),
       readyToSend(false),
@@ -119,26 +118,6 @@ void MotionSwitchboard::run() {
     while(running) {
         PROF_ENTER(P_SWITCHBOARD);
         realityCheckJoints();
-
-        /**
-         * This is a big fat hack. Running this code from the vision
-         * thread, and accessing the walkProvider causes awful
-         * deadlocks. So, here is my best attempt at getting around
-         * this. Sorry I'm not sorry. --Jack
-         */
-//        if (shouldWalkPose){
-//            vector<BodyJointCommand::ptr> gaitSwitches =
-//                walkProvider.getGaitTransitionCommand();
-//
-//            if(gaitSwitches.size() >= 1){
-//                vector<BodyJointCommand::ptr>::iterator i;
-//                for(i = gaitSwitches.begin(); i != gaitSwitches.end(); i++){
-//                    sendMotionCommand(*i);
-//                }
-//            }
-//            shouldWalkPose = false;
-//        }
-
 
         preProcess();
         processJoints();
@@ -895,13 +874,4 @@ vector<BodyJointCommand::ptr> MotionSwitchboard::generateNextBodyProviderTransit
                             Kinematics::INTERPOLATION_SMOOTH))  );
 
     return commands;
-}
-
-/**
- * Send a scripted command which moves the robot to the Walk position
- */
-void MotionSwitchboard::walkPose()
-{
-    //make it stand
-    this->sendMotionCommand(WalkCommand::ptr(new WalkCommand(0, 0, 0)));
 }

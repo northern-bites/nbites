@@ -141,7 +141,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("sendStepCommand", &PyMotionInterface::sendStepCommand)
-    .def("sendDestCommand", &PyMotionInterface::sendDestCommand)
+        .def("sendDestCommand", &PyMotionInterface::sendDestCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead", &PyMotionInterface::setHead)
         .def("coordHead", &PyMotionInterface::coordHead)
@@ -154,7 +154,6 @@ BOOST_PYTHON_MODULE(_motion)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
         .def("resetWalk", &PyMotionInterface::resetWalkProvider)
         .def("resetScripted", &PyMotionInterface::resetScriptedProvider)
-        .def("walkPose", &PyMotionInterface::walkPose)
         ;
 }
 

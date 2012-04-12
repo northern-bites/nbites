@@ -40,7 +40,7 @@ def gameReady(player):
     """
     if player.firstFrame():
         player.stopWalking()
-        player.walkPose()
+        player.stand()
         player.brain.tracker.switchTo('locPans')
     return player.stay()
 

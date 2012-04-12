@@ -99,8 +99,6 @@ public:
     void setBalanceMode( int pBalanceMode ) const ;
     int getBalanceMode() const;
 
-    void walkPose() const;
-
     int getFrameCount() const { return switchboard->getFrameCount(); }
 
 private:

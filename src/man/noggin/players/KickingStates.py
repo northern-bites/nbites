@@ -33,7 +33,7 @@ def afterKick(player):
     Currently exits after one frame.
     """
     if player.firstFrame():
-        player.walkPose()        # stand up right, ready to walk
+        player.stand()        # stand up right, ready to walk
         player.brain.tracker.trackBall()
 
         kick = player.brain.kickDecider.getKick()
