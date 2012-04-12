@@ -14,13 +14,18 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager) {
     MImage::const_ptr rawMImage = memoryManager->getMemory()->getMImage();
     FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(rawMImage, this);
-
-    OverlayImage shapes = new OverlayImage(memoryManager->getMemory()->getMVision());
-    OverlayedImage combo = new OverlayedImage(rawBMP, shapes, this);
+    int drawShapes = 1;
+    BMPImageViewer* imageViewer;
+    if(drawShapes>0){
+      VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision());
+      OverlayedImage* combo = new OverlayedImage(rawBMP, shapes, this);
     
-    BMPImageViewer imageViewer = new BMPImageViewer(combo, this);
-
-    this->setCentralWidget(&imageViewer);
+      imageViewer = new BMPImageViewer(combo, this);
+    }
+    else{
+      imageViewer = new BMPImageViewer(rawBMP, this);
+    }
+    this->setCentralWidget(imageViewer);
     memoryManager->connectSlotToMObject(imageViewer,
                         SLOT(updateView()), MIMAGE_ID);
 

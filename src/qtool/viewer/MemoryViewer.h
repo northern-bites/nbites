@@ -16,8 +16,7 @@
 #include "man/memory/Memory.h"
 #include "image/BMPYUVImage.h"
 
-#include "image/OverlayImage.h"
-
+#include "image/VisualInfoImage.h"
 #include "data/RobotMemoryManager.h"
 #include "BMPImageViewer.h"
 #include "ChannelImageViewer.h"

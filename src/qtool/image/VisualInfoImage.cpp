@@ -1,4 +1,4 @@
-#include "OverlayImage.h"
+#include "VisualInfoImage.h"
 #include <Qt>
 #include <QPainter>
 
@@ -8,12 +8,12 @@ namespace image {
     using namespace man::memory;
     using namespace google::protobuf;
 
-    OverlayImage::OverlayImage(MVision::const_ptr visionData) :
+    VisualInfoImage::VisualInfoImage(MVision::const_ptr visionData) :
 	visionData(visionData)
 
 { } 
 
-void OverlayImage::buildBitmap() {
+void VisualInfoImage::buildBitmap() {
      int image_width = 640;
      int image_height = 480;
      bitmap= QImage(image_width,image_height, QImage::Format_ARGB32);
@@ -69,7 +69,7 @@ void OverlayImage::buildBitmap() {
   
 }
 
-void OverlayImage::drawBall(const PVision::PVisualBall ballData) {
+void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
     QPainter painter(&bitmap);
     painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -83,7 +83,7 @@ void OverlayImage::drawBall(const PVision::PVisualBall ballData) {
     painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
   }
 
-void OverlayImage::drawCorner(const PVision::PVisualCorner cornerData) {
+void VisualInfoImage::drawCorner(const PVision::PVisualCorner cornerData) {
     QPainter painter(&bitmap);
     painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -99,7 +99,7 @@ void OverlayImage::drawCorner(const PVision::PVisualCorner cornerData) {
     
   }
   
-void OverlayImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
+void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     QPainter painter(&bitmap);
     painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -125,7 +125,7 @@ void OverlayImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     painter.drawConvexPolygon(points, 4);
 }
 
-  void OverlayImage::drawNavyRobot(const PVision::PVisualRobot robotData) {
+  void VisualInfoImage::drawNavyRobot(const PVision::PVisualRobot robotData) {
     QPainter painter(&bitmap);
     painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -150,7 +150,7 @@ void OverlayImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     painter.setBrush(QBrush(QColor(0,0,200,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
   }
- void OverlayImage::drawRedRobot(const PVision::PVisualRobot robotData) {
+ void VisualInfoImage::drawRedRobot(const PVision::PVisualRobot robotData) {
     QPainter painter(&bitmap);
     painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -176,7 +176,7 @@ void OverlayImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     painter.drawConvexPolygon(points, 4);
   }
 
-  void OverlayImage::drawLine(const PVision::PVisualLine lineData) {
+  void VisualInfoImage::drawLine(const PVision::PVisualLine lineData) {
     QPainter painter(&bitmap);
     painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -190,7 +190,7 @@ void OverlayImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     painter.drawLine(start_x, start_y, end_x, end_y);
   }
 
-  void OverlayImage::drawCross(const PVision::PVisualCross crossData) {
+  void VisualInfoImage::drawCross(const PVision::PVisualCross crossData) {
     QPainter painter(&bitmap);
     painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing, true);

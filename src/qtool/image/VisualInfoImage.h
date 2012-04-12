@@ -1,5 +1,5 @@
 /**
- * @class OverlayImage
+ * @class VisualInfoImage
  * 
  * Draws an overlay of the location of the ball and corners over the image in qtool.
  *
@@ -15,12 +15,12 @@ namespace qtool {
 namespace image {
 
 
-class OverlayImage : public BMPImage
+class VisualInfoImage : public BMPImage
 {
 
  public:
-    OverlayImage(man::memory::MVision::const_ptr visionData);
-    virtual ~OverlayImage() {};
+    VisualInfoImage(man::memory::MVision::const_ptr visionData);
+    virtual ~VisualInfoImage() {};
 
     void buildBitmap();
     void drawBall(const man::memory::proto::PVision::PVisualBall);
