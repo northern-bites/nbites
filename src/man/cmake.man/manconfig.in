@@ -11,17 +11,6 @@
 // :::::::::::::::::::::::::::::::::::::::::::::::::::::: Options variables :::..
 
 
-# define TARGET_HOST_UNKNOWN    0
-# define TARGET_HOST_LINUX      1
-# define TARGET_HOST_WINDOWS    2
-# define TARGET_HOST_MACOSX     3
-
-# define TARGET_HOST ${TARGET_HOST}
-
-# if TARGET_HOST == TARGET_HOST_UNKNOWN
-#   error "Target host not supported, or badly detected !"
-# endif // TARGET_HOST == TARGET_HOST_UNKNOWN
-
 # define MANMODULE_REVISION "${MANMODULE_REVISION}"
 
 //

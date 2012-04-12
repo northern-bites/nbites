@@ -1,4 +1,4 @@
-#include "alcore/alerror.h"
+#include "alerror/alerror.h"
 #include "NaoLights.h"
 #include "ALLedNames.h"
 
@@ -6,12 +6,12 @@
 //#define DEBUG_NAOLIGHTS_INIT
 //#define DEBUG_NAOLIGHTS_COMMAND
 
-NaoLights::NaoLights(AL::ALPtr<AL::ALBroker> broker)
+NaoLights::NaoLights(boost::shared_ptr<AL::ALBroker> broker)
     :Lights(),
      hexList(ALNames::NUM_UNIQUE_LEDS,0x000000)
 {
     try {
-        dcmProxy = AL::ALPtr<AL::DCMProxy>(new AL::DCMProxy(broker));
+        dcmProxy = boost::shared_ptr<AL::DCMProxy>(new AL::DCMProxy(broker));
     } catch(AL::ALError &e) {
 		std::cout << "Failed to initialize proxy to DCM" << std::endl;
     }

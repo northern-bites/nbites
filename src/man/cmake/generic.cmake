@@ -1,31 +1,21 @@
 
-########################## PLATFORM
-IF( WIN32 )
-  SET( TARGET_ARCH "windows" )
-  SET( TARGET_HOST "TARGET_HOST_WINDOWS")
-ENDIF( WIN32 )
-
-IF( UNIX )
-  SET( TARGET_ARCH "linux")
-  SET( TARGET_HOST "TARGET_HOST_LINUX")
-  SET( PLATFORM_X86 1 )
-ENDIF( UNIX )
-
-IF( APPLE )
-  SET( TARGET_ARCH "macosx" )
-  SET( TARGET_HOST "TARGET_HOST_MACOSX")
-ENDIF( APPLE )
+include("${CMAKE_CURRENT_LIST_DIR}/find_nbites_dir.cmake")
 
 SET( OFFLINE ON )
+SET( BUILDING_FOR_A_REMOTE_NAO OFF )
 
 ######## CCache
 
-if (CCACHE)
-  SET( CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
-  SET( CMAKE_CXX_COMPILER ${CCACHE})
-  SET( CMAKE_C_COMPILER_ARG1 ${CMAKE_C_COMPILER})
-  SET( CMAKE_C_COMPILER ${CCACHE})
-endif()
+# CMake automatically uses ccache nowadays, so this is redundant
+
+#if (CCACHE)
+##  SET( CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
+#  SET( CMAKE_CXX_COMPILER ${CCACHE})
+#  SET( CMAKE_C_COMPILER_ARG1 ${CMAKE_C_COMPILER})
+#  SET( CMAKE_C_COMPILER ${CCACHE})
+#endif()
+
+SET( ROBOT_TYPE "NAO_NEXTGEN" )
 
 ######## PyVersion
 ### Note: the robots currently use 2.6, so this is to make sure cmake
@@ -37,7 +27,7 @@ SET( CMAKE_USE_PYTHON_VERSION 2.6 )
 # so we use the same version as on the robot
 # The order matters - this forces cmake to first look in
 # nbites_dir/ext, then the regular system folders
-SET( CMAKE_FIND_ROOT_PATH  $ENV{NBITES_DIR}/ext/ /usr/)
+SET( CMAKE_FIND_ROOT_PATH  ${NBITES_EXT} /usr/)
 
 # search for programs in the system root
 SET( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )

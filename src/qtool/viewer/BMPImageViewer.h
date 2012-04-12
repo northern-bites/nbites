@@ -29,7 +29,7 @@ public:
         return QSize(image->getWidth(), image->getHeight());
     }
 
-protected slots:
+public slots:
     void updateView();
 
 protected:
@@ -38,6 +38,7 @@ protected:
 
 protected:
     image::BMPImage* image;
+    image::BMPImage* overlay;
     QLabel imagePlaceholder;
 
 };

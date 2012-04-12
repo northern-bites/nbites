@@ -7,7 +7,7 @@ namespace qtool {
 namespace viewer {
 
 BMPImageViewer::BMPImageViewer(image::BMPImage* image,
-                                 QWidget *parent)
+                               QWidget *parent)
     : QWidget(parent), image(image) {
     setupUI();
 }
@@ -24,18 +24,19 @@ void BMPImageViewer::setupUI() {
 void BMPImageViewer::updateView() {
     if (this->isVisible()) {
         image->updateBitmap();
-        //enqueues a repaint - thread-safe
-        this->QWidget::update();
         QImage* qimage = image->getBitmap();
         if (qimage) {
             imagePlaceholder.setPixmap(QPixmap::fromImage(*(qimage)));
         } else {
             imagePlaceholder.setText("Underlying Null image pointer!");
         }
+        //enqueues a repaint - thread-safe
+        this->QWidget::update();
     }
 }
 
-void BMPImageViewer::showEvent(QShowEvent * ) {
+void BMPImageViewer::showEvent(QShowEvent * e) {
+    QWidget::showEvent(e);
     //explicitely update the bitmap when the widget becomes visible again
     //since it might have changed!
     this->updateView();

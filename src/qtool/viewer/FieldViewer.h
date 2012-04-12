@@ -17,8 +17,8 @@
 #include <vector>
 
 #include "data/DataManager.h"
-#include "MObjectViewer.h"
-#include "PaintField.h"
+#include "image/PaintField.h"
+#include "BMPImageViewer.h"
 
 namespace qtool {
 namespace viewer {
@@ -32,7 +32,8 @@ public:
 private:
     std::vector<QDockWidget*> dockWidget;
     data::DataManager::ptr dataManager;
-    PaintField* paintField;
+    image::PaintField* paintField;
+    BMPImageViewer* fieldView;
 
 };
 

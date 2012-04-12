@@ -20,11 +20,14 @@ class MVision: public MObject {
 
     ADD_SHARED_PTR(MVision);
 
+    typedef boost::shared_ptr<proto::PVision> PVision_ptr;
+
 public:
     static const MObject_ID id = MVISION_ID;
 
 public:
-    MVision(boost::shared_ptr<Vision> vision);
+    MVision(boost::shared_ptr<Vision> vision,
+            PVision_ptr data = PVision_ptr(new proto::PVision()));
     virtual ~MVision();
 
     /**
@@ -51,7 +54,7 @@ private:
 	    VisualCross* visualCross);
 private:
     boost::shared_ptr<Vision> vision;
-    boost::shared_ptr<proto::PVision> data;
+    PVision_ptr data;
 
 };
 }
