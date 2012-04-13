@@ -22,7 +22,6 @@ class Navigator(FSA.FSA):
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
-        self.justKicked = False
 
         # Goto controls
         self.dest = RobotLocation(0, 0, 0)
