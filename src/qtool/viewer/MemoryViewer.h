@@ -12,6 +12,7 @@
 #include <QWidget>
 #include <QtGui>
 #include <vector>
+#include <QCheckBox>
 
 #include "man/memory/Memory.h"
 #include "image/BMPYUVImage.h"
@@ -31,11 +32,13 @@ class MemoryViewer : public QMainWindow{
 public:
     MemoryViewer(data::RobotMemoryManager::const_ptr memoryManager);
 
+private slots:
+    void toggleOverlay() {};
+ 
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
-    //viewer::BMPImageViewer imageViewer;
-    //    image::Overlaye
+
 };
 
 }
