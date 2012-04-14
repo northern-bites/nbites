@@ -16,33 +16,33 @@ LoggingBoard::LoggingBoard(Memory::const_ptr memory) :
 void LoggingBoard::newOutputProvider(OutProvider::ptr outProvider,
 									 MObject_ID id) {
 
-    MObjectLogger::ptr logger(
-    			new MObjectLogger(outProvider,  memory->getMObject(id)));
+    MessageLogger::ptr logger(
+    			new MessageLogger(outProvider,  memory->getMObject(id)));
     objectIOMap[id] = logger;
     memory->subscribe(logger.get(), id);
     //start the logging thread
     logger->start();
 }
 
-MObjectLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
+MessageLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
     ObjectIOMap::const_iterator it = objectIOMap.find(id);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
         return it->second;
     } else {
-        return MObjectLogger::const_ptr();
+        return MessageLogger::const_ptr();
     }
 }
 
-MObjectLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
+MessageLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
     ObjectIOMap::iterator it = objectIOMap.find(id);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
         return it->second;
     } else {
-        return MObjectLogger::ptr();
+        return MessageLogger::ptr();
     }
 }
 

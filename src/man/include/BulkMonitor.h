@@ -58,7 +58,7 @@ private:
     boost::shared_ptr<Speech> speech;
     SensorMonitor* monitors;
     int numberMonitors;
-    string bulkName; // output file we log to in /home/nao/naoqi/log/
+    string bulkName; // output file we log to in /home/nao/nbites/log/
 };
 
 #endif

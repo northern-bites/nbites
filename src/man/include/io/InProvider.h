@@ -37,9 +37,16 @@ public:
     virtual bool reachedEnd() const = 0;
     virtual void peekAt(char* buffer, uint32_t size) const throw (read_exception) = 0;
 
-    // does a read from the source of the input
-    // might be blocking or might be asynchronous (in which case
-    // readInProgress() is going to return true as the read is running)
+    /* does a read from the source of the input
+     * might be blocking or might be asynchronous (in which case
+     * readInProgress() is going to return true as the read is running)
+     *
+     * once the read is done, readInProgress will return false
+     * and bytesRead() will return the number of bytes read
+     *
+     * WARNING: it might legitimately read less bytes than the buffer size,
+     * so don't bank on it always reading an entire buffer!
+     */
     virtual void readCharBuffer(char* buffer, uint32_t size) const
                                         throw (read_exception) = 0;
 

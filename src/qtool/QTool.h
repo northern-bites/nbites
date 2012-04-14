@@ -19,6 +19,7 @@
 #include "viewer/BallEKFViewer.h"
 #include "viewer/FieldViewer.h"
 #include "remote/RobotSelect.h"
+#include "overseer/OverseerClient.h"
 
 #ifndef NBITES_DIR
 #define NBITES_DIR "~/nbites"
@@ -53,6 +54,8 @@ private:
     offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::FieldViewer* fieldViewer;
+    overseer::OverseerClient* overseerClient;
+
     QPushButton* prevButton;
     QPushButton* nextButton;
     QPushButton* recordButton;

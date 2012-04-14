@@ -76,7 +76,7 @@ Sensors::Sensors(boost::shared_ptr<Speech> s) :
         varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
         fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
         unfilteredInertial(), chestButton(0.0f), batteryCharge(0.0f),
-        batteryCurrent(0.0f), FRM_FOLDER("/home/nao/naoqi/frames"),
+        batteryCurrent(0.0f), FRM_FOLDER("/home/nao/nbites/frames"),
         saving_frames_on(false) {
 
     mutex* vision_sensors_mutices[] = { &battery_mutex, &bumper_mutex,
