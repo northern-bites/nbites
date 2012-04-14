@@ -25,7 +25,7 @@ QTool::QTool() : QMainWindow(),
         ballEKFViewer(new BallEKFViewer(dataManager)),
         fieldViewer(new FieldViewer(dataManager)),
         overseerClient(new OverseerClient(dataManager, this)),
-        graphViewer(new GraphViewer())			
+		 graphViewer(new GraphViewer(dataManager, this))			
 {
 
     this->setWindowTitle(tr("HackTool"));

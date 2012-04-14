@@ -57,7 +57,6 @@ target_link_libraries(
   image
   memory
   ${QT_LIBRARIES}
-  ${QT_QTSVG_LIBRARY}
   #${R_LIBRARY} 
   ${QWT_LIBRARY}
 

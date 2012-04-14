@@ -4,17 +4,31 @@ namespace qtool
 {
   namespace viewer
   {
-    GraphViewer::GraphViewer(QWidget *parent)
-      : QWidget(parent), layout(new QGridLayout(this)), graphOptions(new QVBoxLayout(this)),
-	graphTitleOption(new QHBoxLayout(this))
+    GraphViewer::GraphViewer(qtool::data::DataManager::ptr dataManager, QWidget *parent)
+      : QWidget(parent), layout(new QGridLayout(this)), graphOptions(new QVBoxLayout()),
+	graphTitleOption(new QHBoxLayout()), plotOptions(new QHBoxLayout()),
+	dataManager(dataManager)
     {
+      // Setup signals for protocol buffer messages.
+      dataManager->connectSlotToMObject(this, 
+					SLOT( updateMotionSensors() ), 
+					man::memory::MMOTION_SENSORS_ID);
+
       updateGraphButton = new QPushButton(tr("Update Graph"), this);
       graphTitleInput   = new QLineEdit(tr("Default Plot"), this);
-      graphTitleLabel   = new QLabel(tr("Graph title: "));
-      xAxisTitleLabel   = new QLabel(tr("Horizontal axis label: "));
+      graphTitleLabel   = new QLabel(tr("Graph title: "), this);
+      xAxisTitleLabel   = new QLabel(tr("Horizontal axis label: "), this);
       xAxisTitleInput   = new QLineEdit(this);
-      yAxisTitleLabel   = new QLabel(tr("Vertical axis label: "));
+      yAxisTitleLabel   = new QLabel(tr("Vertical axis label: "), this);
       yAxisTitleInput   = new QLineEdit(this);
+
+      plotOptionsLabel  = new QLabel(tr("Plot curve options: "), this);
+      setPlotLineButton = new QRadioButton(tr("Line"), this);
+      setPlotDotsButton = new QRadioButton(tr("Points"), this);
+
+      plotOptionsGroup  = new QButtonGroup(this);
+      plotOptionsGroup->addButton(setPlotLineButton);
+      plotOptionsGroup->addButton(setPlotDotsButton);
 
       graphTitleOption->addWidget(graphTitleLabel);
       graphTitleOption->addWidget(graphTitleInput);
@@ -23,10 +37,17 @@ namespace qtool
       graphTitleOption->addWidget(yAxisTitleLabel);
       graphTitleOption->addWidget(yAxisTitleInput);
 
+      plotOptions->addWidget(plotOptionsLabel);
+      plotOptions->addWidget(setPlotLineButton);
+      plotOptions->addWidget(setPlotDotsButton);
+
       graphOptions->addLayout(graphTitleOption);
+      graphOptions->addLayout(plotOptions);
       graphOptions->addWidget(updateGraphButton);
 
-      connect(updateGraphButton, SIGNAL( clicked() ), SLOT( updateGraph() ));
+      connect(updateGraphButton, SIGNAL( clicked() ), this, SLOT( updateGraph() ));
+
+      connect(plotOptionsGroup, SIGNAL( buttonPressed(int) ), this, SLOT( updateCurveStyle(int) ));
 
       centralPlot = new QwtPlot(QwtText("Default Plot"));
 
@@ -38,14 +59,18 @@ namespace qtool
 	xData.push_back((double)i);
 	yData.push_back(std::sqrt((double)i));
       }
-      plotCurve(xData, yData, "f(x) = sqrt(x)");
+      plotCurve(xData, yData, "f(x) = sqrt(x)", QwtPlotCurve::Lines);
 
       layout->addLayout(graphOptions, 1, 0, Qt::AlignTop);
       layout->addWidget(centralPlot, 0, 0, 1, 1);
 
       this->setLayout(layout);
 
-    }
+      motionSensors = dataManager->getMemory()->getMObject(man::memory::MMOTION_SENSORS_ID);
+      man::memory::ProtoMessage_const_ptr motionSensorsMessage = motionSensors->getProtoMessage();
+      //std::cout << motionSensorsMessage->timestamp() << std::endl;
+      //std::cout << motionSensorsMessage->body_temperatures << std::endl;
+   }
 
     GraphViewer::~GraphViewer()
     {
@@ -53,16 +78,12 @@ namespace qtool
       //R = 0;
       delete centralPlot;
       centralPlot = 0;
-      // Clean up curves in memory.
-      for(int i = 0; i < curves.size(); ++i)
-      {
-	if(curves[i])
-	{
-	  std::cout << "Deleting curve " << i << "." << std::endl;
-	  delete curves[i];
-	  curves[i] = 0;
-	}
-      }
+      delete graphOptions;
+      graphOptions = 0;
+      delete graphTitleOption;
+      graphTitleOption = 0;
+      delete plotOptions;
+      plotOptions = 0;
     }
 
     //void GraphViewer::initializeR(int argc, char *argv[])
@@ -73,9 +94,12 @@ namespace qtool
     //}
     //}
 
-    void GraphViewer::plotCurve(QVector<double> x, QVector<double> y, QString title)
+    void GraphViewer::plotCurve(QVector<double> x, QVector<double> y, QString title,
+				QwtPlotCurve::CurveStyle style)
     {
       QwtPlotCurve *curve = new QwtPlotCurve(title);
+
+      curve->setStyle(style);
 
       curves.push_back(curve);
 
@@ -88,12 +112,36 @@ namespace qtool
 
     void GraphViewer::updateGraph()
     {
-      // @todo
-      std::cout << "Updating graph..." << std::endl;
+      //std::cout << "Updating graph..." << std::endl;
 
       centralPlot->setTitle(graphTitleInput->text());
       centralPlot->setAxisTitle(QwtPlot::xBottom, xAxisTitleInput->text());
       centralPlot->setAxisTitle(QwtPlot::yLeft, yAxisTitleInput->text());
+    }
+
+    void GraphViewer::updateCurveStyle(int id)
+    {
+      //std::cout << "Updating curve style..." << std::endl;
+      if(id == plotOptionsGroup->id(setPlotLineButton))
+      {
+	curves[0]->setStyle(QwtPlotCurve::Lines);
+	centralPlot->replot();
+      }
+      else if(id == plotOptionsGroup->id(setPlotDotsButton))
+      {
+	curves[0]->setStyle(QwtPlotCurve::Dots);
+	centralPlot->replot();
+      }
+      else
+      {
+      	std::cout << "GraphViewer::updateCurveStyle() bad id!" << std::endl;
+      }
+    }
+
+    void GraphViewer::updateMotionSensors()
+    {
+      std::cout << "Updating Motion Sensor message..." << std::endl;
+      motionSensors = dataManager->getMemory()->getMObject(man::memory::MMOTION_SENSORS_ID);
     }
   }
 }
